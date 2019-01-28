@@ -12,23 +12,18 @@
 
 class Ipd_callback
 {
-public: 
-	static void get_ipd_data(string slaveName);
-	static void set_ipd_data(const custom_msgs::IPDtoEC);
+public:
+  static void get_ipd_data(string slaveName);
+  static void set_ipd_data(const custom_msgs::IPDtoEC);
 
 private:
-	//upstream
-	const static int16_t IpdDesiredStateLocation	= 0;
-	const static int16_t IpdErrorRegisterLocation	= 1;
-	
+  // upstream
+  const static int16_t IpdDesiredStateLocation = 0;
+  const static int16_t IpdErrorRegisterLocation = 1;
 
-	//downstream
-	const static int16_t IpdActualStateLocation		= 2;
-	const static int16_t IpdErrorMessageLocation	= 0;
-
+  // downstream
+  const static int16_t IpdActualStateLocation = 2;
+  const static int16_t IpdErrorMessageLocation = 0;
 };
 
-
-
-
-#endif //IPD_CALLBACK_
+#endif  // IPD_CALLBACK_

@@ -7,7 +7,7 @@
 #include "ipd_callback.h"
 #include "update.h"
 
-//import message types
+// import message types
 #include <custom_msgs/ECtoJH.h>
 #include <custom_msgs/ECtoUG.h>
 #include <custom_msgs/ECtoLG.h>
@@ -18,23 +18,23 @@
 
 #include "launch_parameters.h"
 
-//JOINTHANDLER
+// JOINTHANDLER
 static vector<ros::Subscriber*> jointPositionSubList;
 static vector<ros::Subscriber*> jointWordSubList;
 static map<string, ros::Publisher*> jointHandlerPubMap;
 
-//GESHANDLER
+// GESHANDLER
 static map<string, ros::Publisher*> gesHandlerPubMap;
 static ros::Subscriber* speakerSubPtr;
 
-//SAFETY
+// SAFETY
 static ros::Publisher* safetyPubPtr;
 
-//PDBHANDLER
+// PDBHANDLER
 static ros::Publisher* PdbHandlerPubPtr;
 static ros::Subscriber* PdbCommandSubPtr;
 
-//IPDHANDLER
+// IPDHANDLER
 static ros::Publisher* IpdHandlerPubPtr;
 
 static ros::Subscriber* IpdHandlerSubPtr;
@@ -55,4 +55,4 @@ void publish_to_ipd_handler(string slaveName, custom_msgs::ECtoIPD msg);
 
 void rosSpinOnce();
 
-#endif //ROS_INIT_
+#endif  // ROS_INIT_

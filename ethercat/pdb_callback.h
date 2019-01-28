@@ -11,10 +11,9 @@
 
 class Pdb_callback
 {
-public: 
-	static void set_pdb_command(const std_msgs::UInt8 &msgIn);
-	static void get_pdb_data(string slaveName);	
+public:
+  static void set_pdb_command(const std_msgs::UInt8& msgIn);
+  static void get_pdb_data(string slaveName);
 };
 
-
-#endif //PDB_CALLBACK_
+#endif  // PDB_CALLBACK_

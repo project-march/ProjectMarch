@@ -12,20 +12,16 @@
 
 #include "launch_parameters.h"
 
-
 class Imc_callback
 {
-public: 
+public:
+  // static void set_imc_data(const custom_msgs::JHtoEC &msgIn);
+  static void get_imc_data(string slavename);
 
-	// static void set_imc_data(const custom_msgs::JHtoEC &msgIn);
-	static void get_imc_data(string slavename);
+  static void set_target_position(const custom_msgs::IUPos& msgIn);
+  static void set_controlword(const custom_msgs::register16Msg& msgIn);
 
-	static void set_target_position(const custom_msgs::IUPos &msgIn);
-	static void set_controlword(const custom_msgs::register16Msg &msgIn);
-
-	static void set_SDO(const custom_msgs::SDOMsg &msgIn);
-
-
+  static void set_SDO(const custom_msgs::SDOMsg& msgIn);
 };
 
-#endif //IMC_CALLBACK_
+#endif  // IMC_CALLBACK_
