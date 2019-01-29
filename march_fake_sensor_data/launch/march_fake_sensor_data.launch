@@ -3,6 +3,7 @@
     <rosparam>
       min_temperature: 0
       max_temperature: 50
+      sensors: ['fake_ankle_joint', 'fake_hip_joint']
     </rosparam>
   </node>
 </launch>
