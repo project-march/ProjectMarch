@@ -33,6 +33,22 @@ void publishTemperature(ros::Publisher temperature_pub)
   temperature_pub.publish(msg);
 }
 
+/**
+ * Combine the base topic name with sensor name
+ * @param base the leading part of the topic
+ * @param name the sensor name
+ * @return
+ */
+std::string createTopicName(const char* base, const char* name){
+  char slash[] = "/";
+  // Create a char array of the combined size of all three parts
+  char full_topic[strlen(base) + strlen(slash) + strlen(name)];
+  strcpy(full_topic, base);      // copy string one into full_topic.
+  strcat(full_topic, slash);     // append the slash to full_topic.
+  strcat(full_topic, name);      // append the name two to full_topic.
+  return full_topic;
+}
+
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "march_fake_sensor_data");
@@ -47,8 +63,7 @@ int main(int argc, char** argv)
 
   for (std::string sensor_name : sensor_names)
   {
-    //TODO(Tim) add '/' in the topic name
-    ros::Publisher temperature_pub = n.advertise<sensor_msgs::Temperature>(TopicNames::temperature + sensor_name, 1000);
+    ros::Publisher temperature_pub = n.advertise<sensor_msgs::Temperature>(createTopicName(TopicNames::temperature, sensor_name.c_str()), 1000);
     temperature_publishers.push_back(temperature_pub);
   }
 
