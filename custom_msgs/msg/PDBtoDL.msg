@@ -1,0 +1,13 @@
+int8 command
+float32 LVNetCurrent
+float32 PDBNetCurrent
+uint16 HVConnectionsStates	
+uint8 HVConnectionsTrigger
+uint8 HVConnectionsI2t
+float32 HVConnectionsCurrentRH
+float32 HVConnectionsCurrentLH
+float32 HVConnectionsCurrentRK
+float32 HVConnectionsCurrentLK
+float32 HVConnectionsCurrentRA
+float32 HVConnectionsCurrentLA
+uint8 errorMessage

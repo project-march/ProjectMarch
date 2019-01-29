@@ -1,0 +1,3 @@
+string slaveName
+uint8 IpdErrorRegister
+int8 IpdDesiredState
