@@ -15,6 +15,23 @@ int max_temperature = 50;
 std::vector<std::string> sensor_names;
 std::vector<ros::Publisher> temperature_publishers;
 
+// Store the 7 most recent generated temperatures so we can take the weighted average of them when we publish.
+std::vector<double> latest_temperatures = { 0, 0, 0, 0, 0, 0, 0 };
+
+// The weights of the autoregression, the most recent temperature has the highest weight.
+std::vector<double> ar_values = { 0.1, 0.1, 0.1, 0.15, 0.15, 0.2, 0.2 };
+
+// Calculate the weighted average of the latest_temperatures
+double calculateArTemperature()
+{
+  double res = 0;
+  for (int i = 0; i < latest_temperatures.size(); i++)
+  {
+    res += latest_temperatures.at(i) * ar_values.at(i);
+  }
+  return res;
+}
+
 /**
  * This callback is called when parameters from the config file are changed during run-time.
  * This method updates the local values which depend on these parameters to make ensure the values are not out-of-date.
@@ -39,8 +56,13 @@ void callback(march_fake_sensor_data::TemperaturesConfig& config, uint32_t level
 void publishTemperature(ros::Publisher temperature_pub)
 {
   // Pick a random value between min and max temperature
-  double current_temperature = rand() % (max_temperature - min_temperature + 1) + min_temperature;
+  double random_temperature = rand() % (max_temperature - min_temperature) + min_temperature;
 
+  // Update the vector with the latest temperatures by removing the first entry and adding a new one.
+  latest_temperatures.erase(latest_temperatures.begin());
+  latest_temperatures.push_back(random_temperature);
+
+  double current_temperature = calculateArTemperature();
   sensor_msgs::Temperature msg;
   msg.temperature = current_temperature;
   msg.header.stamp = ros::Time::now();
