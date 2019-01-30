@@ -6,8 +6,8 @@
 
     <node name="march_fake_sensor_data" pkg="march_fake_sensor_data" type="march_fake_temperature_data_node" output="screen">
         <rosparam>
-            min_temperature: 1
-            max_temperature: 40
+            min_temperature: 0
+            max_temperature: 50
         </rosparam>
     </node>
 </launch>
