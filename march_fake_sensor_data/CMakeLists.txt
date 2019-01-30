@@ -33,9 +33,9 @@ file(GLOB_RECURSE lintfiles
 
 roslint_cpp(${lintfiles})
 
-add_executable(march_fake_sensor_data_node
-        src/FakeSensorData.cpp
+add_executable(march_fake_temperature_data_node
+        src/FakeTemperatureData.cpp
         )
 
-add_dependencies(march_fake_sensor_data_node ${PROJECT_NAME}_gencfg ${catkin_EXPORTED_TARGETS})
-target_link_libraries(march_fake_sensor_data_node ${catkin_LIBRARIES})
+add_dependencies(march_fake_temperature_data_node ${PROJECT_NAME}_gencfg ${catkin_EXPORTED_TARGETS})
+target_link_libraries(march_fake_temperature_data_node ${catkin_LIBRARIES})
