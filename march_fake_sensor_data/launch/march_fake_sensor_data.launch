@@ -1,9 +1,13 @@
 <launch>
-  <node name="march_fake_sensor_data" pkg="march_fake_sensor_data" type="march_fake_sensor_data_node" output="screen">
+    <!--The available sensors in this fake system -->
     <rosparam>
-      min_temperature: 0
-      max_temperature: 50
-      sensors: ['fake_ankle_joint', 'fake_hip_joint']
+        sensors: [fake_ankle_joint, fake_hip_joint]
     </rosparam>
-  </node>
+
+    <node name="march_fake_sensor_data" pkg="march_fake_sensor_data" type="march_fake_sensor_data_node" output="screen">
+        <rosparam>
+            min_temperature: 0
+            max_temperature: 50
+        </rosparam>
+    </node>
 </launch>
