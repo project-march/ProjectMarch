@@ -23,6 +23,11 @@ std::vector<ros::Publisher> temperature_publishers;
  */
 void callback(march_fake_sensor_data::TemperaturesConfig& config, uint32_t level)
 {
+  // Make sure there is always a possible interval between min and max temperature.
+  if (config.min_temperature >= config.max_temperature)
+  {
+    config.max_temperature = config.min_temperature + 1;
+  }
   min_temperature = config.min_temperature;
   max_temperature = config.max_temperature;
 }
@@ -34,7 +39,7 @@ void callback(march_fake_sensor_data::TemperaturesConfig& config, uint32_t level
 void publishTemperature(ros::Publisher temperature_pub)
 {
   // Pick a random value between min and max temperature
-  double current_temperature = rand() % (max_temperature - min_temperature) + min_temperature;
+  double current_temperature = rand() % (max_temperature - min_temperature + 1) + min_temperature;
 
   sensor_msgs::Temperature msg;
   msg.temperature = current_temperature;
