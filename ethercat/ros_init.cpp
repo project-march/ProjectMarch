@@ -14,8 +14,6 @@ void publish_to_joint_handler(string slaveName, custom_msgs::ECtoJH msg)
 }
 
 //------------------------------------------------------------------------------------------------//
-
-//------------------------------------------------------------------------------------------------//
 // GES HANDLER PUB FUNCTIONS
 //------------------------------------------------------------------------------------------------//
 
@@ -35,8 +33,6 @@ void publish_to_ges_handler(string slaveName, custom_msgs::ECtoLG msg)
 // }
 
 //------------------------------------------------------------------------------------------------//
-
-//------------------------------------------------------------------------------------------------//
 // GES HANDLER PUB FUNCTIONS
 //------------------------------------------------------------------------------------------------//
 
@@ -44,8 +40,6 @@ void publish_to_safety(custom_msgs::data8Msg msg)
 {
   safetyPubPtr->publish(msg);
 }
-
-//------------------------------------------------------------------------------------------------//
 
 //------------------------------------------------------------------------------------------------//
 // GES HANDLER PUB FUNCTIONS
@@ -86,43 +80,23 @@ void rosloop(ros::NodeHandle nh)
     //--------------------------------------------------------------------------------------------//
     // TARGET POSITION
     //--------------------------------------------------------------------------------------------//
-
-    // create subscribers w/ topic name, queue size and callback function
     jointPositionSubList.push_back(
         new ros::Subscriber(nh.subscribe(prefix + "TargetPositionIU", 1, &Imc_callback::set_target_position)));
+
 
     //--------------------------------------------------------------------------------------------//
     // CONTROLWORD
     //--------------------------------------------------------------------------------------------//
-
-    // create subscribers w/ topic name, queue size and callback function
     jointWordSubList.push_back(
         new ros::Subscriber(nh.subscribe(prefix + "Controlword", 50, &Imc_callback::set_controlword)));
   };
 
-  //------------------------------------------------------------------------------------------------//
 
   //------------------------------------------------------------------------------------------------//
   // GES HANDLER PUBS & SUBS
   //--//--------------------------------------------------------------------------------------------//
   // COMBINED MESSAGES UPSTREAM
   //--------------------------------------------------------------------------------------------//
-
-  // for(int i = 0; i < *get_number_of_GES(); i++)
-  // {
-  // 	//create publishers w/ datatype, topic name and queue size
-  // 	string prefix = (*get_list_of_GES())[i];
-
-  // 	gesHandlerPubMap[prefix] = (
-  // 		new ros::Publisher(
-  // 			nh.advertise<custom_msgs::ECtoUG>(
-  // 				"ECto" + prefix,
-  // 				50
-  // 			)
-  // 		)
-  // 	);
-
-  // };
 
   for (vector<string>::iterator i = LaunchParameters::get_list_of_GES()->begin();
        i != LaunchParameters::get_list_of_GES()->end(); ++i)
@@ -137,14 +111,7 @@ void rosloop(ros::NodeHandle nh)
     }
     else if (*i == "BPG")
     {
-      // gesHandlerPubMap[*i] = (
-      // 	new ros::Publisher(
-      // 		nh.advertise<custom_msgs::ECtoBPG>(
-      // 			"ECto" + *i,
-      // 			50
-      // 		)
-      // 	)
-      // );
+      // gesHandlerPubMap[*i] = (new ros::Publisher(nh.advertise<custom_msgs::ECtoBPG>("ECto" + *i, 50)));
 
       speakerSubPtr = (new ros::Subscriber(nh.subscribe(*i + "toEC", 50, &Backpack_ges_callback::send_frequency)));
     }
@@ -155,16 +122,12 @@ void rosloop(ros::NodeHandle nh)
   }
 
   //------------------------------------------------------------------------------------------------//
-
-  //------------------------------------------------------------------------------------------------//
   // SAFETY PUBS & SUBS
   //--//--------------------------------------------------------------------------------------------//
   // SLAVE LOST ERROR
   //--------------------------------------------------------------------------------------------//
 
   safetyPubPtr = (new ros::Publisher(nh.advertise<custom_msgs::data8Msg>("ECErrorMessage", 50)));
-
-  //------------------------------------------------------------------------------------------------//
 
   //------------------------------------------------------------------------------------------------//
   // PDB HANDLER PUBS & SUBS
@@ -198,22 +161,24 @@ void rosloop(ros::NodeHandle nh)
 
     IpdHandlerSubPtr = (new ros::Subscriber(nh.subscribe("IPDtoEC", 50, &Ipd_callback::set_ipd_data)));
   }
-  //------------------------------------------------------------------------------------------------//
+
 
   cout << "number of joints: " << *LaunchParameters::get_number_of_joints() << endl;
   cout << "number of ges: " << *LaunchParameters::get_number_of_GES() << endl;
   cout << "number of pdb: " << *LaunchParameters::get_number_of_Pdb() << endl;
   cout << "number of ipd: " << *LaunchParameters::get_number_of_ipd() << endl;
 
-  // startup_sdo(1);
-
   ros::Rate rate(*LaunchParameters::get_ethercat_frequency());
   while (ros::ok())
   {
+
+    // run a SOEM loop and publish data
     update();
 
+    // receive and act on subscribed nodes
     ros::spinOnce();
 
+    // wait unitl next iteration unless over time
     rate.sleep();
   };
 

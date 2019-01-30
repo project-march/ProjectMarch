@@ -1,12 +1,6 @@
-/** \file
- * \brief Example code for Simple Open EtherCAT master
+/*
+ * led_test       - Initialises and runs SOEM/Ethercat and the ros node
  *
- * Usage : led_test [ifname1]
- * ifname is NIC interface, f.e. eth0
- *
- * This is a minimal test.
- *
- * (c)Arthur Ketels 2010 - 2011
  */
 
 #include <stdio.h>
@@ -24,23 +18,28 @@ extern "C" {
 
 #define EC_TIMEOUTMON 500
 
-char IOmap[4096];
-OSAL_THREAD_HANDLE thread1;
-int expectedWKC;
-boolean needlf;
-volatile int wkc;
-boolean inOP;
-uint8 currentgroup = 0;
+char IOmap[4096];               // holds the mapping of the SOEM message
+OSAL_THREAD_HANDLE thread1;     // holds the thread used for error handling with soem
+int expectedWKC;                // expected working-counter
+boolean needlf;                 // ????
+volatile int wkc;               // keeps track of SOEMs working-counter, can be used as a safety check toghther with the expected wkc to see if every slave is passed
+boolean inOP;                   // Whether or not SOEM is currently in Operational state
+uint8 currentgroup = 0;         // Identifier for the current slave group
 
 void ledtest(int argc, char* argv[])
 {
+
+  // --------------------------------------------------------------------------------
   // initialise rosnode
   ros::init(argc, argv, "SOEM_node");
   // create nodeHandle object which represents the current ros node
   ros::NodeHandle nh;
+
   LaunchParameters::init_parameters();
 
-  char* ifname = argv[1];
+  // --------------------------------------------------------------------------------
+
+  char* ifname = argv[1];       // Holds the name of the network interface (if) over which SOEM will be run
   int i, chk;  //, j, oloop, iloop;
   needlf = FALSE;
   inOP = FALSE;
@@ -57,7 +56,15 @@ void ledtest(int argc, char* argv[])
     {
       printf("%d slaves found and configured.\n", ec_slavecount);
 
-      ec_statecheck(1, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
+      // request and wait for slaves to be in pre-operational state (currently points to slave 1 which puzzles me, id expect this to point to 0 (all slaves))
+      ec_statecheck(1, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);     
+
+
+      // ----------------------------------------------------------------------------
+
+      // over all iMotioncubes: 
+      //    apply PDO-mapping                 --> This can only be done while in pre-operational mode (if i remember correctly this is defined in the iMc documentation)
+      //    send initialisation SDO messages
 
       for (int j = 0; j < *LaunchParameters::get_number_of_joints(); j++)
       {
@@ -66,14 +73,18 @@ void ledtest(int argc, char* argv[])
         startup_sdo(slaveNumber);
       }
 
+      // ----------------------------------------------------------------------------
+
+      // Configure the ethercat message structure depending on the PDO mapping of all the slaves
       ec_config_map(&IOmap);
 
       ec_configdc();
 
-      // ec_slave[1].state = EC_STATE_SAFE_OP;
       /* wait for all slaves to reach SAFE_OP state */
       ec_statecheck(0, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE * 4);
 
+
+      // Safety check on the data size fo the input and output of the slaves (afaik?)
       /*
        oloop = ec_slave[0].Obytes;
        if ((oloop == 0) && (ec_slave[0].Obits > 0)) oloop = 1;
@@ -95,6 +106,7 @@ void ledtest(int argc, char* argv[])
       /* send one valid process data to make outputs in slaves happy*/
       ec_send_processdata();
       ec_receive_processdata(EC_TIMEOUTRET);
+
       /* request OP state for all slaves */
       ec_writestate(0);
       chk = 40;
@@ -107,15 +119,19 @@ void ledtest(int argc, char* argv[])
         ec_statecheck(0, EC_STATE_OPERATIONAL, 50000);
       } while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));
 
+
+      // All salves in operational
       if (ec_slave[0].state == EC_STATE_OPERATIONAL)
       {
         // printf("Operational state reached for all slaves.\n");
         printf("Slave name: %s\n", ec_slave[0].name);
         inOP = TRUE;
 
+        // Send and receive ethercat message
         ec_send_processdata();
         ec_receive_processdata(EC_TIMEOUTRET);
 
+        // Run ros node program
         rosloop(nh);
 
         inOP = FALSE;
@@ -152,6 +168,9 @@ void ledtest(int argc, char* argv[])
   }
 }
 
+
+
+// Error handling function for SOEM. Is run in a seperate thread next to SOEM itself. 
 OSAL_THREAD_FUNC ecatcheck(void* ptr)
 {
   int slave;
@@ -223,7 +242,7 @@ OSAL_THREAD_FUNC ecatcheck(void* ptr)
         }
       }
       // if(!ec_group[currentgroup].docheckstate)
-      //    printf("OK : all slaves resumed OPERATIONAL.\n");
+      //    printf("OK : all slaves resumed OPERATIONAL.\n"); // removed to reduce prints
     }
     osal_usleep(10000);
   }
@@ -231,18 +250,20 @@ OSAL_THREAD_FUNC ecatcheck(void* ptr)
 
 int main(int argc, char* argv[])
 {
+
+  // Runs the program if the right amount of variables have been given
   if (argc >= 2)
   {
-    // create thread to handle slave error handling in OP
-    //      pthread_create( &thread1, NULL, (void *) &ecatcheck, (void*) &ctime);
-
+    // create thread to handle slave error handling in OP (operational mode)
     march_osal_thread_create(&thread1, 128000, &ecatcheck, &ctime);
 
-    // start cyclic part
+    // initialise the ROS node and SOEM
     ledtest(argc, argv);
   }
   else
   {
+
+    // probably outdated advise for the usage of led_test without launch file 
     printf("Usage: rosrun ethercat led_test ifname1\nifname = enp2s0 for Jetway 3.1\nif unsure use ifconfig in "
            "terminal\n");
   }

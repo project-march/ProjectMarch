@@ -242,42 +242,4 @@ void update()
   }
 
   ethercat_safety::monitor_slave_connection();
-
-  /*
-
-
-      static union bit16 prevStatusWord; //not initialized,
-
-      union bit16 controlWord;
-
-      union bit16 statusWord;
-      union bit32 actualPosition;
-      union bit16 motionErrorRegister;
-      motionErrorRegister.ui = getSd_MotionErrorRegister(1);
-      statusWord.ui = getSd_StatusWord(1);
-      if(statusWord.ui != prevStatusWord.ui){
-          printf("statusWord: 0x%04X\n", statusWord.ui);
-          printf("Error: 0x%04X\n", motionErrorRegister.ui);
-      }
-
-
-
-
-      if(tempCounter++ > 100){
-          printf("actualPosition: IU: %+7i, RAD: %+1.6f ROT: %+1.6f\n", actualPosition.i,
-     actualPosition.i*(2*PI)/(100*4096), actualPosition.i/(100.0*4096));
-          tempCounter = 0;
-      }
-
-
-      // Moved to ros_init.cpp
-      //targetPosition.i = convert_to_IU(0);
-
-      // object 607A
-      //set_output_bit32(1, 2, targetPosition);
-
-      prevStatusWord.ui = statusWord.ui;
-
-
-  */
 }

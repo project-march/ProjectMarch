@@ -4,13 +4,6 @@ extern "C" {
 #include "ethercat.h"
 }
 
-/* message for sound, not yet implemented
-void Ges_callback::set_sound(const custom_msgs::soundMsg &msgIn)
-{
-
-}
-*/
-
 void Upper_ges_callback::get_ges_data(string slaveName)
 {
   custom_msgs::ECtoUG gesMessage;

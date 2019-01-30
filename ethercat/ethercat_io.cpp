@@ -4,18 +4,6 @@ extern "C" {
 #include "ethercat.h"
 }
 
-class testclass
-{
-public:
-  int add()
-  {
-    return a + b;
-  };
-
-private:
-  int a, b;
-} testclass;
-
 union bit64 get_input_bit64(uint16 slave_no, uint8 module_index)
 {
   union bit64 return_value;
