@@ -16,18 +16,18 @@ std::vector<std::string> sensor_names;
 std::vector<ros::Publisher> temperature_publishers;
 
 // Store the 7 most recent generated temperatures so we can take the weighted average of them when we publish.
-std::vector<double> latest_temperatures = { 0, 0, 0, 0, 0, 0, 0 };
+std::vector<int> latest_temperatures;
 
 // The weights of the autoregression, the most recent temperature has the highest weight.
-std::vector<double> ar_values = { 0.1, 0.1, 0.1, 0.15, 0.15, 0.2, 0.2 };
+std::vector<float> ar_values;
 
 // Calculate the weighted average of the latest_temperatures
-double calculateArTemperature()
+double calculateArTemperature(std::vector<int> temperatures, std::vector<float> ar_values)
 {
   double res = 0;
-  for (int i = 0; i < latest_temperatures.size(); i++)
+  for (unsigned int i = 0; i < temperatures.size(); i++)
   {
-    res += latest_temperatures.at(i) * ar_values.at(i);
+    res += temperatures.at(i) * ar_values.at(i);
   }
   return res;
 }
@@ -38,7 +38,7 @@ double calculateArTemperature()
  * @param config the config file with all the parameters
  * @param level A bitmask
  */
-void callback(march_fake_sensor_data::TemperaturesConfig& config, uint32_t level)
+void temperatureConfigCallback(march_fake_sensor_data::TemperaturesConfig& config, uint32_t level)
 {
   // Make sure there is always a possible interval between min and max temperature.
   if (config.min_temperature >= config.max_temperature)
@@ -53,16 +53,16 @@ void callback(march_fake_sensor_data::TemperaturesConfig& config, uint32_t level
  * Publish a random temperature within the boundaries of the min and max parameters
  * @param temperature_pub publish the temperature message with this publisher
  */
-void publishTemperature(ros::Publisher temperature_pub)
+void publishTemperature(const ros::Publisher& temperature_pub)
 {
   // Pick a random value between min and max temperature
-  double random_temperature = rand() % (max_temperature - min_temperature) + min_temperature;
+  int random_temperature = rand() % (max_temperature - min_temperature) + min_temperature;
 
   // Update the vector with the latest temperatures by removing the first entry and adding a new one.
   latest_temperatures.erase(latest_temperatures.begin());
   latest_temperatures.push_back(random_temperature);
 
-  double current_temperature = calculateArTemperature();
+  double current_temperature = calculateArTemperature(latest_temperatures, ar_values);
   sensor_msgs::Temperature msg;
   msg.temperature = current_temperature;
   msg.header.stamp = ros::Time::now();
@@ -96,6 +96,10 @@ int main(int argc, char** argv)
   n.getParam(n.getNamespace() + "/max_temperature", max_temperature);
   n.getParam("/sensors", sensor_names);
 
+  // Initialise autoregression variables.
+  latest_temperatures = { 0, 0, 0, 0, 0, 0, 0 };
+  ar_values = { 0.1, 0.1, 0.1, 0.15, 0.15, 0.2, 0.2 };
+
   // Create a publisher for each sensor
   for (std::string sensor_name : sensor_names)
   {
@@ -107,7 +111,7 @@ int main(int argc, char** argv)
   // Make the temperature values dynamic reconfigurable
   dynamic_reconfigure::Server<march_fake_sensor_data::TemperaturesConfig> server;
   dynamic_reconfigure::Server<march_fake_sensor_data::TemperaturesConfig>::CallbackType f;
-  server.setCallback(boost::bind(&callback, _1, _2));
+  server.setCallback(boost::bind(&temperatureConfigCallback, _1, _2));
 
   while (ros::ok())
   {
