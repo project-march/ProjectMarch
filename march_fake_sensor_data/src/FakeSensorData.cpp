@@ -38,6 +38,7 @@ void publishTemperature(ros::Publisher temperature_pub)
 
   sensor_msgs::Temperature msg;
   msg.temperature = current_temperature;
+  msg.header.stamp = ros::Time::now();
   temperature_pub.publish(msg);
 }
 
