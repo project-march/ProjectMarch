@@ -10,8 +10,8 @@
 
 #include <march_fake_sensor_data/TemperaturesConfig.h>
 
-int min_temperature = 0;
-int max_temperature = 50;
+int min_temperature;
+int max_temperature;
 std::vector<std::string> sensor_names;
 std::vector<ros::Publisher> temperature_publishers;
 
