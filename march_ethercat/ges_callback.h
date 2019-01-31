@@ -47,6 +47,20 @@ private:
   // downstream
 };
 
+class Template_ges_callback : public Ges_callback
+{
+public:
+    static void get_ges_data(string slaveName);
+    static void set_ges_data(string slaveName, int8 value_arg);
+
+private:
+    // upstream
+    const static int16_t firstmisobyte = 0;
+    // downstream
+    const static int16_t firstmosibyte = 0;
+};
+
+
 class Backpack_ges_callback : public Ges_callback
 {
 public:

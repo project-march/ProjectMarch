@@ -1,5 +1,5 @@
 /*
- * led_test       - Initialises and runs SOEM/Ethercat and the ros node
+ * march_ethercat       - Initialises and runs SOEM/Ethercat and the ros node
  *
  */
 
@@ -21,7 +21,7 @@ extern "C" {
 char IOmap[4096];               // holds the mapping of the SOEM message
 OSAL_THREAD_HANDLE thread1;     // holds the thread used for error handling with soem
 int expectedWKC;                // expected working-counter
-boolean needlf;                 // ????
+boolean needlf;                 // ???? Doing nothing useful right now
 volatile int wkc;               // keeps track of SOEMs working-counter, can be used as a safety check toghther with the expected wkc to see if every slave is passed
 boolean inOP;                   // Whether or not SOEM is currently in Operational state
 uint8 currentgroup = 0;         // Identifier for the current slave group
@@ -36,8 +36,6 @@ void march_ethercat(int argc, char* argv[])
   ros::NodeHandle nh;
 
   LaunchParameters::init_parameters();
-
-  printf("rosinit successful");
 
   // --------------------------------------------------------------------------------
 
@@ -122,7 +120,7 @@ void march_ethercat(int argc, char* argv[])
       } while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));
 
 
-      // All salves in operational
+      // All slaves in operational
       if (ec_slave[0].state == EC_STATE_OPERATIONAL)
       {
         // printf("Operational state reached for all slaves.\n");

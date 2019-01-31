@@ -32,6 +32,22 @@ void Lower_ges_callback::get_ges_data(string slaveName)
   publish_to_ges_handler(slaveName, gesMessage);
 }
 
+
+void Template_ges_callback::get_ges_data(string slaveName)
+{
+  uint16 slaveNumber = LaunchParameters::get_slave_number(slaveName);
+  printf("Returned value: %i", get_input_bit8(slaveNumber, firstmisobyte).i);
+}
+
+void Template_ges_callback::set_ges_data(string slaveName, int8 value_arg)
+{
+  union bit8 value;
+  value.i = value_arg;
+  uint16 slaveNumber = LaunchParameters::get_slave_number(slaveName);
+  set_output_bit8(slaveNumber, firstmosibyte, value);
+  printf("Set value: %i", value.i);
+}
+
 // void Backpack_ges_callback::get_ges_data(string slaveName)
 // {
 // 	custom_msgs::ECtoBPG gesMessage;

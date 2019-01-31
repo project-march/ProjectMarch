@@ -5,10 +5,10 @@
 #include "ethercat_io.h"
 #include <string>
 
-#include <custom_msgs/msg/IUPos.h>
-#include <custom_msgs/msg/SDOMsg.h>
-#include <custom_msgs/msg/register16Msg.h>
-#include <custom_msgs/msg/ECtoJH.h>
+#include <custom_msgs/IUPos.h>
+#include <custom_msgs/SDOMsg.h>
+#include <custom_msgs/register16Msg.h>
+#include <custom_msgs/ECtoJH.h>
 
 #include "launch_parameters.h"
 

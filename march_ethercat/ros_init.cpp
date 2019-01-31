@@ -115,6 +115,11 @@ void rosloop(ros::NodeHandle nh)
 
       speakerSubPtr = (new ros::Subscriber(nh.subscribe(*i + "toEC", 50, &Backpack_ges_callback::send_frequency)));
     }
+    else if (*i == "TEMPL_GES")
+    {
+      // Todo: Implement listening to led command topic
+      printf("Set callback for listening to led command topic");
+    }
     else
     {
       printf("error when making ges publishers! unknown name\n");

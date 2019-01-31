@@ -218,6 +218,20 @@ void update()
     {
       // Backpack_ges_callback::get_ges_data(*i);
     }
+    else if (*i == "TEMPL_GES")
+    {
+      // Do stuff with TEMPL_GES
+      printf("Template GES callback called\n");
+      Template_ges_callback::get_ges_data(*i);
+
+      // For now, set led command here. Todo: make this a callback for ros message
+      Template_ges_callback::set_ges_data(*i, 1);
+    }
+    else if (*i == "CAP_GES")
+    {
+      // Do stuff with GES one
+      printf("Capacity test GES callback called\n");
+    }
     else
     {
       printf("error when getting ges data from EC! unknown name\n");

@@ -11,7 +11,7 @@ union bit64 get_input_bit64(uint16 slave_no, uint8 module_index)
   /* Get the IO map pointer from the ec_slave struct */
   data_ptr = ec_slave[slave_no].inputs;
   /* Move pointer to correct module index */
-  data_ptr += module_index * 8;
+  data_ptr += module_index * 8; // Probably wrong!
   /* Read value byte by byte since all targets can't handle misaligned
    * addresses
    */
@@ -31,7 +31,7 @@ void set_output_bit64(uint16 slave_no, uint8 module_index, union bit64 value)
 {
   uint8* data_ptr;
   data_ptr = ec_slave[slave_no].outputs;
-  data_ptr += module_index * 8;
+  data_ptr += module_index * 8; // Probably wrong!
 
   *data_ptr++ = value.p.b0;
   *data_ptr++ = value.p.b1;

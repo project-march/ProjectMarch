@@ -17,8 +17,8 @@ file(GLOB_RECURSE SOEM_SRC
 
 add_library(${SOURCES} ${SOEM_SRC})
 
-add_executable(march_ethercat ${SOURCES} ${SOEM_SRC})
+add_executable(march_ethercat_node ${SOURCES} ${SOEM_SRC})
 
-add_dependencies(march_ethercat ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(march_ethercat_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-target_link_libraries(march_ethercat ${catkin_LIBRARIES})
+target_link_libraries(march_ethercat_node ${catkin_LIBRARIES})

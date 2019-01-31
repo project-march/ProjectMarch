@@ -16,9 +16,9 @@
         NUMBER_OF_IPD: 0
 
         LIST_OF_JOINTS: []
-        LIST_OF_GES: [ONE, TWO]
+        LIST_OF_GES: [TEMPL_GES, TEMPL_GES]
 
-        LIST_OF_SLAVES: [MAS, ONE, TWO]
+        LIST_OF_SLAVES: [MAS, TEMPL_GES, TEMPL_GES]
 
         <!-- COMMUNICATION CONFIGURATION -->
 
