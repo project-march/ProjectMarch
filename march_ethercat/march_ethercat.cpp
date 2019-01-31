@@ -26,16 +26,18 @@ volatile int wkc;               // keeps track of SOEMs working-counter, can be 
 boolean inOP;                   // Whether or not SOEM is currently in Operational state
 uint8 currentgroup = 0;         // Identifier for the current slave group
 
-void ledtest(int argc, char* argv[])
+void march_ethercat(int argc, char* argv[])
 {
 
   // --------------------------------------------------------------------------------
   // initialise rosnode
-  ros::init(argc, argv, "SOEM_node");
+  ros::init(argc, argv, "ethercat_node");
   // create nodeHandle object which represents the current ros node
   ros::NodeHandle nh;
 
   LaunchParameters::init_parameters();
+
+  printf("rosinit successful");
 
   // --------------------------------------------------------------------------------
 
@@ -44,7 +46,7 @@ void ledtest(int argc, char* argv[])
   needlf = FALSE;
   inOP = FALSE;
 
-  printf("Starting led test\n");
+  printf("Starting ethercat\n");
 
   /* initialise SOEM, bind socket to ifname */
   if (ec_init(ifname))
@@ -258,16 +260,15 @@ int main(int argc, char* argv[])
     march_osal_thread_create(&thread1, 128000, &ecatcheck, &ctime);
 
     // initialise the ROS node and SOEM
-    ledtest(argc, argv);
+    march_ethercat(argc, argv);
   }
   else
   {
 
     // probably outdated advise for the usage of led_test without launch file 
-    printf("Usage: rosrun ethercat led_test ifname1\nifname = enp2s0 for Jetway 3.1\nif unsure use ifconfig in "
-           "terminal\n");
+    printf("Usage: roslaunch march_ethercat march_ethercat.launch ifname1\nif unsure use ifconfig in terminal\n");
   }
 
-  printf("End program\n");
+  printf("End of march_ethercat\n");
   return (0);
 }

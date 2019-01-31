@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>ethercat</name>
+  <name>march_ethercat</name>
   <version>0.0.0</version>
   <description>Developer input device to send commands to the march-iv</description>
 

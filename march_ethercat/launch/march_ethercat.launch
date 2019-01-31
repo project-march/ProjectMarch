@@ -1,0 +1,184 @@
+<launch launch-prefix="gdb -ex run --args">
+
+    <machine name="localhost" address="127.0.0.1">
+    </machine>
+
+
+    <!-- Parameter server -->
+
+    <rosparam>
+
+        <!-- EXOSKELETON CONFIGURATION 	-->
+
+        NUMBER_OF_JOINTS: 0
+        NUMBER_OF_GES: 2
+        NUMBER_OF_PDB: 0
+        NUMBER_OF_IPD: 0
+
+        LIST_OF_JOINTS: []
+        LIST_OF_GES: [ONE, TWO]
+
+        LIST_OF_SLAVES: [MAS, ONE, TWO]
+
+        <!-- COMMUNICATION CONFIGURATION -->
+
+        <!-- ethercat cycle speed in milliseconds/cycle -->
+        ETHERCAT_CYCLE_TIME: 4
+
+        <!--&lt;!&ndash; speed of homing in degrees/second &ndash;&gt;-->
+        <!--HOMING_SPEED: 15-->
+
+        <!--&lt;!&ndash; SOFTWARE CONFIGURATION &ndash;&gt;-->
+
+        <!--DELIMITER: '~'-->
+
+        <!--&lt;!&ndash; JOINT SPECIFIC CONFIGURATION &ndash;&gt;-->
+
+        <!--&lt;!&ndash; Max speed is given in degrees/second &ndash;&gt;-->
+        <!--LIST_OF_JOINT_MAX_SPEED: [40, 40, 40, 40, 20, 20]-->
+        <!--LIST_OF_END_STOPS: [105, -15, 105, -15, 115, -5, 115, -5, 15, -20, 17, -21]-->
+        <!--LIST_OF_ACTUAL_ENCODER_STOPS: [43936, 22134, 31557, 9746, 39941, 18120, 43734, 21924, 1490, 1086, 1022, 631]-->
+        <!--LIST_OF_FIXED_POSITIONS: [121, 121, 121, 121, 9.5, 9.5]-->
+        <!--SOFT_STOP_MARGIN: 0-->
+        <!--HARD_STOP_MARGIN: 2.5-->
+
+        <!--&lt;!&ndash; Encoder resolution in bits &ndash;&gt;-->
+        <!--LIST_OF_ENCODER_RESOLUTIONS: [16, 16, 16, 16, 12, 12]-->
+
+        <!--&lt;!&ndash; ERROR HANDLING CONFIGURATION &ndash;&gt;-->
+
+        <!--&lt;!&ndash; Mapping to carry over bits from motion error register to safety register &ndash;&gt;-->
+        <!--MOTION_ERROR_TO_SAFETY_MAPPING: [-1, 18, -1, 8, -1, -1, -1, -1, 16, 12, -1, 20, 11, 17, -1, 19]-->
+        <!--DETAILED_ERROR1_TO_SAFETY_MAPPING: [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 4, -1, -1, -1, -1, -1]-->
+        <!--DETAILED_ERROR2_TO_SAFETY_MAPPING: [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]-->
+
+        <!--&lt;!&ndash; Marge on maximum speed defined above at which the encoder wrong reading is triggered &ndash;&gt;-->
+        <!--ENCODER_MAX_SPEED_MARGE: 5-->
+        <!--&lt;!&ndash; Maximum amount of times the above value may be exceeded before an error is called &ndash;&gt;-->
+        <!--ENCODER_MAX_COUNTER: 3-->
+        <!--&lt;!&ndash; 	Minimum value for the maximum difference, resolution of the ankle encoders were to small compared to the noise to let-->
+                <!--it be dependend on the max speed &ndash;&gt;-->
+        <!--ENCODER_MAX_DIFFERENCE_MIN: 50-->
+
+        <!--&lt;!&ndash; LOGGING CONFIGURATION &ndash;&gt;-->
+
+        <!--&lt;!&ndash; Mapping of the joints to the connectors on the PDB &ndash;&gt;-->
+        <!--JOINT_CONNECTOR_MAPPING: [LAJ, LKJ, LHJ, RAJ, RKJ, RHJ]-->
+
+
+    </rosparam>
+
+    <!--&lt;!&ndash; SOFTWARE SYSTEM NODES &ndash;&gt;-->
+
+    <!--Hardware Communication -->
+
+    <node name="march_ethercat" pkg="march_ethercat" type="march_ethercat_node"  args="enp4s0f2" required="true" output="screen">
+    </node>
+
+    <!--&lt;!&ndash;State Machine &ndash;&gt;-->
+
+    <!--<node machine="localhost" pkg="statemachine" type="state_machine_main" name="stateMachine" required="true">-->
+    <!--</node>-->
+
+    <!--&lt;!&ndash;Error Handler &ndash;&gt;-->
+
+    <!--<node machine="localhost" pkg="errorhandler" type="error_handler" name="errorHandler" required="true">-->
+    <!--</node>-->
+
+    <!--&lt;!&ndash;Gait Handler &ndash;&gt;-->
+
+    <!--<node machine="localhost" pkg="gaithandler" type="gait_handler" name="gaitHandler" required="true">-->
+    <!--</node>-->
+
+    <!--&lt;!&ndash; LOGGING NODES &ndash;&gt;-->
+
+    <!--&lt;!&ndash;Data Logger &ndash;&gt;-->
+
+    <!--<node machine="localhost" pkg="datalogger" type="data_logger" name="data_logger" required="true">-->
+    <!--</node>-->
+
+    <!--&lt;!&ndash; Topic Spy &ndash;&gt;-->
+    <!--&lt;!&ndash;-->
+          <!--<node machine="localhost" pkg="topicspy" type="topic_spy" name="topicSpy" required="true">-->
+          <!--</node>-->
+    <!--&ndash;&gt;-->
+    <!--&lt;!&ndash; HARDWARE SYSTEM NODES (top to bottom) &ndash;&gt;-->
+
+    <!--&lt;!&ndash;PDB Handler &ndash;&gt;-->
+
+    <!--<node machine="localhost" pkg="pdbhandler" type="pdb_handler" name="pdbhandler" required="true">-->
+    <!--</node>-->
+
+    <!--&lt;!&ndash;IPD Handler &ndash;&gt;-->
+
+    <!--<node machine="localhost" pkg="ipdhandler" type="ipd_handler" name="ipdhandler" required="true">-->
+    <!--</node>-->
+
+    <!--&lt;!&ndash;Backpack Ges &ndash;&gt;-->
+
+    <!--<group ns="BPG">-->
+        <!--<node machine="localhost" pkg="geshandler" type="ges_handler" name="BPGGesHandler" required="true">-->
+        <!--</node>-->
+    <!--</group>-->
+
+    <!--&lt;!&ndash;Hip Joints &ndash;&gt;-->
+
+    <!--<group ns="RHJ">-->
+        <!--<node machine="localhost" pkg="jointhandler" type="joint_handler" name="RHJJointHandler" required="true">-->
+        <!--</node>-->
+    <!--</group>-->
+
+    <!--<group ns="LHJ">-->
+        <!--<node machine="localhost" pkg="jointhandler" type="joint_handler" name="LHJJointHandler" required="true">-->
+        <!--</node>-->
+    <!--</group>-->
+
+    <!--&lt;!&ndash;Upper Leg GESs &ndash;&gt;-->
+
+    <!--<group ns="RUG">-->
+        <!--<node machine="localhost" pkg="geshandler" type="ges_handler" name="gesHandler" required="true">-->
+        <!--</node>-->
+    <!--</group>-->
+    <!--<group ns="LUG">-->
+        <!--<node machine="localhost" pkg="geshandler" type="ges_handler" name="gesHandler" required="true">-->
+        <!--</node>-->
+    <!--</group>-->
+
+    <!--&lt;!&ndash;Knee Joints &ndash;&gt;-->
+
+    <!--<group ns="RKJ">-->
+        <!--<node machine="localhost" pkg="jointhandler" type="joint_handler" name="RKJJointHandler" required="true">-->
+        <!--</node>-->
+    <!--</group>-->
+
+    <!--<group ns="LKJ">-->
+        <!--<node machine="localhost" pkg="jointhandler" type="joint_handler" name="LKJJointHandler" required="true">-->
+        <!--</node>-->
+    <!--</group>-->
+
+    <!--&lt;!&ndash;Ankle Joints &ndash;&gt;-->
+
+    <!--<group ns="RAJ">-->
+        <!--<node machine="localhost" pkg="jointhandler" type="joint_handler" name="RAJJointHandler" required="true">-->
+        <!--</node>-->
+    <!--</group>-->
+
+    <!--<group ns="LAJ">-->
+        <!--<node machine="localhost" pkg="jointhandler" type="joint_handler" name="LAJJointHandler" required="true">-->
+        <!--</node>-->
+    <!--</group>-->
+
+    <!--&lt;!&ndash;Lower Leg GESs &ndash;&gt;-->
+
+    <!--<group ns="RLG">-->
+        <!--<node machine="localhost" pkg="geshandler" type="ges_handler" name="gesHandler" required="true">-->
+        <!--</node>-->
+    <!--</group>-->
+    <!--<group ns="LLG">-->
+        <!--<node machine="localhost" pkg="geshandler" type="ges_handler" name="gesHandler" required="true">-->
+        <!--</node>-->
+    <!--</group>-->
+
+
+
+</launch>
