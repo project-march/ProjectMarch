@@ -118,7 +118,7 @@ void rosloop(ros::NodeHandle nh)
     else if (*i == "TEMPL_GES")
     {
       // Todo: Implement listening to led command topic
-      printf("Set callback for listening to led command topic");
+      printf("Set callback for listening to led command topic\n");
     }
     else
     {

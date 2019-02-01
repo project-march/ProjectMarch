@@ -221,16 +221,16 @@ void update()
     else if (*i == "TEMPL_GES")
     {
       // Do stuff with TEMPL_GES
-      printf("Template GES callback called\n");
+//      printf("Template GES callback called\n");
       Template_ges_callback::get_ges_data(*i);
 
       // For now, set led command here. Todo: make this a callback for ros message
-      Template_ges_callback::set_ges_data(*i, 1);
+      Template_ges_callback::set_ges_data(*i, 2);
     }
     else if (*i == "CAP_GES")
     {
       // Do stuff with GES one
-      printf("Capacity test GES callback called\n");
+//      printf("Capacity test GES callback called\n");
     }
     else
     {

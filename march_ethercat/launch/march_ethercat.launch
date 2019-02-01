@@ -23,7 +23,7 @@
         <!-- COMMUNICATION CONFIGURATION -->
 
         <!-- ethercat cycle speed in milliseconds/cycle -->
-        ETHERCAT_CYCLE_TIME: 4
+        ETHERCAT_CYCLE_TIME: 500
 
         <!--&lt;!&ndash; speed of homing in degrees/second &ndash;&gt;-->
         <!--HOMING_SPEED: 15-->

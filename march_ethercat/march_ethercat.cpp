@@ -123,8 +123,8 @@ void march_ethercat(int argc, char* argv[])
       // All slaves in operational
       if (ec_slave[0].state == EC_STATE_OPERATIONAL)
       {
-        // printf("Operational state reached for all slaves.\n");
-        printf("Slave name: %s\n", ec_slave[0].name);
+          printf("Operational state reached for all slaves.\n");
+        printf("Slave name: %s\n", ec_slave[1].name);
         inOP = TRUE;
 
         // Send and receive ethercat message

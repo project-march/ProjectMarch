@@ -26,6 +26,6 @@ target_link_libraries(march_ethercat_node ${catkin_LIBRARIES})
 # Give sudo access to ethernet port
 add_custom_command( TARGET march_ethercat_node
                     POST_BUILD
-                    COMMAND sudo setcap cap_net_raw+ep march_ethercat
+                    COMMAND sudo setcap cap_net_raw+ep march_ethercat_node
                     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/../devel/lib/march_ethercat
                   )
