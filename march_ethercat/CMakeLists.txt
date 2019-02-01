@@ -22,3 +22,10 @@ add_executable(march_ethercat_node ${SOURCES} ${SOEM_SRC})
 add_dependencies(march_ethercat_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(march_ethercat_node ${catkin_LIBRARIES})
+
+# Give sudo access to ethernet port
+add_custom_command( TARGET march_ethercat_node
+                    POST_BUILD
+                    COMMAND sudo setcap cap_net_raw+ep march_ethercat
+                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/../devel/lib/march_ethercat
+                  )
