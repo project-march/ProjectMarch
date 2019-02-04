@@ -222,8 +222,8 @@ void update()
     {
       // Do stuff with TEMPL_GES
 //      printf("Template GES callback called\n");
-      Template_ges_callback::get_ges_data(*i);
-
+      int8 ret_value = Template_ges_callback::get_ges_data(*i);
+        printf("Returned value: %i\n", ret_value);
       // For now, set led command here. Todo: make this a callback for ros message
 //      Template_ges_callback::set_ges_data(*i, 2);
     }

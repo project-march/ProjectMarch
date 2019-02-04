@@ -64,7 +64,8 @@ void rosSpinOnce()
 
 void template_ges_value_callback(std_msgs::UInt8 msg)
 {
-  Template_ges_callback::set_ges_data("TEMPL_GES",msg.data);
+    printf("Set data to %i\n",msg.data);
+    Template_ges_callback::set_ges_data("TEMPL_GES",msg.data);
 }
 
 void rosloop(ros::NodeHandle nh)
