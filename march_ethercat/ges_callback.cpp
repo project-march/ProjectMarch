@@ -32,11 +32,10 @@ void Lower_ges_callback::get_ges_data(string slaveName)
   publish_to_ges_handler(slaveName, gesMessage);
 }
 
-
-void Template_ges_callback::get_ges_data(string slaveName)
+int8 Template_ges_callback::get_ges_data(string slaveName)
 {
   uint16 slaveNumber = LaunchParameters::get_slave_number(slaveName);
-  printf("Returned value: %i\n", get_input_bit8(slaveNumber, firstmisobyte).i);
+  return get_input_bit8(slaveNumber, firstmisobyte).i;
 }
 
 void Template_ges_callback::set_ges_data(string slaveName, int8 value_arg)

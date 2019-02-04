@@ -50,7 +50,7 @@ private:
 class Template_ges_callback : public Ges_callback
 {
 public:
-    static void get_ges_data(string slaveName);
+    static int8 get_ges_data(string slaveName);
     static void set_ges_data(string slaveName, int8 value_arg);
 
 private:

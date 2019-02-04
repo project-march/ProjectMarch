@@ -62,6 +62,11 @@ void rosSpinOnce()
   ros::spinOnce();
 }
 
+void template_ges_value_callback(std_msgs::UInt8 msg)
+{
+  Template_ges_callback::set_ges_data("TEMPL_GES",msg.data);
+}
+
 void rosloop(ros::NodeHandle nh)
 {
   //------------------------------------------------------------------------------------------------//
@@ -83,14 +88,12 @@ void rosloop(ros::NodeHandle nh)
     jointPositionSubList.push_back(
         new ros::Subscriber(nh.subscribe(prefix + "TargetPositionIU", 1, &Imc_callback::set_target_position)));
 
-
     //--------------------------------------------------------------------------------------------//
     // CONTROLWORD
     //--------------------------------------------------------------------------------------------//
     jointWordSubList.push_back(
         new ros::Subscriber(nh.subscribe(prefix + "Controlword", 50, &Imc_callback::set_controlword)));
   };
-
 
   //------------------------------------------------------------------------------------------------//
   // GES HANDLER PUBS & SUBS
@@ -167,6 +170,10 @@ void rosloop(ros::NodeHandle nh)
     IpdHandlerSubPtr = (new ros::Subscriber(nh.subscribe("IPDtoEC", 50, &Ipd_callback::set_ipd_data)));
   }
 
+  if (*LaunchParameters::get_number_of_GES())
+  {
+    TemplateHandlerSubPtr = (new ros::Subscriber(nh.subscribe("march/template/data", 50, &template_ges_value_callback)));
+  }
 
   cout << "number of joints: " << *LaunchParameters::get_number_of_joints() << endl;
   cout << "number of ges: " << *LaunchParameters::get_number_of_GES() << endl;
@@ -176,7 +183,6 @@ void rosloop(ros::NodeHandle nh)
   ros::Rate rate(*LaunchParameters::get_ethercat_frequency());
   while (ros::ok())
   {
-
     // run a SOEM loop and publish data
     update();
 

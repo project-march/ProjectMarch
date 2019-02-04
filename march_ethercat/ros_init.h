@@ -39,6 +39,9 @@ static ros::Publisher* IpdHandlerPubPtr;
 
 static ros::Subscriber* IpdHandlerSubPtr;
 
+// TEMPLATE GES HANDLER
+static ros::Subscriber* TemplateHandlerSubPtr;
+
 void rosloop(ros::NodeHandle nh);
 
 void publish_to_joint_handler(string slaveName, custom_msgs::ECtoJH msg);

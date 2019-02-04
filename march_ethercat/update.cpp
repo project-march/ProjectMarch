@@ -225,7 +225,7 @@ void update()
       Template_ges_callback::get_ges_data(*i);
 
       // For now, set led command here. Todo: make this a callback for ros message
-      Template_ges_callback::set_ges_data(*i, 2);
+//      Template_ges_callback::set_ges_data(*i, 2);
     }
     else if (*i == "CAP_GES")
     {
