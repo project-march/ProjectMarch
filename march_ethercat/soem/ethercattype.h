@@ -258,7 +258,7 @@ typedef enum {
 /** EEprom state machine error acknowledge */
 #define EC_ESTAT_NACK 0x2000
 
-/* Ethercat SSI (Slave Information Interface) */
+/* EthercatMaster SSI (Slave Information Interface) */
 
 /** Start address SII sections in Eeprom */
 #define ECT_SII_START 0x0040

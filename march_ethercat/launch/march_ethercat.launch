@@ -16,14 +16,14 @@
         NUMBER_OF_IPD: 0
 
         LIST_OF_JOINTS: []
-        LIST_OF_GES: [TEMPL_GES]
+        LIST_OF_GES: [TEMPLATEGES]
 
-        LIST_OF_SLAVES: [MAS, TEMPL_GES]
+        LIST_OF_SLAVES: [MAS, TEMPLATEGES]
 
         <!-- COMMUNICATION CONFIGURATION -->
 
         <!-- ethercat cycle speed in milliseconds/cycle -->
-        ETHERCAT_CYCLE_TIME: 500
+        ETHERCAT_CYCLE_TIME: 200
 
         <!--&lt;!&ndash; speed of homing in degrees/second &ndash;&gt;-->
         <!--HOMING_SPEED: 15-->
@@ -72,7 +72,10 @@
 
     <!--Hardware Communication -->
 
-    <node name="march_ethercat" pkg="march_ethercat" type="march_ethercat_node"  args="enp4s0f2" required="true" output="screen">
+    <node name="march_ethercat" pkg="march_ethercat" type="march_ethercat_node" required="true" output="screen">
+        <rosparam>
+            ifname: 'enp4s0f2'
+        </rosparam>
     </node>
 
     <!--&lt;!&ndash;State Machine &ndash;&gt;-->

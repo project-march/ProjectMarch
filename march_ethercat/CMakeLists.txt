@@ -9,7 +9,7 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS})
 include_directories(soem)
 
-set(SOURCES march_ethercat.cpp update.cpp ethercat_io.cpp ros_init.cpp imc_callback.cpp ges_callback.cpp ethercat_safety.cpp pdb_callback.cpp ipd_callback.cpp launch_parameters.cpp)
+set(SOURCES EthercatNode.cpp EthercatMaster.cpp EthercatMaster.h ethercat_SDO.cpp ethercat_io.cpp ethercat_safety.cpp launch_parameters.cpp)
 
 file(GLOB_RECURSE SOEM_SRC
     "*.h" "*.c"

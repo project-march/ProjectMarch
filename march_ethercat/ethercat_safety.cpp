@@ -60,6 +60,6 @@ void ethercat_safety::send_safety_message(int lostSlaveIndex)
 
   safetyMassage.slaveName = LaunchParameters::get_slave_name(lostSlaveIndex);
   safetyMassage.data = get_error_code(lostSlaveIndex);
-
-  publish_to_safety(safetyMassage);
+  // Todo: Fix this
+  // publish_to_safety(safetyMassage);
 }

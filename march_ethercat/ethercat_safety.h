@@ -1,9 +1,7 @@
 #ifndef ETHERCAT_SAFETY_
 #define ETHERCAT_SAFETY_
 
-#include "ros_init.h"
 #include <custom_msgs/data8Msg.h>
-
 #include "launch_parameters.h"
 
 class ethercat_safety
