@@ -129,7 +129,7 @@ int EthercatMaster::ReceiveProcessData()
   return ec_receive_processdata(EC_TIMEOUTRET);
 }
 
-void EthercatMaster::CallCallbacks()
+void EthercatMaster::PublishProcessData()
 {
   for (vector<string>::iterator i = LaunchParameters::get_list_of_GES()->begin();
        i != LaunchParameters::get_list_of_GES()->end(); ++i)
@@ -137,7 +137,7 @@ void EthercatMaster::CallCallbacks()
     // Todo: Add other slave types
     // Todo: Make slaves a class
 
-    if (*i == "TEMPL_GES")
+    if (*i == "TEMPLATEGES")
     {
       int8 ret_value = this->GetByte(*i, 0);
       printf("Returned value: %d\n", ret_value);

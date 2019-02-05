@@ -29,7 +29,7 @@ public:
     // Receive Process Data over EtherCAT
     int ReceiveProcessData();
     // Call Callbacks for received Process Data
-    void CallCallbacks();
+    void PublishProcessData();
     // Monitor slave connection
     void MonitorSlaveConnection();
     // Set data to be sent

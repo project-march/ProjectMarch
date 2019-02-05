@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
   ros::Rate rate(*LaunchParameters::get_ethercat_frequency());
 
   // Initialize publishers and subscribers and their callbacks
-  if (*LaunchParameters::get_number_of_GES())
+  if (*LaunchParameters::get_number_of_GES() > 0)
   {
     // TEMPLATE GES HANDLER
     new ros::Subscriber(nh.subscribe("march/template/data", 50, &SetTemplateData));
@@ -48,17 +48,11 @@ int main(int argc, char* argv[])
 
   while (ros::ok() && ethercatMaster.inOP)
   {
-    // Send Process Data over EtherCAT
     ethercatMaster.SendProcessData();
-    // Receive Process Data over EtherCAT
     ethercatMaster.ReceiveProcessData();
-    // Call upon Slave callbacks to do stuff
-    ethercatMaster.CallCallbacks();
-    // Monitor Slave connections
+    ethercatMaster.PublishProcessData();
     ethercatMaster.MonitorSlaveConnection();
-    // Call all waiting callbacks
     ros::spinOnce();
-    // Sleep until next cycle
     rate.sleep();
   }
 
