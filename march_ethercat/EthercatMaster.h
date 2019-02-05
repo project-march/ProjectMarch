@@ -7,6 +7,7 @@
 
 #include <ros/node_handle.h>
 #include "ethercat_io.h"
+#include "Slave.h"
 
 extern "C" {
 #include "osal.h"
@@ -21,7 +22,7 @@ public:
     bool inOP;           // Is SOEM in operational state
 
     // Constructor
-    explicit EthercatMaster(ros::NodeHandle nh);
+    explicit EthercatMaster(ros::NodeHandle nh, std::vector<Slave> slave);
     // Destructor
     ~EthercatMaster();
     // Send Process Data over EtherCAT

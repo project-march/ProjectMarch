@@ -12,7 +12,7 @@ extern "C" {
 }
 
 // Constructor
-EthercatMaster::EthercatMaster(ros::NodeHandle nh)
+EthercatMaster::EthercatMaster(ros::NodeHandle nh, std::vector<Slave> slaveList)
 {
   // Get the name of the network interface (if) over which SOEM will be run from the launch file
   nh.getParam(ros::this_node::getName() + "/ifname", ifname);
@@ -141,6 +141,15 @@ void EthercatMaster::PublishProcessData()
     {
       int8 ret_value = this->GetByte(*i, 0);
       printf("Returned value: %d\n", ret_value);
+    }
+    else if (*i == "IMC")
+    {
+    }
+    else if (*i == "PDB")
+    {
+    }
+    else if (*i == "GES")
+    {
     }
     else
     {
