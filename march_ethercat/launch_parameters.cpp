@@ -76,7 +76,7 @@ void LaunchParameters::init_parameters()
   success &= ros::param::get("/NUMBER_OF_IPD", numberOfIpd);
 
   success &= ros::param::get("/ETHERCAT_CYCLE_TIME", ethercatCycleTime);
-  ethercatFrequency = 1000 / ethercatCycleTime;
+//  ethercatFrequency = 1000 / ethercatCycleTime;
 
   success &= ros::param::get("/LIST_OF_JOINTS", listOfJoints);
   success &= ros::param::get("/LIST_OF_GES", listOfGES);

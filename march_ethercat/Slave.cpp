@@ -4,6 +4,13 @@
 
 #include "Slave.h"
 
+Slave::Slave(std::string name, uint16 number)
+{
+  this->name = name;
+  this->number = number;
+  type = "SLAVE";
+}
+
 std::string Slave::getName()
 {
   return name;
@@ -12,4 +19,9 @@ std::string Slave::getName()
 int Slave::getNumber()
 {
   return number;
+}
+
+std::string Slave::getType()
+{
+  return type;
 }

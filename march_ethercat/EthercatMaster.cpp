@@ -3,17 +3,19 @@
 //
 
 #include "EthercatMaster.h"
-#include "launch_parameters.h"
 #include "ethercat_SDO.h"
 #include "ethercat_safety.h"
+#include "IMC.h"
+#include "TemplateGES.h"
 
 extern "C" {
 #include "ethercat.h"
 }
 
 // Constructor
-EthercatMaster::EthercatMaster(ros::NodeHandle nh, std::vector<Slave> slaveList)
+EthercatMaster::EthercatMaster(ros::NodeHandle nh, std::vector<Slave*> slaves)
 {
+  slaveList = slaves;
   // Get the name of the network interface (if) over which SOEM will be run from the launch file
   nh.getParam(ros::this_node::getName() + "/ifname", ifname);
 
@@ -25,7 +27,7 @@ EthercatMaster::EthercatMaster(ros::NodeHandle nh, std::vector<Slave> slaveList)
   if (!ec_init(ifname.c_str()))
   {
     ROS_ERROR("No socket connection on %s", ifname.c_str());
-    ros::shutdown();
+    return;
   }
   printf("ec_init on %s succeeded.\n", ifname.c_str());
 
@@ -33,8 +35,7 @@ EthercatMaster::EthercatMaster(ros::NodeHandle nh, std::vector<Slave> slaveList)
   if (ec_config_init(FALSE) <= 0)
   {
     ROS_ERROR("No slaves found, shutting down");
-    ec_close();
-    ros::shutdown();
+    return;
   }
   printf("%d slaves found and configured.\n", ec_slavecount);
 
@@ -45,11 +46,16 @@ EthercatMaster::EthercatMaster(ros::NodeHandle nh, std::vector<Slave> slaveList)
   // Over all iMotionCubes:
   //    Apply PDO-mapping while in PreOP state
   //    Send initialization SDO messages
-  for (int j = 0; j < *LaunchParameters::get_number_of_joints(); j++)
+  int ecatCycleTime;
+  nh.getParam("/ETHERCAT_CYCLE_TIME", ecatCycleTime);
+  for (int j = 0; j < slaveList.size(); j++)
   {
-    int slaveNumber = LaunchParameters::get_slave_number((*LaunchParameters::get_list_of_joints())[j]);
-    this->PDOmapping(slaveNumber);
-    this->StartupSDO(slaveNumber);
+    if (slaveList[j]->getType() == "IMC")
+    {
+      IMC* tmpIMCSlave = (IMC*)slaveList[j];
+      tmpIMCSlave->PDOmapping();
+      tmpIMCSlave->StartupSDO(ecatCycleTime);
+    }
   }
 
   // Configure the EtherCAT message structure depending on the PDO mapping of all the slaves
@@ -103,8 +109,6 @@ EthercatMaster::EthercatMaster(ros::NodeHandle nh, std::vector<Slave> slaveList)
                ec_ALstatuscode2string(ec_slave[i].ALstatuscode));
       }
     }
-    // Call destructor
-    this->~EthercatMaster();
   }
 }
 
@@ -115,7 +119,9 @@ EthercatMaster::~EthercatMaster()
   printf("Request init state for all slaves\n");
   ec_slave[0].state = EC_STATE_INIT;
   ec_writestate(0);
+  printf("Closing EtherCAT\n");
   ec_close();
+  printf("Shutting down ROS\n");
   ros::shutdown();
 }
 
@@ -131,24 +137,23 @@ int EthercatMaster::ReceiveProcessData()
 
 void EthercatMaster::PublishProcessData()
 {
-  for (vector<string>::iterator i = LaunchParameters::get_list_of_GES()->begin();
-       i != LaunchParameters::get_list_of_GES()->end(); ++i)
+  // Publish for all slaves except the master (slave 0)
+  for (int i = 1; i < slaveList.size(); i++)
   {
-    // Todo: Add other slave types
-    // Todo: Make slaves a class
-
-    if (*i == "TEMPLATEGES")
+    // Todo: Add other slave publisher implementations
+    std::string slaveType = slaveList[i]->getType();
+    if (slaveType == "TEMPLATEGES")
     {
-      int8 ret_value = this->GetByte(*i, 0);
-      printf("Returned value: %d\n", ret_value);
+      TemplateGES* tmpTemplateGES = (TemplateGES*)slaveList[i];
+      tmpTemplateGES->publish();
     }
-    else if (*i == "IMC")
-    {
-    }
-    else if (*i == "PDB")
+    else if (slaveType == "IMC")
     {
     }
-    else if (*i == "GES")
+    else if (slaveType == "PDB")
+    {
+    }
+    else if (slaveType == "GES")
     {
     }
     else
@@ -162,135 +167,4 @@ void EthercatMaster::MonitorSlaveConnection()
 {
   // Todo: refactor this
   ethercat_safety::monitor_slave_connection();
-}
-
-void EthercatMaster::SetByte(std::string slaveName, uint8 offset, int8 byte)
-{
-  // Todo: make this a general-purpose set output method
-  union bit8 unionbyte;
-  unionbyte.i = byte;
-  uint16 slaveNumber = LaunchParameters::get_slave_number(slaveName);
-  set_output_bit8(slaveNumber, offset, unionbyte);
-}
-
-int8 EthercatMaster::GetByte(std::string slaveName, uint8 offset)
-{
-  // Todo: make this a general-purpose get input method
-  uint16 slaveNumber = LaunchParameters::get_slave_number(slaveName);
-  return get_input_bit8(slaveNumber, offset).i;
-}
-
-int EthercatMaster::PDOmapping(int slave)
-{
-  printf("PDO mapping START!\n");
-
-  bool success = true;
-
-  //----------------------------------------
-
-  // clear sm pdos
-  success &= sdo_bit8(slave, 0x1C12, 0, 0);
-  success &= sdo_bit8(slave, 0x1C13, 0, 0);
-
-  //----------------------------------------
-
-  // clear 1A00 pdo entries
-  success &= sdo_bit32(slave, 0x1A00, 0, 0);
-  // download 1A00 pdo entries
-  success &= sdo_bit32(slave, 0x1A00, 1, 0x60410010);
-  success &= sdo_bit32(slave, 0x1A00, 2, 0x60640020);
-  success &= sdo_bit32(slave, 0x1A00, 3, 0x20000010);
-  // download 1A00 pdo count: 3
-  success &= sdo_bit32(slave, 0x1A00, 0, 3);
-  //--------------------
-
-  // clear 1A01 pdo entries
-  success &= sdo_bit32(slave, 0x1A01, 0, 0);
-  // download 1A01 pdo entries
-  success &= sdo_bit32(slave, 0x1A01, 1, 0x20020010);
-  success &= sdo_bit32(slave, 0x1A01, 2, 0x20550010);
-  success &= sdo_bit32(slave, 0x1A01, 3, 0x20580010);
-  // download 1A01 pdo count: 4
-  success &= sdo_bit32(slave, 0x1A01, 0, 3);
-
-  // clear 1A02 pdo entries
-  success &= sdo_bit32(slave, 0x1A02, 0, 0);
-  // download 1A02 pdo entries
-  success &= sdo_bit32(slave, 0x1A02, 1, 0x60770010);
-  success &= sdo_bit32(slave, 0x1A02, 2, 0x207f0010);
-  success &= sdo_bit32(slave, 0x1A02, 3, 0x20880020);
-  // download 1A02 pdo count: 1
-  success &= sdo_bit32(slave, 0x1A02, 0, 3);
-  // clear 1A03 pdo entries
-  success &= sdo_bit32(slave, 0x1A03, 0, 0);
-
-  //----------------------------------------
-
-  // clear 1600 pdo entries
-  success &= sdo_bit32(slave, 0x1600, 0, 0);
-  // download 1600 pdo entries
-  success &= sdo_bit32(slave, 0x1600, 1, 0x60400010);
-  success &= sdo_bit32(slave, 0x1600, 2, 0x607A0020);
-  // download 1600 pdo count: 2
-  success &= sdo_bit32(slave, 0x1600, 0, 2);
-
-  //--------------------
-
-  // clear 1601 pdo entries
-  success &= sdo_bit32(slave, 0x1601, 0, 0);
-  // clear 1602 pdo entries
-  success &= sdo_bit32(slave, 0x1602, 0, 0);
-  // clear 1603 pdo entries
-  success &= sdo_bit32(slave, 0x1603, 0, 0);
-
-  //----------------------------------------
-
-  // download 1C12:01 index
-  success &= sdo_bit16(slave, 0x1C12, 1, 0x1600);
-  // download 1C12 counter
-  success &= sdo_bit8(slave, 0x1C12, 0, 1);
-
-  //--------------------
-
-  // download 1C13:01 index
-  success &= sdo_bit16(slave, 0x1C13, 1, 0x1A00);
-  success &= sdo_bit16(slave, 0x1C13, 2, 0x1A01);
-  success &= sdo_bit16(slave, 0x1c13, 3, 0x1A02);
-  // download 1C13 counter
-  success &= sdo_bit8(slave, 0x1C13, 0, 3);
-
-  //----------------------------------------
-
-  printf(success ? "true\n" : "false\n");
-
-  return success;
-}
-
-int EthercatMaster::StartupSDO(int slave)
-{
-  bool success = true;
-  printf("Startup SDO\n");
-
-  //----------------------------------------
-  // Start writing to sdo
-  //----------------------------------------
-
-  // mode of operation
-  success &= sdo_bit8(slave, 0x6060, 0, 8);
-
-  // position dimension index
-  success &= sdo_bit8(slave, 0x608A, 0, 1);
-
-  // position factor -- scaling factor numerator
-  success &= sdo_bit32(slave, 0x6093, 1, 1);
-  // position factor -- scaling factor denominator
-  success &= sdo_bit32(slave, 0x6093, 2, 1);
-
-  // set the ethercat rate of encoder in form x*10^y
-  success &= sdo_bit8(slave, 0x60C2, 1, *LaunchParameters::get_ethercat_cycle_time());
-  success &= sdo_bit8(slave, 0x60C2, 2, -3);
-
-  printf(success ? "true\n" : "false\n");
-
-  return success;
 }

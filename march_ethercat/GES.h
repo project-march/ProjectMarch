@@ -7,11 +7,11 @@
 
 #include "Slave.h"
 
-
-class GES : public Slave{
+class GES : public Slave
+{
 public:
-    GES(std::string name, int number);
+  GES(std::string name, uint16 number);
+  virtual void publish() = 0;
 };
 
-
-#endif //PROJECT_GES_H
+#endif  // PROJECT_GES_H

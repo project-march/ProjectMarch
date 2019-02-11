@@ -7,69 +7,125 @@
 #include <ros/ros.h>
 #include <std_msgs/UInt8.h>
 #include "EthercatMaster.h"
-#include "launch_parameters.h"
-#include "GES.h"
+#include "TemplateGES.h"
+#include "IMC.h"
+#include "PDB.h"
 
-EthercatMaster* ethercatMasterPtr;
+// EthercatMaster* ethercatMasterPtr;
+std::vector<Slave*> slaveList;
 
 // Temporary method to set data sent to Template GES
 // Called when published on /march/template/data
 void SetTemplateDataCB(std_msgs::UInt8 msg)
 {
-  // Todo: make this general purpose for any slave type
-  ethercatMasterPtr->SetByte("TEMPLATEGES", 0, msg.data);
-}
-
-void initSubscribers(ros::NodeHandle nh)
-{
-    // Todo: make this work with slave classes
-    int nrofGES, nrofPDB, nrofIMC;
-    nh.getParam("/NUMBER_OF_GES", nrofGES);
-    nh.getParam("/NUMBER_OF_PDB", nrofPDB);
-    nh.getParam("/NUMBER_OF_JOINTS", nrofIMC);
-    if (nrofGES > 0)
+  for (int i = 0; i < slaveList.size(); i++)
+  {
+    std::string slaveType = slaveList[i]->getType();
+    if (slaveType == "TEMPLATEGES")
     {
-        // TEMPLATE GES
-        new ros::Subscriber(nh.subscribe("march/template/data", 50, &SetTemplateDataCB));
+      TemplateGES* tmpTemplateGES = (TemplateGES*)slaveList[i];
+      tmpTemplateGES->setLedCommand(msg.data);
+      printf("Set LED command to GES with name %s to value %i\n", tmpTemplateGES->getName().c_str(), msg.data);
     }
+  }
 }
 
-void initPublishers(ros::NodeHandle nh)
+// Creates slave objects from dictionary in launch file
+std::vector<Slave*> initSlaves(ros::NodeHandle nh)
 {
-
+  std::vector<Slave*> slaves;
+  std::map<std::string, std::string> slaveMap;
+  nh.getParam(ros::this_node::getName() + "/slaves", slaveMap);
+  std::map<std::string, std::string>::iterator i;
+  for (i = slaveMap.begin(); i != slaveMap.end(); i++)
+  {
+    uint16 slaveNumber = (uint16)std::distance(slaveMap.begin(), i);
+    if (i->second == "TEMPLATEGES")
+    {
+      slaves.push_back(new TemplateGES(i->first, slaveNumber));
+    }
+    else if (i->second == "IMC")
+    {
+      slaves.push_back(new IMC(i->first, slaveNumber));
+    }
+    else if (i->second == "PDB")
+    {
+      slaves.push_back(new PDB(i->first, slaveNumber));
+    }
+    else
+    {
+      slaves.push_back(new Slave(i->first, slaveNumber));
+    }
+  }
+  return slaves;
 }
 
-std::vector<Slave> initSlaves(ros::NodeHandle nh)
+// Initialize subscribers and publishers based on if certain slave types are present
+void initTopics(ros::NodeHandle nh)
 {
-    std::vector<Slave> slaves;
-    //Todo: Get amount of slaves, types and order from launch file
-
-    slaves.push_back(GES("TEMPLATEGES", 1));
-    return slaves;
+  int nrofTEMPLATEGES, nrofPDB, nrofIMC;
+  nrofTEMPLATEGES = nrofPDB = nrofIMC = 0;
+  for (int i = 0; i < slaveList.size(); i++)
+  {
+    std::string slaveType = slaveList[i]->getType();
+    if (slaveType == "IMC")
+    {
+      nrofIMC++;
+    }
+    if (slaveType == "PDB")
+    {
+      nrofPDB++;
+    }
+    if (slaveType == "TEMPLATEGES")
+    {
+      nrofTEMPLATEGES++;
+    }
+  }
+  if (nrofTEMPLATEGES > 0)
+  {
+    new ros::Subscriber(nh.subscribe("march/template/data", 50, &SetTemplateDataCB));
+  }
 }
 
-
+// Find a slave by its name
+Slave* getSlaveByName(std::vector<Slave*>* slaveList, std::string name)
+{
+  for (int i = 0; i < slaveList->size(); i++)
+  {
+    if (slaveList->at(i)->getName() == name)
+    {
+      return slaveList->at(i);
+    }
+  }
+  printf("No slave found with name %s\n", name.c_str());
+  return slaveList->at(0);
+}
+//--------------------------------------------------------------------
+// Main
+//--------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
   ros::init(argc, argv, "EthercatNode");
   ros::NodeHandle nh;
 
-  // Todo: Get rid of launch parameters and replace with nodehandle methods
-  LaunchParameters::init_parameters();
-
   int EthercatCycleTime, EthercatFrequency;
-  nh.getParam("/ETHERCAT_CYCLE_TIME",EthercatCycleTime);
-  EthercatFrequency = 1000/EthercatCycleTime;
+  nh.getParam("/ETHERCAT_CYCLE_TIME", EthercatCycleTime);
+  EthercatFrequency = 1000 / EthercatCycleTime;
   ros::Rate rate(EthercatFrequency);
 
-  std::vector<Slave> slaveList = initSlaves(nh);
+  slaveList = initSlaves(nh);
 
-  initSubscribers(nh);
-  initPublishers(nh);
+  // Print all slave types
+  for (int i = 0; i < slaveList.size(); i++)
+  {
+    printf("%s\n", slaveList.at(i)->type.c_str());
+  }
 
-  // Initialize EthercatMaster
+  initTopics(nh);
+
+  //  Initialize EthercatMaster
   EthercatMaster ethercatMaster = EthercatMaster(nh, slaveList);
-  ethercatMasterPtr = &ethercatMaster;
+  //  ethercatMasterPtr = &ethercatMaster;
 
   while (ros::ok() && ethercatMaster.inOP)
   {
@@ -81,6 +137,10 @@ int main(int argc, char* argv[])
     rate.sleep();
   }
 
+//  for (int i = 0; i < slaveList.size(); i++)
+//  {
+//    delete slaveList.at(i);
+//  }
   printf("End of EthercatNode\n");
   return (0);
 }

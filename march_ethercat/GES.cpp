@@ -4,7 +4,7 @@
 
 #include "GES.h"
 
-GES::GES(std::string name, int number){
-    this->name = name;
-    this->number = number;
+GES::GES(std::string name, uint16 number) : Slave(name, number)
+{
+  type = "GES";
 }

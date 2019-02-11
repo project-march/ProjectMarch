@@ -74,7 +74,14 @@
 
     <node name="march_ethercat" pkg="march_ethercat" type="march_ethercat_node" required="true" output="screen">
         <rosparam>
+            <!-- Network interface name -->
             ifname: 'enp4s0f2'
+        </rosparam>
+        <rosparam param="slaves">
+            <!-- Map of slaves and their names -->
+            <!-- Format: <NAME> : <TYPE> -->
+            master: MASTER
+            testGES: TEMPLATEGES
         </rosparam>
     </node>
 
