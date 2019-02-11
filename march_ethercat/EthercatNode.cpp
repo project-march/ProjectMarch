@@ -1,5 +1,5 @@
 /*
- * EthercatNode       - Initialises and runs SOEM/EthercatMaster and the ros node
+ * EthercatNode       - Initialises and runs ROS and the EtherCAT master
  *
  */
 
@@ -11,11 +11,10 @@
 #include "IMC.h"
 #include "PDB.h"
 
-// EthercatMaster* ethercatMasterPtr;
 std::vector<Slave*> slaveList;
 
-// Temporary method to set data sent to Template GES
-// Called when published on /march/template/data
+// Callback function to set data sent to Template GES
+// Triggered when a message is published on /march/template/data
 void SetTemplateDataCB(std_msgs::UInt8 msg)
 {
   for (int i = 0; i < slaveList.size(); i++)
@@ -108,24 +107,24 @@ int main(int argc, char* argv[])
   ros::init(argc, argv, "EthercatNode");
   ros::NodeHandle nh;
 
+  // Set ROS rate from cycle time in launch file
   int EthercatCycleTime, EthercatFrequency;
   nh.getParam("/ETHERCAT_CYCLE_TIME", EthercatCycleTime);
   EthercatFrequency = 1000 / EthercatCycleTime;
   ros::Rate rate(EthercatFrequency);
 
+  // Create all slaves based on launch file rosparams
   slaveList = initSlaves(nh);
 
-  // Print all slave types
+  // Print all slave types to see if correctly initialized all
   for (int i = 0; i < slaveList.size(); i++)
   {
-    printf("%s\n", slaveList.at(i)->type.c_str());
+    printf("%s\n", slaveList[i]->getType().c_str());
   }
 
   initTopics(nh);
 
-  //  Initialize EthercatMaster
   EthercatMaster ethercatMaster = EthercatMaster(nh, slaveList);
-  //  ethercatMasterPtr = &ethercatMaster;
 
   while (ros::ok() && ethercatMaster.inOP)
   {
@@ -137,10 +136,6 @@ int main(int argc, char* argv[])
     rate.sleep();
   }
 
-//  for (int i = 0; i < slaveList.size(); i++)
-//  {
-//    delete slaveList.at(i);
-//  }
   printf("End of EthercatNode\n");
   return (0);
 }

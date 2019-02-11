@@ -35,10 +35,7 @@ public:
   void PublishProcessData();
   // Monitor slave connection
   void MonitorSlaveConnection();
-  // Set data to be sent
-  // void SetByte(std::string slavename, uint8 offset, int8 byte);
-  // Get input received
-  // int8 GetByte(std::string slavename, uint8 offset);
+
 };
 
 #endif  // PROJECT_ETHERCAT_H

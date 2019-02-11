@@ -17,6 +17,7 @@ class Slave {
 protected:
     std::string name;
     uint16 number;
+    std::string type;
 public:
     Slave(std::string name, uint16 number);
     ~Slave() {};
@@ -24,7 +25,6 @@ public:
     std::string getName();
     int getNumber();
     std::string getType();
-    std::string type;
 };
 
 

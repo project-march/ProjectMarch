@@ -41,7 +41,7 @@ EthercatMaster::EthercatMaster(ros::NodeHandle nh, std::vector<Slave*> slaves)
 
   // Request and wait for slaves to be in preOP state
   // Todo: Change to 0
-  ec_statecheck(1, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
+  ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
 
   // Over all iMotionCubes:
   //    Apply PDO-mapping while in PreOP state
