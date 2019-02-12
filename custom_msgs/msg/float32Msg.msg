@@ -1,2 +1,0 @@
-string slaveName
-float32 data

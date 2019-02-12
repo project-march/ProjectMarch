@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(march_ethercat)
 
-find_package(catkin REQUIRED COMPONENTS actionlib_msgs custom_msgs roscpp std_msgs std_srvs)
+find_package(catkin REQUIRED COMPONENTS actionlib_msgs roscpp std_msgs std_srvs)
 
 catkin_package(
 )

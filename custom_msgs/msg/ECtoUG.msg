@@ -1,5 +1,0 @@
-string slaveName
-float32 hipTemperature
-float32 kneeTemperature
-int8 manualInputState
-uint8 errorCode

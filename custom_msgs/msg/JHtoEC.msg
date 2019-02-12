@@ -1,3 +1,0 @@
-string slaveName
-int32 position
-int16 controlword

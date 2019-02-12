@@ -10,7 +10,6 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <depend>actionlib_msgs</depend>
-  <depend>custom_msgs</depend>
   <depend>roscpp</depend>
   <depend>std_srvs</depend>
   <depend>std_msgs</depend>

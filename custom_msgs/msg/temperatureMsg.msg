@@ -1,3 +1,0 @@
-string slaveName
-float32 temperature1
-float32 temperature2

@@ -1,8 +1,6 @@
 #ifndef ETHERCAT_SAFETY_
 #define ETHERCAT_SAFETY_
 
-#include <custom_msgs/data8Msg.h>
-
 class ethercat_safety
 {
 public:

@@ -1,3 +1,0 @@
-string slaveName
-float32 ankleTemperature
-uint8 errorCode

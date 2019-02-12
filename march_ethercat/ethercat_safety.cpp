@@ -57,7 +57,6 @@ unsigned int ethercat_safety::get_error_code(int lostSlaveIndex)
 
 void ethercat_safety::send_safety_message(int lostSlaveIndex)
 {
-  custom_msgs::data8Msg safetyMassage;
 
   // Todo: Fix this
   // safetyMassage.slaveName = LaunchParameters::get_slave_name(lostSlaveIndex);
