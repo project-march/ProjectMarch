@@ -1,21 +1,43 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(march_ethercat)
 
-find_package(catkin REQUIRED COMPONENTS actionlib_msgs roscpp std_msgs std_srvs)
+find_package(catkin REQUIRED
+        COMPONENTS
+                march_shared_resources
+                roscpp
+                std_msgs
+                std_srvs
+        )
 
 catkin_package(
-)
+        CATKIN_DEPENDS
+                roscpp
+                std_msgs
+                std_srvs
+        )
 
-include_directories(include ${catkin_INCLUDE_DIRS})
-include_directories(soem)
+include_directories(
+        ${catkin_INCLUDE_DIRS}
+        soem
+        )
 
-set(SOURCES EthercatNode.cpp EthercatMaster.cpp EthercatMaster.h ethercat_SDO.cpp ethercat_io.cpp ethercat_safety.cpp Slave.cpp Slave.h GES.cpp GES.h IMC.cpp IMC.h PDB.cpp PDB.h TemplateGES.cpp TemplateGES.h)
+set(SOURCES
+        src/EthercatNode.cpp
+        src/EthercatMaster.cpp
+        src/EthercatSDO.cpp
+        src/ethercat_io.cpp
+        src/ethercat_safety.cpp
+        src/Slaves/Slave.cpp
+        src/Slaves/GES.cpp
+        src/Slaves/IMC.cpp
+        src/Slaves/PDB.cpp
+        src/Slaves/TemplateGES.cpp
+        )
 
-file(GLOB_RECURSE SOEM_SRC
-    "*.h" "*.c"
-)
-
-add_library(${SOURCES} ${SOEM_SRC})
+file(GLOB SOEM_SRC
+        soem/*.h
+        soem/*.c
+        )
 
 add_executable(march_ethercat_node ${SOURCES} ${SOEM_SRC})
 

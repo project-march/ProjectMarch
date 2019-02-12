@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include <osal.h>
+#include "osal.h"
 
 #define USECS_PER_SEC     1000000
 

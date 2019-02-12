@@ -6,8 +6,8 @@
 #include "EthercatMaster.h"
 #include "ethercat_SDO.h"
 #include "ethercat_safety.h"
-#include "IMC.h"
-#include "TemplateGES.h"
+#include "Slaves/IMC.h"
+#include "Slaves/TemplateGES.h"
 
 extern "C" {
 #include "ethercat.h"

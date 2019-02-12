@@ -7,7 +7,7 @@
 
 #include <ros/node_handle.h>
 #include "ethercat_io.h"
-#include "Slave.h"
+#include "Slaves/Slave.h"
 
 extern "C" {
 #include "osal.h"

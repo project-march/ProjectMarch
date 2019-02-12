@@ -7,9 +7,9 @@
 #include <ros/ros.h>
 #include <std_msgs/UInt8.h>
 #include "EthercatMaster.h"
-#include "TemplateGES.h"
-#include "IMC.h"
-#include "PDB.h"
+#include "Slaves/TemplateGES.h"
+#include "Slaves/IMC.h"
+#include "Slaves/PDB.h"
 
 std::vector<Slave*> slaveList;
 

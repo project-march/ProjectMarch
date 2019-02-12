@@ -1,4 +1,5 @@
 #include "ethercat_safety.h"
+#include <ros/ros.h>
 
 extern "C" {
 #include "ethercat.h"
@@ -45,7 +46,7 @@ unsigned int ethercat_safety::get_error_code(int lostSlaveIndex)
   if (!lostSlaveIndex)
     return 0;
 
-  // Todo: lostSlaveIndex <= slavenumber of PDB
+  // TODO(Martijn) lostSlaveIndex <= slavenumber of PDB
   if (lostSlaveIndex <= 1)
     return 0b010;
 
@@ -58,8 +59,11 @@ unsigned int ethercat_safety::get_error_code(int lostSlaveIndex)
 void ethercat_safety::send_safety_message(int lostSlaveIndex)
 {
 
-  // Todo: Fix this
+  // TODO(Martijn, Isha) Determine what to do when slave is lost, how to publish
   // safetyMassage.slaveName = LaunchParameters::get_slave_name(lostSlaveIndex);
   // safetyMassage.data = get_error_code(lostSlaveIndex);
   // publish_to_safety(safetyMassage);
+
+  // For now, use ROS_DEBUG
+  ROS_DEBUG("Slave %d lost with errorCode %d", lostSlaveIndex, get_error_code(lostSlaveIndex));
 }

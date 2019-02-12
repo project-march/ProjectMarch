@@ -6,7 +6,8 @@
 #define PROJECT_SLAVE_H
 
 #include <string>
-#include "ethercat_io.h"
+#include <ros/ros.h>
+#include "../ethercat_io.h"
 
 extern "C" {
 #include "osal.h"
