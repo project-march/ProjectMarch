@@ -45,7 +45,8 @@ unsigned int ethercat_safety::get_error_code(int lostSlaveIndex)
   if (!lostSlaveIndex)
     return 0;
 
-  if (lostSlaveIndex <= LaunchParameters::get_slave_number("PDB"))
+  // Todo: lostSlaveIndex <= slavenumber of PDB
+  if (lostSlaveIndex <= 1)
     return 0b010;
 
   if (lostSlaveIndex == ec_slavecount)
@@ -58,8 +59,8 @@ void ethercat_safety::send_safety_message(int lostSlaveIndex)
 {
   custom_msgs::data8Msg safetyMassage;
 
-  safetyMassage.slaveName = LaunchParameters::get_slave_name(lostSlaveIndex);
-  safetyMassage.data = get_error_code(lostSlaveIndex);
   // Todo: Fix this
+  // safetyMassage.slaveName = LaunchParameters::get_slave_name(lostSlaveIndex);
+  // safetyMassage.data = get_error_code(lostSlaveIndex);
   // publish_to_safety(safetyMassage);
 }

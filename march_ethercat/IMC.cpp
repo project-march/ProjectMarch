@@ -106,6 +106,7 @@ bool IMC::PDOmapping()
   return success;
 }
 
+// Set configuration parameters to the IMC
 bool IMC::StartupSDO(int ecatCycleTime)
 {
   bool success = true;

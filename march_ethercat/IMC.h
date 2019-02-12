@@ -15,7 +15,9 @@ public:
   IMC(std::string name, uint16 number);
   // Process Data Object mapping
   bool PDOmapping();
+  // Set configuration parameters for the IMC
   bool StartupSDO(int ecatCycleTime);
+  // Publish received data
   void publish();
 };
 

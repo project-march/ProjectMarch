@@ -2,7 +2,6 @@
 #define ETHERCAT_SAFETY_
 
 #include <custom_msgs/data8Msg.h>
-#include "launch_parameters.h"
 
 class ethercat_safety
 {

@@ -1,7 +1,7 @@
-/*
- * EthercatNode       - Initialises and runs ROS and the EtherCAT master
- *
- */
+//
+// Initialises and runs ROS and the EtherCAT master
+// Developed by MARCH IV
+//
 
 #include <stdio.h>
 #include <ros/ros.h>
@@ -96,12 +96,6 @@ int main(int argc, char* argv[])
   ros::init(argc, argv, "EthercatNode");
   ros::NodeHandle nh;
 
-  // Set ROS rate from cycle time in launch file
-  int EthercatCycleTime, EthercatFrequency;
-  nh.getParam(ros::this_node::getName() + "/EthercatCycleTime", EthercatCycleTime);
-  EthercatFrequency = 1000 / EthercatCycleTime;
-  ros::Rate rate(EthercatFrequency);
-
   // Create all slaves based on launch file rosparams
   slaveList = initSlaves(nh);
 
@@ -114,6 +108,12 @@ int main(int argc, char* argv[])
   initTopics(nh);
 
   EthercatMaster ethercatMaster = EthercatMaster(nh, slaveList);
+
+  // Set ROS rate from cycle time in launch file
+  int EthercatCycleTime, EthercatFrequency;
+  nh.getParam(ros::this_node::getName() + "/EthercatCycleTime", EthercatCycleTime);
+  EthercatFrequency = 1000 / EthercatCycleTime;
+  ros::Rate rate(EthercatFrequency);
 
   while (ros::ok() && ethercatMaster.inOP)
   {
