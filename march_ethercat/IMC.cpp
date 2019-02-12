@@ -1,19 +1,25 @@
 //
-// Created by Martijn on 8-2-19.
+// Class source for IMotionCubes
+// Derived from Slave class
 //
 
 #include "IMC.h"
 #include "ethercat_SDO.h"
 
+// Constructor
 IMC::IMC(std::string name, uint16 number) : Slave(name, number)
 {
   type = "IMC";
 }
 
+// Publish received data
 void IMC::publish()
 {
+  // Empty for now
+  // Todo: determine what to do with received IMC data
 }
 
+// Map Process Data Object by sending SDOs to the IMC
 bool IMC::PDOmapping()
 {
   printf("PDO mapping START!\n");

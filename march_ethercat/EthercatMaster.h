@@ -1,5 +1,5 @@
 //
-// Created by Martijn on 4-2-19.
+// EtherCAT master class header. Interfaces with SOEM
 //
 
 #ifndef PROJECT_ETHERCAT_H
@@ -18,7 +18,7 @@ class EthercatMaster
   std::string ifname;  // Network interface name, check ifconfig
   char IOmap[4096];    // Holds the mapping of the SOEM message
   int expectedWKC;     // Expected working counter
-  std::vector<Slave*> slaveList;
+  std::vector<Slave*> slaveList;    // Contains all slaves
 
 public:
   bool inOP;  // Is SOEM in operational state
@@ -31,7 +31,7 @@ public:
   void SendProcessData();
   // Receive Process Data over EtherCAT
   int ReceiveProcessData();
-  // Call Callbacks for received Process Data
+  // Publish received Process Data per slave
   void PublishProcessData();
   // Monitor slave connection
   void MonitorSlaveConnection();

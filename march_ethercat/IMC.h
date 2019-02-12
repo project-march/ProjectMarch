@@ -1,5 +1,6 @@
 //
-// Created by Martijn on 8-2-19.
+// Class header for IMotionCubes
+// Derived from Slave class
 //
 
 #ifndef PROJECT_IMC_H
@@ -10,7 +11,9 @@
 class IMC : public Slave
 {
 public:
+  // Constructor
   IMC(std::string name, uint16 number);
+  // Process Data Object mapping
   bool PDOmapping();
   bool StartupSDO(int ecatCycleTime);
   void publish();

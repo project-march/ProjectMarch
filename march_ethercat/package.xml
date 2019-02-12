@@ -2,7 +2,7 @@
 <package format="2">
   <name>march_ethercat</name>
   <version>0.0.0</version>
-  <description>Developer input device to send commands to the march-iv</description>
+  <description>EtherCAT interface of the march-iv</description>
 
   <maintainer email="software@projectmarch.nl">Project March</maintainer>
   <license>TODO</license>

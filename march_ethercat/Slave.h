@@ -1,5 +1,5 @@
 //
-// Created by Martijn on 5-2-19.
+// Base class header for all slaves
 //
 
 #ifndef PROJECT_SLAVE_H
@@ -15,13 +15,16 @@ extern "C" {
 class Slave {
 
 protected:
+    // Name, number and type of slave
     std::string name;
     uint16 number;
     std::string type;
 public:
+    // Constructor and Destructor
     Slave(std::string name, uint16 number);
-    ~Slave() {};
+    ~Slave(){};
 
+    // Getters
     std::string getName();
     int getNumber();
     std::string getType();

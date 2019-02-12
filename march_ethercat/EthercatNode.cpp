@@ -62,9 +62,10 @@ std::vector<Slave*> initSlaves(ros::NodeHandle nh)
 // Initialize subscribers and publishers based on if certain slave types are present
 void initTopics(ros::NodeHandle nh)
 {
+  // Find amount of each type of slave
   int nrofTEMPLATEGES, nrofPDB, nrofIMC;
   nrofTEMPLATEGES = nrofPDB = nrofIMC = 0;
-  for (int i = 0; i < slaveList.size(); i++)
+  for (int i = 1; i < slaveList.size(); i++)
   {
     std::string slaveType = slaveList[i]->getType();
     if (slaveType == "IMC")
@@ -80,25 +81,13 @@ void initTopics(ros::NodeHandle nh)
       nrofTEMPLATEGES++;
     }
   }
+  // Initialize subscribers and publishers based on presence/amount of slave types
   if (nrofTEMPLATEGES > 0)
   {
     new ros::Subscriber(nh.subscribe("march/template/data", 50, &SetTemplateDataCB));
   }
 }
 
-// Find a slave by its name
-Slave* getSlaveByName(std::vector<Slave*>* slaveList, std::string name)
-{
-  for (int i = 0; i < slaveList->size(); i++)
-  {
-    if (slaveList->at(i)->getName() == name)
-    {
-      return slaveList->at(i);
-    }
-  }
-  printf("No slave found with name %s\n", name.c_str());
-  return slaveList->at(0);
-}
 //--------------------------------------------------------------------
 // Main
 //--------------------------------------------------------------------
@@ -109,14 +98,14 @@ int main(int argc, char* argv[])
 
   // Set ROS rate from cycle time in launch file
   int EthercatCycleTime, EthercatFrequency;
-  nh.getParam("/ETHERCAT_CYCLE_TIME", EthercatCycleTime);
+  nh.getParam(ros::this_node::getName() + "/EthercatCycleTime", EthercatCycleTime);
   EthercatFrequency = 1000 / EthercatCycleTime;
   ros::Rate rate(EthercatFrequency);
 
   // Create all slaves based on launch file rosparams
   slaveList = initSlaves(nh);
 
-  // Print all slave types to see if correctly initialized all
+  // Print all slave types to see if correctly initialized all slaves
   for (int i = 0; i < slaveList.size(); i++)
   {
     printf("%s\n", slaveList[i]->getType().c_str());

@@ -1,7 +1,8 @@
 //
-// Created by Martijn on 4-2-19.
+// EtherCAT master class source. Interfaces with SOEM
 //
 
+#include <ros/ros.h>
 #include "EthercatMaster.h"
 #include "ethercat_SDO.h"
 #include "ethercat_safety.h"
@@ -47,7 +48,7 @@ EthercatMaster::EthercatMaster(ros::NodeHandle nh, std::vector<Slave*> slaves)
   //    Apply PDO-mapping while in PreOP state
   //    Send initialization SDO messages
   int ecatCycleTime;
-  nh.getParam("/ETHERCAT_CYCLE_TIME", ecatCycleTime);
+  nh.getParam(ros::this_node::getName() + "/EthercatCycleTime", ecatCycleTime);
   for (int j = 0; j < slaveList.size(); j++)
   {
     if (slaveList[j]->getType() == "IMC")

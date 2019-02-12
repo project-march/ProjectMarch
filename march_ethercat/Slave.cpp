@@ -1,15 +1,18 @@
 //
-// Created by Martijn on 5-2-19.
+// Base class source for all slaves
 //
 
 #include "Slave.h"
 
+// Constructor
 Slave::Slave(std::string name, uint16 number)
 {
   this->name = name;
   this->number = number;
   type = "SLAVE";
 }
+
+// Getters
 
 std::string Slave::getName()
 {
