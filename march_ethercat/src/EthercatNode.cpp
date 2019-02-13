@@ -7,6 +7,7 @@
 #include <ros/ros.h>
 #include <std_msgs/UInt8.h>
 #include "EthercatMaster.h"
+#include "Slaves/Slaves.h"
 #include "Slaves/TemplateGES.h"
 #include "Slaves/IMC.h"
 #include "Slaves/PDB.h"
@@ -24,7 +25,7 @@ void SetTemplateDataCB(std_msgs::UInt8 msg)
     {
       TemplateGES* tmpTemplateGES = (TemplateGES*)slaveList[i];
       tmpTemplateGES->setLedCommand(msg.data);
-      printf("Set LED command to GES with name %s to value %i\n", tmpTemplateGES->getName().c_str(), msg.data);
+      ROS_DEBUG("Set LED command to GES with name %s to value %i\n", tmpTemplateGES->getName().c_str(), msg.data);
     }
   }
 }
@@ -51,9 +52,13 @@ std::vector<Slave*> initSlaves(ros::NodeHandle nh)
     {
       slaves.push_back(new PDB(i->first, slaveNumber));
     }
-    else
+    else if (i->second == "MASTER")
     {
       slaves.push_back(new Slave(i->first, slaveNumber));
+    }
+    else
+    {
+      ROS_WARN("Could not make slave of type %s", i->second.c_str());
     }
   }
   return slaves;
@@ -102,29 +107,31 @@ int main(int argc, char* argv[])
   // Print all slave types to see if correctly initialized all slaves
   for (int i = 0; i < slaveList.size(); i++)
   {
-    printf("%s\n", slaveList[i]->getType().c_str());
+    ROS_DEBUG("%s\n", slaveList[i]->getType().c_str());
   }
 
-  initTopics(nh);
+  // Print all GESs
 
-  EthercatMaster ethercatMaster = EthercatMaster(nh, slaveList);
+  //  initTopics(nh);
+  //
+  //  EthercatMaster ethercatMaster = EthercatMaster(nh, slaveList);
+  //
+  //  // Set ROS rate from cycle time in launch file
+  //  int EthercatCycleTime, EthercatFrequency;
+  //  nh.getParam(ros::this_node::getName() + "/EthercatCycleTime", EthercatCycleTime);
+  //  EthercatFrequency = 1000 / EthercatCycleTime;
+  //  ros::Rate rate(EthercatFrequency);
+  //
+  //  while (ros::ok() && ethercatMaster.inOP)
+  //  {
+  //    ethercatMaster.SendProcessData();
+  //    ethercatMaster.ReceiveProcessData();
+  //    ethercatMaster.PublishProcessData();
+  //    ethercatMaster.MonitorSlaveConnection();
+  //    ros::spinOnce();
+  //    rate.sleep();
+  //  }
 
-  // Set ROS rate from cycle time in launch file
-  int EthercatCycleTime, EthercatFrequency;
-  nh.getParam(ros::this_node::getName() + "/EthercatCycleTime", EthercatCycleTime);
-  EthercatFrequency = 1000 / EthercatCycleTime;
-  ros::Rate rate(EthercatFrequency);
-
-  while (ros::ok() && ethercatMaster.inOP)
-  {
-    ethercatMaster.SendProcessData();
-    ethercatMaster.ReceiveProcessData();
-    ethercatMaster.PublishProcessData();
-    ethercatMaster.MonitorSlaveConnection();
-    ros::spinOnce();
-    rate.sleep();
-  }
-
-  printf("End of EthercatNode\n");
+  ROS_DEBUG("End of EthercatNode\n");
   return (0);
 }

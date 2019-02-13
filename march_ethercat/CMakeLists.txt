@@ -9,11 +9,10 @@ find_package(catkin REQUIRED
                 std_srvs
         )
 
-catkin_package(
-        CATKIN_DEPENDS
-                roscpp
-                std_msgs
-                std_srvs
+catkin_package(CATKIN_DEPENDS
+        roscpp
+        std_msgs
+        std_srvs
         )
 
 include_directories(
@@ -32,22 +31,30 @@ set(SOURCES
         src/Slaves/IMC.cpp
         src/Slaves/PDB.cpp
         src/Slaves/TemplateGES.cpp
-        )
+        src/Slaves/Slaves.cpp)
 
 file(GLOB SOEM_SRC
         soem/*.h
         soem/*.c
         )
 
-add_executable(march_ethercat_node ${SOURCES} ${SOEM_SRC})
+add_executable(march_ethercat_node
+        ${SOURCES}
+        ${SOEM_SRC}
+        )
 
-add_dependencies(march_ethercat_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(march_ethercat_node
+        ${${PROJECT_NAME}_EXPORTED_TARGETS}
+        ${catkin_EXPORTED_TARGETS}
+        )
 
-target_link_libraries(march_ethercat_node ${catkin_LIBRARIES})
+target_link_libraries(march_ethercat_node
+        ${catkin_LIBRARIES})
 
 # Give sudo access to ethernet port
-add_custom_command( TARGET march_ethercat_node
-                    POST_BUILD
-                    COMMAND sudo setcap cap_net_raw+ep march_ethercat_node
-                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/../devel/lib/march_ethercat
-                  )
+add_custom_command(
+        TARGET march_ethercat_node
+        POST_BUILD
+        COMMAND sudo setcap cap_net_raw+ep march_ethercat_node
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/../devel/lib/march_ethercat
+        )
