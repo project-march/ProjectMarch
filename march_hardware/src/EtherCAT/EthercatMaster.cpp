@@ -5,6 +5,7 @@
 #include <ros/ros.h>
 #include <march_hardware/EtherCAT/EthercatMaster.h>
 #include <march_hardware/Joint.h>
+#include <thread>
 
 extern "C" {
 #include "ethercat.h"
@@ -20,7 +21,7 @@ EthercatMaster::EthercatMaster(std::vector<Joint> jointList)
 
   inOP = false;
 
-  printf("Starting ethercat\n");
+  ROS_INFO("Starting ethercat\n");
 
   // Initialise SOEM, bind socket to ifname
   if (!ec_init(ifname.c_str()))
@@ -28,7 +29,7 @@ EthercatMaster::EthercatMaster(std::vector<Joint> jointList)
     ROS_ERROR("No socket connection on %s", ifname.c_str());
     return;
   }
-  printf("ec_init on %s succeeded.\n", ifname.c_str());
+  ROS_INFO("ec_init on %s succeeded.\n", ifname.c_str());
 
   // Find and auto-config slaves
   if (ec_config_init(FALSE) <= 0)
@@ -36,10 +37,9 @@ EthercatMaster::EthercatMaster(std::vector<Joint> jointList)
     ROS_ERROR("No slaves found, shutting down");
     return;
   }
-  printf("%d slaves found and configured.\n", ec_slavecount);
+  ROS_DEBUG("%d slaves found and configured.\n", ec_slavecount);
 
   // Request and wait for slaves to be in preOP state
-  // Todo: Change to 0
   ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
 
   //  int ecatCycleTime = 200; //TODO(Martijn) make this less magic-numberesqe
@@ -56,12 +56,12 @@ EthercatMaster::EthercatMaster(std::vector<Joint> jointList)
   // Wait for all slaves to reach SAFE_OP state
   ec_statecheck(0, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE * 4);
 
-  printf("segments : %d : %d %d %d %d\n", ec_group[0].nsegments, ec_group[0].IOsegment[0], ec_group[0].IOsegment[1],
-         ec_group[0].IOsegment[2], ec_group[0].IOsegment[3]);
+  ROS_DEBUG("segments : %d : %d %d %d %d\n", ec_group[0].nsegments, ec_group[0].IOsegment[0], ec_group[0].IOsegment[1],
+            ec_group[0].IOsegment[2], ec_group[0].IOsegment[3]);
 
-  printf("Request operational state for all slaves\n");
+  ROS_DEBUG("Request operational state for all slaves\n");
   expectedWKC = (ec_group[0].outputsWKC * 2) + ec_group[0].inputsWKC;
-  printf("Calculated workcounter %d\n", expectedWKC);
+  ROS_DEBUG("Calculated workcounter %d\n", expectedWKC);
   ec_slave[0].state = EC_STATE_OPERATIONAL;
 
   // send one valid process data to make outputs in slaves happy
@@ -83,7 +83,7 @@ EthercatMaster::EthercatMaster(std::vector<Joint> jointList)
   if (ec_slave[0].state == EC_STATE_OPERATIONAL)
   {
     // All slaves in operational state
-    printf("Operational state reached for all slaves.\n");
+    ROS_DEBUG("Operational state reached for all slaves.\n");
     inOP = true;
     // TODO(Martijn) create parallel thread
     std::thread EcatThread(&EthercatMaster::EthercatLoop, this);
@@ -98,8 +98,8 @@ EthercatMaster::EthercatMaster(std::vector<Joint> jointList)
     {
       if (ec_slave[i].state != EC_STATE_OPERATIONAL)
       {
-        printf("Slave %d State=0x%2.2x StatusCode=0x%4.4x : %s\n", i, ec_slave[i].state, ec_slave[i].ALstatuscode,
-               ec_ALstatuscode2string(ec_slave[i].ALstatuscode));
+        ROS_DEBUG("Slave %d State=0x%2.2x StatusCode=0x%4.4x : %s\n", i, ec_slave[i].state, ec_slave[i].ALstatuscode,
+                  ec_ALstatuscode2string(ec_slave[i].ALstatuscode));
       }
     }
   }
@@ -108,14 +108,14 @@ EthercatMaster::EthercatMaster(std::vector<Joint> jointList)
 EthercatMaster::~EthercatMaster()
 {
   inOP = false;
-  printf("Deconstructing EthercatMaster object\n");
-  printf("Request init state for all slaves\n");
+  ROS_DEBUG("Deconstructing EthercatMaster object\n");
+  ROS_DEBUG("Request init state for all slaves\n");
   ec_slave[0].state = EC_STATE_INIT;
   ec_writestate(0);
-  printf("Closing EtherCAT\n");
+  ROS_DEBUG("Closing EtherCAT\n");
   ec_close();
-  printf("Shutting down ROS\n");
-  ros::shutdown();
+  ROS_DEBUG("Shutting down ROS\n");
+//  ros::shutdown();
 }
 
 void EthercatMaster::SendProcessData()
@@ -160,8 +160,10 @@ void EthercatMaster::PublishProcessData()
 
 void EthercatMaster::MonitorSlaveConnection()
 {
-  // Todo: refactor this
-  ethercat_safety::monitor_slave_connection();
+  // TODO(Martijn)
+  //  Integrate this within EthercatMaster and Slave classes
+  //  Determine how to notify developer/user
+  //  ethercat_safety::monitor_slave_connection();
 }
 
 void EthercatMaster::EthercatLoop()
