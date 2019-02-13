@@ -3,22 +3,20 @@
 //
 
 #include <ros/ros.h>
-#include "EthercatMaster.h"
-#include "ethercat_SDO.h"
-#include "ethercat_safety.h"
-#include "Slaves/IMC.h"
-#include "Slaves/TemplateGES.h"
+#include <march_hardware/EtherCAT/EthercatMaster.h>
+#include <march_hardware/Joint.h>
 
 extern "C" {
 #include "ethercat.h"
 }
 
 // Constructor
-EthercatMaster::EthercatMaster(ros::NodeHandle nh, std::vector<Slave*> slaves)
+EthercatMaster::EthercatMaster(std::vector<Joint> jointList)
 {
-  slaveList = slaves;
-  // Get the name of the network interface (if) over which SOEM will be run from the launch file
-  nh.getParam(ros::this_node::getName() + "/ifname", ifname);
+  this->jointList = jointList;
+
+  // TODO(Isha, Martijn) make this variable or configure at runtime?
+  ifname = "enp2s0";
 
   inOP = false;
 
@@ -47,16 +45,13 @@ EthercatMaster::EthercatMaster(ros::NodeHandle nh, std::vector<Slave*> slaves)
   // Over all iMotionCubes:
   //    Apply PDO-mapping while in PreOP state
   //    Send initialization SDO messages
-  int ecatCycleTime;
-  nh.getParam(ros::this_node::getName() + "/EthercatCycleTime", ecatCycleTime);
-  for (int j = 0; j < slaveList.size(); j++)
+//  int ecatCycleTime = 200; //TODO(Martijn) make this less magic-numberesqe
+  for (int i = 0; i < jointList.size(); i++)
   {
-    if (slaveList[j]->getType() == "IMC")
-    {
-      IMC* tmpIMCSlave = (IMC*)slaveList[j];
-      tmpIMCSlave->PDOmapping();
-      tmpIMCSlave->StartupSDO(ecatCycleTime);
-    }
+    jointList[i].initialize();
+//    IMC* tmpIMCSlave = (IMC*)slaveList[j];
+//      tmpIMCSlave->PDOmapping();
+//      tmpIMCSlave->StartupSDO(ecatCycleTime);
   }
 
   // Configure the EtherCAT message structure depending on the PDO mapping of all the slaves
@@ -96,6 +91,8 @@ EthercatMaster::EthercatMaster(ros::NodeHandle nh, std::vector<Slave*> slaves)
     // All slaves in operational state
     printf("Operational state reached for all slaves.\n");
     inOP = true;
+    //TODO(Martijn) create parallel thread
+    //osal_thread_create(&thread1, 128000, &EthercatLoop, &ctime)
   }
   else
   {
@@ -139,33 +136,39 @@ int EthercatMaster::ReceiveProcessData()
 void EthercatMaster::PublishProcessData()
 {
   // Publish for all slaves except the master (slave 0)
-  for (int i = 1; i < slaveList.size(); i++)
-  {
-    // Todo: Add other slave publisher implementations
-    std::string slaveType = slaveList[i]->getType();
-    if (slaveType == "TEMPLATEGES")
-    {
-      TemplateGES* tmpTemplateGES = (TemplateGES*)slaveList[i];
-      tmpTemplateGES->publish();
-    }
-    else if (slaveType == "IMC")
-    {
-    }
-    else if (slaveType == "PDB")
-    {
-    }
-    else if (slaveType == "GES")
-    {
-    }
-    else
-    {
-      printf("Error when getting GES data! Unknown GES name\n");
-    }
-  }
+//  for (int i = 1; i < jointList.size(); i++)
+//  {
+//    // TODO(Isha, BaCo)
+//    //  Determine how to publish EtherCAT process data
+//    //  Add other slave publisher implementations
+//    std::string slaveType = jointList[i]->getType();
+//    if (slaveType == "TEMPLATEGES")
+//    {
+//      TemplateGES* tmpTemplateGES = (TemplateGES*)slaveList[i];
+//      tmpTemplateGES->publish();
+//    }
+//    else if (slaveType == "IMC")
+//    {
+//    }
+//    else if (slaveType == "PDB")
+//    {
+//    }
+//    else if (slaveType == "GES")
+//    {
+//    }
+//    else
+//    {
+//      ROS_DEBUG("Error when getting GES data! Unknown GES name\n");
+//    }
+//  }
 }
 
 void EthercatMaster::MonitorSlaveConnection()
 {
   // Todo: refactor this
   ethercat_safety::monitor_slave_connection();
+}
+
+OSAL_THREAD_FUNC EthercatLoop(void* ptr){
+    //Parallel thread
 }

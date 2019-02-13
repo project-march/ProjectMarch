@@ -17,13 +17,13 @@ catkin_package(CATKIN_DEPENDS
 
 include_directories(
         ${catkin_INCLUDE_DIRS}
-        soem
+        ../march_hardware/soem
         )
 
 set(SOURCES
         src/EthercatNode.cpp
-        src/EthercatMaster.cpp
-        src/EthercatSDO.cpp
+        ../march_hardware/src/EtherCAT/EthercatMaster.cpp
+        ../march_hardware/src/EtherCAT/EthercatSDO.cpp
         src/ethercat_io.cpp
         src/ethercat_safety.cpp
         src/Slaves/Slave.cpp
@@ -34,8 +34,8 @@ set(SOURCES
         src/Slaves/Slaves.cpp)
 
 file(GLOB SOEM_SRC
-        soem/*.h
-        soem/*.c
+        ../march_hardware/soem/*.h
+        ../march_hardware/soem/*.c
         )
 
 add_executable(march_ethercat_node
