@@ -27,6 +27,13 @@ install(DIRECTORY include/${PROJECT_NAME}/
         FILES_MATCHING PATTERN "*.h"
         PATTERN ".svn" EXCLUDE)
 
+
+file(GLOB SOEM_SRC
+        soem/*.h
+        soem/*.c
+        )
+
+
 add_library(march4cpp
         include/${PROJECT_NAME}/IMotionCube.h
         include/${PROJECT_NAME}/Joint.h
@@ -37,7 +44,12 @@ add_library(march4cpp
         src/March4.cpp
         src/TemperatureSensor.cpp
         src/EtherCAT/EthercatMaster.cpp
+        include/${PROJECT_NAME}/EtherCAT/EthercatMaster.h
+        include/${PROJECT_NAME}/EtherCAT/EthercatSDO.h
         src/EtherCAT/EthercatSDO.cpp
+
+        ${SOEM_SRC}
+
 
         src/main.cpp
         )
@@ -45,5 +57,5 @@ add_library(march4cpp
 target_link_libraries(march4cpp ${catkin_LIBRARIES})
 
 
-add_executable(hardware_test src/main.cpp)
-target_link_libraries(hardware_test march4cpp)
+add_executable(hardware_dummy src/main.cpp)
+target_link_libraries(hardware_dummy march4cpp)
