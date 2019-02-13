@@ -59,3 +59,11 @@ target_link_libraries(march4cpp ${catkin_LIBRARIES})
 
 add_executable(hardware_dummy src/main.cpp)
 target_link_libraries(hardware_dummy march4cpp)
+
+# Give sudo access to ethernet port
+add_custom_command(
+        TARGET hardware_dummy
+        POST_BUILD
+        COMMAND sudo setcap cap_net_raw+ep hardware_dummy
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/../devel/lib/march_hardware
+)

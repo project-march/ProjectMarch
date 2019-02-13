@@ -33,6 +33,7 @@ public:
   void PublishProcessData();
   // Monitor slave connection
   void MonitorSlaveConnection();
+  void EthercatLoop();
 
 };
 

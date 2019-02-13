@@ -16,7 +16,7 @@ EthercatMaster::EthercatMaster(std::vector<Joint> jointList)
   this->jointList = jointList;
 
   // TODO(Isha, Martijn) make this variable or configure at runtime?
-  ifname = "enp2s0";
+  ifname = "enp3s0";
 
   inOP = false;
 
@@ -42,16 +42,10 @@ EthercatMaster::EthercatMaster(std::vector<Joint> jointList)
   // Todo: Change to 0
   ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
 
-  // Over all iMotionCubes:
-  //    Apply PDO-mapping while in PreOP state
-  //    Send initialization SDO messages
-//  int ecatCycleTime = 200; //TODO(Martijn) make this less magic-numberesqe
+  //  int ecatCycleTime = 200; //TODO(Martijn) make this less magic-numberesqe
   for (int i = 0; i < jointList.size(); i++)
   {
     jointList[i].initialize();
-//    IMC* tmpIMCSlave = (IMC*)slaveList[j];
-//      tmpIMCSlave->PDOmapping();
-//      tmpIMCSlave->StartupSDO(ecatCycleTime);
   }
 
   // Configure the EtherCAT message structure depending on the PDO mapping of all the slaves
@@ -91,8 +85,9 @@ EthercatMaster::EthercatMaster(std::vector<Joint> jointList)
     // All slaves in operational state
     printf("Operational state reached for all slaves.\n");
     inOP = true;
-    //TODO(Martijn) create parallel thread
-    //osal_thread_create(&thread1, 128000, &EthercatLoop, &ctime)
+    // TODO(Martijn) create parallel thread
+    std::thread EcatThread(&EthercatMaster::EthercatLoop, this);
+
   }
   else
   {
@@ -136,31 +131,31 @@ int EthercatMaster::ReceiveProcessData()
 void EthercatMaster::PublishProcessData()
 {
   // Publish for all slaves except the master (slave 0)
-//  for (int i = 1; i < jointList.size(); i++)
-//  {
-//    // TODO(Isha, BaCo)
-//    //  Determine how to publish EtherCAT process data
-//    //  Add other slave publisher implementations
-//    std::string slaveType = jointList[i]->getType();
-//    if (slaveType == "TEMPLATEGES")
-//    {
-//      TemplateGES* tmpTemplateGES = (TemplateGES*)slaveList[i];
-//      tmpTemplateGES->publish();
-//    }
-//    else if (slaveType == "IMC")
-//    {
-//    }
-//    else if (slaveType == "PDB")
-//    {
-//    }
-//    else if (slaveType == "GES")
-//    {
-//    }
-//    else
-//    {
-//      ROS_DEBUG("Error when getting GES data! Unknown GES name\n");
-//    }
-//  }
+  //  for (int i = 1; i < jointList.size(); i++)
+  //  {
+  //    // TODO(Isha, BaCo)
+  //    //  Determine how to publish EtherCAT process data
+  //    //  Add other slave publisher implementations
+  //    std::string slaveType = jointList[i]->getType();
+  //    if (slaveType == "TEMPLATEGES")
+  //    {
+  //      TemplateGES* tmpTemplateGES = (TemplateGES*)slaveList[i];
+  //      tmpTemplateGES->publish();
+  //    }
+  //    else if (slaveType == "IMC")
+  //    {
+  //    }
+  //    else if (slaveType == "PDB")
+  //    {
+  //    }
+  //    else if (slaveType == "GES")
+  //    {
+  //    }
+  //    else
+  //    {
+  //      ROS_DEBUG("Error when getting GES data! Unknown GES name\n");
+  //    }
+  //  }
 }
 
 void EthercatMaster::MonitorSlaveConnection()
@@ -169,6 +164,19 @@ void EthercatMaster::MonitorSlaveConnection()
   ethercat_safety::monitor_slave_connection();
 }
 
-OSAL_THREAD_FUNC EthercatLoop(void* ptr){
-    //Parallel thread
+void EthercatMaster::EthercatLoop()
+{
+  // Parallel thread
+  //    while (&& inOP)
+  //      {
+  //        ethercatMaster.SendProcessData();
+  //        ethercatMaster.ReceiveProcessData();
+  //        ethercatMaster.PublishProcessData();
+  //        ethercatMaster.MonitorSlaveConnection();
+  //        ros::spinOnce();
+  //        rate.sleep();
+  while (1)
+  {
+    printf("Parallel\n");
+  }
 }
