@@ -44,8 +44,8 @@ add_library(march4cpp
         src/March4.cpp
         src/TemperatureSensor.cpp
         src/EtherCAT/EthercatMaster.cpp
-        include/${PROJECT_NAME}/EtherCAT/EthercatMaster.h
         include/${PROJECT_NAME}/EtherCAT/EthercatSDO.h
+        include/${PROJECT_NAME}/EtherCAT/EthercatMaster.h
         src/EtherCAT/EthercatSDO.cpp
 
         ${SOEM_SRC}

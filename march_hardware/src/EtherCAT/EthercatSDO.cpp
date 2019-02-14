@@ -1,4 +1,4 @@
-#include "../../include/march_hardware/EtherCAT/EthercatSDO.h"
+#include "march_hardware/EtherCAT/EthercatSDO.h"
 
 extern "C" {
 #include "ethercat.h"
