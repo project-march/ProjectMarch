@@ -1,11 +1,5 @@
-#include <utility>
+#include <ros/ros.h>
 
-#include <utility>
-
-#include <stdlib.h>
-#include <math.h>
-#include <stdexcept>
-#include "ros/ros.h"
 #include <march_hardware/Joint.h>
 
 Joint::Joint(std::string name, TemperatureSensor* temperatureSensor, IMotionCube* iMotionCube)
@@ -15,15 +9,37 @@ Joint::Joint(std::string name, TemperatureSensor* temperatureSensor, IMotionCube
   this->iMotionCube = iMotionCube;
 }
 
+void Joint::initialize()
+{
+  if (hasIMotionCube())
+  {
+    iMotionCube->initialize();
+  }
+  if (hasTemperatureSensor())
+  {
+    temperatureSensor->initialize();
+  }
+}
+
 void Joint::actuate(double position)
 {
   // TODO(Martijn) write to ethercat
   // TODO(BaCo) check that the position is allowed and does not exceed (torque) limits.
 }
 
+float Joint::getAngle()
+{
+  if (!hasIMotionCube())
+  {
+    ROS_WARN("Joint %s has no iMotionCube", this->name.c_str());
+    return -1;
+  }
+  return this->iMotionCube->getAngle();
+}
+
 float Joint::getTemperature()
 {
-  if (this->temperatureSensor == NULL)
+  if (!hasTemperatureSensor())
   {
     ROS_WARN("Joint %s has no temperaturesensor", this->name.c_str());
     return -1;
@@ -31,14 +47,18 @@ float Joint::getTemperature()
   return this->temperatureSensor->getTemperature();
 }
 
-float Joint::getAngle()
-{
-    if (this->iMotionCube == NULL)
-    {
-        ROS_WARN("Joint %s has no iMotionCube", this->name.c_str());
-        return -1;
-    }
-    return this->iMotionCube->getAngle();
+int Joint::getTemperatureSensorSlaveIndex(){
+  if(hasTemperatureSensor()){
+    return this->temperatureSensor->getSlaveIndex();
+  }
+  return -1;
+}
+
+int Joint::getIMotionCubeSlaveIndex(){
+  if(hasIMotionCube()){
+    return this->iMotionCube->getSlaveIndex();
+  }
+  return -1;
 }
 
 std::string Joint::getName()
@@ -46,14 +66,12 @@ std::string Joint::getName()
   return this->name;
 }
 
-void Joint::initialize()
+bool Joint::hasIMotionCube()
 {
-  if (this->iMotionCube != NULL)
-  {
-    iMotionCube->initialize();
-  }
-  if (this->temperatureSensor != NULL)
-  {
-    temperatureSensor->initialize();
-  }
+  return iMotionCube != NULL;
+}
+
+bool Joint::hasTemperatureSensor()
+{
+  return temperatureSensor != NULL;
 }

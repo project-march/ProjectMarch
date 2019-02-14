@@ -3,18 +3,19 @@
 
 #include <stdint.h>
 
-class TemperatureSensor {
-
+class TemperatureSensor
+{
 private:
-    int slaveIndex;
-    uint8_t byteOffset;
+  int slaveIndex;
+  uint8_t byteOffset;
 
 public:
-    TemperatureSensor(int slaveIndex, uint8_t byteOffset);
+  TemperatureSensor(int slaveIndex, uint8_t byteOffset);
 
-    float getTemperature();
+  void initialize();
 
-    void initialize();
+  float getTemperature();
+  int getSlaveIndex();
 };
 
 #endif

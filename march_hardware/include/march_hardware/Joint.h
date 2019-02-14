@@ -1,29 +1,36 @@
 #ifndef MARCH4CPP__JOINT_H
 #define MARCH4CPP__JOINT_H
 
-#include <sstream>
-#include "march_hardware/TemperatureSensor.h"
-#include "march_hardware/IMotionCube.h"
+#include <string>
+
+#include <march_hardware/IMotionCube.h>
+#include <march_hardware/TemperatureSensor.h>
 
 class Joint {
 private:
     std::string name;
-    TemperatureSensor *temperatureSensor;
     IMotionCube *iMotionCube;
+    TemperatureSensor *temperatureSensor;
 
 public:
-
     Joint(std::string name, TemperatureSensor *temperatureSensor = NULL, IMotionCube *iMotionCube = NULL);
 
-    ~Joint() = default;
+    void initialize();
 
     void actuate(double effort);
 
-    std::string getName();
     float getAngle();
 
     float getTemperature();
-    void initialize();
+
+    std::string getName();
+
+    int getTemperatureSensorSlaveIndex();
+    int getIMotionCubeSlaveIndex();
+
+    bool hasIMotionCube();
+
+    bool hasTemperatureSensor();
 };
 
 #endif

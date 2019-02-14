@@ -46,13 +46,14 @@ add_library(march4cpp
         src/EtherCAT/EthercatMaster.cpp
         include/${PROJECT_NAME}/EtherCAT/EthercatSDO.h
         include/${PROJECT_NAME}/EtherCAT/EthercatMaster.h
+        include/${PROJECT_NAME}/EtherCAT/EthercatIO.h
         src/EtherCAT/EthercatSDO.cpp
+        src/EtherCAT/EthercatIO.cpp
 
         ${SOEM_SRC}
 
 
-        src/main.cpp
-        )
+        src/main.cpp)
 
 target_link_libraries(march4cpp ${catkin_LIBRARIES})
 

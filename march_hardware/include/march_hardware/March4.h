@@ -1,20 +1,34 @@
 #ifndef MARCH4CPP__MARCH4_H
 #define MARCH4CPP__MARCH4_H
 
-#include <sstream>
+#include <string>
 #include <vector>
-#include "march_hardware/Joint.h"
+#include <stdint.h>
+
+#include <march_hardware/Joint.h>
+
+#include <march_hardware/EtherCAT/EthercatMaster.h>
 
 class MARCH4 {
 private:
+    EthercatMaster *ethercatMaster;
+
 public:
-    MARCH4();
-    ~MARCH4();
     std::vector<Joint> jointList;
+
+    MARCH4();
+
+    void startEtherCAT();
+
+    void stopEtherCAT();
+
+    bool hasValidSlaves();
+
+    bool isOperational();
+
     Joint getJoint(std::string jointName);
 
-//    TODO(Isha) check if all slave indices are valid.
-    bool isValid();
+    void sendData(uint8_t value);
 };
 
 #endif

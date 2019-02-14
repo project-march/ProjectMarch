@@ -3,9 +3,8 @@
 //
 
 #include <ros/ros.h>
+
 #include <march_hardware/EtherCAT/EthercatMaster.h>
-#include <march_hardware/Joint.h>
-#include <thread>
 
 extern "C" {
 #include "ethercat.h"
@@ -17,10 +16,11 @@ EthercatMaster::EthercatMaster(std::vector<Joint> jointList)
   this->jointList = jointList;
 
   // TODO(Isha, Martijn) make this variable or configure at runtime?
-  ifname = "enp3s0";
+  ifname = "enp2s0";
+}
 
-  inOP = false;
-
+void EthercatMaster::start()
+{
   ROS_INFO("Starting ethercat\n");
 
   // Initialise SOEM, bind socket to ifname
@@ -37,7 +37,7 @@ EthercatMaster::EthercatMaster(std::vector<Joint> jointList)
     ROS_ERROR("No slaves found, shutting down");
     return;
   }
-  ROS_DEBUG("%d slaves found and configured.\n", ec_slavecount);
+  ROS_INFO("%d slaves found and configured.\n", ec_slavecount);
 
   // Request and wait for slaves to be in preOP state
   ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
@@ -55,12 +55,12 @@ EthercatMaster::EthercatMaster(std::vector<Joint> jointList)
   // Wait for all slaves to reach SAFE_OP state
   ec_statecheck(0, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE * 4);
 
-  ROS_DEBUG("segments : %d : %d %d %d %d\n", ec_group[0].nsegments, ec_group[0].IOsegment[0], ec_group[0].IOsegment[1],
-            ec_group[0].IOsegment[2], ec_group[0].IOsegment[3]);
+  ROS_INFO("segments : %d : %d %d %d %d\n", ec_group[0].nsegments, ec_group[0].IOsegment[0], ec_group[0].IOsegment[1],
+           ec_group[0].IOsegment[2], ec_group[0].IOsegment[3]);
 
-  ROS_DEBUG("Request operational state for all slaves\n");
+  ROS_INFO("Request operational state for all slaves\n");
   expectedWKC = (ec_group[0].outputsWKC * 2) + ec_group[0].inputsWKC;
-  ROS_DEBUG("Calculated workcounter %d\n", expectedWKC);
+  ROS_INFO("Calculated workcounter %d\n", expectedWKC);
   ec_slave[0].state = EC_STATE_OPERATIONAL;
 
   // send one valid process data to make outputs in slaves happy
@@ -82,11 +82,10 @@ EthercatMaster::EthercatMaster(std::vector<Joint> jointList)
   if (ec_slave[0].state == EC_STATE_OPERATIONAL)
   {
     // All slaves in operational state
-    ROS_DEBUG("Operational state reached for all slaves.\n");
-    inOP = true;
+    ROS_INFO("Operational state reached for all slaves.\n");
+    isOperational = true;
     // TODO(Martijn) create parallel thread
-    std::thread EcatThread(&EthercatMaster::EthercatLoop, this);
-
+    EcatThread = std::thread(&EthercatMaster::ethercatLoop, this);
   }
   else
   {
@@ -97,85 +96,49 @@ EthercatMaster::EthercatMaster(std::vector<Joint> jointList)
     {
       if (ec_slave[i].state != EC_STATE_OPERATIONAL)
       {
-        ROS_DEBUG("Slave %d State=0x%2.2x StatusCode=0x%4.4x : %s\n", i, ec_slave[i].state, ec_slave[i].ALstatuscode,
-                  ec_ALstatuscode2string(ec_slave[i].ALstatuscode));
+        ROS_INFO("Slave %d State=0x%2.2x StatusCode=0x%4.4x : %s\n", i, ec_slave[i].state, ec_slave[i].ALstatuscode,
+                 ec_ALstatuscode2string(ec_slave[i].ALstatuscode));
       }
     }
   }
 }
 
-EthercatMaster::~EthercatMaster()
+void EthercatMaster::stop()
 {
-  inOP = false;
-  ROS_DEBUG("Deconstructing EthercatMaster object\n");
-  ROS_DEBUG("Request init state for all slaves\n");
+  ROS_INFO("Stopping EtherCAT\n");
+  isOperational = false;
+  EcatThread.join();
   ec_slave[0].state = EC_STATE_INIT;
   ec_writestate(0);
-  ROS_DEBUG("Closing EtherCAT\n");
   ec_close();
-  ROS_DEBUG("Shutting down ROS\n");
-//  ros::shutdown();
 }
 
-void EthercatMaster::SendProcessData()
+void EthercatMaster::ethercatLoop()
+{
+  while (isOperational)
+  {
+    sendProcessData();
+    receiveProcessData();
+    monitorSlaveConnection();
+    usleep(200000);
+  }
+}
+
+void EthercatMaster::sendProcessData()
 {
   ec_send_processdata();
 }
 
-int EthercatMaster::ReceiveProcessData()
+int EthercatMaster::receiveProcessData()
 {
   return ec_receive_processdata(EC_TIMEOUTRET);
 }
 
-void EthercatMaster::PublishProcessData()
-{
-  // Publish for all slaves except the master (slave 0)
-  //  for (int i = 1; i < jointList.size(); i++)
-  //  {
-  //    // TODO(Isha, BaCo)
-  //    //  Determine how to publish EtherCAT process data
-  //    //  Add other slave publisher implementations
-  //    std::string slaveType = jointList[i]->getType();
-  //    if (slaveType == "TEMPLATEGES")
-  //    {
-  //      TemplateGES* tmpTemplateGES = (TemplateGES*)slaveList[i];
-  //      tmpTemplateGES->publish();
-  //    }
-  //    else if (slaveType == "IMC")
-  //    {
-  //    }
-  //    else if (slaveType == "PDB")
-  //    {
-  //    }
-  //    else if (slaveType == "GES")
-  //    {
-  //    }
-  //    else
-  //    {
-  //      ROS_DEBUG("Error when getting GES data! Unknown GES name\n");
-  //    }
-  //  }
-}
 
-void EthercatMaster::MonitorSlaveConnection()
+void EthercatMaster::monitorSlaveConnection()
 {
   // TODO(Martijn)
   //  Integrate this within EthercatMaster and Slave classes
   //  Determine how to notify developer/user
   //  ethercat_safety::monitor_slave_connection();
-}
-
-void EthercatMaster::EthercatLoop()
-{
-  // Parallel thread
-  //    while (&& inOP)
-  //      {
-  //        ethercatMaster.SendProcessData();
-  //        ethercatMaster.ReceiveProcessData();
-  //        ethercatMaster.PublishProcessData();
-  //        ethercatMaster.MonitorSlaveConnection();
-  while (1)
-  {
-    printf("Parallel\n");
-  }
 }

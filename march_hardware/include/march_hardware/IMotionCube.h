@@ -2,23 +2,26 @@
 // Created by projectmarch on 13-2-19.
 //
 
-#ifndef PROJECT_IMOTIONCUBE_H
-#define PROJECT_IMOTIONCUBE_H
+#ifndef MARCH4CPP__IMOTIONCUBE_H
+#define MARCH4CPP__IMOTIONCUBE_H
 
-
-class IMotionCube {
+class IMotionCube
+{
 private:
-    int slaveIndex;
+  int slaveIndex;
 
-//    TODO(Martijn) add PDO/SDO settings here.
+  //    TODO(Martijn) add PDO/SDO settings here.
 
 public:
-    IMotionCube(int slaveIndex);
-    void initialize();
-    float getAngle();
-    bool PDOmapping();
-    bool StartupSDO(int ecatCycleTime);
+  IMotionCube(int slaveIndex);
 
+  void initialize();
+  bool PDOmapping();
+  bool StartupSDO(int ecatCycleTime);
+
+  float getAngle();
+
+  int getSlaveIndex();
 };
 
-#endif //PROJECT_IMOTIONCUBE_H
+#endif  // PROJECT_IMOTIONCUBE_H
