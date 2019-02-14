@@ -33,12 +33,12 @@ float Joint::getTemperature()
 
 float Joint::getAngle()
 {
-  if (this->iMotionCube == NULL)
-  {
-    ROS_WARN("Joint %s has no iMotionCube", this->name.c_str());
-    return -1;
-  }
-  return this->iMotionCube->getAngle();
+    if (this->iMotionCube == NULL)
+    {
+        ROS_WARN("Joint %s has no iMotionCube", this->name.c_str());
+        return -1;
+    }
+    return this->iMotionCube->getAngle();
 }
 
 std::string Joint::getName()

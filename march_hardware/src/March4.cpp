@@ -21,6 +21,9 @@ MARCH4::MARCH4() {
     jointList.push_back(imc);
     jointList.push_back(none);
 
+//    TODO(Isha) implement validation function.
+
+
 //    TODO(Isha, Martijn) Initialize ethercat (create seperate thread).
 
     EthercatMaster ethercatMaster = EthercatMaster(jointList);

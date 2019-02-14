@@ -42,7 +42,6 @@ EthercatMaster::EthercatMaster(std::vector<Joint> jointList)
   // Request and wait for slaves to be in preOP state
   ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
 
-  //  int ecatCycleTime = 200; //TODO(Martijn) make this less magic-numberesqe
   for (int i = 0; i < jointList.size(); i++)
   {
     jointList[i].initialize();
@@ -175,8 +174,6 @@ void EthercatMaster::EthercatLoop()
   //        ethercatMaster.ReceiveProcessData();
   //        ethercatMaster.PublishProcessData();
   //        ethercatMaster.MonitorSlaveConnection();
-  //        ros::spinOnce();
-  //        rate.sleep();
   while (1)
   {
     printf("Parallel\n");

@@ -7,6 +7,8 @@ int main(int argc, char** argv)
 
     printf("%f\n", march4.getJoint("TEMP IMC").getTemperature());
     printf("%f\n", march4.getJoint("TEMP IMC").getAngle());
+
+
     printf("%f\n", march4.getJoint("TEMP").getTemperature());
     printf("%f\n", march4.getJoint("TEMP").getAngle());
     printf("%f\n", march4.getJoint("IMC").getTemperature());
