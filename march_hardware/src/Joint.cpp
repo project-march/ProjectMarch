@@ -47,15 +47,19 @@ float Joint::getTemperature()
   return this->temperatureSensor->getTemperature();
 }
 
-int Joint::getTemperatureSensorSlaveIndex(){
-  if(hasTemperatureSensor()){
+int Joint::getTemperatureSensorSlaveIndex()
+{
+  if (hasTemperatureSensor())
+  {
     return this->temperatureSensor->getSlaveIndex();
   }
   return -1;
 }
 
-int Joint::getIMotionCubeSlaveIndex(){
-  if(hasIMotionCube()){
+int Joint::getIMotionCubeSlaveIndex()
+{
+  if (hasIMotionCube())
+  {
     return this->iMotionCube->getSlaveIndex();
   }
   return -1;

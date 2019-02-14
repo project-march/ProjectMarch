@@ -9,26 +9,26 @@
 
 #include <march_hardware/EtherCAT/EthercatMaster.h>
 
-class MARCH4 {
+class MARCH4
+{
 private:
-    EthercatMaster *ethercatMaster;
+  EthercatMaster* ethercatMaster;
 
 public:
-    std::vector<Joint> jointList;
+  std::vector<Joint> jointList;
 
-    MARCH4();
+  MARCH4();
 
-    void startEtherCAT();
+  void startEtherCAT();
+  void stopEtherCAT();
 
-    void stopEtherCAT();
+  int getMaxSlaveIndex();
 
-    bool hasValidSlaves();
+  bool hasValidSlaves();
+  bool isOperational();
+  Joint getJoint(std::string jointName);
 
-    bool isOperational();
-
-    Joint getJoint(std::string jointName);
-
-    void sendData(uint8_t value);
+  void sendData(uint8_t value);
 };
 
 #endif

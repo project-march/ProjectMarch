@@ -20,6 +20,7 @@ float TemperatureSensor::getTemperature()
   return (float)return_byte.ui;
 }
 
-int TemperatureSensor::getSlaveIndex() {
-    return slaveIndex;
+int TemperatureSensor::getSlaveIndex()
+{
+  return slaveIndex;
 }

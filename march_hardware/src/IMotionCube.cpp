@@ -139,6 +139,7 @@ float IMotionCube::getAngle()
   return 0;
 }
 
-int IMotionCube::getSlaveIndex() {
-    return slaveIndex;
+int IMotionCube::getSlaveIndex()
+{
+  return slaveIndex;
 }

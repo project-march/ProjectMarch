@@ -6,31 +6,28 @@
 #include <march_hardware/IMotionCube.h>
 #include <march_hardware/TemperatureSensor.h>
 
-class Joint {
+class Joint
+{
 private:
-    std::string name;
-    IMotionCube *iMotionCube;
-    TemperatureSensor *temperatureSensor;
+  std::string name;
+  IMotionCube* iMotionCube;
+  TemperatureSensor* temperatureSensor;
 
 public:
-    Joint(std::string name, TemperatureSensor *temperatureSensor = NULL, IMotionCube *iMotionCube = NULL);
+  Joint(std::string name, TemperatureSensor* temperatureSensor = NULL, IMotionCube* iMotionCube = NULL);
 
-    void initialize();
+  void initialize();
+  void actuate(double effort);
 
-    void actuate(double effort);
+  float getAngle();
+  float getTemperature();
 
-    float getAngle();
+  std::string getName();
+  int getTemperatureSensorSlaveIndex();
+  int getIMotionCubeSlaveIndex();
 
-    float getTemperature();
-
-    std::string getName();
-
-    int getTemperatureSensorSlaveIndex();
-    int getIMotionCubeSlaveIndex();
-
-    bool hasIMotionCube();
-
-    bool hasTemperatureSensor();
+  bool hasIMotionCube();
+  bool hasTemperatureSensor();
 };
 
 #endif

@@ -7,17 +7,17 @@
 
 class EthercatMaster
 {
-  std::string ifname;  // Network interface name, check ifconfig
-  char IOmap[4096];    // Holds the mapping of the SOEM message
-  int expectedWKC;     // Expected working counter
-  std::thread EcatThread; // Handler for parallel thread
-
+  std::string ifname;      // Network interface name, check ifconfig
+  char IOmap[4096];        // Holds the mapping of the SOEM message
+  int expectedWKC;         // Expected working counter
+  std::thread EcatThread;  // Handler for parallel thread
   std::vector<Joint> jointList;
+  int maxSlaveIndex;
 
 public:
   bool isOperational = false;  // Is SOEM in operational state
 
-  explicit EthercatMaster(std::vector<Joint> slaves);
+  explicit EthercatMaster(std::vector<Joint> slaves, std::string ifname, int maxSlaveIndex);
 
   void start();
   void stop();
@@ -32,4 +32,4 @@ public:
   void monitorSlaveConnection();
 };
 
-#endif  // PROJECT_ETHERCAT_H
+#endif

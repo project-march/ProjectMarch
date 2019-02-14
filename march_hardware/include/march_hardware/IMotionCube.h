@@ -24,4 +24,4 @@ public:
   int getSlaveIndex();
 };
 
-#endif  // PROJECT_IMOTIONCUBE_H
+#endif  // MARCH4CPP__IMOTIONCUBE_H

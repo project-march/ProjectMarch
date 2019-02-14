@@ -11,12 +11,11 @@ extern "C" {
 }
 
 // Constructor
-EthercatMaster::EthercatMaster(std::vector<Joint> jointList)
+EthercatMaster::EthercatMaster(std::vector<Joint> jointList, std::string ifname, int maxSlaveIndex)
 {
   this->jointList = jointList;
-
-  // TODO(Isha, Martijn) make this variable or configure at runtime?
-  ifname = "enp2s0";
+  this->ifname = ifname;
+  this->maxSlaveIndex = maxSlaveIndex;
 }
 
 void EthercatMaster::start()
@@ -37,8 +36,13 @@ void EthercatMaster::start()
     ROS_ERROR("No slaves found, shutting down");
     return;
   }
-  ROS_INFO("%d slaves found and configured.\n", ec_slavecount);
+  ROS_INFO("%d slave(s) found and initialized.\n", ec_slavecount);
 
+  if (ec_slavecount < this->maxSlaveIndex)
+  {
+    ROS_FATAL("Slave configured with index %d while soem only found %d slave(s)", this->maxSlaveIndex, ec_slavecount);
+    return;
+  }
   // Request and wait for slaves to be in preOP state
   ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
 
@@ -133,7 +137,6 @@ int EthercatMaster::receiveProcessData()
 {
   return ec_receive_processdata(EC_TIMEOUTRET);
 }
-
 
 void EthercatMaster::monitorSlaveConnection()
 {
