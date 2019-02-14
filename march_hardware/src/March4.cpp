@@ -11,7 +11,7 @@
 
 MARCH4::MARCH4()
 {
-  TemperatureSensor* tempSens = new TemperatureSensor(4, 0);
+  TemperatureSensor* tempSens = new TemperatureSensor(1, 0);
   Joint temp = Joint("TEMP", tempSens);
   jointList.push_back(temp);
 
