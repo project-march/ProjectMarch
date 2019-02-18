@@ -2,7 +2,8 @@
 #define MARCH4CPP__TEMPERATURESENSOR_H
 
 #include <stdint.h>
-
+namespace march4cpp
+{
 class TemperatureSensor
 {
 private:
@@ -15,7 +16,8 @@ public:
   void initialize();
 
   float getTemperature();
+
   int getSlaveIndex();
 };
-
+}
 #endif

@@ -4,7 +4,8 @@
 
 #ifndef MARCH4CPP__IMOTIONCUBE_H
 #define MARCH4CPP__IMOTIONCUBE_H
-
+namespace march4cpp
+{
 class IMotionCube
 {
 private:
@@ -16,7 +17,9 @@ public:
   IMotionCube(int slaveIndex);
 
   void initialize();
+
   bool PDOmapping();
+
   bool StartupSDO(int ecatCycleTime);
 
   float getAngle();
@@ -24,4 +27,5 @@ public:
   int getSlaveIndex();
 };
 
+}  // namespace march4cpp
 #endif  // MARCH4CPP__IMOTIONCUBE_H

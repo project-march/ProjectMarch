@@ -1,7 +1,8 @@
 #include "march_hardware/EtherCAT/EthercatIO.h"
 
 #include <march_hardware/TemperatureSensor.h>
-
+namespace march4cpp
+{
 TemperatureSensor::TemperatureSensor(int slaveIndex, uint8_t byteOffset)
 {
   this->slaveIndex = slaveIndex;
@@ -24,3 +25,4 @@ int TemperatureSensor::getSlaveIndex()
 {
   return slaveIndex;
 }
+}  // namespace march4cpp

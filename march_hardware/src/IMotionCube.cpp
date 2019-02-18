@@ -3,7 +3,8 @@
 #include <march_hardware/EtherCAT/EthercatSDO.h>
 
 #include <march_hardware/IMotionCube.h>
-
+namespace march4cpp
+{
 IMotionCube::IMotionCube(int slaveIndex)
 {
   this->slaveIndex = slaveIndex;
@@ -143,3 +144,4 @@ int IMotionCube::getSlaveIndex()
 {
   return slaveIndex;
 }
+}  // namespace march4cpp

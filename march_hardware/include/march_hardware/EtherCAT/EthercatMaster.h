@@ -5,6 +5,8 @@
 
 #include <march_hardware/Joint.h>
 
+namespace march4cpp
+{
 class EthercatMaster
 {
   std::string ifname;      // Network interface name, check ifconfig
@@ -32,4 +34,5 @@ public:
   void monitorSlaveConnection();
 };
 
+}  // namespace march4cpp
 #endif

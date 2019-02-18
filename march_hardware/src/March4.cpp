@@ -9,6 +9,8 @@
 
 #include <march_hardware/March4.h>
 
+namespace march4cpp
+{
 MARCH4::MARCH4()
 {
   TemperatureSensor* tempSens = new TemperatureSensor(1, 0);
@@ -45,6 +47,7 @@ void MARCH4::stopEtherCAT()
   }
   ethercatMaster->stop();
 }
+
 int MARCH4::getMaxSlaveIndex()
 {
   int maxSlaveIndex = -1;
@@ -68,8 +71,8 @@ int MARCH4::getMaxSlaveIndex()
 
 bool MARCH4::hasValidSlaves()
 {
-  std::vector<int> iMotionCubeIndices;
-  std::vector<int> temperatureSlaveIndices;
+  ::std::vector<int> iMotionCubeIndices;
+  ::std::vector<int> temperatureSlaveIndices;
 
   for (int i = 0; i < jointList.size(); i++)
   {
@@ -92,7 +95,7 @@ bool MARCH4::hasValidSlaves()
                                 temperatureSlaveIndices.end());
 
   // Merge the slave indices
-  std::vector<int> slaveIndices;
+  ::std::vector<int> slaveIndices;
 
   slaveIndices.reserve(iMotionCubeIndices.size() + temperatureSlaveIndices.size());
   slaveIndices.insert(slaveIndices.end(), iMotionCubeIndices.begin(), iMotionCubeIndices.end());
@@ -108,8 +111,8 @@ bool MARCH4::hasValidSlaves()
 
   // Sort the indices and check for duplicates.
   // If there are no duplicates, the configuration is valid.
-  std::sort(slaveIndices.begin(), slaveIndices.end());
-  auto it = std::unique(slaveIndices.begin(), slaveIndices.end());
+  ::std::sort(slaveIndices.begin(), slaveIndices.end());
+  auto it = ::std::unique(slaveIndices.begin(), slaveIndices.end());
   bool isUnique = (it == slaveIndices.end());
   return isUnique;
 }
@@ -119,7 +122,7 @@ bool MARCH4::isOperational()
   return ethercatMaster->isOperational;
 }
 
-Joint MARCH4::getJoint(std::string jointName)
+Joint MARCH4::getJoint(::std::string jointName)
 {
   if (!ethercatMaster->isOperational)
   {
@@ -134,7 +137,7 @@ Joint MARCH4::getJoint(std::string jointName)
   }
 
   ROS_ERROR("Could not find joint with name %s", jointName.c_str());
-  throw std::runtime_error("Could not find joint with name " + jointName);
+  throw ::std::runtime_error("Could not find joint with name " + jointName);
 }
 
 void MARCH4::sendData(uint8_t value)
@@ -143,3 +146,4 @@ void MARCH4::sendData(uint8_t value)
   unionbyte.ui = value;
   set_output_bit8(1, 0, unionbyte);
 }
+} // namespace march4cpp

@@ -2,6 +2,9 @@
 
 #include <march_hardware/Joint.h>
 
+namespace march4cpp
+{
+
 Joint::Joint(std::string name, TemperatureSensor* temperatureSensor, IMotionCube* iMotionCube)
 {
   this->name = std::move(name);
@@ -78,4 +81,5 @@ bool Joint::hasIMotionCube()
 bool Joint::hasTemperatureSensor()
 {
   return temperatureSensor != NULL;
+}
 }

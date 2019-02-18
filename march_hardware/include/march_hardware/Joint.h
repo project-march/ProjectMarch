@@ -5,7 +5,8 @@
 
 #include <march_hardware/IMotionCube.h>
 #include <march_hardware/TemperatureSensor.h>
-
+namespace march4cpp
+{
 class Joint
 {
 private:
@@ -29,5 +30,5 @@ public:
   bool hasIMotionCube();
   bool hasTemperatureSensor();
 };
-
+}  // namespace march4cpp
 #endif

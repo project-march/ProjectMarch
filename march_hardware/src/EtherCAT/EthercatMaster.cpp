@@ -10,6 +10,8 @@ extern "C" {
 #include "ethercat.h"
 }
 
+namespace march4cpp
+{
 // Constructor
 EthercatMaster::EthercatMaster(std::vector<Joint> jointList, std::string ifname, int maxSlaveIndex)
 {
@@ -20,12 +22,12 @@ EthercatMaster::EthercatMaster(std::vector<Joint> jointList, std::string ifname,
 
 void EthercatMaster::start()
 {
-  ROS_INFO("Starting ethercat\n");
+  ROS_INFO("Trying to start EtherCAT");
 
   // Initialise SOEM, bind socket to ifname
   if (!ec_init(ifname.c_str()))
   {
-    ROS_ERROR("No socket connection on %s", ifname.c_str());
+    ROS_ERROR("No socket connection on %s. Confirm that you have selected the right ifname", ifname.c_str());
     return;
   }
   ROS_INFO("ec_init on %s succeeded.\n", ifname.c_str());
@@ -145,3 +147,5 @@ void EthercatMaster::monitorSlaveConnection()
   //  Determine how to notify developer/user
   //  ethercat_safety::monitor_slave_connection();
 }
+
+}  // namespace march4cpp

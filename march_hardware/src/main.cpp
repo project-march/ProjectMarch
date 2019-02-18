@@ -7,7 +7,7 @@
 
 int main(int argc, char** argv)
 {
-  MARCH4 march4 = MARCH4();
+  march4cpp::MARCH4 march4 = march4cpp::MARCH4();
   march4.startEtherCAT();
 
   if (!march4.isOperational())

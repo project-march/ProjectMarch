@@ -8,6 +8,8 @@ extern "C" {
 #include "ethercat.h"
 }
 
+namespace march4cpp
+{
 // struct used to easily get specific bytes from a 64 bit variable
 typedef struct packed_bit64
 {
@@ -96,4 +98,5 @@ union bit8 get_output_bit8(uint16 slave_no, uint8 module_index);
 
 void set_output_bit(uint16 slave_no, uint8 module_index, uint8 value);
 
+}  // namespace march4cpp
 #endif  // MARCH4CPP__ETHERCAT_IO_
