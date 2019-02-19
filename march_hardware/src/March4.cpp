@@ -61,7 +61,7 @@ int MARCH4::getMaxSlaveIndex()
       maxSlaveIndex = temperatureSlaveIndex;
     }
 
-    int iMotionCubeSlaveIndex = jointList[i].getTemperatureSensorSlaveIndex();
+    int iMotionCubeSlaveIndex = jointList[i].getIMotionCubeSlaveIndex();
     if (iMotionCubeSlaveIndex > maxSlaveIndex)
     {
       maxSlaveIndex = iMotionCubeSlaveIndex;
