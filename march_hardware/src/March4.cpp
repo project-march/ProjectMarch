@@ -13,8 +13,9 @@ namespace march4cpp
 {
 MARCH4::MARCH4()
 {
-  TemperatureSensor* tempSens = new TemperatureSensor(1, 0);
-  Joint temp = Joint("TEMP", tempSens);
+  TemperatureSensor tempSens = TemperatureSensor(1, 0);
+  IMotionCube imc = IMotionCube(2);
+  Joint temp = Joint("test_joint", tempSens, imc);
   jointList.push_back(temp);
 
   ethercatMaster = new EthercatMaster(jointList, "enp2s0", this->getMaxSlaveIndex());
@@ -76,16 +77,16 @@ bool MARCH4::hasValidSlaves()
 
   for (int i = 0; i < jointList.size(); i++)
   {
-    int temperatureSlaveIndex = jointList[i].getTemperatureSensorSlaveIndex();
-    if (temperatureSlaveIndex != -1)
+    if (jointList[i].hasTemperatureSensor())
     {
-      temperatureSlaveIndices.push_back(temperatureSlaveIndex);
+        int temperatureSlaveIndex = jointList[i].getTemperatureSensorSlaveIndex();
+        temperatureSlaveIndices.push_back(temperatureSlaveIndex);
     }
 
-    int iMotionCubeSlaveIndex = jointList[i].getIMotionCubeSlaveIndex();
-    if (iMotionCubeSlaveIndex != -1)
+    if (jointList[i].hasIMotionCube())
     {
-      iMotionCubeIndices.push_back(iMotionCubeSlaveIndex);
+        int iMotionCubeSlaveIndex = jointList[i].getIMotionCubeSlaveIndex();
+        iMotionCubeIndices.push_back(iMotionCubeSlaveIndex);
     }
   }
   // Multiple temperature sensors may be connected to the same slave.

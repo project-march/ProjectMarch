@@ -16,6 +16,11 @@ private:
 public:
   IMotionCube(int slaveIndex);
 
+  IMotionCube()
+  {
+    slaveIndex = -1;
+  }
+
   void initialize();
 
   bool PDOmapping();

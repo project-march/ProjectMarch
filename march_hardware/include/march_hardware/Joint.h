@@ -11,11 +11,13 @@ class Joint
 {
 private:
   std::string name;
-  IMotionCube* iMotionCube;
-  TemperatureSensor* temperatureSensor;
+  IMotionCube iMotionCube;
+  TemperatureSensor temperatureSensor;
 
 public:
-  Joint(std::string name, TemperatureSensor* temperatureSensor = NULL, IMotionCube* iMotionCube = NULL);
+  Joint(std::string name, TemperatureSensor temperatureSensor, IMotionCube iMotionCube);
+  Joint(std::string name, TemperatureSensor temperatureSensor);
+  Joint(std::string name, IMotionCube iMotionCube);
 
   void initialize();
   void actuate(double effort);

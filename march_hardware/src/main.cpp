@@ -17,15 +17,7 @@ int main(int argc, char** argv)
   }
 
   printf("march4 initialized\n");
-  printf("%f\n", march4.getJoint("TEMP").getTemperature());
-  sleep(2);
-  march4.sendData(3);
-  sleep(2);
-  printf("%f\n", march4.getJoint("TEMP").getTemperature());
-  sleep(2);
-  march4.sendData(5);
-  sleep(2);
-  printf("%f\n", march4.getJoint("TEMP").getTemperature());
+  printf("slaveindex: %d\n", march4.getJoint("test_joint").hasIMotionCube());
 
   march4.stopEtherCAT();
 }

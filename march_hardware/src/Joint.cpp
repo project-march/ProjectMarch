@@ -4,23 +4,31 @@
 
 namespace march4cpp
 {
-
-Joint::Joint(std::string name, TemperatureSensor* temperatureSensor, IMotionCube* iMotionCube)
+Joint::Joint(std::string name, TemperatureSensor temperatureSensor, IMotionCube iMotionCube)
+  : temperatureSensor(temperatureSensor), iMotionCube(iMotionCube)
 {
   this->name = std::move(name);
-  this->temperatureSensor = temperatureSensor;
-  this->iMotionCube = iMotionCube;
+}
+
+Joint::Joint(std::string name, TemperatureSensor temperatureSensor) : temperatureSensor(temperatureSensor)
+{
+  this->name = std::move(name);
+}
+Joint::Joint(std::string name, IMotionCube iMotionCube) : iMotionCube(iMotionCube)
+
+{
+  this->name = std::move(name);
 }
 
 void Joint::initialize()
 {
   if (hasIMotionCube())
   {
-    iMotionCube->initialize();
+    iMotionCube.initialize();
   }
   if (hasTemperatureSensor())
   {
-    temperatureSensor->initialize();
+    temperatureSensor.initialize();
   }
 }
 
@@ -37,7 +45,7 @@ float Joint::getAngle()
     ROS_WARN("Joint %s has no iMotionCube", this->name.c_str());
     return -1;
   }
-  return this->iMotionCube->getAngle();
+  return this->iMotionCube.getAngle();
 }
 
 float Joint::getTemperature()
@@ -47,14 +55,14 @@ float Joint::getTemperature()
     ROS_WARN("Joint %s has no temperaturesensor", this->name.c_str());
     return -1;
   }
-  return this->temperatureSensor->getTemperature();
+  return this->temperatureSensor.getTemperature();
 }
 
 int Joint::getTemperatureSensorSlaveIndex()
 {
   if (hasTemperatureSensor())
   {
-    return this->temperatureSensor->getSlaveIndex();
+    return this->temperatureSensor.getSlaveIndex();
   }
   return -1;
 }
@@ -63,7 +71,7 @@ int Joint::getIMotionCubeSlaveIndex()
 {
   if (hasIMotionCube())
   {
-    return this->iMotionCube->getSlaveIndex();
+    return this->iMotionCube.getSlaveIndex();
   }
   return -1;
 }
@@ -75,11 +83,11 @@ std::string Joint::getName()
 
 bool Joint::hasIMotionCube()
 {
-  return iMotionCube != NULL;
+  return this->iMotionCube.getSlaveIndex() != -1;
 }
 
 bool Joint::hasTemperatureSensor()
 {
-  return temperatureSensor != NULL;
+  return this->temperatureSensor.getSlaveIndex() != -1;
 }
 }

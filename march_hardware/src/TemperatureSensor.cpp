@@ -23,6 +23,6 @@ float TemperatureSensor::getTemperature()
 
 int TemperatureSensor::getSlaveIndex()
 {
-  return slaveIndex;
+  return this->slaveIndex;
 }
 }  // namespace march4cpp

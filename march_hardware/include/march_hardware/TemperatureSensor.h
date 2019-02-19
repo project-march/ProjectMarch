@@ -13,6 +13,11 @@ private:
 public:
   TemperatureSensor(int slaveIndex, uint8_t byteOffset);
 
+  TemperatureSensor()
+  {
+    slaveIndex = -1;
+  };
+
   void initialize();
 
   float getTemperature();
