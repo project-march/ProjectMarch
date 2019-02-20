@@ -9,14 +9,14 @@ namespace march4cpp
 class TemperatureSensor : public Slave
 {
 private:
-  uint8_t byteOffset;
+  int byteOffset;
 
 public:
-  TemperatureSensor(int slaveIndex, uint8_t byteOffset);
+  TemperatureSensor(int slaveIndex, int byteOffset);
 
   TemperatureSensor()
   {
-    byteOffset = static_cast<uint8_t>(-1);
+    byteOffset = -1;
     slaveIndex = -1;
   };
 

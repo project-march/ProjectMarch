@@ -4,8 +4,13 @@
 
 namespace march4cpp
 {
-TemperatureSensor::TemperatureSensor(int slaveIndex, uint8_t byteOffset) : Slave(slaveIndex)
+TemperatureSensor::TemperatureSensor(int slaveIndex, int byteOffset) : Slave(slaveIndex)
 {
+  if ((int) byteOffset < 0)
+  {
+    ROS_FATAL("Slave configuration error: byteOffset can not be negative.");
+    throw ::std::invalid_argument("Slave configuration error: slaveindex can not be negative");
+  }
   this->byteOffset = byteOffset;
 }
 
@@ -17,7 +22,7 @@ void TemperatureSensor::initialize()
 float TemperatureSensor::getTemperature()
 {
   //  TODO(Martijn) read actual data from ethercat.
-  union bit8 return_byte = get_input_bit8(slaveIndex, byteOffset);
+  union bit8 return_byte = get_input_bit8(static_cast<uint16>(slaveIndex), static_cast<uint8>(byteOffset));
   return (float)return_byte.ui;
 }
 
