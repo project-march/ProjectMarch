@@ -6,6 +6,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 find_package(catkin REQUIRED COMPONENTS
         roscpp
+        rostest
         )
 
 catkin_package(
@@ -70,3 +71,16 @@ add_custom_command(
         COMMAND sudo setcap cap_net_raw+ep hardware_dummy
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/../devel/lib/march_hardware
 )
+
+## Add gtest based cpp test target and link libraries
+if (CATKIN_ENABLE_TESTING)
+    add_rostest_gtest(${PROJECT_NAME}-test
+            test/march4cpp.test
+            test/TestRunner.cpp
+            test/TestIMotionCube.cpp
+            test/TestTemperatureSensor.cpp
+            test/TestJoint.cpp
+            test/mocks/MockTemperatureSensor.cpp
+            )
+    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march4cpp)
+endif ()
