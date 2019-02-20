@@ -6,8 +6,9 @@
 
 namespace march4cpp
 {
-IMotionCube::IMotionCube(int slaveIndex) : Slave(slaveIndex)
+IMotionCube::IMotionCube(int slaveIndex, Encoder encoder) : Slave(slaveIndex)
 {
+  this->encoder = encoder;
 }
 
 void IMotionCube::initialize()
@@ -151,9 +152,7 @@ bool IMotionCube::StartupSDO(uint8 ecatCycleTime)
 
 float IMotionCube::getAngle()
 {
-  // TODO(Martijn) read absolute position instead of motor position when test joint is fixed
-  union bit32 return_byte = get_input_bit32(slaveIndex, 2);
-  return (float) return_byte.i;
+  return encoder.getAngleRad();
 }
 
 }  // namespace march4cpp

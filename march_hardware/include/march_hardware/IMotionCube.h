@@ -6,16 +6,18 @@
 
 #include <march_hardware/EtherCAT/EthercatIO.h>
 #include <march_hardware/Slave.h>
+#include <march_hardware/Encoder.h>
 
 namespace march4cpp
 {
 class IMotionCube : public Slave
 {
 private:
+    Encoder encoder;
   //    TODO(Martijn) add PDO/SDO settings here.
 
 public:
-  explicit IMotionCube(int slaveIndex);
+  explicit IMotionCube(int slaveIndex, Encoder encoder);
 
   IMotionCube()
   {

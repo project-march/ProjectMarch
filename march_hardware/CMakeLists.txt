@@ -40,6 +40,7 @@ add_library(march4cpp
         include/${PROJECT_NAME}/EtherCAT/EthercatIO.h
         include/${PROJECT_NAME}/EtherCAT/EthercatMaster.h
         include/${PROJECT_NAME}/EtherCAT/EthercatSDO.h
+        include/${PROJECT_NAME}/Encoder.h
         include/${PROJECT_NAME}/IMotionCube.h
         include/${PROJECT_NAME}/Joint.h
         include/${PROJECT_NAME}/March4.h
@@ -48,6 +49,7 @@ add_library(march4cpp
         src/EtherCAT/EthercatIO.cpp
         src/EtherCAT/EthercatMaster.cpp
         src/EtherCAT/EthercatSDO.cpp
+        src/Encoder.cpp
         src/IMotionCube.cpp
         src/Joint.cpp
         src/March4.cpp

@@ -4,6 +4,7 @@
 
 #include <march_hardware/Joint.h>
 #include <march_hardware/TemperatureSensor.h>
+#include <march_hardware/Encoder.h>
 
 #include <march_hardware/EtherCAT/EthercatIO.h>
 
@@ -14,7 +15,8 @@ namespace march4cpp
 MARCH4::MARCH4()
 {
   TemperatureSensor tempSens = TemperatureSensor(1, 0);
-  IMotionCube imc = IMotionCube(2);
+  Encoder enc = Encoder(16, -27532, -5);
+  IMotionCube imc = IMotionCube(2, enc);
   Joint temp = Joint("test_joint", tempSens, imc);
   jointList.push_back(temp);
 
