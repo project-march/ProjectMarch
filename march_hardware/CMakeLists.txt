@@ -34,27 +34,23 @@ file(GLOB SOEM_SRC
         soem/*.c
         )
 
-
 add_library(march4cpp
+        ${SOEM_SRC}
+        include/${PROJECT_NAME}/EtherCAT/EthercatIO.h
+        include/${PROJECT_NAME}/EtherCAT/EthercatMaster.h
+        include/${PROJECT_NAME}/EtherCAT/EthercatSDO.h
         include/${PROJECT_NAME}/IMotionCube.h
         include/${PROJECT_NAME}/Joint.h
         include/${PROJECT_NAME}/March4.h
         include/${PROJECT_NAME}/Slave.h
         include/${PROJECT_NAME}/TemperatureSensor.h
+        src/EtherCAT/EthercatIO.cpp
+        src/EtherCAT/EthercatMaster.cpp
+        src/EtherCAT/EthercatSDO.cpp
         src/IMotionCube.cpp
         src/Joint.cpp
         src/March4.cpp
         src/TemperatureSensor.cpp
-        src/EtherCAT/EthercatMaster.cpp
-        include/${PROJECT_NAME}/EtherCAT/EthercatSDO.h
-        include/${PROJECT_NAME}/EtherCAT/EthercatMaster.h
-        include/${PROJECT_NAME}/EtherCAT/EthercatIO.h
-        src/EtherCAT/EthercatSDO.cpp
-        src/EtherCAT/EthercatIO.cpp
-
-        ${SOEM_SRC}
-
-
         src/main.cpp)
 
 target_link_libraries(march4cpp ${catkin_LIBRARIES})
