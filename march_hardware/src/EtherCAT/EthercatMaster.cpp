@@ -45,14 +45,14 @@ void EthercatMaster::start()
     ROS_FATAL("Slave configured with index %d while soem only found %d slave(s)", this->maxSlaveIndex, ec_slavecount);
     return;
   }
-  //TODO(Martijn) Check on type of slaves
+  // TODO(Martijn) Check on type of slaves
 
   // Request and wait for slaves to be in preOP state
   ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
 
   for (int i = 0; i < jointList.size(); i++)
   {
-    jointList[i].initialize();
+    jointList.at(i).initialize();
   }
 
   // Configure the EtherCAT message structure depending on the PDO mapping of all the slaves

@@ -55,13 +55,14 @@ int MARCH4::getMaxSlaveIndex()
 
   for (int i = 0; i < jointList.size(); i++)
   {
-    int temperatureSlaveIndex = jointList[i].getTemperatureSensorSlaveIndex();
+    int temperatureSlaveIndex = jointList.at(i).getTemperatureSensorSlaveIndex();
     if (temperatureSlaveIndex > maxSlaveIndex)
     {
       maxSlaveIndex = temperatureSlaveIndex;
     }
 
-    int iMotionCubeSlaveIndex = jointList[i].getIMotionCubeSlaveIndex();
+    int iMotionCubeSlaveIndex = jointList.at(i).getIMotionCubeSlaveIndex();
+
     if (iMotionCubeSlaveIndex > maxSlaveIndex)
     {
       maxSlaveIndex = iMotionCubeSlaveIndex;
@@ -79,14 +80,14 @@ bool MARCH4::hasValidSlaves()
   {
     if (jointList[i].hasTemperatureSensor())
     {
-        int temperatureSlaveIndex = jointList[i].getTemperatureSensorSlaveIndex();
-        temperatureSlaveIndices.push_back(temperatureSlaveIndex);
+      int temperatureSlaveIndex = jointList[i].getTemperatureSensorSlaveIndex();
+      temperatureSlaveIndices.push_back(temperatureSlaveIndex);
     }
 
     if (jointList[i].hasIMotionCube())
     {
-        int iMotionCubeSlaveIndex = jointList[i].getIMotionCubeSlaveIndex();
-        iMotionCubeIndices.push_back(iMotionCubeSlaveIndex);
+      int iMotionCubeSlaveIndex = jointList[i].getIMotionCubeSlaveIndex();
+      iMotionCubeIndices.push_back(iMotionCubeSlaveIndex);
     }
   }
   // Multiple temperature sensors may be connected to the same slave.
@@ -147,4 +148,4 @@ void MARCH4::sendData(uint8_t value)
   unionbyte.ui = value;
   set_output_bit8(1, 0, unionbyte);
 }
-} // namespace march4cpp
+}  // namespace march4cpp

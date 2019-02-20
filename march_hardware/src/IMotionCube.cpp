@@ -6,9 +6,8 @@
 
 namespace march4cpp
 {
-IMotionCube::IMotionCube(int slaveIndex)
+IMotionCube::IMotionCube(int slaveIndex) : Slave(slaveIndex)
 {
-  this->slaveIndex = slaveIndex;
 }
 
 void IMotionCube::initialize()
@@ -156,8 +155,4 @@ float IMotionCube::getAngle()
   return (float)return_byte.ui;
 }
 
-int IMotionCube::getSlaveIndex()
-{
-  return slaveIndex;
-}
 }  // namespace march4cpp

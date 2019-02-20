@@ -1,37 +1,36 @@
 //
 // Created by projectmarch on 13-2-19.
 //
-
-#include <march_hardware/EtherCAT/EthercatIO.h>
-
 #ifndef MARCH4CPP__IMOTIONCUBE_H
 #define MARCH4CPP__IMOTIONCUBE_H
+
+#include <march_hardware/EtherCAT/EthercatIO.h>
+#include <march_hardware/Slave.h>
+
 namespace march4cpp
 {
-class IMotionCube
+class IMotionCube : public Slave
 {
 private:
-  int slaveIndex;
-
   //    TODO(Martijn) add PDO/SDO settings here.
 
 public:
-  IMotionCube(int slaveIndex);
+  explicit IMotionCube(int slaveIndex);
 
   IMotionCube()
   {
     slaveIndex = -1;
   }
 
-  void initialize();
+  ~IMotionCube() = default;
+
+  void initialize() override;
 
   bool PDOmapping();
 
   bool StartupSDO(uint8 ecatCycleTime);
 
   float getAngle();
-
-  int getSlaveIndex();
 };
 
 }  // namespace march4cpp

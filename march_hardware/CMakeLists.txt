@@ -39,6 +39,7 @@ add_library(march4cpp
         include/${PROJECT_NAME}/IMotionCube.h
         include/${PROJECT_NAME}/Joint.h
         include/${PROJECT_NAME}/March4.h
+        include/${PROJECT_NAME}/Slave.h
         include/${PROJECT_NAME}/TemperatureSensor.h
         src/IMotionCube.cpp
         src/Joint.cpp

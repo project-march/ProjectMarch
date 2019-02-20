@@ -19,7 +19,7 @@ class EthercatMaster
 public:
   bool isOperational = false;  // Is SOEM in operational state
 
-  explicit EthercatMaster(std::vector<Joint> slaves, std::string ifname, int maxSlaveIndex);
+  explicit EthercatMaster(std::vector<Joint> jointList, std::string ifname, int maxSlaveIndex);
 
   void start();
   void stop();

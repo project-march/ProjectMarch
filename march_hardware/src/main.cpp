@@ -18,6 +18,10 @@ int main(int argc, char** argv)
 
   printf("march4 initialized\n");
   printf("slaveindex: %d\n", march4.getJoint("test_joint").hasIMotionCube());
+  for(int i = 0; i< 1; i++) {
+      usleep(100000);
+//      printf("imc get: %f\n", march4.getJoint("test_joint").getAngle());
+  }
 
   march4.stopEtherCAT();
 }

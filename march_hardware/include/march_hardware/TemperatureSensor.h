@@ -2,12 +2,13 @@
 #define MARCH4CPP__TEMPERATURESENSOR_H
 
 #include <stdint.h>
+#include <march_hardware/Slave.h>
+
 namespace march4cpp
 {
-class TemperatureSensor
+class TemperatureSensor : public Slave
 {
 private:
-  int slaveIndex;
   uint8_t byteOffset;
 
 public:
@@ -15,14 +16,14 @@ public:
 
   TemperatureSensor()
   {
+    byteOffset = static_cast<uint8_t>(-1);
     slaveIndex = -1;
   };
 
-  void initialize();
+  void initialize() override;
 
   float getTemperature();
 
-  int getSlaveIndex();
 };
 }
 #endif
