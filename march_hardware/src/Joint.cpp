@@ -52,7 +52,7 @@ float Joint::getTemperature()
 {
   if (!hasTemperatureSensor())
   {
-    ROS_WARN("Joint %s has no temperaturesensor", this->name.c_str());
+    ROS_WARN("Joint %s has no temperature sensor", this->name.c_str());
     return -1;
   }
   return this->temperatureSensor.getTemperature();
