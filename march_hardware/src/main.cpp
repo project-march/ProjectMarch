@@ -21,6 +21,7 @@ int main(int argc, char** argv)
   for(int i = 0; i< 1; i++) {
       usleep(100000);
 //      printf("imc get: %f\n", march4.getJoint("test_joint").getAngle());
+    march4.getJoint("test_joint").getAngle();
   }
 
   march4.stopEtherCAT();
