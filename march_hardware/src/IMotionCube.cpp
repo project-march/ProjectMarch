@@ -3,6 +3,7 @@
 #include <march_hardware/EtherCAT/EthercatSDO.h>
 
 #include <march_hardware/IMotionCube.h>
+
 namespace march4cpp
 {
 IMotionCube::IMotionCube(int slaveIndex)
@@ -12,7 +13,7 @@ IMotionCube::IMotionCube(int slaveIndex)
 
 void IMotionCube::initialize()
 {
-  //    TODO(Martijn Isha) change ecat cycle time magic number
+  // TODO(Martijn Isha) change ecat cycle time magic number
   PDOmapping();
   StartupSDO(200);
 }
@@ -21,6 +22,7 @@ void IMotionCube::initialize()
 bool IMotionCube::PDOmapping()
 {
   ROS_DEBUG("PDO mapping START!\n");
+  // TODO(Martijn) Refactor this into something more readable and modular
 
   bool success = true;
 
@@ -36,7 +38,9 @@ bool IMotionCube::PDOmapping()
   success &= sdo_bit32(slaveIndex, 0x1A00, 0, 0);
   // download 1A00 pdo entries
   success &= sdo_bit32(slaveIndex, 0x1A00, 1, 0x60410010);
+
   success &= sdo_bit32(slaveIndex, 0x1A00, 2, 0x60640020);
+
   success &= sdo_bit32(slaveIndex, 0x1A00, 3, 0x20000010);
   // download 1A00 pdo count: 3
   success &= sdo_bit32(slaveIndex, 0x1A00, 0, 3);
@@ -45,8 +49,12 @@ bool IMotionCube::PDOmapping()
   // clear 1A01 pdo entries
   success &= sdo_bit32(slaveIndex, 0x1A01, 0, 0);
   // download 1A01 pdo entries
+
+  //  Detailed error register
   success &= sdo_bit32(slaveIndex, 0x1A01, 1, 0x20020010);
+  //  DC-link voltage
   success &= sdo_bit32(slaveIndex, 0x1A01, 2, 0x20550010);
+  //  Drive temperature
   success &= sdo_bit32(slaveIndex, 0x1A01, 3, 0x20580010);
   // download 1A01 pdo count: 4
   success &= sdo_bit32(slaveIndex, 0x1A01, 0, 3);
@@ -54,9 +62,14 @@ bool IMotionCube::PDOmapping()
   // clear 1A02 pdo entries
   success &= sdo_bit32(slaveIndex, 0x1A02, 0, 0);
   // download 1A02 pdo entries
+
+  //  Torque actual value
   success &= sdo_bit32(slaveIndex, 0x1A02, 1, 0x60770010);
+  //  Current limit
   success &= sdo_bit32(slaveIndex, 0x1A02, 2, 0x207f0010);
+  //  Motor position
   success &= sdo_bit32(slaveIndex, 0x1A02, 3, 0x20880020);
+
   // download 1A02 pdo count: 1
   success &= sdo_bit32(slaveIndex, 0x1A02, 0, 3);
   // clear 1A03 pdo entries
@@ -67,7 +80,9 @@ bool IMotionCube::PDOmapping()
   // clear 1600 pdo entries
   success &= sdo_bit32(slaveIndex, 0x1600, 0, 0);
   // download 1600 pdo entries
+  //  Control word
   success &= sdo_bit32(slaveIndex, 0x1600, 1, 0x60400010);
+  //  Target position
   success &= sdo_bit32(slaveIndex, 0x1600, 2, 0x607A0020);
   // download 1600 pdo count: 2
   success &= sdo_bit32(slaveIndex, 0x1600, 0, 2);
@@ -105,7 +120,7 @@ bool IMotionCube::PDOmapping()
 }
 
 // Set configuration parameters to the IMC
-bool IMotionCube::StartupSDO(int ecatCycleTime)
+bool IMotionCube::StartupSDO(uint8 ecatCycleTime)
 {
   bool success = true;
   ROS_DEBUG("Startup SDO\n");
@@ -136,8 +151,9 @@ bool IMotionCube::StartupSDO(int ecatCycleTime)
 
 float IMotionCube::getAngle()
 {
-  // TODO(Martijn) read from ethercat
-  return 0;
+  // TODO(Martijn) read absolute position instead of motor position when test joint is fixed
+  union bit32 return_byte = get_input_bit32(slaveIndex, 18);
+  return (float)return_byte.ui;
 }
 
 int IMotionCube::getSlaveIndex()

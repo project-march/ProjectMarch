@@ -29,7 +29,7 @@ void MARCH4::startEtherCAT()
     return;
   }
 
-  ROS_INFO("Slave configuration is non-conflicting!");
+  ROS_INFO("Slave configuration is non-conflicting");
 
   if (ethercatMaster->isOperational)
   {

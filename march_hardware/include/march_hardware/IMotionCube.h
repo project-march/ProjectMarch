@@ -2,6 +2,8 @@
 // Created by projectmarch on 13-2-19.
 //
 
+#include <march_hardware/EtherCAT/EthercatIO.h>
+
 #ifndef MARCH4CPP__IMOTIONCUBE_H
 #define MARCH4CPP__IMOTIONCUBE_H
 namespace march4cpp
@@ -25,7 +27,7 @@ public:
 
   bool PDOmapping();
 
-  bool StartupSDO(int ecatCycleTime);
+  bool StartupSDO(uint8 ecatCycleTime);
 
   float getAngle();
 
