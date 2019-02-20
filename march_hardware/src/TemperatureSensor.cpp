@@ -9,7 +9,7 @@ TemperatureSensor::TemperatureSensor(int slaveIndex, int byteOffset) : Slave(sla
   if ((int) byteOffset < 0)
   {
     ROS_FATAL("Slave configuration error: byteOffset can not be negative.");
-    throw ::std::invalid_argument("Slave configuration error: slaveindex can not be negative");
+    throw ::std::invalid_argument("Slave configuration error: byteOffset can not be negative");
   }
   this->byteOffset = byteOffset;
 }
