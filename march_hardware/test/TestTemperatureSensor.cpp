@@ -25,6 +25,22 @@ TEST_F(TestJoint, SlaveIndexMinusOne)
     ASSERT_THROW(march4cpp::TemperatureSensor(-1, 0), std::invalid_argument);
 }
 
+
+TEST_F(TestJoint, ByteOffsetOne)
+{
+    ASSERT_NO_THROW(march4cpp::TemperatureSensor(2, 1));
+}
+
+TEST_F(TestJoint, ByteOffsetZero)
+{
+    ASSERT_NO_THROW(march4cpp::TemperatureSensor(2, 0));
+}
+
+TEST_F(TestJoint, ByteOffsetMinusOne)
+{
+    ASSERT_THROW(march4cpp::TemperatureSensor(2, -1), std::invalid_argument);
+}
+
 TEST_F(TestJoint, NoSlaveIndexConstructor)
 {
     ASSERT_NO_THROW(march4cpp::TemperatureSensor tempSens = march4cpp::TemperatureSensor());

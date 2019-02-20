@@ -4,6 +4,7 @@
 
 #include <march_hardware/Joint.h>
 #include <march_hardware/March4.h>
+#include "sensor_msgs/JointState.h"
 
 int main(int argc, char** argv)
 {
@@ -16,12 +17,24 @@ int main(int argc, char** argv)
     return 0;
   }
 
-  printf("march4 initialized\n");
+    ros::init(argc, argv, "dummy");
+    ros::NodeHandle nh;
+    ros::Rate rate(10);
+
+    ros::Publisher pub = nh.advertise<sensor_msgs::JointState>("march/joint_states", 5);
+
+
+    printf("march4 initialized\n");
   printf("slaveindex: %d\n", march4.getJoint("test_joint").hasIMotionCube());
-  for(int i = 0; i< 1; i++) {
+  for(int i = 0; i< 10000; i++) {
       usleep(100000);
-//      printf("imc get: %f\n", march4.getJoint("test_joint").getAngle());
-    march4.getJoint("test_joint").getAngle();
+      float angleVal = march4.getJoint("test_joint").getAngle();
+      printf("imc get: %f\n", angleVal);
+      sensor_msgs::JointState joint_state;
+      joint_state.header.stamp = ros::Time::now();
+      joint_state.name = {"test_joint"};
+      joint_state.position = {angleVal};
+      pub.publish(joint_state);
   }
 
   march4.stopEtherCAT();

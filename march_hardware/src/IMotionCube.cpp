@@ -38,6 +38,7 @@ bool IMotionCube::PDOmapping()
   // download 1A00 pdo entries
   success &= sdo_bit32(slaveIndex, 0x1A00, 1, 0x60410010);
 
+//  Position actual value
   success &= sdo_bit32(slaveIndex, 0x1A00, 2, 0x60640020);
 
   success &= sdo_bit32(slaveIndex, 0x1A00, 3, 0x20000010);
@@ -151,8 +152,8 @@ bool IMotionCube::StartupSDO(uint8 ecatCycleTime)
 float IMotionCube::getAngle()
 {
   // TODO(Martijn) read absolute position instead of motor position when test joint is fixed
-  union bit32 return_byte = get_input_bit32(slaveIndex, 18);
-  return (float)return_byte.ui;
+  union bit32 return_byte = get_input_bit32(slaveIndex, 2);
+  return (float) return_byte.i;
 }
 
 }  // namespace march4cpp
