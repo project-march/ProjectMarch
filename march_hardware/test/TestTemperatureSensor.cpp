@@ -4,49 +4,49 @@
 #include "march_hardware/TemperatureSensor.h"
 
 
-class TestJoint : public ::testing::Test
+class TestTemperatureJoint : public ::testing::Test
 {
 protected:
 };
 
-TEST_F(TestJoint, SlaveIndexOne)
+TEST_F(TestTemperatureJoint, SlaveIndexOne)
 {
     march4cpp::TemperatureSensor tempSens = march4cpp::TemperatureSensor(1, 2);
     ASSERT_EQ(1, tempSens.getSlaveIndex());
 }
 
-TEST_F(TestJoint, SlaveIndexZero)
+TEST_F(TestTemperatureJoint, SlaveIndexZero)
 {
     ASSERT_THROW(march4cpp::TemperatureSensor(0, 0), std::invalid_argument);
 }
 
-TEST_F(TestJoint, SlaveIndexMinusOne)
+TEST_F(TestTemperatureJoint, SlaveIndexMinusOne)
 {
     ASSERT_THROW(march4cpp::TemperatureSensor(-1, 0), std::invalid_argument);
 }
 
 
-TEST_F(TestJoint, ByteOffsetOne)
+TEST_F(TestTemperatureJoint, ByteOffsetOne)
 {
     ASSERT_NO_THROW(march4cpp::TemperatureSensor(2, 1));
 }
 
-TEST_F(TestJoint, ByteOffsetZero)
+TEST_F(TestTemperatureJoint, ByteOffsetZero)
 {
     ASSERT_NO_THROW(march4cpp::TemperatureSensor(2, 0));
 }
 
-TEST_F(TestJoint, ByteOffsetMinusOne)
+TEST_F(TestTemperatureJoint, ByteOffsetMinusOne)
 {
     ASSERT_THROW(march4cpp::TemperatureSensor(2, -1), std::invalid_argument);
 }
 
-TEST_F(TestJoint, NoSlaveIndexConstructor)
+TEST_F(TestTemperatureJoint, NoSlaveIndexConstructor)
 {
     ASSERT_NO_THROW(march4cpp::TemperatureSensor tempSens = march4cpp::TemperatureSensor());
 
 }
-TEST_F(TestJoint, NoSlaveIndexConstructorGetIndex)
+TEST_F(TestTemperatureJoint, NoSlaveIndexConstructorGetIndex)
 {
     march4cpp::TemperatureSensor tempSens = march4cpp::TemperatureSensor();
     ASSERT_EQ(-1, tempSens.getSlaveIndex());
