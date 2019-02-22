@@ -6,7 +6,7 @@ namespace march4cpp
 {
 TemperatureSensor::TemperatureSensor(int slaveIndex, int byteOffset) : Slave(slaveIndex)
 {
-  if ((int) byteOffset < 0)
+  if (byteOffset < 0)
   {
     ROS_FATAL("Slave configuration error: byteOffset can not be negative.");
     throw ::std::invalid_argument("Slave configuration error: byteOffset can not be negative");
