@@ -32,7 +32,7 @@ public:
 
   virtual void initialize() = 0;
 
-  int getSlaveIndex()
+  virtual int getSlaveIndex()
   {
     return this->slaveIndex;
   }

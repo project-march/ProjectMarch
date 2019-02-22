@@ -3,7 +3,7 @@
 #include <ros/ros.h>
 
 #include <march_hardware/Joint.h>
-#include <march_hardware/TemperatureSensor.h>
+#include <march_hardware/TemperatureGES.h>
 #include <march_hardware/Encoder.h>
 
 #include <march_hardware/EtherCAT/EthercatIO.h>
@@ -14,10 +14,10 @@ namespace march4cpp
 {
 MARCH4::MARCH4()
 {
-  TemperatureSensor tempSens = TemperatureSensor(1, 0);
+  TemperatureGES tempSens = TemperatureGES(1, 0);
   Encoder enc = Encoder(16, -27532, -5);
-  IMotionCube imc = IMotionCube(2, enc);
-  Joint temp = Joint("test_joint", tempSens, imc);
+  IMotionCube imc = IMotionCube(2, &enc);
+  Joint temp = Joint("test_joint", &tempSens, imc);
   jointList.push_back(temp);
 
   ethercatMaster = new EthercatMaster(jointList, "enp2s0", this->getMaxSlaveIndex());
@@ -57,7 +57,7 @@ int MARCH4::getMaxSlaveIndex()
 
   for (int i = 0; i < jointList.size(); i++)
   {
-    int temperatureSlaveIndex = jointList.at(i).getTemperatureSensorSlaveIndex();
+    int temperatureSlaveIndex = jointList.at(i).getTemperatureGESSlaveIndex();
     if (temperatureSlaveIndex > maxSlaveIndex)
     {
       maxSlaveIndex = temperatureSlaveIndex;
@@ -80,9 +80,9 @@ bool MARCH4::hasValidSlaves()
 
   for (int i = 0; i < jointList.size(); i++)
   {
-    if (jointList[i].hasTemperatureSensor())
+    if (jointList[i].hasTemperatureGES())
     {
-      int temperatureSlaveIndex = jointList[i].getTemperatureSensorSlaveIndex();
+      int temperatureSlaveIndex = jointList[i].getTemperatureGESSlaveIndex();
       temperatureSlaveIndices.push_back(temperatureSlaveIndex);
     }
 

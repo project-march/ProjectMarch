@@ -1,29 +1,14 @@
-#ifndef MARCH4CPP__TEMPERATURESENSOR_H
-#define MARCH4CPP__TEMPERATURESENSOR_H
-
-#include <stdint.h>
-#include <march_hardware/Slave.h>
+// Copyright 2019 Project March.
+#ifndef PROJECT_TEMPERATUREINTERFACE_H
+#define PROJECT_TEMPERATUREINTERFACE_H
 
 namespace march4cpp
 {
-class TemperatureSensor : public Slave
+class TemperatureSensor
 {
-private:
-  int byteOffset;
-
-public:
-  TemperatureSensor(int slaveIndex, int byteOffset);
-
-  TemperatureSensor()
-  {
-    byteOffset = -1;
-    slaveIndex = -1;
-  };
-
-  void initialize() override;
-
-  float getTemperature();
-
+ public:
+  virtual float getTemperature() = 0;
 };
 }
-#endif
+
+#endif  // PROJECT_TEMPERATUREINTERFACE_H

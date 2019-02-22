@@ -23,7 +23,6 @@ public:
   IMotionCube()
   {
     slaveIndex = -1;
-    encoder = nullptr;
   }
 
   ~IMotionCube() = default;
