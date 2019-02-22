@@ -13,7 +13,7 @@ namespace march4cpp
 class IMotionCube : public Slave
 {
 private:
-    Encoder encoder;
+  Encoder encoder;
   //    TODO(Martijn) add PDO/SDO settings here.
 
 public:
@@ -33,6 +33,11 @@ public:
   bool StartupSDO(uint8 ecatCycleTime);
 
   float getAngle();
+
+  void actuateRad(float rad);
+
+  bool isValidIUCommand(float iu);
+  bool isValidDegCommand(float deg);
 };
 
 }  // namespace march4cpp

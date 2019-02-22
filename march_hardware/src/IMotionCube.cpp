@@ -39,7 +39,7 @@ bool IMotionCube::PDOmapping()
   // download 1A00 pdo entries
   success &= sdo_bit32(slaveIndex, 0x1A00, 1, 0x60410010);
 
-//  Position actual value
+  //  Position actual value
   success &= sdo_bit32(slaveIndex, 0x1A00, 2, 0x60640020);
 
   success &= sdo_bit32(slaveIndex, 0x1A00, 3, 0x20000010);
@@ -136,6 +136,8 @@ bool IMotionCube::StartupSDO(uint8 ecatCycleTime)
   // position dimension index
   success &= sdo_bit8(slaveIndex, 0x608A, 0, 1);
 
+  //  Todo(Isha) implement position factor scaling
+
   // position factor -- scaling factor numerator
   success &= sdo_bit32(slaveIndex, 0x6093, 1, 1);
   // position factor -- scaling factor denominator
@@ -150,9 +152,25 @@ bool IMotionCube::StartupSDO(uint8 ecatCycleTime)
   return success;
 }
 
+void IMotionCube::actuateRad(float rad)
+{
+  // TODO(Isha) implement actuation method.
+  // Convert to internal units and write to the correct index.
+}
+
 float IMotionCube::getAngle()
 {
-  return encoder.getAngleRad();
+  return encoder.getAngleDeg();
+}
+
+bool IMotionCube::isValidIUCommand(float iu)
+{
+  return iu > encoder.getMinEncoderValue() && iu < encoder.getMaxEncoderValue();
+}
+
+bool IMotionCube::isValidDegCommand(float deg)
+{
+  return deg > encoder.getMinDegvalue() && deg < encoder.getMaxDegvalue();
 }
 
 }  // namespace march4cpp

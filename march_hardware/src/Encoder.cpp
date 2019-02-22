@@ -9,30 +9,62 @@
 
 namespace march4cpp
 {
-Encoder::Encoder(int numberOfBytes, int minEncoderValue, int minDegvalue)
+Encoder::Encoder(int numberOfBytes, int minEncoderValue, int maxEncoderValue, float minDegValue, float maxDegValue)
 {
   this->numberOfBytes = numberOfBytes;
   this->minEncoderValue = minEncoderValue;
-  this->minDegvalue = minDegvalue;
+  this->maxEncoderValue = maxEncoderValue;
+  this->minDegvalue = minDegValue;
+  this->maxDegvalue = maxDegValue;
 }
 
+float Encoder::getAngleRad()
+{
+  return IUtoRad(getAngleIU());
+}
 
 // TODO refactor to doubles;
 float Encoder::getAngleDeg()
 {
-    float bits = static_cast<float>(pow(2, 16));
-    float angle = getAngle();
-    return (angle - this->minEncoderValue)/bits*360 + this->minDegvalue;
+  return IUtoDeg(getAngleIU());
 }
 
-float Encoder::getAngleRad(){
-    return getAngleDeg()*M_PI/180;
-}
-
-float Encoder::getAngle()
+int Encoder::getAngleIU()
 {
   // TODO(Martijn) read absolute position instead of motor position when test joint is fixed
   union bit32 return_byte = get_input_bit32(2, 2);
-  return (float)return_byte.i;
+  return return_byte.i;
+}
+
+float Encoder::IUtoDeg(float iu)
+{
+  auto bits = static_cast<float>(pow(2, this->numberOfBytes));
+  return (iu - this->minEncoderValue) / bits * 360 + this->minDegvalue;
+}
+
+float Encoder::IUtoRad(float iu)
+{
+  auto bits = static_cast<float>(pow(2, this->numberOfBytes));
+  return static_cast<float>((iu - this->minEncoderValue) / bits * 2 * M_PI + this->minDegvalue);
+}
+
+int Encoder::getMinEncoderValue() const
+{
+  return minEncoderValue;
+}
+
+int Encoder::getMaxEncoderValue() const
+{
+  return maxEncoderValue;
+}
+
+float Encoder::getMinDegvalue() const
+{
+  return minDegvalue;
+}
+
+float Encoder::getMaxDegvalue() const
+{
+  return maxDegvalue;
 }
 }

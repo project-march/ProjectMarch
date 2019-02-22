@@ -12,17 +12,32 @@ class Encoder
 private:
   int numberOfBytes;
   int minEncoderValue;
-  int minDegvalue;
+  int maxEncoderValue;
+  float minDegvalue;
+  float maxDegvalue;
 
 public:
-  Encoder(){};
+  Encoder() = default;
 
-  Encoder(int numberOfBytes, int minEncoderValue, int minDegvalue);
+  Encoder(int numberOfBytes, int minEncoderValue, int maxEncoderValue, float minDegvalue, float maxDegValue);
 
   float getAngleRad();
   float getAngleDeg();
 
-  float getAngle();
+  int getAngleIU();
+
+  float IUtoDeg(float iu);
+  float IUtoRad(float iu);
+
+  float DegtoIU(float deg);
+  float RadtoIU(float rad);
+
+
+
+  int getMinEncoderValue() const;
+  int getMaxEncoderValue() const;
+  float getMinDegvalue() const;
+  float getMaxDegvalue() const;
 };
 }
 

@@ -15,7 +15,8 @@ namespace march4cpp
 MARCH4::MARCH4()
 {
   TemperatureSensor tempSens = TemperatureSensor(1, 0);
-  Encoder enc = Encoder(16, -27532, -5);
+//  TODO double-check these numbers.
+  Encoder enc = Encoder(16, -27532, -8000, -5, 117);
   IMotionCube imc = IMotionCube(2, enc);
   Joint temp = Joint("test_joint", tempSens, imc);
   jointList.push_back(temp);
