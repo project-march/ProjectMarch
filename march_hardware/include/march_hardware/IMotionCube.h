@@ -7,21 +7,23 @@
 #include <march_hardware/EtherCAT/EthercatIO.h>
 #include <march_hardware/Slave.h>
 #include <march_hardware/Encoder.h>
+#include "TemperatureSensor.h"
 
 namespace march4cpp
 {
 class IMotionCube : public Slave
 {
 private:
-    Encoder encoder;
-  //    TODO(Martijn) add PDO/SDO settings here.
+  AngleEncoder* encoder;
+  // TODO(Martijn) add PDO/SDO settings here.
 
 public:
-  explicit IMotionCube(int slaveIndex, Encoder encoder);
+  explicit IMotionCube(int slaveIndex, AngleEncoder* encoder);
 
   IMotionCube()
   {
     slaveIndex = -1;
+    encoder = nullptr;
   }
 
   ~IMotionCube() = default;

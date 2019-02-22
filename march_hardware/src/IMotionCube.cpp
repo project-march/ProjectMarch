@@ -6,7 +6,7 @@
 
 namespace march4cpp
 {
-IMotionCube::IMotionCube(int slaveIndex, Encoder encoder) : Slave(slaveIndex)
+IMotionCube::IMotionCube(int slaveIndex, AngleEncoder* encoder) : Slave(slaveIndex)
 {
   this->encoder = encoder;
 }
@@ -39,7 +39,7 @@ bool IMotionCube::PDOmapping()
   // download 1A00 pdo entries
   success &= sdo_bit32(slaveIndex, 0x1A00, 1, 0x60410010);
 
-//  Position actual value
+  //  Position actual value
   success &= sdo_bit32(slaveIndex, 0x1A00, 2, 0x60640020);
 
   success &= sdo_bit32(slaveIndex, 0x1A00, 3, 0x20000010);
@@ -152,7 +152,7 @@ bool IMotionCube::StartupSDO(uint8 ecatCycleTime)
 
 float IMotionCube::getAngle()
 {
-  return encoder.getAngleRad();
+  return encoder->getAngleRad();
 }
 
 }  // namespace march4cpp

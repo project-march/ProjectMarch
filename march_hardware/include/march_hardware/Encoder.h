@@ -5,9 +5,10 @@
 #ifndef PROJECT_ENCODER_H
 #define PROJECT_ENCODER_H
 
+#include "AngleEncoder.h"
 namespace march4cpp
 {
-class Encoder
+class Encoder : public march4cpp::AngleEncoder
 {
 private:
   int numberOfBytes;
@@ -19,10 +20,9 @@ public:
 
   Encoder(int numberOfBytes, int minEncoderValue, int minDegvalue);
 
-  float getAngleRad();
-  float getAngleDeg();
-
-  float getAngle();
+  float getAngleRad() override;
+  float getAngleDeg() override;
+  float getAngle() override;
 };
 }
 
