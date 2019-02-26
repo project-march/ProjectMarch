@@ -35,14 +35,15 @@ void EthercatMaster::start()
   // Find and auto-config slaves
   if (ec_config_init(FALSE) <= 0)
   {
-    ROS_ERROR("No slaves found, shutting down. Confirm that you have selected the right ifname.");
+    ROS_ERROR("No slaves found, shutting down. Confirm that you have selected the right ifname.\n"
+              "Check that the first slave is connected properly.");
     return;
   }
   ROS_INFO("%d slave(s) found and initialized.\n", ec_slavecount);
 
   if (ec_slavecount < this->maxSlaveIndex)
   {
-    ROS_FATAL("Slave configured with index %d while soem only found %d slave(s)", this->maxSlaveIndex, ec_slavecount);
+    ROS_FATAL("Slave configured with index %d while soem only found %d slave(s).", this->maxSlaveIndex, ec_slavecount);
     return;
   }
   // TODO(Martijn) Check on type of slaves
