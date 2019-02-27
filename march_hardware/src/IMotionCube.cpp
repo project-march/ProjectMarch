@@ -3,12 +3,16 @@
 #include <march_hardware/EtherCAT/EthercatSDO.h>
 
 #include <march_hardware/IMotionCube.h>
+#include <unistd.h>
+#include <march_hardware/EtherCAT/EthercatIO.h>
 
 namespace march4cpp
 {
 IMotionCube::IMotionCube(int slaveIndex, Encoder encoder) : Slave(slaveIndex)
 {
   this->encoder = encoder;
+  this->encoder.setSlaveIndex(this->slaveIndex);
+
 }
 
 void IMotionCube::initialize()
@@ -42,7 +46,9 @@ bool IMotionCube::PDOmapping()
   //  Position actual value
   success &= sdo_bit32(slaveIndex, 0x1A00, 2, 0x60640020);
 
+  // Motion error register
   success &= sdo_bit32(slaveIndex, 0x1A00, 3, 0x20000010);
+
   // download 1A00 pdo count: 3
   success &= sdo_bit32(slaveIndex, 0x1A00, 0, 3);
   //--------------------
@@ -152,15 +158,43 @@ bool IMotionCube::StartupSDO(uint8 ecatCycleTime)
   return success;
 }
 
-void IMotionCube::actuateRad(float rad)
+void IMotionCube::actuateRad(float position)
 {
+  ROS_INFO("Moving to position %f", position);
+  if (!this->isValidIUCommand(position)){
+    ROS_ERROR("Position %f id invalid.", position);
+    return;
+  }
   // TODO(Isha) implement actuation method.
   // Convert to internal units and write to the correct index.
+//
+//  union bit16 controlword;
+//
+//  controlword.i = 0b0000000010000000;
+//  set_output_bit16(this->slaveIndex, 0, controlword);
+
+
+
+
+
+  union bit32 targetPosition;
+  targetPosition.i = position;
+
+  int8_t slaveNumber = this->slaveIndex;
+  int16_t targetPositionLocation = 2;
+
+  ROS_INFO("Trying to actuate slave %d, soem location %d to targetposition %d", slaveNumber, targetPositionLocation, targetPosition.i);
+  set_output_bit32(slaveNumber, targetPositionLocation, targetPosition);
+
+  ROS_WARN_STREAM("MotionErrorRegister " << get_input_bit16(this->slaveIndex, 6).ui);
+  ROS_WARN_STREAM("DetailedErrorRegister " << get_input_bit16(this->slaveIndex, 8).ui);
+
+  ROS_WARN("Warning %d", get_input_bit16(2, 6).ui);
 }
 
 float IMotionCube::getAngle()
 {
-  return encoder.getAngleDeg();
+  return this->encoder.getAngleDeg();
 }
 
 bool IMotionCube::isValidIUCommand(float iu)

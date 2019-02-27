@@ -11,6 +11,7 @@ namespace march4cpp
 {
 Encoder::Encoder(int numberOfBytes, int minEncoderValue, int maxEncoderValue, float minDegValue, float maxDegValue)
 {
+  this->slaveIndex = -1;
   this->numberOfBytes = numberOfBytes;
   this->minEncoderValue = minEncoderValue;
   this->maxEncoderValue = maxEncoderValue;
@@ -32,7 +33,12 @@ float Encoder::getAngleDeg()
 int Encoder::getAngleIU()
 {
   // TODO(Martijn) read absolute position instead of motor position when test joint is fixed
-  union bit32 return_byte = get_input_bit32(2, 2);
+  if (this->slaveIndex == -1)
+  {
+    ROS_FATAL("Encoder has slaveIndex of -1");
+  }
+  union bit32 return_byte = get_input_bit32(this->slaveIndex, 2);
+  ROS_WARN_STREAM(return_byte.i);
   return return_byte.i;
 }
 
@@ -66,5 +72,15 @@ float Encoder::getMinDegvalue() const
 float Encoder::getMaxDegvalue() const
 {
   return maxDegvalue;
+}
+
+void Encoder::setSlaveIndex(int slaveIndex)
+{
+  this->slaveIndex = slaveIndex;
+}
+
+int Encoder::getSlaveIndex()
+{
+  return this->slaveIndex;
 }
 }

@@ -10,6 +10,7 @@ namespace march4cpp
 class Encoder
 {
 private:
+  int slaveIndex;
   int numberOfBytes;
   int minEncoderValue;
   int maxEncoderValue;
@@ -19,7 +20,8 @@ private:
 public:
   Encoder() = default;
 
-  Encoder(int numberOfBytes, int minEncoderValue, int maxEncoderValue, float minDegvalue, float maxDegValue);
+  Encoder(int numberOfBytes, int minEncoderValue, int maxEncoderValue, float minDegvalue,
+          float maxDegValue);
 
   float getAngleRad();
   float getAngleDeg();
@@ -32,12 +34,13 @@ public:
   float DegtoIU(float deg);
   float RadtoIU(float rad);
 
-
-
   int getMinEncoderValue() const;
   int getMaxEncoderValue() const;
   float getMinDegvalue() const;
   float getMaxDegvalue() const;
+
+  void setSlaveIndex(int slaveIndex);
+  int getSlaveIndex();
 };
 }
 

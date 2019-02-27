@@ -36,6 +36,7 @@ void Joint::actuate(double position)
 {
   // TODO(Martijn) write to ethercat
   // TODO(BaCo) check that the position is allowed and does not exceed (torque) limits.
+  this->iMotionCube.actuateRad(position);
 }
 
 float Joint::getAngle()
