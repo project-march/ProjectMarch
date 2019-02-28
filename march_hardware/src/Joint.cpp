@@ -32,21 +32,20 @@ void Joint::initialize()
   }
 }
 
-void Joint::actuate(double position)
+void Joint::actuateRad(float targetPositionRad)
 {
-  // TODO(Martijn) write to ethercat
   // TODO(BaCo) check that the position is allowed and does not exceed (torque) limits.
-  this->iMotionCube.actuateRad(position);
+  this->iMotionCube.actuateRad(targetPositionRad);
 }
 
-float Joint::getAngle()
+float Joint::getAngleRad()
 {
   if (!hasIMotionCube())
   {
     ROS_WARN("Joint %s has no iMotionCube", this->name.c_str());
     return -1;
   }
-  return this->iMotionCube.getAngle();
+  return this->iMotionCube.getAngleRad();
 }
 
 float Joint::getTemperature()
@@ -75,6 +74,11 @@ int Joint::getIMotionCubeSlaveIndex()
     return this->iMotionCube.getSlaveIndex();
   }
   return -1;
+}
+
+IMotionCube Joint::getIMotionCube()
+{
+  return this->iMotionCube;
 }
 
 std::string Joint::getName()

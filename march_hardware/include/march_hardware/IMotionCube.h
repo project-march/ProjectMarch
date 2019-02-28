@@ -14,7 +14,8 @@ class IMotionCube : public Slave
 {
 private:
   Encoder encoder;
-  //    TODO(Martijn) add PDO/SDO settings here.
+  void actuateIU(int iu);
+  // TODO(Martijn) add PDO/SDO settings here.
 
 public:
   explicit IMotionCube(int slaveIndex, Encoder encoder);
@@ -32,12 +33,21 @@ public:
 
   bool StartupSDO(uint8 ecatCycleTime);
 
-  float getAngle();
+  float getAngleRad();
 
-  void actuateRad(float rad);
+  uint16 getMotionError();
+  uint16 getDetailedError();
+  uint16 getStatusWord();
 
-  bool isValidIUCommand(float iu);
-  bool isValidDegCommand(float deg);
+  void setControlWord(uint16 controlWord);
+
+  void actuateRad(float targetRad);
+
+  void parseMotionError(int errorCode);
+  void parseStatusWord();
+  bool goToOperationEnabled();
+
+  bool get_bit(uint16 value, int index);
 };
 
 }  // namespace march4cpp

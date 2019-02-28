@@ -20,14 +20,15 @@ public:
   Joint(std::string name, IMotionCube iMotionCube);
 
   void initialize();
-  void actuate(double effort);
+  void actuateRad(float targetPositionRad);
 
-  float getAngle();
+  float getAngleRad();
   float getTemperature();
 
   std::string getName();
   int getTemperatureSensorSlaveIndex();
   int getIMotionCubeSlaveIndex();
+  IMotionCube getIMotionCube();
 
   bool hasIMotionCube();
   bool hasTemperatureSensor();

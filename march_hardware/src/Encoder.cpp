@@ -9,14 +9,13 @@
 
 namespace march4cpp
 {
-Encoder::Encoder(int numberOfBytes, int minEncoderValue, int maxEncoderValue, float minDegValue, float maxDegValue)
+Encoder::Encoder(int numberOfBits, int minPositionIU, int maxPositionIU, int zeroPositionIU)
 {
   this->slaveIndex = -1;
-  this->numberOfBytes = numberOfBytes;
-  this->minEncoderValue = minEncoderValue;
-  this->maxEncoderValue = maxEncoderValue;
-  this->minDegvalue = minDegValue;
-  this->maxDegvalue = maxDegValue;
+  this->totalPositions = static_cast<int>(pow(2, numberOfBits));
+  this->minPositionIU = minPositionIU;
+  this->maxPositionIU = maxPositionIU;
+  this->zeroPositionIU = zeroPositionIU;
 }
 
 float Encoder::getAngleRad()
@@ -24,54 +23,22 @@ float Encoder::getAngleRad()
   return IUtoRad(getAngleIU());
 }
 
-// TODO refactor to doubles;
-float Encoder::getAngleDeg()
-{
-  return IUtoDeg(getAngleIU());
-}
-
 int Encoder::getAngleIU()
 {
-  // TODO(Martijn) read absolute position instead of motor position when test joint is fixed
   if (this->slaveIndex == -1)
   {
     ROS_FATAL("Encoder has slaveIndex of -1");
   }
   union bit32 return_byte = get_input_bit32(this->slaveIndex, 2);
-  ROS_WARN_STREAM(return_byte.i);
   return return_byte.i;
 }
 
-float Encoder::IUtoDeg(float iu)
-{
-  auto bits = static_cast<float>(pow(2, this->numberOfBytes));
-  return (iu - this->minEncoderValue) / bits * 360 + this->minDegvalue;
+int Encoder::RadtoIU(float rad) {
+    return static_cast<int>(rad*totalPositions/(2*M_PI)+zeroPositionIU);
 }
 
-float Encoder::IUtoRad(float iu)
-{
-  auto bits = static_cast<float>(pow(2, this->numberOfBytes));
-  return static_cast<float>((iu - this->minEncoderValue) / bits * 2 * M_PI + this->minDegvalue);
-}
-
-int Encoder::getMinEncoderValue() const
-{
-  return minEncoderValue;
-}
-
-int Encoder::getMaxEncoderValue() const
-{
-  return maxEncoderValue;
-}
-
-float Encoder::getMinDegvalue() const
-{
-  return minDegvalue;
-}
-
-float Encoder::getMaxDegvalue() const
-{
-  return maxDegvalue;
+float Encoder::IUtoRad(int iu) {
+    return static_cast<float>(iu - zeroPositionIU) * 2 * M_PI / totalPositions;
 }
 
 void Encoder::setSlaveIndex(int slaveIndex)
@@ -79,8 +46,13 @@ void Encoder::setSlaveIndex(int slaveIndex)
   this->slaveIndex = slaveIndex;
 }
 
-int Encoder::getSlaveIndex()
+int Encoder::getSlaveIndex() const
 {
   return this->slaveIndex;
+}
+
+bool Encoder::isValidTargetPositionIU(int targetPosIU)
+{
+    return (targetPosIU > this->minPositionIU && targetPosIU < this->maxPositionIU);
 }
 }

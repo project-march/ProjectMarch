@@ -27,23 +27,23 @@ void EthercatMaster::start()
   // Initialise SOEM, bind socket to ifname
   if (!ec_init(ifname.c_str()))
   {
-    ROS_ERROR("No socket connection on %s. Confirm that you have selected the right ifname.", ifname.c_str());
+    ROS_ERROR("No socket connection on %s. Confirm that you have selected the right ifname", ifname.c_str());
     return;
   }
-  ROS_INFO("ec_init on %s succeeded.\n", ifname.c_str());
+  ROS_INFO("ec_init on %s succeeded\n", ifname.c_str());
 
   // Find and auto-config slaves
   if (ec_config_init(FALSE) <= 0)
   {
-    ROS_ERROR("No slaves found, shutting down. Confirm that you have selected the right ifname.\n"
+    ROS_ERROR("No slaves found, shutting down. Confirm that you have selected the right ifname\n"
               "Check that the first slave is connected properly.");
     return;
   }
-  ROS_INFO("%d slave(s) found and initialized.\n", ec_slavecount);
+  ROS_INFO("%d slave(s) found and initialized.", ec_slavecount);
 
   if (ec_slavecount < this->maxSlaveIndex)
   {
-    ROS_FATAL("Slave configured with index %d while soem only found %d slave(s).", this->maxSlaveIndex, ec_slavecount);
+    ROS_FATAL("Slave configured with index %d while soem only found %d slave(s)", this->maxSlaveIndex, ec_slavecount);
     return;
   }
   // TODO(Martijn) Check on type of slaves
@@ -64,12 +64,12 @@ void EthercatMaster::start()
   // Wait for all slaves to reach SAFE_OP state
   ec_statecheck(0, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE * 4);
 
-  ROS_INFO("segments : %d : %d %d %d %d\n", ec_group[0].nsegments, ec_group[0].IOsegment[0], ec_group[0].IOsegment[1],
+  ROS_INFO("segments : %d : %d %d %d %d", ec_group[0].nsegments, ec_group[0].IOsegment[0], ec_group[0].IOsegment[1],
            ec_group[0].IOsegment[2], ec_group[0].IOsegment[3]);
 
-  ROS_INFO("Request operational state for all slaves\n");
+  ROS_INFO("Request operational state for all slaves");
   expectedWKC = (ec_group[0].outputsWKC * 2) + ec_group[0].inputsWKC;
-  ROS_INFO("Calculated workcounter %d\n", expectedWKC);
+  ROS_INFO("Calculated workcounter %d", expectedWKC);
   ec_slave[0].state = EC_STATE_OPERATIONAL;
 
   // send one valid process data to make outputs in slaves happy
@@ -91,7 +91,7 @@ void EthercatMaster::start()
   if (ec_slave[0].state == EC_STATE_OPERATIONAL)
   {
     // All slaves in operational state
-    ROS_INFO("Operational state reached for all slaves.\n");
+    ROS_INFO("Operational state reached for all slaves.");
     isOperational = true;
     // TODO(Martijn) create parallel thread
     EcatThread = std::thread(&EthercatMaster::ethercatLoop, this);
@@ -114,7 +114,7 @@ void EthercatMaster::start()
 
 void EthercatMaster::stop()
 {
-  ROS_INFO("Stopping EtherCAT\n");
+  ROS_INFO("Stopping EtherCAT");
   isOperational = false;
   EcatThread.join();
   ec_slave[0].state = EC_STATE_INIT;
@@ -129,7 +129,7 @@ void EthercatMaster::ethercatLoop()
     sendProcessData();
     receiveProcessData();
     monitorSlaveConnection();
-    usleep(200000);
+    usleep(2000);
   }
 }
 

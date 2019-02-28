@@ -11,36 +11,27 @@ class Encoder
 {
 private:
   int slaveIndex;
-  int numberOfBytes;
-  int minEncoderValue;
-  int maxEncoderValue;
-  float minDegvalue;
-  float maxDegvalue;
+  int totalPositions;
+  int minPositionIU;
+  int maxPositionIU;
+  int zeroPositionIU;
 
 public:
   Encoder() = default;
 
-  Encoder(int numberOfBytes, int minEncoderValue, int maxEncoderValue, float minDegvalue,
-          float maxDegValue);
+  Encoder(int numberOfBits, int minPositionIU, int maxPositionIU, int zeroPositionIU);
 
   float getAngleRad();
-  float getAngleDeg();
 
   int getAngleIU();
 
-  float IUtoDeg(float iu);
-  float IUtoRad(float iu);
+  float IUtoRad(int iu);
+  int RadtoIU(float rad);
 
-  float DegtoIU(float deg);
-  float RadtoIU(float rad);
-
-  int getMinEncoderValue() const;
-  int getMaxEncoderValue() const;
-  float getMinDegvalue() const;
-  float getMaxDegvalue() const;
+  bool isValidTargetPositionIU(int targetPosIU);
 
   void setSlaveIndex(int slaveIndex);
-  int getSlaveIndex();
+  int getSlaveIndex() const;
 };
 }
 
