@@ -217,23 +217,23 @@ void IMotionCube::setControlWord(uint16 controlWord)
 void IMotionCube::parseStatusWord(uint16 statusWord) {
     ROS_WARN_STREAM("Looking up Status Word " << std::bitset<16>(statusWord));
     if(get_bit(statusWord, 0) == 1){
-        ROS_WARN("\tAxis on. Power stage is enabled. Motor control is performed");
+        ROS_WARN("\tAxis on. Power stage is enabled. Motor control is performed.");
     } else {
-        ROS_WARN("\tAxis off. Power stage is disabled. Motor control is not performed");
+        ROS_WARN("\tAxis off. Power stage is disabled. Motor control is not performed.");
     }
     if(get_bit(statusWord, 2) == 1){
-        ROS_WARN("\tOperation Enabled");
+        ROS_WARN("\tOperation Enabled.");
     }
     if(get_bit(statusWord, 3) == 1){
         ROS_WARN("\tFault. If set, a fault condition is or was present in the drive.");
     }
     if(get_bit(statusWord, 4) == 1){
-        ROS_WARN("\tMotor supply voltage is present");
+        ROS_WARN("\tMotor supply voltage is present.");
     } else {
-        ROS_WARN("\tMotor supply voltage is absent");
+        ROS_WARN("\tMotor supply voltage is absent.");
     }
     if(get_bit(statusWord, 5) == 0){
-        ROS_WARN("\tQuick Stop. When this bit is zero, the drive is performing a quick stop");
+        ROS_WARN("\tQuick Stop. When this bit is zero, the drive is performing a quick stop.");
     }
     if(get_bit(statusWord, 6) == 1){
         ROS_WARN("\tSwitch On Disabled.");
@@ -242,34 +242,34 @@ void IMotionCube::parseStatusWord(uint16 statusWord) {
         ROS_WARN("\tWarning. A TML function / homing was called, while another TML function homing is still in execution. The last call is ignored.");
     }
     if(get_bit(statusWord, 8) == 1){
-        ROS_WARN("\tA TML function or homing is executed. Until the function or homing execution ends or is aborted, no other TML function / homing may be called");
+        ROS_WARN("\tA TML function or homing is executed. Until the function or homing execution ends or is aborted, no other TML function / homing may be called.");
     }
     if(get_bit(statusWord, 9) == 1){
-        ROS_WARN("\tRemote – drive parameters may be modified via CAN and the drive will execute the command message.");
+        ROS_WARN("\tRemote - drive parameters may be modified via CAN and the drive will execute the command message.");
     } else {
-        ROS_WARN("\tRemote – drive is in local mode and will not execute the command message.");
+        ROS_WARN("\tRemote - drive is in local mode and will not execute the command message.");
     }
     if(get_bit(statusWord, 10) == 1){
-        ROS_WARN("\tTarget reached");
+        ROS_WARN("\tTarget reached.");
     }
     if(get_bit(statusWord, 11) == 1){
-        ROS_WARN("\tInternal Limit Active");
+        ROS_WARN("\tInternal Limit Active.");
     }
     if(get_bit(statusWord, 12) == 0){
-        ROS_WARN("\tTarget position ignored");
+        ROS_WARN("\tTarget position ignored.");
     }
     if(get_bit(statusWord, 13) == 1){
-        ROS_WARN("\tFollowing error");
+        ROS_WARN("\tFollowing error.");
     }
     if(get_bit(statusWord, 14) == 1){
-        ROS_WARN("\tLast event set has occurred");
+        ROS_WARN("\tLast event set has occurred.");
     } else{
-        ROS_WARN("\tNo event set or the programmed event has not occurred yet");
+        ROS_WARN("\tNo event set or the programmed event has not occurred yet.");
     }
     if(get_bit(statusWord, 15) == 1){
-        ROS_WARN("\tAxis on. Power stage is enabled. Motor control is performed");
+        ROS_WARN("\tAxis on. Power stage is enabled. Motor control is performed.");
     } else{
-        ROS_WARN("\tAxis off. Power stage is disabled. Motor control is not performed");
+        ROS_WARN("\tAxis off. Power stage is disabled. Motor control is not performed.");
     }
 }
 
@@ -300,7 +300,7 @@ void IMotionCube::parseMotionError(uint16 motionError){
 
   for(int i = 0; i<16; i++){
     if(get_bit(motionError, i) == 1){
-        ROS_ERROR_STREAM(bitDescriptions.at(i));
+        ROS_WARN_STREAM(bitDescriptions.at(i));
     }
   }
 }
@@ -320,7 +320,7 @@ void IMotionCube::parseDetailedError(uint16 detailedError) {
 
     for(int i = 0; i<9; i++){
         if(get_bit(detailedError, i) == 1){
-            ROS_ERROR_STREAM(bitDescriptions.at(i));
+            ROS_WARN_STREAM(bitDescriptions.at(i));
         }
     }
 }
@@ -328,6 +328,7 @@ void IMotionCube::parseDetailedError(uint16 detailedError) {
 bool IMotionCube::goToOperationEnabled(){
     this->setControlWord(128);
 
+    ROS_INFO("Try to go to 'Switch on Disabled'");
     bool switchOnDisabled = false;
     while (!switchOnDisabled){
         this->setControlWord(128);
@@ -335,11 +336,11 @@ bool IMotionCube::goToOperationEnabled(){
         int switchOnDisabledMask = 0b0000000001001111;
         int switchOnDisabledState = 64;
         switchOnDisabled = (statusWord & switchOnDisabledMask) == switchOnDisabledState;
-        ROS_INFO_STREAM_THROTTLE(0.1, "Waiting for switch on disabled: " << std::bitset<16>(statusWord));
+        ROS_INFO_STREAM_THROTTLE(0.1, "Waiting for 'Switch on Disabled': " << std::bitset<16>(statusWord));
     }
-    ROS_INFO("Switch on disabled!");
+    ROS_INFO("Switch on Disabled!");
 
-    ROS_INFO("Try to go to 'Ready To switch on'");
+    ROS_INFO("Try to go to 'Ready to Switch On'");
     bool readyToSwitchOn = false;
     while (!readyToSwitchOn){
         this->setControlWord(6);
@@ -347,11 +348,11 @@ bool IMotionCube::goToOperationEnabled(){
         int readyToSwitchOnMask = 0b0000000001101111;
         int readyToSwitchOnState = 33;
         readyToSwitchOn = (statusWord & readyToSwitchOnMask) == readyToSwitchOnState;
-        ROS_INFO_STREAM_THROTTLE(0.1, "Waiting for ready to switch on: " << std::bitset<16>(statusWord));
+        ROS_INFO_STREAM_THROTTLE(0.1, "Waiting for 'Ready to Switch On': " << std::bitset<16>(statusWord));
     }
-    ROS_INFO("Ready to switch on!");
+    ROS_INFO("Ready to Switch On!");
 
-
+    ROS_INFO("Try to go to 'Switched On'");
     bool switchedOn = false;
     while (!switchedOn){
         this->setControlWord(7);
@@ -359,12 +360,13 @@ bool IMotionCube::goToOperationEnabled(){
         int switchedOnMask = 0b0000000001101111;
         int switchedOnState = 35;
         switchedOn = (statusWord & switchedOnMask) == switchedOnState;
-        ROS_INFO_STREAM_THROTTLE(0.1, "Waiting to switch on: " << std::bitset<16>(statusWord));
+        ROS_INFO_STREAM_THROTTLE(0.1, "Waiting for 'Switched On': " << std::bitset<16>(statusWord));
     }
-    ROS_INFO("Switched on!");
+    ROS_INFO("Switched On!");
 
     this->actuateIU(this->encoder.getAngleIU());
 
+    ROS_INFO("Try to go to 'Operation Enabled'");
     bool operationEnabled = false;
     while (!operationEnabled){
         this->setControlWord(15);
@@ -372,9 +374,9 @@ bool IMotionCube::goToOperationEnabled(){
         int operationEnabledMask = 0b0000000001101111;
         int operationEnabledState = 39;
         operationEnabled = (statusWord & operationEnabledMask) == operationEnabledState;
-        ROS_INFO_STREAM_THROTTLE(0.1, "Waiting for operation enabled: " << std::bitset<16>(statusWord));
+        ROS_INFO_STREAM_THROTTLE(0.1, "Waiting for 'Operation Enabled': " << std::bitset<16>(statusWord));
     }
-    ROS_INFO("Operation enabled!");
+    ROS_INFO("Operation Enabled!");
 
 
 }
