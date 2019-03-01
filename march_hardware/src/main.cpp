@@ -17,7 +17,7 @@ int main(int argc, char** argv)
   march4cpp::MARCH4 march4 = march4cpp::MARCH4();
   march4.startEtherCAT();
 
-  if (!march4.isOperational())
+  if (!march4.isEthercatOperational())
   {
     ROS_FATAL("Ethercat is not operational");
     return 0;

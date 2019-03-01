@@ -30,7 +30,7 @@ public:
 
   ~Slave() = default;
 
-  virtual void initialize() = 0;
+  virtual void writeInitialSDOs(int ecatCycleTime) = 0;
 
   int getSlaveIndex()
   {

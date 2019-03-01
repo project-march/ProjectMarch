@@ -13,11 +13,12 @@ extern "C" {
 namespace march4cpp
 {
 // Constructor
-EthercatMaster::EthercatMaster(std::vector<Joint> jointList, std::string ifname, int maxSlaveIndex)
+EthercatMaster::EthercatMaster(std::vector<Joint> jointList, std::string ifname, int maxSlaveIndex, int ecatCycleTime)
 {
   this->jointList = jointList;
   this->ifname = ifname;
   this->maxSlaveIndex = maxSlaveIndex;
+  this->ecatCycleTimems = ecatCycleTime;
 }
 
 void EthercatMaster::start()
@@ -53,7 +54,7 @@ void EthercatMaster::start()
 
   for (int i = 0; i < jointList.size(); i++)
   {
-    jointList.at(i).initialize();
+    jointList.at(i).initialize(ecatCycleTimems);
   }
 
   // Configure the EtherCAT message structure depending on the PDO mapping of all the slaves
@@ -129,7 +130,7 @@ void EthercatMaster::ethercatLoop()
     sendProcessData();
     receiveProcessData();
     monitorSlaveConnection();
-    usleep(2000);
+    usleep(ecatCycleTimems*1000);
   }
 }
 

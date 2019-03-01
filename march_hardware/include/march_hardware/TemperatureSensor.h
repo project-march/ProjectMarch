@@ -20,7 +20,7 @@ public:
     slaveIndex = -1;
   };
 
-  void initialize() override;
+  void writeInitialSDOs(int ecatCycleTime) override;
 
   float getTemperature();
 

@@ -17,17 +17,15 @@ IMotionCube::IMotionCube(int slaveIndex, Encoder encoder) : Slave(slaveIndex)
 }
 
 // TODO(Martijn Isha) change name to show this is only EtherCAT startup initialization
-void IMotionCube::initialize()
+void IMotionCube::writeInitialSDOs(int ecatCycleTime)
 {
-  // TODO(Martijn Isha) change ecat cycle time magic number
-  PDOmapping();
-  StartupSDO(4);
+    mapPDOs();
+    writeInitialSettings(ecatCycleTime);
 }
 
 // Map Process Data Object by sending SDOs to the IMC
-bool IMotionCube::PDOmapping()
+bool IMotionCube::mapPDOs()
 {
-  ROS_INFO("Start PDO mapping of IMC %d", this->slaveIndex);
   // TODO(Martijn) Refactor this into something more readable and modular
 
   bool success = true;
@@ -43,6 +41,8 @@ bool IMotionCube::PDOmapping()
   // clear 1A00 pdo entries
   success &= sdo_bit32(slaveIndex, 0x1A00, 0, 0);
   // download 1A00 pdo entries
+
+  // Status word
   success &= sdo_bit32(slaveIndex, 0x1A00, 1, 0x60410010);
 
   //  Position actual value
@@ -123,16 +123,19 @@ bool IMotionCube::PDOmapping()
 
   //----------------------------------------
 
-  ROS_INFO_STREAM("PDO mapping was a " << (success ? "success" : "failure"));
+  if(success){
+      ROS_INFO("Successfully mapped PDOs of IMC %d", this->slaveIndex);
+  } else {
+      ROS_WARN("PDO mapping of IMC %d failed", this->slaveIndex);
+  }
 
   return success;
 }
 
 // Set configuration parameters to the IMC
-bool IMotionCube::StartupSDO(uint8 ecatCycleTime)
+bool IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
 {
   bool success = true;
-  ROS_INFO("Start SDO writing to IMC %d", this->slaveIndex);
 
   // mode of operation
   success &= sdo_bit8(slaveIndex, 0x6060, 0, 8);
@@ -151,8 +154,11 @@ bool IMotionCube::StartupSDO(uint8 ecatCycleTime)
   success &= sdo_bit8(slaveIndex, 0x60C2, 1, ecatCycleTime);
   success &= sdo_bit8(slaveIndex, 0x60C2, 2, -3);
 
-
-  ROS_INFO_STREAM("SDO writing was a " << (success ? "success" : "failure"));
+  if(success){
+      ROS_INFO("Successfully wrote initial settings to IMC %d", this->slaveIndex);
+  } else {
+      ROS_WARN("Writing initial settings to IMC %d failed", this->slaveIndex);
+  }
 
   return success;
 }
@@ -163,7 +169,6 @@ void IMotionCube::actuateRad(float targetRad){
 
 void IMotionCube::actuateIU(int targetIU)
 {
-  ROS_INFO("Trying to move to position %i", targetIU);
   if (!this->encoder.isValidTargetPositionIU(targetIU))
   {
     ROS_ERROR("Position %i is invalid.", targetIU);
@@ -173,7 +178,7 @@ void IMotionCube::actuateIU(int targetIU)
   union bit32 targetPosition;
   targetPosition.i = targetIU;
 
-  uint8 targetPositionLocation = 2;
+  uint8 targetPositionLocation = 2; //TODO(Isha Martijn) make this dynamic
 
   ROS_INFO("Trying to actuate slave %d, soem location %d to targetposition %d", this->slaveIndex, targetPositionLocation,
            targetPosition.i);
@@ -186,6 +191,11 @@ float IMotionCube::getAngleRad()
   return this->encoder.getAngleRad();
 }
 
+uint16 IMotionCube::getStatusWord()
+{
+    return get_input_bit16(this->slaveIndex, 0).ui;
+}
+
 uint16 IMotionCube::getMotionError()
 {
   return get_input_bit16(this->slaveIndex, 6).ui;
@@ -196,14 +206,6 @@ uint16 IMotionCube::getDetailedError()
   return get_input_bit16(this->slaveIndex, 8).ui;
 }
 
-uint16 IMotionCube::getStatusWord()
-{
-  uint16 statusWord = get_input_bit16(this->slaveIndex, 0).ui;
-//  if (get_bit(statusWord, ))
-
-  return statusWord;
-}
-
 
 void IMotionCube::setControlWord(uint16 controlWord)
 {
@@ -212,41 +214,117 @@ void IMotionCube::setControlWord(uint16 controlWord)
   set_output_bit16(slaveIndex, 0, controlwordu);
 }
 
-void IMotionCube::parseMotionError(int errorCode){
-  ROS_WARN_STREAM("Looking up motion error " << std::bitset<16>(errorCode));
+void IMotionCube::parseStatusWord(uint16 statusWord) {
+    ROS_WARN_STREAM("Looking up Status Word " << std::bitset<16>(statusWord));
+    if(get_bit(statusWord, 0) == 1){
+        ROS_WARN("\tAxis on. Power stage is enabled. Motor control is performed");
+    } else {
+        ROS_WARN("\tAxis off. Power stage is disabled. Motor control is not performed");
+    }
+    if(get_bit(statusWord, 2) == 1){
+        ROS_WARN("\tOperation Enabled");
+    }
+    if(get_bit(statusWord, 3) == 1){
+        ROS_WARN("\tFault. If set, a fault condition is or was present in the drive.");
+    }
+    if(get_bit(statusWord, 4) == 1){
+        ROS_WARN("\tMotor supply voltage is present");
+    } else {
+        ROS_WARN("\tMotor supply voltage is absent");
+    }
+    if(get_bit(statusWord, 5) == 0){
+        ROS_WARN("\tQuick Stop. When this bit is zero, the drive is performing a quick stop");
+    }
+    if(get_bit(statusWord, 6) == 1){
+        ROS_WARN("\tSwitch On Disabled.");
+    }
+    if(get_bit(statusWord, 7) == 1){
+        ROS_WARN("\tWarning. A TML function / homing was called, while another TML function homing is still in execution. The last call is ignored.");
+    }
+    if(get_bit(statusWord, 8) == 1){
+        ROS_WARN("\tA TML function or homing is executed. Until the function or homing execution ends or is aborted, no other TML function / homing may be called");
+    }
+    if(get_bit(statusWord, 9) == 1){
+        ROS_WARN("\tRemote – drive parameters may be modified via CAN and the drive will execute the command message.");
+    } else {
+        ROS_WARN("\tRemote – drive is in local mode and will not execute the command message.");
+    }
+    if(get_bit(statusWord, 10) == 1){
+        ROS_WARN("\tTarget reached");
+    }
+    if(get_bit(statusWord, 11) == 1){
+        ROS_WARN("\tInternal Limit Active");
+    }
+    if(get_bit(statusWord, 12) == 0){
+        ROS_WARN("\tTarget position ignored");
+    }
+    if(get_bit(statusWord, 13) == 1){
+        ROS_WARN("\tFollowing error");
+    }
+    if(get_bit(statusWord, 14) == 1){
+        ROS_WARN("\tLast event set has occurred");
+    } else{
+        ROS_WARN("\tNo event set or the programmed event has not occurred yet");
+    }
+    if(get_bit(statusWord, 15) == 1){
+        ROS_WARN("\tAxis on. Power stage is enabled. Motor control is performed");
+    } else{
+        ROS_WARN("\tAxis off. Power stage is disabled. Motor control is not performed");
+    }
+}
+
+void IMotionCube::parseMotionError(uint16 motionError){
+  ROS_WARN_STREAM("Looking up Motion Error " << std::bitset<16>(motionError));
   std::vector<std::string> bitDescriptions = {};
-  bitDescriptions.push_back("EtherCAT communication error. Reset by a Reset Fault command or by Clear Error in the EtherCAT ® State Machine.");
-  bitDescriptions.push_back("Short-circuit. Set when protection is triggered. Reset by a Reset Fault command.");
-  bitDescriptions.push_back("Invalid setup data. Set when the EEPROM stored setup data is not valid or not present.");
-  bitDescriptions.push_back("Control error (position/speed error too big). Set when protection is triggered. Reset by a Reset Fault command.");
-  bitDescriptions.push_back("Communication error. Set when protection is triggered. Reset by a Reset Fault command.");
-  bitDescriptions.push_back("Motor position wraps around. Set when protection is triggered. Reset by a Reset Fault command.");
-  bitDescriptions.push_back("Positive limit switch active. Set when LSP input is in active state. Reset when LSP input is inactive state");
-  bitDescriptions.push_back("Negative limit switch active. Set when LSN input is in active state. Reset when LSN input is inactive state");
-  bitDescriptions.push_back("Over current. Set when protection is triggered. Reset by a Reset Fault command");
-  bitDescriptions.push_back("I2T protection. Set when protection is triggered. Reset by a Reset Fault command");
-  bitDescriptions.push_back("Over temperature motor. Set when protection is triggered. Reset by a Reset Fault command. This protection may be activated if the motor has a PTC or NTC temperature contact.");
-  bitDescriptions.push_back("Over temperature drive. Set when protection is triggered. Reset by a Reset Fault command.");
-  bitDescriptions.push_back("Over-voltage. Set when protection is triggered. Reset by a Reset Fault command");
-  bitDescriptions.push_back("Under-voltage. Set when protection is triggered. Reset by a Reset Fault command");
-  bitDescriptions.push_back("Command error. This bit is set in several situations. They can be distinguished either\n"
-                            "by the associated emergency code, or in conjunction with other bits:\n"
-                            "0xFF03 - Specified homing method not available\n"
-                            "0xFF04 - A wrong mode is set in object 6060h, modes_of_operation\n"
-                            "0xFF05 - Specified digital I/O line not available\n"
-                            "A function is called during the execution of another function (+ set bit 7 of object\n"
-                            "6041h, statusword)\n"
-                            "Update of operation mode received during a transition\n"
-                            "This bit acts just as a warning.");
-  bitDescriptions.push_back("Drive disabled due to enable input. Set when enable input is on disable state. Reset when enable input is on enable state");
+  bitDescriptions.push_back("\tEtherCAT communication error. Reset by a Reset Fault command or by Clear Error in the EtherCAT State Machine.");
+  bitDescriptions.push_back("\tShort-circuit. Set when protection is triggered. Reset by a Reset Fault command.");
+  bitDescriptions.push_back("\tInvalid setup data. Set when the EEPROM stored setup data is not valid or not present.");
+  bitDescriptions.push_back("\tControl error (position/speed error too big). Set when protection is triggered. Reset by a Reset Fault command.");
+  bitDescriptions.push_back("\tCommunication error. Set when protection is triggered. Reset by a Reset Fault command.");
+  bitDescriptions.push_back("\tMotor position wraps around. Set when protection is triggered. Reset by a Reset Fault command.");
+  bitDescriptions.push_back("\tPositive limit switch active. Set when LSP input is in active state. Reset when LSP input is inactive state");
+  bitDescriptions.push_back("\tNegative limit switch active. Set when LSN input is in active state. Reset when LSN input is inactive state");
+  bitDescriptions.push_back("\tOver current. Set when protection is triggered. Reset by a Reset Fault command");
+  bitDescriptions.push_back("\tI2T protection. Set when protection is triggered. Reset by a Reset Fault command");
+  bitDescriptions.push_back("\tOver temperature motor. Set when protection is triggered. Reset by a Reset Fault command. This protection may be activated if the motor has a PTC or NTC temperature contact.");
+  bitDescriptions.push_back("\tOver temperature drive. Set when protection is triggered. Reset by a Reset Fault command.");
+  bitDescriptions.push_back("\tOver-voltage. Set when protection is triggered. Reset by a Reset Fault command");
+  bitDescriptions.push_back("\tUnder-voltage. Set when protection is triggered. Reset by a Reset Fault command");
+  bitDescriptions.push_back("\tCommand error. This bit is set in several situations. They can be distinguished either by the associated emergency code, or in conjunction with other bits:\n"
+                            "\t\t0xFF03 - Specified homing method not available\n"
+                            "\t\t0xFF04 - A wrong mode is set in object 6060h, modes_of_operation\n"
+                            "\t\t0xFF05 - Specified digital I/O line not available\n"
+                            "\tA function is called during the execution of another function (+ set bit 7 of object 6041h, statusword).\n"
+                            "\tUpdate of operation mode received during a transition. This bit acts just as a warning.");
+  bitDescriptions.push_back("\tDrive disabled due to enable input. Set when enable input is on disable state. Reset when enable input is on enable state");
 
   for(int i = 0; i<16; i++){
-    if(get_bit(errorCode, i) == 1){
+    if(get_bit(motionError, i) == 1){
         ROS_ERROR_STREAM(bitDescriptions.at(i));
     }
   }
-
 }
+
+void IMotionCube::parseDetailedError(uint16 detailedError) {
+    ROS_WARN_STREAM("Looking up Detailed Error " << std::bitset<16>(detailedError));
+    std::vector<std::string> bitDescriptions = {};
+    bitDescriptions.push_back("\tThe number of nested function calls exceeded the length of TML stack. Last function call was ignored.");
+    bitDescriptions.push_back("\tA RET/RETI instruction was executed while no function/ISR was active.");
+    bitDescriptions.push_back("\tA call to an inexistent homing routine was received.");
+    bitDescriptions.push_back("\tA call to an inexistent function was received.");
+    bitDescriptions.push_back("\tUPD instruction received while AXISON was executed. The UPD instruction. The UPD instruction was ignored and it must be sent again when AXISON is completed.");
+    bitDescriptions.push_back("\tCancelable call instruction received while another cancelable function was active.");
+    bitDescriptions.push_back("\tPositive software limit switch is active.");
+    bitDescriptions.push_back("\tNegative software limit switch is active.");
+    bitDescriptions.push_back("\tS-curve parameters caused an invalid profile. UPD instruction was ignored.");
+
+    for(int i = 0; i<9; i++){
+        if(get_bit(detailedError, i) == 1){
+            ROS_ERROR_STREAM(bitDescriptions.at(i));
+        }
+    }
+}
+
 bool IMotionCube::goToOperationEnabled(){
     this->setControlWord(128);
 
@@ -300,86 +378,6 @@ bool IMotionCube::goToOperationEnabled(){
 
 
 }
-
-
-    void IMotionCube::parseStatusWord() {
-
-    int statusWord = this->getStatusWord();
-    ROS_WARN("--------------------");
-        ROS_WARN_STREAM("Looking up status word " << std::bitset<16>(statusWord));
-
-        if(get_bit(statusWord, 0) == 1){
-            ROS_WARN("Axis on. Power stage is enabled. Motor control is performed");
-        }
-
-        if(get_bit(statusWord, 1) == 0){
-            ROS_WARN("Axis off. Power stage is disabled. Motor control is not performed");
-        }
-
-        if(get_bit(statusWord, 2) == 1){
-            ROS_WARN("Operation Enabled");
-        }
-
-        if(get_bit(statusWord, 3) == 1){
-            ROS_WARN("Fault. If set, a fault condition is or was present in the drive.");
-        }
-
-        if(get_bit(statusWord, 4) == 1){
-            ROS_WARN("Motor supply voltage is present");
-        } else {
-            ROS_WARN("Motor supply voltage is absent");
-        }
-
-
-        if(get_bit(statusWord, 5) == 0){
-            ROS_WARN("Quick Stop. When this bit is zero, the drive is performing a quick stop");
-        }
-        if(get_bit(statusWord, 6) == 1){
-            ROS_WARN("Switch On Disabled.");
-        }
-        if(get_bit(statusWord, 7) == 1){
-            ROS_WARN("Warning. A TML function / homing was called, while another TML function homing is still in execution. The last call is ignored.");
-        }
-        if(get_bit(statusWord, 8) == 1){
-            ROS_WARN("A TML function or homing is executed. Until the function or homing execution ends or is aborted, no other TML function / homing may be called");
-        }
-
-        if(get_bit(statusWord, 9) == 1){
-            ROS_WARN("Remote – drive parameters may be modified via CAN and the drive will execute the command message.");
-        } else {
-            ROS_WARN("Remote – drive is in local mode and will not execute the command message.");
-        }
-
-        if(get_bit(statusWord, 10) == 1){
-            ROS_WARN("Target reached");
-        }
-
-        if(get_bit(statusWord, 11) == 1){
-            ROS_WARN("Internal Limit Active");
-        }
-
-        if(get_bit(statusWord, 12) == 0){
-            ROS_WARN("Target position ignored");
-        }
-
-        if(get_bit(statusWord, 13) == 1){
-            ROS_WARN("Following error");
-        }
-
-        if(get_bit(statusWord, 14) == 1){
-            ROS_WARN("Last event set has occurred");
-        } else{
-            ROS_WARN("No event set or the programmed event has not occurred yet");
-        }
-
-        if(get_bit(statusWord, 15) == 1){
-            ROS_WARN("Axis on. Power stage is enabled. Motor control is performed");
-        } else{
-            ROS_WARN("Axis off. Power stage is disabled. Motor control is not performed");
-        }
-        ROS_WARN("--------------------");
-
-    }
 
 bool IMotionCube::get_bit(uint16 value, int index)
 {

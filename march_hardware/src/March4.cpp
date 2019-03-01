@@ -21,7 +21,8 @@ MARCH4::MARCH4()
   Joint temp = Joint("test_joint", tempSens, imc);
   jointList.push_back(temp);
 
-  ethercatMaster = new EthercatMaster(jointList, "enp2s0", this->getMaxSlaveIndex());
+  int ecatCycleTime = 4; //milliseconds
+  ethercatMaster = new EthercatMaster(jointList, "enp2s0", this->getMaxSlaveIndex(), ecatCycleTime);
 }
 
 void MARCH4::startEtherCAT()
@@ -122,7 +123,7 @@ bool MARCH4::hasValidSlaves()
   return isUnique;
 }
 
-bool MARCH4::isOperational()
+bool MARCH4::isEthercatOperational()
 {
   return ethercatMaster->isOperational;
 }

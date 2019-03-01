@@ -19,7 +19,7 @@ public:
   Joint(std::string name, TemperatureSensor temperatureSensor);
   Joint(std::string name, IMotionCube iMotionCube);
 
-  void initialize();
+  void initialize(int ecatCycleTime);
   void actuateRad(float targetPositionRad);
 
   float getAngleRad();

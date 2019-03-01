@@ -29,7 +29,7 @@ public:
 
   bool hasValidSlaves();
 
-  bool isOperational();
+  bool isEthercatOperational();
 
   Joint getJoint(::std::string jointName);
 

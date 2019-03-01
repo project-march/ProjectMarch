@@ -20,15 +20,15 @@ Joint::Joint(std::string name, IMotionCube iMotionCube) : iMotionCube(iMotionCub
   this->name = std::move(name);
 }
 
-void Joint::initialize()
+void Joint::initialize(int ecatCycleTime)
 {
   if (hasIMotionCube())
   {
-    iMotionCube.initialize();
+      iMotionCube.writeInitialSDOs(ecatCycleTime);
   }
   if (hasTemperatureSensor())
   {
-    temperatureSensor.initialize();
+      temperatureSensor.writeInitialSDOs(ecatCycleTime);
   }
 }
 

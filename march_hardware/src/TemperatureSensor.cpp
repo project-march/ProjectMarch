@@ -14,9 +14,9 @@ TemperatureSensor::TemperatureSensor(int slaveIndex, int byteOffset) : Slave(sla
   this->byteOffset = byteOffset;
 }
 
-void TemperatureSensor::initialize()
+void TemperatureSensor::writeInitialSDOs(int ecatCycleTime)
 {
-  //  TODO(Martijn) initialize PDO/SDO settings here.
+  //  TODO(Martijn) initialize PDO/SDO settings here if necessary
 }
 
 float TemperatureSensor::getTemperature()
