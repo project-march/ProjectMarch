@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)createTopicName
+cmake_minimum_required(VERSION 2.8.3)
 project(march_fake_sensor_data)
 add_definitions(-std=c++11 -Wall -g)
 

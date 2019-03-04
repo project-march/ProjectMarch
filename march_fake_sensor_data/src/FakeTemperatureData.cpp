@@ -56,7 +56,8 @@ void temperatureConfigCallback(march_fake_sensor_data::TemperaturesConfig& confi
  * @param end highest number
  * @return
  */
-int randBetween(int start, int end) {
+int randBetween(int start, int end)
+{
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<> dis(start, end);
@@ -92,11 +93,10 @@ void publishTemperature(const ros::Publisher& temperature_pub)
 std::string createTopicName(const char* base, const char* name)
 {
   char slash[] = "/";
+  const int kArraySize = static_cast<const int>(strlen(base) + strlen(slash) + strlen(name));
   // Create a char array of the combined size of all three parts
-  char full_topic[strlen(base) + strlen(slash) + strlen(name)];
-  strcpy(full_topic, base);   // copy string one into full_topic.
-  strcat(full_topic, slash);  // append the slash to full_topic.
-  strcat(full_topic, name);   // append the name two to full_topic.
+  char full_topic[kArraySize];
+  snprintf(full_topic, kArraySize, "%s%s%s", base, slash, name);
   return full_topic;
 }
 
