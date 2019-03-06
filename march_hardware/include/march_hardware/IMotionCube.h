@@ -43,6 +43,7 @@ public:
   void setControlWord(uint16 controlWord);
 
   void actuateRad(float targetRad);
+  void actuateRadFixedSpeed(float targetRad, float radPerSec);
 
   void parseStatusWord(uint16 statusWord);
   void parseMotionError(uint16 motionError);
