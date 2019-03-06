@@ -9,14 +9,13 @@
  * @section sensors Implemented Sensors
  * @subsection temp_sensor Temperature Sensors
  * A dynamically reconfigurable temperature publisher is implemented in FakeTemperatureData.cpp.
- * To add a fake temperature sensor, simply add a name to the 'sensors' array in the launchfile.
+ * To add a fake temperature sensor, simply add a name to the `sensors` array in the launchfile.
  * @note The min and max temperature are global for all fake publishers.
  *
  * @subsubsection topics Created topics
- * For each sensor a temperature topic is created.
- * This is based on the sensors on the parameter service.
- * For example when you have an `ankle_joint` and a `hip_joint`.
- * The following topics are created: `/march/temperature/ankle_joint` `/march/temperature/hip_joint`
+ * For each sensor a temperature topic is created. This is based on the sensors on the parameter service.
+ *
+ * For example when you have an `ankle_joint` and a `hip_joint`. The following topics are created: `/march/temperature/ankle_joint` `/march/temperature/hip_joint`
  *
  * @subsubsection launchfile Example launchfile
  *
