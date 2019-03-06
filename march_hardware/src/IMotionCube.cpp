@@ -6,7 +6,7 @@
 
 namespace march4cpp
 {
-IMotionCube::IMotionCube(int slaveIndex, AngleEncoder* encoder) : Slave(slaveIndex)
+IMotionCube::IMotionCube(int slaveIndex, Encoder* encoder) : Slave(slaveIndex)
 {
   this->encoder = encoder;
 }

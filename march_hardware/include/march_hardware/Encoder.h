@@ -8,7 +8,7 @@
 #include "AngleEncoder.h"
 namespace march4cpp
 {
-class Encoder : public march4cpp::AngleEncoder
+class Encoder
 {
 private:
   int numberOfBytes;
@@ -20,9 +20,9 @@ public:
 
   Encoder(int numberOfBytes, int minEncoderValue, int minDegvalue);
 
-  float getAngleRad() override;
-  float getAngleDeg() override;
-  float getAngle() override;
+  float getAngleRad();
+  float getAngleDeg();
+  float getAngle();
 };
 }
 

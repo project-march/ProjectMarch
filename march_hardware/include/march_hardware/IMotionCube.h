@@ -14,11 +14,11 @@ namespace march4cpp
 class IMotionCube : public Slave
 {
 private:
-  AngleEncoder* encoder;
+  Encoder* encoder;
   // TODO(Martijn) add PDO/SDO settings here.
 
 public:
-  explicit IMotionCube(int slaveIndex, AngleEncoder* encoder);
+  explicit IMotionCube(int slaveIndex, Encoder* encoder);
 
   IMotionCube()
   {

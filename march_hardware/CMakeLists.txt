@@ -77,6 +77,7 @@ if (CATKIN_ENABLE_TESTING)
     add_rostest_gtest(${PROJECT_NAME}-test
             test/march4cpp.test
             test/TestRunner.cpp
+            test/TestEncoder.cpp
             test/TestIMotionCube.cpp
             test/TestTemperatureSensor.cpp
             test/TestJoint.cpp
