@@ -13,7 +13,10 @@
  * @note The min and max temperature are global for all fake publishers.
  *
  * @subsubsection topics Created topics
- * @todo Tim add a section on which topics are created.
+ * For each sensor a temperature topic is created.
+ * This is based on the sensors on the parameter service.
+ * For example when you have an `ankle_joint` and a `hip_joint`.
+ * The following topics are created: `/march/temperature/ankle_joint` `/march/temperature/hip_joint`
  *
  * @subsubsection launchfile Example launchfile
  *
