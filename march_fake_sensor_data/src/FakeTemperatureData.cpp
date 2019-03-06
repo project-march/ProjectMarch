@@ -11,6 +11,13 @@
 
 #include <march_fake_sensor_data/TemperaturesConfig.h>
 
+/**
+ * @file FakeTemperatureData.cpp
+ * @brief Responsible for publishing random temperatures for the fake temperature sensors.
+ * @details Apply an autoregression filter to the latest 7 randomly generated temperatures to
+ * make the temperature less jittery.
+ */
+
 int min_temperature;
 int max_temperature;
 std::vector<std::string> sensor_names;
@@ -51,10 +58,10 @@ void temperatureConfigCallback(march_fake_sensor_data::TemperaturesConfig& confi
 }
 
 /**
- * Generate number between start and end
- * @param start lowest number
- * @param end highest number
- * @return
+ * @brief Generate number between start and end
+ * @param start Lowest number
+ * @param end Highest number
+ * @return The Random number
  */
 int randBetween(int start, int end)
 {
@@ -70,7 +77,6 @@ int randBetween(int start, int end)
  */
 void publishTemperature(const ros::Publisher& temperature_pub)
 {
-  // Pick a random value between min and max temperature
   int random_temperature = randBetween(min_temperature, max_temperature);
 
   // Update the vector with the latest temperatures by removing the first entry and adding a new one.
@@ -85,10 +91,10 @@ void publishTemperature(const ros::Publisher& temperature_pub)
 }
 
 /**
- * Combine the base topic name with sensor name
- * @param base the leading part of the topic
- * @param name the sensor name
- * @return
+ * @brief Combine the base topic name with sensor name.
+ * @param base Leading part of the topic
+ * @param name Name of the sensor
+ * @return Full topic name
  */
 std::string createTopicName(const char* base, const char* name)
 {
