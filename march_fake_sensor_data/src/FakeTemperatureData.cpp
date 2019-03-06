@@ -5,6 +5,7 @@
 #include <dynamic_reconfigure/server.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <random>
 
 #include <march_shared_resources/TopicNames.h>
 
@@ -50,13 +51,27 @@ void temperatureConfigCallback(march_fake_sensor_data::TemperaturesConfig& confi
 }
 
 /**
+ * Generate number between start and end
+ * @param start lowest number
+ * @param end highest number
+ * @return
+ */
+int randBetween(int start, int end)
+{
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<> dis(start, end);
+  return dis(gen);
+}
+
+/**
  * Publish a random temperature within the boundaries of the min and max parameters
  * @param temperature_pub publish the temperature message with this publisher
  */
 void publishTemperature(const ros::Publisher& temperature_pub)
 {
   // Pick a random value between min and max temperature
-  int random_temperature = rand() % (max_temperature - min_temperature) + min_temperature;
+  int random_temperature = randBetween(min_temperature, max_temperature);
 
   // Update the vector with the latest temperatures by removing the first entry and adding a new one.
   latest_temperatures.erase(latest_temperatures.begin());
@@ -78,11 +93,10 @@ void publishTemperature(const ros::Publisher& temperature_pub)
 std::string createTopicName(const char* base, const char* name)
 {
   char slash[] = "/";
+  const int kArraySize = static_cast<const int>(strlen(base) + strlen(slash) + strlen(name));
   // Create a char array of the combined size of all three parts
-  char full_topic[strlen(base) + strlen(slash) + strlen(name)];
-  strcpy(full_topic, base);   // copy string one into full_topic.
-  strcat(full_topic, slash);  // append the slash to full_topic.
-  strcat(full_topic, name);   // append the name two to full_topic.
+  char full_topic[kArraySize];
+  snprintf(full_topic, kArraySize, "%s%s%s", base, slash, name);
   return full_topic;
 }
 

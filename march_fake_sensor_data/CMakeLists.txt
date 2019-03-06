@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
         dynamic_reconfigure
         march_shared_resources
         roscpp
+        roslint
         sensor_msgs
         std_msgs
         )
