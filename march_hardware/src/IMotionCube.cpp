@@ -1,3 +1,4 @@
+// Copyright 2018 Project March.
 #include <ros/ros.h>
 #include <bitset>
 
@@ -153,8 +154,8 @@ bool IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
   success &= sdo_bit32(slaveIndex, 0x6093, 2, 1);
 
   // position limit -- min position
-//  39717 = 0 rad
-  success &= sdo_bit32(slaveIndex, 0x607D, 1, 49000);
+  //  39717 = 0 rad
+  success &= sdo_bit32(slaveIndex, 0x607D, 1, 39717);
   // position limit -- max position
   success &= sdo_bit32(slaveIndex, 0x607D, 2, 51000);
 
@@ -185,30 +186,32 @@ void IMotionCube::actuateRad(float targetRad)
   this->actuateIU(this->encoder.RadtoIU(targetRad));
 }
 
+void IMotionCube::actuateRadFixedSpeed(float targetRad, float radPerSec)
+{
+  if (radPerSec <= 0)
+  {
+    ROS_ERROR("Rad per sec must be bigger than 0, given: %f", radPerSec);
+    return;
+  }
+  if (radPerSec > 0.5)
+  {
+    ROS_ERROR("Rad per sec must be smaller than 0.5, given: %f", radPerSec);
+    return;
+  }
 
-void IMotionCube::actuateRadFixedSpeed(float targetRad, float radPerSec) {
-    if (radPerSec <= 0){
-        ROS_ERROR("Rad per sec must be bigger than 0, given: %f", radPerSec);
-        return;
-    }
-    if (radPerSec > 0.5){
-        ROS_ERROR("Rad per sec must be smaller than 0.5, given: %f", radPerSec);
-        return;
-    }
-    float currentRad = this->getAngleRad();
-    ROS_INFO("Trying to go from position %f to position %f with speed %f", currentRad, targetRad, radPerSec);
-    float distance = targetRad - currentRad;
-    int resolution = 250;
-    int cycles = std::floor(std::abs(distance)/radPerSec * resolution) + 1;
-    for(int i = 0; i <cycles; i++){
-        float index = i;
-        float calculatedTarget = currentRad + (index/cycles * distance);
-        ROS_INFO_STREAM(calculatedTarget);
-        usleep(static_cast<__useconds_t>(1000000 / resolution));
-        this->actuateRad(calculatedTarget);
-    }
-
-
+  float currentRad = this->getAngleRad();
+  ROS_INFO("Trying to go from position %f to position %f with speed %f", currentRad, targetRad, radPerSec);
+  float distance = targetRad - currentRad;
+  int resolution = 250;
+  int cycles = std::floor(std::abs(distance) / radPerSec * resolution) + 1;
+  for (int i = 0; i < cycles; i++)
+  {
+    float index = i;
+    float calculatedTarget = currentRad + (index / cycles * distance);
+    ROS_INFO_STREAM(calculatedTarget);
+    usleep(static_cast<__useconds_t>(1000000 / resolution));
+    this->actuateRad(calculatedTarget);
+  }
 }
 
 void IMotionCube::actuateIU(int targetIU)
@@ -475,7 +478,7 @@ bool IMotionCube::goToOperationEnabled()
 
 bool IMotionCube::get_bit(uint16 value, int index)
 {
-  return (bool)(value & (1 << index));
+  return static_cast<bool>(value & (1 << index));
 }
 
 }  // namespace march4cpp

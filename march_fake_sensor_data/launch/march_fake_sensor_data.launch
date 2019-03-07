@@ -1,0 +1,13 @@
+<launch>
+    <!--The available sensors in this fake system -->
+    <rosparam>
+        sensors: [ankle_joint, hip_joint]
+    </rosparam>
+
+    <node name="march_fake_sensor_data" pkg="march_fake_sensor_data" type="march_fake_temperature_data_node" output="screen">
+        <rosparam>
+            min_temperature: 0
+            max_temperature: 30
+        </rosparam>
+    </node>
+</launch>

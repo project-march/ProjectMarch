@@ -1,3 +1,4 @@
+// Copyright 2018 Project March.
 #include <cmath>
 
 #include <unistd.h>
@@ -35,7 +36,7 @@ int main(int argc, char** argv)
   march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(1, 0.261);
   march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(0.6, 0.261);
   march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(1, 0.261);
-//  march4.getJoint("test_joint").actuateRad(0.6);
+  // march4.getJoint("test_joint").actuateRad(0.6);
 
   //      for (int i = 0; i < 10000; i++){
   //          ROS_INFO_STREAM("Angle: " << march4.getJoint("test_joint").getAngleRad());
@@ -75,8 +76,10 @@ int main(int argc, char** argv)
   // Final values
   //  sleep(1);
   //  ROS_WARN("Final values:");
-  //  march4.getJoint("test_joint").getIMotionCube().parseMotionError(march4.getJoint("test_joint").getIMotionCube().getMotionError());
-  //  march4.getJoint("test_joint").getIMotionCube().parseDetailedError(march4.getJoint("test_joint").getIMotionCube().getDetailedError());
+  //  march4.getJoint("test_joint").getIMotionCube().
+  //    parseMotionError(march4.getJoint("test_joint").getIMotionCube().getMotionError());
+  //  march4.getJoint("test_joint").getIMotionCube()
+  //    .parseDetailedError(march4.getJoint("test_joint").getIMotionCube().getDetailedError());
   //  ROS_WARN_STREAM("Angle: " << march4.getJoint("test_joint").getAngleRad());
   sleep(1);
   march4.getJoint("test_joint")

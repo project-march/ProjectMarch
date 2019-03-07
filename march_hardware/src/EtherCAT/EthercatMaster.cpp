@@ -1,3 +1,5 @@
+// Copyright 2019 Project March.
+
 //
 // EtherCAT master class source. Interfaces with SOEM
 //
@@ -6,7 +8,8 @@
 
 #include <march_hardware/EtherCAT/EthercatMaster.h>
 
-extern "C" {
+extern "C"
+{
 #include "ethercat.h"
 }
 
@@ -87,7 +90,8 @@ void EthercatMaster::start()
     ec_send_processdata();
     ec_receive_processdata(EC_TIMEOUTRET);
     ec_statecheck(0, EC_STATE_OPERATIONAL, 50000);
-  } while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));
+  }
+  while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));
 
   if (ec_slave[0].state == EC_STATE_OPERATIONAL)
   {
