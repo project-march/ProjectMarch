@@ -198,7 +198,11 @@ void IMotionCube::actuateRadFixedSpeed(float targetRad, float radPerSec)
     ROS_ERROR("Rad per sec must be smaller than 0.5, given: %f", radPerSec);
     return;
   }
-
+  if (!this->encoder.isValidTargetPositionIU(this->encoder.RadtoIU(targetRad)))
+  {
+    ROS_ERROR("Target position is outside the allowed range of motion, given: %f", targetRad);
+    return;
+  }
   float currentRad = this->getAngleRad();
   ROS_INFO("Trying to go from position %f to position %f with speed %f", currentRad, targetRad, radPerSec);
   float distance = targetRad - currentRad;

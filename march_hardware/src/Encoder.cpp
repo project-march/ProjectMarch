@@ -9,12 +9,13 @@
 
 namespace march4cpp
 {
-Encoder::Encoder(int numberOfBits, int minPositionIU, int maxPositionIU, int zeroPositionIU)
+Encoder::Encoder(int numberOfBits, int minPositionIU, int maxPositionIU, int zeroPositionIU, float safetyMarginRad)
 {
+  this->safetyMarginRad = safetyMarginRad;
   this->slaveIndex = -1;
   this->totalPositions = static_cast<int>(pow(2, numberOfBits));
-  this->minPositionIU = minPositionIU;
-  this->maxPositionIU = maxPositionIU;
+  this->minPositionIU = minPositionIU + RadtoIU(this->safetyMarginRad);
+  this->maxPositionIU = maxPositionIU - RadtoIU(this->safetyMarginRad);
   this->zeroPositionIU = zeroPositionIU;
 }
 

@@ -15,11 +15,12 @@ private:
   int minPositionIU;
   int maxPositionIU;
   int zeroPositionIU;
+  float safetyMarginRad;
 
 public:
   Encoder() = default;
 
-  Encoder(int numberOfBits, int minPositionIU, int maxPositionIU, int zeroPositionIU);
+  Encoder(int numberOfBits, int minPositionIU, int maxPositionIU, int zeroPositionIU, float safetyMarginRad);
 
   float getAngleRad();
 

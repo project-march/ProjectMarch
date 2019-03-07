@@ -29,13 +29,13 @@ int main(int argc, char** argv)
   ros::Rate rate(10);
 
   // Uncomment to allow actuation.
-  march4.getJoint("test_joint").getIMotionCube().goToOperationEnabled();
+//  march4.getJoint("test_joint").getIMotionCube().goToOperationEnabled();
   ROS_INFO("march4 initialized");
 
   ROS_INFO_STREAM("Angle: " << march4.getJoint("test_joint").getAngleRad());
-  march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(1, 0.261);
-  march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(0.6, 0.261);
-  march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(1, 0.261);
+  march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(1.1, 0.261);
+  march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(0.8, 0.261);
+  march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(1.2, 0.261);
   // march4.getJoint("test_joint").actuateRad(0.6);
 
   //      for (int i = 0; i < 10000; i++){

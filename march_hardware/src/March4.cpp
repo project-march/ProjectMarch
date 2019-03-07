@@ -17,7 +17,7 @@ MARCH4::MARCH4()
 {
   TemperatureGES temperatureGES = TemperatureGES(1, 0);
   // TODO(Isha, Martijn) double-check these numbers.
-  Encoder enc = Encoder(16, 37961, 59649, 39717);
+  Encoder enc = Encoder(16, 37961, 59649, 39717, 0.3);
   IMotionCube imc = IMotionCube(2, enc);
   Joint temp = Joint("test_joint", temperatureGES, imc);
   jointList.push_back(temp);
