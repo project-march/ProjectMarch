@@ -35,5 +35,5 @@ public:
 
   void sendData(uint8_t value);
 };
-} // namespace march4cpp
+}  // namespace march4cpp
 #endif

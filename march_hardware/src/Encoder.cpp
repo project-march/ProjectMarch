@@ -1,5 +1,5 @@
 //
-// Created by projectmarch on 20-2-19.
+// Copyright 2019 Project March.
 //
 
 #include <march_hardware/EtherCAT/EthercatIO.h>
@@ -34,12 +34,14 @@ int Encoder::getAngleIU()
   return return_byte.i;
 }
 
-int Encoder::RadtoIU(float rad) {
-    return static_cast<int>(rad*totalPositions/(2*M_PI)+zeroPositionIU);
+int Encoder::RadtoIU(float rad)
+{
+  return static_cast<int>(rad * totalPositions / (2 * M_PI) + zeroPositionIU);
 }
 
-float Encoder::IUtoRad(int iu) {
-    return static_cast<float>(iu - zeroPositionIU) * 2 * M_PI / totalPositions;
+float Encoder::IUtoRad(int iu)
+{
+  return static_cast<float>(iu - zeroPositionIU) * 2 * M_PI / totalPositions;
 }
 
 void Encoder::setSlaveIndex(int slaveIndex)
@@ -54,6 +56,7 @@ int Encoder::getSlaveIndex() const
 
 bool Encoder::isValidTargetPositionIU(int targetPosIU)
 {
-    return (targetPosIU > this->minPositionIU && targetPosIU < this->maxPositionIU);
+  return (targetPosIU > this->minPositionIU && targetPosIU < this->maxPositionIU);
 }
-}
+
+}  // namespace march4cpp

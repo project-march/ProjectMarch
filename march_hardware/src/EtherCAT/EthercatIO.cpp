@@ -1,3 +1,4 @@
+// Copyright 2019 Project March.
 #include "march_hardware/EtherCAT/EthercatIO.h"
 
 namespace march4cpp

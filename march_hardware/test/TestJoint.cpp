@@ -24,4 +24,3 @@ TEST_F(TestJoint, SlaveIndexZero)
 TEST_F(TestJoint, SlaveIndexMinusOne)
 {
 }
-}

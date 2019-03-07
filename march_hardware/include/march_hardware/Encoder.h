@@ -1,5 +1,5 @@
 //
-// Created by projectmarch on 20-2-19.
+// Copyright 2019 Project March.
 //
 
 #ifndef PROJECT_ENCODER_H

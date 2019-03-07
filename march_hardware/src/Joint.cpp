@@ -1,3 +1,4 @@
+// Copyright 2019 Project March.
 #include <ros/ros.h>
 
 #include <march_hardware/Joint.h>
@@ -24,11 +25,11 @@ void Joint::initialize(int ecatCycleTime)
 {
   if (hasIMotionCube())
   {
-      iMotionCube.writeInitialSDOs(ecatCycleTime);
+    iMotionCube.writeInitialSDOs(ecatCycleTime);
   }
   if (hasTemperatureSensor())
   {
-      temperatureSensor.writeInitialSDOs(ecatCycleTime);
+    temperatureSensor.writeInitialSDOs(ecatCycleTime);
   }
 }
 
@@ -95,4 +96,4 @@ bool Joint::hasTemperatureSensor()
 {
   return this->temperatureSensor.getSlaveIndex() != -1;
 }
-}
+}  // namespace march4cpp

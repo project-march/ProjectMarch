@@ -10,11 +10,11 @@ protected:
 
 TEST_F(ExampleTest, AlwaysTrue)
 {
-    ASSERT_EQ(3, 3);
+  ASSERT_EQ(3, 3);
 }
 TEST_F(ExampleTest, AlwaysT2rue)
 {
-    ASSERT_EQ(3, 3);
+  ASSERT_EQ(3, 3);
 }
 
 /**
@@ -22,11 +22,11 @@ TEST_F(ExampleTest, AlwaysT2rue)
  */
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "march4cpp_test");
-    testing::InitGoogleTest(&argc, argv);
+  ros::init(argc, argv, "march4cpp_test");
+  testing::InitGoogleTest(&argc, argv);
 
-    auto res = RUN_ALL_TESTS();
+  auto res = RUN_ALL_TESTS();
 
-    ros::shutdown();
-    return res;
+  ros::shutdown();
+  return res;
 }

@@ -23,7 +23,6 @@ public:
   void writeInitialSDOs(int ecatCycleTime) override;
 
   float getTemperature();
-
 };
 }
 #endif

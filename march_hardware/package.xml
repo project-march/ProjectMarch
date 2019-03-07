@@ -13,9 +13,11 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>roscpp</build_depend>
+  <build_depend>roslint</build_depend>
   <build_depend>rostest</build_depend>
 
   <build_export_depend>roscpp</build_export_depend>
+  <build_depend>roslint</build_depend>
   <build_export_depend>rostest</build_export_depend>
 
   <exec_depend>roscpp</exec_depend>

@@ -1,3 +1,4 @@
+// Copyright 2018 Project March.
 #include <vector>
 
 #include <ros/ros.h>
@@ -15,13 +16,13 @@ namespace march4cpp
 MARCH4::MARCH4()
 {
   TemperatureSensor tempSens = TemperatureSensor(1, 0);
-//  TODO double-check these numbers.
+  // TODO(ISHA, MARTIJN) double-check these numbers.
   Encoder enc = Encoder(16, 37961, 59649, 39717);
   IMotionCube imc = IMotionCube(2, enc);
   Joint temp = Joint("test_joint", tempSens, imc);
   jointList.push_back(temp);
 
-  int ecatCycleTime = 4; //milliseconds
+  int ecatCycleTime = 4;  // milliseconds
   ethercatMaster = new EthercatMaster(jointList, "enp2s0", this->getMaxSlaveIndex(), ecatCycleTime);
 }
 
