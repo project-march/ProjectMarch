@@ -3,26 +3,27 @@
 
 #include <stdint.h>
 #include <march_hardware/Slave.h>
+#include "TemperatureSensor.h"
 
 namespace march4cpp
 {
-class TemperatureSensor : public Slave
+class TemperatureGES : public Slave, TemperatureSensor
 {
 private:
   int byteOffset;
 
 public:
-  TemperatureSensor(int slaveIndex, int byteOffset);
+  TemperatureGES(int slaveIndex, int byteOffset);
 
-  TemperatureSensor()
+  TemperatureGES()
   {
     byteOffset = -1;
     slaveIndex = -1;
   };
 
-  void writeInitialSDOs(int ecatCycleTime) override;
+  void initialize() override;
 
-  float getTemperature();
+  float getTemperature() override;
 };
 }
 #endif

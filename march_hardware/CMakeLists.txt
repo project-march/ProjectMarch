@@ -54,6 +54,7 @@ file(GLOB SOEM_SRC
 
 add_library(march4cpp
         ${SOEM_SRC}
+        include/${PROJECT_NAME}/AngleEncoder.h
         include/${PROJECT_NAME}/EtherCAT/EthercatIO.h
         include/${PROJECT_NAME}/EtherCAT/EthercatMaster.h
         include/${PROJECT_NAME}/EtherCAT/EthercatSDO.h
@@ -63,6 +64,7 @@ add_library(march4cpp
         include/${PROJECT_NAME}/Joint.h
         include/${PROJECT_NAME}/March4.h
         include/${PROJECT_NAME}/Slave.h
+        include/${PROJECT_NAME}/TemperatureGES.h
         include/${PROJECT_NAME}/TemperatureSensor.h
         src/EtherCAT/EthercatIO.cpp
         src/EtherCAT/EthercatMaster.cpp
@@ -71,7 +73,7 @@ add_library(march4cpp
         src/IMotionCube.cpp
         src/Joint.cpp
         src/March4.cpp
-        src/TemperatureSensor.cpp
+        src/TemperatureGES.cpp
         src/main.cpp)
 
 target_link_libraries(march4cpp ${catkin_LIBRARIES})
@@ -93,10 +95,14 @@ if (CATKIN_ENABLE_TESTING)
     add_rostest_gtest(${PROJECT_NAME}-test
             test/march4cpp.test
             test/TestRunner.cpp
+            test/TestEncoder.cpp
             test/TestIMotionCube.cpp
             test/TestTemperatureSensor.cpp
             test/TestJoint.cpp
-            test/mocks/MockTemperatureSensor.cpp
+            test/mocks/MockTemperatureGES.cpp
+            test/mocks/MockEncoder.cpp
+            test/mocks/MockIMotionCube.cpp
+            test/mocks/MockJoint.cpp
             )
-    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march4cpp)
+    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march4cpp gtest gmock)
 endif ()

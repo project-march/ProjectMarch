@@ -4,7 +4,7 @@
 #include <string>
 
 #include <march_hardware/IMotionCube.h>
-#include <march_hardware/TemperatureSensor.h>
+#include <march_hardware/TemperatureGES.h>
 namespace march4cpp
 {
 class Joint
@@ -12,11 +12,11 @@ class Joint
 private:
   std::string name;
   IMotionCube iMotionCube;
-  TemperatureSensor temperatureSensor;
+  TemperatureGES* temperatureGES;
 
 public:
-  Joint(std::string name, TemperatureSensor temperatureSensor, IMotionCube iMotionCube);
-  Joint(std::string name, TemperatureSensor temperatureSensor);
+  Joint(std::string name, TemperatureGES* temperatureGES, IMotionCube iMotionCube);
+  Joint(std::string name, TemperatureGES* temperatureGES);
   Joint(std::string name, IMotionCube iMotionCube);
 
   void initialize(int ecatCycleTime);
@@ -26,12 +26,12 @@ public:
   float getTemperature();
 
   std::string getName();
-  int getTemperatureSensorSlaveIndex();
+  int getTemperatureGESSlaveIndex();
   int getIMotionCubeSlaveIndex();
   IMotionCube getIMotionCube();
 
   bool hasIMotionCube();
-  bool hasTemperatureSensor();
+  bool hasTemperatureGES();
 };
 }  // namespace march4cpp
 #endif

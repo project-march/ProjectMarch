@@ -32,7 +32,7 @@ public:
 
   virtual void writeInitialSDOs(int ecatCycleTime) = 0;
 
-  int getSlaveIndex()
+  virtual int getSlaveIndex()
   {
     return this->slaveIndex;
   }
