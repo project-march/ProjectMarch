@@ -16,7 +16,7 @@ namespace march4cpp
 MARCH4::MARCH4()
 {
   TemperatureGES temperatureGES = TemperatureGES(1, 0);
-  // TODO(ISHA, MARTIJN) double-check these numbers.
+  // TODO(Isha, Martijn) double-check these numbers.
   Encoder enc = Encoder(16, 37961, 59649, 39717);
   IMotionCube imc = IMotionCube(2, enc);
   Joint temp = Joint("test_joint", temperatureGES, imc);
