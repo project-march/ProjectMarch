@@ -155,7 +155,7 @@ bool IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
 
   // position limit -- min position
   //  39717 = 0 rad
-  success &= sdo_bit32(slaveIndex, 0x607D, 1, 39717);
+  success &= sdo_bit32(slaveIndex, 0x607D, 1, 49000);
   // position limit -- max position
   success &= sdo_bit32(slaveIndex, 0x607D, 2, 51000);
 
