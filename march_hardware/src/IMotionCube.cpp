@@ -154,12 +154,15 @@ bool IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
 
   // position limit -- min position
 //  39717 = 0 rad
-  success &= sdo_bit32(slaveIndex, 0x607D, 1, 39717);
+  success &= sdo_bit32(slaveIndex, 0x607D, 1, 49000);
   // position limit -- max position
   success &= sdo_bit32(slaveIndex, 0x607D, 2, 51000);
 
   // Quick stop option
   success &= sdo_bit16(slaveIndex, 0x605A, 0, 6);
+
+  // Quick stop deceleration
+  success &= sdo_bit32(slaveIndex, 0x6085, 0, 0x7FFFFFFF);
 
   // set the ethercat rate of encoder in form x*10^y
   success &= sdo_bit8(slaveIndex, 0x60C2, 1, ecatCycleTime);
@@ -192,8 +195,8 @@ void IMotionCube::actuateRadFixedSpeed(float targetRad, float radPerSec) {
         ROS_ERROR("Rad per sec must be smaller than 0.5, given: %f", radPerSec);
         return;
     }
-
     float currentRad = this->getAngleRad();
+    ROS_INFO("Trying to go from position %f to position %f with speed %f", currentRad, targetRad, radPerSec);
     float distance = targetRad - currentRad;
     int resolution = 250;
     int cycles = std::floor(std::abs(distance)/radPerSec * resolution) + 1;
