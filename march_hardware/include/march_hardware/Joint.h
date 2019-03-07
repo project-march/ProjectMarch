@@ -12,11 +12,11 @@ class Joint
 private:
   std::string name;
   IMotionCube iMotionCube;
-  TemperatureGES* temperatureGES;
+  TemperatureGES temperatureGES;
 
 public:
-  Joint(std::string name, TemperatureGES* temperatureGES, IMotionCube iMotionCube);
-  Joint(std::string name, TemperatureGES* temperatureGES);
+  Joint(std::string name, TemperatureGES temperatureGES, IMotionCube iMotionCube);
+  Joint(std::string name, TemperatureGES temperatureGES);
   Joint(std::string name, IMotionCube iMotionCube);
 
   void initialize(int ecatCycleTime);

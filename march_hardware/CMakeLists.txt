@@ -54,7 +54,6 @@ file(GLOB SOEM_SRC
 
 add_library(march4cpp
         ${SOEM_SRC}
-        include/${PROJECT_NAME}/AngleEncoder.h
         include/${PROJECT_NAME}/EtherCAT/EthercatIO.h
         include/${PROJECT_NAME}/EtherCAT/EthercatMaster.h
         include/${PROJECT_NAME}/EtherCAT/EthercatSDO.h
@@ -97,9 +96,10 @@ if (CATKIN_ENABLE_TESTING)
             test/TestRunner.cpp
             test/TestEncoder.cpp
             test/TestIMotionCube.cpp
-            test/TestTemperatureSensor.cpp
+            test/TestTemperatureGES.cpp
             test/TestJoint.cpp
             test/mocks/MockTemperatureGES.cpp
+            test/mocks/MockTemperatureSensor.cpp
             test/mocks/MockEncoder.cpp
             test/mocks/MockIMotionCube.cpp
             test/mocks/MockJoint.cpp

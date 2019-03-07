@@ -30,9 +30,11 @@ public:
 
   ~Slave() = default;
 
-  virtual void writeInitialSDOs(int ecatCycleTime) = 0;
+  virtual void writeInitialSDOs(int ecatCycleTime) {
 
-  virtual int getSlaveIndex()
+  }
+
+  int getSlaveIndex()
   {
     return this->slaveIndex;
   }

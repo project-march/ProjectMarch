@@ -54,6 +54,6 @@ TEST_F(TestIMotionCube, GetAngleEncoder)
   EXPECT_CALL(mockEncoder, getAngleRad())
       .Times(AtLeast(1));
   ON_CALL(mockEncoder, getAngleRad()).WillByDefault(Return(angle));
-  march4cpp::IMotionCube imc = march4cpp::IMotionCube(1, &mockEncoder);
-  ASSERT_EQ(angle, imc.getAngle());
+  march4cpp::IMotionCube imc = march4cpp::IMotionCube(1, mockEncoder);
+  ASSERT_EQ(angle, imc.getAngleRad());
 }

@@ -5,13 +5,13 @@
 
 namespace march4cpp
 {
-Joint::Joint(std::string name, TemperatureSensor temperatureSensor, IMotionCube iMotionCube)
-  : temperatureSensor(temperatureSensor), iMotionCube(iMotionCube)
+Joint::Joint(std::string name, TemperatureGES temperatureGES, IMotionCube iMotionCube)
+  : temperatureGES(temperatureGES), iMotionCube(iMotionCube)
 {
   this->name = std::move(name);
 }
 
-Joint::Joint(std::string name, TemperatureSensor temperatureSensor) : temperatureSensor(temperatureSensor)
+Joint::Joint(std::string name, TemperatureGES temperatureGES) : temperatureGES(temperatureGES)
 {
   this->name = std::move(name);
 }
@@ -27,9 +27,9 @@ void Joint::initialize(int ecatCycleTime)
   {
     iMotionCube.writeInitialSDOs(ecatCycleTime);
   }
-  if (hasTemperatureSensor())
+  if (hasTemperatureGES())
   {
-    temperatureSensor.writeInitialSDOs(ecatCycleTime);
+    temperatureGES.writeInitialSDOs(ecatCycleTime);
   }
 }
 
@@ -51,19 +51,19 @@ float Joint::getAngleRad()
 
 float Joint::getTemperature()
 {
-  if (!hasTemperatureSensor())
+  if (!hasTemperatureGES())
   {
     ROS_WARN("Joint %s has no temperature sensor", this->name.c_str());
     return -1;
   }
-  return this->temperatureSensor.getTemperature();
+  return this->temperatureGES.getTemperature();
 }
 
-int Joint::getTemperatureSensorSlaveIndex()
+int Joint::getTemperatureGESSlaveIndex()
 {
-  if (hasTemperatureSensor())
+  if (hasTemperatureGES())
   {
-    return this->temperatureSensor.getSlaveIndex();
+    return this->temperatureGES.getSlaveIndex();
   }
   return -1;
 }
@@ -92,8 +92,8 @@ bool Joint::hasIMotionCube()
   return this->iMotionCube.getSlaveIndex() != -1;
 }
 
-bool Joint::hasTemperatureSensor()
+bool Joint::hasTemperatureGES()
 {
-  return this->temperatureSensor.getSlaveIndex() != -1;
+  return this->temperatureGES.getSlaveIndex() != -1;
 }
 }  // namespace march4cpp

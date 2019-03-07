@@ -15,11 +15,11 @@ namespace march4cpp
 {
 MARCH4::MARCH4()
 {
-  TemperatureSensor tempSens = TemperatureSensor(1, 0);
+  TemperatureGES temperatureGES = TemperatureGES(1, 0);
   // TODO(ISHA, MARTIJN) double-check these numbers.
   Encoder enc = Encoder(16, 37961, 59649, 39717);
   IMotionCube imc = IMotionCube(2, enc);
-  Joint temp = Joint("test_joint", tempSens, imc);
+  Joint temp = Joint("test_joint", temperatureGES, imc);
   jointList.push_back(temp);
 
   int ecatCycleTime = 4;  // milliseconds
@@ -60,7 +60,7 @@ int MARCH4::getMaxSlaveIndex()
 
   for (int i = 0; i < jointList.size(); i++)
   {
-    int temperatureSlaveIndex = jointList.at(i).getTemperatureSensorSlaveIndex();
+    int temperatureSlaveIndex = jointList.at(i).getTemperatureGESSlaveIndex();
     if (temperatureSlaveIndex > maxSlaveIndex)
     {
       maxSlaveIndex = temperatureSlaveIndex;
@@ -83,9 +83,9 @@ bool MARCH4::hasValidSlaves()
 
   for (int i = 0; i < jointList.size(); i++)
   {
-    if (jointList[i].hasTemperatureSensor())
+    if (jointList[i].hasTemperatureGES())
     {
-      int temperatureSlaveIndex = jointList[i].getTemperatureSensorSlaveIndex();
+      int temperatureSlaveIndex = jointList[i].getTemperatureGESSlaveIndex();
       temperatureSlaveIndices.push_back(temperatureSlaveIndex);
     }
 

@@ -21,8 +21,6 @@ public:
     slaveIndex = -1;
   };
 
-  void initialize() override;
-
   float getTemperature() override;
 };
 }

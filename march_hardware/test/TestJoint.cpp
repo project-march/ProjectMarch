@@ -22,7 +22,7 @@ protected:
 TEST_F(TestJoint, TemperatureJoint)
 {
   MockTemperatureGES mockTemperatureGES;
-  march4cpp::Joint emptyJoint = march4cpp::Joint("empty-joint", &mockTemperatureGES);
+  march4cpp::Joint emptyJoint = march4cpp::Joint("empty-joint", mockTemperatureGES);
 
   EXPECT_CALL(mockTemperatureGES, getTemperature()).Times(AtLeast(1));
   ON_CALL(mockTemperatureGES, getTemperature()).WillByDefault(Return(temperature));
@@ -36,7 +36,7 @@ TEST_F(TestJoint, TemperatureJoint)
 TEST_F(TestJoint, TemperatureJointIncorrectSlave)
 {
   MockTemperatureGES mockTemperatureGES;
-  march4cpp::Joint emptyJoint = march4cpp::Joint("empty-joint", &mockTemperatureGES);
+  march4cpp::Joint emptyJoint = march4cpp::Joint("empty-joint", mockTemperatureGES);
 
   EXPECT_CALL(mockTemperatureGES, getTemperature()).Times(AtMost(0));
   ON_CALL(mockTemperatureGES, getTemperature()).WillByDefault(Return(temperature));
