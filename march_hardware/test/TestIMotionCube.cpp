@@ -44,16 +44,3 @@ TEST_F(TestIMotionCube, NoSlaveIndexConstructorGetIndex)
   march4cpp::IMotionCube imc = march4cpp::IMotionCube();
   ASSERT_EQ(-1, imc.getSlaveIndex());
 }
-
-//TODO(TIM) Make this parameterized
-TEST_F(TestIMotionCube, GetAngleEncoder)
-{
-  const float angle = 10;
-
-  MockEncoder mockEncoder;
-  EXPECT_CALL(mockEncoder, getAngleRad())
-      .Times(AtLeast(1));
-  ON_CALL(mockEncoder, getAngleRad()).WillByDefault(Return(angle));
-  march4cpp::IMotionCube imc = march4cpp::IMotionCube(1, mockEncoder);
-  ASSERT_EQ(angle, imc.getAngleRad());
-}
