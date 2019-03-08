@@ -99,7 +99,6 @@ void EthercatMaster::start()
     // All slaves in operational state
     ROS_INFO("Operational state reached for all slaves");
     isOperational = true;
-    // TODO(Martijn) create parallel thread
     EcatThread = std::thread(&EthercatMaster::ethercatLoop, this);
   }
   else
