@@ -1,3 +1,4 @@
+// Copyright 2019 Project March.
 #ifndef PROJECT_ANGLECONVERSIONS_H
 #define PROJECT_ANGLECONVERSIONS_H
 

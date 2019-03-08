@@ -1,6 +1,4 @@
-//
-// Created by projectmarch on 13-2-19.
-//
+// Copyright 2019 Project March.
 #ifndef MARCH4CPP__IMOTIONCUBE_H
 #define MARCH4CPP__IMOTIONCUBE_H
 

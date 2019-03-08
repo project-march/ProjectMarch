@@ -1,6 +1,4 @@
-//
 // Copyright 2019 Project March.
-//
 
 #ifndef PROJECT_ENCODER_H
 #define PROJECT_ENCODER_H
