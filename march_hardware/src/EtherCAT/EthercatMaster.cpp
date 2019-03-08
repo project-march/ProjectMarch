@@ -135,6 +135,7 @@ void EthercatMaster::ethercatLoop()
     sendProcessData();
     receiveProcessData();
     monitorSlaveConnection();
+    // TODO (Martijn) can this be removed?
     usleep(ecatCycleTimems * 1000);
   }
 }
