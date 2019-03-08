@@ -14,12 +14,12 @@ Encoder::Encoder(int numberOfBits, int minPositionIU, int maxPositionIU, int zer
   this->safetyMarginRad = safetyMarginRad;
   this->slaveIndex = -1;
   this->totalPositions = static_cast<int>(pow(2, numberOfBits));
+  this->zeroPositionIU = zeroPositionIU;
 
-  int safetyMarginIU = static_cast<int>(safetyMarginRad * totalPositions / (2 * M_PI));
+  int safetyMarginIU = RadtoIU(safetyMarginRad) - this->zeroPositionIU;
 
   this->minPositionIU = minPositionIU + safetyMarginIU;
   this->maxPositionIU = maxPositionIU - safetyMarginIU;
-  this->zeroPositionIU = zeroPositionIU;
 
   if (this->minPositionIU >= this->maxPositionIU)
   {

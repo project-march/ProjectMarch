@@ -29,7 +29,7 @@ int main(int argc, char** argv)
   ros::Rate rate(10);
 
   // Uncomment to allow actuation.
-  //  march4.getJoint("test_joint").getIMotionCube().goToOperationEnabled();
+  march4.getJoint("test_joint").getIMotionCube().goToOperationEnabled();
   ROS_INFO("march4 initialized");
 
   ROS_INFO_STREAM("Angle: " << march4.getJoint("test_joint").getAngleRad());
