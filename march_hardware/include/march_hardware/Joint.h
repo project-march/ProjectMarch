@@ -15,6 +15,7 @@ private:
   TemperatureGES temperatureGES;
 
 public:
+  // TODO(Tim) pass by reference or pointer instead of making copy
   Joint(std::string name, TemperatureGES temperatureGES, IMotionCube iMotionCube);
   Joint(std::string name, TemperatureGES temperatureGES);
   Joint(std::string name, IMotionCube iMotionCube);

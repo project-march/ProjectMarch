@@ -13,6 +13,7 @@ class EthercatMaster
   char IOmap[4096];        // Holds the mapping of the SOEM message
   int expectedWKC;         // Expected working counter
   std::thread EcatThread;  // Handler for parallel thread
+  // TODO (Isha, Tim) remove double joint list (also in March4)
   std::vector<Joint> jointList;
   int maxSlaveIndex;
   int ecatCycleTimems;

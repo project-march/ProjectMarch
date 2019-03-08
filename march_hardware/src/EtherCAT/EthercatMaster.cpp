@@ -26,6 +26,7 @@ EthercatMaster::EthercatMaster(std::vector<Joint> jointList, std::string ifname,
 
 void EthercatMaster::start()
 {
+  // TODO(Isha, Martijn) this method is really long, split into more methods
   ROS_INFO("Trying to start EtherCAT");
 
   // Initialise SOEM, bind socket to ifname
@@ -90,8 +91,7 @@ void EthercatMaster::start()
     ec_send_processdata();
     ec_receive_processdata(EC_TIMEOUTRET);
     ec_statecheck(0, EC_STATE_OPERATIONAL, 50000);
-  }
-  while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));
+  } while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));
 
   if (ec_slave[0].state == EC_STATE_OPERATIONAL)
   {

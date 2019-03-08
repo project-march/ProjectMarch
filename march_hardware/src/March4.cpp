@@ -19,6 +19,8 @@ MARCH4::MARCH4()
   // TODO(Isha, Martijn) double-check these numbers.
   Encoder enc = Encoder(16, 37961, 59649, 39717, 0.3);
   IMotionCube imc = IMotionCube(2, enc);
+  // For now we are only running on the test joint
+  // TODO(Isha) refactor this that you can switch between test_joint, MARCH4 (and MARCH3)
   Joint temp = Joint("test_joint", temperatureGES, imc);
   jointList.push_back(temp);
 

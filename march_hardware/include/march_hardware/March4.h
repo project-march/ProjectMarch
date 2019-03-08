@@ -17,6 +17,7 @@ private:
   EthercatMaster* ethercatMaster;
 
 public:
+  // TODO(Isha, Tim) remove
   ::std::vector<Joint> jointList;
 
   MARCH4();

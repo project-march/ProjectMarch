@@ -3,6 +3,8 @@
 
 namespace march4cpp
 {
+
+// TODO(Isha, Tim) refactor this with more generic types
 union bit64 get_input_bit64(uint16 slave_no, uint8 module_index)
 {
   union bit64 return_value;
