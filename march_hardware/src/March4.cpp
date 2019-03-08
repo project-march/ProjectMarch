@@ -22,6 +22,7 @@ MARCH4::MARCH4()
   // For now we are only running on the test joint
   // TODO(Isha) refactor this that you can switch between test_joint, MARCH4 (and MARCH3)
   Joint temp = Joint("test_joint", temperatureGES, imc);
+  // TODO(Tim) should not create copy of joint for vector
   jointList.push_back(temp);
 
   int ecatCycleTime = 4;  // milliseconds
