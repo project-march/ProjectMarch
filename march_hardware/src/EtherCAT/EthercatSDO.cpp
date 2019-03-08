@@ -8,6 +8,8 @@ extern "C"
 
 namespace march4cpp
 {
+
+// TODO(Isha, Martijn, Tim) refactor this with more generic types
 int sdo_bit8(int slave, uint32_t index, uint8_t sub, uint8_t value)
 {
   return ec_SDOwrite(slave, index, sub, FALSE, 1, &value, EC_TIMEOUTRXM);
