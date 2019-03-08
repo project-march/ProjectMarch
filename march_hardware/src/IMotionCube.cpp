@@ -154,10 +154,9 @@ bool IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
   success &= sdo_bit32(slaveIndex, 0x6093, 2, 1);
 
   // position limit -- min position
-  //  39717 = 0 rad
-  success &= sdo_bit32(slaveIndex, 0x607D, 1, 49000);
+  success &= sdo_bit32(slaveIndex, 0x607D, 1, this->encoder.getMinPositionIU());
   // position limit -- max position
-  success &= sdo_bit32(slaveIndex, 0x607D, 2, 51000);
+  success &= sdo_bit32(slaveIndex, 0x607D, 2, this->encoder.getMaxPositionIU());
 
   // Quick stop option
   success &= sdo_bit16(slaveIndex, 0x605A, 0, 6);
@@ -464,7 +463,18 @@ bool IMotionCube::goToOperationEnabled()
   }
   ROS_INFO("Switched On!");
 
-  this->actuateIU(this->encoder.getAngleIU());
+  //  If the encoder is functioning correctly, move the joint to its current position. Otherwise shutdown
+  int angleRead = this->encoder.getAngleIU();
+  if (this->encoder.isValidTargetPositionIU(angleRead))
+  {
+    this->actuateIU(angleRead);
+  }
+  else
+  {
+    ROS_FATAL("Encoder is not functioning properly, read value %d, min value is %d, max value is %d. Shutting down",
+              angleRead, this->encoder.getMinPositionIU(), this->encoder.getMaxPositionIU());
+    throw std::domain_error("Encoder is not functioning properly");
+  }
 
   ROS_INFO("Try to go to 'Operation Enabled'");
   bool operationEnabled = false;

@@ -33,9 +33,9 @@ int main(int argc, char** argv)
   ROS_INFO("march4 initialized");
 
   ROS_INFO_STREAM("Angle: " << march4.getJoint("test_joint").getAngleRad());
-  march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(1.1, 0.261);
-  march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(0.8, 0.261);
-  march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(1.2, 0.261);
+  march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(0.6, 0.1);
+  march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(1, 0.2);
+  march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(0.6, 0.3);
 
   // Publish and print joint position
   //    ros::Publisher pub = nh.advertise<sensor_msgs::JointState>("march/joint_states", 5);

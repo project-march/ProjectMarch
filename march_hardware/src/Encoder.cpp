@@ -69,4 +69,14 @@ bool Encoder::isValidTargetPositionIU(int targetPosIU)
   return (targetPosIU > this->minPositionIU && targetPosIU < this->maxPositionIU);
 }
 
+int Encoder::getMinPositionIU() const
+{
+  return minPositionIU;
+}
+
+int Encoder::getMaxPositionIU() const
+{
+  return maxPositionIU;
+}
+
 }  // namespace march4cpp

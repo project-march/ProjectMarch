@@ -31,6 +31,9 @@ public:
 
   void setSlaveIndex(int slaveIndex);
   int getSlaveIndex() const;
+
+  int getMinPositionIU() const;
+  int getMaxPositionIU() const;
 };
 }
 
