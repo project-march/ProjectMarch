@@ -14,11 +14,18 @@ Encoder::Encoder(int numberOfBits, int minPositionIU, int maxPositionIU, int zer
   this->safetyMarginRad = safetyMarginRad;
   this->slaveIndex = -1;
   this->totalPositions = static_cast<int>(pow(2, numberOfBits));
-  this->minPositionIU = minPositionIU + RadtoIU(this->safetyMarginRad);
-  this->maxPositionIU = maxPositionIU - RadtoIU(this->safetyMarginRad);
+
+  int safetyMarginIU = static_cast<int>(safetyMarginRad * totalPositions / (2 * M_PI));
+
+  this->minPositionIU = minPositionIU + safetyMarginIU;
+  this->maxPositionIU = maxPositionIU - safetyMarginIU;
   this->zeroPositionIU = zeroPositionIU;
-  if(this->minPositionIU >= this->maxPositionIU){
-    ROS_FATAL("No valid range of motion. Safety margin too large or min/max position invalid.");
+
+  if (this->minPositionIU >= this->maxPositionIU)
+  {
+    ROS_FATAL("No valid range of motion. Safety margin too large or min/max position invalid. Minposition: %i, "
+              "Maxposition: %i, safetyMargin: %f",
+              this->minPositionIU, this->maxPositionIU, this->safetyMarginRad);
     throw std::invalid_argument("No valid range of motion. Safety margin too large or min/max position invalid.");
   }
 }
