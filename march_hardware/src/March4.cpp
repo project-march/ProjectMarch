@@ -26,7 +26,7 @@ MARCH4::MARCH4()
   jointList.push_back(temp);
 
   int ecatCycleTime = 4;  // milliseconds
-  ethercatMaster = new EthercatMaster(jointList, "enp2s0", this->getMaxSlaveIndex(), ecatCycleTime);
+  ethercatMaster.reset(new EthercatMaster(jointList, "enp2s0", this->getMaxSlaveIndex(), ecatCycleTime));
 }
 
 void MARCH4::startEtherCAT()
