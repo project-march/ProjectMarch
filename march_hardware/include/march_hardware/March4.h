@@ -33,8 +33,6 @@ public:
   bool isEthercatOperational();
 
   Joint getJoint(::std::string jointName);
-
-  void sendData(uint8_t value);
 };
 }  // namespace march4cpp
 #endif

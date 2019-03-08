@@ -150,10 +150,4 @@ Joint MARCH4::getJoint(::std::string jointName)
   throw ::std::runtime_error("Could not find joint with name " + jointName);
 }
 
-void MARCH4::sendData(uint8_t value)
-{
-  union bit8 unionbyte;
-  unionbyte.ui = value;
-  set_output_bit8(1, 0, unionbyte);
-}
 }  // namespace march4cpp
