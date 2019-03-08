@@ -14,7 +14,7 @@ namespace march4cpp
 class MARCH4
 {
 private:
-  std::unique_ptr<EthercatMaster> ethercatMaster;
+  EthercatMaster* ethercatMaster;
 
 public:
   // TODO(Isha, Tim) remove
