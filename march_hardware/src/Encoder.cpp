@@ -17,6 +17,10 @@ Encoder::Encoder(int numberOfBits, int minPositionIU, int maxPositionIU, int zer
   this->minPositionIU = minPositionIU + RadtoIU(this->safetyMarginRad);
   this->maxPositionIU = maxPositionIU - RadtoIU(this->safetyMarginRad);
   this->zeroPositionIU = zeroPositionIU;
+  if(this->minPositionIU >= this->maxPositionIU){
+    ROS_FATAL("No valid range of motion. Safety margin too large or min/max position invalid.");
+    throw std::invalid_argument("No valid range of motion. Safety margin too large or min/max position invalid.");
+  }
 }
 
 float Encoder::getAngleRad()
