@@ -99,10 +99,17 @@ void publishTemperature(const ros::Publisher& temperature_pub)
 std::string createTopicName(const char* base, const char* name)
 {
   char slash[] = "/";
-  const int kArraySize = static_cast<const int>(strlen(base) + strlen(slash) + strlen(name));
+  // The buffer needs more space then the final string length.
+  int extra_buffer_size = 100;
+  const int kArraySize = static_cast<const int>(strlen(base) + strlen(slash) + strlen(name) + extra_buffer_size);
   // Create a char array of the combined size of all three parts
   char full_topic[kArraySize];
-  snprintf(full_topic, kArraySize, "%s%s%s", base, slash, name);
+  int error_code = snprintf(full_topic, kArraySize, "%s%s%s", base, slash, name);
+  if (error_code < 0 || error_code > kArraySize)
+  {
+    ROS_ERROR("Error creating topic %d", error_code);
+  }
+  ROS_INFO(full_topic);
   return full_topic;
 }
 
