@@ -1,2 +1,3 @@
-# ethercat-master
-The EtherCAT master of the MARCH IV. This repository uses the SOEM library.
+# hardware-interface
+The hardware interface of the MARCH IV. This includes EtherCAT master and uses the SOEM library.
+
