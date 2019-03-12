@@ -107,9 +107,8 @@ std::string createTopicName(const char* base, const char* name)
   int error_code = snprintf(full_topic, kArraySize, "%s%s%s", base, slash, name);
   if (error_code < 0 || error_code > kArraySize)
   {
-    ROS_ERROR("Error creating topic %d", error_code);
+    ROS_ERROR("Error creating topic %s (error code %d)", full_topic, error_code);
   }
-  ROS_INFO(full_topic);
   return full_topic;
 }
 
