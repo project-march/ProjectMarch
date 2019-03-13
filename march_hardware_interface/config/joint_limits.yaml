@@ -1,0 +1,7 @@
+joint_limits:
+  test_joint:
+    has_position_limits: true
+    min_position: 0
+    max_position: 1
+    has_velocity_limits: true
+    max_velocity: 0.7

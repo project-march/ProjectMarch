@@ -1,0 +1,10 @@
+march:
+  controller:
+    state:
+      type: joint_state_controller/JointStateController
+      publish_rate: 50
+    position:
+      test_joint:
+        type: position_controllers/JointPositionController
+        joint: test_joint
+        pid: {p: 10.0, i: 0.0, d: 1.0}
