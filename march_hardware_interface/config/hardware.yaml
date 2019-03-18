@@ -1,5 +1,5 @@
 march:
   hardware_interface:
-    loop_hz: 10 # hz
+    loop_hz: 1 # hz
     joints:
       - test_joint
