@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 extern "C" {
-#include "ethercat.h"
+#include "../../../soem/ethercat.h"
 }
 
 namespace march4cpp

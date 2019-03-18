@@ -28,19 +28,19 @@ namespace march_hardware_interface
 
     void MarchHardwareInterface::init() {
         this->march = march4cpp::MARCH4();
-//        this->march.startEtherCAT();
-//
-//        if (!this->march.isEthercatOperational())
-//        {
-//            ROS_FATAL("EtherCAT is not operational");
-//            exit(0);
-//        }
+        this->march.startEtherCAT();
+
+        if (!this->march.isEthercatOperational())
+        {
+            ROS_FATAL("EtherCAT is not operational");
+            exit(0);
+        }
+
 
         // Get joint names
         nh_.getParam("/march/hardware_interface/joints", joint_names_);
         num_joints_ = joint_names_.size();
 
-        joint_mode_ = 1;
         // Resize vectors
         joint_position_.resize(num_joints_);
         joint_velocity_.resize(num_joints_);
@@ -49,7 +49,7 @@ namespace march_hardware_interface
         joint_velocity_command_.resize(num_joints_);
         joint_effort_command_.resize(num_joints_);
 
-        // Initialize Controller 
+        // Initialize Controller
         for (int i = 0; i < num_joints_; ++i) {
             march4cpp::Joint joint = march.getJoint(joint_names_[i]);
             // Create joint state interface
@@ -68,6 +68,10 @@ namespace march_hardware_interface
             positionJointSoftLimitsInterface.registerHandle(jointLimitsHandle);
             position_joint_interface_.registerHandle(jointPositionHandle);
 
+//          Set the first target as the current position.
+            this->read();
+            joint_position_command_[i] = joint_position_[i];
+
 //            ROS_WARN("has position limits: %d", limits.has_position_limits);
 //            ROS_WARN("min_position: %f", limits.min_position);
 //            ROS_WARN("max_position: %f", limits.max_position);
@@ -75,6 +79,9 @@ namespace march_hardware_interface
             // Create effort joint interface
             JointHandle jointEffortHandle(jointStateHandle, &joint_effort_command_[i]);
             effort_joint_interface_.registerHandle(jointEffortHandle);
+
+            joint.getIMotionCube().goToOperationEnabled();
+
         }
 
         registerInterface(&joint_state_interface_);
@@ -93,19 +100,18 @@ namespace march_hardware_interface
     void MarchHardwareInterface::read() {
         for (int i = 0; i < num_joints_; i++) {
             joint_position_[i] = march.getJoint(joint_names_[i]).getAngleRad();
+            ROS_INFO("Position: %f", joint_position_[i]);
         }
     }
 
     void MarchHardwareInterface::write(ros::Duration elapsed_time) {
-//        ROS_WARN("Trying to actuate joint %s, to %f rad, %f speed, %f effort.", joint_names_[0].c_str(), joint_position_command_[0], joint_velocity_command_[0], joint_effort_command_[0]);
-//        ROS_WARN("Elapsed time %f", elapsed_time.toSec());
 
+        ROS_INFO_THROTTLE(1, "Trying to actuate joint %s, to %f rad, %f speed, %f effort.", joint_names_[0].c_str(), joint_position_command_[0], joint_velocity_command_[0], joint_effort_command_[0]);
         positionJointSoftLimitsInterface.enforceLimits(elapsed_time);
 
         for (int i = 0; i < num_joints_; i++) {
-//            ROS_WARN("Trying to actuate joint %s, to %f rad, %f speed, %f effort.", joint_names_[i].c_str(), joint_position_command_[i], joint_velocity_command_[i], joint_effort_command_[i]);
-            ROS_WARN("%f", joint_position_command_[i]);
-//            march.getJoint(joint_names_[i]).actuateRad(joint_position_command_[i]);
+            ROS_INFO_THROTTLE(1, "Trying to actuate joint %s, to %f rad, %f speed, %f effort.", joint_names_[i].c_str(), joint_position_command_[i], joint_velocity_command_[i], joint_effort_command_[i]);
+            march.getJoint(joint_names_[i]).actuateRad(joint_position_command_[i]);
         }
     }
 }
