@@ -5,6 +5,6 @@ march:
       publish_rate: 50
     trajectory:
       test_joint:
-        type: "position_controllers/JointTrajectoryController"
+        type: position_controllers/JointTrajectoryController
         joints:
           - test_joint

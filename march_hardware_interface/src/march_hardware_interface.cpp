@@ -28,13 +28,13 @@ namespace march_hardware_interface
 
     void MarchHardwareInterface::init() {
         this->march = march4cpp::MARCH4();
-        this->march.startEtherCAT();
-
-        if (!this->march.isEthercatOperational())
-        {
-            ROS_FATAL("EtherCAT is not operational");
-            exit(0);
-        }
+//        this->march.startEtherCAT();
+//
+//        if (!this->march.isEthercatOperational())
+//        {
+//            ROS_FATAL("EtherCAT is not operational");
+//            exit(0);
+//        }
 
         // Get joint names
         nh_.getParam("/march/hardware_interface/joints", joint_names_);
@@ -60,7 +60,10 @@ namespace march_hardware_interface
             JointHandle jointPositionHandle(jointStateHandle, &joint_position_command_[i]);
             JointLimits limits;
             SoftJointLimits softLimits;
+
             getJointLimits(joint.getName(), nh_, limits);
+            getSoftJointLimits(joint.getName(), nh_, softLimits);
+
             PositionJointSoftLimitsHandle jointLimitsHandle(jointPositionHandle, limits, softLimits);
             positionJointSoftLimitsInterface.registerHandle(jointLimitsHandle);
             position_joint_interface_.registerHandle(jointPositionHandle);
@@ -94,12 +97,14 @@ namespace march_hardware_interface
     }
 
     void MarchHardwareInterface::write(ros::Duration elapsed_time) {
-        ROS_WARN("Trying to actuate joint %s, to %f rad, %f speed, %f effort.", joint_names_[0].c_str(), joint_position_command_[0], joint_velocity_command_[0], joint_effort_command_[0]);
+//        ROS_WARN("Trying to actuate joint %s, to %f rad, %f speed, %f effort.", joint_names_[0].c_str(), joint_position_command_[0], joint_velocity_command_[0], joint_effort_command_[0]);
+//        ROS_WARN("Elapsed time %f", elapsed_time.toSec());
 
         positionJointSoftLimitsInterface.enforceLimits(elapsed_time);
 
         for (int i = 0; i < num_joints_; i++) {
-            ROS_WARN("Trying to actuate joint %s, to %f rad, %f speed, %f effort.", joint_names_[i].c_str(), joint_position_command_[i], joint_velocity_command_[i], joint_effort_command_[i]);
+//            ROS_WARN("Trying to actuate joint %s, to %f rad, %f speed, %f effort.", joint_names_[i].c_str(), joint_position_command_[i], joint_velocity_command_[i], joint_effort_command_[i]);
+            ROS_WARN("%f", joint_position_command_[i]);
 //            march.getJoint(joint_names_[i]).actuateRad(joint_position_command_[i]);
         }
     }
