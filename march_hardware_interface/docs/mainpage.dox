@@ -1,0 +1,33 @@
+/** @mainpage March Hardware Interface
+ * @section introduction Introduction
+ * This package serves as the bridge between the march_hardware package and ros_control.
+ *
+ * Most of this package was directly implemented from
+ *<a href="https://slaterobots.com/blog/5abd8a1ed4442a651de5cb5b/how-to-implement-ros_control-on-a-custom-robot">
+ * this tutorial
+ * </a>.
+ * If you want to understand how this package works, it is highly suggested to follow that tutorial first.
+ *
+ * @section features Features
+ * - Easily switch between different types of controllers for each joint.
+ * - Publish joint states of the exoskeleton.
+ * - Create a command topic for each controller.
+
+ * @section how_it_works How it works
+
+ * @section tutorials Tutorials
+
+ * @subsection how_to_use How to use
+ * To launch, run the following command:
+ * @verbatim roslaunch march_hardware_interface march_controllers.launch @endverbatim
+ * This launchfile does a few things:
+ * - Load the hardware, controller and joint limits to the parameter server.
+ * - Start the march_hardware_interface node.
+ * - Launch the controller spawner to spawn all controllers given as arguments in the launchfile.
+
+ * Depending on what controllers you are using, you can now send specific commands to a topic to trigger them.
+ * @verbatim /march/controller/<controller_type>/<joint_name>/command @endverbatim.
+ * Which controllers exist and their input can be found on the <a href="http://wiki.ros.org/ros_control"> ros wiki<a>.
+
+ * @subsection add_controller Add a new controller
+ */
