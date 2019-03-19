@@ -8,3 +8,7 @@ march:
         type: position_controllers/JointTrajectoryController
         joints:
           - test_joint
+    position:
+      test_joint:
+        type: position_controllers/JointPositionController
+        joint: test_joint

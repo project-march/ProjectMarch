@@ -12,6 +12,6 @@
     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="/"
           args="
             /march/controller/state
-            /march/controller/trajectory/test_joint
+            /march/controller/position/test_joint
         "/>
 </launch>
