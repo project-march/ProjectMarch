@@ -1,0 +1,45 @@
+/** @mainpage March Hardware Interface
+ * @section introduction Introduction
+ * This package serves as the bridge between the march_hardware package and ros_control.
+ *
+ * Most of this package was directly implemented from
+ *<a href="https://slaterobots.com/blog/5abd8a1ed4442a651de5cb5b/how-to-implement-ros_control-on-a-custom-robot">
+ * this tutorial</a>.
+ * If you want to understand how this package works, it is highly suggested to follow that tutorial first.
+ *
+ * @section features Features
+ * - Parse .yaml files to set configure ros_control limits and controllers.
+ * - Easily switch between different types of controllers for each joint.
+ * - Publish joint states of the exoskeleton.
+ * - Create a command topic for each controller.
+ *
+ * @section how_to_use How to use
+ * To launch, run the following command:
+ * @verbatim roslaunch march_hardware_interface march_controllers.launch @endverbatim
+ * This launchfile does a few things:
+ * - Load the hardware settings, controller settings and joint limits to the parameter server.
+ * - Start the march_hardware_interface_node.cpp.
+ * - Launch the controller spawner to spawn all controllers given as arguments in the launchfile.
+
+ * Depending on what controllers you are using, you can now send specific commands to a topic to trigger them.
+ * @verbatim /march/controller/<controller_type>/<joint_name>/command @endverbatim
+ * Which controllers exist and their input can be found on the <a href="http://wiki.ros.org/ros_control"> ros wiki</a>.
+ *
+ * @section tutorials Tutorials
+ *
+
+ * @subsection add_controller Add a new controller
+ * To add a new controller, simply edit the controllers.yaml file and add a configuration.
+ * Some examples can be found
+ *     <a href="https://github.com/SlateRobotics/tr1_hardware_interface/blob/master/config/controllers.yaml">
+ *     here </a> and <a href="http://wiki.ros.org/joint_trajectory_controller">here</a>.
+ *
+ * To load the controller, add it to the `args` in the controller spawner node.
+ *
+ * @subsection add_joint Add a new joint.
+ * - Add the joint to the list in the hardware.yaml file.
+ * - Add joint_limits in joint_limits.yaml specified by the joint you want to add.
+ *
+ * Your joint can now be used as a joint in a controller. Of course you still need to add a controller for this joint
+ *     as described above.
+ */

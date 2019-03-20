@@ -4,11 +4,10 @@
     command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/test-joint.xacro'" />
 
     <!--convert joint states to TF transforms for rviz, etc-->
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" ns="/march"
           respawn="false" output="screen">
     </node>
-    <node name="rviz" pkg="rviz" type="rviz" args="" required="false"/>
-
+    <node name="rviz" pkg="rviz" type="rviz" args="" required="false" ns="/march"/>
 
 
 </launch>

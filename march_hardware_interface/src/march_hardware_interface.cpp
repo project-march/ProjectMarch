@@ -70,7 +70,7 @@ void MarchHardwareInterface::init()
     positionJointSoftLimitsInterface.registerHandle(jointLimitsHandle);
     position_joint_interface_.registerHandle(jointPositionHandle);
 
-    //          Set the first target as the current position.
+    // Set the first target as the current position.
     this->read();
     joint_position_command_[i] = joint_position_[i];
 
