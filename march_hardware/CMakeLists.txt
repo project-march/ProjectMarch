@@ -14,8 +14,6 @@ catkin_package(
         include
         CATKIN_DEPENDS
         roscpp
-        # TODO (Isha) make sure this code works properly
-        # for now this line is commented to make roslint pass
         LIBRARIES
         march_hardware
 )
@@ -77,6 +75,11 @@ target_link_libraries(march_hardware ${catkin_LIBRARIES})
 add_executable(hardware_dummy src/main.cpp)
 target_link_libraries(hardware_dummy march_hardware)
 
+install(TARGETS march_hardware
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
+
 # Give sudo access to ethernet port
 add_custom_command(
         TARGET hardware_dummy
@@ -100,5 +103,5 @@ if (CATKIN_ENABLE_TESTING)
             test/mocks/MockIMotionCube.cpp
             test/mocks/MockJoint.cpp
             )
-    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march4cpp gtest gmock)
+    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march_hardware gtest gmock)
 endif ()
