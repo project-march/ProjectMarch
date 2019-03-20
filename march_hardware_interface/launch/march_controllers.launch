@@ -3,10 +3,6 @@
     <rosparam file="$(find march_hardware_interface)/config/controllers.yaml" command="load"/>
     <rosparam file="$(find march_hardware_interface)/config/joint_limits.yaml" command="load"/>
 
-    <!--TODO(Isha) remove before merging-->
-    <include file="$(find march_hardware_interface)/launch/demo.launch"/>
-
-
     <node name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" output="screen"/>
 
     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="/"
