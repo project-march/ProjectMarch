@@ -1,3 +1,5 @@
+// Copyright 2019 Project March.
+
 #include <march_hardware_interface/march_hardware_interface.h>
 int main(int argc, char** argv)
 {

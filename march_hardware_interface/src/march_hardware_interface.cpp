@@ -1,3 +1,5 @@
+// Copyright 2019 Project March.
+
 #include <sstream>
 #include <march_hardware_interface/march_hardware_interface.h>
 #include <joint_limits_interface/joint_limits_interface.h>
@@ -6,7 +8,6 @@
 #include <joint_limits_interface/joint_limits_rosparam.h>
 #include <march_hardware/March4.h>
 
-using namespace hardware_interface;
 using joint_limits_interface::JointLimits;
 using joint_limits_interface::SoftJointLimits;
 using joint_limits_interface::PositionJointSoftLimitsHandle;
@@ -115,4 +116,4 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
     march.getJoint(joint_names_[i]).actuateRad(joint_position_command_[i]);
   }
 }
-}
+}  // namespace march_hardware_interface

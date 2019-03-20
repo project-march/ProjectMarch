@@ -9,6 +9,7 @@ add_compile_options(-std=c++11)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  roslint
   rospy
   std_msgs
   controller_manager
@@ -17,8 +18,18 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
         CATKIN_DEPENDS
+        std_msgs
 )
 
+# Roslinter
+set(ROSLINT_CPP_OPTS "--filter=-build/include,-build/header_guard,-runtime/references" "--linelength=120")
+
+file(GLOB_RECURSE lintfiles
+        "src/*.cpp"
+        "src/*.h"
+        )
+
+roslint_cpp(${lintfiles})
 
 
 include_directories(include ${catkin_INCLUDE_DIRS})
