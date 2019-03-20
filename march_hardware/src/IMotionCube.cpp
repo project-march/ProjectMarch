@@ -234,7 +234,7 @@ void IMotionCube::actuateIU(int targetIU)
 
   uint8 targetPositionLocation = 2;  // TODO(Isha Martijn) make this dynamic
 
-  ROS_INFO_THROTTLE(1, "Trying to actuate slave %d, soem location %d to targetposition %d", this->slaveIndex,
+  ROS_DEBUG_THROTTLE("Trying to actuate slave %d, soem location %d to targetposition %d", this->slaveIndex,
            targetPositionLocation, targetPosition.i);
   set_output_bit32(this->slaveIndex, targetPositionLocation, targetPosition);
 }
