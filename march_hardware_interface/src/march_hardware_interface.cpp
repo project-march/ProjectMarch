@@ -74,7 +74,18 @@ void MarchHardwareInterface::init()
     // Set the first target as the current position.
     this->read();
     joint_position_command_[i] = joint_position_[i];
+    ROS_INFO("Joint %s: first read position: %f", joint_names_[i].c_str(), joint_position_[i]);
 
+    if (joint_position_[i] < softLimits.min_position || joint_position_[i] > softLimits.max_position)
+    {
+      ROS_FATAL("Joint %s is outside of its softLimits (%f, %f). Actual position: %f", joint_names_[i].c_str(),
+                softLimits.min_position, softLimits.max_position, joint_position_[i]);
+
+      std::ostringstream errorStream;
+      errorStream << "Joint " << joint_names_[i].c_str() << " is out of its softLimits (" << softLimits.min_position
+                  << ", " << softLimits.max_position << "). Actual position: " << joint_position_[i];
+      throw ::std::invalid_argument(errorStream.str());
+    }
     // Create effort joint interface
     JointHandle jointEffortHandle(jointStateHandle, &joint_effort_command_[i]);
     effort_joint_interface_.registerHandle(jointEffortHandle);
@@ -111,9 +122,9 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
 
   for (int i = 0; i < num_joints_; i++)
   {
-    ROS_DEBUG("Trying to actuate joint %s, to %f rad, %f speed, %f effort.", joint_names_[i].c_str(),
-              joint_position_command_[i], joint_velocity_command_[i], joint_effort_command_[i]);
-    march.getJoint(joint_names_[i]).actuateRad(joint_position_command_[i]);
+    ROS_DEBUG("After limits: Trying to actuate joint %s, to %lf rad, %f speed, %f effort.", joint_names_[i].c_str(),
+             joint_position_command_[i], joint_velocity_command_[i], joint_effort_command_[i]);
+    march.getJoint(joint_names_[i]).actuateRad(static_cast<float>(joint_position_command_[i]));
   }
 }
 }  // namespace march_hardware_interface

@@ -216,7 +216,8 @@ void IMotionCube::actuateRadFixedSpeed(float targetRad, float radPerSec)
   {
     float index = i;
     float calculatedTarget = currentRad + (index / cycles * distance);
-    ROS_INFO_STREAM(calculatedTarget);
+    ROS_INFO_STREAM("Target: " << calculatedTarget);
+    ROS_INFO_STREAM("Current: " << this->getAngleRad());
     usleep(static_cast<__useconds_t>(1000000 / resolution));
     this->actuateRad(calculatedTarget);
   }
