@@ -102,6 +102,7 @@ void MarchHardwareInterface::init()
 void MarchHardwareInterface::update(const ros::TimerEvent& e)
 {
   elapsed_time_ = ros::Duration(e.current_real - e.last_real);
+  ROS_INFO("Elapsed time: %d.%d", elapsed_time_.sec, elapsed_time_.nsec);
   read();
   controller_manager_->update(ros::Time::now(), elapsed_time_);
   write(elapsed_time_);
