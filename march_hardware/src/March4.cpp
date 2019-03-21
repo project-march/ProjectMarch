@@ -15,18 +15,19 @@ namespace march4cpp
 {
 MARCH4::MARCH4()
 {
-  TemperatureGES temperatureGES = TemperatureGES(1, 0);
+//                        0    1    2    3    4    5    6    7    8    9    10   11   12   13
+//      LIST_OF_SLAVES: [MAS, PDB, BPG, LHJ, LUG, LKJ, LLG, LAJ, RHJ, RUG, RKJ, RLG, RAJ, IPD]
   // TODO(Isha, Martijn) double-check these numbers.
-  Encoder enc = Encoder(16, 37961, 59649, 39717, 0.3);
-  IMotionCube imc = IMotionCube(2, enc);
-  // For now we are only running on the test joint
-  // TODO(Isha) refactor this that you can switch between test_joint, MARCH4 (and MARCH3)
-  Joint temp = Joint("test_joint", temperatureGES, imc);
+  Encoder LHJenc = Encoder(16, 37961, 59649, 39717, 0.3);
+  IMotionCube LHJimc = IMotionCube(3, LHJenc);
+  Joint leftHip = Joint("test_joint", LHJimc);
+
   // TODO(Tim) should not create copy of joint for vector
-  jointList.push_back(temp);
+
+  jointList.push_back(leftHip);
 
   int ecatCycleTime = 4;  // milliseconds
-  ethercatMaster.reset(new EthercatMaster(jointList, "enp2s0", this->getMaxSlaveIndex(), ecatCycleTime));
+  ethercatMaster.reset(new EthercatMaster(jointList, "enp3s0", this->getMaxSlaveIndex(), ecatCycleTime));
 }
 
 void MARCH4::startEtherCAT()
@@ -49,6 +50,7 @@ void MARCH4::startEtherCAT()
 
 void MARCH4::stopEtherCAT()
 {
+
   if (!ethercatMaster->isOperational)
   {
     ROS_ERROR("Trying to stop EtherCAT while it is not active.");
