@@ -101,11 +101,11 @@ void MarchHardwareInterface::init()
 
 void MarchHardwareInterface::update(const ros::TimerEvent& e)
 {
-  ROS_INFO("Pre elapsed time");
-  elapsed_time_ = ros::Duration(e.current_real - e.last_real);
-  ROS_INFO("Elapsed time: %d.%d", elapsed_time_.sec, elapsed_time_.nsec);
+
   read();
   ROS_INFO("Post read");
+  elapsed_time_ = ros::Duration(e.current_real - e.last_real);
+  ROS_INFO("Elapsed time: %d.%d", elapsed_time_.sec, elapsed_time_.nsec);
   controller_manager_->update(ros::Time::now(), elapsed_time_);
   ROS_INFO("Post controller manager update");
   write(elapsed_time_);
