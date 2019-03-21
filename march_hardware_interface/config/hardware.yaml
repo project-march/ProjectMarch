@@ -2,4 +2,4 @@ march:
   hardware_interface:
     loop_hz: 100
     joints:
-      - test_joint
+      - left_hip_joint

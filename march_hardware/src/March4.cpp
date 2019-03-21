@@ -19,12 +19,33 @@ MARCH4::MARCH4()
 //      LIST_OF_SLAVES: [MAS, PDB, BPG, LHJ, LUG, LKJ, LLG, LAJ, RHJ, RUG, RKJ, RLG, RAJ, IPD]
   // TODO(Isha, Martijn) double-check these numbers.
   Encoder LHJenc = Encoder(16, 22134, 43936, 23125, 0.3);
+  Encoder LKJenc = Encoder(16, 22134, 43936, 23125, 0.3);
+  Encoder LAJenc = Encoder(16, 22134, 43936, 23125, 0.3);
+  Encoder RHJenc = Encoder(16, 22134, 43936, 23125, 0.3);
+  Encoder RKJenc = Encoder(16, 22134, 43936, 23125, 0.3);
+  Encoder RAJenc = Encoder(16, 22134, 43936, 23125, 0.3);
   IMotionCube LHJimc = IMotionCube(3, LHJenc);
-  Joint leftHip = Joint("test_joint", LHJimc);
+  IMotionCube LKJimc = IMotionCube(5, LKJenc);
+  IMotionCube LAJimc = IMotionCube(7, LAJenc);
+  IMotionCube RHJimc = IMotionCube(8, RHJenc);
+  IMotionCube RKJimc = IMotionCube(10, RKJenc);
+  IMotionCube RAJimc = IMotionCube(12, RAJenc);
+
+  Joint leftHip = Joint("left_hip_joint", LHJimc);
+  Joint leftKnee = Joint("left_knee_joint", LKJimc);
+  Joint leftAnkle = Joint("left_ankle_joint", LAJimc);
+  Joint rightHip = Joint("right_hip_joint", RHJimc);
+  Joint rightKnee = Joint("right_knee_joint", RKJimc);
+  Joint rightAnkle = Joint("right_ankle_joint", RAJimc);
 
   // TODO(Tim) should not create copy of joint for vector
 
   jointList.push_back(leftHip);
+  jointList.push_back(leftKnee);
+  jointList.push_back(leftAnkle);
+  jointList.push_back(rightHip);
+  jointList.push_back(rightKnee);
+  jointList.push_back(rightAnkle);
 
   int ecatCycleTime = 4;  // milliseconds
   ethercatMaster.reset(new EthercatMaster(jointList, "enp3s0", this->getMaxSlaveIndex(), ecatCycleTime));
