@@ -107,8 +107,8 @@ void MarchHardwareInterface::update(const ros::TimerEvent& e)
   ROS_INFO("Elapsed time: %fs ", elapsed_time_.toSec());
   try {
     controller_manager_->update(ros::Time::now(), elapsed_time_);
-  }catch(std::exception& exception){
-    ROS_ERROR("Exception: %s", exception.what());
+  }catch(ros::Exception &e ){
+    ROS_ERROR("Exception: %s", e.what());
   }
   ROS_INFO("Post controller manager update");
   write(elapsed_time_);
