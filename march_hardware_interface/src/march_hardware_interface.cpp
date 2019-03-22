@@ -101,12 +101,15 @@ void MarchHardwareInterface::init()
 
 void MarchHardwareInterface::update(const ros::TimerEvent& e)
 {
-
   read();
   ROS_INFO("Post read");
   elapsed_time_ = ros::Duration(e.current_real - e.last_real);
   ROS_INFO("Elapsed time: %fs ", elapsed_time_.toSec());
-  controller_manager_->update(ros::Time::now(), elapsed_time_);
+  try {
+    controller_manager_->update(ros::Time::now(), elapsed_time_);
+  }catch(std::exception& exception){
+    ROS_ERROR("Exception: %s", exception.what());
+  }
   ROS_INFO("Post controller manager update");
   write(elapsed_time_);
   ROS_INFO("Post write");
