@@ -1,5 +1,9 @@
+<launch>
+
+
 <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="true" output="screen" ns="/"
       args="
             /march/controller/state
             /march/controller/position/left_hip_joint
         "/>
+</launch>
