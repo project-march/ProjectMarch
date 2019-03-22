@@ -106,7 +106,6 @@ void MarchHardwareInterface::update(const ros::TimerEvent& e)
   ROS_INFO("Post read");
   elapsed_time_ = ros::Duration(e.current_real - e.last_real);
   ROS_INFO("Elapsed time: %d.%d", elapsed_time_.sec, elapsed_time_.nsec);
-  elapsed_time_.nsec = 200000;
   controller_manager_->update(ros::Time::now(), elapsed_time_);
   ROS_INFO("Post controller manager update");
   write(elapsed_time_);
