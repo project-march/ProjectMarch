@@ -8,5 +8,6 @@ int main(int argc, char** argv)
   ros::AsyncSpinner spinner(1);
   spinner.start();
   march_hardware_interface::MarchHardwareInterface march(nh);
+  ros::waitForShutdown()
   return 0;
 }
