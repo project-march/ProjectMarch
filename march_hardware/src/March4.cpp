@@ -19,14 +19,14 @@ MARCH4::MARCH4()
 //      LIST_OF_SLAVES: [MAS, PDB, BPG, LHJ, LUG, LKJ, LLG, LAJ, RHJ, RUG, RKJ, RLG, RAJ, IPD]
   // TODO(Isha, Martijn) double-check these numbers.
 
-    Encoder RHJenc = Encoder(16, 22134, 43436, 24801, 0.05); // Calibrated
-    Encoder LHJenc = Encoder(16, 9746, 31557, 12193, 0.05); // Calibrated
+    Encoder RHJenc = Encoder(16, 22134, 43436, 24515, 0.05); // Calibrated
+    Encoder LHJenc = Encoder(16, 9746, 31557, 11830, 0.05); // Calibrated
 
-    Encoder RKJenc = Encoder(16, 18120, 39941, 24722, 0.05); // Calibrated
-    Encoder LKJenc = Encoder(16, 21924, 43734, 23000, 0.05);
+    Encoder RKJenc = Encoder(16, 18120, 39941, 19000, 0.05); // Calibrated
+    Encoder LKJenc = Encoder(16, 21924, 43734, 22552, 0.05);
 
-    Encoder LAJenc = Encoder(12, 1086, 1490, 1100, 0.01);
-    Encoder RAJenc = Encoder(12, 631, 1022, 700, 0.01);
+    Encoder LAJenc = Encoder(12, 1086, 1490, 1417, 0.01);
+    Encoder RAJenc = Encoder(12, 631, 1022, 948, 0.01);
 
     IMotionCube LHJimc = IMotionCube(3, LHJenc);
     IMotionCube LKJimc = IMotionCube(5, LKJenc);
