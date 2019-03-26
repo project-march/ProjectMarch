@@ -19,7 +19,7 @@ MARCH4::MARCH4()
 //      LIST_OF_SLAVES: [MAS, PDB, BPG, LHJ, LUG, LKJ, LLG, LAJ, RHJ, RUG, RKJ, RLG, RAJ, IPD]
   // TODO(Isha, Martijn) double-check these numbers.
 
-    Encoder RHJenc = Encoder(16, 22134, 43936, 23125, 0.3);
+    Encoder RHJenc = Encoder(16, 22134, 43436, 24801, 0.3); // Calibrated
     Encoder LHJenc = Encoder(16, 9746, 31557, 12193, 0.3); // Calibrated
 
     Encoder RKJenc = Encoder(16, 18120, 39941, 0, 0.3);
