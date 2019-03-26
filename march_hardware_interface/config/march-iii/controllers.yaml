@@ -7,3 +7,13 @@ march:
       left_hip_joint:
         type: position_controllers/JointPositionController
         joint: left_hip_joint
+    trajectory:
+      full_exoskeleton:
+        type: position_controllers/JointTrajectoryController
+        joints:
+          - right_hip_joint
+          - left_hip_joint
+          - right_knee_joint
+          - left_knee_joint
+          - right_ankle_joint
+          - left_ankle_joint

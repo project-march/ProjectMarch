@@ -3,10 +3,13 @@
     <rosparam file="$(find march_hardware_interface)/config/march-iii/controllers.yaml" command="load"/>
     <rosparam file="$(find march_hardware_interface)/config/march-iii/joint_limits.yaml" command="load"/>
 
+    <include file="$(find march_description)/launch/load_description.launch"/>
+
+
     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="true" output="screen" ns="/"
           args="
                 /march/controller/state
-                /march/controller/position/left_hip_joint
+                /march/controller/trajectory/full_exoskeleton/
             "/>
 
     <node name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" output="screen"/>
