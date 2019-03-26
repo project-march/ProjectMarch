@@ -18,14 +18,18 @@ MARCH4::MARCH4()
 //                        0    1    2    3    4    5    6    7    8    9    10   11   12   13
 //      LIST_OF_SLAVES: [MAS, PDB, BPG, LHJ, LUG, LKJ, LLG, LAJ, RHJ, RUG, RKJ, RLG, RAJ, IPD]
   // TODO(Isha, Martijn) double-check these numbers.
-  Encoder LHJenc = Encoder(16, 9769, 31541, 12555, 0.3);
-  Encoder LKJenc = Encoder(16, 22134, 43936, 23125, 0.3);
-  Encoder LAJenc = Encoder(16, 22134, 43936, 23125, 0.3);
-  Encoder RHJenc = Encoder(16, 22134, 43936, 23125, 0.3);
-  Encoder RKJenc = Encoder(16, 22134, 43936, 23125, 0.3);
-  Encoder RAJenc = Encoder(16, 22134, 43936, 23125, 0.3);
-  IMotionCube LHJimc = IMotionCube(3, LHJenc);
-  IMotionCube LKJimc = IMotionCube(5, LKJenc);
+
+    Encoder RHJenc = Encoder(16, 22134, 43936, 23125, 0.3);
+    Encoder LHJenc = Encoder(16, 9746, 31557, 0, 0.3);
+
+    Encoder RKJenc = Encoder(16, 18120, 39941, 0, 0.3);
+    Encoder LKJenc = Encoder(16, 21924, 43734, 0, 0.3);
+
+    Encoder LAJenc = Encoder(12, 1086, 1490, 0, 0.3);
+    Encoder RAJenc = Encoder(12, 631, 1022, 0, 0.3);
+
+    IMotionCube LHJimc = IMotionCube(3, LHJenc);
+    IMotionCube LKJimc = IMotionCube(5, LKJenc);
   IMotionCube LAJimc = IMotionCube(7, LAJenc);
   IMotionCube RHJimc = IMotionCube(8, RHJenc);
   IMotionCube RKJimc = IMotionCube(10, RKJenc);
