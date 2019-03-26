@@ -22,8 +22,8 @@ MARCH4::MARCH4()
     Encoder RHJenc = Encoder(16, 22134, 43436, 24801, 0.3); // Calibrated
     Encoder LHJenc = Encoder(16, 9746, 31557, 12193, 0.3); // Calibrated
 
-    Encoder RKJenc = Encoder(16, 18120, 39941, 0, 0.3);
-    Encoder LKJenc = Encoder(16, 21924, 43734, 0, 0.3);
+    Encoder RKJenc = Encoder(16, 18120, 39941, 20000, 0.3);
+    Encoder LKJenc = Encoder(16, 21924, 43734, 23000, 0.3);
 
     Encoder LAJenc = Encoder(12, 1086, 1490, 0, 0.3);
     Encoder RAJenc = Encoder(12, 631, 1022, 0, 0.3);
