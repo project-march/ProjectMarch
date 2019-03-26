@@ -27,26 +27,26 @@ joint_limits:
 
   left_knee_joint:
     has_position_limits: true
-    min_position: -0.05
+    min_position: -0.2
     max_position: 2
     has_velocity_limits: true
     max_velocity: 0.2
 
     has_soft_limits: true
-    soft_lower_limit: -0.02
+    soft_lower_limit: -0.25
     soft_upper_limit: 1.75
     k_position: 10.0
     k_velocity: 10.0
 
   right_knee_joint:
     has_position_limits: true
-    min_position: -0.05
+    min_position: -0.2
     max_position: 2
     has_velocity_limits: true
     max_velocity: 0.2
 
     has_soft_limits: true
-    soft_lower_limit: -0.02
+    soft_lower_limit: -0.25
     soft_upper_limit: 1.75
     k_position: 10.0
     k_velocity: 10.0
