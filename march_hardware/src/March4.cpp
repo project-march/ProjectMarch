@@ -25,8 +25,8 @@ MARCH4::MARCH4()
     Encoder RKJenc = Encoder(16, 18120, 39941, 19000, 0.05); // Calibrated
     Encoder LKJenc = Encoder(16, 21924, 43734, 22552, 0.05);
 
-    Encoder LAJenc = Encoder(12, 1086, 1490, 1417, 0.005);
-    Encoder RAJenc = Encoder(12, 631, 1022, 948, 0.005);
+    Encoder RAJenc = Encoder(12, 1086, 1490, 1417, 0.005);
+    Encoder LAJenc = Encoder(12, 631, 1022, 948, 0.005);
 
     IMotionCube LHJimc = IMotionCube(3, LHJenc);
     IMotionCube LKJimc = IMotionCube(5, LKJenc);
