@@ -2,4 +2,9 @@ march:
   hardware_interface:
     loop_hz: 100
     joints:
+      - right_hip_joint
       - left_hip_joint
+      - right_knee_joint
+      - left_knee_joint
+      - right_ankle_joint
+      - left_ankle_joint

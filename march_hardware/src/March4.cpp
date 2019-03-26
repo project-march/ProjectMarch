@@ -20,7 +20,7 @@ MARCH4::MARCH4()
   // TODO(Isha, Martijn) double-check these numbers.
 
     Encoder RHJenc = Encoder(16, 22134, 43936, 23125, 0.3);
-    Encoder LHJenc = Encoder(16, 9746, 31557, 0, 0.3);
+    Encoder LHJenc = Encoder(16, 9746, 31557, 12193, 0.3); // Calibrated
 
     Encoder RKJenc = Encoder(16, 18120, 39941, 0, 0.3);
     Encoder LKJenc = Encoder(16, 21924, 43734, 0, 0.3);
