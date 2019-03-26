@@ -53,8 +53,12 @@ joint_limits:
 
   right_ankle_joint:
     has_position_limits: false
-    has_velocity_limits: false
+    has_velocity_limits: true
+    max_velocity: 0.2
+
 
   left_ankle_joint:
     has_position_limits: false
-    has_velocity_limits: false
+    has_velocity_limits: true
+    max_velocity: 0.2
+
