@@ -90,7 +90,7 @@ void MarchHardwareInterface::init()
     JointHandle jointEffortHandle(jointStateHandle, &joint_effort_command_[i]);
     effort_joint_interface_.registerHandle(jointEffortHandle);
 
-//    joint.getIMotionCube().goToOperationEnabled();
+    joint.getIMotionCube().goToOperationEnabled();
   }
 
   registerInterface(&joint_state_interface_);
