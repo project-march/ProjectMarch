@@ -50,3 +50,9 @@ joint_limits:
     soft_upper_limit: 1.75
     k_position: 10.0
     k_velocity: 10.0
+
+  right_ankle_joint:
+    has_position_limits: false
+
+  left_ankle_joint:
+    has_position_limits: false
