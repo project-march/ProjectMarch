@@ -70,7 +70,7 @@ void MarchHardwareInterface::init()
     getJointLimits(joint.getName(), nh_, limits);
     SoftJointLimits softLimits;
     getSoftJointLimits(joint.getName(), nh_, softLimits);
-
+// Create joint limit interface
 
     PositionJointSoftLimitsHandle jointLimitsHandle(jointPositionHandle, limits, softLimits);
     positionJointSoftLimitsInterface.registerHandle(jointLimitsHandle);
