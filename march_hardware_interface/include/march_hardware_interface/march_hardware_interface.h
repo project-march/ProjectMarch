@@ -30,9 +30,22 @@ class MarchHardwareInterface : public march_hardware_interface::MarchHardware
 public:
   MarchHardwareInterface(ros::NodeHandle& nh);
   ~MarchHardwareInterface();
+
+  /**
+  * @brief Initialize the HardwareInterface by registering position interfaces for each joint.
+  */
   void init();
   void update(const ros::TimerEvent& e);
+
+  /**
+  * @brief Read actual postion from the hardware.
+  */
   void read();
+
+  /**
+  * @brief Write position commands to the hardware.
+  * @param elapsed_time Duration since last write action
+  */
   void write(ros::Duration elapsed_time);
 
 protected:

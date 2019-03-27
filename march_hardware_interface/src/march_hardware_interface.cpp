@@ -1,11 +1,13 @@
 // Copyright 2019 Project March.
 
 #include <sstream>
-#include <march_hardware_interface/march_hardware_interface.h>
 #include <joint_limits_interface/joint_limits_interface.h>
 #include <joint_limits_interface/joint_limits.h>
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <joint_limits_interface/joint_limits_rosparam.h>
+
+#include <march_hardware_interface/march_hardware_interface.h>
+
 #include <march_hardware/March4.h>
 
 using joint_limits_interface::JointLimits;
@@ -30,6 +32,7 @@ MarchHardwareInterface::~MarchHardwareInterface()
 
 void MarchHardwareInterface::init()
 {
+  // Start ethercat cycle in the hardware
   this->march = march4cpp::MARCH4();
   this->march.startEtherCAT();
 
@@ -51,7 +54,7 @@ void MarchHardwareInterface::init()
   joint_velocity_command_.resize(num_joints_);
   joint_effort_command_.resize(num_joints_);
 
-  // Initialize Controller
+  // Initialize interfaces for each joint
   for (int i = 0; i < num_joints_; ++i)
   {
     march4cpp::Joint joint = march.getJoint(joint_names_[i]);
@@ -61,17 +64,20 @@ void MarchHardwareInterface::init()
 
     // Create position joint interface
     JointHandle jointPositionHandle(jointStateHandle, &joint_position_command_[i]);
-    JointLimits limits;
-    SoftJointLimits softLimits;
 
+    // Retrieve joint (soft) limits from the parameter server
+    JointLimits limits;
     getJointLimits(joint.getName(), nh_, limits);
+    SoftJointLimits softLimits;
     getSoftJointLimits(joint.getName(), nh_, softLimits);
+
 
     PositionJointSoftLimitsHandle jointLimitsHandle(jointPositionHandle, limits, softLimits);
     positionJointSoftLimitsInterface.registerHandle(jointLimitsHandle);
+
     position_joint_interface_.registerHandle(jointPositionHandle);
 
-    // Set the first target as the current position.
+    // Set the first target as the current position
     this->read();
     joint_position_command_[i] = joint_position_[i];
     ROS_INFO("Joint %s: first read position: %f", joint_names_[i].c_str(), joint_position_[i]);
@@ -86,10 +92,12 @@ void MarchHardwareInterface::init()
                   << ", " << softLimits.max_position << "). Actual position: " << joint_position_[i];
       throw ::std::invalid_argument(errorStream.str());
     }
+
     // Create effort joint interface
     JointHandle jointEffortHandle(jointStateHandle, &joint_effort_command_[i]);
     effort_joint_interface_.registerHandle(jointEffortHandle);
 
+    // Enable high voltage on the IMC
     joint.getIMotionCube().goToOperationEnabled();
   }
 
