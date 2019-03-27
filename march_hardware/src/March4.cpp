@@ -35,12 +35,12 @@ MARCH4::MARCH4()
   IMotionCube RKJimc = IMotionCube(10, RKJenc);
   IMotionCube RAJimc = IMotionCube(12, RAJenc);
 
-  Joint leftHip = Joint("left_hip_joint", LHJimc);
-  Joint leftKnee = Joint("left_knee_joint", LKJimc);
-  Joint leftAnkle = Joint("left_ankle_joint", LAJimc);
-  Joint rightHip = Joint("right_hip_joint", RHJimc);
-  Joint rightKnee = Joint("right_knee_joint", RKJimc);
-  Joint rightAnkle = Joint("right_ankle_joint", RAJimc);
+  Joint leftHip = Joint("left_hip", LHJimc);
+  Joint leftKnee = Joint("left_knee", LKJimc);
+  Joint leftAnkle = Joint("left_ankle", LAJimc);
+  Joint rightHip = Joint("right_hip", RHJimc);
+  Joint rightKnee = Joint("right_knee", RKJimc);
+  Joint rightAnkle = Joint("right_ankle", RAJimc);
 
   // TODO(Tim) should not create copy of joint for vector
 
