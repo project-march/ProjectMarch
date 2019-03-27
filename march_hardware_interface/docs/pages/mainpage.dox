@@ -36,7 +36,7 @@
  *
  * To load the controller, add it to the `args` in the controller spawner node.
  *
- * @subsection add_joint Add a new joint.
+ * @subsection add_joint Add a new joint
  * - Add the joint to the list in the hardware.yaml file.
  * - Add joint_limits in joint_limits.yaml specified by the joint you want to add.
  *
