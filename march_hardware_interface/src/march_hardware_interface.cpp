@@ -1,11 +1,13 @@
 // Copyright 2019 Project March.
 
 #include <sstream>
-#include <march_hardware_interface/march_hardware_interface.h>
 #include <joint_limits_interface/joint_limits_interface.h>
 #include <joint_limits_interface/joint_limits.h>
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <joint_limits_interface/joint_limits_rosparam.h>
+
+#include <march_hardware_interface/march_hardware_interface.h>
+
 #include <march_hardware/March4.h>
 
 using joint_limits_interface::JointLimits;
@@ -30,6 +32,7 @@ MarchHardwareInterface::~MarchHardwareInterface()
 
 void MarchHardwareInterface::init()
 {
+  // Start ethercat cycle in the hardware
   this->march = march4cpp::MARCH4();
   this->march.startEtherCAT();
 
@@ -51,7 +54,7 @@ void MarchHardwareInterface::init()
   joint_velocity_command_.resize(num_joints_);
   joint_effort_command_.resize(num_joints_);
 
-  // Initialize Controller
+  // Initialize interfaces for each joint
   for (int i = 0; i < num_joints_; ++i)
   {
     march4cpp::Joint joint = march.getJoint(joint_names_[i]);
@@ -61,17 +64,20 @@ void MarchHardwareInterface::init()
 
     // Create position joint interface
     JointHandle jointPositionHandle(jointStateHandle, &joint_position_command_[i]);
-    JointLimits limits;
-    SoftJointLimits softLimits;
 
+    // Retrieve joint (soft) limits from the parameter server
+    JointLimits limits;
     getJointLimits(joint.getName(), nh_, limits);
+    SoftJointLimits softLimits;
     getSoftJointLimits(joint.getName(), nh_, softLimits);
 
+    // Create joint limit interface
     PositionJointSoftLimitsHandle jointLimitsHandle(jointPositionHandle, limits, softLimits);
     positionJointSoftLimitsInterface.registerHandle(jointLimitsHandle);
+
     position_joint_interface_.registerHandle(jointPositionHandle);
 
-    // Set the first target as the current position.
+    // Set the first target as the current position
     this->read();
     joint_position_command_[i] = joint_position_[i];
     ROS_INFO("Joint %s: first read position: %f", joint_names_[i].c_str(), joint_position_[i]);
@@ -95,6 +101,7 @@ void MarchHardwareInterface::init()
     JointHandle jointEffortHandle(jointStateHandle, &joint_effort_command_[i]);
     effort_joint_interface_.registerHandle(jointEffortHandle);
 
+    // Enable high voltage on the IMC
     joint.getIMotionCube().goToOperationEnabled();
   }
 
@@ -106,18 +113,10 @@ void MarchHardwareInterface::init()
 
 void MarchHardwareInterface::update(const ros::TimerEvent& e)
 {
-  read();
-  ROS_INFO("Post read");
   elapsed_time_ = ros::Duration(e.current_real - e.last_real);
-  ROS_INFO("Elapsed time: %fs ", elapsed_time_.toSec());
-  try {
-    controller_manager_->update(ros::Time::now(), elapsed_time_);
-  }catch(ros::Exception &e ){
-    ROS_ERROR("Exception: %s", e.what());
-  }
-  ROS_INFO("Post controller manager update");
+  read();
+  controller_manager_->update(ros::Time::now(), elapsed_time_);
   write(elapsed_time_);
-  ROS_INFO("Post write");
 }
 
 void MarchHardwareInterface::read()
@@ -135,7 +134,7 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
 
   for (int i = 0; i < num_joints_; i++)
   {
-    ROS_INFO("After limits: Trying to actuate joint %s, to %lf rad, %f speed, %f effort.", joint_names_[i].c_str(),
+    ROS_DEBUG("After limits: Trying to actuate joint %s, to %lf rad, %f speed, %f effort.", joint_names_[i].c_str(),
              joint_position_command_[i], joint_velocity_command_[i], joint_effort_command_[i]);
     march.getJoint(joint_names_[i]).actuateRad(static_cast<float>(joint_position_command_[i]));
   }

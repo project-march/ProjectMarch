@@ -34,9 +34,9 @@
  *     <a href="https://github.com/SlateRobotics/tr1_hardware_interface/blob/master/config/controllers.yaml">
  *     here </a> and <a href="http://wiki.ros.org/joint_trajectory_controller">here</a>.
  *
- * To load the controller, add it to the `args` in the controller spawner node.
+ * To load the controller, add it to the `args` of the controller spawner node in `march_controllers.launch`.
  *
- * @subsection add_joint Add a new joint.
+ * @subsection add_joint Add a new joint
  * - Add the joint to the list in the hardware.yaml file.
  * - Add joint_limits in joint_limits.yaml specified by the joint you want to add.
  *
