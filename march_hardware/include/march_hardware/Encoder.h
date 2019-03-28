@@ -29,9 +29,10 @@ public:
 
   bool isValidTargetPositionIU(int targetPosIU);
 
+  bool isValidPositionIU(int positionIU);
   void setSlaveIndex(int slaveIndex);
-  int getSlaveIndex() const;
 
+  int getSlaveIndex() const;
   int getMinPositionIU() const;
   int getMaxPositionIU() const;
 };

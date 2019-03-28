@@ -227,7 +227,8 @@ void IMotionCube::actuateIU(int targetIU)
 {
   if (!this->encoder.isValidTargetPositionIU(targetIU))
   {
-    ROS_ERROR("Position %i is invalid.", targetIU);
+    ROS_ERROR("Position %i is invalid. (%d, %d)", targetIU,
+            this->encoder.getMinPositionIU(), this->encoder.getMaxPositionIU());
     return;
   }
 
