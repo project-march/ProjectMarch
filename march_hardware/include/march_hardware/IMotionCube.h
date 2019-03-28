@@ -5,6 +5,7 @@
 #include <march_hardware/EtherCAT/EthercatIO.h>
 #include <march_hardware/Slave.h>
 #include <march_hardware/Encoder.h>
+#include <march_hardware/PDOmap.h>
 
 namespace march4cpp
 {
