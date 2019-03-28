@@ -86,6 +86,11 @@ void MarchHardwareInterface::init()
                   << ", " << softLimits.max_position << "). Actual position: " << joint_position_[i];
       throw ::std::invalid_argument(errorStream.str());
     }
+
+    // Create velocity joint interface
+    JointHandle jointVelocityHandle(jointStateHandle, &joint_velocity_command_[i]);
+    velocity_joint_interface_.registerHandle(jointVelocityHandle);
+
     // Create effort joint interface
     JointHandle jointEffortHandle(jointStateHandle, &joint_effort_command_[i]);
     effort_joint_interface_.registerHandle(jointEffortHandle);
