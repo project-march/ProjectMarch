@@ -3,7 +3,7 @@
   <name>march_hardware</name>
   <version>0.0.0</version>
   <description>
-    C++ package for interfacing with March4 hardware.
+    C++ library to interface with the March4 hardware.
   </description>
 
   <maintainer email="software@projectmarch.nl">Project March</maintainer>

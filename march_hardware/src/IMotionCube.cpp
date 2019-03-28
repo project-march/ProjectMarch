@@ -182,6 +182,11 @@ bool IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
 
 void IMotionCube::actuateRad(float targetRad)
 {
+  if (std::abs(targetRad - this->getAngleRad()) > 0.2)
+  {
+    ROS_ERROR("Target %f exceeds max difference of 0.2 from current %f", targetRad, this->getAngleRad());
+    return;
+  }
   this->actuateIU(this->encoder.RadtoIU(targetRad));
 }
 
@@ -211,7 +216,8 @@ void IMotionCube::actuateRadFixedSpeed(float targetRad, float radPerSec)
   {
     float index = i;
     float calculatedTarget = currentRad + (index / cycles * distance);
-    ROS_INFO_STREAM(calculatedTarget);
+    ROS_INFO_STREAM("Target: " << calculatedTarget);
+    ROS_INFO_STREAM("Current: " << this->getAngleRad());
     usleep(static_cast<__useconds_t>(1000000 / resolution));
     this->actuateRad(calculatedTarget);
   }
@@ -230,8 +236,8 @@ void IMotionCube::actuateIU(int targetIU)
 
   uint8 targetPositionLocation = 2;  // TODO(Isha Martijn) make this dynamic
 
-  ROS_INFO("Trying to actuate slave %d, soem location %d to targetposition %d", this->slaveIndex,
-           targetPositionLocation, targetPosition.i);
+  ROS_DEBUG("Trying to actuate slave %d, soem location %d to targetposition %d", this->slaveIndex,
+                    targetPositionLocation, targetPosition.i);
   set_output_bit32(this->slaveIndex, targetPositionLocation, targetPosition);
 }
 
