@@ -12,25 +12,13 @@ HardwareBuilder::HardwareBuilder() {
 }
 
 march4cpp::Encoder HardwareBuilder::createEncoder(YAML::Node config) {
-    if(config["encoder"]["resolution"].Type() == YAML::NodeType::Undefined){
-        throw MissingKeyException("resolution", "encoder");
+    std::vector<std::string> required_keys = {"resolution", "minPositionIU", "maxPositionIU", "zeroPositionIU", "safetyMarginRad"};
+    for(std::vector<std::string>::size_type i = 0; i != required_keys.size(); i++) {
+        if(config["encoder"][required_keys.at(i)].Type() == YAML::NodeType::Undefined){
+            throw MissingKeyException(required_keys.at(i), "encoder");
+        }
     }
 
-    if(config["encoder"]["minPositionIU"].Type() == YAML::NodeType::Undefined){
-        throw MissingKeyException("minPositionIU", "encoder");
-    }
-
-    if(config["encoder"]["maxPositionIU"].Type() == YAML::NodeType::Undefined){
-        throw MissingKeyException("maxPositionIU", "encoder");
-    }
-
-    if(config["encoder"]["zeroPositionIU"].Type() == YAML::NodeType::Undefined){
-        throw MissingKeyException("zeroPositionIU", "encoder");
-    }
-
-    if(config["encoder"]["safetyMarginRad"].Type() == YAML::NodeType::Undefined){
-        throw MissingKeyException("safetyMarginRad", "encoder");
-    }
     int resolution = config["encoder"]["resolution"].as<int>();
     int minPositionIU = config["encoder"]["minPositionIU"].as<int>();
     int maxPositionIU = config["encoder"]["maxPositionIU"].as<int>();
