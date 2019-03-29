@@ -12,7 +12,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <ros/ros.h>
 #include <march_hardware_interface/march_hardware.h>
-#include <march_hardware/March4.h>
+#include <march_hardware/MarchRobot.h>
 
 using namespace hardware_interface;
 using joint_limits_interface::JointLimits;
@@ -54,7 +54,7 @@ public:
   void write(ros::Duration elapsed_time);
 
 protected:
-  ::march4cpp::MARCH4 march;
+  ::march4cpp::MarchRobot march;
   ros::NodeHandle nh_;
   ros::Timer non_realtime_loop_;
   ros::Duration control_period_;

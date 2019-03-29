@@ -1,4 +1,5 @@
 // Copyright 2019 Project March.
+
 #ifndef MARCH4CPP__MARCH4_H
 #define MARCH4CPP__MARCH4_H
 
@@ -12,16 +13,22 @@
 
 namespace march4cpp
 {
-class MARCH4
+class MarchRobot
 {
 private:
   std::unique_ptr<EthercatMaster> ethercatMaster;
 
+  enum class AllowedRobot
+  {
+    testsetup,
+    march4,
+    march3
+  };
+
 public:
-  // TODO(Isha, Tim) remove
   ::std::vector<Joint> jointList;
 
-  MARCH4();
+  MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int ecatCycleTime);
 
   void startEtherCAT();
 

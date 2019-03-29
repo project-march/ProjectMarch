@@ -8,14 +8,14 @@
 #include <bitset>
 
 #include <march_hardware/Joint.h>
-#include <march_hardware/March4.h>
+#include <march_hardware/MarchRobot.h>
 #include "sensor_msgs/JointState.h"
 #include <march_hardware/EtherCAT/EthercatIO.h>
 #include <march_hardware/EtherCAT/EthercatSDO.h>
 
 int main(int argc, char** argv)
 {
-  march4cpp::MARCH4 march4 = march4cpp::MARCH4();
+  march4cpp::MarchRobot march4 = march4cpp::MarchRobot();
   march4.startEtherCAT();
 
   if (!march4.isEthercatOperational())

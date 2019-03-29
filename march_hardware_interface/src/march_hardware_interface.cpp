@@ -8,7 +8,7 @@
 
 #include <march_hardware_interface/march_hardware_interface.h>
 
-#include <march_hardware/March4.h>
+#include <march_hardware/MarchRobot.h>
 
 using joint_limits_interface::JointLimits;
 using joint_limits_interface::SoftJointLimits;
@@ -33,7 +33,10 @@ MarchHardwareInterface::~MarchHardwareInterface()
 void MarchHardwareInterface::init()
 {
   // Start ethercat cycle in the hardware
-  this->march = march4cpp::MARCH4();
+  this->march = march4cpp::MarchRobot();
+
+  this->march = HardwareBuilder.createFromName("march3")
+
   this->march.startEtherCAT();
 
   if (!this->march.isEthercatOperational())

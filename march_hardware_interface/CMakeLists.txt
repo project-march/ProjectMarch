@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   controller_manager
   march_hardware
+  march_hardware_configuration_parser
 )
 
 catkin_package(

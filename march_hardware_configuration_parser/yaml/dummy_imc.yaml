@@ -1,3 +1,4 @@
+slaveIndex: 2
 encoder:
   resolution: 16
   minPositionIU: 22134
