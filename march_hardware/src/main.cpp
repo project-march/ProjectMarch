@@ -6,6 +6,7 @@
 #include <ros/ros.h>
 
 #include <bitset>
+#include <map>
 
 #include <march_hardware/Joint.h>
 #include <march_hardware/March4.h>
@@ -22,7 +23,14 @@ int main(int argc, char** argv)
     pdoMapMISO.addObject("ActualPosition");
     pdoMapMISO.addObject("DCLinkVoltage");
     pdoMapMISO.addObject("DetailedErrorRegister");
-    pdoMapMISO.map(1, march4cpp::dataDirection::miso);
+    std::map<std::string, int> map = pdoMapMISO.map(1, march4cpp::dataDirection::miso);
+
+    //print map
+    ROS_INFO("Byte offsets:");
+    std::map<std::string, int>::iterator i;
+    for (i = map.begin(); i != map.end(); i++){
+        ROS_INFO("%s byte offset: %i", i->first.c_str(), i->second);
+    }
 
 //   march4cpp::MARCH4 march4 = march4cpp::MARCH4();
 //   march4.startEtherCAT();

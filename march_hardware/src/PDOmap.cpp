@@ -16,7 +16,7 @@ void PDOmap::addObject(std::string objectname){
     }
 }
 
-void PDOmap::map(int slaveIndex, enum dataDirection direction){
+std::map<std::string, int> PDOmap::map(int slaveIndex, enum dataDirection direction){
     // Sort PDOObjects map
     this->sortPDOObjects();
     int reg;
@@ -34,11 +34,12 @@ void PDOmap::map(int slaveIndex, enum dataDirection direction){
     }
     // Clear SyncManager Object
     // sdo_bit8(slaveIndex, SMAddress, 0, 0);
-    ROS_INFO("sdo write: slaveindex %i, reg 0x%X, subindex 0, value 0", slaveIndex, SMAddress);
+    ROS_INFO("sdo write: slaveindex %i, reg 0x%X, subindex 0, value 0x0", slaveIndex, SMAddress);
     int startReg = reg;
     int lastFilledReg = reg;
     int sizeleft = 64;
     int counter = 0;
+    int byteOffset = 0;
     while(this->sortedPDOObjects.size() > 0){
         // Check if register is still empty
         if(sizeleft == 64){
@@ -54,6 +55,8 @@ void PDOmap::map(int slaveIndex, enum dataDirection direction){
         // this->combineAddressLength(instruction.second.address, instruction.second.length));
         ROS_INFO("sdo write: slaveIndex %i, reg 0x%X, subindex %i, value 0x%X",
                 slaveIndex, reg, counter, this->combineAddressLength(nextObject.second.address, nextObject.second.length));
+        this->byteOffsets[nextObject.first] = byteOffset;
+        byteOffset += nextObject.second.length/8;
         sizeleft -= nextObject.second.length;
         // Check if this was the last object
         if (this->sortedPDOObjects.size() == 0){
@@ -85,7 +88,7 @@ void PDOmap::map(int slaveIndex, enum dataDirection direction){
     }
     // sdo_bit8(slaveIndex, SMAddress, 0, count);
     ROS_INFO("sdo write: slaveindex %i, reg 0x%X, subindex 0, value 0x%X", slaveIndex, SMAddress, count);
-
+    return this->byteOffsets;
 }
 
 void PDOmap::sortPDOObjects(){
@@ -122,6 +125,10 @@ void PDOmap::initAllObjects(){
     this->allObjects["MotionErrorRegister"] = IMCObject(0x2000, 16);
     this->allObjects["DetailedErrorRegister"] = IMCObject(0x2002, 16);
     this->allObjects["DCLinkVoltage"] = IMCObject(0x2055, 16);
+    this->allObjects["DriveTemperature"] = IMCObject(0x2058, 16);
+    this->allObjects["ActualTorque"] = IMCObject(0x6077, 16);
+    this->allObjects["CurrentLimit"] = IMCObject(0x207F, 16);
+    this->allObjects["MotorPosition"] = IMCObject(0x2088, 32);
     // etc...
 }
 

@@ -35,7 +35,8 @@ public:
     PDOmap();
 
     void addObject(std::string objectname);
-    void map(int slaveIndex, enum dataDirection direction);
+    std::map<std::string, int> map(int slaveIndex, enum dataDirection direction);
+
 
 private:
     void initAllObjects();
@@ -44,6 +45,7 @@ private:
     std::map<std::string, IMCObject> PDOObjects;
     std::map<std::string, IMCObject> allObjects;
     std::vector<std::pair<std::string, IMCObject>> sortedPDOObjects;
+    std::map<std::string, int> byteOffsets;
 
     const int bitsPerReg = 64;
     const int nrofRegs = 4;
