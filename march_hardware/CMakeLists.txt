@@ -64,6 +64,7 @@ add_library(march4cpp
         include/${PROJECT_NAME}/Slave.h
         include/${PROJECT_NAME}/TemperatureGES.h
         include/${PROJECT_NAME}/TemperatureSensor.h
+        include/${PROJECT_NAME}/PDOmap.h
         src/EtherCAT/EthercatIO.cpp
         src/EtherCAT/EthercatMaster.cpp
         src/EtherCAT/EthercatSDO.cpp
@@ -72,6 +73,7 @@ add_library(march4cpp
         src/Joint.cpp
         src/March4.cpp
         src/TemperatureGES.cpp
+        src/PDOmap.cpp
         src/main.cpp)
 
 target_link_libraries(march4cpp ${catkin_LIBRARIES})

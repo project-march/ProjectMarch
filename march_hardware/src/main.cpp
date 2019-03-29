@@ -12,14 +12,17 @@
 #include "sensor_msgs/JointState.h"
 #include <march_hardware/EtherCAT/EthercatIO.h>
 #include <march_hardware/EtherCAT/EthercatSDO.h>
+#include <march_hardware/PDOmap.h>
 
 int main(int argc, char** argv)
 {
 
-    PDOmap pdoMapMISO();
+    march4cpp::PDOmap pdoMapMISO = march4cpp::PDOmap();
     pdoMapMISO.addObject("StatusWord");
     pdoMapMISO.addObject("ActualPosition");
-    pdoMapMISO.mapMISO();
+    pdoMapMISO.addObject("DCLinkVoltage");
+    pdoMapMISO.addObject("DetailedErrorRegister");
+    pdoMapMISO.mapMISO(1);
 
 //   march4cpp::MARCH4 march4 = march4cpp::MARCH4();
 //   march4.startEtherCAT();

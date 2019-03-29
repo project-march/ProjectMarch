@@ -27,11 +27,11 @@ void IMotionCube::writeInitialSDOs(int ecatCycleTime)
 bool IMotionCube::mapPDOs()
 {
   // TODO(Martijn) Refactor this into something more readable and modular
-  PDOmap pdoMapMISO();
-
-  pdoMapMISO.addObject("StatusWord");
-
-  pdoMapMISO.mapIMC();
+//  PDOmap pdoMapMISO();
+//
+//  pdoMapMISO.addObject("StatusWord");
+//
+//  pdoMapMISO.mapIMC();
 
 
 
