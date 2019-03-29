@@ -15,21 +15,17 @@ namespace march4cpp
 {
 MARCH4::MARCH4()
 {
-//                        0    1    2    3    4    5    6    7    8    9    10   11   12   13
-//      LIST_OF_SLAVES: [MAS, PDB, BPG, LHJ, LUG, LKJ, LLG, LAJ, RHJ, RUG, RKJ, RLG, RAJ, IPD]
-  // TODO(Isha, Martijn) double-check these numbers.
+  Encoder RHJenc = Encoder(16, 22134, 43436, 24515, 0.05);
+  Encoder LHJenc = Encoder(16, 9746, 31557, 11830, 0.05);
 
-    Encoder RHJenc = Encoder(16, 22134, 43436, 24515, 0.05); // Calibrated
-    Encoder LHJenc = Encoder(16, 9746, 31557, 11830, 0.05); // Calibrated
+  Encoder RKJenc = Encoder(16, 18120, 39941, 19000, 0.05);
+  Encoder LKJenc = Encoder(16, 21924, 43734, 22552, 0.05);
 
-    Encoder RKJenc = Encoder(16, 18120, 39941, 19000, 0.05); // Calibrated
-    Encoder LKJenc = Encoder(16, 21924, 43734, 22552, 0.05);
+  Encoder RAJenc = Encoder(12, 1086, 1490, 1301, 0.005);
+  Encoder LAJenc = Encoder(12, 631, 1022, 918, 0.005);
 
-    Encoder RAJenc = Encoder(12, 1086, 1490, 1301, 0.005);
-    Encoder LAJenc = Encoder(12, 631, 1022, 918, 0.005);
-
-    IMotionCube LHJimc = IMotionCube(3, LHJenc);
-    IMotionCube LKJimc = IMotionCube(5, LKJenc);
+  IMotionCube LHJimc = IMotionCube(3, LHJenc);
+  IMotionCube LKJimc = IMotionCube(5, LKJenc);
   IMotionCube LAJimc = IMotionCube(7, LAJenc);
   IMotionCube RHJimc = IMotionCube(8, RHJenc);
   IMotionCube RKJimc = IMotionCube(10, RKJenc);
@@ -75,7 +71,6 @@ void MARCH4::startEtherCAT()
 
 void MARCH4::stopEtherCAT()
 {
-
   if (!ethercatMaster->isOperational)
   {
     ROS_ERROR("Trying to stop EtherCAT while it is not active.");
