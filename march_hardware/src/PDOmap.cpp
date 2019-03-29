@@ -16,57 +16,95 @@ void PDOmap::addObject(std::string objectname){
     }
 }
 
-void PDOmap::mapMISO(int slaveIndex){
+void PDOmap::map(int slaveIndex, enum dataDirection direction){
     // Sort PDOObjects map
     this->sortPDOObjects();
-    // Place into PDO registers of IMC
-    int reg = 0x1A00;
+    int reg;
+    int SMAddress;
+    if(direction == dataDirection::miso){
+        reg = 0x1A00;
+        SMAddress = 0x1C13;
+    }
+    else if(direction == dataDirection::mosi){
+        reg = 0x1600;
+        SMAddress = 0x1C12;
+    }
+    else{
+        ROS_ERROR("Invalid dataDirection argument");
+    }
+    // Clear SyncManager Object
+    // sdo_bit8(slaveIndex, SMAddress, 0, 0);
+    ROS_INFO("sdo write: slaveindex %i, reg 0x%X, subindex 0, value 0", slaveIndex, SMAddress);
+    int startReg = reg;
+    int lastFilledReg = reg;
     int sizeleft = 64;
     int counter = 0;
-    // sdo_write(slaveIndex, reg, 0, 0);
-    ROS_INFO("sdo write: slaveIndex %i, reg 0x%X, subindex 0, value 0x0", slaveIndex, reg);
     while(this->sortedPDOObjects.size() > 0){
-        // Get next instruction (from end, because sorted from small to large)
-        std::pair<std::string, IMCObject> instruction = this->sortedPDOObjects.back();
+        // Check if register is still empty
+        if(sizeleft == 64){
+            // sdo_write(slaveIndex, reg, 0, 0);
+            ROS_INFO("sdo write: slaveIndex %i, reg 0x%X, subindex 0, value 0x0", slaveIndex, reg);
+        }
+        // Get next object (from end, because sorted from small to large)
+        std::pair<std::string, IMCObject> nextObject = this->sortedPDOObjects.back();
         this->sortedPDOObjects.pop_back();
-        if (sizeleft <= 0){
-            // Go to the next register
+        // Add next object to map
+        counter++;
+        // sdo_write(slaveIndex, reg, counter,
+        // this->combineAddressLength(instruction.second.address, instruction.second.length));
+        ROS_INFO("sdo write: slaveIndex %i, reg 0x%X, subindex %i, value 0x%X",
+                slaveIndex, reg, counter, this->combineAddressLength(nextObject.second.address, nextObject.second.length));
+        sizeleft -= nextObject.second.length;
+        // Check if this was the last object
+        if (this->sortedPDOObjects.size() == 0){
+            // sdo_write(slaveIndex, reg, 0, counter);
+            ROS_INFO("sdo write: slaveIndex %i, reg 0x%X, subindex 0, value 0x%X", slaveIndex, reg, counter);
+            lastFilledReg = reg;
+            reg++;
+        }
+        // else, check if register is full
+        else if (sizeleft <= 0){
             // sdo_write(slaveIndex, reg, 0, counter);
             ROS_INFO("sdo write: slaveIndex %i, reg 0x%X, subindex 0, value 0x%X", slaveIndex, reg, counter);
             reg++;
             counter = 0;
             sizeleft = 64;
-            // sdo_write(slaveIndex, reg, 0, 0);
-            ROS_INFO("sdo write: slaveIndex %i, reg 0x%X, subindex 0, value 0x0", slaveIndex, reg);
         }
-        counter++;
-        // sdo_write(slaveIndex, reg, counter, this->combineAddressLength(instruction.second.address, instruction.second.length));
-        ROS_INFO("sdo write: slaveIndex %i, reg 0x%X, subindex %i, value 0x%X", slaveIndex, reg, counter, this->combineAddressLength(instruction.second.address, instruction.second.length));
-        sizeleft -= instruction.second.length;
     }
+    // For the unused registers, set count to zero
+    for(int i = reg; i < startReg + this->nrofRegs; i++){
+        // sdo_write(slaveIndex, i, 0, 0);
+        ROS_INFO("sdo write: slaveIndex %i, reg 0x%X, subindex 0, value 0x0", slaveIndex, i);
+    }
+    // For all filled registers, set data to Sync Manager object
+    int count = 0;
+    for(int i = startReg; i <= lastFilledReg; i++){
+        count++;
+        // sdo_bit16(slaveIndex, SMAddress, count, 0x1600);
+        ROS_INFO("sdo write: slaveindex %i, reg 0x%X, subindex %i, value 0x%X", slaveIndex, SMAddress, count, i);
+    }
+    // sdo_bit8(slaveIndex, SMAddress, 0, count);
+    ROS_INFO("sdo write: slaveindex %i, reg 0x%X, subindex 0, value 0x%X", slaveIndex, SMAddress, count);
 
 }
 
 void PDOmap::sortPDOObjects(){
     // Sort from small to large
-
-    //@TODO(Martijn) extract and make const globally.
-    int sizes[] = {8, 16, 32};
     int totalbits = 0;
-    for(int i = 0; i < (sizeof(sizes)/sizeof(sizes[0])); i++){
+    for(int i = 0; i < (sizeof(this->objectSizes)/sizeof(this->objectSizes[0])); i++){
         std::map<std::string, IMCObject>::iterator j;
         for (j = this->PDOObjects.begin(); j != this->PDOObjects.end(); j++){
-            if (j->second.length == sizes[i]){
+            if (j->second.length == this->objectSizes[i]){
                 std::pair<std::string, IMCObject> nextObject;
                 nextObject.first = j->first;
                 nextObject.second = j->second;
                 this->sortedPDOObjects.push_back(nextObject);
-                totalbits += sizes[i];
+                totalbits += this->objectSizes[i];
             }
         }
     }
     if(totalbits > this->nrofRegs*this->bitsPerReg){
-        ROS_ERROR("Too many objects in PDO Map (total bits %d, only %d allowed",
+        ROS_ERROR("Too many objects in PDO Map (total bits %d, only %d allowed)",
                 totalbits, this->nrofRegs*this->bitsPerReg);
     }
 }

@@ -22,7 +22,7 @@ int main(int argc, char** argv)
     pdoMapMISO.addObject("ActualPosition");
     pdoMapMISO.addObject("DCLinkVoltage");
     pdoMapMISO.addObject("DetailedErrorRegister");
-    pdoMapMISO.mapMISO(1);
+    pdoMapMISO.map(1, march4cpp::dataDirection::miso);
 
 //   march4cpp::MARCH4 march4 = march4cpp::MARCH4();
 //   march4.startEtherCAT();

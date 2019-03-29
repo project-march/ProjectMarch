@@ -8,6 +8,9 @@
 
 #include <ros/ros.h>
 
+#include <march_hardware/EtherCAT/EthercatSDO.h>
+
+
 namespace march4cpp
 {
 
@@ -21,9 +24,9 @@ struct IMCObject{
     }
 
     IMCObject(){};
-
-
 };
+
+enum class dataDirection {miso, mosi};
 
 class PDOmap
 {
@@ -32,8 +35,7 @@ public:
     PDOmap();
 
     void addObject(std::string objectname);
-    void mapMISO(int slaveIndex);
-    void mapMOSI(int slaveIndex);
+    void map(int slaveIndex, enum dataDirection direction);
 
 private:
     void initAllObjects();
@@ -45,6 +47,7 @@ private:
 
     const int bitsPerReg = 64;
     const int nrofRegs = 4;
+    const int objectSizes[3] = {8, 16, 32};
 
 };
 }
