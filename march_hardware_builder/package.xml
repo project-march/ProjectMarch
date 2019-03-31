@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>march_hardware_configuration_parser</name>
+  <name>march_hardware_builder</name>
   <version>0.0.0</version>
   <description>Generate hardware configuration from yaml files.</description>
 

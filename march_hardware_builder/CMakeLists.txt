@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(march_hardware_configuration_parser)
+project(march_hardware_builder)
 
 add_definitions(-std=c++11 -Wall -g)
 
@@ -17,7 +17,7 @@ catkin_package(
         CATKIN_DEPENDS
         roscpp
         LIBRARIES
-        march_hardware_configuration_parser
+        march_hardware_builder
 )
 
 # Roslinter
@@ -43,20 +43,20 @@ install(DIRECTORY include/${PROJECT_NAME}/
 
 
 
-add_library(march_hardware_configuration_parser
+add_library(march_hardware_builder
         include/${PROJECT_NAME}/HardwareBuilder.h
         include/${PROJECT_NAME}/HardwareConfigExceptions.h
         src/HardwareBuilder.cpp
         src/main.cpp
         )
 
-target_link_libraries(march_hardware_configuration_parser ${catkin_LIBRARIES} yaml-cpp)
+target_link_libraries(march_hardware_builder ${catkin_LIBRARIES} yaml-cpp)
 
 
-add_executable(hardware_configuration_parser_dummy src/main.cpp)
-target_link_libraries(hardware_configuration_parser_dummy march_hardware_configuration_parser yaml-cpp)
+add_executable(hardware_builder_dummy src/main.cpp)
+target_link_libraries(hardware_builder_dummy march_hardware_builder yaml-cpp)
 
-install(TARGETS march_hardware_configuration_parser
+install(TARGETS march_hardware_builder
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
@@ -66,5 +66,5 @@ install(TARGETS march_hardware_configuration_parser
 #if (CATKIN_ENABLE_TESTING)
 #    add_rostest_gtest(${PROJECT_NAME}-test
 #            )
-#    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march_hardware_configuration_parser gtest gmock)
+#    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march_hardware_builder gtest gmock)
 #endif ()

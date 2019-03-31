@@ -1,7 +1,7 @@
 // Copyright 2019 Project March.
 
-#include <march_hardware_configuration_parser/HardwareBuilder.h>
-#include <march_hardware_configuration_parser/HardwareConfigExceptions.h>
+#include <march_hardware_builder/HardwareBuilder.h>
+#include <march_hardware_builder/HardwareConfigExceptions.h>
 
 HardwareBuilder::HardwareBuilder()
 {
