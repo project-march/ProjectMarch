@@ -6,9 +6,10 @@
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <joint_limits_interface/joint_limits_rosparam.h>
 
-#include <march_hardware_interface/march_hardware_interface.h>
-
 #include <march_hardware/MarchRobot.h>
+
+
+#include <march_hardware_interface/march_hardware_interface.h>
 
 using joint_limits_interface::JointLimits;
 using joint_limits_interface::SoftJointLimits;
@@ -17,8 +18,9 @@ using joint_limits_interface::PositionJointSoftLimitsInterface;
 
 namespace march_hardware_interface
 {
-MarchHardwareInterface::MarchHardwareInterface(ros::NodeHandle& nh) : nh_(nh)
+MarchHardwareInterface::MarchHardwareInterface(ros::NodeHandle& nh, march4cpp::MarchRobot marchRobot) : nh_(nh), marchRobot(marchRobot)
 {
+    this->marchRobot = marchRobot;
   init();
   controller_manager_.reset(new controller_manager::ControllerManager(this, nh_));
   nh_.param("/march/hardware_interface/loop_hz", loop_hz_, 0.1);
@@ -33,13 +35,12 @@ MarchHardwareInterface::~MarchHardwareInterface()
 void MarchHardwareInterface::init()
 {
   // Start ethercat cycle in the hardware
-  this->march = march4cpp::MarchRobot();
 
-  this->march = HardwareBuilder.createFromName("march3")
 
-  this->march.startEtherCAT();
 
-  if (!this->march.isEthercatOperational())
+  this->marchRobot.startEtherCAT();
+
+  if (!this->marchRobot.isEthercatOperational())
   {
     ROS_FATAL("EtherCAT is not operational");
     exit(0);
@@ -60,7 +61,7 @@ void MarchHardwareInterface::init()
   // Initialize interfaces for each joint
   for (int i = 0; i < num_joints_; ++i)
   {
-    march4cpp::Joint joint = march.getJoint(joint_names_[i]);
+    march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
     // Create joint state interface
     JointStateHandle jointStateHandle(joint.getName(), &joint_position_[i], &joint_velocity_[i], &joint_effort_[i]);
     joint_state_interface_.registerHandle(jointStateHandle);
@@ -122,7 +123,7 @@ void MarchHardwareInterface::read()
 {
   for (int i = 0; i < num_joints_; i++)
   {
-    joint_position_[i] = march.getJoint(joint_names_[i]).getAngleRad();
+    joint_position_[i] = marchRobot.getJoint(joint_names_[i]).getAngleRad();
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(), joint_position_[i]);
   }
 }
@@ -135,7 +136,7 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
   {
     ROS_DEBUG("After limits: Trying to actuate joint %s, to %lf rad, %f speed, %f effort.", joint_names_[i].c_str(),
              joint_position_command_[i], joint_velocity_command_[i], joint_effort_command_[i]);
-    march.getJoint(joint_names_[i]).actuateRad(static_cast<float>(joint_position_command_[i]));
+      marchRobot.getJoint(joint_names_[i]).actuateRad(static_cast<float>(joint_position_command_[i]));
   }
 }
 }  // namespace march_hardware_interface

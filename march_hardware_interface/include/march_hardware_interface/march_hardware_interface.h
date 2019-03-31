@@ -33,7 +33,7 @@ static const double VELOCITY_STEP_FACTOR = 10;
 class MarchHardwareInterface : public march_hardware_interface::MarchHardware
 {
 public:
-  MarchHardwareInterface(ros::NodeHandle& nh);
+  MarchHardwareInterface(ros::NodeHandle& nh, march4cpp::MarchRobot marchRobot);
   ~MarchHardwareInterface();
 
   /**
@@ -54,7 +54,7 @@ public:
   void write(ros::Duration elapsed_time);
 
 protected:
-  ::march4cpp::MarchRobot march;
+  ::march4cpp::MarchRobot marchRobot;
   ros::NodeHandle nh_;
   ros::Timer non_realtime_loop_;
   ros::Duration control_period_;

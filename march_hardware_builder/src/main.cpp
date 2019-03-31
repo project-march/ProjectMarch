@@ -4,7 +4,7 @@
 
 int main (int argc, char* argv[])
 {
-    YAML::Node config = YAML::LoadFile("/home/ishadijcks/march-iv/march_ws/src/hardware-interface/march_hardware_builder/yaml/dummy_joint.yaml");
+    YAML::Node config = YAML::LoadFile("<march_hardware_builder/yaml/dummy_joint.yaml>");
 
 
     HardwareBuilder hardwareBuilder = HardwareBuilder();

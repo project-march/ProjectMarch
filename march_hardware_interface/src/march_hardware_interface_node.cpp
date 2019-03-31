@@ -7,7 +7,8 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
   ros::AsyncSpinner spinner(1);
   spinner.start();
-  march_hardware_interface::MarchHardwareInterface march(nh);
+
+  march_hardware_interface::MarchHardwareInterface march(nh, );
   ros::spin();
   return 0;
 }

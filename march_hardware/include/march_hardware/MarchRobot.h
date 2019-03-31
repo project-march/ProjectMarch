@@ -18,13 +18,6 @@ class MarchRobot
 private:
   std::unique_ptr<EthercatMaster> ethercatMaster;
 
-  enum class AllowedRobot
-  {
-    testsetup,
-    march4,
-    march3
-  };
-
 public:
   ::std::vector<Joint> jointList;
 
