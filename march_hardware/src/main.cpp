@@ -4,10 +4,8 @@
 #include <unistd.h>
 
 #include <ros/ros.h>
-#include <ros/console.h>
 
 #include <bitset>
-#include <map>
 
 #include <march_hardware/Joint.h>
 #include <march_hardware/March4.h>
@@ -18,65 +16,50 @@
 
 int main(int argc, char** argv)
 {
-    ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
 
-    march4cpp::PDOmap pdoMapMISO = march4cpp::PDOmap();
-    pdoMapMISO.addObject(march4cpp::IMCObjectName::StatusWord);
-    pdoMapMISO.addObject(march4cpp::IMCObjectName::ActualPosition);
-    pdoMapMISO.addObject(march4cpp::IMCObjectName::DCLinkVoltage);
-    pdoMapMISO.addObject(march4cpp::IMCObjectName::DetailedErrorRegister);
-    pdoMapMISO.addObject(march4cpp::IMCObjectName::ActualPosition);
-    std::map<enum march4cpp::IMCObjectName, int> misoByteOffsets = pdoMapMISO.map(1, march4cpp::dataDirection::miso);
+   march4cpp::MARCH4 march4 = march4cpp::MARCH4();
+   march4.startEtherCAT();
 
+   if (!march4.isEthercatOperational())
+   {
+     ROS_FATAL("EtherCAT is not operational");
+     return 0;
+   }
 
-    march4cpp::PDOmap pdoMapMOSI = march4cpp::PDOmap();
-    pdoMapMOSI.addObject(march4cpp::IMCObjectName::ControlWord);
-    pdoMapMOSI.addObject(march4cpp::IMCObjectName::TargetPosition);
-    std::map<enum march4cpp::IMCObjectName, int> mosiByteOffsets  = pdoMapMOSI.map(3, march4cpp::dataDirection::mosi);
+   ros::init(argc, argv, "dummy");
+   ros::NodeHandle nh;
+   ros::Rate rate(10);
 
-//   march4cpp::MARCH4 march4 = march4cpp::MARCH4();
-//   march4.startEtherCAT();
+   // Uncomment to allow actuation.
+   march4.getJoint("test_joint").getIMotionCube().goToOperationEnabled();
+   ROS_INFO("march4 initialized");
 
-//   if (!march4.isEthercatOperational())
-//   {
-//     ROS_FATAL("EtherCAT is not operational");
-//     return 0;
-//   }
+   ROS_INFO_STREAM("Angle: " << march4.getJoint("test_joint").getAngleRad());
+   march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(0.6, 0.1);
+   march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(1, 0.2);
+   march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(0.6, 0.3);
 
-//   ros::init(argc, argv, "dummy");
-//   ros::NodeHandle nh;
-//   ros::Rate rate(10);
+   // Publish and print joint position
+   //    ros::Publisher pub = nh.advertise<sensor_msgs::JointState>("march/joint_states", 5);
+   //    angleVal = march4.getJoint("test_joint").getAngleRad();
+   //    printf("imc get: %f\n", angleVal);
+   //    sensor_msgs::JointState joint_state;
+   //    joint_state.header.stamp = ros::Time::now();
+   //    joint_state.name = {"test_joint"};
+   //    joint_state.position = {angleVal};
+   //    pub.publish(joint_state);
 
-//   // Uncomment to allow actuation.
-//   march4.getJoint("test_joint").getIMotionCube().goToOperationEnabled();
-//   ROS_INFO("march4 initialized");
+   // Print final status
+   sleep(1);
+   march4.getJoint("test_joint")
+       .getIMotionCube()
+       .parseStatusWord(march4.getJoint("test_joint").getIMotionCube().getStatusWord());
+   march4.getJoint("test_joint")
+       .getIMotionCube()
+       .parseMotionError(march4.getJoint("test_joint").getIMotionCube().getMotionError());
+   march4.getJoint("test_joint")
+       .getIMotionCube()
+       .parseDetailedError(march4.getJoint("test_joint").getIMotionCube().getDetailedError());
 
-//   ROS_INFO_STREAM("Angle: " << march4.getJoint("test_joint").getAngleRad());
-//   march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(0.6, 0.1);
-//   march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(1, 0.2);
-//   march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(0.6, 0.3);
-
-//   // Publish and print joint position
-//   //    ros::Publisher pub = nh.advertise<sensor_msgs::JointState>("march/joint_states", 5);
-//   //    angleVal = march4.getJoint("test_joint").getAngleRad();
-//   //    printf("imc get: %f\n", angleVal);
-//   //    sensor_msgs::JointState joint_state;
-//   //    joint_state.header.stamp = ros::Time::now();
-//   //    joint_state.name = {"test_joint"};
-//   //    joint_state.position = {angleVal};
-//   //    pub.publish(joint_state);
-
-//   // Print final status
-//   sleep(1);
-//   march4.getJoint("test_joint")
-//       .getIMotionCube()
-//       .parseStatusWord(march4.getJoint("test_joint").getIMotionCube().getStatusWord());
-//   march4.getJoint("test_joint")
-//       .getIMotionCube()
-//       .parseMotionError(march4.getJoint("test_joint").getIMotionCube().getMotionError());
-//   march4.getJoint("test_joint")
-//       .getIMotionCube()
-//       .parseDetailedError(march4.getJoint("test_joint").getIMotionCube().getDetailedError());
-
-//   march4.stopEtherCAT();
+   march4.stopEtherCAT();
 }
