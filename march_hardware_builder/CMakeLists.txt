@@ -69,6 +69,7 @@ if (CATKIN_ENABLE_TESTING)
     add_rostest_gtest(${PROJECT_NAME}-test
             test/march_hardware_builder.test
             test/TestRunner.cpp
+            test/TestAllowedRobots.cpp
             test/TestHardwareBuilderCreateEncoder.cpp
             test/TestHardwareBuilderCreateIMotionCube.cpp
             test/TestHardwareBuilderCreateJoint.cpp

@@ -22,7 +22,7 @@ HardwareBuilder::HardwareBuilder() = default;
 march4cpp::MarchRobot HardwareBuilder::createMarchRobot(YAML::Node marchRobotConfig)
 {
   std::string robotName = marchRobotConfig.begin()->first.as<std::string>();
-  ROS_INFO("Starting creation of robot %s", robotName.c_str());
+  ROS_INFO("Started creation of robot %s", robotName.c_str());
 
   std::string ifName = marchRobotConfig[robotName]["ifName"].as<std::string>();
   int ecatCycleTime = marchRobotConfig[robotName]["ecatCycleTime"].as<int>();
@@ -142,11 +142,11 @@ std::string HardwareBuilder::getFilePathFromRobot(AllowedRobot robotName)
   switch (robotName)
   {
     case AllowedRobot::testsetup:
-      return basePath.append("/src/robots/testsetup.yaml");
+      return basePath.append("/src/robots/test_setup.yaml");
     case AllowedRobot::march3:
       return basePath.append("/src/robots/march3.yaml");
     default:
-      ROS_ERROR_STREAM("Robotname not implemented. Using march3.yaml...");
+      ROS_ERROR("Robotname not implemented. Using march3.yaml...");
       return basePath.append("/src/robots/march3.yaml");
   }
 }

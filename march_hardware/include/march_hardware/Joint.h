@@ -40,6 +40,11 @@ public:
   {
     return lhs.name == rhs.name && lhs.iMotionCube == rhs.iMotionCube && lhs.temperatureGES == rhs.temperatureGES;
   }
+
+  friend bool operator!=(const Joint& lhs, const Joint& rhs)
+  {
+    return !(lhs == rhs);
+  }
   /** @brief Override stream operator for clean printing */
   friend ::std::ostream& operator<<(std::ostream& os, const Joint& joint)
   {
