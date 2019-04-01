@@ -39,7 +39,9 @@ enum class IMCObjectName {  StatusWord,
                             CurrentLimit,
                             MotorPosition,
                             ControlWord,
-                            TargetPosition};
+                            TargetPosition,
+                            QuickStopDeceleration,
+                            QuickStopOption};
 
 class PDOmap
 {

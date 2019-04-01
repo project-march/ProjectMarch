@@ -22,7 +22,7 @@ void IMotionCube::writeInitialSDOs(int ecatCycleTime)
   writeInitialSettings(ecatCycleTime);
 }
 
-// Map Process Data Object by sending SDOs to the IMC
+// Map Process Data Object (PDO) by sending SDOs to the IMC
 void IMotionCube::mapPDOs()
 {
   PDOmap pdoMapMISO = PDOmap();
@@ -42,7 +42,7 @@ void IMotionCube::mapPDOs()
 bool IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
 {
   bool success = true;
-
+  // sdo_bit32(slaveIndex, address, subindex, value);
   // mode of operation
   success &= sdo_bit8(slaveIndex, 0x6060, 0, 8);
 

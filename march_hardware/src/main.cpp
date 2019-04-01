@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include <ros/ros.h>
+#include <ros/console.h>
 
 #include <bitset>
 #include <map>
@@ -17,13 +18,21 @@
 
 int main(int argc, char** argv)
 {
+    ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
 
     march4cpp::PDOmap pdoMapMISO = march4cpp::PDOmap();
     pdoMapMISO.addObject(march4cpp::IMCObjectName::StatusWord);
     pdoMapMISO.addObject(march4cpp::IMCObjectName::ActualPosition);
     pdoMapMISO.addObject(march4cpp::IMCObjectName::DCLinkVoltage);
     pdoMapMISO.addObject(march4cpp::IMCObjectName::DetailedErrorRegister);
-    std::map<enum march4cpp::IMCObjectName, int> byteOffsets = pdoMapMISO.map(1, march4cpp::dataDirection::miso);
+    pdoMapMISO.addObject(march4cpp::IMCObjectName::ActualPosition);
+    std::map<enum march4cpp::IMCObjectName, int> misoByteOffsets = pdoMapMISO.map(1, march4cpp::dataDirection::miso);
+
+
+    march4cpp::PDOmap pdoMapMOSI = march4cpp::PDOmap();
+    pdoMapMOSI.addObject(march4cpp::IMCObjectName::ControlWord);
+    pdoMapMOSI.addObject(march4cpp::IMCObjectName::TargetPosition);
+    std::map<enum march4cpp::IMCObjectName, int> mosiByteOffsets  = pdoMapMOSI.map(3, march4cpp::dataDirection::mosi);
 
 //   march4cpp::MARCH4 march4 = march4cpp::MARCH4();
 //   march4.startEtherCAT();

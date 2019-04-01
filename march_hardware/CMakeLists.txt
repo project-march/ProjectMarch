@@ -99,6 +99,7 @@ if (CATKIN_ENABLE_TESTING)
             test/TestIMotionCube.cpp
             test/TestTemperatureGES.cpp
             test/TestJoint.cpp
+            test/TestPDOmap.cpp
             test/mocks/MockTemperatureGES.cpp
             test/mocks/MockTemperatureSensor.cpp
             test/mocks/MockEncoder.cpp
