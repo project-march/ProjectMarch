@@ -7,6 +7,7 @@ add_definitions(-std=c++11 -Wall -g)
 find_package(catkin REQUIRED COMPONENTS
         roscpp
         roslint
+        roslib
         rostest
         march_hardware
         )
