@@ -127,8 +127,7 @@ std::string HardwareBuilder::getFilePathFromRobot(AllowedRobot robotName)
     case AllowedRobot::testsetup:
       return "test";
     case AllowedRobot::march3:
-      return "/home/projectmarch/Documents/march-iv/march_ws/src/hardware-interface/march_hardware_builder/src/"
-             "march3.yaml";
+      return "";
     default:
       return "";
   }

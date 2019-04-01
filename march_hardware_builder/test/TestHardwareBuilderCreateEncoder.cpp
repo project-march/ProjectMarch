@@ -87,3 +87,11 @@ TEST_F(EncoderTest, NoSafetyMargin)
 
     ASSERT_THROW(hardwareBuilder.createEncoder(encoderConfig), MissingKeyException);
 }
+
+TEST_F(EncoderTest, IncorrectResolution)
+{
+    std::string fullPath = this->fullPath("/encoder_incorrect_resolution.yaml");
+    YAML::Node encoderConfig = YAML::LoadFile(fullPath);
+
+    ASSERT_DEATH(hardwareBuilder.createEncoder(encoderConfig), "Encoder resolution of -1 is not within range \\(0, 32\\)");
+}
