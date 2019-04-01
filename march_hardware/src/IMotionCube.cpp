@@ -227,8 +227,8 @@ void IMotionCube::actuateIU(int targetIU)
 {
   if (!this->encoder.isValidTargetPositionIU(targetIU))
   {
-    ROS_ERROR("Position %i is invalid. (%d, %d)", targetIU,
-            this->encoder.getMinPositionIU(), this->encoder.getMaxPositionIU());
+    ROS_ERROR("Position %i is invalid. (%d, %d)", targetIU, this->encoder.getMinPositionIU(),
+              this->encoder.getMaxPositionIU());
     return;
   }
 
@@ -238,7 +238,7 @@ void IMotionCube::actuateIU(int targetIU)
   uint8 targetPositionLocation = 2;  // TODO(Isha Martijn) make this dynamic
 
   ROS_DEBUG("Trying to actuate slave %d, soem location %d to targetposition %d", this->slaveIndex,
-                    targetPositionLocation, targetPosition.i);
+            targetPositionLocation, targetPosition.i);
   set_output_bit32(this->slaveIndex, targetPositionLocation, targetPosition);
 }
 

@@ -23,6 +23,18 @@ public:
   };
 
   float getTemperature() override;
+
+  /** @brief Override comparison operator */
+  friend bool operator==(const TemperatureGES& lhs, const TemperatureGES& rhs)
+  {
+    return lhs.slaveIndex == rhs.slaveIndex && lhs.byteOffset == rhs.byteOffset;
+  }
+  /** @brief Override stream operator for clean printing */
+  friend ::std::ostream& operator<<(std::ostream& os, const TemperatureGES& temperatureGes)
+  {
+    return os << "slaveIndex: " << temperatureGes.slaveIndex << ", "
+              << "byteOffset: " << temperatureGes.byteOffset;
+  }
 };
 }
 #endif
