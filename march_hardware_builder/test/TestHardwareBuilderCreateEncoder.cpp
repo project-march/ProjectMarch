@@ -21,7 +21,7 @@ protected:
     base_path = ros::package::getPath("march_hardware_builder").append("/test/yaml");
   }
 
-  std::string fullPath(std::string relativePath)
+  std::string fullPath(const std::string& relativePath)
   {
     return this->base_path.append(relativePath);
   }
