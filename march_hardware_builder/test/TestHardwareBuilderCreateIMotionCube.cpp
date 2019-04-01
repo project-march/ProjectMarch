@@ -27,6 +27,10 @@ protected:
   }
 };
 
+class IMotionCubeDeathTest : public IMotionCubeTest
+{
+};
+
 TEST_F(IMotionCubeTest, ValidIMotionCubeHip)
 {
   std::string fullPath = this->fullPath("/imotioncube_correct_1.yaml");
@@ -76,10 +80,6 @@ TEST_F(IMotionCubeTest, NoSlaveIndex)
 
   ASSERT_THROW(hardwareBuilder.createIMotionCube(iMotionCubeConfig), MissingKeyException);
 }
-
-class IMotionCubeDeathTest : public IMotionCubeTest
-{
-};
 
 TEST_F(IMotionCubeDeathTest, IncorrectSlaveIndex)
 {

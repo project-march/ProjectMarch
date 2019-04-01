@@ -27,6 +27,10 @@ protected:
   }
 };
 
+class EncoderDeathTest : public EncoderTest
+{
+};
+
 TEST_F(EncoderTest, ValidEncoderHip)
 {
   std::string fullPath = this->fullPath("/encoder_correct_1.yaml");
@@ -87,10 +91,6 @@ TEST_F(EncoderTest, NoSafetyMargin)
 
   ASSERT_THROW(hardwareBuilder.createEncoder(encoderConfig), MissingKeyException);
 }
-
-class EncoderDeathTest : public EncoderTest
-{
-};
 
 TEST_F(EncoderDeathTest, IncorrectResolution)
 {

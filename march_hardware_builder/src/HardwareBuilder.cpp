@@ -82,7 +82,7 @@ march4cpp::Joint HardwareBuilder::createJoint(YAML::Node jointConfig, std::strin
   }
 
   ROS_ASSERT_MSG(hasIMotionCube || hasTemperatureGes,
-                 "Joint %s has no IMotionCube and no TemperatureGES. Please check its purpose", jointName.c_str());
+                 "Joint %s has no IMotionCube and no TemperatureGES. Please check its purpose.", jointName.c_str());
   if (hasTemperatureGes && hasIMotionCube)
   {
     return march4cpp::Joint(jointName, temperatureGes, imc);
