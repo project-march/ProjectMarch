@@ -14,6 +14,10 @@
 
 namespace march4cpp
 {
+MarchRobot::MarchRobot()
+{
+}
+
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int ecatCycleTime)
 {
   this->jointList = jointList;

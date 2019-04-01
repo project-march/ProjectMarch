@@ -3,7 +3,7 @@ march3:
   ecatCycleTime: 4
   joints:
     - left_hip:
-        imc:
+        imotioncube:
           slaveIndex: 1
           encoder:
             resolution: 16
@@ -12,7 +12,7 @@ march3:
             zeroPositionIU: 24515
             safetyMarginRad: 0.05
     - right_hip:
-        imc:
+        imotioncube:
           slaveIndex: 2
           encoder:
             resolution: 16

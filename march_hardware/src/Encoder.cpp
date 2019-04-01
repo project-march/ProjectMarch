@@ -11,7 +11,7 @@ Encoder::Encoder(int numberOfBits, int minPositionIU, int maxPositionIU, int zer
 {
   ROS_ASSERT_MSG(numberOfBits > 0 && numberOfBits <= 32, "Encoder resolution of %d is not within range (0, 32)",
                  numberOfBits);
-  this->totalPositions = static_cast<int>(pow(2, numberOfBits)-1);
+  this->totalPositions = static_cast<int>(pow(2, numberOfBits) - 1);
 
   ROS_ASSERT_MSG(this->isValidPositionIU(minPositionIU), "MinPositionIU %d is not within range (0, %d)", minPositionIU,
                  this->totalPositions);
@@ -33,8 +33,8 @@ Encoder::Encoder(int numberOfBits, int minPositionIU, int maxPositionIU, int zer
   this->maxPositionIU = maxPositionIU - safetyMarginIU;
 
   ROS_ASSERT_MSG(this->minPositionIU < this->maxPositionIU, "Invalid range of motion. Safety margin too large or "
-                                                             "min/max position invalid. Minposition: %i, Maxposition: "
-                                                             "%i, safetyMargin: %f",
+                                                            "min/max position invalid. Minposition: %i, Maxposition: "
+                                                            "%i, safetyMargin: %f",
                  this->minPositionIU, this->maxPositionIU, this->safetyMarginRad);
 }
 

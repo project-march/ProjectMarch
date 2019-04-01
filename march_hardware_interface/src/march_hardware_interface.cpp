@@ -8,7 +8,6 @@
 
 #include <march_hardware/MarchRobot.h>
 
-
 #include <march_hardware_interface/march_hardware_interface.h>
 
 using joint_limits_interface::JointLimits;
@@ -18,9 +17,10 @@ using joint_limits_interface::PositionJointSoftLimitsInterface;
 
 namespace march_hardware_interface
 {
-MarchHardwareInterface::MarchHardwareInterface(ros::NodeHandle& nh, march4cpp::MarchRobot marchRobot) : nh_(nh), marchRobot(marchRobot)
+MarchHardwareInterface::MarchHardwareInterface(ros::NodeHandle& nh, AllowedRobot robotName) : nh_(nh)
 {
-    this->marchRobot = marchRobot;
+  HardwareBuilder hardwareBuilder = HardwareBuilder(robotName);
+  this->marchRobot = hardwareBuilder.createMarchRobot();
   init();
   controller_manager_.reset(new controller_manager::ControllerManager(this, nh_));
   nh_.param("/march/hardware_interface/loop_hz", loop_hz_, 0.1);
@@ -35,8 +35,6 @@ MarchHardwareInterface::~MarchHardwareInterface()
 void MarchHardwareInterface::init()
 {
   // Start ethercat cycle in the hardware
-
-
 
   this->marchRobot.startEtherCAT();
 
@@ -74,7 +72,7 @@ void MarchHardwareInterface::init()
     getJointLimits(joint.getName(), nh_, limits);
     SoftJointLimits softLimits;
     getSoftJointLimits(joint.getName(), nh_, softLimits);
-// Create joint limit interface
+    // Create joint limit interface
 
     PositionJointSoftLimitsHandle jointLimitsHandle(jointPositionHandle, limits, softLimits);
     positionJointSoftLimitsInterface.registerHandle(jointLimitsHandle);
@@ -135,8 +133,8 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
   for (int i = 0; i < num_joints_; i++)
   {
     ROS_DEBUG("After limits: Trying to actuate joint %s, to %lf rad, %f speed, %f effort.", joint_names_[i].c_str(),
-             joint_position_command_[i], joint_velocity_command_[i], joint_effort_command_[i]);
-      marchRobot.getJoint(joint_names_[i]).actuateRad(static_cast<float>(joint_position_command_[i]));
+              joint_position_command_[i], joint_velocity_command_[i], joint_effort_command_[i]);
+    marchRobot.getJoint(joint_names_[i]).actuateRad(static_cast<float>(joint_position_command_[i]));
   }
 }
 }  // namespace march_hardware_interface

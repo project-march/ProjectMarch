@@ -46,6 +46,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 add_library(march_hardware_builder
         include/${PROJECT_NAME}/HardwareBuilder.h
         include/${PROJECT_NAME}/HardwareConfigExceptions.h
+        include/${PROJECT_NAME}/AllowedRobot.h
         src/HardwareBuilder.cpp
         src/main.cpp
         )
@@ -63,8 +64,11 @@ install(TARGETS march_hardware_builder
 
 
 ## Add gtest based cpp test target and link libraries
-#if (CATKIN_ENABLE_TESTING)
-#    add_rostest_gtest(${PROJECT_NAME}-test
-#            )
-#    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march_hardware_builder gtest gmock)
-#endif ()
+if (CATKIN_ENABLE_TESTING)
+    add_rostest_gtest(${PROJECT_NAME}-test
+            test/march_hardware_builder.test
+            test/TestRunner.cpp
+            test/TestHardwareBuilderCreateEncoder.cpp
+            )
+    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march_hardware_builder gtest gmock)
+endif ()

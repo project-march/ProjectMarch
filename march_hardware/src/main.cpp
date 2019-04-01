@@ -17,7 +17,6 @@
 
 int main(int argc, char** argv)
 {
-
     march4cpp::TemperatureGES temperatureGES = march4cpp::TemperatureGES(1, 0);
     // TODO(ISHA, MARTIJN) double-check these numbers.
     march4cpp::Encoder enc = march4cpp::Encoder(16, 37961, 59649, 39717, 0.05);
