@@ -8,7 +8,7 @@
 using ::testing::Return;
 using ::testing::AtLeast;
 
-class TestIMotionCube : public ::testing::Test
+class IMotionCubeTest : public ::testing::Test
 {
 protected:
   march4cpp::Encoder encoder;
@@ -19,27 +19,33 @@ protected:
   }
 };
 
-TEST_F(TestIMotionCube, SlaveIndexOne)
+class IMotionCubeDeathTest : public IMotionCubeTest
+{
+};
+
+TEST_F(IMotionCubeTest, SlaveIndexOne)
 {
   march4cpp::IMotionCube imc = march4cpp::IMotionCube(1, encoder);
   ASSERT_EQ(1, imc.getSlaveIndex());
 }
 
-TEST_F(TestIMotionCube, SlaveIndexZero)
+TEST_F(IMotionCubeDeathTest, SlaveIndexZero)
 {
-  ASSERT_THROW(march4cpp::IMotionCube(0, encoder), std::invalid_argument);
+  ASSERT_DEATH(march4cpp::IMotionCube(0, encoder), "Slave configuration error: slaveindex 0 can not be smaller than "
+                                                   "1.");
 }
 
-TEST_F(TestIMotionCube, SlaveIndexMinusOne)
+TEST_F(IMotionCubeTest, SlaveIndexMinusOne)
 {
-  ASSERT_THROW(march4cpp::IMotionCube(-1, encoder), std::invalid_argument);
+  ASSERT_DEATH(march4cpp::IMotionCube(-1, encoder), "Slave configuration error: slaveindex -1 can not be smaller than "
+                                                    "1.");
 }
 
-TEST_F(TestIMotionCube, NoSlaveIndexConstructor)
+TEST_F(IMotionCubeTest, NoSlaveIndexConstructor)
 {
   ASSERT_NO_THROW(march4cpp::IMotionCube imc = march4cpp::IMotionCube());
 }
-TEST_F(TestIMotionCube, NoSlaveIndexConstructorGetIndex)
+TEST_F(IMotionCubeTest, NoSlaveIndexConstructorGetIndex)
 {
   march4cpp::IMotionCube imc = march4cpp::IMotionCube();
   ASSERT_EQ(-1, imc.getSlaveIndex());

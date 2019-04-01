@@ -5,6 +5,7 @@
 
 /**
  * The main method which runs all the tests
+ * @TODO(Isha) Implement tests for a temperature GES after its implementation has changed.
  */
 int main(int argc, char** argv)
 {

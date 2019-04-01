@@ -1,0 +1,7 @@
+slaveIndex: 1
+encoder:
+  resolution: 16
+  minPositionIU: 22134
+  maxionIU: 43436
+  zeroPositionIU: 24515
+  safetyMarginRad: 0.05

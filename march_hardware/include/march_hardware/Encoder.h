@@ -48,13 +48,12 @@ public:
   /** @brief Override stream operator for clean printing */
   friend ::std::ostream& operator<<(std::ostream& os, const Encoder& encoder)
   {
-    return os << "Encoder: \n"
-              << "slaveIndex: " << encoder.slaveIndex << "\n"
-              << "totalPositions: " << encoder.totalPositions << "\n"
-              << "minPositionIU: " << encoder.minPositionIU << "\n"
-              << "maxPositionIU: " << encoder.maxPositionIU << "\n"
-              << "zeroPositionIU: " << encoder.zeroPositionIU << "\n"
-              << "safetyMarginRad: " << encoder.safetyMarginRad << "\n";
+    return os << "slaveIndex: " << encoder.slaveIndex << ", "
+              << "totalPositions: " << encoder.totalPositions << ", "
+              << "minPositionIU: " << encoder.minPositionIU << ", "
+              << "maxPositionIU: " << encoder.maxPositionIU << ", "
+              << "zeroPositionIU: " << encoder.zeroPositionIU << ", "
+              << "safetyMarginRad: " << encoder.safetyMarginRad;
   }
 };
 }

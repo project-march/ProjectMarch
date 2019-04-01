@@ -2,6 +2,8 @@
 
 #include <march_hardware_builder/HardwareBuilder.h>
 #include <march_hardware_builder/HardwareConfigExceptions.h>
+#include "ros/ros.h"
+#include <ros/package.h>
 
 HardwareBuilder::HardwareBuilder(std::string yamlPath)
 {
@@ -16,18 +18,6 @@ HardwareBuilder::HardwareBuilder(AllowedRobot robotName)
 }
 
 HardwareBuilder::HardwareBuilder() = default;
-
-march4cpp::Encoder HardwareBuilder::createEncoder(YAML::Node EncoderConfig)
-{
-  this->validateRequiredKeysExist(EncoderConfig, this->ENCODER_REQUIRED_KEYS, "encoder");
-
-  int resolution = EncoderConfig["resolution"].as<int>();
-  int minPositionIU = EncoderConfig["minPositionIU"].as<int>();
-  int maxPositionIU = EncoderConfig["maxPositionIU"].as<int>();
-  int zeroPositionIU = EncoderConfig["zeroPositionIU"].as<int>();
-  auto safetyMarginRad = EncoderConfig["safetyMarginRad"].as<float>();
-  return march4cpp::Encoder(resolution, minPositionIU, maxPositionIU, zeroPositionIU, safetyMarginRad);
-}
 
 march4cpp::MarchRobot HardwareBuilder::createMarchRobot(YAML::Node marchRobotConfig)
 {
@@ -99,6 +89,18 @@ march4cpp::IMotionCube HardwareBuilder::createIMotionCube(YAML::Node iMotionCube
   return march4cpp::IMotionCube(slaveIndex, this->createEncoder(encoderConfig));
 }
 
+march4cpp::Encoder HardwareBuilder::createEncoder(YAML::Node EncoderConfig)
+{
+  this->validateRequiredKeysExist(EncoderConfig, this->ENCODER_REQUIRED_KEYS, "encoder");
+
+  int resolution = EncoderConfig["resolution"].as<int>();
+  int minPositionIU = EncoderConfig["minPositionIU"].as<int>();
+  int maxPositionIU = EncoderConfig["maxPositionIU"].as<int>();
+  int zeroPositionIU = EncoderConfig["zeroPositionIU"].as<int>();
+  auto safetyMarginRad = EncoderConfig["safetyMarginRad"].as<float>();
+  return march4cpp::Encoder(resolution, minPositionIU, maxPositionIU, zeroPositionIU, safetyMarginRad);
+}
+
 march4cpp::TemperatureGES HardwareBuilder::createTemperatureGES(YAML::Node temperatureGESConfig)
 {
   this->validateRequiredKeysExist(temperatureGESConfig, this->TEMPERATUREGES_REQUIRED_KEYS, "temperatureges");
@@ -122,13 +124,15 @@ void HardwareBuilder::validateRequiredKeysExist(YAML::Node config, std::vector<s
 
 std::string HardwareBuilder::getFilePathFromRobot(AllowedRobot robotName)
 {
+  std::string basePath = ros::package::getPath("march_hardware_builder");
   switch (robotName)
   {
     case AllowedRobot::testsetup:
-      return "test";
+      return basePath.append("/src/robots/testsetup.yaml");
     case AllowedRobot::march3:
-      return "";
+      return basePath.append("/src/robots/march3.yaml");
     default:
-      return "";
+      ROS_ERROR_STREAM("Robotname not implemented. Using march3.yaml...");
+      return basePath.append("/src/robots/march3.yaml");
   }
 }

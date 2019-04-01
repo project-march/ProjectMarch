@@ -70,6 +70,7 @@ if (CATKIN_ENABLE_TESTING)
             test/march_hardware_builder.test
             test/TestRunner.cpp
             test/TestHardwareBuilderCreateEncoder.cpp
+            test/TestHardwareBuilderCreateIMotionCube.cpp
             )
     target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march_hardware_builder gtest gmock)
 endif ()

@@ -15,12 +15,7 @@ protected:
 public:
   explicit Slave(int slaveIndex)
   {
-    if (slaveIndex < 1)
-    {
-      ROS_FATAL("Slave configuration error: slaveindex can not be smaller than 1.");
-      throw ::std::invalid_argument("Slave configuration error: slaveindex can not be smaller than 1.");
-    }
-
+    ROS_ASSERT_MSG(slaveIndex >= 1, "Slave configuration error: slaveindex %d can not be smaller than 1.", slaveIndex);
     this->slaveIndex = slaveIndex;
   };
 
@@ -31,8 +26,8 @@ public:
 
   ~Slave() = default;
 
-  virtual void writeInitialSDOs(int ecatCycleTime) {
-
+  virtual void writeInitialSDOs(int ecatCycleTime)
+  {
   }
 
   int getSlaveIndex()
