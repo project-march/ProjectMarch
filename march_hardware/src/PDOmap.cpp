@@ -7,16 +7,16 @@ PDOmap::PDOmap(){
     this->initAllObjects();
 }
 
-void PDOmap::addObject(std::string objectname){
+void PDOmap::addObject(IMCObjectName objectname){
     if (this->allObjects.count(objectname) != 1) {
-        ROS_WARN("IMC object %s does not exist (yet), or multiple exist", objectname.c_str());
+        ROS_WARN("IMC object does not exist (yet), or multiple exist");
     }
     else {
         this->PDOObjects[objectname] = this->allObjects[objectname];
     }
 }
 
-std::map<std::string, int> PDOmap::map(int slaveIndex, enum dataDirection direction){
+std::map<enum IMCObjectName, int> PDOmap::map(int slaveIndex, enum dataDirection direction){
     // Sort PDOObjects map
     this->sortPDOObjects();
     int reg;
@@ -47,7 +47,7 @@ std::map<std::string, int> PDOmap::map(int slaveIndex, enum dataDirection direct
             ROS_INFO("sdo write: slaveIndex %i, reg 0x%X, subindex 0, value 0x0", slaveIndex, reg);
         }
         // Get next object (from end, because sorted from small to large)
-        std::pair<std::string, IMCObject> nextObject = this->sortedPDOObjects.back();
+        std::pair<IMCObjectName, IMCObject> nextObject = this->sortedPDOObjects.back();
         this->sortedPDOObjects.pop_back();
         // Add next object to map
         counter++;
@@ -95,10 +95,10 @@ void PDOmap::sortPDOObjects(){
     // Sort from small to large
     int totalbits = 0;
     for(int i = 0; i < (sizeof(this->objectSizes)/sizeof(this->objectSizes[0])); i++){
-        std::map<std::string, IMCObject>::iterator j;
+        std::map<IMCObjectName, IMCObject>::iterator j;
         for (j = this->PDOObjects.begin(); j != this->PDOObjects.end(); j++){
             if (j->second.length == this->objectSizes[i]){
-                std::pair<std::string, IMCObject> nextObject;
+                std::pair<IMCObjectName, IMCObject> nextObject;
                 nextObject.first = j->first;
                 nextObject.second = j->second;
                 this->sortedPDOObjects.push_back(nextObject);
@@ -113,23 +113,26 @@ void PDOmap::sortPDOObjects(){
 }
 
 uint32_t PDOmap::combineAddressLength(uint16_t address, uint16_t length){
-    uint32_t MSword = ((address & 0xFFFF) << 16);
+    uint32_t MSword = ((address & 0xFFFF) << 16); // Shift 16 bits left for most significant word
     uint32_t LSword = (length & 0xFFFF);
     return (MSword | LSword);
 }
 
 void PDOmap::initAllObjects(){
     // Object(address, length);
-    this->allObjects["StatusWord"] = IMCObject(0x6041, 16);
-    this->allObjects["ActualPosition"] = IMCObject(0x6064, 32);
-    this->allObjects["MotionErrorRegister"] = IMCObject(0x2000, 16);
-    this->allObjects["DetailedErrorRegister"] = IMCObject(0x2002, 16);
-    this->allObjects["DCLinkVoltage"] = IMCObject(0x2055, 16);
-    this->allObjects["DriveTemperature"] = IMCObject(0x2058, 16);
-    this->allObjects["ActualTorque"] = IMCObject(0x6077, 16);
-    this->allObjects["CurrentLimit"] = IMCObject(0x207F, 16);
-    this->allObjects["MotorPosition"] = IMCObject(0x2088, 32);
+    this->allObjects[IMCObjectName::StatusWord] = IMCObject(0x6041, 16);
+    this->allObjects[IMCObjectName::ActualPosition] = IMCObject(0x6064, 32);
+    this->allObjects[IMCObjectName::MotionErrorRegister] = IMCObject(0x2000, 16);
+    this->allObjects[IMCObjectName::DetailedErrorRegister] = IMCObject(0x2002, 16);
+    this->allObjects[IMCObjectName::DCLinkVoltage] = IMCObject(0x2055, 16);
+    this->allObjects[IMCObjectName::DriveTemperature] = IMCObject(0x2058, 16);
+    this->allObjects[IMCObjectName::ActualTorque] = IMCObject(0x6077, 16);
+    this->allObjects[IMCObjectName::CurrentLimit] = IMCObject(0x207F, 16);
+    this->allObjects[IMCObjectName::MotorPosition] = IMCObject(0x2088, 32);
+    this->allObjects[IMCObjectName::ControlWord] = IMCObject(0x6040, 16);
+    this->allObjects[IMCObjectName::TargetPosition] = IMCObject(0x607A, 32);
     // etc...
+    // If a new entry is added here, first add it to the enum!
 }
 
 }

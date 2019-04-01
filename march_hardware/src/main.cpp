@@ -19,18 +19,11 @@ int main(int argc, char** argv)
 {
 
     march4cpp::PDOmap pdoMapMISO = march4cpp::PDOmap();
-    pdoMapMISO.addObject("StatusWord");
-    pdoMapMISO.addObject("ActualPosition");
-    pdoMapMISO.addObject("DCLinkVoltage");
-    pdoMapMISO.addObject("DetailedErrorRegister");
-    std::map<std::string, int> map = pdoMapMISO.map(1, march4cpp::dataDirection::miso);
-
-    //print map
-    ROS_INFO("Byte offsets:");
-    std::map<std::string, int>::iterator i;
-    for (i = map.begin(); i != map.end(); i++){
-        ROS_INFO("%s byte offset: %i", i->first.c_str(), i->second);
-    }
+    pdoMapMISO.addObject(march4cpp::IMCObjectName::StatusWord);
+    pdoMapMISO.addObject(march4cpp::IMCObjectName::ActualPosition);
+    pdoMapMISO.addObject(march4cpp::IMCObjectName::DCLinkVoltage);
+    pdoMapMISO.addObject(march4cpp::IMCObjectName::DetailedErrorRegister);
+    std::map<enum march4cpp::IMCObjectName, int> byteOffsets = pdoMapMISO.map(1, march4cpp::dataDirection::miso);
 
 //   march4cpp::MARCH4 march4 = march4cpp::MARCH4();
 //   march4.startEtherCAT();

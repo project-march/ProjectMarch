@@ -28,18 +28,18 @@ Encoder::Encoder(int numberOfBits, int minPositionIU, int maxPositionIU, int zer
   }
 }
 
-float Encoder::getAngleRad()
+float Encoder::getAngleRad(uint8_t ActualPositionByteOffset)
 {
-  return IUtoRad(getAngleIU());
+  return IUtoRad(getAngleIU(ActualPositionByteOffset));
 }
 
-int Encoder::getAngleIU()
+int Encoder::getAngleIU(uint8_t ActualPositionByteOffset)
 {
   if (this->slaveIndex == -1)
   {
     ROS_FATAL("Encoder has slaveIndex of -1");
   }
-  union bit32 return_byte = get_input_bit32(this->slaveIndex, 2);
+  union bit32 return_byte = get_input_bit32(this->slaveIndex, ActualPositionByteOffset);
   ROS_INFO("Encoder read (IU): %d", return_byte.i);
   return return_byte.i;
 }
