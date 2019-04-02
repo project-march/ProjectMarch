@@ -90,7 +90,7 @@ add_custom_command(
 
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
-    add_rostest_gtest(${PROJECT_NAME}-test
+    add_rostest_gmock(${PROJECT_NAME}-test
             test/march4cpp.test
             test/TestRunner.cpp
             test/TestEncoder.cpp
@@ -103,5 +103,5 @@ if (CATKIN_ENABLE_TESTING)
             test/mocks/MockIMotionCube.cpp
             test/mocks/MockJoint.cpp
             )
-    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march_hardware gtest gmock)
+    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march_hardware gtest)
 endif ()
