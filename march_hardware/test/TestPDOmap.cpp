@@ -46,5 +46,5 @@ TEST_F(PDOTest, exceedMaxSize)
     pdoMapMISO.addObject(march4cpp::IMCObjectName::CurrentLimit);
     pdoMapMISO.addObject(march4cpp::IMCObjectName::DriveTemperature);
     pdoMapMISO.addObject(march4cpp::IMCObjectName::QuickStopOption);
-    ASSERT_THROW(pdoMapMISO.map(1, march4cpp::dataDirection::miso), std::invalid_argument);
+    ASSERT_THROW(pdoMapMISO.map(1, march4cpp::dataDirection::miso), std::exception);
 }

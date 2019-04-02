@@ -131,9 +131,9 @@ void PDOmap::sortPDOObjects()
   }
   if (totalbits > this->nrofRegs * this->bitsPerReg)
   {
-    ROS_WARN("Too many objects in PDO Map (total bits %d, only %d allowed)", totalbits,
+    ROS_FATAL("Too many objects in PDO Map (total bits %d, only %d allowed)", totalbits,
              this->nrofRegs * this->bitsPerReg);
-    throw std::invalid_argument("asdasd");
+    throw std::exception();
   }
 }
 
