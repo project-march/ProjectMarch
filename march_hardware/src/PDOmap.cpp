@@ -28,7 +28,6 @@ void PDOmap::addObject(IMCObjectName objectname)
 
 std::map<enum IMCObjectName, int> PDOmap::map(int slaveIndex, enum dataDirection direction)
 {
-  // Sort PDOObjects map
   this->sortPDOObjects();
   int reg;
   int SMAddress;
@@ -51,13 +50,13 @@ std::map<enum IMCObjectName, int> PDOmap::map(int slaveIndex, enum dataDirection
   ROS_DEBUG("sdo write: slaveindex %i, reg 0x%X, subindex 0, value 0x0", slaveIndex, SMAddress);
   int startReg = reg;
   int lastFilledReg = reg;
-  int sizeleft = 64;
+  int sizeleft = this->bitsPerReg;
   int counter = 0;
   int byteOffset = 0;
   while (this->sortedPDOObjects.size() > 0)
   {
     // Check if register is still empty
-    if (sizeleft == 64)
+    if (sizeleft == this->bitsPerReg)
     {
       sdo_bit32(slaveIndex, reg, 0, 0);
       ROS_DEBUG("sdo write: slaveIndex %i, reg 0x%X, subindex 0, value 0x0", slaveIndex, reg);
@@ -74,7 +73,7 @@ std::map<enum IMCObjectName, int> PDOmap::map(int slaveIndex, enum dataDirection
     this->byteOffsets[nextObject.first] = byteOffset;
     byteOffset += nextObject.second.length / 8;
     sizeleft -= nextObject.second.length;
-    // Check if this was the last object
+    // Check if this was the last object of the list
     if (this->sortedPDOObjects.size() == 0)
     {
       sdo_bit32(slaveIndex, reg, 0, counter);
@@ -89,7 +88,7 @@ std::map<enum IMCObjectName, int> PDOmap::map(int slaveIndex, enum dataDirection
       ROS_DEBUG("sdo write: slaveIndex %i, reg 0x%X, subindex 0, value 0x%X", slaveIndex, reg, counter);
       reg++;
       counter = 0;
-      sizeleft = 64;
+      sizeleft = this->bitsPerReg;
     }
   }
   // For the unused registers, set count to zero
