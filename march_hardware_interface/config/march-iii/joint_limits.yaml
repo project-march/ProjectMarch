@@ -33,7 +33,7 @@ joint_limits:
     max_velocity: 0.2
 
     has_soft_limits: true
-    soft_lower_limit: -0.25
+    soft_lower_limit: -0.18
     soft_upper_limit: 1.75
     k_position: 10.0
     k_velocity: 10.0
@@ -46,7 +46,7 @@ joint_limits:
     max_velocity: 0.2
 
     has_soft_limits: true
-    soft_lower_limit: -0.25
+    soft_lower_limit: -0.18
     soft_upper_limit: 1.75
     k_position: 10.0
     k_velocity: 10.0
