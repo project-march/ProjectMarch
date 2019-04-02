@@ -395,7 +395,8 @@ bool IMotionCube::goToOperationEnabled()
   ROS_INFO("Switched On!");
 
   // If ActualPosition is not defined in PDOmapping, a fatal error is thrown because of safety reasons
-  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO mapping, so can't get angle");
+  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO "
+                                                                                  "mapping, so can't get angle");
 
   int angleRead = this->encoder.getAngleIU(this->misoByteOffsets[IMCObjectName::ActualPosition]);
   //  If the encoder is functioning correctly, move the joint to its current position. Otherwise shutdown
