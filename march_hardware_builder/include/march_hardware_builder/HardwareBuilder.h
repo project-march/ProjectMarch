@@ -13,6 +13,9 @@
 
 #include <march_hardware_builder/AllowedRobot.h>
 
+/**
+ * @brief Creates a MarchRobot from a robot name, yamlPath, or a loaded .yaml config.
+ */
 class HardwareBuilder
 {
 private:
@@ -26,11 +29,26 @@ public:
   std::string yamlPath;
   YAML::Node robotConfig;
 
+  /**
+   * @brief Initialise a HardwareBuilder with a robotName enumerator.
+   * @details Grabs the .yaml file associated with the robotName and loads it in the robotConfig.
+   */
   explicit HardwareBuilder(AllowedRobot robotName);
+
+  /**
+   * @brief Initialise a HardwareBuilder with a path to a .yaml file.
+   */
   explicit HardwareBuilder(std::string yamlPath);
   HardwareBuilder();
 
+  /**
+   * @brief Create a MarchRobot from a yaml config.
+   */
   march4cpp::MarchRobot createMarchRobot(YAML::Node marchRobotConfig);
+
+  /**
+   * @brief Create a MarchRobot, can only be used when a robotConfig is already loaded via the constructor.
+   */
   march4cpp::MarchRobot createMarchRobot();
 
   march4cpp::Joint createJoint(YAML::Node jointConfig, std::string jointName);
@@ -38,7 +56,15 @@ public:
   march4cpp::IMotionCube createIMotionCube(YAML::Node iMotionCubeConfig);
   march4cpp::TemperatureGES createTemperatureGES(YAML::Node temperatureGESConfig);
 
+  /**
+   * @brief Loop over all keys in the keyList and check if they exist in the config. Throws a MissingKeyException when
+   *     keys are missing.
+   */
   void validateRequiredKeysExist(YAML::Node config, std::vector<std::string> keyList, const std::string& objectName);
+
+  /**
+   * @brief Maps a robotName to a yaml filePath.
+   */
   std::string getFilePathFromRobot(AllowedRobot robotName);
 };
 

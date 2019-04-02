@@ -35,7 +35,6 @@ MarchHardwareInterface::~MarchHardwareInterface()
 void MarchHardwareInterface::init()
 {
   // Start ethercat cycle in the hardware
-
   this->marchRobot.startEtherCAT();
 
   if (!this->marchRobot.isEthercatOperational())
