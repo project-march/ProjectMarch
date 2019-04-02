@@ -3,11 +3,11 @@
 #include <iostream>
 #include <yaml-cpp/yaml.h>
 #include <march_hardware_builder/HardwareBuilder.h>
+#include "ros/package.h"
 
 int main(int argc, char* argv[])
 {
-  const std::string filePath = "/home/projectmarch/Documents/march-iv/march_ws/src/hardware-interface/"
-                               "march_hardware_builder/src/march3.yaml";
+  const std::string filePath = ros::package::getPath("march_hardware_builder").append("/src/march3.yaml");
   //    YAML::Node config = YAML::LoadFile();
 
   HardwareBuilder hardwareBuilder = HardwareBuilder(filePath);
