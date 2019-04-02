@@ -16,8 +16,8 @@
 class HardwareBuilder
 {
 private:
-  const std::vector<std::string> ENCODER_REQUIRED_KEYS = { "resolution", "minPositionIU", "maxPositionIU",
-                                                           "zeroPositionIU", "safetyMarginRad" };
+  const std::vector<std::string> ENCODER_REQUIRED_KEYS =
+          { "resolution", "minPositionIU", "maxPositionIU", "zeroPositionIU", "safetyMarginRad" };
   const std::vector<std::string> IMOTIONCUBE_REQUIRED_KEYS = { "slaveIndex", "encoder" };
   const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS = { "slaveIndex", "byteOffset" };
   const std::vector<std::string> JOINT_REQUIRED_KEYS = {};

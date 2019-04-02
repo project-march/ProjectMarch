@@ -25,8 +25,8 @@ catkin_package(
 set(ROSLINT_CPP_OPTS "--filter=-build/include,-build/header_guard,-runtime/references" "--linelength=120")
 
 file(GLOB_RECURSE lintfiles
-        "src/*.cpp"
-        "src/*.h"
+        "*.cpp"
+        "*.h"
         )
 
 roslint_cpp(${lintfiles})
