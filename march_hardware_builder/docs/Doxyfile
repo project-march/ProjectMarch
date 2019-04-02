@@ -3,7 +3,7 @@
 # Explanation for each setting here http://www.doxygen.nl/manual/config.html.
 
 DOXYFILE_ENCODING      = UTF-8
-PROJECT_NAME           = "Hardware Configuration Parser"
+PROJECT_NAME           = "March Hardware Builder"
 PROJECT_BRIEF          =
 OUTPUT_DIRECTORY       = NOTE: Will be overwritten by doc.sh
 EXTRACT_ALL            = YES
