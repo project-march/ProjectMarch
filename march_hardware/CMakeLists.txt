@@ -14,10 +14,8 @@ catkin_package(
         include
         CATKIN_DEPENDS
         roscpp
-        # TODO (Isha) make sure this code works properly
-        # for now this line is commented to make roslint pass
-#        LIBRARIES
-#        march4cpp
+        LIBRARIES
+        march_hardware
 )
 
 # Roslinter
@@ -29,9 +27,6 @@ file(GLOB_RECURSE lintfiles
         )
 
 roslint_cpp(${lintfiles})
-include_directories(
-        ${catkin_INCLUDE_DIRS}
-)
 
 
 include_directories(
@@ -51,7 +46,7 @@ file(GLOB SOEM_SRC
         soem/*.c
         )
 
-add_library(march4cpp
+add_library(march_hardware
         ${SOEM_SRC}
         include/${PROJECT_NAME}/EtherCAT/EthercatIO.h
         include/${PROJECT_NAME}/EtherCAT/EthercatMaster.h
@@ -76,11 +71,16 @@ add_library(march4cpp
         src/PDOmap.cpp
         src/main.cpp)
 
-target_link_libraries(march4cpp ${catkin_LIBRARIES})
+target_link_libraries(march_hardware ${catkin_LIBRARIES})
 
 
 add_executable(hardware_dummy src/main.cpp)
-target_link_libraries(hardware_dummy march4cpp)
+target_link_libraries(hardware_dummy march_hardware)
+
+install(TARGETS march_hardware
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
 
 # Give sudo access to ethernet port
 add_custom_command(
@@ -106,5 +106,5 @@ if (CATKIN_ENABLE_TESTING)
             test/mocks/MockIMotionCube.cpp
             test/mocks/MockJoint.cpp
             )
-    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march4cpp gtest gmock)
+    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march_hardware gtest gmock)
 endif ()
