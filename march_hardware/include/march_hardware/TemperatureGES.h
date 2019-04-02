@@ -36,5 +36,5 @@ public:
               << "byteOffset: " << temperatureGes.byteOffset;
   }
 };
-}
+}  // namespace march4cpp
 #endif

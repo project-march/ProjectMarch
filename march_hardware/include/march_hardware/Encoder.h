@@ -56,6 +56,6 @@ public:
               << "safetyMarginRad: " << encoder.safetyMarginRad;
   }
 };
-}
+}  // namespace march4cpp
 
 #endif  // PROJECT_ENCODER_H

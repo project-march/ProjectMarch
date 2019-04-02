@@ -1,7 +1,8 @@
 // Copyright 2019 Project March.
 #ifndef MARCH4CPP__ETHERCATMASTER_H
 #define MARCH4CPP__ETHERCATMASTER_H
-#include <thread>
+
+#include <thread>  // NOLINT(build/c++11)
 
 #include <march_hardware/Joint.h>
 
@@ -13,7 +14,7 @@ class EthercatMaster
   char IOmap[4096];        // Holds the mapping of the SOEM message
   int expectedWKC;         // Expected working counter
   std::thread EcatThread;  // Handler for parallel thread
-  // TODO (Isha, Tim) remove double joint list (also in March4)
+  // TODO(Isha, Tim) remove double joint list (also in March4)
   std::vector<Joint> jointList;
   int maxSlaveIndex;
   int ecatCycleTimems;

@@ -35,6 +35,6 @@ public:
     return this->slaveIndex;
   }
 };
-}
+}  // namespace march4cpp
 
 #endif

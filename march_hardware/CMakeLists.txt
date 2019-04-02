@@ -23,7 +23,7 @@ set(ROSLINT_CPP_OPTS "--filter=-build/include,-build/header_guard,-runtime/refer
 
 file(GLOB_RECURSE lintfiles
         "src/*.cpp"
-        "src/*.h"
+        "include/*.h"
         )
 
 roslint_cpp(${lintfiles})

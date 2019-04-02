@@ -9,6 +9,6 @@ class TemperatureSensor
  public:
   virtual float getTemperature() = 0;
 };
-}
+}  // namespace march4cpp
 
 #endif  // PROJECT_TEMPERATUREINTERFACE_H
