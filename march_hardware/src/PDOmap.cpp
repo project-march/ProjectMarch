@@ -1,3 +1,4 @@
+// Copyright 2019 Project March.
 #include <march_hardware/PDOmap.h>
 
 namespace march4cpp
@@ -163,4 +164,4 @@ void PDOmap::initAllObjects()
   // etc...
   // If a new entry is added here, first add it to the enum (in the header file)!
 }
-}
+}  // namespace march4cpp

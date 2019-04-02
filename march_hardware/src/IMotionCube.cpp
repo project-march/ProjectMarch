@@ -143,30 +143,21 @@ void IMotionCube::actuateIU(int targetIU)
   uint8 targetPositionLocation = this->mosiByteOffsets[IMCObjectName::TargetPosition];
 
   ROS_DEBUG("Trying to actuate slave %d, soem location %d to targetposition %d", this->slaveIndex,
-                    targetPositionLocation, targetPosition.i);
+            targetPositionLocation, targetPosition.i);
   set_output_bit32(this->slaveIndex, targetPositionLocation, targetPosition);
 }
 
 float IMotionCube::getAngleRad()
 {
-  if (this->misoByteOffsets.count(IMCObjectName::ActualPosition) != 1)
-  {
-    ROS_FATAL("ActualPosition not defined in PDO mapping, so can't get angle");
-    throw std::exception();
-  }
-  else
-  {
-    return this->encoder.getAngleRad(this->misoByteOffsets[IMCObjectName::ActualPosition]);
-  }
+  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO "
+                                                                                  "mapping, so can't get angle");
+  return this->encoder.getAngleRad(this->misoByteOffsets[IMCObjectName::ActualPosition]);
 }
 
 uint16 IMotionCube::getStatusWord()
 {
-  if (this->misoByteOffsets.count(IMCObjectName::StatusWord) != 1)
-  {
-    ROS_FATAL("StatusWord not defined in PDO mapping, so can't get status");
-    throw std::exception();
-  }
+  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::StatusWord) == 1, "StatusWord not defined in PDO "
+                                                                              "mapping, so can't get status word");
   return get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::StatusWord]).ui;
 }
 
