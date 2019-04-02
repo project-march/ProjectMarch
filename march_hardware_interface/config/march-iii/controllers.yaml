@@ -3,10 +3,6 @@ march:
     state:
       type: joint_state_controller/JointStateController
       publish_rate: 50
-    position:
-      left_hip_joint:
-        type: position_controllers/JointPositionController
-        joint: left_hip
     trajectory:
       full_exoskeleton:
         type: position_controllers/JointTrajectoryController
