@@ -16,9 +16,10 @@ extern "C"
 namespace march4cpp
 {
 // Constructor
-EthercatMaster::EthercatMaster(std::vector<Joint> jointList, std::string ifname, int maxSlaveIndex, int ecatCycleTime)
+EthercatMaster::EthercatMaster(std::vector<Joint>* jointListPtr, std::string ifname, int maxSlaveIndex,
+                               int ecatCycleTime)
+  : jointListPtr(jointListPtr)
 {
-  this->jointList = jointList;
   this->ifname = ifname;
   this->maxSlaveIndex = maxSlaveIndex;
   this->ecatCycleTimems = ecatCycleTime;
@@ -56,9 +57,9 @@ void EthercatMaster::start()
   // Request and wait for slaves to be in preOP state
   ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
 
-  for (int i = 0; i < jointList.size(); i++)
+  for (int i = 0; i < jointListPtr->size(); i++)
   {
-    jointList.at(i).initialize(ecatCycleTimems);
+    jointListPtr->at(i).initialize(ecatCycleTimems);
   }
 
   // Configure the EtherCAT message structure depending on the PDO mapping of all the slaves
