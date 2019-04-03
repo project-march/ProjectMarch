@@ -1,0 +1,14 @@
+<launch>
+    <rosparam file="$(find march_hardware_interface)/config/hardware.yaml" command="load"/>
+    <rosparam file="$(find march_hardware_interface)/config/joint_limits.yaml" command="load"/>
+
+    <!-- Load the URDF into the ROS Parameter Server -->
+    <param name="robot_description"
+           command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iii.xacro'" />
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />
+    <node name="joint_state" pkg="joint_state_publisher" type="joint_state_publisher" respawn="true" output="screen" />
+
+
+    <!--<node name="march_gait_generator" pkg="march_gait_generator" type="march_gait_generator" output="screen"/>-->
+</launch>
