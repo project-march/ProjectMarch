@@ -17,9 +17,16 @@ class IMotionCube : public Slave
 private:
   Encoder encoder;
   void actuateIU(int iu);
-  bool get_bit(uint16 value, int index);
+
   std::map<IMCObjectName, int> misoByteOffsets;
   std::map<IMCObjectName, int> mosiByteOffsets;
+  void mapMisoPDOs();
+  void mapMosiPDOs();
+  void validateMisoPDOs();
+  void validateMosiPDOs();
+  void writeInitialSettings(uint8 ecatCycleTime);
+
+  bool get_bit(uint16 value, int index);
 
 public:
   explicit IMotionCube(int slaveIndex, Encoder encoder);
@@ -32,10 +39,6 @@ public:
   ~IMotionCube() = default;
 
   void writeInitialSDOs(int ecatCycleTime) override;
-
-  void mapPDOs();
-
-  bool writeInitialSettings(uint8 ecatCycleTime);
 
   float getAngleRad();
 

@@ -47,7 +47,6 @@ std::map<enum IMCObjectName, int> PDOmap::map(int slaveIndex, enum dataDirection
   }
   // Clear SyncManager Object
   sdo_bit8(slaveIndex, SMAddress, 0, 0);
-  ROS_DEBUG("sdo write: slaveindex %i, reg 0x%X, subindex 0, value 0x0", slaveIndex, SMAddress);
   int startReg = reg;
   int lastFilledReg = reg;
   int sizeleft = this->bitsPerReg;
@@ -59,7 +58,6 @@ std::map<enum IMCObjectName, int> PDOmap::map(int slaveIndex, enum dataDirection
     if (sizeleft == this->bitsPerReg)
     {
       sdo_bit32(slaveIndex, reg, 0, 0);
-      ROS_DEBUG("sdo write: slaveIndex %i, reg 0x%X, subindex 0, value 0x0", slaveIndex, reg);
     }
     // Get next object (from end, because sorted from small to large)
     std::pair<IMCObjectName, IMCObject> nextObject = this->sortedPDOObjects.back();
@@ -68,8 +66,6 @@ std::map<enum IMCObjectName, int> PDOmap::map(int slaveIndex, enum dataDirection
     counter++;
     sdo_bit32(slaveIndex, reg, counter,
               this->combineAddressLength(nextObject.second.address, nextObject.second.length));
-    ROS_DEBUG("sdo write: slaveIndex %i, reg 0x%X, subindex %i, value 0x%X", slaveIndex, reg, counter,
-              this->combineAddressLength(nextObject.second.address, nextObject.second.length));
     this->byteOffsets[nextObject.first] = byteOffset;
     byteOffset += nextObject.second.length / 8;
     sizeleft -= nextObject.second.length;
@@ -77,7 +73,6 @@ std::map<enum IMCObjectName, int> PDOmap::map(int slaveIndex, enum dataDirection
     if (this->sortedPDOObjects.size() == 0)
     {
       sdo_bit32(slaveIndex, reg, 0, counter);
-      ROS_DEBUG("sdo write: slaveIndex %i, reg 0x%X, subindex 0, value 0x%X", slaveIndex, reg, counter);
       lastFilledReg = reg;
       reg++;
     }
@@ -85,7 +80,6 @@ std::map<enum IMCObjectName, int> PDOmap::map(int slaveIndex, enum dataDirection
     else if (sizeleft <= 0)
     {
       sdo_bit32(slaveIndex, reg, 0, counter);
-      ROS_DEBUG("sdo write: slaveIndex %i, reg 0x%X, subindex 0, value 0x%X", slaveIndex, reg, counter);
       reg++;
       counter = 0;
       sizeleft = this->bitsPerReg;
@@ -95,7 +89,6 @@ std::map<enum IMCObjectName, int> PDOmap::map(int slaveIndex, enum dataDirection
   for (int i = reg; i < startReg + this->nrofRegs; i++)
   {
     sdo_bit32(slaveIndex, i, 0, 0);
-    ROS_DEBUG("sdo write: slaveIndex %i, reg 0x%X, subindex 0, value 0x0", slaveIndex, i);
   }
   // For all filled registers, set data to Sync Manager object
   int count = 0;
@@ -103,10 +96,8 @@ std::map<enum IMCObjectName, int> PDOmap::map(int slaveIndex, enum dataDirection
   {
     count++;
     sdo_bit16(slaveIndex, SMAddress, count, 0x1600);
-    ROS_DEBUG("sdo write: slaveindex %i, reg 0x%X, subindex %i, value 0x%X", slaveIndex, SMAddress, count, i);
   }
   sdo_bit8(slaveIndex, SMAddress, 0, count);
-  ROS_DEBUG("sdo write: slaveindex %i, reg 0x%X, subindex 0, value 0x%X", slaveIndex, SMAddress, count);
   return this->byteOffsets;
 }
 
@@ -132,7 +123,7 @@ void PDOmap::sortPDOObjects()
   if (totalbits > this->nrofRegs * this->bitsPerReg)
   {
     ROS_FATAL("Too many objects in PDO Map (total bits %d, only %d allowed)", totalbits,
-             this->nrofRegs * this->bitsPerReg);
+              this->nrofRegs * this->bitsPerReg);
     throw std::exception();
   }
 }

@@ -18,12 +18,16 @@ IMotionCube::IMotionCube(int slaveIndex, Encoder encoder) : Slave(slaveIndex)
 
 void IMotionCube::writeInitialSDOs(int ecatCycleTime)
 {
-  mapPDOs();
+  mapMisoPDOs();
+  mapMosiPDOs();
+  validateMisoPDOs();
+  validateMosiPDOs();
   writeInitialSettings(ecatCycleTime);
 }
 
-// Map Process Data Object (PDO) by sending SDOs to the IMC
-void IMotionCube::mapPDOs()
+// Map Process Data Object (PDO) for by sending SDOs to the IMC
+// Master In, Slave Out
+void IMotionCube::mapMisoPDOs()
 {
   PDOmap pdoMapMISO = PDOmap();
   pdoMapMISO.addObject(IMCObjectName::StatusWord);      // Compulsory!
@@ -31,15 +35,33 @@ void IMotionCube::mapPDOs()
   pdoMapMISO.addObject(IMCObjectName::DCLinkVoltage);
   pdoMapMISO.addObject(IMCObjectName::DetailedErrorRegister);
   this->misoByteOffsets = pdoMapMISO.map(this->slaveIndex, dataDirection::miso);
+}
 
+// Map Process Data Object (PDO) for by sending SDOs to the IMC
+// Master Out, Slave In
+void IMotionCube::mapMosiPDOs()
+{
   PDOmap pdoMapMOSI = PDOmap();
   pdoMapMOSI.addObject(IMCObjectName::ControlWord);  // Compulsory!
   pdoMapMOSI.addObject(IMCObjectName::TargetPosition);
   this->mosiByteOffsets = pdoMapMOSI.map(this->slaveIndex, dataDirection::mosi);
 }
 
+// Checks if the compulsory MISO PDO objects are mapped
+void IMotionCube::validateMisoPDOs()
+{
+  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::StatusWord) == 1, "StatusWord not mapped");
+  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not mapped");
+}
+
+// Checks if the compulsory MOSI PDO objects are mapped
+void IMotionCube::validateMosiPDOs()
+{
+  ROS_ASSERT_MSG(this->mosiByteOffsets.count(IMCObjectName::ControlWord) == 1, "ControlWord not mapped");
+}
+
 // Set configuration parameters to the IMC
-bool IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
+void IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
 {
   bool success = true;
   // sdo_bit32(slaveIndex, address, subindex, value);
@@ -69,16 +91,7 @@ bool IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
   success &= sdo_bit8(slaveIndex, 0x60C2, 1, ecatCycleTime);
   success &= sdo_bit8(slaveIndex, 0x60C2, 2, -3);
 
-  if (success)
-  {
-    ROS_INFO("Successfully wrote initial settings to IMC %d", this->slaveIndex);
-  }
-  else
-  {
-    ROS_WARN("Writing initial settings to IMC %d failed", this->slaveIndex);
-  }
-
-  return success;
+  ROS_ASSERT_MSG(success, "Writing initial settings to IMC %d failed", this->slaveIndex);
 }
 
 void IMotionCube::actuateRad(float targetRad)
