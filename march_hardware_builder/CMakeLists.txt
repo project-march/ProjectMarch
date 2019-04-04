@@ -10,7 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
         roslib
         rostest
         march_hardware
-        )
+)
 
 catkin_package(
         INCLUDE_DIRS
@@ -27,7 +27,7 @@ set(ROSLINT_CPP_OPTS "--filter=-build/include,-build/header_guard,-runtime/refer
 file(GLOB_RECURSE lintfiles
         "*.cpp"
         "*.h"
-        )
+)
 
 roslint_cpp(${lintfiles})
 
@@ -40,29 +40,26 @@ include_directories(
 install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
         FILES_MATCHING PATTERN "*.h"
-        PATTERN ".svn" EXCLUDE)
-
-
+        PATTERN ".svn" EXCLUDE
+)
 
 add_library(march_hardware_builder
         include/${PROJECT_NAME}/HardwareBuilder.h
         include/${PROJECT_NAME}/HardwareConfigExceptions.h
         include/${PROJECT_NAME}/AllowedRobot.h
         src/HardwareBuilder.cpp
-        src/main.cpp
-        )
+)
 
-target_link_libraries(march_hardware_builder ${catkin_LIBRARIES} yaml-cpp)
-
-
-add_executable(hardware_builder_dummy src/main.cpp)
-target_link_libraries(hardware_builder_dummy march_hardware_builder yaml-cpp)
+target_link_libraries(march_hardware_builder
+        ${catkin_LIBRARIES}
+        yaml-cpp
+)
 
 install(TARGETS march_hardware_builder
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-        RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
-
+        RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
+)
 
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
