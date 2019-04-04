@@ -16,137 +16,60 @@ IMotionCube::IMotionCube(int slaveIndex, Encoder encoder) : Slave(slaveIndex)
   this->encoder.setSlaveIndex(this->slaveIndex);
 }
 
-// TODO(Martijn Isha) change name to show this is only EtherCAT startup initialization
 void IMotionCube::writeInitialSDOs(int ecatCycleTime)
 {
-  mapPDOs();
+  mapMisoPDOs();
+  mapMosiPDOs();
+  validateMisoPDOs();
+  validateMosiPDOs();
   writeInitialSettings(ecatCycleTime);
 }
 
-// Map Process Data Object by sending SDOs to the IMC
-bool IMotionCube::mapPDOs()
+// Map Process Data Object (PDO) for by sending SDOs to the IMC
+// Master In, Slave Out
+void IMotionCube::mapMisoPDOs()
 {
-  // TODO(Martijn) Refactor this into something more readable and modular
+  PDOmap pdoMapMISO = PDOmap();
+  pdoMapMISO.addObject(IMCObjectName::StatusWord);      // Compulsory!
+  pdoMapMISO.addObject(IMCObjectName::ActualPosition);  // Compulsory!
+  pdoMapMISO.addObject(IMCObjectName::DCLinkVoltage);
+  pdoMapMISO.addObject(IMCObjectName::DetailedErrorRegister);
+  this->misoByteOffsets = pdoMapMISO.map(this->slaveIndex, dataDirection::miso);
+}
 
-  bool success = true;
+// Map Process Data Object (PDO) for by sending SDOs to the IMC
+// Master Out, Slave In
+void IMotionCube::mapMosiPDOs()
+{
+  PDOmap pdoMapMOSI = PDOmap();
+  pdoMapMOSI.addObject(IMCObjectName::ControlWord);  // Compulsory!
+  pdoMapMOSI.addObject(IMCObjectName::TargetPosition);
+  this->mosiByteOffsets = pdoMapMOSI.map(this->slaveIndex, dataDirection::mosi);
+}
 
-  //----------------------------------------
+// Checks if the compulsory MISO PDO objects are mapped
+void IMotionCube::validateMisoPDOs()
+{
+  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::StatusWord) == 1, "StatusWord not mapped");
+  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not mapped");
+}
 
-  // clear sm pdos
-  success &= sdo_bit8(slaveIndex, 0x1C12, 0, 0);
-  success &= sdo_bit8(slaveIndex, 0x1C13, 0, 0);
-
-  //----------------------------------------
-
-  // clear 1A00 pdo entries
-  success &= sdo_bit32(slaveIndex, 0x1A00, 0, 0);
-  // download 1A00 pdo entries
-
-  // Status word
-  success &= sdo_bit32(slaveIndex, 0x1A00, 1, 0x60410010);
-
-  //  Position actual value
-  success &= sdo_bit32(slaveIndex, 0x1A00, 2, 0x60640020);
-
-  // Motion error register
-  success &= sdo_bit32(slaveIndex, 0x1A00, 3, 0x20000010);
-
-  // download 1A00 pdo count: 3
-  success &= sdo_bit32(slaveIndex, 0x1A00, 0, 3);
-  //--------------------
-
-  // clear 1A01 pdo entries
-  success &= sdo_bit32(slaveIndex, 0x1A01, 0, 0);
-  // download 1A01 pdo entries
-
-  //  Detailed error register
-  success &= sdo_bit32(slaveIndex, 0x1A01, 1, 0x20020010);
-  //  DC-link voltage
-  success &= sdo_bit32(slaveIndex, 0x1A01, 2, 0x20550010);
-  //  Drive temperature
-  success &= sdo_bit32(slaveIndex, 0x1A01, 3, 0x20580010);
-  // download 1A01 pdo count: 4
-  success &= sdo_bit32(slaveIndex, 0x1A01, 0, 3);
-
-  // clear 1A02 pdo entries
-  success &= sdo_bit32(slaveIndex, 0x1A02, 0, 0);
-  // download 1A02 pdo entries
-
-  //  Torque actual value
-  success &= sdo_bit32(slaveIndex, 0x1A02, 1, 0x60770010);
-  //  Current limit
-  success &= sdo_bit32(slaveIndex, 0x1A02, 2, 0x207f0010);
-  //  Motor position
-  success &= sdo_bit32(slaveIndex, 0x1A02, 3, 0x20880020);
-
-  // download 1A02 pdo count: 1
-  success &= sdo_bit32(slaveIndex, 0x1A02, 0, 3);
-  // clear 1A03 pdo entries
-  success &= sdo_bit32(slaveIndex, 0x1A03, 0, 0);
-
-  //----------------------------------------
-
-  // clear 1600 pdo entries
-  success &= sdo_bit32(slaveIndex, 0x1600, 0, 0);
-  // download 1600 pdo entries
-  //  Control word
-  success &= sdo_bit32(slaveIndex, 0x1600, 1, 0x60400010);
-  //  Target position
-  success &= sdo_bit32(slaveIndex, 0x1600, 2, 0x607A0020);
-  // download 1600 pdo count: 2
-  success &= sdo_bit32(slaveIndex, 0x1600, 0, 2);
-
-  //--------------------
-
-  // clear 1601 pdo entries
-  success &= sdo_bit32(slaveIndex, 0x1601, 0, 0);
-  // clear 1602 pdo entries
-  success &= sdo_bit32(slaveIndex, 0x1602, 0, 0);
-  // clear 1603 pdo entries
-  success &= sdo_bit32(slaveIndex, 0x1603, 0, 0);
-
-  //----------------------------------------
-
-  // download 1C12:01 index
-  success &= sdo_bit16(slaveIndex, 0x1C12, 1, 0x1600);
-  // download 1C12 counter
-  success &= sdo_bit8(slaveIndex, 0x1C12, 0, 1);
-
-  //--------------------
-
-  // download 1C13:01 index
-  success &= sdo_bit16(slaveIndex, 0x1C13, 1, 0x1A00);
-  success &= sdo_bit16(slaveIndex, 0x1C13, 2, 0x1A01);
-  success &= sdo_bit16(slaveIndex, 0x1c13, 3, 0x1A02);
-  // download 1C13 counter
-  success &= sdo_bit8(slaveIndex, 0x1C13, 0, 3);
-
-  //----------------------------------------
-
-  if (success)
-  {
-    ROS_INFO("Successfully mapped PDOs of IMC %d", this->slaveIndex);
-  }
-  else
-  {
-    ROS_WARN("PDO mapping of IMC %d failed", this->slaveIndex);
-  }
-
-  return success;
+// Checks if the compulsory MOSI PDO objects are mapped
+void IMotionCube::validateMosiPDOs()
+{
+  ROS_ASSERT_MSG(this->mosiByteOffsets.count(IMCObjectName::ControlWord) == 1, "ControlWord not mapped");
 }
 
 // Set configuration parameters to the IMC
-bool IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
+void IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
 {
   bool success = true;
-
+  // sdo_bit32(slaveIndex, address, subindex, value);
   // mode of operation
   success &= sdo_bit8(slaveIndex, 0x6060, 0, 8);
 
   // position dimension index
   success &= sdo_bit8(slaveIndex, 0x608A, 0, 1);
-
-  //  Todo(Isha) implement position factor scaling
 
   // position factor -- scaling factor numerator
   success &= sdo_bit32(slaveIndex, 0x6093, 1, 1);
@@ -168,16 +91,7 @@ bool IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
   success &= sdo_bit8(slaveIndex, 0x60C2, 1, ecatCycleTime);
   success &= sdo_bit8(slaveIndex, 0x60C2, 2, -3);
 
-  if (success)
-  {
-    ROS_INFO("Successfully wrote initial settings to IMC %d", this->slaveIndex);
-  }
-  else
-  {
-    ROS_WARN("Writing initial settings to IMC %d failed", this->slaveIndex);
-  }
-
-  return success;
+  ROS_ASSERT_MSG(success, "Writing initial settings to IMC %d failed", this->slaveIndex);
 }
 
 void IMotionCube::actuateRad(float targetRad)
@@ -234,38 +148,62 @@ void IMotionCube::actuateIU(int targetIU)
   union bit32 targetPosition;
   targetPosition.i = targetIU;
 
-  uint8 targetPositionLocation = 2;  // TODO(Isha Martijn) make this dynamic
+  if (this->mosiByteOffsets.count(IMCObjectName::TargetPosition) != 1)
+  {
+    ROS_WARN("TargetPosition not defined in PDO mapping, so can't do actuateIU");
+    return;
+  }
+  uint8 targetPositionLocation = this->mosiByteOffsets[IMCObjectName::TargetPosition];
 
   ROS_DEBUG("Trying to actuate slave %d, soem location %d to targetposition %d", this->slaveIndex,
-                    targetPositionLocation, targetPosition.i);
+            targetPositionLocation, targetPosition.i);
   set_output_bit32(this->slaveIndex, targetPositionLocation, targetPosition);
 }
 
 float IMotionCube::getAngleRad()
 {
-  return this->encoder.getAngleRad();
+  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO "
+                                                                                  "mapping, so can't get angle");
+  return this->encoder.getAngleRad(this->misoByteOffsets[IMCObjectName::ActualPosition]);
 }
 
 uint16 IMotionCube::getStatusWord()
 {
-  return get_input_bit16(this->slaveIndex, 0).ui;
+  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::StatusWord) == 1, "StatusWord not defined in PDO "
+                                                                              "mapping, so can't get status word");
+  return get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::StatusWord]).ui;
 }
 
 uint16 IMotionCube::getMotionError()
 {
-  return get_input_bit16(this->slaveIndex, 6).ui;
+  if (this->misoByteOffsets.count(IMCObjectName::MotionErrorRegister) != 1)
+  {
+    ROS_WARN("MotionErrorRegister not defined in PDO mapping, so can't read it");
+    return 0xFFFF;  // Not fatal, so can return
+  }
+  return get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::MotionErrorRegister]).ui;
 }
 
 uint16 IMotionCube::getDetailedError()
 {
-  return get_input_bit16(this->slaveIndex, 8).ui;
+  if (this->misoByteOffsets.count(IMCObjectName::DetailedErrorRegister) != 1)
+  {
+    ROS_WARN("DetailedErrorRegister not defined in PDO mapping, so can't read it");
+    return 0xFFFF;  // Not fatal, so can return
+  }
+  return get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::DetailedErrorRegister]).ui;
 }
 
 void IMotionCube::setControlWord(uint16 controlWord)
 {
+  if (this->mosiByteOffsets.count(IMCObjectName::ControlWord) != 1)
+  {
+    ROS_FATAL("ControlWord not defined in PDO mapping, so can't set Control Word");
+    throw std::exception();
+  }
   union bit16 controlwordu;
   controlwordu.i = controlWord;
-  set_output_bit16(slaveIndex, 0, controlwordu);
+  set_output_bit16(slaveIndex, this->mosiByteOffsets[IMCObjectName::ControlWord], controlwordu);
 }
 
 void IMotionCube::parseStatusWord(uint16 statusWord)
@@ -469,8 +407,12 @@ bool IMotionCube::goToOperationEnabled()
   }
   ROS_INFO("Switched On!");
 
+  // If ActualPosition is not defined in PDOmapping, a fatal error is thrown because of safety reasons
+  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO "
+                                                                                  "mapping, so can't get angle");
+
+  int angleRead = this->encoder.getAngleIU(this->misoByteOffsets[IMCObjectName::ActualPosition]);
   //  If the encoder is functioning correctly, move the joint to its current position. Otherwise shutdown
-  int angleRead = this->encoder.getAngleIU();
   if (this->encoder.isValidTargetPositionIU(angleRead))
   {
     this->actuateIU(angleRead);

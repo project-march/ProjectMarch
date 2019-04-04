@@ -59,6 +59,7 @@ add_library(march_hardware
         include/${PROJECT_NAME}/Slave.h
         include/${PROJECT_NAME}/TemperatureGES.h
         include/${PROJECT_NAME}/TemperatureSensor.h
+        include/${PROJECT_NAME}/PDOmap.h
         src/EtherCAT/EthercatIO.cpp
         src/EtherCAT/EthercatMaster.cpp
         src/EtherCAT/EthercatSDO.cpp
@@ -67,6 +68,7 @@ add_library(march_hardware
         src/Joint.cpp
         src/March4.cpp
         src/TemperatureGES.cpp
+        src/PDOmap.cpp
         src/main.cpp)
 
 target_link_libraries(march_hardware ${catkin_LIBRARIES})
@@ -97,6 +99,7 @@ if (CATKIN_ENABLE_TESTING)
             test/TestIMotionCube.cpp
             test/TestTemperatureGES.cpp
             test/TestJoint.cpp
+            test/TestPDOmap.cpp
             test/mocks/MockTemperatureGES.cpp
             test/mocks/MockTemperatureSensor.cpp
             test/mocks/MockEncoder.cpp

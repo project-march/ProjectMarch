@@ -20,9 +20,9 @@ public:
 
   Encoder(int numberOfBits, int minPositionIU, int maxPositionIU, int zeroPositionIU, float safetyMarginRad);
 
-  float getAngleRad();
+  float getAngleRad(uint8_t ActualPositionByteOffset);
 
-  int getAngleIU();
+  int getAngleIU(uint8_t ActualPositionByteOffset);
 
   float IUtoRad(int iu);
   int RadtoIU(float rad);
