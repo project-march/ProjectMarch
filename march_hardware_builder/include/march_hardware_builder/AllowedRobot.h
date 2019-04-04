@@ -35,7 +35,7 @@ public:
     std::string basePath = ros::package::getPath("march_hardware_builder");
     if (this->value == AllowedRobot::testsetup)
     {
-      return basePath.append("/src/robots/test_setup.yaml");
+      return basePath.append("/src/robots/testsetup.yaml");
     }
     else if (this->value == AllowedRobot::march3)
     {
