@@ -25,9 +25,11 @@ public:
     {
       this->value = testsetup;
     }
-
-    ROS_ASSERT_MSG(false, "Unknown robot %s", robotName.c_str());
-    this->value = AllowedRobot::testsetup;
+    else
+    {
+      ROS_ASSERT_MSG(false, "Unknown robot %s", robotName.c_str());
+      this->value = AllowedRobot::testsetup;
+    }
   }
 
   std::string getFilePath()
