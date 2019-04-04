@@ -23,7 +23,7 @@ set(ROSLINT_CPP_OPTS "--filter=-build/include,-build/header_guard,-runtime/refer
 
 file(GLOB_RECURSE lintfiles
         "src/*.cpp"
-        "src/*.h"
+        "include/*.h"
         )
 
 roslint_cpp(${lintfiles})
@@ -55,18 +55,20 @@ add_library(march_hardware
         include/${PROJECT_NAME}/Encoder.h
         include/${PROJECT_NAME}/IMotionCube.h
         include/${PROJECT_NAME}/Joint.h
-        include/${PROJECT_NAME}/March4.h
+        include/${PROJECT_NAME}/MarchRobot.h
         include/${PROJECT_NAME}/Slave.h
         include/${PROJECT_NAME}/TemperatureGES.h
         include/${PROJECT_NAME}/TemperatureSensor.h
+        include/${PROJECT_NAME}/PDOmap.h
         src/EtherCAT/EthercatIO.cpp
         src/EtherCAT/EthercatMaster.cpp
         src/EtherCAT/EthercatSDO.cpp
         src/Encoder.cpp
         src/IMotionCube.cpp
         src/Joint.cpp
-        src/March4.cpp
+        src/MarchRobot.cpp
         src/TemperatureGES.cpp
+        src/PDOmap.cpp
         src/main.cpp)
 
 target_link_libraries(march_hardware ${catkin_LIBRARIES})
@@ -90,18 +92,19 @@ add_custom_command(
 
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
-    add_rostest_gtest(${PROJECT_NAME}-test
+    add_rostest_gmock(${PROJECT_NAME}-test
             test/march4cpp.test
             test/TestRunner.cpp
             test/TestEncoder.cpp
             test/TestIMotionCube.cpp
             test/TestTemperatureGES.cpp
             test/TestJoint.cpp
+            test/TestPDOmap.cpp
             test/mocks/MockTemperatureGES.cpp
             test/mocks/MockTemperatureSensor.cpp
             test/mocks/MockEncoder.cpp
             test/mocks/MockIMotionCube.cpp
             test/mocks/MockJoint.cpp
             )
-    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march_hardware gtest gmock)
+    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march_hardware gtest)
 endif ()

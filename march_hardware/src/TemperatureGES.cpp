@@ -7,11 +7,7 @@ namespace march4cpp
 {
 TemperatureGES::TemperatureGES(int slaveIndex, int byteOffset) : Slave(slaveIndex)
 {
-  if (byteOffset < 0)
-  {
-    ROS_FATAL("Slave configuration error: byteOffset can not be negative.");
-    throw ::std::invalid_argument("Slave configuration error: byteOffset can not be negative");
-  }
+  ROS_ASSERT_MSG(byteOffset >= 0, "Slave configuration error: byteOffset %d can not be negative.", byteOffset);
   this->byteOffset = byteOffset;
 }
 

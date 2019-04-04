@@ -1,0 +1,4 @@
+resolution: 16
+maxPositionIU: 0
+zeroPositionIU: 10
+safetyMarginRad: 0.05

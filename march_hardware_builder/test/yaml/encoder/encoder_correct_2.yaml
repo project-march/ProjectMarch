@@ -1,0 +1,5 @@
+resolution: 12
+minPositionIU: 1086
+maxPositionIU: 1490
+zeroPositionIU: 1301
+safetyMarginRad: 0.005

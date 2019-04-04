@@ -36,6 +36,7 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "march4cpp_test");
   testing::InitGoogleTest(&argc, argv);
+  ::testing::FLAGS_gtest_death_test_style = "threadsafe";
 
   auto res = RUN_ALL_TESTS();
 

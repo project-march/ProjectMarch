@@ -1,4 +1,5 @@
 // Copyright 2018 Project March.
+
 #include <vector>
 
 #include <ros/ros.h>
@@ -9,49 +10,21 @@
 
 #include <march_hardware/EtherCAT/EthercatIO.h>
 
-#include <march_hardware/March4.h>
+#include <march_hardware/MarchRobot.h>
 
 namespace march4cpp
 {
-MARCH4::MARCH4()
+MarchRobot::MarchRobot()
 {
-  Encoder RHJenc = Encoder(16, 22134, 43436, 24515, 0.05);
-  Encoder LHJenc = Encoder(16, 9746, 31557, 11830, 0.05);
-
-  Encoder RKJenc = Encoder(16, 18120, 39941, 19000, 0.05);
-  Encoder LKJenc = Encoder(16, 21924, 43734, 22552, 0.05);
-
-  Encoder RAJenc = Encoder(12, 1086, 1490, 1301, 0.005);
-  Encoder LAJenc = Encoder(12, 631, 1022, 918, 0.005);
-
-  IMotionCube LHJimc = IMotionCube(3, LHJenc);
-  IMotionCube LKJimc = IMotionCube(5, LKJenc);
-  IMotionCube LAJimc = IMotionCube(7, LAJenc);
-  IMotionCube RHJimc = IMotionCube(8, RHJenc);
-  IMotionCube RKJimc = IMotionCube(10, RKJenc);
-  IMotionCube RAJimc = IMotionCube(12, RAJenc);
-
-  Joint leftHip = Joint("left_hip", LHJimc);
-  Joint leftKnee = Joint("left_knee", LKJimc);
-  Joint leftAnkle = Joint("left_ankle", LAJimc);
-  Joint rightHip = Joint("right_hip", RHJimc);
-  Joint rightKnee = Joint("right_knee", RKJimc);
-  Joint rightAnkle = Joint("right_ankle", RAJimc);
-
-  // TODO(Tim) should not create copy of joint for vector
-
-  jointList.push_back(leftHip);
-  jointList.push_back(leftKnee);
-  jointList.push_back(leftAnkle);
-  jointList.push_back(rightHip);
-  jointList.push_back(rightKnee);
-  jointList.push_back(rightAnkle);
-
-  int ecatCycleTime = 4;  // milliseconds
-  ethercatMaster.reset(new EthercatMaster(jointList, "enp3s0", this->getMaxSlaveIndex(), ecatCycleTime));
 }
 
-void MARCH4::startEtherCAT()
+MarchRobot::MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int ecatCycleTime)
+{
+  this->jointList = jointList;
+  ethercatMaster.reset(new EthercatMaster(&jointList, ifName, this->getMaxSlaveIndex(), ecatCycleTime));
+}
+
+void MarchRobot::startEtherCAT()
 {
   if (!hasValidSlaves())
   {
@@ -69,7 +42,7 @@ void MARCH4::startEtherCAT()
   ethercatMaster->start();
 }
 
-void MARCH4::stopEtherCAT()
+void MarchRobot::stopEtherCAT()
 {
   if (!ethercatMaster->isOperational)
   {
@@ -79,7 +52,7 @@ void MARCH4::stopEtherCAT()
   ethercatMaster->stop();
 }
 
-int MARCH4::getMaxSlaveIndex()
+int MarchRobot::getMaxSlaveIndex()
 {
   int maxSlaveIndex = -1;
 
@@ -101,7 +74,7 @@ int MARCH4::getMaxSlaveIndex()
   return maxSlaveIndex;
 }
 
-bool MARCH4::hasValidSlaves()
+bool MarchRobot::hasValidSlaves()
 {
   ::std::vector<int> iMotionCubeIndices;
   ::std::vector<int> temperatureSlaveIndices;
@@ -149,12 +122,12 @@ bool MARCH4::hasValidSlaves()
   return isUnique;
 }
 
-bool MARCH4::isEthercatOperational()
+bool MarchRobot::isEthercatOperational()
 {
   return ethercatMaster->isOperational;
 }
 
-Joint MARCH4::getJoint(::std::string jointName)
+Joint MarchRobot::getJoint(::std::string jointName)
 {
   if (!ethercatMaster->isOperational)
   {
