@@ -19,11 +19,22 @@
 class HardwareBuilder
 {
 private:
-  const std::vector<std::string> ENCODER_REQUIRED_KEYS =
-          { "resolution", "minPositionIU", "maxPositionIU", "zeroPositionIU", "safetyMarginRad" };
+  const std::vector<std::string> ENCODER_REQUIRED_KEYS = { "resolution", "minPositionIU", "maxPositionIU",
+                                                           "zeroPositionIU", "safetyMarginRad" };
   const std::vector<std::string> IMOTIONCUBE_REQUIRED_KEYS = { "slaveIndex", "encoder" };
   const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS = { "slaveIndex", "byteOffset" };
   const std::vector<std::string> JOINT_REQUIRED_KEYS = {};
+
+  /**
+   * @brief Loop over all keys in the keyList and check if they exist in the config. Throws a MissingKeyException when
+   *     keys are missing.
+   */
+  void validateRequiredKeysExist(YAML::Node config, std::vector<std::string> keyList, const std::string& objectName);
+
+  /**
+   * @brief Maps a robotName to a yaml filePath.
+   */
+  std::string getFilePathFromRobot(AllowedRobot robotName);
 
 public:
   std::string yamlPath;
@@ -55,17 +66,6 @@ public:
   march4cpp::Encoder createEncoder(YAML::Node encoderConfig);
   march4cpp::IMotionCube createIMotionCube(YAML::Node iMotionCubeConfig);
   march4cpp::TemperatureGES createTemperatureGES(YAML::Node temperatureGESConfig);
-
-  /**
-   * @brief Loop over all keys in the keyList and check if they exist in the config. Throws a MissingKeyException when
-   *     keys are missing.
-   */
-  void validateRequiredKeysExist(YAML::Node config, std::vector<std::string> keyList, const std::string& objectName);
-
-  /**
-   * @brief Maps a robotName to a yaml filePath.
-   */
-  std::string getFilePathFromRobot(AllowedRobot robotName);
 };
 
 #endif  // MARCH_IV_HARDWAREBUILDER_H

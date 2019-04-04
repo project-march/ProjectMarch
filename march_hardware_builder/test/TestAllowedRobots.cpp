@@ -13,15 +13,13 @@ using ::testing::AtLeast;
 class AllowedRobotTest : public ::testing::Test
 {
 protected:
-  HardwareBuilder hardwareBuilder;
 };
 
 TEST_F(AllowedRobotTest, TestMarch3)
 {
-  std::string fullPath = hardwareBuilder.getFilePathFromRobot(AllowedRobot::march3);
-  YAML::Node march3Config = YAML::LoadFile(fullPath);
+  HardwareBuilder hardwareBuilder = HardwareBuilder(AllowedRobot::march3);
   march4cpp::MarchRobot march3;
-  ASSERT_NO_THROW(march3 = hardwareBuilder.createMarchRobot(march3Config));
+  ASSERT_NO_THROW(march3 = hardwareBuilder.createMarchRobot());
 
   march4cpp::Encoder RHJenc = march4cpp::Encoder(16, 22134, 43436, 24515, 0.05);
   march4cpp::Encoder LHJenc = march4cpp::Encoder(16, 9746, 31557, 11830, 0.05);
@@ -67,8 +65,7 @@ TEST_F(AllowedRobotTest, TestMarch3)
 
 TEST_F(AllowedRobotTest, TestTestSetup)
 {
-  std::string fullPath = hardwareBuilder.getFilePathFromRobot(AllowedRobot::testsetup);
-  YAML::Node testSetupConfig = YAML::LoadFile(fullPath);
+  HardwareBuilder hardwareBuilder = HardwareBuilder(AllowedRobot::testsetup);
   march4cpp::MarchRobot testSetup;
-  ASSERT_NO_THROW(testSetup = hardwareBuilder.createMarchRobot(testSetupConfig));
+  ASSERT_NO_THROW(testSetup = hardwareBuilder.createMarchRobot());
 }
