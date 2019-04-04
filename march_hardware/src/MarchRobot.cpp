@@ -1,4 +1,5 @@
 // Copyright 2018 Project March.
+
 #include <vector>
 
 #include <ros/ros.h>
@@ -9,27 +10,21 @@
 
 #include <march_hardware/EtherCAT/EthercatIO.h>
 
-#include <march_hardware/March4.h>
+#include <march_hardware/MarchRobot.h>
 
 namespace march4cpp
 {
-MARCH4::MARCH4()
+MarchRobot::MarchRobot()
 {
-  TemperatureGES temperatureGES = TemperatureGES(1, 0);
-  // TODO(Isha, Martijn) double-check these numbers.
-  Encoder enc = Encoder(16, 37961, 59649, 39717, 0.3);
-  IMotionCube imc = IMotionCube(2, enc);
-  // For now we are only running on the test joint
-  // TODO(Isha) refactor this that you can switch between test_joint, MARCH4 (and MARCH3)
-  Joint temp = Joint("test_joint", temperatureGES, imc);
-  // TODO(Tim) should not create copy of joint for vector
-  jointList.push_back(temp);
-
-  int ecatCycleTime = 4;  // milliseconds
-  ethercatMaster.reset(new EthercatMaster(&jointList, "enp2s0", this->getMaxSlaveIndex(), ecatCycleTime));
 }
 
-void MARCH4::startEtherCAT()
+MarchRobot::MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int ecatCycleTime)
+{
+  this->jointList = jointList;
+  ethercatMaster.reset(new EthercatMaster(&jointList, ifName, this->getMaxSlaveIndex(), ecatCycleTime));
+}
+
+void MarchRobot::startEtherCAT()
 {
   if (!hasValidSlaves())
   {
@@ -47,7 +42,7 @@ void MARCH4::startEtherCAT()
   ethercatMaster->start();
 }
 
-void MARCH4::stopEtherCAT()
+void MarchRobot::stopEtherCAT()
 {
   if (!ethercatMaster->isOperational)
   {
@@ -57,7 +52,7 @@ void MARCH4::stopEtherCAT()
   ethercatMaster->stop();
 }
 
-int MARCH4::getMaxSlaveIndex()
+int MarchRobot::getMaxSlaveIndex()
 {
   int maxSlaveIndex = -1;
 
@@ -79,7 +74,7 @@ int MARCH4::getMaxSlaveIndex()
   return maxSlaveIndex;
 }
 
-bool MARCH4::hasValidSlaves()
+bool MarchRobot::hasValidSlaves()
 {
   ::std::vector<int> iMotionCubeIndices;
   ::std::vector<int> temperatureSlaveIndices;
@@ -127,12 +122,12 @@ bool MARCH4::hasValidSlaves()
   return isUnique;
 }
 
-bool MARCH4::isEthercatOperational()
+bool MarchRobot::isEthercatOperational()
 {
   return ethercatMaster->isOperational;
 }
 
-Joint MARCH4::getJoint(::std::string jointName)
+Joint MarchRobot::getJoint(::std::string jointName)
 {
   if (!ethercatMaster->isOperational)
   {

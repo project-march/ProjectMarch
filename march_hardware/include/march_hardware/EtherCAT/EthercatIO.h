@@ -5,7 +5,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
-extern "C" {
+extern "C"
+{
 #include "../../../soem/ethercat.h"
 }
 
@@ -22,7 +23,8 @@ typedef struct packed_bit64
   unsigned char b5;
   unsigned char b6;
   unsigned char b7;
-} packed_bit64;
+}
+packed_bit64;
 
 // union used for int64 and uint64 in combination with the above struct
 typedef union bit64
@@ -30,7 +32,8 @@ typedef union bit64
   int64 i;
   uint64 ui;
   packed_bit64 p;
-} bit64;
+}
+bit64;
 
 // struct used to send the x2 variable to the servo drive in the format that is required
 typedef struct packed_sd_x2
@@ -38,7 +41,8 @@ typedef struct packed_sd_x2
   uint16 time;
   unsigned char reserved;  // empty but reserved space
   uint8 integrityCounter;  // represents a 7bit int where the last bit is also part of reserved
-} packed_sd_x2;
+}
+packed_sd_x2;
 
 // struct used to easily get specific bytes from a 32 bit variable
 typedef struct packed_bit32
@@ -47,7 +51,8 @@ typedef struct packed_bit32
   unsigned char b1;
   unsigned char b2;
   unsigned char b3;
-} packed_bit32;
+}
+packed_bit32;
 
 // union used for int32, uint32, float and the x2 variable for the servo drive (sd) in combination with the above struct
 typedef union bit32
@@ -57,14 +62,16 @@ typedef union bit32
   float f;
   packed_sd_x2 ppt;
   packed_bit32 p;
-} bit32;
+}
+bit32;
 
 // struct used to easily get specific bytes from a 16 bit variable
 typedef struct packed_bit16
 {
   unsigned char b0;
   unsigned char b1;
-} packed_bit16;
+}
+packed_bit16;
 
 // union used for int16 and uint16 in combination with the above struct
 typedef union bit16
@@ -72,7 +79,8 @@ typedef union bit16
   int16 i;
   uint16 ui;
   packed_bit16 p;
-} bit16;
+}
+bit16;
 
 // union used for int8 and uint8 in combination with the above struct, unsigned char is used to read single byte
 // unbiased
@@ -81,7 +89,8 @@ typedef union bit8
   int8 i;
   uint8 ui;
   unsigned char b0;
-} bit8;
+}
+bit8;
 
 // functions to write #bit amounts of data to the EtherCAT train.
 // Takes the slave number where 0 is the master and the first slave is 1.

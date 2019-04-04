@@ -1,4 +1,5 @@
 // Copyright 2019 Project March.
+
 #ifndef MARCH4CPP__IMOTIONCUBE_H
 #define MARCH4CPP__IMOTIONCUBE_H
 
@@ -56,6 +57,18 @@ public:
   void parseDetailedError(uint16 detailedError);
 
   bool goToOperationEnabled();
+
+  /** @brief Override comparison operator */
+  friend bool operator==(const IMotionCube& lhs, const IMotionCube& rhs)
+  {
+    return lhs.slaveIndex == rhs.slaveIndex && lhs.encoder == rhs.encoder;
+  }
+  /** @brief Override stream operator for clean printing */
+  friend ::std::ostream& operator<<(std::ostream& os, const IMotionCube& iMotionCube)
+  {
+    return os << "slaveIndex: " << iMotionCube.slaveIndex << ", "
+              << "encoder: " << iMotionCube.encoder;
+  }
 };
 
 }  // namespace march4cpp

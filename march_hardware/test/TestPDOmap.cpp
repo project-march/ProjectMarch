@@ -4,7 +4,7 @@
 #include <gmock/gmock.h>
 
 #include <march_hardware/PDOmap.h>
-#include <march_hardware/March4.h>
+#include <march_hardware/MarchRobot.h>
 
 class PDOTest : public ::testing::Test
 {

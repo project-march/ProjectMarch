@@ -10,63 +10,68 @@
 
 #include <march_hardware/EtherCAT/EthercatSDO.h>
 
-
 namespace march4cpp
 {
+struct IMCObject
+{
+  int address;  // in IMC memory (see IMC manual)
+  int length;   // bits (see IMC manual)
 
-struct IMCObject{
-    int address;    // in IMC memory (see IMC manual)
-    int length;     // bits (see IMC manual)
+  explicit IMCObject(int _address, int _length)
+  {
+    this->address = _address;
+    this->length = _length;
+  }
 
-    explicit IMCObject(int _address, int _length){
-        this->address = _address;
-        this->length = _length;
-    }
-
-    IMCObject(){};
+  IMCObject(){}
 };
 
-enum class dataDirection {miso, mosi};
+enum class dataDirection
+{
+  miso,
+  mosi
+};
 
 // If a new object is added to this enum, make sure to also add it to PDOmap::initAllObjects()!
-enum class IMCObjectName {  StatusWord,
-                            ActualPosition,
-                            MotionErrorRegister,
-                            DetailedErrorRegister,
-                            DCLinkVoltage,
-                            DriveTemperature,
-                            ActualTorque,
-                            CurrentLimit,
-                            MotorPosition,
-                            ControlWord,
-                            TargetPosition,
-                            QuickStopDeceleration,
-                            QuickStopOption};
+enum class IMCObjectName
+{
+  StatusWord,
+  ActualPosition,
+  MotionErrorRegister,
+  DetailedErrorRegister,
+  DCLinkVoltage,
+  DriveTemperature,
+  ActualTorque,
+  CurrentLimit,
+  MotorPosition,
+  ControlWord,
+  TargetPosition,
+  QuickStopDeceleration,
+  QuickStopOption
+};
 
 class PDOmap
 {
 public:
-    // Constructor
-    PDOmap();
+  // Constructor
+  PDOmap();
 
-    void addObject(IMCObjectName objectname);
-    std::map<IMCObjectName, int> map(int slaveIndex, dataDirection direction);
-
+  void addObject(IMCObjectName objectname);
+  std::map<IMCObjectName, int> map(int slaveIndex, dataDirection direction);
 
 private:
-    void initAllObjects();
-    void sortPDOObjects();
-    uint32_t combineAddressLength(uint16_t address, uint16_t length);
-    std::map<IMCObjectName, IMCObject> PDOObjects;
-    std::map<IMCObjectName, IMCObject> allObjects;
-    std::vector<std::pair<IMCObjectName, IMCObject>> sortedPDOObjects;
-    std::map<IMCObjectName, int> byteOffsets;
+  void initAllObjects();
+  void sortPDOObjects();
+  uint32_t combineAddressLength(uint16_t address, uint16_t length);
+  std::map<IMCObjectName, IMCObject> PDOObjects;
+  std::map<IMCObjectName, IMCObject> allObjects;
+  std::vector<std::pair<IMCObjectName, IMCObject>> sortedPDOObjects;
+  std::map<IMCObjectName, int> byteOffsets;
 
-    const int bitsPerReg = 64;
-    const int nrofRegs = 4;
-    const int objectSizes[3] = {8, 16, 32};
-
+  const int bitsPerReg = 64;
+  const int nrofRegs = 4;
+  const int objectSizes[3] = { 8, 16, 32 };
 };
-}
+}  // namespace march4cpp
 
 #endif

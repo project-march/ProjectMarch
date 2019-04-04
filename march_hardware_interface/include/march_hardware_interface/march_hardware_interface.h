@@ -12,7 +12,10 @@
 #include <boost/scoped_ptr.hpp>
 #include <ros/ros.h>
 #include <march_hardware_interface/march_hardware.h>
-#include <march_hardware/March4.h>
+
+#include <march_hardware_builder/HardwareBuilder.h>
+
+#include <march_hardware/MarchRobot.h>
 
 using namespace hardware_interface;
 using joint_limits_interface::JointLimits;
@@ -33,7 +36,7 @@ static const double VELOCITY_STEP_FACTOR = 10;
 class MarchHardwareInterface : public march_hardware_interface::MarchHardware
 {
 public:
-  MarchHardwareInterface(ros::NodeHandle& nh);
+  MarchHardwareInterface(ros::NodeHandle &nh, AllowedRobot robotName);
   ~MarchHardwareInterface();
 
   /**
@@ -54,7 +57,7 @@ public:
   void write(ros::Duration elapsed_time);
 
 protected:
-  ::march4cpp::MARCH4 march;
+  ::march4cpp::MarchRobot marchRobot;
   ros::NodeHandle nh_;
   ros::Timer non_realtime_loop_;
   ros::Duration control_period_;

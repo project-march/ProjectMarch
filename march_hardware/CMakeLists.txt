@@ -23,7 +23,7 @@ set(ROSLINT_CPP_OPTS "--filter=-build/include,-build/header_guard,-runtime/refer
 
 file(GLOB_RECURSE lintfiles
         "src/*.cpp"
-        "src/*.h"
+        "include/*.h"
         )
 
 roslint_cpp(${lintfiles})
@@ -55,7 +55,7 @@ add_library(march_hardware
         include/${PROJECT_NAME}/Encoder.h
         include/${PROJECT_NAME}/IMotionCube.h
         include/${PROJECT_NAME}/Joint.h
-        include/${PROJECT_NAME}/March4.h
+        include/${PROJECT_NAME}/MarchRobot.h
         include/${PROJECT_NAME}/Slave.h
         include/${PROJECT_NAME}/TemperatureGES.h
         include/${PROJECT_NAME}/TemperatureSensor.h
@@ -66,7 +66,7 @@ add_library(march_hardware
         src/Encoder.cpp
         src/IMotionCube.cpp
         src/Joint.cpp
-        src/March4.cpp
+        src/MarchRobot.cpp
         src/TemperatureGES.cpp
         src/PDOmap.cpp
         src/main.cpp)
