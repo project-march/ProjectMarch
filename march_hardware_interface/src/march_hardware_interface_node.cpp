@@ -9,7 +9,12 @@ int main(int argc, char** argv)
   ros::AsyncSpinner spinner(2);
   spinner.start();
 
-  march_hardware_interface::MarchHardwareInterface march(nh, AllowedRobot::march3);
+  std::string selectedRobotName = argv[1];
+  ROS_INFO("Selected robot: %s", selectedRobotName.c_str());
+  AllowedRobot selectedRobot = AllowedRobot(selectedRobotName);
+
+  march_hardware_interface::MarchHardwareInterface march(nh, selectedRobot);
   ros::waitForShutdown();
   return 0;
 }
+

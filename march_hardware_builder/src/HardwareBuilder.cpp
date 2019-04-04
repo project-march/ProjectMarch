@@ -3,7 +3,6 @@
 #include <march_hardware_builder/HardwareBuilder.h>
 #include <march_hardware_builder/HardwareConfigExceptions.h>
 #include "ros/ros.h"
-#include <ros/package.h>
 
 HardwareBuilder::HardwareBuilder(std::string yamlPath)
 {
@@ -11,9 +10,9 @@ HardwareBuilder::HardwareBuilder(std::string yamlPath)
   this->robotConfig = YAML::LoadFile(yamlPath);
 }
 
-HardwareBuilder::HardwareBuilder(AllowedRobot robotName)
+HardwareBuilder::HardwareBuilder(AllowedRobot robot)
 {
-  this->yamlPath = getFilePathFromRobot(robotName);
+  this->yamlPath = robot.getFilePath();
   this->robotConfig = YAML::LoadFile(yamlPath);
 }
 
@@ -133,20 +132,5 @@ void HardwareBuilder::validateRequiredKeysExist(YAML::Node config, std::vector<s
     {
       throw MissingKeyException(keyList.at(i), objectName);
     }
-  }
-}
-
-std::string HardwareBuilder::getFilePathFromRobot(AllowedRobot robotName)
-{
-  std::string basePath = ros::package::getPath("march_hardware_builder");
-  switch (robotName)
-  {
-    case AllowedRobot::testsetup:
-      return basePath.append("/src/robots/test_setup.yaml");
-    case AllowedRobot::march3:
-      return basePath.append("/src/robots/march3.yaml");
-    default:
-      ROS_ERROR("Robotname not implemented. Using march3.yaml...");
-      return basePath.append("/src/robots/march3.yaml");
   }
 }
