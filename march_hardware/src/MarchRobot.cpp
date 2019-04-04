@@ -21,7 +21,7 @@ MarchRobot::MarchRobot()
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int ecatCycleTime)
 {
   this->jointList = jointList;
-  ethercatMaster.reset(new EthercatMaster(jointList, ifName, this->getMaxSlaveIndex(), ecatCycleTime));
+  ethercatMaster.reset(new EthercatMaster(&jointList, ifName, this->getMaxSlaveIndex(), ecatCycleTime));
 }
 
 void MarchRobot::startEtherCAT()

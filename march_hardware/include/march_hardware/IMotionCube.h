@@ -3,9 +3,13 @@
 #ifndef MARCH4CPP__IMOTIONCUBE_H
 #define MARCH4CPP__IMOTIONCUBE_H
 
+#include <map>
+#include <string>
+
 #include <march_hardware/EtherCAT/EthercatIO.h>
 #include <march_hardware/Slave.h>
 #include <march_hardware/Encoder.h>
+#include <march_hardware/PDOmap.h>
 
 namespace march4cpp
 {
@@ -14,8 +18,16 @@ class IMotionCube : public Slave
 private:
   Encoder encoder;
   void actuateIU(int iu);
+
+  std::map<IMCObjectName, int> misoByteOffsets;
+  std::map<IMCObjectName, int> mosiByteOffsets;
+  void mapMisoPDOs();
+  void mapMosiPDOs();
+  void validateMisoPDOs();
+  void validateMosiPDOs();
+  void writeInitialSettings(uint8 ecatCycleTime);
+
   bool get_bit(uint16 value, int index);
-  // TODO(Martijn) add PDO/SDO settings here.
 
 public:
   explicit IMotionCube(int slaveIndex, Encoder encoder);
@@ -28,10 +40,6 @@ public:
   ~IMotionCube() = default;
 
   void writeInitialSDOs(int ecatCycleTime) override;
-
-  bool mapPDOs();
-
-  bool writeInitialSettings(uint8 ecatCycleTime);
 
   float getAngleRad();
 
