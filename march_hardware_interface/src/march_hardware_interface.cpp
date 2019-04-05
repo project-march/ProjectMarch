@@ -17,10 +17,9 @@ using joint_limits_interface::PositionJointSoftLimitsInterface;
 
 namespace march_hardware_interface
 {
-MarchHardwareInterface::MarchHardwareInterface(ros::NodeHandle& nh, AllowedRobot robotName) : nh_(nh)
+MarchHardwareInterface::MarchHardwareInterface(ros::NodeHandle& nh, AllowedRobot robotName)
+  : nh_(nh), marchRobot(HardwareBuilder(robotName).createMarchRobot())
 {
-  HardwareBuilder hardwareBuilder = HardwareBuilder(robotName);
-  this->marchRobot = hardwareBuilder.createMarchRobot();
   init();
   controller_manager_.reset(new controller_manager::ControllerManager(this, nh_));
   nh_.param("/march/hardware_interface/loop_hz", loop_hz_, 0.1);
