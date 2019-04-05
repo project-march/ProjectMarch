@@ -23,8 +23,6 @@ public:
 
   MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int ecatCycleTime);
 
-  MarchRobot();
-
   void startEtherCAT();
 
   void stopEtherCAT();
