@@ -98,7 +98,7 @@ void MarchHardwareInterface::init()
     effort_joint_interface_.registerHandle(jointEffortHandle);
 
     // Enable high voltage on the IMC
-    //    joint.getIMotionCube().goToOperationEnabled();
+    joint.getIMotionCube().goToOperationEnabled();
   }
 
   registerInterface(&joint_state_interface_);
