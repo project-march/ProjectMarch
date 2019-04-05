@@ -15,11 +15,15 @@ class AllowedRobotTest : public ::testing::Test
 protected:
 };
 
-TEST_F(AllowedRobotTest, TestMarch3)
+TEST_F(AllowedRobotTest, TestMarch3Creation)
 {
   HardwareBuilder hardwareBuilder = HardwareBuilder(AllowedRobot::march3);
-  march4cpp::MarchRobot march3;
-  ASSERT_NO_THROW(march3 = hardwareBuilder.createMarchRobot());
+  ASSERT_NO_THROW(march4cpp::MarchRobot march3 = hardwareBuilder.createMarchRobot());
+}
+
+TEST_F(AllowedRobotTest, TestMarch3Values)
+{
+  march4cpp::MarchRobot march3 = HardwareBuilder(AllowedRobot::march3).createMarchRobot();
 
   march4cpp::Encoder RHJenc = march4cpp::Encoder(16, 22134, 43436, 24515, 0.05);
   march4cpp::Encoder LHJenc = march4cpp::Encoder(16, 9746, 31557, 11830, 0.05);
@@ -63,9 +67,7 @@ TEST_F(AllowedRobotTest, TestMarch3)
   ASSERT_EQ(actualRobot, march3);
 }
 
-TEST_F(AllowedRobotTest, TestTestSetup)
+TEST_F(AllowedRobotTest, TestTestSetupCreation)
 {
-  HardwareBuilder hardwareBuilder = HardwareBuilder(AllowedRobot::testsetup);
-  march4cpp::MarchRobot testSetup;
-  ASSERT_NO_THROW(testSetup = hardwareBuilder.createMarchRobot());
+  ASSERT_NO_THROW(march4cpp::MarchRobot testSetup = HardwareBuilder(AllowedRobot::testsetup).createMarchRobot());
 }
