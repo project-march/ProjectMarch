@@ -9,9 +9,9 @@
     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="true" output="screen" ns="/"
           args="
                 /march/controller/state
-                /march/controller/trajectory/full_exoskeleton
+                /march/controller/trajectory/testjoint
             "/>
 
-    <node name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" args="testsetup" output="screen"/>
+<!--    <node name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" args="testsetup" output="screen"/>-->
 
 </launch>

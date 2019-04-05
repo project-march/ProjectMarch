@@ -4,7 +4,7 @@ march:
       type: joint_state_controller/JointStateController
       publish_rate: 50
     trajectory:
-      full_exoskeleton:
+      testjoint:
         type: position_controllers/JointTrajectoryController
         joints:
           - test_joint
