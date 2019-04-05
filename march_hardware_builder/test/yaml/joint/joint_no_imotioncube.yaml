@@ -1,3 +1,4 @@
+actuate: true
 temperatureges:
   slaveIndex: 1
   byteOffset: 2
