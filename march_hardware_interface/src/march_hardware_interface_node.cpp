@@ -6,10 +6,15 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "march_hardware_interface");
   ros::NodeHandle nh;
-  ros::AsyncSpinner spinner(1);
+  ros::AsyncSpinner spinner(2);
   spinner.start();
 
-  march_hardware_interface::MarchHardwareInterface march(nh, AllowedRobot::march3);
-  ros::spin();
+  std::string selectedRobotName = argv[1];
+  ROS_INFO("Selected robot: %s", selectedRobotName.c_str());
+  AllowedRobot selectedRobot = AllowedRobot(selectedRobotName);
+
+  march_hardware_interface::MarchHardwareInterface march(nh, selectedRobot);
+  ros::waitForShutdown();
   return 0;
 }
+

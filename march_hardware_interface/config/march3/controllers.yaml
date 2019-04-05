@@ -4,11 +4,12 @@ march:
       type: joint_state_controller/JointStateController
       publish_rate: 50
     trajectory:
-      test_joint:
+      full_exoskeleton:
         type: position_controllers/JointTrajectoryController
         joints:
-          - test_joint
-    position:
-      test_joint:
-        type: position_controllers/JointPositionController
-        joint: test_joint
+          - right_hip
+          - left_hip
+          - right_knee
+          - left_knee
+          - right_ankle
+          - left_ankle

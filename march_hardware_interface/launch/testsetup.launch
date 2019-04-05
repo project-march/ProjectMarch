@@ -1,0 +1,17 @@
+<launch>
+    <rosparam file="$(find march_hardware_interface)/config/testsetup/hardware.yaml" command="load"/>
+    <rosparam file="$(find march_hardware_interface)/config/testsetup/controllers.yaml" command="load"/>
+    <rosparam file="$(find march_hardware_interface)/config/testsetup/joint_limits.yaml" command="load"/>
+
+    <include file="$(find march_description)/launch/load_test_joint_description.launch"/>
+
+
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="true" output="screen" ns="/"
+          args="
+                /march/controller/state
+                /march/controller/trajectory/testjoint
+            "/>
+
+    <node name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" args="testsetup" output="screen"/>
+
+</launch>

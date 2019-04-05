@@ -31,11 +31,6 @@ private:
    */
   void validateRequiredKeysExist(YAML::Node config, std::vector<std::string> keyList, const std::string& objectName);
 
-  /**
-   * @brief Maps a robotName to a yaml filePath.
-   */
-  std::string getFilePathFromRobot(AllowedRobot robotName);
-
 public:
   std::string yamlPath;
   YAML::Node robotConfig;
@@ -44,7 +39,7 @@ public:
    * @brief Initialise a HardwareBuilder with a robotName enumerator.
    * @details Grabs the .yaml file associated with the robotName and loads it in the robotConfig.
    */
-  explicit HardwareBuilder(AllowedRobot robotName);
+  explicit HardwareBuilder(AllowedRobot robot);
 
   /**
    * @brief Initialise a HardwareBuilder with a path to a .yaml file.
