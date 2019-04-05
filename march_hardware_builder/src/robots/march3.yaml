@@ -3,6 +3,7 @@ march3:
   ecatCycleTime: 4
   joints:
     - right_hip:
+        actuate: true
         imotioncube:
           slaveIndex: 8
           encoder:
@@ -12,6 +13,7 @@ march3:
             zeroPositionIU: 24515
             safetyMarginRad: 0.05
     - left_hip:
+        actuate: true
         imotioncube:
           slaveIndex: 3
           encoder:
@@ -21,6 +23,7 @@ march3:
             zeroPositionIU: 11830
             safetyMarginRad: 0.05
     - right_knee:
+        actuate: true
         imotioncube:
           slaveIndex: 10
           encoder:
@@ -30,6 +33,7 @@ march3:
             zeroPositionIU: 19000
             safetyMarginRad: 0.05
     - left_knee:
+        actuate: true
         imotioncube:
           slaveIndex: 5
           encoder:
@@ -39,6 +43,7 @@ march3:
             zeroPositionIU: 22552
             safetyMarginRad: 0.05
     - right_ankle:
+        actuate: true
         imotioncube:
           slaveIndex: 12
           encoder:
@@ -48,6 +53,7 @@ march3:
             zeroPositionIU: 1301
             safetyMarginRad: 0.005
     - left_ankle:
+        actuate: true
         imotioncube:
           slaveIndex: 7
           encoder:

@@ -52,13 +52,16 @@ march4cpp::MarchRobot HardwareBuilder::createMarchRobot()
 march4cpp::Joint HardwareBuilder::createJoint(YAML::Node jointConfig, std::string jointName)
 {
   ROS_INFO("Starting creation of joint %s", jointName.c_str());
+  this->validateRequiredKeysExist(jointConfig, this->JOINT_REQUIRED_KEYS, "joint");
+
 
   march4cpp::IMotionCube imc;
   march4cpp::TemperatureGES temperatureGes;
 
   bool hasIMotionCube = false;
   bool hasTemperatureGes = false;
-  this->validateRequiredKeysExist(jointConfig, this->JOINT_REQUIRED_KEYS, "joint");
+  bool actuate = jointConfig["actuate"].as<bool>();
+
 
   if (jointConfig["imotioncube"].Type() == YAML::NodeType::Undefined)
   {
@@ -84,13 +87,13 @@ march4cpp::Joint HardwareBuilder::createJoint(YAML::Node jointConfig, std::strin
                  "Joint %s has no IMotionCube and no TemperatureGES. Please check its purpose.", jointName.c_str());
   if (hasTemperatureGes && hasIMotionCube)
   {
-    return march4cpp::Joint(jointName, temperatureGes, imc);
+    return march4cpp::Joint(jointName, actuate, temperatureGes, imc);
   }
   if (hasTemperatureGes)
   {
-    return march4cpp::Joint(jointName, temperatureGes);
+    return march4cpp::Joint(jointName, actuate, temperatureGes);
   }
-  return march4cpp::Joint(jointName, imc);
+  return march4cpp::Joint(jointName, actuate, imc);
 }
 
 march4cpp::IMotionCube HardwareBuilder::createIMotionCube(YAML::Node iMotionCubeConfig)

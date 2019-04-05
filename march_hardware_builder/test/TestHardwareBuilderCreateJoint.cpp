@@ -58,10 +58,12 @@ TEST_F(JointTest, ValidNotActuated)
   march4cpp::IMotionCube actualIMotionCube = march4cpp::IMotionCube(2, actualEncoder);
   march4cpp::TemperatureGES actualTemperatureGes = march4cpp::TemperatureGES(1, 2);
   march4cpp::Joint actualJoint = march4cpp::Joint("test_joint_hip", false, actualTemperatureGes, actualIMotionCube);
+  march4cpp::Joint actualJointWrong = march4cpp::Joint("test_joint_hip", true, actualTemperatureGes, actualIMotionCube);
 
   ASSERT_EQ("test_joint_hip", actualJoint.getName());
   ASSERT_FALSE(actualJoint.canActuate());
   ASSERT_EQ(actualJoint, createdJoint);
+  ASSERT_NE(actualJointWrong, createdJoint);
 }
 
 TEST_F(JointTest, ValidJointAnkle)
@@ -104,11 +106,19 @@ TEST_F(JointTest, NoTemperatureGES)
   ASSERT_NO_THROW(hardwareBuilder.createJoint(jointConfig, "test_joint_no_temperature_ges"));
 }
 
+TEST_F(JointDeathTest, OnlyActuate)
+{
+  std::string fullPath = this->fullPath("/joint_only_actuate.yaml");
+  YAML::Node jointConfig = YAML::LoadFile(fullPath);
+
+  ASSERT_DEATH(hardwareBuilder.createJoint(jointConfig, "test_joint_only_actuate"),
+               "Joint test_joint_only_actuate has no IMotionCube and no TemperatureGES. Please check its purpose.");
+}
+
 TEST_F(JointDeathTest, EmptyJoint)
 {
   std::string fullPath = this->fullPath("/joint_empty.yaml");
   YAML::Node jointConfig = YAML::LoadFile(fullPath);
 
-  ASSERT_DEATH(hardwareBuilder.createJoint(jointConfig, "test_joint_empty_joint"),
-               "Joint test_joint_empty_joint has no IMotionCube and no TemperatureGES. Please check its purpose.");
+  ASSERT_THROW(hardwareBuilder.createJoint(jointConfig, "test_joint_empty"), MissingKeyException);
 }

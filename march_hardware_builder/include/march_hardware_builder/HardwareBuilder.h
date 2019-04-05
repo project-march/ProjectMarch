@@ -23,7 +23,7 @@ private:
           { "resolution", "minPositionIU", "maxPositionIU", "zeroPositionIU", "safetyMarginRad" };
   const std::vector<std::string> IMOTIONCUBE_REQUIRED_KEYS = { "slaveIndex", "encoder" };
   const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS = { "slaveIndex", "byteOffset" };
-  const std::vector<std::string> JOINT_REQUIRED_KEYS = {};
+  const std::vector<std::string> JOINT_REQUIRED_KEYS = {"actuate"};
 
   /**
    * @brief Loop over all keys in the keyList and check if they exist in the config. Throws a MissingKeyException when

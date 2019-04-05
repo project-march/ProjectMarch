@@ -5,20 +5,23 @@
 
 namespace march4cpp
 {
-Joint::Joint(std::string name, TemperatureGES temperatureGES, IMotionCube iMotionCube)
+Joint::Joint(std::string name, bool actuate, TemperatureGES temperatureGES, IMotionCube iMotionCube)
   : temperatureGES(temperatureGES), iMotionCube(iMotionCube)
 {
   this->name = std::move(name);
+  this->actuate = actuate;
 }
 
-Joint::Joint(std::string name, TemperatureGES temperatureGES) : temperatureGES(temperatureGES)
+Joint::Joint(std::string name, bool actuate, TemperatureGES temperatureGES) : temperatureGES(temperatureGES)
 {
   this->name = std::move(name);
+  this->actuate = actuate;
 }
-Joint::Joint(std::string name, IMotionCube iMotionCube) : iMotionCube(iMotionCube)
+Joint::Joint(std::string name, bool actuate, IMotionCube iMotionCube) : iMotionCube(iMotionCube)
 
 {
   this->name = std::move(name);
+  this->actuate = actuate;
 }
 
 void Joint::initialize(int ecatCycleTime)
@@ -95,5 +98,10 @@ bool Joint::hasIMotionCube()
 bool Joint::hasTemperatureGES()
 {
   return this->temperatureGES.getSlaveIndex() != -1;
+}
+
+bool Joint::canActuate()
+{
+  return this->actuate;
 }
 }  // namespace march4cpp
