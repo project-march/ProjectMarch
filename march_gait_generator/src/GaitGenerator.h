@@ -26,11 +26,13 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef MYVIZ_H
-#define MYVIZ_H
+#ifndef GAITGENERATOR_H
+#define GAITGENERATOR_H
 
 #include <QWidget>
-#include <geometry_msgs/TransformStamped.h>
+#include <QHBoxLayout>
+#include <urdf/model.h>
+
 
 namespace rviz
 {
@@ -43,19 +45,27 @@ namespace rviz
 // Class "GaitGenerator" implements the top level widget for this example.
 class GaitGenerator: public QWidget
 {
-    Q_OBJECT
+Q_OBJECT
+
 public:
+    int keyFrameCounter;
+
     GaitGenerator( QWidget* parent = 0 );
     virtual ~GaitGenerator();
 
 private Q_SLOTS:
-            void setThickness( int thickness_percent );
-    void setCellSize( int cell_size_percent );
+    void addKeyFramePanel();
+    QGridLayout* createKeyFrameSettings();
+    void initUrdf();
+    void addKeyFrameUI();
+
+    QString appendKeyFrameCounter(const std::string& base);
 
 private:
-    rviz::VisualizationManager* manager_;
-    rviz::RenderPanel* render_panel_;
-    rviz::Display* grid_;
+    QHBoxLayout* main_layout_;
+    urdf::Model* model_;
+    void publishKeyFrame(int keyFrameIndex);
+
 };
 // END_TUTORIAL
-#endif // MYVIZ_H
+#endif // GAITGENERATOR_H

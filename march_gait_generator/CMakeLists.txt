@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(march_gait_generator)
+
+add_definitions(-std=c++11 -Wall -g)
+
 find_package(catkin REQUIRED COMPONENTS rviz roscpp)
 catkin_package()
 include_directories(${catkin_INCLUDE_DIRS})
@@ -29,8 +32,9 @@ add_definitions(-DQT_NO_KEYWORDS)
 ## Here we specify the list of source files.
 ## The generated MOC files are included automatically as headers.
 set(SRC_FILES
-        src/gaitgenerator.cpp
+        src/GaitGenerator.cpp
         src/main.cpp
+        src/widgets/FancySlider.cpp
         )
 
 ## Add the "march_gait_generator" executable and specify the list of source files we
