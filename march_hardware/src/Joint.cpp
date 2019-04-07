@@ -38,7 +38,9 @@ void Joint::initialize(int ecatCycleTime)
 
 void Joint::actuateRad(float targetPositionRad)
 {
-  // TODO(BaCo) check that the position is allowed and does not exceed (torque) limits.
+  ROS_ASSERT_MSG(this->actuate, "Joint %s is not allowed to actuate, yet its actuate method has been called.",
+          this->name.c_str());
+    // TODO(BaCo) check that the position is allowed and does not exceed (torque) limits.
   this->iMotionCube.actuateRad(targetPositionRad);
 }
 
