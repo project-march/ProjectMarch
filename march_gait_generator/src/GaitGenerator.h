@@ -31,7 +31,10 @@
 
 #include <QWidget>
 #include <QHBoxLayout>
+
 #include <urdf/model.h>
+
+#include <sensor_msgs/JointState.h>
 
 
 namespace rviz
@@ -62,9 +65,14 @@ private Q_SLOTS:
     QString appendKeyFrameCounter(const std::string& base);
 
 private:
+    ros::NodeHandle n;
+    ros::Publisher joint_pub;
+
     QHBoxLayout* main_layout_;
     urdf::Model* model_;
-    void publishKeyFrame(int keyFrameIndex);
+    void publishKeyFrame(sensor_msgs::JointState jointState);
+
+    sensor_msgs::JointState getJointStateFromKeyFrame(int keyFrameIndex);
 
 };
 // END_TUTORIAL

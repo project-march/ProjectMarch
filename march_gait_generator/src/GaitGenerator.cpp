@@ -33,8 +33,6 @@
 #include <QVBoxLayout>
 #include <QLineEdit>
 
-#include <sensor_msgs/JointState.h>
-
 #include <tf/transform_broadcaster.h>
 
 #include "rviz/visualization_manager.h"
@@ -50,6 +48,7 @@ GaitGenerator::GaitGenerator( QWidget* parent )
         : QWidget( parent )
 {
 
+    joint_pub = n.advertise<sensor_msgs::JointState>("joint_states", 1);
     initUrdf();
 
     keyFrameCounter = 0;
@@ -61,7 +60,6 @@ GaitGenerator::GaitGenerator( QWidget* parent )
 
     addKeyFramePanel();
     addKeyFramePanel();
-
 
 //    publishKeyFrame();
 }
@@ -86,7 +84,7 @@ void GaitGenerator::initUrdf(){
 QGridLayout* GaitGenerator::createKeyFrameSettings(){
     QGridLayout* controls_layout = new QGridLayout();
     ROS_WARN("Joint name");
-
+    int frameIndex = keyFrameCounter;
     std::map<std::string, urdf::JointSharedPtr> jointMap = model_->joints_;
 
 //    ROS_INFO_STREAM(model_->joints_);
@@ -106,20 +104,25 @@ QGridLayout* GaitGenerator::createKeyFrameSettings(){
         QLabel* minLabel = new QLabel(QString::fromStdString(std::to_string(lowerLimit)), fancySlider);
         QLabel* maxLabel = new QLabel(QString::fromStdString(std::to_string(upperLimit)), fancySlider);
 
-        fancySlider->setValue(10);
-        fancySlider->setMinimum( lowerLimit * fancySlider->MULTIPLICATION_FACTOR );
+        fancySlider->setMinimum( lowerLimit * fancySlider->MULTIPLICATION_FACTOR);
         fancySlider->setMaximum( upperLimit * fancySlider->MULTIPLICATION_FACTOR);
-        QLineEdit* actualValue = new QLineEdit();
 
-        controls_layout->addWidget( jointLabel, gridRow, 0);
-        controls_layout->addWidget( actualValue, gridRow, 1, 1, 2);
-        controls_layout->addWidget( minLabel, gridRow + 1, 0);
-        controls_layout->addWidget( fancySlider, gridRow + 1, 1);
-        controls_layout->addWidget( maxLabel, gridRow + 1, 2);
+        QLineEdit* actualValue = new QLineEdit();
+        // Set objectname to later retrieve the jointname.
+        actualValue->setObjectName(QString("frame").append(QString::number(frameIndex)).append(it->first.c_str()));
+        actualValue->setText(QString::number(0/fancySlider->MULTIPLICATION_FACTOR));
+
+        controls_layout->setObjectName(QString("frame").append(QString::number(frameIndex)));
+        controls_layout->addWidget(jointLabel, gridRow, 0);
+        controls_layout->addWidget(actualValue, gridRow, 1, 1, 2);
+        controls_layout->addWidget(minLabel, gridRow + 1, 0);
+        controls_layout->addWidget(fancySlider, gridRow + 1, 1);
+        controls_layout->addWidget(maxLabel, gridRow + 1, 2);
 
         connect(fancySlider, &FancySlider::valueChanged, [=]() {
             float value = fancySlider->value();
             actualValue->setText(QString::number(value/fancySlider->MULTIPLICATION_FACTOR));
+            publishKeyFrame(getJointStateFromKeyFrame(frameIndex));
         });
 
         connect(actualValue, &QLineEdit::editingFinished, [=]() {
@@ -127,15 +130,18 @@ QGridLayout* GaitGenerator::createKeyFrameSettings(){
             bool succes;
             float value = text.toFloat(&succes);
             if(succes){
-                printf("asdasd");
                 fancySlider->setValue(value*fancySlider->MULTIPLICATION_FACTOR);
+                publishKeyFrame(getJointStateFromKeyFrame(frameIndex));
+
             } else {
                 ROS_WARN("Text %s is not a valid position.", text.toStdString().c_str());
                 actualValue->setText(QString::number(fancySlider->value()/fancySlider->MULTIPLICATION_FACTOR));
             }
         });
 
-//        connect(controls_layout, &FancySlider::valueChanged, [=]() {
+        fancySlider->setValue(0);
+
+//        connect(controls_layout, &QGridLayout::triggered, [=]() {
 //
 //        });
 
@@ -182,6 +188,28 @@ QString GaitGenerator::appendKeyFrameCounter(const std::string& base){
 
 }
 
-void GaitGenerator::publishKeyFrame(int keyFrameIndex) {
+void GaitGenerator::publishKeyFrame(sensor_msgs::JointState jointState) {
+    joint_pub.publish(jointState);
+}
 
+sensor_msgs::JointState GaitGenerator::getJointStateFromKeyFrame(int keyFrameIndex) {
+    QString keyName = QString("frame").append(QString::number(keyFrameIndex));
+    QGridLayout* layout = main_layout_->findChild<QGridLayout*>(keyName);
+    QList<QLineEdit *> values = layout->findChildren<QLineEdit*>();
+
+    sensor_msgs::JointState jointState;
+    jointState.header.stamp = ros::Time::now();
+    for (int i = 0; i < layout->count(); ++i)
+    {
+        QLineEdit *widget = dynamic_cast<QLineEdit *>(layout->itemAt(i)->widget());
+
+        if (widget != NULL)
+        {
+            double position = widget->text().toDouble();
+            std::string jointName = widget->objectName().replace(keyName, "").toStdString();
+            jointState.name.push_back(jointName);
+            jointState.position.push_back(position);
+        }
+    }
+    return jointState;
 }
