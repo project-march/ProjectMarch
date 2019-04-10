@@ -80,7 +80,8 @@ private:
     QHBoxLayout* main_layout_;
     urdf::Model* model_;
 
-    void initUrdf();
+    void loadUrdf();
+    void initLayout();
 
     void publishPose(int keyFrameIndex);
 

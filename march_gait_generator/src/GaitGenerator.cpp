@@ -18,8 +18,43 @@
 GaitGenerator::GaitGenerator(Gait gait, QWidget* parent )
         : gait(gait), QWidget( parent )
 {
-    initUrdf();
+    this->loadUrdf();
 
+    this->initLayout();
+    this->loadGaitEditor();
+}
+
+GaitGenerator::GaitGenerator( QWidget* parent){
+    this->loadUrdf();
+
+    // Create an empty Gait based on the joints found in the URDF.
+    std::vector<std::string> joints;
+    for( auto it = model_->joints_.begin(); it != model_->joints_.end(); ++it) {
+        std::string jointName = it->first;
+        joints.push_back(jointName);
+    }
+    this->gait = Gait();
+    gait.addPoseStamped(PoseStamped(joints));
+    gait.addPoseStamped(PoseStamped(joints));
+    gait.addPoseStamped(PoseStamped(joints));
+    gait.addPoseStamped(PoseStamped(joints));
+    gait.addPoseStamped(PoseStamped(joints));
+    gait.addPoseStamped(PoseStamped(joints));
+    gait.addPoseStamped(PoseStamped(joints));
+    gait.addPoseStamped(PoseStamped(joints));
+
+    this->initLayout();
+    this->loadGaitEditor();
+
+}
+
+// Destructor.
+GaitGenerator::~GaitGenerator()
+{
+//    delete manager_;
+}
+
+void GaitGenerator::initLayout(){
     keyFrameCounter = 0;
     main_layout_ = new QHBoxLayout;
 
@@ -27,16 +62,6 @@ GaitGenerator::GaitGenerator(Gait gait, QWidget* parent )
     // Set the top-level layout for this GaitGenerator widget.
     setLayout( main_layout_ );
 
-    this->loadGaitEditor();
-}
-
-GaitGenerator::GaitGenerator( QWidget* parent): GaitGenerator(Gait(), parent){
-}
-
-// Destructor.
-GaitGenerator::~GaitGenerator()
-{
-//    delete manager_;
 }
 
 void GaitGenerator::loadGaitEditor(){
@@ -89,11 +114,11 @@ QGroupBox* GaitGenerator::createPoseEditor(Pose pose, int poseIndex){
         auto joint = model_->getJoint(jointName);
         ROS_ASSERT_MSG(joint != nullptr, "Joint %s does not exist in the robot description", jointName.c_str());
 
-//
         if ( joint->limits->lower == 0 and joint->limits->upper == 0){
             ROS_WARN("Skipping joint %s as limits are 0.", jointName.c_str());
             continue;
         }
+
         QGroupBox* jointSetting = createJointSetting(jointName, joint->limits, pose.getJointPosition(jointName), pose.getJointVelocity(jointName));
 
         poseEditorLayout->addWidget(jointSetting, i, 0);
@@ -118,7 +143,7 @@ QGroupBox* GaitGenerator::createPoseEditor(Pose pose, int poseIndex){
 }
 
 
-void GaitGenerator::initUrdf(){
+void GaitGenerator::loadUrdf(){
     model_ = new urdf::Model();
     model_->initParam("robot_description");
 }

@@ -48,15 +48,9 @@ int main(int argc, char **argv)
 
     Gait testGait = Gait("Dummy gait", "Not a very interesting gait", "0.1");
 
-    std::vector<std::string> joints = {"left_hip", "right_hip"};
-    PoseStamped testPose1 = PoseStamped(0.1, 0.1, joints);
-    PoseStamped testPose2 = PoseStamped(0.5, 0.5, joints);
-    testGait.addPoseStamped(testPose1);
-    testGait.addPoseStamped(testPose2);
-
     QApplication app( argc, argv );
 
-    GaitGenerator* gaitGenerator = new GaitGenerator(testGait);
+    GaitGenerator* gaitGenerator = new GaitGenerator();
     gaitGenerator->show();
 
     app.exec();
