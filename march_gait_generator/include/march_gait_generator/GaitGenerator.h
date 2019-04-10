@@ -64,9 +64,6 @@ public:
     QGridLayout* createKeyFrameSettings();
 
 private Q_SLOTS:
-    void initUrdf();
-    void addKeyFrameUI();
-
 
 private:
     ros::NodeHandle n;
@@ -74,6 +71,9 @@ private:
 
     QHBoxLayout* main_layout_;
     urdf::Model* model_;
+
+    void initUrdf();
+
     void publishKeyFrame(int keyFrameIndex, sensor_msgs::JointState jointState);
 
     void addPoseView(PoseStamped poseStamped);

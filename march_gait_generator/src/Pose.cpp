@@ -9,6 +9,8 @@ Pose::Pose(const std::vector<std::string> &name) {
     sensor_msgs::JointState jointState;
     for(int i = 0; i<name.size(); i++){
         jointState.name.push_back(name.at(i));
+        jointState.position.push_back(0);
+        jointState.velocity.push_back(0);
     }
     this->fromJointState(jointState);
 }

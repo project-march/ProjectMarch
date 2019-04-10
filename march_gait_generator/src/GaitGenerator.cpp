@@ -115,22 +115,19 @@ QGridLayout* GaitGenerator::createPoseEditor(Pose pose){
     QGridLayout* poseEditor = new QGridLayout();
     int frameIndex = keyFrameCounter;
 
-//    for( auto it = jointMap.begin(); it != jointMap.end(); ++it) {
     for(int i =0; i< pose.name.size(); i++){
         std::string jointName = pose.name.at(i);
-        auto test = model_->getJoint(jointName);
+        auto joint = model_->getJoint(jointName);
+        ROS_ASSERT_MSG(joint != nullptr, "Joint %s does not exist in the robot description", jointName.c_str());
 
-        ROS_INFO_STREAM(test);
-//        double lowerLimit = limits->lower;
-//        double upperLimit = limits->upper;
 //
-//        QGridLayout* jointSetting = createJointSetting()
-//
-//        if ( lowerLimit == 0 and upperLimit == 0){
-//            ROS_WARN("Skipping joint %s as limits are 0.", it->first.c_str());
-//            continue;
-//        }
-//
+        if ( joint->limits->lower == 0 and joint->limits->upper == 0){
+            ROS_WARN("Skipping joint %s as limits are 0.", jointName.c_str());
+            continue;
+        }
+        QGridLayout* jointSetting = createJointSetting(jointName, joint->limits->lower, joint->limits->upper, pose.getJointPosition(jointName));
+
+        poseEditor->addLayout(jointSetting, i, 0);
 //        connect(fancySlider, &FancySlider::valueChanged, [=]() {
 //            float value = fancySlider->value();
 //            actualValue->setText(QString::number(value/fancySlider->MULTIPLICATION_FACTOR));
