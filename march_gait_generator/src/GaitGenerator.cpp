@@ -2,7 +2,6 @@
 #include <QSlider>
 #include <QLabel>
 #include <QGridLayout>
-#include <QDialog>
 #include <QVBoxLayout>
 
 #include <tf/transform_broadcaster.h>
@@ -54,16 +53,14 @@ void GaitGenerator::initLayout(){
 
 
     // Set the top-level layout for this GaitGenerator widget.
-    this->setLayout( main_layout_ );
+    setLayout( main_layout_ );
 
-
-    QWidget *poseViewList_ = new QWidget;
-    QScrollArea *scrollArea_ = new QScrollArea;
-    QVBoxLayout *layout = new QVBoxLayout(poseViewList_);
-    scrollArea_->setWidget(poseViewList_);
-    scrollArea_->setWidgetResizable(true);
-
-    main_layout_->addWidget(poseViewList_);
+    poseViewList_ = new QGroupBox();
+//    scrollArea_ = new QScrollArea();
+//    scrollArea_->setWidget(poseViewList_);
+//    scrollArea_->setLayout(new QHBoxLayout());
+//    poseViewList_->setLayout(new QHBoxLayout());
+//    main_layout_->addWidget(scrollArea_);
 
 }
 
@@ -83,7 +80,7 @@ void GaitGenerator::addPoseView(PoseStamped poseStamped, int index){
     poseEditor->setTitle(QString("Pose"));
     poseEditor->layout()->addWidget(renderPanel);
 
-    poseViewList_->layout()->addWidget(poseEditor);
+    main_layout_->addWidget(poseEditor);
 
 
     rviz::VisualizationManager* manager = new rviz::VisualizationManager( renderPanel );
