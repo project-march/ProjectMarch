@@ -25,28 +25,6 @@ file(GLOB_RECURSE lintfiles
 
 roslint_cpp(${lintfiles})
 
-include_directories(
-        include
-        ${catkin_INCLUDE_DIRS}
-)
-
-link_directories(include ${catkin_LIBRARY_DIRS})
-
-install(DIRECTORY include/${PROJECT_NAME}/
-        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-        FILES_MATCHING PATTERN "*.h"
-        PATTERN ".svn" EXCLUDE)
-
-add_library(march_gait_generator
-        include/${PROJECT_NAME}/GaitGenerator.h
-        include/${PROJECT_NAME}/Pose.h
-        include/${PROJECT_NAME}/widgets/FancySlider.h
-        src/GaitGenerator.cpp
-        src/Pose.cpp
-        src/widgets/FancySlider.cpp
-        src/main.cpp
-        )
-
 ## This setting causes Qt's "MOC" generation to happen automatically.
 set(CMAKE_AUTOMOC ON)
 
@@ -68,6 +46,28 @@ endif()
 ## etc because they can conflict with boost signals, so define QT_NO_KEYWORDS here.
 add_definitions(-DQT_NO_KEYWORDS)
 
+
+include_directories(
+        include
+        ${catkin_INCLUDE_DIRS}
+)
+
+link_directories(include ${catkin_LIBRARY_DIRS})
+
+install(DIRECTORY include/${PROJECT_NAME}/
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+        FILES_MATCHING PATTERN "*.h"
+        PATTERN ".svn" EXCLUDE)
+
+add_library(march_gait_generator
+        include/${PROJECT_NAME}/GaitGenerator.h
+        include/${PROJECT_NAME}/Pose.h
+        include/${PROJECT_NAME}/widgets/FancySlider.h
+        src/GaitGenerator.cpp
+        src/Pose.cpp
+        src/widgets/FancySlider.cpp
+        src/main.cpp
+        )
 
 target_link_libraries(march_gait_generator ${QT_LIBRARIES} ${catkin_LIBRARIES})
 
