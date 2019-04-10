@@ -4,6 +4,16 @@
 
 #include <march_gait_generator/Pose.h>
 
+
+Pose::Pose(const std::vector<std::string> &name) {
+    sensor_msgs::JointState jointState;
+    for(int i = 0; i<name.size(); i++){
+        jointState.name.push_back(name.at(i));
+    }
+    this->fromJointState(jointState);
+}
+
+
 Pose::Pose(const std::vector<std::string> &name, const std::vector<double> &position,
            const std::vector<double> &velocity) : name(name), position(position), velocity(velocity) {}
 
@@ -38,8 +48,3 @@ double Pose::getJointVelocity(std::string jointName){
         return 0;
     }
     return this->velocity.at(index);}
-
-Pose::Pose() {
-    sensor_msgs::JointState emptyJointState;
-    this->fromJointState(emptyJointState);
-}

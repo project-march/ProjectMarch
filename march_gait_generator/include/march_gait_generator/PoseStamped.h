@@ -18,10 +18,9 @@ private:
 
 public:
 
-    PoseStamped() = default;
-
-    PoseStamped(float seconds, float percentage) : seconds(seconds), percentage(percentage) {}
+    PoseStamped(float seconds, float percentage, const std::vector<std::string> &name) : seconds(seconds), percentage(percentage), pose(name) {}
     PoseStamped(float seconds, float percentage, Pose pose) : seconds(seconds), percentage(percentage), pose(pose) {}
+    explicit PoseStamped(const std::vector<std::string> &name): PoseStamped(0,0, name) {}
 
     /** @brief Override comparison operator */
     friend bool operator==(const PoseStamped& lhs, const PoseStamped& rhs)

@@ -24,7 +24,7 @@ public:
 
     Pose(const sensor_msgs::JointState& jointState);
 
-    Pose();
+    Pose(const std::vector<std::string> &name);
 
     double getJointPosition(std::string jointName);
     double getJointVelocity(std::string jointName);

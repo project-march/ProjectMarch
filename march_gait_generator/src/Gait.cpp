@@ -3,12 +3,15 @@
 
 Gait::Gait(): Gait("Default", "Description", "0.1")
 {
-    PoseStamped emptyPose;
+    std::vector<std::string> names;
+    names.push_back("joint1");
+    names.push_back("joint2");
+    PoseStamped emptyPose = PoseStamped(name);
     this->addPoseStamped(emptyPose);
 }
 
 Gait::Gait(const std::string &name, const std::string &comment, const std::string &version, const ros::Duration &duration)
-        : name(name), comment(comment), version(version), duration(duration) {
+        : name(name), comment(comment), version(version), duration(duration), poseList({}) {
 
 }
 
