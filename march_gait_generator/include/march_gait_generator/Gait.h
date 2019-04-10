@@ -9,7 +9,7 @@
 #include <ros/console.h>
 #include <utility>
 #include <march_gait_generator/Pose.h>
-#include <march_gait_generator/PoseStamp.h>
+#include <march_gait_generator/PoseStamped.h>
 
 class Gait {
 
@@ -18,11 +18,22 @@ private:
     std::string comment;
     std::string version;
     ros::Duration duration;
-    std::vector<std::pair<PoseStamp, Pose>> poseList;
+    std::vector<PoseStamped> poseList;
 
 public:
-
+    Gait();
     Gait(const std::string &name, const std::string &comment, const std::string &version, const ros::Duration &duration);
+    Gait(const std::string &name, const std::string &comment, const std::string &version);
+
+    /**
+     * @brief Add a PoseStamped add a specific index in the poseList.
+     */
+    void addPoseStamped(int index, PoseStamped poseStamped);
+
+    /**
+     * @brief Add a PoseStamped to the end of the poseList.
+     */
+    void addPoseStamped(PoseStamped poseStamped);
 
     /** @brief Override comparison operator */
     friend bool operator==(const Gait& lhs, const Gait& rhs)

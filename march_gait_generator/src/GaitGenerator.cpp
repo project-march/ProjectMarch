@@ -46,10 +46,9 @@
 
 // BEGIN_TUTORIAL
 // Constructor for GaitGenerator.  This does most of the work of the class.
-GaitGenerator::GaitGenerator( QWidget* parent )
+GaitGenerator::GaitGenerator(Gait gait, QWidget* parent )
         : QWidget( parent )
 {
-
     initUrdf();
 
     keyFrameCounter = 0;
@@ -63,6 +62,9 @@ GaitGenerator::GaitGenerator( QWidget* parent )
     addKeyFramePanel();
 
 //    publishKeyFrame();
+}
+
+GaitGenerator::GaitGenerator( QWidget* parent): GaitGenerator(Gait(), parent){
 }
 
 // Destructor.

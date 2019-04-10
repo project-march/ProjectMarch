@@ -63,7 +63,7 @@ add_library(march_gait_generator
         include/${PROJECT_NAME}/Gait.h
         include/${PROJECT_NAME}/GaitGenerator.h
         include/${PROJECT_NAME}/Pose.h
-        include/${PROJECT_NAME}/PoseStamp.h
+        include/${PROJECT_NAME}/PoseStamped.h
         include/${PROJECT_NAME}/widgets/FancySlider.h
         src/Gait.cpp
         src/GaitGenerator.cpp

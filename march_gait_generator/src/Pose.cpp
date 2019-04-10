@@ -38,3 +38,8 @@ double Pose::getJointVelocity(std::string jointName){
         return 0;
     }
     return this->velocity.at(index);}
+
+Pose::Pose() {
+    sensor_msgs::JointState emptyJointState;
+    this->fromJointState(emptyJointState);
+}

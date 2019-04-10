@@ -36,6 +36,7 @@
 #include <ros/ros.h>
 #include <march_gait_generator/GaitGenerator.h>
 #include <QApplication>
+#include <march_gait_generator/Gait.h>
 
 int main(int argc, char **argv)
 {
@@ -43,6 +44,13 @@ int main(int argc, char **argv)
     {
         ros::init( argc, argv, "gaitgenerator");
     }
+
+
+    Gait testGait = Gait("Dummy gait", "Not a very interesting gait", "0.1");
+    PoseStamped testPose1 = PoseStamped(0.1, 0.1);
+    PoseStamped testPose2 = PoseStamped(0.5, 0.5);
+    testGait.addPoseStamped(testPose1);
+    testGait.addPoseStamped(testPose2);
 
     QApplication app( argc, argv );
 

@@ -35,6 +35,7 @@
 #include <urdf/model.h>
 
 #include <sensor_msgs/JointState.h>
+#include <march_gait_generator/Gait.h>
 
 
 namespace rviz
@@ -52,8 +53,10 @@ Q_OBJECT
 
 public:
     int keyFrameCounter;
+    Gait gait;
 
-    GaitGenerator( QWidget* parent = 0 );
+    explicit GaitGenerator(QWidget* parent = 0 );
+    explicit GaitGenerator(Gait gait,  QWidget* parent = 0);
     virtual ~GaitGenerator();
 
 private Q_SLOTS:
