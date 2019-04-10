@@ -1,0 +1,4 @@
+<launch>
+    <!-- Launch the required nodes here -->
+    <test test-name="march_gait_generator_test" pkg="march_gait_generator" type="march_gait_generator-test"/>
+</launch>

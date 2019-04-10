@@ -70,7 +70,7 @@ private:
 
     QHBoxLayout* main_layout_;
     urdf::Model* model_;
-    void publishKeyFrame(sensor_msgs::JointState jointState);
+    void publishKeyFrame(int keyFrameIndex, sensor_msgs::JointState jointState);
 
     sensor_msgs::JointState getJointStateFromKeyFrame(int keyFrameIndex);
 

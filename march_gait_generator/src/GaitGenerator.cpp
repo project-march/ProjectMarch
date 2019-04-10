@@ -39,8 +39,10 @@
 #include "rviz/render_panel.h"
 #include "rviz/display.h"
 
-#include "GaitGenerator.h"
-#include "widgets/FancySlider.h"
+#include <robot_state_publisher/robot_state_publisher.h>
+
+#include <march_gait_generator/GaitGenerator.h>
+#include <march_gait_generator/widgets/FancySlider.h>
 
 // BEGIN_TUTORIAL
 // Constructor for GaitGenerator.  This does most of the work of the class.
@@ -48,7 +50,6 @@ GaitGenerator::GaitGenerator( QWidget* parent )
         : QWidget( parent )
 {
 
-    joint_pub = n.advertise<sensor_msgs::JointState>("joint_states", 1);
     initUrdf();
 
     keyFrameCounter = 0;
@@ -122,7 +123,7 @@ QGridLayout* GaitGenerator::createKeyFrameSettings(){
         connect(fancySlider, &FancySlider::valueChanged, [=]() {
             float value = fancySlider->value();
             actualValue->setText(QString::number(value/fancySlider->MULTIPLICATION_FACTOR));
-            publishKeyFrame(getJointStateFromKeyFrame(frameIndex));
+            publishKeyFrame(frameIndex, getJointStateFromKeyFrame(frameIndex));
         });
 
         connect(actualValue, &QLineEdit::editingFinished, [=]() {
@@ -131,7 +132,7 @@ QGridLayout* GaitGenerator::createKeyFrameSettings(){
             float value = text.toFloat(&succes);
             if(succes){
                 fancySlider->setValue(value*fancySlider->MULTIPLICATION_FACTOR);
-                publishKeyFrame(getJointStateFromKeyFrame(frameIndex));
+                publishKeyFrame(frameIndex, getJointStateFromKeyFrame(frameIndex));
 
             } else {
                 ROS_WARN("Text %s is not a valid position.", text.toStdString().c_str());
@@ -156,6 +157,8 @@ void GaitGenerator::addKeyFrameUI() {
     // Construct and lay out render panel.
     rviz::RenderPanel* render_panel = new rviz::RenderPanel();
 
+    render_panel->getViewController();
+
     QGridLayout* controls_layout = createKeyFrameSettings();
     controls_layout->addWidget( render_panel, 0, 0, 1, 5);
 
@@ -174,10 +177,14 @@ void GaitGenerator::addKeyFrameUI() {
     ROS_ASSERT( grid != NULL );
 
     // Configure the GridDisplay the way we like it.
-    grid->subProp( "Line Style" )->setValue( "Billboards" );
+    grid->subProp( "Line Style" )->setValue( "Lines" );
     grid->subProp( "Color" )->setValue( QColor(Qt::yellow) );
+    grid->subProp( "Plane" )->setValue( "XZ");
+    grid->subProp( "Cell Size" )->setValue( 0.1);
+    grid->subProp( "Plane Cell Count" )->setValue( 20);
     rviz::Display* robotmodel = manager->createDisplay( "rviz/RobotModel", appendKeyFrameCounter("robotmodel"), true );
-//    robotmodel->subProp("TF Prefix")->setValue("test");
+    manager->createDisplay( "rviz/TF", "sd", true );
+//    robotmodel->subProp("TF Prefix")->setValue(QString("frame").append(QString::number(keyFrameCounter)));
     keyFrameCounter += 1;
 }
 
@@ -188,7 +195,10 @@ QString GaitGenerator::appendKeyFrameCounter(const std::string& base){
 
 }
 
-void GaitGenerator::publishKeyFrame(sensor_msgs::JointState jointState) {
+void GaitGenerator::publishKeyFrame(int keyFrameIndex, sensor_msgs::JointState jointState) {
+    std::string topic = QString("frame").append(QString::number(keyFrameIndex)).append("/joint_states").toStdString();
+    joint_pub = n.advertise<sensor_msgs::JointState>("joint_states", 1);
+
     joint_pub.publish(jointState);
 }
 

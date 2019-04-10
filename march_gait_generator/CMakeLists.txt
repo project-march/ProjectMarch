@@ -4,9 +4,48 @@ project(march_gait_generator)
 add_definitions(-std=c++11 -Wall -g)
 
 find_package(catkin REQUIRED COMPONENTS rviz roscpp)
-catkin_package()
-include_directories(${catkin_INCLUDE_DIRS})
-link_directories(${catkin_LIBRARY_DIRS})
+
+catkin_package(
+        INCLUDE_DIRS
+        include
+        CATKIN_DEPENDS
+        rviz
+        roscpp
+        LIBRARIES
+        march_gait_generator
+)
+
+# Roslinter
+set(ROSLINT_CPP_OPTS "--filter=-build/include,-build/header_guard,-runtime/references" "--linelength=120")
+
+file(GLOB_RECURSE lintfiles
+        "src/*.cpp"
+        "include/*.h"
+)
+
+roslint_cpp(${lintfiles})
+
+include_directories(
+        include
+        ${catkin_INCLUDE_DIRS}
+)
+
+link_directories(include ${catkin_LIBRARY_DIRS})
+
+install(DIRECTORY include/${PROJECT_NAME}/
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+        FILES_MATCHING PATTERN "*.h"
+        PATTERN ".svn" EXCLUDE)
+
+add_library(march_gait_generator
+        include/${PROJECT_NAME}/GaitGenerator.h
+        include/${PROJECT_NAME}/Pose.h
+        include/${PROJECT_NAME}/widgets/FancySlider.h
+        src/GaitGenerator.cpp
+        src/Pose.cpp
+        src/widgets/FancySlider.cpp
+        src/main.cpp
+        )
 
 ## This setting causes Qt's "MOC" generation to happen automatically.
 set(CMAKE_AUTOMOC ON)
@@ -29,24 +68,25 @@ endif()
 ## etc because they can conflict with boost signals, so define QT_NO_KEYWORDS here.
 add_definitions(-DQT_NO_KEYWORDS)
 
-## Here we specify the list of source files.
-## The generated MOC files are included automatically as headers.
-set(SRC_FILES
-        src/GaitGenerator.cpp
-        src/main.cpp
-        src/widgets/FancySlider.cpp
-        )
 
-## Add the "march_gait_generator" executable and specify the list of source files we
-## collected above in ``${SRC_FILES}``.
-add_executable(march_gait_generator ${SRC_FILES})
-
-## Link the march_gait_generator executable with whatever Qt libraries have been defined by
-## the ``find_package(Qt4 ...)`` line above, or by the
-## ``set(QT_LIBRARIES Qt5::Widgets)``, and with whatever libraries
-## catkin has included.
 target_link_libraries(march_gait_generator ${QT_LIBRARIES} ${catkin_LIBRARIES})
-## END_TUTORIAL
 
-## Install
-install(TARGETS march_gait_generator DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+add_executable(gait_generator_dummy src/main.cpp)
+target_link_libraries(gait_generator_dummy march_gait_generator)
+
+
+install(TARGETS march_gait_generator
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
+
+
+## Add gtest based cpp test target and link libraries
+if (CATKIN_ENABLE_TESTING)
+    add_rostest_gtest(${PROJECT_NAME}-test
+            test/march_gait_generator.test
+            test/TestRunner.cpp
+            test/TestPose.cpp
+            )
+    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march_gait_generator gtest gmock)
+endif ()

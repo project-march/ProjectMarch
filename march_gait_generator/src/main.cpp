@@ -33,9 +33,9 @@
 // initializes ROS, creates a QApplication, creates the top-level
 // widget (of type "GaitGenerator"), shows it, and runs the Qt event loop.
 
-#include <QApplication>
 #include <ros/ros.h>
-#include "GaitGenerator.h"
+#include <march_gait_generator/GaitGenerator.h>
+#include <QApplication>
 
 int main(int argc, char **argv)
 {

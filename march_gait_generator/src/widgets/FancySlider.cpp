@@ -1,4 +1,4 @@
-#include "FancySlider.h"
+#include <march_gait_generator/widgets/FancySlider.h>
 
 #include <QStyleOptionSlider>
 #include <QToolTip>
