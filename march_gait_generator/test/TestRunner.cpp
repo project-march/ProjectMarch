@@ -15,12 +15,5 @@ int main(int argc, char** argv)
   ::testing::FLAGS_gtest_death_test_style = "threadsafe";
   auto res = RUN_ALL_TESTS();
 
-    QApplication app( argc, argv );
-
-    GaitGenerator* gaitGenerator = new GaitGenerator();
-    gaitGenerator->show();
-
-    app.exec();
-
   return res;
 }

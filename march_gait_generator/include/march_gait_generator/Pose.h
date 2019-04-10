@@ -16,21 +16,7 @@ private:
     std::vector<double> position;
     std::vector<double> velocity;
 
-    int getJointIndex(std::string jointName){
-        int index = -1;
-        auto it = std::find(name.begin(), name.end(), jointName);
-        if (it != name.end()) {
-            std::cout << "Element Found" << std::endl;
-            index = std::distance(name.begin(), it);
-        }
-        else {
-            ROS_WARN("Joint %s does not exist in this pose", jointName.c_str());
-        }
-
-        return index;
-    }
-
-
+    int getJointIndex(std::string jointName);
 
 public:
     Pose(const std::vector<std::string> &name, const std::vector<double> &position,
@@ -38,10 +24,43 @@ public:
 
     Pose(const sensor_msgs::JointState& jointState);
 
+    double getJointPosition(std::string jointName);
+    double getJointVelocity(std::string jointName);
 
-    double getJointPosition(std::string jointName){
-        return this->position.at(this->getJointIndex(std::move(jointName)));
+    /** @brief Override comparison operator */
+    friend bool operator==(const Pose& lhs, const Pose& rhs)
+    {
+        return lhs.name == rhs.name && lhs.position == rhs.position && lhs.velocity == rhs.velocity;
     }
+
+    friend bool operator!=(const Pose& lhs, const Pose& rhs)
+    {
+        return !(lhs == rhs);
+    }
+
+    /** @brief Override stream operator for clean printing */
+    friend ::std::ostream& operator<<(std::ostream& os, const Pose& pose)
+    {
+
+        std::stringstream nameStream;
+        nameStream << "names: {";
+        std::copy(pose.name.begin(), pose.name.end(), std::ostream_iterator<std::string>(nameStream, " "));
+        nameStream << "} ";
+
+        std::stringstream positionStream;
+        positionStream << "positions: {";
+        std::copy(pose.position.begin(), pose.position.end(), std::ostream_iterator<double>(positionStream, " "));
+        positionStream << "} ";
+
+        std::stringstream velocityStream;
+        velocityStream << "velocities: {";
+        std::copy(pose.velocity.begin(), pose.velocity.end(), std::ostream_iterator<double>(velocityStream, " "));
+        velocityStream << "} ";
+
+        return os << nameStream.str() << positionStream.str() << velocityStream.str();
+    }
+
+
 };
 
 
