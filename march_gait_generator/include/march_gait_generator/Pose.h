@@ -29,19 +29,11 @@ public:
     double getJointPosition(std::string jointName);
     double getJointVelocity(std::string jointName);
 
-    void fromJointState(const sensor_msgs::JointState& jointState){
-        this->name = jointState.name;
-        this->position = jointState.position;
-        this->velocity = jointState.velocity;
-    }
+    void fromJointState(const sensor_msgs::JointState& jointState);
+    sensor_msgs::JointState toJointState();
 
-    sensor_msgs::JointState toJointState(){
-        sensor_msgs::JointState jointState;
-        jointState.name = this->name;
-        jointState.position = this->position;
-        jointState.velocity = this->velocity;
-        return jointState;
-    }
+    void setJointPosition(std::string jointName, float position);
+    void setJointVelocity(std::string jointName, float velocity);
 
     /** @brief Override comparison operator */
     friend bool operator==(const Pose& lhs, const Pose& rhs)

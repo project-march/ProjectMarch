@@ -31,10 +31,14 @@
 
 #include <QWidget>
 #include <QHBoxLayout>
+#include <QGroupBox>
+#include <QLineEdit>
 
 #include <urdf/model.h>
 
 #include <sensor_msgs/JointState.h>
+
+#include <march_gait_generator/widgets/FancySlider.h>
 #include <march_gait_generator/Gait.h>
 
 
@@ -45,8 +49,12 @@ namespace rviz
     class VisualizationManager;
 }
 
-// BEGIN_TUTORIAL
-// Class "GaitGenerator" implements the top level widget for this example.
+
+enum PoseOption {
+    position,
+    velocity
+};
+
 class GaitGenerator: public QWidget
 {
 Q_OBJECT
@@ -61,7 +69,7 @@ public:
 
     QString appendKeyFrameCounter(const std::string& base);
     void loadGaitEditor();
-    QGridLayout* createKeyFrameSettings();
+    QGroupBox* createKeyFrameSettings();
 
 private Q_SLOTS:
 
@@ -74,13 +82,12 @@ private:
 
     void initUrdf();
 
-    void publishKeyFrame(int keyFrameIndex, sensor_msgs::JointState jointState);
+    void publishPose(int keyFrameIndex);
 
-    void addPoseView(PoseStamped poseStamped);
-    QGridLayout* createPoseEditor(Pose pose);
+    void addPoseView(PoseStamped poseStamped, int index);
+    QGroupBox* createPoseEditor(Pose pose, int poseIndex);
 
-    sensor_msgs::JointState getJointStateFromKeyFrame(int keyFrameIndex);
+    void connectSlider(std::string jointName, int poseIndex, FancySlider* slider, QLineEdit* value, PoseOption option);
 
 };
-// END_TUTORIAL
 #endif // GAITGENERATOR_H

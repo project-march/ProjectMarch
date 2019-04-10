@@ -1,37 +1,8 @@
-/*
- * Copyright (c) 2012, Willow Garage, Inc.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Willow Garage, Inc. nor the names of its
- *       contributors may be used to endorse or promote products derived from
- *       this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
 
 #include <QSlider>
 #include <QLabel>
 #include <QGridLayout>
 #include <QVBoxLayout>
-#include <QLineEdit>
 
 #include <tf/transform_broadcaster.h>
 
@@ -42,11 +13,8 @@
 #include <robot_state_publisher/robot_state_publisher.h>
 
 #include <march_gait_generator/GaitGenerator.h>
-#include <march_gait_generator/widgets/FancySlider.h>
 #include <march_gait_generator/UIBuilder.h>
 
-// BEGIN_TUTORIAL
-// Constructor for GaitGenerator.  This does most of the work of the class.
 GaitGenerator::GaitGenerator(Gait gait, QWidget* parent )
         : gait(gait), QWidget( parent )
 {
@@ -73,20 +41,20 @@ GaitGenerator::~GaitGenerator()
 
 void GaitGenerator::loadGaitEditor(){
     for( int i = 0; i<this->gait.poseList.size(); i++){
-        this->addPoseView(this->gait.poseList.at(i));
+        this->addPoseView(this->gait.poseList.at(i), i);
     }
 }
 
-void GaitGenerator::addPoseView(PoseStamped poseStamped){
+void GaitGenerator::addPoseView(PoseStamped poseStamped, int index){
     // Construct and lay out render panel.
     rviz::RenderPanel* renderPanel = new rviz::RenderPanel();
 
     renderPanel->getViewController();
 
-    QGridLayout* poseEditor = this->createPoseEditor(poseStamped.pose);
+    QGroupBox* poseEditor = this->createPoseEditor(poseStamped.pose, index);
 //    controls_layout->addWidget( renderPanel, 0, 0, 1, 5);
 
-    main_layout_->addLayout(poseEditor);
+    main_layout_->addWidget(poseEditor);
 
 
     rviz::VisualizationManager* manager = new rviz::VisualizationManager( renderPanel );
@@ -111,9 +79,10 @@ void GaitGenerator::addPoseView(PoseStamped poseStamped){
 //    robotmodel->subProp("TF Prefix")->setValue(QString("frame").append(QString::number(keyFrameCounter)));
 }
 
-QGridLayout* GaitGenerator::createPoseEditor(Pose pose){
-    QGridLayout* poseEditor = new QGridLayout();
-    int frameIndex = keyFrameCounter;
+QGroupBox* GaitGenerator::createPoseEditor(Pose pose, int poseIndex){
+    QGroupBox* poseEditor = new QGroupBox();
+    QGridLayout* poseEditorLayout = new QGridLayout();
+    poseEditor->setLayout(poseEditorLayout);
 
     for(int i =0; i< pose.name.size(); i++){
         std::string jointName = pose.name.at(i);
@@ -125,28 +94,20 @@ QGridLayout* GaitGenerator::createPoseEditor(Pose pose){
             ROS_WARN("Skipping joint %s as limits are 0.", jointName.c_str());
             continue;
         }
-        QGridLayout* jointSetting = createJointSetting(jointName, joint->limits->lower, joint->limits->upper, pose.getJointPosition(jointName));
+        QGroupBox* jointSetting = createJointSetting(jointName, joint->limits, pose.getJointPosition(jointName), pose.getJointVelocity(jointName));
 
-        poseEditor->addLayout(jointSetting, i, 0);
-//        connect(fancySlider, &FancySlider::valueChanged, [=]() {
-//            float value = fancySlider->value();
-//            actualValue->setText(QString::number(value/fancySlider->MULTIPLICATION_FACTOR));
-//            publishKeyFrame(frameIndex, getJointStateFromKeyFrame(frameIndex));
-//        });
-//
-//        connect(actualValue, &QLineEdit::editingFinished, [=]() {
-//            QString text = actualValue->text();
-//            bool succes;
-//            float value = text.toFloat(&succes);
-//            if(succes){
-//                fancySlider->setValue(value*fancySlider->MULTIPLICATION_FACTOR);
-//                publishKeyFrame(frameIndex, getJointStateFromKeyFrame(frameIndex));
-//
-//            } else {
-//                ROS_WARN("Text %s is not a valid position.", text.toStdString().c_str());
-//                actualValue->setText(QString::number(fancySlider->value()/fancySlider->MULTIPLICATION_FACTOR));
-//            }
-//        });
+        poseEditorLayout->addWidget(jointSetting, i, 0);
+
+        auto positionSlider = jointSetting->findChild<FancySlider*>("PositionSlider");
+        auto positionValue = jointSetting->findChild<QLineEdit*>("PositionValue");
+
+        this->connectSlider(jointName, poseIndex, positionSlider, positionValue, PoseOption::position);
+
+        auto velocitySlider = jointSetting->findChild<FancySlider*>("VelocitySlider");
+        auto velocityValue = jointSetting->findChild<QLineEdit*>("VelocityValue");
+
+        this->connectSlider(jointName, poseIndex, velocitySlider, velocityValue, PoseOption::velocity);
+
 //
 //        fancySlider->setValue(0);
 //
@@ -169,31 +130,38 @@ QString GaitGenerator::appendKeyFrameCounter(const std::string& base){
 
 }
 
-void GaitGenerator::publishKeyFrame(int keyFrameIndex, sensor_msgs::JointState jointState) {
-    std::string topic = QString("frame").append(QString::number(keyFrameIndex)).append("/joint_states").toStdString();
-    joint_pub = n.advertise<sensor_msgs::JointState>("joint_states", 1);
-
-    joint_pub.publish(jointState);
+void GaitGenerator::publishPose(int poseIndex) {
+    std::string topic = QString("pose").append(QString::number(poseIndex)).append("/joint_states").toStdString();
+    joint_pub = n.advertise<sensor_msgs::JointState>(topic, 1);
+    joint_pub.publish(this->gait.poseList.at(poseIndex).pose.toJointState());
 }
 
-sensor_msgs::JointState GaitGenerator::getJointStateFromKeyFrame(int keyFrameIndex) {
-    QString keyName = QString("frame").append(QString::number(keyFrameIndex));
-    QGridLayout* layout = main_layout_->findChild<QGridLayout*>(keyName);
-    QList<QLineEdit *> values = layout->findChildren<QLineEdit*>();
-
-    sensor_msgs::JointState jointState;
-    jointState.header.stamp = ros::Time::now();
-    for (int i = 0; i < layout->count(); ++i)
-    {
-        QLineEdit *widget = dynamic_cast<QLineEdit *>(layout->itemAt(i)->widget());
-
-        if (widget != NULL)
-        {
-            double position = widget->text().toDouble();
-            std::string jointName = widget->objectName().replace(keyName, "").toStdString();
-            jointState.name.push_back(jointName);
-            jointState.position.push_back(position);
+void GaitGenerator::connectSlider(std::string jointName, int poseIndex, FancySlider *slider, QLineEdit *valueDisplay, PoseOption option) {
+    // Have to create the connections here or else we can't connect it to the gait.
+    connect(slider, &FancySlider::valueChanged, [=]() {
+        float value = slider->value();
+        valueDisplay->setText(QString::number(value/slider->MULTIPLICATION_FACTOR));
+        if(option == PoseOption::position){
+            this->gait.poseList.at(poseIndex).pose.setJointPosition(jointName, value/slider->MULTIPLICATION_FACTOR);
+        } else if (option == PoseOption::velocity) {
+            this->gait.poseList.at(poseIndex).pose.setJointVelocity(jointName, value/slider->MULTIPLICATION_FACTOR);
+        } else {
+            ROS_WARN("Pose option is not known");
         }
-    }
-    return jointState;
+        this->publishPose(poseIndex);
+    });
+
+    connect(valueDisplay, &QLineEdit::editingFinished, [=]() {
+        QString text = valueDisplay->text();
+        bool success;
+        float value = text.toFloat(&success);
+        if(success){
+            slider->setValue(value*slider->MULTIPLICATION_FACTOR);
+            publishPose(poseIndex);
+
+        } else {
+            ROS_WARN("Text %s is not valid.", text.toStdString().c_str());
+            valueDisplay->setText(QString::number(slider->value()/slider->MULTIPLICATION_FACTOR));
+        }
+    });
 }

@@ -9,31 +9,46 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 
-QGridLayout* createJointSetting(std::string jointName, float minValue, float maxValue, float value){
-    QGridLayout* jointSetting = new QGridLayout();
+QGroupBox* createJointSetting(std::string jointName, const urdf::JointLimitsSharedPtr& limits, float position, float velocity){
+    QGroupBox* jointSetting = new QGroupBox();
+    QGridLayout* jointSettingLayout = new QGridLayout();
+    jointSetting->setLayout(jointSettingLayout);
 
-    FancySlider* fancySlider = new FancySlider( Qt::Horizontal);
+    FancySlider* positionSlider = new FancySlider( Qt::Horizontal);
+    positionSlider->setMinimum( limits->lower * positionSlider->MULTIPLICATION_FACTOR);
+    positionSlider->setMaximum( limits->upper * positionSlider->MULTIPLICATION_FACTOR);
+    positionSlider->setObjectName("PositionSlider");
 
-    QLabel* minLabel = new QLabel(QString::fromStdString(std::to_string(minValue)), fancySlider);
-    QLabel* maxLabel = new QLabel(QString::fromStdString(std::to_string(maxValue)), fancySlider);
 
-    fancySlider->setMinimum( minValue * fancySlider->MULTIPLICATION_FACTOR);
-    fancySlider->setMaximum( maxValue * fancySlider->MULTIPLICATION_FACTOR);
+    FancySlider* velocitySlider = new FancySlider( Qt::Horizontal);
+    velocitySlider->setMinimum( -limits->velocity * velocitySlider->MULTIPLICATION_FACTOR);
+    velocitySlider->setMaximum( limits->velocity * velocitySlider->MULTIPLICATION_FACTOR);
+    velocitySlider->setObjectName("VelocitySlider");
 
-    QLineEdit* actualValue = new QLineEdit();
-    // Set objectname to later retrieve the jointname.
-    actualValue->setText(QString::number(0/fancySlider->MULTIPLICATION_FACTOR));
+
+    QLineEdit* positionValue = new QLineEdit();
+    positionValue->setText(QString::number(position));
+    positionValue->setObjectName("PositionValue");
+
+    QLineEdit* velocityValue = new QLineEdit();
+    velocityValue->setText(QString::number(velocity));
+    velocityValue->setObjectName("VelocityValue");
+
 
     QLabel* jointLabel = new QLabel(QString::fromStdString(jointName));
+    QLabel* positionLabel = new QLabel("Position");
+    QLabel* velocityLabel = new QLabel("Velocity");
 
+    jointSettingLayout->setColumnMinimumWidth(1, 200);
+    jointSettingLayout->addWidget(jointLabel, 0, 0, 1, 4, Qt::AlignmentFlag::AlignCenter);
 
-    jointSetting->addWidget(jointLabel, 0, 0);
+    jointSettingLayout->addWidget(positionLabel, 1, 0);
+    jointSettingLayout->addWidget(positionSlider, 1, 1, 1, 2);
+    jointSettingLayout->addWidget(positionValue, 1, 3);
 
-
-    jointSetting->addWidget(actualValue, 0, 1, 1, 2);
-    jointSetting->addWidget(minLabel, 1, 0);
-    jointSetting->addWidget(fancySlider, 1, 1);
-    jointSetting->addWidget(maxLabel, 1, 2);
+    jointSettingLayout->addWidget(velocityLabel, 2, 0);
+    jointSettingLayout->addWidget(velocitySlider,2, 1, 1, 2);
+    jointSettingLayout->addWidget(velocityValue, 2, 3);
     return jointSetting;
 }
 
