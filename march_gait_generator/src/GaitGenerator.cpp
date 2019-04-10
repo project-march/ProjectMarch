@@ -43,11 +43,12 @@
 
 #include <march_gait_generator/GaitGenerator.h>
 #include <march_gait_generator/widgets/FancySlider.h>
+#include <march_gait_generator/UIBuilder.h>
 
 // BEGIN_TUTORIAL
 // Constructor for GaitGenerator.  This does most of the work of the class.
 GaitGenerator::GaitGenerator(Gait gait, QWidget* parent )
-        : QWidget( parent )
+        : gait(gait), QWidget( parent )
 {
     initUrdf();
 
@@ -58,10 +59,7 @@ GaitGenerator::GaitGenerator(Gait gait, QWidget* parent )
     // Set the top-level layout for this GaitGenerator widget.
     setLayout( main_layout_ );
 
-    addKeyFramePanel();
-    addKeyFramePanel();
-
-//    publishKeyFrame();
+    this->loadGaitEditor();
 }
 
 GaitGenerator::GaitGenerator( QWidget* parent): GaitGenerator(Gait(), parent){
@@ -73,102 +71,26 @@ GaitGenerator::~GaitGenerator()
 //    delete manager_;
 }
 
-void GaitGenerator::addKeyFramePanel(){
-    addKeyFrameUI();
-
-}
-
-void GaitGenerator::initUrdf(){
-    model_ = new urdf::Model();
-    model_->initParam("robot_description");
-}
-
-
-QGridLayout* GaitGenerator::createKeyFrameSettings(){
-    QGridLayout* controls_layout = new QGridLayout();
-    ROS_WARN("Joint name");
-    int frameIndex = keyFrameCounter;
-    std::map<std::string, urdf::JointSharedPtr> jointMap = model_->joints_;
-
-//    ROS_INFO_STREAM(model_->joints_);
-    int gridRow = 1;
-    for( auto it = jointMap.begin(); it != jointMap.end(); ++it) {
-        QLabel* jointLabel = new QLabel(QString::fromStdString(it->first));
-        urdf::JointLimitsSharedPtr limits = it->second->limits;
-        double lowerLimit = limits->lower;
-        double upperLimit = limits->upper;
-
-        if ( lowerLimit == 0 and upperLimit == 0){
-            ROS_WARN("Skipping joint %s as limits are 0.", it->first.c_str());
-            continue;
-        }
-        FancySlider* fancySlider = new FancySlider( Qt::Horizontal);
-
-        QLabel* minLabel = new QLabel(QString::fromStdString(std::to_string(lowerLimit)), fancySlider);
-        QLabel* maxLabel = new QLabel(QString::fromStdString(std::to_string(upperLimit)), fancySlider);
-
-        fancySlider->setMinimum( lowerLimit * fancySlider->MULTIPLICATION_FACTOR);
-        fancySlider->setMaximum( upperLimit * fancySlider->MULTIPLICATION_FACTOR);
-
-        QLineEdit* actualValue = new QLineEdit();
-        // Set objectname to later retrieve the jointname.
-        actualValue->setObjectName(QString("frame").append(QString::number(frameIndex)).append(it->first.c_str()));
-        actualValue->setText(QString::number(0/fancySlider->MULTIPLICATION_FACTOR));
-
-        controls_layout->setObjectName(QString("frame").append(QString::number(frameIndex)));
-        controls_layout->addWidget(jointLabel, gridRow, 0);
-        controls_layout->addWidget(actualValue, gridRow, 1, 1, 2);
-        controls_layout->addWidget(minLabel, gridRow + 1, 0);
-        controls_layout->addWidget(fancySlider, gridRow + 1, 1);
-        controls_layout->addWidget(maxLabel, gridRow + 1, 2);
-
-        connect(fancySlider, &FancySlider::valueChanged, [=]() {
-            float value = fancySlider->value();
-            actualValue->setText(QString::number(value/fancySlider->MULTIPLICATION_FACTOR));
-            publishKeyFrame(frameIndex, getJointStateFromKeyFrame(frameIndex));
-        });
-
-        connect(actualValue, &QLineEdit::editingFinished, [=]() {
-            QString text = actualValue->text();
-            bool succes;
-            float value = text.toFloat(&succes);
-            if(succes){
-                fancySlider->setValue(value*fancySlider->MULTIPLICATION_FACTOR);
-                publishKeyFrame(frameIndex, getJointStateFromKeyFrame(frameIndex));
-
-            } else {
-                ROS_WARN("Text %s is not a valid position.", text.toStdString().c_str());
-                actualValue->setText(QString::number(fancySlider->value()/fancySlider->MULTIPLICATION_FACTOR));
-            }
-        });
-
-        fancySlider->setValue(0);
-
-//        connect(controls_layout, &QGridLayout::triggered, [=]() {
-//
-//        });
-
-        gridRow += 2;
+void GaitGenerator::loadGaitEditor(){
+    for( int i = 0; i<this->gait.poseList.size(); i++){
+        this->addPoseView(this->gait.poseList.at(i));
     }
-
-    return controls_layout;
 }
 
-void GaitGenerator::addKeyFrameUI() {
-
+void GaitGenerator::addPoseView(PoseStamped poseStamped){
     // Construct and lay out render panel.
-    rviz::RenderPanel* render_panel = new rviz::RenderPanel();
+    rviz::RenderPanel* renderPanel = new rviz::RenderPanel();
 
-    render_panel->getViewController();
+    renderPanel->getViewController();
 
-    QGridLayout* controls_layout = createKeyFrameSettings();
-    controls_layout->addWidget( render_panel, 0, 0, 1, 5);
+    QGridLayout* poseEditor = this->createPoseEditor(poseStamped.pose);
+//    controls_layout->addWidget( renderPanel, 0, 0, 1, 5);
 
-    main_layout_->addLayout(controls_layout);
+    main_layout_->addLayout(poseEditor);
 
 
-    rviz::VisualizationManager* manager = new rviz::VisualizationManager( render_panel );
-    render_panel ->initialize( manager->getSceneManager(), manager );
+    rviz::VisualizationManager* manager = new rviz::VisualizationManager( renderPanel );
+    renderPanel ->initialize( manager->getSceneManager(), manager );
     manager->initialize();
     manager->startUpdate();
 
@@ -187,7 +109,60 @@ void GaitGenerator::addKeyFrameUI() {
     rviz::Display* robotmodel = manager->createDisplay( "rviz/RobotModel", appendKeyFrameCounter("robotmodel"), true );
     manager->createDisplay( "rviz/TF", "sd", true );
 //    robotmodel->subProp("TF Prefix")->setValue(QString("frame").append(QString::number(keyFrameCounter)));
-    keyFrameCounter += 1;
+}
+
+QGridLayout* GaitGenerator::createPoseEditor(Pose pose){
+    QGridLayout* poseEditor = new QGridLayout();
+    int frameIndex = keyFrameCounter;
+
+//    for( auto it = jointMap.begin(); it != jointMap.end(); ++it) {
+    for(int i =0; i< pose.name.size(); i++){
+        std::string jointName = pose.name.at(i);
+        auto test = model_->getJoint(jointName);
+
+        ROS_INFO_STREAM(test);
+//        double lowerLimit = limits->lower;
+//        double upperLimit = limits->upper;
+//
+//        QGridLayout* jointSetting = createJointSetting()
+//
+//        if ( lowerLimit == 0 and upperLimit == 0){
+//            ROS_WARN("Skipping joint %s as limits are 0.", it->first.c_str());
+//            continue;
+//        }
+//
+//        connect(fancySlider, &FancySlider::valueChanged, [=]() {
+//            float value = fancySlider->value();
+//            actualValue->setText(QString::number(value/fancySlider->MULTIPLICATION_FACTOR));
+//            publishKeyFrame(frameIndex, getJointStateFromKeyFrame(frameIndex));
+//        });
+//
+//        connect(actualValue, &QLineEdit::editingFinished, [=]() {
+//            QString text = actualValue->text();
+//            bool succes;
+//            float value = text.toFloat(&succes);
+//            if(succes){
+//                fancySlider->setValue(value*fancySlider->MULTIPLICATION_FACTOR);
+//                publishKeyFrame(frameIndex, getJointStateFromKeyFrame(frameIndex));
+//
+//            } else {
+//                ROS_WARN("Text %s is not a valid position.", text.toStdString().c_str());
+//                actualValue->setText(QString::number(fancySlider->value()/fancySlider->MULTIPLICATION_FACTOR));
+//            }
+//        });
+//
+//        fancySlider->setValue(0);
+//
+//        gridRow += 2;
+    }
+
+    return poseEditor;
+}
+
+
+void GaitGenerator::initUrdf(){
+    model_ = new urdf::Model();
+    model_->initParam("robot_description");
 }
 
 QString GaitGenerator::appendKeyFrameCounter(const std::string& base){

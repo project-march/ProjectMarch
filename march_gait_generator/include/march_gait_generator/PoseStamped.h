@@ -11,12 +11,12 @@
 
 class PoseStamped {
 
-private:
+
+
+public:
     float seconds;
     float percentage;
     Pose pose;
-
-public:
 
     PoseStamped(float seconds, float percentage, const std::vector<std::string> &name) : seconds(seconds), percentage(percentage), pose(name) {}
     PoseStamped(float seconds, float percentage, Pose pose) : seconds(seconds), percentage(percentage), pose(pose) {}

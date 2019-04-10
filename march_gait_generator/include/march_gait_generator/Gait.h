@@ -14,13 +14,15 @@
 class Gait {
 
 private:
+
+
+public:
     std::string name;
     std::string comment;
     std::string version;
     ros::Duration duration;
     std::vector<PoseStamped> poseList;
 
-public:
     Gait();
     Gait(const std::string &name, const std::string &comment, const std::string &version, const ros::Duration &duration);
     Gait(const std::string &name, const std::string &comment, const std::string &version);

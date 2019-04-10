@@ -6,7 +6,7 @@ Gait::Gait(): Gait("Default", "Description", "0.1")
     std::vector<std::string> names;
     names.push_back("joint1");
     names.push_back("joint2");
-    PoseStamped emptyPose = PoseStamped(name);
+    PoseStamped emptyPose = PoseStamped(names);
     this->addPoseStamped(emptyPose);
 }
 

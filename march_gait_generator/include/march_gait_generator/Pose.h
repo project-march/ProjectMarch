@@ -12,13 +12,13 @@
 class Pose {
 
 private:
+    int getJointIndex(std::string jointName);
+
+public:
     std::vector<std::string> name;
     std::vector<double> position;
     std::vector<double> velocity;
 
-    int getJointIndex(std::string jointName);
-
-public:
     Pose(const std::vector<std::string> &name, const std::vector<double> &position,
          const std::vector<double> &velocity);
 

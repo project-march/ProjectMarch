@@ -47,14 +47,14 @@ int main(int argc, char **argv)
 
 
     Gait testGait = Gait("Dummy gait", "Not a very interesting gait", "0.1");
-    PoseStamped testPose1 = PoseStamped(0.1, 0.1);
-    PoseStamped testPose2 = PoseStamped(0.5, 0.5);
+    PoseStamped testPose1 = PoseStamped(0.1, 0.1, {"joint1", "joint2"});
+    PoseStamped testPose2 = PoseStamped(0.5, 0.5, {"joint1", "joint2"});
     testGait.addPoseStamped(testPose1);
     testGait.addPoseStamped(testPose2);
 
     QApplication app( argc, argv );
 
-    GaitGenerator* gaitGenerator = new GaitGenerator();
+    GaitGenerator* gaitGenerator = new GaitGenerator(testGait);
     gaitGenerator->show();
 
     app.exec();

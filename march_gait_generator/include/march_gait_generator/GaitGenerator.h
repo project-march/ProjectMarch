@@ -59,13 +59,14 @@ public:
     explicit GaitGenerator(Gait gait,  QWidget* parent = 0);
     virtual ~GaitGenerator();
 
-private Q_SLOTS:
-    void addKeyFramePanel();
+    QString appendKeyFrameCounter(const std::string& base);
+    void loadGaitEditor();
     QGridLayout* createKeyFrameSettings();
+
+private Q_SLOTS:
     void initUrdf();
     void addKeyFrameUI();
 
-    QString appendKeyFrameCounter(const std::string& base);
 
 private:
     ros::NodeHandle n;
@@ -74,6 +75,9 @@ private:
     QHBoxLayout* main_layout_;
     urdf::Model* model_;
     void publishKeyFrame(int keyFrameIndex, sensor_msgs::JointState jointState);
+
+    void addPoseView(PoseStamped poseStamped);
+    QGridLayout* createPoseEditor(Pose pose);
 
     sensor_msgs::JointState getJointStateFromKeyFrame(int keyFrameIndex);
 
