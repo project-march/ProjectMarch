@@ -33,6 +33,7 @@
 #include <QHBoxLayout>
 #include <QGroupBox>
 #include <QLineEdit>
+#include <QScrollArea>
 
 #include <urdf/model.h>
 
@@ -78,6 +79,9 @@ private:
     ros::Publisher joint_pub;
 
     QHBoxLayout* main_layout_;
+    QScrollArea* scrollArea_;
+    QWidget* poseViewList_;
+    QVBoxLayout * layout_;
     urdf::Model* model_;
 
     void loadUrdf();

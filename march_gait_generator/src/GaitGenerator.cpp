@@ -2,6 +2,7 @@
 #include <QSlider>
 #include <QLabel>
 #include <QGridLayout>
+#include <QDialog>
 #include <QVBoxLayout>
 
 #include <tf/transform_broadcaster.h>
@@ -36,13 +37,6 @@ GaitGenerator::GaitGenerator( QWidget* parent){
     this->gait = Gait();
     gait.addPoseStamped(PoseStamped(joints));
     gait.addPoseStamped(PoseStamped(joints));
-    gait.addPoseStamped(PoseStamped(joints));
-    gait.addPoseStamped(PoseStamped(joints));
-    gait.addPoseStamped(PoseStamped(joints));
-    gait.addPoseStamped(PoseStamped(joints));
-    gait.addPoseStamped(PoseStamped(joints));
-    gait.addPoseStamped(PoseStamped(joints));
-
     this->initLayout();
     this->loadGaitEditor();
 
@@ -56,11 +50,20 @@ GaitGenerator::~GaitGenerator()
 
 void GaitGenerator::initLayout(){
     keyFrameCounter = 0;
-    main_layout_ = new QHBoxLayout;
+    main_layout_ = new QHBoxLayout();
 
 
     // Set the top-level layout for this GaitGenerator widget.
-    setLayout( main_layout_ );
+    this->setLayout( main_layout_ );
+
+
+    QWidget *poseViewList_ = new QWidget;
+    QScrollArea *scrollArea_ = new QScrollArea;
+    QVBoxLayout *layout = new QVBoxLayout(poseViewList_);
+    scrollArea_->setWidget(poseViewList_);
+    scrollArea_->setWidgetResizable(true);
+
+    main_layout_->addWidget(poseViewList_);
 
 }
 
@@ -77,9 +80,10 @@ void GaitGenerator::addPoseView(PoseStamped poseStamped, int index){
     renderPanel->getViewController();
 
     QGroupBox* poseEditor = this->createPoseEditor(poseStamped.pose, index);
-//    controls_layout->addWidget( renderPanel, 0, 0, 1, 5);
+    poseEditor->setTitle(QString("Pose"));
+    poseEditor->layout()->addWidget(renderPanel);
 
-    main_layout_->addWidget(poseEditor);
+    poseViewList_->layout()->addWidget(poseEditor);
 
 
     rviz::VisualizationManager* manager = new rviz::VisualizationManager( renderPanel );

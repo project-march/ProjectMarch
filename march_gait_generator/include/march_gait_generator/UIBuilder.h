@@ -12,6 +12,9 @@
 QGroupBox* createJointSetting(std::string jointName, const urdf::JointLimitsSharedPtr& limits, float position, float velocity){
     QGroupBox* jointSetting = new QGroupBox();
     QGridLayout* jointSettingLayout = new QGridLayout();
+
+
+    jointSetting->setTitle(QString::fromStdString(jointName));
     jointSetting->setLayout(jointSettingLayout);
 
     FancySlider* positionSlider = new FancySlider( Qt::Horizontal);
@@ -34,21 +37,19 @@ QGroupBox* createJointSetting(std::string jointName, const urdf::JointLimitsShar
     velocityValue->setText(QString::number(velocity));
     velocityValue->setObjectName("VelocityValue");
 
-
-    QLabel* jointLabel = new QLabel(QString::fromStdString(jointName));
     QLabel* positionLabel = new QLabel("Position");
     QLabel* velocityLabel = new QLabel("Velocity");
 
     jointSettingLayout->setColumnMinimumWidth(1, 200);
-    jointSettingLayout->addWidget(jointLabel, 0, 0, 1, 4, Qt::AlignmentFlag::AlignCenter);
+    jointSettingLayout->setColumnMinimumWidth(3, 100);
 
-    jointSettingLayout->addWidget(positionLabel, 1, 0);
-    jointSettingLayout->addWidget(positionSlider, 1, 1, 1, 2);
-    jointSettingLayout->addWidget(positionValue, 1, 3);
+    jointSettingLayout->addWidget(positionLabel, 0, 0);
+    jointSettingLayout->addWidget(positionSlider, 0, 1, 1, 2);
+    jointSettingLayout->addWidget(positionValue, 0, 3);
 
-    jointSettingLayout->addWidget(velocityLabel, 2, 0);
-    jointSettingLayout->addWidget(velocitySlider,2, 1, 1, 2);
-    jointSettingLayout->addWidget(velocityValue, 2, 3);
+    jointSettingLayout->addWidget(velocityLabel, 1, 0);
+    jointSettingLayout->addWidget(velocitySlider, 1, 1, 1, 2);
+    jointSettingLayout->addWidget(velocityValue, 1, 3);
     return jointSetting;
 }
 
