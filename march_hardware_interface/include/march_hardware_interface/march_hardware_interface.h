@@ -48,7 +48,7 @@ public:
   /**
    * @brief Read actual postion from the hardware.
    */
-  void read();
+  void read(ros::Duration elapsed_time);
 
   /**
    * @brief Write position commands to the hardware.

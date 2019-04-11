@@ -114,16 +114,18 @@ void MarchHardwareInterface::init()
 void MarchHardwareInterface::update(const ros::TimerEvent& e)
 {
   elapsed_time_ = ros::Duration(e.current_real - e.last_real);
-  read();
+  read(elapsed_time_);
   controller_manager_->update(ros::Time::now(), elapsed_time_);
   write(elapsed_time_);
 }
 
-void MarchHardwareInterface::read()
+void MarchHardwareInterface::read(ros::Duration elapsed_time)
 {
   for (int i = 0; i < num_joints_; i++)
   {
+    float oldPosition = joint_position_[i];
     joint_position_[i] = marchRobot.getJoint(joint_names_[i]).getAngleRad();
+    joint_velocity_[i] = (joint_position_[i]-oldPosition)*1/elapsed_time.toSec();
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(), joint_position_[i]);
   }
 }
