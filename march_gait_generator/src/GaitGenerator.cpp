@@ -42,6 +42,11 @@ GaitGenerator::GaitGenerator( QWidget* parent){
     this->initLayout();
     this->loadGaitEditor();
 
+    sleep(1);
+    for( int i = 0; i<this->gait.poseList.size(); i++){
+        publishPose(i);
+        publishPose(i);
+    }
 }
 
 // Destructor.
@@ -104,7 +109,9 @@ QGroupBox* GaitGenerator::createPoseView(PoseStamped poseStamped, int index){
     manager->initialize();
     manager->startUpdate();
 
-    manager->setFixedFrame("world");
+    QString fixedFrame = QString("pose").append(QString::number(index)).append("/world");
+
+    manager->setFixedFrame(fixedFrame);
 
 
     rviz::Display* grid = manager->createDisplay( "rviz/Grid", appendKeyFrameCounter("grid") , true );
@@ -116,9 +123,10 @@ QGroupBox* GaitGenerator::createPoseView(PoseStamped poseStamped, int index){
     grid->subProp( "Plane" )->setValue( "XZ");
     grid->subProp( "Cell Size" )->setValue( 0.1);
     grid->subProp( "Plane Cell Count" )->setValue( 20);
-    rviz::Display* robotmodel = manager->createDisplay( "rviz/RobotModel", appendKeyFrameCounter("robotmodel"), true );
-    manager->createDisplay( "rviz/TF", "sd", true );
-//    robotmodel->subProp("TF Prefix")->setValue(QString("pose").append(QString::number(index)));
+    rviz::Display* tf = manager->createDisplay( "rviz/TF", "Tf", true );
+    rviz::Display* robotmodel = manager->createDisplay( "rviz/RobotModel", "robot_description", true );
+    robotmodel->subProp("TF Prefix")->setValue(QString("pose").append(QString::number(index)));
+    tf->subProp("Show Names")->setValue(false);
 
 
     return poseEditor;
@@ -152,11 +160,6 @@ QGroupBox* GaitGenerator::createPoseEditor(Pose pose, int poseIndex){
         auto velocityValue = jointSetting->findChild<QLineEdit*>("VelocityValue");
 
         this->connectSlider(jointName, poseIndex, velocitySlider, velocityValue, PoseOption::velocity);
-
-//
-//        fancySlider->setValue(0);
-//
-//        gridRow += 2;
     }
 
     return poseEditor;
@@ -182,9 +185,14 @@ QString GaitGenerator::appendKeyFrameCounter(const std::string& base){
 }
 
 void GaitGenerator::publishPose(int poseIndex) {
-    std::string topic = QString("pose").append(QString::number(poseIndex)).append("/joint_states").toStdString();
-    joint_pub = n.advertise<sensor_msgs::JointState>(topic, 1);
-    joint_pub.publish(this->gait.poseList.at(poseIndex).pose.toJointState());
+    std::string prefix = QString("pose").append(QString::number(poseIndex)).toStdString();
+//    std::string topic = QString(QString::fromStdString(prefix)).append("/joint_states").toStdString();
+//    joint_pub = n.advertise<sensor_msgs::JointState>(topic, 1);
+//    joint_pub.publish(this->gait.poseList.at(poseIndex).pose.toJointState());
+
+    ROS_INFO(prefix.c_str());
+    this->robotStatePublisher->publishFixedTransforms(prefix);
+    this->robotStatePublisher->publishTransforms(this->gait.poseList.at(poseIndex).pose.toPositionMap(), ros::Time::now(), prefix);
 }
 
 void GaitGenerator::connectSlider(std::string jointName, int poseIndex, FancySlider *slider, QLineEdit *valueDisplay, PoseOption option) {

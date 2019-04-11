@@ -38,6 +38,16 @@ sensor_msgs::JointState Pose::toJointState(){
     return jointState;
 }
 
+std::map<std::string, double> Pose::toPositionMap(){
+    std::map<std::string, double> map;
+    for(int i = 0; i<this->name.size(); i++){
+        std::pair<std::string, double> entry;
+        entry.first = this->name.at(i);
+        entry.second= this->position.at(i);
+        map.insert(entry);
+    }
+    return map;
+}
 
 int Pose::getJointIndex(std::string jointName){
     int index = -1;

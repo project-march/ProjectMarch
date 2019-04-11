@@ -31,6 +31,7 @@ public:
 
     void fromJointState(const sensor_msgs::JointState& jointState);
     sensor_msgs::JointState toJointState();
+    std::map<std::string, double> toPositionMap();
 
     void setJointPosition(std::string jointName, float position);
     void setJointVelocity(std::string jointName, float velocity);
