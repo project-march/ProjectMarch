@@ -33,7 +33,7 @@
 #include <QHBoxLayout>
 #include <QGroupBox>
 #include <QLineEdit>
-#include <QScrollArea>
+#include <QTableWidget>
 
 #include <urdf/model.h>
 
@@ -41,6 +41,8 @@
 
 #include <march_gait_generator/widgets/FancySlider.h>
 #include <march_gait_generator/Gait.h>
+#include <QColumnView>
+#include <QStandardItemModel>
 
 
 namespace rviz
@@ -79,9 +81,7 @@ private:
     ros::Publisher joint_pub;
 
     QHBoxLayout* main_layout_;
-    QScrollArea* scrollArea_;
-    QWidget* poseViewList_;
-    QVBoxLayout * layout_;
+    QTableWidget* gaitEditor_;
     urdf::Model* model_;
 
     void loadUrdf();
@@ -89,7 +89,7 @@ private:
 
     void publishPose(int keyFrameIndex);
 
-    void addPoseView(PoseStamped poseStamped, int index);
+    QGroupBox* createPoseView(PoseStamped poseStamped, int index);
     QGroupBox* createPoseEditor(Pose pose, int poseIndex);
 
     void connectSlider(std::string jointName, int poseIndex, FancySlider* slider, QLineEdit* value, PoseOption option);

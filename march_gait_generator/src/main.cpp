@@ -51,9 +51,8 @@ int main(int argc, char **argv)
     QApplication app( argc, argv );
 
     GaitGenerator* gaitGenerator = new GaitGenerator();
-//    gaitGenerator->showMaximized();
+    gaitGenerator->showMaximized();
     gaitGenerator->show();
-
     app.setStyleSheet("QGroupBox {"
                       "    border: 1px solid gray;"
                       "    border-radius: 9px;"

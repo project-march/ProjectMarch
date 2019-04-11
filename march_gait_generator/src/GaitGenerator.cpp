@@ -1,7 +1,9 @@
 
 #include <QSlider>
 #include <QLabel>
+#include <QHeaderView>
 #include <QGridLayout>
+
 #include <QVBoxLayout>
 
 #include <tf/transform_broadcaster.h>
@@ -14,6 +16,7 @@
 
 #include <march_gait_generator/GaitGenerator.h>
 #include <march_gait_generator/UIBuilder.h>
+
 
 GaitGenerator::GaitGenerator(Gait gait, QWidget* parent )
         : gait(gait), QWidget( parent )
@@ -36,6 +39,9 @@ GaitGenerator::GaitGenerator( QWidget* parent){
     this->gait = Gait();
     gait.addPoseStamped(PoseStamped(joints));
     gait.addPoseStamped(PoseStamped(joints));
+    gait.addPoseStamped(PoseStamped(joints));
+    gait.addPoseStamped(PoseStamped(joints));
+    gait.addPoseStamped(PoseStamped(joints));
     this->initLayout();
     this->loadGaitEditor();
 
@@ -44,33 +50,45 @@ GaitGenerator::GaitGenerator( QWidget* parent){
 // Destructor.
 GaitGenerator::~GaitGenerator()
 {
-//    delete manager_;
+    delete main_layout_;
+    delete model_;
 }
 
-void GaitGenerator::initLayout(){
+void GaitGenerator::initLayout() {
     keyFrameCounter = 0;
     main_layout_ = new QHBoxLayout();
 
+    this->setLayout(main_layout_);
 
-    // Set the top-level layout for this GaitGenerator widget.
-    setLayout( main_layout_ );
+    gaitEditor_ = new QTableWidget();
+    gaitEditor_->setRowCount(2);
+    gaitEditor_->setColumnCount(this->gait.poseList.size());
 
-    poseViewList_ = new QGroupBox();
-//    scrollArea_ = new QScrollArea();
-//    scrollArea_->setWidget(poseViewList_);
-//    scrollArea_->setLayout(new QHBoxLayout());
-//    poseViewList_->setLayout(new QHBoxLayout());
-//    main_layout_->addWidget(scrollArea_);
-
+    gaitEditor_->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+    gaitEditor_->verticalHeader()->setVisible(false);
+    gaitEditor_->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    gaitEditor_->setSelectionMode(QAbstractItemView::NoSelection);
+    gaitEditor_->setShowGrid(false);
+    gaitEditor_->horizontalHeader()->setSectionResizeMode (QHeaderView::Fixed);
+    main_layout_->addWidget(gaitEditor_);
 }
+
 
 void GaitGenerator::loadGaitEditor(){
+
     for( int i = 0; i<this->gait.poseList.size(); i++){
-        this->addPoseView(this->gait.poseList.at(i), i);
+        QGroupBox* poseView = this->createPoseView(gait.poseList.at(i), i);
+        gaitEditor_->setCellWidget(0, i, poseView);
     }
+
+    gaitEditor_->setCellWidget(1,0, createFooter(this->gait.name, this->gait.comment, this->gait.version));
+    gaitEditor_->resizeColumnsToContents();
+    gaitEditor_->resizeRowsToContents();
+
+
 }
 
-void GaitGenerator::addPoseView(PoseStamped poseStamped, int index){
+QGroupBox* GaitGenerator::createPoseView(PoseStamped poseStamped, int index){
     // Construct and lay out render panel.
     rviz::RenderPanel* renderPanel = new rviz::RenderPanel();
 
@@ -80,11 +98,10 @@ void GaitGenerator::addPoseView(PoseStamped poseStamped, int index){
     poseEditor->setTitle(QString("Pose"));
     poseEditor->layout()->addWidget(renderPanel);
 
-    main_layout_->addWidget(poseEditor);
-
+    poseEditor->setFixedWidth(400);
 
     rviz::VisualizationManager* manager = new rviz::VisualizationManager( renderPanel );
-    renderPanel ->initialize( manager->getSceneManager(), manager );
+    renderPanel->initialize( manager->getSceneManager(), manager );
     manager->initialize();
     manager->startUpdate();
 
@@ -102,7 +119,10 @@ void GaitGenerator::addPoseView(PoseStamped poseStamped, int index){
     grid->subProp( "Plane Cell Count" )->setValue( 20);
     rviz::Display* robotmodel = manager->createDisplay( "rviz/RobotModel", appendKeyFrameCounter("robotmodel"), true );
     manager->createDisplay( "rviz/TF", "sd", true );
-//    robotmodel->subProp("TF Prefix")->setValue(QString("frame").append(QString::number(keyFrameCounter)));
+    robotmodel->subProp("TF Prefix")->setValue(QString("pose").append(QString::number(index)));
+
+
+    return poseEditor;
 }
 
 QGroupBox* GaitGenerator::createPoseEditor(Pose pose, int poseIndex){
