@@ -1,3 +1,5 @@
+// Copyright 2019 Project March
+
 #ifndef GAITGENERATOR_H
 #define GAITGENERATOR_H
 
@@ -18,56 +20,54 @@
 #include <march_gait_generator/widgets/FancySlider.h>
 #include <march_gait_generator/Gait.h>
 
-
 namespace rviz
 {
-    class Display;
-    class RenderPanel;
-    class VisualizationManager;
+class Display;
+class RenderPanel;
+class VisualizationManager;
 }
 
-
-enum PoseOption {
-    position,
-    velocity
+enum PoseOption
+{
+  position,
+  velocity
 };
 
-class GaitGenerator: public QWidget
+class GaitGenerator : public QWidget
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
-    int keyFrameCounter;
-    Gait gait;
+  int keyFrameCounter;
+  Gait gait;
 
-    explicit GaitGenerator(QWidget* parent = 0 );
-    explicit GaitGenerator(Gait gait,  QWidget* parent = 0);
-    virtual ~GaitGenerator();
+  explicit GaitGenerator(QWidget* parent = 0);
+  explicit GaitGenerator(Gait gait, QWidget* parent = 0);
+  virtual ~GaitGenerator();
 
-    QString appendKeyFrameCounter(const std::string& base);
-    void loadGaitEditor();
-    QGroupBox* createKeyFrameSettings();
+  QString appendKeyFrameCounter(const std::string& base);
+  void loadGaitEditor();
+  QGroupBox* createKeyFrameSettings();
 
 private Q_SLOTS:
 
 private:
-    ros::NodeHandle n;
-    ros::Publisher joint_pub;
-    robot_state_publisher::RobotStatePublisher* robotStatePublisher;
-    QHBoxLayout* main_layout_;
-    QTableWidget* gaitEditor_;
-    urdf::Model* model_;
-    KDL::Tree kdlTree_;
+  ros::NodeHandle n;
+  ros::Publisher joint_pub;
+  robot_state_publisher::RobotStatePublisher* robotStatePublisher;
+  QHBoxLayout* main_layout_;
+  QTableWidget* gaitEditor_;
+  urdf::Model* model_;
+  KDL::Tree kdlTree_;
 
-    void loadUrdf();
-    void initLayout();
+  void loadUrdf();
+  void initLayout();
 
-    void publishPose(int keyFrameIndex);
+  void publishPose(int keyFrameIndex);
 
-    QGroupBox* createPoseView(PoseStamped poseStamped, int index);
-    QGroupBox* createPoseEditor(Pose pose, int poseIndex);
+  QGroupBox* createPoseView(PoseStamped poseStamped, int index);
+  QGroupBox* createPoseEditor(Pose pose, int poseIndex);
 
-    void connectSlider(std::string jointName, int poseIndex, FancySlider* slider, QLineEdit* value, PoseOption option);
-
+  void connectSlider(std::string jointName, int poseIndex, FancySlider* slider, QLineEdit* value, PoseOption option);
 };
-#endif // GAITGENERATOR_H
+#endif  // GAITGENERATOR_H

@@ -1,3 +1,5 @@
+// Copyright 2019 Project March
+
 #ifndef FANCYSLIDER_H
 #define FANCYSLIDER_H
 
@@ -5,14 +7,14 @@
 
 class FancySlider : public QSlider
 {
-Q_OBJECT
+  Q_OBJECT
 public:
-    int MULTIPLICATION_FACTOR = 1000000;
-    explicit FancySlider(QWidget *parent = 0);
-    explicit FancySlider(Qt::Orientation orientation, QWidget *parent = 0);
+  int MULTIPLICATION_FACTOR = 1000000;
+  explicit FancySlider(QWidget* parent = 0);
+  explicit FancySlider(Qt::Orientation orientation, QWidget* parent = 0);
 
 protected:
-    virtual void sliderChange(SliderChange change);
+  virtual void sliderChange(SliderChange change);
 };
 
-#endif // FANCYSLIDER_H
+#endif  // FANCYSLIDER_H

@@ -1,3 +1,4 @@
+// Copyright 2019 Project March
 
 #include <march_gait_generator/Gait.h>
 

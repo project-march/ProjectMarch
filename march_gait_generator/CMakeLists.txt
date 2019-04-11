@@ -6,6 +6,7 @@ add_definitions(-std=c++11 -Wall -g)
 find_package(catkin REQUIRED COMPONENTS rviz roscpp
         kdl_parser
         robot_state_publisher
+        roslint
         )
 
 catkin_package(

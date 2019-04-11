@@ -1,3 +1,4 @@
+// Copyright 2019 Project March
 
 #ifndef MARCH_GAIT_GENERATOR_UIBUILDER_H
 #define MARCH_GAIT_GENERATOR_UIBUILDER_H
