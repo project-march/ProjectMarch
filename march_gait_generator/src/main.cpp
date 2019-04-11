@@ -55,7 +55,7 @@ int main(int argc, char **argv)
     gaitGenerator->show();
     app.setStyleSheet("QGroupBox {"
                       "    border: 1px solid gray;"
-                      "    border-radius: 9px;"
+//                      "    border-radius: 9px;"
                       "    margin-top: 0.5em;"
                       "}"
                       ""

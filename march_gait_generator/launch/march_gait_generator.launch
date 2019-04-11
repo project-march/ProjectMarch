@@ -5,7 +5,7 @@
            command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iii.xacro'" />
 
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen">
-<!--            <param name="tf_prefix" value="/frame1"/>-->
+<!--            <param name="tf_prefix" value="pose0/"/>-->
         </node>
 <!--        <node name="joint_state1" pkg="joint_state_publisher" type="joint_state_publisher" respawn="true" output="screen">-->
 <!--            <param name="use_gui" value="true"/>-->

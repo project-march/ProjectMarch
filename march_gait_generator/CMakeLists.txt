@@ -11,6 +11,8 @@ catkin_package(
         CATKIN_DEPENDS
         rviz
         roscpp
+        kdl
+        kdl_parser
         LIBRARIES
         march_gait_generator
 )

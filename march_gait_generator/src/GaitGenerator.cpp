@@ -6,13 +6,11 @@
 
 #include <QVBoxLayout>
 
-#include <tf/transform_broadcaster.h>
 
 #include "rviz/visualization_manager.h"
 #include "rviz/render_panel.h"
 #include "rviz/display.h"
 
-#include <robot_state_publisher/robot_state_publisher.h>
 
 #include <march_gait_generator/GaitGenerator.h>
 #include <march_gait_generator/UIBuilder.h>
@@ -61,7 +59,7 @@ void GaitGenerator::initLayout() {
     this->setLayout(main_layout_);
 
     gaitEditor_ = new QTableWidget();
-    gaitEditor_->setRowCount(2);
+    gaitEditor_->setRowCount(3);
     gaitEditor_->setColumnCount(this->gait.poseList.size());
 
     gaitEditor_->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
@@ -81,7 +79,9 @@ void GaitGenerator::loadGaitEditor(){
         gaitEditor_->setCellWidget(0, i, poseView);
     }
 
-    gaitEditor_->setCellWidget(1,0, createFooter(this->gait.name, this->gait.comment, this->gait.version));
+    gaitEditor_->setSpan(2, 0, 1, this->gait.poseList.size());
+
+    gaitEditor_->setCellWidget(2, 0, createFooter(this->gait.name, this->gait.comment, this->gait.version));
     gaitEditor_->resizeColumnsToContents();
     gaitEditor_->resizeRowsToContents();
 
@@ -119,7 +119,7 @@ QGroupBox* GaitGenerator::createPoseView(PoseStamped poseStamped, int index){
     grid->subProp( "Plane Cell Count" )->setValue( 20);
     rviz::Display* robotmodel = manager->createDisplay( "rviz/RobotModel", appendKeyFrameCounter("robotmodel"), true );
     manager->createDisplay( "rviz/TF", "sd", true );
-    robotmodel->subProp("TF Prefix")->setValue(QString("pose").append(QString::number(index)));
+//    robotmodel->subProp("TF Prefix")->setValue(QString("pose").append(QString::number(index)));
 
 
     return poseEditor;
@@ -167,6 +167,10 @@ QGroupBox* GaitGenerator::createPoseEditor(Pose pose, int poseIndex){
 void GaitGenerator::loadUrdf(){
     model_ = new urdf::Model();
     model_->initParam("robot_description");
+
+//    if (!kdl_parser::treeFromUrdfModel(*model_, kdlTree_)){
+//        ROS_ERROR("Failed to construct kdl tree");
+//    }
 }
 
 QString GaitGenerator::appendKeyFrameCounter(const std::string& base){

@@ -54,16 +54,26 @@ QGroupBox* createJointSetting(std::string jointName, const urdf::JointLimitsShar
 
 QGroupBox* createFooter(std::string name, std::string comment, std::string version){
     QGroupBox* footer = new QGroupBox();
-    QVBoxLayout* footerLayout = new QVBoxLayout();
+    QHBoxLayout* footerLayout = new QHBoxLayout();
     footer->setLayout(footerLayout);
 
-    footerLayout->addWidget(new QLabel("Gait:"));
-    footerLayout->addWidget(new QLineEdit(QString::fromStdString(name)));
+    footerLayout->addWidget(new QLabel("Name:"));
+    QLineEdit *nameEdit = new QLineEdit(QString::fromStdString(name));
+//    nameEdit->setFixedWidth(150);
+    footerLayout->addWidget(nameEdit);
+
     footerLayout->addWidget(new QLabel("Description:"));
+    QLineEdit* descriptionEdit = new QLineEdit(QString::fromStdString(comment));
+//    descriptionEdit->setFixedWidth(300);
+    footerLayout->addWidget(descriptionEdit);
+
     footerLayout->addWidget(new QLabel("Version:"));
+    QLineEdit* versionEdit = new QLineEdit(QString::fromStdString(version));
+//    versionEdit->setFixedWidth(150);
+    footerLayout->addWidget(versionEdit);
 
+    footer->setFixedWidth(600);
     return footer;
-
 }
 
 #endif //MARCH_GAIT_GENERATOR_UIBUILDER_H
