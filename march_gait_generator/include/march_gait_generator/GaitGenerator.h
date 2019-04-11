@@ -53,11 +53,11 @@ private Q_SLOTS:
 private:
     ros::NodeHandle n;
     ros::Publisher joint_pub;
-//    robot_state_publisher::RobotStatePublisher robotStatePublisher;
+    robot_state_publisher::RobotStatePublisher* robotStatePublisher;
     QHBoxLayout* main_layout_;
     QTableWidget* gaitEditor_;
     urdf::Model* model_;
-//    KDL::Tree kdlTree_;
+    KDL::Tree kdlTree_;
 
     void loadUrdf();
     void initLayout();

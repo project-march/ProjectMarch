@@ -17,8 +17,7 @@
 
 
 GaitGenerator::GaitGenerator(Gait gait, QWidget* parent )
-        : gait(gait), QWidget( parent )
-{
+        : gait(gait), QWidget( parent ){
     this->loadUrdf();
 
     this->initLayout();
@@ -168,9 +167,11 @@ void GaitGenerator::loadUrdf(){
     model_ = new urdf::Model();
     model_->initParam("robot_description");
 
-//    if (!kdl_parser::treeFromUrdfModel(*model_, kdlTree_)){
-//        ROS_ERROR("Failed to construct kdl tree");
-//    }
+    if (!kdl_parser::treeFromUrdfModel(*model_, kdlTree_)){
+        ROS_ERROR("Failed to construct kdl tree");
+    }
+
+    this->robotStatePublisher = new robot_state_publisher::RobotStatePublisher(kdlTree_, *model_);
 }
 
 QString GaitGenerator::appendKeyFrameCounter(const std::string& base){

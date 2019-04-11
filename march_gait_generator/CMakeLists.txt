@@ -3,7 +3,10 @@ project(march_gait_generator)
 
 add_definitions(-std=c++11 -Wall -g)
 
-find_package(catkin REQUIRED COMPONENTS rviz roscpp)
+find_package(catkin REQUIRED COMPONENTS rviz roscpp
+        kdl_parser
+        robot_state_publisher
+        )
 
 catkin_package(
         INCLUDE_DIRS
@@ -11,8 +14,8 @@ catkin_package(
         CATKIN_DEPENDS
         rviz
         roscpp
-        kdl
         kdl_parser
+        robot_state_publisher
         LIBRARIES
         march_gait_generator
 )
