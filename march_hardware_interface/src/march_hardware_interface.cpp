@@ -78,7 +78,8 @@ void MarchHardwareInterface::init()
     position_joint_interface_.registerHandle(jointPositionHandle);
 
     // Set the first target as the current position
-    this->read();
+    this->read(ros::Duration(0.01));
+    joint_velocity_[i] = 0;
     joint_position_command_[i] = joint_position_[i];
     ROS_INFO("Joint %s: first read position: %f", joint_names_[i].c_str(), joint_position_[i]);
 
