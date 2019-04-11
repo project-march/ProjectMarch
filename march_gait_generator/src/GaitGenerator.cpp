@@ -9,6 +9,7 @@
 
 #include "rviz/visualization_manager.h"
 #include "rviz/render_panel.h"
+#include "rviz/view_manager.h"
 #include "rviz/display.h"
 
 
@@ -41,12 +42,6 @@ GaitGenerator::GaitGenerator( QWidget* parent){
     gait.addPoseStamped(PoseStamped(joints));
     this->initLayout();
     this->loadGaitEditor();
-
-    sleep(1);
-    for( int i = 0; i<this->gait.poseList.size(); i++){
-        publishPose(i);
-        publishPose(i);
-    }
 }
 
 // Destructor.
@@ -67,6 +62,7 @@ void GaitGenerator::initLayout() {
     gaitEditor_->setColumnCount(this->gait.poseList.size());
 
     gaitEditor_->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+    gaitEditor_->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
     gaitEditor_->verticalHeader()->setVisible(false);
     gaitEditor_->setEditTriggers(QAbstractItemView::NoEditTriggers);
     gaitEditor_->setSelectionMode(QAbstractItemView::NoSelection);
@@ -88,15 +84,11 @@ void GaitGenerator::loadGaitEditor(){
     gaitEditor_->setCellWidget(2, 0, createFooter(this->gait.name, this->gait.comment, this->gait.version));
     gaitEditor_->resizeColumnsToContents();
     gaitEditor_->resizeRowsToContents();
-
-
 }
 
 QGroupBox* GaitGenerator::createPoseView(PoseStamped poseStamped, int index){
     // Construct and lay out render panel.
     rviz::RenderPanel* renderPanel = new rviz::RenderPanel();
-
-    renderPanel->getViewController();
 
     QGroupBox* poseEditor = this->createPoseEditor(poseStamped.pose, index);
     poseEditor->setTitle(QString("Pose"));
@@ -109,25 +101,28 @@ QGroupBox* GaitGenerator::createPoseView(PoseStamped poseStamped, int index){
     manager->initialize();
     manager->startUpdate();
 
+    manager->getViewManager()->getCurrent()->subProp("Distance")->setValue("1.4");
+    manager->getViewManager()->getCurrent()->subProp("Yaw")->setValue("1.57");
+    manager->getViewManager()->getCurrent()->subProp("Pitch")->setValue("0");
+    manager->getViewManager()->getCurrent()->subProp("Focal Point")->subProp("X")->setValue("0");
+    manager->getViewManager()->getCurrent()->subProp("Focal Point")->subProp("Y")->setValue("0");
+    manager->getViewManager()->getCurrent()->subProp("Focal Point")->subProp("Z")->setValue("0.7");
+
     QString fixedFrame = QString("pose").append(QString::number(index)).append("/world");
 
     manager->setFixedFrame(fixedFrame);
 
-
     rviz::Display* grid = manager->createDisplay( "rviz/Grid", appendKeyFrameCounter("grid") , true );
     ROS_ASSERT( grid != NULL );
 
-    // Configure the GridDisplay the way we like it.
     grid->subProp( "Line Style" )->setValue( "Lines" );
     grid->subProp( "Color" )->setValue( QColor(Qt::yellow) );
     grid->subProp( "Plane" )->setValue( "XZ");
     grid->subProp( "Cell Size" )->setValue( 0.1);
-    grid->subProp( "Plane Cell Count" )->setValue( 20);
-    rviz::Display* tf = manager->createDisplay( "rviz/TF", "Tf", true );
+    grid->subProp( "Plane Cell Count" )->setValue( 30);
+
     rviz::Display* robotmodel = manager->createDisplay( "rviz/RobotModel", "robot_description", true );
     robotmodel->subProp("TF Prefix")->setValue(QString("pose").append(QString::number(index)));
-    tf->subProp("Show Names")->setValue(false);
-
 
     return poseEditor;
 }
@@ -142,8 +137,8 @@ QGroupBox* GaitGenerator::createPoseEditor(Pose pose, int poseIndex){
         auto joint = model_->getJoint(jointName);
         ROS_ASSERT_MSG(joint != nullptr, "Joint %s does not exist in the robot description", jointName.c_str());
 
-        if ( joint->limits->lower == 0 and joint->limits->upper == 0){
-            ROS_WARN("Skipping joint %s as limits are 0.", jointName.c_str());
+        if ( joint->limits == nullptr){
+            ROS_WARN("Skipping joint %s as limits are missing.", jointName.c_str());
             continue;
         }
 
@@ -186,11 +181,8 @@ QString GaitGenerator::appendKeyFrameCounter(const std::string& base){
 
 void GaitGenerator::publishPose(int poseIndex) {
     std::string prefix = QString("pose").append(QString::number(poseIndex)).toStdString();
-//    std::string topic = QString(QString::fromStdString(prefix)).append("/joint_states").toStdString();
-//    joint_pub = n.advertise<sensor_msgs::JointState>(topic, 1);
-//    joint_pub.publish(this->gait.poseList.at(poseIndex).pose.toJointState());
+    std::string prefixOld = QString("pose").append(QString::number(poseIndex-1)).toStdString();
 
-    ROS_INFO(prefix.c_str());
     this->robotStatePublisher->publishFixedTransforms(prefix);
     this->robotStatePublisher->publishTransforms(this->gait.poseList.at(poseIndex).pose.toPositionMap(), ros::Time::now(), prefix);
 }
