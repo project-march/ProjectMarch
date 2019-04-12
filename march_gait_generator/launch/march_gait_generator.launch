@@ -1,14 +1,6 @@
 <launch>
-
-    <!-- Load the URDF into the ROS Parameter Server -->
     <param name="robot_description"
            command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iii.xacro'" />
 
-<!--        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen">-->
-<!--        </node>-->
-<!--        <node name="joint_state1" pkg="joint_state_publisher" type="joint_state_publisher" respawn="true" output="screen">-->
-<!--        </node>-->
-
-
-    <!--    <node name="march_gait_generator" pkg="march_gait_generator" type="march_gait_generator" output="screen"/>-->
+    <node name="march_gait_generator" pkg="march_gait_generator" type="gait_generator_dummy" output="screen"/>
 </launch>
