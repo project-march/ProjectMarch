@@ -32,8 +32,14 @@ GaitGenerator::GaitGenerator(QWidget* parent)
   for (auto it = model_->joints_.begin(); it != model_->joints_.end(); ++it)
   {
     std::string jointName = it->first;
+    if (it->second->limits == nullptr)
+    {
+      ROS_WARN("Skipping joint %s as limits are missing.", jointName.c_str());
+      continue;
+    }
     joints.push_back(jointName);
   }
+
   this->gait = Gait();
   gait.addPoseStamped(PoseStamped(joints));
   gait.addPoseStamped(PoseStamped(joints));
@@ -141,12 +147,6 @@ QGroupBox* GaitGenerator::createPoseEditor(Pose pose, int poseIndex)
     auto joint = model_->getJoint(jointName);
     ROS_ASSERT_MSG(joint != nullptr, "Joint %s does not exist in the robot description", jointName.c_str());
 
-    if (joint->limits == nullptr)
-    {
-      ROS_WARN("Skipping joint %s as limits are missing.", jointName.c_str());
-      continue;
-    }
-
     QGroupBox* jointSetting = createJointSetting(jointName, joint->limits, pose.getJointPosition(jointName),
                                                  pose.getJointVelocity(jointName));
 
@@ -200,7 +200,7 @@ void GaitGenerator::connectSlider(std::string jointName, int poseIndex, FancySli
                                   PoseOption option)
 {
   // Have to create the connections here or else we can't connect it to the gait.
-  connect(slider, &FancySlider::valueChanged, [=]() {
+  connect(slider, &FancySlider::valueChanged, [this, jointName, poseIndex, slider, valueDisplay, option]() {
     float value = slider->value();
     valueDisplay->setText(QString::number(value / slider->MULTIPLICATION_FACTOR));
     if (option == PoseOption::position)
@@ -216,21 +216,21 @@ void GaitGenerator::connectSlider(std::string jointName, int poseIndex, FancySli
       ROS_WARN("Pose option is not known");
     }
     this->publishPose(poseIndex);
-  });
+  });  // NOLINT(whitespace/parens)
 
-  connect(valueDisplay, &QLineEdit::editingFinished, [=]() {
+  connect(valueDisplay, &QLineEdit::editingFinished, [this, poseIndex, slider, valueDisplay]() {
     QString text = valueDisplay->text();
     bool success;
     float value = text.toFloat(&success);
     if (success)
     {
       slider->setValue(value * slider->MULTIPLICATION_FACTOR);
-      publishPose(poseIndex);
+      this->publishPose(poseIndex);
     }
     else
     {
       ROS_WARN("Text %s is not valid.", text.toStdString().c_str());
       valueDisplay->setText(QString::number(slider->value() / slider->MULTIPLICATION_FACTOR));
     }
-  });
+  });  // NOLINT(whitespace/parens)
 }

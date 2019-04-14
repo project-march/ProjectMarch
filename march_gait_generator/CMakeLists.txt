@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS rviz roscpp
         kdl_parser
         robot_state_publisher
         roslint
+        joint_trajectory_controller
         )
 
 catkin_package(
@@ -71,10 +72,13 @@ add_library(march_gait_generator
         include/${PROJECT_NAME}/Pose.h
         include/${PROJECT_NAME}/PoseStamped.h
         include/${PROJECT_NAME}/UIBuilder.h
+        include/${PROJECT_NAME}/TrajectoryPreview.h
         include/${PROJECT_NAME}/widgets/FancySlider.h
         src/Gait.cpp
         src/GaitGenerator.cpp
         src/Pose.cpp
+        src/PoseStamped.cpp
+        src/TrajectoryPreview.cpp
         src/widgets/FancySlider.cpp
         src/main.cpp
         )

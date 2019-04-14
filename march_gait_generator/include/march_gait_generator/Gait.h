@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <sensor_msgs/JointState.h>
+#include <trajectory_msgs/JointTrajectory.h>
 #include <ros/console.h>
 #include <utility>
 #include <march_gait_generator/Pose.h>
@@ -24,6 +25,8 @@ public:
   Gait();
   Gait(const std::string& name, const std::string& comment, const std::string& version, const ros::Duration& duration);
   Gait(const std::string& name, const std::string& comment, const std::string& version);
+
+  trajectory_msgs::JointTrajectory toJointTrajectory();
 
   /**
    * @brief Add a PoseStamped add a specific index in the poseList.

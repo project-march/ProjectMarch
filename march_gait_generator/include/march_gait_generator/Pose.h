@@ -21,9 +21,9 @@ public:
 
   Pose(const std::vector<std::string>& name, const std::vector<double>& position, const std::vector<double>& velocity);
 
-  Pose(const sensor_msgs::JointState& jointState);
+  explicit Pose(const sensor_msgs::JointState& jointState);
 
-  Pose(const std::vector<std::string>& name);
+  explicit Pose(const std::vector<std::string>& name);
 
   double getJointPosition(std::string jointName);
   double getJointVelocity(std::string jointName);

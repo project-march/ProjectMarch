@@ -26,6 +26,6 @@ void FancySlider::sliderChange(QAbstractSlider::SliderChange change)
     QPoint bottomRightCorner = sr.bottomLeft();
 
     QToolTip::showText(mapToGlobal(QPoint(bottomRightCorner.x(), bottomRightCorner.y())),
-                       QString::number((float)value() / MULTIPLICATION_FACTOR), this);
+                       QString::number(static_cast<float>(value()) / MULTIPLICATION_FACTOR), this);
   }
 }

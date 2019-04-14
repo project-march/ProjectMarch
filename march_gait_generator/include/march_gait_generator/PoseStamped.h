@@ -5,7 +5,10 @@
 
 #include <vector>
 #include <string>
-#include <sensor_msgs/JointState.h>
+
+#include <trajectory_msgs/JointTrajectoryPoint.h>
+#include <march_gait_generator/Pose.h>
+
 #include <ros/console.h>
 #include <utility>
 
@@ -16,16 +19,11 @@ public:
   float percentage;
   Pose pose;
 
-  PoseStamped(float seconds, float percentage, const std::vector<std::string>& name)
-    : seconds(seconds), percentage(percentage), pose(name)
-  {
-  }
-  PoseStamped(float seconds, float percentage, Pose pose) : seconds(seconds), percentage(percentage), pose(pose)
-  {
-  }
-  explicit PoseStamped(const std::vector<std::string>& name) : PoseStamped(0, 0, name)
-  {
-  }
+  PoseStamped(float seconds, float percentage, const std::vector<std::string>& name);
+  PoseStamped(float seconds, float percentage, Pose pose);
+  explicit PoseStamped(const std::vector<std::string>& name);
+
+  trajectory_msgs::JointTrajectoryPoint toJointTrajectoryPoint();
 
   /** @brief Override comparison operator */
   friend bool operator==(const PoseStamped& lhs, const PoseStamped& rhs)
