@@ -5,14 +5,10 @@
 
 #include <march_gait_generator/Gait.h>
 
-
-class TrajectoryPreview {
-
+class TrajectoryPreview
+{
 public:
-    TrajectoryPreview(Gait gait);
-
-
+  explicit TrajectoryPreview(Gait gait);
 };
 
-
-#endif //MARCH_IV_TRAJECTORYPREVIEW_H
+#endif  // MARCH_IV_TRAJECTORYPREVIEW_H
