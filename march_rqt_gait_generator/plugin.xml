@@ -1,0 +1,12 @@
+<library path="src">
+    <class name="GaitGeneratorPlugin" type="march_rqt_gait_generator.gait_generator.GaitGeneratorPlugin" base_class_type="rqt_gui_py::Plugin">
+        <description>
+            RQT plugin to create and visualize gaits.
+        </description>
+        <qtgui>
+            <label>March Gait Generator</label>
+            <icon>resource/img/march-walking.png</icon>
+            <statustip>March IV Gait Generator</statustip>
+        </qtgui>
+    </class>
+</library>

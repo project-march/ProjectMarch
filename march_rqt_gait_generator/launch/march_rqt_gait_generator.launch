@@ -1,0 +1,9 @@
+<launch>
+
+    <param name="robot_description"
+           command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iii.xacro'" />
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+    <node name="march_rqt_gait_generator" pkg="march_rqt_gait_generator" type="rqt_gait_generator" output="screen"/>
+</launch>

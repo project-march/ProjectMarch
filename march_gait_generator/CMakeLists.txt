@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS rviz roscpp
         robot_state_publisher
         roslint
         joint_trajectory_controller
+        rqt_plot
         )
 
 catkin_package(

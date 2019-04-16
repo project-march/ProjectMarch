@@ -15,39 +15,45 @@
 #include <march_gait_generator/GaitGenerator.h>
 #include <march_gait_generator/UIBuilder.h>
 
+
+using namespace QtCharts;
+
 GaitGenerator::GaitGenerator(Gait gait, QWidget* parent) : gait(gait), QWidget(parent)
 {
-  this->loadUrdf();
 
-  this->initLayout();
-  this->loadGaitEditor();
+
+
+//  this->loadUrdf();
+//
+//  this->initLayout();
+//  this->loadGaitEditor();
 }
 
 GaitGenerator::GaitGenerator(QWidget* parent)
 {
-  this->loadUrdf();
-
-  // Create an empty Gait based on the joints found in the URDF.
-  std::vector<std::string> joints;
-  for (auto it = model_->joints_.begin(); it != model_->joints_.end(); ++it)
-  {
-    std::string jointName = it->first;
-    if (it->second->limits == nullptr)
-    {
-      ROS_WARN("Skipping joint %s as limits are missing.", jointName.c_str());
-      continue;
-    }
-    joints.push_back(jointName);
-  }
-
-  this->gait = Gait();
-  gait.addPoseStamped(PoseStamped(joints));
-  gait.addPoseStamped(PoseStamped(joints));
-  gait.addPoseStamped(PoseStamped(joints));
-  gait.addPoseStamped(PoseStamped(joints));
-  gait.addPoseStamped(PoseStamped(joints));
-  this->initLayout();
-  this->loadGaitEditor();
+//  this->loadUrdf();
+//
+//  // Create an empty Gait based on the joints found in the URDF.
+//  std::vector<std::string> joints;
+//  for (auto it = model_->joints_.begin(); it != model_->joints_.end(); ++it)
+//  {
+//    std::string jointName = it->first;
+//    if (it->second->limits == nullptr)
+//    {
+//      ROS_WARN("Skipping joint %s as limits are missing.", jointName.c_str());
+//      continue;
+//    }
+//    joints.push_back(jointName);
+//  }
+//
+//  this->gait = Gait();
+//  gait.addPoseStamped(PoseStamped(joints));
+//  gait.addPoseStamped(PoseStamped(joints));
+//  gait.addPoseStamped(PoseStamped(joints));
+//  gait.addPoseStamped(PoseStamped(joints));
+//  gait.addPoseStamped(PoseStamped(joints));
+//  this->initLayout();
+//  this->loadGaitEditor();
 }
 
 // Destructor.
