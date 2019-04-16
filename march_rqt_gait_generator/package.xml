@@ -2,7 +2,7 @@
 <package format="2">
   <name>march_rqt_gait_generator</name>
   <version>0.0.0</version>
-  <description>rqt plugin to provide a clean launch menu for the march-iv exoskeleton.</description>
+  <description>rqt plugin to generate gaits for the march-iv exoskeleton</description>
 
   <maintainer email="software@projectmarch.nl">Project March</maintainer>
   <license>TODO</license>
@@ -11,6 +11,9 @@
   <build_depend>rospy</build_depend>
   <build_depend>rqt_gui</build_depend>
   <build_depend>rqt_gui_py</build_depend>
+  <build_depend>roslint</build_depend>
+  <build_depend>rviz</build_depend>
+  <build_depend>robot_state_publisher</build_depend>
   <build_export_depend>rospy</build_export_depend>
   <build_export_depend>rqt_gui</build_export_depend>
   <build_export_depend>rqt_gui_py</build_export_depend>

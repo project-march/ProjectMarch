@@ -169,7 +169,6 @@ class GaitGeneratorPlugin(Plugin):
     def update_plot(self, plot, setpoints):
         plot.updateSetpoints(),
 
-
     def update_table(self, table, setpoints):
         rospy.logdebug("Updating table")
 

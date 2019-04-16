@@ -3,6 +3,7 @@ from march_rqt_gait_generator.model.Setpoint import Setpoint
 
 import rospy
 
+
 class Joint:
 
     def __init__(self, name, limits, setpoints):
@@ -34,7 +35,7 @@ class Joint:
         for i in range(0, len(setpoints)):
             if setpoints[i].position > self.limits.upper or setpoints[i].position < self.limits.lower:
                 return False
-            if i > 0 and setpoints[i].time <= setpoints[i-1].time:
+            if i > 0 and setpoints[i].time <= setpoints[i - 1].time:
                 return False
         return True
 
@@ -45,7 +46,8 @@ class Joint:
 
     def within_safety_limits(self):
         for i in range(0, len(self.interpolatedSetpoints)):
-            if self.interpolatedSetpoints[i].position > self.limits.upper or self.interpolatedSetpoints[i].position < self.limits.lower:
+            if self.interpolatedSetpoints[i].position > self.limits.upper or \
+                    self.interpolatedSetpoints[i].position < self.limits.lower:
                 return False
             if i > 0 and abs(self.interpolatedSetpoints[i] - self.interpolatedSetpoints[i - 1]) > self.limits.velocity:
                 return False

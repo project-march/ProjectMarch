@@ -27,16 +27,12 @@ class JointSettingPlot(pg.PlotItem):
         # Create initial plot information for this example.
         self.plotSetpoints(joint.get_setpoints_unzipped())
 
-        # Customize dynamic properties.
         self.setTitle(joint.name)
         self.setYRange(self.lower_limit-0.1, self.upper_limit+0.1, padding=0)
         pen = pg.mkPen(color=(255, 0, 0), style=QtCore.Qt.DotLine)
         self.addItem(pg.InfiniteLine(self.joint.limits.lower, angle=0, pen=pen))
         self.addItem(pg.InfiniteLine(self.joint.limits.upper, angle=0, pen=pen))
 
-
-
-        # Customize static properties.
         self.setXRange(-0.1, self.duration + 0.1, padding=0)
         self.setMouseEnabled(False, False)
         self.hideButtons()
@@ -99,7 +95,7 @@ class JointSettingPlot(pg.PlotItem):
                 # Update the new values, normalized to the position limits and neighbouring setpoints.
                 x_min = 0
                 x_max = self.duration
-                if self.dragIndex > 0 :
+                if self.dragIndex > 0:
                     x_min = x[self.dragIndex-1]
                 if self.dragIndex < len(x)-1:
                     x_max = x[self.dragIndex+1]
