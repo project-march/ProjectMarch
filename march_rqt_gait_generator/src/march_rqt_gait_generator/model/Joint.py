@@ -28,7 +28,6 @@ class Joint:
         return self.setpoints[index]
 
     def set_setpoints(self, setpoints):
-        rospy.loginfo("Updating setpoints of joint " + self.name)
         self.setpoints = setpoints
 
     def within_safety_limits(self):

@@ -11,7 +11,6 @@ from python_qt_binding.QtWidgets import QWidget
 from python_qt_binding.QtWidgets import QFrame
 from python_qt_binding.QtWidgets import QTableWidgetItem
 
-
 import rviz
 
 from march_rqt_gait_generator.JointSettingPlot import JointSettingPlot
@@ -23,6 +22,7 @@ from march_rqt_gait_generator.model.Gait import Gait
 from urdf_parser_py import urdf
 
 import pyqtgraph as pg
+
 
 class GaitGeneratorPlugin(Plugin):
     TABLE_DIGITS = 4
@@ -63,7 +63,8 @@ class GaitGeneratorPlugin(Plugin):
         self.frame.initialize()
         reader = rviz.YamlConfigReader()
         config = rviz.Config()
-        reader.readFile(config, os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'), 'resource', 'cfg.rviz'))
+        reader.readFile(config,
+                        os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'), 'resource', 'cfg.rviz'))
         self.frame.load(config)
 
         # Hide irrelevant Rviz details
@@ -104,10 +105,12 @@ class GaitGeneratorPlugin(Plugin):
 
     def create_joint_settings(self):
         for i in range(0, len(self.gait.joints)):
-            self._widget.JointSettingContainer.layout().addWidget(self.create_joint_setting(self.gait.joints[i]), i % 3, i >= 3)
+            self._widget.JointSettingContainer.layout().addWidget(self.create_joint_setting(self.gait.joints[i]), i % 3,
+                                                                  i >= 3)
 
     def create_joint_setting(self, joint):
-        joint_setting_file = os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'), 'resource', 'joint_setting.ui')
+        joint_setting_file = os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'), 'resource',
+                                          'joint_setting.ui')
 
         joint_setting = QFrame()
         loadUi(joint_setting_file, joint_setting)
@@ -118,16 +121,19 @@ class GaitGeneratorPlugin(Plugin):
         joint_setting_plot.plot_item.sigPlotChanged.connect(
             lambda: [self.update_joint_setpoints(joint.name, self.plot_to_setpoints(joint_setting_plot)),
                      self.update_table(joint_setting.Table, self.gait.get_joint(joint.name).setpoints)
-                    ])
+                     ])
 
         joint_setting.Plot.addItem(joint_setting_plot)
 
         # Populate table with data and resize
         joint_setting.Table = self.update_table(joint_setting.Table, joint.setpoints)
 
-        joint_setting.Table.itemChanged.connect(
-            lambda: [self.update_joint_setpoints(joint.name, self.table_to_setpoints(joint_setting_plot)),
-                     self.update_plot(joint_setting_plot)
+        joint_setting.Table.cellChanged.connect(
+            lambda: [self.update_joint_setpoints(joint.name, self.table_to_setpoints(joint_setting.Table)),
+                     joint_setting_plot.plot_item.blockSignals(True),
+                     self.update_plot(joint_setting_plot, self.gait.get_joint(joint.name).setpoints),
+                     joint_setting_plot.plot_item.blockSignals(False)
+
                      ])
 
         # Disable scrolling vertically
@@ -146,22 +152,28 @@ class GaitGeneratorPlugin(Plugin):
             setpoints.append(Setpoint(plot_data[0][i], plot_data[1][i], 0))
         return setpoints
 
-    def table_to_setpoints(self, table):
-        table_data = table
+    def table_to_setpoints(self, table_data):
         setpoints = []
-        rospy.logwarn(table_data)
-        # for i in range(0, len(plot_data[0])):
-        #     TODO(Isha) Implement velocity here.
-            # setpoints.append(Setpoint(plot_data[0][i], plot_data[1][i], 0))
+        for i in range(0, table_data.columnCount()):
+            time = float(table_data.item(0, i).text())
+            position = float(table_data.item(1, i).text())
+            velocity = float(table_data.item(2, i).text())
+            setpoints.append(Setpoint(time, position, velocity))
         return setpoints
 
-    def update_plot(self, plot):
-        rospy.loginfo("Updating plot")
-        plot.plot_item.setData([0.1,0.2,0.3,0.4,0.5], [0.1,0.2,0.3,0.4,0.5])
+    def update_plot(self, plot, setpoints):
+        rospy.logdebug("Updating plot")
 
+        x = []
+        y = []
+
+        for i in range(0, len(setpoints)):
+            x.append(setpoints[i].time)
+            y.append(setpoints[i].position)
+        plot.plot_item.setData(x, y)
 
     def update_table(self, table, setpoints):
-        rospy.loginfo("Updating table")
+        rospy.logdebug("Updating table")
 
         table.setColumnCount(len(setpoints))
         for i in range(0, len(setpoints)):

@@ -44,7 +44,7 @@ class JointSettingPlot(pg.PlotItem):
         for i in range(0, len(setpoints)):
             x.append(setpoints[i].time)
             y.append(setpoints[i].position)
-
+        self.plot_item = None
         self.plot_item = self.plot(x, y, symbolBrush=(255, 0, 0), symbolPen='w')
 
     def mouseDragEvent(self, ev):
