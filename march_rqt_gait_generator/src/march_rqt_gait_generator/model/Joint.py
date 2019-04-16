@@ -8,7 +8,7 @@ class Joint:
     def __init__(self, name, limits, setpoints):
         self.name = name
         self.limits = limits
-        self.setpoints = setpoints
+        self.setpoints = self.enforce_position_limits(setpoints)
         self.interpolatedSetpoints = self.interpolate_setpoints()
 
     def get_interpolated_value(self, time):
@@ -28,12 +28,37 @@ class Joint:
         return self.setpoints[index]
 
     def set_setpoints(self, setpoints):
-        self.setpoints = setpoints
+        self.setpoints = self.enforce_position_limits(setpoints)
+
+    def valid_setpoints(self, setpoints):
+        for i in range(0, len(setpoints)):
+            if setpoints[i].position > self.limits.upper or setpoints[i].position < self.limits.lower:
+                return False
+            if i > 0 and setpoints[i].time <= setpoints[i-1].time:
+                return False
+        return True
+
+    def enforce_position_limits(self, setpoints):
+        for i in range(0, len(setpoints)):
+            setpoints[i].position = min(max(setpoints[i].position, self.limits.lower), self.limits.upper)
+        return setpoints
 
     def within_safety_limits(self):
         for i in range(0, len(self.interpolatedSetpoints)):
-            if self.interpolatedSetpoints[i] > self.limits.upper or self.interpolatedSetpoints[i] < self.limits.lower:
+            if self.interpolatedSetpoints[i].position > self.limits.upper or self.interpolatedSetpoints[i].position < self.limits.lower:
                 return False
             if i > 0 and abs(self.interpolatedSetpoints[i] - self.interpolatedSetpoints[i - 1]) > self.limits.velocity:
                 return False
             return True
+
+    def get_setpoints_unzipped(self):
+        time = []
+        position = []
+        velocity = []
+
+        for i in range(0, len(self.setpoints)):
+            time.append(self.setpoints[i].time)
+            position.append(self.setpoints[i].position)
+            velocity.append(self.setpoints[i].velocity)
+
+        return (time, position, velocity)

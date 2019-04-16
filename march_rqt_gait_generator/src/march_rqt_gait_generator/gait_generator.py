@@ -124,7 +124,7 @@ class GaitGeneratorPlugin(Plugin):
         # Connect a function to update the model and to update the table.
         joint_setting_plot.plot_item.sigPlotChanged.connect(
             lambda: [self.update_joint_setpoints(joint.name, self.plot_to_setpoints(joint_setting_plot)),
-                     self.update_table(joint_setting.Table, self.gait.get_joint(joint.name).setpoints)
+                     self.update_table(joint_setting.Table, self.gait.get_joint(joint.name))
                      ])
 
         joint_setting.Plot.addItem(joint_setting_plot)
@@ -133,10 +133,11 @@ class GaitGeneratorPlugin(Plugin):
         joint_setting.Table = self.update_table(joint_setting.Table, joint.setpoints)
 
         # Disconnect the signals on the plot to avoid an infinite loop of table to plot to table updates.
-        joint_setting.Table.cellChanged.connect(
+        # Todo(Isha) refactor to check if new item is valid and don't update if invalid.
+        joint_setting.Table.itemChanged.connect(
             lambda: [self.update_joint_setpoints(joint.name, self.table_to_setpoints(joint_setting.Table)),
                      joint_setting_plot.plot_item.blockSignals(True),
-                     self.update_plot(joint_setting_plot, self.gait.get_joint(joint.name).setpoints),
+                     self.update_plot(joint_setting_plot, self.gait.get_joint(joint.name).get_setpoints_unzipped()),
                      joint_setting_plot.plot_item.blockSignals(False)
                      ])
 
@@ -166,15 +167,8 @@ class GaitGeneratorPlugin(Plugin):
         return setpoints
 
     def update_plot(self, plot, setpoints):
-        rospy.logdebug("Updating plot")
+        plot.updateSetpoints(),
 
-        x = []
-        y = []
-
-        for i in range(0, len(setpoints)):
-            x.append(setpoints[i].time)
-            y.append(setpoints[i].position)
-        plot.plot_item.setData(x, y)
 
     def update_table(self, table, setpoints):
         rospy.logdebug("Updating table")

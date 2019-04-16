@@ -25,7 +25,7 @@ class JointSettingPlot(pg.PlotItem):
         self.duration = duration
 
         # Create initial plot information for this example.
-        self.plotSetpoints(joint.setpoints)
+        self.plotSetpoints(joint.get_setpoints_unzipped())
 
         # Customize dynamic properties.
         self.setTitle(joint.name)
@@ -41,15 +41,12 @@ class JointSettingPlot(pg.PlotItem):
         self.setMouseEnabled(False, False)
         self.hideButtons()
 
-    def plotSetpoints(self, setpoints):
-        x = []
-        y = []
+    def plotSetpoints(self, (time, position, velocity)):
+        self.plot_item = self.plot(time, position, symbolBrush=(255, 0, 0), symbolPen='w')
 
-        for i in range(0, len(setpoints)):
-            x.append(setpoints[i].time)
-            y.append(setpoints[i].position)
-        self.plot_item = None
-        self.plot_item = self.plot(x, y, symbolBrush=(255, 0, 0), symbolPen='w')
+    def updateSetpoints(self, (time, position, velocity)):
+        # TODO(Isha) implement velocity slider
+        self.plot_item.setData(time, position)
 
     def mouseDragEvent(self, ev):
         # Check to make sure the button is the left mouse button. If not, ignore it.
