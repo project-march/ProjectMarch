@@ -7,13 +7,18 @@ import rospkg
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget
+from python_qt_binding.QtWidgets import QFrame
 from python_qt_binding.QtWidgets import QVBoxLayout
 from python_qt_binding.QtWidgets import QGroupBox
 from python_qt_binding.QtWidgets import QRadioButton
+from python_qt_binding.QtWidgets import QRadioButton
 from python_qt_binding.QtWidgets import QCheckBox
+
+from march_rqt_gait_generator.JointSettingPlot import JointSettingPlot
 
 import rviz
 
+import pyqtgraph as pg
 
 class GaitGeneratorPlugin(Plugin):
 
@@ -70,13 +75,29 @@ class GaitGeneratorPlugin(Plugin):
         self.frame.setStatusBar(None)
         self.frame.setHideButtonVisibility(False)
 
-        self._widget.RvizFrame.layout().addWidget(self.frame)
+        self._widget.RvizFrame.layout().addWidget(self.frame, 1, 0)
 
+        joint_setting_file = os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'), 'resource', 'joint_setting.ui')
 
+        AMOUNT_OF_JOINTS = 2
+        MIN_Y = -1
+        MAX_Y = 1
+        MIN_X = 0
+        MAX_X = 12
+        for i in range(0, AMOUNT_OF_JOINTS):
+            joint_setting = QFrame()
+            loadUi(joint_setting_file, joint_setting)
+            # p = Plot()
+            # p.setXRange(MIN_X, MAX_X)
+            # p.setYRange(MIN_Y, MAX_Y)
+            #
+            # p.plot([0.3, 0.12, -0.1, 0.1, -0.4, 0.6])
+            w = pg.GraphicsLayoutWidget()
+            w.addItem(JointSettingPlot())
+            joint_setting.layout().addWidget(w, 0, 0)
 
-    """Return all widgets found in the requested layout."""
-    def get_layout_widgets(self, layout):
-        return (layout.itemAt(i).widget() for i in range(layout.count()))
+            self._widget.JointSettingContainer.layout().addWidget(joint_setting)
+
 
 # def trigger_configuration(self):
 # Comment in to signal that the plugin has a way to configure
