@@ -1,6 +1,7 @@
 from march_rqt_gait_generator.model.Limits import Limits
 from march_rqt_gait_generator.model.Setpoint import Setpoint
 
+import rospy
 
 class Joint:
 
@@ -26,8 +27,9 @@ class Joint:
     def get_setpoint(self, index):
         return self.setpoints[index]
 
-    def update_setpoint(self, index, setpoint):
-        self.setpoints[index] = setpoint
+    def set_setpoints(self, setpoints):
+        rospy.loginfo("Updating setpoints of joint " + self.name)
+        self.setpoints = setpoints
 
     def within_safety_limits(self):
         for i in range(0, len(self.interpolatedSetpoints)):

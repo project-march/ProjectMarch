@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>702</width>
-    <height>381</height>
+    <height>483</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -19,8 +19,27 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="1">
+   <item row="0" column="0">
+    <widget class="GraphicsLayoutWidget" name="Plot">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>200</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
     <widget class="QTableWidget" name="Table">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -28,25 +47,46 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="rowCount">
-      <number>3</number>
+     <property name="minimumSize">
+      <size>
+       <width>684</width>
+       <height>0</height>
+      </size>
      </property>
-     <property name="columnCount">
-      <number>3</number>
+     <property name="maximumSize">
+      <size>
+       <width>684</width>
+       <height>100</height>
+      </size>
      </property>
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="verticalScrollMode">
+      <enum>QAbstractItemView::ScrollPerPixel</enum>
+     </property>
+     <attribute name="horizontalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="verticalHeaderDefaultSectionSize">
+      <number>21</number>
+     </attribute>
      <row>
       <property name="text">
-       <string>Time</string>
+       <string>Time (s)</string>
       </property>
      </row>
      <row>
       <property name="text">
-       <string>Position</string>
+       <string>Position (rad)</string>
       </property>
      </row>
      <row>
       <property name="text">
-       <string>Velocity</string>
+       <string>Velocity (rad/s)</string>
       </property>
      </row>
      <column>
@@ -64,17 +104,22 @@
        <string>3</string>
       </property>
      </column>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="PlotPlaceholer">
-     <property name="text">
-      <string>Placeholder for the plot. View JointSettingPlot.py for imlementation</string>
-     </property>
+     <column>
+      <property name="text">
+       <string>4</string>
+      </property>
+     </column>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>GraphicsLayoutWidget</class>
+   <extends>QGraphicsView</extends>
+   <header>pyqtgraph</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
