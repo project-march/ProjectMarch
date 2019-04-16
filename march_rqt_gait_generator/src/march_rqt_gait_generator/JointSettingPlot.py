@@ -24,7 +24,7 @@ class JointSettingPlot(pg.PlotItem):
         self.plotSetpoints(joint.setpoints)
 
         # Customize dynamic properties.
-        # self.setTitle(joint.name)
+        self.setTitle(joint.name)
         self.setYRange(self.joint.limits.lower-0.1, self.joint.limits.upper+0.1, padding=0)
         pen = pg.mkPen(color=(255, 0, 0), style=QtCore.Qt.DotLine)
         self.addItem(pg.InfiniteLine(self.joint.limits.lower, angle=0, pen=pen))

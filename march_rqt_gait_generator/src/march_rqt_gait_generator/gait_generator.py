@@ -85,8 +85,12 @@ class GaitGeneratorPlugin(Plugin):
         joint_list = []
         for i in range(0, len(self.robot.joints)):
             urdf_joint = self.robot.joints[i]
+            if urdf_joint.type == "fixed":
+                rospy.loginfo("Skipping fixed joint " + urdf_joint.name)
+                continue
 
             if urdf_joint.limit is None:
+                rospy.logwarn("Skipping joint " + urdf_joint.name + " because it has no limits.")
                 continue
 
             default_setpoints = [
@@ -128,12 +132,12 @@ class GaitGeneratorPlugin(Plugin):
         # Populate table with data and resize
         joint_setting.Table = self.update_table(joint_setting.Table, joint.setpoints)
 
+        # Disconnect the signals on the plot to avoid an infinite loop of table to plot to table updates.
         joint_setting.Table.cellChanged.connect(
             lambda: [self.update_joint_setpoints(joint.name, self.table_to_setpoints(joint_setting.Table)),
                      joint_setting_plot.plot_item.blockSignals(True),
                      self.update_plot(joint_setting_plot, self.gait.get_joint(joint.name).setpoints),
                      joint_setting_plot.plot_item.blockSignals(False)
-
                      ])
 
         # Disable scrolling vertically
