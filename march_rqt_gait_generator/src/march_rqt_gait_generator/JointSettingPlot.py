@@ -20,12 +20,16 @@ class JointSettingPlot(pg.PlotItem):
         self.plot_item = None
 
         self.joint = joint
+        self.lower_limit = joint.limits.lower
+        self.upper_limit = joint.limits.upper
+        self.duration = duration
+
         # Create initial plot information for this example.
         self.plotSetpoints(joint.setpoints)
 
         # Customize dynamic properties.
         self.setTitle(joint.name)
-        self.setYRange(self.joint.limits.lower-0.1, self.joint.limits.upper+0.1, padding=0)
+        self.setYRange(self.lower_limit-0.1, self.upper_limit+0.1, padding=0)
         pen = pg.mkPen(color=(255, 0, 0), style=QtCore.Qt.DotLine)
         self.addItem(pg.InfiniteLine(self.joint.limits.lower, angle=0, pen=pen))
         self.addItem(pg.InfiniteLine(self.joint.limits.upper, angle=0, pen=pen))
@@ -33,7 +37,7 @@ class JointSettingPlot(pg.PlotItem):
 
 
         # Customize static properties.
-        self.setXRange(-0.1, duration + 0.1, padding=0)
+        self.setXRange(-0.1, self.duration + 0.1, padding=0)
         self.setMouseEnabled(False, False)
         self.hideButtons()
 
@@ -94,8 +98,17 @@ class JointSettingPlot(pg.PlotItem):
                 # is has a point being moved. For this example we know it is the plot_item object.
                 x, y = self.plot_item.getData()
                 # Be sure to add in the initial drag offset to each coordinate to account for the initial mismatch.
-                x[self.dragIndex] = local_pos.x() + self.dragOffset.x()
-                y[self.dragIndex] = local_pos.y() + self.dragOffset.y()
+
+                # Update the new values, normalized to the position limits and neighbouring setpoints.
+                x_min = 0
+                x_max = self.duration
+                if self.dragIndex > 0 :
+                    x_min = x[self.dragIndex-1]
+                if self.dragIndex < len(x)-1:
+                    x_max = x[self.dragIndex+1]
+                x[self.dragIndex] = min(max(local_pos.x() + self.dragOffset.x(), x_min), x_max)
+                y[self.dragIndex] = min(max(local_pos.y() + self.dragOffset.y(), self.lower_limit), self.upper_limit)
+
                 # Update the PlotDataItem (this will automatically update the graphics when a change is detected)
                 self.plot_item.setData(x, y)
         pass
