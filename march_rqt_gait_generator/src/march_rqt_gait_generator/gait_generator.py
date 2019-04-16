@@ -8,15 +8,17 @@ from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget
 from python_qt_binding.QtWidgets import QFrame
-from python_qt_binding.QtWidgets import QVBoxLayout
-from python_qt_binding.QtWidgets import QGroupBox
-from python_qt_binding.QtWidgets import QRadioButton
-from python_qt_binding.QtWidgets import QRadioButton
-from python_qt_binding.QtWidgets import QCheckBox
 
-from march_rqt_gait_generator.JointSettingPlot import JointSettingPlot
 
 import rviz
+
+from march_rqt_gait_generator.JointSettingPlot import JointSettingPlot
+from march_rqt_gait_generator.model.Setpoint import Setpoint
+from march_rqt_gait_generator.model.Joint import Joint
+from march_rqt_gait_generator.model.Limits import Limits
+from march_rqt_gait_generator.model.Gait import Gait
+
+from urdf_parser_py import urdf
 
 import pyqtgraph as pg
 
@@ -24,8 +26,11 @@ class GaitGeneratorPlugin(Plugin):
 
     def __init__(self, context):
         super(GaitGeneratorPlugin, self).__init__(context)
-        # Give QObjects reasonable names
         self.setObjectName('GaitGeneratorPlugin')
+
+        self.robot = None
+        self.load_urdf()
+        self.gait = self.create_empty_gait()
 
         # Process standalone plugin command-line arguments
         from argparse import ArgumentParser
@@ -77,26 +82,51 @@ class GaitGeneratorPlugin(Plugin):
 
         self._widget.RvizFrame.layout().addWidget(self.frame, 1, 0)
 
+        self.create_joint_settings()
+
+
+    def load_urdf(self):
+        self.robot = urdf.Robot.from_parameter_server()
+
+    def create_empty_gait(self):
+        if self.robot is None:
+            rospy.logerr("Cannot create gait without a loaded robot.")
+        joint_list = []
+        for i in range(0, len(self.robot.joints)):
+            urdf_joint = self.robot.joints[i]
+
+            if urdf_joint.limit is None:
+                continue
+
+            default_setpoints = [
+                Setpoint(0.1, 0.1, 0.1),
+                Setpoint(0.3, -0.2, 0.2),
+                Setpoint(0.5, 0.3, 0.3),
+                Setpoint(0.7, 0.5, 0.4)
+            ]
+            joint = Joint(urdf_joint.name,
+                          Limits(urdf_joint.limit.upper, urdf_joint.limit.lower, urdf_joint.limit.velocity),
+                          default_setpoints
+                          )
+            joint_list.append(joint)
+        return Gait(joint_list)
+
+    def create_joint_settings(self):
+        rospy.logwarn(self.gait.joints)
+        for i in range(0, len(self.gait.joints)):
+            self._widget.JointSettingContainer.layout().addWidget(self.create_joint_setting(self.gait.joints[i]))
+
+    def create_joint_setting(self, joint):
         joint_setting_file = os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'), 'resource', 'joint_setting.ui')
 
-        AMOUNT_OF_JOINTS = 2
-        MIN_Y = -1
-        MAX_Y = 1
-        MIN_X = 0
-        MAX_X = 12
-        for i in range(0, AMOUNT_OF_JOINTS):
-            joint_setting = QFrame()
-            loadUi(joint_setting_file, joint_setting)
-            # p = Plot()
-            # p.setXRange(MIN_X, MAX_X)
-            # p.setYRange(MIN_Y, MAX_Y)
-            #
-            # p.plot([0.3, 0.12, -0.1, 0.1, -0.4, 0.6])
-            w = pg.GraphicsLayoutWidget()
-            w.addItem(JointSettingPlot())
-            joint_setting.layout().addWidget(w, 0, 0)
+        joint_setting = QFrame()
+        loadUi(joint_setting_file, joint_setting)
 
-            self._widget.JointSettingContainer.layout().addWidget(joint_setting)
+        w = pg.GraphicsLayoutWidget()
+        w.addItem(JointSettingPlot(joint.setpoints))
+        joint_setting.layout().addWidget(w, 0, 0)
+        return joint_setting
+
 
 
 # def trigger_configuration(self):

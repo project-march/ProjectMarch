@@ -2,12 +2,15 @@ import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 import numpy as np
 
+from march_rqt_gait_generator.model.Setpoint import Setpoint
+
 # Enable antialiasing for prettier plots
 pg.setConfigOptions(antialias=True)
 
+
 class JointSettingPlot(pg.PlotItem):
 
-    def __init__(self):
+    def __init__(self, setpoints):
         pg.PlotItem.__init__(self)
 
         # Initialize the class instance variables.
@@ -17,14 +20,17 @@ class JointSettingPlot(pg.PlotItem):
         self.plot_item_control = None
 
         # Create initial plot information for this example.
-        self._create_stuff()
+        self.plotSetpoints(setpoints)
 
-    def _create_stuff(self):
-        x = np.array([1.0, 2.0, 4.0, 3.0])
-        y = np.array([1.0, 3.0, 3.0, 1.0])
+    def plotSetpoints(self, setpoints):
+        x = []
+        y = []
 
-        self.plot_item_control = self.plot(x,y, symbolBrush=(255,0,0), symbolPen='w')
-        pass
+        for i in range(0, len(setpoints)):
+            x.append(setpoints[i].time)
+            y.append(setpoints[i].position)
+
+        self.plot_item_control = self.plot(x, y, symbolBrush=(255, 0, 0), symbolPen='w')
 
     def mouseDragEvent(self, ev):
         # Check to make sure the button is the left mouse button. If not, ignore it.
@@ -71,15 +77,13 @@ class JointSettingPlot(pg.PlotItem):
                 # Update the point in the PlotDataItem using get/set data.
                 # If we had more than one plotdataitem we would need to search/store which item
                 # is has a point being moved. For this example we know it is the plot_item_control object.
-                x,y = self.plot_item_control.getData()
+                x, y = self.plot_item_control.getData()
                 # Be sure to add in the initial drag offset to each coordinate to account for the initial mismatch.
                 x[self.dragIndex] = local_pos.x() + self.dragOffset.x()
                 y[self.dragIndex] = local_pos.y() + self.dragOffset.y()
                 # Update the PlotDataItem (this will automatically update the graphics when a change is detected)
                 self.plot_item_control.setData(x, y)
-                print(x[self.dragIndex])
-                print(y[self.dragIndex])
-
+                print("(" + str(x[self.dragIndex]) + "," + str(y[self.dragIndex]) + ")")
         pass
 
     pass
