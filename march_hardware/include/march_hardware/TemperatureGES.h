@@ -33,7 +33,7 @@ public:
   friend ::std::ostream& operator<<(std::ostream& os, const TemperatureGES& temperatureGes)
   {
     return os << "slaveIndex: " << temperatureGes.slaveIndex << ", "
-              << "byteOffset: " << temperatureGes.temperatureByteOffset;
+              << "temperatureByteOffset: " << temperatureGes.temperatureByteOffset;
   }
 };
 }  // namespace march4cpp
