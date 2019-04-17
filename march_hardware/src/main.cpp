@@ -28,7 +28,7 @@ int main(int argc, char** argv)
     jointList.push_back(temp);
 
     int ecatCycleTime = 4;  // milliseconds
-    march4cpp::MarchRobot march4 = march4cpp::MarchRobot(jointList, "enp4s0f2", ecatCycleTime);
+    march4cpp::MarchRobot march4 = march4cpp::MarchRobot(jointList, "enp2s0", ecatCycleTime);
     march4.startEtherCAT();
 
      if (!march4.isEthercatOperational())
