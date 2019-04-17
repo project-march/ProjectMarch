@@ -1,6 +1,0 @@
-<launch>
-    <param name="robot_description"
-           command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iii.xacro'" />
-
-<!--    <node name="march_gait_generator" pkg="march_gait_generator" type="gait_generator_dummy" output="screen"/>-->
-</launch>
