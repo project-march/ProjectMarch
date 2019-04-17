@@ -23,7 +23,6 @@
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QGridLayout" name="gridLayout_2"/>
-     <zorder>RvizFrame</zorder>
     </widget>
    </item>
    <item>
@@ -48,7 +47,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
-       <widget class="QLabel" name="RvizLabel">
+       <widget class="QLabel" name="Label">
         <property name="text">
          <string>Gait Preview</string>
         </property>
@@ -62,7 +61,7 @@
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QSlider" name="RvizTimeSlider">
+       <widget class="QSlider" name="TimeSlider">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>

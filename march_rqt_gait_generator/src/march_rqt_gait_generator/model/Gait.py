@@ -8,6 +8,7 @@ class Gait:
         self.name = name
         self.description = description
         self.duration = duration
+        self.current_time = 0
 
     def get_joint(self, name):
         for i in range(0, len(self.joints)):
@@ -15,3 +16,7 @@ class Gait:
                 return self.joints[i]
         rospy.logerr("Joint with name " + name + " does not exist in gait " + self.name + ".")
         return None
+
+    def set_current_time(self, time):
+        rospy.logerr("Time" + str(time))
+        self.current_time = time

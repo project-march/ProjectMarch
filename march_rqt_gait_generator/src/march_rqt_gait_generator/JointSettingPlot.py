@@ -28,22 +28,21 @@ class JointSettingPlot(pg.PlotItem):
 
         self.setTitle(joint.name)
 
-        print "Setting limits..."
         self.setYRange(self.lower_limit-0.1, self.upper_limit+0.1, padding=0)
         pen = pg.mkPen(color=(255, 0, 0), style=QtCore.Qt.DotLine)
         self.addItem(pg.InfiniteLine(joint.limits.lower, angle=0, pen=pen))
         self.addItem(pg.InfiniteLine(joint.limits.upper, angle=0, pen=pen))
-
         self.setXRange(-0.1, self.duration + 0.1, padding=0)
         self.setMouseEnabled(False, False)
+        self.setMenuEnabled(False)
         self.hideButtons()
-        print "Done..."
 
         self.updateSetpoints(joint)
 
 
     def createPlots(self, joint):
         self.plot_item = self.plot(pen=None, symbolBrush=(255, 0, 0), symbolPen='w')
+        self.showGrid(True, True, 1)
         self.plot_interpolation = self.plot()
 
     def updateSetpoints(self, joint):
@@ -107,9 +106,9 @@ class JointSettingPlot(pg.PlotItem):
                 x_min = 0
                 x_max = self.duration
                 if self.dragIndex > 0:
-                    x_min = x[self.dragIndex-1]
+                    x_min = x[self.dragIndex-1] + 0.01
                 if self.dragIndex < len(x)-1:
-                    x_max = x[self.dragIndex+1]
+                    x_max = x[self.dragIndex+1] - 0.01
                 x[self.dragIndex] = min(max(local_pos.x() + self.dragOffset.x(), x_min), x_max)
                 y[self.dragIndex] = min(max(local_pos.y() + self.dragOffset.y(), self.lower_limit), self.upper_limit)
 

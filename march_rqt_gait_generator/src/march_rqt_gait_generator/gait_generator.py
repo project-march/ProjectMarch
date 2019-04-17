@@ -9,6 +9,8 @@ from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget
 from python_qt_binding.QtWidgets import QFrame
+from python_qt_binding.QtWidgets import QSlider
+from python_qt_binding.QtWidgets import QHeaderView
 from python_qt_binding.QtWidgets import QTableWidgetItem
 
 import rviz
@@ -23,6 +25,8 @@ from urdf_parser_py import urdf
 
 import pyqtgraph as pg
 
+from sensor_msgs.msg import JointState
+
 
 class GaitGeneratorPlugin(Plugin):
     TABLE_DIGITS = 4
@@ -30,6 +34,8 @@ class GaitGeneratorPlugin(Plugin):
     def __init__(self, context):
         super(GaitGeneratorPlugin, self).__init__(context)
         self.setObjectName('GaitGeneratorPlugin')
+
+        self.joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=10)
 
         self.robot = None
         self.load_urdf()
@@ -73,6 +79,15 @@ class GaitGeneratorPlugin(Plugin):
         self.frame.setHideButtonVisibility(False)
 
         self._widget.RvizFrame.layout().addWidget(self.frame, 1, 0)
+
+        time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
+        time_slider.setRange(0, 1000)
+        # Connect TimeSlider
+        time_slider.valueChanged.connect(lambda: [
+            rospy.logwarn(time_slider.value()),
+            self.gait.set_current_time(float(time_slider.value() / 1000.0) * self.gait.duration),
+            self.publish_preview()
+        ])
 
         self.create_joint_settings()
 
@@ -126,7 +141,8 @@ class GaitGeneratorPlugin(Plugin):
         # Connect a function to update the model and to update the table.
         joint_setting_plot.plot_item.sigPlotChanged.connect(
             lambda: [self.update_joint_setpoints(joint.name, self.plot_to_setpoints(joint_setting_plot)),
-                     self.update_table(joint_setting.Table, self.gait.get_joint(joint.name).setpoints)
+                     self.update_table(joint_setting.Table, self.gait.get_joint(joint.name).setpoints),
+                     self.publish_preview()
                      ])
 
         joint_setting.Plot.addItem(joint_setting_plot)
@@ -140,11 +156,13 @@ class GaitGeneratorPlugin(Plugin):
             lambda: [self.update_joint_setpoints(joint.name, self.table_to_setpoints(joint_setting.Table)),
                      joint_setting_plot.plot_item.blockSignals(True),
                      joint_setting_plot.updateSetpoints(self.gait.get_joint(joint.name)),
-                     joint_setting_plot.plot_item.blockSignals(False)
+                     joint_setting_plot.plot_item.blockSignals(False),
+                     self.publish_preview()
                      ])
 
         # Disable scrolling vertically
         joint_setting.Table.verticalScrollBar().setDisabled(True)
+        joint_setting.Table.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         return joint_setting
 
@@ -180,6 +198,24 @@ class GaitGeneratorPlugin(Plugin):
         table.resizeRowsToContents()
         table.resizeColumnsToContents()
         return table
+
+    def publish_preview(self):
+        joint_state = JointState()
+        joint_state.header.stamp = rospy.get_rostime()
+        time = self.gait.current_time
+
+        for i in range(len(self.gait.joints)):
+            joint_state.name.append(self.gait.joints[i].name)
+            joint_state.position.append(self.gait.joints[i].get_interpolated_position(time))
+        self.joint_state_pub.publish(joint_state)
+
+    @staticmethod
+    def rad_to_deg(rad):
+        return rad * math.pi / 180
+
+    @staticmethod
+    def deg_to_rad(deg):
+        return deg / math.pi * 180
 
 # def trigger_configuration(self):
 # Comment in to signal that the plugin has a way to configure

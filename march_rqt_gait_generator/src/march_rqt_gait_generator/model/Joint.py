@@ -15,10 +15,12 @@ class Joint:
         self.duration = duration
         self.interpolatedSetpoints = self.interpolate_setpoints()
 
-    def get_interpolated_value(self, time):
-        for i in range(0, len(self.interpolatedSetpoints)):
-            if self.interpolatedSetpoints[i] > time:
-                return self.interpolatedSetpoints[i - 1]
+    def get_interpolated_position(self, time):
+        for i in range(0, len(self.interpolatedSetpoints[0])):
+            if self.interpolatedSetpoints[0][i] > time:
+                return self.interpolatedSetpoints[1][i - 1]
+
+        return self.interpolatedSetpoints[1][-1]
 
     def interpolate_setpoints(self):
         # TODO(Isha) implement interpolation using JTC. Maybe from Gait class?
