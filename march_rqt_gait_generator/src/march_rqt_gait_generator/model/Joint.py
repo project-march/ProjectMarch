@@ -45,7 +45,7 @@ class Joint:
             yi.append([position[i], velocity[i]])
 
         bpoly = BPoly.from_derivatives(time, yi)
-        indices = np.linspace(0, self.duration, self.duration*1000)
+        indices = np.linspace(0, self.duration, self.duration*10)
         return [indices, bpoly(indices)]
 
 

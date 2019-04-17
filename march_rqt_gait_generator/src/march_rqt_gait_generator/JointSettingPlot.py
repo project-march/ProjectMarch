@@ -29,9 +29,9 @@ class JointSettingPlot(pg.PlotItem):
         self.setTitle(joint.name)
 
         self.setYRange(self.lower_limit-0.1, self.upper_limit+0.1, padding=0)
-        pen = pg.mkPen(color=(255, 0, 0), style=QtCore.Qt.DotLine)
-        self.addItem(pg.InfiniteLine(joint.limits.lower, angle=0, pen=pen))
-        self.addItem(pg.InfiniteLine(joint.limits.upper, angle=0, pen=pen))
+        limit_pen = pg.mkPen(color='r', style=QtCore.Qt.DotLine)
+        self.addItem(pg.InfiniteLine(joint.limits.lower, angle=0, pen=limit_pen))
+        self.addItem(pg.InfiniteLine(joint.limits.upper, angle=0, pen=limit_pen))
         self.setXRange(-0.1, self.duration + 0.1, padding=0)
         self.setMouseEnabled(False, False)
         self.setMenuEnabled(False)
@@ -39,6 +39,11 @@ class JointSettingPlot(pg.PlotItem):
 
         self.updateSetpoints(joint)
 
+        time_pen = pg.mkPen(color='y', style=QtCore.Qt.DotLine)
+        self.time_line = self.addLine(0, name="test", pen=time_pen, movable=True, bounds=(0, self.duration))
+
+    def updateTimeSlider(self, time):
+        print self.time_line.setValue(time)
 
     def createPlots(self, joint):
         self.plot_item = self.plot(pen=None, symbolBrush=(255, 0, 0), symbolPen='w')

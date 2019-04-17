@@ -84,11 +84,14 @@ class GaitGeneratorPlugin(Plugin):
         time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
         time_slider.setRange(0, 1000)
 
-        # Connect TimeSlider
+        # Connect TimeSlider to the preview
         time_slider.valueChanged.connect(lambda: [
             self.gait.set_current_time(float(time_slider.value() / 1000.0) * self.gait.duration),
-            self.publish_preview()
+            self.publish_preview(),
+            self.update_time_sliders(),
         ])
+
+        self._widget.keyPressed.connect(lambda: rospy.logwarn(" sad"))
 
         # Connect settings buttons
         self._widget.SettingsFrame.findChild(QPushButton, "ExportButton").clicked.connect(lambda: self.gait.export_to_file())
@@ -214,6 +217,12 @@ class GaitGeneratorPlugin(Plugin):
             joint_state.name.append(self.gait.joints[i].name)
             joint_state.position.append(self.gait.joints[i].get_interpolated_position(time))
         self.joint_state_pub.publish(joint_state)
+
+    def update_time_sliders(self):
+        graphics_layouts = self._widget.JointSettingContainer.findChildren(pg.GraphicsLayoutWidget)
+        for graphics_layout in graphics_layouts:
+            joint_settings_plot = graphics_layout.getItem(0, 0)
+            joint_settings_plot.updateTimeSlider(self.gait.current_time)
 
     @staticmethod
     def rad_to_deg(rad):
