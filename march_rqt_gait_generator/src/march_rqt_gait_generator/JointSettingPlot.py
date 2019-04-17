@@ -1,7 +1,6 @@
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 import numpy as np
-from scipy.interpolate import BPoly
 from march_rqt_gait_generator.model.Setpoint import Setpoint
 
 import rospy
@@ -15,47 +14,46 @@ class JointSettingPlot(pg.PlotItem):
     def __init__(self, joint, duration):
         pg.PlotItem.__init__(self)
 
-        # Initialize the class instance variables.
         self.dragPoint = None
         self.dragIndex = -1
         self.dragOffset = 0
         self.plot_item = None
         self.plot_interpolation = None
 
-        self.joint = joint
         self.lower_limit = joint.limits.lower
         self.upper_limit = joint.limits.upper
         self.duration = duration
 
-        # Create initial plot information for this example.
-        self.plotSetpoints(joint.get_setpoints_unzipped())
+        self.createPlots(joint)
 
         self.setTitle(joint.name)
+
+        print "Setting limits..."
         self.setYRange(self.lower_limit-0.1, self.upper_limit+0.1, padding=0)
         pen = pg.mkPen(color=(255, 0, 0), style=QtCore.Qt.DotLine)
-        self.addItem(pg.InfiniteLine(self.joint.limits.lower, angle=0, pen=pen))
-        self.addItem(pg.InfiniteLine(self.joint.limits.upper, angle=0, pen=pen))
+        self.addItem(pg.InfiniteLine(joint.limits.lower, angle=0, pen=pen))
+        self.addItem(pg.InfiniteLine(joint.limits.upper, angle=0, pen=pen))
 
         self.setXRange(-0.1, self.duration + 0.1, padding=0)
         self.setMouseEnabled(False, False)
         self.hideButtons()
+        print "Done..."
 
-    def plotSetpoints(self, (time, position, velocity)):
-        self.plot_item = self.plot(time, position, pen=None, symbolBrush=(255, 0, 0), symbolPen='w')
-        self.plot_interpolation = self.plot(time, position)
+        self.updateSetpoints(joint)
 
-    def updateSetpoints(self, (time, position, velocity)):
+
+    def createPlots(self, joint):
+        self.plot_item = self.plot(pen=None, symbolBrush=(255, 0, 0), symbolPen='w')
+        self.plot_interpolation = self.plot()
+
+    def updateSetpoints(self, joint):
+        time, position, velocity = joint.get_setpoints_unzipped()
+
         # TODO(Isha) implement velocity slider
         self.plot_item.setData(time, position)
 
-        yi = []
-        for i in range(0, len(time)):
-            yi.append([position[i], velocity[i]])
-
-        test = BPoly.from_derivatives(time, yi)
-        indices = np.linspace(0, self.duration, 100)
-
-        self.plot_interpolation.setData(indices, test(indices))
+        [indices, values] = joint.interpolatedSetpoints
+        self.plot_interpolation.setData(indices, values)
 
     def mouseDragEvent(self, ev):
         # Check to make sure the button is the left mouse button. If not, ignore it.

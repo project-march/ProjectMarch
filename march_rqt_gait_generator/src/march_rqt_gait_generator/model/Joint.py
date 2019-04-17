@@ -1,15 +1,18 @@
+import numpy as np
 from march_rqt_gait_generator.model.Limits import Limits
 from march_rqt_gait_generator.model.Setpoint import Setpoint
 
 import rospy
+from scipy.interpolate import BPoly
 
 
 class Joint:
 
-    def __init__(self, name, limits, setpoints):
+    def __init__(self, name, limits, setpoints, duration):
         self.name = name
         self.limits = limits
         self.setpoints = self.enforce_position_limits(setpoints)
+        self.duration = duration
         self.interpolatedSetpoints = self.interpolate_setpoints()
 
     def get_interpolated_value(self, time):
@@ -19,7 +22,15 @@ class Joint:
 
     def interpolate_setpoints(self):
         # TODO(Isha) implement interpolation using JTC. Maybe from Gait class?
-        return self.setpoints
+
+        time, position, velocity = self.get_setpoints_unzipped()
+        yi = []
+        for i in range(0, len(time)):
+            yi.append([position[i], velocity[i]])
+
+        bpoly = BPoly.from_derivatives(time, yi)
+        indices = np.linspace(0, self.duration, 100)
+        return [indices, bpoly(indices)]
 
     def to_joint_trajectory_point(self):
         # TODO(Isha) create trajectoryPoint msg here.
@@ -30,6 +41,7 @@ class Joint:
 
     def set_setpoints(self, setpoints):
         self.setpoints = self.enforce_position_limits(setpoints)
+        self.interpolatedSetpoints = self.interpolate_setpoints()
 
     def valid_setpoints(self, setpoints):
         for i in range(0, len(setpoints)):
@@ -63,4 +75,4 @@ class Joint:
             position.append(self.setpoints[i].position)
             velocity.append(self.setpoints[i].velocity)
 
-        return (time, position, velocity)
+        return time, position, velocity

@@ -80,6 +80,7 @@ class GaitGeneratorPlugin(Plugin):
         self.robot = urdf.Robot.from_parameter_server()
 
     def create_empty_gait(self):
+        DEFAULT_GAIT_DURATION = 12
         if self.robot is None:
             rospy.logerr("Cannot create gait without a loaded robot.")
         joint_list = []
@@ -102,10 +103,11 @@ class GaitGeneratorPlugin(Plugin):
             ]
             joint = Joint(urdf_joint.name,
                           Limits(urdf_joint.limit.upper, urdf_joint.limit.lower, urdf_joint.limit.velocity),
-                          default_setpoints
+                          default_setpoints,
+                          DEFAULT_GAIT_DURATION
                           )
             joint_list.append(joint)
-        return Gait(joint_list)
+        return Gait(joint_list, DEFAULT_GAIT_DURATION)
 
     def create_joint_settings(self):
         for i in range(0, len(self.gait.joints)):
@@ -137,7 +139,7 @@ class GaitGeneratorPlugin(Plugin):
         joint_setting.Table.itemChanged.connect(
             lambda: [self.update_joint_setpoints(joint.name, self.table_to_setpoints(joint_setting.Table)),
                      joint_setting_plot.plot_item.blockSignals(True),
-                     joint_setting_plot.updateSetpoints(self.gait.get_joint(joint.name).get_setpoints_unzipped()),
+                     joint_setting_plot.updateSetpoints(self.gait.get_joint(joint.name)),
                      joint_setting_plot.plot_item.blockSignals(False)
                      ])
 

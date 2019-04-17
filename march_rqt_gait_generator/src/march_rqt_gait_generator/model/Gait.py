@@ -3,7 +3,7 @@ import rospy
 
 class Gait:
 
-    def __init__(self, joints, name="Dummy gait", description="Just a simple gait", duration=12):
+    def __init__(self, joints, duration, name="Dummy gait", description="Just a simple gait"):
         self.joints = joints
         self.name = name
         self.description = description
