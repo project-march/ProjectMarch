@@ -48,6 +48,8 @@ void MarchHardwareInterface::init()
 
   // Resize vectors
   joint_position_.resize(num_joints_);
+  /*joint_velocity_unfiltered_.resize(num_joints_);
+  joint_velocity_filtered_.resize(num_joints_);*/
   joint_velocity_.resize(num_joints_);
   joint_effort_.resize(num_joints_);
   joint_position_command_.resize(num_joints_);
@@ -80,6 +82,7 @@ void MarchHardwareInterface::init()
     // Set the first target as the current position
     this->read(ros::Duration(0.01));
     joint_velocity_[i] = 0;
+    joint_effort_[i] = 0;
     joint_position_command_[i] = joint_position_[i];
     ROS_INFO("Joint %s: first read position: %f", joint_names_[i].c_str(), joint_position_[i]);
 
@@ -126,7 +129,13 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
   {
     float oldPosition = joint_position_[i];
     joint_position_[i] = marchRobot.getJoint(joint_names_[i]).getAngleRad();
-    joint_velocity_[i] = (joint_position_[i]-oldPosition)*1/elapsed_time.toSec();
+
+    // Get velocity from encoder position
+    joint_effort_[i] = (joint_position_[i]-oldPosition)*1/elapsed_time.toSec();
+
+    // Apply exponential smoothing to velocity obtained from encoder with alpha=0.2
+    joint_velocity_[i] = filters::exponentialSmoothing(joint_effort_[i], joint_velocity_[i], 0.2);
+
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(), joint_position_[i]);
   }
 }

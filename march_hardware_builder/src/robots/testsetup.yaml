@@ -3,11 +3,11 @@ testsetup:
   ecatCycleTime: 4
   joints:
     - test_joint:
-        temperatureges:
-          slaveIndex: 1
-          byteOffset: 0
+#        temperatureges:
+#          slaveIndex: 1
+#          byteOffset: 0
         imotioncube:
-          slaveIndex: 2
+          slaveIndex: 1
           encoder:
             resolution: 16
             minPositionIU: 37961
