@@ -1,8 +1,10 @@
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 import numpy as np
-
+from scipy.interpolate import BPoly
 from march_rqt_gait_generator.model.Setpoint import Setpoint
+
+import rospy
 
 # Enable antialiasing for prettier plots
 pg.setConfigOptions(antialias=True)
@@ -18,6 +20,7 @@ class JointSettingPlot(pg.PlotItem):
         self.dragIndex = -1
         self.dragOffset = 0
         self.plot_item = None
+        self.plot_interpolation = None
 
         self.joint = joint
         self.lower_limit = joint.limits.lower
@@ -38,11 +41,21 @@ class JointSettingPlot(pg.PlotItem):
         self.hideButtons()
 
     def plotSetpoints(self, (time, position, velocity)):
-        self.plot_item = self.plot(time, position, symbolBrush=(255, 0, 0), symbolPen='w')
+        self.plot_item = self.plot(time, position, pen=None, symbolBrush=(255, 0, 0), symbolPen='w')
+        self.plot_interpolation = self.plot(time, position)
 
     def updateSetpoints(self, (time, position, velocity)):
         # TODO(Isha) implement velocity slider
         self.plot_item.setData(time, position)
+
+        yi = []
+        for i in range(0, len(time)):
+            yi.append([position[i], velocity[i]])
+
+        test = BPoly.from_derivatives(time, yi)
+        indices = np.linspace(0, self.duration, 100)
+
+        self.plot_interpolation.setData(indices, test(indices))
 
     def mouseDragEvent(self, ev):
         # Check to make sure the button is the left mouse button. If not, ignore it.
