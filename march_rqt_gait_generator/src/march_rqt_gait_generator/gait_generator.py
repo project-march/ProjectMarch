@@ -8,6 +8,7 @@ import rospkg
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget
+from python_qt_binding.QtWidgets import QPushButton
 from python_qt_binding.QtWidgets import QFrame
 from python_qt_binding.QtWidgets import QSlider
 from python_qt_binding.QtWidgets import QHeaderView
@@ -82,14 +83,19 @@ class GaitGeneratorPlugin(Plugin):
 
         time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
         time_slider.setRange(0, 1000)
+
         # Connect TimeSlider
         time_slider.valueChanged.connect(lambda: [
-            rospy.logwarn(time_slider.value()),
             self.gait.set_current_time(float(time_slider.value() / 1000.0) * self.gait.duration),
             self.publish_preview()
         ])
 
+        # Connect settings buttons
+        self._widget.SettingsFrame.findChild(QPushButton, "ExportButton").clicked.connect(lambda: self.gait.export_to_file())
+
         self.create_joint_settings()
+
+        self.publish_preview()
 
     def load_urdf(self):
         self.robot = urdf.Robot.from_parameter_server()

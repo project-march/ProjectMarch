@@ -4,3 +4,6 @@ class Setpoint:
         self.time = time
         self.position = position
         self.velocity = velocity
+
+    def __repr__(self):
+        return 'Time: %s, Position: %s, Velocity: %s' % (self.time, self.position, self.velocity)

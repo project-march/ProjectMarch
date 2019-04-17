@@ -51,7 +51,7 @@ class JointSettingPlot(pg.PlotItem):
         # TODO(Isha) implement velocity slider
         self.plot_item.setData(time, position)
 
-        [indices, values] = joint.interpolatedSetpoints
+        [indices, values] = joint.interpolate_setpoints()
         self.plot_interpolation.setData(indices, values)
 
     def mouseDragEvent(self, ev):
