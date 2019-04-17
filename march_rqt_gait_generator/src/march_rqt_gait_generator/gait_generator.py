@@ -124,7 +124,7 @@ class GaitGeneratorPlugin(Plugin):
         # Connect a function to update the model and to update the table.
         joint_setting_plot.plot_item.sigPlotChanged.connect(
             lambda: [self.update_joint_setpoints(joint.name, self.plot_to_setpoints(joint_setting_plot)),
-                     self.update_table(joint_setting.Table, self.gait.get_joint(joint.name))
+                     self.update_table(joint_setting.Table, self.gait.get_joint(joint.name).setpoints)
                      ])
 
         joint_setting.Plot.addItem(joint_setting_plot)
@@ -137,7 +137,7 @@ class GaitGeneratorPlugin(Plugin):
         joint_setting.Table.itemChanged.connect(
             lambda: [self.update_joint_setpoints(joint.name, self.table_to_setpoints(joint_setting.Table)),
                      joint_setting_plot.plot_item.blockSignals(True),
-                     self.update_plot(joint_setting_plot, self.gait.get_joint(joint.name).get_setpoints_unzipped()),
+                     joint_setting_plot.updateSetpoints(self.gait.get_joint(joint.name).get_setpoints_unzipped()),
                      joint_setting_plot.plot_item.blockSignals(False)
                      ])
 
@@ -165,9 +165,6 @@ class GaitGeneratorPlugin(Plugin):
             velocity = float(table_data.item(2, i).text())
             setpoints.append(Setpoint(time, position, velocity))
         return setpoints
-
-    def update_plot(self, plot, setpoints):
-        plot.updateSetpoints(),
 
     def update_table(self, table, setpoints):
         rospy.logdebug("Updating table")
