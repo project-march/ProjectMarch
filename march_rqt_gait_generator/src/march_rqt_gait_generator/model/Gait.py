@@ -26,7 +26,7 @@ class Gait:
 
         for timestamp in timestamps:
             joint_trajectory_point = JointTrajectoryPoint()
-            joint_trajectory_point.time_from_start = timestamp
+            joint_trajectory_point.time_from_start = rospy.Duration(timestamp)
             for joint in self.joints:
                 interpolated_setpoint = joint.get_interpolated_setpoint(timestamp)
 

@@ -1,32 +1,33 @@
 import math
 import os
-import sys
 
 import rospy
 import rospkg
+
+from urdf_parser_py import urdf
+import pyqtgraph as pg
+
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget
 from python_qt_binding.QtWidgets import QPushButton
 from python_qt_binding.QtWidgets import QFrame
+from python_qt_binding.QtWidgets import QLineEdit
 from python_qt_binding.QtWidgets import QSlider
 from python_qt_binding.QtWidgets import QHeaderView
 from python_qt_binding.QtWidgets import QTableWidgetItem
 
 import rviz
 
+from trajectory_msgs.msg import JointTrajectory
+from sensor_msgs.msg import JointState
+
 from march_rqt_gait_generator.JointSettingPlot import JointSettingPlot
 from march_rqt_gait_generator.model.Setpoint import Setpoint
 from march_rqt_gait_generator.model.Joint import Joint
 from march_rqt_gait_generator.model.Limits import Limits
 from march_rqt_gait_generator.model.Gait import Gait
-
-from urdf_parser_py import urdf
-
-import pyqtgraph as pg
-
-from sensor_msgs.msg import JointState
 
 
 class GaitGeneratorPlugin(Plugin):
@@ -91,11 +92,14 @@ class GaitGeneratorPlugin(Plugin):
             self.update_time_sliders(),
         ])
 
-        self._widget.keyPressed.connect(lambda: rospy.logwarn(" sad"))
-
-        # Connect settings buttons
+        # Connect Gait settings buttons
         self._widget.SettingsFrame.findChild(QPushButton, "ExportButton").clicked.connect(
-            lambda: self.gait.export_to_file())
+            lambda: self.gait.export_to_file()
+        )
+
+        self._widget.SettingsFrame.findChild(QPushButton, "PublishButton").clicked.connect(
+            lambda: self.publish_gait(self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").text())
+        )
 
         self.create_joint_settings()
 
@@ -224,6 +228,13 @@ class GaitGeneratorPlugin(Plugin):
         for graphics_layout in graphics_layouts:
             joint_settings_plot = graphics_layout.getItem(0, 0)
             joint_settings_plot.updateTimeSlider(self.gait.current_time)
+
+    def publish_gait(self, topic_name):
+        trajectory = self.gait.to_joint_trajectory()
+        trajectory.header.stamp = rospy.Time.now()
+        publisher = rospy.Publisher(topic_name, JointTrajectory, queue_size=10)
+        rospy.logwarn(trajectory)
+        publisher.publish(trajectory)
 
     @staticmethod
     def rad_to_deg(rad):
