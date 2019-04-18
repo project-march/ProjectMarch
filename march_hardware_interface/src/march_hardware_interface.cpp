@@ -54,6 +54,12 @@ void MarchHardwareInterface::init()
   joint_velocity_command_.resize(num_joints_);
   joint_effort_command_.resize(num_joints_);
 
+  // Print all joint positions on startup in case initialization fails.
+  for (int i = 0; i < num_joints_; ++i) {
+      this->read();
+      ROS_INFO("Joint %s: first read position: %f", joint_names_[i].c_str(), joint_position_[i]);
+  }
+
   // Initialize interfaces for each joint
   for (int i = 0; i < num_joints_; ++i)
   {
@@ -80,7 +86,6 @@ void MarchHardwareInterface::init()
     // Set the first target as the current position
     this->read();
     joint_position_command_[i] = joint_position_[i];
-    ROS_INFO("Joint %s: first read position: %f", joint_names_[i].c_str(), joint_position_[i]);
 
     if (joint_position_[i] < softLimits.min_position || joint_position_[i] > softLimits.max_position)
     {
