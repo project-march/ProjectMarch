@@ -55,7 +55,8 @@ void MarchHardwareInterface::init()
   joint_effort_command_.resize(num_joints_);
 
   // Print all joint positions on startup in case initialization fails.
-  for (int i = 0; i < num_joints_; ++i) {
+  for (int i = 0; i < num_joints_; ++i)
+  {
       this->read();
       ROS_INFO("Joint %s: first read position: %f", joint_names_[i].c_str(), joint_position_[i]);
   }
