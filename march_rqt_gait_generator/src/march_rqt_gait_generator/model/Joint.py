@@ -1,9 +1,9 @@
 import numpy as np
-from march_rqt_gait_generator.model.Limits import Limits
-from march_rqt_gait_generator.model.Setpoint import Setpoint
-
 import rospy
 from scipy.interpolate import BPoly
+
+from march_rqt_gait_generator.model.Setpoint import Setpoint
+
 
 class Joint:
 
@@ -31,7 +31,8 @@ class Joint:
         for i in range(0, len(interpolated_setpoints[0])):
             if interpolated_setpoints[0][i] > time:
                 position = interpolated_setpoints[1][i - 1]
-                velocity = (interpolated_setpoints[1][i - 1] - interpolated_setpoints[1][i - 2])/(interpolated_setpoints[0][i-1]-interpolated_setpoints[0][i-2])
+                velocity = (interpolated_setpoints[1][i - 1] - interpolated_setpoints[1][i - 2]) \
+                    / (interpolated_setpoints[0][i - 1] - interpolated_setpoints[0][i - 2])
                 return Setpoint(time, position, velocity)
         rospy.logerr("Could not interpolate setpoint at time " + str(time))
         return Setpoint(0, 0, 0)
@@ -45,9 +46,8 @@ class Joint:
             yi.append([position[i], velocity[i]])
 
         bpoly = BPoly.from_derivatives(time, yi)
-        indices = np.linspace(0, self.duration, self.duration*10)
+        indices = np.linspace(0, self.duration, self.duration * 10)
         return [indices, bpoly(indices)]
-
 
     def get_setpoint(self, index):
         return self.setpoints[index]
@@ -74,7 +74,8 @@ class Joint:
             if self.interpolated_setpoints[i].position > self.limits.upper or \
                     self.interpolated_setpoints[i].position < self.limits.lower:
                 return False
-            if i > 0 and abs(self.interpolated_setpoints[i] - self.interpolated_setpoints[i - 1]) > self.limits.velocity:
+            if i > 0 and abs(
+                    self.interpolated_setpoints[i] - self.interpolated_setpoints[i - 1]) > self.limits.velocity:
                 return False
             return True
 

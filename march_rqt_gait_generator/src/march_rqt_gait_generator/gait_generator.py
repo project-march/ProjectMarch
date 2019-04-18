@@ -94,7 +94,8 @@ class GaitGeneratorPlugin(Plugin):
         self._widget.keyPressed.connect(lambda: rospy.logwarn(" sad"))
 
         # Connect settings buttons
-        self._widget.SettingsFrame.findChild(QPushButton, "ExportButton").clicked.connect(lambda: self.gait.export_to_file())
+        self._widget.SettingsFrame.findChild(QPushButton, "ExportButton").clicked.connect(
+            lambda: self.gait.export_to_file())
 
         self.create_joint_settings()
 
