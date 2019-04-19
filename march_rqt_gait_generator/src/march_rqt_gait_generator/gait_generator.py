@@ -42,6 +42,8 @@ class GaitGeneratorPlugin(Plugin):
         self.robot = None
         self.load_urdf()
         self.gait = self.create_empty_gait()
+        self.gait_publisher = None
+        self.topic_name = ""
 
         # Process standalone plugin command-line arguments
         from argparse import ArgumentParser
@@ -98,8 +100,15 @@ class GaitGeneratorPlugin(Plugin):
         )
 
         self._widget.SettingsFrame.findChild(QPushButton, "PublishButton").clicked.connect(
-            lambda: self.publish_gait(self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").text())
+            lambda: self.publish_gait()
         )
+
+        self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").editingFinished.connect(
+            lambda: self.set_topic_name(self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").text())
+        )
+
+        # Initialize the publisher on startup
+        self.set_topic_name(self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").text())
 
         self.create_joint_settings()
 
@@ -124,11 +133,10 @@ class GaitGeneratorPlugin(Plugin):
                 continue
 
             default_setpoints = [
-                Setpoint(0, 0.6, 0.1),
-                Setpoint(3.3, -0.1, 0.2),
-                Setpoint(7.5, 1.3, 0.3),
-                Setpoint(11.7, 0.5, 0.4),
-                Setpoint(12, 0.3, 0.2)
+                Setpoint(0.2, 0, 0),
+                Setpoint(3, 1.3, 0),
+                Setpoint(4, 1.3, 0),
+                Setpoint(6.8, 0, 0)
             ]
             joint = Joint(urdf_joint.name,
                           Limits(urdf_joint.limit.upper, urdf_joint.limit.lower, urdf_joint.limit.velocity),
@@ -229,12 +237,15 @@ class GaitGeneratorPlugin(Plugin):
             joint_settings_plot = graphics_layout.getItem(0, 0)
             joint_settings_plot.updateTimeSlider(self.gait.current_time)
 
-    def publish_gait(self, topic_name):
+    def publish_gait(self, ):
         trajectory = self.gait.to_joint_trajectory()
-        trajectory.header.stamp = rospy.Time.now()
-        publisher = rospy.Publisher(topic_name, JointTrajectory, queue_size=10)
-        rospy.logwarn(trajectory)
-        publisher.publish(trajectory)
+        rospy.loginfo("Publishing trajectory to topic '" + self.topic_name + "'")
+        self.gait_publisher.publish(trajectory)
+
+    def set_topic_name(self, topic_name):
+        self.topic_name = topic_name
+        self.gait_publisher = rospy.Publisher(topic_name,
+                                    JointTrajectory, queue_size=10)
 
     @staticmethod
     def rad_to_deg(rad):
