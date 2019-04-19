@@ -162,10 +162,17 @@ class GaitGeneratorPlugin(Plugin):
 
         # Connect a function to update the model and to update the table.
         joint_setting_plot.plot_item.sigPlotChanged.connect(
-            lambda: [self.update_joint_setpoints(joint.name, self.plot_to_setpoints(joint_setting_plot)),
-                     self.update_table(joint_setting.Table, self.gait.get_joint(joint.name).setpoints),
+            lambda: [joint.set_setpoints(self.plot_to_setpoints(joint_setting_plot)),
+                     self.update_ui_elements(joint, table=joint_setting.Table, plot=joint_setting_plot),
                      self.publish_preview()
                      ])
+
+        joint_setting_plot.add_setpoint.connect(
+            lambda test: [
+                          joint.add_setpoint(test),
+                          self.update_ui_elements(joint, table=joint_setting.Table, plot=joint_setting_plot)
+            ])
+
 
         joint_setting.Plot.addItem(joint_setting_plot)
 
@@ -175,11 +182,8 @@ class GaitGeneratorPlugin(Plugin):
         # Disconnect the signals on the plot to avoid an infinite loop of table to plot to table updates.
         # Todo(Isha) refactor to check if new item is valid and don't update if invalid.
         joint_setting.Table.itemChanged.connect(
-            lambda: [self.update_joint_setpoints(joint.name, self.table_to_setpoints(joint_setting.Table)),
-                     joint_setting_plot.plot_item.blockSignals(True),
-                     joint_setting_plot.updateSetpoints(self.gait.get_joint(joint.name)),
-                     joint_setting_plot.plot_item.blockSignals(False),
-                     self.publish_preview()
+            lambda: [joint.set_setpoints(self.table_to_setpoints(joint_setting.Table)),
+                     self.update_ui_elements(joint, table=joint_setting.Table, plot=joint_setting_plot)
                      ])
 
         # Disable scrolling vertically
@@ -246,6 +250,20 @@ class GaitGeneratorPlugin(Plugin):
         self.topic_name = topic_name
         self.gait_publisher = rospy.Publisher(topic_name,
                                     JointTrajectory, queue_size=10)
+
+    def update_ui_elements(self, joint, table, plot, update_preview=True):
+        plot.plot_item.blockSignals(True)
+        table.blockSignals(True)
+
+        plot.updateSetpoints(joint)
+
+        self.update_table(table, joint.setpoints)
+
+        plot.plot_item.blockSignals(False)
+        table.blockSignals(False)
+
+        if update_preview:
+            self.publish_preview()
 
     @staticmethod
     def rad_to_deg(rad):

@@ -1,7 +1,6 @@
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
-import numpy as np
-from march_rqt_gait_generator.model.Setpoint import Setpoint
+from PyQt5.QtCore import QObject, pyqtSignal
 
 import rospy
 
@@ -10,6 +9,9 @@ pg.setConfigOptions(antialias=True)
 
 
 class JointSettingPlot(pg.PlotItem):
+
+    # Custom signals
+    add_setpoint = pyqtSignal(int)
 
     def __init__(self, joint, duration):
         pg.PlotItem.__init__(self)
@@ -40,10 +42,10 @@ class JointSettingPlot(pg.PlotItem):
         self.updateSetpoints(joint)
 
         time_pen = pg.mkPen(color='y', style=QtCore.Qt.DotLine)
-        self.time_line = self.addLine(0, name="test", pen=time_pen, movable=True, bounds=(0, self.duration))
+        self.time_line = self.addLine(0, name="test", pen=time_pen, bounds=(0, self.duration))
 
     def updateTimeSlider(self, time):
-        print self.time_line.setValue(time)
+        self.time_line.setValue(time)
 
     def createPlots(self, joint):
         self.plot_item = self.plot(pen=None, symbolBrush=(255, 0, 0), symbolPen='w')
@@ -58,6 +60,10 @@ class JointSettingPlot(pg.PlotItem):
 
         [indices, values] = joint.interpolate_setpoints()
         self.plot_interpolation.setData(indices, values)
+
+    def mouseClickEvent(self, ev):
+        self.add_setpoint.emit(6)
+
 
     def mouseDragEvent(self, ev):
         # Check to make sure the button is the left mouse button. If not, ignore it.

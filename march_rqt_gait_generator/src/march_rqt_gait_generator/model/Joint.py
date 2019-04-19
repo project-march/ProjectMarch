@@ -90,3 +90,10 @@ class Joint:
             velocity.append(self.setpoints[i].velocity)
 
         return time, position, velocity
+
+    def add_setpoint(self, time):
+        for i in range(0, len(self.setpoints)):
+            if self.setpoints[i].time > time:
+                print "adding setpoint " + str(self.get_interpolated_setpoint(time))
+                self.setpoints.insert(i, self.get_interpolated_setpoint(time))
+                break
