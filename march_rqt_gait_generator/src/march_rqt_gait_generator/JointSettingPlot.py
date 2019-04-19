@@ -15,7 +15,12 @@ class JointSettingPlot(pg.PlotItem):
     VELOCITY_SLIDER_LENGTH = 1
 
     # Custom signals
-    add_setpoint = pyqtSignal(int)
+
+    # time, position, button_pressed
+    add_setpoint = pyqtSignal(float, float, QtCore.Qt.KeyboardModifiers)
+
+    # index
+    remove_setpoint = pyqtSignal(int)
 
     def __init__(self, joint, duration):
         pg.PlotItem.__init__(self)
@@ -86,7 +91,29 @@ class JointSettingPlot(pg.PlotItem):
             self.velocity_sliders[i].setPos(x, y)
 
     def mouseClickEvent(self, ev):
-        self.add_setpoint.emit(6)
+
+        scene_position = ev.scenePos()
+
+        local_position = self.vb.mapSceneToView(scene_position)
+
+        # Check for deletion
+        if ev.modifiers() == QtCore.Qt.ShiftModifier:
+            for item in self.dataItems:
+                new_pts = item.scatter.pointsAt(local_position)
+                if len(new_pts) >= 1:
+                    self.dragPoint = new_pts[0]
+                    index = item.scatter.points().tolist().index(new_pts[0])
+                    self.remove_setpoint.emit(index)
+                    ev.accept()
+            return
+
+        # Create a new point
+        time = self.getViewBox().mapSceneToView(ev.scenePos()).x()
+        position = self.getViewBox().mapSceneToView(ev.scenePos()).y()
+
+        self.add_setpoint.emit(time, position, ev.modifiers())
+
+
 
 
     def mouseDragEvent(self, ev):

@@ -91,9 +91,20 @@ class Joint:
 
         return time, position, velocity
 
-    def add_setpoint(self, time):
+    def add_interpolated_setpoint(self, time):
         for i in range(0, len(self.setpoints)):
             if self.setpoints[i].time > time:
                 print "adding setpoint " + str(self.get_interpolated_setpoint(time))
                 self.setpoints.insert(i, self.get_interpolated_setpoint(time))
+
                 break
+
+    def add_setpoint(self, setpoint):
+        for i in range(0, len(self.setpoints)):
+            if self.setpoints[i].time > setpoint.time:
+                print "adding setpoint " + str(setpoint)
+                self.setpoints.insert(i, setpoint)
+                break
+
+    def remove_setpoint(self, index):
+        del self.setpoints[index]

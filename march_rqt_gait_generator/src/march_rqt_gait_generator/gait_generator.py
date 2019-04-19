@@ -8,6 +8,8 @@ from urdf_parser_py import urdf
 import pyqtgraph as pg
 
 
+from pyqtgraph.Qt import QtCore
+
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget
@@ -40,8 +42,7 @@ class GaitGeneratorPlugin(Plugin):
 
         self.joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=10)
 
-        self.robot = None
-        self.load_urdf()
+        self.robot = urdf.Robot.from_parameter_server()
         self.gait = self.create_empty_gait()
         self.gait_publisher = None
         self.topic_name = ""
@@ -115,9 +116,6 @@ class GaitGeneratorPlugin(Plugin):
 
         self.publish_preview()
 
-    def load_urdf(self):
-        self.robot = urdf.Robot.from_parameter_server()
-
     def create_empty_gait(self):
         if self.robot is None:
             rospy.logerr("Cannot create gait without a loaded robot.")
@@ -170,13 +168,19 @@ class GaitGeneratorPlugin(Plugin):
         joint_setting_plot.plot_item.sigPlotChanged.connect(
             lambda: [joint.set_setpoints(self.plot_to_setpoints(joint_setting_plot)),
                      self.update_ui_elements(joint, table=joint_setting.Table, plot=joint_setting_plot),
-                     self.publish_preview(),
+                     self.publish_preview()
                      ])
 
         joint_setting_plot.add_setpoint.connect(
-            lambda test: [
-                          joint.add_setpoint(test),
-                          self.update_ui_elements(joint, table=joint_setting.Table, plot=joint_setting_plot)
+            lambda time, position, button: [
+                                    self.add_setpoint(joint, time, position, button),
+                                    self.update_ui_elements(joint, table=joint_setting.Table, plot=joint_setting_plot)
+            ])
+
+        joint_setting_plot.remove_setpoint.connect(
+            lambda index: [
+                joint.remove_setpoint(index),
+                self.update_ui_elements(joint, table=joint_setting.Table, plot=joint_setting_plot)
             ])
 
         joint_setting.Plot.addItem(joint_setting_plot)
@@ -197,8 +201,11 @@ class GaitGeneratorPlugin(Plugin):
 
         return joint_setting
 
-    def update_joint_setpoints(self, name, setpoints):
-        self.gait.get_joint(name).set_setpoints(setpoints)
+    def add_setpoint(self, joint, time, position, button):
+        if button == QtCore.Qt.ControlModifier:
+            joint.add_interpolated_setpoint(time)
+        else:
+            joint.add_setpoint(Setpoint(time, position, 0))
 
     def plot_to_setpoints(self, plot):
         plot_data = plot.plot_item.getData()
