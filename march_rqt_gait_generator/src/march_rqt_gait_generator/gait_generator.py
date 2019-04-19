@@ -32,6 +32,7 @@ from march_rqt_gait_generator.model.Gait import Gait
 
 class GaitGeneratorPlugin(Plugin):
     TABLE_DIGITS = 4
+    DEFAULT_GAIT_DURATION = 12
 
     def __init__(self, context):
         super(GaitGeneratorPlugin, self).__init__(context)
@@ -118,7 +119,6 @@ class GaitGeneratorPlugin(Plugin):
         self.robot = urdf.Robot.from_parameter_server()
 
     def create_empty_gait(self):
-        DEFAULT_GAIT_DURATION = 12
         if self.robot is None:
             rospy.logerr("Cannot create gait without a loaded robot.")
         joint_list = []
@@ -141,10 +141,10 @@ class GaitGeneratorPlugin(Plugin):
             joint = Joint(urdf_joint.name,
                           Limits(urdf_joint.limit.upper, urdf_joint.limit.lower, urdf_joint.limit.velocity),
                           default_setpoints,
-                          DEFAULT_GAIT_DURATION
+                          self.DEFAULT_GAIT_DURATION
                           )
             joint_list.append(joint)
-        return Gait(joint_list, DEFAULT_GAIT_DURATION)
+        return Gait(joint_list, self.DEFAULT_GAIT_DURATION)
 
     def create_joint_settings(self):
         for i in range(0, len(self.gait.joints)):
@@ -161,10 +161,16 @@ class GaitGeneratorPlugin(Plugin):
         joint_setting_plot = JointSettingPlot(joint, self.gait.duration)
 
         # Connect a function to update the model and to update the table.
+        for slider in joint_setting_plot.velocity_sliders:
+            slider.sigRegionChangeStarted.connect(
+                lambda: rospy.logwarn("asdasd")
+        )
+
+
         joint_setting_plot.plot_item.sigPlotChanged.connect(
             lambda: [joint.set_setpoints(self.plot_to_setpoints(joint_setting_plot)),
                      self.update_ui_elements(joint, table=joint_setting.Table, plot=joint_setting_plot),
-                     self.publish_preview()
+                     self.publish_preview(),
                      ])
 
         joint_setting_plot.add_setpoint.connect(
@@ -172,7 +178,6 @@ class GaitGeneratorPlugin(Plugin):
                           joint.add_setpoint(test),
                           self.update_ui_elements(joint, table=joint_setting.Table, plot=joint_setting_plot)
             ])
-
 
         joint_setting.Plot.addItem(joint_setting_plot)
 

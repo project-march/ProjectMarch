@@ -1,3 +1,5 @@
+import math
+
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from PyQt5.QtCore import QObject, pyqtSignal
@@ -10,6 +12,8 @@ pg.setConfigOptions(antialias=True)
 
 class JointSettingPlot(pg.PlotItem):
 
+    VELOCITY_SLIDER_LENGTH = 1
+
     # Custom signals
     add_setpoint = pyqtSignal(int)
 
@@ -21,6 +25,7 @@ class JointSettingPlot(pg.PlotItem):
         self.dragOffset = 0
         self.plot_item = None
         self.plot_interpolation = None
+        self.velocity_sliders = []
 
         self.lower_limit = joint.limits.lower
         self.upper_limit = joint.limits.upper
@@ -42,7 +47,18 @@ class JointSettingPlot(pg.PlotItem):
         self.updateSetpoints(joint)
 
         time_pen = pg.mkPen(color='y', style=QtCore.Qt.DotLine)
-        self.time_line = self.addLine(0, name="test", pen=time_pen, bounds=(0, self.duration))
+        self.time_line = self.addLine(0, pen=time_pen, bounds=(0, self.duration))
+
+    def createVelocitySliders(self, setpoints):
+        self.velocity_sliders = []
+        for setpoint in setpoints:
+            angle = setpoint.velocity*math.pi/180
+            velocity_pen = pg.mkPen(color='b', size=3)
+            x, y = self.calculate_center_position(setpoint.time, setpoint.position, setpoint.velocity, self.VELOCITY_SLIDER_LENGTH)
+            velocity_slider = pg.ROI(pos=(x, y), size=(self.VELOCITY_SLIDER_LENGTH, 0), angle=angle, pen=velocity_pen)
+            velocity_slider.addRotateHandle((0, 0), (0.5, 0))
+            self.addItem(velocity_slider)
+            self.velocity_sliders.append(velocity_slider)
 
     def updateTimeSlider(self, time):
         self.time_line.setValue(time)
@@ -55,11 +71,19 @@ class JointSettingPlot(pg.PlotItem):
     def updateSetpoints(self, joint):
         time, position, velocity = joint.get_setpoints_unzipped()
 
+        self.createVelocitySliders(joint.setpoints)
+
         # TODO(Isha) implement velocity slider
         self.plot_item.setData(time, position)
 
         [indices, values] = joint.interpolate_setpoints()
         self.plot_interpolation.setData(indices, values)
+
+        for i in range(0, len(joint.setpoints)):
+            angle = velocity[i]*180/math.pi
+            self.velocity_sliders[i].setAngle(angle)
+            x, y = self.calculate_center_position(time[i], position[i], velocity[i], self.VELOCITY_SLIDER_LENGTH)
+            self.velocity_sliders[i].setPos(x, y)
 
     def mouseClickEvent(self, ev):
         self.add_setpoint.emit(6)
@@ -128,3 +152,8 @@ class JointSettingPlot(pg.PlotItem):
         pass
 
     pass
+
+    def calculate_center_position(self, x, y, angle, length):
+        x_center = x - (0.5*length*math.cos(angle))
+        y_center = y - (0.5*length*math.sin(angle))
+        return x_center, y_center
