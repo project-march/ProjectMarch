@@ -191,7 +191,3 @@ class JointSettingPlot(pg.PlotItem):
 
     pass
 
-    def calculate_center_position(self, x, y, velocity, length):
-        x_center = x - (0.5*length*math.cos(velocity))
-        y_center = y - (0.5*length*math.sin(velocity))
-        return x_center, math.degrees(y_center)

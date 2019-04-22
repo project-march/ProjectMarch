@@ -214,7 +214,6 @@ class GaitGeneratorPlugin(Plugin):
         for i in range(0, table_data.columnCount()):
             time = float(table_data.item(0, i).text())
             position = math.radians(float(table_data.item(1, i).text()))
-            position = math.radians(float(table_data.item(1, i).text()))
             velocity = math.radians(float(table_data.item(2, i).text()))
             setpoints.append(Setpoint(time, position, velocity))
         return setpoints
