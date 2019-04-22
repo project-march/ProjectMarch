@@ -9,19 +9,19 @@ Joint::Joint(std::string name, bool actuate, TemperatureGES temperatureGES, IMot
   : temperatureGES(temperatureGES), iMotionCube(iMotionCube)
 {
   this->name = std::move(name);
-  this->actuate = actuate;
+  this->allowActuation = actuate;
 }
 
 Joint::Joint(std::string name, bool actuate, TemperatureGES temperatureGES) : temperatureGES(temperatureGES)
 {
   this->name = std::move(name);
-  this->actuate = actuate;
+  this->allowActuation = actuate;
 }
 Joint::Joint(std::string name, bool actuate, IMotionCube iMotionCube) : iMotionCube(iMotionCube)
 
 {
   this->name = std::move(name);
-  this->actuate = actuate;
+  this->allowActuation = actuate;
 }
 
 void Joint::initialize(int ecatCycleTime)
@@ -38,7 +38,7 @@ void Joint::initialize(int ecatCycleTime)
 
 void Joint::actuateRad(float targetPositionRad)
 {
-  ROS_ASSERT_MSG(this->actuate, "Joint %s is not allowed to actuate, yet its actuate method has been called.",
+  ROS_ASSERT_MSG(this->allowActuation, "Joint %s is not allowed to actuate, yet its actuate method has been called.",
           this->name.c_str());
     // TODO(BaCo) check that the position is allowed and does not exceed (torque) limits.
   this->iMotionCube.actuateRad(targetPositionRad);
@@ -104,6 +104,6 @@ bool Joint::hasTemperatureGES()
 
 bool Joint::canActuate()
 {
-  return this->actuate;
+  return this->allowActuation;
 }
 }  // namespace march4cpp
