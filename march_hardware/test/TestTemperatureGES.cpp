@@ -40,7 +40,7 @@ TEST_F(TemperatureJointTest, ByteOffsetZero)
 
 TEST_F(TemperatureJointDeathTest, ByteOffsetMinusOne)
 {
-    ASSERT_DEATH(march4cpp::TemperatureGES(2, -1), "Slave configuration error: byteOffset -1 can not be negative.");
+    ASSERT_DEATH(march4cpp::TemperatureGES(2, -1), "Slave configuration error: temperatureByteOffset -1 can not be negative.");
 }
 
 TEST_F(TemperatureJointTest, NoSlaveIndexConstructor)
