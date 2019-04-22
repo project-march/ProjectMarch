@@ -113,9 +113,6 @@ class JointSettingPlot(pg.PlotItem):
 
         self.add_setpoint.emit(time, position, ev.modifiers())
 
-
-
-
     def mouseDragEvent(self, ev):
         # Check to make sure the button is the left mouse button. If not, ignore it.
         # Would have to change this if porting to Mac I assume.
