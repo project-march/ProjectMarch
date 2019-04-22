@@ -3,7 +3,7 @@ testsetup:
   ecatCycleTime: 4
   joints:
     - test_joint:
-        actuate: true
+        allowActuation: true
         temperatureges:
           slaveIndex: 1
           byteOffset: 0

@@ -5,23 +5,23 @@
 
 namespace march4cpp
 {
-Joint::Joint(std::string name, bool actuate, TemperatureGES temperatureGES, IMotionCube iMotionCube)
+Joint::Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES, IMotionCube iMotionCube)
   : temperatureGES(temperatureGES), iMotionCube(iMotionCube)
 {
   this->name = std::move(name);
-  this->allowActuation = actuate;
+  this->allowActuation = allowActuation;
 }
 
-Joint::Joint(std::string name, bool actuate, TemperatureGES temperatureGES) : temperatureGES(temperatureGES)
+Joint::Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES) : temperatureGES(temperatureGES)
 {
   this->name = std::move(name);
-  this->allowActuation = actuate;
+  this->allowActuation = allowActuation;
 }
-Joint::Joint(std::string name, bool actuate, IMotionCube iMotionCube) : iMotionCube(iMotionCube)
+Joint::Joint(std::string name, bool allowActuation, IMotionCube iMotionCube) : iMotionCube(iMotionCube)
 
 {
   this->name = std::move(name);
-  this->allowActuation = actuate;
+  this->allowActuation = allowActuation;
 }
 
 void Joint::initialize(int ecatCycleTime)
