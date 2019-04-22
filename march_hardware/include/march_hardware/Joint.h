@@ -12,7 +12,7 @@ class Joint
 {
 private:
   std::string name;
-  bool actuate;
+  bool allowActuation;
   IMotionCube iMotionCube;
   TemperatureGES temperatureGES;
 
@@ -41,7 +41,7 @@ public:
   friend bool operator==(const Joint& lhs, const Joint& rhs)
   {
     return lhs.name == rhs.name && lhs.iMotionCube == rhs.iMotionCube && lhs.temperatureGES == rhs.temperatureGES &&
-           lhs.actuate == rhs.actuate;
+           lhs.allowActuation == rhs.allowActuation;
   }
 
   friend bool operator!=(const Joint& lhs, const Joint& rhs)
@@ -52,7 +52,7 @@ public:
   friend ::std::ostream& operator<<(std::ostream& os, const Joint& joint)
   {
     return os << "name: " << joint.name << ", "
-              << "actuate: " << joint.actuate<< ", "
+              << "actuate: " << joint.allowActuation<< ", "
               << "imotioncube: " << joint.iMotionCube << ","
               << "temperatureges: " << joint.temperatureGES;
   }
