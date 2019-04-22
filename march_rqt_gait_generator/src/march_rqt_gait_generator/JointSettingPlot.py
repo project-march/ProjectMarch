@@ -60,11 +60,13 @@ class JointSettingPlot(pg.PlotItem):
             self.removeItem(self.velocity_sliders.pop())
 
         for setpoint in setpoints:
-            angle = setpoint.velocity*math.pi/180
+            angle = math.degrees(math.atan(setpoint.velocity))
+            rospy.logwarn("Angle in deg: " + str(angle))
             velocity_pen = pg.mkPen(color='b', size=3)
             x, y = self.calculate_center_position(setpoint.time, setpoint.position, setpoint.velocity, self.VELOCITY_SLIDER_LENGTH)
             velocity_slider = pg.ROI(pos=(x, y), size=(self.VELOCITY_SLIDER_LENGTH, 0), angle=angle, pen=velocity_pen)
             velocity_slider.addRotateHandle((0, 0), (0.5, 0))
+            rospy.logwarn("Angle of slider: " + str(velocity_slider.angle()))
             self.addItem(velocity_slider)
             self.velocity_sliders.append(velocity_slider)
 

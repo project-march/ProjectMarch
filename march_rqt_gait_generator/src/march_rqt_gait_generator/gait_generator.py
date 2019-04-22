@@ -131,9 +131,9 @@ class GaitGeneratorPlugin(Plugin):
                 continue
 
             default_setpoints = [
-                Setpoint(0.2, 0, 0),
+                # Setpoint(0.2, 0, 0),
                 Setpoint(3, 1.3, 0),
-                Setpoint(4, 1.3, 0),
+                # Setpoint(4, 1.3, 0),
                 Setpoint(6.8, 0, 0)
             ]
             joint = Joint(urdf_joint.name,
@@ -159,15 +159,9 @@ class GaitGeneratorPlugin(Plugin):
         joint_setting_plot = JointSettingPlot(joint, self.gait.duration)
 
         # Connect a function to update the model and to update the table.
-        for slider in joint_setting_plot.velocity_sliders:
-            slider.sigRegionChangeStarted.connect(
-                lambda: rospy.logwarn("asdasd")
-            )
-
         joint_setting_plot.plot_item.sigPlotChanged.connect(
             lambda: [joint.set_setpoints(self.plot_to_setpoints(joint_setting_plot)),
                      self.update_ui_elements(joint, table=joint_setting.Table, plot=joint_setting_plot),
-                     self.publish_preview()
                      ])
 
         joint_setting_plot.add_setpoint.connect(
@@ -210,8 +204,11 @@ class GaitGeneratorPlugin(Plugin):
         plot_data = plot.plot_item.getData()
         setpoints = []
         for i in range(0, len(plot_data[0])):
-            # TODO(Isha) Implement velocity here.
-            setpoints.append(Setpoint(plot_data[0][i], plot_data[1][i], 0))
+            angle = math.radians(plot.velocity_sliders[i].angle())
+            rospy.logwarn("Angle rad: " + str(angle))
+            velocity = math.tan(angle)
+            rospy.logwarn("Velocity rad/s: " + str(velocity))
+            setpoints.append(Setpoint(plot_data[0][i], plot_data[1][i], velocity))
         return setpoints
 
     def table_to_setpoints(self, table_data):
@@ -275,14 +272,6 @@ class GaitGeneratorPlugin(Plugin):
 
         if update_preview:
             self.publish_preview()
-
-    @staticmethod
-    def rad_to_deg(rad):
-        return rad * math.pi / 180
-
-    @staticmethod
-    def deg_to_rad(deg):
-        return deg / math.pi * 180
 
 # def trigger_configuration(self):
 # Comment in to signal that the plugin has a way to configure
