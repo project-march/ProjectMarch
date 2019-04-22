@@ -162,8 +162,7 @@ class GaitGeneratorPlugin(Plugin):
         for slider in joint_setting_plot.velocity_sliders:
             slider.sigRegionChangeStarted.connect(
                 lambda: rospy.logwarn("asdasd")
-        )
-
+            )
 
         joint_setting_plot.plot_item.sigPlotChanged.connect(
             lambda: [joint.set_setpoints(self.plot_to_setpoints(joint_setting_plot)),
