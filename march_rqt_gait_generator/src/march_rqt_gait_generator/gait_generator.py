@@ -7,7 +7,6 @@ import rospkg
 from urdf_parser_py import urdf
 import pyqtgraph as pg
 
-
 from pyqtgraph.Qt import QtCore
 
 from qt_gui.plugin import Plugin
@@ -131,10 +130,10 @@ class GaitGeneratorPlugin(Plugin):
                 continue
 
             default_setpoints = [
-                # Setpoint(0.2, 0, 0),
+                Setpoint(0.2, 0, 0),
                 Setpoint(3, 1.3, 0),
-                # Setpoint(4, 1.3, 0),
-                Setpoint(6.8, 0, 0)
+                Setpoint(4, 1.3, 0),
+                Setpoint(self.DEFAULT_GAIT_DURATION, 0, 0)
             ]
             joint = Joint(urdf_joint.name,
                           Limits(urdf_joint.limit.upper, urdf_joint.limit.lower, urdf_joint.limit.velocity),
@@ -166,8 +165,8 @@ class GaitGeneratorPlugin(Plugin):
 
         joint_setting_plot.add_setpoint.connect(
             lambda time, position, button: [
-                                    self.add_setpoint(joint, time, position, button),
-                                    self.update_ui_elements(joint, table=joint_setting.Table, plot=joint_setting_plot)
+                self.add_setpoint(joint, time, position, button),
+                self.update_ui_elements(joint, table=joint_setting.Table, plot=joint_setting_plot)
             ])
 
         joint_setting_plot.remove_setpoint.connect(
@@ -204,19 +203,19 @@ class GaitGeneratorPlugin(Plugin):
         plot_data = plot.plot_item.getData()
         setpoints = []
         for i in range(0, len(plot_data[0])):
-            angle = math.radians(plot.velocity_sliders[i].angle())
-            rospy.logwarn("Angle rad: " + str(angle))
-            velocity = math.tan(angle)
-            rospy.logwarn("Velocity rad/s: " + str(velocity))
-            setpoints.append(Setpoint(plot_data[0][i], plot_data[1][i], velocity))
+            velocity = plot.velocities[i]
+            time = plot_data[0][i]
+            position = math.radians(plot_data[1][i])
+            setpoints.append(Setpoint(time, position, velocity))
         return setpoints
 
     def table_to_setpoints(self, table_data):
         setpoints = []
         for i in range(0, table_data.columnCount()):
             time = float(table_data.item(0, i).text())
-            position = float(table_data.item(1, i).text())
-            velocity = float(table_data.item(2, i).text())
+            position = math.radians(float(table_data.item(1, i).text()))
+            position = math.radians(float(table_data.item(1, i).text()))
+            velocity = math.radians(float(table_data.item(2, i).text()))
             setpoints.append(Setpoint(time, position, velocity))
         return setpoints
 
@@ -226,8 +225,8 @@ class GaitGeneratorPlugin(Plugin):
         table.setColumnCount(len(setpoints))
         for i in range(0, len(setpoints)):
             table.setItem(0, i, QTableWidgetItem(str(round(setpoints[i].time, self.TABLE_DIGITS))))
-            table.setItem(1, i, QTableWidgetItem(str(round(setpoints[i].position, self.TABLE_DIGITS))))
-            table.setItem(2, i, QTableWidgetItem(str(round(setpoints[i].velocity, self.TABLE_DIGITS))))
+            table.setItem(1, i, QTableWidgetItem(str(round(math.degrees(setpoints[i].position), self.TABLE_DIGITS))))
+            table.setItem(2, i, QTableWidgetItem(str(round(math.degrees(setpoints[i].velocity), self.TABLE_DIGITS))))
 
         table.resizeRowsToContents()
         table.resizeColumnsToContents()
@@ -257,7 +256,7 @@ class GaitGeneratorPlugin(Plugin):
     def set_topic_name(self, topic_name):
         self.topic_name = topic_name
         self.gait_publisher = rospy.Publisher(topic_name,
-                                    JointTrajectory, queue_size=10)
+                                              JointTrajectory, queue_size=10)
 
     def update_ui_elements(self, joint, table, plot, update_preview=True):
         plot.plot_item.blockSignals(True)

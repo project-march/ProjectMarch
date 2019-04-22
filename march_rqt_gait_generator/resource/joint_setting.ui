@@ -90,12 +90,12 @@
      </row>
      <row>
       <property name="text">
-       <string>Position (rad)</string>
+       <string>Position (deg)</string>
       </property>
      </row>
      <row>
       <property name="text">
-       <string>Velocity (rad/s)</string>
+       <string>Velocity (deg/s)</string>
       </property>
      </row>
      <column>
