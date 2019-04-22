@@ -55,7 +55,10 @@ class JointSettingPlot(pg.PlotItem):
         self.time_line = self.addLine(0, pen=time_pen, bounds=(0, self.duration))
 
     def createVelocitySliders(self, setpoints):
-        self.velocity_sliders = []
+        # Remove old sliders
+        while self.velocity_sliders:
+            self.removeItem(self.velocity_sliders.pop())
+
         for setpoint in setpoints:
             angle = setpoint.velocity*math.pi/180
             velocity_pen = pg.mkPen(color='b', size=3)
@@ -78,7 +81,6 @@ class JointSettingPlot(pg.PlotItem):
 
         self.createVelocitySliders(joint.setpoints)
 
-        # TODO(Isha) implement velocity slider
         self.plot_item.setData(time, position)
 
         [indices, values] = joint.interpolate_setpoints()
