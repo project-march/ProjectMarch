@@ -12,6 +12,7 @@ from pyqtgraph.Qt import QtCore
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget
+from python_qt_binding.QtWidgets import QFileDialog
 from python_qt_binding.QtWidgets import QPushButton
 from python_qt_binding.QtWidgets import QFrame
 from python_qt_binding.QtWidgets import QLineEdit
@@ -45,6 +46,7 @@ class GaitGeneratorPlugin(Plugin):
         self.gait = self.create_empty_gait()
         self.gait_publisher = None
         self.topic_name = ""
+        self.gait_directory = None
 
         # Process standalone plugin command-line arguments
         from argparse import ArgumentParser
@@ -97,7 +99,7 @@ class GaitGeneratorPlugin(Plugin):
 
         # Connect Gait settings buttons
         self._widget.SettingsFrame.findChild(QPushButton, "ExportButton").clicked.connect(
-            lambda: self.gait.export_to_file()
+            lambda: self.export_to_file()
         )
 
         self._widget.SettingsFrame.findChild(QPushButton, "PublishButton").clicked.connect(
@@ -108,7 +110,21 @@ class GaitGeneratorPlugin(Plugin):
             lambda: self.set_topic_name(self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").text())
         )
 
-        # Initialize the publisher on startup
+        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Name").setText(self.gait.name)
+        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Name").editingFinished.connect(
+            lambda: self.gait.set_name(self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Name").text())
+        )
+
+        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").setText(self.gait.version)
+        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").editingFinished.connect(
+            lambda: self.gait.set_version(self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").text())
+        )
+        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").setText(self.gait.description)
+        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").editingFinished.connect(
+            lambda: self.gait.set_description(self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").text())
+        )
+
+    # Initialize the publisher on startup
         self.set_topic_name(self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").text())
 
         self.create_joint_settings()
@@ -271,7 +287,40 @@ class GaitGeneratorPlugin(Plugin):
         if update_preview:
             self.publish_preview()
 
-# def trigger_configuration(self):
-# Comment in to signal that the plugin has a way to configure
-# This will enable a setting button (gear icon) in each dock widget title bar
-# Usually used to open a modal configuration dialog
+    def export_to_file(self):
+        if self.gait_directory is None:
+            self.gait_directory= str(QFileDialog.getExistingDirectory(None, "Select a directory to save gaits"))
+
+        joint_trajectory = self.gait.to_joint_trajectory()
+        output_file_directory = os.path.join(self.gait_directory, self.gait.name.replace(" ", "_"))
+        output_file_path = os.path.join(output_file_directory, self.gait.version.replace(" ", "_") + ".gait")
+
+        rospy.loginfo("Writing gait to " + output_file_path)
+
+        try:
+            os.makedirs(output_file_directory)
+        except OSError:
+            if not os.path.isdir(output_file_directory):
+                raise
+
+        output_file = open(output_file_path, 'w')
+        output_file.write(str(joint_trajectory))
+
+        output_file.close()
+
+
+    def save_settings(self, plugin_settings, instance_settings):
+        # TODO save intrinsic configuration, usually using:
+        plugin_settings.set_value('test', 3)
+        v = plugin_settings.value('test')
+        rospy.loginfo(v)
+
+    def restore_settings(self, plugin_settings, instance_settings):
+        # TODO restore intrinsic configuration, usually using:
+        v = plugin_settings.value('test')
+        rospy.loginfo(v)
+
+    # def trigger_configuration(self):
+    # Comment in to signal that the plugin has a way to configure
+    # This will enable a setting button (gear icon) in each dock widget title bar
+    # Usually used to open a modal configuration dialog

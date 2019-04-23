@@ -5,16 +5,13 @@ from trajectory_msgs.msg import JointTrajectoryPoint
 
 class Gait:
 
-    def __init__(self, joints, duration, name="Dummy gait", description="Just a simple gait"):
+    def __init__(self, joints, duration, name="Dummy", version="First try",  description="Just a simple gait"):
         self.joints = joints
         self.name = name
+        self.version = version
         self.description = description
         self.duration = duration
         self.current_time = 0
-
-    def export_to_file(self):
-        joint_trajectory = self.to_joint_trajectory()
-        rospy.logwarn(joint_trajectory)
 
     def to_joint_trajectory(self):
         joint_trajectory = JointTrajectory()
@@ -53,5 +50,15 @@ class Gait:
         rospy.logerr("Joint with name " + name + " does not exist in gait " + self.name + ".")
         return None
 
-    def set_current_time(self, time):
-        self.current_time = time
+    # Setters to allow changing values in a callback
+    def set_name(self, name):
+        self.name = name
+
+    def set_description(self, description):
+        self.description = description
+
+    def set_version(self, version):
+        self.version = version
+
+    def set_current_time(self, current_time):
+        self.current_time = current_time
