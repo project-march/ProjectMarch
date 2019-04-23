@@ -46,7 +46,7 @@ class Joint:
             yi.append([position[i], velocity[i]])
 
         bpoly = BPoly.from_derivatives(time, yi)
-        indices = np.linspace(0, self.duration, self.duration * 10)
+        indices = np.linspace(0, self.duration, self.duration * 100)
         return [indices, bpoly(indices)]
 
     def get_setpoint(self, index):

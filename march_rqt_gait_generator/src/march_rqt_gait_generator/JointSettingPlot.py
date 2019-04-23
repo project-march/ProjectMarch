@@ -190,4 +190,3 @@ class JointSettingPlot(pg.PlotItem):
         pass
 
     pass
-

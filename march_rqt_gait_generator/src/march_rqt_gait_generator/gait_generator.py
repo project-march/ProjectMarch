@@ -1,5 +1,6 @@
 import math
 import os
+from time import sleep
 
 import rospy
 import rospkg
@@ -8,17 +9,11 @@ from urdf_parser_py import urdf
 import pyqtgraph as pg
 
 from pyqtgraph.Qt import QtCore
+from pyqtgraph.Qt import QtGui
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget
-from python_qt_binding.QtWidgets import QFileDialog
-from python_qt_binding.QtWidgets import QPushButton
-from python_qt_binding.QtWidgets import QFrame
-from python_qt_binding.QtWidgets import QLineEdit
-from python_qt_binding.QtWidgets import QSlider
-from python_qt_binding.QtWidgets import QHeaderView
-from python_qt_binding.QtWidgets import QTableWidgetItem
+from python_qt_binding.QtWidgets import QWidget, QFileDialog, QPushButton, QFrame, QLineEdit, QSlider, QHeaderView, QTableWidgetItem
 
 import rviz
 
@@ -47,6 +42,9 @@ class GaitGeneratorPlugin(Plugin):
         self.gait_publisher = None
         self.topic_name = ""
         self.gait_directory = None
+
+        self.playback_speed = 100
+        self.thread = None
 
         # Process standalone plugin command-line arguments
         from argparse import ArgumentParser
@@ -85,25 +83,40 @@ class GaitGeneratorPlugin(Plugin):
         self.frame.setStatusBar(None)
         self.frame.setHideButtonVisibility(False)
 
-        self._widget.RvizFrame.layout().addWidget(self.frame, 1, 0)
+        self._widget.RvizFrame.layout().addWidget(self.frame, 1, 0, 1, 3)
 
         time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
-        time_slider.setRange(0, 1000)
+        time_slider.setRange(0, 100 * self.gait.duration)
 
         # Connect TimeSlider to the preview
         time_slider.valueChanged.connect(lambda: [
-            self.gait.set_current_time(float(time_slider.value() / 1000.0) * self.gait.duration),
+            self.gait.set_current_time(float(time_slider.value()) / 100),
             self.publish_preview(),
             self.update_time_sliders(),
         ])
 
         # Connect Gait settings buttons
-        self._widget.SettingsFrame.findChild(QPushButton, "ExportButton").clicked.connect(
+        self._widget.SettingsFrame.findChild(QPushButton, "Export").clicked.connect(
             lambda: self.export_to_file()
         )
 
-        self._widget.SettingsFrame.findChild(QPushButton, "PublishButton").clicked.connect(
+        self._widget.SettingsFrame.findChild(QPushButton, "Publish").clicked.connect(
             lambda: self.publish_gait()
+        )
+
+        self._widget.RvizFrame.findChild(QPushButton, "Start").clicked.connect(self.start_time_slider_thread)
+
+        self._widget.RvizFrame.findChild(QPushButton, "Stop").clicked.connect(self.stop_time_slider_thread)
+
+        self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed").setValidator(QtGui.QIntValidator(0, 500, self))
+
+        self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed").editingFinished.connect(
+            lambda: [
+                self.stop_time_slider_thread(),
+                self.set_playback_speed(float(self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed").text())),
+                rospy.loginfo("Changing playbackspeed to " + str(self.playback_speed)),
+                self.start_time_slider_thread()
+            ]
         )
 
         self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").editingFinished.connect(
@@ -121,10 +134,11 @@ class GaitGeneratorPlugin(Plugin):
         )
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").setText(self.gait.description)
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").editingFinished.connect(
-            lambda: self.gait.set_description(self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").text())
+            lambda: self.gait.set_description(
+                self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").text())
         )
 
-    # Initialize the publisher on startup
+        # Initialize the publisher on startup
         self.set_topic_name(self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").text())
 
         self.create_joint_settings()
@@ -273,6 +287,9 @@ class GaitGeneratorPlugin(Plugin):
         self.gait_publisher = rospy.Publisher(topic_name,
                                               JointTrajectory, queue_size=10)
 
+    def set_playback_speed(self, playback_speed):
+        self.playback_speed = playback_speed
+
     def update_ui_elements(self, joint, table, plot, update_preview=True):
         plot.plot_item.blockSignals(True)
         table.blockSignals(True)
@@ -287,9 +304,27 @@ class GaitGeneratorPlugin(Plugin):
         if update_preview:
             self.publish_preview()
 
+    def start_time_slider_thread(self):
+        time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
+
+        current = time_slider.value()
+        playback_speed = self.playback_speed
+        max = time_slider.maximum()
+        self.thread = TimeSliderThread(current, playback_speed, max)
+        self.thread.update_signal.connect(self.update_main_time_slider)
+        self.thread.start()
+
+    def stop_time_slider_thread(self):
+        if self.thread is not None:
+            self.thread.stop()
+
+    @QtCore.pyqtSlot(str)
+    def update_main_time_slider(self, time):
+        self._widget.RvizFrame.findChild(QSlider, "TimeSlider").setValue(time)
+
     def export_to_file(self):
         if self.gait_directory is None:
-            self.gait_directory= str(QFileDialog.getExistingDirectory(None, "Select a directory to save gaits"))
+            self.gait_directory = str(QFileDialog.getExistingDirectory(None, "Select a directory to save gaits"))
 
         joint_trajectory = self.gait.to_joint_trajectory()
         output_file_directory = os.path.join(self.gait_directory, self.gait.name.replace(" ", "_"))
@@ -308,6 +343,8 @@ class GaitGeneratorPlugin(Plugin):
 
         output_file.close()
 
+    def shutdown_plugin(self):
+        self.stop_time_slider_thread()
 
     def save_settings(self, plugin_settings, instance_settings):
         # TODO save intrinsic configuration, usually using:
@@ -324,3 +361,28 @@ class GaitGeneratorPlugin(Plugin):
     # Comment in to signal that the plugin has a way to configure
     # This will enable a setting button (gear icon) in each dock widget title bar
     # Usually used to open a modal configuration dialog
+
+
+class TimeSliderThread(QtCore.QThread):
+
+    update_signal = QtCore.pyqtSignal(int)
+
+    def __init__(self, current, playback_speed, max):
+        QtCore.QThread.__init__(self)
+        self.current = current
+        self.playback_speed = playback_speed
+        self.max = max
+        self.allowed_to_run = True
+
+    def run(self):
+        index = 0
+        calculations_per_second = 50
+        r = rospy.Rate(calculations_per_second)
+        while self.allowed_to_run:
+            index += 1
+            value = (self.current + float(index)/calculations_per_second*self.playback_speed) % self.max
+            self.update_signal.emit(value)
+            r.sleep()
+
+    def stop(self):
+        self.allowed_to_run = False
