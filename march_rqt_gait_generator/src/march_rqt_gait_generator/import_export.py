@@ -2,7 +2,6 @@ import os
 import rospy
 
 
-
 def export_to_file(gait, gait_directory):
     joint_trajectory = gait.to_joint_trajectory()
     output_file_directory = os.path.join(gait_directory, gait.name.replace(" ", "_"))

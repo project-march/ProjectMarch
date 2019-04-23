@@ -11,7 +11,8 @@ from pyqtgraph.Qt import QtCore, QtGui
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget, QFileDialog, QPushButton, QFrame, QLineEdit, QSlider, QHeaderView, QTableWidgetItem
+from python_qt_binding.QtWidgets import QWidget, QFileDialog, QPushButton, QFrame,\
+    QLineEdit, QSlider, QHeaderView, QTableWidgetItem
 
 import rviz
 
@@ -125,7 +126,6 @@ class GaitGeneratorPlugin(Plugin):
         self.publish_preview()
 
     def create_rviz_frame(self):
-        # Load and configure Rviz
         frame = rviz.VisualizationFrame()
         frame.initialize()
         reader = rviz.YamlConfigReader()
@@ -157,7 +157,8 @@ class GaitGeneratorPlugin(Plugin):
         # Connect a function to update the model and to update the table.
         joint_setting_plot.plot_item.sigPlotChanged.connect(
             lambda: [joint.set_setpoints(UserInterfaceController.plot_to_setpoints(joint_setting_plot)),
-                     UserInterfaceController.update_ui_elements(joint, table=joint_setting.Table, plot=joint_setting_plot),
+                     UserInterfaceController.update_ui_elements(
+                         joint, table=joint_setting.Table, plot=joint_setting_plot),
                      self.publish_preview()
                      ])
 
@@ -182,7 +183,8 @@ class GaitGeneratorPlugin(Plugin):
         # Todo(Isha) refactor to check if new item is valid and don't update if invalid.
         joint_setting.Table.itemChanged.connect(
             lambda: [joint.set_setpoints(UserInterfaceController.table_to_setpoints(joint_setting.Table)),
-                     UserInterfaceController.update_ui_elements(joint, table=joint_setting.Table, plot=joint_setting_plot),
+                     UserInterfaceController.update_ui_elements(
+                         joint, table=joint_setting.Table, plot=joint_setting_plot),
                      self.publish_preview()
                      ])
 
