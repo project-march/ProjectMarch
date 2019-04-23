@@ -49,7 +49,7 @@ class JointSettingPlot(pg.PlotItem):
         self.addItem(pg.InfiniteLine(self.lower_limit, angle=0, pen=limit_pen))
         self.addItem(pg.InfiniteLine(self.upper_limit, angle=0, pen=limit_pen))
         self.setXRange(-0.1, self.duration + 0.1, padding=0)
-        self.setMouseEnabled(False, False)
+        # self.setMouseEnabled(False, False)
         self.setMenuEnabled(False)
         self.hideButtons()
 
@@ -67,12 +67,12 @@ class JointSettingPlot(pg.PlotItem):
         for setpoint in setpoints:
             velocity_pen = pg.mkPen(color='g', size=3)
 
-            # Calculate start and endpoint to
-            dx = 0.5*self.VELOCITY_MARKER_LENGTH*math.cos(setpoint.velocity)
+            # Calculate start and endpoint of velocity marker
+            dx = 0.5*self.VELOCITY_MARKER_LENGTH*math.cos(math.atan(setpoint.velocity))
             x_start = setpoint.time - dx
             x_end = setpoint.time + dx
 
-            dy = math.degrees(0.5*self.VELOCITY_MARKER_LENGTH*math.sin(setpoint.velocity))
+            dy = math.degrees(0.5*self.VELOCITY_MARKER_LENGTH*math.sin(math.atan(setpoint.velocity)))
             y_start = math.degrees(setpoint.position) - dy
             y_end = math.degrees(setpoint.position) + dy
 
