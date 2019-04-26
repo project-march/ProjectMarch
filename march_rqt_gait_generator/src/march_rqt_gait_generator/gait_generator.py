@@ -288,7 +288,6 @@ class GaitGeneratorPlugin(Plugin):
         self.create_joint_settings()
         self.start_time_slider_thread()
 
-
     def stop_time_slider_thread(self):
         if self.thread is not None:
             self.thread.stop()
