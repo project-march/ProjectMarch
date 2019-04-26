@@ -5,7 +5,7 @@ from trajectory_msgs.msg import JointTrajectoryPoint
 
 class Gait:
 
-    def __init__(self, joints, duration, name="Dummy", version="First try",  description="Just a simple gait"):
+    def __init__(self, joints, duration, name="Dummy", version="First try", description="Just a simple gait"):
         self.joints = joints
         self.name = name
         self.version = version
@@ -50,6 +50,13 @@ class Gait:
         rospy.logerr("Joint with name " + name + " does not exist in gait " + self.name + ".")
         return None
 
+    def has_setpoints_after_duration(self, duration):
+        for joint in self.joints:
+            for setpoint in joint.setpoints:
+                if setpoint.time > duration:
+                    return True
+        return False
+
     # Setters to allow changing values in a callback
     def set_name(self, name):
         self.name = name
@@ -59,6 +66,19 @@ class Gait:
 
     def set_version(self, version):
         self.version = version
+
+    def set_duration(self, duration, rescale=False):
+        for joint in self.joints:
+            # Loop in reverse to avoid out of bounds errors while deleting.
+            for setpoint in reversed(joint.setpoints):
+                if rescale:
+                    setpoint.time = duration * setpoint.time / self.duration
+                else:
+                    if setpoint.time > duration:
+                        joint.setpoints.remove(setpoint)
+            joint.interpolated_setpoints = joint.interpolate_setpoints()
+
+        self.duration = duration
 
     def set_current_time(self, current_time):
         self.current_time = current_time

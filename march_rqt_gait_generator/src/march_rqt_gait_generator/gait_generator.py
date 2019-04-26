@@ -11,8 +11,8 @@ from pyqtgraph.Qt import QtCore, QtGui
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget, QFileDialog, QPushButton, QFrame,\
-    QLineEdit, QSlider, QHeaderView, QTableWidgetItem
+from python_qt_binding.QtWidgets import QWidget, QFileDialog, QPushButton, QFrame, \
+    QLineEdit, QSlider, QHeaderView, QTableWidgetItem, QCheckBox, QMessageBox
 
 import rviz
 
@@ -47,9 +47,11 @@ class GaitGeneratorPlugin(Plugin):
         self.thread = None
         self.joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=10)
 
-        # TODO(Isha) load dynamically at runtime
         self.robot = urdf.Robot.from_parameter_server()
         self.gait = GaitFactory.empty_gait(self.robot, 10)
+
+        # History variable to avoid a Qt bug when the gait duration changes.
+        self.last_duration = self.gait.duration
 
         # Start UI construction
         self._widget = QWidget()
@@ -89,7 +91,6 @@ class GaitGeneratorPlugin(Plugin):
         self._widget.RvizFrame.findChild(QPushButton, "Stop").clicked.connect(self.stop_time_slider_thread)
 
         self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed").setValidator(QtGui.QIntValidator(0, 500, self))
-
         self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed").editingFinished.connect(
             lambda: [
                 self.stop_time_slider_thread(),
@@ -118,6 +119,14 @@ class GaitGeneratorPlugin(Plugin):
                 self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").text())
         )
 
+        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Duration").setValidator(
+            QtGui.QDoubleValidator(1.0, 20.0, QtGui.QDoubleValidator.StandardNotation, self))
+        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Duration").setText(str(self.gait.duration))
+        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Duration").returnPressed.connect(
+            lambda: self.update_gait_duration(
+                float(self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Duration").text()))
+        )
+
         # Initialize the publisher on startup
         self.set_topic_name(self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").text())
 
@@ -141,6 +150,14 @@ class GaitGeneratorPlugin(Plugin):
         return frame
 
     def create_joint_settings(self):
+        layout = self._widget.JointSettingContainer.layout()
+        for i in reversed(range(layout.count())):
+            widgetToRemove = layout.itemAt(i).widget()
+            # remove it from the layout list
+            layout.removeWidget(widgetToRemove)
+            # remove it from the gui
+            widgetToRemove.setParent(None)
+
         for i in range(0, len(self.gait.joints)):
             self._widget.JointSettingContainer.layout().addWidget(self.create_joint_setting(self.gait.joints[i]), i % 3,
                                                                   i >= 3)
@@ -243,6 +260,34 @@ class GaitGeneratorPlugin(Plugin):
         self.thread = TimeSliderThread(current, playback_speed, max)
         self.thread.update_signal.connect(self.update_main_time_slider)
         self.thread.start()
+
+    def update_gait_duration(self, duration):
+
+        # Workaround to prevent from updating twice.
+        if duration == self.last_duration:
+            return
+
+        self.last_duration = duration
+
+        rescale_setpoints = self._widget.GaitPropertiesFrame.findChild(QCheckBox, "ScaleSetpoints").isChecked()
+
+        if self.gait.has_setpoints_after_duration(duration) and not rescale_setpoints:
+
+            discard_setpoints = QMessageBox.question(self._widget, 'Gait duration lower than highest time setpoint',
+                                                     "Do you want to discard any setpoints higher than the given "
+                                                     "duration?",
+                                                     QMessageBox.Yes | QMessageBox.No)
+            if discard_setpoints == QMessageBox.No:
+                self.last_duration = None
+                self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Duration").setText(str(self.gait.duration))
+                return
+        self.gait.set_duration(duration, rescale_setpoints)
+        self._widget.RvizFrame.findChild(QSlider, "TimeSlider").setRange(0, 100 * self.gait.duration)
+
+        self.stop_time_slider_thread()
+        self.create_joint_settings()
+        self.start_time_slider_thread()
+
 
     def stop_time_slider_thread(self):
         if self.thread is not None:

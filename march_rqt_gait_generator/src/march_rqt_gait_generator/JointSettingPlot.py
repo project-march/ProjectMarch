@@ -11,9 +11,6 @@ pg.setConfigOptions(antialias=True)
 
 
 class JointSettingPlot(pg.PlotItem):
-
-    VELOCITY_MARKER_LENGTH = 1
-
     # Custom signals
 
     # time, position, button_pressed
@@ -49,7 +46,7 @@ class JointSettingPlot(pg.PlotItem):
         self.addItem(pg.InfiniteLine(self.lower_limit, angle=0, pen=limit_pen))
         self.addItem(pg.InfiniteLine(self.upper_limit, angle=0, pen=limit_pen))
         self.setXRange(-0.1, self.duration + 0.1, padding=0)
-        # self.setMouseEnabled(False, False)
+        self.setMouseEnabled(False, False)
         self.setMenuEnabled(False)
         self.hideButtons()
 
@@ -60,6 +57,9 @@ class JointSettingPlot(pg.PlotItem):
 
     def createVelocityMarkers(self, setpoints):
         # Remove old sliders
+
+        marker_length = self.duration/10
+
         while self.velocity_markers:
             self.removeItem(self.velocity_markers.pop())
             self.velocities.pop()
@@ -68,11 +68,11 @@ class JointSettingPlot(pg.PlotItem):
             velocity_pen = pg.mkPen(color='g', size=3)
 
             # Calculate start and endpoint of velocity marker
-            dx = 0.5*self.VELOCITY_MARKER_LENGTH*math.cos(math.atan(setpoint.velocity))
+            dx = 0.5*marker_length*math.cos(math.atan(setpoint.velocity))
             x_start = setpoint.time - dx
             x_end = setpoint.time + dx
 
-            dy = math.degrees(0.5*self.VELOCITY_MARKER_LENGTH*math.sin(math.atan(setpoint.velocity)))
+            dy = math.degrees(0.5*marker_length*math.sin(math.atan(setpoint.velocity)))
             y_start = math.degrees(setpoint.position) - dy
             y_end = math.degrees(setpoint.position) + dy
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>702</width>
-    <height>332</height>
+    <height>324</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>March Gait Generator</string>
+   <string>Form</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -26,7 +26,7 @@
    <item row="0" column="0">
     <widget class="GraphicsLayoutWidget" name="Plot">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Maximum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
