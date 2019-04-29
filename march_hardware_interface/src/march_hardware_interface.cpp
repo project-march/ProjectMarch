@@ -54,6 +54,13 @@ void MarchHardwareInterface::init()
   joint_velocity_command_.resize(num_joints_);
   joint_effort_command_.resize(num_joints_);
 
+  // Print all joint positions on startup in case initialization fails.
+  this->read();
+  for (int i = 0; i < num_joints_; ++i)
+  {
+      ROS_INFO("Joint %s: first read position: %f", joint_names_[i].c_str(), joint_position_[i]);
+  }
+
   // Initialize interfaces for each joint
   for (int i = 0; i < num_joints_; ++i)
   {
@@ -80,7 +87,6 @@ void MarchHardwareInterface::init()
     // Set the first target as the current position
     this->read();
     joint_position_command_[i] = joint_position_[i];
-    ROS_INFO("Joint %s: first read position: %f", joint_names_[i].c_str(), joint_position_[i]);
 
     if (joint_position_[i] < softLimits.min_position || joint_position_[i] > softLimits.max_position)
     {
@@ -102,7 +108,10 @@ void MarchHardwareInterface::init()
     effort_joint_interface_.registerHandle(jointEffortHandle);
 
     // Enable high voltage on the IMC
-    joint.getIMotionCube().goToOperationEnabled();
+    if (joint.canActuate())
+    {
+      joint.getIMotionCube().goToOperationEnabled();
+    }
   }
 
   registerInterface(&joint_state_interface_);
@@ -134,9 +143,12 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
 
   for (int i = 0; i < num_joints_; i++)
   {
-    ROS_DEBUG("After limits: Trying to actuate joint %s, to %lf rad, %f speed, %f effort.", joint_names_[i].c_str(),
-              joint_position_command_[i], joint_velocity_command_[i], joint_effort_command_[i]);
-    marchRobot.getJoint(joint_names_[i]).actuateRad(static_cast<float>(joint_position_command_[i]));
+    if (marchRobot.getJoint(joint_names_[i]).canActuate())
+    {
+      ROS_DEBUG("After limits: Trying to actuate joint %s, to %lf rad, %f speed, %f effort.", joint_names_[i].c_str(),
+                joint_position_command_[i], joint_velocity_command_[i], joint_effort_command_[i]);
+      marchRobot.getJoint(joint_names_[i]).actuateRad(static_cast<float>(joint_position_command_[i]));
+    }
   }
 }
 }  // namespace march_hardware_interface

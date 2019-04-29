@@ -1,4 +1,4 @@
-allowActuation: true
+allowActuation: false
 imotioncube:
   slaveIndex: 2
   encoder:
