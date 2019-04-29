@@ -10,6 +10,7 @@
           args="
                 /march/controller/state
                 /march/controller/trajectory/testjoint
+                /march/controller/march_state
             "/>
 
     <node name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" args="testsetup" output="screen"/>

@@ -8,3 +8,6 @@ march:
         type: position_controllers/JointTrajectoryController
         joints:
           - test_joint
+    march_state:
+      type: march_state_controller/MarchStateController
+      publish_rate: 50
