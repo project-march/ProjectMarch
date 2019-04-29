@@ -41,12 +41,13 @@ int main(int argc, char** argv)
   //     ros::NodeHandle nh;
   //     ros::Rate rate(10);
 
-  if (march4.getJoint("test_joint").canActuate()) {
-      //     march4.getJoint("test_joint").getIMotionCube().goToOperationEnabled();}
-      ROS_INFO("march4 initialized");
-      while (1) {
-          ROS_INFO("Temperature: %f", march4.getJoint("test_joint").getTemperature());
-      }
+  if (march4.getJoint("test_joint").canActuate())
+  {
+    //     march4.getJoint("test_joint").getIMotionCube().goToOperationEnabled();}
+    ROS_INFO("march4 initialized");
+    while (1)
+    {
+      ROS_INFO("Temperature: %f", march4.getJoint("test_joint").getTemperature());
+    }
   }
-
 }
