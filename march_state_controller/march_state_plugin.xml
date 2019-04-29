@@ -1,0 +1,7 @@
+<library path="lib/libmarch_state_controller">
+  <class name="march_state_controller/MarchStateController" type="march_state_controller::MarchStateController" base_class_type="controller_interface::ControllerBase">
+  <description>
+    This controller publishes the readings of all available march sensors.
+  </description>
+  </class>
+</library>
