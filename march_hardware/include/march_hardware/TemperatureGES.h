@@ -11,14 +11,14 @@ namespace march4cpp
 class TemperatureGES : public Slave, TemperatureSensor
 {
 private:
-  int byteOffset;
+  int temperatureByteOffset;
 
 public:
-  TemperatureGES(int slaveIndex, int byteOffset);
+  TemperatureGES(int slaveIndex, int temperatureByteOffset);
 
   TemperatureGES()
   {
-    byteOffset = -1;
+    temperatureByteOffset = -1;
     slaveIndex = -1;
   };
 
@@ -27,13 +27,13 @@ public:
   /** @brief Override comparison operator */
   friend bool operator==(const TemperatureGES& lhs, const TemperatureGES& rhs)
   {
-    return lhs.slaveIndex == rhs.slaveIndex && lhs.byteOffset == rhs.byteOffset;
+    return lhs.slaveIndex == rhs.slaveIndex && lhs.temperatureByteOffset == rhs.temperatureByteOffset;
   }
   /** @brief Override stream operator for clean printing */
   friend ::std::ostream& operator<<(std::ostream& os, const TemperatureGES& temperatureGes)
   {
     return os << "slaveIndex: " << temperatureGes.slaveIndex << ", "
-              << "byteOffset: " << temperatureGes.byteOffset;
+              << "temperatureByteOffset: " << temperatureGes.temperatureByteOffset;
   }
 };
 }  // namespace march4cpp
