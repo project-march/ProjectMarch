@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(march_state_controller)
+project(march_temperature_sensor_controller)
 
 find_package(catkin REQUIRED COMPONENTS
   controller_interface
@@ -38,8 +38,8 @@ roslint_cpp(${lintfiles})
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
 add_library(${PROJECT_NAME}
-  src/march_state_controller.cpp
-  include/march_state_controller/march_state_controller.h)
+        src/march_temperature_sensor_controller.cpp
+  include/march_temperature_sensor_controller/march_temperature_sensor_controller.h)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 # Install
@@ -52,5 +52,5 @@ install(TARGETS ${PROJECT_NAME}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   )
 
-install(FILES march_state_plugin.xml
+install(FILES march_temperature_sensor_plugin.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

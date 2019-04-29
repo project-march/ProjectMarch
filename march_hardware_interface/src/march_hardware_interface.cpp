@@ -34,13 +34,13 @@ MarchHardwareInterface::~MarchHardwareInterface()
 void MarchHardwareInterface::init()
 {
   // Start ethercat cycle in the hardware
-//  this->marchRobot.startEtherCAT();
-//
-//  if (!this->marchRobot.isEthercatOperational())
-//  {
-//    ROS_FATAL("EtherCAT is not operational");
-//    exit(0);
-//  }
+  this->marchRobot.startEtherCAT();
+
+  if (!this->marchRobot.isEthercatOperational())
+  {
+    ROS_FATAL("EtherCAT is not operational");
+    exit(0);
+  }
 
   // Get joint names
   nh_.getParam("/march/hardware_interface/joints", joint_names_);
@@ -50,6 +50,8 @@ void MarchHardwareInterface::init()
   joint_position_.resize(num_joints_);
   joint_velocity_.resize(num_joints_);
   joint_effort_.resize(num_joints_);
+  joint_temperature_.resize(num_joints_);
+  joint_temperature_variance_.resize(num_joints_);
   joint_position_command_.resize(num_joints_);
   joint_velocity_command_.resize(num_joints_);
   joint_effort_command_.resize(num_joints_);
@@ -108,13 +110,14 @@ void MarchHardwareInterface::init()
     effort_joint_interface_.registerHandle(jointEffortHandle);
 
     // Create march_state interface
-    MarchStateHandle marchStateHandle("test", "world", &joint_velocity_command_[i], &joint_velocity_command_[i], &joint_velocity_command_[i], &joint_velocity_command_[i], &joint_velocity_command_[i], &joint_velocity_command_[i]);
-    march_state_interface.registerHandle(marchStateHandle);
+    MarchTemperatureSensorHandle marchTemperatureSensorHandle(
+            joint_names_[i], &joint_temperature_[i], &joint_temperature_variance_[i]);
+    march_state_interface.registerHandle(marchTemperatureSensorHandle);
 
     // Enable high voltage on the IMC
     if (joint.canActuate())
     {
-//      joint.getIMotionCube().goToOperationEnabled();
+      joint.getIMotionCube().goToOperationEnabled();
     }
   }
 
@@ -138,7 +141,8 @@ void MarchHardwareInterface::read()
 {
   for (int i = 0; i < num_joints_; i++)
   {
-    joint_position_[i] = 0.1;
+    joint_position_[i] = marchRobot.getJoint(joint_names_[i]).getAngleRad();
+    joint_temperature_[i] = marchRobot.getJoint(joint_names_[i]).getTemperature();
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(), joint_position_[i]);
   }
 }
@@ -149,12 +153,12 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
 
   for (int i = 0; i < num_joints_; i++)
   {
-//    if (marchRobot.getJoint(joint_names_[i]).canActuate())
-//    {
-//      ROS_DEBUG("After limits: Trying to actuate joint %s, to %lf rad, %f speed, %f effort.", joint_names_[i].c_str(),
-//                joint_position_command_[i], joint_velocity_command_[i], joint_effort_command_[i]);
-//      marchRobot.getJoint(joint_names_[i]).actuateRad(static_cast<float>(joint_position_command_[i]));
-//    }
+    if (marchRobot.getJoint(joint_names_[i]).canActuate())
+    {
+      ROS_DEBUG("After limits: Trying to actuate joint %s, to %lf rad, %f speed, %f effort.", joint_names_[i].c_str(),
+                joint_position_command_[i], joint_velocity_command_[i], joint_effort_command_[i]);
+      marchRobot.getJoint(joint_names_[i]).actuateRad(static_cast<float>(joint_position_command_[i]));
+    }
   }
 }
 }  // namespace march_hardware_interface
