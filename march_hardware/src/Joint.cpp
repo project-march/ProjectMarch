@@ -42,6 +42,10 @@ void Joint::prepareActuation()
   {
     this->iMotionCube.goToOperationEnabled();
   }
+  else
+  {
+    ROS_ERROR("Trying to prepare joint %s for actuation while it is not allowed to actuate", this->name.c_str());
+  }
 }
 
 void Joint::actuateRad(float targetPositionRad)
