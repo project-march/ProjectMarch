@@ -10,8 +10,11 @@ class Joint:
     def __init__(self, name, limits, setpoints, duration):
         self.name = name
         self.limits = limits
-        self.setpoints = self.enforce_position_limits(setpoints)
+        self.setpoints = setpoints
         self.duration = duration
+
+        self.enforce_limits()
+
         self.interpolated_setpoints = self.interpolate_setpoints()
 
     def get_interpolated_position(self, time):
@@ -39,7 +42,6 @@ class Joint:
 
     def interpolate_setpoints(self):
         # TODO(Isha) implement interpolation using JTC. Maybe from Gait class?
-
         time, position, velocity = self.get_setpoints_unzipped()
         yi = []
         for i in range(0, len(time)):
@@ -53,7 +55,8 @@ class Joint:
         return self.setpoints[index]
 
     def set_setpoints(self, setpoints):
-        self.setpoints = self.enforce_position_limits(setpoints)
+        self.setpoints = setpoints
+        self.enforce_limits()
         self.interpolated_setpoints = self.interpolate_setpoints()
 
     def valid_setpoints(self, setpoints):
@@ -64,10 +67,10 @@ class Joint:
                 return False
         return True
 
-    def enforce_position_limits(self, setpoints):
-        for i in range(0, len(setpoints)):
-            setpoints[i].position = min(max(setpoints[i].position, self.limits.lower), self.limits.upper)
-        return setpoints
+    def enforce_limits(self):
+        for i in range(0, len(self.setpoints)):
+            self.setpoints[i].position = min(max(self.setpoints[i].position, self.limits.lower), self.limits.upper)
+            self.setpoints[i].velocity = min(max(self.setpoints[i].velocity, -self.limits.velocity), self.limits.velocity)
 
     def within_safety_limits(self):
         for i in range(0, len(self.interpolated_setpoints)):
@@ -92,12 +95,7 @@ class Joint:
         return time, position, velocity
 
     def add_interpolated_setpoint(self, time):
-        for i in range(0, len(self.setpoints)):
-            if self.setpoints[i].time > time:
-                rospy.logdebug("adding setpoint " + str(self.get_interpolated_setpoint(time)))
-                self.setpoints.insert(i, self.get_interpolated_setpoint(time))
-
-                break
+        self.add_setpoint(self.get_interpolated_setpoint(time))
 
     def add_setpoint(self, setpoint):
         for i in range(0, len(self.setpoints)):
@@ -105,6 +103,10 @@ class Joint:
                 rospy.logdebug("adding setpoint " + str(setpoint))
                 self.setpoints.insert(i, setpoint)
                 break
+        self.enforce_limits()
+        self.interpolated_setpoints = self.interpolate_setpoints()
 
     def remove_setpoint(self, index):
         del self.setpoints[index]
+        self.enforce_limits()
+        self.interpolated_setpoints = self.interpolate_setpoints()

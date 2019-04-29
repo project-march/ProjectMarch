@@ -2,7 +2,7 @@ import math
 
 import rospy
 
-from python_qt_binding.QtWidgets import QTableWidgetItem
+from python_qt_binding.QtWidgets import QTableWidgetItem, QMessageBox
 
 
 from model.Setpoint import Setpoint
@@ -33,6 +33,14 @@ def update_table(table, setpoints):
     table.resizeColumnsToContents()
     return table
 
+def item_changed(self, Qitem):
+    try:
+        test = float(Qitem.text())
+    except ValueError:
+        Msgbox = QMessageBox()
+        Msgbox.setText("Error, value must be number!")
+        Msgbox.exec_()
+        Qitem.setText(str(0.1))
 
 def plot_to_setpoints(plot):
     plot_data = plot.plot_item.getData()
