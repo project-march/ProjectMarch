@@ -36,11 +36,19 @@ void Joint::initialize(int ecatCycleTime)
   }
 }
 
+void Joint::prepareActuation()
+{
+  if (this->allowActuation)
+  {
+    this->iMotionCube.goToOperationEnabled();
+  }
+}
+
 void Joint::actuateRad(float targetPositionRad)
 {
   ROS_ASSERT_MSG(this->allowActuation, "Joint %s is not allowed to actuate, yet its actuate method has been called.",
-          this->name.c_str());
-    // TODO(BaCo) check that the position is allowed and does not exceed (torque) limits.
+                 this->name.c_str());
+  // TODO(BaCo) check that the position is allowed and does not exceed (torque) limits.
   this->iMotionCube.actuateRad(targetPositionRad);
 }
 
@@ -80,11 +88,6 @@ int Joint::getIMotionCubeSlaveIndex()
     return this->iMotionCube.getSlaveIndex();
   }
   return -1;
-}
-
-IMotionCube Joint::getIMotionCube()
-{
-  return this->iMotionCube;
 }
 
 std::string Joint::getName()

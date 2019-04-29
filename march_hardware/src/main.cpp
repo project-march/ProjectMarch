@@ -43,37 +43,12 @@ int main(int argc, char** argv)
 
   if (march4.getJoint("test_joint").canActuate())
   {
-    march4.getJoint("test_joint").getIMotionCube().goToOperationEnabled();
+    march4.getJoint("test_joint").prepareActuation();
   }
 
   ROS_INFO("march4 initialized");
 
   ROS_INFO_STREAM("Angle: " << march4.getJoint("test_joint").getAngleRad());
-  march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(0.6, 0.1);
-  march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(1, 0.2);
-  march4.getJoint("test_joint").getIMotionCube().actuateRadFixedSpeed(0.6, 0.3);
-
-  // Publish and print joint position
-  //    ros::Publisher pub = nh.advertise<sensor_msgs::JointState>("march/joint_states", 5);
-  //    angleVal = march4.getJoint("test_joint").getAngleRad();
-  //    printf("imc get: %f\n", angleVal);
-  //    sensor_msgs::JointState joint_state;
-  //    joint_state.header.stamp = ros::Time::now();
-  //    joint_state.name = {"test_joint"};
-  //    joint_state.position = {angleVal};
-  //    pub.publish(joint_state);
-
-  //   Print final status
-  sleep(1);
-  march4.getJoint("test_joint")
-      .getIMotionCube()
-      .parseStatusWord(march4.getJoint("test_joint").getIMotionCube().getStatusWord());
-  march4.getJoint("test_joint")
-      .getIMotionCube()
-      .parseMotionError(march4.getJoint("test_joint").getIMotionCube().getMotionError());
-  march4.getJoint("test_joint")
-      .getIMotionCube()
-      .parseDetailedError(march4.getJoint("test_joint").getIMotionCube().getDetailedError());
 
   march4.stopEtherCAT();
 }
