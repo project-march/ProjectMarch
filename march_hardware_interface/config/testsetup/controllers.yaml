@@ -3,6 +3,9 @@ march:
     state:
       type: joint_state_controller/JointStateController
       publish_rate: 50
+    temperature_sensor:
+      type: march_temperature_sensor_controller/MarchTemperatureSensorController
+      publish_rate: 50
     trajectory:
       testjoint:
         type: position_controllers/JointTrajectoryController
