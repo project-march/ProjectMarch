@@ -1,10 +1,8 @@
 import math
 
-import rospy
 
-from python_qt_binding.QtWidgets import QTableWidgetItem, QMessageBox, QDoubleSpinBox, QAbstractSpinBox
-from pyqtgraph.Qt import QtCore
-
+from JointSettingSpinBoxDelegate import JointSettingSpinBoxDelegate
+from python_qt_binding.QtWidgets import QTableWidgetItem
 import pynotify
 
 from model.Setpoint import Setpoint
@@ -22,9 +20,9 @@ def notify(title, message):
 def table_to_setpoints(table_data):
     setpoints = []
     for i in range(0, table_data.columnCount()):
-        time = table_data.cellWidget(0, i).value()
-        position = math.radians(table_data.cellWidget(1, i).value())
-        velocity = math.radians(table_data.cellWidget(2, i).value())
+        time = float(table_data.item(0, i).text())
+        position = math.radians(float(table_data.item(1, i).text()))
+        velocity = math.radians(float(table_data.item(2, i).text()))
         setpoints.append(Setpoint(time, position, velocity))
     return setpoints
 
@@ -34,40 +32,22 @@ def update_table(table, joint, duration):
 
     for i in range(0, len(joint.setpoints)):
 
-        time_offset = 1/math.pow(10, TABLE_DIGITS)
+        time_item = QTableWidgetItem(str(round(joint.setpoints[i].time, TABLE_DIGITS)))
 
-        if i == 0:
-            min_time = 0
-            max_time = joint.setpoints[i+1].time - time_offset
-        elif i == len(joint.setpoints)-1:
-            min_time = joint.setpoints[i-1].time + time_offset
-            max_time = duration
-        else:
-            min_time = joint.setpoints[i-1].time + time_offset
-            max_time = joint.setpoints[i+1].time - time_offset
+        position_item = QTableWidgetItem(
+            str(round(math.degrees(joint.setpoints[i].position), TABLE_DIGITS)))
 
-        table.setCellWidget(0, i, create_table_spinbox(table.item(0, i), joint.setpoints[i].time, min_time, max_time))
-        table.setCellWidget(1, i, create_table_spinbox(table.item(1, i), math.degrees(joint.setpoints[i].position), math.degrees(joint.limits.lower), math.degrees(joint.limits.upper)))
-        table.setCellWidget(2, i, create_table_spinbox(table.item(2, i), math.degrees(joint.setpoints[i].velocity), math.degrees(-joint.limits.velocity), math.degrees(joint.limits.velocity)))
+        velocity_item = QTableWidgetItem(
+            str(round(math.degrees(joint.setpoints[i].velocity), TABLE_DIGITS)))
 
+        table.setItem(0, i, time_item)
+        table.setItem(1, i, position_item)
+        table.setItem(2, i, velocity_item)
+
+    table.setItemDelegate(JointSettingSpinBoxDelegate(joint.limits.velocity, joint.limits.lower, joint.limits.upper, duration))
     table.resizeRowsToContents()
     table.resizeColumnsToContents()
     return table
-
-
-def create_table_spinbox(spinbox, value, min, max):
-    if spinbox is None:
-        spinbox = QDoubleSpinBox()
-    spinbox.setValue(value)
-    spinbox.setDecimals(TABLE_DIGITS)
-    spinbox.setMinimum(min)
-    spinbox.setMaximum(max)
-    spinbox.setButtonSymbols(QAbstractSpinBox.NoButtons)
-    spinbox.setCorrectionMode(QAbstractSpinBox.CorrectToNearestValue)
-    spinbox.setFixedWidth(75)
-    spinbox.setSingleStep(0)
-    return spinbox
-
 
 def plot_to_setpoints(plot):
     plot_data = plot.plot_item.getData()
@@ -80,12 +60,18 @@ def plot_to_setpoints(plot):
     return setpoints
 
 
-def update_ui_elements(joint, table, plot, duration):
-    plot.plot_item.blockSignals(True)
-    table.blockSignals(True)
+def update_ui_elements(joint, duration, table=None, plot=None):
+    if plot is not None:
+        plot.plot_item.blockSignals(True)
+    if table is not None:
+        table.blockSignals(True)
 
-    plot.updateSetpoints(joint)
-    update_table(table, joint, duration)
+    if plot is not None:
+        plot.updateSetpoints(joint)
+    if table is not None:
+        update_table(table, joint, duration)
 
-    plot.plot_item.blockSignals(False)
-    table.blockSignals(False)
+    if plot is not None:
+        plot.plot_item.blockSignals(False)
+    if table is not None:
+        table.blockSignals(False)

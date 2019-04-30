@@ -57,12 +57,11 @@ class JointSettingPlot(pg.PlotItem):
 
     def createVelocityMarkers(self, setpoints):
         # Remove old sliders
-
-        marker_length = self.duration/10.0
-
         while self.velocity_markers:
             self.removeItem(self.velocity_markers.pop())
             self.velocities.pop()
+
+        marker_length = self.duration/10.0
 
         for setpoint in setpoints:
             velocity_pen = pg.mkPen(color='g', size=3)

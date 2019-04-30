@@ -7,13 +7,12 @@ import rospkg
 from urdf_parser_py import urdf
 import pyqtgraph as pg
 
-
 from pyqtgraph.Qt import QtCore, QtGui
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget, QFileDialog, QPushButton, QFrame, \
-    QLineEdit, QSlider, QHeaderView, QTableWidgetItem, QCheckBox, QMessageBox
+    QLineEdit, QSlider, QHeaderView, QTableWidgetItem, QCheckBox, QMessageBox, QSpinBox
 
 import rviz
 
@@ -24,7 +23,6 @@ import GaitFactory
 import UserInterfaceController
 
 from model.Setpoint import Setpoint
-
 
 from import_export import export_to_file
 
@@ -38,7 +36,6 @@ class GaitGeneratorPlugin(Plugin):
     def __init__(self, context):
         super(GaitGeneratorPlugin, self).__init__(context)
 
-        UserInterfaceController.notify("Welcome", "asd")
         # Default values
         self.gait_publisher = None
         self.topic_name = ""
@@ -49,9 +46,6 @@ class GaitGeneratorPlugin(Plugin):
 
         self.robot = urdf.Robot.from_parameter_server()
         self.gait = GaitFactory.empty_gait(self.robot, self.DEFAULT_GAIT_DURATION)
-
-        # History variable to avoid a Qt bug when the gait duration changes.
-        self.last_duration = self.gait.duration
 
         # Start UI construction
         self._widget = QWidget()
@@ -196,11 +190,11 @@ class GaitGeneratorPlugin(Plugin):
         joint_setting.Table = UserInterfaceController.update_table(
             joint_setting.Table, joint, self.gait.duration)
 
-        # Todo(Isha) refactor to check if new item is valid and don't update if invalid.
         joint_setting.Table.itemChanged.connect(
-            lambda: [joint.set_setpoints(UserInterfaceController.table_to_setpoints(joint_setting.Table)),
+            lambda: [rospy.logwarn("item changed"),
+                     joint.set_setpoints(UserInterfaceController.table_to_setpoints(joint_setting.Table)),
                      UserInterfaceController.update_ui_elements(
-                         joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration),
+                         joint, plot=joint_setting_plot, duration=self.gait.duration),
                      self.publish_preview()
                      ])
 
@@ -267,13 +261,6 @@ class GaitGeneratorPlugin(Plugin):
         self.thread.start()
 
     def update_gait_duration(self, duration):
-
-        # Workaround to prevent from updating twice.
-        if duration == self.last_duration:
-            return
-
-        self.last_duration = duration
-
         rescale_setpoints = self._widget.GaitPropertiesFrame.findChild(QCheckBox, "ScaleSetpoints").isChecked()
 
         if self.gait.has_setpoints_after_duration(duration) and not rescale_setpoints:
@@ -283,7 +270,6 @@ class GaitGeneratorPlugin(Plugin):
                                                      "duration?",
                                                      QMessageBox.Yes | QMessageBox.No)
             if discard_setpoints == QMessageBox.No:
-                self.last_duration = None
                 self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Duration").setText(str(self.gait.duration))
                 return
         self.gait.set_duration(duration, rescale_setpoints)
