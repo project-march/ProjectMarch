@@ -58,7 +58,7 @@ class JointSettingPlot(pg.PlotItem):
     def createVelocityMarkers(self, setpoints):
         # Remove old sliders
 
-        marker_length = self.duration/10
+        marker_length = self.duration/10.0
 
         while self.velocity_markers:
             self.removeItem(self.velocity_markers.pop())
