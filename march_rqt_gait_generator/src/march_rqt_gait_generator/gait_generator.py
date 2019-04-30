@@ -175,33 +175,37 @@ class GaitGeneratorPlugin(Plugin):
         joint_setting_plot.plot_item.sigPlotChanged.connect(
             lambda: [joint.set_setpoints(UserInterfaceController.plot_to_setpoints(joint_setting_plot)),
                      UserInterfaceController.update_ui_elements(
-                         joint, table=joint_setting.Table, plot=joint_setting_plot),
+                         joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration),
                      self.publish_preview()
                      ])
 
         joint_setting_plot.add_setpoint.connect(
             lambda time, position, button: [
                 self.add_setpoint(joint, time, position, button),
-                UserInterfaceController.update_ui_elements(joint, table=joint_setting.Table, plot=joint_setting_plot),
+                UserInterfaceController.update_ui_elements(
+                    joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration),
                 self.publish_preview()
             ])
 
         joint_setting_plot.remove_setpoint.connect(
             lambda index: [
                 joint.remove_setpoint(index),
-                UserInterfaceController.update_ui_elements(joint, table=joint_setting.Table, plot=joint_setting_plot),
+                UserInterfaceController.update_ui_elements(
+                    joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration),
                 self.publish_preview()
             ])
 
         joint_setting.Plot.addItem(joint_setting_plot)
 
-        joint_setting.Table = UserInterfaceController.update_table(joint_setting.Table, joint.setpoints)
+        joint_setting.Table = UserInterfaceController.update_table(
+            joint_setting.Table, joint.setpoints, self.gait.duration)
 
         # Todo(Isha) refactor to check if new item is valid and don't update if invalid.
+        rospy.logwarn(joint_setting.Table)
         joint_setting.Table.itemChanged.connect(
             lambda: [joint.set_setpoints(UserInterfaceController.table_to_setpoints(joint_setting.Table)),
                      UserInterfaceController.update_ui_elements(
-                         joint, table=joint_setting.Table, plot=joint_setting_plot),
+                         joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration),
                      self.publish_preview()
                      ])
 
