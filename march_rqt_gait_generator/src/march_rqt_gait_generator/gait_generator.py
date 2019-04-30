@@ -45,7 +45,7 @@ class GaitGeneratorPlugin(Plugin):
         self.joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=10)
 
         self.robot = urdf.Robot.from_parameter_server()
-        self.gait = import_from_file_name(self.robot, "/home/ishadijcks/march-iv/march_ws/src/gait-generation/march_rqt_gait_generator/gaits/Example/Noice.gait")
+        self.gait = GaitFactory.empty_gait(self.robot, self.DEFAULT_GAIT_DURATION)
 
         # Start UI construction
         self._widget = QWidget()
@@ -58,22 +58,17 @@ class GaitGeneratorPlugin(Plugin):
         self.rviz_frame = self.create_rviz_frame()
         self._widget.RvizFrame.layout().addWidget(self.rviz_frame, 1, 0, 1, 3)
 
-        time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
-        time_slider.setRange(0, 100 * self.gait.duration)
-
-        # Connect TimeSlider to the preview
-        time_slider.valueChanged.connect(lambda: [
-            self.gait.set_current_time(float(time_slider.value()) / 100),
-            self.publish_preview(),
-            self.update_time_sliders(),
-        ])
-
         # Connect Gait settings buttons
-
         self.set_gait_directory_button(self.gait_directory)
         self._widget.SettingsFrame.findChild(QPushButton, "ChangeGaitDirectory").clicked.connect(
             lambda: [
-            self.set_gait_directory_button(self.get_gait_directory(True))
+                self.set_gait_directory_button(self.get_gait_directory(True))
+            ]
+        )
+
+        self._widget.SettingsFrame.findChild(QPushButton, "Import").clicked.connect(
+            lambda: [
+                self.load_gait()
             ]
         )
 
@@ -104,16 +99,13 @@ class GaitGeneratorPlugin(Plugin):
             lambda: self.set_topic_name(self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").text())
         )
 
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Name").setText(self.gait.name)
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Name").editingFinished.connect(
             lambda: self.gait.set_name(self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Name").text())
         )
 
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").setText(self.gait.version)
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").editingFinished.connect(
             lambda: self.gait.set_version(self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").text())
         )
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").setText(self.gait.description)
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").editingFinished.connect(
             lambda: self.gait.set_description(
                 self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").text())
@@ -121,7 +113,6 @@ class GaitGeneratorPlugin(Plugin):
 
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Duration").setValidator(
             QtGui.QDoubleValidator(1.0, 20.0, QtGui.QDoubleValidator.StandardNotation, self))
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Duration").setText(str(self.gait.duration))
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Duration").returnPressed.connect(
             lambda: self.update_gait_duration(
                 float(self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Duration").text()))
@@ -130,9 +121,8 @@ class GaitGeneratorPlugin(Plugin):
         # Initialize the publisher on startup
         self.set_topic_name(self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").text())
 
-        self.create_joint_settings()
 
-        self.publish_preview()
+        self.load_gait_into_ui()
 
     def create_rviz_frame(self):
         frame = rviz.VisualizationFrame()
@@ -303,6 +293,39 @@ class GaitGeneratorPlugin(Plugin):
         if self.thread is not None:
             self.thread.stop()
             self.thread = None
+
+    def load_gait(self):
+
+        file_name, f = QFileDialog.getOpenFileName(self._widget,
+                                                   "Open Image",
+                                                   rospkg.RosPack().get_path('march_rqt_gait_generator'),
+                                                   "March Gait (*.gait)")
+        if file_name == "":
+            return
+
+        self.gait = import_from_file_name(self.robot, file_name)
+        self.load_gait_into_ui()
+
+    def load_gait_into_ui(self):
+        time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
+        time_slider.setRange(0, 100 * self.gait.duration)
+
+        # Connect TimeSlider to the preview
+        time_slider.valueChanged.connect(lambda: [
+            self.gait.set_current_time(float(time_slider.value()) / 100),
+            self.publish_preview(),
+            self.update_time_sliders(),
+        ])
+
+        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Name").setText(self.gait.name)
+        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").setText(self.gait.version)
+        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").setText(self.gait.description)
+        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Duration").setText(str(self.gait.duration))
+
+
+        self.create_joint_settings()
+
+        self.publish_preview()
 
     @QtCore.pyqtSlot(int)
     def update_main_time_slider(self, time):
