@@ -43,11 +43,12 @@ int main(int argc, char** argv)
 
   if (march4.getJoint("test_joint").canActuate())
   {
-    //     march4.getJoint("test_joint").getIMotionCube().goToOperationEnabled();}
-    ROS_INFO("march4 initialized");
-    while (1)
-    {
-      ROS_INFO("Temperature: %f", march4.getJoint("test_joint").getTemperature());
-    }
+    march4.getJoint("test_joint").prepareActuation();
   }
+
+  ROS_INFO("march4 initialized");
+
+  ROS_INFO_STREAM("Angle: " << march4.getJoint("test_joint").getAngleRad());
+
+  march4.stopEtherCAT();
 }

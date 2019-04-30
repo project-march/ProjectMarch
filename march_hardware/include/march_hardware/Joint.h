@@ -23,6 +23,8 @@ public:
   Joint(std::string name, bool allowActuation, IMotionCube iMotionCube);
 
   void initialize(int ecatCycleTime);
+  void prepareActuation();
+
   void actuateRad(float targetPositionRad);
 
   float getAngleRad();
@@ -31,7 +33,6 @@ public:
   std::string getName();
   int getTemperatureGESSlaveIndex();
   int getIMotionCubeSlaveIndex();
-  IMotionCube getIMotionCube();
 
   bool hasIMotionCube();
   bool hasTemperatureGES();

@@ -117,7 +117,7 @@ void MarchHardwareInterface::init()
     // Enable high voltage on the IMC
     if (joint.canActuate())
     {
-      joint.getIMotionCube().goToOperationEnabled();
+      joint.prepareActuation();
     }
   }
 
