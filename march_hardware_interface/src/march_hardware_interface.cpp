@@ -50,6 +50,8 @@ void MarchHardwareInterface::init()
   joint_position_.resize(num_joints_);
   joint_velocity_.resize(num_joints_);
   joint_effort_.resize(num_joints_);
+  joint_temperature_.resize(num_joints_);
+  joint_temperature_variance_.resize(num_joints_);
   joint_position_command_.resize(num_joints_);
   joint_velocity_command_.resize(num_joints_);
   joint_effort_command_.resize(num_joints_);
@@ -107,12 +109,19 @@ void MarchHardwareInterface::init()
     JointHandle jointEffortHandle(jointStateHandle, &joint_effort_command_[i]);
     effort_joint_interface_.registerHandle(jointEffortHandle);
 
+    // Create march_state interface
+    MarchTemperatureSensorHandle marchTemperatureSensorHandle(
+            joint_names_[i], &joint_temperature_[i], &joint_temperature_variance_[i]);
+    march_state_interface.registerHandle(marchTemperatureSensorHandle);
+
     // Enable high voltage on the IMC
     if (joint.canActuate())
     {
       joint.prepareActuation();
     }
   }
+
+  registerInterface(&march_state_interface);
 
   registerInterface(&joint_state_interface_);
   registerInterface(&position_joint_interface_);
@@ -133,6 +142,7 @@ void MarchHardwareInterface::read()
   for (int i = 0; i < num_joints_; i++)
   {
     joint_position_[i] = marchRobot.getJoint(joint_names_[i]).getAngleRad();
+    joint_temperature_[i] = marchRobot.getJoint(joint_names_[i]).getTemperature();
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(), joint_position_[i]);
   }
 }

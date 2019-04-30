@@ -19,6 +19,8 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
         CATKIN_DEPENDS
         std_msgs
+        INCLUDE_DIRS
+        include
 )
 
 # Roslinter
@@ -41,6 +43,16 @@ add_executable(march_hardware_interface_node ${SOURCES} ${SOURCE})
 add_dependencies(march_hardware_interface_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(march_hardware_interface_node ${catkin_LIBRARIES})
+
+include_directories(
+        include
+        ${catkin_INCLUDE_DIRS}
+)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+        FILES_MATCHING PATTERN "*.h"
+        PATTERN ".svn" EXCLUDE)
 
 # Give sudo access to ethernet port
 add_custom_command(
