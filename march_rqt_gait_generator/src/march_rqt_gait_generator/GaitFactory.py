@@ -6,6 +6,8 @@ from model.Joint import Joint
 from model.Limits import Limits
 from model.Setpoint import Setpoint
 
+from bunch import bunchify
+
 
 def empty_gait(robot, duration):
     if robot is None:
@@ -28,7 +30,7 @@ def empty_gait(robot, duration):
             Setpoint(duration, 0, 0)
         ]
         joint = Joint(urdf_joint.name,
-                      Limits(urdf_joint.limit.upper, urdf_joint.limit.lower, urdf_joint.limit.velocity),
+                      Limits(urdf_joint.limit.lower, urdf_joint.limit.upper, urdf_joint.limit.velocity),
                       default_setpoints,
                       duration
                       )
@@ -36,5 +38,61 @@ def empty_gait(robot, duration):
     return Gait(joint_list, duration)
 
 
-def from_file(robot, file):
-    pass
+def from_msg(robot, march_gait):
+    if robot is None:
+        rospy.logerr("Cannot create gait without a loaded robot.")
+
+    march_gait = bunchify(march_gait)
+    actual_setpoints = march_gait.actual_setpoints
+    joint_trajectory = march_gait.joint_trajectory
+
+    # Check if all joints in this gait exist in the robot, joints in the robot but not in the gait are allowed.
+    for joint_name in joint_trajectory.joint_names:
+        if not joint_exists(robot, joint_name):
+            rospy.logerr("Joint " + joint_name + " not found in robot description")
+            return None
+
+    joint_list = []
+    duration = rospy.Duration(march_gait.duration.secs, march_gait.duration.nsecs).to_sec()
+
+    for joint_name in joint_trajectory.joint_names:
+        setpoints = []
+        for actual_setpoint in actual_setpoints:
+            if joint_name in actual_setpoint.joint_names:
+                setpoints.append(get_setpoint_at_duration(joint_trajectory, joint_name, actual_setpoint.time_from_start))
+
+        print "Joint " + joint_name + " has setpoints " + str(setpoints)
+        urdf_joint = get_joint_from_urdf(robot, joint_name)
+
+        limits = Limits(urdf_joint.limit.lower, urdf_joint.limit.upper, urdf_joint.limit.velocity)
+        joint = Joint(joint_name,
+                      limits,
+                      setpoints,
+                      duration
+                      )
+        joint_list.append(joint)
+
+    print march_gait.gait, march_gait.version, march_gait.description
+    return Gait(joint_list, duration, march_gait.gait, march_gait.version, march_gait.description)
+
+
+
+def get_setpoint_at_duration(joint_trajectory, joint_name, duration):
+    for point in joint_trajectory.points:
+        if point.time_from_start == duration:
+            index = joint_trajectory.joint_names.index(joint_name)
+            time = rospy.Duration(point.time_from_start.secs, point.time_from_start.nsecs).to_sec()
+
+            return Setpoint(time, point.positions[index], point.velocities[index])
+    return None
+
+
+def joint_exists(robot, joint_name):
+    return get_joint_from_urdf(robot, joint_name) is not None
+
+
+def get_joint_from_urdf(robot, joint_name):
+    for urdf_joint in robot.joints:
+        if urdf_joint.name == joint_name:
+            return urdf_joint
+    return None

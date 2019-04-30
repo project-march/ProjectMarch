@@ -24,7 +24,7 @@ import UserInterfaceController
 
 from model.Setpoint import Setpoint
 
-from import_export import export_to_file
+from import_export import export_to_file, import_from_file_name
 
 from JointSettingPlot import JointSettingPlot
 from TimeSliderThread import TimeSliderThread
@@ -45,7 +45,7 @@ class GaitGeneratorPlugin(Plugin):
         self.joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=10)
 
         self.robot = urdf.Robot.from_parameter_server()
-        self.gait = GaitFactory.empty_gait(self.robot, self.DEFAULT_GAIT_DURATION)
+        self.gait = import_from_file_name(self.robot, "/home/ishadijcks/march-iv/march_ws/src/gait-generation/march_rqt_gait_generator/gaits/Example/Noice.gait")
 
         # Start UI construction
         self._widget = QWidget()
@@ -69,10 +69,18 @@ class GaitGeneratorPlugin(Plugin):
         ])
 
         # Connect Gait settings buttons
+
+        self.set_gait_directory_button(self.gait_directory)
+        self._widget.SettingsFrame.findChild(QPushButton, "ChangeGaitDirectory").clicked.connect(
+            lambda: [
+            self.set_gait_directory_button(self.get_gait_directory(True))
+            ]
+        )
+
         self._widget.SettingsFrame.findChild(QPushButton, "Export").clicked.connect(
             lambda: [
-                self.get_gait_directory(),
-                export_to_file(self.gait, self.gait_directory)
+                export_to_file(self.gait, self.get_gait_directory()),
+                self.set_gait_directory_button(self.gait_directory)
             ]
         )
 
@@ -210,10 +218,18 @@ class GaitGeneratorPlugin(Plugin):
         else:
             joint.add_setpoint(Setpoint(time, position, 0))
 
-    def get_gait_directory(self):
-        if self.gait_directory is None:
+    def get_gait_directory(self, select_new=False):
+        if self.gait_directory is None or select_new:
             self.gait_directory = str(QFileDialog.getExistingDirectory(None, "Select a directory to save gaits"))
+        if self.gait_directory == "":
+            self.gait_directory = None
+        rospy.loginfo("Selected output directory " + str(self.gait_directory))
         return self.gait_directory
+
+    def set_gait_directory_button(self, gait_directory):
+        if gait_directory is None:
+            gait_directory = "Select a gait directory..."
+        self._widget.SettingsFrame.findChild(QPushButton, "ChangeGaitDirectory").setText(gait_directory)
 
     def publish_preview(self):
         joint_state = JointState()
@@ -304,7 +320,8 @@ class GaitGeneratorPlugin(Plugin):
     def restore_settings(self, plugin_settings, instance_settings):
         # TODO restore intrinsic configuration, usually using:
         v = plugin_settings.value('test')
-        rospy.loginfo(v)
+
+        rospy.loginfo("Restor settings called here: " + v)
 
     # def trigger_configuration(self):
     # Comment in to signal that the plugin has a way to configure

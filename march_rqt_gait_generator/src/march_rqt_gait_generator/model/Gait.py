@@ -2,6 +2,7 @@ import rospy
 from trajectory_msgs.msg import JointTrajectory
 from trajectory_msgs.msg import JointTrajectoryPoint
 
+from march_rqt_gait_generator.msg import ActualSetpoint
 
 class Gait:
 
@@ -34,6 +35,19 @@ class Gait:
             joint_trajectory.points.append(joint_trajectory_point)
 
         return joint_trajectory
+
+    def to_actual_setpoints(self):
+        actual_setpoints = []
+        timestamps = self.get_unique_timestamps()
+        for timestamp in timestamps:
+            actual_setpoint = ActualSetpoint()
+            actual_setpoint.time_from_start = rospy.Duration.from_sec(timestamp)
+            for joint in self.joints:
+                for setpoint in joint.setpoints:
+                    if setpoint.time == timestamp:
+                        actual_setpoint.joint_names.append(joint.name)
+            actual_setpoints.append(actual_setpoint)
+        return actual_setpoints
 
     def get_unique_timestamps(self):
         timestamps = []

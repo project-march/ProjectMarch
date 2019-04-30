@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>644</width>
+    <width>828</width>
     <height>722</height>
    </rect>
   </property>
@@ -190,30 +190,64 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
       <item row="0" column="0">
-       <widget class="QPushButton" name="Import">
+       <widget class="QLabel" name="GaitDirectory">
         <property name="text">
-         <string>Import</string>
+         <string>TextLabel</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QPushButton" name="Export">
+       <widget class="QPushButton" name="Import">
         <property name="text">
-         <string>Export</string>
+         <string>Import Gait</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" colspan="2">
+      <item row="1" column="1">
+       <widget class="QPushButton" name="Export">
+        <property name="text">
+         <string>Export Gait</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
        <widget class="QLineEdit" name="TopicName">
         <property name="text">
          <string>/march/controller/trajectory/full_exoskeleton/command</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="2">
+      <item row="4" column="0" colspan="2">
        <widget class="QPushButton" name="Publish">
         <property name="text">
          <string>Publish</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QPushButton" name="ChangeGaitDirectory">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>200</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#ChangeGaitDirectory {
+Text-align: right
+}</string>
+        </property>
+        <property name="text">
+         <string>Change Gait Directory</string>
         </property>
        </widget>
       </item>
