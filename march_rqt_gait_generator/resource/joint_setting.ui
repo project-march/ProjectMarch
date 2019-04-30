@@ -68,6 +68,9 @@
      <property name="verticalScrollMode">
       <enum>QAbstractItemView::ScrollPerPixel</enum>
      </property>
+     <property name="horizontalScrollMode">
+      <enum>QAbstractItemView::ScrollPerPixel</enum>
+     </property>
      <attribute name="horizontalHeaderVisible">
       <bool>false</bool>
      </attribute>
@@ -98,26 +101,6 @@
        <string>Velocity (deg/s)</string>
       </property>
      </row>
-     <column>
-      <property name="text">
-       <string>1</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>2</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>3</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>4</string>
-      </property>
-     </column>
     </widget>
    </item>
   </layout>

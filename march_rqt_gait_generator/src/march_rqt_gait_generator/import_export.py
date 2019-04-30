@@ -1,5 +1,6 @@
 import os
 import rospy
+from UserInterfaceController import notify
 
 
 def export_to_file(gait, gait_directory):
@@ -17,5 +18,7 @@ def export_to_file(gait, gait_directory):
 
     output_file = open(output_file_path, 'w')
     output_file.write(str(joint_trajectory))
+
+    notify("Gait Saved", output_file_path)
 
     output_file.close()

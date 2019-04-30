@@ -15,7 +15,7 @@ class TimeSliderThread(QtCore.QThread):
 
     def run(self):
         index = 0
-        calculations_per_second = 50
+        calculations_per_second = 30
         r = rospy.Rate(calculations_per_second)
         while self.allowed_to_run:
             index += 1

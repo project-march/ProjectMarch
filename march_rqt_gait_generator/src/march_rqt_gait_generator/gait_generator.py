@@ -7,6 +7,7 @@ import rospkg
 from urdf_parser_py import urdf
 import pyqtgraph as pg
 
+
 from pyqtgraph.Qt import QtCore, QtGui
 
 from qt_gui.plugin import Plugin
@@ -23,9 +24,7 @@ import GaitFactory
 import UserInterfaceController
 
 from model.Setpoint import Setpoint
-from model.Joint import Joint
-from model.Limits import Limits
-from model.Gait import Gait
+
 
 from import_export import export_to_file
 
@@ -34,11 +33,12 @@ from TimeSliderThread import TimeSliderThread
 
 
 class GaitGeneratorPlugin(Plugin):
-    DEFAULT_GAIT_DURATION = 12
+    DEFAULT_GAIT_DURATION = 8
 
     def __init__(self, context):
         super(GaitGeneratorPlugin, self).__init__(context)
 
+        UserInterfaceController.notify("Welcome", "asd")
         # Default values
         self.gait_publisher = None
         self.topic_name = ""
@@ -48,7 +48,7 @@ class GaitGeneratorPlugin(Plugin):
         self.joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=10)
 
         self.robot = urdf.Robot.from_parameter_server()
-        self.gait = GaitFactory.empty_gait(self.robot, 10)
+        self.gait = GaitFactory.empty_gait(self.robot, self.DEFAULT_GAIT_DURATION)
 
         # History variable to avoid a Qt bug when the gait duration changes.
         self.last_duration = self.gait.duration
@@ -93,10 +93,8 @@ class GaitGeneratorPlugin(Plugin):
         self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed").setValidator(QtGui.QIntValidator(0, 500, self))
         self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed").editingFinished.connect(
             lambda: [
-                self.stop_time_slider_thread(),
                 self.set_playback_speed(float(self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed").text())),
                 rospy.loginfo("Changing playbackspeed to " + str(self.playback_speed)),
-                self.start_time_slider_thread()
             ]
         )
 
@@ -152,11 +150,9 @@ class GaitGeneratorPlugin(Plugin):
     def create_joint_settings(self):
         layout = self._widget.JointSettingContainer.layout()
         for i in reversed(range(layout.count())):
-            widgetToRemove = layout.itemAt(i).widget()
-            # remove it from the layout list
-            layout.removeWidget(widgetToRemove)
-            # remove it from the gui
-            widgetToRemove.setParent(None)
+            widget = layout.itemAt(i).widget()
+            layout.removeWidget(widget)
+            widget.setParent(None)
 
         for i in range(0, len(self.gait.joints)):
             self._widget.JointSettingContainer.layout().addWidget(self.create_joint_setting(self.gait.joints[i]), i % 3,
@@ -198,10 +194,9 @@ class GaitGeneratorPlugin(Plugin):
         joint_setting.Plot.addItem(joint_setting_plot)
 
         joint_setting.Table = UserInterfaceController.update_table(
-            joint_setting.Table, joint.setpoints, self.gait.duration)
+            joint_setting.Table, joint, self.gait.duration)
 
         # Todo(Isha) refactor to check if new item is valid and don't update if invalid.
-        rospy.logwarn(joint_setting.Table)
         joint_setting.Table.itemChanged.connect(
             lambda: [joint.set_setpoints(UserInterfaceController.table_to_setpoints(joint_setting.Table)),
                      UserInterfaceController.update_ui_elements(
@@ -253,7 +248,13 @@ class GaitGeneratorPlugin(Plugin):
                                               JointTrajectory, queue_size=10)
 
     def set_playback_speed(self, playback_speed):
+        was_playing = self.thread is not None
+        self.stop_time_slider_thread()
+
         self.playback_speed = playback_speed
+
+        if was_playing:
+            self.start_time_slider_thread()
 
     def start_time_slider_thread(self):
         time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
@@ -288,15 +289,20 @@ class GaitGeneratorPlugin(Plugin):
         self.gait.set_duration(duration, rescale_setpoints)
         self._widget.RvizFrame.findChild(QSlider, "TimeSlider").setRange(0, 100 * self.gait.duration)
 
+        was_playing = self.thread is not None
         self.stop_time_slider_thread()
+
         self.create_joint_settings()
-        self.start_time_slider_thread()
+
+        if was_playing:
+            self.start_time_slider_thread()
 
     def stop_time_slider_thread(self):
         if self.thread is not None:
             self.thread.stop()
+            self.thread = None
 
-    @QtCore.pyqtSlot(str)
+    @QtCore.pyqtSlot(int)
     def update_main_time_slider(self, time):
         self._widget.RvizFrame.findChild(QSlider, "TimeSlider").setValue(time)
 
