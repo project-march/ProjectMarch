@@ -4,8 +4,8 @@
 
 namespace march_pdb_state_controller
 {
-bool MarchPdbStateController::init(march_hardware_interface::MarchPdbStateInterface* hw,
-                                            ros::NodeHandle& root_nh, ros::NodeHandle& controller_nh)
+bool MarchPdbStateController::init(march_hardware_interface::MarchPdbStateInterface* hw, ros::NodeHandle& root_nh,
+                                   ros::NodeHandle& controller_nh)
 {
   // get all temperature_sensors from the hardware interface
   const std::vector<std::string>& pdb_state_names = hw->getNames();
@@ -60,8 +60,8 @@ void MarchPdbStateController::update(const ros::Time& time, const ros::Duration&
         // populate message
         realtime_pubs_[i]->msg_.header.stamp = time;
 
-        realtime_pubs_[i]->msg_.temperature = *pdb_state_[i].getTemperature();
-        realtime_pubs_[i]->msg_.variance = *pdb_state_[i].getVariance();
+        // TODO(TIM) Set real message!
+        realtime_pubs_[i]->msg_.variance = *pdb_state_[i].getPdbCurrent();
 
         realtime_pubs_[i]->unlockAndPublish();
       }
@@ -74,5 +74,4 @@ void MarchPdbStateController::stopping(const ros::Time& /*time*/)
 }
 }  // namespace march_pdb_state_controller
 
-PLUGINLIB_EXPORT_CLASS(march_pdb_state_controller::MarchPdbStateController,
-                       controller_interface::ControllerBase)
+PLUGINLIB_EXPORT_CLASS(march_pdb_state_controller::MarchPdbStateController, controller_interface::ControllerBase)

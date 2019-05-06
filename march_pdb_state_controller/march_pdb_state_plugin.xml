@@ -1,5 +1,5 @@
-<library path="lib/libmarch_temperature_sensor_controller">
-  <class name="march_pdb_state_controller/MarchPdbStateController" type="march_temperature_sensor_controller::MarchTemperatureSensorController" base_class_type="controller_interface::ControllerBase">
+<library path="lib/libmarch_pdb_state_controller">
+  <class name="march_pdb_state_controller/MarchPdbStateController" type="march_pdb_state_controller::MarchPdbStateController" base_class_type="controller_interface::ControllerBase">
   <description>
     This controller publishes the state pdb.
   </description>
