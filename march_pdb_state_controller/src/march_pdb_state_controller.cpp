@@ -1,16 +1,16 @@
 // Copyright 2019 Project March.
 
-#include "march_temperature_sensor_controller/march_temperature_sensor_controller.h"
+#include "march_pdb_state_controller/march_pdb_state_controller.h"
 
-namespace march_temperature_sensor_controller
+namespace march_pdb_state_controller
 {
-bool MarchTemperatureSensorController::init(march_hardware_interface::MarchTemperatureSensorInterface* hw,
+bool MarchPdbStateController::init(march_hardware_interface::MarchPdbStateInterface* hw,
                                             ros::NodeHandle& root_nh, ros::NodeHandle& controller_nh)
 {
   // get all temperature_sensors from the hardware interface
-  const std::vector<std::string>& temperature_sensor_names = hw->getNames();
-  for (unsigned i = 0; i < temperature_sensor_names.size(); i++)
-    ROS_INFO("Got temperature sensor %s", temperature_sensor_names[i].c_str());
+  const std::vector<std::string>& pdb_state_names = hw->getNames();
+  for (unsigned i = 0; i < pdb_state_names.size(); i++)
+    ROS_INFO("Got pdb state %s", pdb_state_names[i].c_str());
 
   // get publishing period
   if (!controller_nh.getParam("publish_rate", publish_rate_))
@@ -19,23 +19,23 @@ bool MarchTemperatureSensorController::init(march_hardware_interface::MarchTempe
     return false;
   }
 
-  for (unsigned i = 0; i < temperature_sensor_names.size(); i++)
+  for (unsigned i = 0; i < pdb_state_names.size(); i++)
   {
     // sensor handle
-    temperature_sensors_.push_back(hw->getHandle(temperature_sensor_names[i]));
+    pdb_state_.push_back(hw->getHandle(pdb_state_names[i]));
 
     // realtime publisher
     RtPublisherPtr rt_pub(new realtime_tools::RealtimePublisher<sensor_msgs::Temperature>(
-        root_nh, "/march/temperature/" + temperature_sensor_names[i], 4));
+        root_nh, "/march/pdb/" + pdb_state_names[i], 4));
     realtime_pubs_.push_back(rt_pub);
   }
 
   // Last published times
-  last_publish_times_.resize(temperature_sensor_names.size());
+  last_publish_times_.resize(pdb_state_names.size());
   return true;
 }
 
-void MarchTemperatureSensorController::starting(const ros::Time& time)
+void MarchPdbStateController::starting(const ros::Time& time)
 {
   // initialize time
   for (unsigned i = 0; i < last_publish_times_.size(); i++)
@@ -44,7 +44,7 @@ void MarchTemperatureSensorController::starting(const ros::Time& time)
   }
 }
 
-void MarchTemperatureSensorController::update(const ros::Time& time, const ros::Duration& /*period*/)
+void MarchPdbStateController::update(const ros::Time& time, const ros::Duration& /*period*/)
 {
   // limit rate of publishing
   for (unsigned i = 0; i < realtime_pubs_.size(); i++)
@@ -60,8 +60,8 @@ void MarchTemperatureSensorController::update(const ros::Time& time, const ros::
         // populate message
         realtime_pubs_[i]->msg_.header.stamp = time;
 
-        realtime_pubs_[i]->msg_.temperature = *temperature_sensors_[i].getTemperature();
-        realtime_pubs_[i]->msg_.variance = *temperature_sensors_[i].getVariance();
+        realtime_pubs_[i]->msg_.temperature = *pdb_state_[i].getTemperature();
+        realtime_pubs_[i]->msg_.variance = *pdb_state_[i].getVariance();
 
         realtime_pubs_[i]->unlockAndPublish();
       }
@@ -69,10 +69,10 @@ void MarchTemperatureSensorController::update(const ros::Time& time, const ros::
   }
 }
 
-void MarchTemperatureSensorController::stopping(const ros::Time& /*time*/)
+void MarchPdbStateController::stopping(const ros::Time& /*time*/)
 {
 }
-}  // namespace march_temperature_sensor_controller
+}  // namespace march_pdb_state_controller
 
-PLUGINLIB_EXPORT_CLASS(march_temperature_sensor_controller::MarchTemperatureSensorController,
+PLUGINLIB_EXPORT_CLASS(march_pdb_state_controller::MarchPdbStateController,
                        controller_interface::ControllerBase)
