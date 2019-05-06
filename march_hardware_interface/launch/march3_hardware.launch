@@ -10,6 +10,7 @@
           args="
                 /march/controller/state
                 /march/controller/temperature_sensor
+                /march/controller/pdb_state
                 /march/controller/trajectory/full_exoskeleton
             "/>
 
