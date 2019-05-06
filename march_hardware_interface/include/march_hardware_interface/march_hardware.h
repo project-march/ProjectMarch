@@ -2,6 +2,7 @@
 #define ROS_CONTROL__MARCH_HARDWARE_H
 
 #include <march_hardware_interface/march_temperature_sensor_interface.h>
+#include <march_hardware_interface/march_pdb_state_interface.h>
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/robot_hw.h>

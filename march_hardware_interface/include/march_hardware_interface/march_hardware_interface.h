@@ -13,6 +13,7 @@
 #include <ros/ros.h>
 #include <march_hardware_interface/march_hardware.h>
 #include <march_hardware_interface/march_temperature_sensor_interface.h>
+#include <march_hardware_interface/march_pdb_state_interface.h>
 
 #include <march_hardware_builder/HardwareBuilder.h>
 
