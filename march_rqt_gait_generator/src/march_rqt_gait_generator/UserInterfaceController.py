@@ -3,18 +3,15 @@ import math
 
 from JointSettingSpinBoxDelegate import JointSettingSpinBoxDelegate
 from python_qt_binding.QtWidgets import QTableWidgetItem
-import pynotify
 
 from model.Setpoint import Setpoint
+import subprocess
 
 TABLE_DIGITS = 4
 
 
 def notify(title, message):
-    pynotify.init("Basic")
-    n = pynotify.Notification(title, message)
-    n.set_urgency(pynotify.URGENCY_CRITICAL)
-    n.show()
+    subprocess.Popen(['notify-send', str(title), str(message)])
 
 
 def table_to_setpoints(table_data):
