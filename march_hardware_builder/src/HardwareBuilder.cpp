@@ -38,7 +38,16 @@ march4cpp::MarchRobot HardwareBuilder::createMarchRobot(YAML::Node marchRobotCon
     jointList.push_back(this->createJoint(jointConfig[jointName], jointName));
   }
 
-  return march4cpp::MarchRobot(jointList, ifName, ecatCycleTime);
+  if (marchRobotConfig["powerDistributionBoard"].IsDefined())
+  {
+    march4cpp::PowerDistributionBoard powerDistributionBoard =
+        createPowerDistributionBoard(marchRobotConfig["powerDistributionBoard"]);
+    return march4cpp::MarchRobot(jointList, powerDistributionBoard, ifName, ecatCycleTime);
+  }
+  else
+  {
+    return march4cpp::MarchRobot(jointList, ifName, ecatCycleTime);
+  }
 }
 
 march4cpp::MarchRobot HardwareBuilder::createMarchRobot()
