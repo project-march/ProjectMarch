@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 
   int ecatCycleTime = 4;  // milliseconds
 
-  CurrentOffsets currentOffsets = CurrentOffsets(5, 9, 13, 17);
+  NetMonitoringOffsets currentOffsets = NetMonitoringOffsets(5, 9, 13, 17, 3);
   StateOffsets stateOffsets = StateOffsets(0, 0, 1);
   march4cpp::PowerDistributionBoard pdb = march4cpp::PowerDistributionBoard(1, currentOffsets, stateOffsets);
   march4cpp::MarchRobot march4 = march4cpp::MarchRobot(jointList, pdb, "enp2s0", ecatCycleTime);
@@ -61,11 +61,14 @@ int main(int argc, char** argv)
 //      ROS_INFO("getLowVoltageNet2Current: %f", march4.getPowerDistributionBoard().getLowVoltageNet2Current());
 //      ROS_INFO("getHighVoltageNetCurrent: %f", march4.getPowerDistributionBoard().getHighVoltageNetCurrent());
 
-      ROS_INFO("getMasterShutdownRequested: %d", march4.getPowerDistributionBoard().getMasterShutdownRequested());
-      if(march4.getPowerDistributionBoard().getMasterShutdownRequested()){
-          march4.getPowerDistributionBoard().setMasterShutDownAllowed(true);
-          march4.getPowerDistributionBoard().setMasterOk(false);
-      }
+
+      ROS_INFO("getLowVoltageNet1Operational: %d", march4.getPowerDistributionBoard().getLowVoltageNet1Operational());
+      ROS_INFO("getLowVoltageNet2Operational: %d", march4.getPowerDistributionBoard().getLowVoltageNet2Operational());
+//      ROS_INFO("getMasterShutdownRequested: %d", march4.getPowerDistributionBoard().getMasterShutdownRequested());
+//      if(march4.getPowerDistributionBoard().getMasterShutdownRequested()){
+//          march4.getPowerDistributionBoard().setMasterShutDownAllowed(true);
+//          march4.getPowerDistributionBoard().setMasterOk(false);
+//      }
   }
 
   ROS_INFO_STREAM("Angle: " << march4.getJoint("test_joint").getAngleRad());

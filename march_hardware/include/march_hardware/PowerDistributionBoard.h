@@ -5,18 +5,18 @@
 #include <stdint.h>
 #include <march_hardware/Slave.h>
 #include <march_hardware/StateOffsets.h>
-#include <march_hardware/CurrentOffsets.h>
+#include <march_hardware/NetMonitoringOffsets.h>
 
 namespace march4cpp
 {
 class PowerDistributionBoard : public Slave
 {
 private:
-  CurrentOffsets currentOffsets;
+  NetMonitoringOffsets netMonitoringOffsets;
   StateOffsets stateOffsets;
 
 public:
-  PowerDistributionBoard(int slaveIndex, CurrentOffsets currentOffsets, StateOffsets stateOffsets);
+  PowerDistributionBoard(int slaveIndex, NetMonitoringOffsets currentOffsets, StateOffsets stateOffsets);
 
   PowerDistributionBoard(){};
 
@@ -24,7 +24,9 @@ public:
   float getLowVoltageNet1Current();
   float getLowVoltageNet2Current();
   float getHighVoltageNetCurrent();
-  bool getMasterShutdownRequested();
+    bool getMasterShutdownRequested();
+    bool getLowVoltageNet1Operational();
+    bool getLowVoltageNet2Operational();
 
   void setMasterOk(bool isOk);
   void setMasterShutDownAllowed(bool isAllowed);
@@ -32,13 +34,13 @@ public:
   /** @brief Override comparison operator */
   friend bool operator==(const PowerDistributionBoard& lhs, const PowerDistributionBoard& rhs)
   {
-    return lhs.slaveIndex == rhs.slaveIndex && lhs.currentOffsets == rhs.currentOffsets;
+    return lhs.slaveIndex == rhs.slaveIndex && lhs.netMonitoringOffsets == rhs.netMonitoringOffsets;
   }
   /** @brief Override stream operator for clean printing */
   friend ::std::ostream& operator<<(std::ostream& os, const PowerDistributionBoard& powerDistributionBoard)
   {
     return os << "slaveIndex: " << powerDistributionBoard.slaveIndex << ", "
-              << "currentOffsets: (" << powerDistributionBoard.currentOffsets << ") ";
+              << "netMonitoringOffsets: (" << powerDistributionBoard.netMonitoringOffsets << ") ";
   }
 };
 }  // namespace march4cpp
