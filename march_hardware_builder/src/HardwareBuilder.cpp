@@ -131,7 +131,8 @@ march4cpp::PowerDistributionBoard HardwareBuilder::createPowerDistributionBoard(
 
   int slaveIndex = powerDistributionBoardConfig["slaveIndex"].as<int>();
   int masterOkByteOffset = powerDistributionBoardConfig["masterOkByteOffset"].as<int>();
-  int powerDistributionBoardCurrentByteOffset = powerDistributionBoardConfig["powerDistributionBoardCurrentByteOffset"].as<int>();
+  int powerDistributionBoardCurrentByteOffset =
+      powerDistributionBoardConfig["powerDistributionBoardCurrentByteOffset"].as<int>();
   return march4cpp::PowerDistributionBoard(slaveIndex, masterOkByteOffset, powerDistributionBoardCurrentByteOffset);
 }
 
