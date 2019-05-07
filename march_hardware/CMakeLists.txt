@@ -48,6 +48,7 @@ file(GLOB SOEM_SRC
 
 add_library(march_hardware
         ${SOEM_SRC}
+        include/${PROJECT_NAME}/Pdb.h
         include/${PROJECT_NAME}/EtherCAT/EthercatIO.h
         include/${PROJECT_NAME}/EtherCAT/EthercatMaster.h
         include/${PROJECT_NAME}/EtherCAT/EthercatSDO.h
@@ -60,6 +61,7 @@ add_library(march_hardware
         include/${PROJECT_NAME}/TemperatureGES.h
         include/${PROJECT_NAME}/TemperatureSensor.h
         include/${PROJECT_NAME}/PDOmap.h
+        src/PowerDistributionBoard.cpp
         src/EtherCAT/EthercatIO.cpp
         src/EtherCAT/EthercatMaster.cpp
         src/EtherCAT/EthercatSDO.cpp
