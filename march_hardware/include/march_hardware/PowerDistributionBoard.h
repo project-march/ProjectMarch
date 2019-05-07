@@ -1,10 +1,9 @@
 // Copyright 2019 Project March.
-#ifndef MARCH4CPP__TEMPERATURESENSOR_H
-#define MARCH4CPP__TEMPERATURESENSOR_H
+#ifndef MARCH4CPP__POWERDISTRIBUTIONBOARD_H
+#define MARCH4CPP__POWERDISTRIBUTIONBOARD_H
 
 #include <stdint.h>
 #include <march_hardware/Slave.h>
-#include "TemperatureSensor.h"
 
 namespace march4cpp
 {
@@ -24,6 +23,8 @@ public:
   };
 
   float getPowerDistributionBoardCurrent();
+
+  void setMasterOk(bool isOk);
 
   /** @brief Override comparison operator */
   friend bool operator==(const PowerDistributionBoard& lhs, const PowerDistributionBoard& rhs)

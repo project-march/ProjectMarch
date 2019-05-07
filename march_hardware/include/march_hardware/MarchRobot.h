@@ -10,6 +10,7 @@
 #include <march_hardware/Joint.h>
 
 #include <march_hardware/EtherCAT/EthercatMaster.h>
+#include <march_hardware/PowerDistributionBoard.h>
 
 namespace march4cpp
 {
@@ -20,8 +21,11 @@ private:
 
 public:
   ::std::vector<Joint> jointList;
+  PowerDistributionBoard powerDistributionBoard;
 
   MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int ecatCycleTime);
+
+  MarchRobot(::std::vector<Joint> jointList, PowerDistributionBoard powerDistributionBoard, ::std::string ifName, int ecatCycleTime);
 
   void startEtherCAT();
 
@@ -34,6 +38,8 @@ public:
   bool isEthercatOperational();
 
   Joint getJoint(::std::string jointName);
+
+  PowerDistributionBoard getPowerDistributionBoard();
 
   /** @brief Override comparison operator */
   friend bool operator==(const MarchRobot& lhs, const MarchRobot& rhs)

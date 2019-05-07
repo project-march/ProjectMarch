@@ -20,6 +20,13 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int
   ethercatMaster.reset(new EthercatMaster(&this->jointList, ifName, this->getMaxSlaveIndex(), ecatCycleTime));
 }
 
+MarchRobot::MarchRobot(::std::vector<Joint> jointList, PowerDistributionBoard powerDistributionBoard,
+                       ::std::string ifName, int ecatCycleTime)
+  : MarchRobot::MarchRobot(jointList, ifName, ecatCycleTime)
+{
+  this->powerDistributionBoard = powerDistributionBoard;
+}
+
 void MarchRobot::startEtherCAT()
 {
   if (!hasValidSlaves())
@@ -139,6 +146,16 @@ Joint MarchRobot::getJoint(::std::string jointName)
 
   ROS_ERROR("Could not find joint with name %s", jointName.c_str());
   throw ::std::runtime_error("Could not find joint with name " + jointName);
+}
+
+PowerDistributionBoard MarchRobot::getPowerDistributionBoard()
+{
+  if (this->powerDistributionBoard.getSlaveIndex() == -1)
+  {
+    ROS_ERROR("Could not find power distribution board");
+    throw ::std::runtime_error("Could not find power distribution board");
+  }
+  return powerDistributionBoard;
 }
 
 }  // namespace march4cpp

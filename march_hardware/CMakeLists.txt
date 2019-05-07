@@ -48,7 +48,7 @@ file(GLOB SOEM_SRC
 
 add_library(march_hardware
         ${SOEM_SRC}
-        include/${PROJECT_NAME}/Pdb.h
+        include/${PROJECT_NAME}/PowerDistributionBoard.h
         include/${PROJECT_NAME}/EtherCAT/EthercatIO.h
         include/${PROJECT_NAME}/EtherCAT/EthercatMaster.h
         include/${PROJECT_NAME}/EtherCAT/EthercatSDO.h
@@ -89,7 +89,7 @@ add_custom_command(
         TARGET hardware_dummy
         POST_BUILD
         COMMAND sudo setcap cap_net_raw+ep hardware_dummy
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/../devel/lib/march_hardware
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/../../../devel/lib/march_hardware
 )
 
 ## Add gtest based cpp test target and link libraries

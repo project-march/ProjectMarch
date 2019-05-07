@@ -14,6 +14,7 @@
 #include "sensor_msgs/JointState.h"
 #include <march_hardware/EtherCAT/EthercatIO.h>
 #include <march_hardware/EtherCAT/EthercatSDO.h>
+#include <march_hardware/PowerDistributionBoard.h>
 #include <march_hardware/PDOmap.h>
 
 int main(int argc, char** argv)
@@ -25,10 +26,12 @@ int main(int argc, char** argv)
   march4cpp::Joint temp = march4cpp::Joint("test_joint", true, temperatureGES);
 
   std::vector<march4cpp::Joint> jointList;
-  jointList.push_back(temp);
+  //  jointList.push_back(temp);
 
   int ecatCycleTime = 4;  // milliseconds
-  march4cpp::MarchRobot march4 = march4cpp::MarchRobot(jointList, "enp2s0", ecatCycleTime);
+
+  march4cpp::PowerDistributionBoard pdb = march4cpp::PowerDistributionBoard(1, 0, 5);
+  march4cpp::MarchRobot march4 = march4cpp::MarchRobot(jointList, pdb, "enx9cebe848177e", ecatCycleTime);
   march4.startEtherCAT();
 
   if (!march4.isEthercatOperational())
@@ -41,12 +44,17 @@ int main(int argc, char** argv)
   //     ros::NodeHandle nh;
   //     ros::Rate rate(10);
 
-  if (march4.getJoint("test_joint").canActuate())
-  {
-    march4.getJoint("test_joint").prepareActuation();
-  }
+//  if (march4.getJoint("test_joint").canActuate())
+//  {
+//    march4.getJoint("test_joint").prepareActuation();
+//  }
 
   ROS_INFO("march4 initialized");
+
+  while(true){
+    ROS_INFO("Current current: %f", march4.getPowerDistributionBoard().getPowerDistributionBoardCurrent());
+  }
+
 
   ROS_INFO_STREAM("Angle: " << march4.getJoint("test_joint").getAngleRad());
 
