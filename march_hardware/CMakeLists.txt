@@ -60,6 +60,8 @@ add_library(march_hardware
         include/${PROJECT_NAME}/Slave.h
         include/${PROJECT_NAME}/TemperatureGES.h
         include/${PROJECT_NAME}/TemperatureSensor.h
+        include/${PROJECT_NAME}/CurrentOffsets.h
+        include/${PROJECT_NAME}/StateOffsets.h
         include/${PROJECT_NAME}/PDOmap.h
         src/PowerDistributionBoard.cpp
         src/EtherCAT/EthercatIO.cpp
@@ -71,7 +73,8 @@ add_library(march_hardware
         src/MarchRobot.cpp
         src/TemperatureGES.cpp
         src/PDOmap.cpp
-        src/main.cpp)
+        src/main.cpp
+        )
 
 target_link_libraries(march_hardware ${catkin_LIBRARIES})
 

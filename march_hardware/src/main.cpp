@@ -30,8 +30,10 @@ int main(int argc, char** argv)
 
   int ecatCycleTime = 4;  // milliseconds
 
-  march4cpp::PowerDistributionBoard pdb = march4cpp::PowerDistributionBoard(1, 0, 5);
-  march4cpp::MarchRobot march4 = march4cpp::MarchRobot(jointList, pdb, "enx9cebe848177e", ecatCycleTime);
+  CurrentOffsets currentOffsets = CurrentOffsets(5, 9, 13, 17);
+  StateOffsets stateOffsets = StateOffsets(0, 0, 1);
+  march4cpp::PowerDistributionBoard pdb = march4cpp::PowerDistributionBoard(1, currentOffsets, stateOffsets);
+  march4cpp::MarchRobot march4 = march4cpp::MarchRobot(jointList, pdb, "enp2s0", ecatCycleTime);
   march4.startEtherCAT();
 
   if (!march4.isEthercatOperational())
@@ -44,17 +46,27 @@ int main(int argc, char** argv)
   //     ros::NodeHandle nh;
   //     ros::Rate rate(10);
 
-//  if (march4.getJoint("test_joint").canActuate())
-//  {
-//    march4.getJoint("test_joint").prepareActuation();
-//  }
+  //  if (march4.getJoint("test_joint").canActuate())
+  //  {
+  //    march4.getJoint("test_joint").prepareActuation();
+  //  }
 
   ROS_INFO("march4 initialized");
 
-  while(true){
-    ROS_INFO("Current current: %f", march4.getPowerDistributionBoard().getPowerDistributionBoardCurrent());
-  }
+  march4.getPowerDistributionBoard().setMasterOk(true);
+  while (true)
+  {
+//      ROS_INFO("getPowerDistributionBoardCurrent: %f", march4.getPowerDistributionBoard().getPowerDistributionBoardCurrent());
+//      ROS_INFO("getLowVoltageNet1Current: %f", march4.getPowerDistributionBoard().getLowVoltageNet1Current());
+//      ROS_INFO("getLowVoltageNet2Current: %f", march4.getPowerDistributionBoard().getLowVoltageNet2Current());
+//      ROS_INFO("getHighVoltageNetCurrent: %f", march4.getPowerDistributionBoard().getHighVoltageNetCurrent());
 
+      ROS_INFO("getMasterShutdownRequested: %d", march4.getPowerDistributionBoard().getMasterShutdownRequested());
+      if(march4.getPowerDistributionBoard().getMasterShutdownRequested()){
+          march4.getPowerDistributionBoard().setMasterShutDownAllowed(true);
+          march4.getPowerDistributionBoard().setMasterOk(false);
+      }
+  }
 
   ROS_INFO_STREAM("Angle: " << march4.getJoint("test_joint").getAngleRad());
 

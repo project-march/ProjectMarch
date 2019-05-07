@@ -4,42 +4,41 @@
 
 #include <stdint.h>
 #include <march_hardware/Slave.h>
+#include <march_hardware/StateOffsets.h>
+#include <march_hardware/CurrentOffsets.h>
 
 namespace march4cpp
 {
 class PowerDistributionBoard : public Slave
 {
 private:
-  int masterOkByteOffset;
-  int powerDistributionBoardCurrentByteOffset;
+  CurrentOffsets currentOffsets;
+  StateOffsets stateOffsets;
 
 public:
-  PowerDistributionBoard(int slaveIndex, int masterOkByteOffset, int powerDistributionBoardCurrentByteOffset);
+  PowerDistributionBoard(int slaveIndex, CurrentOffsets currentOffsets, StateOffsets stateOffsets);
 
-  PowerDistributionBoard()
-  {
-    masterOkByteOffset = -1;
-    slaveIndex = -1;
-  };
+  PowerDistributionBoard(){};
 
   float getPowerDistributionBoardCurrent();
+  float getLowVoltageNet1Current();
+  float getLowVoltageNet2Current();
+  float getHighVoltageNetCurrent();
+  bool getMasterShutdownRequested();
 
   void setMasterOk(bool isOk);
+  void setMasterShutDownAllowed(bool isAllowed);
 
   /** @brief Override comparison operator */
   friend bool operator==(const PowerDistributionBoard& lhs, const PowerDistributionBoard& rhs)
   {
-    return lhs.slaveIndex == rhs.slaveIndex && lhs.masterOkByteOffset == rhs.masterOkByteOffset &&
-           lhs.powerDistributionBoardCurrentByteOffset == rhs.powerDistributionBoardCurrentByteOffset;
+    return lhs.slaveIndex == rhs.slaveIndex && lhs.currentOffsets == rhs.currentOffsets;
   }
   /** @brief Override stream operator for clean printing */
   friend ::std::ostream& operator<<(std::ostream& os, const PowerDistributionBoard& powerDistributionBoard)
   {
     return os << "slaveIndex: " << powerDistributionBoard.slaveIndex << ", "
-              << "powerDistributionBoardCurrentByteOffset: "
-              << powerDistributionBoard.powerDistributionBoardCurrentByteOffset << ", "
-              << "masterOkByteOffset: "
-              << powerDistributionBoard.masterOkByteOffset;
+              << "currentOffsets: (" << powerDistributionBoard.currentOffsets << ") ";
   }
 };
 }  // namespace march4cpp
