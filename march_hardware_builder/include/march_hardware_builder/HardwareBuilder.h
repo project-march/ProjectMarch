@@ -20,12 +20,14 @@
 class HardwareBuilder
 {
 private:
-  const std::vector<std::string> ENCODER_REQUIRED_KEYS =
-          { "resolution", "minPositionIU", "maxPositionIU", "zeroPositionIU", "safetyMarginRad" };
+  const std::vector<std::string> ENCODER_REQUIRED_KEYS = { "resolution", "minPositionIU", "maxPositionIU",
+                                                           "zeroPositionIU", "safetyMarginRad" };
   const std::vector<std::string> IMOTIONCUBE_REQUIRED_KEYS = { "slaveIndex", "encoder" };
   const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS = { "slaveIndex", "byteOffset" };
-  const std::vector<std::string> POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS = { "slaveIndex", "powerDistributionBoardCurrentByteOffset", "masterOkByteOffset" };
-  const std::vector<std::string> JOINT_REQUIRED_KEYS = {"allowActuation"};
+  const std::vector<std::string> POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS = { "slaveIndex",
+                                                                            "powerDistributionBoardCurrentByteOffset",
+                                                                            "masterOkByteOffset" };
+  const std::vector<std::string> JOINT_REQUIRED_KEYS = { "allowActuation" };
 
   /**
    * @brief Loop over all keys in the keyList and check if they exist in the config. Throws a MissingKeyException when
