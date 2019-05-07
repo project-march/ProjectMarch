@@ -54,14 +54,12 @@ march4cpp::Joint HardwareBuilder::createJoint(YAML::Node jointConfig, std::strin
   ROS_INFO("Starting creation of joint %s", jointName.c_str());
   this->validateRequiredKeysExist(jointConfig, this->JOINT_REQUIRED_KEYS, "joint");
 
-
   march4cpp::IMotionCube imc;
   march4cpp::TemperatureGES temperatureGes;
 
   bool hasIMotionCube = false;
   bool hasTemperatureGes = false;
   bool allowActuation = jointConfig["allowActuation"].as<bool>();
-
 
   if (jointConfig["imotioncube"].Type() == YAML::NodeType::Undefined)
   {
@@ -124,6 +122,17 @@ march4cpp::TemperatureGES HardwareBuilder::createTemperatureGES(YAML::Node tempe
   int slaveIndex = temperatureGESConfig["slaveIndex"].as<int>();
   int byteOffset = temperatureGESConfig["byteOffset"].as<int>();
   return march4cpp::TemperatureGES(slaveIndex, byteOffset);
+}
+
+march4cpp::PowerDistributionBoard HardwareBuilder::createPowerDistributionBoard(YAML::Node powerDistributionBoardConfig)
+{
+  this->validateRequiredKeysExist(powerDistributionBoardConfig, this->POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS,
+                                  "powerdistributionboard");
+
+  int slaveIndex = powerDistributionBoardConfig["slaveIndex"].as<int>();
+  int masterOkByteOffset = powerDistributionBoardConfig["masterOkByteOffset"].as<int>();
+  int powerDistributionBoardCurrentByteOffset = powerDistributionBoardConfig["powerDistributionBoardCurrentByteOffset"].as<int>();
+  return march4cpp::PowerDistributionBoard(slaveIndex, masterOkByteOffset, powerDistributionBoardCurrentByteOffset);
 }
 
 void HardwareBuilder::validateRequiredKeysExist(YAML::Node config, std::vector<std::string> keyList,

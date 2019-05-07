@@ -10,6 +10,7 @@
 #include <march_hardware/Encoder.h>
 #include <march_hardware/IMotionCube.h>
 #include <march_hardware/TemperatureGES.h>
+#include <march_hardware/PowerDistributionBoard.h>
 
 #include <march_hardware_builder/AllowedRobot.h>
 
@@ -23,6 +24,7 @@ private:
           { "resolution", "minPositionIU", "maxPositionIU", "zeroPositionIU", "safetyMarginRad" };
   const std::vector<std::string> IMOTIONCUBE_REQUIRED_KEYS = { "slaveIndex", "encoder" };
   const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS = { "slaveIndex", "byteOffset" };
+  const std::vector<std::string> POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS = { "slaveIndex", "powerDistributionBoardCurrentByteOffset", "masterOkByteOffset" };
   const std::vector<std::string> JOINT_REQUIRED_KEYS = {"allowActuation"};
 
   /**
@@ -61,6 +63,7 @@ public:
   march4cpp::Encoder createEncoder(YAML::Node encoderConfig);
   march4cpp::IMotionCube createIMotionCube(YAML::Node iMotionCubeConfig);
   march4cpp::TemperatureGES createTemperatureGES(YAML::Node temperatureGESConfig);
+  march4cpp::PowerDistributionBoard createPowerDistributionBoard(YAML::Node powerDistributionBoardConfig);
 };
 
 #endif  // MARCH_IV_HARDWAREBUILDER_H
