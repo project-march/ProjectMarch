@@ -12,7 +12,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget, QFileDialog, QPushButton, QFrame, \
-    QLineEdit, QSlider, QHeaderView, QTableWidgetItem, QCheckBox, QMessageBox, QSpinBox
+    QLineEdit, QSlider, QHeaderView, QTableWidgetItem, QCheckBox, QMessageBox, QSpinBox, QDoubleSpinBox
 
 import rviz
 
@@ -111,11 +111,10 @@ class GaitGeneratorPlugin(Plugin):
                 self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").text())
         )
 
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Duration").setValidator(
-            QtGui.QDoubleValidator(1.0, 20.0, QtGui.QDoubleValidator.StandardNotation, self))
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Duration").returnPressed.connect(
+        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").setKeyboardTracking(False)
+        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").valueChanged.connect(
             lambda: self.update_gait_duration(
-                float(self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Duration").text()))
+                self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").value())
         )
 
         # Initialize the publisher on startup
@@ -276,7 +275,7 @@ class GaitGeneratorPlugin(Plugin):
                                                      "duration?",
                                                      QMessageBox.Yes | QMessageBox.No)
             if discard_setpoints == QMessageBox.No:
-                self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Duration").setText(str(self.gait.duration))
+                self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").setValue(self.gait.duration)
                 return
         self.gait.set_duration(duration, rescale_setpoints)
         self._widget.RvizFrame.findChild(QSlider, "TimeSlider").setRange(0, 100 * self.gait.duration)
@@ -320,7 +319,7 @@ class GaitGeneratorPlugin(Plugin):
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Name").setText(self.gait.name)
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").setText(self.gait.version)
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").setText(self.gait.description)
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Duration").setText(str(self.gait.duration))
+        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").setValue(self.gait.duration)
 
 
         self.create_joint_settings()
