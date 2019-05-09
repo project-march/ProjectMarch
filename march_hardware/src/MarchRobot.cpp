@@ -43,6 +43,11 @@ void MarchRobot::startEtherCAT()
     return;
   }
   ethercatMaster->start();
+
+  if (powerDistributionBoard.getSlaveIndex() != -1)
+  {
+    powerDistributionBoard.setMasterOk(true);
+  }
 }
 
 void MarchRobot::stopEtherCAT()
@@ -52,6 +57,12 @@ void MarchRobot::stopEtherCAT()
     ROS_ERROR("Trying to stop EtherCAT while it is not active.");
     return;
   }
+
+  if (powerDistributionBoard.getSlaveIndex() != -1)
+  {
+    powerDistributionBoard.setMasterOk(false);
+  }
+
   ethercatMaster->stop();
 }
 
@@ -156,6 +167,12 @@ PowerDistributionBoard MarchRobot::getPowerDistributionBoard()
     throw ::std::runtime_error("Could not find power distribution board");
   }
   return powerDistributionBoard;
+}
+
+MarchRobot::~MarchRobot()
+{
+  ROS_INFO("destructor called");
+  stopEtherCAT();
 }
 
 }  // namespace march4cpp

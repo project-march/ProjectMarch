@@ -6,18 +6,21 @@
 namespace march4cpp
 {
 PowerDistributionBoard::PowerDistributionBoard(int slaveIndex, NetMonitorOffsets netMonitoringOffsets,
+                                               NetDriverOffsets netDriverOffsets,
                                                BootShutdownOffsets bootShutdownOffsets)
   : Slave(slaveIndex)
 {
   this->netMonitoringOffsets = netMonitoringOffsets;
   this->bootShutdownOffsets = bootShutdownOffsets;
+  this->netDriverOffsets = netDriverOffsets;
+    ROS_INFO("DESTRUCT???" );
 }
 
 float PowerDistributionBoard::getPowerDistributionBoardCurrent()
 {
   union bit32 current =
       get_input_bit32(static_cast<uint16>(this->slaveIndex),
-                      static_cast<uint8>(this->netMonitoringOffsets.getPowerDistributionBoardCurrentByteOffset()));
+                      static_cast<uint8>(this->netMonitoringOffsets.getPowerDistributionBoardCurrent()));
   return current.f;
 }
 
@@ -64,6 +67,9 @@ void PowerDistributionBoard::setLowVoltageNetOnOff(bool on, int netNumber)
     lowVoltageNets.ui = ~lowVoltageNets.ui;
     lowVoltageNets.ui &= currentStateLowVoltageNets;
   }
+  ROS_INFO("low voltage nets: %d", lowVoltageNets.ui);
+  ROS_INFO("offset: %d", this->netDriverOffsets.getLowVoltageNetOnOff());
+
   set_output_bit8(static_cast<uint16>(this->slaveIndex),
                   static_cast<uint8>(this->netDriverOffsets.getLowVoltageNetOnOff()), lowVoltageNets);
 }
@@ -77,33 +83,55 @@ void PowerDistributionBoard::setHighVoltageNetOnOff(bool on, int netNumber)
   }
   if (!on)
   {
-    ROS_FATAL("You are not allowed to turn off high voltage nets this way, use the emergency switch");
-    throw std::exception();
+    ROS_ERROR("You are not allowed to turn off high voltage nets this way, use the emergency switch");
+    return;
   }
   else if (getHighVoltageNetOperational(netNumber))
   {
     ROS_WARN("High voltage net %d is already on", netNumber);
   }
-  bit8 isOn;
-  isOn.ui = static_cast<uint8>(on);
+  uint8 currentStateHighVoltageNets = getHighVoltageNetsOperational();
+  bit8 highVoltageNets;
+  highVoltageNets.ui = 1 << (netNumber - 1);
+  if (on)
+  {
+    highVoltageNets.ui |= currentStateHighVoltageNets;
+  }
+  else
+  {
+    // This code is needed when this method is allowed to turn off high voltage
+    highVoltageNets.ui = ~highVoltageNets.ui;
+    highVoltageNets.ui &= currentStateHighVoltageNets;
+  }
   set_output_bit8(static_cast<uint16>(this->slaveIndex),
-                  static_cast<uint8>(this->netDriverOffsets.getHighVoltageNetOnOff()), isOn);
-}
-
-void PowerDistributionBoard::setHighVoltageOvercurrentReset(bool on, int netNumber)
-{
-  bit8 isOn;
-  isOn.ui = static_cast<uint8>(on);
-  set_output_bit8(static_cast<uint16>(this->slaveIndex),
-                  static_cast<uint8>(this->netDriverOffsets.getLowVoltageNetOnOff()), isOn);
+                  static_cast<uint8>(this->netDriverOffsets.getHighVoltageNetOnOff()), highVoltageNets);
 }
 
 void PowerDistributionBoard::setHighVoltageEmergencySwitchOnOff(bool on)
 {
+  if (on && getEmergencyButtonTriggered())
+  {
+    ROS_WARN("Emergency switch already activated");
+    return;
+  }
+  else if (!on && !getEmergencyButtonTriggered())
+  {
+    ROS_WARN("Emergency switch already deactivated");
+    return;
+  }
+  if (on)
+  {
+    ROS_WARN("Emergency switch activated from software");
+  }
+  else
+  {
+    ROS_WARN("Emergency switch deactivated, high voltage on");
+  }
+
   bit8 isOn;
   isOn.ui = static_cast<uint8>(on);
   set_output_bit8(static_cast<uint16>(this->slaveIndex),
-                  static_cast<uint8>(this->netDriverOffsets.getLowVoltageNetOnOff()), isOn);
+                  static_cast<uint8>(this->netDriverOffsets.getHighVoltageEmergencySwitchOnOff()), isOn);
 }
 
 void PowerDistributionBoard::setMasterShutDownAllowed(bool isAllowed)
@@ -118,15 +146,14 @@ float PowerDistributionBoard::getLowVoltageNetCurrent(int netNumber)
 {
   union bit32 current =
       get_input_bit32(static_cast<uint16>(this->slaveIndex),
-                      static_cast<uint8>(this->netMonitoringOffsets.getLowVoltageNetCurrentByteOffset(netNumber)));
+                      static_cast<uint8>(this->netMonitoringOffsets.getLowVoltageNetCurrent(netNumber)));
   return current.f;
 }
 
 float PowerDistributionBoard::getHighVoltageNetCurrent()
 {
-  union bit32 current =
-      get_input_bit32(static_cast<uint16>(this->slaveIndex),
-                      static_cast<uint8>(this->netMonitoringOffsets.getHighVoltageNetCurrentByteOffset()));
+  union bit32 current = get_input_bit32(static_cast<uint16>(this->slaveIndex),
+                                        static_cast<uint8>(this->netMonitoringOffsets.getHighVoltageNetCurrent()));
   return current.f;
 }
 
@@ -141,7 +168,7 @@ bool PowerDistributionBoard::getEmergencyButtonTriggered()
 {
   union bit8 emergencyButtonTriggered =
       get_input_bit8(static_cast<uint16>(this->slaveIndex),
-                     static_cast<uint8>(this->netMonitoringOffsets.getEmergencyButtonTriggeredByteOffset()));
+                     static_cast<uint8>(this->netMonitoringOffsets.getEmergencyButtonTriggered()));
   return emergencyButtonTriggered.ui;
 }
 
@@ -154,7 +181,7 @@ bool PowerDistributionBoard::getHighVoltageOvercurrentTrigger(int netNumber)
   }
   union bit8 overcurrent =
       get_input_bit8(static_cast<uint16>(this->slaveIndex),
-                     static_cast<uint8>(this->netMonitoringOffsets.getHighVoltageOvercurrentTriggerByteOffset()));
+                     static_cast<uint8>(this->netMonitoringOffsets.getHighVoltageOvercurrentTrigger()));
   return ((overcurrent.ui >> (netNumber - 1)) & 1);
 }
 
@@ -165,9 +192,8 @@ bool PowerDistributionBoard::getLowVoltageNetOperational(int netNumber)
     ROS_FATAL("Can't get operational state from low voltage net %d, there are only 2 low voltage nets", netNumber);
     throw std::exception();
   }
-  union bit8 operational =
-      get_input_bit8(static_cast<uint16>(this->slaveIndex),
-                     static_cast<uint8>(this->netMonitoringOffsets.getLowVoltageStateByteOffset()));
+  union bit8 operational = get_input_bit8(static_cast<uint16>(this->slaveIndex),
+                                          static_cast<uint8>(this->netMonitoringOffsets.getLowVoltageState()));
   // The last bit of the 8 bits represents net 1
   // The second to last bit of the 8 bits represents net 2
   return ((operational.ui >> (netNumber - 1)) & 1);
@@ -175,9 +201,8 @@ bool PowerDistributionBoard::getLowVoltageNetOperational(int netNumber)
 
 uint8 PowerDistributionBoard::getLowVoltageNetsOperational()
 {
-  union bit8 operational =
-      get_input_bit8(static_cast<uint16>(this->slaveIndex),
-                     static_cast<uint8>(this->netMonitoringOffsets.getLowVoltageStateByteOffset()));
+  union bit8 operational = get_input_bit8(static_cast<uint16>(this->slaveIndex),
+                                          static_cast<uint8>(this->netMonitoringOffsets.getLowVoltageState()));
   return operational.ui;
 }
 
@@ -188,18 +213,16 @@ bool PowerDistributionBoard::getHighVoltageNetOperational(int netNumber)
     ROS_FATAL("Can't get operational state from high voltage net %d, there are only 8 high voltage nets", netNumber);
     throw std::exception();
   }
-  union bit8 operational =
-      get_input_bit8(static_cast<uint16>(this->slaveIndex),
-                     static_cast<uint8>(this->netMonitoringOffsets.getHighVoltageStateByteOffset()));
+  union bit8 operational = get_input_bit8(static_cast<uint16>(this->slaveIndex),
+                                          static_cast<uint8>(this->netMonitoringOffsets.getHighVoltageState()));
   // The first bit of the 8 bits represents net 1 and so on till the last 8th bit which represents net 8.
   return ((operational.ui >> (netNumber - 1)) & 1);
 }
 
 uint8 PowerDistributionBoard::getHighVoltageNetsOperational()
 {
-  union bit8 operational =
-      get_input_bit8(static_cast<uint16>(this->slaveIndex),
-                     static_cast<uint8>(this->netMonitoringOffsets.getHighVoltageStateByteOffset()));
+  union bit8 operational = get_input_bit8(static_cast<uint16>(this->slaveIndex),
+                                          static_cast<uint8>(this->netMonitoringOffsets.getHighVoltageState()));
   return operational.ui;
 }
 

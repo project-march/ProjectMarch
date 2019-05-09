@@ -24,7 +24,7 @@ public:
   PowerDistributionBoard(int slaveIndex, NetMonitorOffsets netMonitoringOffsets, NetDriverOffsets netDriverOffsets,
                          BootShutdownOffsets bootShutdownOffsets);
 
-  PowerDistributionBoard(){};
+  PowerDistributionBoard() = default;
 
   float getPowerDistributionBoardCurrent();
   float getLowVoltageNetCurrent(int netNumber);
@@ -39,7 +39,6 @@ public:
   void setMasterShutDownAllowed(bool isAllowed);
   void setLowVoltageNetOnOff(bool on, int netNumber);
   void setHighVoltageNetOnOff(bool on, int netNumber);
-  void setHighVoltageOvercurrentReset(bool on, int netNumber);
   void setHighVoltageEmergencySwitchOnOff(bool on);
 
   /** @brief Override comparison operator */

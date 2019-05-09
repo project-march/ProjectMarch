@@ -6,73 +6,72 @@
 
 class NetMonitorOffsets
 {
-  // TODO(TIM) remove Offset part!
-  int powerDistributionBoardCurrentByteOffset;
-  int lowVoltageNet1CurrentByteOffset;
-  int lowVoltageNet2CurrentByteOffset;
-  int highVoltageNetCurrentByteOffset;
-  int lowVoltageStateByteOffset;
-  int highVoltageOvercurrentTriggerByteOffset;
-  int emergencyButtonTriggeredByteOffset;
-  int highVoltageStateByteOffset;
+  int powerDistributionBoardCurrent;
+  int lowVoltageNet1Current;
+  int lowVoltageNet2Current;
+  int highVoltageNetCurrent;
+  int lowVoltageState;
+  int highVoltageOvercurrentTrigger;
+  int emergencyButtonTriggered;
+  int highVoltageState;
 
 public:
   NetMonitorOffsets(int powerDistributionBoardCurrentByteOffset, int lowVoltageNet1CurrentByteOffset,
                     int lowVoltageNet2CurrentByteOffset, int highVoltageNetCurrentByteOffset,
                     int lowVoltageStateByteOffset, int highVoltageOvercurrentTriggerByteOffset,
                     int emergencyButtonTriggeredByteOffset, int highVoltageStateByteOffset)
-    : powerDistributionBoardCurrentByteOffset(powerDistributionBoardCurrentByteOffset)
-    , lowVoltageNet1CurrentByteOffset(lowVoltageNet1CurrentByteOffset)
-    , lowVoltageNet2CurrentByteOffset(lowVoltageNet2CurrentByteOffset)
-    , highVoltageNetCurrentByteOffset(highVoltageNetCurrentByteOffset)
-    , lowVoltageStateByteOffset(lowVoltageStateByteOffset)
-    , highVoltageOvercurrentTriggerByteOffset(highVoltageOvercurrentTriggerByteOffset)
-    , emergencyButtonTriggeredByteOffset(emergencyButtonTriggeredByteOffset)
-    , highVoltageStateByteOffset(highVoltageStateByteOffset)
+    : powerDistributionBoardCurrent(powerDistributionBoardCurrentByteOffset)
+    , lowVoltageNet1Current(lowVoltageNet1CurrentByteOffset)
+    , lowVoltageNet2Current(lowVoltageNet2CurrentByteOffset)
+    , highVoltageNetCurrent(highVoltageNetCurrentByteOffset)
+    , lowVoltageState(lowVoltageStateByteOffset)
+    , highVoltageOvercurrentTrigger(highVoltageOvercurrentTriggerByteOffset)
+    , emergencyButtonTriggered(emergencyButtonTriggeredByteOffset)
+    , highVoltageState(highVoltageStateByteOffset)
   {
   }
 
   NetMonitorOffsets()
   {
-    powerDistributionBoardCurrentByteOffset = -1;
-    lowVoltageNet1CurrentByteOffset = -1;
-    lowVoltageNet2CurrentByteOffset = -1;
-    highVoltageNetCurrentByteOffset = -1;
-    lowVoltageStateByteOffset = -1;
-    highVoltageOvercurrentTriggerByteOffset = -1;
-    emergencyButtonTriggeredByteOffset = -1;
-    highVoltageStateByteOffset = -1;
+    powerDistributionBoardCurrent = -1;
+    lowVoltageNet1Current = -1;
+    lowVoltageNet2Current = -1;
+    highVoltageNetCurrent = -1;
+    lowVoltageState = -1;
+    highVoltageOvercurrentTrigger = -1;
+    emergencyButtonTriggered = -1;
+    highVoltageState = -1;
   }
 
-  int getHighVoltageStateByteOffset() const
+  int getHighVoltageState() const
   {
-    return highVoltageStateByteOffset;
+    return highVoltageState;
   }
 
-  int getPowerDistributionBoardCurrentByteOffset() const
+  int getPowerDistributionBoardCurrent() const
   {
-    return powerDistributionBoardCurrentByteOffset;
+    return powerDistributionBoardCurrent;
   }
 
-  int getHighVoltageOvercurrentTriggerByteOffset() const
+  int getHighVoltageOvercurrentTrigger() const
   {
-    return highVoltageOvercurrentTriggerByteOffset;
+    return highVoltageOvercurrentTrigger;
   }
 
-  int getEmergencyButtonTriggeredByteOffset() const
+  int getEmergencyButtonTriggered() const
   {
-    return emergencyButtonTriggeredByteOffset;
+    return emergencyButtonTriggered;
   }
 
-  int getLowVoltageNetCurrentByteOffset(int netNumber) const
+  int getLowVoltageNetCurrent(int netNumber) const
   {
     if (netNumber == 1)
     {
-      return lowVoltageNet1CurrentByteOffset;
+      return lowVoltageNet1Current;
     }
     else if (netNumber == 2)
     {
-      return lowVoltageNet2CurrentByteOffset;
+      return lowVoltageNet2Current;
     }
     else
     {
@@ -82,33 +81,32 @@ public:
     }
   }
 
-  int getHighVoltageNetCurrentByteOffset() const
+  int getHighVoltageNetCurrent() const
   {
-    return highVoltageNetCurrentByteOffset;
+    return highVoltageNetCurrent;
   }
 
-  int getLowVoltageStateByteOffset() const
+  int getLowVoltageState() const
   {
-    return lowVoltageStateByteOffset;
+    return lowVoltageState;
   }
 
   //  @TODO(TIM) Add all attributes:
   /** @brief Override comparison operator */
   friend bool operator==(const NetMonitorOffsets& lhs, const NetMonitorOffsets& rhs)
   {
-    return lhs.powerDistributionBoardCurrentByteOffset == rhs.powerDistributionBoardCurrentByteOffset &&
-           lhs.lowVoltageNet1CurrentByteOffset == rhs.lowVoltageNet1CurrentByteOffset &&
-           lhs.lowVoltageNet2CurrentByteOffset == rhs.lowVoltageNet2CurrentByteOffset &&
-           lhs.highVoltageNetCurrentByteOffset == rhs.highVoltageNetCurrentByteOffset;
+    return lhs.powerDistributionBoardCurrent == rhs.powerDistributionBoardCurrent &&
+           lhs.lowVoltageNet1Current == rhs.lowVoltageNet1Current &&
+           lhs.lowVoltageNet2Current == rhs.lowVoltageNet2Current &&
+           lhs.highVoltageNetCurrent == rhs.highVoltageNetCurrent;
   }
   /** @brief Override stream operator for clean printing */
   friend ::std::ostream& operator<<(std::ostream& os, const NetMonitorOffsets& currentOffsets)
   {
-    return os << "powerDistributionBoardCurrentByteOffset: " << currentOffsets.powerDistributionBoardCurrentByteOffset
-              << ", "
-              << "lowVoltageNet1CurrentByteOffset: " << currentOffsets.lowVoltageNet1CurrentByteOffset << ", "
-              << "lowVoltageNet2CurrentByteOffset: " << currentOffsets.lowVoltageNet2CurrentByteOffset << ", "
-              << "highVoltageNetCurrentByteOffset: " << currentOffsets.highVoltageNetCurrentByteOffset;
+    return os << "powerDistributionBoardCurrent: " << currentOffsets.powerDistributionBoardCurrent << ", "
+              << "lowVoltageNet1Current: " << currentOffsets.lowVoltageNet1Current << ", "
+              << "lowVoltageNet2Current: " << currentOffsets.lowVoltageNet2Current << ", "
+              << "highVoltageNetCurrent: " << currentOffsets.highVoltageNetCurrent;
   }
 };
 

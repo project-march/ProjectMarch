@@ -28,6 +28,11 @@ public:
   MarchRobot(::std::vector<Joint> jointList, PowerDistributionBoard powerDistributionBoard, ::std::string ifName,
              int ecatCycleTime);
 
+  //TODO(TIM) This is needed for the destructor, but why??
+  MarchRobot(MarchRobot&&) = default;
+
+  ~MarchRobot();
+
   void startEtherCAT();
 
   void stopEtherCAT();

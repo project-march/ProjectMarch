@@ -30,9 +30,11 @@ int main(int argc, char** argv)
 
   int ecatCycleTime = 4;  // milliseconds
 
-  NetMonitoringOffsets currentOffsets = NetMonitoringOffsets(5, 9, 13, 17, 3);
-  StateOffsets stateOffsets = StateOffsets(0, 0, 1);
-  march4cpp::PowerDistributionBoard pdb = march4cpp::PowerDistributionBoard(1, currentOffsets, stateOffsets);
+  NetMonitorOffsets currentOffsets = NetMonitorOffsets(5, 9, 13, 17, 3, 2, 1, 4);
+  NetDriverOffsets netDriverOffsets = NetDriverOffsets(4, 3, 2);
+  BootShutdownOffsets stateOffsets = BootShutdownOffsets(0, 0, 1);
+  march4cpp::PowerDistributionBoard pdb =
+      march4cpp::PowerDistributionBoard(1, currentOffsets, netDriverOffsets, stateOffsets);
   march4cpp::MarchRobot march4 = march4cpp::MarchRobot(jointList, pdb, "enp2s0", ecatCycleTime);
   march4.startEtherCAT();
 
@@ -54,24 +56,72 @@ int main(int argc, char** argv)
   ROS_INFO("march4 initialized");
 
   march4.getPowerDistributionBoard().setMasterOk(true);
-  while (true)
-  {
-//      ROS_INFO("getPowerDistributionBoardCurrent: %f", march4.getPowerDistributionBoard().getPowerDistributionBoardCurrent());
-//      ROS_INFO("getLowVoltageNet1Current: %f", march4.getPowerDistributionBoard().getLowVoltageNet1Current());
-//      ROS_INFO("getLowVoltageNet2Current: %f", march4.getPowerDistributionBoard().getLowVoltageNet2Current());
-//      ROS_INFO("getHighVoltageNetCurrent: %f", march4.getPowerDistributionBoard().getHighVoltageNetCurrent());
+  bool flip = true;
+//  while (true)
+//  {
+    //      ROS_INFO("getPowerDistributionBoardCurrent: %f",
+    //      march4.getPowerDistributionBoard().getPowerDistributionBoardCurrent());
+    //      ROS_INFO("getLowVoltageNet1Current: %f", march4.getPowerDistributionBoard().getLowVoltageNet1Current());
+    //      ROS_INFO("getLowVoltageNet2Current: %f", march4.getPowerDistributionBoard().getLowVoltageNet2Current());
+    //      ROS_INFO("getHighVoltageNetCurrent: %f", march4.getPowerDistributionBoard().getHighVoltageNetCurrent());
 
+    //      ROS_INFO("1 getLowVoltageNetOperational: %d",
+    //      march4.getPowerDistributionBoard().getHighVoltageNetOperational(3));
+//    flip = !flip;
+//    if (flip)
+//    {
+//      ROS_INFO("turning on");
+//    }
+//    else
+//    {
+//      ROS_INFO("turning off");
+//    }
+//    march4.getPowerDistributionBoard().setHighVoltageNetOnOff(flip, 1);
+//      march4.getPowerDistributionBoard().setMasterOk(true);
+      ROS_INFO("MASTER OK?");
+      sleep(5);
+      march4.getPowerDistributionBoard().setHighVoltageNetOnOff(true, 1);
+      ROS_INFO("1");
+//      march4.stopEtherCAT();
+//      sleep(10);
+//      march4.getPowerDistributionBoard().setHighVoltageNetOnOff(true, 2);
+//      ROS_INFO("2");
+//      sleep(10);
+//      march4.getPowerDistributionBoard().setHighVoltageNetOnOff(true, 3);
+//      ROS_INFO("3");
+//      sleep(10);
+//      march4.getPowerDistributionBoard().setHighVoltageNetOnOff(true, 4);
+//      ROS_INFO("4");
+//      sleep(10);
+//      march4.getPowerDistributionBoard().setHighVoltageNetOnOff(true, 5);
+//      ROS_INFO("5");
+//      sleep(10);
+//      march4.getPowerDistributionBoard().setHighVoltageNetOnOff(true, 6);
+//      ROS_INFO("6");
+//      sleep(10);
 
-      ROS_INFO("getLowVoltageNet1Operational: %d", march4.getPowerDistributionBoard().getLowVoltageNet1Operational());
-      ROS_INFO("getLowVoltageNet2Operational: %d", march4.getPowerDistributionBoard().getLowVoltageNet2Operational());
-//      ROS_INFO("getMasterShutdownRequested: %d", march4.getPowerDistributionBoard().getMasterShutdownRequested());
-//      if(march4.getPowerDistributionBoard().getMasterShutdownRequested()){
-//          march4.getPowerDistributionBoard().setMasterShutDownAllowed(true);
-//          march4.getPowerDistributionBoard().setMasterOk(false);
-//      }
-  }
+      //      ROS_INFO("1 getLowVoltageNetOperational: %d",
+    //      march4.getPowerDistributionBoard().getHighVoltageNetOperational(3));
+    //        ROS_INFO("1 getLowVoltageNetCurrent: %f", march4.getPowerDistributionBoard().getLowVoltageNetCurrent(1));
+    //    ROS_INFO("2 getLowVoltageNetOperational: %d",
+    //    march4.getPowerDistributionBoard().getLowVoltageNetOperational(2));
+    //    ROS_INFO("2 getPowerDistributionBoard: %f", march4.getPowerDistributionBoard().getLowVoltageNetCurrent(2));
+//    sleep(30);
 
-  ROS_INFO_STREAM("Angle: " << march4.getJoint("test_joint").getAngleRad());
+    //    for (int i = 1; i < 9; i++)
+    //    {
+    //      ROS_INFO("getHighVoltageOvercurrentTrigger index(%d) value: %d", i,
+    //               march4.getPowerDistributionBoard().getHighVoltageOvercurrentTrigger(i));
+    //    }
+    //      ROS_INFO("getMasterShutdownRequested: %d",
+    //      march4.getPowerDistributionBoard().getMasterShutdownRequested());
+    //      if(march4.getPowerDistributionBoard().getMasterShutdownRequested()){
+    //          march4.getPowerDistributionBoard().setMasterShutDownAllowed(true);
+    //          march4.getPowerDistributionBoard().setMasterOk(false);
+    //      }
+//  }
 
-  march4.stopEtherCAT();
+//  ROS_INFO_STREAM("Angle: " << march4.getJoint("test_joint").getAngleRad());
+
+//  march4.stopEtherCAT();
 }
