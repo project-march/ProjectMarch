@@ -139,10 +139,27 @@ march4cpp::PowerDistributionBoard HardwareBuilder::createPowerDistributionBoard(
                                   "powerdistributionboard");
 
   int slaveIndex = powerDistributionBoardConfig["slaveIndex"].as<int>();
-  int masterOkByteOffset = powerDistributionBoardConfig["masterOkByteOffset"].as<int>();
-  int powerDistributionBoardCurrentByteOffset =
-      powerDistributionBoardConfig["powerDistributionBoardCurrentByteOffset"].as<int>();
-  return march4cpp::PowerDistributionBoard(slaveIndex, masterOkByteOffset, powerDistributionBoardCurrentByteOffset);
+  YAML::Node netMonitorByteOffsets = powerDistributionBoardConfig["netMonitorByteOffsets"];
+  YAML::Node netDriverByteOffsets = powerDistributionBoardConfig["netDriverByteOffsets"];
+  YAML::Node bootShutdownByteOffsets = powerDistributionBoardConfig["bootShutdownOffsets"];
+
+  NetMonitorOffsets netMonitorOffsets = NetMonitorOffsets(
+      netMonitorByteOffsets["powerDistributionBoardCurrent"].as<int>(),
+      netMonitorByteOffsets["lowVoltageNet1Current"].as<int>(),
+      netMonitorByteOffsets["lowVoltageNet2Current"].as<int>(),
+      netMonitorByteOffsets["highVoltageNetCurrent"].as<int>(), netMonitorByteOffsets["lowVoltageState"].as<int>(),
+      netMonitorByteOffsets["highVoltageOvercurrentTrigger"].as<int>(),
+      netMonitorByteOffsets["emergencyButtonTriggered"].as<int>(), netMonitorByteOffsets["highVoltageState"].as<int>());
+
+  NetDriverOffsets netDriverOffsets = NetDriverOffsets(
+      netDriverByteOffsets["lowVoltageNetOnOff"].as<int>(), netDriverByteOffsets["highVoltageNetOnOff"].as<int>(),
+      netDriverByteOffsets["highVoltageEmergencySwitchOnOff"].as<int>());
+
+  BootShutdownOffsets bootShutdownOffsets =
+      BootShutdownOffsets(bootShutdownByteOffsets["masterOk"].as<int>(), bootShutdownByteOffsets["shutdown"].as<int>(),
+                          bootShutdownByteOffsets["shutdownAllowed"].as<int>());
+
+  return march4cpp::PowerDistributionBoard(slaveIndex, netMonitorOffsets, netDriverOffsets, bootShutdownOffsets);
 }
 
 void HardwareBuilder::validateRequiredKeysExist(YAML::Node config, std::vector<std::string> keyList,

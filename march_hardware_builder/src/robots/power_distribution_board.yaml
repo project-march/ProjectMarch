@@ -1,7 +1,0 @@
-pdbSetup:
-  ifName: enp3s0
-  ecatCycleTime: 4
-  powerDistributionBoard:
-    slaveIndex: 1
-    masterOkByteOffset: 0
-    powerDistributionBoardCurrentByteOffset: 5

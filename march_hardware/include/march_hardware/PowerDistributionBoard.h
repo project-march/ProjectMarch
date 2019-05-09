@@ -16,6 +16,7 @@ private:
   NetMonitorOffsets netMonitoringOffsets;
   NetDriverOffsets netDriverOffsets;
   BootShutdownOffsets bootShutdownOffsets;
+  bool masterOnlineToggle;
 
   uint8 getLowVoltageNetsOperational();
   uint8 getHighVoltageNetsOperational();
@@ -35,7 +36,7 @@ public:
   bool getEmergencyButtonTriggered();
   bool getHighVoltageNetOperational(int netNumber);
 
-  void setMasterOk(bool isOk);
+  void setMasterOnline();
   void setMasterShutDownAllowed(bool isAllowed);
   void setLowVoltageNetOnOff(bool on, int netNumber);
   void setHighVoltageNetOnOff(bool on, int netNumber);

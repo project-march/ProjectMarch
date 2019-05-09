@@ -13,7 +13,6 @@ PowerDistributionBoard::PowerDistributionBoard(int slaveIndex, NetMonitorOffsets
   this->netMonitoringOffsets = netMonitoringOffsets;
   this->bootShutdownOffsets = bootShutdownOffsets;
   this->netDriverOffsets = netDriverOffsets;
-    ROS_INFO("DESTRUCT???" );
 }
 
 float PowerDistributionBoard::getPowerDistributionBoardCurrent()
@@ -24,12 +23,13 @@ float PowerDistributionBoard::getPowerDistributionBoardCurrent()
   return current.f;
 }
 
-void PowerDistributionBoard::setMasterOk(bool isOk)
+void PowerDistributionBoard::setMasterOnline()
 {
   bit8 isOkBit;
-  isOkBit.ui = static_cast<uint8>(isOk);
+  isOkBit.ui = static_cast<uint8>(masterOnlineToggle);
   set_output_bit8(static_cast<uint16>(this->slaveIndex),
                   static_cast<uint8>(this->bootShutdownOffsets.getMasterOkByteOffset()), isOkBit);
+  masterOnlineToggle = !masterOnlineToggle;
 }
 
 void PowerDistributionBoard::setLowVoltageNetOnOff(bool on, int netNumber)

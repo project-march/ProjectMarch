@@ -48,6 +48,7 @@ void MarchRobot::startEtherCAT()
   {
     powerDistributionBoard.setMasterOk(true);
   }
+
 }
 
 void MarchRobot::stopEtherCAT()

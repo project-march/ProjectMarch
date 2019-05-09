@@ -12,6 +12,7 @@ public:
   {
     march3,
     testsetup,
+    pdbtestsetup
   };
 
   AllowedRobot() = default;
@@ -24,6 +25,10 @@ public:
     else if (robotName == "testsetup")
     {
       this->value = testsetup;
+    }
+    else if (robotName == "pdbtestsetup")
+    {
+      this->value = pdbtestsetup;
     }
     else
     {
@@ -41,7 +46,11 @@ public:
     }
     else if (this->value == AllowedRobot::march3)
     {
-      return basePath.append("/src/robots/march3.yaml");
+        return basePath.append("/src/robots/march3.yaml");
+    }
+    else if (this->value == AllowedRobot::pdbtestsetup)
+    {
+        return basePath.append("/src/robots/power_distribution_board_setup.yaml");
     }
     ROS_ERROR("Robotname not implemented. Using march3.yaml...");
     return basePath.append("/src/robots/march3.yaml");
