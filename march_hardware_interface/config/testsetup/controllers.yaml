@@ -6,6 +6,9 @@ march:
     temperature_sensor:
       type: march_temperature_sensor_controller/MarchTemperatureSensorController
       publish_rate: 50
+    pdb_state:
+      type: march_pdb_state_controller/MarchPdbStateController
+      publish_rate: 50
     trajectory:
       testjoint:
         type: position_controllers/JointTrajectoryController
