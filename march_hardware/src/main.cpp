@@ -66,8 +66,8 @@ int main(int argc, char** argv)
 
     //      ROS_INFO("1 getLowVoltageNetOperational: %d",
     //      march4.getPowerDistributionBoard().getHighVoltageNetOperational(3));
-    flip = !flip;
-    march4.getPowerDistributionBoard().setMasterOk(flip);
+
+    march4.getPowerDistributionBoard()->setMasterOnline();
     usleep(10000);
   }
 

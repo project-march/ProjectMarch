@@ -24,7 +24,7 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, PowerDistributionBoard po
                        ::std::string ifName, int ecatCycleTime)
   : MarchRobot::MarchRobot(jointList, ifName, ecatCycleTime)
 {
-  this->powerDistributionBoard = powerDistributionBoard;
+  this->powerDistributionBoard = std::unique_ptr<PowerDistributionBoard>(new PowerDistributionBoard(powerDistributionBoard));
 }
 
 void MarchRobot::startEtherCAT()
@@ -43,12 +43,6 @@ void MarchRobot::startEtherCAT()
     return;
   }
   ethercatMaster->start();
-
-  if (powerDistributionBoard.getSlaveIndex() != -1)
-  {
-    powerDistributionBoard.setMasterOk(true);
-  }
-
 }
 
 void MarchRobot::stopEtherCAT()
@@ -57,11 +51,6 @@ void MarchRobot::stopEtherCAT()
   {
     ROS_ERROR("Trying to stop EtherCAT while it is not active.");
     return;
-  }
-
-  if (powerDistributionBoard.getSlaveIndex() != -1)
-  {
-    powerDistributionBoard.setMasterOk(false);
   }
 
   ethercatMaster->stop();
@@ -160,19 +149,19 @@ Joint MarchRobot::getJoint(::std::string jointName)
   throw ::std::runtime_error("Could not find joint with name " + jointName);
 }
 
-PowerDistributionBoard MarchRobot::getPowerDistributionBoard()
+const std::unique_ptr<PowerDistributionBoard>& MarchRobot::getPowerDistributionBoard() const
 {
-  if (this->powerDistributionBoard.getSlaveIndex() == -1)
+  if (this->powerDistributionBoard->getSlaveIndex() == -1)
   {
     ROS_ERROR("Could not find power distribution board");
     throw ::std::runtime_error("Could not find power distribution board");
   }
+
   return powerDistributionBoard;
 }
 
 MarchRobot::~MarchRobot()
 {
-  ROS_INFO("destructor called");
   stopEtherCAT();
 }
 

@@ -18,10 +18,10 @@ class MarchRobot
 {
 private:
   std::unique_ptr<EthercatMaster> ethercatMaster;
+  std::unique_ptr<PowerDistributionBoard> powerDistributionBoard;
 
 public:
   ::std::vector<Joint> jointList;
-  PowerDistributionBoard powerDistributionBoard;
 
   MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int ecatCycleTime);
 
@@ -45,9 +45,9 @@ public:
 
   Joint getJoint(::std::string jointName);
 
-  PowerDistributionBoard getPowerDistributionBoard();
+    const std::unique_ptr<PowerDistributionBoard> &getPowerDistributionBoard() const;
 
-  /** @brief Override comparison operator */
+    /** @brief Override comparison operator */
   friend bool operator==(const MarchRobot& lhs, const MarchRobot& rhs)
   {
     if (lhs.jointList.size() != rhs.jointList.size())

@@ -26,10 +26,10 @@ float PowerDistributionBoard::getPowerDistributionBoardCurrent()
 void PowerDistributionBoard::setMasterOnline()
 {
   bit8 isOkBit;
-  isOkBit.ui = static_cast<uint8>(masterOnlineToggle);
+  this->masterOnlineToggle = !this->masterOnlineToggle;
+  isOkBit.ui = static_cast<uint8>(this->masterOnlineToggle);
   set_output_bit8(static_cast<uint16>(this->slaveIndex),
                   static_cast<uint8>(this->bootShutdownOffsets.getMasterOkByteOffset()), isOkBit);
-  masterOnlineToggle = !masterOnlineToggle;
 }
 
 void PowerDistributionBoard::setLowVoltageNetOnOff(bool on, int netNumber)
