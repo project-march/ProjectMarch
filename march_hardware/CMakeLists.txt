@@ -57,11 +57,12 @@ add_library(march_hardware
         include/${PROJECT_NAME}/IMotionCube.h
         include/${PROJECT_NAME}/Joint.h
         include/${PROJECT_NAME}/MarchRobot.h
+        include/${PROJECT_NAME}/NetDriverOffsets.h
         include/${PROJECT_NAME}/Slave.h
         include/${PROJECT_NAME}/TemperatureGES.h
         include/${PROJECT_NAME}/TemperatureSensor.h
         include/${PROJECT_NAME}/LowVoltageOffsets.h
-        include/${PROJECT_NAME}/StateOffsets.h
+        include/${PROJECT_NAME}/BootShutdownOffsets.h
         include/${PROJECT_NAME}/PDOmap.h
         src/PowerDistributionBoard.cpp
         src/EtherCAT/EthercatIO.cpp

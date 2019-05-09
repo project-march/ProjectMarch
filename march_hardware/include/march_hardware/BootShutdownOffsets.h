@@ -1,22 +1,23 @@
 // Copyright 2019 Project March.
-#ifndef MARCH_IV_STATEOFFSETS_H
-#define MARCH_IV_STATEOFFSETS_H
+#ifndef MARCH_IV_BOOTSHUTDOWNOFFSETS_H
+#define MARCH_IV_BOOTSHUTDOWNOFFSETS_H
 
-class StateOffsets
+class BootShutdownOffsets
 {
+    //TODO(TIM) remove Offset part!
   int masterOkByteOffset;
   int shutdownByteOffset;
   int shutdownAllowedByteOffset;
 
 public:
-  StateOffsets(int masterOkByteOffset, int shutdownByteOffset, int shutdownAllowedByteOffset)
+  BootShutdownOffsets(int masterOkByteOffset, int shutdownByteOffset, int shutdownAllowedByteOffset)
     : masterOkByteOffset(masterOkByteOffset)
     , shutdownByteOffset(shutdownByteOffset)
     , shutdownAllowedByteOffset(shutdownAllowedByteOffset)
   {
   }
 
-  StateOffsets()
+  BootShutdownOffsets()
   {
     masterOkByteOffset = -1;
     shutdownByteOffset = -1;
@@ -39,4 +40,4 @@ public:
   }
 };
 
-#endif  // MARCH_IV_STATEOFFSETS_H
+#endif  //MARCH_IV_BOOTSHUTDOWNOFFSETS_H

@@ -4,32 +4,43 @@
 
 #include <stdint.h>
 #include <march_hardware/Slave.h>
-#include <march_hardware/StateOffsets.h>
-#include <march_hardware/NetMonitoringOffsets.h>
+#include <march_hardware/BootShutdownOffsets.h>
+#include <march_hardware/NetMonitorOffsets.h>
+#include <march_hardware/NetDriverOffsets.h>
 
 namespace march4cpp
 {
 class PowerDistributionBoard : public Slave
 {
 private:
-  NetMonitoringOffsets netMonitoringOffsets;
-  StateOffsets stateOffsets;
+  NetMonitorOffsets netMonitoringOffsets;
+  NetDriverOffsets netDriverOffsets;
+  BootShutdownOffsets bootShutdownOffsets;
+
+  uint8 getLowVoltageNetsOperational();
+  uint8 getHighVoltageNetsOperational();
 
 public:
-  PowerDistributionBoard(int slaveIndex, NetMonitoringOffsets currentOffsets, StateOffsets stateOffsets);
+  PowerDistributionBoard(int slaveIndex, NetMonitorOffsets netMonitoringOffsets, NetDriverOffsets netDriverOffsets,
+                         BootShutdownOffsets bootShutdownOffsets);
 
   PowerDistributionBoard(){};
 
   float getPowerDistributionBoardCurrent();
-  float getLowVoltageNet1Current();
-  float getLowVoltageNet2Current();
+  float getLowVoltageNetCurrent(int netNumber);
   float getHighVoltageNetCurrent();
-    bool getMasterShutdownRequested();
-    bool getLowVoltageNet1Operational();
-    bool getLowVoltageNet2Operational();
+  bool getMasterShutdownRequested();
+  bool getLowVoltageNetOperational(int netNumber);
+  bool getHighVoltageOvercurrentTrigger(int netNumber);
+  bool getEmergencyButtonTriggered();
+  bool getHighVoltageNetOperational(int netNumber);
 
   void setMasterOk(bool isOk);
   void setMasterShutDownAllowed(bool isAllowed);
+  void setLowVoltageNetOnOff(bool on, int netNumber);
+  void setHighVoltageNetOnOff(bool on, int netNumber);
+  void setHighVoltageOvercurrentReset(bool on, int netNumber);
+  void setHighVoltageEmergencySwitchOnOff(bool on);
 
   /** @brief Override comparison operator */
   friend bool operator==(const PowerDistributionBoard& lhs, const PowerDistributionBoard& rhs)

@@ -25,7 +25,8 @@ public:
 
   MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int ecatCycleTime);
 
-  MarchRobot(::std::vector<Joint> jointList, PowerDistributionBoard powerDistributionBoard, ::std::string ifName, int ecatCycleTime);
+  MarchRobot(::std::vector<Joint> jointList, PowerDistributionBoard powerDistributionBoard, ::std::string ifName,
+             int ecatCycleTime);
 
   void startEtherCAT();
 
