@@ -1,13 +1,13 @@
 // Copyright 2019 Project March.
 
-#include "march_pdb_state_controller/march_pdb_state_controller.h"
+#include <march_pdb_state_controller/march_pdb_state_controller.h>
 
 namespace march_pdb_state_controller
 {
 bool MarchPdbStateController::init(march_hardware_interface::MarchPdbStateInterface* hw, ros::NodeHandle& root_nh,
                                    ros::NodeHandle& controller_nh)
 {
-  // get all temperature_sensors from the hardware interface
+  // Get all temperature_sensors from the hardware interface
   const std::vector<std::string>& pdb_state_names = hw->getNames();
   for (unsigned i = 0; i < pdb_state_names.size(); i++)
     ROS_INFO("Got pdb state %s", pdb_state_names[i].c_str());
@@ -61,7 +61,8 @@ void MarchPdbStateController::update(const ros::Time& time, const ros::Duration&
         realtime_pubs_[i]->msg_.header.stamp = time;
 
         // TODO(TIM) Set real message!
-        realtime_pubs_[i]->msg_.variance = *pdb_state_[i].getPdbCurrent();
+        realtime_pubs_[i]->msg_.temperature =
+            pdb_state_[i].getPowerDistributionBoard()->getLowVoltage().getNetCurrent(1);
 
         realtime_pubs_[i]->unlockAndPublish();
       }

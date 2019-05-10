@@ -12,6 +12,7 @@
   <depend>realtime_tools</depend>
   <depend>roscpp</depend>
   <depend>hardware_interface</depend>
+  <depend>march_hardware</depend>
   <depend>march_hardware_interface</depend>
   <depend>pluginlib</depend>
   <depend>controller_interface</depend> 
