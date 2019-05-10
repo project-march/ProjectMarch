@@ -47,7 +47,7 @@ public:
   /** @brief Override stream operator for clean printing */
   friend ::std::ostream& operator<<(std::ostream& os, const NetDriverOffsets& netDriverOffsets)
   {
-    return os << "NetDriverOffsets( lowVoltageNetOnOff: " << netDriverOffsets.lowVoltageNetOnOff << ", "
+    return os << "NetDriverOffsets(lowVoltageNetOnOff: " << netDriverOffsets.lowVoltageNetOnOff << ", "
               << "highVoltageNetOnOff: " << netDriverOffsets.highVoltageNetOnOff << ", "
               << "highVoltageEmergencySwitchOnOff: " << netDriverOffsets.highVoltageEmergencySwitchOnOff << ")";
   }

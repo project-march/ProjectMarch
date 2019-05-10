@@ -47,11 +47,12 @@ public:
   /** @brief Override stream operator for clean printing */
   friend ::std::ostream& operator<<(std::ostream& os, const PowerDistributionBoard& powerDistributionBoard)
   {
-    return os << "PowerDistributionBoard( slaveIndex: " << powerDistributionBoard.slaveIndex << "\n"
-              << powerDistributionBoard.netMonitoringOffsets << "\n"
-              << powerDistributionBoard.netDriverOffsets << "\n"
-              << powerDistributionBoard.lowVoltage << "\n"
-              << powerDistributionBoard.highVoltage << ")";
+    return os << "PowerDistributionBoard(slaveIndex: " << powerDistributionBoard.slaveIndex << ", "
+              << "masterOnlineToggle: " << powerDistributionBoard.masterOnlineToggle << ", "
+              << powerDistributionBoard.netMonitoringOffsets << ", "
+              << powerDistributionBoard.netDriverOffsets << ", "
+              << powerDistributionBoard.highVoltage << ", "
+              << powerDistributionBoard.lowVoltage << ")";
   }
 };
 }  // namespace march4cpp

@@ -61,13 +61,16 @@ add_library(march_hardware
         include/${PROJECT_NAME}/Slave.h
         include/${PROJECT_NAME}/TemperatureGES.h
         include/${PROJECT_NAME}/TemperatureSensor.h
-        include/${PROJECT_NAME}/LowVoltageOffsets.h
+        include/${PROJECT_NAME}/LowVoltage.h
+        include/${PROJECT_NAME}/HighVoltage.h
         include/${PROJECT_NAME}/BootShutdownOffsets.h
         include/${PROJECT_NAME}/PDOmap.h
         src/PowerDistributionBoard.cpp
         src/EtherCAT/EthercatIO.cpp
         src/EtherCAT/EthercatMaster.cpp
         src/EtherCAT/EthercatSDO.cpp
+        src/LowVoltage.cpp
+        src/HighVoltage.cpp
         src/Encoder.cpp
         src/IMotionCube.cpp
         src/Joint.cpp

@@ -36,7 +36,7 @@ public:
   /** @brief Override stream operator for clean printing */
   friend ::std::ostream& operator<<(std::ostream& os, const LowVoltage& lowVoltage)
   {
-    return os << "LowVoltage (slaveIndex: " << lowVoltage.slaveIndex << ")";
+    return os << "LowVoltage(slaveIndex: " << lowVoltage.slaveIndex << ")";
   }
 
 };

@@ -49,7 +49,7 @@ public:
   /** @brief Override stream operator for clean printing */
   friend ::std::ostream& operator<<(std::ostream& os, const BootShutdownOffsets& bootShutdownOffsets)
   {
-    return os << "BootShutdownOffset( masterOk: " << bootShutdownOffsets.masterOk << ", "
+    return os << "BootShutdownOffset(masterOk: " << bootShutdownOffsets.masterOk << ", "
               << "shutdownAllowed: " << bootShutdownOffsets.shutdownAllowed << ", "
               << "shutdown: " << bootShutdownOffsets.shutdown << ")";
   }

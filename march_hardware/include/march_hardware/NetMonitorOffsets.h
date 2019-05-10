@@ -105,7 +105,7 @@ public:
   /** @brief Override stream operator for clean printing */
   friend ::std::ostream& operator<<(std::ostream& os, const NetMonitorOffsets& netMonitorOffsets)
   {
-    return os << "NetMonitorOffsets( powerDistributionBoardCurrent: " << netMonitorOffsets.powerDistributionBoardCurrent
+    return os << "NetMonitorOffsets(powerDistributionBoardCurrent: " << netMonitorOffsets.powerDistributionBoardCurrent
               << ", "
               << "lowVoltageNet1Current: " << netMonitorOffsets.lowVoltageNet1Current << ", "
               << "lowVoltageNet2Current: " << netMonitorOffsets.lowVoltageNet2Current << ", "
