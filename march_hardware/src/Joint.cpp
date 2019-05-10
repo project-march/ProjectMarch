@@ -5,20 +5,23 @@
 
 namespace march4cpp
 {
-Joint::Joint(std::string name, TemperatureGES temperatureGES, IMotionCube iMotionCube)
+Joint::Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES, IMotionCube iMotionCube)
   : temperatureGES(temperatureGES), iMotionCube(iMotionCube)
 {
   this->name = std::move(name);
+  this->allowActuation = allowActuation;
 }
 
-Joint::Joint(std::string name, TemperatureGES temperatureGES) : temperatureGES(temperatureGES)
+Joint::Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES) : temperatureGES(temperatureGES)
 {
   this->name = std::move(name);
+  this->allowActuation = allowActuation;
 }
-Joint::Joint(std::string name, IMotionCube iMotionCube) : iMotionCube(iMotionCube)
+Joint::Joint(std::string name, bool allowActuation, IMotionCube iMotionCube) : iMotionCube(iMotionCube)
 
 {
   this->name = std::move(name);
+  this->allowActuation = allowActuation;
 }
 
 void Joint::initialize(int ecatCycleTime)
@@ -33,8 +36,22 @@ void Joint::initialize(int ecatCycleTime)
   }
 }
 
+void Joint::prepareActuation()
+{
+  if (this->allowActuation)
+  {
+    this->iMotionCube.goToOperationEnabled();
+  }
+  else
+  {
+    ROS_ERROR("Trying to prepare joint %s for actuation while it is not allowed to actuate", this->name.c_str());
+  }
+}
+
 void Joint::actuateRad(float targetPositionRad)
 {
+  ROS_ASSERT_MSG(this->allowActuation, "Joint %s is not allowed to actuate, yet its actuate method has been called.",
+                 this->name.c_str());
   // TODO(BaCo) check that the position is allowed and does not exceed (torque) limits.
   this->iMotionCube.actuateRad(targetPositionRad);
 }
@@ -77,11 +94,6 @@ int Joint::getIMotionCubeSlaveIndex()
   return -1;
 }
 
-IMotionCube Joint::getIMotionCube()
-{
-  return this->iMotionCube;
-}
-
 std::string Joint::getName()
 {
   return this->name;
@@ -95,5 +107,10 @@ bool Joint::hasIMotionCube()
 bool Joint::hasTemperatureGES()
 {
   return this->temperatureGES.getSlaveIndex() != -1;
+}
+
+bool Joint::canActuate()
+{
+  return this->allowActuation;
 }
 }  // namespace march4cpp

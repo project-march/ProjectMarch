@@ -3,9 +3,10 @@ testsetup:
   ecatCycleTime: 4
   joints:
     - test_joint:
-#        temperatureges:
-#          slaveIndex: 1
-#          byteOffset: 0
+        allowActuation: true
+        temperatureges:
+          slaveIndex: 1
+          byteOffset: 0
         imotioncube:
           slaveIndex: 1
           encoder:

@@ -85,9 +85,9 @@ install(TARGETS march_hardware
 # Give sudo access to ethernet port
 add_custom_command(
         TARGET hardware_dummy
-        POST_BUILD
         COMMAND sudo setcap cap_net_raw+ep hardware_dummy
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/../devel/lib/march_hardware
+        WORKING_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}
+        POST_BUILD
 )
 
 ## Add gtest based cpp test target and link libraries

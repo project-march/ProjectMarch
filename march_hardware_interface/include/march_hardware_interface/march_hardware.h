@@ -1,6 +1,7 @@
 #ifndef ROS_CONTROL__MARCH_HARDWARE_H
 #define ROS_CONTROL__MARCH_HARDWARE_H
 
+#include <march_hardware_interface/march_temperature_sensor_interface.h>
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/robot_hw.h>
@@ -24,6 +25,8 @@ protected:
   hardware_interface::VelocityJointInterface velocity_joint_interface_;
   hardware_interface::EffortJointInterface effort_joint_interface_;
 
+  march_hardware_interface::MarchTemperatureSensorInterface march_state_interface;
+
   joint_limits_interface::EffortJointSaturationInterface effort_joint_saturation_interface_;
   joint_limits_interface::EffortJointSoftLimitsInterface effort_joint_limits_interface_;
   joint_limits_interface::PositionJointSaturationInterface position_joint_saturation_interface_;
@@ -46,6 +49,10 @@ protected:
   std::vector<double> joint_position_command_;
   std::vector<double> joint_velocity_command_;
   std::vector<double> joint_effort_command_;
+
+  std::vector<double> joint_temperature_;
+  std::vector<double> joint_temperature_variance_;
+
   std::vector<double> joint_lower_limits_;
   std::vector<double> joint_upper_limits_;
   std::vector<double> joint_effort_limits_;

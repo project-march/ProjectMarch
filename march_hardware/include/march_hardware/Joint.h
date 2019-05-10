@@ -12,16 +12,19 @@ class Joint
 {
 private:
   std::string name;
+  bool allowActuation;
   IMotionCube iMotionCube;
   TemperatureGES temperatureGES;
 
 public:
   // TODO(Tim) pass by reference or pointer instead of making copy
-  Joint(std::string name, TemperatureGES temperatureGES, IMotionCube iMotionCube);
-  Joint(std::string name, TemperatureGES temperatureGES);
-  Joint(std::string name, IMotionCube iMotionCube);
+  Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES, IMotionCube iMotionCube);
+  Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES);
+  Joint(std::string name, bool allowActuation, IMotionCube iMotionCube);
 
   void initialize(int ecatCycleTime);
+  void prepareActuation();
+
   void actuateRad(float targetPositionRad);
 
   float getAngleRad();
@@ -30,15 +33,16 @@ public:
   std::string getName();
   int getTemperatureGESSlaveIndex();
   int getIMotionCubeSlaveIndex();
-  IMotionCube getIMotionCube();
 
   bool hasIMotionCube();
   bool hasTemperatureGES();
+  bool canActuate();
 
   /** @brief Override comparison operator */
   friend bool operator==(const Joint& lhs, const Joint& rhs)
   {
-    return lhs.name == rhs.name && lhs.iMotionCube == rhs.iMotionCube && lhs.temperatureGES == rhs.temperatureGES;
+    return lhs.name == rhs.name && lhs.iMotionCube == rhs.iMotionCube && lhs.temperatureGES == rhs.temperatureGES &&
+           lhs.allowActuation == rhs.allowActuation;
   }
 
   friend bool operator!=(const Joint& lhs, const Joint& rhs)
@@ -49,6 +53,7 @@ public:
   friend ::std::ostream& operator<<(std::ostream& os, const Joint& joint)
   {
     return os << "name: " << joint.name << ", "
+              << "allowActuation: " << joint.allowActuation<< ", "
               << "imotioncube: " << joint.iMotionCube << ","
               << "temperatureges: " << joint.temperatureGES;
   }
