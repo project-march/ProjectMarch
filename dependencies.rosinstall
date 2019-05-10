@@ -11,6 +11,6 @@
     uri: https://github.com/project-march/simulation
     version: develop
 - git:
-      local-name: state-machine
-      uri: https://github.com/project-march/state-machine
-      version: develop
+    local-name: state-machine
+    uri: https://github.com/project-march/state-machine
+    version: develop
