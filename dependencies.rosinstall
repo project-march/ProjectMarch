@@ -11,10 +11,10 @@
     uri: https://github.com/project-march/march-iv
     version: develop
 - git:
-      local-name: state-machine
-      uri: https://github.com/project-march/state-machine
-      version: develop
+    local-name: state-machine
+    uri: https://github.com/project-march/state-machine
+    version: develop
 - git:
-      local-name: pilot-devices
-      uri: https://github.com/project-march/pilot-devices-coordinator
-      version: develop
+    local-name: pilot-devices
+    uri: https://github.com/project-march/pilot-devices-coordinator
+    version: develop
