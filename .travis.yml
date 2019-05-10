@@ -75,4 +75,4 @@ deploy:
   local_dir: /home/travis/catkin_ws/docs/html
   github_token: "$GH_REPO_TOKEN"
   on:
-    branch: refactor/use-catkin-build
+    branch: develop
