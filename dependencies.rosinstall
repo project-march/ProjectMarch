@@ -1,4 +1,17 @@
 - git:
+    local-name: gait-generation
+    uri: https://github.com/project-march/gait-generation
+    version: develop
+- git:
     local-name: march-iv
     uri: https://github.com/project-march/march-iv
     version: develop
+- git:
+    local-name: march-simulation
+    uri: https://github.com/project-march/march-simulation
+    version: develop
+
+- git:
+      local-name: state-machine
+      uri: https://github.com/project-march/state-machine
+      version: develop
