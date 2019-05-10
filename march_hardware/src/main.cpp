@@ -35,6 +35,8 @@ int main(int argc, char** argv)
   BootShutdownOffsets stateOffsets = BootShutdownOffsets(0, 0, 1);
   march4cpp::PowerDistributionBoard pdb =
       march4cpp::PowerDistributionBoard(1, currentOffsets, netDriverOffsets, stateOffsets);
+
+  ROS_INFO_STREAM(pdb);
   march4cpp::MarchRobot march4 = march4cpp::MarchRobot(jointList, pdb, "enp2s0", ecatCycleTime);
   march4.startEtherCAT();
 
@@ -44,34 +46,14 @@ int main(int argc, char** argv)
     return 0;
   }
 
-  //     ros::init(argc, argv, "dummy");
-  //     ros::NodeHandle nh;
-  //     ros::Rate rate(10);
-
-  //  if (march4.getJoint("test_joint").canActuate())
-  //  {
-  //    march4.getJoint("test_joint").prepareActuation();
-  //  }
-
   ROS_INFO("march4 initialized");
 
-  bool flip = true;
-  while (true)
-  {
-    //      ROS_INFO("getPowerDistributionBoardCurrent: %f",
-    //      march4.getPowerDistributionBoard().getPowerDistributionBoardCurrent());
-    //      ROS_INFO("getLowVoltageNet1Current: %f", march4.getPowerDistributionBoard().getLowVoltageNet1Current());
-    //      ROS_INFO("getLowVoltageNet2Current: %f", march4.getPowerDistributionBoard().getLowVoltageNet2Current());
-    //      ROS_INFO("getHighVoltageNetCurrent: %f", march4.getPowerDistributionBoard().getHighVoltageNetCurrent());
+  //      ROS_INFO("1 getLowVoltageNetOperational: %d",
 
-    //      ROS_INFO("1 getLowVoltageNetOperational: %d",
-    //      march4.getPowerDistributionBoard().getHighVoltageNetOperational(3));
+  march4.getPowerDistributionBoard()->setMasterOnline();
+  march4.getPowerDistributionBoard()->getHighVoltage()->getNetOperational(1);
+  march4.getPowerDistributionBoard()->getHighVoltage()->getNetOperational(2);
+  usleep(10000);
 
-    march4.getPowerDistributionBoard()->setMasterOnline();
-    usleep(10000);
-  }
-
-  //  ROS_INFO_STREAM("Angle: " << march4.getJoint("test_joint").getAngleRad());
-
-  //  march4.stopEtherCAT();
+  march4.stopEtherCAT();
 }

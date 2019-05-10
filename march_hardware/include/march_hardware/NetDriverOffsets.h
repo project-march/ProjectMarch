@@ -7,12 +7,9 @@ class NetDriverOffsets
   int lowVoltageNetOnOff;
   int highVoltageNetOnOff;
   int highVoltageEmergencySwitchOnOff;
-  // overcurrent reset is not supported at this moment
-//  int highVoltageOvercurrentReset;
 
 public:
-  NetDriverOffsets(int lowVoltageNetOnOff, int highVoltageNetOnOff,
-                   int highVoltageEmergencySwitchOnOff)
+  NetDriverOffsets(int lowVoltageNetOnOff, int highVoltageNetOnOff, int highVoltageEmergencySwitchOnOff)
     : lowVoltageNetOnOff(lowVoltageNetOnOff)
     , highVoltageNetOnOff(highVoltageNetOnOff)
     , highVoltageEmergencySwitchOnOff(highVoltageEmergencySwitchOnOff)
@@ -38,6 +35,21 @@ public:
   int getHighVoltageEmergencySwitchOnOff() const
   {
     return highVoltageEmergencySwitchOnOff;
+  }
+
+  /** @brief Override comparison operator */
+  friend bool operator==(const NetDriverOffsets& lhs, const NetDriverOffsets& rhs)
+  {
+    return lhs.lowVoltageNetOnOff == rhs.lowVoltageNetOnOff && lhs.highVoltageNetOnOff == rhs.highVoltageNetOnOff &&
+           lhs.highVoltageEmergencySwitchOnOff == rhs.highVoltageEmergencySwitchOnOff;
+  }
+
+  /** @brief Override stream operator for clean printing */
+  friend ::std::ostream& operator<<(std::ostream& os, const NetDriverOffsets& netDriverOffsets)
+  {
+    return os << "NetDriverOffsets( lowVoltageNetOnOff: " << netDriverOffsets.lowVoltageNetOnOff << ", "
+              << "highVoltageNetOnOff: " << netDriverOffsets.highVoltageNetOnOff << ", "
+              << "highVoltageEmergencySwitchOnOff: " << netDriverOffsets.highVoltageEmergencySwitchOnOff << ")";
   }
 };
 

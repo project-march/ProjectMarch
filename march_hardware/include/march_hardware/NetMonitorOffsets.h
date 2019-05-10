@@ -91,22 +91,29 @@ public:
     return lowVoltageState;
   }
 
-  //  @TODO(TIM) Add all attributes:
   /** @brief Override comparison operator */
   friend bool operator==(const NetMonitorOffsets& lhs, const NetMonitorOffsets& rhs)
   {
     return lhs.powerDistributionBoardCurrent == rhs.powerDistributionBoardCurrent &&
            lhs.lowVoltageNet1Current == rhs.lowVoltageNet1Current &&
            lhs.lowVoltageNet2Current == rhs.lowVoltageNet2Current &&
-           lhs.highVoltageNetCurrent == rhs.highVoltageNetCurrent;
+           lhs.highVoltageNetCurrent == rhs.highVoltageNetCurrent && lhs.lowVoltageState == rhs.lowVoltageState &&
+           lhs.highVoltageOvercurrentTrigger == rhs.highVoltageOvercurrentTrigger &&
+           lhs.emergencyButtonTriggered == rhs.emergencyButtonTriggered && lhs.highVoltageState == rhs.highVoltageState;
   }
+
   /** @brief Override stream operator for clean printing */
-  friend ::std::ostream& operator<<(std::ostream& os, const NetMonitorOffsets& currentOffsets)
+  friend ::std::ostream& operator<<(std::ostream& os, const NetMonitorOffsets& netMonitorOffsets)
   {
-    return os << "powerDistributionBoardCurrent: " << currentOffsets.powerDistributionBoardCurrent << ", "
-              << "lowVoltageNet1Current: " << currentOffsets.lowVoltageNet1Current << ", "
-              << "lowVoltageNet2Current: " << currentOffsets.lowVoltageNet2Current << ", "
-              << "highVoltageNetCurrent: " << currentOffsets.highVoltageNetCurrent;
+    return os << "NetMonitorOffsets( powerDistributionBoardCurrent: " << netMonitorOffsets.powerDistributionBoardCurrent
+              << ", "
+              << "lowVoltageNet1Current: " << netMonitorOffsets.lowVoltageNet1Current << ", "
+              << "lowVoltageNet2Current: " << netMonitorOffsets.lowVoltageNet2Current << ", "
+              << "highVoltageNetCurrent: " << netMonitorOffsets.highVoltageNetCurrent << ", "
+              << "lowVoltageState: " << netMonitorOffsets.lowVoltageState << ", "
+              << "highVoltageOvercurrentTrigger: " << netMonitorOffsets.highVoltageOvercurrentTrigger << ", "
+              << "emergencyButtonTriggered: " << netMonitorOffsets.emergencyButtonTriggered << ", "
+              << "highVoltageState: " << netMonitorOffsets.highVoltageState << ")";
   }
 };
 

@@ -5,39 +5,55 @@
 class BootShutdownOffsets
 {
     //TODO(TIM) remove Offset part!
-  int masterOkByteOffset;
-  int shutdownByteOffset;
-  int shutdownAllowedByteOffset;
+  int masterOk;
+  int shutdown;
+  int shutdownAllowed;
 
 public:
   BootShutdownOffsets(int masterOkByteOffset, int shutdownByteOffset, int shutdownAllowedByteOffset)
-    : masterOkByteOffset(masterOkByteOffset)
-    , shutdownByteOffset(shutdownByteOffset)
-    , shutdownAllowedByteOffset(shutdownAllowedByteOffset)
+    : masterOk(masterOkByteOffset)
+    , shutdown(shutdownByteOffset)
+    , shutdownAllowed(shutdownAllowedByteOffset)
   {
   }
 
   BootShutdownOffsets()
   {
-    masterOkByteOffset = -1;
-    shutdownByteOffset = -1;
-    shutdownAllowedByteOffset = -1;
+    masterOk = -1;
+    shutdown = -1;
+    shutdownAllowed = -1;
   }
 
   int getMasterOkByteOffset() const
   {
-    return masterOkByteOffset;
+    return masterOk;
   }
 
   int getShutdownByteOffset() const
   {
-    return shutdownByteOffset;
+    return shutdown;
   }
 
   int getShutdownAllowedByteOffset() const
   {
-    return shutdownAllowedByteOffset;
+    return shutdownAllowed;
   }
+
+  /** @brief Override comparison operator */
+  friend bool operator==(const BootShutdownOffsets& lhs, const BootShutdownOffsets& rhs)
+  {
+    return lhs.masterOk == rhs.masterOk && lhs.shutdown == rhs.shutdown &&
+        lhs.shutdownAllowed == rhs.shutdownAllowed;
+  }
+
+  /** @brief Override stream operator for clean printing */
+  friend ::std::ostream& operator<<(std::ostream& os, const BootShutdownOffsets& bootShutdownOffsets)
+  {
+    return os << "BootShutdownOffset( masterOk: " << bootShutdownOffsets.masterOk << ", "
+              << "shutdownAllowed: " << bootShutdownOffsets.shutdownAllowed << ", "
+              << "shutdown: " << bootShutdownOffsets.shutdown << ")";
+  }
+
 };
 
 #endif  //MARCH_IV_BOOTSHUTDOWNOFFSETS_H

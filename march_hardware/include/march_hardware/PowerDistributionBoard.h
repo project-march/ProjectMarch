@@ -7,6 +7,9 @@
 #include <march_hardware/BootShutdownOffsets.h>
 #include <march_hardware/NetMonitorOffsets.h>
 #include <march_hardware/NetDriverOffsets.h>
+#include <march_hardware/HighVoltage.h>
+#include <march_hardware/LowVoltage.h>
+#include <march_hardware/EtherCAT/EthercatIO.h>
 
 namespace march4cpp
 {
@@ -16,10 +19,9 @@ private:
   NetMonitorOffsets netMonitoringOffsets;
   NetDriverOffsets netDriverOffsets;
   BootShutdownOffsets bootShutdownOffsets;
+  HighVoltage highVoltage;
+  LowVoltage lowVoltage;
   bool masterOnlineToggle;
-
-  uint8 getLowVoltageNetsOperational();
-  uint8 getHighVoltageNetsOperational();
 
 public:
   PowerDistributionBoard(int slaveIndex, NetMonitorOffsets netMonitoringOffsets, NetDriverOffsets netDriverOffsets,
@@ -28,30 +30,28 @@ public:
   PowerDistributionBoard() = default;
 
   float getPowerDistributionBoardCurrent();
-  float getLowVoltageNetCurrent(int netNumber);
-  float getHighVoltageNetCurrent();
   bool getMasterShutdownRequested();
-  bool getLowVoltageNetOperational(int netNumber);
-  bool getHighVoltageOvercurrentTrigger(int netNumber);
-  bool getEmergencyButtonTriggered();
-  bool getHighVoltageNetOperational(int netNumber);
-
   void setMasterOnline();
   void setMasterShutDownAllowed(bool isAllowed);
-  void setLowVoltageNetOnOff(bool on, int netNumber);
-  void setHighVoltageNetOnOff(bool on, int netNumber);
-  void setHighVoltageEmergencySwitchOnOff(bool on);
+
+  HighVoltage* getHighVoltage();
+  LowVoltage* getLowVoltage();
 
   /** @brief Override comparison operator */
   friend bool operator==(const PowerDistributionBoard& lhs, const PowerDistributionBoard& rhs)
   {
-    return lhs.slaveIndex == rhs.slaveIndex && lhs.netMonitoringOffsets == rhs.netMonitoringOffsets;
+    return lhs.slaveIndex == rhs.slaveIndex && lhs.netMonitoringOffsets == rhs.netMonitoringOffsets &&
+           lhs.netDriverOffsets == rhs.netDriverOffsets && lhs.lowVoltage == rhs.lowVoltage &&
+           lhs.highVoltage == rhs.highVoltage;
   }
   /** @brief Override stream operator for clean printing */
   friend ::std::ostream& operator<<(std::ostream& os, const PowerDistributionBoard& powerDistributionBoard)
   {
-    return os << "slaveIndex: " << powerDistributionBoard.slaveIndex << ", "
-              << "netMonitoringOffsets: (" << powerDistributionBoard.netMonitoringOffsets << ") ";
+    return os << "PowerDistributionBoard( slaveIndex: " << powerDistributionBoard.slaveIndex << "\n"
+              << powerDistributionBoard.netMonitoringOffsets << "\n"
+              << powerDistributionBoard.netDriverOffsets << "\n"
+              << powerDistributionBoard.lowVoltage << "\n"
+              << powerDistributionBoard.highVoltage << ")";
   }
 };
 }  // namespace march4cpp
