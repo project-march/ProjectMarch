@@ -139,7 +139,7 @@ void MarchHardwareInterface::update(const ros::TimerEvent& e)
   write(elapsed_time_);
 }
 
-void MarchHardwareInterface::read(ros::Duration elapsed_time = ros::Duration(0.01))
+void MarchHardwareInterface::read(ros::Duration elapsed_time)
 {
   for (int i = 0; i < num_joints_; i++)
   {

@@ -50,7 +50,7 @@ public:
   /**
    * @brief Read actual postion from the hardware.
    */
-  void read(ros::Duration elapsed_time);
+  void read(ros::Duration elapsed_time = ros::Duration(0.01));
 
   /**
    * @brief Write position commands to the hardware.
