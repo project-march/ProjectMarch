@@ -6,8 +6,7 @@ cache:
 - apt
 notifications:
   slack:
-    secure: n8eup/26IVzzxg8wP55EL4wJvkEOAYMEt/ByltUtOAnrp+NipZiNPIheY062mXYRnc7iKI/7X7WVkSCcIlggalT06q1SoC1FBJn061oLz+s8eoXzUJhX08FCv3ZRVmNnbS45TCq9Xo3Oq+M/siPxeCwej8dOv61aqJJuLLsyRQpFPIyV5tw07ElZKWAMrzd4dIwzIiKJm0MaIyTpPcKKURX3wMzHSffgih+dm0wyNjtpL7jHpCvGTo7JAqQgDmMNoOWUquQw3cozbMEOWsl/4sU1U5716Dvnr8Ug9gqdehbYdwkq/6xDlsEGV/jUOy8810GCRADrR23FLm+He63PuWO2EUnwO4bHCqYRfQ+65qkRu1T29j63Z72sYx7lkQO4UVjad36M3mT7ipg86QzsC1ianXDD7mQC/XAw4INncrp1uBoROHiTUda3ri3JpmQTNcElmesfVnJnVrXXIwwxXchOptyTLDF+LaecQC5pKmQqK/NyWzestCWR/F8Yw8gp+AlVfV19dvnYScmxew+Y0wo855A7Sn/11MtdDzEdeTFXc35JvhFyT4sbi0AHpoZOatt+8/WfT2Lu9eoAnNjjYlNK7//OssZpF6uo+Mhw0isSnuJQpM9TNkrR1J9B+8IGvq7n2fKtkuh2tu5JgkeodRfMIj9sp2KvueQAl5sYkrI=
-
+    secure: I7/Kqj/ZiaoW9bZzlDFYU2aFv1J3R0z5+6kDf9TI8AHsN9K/GYs05kG8gfpORmaBobF22AwpB/I5o8ga5nJGAP25SgX8bcP3jJaKUyfMxXj3ThkfINTMKeLhZqzh5c3ppBwHy62vdSDry4fyuIhtaWOa+8GqmI3D37/0yzFCPQLLYnSXoF5EKSFkKPytfVdwbOKE/uSgPbAy0xsPUKLEGdIhvFjyDzfj5KIHcYWFu9eus0GpuCJVJE/nGTz7PrQ9Rhuh3eVeJNn5CEXo+0Lgn8lghUY0xRH/0xn+mhjYZnxTNO18YRoiF8lUB+/phQx2E3GiDrtPd7BjtluKGIkgFMZM/dyzHN7lSeCJZ0nDhOuALNwdbhS8Hw18q5a6SanT4Kegno8ebDNwsEyHuiHy6D3XNE2PHIZ5SbSgX9MOaLBtarcHccAR19T+96mWJANS6rIKnhe0zW9+Jxl99mTCgcNjTmcm2YG5Axm8xOBmoK920I4ke1wfb9QLeMIOnQ/JM6DxkMbQGtoN49ztrg4cv+JwUOUnEn/yiLsz+p8EdaFiRLfAbww9VJ+1geDdGifv+TRq72RpTzGnNveNnRRysxBjfei3EwwoZqUFhZyVWQWqHuwSa8xFpxS3FMmDzP16oMAB/TuMV03MBTqNK/JDSMXq54Bs1pmtPJ4kvfGiKKo=
 addons:
   apt:
     packages:
@@ -68,11 +67,10 @@ script:
 - src/hardware-interface/build.sh
 - src/hardware-interface/doc.sh
 - pwd
-
 deploy:
   provider: pages
   skip_cleanup: true
-  local_dir: /home/travis/catkin_ws/docs/html
+  local_dir: "/home/travis/catkin_ws/docs/html"
   github_token: "$GH_REPO_TOKEN"
   on:
     branch: develop
