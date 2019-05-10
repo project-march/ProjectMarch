@@ -1,6 +1,0 @@
-00B447A8 sensor_1
-00B447AB sensor_2
-00B447AD sensor_3
-00B4479E sensor_4
-00B447BA sensor_5
-00B4484E sensor_6
