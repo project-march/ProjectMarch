@@ -115,7 +115,7 @@ void MarchHardwareInterface::init()
     march_temperature_interface.registerHandle(marchTemperatureSensorHandle);
 
     // Create march_pdb_state interface
-    MarchPdbStateHandle marchPdbStateHandle(&power_distribution_board_);
+    MarchPdbStateHandle marchPdbStateHandle("PDB handle", &power_distribution_board_);
     march_pdb_interface.registerHandle(marchPdbStateHandle);
 
     // Enable high voltage on the IMC

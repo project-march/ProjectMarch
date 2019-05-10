@@ -14,17 +14,23 @@ class MarchPdbStateHandle
 public:
   MarchPdbStateHandle(
       /// Pointers to the storage location
-      const march4cpp::PowerDistributionBoard* powerDistributionBoard)
-    : powerDistributionBoard_(powerDistributionBoard)
+      const std::string& name, const march4cpp::PowerDistributionBoard* powerDistributionBoard)
+    : name_(name), powerDistributionBoard_(powerDistributionBoard)
   {
   }
 
-  march4cpp::PowerDistributionBoard * getPowerDistributionBoard()
+  std::string getName() const
   {
-    return const_cast<march4cpp::PowerDistributionBoard *>(powerDistributionBoard_);
+    return name_;
+  }
+
+  march4cpp::PowerDistributionBoard* getPowerDistributionBoard()
+  {
+    return const_cast<march4cpp::PowerDistributionBoard*>(powerDistributionBoard_);
   }
 
 private:
+  std::string name_;
   const march4cpp::PowerDistributionBoard* powerDistributionBoard_;
 };
 
