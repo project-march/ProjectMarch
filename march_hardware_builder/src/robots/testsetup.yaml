@@ -8,7 +8,7 @@ testsetup:
           slaveIndex: 1
           byteOffset: 0
         imotioncube:
-          slaveIndex: 1
+          slaveIndex: 2
           encoder:
             resolution: 16
             minPositionIU: 37961
