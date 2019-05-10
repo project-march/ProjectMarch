@@ -4,6 +4,7 @@
 #define HARDWARE_INTERFACE_MARCH_PDB_STATE_INTERFACE_H
 
 #include <hardware_interface/internal/hardware_resource_manager.h>
+#include <march_hardware/PowerDistributionBoard.h>
 #include <string>
 
 namespace march_hardware_interface
@@ -12,28 +13,19 @@ class MarchPdbStateHandle
 {
 public:
   MarchPdbStateHandle(
-      const std::string& name,      ///< The name of joint
-      const double* pdb_current    ///< A pointer to the storage of the pdb current value in ??.
-      )
-    : name_(name)
-    , pdb_current_(pdb_current)
+      /// Pointers to the storage location
+      const march4cpp::PowerDistributionBoard* powerDistributionBoard)
+    : powerDistributionBoard_(powerDistributionBoard)
   {
   }
 
-  std::string getName() const
+  march4cpp::PowerDistributionBoard * getPowerDistributionBoard()
   {
-    return name_;
-  }
-
-  const double* getPdbCurrent() const
-  {
-    return pdb_current_;
+    return const_cast<march4cpp::PowerDistributionBoard *>(powerDistributionBoard_);
   }
 
 private:
-  std::string name_;
-
-  const double* pdb_current_;
+  const march4cpp::PowerDistributionBoard* powerDistributionBoard_;
 };
 
 class MarchPdbStateInterface : public hardware_interface::HardwareResourceManager<MarchPdbStateHandle>
