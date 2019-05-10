@@ -17,15 +17,15 @@ private:
   NetMonitorOffsets netMonitoringOffsets;
   NetDriverOffsets netDriverOffsets;
 
-  uint8 getLowVoltageNetsOperational();
+  uint8 getNetsOperational();
 
 public:
   LowVoltage(int slaveIndex, NetMonitorOffsets netMonitoringOffsets, NetDriverOffsets netDriverOffsets);
   LowVoltage();
 
-  float getLowVoltageNetCurrent(int netNumber);
-  bool getLowVoltageNetOperational(int netNumber);
-  void setLowVoltageNetOnOff(bool on, int netNumber);
+  float getNetCurrent(int netNumber);
+  bool getNetOperational(int netNumber);
+  void setNetOnOff(bool on, int netNumber);
 
   /** @brief Override comparison operator */
   friend bool operator==(const LowVoltage& lhs, const LowVoltage& rhs)

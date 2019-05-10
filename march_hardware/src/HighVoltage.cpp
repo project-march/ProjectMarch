@@ -46,7 +46,7 @@ bool HighVoltage::getOvercurrentTrigger(int netNumber)
   return ((overcurrent.ui >> (netNumber - 1)) & 1);
 }
 
-bool HighVoltage::getEmergencyButtonTriggered()
+bool HighVoltage::getEmergencyButtonTrigger()
 {
   union bit8 emergencyButtonTriggered =
       get_input_bit8(static_cast<uint16>(this->slaveIndex),
@@ -89,12 +89,12 @@ void HighVoltage::setHighVoltageNetOnOff(bool on, int netNumber)
 
 void HighVoltage::setHighVoltageEmergencySwitchOnOff(bool on)
 {
-  if (on && getEmergencyButtonTriggered())
+  if (on && getEmergencyButtonTrigger())
   {
     ROS_WARN("Emergency switch already activated");
     return;
   }
-  else if (!on && !getEmergencyButtonTriggered())
+  else if (!on && !getEmergencyButtonTrigger())
   {
     ROS_WARN("Emergency switch already deactivated");
     return;

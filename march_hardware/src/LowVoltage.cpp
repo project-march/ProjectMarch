@@ -13,7 +13,7 @@ LowVoltage::LowVoltage()
   slaveIndex = -1;
 }
 
-float LowVoltage::getLowVoltageNetCurrent(int netNumber)
+float LowVoltage::getNetCurrent(int netNumber)
 {
   union bit32 current =
       get_input_bit32(static_cast<uint16>(this->slaveIndex),
@@ -21,7 +21,7 @@ float LowVoltage::getLowVoltageNetCurrent(int netNumber)
   return current.f;
 }
 
-bool LowVoltage::getLowVoltageNetOperational(int netNumber)
+bool LowVoltage::getNetOperational(int netNumber)
 {
   if (netNumber < 1 || netNumber > 2)
   {
@@ -35,7 +35,7 @@ bool LowVoltage::getLowVoltageNetOperational(int netNumber)
   return ((operational.ui >> (netNumber - 1)) & 1);
 }
 
-void LowVoltage::setLowVoltageNetOnOff(bool on, int netNumber)
+void LowVoltage::setNetOnOff(bool on, int netNumber)
 {
   if (netNumber == 1)
   {
@@ -47,18 +47,18 @@ void LowVoltage::setLowVoltageNetOnOff(bool on, int netNumber)
     ROS_FATAL("Can't turn low voltage net %d on or off, there are only 2 low voltage nets", netNumber);
     throw std::exception();
   }
-  if (on && getLowVoltageNetOperational(netNumber))
+  if (on && getNetOperational(netNumber))
   {
     ROS_WARN("Low voltage net %d is already on", netNumber);
     return;
   }
-  else if (!on && !getLowVoltageNetOperational(netNumber))
+  else if (!on && !getNetOperational(netNumber))
   {
     ROS_WARN("Low voltage net %d is already off", netNumber);
     return;
   }
 
-  uint8 currentStateLowVoltageNets = getLowVoltageNetsOperational();
+  uint8 currentStateLowVoltageNets = getNetsOperational();
   bit8 lowVoltageNets;
   lowVoltageNets.ui = 1 << (netNumber - 1);
   if (on)
@@ -77,7 +77,7 @@ void LowVoltage::setLowVoltageNetOnOff(bool on, int netNumber)
                   static_cast<uint8>(this->netDriverOffsets.getLowVoltageNetOnOff()), lowVoltageNets);
 }
 
-uint8 LowVoltage::getLowVoltageNetsOperational()
+uint8 LowVoltage::getNetsOperational()
 {
   union bit8 operational = get_input_bit8(static_cast<uint16>(this->slaveIndex),
                                           static_cast<uint8>(this->netMonitoringOffsets.getLowVoltageState()));

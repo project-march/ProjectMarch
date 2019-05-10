@@ -51,8 +51,20 @@ int main(int argc, char** argv)
   //      ROS_INFO("1 getLowVoltageNetOperational: %d",
 
   march4.getPowerDistributionBoard()->setMasterOnline();
-  march4.getPowerDistributionBoard()->getHighVoltage()->getNetOperational(1);
-  march4.getPowerDistributionBoard()->getHighVoltage()->getNetOperational(2);
+
+
+  // All gets:
+  march4.getPowerDistributionBoard()->getHighVoltage().getNetOperational(1); // 1-8
+  march4.getPowerDistributionBoard()->getHighVoltage().getOvercurrentTrigger(1); // 1-8
+  march4.getPowerDistributionBoard()->getHighVoltage().getNetCurrent();
+  march4.getPowerDistributionBoard()->getHighVoltage().getEmergencyButtonTrigger();
+
+  march4.getPowerDistributionBoard()->getLowVoltage().getNetOperational(1); // 1-2
+  march4.getPowerDistributionBoard()->getLowVoltage().getNetCurrent(1); // 1-2
+
+  march4.getPowerDistributionBoard()->getPowerDistributionBoardCurrent();
+  march4.getPowerDistributionBoard()->getMasterShutdownRequested();
+
   usleep(10000);
 
   march4.stopEtherCAT();

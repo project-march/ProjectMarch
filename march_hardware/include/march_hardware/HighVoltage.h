@@ -26,7 +26,7 @@ public:
   float getNetCurrent();
   bool getNetOperational(int netNumber);
   bool getOvercurrentTrigger(int netNumber);
-  bool getEmergencyButtonTriggered();
+  bool getEmergencyButtonTrigger();
   void setHighVoltageNetOnOff(bool on, int netNumber);
   void setHighVoltageEmergencySwitchOnOff(bool on);
 

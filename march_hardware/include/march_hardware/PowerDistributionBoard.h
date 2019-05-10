@@ -34,8 +34,8 @@ public:
   void setMasterOnline();
   void setMasterShutDownAllowed(bool isAllowed);
 
-  HighVoltage* getHighVoltage();
-  LowVoltage* getLowVoltage();
+  HighVoltage getHighVoltage();
+  LowVoltage getLowVoltage();
 
   /** @brief Override comparison operator */
   friend bool operator==(const PowerDistributionBoard& lhs, const PowerDistributionBoard& rhs)

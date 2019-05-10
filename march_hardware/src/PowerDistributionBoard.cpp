@@ -50,14 +50,15 @@ bool PowerDistributionBoard::getMasterShutdownRequested()
 }
 
 
-HighVoltage* PowerDistributionBoard::getHighVoltage()
+HighVoltage PowerDistributionBoard::getHighVoltage()
 {
-  return &highVoltage;
+  return highVoltage;
 }
 
-LowVoltage* PowerDistributionBoard::getLowVoltage()
+LowVoltage PowerDistributionBoard::getLowVoltage()
 {
-  return &lowVoltage;
+  return lowVoltage;
 }
+
 
 }  // namespace march4cpp
