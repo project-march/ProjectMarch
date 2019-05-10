@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-packages="march_fake_sensor_data march_simulation"
+# @TODO(Isha) add documentation for march_simulation
+
+packages="march_fake_sensor_data"
 
 mkdir -p docs/html
 for package in $packages; do
