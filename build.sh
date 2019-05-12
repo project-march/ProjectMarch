@@ -24,7 +24,7 @@ catkin lint -W2 --pkg march_fake_sensor_data || build_failed "Catkin lint failed
 catkin lint -W2 --pkg march_simulation || build_failed "Catkin lint failed in march_simulation"
 
 # Roslint
-catkin build --no-deps --verbose march_fake_sensor_date --no-notify --catkin-make-args roslint || build_failed "Roslint failed in march_fake_sensor_date"
+catkin build --no-deps --verbose march_fake_sensor_data --no-notify --catkin-make-args roslint || build_failed "Roslint failed in march_fake_sensor_data"
 catkin build --no-deps --verbose march_simulation --no-notify --catkin-make-args roslint || build_failed "Roslint failed in march_simulation"
 
 # Run all tests in the workspace, including roslaunch-checks if they exist
