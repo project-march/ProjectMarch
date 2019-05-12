@@ -20,7 +20,7 @@ catkin build --summarize  --no-notify|| build_failed "Could not build workspace"
 source devel/setup.bash
 
 # Catkin lint
-catkin lint -W2 --pkg march_fake_sensor_date || build_failed "Catkin lint failed in march_fake_sensor_date"
+catkin lint -W2 --pkg march_fake_sensor_data || build_failed "Catkin lint failed in march_fake_sensor_data"
 catkin lint -W2 --pkg march_simulation || build_failed "Catkin lint failed in march_simulation"
 
 # Roslint
