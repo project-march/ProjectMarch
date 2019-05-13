@@ -6,7 +6,7 @@ import yaml
 from UserInterfaceController import notify
 import GaitFactory
 from march_rqt_gait_generator.msg import MarchGait
-
+from rospy_message_converter import message_converter
 
 def export_to_file(gait, gait_directory):
 
@@ -42,5 +42,6 @@ def export_to_file(gait, gait_directory):
 
 
 def import_from_file_name(robot, file_name):
-    march_gait = yaml.load(open(file_name))
+    march_gait_yaml = yaml.load(open(file_name))
+    march_gait = message_converter.convert_dictionary_to_ros_message('march_shared_resources/Subgait', march_gait_yaml)
     return GaitFactory.from_msg(robot, march_gait)

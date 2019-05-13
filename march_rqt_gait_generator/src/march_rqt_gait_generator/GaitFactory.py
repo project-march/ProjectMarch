@@ -6,8 +6,6 @@ from model.Joint import Joint
 from model.Limits import Limits
 from model.Setpoint import Setpoint
 
-from bunch import bunchify
-
 
 def empty_gait(robot, duration):
     if robot is None:
@@ -42,7 +40,6 @@ def from_msg(robot, march_gait):
     if robot is None:
         rospy.logerr("Cannot create gait without a loaded robot.")
 
-    march_gait = bunchify(march_gait)
     actual_setpoints = march_gait.actual_setpoints
     joint_trajectory = march_gait.joint_trajectory
 
