@@ -23,9 +23,8 @@ source devel/setup.bash
 catkin lint -W2 --pkg march_fake_sensor_data || build_failed "Catkin lint failed in march_fake_sensor_data"
 catkin lint -W2 --pkg march_simulation || build_failed "Catkin lint failed in march_simulation"
 
-# Roslint
+# Roslint, skip the march_simulation package as it does not and should not contain any code.
 catkin build --no-deps --verbose march_fake_sensor_data --no-notify --catkin-make-args roslint || build_failed "Roslint failed in march_fake_sensor_data"
-catkin build --no-deps --verbose march_simulation --no-notify --catkin-make-args roslint || build_failed "Roslint failed in march_simulation"
 
 # Run all tests in the workspace, including roslaunch-checks if they exist
 catkin build --summarize --catkin-make-args run_tests && catkin_test_results build/ --verbose || build_failed "Tests failed"
