@@ -54,7 +54,7 @@ bool HighVoltage::getEmergencyButtonTrigger()
   return emergencyButtonTriggered.ui;
 }
 
-void HighVoltage::setHighVoltageNetOnOff(bool on, int netNumber)
+void HighVoltage::setNetOnOff(bool on, int netNumber)
 {
   if (netNumber < 1 || netNumber > 8)
   {
@@ -70,7 +70,7 @@ void HighVoltage::setHighVoltageNetOnOff(bool on, int netNumber)
   {
     ROS_WARN("High voltage net %d is already on", netNumber);
   }
-  uint8 currentStateHighVoltageNets = getHighVoltageNetsOperational();
+  uint8 currentStateHighVoltageNets = getNetsOperational();
   bit8 highVoltageNets;
   highVoltageNets.ui = 1 << (netNumber - 1);
   if (on)
@@ -87,7 +87,7 @@ void HighVoltage::setHighVoltageNetOnOff(bool on, int netNumber)
                   static_cast<uint8>(this->netDriverOffsets.getHighVoltageNetOnOff()), highVoltageNets);
 }
 
-void HighVoltage::setHighVoltageEmergencySwitchOnOff(bool on)
+void HighVoltage::setEmergencySwitchOnOff(bool on)
 {
   if (on && getEmergencyButtonTrigger())
   {
@@ -114,7 +114,7 @@ void HighVoltage::setHighVoltageEmergencySwitchOnOff(bool on)
                   static_cast<uint8>(this->netDriverOffsets.getHighVoltageEmergencySwitchOnOff()), isOn);
 }
 
-uint8 HighVoltage::getHighVoltageNetsOperational()
+uint8 HighVoltage::getNetsOperational()
 {
   union bit8 operational = get_input_bit8(static_cast<uint16>(this->slaveIndex),
                                           static_cast<uint8>(this->netMonitoringOffsets.getHighVoltageState()));

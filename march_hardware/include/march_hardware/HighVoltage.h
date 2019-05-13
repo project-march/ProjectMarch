@@ -17,7 +17,7 @@ private:
   NetMonitorOffsets netMonitoringOffsets;
   NetDriverOffsets netDriverOffsets;
 
-  uint8 getHighVoltageNetsOperational();
+  uint8 getNetsOperational();
 
 public:
   HighVoltage(int slaveIndex, NetMonitorOffsets netMonitoringOffsets, NetDriverOffsets netDriverOffsets);
@@ -27,8 +27,8 @@ public:
   bool getNetOperational(int netNumber);
   bool getOvercurrentTrigger(int netNumber);
   bool getEmergencyButtonTrigger();
-  void setHighVoltageNetOnOff(bool on, int netNumber);
-  void setHighVoltageEmergencySwitchOnOff(bool on);
+  void setNetOnOff(bool on, int netNumber);
+  void setEmergencySwitchOnOff(bool on);
 
   /** @brief Override comparison operator */
   friend bool operator==(const HighVoltage& lhs, const HighVoltage& rhs)
