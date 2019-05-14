@@ -6,6 +6,8 @@
 #include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <string>
+#include <ros/ros.h>
+#include <std_msgs/Bool.h>
 
 #include <boost/shared_ptr.hpp>
 #include <controller_interface/controller.h>
@@ -27,6 +29,7 @@ public:
   virtual void starting(const ros::Time &time);
   virtual void update(const ros::Time &time, const ros::Duration & /*period*/);
   virtual void stopping(const ros::Time & /*time*/);
+
 
 private:
   std::vector<march_hardware_interface::MarchPdbStateHandle> pdb_state_;

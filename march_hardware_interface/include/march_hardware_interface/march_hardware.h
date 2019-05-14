@@ -59,6 +59,7 @@ protected:
 
   march4cpp::PowerDistributionBoard power_distribution_board_read_;
   bool master_shutdown_allowed_command;
+  bool trigger_emergency_switch_command;
 
   std::vector<double> joint_temperature_;
   std::vector<double> joint_temperature_variance_;

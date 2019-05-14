@@ -3,6 +3,14 @@
 #include <march_pdb_state_controller/march_pdb_state_controller.h>
 
 namespace march_pdb_state_controller {
+
+bool master_shutdown_allowed_command_;
+bool trigger_emergency_switch_command_;
+
+void emergencySwitchCallback(const std_msgs::Bool::ConstPtr &msg) {
+  trigger_emergency_switch_command_ = msg->data;
+}
+
 bool MarchPdbStateController::init(
     march_hardware_interface::MarchPdbStateInterface *hw,
     ros::NodeHandle &root_nh, ros::NodeHandle &controller_nh) {
@@ -33,6 +41,12 @@ bool MarchPdbStateController::init(
 
   // Last published times
   last_publish_times_.resize(pdb_state_names.size());
+
+  ros::Subscriber sub = root_nh.subscribe(
+      "march/power_distribution_board/emergency_switch_triggered", 1000,
+      emergencySwitchCallback);
+
+  // @TODO(TIM) subscribe to topics such as trigger emergency
   return true;
 }
 
@@ -92,10 +106,11 @@ void MarchPdbStateController::update(const ros::Time &time,
         // populate message
         //        realtime_pubs_[i]->msg_.head.stamp = time;
 
-        ROS_INFO_THROTTLE(10, "header created");
-        // TODO(TIM) Set real message!
         march4cpp::PowerDistributionBoard *pBoard =
             pdb_state_[i].getPowerDistributionBoard();
+        pdb_state_[i].setMasterShutdownAllowed(
+            master_shutdown_allowed_command_);
+        pdb_state_[i].triggerEmergencySwitch(trigger_emergency_switch_command_);
         realtime_pubs_[i]->msg_.low_voltage =
             createPowerNetMessage(pBoard->getLowVoltage());
         realtime_pubs_[i]->msg_.high_voltage =
@@ -104,11 +119,7 @@ void MarchPdbStateController::update(const ros::Time &time,
             pBoard->getMasterShutdownRequested();
         realtime_pubs_[i]->msg_.power_distribution_board_current =
             pBoard->getPowerDistributionBoardCurrent();
-        ROS_INFO_THROTTLE(10, "netCurrent set");
         realtime_pubs_[i]->unlockAndPublish();
-        ROS_INFO_THROTTLE(10, "unlockAndPublish");
-
-
       }
     }
   }

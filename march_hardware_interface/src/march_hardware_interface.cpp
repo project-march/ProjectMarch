@@ -121,12 +121,13 @@ void MarchHardwareInterface::init() {
 
     // Enable high voltage on the IMC
     if (joint.canActuate()) {
+      power_distribution_board_read_.getHighVoltage().setNetOnOff(true, joint.getNetNumber());
       joint.prepareActuation();
     }
   }
   // Create march_pdb_state interface
   MarchPdbStateHandle marchPdbStateHandle("PDBhandle",
-                                          &power_distribution_board_read_);
+                                          &power_distribution_board_read_, &master_shutdown_allowed_command, &trigger_emergency_switch_command);
   march_pdb_interface.registerHandle(marchPdbStateHandle);
 
   registerInterface(&march_temperature_interface);
@@ -172,7 +173,8 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time) {
 
   if (marchRobot.getPowerDistributionBoard()->getSlaveIndex() != -1) {
       marchRobot.getPowerDistributionBoard()->setMasterOnline();
-      marchRobot.getPowerDistributionBoard()->setMasterShutDownAllowed(master_shutdown_allowed_command);
+    marchRobot.getPowerDistributionBoard()->setMasterShutDownAllowed(master_shutdown_allowed_command);
+    marchRobot.getPowerDistributionBoard()->getHighVoltage().setEmergencySwitchOnOff(trigger_emergency_switch_command);
   }
 }
 } // namespace march_hardware_interface
