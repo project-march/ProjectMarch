@@ -126,7 +126,7 @@ void MarchHardwareInterface::init() {
   }
   // Create march_pdb_state interface
   MarchPdbStateHandle marchPdbStateHandle("PDBhandle",
-                                          &power_distribution_board_);
+                                          &power_distribution_board_read_);
   march_pdb_interface.registerHandle(marchPdbStateHandle);
 
   registerInterface(&march_temperature_interface);
@@ -153,7 +153,7 @@ void MarchHardwareInterface::read() {
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(),
               joint_position_[i]);
   }
-  power_distribution_board_ = *marchRobot.getPowerDistributionBoard();
+  power_distribution_board_read_ = *marchRobot.getPowerDistributionBoard();
 }
 
 void MarchHardwareInterface::write(ros::Duration elapsed_time) {
@@ -168,6 +168,11 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time) {
       marchRobot.getJoint(joint_names_[i])
           .actuateRad(static_cast<float>(joint_position_command_[i]));
     }
+  }
+
+  if (marchRobot.getPowerDistributionBoard()->getSlaveIndex() != -1) {
+      marchRobot.getPowerDistributionBoard()->setMasterOnline();
+      marchRobot.getPowerDistributionBoard()->setMasterShutDownAllowed(master_shutdown_allowed_command);
   }
 }
 } // namespace march_hardware_interface

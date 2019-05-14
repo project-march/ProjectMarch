@@ -107,6 +107,8 @@ void MarchPdbStateController::update(const ros::Time &time,
         ROS_INFO_THROTTLE(10, "netCurrent set");
         realtime_pubs_[i]->unlockAndPublish();
         ROS_INFO_THROTTLE(10, "unlockAndPublish");
+
+
       }
     }
   }
