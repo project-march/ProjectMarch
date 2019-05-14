@@ -6,13 +6,12 @@
 #include <controller_interface/controller.h>
 #include <march_hardware_interface/march_pdb_state_interface.h>
 #include <pluginlib/class_list_macros.hpp>
-#include <sensor_msgs/Temperature.h>
+#include <march_shared_resources/PowerDistributionBoardState.h>
 #include <realtime_tools/realtime_publisher.h>
 #include <boost/shared_ptr.hpp>
 
 namespace march_pdb_state_controller
 {
-// this controller gets access to the MarchTemperatureSensorInterface
 class MarchPdbStateController
     : public controller_interface::Controller<march_hardware_interface::MarchPdbStateInterface>
 {
@@ -29,7 +28,7 @@ public:
 
 private:
   std::vector<march_hardware_interface::MarchPdbStateHandle> pdb_state_;
-  typedef boost::shared_ptr<realtime_tools::RealtimePublisher<sensor_msgs::Temperature> > RtPublisherPtr;
+  typedef boost::shared_ptr<realtime_tools::RealtimePublisher<march_shared_resources::PowerDistributionBoardState> > RtPublisherPtr;
   std::vector<RtPublisherPtr> realtime_pubs_;
   std::vector<ros::Time> last_publish_times_;
   double publish_rate_;

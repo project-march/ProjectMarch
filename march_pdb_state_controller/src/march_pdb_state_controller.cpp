@@ -26,7 +26,7 @@ bool MarchPdbStateController::init(
 
     // realtime publisher
     RtPublisherPtr rt_pub(
-        new realtime_tools::RealtimePublisher<sensor_msgs::Temperature>(
+        new realtime_tools::RealtimePublisher<march_shared_resources::PowerDistributionBoardState>(
             root_nh, "/march/pdb/" + pdb_state_names[i], 4));
     realtime_pubs_.push_back(rt_pub);
   }
@@ -46,17 +46,17 @@ void MarchPdbStateController::starting(const ros::Time &time) {
 
 void MarchPdbStateController::update(const ros::Time &time,
                                      const ros::Duration & /*period*/) {
-  ROS_INFO("update MarchPdbStateController");
-  ROS_INFO("amount of pubs: %zu", realtime_pubs_.size());
+  ROS_INFO_THROTTLE(10, "update MarchPdbStateController");
+  ROS_INFO_THROTTLE(10, "amount of pubs: %zu", realtime_pubs_.size());
   // limit rate of publishing
   for (unsigned i = 0; i < realtime_pubs_.size(); i++) {
     if (publish_rate_ > 0.0 &&
         last_publish_times_[i] + ros::Duration(1.0 / publish_rate_) < time) {
-      ROS_INFO("last_publish_times_: %f", last_publish_times_[i].toSec());
+      ROS_INFO_THROTTLE(10, "last_publish_times_: %f", last_publish_times_[i].toSec());
       // try to publish
       if (realtime_pubs_[i]->trylock()) {
 
-        ROS_INFO("realtime_pubs_ %d", i);
+        ROS_INFO_THROTTLE(10, "realtime_pubs_ %d", i);
         // we're actually publishing, so increment time
         last_publish_times_[i] =
             last_publish_times_[i] + ros::Duration(1.0 / publish_rate_);
@@ -64,20 +64,15 @@ void MarchPdbStateController::update(const ros::Time &time,
         // populate message
         realtime_pubs_[i]->msg_.header.stamp = time;
 
-        ROS_INFO("header created");
+        ROS_INFO_THROTTLE(10, "header created");
         // TODO(TIM) Set real message!
         march4cpp::PowerDistributionBoard pBoard = *pdb_state_[i].getPowerDistributionBoard();
-        ROS_INFO("board");
-        ROS_INFO_STREAM("pBoard " << pBoard);
-        march4cpp::LowVoltage voltage = pBoard.getLowVoltage();
-        ROS_INFO_STREAM("voltage " << voltage);
-        double netCurrent = voltage.getNetCurrent(1);
-        ROS_INFO("netCurrent %f", netCurrent);
-        realtime_pubs_[i]->msg_.temperature = netCurrent;
+        march4cpp::LowVoltage lowVoltage = pBoard.getLowVoltage();
+        realtime_pubs_[i]->msg_.low_voltage = lowVoltage.getNetCurrent(1);
 
-        ROS_INFO("netCurrent set");
+        ROS_INFO_THROTTLE(10, "netCurrent set");
         realtime_pubs_[i]->unlockAndPublish();
-        ROS_INFO("unlockAndPublish");
+        ROS_INFO_THROTTLE(10, "unlockAndPublish");
       }
     }
   }

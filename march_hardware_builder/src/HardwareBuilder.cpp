@@ -22,35 +22,32 @@ HardwareBuilder::createMarchRobot(YAML::Node marchRobotConfig) {
   std::string robotName = marchRobotConfig.begin()->first.as<std::string>();
   ROS_INFO("Started creation of robot %s", robotName.c_str());
 
-  std::string ifName = marchRobotConfig[robotName]["ifName"].as<std::string>();
-  int ecatCycleTime = marchRobotConfig[robotName]["ecatCycleTime"].as<int>();
+  // Remove top level robot name key
+  marchRobotConfig = marchRobotConfig[robotName];
+  std::string ifName = marchRobotConfig["ifName"].as<std::string>();
+  int ecatCycleTime = marchRobotConfig["ecatCycleTime"].as<int>();
 
-  YAML::Node jointListConfig = marchRobotConfig[robotName]["joints"];
+  YAML::Node jointListConfig = marchRobotConfig["joints"];
 
   std::vector<march4cpp::Joint> jointList;
 
   for (std::size_t i = 0; i < jointListConfig.size(); i++) {
     YAML::Node jointConfig = jointListConfig[i];
     std::string jointName = jointConfig.begin()->first.as<std::string>();
-
     jointList.push_back(this->createJoint(jointConfig[jointName], jointName));
   }
 
   ROS_INFO_STREAM("marchRobotConfig " << marchRobotConfig);
-  if (marchRobotConfig[robotName]["powerDistributionBoard"].Type() !=
+  if (marchRobotConfig["powerDistributionBoard"].Type() !=
       YAML::NodeType::Undefined) {
-    validateRequiredKeysExist(marchRobotConfig[robotName],
-                              this->POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS,
-                              "powerDistributionBoard");
-    ROS_INFO("powerDistributionBoard is defined");
     march4cpp::PowerDistributionBoard powerDistributionBoard =
         createPowerDistributionBoard(
-            marchRobotConfig[robotName]["powerDistributionBoard"]);
+            marchRobotConfig["powerDistributionBoard"]);
+    ROS_INFO_STREAM("powerDistributionBoard: " << powerDistributionBoard);
     return march4cpp::MarchRobot(jointList, powerDistributionBoard, ifName,
                                  ecatCycleTime);
   } else {
     ROS_INFO("powerDistributionBoard is NOT defined");
-
     return march4cpp::MarchRobot(jointList, ifName, ecatCycleTime);
   }
 }

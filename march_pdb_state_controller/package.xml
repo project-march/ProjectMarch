@@ -14,6 +14,7 @@
   <depend>hardware_interface</depend>
   <depend>march_hardware</depend>
   <depend>march_hardware_interface</depend>
+  <depend>march_shared_resources</depend>
   <depend>pluginlib</depend>
   <depend>controller_interface</depend> 
   <depend>sensor_msgs</depend> 

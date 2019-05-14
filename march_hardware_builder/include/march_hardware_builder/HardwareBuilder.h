@@ -29,8 +29,9 @@ private:
                                                                  "byteOffset"};
   //    TODO(TIM) ADD all keys
   const std::vector<std::string> POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS = {
-      "powerDistributionBoard", "slaveIndex",
-      "powerDistributionBoardCurrentByteOffset", "masterOkByteOffset"};
+      "slaveIndex", "bootShutdownOffsets",
+      "netMonitorByteOffsets",
+      "netDriverByteOffsets"};
   const std::vector<std::string> JOINT_REQUIRED_KEYS = {"allowActuation"};
 
   /**

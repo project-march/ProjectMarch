@@ -150,10 +150,10 @@ void MarchHardwareInterface::read() {
     joint_position_[i] = marchRobot.getJoint(joint_names_[i]).getAngleRad();
     joint_temperature_[i] =
         marchRobot.getJoint(joint_names_[i]).getTemperature();
-    power_distribution_board_ = *marchRobot.getPowerDistributionBoard();
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(),
               joint_position_[i]);
   }
+  power_distribution_board_ = *marchRobot.getPowerDistributionBoard();
 }
 
 void MarchHardwareInterface::write(ros::Duration elapsed_time) {
