@@ -12,6 +12,7 @@
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <march_hardware_interface/march_pdb_state_interface.h>
 #include <march_hardware_interface/march_temperature_sensor_interface.h>
+#include <march_hardware_interface/PowerNetType.h>
 #include <ros/ros.h>
 
 namespace march_hardware_interface {
@@ -60,6 +61,7 @@ protected:
   march4cpp::PowerDistributionBoard power_distribution_board_read_;
   bool master_shutdown_allowed_command;
   bool trigger_emergency_switch_command;
+  PowerNetOnOffCommand power_net_on_off_command_;
 
   std::vector<double> joint_temperature_;
   std::vector<double> joint_temperature_variance_;

@@ -4,13 +4,14 @@
 
 namespace march_pdb_state_controller {
 
-bool master_shutdown_allowed_command_;
-bool trigger_emergency_switch_command_;
-
 void MarchPdbStateController::emergencySwitchCallback(const std_msgs::Bool::ConstPtr &msg) {
-  ROS_INFO("emergencySwitchCallback %d", msg->data);
-  trigger_emergency_switch_command_ = msg->data;
-  pdb_state_.triggerEmergencySwitch(trigger_emergency_switch_command_);
+  pdb_state_.triggerEmergencySwitch(msg->data);
+}
+void MarchPdbStateController::masterShutdownAllowedCallback(const std_msgs::Bool::ConstPtr &msg) {
+  pdb_state_.setMasterShutdownAllowed(msg->data);
+}
+void MarchPdbStateController::turnNetOnOrOffCallBack(const std_msgs::Bool::ConstPtr &msg) {
+  pdb_state_.turnNetOnOrOff(PowerNetType("high_voltage"), msg->data, 1);
 }
 
 bool MarchPdbStateController::init(
@@ -41,8 +42,17 @@ bool MarchPdbStateController::init(
 
   ROS_INFO("Subscriber to "
            "march/power_distribution_board/emergency_switch_triggered");
-  ros::Subscriber sub = root_nh.subscribe(
-      "march/power_distribution_board/emergency_switch_triggered", 1000, &MarchPdbStateController::emergencySwitchCallback, this);
+  sub_emergency = controller_nh.subscribe(
+      "emergency_switch_triggered", 1000, &MarchPdbStateController::emergencySwitchCallback, this);
+
+  sub_master_shutdown_allowed = controller_nh.subscribe(
+      "shutdown_allowed", 1000, &MarchPdbStateController::masterShutdownAllowedCallback, this);
+
+  sub_turn_net_on_or_off = controller_nh.subscribe(
+      "power_net/on_or_off", 1000, &MarchPdbStateController::turnNetOnOrOffCallBack, this);
+
+//  ros::Subscriber sub2 = root_nh.subscribe(
+//      "march/power_distribution_board/emergency_switch_triggered", 1000, &MarchPdbStateController::emergencySwitchCallback, this);
 
   return true;
 }
@@ -125,3 +135,4 @@ void MarchPdbStateController::stopping(const ros::Time & /*time*/) {
 
 PLUGINLIB_EXPORT_CLASS(march_pdb_state_controller::MarchPdbStateController,
                        controller_interface::ControllerBase)
+

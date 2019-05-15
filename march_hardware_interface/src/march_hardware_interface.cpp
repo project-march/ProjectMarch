@@ -8,6 +8,7 @@
 
 #include <march_hardware/MarchRobot.h>
 
+#include <march_hardware_interface/PowerNetOnOffCommand.h>
 #include <march_hardware_interface/march_hardware_interface.h>
 
 using joint_limits_interface::JointLimits;
@@ -123,13 +124,15 @@ void MarchHardwareInterface::init() {
     if (joint.canActuate()) {
       float temp = joint.getTemperature();
       int net_number = joint.getNetNumber();
-      power_distribution_board_read_.getHighVoltage().setNetOnOff(true, net_number);
+      power_distribution_board_read_.getHighVoltage().setNetOnOff(true,
+                                                                  net_number);
       joint.prepareActuation();
     }
   }
   // Create march_pdb_state interface
-  MarchPdbStateHandle marchPdbStateHandle("PDBhandle",
-                                          &power_distribution_board_read_, &master_shutdown_allowed_command, &trigger_emergency_switch_command);
+  MarchPdbStateHandle marchPdbStateHandle(
+      "PDBhandle", &power_distribution_board_read_,
+      &master_shutdown_allowed_command, &trigger_emergency_switch_command, &power_net_on_off_command_);
   march_pdb_interface.registerHandle(marchPdbStateHandle);
 
   registerInterface(&march_temperature_interface);
@@ -174,9 +177,23 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time) {
   }
 
   if (marchRobot.getPowerDistributionBoard()->getSlaveIndex() != -1) {
-      marchRobot.getPowerDistributionBoard()->setMasterOnline();
-    marchRobot.getPowerDistributionBoard()->setMasterShutDownAllowed(master_shutdown_allowed_command);
-    marchRobot.getPowerDistributionBoard()->getHighVoltage().setEmergencySwitchOnOff(trigger_emergency_switch_command);
+    marchRobot.getPowerDistributionBoard()->setMasterOnline();
+    marchRobot.getPowerDistributionBoard()->setMasterShutDownAllowed(
+        master_shutdown_allowed_command);
+    marchRobot.getPowerDistributionBoard()
+        ->getHighVoltage()
+        .setEmergencySwitchOnOff(trigger_emergency_switch_command);
+
+    if (power_net_on_off_command_.getType() == PowerNetType::high_voltage) {
+      marchRobot.getPowerDistributionBoard()->getHighVoltage().setNetOnOff(
+          power_net_on_off_command_.isOnOrOff(),
+          power_net_on_off_command_.getNetNumber());
+    } else if (power_net_on_off_command_.getType() == PowerNetType::low_voltage) {
+      marchRobot.getPowerDistributionBoard()->getLowVoltage().setNetOnOff(
+          power_net_on_off_command_.isOnOrOff(),
+          power_net_on_off_command_.getNetNumber());
+    }
   }
+
 }
 } // namespace march_hardware_interface

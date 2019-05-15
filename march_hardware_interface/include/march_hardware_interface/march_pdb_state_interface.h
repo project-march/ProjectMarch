@@ -4,9 +4,11 @@
 #ifndef HARDWARE_INTERFACE_MARCH_PDB_STATE_INTERFACE_H
 #define HARDWARE_INTERFACE_MARCH_PDB_STATE_INTERFACE_H
 
+#include <string>
+
 #include <hardware_interface/internal/hardware_resource_manager.h>
 #include <march_hardware/PowerDistributionBoard.h>
-#include <string>
+#include <march_hardware_interface/PowerNetOnOffCommand.h>
 
 namespace march_hardware_interface {
 class MarchPdbStateHandle {
@@ -16,10 +18,12 @@ public:
       const std::string &name,
       const march4cpp::PowerDistributionBoard *powerDistributionBoard,
       bool *master_shutdown_allowed_command,
-      bool *trigger_emergency_switch_command)
+      bool *trigger_emergency_switch_command,
+      PowerNetOnOffCommand *power_net_on_off_command)
       : name_(name), powerDistributionBoard_(powerDistributionBoard),
         master_shutdown_allowed_command_(master_shutdown_allowed_command),
-        trigger_emergency_switch_command_(trigger_emergency_switch_command) {}
+        trigger_emergency_switch_command_(trigger_emergency_switch_command),
+        power_net_on_off_command_(power_net_on_off_command){}
 
   MarchPdbStateHandle() {}
 
@@ -30,9 +34,9 @@ public:
         powerDistributionBoard_);
   }
 
-  void setMasterShutdownAllowed(bool isAllowed) {
+  void setMasterShutdownAllowed(bool is_allowed) {
     assert(master_shutdown_allowed_command_);
-    *master_shutdown_allowed_command_ = isAllowed;
+    *master_shutdown_allowed_command_ = is_allowed;
   }
 
   void triggerEmergencySwitch(bool trigger) {
@@ -40,10 +44,17 @@ public:
     *trigger_emergency_switch_command_ = trigger;
   }
 
+  void turnNetOnOrOff(PowerNetType type, bool on_or_off, int net_number){
+    assert(power_net_on_off_command_);
+    PowerNetOnOffCommand power_net_on_off_command(type, on_or_off, net_number);
+    *power_net_on_off_command_ = power_net_on_off_command;
+  }
+
 private:
   std::string name_;
   bool *master_shutdown_allowed_command_;
   bool *trigger_emergency_switch_command_;
+  PowerNetOnOffCommand *power_net_on_off_command_;
   const march4cpp::PowerDistributionBoard *powerDistributionBoard_;
 };
 

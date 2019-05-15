@@ -39,12 +39,17 @@ private:
   ros::Time last_publish_times_;
   double publish_rate_;
 
+  ros::Subscriber sub_emergency;
+  ros::Subscriber sub_master_shutdown_allowed;
+  ros::Subscriber sub_turn_net_on_or_off;
+
   march_shared_resources::PowerNet
   createPowerNetMessage(march4cpp::HighVoltage high_voltage);
   march_shared_resources::PowerNet
   createPowerNetMessage(march4cpp::LowVoltage low_voltage);
-  void emergencySwitchCallback(
-      const std_msgs::Bool::ConstPtr &msg);
+  void emergencySwitchCallback(const std_msgs::Bool::ConstPtr &msg);
+  void masterShutdownAllowedCallback(const std_msgs::Bool::ConstPtr &msg);
+  void turnNetOnOrOffCallBack(const std_msgs::Bool::ConstPtr &msg);
 };
 } // namespace march_pdb_state_controller
 
