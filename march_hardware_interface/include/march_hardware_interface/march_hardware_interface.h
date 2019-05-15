@@ -9,6 +9,7 @@
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <joint_limits_interface/joint_limits_rosparam.h>
 #include <controller_manager/controller_manager.h>
+#include <control_toolbox/filters.h>
 #include <boost/scoped_ptr.hpp>
 #include <ros/ros.h>
 #include <march_hardware_interface/march_hardware.h>
@@ -50,7 +51,7 @@ public:
   /**
    * @brief Read actual postion from the hardware.
    */
-  void read();
+  void read(ros::Duration elapsed_time = ros::Duration(0.01));
 
   /**
    * @brief Write position commands to the hardware.
