@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(march_temperature_sensor_controller)
 
 find_package(catkin REQUIRED COMPONENTS
+  code_coverage
   controller_interface
   hardware_interface
   march_hardware_interface
@@ -54,3 +55,20 @@ install(TARGETS ${PROJECT_NAME}
 
 install(FILES march_temperature_sensor_plugin.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+
+## Add gtest based cpp test target and link libraries
+if (CATKIN_ENABLE_TESTING)
+
+  if(ENABLE_COVERAGE_TESTING)
+    include(CodeCoverage)
+    APPEND_COVERAGE_COMPILER_FLAGS()
+  endif()
+
+  if(ENABLE_COVERAGE_TESTING)
+    set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*")
+    add_code_coverage(
+            NAME ${PROJECT_NAME}_coverage
+            DEPENDS tests
+    )
+  endif()
+endif ()
