@@ -8,6 +8,7 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  code_coverage
   roscpp
   roslint
   std_msgs
@@ -61,3 +62,20 @@ add_custom_command(
         WORKING_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}
         POST_BUILD
 )
+
+## Add gtest based cpp test target and link libraries
+if (CATKIN_ENABLE_TESTING)
+
+    if(ENABLE_COVERAGE_TESTING)
+        include(CodeCoverage)
+        APPEND_COVERAGE_COMPILER_FLAGS()
+    endif()
+
+    if(ENABLE_COVERAGE_TESTING)
+        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*" "*/${PROJECT_NAME}/soem*")
+        add_code_coverage(
+                NAME ${PROJECT_NAME}_coverage
+                DEPENDS tests
+        )
+    endif()
+endif ()

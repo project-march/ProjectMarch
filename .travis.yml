@@ -68,6 +68,9 @@ script:
 - src/hardware-interface/doc.sh
 # Code coverage
 - catkin build march_hardware -v --no-deps --catkin-make-args march_hardware_coverage
+- catkin build march_hardware_builder -v --no-deps --catkin-make-args march_hardware_builder_coverage
+- catkin build march_hardware_interface -v --no-deps --catkin-make-args march_hardware_interface_coverage
+- catkin build march_temperature_sensor_controller -v --no-deps --catkin-make-args march_temperature_sensor_controller_coverage
 - bash <(curl -s https://codecov.io/bash) -f ~/catkin_ws/build/march_hardware/march_hardware_coverage.info
 
 

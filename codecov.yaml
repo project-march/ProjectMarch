@@ -1,3 +1,4 @@
 ignore:
   - "march_hardware/soem/.*"
   - "march_hardware/test/.*"
+  - "march_hardware_builder/test/.*"
