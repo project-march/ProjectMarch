@@ -71,7 +71,7 @@ if (CATKIN_ENABLE_TESTING)
           test/march_temperature_sensor_controller_test.test
           test/TestRunner.cpp
           )
-  target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} gtest gmock)
+  target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march_temperature_sensor_controller gtest gmock)
 
   if(ENABLE_COVERAGE_TESTING)
     set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*")

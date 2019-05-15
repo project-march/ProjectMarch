@@ -3,6 +3,8 @@
 #include "gtest/gtest.h"
 #include <gmock/gmock.h>
 
+#include <march_temperature_sensor_controller/march_temperature_sensor_controller.h>
+
 /**
  * Empty class to create coverage report
  */
@@ -12,6 +14,7 @@ class TestDummy : public ::testing::Test
 
 TEST_F(TestDummy , AlwaysTrue)
 {
+    march_temperature_sensor_controller::MarchTemperatureSensorController marchController;
     ASSERT_TRUE(true);
 }
 
