@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   realtime_tools
   roscpp
   roslint
+  rostest
   sensor_msgs
 )
 
@@ -63,6 +64,12 @@ if (CATKIN_ENABLE_TESTING)
     include(CodeCoverage)
     APPEND_COVERAGE_COMPILER_FLAGS()
   endif()
+
+  add_rostest_gtest(${PROJECT_NAME}-test
+          test/march_hardware_interface.test
+          test/TestRunner.cpp
+          )
+  target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} gtest gmock)
 
   if(ENABLE_COVERAGE_TESTING)
     set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*")
