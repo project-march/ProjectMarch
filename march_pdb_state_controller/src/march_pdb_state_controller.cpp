@@ -4,14 +4,39 @@
 
 namespace march_pdb_state_controller {
 
-void MarchPdbStateController::emergencySwitchCallback(const std_msgs::Bool::ConstPtr &msg) {
+void MarchPdbStateController::emergencySwitchCallback(
+    const std_msgs::Bool::ConstPtr &msg) {
+  ROS_INFO("emergencySwitchCallback %d", msg->data);
   pdb_state_.triggerEmergencySwitch(msg->data);
 }
-void MarchPdbStateController::masterShutdownAllowedCallback(const std_msgs::Bool::ConstPtr &msg) {
+void MarchPdbStateController::masterShutdownAllowedCallback(
+    const std_msgs::Bool::ConstPtr &msg) {
+  ROS_INFO("masterShutdownAllowedCallback %d", msg->data);
   pdb_state_.setMasterShutdownAllowed(msg->data);
 }
-void MarchPdbStateController::turnNetOnOrOffCallBack(const std_msgs::Bool::ConstPtr &msg) {
-  pdb_state_.turnNetOnOrOff(PowerNetType("high_voltage"), msg->data, 1);
+void MarchPdbStateController::turnHighVoltageNetOnOrOffCallBack(
+    const std_msgs::Int8::ConstPtr &msg) {
+  ROS_INFO("turnHighVoltageNetOnOrOffCallBack %d", msg->data);
+  int net_number = msg->data;
+  // sign indicates on or off
+  if (net_number > 0) {
+    pdb_state_.turnNetOnOrOff(PowerNetType("high_voltage"), true, net_number);
+  } else {
+    net_number *= -1;
+    pdb_state_.turnNetOnOrOff(PowerNetType("high_voltage"), false, net_number);
+  }
+}
+void MarchPdbStateController::turnLowVoltageNetOnOrOffCallBack(
+    const std_msgs::Int8::ConstPtr &msg) {
+  ROS_INFO("turnLowVoltageNetOnOrOffCallBack %d", msg->data);
+  int net_number = msg->data;
+  // sign indicates on or off
+  if (net_number > 0) {
+    pdb_state_.turnNetOnOrOff(PowerNetType("low_voltage"), true, net_number);
+  } else {
+    net_number *= -1;
+    pdb_state_.turnNetOnOrOff(PowerNetType("low_voltage"), false, net_number);
+  }
 }
 
 bool MarchPdbStateController::init(
@@ -43,16 +68,20 @@ bool MarchPdbStateController::init(
   ROS_INFO("Subscriber to "
            "march/power_distribution_board/emergency_switch_triggered");
   sub_emergency = controller_nh.subscribe(
-      "emergency_switch_triggered", 1000, &MarchPdbStateController::emergencySwitchCallback, this);
+      "emergency_switch_triggered", 1000,
+      &MarchPdbStateController::emergencySwitchCallback, this);
 
   sub_master_shutdown_allowed = controller_nh.subscribe(
-      "shutdown_allowed", 1000, &MarchPdbStateController::masterShutdownAllowedCallback, this);
+      "shutdown_allowed", 1000,
+      &MarchPdbStateController::masterShutdownAllowedCallback, this);
 
-  sub_turn_net_on_or_off = controller_nh.subscribe(
-      "power_net/on_or_off", 1000, &MarchPdbStateController::turnNetOnOrOffCallBack, this);
+  sub_turn_low_net_on_or_off = controller_nh.subscribe(
+      "low_voltage_net/on_or_off", 1000,
+      &MarchPdbStateController::turnLowVoltageNetOnOrOffCallBack, this);
 
-//  ros::Subscriber sub2 = root_nh.subscribe(
-//      "march/power_distribution_board/emergency_switch_triggered", 1000, &MarchPdbStateController::emergencySwitchCallback, this);
+  sub_turn_high_net_on_or_off = controller_nh.subscribe(
+      "high_voltage_net/on_or_off", 1000,
+      &MarchPdbStateController::turnHighVoltageNetOnOrOffCallBack, this);
 
   return true;
 }
@@ -93,28 +122,17 @@ march_shared_resources::PowerNet MarchPdbStateController::createPowerNetMessage(
 
 void MarchPdbStateController::update(const ros::Time &time,
                                      const ros::Duration & /*period*/) {
-  ROS_INFO_THROTTLE(10, "update MarchPdbStateController");
-  ros::spinOnce();
-
   // limit rate of publishing
   if (publish_rate_ > 0.0 &&
       last_publish_times_ + ros::Duration(1.0 / publish_rate_) < time) {
-    ROS_INFO_THROTTLE(10, "last_publish_times_: %f",
-                      last_publish_times_.toSec());
     // try to publish
     if (realtime_pubs_->trylock()) {
 
       // we're actually publishing, so increment time
       last_publish_times_ =
           last_publish_times_ + ros::Duration(1.0 / publish_rate_);
-
-      // populate message
-      //        realtime_pubs_->msg_.head.stamp = time;
-
       march4cpp::PowerDistributionBoard *pBoard =
           pdb_state_.getPowerDistributionBoard();
-      //      pdb_state_.setMasterShutdownAllowed(master_shutdown_allowed_command_);
-      //      pdb_state_.triggerEmergencySwitch(trigger_emergency_switch_command_);
       realtime_pubs_->msg_.low_voltage =
           createPowerNetMessage(pBoard->getLowVoltage());
       realtime_pubs_->msg_.high_voltage =
@@ -135,4 +153,3 @@ void MarchPdbStateController::stopping(const ros::Time & /*time*/) {
 
 PLUGINLIB_EXPORT_CLASS(march_pdb_state_controller::MarchPdbStateController,
                        controller_interface::ControllerBase)
-

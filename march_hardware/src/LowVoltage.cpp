@@ -37,6 +37,7 @@ bool LowVoltage::getNetOperational(int netNumber)
 
 void LowVoltage::setNetOnOff(bool on, int netNumber)
 {
+  ROS_INFO("set low net %d, for net: %d", on, netNumber);
   if (netNumber == 1)
   {
     ROS_FATAL("Can't turn low voltage net 1 on or off, would cause master suicide");

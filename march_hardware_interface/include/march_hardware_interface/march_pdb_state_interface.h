@@ -36,17 +36,20 @@ public:
 
   void setMasterShutdownAllowed(bool is_allowed) {
     assert(master_shutdown_allowed_command_);
+    ROS_INFO("setMasterShutdownAllowed %d", is_allowed);
     *master_shutdown_allowed_command_ = is_allowed;
   }
 
   void triggerEmergencySwitch(bool trigger) {
     assert(trigger_emergency_switch_command_);
+    ROS_INFO("triggerEmergencySwitch %d", trigger);
     *trigger_emergency_switch_command_ = trigger;
   }
 
   void turnNetOnOrOff(PowerNetType type, bool on_or_off, int net_number){
     assert(power_net_on_off_command_);
     PowerNetOnOffCommand power_net_on_off_command(type, on_or_off, net_number);
+    ROS_INFO_STREAM("turnNetOnOrOff: " << power_net_on_off_command);
     *power_net_on_off_command_ = power_net_on_off_command;
   }
 

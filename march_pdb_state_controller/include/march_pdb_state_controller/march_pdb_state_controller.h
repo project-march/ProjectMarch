@@ -7,6 +7,7 @@
 #include <iostream>
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Int8.h>
 #include <string>
 
 #include <boost/shared_ptr.hpp>
@@ -41,7 +42,8 @@ private:
 
   ros::Subscriber sub_emergency;
   ros::Subscriber sub_master_shutdown_allowed;
-  ros::Subscriber sub_turn_net_on_or_off;
+  ros::Subscriber sub_turn_low_net_on_or_off;
+  ros::Subscriber sub_turn_high_net_on_or_off;
 
   march_shared_resources::PowerNet
   createPowerNetMessage(march4cpp::HighVoltage high_voltage);
@@ -49,7 +51,8 @@ private:
   createPowerNetMessage(march4cpp::LowVoltage low_voltage);
   void emergencySwitchCallback(const std_msgs::Bool::ConstPtr &msg);
   void masterShutdownAllowedCallback(const std_msgs::Bool::ConstPtr &msg);
-  void turnNetOnOrOffCallBack(const std_msgs::Bool::ConstPtr &msg);
+  void turnHighVoltageNetOnOrOffCallBack(const std_msgs::Int8::ConstPtr &msg);
+  void turnLowVoltageNetOnOrOffCallBack(const std_msgs::Int8::ConstPtr &msg);
 };
 } // namespace march_pdb_state_controller
 

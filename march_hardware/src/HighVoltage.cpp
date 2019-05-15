@@ -91,14 +91,12 @@ void HighVoltage::setEmergencySwitchOnOff(bool on)
 {
   if (on && getEmergencyButtonTrigger())
   {
-    //TODO(TIM) this is always called...
-//    ROS_WARN("Emergency switch already activated");
+    ROS_WARN_THROTTLE(2, "Emergency switch already activated");
     return;
   }
   else if (!on && !getEmergencyButtonTrigger())
   {
-    //TODO(TIM) this is always called...
-//    ROS_WARN("Emergency switch already deactivated");
+    ROS_WARN_THROTTLE(2, "Emergency switch already deactivated");
     return;
   }
   if (on)

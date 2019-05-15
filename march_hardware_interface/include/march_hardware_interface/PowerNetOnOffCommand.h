@@ -18,9 +18,19 @@ public:
   PowerNetOnOffCommand(const PowerNetType type, bool on_or_off, int net_number)
       : type_(type), on_or_off_(on_or_off), net_number_(net_number) {}
 
-  const PowerNetType getType() { return type_; }
-  bool isOnOrOff() { return on_or_off_; }
-  int getNetNumber() { return net_number_; }
+  const PowerNetType getType() const { return type_; }
+  bool isOnOrOff() const { return on_or_off_; }
+  int getNetNumber() const { return net_number_; }
+
+  /** @brief Override stream operator for clean printing */
+  friend ::std::ostream &
+  operator<<(std::ostream &os,
+             const PowerNetOnOffCommand &powerNetOnOffCommand) {
+    return os << "PowerNetOnOffCommand(isOnOrOff: "
+              << powerNetOnOffCommand.isOnOrOff()
+              << ", netNumber:" << powerNetOnOffCommand.getNetNumber()
+              << ", type: " << powerNetOnOffCommand.getType() << ")";
+  }
 };
 
 #endif // MARCH_WS_SRC_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_INCLUDE_MARCH_HARDWARE_INTERFACE_POWERNETONOFFCOMMAND_H_
