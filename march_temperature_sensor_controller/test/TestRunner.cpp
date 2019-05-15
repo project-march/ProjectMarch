@@ -3,6 +3,17 @@
 #include "gtest/gtest.h"
 #include <gmock/gmock.h>
 
+/**
+ * Empty class to create coverage report
+ */
+class TestDummy : public ::testing::Test
+{
+};
+
+TEST_F(TestDummy , AlwaysTrue)
+{
+    ASSERT_TRUE(true);
+}
 
 int main(int argc, char** argv)
 {
