@@ -67,6 +67,7 @@ script:
 - src/gait-generation/build.sh
 - src/gait-generation/doc.sh
 - pwd
+
 deploy:
   provider: pages
   skip_cleanup: true
