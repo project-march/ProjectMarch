@@ -102,29 +102,29 @@ class JointSettingPlot(pg.PlotItem):
 
         self.plot_interpolation.setData(indices, values)
 
-    def mouseClickEvent(self, ev):
+    def mouseClickEvent(self, event):
 
-        scene_position = ev.scenePos()
+        scene_position = event.scenePos()
 
         local_position = self.vb.mapSceneToView(scene_position)
 
         # Check for deletion
-        if ev.modifiers() == QtCore.Qt.ShiftModifier:
+        if event.modifiers() == QtCore.Qt.ShiftModifier:
             for item in self.dataItems:
                 new_pts = item.scatter.pointsAt(local_position)
                 if len(new_pts) >= 1:
                     self.dragPoint = new_pts[0]
                     index = item.scatter.points().tolist().index(new_pts[0])
                     self.remove_setpoint.emit(index)
-                    ev.accept()
+                    event.accept()
             return
 
         # Create a new point
-        time = self.getViewBox().mapSceneToView(ev.scenePos()).x()
-        position = self.getViewBox().mapSceneToView(ev.scenePos()).y()
+        time = self.getViewBox().mapSceneToView(event.scenePos()).x()
+        position = self.getViewBox().mapSceneToView(event.scenePos()).y()
 
-        self.add_setpoint.emit(time, math.radians(position), ev.modifiers())
-        ev.accept()
+        self.add_setpoint.emit(time, math.radians(position), event.modifiers())
+        event.accept()
 
     def mouseDragEvent(self, ev):
         # Check to make sure the button is the left mouse button. If not, ignore it.
