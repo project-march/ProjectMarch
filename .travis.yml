@@ -78,7 +78,7 @@ after_success:
 - bash <(curl -s https://codecov.io/bash) -f ~/catkin_ws/build/march_hardware/march_hardware_coverage.info
 - bash <(curl -s https://codecov.io/bash) -f ~/catkin_ws/build/march_hardware_builder/march_hardware_builder_coverage.info
 - bash <(curl -s https://codecov.io/bash) -f ~/catkin_ws/build/march_hardware_interface/march_hardware_interface_coverage.info
-- bash <(curl -s https://codecov.io/bash) -f ~/catkin_ws/build/march_temperature_sensor_controller/march_temperature_sensor_controller.info
+- bash <(curl -s https://codecov.io/bash) -f ~/catkin_ws/build/march_temperature_sensor_controller/march_temperature_sensor_controller_coverage.info
 
 
 deploy:
