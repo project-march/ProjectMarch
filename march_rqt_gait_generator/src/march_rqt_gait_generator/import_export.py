@@ -38,7 +38,7 @@ def export_to_file(gait, gait_directory):
 
     notify("Gait Saved", output_file_path)
 
-    # output_file.close()
+    output_file.close()
 
 
 def import_from_file_name(robot, file_name):
