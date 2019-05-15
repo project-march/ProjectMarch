@@ -3,6 +3,7 @@
 #include "gtest/gtest.h"
 #include <gmock/gmock.h>
 
+#include <march_hardware_interface/march_hardware.h>
 /**
  * Empty class to create coverage report
  */
@@ -12,6 +13,7 @@ class TestDummy : public ::testing::Test
 
 TEST_F(TestDummy , AlwaysTrue)
 {
+    march_hardware_interface::MarchHardware marchHardware;
     ASSERT_TRUE(true);
 }
 
