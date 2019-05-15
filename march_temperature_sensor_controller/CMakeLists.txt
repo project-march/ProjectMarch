@@ -66,7 +66,7 @@ if (CATKIN_ENABLE_TESTING)
   endif()
 
   add_rostest_gtest(${PROJECT_NAME}-test
-          test/march_hardware_interface.test
+          test/march_temperature_sensor_controller_test.test
           test/TestRunner.cpp
           )
   target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} gtest gmock)
