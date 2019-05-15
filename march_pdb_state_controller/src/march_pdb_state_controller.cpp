@@ -7,15 +7,16 @@ namespace march_pdb_state_controller {
 bool master_shutdown_allowed_command_;
 bool trigger_emergency_switch_command_;
 
-void emergencySwitchCallback(const std_msgs::Bool::ConstPtr &msg) {
+void MarchPdbStateController::emergencySwitchCallback(const std_msgs::Bool::ConstPtr &msg) {
+  ROS_INFO("emergencySwitchCallback %d", msg->data);
   trigger_emergency_switch_command_ = msg->data;
+  pdb_state_.triggerEmergencySwitch(trigger_emergency_switch_command_);
 }
 
 bool MarchPdbStateController::init(
     march_hardware_interface::MarchPdbStateInterface *hw,
     ros::NodeHandle &root_nh, ros::NodeHandle &controller_nh) {
   ROS_INFO("init MarchPdbStateController");
-
   // Get all temperature_sensors from the hardware interface
   const std::vector<std::string> &pdb_state_names = hw->getNames();
   for (unsigned i = 0; i < pdb_state_names.size(); i++)
@@ -28,35 +29,30 @@ bool MarchPdbStateController::init(
     return false;
   }
 
-  for (unsigned i = 0; i < pdb_state_names.size(); i++) {
+  if (pdb_state_names.size() == 1) {
     // sensor handle
-    pdb_state_.push_back(hw->getHandle(pdb_state_names[i]));
-
+    pdb_state_ = (hw->getHandle(pdb_state_names[0]));
     // realtime publisher
     RtPublisherPtr rt_pub(new realtime_tools::RealtimePublisher<
                           march_shared_resources::PowerDistributionBoardState>(
-        root_nh, "/march/pdb/" + pdb_state_names[i], 4));
-    realtime_pubs_.push_back(rt_pub);
+        root_nh, "/march/pdb/" + pdb_state_names[0], 4));
+    realtime_pubs_ = rt_pub;
   }
 
-  // Last published times
-  last_publish_times_.resize(pdb_state_names.size());
-
+  ROS_INFO("Subscriber to "
+           "march/power_distribution_board/emergency_switch_triggered");
   ros::Subscriber sub = root_nh.subscribe(
-      "march/power_distribution_board/emergency_switch_triggered", 1000,
-      emergencySwitchCallback);
+      "march/power_distribution_board/emergency_switch_triggered", 1000, &MarchPdbStateController::emergencySwitchCallback, this);
 
-  // @TODO(TIM) subscribe to topics such as trigger emergency
   return true;
 }
 
 void MarchPdbStateController::starting(const ros::Time &time) {
   ROS_INFO("starting MarchPdbStateController");
   // initialize time
-  for (unsigned i = 0; i < last_publish_times_.size(); i++) {
-    last_publish_times_[i] = time;
-  }
+  last_publish_times_ = time;
 }
+
 march_shared_resources::PowerNet MarchPdbStateController::createPowerNetMessage(
     march4cpp::HighVoltage high_voltage) {
   march_shared_resources::PowerNet power_net_msg;
@@ -88,39 +84,36 @@ march_shared_resources::PowerNet MarchPdbStateController::createPowerNetMessage(
 void MarchPdbStateController::update(const ros::Time &time,
                                      const ros::Duration & /*period*/) {
   ROS_INFO_THROTTLE(10, "update MarchPdbStateController");
-  ROS_INFO_THROTTLE(10, "amount of pubs: %zu", realtime_pubs_.size());
+  ros::spinOnce();
+
   // limit rate of publishing
-  for (unsigned i = 0; i < realtime_pubs_.size(); i++) {
-    if (publish_rate_ > 0.0 &&
-        last_publish_times_[i] + ros::Duration(1.0 / publish_rate_) < time) {
-      ROS_INFO_THROTTLE(10, "last_publish_times_: %f",
-                        last_publish_times_[i].toSec());
-      // try to publish
-      if (realtime_pubs_[i]->trylock()) {
+  if (publish_rate_ > 0.0 &&
+      last_publish_times_ + ros::Duration(1.0 / publish_rate_) < time) {
+    ROS_INFO_THROTTLE(10, "last_publish_times_: %f",
+                      last_publish_times_.toSec());
+    // try to publish
+    if (realtime_pubs_->trylock()) {
 
-        ROS_INFO_THROTTLE(10, "realtime_pubs_ %d", i);
-        // we're actually publishing, so increment time
-        last_publish_times_[i] =
-            last_publish_times_[i] + ros::Duration(1.0 / publish_rate_);
+      // we're actually publishing, so increment time
+      last_publish_times_ =
+          last_publish_times_ + ros::Duration(1.0 / publish_rate_);
 
-        // populate message
-        //        realtime_pubs_[i]->msg_.head.stamp = time;
+      // populate message
+      //        realtime_pubs_->msg_.head.stamp = time;
 
-        march4cpp::PowerDistributionBoard *pBoard =
-            pdb_state_[i].getPowerDistributionBoard();
-        pdb_state_[i].setMasterShutdownAllowed(
-            master_shutdown_allowed_command_);
-        pdb_state_[i].triggerEmergencySwitch(trigger_emergency_switch_command_);
-        realtime_pubs_[i]->msg_.low_voltage =
-            createPowerNetMessage(pBoard->getLowVoltage());
-        realtime_pubs_[i]->msg_.high_voltage =
-            createPowerNetMessage(pBoard->getHighVoltage());
-        realtime_pubs_[i]->msg_.master_shutdown_requested =
-            pBoard->getMasterShutdownRequested();
-        realtime_pubs_[i]->msg_.power_distribution_board_current =
-            pBoard->getPowerDistributionBoardCurrent();
-        realtime_pubs_[i]->unlockAndPublish();
-      }
+      march4cpp::PowerDistributionBoard *pBoard =
+          pdb_state_.getPowerDistributionBoard();
+      //      pdb_state_.setMasterShutdownAllowed(master_shutdown_allowed_command_);
+      //      pdb_state_.triggerEmergencySwitch(trigger_emergency_switch_command_);
+      realtime_pubs_->msg_.low_voltage =
+          createPowerNetMessage(pBoard->getLowVoltage());
+      realtime_pubs_->msg_.high_voltage =
+          createPowerNetMessage(pBoard->getHighVoltage());
+      realtime_pubs_->msg_.master_shutdown_requested =
+          pBoard->getMasterShutdownRequested();
+      realtime_pubs_->msg_.power_distribution_board_current =
+          pBoard->getPowerDistributionBoardCurrent();
+      realtime_pubs_->unlockAndPublish();
     }
   }
 }

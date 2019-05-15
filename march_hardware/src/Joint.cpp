@@ -81,12 +81,6 @@ int Joint::getIMotionCubeSlaveIndex() {
   }
   return -1;
 }
-
-int Joint::getNetNumber() {
-  //TODO(TIM) add exception if is -1??
-  return net_number;
-}
-
 std::string Joint::getName() { return this->name; }
 
 bool Joint::hasIMotionCube() { return this->iMotionCube.getSlaveIndex() != -1; }

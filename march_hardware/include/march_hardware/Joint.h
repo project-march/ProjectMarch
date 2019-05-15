@@ -36,7 +36,11 @@ public:
   std::string getName();
   int getTemperatureGESSlaveIndex();
   int getIMotionCubeSlaveIndex();
-  int getNetNumber();
+  int getNetNumber() {
+    // TODO(TIM) add exception if is -1??
+    // And get this working in the cpp file
+    return net_number;
+  }
 
   bool hasIMotionCube();
   bool hasTemperatureGES();

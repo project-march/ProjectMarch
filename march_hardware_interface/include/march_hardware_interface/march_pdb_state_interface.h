@@ -15,10 +15,13 @@ public:
       /// Pointers to the storage location
       const std::string &name,
       const march4cpp::PowerDistributionBoard *powerDistributionBoard,
-      bool* master_shutdown_allowed_command,
-      bool* trigger_emergency_switch_command)
+      bool *master_shutdown_allowed_command,
+      bool *trigger_emergency_switch_command)
       : name_(name), powerDistributionBoard_(powerDistributionBoard),
-        master_shutdown_allowed_command_(master_shutdown_allowed_command), trigger_emergency_switch_command_(trigger_emergency_switch_command) {}
+        master_shutdown_allowed_command_(master_shutdown_allowed_command),
+        trigger_emergency_switch_command_(trigger_emergency_switch_command) {}
+
+  MarchPdbStateHandle() {}
 
   std::string getName() const { return name_; }
 

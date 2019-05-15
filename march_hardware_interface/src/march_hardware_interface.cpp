@@ -121,7 +121,9 @@ void MarchHardwareInterface::init() {
 
     // Enable high voltage on the IMC
     if (joint.canActuate()) {
-      power_distribution_board_read_.getHighVoltage().setNetOnOff(true, joint.getNetNumber());
+      float temp = joint.getTemperature();
+      int net_number = joint.getNetNumber();
+      power_distribution_board_read_.getHighVoltage().setNetOnOff(true, net_number);
       joint.prepareActuation();
     }
   }

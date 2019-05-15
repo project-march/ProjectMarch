@@ -5,9 +5,9 @@
 
 #include <boost/lexical_cast.hpp>
 #include <iostream>
-#include <string>
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
+#include <string>
 
 #include <boost/shared_ptr.hpp>
 #include <controller_interface/controller.h>
@@ -30,20 +30,21 @@ public:
   virtual void update(const ros::Time &time, const ros::Duration & /*period*/);
   virtual void stopping(const ros::Time & /*time*/);
 
-
 private:
-  std::vector<march_hardware_interface::MarchPdbStateHandle> pdb_state_;
+  march_hardware_interface::MarchPdbStateHandle pdb_state_;
   typedef boost::shared_ptr<realtime_tools::RealtimePublisher<
       march_shared_resources::PowerDistributionBoardState> >
       RtPublisherPtr;
-  std::vector<RtPublisherPtr> realtime_pubs_;
-  std::vector<ros::Time> last_publish_times_;
+  RtPublisherPtr realtime_pubs_;
+  ros::Time last_publish_times_;
   double publish_rate_;
 
-    march_shared_resources::PowerNet
-    createPowerNetMessage(march4cpp::HighVoltage high_voltage);
-    march_shared_resources::PowerNet
-    createPowerNetMessage(march4cpp::LowVoltage low_voltage);
+  march_shared_resources::PowerNet
+  createPowerNetMessage(march4cpp::HighVoltage high_voltage);
+  march_shared_resources::PowerNet
+  createPowerNetMessage(march4cpp::LowVoltage low_voltage);
+  void emergencySwitchCallback(
+      const std_msgs::Bool::ConstPtr &msg);
 };
 } // namespace march_pdb_state_controller
 
