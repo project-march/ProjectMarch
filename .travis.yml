@@ -72,7 +72,7 @@ script:
 after_success:
   # Change system-wide lcov default to use branch coverage
 - sudo sed -i 's/lcov_branch_coverage = 0/lcov_branch)coverage = 1/g' /etc/lcovrc
-- catkin build march_hardware -v --no-deps --catkin-make-args march_hardware_coverage --rc lcov_branch_coverage=1
+- catkin build march_hardware -v --no-deps --catkin-make-args march_hardware_coverage
 - catkin build march_hardware_builder -v --no-deps --catkin-make-args march_hardware_builder_coverage
 - catkin build march_hardware_interface -v --no-deps --catkin-make-args march_hardware_interface_coverage
 - catkin build march_temperature_sensor_controller -v --no-deps --catkin-make-args march_temperature_sensor_controller_coverage

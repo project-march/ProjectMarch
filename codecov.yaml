@@ -2,3 +2,5 @@ ignore:
   - "march_hardware/soem/.*"
   - "march_hardware/test/.*"
   - "march_hardware_builder/test/.*"
+  - "march_hardware_interface/test/.*"
+  - "march_temperature_sensor_controller/test/.*"
