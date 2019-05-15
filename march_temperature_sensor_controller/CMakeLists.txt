@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(march_temperature_sensor_controller)
 
+add_definitions(-std=c++11 -Wall -g)
+
 find_package(catkin REQUIRED COMPONENTS
   code_coverage
   controller_interface
