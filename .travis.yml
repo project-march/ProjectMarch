@@ -66,7 +66,11 @@ script:
 - cd ~/catkin_ws
 - src/hardware-interface/build.sh
 - src/hardware-interface/doc.sh
-- pwd
+# Code coverage
+- catkin build march_hardware -v --no-deps --catkin-make-args march_hardware_coverage
+- bash <(curl -s https://codecov.io/bash) -f ~/catkin_ws/build/march_hardware/march_hardware_coverage.info
+
+
 deploy:
   provider: pages
   skip_cleanup: true
