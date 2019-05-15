@@ -4,6 +4,7 @@ from trajectory_msgs.msg import JointTrajectoryPoint
 
 from march_rqt_gait_generator.msg import ActualSetpoint
 
+
 class Gait:
 
     def __init__(self, joints, duration, name="Dummy", version="First try", description="Just a simple gait"):

@@ -8,6 +8,7 @@ import GaitFactory
 from march_rqt_gait_generator.msg import MarchGait
 from rospy_message_converter import message_converter
 
+
 def export_to_file(gait, gait_directory):
 
     march_gait = MarchGait()

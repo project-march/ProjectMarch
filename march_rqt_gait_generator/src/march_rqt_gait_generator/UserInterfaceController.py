@@ -41,10 +41,12 @@ def update_table(table, joint, duration):
         table.setItem(1, i, position_item)
         table.setItem(2, i, velocity_item)
 
-    table.setItemDelegate(JointSettingSpinBoxDelegate(joint.limits.velocity, joint.limits.lower, joint.limits.upper, duration))
+    table.setItemDelegate(JointSettingSpinBoxDelegate(
+        joint.limits.velocity, joint.limits.lower, joint.limits.upper, duration))
     table.resizeRowsToContents()
     table.resizeColumnsToContents()
     return table
+
 
 def plot_to_setpoints(plot):
     plot_data = plot.plot_item.getData()

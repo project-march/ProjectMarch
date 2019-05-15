@@ -8,7 +8,6 @@ find_package(catkin REQUIRED COMPONENTS
         message_runtime
         std_msgs
         trajectory_msgs
-
         )
 
 catkin_python_setup()
@@ -31,6 +30,7 @@ catkin_package(
         message_generation
         message_runtime
         std_msgs
+        trajectory_msgs
 )
 
 install(FILES plugin.xml

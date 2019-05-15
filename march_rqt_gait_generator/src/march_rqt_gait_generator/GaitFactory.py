@@ -56,7 +56,8 @@ def from_msg(robot, march_gait):
         setpoints = []
         for actual_setpoint in actual_setpoints:
             if joint_name in actual_setpoint.joint_names:
-                setpoints.append(get_setpoint_at_duration(joint_trajectory, joint_name, actual_setpoint.time_from_start))
+                setpoints.append(get_setpoint_at_duration(
+                    joint_trajectory, joint_name, actual_setpoint.time_from_start))
 
         print "Joint " + joint_name + " has setpoints " + str(setpoints)
         urdf_joint = get_joint_from_urdf(robot, joint_name)
@@ -71,7 +72,6 @@ def from_msg(robot, march_gait):
 
     print march_gait.gait, march_gait.version, march_gait.description
     return Gait(joint_list, duration, march_gait.gait, march_gait.version, march_gait.description)
-
 
 
 def get_setpoint_at_duration(joint_trajectory, joint_name, duration):

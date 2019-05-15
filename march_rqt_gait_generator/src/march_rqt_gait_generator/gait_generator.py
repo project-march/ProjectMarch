@@ -120,7 +120,6 @@ class GaitGeneratorPlugin(Plugin):
         # Initialize the publisher on startup
         self.set_topic_name(self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").text())
 
-
         self.load_gait_into_ui()
 
     def create_rviz_frame(self):
@@ -320,7 +319,6 @@ class GaitGeneratorPlugin(Plugin):
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").setText(self.gait.version)
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").setText(self.gait.description)
         self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").setValue(self.gait.duration)
-
 
         self.create_joint_settings()
 
