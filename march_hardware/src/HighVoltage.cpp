@@ -24,8 +24,8 @@ bool HighVoltage::getNetOperational(int netNumber)
 {
   if (netNumber < 1 || netNumber > 8)
   {
-    ROS_FATAL_THROTTLE(2, "Can't get operational state from high voltage net %d, there are only 8 high voltage nets", netNumber);
-    throw std::exception();
+    ROS_ERROR_THROTTLE(2, "Can't get operational state from high voltage net %d, there are only 8 high voltage nets", netNumber);
+    throw std::invalid_argument("Only high voltage net 1 and 8 exist");
   }
   union bit8 operational = get_input_bit8(static_cast<uint16>(this->slaveIndex),
                                           static_cast<uint8>(this->netMonitoringOffsets.getHighVoltageState()));
@@ -59,12 +59,12 @@ void HighVoltage::setNetOnOff(bool on, int netNumber)
   if (netNumber < 1 || netNumber > 8)
   {
     ROS_ERROR_THROTTLE(2, "Can't turn high voltage net %d on, there are only 8 high voltage nets", netNumber);
-    return;
+    throw std::invalid_argument("Only high voltage net 1 and 8 exist");
   }
   if (!on)
   {
     ROS_ERROR_THROTTLE(2, "You are not allowed to turn off high voltage nets this way, use the emergency switch");
-    return;
+    throw std::runtime_error("Turning on high voltage this way during runtime is not allowed");
   }
   else if (getNetOperational(netNumber))
   {
@@ -91,17 +91,17 @@ void HighVoltage::setEmergencySwitchOnOff(bool on)
 {
   if (on && getEmergencyButtonTrigger())
   {
-    ROS_WARN_THROTTLE(2, "Emergency switch already activated");
-    return;
+    ROS_ERROR_THROTTLE(2, "Emergency switch already activated");
+    throw std::runtime_error("Emergency switch already activated");
   }
   else if (!on && !getEmergencyButtonTrigger())
   {
-    ROS_WARN_THROTTLE(2, "Emergency switch already deactivated");
-    return;
+    ROS_ERROR_THROTTLE(2, "Emergency switch already deactivated");
+    throw std::runtime_error("Emergency switch already deactivated");
   }
   if (on)
   {
-    ROS_WARN_THROTTLE(2, "Emergency switch activated from software");
+    ROS_INFO_THROTTLE(2, "Emergency switch activated from software");
   }
   else
   {
