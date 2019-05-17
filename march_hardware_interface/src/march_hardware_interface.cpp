@@ -196,34 +196,44 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time) {
 
     marchRobot.getPowerDistributionBoard()->setMasterShutDownAllowed(
         master_shutdown_allowed_command);
-    if (marchRobot.getPowerDistributionBoard()->getHighVoltage().getEmergencyButtonTrigger() != trigger_emergency_switch_command) {
-      marchRobot.getPowerDistributionBoard()->getHighVoltage()
+    if (marchRobot.getPowerDistributionBoard()
+            ->getHighVoltage()
+            .getEmergencyButtonTrigger() != trigger_emergency_switch_command) {
+      marchRobot.getPowerDistributionBoard()
+          ->getHighVoltage()
           .setEmergencySwitchOnOff(trigger_emergency_switch_command);
-    }else if(marchRobot.getPowerDistributionBoard()->getHighVoltage().getEmergencyButtonTrigger() ){
+    } else if (marchRobot.getPowerDistributionBoard()
+                   ->getHighVoltage()
+                   .getEmergencyButtonTrigger()) {
       ROS_WARN_THROTTLE(2, "Emergency highvoltage disabled");
     }
 
-    //TODO(TIM) reset command
+    // TODO(TIM) reset command
 
     if (power_net_on_off_command_.getType() == PowerNetType::high_voltage) {
-      if (marchRobot.getPowerDistributionBoard()->getHighVoltage().getNetOperational(
-              power_net_on_off_command_.getNetNumber()) !=
+      if (marchRobot.getPowerDistributionBoard()
+              ->getHighVoltage()
+              .getNetOperational(power_net_on_off_command_.getNetNumber()) !=
           power_net_on_off_command_.isOnOrOff()) {
-        marchRobot.getPowerDistributionBoard()->getHighVoltage().setNetOnOff(power_net_on_off_command_.isOnOrOff(),
-                                 power_net_on_off_command_.getNetNumber());
+        marchRobot.getPowerDistributionBoard()->getHighVoltage().setNetOnOff(
+            power_net_on_off_command_.isOnOrOff(),
+            power_net_on_off_command_.getNetNumber());
       }
 
-      //TODO(TIM) reset command
+      // TODO(TIM) reset command
 
-    } else if (power_net_on_off_command_.getType() == PowerNetType::low_voltage) {
+    } else if (power_net_on_off_command_.getType() ==
+               PowerNetType::low_voltage) {
       try {
-        if (marchRobot.getPowerDistributionBoard()->getLowVoltage().getNetOperational(
-            power_net_on_off_command_.getNetNumber()) !=
+        if (marchRobot.getPowerDistributionBoard()
+                ->getLowVoltage()
+                .getNetOperational(power_net_on_off_command_.getNetNumber()) !=
             power_net_on_off_command_.isOnOrOff()) {
-          marchRobot.getPowerDistributionBoard()->getLowVoltage().setNetOnOff(power_net_on_off_command_.isOnOrOff(),
-                                                                              power_net_on_off_command_.getNetNumber());
+          marchRobot.getPowerDistributionBoard()->getLowVoltage().setNetOnOff(
+              power_net_on_off_command_.isOnOrOff(),
+              power_net_on_off_command_.getNetNumber());
         }
-      }catch(std::invalid_argument exception){
+      } catch (std::invalid_argument exception) {
         ROS_ERROR("Low voltage command has/is an invalid argument");
         power_net_on_off_command_.reset();
       }
