@@ -201,7 +201,7 @@ void MarchHardwareInterface::updatePowerDistributionBoard() {
   marchRobot.getPowerDistributionBoard()->setMasterShutDownAllowed(
       master_shutdown_allowed_command);
   updateEmergencySwitch();
-  UpdatePowerNet();
+  updatePowerNet();
 }
 
 void MarchHardwareInterface::updateEmergencySwitch() {
