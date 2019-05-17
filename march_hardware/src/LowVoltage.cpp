@@ -25,8 +25,8 @@ bool LowVoltage::getNetOperational(int netNumber)
 {
   if (netNumber < 1 || netNumber > 2)
   {
-    ROS_FATAL("Can't get operational state from low voltage net %d, there are only 2 low voltage nets", netNumber);
-    throw std::exception();
+    ROS_ERROR_THROTTLE(2, "Can't get operational state from low voltage net %d, there are only 2 low voltage nets", netNumber);
+    throw std::invalid_argument("Only low voltage net 1 and 2 exist");
   }
   union bit8 operational = get_input_bit8(static_cast<uint16>(this->slaveIndex),
                                           static_cast<uint8>(this->netMonitoringOffsets.getLowVoltageState()));
@@ -37,25 +37,24 @@ bool LowVoltage::getNetOperational(int netNumber)
 
 void LowVoltage::setNetOnOff(bool on, int netNumber)
 {
-  ROS_INFO("set low net %d, for net: %d", on, netNumber);
   if (netNumber == 1)
   {
-    ROS_FATAL("Can't turn low voltage net 1 on or off, would cause master suicide");
-    throw std::exception();
+    ROS_ERROR_THROTTLE(2, "Can't turn low voltage net 1 on or off, could cause master suicide");
+    return;
   }
   else if (netNumber != 2)
   {
-    ROS_FATAL("Can't turn low voltage net %d on or off, there are only 2 low voltage nets", netNumber);
-    throw std::exception();
+    ROS_ERROR_THROTTLE(2, "Can't turn low voltage net %d on or off, there are only 2 low voltage nets", netNumber);
+    return;
   }
   if (on && getNetOperational(netNumber))
   {
-    ROS_WARN("Low voltage net %d is already on", netNumber);
+    ROS_WARN_THROTTLE(2, "Low voltage net %d is already on", netNumber);
     return;
   }
   else if (!on && !getNetOperational(netNumber))
   {
-    ROS_WARN("Low voltage net %d is already off", netNumber);
+    ROS_WARN_THROTTLE(2, "Low voltage net %d is already off", netNumber);
     return;
   }
 
@@ -71,8 +70,6 @@ void LowVoltage::setNetOnOff(bool on, int netNumber)
     lowVoltageNets.ui = ~lowVoltageNets.ui;
     lowVoltageNets.ui &= currentStateLowVoltageNets;
   }
-  ROS_INFO("low voltage nets: %d", lowVoltageNets.ui);
-  ROS_INFO("offset: %d", this->netDriverOffsets.getLowVoltageNetOnOff());
 
   set_output_bit8(static_cast<uint16>(this->slaveIndex),
                   static_cast<uint8>(this->netDriverOffsets.getLowVoltageNetOnOff()), lowVoltageNets);

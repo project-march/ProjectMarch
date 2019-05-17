@@ -24,7 +24,7 @@ bool HighVoltage::getNetOperational(int netNumber)
 {
   if (netNumber < 1 || netNumber > 8)
   {
-    ROS_FATAL("Can't get operational state from high voltage net %d, there are only 8 high voltage nets", netNumber);
+    ROS_FATAL_THROTTLE(2, "Can't get operational state from high voltage net %d, there are only 8 high voltage nets", netNumber);
     throw std::exception();
   }
   union bit8 operational = get_input_bit8(static_cast<uint16>(this->slaveIndex),
@@ -37,7 +37,7 @@ bool HighVoltage::getOvercurrentTrigger(int netNumber)
 {
   if (netNumber < 1 || netNumber > 8)
   {
-    ROS_FATAL("Can't get overcurrent trigger from high voltage net %d, there are only 8 high voltage nets", netNumber);
+    ROS_FATAL_THROTTLE(2, "Can't get overcurrent trigger from high voltage net %d, there are only 8 high voltage nets", netNumber);
     throw std::exception();
   }
   union bit8 overcurrent =
@@ -58,17 +58,17 @@ void HighVoltage::setNetOnOff(bool on, int netNumber)
 {
   if (netNumber < 1 || netNumber > 8)
   {
-    ROS_FATAL("Can't turn high voltage net %d on, there are only 8 high voltage nets", netNumber);
-    throw std::exception();
+    ROS_ERROR_THROTTLE(2, "Can't turn high voltage net %d on, there are only 8 high voltage nets", netNumber);
+    return;
   }
   if (!on)
   {
-    ROS_ERROR("You are not allowed to turn off high voltage nets this way, use the emergency switch");
+    ROS_ERROR_THROTTLE(2, "You are not allowed to turn off high voltage nets this way, use the emergency switch");
     return;
   }
   else if (getNetOperational(netNumber))
   {
-    ROS_WARN("High voltage net %d is already on", netNumber);
+    ROS_WARN_THROTTLE(2, "High voltage net %d is already on", netNumber);
   }
   uint8 currentStateHighVoltageNets = getNetsOperational();
   bit8 highVoltageNets;
@@ -101,11 +101,11 @@ void HighVoltage::setEmergencySwitchOnOff(bool on)
   }
   if (on)
   {
-    ROS_WARN("Emergency switch activated from software");
+    ROS_WARN_THROTTLE(2, "Emergency switch activated from software");
   }
   else
   {
-    ROS_WARN("Emergency switch deactivated, high voltage on");
+    ROS_WARN_THROTTLE(2, "Emergency switch deactivated, high voltage on");
   }
 
   bit8 isOn;
