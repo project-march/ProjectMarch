@@ -7,9 +7,9 @@
 
 class PowerNetType {
 public:
-  enum Value : int { high_voltage = 0, low_voltage = 1, undefined = 2 };
+  enum Value : int {  undefined = 0, high_voltage = 1, low_voltage = 2 };
 
-  PowerNetType() = default;
+  PowerNetType() { value = undefined; }
 
   explicit PowerNetType(const std::string &name) {
     if (name == "high_voltage") {

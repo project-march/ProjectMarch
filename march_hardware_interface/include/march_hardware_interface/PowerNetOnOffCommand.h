@@ -13,7 +13,15 @@ class PowerNetOnOffCommand {
   int net_number_;
 
 public:
-  PowerNetOnOffCommand() = default;
+  PowerNetOnOffCommand(){
+    reset();
+  }
+
+  void reset(){
+    type_ = PowerNetType();
+    on_or_off_ = false;
+    net_number_ = -1;
+  }
 
   PowerNetOnOffCommand(const PowerNetType type, bool on_or_off, int net_number)
       : type_(type), on_or_off_(on_or_off), net_number_(net_number) {}
