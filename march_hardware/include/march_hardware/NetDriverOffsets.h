@@ -24,11 +24,19 @@ public:
 
   int getLowVoltageNetOnOff() const
   {
+    if(lowVoltageNetOnOff == -1){
+      ROS_FATAL("lowVoltageNetOnOffTrigger is -1");
+      throw std::runtime_error("lowVoltageNetOnOffTrigger is -1");
+    }
     return lowVoltageNetOnOff;
   }
 
   int getHighVoltageNetOnOff() const
   {
+    if(highVoltageNetOnOff == -1){
+      ROS_FATAL("highVoltageNetOnOffTrigger is -1");
+      throw std::runtime_error("highVoltageNetOnOffTrigger is -1");
+    }
     return highVoltageNetOnOff;
   }
 

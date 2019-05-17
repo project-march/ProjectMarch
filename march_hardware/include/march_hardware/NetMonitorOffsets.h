@@ -45,21 +45,37 @@ public:
 
   int getHighVoltageState() const
   {
+    if(highVoltageState == -1){
+      ROS_FATAL("highVoltageStateOffset is -1");
+      throw std::runtime_error("highVoltageStateOffset is -1");
+    }
     return highVoltageState;
   }
 
   int getPowerDistributionBoardCurrent() const
   {
+    if(powerDistributionBoardCurrent == -1){
+      ROS_FATAL("powerDistributionBoardCurrent is -1");
+      throw std::runtime_error("powerDistributionBoardCurrent is -1");
+    }
     return powerDistributionBoardCurrent;
   }
 
   int getHighVoltageOvercurrentTrigger() const
   {
+    if(highVoltageOvercurrentTrigger == -1){
+      ROS_FATAL("highVoltageOvercurrentTrigger is -1");
+      throw std::runtime_error("highVoltageOvercurrentTrigger is -1");
+    }
     return highVoltageOvercurrentTrigger;
   }
 
   int getEmergencyButtonTriggered() const
   {
+    if(emergencyButtonTriggered == -1){
+      ROS_FATAL("emergencyButtonTriggeredOffset is -1");
+      throw std::runtime_error("emergencyButtonTriggeredOffset is -1");
+    }
     return emergencyButtonTriggered;
   }
 
@@ -83,11 +99,19 @@ public:
 
   int getHighVoltageNetCurrent() const
   {
+    if(highVoltageNetCurrent == -1){
+      ROS_FATAL("highVoltageNetCurrentOffset is -1");
+      throw std::runtime_error("highVoltageNetCurrentOffset is -1");
+    }
     return highVoltageNetCurrent;
   }
 
   int getLowVoltageState() const
   {
+    if(lowVoltageState == -1){
+      ROS_FATAL("lowVoltageStateOffset is -1");
+      throw std::runtime_error("lowVoltageStateOffset is -1");
+    }
     return lowVoltageState;
   }
 
