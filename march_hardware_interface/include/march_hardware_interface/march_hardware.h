@@ -59,8 +59,9 @@ protected:
   std::vector<double> joint_effort_command_;
 
   march4cpp::PowerDistributionBoard power_distribution_board_read_;
-  bool master_shutdown_allowed_command;
-  bool trigger_emergency_switch_command;
+  bool master_shutdown_allowed_command = false;
+  //TODO(TIM) check if this is working::
+  bool trigger_emergency_switch_command = true;
   PowerNetOnOffCommand power_net_on_off_command_;
 
   std::vector<double> joint_temperature_;
