@@ -5,24 +5,23 @@ import yaml
 
 from UserInterfaceController import notify
 import GaitFactory
-from march_rqt_gait_generator.msg import MarchGait
+from march_shared_resources.msg import Subgait
 from rospy_message_converter import message_converter
 
 
 def export_to_file(gait, gait_directory):
 
-    march_gait = MarchGait()
-    march_gait.joint_trajectory = gait.to_joint_trajectory()
-    march_gait.actual_setpoints = gait.to_actual_setpoints()
-    march_gait.gait = gait.name
-    march_gait.subgait = "Subgait placeholder"
-    march_gait.version = gait.version
-    march_gait.description = gait.description
+    # Name and version will be empty as it's stored in the filename.
+    subgait = Subgait()
 
-    march_gait.duration = rospy.Duration.from_sec(gait.duration)
+    subgait.trajectory = gait.to_joint_trajectory()
+    subgait.setpoints = gait.to_setpoints()
+    subgait.description = gait.description
 
-    output_file_directory = os.path.join(gait_directory, gait.name.replace(" ", "_"))
-    output_file_path = os.path.join(output_file_directory, gait.version.replace(" ", "_") + ".gait")
+    subgait.duration = rospy.Duration.from_sec(gait.duration)
+
+    output_file_directory = os.path.join(gait_directory, gait.name.replace(" ", "_"), gait.subgait.replace(" ", "_"))
+    output_file_path = os.path.join(output_file_directory, gait.version.replace(" ", "_") + ".subgait")
 
     rospy.loginfo("Writing gait to " + output_file_path)
 
@@ -33,9 +32,7 @@ def export_to_file(gait, gait_directory):
             raise
 
     output_file = open(output_file_path, 'w')
-    output_file.write(str(march_gait))
-
-    rospy.logwarn(march_gait)
+    output_file.write(str(subgait))
 
     notify("Gait Saved", output_file_path)
 
@@ -43,6 +40,9 @@ def export_to_file(gait, gait_directory):
 
 
 def import_from_file_name(robot, file_name):
-    march_gait_yaml = yaml.load(open(file_name))
-    march_gait = message_converter.convert_dictionary_to_ros_message('march_shared_resources/Subgait', march_gait_yaml)
-    return GaitFactory.from_msg(robot, march_gait)
+    gait_name = file_name.split("/")[-3]
+    subgait_name = file_name.split("/")[-2]
+    version = file_name.split("/")[-1].replace(".subgait", "")
+    march_subgait_yaml = yaml.load(open(file_name))
+    march_subgait = message_converter.convert_dictionary_to_ros_message('march_shared_resources/Subgait', march_subgait_yaml)
+    return GaitFactory.from_msg(robot, march_subgait, gait_name, subgait_name, version)

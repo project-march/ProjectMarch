@@ -36,12 +36,12 @@ def empty_gait(robot, duration):
     return Gait(joint_list, duration)
 
 
-def from_msg(robot, march_gait):
+def from_msg(robot, march_gait, gait_name,  subgait_name, version):
     if robot is None:
         rospy.logerr("Cannot create gait without a loaded robot.")
 
-    actual_setpoints = march_gait.actual_setpoints
-    joint_trajectory = march_gait.joint_trajectory
+    user_defined_setpoints = march_gait.setpoints
+    joint_trajectory = march_gait.trajectory
 
     # Check if all joints in this gait exist in the robot, joints in the robot but not in the gait are allowed.
     for joint_name in joint_trajectory.joint_names:
@@ -54,7 +54,7 @@ def from_msg(robot, march_gait):
 
     for joint_name in joint_trajectory.joint_names:
         setpoints = []
-        for actual_setpoint in actual_setpoints:
+        for actual_setpoint in user_defined_setpoints:
             if joint_name in actual_setpoint.joint_names:
                 setpoints.append(get_setpoint_at_duration(
                     joint_trajectory, joint_name, actual_setpoint.time_from_start))
@@ -70,8 +70,7 @@ def from_msg(robot, march_gait):
                       )
         joint_list.append(joint)
 
-    print march_gait.gait, march_gait.version, march_gait.description
-    return Gait(joint_list, duration, march_gait.gait, march_gait.version, march_gait.description)
+    return Gait(joint_list, duration, gait_name, subgait_name, version, march_gait.description)
 
 
 def get_setpoint_at_duration(joint_trajectory, joint_name, duration):

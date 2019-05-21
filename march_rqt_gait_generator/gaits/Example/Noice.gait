@@ -5,7 +5,7 @@ description: "Not very good probably"
 duration: 
   secs: 6
   nsecs:         0
-actual_setpoints: 
+setpoints:
   - 
     time_from_start: 
       secs: 0

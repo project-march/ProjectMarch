@@ -99,13 +99,18 @@ class GaitGeneratorPlugin(Plugin):
             lambda: self.set_topic_name(self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").text())
         )
 
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Name").editingFinished.connect(
-            lambda: self.gait.set_name(self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Name").text())
+        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Gait").editingFinished.connect(
+            lambda: self.gait.set_name(self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Gait").text())
         )
 
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").editingFinished.connect(
             lambda: self.gait.set_version(self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").text())
         )
+
+        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait").editingFinished.connect(
+            lambda: self.gait.set_subgait(self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait").text())
+        )
+
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").editingFinished.connect(
             lambda: self.gait.set_description(
                 self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").text())
@@ -297,10 +302,9 @@ class GaitGeneratorPlugin(Plugin):
         file_name, f = QFileDialog.getOpenFileName(self._widget,
                                                    "Open Image",
                                                    rospkg.RosPack().get_path('march_rqt_gait_generator'),
-                                                   "March Gait (*.gait)")
+                                                   "March Subgait (*.subgait)")
         if file_name == "":
             return
-
         self.gait = import_from_file_name(self.robot, file_name)
         self.load_gait_into_ui()
 
@@ -315,7 +319,8 @@ class GaitGeneratorPlugin(Plugin):
             self.update_time_sliders(),
         ])
 
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Name").setText(self.gait.name)
+        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Gait").setText(self.gait.name)
+        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait").setText(self.gait.subgait)
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").setText(self.gait.version)
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").setText(self.gait.description)
         self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").setValue(self.gait.duration)
@@ -341,7 +346,7 @@ class GaitGeneratorPlugin(Plugin):
         # TODO restore intrinsic configuration, usually using:
         v = plugin_settings.value('test')
 
-        rospy.loginfo("Restor settings called here: " + v)
+        rospy.loginfo("Restor settings called here: " + str(v))
 
     # def trigger_configuration(self):
     # Comment in to signal that the plugin has a way to configure

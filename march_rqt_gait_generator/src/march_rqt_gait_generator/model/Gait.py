@@ -2,14 +2,15 @@ import rospy
 from trajectory_msgs.msg import JointTrajectory
 from trajectory_msgs.msg import JointTrajectoryPoint
 
-from march_rqt_gait_generator.msg import ActualSetpoint
+from march_shared_resources.msg import Setpoint
 
 
 class Gait:
 
-    def __init__(self, joints, duration, name="Dummy", version="First try", description="Just a simple gait"):
+    def __init__(self, joints, duration, name="Walk", subgait="right_open", version="First try", description="Just a simple gait"):
         self.joints = joints
         self.name = name
+        self.subgait = subgait
         self.version = version
         self.description = description
         self.duration = duration
@@ -37,18 +38,18 @@ class Gait:
 
         return joint_trajectory
 
-    def to_actual_setpoints(self):
-        actual_setpoints = []
+    def to_setpoints(self):
+        user_defined_setpoints = []
         timestamps = self.get_unique_timestamps()
         for timestamp in timestamps:
-            actual_setpoint = ActualSetpoint()
-            actual_setpoint.time_from_start = rospy.Duration.from_sec(timestamp)
+            user_defined_setpoint = Setpoint()
+            user_defined_setpoint.time_from_start = rospy.Duration.from_sec(timestamp)
             for joint in self.joints:
                 for setpoint in joint.setpoints:
                     if setpoint.time == timestamp:
-                        actual_setpoint.joint_names.append(joint.name)
-            actual_setpoints.append(actual_setpoint)
-        return actual_setpoints
+                        user_defined_setpoint.joint_names.append(joint.name)
+            user_defined_setpoints.append(user_defined_setpoint)
+        return user_defined_setpoints
 
     def get_unique_timestamps(self):
         timestamps = []
@@ -81,6 +82,9 @@ class Gait:
 
     def set_version(self, version):
         self.version = version
+
+    def set_subgait(self, subgait):
+        self.subgait = subgait
 
     def set_duration(self, duration, rescale=False):
         for joint in self.joints:

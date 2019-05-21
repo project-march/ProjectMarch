@@ -106,20 +106,10 @@
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QGridLayout" name="gridLayout_5">
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="Version">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="4">
+      <item row="2" column="5">
        <widget class="QLineEdit" name="Description"/>
       </item>
-      <item row="0" column="5">
+      <item row="0" column="6">
        <widget class="QLabel" name="DurationLabel">
         <property name="text">
          <string>Duration (s)</string>
@@ -127,14 +117,14 @@
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QLabel" name="NameLabel">
+       <widget class="QLabel" name="GaitLabel">
         <property name="text">
-         <string>Name</string>
+         <string>Gait</string>
         </property>
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QLineEdit" name="Name">
+       <widget class="QLineEdit" name="Gait">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -143,21 +133,21 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="4">
+      <item row="0" column="5">
        <widget class="QLabel" name="DescriptionLabel">
         <property name="text">
          <string>Description</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
+      <item row="0" column="2">
        <widget class="QLabel" name="VersionLabel">
         <property name="text">
          <string>Version</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="7">
+      <item row="2" column="8">
        <widget class="QCheckBox" name="ScaleSetpoints">
         <property name="toolTip">
          <string>Scale the setpoints based on their relative time when adjusting the duration.</string>
@@ -167,7 +157,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="5">
+      <item row="2" column="6">
        <widget class="QDoubleSpinBox" name="Duration">
         <property name="buttonSymbols">
          <enum>QAbstractSpinBox::NoButtons</enum>
@@ -176,6 +166,26 @@
          <double>0.000000000000000</double>
         </property>
        </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLineEdit" name="Version">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="SubgaitLabel">
+        <property name="text">
+         <string>Subgait</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="Subgait"/>
       </item>
      </layout>
     </widget>
