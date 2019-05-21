@@ -7,7 +7,8 @@ from march_shared_resources.msg import Setpoint
 
 class Gait:
 
-    def __init__(self, joints, duration, name="Walk", subgait="right_open", version="First try", description="Just a simple gait"):
+    def __init__(self, joints, duration,
+                 name="Walk", subgait="right_open", version="First try", description="Just a simple gait"):
         self.joints = joints
         self.name = name
         self.subgait = subgait
