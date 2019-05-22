@@ -36,11 +36,16 @@ def empty_gait(robot, duration):
     return Gait(joint_list, duration)
 
 
-def from_msg(robot, march_gait, gait_name,  subgait_name, version):
+def from_msg(robot, march_gait, gait_name, subgait_name, version):
     if robot is None:
         rospy.logerr("Cannot create gait without a loaded robot.")
+        return None
 
     user_defined_setpoints = march_gait.setpoints
+    print user_defined_setpoints
+    if not user_defined_setpoints:
+        rospy.logerr("Subgait %s/%s/%s is missing setpoints", gait_name, subgait_name, version)
+        return None
     joint_trajectory = march_gait.trajectory
 
     # Check if all joints in this gait exist in the robot, joints in the robot but not in the gait are allowed.
