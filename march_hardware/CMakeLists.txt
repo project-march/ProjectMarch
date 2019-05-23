@@ -119,6 +119,8 @@ if (CATKIN_ENABLE_TESTING)
             test/TestBootShutdownOffsets.cpp
             test/TestNetDriverOffsets.cpp
             test/TestNetMonitorOffsets.cpp
+            test/TestLowVoltage.cpp
+            test/TestHighVoltage.cpp
             test/mocks/MockTemperatureGES.cpp
             test/mocks/MockTemperatureSensor.cpp
             test/mocks/MockEncoder.cpp

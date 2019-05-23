@@ -30,13 +30,16 @@ public:
   /** @brief Override comparison operator */
   friend bool operator==(const LowVoltage& lhs, const LowVoltage& rhs)
   {
-    return lhs.slaveIndex == rhs.slaveIndex;
+    return lhs.slaveIndex == rhs.slaveIndex && lhs.netDriverOffsets == rhs.netDriverOffsets &&
+        lhs.netMonitoringOffsets == rhs.netMonitoringOffsets;
   }
 
   /** @brief Override stream operator for clean printing */
   friend ::std::ostream& operator<<(std::ostream& os, const LowVoltage& lowVoltage)
   {
-    return os << "LowVoltage(slaveIndex: " << lowVoltage.slaveIndex << ")";
+    return os << "LowVoltage(slaveIndex: " << lowVoltage.slaveIndex << ", "
+              << "netMonitoringOffsets: " << lowVoltage.netMonitoringOffsets << ", "
+              << "netDriverOffsets: " << lowVoltage.netDriverOffsets << ")";
   }
 
 };
