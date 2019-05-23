@@ -116,6 +116,9 @@ if (CATKIN_ENABLE_TESTING)
             test/TestTemperatureGES.cpp
             test/TestJoint.cpp
             test/TestPDOmap.cpp
+            test/TestBootShutdownOffsets.cpp
+            test/TestNetDriverOffsets.cpp
+            test/TestNetMonitorOffsets.cpp
             test/mocks/MockTemperatureGES.cpp
             test/mocks/MockTemperatureSensor.cpp
             test/mocks/MockEncoder.cpp

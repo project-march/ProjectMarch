@@ -3,6 +3,7 @@
 #define MARCH_IV_NETMONITOROFFSETS_H
 
 #include <ostream>
+#include <ros/ros.h>
 
 class NetMonitorOffsets
 {
@@ -12,7 +13,7 @@ class NetMonitorOffsets
   int highVoltageNetCurrent;
   int lowVoltageState;
   int highVoltageOvercurrentTrigger;
-  int emergencyButtonTriggered;
+  int highVoltageEnabled;
   int highVoltageState;
 
 public:
@@ -26,9 +27,16 @@ public:
     , highVoltageNetCurrent(highVoltageNetCurrentByteOffset)
     , lowVoltageState(lowVoltageStateByteOffset)
     , highVoltageOvercurrentTrigger(highVoltageOvercurrentTriggerByteOffset)
-    , emergencyButtonTriggered(emergencyButtonTriggeredByteOffset)
+    , highVoltageEnabled(emergencyButtonTriggeredByteOffset)
     , highVoltageState(highVoltageStateByteOffset)
   {
+    if (powerDistributionBoardCurrent < 0 || lowVoltageNet1Current < 0 || lowVoltageNet2Current < 0 ||
+        highVoltageNetCurrent < 0 || lowVoltageState < 0 || highVoltageOvercurrentTrigger < 0 ||
+        highVoltageEnabled < 0 || highVoltageState < 0)
+    {
+      ROS_ERROR("Negative byte offset not possible");
+      throw std::runtime_error("Negative byte offset not possible");
+    }
   }
 
   NetMonitorOffsets()
@@ -39,13 +47,14 @@ public:
     highVoltageNetCurrent = -1;
     lowVoltageState = -1;
     highVoltageOvercurrentTrigger = -1;
-    emergencyButtonTriggered = -1;
+    highVoltageEnabled = -1;
     highVoltageState = -1;
   }
 
   int getHighVoltageState() const
   {
-    if(highVoltageState == -1){
+    if (highVoltageState == -1)
+    {
       ROS_FATAL("highVoltageStateOffset is -1");
       throw std::runtime_error("highVoltageStateOffset is -1");
     }
@@ -54,7 +63,8 @@ public:
 
   int getPowerDistributionBoardCurrent() const
   {
-    if(powerDistributionBoardCurrent == -1){
+    if (powerDistributionBoardCurrent == -1)
+    {
       ROS_FATAL("powerDistributionBoardCurrent is -1");
       throw std::runtime_error("powerDistributionBoardCurrent is -1");
     }
@@ -63,43 +73,56 @@ public:
 
   int getHighVoltageOvercurrentTrigger() const
   {
-    if(highVoltageOvercurrentTrigger == -1){
+    if (highVoltageOvercurrentTrigger == -1)
+    {
       ROS_FATAL("highVoltageOvercurrentTrigger is -1");
       throw std::runtime_error("highVoltageOvercurrentTrigger is -1");
     }
     return highVoltageOvercurrentTrigger;
   }
 
-  int getEmergencyButtonTriggered() const
+  int getHighVoltageEnabled() const
   {
-    if(emergencyButtonTriggered == -1){
-      ROS_FATAL("emergencyButtonTriggeredOffset is -1");
-      throw std::runtime_error("emergencyButtonTriggeredOffset is -1");
+    if (highVoltageEnabled == -1)
+    {
+      ROS_FATAL("highVoltageEnabledOffset is -1");
+      throw std::runtime_error("highVoltageEnabledOffset is -1");
     }
-    return emergencyButtonTriggered;
+    return highVoltageEnabled;
   }
 
   int getLowVoltageNetCurrent(int netNumber) const
   {
     if (netNumber == 1)
     {
+      if (lowVoltageNet1Current == -1)
+      {
+        ROS_FATAL("lowVoltageNet1CurrentOffset is -1");
+        throw std::runtime_error("lowVoltageNet1CurrentOffset is -1");
+      }
       return lowVoltageNet1Current;
     }
     else if (netNumber == 2)
     {
+      if (lowVoltageNet2Current == -1)
+      {
+        ROS_FATAL("lowVoltageNet2CurrentOffset is -1");
+        throw std::runtime_error("lowVoltageNet2CurrentOffset is -1");
+      }
       return lowVoltageNet2Current;
     }
     else
     {
       ROS_FATAL("Can't get the byte offset for low voltage net current %d, there are only 2 low voltage nets",
                 netNumber);
-      throw std::exception();
+      throw std::runtime_error("Can't get the byte offset for low voltage net beside 1 and 2");
     }
   }
 
   int getHighVoltageNetCurrent() const
   {
-    if(highVoltageNetCurrent == -1){
+    if (highVoltageNetCurrent == -1)
+    {
       ROS_FATAL("highVoltageNetCurrentOffset is -1");
       throw std::runtime_error("highVoltageNetCurrentOffset is -1");
     }
@@ -108,7 +131,8 @@ public:
 
   int getLowVoltageState() const
   {
-    if(lowVoltageState == -1){
+    if (lowVoltageState == -1)
+    {
       ROS_FATAL("lowVoltageStateOffset is -1");
       throw std::runtime_error("lowVoltageStateOffset is -1");
     }
@@ -123,7 +147,7 @@ public:
            lhs.lowVoltageNet2Current == rhs.lowVoltageNet2Current &&
            lhs.highVoltageNetCurrent == rhs.highVoltageNetCurrent && lhs.lowVoltageState == rhs.lowVoltageState &&
            lhs.highVoltageOvercurrentTrigger == rhs.highVoltageOvercurrentTrigger &&
-           lhs.emergencyButtonTriggered == rhs.emergencyButtonTriggered && lhs.highVoltageState == rhs.highVoltageState;
+           lhs.highVoltageEnabled == rhs.highVoltageEnabled && lhs.highVoltageState == rhs.highVoltageState;
   }
 
   /** @brief Override stream operator for clean printing */
@@ -136,7 +160,7 @@ public:
               << "highVoltageNetCurrent: " << netMonitorOffsets.highVoltageNetCurrent << ", "
               << "lowVoltageState: " << netMonitorOffsets.lowVoltageState << ", "
               << "highVoltageOvercurrentTrigger: " << netMonitorOffsets.highVoltageOvercurrentTrigger << ", "
-              << "emergencyButtonTriggered: " << netMonitorOffsets.emergencyButtonTriggered << ", "
+              << "highVoltageEnabled: " << netMonitorOffsets.highVoltageEnabled << ", "
               << "highVoltageState: " << netMonitorOffsets.highVoltageState << ")";
   }
 };

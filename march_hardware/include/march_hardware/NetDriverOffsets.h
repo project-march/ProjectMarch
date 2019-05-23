@@ -2,6 +2,8 @@
 #ifndef MARCH_IV_NETDRIVEROFFSETS_H
 #define MARCH_IV_NETDRIVEROFFSETS_H
 
+#include <ros/ros.h>
+
 class NetDriverOffsets
 {
   int lowVoltageNetOnOff;
@@ -14,34 +16,47 @@ public:
     , highVoltageNetOnOff(highVoltageNetOnOff)
     , highVoltageEmergencySwitchOnOff(highVoltageEmergencySwitchOnOff)
   {
+    if (lowVoltageNetOnOff < 0 || highVoltageNetOnOff < 0 || highVoltageEmergencySwitchOnOff < 0)
+    {
+      ROS_ERROR("Negative byte offset not possible");
+      throw std::runtime_error("Negative byte offset not possible");
+    }
   }
 
   NetDriverOffsets()
   {
     lowVoltageNetOnOff = -1;
     highVoltageNetOnOff = -1;
+    highVoltageEmergencySwitchOnOff = -1;
   }
 
   int getLowVoltageNetOnOff() const
   {
-    if(lowVoltageNetOnOff == -1){
-      ROS_FATAL("lowVoltageNetOnOffTrigger is -1");
-      throw std::runtime_error("lowVoltageNetOnOffTrigger is -1");
+    if (lowVoltageNetOnOff == -1)
+    {
+      ROS_FATAL("lowVoltageNetOnOffOffset is -1");
+      throw std::runtime_error("lowVoltageNetOnOffOffset is -1");
     }
     return lowVoltageNetOnOff;
   }
 
   int getHighVoltageNetOnOff() const
   {
-    if(highVoltageNetOnOff == -1){
-      ROS_FATAL("highVoltageNetOnOffTrigger is -1");
-      throw std::runtime_error("highVoltageNetOnOffTrigger is -1");
+    if (highVoltageNetOnOff == -1)
+    {
+      ROS_FATAL("highVoltageNetOnOffOffset is -1");
+      throw std::runtime_error("highVoltageNetOnOffOffset is -1");
     }
     return highVoltageNetOnOff;
   }
 
   int getHighVoltageEmergencySwitchOnOff() const
   {
+    if (highVoltageEmergencySwitchOnOff == -1)
+    {
+      ROS_FATAL("highVoltageEmergencySwitchOnOffOffset is -1");
+      throw std::runtime_error("highVoltageEmergencySwitchOnOffOffset is -1");
+    }
     return highVoltageEmergencySwitchOnOff;
   }
 
