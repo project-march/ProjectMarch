@@ -4,6 +4,7 @@ project(march_hardware)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 find_package(catkin REQUIRED COMPONENTS
+        code_coverage
         roscpp
         roslint
         rostest
@@ -101,6 +102,12 @@ add_custom_command(
 
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
+
+    if(ENABLE_COVERAGE_TESTING)
+        include(CodeCoverage)
+        APPEND_COVERAGE_COMPILER_FLAGS()
+    endif()
+
     add_rostest_gmock(${PROJECT_NAME}-test
             test/march4cpp.test
             test/TestRunner.cpp
@@ -116,4 +123,12 @@ if (CATKIN_ENABLE_TESTING)
             test/mocks/MockJoint.cpp
             )
     target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march_hardware gtest)
+
+    if(ENABLE_COVERAGE_TESTING)
+        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*" "*/${PROJECT_NAME}/soem*")
+        add_code_coverage(
+                NAME ${PROJECT_NAME}_coverage
+                DEPENDS tests
+        )
+    endif()
 endif ()

@@ -5,6 +5,7 @@ add_definitions(-std=c++11 -Wall -g)
 
 
 find_package(catkin REQUIRED COMPONENTS
+        code_coverage
         roscpp
         roslint
         roslib
@@ -63,6 +64,12 @@ install(TARGETS march_hardware_builder
 
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
+
+    if(ENABLE_COVERAGE_TESTING)
+        include(CodeCoverage)
+        APPEND_COVERAGE_COMPILER_FLAGS()
+    endif()
+
     add_rostest_gtest(${PROJECT_NAME}-test
             test/march_hardware_builder.test
             test/TestRunner.cpp
@@ -73,4 +80,12 @@ if (CATKIN_ENABLE_TESTING)
             test/TestHardwareBuilderCreatePowerDistributionBoard.cpp
             )
     target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march_hardware_builder gtest gmock)
+
+    if(ENABLE_COVERAGE_TESTING)
+        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*")
+        add_code_coverage(
+                NAME ${PROJECT_NAME}_coverage
+                DEPENDS tests
+        )
+    endif()
 endif ()
