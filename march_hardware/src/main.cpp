@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
     march4.getPowerDistributionBoard()->getHighVoltage().getNetCurrent();
     march4.getPowerDistributionBoard()
         ->getHighVoltage()
-        .getEmergencyButtonTrigger();
+        .getHighVoltageEnabled();
 
     march4.getPowerDistributionBoard()->getLowVoltage().getNetOperational(1);
     // 1-2

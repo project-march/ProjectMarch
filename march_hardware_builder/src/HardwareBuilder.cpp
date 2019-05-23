@@ -157,7 +157,7 @@ march4cpp::PowerDistributionBoard HardwareBuilder::createPowerDistributionBoard(
       netMonitorByteOffsets["highVoltageNetCurrent"].as<int>(),
       netMonitorByteOffsets["lowVoltageState"].as<int>(),
       netMonitorByteOffsets["highVoltageOvercurrentTrigger"].as<int>(),
-      netMonitorByteOffsets["emergencyButtonTriggered"].as<int>(),
+      netMonitorByteOffsets["highVoltageEnabled"].as<int>(),
       netMonitorByteOffsets["highVoltageState"].as<int>());
 
   NetDriverOffsets netDriverOffsets = NetDriverOffsets(

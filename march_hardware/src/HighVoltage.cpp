@@ -24,7 +24,8 @@ bool HighVoltage::getNetOperational(int netNumber)
 {
   if (netNumber < 1 || netNumber > 8)
   {
-    ROS_ERROR_THROTTLE(2, "Can't get operational state from high voltage net %d, there are only 8 high voltage nets", netNumber);
+    ROS_ERROR_THROTTLE(2, "Can't get operational state from high voltage net %d, there are only 8 high voltage nets",
+                       netNumber);
     throw std::invalid_argument("Only high voltage net 1 and 8 exist");
   }
   union bit8 operational = get_input_bit8(static_cast<uint16>(this->slaveIndex),
@@ -37,7 +38,8 @@ bool HighVoltage::getOvercurrentTrigger(int netNumber)
 {
   if (netNumber < 1 || netNumber > 8)
   {
-    ROS_FATAL_THROTTLE(2, "Can't get overcurrent trigger from high voltage net %d, there are only 8 high voltage nets", netNumber);
+    ROS_FATAL_THROTTLE(2, "Can't get overcurrent trigger from high voltage net %d, there are only 8 high voltage nets",
+                       netNumber);
     throw std::exception();
   }
   union bit8 overcurrent =
@@ -46,12 +48,12 @@ bool HighVoltage::getOvercurrentTrigger(int netNumber)
   return ((overcurrent.ui >> (netNumber - 1)) & 1);
 }
 
-bool HighVoltage::getEmergencyButtonTrigger()
+bool HighVoltage::getHighVoltageEnabled()
 {
-  union bit8 emergencyButtonTriggered =
-      get_input_bit8(static_cast<uint16>(this->slaveIndex),
-                     static_cast<uint8>(this->netMonitoringOffsets.getEmergencyButtonTriggered()));
-  return emergencyButtonTriggered.ui;
+  union bit8 highVoltageEnabled = get_input_bit8(
+      static_cast<uint16>(this->slaveIndex), static_cast<uint8>(this->netMonitoringOffsets.getHighVoltageEnabled()));
+  // TODO(TIM) check if this bool needs to be inverted
+  return highVoltageEnabled.ui;
 }
 
 void HighVoltage::setNetOnOff(bool on, int netNumber)
@@ -89,12 +91,12 @@ void HighVoltage::setNetOnOff(bool on, int netNumber)
 
 void HighVoltage::setEmergencySwitchOnOff(bool on)
 {
-  if (on && getEmergencyButtonTrigger())
+  if (on && getHighVoltageEnabled())
   {
     ROS_ERROR_THROTTLE(2, "Emergency switch already activated");
     throw std::runtime_error("Emergency switch already activated");
   }
-  else if (!on && !getEmergencyButtonTrigger())
+  else if (!on && !getHighVoltageEnabled())
   {
     ROS_ERROR_THROTTLE(2, "Emergency switch already deactivated");
     throw std::runtime_error("Emergency switch already deactivated");
@@ -120,6 +122,5 @@ uint8 HighVoltage::getNetsOperational()
                                           static_cast<uint8>(this->netMonitoringOffsets.getHighVoltageState()));
   return operational.ui;
 }
-
 
 }  // namespace march4cpp

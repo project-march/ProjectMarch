@@ -141,7 +141,7 @@ void MarchPdbStateController::update(const ros::Time& time, const ros::Duration&
       realtime_pubs_->msg_.high_voltage_nets = createHighVoltageNetsMessage(pBoard->getHighVoltage());
       realtime_pubs_->msg_.master_shutdown_requested = pBoard->getMasterShutdownRequested();
       realtime_pubs_->msg_.power_distribution_board_current = pBoard->getPowerDistributionBoardCurrent();
-      realtime_pubs_->msg_.high_voltage_emergency_button_triggered = pBoard->getHighVoltage().getEmergencyButtonTrigger();
+      realtime_pubs_->msg_.high_voltage_enabled = pBoard->getHighVoltage().getHighVoltageEnabled();
       realtime_pubs_->unlockAndPublish();
     }
   }

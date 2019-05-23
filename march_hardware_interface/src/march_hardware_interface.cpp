@@ -207,14 +207,14 @@ void MarchHardwareInterface::updatePowerDistributionBoard() {
 void MarchHardwareInterface::updateEmergencySwitch() {
   try {
     if (marchRobot.getPowerDistributionBoard()
-            ->getHighVoltage()
-            .getEmergencyButtonTrigger() != trigger_emergency_switch_command) {
+        ->getHighVoltage()
+        .getHighVoltageEnabled() != trigger_emergency_switch_command) {
       marchRobot.getPowerDistributionBoard()
           ->getHighVoltage()
           .setEmergencySwitchOnOff(trigger_emergency_switch_command);
     } else if (marchRobot.getPowerDistributionBoard()
-                   ->getHighVoltage()
-                   .getEmergencyButtonTrigger()) {
+        ->getHighVoltage()
+        .getHighVoltageEnabled()) {
       ROS_WARN_THROTTLE(2, "Emergency high voltage disabled");
     }
   } catch (std::exception& exception) {
