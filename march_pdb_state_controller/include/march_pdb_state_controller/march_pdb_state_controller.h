@@ -14,27 +14,30 @@
 #include <controller_interface/controller.h>
 #include <march_hardware_interface/march_pdb_state_interface.h>
 #include <march_shared_resources/PowerDistributionBoardState.h>
-#include <march_shared_resources/PowerNet.h>
+#include <march_shared_resources/HighVoltageNet.h>
+#include <march_shared_resources/LowVoltageNet.h>
 #include <pluginlib/class_list_macros.hpp>
 #include <realtime_tools/realtime_publisher.h>
 
-namespace march_pdb_state_controller {
+namespace march_pdb_state_controller
+{
 class MarchPdbStateController
-    : public controller_interface::Controller<
-          march_hardware_interface::MarchPdbStateInterface> {
+    : public controller_interface::Controller<march_hardware_interface::MarchPdbStateInterface>
+{
 public:
-  MarchPdbStateController() {}
+  MarchPdbStateController()
+  {
+  }
 
-  virtual bool init(march_hardware_interface::MarchPdbStateInterface *hw,
-                    ros::NodeHandle &root_nh, ros::NodeHandle &controller_nh);
-  virtual void starting(const ros::Time &time);
-  virtual void update(const ros::Time &time, const ros::Duration & /*period*/);
-  virtual void stopping(const ros::Time & /*time*/);
+  virtual bool init(march_hardware_interface::MarchPdbStateInterface* hw, ros::NodeHandle& root_nh,
+                    ros::NodeHandle& controller_nh);
+  virtual void starting(const ros::Time& time);
+  virtual void update(const ros::Time& time, const ros::Duration& /*period*/);
+  virtual void stopping(const ros::Time& /*time*/);
 
 private:
   march_hardware_interface::MarchPdbStateHandle pdb_state_;
-  typedef boost::shared_ptr<realtime_tools::RealtimePublisher<
-      march_shared_resources::PowerDistributionBoardState> >
+  typedef boost::shared_ptr<realtime_tools::RealtimePublisher<march_shared_resources::PowerDistributionBoardState> >
       RtPublisherPtr;
   RtPublisherPtr realtime_pubs_;
   ros::Time last_publish_times_;
@@ -45,15 +48,13 @@ private:
   ros::Subscriber sub_turn_low_net_on_or_off;
   ros::Subscriber sub_turn_high_net_on_or_off;
 
-  march_shared_resources::PowerNet
-  createPowerNetMessage(march4cpp::HighVoltage high_voltage);
-  march_shared_resources::PowerNet
-  createPowerNetMessage(march4cpp::LowVoltage low_voltage);
-  void emergencySwitchCallback(const std_msgs::Bool::ConstPtr &msg);
-  void masterShutdownAllowedCallback(const std_msgs::Bool::ConstPtr &msg);
-  void turnHighVoltageNetOnOrOffCallBack(const std_msgs::Int8::ConstPtr &msg);
-  void turnLowVoltageNetOnOrOffCallBack(const std_msgs::Int8::ConstPtr &msg);
+  std::vector<march_shared_resources::HighVoltageNet> createHighVoltageNetsMessage(march4cpp::HighVoltage high_voltage);
+  std::vector<march_shared_resources::LowVoltageNet> createLowVoltageNetsMessage(march4cpp::LowVoltage low_voltage);
+  void emergencySwitchCallback(const std_msgs::Bool::ConstPtr& msg);
+  void masterShutdownAllowedCallback(const std_msgs::Bool::ConstPtr& msg);
+  void turnHighVoltageNetOnOrOffCallBack(const std_msgs::Int8::ConstPtr& msg);
+  void turnLowVoltageNetOnOrOffCallBack(const std_msgs::Int8::ConstPtr& msg);
 };
-} // namespace march_pdb_state_controller
+}  // namespace march_pdb_state_controller
 
-#endif // MARCH_PDB_STATE_CONTROLLER_H
+#endif  // MARCH_PDB_STATE_CONTROLLER_H
