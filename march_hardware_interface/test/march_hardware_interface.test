@@ -1,0 +1,3 @@
+<launch>
+    <test test-name="march_hardware_interface_test" pkg="march_hardware_interface" type="march_hardware_interface-test"/>
+</launch>
