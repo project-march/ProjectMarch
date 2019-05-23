@@ -121,6 +121,7 @@ if (CATKIN_ENABLE_TESTING)
             test/TestNetMonitorOffsets.cpp
             test/TestLowVoltage.cpp
             test/TestHighVoltage.cpp
+            test/TestPowerDistributionBoard.cpp
             test/mocks/MockTemperatureGES.cpp
             test/mocks/MockTemperatureSensor.cpp
             test/mocks/MockEncoder.cpp

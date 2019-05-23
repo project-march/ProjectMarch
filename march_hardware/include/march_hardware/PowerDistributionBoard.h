@@ -49,8 +49,6 @@ public:
   {
     return os << "PowerDistributionBoard(slaveIndex: " << powerDistributionBoard.slaveIndex << ", "
               << "masterOnlineToggle: " << powerDistributionBoard.masterOnlineToggle << ", "
-              << powerDistributionBoard.netMonitoringOffsets << ", "
-              << powerDistributionBoard.netDriverOffsets << ", "
               << powerDistributionBoard.highVoltage << ", "
               << powerDistributionBoard.lowVoltage << ")";
   }
