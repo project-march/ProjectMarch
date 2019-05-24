@@ -303,8 +303,6 @@ class GaitGeneratorPlugin(Plugin):
                                                    "Open Image",
                                                    rospkg.RosPack().get_path('march_rqt_gait_generator'),
                                                    "March Subgait (*.subgait)")
-        if file_name == "":
-            return
         self.gait = import_from_file_name(self.robot, file_name)
         if self.gait is None:
             rospy.logwarn("Could not load gait %s", file_name)
