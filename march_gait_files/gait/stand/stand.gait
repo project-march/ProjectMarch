@@ -1,5 +1,5 @@
-name: home_stand
+name: stand
 
 graph:
-  from_subgait: [start,      home_stand]
-  to_subgait:   [home_stand, end    ]
+  from_subgait: [start, stand]
+  to_subgait:   [stand, end    ]
