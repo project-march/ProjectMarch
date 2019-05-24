@@ -27,7 +27,7 @@ protected:
   }
 };
 
-//TEST_F(PowerDistributionBoardTest, ValidPowerDistributionBoard)
+// TEST_F(PowerDistributionBoardTest, ValidPowerDistributionBoard)
 //{
 //  std::string fullPath = this->fullPath("/power_distribution_board.yaml");
 //  YAML::Node config = YAML::LoadFile(fullPath);
@@ -39,7 +39,7 @@ protected:
 //  ASSERT_EQ(powerDistributionBoard, createdPowerDistributionBoard);
 //}
 //
-//TEST_F(PowerDistributionBoardTest, MissingSlaveIndexPowerDistributionBoard)
+// TEST_F(PowerDistributionBoardTest, MissingSlaveIndexPowerDistributionBoard)
 //{
 //  std::string fullPath = this->fullPath("/power_distribution_board_missing_slave_index.yaml");
 //  YAML::Node config = YAML::LoadFile(fullPath);
