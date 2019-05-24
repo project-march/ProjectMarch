@@ -61,6 +61,21 @@ void MarchHardwareInterface::init() {
              joint_position_[i]);
   }
 
+  // Create march_pdb_state interface
+  MarchPdbStateHandle marchPdbStateHandle(
+      "PDBhandle", &power_distribution_board_read_,
+      &master_shutdown_allowed_command, &trigger_emergency_switch_command,
+      &power_net_on_off_command_);
+  march_pdb_interface.registerHandle(marchPdbStateHandle);
+
+  registerInterface(&march_temperature_interface);
+  registerInterface(&march_pdb_interface);
+
+  registerInterface(&joint_state_interface_);
+  registerInterface(&position_joint_interface_);
+  registerInterface(&effort_joint_interface_);
+  registerInterface(&positionJointSoftLimitsInterface);
+
   // Initialize interfaces for each joint
   for (int i = 0; i < num_joints_; ++i) {
     march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
@@ -131,20 +146,6 @@ void MarchHardwareInterface::init() {
       joint.prepareActuation();
     }
   }
-  // Create march_pdb_state interface
-  MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_,
-      &master_shutdown_allowed_command, &trigger_emergency_switch_command,
-      &power_net_on_off_command_);
-  march_pdb_interface.registerHandle(marchPdbStateHandle);
-
-  registerInterface(&march_temperature_interface);
-  registerInterface(&march_pdb_interface);
-
-  registerInterface(&joint_state_interface_);
-  registerInterface(&position_joint_interface_);
-  registerInterface(&effort_joint_interface_);
-  registerInterface(&positionJointSoftLimitsInterface);
 }
 
 void MarchHardwareInterface::update(const ros::TimerEvent &e) {
