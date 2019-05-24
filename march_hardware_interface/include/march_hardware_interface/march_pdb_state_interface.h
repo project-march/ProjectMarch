@@ -1,5 +1,4 @@
-// Copyright 2019 Project MarchMarchPdbStateHandlen PDO Map (total bits 272,
-// only 2
+// Copyright 2019 Project March.
 
 #ifndef HARDWARE_INTERFACE_MARCH_PDB_STATE_INTERFACE_H
 #define HARDWARE_INTERFACE_MARCH_PDB_STATE_INTERFACE_H

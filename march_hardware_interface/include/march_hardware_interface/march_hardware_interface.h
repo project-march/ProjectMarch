@@ -1,19 +1,8 @@
 #ifndef ROS_CONTROL__MARCH_HARDWARE_INTERFACE_H
 #define ROS_CONTROL__MARCH_HARDWARE_INTERFACE_H
 
-#include <boost/scoped_ptr.hpp>
 #include <control_toolbox/filters.h>
-#include <controller_manager/controller_manager.h>
-#include <hardware_interface/joint_command_interface.h>
-#include <hardware_interface/joint_state_interface.h>
-#include <hardware_interface/robot_hw.h>
-#include <joint_limits_interface/joint_limits.h>
-#include <joint_limits_interface/joint_limits_interface.h>
-#include <joint_limits_interface/joint_limits_rosparam.h>
-#include <joint_limits_interface/joint_limits_urdf.h>
 #include <march_hardware_interface/march_hardware.h>
-#include <march_hardware_interface/march_pdb_state_interface.h>
-#include <march_hardware_interface/march_temperature_sensor_interface.h>
 #include <ros/ros.h>
 
 #include <march_hardware_builder/HardwareBuilder.h>
