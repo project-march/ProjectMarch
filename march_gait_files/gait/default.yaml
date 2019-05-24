@@ -1,5 +1,7 @@
 gaits:
   home_sit: {home_sit: home_sit}
   home_stand: {home_stand: home_stand}
+  sit: {sit: sit}
+  stand: {stand: stand}
   walk: {left_close: left_close, left_swing: test, right_close: right_close, right_open: test_a_bit_higher,
     right_swing: test}
