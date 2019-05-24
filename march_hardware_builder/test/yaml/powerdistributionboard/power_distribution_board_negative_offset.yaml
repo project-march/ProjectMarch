@@ -7,7 +7,7 @@ netMonitorByteOffsets:
   powerDistributionBoardCurrent: 5
   lowVoltageNet1Current: 9
   lowVoltageNet2Current: 13
-  highVoltageNetCurrent: 17
+  highVoltageNetCurrent: -17
   lowVoltageState: 3
   highVoltageOvercurrentTrigger: 2
   highVoltageEnabled: 1

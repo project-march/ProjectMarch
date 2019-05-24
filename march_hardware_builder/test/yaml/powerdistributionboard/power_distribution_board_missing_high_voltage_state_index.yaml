@@ -1,4 +1,3 @@
-slaveIndex: 1
 bootShutdownOffsets:
   masterOk: 0
   shutdown: 0
@@ -11,7 +10,6 @@ netMonitorByteOffsets:
   lowVoltageState: 3
   highVoltageOvercurrentTrigger: 2
   highVoltageEnabled: 1
-  highVoltageState: 4
 netDriverByteOffsets:
   lowVoltageNetOnOff: 4
   highVoltageNetOnOff: 3
