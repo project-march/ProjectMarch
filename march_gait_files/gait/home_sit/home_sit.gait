@@ -1,0 +1,5 @@
+name: home_sit
+
+graph:
+  from_subgait: [start,    home_sit]
+  to_subgait:   [home_sit, end    ]
