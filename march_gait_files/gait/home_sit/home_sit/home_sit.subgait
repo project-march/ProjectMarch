@@ -1,0 +1,14 @@
+duration:
+  secs: 5
+  nsecs: 0
+
+trajectory:
+  joint_names: [left_hip, right_hip, left_knee, right_knee, left_ankle, right_ankle]
+  points:
+    - positions: [1.4, 1.4, 1.4, 1.4, 0.0, 0.0]
+      velocities: [0.0, 0, 0, 0, 0, 0]
+      accelerations: []
+      effort: []
+      time_from_start:
+        secs: 5
+        nsecs: 000000000
