@@ -14,7 +14,7 @@ pdbSetup:
       highVoltageNetCurrent: 17
       lowVoltageState: 3
       highVoltageOvercurrentTrigger: 2
-      emergencyButtonTriggered: 1
+      highVoltageEnabled: 1
       highVoltageState: 4
     netDriverByteOffsets:
       lowVoltageNetOnOff: 4

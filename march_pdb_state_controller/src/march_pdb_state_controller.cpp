@@ -106,7 +106,7 @@ MarchPdbStateController::createHighVoltageNetsMessage(march4cpp::HighVoltage hig
     highVoltageNetMsg.name = boost::lexical_cast<std::string>(i);
     highVoltageNetMsg.operational = high_voltage.getNetOperational(i);
     highVoltageNetMsg.overcurrent_triggered = high_voltage.getOvercurrentTrigger(i);
-    highVoltageNetMsgs[i - 1] = highVoltageNetMsg;
+    highVoltageNetMsgs.push_back(highVoltageNetMsg);
   }
   return highVoltageNetMsgs;
 }
@@ -121,13 +121,14 @@ MarchPdbStateController::createLowVoltageNetsMessage(march4cpp::LowVoltage low_v
     lowVoltageNetMsg.name = boost::lexical_cast<std::string>(i);
     lowVoltageNetMsg.operational = low_voltage.getNetOperational(i);
     lowVoltageNetMsg.current = low_voltage.getNetCurrent(i);
-    lowVoltageNetMsgs[i - 1] = lowVoltageNetMsg;
+    lowVoltageNetMsgs.push_back(lowVoltageNetMsg);
   }
   return lowVoltageNetMsgs;
 }
 
 void MarchPdbStateController::update(const ros::Time& time, const ros::Duration& /*period*/)
 {
+  ROS_DEBUG_THROTTLE(1, "update MarchPdbStateController");
   // limit rate of publishing
   if (publish_rate_ > 0.0 && last_publish_times_ + ros::Duration(1.0 / publish_rate_) < time)
   {

@@ -37,13 +37,13 @@ HardwareBuilder::createMarchRobot(YAML::Node marchRobotConfig) {
     jointList.push_back(this->createJoint(jointConfig[jointName], jointName));
   }
 
-  ROS_INFO_STREAM("marchRobotConfig " << marchRobotConfig);
+  ROS_INFO_STREAM("marchRobotConfig " << marchRobotConfig << "\n");
   if (marchRobotConfig["powerDistributionBoard"].Type() !=
       YAML::NodeType::Undefined) {
     march4cpp::PowerDistributionBoard powerDistributionBoard =
         createPowerDistributionBoard(
             marchRobotConfig["powerDistributionBoard"]);
-    ROS_INFO_STREAM("powerDistributionBoard: " << powerDistributionBoard);
+    ROS_INFO_STREAM("PowerDistributionBoard: " << powerDistributionBoard);
     return march4cpp::MarchRobot(jointList, powerDistributionBoard, ifName,
                                  ecatCycleTime);
   } else {
@@ -138,11 +138,14 @@ HardwareBuilder::createTemperatureGES(YAML::Node temperatureGESConfig) {
 
 march4cpp::PowerDistributionBoard HardwareBuilder::createPowerDistributionBoard(
     YAML::Node powerDistributionBoardConfig) {
+  ROS_INFO("Create power distribution board");
   this->validateRequiredKeysExist(powerDistributionBoardConfig,
                                   this->POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS,
                                   "powerdistributionboard");
 
+  ROS_INFO("Keys validated");
   int slaveIndex = powerDistributionBoardConfig["slaveIndex"].as<int>();
+  ROS_INFO("slaveIndex retrieved");
   YAML::Node netMonitorByteOffsets =
       powerDistributionBoardConfig["netMonitorByteOffsets"];
   YAML::Node netDriverByteOffsets =
@@ -170,6 +173,7 @@ march4cpp::PowerDistributionBoard HardwareBuilder::createPowerDistributionBoard(
                           bootShutdownByteOffsets["shutdown"].as<int>(),
                           bootShutdownByteOffsets["shutdownAllowed"].as<int>());
 
+  ROS_INFO("Returning PowerDistributionBoard");
   return march4cpp::PowerDistributionBoard(
       slaveIndex, netMonitorOffsets, netDriverOffsets, bootShutdownOffsets);
 }

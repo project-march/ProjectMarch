@@ -48,8 +48,8 @@ private:
   ros::Subscriber sub_turn_low_net_on_or_off;
   ros::Subscriber sub_turn_high_net_on_or_off;
 
-  std::vector<march_shared_resources::HighVoltageNet> createHighVoltageNetsMessage(march4cpp::HighVoltage high_voltage);
-  std::vector<march_shared_resources::LowVoltageNet> createLowVoltageNetsMessage(march4cpp::LowVoltage low_voltage);
+  static std::vector<march_shared_resources::HighVoltageNet> createHighVoltageNetsMessage(march4cpp::HighVoltage high_voltage);
+  static std::vector<march_shared_resources::LowVoltageNet> createLowVoltageNetsMessage(march4cpp::LowVoltage low_voltage);
   void emergencySwitchCallback(const std_msgs::Bool::ConstPtr& msg);
   void masterShutdownAllowedCallback(const std_msgs::Bool::ConstPtr& msg);
   void turnHighVoltageNetOnOrOffCallBack(const std_msgs::Int8::ConstPtr& msg);
