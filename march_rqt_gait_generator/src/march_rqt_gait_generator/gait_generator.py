@@ -307,7 +307,7 @@ class GaitGeneratorPlugin(Plugin):
             return
         self.gait = import_from_file_name(self.robot, file_name)
         if self.gait is None:
-            rospy.logerr("Could not load gait %s.", file_name)
+            rospy.logwarn("Could not load gait %s", file_name)
         else:
             self.load_gait_into_ui()
 
