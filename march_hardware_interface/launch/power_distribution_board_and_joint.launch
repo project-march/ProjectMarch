@@ -5,9 +5,10 @@
 
     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="true" output="screen" ns="/"
           args="
+                /march/controller/joint_state
                 /march/controller/pdb_state
             "/>
 
-    <node name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" args="pdb_test_setup" output="screen"/>
+    <node name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" args="pdb_and_joint_test_setup" output="screen"/>
 
 </launch>

@@ -11,8 +11,9 @@ public:
   enum Value : int
   {
     march3,
-    testsetup,
-    pdbtestsetup
+    test_setup,
+    pdb_test_setup,
+    pdb_and_joint_test_setup
   };
 
   AllowedRobot() = default;
@@ -22,35 +23,39 @@ public:
     {
       this->value = march3;
     }
-    else if (robotName == "testsetup")
+    else if (robotName == "test_setup")
     {
-      this->value = testsetup;
+      this->value = test_setup;
     }
-    else if (robotName == "pdbtestsetup")
+    else if (robotName == "pdb_test_setup")
     {
-      this->value = pdbtestsetup;
+      this->value = pdb_test_setup;
     }
     else
     {
       ROS_ASSERT_MSG(false, "Unknown robot %s", robotName.c_str());
-      this->value = AllowedRobot::testsetup;
+      this->value = AllowedRobot::test_setup;
     }
   }
 
   std::string getFilePath()
   {
     std::string basePath = ros::package::getPath("march_hardware_builder");
-    if (this->value == AllowedRobot::testsetup)
+    if (this->value == AllowedRobot::test_setup)
     {
-      return basePath.append("/src/robots/testsetup.yaml");
+      return basePath.append("/src/robots/test_setup.yaml");
     }
     else if (this->value == AllowedRobot::march3)
     {
         return basePath.append("/src/robots/march3.yaml");
     }
-    else if (this->value == AllowedRobot::pdbtestsetup)
+    else if (this->value == AllowedRobot::pdb_test_setup)
     {
-        return basePath.append("/src/robots/power_distribution_board_setup.yaml");
+      return basePath.append("/src/robots/power_distribution_board_setup.yaml");
+    }
+    else if (this->value == AllowedRobot::pdb_and_joint_test_setup)
+    {
+      return basePath.append("/src/robots/power_distribution_board_and_joint_setup.yaml");
     }
     ROS_ERROR("Robotname not implemented. Using march3.yaml...");
     return basePath.append("/src/robots/march3.yaml");
