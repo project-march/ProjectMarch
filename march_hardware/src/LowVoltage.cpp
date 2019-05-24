@@ -25,7 +25,8 @@ bool LowVoltage::getNetOperational(int netNumber)
 {
   if (netNumber < 1 || netNumber > 2)
   {
-    ROS_ERROR_THROTTLE(2, "Can't get operational state from low voltage net %d, there are only 2 low voltage nets", netNumber);
+    ROS_ERROR_THROTTLE(2, "Can't get operational state from low voltage net %d, there are only 2 low voltage nets",
+                       netNumber);
     throw std::invalid_argument("Only low voltage net 1 and 2 exist");
   }
   union bit8 operational = get_input_bit8(static_cast<uint16>(this->slaveIndex),

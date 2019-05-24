@@ -31,7 +31,7 @@ public:
   friend bool operator==(const LowVoltage& lhs, const LowVoltage& rhs)
   {
     return lhs.slaveIndex == rhs.slaveIndex && lhs.netDriverOffsets == rhs.netDriverOffsets &&
-        lhs.netMonitoringOffsets == rhs.netMonitoringOffsets;
+           lhs.netMonitoringOffsets == rhs.netMonitoringOffsets;
   }
 
   /** @brief Override stream operator for clean printing */
@@ -41,7 +41,6 @@ public:
               << "netMonitoringOffsets: " << lowVoltage.netMonitoringOffsets << ", "
               << "netDriverOffsets: " << lowVoltage.netDriverOffsets << ")";
   }
-
 };
 
 }  // namespace march4cpp

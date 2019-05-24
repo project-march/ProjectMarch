@@ -28,7 +28,7 @@ public:
   MarchRobot(::std::vector<Joint> jointList, PowerDistributionBoard powerDistributionBoard, ::std::string ifName,
              int ecatCycleTime);
 
-  //TODO(TIM) This is needed for the destructor, but why??
+  // TODO(TIM) This is needed for the destructor, but why??
   MarchRobot(MarchRobot&&) = default;
 
   ~MarchRobot();
@@ -45,9 +45,9 @@ public:
 
   Joint getJoint(::std::string jointName);
 
-    const std::unique_ptr<PowerDistributionBoard> &getPowerDistributionBoard() const;
+  const std::unique_ptr<PowerDistributionBoard>& getPowerDistributionBoard() const;
 
-    /** @brief Override comparison operator */
+  /** @brief Override comparison operator */
   friend bool operator==(const MarchRobot& lhs, const MarchRobot& rhs)
   {
     if (lhs.jointList.size() != rhs.jointList.size())
