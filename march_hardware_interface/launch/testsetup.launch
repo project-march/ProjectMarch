@@ -8,7 +8,7 @@
 
     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="true" output="screen" ns="/"
           args="
-                /march/controller/state
+                /march/controller/joint_state
                 /march/controller/temperature_sensor
                 /march/controller/trajectory/testjoint
             "/>

@@ -1,6 +1,6 @@
 march:
   controller:
-    state:
+    joint_state:
       type: joint_state_controller/JointStateController
       publish_rate: 50
     temperature_sensor:
