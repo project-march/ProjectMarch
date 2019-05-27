@@ -10,7 +10,7 @@ march:
       type: march_pdb_state_controller/MarchPdbStateController
       publish_rate: 50
     trajectory:
-      testjoint:
+      test_joint:
         type: position_controllers/JointTrajectoryController
         joints:
           - test_joint

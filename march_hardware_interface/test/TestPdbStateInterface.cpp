@@ -14,14 +14,14 @@ class TestPdbStateInterface : public ::testing::Test
 protected:
   march4cpp::PowerDistributionBoard power_distribution_board_read_;
   bool master_shutdown_allowed_command = false;
-  bool trigger_emergency_switch_command = true;
+  bool all_high_voltage_on_off_command = true;
   PowerNetOnOffCommand power_net_on_off_command_;
 
   void SetUp() override
   {
     power_distribution_board_read_ = march4cpp::PowerDistributionBoard();
     master_shutdown_allowed_command = false;
-    trigger_emergency_switch_command = true;
+    all_high_voltage_on_off_command = true;
     power_net_on_off_command_ = PowerNetOnOffCommand();
   }
 };
@@ -29,7 +29,7 @@ protected:
 TEST_F(TestPdbStateInterface, GeName)
 {
   march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &trigger_emergency_switch_command,
+      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
       &power_net_on_off_command_);
   EXPECT_EQ("PDBhandle", marchPdbStateHandle.getName());
 }
@@ -37,7 +37,7 @@ TEST_F(TestPdbStateInterface, GeName)
 TEST_F(TestPdbStateInterface, GetPowerDistributionBoardEquals)
 {
   march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &trigger_emergency_switch_command,
+      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
       &power_net_on_off_command_);
   EXPECT_TRUE(power_distribution_board_read_ == *marchPdbStateHandle.getPowerDistributionBoard());
 }
@@ -50,7 +50,7 @@ TEST_F(TestPdbStateInterface, GetPowerDistributionBoardNotEqual)
   march4cpp::PowerDistributionBoard pdb =
       march4cpp::PowerDistributionBoard(1, currentOffsets, netDriverOffsets, stateOffsets);
   march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &trigger_emergency_switch_command,
+      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
       &power_net_on_off_command_);
   EXPECT_FALSE(pdb == *marchPdbStateHandle.getPowerDistributionBoard());
 }
@@ -58,7 +58,7 @@ TEST_F(TestPdbStateInterface, GetPowerDistributionBoardNotEqual)
 TEST_F(TestPdbStateInterface, SetMasterShutdownAllowedTrue)
 {
   march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &trigger_emergency_switch_command,
+      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
       &power_net_on_off_command_);
 
   EXPECT_FALSE(master_shutdown_allowed_command);
@@ -68,7 +68,7 @@ TEST_F(TestPdbStateInterface, SetMasterShutdownAllowedTrue)
 TEST_F(TestPdbStateInterface, SetMasterShutdownAllowedFalse)
 {
   march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &trigger_emergency_switch_command,
+      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
       &power_net_on_off_command_);
 
   EXPECT_FALSE(master_shutdown_allowed_command);
@@ -76,20 +76,20 @@ TEST_F(TestPdbStateInterface, SetMasterShutdownAllowedFalse)
   EXPECT_FALSE(master_shutdown_allowed_command);
 }
 
-TEST_F(TestPdbStateInterface, TriggerEmergencySwitchTrue)
+TEST_F(TestPdbStateInterface, AllHighVoltageOnOffTrue)
 {
   march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &trigger_emergency_switch_command,
+      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
       &power_net_on_off_command_);
 
-  EXPECT_TRUE(trigger_emergency_switch_command);
+  EXPECT_TRUE(all_high_voltage_on_off_command);
   marchPdbStateHandle.setMasterShutdownAllowed(true);
-  EXPECT_TRUE(trigger_emergency_switch_command);
+  EXPECT_TRUE(all_high_voltage_on_off_command);
 }
 TEST_F(TestPdbStateInterface, TurnLowNetOn)
 {
   march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &trigger_emergency_switch_command,
+      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
       &power_net_on_off_command_);
 
   // Check if the power net type is undefined
@@ -103,7 +103,7 @@ TEST_F(TestPdbStateInterface, TurnLowNetOn)
 TEST_F(TestPdbStateInterface, TurnLowNetOff)
 {
   march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &trigger_emergency_switch_command,
+      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
       &power_net_on_off_command_);
 
   // Check if the power net type is undefined
@@ -116,7 +116,7 @@ TEST_F(TestPdbStateInterface, TurnLowNetOff)
 TEST_F(TestPdbStateInterface, TurnHighNetOn)
 {
   march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &trigger_emergency_switch_command,
+      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
       &power_net_on_off_command_);
 
   // Check if the power net type is undefined
@@ -130,7 +130,7 @@ TEST_F(TestPdbStateInterface, TurnHighNetOn)
 TEST_F(TestPdbStateInterface, TurnHighNetOff)
 {
   march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &trigger_emergency_switch_command,
+      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
       &power_net_on_off_command_);
 
   // Check if the power net type is undefined

@@ -6,10 +6,10 @@ namespace march_pdb_state_controller
 {
 // TODO(TIM) Remove the callbacks and subscribers when they are not needed anymore
 // These topics make it able to tests write to pdb commands.
-void MarchPdbStateController::emergencySwitchCallback(const std_msgs::Bool::ConstPtr& msg)
+void MarchPdbStateController::allHighVoltageOnOffCallback(const std_msgs::Bool::ConstPtr &msg)
 {
-  ROS_INFO("emergencySwitchCallback %d", msg->data);
-  pdb_state_.triggerEmergencySwitch(msg->data);
+  ROS_INFO("allHighVoltageOnOffCallback %d", msg->data);
+  pdb_state_.allHighVoltageOnOff(msg->data);
 }
 void MarchPdbStateController::masterShutdownAllowedCallback(const std_msgs::Bool::ConstPtr& msg)
 {
@@ -74,10 +74,8 @@ bool MarchPdbStateController::init(march_hardware_interface::MarchPdbStateInterf
     realtime_pubs_ = rt_pub;
   }
 
-  ROS_INFO("Subscriber to "
-           "march/power_distribution_board/emergency_switch_triggered");
-  sub_emergency = controller_nh.subscribe("emergency_switch_triggered", 1000,
-                                          &MarchPdbStateController::emergencySwitchCallback, this);
+  sub_all_high_voltage = controller_nh.subscribe("enable_all_high_voltage", 1000,
+                                          &MarchPdbStateController::allHighVoltageOnOffCallback, this);
 
   sub_master_shutdown_allowed =
       controller_nh.subscribe("shutdown_allowed", 1000, &MarchPdbStateController::masterShutdownAllowedCallback, this);

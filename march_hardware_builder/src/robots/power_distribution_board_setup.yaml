@@ -19,4 +19,4 @@ pdbSetup:
     netDriverByteOffsets:
       lowVoltageNetOnOff: 4
       highVoltageNetOnOff: 3
-      highVoltageEmergencySwitchOnOff: 2
+      allHighVoltageOnOff: 2

@@ -61,7 +61,7 @@ protected:
   march4cpp::PowerDistributionBoard power_distribution_board_read_;
   bool master_shutdown_allowed_command = false;
   //TODO(TIM) check if this is working::
-  bool trigger_emergency_switch_command = true;
+  bool enable_high_voltage_command = true;
   PowerNetOnOffCommand power_net_on_off_command_;
 
   std::vector<double> joint_temperature_;

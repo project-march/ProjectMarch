@@ -8,15 +8,15 @@ class NetDriverOffsets
 {
   int lowVoltageNetOnOff;
   int highVoltageNetOnOff;
-  int highVoltageEmergencySwitchOnOff;
+  int allHighVoltageOnOff;
 
 public:
-  NetDriverOffsets(int lowVoltageNetOnOff, int highVoltageNetOnOff, int highVoltageEmergencySwitchOnOff)
+  NetDriverOffsets(int lowVoltageNetOnOff, int highVoltageNetOnOff, int allHighVoltageOnOff)
     : lowVoltageNetOnOff(lowVoltageNetOnOff)
     , highVoltageNetOnOff(highVoltageNetOnOff)
-    , highVoltageEmergencySwitchOnOff(highVoltageEmergencySwitchOnOff)
+    , allHighVoltageOnOff(allHighVoltageOnOff)
   {
-    if (lowVoltageNetOnOff < 0 || highVoltageNetOnOff < 0 || highVoltageEmergencySwitchOnOff < 0)
+    if (lowVoltageNetOnOff < 0 || highVoltageNetOnOff < 0 || allHighVoltageOnOff < 0)
     {
       ROS_ERROR("Negative byte offset not possible");
       throw std::runtime_error("Negative byte offset not possible");
@@ -27,7 +27,7 @@ public:
   {
     lowVoltageNetOnOff = -1;
     highVoltageNetOnOff = -1;
-    highVoltageEmergencySwitchOnOff = -1;
+    allHighVoltageOnOff = -1;
   }
 
   int getLowVoltageNetOnOff() const
@@ -50,21 +50,21 @@ public:
     return highVoltageNetOnOff;
   }
 
-  int getHighVoltageEmergencySwitchOnOff() const
+  int getAllHighVoltageOnOff() const
   {
-    if (highVoltageEmergencySwitchOnOff == -1)
+    if (allHighVoltageOnOff == -1)
     {
-      ROS_FATAL("highVoltageEmergencySwitchOnOffOffset is -1");
-      throw std::runtime_error("highVoltageEmergencySwitchOnOffOffset is -1");
+      ROS_FATAL("allHighVoltageOnOffOffset is -1");
+      throw std::runtime_error("allHighVoltageOnOffOffset is -1");
     }
-    return highVoltageEmergencySwitchOnOff;
+    return allHighVoltageOnOff;
   }
 
   /** @brief Override comparison operator */
   friend bool operator==(const NetDriverOffsets& lhs, const NetDriverOffsets& rhs)
   {
     return lhs.lowVoltageNetOnOff == rhs.lowVoltageNetOnOff && lhs.highVoltageNetOnOff == rhs.highVoltageNetOnOff &&
-           lhs.highVoltageEmergencySwitchOnOff == rhs.highVoltageEmergencySwitchOnOff;
+           lhs.allHighVoltageOnOff == rhs.allHighVoltageOnOff;
   }
 
   /** @brief Override stream operator for clean printing */
@@ -72,7 +72,7 @@ public:
   {
     return os << "NetDriverOffsets(lowVoltageNetOnOff: " << netDriverOffsets.lowVoltageNetOnOff << ", "
               << "highVoltageNetOnOff: " << netDriverOffsets.highVoltageNetOnOff << ", "
-              << "highVoltageEmergencySwitchOnOff: " << netDriverOffsets.highVoltageEmergencySwitchOnOff << ")";
+              << "allHighVoltageOnOff: " << netDriverOffsets.allHighVoltageOnOff << ")";
   }
 };
 

@@ -61,7 +61,7 @@ protected:
 
 private:
   void updatePowerNet();
-  void updateEmergencySwitch();
+  void updateHighVoltageEnable();
   void updatePowerDistributionBoard();
 };
 }

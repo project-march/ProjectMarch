@@ -64,7 +64,7 @@ void MarchHardwareInterface::init()
 
   // Create march_pdb_state interface
   MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
-                                          &master_shutdown_allowed_command, &trigger_emergency_switch_command,
+                                          &master_shutdown_allowed_command, &enable_high_voltage_command,
                                           &power_net_on_off_command_);
   march_pdb_interface.registerHandle(marchPdbStateHandle);
 
@@ -193,30 +193,30 @@ void MarchHardwareInterface::updatePowerDistributionBoard()
 {
   marchRobot.getPowerDistributionBoard()->setMasterOnline();
   marchRobot.getPowerDistributionBoard()->setMasterShutDownAllowed(master_shutdown_allowed_command);
-  updateEmergencySwitch();
+  updateHighVoltageEnable();
   updatePowerNet();
 }
 
-void MarchHardwareInterface::updateEmergencySwitch()
+void MarchHardwareInterface::updateHighVoltageEnable()
 {
   try
   {
     if (marchRobot.getPowerDistributionBoard()->getHighVoltage().getHighVoltageEnabled() !=
-        trigger_emergency_switch_command)
+        enable_high_voltage_command)
     {
-      marchRobot.getPowerDistributionBoard()->getHighVoltage().setEmergencySwitchOnOff(
-          trigger_emergency_switch_command);
+      marchRobot.getPowerDistributionBoard()->getHighVoltage().setHighVoltageOnOff(
+          enable_high_voltage_command);
     }
     else if (marchRobot.getPowerDistributionBoard()->getHighVoltage().getHighVoltageEnabled())
     {
-      ROS_WARN_THROTTLE(2, "Emergency high voltage disabled");
+      ROS_WARN_THROTTLE(2, "High voltage disabled");
     }
   }
   catch (std::exception& exception)
   {
     ROS_ERROR("%s", exception.what());
-    ROS_DEBUG("Reverting the emergency switch command input, in attempt to prevent this exception is thrown again");
-    trigger_emergency_switch_command = !trigger_emergency_switch_command;
+    ROS_DEBUG("Reverting the enable_high_voltage_command input, in attempt to prevent this exception is thrown again");
+    enable_high_voltage_command = !enable_high_voltage_command;
   }
 }
 

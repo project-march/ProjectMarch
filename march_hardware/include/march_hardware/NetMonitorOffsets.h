@@ -20,14 +20,14 @@ public:
   NetMonitorOffsets(int powerDistributionBoardCurrentByteOffset, int lowVoltageNet1CurrentByteOffset,
                     int lowVoltageNet2CurrentByteOffset, int highVoltageNetCurrentByteOffset,
                     int lowVoltageStateByteOffset, int highVoltageOvercurrentTriggerByteOffset,
-                    int emergencyButtonTriggeredByteOffset, int highVoltageStateByteOffset)
+                    int highVoltageEnabled, int highVoltageStateByteOffset)
     : powerDistributionBoardCurrent(powerDistributionBoardCurrentByteOffset)
     , lowVoltageNet1Current(lowVoltageNet1CurrentByteOffset)
     , lowVoltageNet2Current(lowVoltageNet2CurrentByteOffset)
     , highVoltageNetCurrent(highVoltageNetCurrentByteOffset)
     , lowVoltageState(lowVoltageStateByteOffset)
     , highVoltageOvercurrentTrigger(highVoltageOvercurrentTriggerByteOffset)
-    , highVoltageEnabled(emergencyButtonTriggeredByteOffset)
+    , highVoltageEnabled(highVoltageEnabled)
     , highVoltageState(highVoltageStateByteOffset)
   {
     if (powerDistributionBoardCurrent < 0 || lowVoltageNet1Current < 0 || lowVoltageNet2Current < 0 ||

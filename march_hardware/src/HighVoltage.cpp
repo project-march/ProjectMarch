@@ -65,7 +65,8 @@ void HighVoltage::setNetOnOff(bool on, int netNumber)
   }
   if (!on)
   {
-    ROS_ERROR_THROTTLE(2, "You are not allowed to turn off high voltage nets this way, use the emergency switch");
+    ROS_ERROR_THROTTLE(2, "You are not allowed to turn off high voltage nets this way, use the all high voltage "
+                          "on/off");
     throw std::runtime_error("Turning on high voltage this way during runtime is not allowed");
   }
   else if (getNetOperational(netNumber))
@@ -89,31 +90,31 @@ void HighVoltage::setNetOnOff(bool on, int netNumber)
                   static_cast<uint8>(this->netDriverOffsets.getHighVoltageNetOnOff()), highVoltageNets);
 }
 
-void HighVoltage::setEmergencySwitchOnOff(bool on)
+void HighVoltage::setHighVoltageOnOff(bool on)
 {
   if (on && getHighVoltageEnabled())
   {
-    ROS_ERROR_THROTTLE(2, "Emergency switch already activated");
-    throw std::runtime_error("Emergency switch already activated");
+    ROS_ERROR_THROTTLE(2, "All High voltage on/off switch already activated");
+    throw std::runtime_error("All High voltage on/off switch already activated");
   }
   else if (!on && !getHighVoltageEnabled())
   {
-    ROS_ERROR_THROTTLE(2, "Emergency switch already deactivated");
-    throw std::runtime_error("Emergency switch already deactivated");
+    ROS_ERROR_THROTTLE(2, "All High voltage on/off switch already deactivated");
+    throw std::runtime_error("All High voltage on/off switch already deactivated");
   }
   if (on)
   {
-    ROS_INFO_THROTTLE(2, "Emergency switch activated from software");
+    ROS_INFO_THROTTLE(2, "All High voltage on/off switch activated from software");
   }
   else
   {
-    ROS_WARN_THROTTLE(2, "Emergency switch deactivated, high voltage on");
+    ROS_WARN_THROTTLE(2, "All High voltage on/off switch deactivated, high voltage on");
   }
 
   bit8 isOn;
   isOn.ui = static_cast<uint8>(on);
   set_output_bit8(static_cast<uint16>(this->slaveIndex),
-                  static_cast<uint8>(this->netDriverOffsets.getHighVoltageEmergencySwitchOnOff()), isOn);
+                  static_cast<uint8>(this->netDriverOffsets.getAllHighVoltageOnOff()), isOn);
 }
 
 uint8 HighVoltage::getNetsOperational()

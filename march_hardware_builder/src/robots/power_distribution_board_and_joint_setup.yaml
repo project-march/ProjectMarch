@@ -3,12 +3,9 @@ pdbSetup:
   ecatCycleTime: 4
   joints:
     - test_joint:
-        allowActuation: true
-        temperatureges:
-          slaveIndex: 1
-          byteOffset: 0
+        allowActuation: false
         imotioncube:
-          slaveIndex: 2
+          slaveIndex: 1
           encoder:
             resolution: 16
             minPositionIU: 37961
@@ -16,7 +13,7 @@ pdbSetup:
             zeroPositionIU: 39717
             safetyMarginRad: 0.05
   powerDistributionBoard:
-    slaveIndex: 1
+    slaveIndex: 2
     bootShutdownOffsets:
       masterOk: 0
       shutdown: 0
@@ -33,4 +30,4 @@ pdbSetup:
     netDriverByteOffsets:
       lowVoltageNetOnOff: 4
       highVoltageNetOnOff: 3
-      highVoltageEmergencySwitchOnOff: 2
+      allHighVoltageOnOff: 2

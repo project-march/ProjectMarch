@@ -63,11 +63,12 @@ void IMotionCube::validateMosiPDOs()
 // Set configuration parameters to the IMC
 void IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
 {
+  ROS_INFO("IMotionCube::writeInitialSettings");
   bool success = true;
   // sdo_bit32(slaveIndex, address, subindex, value);
   // mode of operation
   success &= sdo_bit8(slaveIndex, 0x6060, 0, 8);
-
+  ROS_INFO_STREAM(success);
   // position dimension index
   success &= sdo_bit8(slaveIndex, 0x608A, 0, 1);
 

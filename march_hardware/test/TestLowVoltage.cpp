@@ -50,6 +50,6 @@ TEST_F(TestLowVoltage, Stream)
   EXPECT_EQ("LowVoltage(slaveIndex: 1, netMonitoringOffsets: NetMonitorOffsets(powerDistributionBoardCurrent: -1, "
             "lowVoltageNet1Current: -1, lowVoltageNet2Current: -1, highVoltageNetCurrent: -1, lowVoltageState: -1, "
             "highVoltageOvercurrentTrigger: -1, highVoltageEnabled: -1, highVoltageState: -1), netDriverOffsets: "
-            "NetDriverOffsets(lowVoltageNetOnOff: -1, highVoltageNetOnOff: -1, highVoltageEmergencySwitchOnOff: -1))",
+            "NetDriverOffsets(lowVoltageNetOnOff: -1, highVoltageNetOnOff: -1, allHighVoltageOnOff: -1))",
             ss.str());
 }

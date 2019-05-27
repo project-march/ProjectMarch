@@ -17,11 +17,11 @@ public:
       const std::string &name,
       const march4cpp::PowerDistributionBoard *powerDistributionBoard,
       bool *master_shutdown_allowed_command,
-      bool *trigger_emergency_switch_command,
+      bool *all_high_voltage_on_off_command,
       PowerNetOnOffCommand *power_net_on_off_command)
       : name_(name), powerDistributionBoard_(powerDistributionBoard),
         master_shutdown_allowed_command_(master_shutdown_allowed_command),
-        trigger_emergency_switch_command_(trigger_emergency_switch_command),
+        all_high_voltage_on_off_command_(all_high_voltage_on_off_command),
         power_net_on_off_command_(power_net_on_off_command){}
 
   MarchPdbStateHandle() {}
@@ -39,10 +39,10 @@ public:
     *master_shutdown_allowed_command_ = is_allowed;
   }
 
-  void triggerEmergencySwitch(bool trigger) {
-    assert(trigger_emergency_switch_command_);
-    ROS_INFO("triggerEmergencySwitch %d", trigger);
-    *trigger_emergency_switch_command_ = trigger;
+  void allHighVoltageOnOff(bool on) {
+    assert(all_high_voltage_on_off_command_);
+    ROS_INFO("allHighVoltageOnOff %d", on);
+    *all_high_voltage_on_off_command_ = on;
   }
 
   void turnNetOnOrOff(PowerNetType type, bool on_or_off, int net_number){
@@ -55,7 +55,7 @@ public:
 private:
   std::string name_;
   bool *master_shutdown_allowed_command_;
-  bool *trigger_emergency_switch_command_;
+  bool *all_high_voltage_on_off_command_;
   PowerNetOnOffCommand *power_net_on_off_command_;
   const march4cpp::PowerDistributionBoard *powerDistributionBoard_;
 };
