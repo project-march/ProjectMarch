@@ -273,7 +273,11 @@ class GaitGeneratorPlugin(Plugin):
         rescale_setpoints = self._widget.GaitPropertiesFrame.findChild(QCheckBox, "ScaleSetpoints").isChecked()
 
         if self.gait.has_setpoints_after_duration(duration) and not rescale_setpoints:
-
+            if not self.gait.has_multiple_setpoints_before_duration(duration):
+                QMessageBox.question(self._widget, 'Could not update gait duration',
+                                     "Not all joints have multiple setpoints before duration " + str(duration),
+                                     QMessageBox.Ok)
+                return
             discard_setpoints = QMessageBox.question(self._widget, 'Gait duration lower than highest time setpoint',
                                                      "Do you want to discard any setpoints higher than the given "
                                                      "duration?",
