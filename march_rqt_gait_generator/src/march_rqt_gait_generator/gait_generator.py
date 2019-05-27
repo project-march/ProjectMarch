@@ -133,7 +133,6 @@ class GaitGeneratorPlugin(Plugin):
         QtGui.QShortcut(QtGui.QKeySequence("V"), self._widget).activated.connect(self.toggle_velocity_markers)
         QtGui.QShortcut(QtGui.QKeySequence("Space"), self._widget).activated.connect(self.toggle_time_slider_thread)
 
-
     def toggle_velocity_markers(self):
         self._widget.SettingsFrame.findChild(QCheckBox, "ShowVelocityMarkers").toggle()
 
@@ -323,7 +322,6 @@ class GaitGeneratorPlugin(Plugin):
         if self.thread is not None:
             self.thread.stop()
             self.thread = None
-
 
     def toggle_time_slider_thread(self):
         if self.thread is None:
