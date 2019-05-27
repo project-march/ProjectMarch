@@ -31,6 +31,10 @@ public:
     {
       this->value = pdb_test_setup;
     }
+    else if (robotName == "pdb_and_joint_test_setup")
+    {
+      this->value = pdb_and_joint_test_setup;
+    }
     else
     {
       ROS_ASSERT_MSG(false, "Unknown robot %s", robotName.c_str());
