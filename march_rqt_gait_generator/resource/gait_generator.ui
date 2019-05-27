@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>845</width>
+    <width>894</width>
     <height>722</height>
    </rect>
   </property>
@@ -46,42 +46,42 @@
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="0" colspan="3">
-       <widget class="QLabel" name="RvizPlaceholder">
-        <property name="text">
-         <string>Rviz placeholder</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2">
+      <item row="4" column="2">
        <widget class="QPushButton" name="Stop">
         <property name="text">
          <string>Stop</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="3">
+      <item row="3" column="0" colspan="3">
        <widget class="QSlider" name="TimeSlider">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="4" column="1">
        <widget class="QPushButton" name="Start">
         <property name="text">
          <string>Start</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0" colspan="3">
+      <item row="1" column="0" colspan="3">
        <widget class="QLabel" name="Label">
         <property name="text">
          <string>Gait Preview</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="2" column="0" colspan="3">
+       <widget class="QLabel" name="RvizPlaceholder">
+        <property name="text">
+         <string>Rviz placeholder</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
        <widget class="QLineEdit" name="PlaybackSpeed">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -199,42 +199,42 @@
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
-      <item row="0" column="0">
-       <widget class="QLabel" name="GaitDirectory">
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="Import">
-        <property name="text">
-         <string>Import Gait</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="Export">
-        <property name="text">
-         <string>Export Gait</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0" colspan="2">
+      <item row="4" column="0" colspan="2">
        <widget class="QLineEdit" name="TopicName">
         <property name="text">
          <string>/march/controller/trajectory/full_exoskeleton/command</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="0" colspan="2">
+      <item row="1" column="0">
+       <widget class="QLabel" name="GaitDirectory">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="Import">
+        <property name="text">
+         <string>Import Gait</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QPushButton" name="Export">
+        <property name="text">
+         <string>Export Gait</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" colspan="2">
        <widget class="QPushButton" name="Publish">
         <property name="text">
          <string>Publish</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QPushButton" name="ChangeGaitDirectory">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -258,6 +258,16 @@ Text-align: right
         </property>
         <property name="text">
          <string>Change Gait Directory</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="ShowVelocityMarkers">
+        <property name="text">
+         <string>Show velocity markers</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
