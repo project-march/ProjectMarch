@@ -41,14 +41,12 @@ void PowerDistributionBoard::setMasterShutDownAllowed(bool isAllowed)
                   static_cast<uint8>(this->bootShutdownOffsets.getShutdownAllowedByteOffset()), isAllowedBit);
 }
 
-
 bool PowerDistributionBoard::getMasterShutdownRequested()
 {
   union bit8 current = get_input_bit8(static_cast<uint16>(this->slaveIndex),
                                       static_cast<uint8>(this->bootShutdownOffsets.getShutdownByteOffset()));
   return current.ui;
 }
-
 
 HighVoltage PowerDistributionBoard::getHighVoltage()
 {
@@ -59,6 +57,5 @@ LowVoltage PowerDistributionBoard::getLowVoltage()
 {
   return lowVoltage;
 }
-
 
 }  // namespace march4cpp

@@ -28,9 +28,7 @@ MarchHardwareInterface::MarchHardwareInterface(ros::NodeHandle& nh, AllowedRobot
   non_realtime_loop_ = nh_.createTimer(update_freq, &MarchHardwareInterface::update, this);
 }
 
-MarchHardwareInterface::~MarchHardwareInterface()
-{
-}
+MarchHardwareInterface::~MarchHardwareInterface() = default;
 
 void MarchHardwareInterface::init()
 {
@@ -72,7 +70,6 @@ void MarchHardwareInterface::init()
 
   registerInterface(&march_temperature_interface);
   registerInterface(&march_pdb_interface);
-
   registerInterface(&joint_state_interface_);
   registerInterface(&position_joint_interface_);
   registerInterface(&effort_joint_interface_);
@@ -134,7 +131,6 @@ void MarchHardwareInterface::init()
     // Enable high voltage on the IMC
     if (joint.canActuate())
     {
-      float temp = joint.getTemperature();
       int net_number = joint.getNetNumber();
       power_distribution_board_read_.getHighVoltage().setNetOnOff(true, net_number);
       joint.prepareActuation();

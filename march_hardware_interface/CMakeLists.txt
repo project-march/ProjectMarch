@@ -76,6 +76,7 @@ if (CATKIN_ENABLE_TESTING)
     add_rostest_gtest(${PROJECT_NAME}-test
             test/march_hardware_interface.test
             test/TestRunner.cpp
+            test/TestPdbStateInterface.cpp
             )
     target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} gtest gmock)
 
