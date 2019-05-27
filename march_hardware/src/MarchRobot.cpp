@@ -26,7 +26,6 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, PowerDistributionBoard po
   this->jointList = std::move(jointList);
   this->powerDistributionBoard =
       std::unique_ptr<PowerDistributionBoard>(new PowerDistributionBoard(powerDistributionBoard));
-  // TODO(TIM) check if pdb should be added here:
   ethercatMaster.reset(new EthercatMaster(&this->jointList, ifName, this->getMaxSlaveIndex(), ecatCycleTime));
 }
 

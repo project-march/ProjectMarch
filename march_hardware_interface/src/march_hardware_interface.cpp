@@ -132,7 +132,10 @@ void MarchHardwareInterface::init()
     if (joint.canActuate())
     {
       int net_number = joint.getNetNumber();
-      power_distribution_board_read_.getHighVoltage().setNetOnOff(true, net_number);
+      if (power_distribution_board_read_.getSlaveIndex() != -1)
+      {
+        power_distribution_board_read_.getHighVoltage().setNetOnOff(true, net_number);
+      }
       joint.prepareActuation();
     }
   }
@@ -201,11 +204,9 @@ void MarchHardwareInterface::updateHighVoltageEnable()
 {
   try
   {
-    if (marchRobot.getPowerDistributionBoard()->getHighVoltage().getHighVoltageEnabled() !=
-        enable_high_voltage_command)
+    if (marchRobot.getPowerDistributionBoard()->getHighVoltage().getHighVoltageEnabled() != enable_high_voltage_command)
     {
-      marchRobot.getPowerDistributionBoard()->getHighVoltage().setHighVoltageOnOff(
-          enable_high_voltage_command);
+      marchRobot.getPowerDistributionBoard()->getHighVoltage().setHighVoltageOnOff(enable_high_voltage_command);
     }
     else if (marchRobot.getPowerDistributionBoard()->getHighVoltage().getHighVoltageEnabled())
     {

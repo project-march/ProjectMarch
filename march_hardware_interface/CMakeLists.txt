@@ -38,7 +38,6 @@ roslint_cpp(${lintfiles})
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
-#TODO(TIM) add header files here??
 set(SOURCES src/march_hardware_interface.cpp src/march_hardware_interface_node.cpp include/march_hardware_interface/PowerNetOnOffCommand.h)
 
 add_executable(march_hardware_interface_node ${SOURCES} ${SOURCE})
