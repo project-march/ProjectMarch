@@ -9,8 +9,8 @@ from march_shared_resources.msg import Subgait
 from rospy_message_converter import message_converter
 from python_qt_binding.QtWidgets import QMessageBox
 
-def export_to_file(gait, gait_directory):
 
+def export_to_file(gait, gait_directory):
     # Name and version will be empty as it's stored in the filename.
     subgait = Subgait()
 
@@ -26,8 +26,8 @@ def export_to_file(gait, gait_directory):
     file_exists = os.path.isfile(output_file_path)
     if file_exists:
         overwrite_file = QMessageBox.question(None, 'File already exists',
-                                                 "Do you want to overwrite " + str(output_file_path) + "?",
-                                                 QMessageBox.Yes | QMessageBox.No)
+                                              "Do you want to overwrite " + str(output_file_path) + "?",
+                                              QMessageBox.Yes | QMessageBox.No)
         if overwrite_file == QMessageBox.No:
             return
 
@@ -38,8 +38,6 @@ def export_to_file(gait, gait_directory):
     except OSError:
         if not os.path.isdir(output_file_directory):
             raise
-
-
 
     output_file = open(output_file_path, 'w')
     output_file.write(str(subgait))
