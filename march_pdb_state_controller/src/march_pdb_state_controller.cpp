@@ -4,6 +4,8 @@
 
 namespace march_pdb_state_controller
 {
+// TODO(TIM) Remove the callbacks and subscribers when they are not needed anymore
+// These topics make it able to tests write to pdb commands.
 void MarchPdbStateController::emergencySwitchCallback(const std_msgs::Bool::ConstPtr& msg)
 {
   ROS_INFO("emergencySwitchCallback %d", msg->data);
