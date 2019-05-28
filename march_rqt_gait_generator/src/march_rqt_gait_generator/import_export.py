@@ -11,6 +11,9 @@ from python_qt_binding.QtWidgets import QMessageBox
 
 
 def export_to_file(gait, gait_directory):
+    if gait_directory is None or gait_directory == "":
+        return
+
     # Name and version will be empty as it's stored in the filename.
     subgait = Subgait()
 
