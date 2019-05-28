@@ -41,7 +41,7 @@ class GaitGeneratorPlugin(Plugin):
         self.topic_name = ""
         self.gait_directory = None
         self.playback_speed = 100
-        self.thread = None
+        self.time_slider_thread = None
         self.joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=10)
 
         self.robot = urdf.Robot.from_parameter_server()
@@ -251,7 +251,7 @@ class GaitGeneratorPlugin(Plugin):
                                               JointTrajectory, queue_size=10)
 
     def set_playback_speed(self, playback_speed):
-        was_playing = self.thread is not None
+        was_playing = self.time_slider_thread is not None
         self.stop_time_slider_thread()
 
         self.playback_speed = playback_speed
@@ -260,20 +260,28 @@ class GaitGeneratorPlugin(Plugin):
             self.start_time_slider_thread()
 
     def start_time_slider_thread(self):
+        if self.time_slider_thread is not None:
+            rospy.logdebug("Cannot start another time slider thread as one is already active")
+            return
+
         time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
 
         current = time_slider.value()
         playback_speed = self.playback_speed
         max = time_slider.maximum()
-        self.thread = TimeSliderThread(current, playback_speed, max)
-        self.thread.update_signal.connect(self.update_main_time_slider)
-        self.thread.start()
+        self.time_slider_thread = TimeSliderThread(current, playback_speed, max)
+        self.time_slider_thread.update_signal.connect(self.update_main_time_slider)
+        self.time_slider_thread.start()
 
     def update_gait_duration(self, duration):
         rescale_setpoints = self._widget.GaitPropertiesFrame.findChild(QCheckBox, "ScaleSetpoints").isChecked()
 
         if self.gait.has_setpoints_after_duration(duration) and not rescale_setpoints:
-
+            if not self.gait.has_multiple_setpoints_before_duration(duration):
+                QMessageBox.question(self._widget, 'Could not update gait duration',
+                                     "Not all joints have multiple setpoints before duration " + str(duration),
+                                     QMessageBox.Ok)
+                return
             discard_setpoints = QMessageBox.question(self._widget, 'Gait duration lower than highest time setpoint',
                                                      "Do you want to discard any setpoints higher than the given "
                                                      "duration?",
@@ -284,7 +292,7 @@ class GaitGeneratorPlugin(Plugin):
         self.gait.set_duration(duration, rescale_setpoints)
         self._widget.RvizFrame.findChild(QSlider, "TimeSlider").setRange(0, 100 * self.gait.duration)
 
-        was_playing = self.thread is not None
+        was_playing = self.time_slider_thread is not None
         self.stop_time_slider_thread()
 
         self.create_joint_settings()
@@ -293,9 +301,9 @@ class GaitGeneratorPlugin(Plugin):
             self.start_time_slider_thread()
 
     def stop_time_slider_thread(self):
-        if self.thread is not None:
-            self.thread.stop()
-            self.thread = None
+        if self.time_slider_thread is not None:
+            self.time_slider_thread.stop()
+            self.time_slider_thread = None
 
     def load_gait(self):
 

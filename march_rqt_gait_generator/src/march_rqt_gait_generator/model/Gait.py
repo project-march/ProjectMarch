@@ -67,6 +67,16 @@ class Gait:
         rospy.logerr("Joint with name " + name + " does not exist in gait " + self.name + ".")
         return None
 
+    def has_multiple_setpoints_before_duration(self, duration):
+        for joint in self.joints:
+            count = 0
+            for setpoint in joint.setpoints:
+                if setpoint.time <= duration:
+                    count += 1
+            if count < 2:
+                return False
+        return True
+
     def has_setpoints_after_duration(self, duration):
         for joint in self.joints:
             for setpoint in joint.setpoints:

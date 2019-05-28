@@ -110,6 +110,9 @@ class JointSettingPlot(pg.PlotItem):
 
         # Check for deletion
         if event.modifiers() == QtCore.Qt.ShiftModifier:
+            # Only allow deletion when there are more than 2 items left.
+            if len(self.plot_item.getData()[0]) <= 2:
+                return
             for item in self.dataItems:
                 new_pts = item.scatter.pointsAt(local_position)
                 if len(new_pts) >= 1:
@@ -122,6 +125,13 @@ class JointSettingPlot(pg.PlotItem):
         # Create a new point
         time = self.getViewBox().mapSceneToView(event.scenePos()).x()
         position = self.getViewBox().mapSceneToView(event.scenePos()).y()
+
+        # If the time is smaller than 0, only create a setpoint with time 0 if no other exists yet
+        if time < 0:
+            x, y = self.plot_item.getData()
+            if 0 in x:
+                return
+            time = 0
 
         self.add_setpoint.emit(time, math.radians(position), event.modifiers())
         event.accept()
