@@ -25,8 +25,6 @@ protected:
     const float temperature = 42;
 };
 
-// TODO(Tim) write joint tests (with mocking)
-
 TEST_F(JointTest, AllowActuation)
 {
     march4cpp::TemperatureGES temp = march4cpp::TemperatureGES(2,2);

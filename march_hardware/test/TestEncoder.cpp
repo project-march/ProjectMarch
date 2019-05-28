@@ -12,14 +12,13 @@ using ::testing::Return;
 using ::testing::AtLeast;
 using ::testing::AtMost;
 
-class TestJoint : public ::testing::Test
+class TestEncoder : public ::testing::Test
 {
 protected:
-  // TODO(Tim) make parameterized
   const float angle = 42;
 };
 
-TEST_F(TestJoint, Encoder)
+TEST_F(TestEncoder, Encoder)
 {
   MockEncoder mockEncoder;
 
