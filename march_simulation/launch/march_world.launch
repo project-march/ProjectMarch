@@ -9,7 +9,7 @@
 
   <include file="$(find march_description)/launch/load_description.launch"/>
 
-  <rosparam file="$(find march_simulation)/config/config.yaml" command="load"/>
+  <rosparam file="$(find march_simulation)/config/config_march-iv.yaml" command="load"/>
 
   <node name="controller_spawner" pkg="controller_manager" type="spawner" ns="/march" output="screen"
         args="trajectory_controller joint_state_controller"/>
