@@ -123,6 +123,13 @@ class JointSettingPlot(pg.PlotItem):
         time = self.getViewBox().mapSceneToView(event.scenePos()).x()
         position = self.getViewBox().mapSceneToView(event.scenePos()).y()
 
+        # If the time is smaller than 0, only create a setpoint with time 0 if no other exists yet
+        if time < 0:
+            x, y = self.plot_item.getData()
+            if 0 in x:
+                return
+            time = 0
+
         self.add_setpoint.emit(time, math.radians(position), event.modifiers())
         event.accept()
 
