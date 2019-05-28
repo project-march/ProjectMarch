@@ -110,6 +110,9 @@ class JointSettingPlot(pg.PlotItem):
 
         # Check for deletion
         if event.modifiers() == QtCore.Qt.ShiftModifier:
+            # Only allow deletion when there are more than 2 items left.
+            if len(self.plot_item.getData()[0]) <= 2:
+                return
             for item in self.dataItems:
                 new_pts = item.scatter.pointsAt(local_position)
                 if len(new_pts) >= 1:
