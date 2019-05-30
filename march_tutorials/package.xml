@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package>
+  <name>march_tutorials</name>
+  <version>0.1.0</version>
+  <description>The march_tutorials package</description>
+  <license>BSD</license>
+
+  <author email="isha@projectmarch.nl">Isha Dijcks</author>
+  <author email="tim@projectmarch.nl">Tim Buckers</author>
+
+  <maintainer email="isha@projectmarch.nl">Isha Dijcks</maintainer>
+  <maintainer email="tim@projectmarch.nl">Tim Buckers</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>pluginlib</build_depend>
+  <test_depend>rosunit</test_depend>
+
+  <export>
+  </export>
+
+</package>
