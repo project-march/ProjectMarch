@@ -37,7 +37,7 @@ html_static_path = ['_static']
 html_context = {
     "display_github": True,
     "github_user": "project-march",
-    "github_repo": "march_tutorials",
+    "github_repo": "tutorials",
     "github_version": "develop",
     "conf_py_path": "",
     "source_suffix": source_suffix,
@@ -48,7 +48,7 @@ html_context = {
 
 # Links
 ros_distro = 'kinetic'
-extlinks = {'codedir': ('https://github.com/' + html_context["github_user"] + '/march_tutorials/tree/' + html_context["github_version"] + '/doc/%s', ''),
+extlinks = {'codedir': ('https://github.com/' + html_context["github_user"] + '/tutorials/tree/' + html_context["github_version"] + '/doc/%s', ''),
             'march_website': ('http://projectmarch.nl', '')}
 
 # Output file base name for HTML help builder.

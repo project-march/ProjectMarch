@@ -1,13 +1,13 @@
 # March Tutorials
 
-[https://project-march.github.io/march_tutorials/](https://project-march.github.io/march_tutorials/)
+[https://project-march.github.io/tutorials/](https://project-march.github.io/tutorials/)
 
 Welcome to the primary documentation for the March exoskeleton.
 
 These tutorials use the [reStructuredText](http://www.sphinx-doc.org/en/stable/rest.html) format commonly used in the Sphinx "Python Documentation Generator". This unfortunately differs from the common Markdown format, but its advantage is that it supports embedding code directly from source files for inline code tutorials.
 
-- [![Travis Status](https://travis-ci.org/project-march/march_tutorials.svg?branch=develop)](https://travis-ci.org/project-march/march_tutorials)
-- [Documentation on GitHub Pages](https://project-march.github.io/march_tutorials/): 
+- [![Travis Status](https://travis-ci.org/project-march/tutorials.svg?branch=develop)](https://travis-ci.org/project-march/tutorials)
+- [Documentation on GitHub Pages](https://project-march.github.io/tutorials/): 
 
 ## Build Locally
 
