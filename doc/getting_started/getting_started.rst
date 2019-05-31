@@ -2,7 +2,7 @@ Getting Started
 ===============
 
 Install ROS and Catkin
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
 `Install ROS Kinetic <http://wiki.ros.org/kinetic/Installation/Ubuntu>`_.
 It is easy to miss steps when going through the ROS installation tutorial. If you run into errors in the next few steps, a good place to start is to go back and make sure you have installed ROS correctly.
 
@@ -24,6 +24,7 @@ You will need to have a `catkin <http://wiki.ros.org/catkin>`_ workspace setup: 
 
 Download the march source code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 TODO
 
 Build your Catkin Workspace
@@ -52,6 +53,5 @@ Optional: add the previous command to your ``.bashrc``: ::
    catkin workspace at a time, but we recommend it for simplicity.
 
 Next Step
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^
 TODO Rviz quickstart
-`Visualize a robot with the interactive motion planning plugin for RViz <../quickstart_in_rviz/quickstart_in_rviz_tutorial.html>`_

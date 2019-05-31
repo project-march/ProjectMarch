@@ -3,9 +3,8 @@ project(march_tutorials)
 
 add_compile_options(-std=c++11)
 
-find_package(catkin REQUIRED
-  COMPONENTS
-    march_shared_resources
+find_package(catkin REQUIRED COMPONENTS
+        march_shared_resources
 )
 
 

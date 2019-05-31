@@ -1,5 +1,12 @@
 import sys, os
 
+# Retrieve branch name
+if os.environ['TRAVIS']:
+    branch_name = os.environ['BRANCH']
+else:  # Local
+    import pygit2
+    branch_name = pygit2.Repository('.').head.shorthand
+
 sys.path += [ os.path.abspath( '_scripts' )]
 
 extensions = [ 'sphinx.ext.extlinks',
@@ -38,7 +45,7 @@ html_context = {
     "display_github": True,
     "github_user": "project-march",
     "github_repo": "tutorials",
-    "github_version": "develop",
+    "github_version": branch_name,
     "conf_py_path": "",
     "source_suffix": source_suffix,
     "css_files": ['_static/override.css'],

@@ -12,6 +12,8 @@
   <maintainer email="tim@projectmarch.nl">Tim Buckers</maintainer>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>march_shared_resources</buildtool_depend>
+  <buildtool_depend>rosdoc_lite</buildtool_depend>
 
   <build_depend>pluginlib</build_depend>
   <test_depend>rosunit</test_depend>

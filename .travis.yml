@@ -1,0 +1,97 @@
+# Test build the March tutorials. Author: Isha Dijcks
+# Adapted from 'Test build the MoveIt! tutorials'. Original Author: Dave Coleman
+
+sudo: required
+dist: xenial
+language: ruby
+rvm:
+  - 2.4
+python:
+  - "2.7"
+compiler:
+  - gcc
+
+
+env:
+  global:
+    ROS_DISTRO: kinetic
+    ROS_CI_DESKTOP: "`lsb_release -cs`"
+    CI_SOURCE_PATH: "$(pwd)"
+    ROSINSTALL_FILE: "$CI_SOURCE_PATH/dependencies.rosinstall"
+    CATKIN_OPTIONS: "$CI_SOURCE_PATH/catkin.options"
+    ROS_PARALLEL_JOBS: "-j8 -l6"
+    PYTHONPATH: "$PYTHONPATH:/usr/lib/python2.7/dist-packages:/usr/local/lib/python2.7/dist-packages"
+    NOKOGIRI_USE_SYSTEM_LIBRARIES: true
+    BRANCH: $TRAVIS_BRANCH
+
+
+before_install: # Use this to prepare the system to install prerequisites or dependencies
+  # Define some config vars
+  - export NOKOGIRI_USE_SYSTEM_LIBRARIES=true
+  - export CI_SOURCE_PATH=$(pwd)
+  - export REPOSITORY_NAME=${PWD##*/}
+  - echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
+  - sudo -E sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
+  - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq -y python-rosdep python-wstool python-catkin-tools
+
+  # Setup rosdep
+  - sudo rosdep init
+  - rosdep update
+  # Install htmlpoofer
+  - gem update --system
+  - gem --version
+  - gem install html-proofer
+  # Install ROS's version of sphinx
+  - sudo apt-get -qq install ros-kinetic-rosdoc-lite
+  - source /opt/ros/kinetic/setup.bash
+  - pip install pygit2 --user
+
+#install:
+#  - mkdir -p ~/catkin_ws/src
+#  - cd ~/catkin_ws
+#  - catkin init
+#  - catkin build
+#  - source devel/setup.bash
+#  - cd ~/catkin_ws/src
+#  - ln -s $CI_SOURCE_PATH .
+#
+
+#before_script:
+#  - cd ~/catkin_ws/src
+#  - wstool init
+#  - if [[ -f $ROSINSTALL_FILE ]] ; then wstool merge $ROSINSTALL_FILE ; fi
+#  - wstool up
+#  - cd ~/catkin_ws
+#  - rosdep update
+#  - rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO
+#  - cd src
+#  - cd ~/catkin_ws
+
+script:
+#  - source /opt/ros/$ROS_DISTRO/setup.bash
+#  - cd ~/catkin_ws
+#  - catkin build --summarize
+#  - source devel/setup.bash
+#  - cd ~/catkin_ws/src/tutorials
+
+  # Test build with non-ROS wrapped Sphinx command to allow warnings and errors to be caught
+  # Test build with ROS-version of Sphinx command so that it is generated same as ros.org
+  # Run HTML tests on generated build output to check for 404 errors, etc
+  - if [ "$TRAVIS_PULL_REQUEST" == "false" ];
+    then sphinx-build -W -b html . native_build;
+    rosdoc_lite -o build .;
+    htmlproofer ./build --only-4xx --check-html --file-ignore ./build/html/genindex.html,./build/html/search.html,./build/html/index-msg.html --alt-ignore '/.*/' --url-ignore '#';
+    fi
+# after_success and deploy are skipped if build is broken
+
+#after_success:
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GH_REPO_TOKEN
+  local_dir: build/html
+  on:
+    branch: develop
