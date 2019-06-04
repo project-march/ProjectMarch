@@ -155,7 +155,6 @@ class GaitGeneratorPlugin(Plugin):
             if self.robot.joints[i].type != "fixed":
                 joint_name = self.robot.joints[i].name
                 joint = self.gait.get_joint(joint_name)
-                print joint_name, joint
 
                 x = rospy.get_param("/joint_layout/" + joint_name + "/x", -1)
                 y = rospy.get_param("/joint_layout/" + joint_name + "/y", -1)
