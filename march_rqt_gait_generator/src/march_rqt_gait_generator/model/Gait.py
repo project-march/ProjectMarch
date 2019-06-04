@@ -139,4 +139,3 @@ class Gait:
             mirrored_joints.append(mirrored_joint)
 
         return Gait(mirrored_joints, self.duration, self.name, mirrored_subgait_name, self.version, self.description)
-
