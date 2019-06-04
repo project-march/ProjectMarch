@@ -1,0 +1,7 @@
+joint_layout:
+  left_hip: {x: 0, y: 0}
+  right_hip: {x: 0, y: 1}
+  left_knee: {x: 1, y: 0}
+  right_knee: {x: 1, y: 1}
+  left_ankle: {x: 2, y: 0}
+  right_ankle: {x: 2, y: 1}

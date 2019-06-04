@@ -5,5 +5,7 @@
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 
+    <rosparam file="$(find march_rqt_gait_generator)/config/layout.yaml" command="load"/>
+
     <node name="march_rqt_gait_generator" pkg="march_rqt_gait_generator" type="rqt_gait_generator" output="screen"/>
 </launch>

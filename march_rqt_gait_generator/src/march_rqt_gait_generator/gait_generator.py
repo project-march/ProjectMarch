@@ -150,9 +150,18 @@ class GaitGeneratorPlugin(Plugin):
             layout.removeWidget(widget)
             widget.setParent(None)
 
-        for i in range(0, len(self.gait.joints)):
-            self._widget.JointSettingContainer.layout().addWidget(self.create_joint_setting(self.gait.joints[i]), i % 3,
-                                                                  i >= 3)
+        for i in range(0, len(self.robot.joints)):
+
+            if self.robot.joints[i].type != "fixed":
+                joint_name = self.robot.joints[i].name
+                joint = self.gait.get_joint(joint_name)
+                print joint_name, joint
+
+                x = rospy.get_param("/joint_layout/" + joint_name + "/x", -1)
+                y = rospy.get_param("/joint_layout/" + joint_name + "/y", -1)
+                if x == -1 or y == -1:
+                    rospy.logerr("Could not load the layout for joint %s. Please check config/layout.yaml", joint_name)
+                self._widget.JointSettingContainer.layout().addWidget(self.create_joint_setting(joint), x, y)
 
     def create_joint_setting(self, joint):
         joint_setting_file = os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'), 'resource',
