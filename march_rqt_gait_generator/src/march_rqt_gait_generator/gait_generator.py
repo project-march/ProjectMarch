@@ -72,13 +72,7 @@ class GaitGeneratorPlugin(Plugin):
             ]
         )
 
-        self._widget.SettingsFrame.findChild(QPushButton, "Export").clicked.connect(
-            lambda: [
-                export_to_file(self.gait, self.get_gait_directory()),
-                export_to_file(self.gait.get_mirrored("left", "right"), self.get_gait_directory()),
-                self.set_gait_directory_button(self.gait_directory)
-            ]
-        )
+        self._widget.SettingsFrame.findChild(QPushButton, "Export").clicked.connect(self.export)
 
         self._widget.SettingsFrame.findChild(QPushButton, "Publish").clicked.connect(
             lambda: self.publish_gait()
@@ -121,6 +115,14 @@ class GaitGeneratorPlugin(Plugin):
         self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").valueChanged.connect(
             lambda: self.update_gait_duration(
                 self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").value())
+        )
+
+        # Disable key inputs when mirroring is off.
+        self._widget.SettingsFrame.findChild(QCheckBox, "Mirror").stateChanged.connect(
+            lambda state: [
+                self._widget.SettingsFrame.findChild(QLineEdit, "Key1").setEnabled(state),
+                self._widget.SettingsFrame.findChild(QLineEdit, "Key2").setEnabled(state)
+            ]
         )
 
         # Initialize the publisher on startup
@@ -314,6 +316,22 @@ class GaitGeneratorPlugin(Plugin):
         if self.time_slider_thread is not None:
             self.time_slider_thread.stop()
             self.time_slider_thread = None
+
+    def export(self):
+        should_mirror = self._widget.SettingsFrame.findChild(QCheckBox, "Mirror").isChecked()
+
+        key_1 = self._widget.SettingsFrame.findChild(QLineEdit, "Key1").text()
+        key_2 = self._widget.SettingsFrame.findChild(QLineEdit, "Key2").text()
+
+        if should_mirror:
+            mirror = self.gait.get_mirror("left", "right")
+            if mirror:
+                export_to_file(mirror, self.get_gait_directory())
+            else:
+                UserInterfaceController.notify("Could not mirror gait", "Check the logs for more information.")
+
+        export_to_file(self.gait, self.get_gait_directory()),
+        self.set_gait_directory_button(self.gait_directory)
 
     def load_gait(self):
 

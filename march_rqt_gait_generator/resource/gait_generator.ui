@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>916</width>
+    <width>941</width>
     <height>722</height>
    </rect>
   </property>
@@ -199,14 +199,55 @@
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
-      <item row="0" column="0">
-       <widget class="QLabel" name="GaitDirectory">
+      <item row="5" column="0" colspan="7">
+       <widget class="QLineEdit" name="TopicName">
         <property name="text">
-         <string>TextLabel</string>
+         <string>/march/controller/trajectory/full_exoskeleton/command</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0" colspan="7">
+       <widget class="QPushButton" name="Publish">
+        <property name="text">
+         <string>Publish</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
+       <widget class="QCheckBox" name="Mirror">
+        <property name="text">
+         <string>Mirror</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="Key2">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>left</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLineEdit" name="Key1">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>right</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3" colspan="4">
+       <widget class="QPushButton" name="Export">
+        <property name="text">
+         <string>Export Gait</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
        <widget class="QPushButton" name="ChangeGaitDirectory">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -233,35 +274,7 @@ Text-align: right
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
-       <widget class="QPushButton" name="Export">
-        <property name="text">
-         <string>Export Gait</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0" colspan="4">
-       <widget class="QLineEdit" name="TopicName">
-        <property name="text">
-         <string>/march/controller/trajectory/full_exoskeleton/command</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0" colspan="4">
-       <widget class="QPushButton" name="Publish">
-        <property name="text">
-         <string>Publish</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QCheckBox" name="Mirror">
-        <property name="text">
-         <string>Mirror</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" colspan="3">
+      <item row="0" column="1" colspan="6">
        <widget class="QPushButton" name="Import">
         <property name="text">
          <string>Import Gait</string>

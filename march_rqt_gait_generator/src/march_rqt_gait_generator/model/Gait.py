@@ -116,14 +116,50 @@ class Gait:
     def set_current_time(self, current_time):
         self.current_time = current_time
 
-    def get_mirrored(self, key_1, key_2):
+    def can_mirror(self, key_1, key_2):
+        if not key_1 or not key_2:
+            rospy.loginfo("Keys are invalid")
+            return False
+        # XNOR, only one key can and must exist in the subgait name
+        if key_1 in self.subgait == key_2 in self.subgait:
+            rospy.loginfo("Multiple or no keys exist in subgait %s", self.subgait)
+            return False
+
+        # If a joint name has both keys, we wouldn't know how to replace them.
+        for joint in self.joints:
+            if key_1 in joint.name and key_2 in joint.name:
+                rospy.loginfo("Both keys exist in joint %s", joint.name)
+                return False
+            if key_1 in joint.name:
+                joint_1 = joint
+                joint_2 = self.get_joint(joint.name.replace(key_1, key_2))
+            elif key_2 in joint.name:
+                joint_1 = self.get_joint(joint.name.replace(key_2, key_1))
+                joint_2 = joint
+            else:
+                rospy.loginfo("Should not happen")
+                return False
+
+            if joint_1.setpoints[0].position != joint_2.setpoints[-1].position or joint_1.setpoints[0].velocity != joint_2.setpoints[-1].velocity:
+                rospy.loginfo("First setpoint of %s != last setpoint of %s", joint_1.name, joint_2.name)
+                return False
+            if joint_1.setpoints[-1].position != joint_2.setpoints[0].position or joint_1.setpoints[-1].velocity != joint_2.setpoints[0].velocity:
+                rospy.loginfo("Last setpoint of %s != first setpoint of %s", joint_1.name, joint_2.name)
+                return False
+
+        return True
+
+    def get_mirror(self, key_1, key_2):
+        if not self.can_mirror(key_1, key_2):
+            rospy.logwarn("Cannot mirror gait %s", self.name)
+            return False
+
         if key_1 in self.subgait:
             mirrored_subgait_name = self.subgait.replace(key_1, key_2)
         elif key_2 in self.subgait:
             mirrored_subgait_name = self.subgait.replace(key_2, key_1)
         else:
-            notify("Could not mirror Subgait.",
-                   "Subgait name " + self.subgait + " does not contain required key " + key_1)
+            rospy.logerr("This case should have been caught by can_mirror()")
             return False
 
         mirrored_joints = []
@@ -139,4 +175,3 @@ class Gait:
             mirrored_joints.append(mirrored_joint)
 
         return Gait(mirrored_joints, self.duration, self.name, mirrored_subgait_name, self.version, self.description)
-
