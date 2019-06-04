@@ -116,17 +116,25 @@ class Gait:
     def set_current_time(self, current_time):
         self.current_time = current_time
 
-    def get_mirrored(self, from_key, to_key):
-        if from_key not in self.subgait:
+    def get_mirrored(self, key_1, key_2):
+        if key_1 in self.subgait:
+            mirrored_subgait_name = self.subgait.replace(key_1, key_2)
+        elif key_2 in self.subgait:
+            mirrored_subgait_name = self.subgait.replace(key_2, key_1)
+        else:
             notify("Could not mirror Subgait.",
-                   "Subgait name " + self.subgait + " does not contain required key " + from_key)
+                   "Subgait name " + self.subgait + " does not contain required key " + key_1)
             return False
-
-        mirrored_subgait_name = self.subgait.replace(from_key, to_key)
 
         mirrored_joints = []
         for joint in self.joints:
-            mirrored_name = joint.name.replace(from_key, to_key)
+            if key_1 in joint.name:
+                mirrored_name = joint.name.replace(key_1, key_2)
+            elif key_2 in joint.name:
+                mirrored_name = joint.name.replace(key_2, key_1)
+            else:
+                continue
+
             mirrored_joint = Joint(mirrored_name, joint.limits, joint.setpoints, joint.duration)
             mirrored_joints.append(mirrored_joint)
 

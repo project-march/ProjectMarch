@@ -160,6 +160,7 @@ class GaitGeneratorPlugin(Plugin):
                 y = rospy.get_param("/joint_layout/" + joint_name + "/y", -1)
                 if x == -1 or y == -1:
                     rospy.logerr("Could not load the layout for joint %s. Please check config/layout.yaml", joint_name)
+                    continue
                 self._widget.JointSettingContainer.layout().addWidget(self.create_joint_setting(joint), x, y)
 
     def create_joint_setting(self, joint):
