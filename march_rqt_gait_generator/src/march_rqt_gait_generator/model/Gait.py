@@ -2,7 +2,10 @@ import rospy
 from trajectory_msgs.msg import JointTrajectory
 from trajectory_msgs.msg import JointTrajectoryPoint
 
+from Joint import Joint
+
 from march_shared_resources.msg import Setpoint
+from march_rqt_gait_generator.UserInterfaceController import notify
 
 
 class Gait:
@@ -112,3 +115,20 @@ class Gait:
 
     def set_current_time(self, current_time):
         self.current_time = current_time
+
+    def get_mirrored(self, from_key, to_key):
+        if from_key not in self.subgait:
+            notify("Could not mirror Subgait.",
+                   "Subgait name " + self.subgait + " does not contain required key " + from_key)
+            return False
+
+        mirrored_subgait_name = self.subgait.replace(from_key, to_key)
+
+        mirrored_joints = []
+        for joint in self.joints:
+            mirrored_name = joint.name.replace(from_key, to_key)
+            mirrored_joint = Joint(mirrored_name, joint.limits, joint.setpoints, joint.duration)
+            mirrored_joints.append(mirrored_joint)
+
+        return Gait(mirrored_joints, self.duration, self.name, mirrored_subgait_name, self.version, self.description)
+

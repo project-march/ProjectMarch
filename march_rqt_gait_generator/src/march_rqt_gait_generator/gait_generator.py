@@ -75,6 +75,7 @@ class GaitGeneratorPlugin(Plugin):
         self._widget.SettingsFrame.findChild(QPushButton, "Export").clicked.connect(
             lambda: [
                 export_to_file(self.gait, self.get_gait_directory()),
+                export_to_file(self.gait.get_mirrored("left", "right"), self.get_gait_directory()),
                 self.set_gait_directory_button(self.gait_directory)
             ]
         )

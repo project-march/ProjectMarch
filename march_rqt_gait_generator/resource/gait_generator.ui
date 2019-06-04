@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>845</width>
+    <width>916</width>
     <height>722</height>
    </rect>
   </property>
@@ -206,34 +206,6 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="Import">
-        <property name="text">
-         <string>Import Gait</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="Export">
-        <property name="text">
-         <string>Export Gait</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0" colspan="2">
-       <widget class="QLineEdit" name="TopicName">
-        <property name="text">
-         <string>/march/controller/trajectory/full_exoskeleton/command</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0" colspan="2">
-       <widget class="QPushButton" name="Publish">
-        <property name="text">
-         <string>Publish</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0">
        <widget class="QPushButton" name="ChangeGaitDirectory">
         <property name="sizePolicy">
@@ -258,6 +230,41 @@ Text-align: right
         </property>
         <property name="text">
          <string>Change Gait Directory</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="Export">
+        <property name="text">
+         <string>Export Gait</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="4">
+       <widget class="QLineEdit" name="TopicName">
+        <property name="text">
+         <string>/march/controller/trajectory/full_exoskeleton/command</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="4">
+       <widget class="QPushButton" name="Publish">
+        <property name="text">
+         <string>Publish</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="Mirror">
+        <property name="text">
+         <string>Mirror</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="3">
+       <widget class="QPushButton" name="Import">
+        <property name="text">
+         <string>Import Gait</string>
         </property>
        </widget>
       </item>
