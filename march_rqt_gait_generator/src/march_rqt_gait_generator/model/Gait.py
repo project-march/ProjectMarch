@@ -108,6 +108,8 @@ class Gait:
                         joint.setpoints.remove(setpoint)
             joint.interpolated_setpoints = joint.interpolate_setpoints()
 
+            joint.duration = duration
+
         self.duration = duration
 
     def set_current_time(self, current_time):
