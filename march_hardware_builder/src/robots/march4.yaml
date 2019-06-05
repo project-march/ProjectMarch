@@ -4,28 +4,28 @@ march3:
   joints:
     - right_hip_fe:
         allowActuation: false
-        temperatureges: {slaveIndex: 1, byteOffset: 0}
+        temperatureges: {slaveIndex: 6, byteOffset: 0}
         imotioncube:
-          slaveIndex: 5
+          slaveIndex: 2
           encoder: {resolution: 17, minPositionIU: 9756, maxPositionIU: 43941, zeroPositionIU: 0, safetyMarginRad: 0.05}
 
     - left_hip_fe:
         allowActuation: false
         imotioncube:
-          temperatureges: {slaveIndex: 9, byteOffset: 2}
-          slaveIndex: 0
+          temperatureges: {slaveIndex: 11, byteOffset: 0}
+          slaveIndex: 8
           encoder: {resolution: 17, minPositionIU: 9756, maxPositionIU: 31543, zeroPositionIU: 0, safetyMarginRad: 0.05}
 
     - right_knee:
         allowActuation: false
-        temperatureges: {slaveIndex: 1, byteOffset: 4}
+        temperatureges: {slaveIndex: 6, byteOffset: 4}
         imotioncube:
-          slaveIndex: 2
+          slaveIndex: 5
           encoder: {resolution: 17, minPositionIU: 18102, maxPositionIU: 39895, zeroPositionIU: 0, safetyMarginRad: 0.05}
 
     - left_knee:
         allowActuation: false
-        temperatureges: {slaveIndex: 9, byteOffset: 2}
+        temperatureges: {slaveIndex: 11, byteOffset: 4}
         imotioncube:
-          slaveIndex: 0
+          slaveIndex: 10
           encoder: {resolution: 17, minPositionIU: 21907, maxPositionIU: 43737, zeroPositionIU: 0, safetyMarginRad: 0.05}
