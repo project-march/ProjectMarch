@@ -140,10 +140,12 @@ class Gait:
                 rospy.loginfo("Should not happen")
                 return False
 
-            if joint_1.setpoints[0].position != joint_2.setpoints[-1].position or joint_1.setpoints[0].velocity != joint_2.setpoints[-1].velocity:
+            if joint_1.setpoints[0].position != joint_2.setpoints[-1].position \
+                    or joint_1.setpoints[0].velocity != joint_2.setpoints[-1].velocity:
                 rospy.loginfo("First setpoint of %s != last setpoint of %s", joint_1.name, joint_2.name)
                 return False
-            if joint_1.setpoints[-1].position != joint_2.setpoints[0].position or joint_1.setpoints[-1].velocity != joint_2.setpoints[0].velocity:
+            if joint_1.setpoints[-1].position != joint_2.setpoints[0].position \
+                    or joint_1.setpoints[-1].velocity != joint_2.setpoints[0].velocity:
                 rospy.loginfo("Last setpoint of %s != first setpoint of %s", joint_1.name, joint_2.name)
                 return False
 
