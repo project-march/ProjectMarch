@@ -1,0 +1,44 @@
+march4:
+  ifName: enp3s0
+  ecatCycleTime: 4
+  joints:
+    - right_hip_fe:
+        allowActuation: true
+        imotioncube:
+          slaveIndex: 8
+          encoder:
+            resolution: 16
+            minPositionIU: 22134
+            maxPositionIU: 43436
+            zeroPositionIU: 24515
+            safetyMarginRad: 0.05
+    - left_hip_fe:
+        allowActuation: true
+        imotioncube:
+          slaveIndex: 3
+          encoder:
+            resolution: 16
+            minPositionIU: 9746
+            maxPositionIU: 31557
+            zeroPositionIU: 11830
+            safetyMarginRad: 0.05
+    - right_knee:
+        allowActuation: true
+        imotioncube:
+          slaveIndex: 10
+          encoder:
+            resolution: 16
+            minPositionIU: 18120
+            maxPositionIU: 39941
+            zeroPositionIU: 19000
+            safetyMarginRad: 0.05
+    - left_knee:
+        allowActuation: true
+        imotioncube:
+          slaveIndex: 5
+          encoder:
+            resolution: 16
+            minPositionIU: 21924
+            maxPositionIU: 43734
+            zeroPositionIU: 22552
+            safetyMarginRad: 0.05
