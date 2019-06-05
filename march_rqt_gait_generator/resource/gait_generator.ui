@@ -269,19 +269,6 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="3" colspan="4">
-       <widget class="QLineEdit" name="TopicName">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>/march/controller/trajectory/full_exoskeleton/command</string>
-        </property>
-       </widget>
-      </item>
       <item row="7" column="1" colspan="6">
        <widget class="QPushButton" name="Publish">
         <property name="sizePolicy">
@@ -326,6 +313,19 @@ Text-align: right
         </property>
         <property name="text">
          <string>Change Gait Directory</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="2" colspan="5">
+       <widget class="QLineEdit" name="TopicName">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>/march/controller/trajectory/full_exoskeleton/command</string>
         </property>
        </widget>
       </item>
