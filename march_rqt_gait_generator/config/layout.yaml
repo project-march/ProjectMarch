@@ -1,7 +1,9 @@
 joint_layout:
-  left_hip: {row: 0, column: 0}
-  right_hip: {row: 0, column: 1}
-  left_knee: {row: 1, column: 0}
-  right_knee: {row: 1, column: 1}
-  left_ankle: {row: 2, column: 0}
-  right_ankle: {row: 2, column: 1}
+  left_hip_aa: {row: 0, column: 0}
+  right_hip_aa: {row: 0, column: 1}
+  left_hip_fe: {row: 1, column: 0}
+  right_hip_fe: {row: 1, column: 1}
+  left_knee: {row: 2, column: 0}
+  right_knee: {row: 2, column: 1}
+  left_ankle: {row: 3, column: 0}
+  right_ankle: {row: 3, column: 1}
