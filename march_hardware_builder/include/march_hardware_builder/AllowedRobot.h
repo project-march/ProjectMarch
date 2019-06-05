@@ -52,8 +52,8 @@ public:
     {
         return basePath.append("/src/robots/testsetup.yaml");
     }
-    ROS_ERROR("Robotname not implemented. Using march3.yaml...");
-    return basePath.append("/src/robots/march3.yaml");
+    ROS_ERROR("Robotname not implemented. Using testsetup.yaml...");
+    return basePath.append("/src/robots/testsetup.yaml");
   }
 
   constexpr AllowedRobot(Value aAllowedRobot) : value(aAllowedRobot)
