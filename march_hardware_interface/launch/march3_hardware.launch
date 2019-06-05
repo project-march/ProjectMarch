@@ -3,8 +3,9 @@
     <rosparam file="$(find march_hardware_interface)/config/march3/controllers.yaml" command="load"/>
     <rosparam file="$(find march_hardware_interface)/config/march3/joint_limits.yaml" command="load"/>
 
-    <include file="$(find march_description)/launch/load_description.launch"/>
-
+    <!-- Load the URDF into the ROS Parameter Server -->
+    <param name="robot_description"
+           command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iii.xacro'" />
 
     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="true" output="screen" ns="/"
           args="
