@@ -10,6 +10,7 @@ class AllowedRobot
 public:
   enum Value : int
   {
+    march4,
     march3,
     testsetup,
   };
@@ -17,9 +18,13 @@ public:
   AllowedRobot() = default;
   explicit AllowedRobot(const std::string& robotName)
   {
-    if (robotName == "march3")
+    if (robotName == "march4")
     {
-      this->value = march3;
+      this->value = march4;
+    }
+    else if (robotName == "march3")
+    {
+        this->value = march4;
     }
     else if (robotName == "testsetup")
     {
@@ -35,16 +40,20 @@ public:
   std::string getFilePath()
   {
     std::string basePath = ros::package::getPath("march_hardware_builder");
-    if (this->value == AllowedRobot::testsetup)
+    if (this->value == AllowedRobot::march4)
     {
-      return basePath.append("/src/robots/testsetup.yaml");
+      return basePath.append("/src/robots/march4.yaml");
     }
     else if (this->value == AllowedRobot::march3)
     {
       return basePath.append("/src/robots/march3.yaml");
     }
-    ROS_ERROR("Robotname not implemented. Using march3.yaml...");
-    return basePath.append("/src/robots/march3.yaml");
+    else if (this->value == AllowedRobot::testsetup)
+    {
+        return basePath.append("/src/robots/testsetup.yaml");
+    }
+    ROS_ERROR("Robotname not implemented. Using testsetup.yaml...");
+    return basePath.append("/src/robots/testsetup.yaml");
   }
 
   constexpr AllowedRobot(Value aAllowedRobot) : value(aAllowedRobot)
