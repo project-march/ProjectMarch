@@ -138,7 +138,10 @@ class Gait:
                 joint_1 = self.get_joint(joint.name.replace(key_2, key_1))
                 joint_2 = joint
             else:
-                rospy.loginfo("Should not happen")
+                continue
+
+            if joint_1 is None or joint_2 is None:
+                rospy.logwarn("Joints %s and %s are not valid.", str(joint_1), str(joint_2))
                 return False
 
             if joint_1.setpoints[0].position != joint_2.setpoints[-1].position \
