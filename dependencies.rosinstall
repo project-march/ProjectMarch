@@ -14,7 +14,3 @@
     local-name: state-machine
     uri: https://github.com/project-march/state-machine
     version: develop
-- git:
-    local-name: pilot-devices
-    uri: https://github.com/project-march/pilot-devices-coordinator
-    version: develop
