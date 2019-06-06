@@ -2,7 +2,10 @@ import rospy
 from trajectory_msgs.msg import JointTrajectory
 from trajectory_msgs.msg import JointTrajectoryPoint
 
+from Joint import Joint
+
 from march_shared_resources.msg import Setpoint
+from march_rqt_gait_generator.UserInterfaceController import notify
 
 
 class Gait:
@@ -114,3 +117,69 @@ class Gait:
 
     def set_current_time(self, current_time):
         self.current_time = current_time
+
+    def can_mirror(self, key_1, key_2):
+        if not key_1 or not key_2:
+            rospy.loginfo("Keys are invalid")
+            return False
+
+        # XNOR, only one key can and must exist in the subgait name
+        if (key_1 in self.subgait) == (key_2 in self.subgait):
+            rospy.loginfo("Multiple or no keys exist in subgait %s", self.subgait)
+            return False
+
+        # If a joint name has both keys, we wouldn't know how to replace them.
+        for joint in self.joints:
+            if key_1 in joint.name and key_2 in joint.name:
+                rospy.loginfo("Both keys exist in joint %s", joint.name)
+                return False
+            if key_1 in joint.name:
+                joint_1 = joint
+                joint_2 = self.get_joint(joint.name.replace(key_1, key_2))
+            elif key_2 in joint.name:
+                joint_1 = self.get_joint(joint.name.replace(key_2, key_1))
+                joint_2 = joint
+            else:
+                continue
+
+            if joint_1 is None or joint_2 is None:
+                rospy.logwarn("Joints %s and %s are not valid.", str(joint_1), str(joint_2))
+                return False
+
+            if joint_1.setpoints[0].position != joint_2.setpoints[-1].position \
+                    or joint_1.setpoints[0].velocity != joint_2.setpoints[-1].velocity:
+                rospy.loginfo("First setpoint of %s != last setpoint of %s", joint_1.name, joint_2.name)
+                return False
+            if joint_1.setpoints[-1].position != joint_2.setpoints[0].position \
+                    or joint_1.setpoints[-1].velocity != joint_2.setpoints[0].velocity:
+                rospy.loginfo("Last setpoint of %s != first setpoint of %s", joint_1.name, joint_2.name)
+                return False
+
+        return True
+
+    def get_mirror(self, key_1, key_2):
+        if not self.can_mirror(key_1, key_2):
+            rospy.logwarn("Cannot mirror gait %s", self.name)
+            return False
+
+        if key_1 in self.subgait:
+            mirrored_subgait_name = self.subgait.replace(key_1, key_2)
+        elif key_2 in self.subgait:
+            mirrored_subgait_name = self.subgait.replace(key_2, key_1)
+        else:
+            rospy.logerr("This case should have been caught by can_mirror()")
+            return False
+
+        mirrored_joints = []
+        for joint in self.joints:
+            if key_1 in joint.name:
+                mirrored_name = joint.name.replace(key_1, key_2)
+            elif key_2 in joint.name:
+                mirrored_name = joint.name.replace(key_2, key_1)
+            else:
+                continue
+
+            mirrored_joint = Joint(mirrored_name, joint.limits, joint.setpoints, joint.duration)
+            mirrored_joints.append(mirrored_joint)
+
+        return Gait(mirrored_joints, self.duration, self.name, mirrored_subgait_name, self.version, self.description)

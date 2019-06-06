@@ -72,12 +72,7 @@ class GaitGeneratorPlugin(Plugin):
             ]
         )
 
-        self._widget.SettingsFrame.findChild(QPushButton, "Export").clicked.connect(
-            lambda: [
-                export_to_file(self.gait, self.get_gait_directory()),
-                self.set_gait_directory_button(self.gait_directory)
-            ]
-        )
+        self._widget.SettingsFrame.findChild(QPushButton, "Export").clicked.connect(self.export)
 
         self._widget.SettingsFrame.findChild(QPushButton, "Publish").clicked.connect(
             lambda: self.publish_gait()
@@ -122,6 +117,14 @@ class GaitGeneratorPlugin(Plugin):
                 self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").value())
         )
 
+        # Disable key inputs when mirroring is off.
+        self._widget.SettingsFrame.findChild(QCheckBox, "Mirror").stateChanged.connect(
+            lambda state: [
+                self._widget.SettingsFrame.findChild(QLineEdit, "Key1").setEnabled(state),
+                self._widget.SettingsFrame.findChild(QLineEdit, "Key2").setEnabled(state)
+            ]
+        )
+
         # Initialize the publisher on startup
         self.set_topic_name(self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").text())
 
@@ -149,9 +152,18 @@ class GaitGeneratorPlugin(Plugin):
             layout.removeWidget(widget)
             widget.setParent(None)
 
-        for i in range(0, len(self.gait.joints)):
-            self._widget.JointSettingContainer.layout().addWidget(self.create_joint_setting(self.gait.joints[i]), i % 3,
-                                                                  i >= 3)
+        for i in range(0, len(self.robot.joints)):
+
+            if self.robot.joints[i].type != "fixed":
+                joint_name = self.robot.joints[i].name
+                joint = self.gait.get_joint(joint_name)
+
+                row = rospy.get_param("/joint_layout/" + joint_name + "/row", -1)
+                column = rospy.get_param("/joint_layout/" + joint_name + "/column", -1)
+                if row == -1 or column == -1:
+                    rospy.logerr("Could not load the layout for joint %s. Please check config/layout.yaml", joint_name)
+                    continue
+                self._widget.JointSettingContainer.layout().addWidget(self.create_joint_setting(joint), row, column)
 
     def create_joint_setting(self, joint):
         joint_setting_file = os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'), 'resource',
@@ -305,6 +317,23 @@ class GaitGeneratorPlugin(Plugin):
             self.time_slider_thread.stop()
             self.time_slider_thread = None
 
+    def export(self):
+        should_mirror = self._widget.SettingsFrame.findChild(QCheckBox, "Mirror").isChecked()
+
+        key_1 = self._widget.SettingsFrame.findChild(QLineEdit, "Key1").text()
+        key_2 = self._widget.SettingsFrame.findChild(QLineEdit, "Key2").text()
+
+        if should_mirror:
+            mirror = self.gait.get_mirror(key_1, key_2)
+            if mirror:
+                export_to_file(mirror, self.get_gait_directory())
+            else:
+                UserInterfaceController.notify("Could not mirror gait", "Check the logs for more information.")
+                return
+
+        export_to_file(self.gait, self.get_gait_directory()),
+        self.set_gait_directory_button(self.gait_directory)
+
     def load_gait(self):
 
         file_name, f = QFileDialog.getOpenFileName(self._widget,
@@ -331,8 +360,13 @@ class GaitGeneratorPlugin(Plugin):
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait").setText(self.gait.subgait)
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").setText(self.gait.version)
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").setText(self.gait.description)
-        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").setValue(self.gait.duration)
 
+        # Block signals on the duration edit to prevent a reload of the joint settings
+        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").blockSignals(True)
+        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").setValue(self.gait.duration)
+        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").blockSignals(False)
+
+        print ('load gait into ui')
         self.create_joint_settings()
 
         self.publish_preview()
