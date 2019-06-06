@@ -1,0 +1,35 @@
+<launch>
+
+    <!-- these are the arguments you can pass this launch_sm file, for example paused:=true -->
+    <arg name="paused" default="false"/>
+    <arg name="use_sim_time" default="true"/>
+    <arg name="gazebo_ui" default="true"/>
+    <arg name="headless" default="false"/>
+    <arg name="debug" default="false"/>
+
+    <include file="$(find march_description)/launch/load_description_march-iii.launch"/>
+
+    <rosparam file="$(find march_simulation)/config/config_march-iii.yaml" command="load"/>
+
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" ns="/march" output="screen"
+          args="trajectory_controller joint_state_controller"/>
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+          output="screen" ns="/march">
+    </node>
+
+    <!-- We resume the logic in empty_world.launch_sm, changing only the name of the world to be launched -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find march_simulation)/worlds/march.world"/>
+        <arg name="debug" value="$(arg debug)" />
+        <arg name="gui" value="$(arg gazebo_ui)" />
+        <arg name="paused" value="$(arg paused)"/>
+        <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+        <arg name="headless" value="$(arg headless)"/>
+    </include>
+
+    <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+          args="-urdf -model march -param robot_description"/>
+
+</launch>

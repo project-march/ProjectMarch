@@ -9,9 +9,9 @@
 
   <!-- Load the URDF into the ROS Parameter Server -->
   <param name="robot_description"
-         command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iii.xacro'" />
+          command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iv.xacro'" />
 
-  <rosparam file="$(find march_simulation)/config/config.yaml" command="load"/>
+  <rosparam file="$(find march_simulation)/config/config_march-iv.yaml" command="load"/>
 
   <node name="controller_spawner" pkg="controller_manager" type="spawner" ns="/march" output="screen"
         args="trajectory_controller joint_state_controller"/>
