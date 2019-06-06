@@ -324,11 +324,12 @@ class GaitGeneratorPlugin(Plugin):
         key_2 = self._widget.SettingsFrame.findChild(QLineEdit, "Key2").text()
 
         if should_mirror:
-            mirror = self.gait.get_mirror("left", "right")
+            mirror = self.gait.get_mirror(key_1, key_2)
             if mirror:
                 export_to_file(mirror, self.get_gait_directory())
             else:
                 UserInterfaceController.notify("Could not mirror gait", "Check the logs for more information.")
+                return
 
         export_to_file(self.gait, self.get_gait_directory()),
         self.set_gait_directory_button(self.gait_directory)

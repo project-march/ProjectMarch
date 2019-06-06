@@ -120,8 +120,9 @@ class Gait:
         if not key_1 or not key_2:
             rospy.loginfo("Keys are invalid")
             return False
+
         # XNOR, only one key can and must exist in the subgait name
-        if key_1 in self.subgait == key_2 in self.subgait:
+        if (key_1 in self.subgait) == (key_2 in self.subgait):
             rospy.loginfo("Multiple or no keys exist in subgait %s", self.subgait)
             return False
 
