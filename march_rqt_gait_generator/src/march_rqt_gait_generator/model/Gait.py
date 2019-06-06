@@ -111,6 +111,8 @@ class Gait:
                         joint.setpoints.remove(setpoint)
             joint.interpolated_setpoints = joint.interpolate_setpoints()
 
+            joint.duration = duration
+
         self.duration = duration
 
     def set_current_time(self, current_time):
@@ -120,8 +122,9 @@ class Gait:
         if not key_1 or not key_2:
             rospy.loginfo("Keys are invalid")
             return False
+
         # XNOR, only one key can and must exist in the subgait name
-        if key_1 in self.subgait == key_2 in self.subgait:
+        if (key_1 in self.subgait) == (key_2 in self.subgait):
             rospy.loginfo("Multiple or no keys exist in subgait %s", self.subgait)
             return False
 
@@ -137,7 +140,10 @@ class Gait:
                 joint_1 = self.get_joint(joint.name.replace(key_2, key_1))
                 joint_2 = joint
             else:
-                rospy.loginfo("Should not happen")
+                continue
+
+            if joint_1 is None or joint_2 is None:
+                rospy.logwarn("Joints %s and %s are not valid.", str(joint_1), str(joint_2))
                 return False
 
             if joint_1.setpoints[0].position != joint_2.setpoints[-1].position \
