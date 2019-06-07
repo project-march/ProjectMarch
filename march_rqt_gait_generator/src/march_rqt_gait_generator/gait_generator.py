@@ -211,9 +211,9 @@ class GaitGeneratorPlugin(Plugin):
                      self.publish_preview()
                      ])
 
-        # Disable scrolling vertically
-        joint_setting.Table.verticalScrollBar().setDisabled(True)
-        joint_setting.Table.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # Disable scrolling horizontal
+        joint_setting.Table.horizontalScrollBar().setDisabled(True)
+        joint_setting.Table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         return joint_setting
 
