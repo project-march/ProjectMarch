@@ -135,7 +135,6 @@ void EthercatMaster::ethercatLoop()
     sendProcessData();
     receiveProcessData();
     monitorSlaveConnection();
-    // TODO(Martijn) can this be removed?
     usleep(ecatCycleTimems * 1000);
   }
 }
@@ -152,10 +151,11 @@ int EthercatMaster::receiveProcessData()
 
 void EthercatMaster::monitorSlaveConnection()
 {
-  // TODO(Martijn)
-  //  Integrate this within EthercatMaster and Slave classes
-  //  Determine how to notify developer/user
-  //  ethercat_safety::monitor_slave_connection();
+  for(int i = 0; i < ec_slavecount; i++){
+      if(ec_slave[i].islost){
+          ROS_WARN("Slave with index %d is lost");
+      }
+  }
 }
 
 }  // namespace march4cpp
