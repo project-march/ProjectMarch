@@ -305,6 +305,9 @@ Text-align: right
       </item>
       <item row="2" column="2">
        <widget class="QLineEdit" name="Key1">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>left</string>
         </property>
@@ -312,6 +315,9 @@ Text-align: right
       </item>
       <item row="2" column="4">
        <widget class="QLineEdit" name="Key2">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>right</string>
         </property>
