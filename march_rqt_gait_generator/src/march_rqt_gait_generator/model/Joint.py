@@ -100,11 +100,16 @@ class Joint:
         self.add_setpoint(self.get_interpolated_setpoint(time))
 
     def add_setpoint(self, setpoint):
+        # Calculate at what index the new setpoint should be added.
+        new_index = len(self.setpoints)
         for i in range(0, len(self.setpoints)):
             if self.setpoints[i].time > setpoint.time:
-                rospy.logdebug("adding setpoint " + str(setpoint))
-                self.setpoints.insert(i, setpoint)
+                new_index = i
                 break
+
+        rospy.logdebug("adding setpoint " + str(setpoint) + " at index " + str(new_index))
+        self.setpoints.insert(new_index, setpoint)
+
         self.enforce_limits()
         self.interpolated_setpoints = self.interpolate_setpoints()
 

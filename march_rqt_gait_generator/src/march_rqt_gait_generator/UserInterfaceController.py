@@ -16,16 +16,16 @@ def notify(title, message):
 
 def table_to_setpoints(table_data):
     setpoints = []
-    for i in range(0, table_data.columnCount()):
-        time = float(table_data.item(0, i).text())
-        position = math.radians(float(table_data.item(1, i).text()))
-        velocity = math.radians(float(table_data.item(2, i).text()))
+    for i in range(0, table_data.rowCount()):
+        time = float(table_data.item(i, 0).text())
+        position = math.radians(float(table_data.item(i, 1).text()))
+        velocity = math.radians(float(table_data.item(i, 2).text()))
         setpoints.append(Setpoint(time, position, velocity))
     return setpoints
 
 
 def update_table(table, joint, duration):
-    table.setColumnCount(len(joint.setpoints))
+    table.setRowCount(len(joint.setpoints))
 
     for i in range(0, len(joint.setpoints)):
 
@@ -37,13 +37,13 @@ def update_table(table, joint, duration):
         velocity_item = QTableWidgetItem(
             str(round(math.degrees(joint.setpoints[i].velocity), TABLE_DIGITS)))
 
-        table.setItem(0, i, time_item)
-        table.setItem(1, i, position_item)
-        table.setItem(2, i, velocity_item)
+        table.setItem(i, 0, time_item)
+        table.setItem(i, 1, position_item)
+        table.setItem(i, 2, velocity_item)
 
     table.setItemDelegate(JointSettingSpinBoxDelegate(
         joint.limits.velocity, joint.limits.lower, joint.limits.upper, duration))
-    table.resizeRowsToContents()
+    # table.resizeRowsToContents()
     table.resizeColumnsToContents()
     return table
 
