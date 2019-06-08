@@ -18,6 +18,7 @@ class EthercatMaster
   std::vector<Joint>* jointListPtr;
   int maxSlaveIndex;
   int ecatCycleTimems;
+  std::vector<bool> slavePresent;
 
 public:
   bool isOperational = false;  // Is SOEM in operational state
