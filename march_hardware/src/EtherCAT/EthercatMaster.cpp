@@ -47,8 +47,9 @@ void EthercatMaster::start()
   }
   ROS_INFO("%d slave(s) found and initialized.", ec_slavecount);
 
-  for (int i = 0; i < ec_slavecount; i++){
-      this->slavePresent.push_back(true); // Initially, all slaves are present
+  for (int i = 0; i < ec_slavecount; i++)
+  {
+      this->slavePresent.push_back(true);  // Initially, all slaves are present
   }
 
   if (ec_slavecount < this->maxSlaveIndex)
@@ -155,15 +156,18 @@ int EthercatMaster::receiveProcessData()
 
 void EthercatMaster::monitorSlaveConnection()
 {
-  for(int i = 0; i < this->slavePresent.size(); i++){
-      if(ec_slave[i].islost && this->slavePresent[i]){
+  for (int i = 0; i < this->slavePresent.size(); i++)
+  {
+      if (ec_slave[i].islost && this->slavePresent[i])
+      {
           // Slave now lost, while it was present last frame
-          ROS_WARN("Slave with index %d is lost", i+1); // + 1 because slaveindices start at 1
+          ROS_WARN("Slave with index %d is lost", i+1);  // + 1 because slaveindices start at 1
           this->slavePresent[i] = false;
       }
-      else if((!ec_slave[i].islost) && (!this->slavePresent[i])){
+      else if ((!ec_slave[i].islost) && (!this->slavePresent[i]))
+      {
           // Slave present, while it was lost last frame
-          ROS_INFO("Slave with index %d is recovered", i+1); // + 1 because slaveindices start at 1
+          ROS_INFO("Slave with index %d is recovered", i+1);  // + 1 because slaveindices start at 1
           this->slavePresent[i] = true;
       }
   }
