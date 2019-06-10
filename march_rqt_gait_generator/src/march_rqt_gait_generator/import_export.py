@@ -51,10 +51,16 @@ def export_to_file(gait, gait_directory):
 
 
 def import_from_file_name(robot, file_name):
-    gait_name = file_name.split("/")[-3]
-    subgait_name = file_name.split("/")[-2]
-    version = file_name.split("/")[-1].replace(".subgait", "")
-    march_subgait_yaml = yaml.load(open(file_name))
-    march_subgait = message_converter.convert_dictionary_to_ros_message(
-        'march_shared_resources/Subgait', march_subgait_yaml)
+    if file_name is None or file_name == "":
+        return None
+    try:
+        gait_name = file_name.split("/")[-3]
+        subgait_name = file_name.split("/")[-2]
+        version = file_name.split("/")[-1].replace(".subgait", "")
+        march_subgait_yaml = yaml.load(open(file_name))
+        march_subgait = message_converter.convert_dictionary_to_ros_message(
+            'march_shared_resources/Subgait', march_subgait_yaml)
+    except Exception as e:
+        rospy.logerr(str(e))
+        return None
     return GaitFactory.from_msg(robot, march_subgait, gait_name, subgait_name, version)

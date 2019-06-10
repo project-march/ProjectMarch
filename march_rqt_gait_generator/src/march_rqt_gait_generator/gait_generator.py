@@ -340,10 +340,11 @@ class GaitGeneratorPlugin(Plugin):
                                                    "Open Image",
                                                    rospkg.RosPack().get_path('march_rqt_gait_generator'),
                                                    "March Subgait (*.subgait)")
-        if file_name == "":
-            return
         self.gait = import_from_file_name(self.robot, file_name)
-        self.load_gait_into_ui()
+        if self.gait is None:
+            rospy.logwarn("Could not load gait %s", file_name)
+        else:
+            self.load_gait_into_ui()
 
     def load_gait_into_ui(self):
         time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
@@ -379,18 +380,16 @@ class GaitGeneratorPlugin(Plugin):
         self.stop_time_slider_thread()
 
     def save_settings(self, plugin_settings, instance_settings):
-        # TODO save intrinsic configuration, usually using:
-        plugin_settings.set_value('test', 3)
-        v = plugin_settings.value('test')
-        rospy.loginfo(v)
+        plugin_settings.set_value('gait_directory', self.gait_directory)
 
     def restore_settings(self, plugin_settings, instance_settings):
-        # TODO restore intrinsic configuration, usually using:
-        v = plugin_settings.value('test')
+        gait_directory = plugin_settings.value('gait_directory')
 
-        rospy.loginfo("Restor settings called here: " + str(v))
+        if gait_directory is not None:
+            rospy.loginfo("Restoring saved gait directory " + str(gait_directory))
+            self.gait_directory = gait_directory
 
-    # def trigger_configuration(self):
-    # Comment in to signal that the plugin has a way to configure
-    # This will enable a setting button (gear icon) in each dock widget title bar
-    # Usually used to open a modal configuration dialog
+        # def trigger_configuration(self):
+        # Comment in to signal that the plugin has a way to configure
+        # This will enable a setting button (gear icon) in each dock widget title bar
+        # Usually used to open a modal configuration dialog
