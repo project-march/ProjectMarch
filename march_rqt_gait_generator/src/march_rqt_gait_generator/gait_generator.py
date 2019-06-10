@@ -172,7 +172,6 @@ class GaitGeneratorPlugin(Plugin):
 
         joint_setting = QFrame()
         loadUi(joint_setting_file, joint_setting)
-        print joint
         joint_setting_plot = JointSettingPlot(joint, self.gait.duration)
 
         # Connect a function to update the model and to update the table.
