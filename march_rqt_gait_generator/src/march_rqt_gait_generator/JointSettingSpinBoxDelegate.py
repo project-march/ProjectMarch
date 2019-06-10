@@ -28,15 +28,15 @@ class JointSettingSpinBoxDelegate(QtGui.QItemDelegate):
         editor = QDoubleSpinBox(parent)
 
         # Time
-        if row == 0:
+        if column == 0:
 
-            min_time_cell = index.model().data(index.sibling(row, column - 1), QtCore.Qt.EditRole)
+            min_time_cell = index.model().data(index.sibling(row - 1, column), QtCore.Qt.EditRole)
             if min_time_cell is None:
                 min_time = 0
             else:
                 min_time = float(unicode(min_time_cell)) + time_offset
 
-            max_time_cell = index.model().data(index.sibling(row, column + 1), QtCore.Qt.EditRole)
+            max_time_cell = index.model().data(index.sibling(row + 1, column), QtCore.Qt.EditRole)
             if max_time_cell is None:
                 max_time = self.duration
             else:
@@ -46,11 +46,11 @@ class JointSettingSpinBoxDelegate(QtGui.QItemDelegate):
             editor.setMinimum(min_time)
             editor.setMaximum(max_time)
         # Position
-        elif row == 1:
+        elif column == 1:
             editor.setMinimum(math.degrees(self.min_position))
             editor.setMaximum(math.degrees(self.max_position))
         # Velocity
-        elif row == 2:
+        elif column == 2:
             editor.setMinimum(math.degrees(-self.velocity_limit))
             editor.setMaximum(math.degrees(self.velocity_limit))
 
