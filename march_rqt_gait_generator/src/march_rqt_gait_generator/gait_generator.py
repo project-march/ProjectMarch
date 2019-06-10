@@ -157,7 +157,8 @@ class GaitGeneratorPlugin(Plugin):
             if self.robot.joints[i].type != "fixed":
                 joint_name = self.robot.joints[i].name
                 joint = self.gait.get_joint(joint_name)
-
+                if not joint:
+                    continue
                 row = rospy.get_param("/joint_layout/" + joint_name + "/row", -1)
                 column = rospy.get_param("/joint_layout/" + joint_name + "/column", -1)
                 if row == -1 or column == -1:
@@ -171,7 +172,7 @@ class GaitGeneratorPlugin(Plugin):
 
         joint_setting = QFrame()
         loadUi(joint_setting_file, joint_setting)
-
+        print joint
         joint_setting_plot = JointSettingPlot(joint, self.gait.duration)
 
         # Connect a function to update the model and to update the table.
