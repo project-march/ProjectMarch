@@ -1,0 +1,8 @@
+Continuous Integration
+======================
+
+Travis
+^^^^^^
+
+CodeCov
+^^^^^^^
