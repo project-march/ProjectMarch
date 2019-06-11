@@ -62,7 +62,9 @@ script:
     fi
 
 # after_success and deploy are skipped if build is broken
-#after_success:
+after_success:
+  # Tell GitHub Pages not to bypass Jekyll processing
+  - touch build/html/.nojekyll
 
 deploy:
   provider: pages
