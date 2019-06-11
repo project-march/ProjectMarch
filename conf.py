@@ -1,9 +1,10 @@
 import sys, os
 
 # Retrieve branch name
-if os.environ['TRAVIS']:
+try:
+    travis = os.environ['TRAVIS']
     branch_name = os.environ['BRANCH']
-else:  # Local
+except KeyError:  # Local
     import pygit2
     branch_name = pygit2.Repository('.').head.shorthand
 

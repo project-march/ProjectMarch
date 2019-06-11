@@ -11,7 +11,6 @@ python:
 compiler:
   - gcc
 
-
 env:
   global:
     ROS_DISTRO: kinetic
@@ -49,33 +48,10 @@ before_install: # Use this to prepare the system to install prerequisites or dep
   - pip install pygit2 --user
 
 #install:
-#  - mkdir -p ~/catkin_ws/src
-#  - cd ~/catkin_ws
-#  - catkin init
-#  - catkin build
-#  - source devel/setup.bash
-#  - cd ~/catkin_ws/src
-#  - ln -s $CI_SOURCE_PATH .
-#
 
 #before_script:
-#  - cd ~/catkin_ws/src
-#  - wstool init
-#  - if [[ -f $ROSINSTALL_FILE ]] ; then wstool merge $ROSINSTALL_FILE ; fi
-#  - wstool up
-#  - cd ~/catkin_ws
-#  - rosdep update
-#  - rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO
-#  - cd src
-#  - cd ~/catkin_ws
 
 script:
-#  - source /opt/ros/$ROS_DISTRO/setup.bash
-#  - cd ~/catkin_ws
-#  - catkin build --summarize
-#  - source devel/setup.bash
-#  - cd ~/catkin_ws/src/tutorials
-
   # Test build with non-ROS wrapped Sphinx command to allow warnings and errors to be caught
   # Test build with ROS-version of Sphinx command so that it is generated same as ros.org
   # Run HTML tests on generated build output to check for 404 errors, etc
@@ -84,8 +60,8 @@ script:
     rosdoc_lite -o build .;
     htmlproofer ./build --only-4xx --check-html --file-ignore ./build/html/genindex.html,./build/html/search.html,./build/html/index-msg.html --alt-ignore '/.*/' --url-ignore '#';
     fi
-# after_success and deploy are skipped if build is broken
 
+# after_success and deploy are skipped if build is broken
 #after_success:
 
 deploy:
