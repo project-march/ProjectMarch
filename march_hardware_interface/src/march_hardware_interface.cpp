@@ -156,7 +156,11 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
     float oldPosition = joint_position_[i];
 
     joint_position_[i] = marchRobot.getJoint(joint_names_[i]).getAngleRad();
-    joint_temperature_[i] = marchRobot.getJoint(joint_names_[i]).getTemperature();
+
+    if (marchRobot.getJoint(joint_names_[i]).hasTemperatureGES())
+    {
+        joint_temperature_[i] = marchRobot.getJoint(joint_names_[i]).getTemperature();
+    }
 
     // Get velocity from encoder position
     float joint_velocity = (joint_position_[i] - oldPosition) * 1 / elapsed_time.toSec();
