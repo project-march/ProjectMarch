@@ -1,2 +1,0 @@
-RQT Input Device
-================

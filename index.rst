@@ -94,8 +94,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
 
 .. toctree::
   :caption: March Packages
-  :maxdepth: 3
+  :maxdepth: 4
   :hidden:
 
-  doc/march_packages/march_gait_selection
-  doc/march_packages/march_rqt_input_device
+  doc/march_packages/march_rqt_launch_menu
