@@ -11,7 +11,10 @@ except KeyError:  # Local
 sys.path += [ os.path.abspath( '_scripts' )]
 
 extensions = [ 'sphinx.ext.extlinks',
+               'sphinx.ext.todo',
                'tutorialformatter' ]
+
+todo_include_todos = True
 
 # The master toctree document.
 master_doc = 'index'
