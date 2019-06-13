@@ -75,6 +75,18 @@ void MarchHardwareInterface::init()
   registerInterface(&effort_joint_interface_);
   registerInterface(&positionJointSoftLimitsInterface);
 
+  if (power_distribution_board_read_.getSlaveIndex() != -1)
+  {
+    for (int i = 1; i <= 8; i++)
+    {
+      power_distribution_board_read_.getHighVoltage().setNetOnOff(false, i);
+    }
+  }
+  else
+  {
+    ROS_WARN("Running without Power Distribution Board");
+  }
+
   // Initialize interfaces for each joint
   for (int i = 0; i < num_joints_; ++i)
   {
@@ -128,15 +140,23 @@ void MarchHardwareInterface::init()
                                                               &joint_temperature_variance_[i]);
     march_temperature_interface.registerHandle(marchTemperatureSensorHandle);
 
-    // Enable high voltage on the IMC
-    if (joint.canActuate())
+    if (power_distribution_board_read_.getSlaveIndex() != -1)
     {
-      int net_number = joint.getNetNumber();
-      if (power_distribution_board_read_.getSlaveIndex() != -1)
+      // Enable high voltage on the IMC
+      if (joint.canActuate() || true)
       {
-        power_distribution_board_read_.getHighVoltage().setNetOnOff(true, net_number);
+        int net_number = joint.getNetNumber();
+        if (net_number != -1)
+        {
+          power_distribution_board_read_.getHighVoltage().setNetOnOff(true, net_number);
+        }
+        else
+        {
+          ROS_FATAL("Joint %s has no high voltage net number", joint.getName().c_str());
+          throw std::runtime_error("Joint has no high voltage net number");
+        }
+        joint.prepareActuation();
       }
-      joint.prepareActuation();
     }
   }
 }
@@ -159,7 +179,7 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
 
     if (marchRobot.getJoint(joint_names_[i]).hasTemperatureGES())
     {
-        joint_temperature_[i] = marchRobot.getJoint(joint_names_[i]).getTemperature();
+      joint_temperature_[i] = marchRobot.getJoint(joint_names_[i]).getTemperature();
     }
 
     // Get velocity from encoder position
@@ -172,6 +192,11 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(), joint_position_[i]);
   }
   power_distribution_board_read_ = *marchRobot.getPowerDistributionBoard();
+
+  if (!power_distribution_board_read_.getHighVoltage().getHighVoltageEnabled())
+  {
+    ROS_WARN_THROTTLE(10, "All-High-Voltage disabled");
+  }
 }
 
 void MarchHardwareInterface::write(ros::Duration elapsed_time)
@@ -212,7 +237,7 @@ void MarchHardwareInterface::updateHighVoltageEnable()
     {
       marchRobot.getPowerDistributionBoard()->getHighVoltage().setHighVoltageOnOff(enable_high_voltage_command);
     }
-    else if (marchRobot.getPowerDistributionBoard()->getHighVoltage().getHighVoltageEnabled())
+    else if (!marchRobot.getPowerDistributionBoard()->getHighVoltage().getHighVoltageEnabled())
     {
       ROS_WARN_THROTTLE(2, "High voltage disabled");
     }
@@ -220,7 +245,8 @@ void MarchHardwareInterface::updateHighVoltageEnable()
   catch (std::exception& exception)
   {
     ROS_ERROR("%s", exception.what());
-    ROS_DEBUG("Reverting the enable_high_voltage_command input, in attempt to prevent this exception is thrown again");
+    ROS_DEBUG("Reverting the enable_high_voltage_command input, in attempt to prevent this exception is thrown "
+              "again");
     enable_high_voltage_command = !enable_high_voltage_command;
   }
 }
@@ -241,7 +267,7 @@ void MarchHardwareInterface::updatePowerNet()
     catch (std::exception& exception)
     {
       ROS_ERROR("%s", exception.what());
-      ROS_DEBUG("Reset power net command the input, in attempt to prevent this exception is thrown again");
+      ROS_DEBUG("Reset power net command, in attempt to prevent this exception is thrown again");
       power_net_on_off_command_.reset();
     }
   }
@@ -259,7 +285,7 @@ void MarchHardwareInterface::updatePowerNet()
     catch (std::exception& exception)
     {
       ROS_ERROR("%s", exception.what());
-      ROS_DEBUG("Reset power net command the input, in attempt to prevent this exception is thrown again");
+      ROS_WARN("Reset power net command, in attempt to prevent this exception is thrown again");
       power_net_on_off_command_.reset();
     }
   }
