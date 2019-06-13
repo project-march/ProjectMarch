@@ -9,7 +9,7 @@ mkdir -p march_ws/src
 cd march_ws
 catkin init --workspace .
 catkin build
-wstool init src https://gist.githubusercontent.com/Ishadijcks/ede0d44f04fd5c0abaea839e5b1bc950/raw/58719ef7506be5e7e5b80b502250bd3273f56dfe/march_ws.rosinstall
+wstool init src https://raw.githubusercontent.com/project-march/tutorials/develop/doc/getting_started/.rosinstall
 wstool update -t src
 
 # Install dependencies

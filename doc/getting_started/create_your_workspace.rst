@@ -45,11 +45,7 @@ Download the march source code
 
 We us `wstool <http://wiki.ros.org/wstool>`_ to easily maintain the multiple repositories in our workspace.
 
-.. todo :: (Isha) Update link to develop version.
-
-.. code ::
-
-  wstool init src https://gist.githubusercontent.com/Ishadijcks/ede0d44f04fd5c0abaea839e5b1bc950/raw/58719ef7506be5e7e5b80b502250bd3273f56dfe/march_ws.rosinstall
+  wstool init src https://raw.githubusercontent.com/project-march/tutorials/develop/doc/getting_started/.rosinstall
   wstool update -t src
 
 Build your Catkin Workspace
@@ -78,9 +74,7 @@ Optional: add the previous command to your ``.bashrc``: ::
 
 Automated script
 ^^^^^^^^^^^^^^^^
-.. todo :: (Isha) Update link to develop version.
-
-You can run the following script or download it from here.
+You can run the following script or download it from :codedir:`here <getting_started/create_march_ws.sh>`.
 
 .. literalinclude:: create_march_ws.sh
    :language: bash
