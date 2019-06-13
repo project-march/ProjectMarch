@@ -58,8 +58,6 @@ public:
 
   bool goToOperationEnabled();
 
-  void enableHighVoltage();
-
   /** @brief Override comparison operator */
   friend bool operator==(const IMotionCube& lhs, const IMotionCube& rhs)
   {

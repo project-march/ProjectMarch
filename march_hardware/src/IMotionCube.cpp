@@ -472,10 +472,6 @@ bool IMotionCube::goToOperationEnabled()
   ROS_INFO("Operation Enabled!");
 }
 
-void IMotionCube::enableHighVoltage()
-{
-}
-
 bool IMotionCube::get_bit(uint16 value, int index)
 {
   return static_cast<bool>(value & (1 << index));
