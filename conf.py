@@ -11,7 +11,10 @@ except KeyError:  # Local
 sys.path += [ os.path.abspath( '_scripts' )]
 
 extensions = [ 'sphinx.ext.extlinks',
+               'sphinx.ext.todo',
                'tutorialformatter' ]
+
+todo_include_todos = True
 
 # The master toctree document.
 master_doc = 'index'
@@ -50,9 +53,14 @@ html_context = {
     "conf_py_path": "",
     "source_suffix": source_suffix,
     "css_files": ['_static/override.css'],
-    "favicon": "favicon.ico"
-#  "logo": "logo.png"
+    "favicon": "favicon.ico",
+    "logo": "logo.png"
 }
+
+# Global substitutions
+rst_prolog = """
+.. |m4| replace:: March IV
+"""
 
 # Links
 ros_distro = 'kinetic'

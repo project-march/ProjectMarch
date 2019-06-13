@@ -1,5 +1,11 @@
-Getting Started
-===============
+Create your workspace
+=====================
+.. inclusion-introduction-start
+
+This tutorial will help you set up a ROS workspace with all packages needed to run the |m4| exoskeleton.
+
+.. inclusion-introduction-end
+
 
 Install ROS and Catkin
 ^^^^^^^^^^^^^^^^^^^^^^
