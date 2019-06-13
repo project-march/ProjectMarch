@@ -15,15 +15,17 @@ class Joint
 private:
   std::string name;
   // Set this number via the hardware builder
-  int net_number = -1;
+  int netNumber = -1;
   bool allowActuation;
   IMotionCube iMotionCube;
   TemperatureGES temperatureGES;
 
 public:
   Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES, IMotionCube iMotionCube);
+  Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES, IMotionCube iMotionCube, int netNumber);
   Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES);
   Joint(std::string name, bool allowActuation, IMotionCube iMotionCube);
+  Joint(std::string name, bool allowActuation, IMotionCube iMotionCube, int netNumber);
 
   void initialize(int ecatCycleTime);
   void prepareActuation();
@@ -38,9 +40,7 @@ public:
   int getIMotionCubeSlaveIndex();
   int getNetNumber()
   {
-    // TODO(TIM) add exception if is -1??
-    // And get this working in the cpp file
-    return net_number;
+    return netNumber;
   }
 
   bool hasIMotionCube();

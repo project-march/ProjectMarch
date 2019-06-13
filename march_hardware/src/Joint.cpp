@@ -11,6 +11,13 @@ Joint::Joint(std::string name, bool allowActuation, TemperatureGES temperatureGE
   this->name = std::move(name);
   this->allowActuation = allowActuation;
 }
+Joint::Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES, IMotionCube iMotionCube,
+             int netNumber)
+  : temperatureGES(temperatureGES), iMotionCube(iMotionCube), netNumber(netNumber)
+{
+  this->name = std::move(name);
+  this->allowActuation = allowActuation;
+}
 
 Joint::Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES) : temperatureGES(temperatureGES)
 {
@@ -18,6 +25,13 @@ Joint::Joint(std::string name, bool allowActuation, TemperatureGES temperatureGE
   this->allowActuation = allowActuation;
 }
 Joint::Joint(std::string name, bool allowActuation, IMotionCube iMotionCube) : iMotionCube(iMotionCube)
+{
+  this->name = std::move(name);
+  this->allowActuation = allowActuation;
+}
+
+Joint::Joint(std::string name, bool allowActuation, IMotionCube iMotionCube, int netNumber)
+  : iMotionCube(iMotionCube), netNumber(netNumber)
 {
   this->name = std::move(name);
   this->allowActuation = allowActuation;

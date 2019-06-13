@@ -74,6 +74,8 @@ march4cpp::Joint HardwareBuilder::createJoint(YAML::Node jointConfig, std::strin
 
   bool hasIMotionCube = false;
   bool hasTemperatureGes = false;
+  bool hasNetNumber = false;
+  int netNumber = -1;
   bool allowActuation = jointConfig["allowActuation"].as<bool>();
 
   if (jointConfig["imotioncube"].Type() == YAML::NodeType::Undefined)
@@ -84,6 +86,16 @@ march4cpp::Joint HardwareBuilder::createJoint(YAML::Node jointConfig, std::strin
   {
     hasIMotionCube = true;
     imc = this->createIMotionCube(jointConfig["imotioncube"]);
+  }
+
+  if (jointConfig["netNumber"].Type() == YAML::NodeType::Undefined)
+  {
+    ROS_WARN("Joint %s does not have a netNumber", jointName.c_str());
+  }
+  else
+  {
+    hasNetNumber = true;
+    netNumber = jointConfig["netNumber"].as<int>();
   }
 
   if (jointConfig["temperatureges"].Type() == YAML::NodeType::Undefined)
@@ -101,13 +113,27 @@ march4cpp::Joint HardwareBuilder::createJoint(YAML::Node jointConfig, std::strin
                  jointName.c_str());
   if (hasTemperatureGes && hasIMotionCube)
   {
-    return march4cpp::Joint(jointName, allowActuation, temperatureGes, imc);
+    if (hasNetNumber)
+    {
+      return march4cpp::Joint(jointName, allowActuation, temperatureGes, imc, netNumber);
+    }
+    else
+    {
+      return march4cpp::Joint(jointName, allowActuation, temperatureGes, imc);
+    }
   }
   if (hasTemperatureGes)
   {
     return march4cpp::Joint(jointName, allowActuation, temperatureGes);
   }
-  return march4cpp::Joint(jointName, allowActuation, imc);
+  if (hasNetNumber)
+  {
+    return march4cpp::Joint(jointName, allowActuation, imc, netNumber);
+  }
+  else
+  {
+    return march4cpp::Joint(jointName, allowActuation, imc);
+  }
 }
 
 march4cpp::IMotionCube HardwareBuilder::createIMotionCube(YAML::Node iMotionCubeConfig)
@@ -161,9 +187,9 @@ march4cpp::PowerDistributionBoard HardwareBuilder::createPowerDistributionBoard(
       netMonitorByteOffsets["highVoltageOvercurrentTrigger"].as<int>(),
       netMonitorByteOffsets["highVoltageEnabled"].as<int>(), netMonitorByteOffsets["highVoltageState"].as<int>());
 
-  NetDriverOffsets netDriverOffsets = NetDriverOffsets(
-      netDriverByteOffsets["lowVoltageNetOnOff"].as<int>(), netDriverByteOffsets["highVoltageNetOnOff"].as<int>(),
-      netDriverByteOffsets["allHighVoltageOnOff"].as<int>());
+  NetDriverOffsets netDriverOffsets = NetDriverOffsets(netDriverByteOffsets["lowVoltageNetOnOff"].as<int>(),
+                                                       netDriverByteOffsets["highVoltageNetOnOff"].as<int>(),
+                                                       netDriverByteOffsets["allHighVoltageOnOff"].as<int>());
 
   BootShutdownOffsets bootShutdownOffsets =
       BootShutdownOffsets(bootShutdownByteOffsets["masterOk"].as<int>(), bootShutdownByteOffsets["shutdown"].as<int>(),
