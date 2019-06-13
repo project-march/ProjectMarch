@@ -52,7 +52,6 @@ bool HighVoltage::getHighVoltageEnabled()
 {
   union bit8 highVoltageEnabled = get_input_bit8(
       static_cast<uint16>(this->slaveIndex), static_cast<uint8>(this->netMonitoringOffsets.getHighVoltageEnabled()));
-  // TODO(TIM) check if this bool needs to be inverted
   return highVoltageEnabled.ui;
 }
 
@@ -63,13 +62,7 @@ void HighVoltage::setNetOnOff(bool on, int netNumber)
     ROS_ERROR_THROTTLE(2, "Can't turn high voltage net %d on, there are only 8 high voltage nets", netNumber);
     throw std::invalid_argument("Only high voltage net 1 and 8 exist");
   }
-  if (!on)
-  {
-    ROS_ERROR_THROTTLE(2, "You are not allowed to turn off high voltage nets this way, use the all high voltage "
-                          "on/off");
-    throw std::runtime_error("Turning on high voltage this way during runtime is not allowed");
-  }
-  else if (getNetOperational(netNumber))
+  if (on && getNetOperational(netNumber))
   {
     ROS_WARN_THROTTLE(2, "High voltage net %d is already on", netNumber);
   }
@@ -94,21 +87,21 @@ void HighVoltage::setHighVoltageOnOff(bool on)
 {
   if (on && getHighVoltageEnabled())
   {
-    ROS_ERROR_THROTTLE(2, "All High voltage on/off switch already activated");
-    throw std::runtime_error("All High voltage on/off switch already activated");
+    ROS_ERROR_THROTTLE(2, "All-High-Voltage already enabled");
+    throw std::runtime_error("All-High-Voltage already enabled");
   }
   else if (!on && !getHighVoltageEnabled())
   {
-    ROS_ERROR_THROTTLE(2, "All High voltage on/off switch already deactivated");
-    throw std::runtime_error("All High voltage on/off switch already deactivated");
+    ROS_ERROR_THROTTLE(2, "All-High-Voltage already disabled");
+    throw std::runtime_error("All-High-Voltage already disabled");
   }
   if (on)
   {
-    ROS_INFO_THROTTLE(2, "All High voltage on/off switch activated from software");
+    ROS_DEBUG_THROTTLE(2, "Trying to enable All-High-Voltage from software");
   }
   else
   {
-    ROS_WARN_THROTTLE(2, "All High voltage on/off switch deactivated, high voltage on");
+    ROS_DEBUG_THROTTLE(2, "Trying to disable All-High-Voltage from software");
   }
 
   bit8 isOn;
