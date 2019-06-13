@@ -1,30 +1,50 @@
-march3:
-  ifName: enp3s0
+march4:
+  ifName: enp2s0
   ecatCycleTime: 4
+  powerDistributionBoard:
+    slaveIndex: 1
+    bootShutdownOffsets:
+      masterOk: 0
+      shutdown: 0
+      shutdownAllowed: 1
+    netMonitorByteOffsets:
+      powerDistributionBoardCurrent: 5
+      lowVoltageNet1Current: 9
+      lowVoltageNet2Current: 13
+      highVoltageNetCurrent: 17
+      lowVoltageState: 3
+      highVoltageOvercurrentTrigger: 2
+      highVoltageEnabled: 1
+      highVoltageState: 4
+    netDriverByteOffsets:
+      lowVoltageNetOnOff: 4
+      highVoltageNetOnOff: 3
+      allHighVoltageOnOff: 2
   joints:
     - right_hip_fe:
         allowActuation: false
         temperatureges: {slaveIndex: 6, byteOffset: 0}
+        netNumber: 4
         imotioncube:
           slaveIndex: 2
           encoder: {resolution: 17, minPositionIU: 22129, maxPositionIU: 43941, zeroPositionIU: 22129, safetyMarginRad: 0.05}
-
     - left_hip_fe:
         allowActuation: false
+        netNumber: 4
         imotioncube:
           temperatureges: {slaveIndex: 11, byteOffset: 0}
           slaveIndex: 8
           encoder: {resolution: 17, minPositionIU: 9756, maxPositionIU: 31543, zeroPositionIU: 9756, safetyMarginRad: 0.05}
-
     - right_knee:
         allowActuation: false
+        netNumber: 4
         temperatureges: {slaveIndex: 6, byteOffset: 4}
         imotioncube:
           slaveIndex: 5
           encoder: {resolution: 17, minPositionIU: 18102, maxPositionIU: 39895, zeroPositionIU: 18102, safetyMarginRad: 0.05}
-
     - left_knee:
         allowActuation: false
+        netNumber: 4
         temperatureges: {slaveIndex: 11, byteOffset: 4}
         imotioncube:
           slaveIndex: 10

@@ -69,5 +69,5 @@ TEST_F(AllowedRobotTest, TestMarch3Values)
 
 TEST_F(AllowedRobotTest, TestTestSetupCreation)
 {
-  ASSERT_NO_THROW(march4cpp::MarchRobot testSetup = HardwareBuilder(AllowedRobot::test_setup).createMarchRobot());
+  ASSERT_NO_THROW(march4cpp::MarchRobot testSetup = HardwareBuilder(AllowedRobot::testsetup).createMarchRobot());
 }
