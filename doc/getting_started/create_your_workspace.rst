@@ -6,6 +6,9 @@ This tutorial will help you set up a ROS workspace with all packages needed to r
 
 .. inclusion-introduction-end
 
+.. note:: If you already have ros installed and are familiar with ros installations, you can skip to the :ref:`automated-script-label` below.
+  We strongly recommend to follow the manual guide at least once to familiarize yourself with the commands.
+
 
 Install ROS and Catkin
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -14,7 +17,7 @@ It is easy to miss steps when going through the ROS installation tutorial. If yo
 
 Once you have ROS installed, make sure you have the most up to date packages: ::
 
-  rosdep update
+  rosdep update  # No sudo
   sudo apt-get update
   sudo apt-get dist-upgrade
 
@@ -22,28 +25,41 @@ Install `catkin <http://wiki.ros.org/catkin>`_ the ROS build system: ::
 
   sudo apt-get install ros-kinetic-catkin python-catkin-tools
 
+Install catkin lint and documentation: ::
+
+  pip install --user catkin_lint
+  pip install --user catkin_tools_document
+
+
 Create A Catkin Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 You will need to have a `catkin <http://wiki.ros.org/catkin>`_ workspace setup: ::
 
   mkdir -p ~/march_ws/src
+  cd march_ws
+  catkin init --workspace .
+  catkin build
 
 Download the march source code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-TODO
+We us `wstool <http://wiki.ros.org/wstool>`_ to easily maintain the multiple repositories in our workspace.
+
+.. todo :: (Isha) Update link to develop version.
+
+.. code ::
+
+  wstool init src https://gist.githubusercontent.com/Ishadijcks/ede0d44f04fd5c0abaea839e5b1bc950/raw/58719ef7506be5e7e5b80b502250bd3273f56dfe/march_ws.rosinstall
+  wstool update -t src
 
 Build your Catkin Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The following will install from Debian any package dependencies not already in your workspace: ::
 
-  cd ~/march_ws/src
-  rosdep install -y --from-paths . --ignore-src --rosdistro kinetic
+  rosdep install -y --from-paths src --ignore-src --rosdistro kinetic
 
 The next command will configure your catkin workspace: ::
 
-  cd ~/march_ws
-  catkin config --extend /opt/ros/${ROS_DISTRO} --cmake-args -DCMAKE_BUILD_TYPE=Debug
   catkin build
 
 Source the catkin workspace: ::
@@ -58,6 +74,13 @@ Optional: add the previous command to your ``.bashrc``: ::
    not required and often skipped by advanced users who use more than one
    catkin workspace at a time, but we recommend it for simplicity.
 
-Next Step
-^^^^^^^^^
-TODO Rviz quickstart
+.. _automated-script-label:
+
+Automated script
+^^^^^^^^^^^^^^^^
+.. todo :: (Isha) Update link to develop version.
+
+You can run the following script or download it from here.
+
+.. literalinclude:: create_march_ws.sh
+   :language: bash
