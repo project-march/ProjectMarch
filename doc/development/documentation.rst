@@ -23,7 +23,7 @@ Add the following entry to your ``.rosinstall`` file (recommended):
 .. code::
 
   - git:
-      local-name: tutorials
+      local-name: march_tutorials
       uri: https://github.com/project-march/tutorials
       version: develop
 
@@ -38,6 +38,8 @@ Or clone the repository manually in your source directory:
 .. code::
 
   https://github.com/project-march/tutorials
+
+.. note:: The local repository should be called ``march_tutorials`` instead of the repository name ``tutorials`` to ensure we can uniquely access the launchfiles.
 
 Install rosdoc_lite and Sphinx
 ------------------------------
