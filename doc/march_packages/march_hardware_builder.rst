@@ -18,7 +18,7 @@ Tutorials
 Using the package
 ^^^^^^^^^^^^^^^^^
 
-Add a dependency on this package to your project and ``#include <march_hardware_builder/HardwareBuilder.h>`` to start using the :hardware-interface:`HardwareBuilder class <march_hardware_builder/src/HardwareBuilder.h>`.
+Add a dependency on this package to your project and ``#include <march_hardware_builder/HardwareBuilder.h>`` to start using the :hardware-interface:`HardwareBuilder class <march_hardware_builder/include/march_hardware_builder/HardwareBuilder.h>`.
 
 There are four main ways to interact with the hardware builder:
 
