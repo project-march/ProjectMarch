@@ -30,12 +30,14 @@ Add the following entry to your ``.rosinstall`` file (recommended):
 And use wstool to update your workspace:
 
 .. code::
+
   cd ~/march_ws
   wstool update -t src
 
 Or clone the repository manually in your source directory:
 
 .. code::
+
   cd ~/march_ws/src
   git clone https://github.com/project-march/tutorials
 
@@ -81,6 +83,7 @@ Generate the html
 Simply run the :rootdir:`build_locally <build_locally.sh>` script to generate the docs and automatically open them in your browser.
 
 .. code::
+
   cd ~/march_ws/src/march_tutorials
   ./build_locally.sh
 
@@ -101,11 +104,13 @@ Install it globally with npm:
 
 Start the python watch script:
 .. code::
+
   cd ~/march_ws/src/march_tutorials
   python watch.py
 
 In another terminal, start browser-sync:
 .. code::
+
   cd ~/march_ws/src/march_tutorials
   browser-sync start -s build/html -f "build/html/*.html"
 
