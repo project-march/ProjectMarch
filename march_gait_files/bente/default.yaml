@@ -1,0 +1,4 @@
+gaits:
+  Sit: {Sit_down: MIII, Sit_home: MIII}
+  Stand_Up: {Prepare_Stand_Up: MIII, Stand_Up: MIII}
+  Walk: {left_swing: MIII, right_swing: MIII}
