@@ -30,14 +30,14 @@ Add the following entry to your ``.rosinstall`` file (recommended):
 And use wstool to update your workspace:
 
 .. code::
-
+  cd ~/march_ws
   wstool update -t src
 
 Or clone the repository manually in your source directory:
 
 .. code::
-
-  https://github.com/project-march/tutorials
+  cd ~/march_ws/src
+  git clone https://github.com/project-march/tutorials
 
 .. note:: The local repository should be called ``march_tutorials`` instead of the repository name ``tutorials`` to ensure we can uniquely access the launchfiles.
 
@@ -59,9 +59,12 @@ html-proofer is a tool that can validate your generated html for mistakes like b
 
    sudo apt-get update
    sudo apt install ruby-full
+
+   # Check if ruby and gem got installed correctly
    ruby --version
    gem --version
-   gem update --system
+
+   sudo gem update --system
    sudo gem install html-proofer
 
 Install pygit2
@@ -78,8 +81,8 @@ Generate the html
 Simply run the :rootdir:`build_locally <build_locally.sh>` script to generate the docs and automatically open them in your browser.
 
 .. code::
-
-  ./build_locally
+  cd ~/march_ws/src/march_tutorials
+  ./build_locally.sh
 
 .. note::
   If you have added new files but not pushed to GitHub yet, html-proofer will probably complain about invalid links.
@@ -98,12 +101,12 @@ Install it globally with npm:
 
 Start the python watch script:
 .. code::
-
+  cd ~/march_ws/src/march_tutorials
   python watch.py
 
 In another terminal, start browser-sync:
 .. code::
-
+  cd ~/march_ws/src/march_tutorials
   browser-sync start -s build/html -f "build/html/*.html"
 
 A localhost instance should now be opened, and refreshed whenever you change a ``.rst`` file.
