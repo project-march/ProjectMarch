@@ -3,8 +3,6 @@
 # Exit on the first error
 set -e
 
-pip install pygit2 --user
-
 # Setup Environment
 rm -rf build
 
