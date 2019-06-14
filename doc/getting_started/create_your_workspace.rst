@@ -43,7 +43,9 @@ You will need to have a `catkin <http://wiki.ros.org/catkin>`_ workspace setup: 
 Download the march source code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We us `wstool <http://wiki.ros.org/wstool>`_ to easily maintain the multiple repositories in our workspace.
+We us `wstool <http://wiki.ros.org/wstool>`_ to easily maintain the multiple repositories in our workspace:
+
+.. code::
 
   wstool init src https://raw.githubusercontent.com/project-march/tutorials/develop/doc/getting_started/.rosinstall
   wstool update -t src
