@@ -1,0 +1,217 @@
+name: ''
+version: ''
+description: "The setpoints of this walking gait are the same as the setpoints of the MIII walking\
+  \ gait, except for the fact that the timing of the setpoints in different. "
+setpoints: 
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs:         0
+    joint_names: [left_hip_fe, left_knee, right_hip_fe, right_knee]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs:  31250000
+    joint_names: [left_hip_aa, left_ankle, right_hip_aa, right_ankle]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 468749999
+    joint_names: [left_hip_aa, left_ankle, right_hip_aa, right_ankle]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 525000000
+    joint_names: [left_knee]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 625000000
+    joint_names: [left_hip_aa, left_ankle, right_hip_aa, right_ankle]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 750000000
+    joint_names: [left_hip_fe]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 850000000
+    joint_names: [right_knee]
+  - 
+    time_from_start: 
+      secs: 1
+      nsecs: 125000000
+    joint_names: [left_knee]
+  - 
+    time_from_start: 
+      secs: 1
+      nsecs: 250000000
+    joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
+  right_ankle]
+trajectory: 
+  header: 
+    seq: 0
+    stamp: 
+      secs: 0
+      nsecs:         0
+    frame_id: ''
+  joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
+  right_ankle]
+  points: 
+    - 
+      positions: 
+        - 0.0
+        - -0.166678943565
+        - 0.0523598775598
+        - 0.0
+        - 0.0
+        - 0.314159265359
+        - 0.0523598775598
+        - 0.0
+      velocities: 
+        - -0.0
+        - 0.0
+        - 0.0
+        - -0.0
+        - -0.0
+        - -0.349065850399
+        - 0.0
+        - -0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs:         0
+    - 
+      positions: [0.0, -0.16347166338008468, 0.060212060029304848, 0.0, 0.0, 0.30327672887354656, 0.05235987755979999, 0.0]
+      velocities: [0.0, 0.17550438133319479, 0.42813395420995248, 0.0, 0.0, -0.36692877768769733, -1.376676550535194e-15, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs:  31250000
+    - 
+      positions: [0.0, 0.30020892520483144, 0.84173510763282355, 0.0, 0.0, 0.10069256795634207, 0.052359877559800004, 0.0]
+      velocities: [0.0, 1.3577954413409841, 1.0345264805279859, 0.0, 0.0, -0.51385644215397086, 6.8833827526759767e-16, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 468749999
+    - 
+      positions: 
+        - 0.0
+        - 0.378742306262
+        - 0.872664625997
+        - 0.0
+        - 0.0
+        - 0.0697108499986
+        - 0.0523598775598
+        - 0.0
+      velocities: 
+        - 0.0
+        - 1.2466135638
+        - 0.0
+        - 0.0
+        - 0.0
+        - -0.510250094292
+        - 6.88338275268e-16
+        - 0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 525000000
+    - 
+      positions: [0.0, 0.48736501310626745, 0.8151980443294965, 0.0, 0.0, 0.019198621771927028, 0.052359877559799997, 0.0]
+      velocities: [0.0, 0.91102323831474807, -1.0333209248910249, 0.0, 0.0, -0.49111957849987331, -6.8833827526759392e-16, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 625000000
+    - 
+      positions: 
+        - 0.0
+        - 0.558505360638
+        - 0.634502039024
+        - 0.0
+        - 0.0
+        - -0.0375247400288
+        - 0.0523598775598
+        - 0.0
+      velocities: 
+        - 0.0
+        - 0.200712863979
+        - -1.78699518083
+        - 0.0
+        - 0.0
+        - -0.446515065115
+        - 0.0
+        - 0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 750000000
+    - 
+      positions: 
+        - 0.0
+        - 0.552493579859
+        - 0.442608370727
+        - 0.0
+        - 0.0
+        - -0.0796116726497
+        - 0.0523598775598
+        - 0.0
+      velocities: 
+        - 0.0
+        - -0.272654487827
+        - -1.93328016543
+        - 0.0
+        - 0.0
+        - -0.391304725265
+        - 0.0
+        - 0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 850000000
+    - 
+      positions: 
+        - 0.0
+        - 0.385711401553
+        - 0.0968657734857
+        - 0.0
+        - 0.0
+        - -0.15622519098
+        - 0.0523598775598
+        - 0.0
+      velocities: 
+        - 0.0
+        - -0.692029830636
+        - 0.0
+        - 0.0
+        - 0.0
+        - -0.160319207137
+        - 1.01185726464e-13
+        - 0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs: 125000000
+    - 
+      positions: [0.0, 0.3141592653589793, 0.05235987755982989, 0.0, 0.0, -0.16667894356545848, 0.05235987755982989, 0.0]
+      velocities: [0.0, -0.3490658503988659, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs: 250000000
+duration: 
+  secs: 1
+  nsecs: 250000000
+sounds: []
