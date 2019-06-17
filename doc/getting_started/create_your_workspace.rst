@@ -42,13 +42,40 @@ You will need to have a `catkin <http://wiki.ros.org/catkin>`_ workspace setup: 
 
 Download the march source code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+We us `wstool <http://wiki.ros.org/wstool>`_ to easily maintain the multiple repositories in our workspace.
+The process differs a bit, depending on if you have write access to our repositories or not.
 
-We us `wstool <http://wiki.ros.org/wstool>`_ to easily maintain the multiple repositories in our workspace:
+With write access
+-----------------
+If you have write access, you can use our provided ``.rosinstall`` file to pull all repositories in our workspace
 
 .. code::
 
   wstool init src https://raw.githubusercontent.com/project-march/tutorials/develop/doc/getting_started/.rosinstall
   wstool update -t src
+
+Without write access
+--------------------
+If you do not have write access, you will need to create your own forks of our repositories.
+Please check `this guide <https://guides.github.com/activities/forking/>`_ on how to work with forks if you haven't used them before.
+
+Save the `.rosinstall file <https://raw.githubusercontent.com/project-march/tutorials/develop/doc/getting_started/.rosinstall>`_
+locally and change the uri of the repositories you want to develop to the location of your forks. For example:
+
+.. code::
+
+  - git:
+      local-name: simulation
+      uri: https://github.com/<your-username>/march-simulation
+      version: develop
+
+Then call wstool with your edited ``.rosinstall`` file:
+
+.. code::
+
+  wstool init src ~/local/path/to/the/edited/.rosinstall
+  wstool update -t src
+
 
 Build your Catkin Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
