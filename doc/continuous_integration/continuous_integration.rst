@@ -1,8 +1,3 @@
 Continuous Integration
 ======================
-
-Travis
-^^^^^^
-
-CodeCov
-^^^^^^^
+.. todo:: (Isha) write the Continuous Integration tutorials.
