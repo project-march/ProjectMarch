@@ -1,6 +1,6 @@
 name: ''
 version: ''
-description: !!python/unicode "Sit down gait for the sitting block. This is the same version as\
+description: "Sit down gait for the sitting block. This is the same version as\
   \ MIII used."
 setpoints: 
   - 
@@ -117,7 +117,7 @@ trajectory:
         secs: 2
         nsecs: 299999999
     - 
-      positions: [0.0, 1.6057029118347832, 1.5707963267948966, 0, 0.0, 1.6057029118347832, 1.5707963267948966, 0]
+      positions: [0.0, 1.60570291183, 1.57079632679, 0.0, 0.0, 1.60570291183, 1.57079632679, 0.0]
       velocities: [0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0]
       accelerations: []
       effort: []

@@ -1,6 +1,6 @@
 name: ''
 version: ''
-description: !!python/unicode "Sit down gait. This is the same version as MIII used, except for\
+description: "Sit down gait. This is the same version as MIII used, except for\
   \ the fact that the ankles are moving in this version."
 setpoints: 
   - 

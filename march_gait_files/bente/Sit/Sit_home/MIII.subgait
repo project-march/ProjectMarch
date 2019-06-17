@@ -1,6 +1,6 @@
 name: ''
 version: ''
-description: !!python/unicode "Sit home gait for the sitting block: perform a little bit hip extension.\
+description: "Sit home gait for the sitting block: perform a little bit hip extension.\
   \ This is the same version as MIII used."
 setpoints: 
   - 
@@ -50,14 +50,14 @@ trajectory:
         - 1.57079632679
         - 0.0
       velocities: 
-        - -0.0
         - 0.0
         - 0.0
-        - -0.0
-        - -0.0
         - 0.0
         - 0.0
-        - -0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
       accelerations: []
       effort: []
       time_from_start: 
