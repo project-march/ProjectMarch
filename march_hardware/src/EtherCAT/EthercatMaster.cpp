@@ -4,6 +4,8 @@
 // EtherCAT master class source. Interfaces with SOEM
 //
 
+#include <chrono>
+
 #include <ros/ros.h>
 
 #include <march_hardware/EtherCAT/EthercatMaster.h>
@@ -16,9 +18,9 @@ extern "C"
 namespace march4cpp
 {
 // Constructor
-EthercatMaster::EthercatMaster(std::vector<Joint>* jointListPtr, std::string ifname, int maxSlaveIndex,
+EthercatMaster::EthercatMaster(std::vector<Joint> *jointListPtr, std::string ifname, int maxSlaveIndex,
                                int ecatCycleTime)
-  : jointListPtr(jointListPtr)
+    : jointListPtr(jointListPtr)
 {
   this->ifname = ifname;
   this->maxSlaveIndex = maxSlaveIndex;
@@ -33,7 +35,9 @@ void EthercatMaster::start()
   // Initialise SOEM, bind socket to ifname
   if (!ec_init(ifname.c_str()))
   {
-    ROS_ERROR("No socket connection on %s. Confirm that you have selected the right ifname", ifname.c_str());
+    ROS_ERROR("No socket connection on %s. Confirm that you have selected the "
+              "right ifname",
+              ifname.c_str());
     return;
   }
   ROS_INFO("ec_init on %s succeeded", ifname.c_str());
@@ -41,20 +45,17 @@ void EthercatMaster::start()
   // Find and auto-config slaves
   if (ec_config_init(FALSE) <= 0)
   {
-    ROS_ERROR("No slaves found, shutting down. Confirm that you have selected the right ifname\n"
-              "Check that the first slave is connected properly.");
+    ROS_ERROR("No slaves found, shutting down. Confirm that you have selected the right ifname."
+              "Check that the first slave is connected properly");
     return;
   }
   ROS_INFO("%d slave(s) found and initialized.", ec_slavecount);
 
-  for (int i = 0; i < ec_slavecount; i++)
-  {
-      this->slavePresent.push_back(true);  // Initially, all slaves are present
-  }
-
   if (ec_slavecount < this->maxSlaveIndex)
   {
-    ROS_FATAL("Slave configured with index %d while soem only found %d slave(s)", this->maxSlaveIndex, ec_slavecount);
+    ROS_FATAL(
+        "Slave configured with index %d while soem only found %d slave(s)",
+        this->maxSlaveIndex, ec_slavecount);
     return;
   }
   // TODO(Martijn) Check on type of slaves
@@ -67,7 +68,8 @@ void EthercatMaster::start()
     jointListPtr->at(i).initialize(ecatCycleTimems);
   }
 
-  // Configure the EtherCAT message structure depending on the PDO mapping of all the slaves
+  // Configure the EtherCAT message structure depending on the PDO mapping of
+  // all the slaves
   ec_config_map(&IOmap);
 
   ec_configdc();
@@ -75,7 +77,8 @@ void EthercatMaster::start()
   // Wait for all slaves to reach SAFE_OP state
   ec_statecheck(0, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE * 4);
 
-  //  ROS_INFO("segments : %d : %d %d %d %d", ec_group[0].nsegments, ec_group[0].IOsegment[0], ec_group[0].IOsegment[1],
+  //  ROS_INFO("segments : %d : %d %d %d %d", ec_group[0].nsegments,
+  //  ec_group[0].IOsegment[0], ec_group[0].IOsegment[1],
   //           ec_group[0].IOsegment[2], ec_group[0].IOsegment[3]);
 
   ROS_INFO("Request operational state for all slaves");
@@ -116,7 +119,8 @@ void EthercatMaster::start()
     {
       if (ec_slave[i].state != EC_STATE_OPERATIONAL)
       {
-        ROS_INFO("Slave %d State=0x%2.2x StatusCode=0x%4.4x : %s\n", i, ec_slave[i].state, ec_slave[i].ALstatuscode,
+        ROS_INFO("Slave %d State=0x%2.2x StatusCode=0x%4.4x : %s", i,
+                 ec_slave[i].state, ec_slave[i].ALstatuscode,
                  ec_ALstatuscode2string(ec_slave[i].ALstatuscode));
       }
     }
@@ -137,10 +141,14 @@ void EthercatMaster::ethercatLoop()
 {
   while (isOperational)
   {
+    auto start = std::chrono::high_resolution_clock::now();
     sendProcessData();
     receiveProcessData();
     monitorSlaveConnection();
-    usleep(ecatCycleTimems * 1000);
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration =
+        std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    usleep(ecatCycleTimems * 1000 - duration.count());
   }
 }
 
@@ -156,20 +164,14 @@ int EthercatMaster::receiveProcessData()
 
 void EthercatMaster::monitorSlaveConnection()
 {
-  for (int i = 0; i < this->slavePresent.size(); i++)
+  for (int slave = 1; slave <= ec_slavecount; slave++)
   {
-      if (ec_slave[i].islost && this->slavePresent[i])
-      {
-          // Slave now lost, while it was present last frame
-          ROS_WARN("Slave with index %d is lost", i+1);  // + 1 because slaveindices start at 1
-          this->slavePresent[i] = false;
-      }
-      else if ((!ec_slave[i].islost) && (!this->slavePresent[i]))
-      {
-          // Slave present, while it was lost last frame
-          ROS_INFO("Slave with index %d is recovered", i+1);  // + 1 because slaveindices start at 1
-          this->slavePresent[i] = true;
-      }
+    ec_statecheck(slave, EC_STATE_OPERATIONAL, EC_TIMEOUTRET);
+    if (ec_slave[slave].state == EC_STATE_NONE)
+    {
+      ROS_ERROR("EtherCAT train lost connection from slave %d", slave);
+      throw std::exception();
+    }
   }
 }
 
