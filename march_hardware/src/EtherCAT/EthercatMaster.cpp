@@ -19,8 +19,7 @@ namespace march4cpp
 {
 // Constructor
 EthercatMaster::EthercatMaster(std::vector<Joint> *jointListPtr, std::string ifname, int maxSlaveIndex,
-                               int ecatCycleTime)
-    : jointListPtr(jointListPtr)
+                               int ecatCycleTime) : jointListPtr(jointListPtr)
 {
   this->ifname = ifname;
   this->maxSlaveIndex = maxSlaveIndex;
@@ -77,13 +76,8 @@ void EthercatMaster::start()
   // Wait for all slaves to reach SAFE_OP state
   ec_statecheck(0, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE * 4);
 
-  //  ROS_INFO("segments : %d : %d %d %d %d", ec_group[0].nsegments,
-  //  ec_group[0].IOsegment[0], ec_group[0].IOsegment[1],
-  //           ec_group[0].IOsegment[2], ec_group[0].IOsegment[3]);
-
   ROS_INFO("Request operational state for all slaves");
   expectedWKC = (ec_group[0].outputsWKC * 2) + ec_group[0].inputsWKC;
-  //  ROS_INFO("Calculated workcounter %d", expectedWKC);
   ec_slave[0].state = EC_STATE_OPERATIONAL;
 
   // send one valid process data to make outputs in slaves happy
@@ -146,8 +140,7 @@ void EthercatMaster::ethercatLoop()
     receiveProcessData();
     monitorSlaveConnection();
     auto stop = std::chrono::high_resolution_clock::now();
-    auto duration =
-        std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     usleep(ecatCycleTimems * 1000 - duration.count());
   }
 }
@@ -169,7 +162,7 @@ void EthercatMaster::monitorSlaveConnection()
     ec_statecheck(slave, EC_STATE_OPERATIONAL, EC_TIMEOUTRET);
     if (ec_slave[slave].state == EC_STATE_NONE)
     {
-      ROS_ERROR("EtherCAT train lost connection from slave %d", slave);
+      ROS_ERROR("EtherCAT train lost connection from slave %d onwards", slave);
       throw std::exception();
     }
   }
