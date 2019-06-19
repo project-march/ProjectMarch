@@ -28,7 +28,7 @@ public:
   bool getOvercurrentTrigger(int netNumber);
   bool getHighVoltageEnabled();
   void setNetOnOff(bool on, int netNumber);
-  void setHighVoltageOnOff(bool on);
+  void enableDisableHighVoltage(bool enable);
 
   /** @brief Override comparison operator */
   friend bool operator==(const HighVoltage& lhs, const HighVoltage& rhs)

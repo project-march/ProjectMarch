@@ -235,7 +235,7 @@ void MarchHardwareInterface::updateHighVoltageEnable()
   {
     if (marchRobot.getPowerDistributionBoard()->getHighVoltage().getHighVoltageEnabled() != enable_high_voltage_command)
     {
-      marchRobot.getPowerDistributionBoard()->getHighVoltage().setHighVoltageOnOff(enable_high_voltage_command);
+      marchRobot.getPowerDistributionBoard()->getHighVoltage().enableDisableHighVoltage(enable_high_voltage_command);
     }
     else if (!marchRobot.getPowerDistributionBoard()->getHighVoltage().getHighVoltageEnabled())
     {

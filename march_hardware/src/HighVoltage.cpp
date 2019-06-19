@@ -84,31 +84,31 @@ void HighVoltage::setNetOnOff(bool on, int netNumber)
                   static_cast<uint8>(this->netDriverOffsets.getHighVoltageNetOnOff()), highVoltageNets);
 }
 
-void HighVoltage::setHighVoltageOnOff(bool on)
+void HighVoltage::enableDisableHighVoltage(bool enable)
 {
-  if (on && getHighVoltageEnabled())
+  if (enable && getHighVoltageEnabled())
   {
-    ROS_ERROR_THROTTLE(2, "All-High-Voltage already enabled");
-    throw std::runtime_error("All-High-Voltage already enabled");
+    ROS_ERROR_THROTTLE(2, "High voltage already enabled");
+    throw std::runtime_error("High voltage already enabled");
   }
-  else if (!on && !getHighVoltageEnabled())
+  else if (!enable && !getHighVoltageEnabled())
   {
-    ROS_ERROR_THROTTLE(2, "All-High-Voltage already disabled");
-    throw std::runtime_error("All-High-Voltage already disabled");
+    ROS_ERROR_THROTTLE(2, "High voltage already disabled");
+    throw std::runtime_error("High voltage already disabled");
   }
-  if (on)
+  if (enable)
   {
-    ROS_DEBUG_THROTTLE(2, "Trying to enable All-High-Voltage from software");
+    ROS_DEBUG_THROTTLE(2, "Trying to enable high voltage from software");
   }
   else
   {
-    ROS_DEBUG_THROTTLE(2, "Trying to disable All-High-Voltage from software");
+    ROS_DEBUG_THROTTLE(2, "Trying to disable high voltage from software");
   }
 
-  bit8 isOn;
-  isOn.ui = static_cast<uint8>(on);
+  bit8 isEnabled;
+  isEnabled.ui = static_cast<uint8>(enable);
   set_output_bit8(static_cast<uint16>(this->slaveIndex),
-                  static_cast<uint8>(this->netDriverOffsets.getAllHighVoltageOnOff()), isOn);
+                  static_cast<uint8>(this->netDriverOffsets.getAllHighVoltageOnOff()), isEnabled);
 }
 
 uint8 HighVoltage::getNetsOperational()
