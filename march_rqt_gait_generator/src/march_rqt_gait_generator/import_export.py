@@ -45,8 +45,6 @@ def export_to_file(gait, gait_directory):
     output_file = open(output_file_path, 'w')
     output_file.write(str(subgait))
 
-    print(str(subgait))
-
     notify("Gait Saved", output_file_path)
 
     output_file.close()
