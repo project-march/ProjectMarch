@@ -1,4 +1,4 @@
-march3:
+march4:
   ifName: enp3s0
   ecatCycleTime: 4
   joints:
