@@ -41,7 +41,7 @@ class GaitGeneratorPlugin(Plugin):
         self.topic_name = ""
         self.gait_directory = None
         self.playback_speed = 100
-        self.thread = None
+        self.time_slider_thread = None
         self.joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=10)
 
         self.robot = urdf.Robot.from_parameter_server()
@@ -72,12 +72,7 @@ class GaitGeneratorPlugin(Plugin):
             ]
         )
 
-        self._widget.SettingsFrame.findChild(QPushButton, "Export").clicked.connect(
-            lambda: [
-                export_to_file(self.gait, self.get_gait_directory()),
-                self.set_gait_directory_button(self.gait_directory)
-            ]
-        )
+        self._widget.SettingsFrame.findChild(QPushButton, "Export").clicked.connect(self.export)
 
         self._widget.SettingsFrame.findChild(QPushButton, "Publish").clicked.connect(
             lambda: self.publish_gait()
@@ -122,16 +117,18 @@ class GaitGeneratorPlugin(Plugin):
                 self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").value())
         )
 
-        self.init_shortcuts()
+        # Disable key inputs when mirroring is off.
+        self._widget.SettingsFrame.findChild(QCheckBox, "Mirror").stateChanged.connect(
+            lambda state: [
+                self._widget.SettingsFrame.findChild(QLineEdit, "Key1").setEnabled(state),
+                self._widget.SettingsFrame.findChild(QLineEdit, "Key2").setEnabled(state)
+            ]
+        )
 
         # Initialize the publisher on startup
         self.set_topic_name(self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").text())
 
         self.load_gait_into_ui()
-
-    def init_shortcuts(self):
-        QtGui.QShortcut(QtGui.QKeySequence("V"), self._widget).activated.connect(self.toggle_velocity_markers)
-        QtGui.QShortcut(QtGui.QKeySequence("Space"), self._widget).activated.connect(self.toggle_time_slider_thread)
 
     def toggle_velocity_markers(self):
         self._widget.SettingsFrame.findChild(QCheckBox, "ShowVelocityMarkers").toggle()
@@ -158,9 +155,19 @@ class GaitGeneratorPlugin(Plugin):
             layout.removeWidget(widget)
             widget.setParent(None)
 
-        for i in range(0, len(self.gait.joints)):
-            self._widget.JointSettingContainer.layout().addWidget(self.create_joint_setting(self.gait.joints[i]), i % 3,
-                                                                  i >= 3)
+        for i in range(0, len(self.robot.joints)):
+
+            if self.robot.joints[i].type != "fixed":
+                joint_name = self.robot.joints[i].name
+                joint = self.gait.get_joint(joint_name)
+                if not joint:
+                    continue
+                row = rospy.get_param("/joint_layout/" + joint_name + "/row", -1)
+                column = rospy.get_param("/joint_layout/" + joint_name + "/column", -1)
+                if row == -1 or column == -1:
+                    rospy.logerr("Could not load the layout for joint %s. Please check config/layout.yaml", joint_name)
+                    continue
+                self._widget.JointSettingContainer.layout().addWidget(self.create_joint_setting(joint), row, column)
 
     def create_joint_setting(self, joint):
         joint_setting_file = os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'), 'resource',
@@ -222,9 +229,9 @@ class GaitGeneratorPlugin(Plugin):
                      self.publish_preview()
                      ])
 
-        # Disable scrolling vertically
-        joint_setting.Table.verticalScrollBar().setDisabled(True)
-        joint_setting.Table.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # Disable scrolling horizontal
+        joint_setting.Table.horizontalScrollBar().setDisabled(True)
+        joint_setting.Table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         return joint_setting
 
@@ -277,7 +284,7 @@ class GaitGeneratorPlugin(Plugin):
                                               JointTrajectory, queue_size=10)
 
     def set_playback_speed(self, playback_speed):
-        was_playing = self.thread is not None
+        was_playing = self.time_slider_thread is not None
         self.stop_time_slider_thread()
 
         self.playback_speed = playback_speed
@@ -286,20 +293,28 @@ class GaitGeneratorPlugin(Plugin):
             self.start_time_slider_thread()
 
     def start_time_slider_thread(self):
+        if self.time_slider_thread is not None:
+            rospy.logdebug("Cannot start another time slider thread as one is already active")
+            return
+
         time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
 
         current = time_slider.value()
         playback_speed = self.playback_speed
         max = time_slider.maximum()
-        self.thread = TimeSliderThread(current, playback_speed, max)
-        self.thread.update_signal.connect(self.update_main_time_slider)
-        self.thread.start()
+        self.time_slider_thread = TimeSliderThread(current, playback_speed, max)
+        self.time_slider_thread.update_signal.connect(self.update_main_time_slider)
+        self.time_slider_thread.start()
 
     def update_gait_duration(self, duration):
         rescale_setpoints = self._widget.GaitPropertiesFrame.findChild(QCheckBox, "ScaleSetpoints").isChecked()
 
         if self.gait.has_setpoints_after_duration(duration) and not rescale_setpoints:
-
+            if not self.gait.has_multiple_setpoints_before_duration(duration):
+                QMessageBox.question(self._widget, 'Could not update gait duration',
+                                     "Not all joints have multiple setpoints before duration " + str(duration),
+                                     QMessageBox.Ok)
+                return
             discard_setpoints = QMessageBox.question(self._widget, 'Gait duration lower than highest time setpoint',
                                                      "Do you want to discard any setpoints higher than the given "
                                                      "duration?",
@@ -310,7 +325,7 @@ class GaitGeneratorPlugin(Plugin):
         self.gait.set_duration(duration, rescale_setpoints)
         self._widget.RvizFrame.findChild(QSlider, "TimeSlider").setRange(0, 100 * self.gait.duration)
 
-        was_playing = self.thread is not None
+        was_playing = self.time_slider_thread is not None
         self.stop_time_slider_thread()
 
         self.create_joint_settings()
@@ -319,9 +334,26 @@ class GaitGeneratorPlugin(Plugin):
             self.start_time_slider_thread()
 
     def stop_time_slider_thread(self):
-        if self.thread is not None:
-            self.thread.stop()
-            self.thread = None
+        if self.time_slider_thread is not None:
+            self.time_slider_thread.stop()
+            self.time_slider_thread = None
+
+    def export(self):
+        should_mirror = self._widget.SettingsFrame.findChild(QCheckBox, "Mirror").isChecked()
+
+        key_1 = self._widget.SettingsFrame.findChild(QLineEdit, "Key1").text()
+        key_2 = self._widget.SettingsFrame.findChild(QLineEdit, "Key2").text()
+
+        if should_mirror:
+            mirror = self.gait.get_mirror(key_1, key_2)
+            if mirror:
+                export_to_file(mirror, self.get_gait_directory())
+            else:
+                UserInterfaceController.notify("Could not mirror gait", "Check the logs for more information.")
+                return
+
+        export_to_file(self.gait, self.get_gait_directory()),
+        self.set_gait_directory_button(self.gait_directory)
 
     def toggle_time_slider_thread(self):
         if self.thread is None:
@@ -335,10 +367,11 @@ class GaitGeneratorPlugin(Plugin):
                                                    "Open Image",
                                                    rospkg.RosPack().get_path('march_rqt_gait_generator'),
                                                    "March Subgait (*.subgait)")
-        if file_name == "":
-            return
         self.gait = import_from_file_name(self.robot, file_name)
-        self.load_gait_into_ui()
+        if self.gait is None:
+            rospy.logwarn("Could not load gait %s", file_name)
+        else:
+            self.load_gait_into_ui()
 
     def load_gait_into_ui(self):
         time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
@@ -355,8 +388,13 @@ class GaitGeneratorPlugin(Plugin):
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait").setText(self.gait.subgait)
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").setText(self.gait.version)
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").setText(self.gait.description)
-        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").setValue(self.gait.duration)
 
+        # Block signals on the duration edit to prevent a reload of the joint settings
+        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").blockSignals(True)
+        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").setValue(self.gait.duration)
+        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").blockSignals(False)
+
+        print ('load gait into ui')
         self.create_joint_settings()
 
         self.publish_preview()
@@ -369,18 +407,16 @@ class GaitGeneratorPlugin(Plugin):
         self.stop_time_slider_thread()
 
     def save_settings(self, plugin_settings, instance_settings):
-        # TODO save intrinsic configuration, usually using:
-        plugin_settings.set_value('test', 3)
-        v = plugin_settings.value('test')
-        rospy.loginfo(v)
+        plugin_settings.set_value('gait_directory', self.gait_directory)
 
     def restore_settings(self, plugin_settings, instance_settings):
-        # TODO restore intrinsic configuration, usually using:
-        v = plugin_settings.value('test')
+        gait_directory = plugin_settings.value('gait_directory')
 
-        rospy.loginfo("Restor settings called here: " + str(v))
+        if gait_directory is not None:
+            rospy.loginfo("Restoring saved gait directory " + str(gait_directory))
+            self.gait_directory = gait_directory
 
-    # def trigger_configuration(self):
-    # Comment in to signal that the plugin has a way to configure
-    # This will enable a setting button (gear icon) in each dock widget title bar
-    # Usually used to open a modal configuration dialog
+        # def trigger_configuration(self):
+        # Comment in to signal that the plugin has a way to configure
+        # This will enable a setting button (gear icon) in each dock widget title bar
+        # Usually used to open a modal configuration dialog
