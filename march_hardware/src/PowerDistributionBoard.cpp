@@ -27,6 +27,7 @@ float PowerDistributionBoard::getPowerDistributionBoardCurrent()
 void PowerDistributionBoard::setMasterOnline()
 {
   bit8 isOkBit;
+  // By continuously flipping the master online toggle we let the embed know we are still connected.
   this->masterOnlineToggle = !this->masterOnlineToggle;
   isOkBit.ui = static_cast<uint8>(this->masterOnlineToggle);
   set_output_bit8(static_cast<uint16>(this->slaveIndex),
@@ -43,9 +44,9 @@ void PowerDistributionBoard::setMasterShutDownAllowed(bool isAllowed)
 
 bool PowerDistributionBoard::getMasterShutdownRequested()
 {
-  union bit8 current = get_input_bit8(static_cast<uint16>(this->slaveIndex),
+  union bit8 masterShutdownRequestedBit = get_input_bit8(static_cast<uint16>(this->slaveIndex),
                                       static_cast<uint8>(this->bootShutdownOffsets.getShutdownByteOffset()));
-  return current.ui;
+  return masterShutdownRequestedBit.ui;
 }
 
 HighVoltage PowerDistributionBoard::getHighVoltage()

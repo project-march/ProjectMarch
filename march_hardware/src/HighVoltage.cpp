@@ -71,11 +71,12 @@ void HighVoltage::setNetOnOff(bool on, int netNumber)
   highVoltageNets.ui = 1 << (netNumber - 1);
   if (on)
   {
+    // Force bit of the respective net to one.
     highVoltageNets.ui |= currentStateHighVoltageNets;
   }
   else
   {
-    // This code is needed when this method is allowed to turn off high voltage
+    // Force bit of the respective net to zero.
     highVoltageNets.ui = ~highVoltageNets.ui;
     highVoltageNets.ui &= currentStateHighVoltageNets;
   }
