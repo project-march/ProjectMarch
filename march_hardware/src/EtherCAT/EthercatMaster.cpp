@@ -4,7 +4,7 @@
 // EtherCAT master class source. Interfaces with SOEM
 //
 
-#include <chrono>
+#include <boost/chrono/chrono.hpp>
 
 #include <ros/ros.h>
 
@@ -135,12 +135,17 @@ void EthercatMaster::ethercatLoop()
 {
   while (isOperational)
   {
-    auto start = std::chrono::high_resolution_clock::now();
+    auto start = boost::chrono::high_resolution_clock::now();
     sendProcessData();
     receiveProcessData();
     monitorSlaveConnection();
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    auto stop = boost::chrono::high_resolution_clock::now();
+    auto duration = boost::chrono::duration_cast<boost::chrono::microseconds>(stop - start);
+    if (duration.count() > ecatCycleTimems * 1000)
+    {
+        ROS_ERROR("EtherCAT rate of %d milliseconds cannot be achieved", ecatCycleTimems);
+        throw std::exception();
+    }
     usleep(ecatCycleTimems * 1000 - duration.count());
   }
 }
