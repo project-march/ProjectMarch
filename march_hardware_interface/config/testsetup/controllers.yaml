@@ -7,7 +7,6 @@ march:
       type: march_temperature_sensor_controller/MarchTemperatureSensorController
       publish_rate: 50
     trajectory:
-      testjoint:
         type: position_controllers/JointTrajectoryController
         joints:
           - test_joint
