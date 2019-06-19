@@ -4,14 +4,11 @@ testsetup:
   joints:
     - test_joint:
         allowActuation: true
-        temperatureges:
-          slaveIndex: 1
-          byteOffset: 0
         imotioncube:
-          slaveIndex: 2
+          slaveIndex: 1
           encoder:
-            resolution: 16
-            minPositionIU: 37961
-            maxPositionIU: 59649
-            zeroPositionIU: 39717
-            safetyMarginRad: 0.05
+            resolution: 17
+            minPositionIU: 83678
+            maxPositionIU: 101450
+            zeroPositionIU: 89712
+            safetyMarginRad: 0.005
