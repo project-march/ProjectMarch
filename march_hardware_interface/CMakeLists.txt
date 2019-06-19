@@ -38,7 +38,7 @@ roslint_cpp(${lintfiles})
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
-set(SOURCES src/march_hardware_interface.cpp src/march_hardware_interface_node.cpp)
+set(SOURCES src/march_hardware_interface.cpp src/march_hardware_interface_node.cpp include/march_hardware_interface/PowerNetOnOffCommand.h)
 
 add_executable(march_hardware_interface_node ${SOURCES} ${SOURCE})
 
@@ -75,6 +75,7 @@ if (CATKIN_ENABLE_TESTING)
     add_rostest_gtest(${PROJECT_NAME}-test
             test/march_hardware_interface.test
             test/TestRunner.cpp
+            test/TestPdbStateInterface.cpp
             )
     target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} gtest gmock)
 

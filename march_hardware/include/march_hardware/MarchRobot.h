@@ -10,6 +10,7 @@
 #include <march_hardware/Joint.h>
 
 #include <march_hardware/EtherCAT/EthercatMaster.h>
+#include <march_hardware/PowerDistributionBoard.h>
 
 namespace march4cpp
 {
@@ -17,11 +18,20 @@ class MarchRobot
 {
 private:
   std::unique_ptr<EthercatMaster> ethercatMaster;
+  std::unique_ptr<PowerDistributionBoard> powerDistributionBoard;
 
 public:
   ::std::vector<Joint> jointList;
 
   MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int ecatCycleTime);
+
+  MarchRobot(::std::vector<Joint> jointList, PowerDistributionBoard powerDistributionBoard, ::std::string ifName,
+             int ecatCycleTime);
+
+  // TODO(TIM) This is needed for the destructor, but why??
+  MarchRobot(MarchRobot&&) = default;
+
+  ~MarchRobot();
 
   void startEtherCAT();
 
@@ -34,6 +44,8 @@ public:
   bool isEthercatOperational();
 
   Joint getJoint(::std::string jointName);
+
+  const std::unique_ptr<PowerDistributionBoard>& getPowerDistributionBoard() const;
 
   /** @brief Override comparison operator */
   friend bool operator==(const MarchRobot& lhs, const MarchRobot& rhs)

@@ -50,10 +50,10 @@ public:
     }
     else if (this->value == AllowedRobot::testsetup)
     {
-        return basePath.append("/src/robots/testsetup.yaml");
+        return basePath.append("/src/robots/test_setup.yaml");
     }
-    ROS_ERROR("Robotname not implemented. Using testsetup.yaml...");
-    return basePath.append("/src/robots/testsetup.yaml");
+    ROS_ERROR("Robotname not implemented. Using test_setup.yaml...");
+    return basePath.append("/src/robots/test_setup.yaml");
   }
 
   constexpr AllowedRobot(Value aAllowedRobot) : value(aAllowedRobot)

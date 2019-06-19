@@ -4,9 +4,9 @@
 
 #include <ros/ros.h>
 
+#include <march_hardware/Encoder.h>
 #include <march_hardware/Joint.h>
 #include <march_hardware/TemperatureSensor.h>
-#include <march_hardware/Encoder.h>
 
 #include <march_hardware/EtherCAT/EthercatIO.h>
 
@@ -20,11 +20,21 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int
   ethercatMaster.reset(new EthercatMaster(&this->jointList, ifName, this->getMaxSlaveIndex(), ecatCycleTime));
 }
 
+MarchRobot::MarchRobot(::std::vector<Joint> jointList, PowerDistributionBoard powerDistributionBoard,
+                       ::std::string ifName, int ecatCycleTime)
+{
+  this->jointList = std::move(jointList);
+  this->powerDistributionBoard =
+      std::unique_ptr<PowerDistributionBoard>(new PowerDistributionBoard(powerDistributionBoard));
+  ethercatMaster.reset(new EthercatMaster(&this->jointList, ifName, this->getMaxSlaveIndex(), ecatCycleTime));
+}
+
 void MarchRobot::startEtherCAT()
 {
   if (!hasValidSlaves())
   {
-    ROS_FATAL("Slaves are not configured properly. Confirm the slave indices are correct.");
+    ROS_FATAL("Slaves are not configured properly. Confirm the slave indices "
+              "are correct.");
     return;
   }
 
@@ -45,6 +55,7 @@ void MarchRobot::stopEtherCAT()
     ROS_ERROR("Trying to stop EtherCAT while it is not active.");
     return;
   }
+
   ethercatMaster->stop();
 }
 
@@ -90,7 +101,8 @@ bool MarchRobot::hasValidSlaves()
     }
   }
   // Multiple temperature sensors may be connected to the same slave.
-  // Remove duplicate temperatureSlaveIndices so they don't trigger as duplicates later.
+  // Remove duplicate temperatureSlaveIndices so they don't trigger as
+  // duplicates later.
   sort(temperatureSlaveIndices.begin(), temperatureSlaveIndices.end());
   temperatureSlaveIndices.erase(unique(temperatureSlaveIndices.begin(), temperatureSlaveIndices.end()),
                                 temperatureSlaveIndices.end());
@@ -127,7 +139,8 @@ Joint MarchRobot::getJoint(::std::string jointName)
 {
   if (!ethercatMaster->isOperational)
   {
-    ROS_WARN("Trying to access joints while ethercat is not operational. This may lead to incorrect sensor data.");
+    ROS_WARN("Trying to access joints while ethercat is not operational. This "
+             "may lead to incorrect sensor data.");
   }
   for (int i = 0; i < jointList.size(); i++)
   {
@@ -139,6 +152,22 @@ Joint MarchRobot::getJoint(::std::string jointName)
 
   ROS_ERROR("Could not find joint with name %s", jointName.c_str());
   throw ::std::runtime_error("Could not find joint with name " + jointName);
+}
+
+const std::unique_ptr<PowerDistributionBoard>& MarchRobot::getPowerDistributionBoard() const
+{
+  if (this->powerDistributionBoard->getSlaveIndex() == -1)
+  {
+    ROS_ERROR("Could not find power distribution board");
+    throw ::std::runtime_error("Could not find power distribution board");
+  }
+
+  return powerDistributionBoard;
+}
+
+MarchRobot::~MarchRobot()
+{
+  stopEtherCAT();
 }
 
 }  // namespace march4cpp

@@ -49,6 +49,7 @@ file(GLOB SOEM_SRC
 
 add_library(march_hardware
         ${SOEM_SRC}
+        include/${PROJECT_NAME}/PowerDistributionBoard.h
         include/${PROJECT_NAME}/EtherCAT/EthercatIO.h
         include/${PROJECT_NAME}/EtherCAT/EthercatMaster.h
         include/${PROJECT_NAME}/EtherCAT/EthercatSDO.h
@@ -57,20 +58,28 @@ add_library(march_hardware
         include/${PROJECT_NAME}/IMotionCube.h
         include/${PROJECT_NAME}/Joint.h
         include/${PROJECT_NAME}/MarchRobot.h
+        include/${PROJECT_NAME}/NetDriverOffsets.h
         include/${PROJECT_NAME}/Slave.h
         include/${PROJECT_NAME}/TemperatureGES.h
         include/${PROJECT_NAME}/TemperatureSensor.h
+        include/${PROJECT_NAME}/LowVoltage.h
+        include/${PROJECT_NAME}/HighVoltage.h
+        include/${PROJECT_NAME}/BootShutdownOffsets.h
         include/${PROJECT_NAME}/PDOmap.h
+        src/PowerDistributionBoard.cpp
         src/EtherCAT/EthercatIO.cpp
         src/EtherCAT/EthercatMaster.cpp
         src/EtherCAT/EthercatSDO.cpp
+        src/LowVoltage.cpp
+        src/HighVoltage.cpp
         src/Encoder.cpp
         src/IMotionCube.cpp
         src/Joint.cpp
         src/MarchRobot.cpp
         src/TemperatureGES.cpp
         src/PDOmap.cpp
-        src/main.cpp)
+        src/main.cpp
+        )
 
 target_link_libraries(march_hardware ${catkin_LIBRARIES})
 
@@ -107,6 +116,12 @@ if (CATKIN_ENABLE_TESTING)
             test/TestTemperatureGES.cpp
             test/TestJoint.cpp
             test/TestPDOmap.cpp
+            test/TestBootShutdownOffsets.cpp
+            test/TestNetDriverOffsets.cpp
+            test/TestNetMonitorOffsets.cpp
+            test/TestLowVoltage.cpp
+            test/TestHighVoltage.cpp
+            test/TestPowerDistributionBoard.cpp
             test/mocks/MockTemperatureGES.cpp
             test/mocks/MockTemperatureSensor.cpp
             test/mocks/MockEncoder.cpp

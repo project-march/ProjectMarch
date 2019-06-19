@@ -11,13 +11,6 @@ class TestDummy : public ::testing::Test
 {
 };
 
-TEST_F(TestDummy , AlwaysTrue)
-{
-    march_hardware_interface::MarchHardware marchHardware;
-    ASSERT_TRUE(true);
-}
-
-
 int main(int argc, char** argv)
 {
   testing::InitGoogleTest(&argc, argv);
