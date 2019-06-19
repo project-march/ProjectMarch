@@ -143,10 +143,12 @@ void EthercatMaster::ethercatLoop()
     auto duration = boost::chrono::duration_cast<boost::chrono::microseconds>(stop - start);
     if (duration.count() > ecatCycleTimems * 1000)
     {
-        ROS_ERROR("EtherCAT rate of %d milliseconds cannot be achieved", ecatCycleTimems);
-        throw std::exception();
+        ROS_WARN("EtherCAT rate of %d milliseconds per cycle was not achieved this EtherCAT cycle", ecatCycleTimems);
     }
-    usleep(ecatCycleTimems * 1000 - duration.count());
+    else
+    {
+        usleep(ecatCycleTimems * 1000 - duration.count());
+    }
   }
 }
 
