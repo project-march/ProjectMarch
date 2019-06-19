@@ -19,7 +19,7 @@ def export_to_file(gait, gait_directory):
 
     subgait.trajectory = gait.to_joint_trajectory()
     subgait.setpoints = gait.to_setpoints()
-    subgait.description = gait.description
+    subgait.description = str(gait.description)
 
     subgait.duration = rospy.Duration.from_sec(gait.duration)
 
@@ -44,6 +44,8 @@ def export_to_file(gait, gait_directory):
 
     output_file = open(output_file_path, 'w')
     output_file.write(str(subgait))
+
+    print(str(subgait))
 
     notify("Gait Saved", output_file_path)
 
