@@ -11,7 +11,7 @@
           args="
                 /march/controller/state
                 /march/controller/temperature_sensor
-                /march/controller/trajectory/full_exoskeleton
+                /march/controller/trajectory
             "/>
 
     <node name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" args="march4" output="screen"/>
