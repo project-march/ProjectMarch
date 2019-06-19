@@ -1,12 +1,12 @@
 // Copyright 2018 Project March.
-#include <ros/ros.h>
 #include <bitset>
+#include <ros/ros.h>
 
 #include <march_hardware/EtherCAT/EthercatSDO.h>
 
+#include <march_hardware/EtherCAT/EthercatIO.h>
 #include <march_hardware/IMotionCube.h>
 #include <unistd.h>
-#include <march_hardware/EtherCAT/EthercatIO.h>
 
 namespace march4cpp
 {
@@ -63,6 +63,7 @@ void IMotionCube::validateMosiPDOs()
 // Set configuration parameters to the IMC
 void IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
 {
+  ROS_INFO("IMotionCube::writeInitialSettings");
   bool success = true;
   // sdo_bit32(slaveIndex, address, subindex, value);
   // mode of operation
@@ -236,7 +237,8 @@ void IMotionCube::parseStatusWord(uint16 statusWord)
   }
   if (get_bit(statusWord, 5) == 0)
   {
-    ROS_WARN("\tQuick Stop. When this bit is zero, the drive is performing a quick stop.");
+    ROS_WARN("\tQuick Stop. When this bit is zero, the drive is performing a "
+             "quick stop.");
   }
   if (get_bit(statusWord, 6) == 1)
   {
@@ -244,21 +246,25 @@ void IMotionCube::parseStatusWord(uint16 statusWord)
   }
   if (get_bit(statusWord, 7) == 1)
   {
-    ROS_WARN("\tWarning. A TML function / homing was called, while another TML function homing is still in execution. "
+    ROS_WARN("\tWarning. A TML function / homing was called, while another TML "
+             "function homing is still in execution. "
              "The last call is ignored.");
   }
   if (get_bit(statusWord, 8) == 1)
   {
-    ROS_WARN("\tA TML function or homing is executed. Until the function or homing execution ends or is aborted, no "
+    ROS_WARN("\tA TML function or homing is executed. Until the function or "
+             "homing execution ends or is aborted, no "
              "other TML function / homing may be called.");
   }
   if (get_bit(statusWord, 9) == 1)
   {
-    ROS_WARN("\tRemote - drive parameters may be modified via CAN and the drive will execute the command message.");
+    ROS_WARN("\tRemote - drive parameters may be modified via CAN and the "
+             "drive will execute the command message.");
   }
   else
   {
-    ROS_WARN("\tRemote - drive is in local mode and will not execute the command message.");
+    ROS_WARN("\tRemote - drive is in local mode and will not execute the "
+             "command message.");
   }
   if (get_bit(statusWord, 10) == 1)
   {
@@ -298,37 +304,55 @@ void IMotionCube::parseMotionError(uint16 motionError)
 {
   ROS_WARN_STREAM("Looking up Motion Error " << std::bitset<16>(motionError));
   std::vector<std::string> bitDescriptions = {};
-  bitDescriptions.push_back("\tEtherCAT communication error. Reset by a Reset Fault command or by Clear Error in the "
+  bitDescriptions.push_back("\tEtherCAT communication error. Reset by a Reset "
+                            "Fault command or by Clear Error in the "
                             "EtherCAT State Machine.");
-  bitDescriptions.push_back("\tShort-circuit. Set when protection is triggered. Reset by a Reset Fault command.");
-  bitDescriptions.push_back("\tInvalid setup data. Set when the EEPROM stored setup data is not valid or not present.");
-  bitDescriptions.push_back("\tControl error (position/speed error too big). Set when protection is triggered. Reset "
+  bitDescriptions.push_back("\tShort-circuit. Set when protection is "
+                            "triggered. Reset by a Reset Fault command.");
+  bitDescriptions.push_back("\tInvalid setup data. Set when the EEPROM stored "
+                            "setup data is not valid or not present.");
+  bitDescriptions.push_back("\tControl error (position/speed error too big). "
+                            "Set when protection is triggered. Reset "
                             "by a Reset Fault command.");
-  bitDescriptions.push_back("\tCommunication error. Set when protection is triggered. Reset by a Reset Fault command.");
-  bitDescriptions.push_back("\tMotor position wraps around. Set when protection is triggered. Reset by a Reset Fault "
+  bitDescriptions.push_back("\tCommunication error. Set when protection is "
+                            "triggered. Reset by a Reset Fault command.");
+  bitDescriptions.push_back("\tMotor position wraps around. Set when "
+                            "protection is triggered. Reset by a Reset Fault "
                             "command.");
-  bitDescriptions.push_back("\tPositive limit switch active. Set when LSP input is in active state. Reset when LSP "
+  bitDescriptions.push_back("\tPositive limit switch active. Set when LSP "
+                            "input is in active state. Reset when LSP "
                             "input is inactive state");
-  bitDescriptions.push_back("\tNegative limit switch active. Set when LSN input is in active state. Reset when LSN "
+  bitDescriptions.push_back("\tNegative limit switch active. Set when LSN "
+                            "input is in active state. Reset when LSN "
                             "input is inactive state");
-  bitDescriptions.push_back("\tOver current. Set when protection is triggered. Reset by a Reset Fault command");
-  bitDescriptions.push_back("\tI2T protection. Set when protection is triggered. Reset by a Reset Fault command");
-  bitDescriptions.push_back("\tOver temperature motor. Set when protection is triggered. Reset by a Reset Fault "
-                            "command. This protection may be activated if the motor has a PTC or NTC temperature "
+  bitDescriptions.push_back("\tOver current. Set when protection is triggered. "
+                            "Reset by a Reset Fault command");
+  bitDescriptions.push_back("\tI2T protection. Set when protection is "
+                            "triggered. Reset by a Reset Fault command");
+  bitDescriptions.push_back("\tOver temperature motor. Set when protection is "
+                            "triggered. Reset by a Reset Fault "
+                            "command. This protection may be activated if the "
+                            "motor has a PTC or NTC temperature "
                             "contact.");
-  bitDescriptions.push_back("\tOver temperature drive. Set when protection is triggered. Reset by a Reset Fault "
+  bitDescriptions.push_back("\tOver temperature drive. Set when protection is "
+                            "triggered. Reset by a Reset Fault "
                             "command.");
-  bitDescriptions.push_back("\tOver-voltage. Set when protection is triggered. Reset by a Reset Fault command");
-  bitDescriptions.push_back("\tUnder-voltage. Set when protection is triggered. Reset by a Reset Fault command");
-  bitDescriptions.push_back(
-      "\tCommand error. This bit is set in several situations. They can be distinguished either by the associated "
-      "emergency code, or in conjunction with other bits:\n"
-      "\t\t0xFF03 - Specified homing method not available\n"
-      "\t\t0xFF04 - A wrong mode is set in object 6060h, modes_of_operation\n"
-      "\t\t0xFF05 - Specified digital I/O line not available\n"
-      "\tA function is called during the execution of another function (+ set bit 7 of object 6041h, statusword).\n"
-      "\tUpdate of operation mode received during a transition. This bit acts just as a warning.");
-  bitDescriptions.push_back("\tDrive disabled due to enable input. Set when enable input is on disable state. Reset "
+  bitDescriptions.push_back("\tOver-voltage. Set when protection is triggered. "
+                            "Reset by a Reset Fault command");
+  bitDescriptions.push_back("\tUnder-voltage. Set when protection is "
+                            "triggered. Reset by a Reset Fault command");
+  bitDescriptions.push_back("\tCommand error. This bit is set in several situations. They can be "
+                            "distinguished either by the associated "
+                            "emergency code, or in conjunction with other bits:\n"
+                            "\t\t0xFF03 - Specified homing method not available\n"
+                            "\t\t0xFF04 - A wrong mode is set in object 6060h, modes_of_operation\n"
+                            "\t\t0xFF05 - Specified digital I/O line not available\n"
+                            "\tA function is called during the execution of another function (+ set "
+                            "bit 7 of object 6041h, statusword).\n"
+                            "\tUpdate of operation mode received during a transition. This bit acts "
+                            "just as a warning.");
+  bitDescriptions.push_back("\tDrive disabled due to enable input. Set when "
+                            "enable input is on disable state. Reset "
                             "when enable input is on enable state");
 
   for (int i = 0; i < 16; i++)
@@ -344,17 +368,23 @@ void IMotionCube::parseDetailedError(uint16 detailedError)
 {
   ROS_WARN_STREAM("Looking up Detailed Error " << std::bitset<16>(detailedError));
   std::vector<std::string> bitDescriptions = {};
-  bitDescriptions.push_back("\tThe number of nested function calls exceeded the length of TML stack. Last function "
+  bitDescriptions.push_back("\tThe number of nested function calls exceeded "
+                            "the length of TML stack. Last function "
                             "call was ignored.");
-  bitDescriptions.push_back("\tA RET/RETI instruction was executed while no function/ISR was active.");
+  bitDescriptions.push_back("\tA RET/RETI instruction was executed while no "
+                            "function/ISR was active.");
   bitDescriptions.push_back("\tA call to an inexistent homing routine was received.");
   bitDescriptions.push_back("\tA call to an inexistent function was received.");
-  bitDescriptions.push_back("\tUPD instruction received while AXISON was executed. The UPD instruction. The UPD "
-                            "instruction was ignored and it must be sent again when AXISON is completed.");
-  bitDescriptions.push_back("\tCancelable call instruction received while another cancelable function was active.");
+  bitDescriptions.push_back("\tUPD instruction received while AXISON was "
+                            "executed. The UPD instruction. The UPD "
+                            "instruction was ignored and it must be sent again "
+                            "when AXISON is completed.");
+  bitDescriptions.push_back("\tCancelable call instruction received while "
+                            "another cancelable function was active.");
   bitDescriptions.push_back("\tPositive software limit switch is active.");
   bitDescriptions.push_back("\tNegative software limit switch is active.");
-  bitDescriptions.push_back("\tS-curve parameters caused an invalid profile. UPD instruction was ignored.");
+  bitDescriptions.push_back("\tS-curve parameters caused an invalid profile. "
+                            "UPD instruction was ignored.");
 
   for (int i = 0; i < 9; i++)
   {
@@ -408,19 +438,22 @@ bool IMotionCube::goToOperationEnabled()
   }
   ROS_INFO("Switched On!");
 
-  // If ActualPosition is not defined in PDOmapping, a fatal error is thrown because of safety reasons
+  // If ActualPosition is not defined in PDOmapping, a fatal error is thrown
+  // because of safety reasons
   ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO "
                                                                                   "mapping, so can't get angle");
 
   int angleRead = this->encoder.getAngleIU(this->misoByteOffsets[IMCObjectName::ActualPosition]);
-  //  If the encoder is functioning correctly, move the joint to its current position. Otherwise shutdown
+  //  If the encoder is functioning correctly, move the joint to its current
+  //  position. Otherwise shutdown
   if (this->encoder.isValidTargetPositionIU(angleRead))
   {
     this->actuateIU(angleRead);
   }
   else
   {
-    ROS_FATAL("Encoder is not functioning properly, read value %d, min value is %d, max value is %d. Shutting down",
+    ROS_FATAL("Encoder is not functioning properly, read value %d, min value "
+              "is %d, max value is %d. Shutting down",
               angleRead, this->encoder.getMinPositionIU(), this->encoder.getMaxPositionIU());
     throw std::domain_error("Encoder is not functioning properly");
   }
@@ -443,5 +476,4 @@ bool IMotionCube::get_bit(uint16 value, int index)
 {
   return static_cast<bool>(value & (1 << index));
 }
-
 }  // namespace march4cpp

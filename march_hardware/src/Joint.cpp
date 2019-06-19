@@ -11,6 +11,13 @@ Joint::Joint(std::string name, bool allowActuation, TemperatureGES temperatureGE
   this->name = std::move(name);
   this->allowActuation = allowActuation;
 }
+Joint::Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES, IMotionCube iMotionCube,
+             int netNumber)
+  : temperatureGES(temperatureGES), iMotionCube(iMotionCube), netNumber(netNumber)
+{
+  this->name = std::move(name);
+  this->allowActuation = allowActuation;
+}
 
 Joint::Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES) : temperatureGES(temperatureGES)
 {
@@ -18,7 +25,13 @@ Joint::Joint(std::string name, bool allowActuation, TemperatureGES temperatureGE
   this->allowActuation = allowActuation;
 }
 Joint::Joint(std::string name, bool allowActuation, IMotionCube iMotionCube) : iMotionCube(iMotionCube)
+{
+  this->name = std::move(name);
+  this->allowActuation = allowActuation;
+}
 
+Joint::Joint(std::string name, bool allowActuation, IMotionCube iMotionCube, int netNumber)
+  : iMotionCube(iMotionCube), netNumber(netNumber)
 {
   this->name = std::move(name);
   this->allowActuation = allowActuation;
@@ -44,15 +57,20 @@ void Joint::prepareActuation()
   }
   else
   {
-    ROS_ERROR("Trying to prepare joint %s for actuation while it is not allowed to actuate", this->name.c_str());
+    ROS_ERROR("Trying to prepare joint %s for actuation while it is not "
+              "allowed to actuate",
+              this->name.c_str());
   }
 }
 
 void Joint::actuateRad(float targetPositionRad)
 {
-  ROS_ASSERT_MSG(this->allowActuation, "Joint %s is not allowed to actuate, yet its actuate method has been called.",
+  ROS_ASSERT_MSG(this->allowActuation, "Joint %s is not allowed to actuate, "
+                                       "yet its actuate method has been "
+                                       "called.",
                  this->name.c_str());
-  // TODO(BaCo) check that the position is allowed and does not exceed (torque) limits.
+  // TODO(BaCo) check that the position is allowed and does not exceed (torque)
+  // limits.
   this->iMotionCube.actuateRad(targetPositionRad);
 }
 
@@ -93,7 +111,6 @@ int Joint::getIMotionCubeSlaveIndex()
   }
   return -1;
 }
-
 std::string Joint::getName()
 {
   return this->name;

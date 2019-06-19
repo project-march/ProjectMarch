@@ -14,7 +14,7 @@ int main(int argc, char** argv)
   AllowedRobot selectedRobot = AllowedRobot(selectedRobotName);
 
   march_hardware_interface::MarchHardwareInterface march(nh, selectedRobot);
+
   ros::waitForShutdown();
   return 0;
 }
-

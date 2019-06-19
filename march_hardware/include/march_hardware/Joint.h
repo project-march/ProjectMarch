@@ -5,21 +5,27 @@
 #include <string>
 
 #include <march_hardware/IMotionCube.h>
+#include <march_hardware/PowerDistributionBoard.h>
 #include <march_hardware/TemperatureGES.h>
+
 namespace march4cpp
 {
 class Joint
 {
 private:
   std::string name;
+  // Set this number via the hardware builder
+  int netNumber = -1;
   bool allowActuation;
   IMotionCube iMotionCube;
   TemperatureGES temperatureGES;
 
 public:
   Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES, IMotionCube iMotionCube);
+  Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES, IMotionCube iMotionCube, int netNumber);
   Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES);
   Joint(std::string name, bool allowActuation, IMotionCube iMotionCube);
+  Joint(std::string name, bool allowActuation, IMotionCube iMotionCube, int netNumber);
 
   void initialize(int ecatCycleTime);
   void prepareActuation();
@@ -32,6 +38,10 @@ public:
   std::string getName();
   int getTemperatureGESSlaveIndex();
   int getIMotionCubeSlaveIndex();
+  int getNetNumber()
+  {
+    return netNumber;
+  }
 
   bool hasIMotionCube();
   bool hasTemperatureGES();
@@ -52,7 +62,7 @@ public:
   friend ::std::ostream& operator<<(std::ostream& os, const Joint& joint)
   {
     return os << "name: " << joint.name << ", "
-              << "allowActuation: " << joint.allowActuation<< ", "
+              << "allowActuation: " << joint.allowActuation << ", "
               << "imotioncube: " << joint.iMotionCube << ","
               << "temperatureges: " << joint.temperatureGES;
   }
