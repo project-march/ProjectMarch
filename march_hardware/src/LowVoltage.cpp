@@ -38,42 +38,7 @@ bool LowVoltage::getNetOperational(int netNumber)
 
 void LowVoltage::setNetOnOff(bool on, int netNumber)
 {
-  if (netNumber == 1)
-  {
-    ROS_ERROR_THROTTLE(2, "Can't turn low voltage net 1 on or off, could cause master suicide");
-    return;
-  }
-  else if (netNumber != 2)
-  {
-    ROS_ERROR_THROTTLE(2, "Can't turn low voltage net %d on or off, there are only 2 low voltage nets", netNumber);
-    return;
-  }
-  if (on && getNetOperational(netNumber))
-  {
-    ROS_WARN_THROTTLE(2, "Low voltage net %d is already on", netNumber);
-    return;
-  }
-  else if (!on && !getNetOperational(netNumber))
-  {
-    ROS_WARN_THROTTLE(2, "Low voltage net %d is already off", netNumber);
-    return;
-  }
-
-  uint8 currentStateLowVoltageNets = getNetsOperational();
-  bit8 lowVoltageNets;
-  lowVoltageNets.ui = 1 << (netNumber - 1);
-  if (on)
-  {
-    lowVoltageNets.ui |= currentStateLowVoltageNets;
-  }
-  else
-  {
-    lowVoltageNets.ui = ~lowVoltageNets.ui;
-    lowVoltageNets.ui &= currentStateLowVoltageNets;
-  }
-
-  set_output_bit8(static_cast<uint16>(this->slaveIndex),
-                  static_cast<uint8>(this->netDriverOffsets.getLowVoltageNetOnOff()), lowVoltageNets);
+  ROS_ERROR_THROTTLE(2, "Can't control low voltage nets from master");
 }
 
 uint8 LowVoltage::getNetsOperational()
