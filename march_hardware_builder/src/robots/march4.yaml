@@ -1,5 +1,5 @@
 march4:
-  ifName: enp2s0
+  ifName: enp3s0
   ecatCycleTime: 4
   powerDistributionBoard:
     slaveIndex: 1
