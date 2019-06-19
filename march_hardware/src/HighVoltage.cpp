@@ -59,8 +59,8 @@ void HighVoltage::setNetOnOff(bool on, int netNumber)
 {
   if (netNumber < 1 || netNumber > 8)
   {
-    ROS_ERROR_THROTTLE(2, "Can't turn high voltage net %d on, there are only 8 high voltage nets", netNumber);
-    throw std::invalid_argument("Only high voltage net 1 and 8 exist");
+    ROS_ERROR_THROTTLE(2, "Can't turn high voltage net %d on, only high voltage net 1 to 8 exist", netNumber);
+    throw std::invalid_argument("Only high voltage net 1 to 8 exist");
   }
   if (on && getNetOperational(netNumber))
   {

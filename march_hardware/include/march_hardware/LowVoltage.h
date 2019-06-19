@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
-#ifndef MARCH_FAKE_SENSOR_DATA_LOWVOLTAGE_H
-#define MARCH_FAKE_SENSOR_DATA_LOWVOLTAGE_H
+#ifndef MARCH_IV_LOW_VOLTAGE_H
+#define MARCH_IV_LOW_VOLTAGE_H
 
 #include <ros/ros.h>
 
@@ -44,4 +44,4 @@ public:
 };
 
 }  // namespace march4cpp
-#endif  // MARCH_FAKE_SENSOR_DATA_LOWVOLTAGE_H
+#endif  // MARCH_IV_LOW_VOLTAGE_H
