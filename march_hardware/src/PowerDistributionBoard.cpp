@@ -27,7 +27,7 @@ float PowerDistributionBoard::getPowerDistributionBoardCurrent()
 void PowerDistributionBoard::setMasterOnline()
 {
   bit8 isOkBit;
-  // By continuously flipping the master online toggle we let the embed know we are still connected.
+  // By continuously flipping the master online toggle we let the pdb know we are still connected.
   this->masterOnlineToggle = !this->masterOnlineToggle;
   isOkBit.ui = static_cast<uint8>(this->masterOnlineToggle);
   set_output_bit8(static_cast<uint16>(this->slaveIndex),
