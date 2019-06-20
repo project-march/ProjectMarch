@@ -1,5 +1,4 @@
 <launch>
-    <rosparam file="$(find march_hardware_interface)/config/march4/hardware.yaml" command="load"/>
     <rosparam file="$(find march_hardware_interface)/config/march4/controllers.yaml" command="load"/>
     <rosparam file="$(find march_hardware_interface)/config/march4/joint_limits.yaml" command="load"/>
 

@@ -11,6 +11,9 @@
 #include <march_hardware_interface/PowerNetOnOffCommand.h>
 #include <march_hardware_interface/march_hardware_interface.h>
 
+#include <urdf/model.h>
+
+
 using joint_limits_interface::JointLimits;
 using joint_limits_interface::SoftJointLimits;
 using joint_limits_interface::PositionJointSoftLimitsHandle;
@@ -41,8 +44,22 @@ void MarchHardwareInterface::init()
     exit(0);
   }
 
-  // Get joint names
-  nh_.getParam("/march/hardware_interface/joints", joint_names_);
+  urdf::Model model;
+  if (!model.initParam("/robot_description"))
+  {
+      ROS_ERROR("Failed to read the urdf from the parameter server.");
+      throw std::runtime_error("Failed to read the urdf from the parameter server.");
+  }
+
+  // Get joint names from urdf
+
+  for (auto const& urdfJoint : model.joints_)
+  {
+      if (urdfJoint.second->type != urdf::Joint::FIXED)
+      {
+          joint_names_.push_back(urdfJoint.first);
+      }
+  }
   num_joints_ = joint_names_.size();
 
   // Resize vectors
