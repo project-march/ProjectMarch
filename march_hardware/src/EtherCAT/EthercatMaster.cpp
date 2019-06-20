@@ -34,9 +34,7 @@ void EthercatMaster::start()
   // Initialise SOEM, bind socket to ifname
   if (!ec_init(ifname.c_str()))
   {
-    ROS_ERROR("No socket connection on %s. Confirm that you have selected the "
-              "right ifname",
-              ifname.c_str());
+    ROS_ERROR("No socket connection on %s. Confirm that you have selected the right ifname", ifname.c_str());
     return;
   }
   ROS_INFO("ec_init on %s succeeded", ifname.c_str());
@@ -44,17 +42,15 @@ void EthercatMaster::start()
   // Find and auto-config slaves
   if (ec_config_init(FALSE) <= 0)
   {
-    ROS_ERROR("No slaves found, shutting down. Confirm that you have selected the right ifname."
-              "Check that the first slave is connected properly");
+    ROS_ERROR("No slaves found, shutting down. Confirm that you have selected the right ifname.");
+    ROS_ERROR("Check that the first slave is connected properly");
     return;
   }
   ROS_INFO("%d slave(s) found and initialized.", ec_slavecount);
 
   if (ec_slavecount < this->maxSlaveIndex)
   {
-    ROS_FATAL(
-        "Slave configured with index %d while soem only found %d slave(s)",
-        this->maxSlaveIndex, ec_slavecount);
+    ROS_FATAL("Slave configured with index %d while soem only found %d slave(s)", this->maxSlaveIndex, ec_slavecount);
     return;
   }
   // TODO(Martijn) Check on type of slaves
@@ -67,8 +63,7 @@ void EthercatMaster::start()
     jointListPtr->at(i).initialize(ecatCycleTimems);
   }
 
-  // Configure the EtherCAT message structure depending on the PDO mapping of
-  // all the slaves
+  // Configure the EtherCAT message structure depending on the PDO mapping of all the slaves
   ec_config_map(&IOmap);
 
   ec_configdc();
@@ -113,8 +108,7 @@ void EthercatMaster::start()
     {
       if (ec_slave[i].state != EC_STATE_OPERATIONAL)
       {
-        ROS_INFO("Slave %d State=0x%2.2x StatusCode=0x%4.4x : %s", i,
-                 ec_slave[i].state, ec_slave[i].ALstatuscode,
+          ROS_INFO("Slave %d State=0x%2.2x StatusCode=0x%4.4x : %s\n", i, ec_slave[i].state, ec_slave[i].ALstatuscode,
                  ec_ALstatuscode2string(ec_slave[i].ALstatuscode));
       }
     }
