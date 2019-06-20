@@ -341,7 +341,6 @@ class GaitGeneratorPlugin(Plugin):
                                                    rospkg.RosPack().get_path('march_rqt_gait_generator'),
                                                    "March Subgait (*.subgait)")
 
-
         gait_directory = '/'.join(file_name.split('/')[:-3])
         if gait_directory != "":
             rospy.loginfo("Setting gait directory to %s", str(gait_directory))
