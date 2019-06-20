@@ -15,7 +15,7 @@ class Gait:
         self.name = name
         self.subgait = subgait
         self.version = version
-        self.description = description
+        self.description = str(description)
         self.duration = duration
         self.current_time = 0
 
@@ -91,7 +91,7 @@ class Gait:
         self.name = name
 
     def set_description(self, description):
-        self.description = description
+        self.description = str(description)
 
     def set_version(self, version):
         self.version = version
@@ -172,9 +172,9 @@ class Gait:
         mirrored_joints = []
         for joint in self.joints:
             if key_1 in joint.name:
-                mirrored_name = joint.name.replace(key_1, key_2)
+                mirrored_name = str(joint.name.replace(key_1, key_2))
             elif key_2 in joint.name:
-                mirrored_name = joint.name.replace(key_2, key_1)
+                mirrored_name = str(joint.name.replace(key_2, key_1))
             else:
                 continue
 
