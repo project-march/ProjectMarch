@@ -6,11 +6,19 @@ namespace march_pdb_state_controller
 {
 // TODO(TIM) Remove the callbacks and subscribers when they are not needed anymore
 // These topics make it able to tests write to pdb commands.
-void MarchPdbStateController::allHighVoltageOnOffCallback(const std_msgs::Bool::ConstPtr& msg)
+bool MarchPdbStateController::serviceDisableEnableHighVoltage(std_srvs::SetBool::Request &req,
+                                                              std_srvs::SetBool::Response &res)
 {
-  ROS_INFO("allHighVoltageOnOffCallback %d", msg->data);
-  pdb_state_.allHighVoltageOnOff(msg->data);
+  if (pdb_state_.getHighVoltageEnabled() != req.data)
+  {
+    ROS_WARN("highVoltageDisableEnable is already %d", req.data);
+    return false;
+  }
+  ROS_INFO("trying to set highVoltageNetEnableDisable to %d", req.data);
+  pdb_state_.highVoltageNetEnableDisable(req.data);
+  return true;
 }
+
 void MarchPdbStateController::masterShutdownAllowedCallback(const std_msgs::Bool::ConstPtr& msg)
 {
   ROS_INFO("masterShutdownAllowedCallback %d", msg->data);
@@ -74,8 +82,8 @@ bool MarchPdbStateController::init(march_hardware_interface::MarchPdbStateInterf
     realtime_pubs_ = rt_pub;
   }
 
-  sub_all_high_voltage = controller_nh.subscribe("enable_all_high_voltage", 1000,
-                                                 &MarchPdbStateController::allHighVoltageOnOffCallback, this);
+  enable_disable_high_voltage_service = controller_nh.advertiseService("enable_all_high_voltage",
+                                                                       &MarchPdbStateController::serviceDisableEnableHighVoltage, this);
 
   sub_master_shutdown_allowed =
       controller_nh.subscribe("shutdown_allowed", 1000, &MarchPdbStateController::masterShutdownAllowedCallback, this);
