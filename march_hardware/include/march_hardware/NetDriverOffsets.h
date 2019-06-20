@@ -8,15 +8,15 @@ class NetDriverOffsets
 {
   int lowVoltageNetOnOff;
   int highVoltageNetOnOff;
-  int allHighVoltageOnOff;
+  int highVoltageNetEnableDisable;
 
 public:
-  NetDriverOffsets(int lowVoltageNetOnOff, int highVoltageNetOnOff, int allHighVoltageOnOff)
+  NetDriverOffsets(int lowVoltageNetOnOff, int highVoltageNetOnOff, int highVoltageNetEnableDisable)
     : lowVoltageNetOnOff(lowVoltageNetOnOff)
     , highVoltageNetOnOff(highVoltageNetOnOff)
-    , allHighVoltageOnOff(allHighVoltageOnOff)
+    , highVoltageNetEnableDisable(highVoltageNetEnableDisable)
   {
-    if (lowVoltageNetOnOff < 0 || highVoltageNetOnOff < 0 || allHighVoltageOnOff < 0)
+    if (lowVoltageNetOnOff < 0 || highVoltageNetOnOff < 0 || highVoltageNetEnableDisable < 0)
     {
       ROS_ERROR("Negative byte offset not possible");
       throw std::runtime_error("Negative byte offset not possible");
@@ -27,7 +27,7 @@ public:
   {
     lowVoltageNetOnOff = -1;
     highVoltageNetOnOff = -1;
-    allHighVoltageOnOff = -1;
+    highVoltageNetEnableDisable = -1;
   }
 
   int getLowVoltageNetOnOff() const
@@ -50,21 +50,21 @@ public:
     return highVoltageNetOnOff;
   }
 
-  int getAllHighVoltageOnOff() const
+  int getHighVoltageEnableDisable() const
   {
-    if (allHighVoltageOnOff == -1)
+    if (highVoltageNetEnableDisable == -1)
     {
-      ROS_FATAL("allHighVoltageOnOffOffset is -1");
-      throw std::runtime_error("allHighVoltageOnOffOffset is -1");
+      ROS_FATAL("highVoltageNetEnableDisable is -1");
+      throw std::runtime_error("highVoltageNetEnableDisable is -1");
     }
-    return allHighVoltageOnOff;
+    return highVoltageNetEnableDisable;
   }
 
   /** @brief Override comparison operator */
   friend bool operator==(const NetDriverOffsets& lhs, const NetDriverOffsets& rhs)
   {
     return lhs.lowVoltageNetOnOff == rhs.lowVoltageNetOnOff && lhs.highVoltageNetOnOff == rhs.highVoltageNetOnOff &&
-           lhs.allHighVoltageOnOff == rhs.allHighVoltageOnOff;
+           lhs.highVoltageNetEnableDisable == rhs.highVoltageNetEnableDisable;
   }
 
   /** @brief Override stream operator for clean printing */
@@ -72,7 +72,7 @@ public:
   {
     return os << "NetDriverOffsets(lowVoltageNetOnOff: " << netDriverOffsets.lowVoltageNetOnOff << ", "
               << "highVoltageNetOnOff: " << netDriverOffsets.highVoltageNetOnOff << ", "
-              << "allHighVoltageOnOff: " << netDriverOffsets.allHighVoltageOnOff << ")";
+              << "highVoltageNetEnableDisable: " << netDriverOffsets.highVoltageNetEnableDisable << ")";
   }
 };
 

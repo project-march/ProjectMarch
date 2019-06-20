@@ -19,7 +19,7 @@ march4:
     netDriverByteOffsets:
       lowVoltageNetOnOff: 4
       highVoltageNetOnOff: 3
-      allHighVoltageOnOff: 2
+      highVoltageNetEnableDisable: 2
   joints:
     - right_hip_fe:
         allowActuation: false
