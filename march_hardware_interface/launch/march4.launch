@@ -1,6 +1,5 @@
 <launch>
     <rosparam file="$(find march_hardware_interface)/config/march4/controllers.yaml" command="load"/>
-    <rosparam file="$(find march_hardware_interface)/config/march4/joint_limits.yaml" command="load"/>
 
     <param name="robot_description"
            command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iv.xacro'" />
@@ -13,6 +12,6 @@
                 /march/controller/trajectory
             "/>
 
-    <node name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" args="march4" output="screen"/>
+<!--    <node name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" args="march4" output="screen"/>-->
 
 </launch>

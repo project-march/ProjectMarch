@@ -2,7 +2,6 @@
 
 #include <joint_limits_interface/joint_limits.h>
 #include <joint_limits_interface/joint_limits_interface.h>
-#include <joint_limits_interface/joint_limits_rosparam.h>
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <sstream>
 
@@ -36,13 +35,13 @@ MarchHardwareInterface::~MarchHardwareInterface() = default;
 void MarchHardwareInterface::init()
 {
   // Start ethercat cycle in the hardware
-  this->marchRobot.startEtherCAT();
-
-  if (!this->marchRobot.isEthercatOperational())
-  {
-    ROS_FATAL("EtherCAT is not operational");
-    exit(0);
-  }
+//  this->marchRobot.startEtherCAT();
+//
+//  if (!this->marchRobot.isEthercatOperational())
+//  {
+//    ROS_FATAL("EtherCAT is not operational");
+//    exit(0);
+//  }
 
   urdf::Model model;
   if (!model.initParam("/robot_description"))
@@ -52,7 +51,6 @@ void MarchHardwareInterface::init()
   }
 
   // Get joint names from urdf
-
   for (auto const& urdfJoint : model.joints_)
   {
       if (urdfJoint.second->type != urdf::Joint::FIXED)
@@ -73,11 +71,11 @@ void MarchHardwareInterface::init()
   joint_effort_command_.resize(num_joints_);
 
   // Print all joint positions on startup in case initialization fails.
-  this->read();
-  for (int i = 0; i < num_joints_; ++i)
-  {
-    ROS_INFO("Joint %s: first read position: %f", joint_names_[i].c_str(), joint_position_[i]);
-  }
+//  this->read();
+//  for (int i = 0; i < num_joints_; ++i)
+//  {
+//    ROS_INFO("Joint %s: first read position: %f", joint_names_[i].c_str(), joint_position_[i]);
+//  }
 
   // Create march_pdb_state interface
   MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
@@ -115,11 +113,11 @@ void MarchHardwareInterface::init()
     // Create position joint interface
     JointHandle jointPositionHandle(jointStateHandle, &joint_position_command_[i]);
 
-    // Retrieve joint (soft) limits from the parameter server
+    // Retrieve joint (soft) limits from the urdf
     JointLimits limits;
-    getJointLimits(joint.getName(), nh_, limits);
+    getJointLimits(model.getJoint(joint.getName()), limits);
     SoftJointLimits softLimits;
-    getSoftJointLimits(joint.getName(), nh_, softLimits);
+    getSoftJointLimits(model.getJoint(joint.getName()), softLimits);
 
     // Create joint limit interface
     PositionJointSoftLimitsHandle jointLimitsHandle(jointPositionHandle, limits, softLimits);
@@ -128,21 +126,21 @@ void MarchHardwareInterface::init()
     position_joint_interface_.registerHandle(jointPositionHandle);
 
     // Set the first target as the current position
-    this->read();
-    joint_velocity_[i] = 0;
-    joint_effort_[i] = 0;
-    joint_position_command_[i] = joint_position_[i];
-
-    if (joint_position_[i] < softLimits.min_position || joint_position_[i] > softLimits.max_position)
-    {
-      ROS_FATAL("Joint %s is outside of its softLimits (%f, %f). Actual position: %f", joint_names_[i].c_str(),
-                softLimits.min_position, softLimits.max_position, joint_position_[i]);
-
-      std::ostringstream errorStream;
-      errorStream << "Joint " << joint_names_[i].c_str() << " is out of its softLimits (" << softLimits.min_position
-                  << ", " << softLimits.max_position << "). Actual position: " << joint_position_[i];
-      throw ::std::invalid_argument(errorStream.str());
-    }
+//    this->read();
+//    joint_velocity_[i] = 0;
+//    joint_effort_[i] = 0;
+//    joint_position_command_[i] = joint_position_[i];
+//
+//    if (joint_position_[i] < softLimits.min_position || joint_position_[i] > softLimits.max_position)
+//    {
+//      ROS_FATAL("Joint %s is outside of its softLimits (%f, %f). Actual position: %f", joint_names_[i].c_str(),
+//                softLimits.min_position, softLimits.max_position, joint_position_[i]);
+//
+//      std::ostringstream errorStream;
+//      errorStream << "Joint " << joint_names_[i].c_str() << " is out of its softLimits (" << softLimits.min_position
+//                  << ", " << softLimits.max_position << "). Actual position: " << joint_position_[i];
+//      throw ::std::invalid_argument(errorStream.str());
+//    }
 
     // Create velocity joint interface
     JointHandle jointVelocityHandle(jointStateHandle, &joint_velocity_command_[i]);
