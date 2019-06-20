@@ -143,7 +143,7 @@ void MarchHardwareInterface::init()
     if (power_distribution_board_read_.getSlaveIndex() != -1)
     {
       // Enable high voltage on the IMC
-      if (joint.canActuate() || true)
+      if (joint.canActuate())
       {
         int net_number = joint.getNetNumber();
         if (net_number != -1)
