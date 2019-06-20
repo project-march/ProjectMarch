@@ -130,6 +130,9 @@ class GaitGeneratorPlugin(Plugin):
 
         self.load_gait_into_ui()
 
+    def toggle_velocity_markers(self):
+        self._widget.SettingsFrame.findChild(QCheckBox, "ShowVelocityMarkers").toggle()
+
     def create_rviz_frame(self):
         frame = rviz.VisualizationFrame()
         frame.initialize()
@@ -172,13 +175,25 @@ class GaitGeneratorPlugin(Plugin):
 
         joint_setting = QFrame()
         loadUi(joint_setting_file, joint_setting)
-        joint_setting_plot = JointSettingPlot(joint, self.gait.duration)
+
+        show_velocity_markers = self._widget.SettingsFrame.findChild(QCheckBox, "ShowVelocityMarkers").isChecked()
+        joint_setting_plot = JointSettingPlot(joint, self.gait.duration, show_velocity_markers)
+
+        self._widget.SettingsFrame.findChild(QCheckBox, "ShowVelocityMarkers").stateChanged.connect(
+            lambda: [joint.set_setpoints(UserInterfaceController.plot_to_setpoints(joint_setting_plot)),
+                     UserInterfaceController.update_ui_elements(
+                         joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration,
+                         show_velocity_markers=self.show_velocity_markers_checked()),
+                     self.publish_preview()
+                     ]
+        )
 
         # Connect a function to update the model and to update the table.
         joint_setting_plot.plot_item.sigPlotChanged.connect(
             lambda: [joint.set_setpoints(UserInterfaceController.plot_to_setpoints(joint_setting_plot)),
                      UserInterfaceController.update_ui_elements(
-                         joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration),
+                         joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration,
+                         show_velocity_markers=self.show_velocity_markers_checked()),
                      self.publish_preview()
                      ])
 
@@ -186,7 +201,8 @@ class GaitGeneratorPlugin(Plugin):
             lambda time, position, button: [
                 self.add_setpoint(joint, time, position, button),
                 UserInterfaceController.update_ui_elements(
-                    joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration),
+                    joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration,
+                    show_velocity_markers=self.show_velocity_markers_checked()),
                 self.publish_preview()
             ])
 
@@ -194,7 +210,8 @@ class GaitGeneratorPlugin(Plugin):
             lambda index: [
                 joint.remove_setpoint(index),
                 UserInterfaceController.update_ui_elements(
-                    joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration),
+                    joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration,
+                    show_velocity_markers=self.show_velocity_markers_checked()),
                 self.publish_preview()
             ])
 
@@ -207,7 +224,8 @@ class GaitGeneratorPlugin(Plugin):
             lambda: [rospy.logwarn("item changed"),
                      joint.set_setpoints(UserInterfaceController.table_to_setpoints(joint_setting.Table)),
                      UserInterfaceController.update_ui_elements(
-                         joint, plot=joint_setting_plot, duration=self.gait.duration),
+                         joint, plot=joint_setting_plot, duration=self.gait.duration,
+                         show_velocity_markers=self.show_velocity_markers_checked()),
                      self.publish_preview()
                      ])
 
@@ -216,6 +234,9 @@ class GaitGeneratorPlugin(Plugin):
         joint_setting.Table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         return joint_setting
+
+    def show_velocity_markers_checked(self):
+        return self._widget.SettingsFrame.findChild(QCheckBox, "ShowVelocityMarkers").isChecked()
 
     def add_setpoint(self, joint, time, position, button):
         if button == QtCore.Qt.ControlModifier:
@@ -333,6 +354,12 @@ class GaitGeneratorPlugin(Plugin):
 
         export_to_file(self.gait, self.get_gait_directory()),
         self.set_gait_directory_button(self.gait_directory)
+
+    def toggle_time_slider_thread(self):
+        if self.thread is None:
+            self.start_time_slider_thread()
+        else:
+            self.stop_time_slider_thread()
 
     def load_gait(self):
 
