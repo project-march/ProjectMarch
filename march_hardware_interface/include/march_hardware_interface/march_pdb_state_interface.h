@@ -39,10 +39,10 @@ public:
     *master_shutdown_allowed_command_ = is_allowed;
   }
 
-  void allHighVoltageOnOff(bool on) {
+  void highVoltageNetEnableDisable(bool enable_disable) {
     assert(all_high_voltage_on_off_command_);
-    ROS_INFO("allHighVoltageOnOff %d", on);
-    *all_high_voltage_on_off_command_ = on;
+    ROS_INFO("highVoltageNetEnableDisable %d", enable_disable);
+    *all_high_voltage_on_off_command_ = enable_disable;
   }
 
   void turnNetOnOrOff(PowerNetType type, bool on_or_off, int net_number){
@@ -52,12 +52,16 @@ public:
     *power_net_on_off_command_ = power_net_on_off_command;
   }
 
+  bool getHighVoltageEnabled() {
+    return powerDistributionBoard_->getHighVoltage().getHighVoltageEnabled();
+  }
+
 private:
   std::string name_;
   bool *master_shutdown_allowed_command_;
   bool *all_high_voltage_on_off_command_;
   PowerNetOnOffCommand *power_net_on_off_command_;
-  const march4cpp::PowerDistributionBoard *powerDistributionBoard_;
+  march4cpp::PowerDistributionBoard *powerDistributionBoard_;
 };
 
 class MarchPdbStateInterface
