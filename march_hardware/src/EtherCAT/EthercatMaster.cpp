@@ -108,7 +108,7 @@ void EthercatMaster::start()
     {
       if (ec_slave[i].state != EC_STATE_OPERATIONAL)
       {
-          ROS_INFO("Slave %d State=0x%2.2x StatusCode=0x%4.4x : %s\n", i, ec_slave[i].state, ec_slave[i].ALstatuscode,
+        ROS_INFO("Slave %d State=0x%2.2x StatusCode=0x%4.4x : %s\n", i, ec_slave[i].state, ec_slave[i].ALstatuscode,
                  ec_ALstatuscode2string(ec_slave[i].ALstatuscode));
       }
     }
