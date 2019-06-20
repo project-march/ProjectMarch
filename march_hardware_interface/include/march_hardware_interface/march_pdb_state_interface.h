@@ -15,7 +15,7 @@ public:
   MarchPdbStateHandle(
       /// Pointers to the storage location
       const std::string &name,
-      const march4cpp::PowerDistributionBoard *powerDistributionBoard,
+      march4cpp::PowerDistributionBoard *powerDistributionBoard,
       bool *master_shutdown_allowed_command,
       bool *all_high_voltage_on_off_command,
       PowerNetOnOffCommand *power_net_on_off_command)
