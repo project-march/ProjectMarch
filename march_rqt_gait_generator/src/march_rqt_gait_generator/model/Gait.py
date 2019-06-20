@@ -9,7 +9,6 @@ from march_rqt_gait_generator.UserInterfaceController import notify
 
 
 class Gait:
-
     def __init__(self, joints, duration,
                  name="Walk", subgait="right_open", version="First try", description="Just a simple gait"):
         self.joints = joints
@@ -105,7 +104,7 @@ class Gait:
             # Loop in reverse to avoid out of bounds errors while deleting.
             for setpoint in reversed(joint.setpoints):
                 if rescale:
-                    setpoint.time = duration * setpoint.time / self.duration
+                    setpoint.set_time(duration * setpoint.time / self.duration)
                 else:
                     if setpoint.time > duration:
                         joint.setpoints.remove(setpoint)
