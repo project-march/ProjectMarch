@@ -121,7 +121,8 @@ void MarchHardwareInterface::init()
       ROS_FATAL("Joint %s is outside of its softLimits (%f, %f). Actual position: %f", joint_names_[i].c_str(),
                 softLimits.min_position, softLimits.max_position, joint_position_[i]);
 
-      if(joint.canActuate()){
+      if (joint.canActuate())
+      {
         std::ostringstream errorStream;
         errorStream << "Joint " << joint_names_[i].c_str() << " is out of its softLimits (" << softLimits.min_position
                     << ", " << softLimits.max_position << "). Actual position: " << joint_position_[i];
