@@ -393,10 +393,11 @@ class GaitGeneratorPlugin(Plugin):
             self.gait_directory = gait_directory
             self.set_gait_directory_button(gait_directory)
 
-        self.gait = import_from_file_name(self.robot, file_name)
-        if self.gait is None:
+        gait = import_from_file_name(self.robot, file_name)
+        if gait is None:
             rospy.logwarn("Could not load gait %s", file_name)
         else:
+            self.gait = gait
             self.load_gait_into_ui()
 
     def load_gait_into_ui(self):
