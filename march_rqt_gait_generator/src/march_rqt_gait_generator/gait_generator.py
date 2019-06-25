@@ -72,6 +72,7 @@ class GaitGeneratorPlugin(Plugin):
         self.subgait_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait")
         self.description_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description")
         self.duration_spin_box = self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration")
+        self.mirror_check_box = self._widget.SettingsFrame.findChild(QCheckBox, "Mirror")
 
         # Connect Gait settings buttons
         self.set_gait_directory_button(self.gait_directory)
@@ -133,7 +134,7 @@ class GaitGeneratorPlugin(Plugin):
         )
 
         # Disable key inputs when mirroring is off.
-        self._widget.SettingsFrame.findChild(QCheckBox, "Mirror").stateChanged.connect(
+        self.mirror_check_box.stateChanged.connect(
             lambda state: [
                 self._widget.SettingsFrame.findChild(QLineEdit, "Key1").setEnabled(state),
                 self._widget.SettingsFrame.findChild(QLineEdit, "Key2").setEnabled(state)
@@ -354,7 +355,7 @@ class GaitGeneratorPlugin(Plugin):
             self.time_slider_thread = None
 
     def export(self):
-        should_mirror = self._widget.SettingsFrame.findChild(QCheckBox, "Mirror").isChecked()
+        should_mirror = self.mirror_check_box.isChecked()
 
         key_1 = self._widget.SettingsFrame.findChild(QLineEdit, "Key1").text()
         key_2 = self._widget.SettingsFrame.findChild(QLineEdit, "Key2").text()
