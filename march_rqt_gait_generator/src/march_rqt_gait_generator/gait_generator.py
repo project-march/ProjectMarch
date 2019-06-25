@@ -58,9 +58,13 @@ class GaitGeneratorPlugin(Plugin):
         self.rviz_frame = self.create_rviz_frame()
         self._widget.RvizFrame.layout().addWidget(self.rviz_frame, 1, 0, 1, 3)
 
+        # Store ui elements.
+        self.change_gait_directory_button = self._widget.SettingsFrame.findChild(QPushButton, "ChangeGaitDirectory")
+
+
         # Connect Gait settings buttons
         self.set_gait_directory_button(self.gait_directory)
-        self._widget.SettingsFrame.findChild(QPushButton, "ChangeGaitDirectory").clicked.connect(
+        self.change_gait_directory_button.clicked.connect(
             lambda: [
                 self.set_gait_directory_button(self.get_gait_directory(True))
             ]
@@ -255,7 +259,7 @@ class GaitGeneratorPlugin(Plugin):
     def set_gait_directory_button(self, gait_directory):
         if gait_directory is None:
             gait_directory = "Select a gait directory..."
-        self._widget.SettingsFrame.findChild(QPushButton, "ChangeGaitDirectory").setText(gait_directory)
+        self.change_gait_directory_button.setText(gait_directory)
 
     def publish_preview(self):
         joint_state = JointState()
