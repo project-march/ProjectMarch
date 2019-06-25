@@ -67,6 +67,10 @@ class GaitGeneratorPlugin(Plugin):
         self.stop_button = self._widget.RvizFrame.findChild(QPushButton, "Stop")
         self.playback_speed_line_edit = self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed")
         self.topic_name_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "TopicName")
+        self.gait_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Gait")
+        self.version_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version")
+        self.subgait_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait")
+        self.description_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description")
 
         # Connect Gait settings buttons
         self.set_gait_directory_button(self.gait_directory)
@@ -104,21 +108,21 @@ class GaitGeneratorPlugin(Plugin):
             lambda: self.set_topic_name(self.topic_name_line_edit.text())
         )
 
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Gait").editingFinished.connect(
-            lambda: self.gait.set_name(self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Gait").text())
+        self.gait_name_line_edit.editingFinished.connect(
+            lambda: self.gait.set_name(self.gait_name_line_edit.text())
         )
 
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").editingFinished.connect(
-            lambda: self.gait.set_version(self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").text())
+        self.version_name_line_edit.editingFinished.connect(
+            lambda: self.gait.set_version(self.version_name_line_edit.text())
         )
 
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait").editingFinished.connect(
-            lambda: self.gait.set_subgait(self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait").text())
+        self.subgait_name_line_edit.editingFinished.connect(
+            lambda: self.gait.set_subgait(self.subgait_name_line_edit.text())
         )
 
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").editingFinished.connect(
+        self.description_line_edit.editingFinished.connect(
             lambda: self.gait.set_description(
-                self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").text())
+                self.description_line_edit.text())
         )
 
         self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").setKeyboardTracking(False)
@@ -401,10 +405,10 @@ class GaitGeneratorPlugin(Plugin):
             self.update_time_sliders(),
         ])
 
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Gait").setText(self.gait.name)
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait").setText(self.gait.subgait)
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").setText(self.gait.version)
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").setText(self.gait.description)
+        self.gait_name_line_edit.setText(self.gait.name)
+        self.subgait_name_line_edit.setText(self.gait.subgait)
+        self.version_name_line_edit.setText(self.gait.version)
+        self.description_line_edit.setText(self.gait.description)
 
         # Block signals on the duration edit to prevent a reload of the joint settings
         self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").blockSignals(True)
