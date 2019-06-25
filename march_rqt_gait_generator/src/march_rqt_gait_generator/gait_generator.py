@@ -77,6 +77,7 @@ class GaitGeneratorPlugin(Plugin):
         self.mirror_key2_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "Key2")
         self.velocity_markers_check_box = self._widget.SettingsFrame.findChild(QCheckBox, "ShowVelocityMarkers")
         self.time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
+        self.scale_setpoints_check_box = self._widget.GaitPropertiesFrame.findChild(QCheckBox, "ScaleSetpoints")
 
         # Connect Gait settings buttons
         self.set_gait_directory_button(self.gait_directory)
@@ -325,7 +326,7 @@ class GaitGeneratorPlugin(Plugin):
         self.time_slider_thread.start()
 
     def update_gait_duration(self, duration):
-        rescale_setpoints = self._widget.GaitPropertiesFrame.findChild(QCheckBox, "ScaleSetpoints").isChecked()
+        rescale_setpoints = self.scale_setpoints_check_box.isChecked()
 
         if self.gait.has_setpoints_after_duration(duration) and not rescale_setpoints:
             if not self.gait.has_multiple_setpoints_before_duration(duration):
