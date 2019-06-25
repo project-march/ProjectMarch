@@ -75,6 +75,7 @@ class GaitGeneratorPlugin(Plugin):
         self.mirror_check_box = self._widget.SettingsFrame.findChild(QCheckBox, "Mirror")
         self.mirror_key1_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "Key1")
         self.mirror_key2_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "Key2")
+        self.velocity_markers_check_box = self.velocity_markers_check_box
 
         # Connect Gait settings buttons
         self.set_gait_directory_button(self.gait_directory)
@@ -149,7 +150,7 @@ class GaitGeneratorPlugin(Plugin):
         self.load_gait_into_ui()
 
     def toggle_velocity_markers(self):
-        self._widget.SettingsFrame.findChild(QCheckBox, "ShowVelocityMarkers").toggle()
+        self.velocity_markers_check_box.toggle()
 
     def create_rviz_frame(self):
         frame = rviz.VisualizationFrame()
@@ -194,10 +195,10 @@ class GaitGeneratorPlugin(Plugin):
         joint_setting = QFrame()
         loadUi(joint_setting_file, joint_setting)
 
-        show_velocity_markers = self._widget.SettingsFrame.findChild(QCheckBox, "ShowVelocityMarkers").isChecked()
+        show_velocity_markers = self.velocity_markers_check_box.isChecked()
         joint_setting_plot = JointSettingPlot(joint, self.gait.duration, show_velocity_markers)
 
-        self._widget.SettingsFrame.findChild(QCheckBox, "ShowVelocityMarkers").stateChanged.connect(
+        self.velocity_markers_check_box.stateChanged.connect(
             lambda: [joint.set_setpoints(UserInterfaceController.plot_to_setpoints(joint_setting_plot)),
                      UserInterfaceController.update_ui_elements(
                          joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration,
@@ -254,7 +255,7 @@ class GaitGeneratorPlugin(Plugin):
         return joint_setting
 
     def show_velocity_markers_checked(self):
-        return self._widget.SettingsFrame.findChild(QCheckBox, "ShowVelocityMarkers").isChecked()
+        return self.velocity_markers_check_box.isChecked()
 
     def add_setpoint(self, joint, time, position, button):
         if button == QtCore.Qt.ControlModifier:
