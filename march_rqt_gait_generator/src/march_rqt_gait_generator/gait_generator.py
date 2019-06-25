@@ -71,6 +71,7 @@ class GaitGeneratorPlugin(Plugin):
         self.version_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version")
         self.subgait_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait")
         self.description_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description")
+        self.duration_spin_box = self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration")
 
         # Connect Gait settings buttons
         self.set_gait_directory_button(self.gait_directory)
@@ -125,10 +126,10 @@ class GaitGeneratorPlugin(Plugin):
                 self.description_line_edit.text())
         )
 
-        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").setKeyboardTracking(False)
-        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").valueChanged.connect(
+        self.duration_spin_box.setKeyboardTracking(False)
+        self.duration_spin_box.valueChanged.connect(
             lambda: self.update_gait_duration(
-                self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").value())
+                self.duration_spin_box.value())
         )
 
         # Disable key inputs when mirroring is off.
@@ -334,7 +335,7 @@ class GaitGeneratorPlugin(Plugin):
                                                      "duration?",
                                                      QMessageBox.Yes | QMessageBox.No)
             if discard_setpoints == QMessageBox.No:
-                self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").setValue(self.gait.duration)
+                self.duration_spin_box.setValue(self.gait.duration)
                 return
         self.gait.set_duration(duration, rescale_setpoints)
         self._widget.RvizFrame.findChild(QSlider, "TimeSlider").setRange(0, 100 * self.gait.duration)
@@ -411,9 +412,9 @@ class GaitGeneratorPlugin(Plugin):
         self.description_line_edit.setText(self.gait.description)
 
         # Block signals on the duration edit to prevent a reload of the joint settings
-        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").blockSignals(True)
-        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").setValue(self.gait.duration)
-        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").blockSignals(False)
+        self.duration_spin_box.blockSignals(True)
+        self.duration_spin_box.setValue(self.gait.duration)
+        self.duration_spin_box.blockSignals(False)
 
         print ('load gait into ui')
         self.create_joint_settings()
