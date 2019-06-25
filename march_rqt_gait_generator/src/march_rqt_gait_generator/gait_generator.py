@@ -65,6 +65,7 @@ class GaitGeneratorPlugin(Plugin):
         self.publish_gait_button = self._widget.SettingsFrame.findChild(QPushButton, "Publish")
         self.start_button = self._widget.RvizFrame.findChild(QPushButton, "Start")
         self.stop_button = self._widget.RvizFrame.findChild(QPushButton, "Stop")
+        self.playback_speed_line_edit = self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed")
 
         # Connect Gait settings buttons
         self.set_gait_directory_button(self.gait_directory)
@@ -90,10 +91,10 @@ class GaitGeneratorPlugin(Plugin):
 
         self.stop_button.clicked.connect(self.stop_time_slider_thread)
 
-        self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed").setValidator(QtGui.QIntValidator(0, 500, self))
-        self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed").editingFinished.connect(
+        self.playback_speed_line_edit.setValidator(QtGui.QIntValidator(0, 500, self))
+        self.playback_speed_line_edit.editingFinished.connect(
             lambda: [
-                self.set_playback_speed(float(self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed").text())),
+                self.set_playback_speed(float(self.playback_speed_line_edit.text())),
                 rospy.loginfo("Changing playbackspeed to " + str(self.playback_speed)),
             ]
         )
