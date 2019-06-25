@@ -76,6 +76,7 @@ class GaitGeneratorPlugin(Plugin):
         self.mirror_key1_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "Key1")
         self.mirror_key2_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "Key2")
         self.velocity_markers_check_box = self._widget.SettingsFrame.findChild(QCheckBox, "ShowVelocityMarkers")
+        self.time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
 
         # Connect Gait settings buttons
         self.set_gait_directory_button(self.gait_directory)
@@ -316,11 +317,9 @@ class GaitGeneratorPlugin(Plugin):
             rospy.logdebug("Cannot start another time slider thread as one is already active")
             return
 
-        time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
-
-        current = time_slider.value()
+        current = self.time_slider.value()
         playback_speed = self.playback_speed
-        max = time_slider.maximum()
+        max = self.time_slider.maximum()
         self.time_slider_thread = TimeSliderThread(current, playback_speed, max)
         self.time_slider_thread.update_signal.connect(self.update_main_time_slider)
         self.time_slider_thread.start()
@@ -342,7 +341,7 @@ class GaitGeneratorPlugin(Plugin):
                 self.duration_spin_box.setValue(self.gait.duration)
                 return
         self.gait.set_duration(duration, rescale_setpoints)
-        self._widget.RvizFrame.findChild(QSlider, "TimeSlider").setRange(0, 100 * self.gait.duration)
+        self.time_slider.setRange(0, 100 * self.gait.duration)
 
         was_playing = self.time_slider_thread is not None
         self.stop_time_slider_thread()
@@ -400,12 +399,11 @@ class GaitGeneratorPlugin(Plugin):
             self.load_gait_into_ui()
 
     def load_gait_into_ui(self):
-        time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
-        time_slider.setRange(0, 100 * self.gait.duration)
+        self.time_slider.setRange(0, 100 * self.gait.duration)
 
         # Connect TimeSlider to the preview
-        time_slider.valueChanged.connect(lambda: [
-            self.gait.set_current_time(float(time_slider.value()) / 100),
+        self.time_slider.valueChanged.connect(lambda: [
+            self.gait.set_current_time(float(self.time_slider.value()) / 100),
             self.publish_preview(),
             self.update_time_sliders(),
         ])
@@ -427,7 +425,7 @@ class GaitGeneratorPlugin(Plugin):
 
     @QtCore.pyqtSlot(int)
     def update_main_time_slider(self, time):
-        self._widget.RvizFrame.findChild(QSlider, "TimeSlider").setValue(time)
+        self.time_slider.setValue(time)
 
     def shutdown_plugin(self):
         self.stop_time_slider_thread()
