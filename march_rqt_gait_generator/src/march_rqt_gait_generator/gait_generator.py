@@ -73,6 +73,8 @@ class GaitGeneratorPlugin(Plugin):
         self.description_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description")
         self.duration_spin_box = self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration")
         self.mirror_check_box = self._widget.SettingsFrame.findChild(QCheckBox, "Mirror")
+        self.mirror_key1_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "Key1")
+        self.mirror_key2_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "Key2")
 
         # Connect Gait settings buttons
         self.set_gait_directory_button(self.gait_directory)
@@ -136,8 +138,8 @@ class GaitGeneratorPlugin(Plugin):
         # Disable key inputs when mirroring is off.
         self.mirror_check_box.stateChanged.connect(
             lambda state: [
-                self._widget.SettingsFrame.findChild(QLineEdit, "Key1").setEnabled(state),
-                self._widget.SettingsFrame.findChild(QLineEdit, "Key2").setEnabled(state)
+                self.mirror_key1_line_edit.setEnabled(state),
+                self.mirror_key2_line_edit.setEnabled(state)
             ]
         )
 
@@ -357,8 +359,8 @@ class GaitGeneratorPlugin(Plugin):
     def export(self):
         should_mirror = self.mirror_check_box.isChecked()
 
-        key_1 = self._widget.SettingsFrame.findChild(QLineEdit, "Key1").text()
-        key_2 = self._widget.SettingsFrame.findChild(QLineEdit, "Key2").text()
+        key_1 = self.mirror_key1_line_edit.text()
+        key_2 = self.mirror_key2_line_edit.text()
 
         if should_mirror:
             mirror = self.gait.get_mirror(key_1, key_2)
