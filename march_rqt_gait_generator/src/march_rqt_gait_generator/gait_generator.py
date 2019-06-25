@@ -75,7 +75,7 @@ class GaitGeneratorPlugin(Plugin):
         self.mirror_check_box = self._widget.SettingsFrame.findChild(QCheckBox, "Mirror")
         self.mirror_key1_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "Key1")
         self.mirror_key2_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "Key2")
-        self.velocity_markers_check_box = self.velocity_markers_check_box
+        self.velocity_markers_check_box = self._widget.SettingsFrame.findChild(QCheckBox, "ShowVelocityMarkers")
 
         # Connect Gait settings buttons
         self.set_gait_directory_button(self.gait_directory)
