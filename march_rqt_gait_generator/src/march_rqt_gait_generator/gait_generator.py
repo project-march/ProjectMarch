@@ -61,6 +61,7 @@ class GaitGeneratorPlugin(Plugin):
         # Store ui elements.
         self.change_gait_directory_button = self._widget.SettingsFrame.findChild(QPushButton, "ChangeGaitDirectory")
         self.import_gait_button = self._widget.SettingsFrame.findChild(QPushButton, "Import")
+        self.export_gait_button = self._widget.SettingsFrame.findChild(QPushButton, "Export")
 
         # Connect Gait settings buttons
         self.set_gait_directory_button(self.gait_directory)
@@ -76,7 +77,7 @@ class GaitGeneratorPlugin(Plugin):
             ]
         )
 
-        self._widget.SettingsFrame.findChild(QPushButton, "Export").clicked.connect(self.export)
+        self.export_gait_button.clicked.connect(self.export)
 
         self._widget.SettingsFrame.findChild(QPushButton, "Publish").clicked.connect(
             lambda: self.publish_gait()
