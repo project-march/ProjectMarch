@@ -1,0 +1,541 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true" buildAllGenerated="false">
+    <generated />
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="0bbea44c-6aff-4b8e-9a9c-c8c120488627" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/bente/Sit/Sit_down/MIII.subgait" beforeDir="false" afterPath="$PROJECT_DIR$/bente/Sit/Sit_down/MIII.subgait" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bente/Sit/Sit_down/With_ankle_joint_movements.subgait" beforeDir="false" afterPath="$PROJECT_DIR$/bente/Sit/Sit_down/With_ankle_joint_movements.subgait" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bente/Sit/Sit_home/MIII.subgait" beforeDir="false" afterPath="$PROJECT_DIR$/bente/Sit/Sit_home/MIII.subgait" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bente/Stand/Prepare_Stand_Up/MIII.subgait" beforeDir="false" afterPath="$PROJECT_DIR$/bente/Stand/Prepare_Stand_Up/MIII.subgait" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bente/Stand/Stand_Up/MIII.subgait" beforeDir="false" afterPath="$PROJECT_DIR$/bente/Stand/Stand_Up/MIII.subgait" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bente/Stand/Stand_Up/With_ankle_movement.subgait" beforeDir="false" afterPath="$PROJECT_DIR$/bente/Stand/Stand_Up/With_ankle_movement.subgait" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bente/Walk/Walk.gait" beforeDir="false" afterPath="$PROJECT_DIR$/bente/Walk/Walk.gait" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bente/Walk/Walk.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bente/Walk/left_swing/Literature_based.subgait" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bente/Walk/left_swing/MIII.subgait" beforeDir="false" afterPath="$PROJECT_DIR$/bente/Walk/left_swing/MIII.subgait" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bente/Walk/left_swing/MIII_old.subgait" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bente/Walk/left_swing/MIII_tweaked.subgait" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bente/Walk/left_swing/MIII_tweaked_longer_hip_flexion.subgait" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bente/Walk/right_swing/Literature_based.subgait" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bente/Walk/right_swing/MIII.subgait" beforeDir="false" afterPath="$PROJECT_DIR$/bente/Walk/right_swing/MIII.subgait" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bente/Walk/right_swing/MIII_old.subgait" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bente/Walk/right_swing/MIII_tweaked.subgait" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bente/Walk/right_swing/MIII_tweaked_longer_hip_flexion.subgait" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bente/default.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/bente/default.yaml" afterDir="false" />
+    </list>
+    <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
+    <ignored path=".idea/codeStyles/Project.xml" />
+    <ignored path=".idea/march_gait_files.iml" />
+    <ignored path=".idea/misc.xml" />
+    <ignored path=".idea/modules.xml" />
+    <ignored path=".idea/vcs.xml" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FUSProjectUsageTrigger">
+    <session id="1876576395">
+      <usages-collector id="statistics.lifecycle.project">
+        <counts>
+          <entry key="project.closed" value="11" />
+          <entry key="project.open.time.115" value="1" />
+          <entry key="project.open.time.3" value="1" />
+          <entry key="project.open.time.34" value="1" />
+          <entry key="project.open.time.35" value="1" />
+          <entry key="project.open.time.40" value="4" />
+          <entry key="project.open.time.44" value="1" />
+          <entry key="project.open.time.48" value="1" />
+          <entry key="project.open.time.53" value="1" />
+          <entry key="project.opened" value="11" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.open">
+        <counts>
+          <entry key="gait" value="38" />
+          <entry key="png" value="1" />
+          <entry key="subgait" value="32" />
+          <entry key="yaml" value="10" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="Image" value="1" />
+          <entry key="PLAIN_TEXT" value="70" />
+          <entry key="YAML" value="10" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.edit">
+        <counts>
+          <entry key="gait" value="258" />
+          <entry key="subgait" value="32" />
+          <entry key="txt" value="382" />
+          <entry key="yaml" value="102" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.edit">
+        <counts>
+          <entry key="PLAIN_TEXT" value="672" />
+          <entry key="YAML" value="102" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.vcs.git.usages">
+        <counts>
+          <entry key="git.branch.create.new" value="1" />
+        </counts>
+      </usages-collector>
+    </session>
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="225">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/gait/default.yaml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="12">
+              <caret line="1" selection-start-line="1" selection-end-line="2" selection-end-column="38" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/bente/default.yaml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="72">
+              <caret line="6" lean-forward="true" selection-start-line="6" selection-end-line="6" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/.." value="develop" />
+      </map>
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/bente/Walk/walk.gait" />
+        <option value="$PROJECT_DIR$/bente/Sit/Sit.gait" />
+        <option value="$PROJECT_DIR$/bente/Stand_Up/Stand_Up.gait" />
+        <option value="$PROJECT_DIR$/bente/Stand/Stand.gait" />
+        <option value="$PROJECT_DIR$/bente/Stand/Stand_Up/With_ankle_movement.subgait" />
+        <option value="$PROJECT_DIR$/bente/Stand/Prepare_Stand_Up/MIII.subgait" />
+        <option value="$PROJECT_DIR$/bente/Sit/Sit_down/MIII.subgait" />
+        <option value="$PROJECT_DIR$/bente/Sit/Sit_down/With_ankle_joint_movements.subgait" />
+        <option value="$PROJECT_DIR$/bente/Sit/Sit_home/MIII.subgait" />
+        <option value="$PROJECT_DIR$/bente/Walk/left_swing/MIII.subgait" />
+        <option value="$PROJECT_DIR$/bente/Walk/left_swing/MIII_old.subgait" />
+        <option value="$PROJECT_DIR$/bente/Walk/right_swing/MIII_old.subgait" />
+        <option value="$PROJECT_DIR$/bente/Walk/left_swing/MIII_old (test).subgait" />
+        <option value="$PROJECT_DIR$/bente/Walk/right_swing/MIII_tweaked_longer_hip_flexion.subgait" />
+        <option value="$PROJECT_DIR$/bente/Walk/left_swing/MIII_tweaked_longer_hip_flexion (copy).subgait" />
+        <option value="$PROJECT_DIR$/bente/Walk/left_swing/MIII_total.subgait" />
+        <option value="$PROJECT_DIR$/bente/Walk/left_swing/test_MIII_tweaked_more_hip_extension_total.subgait" />
+        <option value="$PROJECT_DIR$/bente/Walk/Walk.gait" />
+        <option value="$PROJECT_DIR$/bente/Home_Sit/Home_Sit.gait" />
+        <option value="$PROJECT_DIR$/bente/default.yaml" />
+        <option value="$PROJECT_DIR$/bente/Home_Stand/Home_Stand.gait" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="48" />
+    <option name="y" value="-17" />
+    <option name="width" value="1873" />
+    <option name="height" value="1098" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="march_gait_files" type="b2602c69:ProjectViewProjectNode" />
+              <item name="march_gait_files" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="march_gait_files" type="b2602c69:ProjectViewProjectNode" />
+              <item name="march_gait_files" type="462c0819:PsiDirectoryNode" />
+              <item name="bente" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="march_gait_files" type="b2602c69:ProjectViewProjectNode" />
+              <item name="march_gait_files" type="462c0819:PsiDirectoryNode" />
+              <item name="bente" type="462c0819:PsiDirectoryNode" />
+              <item name="Home_Sit" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="march_gait_files" type="b2602c69:ProjectViewProjectNode" />
+              <item name="march_gait_files" type="462c0819:PsiDirectoryNode" />
+              <item name="bente" type="462c0819:PsiDirectoryNode" />
+              <item name="Home_Stand" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="march_gait_files" type="b2602c69:ProjectViewProjectNode" />
+              <item name="march_gait_files" type="462c0819:PsiDirectoryNode" />
+              <item name="bente" type="462c0819:PsiDirectoryNode" />
+              <item name="Stand" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="march_gait_files" type="b2602c69:ProjectViewProjectNode" />
+              <item name="march_gait_files" type="462c0819:PsiDirectoryNode" />
+              <item name="bente" type="462c0819:PsiDirectoryNode" />
+              <item name="Stand" type="462c0819:PsiDirectoryNode" />
+              <item name="Prepare_Stand_Up" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="march_gait_files" type="b2602c69:ProjectViewProjectNode" />
+              <item name="march_gait_files" type="462c0819:PsiDirectoryNode" />
+              <item name="bente" type="462c0819:PsiDirectoryNode" />
+              <item name="Stand" type="462c0819:PsiDirectoryNode" />
+              <item name="Stand_Up" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="march_gait_files" type="b2602c69:ProjectViewProjectNode" />
+              <item name="march_gait_files" type="462c0819:PsiDirectoryNode" />
+              <item name="bente" type="462c0819:PsiDirectoryNode" />
+              <item name="Walk" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="march_gait_files" type="b2602c69:ProjectViewProjectNode" />
+              <item name="march_gait_files" type="462c0819:PsiDirectoryNode" />
+              <item name="gait" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="march_gait_files" type="b2602c69:ProjectViewProjectNode" />
+              <item name="march_gait_files" type="462c0819:PsiDirectoryNode" />
+              <item name="gait" type="462c0819:PsiDirectoryNode" />
+              <item name="home_sit" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="march_gait_files" type="b2602c69:ProjectViewProjectNode" />
+              <item name="march_gait_files" type="462c0819:PsiDirectoryNode" />
+              <item name="gait" type="462c0819:PsiDirectoryNode" />
+              <item name="home_stand" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../march-iv" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/bente/Home_Stand" />
+      <recent name="$PROJECT_DIR$/bente/Home_Sit" />
+      <recent name="$PROJECT_DIR$/bente/Walk" />
+      <recent name="$PROJECT_DIR$/bente/Sit" />
+      <recent name="$PROJECT_DIR$/bente/Stand_Up" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0bbea44c-6aff-4b8e-9a9c-c8c120488627" name="Default Changelist" comment="" />
+      <created>1560498835656</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1560498835656</updated>
+      <workItem from="1560498838151" duration="5025000" />
+      <workItem from="1560517620303" duration="293000" />
+      <workItem from="1560782653766" duration="1843000" />
+      <workItem from="1560844401877" duration="717000" />
+      <workItem from="1560931417736" duration="1244000" />
+      <workItem from="1560937164397" duration="1719000" />
+      <workItem from="1560939418978" duration="654000" />
+      <workItem from="1560947034317" duration="880000" />
+      <workItem from="1561389107307" duration="842000" />
+      <workItem from="1561457625072" duration="963000" />
+      <workItem from="1561463286848" duration="746000" />
+    </task>
+    <task id="LOCAL-00001" summary="Add walking gait + sit and stand gait">
+      <created>1560500260127</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1560500260127</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Add gait files for walking, sit and stand">
+      <created>1560502360646</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1560502360646</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Add gait files for walking, sit and stand">
+      <created>1560784311600</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1560784311600</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Added new walking files: MIII_tweaked and Literature_based">
+      <created>1560784367431</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1560784367431</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Added gait file for left swing with corrected decimals.">
+      <created>1560844513067</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1560844513067</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Corrected the decimals so that left swing and right swing are matching.">
+      <created>1560939518429</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1560939518430</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Added new version of the tweaked MIII gait: with longer hip flexion, so that the steps are bigger.">
+      <created>1560939690426</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1560939690426</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="14926000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="49" y="-3" width="1871" height="1083" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.27332243" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.3295099" />
+      <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.3295099" />
+      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
+      <window_info anchor="bottom" id="Version Control" order="10" show_stripe_button="false" />
+      <window_info anchor="bottom" id="CMake" order="11" visible="true" weight="0.3295099" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Database" order="3" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Add walking gait + sit and stand gait" />
+    <MESSAGE value="Add gait files for walking, sit and stand" />
+    <MESSAGE value="Added new walking files: MIII_tweaked and Literature_based" />
+    <MESSAGE value="Added gait file for left swing with corrected decimals." />
+    <MESSAGE value="Corrected the decimals so that left swing and right swing are matching." />
+    <MESSAGE value="Added new version of the tweaked MIII gait: with longer hip flexion, so that the steps are bigger." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added new version of the tweaked MIII gait: with longer hip flexion, so that the steps are bigger." />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/gait/walk/walk.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bente/Stand_Up/Stand_Up/With_ankle_movement.subgait" />
+    <entry file="file://$PROJECT_DIR$/bente/Stand_Up/Prepare_Stand_Up/MIII.subgait" />
+    <entry file="file://$PROJECT_DIR$/gait/walk/left_swing/test.subgait">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="168">
+          <caret line="14" column="22" lean-forward="true" selection-start-line="14" selection-start-column="22" selection-end-line="14" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bente/Stand_Up/Stand_Up.gait" />
+    <entry file="file://$PROJECT_DIR$/gait/sit/sit.gait">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gait/stand/stand.gait">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bente/Stand/Stand_Up/MIII.subgait">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bente/Sit/Sit_down/With_ankle_joint_movements.subgait">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="24">
+          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bente/Walk/left_swing/MIII.subgait">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="24">
+          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bente/Walk/left_swing/MIII_old.subgait" />
+    <entry file="file://$PROJECT_DIR$/bente/Walk/right_swing/MIII.subgait">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bente/Walk/right_swing/MIII_old.subgait" />
+    <entry file="file://$PROJECT_DIR$/bente/Stand/Prepare_Stand_Up/MIII.subgait">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="24">
+          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bente/Stand/Stand_Up/With_ankle_movement.subgait">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="24">
+          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bente/Sit/Sit_down/MIII.subgait">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="452">
+          <caret line="121" column="23" lean-forward="true" selection-start-line="121" selection-start-column="23" selection-end-line="121" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bente/Sit/Sit_home/MIII.subgait">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="440">
+          <caret line="91" column="34" selection-start-line="91" selection-end-line="92" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bente/Walk/left_swing/Literature_based.subgait" />
+    <entry file="file://$PROJECT_DIR$/bente/Walk/left_swing/MIII_old (test).subgait" />
+    <entry file="file://$PROJECT_DIR$/bente/Walk/left_swing/MIII_tweaked_longer_hip_flexion (copy).subgait" />
+    <entry file="file://$PROJECT_DIR$/bente/Walk/left_swing/MIII_tweaked.subgait" />
+    <entry file="file://$PROJECT_DIR$/bente/Walk/right_swing/MIII_tweaked_longer_hip_flexion.subgait" />
+    <entry file="file://$PROJECT_DIR$/bente/Walk/left_swing/MIII_tweaked_longer_hip_flexion.subgait" />
+    <entry file="file://$PROJECT_DIR$/bente/Walk/left_swing/MIII_total.subgait" />
+    <entry file="file://$PROJECT_DIR$/bente/Walk/left_swing/test_MIII_tweaked_more_hip_extension_total.subgait" />
+    <entry file="file://$PROJECT_DIR$/bente/Walk/left_swing/MIII_tweaked_total.subgait" />
+    <entry file="file://$PROJECT_DIR$/bente/Sit/Sit.gait">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="48">
+          <caret line="4" column="47" lean-forward="true" selection-start-line="4" selection-start-column="47" selection-end-line="4" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bente/Stand/Stand.gait">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="48">
+          <caret line="4" column="33" lean-forward="true" selection-start-line="4" selection-start-column="33" selection-end-line="4" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gait/walk/walk.gait">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="36">
+          <caret line="3" column="23" lean-forward="true" selection-start-line="3" selection-start-column="23" selection-end-line="3" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bente/Walk/Walk.gait">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bente/Home_Sit/Home_Sit.gait">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="48">
+          <caret line="4" column="25" selection-start-line="4" selection-start-column="25" selection-end-line="4" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gait/home_stand/home_stand.gait">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gait/home_sit/home_sit.gait">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bente/Home_Stand/Home_Stand.gait">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gait/default.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="12">
+          <caret line="1" selection-start-line="1" selection-end-line="2" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bente/default.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="72">
+          <caret line="6" lean-forward="true" selection-start-line="6" selection-end-line="6" />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

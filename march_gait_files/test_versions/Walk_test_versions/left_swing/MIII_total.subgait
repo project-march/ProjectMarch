@@ -1,0 +1,500 @@
+name: ''
+version: ''
+description: "MIII walking gait. "
+setpoints: 
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs:         0
+    joint_names: [left_hip_fe, left_knee, right_hip_fe, right_knee]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs:  31250000
+    joint_names: [left_hip_aa, left_ankle, right_hip_aa, right_ankle]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 198412698
+    joint_names: [right_hip_fe, right_knee]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 287500000
+    joint_names: [left_knee]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 400000000
+    joint_names: [left_hip_fe]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 468749999
+    joint_names: [left_hip_aa, left_ankle, right_hip_aa, right_ankle]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 625000000
+    joint_names: [left_hip_aa, left_ankle, right_hip_aa, right_ankle]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 775000000
+    joint_names: [left_knee]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 850000000
+    joint_names: [right_knee]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 887500000
+    joint_names: [left_hip_fe]
+  -
+    time_from_start: 
+      secs: 1
+      nsecs: 250000000
+    joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
+  right_ankle]
+  - 
+    time_from_start: 
+      secs: 1
+      nsecs:  281250000
+    joint_names: [left_hip_aa, left_ankle, right_hip_aa, right_ankle]
+  - 
+    time_from_start: 
+      secs: 1
+      nsecs: 448412698
+    joint_names: [left_hip_fe, left_knee]
+  - 
+    time_from_start: 
+      secs: 1
+      nsecs: 537500000
+    joint_names: [right_knee]
+  - 
+    time_from_start: 
+      secs: 1
+      nsecs: 650000000
+    joint_names: [right_hip_fe]
+  - 
+    time_from_start: 
+      secs: 1
+      nsecs: 718749999
+    joint_names: [left_hip_aa, left_ankle, right_hip_aa, right_ankle]
+  - 
+    time_from_start: 
+      secs: 1
+      nsecs: 875000000
+    joint_names: [left_hip_aa, left_ankle, right_hip_aa, right_ankle]
+  - 
+    time_from_start: 
+      secs: 2
+      nsecs: 25000000
+    joint_names: [right_knee]
+  - 
+    time_from_start: 
+      secs: 2
+      nsecs: 100000000
+    joint_names: [left_knee]
+  - 
+    time_from_start: 
+      secs: 2
+      nsecs: 137500000
+    joint_names: [right_hip_fe]
+  - 
+    time_from_start: 
+      secs: 2
+      nsecs: 500000000
+    joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee, right_ankle]
+trajectory: 
+  header: 
+    seq: 0
+    stamp: 
+      secs: 0
+      nsecs:         0
+    frame_id: ''
+  joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
+  right_ankle]
+  points: 
+    - 
+      positions: 
+        - 0.0
+        - -0.16667894356545848
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.3490658503988659
+        - 0.3490658503988659
+        - 0.0
+      velocities: 
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - -1.0000736613927508
+        - -0.8726646259971648
+        - 0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs:         0
+    - 
+      positions: [0.0, -0.1659966641943984, 0.0036581758449435488, 0.0, 0.0, 0.32250339672945194, 0.31587717835060014, 0.0]
+      velocities: [0.0, 0.038405942131857967, 0.20195885879082265, 0.0, 0.0, -0.80329043936978251, -1.2341769314946331, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs:  31250000
+    - 
+      positions: 
+        - 0.0
+        - -0.127597394492
+        - 0.151867897956
+        - 0.0
+        - 0.0
+        - 0.209439510239
+        - 0.0968657734857
+        - 0.0
+      velocities: 
+        - 0.0
+        - 0.462540545024
+        - 1.57265904634
+        - 0.0
+        - 0.0
+        - -1.00007366139
+        - -0.399680398707
+        - 0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 198412698
+    - 
+      positions: 
+        - 0.0
+        - -0.067493187809
+        - 0.349065850399
+        - 0.0
+        - 0.0
+        - 0.131634323808
+        - 0.0670249411901
+        - 0.0
+      velocities: 
+        - 0.0
+        - 0.836920847308
+        - 2.50000962056
+        - 0.0
+        - 0.0
+        - -0.86591845049
+        - -0.318701068208
+        - 0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 287500000
+    - 
+      positions: 
+        - 0.0
+        - 0.0698131700798
+        - 0.574222831133
+        - 0.0
+        - 0.0
+        - 0.0462246058302
+        - 0.037820385133
+        - 0.0
+      velocities: 
+        - 0.0
+        - 1.49923782746
+        - 1.81121370231
+        - 0.0
+        - 0.0
+        - -0.693386858798
+        - -0.21995935491
+        - 0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 400000000
+    - 
+      positions: [0.0, 0.16339996560641054, 0.68445711856096247, 0.0, 0.0, 0.001368724495346875, 0.024500829257332424, 0.0]
+      velocities: [0.0, 1.4397776563687421, 1.3817199613043263, 0.0, 0.0, -0.59348467366700119, -0.16638443832896213, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 468749999
+    - 
+      positions: [0.0, 0.37260310886152731, 0.83433767227224076, 0.0, 0.0, -0.076725621877890962, 0.0063436774099160185, 0.0]
+      velocities: [0.0, 1.1398382353866401, 0.5661433254447451, 0.0, 0.0, -0.39402378787708348, -0.070974665896656824, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 625000000
+    - 
+      positions: 
+        - 0.0
+        - 0.502998113914
+        - 0.872664625997
+        - 0.0
+        - 0.0
+        - -0.121271195411
+        - 0.000642113055179
+        - 0.0
+      velocities: 
+        - 0.0
+        - 0.713100591014
+        - 0.0
+        - 0.0
+        - 0.0
+        - -0.252464332631
+        - -0.0183601788662
+        - 0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 775000000
+    - 
+      positions: 
+        - 0.0
+        - 0.546652672981
+        - 0.848446872003
+        - 0.0
+        - 0.0
+        - -0.138522008353
+        - 0.0
+        - 0.0
+      velocities: 
+        - 0.0
+        - 0.400404902376
+        - -0.604972907514
+        - 0.0
+        - 0.0
+        - -0.185388720796
+        - 0.0
+        - 0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 850000000
+    - 
+      positions: 
+        - 0.0
+        - 0.558505360638
+        - 0.816583540741
+        - 0.0
+        - 0.0
+        - -0.14523919645
+        - 0.0
+        - 0.0
+      velocities: 
+        - 0.0
+        - 0.200712863979
+        - -0.894154401124
+        - 0.0
+        - 0.0
+        - -0.155618780001
+        - 0.0
+        - 0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 887500000
+    - 
+      positions: [0.0, 0.349065850399, 0.349065850399, 0.0, 0.0, -0.166678943565, 0.0, 0.0]
+      velocities: [-0.0, -1.00007366139, -0.872664625997, -0.0, -0.0, 0.0, 0.0, -0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs: 250000000
+    - 
+      positions: [0.0, 0.32250339671805944, 0.31587717830547141, 0.0, 0.0, -0.1659966641943984, 0.0036581758449435514, 0.0]
+      velocities: [0.0, -0.80329043999285532, -1.2341769338725777, 0.0, 0.0, 0.038405942131857967, 0.20195885879082281, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs:  281250000
+    - 
+      positions: 
+        - 0.0
+        - 0.209439510239
+        - 0.0968657734857
+        - 0.0
+        - 0.0
+        - -0.127597394492
+        - 0.151867897956
+        - 0.0
+      velocities: 
+        - 0.0
+        - -1.00007366139
+        - -0.399680398707
+        - 0.0
+        - 0.0
+        - 0.462540545024
+        - 1.57265904634
+        - 0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs: 448412698
+    - 
+      positions: 
+        - 0.0
+        - 0.131634323455
+        - 0.0670249410611
+        - 0.0
+        - 0.0
+        - -0.067493187809
+        - 0.349065850399
+        - 0.0
+      velocities: 
+        - 0.0
+        - -0.865918449805
+        - -0.318701067796
+        - 0.0
+        - 0.0
+        - 0.836920847308
+        - 2.50000962056
+        - 0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs: 537500000
+    - 
+      positions: 
+        - 0.0
+        - 0.0462246055488
+        - 0.0378203850463
+        - 0.0
+        - 0.0
+        - 0.0698131700798
+        - 0.574222831133
+        - 0.0
+      velocities: 
+        - 0.0
+        - -0.693386858176
+        - -0.219959354556
+        - 0.0
+        - 0.0
+        - 1.49923782746
+        - 1.81121370231
+        - 0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs: 650000000
+    - 
+      positions: [0.0, 0.001368724256107508, 0.024500829193889996, 0.0, 0.0, 0.16339996560641054, 0.68445711856096259, 0.0]
+      velocities: [0.0, -0.59348467308740382, -0.16638443801791239, 0.0, 0.0, 1.4397776563687421, 1.3817199613043263, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs: 718749999
+    - 
+      positions: [0.0, -0.076725622032308732, 0.0063436773872642578, 0.0, 0.0, 0.37260310886152731, 0.83433767227224076, 0.0]
+      velocities: [0.0, -0.3940237873998379, -0.070974665698431666, 0.0, 0.0, 1.1398382353866401, 0.5661433254447451, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs: 875000000
+    - 
+      positions: 
+        - 0.0
+        - -0.121271195505
+        - 0.000642113051894
+        - 0.0
+        - 0.0
+        - 0.502998113914
+        - 0.872664625997
+        - 0.0
+      velocities: 
+        - 0.0
+        - -0.25246433225
+        - -0.0183601787844
+        - 0.0
+        - 0.0
+        - 0.713100591014
+        - 0.0
+        - 0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 2
+        nsecs: 25000000
+    - 
+      positions: 
+        - 0.0
+        - -0.138522008419
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.546652672981
+        - 0.848446872003
+        - 0.0
+      velocities: 
+        - 0.0
+        - -0.185388720473
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.400404902376
+        - -0.604972907514
+        - 0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 2
+        nsecs: 100000000
+    - 
+      positions: 
+        - 0.0
+        - -0.145239196504
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.558505360638
+        - 0.816583540741
+        - 0.0
+      velocities: 
+        - 0.0
+        - -0.155618779707
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.200712863979
+        - -0.894154401124
+        - 0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 2
+        nsecs: 137500000
+    - 
+      positions: [0.0, -0.16667894356545848, 0.0, 0.0, 0.0, 0.3490658503988659, 0.3490658503988659, 0.0]
+      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, -1.0000736613927508, -0.8726646259971648, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 2
+        nsecs: 500000000
+duration: 
+  secs: 2
+  nsecs: 500000000
+sounds: []

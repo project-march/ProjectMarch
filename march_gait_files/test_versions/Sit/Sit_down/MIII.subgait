@@ -1,0 +1,130 @@
+name: ''
+version: ''
+description: "Sit down gait for the sitting block. This is the same version as\
+  \ MIII used."
+setpoints: 
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs:         0
+    joint_names: [left_hip_fe, left_knee, right_hip_fe, right_knee]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs:  62500000
+    joint_names: [left_hip_aa, left_ankle, right_hip_aa, right_ankle]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 937500000
+    joint_names: [left_hip_aa, right_hip_aa]
+  - 
+    time_from_start: 
+      secs: 1
+      nsecs: 250000000
+    joint_names: [left_hip_aa, right_hip_aa]
+  - 
+    time_from_start: 
+      secs: 2
+      nsecs: 299999999
+    joint_names: [left_hip_fe, left_knee, right_hip_fe, right_knee]
+  - 
+    time_from_start: 
+      secs: 2
+      nsecs: 500000000
+    joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
+  right_ankle]
+trajectory: 
+  header: 
+    seq: 0
+    stamp: 
+      secs: 0
+      nsecs:         0
+    frame_id: ''
+  joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
+  right_ankle]
+  points: 
+    - 
+      positions: 
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+      velocities: 
+        - -0.0
+        - 0.799360797413
+        - 0.799360797413
+        - -0.0
+        - -0.0
+        - 0.799360797413
+        - 0.799360797413
+        - -0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs:         0
+    - 
+      positions: [0.0, 0.047612885330628268, 0.04743642523486765, 0, 0.0, 0.047612885330628268, 0.04743642523486765, 0]
+      velocities: [0.0, 0.78299572234376713, 0.77766160400294793, 0, 0.0, 0.78299572234376713, 0.77766160400294793, 0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs:  62500000
+    - 
+      positions: [0.0, 0.64984098503817145, 0.61837093256738662, 0.0, 0.0, 0.64984098503817145, 0.61837093256738662, 0.0]
+      velocities: [0.0, 0.63121819335798712, 0.57641291172321729, 0.0, 0.0, 0.63121819335798712, 0.57641291172321729, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 937500000
+    - 
+      positions: [0.0, 0.84477476603315393, 0.79574824213325246, 0.0, 0.0, 0.84477476603315393, 0.79574824213325246, 0.0]
+      velocities: [0.0, 0.62582158091341955, 0.56925729913376155, 0.0, 0.0, 0.62582158091341955, 0.56925729913376155, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs: 250000000
+    - 
+      positions: 
+        - 0.0
+        - 1.57079632679
+        - 1.4835298642
+        - 0.0
+        - 0.0
+        - 1.57079632679
+        - 1.4835298642
+        - 0.0
+      velocities: 
+        - 0.0
+        - 0.799360797413
+        - 0.799360797413
+        - 0.0
+        - 0.0
+        - 0.799360797413
+        - 0.799360797413
+        - 0.0
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 2
+        nsecs: 299999999
+    - 
+      positions: [0.0, 1.60570291183, 1.57079632679, 0.0, 0.0, 1.60570291183, 1.57079632679, 0.0]
+      velocities: [0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 2
+        nsecs: 500000000
+duration: 
+  secs: 2
+  nsecs: 500000000
+sounds: []
