@@ -66,6 +66,7 @@ class GaitGeneratorPlugin(Plugin):
         self.start_button = self._widget.RvizFrame.findChild(QPushButton, "Start")
         self.stop_button = self._widget.RvizFrame.findChild(QPushButton, "Stop")
         self.playback_speed_line_edit = self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed")
+        self.topic_name_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "TopicName")
 
         # Connect Gait settings buttons
         self.set_gait_directory_button(self.gait_directory)
@@ -99,8 +100,8 @@ class GaitGeneratorPlugin(Plugin):
             ]
         )
 
-        self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").editingFinished.connect(
-            lambda: self.set_topic_name(self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").text())
+        self.topic_name_line_edit.editingFinished.connect(
+            lambda: self.set_topic_name(self.topic_name_line_edit.text())
         )
 
         self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Gait").editingFinished.connect(
@@ -135,7 +136,7 @@ class GaitGeneratorPlugin(Plugin):
         )
 
         # Initialize the publisher on startup
-        self.set_topic_name(self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").text())
+        self.set_topic_name(self.topic_name_line_edit.text())
 
         self.load_gait_into_ui()
 
