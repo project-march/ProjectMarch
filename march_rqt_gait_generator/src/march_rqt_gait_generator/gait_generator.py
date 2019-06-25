@@ -63,6 +63,8 @@ class GaitGeneratorPlugin(Plugin):
         self.import_gait_button = self._widget.SettingsFrame.findChild(QPushButton, "Import")
         self.export_gait_button = self._widget.SettingsFrame.findChild(QPushButton, "Export")
         self.publish_gait_button = self._widget.SettingsFrame.findChild(QPushButton, "Publish")
+        self.start_button = self._widget.RvizFrame.findChild(QPushButton, "Start")
+        self.stop_button = self._widget.RvizFrame.findChild(QPushButton, "Stop")
 
         # Connect Gait settings buttons
         self.set_gait_directory_button(self.gait_directory)
@@ -84,9 +86,9 @@ class GaitGeneratorPlugin(Plugin):
             lambda: self.publish_gait()
         )
 
-        self._widget.RvizFrame.findChild(QPushButton, "Start").clicked.connect(self.start_time_slider_thread)
+        self.start_button.clicked.connect(self.start_time_slider_thread)
 
-        self._widget.RvizFrame.findChild(QPushButton, "Stop").clicked.connect(self.stop_time_slider_thread)
+        self.stop_button.clicked.connect(self.stop_time_slider_thread)
 
         self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed").setValidator(QtGui.QIntValidator(0, 500, self))
         self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed").editingFinished.connect(
