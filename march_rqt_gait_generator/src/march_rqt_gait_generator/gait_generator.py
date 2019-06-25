@@ -58,80 +58,101 @@ class GaitGeneratorPlugin(Plugin):
         self.rviz_frame = self.create_rviz_frame()
         self._widget.RvizFrame.layout().addWidget(self.rviz_frame, 1, 0, 1, 3)
 
+        # Store ui elements.
+        self.change_gait_directory_button = self._widget.SettingsFrame.findChild(QPushButton, "ChangeGaitDirectory")
+        self.import_gait_button = self._widget.SettingsFrame.findChild(QPushButton, "Import")
+        self.export_gait_button = self._widget.SettingsFrame.findChild(QPushButton, "Export")
+        self.publish_gait_button = self._widget.SettingsFrame.findChild(QPushButton, "Publish")
+        self.start_button = self._widget.RvizFrame.findChild(QPushButton, "Start")
+        self.stop_button = self._widget.RvizFrame.findChild(QPushButton, "Stop")
+        self.playback_speed_line_edit = self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed")
+        self.topic_name_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "TopicName")
+        self.gait_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Gait")
+        self.version_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version")
+        self.subgait_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait")
+        self.description_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description")
+        self.duration_spin_box = self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration")
+        self.mirror_check_box = self._widget.SettingsFrame.findChild(QCheckBox, "Mirror")
+        self.mirror_key1_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "Key1")
+        self.mirror_key2_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "Key2")
+        self.velocity_markers_check_box = self._widget.SettingsFrame.findChild(QCheckBox, "ShowVelocityMarkers")
+        self.time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
+        self.scale_setpoints_check_box = self._widget.GaitPropertiesFrame.findChild(QCheckBox, "ScaleSetpoints")
+
         # Connect Gait settings buttons
         self.set_gait_directory_button(self.gait_directory)
-        self._widget.SettingsFrame.findChild(QPushButton, "ChangeGaitDirectory").clicked.connect(
+        self.change_gait_directory_button.clicked.connect(
             lambda: [
                 self.set_gait_directory_button(self.get_gait_directory(True))
             ]
         )
 
-        self._widget.SettingsFrame.findChild(QPushButton, "Import").clicked.connect(
+        self.import_gait_button.clicked.connect(
             lambda: [
                 self.load_gait()
             ]
         )
 
-        self._widget.SettingsFrame.findChild(QPushButton, "Export").clicked.connect(self.export)
+        self.export_gait_button.clicked.connect(self.export)
 
-        self._widget.SettingsFrame.findChild(QPushButton, "Publish").clicked.connect(
+        self.publish_gait_button.clicked.connect(
             lambda: self.publish_gait()
         )
 
-        self._widget.RvizFrame.findChild(QPushButton, "Start").clicked.connect(self.start_time_slider_thread)
+        self.start_button.clicked.connect(self.start_time_slider_thread)
 
-        self._widget.RvizFrame.findChild(QPushButton, "Stop").clicked.connect(self.stop_time_slider_thread)
+        self.stop_button.clicked.connect(self.stop_time_slider_thread)
 
-        self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed").setValidator(QtGui.QIntValidator(0, 500, self))
-        self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed").editingFinished.connect(
+        self.playback_speed_line_edit.setValidator(QtGui.QIntValidator(0, 500, self))
+        self.playback_speed_line_edit.editingFinished.connect(
             lambda: [
-                self.set_playback_speed(float(self._widget.RvizFrame.findChild(QLineEdit, "PlaybackSpeed").text())),
+                self.set_playback_speed(float(self.playback_speed_line_edit.text())),
                 rospy.loginfo("Changing playbackspeed to " + str(self.playback_speed)),
             ]
         )
 
-        self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").editingFinished.connect(
-            lambda: self.set_topic_name(self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").text())
+        self.topic_name_line_edit.editingFinished.connect(
+            lambda: self.set_topic_name(self.topic_name_line_edit.text())
         )
 
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Gait").editingFinished.connect(
-            lambda: self.gait.set_name(self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Gait").text())
+        self.gait_name_line_edit.editingFinished.connect(
+            lambda: self.gait.set_name(self.gait_name_line_edit.text())
         )
 
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").editingFinished.connect(
-            lambda: self.gait.set_version(self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").text())
+        self.version_name_line_edit.editingFinished.connect(
+            lambda: self.gait.set_version(self.version_name_line_edit.text())
         )
 
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait").editingFinished.connect(
-            lambda: self.gait.set_subgait(self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait").text())
+        self.subgait_name_line_edit.editingFinished.connect(
+            lambda: self.gait.set_subgait(self.subgait_name_line_edit.text())
         )
 
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").editingFinished.connect(
+        self.description_line_edit.editingFinished.connect(
             lambda: self.gait.set_description(
-                self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").text())
+                self.description_line_edit.text())
         )
 
-        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").setKeyboardTracking(False)
-        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").valueChanged.connect(
+        self.duration_spin_box.setKeyboardTracking(False)
+        self.duration_spin_box.valueChanged.connect(
             lambda: self.update_gait_duration(
-                self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").value())
+                self.duration_spin_box.value())
         )
 
         # Disable key inputs when mirroring is off.
-        self._widget.SettingsFrame.findChild(QCheckBox, "Mirror").stateChanged.connect(
+        self.mirror_check_box.stateChanged.connect(
             lambda state: [
-                self._widget.SettingsFrame.findChild(QLineEdit, "Key1").setEnabled(state),
-                self._widget.SettingsFrame.findChild(QLineEdit, "Key2").setEnabled(state)
+                self.mirror_key1_line_edit.setEnabled(state),
+                self.mirror_key2_line_edit.setEnabled(state)
             ]
         )
 
         # Initialize the publisher on startup
-        self.set_topic_name(self._widget.SettingsFrame.findChild(QLineEdit, "TopicName").text())
+        self.set_topic_name(self.topic_name_line_edit.text())
 
         self.load_gait_into_ui()
 
     def toggle_velocity_markers(self):
-        self._widget.SettingsFrame.findChild(QCheckBox, "ShowVelocityMarkers").toggle()
+        self.velocity_markers_check_box.toggle()
 
     def create_rviz_frame(self):
         frame = rviz.VisualizationFrame()
@@ -176,10 +197,10 @@ class GaitGeneratorPlugin(Plugin):
         joint_setting = QFrame()
         loadUi(joint_setting_file, joint_setting)
 
-        show_velocity_markers = self._widget.SettingsFrame.findChild(QCheckBox, "ShowVelocityMarkers").isChecked()
+        show_velocity_markers = self.velocity_markers_check_box.isChecked()
         joint_setting_plot = JointSettingPlot(joint, self.gait.duration, show_velocity_markers)
 
-        self._widget.SettingsFrame.findChild(QCheckBox, "ShowVelocityMarkers").stateChanged.connect(
+        self.velocity_markers_check_box.stateChanged.connect(
             lambda: [joint.set_setpoints(UserInterfaceController.plot_to_setpoints(joint_setting_plot)),
                      UserInterfaceController.update_ui_elements(
                          joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration,
@@ -236,7 +257,7 @@ class GaitGeneratorPlugin(Plugin):
         return joint_setting
 
     def show_velocity_markers_checked(self):
-        return self._widget.SettingsFrame.findChild(QCheckBox, "ShowVelocityMarkers").isChecked()
+        return self.velocity_markers_check_box.isChecked()
 
     def add_setpoint(self, joint, time, position, button):
         if button == QtCore.Qt.ControlModifier:
@@ -255,7 +276,7 @@ class GaitGeneratorPlugin(Plugin):
     def set_gait_directory_button(self, gait_directory):
         if gait_directory is None:
             gait_directory = "Select a gait directory..."
-        self._widget.SettingsFrame.findChild(QPushButton, "ChangeGaitDirectory").setText(gait_directory)
+        self.change_gait_directory_button.setText(gait_directory)
 
     def publish_preview(self):
         joint_state = JointState()
@@ -297,17 +318,15 @@ class GaitGeneratorPlugin(Plugin):
             rospy.logdebug("Cannot start another time slider thread as one is already active")
             return
 
-        time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
-
-        current = time_slider.value()
+        current = self.time_slider.value()
         playback_speed = self.playback_speed
-        max = time_slider.maximum()
+        max = self.time_slider.maximum()
         self.time_slider_thread = TimeSliderThread(current, playback_speed, max)
         self.time_slider_thread.update_signal.connect(self.update_main_time_slider)
         self.time_slider_thread.start()
 
     def update_gait_duration(self, duration):
-        rescale_setpoints = self._widget.GaitPropertiesFrame.findChild(QCheckBox, "ScaleSetpoints").isChecked()
+        rescale_setpoints = self.scale_setpoints_check_box.isChecked()
 
         if self.gait.has_setpoints_after_duration(duration) and not rescale_setpoints:
             if not self.gait.has_multiple_setpoints_before_duration(duration):
@@ -320,10 +339,10 @@ class GaitGeneratorPlugin(Plugin):
                                                      "duration?",
                                                      QMessageBox.Yes | QMessageBox.No)
             if discard_setpoints == QMessageBox.No:
-                self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").setValue(self.gait.duration)
+                self.duration_spin_box.setValue(self.gait.duration)
                 return
         self.gait.set_duration(duration, rescale_setpoints)
-        self._widget.RvizFrame.findChild(QSlider, "TimeSlider").setRange(0, 100 * self.gait.duration)
+        self.time_slider.setRange(0, 100 * self.gait.duration)
 
         was_playing = self.time_slider_thread is not None
         self.stop_time_slider_thread()
@@ -339,10 +358,10 @@ class GaitGeneratorPlugin(Plugin):
             self.time_slider_thread = None
 
     def export(self):
-        should_mirror = self._widget.SettingsFrame.findChild(QCheckBox, "Mirror").isChecked()
+        should_mirror = self.mirror_check_box.isChecked()
 
-        key_1 = self._widget.SettingsFrame.findChild(QLineEdit, "Key1").text()
-        key_2 = self._widget.SettingsFrame.findChild(QLineEdit, "Key2").text()
+        key_1 = self.mirror_key1_line_edit.text()
+        key_2 = self.mirror_key2_line_edit.text()
 
         if should_mirror:
             mirror = self.gait.get_mirror(key_1, key_2)
@@ -374,32 +393,32 @@ class GaitGeneratorPlugin(Plugin):
             self.gait_directory = gait_directory
             self.set_gait_directory_button(gait_directory)
 
-        self.gait = import_from_file_name(self.robot, file_name)
-        if self.gait is None:
+        gait = import_from_file_name(self.robot, file_name)
+        if gait is None:
             rospy.logwarn("Could not load gait %s", file_name)
         else:
+            self.gait = gait
             self.load_gait_into_ui()
 
     def load_gait_into_ui(self):
-        time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
-        time_slider.setRange(0, 100 * self.gait.duration)
+        self.time_slider.setRange(0, 100 * self.gait.duration)
 
         # Connect TimeSlider to the preview
-        time_slider.valueChanged.connect(lambda: [
-            self.gait.set_current_time(float(time_slider.value()) / 100),
+        self.time_slider.valueChanged.connect(lambda: [
+            self.gait.set_current_time(float(self.time_slider.value()) / 100),
             self.publish_preview(),
             self.update_time_sliders(),
         ])
 
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Gait").setText(self.gait.name)
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait").setText(self.gait.subgait)
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version").setText(self.gait.version)
-        self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description").setText(self.gait.description)
+        self.gait_name_line_edit.setText(self.gait.name)
+        self.subgait_name_line_edit.setText(self.gait.subgait)
+        self.version_name_line_edit.setText(self.gait.version)
+        self.description_line_edit.setText(self.gait.description)
 
         # Block signals on the duration edit to prevent a reload of the joint settings
-        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").blockSignals(True)
-        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").setValue(self.gait.duration)
-        self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration").blockSignals(False)
+        self.duration_spin_box.blockSignals(True)
+        self.duration_spin_box.setValue(self.gait.duration)
+        self.duration_spin_box.blockSignals(False)
 
         print ('load gait into ui')
         self.create_joint_settings()
@@ -408,7 +427,7 @@ class GaitGeneratorPlugin(Plugin):
 
     @QtCore.pyqtSlot(int)
     def update_main_time_slider(self, time):
-        self._widget.RvizFrame.findChild(QSlider, "TimeSlider").setValue(time)
+        self.time_slider.setValue(time)
 
     def shutdown_plugin(self):
         self.stop_time_slider_thread()
