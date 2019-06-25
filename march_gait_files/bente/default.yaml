@@ -1,4 +1,5 @@
 gaits:
-  Sit: {Sit_down: MIII, Sit_home: MIII}
-  Stand: {Prepare_Stand_Up: MIII, Stand_Up: MIII}
-  Walk: {left_swing: MIII_tweaked, right_swing: MIII_tweaked}
+  home: {home_sit: home_sit, home_stand: home_stand}
+  sit: {sit_down: MIII, sit_home: MIII}
+  stand: {prepare_stand_up: MIII, stand_up: MIII}
+  walk: {right_open: MIV, left_swing: MIV, right_swing: MIV, left_close: MIV, right_close: MIV}

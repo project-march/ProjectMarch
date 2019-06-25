@@ -1,6 +1,0 @@
-name: Stand
-
-
-graph:
-  from_subgait: [start,      Prepare_Stand_Up, Stand_Up]
-  to_subgait:   [Prepare_Stand_Up, Stand_Up,       end]
