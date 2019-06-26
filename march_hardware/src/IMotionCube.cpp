@@ -472,13 +472,6 @@ bool IMotionCube::goToOperationEnabled()
   ROS_INFO("Operation Enabled!");
 }
 
-bool IMotionCube::resetIMotionCube()
-{
-    ROS_INFO("Try to reset IMC with slave index %d", slaveIndex);
-    sdo_bit16(slaveIndex, 0x2080, 0, 1);
-    usleep(20000);
-}
-
 bool IMotionCube::get_bit(uint16 value, int index)
 {
   return static_cast<bool>(value & (1 << index));

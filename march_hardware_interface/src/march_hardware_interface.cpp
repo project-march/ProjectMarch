@@ -55,12 +55,6 @@ void MarchHardwareInterface::init()
   joint_velocity_command_.resize(num_joints_);
   joint_effort_command_.resize(num_joints_);
 
-  for (int i = 0; i < num_joints_; ++i)
-  {
-    march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
-    joint.resetIMotionCube();
-  }
-
   // Print all joint positions on startup in case initialization fails.
   this->read();
   for (int i = 0; i < num_joints_; ++i)

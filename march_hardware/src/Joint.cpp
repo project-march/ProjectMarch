@@ -63,11 +63,6 @@ void Joint::prepareActuation()
   }
 }
 
-void Joint::resetIMotionCube()
-{
-    this->iMotionCube.resetIMotionCube();
-}
-
 void Joint::actuateRad(float targetPositionRad)
 {
   ROS_ASSERT_MSG(this->allowActuation, "Joint %s is not allowed to actuate, "
