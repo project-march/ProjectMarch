@@ -13,7 +13,7 @@ trajectory:
   points: 
     - 
       positions: [0.0, 0.0, 0.0, 0.0873, 0.0, 0.0, 0.0, 0.0873]
-      velocities: [0.0, -0.8378, -0.8378, 0.0, 0.0, -0.8378, -0.8378, 0.0]
+      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
