@@ -195,9 +195,11 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(), joint_position_[i]);
   }
 
-    if (power_distribution_board_read_.getSlaveIndex() != -1) {
+    if (power_distribution_board_read_.getSlaveIndex() != -1)
+    {
         power_distribution_board_read_ = *marchRobot.getPowerDistributionBoard();
-        if (!power_distribution_board_read_.getHighVoltage().getHighVoltageEnabled()) {
+        if (!power_distribution_board_read_.getHighVoltage().getHighVoltageEnabled())
+        {
             ROS_WARN_THROTTLE(10, "All-High-Voltage disabled");
         }
     }
