@@ -13,8 +13,18 @@ setpoints:
   - 
     time_from_start: 
       secs: 0
+      nsecs: 200000000
+    joint_names: [left_hip_fe, left_knee, right_hip_fe, right_knee]
+  - 
+    time_from_start: 
+      secs: 0
       nsecs: 300000000
     joint_names: [left_ankle, right_ankle]
+  - 
+    time_from_start: 
+      secs: 1
+      nsecs: 300000000
+    joint_names: [left_hip_fe, left_knee, right_hip_fe, right_knee]
   - 
     time_from_start: 
       secs: 1
@@ -33,23 +43,39 @@ trajectory:
   points: 
     - 
       positions: [0.0, 1.5708, 1.5708, 0.0873, 0.0, 1.5708, 1.5708, 0.0873]
-      velocities: [0.0, -0.8378, -0.8378, 0.0, 0.0, -0.8378, -0.8378, 0.0]
+      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs:         0
     - 
-      positions: [0.0, 1.2951, 1.2951, 0.1745, 0.0, 1.2951, 1.2951, 0.1745]
-      velocities: [0.0, -1.0321, -1.0321, 0.0, 0.0, -1.0321, -1.0321, 0.0]
+      positions: [0.0, 1.3963, 1.3963, 0.1484, 0.0, 1.3963, 1.3963, 0.1484]
+      velocities: [0.0, -0.8378, -0.8378, 0.4104, 0.0, -0.8378, -0.8378, 0.4104]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 200000000
+    - 
+      positions: [0.0, 1.3133, 1.3133, 0.1745, 0.0, 1.3133, 1.3133, 0.1745]
+      velocities: [0.0, -0.957, -0.957, 0.0, 0.0, -0.957, -0.957, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs: 300000000
     - 
+      positions: [0.0, 0.1745, 0.1745, 0.0938, 0.0, 0.1745, 0.1745, 0.0938]
+      velocities: [0.0, -0.8378, -0.8378, -0.0621, 0.0, -0.8378, -0.8378, -0.0621]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs: 300000000
+    - 
       positions: [0.0, 0.0, 0.0, 0.0873, 0.0, 0.0, 0.0, 0.0873]
-      velocities: [0.0, -0.8378, -0.8378, 0.0, 0.0, -0.8378, -0.8378, 0.0]
+      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
