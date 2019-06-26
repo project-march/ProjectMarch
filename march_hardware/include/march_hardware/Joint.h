@@ -29,6 +29,7 @@ public:
 
   void initialize(int ecatCycleTime);
   void prepareActuation();
+  void resetIMotionCube();
 
   void actuateRad(float targetPositionRad);
 

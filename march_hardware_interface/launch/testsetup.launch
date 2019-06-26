@@ -1,7 +1,7 @@
 <launch>
-    <rosparam file="$(find march_hardware_interface)/config/testsetup/hardware.yaml" command="load"/>
-    <rosparam file="$(find march_hardware_interface)/config/testsetup/controllers.yaml" command="load"/>
-    <rosparam file="$(find march_hardware_interface)/config/testsetup/joint_limits.yaml" command="load"/>
+    <rosparam file="$(find march_hardware_interface)/config/test_setup/hardware.yaml" command="load"/>
+    <rosparam file="$(find march_hardware_interface)/config/test_setup/controllers.yaml" command="load"/>
+    <rosparam file="$(find march_hardware_interface)/config/test_setup/joint_limits.yaml" command="load"/>
 
     <!-- Load the URDF into the ROS Parameter Server -->
     <param name="robot_description"

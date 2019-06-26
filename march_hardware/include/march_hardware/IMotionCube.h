@@ -57,6 +57,7 @@ public:
   void parseDetailedError(uint16 detailedError);
 
   bool goToOperationEnabled();
+  bool resetIMotionCube();
 
   /** @brief Override comparison operator */
   friend bool operator==(const IMotionCube& lhs, const IMotionCube& rhs)
