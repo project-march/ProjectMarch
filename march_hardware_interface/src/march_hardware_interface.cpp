@@ -121,10 +121,13 @@ void MarchHardwareInterface::init()
       ROS_FATAL("Joint %s is outside of its softLimits (%f, %f). Actual position: %f", joint_names_[i].c_str(),
                 softLimits.min_position, softLimits.max_position, joint_position_[i]);
 
-      std::ostringstream errorStream;
-      errorStream << "Joint " << joint_names_[i].c_str() << " is out of its softLimits (" << softLimits.min_position
-                  << ", " << softLimits.max_position << "). Actual position: " << joint_position_[i];
-      throw ::std::invalid_argument(errorStream.str());
+      if (joint.canActuate())
+      {
+        std::ostringstream errorStream;
+        errorStream << "Joint " << joint_names_[i].c_str() << " is out of its softLimits (" << softLimits.min_position
+                    << ", " << softLimits.max_position << "). Actual position: " << joint_position_[i];
+        throw ::std::invalid_argument(errorStream.str());
+      }
     }
 
     // Create velocity joint interface
@@ -191,12 +194,15 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
 
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(), joint_position_[i]);
   }
-  power_distribution_board_read_ = *marchRobot.getPowerDistributionBoard();
 
-  if (!power_distribution_board_read_.getHighVoltage().getHighVoltageEnabled())
-  {
-    ROS_WARN_THROTTLE(10, "All-High-Voltage disabled");
-  }
+    if (power_distribution_board_read_.getSlaveIndex() != -1)
+    {
+        power_distribution_board_read_ = *marchRobot.getPowerDistributionBoard();
+        if (!power_distribution_board_read_.getHighVoltage().getHighVoltageEnabled())
+        {
+            ROS_WARN_THROTTLE(10, "All-High-Voltage disabled");
+        }
+    }
 }
 
 void MarchHardwareInterface::write(ros::Duration elapsed_time)
