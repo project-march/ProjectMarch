@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   controller_manager
   march_hardware
   march_hardware_builder
+  urdf
 )
 
 catkin_package(
