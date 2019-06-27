@@ -1,6 +1,6 @@
 gaits:
   home: {home_sit: home_sit, home_stand: home_stand}
-  single_step: {right_open: MIV, left_close: MIV}
+  single-step: {right_open: MIV, left_close: MIV}
   sit: {sit_down: MIII, sit_home: MIII}
   stand: {prepare_stand_up: MIII, stand_up: MIII}
   walk: {right_open: MIV, left_swing: MIV, right_swing: MIV, left_close: MIV, right_close: MIV}
