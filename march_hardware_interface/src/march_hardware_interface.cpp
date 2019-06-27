@@ -71,15 +71,12 @@ void MarchHardwareInterface::init()
     ROS_INFO("Joint %s: first read position: %f", joint_names_[i].c_str(), joint_position_[i]);
   }
 
-  ROS_INFO_STREAM("power_distribution_board_read_ " << power_distribution_board_read_);
   // Create march_pdb_state interface
   MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
                                           &master_shutdown_allowed_command, &enable_high_voltage_command,
                                           &power_net_on_off_command_);
-  ROS_INFO(" marchPdbStateHandle");
   march_pdb_interface.registerHandle(marchPdbStateHandle);
 
-  ROS_INFO(" marchPdbStateHandle 2");
   registerInterface(&march_temperature_interface);
   registerInterface(&march_pdb_interface);
   registerInterface(&joint_state_interface_);
@@ -87,12 +84,9 @@ void MarchHardwareInterface::init()
   registerInterface(&effort_joint_interface_);
   registerInterface(&positionJointSoftLimitsInterface);
 
-  ROS_INFO(" has pdb");
   hasPowerDistributionBoard = marchRobot.getPowerDistributionBoard()->getSlaveIndex() != -1;
-
   if (hasPowerDistributionBoard)
   {
-    ROS_INFO(" num_joints_ %d", num_joints_);
     for (int i = 0; i < num_joints_; i++)
     {
       int netNumber = marchRobot.getJoint(joint_names_[i]).getNetNumber();
@@ -104,7 +98,6 @@ void MarchHardwareInterface::init()
     ROS_WARN("Running without Power Distribution Board");
   }
 
-  ROS_INFO("before joints ");
   // Initialize interfaces for each joint
   for (int i = 0; i < num_joints_; ++i)
   {
@@ -148,8 +141,6 @@ void MarchHardwareInterface::init()
       }
     }
 
-    ROS_INFO("after joints ");
-
     // Create velocity joint interface
     JointHandle jointVelocityHandle(jointStateHandle, &joint_velocity_command_[i]);
     velocity_joint_interface_.registerHandle(jointVelocityHandle);
@@ -164,7 +155,6 @@ void MarchHardwareInterface::init()
     march_temperature_interface.registerHandle(marchTemperatureSensorHandle);
 
 
-    ROS_INFO("can actuate joints ");
     // Enable high voltage on the IMC
     if (joint.canActuate())
     {
@@ -221,13 +211,10 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
   {
     power_distribution_board_read_ = *marchRobot.getPowerDistributionBoard();
 
-    ROS_INFO("getHV enabled");
-    ROS_INFO_STREAM(*marchRobot.getPowerDistributionBoard());
-//    if (!power_distribution_board_read_.getHighVoltage().getHighVoltageEnabled())
-//    {
-//      ROS_WARN_THROTTLE(10, "All-High-Voltage disabled");
-//    }
-    ROS_INFO("getHV enabled done");
+    if (!power_distribution_board_read_.getHighVoltage().getHighVoltageEnabled())
+    {
+      ROS_WARN_THROTTLE(10, "All-High-Voltage disabled");
+    }
   }
 }
 
@@ -249,9 +236,7 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
 
   if (hasPowerDistributionBoard)
   {
-    ROS_INFO("before update");
     updatePowerDistributionBoard();
-    ROS_INFO("after update");
   }
 }
 
