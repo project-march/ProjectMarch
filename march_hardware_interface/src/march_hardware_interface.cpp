@@ -140,10 +140,10 @@ void MarchHardwareInterface::init()
                                                               &joint_temperature_variance_[i]);
     march_temperature_interface.registerHandle(marchTemperatureSensorHandle);
 
-    if (power_distribution_board_read_.getSlaveIndex() != -1)
+    // Enable high voltage on the IMC
+    if (joint.canActuate())
     {
-      // Enable high voltage on the IMC
-      if (joint.canActuate())
+      if (power_distribution_board_read_.getSlaveIndex() != -1)
       {
         int net_number = joint.getNetNumber();
         if (net_number != -1)
@@ -155,8 +155,8 @@ void MarchHardwareInterface::init()
           ROS_FATAL("Joint %s has no high voltage net number", joint.getName().c_str());
           throw std::runtime_error("Joint has no high voltage net number");
         }
-        joint.prepareActuation();
       }
+      joint.prepareActuation();
     }
   }
 }
