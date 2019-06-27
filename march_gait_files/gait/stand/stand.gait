@@ -1,5 +1,0 @@
-name: stand
-
-graph:
-  from_subgait: [start, stand]
-  to_subgait:   [stand, end  ]

@@ -1,5 +1,0 @@
-name: sit
-
-graph:
-  from_subgait: [start, sit]
-  to_subgait:   [sit,   end    ]
