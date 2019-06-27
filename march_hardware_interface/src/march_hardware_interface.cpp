@@ -84,11 +84,14 @@ void MarchHardwareInterface::init()
   registerInterface(&effort_joint_interface_);
   registerInterface(&positionJointSoftLimitsInterface);
 
-  if (power_distribution_board_read_.getSlaveIndex() != -1)
+  hasPowerDistributionBoard = marchRobot.getPowerDistributionBoard()->getSlaveIndex() != -1;
+
+  if (hasPowerDistributionBoard)
   {
-    for (int i = 1; i <= 8; i++)
+    for (int i = 1; i <= num_joints_; i++)
     {
-      power_distribution_board_read_.getHighVoltage().setNetOnOff(false, i);
+      int netNumber = marchRobot.getJoint(joint_names_[i]).getNetNumber();
+      marchRobot.getPowerDistributionBoard()->getHighVoltage().setNetOnOff(false, netNumber);
     }
   }
   else
@@ -155,12 +158,12 @@ void MarchHardwareInterface::init()
     // Enable high voltage on the IMC
     if (joint.canActuate())
     {
-      if (power_distribution_board_read_.getSlaveIndex() != -1)
+      if (hasPowerDistributionBoard)
       {
         int net_number = joint.getNetNumber();
         if (net_number != -1)
         {
-          power_distribution_board_read_.getHighVoltage().setNetOnOff(true, net_number);
+          marchRobot.getPowerDistributionBoard()->getHighVoltage().setNetOnOff(true, net_number);
         }
         else
         {
@@ -204,14 +207,14 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(), joint_position_[i]);
   }
 
-    if (power_distribution_board_read_.getSlaveIndex() != -1)
+  if (hasPowerDistributionBoard)
+  {
+
+    if (!power_distribution_board_read_.getHighVoltage().getHighVoltageEnabled())
     {
-        power_distribution_board_read_ = *marchRobot.getPowerDistributionBoard();
-        if (!power_distribution_board_read_.getHighVoltage().getHighVoltageEnabled())
-        {
-            ROS_WARN_THROTTLE(10, "All-High-Voltage disabled");
-        }
+      ROS_WARN_THROTTLE(10, "All-High-Voltage disabled");
     }
+  }
 }
 
 void MarchHardwareInterface::write(ros::Duration elapsed_time)
@@ -230,7 +233,7 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
     }
   }
 
-  if (marchRobot.getPowerDistributionBoard()->getSlaveIndex() != -1)
+  if (hasPowerDistributionBoard)
   {
     updatePowerDistributionBoard();
   }
