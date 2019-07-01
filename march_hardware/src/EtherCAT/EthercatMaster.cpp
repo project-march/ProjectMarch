@@ -112,7 +112,7 @@ void EthercatMaster::start()
                  ec_ALstatuscode2string(ec_slave[i].ALstatuscode));
       }
     }
-    throw std::runtime_error("Not all slaves reached operational state.")
+    throw std::runtime_error("Not all slaves reached operational state.");
   }
 }
 
