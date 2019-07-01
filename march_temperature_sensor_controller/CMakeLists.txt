@@ -42,7 +42,7 @@ roslint_cpp(${lintfiles})
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
 add_library(${PROJECT_NAME}
-        src/march_hardware_state_controller.cpp
+        src/march_temperature_sensor_controller.cpp
   include/march_temperature_sensor_controller/march_temperature_sensor_controller.h)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
