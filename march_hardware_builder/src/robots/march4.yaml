@@ -74,5 +74,5 @@ march4:
         allowActuation: false
         temperatureges: {slaveIndex: 11, byteOffset: 4}
         imotioncube:
-          slaveIndex:
+          slaveIndex: -1
           encoder: {resolution: 12, minPositionIU: 1, maxPositionIU: 3, zeroPositionIU: 2, safetyMarginRad: 0}
