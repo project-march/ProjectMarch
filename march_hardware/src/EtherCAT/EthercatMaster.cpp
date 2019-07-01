@@ -102,7 +102,7 @@ void EthercatMaster::start()
   else
   {
     // Not all slaves in operational state
-    ROS_FATAL("Not all slaves reached operational state. See below for more information on which slave.");
+    ROS_FATAL("Not all slaves reached operational state. Non-operational slave(s) listed below.");
     ec_readstate();
     for (int i = 1; i <= ec_slavecount; i++)
     {
