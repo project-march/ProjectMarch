@@ -32,7 +32,7 @@ march4:
         allowActuation: false
         temperatureges: {slaveIndex: 8, byteOffset: 0}
         imotioncube:
-          slaveIndex: 13
+          slaveIndex: 9
           encoder: {resolution: 17, minPositionIU: 1, maxPositionIU: 3, zeroPositionIU: 2, safetyMarginRad: 0}
 
     - right_hip_fe:
@@ -44,9 +44,9 @@ march4:
 
     - left_hip_fe:
         allowActuation: false
-        temperatureges: {slaveIndex: 9, byteOffset: 0}
+        temperatureges: {slaveIndex: 10, byteOffset: 0}
         imotioncube:
-          slaveIndex: 12
+          slaveIndex: 14
           encoder: {resolution: 17, minPositionIU: 1, maxPositionIU: 3, zeroPositionIU: 2, safetyMarginRad: 0}
 
     - right_knee:
@@ -58,9 +58,9 @@ march4:
 
     - left_knee:
         allowActuation: false
-        temperatureges: {slaveIndex: 9, byteOffset: 4}
+        temperatureges: {slaveIndex: 10, byteOffset: 4}
         imotioncube:
-          slaveIndex: 10
+          slaveIndex: 11
           encoder: {resolution: 17, minPositionIU: 1, maxPositionIU: 3, zeroPositionIU: 2, safetyMarginRad: 0}
 
     - right_ankle:
@@ -72,7 +72,7 @@ march4:
 
     - left_ankle:
         allowActuation: false
-        temperatureges: {slaveIndex: 11, byteOffset: 4}
+        temperatureges: {slaveIndex: 12, byteOffset: 4}
         imotioncube:
-          slaveIndex:
+          slaveIndex: 13
           encoder: {resolution: 12, minPositionIU: 1, maxPositionIU: 3, zeroPositionIU: 2, safetyMarginRad: 0}
