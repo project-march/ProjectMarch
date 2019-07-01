@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(march_temperature_sensor_controller)
+project(march_hardware_state_controller)
 
 add_definitions(-std=c++11 -Wall -g)
 
@@ -13,7 +13,6 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   roslint
   rostest
-  sensor_msgs
 )
 
 catkin_package(
@@ -24,7 +23,6 @@ catkin_package(
     pluginlib
     realtime_tools
     roscpp
-    sensor_msgs
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
   )
@@ -43,7 +41,7 @@ include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
 add_library(${PROJECT_NAME}
         src/march_hardware_state_controller.cpp
-  include/march_temperature_sensor_controller/march_temperature_sensor_controller.h)
+  include/march_hardware_state_controller/march_hardware_state_controller.h)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 # Install
@@ -56,7 +54,7 @@ install(TARGETS ${PROJECT_NAME}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   )
 
-install(FILES march_temperature_sensor_plugin.xml
+install(FILES march_hardware_state_plugin.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 ## Add gtest based cpp test target and link libraries
@@ -68,10 +66,10 @@ if (CATKIN_ENABLE_TESTING)
   endif()
 
   add_rostest_gtest(${PROJECT_NAME}-test
-          test/march_temperature_sensor_controller_test.test
+          test/march_hardware_state_controller_test.test
           test/TestRunner.cpp
           )
-  target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march_temperature_sensor_controller gtest gmock)
+  target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march_hardware_state_controller gtest gmock)
 
   if(ENABLE_COVERAGE_TESTING)
     set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*")
