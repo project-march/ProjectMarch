@@ -1,0 +1,22 @@
+pdb:
+  ifName: enp2s0
+  ecatCycleTime: 4
+  powerDistributionBoard:
+    slaveIndex: 1
+    bootShutdownOffsets:
+      masterOk: 0
+      shutdown: 0
+      shutdownAllowed: 1
+    netMonitorByteOffsets:
+      powerDistributionBoardCurrent: 5
+      lowVoltageNet1Current: 9
+      lowVoltageNet2Current: 13
+      highVoltageNetCurrent: 17
+      lowVoltageState: 3
+      highVoltageOvercurrentTrigger: 2
+      highVoltageEnabled: 1
+      highVoltageState: 4
+    netDriverByteOffsets:
+      lowVoltageNetOnOff: 4
+      highVoltageNetOnOff: 3
+      allHighVoltageOnOff: 2
