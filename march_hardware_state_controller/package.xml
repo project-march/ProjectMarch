@@ -18,7 +18,6 @@
   <depend>march_hardware_interface</depend>
   <depend>pluginlib</depend>
   <depend>controller_interface</depend> 
-  <depend>sensor_msgs</depend> 
 
   <export>
     <controller_interface plugin="${prefix}/march_hardware_state_plugin.xml"/>
