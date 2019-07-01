@@ -29,7 +29,10 @@ MarchHardwareInterface::MarchHardwareInterface(ros::NodeHandle& nh, AllowedRobot
   non_realtime_loop_ = nh_.createTimer(update_freq, &MarchHardwareInterface::update, this);
 }
 
-MarchHardwareInterface::~MarchHardwareInterface() = default;
+MarchHardwareInterface::~MarchHardwareInterface()
+{
+  this->marchRobot.stopEtherCAT();
+}
 
 void MarchHardwareInterface::init()
 {
