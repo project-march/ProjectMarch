@@ -12,7 +12,6 @@
 
 #include <urdf/model.h>
 
-
 using joint_limits_interface::JointLimits;
 using joint_limits_interface::SoftJointLimits;
 using joint_limits_interface::PositionJointSoftLimitsHandle;
@@ -40,17 +39,17 @@ void MarchHardwareInterface::init()
   urdf::Model model;
   if (!model.initParam("/robot_description"))
   {
-      ROS_ERROR("Failed to read the urdf from the parameter server.");
-      throw std::runtime_error("Failed to read the urdf from the parameter server.");
+    ROS_ERROR("Failed to read the urdf from the parameter server.");
+    throw std::runtime_error("Failed to read the urdf from the parameter server.");
   }
 
   // Get joint names from urdf
   for (auto const& urdfJoint : model.joints_)
   {
-      if (urdfJoint.second->type != urdf::Joint::FIXED)
-      {
-          joint_names_.push_back(urdfJoint.first);
-      }
+    if (urdfJoint.second->type != urdf::Joint::FIXED)
+    {
+      joint_names_.push_back(urdfJoint.first);
+    }
   }
   num_joints_ = joint_names_.size();
 
@@ -90,6 +89,12 @@ void MarchHardwareInterface::init()
     for (int i = 0; i < num_joints_; i++)
     {
       int netNumber = marchRobot.getJoint(joint_names_[i]).getNetNumber();
+      if (netNumber == -1)
+      {
+        std::ostringstream errorStream;
+        errorStream << "Joint " << joint_names_[i].c_str() << " has no net number";
+        throw std::runtime_error(errorStream.str());
+      }
       marchRobot.getPowerDistributionBoard()->getHighVoltage().setNetOnOff(false, netNumber);
     }
   }
@@ -153,7 +158,6 @@ void MarchHardwareInterface::init()
     MarchTemperatureSensorHandle marchTemperatureSensorHandle(joint_names_[i], &joint_temperature_[i],
                                                               &joint_temperature_variance_[i]);
     march_temperature_interface.registerHandle(marchTemperatureSensorHandle);
-
 
     // Enable high voltage on the IMC
     if (joint.canActuate())
