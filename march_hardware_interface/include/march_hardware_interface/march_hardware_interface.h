@@ -56,7 +56,7 @@ protected:
   PositionJointInterface positionJointInterface;
   PositionJointSoftLimitsInterface positionJointSoftLimitsInterface;
   double loop_hz_;
-  bool hasPowerDistributionBoard;
+  bool hasPowerDistributionBoard = false;
   boost::shared_ptr<controller_manager::ControllerManager> controller_manager_;
   double p_error_, v_error_, e_error_;
 
