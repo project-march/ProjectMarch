@@ -33,7 +33,7 @@ MarchHardwareInterface::~MarchHardwareInterface() = default;
 
 void MarchHardwareInterface::init()
 {
-  // initialize realtime publisher
+//   initialize realtime publisher
   RtPublisherPtr rt_pub(new realtime_tools::RealtimePublisher<march_shared_resources::ImcErrorState>(
             this->nh_, "/march/imc/", 4));
   realtime_pubs_ = rt_pub;
@@ -218,10 +218,12 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
 
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(), joint_position_[i]);
 
+    realtime_pubs_->msg_.joint_names.clear();
+    realtime_pubs_->msg_.state.clear();
     std::vector<uint16> IMotionCubeErrorStates = marchRobot.getJoint(joint_names_[i]).getIMotionCubeErrorState();
     std::string IMotionCubeState = this->getIMotionCubeState(IMotionCubeErrorStates[0]);
-    realtime_pubs_->msg_.joint_names[i] = joint_names_[i];
-    realtime_pubs_->msg_.state[i] = IMotionCubeState;
+    realtime_pubs_->msg_.joint_names.push_back(joint_names_[i]);
+    realtime_pubs_->msg_.state.push_back(IMotionCubeState);
 
   }
   if (realtime_pubs_->trylock())
@@ -381,6 +383,7 @@ std::string MarchHardwareInterface::getIMotionCubeState(uint16 statusWord)
     {
         return "Fault";
     }
+    else return "not in a recognized state";
 }
 
 }  // namespace march_hardware_interface
