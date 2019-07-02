@@ -52,9 +52,10 @@ public:
   void actuateRad(float targetRad);
   void actuateRadFixedSpeed(float targetRad, float radPerSec);
 
-  void parseStatusWord(uint16 statusWord);
-  void parseMotionError(uint16 motionError);
-  void parseDetailedError(uint16 detailedError);
+  std::string parseStatusWord(uint16 statusWord);
+  std::string getState(uint16 statusWord);
+  std::string parseMotionError(uint16 motionError);
+  std::string parseDetailedError(uint16 detailedError);
 
   bool goToOperationEnabled();
 

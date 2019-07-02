@@ -35,7 +35,7 @@ public:
 
   float getAngleRad();
   float getTemperature();
-  std::vector<uint16> getIMotionCubeErrorState();
+  std::vector<std::string> getIMotionCubeState();
 
   std::string getName();
   int getTemperatureGESSlaveIndex();

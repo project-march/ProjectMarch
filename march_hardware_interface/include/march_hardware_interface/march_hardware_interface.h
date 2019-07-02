@@ -68,10 +68,7 @@ private:
   void updatePowerNet();
   void updateHighVoltageEnable();
   void updatePowerDistributionBoard();
-
-  std::string getIMotionCubeState(uint16 statusWord);
-  std::string parseMotionError(uint16 motionError);
-  bool get_bit(uint16 value, int index);
+  void updateIMotionCubeState(int jointIndex);
 };
 }
 

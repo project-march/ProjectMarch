@@ -34,16 +34,13 @@ MarchHardwareInterface::~MarchHardwareInterface() = default;
 
 void MarchHardwareInterface::init()
 {
-//   initialize realtime publisher
+  // Initialize realtime publisher for the IMotionCube states
   RtPublisherPtr rt_pub(new realtime_tools::RealtimePublisher<march_shared_resources::ImcErrorState>(
-            this->nh_, "/march/imc/", 4));
+            this->nh_, "/march/imc_states/", 4));
   realtime_pubs_ = rt_pub;
-  ROS_INFO("initializing the realtime publisher");
 
   // Start ethercat cycle in the hardware
   this->marchRobot.startEtherCAT();
-
-  ROS_INFO("etherCAT has been started");
 
   urdf::Model model;
   if (!model.initParam("/robot_description"))
@@ -199,6 +196,15 @@ void MarchHardwareInterface::update(const ros::TimerEvent& e)
 
 void MarchHardwareInterface::read(ros::Duration elapsed_time)
 {
+  // Clear msg of IMotionCubeStates
+  realtime_pubs_->msg_.joint_names.clear();
+  realtime_pubs_->msg_.status_word.clear();
+  realtime_pubs_->msg_.detailed_error.clear();
+  realtime_pubs_->msg_.motion_error.clear();
+  realtime_pubs_->msg_.state.clear();
+  realtime_pubs_->msg_.detailed_error_description.clear();
+  realtime_pubs_->msg_.motion_error_description.clear();
+
   for (int i = 0; i < num_joints_; i++)
   {
     float oldPosition = joint_position_[i];
@@ -219,29 +225,10 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
 
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(), joint_position_[i]);
 
-    realtime_pubs_->msg_.joint_names.clear();
-    realtime_pubs_->msg_.state.clear();
-    realtime_pubs_->msg_.status_word.clear();
-    realtime_pubs_->msg_.detailed_error.clear();
-    realtime_pubs_->msg_.motion_error.clear();
-    realtime_pubs_->msg_.motion_error_description.clear();
-
-    std::vector<uint16> IMotionCubeErrorStates = marchRobot.getJoint(joint_names_[i]).getIMotionCubeErrorState();
-    std::string IMotionCubeState = this->getIMotionCubeState(IMotionCubeErrorStates[0]);
-    std::string motionErrorDescription = this->parseMotionError(IMotionCubeErrorStates[2]);
-
-    std::bitset<16> statusWord = IMotionCubeErrorStates[0];
-    std::bitset<16> detailedError = IMotionCubeErrorStates[1];
-    std::bitset<16> motionError = IMotionCubeErrorStates[2];
-
-    realtime_pubs_->msg_.joint_names.push_back(joint_names_[i]);
-    realtime_pubs_->msg_.state.push_back(IMotionCubeState);
-    realtime_pubs_->msg_.status_word.push_back(statusWord.to_string());
-    realtime_pubs_->msg_.detailed_error.push_back(detailedError.to_string());
-    realtime_pubs_->msg_.motion_error.push_back(motionError.to_string());
-    realtime_pubs_->msg_.motion_error_description.push_back(motionErrorDescription);
-
+    this->updateIMotionCubeState(i);
   }
+
+  // Publish IMotionCubeStates if possible
   if (realtime_pubs_->trylock())
   {
     realtime_pubs_->unlockAndPublish();
@@ -350,123 +337,17 @@ void MarchHardwareInterface::updatePowerNet()
   }
 }
 
-std::string MarchHardwareInterface::getIMotionCubeState(uint16 statusWord)
+void MarchHardwareInterface::updateIMotionCubeState(int jointIndex)
 {
-    uint16 fiveBitMask = 0b0000000001001111;
-    uint16 sixBitMask = 0b0000000001101111;
+    std::vector<std::string> IMotionCubeState = marchRobot.getJoint(joint_names_[jointIndex]).getIMotionCubeState();
 
-    uint16 notReadyToSwitchOn = 0b0000000000000000;
-    uint16 switchOnDisabled = 0b0000000001000000;
-    uint16 readyToSwitchOn = 0b0000000000100001;
-    uint16 switchedOn = 0b0000000000100011;
-    uint16 operationEnabled = 0b0000000000100111;
-    uint16 quickStopActive = 0b0000000000000111;
-    uint16 faultReactionActive = 0b0000000000001111;
-    uint16 fault = 0b0000000000001000;
-
-    uint16 statusWordFiveBitMasked = (statusWord & fiveBitMask);
-    uint16 statusWordSixBitMasked = (statusWord & sixBitMask);
-
-    if (statusWordFiveBitMasked == notReadyToSwitchOn)
-    {
-        return "Not Ready To Switch On";
-    }
-    else if (statusWordFiveBitMasked == switchOnDisabled)
-    {
-        return "Switch On Disabled";
-    }
-    else if (statusWordSixBitMasked == readyToSwitchOn)
-    {
-        return "Ready to Switch On";
-    }
-    else if (statusWordSixBitMasked == switchedOn)
-    {
-        return "Switched On";
-    }
-    else if (statusWordSixBitMasked == operationEnabled)
-    {
-        return "Operation Enabled";
-    }
-    else if (statusWordSixBitMasked == quickStopActive)
-    {
-        return "Quick Stop Active";
-    }
-    else if (statusWordFiveBitMasked == faultReactionActive)
-    {
-        return "Fault Reaction Active";
-    }
-    else if (statusWordFiveBitMasked == fault)
-    {
-        return "Fault";
-    }
-    else return "Not in a recognized IMC state";
-}
-
-std::string MarchHardwareInterface::parseMotionError(uint16 motionError)
-{
-  std::string errorDescription = "";
-  std::vector<std::string> bitDescriptions = {};
-  bitDescriptions.push_back("\tEtherCAT communication error. Reset by a Reset "
-                            "Fault command or by Clear Error in the "
-                            "EtherCAT State Machine.");
-  bitDescriptions.push_back("\tShort-circuit. Set when protection is "
-                            "triggered. .");
-  bitDescriptions.push_back("\tInvalid setup data. Set when the EEPROM stored "
-                            "setup data is not valid or not present.");
-  bitDescriptions.push_back("\tControl error (position/speed error too big). "
-                            "Set when protection is triggered. Reset "
-                            "by a Reset Fault command.");
-  bitDescriptions.push_back("\tCommunication error. Set when protection is "
-                            "triggered. .");
-  bitDescriptions.push_back("\tMotor position wraps around. Set when "
-                            "protection is triggered. Reset by a Reset Fault "
-                            "command.");
-  bitDescriptions.push_back("\tPositive limit switch active. Set when LSP "
-                            "input is in active state. Reset when LSP "
-                            "input is inactive state");
-  bitDescriptions.push_back("\tNegative limit switch active. Set when LSN "
-                            "input is in active state. Reset when LSN "
-                            "input is inactive state");
-  bitDescriptions.push_back("\tOver current. Set when protection is triggered. "
-                            "");
-  bitDescriptions.push_back("\tI2T protection. Set when protection is "
-                            "triggered. ");
-  bitDescriptions.push_back("\tOver temperature motor. Set when protection is "
-                            "triggered. Reset by a Reset Fault "
-                            "command. This protection may be activated if the "
-                            "motor has a PTC or NTC temperature "
-                            "contact.");
-  bitDescriptions.push_back("\tOver temperature drive. Set when protection is "
-                            "triggered. Reset by a Reset Fault "
-                            "command.");
-  bitDescriptions.push_back("\tOver-voltage. Set when protection is triggered. "
-                            "");
-  bitDescriptions.push_back("\tUnder-voltage. Set when protection is triggered.");
-  bitDescriptions.push_back("\tCommand error. This bit is set in several situations. They can be "
-                            "distinguished either by the associated "
-                            "emergency code, or in conjunction with other bits:\n"
-                            "\t\t0xFF03 - Specified homing method not available\n"
-                            "\t\t0xFF04 - A wrong mode is set in object 6060h, modes_of_operation\n"
-                            "\t\t0xFF05 - Specified digital I/O line not available\n"
-                            "\tA function is called during the execution of another function (+ set "
-                            "bit 7 of object 6041h, statusword).\n"
-                            "\tUpdate of operation mode received during a transition. This bit acts "
-                            "just as a warning.");
-  bitDescriptions.push_back("Drive disabled: emergency button connector not shorted");
-
-  for (int i = 0; i < 16; i++)
-  {
-    if (get_bit(motionError, i) == 1)
-    {
-      errorDescription = errorDescription + bitDescriptions.at(i);
-    }
-  }
-  return errorDescription;
-}
-
-bool MarchHardwareInterface::get_bit(uint16 value, int index)
-{
-  return static_cast<bool>(value & (1 << index));
+    realtime_pubs_->msg_.joint_names.push_back(joint_names_[jointIndex]);
+    realtime_pubs_->msg_.status_word.push_back(IMotionCubeState[0]);
+    realtime_pubs_->msg_.detailed_error.push_back(IMotionCubeState[1]);
+    realtime_pubs_->msg_.motion_error.push_back(IMotionCubeState[2]);
+    realtime_pubs_->msg_.state.push_back(IMotionCubeState[3]);
+    realtime_pubs_->msg_.detailed_error_description.push_back(IMotionCubeState[4]);
+    realtime_pubs_->msg_.motion_error_description.push_back(IMotionCubeState[5]);
 }
 
 }  // namespace march_hardware_interface

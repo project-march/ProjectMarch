@@ -1,6 +1,8 @@
 // Copyright 2019 Project March.
 #include <ros/ros.h>
 
+#include <bitset>
+
 #include <march_hardware/Joint.h>
 
 namespace march4cpp
@@ -94,13 +96,25 @@ float Joint::getTemperature()
   return this->temperatureGES.getTemperature();
 }
 
-std::vector<uint16> Joint::getIMotionCubeErrorState()
+std::vector<std::string> Joint::getIMotionCubeState()
 {
-    std::vector<uint16> errors;
-    errors.push_back(this->iMotionCube.getStatusWord());
-    errors.push_back(this->iMotionCube.getDetailedError());
-    errors.push_back(this->iMotionCube.getMotionError());
-    return errors;
+    // Return a vector of strings:
+    // First the literal bits of the Status Word, Detailed Error and Motion Error
+    // Then the parsed interpretation of these bits
+    std::vector<std::string> return_strings;
+
+    std::bitset<16> statusWordBits = this->iMotionCube.getStatusWord();
+    return_strings.push_back(statusWordBits.to_string());
+    std::bitset<16> detailedErrorBits = this->iMotionCube.getDetailedError();
+    return_strings.push_back(detailedErrorBits.to_string());
+    std::bitset<16> motionErrorBits = this->iMotionCube.getMotionError();
+    return_strings.push_back(motionErrorBits.to_string());
+
+    return_strings.push_back(this->iMotionCube.getState(this->iMotionCube.getStatusWord()));
+    return_strings.push_back(this->iMotionCube.parseDetailedError(this->iMotionCube.getDetailedError()));
+    return_strings.push_back(this->iMotionCube.parseMotionError(this->iMotionCube.getMotionError()));
+
+    return return_strings;
 }
 
 int Joint::getTemperatureGESSlaveIndex()
