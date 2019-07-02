@@ -134,7 +134,7 @@ void MarchHardwareInterface::init()
     joint_effort_[i] = 0;
     joint_position_command_[i] = joint_position_[i];
 
-    isOutSideLimits(i);
+    this->outsideLimitsCheck(i);
 
     // Create velocity joint interface
     JointHandle jointVelocityHandle(jointStateHandle, &joint_velocity_command_[i]);
@@ -182,7 +182,7 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
 {
   for (int i = 0; i < num_joints_; i++)
   {
-    isOutSideLimits(i);
+    this->outsideLimitsCheck(i);
 
     float oldPosition = joint_position_[i];
 
@@ -306,13 +306,13 @@ void MarchHardwareInterface::updatePowerNet()
   }
 }
 
-bool MarchHardwareInterface::isOutSideLimits(int joint_index)
+void MarchHardwareInterface::outsideLimitsCheck(int joint_index)
 {
   march4cpp::Joint joint = marchRobot.getJoint(joint_names_[joint_index]);
   if (joint_position_[joint_index] < soft_limits_.min_position ||
       joint_position_[joint_index] > soft_limits_.max_position)
   {
-    ROS_FATAL("Joint %s is outside of its soft_limits_ (%f, %f). Actual position: %f",
+    ROS_ERROR("Joint %s is outside of its soft_limits_ (%f, %f). Actual position: %f",
               joint_names_[joint_index].c_str(), soft_limits_.min_position, soft_limits_.max_position,
               joint_position_[joint_index]);
 

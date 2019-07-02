@@ -65,7 +65,7 @@ private:
   void updatePowerNet();
   void updateHighVoltageEnable();
   void updatePowerDistributionBoard();
-  bool isOutSideLimits(int joint_index);
+  void outsideLimitsCheck(int joint_index);
 };
 }
 
