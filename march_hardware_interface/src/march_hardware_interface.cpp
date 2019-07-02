@@ -265,7 +265,6 @@ void MarchHardwareInterface::resetIMotionCubesUntilTheyWork()
         encoderSetCorrectly = false;
       }
     }
-    ROS_INFO("Restarting EtherCAT");
     for (int i = 0; i < num_joints_; ++i)
     {
       march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
@@ -273,6 +272,7 @@ void MarchHardwareInterface::resetIMotionCubesUntilTheyWork()
     }
     if (!encoderSetCorrectly)
     {
+      ROS_INFO("Restarting EtherCAT");
       marchRobot.stopEtherCAT();
       marchRobot.startEtherCAT();
     }
