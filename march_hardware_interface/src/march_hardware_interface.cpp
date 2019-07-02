@@ -179,6 +179,8 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
 {
   for (int i = 0; i < num_joints_; i++)
   {
+    isOutSideLimits(i);
+
     float oldPosition = joint_position_[i];
 
     joint_position_[i] = marchRobot.getJoint(joint_names_[i]).getAngleRad();
