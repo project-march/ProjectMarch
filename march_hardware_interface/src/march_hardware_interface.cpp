@@ -4,6 +4,7 @@
 #include <joint_limits_interface/joint_limits_interface.h>
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <sstream>
+#include <bitset>
 
 #include <march_hardware/MarchRobot.h>
 
@@ -221,13 +222,21 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
     realtime_pubs_->msg_.joint_names.clear();
     realtime_pubs_->msg_.state.clear();
     realtime_pubs_->msg_.status_word.clear();
+    realtime_pubs_->msg_.detailed_error.clear();
+    realtime_pubs_->msg_.motion_error.clear();
 
     std::vector<uint16> IMotionCubeErrorStates = marchRobot.getJoint(joint_names_[i]).getIMotionCubeErrorState();
     std::string IMotionCubeState = this->getIMotionCubeState(IMotionCubeErrorStates[0]);
 
+    std::bitset<16> statusWord = IMotionCubeErrorStates[0];
+    std::bitset<16> detailedError = IMotionCubeErrorStates[1];
+    std::bitset<16> motionError = IMotionCubeErrorStates[2];
+
     realtime_pubs_->msg_.joint_names.push_back(joint_names_[i]);
     realtime_pubs_->msg_.state.push_back(IMotionCubeState);
-    realtime_pubs_->msg_.status_word.push_back(IMotionCubeErrorStates[0]);
+    realtime_pubs_->msg_.status_word.push_back(statusWord.to_string());
+    realtime_pubs_->msg_.detailed_error.push_back(detailedError.to_string());
+    realtime_pubs_->msg_.motion_error.push_back(motionError.to_string());
 
   }
   if (realtime_pubs_->trylock())
