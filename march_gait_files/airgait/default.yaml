@@ -1,5 +1,10 @@
 gaits:
   home: {home_sit: home_sit, home_stand: home_stand}
+  single_step: {right_open: MIII, left_close: MIII}
+  sit: {sit_down: MIII, sit_home: MIII}
+  stand: {prepare_stand_up: MIII, stand_up: MIII}
+  walk: {right_open: MIII, left_swing: MIII, right_swing: MIII, left_close: MIII, right_close: MIII}
+
 
   #SINGLE STEP
 
@@ -32,10 +37,6 @@ gaits:
 #  single_step: {right_open: MIV_more_hip_extension, left_close: MIV_more_hip_extension_more_hip_flexion}
 #  single_step: {right_open: MIV_more_hip_extension_2sec, left_close: MIV_more_hip_extension_more_hip_flexion_2sec}
 #  single_step: {right_open: MIV_more_hip_extension_2,5sec, left_close: MIV_more_hip_extension_more_hip_flexion_2,5sec}
-
-
-  sit: {sit_down: MIII, sit_home: MIII}
-  stand: {prepare_stand_up: MIII, stand_up: MIII}
 
   #WALK
 
