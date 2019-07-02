@@ -2,7 +2,6 @@
 
 #include <joint_limits_interface/joint_limits.h>
 #include <joint_limits_interface/joint_limits_interface.h>
-#include <joint_limits_interface/joint_limits_rosparam.h>
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <sstream>
 
@@ -10,6 +9,8 @@
 
 #include <march_hardware_interface/PowerNetOnOffCommand.h>
 #include <march_hardware_interface/march_hardware_interface.h>
+
+#include <urdf/model.h>
 
 using joint_limits_interface::JointLimits;
 using joint_limits_interface::SoftJointLimits;
@@ -28,21 +29,31 @@ MarchHardwareInterface::MarchHardwareInterface(ros::NodeHandle& nh, AllowedRobot
   non_realtime_loop_ = nh_.createTimer(update_freq, &MarchHardwareInterface::update, this);
 }
 
-MarchHardwareInterface::~MarchHardwareInterface() = default;
+MarchHardwareInterface::~MarchHardwareInterface()
+{
+  this->marchRobot.stopEtherCAT();
+}
 
 void MarchHardwareInterface::init()
 {
   // Start ethercat cycle in the hardware
   this->marchRobot.startEtherCAT();
 
-  if (!this->marchRobot.isEthercatOperational())
+  urdf::Model model;
+  if (!model.initParam("/robot_description"))
   {
-    ROS_FATAL("EtherCAT is not operational");
-    exit(0);
+    ROS_ERROR("Failed to read the urdf from the parameter server.");
+    throw std::runtime_error("Failed to read the urdf from the parameter server.");
   }
 
-  // Get joint names
-  nh_.getParam("/march/hardware_interface/joints", joint_names_);
+  // Get joint names from urdf
+  for (auto const& urdfJoint : model.joints_)
+  {
+    if (urdfJoint.second->type != urdf::Joint::FIXED)
+    {
+      joint_names_.push_back(urdfJoint.first);
+    }
+  }
   num_joints_ = joint_names_.size();
 
   // Resize vectors
@@ -75,11 +86,19 @@ void MarchHardwareInterface::init()
   registerInterface(&effort_joint_interface_);
   registerInterface(&positionJointSoftLimitsInterface);
 
-  if (power_distribution_board_read_.getSlaveIndex() != -1)
+  hasPowerDistributionBoard = marchRobot.getPowerDistributionBoard()->getSlaveIndex() != -1;
+  if (hasPowerDistributionBoard)
   {
-    for (int i = 1; i <= 8; i++)
+    for (int i = 0; i < num_joints_; i++)
     {
-      power_distribution_board_read_.getHighVoltage().setNetOnOff(false, i);
+      int netNumber = marchRobot.getJoint(joint_names_[i]).getNetNumber();
+      if (netNumber == -1)
+      {
+        std::ostringstream errorStream;
+        errorStream << "Joint " << joint_names_[i].c_str() << " has no net number";
+        throw std::runtime_error(errorStream.str());
+      }
+      marchRobot.getPowerDistributionBoard()->getHighVoltage().setNetOnOff(false, netNumber);
     }
   }
   else
@@ -98,11 +117,11 @@ void MarchHardwareInterface::init()
     // Create position joint interface
     JointHandle jointPositionHandle(jointStateHandle, &joint_position_command_[i]);
 
-    // Retrieve joint (soft) limits from the parameter server
+    // Retrieve joint (soft) limits from the urdf
     JointLimits limits;
-    getJointLimits(joint.getName(), nh_, limits);
+    getJointLimits(model.getJoint(joint.getName()), limits);
     SoftJointLimits softLimits;
-    getSoftJointLimits(joint.getName(), nh_, softLimits);
+    getSoftJointLimits(model.getJoint(joint.getName()), softLimits);
 
     // Create joint limit interface
     PositionJointSoftLimitsHandle jointLimitsHandle(jointPositionHandle, limits, softLimits);
@@ -121,10 +140,13 @@ void MarchHardwareInterface::init()
       ROS_FATAL("Joint %s is outside of its softLimits (%f, %f). Actual position: %f", joint_names_[i].c_str(),
                 softLimits.min_position, softLimits.max_position, joint_position_[i]);
 
-      std::ostringstream errorStream;
-      errorStream << "Joint " << joint_names_[i].c_str() << " is out of its softLimits (" << softLimits.min_position
-                  << ", " << softLimits.max_position << "). Actual position: " << joint_position_[i];
-      throw ::std::invalid_argument(errorStream.str());
+      if (joint.canActuate())
+      {
+        std::ostringstream errorStream;
+        errorStream << "Joint " << joint_names_[i].c_str() << " is out of its softLimits (" << softLimits.min_position
+                    << ", " << softLimits.max_position << "). Actual position: " << joint_position_[i];
+        throw ::std::invalid_argument(errorStream.str());
+      }
     }
 
     // Create velocity joint interface
@@ -140,23 +162,23 @@ void MarchHardwareInterface::init()
                                                               &joint_temperature_variance_[i]);
     march_temperature_interface.registerHandle(marchTemperatureSensorHandle);
 
-    if (power_distribution_board_read_.getSlaveIndex() != -1)
+    // Enable high voltage on the IMC
+    if (joint.canActuate())
     {
-      // Enable high voltage on the IMC
-      if (joint.canActuate() || true)
+      if (hasPowerDistributionBoard)
       {
         int net_number = joint.getNetNumber();
         if (net_number != -1)
         {
-          power_distribution_board_read_.getHighVoltage().setNetOnOff(true, net_number);
+          marchRobot.getPowerDistributionBoard()->getHighVoltage().setNetOnOff(true, net_number);
         }
         else
         {
           ROS_FATAL("Joint %s has no high voltage net number", joint.getName().c_str());
           throw std::runtime_error("Joint has no high voltage net number");
         }
-        joint.prepareActuation();
       }
+      joint.prepareActuation();
     }
   }
 }
@@ -191,11 +213,15 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
 
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(), joint_position_[i]);
   }
-  power_distribution_board_read_ = *marchRobot.getPowerDistributionBoard();
 
-  if (!power_distribution_board_read_.getHighVoltage().getHighVoltageEnabled())
+  if (hasPowerDistributionBoard)
   {
-    ROS_WARN_THROTTLE(10, "All-High-Voltage disabled");
+    power_distribution_board_read_ = *marchRobot.getPowerDistributionBoard();
+
+    if (!power_distribution_board_read_.getHighVoltage().getHighVoltageEnabled())
+    {
+      ROS_WARN_THROTTLE(10, "All-High-Voltage disabled");
+    }
   }
 }
 
@@ -215,7 +241,7 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
     }
   }
 
-  if (marchRobot.getPowerDistributionBoard()->getSlaveIndex() != -1)
+  if (hasPowerDistributionBoard)
   {
     updatePowerDistributionBoard();
   }
