@@ -312,7 +312,7 @@ void MarchHardwareInterface::outsideLimitsCheck(int joint_index)
   if (joint_position_[joint_index] < soft_limits_.min_position ||
       joint_position_[joint_index] > soft_limits_.max_position)
   {
-    ROS_ERROR("Joint %s is outside of its soft_limits_ (%f, %f). Actual position: %f",
+    ROS_ERROR_THROTTLE(1, "Joint %s is outside of its soft_limits_ (%f, %f). Actual position: %f",
               joint_names_[joint_index].c_str(), soft_limits_.min_position, soft_limits_.max_position,
               joint_position_[joint_index]);
 
