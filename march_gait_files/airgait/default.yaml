@@ -8,12 +8,10 @@ gaits:
 #  single_step: {right_open: MIII_2sec, left_close: MIII_2sec}
 #  single_step: {right_open: MIII_2,5sec, left_close: MIII_2,5sec}
 
-
   #MIII more hip flexion
 #  single_step: {right_open: MIII, left_close: MIII_more_hip_flexion}
 #  single_step: {right_open: MIII_2sec, left_close: MIII_more_hip_flexion_2sec}
 #  single_step: {right_open: MIII_2,5sec, left_close: MIII_more_hip_flexion_2,5sec}
-
 
   #MIV
 #  single_step: {right_open: MIV, left_close: MIV}
