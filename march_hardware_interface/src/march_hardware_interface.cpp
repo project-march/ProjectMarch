@@ -67,6 +67,14 @@ void MarchHardwareInterface::init()
   joint_effort_command_.resize(num_joints_);
   soft_limits_.resize(num_joints_);
 
+  for (int i = 0; i < num_joints_; ++i)
+  {
+    SoftJointLimits soft_limits;
+    getSoftJointLimits(model.getJoint(joint_names_[i]), soft_limits);
+    ROS_INFO("soft_limits_ (%f, %f).", soft_limits.min_position, soft_limits.max_position);
+    soft_limits_[i] = soft_limits;
+  }
+
   // Print all joint positions on startup in case initialization fails.
   this->read();
   for (int i = 0; i < num_joints_; ++i)
@@ -121,12 +129,9 @@ void MarchHardwareInterface::init()
     // Retrieve joint (soft) limits from the urdf
     JointLimits limits;
     getJointLimits(model.getJoint(joint.getName()), limits);
-    SoftJointLimits soft_limits;
-    getSoftJointLimits(model.getJoint(joint.getName()), soft_limits);
-    soft_limits_[i] = soft_limits;
 
     // Create joint limit interface
-    PositionJointSoftLimitsHandle jointLimitsHandle(jointPositionHandle, limits, soft_limits);
+    PositionJointSoftLimitsHandle jointLimitsHandle(jointPositionHandle, limits, soft_limits_[i]);
     positionJointSoftLimitsInterface.registerHandle(jointLimitsHandle);
 
     position_joint_interface_.registerHandle(jointPositionHandle);
@@ -316,8 +321,8 @@ void MarchHardwareInterface::outsideLimitsCheck(int joint_index)
       joint_position_[joint_index] > soft_limits_[joint_index].max_position)
   {
     ROS_ERROR_THROTTLE(1, "Joint %s is outside of its soft_limits_ (%f, %f). Actual position: %f",
-              joint_names_[joint_index].c_str(), soft_limits_[joint_index].min_position, soft_limits_[joint_index].max_position,
-              joint_position_[joint_index]);
+                       joint_names_[joint_index].c_str(), soft_limits_[joint_index].min_position,
+                       soft_limits_[joint_index].max_position, joint_position_[joint_index]);
 
     if (joint.canActuate())
     {
