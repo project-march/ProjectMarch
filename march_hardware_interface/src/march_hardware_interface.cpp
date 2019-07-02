@@ -65,6 +65,7 @@ void MarchHardwareInterface::init()
   joint_position_command_.resize(num_joints_);
   joint_velocity_command_.resize(num_joints_);
   joint_effort_command_.resize(num_joints_);
+  soft_limits_.resize(num_joints_);
 
   // Print all joint positions on startup in case initialization fails.
   this->read();
@@ -120,10 +121,12 @@ void MarchHardwareInterface::init()
     // Retrieve joint (soft) limits from the urdf
     JointLimits limits;
     getJointLimits(model.getJoint(joint.getName()), limits);
-    getSoftJointLimits(model.getJoint(joint.getName()), soft_limits_);
+    SoftJointLimits soft_limits;
+    getSoftJointLimits(model.getJoint(joint.getName()), soft_limits);
+    soft_limits_[i] = soft_limits;
 
     // Create joint limit interface
-    PositionJointSoftLimitsHandle jointLimitsHandle(jointPositionHandle, limits, soft_limits_);
+    PositionJointSoftLimitsHandle jointLimitsHandle(jointPositionHandle, limits, soft_limits);
     positionJointSoftLimitsInterface.registerHandle(jointLimitsHandle);
 
     position_joint_interface_.registerHandle(jointPositionHandle);
@@ -309,18 +312,18 @@ void MarchHardwareInterface::updatePowerNet()
 void MarchHardwareInterface::outsideLimitsCheck(int joint_index)
 {
   march4cpp::Joint joint = marchRobot.getJoint(joint_names_[joint_index]);
-  if (joint_position_[joint_index] < soft_limits_.min_position ||
-      joint_position_[joint_index] > soft_limits_.max_position)
+  if (joint_position_[joint_index] < soft_limits_[joint_index].min_position ||
+      joint_position_[joint_index] > soft_limits_[joint_index].max_position)
   {
     ROS_ERROR_THROTTLE(1, "Joint %s is outside of its soft_limits_ (%f, %f). Actual position: %f",
-              joint_names_[joint_index].c_str(), soft_limits_.min_position, soft_limits_.max_position,
+              joint_names_[joint_index].c_str(), soft_limits_[joint_index].min_position, soft_limits_[joint_index].max_position,
               joint_position_[joint_index]);
 
     if (joint.canActuate())
     {
       std::ostringstream errorStream;
       errorStream << "Joint " << joint_names_[joint_index].c_str() << " is out of its soft_limits_ ("
-                  << soft_limits_.min_position << ", " << soft_limits_.max_position
+                  << soft_limits_[joint_index].min_position << ", " << soft_limits_[joint_index].max_position
                   << "). Actual position: " << joint_position_[joint_index];
       throw ::std::invalid_argument(errorStream.str());
     }
