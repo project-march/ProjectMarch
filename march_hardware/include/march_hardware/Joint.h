@@ -3,6 +3,7 @@
 #define MARCH4CPP__JOINT_H
 
 #include <string>
+#include <vector>
 
 #include <march_hardware/IMotionCube.h>
 #include <march_hardware/PowerDistributionBoard.h>
@@ -34,6 +35,7 @@ public:
 
   float getAngleRad();
   float getTemperature();
+  std::vector<uint16> getIMotionCubeErrorState();
 
   std::string getName();
   int getTemperatureGESSlaveIndex();

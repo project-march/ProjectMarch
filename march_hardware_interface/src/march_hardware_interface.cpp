@@ -33,8 +33,16 @@ MarchHardwareInterface::~MarchHardwareInterface() = default;
 
 void MarchHardwareInterface::init()
 {
+  // initialize realtime publisher
+  RtPublisherPtr rt_pub(new realtime_tools::RealtimePublisher<march_shared_resources::ImcErrorState>(
+            this->nh_, "/march/imc/", 4));
+  realtime_pubs_ = rt_pub;
+  ROS_INFO("initializing the realtime publisher");
+
   // Start ethercat cycle in the hardware
   this->marchRobot.startEtherCAT();
+
+  ROS_INFO("etherCAT has been started");
 
   urdf::Model model;
   if (!model.initParam("/robot_description"))
@@ -209,6 +217,16 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
     joint_velocity_[i] = filters::exponentialSmoothing(joint_velocity, joint_velocity_[i], 0.2);
 
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(), joint_position_[i]);
+
+    std::vector<uint16> IMotionCubeErrorStates = marchRobot.getJoint(joint_names_[i]).getIMotionCubeErrorState();
+    std::string IMotionCubeState = this->getIMotionCubeState(IMotionCubeErrorStates[0]);
+    realtime_pubs_->msg_.joint_names[i] = joint_names_[i];
+    realtime_pubs_->msg_.state[i] = IMotionCubeState;
+
+  }
+  if (realtime_pubs_->trylock())
+  {
+    realtime_pubs_->unlockAndPublish();
   }
 
   if (hasPowerDistributionBoard)
@@ -313,4 +331,56 @@ void MarchHardwareInterface::updatePowerNet()
     }
   }
 }
+
+std::string MarchHardwareInterface::getIMotionCubeState(uint16 statusWord)
+{
+    uint16 fiveBitMask = 0b0000000001001111;
+    uint16 sixBitMask = 0b0000000001101111;
+
+    uint16 notReadyToSwitchOn = 0b0000000000000000;
+    uint16 switchOnDisabled = 0b0000000001000000;
+    uint16 readyToSwitchOn = 0b0000000000100001;
+    uint16 switchedOn = 0b0000000000100011;
+    uint16 operationEnabled = 0b0000000000100111;
+    uint16 quickStopActive = 0b0000000000000111;
+    uint16 faultReactionActive = 0b0000000000001111;
+    uint16 fault = 0b0000000000001000;
+
+    uint16 statusWordFiveBitMasked = (statusWord & fiveBitMask);
+    uint16 statusWordSixBitMasked = (statusWord & sixBitMask);
+
+    if (statusWordFiveBitMasked == notReadyToSwitchOn)
+    {
+        return "Not Ready To Switch On";
+    }
+    else if (statusWordFiveBitMasked == switchOnDisabled)
+    {
+        return "Switch On Disabled";
+    }
+    else if (statusWordSixBitMasked == readyToSwitchOn)
+    {
+        return "Ready to Switch On";
+    }
+    else if (statusWordSixBitMasked == switchedOn)
+    {
+        return "Switched On";
+    }
+    else if (statusWordSixBitMasked == operationEnabled)
+    {
+        return "Operation Enabled";
+    }
+    else if (statusWordSixBitMasked == quickStopActive)
+    {
+        return "Quick Stop Active";
+    }
+    else if (statusWordFiveBitMasked == faultReactionActive)
+    {
+        return "Fault Reaction Active";
+    }
+    else if (statusWordFiveBitMasked == fault)
+    {
+        return "Fault";
+    }
+}
+
 }  // namespace march_hardware_interface

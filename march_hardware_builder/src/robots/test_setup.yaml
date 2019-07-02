@@ -3,7 +3,7 @@ testsetup:
   ecatCycleTime: 4
   joints:
     - test_joint:
-        allowActuation: true
+        allowActuation: false
         imotioncube:
           slaveIndex: 1
           encoder:

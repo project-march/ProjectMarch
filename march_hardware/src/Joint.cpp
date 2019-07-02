@@ -94,6 +94,15 @@ float Joint::getTemperature()
   return this->temperatureGES.getTemperature();
 }
 
+std::vector<uint16> Joint::getIMotionCubeErrorState()
+{
+    std::vector<uint16> errors;
+    errors.push_back(this->iMotionCube.getStatusWord());
+    errors.push_back(this->iMotionCube.getDetailedError());
+    errors.push_back(this->iMotionCube.getMotionError());
+    return errors;
+}
+
 int Joint::getTemperatureGESSlaveIndex()
 {
   if (hasTemperatureGES())
