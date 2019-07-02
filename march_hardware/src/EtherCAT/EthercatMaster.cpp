@@ -34,17 +34,17 @@ void EthercatMaster::start()
   // Initialise SOEM, bind socket to ifname
   if (!ec_init(ifname.c_str()))
   {
-    ROS_ERROR("No socket connection on %s. Confirm that you have selected the right ifname", ifname.c_str());
-    return;
+    ROS_FATAL("No socket connection on %s. Confirm that you have selected the right ifname", ifname.c_str());
+    throw std::runtime_error("No socket connection on %s. Confirm that you have selected the right ifname");
   }
   ROS_INFO("ec_init on %s succeeded", ifname.c_str());
 
   // Find and auto-config slaves
   if (ec_config_init(FALSE) <= 0)
   {
-    ROS_ERROR("No slaves found, shutting down. Confirm that you have selected the right ifname.");
-    ROS_ERROR("Check that the first slave is connected properly");
-    return;
+    ROS_FATAL("No slaves found, shutting down. Confirm that you have selected the right ifname.");
+    ROS_FATAL("Check that the first slave is connected properly");
+    throw std::runtime_error("No slaves found, shutting down. Confirm that you have selected the right ifname.");
   }
   ROS_INFO("%d slave(s) found and initialized.", ec_slavecount);
 
