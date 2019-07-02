@@ -220,10 +220,14 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
 
     realtime_pubs_->msg_.joint_names.clear();
     realtime_pubs_->msg_.state.clear();
+    realtime_pubs_->msg_.status_word.clear();
+
     std::vector<uint16> IMotionCubeErrorStates = marchRobot.getJoint(joint_names_[i]).getIMotionCubeErrorState();
     std::string IMotionCubeState = this->getIMotionCubeState(IMotionCubeErrorStates[0]);
+
     realtime_pubs_->msg_.joint_names.push_back(joint_names_[i]);
     realtime_pubs_->msg_.state.push_back(IMotionCubeState);
+    realtime_pubs_->msg_.status_word.push_back(IMotionCubeErrorStates[0]);
 
   }
   if (realtime_pubs_->trylock())
@@ -383,7 +387,7 @@ std::string MarchHardwareInterface::getIMotionCubeState(uint16 statusWord)
     {
         return "Fault";
     }
-    else return "not in a recognized state";
+    else return "Not in a recognized IMC state";
 }
 
 }  // namespace march_hardware_interface
