@@ -224,9 +224,11 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
     realtime_pubs_->msg_.status_word.clear();
     realtime_pubs_->msg_.detailed_error.clear();
     realtime_pubs_->msg_.motion_error.clear();
+    realtime_pubs_->msg_.motion_error_description.clear();
 
     std::vector<uint16> IMotionCubeErrorStates = marchRobot.getJoint(joint_names_[i]).getIMotionCubeErrorState();
     std::string IMotionCubeState = this->getIMotionCubeState(IMotionCubeErrorStates[0]);
+    std::string motionErrorDescription = this->parseMotionError(IMotionCubeErrorStates[2]);
 
     std::bitset<16> statusWord = IMotionCubeErrorStates[0];
     std::bitset<16> detailedError = IMotionCubeErrorStates[1];
@@ -237,6 +239,7 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
     realtime_pubs_->msg_.status_word.push_back(statusWord.to_string());
     realtime_pubs_->msg_.detailed_error.push_back(detailedError.to_string());
     realtime_pubs_->msg_.motion_error.push_back(motionError.to_string());
+    realtime_pubs_->msg_.motion_error_description.push_back(motionErrorDescription);
 
   }
   if (realtime_pubs_->trylock())
@@ -397,6 +400,73 @@ std::string MarchHardwareInterface::getIMotionCubeState(uint16 statusWord)
         return "Fault";
     }
     else return "Not in a recognized IMC state";
+}
+
+std::string MarchHardwareInterface::parseMotionError(uint16 motionError)
+{
+  std::string errorDescription = "";
+  std::vector<std::string> bitDescriptions = {};
+  bitDescriptions.push_back("\tEtherCAT communication error. Reset by a Reset "
+                            "Fault command or by Clear Error in the "
+                            "EtherCAT State Machine.");
+  bitDescriptions.push_back("\tShort-circuit. Set when protection is "
+                            "triggered. .");
+  bitDescriptions.push_back("\tInvalid setup data. Set when the EEPROM stored "
+                            "setup data is not valid or not present.");
+  bitDescriptions.push_back("\tControl error (position/speed error too big). "
+                            "Set when protection is triggered. Reset "
+                            "by a Reset Fault command.");
+  bitDescriptions.push_back("\tCommunication error. Set when protection is "
+                            "triggered. .");
+  bitDescriptions.push_back("\tMotor position wraps around. Set when "
+                            "protection is triggered. Reset by a Reset Fault "
+                            "command.");
+  bitDescriptions.push_back("\tPositive limit switch active. Set when LSP "
+                            "input is in active state. Reset when LSP "
+                            "input is inactive state");
+  bitDescriptions.push_back("\tNegative limit switch active. Set when LSN "
+                            "input is in active state. Reset when LSN "
+                            "input is inactive state");
+  bitDescriptions.push_back("\tOver current. Set when protection is triggered. "
+                            "");
+  bitDescriptions.push_back("\tI2T protection. Set when protection is "
+                            "triggered. ");
+  bitDescriptions.push_back("\tOver temperature motor. Set when protection is "
+                            "triggered. Reset by a Reset Fault "
+                            "command. This protection may be activated if the "
+                            "motor has a PTC or NTC temperature "
+                            "contact.");
+  bitDescriptions.push_back("\tOver temperature drive. Set when protection is "
+                            "triggered. Reset by a Reset Fault "
+                            "command.");
+  bitDescriptions.push_back("\tOver-voltage. Set when protection is triggered. "
+                            "");
+  bitDescriptions.push_back("\tUnder-voltage. Set when protection is triggered.");
+  bitDescriptions.push_back("\tCommand error. This bit is set in several situations. They can be "
+                            "distinguished either by the associated "
+                            "emergency code, or in conjunction with other bits:\n"
+                            "\t\t0xFF03 - Specified homing method not available\n"
+                            "\t\t0xFF04 - A wrong mode is set in object 6060h, modes_of_operation\n"
+                            "\t\t0xFF05 - Specified digital I/O line not available\n"
+                            "\tA function is called during the execution of another function (+ set "
+                            "bit 7 of object 6041h, statusword).\n"
+                            "\tUpdate of operation mode received during a transition. This bit acts "
+                            "just as a warning.");
+  bitDescriptions.push_back("Drive disabled: emergency button connector not shorted");
+
+  for (int i = 0; i < 16; i++)
+  {
+    if (get_bit(motionError, i) == 1)
+    {
+      errorDescription = errorDescription + bitDescriptions.at(i);
+    }
+  }
+  return errorDescription;
+}
+
+bool MarchHardwareInterface::get_bit(uint16 value, int index)
+{
+  return static_cast<bool>(value & (1 << index));
 }
 
 }  // namespace march_hardware_interface
