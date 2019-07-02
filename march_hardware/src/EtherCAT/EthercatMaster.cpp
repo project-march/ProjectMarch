@@ -51,7 +51,7 @@ void EthercatMaster::start()
   if (ec_slavecount < this->maxSlaveIndex)
   {
     ROS_FATAL("Slave configured with index %d while soem only found %d slave(s)", this->maxSlaveIndex, ec_slavecount);
-    return;
+    throw std::runtime_error("More slaves configured than soem could detect.");
   }
   // TODO(Martijn) Check on type of slaves
 
@@ -102,7 +102,7 @@ void EthercatMaster::start()
   else
   {
     // Not all slaves in operational state
-    ROS_ERROR("Not all slaves reached operational state");
+    ROS_FATAL("Not all slaves reached operational state. Non-operational slave(s) listed below.");
     ec_readstate();
     for (int i = 1; i <= ec_slavecount; i++)
     {
@@ -112,6 +112,7 @@ void EthercatMaster::start()
                  ec_ALstatuscode2string(ec_slave[i].ALstatuscode));
       }
     }
+    throw std::runtime_error("Not all slaves reached operational state.");
   }
 }
 
