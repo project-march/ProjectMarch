@@ -98,30 +98,22 @@ float Joint::getTemperature()
 
 IMotionCubeState Joint::getIMotionCubeState()
 {
-    // Return a vector of strings:
-    // First the literal bits of the Status Word, Detailed Error and Motion Error
-    // Then the parsed interpretation of these bits
-//    std::vector<std::string> return_strings;
+    // Return an object of strings:
+    // the literal bits of the Status Word, Detailed Error and Motion Error
+    // and the parsed interpretation of these bits
     IMotionCubeState states;
 
     std::bitset<16> statusWordBits = this->iMotionCube.getStatusWord();
-//    return_strings.push_back(statusWordBits.to_string());
     states.statusWord = statusWordBits.to_string();
     std::bitset<16> detailedErrorBits = this->iMotionCube.getDetailedError();
-//    return_strings.push_back(detailedErrorBits.to_string());
     states.detailedError = detailedErrorBits.to_string();
     std::bitset<16> motionErrorBits = this->iMotionCube.getMotionError();
-//    return_strings.push_back(motionErrorBits.to_string());
     states.motionError = motionErrorBits.to_string();
 
-//    return_strings.push_back(this->iMotionCube.getState(this->iMotionCube.getStatusWord()));
     states.state = this->iMotionCube.getState(this->iMotionCube.getStatusWord());
-//    return_strings.push_back(this->iMotionCube.parseDetailedError(this->iMotionCube.getDetailedError()));
     states.detailedErrorDescription = this->iMotionCube.parseDetailedError(this->iMotionCube.getDetailedError());
-//    return_strings.push_back(this->iMotionCube.parseMotionError(this->iMotionCube.getMotionError()));
     states.motionErrorDescription = this->iMotionCube.parseMotionError(this->iMotionCube.getMotionError());
 
-//    return return_strings;
     return states;
 }
 
