@@ -63,12 +63,15 @@ protected:
     RtPublisherPtr;
     RtPublisherPtr realtime_pubs_;
   double p_error_, v_error_, e_error_;
+  std::vector<SoftJointLimits> soft_limits_;
 
 private:
   void updatePowerNet();
   void updateHighVoltageEnable();
   void updatePowerDistributionBoard();
   void updateIMotionCubeState();
+  void resetIMotionCubesUntilTheyWork();
+  void outsideLimitsCheck(int joint_index);
 };
 }
 

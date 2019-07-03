@@ -42,6 +42,7 @@ public:
   void writeInitialSDOs(int ecatCycleTime) override;
 
   float getAngleRad();
+  int getAngleIU();
 
   uint16 getStatusWord();
   uint16 getMotionError();
@@ -58,6 +59,7 @@ public:
   std::string parseDetailedError(uint16 detailedError);
 
   bool goToOperationEnabled();
+  bool resetIMotionCube();
 
   /** @brief Override comparison operator */
   friend bool operator==(const IMotionCube& lhs, const IMotionCube& rhs)
