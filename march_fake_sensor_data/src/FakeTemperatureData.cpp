@@ -120,7 +120,21 @@ int main(int argc, char** argv)
 
   n.getParam(n.getNamespace() + "/min_temperature", min_temperature);
   n.getParam(n.getNamespace() + "/max_temperature", max_temperature);
-  n.getParam("/sensors", sensor_names);
+
+
+  int count = 0;
+  while (!n.hasParam("/march/joint_names"))
+  {
+    ros::Duration(0.5).sleep();
+    count++;
+    if (count > 10)
+    {
+      ROS_ERROR("Failed to read the joint_names from the parameter server.");
+      throw std::runtime_error("Failed to read the joint_names from the parameter server.");
+    }
+  }
+
+  n.getParam("/march/joint_names", sensor_names);
 
   // Initialise autoregression variables.
   latest_temperatures = { 0, 0, 0, 0, 0, 0, 0 };
