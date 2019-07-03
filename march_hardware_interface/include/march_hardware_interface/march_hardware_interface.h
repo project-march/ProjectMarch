@@ -64,6 +64,7 @@ private:
   void updatePowerNet();
   void updateHighVoltageEnable();
   void updatePowerDistributionBoard();
+  void resetIMotionCubesUntilTheyWork();
 };
 }
 
