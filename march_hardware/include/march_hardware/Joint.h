@@ -15,7 +15,7 @@ namespace march4cpp
 class IMotionCubeState
 {
 public:
-    IMotionCubeState(){};
+    IMotionCubeState() {}
 
     std::string statusWord;
     std::string detailedError;

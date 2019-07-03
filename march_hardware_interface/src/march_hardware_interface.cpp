@@ -354,8 +354,6 @@ void MarchHardwareInterface::updateIMotionCubeState()
   }
 
   realtime_pubs_->unlockAndPublish();
-
-
 }
 
 }  // namespace march_hardware_interface
