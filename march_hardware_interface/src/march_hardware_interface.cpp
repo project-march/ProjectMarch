@@ -37,7 +37,7 @@ MarchHardwareInterface::~MarchHardwareInterface()
 void MarchHardwareInterface::init()
 {
   // Start ethercat cycle in the hardware
-  this->marchRobot.startEtherCAT();
+//  this->marchRobot.startEtherCAT();
 
   urdf::Model model;
   if (!model.initParam("/robot_description"))
@@ -54,6 +54,9 @@ void MarchHardwareInterface::init()
       joint_names_.push_back(urdfJoint.first);
     }
   }
+
+  nh_.setParam("/march/joint_names", joint_names_);
+
   num_joints_ = joint_names_.size();
 
   // Resize vectors
