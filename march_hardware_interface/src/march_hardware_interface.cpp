@@ -37,7 +37,7 @@ MarchHardwareInterface::~MarchHardwareInterface()
 void MarchHardwareInterface::init()
 {
   // Start ethercat cycle in the hardware
-//  this->marchRobot.startEtherCAT();
+  this->marchRobot.startEtherCAT();
 
   urdf::Model model;
   if (!model.initParam("/robot_description"))
