@@ -267,6 +267,7 @@ void MarchHardwareInterface::resetIMotionCubesUntilTheyWork()
     }
     if (!encoderSetCorrectly)
     {
+      // TODO(Martijn) check if you need to reset all joints.
       for (int i = 0; i < num_joints_; ++i)
       {
         march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
