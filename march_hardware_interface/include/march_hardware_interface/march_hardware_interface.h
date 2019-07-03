@@ -65,6 +65,7 @@ private:
   void updatePowerNet();
   void updateHighVoltageEnable();
   void updatePowerDistributionBoard();
+  void resetIMotionCubesUntilTheyWork();
   void outsideLimitsCheck(int joint_index);
 };
 }

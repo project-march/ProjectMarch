@@ -75,6 +75,8 @@ void MarchHardwareInterface::init()
     soft_limits_[i] = soft_limits;
   }
 
+  resetIMotionCubesUntilTheyWork();
+
   // Print all joint positions on startup in case initialization fails.
   this->read();
   for (int i = 0; i < num_joints_; ++i)
@@ -241,6 +243,37 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
   if (hasPowerDistributionBoard)
   {
     updatePowerDistributionBoard();
+  }
+}
+
+void MarchHardwareInterface::resetIMotionCubesUntilTheyWork()
+{
+  bool encoderSetCorrectly = false;
+
+  while (!encoderSetCorrectly)
+  {
+    encoderSetCorrectly = true;
+    for (int i = 0; i < num_joints_; ++i)
+    {
+      march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
+      if (joint.getAngleIU() == 0)
+      {
+        ROS_ERROR("Joint %s failed (encoder reset)", joint_names_[i].c_str());
+        encoderSetCorrectly = false;
+      }
+    }
+    if (!encoderSetCorrectly)
+    {
+      // TODO(Martijn) check if you need to reset all joints.
+      for (int i = 0; i < num_joints_; ++i)
+      {
+        march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
+        joint.resetIMotionCube();
+      }
+      ROS_INFO("Restarting EtherCAT");
+      marchRobot.stopEtherCAT();
+      marchRobot.startEtherCAT();
+    }
   }
 }
 
