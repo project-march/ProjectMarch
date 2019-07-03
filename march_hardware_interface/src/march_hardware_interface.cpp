@@ -265,13 +265,13 @@ void MarchHardwareInterface::resetIMotionCubesUntilTheyWork()
         encoderSetCorrectly = false;
       }
     }
-    for (int i = 0; i < num_joints_; ++i)
-    {
-      march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
-      joint.resetIMotionCube();
-    }
     if (!encoderSetCorrectly)
     {
+      for (int i = 0; i < num_joints_; ++i)
+      {
+        march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
+        joint.resetIMotionCube();
+      }
       ROS_INFO("Restarting EtherCAT");
       marchRobot.stopEtherCAT();
       marchRobot.startEtherCAT();
