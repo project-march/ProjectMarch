@@ -18,8 +18,9 @@ extern "C"
 namespace march4cpp
 {
 // Constructor
-EthercatMaster::EthercatMaster(std::vector<Joint> *jointListPtr, std::string ifname, int maxSlaveIndex,
-                               int ecatCycleTime) : jointListPtr(jointListPtr)
+EthercatMaster::EthercatMaster(std::vector<Joint>* jointListPtr, std::string ifname, int maxSlaveIndex,
+                               int ecatCycleTime)
+  : jointListPtr(jointListPtr)
 {
   this->ifname = ifname;
   this->maxSlaveIndex = maxSlaveIndex;
@@ -128,6 +129,9 @@ void EthercatMaster::stop()
 
 void EthercatMaster::ethercatLoop()
 {
+  uint32_t totalLoops = 0;
+  uint32_t rateNotAchievedCount = 0;
+  int rate = 1000 / ecatCycleTimems;
   while (isOperational)
   {
     auto start = boost::chrono::high_resolution_clock::now();
@@ -138,11 +142,28 @@ void EthercatMaster::ethercatLoop()
     auto duration = boost::chrono::duration_cast<boost::chrono::microseconds>(stop - start);
     if (duration.count() > ecatCycleTimems * 1000)
     {
-        ROS_WARN("EtherCAT rate of %d milliseconds per cycle was not achieved this EtherCAT cycle", ecatCycleTimems);
+      rateNotAchievedCount++;
     }
     else
     {
-        usleep(ecatCycleTimems * 1000 - duration.count());
+      usleep(ecatCycleTimems * 1000 - duration.count());
+    }
+    totalLoops++;
+    if (totalLoops >= 10 * rate)  // Every 10 seconds
+    {
+      float rateNotAchievedPercentage = 100 * (static_cast<float>(rateNotAchievedCount) / totalLoops);
+      if (rateNotAchievedPercentage > 10)  // If percentage greater than 10 percent, do ROS_WARN instead of ROS_INFO
+      {
+        ROS_WARN("EtherCAT rate of %d milliseconds per cycle was not achieved for %f percent of all cycles",
+                 ecatCycleTimems, rateNotAchievedPercentage);
+      }
+      else
+      {
+        ROS_INFO("EtherCAT rate of %d milliseconds per cycle was not achieved for %f percent of all cycles",
+                 ecatCycleTimems, rateNotAchievedPercentage);
+      }
+      totalLoops = 0;
+      rateNotAchievedCount = 0;
     }
   }
 }
