@@ -20,6 +20,8 @@
         output="screen" ns="/march">
   </node>
 
+  <node name="upload_joint_names" pkg="march_simulation" type="upload_joint_names.py"/>
+
   <!-- We resume the logic in empty_world.launch_sm, changing only the name of the world to be launched -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find march_simulation)/worlds/march.world"/>
