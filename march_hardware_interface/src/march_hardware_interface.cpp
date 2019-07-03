@@ -7,6 +7,7 @@
 #include <bitset>
 
 #include <march_hardware/MarchRobot.h>
+#include <march_hardware/Joint.h>
 
 #include <march_hardware_interface/PowerNetOnOffCommand.h>
 #include <march_hardware_interface/march_hardware_interface.h>
@@ -342,15 +343,16 @@ void MarchHardwareInterface::updatePowerNet()
 
 void MarchHardwareInterface::updateIMotionCubeState(int jointIndex)
 {
-    std::vector<std::string> IMotionCubeState = marchRobot.getJoint(joint_names_[jointIndex]).getIMotionCubeState();
+//    std::vector<std::string> IMotionCubeState = marchRobot.getJoint(joint_names_[jointIndex]).getIMotionCubeState();
 
+    march4cpp::IMotionCubeState iMotionCubeState = marchRobot.getJoint(joint_names_[jointIndex]).getIMotionCubeState();
     realtime_pubs_->msg_.joint_names.push_back(joint_names_[jointIndex]);
-    realtime_pubs_->msg_.status_word.push_back(IMotionCubeState[0]);
-    realtime_pubs_->msg_.detailed_error.push_back(IMotionCubeState[1]);
-    realtime_pubs_->msg_.motion_error.push_back(IMotionCubeState[2]);
-    realtime_pubs_->msg_.state.push_back(IMotionCubeState[3]);
-    realtime_pubs_->msg_.detailed_error_description.push_back(IMotionCubeState[4]);
-    realtime_pubs_->msg_.motion_error_description.push_back(IMotionCubeState[5]);
+    realtime_pubs_->msg_.status_word.push_back(iMotionCubeState.statusWord);
+    realtime_pubs_->msg_.detailed_error.push_back(iMotionCubeState.detailedError);
+    realtime_pubs_->msg_.motion_error.push_back(iMotionCubeState.motionError);
+    realtime_pubs_->msg_.state.push_back(iMotionCubeState.state);
+    realtime_pubs_->msg_.detailed_error_description.push_back(iMotionCubeState.detailedErrorDescription);
+    realtime_pubs_->msg_.motion_error_description.push_back(iMotionCubeState.motionErrorDescription);
 }
 
 }  // namespace march_hardware_interface

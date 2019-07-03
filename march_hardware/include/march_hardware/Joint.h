@@ -11,6 +11,20 @@
 
 namespace march4cpp
 {
+
+class IMotionCubeState
+{
+public:
+    IMotionCubeState(){};
+
+    std::string statusWord;
+    std::string detailedError;
+    std::string motionError;
+    std::string state;
+    std::string detailedErrorDescription;
+    std::string motionErrorDescription;
+};
+
 class Joint
 {
 private:
@@ -35,7 +49,7 @@ public:
 
   float getAngleRad();
   float getTemperature();
-  std::vector<std::string> getIMotionCubeState();
+  IMotionCubeState getIMotionCubeState();
 
   std::string getName();
   int getTemperatureGESSlaveIndex();
@@ -69,5 +83,6 @@ public:
               << "temperatureges: " << joint.temperatureGES;
   }
 };
+
 }  // namespace march4cpp
 #endif

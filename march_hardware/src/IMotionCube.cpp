@@ -213,83 +213,83 @@ std::string IMotionCube::parseStatusWord(uint16 statusWord)
   std::string wordDescription = "";
   if (get_bit(statusWord, 0) == 1)
   {
-    wordDescription += "Axis on. Power stage is enabled. Motor control is performed.";
+    wordDescription += "Axis on. Power stage is enabled. Motor control is performed. ";
   }
   else
   {
-    wordDescription += "Axis off. Power stage is disabled. Motor control is not performed.";
+    wordDescription += "Axis off. Power stage is disabled. Motor control is not performed. ";
   }
   if (get_bit(statusWord, 2) == 1)
   {
-    wordDescription += "Operation Enabled.";
+    wordDescription += "Operation Enabled. ";
   }
   if (get_bit(statusWord, 3) == 1)
   {
-    wordDescription += "Fault. If set, a fault condition is or was present in the drive.";
+    wordDescription += "Fault. If set, a fault condition is or was present in the drive. ";
   }
   if (get_bit(statusWord, 4) == 1)
   {
-    wordDescription += "Motor supply voltage is present.";
+    wordDescription += "Motor supply voltage is present. ";
   }
   else
   {
-    wordDescription += "Motor supply voltage is absent.";
+    wordDescription += "Motor supply voltage is absent. ";
   }
   if (get_bit(statusWord, 5) == 0)
   {
-    wordDescription += "Quick Stop. When this bit is zero, the drive is performing a quick stop.";
+    wordDescription += "Quick Stop. When this bit is zero, the drive is performing a quick stop. ";
   }
   if (get_bit(statusWord, 6) == 1)
   {
-    wordDescription += "Switch On Disabled.";
+    wordDescription += "Switch On Disabled. ";
   }
   if (get_bit(statusWord, 7) == 1)
   {
-    wordDescription += "A TML function  was called, while another TML function is still in execution";
+    wordDescription += "A TML function  was called, while another TML function is still in execution. ";
   }
   if (get_bit(statusWord, 8) == 1)
   {
-    wordDescription += "A TML function or homing is executed";
+    wordDescription += "A TML function or homing is executed. ";
   }
   if (get_bit(statusWord, 9) == 1)
   {
-    wordDescription += "Remote - drive parameters may be modified via CAN";
+    wordDescription += "Remote - drive parameters may be modified via CAN. ";
   }
   else
   {
-    wordDescription += "Remote - drive is in local mode and will not execute the command message.";
+    wordDescription += "Remote - drive is in local mode and will not execute the command message. ";
   }
   if (get_bit(statusWord, 10) == 1)
   {
-    wordDescription += "Target reached.";
+    wordDescription += "Target reached. ";
   }
   if (get_bit(statusWord, 11) == 1)
   {
-    wordDescription += "Internal Limit Active.";
+    wordDescription += "Internal Limit Active. ";
   }
   if (get_bit(statusWord, 12) == 0)
   {
-    wordDescription += "Target position ignored.";
+    wordDescription += "Target position ignored. ";
   }
   if (get_bit(statusWord, 13) == 1)
   {
-    wordDescription += "Following error.";
+    wordDescription += "Following error. ";
   }
   if (get_bit(statusWord, 14) == 1)
   {
-    wordDescription += "Last event set has occurred.";
+    wordDescription += "Last event set has occurred. ";
   }
   else
   {
-    wordDescription += "No event set or the programmed event has not occurred yet.";
+    wordDescription += "No event set or the programmed event has not occurred yet. ";
   }
   if (get_bit(statusWord, 15) == 1)
   {
-    wordDescription += "Axis on. Power stage is enabled. Motor control is performed.";
+    wordDescription += "Axis on. Power stage is enabled. Motor control is performed. ";
   }
   else
   {
-    wordDescription += "Axis off. Power stage is disabled. Motor control is not performed.";
+    wordDescription += "Axis off. Power stage is disabled. Motor control is not performed. ";
   }
 }
 
@@ -348,22 +348,22 @@ std::string IMotionCube::getState(uint16 statusWord)
 std::string IMotionCube::parseMotionError(uint16 motionError)
 {
   std::vector<std::string> bitDescriptions = {};
-  bitDescriptions.push_back("EtherCAT communication error");
-  bitDescriptions.push_back("Short-circuit");
-  bitDescriptions.push_back("Invalid setup (EEPROM) data");
-  bitDescriptions.push_back("Control error (position/speed error too big)");
-  bitDescriptions.push_back("Communication error");
-  bitDescriptions.push_back("Motor position wraps around");
-  bitDescriptions.push_back("Positive limit switch");
-  bitDescriptions.push_back("Negative limit switch");
-  bitDescriptions.push_back("Over-current");
-  bitDescriptions.push_back("I2T protection");
-  bitDescriptions.push_back("Over-temperature motor");
-  bitDescriptions.push_back("Over-temperature drive");
-  bitDescriptions.push_back("Over-voltage");
-  bitDescriptions.push_back("Under-voltage");
-  bitDescriptions.push_back("Command error");
-  bitDescriptions.push_back("Drive disabled (Emergency button connector not shorted)");
+  bitDescriptions.push_back("EtherCAT communication error. ");
+  bitDescriptions.push_back("Short-circuit. ");
+  bitDescriptions.push_back("Invalid setup (EEPROM) data. ");
+  bitDescriptions.push_back("Control error (position/speed error too big). ");
+  bitDescriptions.push_back("Communication error. ");
+  bitDescriptions.push_back("Motor position wraps around. ");
+  bitDescriptions.push_back("Positive limit switch. ");
+  bitDescriptions.push_back("Negative limit switch. ");
+  bitDescriptions.push_back("Over-current. ");
+  bitDescriptions.push_back("I2T protection. ");
+  bitDescriptions.push_back("Over-temperature motor. ");
+  bitDescriptions.push_back("Over-temperature drive. ");
+  bitDescriptions.push_back("Over-voltage. ");
+  bitDescriptions.push_back("Under-voltage. ");
+  bitDescriptions.push_back("Command error. ");
+  bitDescriptions.push_back("Drive disabled (Emergency button connector not shorted). ");
 
   std::string errorDescription = "";
   for (int i = 0; i < 16; i++)
@@ -379,15 +379,15 @@ std::string IMotionCube::parseMotionError(uint16 motionError)
 std::string IMotionCube::parseDetailedError(uint16 detailedError)
 {
   std::vector<std::string> bitDescriptions = {};
-  bitDescriptions.push_back("TML stack overflow");
-  bitDescriptions.push_back("TML stack underflow");
-  bitDescriptions.push_back("Homing not available");
-  bitDescriptions.push_back("Function not available");
-  bitDescriptions.push_back("UPD ignored");
-  bitDescriptions.push_back("Cancelable call ignored");
-  bitDescriptions.push_back("Positive software limit switch is active");
-  bitDescriptions.push_back("Negative software limit switch is active");
-  bitDescriptions.push_back("Invalid S-curve profile");
+  bitDescriptions.push_back("TML stack overflow. ");
+  bitDescriptions.push_back("TML stack underflow. ");
+  bitDescriptions.push_back("Homing not available. ");
+  bitDescriptions.push_back("Function not available. ");
+  bitDescriptions.push_back("UPD ignored. ");
+  bitDescriptions.push_back("Cancelable call ignored. ");
+  bitDescriptions.push_back("Positive software limit switch is active. ");
+  bitDescriptions.push_back("Negative software limit switch is active. ");
+  bitDescriptions.push_back("Invalid S-curve profile. ");
 
   std::string errorDescription = "";
   for (int i = 0; i < 9; i++)
