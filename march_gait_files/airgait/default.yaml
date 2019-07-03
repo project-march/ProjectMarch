@@ -1,7 +1,99 @@
 gaits:
-  home: {home_sit: 'home_sit_1,5sec', home_stand: 'home_stand_1,5sec'}
+  home: {home_sit: home_sit_1,5sec, home_stand: home_stand_1,5sec}
   single_step: {left_close: MIII, right_open: MIII}
   sit: {sit_down: MIII, sit_home: MIII}
   stand: {prepare_stand_up: MIII, stand_up: MIII}
   walk: {left_close: MIII, left_swing: MIII, right_close: MIII, right_open: MIII,
     right_swing: MIII}
+
+  #SINGLE STEP
+
+  #MIII
+  #  single_step: {right_open: MIII, left_close: MIII}
+  #  single_step: {right_open: MIII_2sec, left_close: MIII_2sec}
+  #  single_step: {right_open: MIII_2,5sec, left_close: MIII_2,5sec}
+
+  #MIII more hip flexion
+  #  single_step: {right_open: MIII, left_close: MIII_more_hip_flexion}
+  #  single_step: {right_open: MIII_2sec, left_close: MIII_more_hip_flexion_2sec}
+  #  single_step: {right_open: MIII_2,5sec, left_close: MIII_more_hip_flexion_2,5sec}
+
+  #MIV
+  #  single_step: {right_open: MIV, left_close: MIV}
+  #  single_step: {right_open: MIV_2sec, left_close: MIV_2sec}
+  #  single_step: {right_open: MIV_2,5sec, left_close: MIV_2,5sec}
+
+  #MIV more hip flexion
+  #  single_step: {right_open: MIV, left_close: MIV_more_hip_flexion}
+  #  single_step: {right_open: MIV_2sec, left_close: MIV_more_hip_flexion_2sec}
+  #  single_step: {right_open: MIV_2,5sec, left_close: MIV_more_hip_flexion_2,5sec}
+
+  #MIV more hip extension
+  #  single_step: {right_open: MIV_more_hip_extension, left_close: MIV_more_hip_extension}
+  #  single_step: {right_open: MIV_more_hip_extension_2sec, left_close: MIV_more_hip_extension_2sec}
+  #  single_step: {right_open: MIV_more_hip_extension_2,5sec, left_close: MIV_more_hip_extension_2,5sec}
+
+  #MIV more hip extension and more hip flexion
+  #  single_step: {right_open: MIV_more_hip_extension, left_close: MIV_more_hip_extension_more_hip_flexion}
+  #  single_step: {right_open: MIV_more_hip_extension_2sec, left_close: MIV_more_hip_extension_more_hip_flexion_2sec}
+  #  single_step: {right_open: MIV_more_hip_extension_2,5sec, left_close: MIV_more_hip_extension_more_hip_flexion_2,5sec}
+
+  #MIV with ankle movements
+  #  single_step: {right_open: MIV_ankle, left_close: MIV_ankle}
+  #  single_step: {right_open: MIV_ankle_swing, left_close: MIV_ankle_swing}
+
+  #WALK
+
+  # MIII walk gait
+  #  walk: {right_open: MIII, left_swing: MIII, right_swing: MIII, left_close: MIII, right_close: MIII}
+  #  walk: {right_open: MIII_2sec, left_swing: MIII_2sec, right_swing: MIII_2sec, left_close: MIII_2sec, right_close: MIII_2sec}
+  #  walk: {right_open: MIII_2,5sec, left_swing: MIII_2,5sec, right_swing: MIII_2,5sec, left_close: MIII_2,5sec, right_close: MIII_2,5sec}
+
+  # MIV walk gait
+  #  walk: {right_open: MIV, left_swing: MIV, right_swing: MIV, left_close: MIV, right_close: MIV}
+  #  walk: {right_open: MIV_2sec, left_swing: MIV_2sec, right_swing: MIV_2sec, left_close: MIV_2sec, right_close: MIV_2sec}
+  #  walk: {right_open: MIV_2,5sec, left_swing: MIV_2,5sec, right_swing: MIV_2,5sec, left_close: MIV_2,5sec, right_close: MIV_2,5sec}\
+
+  # MIV walk gait with less hip flexion
+  #  walk: {right_open: MIV_less_hip_flexion, left_swing: MIV_less_hip_flexion, right_swing: MIV_less_hip_flexion, left_close: MIV_less_hip_flexion, right_close: MIV_less_hip_flexion}
+  #  walk: {right_open: MIV_less_hip_flexion_2sec, left_swing: MIV_less_hip_flexion_2sec, right_swing: MIV_less_hip_flexion_2sec, left_close: MIV_less_hip_flexion_2sec, right_close: MIV_less_hip_flexion_2sec}
+  #  walk: {right_open: MIV_less_hip_flexion_2,5sec, left_swing: MIV_less_hip_flexion_2,5sec, right_swing: MIV_less_hip_flexion_2,5sec, left_close: MIV_less_hip_flexion_2,5sec, right_close: MIV_less_hip_flexion_2,5sec}
+
+  # MIV walk gait with longer hip flexion
+  #  walk: {right_open: MIV_longer_hip_flexion, left_swing: MIV_longer_hip_flexion, right_swing: MIV_longer_hip_flexion, left_close: MIV_longer_hip_flexion, right_close: MIV_longer_hip_flexion}
+  #  walk: {right_open: MIV_longer_hip_flexion_2sec, left_swing: MIV_longer_hip_flexion_2sec, right_swing: MIV_longer_hip_flexion_2sec, left_close: MIV_longer_hip_flexion_2sec, right_close: MIV_longer_hip_flexion_2sec}
+  #  walk: {right_open: MIV_longer_hip_flexion_2,5sec, left_swing: MIV_longer_hip_flexion_2,5sec, right_swing: MIV_longer_hip_flexion_2,5sec, left_close: MIV_longer_hip_flexion_2,5sec, right_close: MIV_longer_hip_flexion_2,5sec}
+
+  # MIV walk gait with more hip extension
+  #  walk: {right_open: MIV_more_hip_extension, left_swing: MIV_more_hip_extension, right_swing: MIV_more_hip_extension, left_close: MIV_more_hip_extension, right_close: MIV_more_hip_extension}
+  #  walk: {right_open: MIV_more_hip_extension_2sec, left_swing: MIV_more_hip_extension_2sec, right_swing: MIV_more_hip_extension_2sec, left_close: MIV_more_hip_extension_2sec, right_close: MIV_more_hip_extension_2sec}
+  #  walk: {right_open: MIV_more_hip_extension_2,5sec, left_swing: MIV_more_hip_extension_2,5sec, right_swing: MIV_more_hip_extension_2,5sec, left_close: MIV_more_hip_extension_2,5sec, right_close: MIV_more_hip_extension_2,5sec}
+
+  # MIV walk gait with more hip extension and less hip flexion
+  #  walk: {right_open: MIV_more_hip_extension_less_hip_flexion, left_swing: MIV_more_hip_extension_less_hip_flexion, right_swing: MIV_more_hip_extension_less_hip_flexion, left_close: MIV_more_hip_extension_less_hip_flexion, right_close: MIV_more_hip_extension_less_hip_flexion}
+  #  walk: {right_open: MIV_more_hip_extension_less_hip_flexion_2sec, left_swing: MIV_more_hip_extension_less_hip_flexion_2sec, right_swing: MIV_more_hip_extension_less_hip_flexion_2sec, left_close: MIV_more_hip_extension_less_hip_flexion_2sec, right_close: MIV_more_hip_extension_less_hip_flexion_2sec}
+  #  walk: {right_open: MIV_more_hip_extension_less_hip_flexion_2,5sec, left_swing: MIV_more_hip_extension_less_hip_flexion_2,5sec, right_swing: MIV_more_hip_extension_less_hip_flexion_2,5sec, left_close: MIV_more_hip_extension_less_hip_flexion_2,5sec, right_close: MIV_more_hip_extension_less_hip_flexion_2,5sec}
+
+  # MIV walk gait with more hip extension and longer hip flexion
+  #  walk: {right_open: MIV_more_hip_extension_longer_hip_flexion, left_swing: MIV_more_hip_extension_longer_hip_flexion, right_swing: MIV_more_hip_extension_longer_hip_flexion, left_close: MIV_more_hip_extension_longer_hip_flexion, right_close: MIV_more_hip_extension_longer_hip_flexion}
+  #  walk: {right_open: MIV_more_hip_extension_longer_hip_flexion_2sec, left_swing: MIV_more_hip_extension_longer_hip_flexion_2sec, right_swing: MIV_more_hip_extension_longer_hip_flexion_2sec, left_close: MIV_more_hip_extension_longer_hip_flexion_2sec, right_close: MIV_more_hip_extension_longer_hip_flexion_2sec}
+  #  walk: {right_open: MIV_more_hip_extension_longer_hip_flexion_2,5sec, left_swing: MIV_more_hip_extension_longer_hip_flexion_2,5sec, right_swing: MIV_more_hip_extension_longer_hip_flexion_2,5sec, left_close: MIV_more_hip_extension_longer_hip_flexion_2,5sec, right_close: MIV_more_hip_extension_longer_hip_flexion_2,5sec}
+
+  # MIII walk gait with more hip flexion in closing step
+  #  walk: {right_open: MIII, left_swing: MIII, right_swing: MIII, left_close: MIII_more_hip_flexion, right_close: MIII_more_hip_flexion}
+  #  walk: {right_open: MIII_2sec, left_swing: MIII_2sec, right_swing: MIII_2sec, left_close: MIII_more_hip_flexion_2sec, right_close: MIII_more_hip_flexion_2sec}
+  #  walk: {right_open: MIII_2,5sec, left_swing: MIII_2,5sec, right_swing: MIII_2,5sec, left_close: MIII_more_hip_flexion_2,5sec, right_close: MIII_more_hip_flexion_2,5sec}
+
+  # MIV walk gait with more hip flexion in closing step
+  #  walk: {right_open: MIV, left_swing: MIV, right_swing: MIV, left_close: MIV_more_hip_flexion, right_close: MIV_more_hip_flexion}
+  #  walk: {right_open: MIV_2sec, left_swing: MIV_2sec, right_swing: MIV_2sec, left_close: MIV_more_hip_flexion_2sec, right_close: MIV_more_hip_flexion_2sec}
+  #  walk: {right_open: MIV_2,5sec, left_swing: MIV_2,5sec, right_swing: MIV_2,5sec, left_close: MIV_more_hip_flexion_2,5sec, right_close: MIV_more_hip_flexion_2,5sec}
+
+  # MIV walk gait with more hip extension and more hip flexion in closing step
+  #  walk: {right_open: MIV_more_hip_extension, left_swing: MIV_more_hip_extension, right_swing: MIV_more_hip_extension, left_close: MIV_more_hip_extension_more_hip_flexion, right_close: MIV_more_hip_extension_more_hip_flexion}
+  #  walk: {right_open: MIV_more_hip_extension_2sec, left_swing: MIV_more_hip_extension_2sec, right_swing: MIV_more_hip_extension_2sec, left_close: MIV_more_hip_extension_more_hip_flexion_2sec, right_close: MIV_more_hip_extension_more_hip_flexion_2sec}
+  #  walk: {right_open: MIV_more_hip_extension_2,5sec, left_swing: MIV_more_hip_extension_2,5sec, right_swing: MIV_more_hip_extension_2,5sec, left_close: MIV_more_hip_extension_more_hip_flexion_2,5sec, right_close: MIV_more_hip_extension_more_hip_flexion_2,5sec}
+
+  # MIV walk with ankle movements
+  #  walk: {right_open: MIV_ankle, left_swing: MIV_ankle, right_swing: MIV_ankle, left_close: MIV_ankle, right_close: MIV_ankle}
+  #  walk: {right_open: MIV_ankle_swing, left_swing: MIV_ankle_swing, right_swing: MIV_ankle_swing, left_close: MIV_ankle_swing, right_close: MIV_ankle_swing}
