@@ -398,7 +398,6 @@ std::string IMotionCube::parseDetailedError(uint16 detailedError)
     }
   }
   return errorDescription;
-
 }
 
 bool IMotionCube::goToOperationEnabled()
