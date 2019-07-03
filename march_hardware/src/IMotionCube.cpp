@@ -379,15 +379,15 @@ std::string IMotionCube::parseMotionError(uint16 motionError)
 std::string IMotionCube::parseDetailedError(uint16 detailedError)
 {
   std::vector<std::string> bitDescriptions = {};
-  bitDescriptions.push_back("Exceeded TML stack length");
-  bitDescriptions.push_back("A RET/RETI instruction was executed while no function/ISR was active");
-  bitDescriptions.push_back("A call to an inexistent homing routine was received");
-  bitDescriptions.push_back("A call to an inexistent function was received");
-  bitDescriptions.push_back("UPD instruction received while AXISON was executed");
-  bitDescriptions.push_back("Cancelable call instruction received while another cancelable function was active");
+  bitDescriptions.push_back("TML stack overflow");
+  bitDescriptions.push_back("TML stack underflow");
+  bitDescriptions.push_back("Homing not available");
+  bitDescriptions.push_back("Function not available");
+  bitDescriptions.push_back("UPD ignored");
+  bitDescriptions.push_back("Cancelable call ignored");
   bitDescriptions.push_back("Positive software limit switch is active");
   bitDescriptions.push_back("Negative software limit switch is active");
-  bitDescriptions.push_back("S-curve parameters caused an invalid profile");
+  bitDescriptions.push_back("Invalid S-curve profile");
 
   std::string errorDescription = "";
   for (int i = 0; i < 9; i++)
