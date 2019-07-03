@@ -363,7 +363,7 @@ void MarchHardwareInterface::outsideLimitsCheck(int joint_index)
       errorStream << "Joint " << joint_names_[joint_index].c_str() << " is out of its soft_limits_ ("
                   << soft_limits_[joint_index].min_position << ", " << soft_limits_[joint_index].max_position
                   << "). Actual position: " << joint_position_[joint_index];
-      throw ::std::invalid_argument(errorStream.str());
+      throw ::std::runtime_error(errorStream.str());
     }
   }
 }
