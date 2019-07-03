@@ -54,6 +54,9 @@ void MarchHardwareInterface::init()
       joint_names_.push_back(urdfJoint.first);
     }
   }
+
+  nh_.setParam("/march/joint_names", joint_names_);
+
   num_joints_ = joint_names_.size();
 
   // Resize vectors
