@@ -200,15 +200,6 @@ void MarchHardwareInterface::update(const ros::TimerEvent& e)
 
 void MarchHardwareInterface::read(ros::Duration elapsed_time)
 {
-  // Clear msg of IMotionCubeStates
-  realtime_pubs_->msg_.joint_names.clear();
-  realtime_pubs_->msg_.status_word.clear();
-  realtime_pubs_->msg_.detailed_error.clear();
-  realtime_pubs_->msg_.motion_error.clear();
-  realtime_pubs_->msg_.state.clear();
-  realtime_pubs_->msg_.detailed_error_description.clear();
-  realtime_pubs_->msg_.motion_error_description.clear();
-
   for (int i = 0; i < num_joints_; i++)
   {
     float oldPosition = joint_position_[i];
@@ -228,15 +219,9 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
     joint_velocity_[i] = filters::exponentialSmoothing(joint_velocity, joint_velocity_[i], 0.2);
 
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(), joint_position_[i]);
-
-    this->updateIMotionCubeState(i);
   }
 
-  // Publish IMotionCubeStates if possible
-  if (realtime_pubs_->trylock())
-  {
-    realtime_pubs_->unlockAndPublish();
-  }
+  this->updateIMotionCubeState();
 
   if (hasPowerDistributionBoard)
   {
@@ -341,18 +326,36 @@ void MarchHardwareInterface::updatePowerNet()
   }
 }
 
-void MarchHardwareInterface::updateIMotionCubeState(int jointIndex)
+void MarchHardwareInterface::updateIMotionCubeState()
 {
-//    std::vector<std::string> IMotionCubeState = marchRobot.getJoint(joint_names_[jointIndex]).getIMotionCubeState();
+  if (!realtime_pubs_->trylock())
+  {
+    return;
+  }
+  // Clear msg of IMotionCubeStates
+  realtime_pubs_->msg_.joint_names.clear();
+  realtime_pubs_->msg_.status_word.clear();
+  realtime_pubs_->msg_.detailed_error.clear();
+  realtime_pubs_->msg_.motion_error.clear();
+  realtime_pubs_->msg_.state.clear();
+  realtime_pubs_->msg_.detailed_error_description.clear();
+  realtime_pubs_->msg_.motion_error_description.clear();
 
-    march4cpp::IMotionCubeState iMotionCubeState = marchRobot.getJoint(joint_names_[jointIndex]).getIMotionCubeState();
-    realtime_pubs_->msg_.joint_names.push_back(joint_names_[jointIndex]);
+  for (int i = 0; i < num_joints_; i++)
+  {
+    march4cpp::IMotionCubeState iMotionCubeState = marchRobot.getJoint(joint_names_[i]).getIMotionCubeState();
+    realtime_pubs_->msg_.joint_names.push_back(joint_names_[i]);
     realtime_pubs_->msg_.status_word.push_back(iMotionCubeState.statusWord);
     realtime_pubs_->msg_.detailed_error.push_back(iMotionCubeState.detailedError);
     realtime_pubs_->msg_.motion_error.push_back(iMotionCubeState.motionError);
     realtime_pubs_->msg_.state.push_back(iMotionCubeState.state);
     realtime_pubs_->msg_.detailed_error_description.push_back(iMotionCubeState.detailedErrorDescription);
     realtime_pubs_->msg_.motion_error_description.push_back(iMotionCubeState.motionErrorDescription);
+  }
+
+  realtime_pubs_->unlockAndPublish();
+
+
 }
 
 }  // namespace march_hardware_interface

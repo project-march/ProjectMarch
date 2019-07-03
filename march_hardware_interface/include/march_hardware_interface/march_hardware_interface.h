@@ -68,7 +68,7 @@ private:
   void updatePowerNet();
   void updateHighVoltageEnable();
   void updatePowerDistributionBoard();
-  void updateIMotionCubeState(int jointIndex);
+  void updateIMotionCubeState();
 };
 }
 
