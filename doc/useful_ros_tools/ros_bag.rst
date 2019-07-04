@@ -1,3 +1,5 @@
+.. _ros-bag-label:
+
 ROS bag
 =======
 
@@ -14,11 +16,12 @@ The recorded topics are saved to a bagfile. These bags can be easily inspected w
 
    Example of rqt_bag
 
-Start from launchfile
-^^^^^^^^^^^^^^^^^^^^^
+Recording bags
+^^^^^^^^^^^^^^
 
-To record a rosbag when launching a launchfile, simply add the following node to your launchfile and change the topics.
-Use the option -a to record all topics.
+There are many ways to record a rosbag: Using the RQT plugin, with the commandline, or adding it to the launchfile.
+
+Adding it to the launchfile is the least effort, and is done by starting the following node:
 
 .. code::
 
@@ -29,3 +32,5 @@ Use the option -a to record all topics.
     output="screen"
     args="-o <output_directory> /topic1 /topic2"
   />
+
+Use the option -a to record all topics.

@@ -83,6 +83,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    doc/using_the_march_iv/high_level_overview
    doc/using_the_march_iv/how_to_airgait
    doc/using_the_march_iv/how_to_report_bugs
+   doc/using_the_march_iv/log_files
 
 .. toctree::
    :caption: Development
