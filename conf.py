@@ -12,6 +12,7 @@ sys.path += [ os.path.abspath( '_scripts' )]
 
 extensions = [ 'sphinx.ext.extlinks',
                'sphinx.ext.todo',
+               'sphinx_copybutton',
                'tutorialformatter' ]
 
 todo_include_todos = True
