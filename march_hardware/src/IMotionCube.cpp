@@ -99,8 +99,8 @@ void IMotionCube::actuateRad(float targetRad)
 {
   if (std::abs(targetRad - this->getAngleRad()) > 0.2)
   {
-    ROS_ERROR("Target %f exceeds max difference of 0.2 from current %f", targetRad, this->getAngleRad());
-    return;
+    ROS_ERROR("Target %f exceeds max difference of 0.2 from current %f for slave %d", targetRad, this->getAngleRad(), this->slaveIndex);
+    throw std::runtime_error("Target exceeds max difference of 0.2 from current position");
   }
   this->actuateIU(this->encoder.RadtoIU(targetRad));
 }
