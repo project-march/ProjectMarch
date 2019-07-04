@@ -46,6 +46,7 @@ before_install: # Use this to prepare the system to install prerequisites or dep
   - sudo apt-get -qq install ros-kinetic-rosdoc-lite
   - source /opt/ros/kinetic/setup.bash
   - pip install pygit2 --user
+  - pip install sphinx-copybutton --user
 
 #install:
 
