@@ -198,9 +198,6 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
 {
   for (int i = 0; i < num_joints_; i++)
   {
-    this->outsideLimitsCheck(i);
-    this->iMotionCubeStateCheck(i);
-
     float oldPosition = joint_position_[i];
 
     joint_position_[i] = marchRobot.getJoint(joint_names_[i]).getAngleRad();
@@ -231,6 +228,9 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
       ROS_WARN_THROTTLE(10, "All-High-Voltage disabled");
     }
   }
+
+  this->outsideLimitsCheck(i);
+  this->iMotionCubeStateCheck(i);
 }
 
 void MarchHardwareInterface::write(ros::Duration elapsed_time)
