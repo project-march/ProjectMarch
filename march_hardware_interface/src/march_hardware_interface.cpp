@@ -229,8 +229,11 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
     }
   }
 
-  this->outsideLimitsCheck(i);
-  this->iMotionCubeStateCheck(i);
+  for (int i = 0; i < num_joints_; i++)
+  {
+    this->outsideLimitsCheck(i);
+    this->iMotionCubeStateCheck(i);
+  }
 }
 
 void MarchHardwareInterface::write(ros::Duration elapsed_time)
