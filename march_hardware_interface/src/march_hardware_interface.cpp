@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include <march_hardware/MarchRobot.h>
+#include <march_hardware/Joint.h>
 
 #include <march_hardware_interface/PowerNetOnOffCommand.h>
 #include <march_hardware_interface/march_hardware_interface.h>
@@ -13,9 +14,9 @@
 #include <urdf/model.h>
 
 using joint_limits_interface::JointLimits;
-using joint_limits_interface::SoftJointLimits;
 using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::PositionJointSoftLimitsInterface;
+using joint_limits_interface::SoftJointLimits;
 
 namespace march_hardware_interface
 {
@@ -36,6 +37,10 @@ MarchHardwareInterface::~MarchHardwareInterface()
 
 void MarchHardwareInterface::init()
 {
+  // Initialize realtime publisher for the IMotionCube states
+  imc_state_pub_ = RtPublisherPtr(
+      new realtime_tools::RealtimePublisher<march_shared_resources::ImcErrorState>(this->nh_, "/march/imc_states/", 4));
+
   // Start ethercat cycle in the hardware
   this->marchRobot.startEtherCAT();
 
@@ -216,6 +221,8 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(), joint_position_[i]);
   }
 
+  this->updateIMotionCubeState();
+
   if (hasPowerDistributionBoard)
   {
     power_distribution_board_read_ = *marchRobot.getPowerDistributionBoard();
@@ -348,6 +355,36 @@ void MarchHardwareInterface::updatePowerNet()
       power_net_on_off_command_.reset();
     }
   }
+}
+
+void MarchHardwareInterface::updateIMotionCubeState()
+{
+  if (!imc_state_pub_->trylock())
+  {
+    return;
+  }
+  // Clear msg of IMotionCubeStates
+  imc_state_pub_->msg_.joint_names.clear();
+  imc_state_pub_->msg_.status_word.clear();
+  imc_state_pub_->msg_.detailed_error.clear();
+  imc_state_pub_->msg_.motion_error.clear();
+  imc_state_pub_->msg_.state.clear();
+  imc_state_pub_->msg_.detailed_error_description.clear();
+  imc_state_pub_->msg_.motion_error_description.clear();
+
+  for (int i = 0; i < num_joints_; i++)
+  {
+    march4cpp::IMotionCubeState iMotionCubeState = marchRobot.getJoint(joint_names_[i]).getIMotionCubeState();
+    imc_state_pub_->msg_.joint_names.push_back(joint_names_[i]);
+    imc_state_pub_->msg_.status_word.push_back(iMotionCubeState.statusWord);
+    imc_state_pub_->msg_.detailed_error.push_back(iMotionCubeState.detailedError);
+    imc_state_pub_->msg_.motion_error.push_back(iMotionCubeState.motionError);
+    imc_state_pub_->msg_.state.push_back(iMotionCubeState.state.getString());
+    imc_state_pub_->msg_.detailed_error_description.push_back(iMotionCubeState.detailedErrorDescription);
+    imc_state_pub_->msg_.motion_error_description.push_back(iMotionCubeState.motionErrorDescription);
+  }
+
+  imc_state_pub_->unlockAndPublish();
 }
 
 void MarchHardwareInterface::outsideLimitsCheck(int joint_index)

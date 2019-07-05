@@ -4,7 +4,8 @@
 #include <control_toolbox/filters.h>
 #include <march_hardware_interface/march_hardware.h>
 #include <ros/ros.h>
-
+#include <realtime_tools/realtime_publisher.h>
+#include <march_shared_resources/ImcErrorState.h>
 #include <march_hardware_builder/HardwareBuilder.h>
 
 #include <march_hardware/MarchRobot.h>
@@ -58,6 +59,8 @@ protected:
   double loop_hz_;
   bool hasPowerDistributionBoard = false;
   boost::shared_ptr<controller_manager::ControllerManager> controller_manager_;
+  typedef boost::shared_ptr<realtime_tools::RealtimePublisher<march_shared_resources::ImcErrorState> > RtPublisherPtr;
+  RtPublisherPtr imc_state_pub_;
   double p_error_, v_error_, e_error_;
   std::vector<SoftJointLimits> soft_limits_;
 
@@ -65,6 +68,7 @@ private:
   void updatePowerNet();
   void updateHighVoltageEnable();
   void updatePowerDistributionBoard();
+  void updateIMotionCubeState();
   void resetIMotionCubesUntilTheyWork();
   void outsideLimitsCheck(int joint_index);
 };

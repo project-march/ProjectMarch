@@ -56,6 +56,7 @@ add_library(march_hardware
         include/${PROJECT_NAME}/AngleConversions.h
         include/${PROJECT_NAME}/Encoder.h
         include/${PROJECT_NAME}/IMotionCube.h
+        include/${PROJECT_NAME}/IMotionCubeState.h
         include/${PROJECT_NAME}/Joint.h
         include/${PROJECT_NAME}/MarchRobot.h
         include/${PROJECT_NAME}/NetDriverOffsets.h
