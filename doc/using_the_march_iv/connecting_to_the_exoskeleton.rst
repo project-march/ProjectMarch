@@ -16,7 +16,8 @@ This tutorial will help you setting up a connection with the exoskeleton.
 Preparation before connecting
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This tutorial is written to establish a connection between your computer and the exoskeleton on the **same wifi**.
-So, make sure you are on the same wifi. A public network such as eduroam will probably not work.
+So, make sure you are on the same wifi. A public network such as eduroam will probably not work. Normally the |M4| exoskeleton
+automatically connects with the hotspot: **MARCH**.
 
 Running commands on the exoskeleton computer (SSH)
 --------------------------------------------------
