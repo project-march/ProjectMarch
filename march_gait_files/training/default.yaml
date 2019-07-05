@@ -3,5 +3,5 @@ gaits:
   single_step: {left_close: MIV, right_open: MIV}
   sit: {sit_down: MIII, sit_home: MIII}
   stand: {prepare_stand_up: MIII, stand_up: MIII}
-  walk: {left_close: MIV_2sec, left_swing: MIV, right_close: MIV, right_open: MIV,
+  walk: {left_close: MIV, left_swing: MIV, right_close: MIV, right_open: MIV,
     right_swing: MIV}
