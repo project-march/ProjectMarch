@@ -190,9 +190,20 @@ void MarchHardwareInterface::update(const ros::TimerEvent& e)
 {
   elapsed_time_ = ros::Duration(e.current_real - e.last_real);
   read(elapsed_time_);
+  validate();
   controller_manager_->update(ros::Time::now(), elapsed_time_);
   write(elapsed_time_);
 }
+
+void MarchHardwareInterface::validate()
+{
+  for (int i = 0; i < num_joints_; i++)
+  {
+    this->outsideLimitsCheck(i);
+    this->iMotionCubeStateCheck(i);
+  }
+}
+
 
 void MarchHardwareInterface::read(ros::Duration elapsed_time)
 {
@@ -227,12 +238,6 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
     {
       ROS_WARN_THROTTLE(10, "All-High-Voltage disabled");
     }
-  }
-
-  for (int i = 0; i < num_joints_; i++)
-  {
-    this->outsideLimitsCheck(i);
-    this->iMotionCubeStateCheck(i);
   }
 }
 
