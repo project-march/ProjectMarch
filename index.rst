@@ -80,6 +80,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    :hidden:
 
    doc/using_the_march_iv/high_level_overview
+   doc/using_the_march_iv/connecting_to_the_exoskeleton
    doc/using_the_march_iv/how_to_airgait
    doc/using_the_march_iv/how_to_report_bugs
 
