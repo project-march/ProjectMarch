@@ -1,6 +1,8 @@
 // Copyright 2019 Project March.
 #include <ros/ros.h>
 
+#include <bitset>
+
 #include <march_hardware/Joint.h>
 
 namespace march4cpp
@@ -107,6 +109,27 @@ float Joint::getTemperature()
     return -1;
   }
   return this->temperatureGES.getTemperature();
+}
+
+IMotionCubeState Joint::getIMotionCubeState()
+{
+    // Return an object of strings:
+    // the literal bits of the Status Word, Detailed Error and Motion Error
+    // and the parsed interpretation of these bits
+    IMotionCubeState states;
+
+    std::bitset<16> statusWordBits = this->iMotionCube.getStatusWord();
+    states.statusWord = statusWordBits.to_string();
+    std::bitset<16> detailedErrorBits = this->iMotionCube.getDetailedError();
+    states.detailedError = detailedErrorBits.to_string();
+    std::bitset<16> motionErrorBits = this->iMotionCube.getMotionError();
+    states.motionError = motionErrorBits.to_string();
+
+    states.state = this->iMotionCube.getState(this->iMotionCube.getStatusWord());
+    states.detailedErrorDescription = this->iMotionCube.parseDetailedError(this->iMotionCube.getDetailedError());
+    states.motionErrorDescription = this->iMotionCube.parseMotionError(this->iMotionCube.getMotionError());
+
+    return states;
 }
 
 int Joint::getTemperatureGESSlaveIndex()

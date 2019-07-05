@@ -3,13 +3,16 @@
 #define MARCH4CPP__JOINT_H
 
 #include <string>
+#include <vector>
 
 #include <march_hardware/IMotionCube.h>
 #include <march_hardware/PowerDistributionBoard.h>
 #include <march_hardware/TemperatureGES.h>
+#include <march_hardware/IMotionCubeState.h>
 
 namespace march4cpp
 {
+
 class Joint
 {
 private:
@@ -37,6 +40,7 @@ public:
   float getAngleRad();
   int getAngleIU();
   float getTemperature();
+  IMotionCubeState getIMotionCubeState();
 
   std::string getName();
   int getTemperatureGESSlaveIndex();
@@ -70,5 +74,6 @@ public:
               << "temperatureges: " << joint.temperatureGES;
   }
 };
+
 }  // namespace march4cpp
 #endif
