@@ -185,8 +185,7 @@ void EthercatMaster::monitorSlaveConnection()
     ec_statecheck(slave, EC_STATE_OPERATIONAL, EC_TIMEOUTRET);
     if (ec_slave[slave].state == EC_STATE_NONE)
     {
-      ROS_ERROR("EtherCAT train lost connection from slave %d onwards", slave);
-      throw std::exception();
+      ROS_WARN("EtherCAT train lost connection from slave %d onwards", slave);
     }
   }
 }
