@@ -152,9 +152,6 @@ void MarchHardwareInterface::init()
     joint_effort_[i] = 0;
     joint_position_command_[i] = joint_position_[i];
 
-    this->outsideLimitsCheck(i);
-    this->iMotionCubeStateCheck(i);
-
     // Create velocity joint interface
     JointHandle jointVelocityHandle(jointStateHandle, &joint_velocity_command_[i]);
     velocity_joint_interface_.registerHandle(jointVelocityHandle);
@@ -202,6 +199,7 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
   for (int i = 0; i < num_joints_; i++)
   {
     this->outsideLimitsCheck(i);
+    this->iMotionCubeStateCheck(i);
 
     float oldPosition = joint_position_[i];
 
