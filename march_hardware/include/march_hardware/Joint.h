@@ -8,22 +8,8 @@
 #include <march_hardware/IMotionCube.h>
 #include <march_hardware/PowerDistributionBoard.h>
 #include <march_hardware/TemperatureGES.h>
+#include <march_hardware/IMotionCubeState.h>
 
-namespace march4cpp
-{
-
-class IMotionCubeState
-{
-public:
-    IMotionCubeState() {}
-
-    std::string statusWord;
-    std::string detailedError;
-    std::string motionError;
-    std::string state;
-    std::string detailedErrorDescription;
-    std::string motionErrorDescription;
-};
 
 class Joint
 {
