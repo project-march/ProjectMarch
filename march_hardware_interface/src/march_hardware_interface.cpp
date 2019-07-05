@@ -4,7 +4,6 @@
 #include <joint_limits_interface/joint_limits_interface.h>
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <sstream>
-#include <bitset>
 
 #include <march_hardware/MarchRobot.h>
 #include <march_hardware/Joint.h>
