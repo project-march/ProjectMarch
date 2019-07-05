@@ -1,3 +1,5 @@
+.. _create-your-workspace-label:
+
 Create your workspace
 =====================
 .. inclusion-introduction-start
@@ -8,7 +10,6 @@ This tutorial will help you set up a ROS workspace with all packages needed to r
 
 .. note:: If you already have ros installed and are familiar with ros installations, you can skip to the :ref:`automated-script-label` below.
   We strongly recommend to follow the manual guide at least once to familiarize yourself with the commands.
-
 
 Install ROS and Catkin
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -76,6 +77,7 @@ Then call wstool with your edited ``.rosinstall`` file:
   wstool init src ~/local/path/to/the/edited/.rosinstall
   wstool update -t src
 
+.. _build-your-catkin-workspace-label:
 
 Build your Catkin Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -87,13 +89,12 @@ The next command will configure your catkin workspace: ::
 
   catkin build
 
-Source the catkin workspace: ::
+In order for catkin to know where your files are located, you have to provide a source. You do this with:
+:code:`source ~/path/to/your/repo/march-iv/march_ws/devel/setup.bash`.
 
-  source ~/march_ws/devel/setup.bash
-
-Optional: add the previous command to your ``.bashrc``: ::
-
-   echo 'source ~/march_ws/devel/setup.bash' >> ~/.bashrc
+This needs to be done for every new terminal you open, so it is advised to
+`add this command to your <https://answers.ros.org/question/206876/how-often-do-i-need-to-source-setupbash/?answer=206976#post-id-206976>`_
+:code:`~/.bashrc`, which is an Ubuntu script ran every time a new terminal is started. Restart your terminal after doing this.
 
 .. note:: Sourcing the ``setup.bash`` automatically in your ``~/.bashrc`` is
    not required and often skipped by advanced users who use more than one
