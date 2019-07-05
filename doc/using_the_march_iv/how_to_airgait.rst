@@ -51,8 +51,8 @@ Start up
 - **Start your computer** Start your computer and connect with the **MARCH** hotspot from the router.
 - **High voltage:** Turn the high voltage on, but releasing the emergency button.
 - **SSH:** Start a terminal to connect with the exoskeleton pc. Connect with :code:`ssh march@march`.
-- **Start the software:** Type in a sourced terminal :code:`roslaunch march_launch march_headless.launch`.
-- **Input Device:** Type in a sourced terminal :code:`roslaunch march_rqt_input_device march_rqt_input_device.launch`.
+- **Start the software:** Type :code:`roslaunch march_launch march_headless.launch`.
+- **Input Device:** Type in a sourced terminal on your computer :code:`roslaunch march_rqt_input_device march_rqt_input_device.launch`.
 
 
 .. note:: For this part we assume that on the pc you are running everything is installed described in  :ref:`create-your-workspace-label`
