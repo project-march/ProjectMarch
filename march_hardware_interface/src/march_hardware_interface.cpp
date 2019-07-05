@@ -152,8 +152,6 @@ void MarchHardwareInterface::init()
     joint_effort_[i] = 0;
     joint_position_command_[i] = joint_position_[i];
 
-    this->outsideLimitsCheck(i);
-
     // Create velocity joint interface
     JointHandle jointVelocityHandle(jointStateHandle, &joint_velocity_command_[i]);
     velocity_joint_interface_.registerHandle(jointVelocityHandle);
@@ -192,16 +190,25 @@ void MarchHardwareInterface::update(const ros::TimerEvent& e)
 {
   elapsed_time_ = ros::Duration(e.current_real - e.last_real);
   read(elapsed_time_);
+  validate();
   controller_manager_->update(ros::Time::now(), elapsed_time_);
   write(elapsed_time_);
 }
+
+void MarchHardwareInterface::validate()
+{
+  for (int i = 0; i < num_joints_; i++)
+  {
+    this->outsideLimitsCheck(i);
+    this->iMotionCubeStateCheck(i);
+  }
+}
+
 
 void MarchHardwareInterface::read(ros::Duration elapsed_time)
 {
   for (int i = 0; i < num_joints_; i++)
   {
-    this->outsideLimitsCheck(i);
-
     float oldPosition = joint_position_[i];
 
     joint_position_[i] = marchRobot.getJoint(joint_names_[i]).getAngleRad();
@@ -385,6 +392,20 @@ void MarchHardwareInterface::updateIMotionCubeState()
   }
 
   imc_state_pub_->unlockAndPublish();
+}
+
+void MarchHardwareInterface::iMotionCubeStateCheck(int joint_index)
+{
+  {
+    march4cpp::IMotionCubeState iMotionCubeState = marchRobot.getJoint(joint_names_[joint_index]).getIMotionCubeState();
+    if (iMotionCubeState.state == march4cpp::IMCState::fault)
+    {
+      std::ostringstream errorStream;
+      errorStream << "IMotionCube of joint " << joint_names_[joint_index].c_str() << " is in a a fault state.";
+
+      throw std::runtime_error(errorStream.str());
+    }
+  }
 }
 
 void MarchHardwareInterface::outsideLimitsCheck(int joint_index)

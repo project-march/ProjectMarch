@@ -43,6 +43,11 @@ public:
   void read(ros::Duration elapsed_time = ros::Duration(0.01));
 
   /**
+  * @brief Perform all safety checks that might crash the exoskeleton.
+ */
+  void validate();
+
+  /**
    * @brief Write position commands to the hardware.
    * @param elapsed_time Duration since last write action
    */
@@ -71,6 +76,7 @@ private:
   void updateIMotionCubeState();
   void resetIMotionCubesUntilTheyWork();
   void outsideLimitsCheck(int joint_index);
+  void iMotionCubeStateCheck(int joint_index);
 };
 }
 
