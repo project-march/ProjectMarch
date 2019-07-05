@@ -10,6 +10,8 @@
 #include <march_hardware/TemperatureGES.h>
 #include <march_hardware/IMotionCubeState.h>
 
+namespace march4cpp
+{
 
 class Joint
 {

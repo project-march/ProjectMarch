@@ -380,7 +380,7 @@ void MarchHardwareInterface::updateIMotionCubeState()
     imc_state_pub_->msg_.status_word.push_back(iMotionCubeState.statusWord);
     imc_state_pub_->msg_.detailed_error.push_back(iMotionCubeState.detailedError);
     imc_state_pub_->msg_.motion_error.push_back(iMotionCubeState.motionError);
-    imc_state_pub_->msg_.state.push_back(iMotionCubeState.state);
+    imc_state_pub_->msg_.state.push_back(iMotionCubeState.state.getString());
     imc_state_pub_->msg_.detailed_error_description.push_back(iMotionCubeState.detailedErrorDescription);
     imc_state_pub_->msg_.motion_error_description.push_back(iMotionCubeState.motionErrorDescription);
   }

@@ -301,7 +301,7 @@ std::string IMotionCube::parseStatusWord(uint16 statusWord)
   }
 }
 
-std::string IMotionCube::getState(uint16 statusWord)
+IMCState IMotionCube::getState(uint16 statusWord)
 {
     uint16 fiveBitMask = 0b0000000001001111;
     uint16 sixBitMask = 0b0000000001101111;
@@ -318,39 +318,43 @@ std::string IMotionCube::getState(uint16 statusWord)
     uint16 statusWordFiveBitMasked = (statusWord & fiveBitMask);
     uint16 statusWordSixBitMasked = (statusWord & sixBitMask);
 
-    if (statusWordFiveBitMasked == notReadyToSwitchOn)
-    {
-        return "Not Ready To Switch On";
-    }
-    else if (statusWordFiveBitMasked == switchOnDisabled)
-    {
-        return "Switch On Disabled";
-    }
-    else if (statusWordSixBitMasked == readyToSwitchOn)
-    {
-        return "Ready to Switch On";
-    }
-    else if (statusWordSixBitMasked == switchedOn)
-    {
-        return "Switched On";
-    }
-    else if (statusWordSixBitMasked == operationEnabled)
-    {
-        return "Operation Enabled";
-    }
-    else if (statusWordSixBitMasked == quickStopActive)
-    {
-        return "Quick Stop Active";
-    }
-    else if (statusWordFiveBitMasked == faultReactionActive)
-    {
-        return "Fault Reaction Active";
-    }
-    else if (statusWordFiveBitMasked == fault)
-    {
-        return "Fault";
-    }
-    else return "Not in a recognized IMC state";
+
+  if (statusWordFiveBitMasked == notReadyToSwitchOn)
+  {
+    return IMCState::notReadyToSwitchOn;
+  }
+  else if (statusWordFiveBitMasked == switchOnDisabled)
+  {
+    return IMCState::switchOnDisabled;
+  }
+  else if (statusWordSixBitMasked == readyToSwitchOn)
+  {
+    return IMCState::readyToSwitchOn;
+  }
+  else if (statusWordSixBitMasked == switchedOn)
+  {
+    return IMCState::switchedOn;
+  }
+  else if (statusWordSixBitMasked == operationEnabled)
+  {
+    return IMCState::operationEnabled;
+  }
+  else if (statusWordSixBitMasked == quickStopActive)
+  {
+    return IMCState::quickStopActive;
+  }
+  else if (statusWordFiveBitMasked == faultReactionActive)
+  {
+    return IMCState::faultReactionActive;
+  }
+  else if (statusWordFiveBitMasked == fault)
+  {
+    return IMCState::fault;
+  }
+  else {
+    return IMCState::unknown;
+  }
+
 }
 
 std::string IMotionCube::parseMotionError(uint16 motionError)
