@@ -303,21 +303,20 @@ std::string IMotionCube::parseStatusWord(uint16 statusWord)
 
 IMCState IMotionCube::getState(uint16 statusWord)
 {
-    uint16 fiveBitMask = 0b0000000001001111;
-    uint16 sixBitMask = 0b0000000001101111;
+  uint16 fiveBitMask = 0b0000000001001111;
+  uint16 sixBitMask = 0b0000000001101111;
 
-    uint16 notReadyToSwitchOn = 0b0000000000000000;
-    uint16 switchOnDisabled = 0b0000000001000000;
-    uint16 readyToSwitchOn = 0b0000000000100001;
-    uint16 switchedOn = 0b0000000000100011;
-    uint16 operationEnabled = 0b0000000000100111;
-    uint16 quickStopActive = 0b0000000000000111;
-    uint16 faultReactionActive = 0b0000000000001111;
-    uint16 fault = 0b0000000000001000;
+  uint16 notReadyToSwitchOn = 0b0000000000000000;
+  uint16 switchOnDisabled = 0b0000000001000000;
+  uint16 readyToSwitchOn = 0b0000000000100001;
+  uint16 switchedOn = 0b0000000000100011;
+  uint16 operationEnabled = 0b0000000000100111;
+  uint16 quickStopActive = 0b0000000000000111;
+  uint16 faultReactionActive = 0b0000000000001111;
+  uint16 fault = 0b0000000000001000;
 
-    uint16 statusWordFiveBitMasked = (statusWord & fiveBitMask);
-    uint16 statusWordSixBitMasked = (statusWord & sixBitMask);
-
+  uint16 statusWordFiveBitMasked = (statusWord & fiveBitMask);
+  uint16 statusWordSixBitMasked = (statusWord & sixBitMask);
 
   if (statusWordFiveBitMasked == notReadyToSwitchOn)
   {
@@ -351,10 +350,10 @@ IMCState IMotionCube::getState(uint16 statusWord)
   {
     return IMCState::fault;
   }
-  else {
+  else
+  {
     return IMCState::unknown;
   }
-
 }
 
 std::string IMotionCube::parseMotionError(uint16 motionError)
