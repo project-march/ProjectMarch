@@ -154,6 +154,7 @@ void MarchHardwareInterface::init()
     joint_position_command_[i] = joint_position_[i];
 
     this->outsideLimitsCheck(i);
+    this->iMotionCubeStateCheck(i);
 
     // Create velocity joint interface
     JointHandle jointVelocityHandle(jointStateHandle, &joint_velocity_command_[i]);
@@ -386,6 +387,20 @@ void MarchHardwareInterface::updateIMotionCubeState()
   }
 
   imc_state_pub_->unlockAndPublish();
+}
+
+void MarchHardwareInterface::iMotionCubeStateCheck(int joint_index)
+{
+  {
+    march4cpp::IMotionCubeState iMotionCubeState = marchRobot.getJoint(joint_names_[joint_index]).getIMotionCubeState();
+    if (iMotionCubeState.state == march4cpp::IMCState::fault)
+    {
+      std::ostringstream errorStream;
+      errorStream << "IMotionCube of joint " << joint_names_[joint_index].c_str() << " is in a a fault state.";
+
+      throw std::runtime_error(errorStream.str());
+    }
+  }
 }
 
 void MarchHardwareInterface::outsideLimitsCheck(int joint_index)
