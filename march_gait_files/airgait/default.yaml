@@ -1,4 +1,6 @@
 gaits:
+  ankle_test_sit: {ankle_test_sit: left}
+  ankle_test_stand: {ankle_test_stand: ankle_test_stand}
   home: {home_sit: home_sit_3sec_more_hip_extension, home_stand: home_stand_3sec_more_hip_extension}
   single_step: {left_close: MIV, right_open: MIV}
   sit: {sit_down: MIII_more_hip_extension, sit_home: MIII_more_hip_extension}
