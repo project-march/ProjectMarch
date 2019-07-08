@@ -28,7 +28,9 @@ def empty_gait(robot, duration):
             Setpoint(duration, 0, 0)
         ]
         joint = Joint(urdf_joint.name,
-                      Limits(urdf_joint.safety_controller.soft_lower_limit, urdf_joint.safety_controller.soft_upper_limit, urdf_joint.limit.velocity),
+                      Limits(urdf_joint.safety_controller.soft_lower_limit,
+                             urdf_joint.safety_controller.soft_upper_limit,
+                             urdf_joint.limit.velocity),
                       default_setpoints,
                       duration
                       )
@@ -76,7 +78,9 @@ def from_msg(robot, march_gait, gait_name, subgait_name, version):
         rospy.loginfo("Joint " + joint_name + " has setpoints " + str(setpoints))
         urdf_joint = get_joint_from_urdf(robot, joint_name)
 
-        limits = Limits(urdf_joint.safety_controller.soft_lower_limit, urdf_joint.safety_controller.soft_upper_limit, urdf_joint.limit.velocity)
+        limits = Limits(urdf_joint.safety_controller.soft_lower_limit,
+                        urdf_joint.safety_controller.soft_upper_limit,
+                        urdf_joint.limit.velocity)
         joint = Joint(joint_name,
                       limits,
                       setpoints,
