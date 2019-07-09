@@ -49,7 +49,7 @@ Start up
 - **Start the exoskeleton pc:** Keep the start button pressed until the blue light is continuously on.
 - The computer is now booting. The computer will automatically connect with the **MARCH** hotspot.
 - **Start your computer** Start your computer and connect with the **MARCH** hotspot from the router.
-- **High voltage:** Turn the high voltage on, but releasing the emergency button.
+- **High voltage:** Turn the high voltage on by releasing the emergency button.
 - **SSH:** Start a terminal to connect with the exoskeleton pc. Connect with :code:`ssh march@march`.
 - **Start the software:** Type :code:`roslaunch march_launch march_headless.launch`.
 - **Input Device:** Type in a sourced terminal on your computer :code:`roslaunch march_rqt_input_device march_rqt_input_device.launch`.
