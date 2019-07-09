@@ -16,3 +16,5 @@ march:
         - left_hip_fe
         - right_knee
         - left_knee
+        - right_ankle
+        - left_ankle
