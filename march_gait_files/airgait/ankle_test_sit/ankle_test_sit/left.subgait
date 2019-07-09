@@ -12,17 +12,27 @@ setpoints:
     time_from_start: 
       secs: 1
       nsecs: 500000000
-    joint_names: [left_hip_fe, left_knee, right_hip_fe, right_knee]
+    joint_names: [left_hip_fe, right_hip_fe, right_knee]
+  - 
+    time_from_start: 
+      secs: 3
+      nsecs:         0
+    joint_names: [left_hip_fe, left_knee, left_ankle]
   - 
     time_from_start: 
       secs: 5
       nsecs:         0
-    joint_names: [left_hip_fe, left_knee, left_ankle, right_hip_fe, right_knee, right_ankle]
+    joint_names: [right_hip_fe, right_knee, right_ankle]
+  - 
+    time_from_start: 
+      secs: 6
+      nsecs:         0
+    joint_names: [left_ankle]
   - 
     time_from_start: 
       secs: 8
       nsecs:         0
-    joint_names: [left_ankle, right_ankle]
+    joint_names: [right_ankle]
   - 
     time_from_start: 
       secs: 9
@@ -30,27 +40,32 @@ setpoints:
     joint_names: [left_hip_aa, right_hip_aa]
   - 
     time_from_start: 
-      secs: 12
-      nsecs: 500000000
-    joint_names: [left_hip_aa, right_hip_aa]
+      secs: 13
+      nsecs:         0
+    joint_names: [left_knee, left_ankle]
   - 
     time_from_start: 
       secs: 15
       nsecs:         0
-    joint_names: [left_knee, left_ankle, right_knee, right_ankle]
+    joint_names: [right_knee, right_ankle]
+  - 
+    time_from_start: 
+      secs: 19
+      nsecs:         0
+    joint_names: [left_hip_fe, left_knee, left_ankle]
   - 
     time_from_start: 
       secs: 21
       nsecs:         0
-    joint_names: [left_hip_fe, left_knee, left_ankle, right_hip_fe, right_knee, right_ankle]
+    joint_names: [right_hip_fe]
+  - 
+    time_from_start: 
+      secs: 21
+      nsecs:     99999
+    joint_names: [left_hip_fe]
   - 
     time_from_start: 
       secs: 23
-      nsecs:         0
-    joint_names: [left_hip_fe, right_hip_fe]
-  - 
-    time_from_start: 
-      secs: 25
       nsecs:         0
     joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
   right_ankle]
@@ -73,8 +88,8 @@ trajectory:
         secs: 0
         nsecs:         0
     - 
-      positions: [0.0, 1.3963, 1.5708, 0.0873, 0.0, 1.2217, 1.5708, 0.0873]
-      velocities: [0.0, 0.0, 0.0, -0.0, 0.0, 0.0, 0.0, -0.0]
+      positions: [0.0, 1.3963, 0.7927, 0.0873, 0.0, 1.2217, 1.5708, 0.0873]
+      velocities: [0.0, 0.0, -0.7853, 0.0, 0.0, 0.0, 0.0, -0.0]
       accelerations: []
       effort: []
       time_from_start: 
@@ -82,7 +97,15 @@ trajectory:
         nsecs: 500000000
     - 
       positions: [0.0, 1.2217, 0.0, 0.0873, 0.0, 1.2217, 1.5708, 0.0873]
-      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, -0.0, -0.0, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 3
+        nsecs:         0
+    - 
+      positions: [0.0, 1.2217, 0.0, 0.1516, 0.0, 1.2217, 1.5708, 0.0873]
+      velocities: [0.0, 0.0, 0.0, 0.039, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
@@ -90,31 +113,39 @@ trajectory:
         nsecs:         0
     - 
       positions: [0.0, 1.2217, 0.0, 0.1745, 0.0, 1.2217, 1.5708, 0.0873]
-      velocities: [0.0, -0.0, 0.0, 0.0, 0.0, -0.0, 0.0, 0.0]
+      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 6
+        nsecs:         0
+    - 
+      positions: [0.0, 1.2217, 0.0, 0.0713, 0.0, 1.2217, 1.5708, 0.0873]
+      velocities: [0.0, 0.0, 0.0, -0.0913, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 8
         nsecs:         0
     - 
-      positions: [0.0, 1.2217, 0.0, 0.1307, 0.0, 1.2217, 1.5708, 0.0873]
-      velocities: [0.0, 0.0, 0.0, -0.0588, 0.0, 0.0, -0.0, -0.0]
+      positions: [0.0, 1.2217, 0.0, -0.0732, 0.0, 1.2217, 1.5708, 0.0873]
+      velocities: [0.0, 0.0, 0.0, -0.112, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 9
         nsecs: 375000000
     - 
-      positions: [0.0, 1.2217, 0.0, -0.1342, 0.0, 1.2217, 1.5708, 0.0873]
-      velocities: [0.0, -0.0, 0.0, -0.086, 0.0, -0.0, -0.0, -0.0]
+      positions: [0.0, 1.2217, 0.0, -0.3491, 0.0, 1.2217, 1.5708, 0.0873]
+      velocities: [0.0, -0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
-        secs: 12
-        nsecs: 500000000
+        secs: 13
+        nsecs:         0
     - 
-      positions: [0.0, 1.2217, 0.0, -0.2618, 0.0, 1.2217, 1.5708, 0.0873]
-      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      positions: [0.0, 1.2217, 0.0, -0.2363, 0.0, 1.2217, 1.5708, 0.0873]
+      velocities: [0.0, 0.0, 0.0, 0.0968, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
@@ -122,7 +153,15 @@ trajectory:
         nsecs:         0
     - 
       positions: [0.0, 1.2217, 0.0, 0.0873, 0.0, 1.2217, 1.5708, 0.0873]
-      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, -0.0, 0.0, -0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 19
+        nsecs:         0
+    - 
+      positions: [0.0, 1.3963, 0.7849, 0.0873, 0.0, 1.2217, 1.5708, 0.0873]
+      velocities: [0.0, 0.0016, 0.589, 0.0, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
@@ -130,21 +169,21 @@ trajectory:
         nsecs:         0
     - 
       positions: [0.0, 1.3963, 0.7849, 0.0873, 0.0, 1.2217, 1.5708, 0.0873]
-      velocities: [0.0, 0.0, 0.589, 0.0, 0.0, 0.0, -0.0, 0.0]
+      velocities: [0.0, 0.0, 0.589, 0.0, 0.0, -0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
-        secs: 23
-        nsecs:         0
+        secs: 21
+        nsecs:     99999
     - 
       positions: [0.0, 1.2217, 1.5708, 0.0873, 0.0, 1.2217, 1.5708, 0.0873]
       velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
-        secs: 25
+        secs: 23
         nsecs:         0
 duration: 
-  secs: 25
+  secs: 23
   nsecs:         0
 sounds: []
