@@ -5,6 +5,14 @@
     <param name="robot_description"
            command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/test-joint.xacro'" />
 
+    <node
+            pkg="rosbag"
+            name="record"
+            type="record"
+            output="screen"
+            args="-o /home/projectmarch/Documents/logs/Testjoint.bag /march/controller/trajectory/state /clock"
+    />
+
     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="true" output="screen" ns="/"
           args="
                 /march/controller/joint_state
