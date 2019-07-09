@@ -97,7 +97,7 @@ void IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
 
 void IMotionCube::actuateRad(float targetRad)
 {
-  if (std::abs(targetRad - this->getAngleRad()) > 0.075)
+  if (std::abs(targetRad - this->getAngleRad()) > 0.27)
   {
     ROS_ERROR("Target %f exceeds max difference of 0.075 from current %f for slave %d", targetRad, this->getAngleRad(),
               this->slaveIndex);
