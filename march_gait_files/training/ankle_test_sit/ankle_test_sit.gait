@@ -1,0 +1,5 @@
+name: ankle_test_sit
+
+graph:
+  from_subgait: [start, ankle_test_sit]
+  to_subgait:   [ankle_test_sit, end]
