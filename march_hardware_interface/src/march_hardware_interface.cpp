@@ -204,7 +204,6 @@ void MarchHardwareInterface::validate()
   }
 }
 
-
 void MarchHardwareInterface::read(ros::Duration elapsed_time)
 {
   for (int i = 0; i < num_joints_; i++)
@@ -401,7 +400,12 @@ void MarchHardwareInterface::iMotionCubeStateCheck(int joint_index)
     if (iMotionCubeState.state == march4cpp::IMCState::fault)
     {
       std::ostringstream errorStream;
-      errorStream << "IMotionCube of joint " << joint_names_[joint_index].c_str() << " is in a a fault state.";
+      errorStream << "IMotionCube of joint " << joint_names_[joint_index].c_str() << " is in fault state "
+                  << iMotionCubeState.state.getString() << std::endl;
+      errorStream << "Detailed Error: " << iMotionCubeState.detailedErrorDescription << "("
+                  << iMotionCubeState.detailedError << ")" << std::endl;
+      errorStream << "Motion Error: " << iMotionCubeState.motionErrorDescription << "(" << iMotionCubeState.motionError
+                  << ")" << std::endl;
 
       throw std::runtime_error(errorStream.str());
     }
