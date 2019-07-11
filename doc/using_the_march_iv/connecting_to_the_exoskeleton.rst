@@ -37,6 +37,17 @@ If you're running remote/headless it's probably easier to **SSH** into the exosk
 Instead of running this command in every terminal you open, you can do this automatically for every terminal on a computer by `adding this command to your <https://answers.ros.org/question/206876/how-often-do-i-need-to-source-setupbash/?answer=206976#post-id-206976>`_
 :code:`~/.bashrc`
 
+ROS IP
+--------------
+To use ros commands you also need to setup the right `ROS_IP <http://wiki.ros.org/ROS/EnvironmentVariables>`_ in every terminal you use: ::
+
+    export ROS_MASTER_URI=<your ip>
+
+**<your ip>** can be obtained by running the command :code:`hostname -I` in a terminal on your computer.
+
+Instead of running this command in every terminal you open, you can do this automatically for every terminal on a computer by `adding this command to your <https://answers.ros.org/question/206876/how-often-do-i-need-to-source-setupbash/?answer=206976#post-id-206976>`_
+:code:`~/.bashrc`
+
 Add March network to hosts file
 -------------------------------
 You need to add the march network with ip to your hosts file:
