@@ -10,37 +10,37 @@ setpoints:
   - 
     time_from_start: 
       secs: 0
-      nsecs:  38800000
+      nsecs:  42600000
     joint_names: [left_hip_aa, left_ankle, right_hip_aa, right_ankle]
   - 
     time_from_start: 
       secs: 0
-      nsecs: 496000000
+      nsecs: 544000000
     joint_names: [left_knee]
   - 
     time_from_start: 
       secs: 0
-      nsecs: 581200000
+      nsecs: 637400000
     joint_names: [left_hip_aa, right_hip_aa]
   - 
     time_from_start: 
       secs: 0
-      nsecs: 620000000
+      nsecs: 680000000
     joint_names: [left_hip_fe]
   - 
     time_from_start: 
       secs: 0
-      nsecs: 775000000
+      nsecs: 850000000
     joint_names: [left_hip_aa, right_hip_aa]
   - 
     time_from_start: 
-      secs: 0
-      nsecs: 930000000
+      secs: 1
+      nsecs:  20000000
     joint_names: [right_hip_fe]
   - 
     time_from_start: 
       secs: 1
-      nsecs: 550000000
+      nsecs: 700000000
     joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
   right_ankle]
 trajectory: 
@@ -54,7 +54,7 @@ trajectory:
   right_ankle]
   points: 
     - 
-      positions: [0.0, -0.1667, 0.1396, 0.0873, 0.0, 0.3142, 0.1396, 0.0873]
+      positions: [0.0, -0.1667, 0.1396, 0.0873, 0.0, 0.2618, 0.1396, 0.0873]
       velocities: [-0.0, 0.0, 0.0, -0.0, -0.0, -0.3491, 0.0, -0.0]
       accelerations: []
       effort: []
@@ -62,53 +62,53 @@ trajectory:
         secs: 0
         nsecs:         0
     - 
-      positions: [0.0, -0.1619, 0.1474, 0.0873, 0.0, 0.3035, 0.1394, 0.0873]
-      velocities: [0.0, 0.2625, 0.4268, 0.0, 0.0, -0.3565, -0.0086, 0.0]
+      positions: [0.0, -0.1597, 0.151, 0.0873, 0.0, 0.2479, 0.1394, 0.0873]
+      velocities: [0.0, 0.3007, 0.4892, 0.0, 0.0, -0.3432, -0.01, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
-        nsecs:  38800000
+        nsecs:  42600000
     - 
-      positions: [0.0, 0.4687, 0.8727, 0.0873, 0.0, 0.1334, 0.1062, 0.0873]
-      velocities: [0.0, 1.2147, 0.0, -0.0, 0.0, -0.3259, -0.1166, -0.0]
+      positions: [0.0, 0.4701, 0.8727, 0.0873, 0.0, 0.1055, 0.1059, 0.0873]
+      velocities: [0.0, 1.0975, 0.0, 0.0, 0.0, -0.2109, -0.1066, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
-        nsecs: 496000000
+        nsecs: 544000000
     - 
-      positions: [0.0, 0.5414, 0.8592, 0.0873, 0.0, 0.1088, 0.0964, 0.0873]
-      velocities: [0.0, 0.629, -0.3189, 0.0, 0.0, -0.2881, -0.1255, 0.0]
+      positions: [0.0, 0.5433, 0.8577, 0.0873, 0.0, 0.088, 0.0959, 0.0873]
+      velocities: [0.0, 0.5461, -0.3075, 0.0, 0.0, -0.1775, -0.1148, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
-        nsecs: 581200000
+        nsecs: 637400000
     - 
-      positions: [0.0, 0.5585, 0.8424, 0.0873, 0.0, 0.0978, 0.0912, 0.0873]
-      velocities: [0.0, 0.1396, -0.4752, -0.0, 0.0, -0.2656, -0.1289, -0.0]
+      positions: [0.0, 0.5585, 0.8421, 0.0873, 0.0, 0.0813, 0.0912, 0.0873]
+      velocities: [0.0, 0.1396, -0.4366, -0.0, 0.0, -0.1618, -0.1176, -0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
-        nsecs: 620000000
+        nsecs: 680000000
     - 
-      positions: [0.0, 0.5257, 0.7216, 0.0873, 0.0, 0.0643, 0.0698, 0.0873]
-      velocities: [0.0, -0.503, -0.9556, -0.0, 0.0, -0.1515, -0.1351, -0.0]
+      positions: [0.0, 0.5295, 0.726, 0.0873, 0.0, 0.0601, 0.0704, 0.0873]
+      velocities: [0.0, -0.4399, -0.8627, 0.0, 0.0, -0.0884, -0.1232, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
-        nsecs: 775000000
+        nsecs: 850000000
     - 
-      positions: [0.0, 0.414, 0.5555, 0.0873, 0.0, 0.0524, 0.0497, 0.0873]
-      velocities: [0.0, -0.9092, -1.1954, 0.0, 0.0, 0.0, -0.1303, 0.0]
+      positions: [0.0, 0.4155, 0.5551, 0.0873, 0.0, 0.0524, 0.0496, 0.0873]
+      velocities: [0.0, -0.8301, -1.0906, -0.0, 0.0, 0.0, -0.1188, -0.0]
       accelerations: []
       effort: []
       time_from_start: 
-        secs: 0
-        nsecs: 930000000
+        secs: 1
+        nsecs:  20000000
     - 
       positions: [0.0, -0.0873, 0.0, 0.0873, 0.0, -0.0873, 0.0, 0.0873]
       velocities: [-0.0, 0.0, 0.0, -0.0, -0.0, 0.0, 0.0, -0.0]
@@ -116,8 +116,8 @@ trajectory:
       effort: []
       time_from_start: 
         secs: 1
-        nsecs: 550000000
+        nsecs: 700000000
 duration: 
   secs: 1
-  nsecs: 550000000
+  nsecs: 700000000
 sounds: []
