@@ -55,7 +55,9 @@ void Joint::prepareActuation()
 {
   if (this->allowActuation)
   {
+    ROS_INFO("Preparing joint %s for actuation", this->name.c_str());
     this->iMotionCube.goToOperationEnabled();
+    ROS_INFO("\tJoint %s successfully prepared for actuation", this->name.c_str());
   }
   else
   {
