@@ -63,7 +63,7 @@ void IMotionCube::validateMosiPDOs()
 // Set configuration parameters to the IMC
 void IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
 {
-  ROS_INFO("IMotionCube::writeInitialSettings");
+  ROS_DEBUG("IMotionCube::writeInitialSettings");
   bool success = true;
   // sdo_bit32(slaveIndex, address, subindex, value);
   // mode of operation
