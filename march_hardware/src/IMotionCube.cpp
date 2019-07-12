@@ -462,7 +462,7 @@ bool IMotionCube::goToOperationEnabled()
   int angleRead = this->encoder.getAngleIU(this->misoByteOffsets[IMCObjectName::ActualPosition]);
   //  If the encoder is functioning correctly, move the joint to its current
   //  position. Otherwise shutdown
-  if (this->encoder.isValidTargetPositionIU(angleRead))
+  if (this->encoder.isValidTargetPositionIU(angleRead) && angleRead != 0)
   {
     this->actuateIU(angleRead);
   }
