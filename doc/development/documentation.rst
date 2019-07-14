@@ -87,6 +87,26 @@ Simply run the :rootdir:`build_locally <build_locally.sh>` script to generate th
   cd ~/march_ws/src/march_tutorials
   ./build_locally.sh
 
+.. warning::
+  If you already have sphinx installed, you might get the following error:
+
+  .. code::
+
+    Traceback (most recent call last):
+      File "/home/march/.local/bin/sphinx-build", line 7, in <module>
+        from sphinx.cmd.build import main
+      File "/home/march/.local/lib/python2.7/site-packages/sphinx/cmd/build.py", line 39
+        file=stderr)
+            ^
+    SyntaxError: invalid syntax
+    stdout:
+
+  Fix it by uninstalling sphinx
+
+  .. code::
+
+    pip uninstall sphinx
+
 .. note::
   If you have added new files but not pushed to GitHub yet, html-proofer will probably complain about invalid links.
   Push your files and build locally again to solve this problem.

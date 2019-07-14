@@ -57,7 +57,7 @@ You need to add the march network with ip to your hosts file:
 - Close and save the file with **ctrl + x**.
 
 Test ROS on multiple devices
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This is a very simple test to make sure you followed :ref:`preparation-before-connecting-label` correctly.
 
 - Run :code:`roscore` in a terminal on the |M4| exoskeleton computer (you can always do this via SSH).
