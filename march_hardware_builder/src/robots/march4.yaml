@@ -65,14 +65,14 @@ march4:
 
     - right_ankle:
         allowActuation: true
-#        temperatureges: {slaveIndex: 4, byteOffset: 4}
+        temperatureges: {slaveIndex: 4, byteOffset: 0}
         imotioncube:
           slaveIndex: 3
           encoder: {resolution: 12, minPositionIU: 462, maxPositionIU: 937, zeroPositionIU: 759, safetyMarginRad: 0}
 
     - left_ankle:
         allowActuation: true
-#        temperatureges: {slaveIndex: 12, byteOffset: 4}
+        temperatureges: {slaveIndex: 12, byteOffset: 0}
         imotioncube:
           slaveIndex: 13
           encoder: {resolution: 12, minPositionIU: 925, maxPositionIU: 1413, zeroPositionIU: 1230, safetyMarginRad: 0}
