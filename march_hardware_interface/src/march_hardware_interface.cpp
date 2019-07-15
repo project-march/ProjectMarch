@@ -185,7 +185,6 @@ void MarchHardwareInterface::init()
           throw std::runtime_error("Joint has no high voltage net number");
         }
       }
-      //
       joint.prepareActuation();
     }
   }
