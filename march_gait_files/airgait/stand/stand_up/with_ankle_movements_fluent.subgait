@@ -1,8 +1,11 @@
 name: ''
 version: ''
 description: "Stand up gait: from the sitting block to the standing position. This is the same\
-  \ version as MIV, but the velocities at the beginning and end are decreased to make\
-  \ the gait more smooth."
+  \ version as MIII used except for the ankle joints. In the version of MIII the ankle\
+  \ joints don't move, but in this version the ankles are moving while standing up.\
+  \ Furthermore, 5 degrees of hip extension is added to the standing position and\
+  \ the velocities at the beginning and the end of the gait are decreased to make\
+  \ the gait smoother."
 setpoints: 
   - 
     time_from_start: 
@@ -14,7 +17,7 @@ setpoints:
     time_from_start: 
       secs: 0
       nsecs: 300000000
-    joint_names: [left_hip_fe, left_knee, right_hip_fe, right_knee]
+    joint_names: [left_hip_fe, left_knee, left_ankle, right_hip_fe, right_knee, right_ankle]
   - 
     time_from_start: 
       secs: 1
@@ -45,7 +48,7 @@ trajectory:
         secs: 0
         nsecs:         0
     - 
-      positions: [0.0, 1.3963, 1.3963, 0.0873, 0.0, 1.3963, 1.3963, 0.0873]
+      positions: [0.0, 1.3963, 1.3963, 0.1745, 0.0, 1.3963, 1.3963, 0.1745]
       velocities: [0.0, -0.8378, -0.8378, 0.0, 0.0, -0.8378, -0.8378, 0.0]
       accelerations: []
       effort: []
@@ -53,8 +56,8 @@ trajectory:
         secs: 0
         nsecs: 300000000
     - 
-      positions: [0.0, 0.0873, 0.1745, 0.0873, 0.0, 0.0873, 0.1745, 0.0873]
-      velocities: [0.0, -0.8378, -0.8378, -0.0, 0.0, -0.8378, -0.8378, -0.0]
+      positions: [0.0, 0.0873, 0.1745, 0.1011, 0.0, 0.0873, 0.1745, 0.1011]
+      velocities: [0.0, -0.8378, -0.8378, -0.083, 0.0, -0.8378, -0.8378, -0.083]
       accelerations: []
       effort: []
       time_from_start: 
