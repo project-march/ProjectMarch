@@ -8,17 +8,14 @@ namespace march_pdb_state_controller
 // These topics make it able to tests write to pdb commands.
 void MarchPdbStateController::allHighVoltageOnOffCallback(const std_msgs::Bool::ConstPtr& msg)
 {
-  ROS_INFO("allHighVoltageOnOffCallback %d", msg->data);
   pdb_state_.allHighVoltageOnOff(msg->data);
 }
 void MarchPdbStateController::masterShutdownAllowedCallback(const std_msgs::Bool::ConstPtr& msg)
 {
-  ROS_INFO("masterShutdownAllowedCallback %d", msg->data);
   pdb_state_.setMasterShutdownAllowed(msg->data);
 }
 void MarchPdbStateController::turnHighVoltageNetOnOrOffCallBack(const std_msgs::Int8::ConstPtr& msg)
 {
-  ROS_INFO("turnHighVoltageNetOnOrOffCallBack %d", msg->data);
   int net_number = msg->data;
   // sign indicates on or off
   if (net_number > 0)
@@ -33,7 +30,6 @@ void MarchPdbStateController::turnHighVoltageNetOnOrOffCallBack(const std_msgs::
 }
 void MarchPdbStateController::turnLowVoltageNetOnOrOffCallBack(const std_msgs::Int8::ConstPtr& msg)
 {
-  ROS_INFO("turnLowVoltageNetOnOrOffCallBack %d", msg->data);
   int net_number = msg->data;
   // sign indicates on or off
   if (net_number > 0)
@@ -50,13 +46,9 @@ void MarchPdbStateController::turnLowVoltageNetOnOrOffCallBack(const std_msgs::I
 bool MarchPdbStateController::init(march_hardware_interface::MarchPdbStateInterface* hw, ros::NodeHandle& root_nh,
                                    ros::NodeHandle& controller_nh)
 {
-  ROS_INFO("init MarchPdbStateController");
   // Get all temperature_sensors from the hardware interface
   const std::vector<std::string>& pdb_state_names = hw->getNames();
   for (unsigned i = 0; i < pdb_state_names.size(); i++)
-    ROS_INFO("Got pdb state %s", pdb_state_names[i].c_str());
-
-  ROS_INFO("amount of pdb_state_names: %zu", pdb_state_names.size());
   // get publishing period
   if (!controller_nh.getParam("publish_rate", publish_rate_))
   {
@@ -91,7 +83,6 @@ bool MarchPdbStateController::init(march_hardware_interface::MarchPdbStateInterf
 
 void MarchPdbStateController::starting(const ros::Time& time)
 {
-  ROS_INFO("starting MarchPdbStateController");
   // initialize time
   last_publish_times_ = time;
 }
@@ -150,7 +141,6 @@ void MarchPdbStateController::update(const ros::Time& time, const ros::Duration&
 
 void MarchPdbStateController::stopping(const ros::Time& /*time*/)
 {
-  ROS_INFO("stopping MarchPdbStateController");
 }
 }  // namespace march_pdb_state_controller
 
