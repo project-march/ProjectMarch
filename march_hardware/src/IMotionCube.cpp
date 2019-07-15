@@ -32,7 +32,7 @@ void IMotionCube::mapMisoPDOs()
   PDOmap pdoMapMISO = PDOmap();
   pdoMapMISO.addObject(IMCObjectName::StatusWord);      // Compulsory!
   pdoMapMISO.addObject(IMCObjectName::ActualPosition);  // Compulsory!
-  pdoMapMISO.addObject(IMCObjectName::DCLinkVoltage);
+  pdoMapMISO.addObject(IMCObjectName::MotionErrorRegister);
   pdoMapMISO.addObject(IMCObjectName::DetailedErrorRegister);
   this->misoByteOffsets = pdoMapMISO.map(this->slaveIndex, dataDirection::miso);
 }
@@ -63,7 +63,7 @@ void IMotionCube::validateMosiPDOs()
 // Set configuration parameters to the IMC
 void IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
 {
-  ROS_INFO("IMotionCube::writeInitialSettings");
+  ROS_DEBUG("IMotionCube::writeInitialSettings");
   bool success = true;
   // sdo_bit32(slaveIndex, address, subindex, value);
   // mode of operation
@@ -97,10 +97,11 @@ void IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
 
 void IMotionCube::actuateRad(float targetRad)
 {
-  if (std::abs(targetRad - this->getAngleRad()) > 0.2)
+  if (std::abs(targetRad - this->getAngleRad()) > 0.27)
   {
-    ROS_ERROR("Target %f exceeds max difference of 0.2 from current %f", targetRad, this->getAngleRad());
-    return;
+    ROS_ERROR("Target %f exceeds max difference of 0.27 from current %f for slave %d", targetRad, this->getAngleRad(),
+              this->slaveIndex);
+    throw std::runtime_error("Target exceeds max difference of 0.27 from current position");
   }
   this->actuateIU(this->encoder.RadtoIU(targetRad));
 }
@@ -142,9 +143,9 @@ void IMotionCube::actuateIU(int targetIU)
 {
   if (!this->encoder.isValidTargetPositionIU(targetIU))
   {
-    ROS_ERROR("Position %i is invalid. (%d, %d)", targetIU, this->encoder.getMinPositionIU(),
-              this->encoder.getMaxPositionIU());
-    return;
+    ROS_ERROR("Position %i is invalid for slave %d. (%d, %d)", targetIU, this->slaveIndex,
+              this->encoder.getMinPositionIU(), this->encoder.getMaxPositionIU());
+    throw std::runtime_error("Invalid IU actuate command.");
   }
 
   union bit32 targetPosition;
@@ -167,6 +168,13 @@ float IMotionCube::getAngleRad()
   ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO "
                                                                                   "mapping, so can't get angle");
   return this->encoder.getAngleRad(this->misoByteOffsets[IMCObjectName::ActualPosition]);
+}
+
+int IMotionCube::getAngleIU()
+{
+  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO "
+                                                                                  "mapping, so can't get angle");
+  return this->encoder.getAngleIU(this->misoByteOffsets[IMCObjectName::ActualPosition]);
 }
 
 uint16 IMotionCube::getStatusWord()
@@ -208,198 +216,206 @@ void IMotionCube::setControlWord(uint16 controlWord)
   set_output_bit16(slaveIndex, this->mosiByteOffsets[IMCObjectName::ControlWord], controlwordu);
 }
 
-void IMotionCube::parseStatusWord(uint16 statusWord)
+std::string IMotionCube::parseStatusWord(uint16 statusWord)
 {
-  ROS_WARN_STREAM("Looking up Status Word " << std::bitset<16>(statusWord));
+  std::string wordDescription = "";
   if (get_bit(statusWord, 0) == 1)
   {
-    ROS_WARN("\tAxis on. Power stage is enabled. Motor control is performed.");
+    wordDescription += "Axis on. Power stage is enabled. Motor control is performed. ";
   }
   else
   {
-    ROS_WARN("\tAxis off. Power stage is disabled. Motor control is not performed.");
+    wordDescription += "Axis off. Power stage is disabled. Motor control is not performed. ";
   }
   if (get_bit(statusWord, 2) == 1)
   {
-    ROS_WARN("\tOperation Enabled.");
+    wordDescription += "Operation Enabled. ";
   }
   if (get_bit(statusWord, 3) == 1)
   {
-    ROS_WARN("\tFault. If set, a fault condition is or was present in the drive.");
+    wordDescription += "Fault. If set, a fault condition is or was present in the drive. ";
   }
   if (get_bit(statusWord, 4) == 1)
   {
-    ROS_WARN("\tMotor supply voltage is present.");
+    wordDescription += "Motor supply voltage is present. ";
   }
   else
   {
-    ROS_WARN("\tMotor supply voltage is absent.");
+    wordDescription += "Motor supply voltage is absent. ";
   }
   if (get_bit(statusWord, 5) == 0)
   {
-    ROS_WARN("\tQuick Stop. When this bit is zero, the drive is performing a "
-             "quick stop.");
+    wordDescription += "Quick Stop. When this bit is zero, the drive is performing a quick stop. ";
   }
   if (get_bit(statusWord, 6) == 1)
   {
-    ROS_WARN("\tSwitch On Disabled.");
+    wordDescription += "Switch On Disabled. ";
   }
   if (get_bit(statusWord, 7) == 1)
   {
-    ROS_WARN("\tWarning. A TML function / homing was called, while another TML "
-             "function homing is still in execution. "
-             "The last call is ignored.");
+    wordDescription += "A TML function  was called, while another TML function is still in execution. ";
   }
   if (get_bit(statusWord, 8) == 1)
   {
-    ROS_WARN("\tA TML function or homing is executed. Until the function or "
-             "homing execution ends or is aborted, no "
-             "other TML function / homing may be called.");
+    wordDescription += "A TML function or homing is executed. ";
   }
   if (get_bit(statusWord, 9) == 1)
   {
-    ROS_WARN("\tRemote - drive parameters may be modified via CAN and the "
-             "drive will execute the command message.");
+    wordDescription += "Remote - drive parameters may be modified via CAN. ";
   }
   else
   {
-    ROS_WARN("\tRemote - drive is in local mode and will not execute the "
-             "command message.");
+    wordDescription += "Remote - drive is in local mode and will not execute the command message. ";
   }
   if (get_bit(statusWord, 10) == 1)
   {
-    ROS_WARN("\tTarget reached.");
+    wordDescription += "Target reached. ";
   }
   if (get_bit(statusWord, 11) == 1)
   {
-    ROS_WARN("\tInternal Limit Active.");
+    wordDescription += "Internal Limit Active. ";
   }
   if (get_bit(statusWord, 12) == 0)
   {
-    ROS_WARN("\tTarget position ignored.");
+    wordDescription += "Target position ignored. ";
   }
   if (get_bit(statusWord, 13) == 1)
   {
-    ROS_WARN("\tFollowing error.");
+    wordDescription += "Following error. ";
   }
   if (get_bit(statusWord, 14) == 1)
   {
-    ROS_WARN("\tLast event set has occurred.");
+    wordDescription += "Last event set has occurred. ";
   }
   else
   {
-    ROS_WARN("\tNo event set or the programmed event has not occurred yet.");
+    wordDescription += "No event set or the programmed event has not occurred yet. ";
   }
   if (get_bit(statusWord, 15) == 1)
   {
-    ROS_WARN("\tAxis on. Power stage is enabled. Motor control is performed.");
+    wordDescription += "Axis on. Power stage is enabled. Motor control is performed. ";
   }
   else
   {
-    ROS_WARN("\tAxis off. Power stage is disabled. Motor control is not performed.");
+    wordDescription += "Axis off. Power stage is disabled. Motor control is not performed. ";
   }
 }
 
-void IMotionCube::parseMotionError(uint16 motionError)
+IMCState IMotionCube::getState(uint16 statusWord)
 {
-  ROS_WARN_STREAM("Looking up Motion Error " << std::bitset<16>(motionError));
-  std::vector<std::string> bitDescriptions = {};
-  bitDescriptions.push_back("\tEtherCAT communication error. Reset by a Reset "
-                            "Fault command or by Clear Error in the "
-                            "EtherCAT State Machine.");
-  bitDescriptions.push_back("\tShort-circuit. Set when protection is "
-                            "triggered. Reset by a Reset Fault command.");
-  bitDescriptions.push_back("\tInvalid setup data. Set when the EEPROM stored "
-                            "setup data is not valid or not present.");
-  bitDescriptions.push_back("\tControl error (position/speed error too big). "
-                            "Set when protection is triggered. Reset "
-                            "by a Reset Fault command.");
-  bitDescriptions.push_back("\tCommunication error. Set when protection is "
-                            "triggered. Reset by a Reset Fault command.");
-  bitDescriptions.push_back("\tMotor position wraps around. Set when "
-                            "protection is triggered. Reset by a Reset Fault "
-                            "command.");
-  bitDescriptions.push_back("\tPositive limit switch active. Set when LSP "
-                            "input is in active state. Reset when LSP "
-                            "input is inactive state");
-  bitDescriptions.push_back("\tNegative limit switch active. Set when LSN "
-                            "input is in active state. Reset when LSN "
-                            "input is inactive state");
-  bitDescriptions.push_back("\tOver current. Set when protection is triggered. "
-                            "Reset by a Reset Fault command");
-  bitDescriptions.push_back("\tI2T protection. Set when protection is "
-                            "triggered. Reset by a Reset Fault command");
-  bitDescriptions.push_back("\tOver temperature motor. Set when protection is "
-                            "triggered. Reset by a Reset Fault "
-                            "command. This protection may be activated if the "
-                            "motor has a PTC or NTC temperature "
-                            "contact.");
-  bitDescriptions.push_back("\tOver temperature drive. Set when protection is "
-                            "triggered. Reset by a Reset Fault "
-                            "command.");
-  bitDescriptions.push_back("\tOver-voltage. Set when protection is triggered. "
-                            "Reset by a Reset Fault command");
-  bitDescriptions.push_back("\tUnder-voltage. Set when protection is "
-                            "triggered. Reset by a Reset Fault command");
-  bitDescriptions.push_back("\tCommand error. This bit is set in several situations. They can be "
-                            "distinguished either by the associated "
-                            "emergency code, or in conjunction with other bits:\n"
-                            "\t\t0xFF03 - Specified homing method not available\n"
-                            "\t\t0xFF04 - A wrong mode is set in object 6060h, modes_of_operation\n"
-                            "\t\t0xFF05 - Specified digital I/O line not available\n"
-                            "\tA function is called during the execution of another function (+ set "
-                            "bit 7 of object 6041h, statusword).\n"
-                            "\tUpdate of operation mode received during a transition. This bit acts "
-                            "just as a warning.");
-  bitDescriptions.push_back("\tDrive disabled due to enable input. Set when "
-                            "enable input is on disable state. Reset "
-                            "when enable input is on enable state");
+  uint16 fiveBitMask = 0b0000000001001111;
+  uint16 sixBitMask = 0b0000000001101111;
 
+  uint16 notReadyToSwitchOn = 0b0000000000000000;
+  uint16 switchOnDisabled = 0b0000000001000000;
+  uint16 readyToSwitchOn = 0b0000000000100001;
+  uint16 switchedOn = 0b0000000000100011;
+  uint16 operationEnabled = 0b0000000000100111;
+  uint16 quickStopActive = 0b0000000000000111;
+  uint16 faultReactionActive = 0b0000000000001111;
+  uint16 fault = 0b0000000000001000;
+
+  uint16 statusWordFiveBitMasked = (statusWord & fiveBitMask);
+  uint16 statusWordSixBitMasked = (statusWord & sixBitMask);
+
+  if (statusWordFiveBitMasked == notReadyToSwitchOn)
+  {
+    return IMCState::notReadyToSwitchOn;
+  }
+  else if (statusWordFiveBitMasked == switchOnDisabled)
+  {
+    return IMCState::switchOnDisabled;
+  }
+  else if (statusWordSixBitMasked == readyToSwitchOn)
+  {
+    return IMCState::readyToSwitchOn;
+  }
+  else if (statusWordSixBitMasked == switchedOn)
+  {
+    return IMCState::switchedOn;
+  }
+  else if (statusWordSixBitMasked == operationEnabled)
+  {
+    return IMCState::operationEnabled;
+  }
+  else if (statusWordSixBitMasked == quickStopActive)
+  {
+    return IMCState::quickStopActive;
+  }
+  else if (statusWordFiveBitMasked == faultReactionActive)
+  {
+    return IMCState::faultReactionActive;
+  }
+  else if (statusWordFiveBitMasked == fault)
+  {
+    return IMCState::fault;
+  }
+  else
+  {
+    return IMCState::unknown;
+  }
+}
+
+std::string IMotionCube::parseMotionError(uint16 motionError)
+{
+  std::vector<std::string> bitDescriptions = {};
+  bitDescriptions.push_back("EtherCAT communication error. ");
+  bitDescriptions.push_back("Short-circuit. ");
+  bitDescriptions.push_back("Invalid setup (EEPROM) data. ");
+  bitDescriptions.push_back("Control error (position/speed error too big). ");
+  bitDescriptions.push_back("Communication error. ");
+  bitDescriptions.push_back("Motor position wraps around. ");
+  bitDescriptions.push_back("Positive limit switch. ");
+  bitDescriptions.push_back("Negative limit switch. ");
+  bitDescriptions.push_back("Over-current. ");
+  bitDescriptions.push_back("I2T protection. ");
+  bitDescriptions.push_back("Over-temperature motor. ");
+  bitDescriptions.push_back("Over-temperature drive. ");
+  bitDescriptions.push_back("Over-voltage. ");
+  bitDescriptions.push_back("Under-voltage. ");
+  bitDescriptions.push_back("Command error. ");
+  bitDescriptions.push_back("Drive disabled (Emergency button connector not shorted). ");
+
+  std::string errorDescription = "";
   for (int i = 0; i < 16; i++)
   {
     if (get_bit(motionError, i) == 1)
     {
-      ROS_WARN_STREAM(bitDescriptions.at(i));
+      errorDescription = errorDescription + bitDescriptions.at(i);
     }
   }
+  return errorDescription;
 }
 
-void IMotionCube::parseDetailedError(uint16 detailedError)
+std::string IMotionCube::parseDetailedError(uint16 detailedError)
 {
-  ROS_WARN_STREAM("Looking up Detailed Error " << std::bitset<16>(detailedError));
   std::vector<std::string> bitDescriptions = {};
-  bitDescriptions.push_back("\tThe number of nested function calls exceeded "
-                            "the length of TML stack. Last function "
-                            "call was ignored.");
-  bitDescriptions.push_back("\tA RET/RETI instruction was executed while no "
-                            "function/ISR was active.");
-  bitDescriptions.push_back("\tA call to an inexistent homing routine was received.");
-  bitDescriptions.push_back("\tA call to an inexistent function was received.");
-  bitDescriptions.push_back("\tUPD instruction received while AXISON was "
-                            "executed. The UPD instruction. The UPD "
-                            "instruction was ignored and it must be sent again "
-                            "when AXISON is completed.");
-  bitDescriptions.push_back("\tCancelable call instruction received while "
-                            "another cancelable function was active.");
-  bitDescriptions.push_back("\tPositive software limit switch is active.");
-  bitDescriptions.push_back("\tNegative software limit switch is active.");
-  bitDescriptions.push_back("\tS-curve parameters caused an invalid profile. "
-                            "UPD instruction was ignored.");
+  bitDescriptions.push_back("TML stack overflow. ");
+  bitDescriptions.push_back("TML stack underflow. ");
+  bitDescriptions.push_back("Homing not available. ");
+  bitDescriptions.push_back("Function not available. ");
+  bitDescriptions.push_back("UPD ignored. ");
+  bitDescriptions.push_back("Cancelable call ignored. ");
+  bitDescriptions.push_back("Positive software limit switch is active. ");
+  bitDescriptions.push_back("Negative software limit switch is active. ");
+  bitDescriptions.push_back("Invalid S-curve profile. ");
 
+  std::string errorDescription = "";
   for (int i = 0; i < 9; i++)
   {
     if (get_bit(detailedError, i) == 1)
     {
-      ROS_WARN_STREAM(bitDescriptions.at(i));
+      errorDescription = errorDescription + bitDescriptions.at(i);
     }
   }
+  return errorDescription;
 }
 
 bool IMotionCube::goToOperationEnabled()
 {
   this->setControlWord(128);
 
-  ROS_INFO("Try to go to 'Switch on Disabled'");
+  ROS_INFO("\tTry to go to 'Switch on Disabled'");
   bool switchOnDisabled = false;
   while (!switchOnDisabled)
   {
@@ -408,11 +424,11 @@ bool IMotionCube::goToOperationEnabled()
     int switchOnDisabledMask = 0b0000000001001111;
     int switchOnDisabledState = 64;
     switchOnDisabled = (statusWord & switchOnDisabledMask) == switchOnDisabledState;
-    ROS_INFO_STREAM_THROTTLE(0.1, "Waiting for 'Switch on Disabled': " << std::bitset<16>(statusWord));
+    ROS_INFO_STREAM_THROTTLE(0.5, "\tWaiting for 'Switch on Disabled': " << std::bitset<16>(statusWord));
   }
-  ROS_INFO("Switch on Disabled!");
+  ROS_INFO("\tSwitch on Disabled!");
 
-  ROS_INFO("Try to go to 'Ready to Switch On'");
+  ROS_INFO("\tTry to go to 'Ready to Switch On'");
   bool readyToSwitchOn = false;
   while (!readyToSwitchOn)
   {
@@ -421,11 +437,11 @@ bool IMotionCube::goToOperationEnabled()
     int readyToSwitchOnMask = 0b0000000001101111;
     int readyToSwitchOnState = 33;
     readyToSwitchOn = (statusWord & readyToSwitchOnMask) == readyToSwitchOnState;
-    ROS_INFO_STREAM_THROTTLE(0.1, "Waiting for 'Ready to Switch On': " << std::bitset<16>(statusWord));
+    ROS_INFO_STREAM_THROTTLE(0.5, "\tWaiting for 'Ready to Switch On': " << std::bitset<16>(statusWord));
   }
-  ROS_INFO("Ready to Switch On!");
+  ROS_INFO("\tReady to Switch On!");
 
-  ROS_INFO("Try to go to 'Switched On'");
+  ROS_INFO("\tTry to go to 'Switched On'");
   bool switchedOn = false;
   while (!switchedOn)
   {
@@ -434,9 +450,9 @@ bool IMotionCube::goToOperationEnabled()
     int switchedOnMask = 0b0000000001101111;
     int switchedOnState = 35;
     switchedOn = (statusWord & switchedOnMask) == switchedOnState;
-    ROS_INFO_STREAM_THROTTLE(0.1, "Waiting for 'Switched On': " << std::bitset<16>(statusWord));
+    ROS_INFO_STREAM_THROTTLE(0.5, "\tWaiting for 'Switched On': " << std::bitset<16>(statusWord));
   }
-  ROS_INFO("Switched On!");
+  ROS_INFO("\tSwitched On!");
 
   // If ActualPosition is not defined in PDOmapping, a fatal error is thrown
   // because of safety reasons
@@ -446,19 +462,19 @@ bool IMotionCube::goToOperationEnabled()
   int angleRead = this->encoder.getAngleIU(this->misoByteOffsets[IMCObjectName::ActualPosition]);
   //  If the encoder is functioning correctly, move the joint to its current
   //  position. Otherwise shutdown
-  if (this->encoder.isValidTargetPositionIU(angleRead))
+  if (this->encoder.isValidTargetPositionIU(angleRead) && angleRead != 0)
   {
     this->actuateIU(angleRead);
   }
   else
   {
-    ROS_FATAL("Encoder is not functioning properly, read value %d, min value "
-              "is %d, max value is %d. Shutting down",
+    ROS_FATAL("Encoder of iMotionCube (with slaveindex %d) is not functioning properly, read value %d, min value "
+              "is %d, max value is %d. Shutting down", this->slaveIndex,
               angleRead, this->encoder.getMinPositionIU(), this->encoder.getMaxPositionIU());
     throw std::domain_error("Encoder is not functioning properly");
   }
 
-  ROS_INFO("Try to go to 'Operation Enabled'");
+  ROS_INFO("\tTry to go to 'Operation Enabled'");
   bool operationEnabled = false;
   while (!operationEnabled)
   {
@@ -467,9 +483,16 @@ bool IMotionCube::goToOperationEnabled()
     int operationEnabledMask = 0b0000000001101111;
     int operationEnabledState = 39;
     operationEnabled = (statusWord & operationEnabledMask) == operationEnabledState;
-    ROS_INFO_STREAM_THROTTLE(0.1, "Waiting for 'Operation Enabled': " << std::bitset<16>(statusWord));
+    ROS_INFO_STREAM_THROTTLE(0.5, "\tWaiting for 'Operation Enabled': " << std::bitset<16>(statusWord));
   }
-  ROS_INFO("Operation Enabled!");
+  ROS_INFO("\tOperation Enabled!");
+}
+
+bool IMotionCube::resetIMotionCube()
+{
+  this->setControlWord(0);
+  ROS_DEBUG("Slave: %d, Try to reset IMC", this->slaveIndex);
+  sdo_bit16(slaveIndex, 0x2080, 0, 1);
 }
 
 bool IMotionCube::get_bit(uint16 value, int index)

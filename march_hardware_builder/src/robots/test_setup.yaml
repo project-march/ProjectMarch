@@ -8,7 +8,7 @@ testsetup:
           slaveIndex: 1
           encoder:
             resolution: 17
-            minPositionIU: 83678
-            maxPositionIU: 101450
-            zeroPositionIU: 89712
+            minPositionIU: 82805
+            maxPositionIU: 102499
+            zeroPositionIU: 94540
             safetyMarginRad: 0.005

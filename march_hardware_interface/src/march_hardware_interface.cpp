@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include <march_hardware/MarchRobot.h>
+#include <march_hardware/Joint.h>
 
 #include <march_hardware_interface/PowerNetOnOffCommand.h>
 #include <march_hardware_interface/march_hardware_interface.h>
@@ -13,9 +14,9 @@
 #include <urdf/model.h>
 
 using joint_limits_interface::JointLimits;
-using joint_limits_interface::SoftJointLimits;
 using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::PositionJointSoftLimitsInterface;
+using joint_limits_interface::SoftJointLimits;
 
 namespace march_hardware_interface
 {
@@ -36,6 +37,10 @@ MarchHardwareInterface::~MarchHardwareInterface()
 
 void MarchHardwareInterface::init()
 {
+  // Initialize realtime publisher for the IMotionCube states
+  imc_state_pub_ = RtPublisherPtr(
+      new realtime_tools::RealtimePublisher<march_shared_resources::ImcErrorState>(this->nh_, "/march/imc_states/", 4));
+
   // Start ethercat cycle in the hardware
   this->marchRobot.startEtherCAT();
 
@@ -54,6 +59,9 @@ void MarchHardwareInterface::init()
       joint_names_.push_back(urdfJoint.first);
     }
   }
+
+  nh_.setParam("/march/joint_names", joint_names_);
+
   num_joints_ = joint_names_.size();
 
   // Resize vectors
@@ -65,6 +73,17 @@ void MarchHardwareInterface::init()
   joint_position_command_.resize(num_joints_);
   joint_velocity_command_.resize(num_joints_);
   joint_effort_command_.resize(num_joints_);
+  soft_limits_.resize(num_joints_);
+
+  for (int i = 0; i < num_joints_; ++i)
+  {
+    SoftJointLimits soft_limits;
+    getSoftJointLimits(model.getJoint(joint_names_[i]), soft_limits);
+    ROS_INFO("%s soft_limits_ (%f, %f).", joint_names_[i].c_str(), soft_limits.min_position, soft_limits.max_position);
+    soft_limits_[i] = soft_limits;
+  }
+
+  resetIMotionCubesUntilTheyWork();
 
   // Print all joint positions on startup in case initialization fails.
   this->read();
@@ -120,11 +139,9 @@ void MarchHardwareInterface::init()
     // Retrieve joint (soft) limits from the urdf
     JointLimits limits;
     getJointLimits(model.getJoint(joint.getName()), limits);
-    SoftJointLimits softLimits;
-    getSoftJointLimits(model.getJoint(joint.getName()), softLimits);
 
     // Create joint limit interface
-    PositionJointSoftLimitsHandle jointLimitsHandle(jointPositionHandle, limits, softLimits);
+    PositionJointSoftLimitsHandle jointLimitsHandle(jointPositionHandle, limits, soft_limits_[i]);
     positionJointSoftLimitsInterface.registerHandle(jointLimitsHandle);
 
     position_joint_interface_.registerHandle(jointPositionHandle);
@@ -134,20 +151,6 @@ void MarchHardwareInterface::init()
     joint_velocity_[i] = 0;
     joint_effort_[i] = 0;
     joint_position_command_[i] = joint_position_[i];
-
-    if (joint_position_[i] < softLimits.min_position || joint_position_[i] > softLimits.max_position)
-    {
-      ROS_FATAL("Joint %s is outside of its softLimits (%f, %f). Actual position: %f", joint_names_[i].c_str(),
-                softLimits.min_position, softLimits.max_position, joint_position_[i]);
-
-      if (joint.canActuate())
-      {
-        std::ostringstream errorStream;
-        errorStream << "Joint " << joint_names_[i].c_str() << " is out of its softLimits (" << softLimits.min_position
-                    << ", " << softLimits.max_position << "). Actual position: " << joint_position_[i];
-        throw ::std::invalid_argument(errorStream.str());
-      }
-    }
 
     // Create velocity joint interface
     JointHandle jointVelocityHandle(jointStateHandle, &joint_velocity_command_[i]);
@@ -187,8 +190,18 @@ void MarchHardwareInterface::update(const ros::TimerEvent& e)
 {
   elapsed_time_ = ros::Duration(e.current_real - e.last_real);
   read(elapsed_time_);
+  validate();
   controller_manager_->update(ros::Time::now(), elapsed_time_);
   write(elapsed_time_);
+}
+
+void MarchHardwareInterface::validate()
+{
+  for (int i = 0; i < num_joints_; i++)
+  {
+    this->outsideLimitsCheck(i);
+    this->iMotionCubeStateCheck(i);
+  }
 }
 
 void MarchHardwareInterface::read(ros::Duration elapsed_time)
@@ -213,6 +226,8 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
 
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(), joint_position_[i]);
   }
+
+  this->updateIMotionCubeState();
 
   if (hasPowerDistributionBoard)
   {
@@ -244,6 +259,37 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
   if (hasPowerDistributionBoard)
   {
     updatePowerDistributionBoard();
+  }
+}
+
+void MarchHardwareInterface::resetIMotionCubesUntilTheyWork()
+{
+  bool encoderSetCorrectly = false;
+
+  while (!encoderSetCorrectly)
+  {
+    encoderSetCorrectly = true;
+    for (int i = 0; i < num_joints_; ++i)
+    {
+      march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
+      if (joint.getAngleIU() == 0)
+      {
+        ROS_ERROR("Joint %s failed (encoder reset)", joint_names_[i].c_str());
+        encoderSetCorrectly = false;
+      }
+    }
+    if (!encoderSetCorrectly)
+    {
+      // TODO(Martijn) check if you need to reset all joints.
+      for (int i = 0; i < num_joints_; ++i)
+      {
+        march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
+        joint.resetIMotionCube();
+      }
+      ROS_INFO("Restarting EtherCAT");
+      marchRobot.stopEtherCAT();
+      marchRobot.startEtherCAT();
+    }
   }
 }
 
@@ -313,6 +359,76 @@ void MarchHardwareInterface::updatePowerNet()
       ROS_ERROR("%s", exception.what());
       ROS_WARN("Reset power net command, in attempt to prevent this exception is thrown again");
       power_net_on_off_command_.reset();
+    }
+  }
+}
+
+void MarchHardwareInterface::updateIMotionCubeState()
+{
+  if (!imc_state_pub_->trylock())
+  {
+    return;
+  }
+  // Clear msg of IMotionCubeStates
+  imc_state_pub_->msg_.joint_names.clear();
+  imc_state_pub_->msg_.status_word.clear();
+  imc_state_pub_->msg_.detailed_error.clear();
+  imc_state_pub_->msg_.motion_error.clear();
+  imc_state_pub_->msg_.state.clear();
+  imc_state_pub_->msg_.detailed_error_description.clear();
+  imc_state_pub_->msg_.motion_error_description.clear();
+
+  for (int i = 0; i < num_joints_; i++)
+  {
+    march4cpp::IMotionCubeState iMotionCubeState = marchRobot.getJoint(joint_names_[i]).getIMotionCubeState();
+    imc_state_pub_->msg_.joint_names.push_back(joint_names_[i]);
+    imc_state_pub_->msg_.status_word.push_back(iMotionCubeState.statusWord);
+    imc_state_pub_->msg_.detailed_error.push_back(iMotionCubeState.detailedError);
+    imc_state_pub_->msg_.motion_error.push_back(iMotionCubeState.motionError);
+    imc_state_pub_->msg_.state.push_back(iMotionCubeState.state.getString());
+    imc_state_pub_->msg_.detailed_error_description.push_back(iMotionCubeState.detailedErrorDescription);
+    imc_state_pub_->msg_.motion_error_description.push_back(iMotionCubeState.motionErrorDescription);
+  }
+
+  imc_state_pub_->unlockAndPublish();
+}
+
+void MarchHardwareInterface::iMotionCubeStateCheck(int joint_index)
+{
+  {
+    march4cpp::IMotionCubeState iMotionCubeState = marchRobot.getJoint(joint_names_[joint_index]).getIMotionCubeState();
+    if (iMotionCubeState.state == march4cpp::IMCState::fault)
+    {
+      std::ostringstream errorStream;
+      errorStream << "IMotionCube of joint " << joint_names_[joint_index].c_str() << " is in fault state "
+                  << iMotionCubeState.state.getString() << std::endl;
+      errorStream << "Detailed Error: " << iMotionCubeState.detailedErrorDescription << "("
+                  << iMotionCubeState.detailedError << ")" << std::endl;
+      errorStream << "Motion Error: " << iMotionCubeState.motionErrorDescription << "(" << iMotionCubeState.motionError
+                  << ")" << std::endl;
+
+      throw std::runtime_error(errorStream.str());
+    }
+  }
+}
+
+void MarchHardwareInterface::outsideLimitsCheck(int joint_index)
+{
+  march4cpp::Joint joint = marchRobot.getJoint(joint_names_[joint_index]);
+  if (joint_position_[joint_index] < soft_limits_[joint_index].min_position ||
+      joint_position_[joint_index] > soft_limits_[joint_index].max_position)
+  {
+    ROS_ERROR_THROTTLE(1, "Joint %s is outside of its soft_limits_ (%f, %f). Actual position: %f",
+                       joint_names_[joint_index].c_str(), soft_limits_[joint_index].min_position,
+                       soft_limits_[joint_index].max_position, joint_position_[joint_index]);
+
+    if (joint.canActuate())
+    {
+      std::ostringstream errorStream;
+      errorStream << "Joint " << joint_names_[joint_index].c_str() << " is out of its soft_limits_ ("
+                  << soft_limits_[joint_index].min_position << ", " << soft_limits_[joint_index].max_position
+                  << "). Actual position: " << joint_position_[joint_index];
+      throw ::std::runtime_error(errorStream.str());
     }
   }
 }

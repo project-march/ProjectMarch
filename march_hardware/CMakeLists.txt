@@ -56,6 +56,7 @@ add_library(march_hardware
         include/${PROJECT_NAME}/AngleConversions.h
         include/${PROJECT_NAME}/Encoder.h
         include/${PROJECT_NAME}/IMotionCube.h
+        include/${PROJECT_NAME}/IMotionCubeState.h
         include/${PROJECT_NAME}/Joint.h
         include/${PROJECT_NAME}/MarchRobot.h
         include/${PROJECT_NAME}/NetDriverOffsets.h
@@ -85,7 +86,11 @@ target_link_libraries(march_hardware ${catkin_LIBRARIES})
 
 
 add_executable(hardware_dummy src/main.cpp)
+
 target_link_libraries(hardware_dummy march_hardware)
+
+add_executable(slave_count_check check/SlaveCount.cpp)
+target_link_libraries(slave_count_check march_hardware)
 
 install(TARGETS march_hardware
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -96,6 +101,14 @@ install(TARGETS march_hardware
 add_custom_command(
         TARGET hardware_dummy
         COMMAND sudo setcap cap_net_raw+ep hardware_dummy
+        WORKING_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}
+        POST_BUILD
+)
+
+# Give sudo access to ethernet port
+add_custom_command(
+        TARGET slave_count_check
+        COMMAND sudo setcap cap_net_raw+ep slave_count_check
         WORKING_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}
         POST_BUILD
 )

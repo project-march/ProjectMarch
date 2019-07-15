@@ -17,6 +17,8 @@ find_package(catkin REQUIRED COMPONENTS
   march_hardware
   march_hardware_builder
   urdf
+  march_shared_resources
+  realtime_tools
 )
 
 catkin_package(

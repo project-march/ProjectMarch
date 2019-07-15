@@ -10,6 +10,7 @@
 #include <march_hardware/Slave.h>
 #include <march_hardware/Encoder.h>
 #include <march_hardware/PDOmap.h>
+#include <march_hardware/IMotionCubeState.h>
 
 namespace march4cpp
 {
@@ -42,6 +43,7 @@ public:
   void writeInitialSDOs(int ecatCycleTime) override;
 
   float getAngleRad();
+  int getAngleIU();
 
   uint16 getStatusWord();
   uint16 getMotionError();
@@ -52,11 +54,13 @@ public:
   void actuateRad(float targetRad);
   void actuateRadFixedSpeed(float targetRad, float radPerSec);
 
-  void parseStatusWord(uint16 statusWord);
-  void parseMotionError(uint16 motionError);
-  void parseDetailedError(uint16 detailedError);
+  std::string parseStatusWord(uint16 statusWord);
+  IMCState getState(uint16 statusWord);
+  std::string parseMotionError(uint16 motionError);
+  std::string parseDetailedError(uint16 detailedError);
 
   bool goToOperationEnabled();
+  bool resetIMotionCube();
 
   /** @brief Override comparison operator */
   friend bool operator==(const IMotionCube& lhs, const IMotionCube& rhs)

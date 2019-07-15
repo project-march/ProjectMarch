@@ -18,8 +18,9 @@ extern "C"
 namespace march4cpp
 {
 // Constructor
-EthercatMaster::EthercatMaster(std::vector<Joint> *jointListPtr, std::string ifname, int maxSlaveIndex,
-                               int ecatCycleTime) : jointListPtr(jointListPtr)
+EthercatMaster::EthercatMaster(std::vector<Joint>* jointListPtr, std::string ifname, int maxSlaveIndex,
+                               int ecatCycleTime)
+  : jointListPtr(jointListPtr)
 {
   this->ifname = ifname;
   this->maxSlaveIndex = maxSlaveIndex;
@@ -34,17 +35,17 @@ void EthercatMaster::start()
   // Initialise SOEM, bind socket to ifname
   if (!ec_init(ifname.c_str()))
   {
-    ROS_ERROR("No socket connection on %s. Confirm that you have selected the right ifname", ifname.c_str());
-    return;
+    ROS_FATAL("No socket connection on %s. Confirm that you have selected the right ifname", ifname.c_str());
+    throw std::runtime_error("No socket connection on %s. Confirm that you have selected the right ifname");
   }
   ROS_INFO("ec_init on %s succeeded", ifname.c_str());
 
   // Find and auto-config slaves
   if (ec_config_init(FALSE) <= 0)
   {
-    ROS_ERROR("No slaves found, shutting down. Confirm that you have selected the right ifname.");
-    ROS_ERROR("Check that the first slave is connected properly");
-    return;
+    ROS_FATAL("No slaves found, shutting down. Confirm that you have selected the right ifname.");
+    ROS_FATAL("Check that the first slave is connected properly");
+    throw std::runtime_error("No slaves found, shutting down. Confirm that you have selected the right ifname.");
   }
   ROS_INFO("%d slave(s) found and initialized.", ec_slavecount);
 
@@ -128,6 +129,9 @@ void EthercatMaster::stop()
 
 void EthercatMaster::ethercatLoop()
 {
+  uint32_t totalLoops = 0;
+  uint32_t rateNotAchievedCount = 0;
+  int rate = 1000 / ecatCycleTimems;
   while (isOperational)
   {
     auto start = boost::chrono::high_resolution_clock::now();
@@ -138,11 +142,28 @@ void EthercatMaster::ethercatLoop()
     auto duration = boost::chrono::duration_cast<boost::chrono::microseconds>(stop - start);
     if (duration.count() > ecatCycleTimems * 1000)
     {
-        ROS_WARN("EtherCAT rate of %d milliseconds per cycle was not achieved this EtherCAT cycle", ecatCycleTimems);
+      rateNotAchievedCount++;
     }
     else
     {
-        usleep(ecatCycleTimems * 1000 - duration.count());
+      usleep(ecatCycleTimems * 1000 - duration.count());
+    }
+    totalLoops++;
+    if (totalLoops >= 10 * rate)  // Every 10 seconds
+    {
+      float rateNotAchievedPercentage = 100 * (static_cast<float>(rateNotAchievedCount) / totalLoops);
+      if (rateNotAchievedPercentage > 1)  // If percentage greater than 10 percent, do ROS_WARN instead of ROS_INFO
+      {
+        ROS_WARN("EtherCAT rate of %d milliseconds per cycle was not achieved for %f percent of all cycles",
+                 ecatCycleTimems, rateNotAchievedPercentage);
+      }
+      else
+      {
+        ROS_DEBUG("EtherCAT rate of %d milliseconds per cycle was not achieved for %f percent of all cycles",
+                 ecatCycleTimems, rateNotAchievedPercentage);
+      }
+      totalLoops = 0;
+      rateNotAchievedCount = 0;
     }
   }
 }
@@ -164,8 +185,8 @@ void EthercatMaster::monitorSlaveConnection()
     ec_statecheck(slave, EC_STATE_OPERATIONAL, EC_TIMEOUTRET);
     if (ec_slave[slave].state == EC_STATE_NONE)
     {
-      ROS_ERROR("EtherCAT train lost connection from slave %d onwards", slave);
-      throw std::exception();
+      // TODO(@Tim, @Isha, @Martijn) throw error when it happens multiple times in a short period of time.
+      ROS_WARN("EtherCAT train lost connection from slave %d onwards", slave);
     }
   }
 }
