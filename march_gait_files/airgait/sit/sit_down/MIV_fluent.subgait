@@ -1,6 +1,8 @@
 name: ''
 version: ''
-description: "Sit down gait for the sitting block. This is the same version as MIII used."
+description: "Sit down gait for the sitting block. This is the same version as MIV except for the\
+  \ fact that the velocities and the beginning and the end are decreased to get a\
+  \ smoother gait."
 setpoints: 
   - 
     time_from_start: 

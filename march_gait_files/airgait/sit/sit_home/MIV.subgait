@@ -1,7 +1,6 @@
 name: ''
 version: ''
-description: "Sit home gait for the sitting block: perform a little bit hip extension. This is\
-  \ the same version as MIII used."
+description: "Sit home gait for the sitting block: perform a little bit hip extension."
 setpoints: 
   - 
     time_from_start: 

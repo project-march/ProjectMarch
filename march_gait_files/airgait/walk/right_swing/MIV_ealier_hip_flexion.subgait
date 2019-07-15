@@ -1,7 +1,7 @@
 name: ''
 version: ''
-description: "The setpoints of this walking gait are the same as the setpoints of the MIII walking\
-  \ gait, except for the fact that the timing of the setpoints in different."
+description: "The setpoints of this walking gait are the same as the setpoints of the MIV walking\
+  \ gait, but the hip and knee flexion is earlier in the gait cycle."
 setpoints: 
   - 
     time_from_start: 
@@ -151,7 +151,7 @@ trajectory:
         nsecs: 399999999
     - 
       positions: [0.0, 0.3142, 0.1396, 0.0873, 0.0, -0.1047, 0.1396, 0.0873]
-      velocities: [-0.0, -0.3491, 0.0, -0.0, -0.0, 0.3491, 0.0, -0.0]
+      velocities: [0.0, -0.3491, 0.0, 0.0, 0.0, 0.3491, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 

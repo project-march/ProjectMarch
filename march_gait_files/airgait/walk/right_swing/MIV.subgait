@@ -138,7 +138,7 @@ trajectory:
         nsecs: 395000000
     - 
       positions: [0.0, 0.3142, 0.1396, 0.0873, 0.0, -0.1667, 0.1396, 0.0873]
-      velocities: [-0.0, -0.3491, 0.0, -0.0, -0.0, 0.0, 0.0, -0.0]
+      velocities: [0.0, -0.3491, 0.0, -0.0, 0.0, 0.0, 0.0, -0.0]
       accelerations: []
       effort: []
       time_from_start: 

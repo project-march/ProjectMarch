@@ -1,7 +1,8 @@
 name: ''
 version: ''
 description: "Stand up gait: from the sitting block to the standing position. This is the same\
-  \ version as MIII used."
+  \ version as MIII used, except for the fact that 5 degrees of hip extension is added\
+  \ to the standing position."
 setpoints: 
   - 
     time_from_start: 

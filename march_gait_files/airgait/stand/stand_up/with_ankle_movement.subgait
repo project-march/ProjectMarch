@@ -1,8 +1,10 @@
 name: ''
 version: ''
 description: "Stand up gait: from the sitting block to the standing position. This is the same\
-  \ version as MIII used except for the ankle joints. In the version of MIII the ankle\
-  \ joints don't move, but in this version the ankles are moving while standing up."
+  \ version as MIII used except for the ankle joint and the standing position of the\
+  \ hip joints. In the version of MIII the ankle joints don't move, but in this version\
+  \ the ankles are moving while standing up. Furthermore, 5 degrees more hip extension\
+  \ is added to the standing position."
 setpoints: 
   - 
     time_from_start: 

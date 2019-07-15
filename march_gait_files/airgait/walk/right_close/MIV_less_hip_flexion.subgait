@@ -1,6 +1,6 @@
 name: ''
 version: ''
-description: "Final right step of the MIV walking gait."
+description: "Final right step of the MIV walking gait with less hip flexion"
 setpoints: 
   - 
     time_from_start: 

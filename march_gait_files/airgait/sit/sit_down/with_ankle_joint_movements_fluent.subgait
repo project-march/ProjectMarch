@@ -1,6 +1,6 @@
 name: ''
 version: ''
-description: "Sit down gait. This is the same version as MIII used, except for the fact that the\
+description: "Sit down gait. This is the same version as MIV_fluent, except for the fact that the\
   \ ankles are moving in this version."
 setpoints: 
   - 
@@ -55,7 +55,7 @@ trajectory:
   right_ankle]
   points: 
     - 
-      positions: [0.0, -0.0873, 0.0, 0.0, 0.0, -0.0873, 0.0, 0.0]
+      positions: [0.0, -0.0873, 0.0, 0.0873, 0.0, -0.0873, 0.0, 0.0873]
       velocities: [-0.0, 0.0, 0.0, 0.0, -0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
@@ -63,8 +63,8 @@ trajectory:
         secs: 0
         nsecs:         0
     - 
-      positions: [0.0, -0.0819, 0.0019, 0.0183, 0.0, -0.0819, 0.0019, 0.0183]
-      velocities: [0.0, 0.1613, 0.0584, 0.5238, 0.0, 0.1613, 0.0584, 0.5238]
+      positions: [0.0, -0.0819, 0.0019, 0.0964, 0.0, -0.0819, 0.0019, 0.0964]
+      velocities: [0.0, 0.1613, 0.0584, 0.2618, 0.0, 0.1613, 0.0584, 0.2618]
       accelerations: []
       effort: []
       time_from_start: 

@@ -1,7 +1,8 @@
 name: ''
 version: ''
 description: "Prepare stand up: perform hip flexion before the actual standing up. This is the\
-  \ same version as MIII used."
+  \ same version as MIII used, except for the fact that more hip extension is added\
+  \ at the sitting position."
 setpoints: 
   - 
     time_from_start: 
