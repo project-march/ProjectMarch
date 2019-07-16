@@ -1,0 +1,5 @@
+name: sofa_sit
+
+graph:
+  from_subgait: [start,      sit_down, sit_home]
+  to_subgait:   [sit_down, sit_home,       end]
