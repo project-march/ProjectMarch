@@ -1,27 +1,26 @@
 name: ''
 version: ''
-description: "Stand up gait: from the sofa to the standing position."
+description: "Closing step for a side step to the right."
 setpoints: 
   - 
     time_from_start: 
       secs: 0
       nsecs:         0
-    joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
-  right_ankle]
+    joint_names: [left_hip_aa, left_hip_fe, left_knee, right_hip_aa, right_hip_fe, right_knee]
   - 
     time_from_start: 
       secs: 0
-      nsecs: 340000000
-    joint_names: [left_hip_fe, left_knee, right_hip_fe, right_knee]
+      nsecs:  50100000
+    joint_names: [left_ankle, right_ankle]
   - 
     time_from_start: 
       secs: 1
-      nsecs: 360000000
-    joint_names: [left_hip_fe, left_knee, right_hip_fe, right_knee]
+      nsecs:         0
+    joint_names: [left_hip_aa, right_hip_aa]
   - 
     time_from_start: 
-      secs: 1
-      nsecs: 700000000
+      secs: 2
+      nsecs:         0
     joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
   right_ankle]
 trajectory: 
@@ -35,38 +34,38 @@ trajectory:
   right_ankle]
   points: 
     - 
-      positions: [0.0, 1.6581, 1.9024, 0.0873, 0.0, 1.6581, 1.9024, 0.0873]
-      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      positions: [0.0873, -0.0873, 0.0, 0.0873, 0.0873, -0.0873, 0.0, 0.0873]
+      velocities: [0.0, 0.0, 0.0, -0.0, 0.0, 0.0, 0.0, -0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs:         0
     - 
-      positions: [0.0, 1.4835, 1.7453, 0.0873, 0.0, 1.4835, 1.7453, 0.0873]
-      velocities: [0.0, -0.8378, -0.8378, -0.0, 0.0, -0.8378, -0.8378, -0.0]
+      positions: [0.0873, -0.0873, 0.0, 0.0873, 0.0866, -0.0873, 0.0, 0.0873]
+      velocities: [0.0, 0.0, 0.0, 0.0, -0.0284, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
-        nsecs: 340000000
+        nsecs:  50100000
     - 
-      positions: [0.0, 0.0873, 0.1745, 0.0873, 0.0, 0.0873, 0.1745, 0.0873]
-      velocities: [0.0, -0.8378, -0.8378, 0.0, 0.0, -0.8378, -0.8378, 0.0]
+      positions: [0.0873, -0.0873, 0.0, 0.0873, -0.0524, -0.0873, 0.0, 0.0873]
+      velocities: [0.0, 0.0, 0.0, -0.0, 0.0, 0.0, 0.0, -0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 1
-        nsecs: 360000000
+        nsecs:         0
     - 
       positions: [0.0, -0.0873, 0.0, 0.0873, 0.0, -0.0873, 0.0, 0.0873]
       velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
-        secs: 1
-        nsecs: 700000000
+        secs: 2
+        nsecs:         0
 duration: 
-  secs: 1
-  nsecs: 700000000
+  secs: 2
+  nsecs:         0
 sounds: []
