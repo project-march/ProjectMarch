@@ -1,7 +1,7 @@
 name: ''
 version: ''
-description: "The setpoints of this walking gait are the same as the setpoints of the MIV, but\
-  \ ealier hip and knee flexion."
+description: "The setpoints of this walking gait are the same as the setpoints of the MIV walking\
+  \ gait, but the hip and knee flexion is earlier in the gait cycle."
 setpoints: 
   - 
     time_from_start: 
@@ -52,7 +52,7 @@ setpoints:
     time_from_start: 
       secs: 1
       nsecs:  83900000
-    joint_names: [right_hip_fe]
+    joint_names: [right_hip_fe, right_knee]
   - 
     time_from_start: 
       secs: 1
@@ -70,32 +70,32 @@ trajectory:
   right_ankle]
   points: 
     - 
-      positions: [0.0, -0.1047, 0.1396, 0.0873, 0.0, 0.3142, 0.1396, 0.0873]
-      velocities: [-0.0, 0.3491, 0.0, 0.0, -0.0, -0.3491, 0.0, 0.0]
+      positions: [0.0, -0.1047, 0.2094, 0.0873, 0.0, 0.3142, 0.1396, 0.0873]
+      velocities: [-0.0, 0.3491, 0.6981, 0.0, -0.0, -0.3491, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs:         0
     - 
-      positions: [0.0, -0.0965, 0.1431, 0.0873, 0.0, 0.3069, 0.141, 0.0873]
-      velocities: [0.0, 0.4288, 0.2559, 0.0, 0.0, -0.3666, 0.1036, 0.0]
+      positions: [0.0, -0.0965, 0.2256, 0.0873, 0.0, 0.3069, 0.141, 0.0873]
+      velocities: [0.0, 0.4288, 0.8471, 0.0, 0.0, -0.3666, 0.1036, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs:  30000000
     - 
-      positions: [0.0, 0.0899, 0.4667, 0.0873, 0.0, 0.2065, 0.2094, 0.0873]
-      velocities: [0.0, 1.1628, 2.1631, -0.0, 0.0, -0.5443, 0.0, -0.0]
+      positions: [0.0, 0.0899, 0.5523, 0.0873, 0.0, 0.2065, 0.2094, 0.0873]
+      velocities: [0.0, 1.1628, 1.8192, -0.0, 0.0, -0.5443, 0.0, -0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs: 240000000
     - 
-      positions: [0.0, 0.353, 0.8471, 0.0873, 0.0, 0.0821, 0.1888, 0.0873]
-      velocities: [0.0, 1.1823, 0.9364, -0.0, 0.0, -0.5967, -0.1657, -0.0]
+      positions: [0.0, 0.353, 0.8535, 0.0873, 0.0, 0.0821, 0.1888, 0.0873]
+      velocities: [0.0, 1.1823, 0.7079, -0.0, 0.0, -0.5967, -0.1657, -0.0]
       accelerations: []
       effort: []
       time_from_start: 
@@ -135,7 +135,7 @@ trajectory:
         nsecs: 816000000
     - 
       positions: [0.0, 0.3805, 0.0969, 0.0873, 0.0, -0.1667, 0.1396, 0.0873]
-      velocities: [0.0, -0.6918, 0.0, 0.0, 0.0, -0.0198, 0.0, 0.0]
+      velocities: [0.0, -0.6918, 0.0, 0.0, 0.0, -0.0198, -0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
@@ -150,8 +150,8 @@ trajectory:
         secs: 1
         nsecs:  83900000
     - 
-      positions: [0.0, 0.3142, 0.1396, 0.0873, 0.0, -0.1047, 0.1396, 0.0873]
-      velocities: [-0.0, -0.3491, 0.0, -0.0, -0.0, 0.3491, 0.0, -0.0]
+      positions: [0.0, 0.3142, 0.1396, 0.0873, 0.0, -0.1047, 0.2094, 0.0873]
+      velocities: [0.0, -0.3491, 0.0, 0.0, 0.0, 0.3491, 0.6981, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
