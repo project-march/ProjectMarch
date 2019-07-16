@@ -52,7 +52,7 @@ setpoints:
     time_from_start: 
       secs: 1
       nsecs: 174199999
-    joint_names: [left_hip_fe]
+    joint_names: [left_hip_fe, left_knee]
   - 
     time_from_start: 
       secs: 1
@@ -70,32 +70,32 @@ trajectory:
   left_ankle]
   points: 
     - 
-      positions: [0.0, -0.1047, 0.1396, 0.0873, 0.0, 0.3142, 0.1396, 0.0873]
-      velocities: [-0.0, 0.3491, 0.0, 0.0, -0.0, -0.3491, 0.0, 0.0]
+      positions: [0.0, -0.1047, 0.2094, 0.0873, 0.0, 0.3142, 0.1396, 0.0873]
+      velocities: [-0.0, 0.3491, 0.6981, 0.0, -0.0, -0.3491, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs:         0
     - 
-      positions: [0.0, -0.0922, 0.1461, 0.0873, 0.0, 0.3032, 0.1422, 0.0873]
-      velocities: [0.0, 0.4559, 0.3543, 0.0, 0.0, -0.3712, 0.1408, 0.0]
+      positions: [0.0, -0.0922, 0.2341, 0.0873, 0.0, 0.3032, 0.1422, 0.0873]
+      velocities: [0.0, 0.4559, 0.8944, 0.0, 0.0, -0.3712, 0.1408, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs:  32500000
     - 
-      positions: [0.0, 0.0908, 0.4638, 0.0873, 0.0, 0.203, 0.2094, 0.0873]
-      velocities: [0.0, 1.0692, 1.9954, 0.0, 0.0, -0.5098, 0.0, 0.0]
+      positions: [0.0, 0.0908, 0.5538, 0.0873, 0.0, 0.203, 0.2094, 0.0873]
+      velocities: [0.0, 1.0692, 1.6691, 0.0, 0.0, -0.5098, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs: 260000000
     - 
-      positions: [0.0, 0.3526, 0.8463, 0.0873, 0.0, 0.0782, 0.1889, 0.0873]
-      velocities: [0.0, 1.0823, 0.8706, 0.0, 0.0, -0.5473, -0.1528, 0.0]
+      positions: [0.0, 0.3526, 0.8532, 0.0873, 0.0, 0.0782, 0.1889, 0.0873]
+      velocities: [0.0, 1.0823, 0.6474, 0.0, 0.0, -0.5473, -0.1528, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
@@ -150,8 +150,8 @@ trajectory:
         secs: 1
         nsecs: 174199999
     - 
-      positions: [0.0, 0.3142, 0.1396, 0.0873, 0.0, -0.1047, 0.1396, 0.0873]
-      velocities: [0.0, -0.3491, 0.0, 0.0, 0.0, 0.3491, 0.0, 0.0]
+      positions: [0.0, 0.3142, 0.1396, 0.0873, 0.0, -0.1047, 0.2094, 0.0873]
+      velocities: [0.0, -0.3491, 0.0, 0.0, 0.0, 0.3491, 0.6981, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
