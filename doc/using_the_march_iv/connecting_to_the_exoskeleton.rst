@@ -29,7 +29,7 @@ ROS Master URI
 --------------
 To use ros commands you need to setup the right `ROS_MASTER_URI <http://wiki.ros.org/ROS/EnvironmentVariables>`_ in every terminal you use: ::
 
-    export ROS_MASTER_URI=http://<exoskeleton ip>:11311/
+    export ROS_MASTER_URI=http://<exoskeleton_ip>:11311/
 
 **<exoskeleton ip>** can be obtained by running the command :code:`hostname -I` in a terminal on the exoskeleton computer.
 If you're running remote/headless it's probably easier to **SSH** into the exoskeleton computer.
@@ -41,7 +41,7 @@ ROS IP
 --------------
 To use ros commands you also need to setup the right `ROS_IP <http://wiki.ros.org/ROS/EnvironmentVariables>`_ in every terminal you use: ::
 
-    export ROS_MASTER_URI=<your ip>
+    export ROS_IP=<your_ip>
 
 **<your ip>** can be obtained by running the command :code:`hostname -I` in a terminal on your computer.
 
