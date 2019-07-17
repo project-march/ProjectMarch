@@ -1,7 +1,7 @@
 name: ''
 version: ''
-description: "The setpoints of this walking gait are the same as the setpoints of the MIII walking\
-  \ gait, except for the fact that the timing of the setpoints in different."
+description: "The setpoints of this walking gait are the same as the setpoints of the MIV, except\
+  \ for the fact that the HAA joints are also moving."
 setpoints: 
   - 
     time_from_start: 
