@@ -39,10 +39,10 @@ public:
     *master_shutdown_allowed_command_ = is_allowed;
   }
 
-  void highVoltageNetEnableDisable(bool enable_disable) {
+  void highVoltageNetEnableDisable(bool enable) {
     assert(all_high_voltage_on_off_command_);
-    ROS_INFO("highVoltageNetEnableDisable %d", enable_disable);
-    *all_high_voltage_on_off_command_ = enable_disable;
+    ROS_INFO("highVoltageNetEnableDisable %d", enable);
+    *all_high_voltage_on_off_command_ = enable;
   }
 
   void turnNetOnOrOff(PowerNetType type, bool on_or_off, int net_number){
