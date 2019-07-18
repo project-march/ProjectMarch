@@ -5,6 +5,10 @@ set -e
 
 # Setup Environment
 rm -rf build
+rm -rf native_build
+
+# Build without ros wrapper to catch warnings and errors
+sphinx-build -W -b html . native_build
 
 # Build
 rosdoc_lite -o build .
