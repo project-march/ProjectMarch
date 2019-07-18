@@ -57,7 +57,7 @@ script:
   # Test build with ROS-version of Sphinx command so that it is generated same as ros.org
   # Run HTML tests on generated build output to check for 404 errors, etc
   - if [ "$TRAVIS_PULL_REQUEST" == "false" ];
-    then sphinx-build -W -b html . native_build;
+    then sphinx-build -W -b html . native_build || travis_terminate 1;;
     rosdoc_lite -o build .;
     htmlproofer ./build --only-4xx --check-html --file-ignore ./build/html/genindex.html,./build/html/search.html,./build/html/index-msg.html --alt-ignore '/.*/' --url-ignore '#';
     fi
