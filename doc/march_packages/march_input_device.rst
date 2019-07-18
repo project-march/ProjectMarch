@@ -3,7 +3,7 @@ march_input_device
 
 Overview
 --------
-The march_input_device is the software running on the |m4| exoskeleton input device. The input device is used by the
+The march_input_device is the software running on the |m4| exoskeleton input device. The input device is used
 to give input to the software running on the |m4| exoskeleton.
 
 
