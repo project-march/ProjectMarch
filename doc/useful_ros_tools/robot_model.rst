@@ -4,7 +4,7 @@ Robot model
 ===========
 
 This tutorial lists the main components that allow you to visualize a robot model.
-As the official documentation is sufficient, we will only provide a brief description of each component.
+As the official documentation of these components is sufficient, we will only provide a brief description of each component.
 
 tf2
 ^^^
