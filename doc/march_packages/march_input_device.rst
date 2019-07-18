@@ -49,12 +49,6 @@ Start the software
 
 .. code::
 
-    roscore
-
-- Type in a terminal:
-
-.. code::
-
     roslaunch march_launch serial_connection.launch tcp:=false
 
 - Connect the input device via usb cable, this powers and launches the input device automatically.
@@ -87,12 +81,6 @@ Start the software
 .. code::
 
     export ROS_MASTER_URI=http://<your_hostname>:11311/
-
-- Type in a terminal:
-
-.. code::
-
-    roscore
 
 - Type in a terminal:
 
