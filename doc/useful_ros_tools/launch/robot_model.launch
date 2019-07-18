@@ -1,0 +1,19 @@
+<launch>
+    <!-- Load the URDF into the ROS Parameter Server -->
+    <param name="robot_description"
+           command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iv.xacro'"/>
+
+    <!-- Start the robot state publisher to publish tf frames -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+    <!-- Start the joint state publisher to publish dummy joint frames -->
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+
+        <!-- Use the gui to easily change the joint_states with sliders -->
+        <param name="use_gui" value="true"/>
+    </node>
+
+    <!-- Start the visualization tool rviz -->
+    <node type="rviz" name="rviz" pkg="rviz"/>
+
+</launch>
