@@ -102,3 +102,4 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
 
   doc/march_packages/march_hardware_builder
   doc/march_packages/march_rqt_launch_menu
+  doc/march_packages/march_input_device
