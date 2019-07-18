@@ -32,6 +32,9 @@ Tutorials
 
 How to run wired
 ^^^^^^^^^^^^^^^^
+
+.. todo:: (Electro) Document how to change the input device to wired mode
+
 Upload the code on the input device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Skip this section if the correct code for running wired is already on the input device. More detailed information on how
@@ -59,6 +62,8 @@ Start the software
 
 How to run Wireless
 ^^^^^^^^^^^^^^^^^^^
+
+.. todo:: (Electro) Document how to change the input device to wireless mode
 
 .. note:: Make sure the pc that needs to receive the messages and the input device are on the same hotspot.
 
