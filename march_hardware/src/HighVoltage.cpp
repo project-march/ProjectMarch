@@ -108,7 +108,7 @@ void HighVoltage::enableDisableHighVoltage(bool enable)
   bit8 isEnabled;
   isEnabled.ui = static_cast<uint8>(enable);
   set_output_bit8(static_cast<uint16>(this->slaveIndex),
-                  static_cast<uint8>(this->netDriverOffsets.getAllHighVoltageOnOff()), isEnabled);
+                  static_cast<uint8>(this->netDriverOffsets.getHighVoltageEnableDisable()), isEnabled);
 }
 
 uint8 HighVoltage::getNetsOperational()

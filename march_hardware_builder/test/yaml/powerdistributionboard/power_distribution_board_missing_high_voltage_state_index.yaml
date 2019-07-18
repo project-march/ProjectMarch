@@ -13,4 +13,4 @@ netMonitorByteOffsets:
 netDriverByteOffsets:
   lowVoltageNetOnOff: 4
   highVoltageNetOnOff: 3
-  allHighVoltageOnOff: 2
+  highVoltageDisableEnable: 2
