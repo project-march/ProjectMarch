@@ -15,7 +15,7 @@ They are used by the robot_state_publisher and rviz to properly visualize your r
 urdf
 ^^^^
 
-`urdf <http://wiki.ros.org/urdf>`_ is an xml format used to describe robots. It contains of visuals as well as collision
+`urdf <http://wiki.ros.org/urdf>`_ is an xml format used to describe robots. It contains of visuals as well as collisions.
 `xacro <http://wiki.ros.org/urdf/Tutorials/Using%20Xacro%20to%20Clean%20Up%20a%20URDF%20File>`_ is a macro language which allows you to use variables and other neat shortcuts in urdf files.
 To gain practical experience, please see the `official tutorials <http://wiki.ros.org/urdf/Tutorials>`_.
 
