@@ -71,3 +71,16 @@ Start the software
 - Type in a terminal: :code:`roslaunch march_launch serial_connection.launch`
 - Make sure the batteries are charged and in the input device.
 - Press on button, which is located on the electronics holder.
+
+How to add a gait
+^^^^^^^^^^^^^^^^^
+.. todo:: (Karlijn) Document how to add new screens
+- Add new screens.
+- Add a new entry to the :code:`stateToGaitMapping`. By adding a extra line in the constructor of the *StateMachine.cpp*:
+.. code-block::
+
+stateToGaitMapping[State::<name_activated_state>] = "<gait_name>";
+
+**<name_activated_state>** name of the activated state
+
+**<gait_name>** name of the gait
