@@ -71,9 +71,8 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    :maxdepth: 2
    :hidden:
 
-   doc/useful_ros_tools/rviz
+   doc/useful_ros_tools/robot_model
    doc/useful_ros_tools/ros_bag
-   doc/useful_ros_tools/joint_state_publisher
 
 .. toctree::
    :caption: Using the March IV
