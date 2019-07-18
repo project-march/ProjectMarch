@@ -20,7 +20,7 @@ Sending messages
 
 .. todo:: (Tim) link this to the march_safety documentation.
 
-**Stay alive:** Every cycle a stay alive message is send. This way *march_safety* can detect when the input device loses connection.
+**Stay alive:** Every loop a stay alive message is send. This way *march_safety* can detect when the input device loses connection.
 
 Receiving messages
 ^^^^^^^^^^^^^^^^^^
