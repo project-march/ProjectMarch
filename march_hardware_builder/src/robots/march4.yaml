@@ -1,41 +1,41 @@
 march4:
   ifName: enp2s0
   ecatCycleTime: 4
-  powerDistributionBoard:
-    slaveIndex: 7
-    bootShutdownOffsets:
-      masterOk: 0
-      shutdown: 0
-      shutdownAllowed: 1
-    netMonitorByteOffsets:
-      powerDistributionBoardCurrent: 5
-      lowVoltageNet1Current: 9
-      lowVoltageNet2Current: 13
-      highVoltageNetCurrent: 17
-      lowVoltageState: 3
-      highVoltageOvercurrentTrigger: 2
-      highVoltageEnabled: 1
-      highVoltageState: 4
-    netDriverByteOffsets:
-      lowVoltageNetOnOff: 4
-      highVoltageNetOnOff: 3
-      allHighVoltageOnOff: 2
+#  powerDistributionBoard:
+#    slaveIndex: 7
+#    bootShutdownOffsets:
+#      masterOk: 0
+#      shutdown: 0
+#      shutdownAllowed: 1
+#    netMonitorByteOffsets:
+#      powerDistributionBoardCurrent: 5
+#      lowVoltageNet1Current: 9
+#      lowVoltageNet2Current: 13
+#      highVoltageNetCurrent: 17
+#      lowVoltageState: 3
+#      highVoltageOvercurrentTrigger: 2
+#      highVoltageEnabled: 1
+#      highVoltageState: 4
+#    netDriverByteOffsets:
+#      lowVoltageNetOnOff: 4
+#      highVoltageNetOnOff: 3
+#      allHighVoltageOnOff: 2
   joints:
-    #    - right_hip_aa:
-    #        allowActuation: false
-    #        netNumber: 1
-    #        temperatureges: {slaveIndex: 8, byteOffset: 0}
-    #        imotioncube:
-    #          slaveIndex: 6
-    #          encoder: {resolution: 17, minPositionIU: 1, maxPositionIU: 3, zeroPositionIU: 2, safetyMarginRad: 0}
-    #
-    #    - left_hip_aa:
-    #        allowActuation: false
-    #        netNumber: 5
-    #        temperatureges: {slaveIndex: 8, byteOffset: 0}
-    #        imotioncube:
-    #          slaveIndex: 9
-    #          encoder: {resolution: 17, minPositionIU: 1, maxPositionIU: 3, zeroPositionIU: 2, safetyMarginRad: 0}
+        - right_hip_aa:
+            allowActuation: false
+            netNumber: 1
+            temperatureges: {slaveIndex: 8, byteOffset: 0}
+            imotioncube:
+              slaveIndex: 6
+              encoder: {resolution: 12, minPositionIU: 3688, maxPositionIU: 4070, zeroPositionIU: 3858, safetyMarginRad: 0}
+
+        - left_hip_aa:
+            allowActuation: false
+            netNumber: 5
+            temperatureges: {slaveIndex: 8, byteOffset: 0}
+            imotioncube:
+              slaveIndex: 9
+              encoder: {resolution: 12, minPositionIU: 1010, maxPositionIU: 1401, zeroPositionIU: 1194, safetyMarginRad: 0}
 
     - right_hip_fe:
         allowActuation: true
