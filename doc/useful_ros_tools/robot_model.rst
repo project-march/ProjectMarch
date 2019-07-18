@@ -32,6 +32,7 @@ The `robot_state_publisher <http://wiki.ros.org/robot_state_publisher>`_ takes y
 rviz
 ^^^^
 `rviz <http://wiki.ros.org/rviz>`_ is a 3D visualization tool which is capable of displaying information about your robot and its surroundings.
+The visualization combines the urdf and the tf frames to show the robot model.
 Please check the `official userguide <http://wiki.ros.org/rviz/UserGuide>`_ to start using it!
 
 Example
