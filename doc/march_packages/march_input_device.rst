@@ -16,7 +16,7 @@ Sending messages
 ^^^^^^^^^^^^^^^^
 **Gait instruction:** This is a instruction to start the sent gait right now, if this is possible.
 
-**Stop:** This message can stop a looping gait(such as walk). After receiving the stop message the |m4| exoskeleton will go to the standing pose.
+**Stop:** This message can stop a repeating gait (such as walk). After receiving the stop message the exoskeleton will go to the standing pose.
 
 .. todo:: (Tim) link this to the march_safety documentation.
 
