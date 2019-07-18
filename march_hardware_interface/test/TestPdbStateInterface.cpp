@@ -76,7 +76,7 @@ TEST_F(TestPdbStateInterface, SetMasterShutdownAllowedFalse)
   EXPECT_FALSE(master_shutdown_allowed_command);
 }
 
-TEST_F(TestPdbStateInterface, AllHighVoltageOnOffTrue)
+TEST_F(TestPdbStateInterface, HighVoltageNetEnableDisable)
 {
   march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
       "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,

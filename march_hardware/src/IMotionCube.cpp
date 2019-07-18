@@ -63,7 +63,7 @@ void IMotionCube::validateMosiPDOs()
 // Set configuration parameters to the IMC
 void IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
 {
-  ROS_INFO("IMotionCube::writeInitialSettings");
+  ROS_DEBUG("IMotionCube::writeInitialSettings");
   bool success = true;
   // sdo_bit32(slaveIndex, address, subindex, value);
   // mode of operation
@@ -415,7 +415,7 @@ bool IMotionCube::goToOperationEnabled()
 {
   this->setControlWord(128);
 
-  ROS_INFO("Try to go to 'Switch on Disabled'");
+  ROS_INFO("\tTry to go to 'Switch on Disabled'");
   bool switchOnDisabled = false;
   while (!switchOnDisabled)
   {
@@ -424,11 +424,11 @@ bool IMotionCube::goToOperationEnabled()
     int switchOnDisabledMask = 0b0000000001001111;
     int switchOnDisabledState = 64;
     switchOnDisabled = (statusWord & switchOnDisabledMask) == switchOnDisabledState;
-    ROS_INFO_STREAM_THROTTLE(0.1, "Waiting for 'Switch on Disabled': " << std::bitset<16>(statusWord));
+    ROS_INFO_STREAM_THROTTLE(0.5, "\tWaiting for 'Switch on Disabled': " << std::bitset<16>(statusWord));
   }
-  ROS_INFO("Switch on Disabled!");
+  ROS_INFO("\tSwitch on Disabled!");
 
-  ROS_INFO("Try to go to 'Ready to Switch On'");
+  ROS_INFO("\tTry to go to 'Ready to Switch On'");
   bool readyToSwitchOn = false;
   while (!readyToSwitchOn)
   {
@@ -437,11 +437,11 @@ bool IMotionCube::goToOperationEnabled()
     int readyToSwitchOnMask = 0b0000000001101111;
     int readyToSwitchOnState = 33;
     readyToSwitchOn = (statusWord & readyToSwitchOnMask) == readyToSwitchOnState;
-    ROS_INFO_STREAM_THROTTLE(0.1, "Waiting for 'Ready to Switch On': " << std::bitset<16>(statusWord));
+    ROS_INFO_STREAM_THROTTLE(0.5, "\tWaiting for 'Ready to Switch On': " << std::bitset<16>(statusWord));
   }
-  ROS_INFO("Ready to Switch On!");
+  ROS_INFO("\tReady to Switch On!");
 
-  ROS_INFO("Try to go to 'Switched On'");
+  ROS_INFO("\tTry to go to 'Switched On'");
   bool switchedOn = false;
   while (!switchedOn)
   {
@@ -450,9 +450,9 @@ bool IMotionCube::goToOperationEnabled()
     int switchedOnMask = 0b0000000001101111;
     int switchedOnState = 35;
     switchedOn = (statusWord & switchedOnMask) == switchedOnState;
-    ROS_INFO_STREAM_THROTTLE(0.1, "Waiting for 'Switched On': " << std::bitset<16>(statusWord));
+    ROS_INFO_STREAM_THROTTLE(0.5, "\tWaiting for 'Switched On': " << std::bitset<16>(statusWord));
   }
-  ROS_INFO("Switched On!");
+  ROS_INFO("\tSwitched On!");
 
   // If ActualPosition is not defined in PDOmapping, a fatal error is thrown
   // because of safety reasons
@@ -462,19 +462,19 @@ bool IMotionCube::goToOperationEnabled()
   int angleRead = this->encoder.getAngleIU(this->misoByteOffsets[IMCObjectName::ActualPosition]);
   //  If the encoder is functioning correctly, move the joint to its current
   //  position. Otherwise shutdown
-  if (this->encoder.isValidTargetPositionIU(angleRead))
+  if (this->encoder.isValidTargetPositionIU(angleRead) && angleRead != 0)
   {
     this->actuateIU(angleRead);
   }
   else
   {
-    ROS_FATAL("Encoder is not functioning properly, read value %d, min value "
-              "is %d, max value is %d. Shutting down",
+    ROS_FATAL("Encoder of iMotionCube (with slaveindex %d) is not functioning properly, read value %d, min value "
+              "is %d, max value is %d. Shutting down", this->slaveIndex,
               angleRead, this->encoder.getMinPositionIU(), this->encoder.getMaxPositionIU());
     throw std::domain_error("Encoder is not functioning properly");
   }
 
-  ROS_INFO("Try to go to 'Operation Enabled'");
+  ROS_INFO("\tTry to go to 'Operation Enabled'");
   bool operationEnabled = false;
   while (!operationEnabled)
   {
@@ -483,9 +483,9 @@ bool IMotionCube::goToOperationEnabled()
     int operationEnabledMask = 0b0000000001101111;
     int operationEnabledState = 39;
     operationEnabled = (statusWord & operationEnabledMask) == operationEnabledState;
-    ROS_INFO_STREAM_THROTTLE(0.1, "Waiting for 'Operation Enabled': " << std::bitset<16>(statusWord));
+    ROS_INFO_STREAM_THROTTLE(0.5, "\tWaiting for 'Operation Enabled': " << std::bitset<16>(statusWord));
   }
-  ROS_INFO("Operation Enabled!");
+  ROS_INFO("\tOperation Enabled!");
 }
 
 bool IMotionCube::resetIMotionCube()

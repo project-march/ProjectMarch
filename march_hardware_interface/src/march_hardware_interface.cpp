@@ -79,7 +79,7 @@ void MarchHardwareInterface::init()
   {
     SoftJointLimits soft_limits;
     getSoftJointLimits(model.getJoint(joint_names_[i]), soft_limits);
-    ROS_INFO("soft_limits_ (%f, %f).", soft_limits.min_position, soft_limits.max_position);
+    ROS_INFO("%s soft_limits_ (%f, %f).", joint_names_[i].c_str(), soft_limits.min_position, soft_limits.max_position);
     soft_limits_[i] = soft_limits;
   }
 
@@ -117,7 +117,12 @@ void MarchHardwareInterface::init()
         errorStream << "Joint " << joint_names_[i].c_str() << " has no net number";
         throw std::runtime_error(errorStream.str());
       }
-      marchRobot.getPowerDistributionBoard()->getHighVoltage().setNetOnOff(false, netNumber);
+      while (!marchRobot.getPowerDistributionBoard()->getHighVoltage().getNetOperational(netNumber))
+      {
+        marchRobot.getPowerDistributionBoard()->getHighVoltage().setNetOnOff(true, netNumber);
+        usleep(100000);
+        ROS_INFO_THROTTLE(1, "Waiting on high voltage for joint %s", joint_names_[i].c_str());
+      }
     }
   }
   else

@@ -8,7 +8,7 @@ march:
       publish_rate: 50
     temperature_sensor:
       type: march_temperature_sensor_controller/MarchTemperatureSensorController
-      publish_rate: 50
+      publish_rate: 1
     trajectory:
       type: position_controllers/JointTrajectoryController
       joints:
@@ -16,3 +16,5 @@ march:
         - left_hip_fe
         - right_knee
         - left_knee
+        - right_ankle
+        - left_ankle

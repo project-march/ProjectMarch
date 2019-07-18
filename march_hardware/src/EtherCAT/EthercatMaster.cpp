@@ -152,14 +152,14 @@ void EthercatMaster::ethercatLoop()
     if (totalLoops >= 10 * rate)  // Every 10 seconds
     {
       float rateNotAchievedPercentage = 100 * (static_cast<float>(rateNotAchievedCount) / totalLoops);
-      if (rateNotAchievedPercentage > 10)  // If percentage greater than 10 percent, do ROS_WARN instead of ROS_INFO
+      if (rateNotAchievedPercentage > 1)  // If percentage greater than 10 percent, do ROS_WARN instead of ROS_INFO
       {
         ROS_WARN("EtherCAT rate of %d milliseconds per cycle was not achieved for %f percent of all cycles",
                  ecatCycleTimems, rateNotAchievedPercentage);
       }
       else
       {
-        ROS_INFO("EtherCAT rate of %d milliseconds per cycle was not achieved for %f percent of all cycles",
+        ROS_DEBUG("EtherCAT rate of %d milliseconds per cycle was not achieved for %f percent of all cycles",
                  ecatCycleTimems, rateNotAchievedPercentage);
       }
       totalLoops = 0;
