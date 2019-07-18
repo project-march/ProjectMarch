@@ -45,13 +45,12 @@ to run and upload the code see the :input-device:`ReadMe <>`.
 
 Start the software
 ~~~~~~~~~~~~~~~~~~
+- Connect the input device via usb cable, this powers and launches the input device automatically.
 - Type in a terminal:
 
 .. code::
 
     roslaunch march_launch serial_connection.launch tcp:=false
-
-- Connect the input device via usb cable, this powers and launches the input device automatically.
 
 
 How to run Wireless
