@@ -69,6 +69,8 @@ extlinks = {'codedir': ('https://github.com/' + html_context["github_user"] + '/
             'rootdir': ('https://github.com/' + html_context["github_user"] + '/tutorials/tree/' + html_context["github_version"] + '/%s', ''),
             'hardware-interface': ('https://github.com/' + html_context["github_user"] + '/hardware-interface/tree/develop/%s', ''),
             'input-device': ('https://github.com/' + html_context["github_user"] + '/input-device/tree/develop/%s', ''),
+            'march-iv_repo': ('https://github.com/' + html_context["github_user"] + '/march-iv/tree/develop/%s',
+                              ''),
             'march_website': ('http://projectmarch.nl', '')}
 
 # Output file base name for HTML help builder.

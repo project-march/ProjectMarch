@@ -14,17 +14,17 @@ This can be run wired via usb cable or wireless via wifi connection.
 
 Sending messages
 ^^^^^^^^^^^^^^^^
-**Gait instruction:** This is a instruction to start the sent gait right now, if this is possible.
+:march-iv_repo:`Gait Instruction Message <march_shared_resources/msg/GaitInstruction.msg>` This is a instruction to start the sent gait right now, if this is possible.
 
-**Stop:** This message can stop a repeating gait (such as walk). After receiving the stop message the exoskeleton will go to the standing pose.
+:march-iv_repo:`Stop Message <march_shared_resources/msg/GaitInstruction.msg>` This message can stop a repeating gait (such as walk). After receiving the stop message the exoskeleton will go to the standing pose.
 
 .. todo:: (Tim) link this to the march_safety documentation.
 
-**Stay alive:** Every loop a stay alive message is send. This way *march_safety* can detect when the input device loses connection.
+`Stay Alive Message <http://docs.ros.org/kinetic/api/std_msgs/html/msg/Time.html>`_  Every loop a stay alive message is send. This way *march_safety* can detect when the input device loses connection.
 
 Receiving messages
 ^^^^^^^^^^^^^^^^^^
-**Gait instruction response:** This message indicate that the last gait instruction is handled. The value represent successful handled or rejected.
+`Gait Instruction Response Message <http://docs.ros.org/kinetic/api/std_msgs/html/msg/Bool.html>`_  This message indicate that the last gait instruction is handled. The value represent successful handled or rejected.
 
 Tutorials
 ---------
