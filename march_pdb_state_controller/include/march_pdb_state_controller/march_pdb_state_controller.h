@@ -8,6 +8,7 @@
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Int8.h>
+#include <std_srvs/SetBool.h>
 #include <string>
 
 #include <boost/shared_ptr.hpp>
@@ -43,14 +44,16 @@ private:
   ros::Time last_publish_times_;
   double publish_rate_;
 
-  ros::Subscriber sub_all_high_voltage;
+  ros::ServiceServer enable_disable_high_voltage_service;
   ros::Subscriber sub_master_shutdown_allowed;
   ros::Subscriber sub_turn_low_net_on_or_off;
   ros::Subscriber sub_turn_high_net_on_or_off;
 
-  static std::vector<march_shared_resources::HighVoltageNet> createHighVoltageNetsMessage(march4cpp::HighVoltage high_voltage);
-  static std::vector<march_shared_resources::LowVoltageNet> createLowVoltageNetsMessage(march4cpp::LowVoltage low_voltage);
-  void allHighVoltageOnOffCallback(const std_msgs::Bool::ConstPtr &msg);
+  static std::vector<march_shared_resources::HighVoltageNet>
+  createHighVoltageNetsMessage(march4cpp::HighVoltage high_voltage);
+  static std::vector<march_shared_resources::LowVoltageNet>
+  createLowVoltageNetsMessage(march4cpp::LowVoltage low_voltage);
+  bool serviceDisableEnableHighVoltage(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res);
   void masterShutdownAllowedCallback(const std_msgs::Bool::ConstPtr& msg);
   void turnHighVoltageNetOnOrOffCallBack(const std_msgs::Int8::ConstPtr& msg);
   void turnLowVoltageNetOnOrOffCallBack(const std_msgs::Int8::ConstPtr& msg);

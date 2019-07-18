@@ -57,10 +57,10 @@ TEST_F(TestPowerDistributionBoard, Stream)
             "netMonitoringOffsets: NetMonitorOffsets(powerDistributionBoardCurrent: -1, lowVoltageNet1Current: -1, "
             "lowVoltageNet2Current: -1, highVoltageNetCurrent: -1, lowVoltageState: -1, highVoltageOvercurrentTrigger: "
             "-1, highVoltageEnabled: -1, highVoltageState: -1), netDriverOffsets: NetDriverOffsets(lowVoltageNetOnOff: "
-            "-1, highVoltageNetOnOff: -1, allHighVoltageOnOff: -1)), LowVoltage(slaveIndex: 2, "
+            "-1, highVoltageNetOnOff: -1, highVoltageNetEnableDisable: -1)), LowVoltage(slaveIndex: 2, "
             "netMonitoringOffsets: NetMonitorOffsets(powerDistributionBoardCurrent: -1, lowVoltageNet1Current: -1, "
             "lowVoltageNet2Current: -1, highVoltageNetCurrent: -1, lowVoltageState: -1, highVoltageOvercurrentTrigger: "
             "-1, highVoltageEnabled: -1, highVoltageState: -1), netDriverOffsets: NetDriverOffsets(lowVoltageNetOnOff: "
-            "-1, highVoltageNetOnOff: -1, allHighVoltageOnOff: -1)))",
+            "-1, highVoltageNetOnOff: -1, highVoltageNetEnableDisable: -1)))",
             ss.str());
 }
