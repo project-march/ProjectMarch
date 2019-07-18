@@ -65,7 +65,7 @@ How to run Wireless
 
 .. todo:: (Electro) Document how to change the input device to wireless mode
 
-.. note:: Make sure the pc that needs to receive the messages and the input device are on the same hotspot.
+.. note:: Make sure the pc that needs to receive the messages and the input device are on the same network.
 
 Upload the code on the input device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
