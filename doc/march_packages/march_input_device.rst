@@ -19,6 +19,7 @@ Sending messages
 **Stop:** This message can stop a looping gait(such as walk). After receiving the stop message the |m4| exoskeleton will go to the standing pose.
 
 .. todo:: (Tim) link this to the march_safety documentation.
+
 **Stay alive:** Every cycle a stay alive message is send. This way *march_safety* can detect when the input device loses connection.
 
 Receiving messages
@@ -41,8 +42,18 @@ to run and upload the code see the :input-device:`ReadMe <>`.
 
 Start the software
 ~~~~~~~~~~~~~~~~~~
-- Type in a terminal: :code:`roscore`.
-- Type in a terminal: :code:`roslaunch march_launch serial_connection.launch tcp:=false`.
+- Type in a terminal:
+
+.. code::
+
+    roscore
+
+- Type in a terminal:
+
+.. code::
+
+    roslaunch march_launch serial_connection.launch tcp:=false
+
 - Connect the input device via usb cable, this powers and launches the input device automatically.
 
 
@@ -66,20 +77,37 @@ to run and upload the code see the :input-device:`ReadMe <>`.
 
 Start the software
 ~~~~~~~~~~~~~~~~~~
-- Type in every terminal you are going to use: :code:`export ROS_MASTER_URI=http://<your_hostname>:11311/`
-- Type in a terminal: :code:`roscore`
-- Type in a terminal: :code:`roslaunch march_launch serial_connection.launch`
+- Type in every terminal you are going to use:
+
+.. code::
+
+    export ROS_MASTER_URI=http://<your_hostname>:11311/
+
+- Type in a terminal:
+
+.. code::
+
+    roscore
+
+- Type in a terminal:
+
+.. code::
+
+    roslaunch march_launch serial_connection.launch
+
 - Make sure the batteries are charged and in the input device.
 - Press on button, which is located on the electronics holder.
 
 How to add a gait
 ^^^^^^^^^^^^^^^^^
 .. todo:: (Karlijn) Document how to add new screens
-- Add new screens.
-- Add a new entry to the :code:`stateToGaitMapping`. By adding a extra line in the constructor of the *StateMachine.cpp*:
-.. code-block::
 
-stateToGaitMapping[State::<name_activated_state>] = "<gait_name>";
+- Add new screens.
+- Add a new entry to the *stateToGaitMapping*. By adding a extra line in the constructor of the *StateMachine.cpp*:
+
+.. code::
+
+    stateToGaitMapping[State::<name_activated_state>] = "<gait_name>";
 
 **<name_activated_state>** name of the activated state
 
