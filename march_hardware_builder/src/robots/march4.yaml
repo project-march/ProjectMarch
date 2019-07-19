@@ -24,7 +24,7 @@ march4:
     #    - right_hip_aa:
     #        allowActuation: false
     #        netNumber: 1
-    #        temperatureges: {slaveIndex: 8, byteOffset: 0}
+    #        temperatureges: {slaveIndex: 8, byteOffset: 4}
     #        imotioncube:
     #          slaveIndex: 6
     #          encoder: {resolution: 17, minPositionIU: 1, maxPositionIU: 3, zeroPositionIU: 2, safetyMarginRad: 0}
