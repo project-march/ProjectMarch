@@ -1,0 +1,18 @@
+#!/usr/bin/env python
+
+from urdf_parser_py import urdf
+import rospy
+
+
+def main():
+    rospy.init_node("upload_joint_names")
+    robot = urdf.Robot.from_parameter_server()
+    joint_names = []
+    for joint in robot.joints:
+        if joint.type != "fixed":
+            joint_names.append(joint.name)
+    rospy.set_param('/march/joint_names', joint_names)
+
+
+if __name__ == '__main__':
+    main()
