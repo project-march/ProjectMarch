@@ -53,7 +53,7 @@ Add March network to hosts file
 You need to add the march network with ip to your hosts file:
 
 - Type :code:`sudo nano /etc/hosts` in your terminal.
-- add the line :code:`192.168.137.253       march` at the top of the file.
+- add the line :code:`<exoskeleton_ip>       march` at the top of the file.
 - Close and save the file with **ctrl + x**.
 
 Test ROS on multiple devices
