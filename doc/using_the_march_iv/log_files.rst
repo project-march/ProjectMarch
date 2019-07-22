@@ -35,5 +35,5 @@ The following command will upload all the logs to the cloudstation and create a 
 
 .. code::
 
-  scp -r </path/to/yyyy_mm_dd-activity_name> log@cloudstation.projectmarch.nl:"/volume1/March\ IV\ log\ files/"
+  scp -r </path/to/yyyy_mm_dd-activity_name> log@cloudstation.projectmarch.nl:"/volume1/Log\ Files/March\ IV\ Log\ Files/"
 
