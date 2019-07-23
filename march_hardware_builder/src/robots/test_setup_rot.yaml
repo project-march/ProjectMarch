@@ -1,4 +1,4 @@
-testsetup:
+testsetup_rot:
   ifName: enp2s0
   ecatCycleTime: 4
   joints:

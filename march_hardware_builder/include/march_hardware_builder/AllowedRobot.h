@@ -12,7 +12,8 @@ public:
   {
     march4,
     march3,
-    testsetup,
+    testsetup_rot,
+    testsetup_lin,
     pdb,
   };
 
@@ -27,10 +28,13 @@ public:
     {
         this->value = march4;
     }
-    else if (robotName == "testsetup")
+    else if (robotName == "testsetup_rot")
     {
-      this->value = testsetup;
+      this->value = testsetup_rot;
     }
+    else if (robotName == "testsetup_lin")
+    {
+        this->value = testsetup_lin;
     else if (robotName == "pdb")
     {
       this->value = pdb;
@@ -38,7 +42,7 @@ public:
     else
     {
       ROS_ASSERT_MSG(false, "Unknown robot %s", robotName.c_str());
-      this->value = AllowedRobot::testsetup;
+      this->value = AllowedRobot::testsetup_rot;
     }
   }
 
@@ -53,16 +57,22 @@ public:
     {
       return basePath.append("/src/robots/march3.yaml");
     }
-    else if (this->value == AllowedRobot::testsetup)
+    else if (this->value == AllowedRobot::testsetup_rot)
     {
-      return basePath.append("/src/robots/test_setup.yaml");
+      return basePath.append("/src/robots/test_setup_rot.yaml");
     }
+    else if (this->value == AllowedRobot::testsetup_lin)
+    {
+        return basePath.append("/src/robots/test_setup_lin.yaml");
+    }
+
+
     else if (this->value == AllowedRobot::pdb)
     {
       return basePath.append("/src/robots/pdb.yaml");
     }
-    ROS_ERROR("Robotname not implemented. Using test_setup.yaml...");
-    return basePath.append("/src/robots/test_setup.yaml");
+    ROS_ERROR("Robotname not implemented. Using test_setup_rot.yaml...");
+    return basePath.append("/src/robots/test_setup_rot.yaml");
   }
 
   constexpr AllowedRobot(Value aAllowedRobot) : value(aAllowedRobot)

@@ -1,9 +1,9 @@
 <launch>
-    <rosparam file="$(find march_hardware_interface)/config/test_setup/controllers.yaml" command="load"/>
+    <rosparam file="$(find march_hardware_interface)/config/test_setup_lin/controllers.yaml" command="load"/>
 
     <!-- Load the URDF into the ROS Parameter Server -->
     <param name="robot_description"
-           command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/test-joint.xacro'" />
+           command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/test-joint-lin.xacro'" />
 
     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="true" output="screen" ns="/"
           args="
@@ -12,6 +12,6 @@
                 /march/controller/trajectory
             "/>
 
-    <node name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" args="testsetup" output="screen"/>
+    <node name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" args="testsetup_lin" output="screen"/>
 
 </launch>
