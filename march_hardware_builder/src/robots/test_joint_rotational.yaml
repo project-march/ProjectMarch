@@ -1,8 +1,8 @@
-testsetup_rot:
+testjoint_rotational:
   ifName: enp2s0
   ecatCycleTime: 4
   joints:
-    - test_joint:
+    - rotational_joint:
         allowActuation: true
         imotioncube:
           slaveIndex: 1

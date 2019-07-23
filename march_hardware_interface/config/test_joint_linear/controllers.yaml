@@ -12,4 +12,4 @@ march:
     trajectory:
       type: position_controllers/JointTrajectoryController
       joints:
-        - test_joint_rot
+        - linear_joint

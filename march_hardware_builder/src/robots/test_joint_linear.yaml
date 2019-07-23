@@ -1,8 +1,8 @@
-testsetup_lin:
+testjoint_linear:
  ifName: enp2s0
  ecatCycleTime: 4
  joints:
-   - test_joint:
+   - linear_joint:
        actuationMode: torque
        allowActuation: true
        imotioncube:
