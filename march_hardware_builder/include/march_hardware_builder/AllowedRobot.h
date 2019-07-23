@@ -26,7 +26,7 @@ public:
     }
     else if (robotName == "march3")
     {
-        this->value = march4;
+      this->value = march4;
     }
     else if (robotName == "testsetup_rot")
     {
@@ -34,7 +34,8 @@ public:
     }
     else if (robotName == "testsetup_lin")
     {
-        this->value = testsetup_lin;
+      this->value = testsetup_lin;
+    }
     else if (robotName == "pdb")
     {
       this->value = pdb;
@@ -42,7 +43,7 @@ public:
     else
     {
       ROS_ASSERT_MSG(false, "Unknown robot %s", robotName.c_str());
-      this->value = AllowedRobot::testsetup_rot;
+      this->value = AllowedRobot::march4;
     }
   }
 
@@ -63,16 +64,14 @@ public:
     }
     else if (this->value == AllowedRobot::testsetup_lin)
     {
-        return basePath.append("/src/robots/test_setup_lin.yaml");
+      return basePath.append("/src/robots/test_setup_lin.yaml");
     }
-
-
     else if (this->value == AllowedRobot::pdb)
     {
       return basePath.append("/src/robots/pdb.yaml");
     }
-    ROS_ERROR("Robotname not implemented. Using test_setup_rot.yaml...");
-    return basePath.append("/src/robots/test_setup_rot.yaml");
+    ROS_ERROR("Robotname not implemented. Using march4.yaml...");
+    return basePath.append("/src/robots/march4.yaml");
   }
 
   constexpr AllowedRobot(Value aAllowedRobot) : value(aAllowedRobot)
