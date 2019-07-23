@@ -27,22 +27,23 @@ protected:
 
 TEST_F(JointTest, AllowActuation)
 {
-    march4cpp::TemperatureGES temp = march4cpp::TemperatureGES(2,2);
-    march4cpp::Joint joint = march4cpp::Joint("actuate_true", true, temp);
+    march4cpp::Joint joint;
+    joint.setAllowActuation(true);
     ASSERT_TRUE(joint.canActuate());
 }
 
 TEST_F(JointTest, DisableActuation)
 {
-    march4cpp::TemperatureGES temp = march4cpp::TemperatureGES(2,2);
-    march4cpp::Joint joint = march4cpp::Joint("actuate_false", false, temp);
+    march4cpp::Joint joint;
+    joint.setAllowActuation(false);
     ASSERT_FALSE(joint.canActuate());
 }
 
 TEST_F(JointDeathTest, ActuateDisableActuation)
 {
-    march4cpp::TemperatureGES temp = march4cpp::TemperatureGES(2,2);
-    march4cpp::Joint joint = march4cpp::Joint("actuate_false", false, temp);
+    march4cpp::Joint joint;
+    joint.setAllowActuation(false);
+    joint.setName("actuate_false");
     ASSERT_FALSE(joint.canActuate());
     ASSERT_DEATH(joint.actuateRad(0.3), "Joint actuate_false is not allowed to actuate, yet its actuate method has been called.");
 }
