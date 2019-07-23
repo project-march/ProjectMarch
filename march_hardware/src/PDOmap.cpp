@@ -149,6 +149,7 @@ void PDOmap::initAllObjects()
   this->allObjects[IMCObjectName::MotorPosition] = IMCObject(0x2088, 32);
   this->allObjects[IMCObjectName::ControlWord] = IMCObject(0x6040, 16);
   this->allObjects[IMCObjectName::TargetPosition] = IMCObject(0x607A, 32);
+  this->allObjects[IMCObjectName::TargetTorque] = IMCObject(0x6071, 16);
   this->allObjects[IMCObjectName::QuickStopDeceleration] = IMCObject(0x6085, 32);
   this->allObjects[IMCObjectName::QuickStopOption] = IMCObject(0x605A, 16);
   // etc...
