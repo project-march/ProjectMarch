@@ -49,6 +49,9 @@ public:
   uint16 getMotionError();
   uint16 getDetailedError();
 
+  float getMotorCurrent();
+  float getMotorVoltage();
+
   void setControlWord(uint16 controlWord);
 
   void actuateRad(float targetRad);

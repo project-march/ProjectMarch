@@ -115,9 +115,6 @@ float Joint::getTemperature()
 
 IMotionCubeState Joint::getIMotionCubeState()
 {
-    // Return an object of strings:
-    // the literal bits of the Status Word, Detailed Error and Motion Error
-    // and the parsed interpretation of these bits
     IMotionCubeState states;
 
     std::bitset<16> statusWordBits = this->iMotionCube.getStatusWord();
@@ -130,6 +127,9 @@ IMotionCubeState Joint::getIMotionCubeState()
     states.state = this->iMotionCube.getState(this->iMotionCube.getStatusWord());
     states.detailedErrorDescription = this->iMotionCube.parseDetailedError(this->iMotionCube.getDetailedError());
     states.motionErrorDescription = this->iMotionCube.parseMotionError(this->iMotionCube.getMotionError());
+
+    states.motorCurrent = this->iMotionCube.getMotorCurrent();
+    states.motorVoltage = this->iMotionCube.getMotorVoltage();
 
     return states;
 }

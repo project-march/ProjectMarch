@@ -34,6 +34,8 @@ void IMotionCube::mapMisoPDOs()
   pdoMapMISO.addObject(IMCObjectName::ActualPosition);  // Compulsory!
   pdoMapMISO.addObject(IMCObjectName::MotionErrorRegister);
   pdoMapMISO.addObject(IMCObjectName::DetailedErrorRegister);
+  pdoMapMISO.addObject(IMCObjectName::ActualTorque);
+  pdoMapMISO.addObject(IMCObjectName::DCLinkVoltage);
   this->misoByteOffsets = pdoMapMISO.map(this->slaveIndex, dataDirection::miso);
 }
 
@@ -202,6 +204,32 @@ uint16 IMotionCube::getDetailedError()
     return 0xFFFF;  // Not fatal, so can return
   }
   return get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::DetailedErrorRegister]).ui;
+}
+
+float IMotionCube::getMotorCurrent()
+{
+  if (this->misoByteOffsets.count(IMCObjectName::ActualTorque) != 1)
+  {
+    ROS_WARN("ActualTorque not defined in PDO mapping, so can't read it");
+    return 0xFFFF;  // Not fatal, so can return
+  }
+  uint16_t motorCurrentIU = get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::ActualTorque]).ui;
+  float motorCurrentA =
+      (2.0 * 40.0 / 65520.0) * motorCurrentIU;  // Conversion to Amp, see Technosoft CoE programming manual
+  return motorCurrentA;
+}
+
+float IMotionCube::getMotorVoltage()
+{
+  if (this->misoByteOffsets.count(IMCObjectName::DCLinkVoltage) != 1)
+  {
+    ROS_WARN("DC-link Voltage not defined in PDO mapping, so can't read it");
+    return 0xFFFF;  // Not fatal, so can return
+  }
+  uint16_t motorVoltageIU = get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::DCLinkVoltage]).ui;
+  float motorVoltageV =
+      (102.3 / 65520.0) * motorVoltageIU;  // Conversion to Volt, see Technosoft CoE programming manual
+  return motorVoltageV;
 }
 
 void IMotionCube::setControlWord(uint16 controlWord)
@@ -469,8 +497,8 @@ bool IMotionCube::goToOperationEnabled()
   else
   {
     ROS_FATAL("Encoder of iMotionCube (with slaveindex %d) is not functioning properly, read value %d, min value "
-              "is %d, max value is %d. Shutting down", this->slaveIndex,
-              angleRead, this->encoder.getMinPositionIU(), this->encoder.getMaxPositionIU());
+              "is %d, max value is %d. Shutting down",
+              this->slaveIndex, angleRead, this->encoder.getMinPositionIU(), this->encoder.getMaxPositionIU());
     throw std::domain_error("Encoder is not functioning properly");
   }
 
