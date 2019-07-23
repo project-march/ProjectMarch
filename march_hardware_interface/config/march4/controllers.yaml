@@ -18,3 +18,5 @@ march:
         - left_knee
         - right_ankle
         - left_ankle
+        - right_hip_aa
+        - left_hip_aa

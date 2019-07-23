@@ -21,21 +21,21 @@ march4:
       highVoltageNetOnOff: 3
       highVoltageNetEnableDisable: 2
   joints:
-    #    - right_hip_aa:
-    #        allowActuation: false
-    #        netNumber: 1
-    #        temperatureges: {slaveIndex: 8, byteOffset: 0}
-    #        imotioncube:
-    #          slaveIndex: 6
-    #          encoder: {resolution: 17, minPositionIU: 1, maxPositionIU: 3, zeroPositionIU: 2, safetyMarginRad: 0}
-    #
-    #    - left_hip_aa:
-    #        allowActuation: false
-    #        netNumber: 5
-    #        temperatureges: {slaveIndex: 8, byteOffset: 0}
-    #        imotioncube:
-    #          slaveIndex: 9
-    #          encoder: {resolution: 17, minPositionIU: 1, maxPositionIU: 3, zeroPositionIU: 2, safetyMarginRad: 0}
+    - right_hip_aa:
+        allowActuation: true
+        netNumber: 1
+        temperatureges: {slaveIndex: 8, byteOffset: 4}
+        imotioncube:
+          slaveIndex: 6
+          encoder: {resolution: 12, minPositionIU: 3688, maxPositionIU: 4070, zeroPositionIU: 3884, safetyMarginRad: 0.05}
+
+    - left_hip_aa:
+        allowActuation: true
+        netNumber: 5
+        temperatureges: {slaveIndex: 8, byteOffset: 0}
+        imotioncube:
+          slaveIndex: 9
+          encoder: {resolution: 12, minPositionIU: 1010, maxPositionIU: 1401, zeroPositionIU: 1211, safetyMarginRad: 0.05}
 
     - right_hip_fe:
         allowActuation: true
