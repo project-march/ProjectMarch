@@ -227,7 +227,7 @@ float IMotionCube::getMotorCurrent()
 float IMotionCube::getMotorVoltage()
 {
   const float V_DC_MAX_MEASURABLE = 102.3;
-  const float IU_CONVERSION_CONST = 65520.0;
+  const float IU_CONVERSION_CONST = 65520.0; // Conversion parameter, see Technosoft CoE programming manual
   if (this->misoByteOffsets.count(IMCObjectName::DCLinkVoltage) != 1)
   {
     ROS_WARN("DC-link Voltage not defined in PDO mapping, so can't read it");
