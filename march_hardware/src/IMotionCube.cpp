@@ -218,8 +218,8 @@ float IMotionCube::getMotorCurrent()
     return 0xFFFF;  // Not fatal, so can return
   }
   int16_t motorCurrentIU = get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::ActualTorque]).i;
-  float motorCurrentA =
-      (2.0 * PEAK_CURRENT / 65520.0) * motorCurrentIU;  // Conversion to Amp, see Technosoft CoE programming manual
+  float motorCurrentA = (2.0 * PEAK_CURRENT / IU_CONVERSION_CONST) *
+                        motorCurrentIU;  // Conversion to Amp, see Technosoft CoE programming manual
   return motorCurrentA;
 }
 
@@ -232,8 +232,8 @@ float IMotionCube::getMotorVoltage()
     return 0xFFFF;  // Not fatal, so can return
   }
   uint16_t motorVoltageIU = get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::DCLinkVoltage]).ui;
-  float motorVoltageV =
-      (V_DC_MAX_MEASURABLE / 65520.0) * motorVoltageIU;  // Conversion to Volt, see Technosoft CoE programming manual
+  float motorVoltageV = (V_DC_MAX_MEASURABLE / IU_CONVERSION_CONST) *
+                        motorVoltageIU;  // Conversion to Volt, see Technosoft CoE programming manual
   return motorVoltageV;
 }
 
