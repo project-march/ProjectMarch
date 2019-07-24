@@ -1,4 +1,4 @@
-name: single_step
+name: single_step_normal
 
 graph:
   from_subgait: [start,     right_open, left_close]
