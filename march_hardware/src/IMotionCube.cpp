@@ -211,7 +211,7 @@ uint16 IMotionCube::getDetailedError()
 
 float IMotionCube::getMotorCurrent()
 {
-  const float PEAK_CURRENT = 40.0;
+  const float PEAK_CURRENT = 40.0; //Peak current of iMC drive
   const float IU_CONVERSION_CONST = 65520.0;
   if (this->misoByteOffsets.count(IMCObjectName::ActualTorque) != 1)
   {
