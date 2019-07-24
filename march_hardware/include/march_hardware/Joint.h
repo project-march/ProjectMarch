@@ -18,17 +18,15 @@ class Joint
 private:
   std::string name;
   // Set this number via the hardware builder
-  int netNumber = -1;
+  int netNumber;
   bool allowActuation;
   IMotionCube iMotionCube;
   TemperatureGES temperatureGES;
 
 public:
-  Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES, IMotionCube iMotionCube);
-  Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES, IMotionCube iMotionCube, int netNumber);
-  Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES);
-  Joint(std::string name, bool allowActuation, IMotionCube iMotionCube);
-  Joint(std::string name, bool allowActuation, IMotionCube iMotionCube, int netNumber);
+  Joint(): name(""), netNumber(-1), allowActuation(false)
+  {
+  }
 
   void initialize(int ecatCycleTime);
   void prepareActuation();
@@ -73,6 +71,12 @@ public:
               << "imotioncube: " << joint.iMotionCube << ","
               << "temperatureges: " << joint.temperatureGES;
   }
+
+  void setName(const std::string& name);
+  void setAllowActuation(bool allowActuation);
+  void setIMotionCube(const IMotionCube& iMotionCube);
+  void setTemperatureGes(const TemperatureGES& temperatureGes);
+  void setNetNumber(int netNumber);
 };
 
 }  // namespace march4cpp

@@ -7,38 +7,6 @@
 
 namespace march4cpp
 {
-Joint::Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES, IMotionCube iMotionCube)
-  : temperatureGES(temperatureGES), iMotionCube(iMotionCube)
-{
-  this->name = std::move(name);
-  this->allowActuation = allowActuation;
-}
-Joint::Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES, IMotionCube iMotionCube,
-             int netNumber)
-  : temperatureGES(temperatureGES), iMotionCube(iMotionCube), netNumber(netNumber)
-{
-  this->name = std::move(name);
-  this->allowActuation = allowActuation;
-}
-
-Joint::Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES) : temperatureGES(temperatureGES)
-{
-  this->name = std::move(name);
-  this->allowActuation = allowActuation;
-}
-Joint::Joint(std::string name, bool allowActuation, IMotionCube iMotionCube) : iMotionCube(iMotionCube)
-{
-  this->name = std::move(name);
-  this->allowActuation = allowActuation;
-}
-
-Joint::Joint(std::string name, bool allowActuation, IMotionCube iMotionCube, int netNumber)
-  : iMotionCube(iMotionCube), netNumber(netNumber)
-{
-  this->name = std::move(name);
-  this->allowActuation = allowActuation;
-}
-
 void Joint::initialize(int ecatCycleTime)
 {
   if (hasIMotionCube())
@@ -74,9 +42,10 @@ void Joint::resetIMotionCube()
 
 void Joint::actuateRad(float targetPositionRad)
 {
-  ROS_ASSERT_MSG(this->allowActuation, "Joint %s is not allowed to actuate, "
-                                       "yet its actuate method has been "
-                                       "called.",
+  ROS_ASSERT_MSG(this->allowActuation,
+                 "Joint %s is not allowed to actuate, "
+                 "yet its actuate method has been "
+                 "called.",
                  this->name.c_str());
   // TODO(BaCo) check that the position is allowed and does not exceed (torque)
   // limits.
@@ -134,6 +103,23 @@ IMotionCubeState Joint::getIMotionCubeState()
     return states;
 }
 
+void Joint::setName(const std::string& name)
+{
+  Joint::name = name;
+}
+void Joint::setAllowActuation(bool allowActuation)
+{
+  Joint::allowActuation = allowActuation;
+}
+void Joint::setIMotionCube(const IMotionCube& iMotionCube)
+{
+  Joint::iMotionCube = iMotionCube;
+}
+void Joint::setTemperatureGes(const TemperatureGES& temperatureGes)
+{
+  temperatureGES = temperatureGes;
+}
+
 int Joint::getTemperatureGESSlaveIndex()
 {
   if (hasTemperatureGES())
@@ -169,5 +155,10 @@ bool Joint::hasTemperatureGES()
 bool Joint::canActuate()
 {
   return this->allowActuation;
+}
+
+void Joint::setNetNumber(int netNumber)
+{
+  Joint::netNumber = netNumber;
 }
 }  // namespace march4cpp

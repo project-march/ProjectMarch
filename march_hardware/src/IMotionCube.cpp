@@ -32,6 +32,7 @@ void IMotionCube::mapMisoPDOs()
   PDOmap pdoMapMISO = PDOmap();
   pdoMapMISO.addObject(IMCObjectName::StatusWord);      // Compulsory!
   pdoMapMISO.addObject(IMCObjectName::ActualPosition);  // Compulsory!
+  pdoMapMISO.addObject(IMCObjectName::ActualTorque);    // Compulsory!
   pdoMapMISO.addObject(IMCObjectName::MotionErrorRegister);
   pdoMapMISO.addObject(IMCObjectName::DetailedErrorRegister);
   pdoMapMISO.addObject(IMCObjectName::ActualTorque);
@@ -46,6 +47,7 @@ void IMotionCube::mapMosiPDOs()
   PDOmap pdoMapMOSI = PDOmap();
   pdoMapMOSI.addObject(IMCObjectName::ControlWord);  // Compulsory!
   pdoMapMOSI.addObject(IMCObjectName::TargetPosition);
+  pdoMapMOSI.addObject(IMCObjectName::TargetTorque);
   this->mosiByteOffsets = pdoMapMOSI.map(this->slaveIndex, dataDirection::mosi);
 }
 
@@ -54,6 +56,8 @@ void IMotionCube::validateMisoPDOs()
 {
   ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::StatusWord) == 1, "StatusWord not mapped");
   ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not mapped");
+  ROS_ASSERT_MSG(this->mosiByteOffsets.count(IMCObjectName::TargetPosition) == 1, "TargetPosition not mapped");
+  ROS_ASSERT_MSG(this->mosiByteOffsets.count(IMCObjectName::TargetTorque) == 1, "TargetTorque not mapped");
 }
 
 // Checks if the compulsory MOSI PDO objects are mapped
