@@ -17,9 +17,6 @@ namespace march4cpp
 class IMotionCube : public Slave
 {
 private:
-
-  const float IU_CONVERSION_CONST = 65520.0;
-
   Encoder encoder;
   void actuateIU(int iu);
 

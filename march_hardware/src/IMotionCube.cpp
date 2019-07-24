@@ -212,6 +212,7 @@ uint16 IMotionCube::getDetailedError()
 float IMotionCube::getMotorCurrent()
 {
   const float PEAK_CURRENT = 40.0;
+  const float IU_CONVERSION_CONST = 65520.0;
   if (this->misoByteOffsets.count(IMCObjectName::ActualTorque) != 1)
   {
     ROS_WARN("ActualTorque not defined in PDO mapping, so can't read it");
@@ -226,6 +227,7 @@ float IMotionCube::getMotorCurrent()
 float IMotionCube::getMotorVoltage()
 {
   const float V_DC_MAX_MEASURABLE = 102.3;
+  const float IU_CONVERSION_CONST = 65520.0;
   if (this->misoByteOffsets.count(IMCObjectName::DCLinkVoltage) != 1)
   {
     ROS_WARN("DC-link Voltage not defined in PDO mapping, so can't read it");
