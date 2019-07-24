@@ -92,6 +92,8 @@ public:
   IMCState state;
   std::string detailedErrorDescription;
   std::string motionErrorDescription;
+  float motorCurrent;
+  float motorVoltage;
 };
 
 }  // namespace march4cpp

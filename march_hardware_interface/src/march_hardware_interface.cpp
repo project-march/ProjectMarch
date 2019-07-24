@@ -382,6 +382,8 @@ void MarchHardwareInterface::updateIMotionCubeState()
   imc_state_pub_->msg_.state.clear();
   imc_state_pub_->msg_.detailed_error_description.clear();
   imc_state_pub_->msg_.motion_error_description.clear();
+  imc_state_pub_->msg_.motor_current.clear();
+  imc_state_pub_->msg_.motor_voltage.clear();
 
   for (int i = 0; i < num_joints_; i++)
   {
@@ -393,6 +395,8 @@ void MarchHardwareInterface::updateIMotionCubeState()
     imc_state_pub_->msg_.state.push_back(iMotionCubeState.state.getString());
     imc_state_pub_->msg_.detailed_error_description.push_back(iMotionCubeState.detailedErrorDescription);
     imc_state_pub_->msg_.motion_error_description.push_back(iMotionCubeState.motionErrorDescription);
+    imc_state_pub_->msg_.motor_current.push_back(iMotionCubeState.motorCurrent);
+    imc_state_pub_->msg_.motor_voltage.push_back(iMotionCubeState.motorVoltage);
   }
 
   imc_state_pub_->unlockAndPublish();
