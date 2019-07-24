@@ -35,7 +35,6 @@ void IMotionCube::mapMisoPDOs()
   pdoMapMISO.addObject(IMCObjectName::ActualTorque);    // Compulsory!
   pdoMapMISO.addObject(IMCObjectName::MotionErrorRegister);
   pdoMapMISO.addObject(IMCObjectName::DetailedErrorRegister);
-  pdoMapMISO.addObject(IMCObjectName::ActualTorque);
   pdoMapMISO.addObject(IMCObjectName::DCLinkVoltage);
   this->misoByteOffsets = pdoMapMISO.map(this->slaveIndex, dataDirection::miso);
 }
@@ -217,7 +216,7 @@ float IMotionCube::getMotorCurrent()
     ROS_WARN("ActualTorque not defined in PDO mapping, so can't read it");
     return 0xFFFF;  // Not fatal, so can return
   }
-  uint16_t motorCurrentIU = get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::ActualTorque]).ui;
+  int16_t motorCurrentIU = get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::ActualTorque]).i;
   float motorCurrentA =
       (2.0 * 40.0 / 65520.0) * motorCurrentIU;  // Conversion to Amp, see Technosoft CoE programming manual
   return motorCurrentA;
