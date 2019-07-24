@@ -211,29 +211,29 @@ uint16 IMotionCube::getDetailedError()
 
 float IMotionCube::getMotorCurrent()
 {
+  const float PEAK_CURRENT = 40.0;
   if (this->misoByteOffsets.count(IMCObjectName::ActualTorque) != 1)
   {
     ROS_WARN("ActualTorque not defined in PDO mapping, so can't read it");
     return 0xFFFF;  // Not fatal, so can return
   }
   int16_t motorCurrentIU = get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::ActualTorque]).i;
-  float peakCurrent = 40.0;
   float motorCurrentA =
-      (2.0 * peakCurrent / 65520.0) * motorCurrentIU;  // Conversion to Amp, see Technosoft CoE programming manual
+      (2.0 * PEAK_CURRENT / 65520.0) * motorCurrentIU;  // Conversion to Amp, see Technosoft CoE programming manual
   return motorCurrentA;
 }
 
 float IMotionCube::getMotorVoltage()
 {
+  const float V_DC_MAX_MEASURABLE = 102.3;
   if (this->misoByteOffsets.count(IMCObjectName::DCLinkVoltage) != 1)
   {
     ROS_WARN("DC-link Voltage not defined in PDO mapping, so can't read it");
     return 0xFFFF;  // Not fatal, so can return
   }
   uint16_t motorVoltageIU = get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::DCLinkVoltage]).ui;
-  float VdcMaxMeasurable = 102.3;
   float motorVoltageV =
-      (VdcMaxMeasurable / 65520.0) * motorVoltageIU;  // Conversion to Volt, see Technosoft CoE programming manual
+      (V_DC_MAX_MEASURABLE / 65520.0) * motorVoltageIU;  // Conversion to Volt, see Technosoft CoE programming manual
   return motorVoltageV;
 }
 
