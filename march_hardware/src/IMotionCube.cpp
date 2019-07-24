@@ -211,7 +211,7 @@ uint16 IMotionCube::getDetailedError()
 
 float IMotionCube::getMotorCurrent()
 {
-  const float PEAK_CURRENT = 40.0; //Peak current of iMC drive
+  const float PEAK_CURRENT = 40.0;  // Peak current of iMC drive
   const float IU_CONVERSION_CONST = 65520.0;   // Conversion parameter, see Technosoft CoE programming manual
   if (this->misoByteOffsets.count(IMCObjectName::ActualTorque) != 1)
   {
@@ -226,8 +226,8 @@ float IMotionCube::getMotorCurrent()
 
 float IMotionCube::getMotorVoltage()
 {
-  const float V_DC_MAX_MEASURABLE = 102.3; // maximum measurable DC voltage found in EMS Setup/Drive info button
-  const float IU_CONVERSION_CONST = 65520.0; // Conversion parameter, see Technosoft CoE programming manual
+  const float V_DC_MAX_MEASURABLE = 102.3;  // maximum measurable DC voltage found in EMS Setup/Drive info button
+  const float IU_CONVERSION_CONST = 65520.0;  // Conversion parameter, see Technosoft CoE programming manual
   if (this->misoByteOffsets.count(IMCObjectName::DCLinkVoltage) != 1)
   {
     ROS_WARN("DC-link Voltage not defined in PDO mapping, so can't read it");
