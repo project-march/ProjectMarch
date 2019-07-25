@@ -1,0 +1,5 @@
+name: stairs_down
+
+graph:
+  from_subgait: [start,     right_open, left_swing, right_swing, left_close, right_final, left_final]
+  to_subgait:   [right_open, left_swing, right_swing, left_close, right_final, left_final, end]

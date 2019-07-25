@@ -7,6 +7,8 @@ gaits:
   sit: {sit_down: MIV_fluent, sit_home: MIV}
   sofa_sit: {sit_down: MIV, sit_home: MIV}
   sofa_stand: {prepare_stand_up: MIV, stand_up: MIV}
+  stairs_down: {left_close: MIII_continuous, left_final: MIII_continuous, left_swing: MIII_continuous,
+    right_final: MIII_continuous, right_open: MIII_continuous, right_swing: MIII_continuous}
   stairs_up: {left_swing: MIII, right_close: MIII, right_open: MIII, right_swing: MIII}
   stand: {prepare_stand_up: MIV, stand_up: MIV_fluent}
   walk: {left_close: MIV, left_swing: 'MIV_1,3sec', right_close: MIV, right_open: MIV,
