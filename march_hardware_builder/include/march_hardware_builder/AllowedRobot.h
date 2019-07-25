@@ -25,7 +25,7 @@ public:
     }
     else if (robotName == "march3")
     {
-        this->value = march4;
+        this->value = march3;
     }
     else if (robotName == "testsetup")
     {
