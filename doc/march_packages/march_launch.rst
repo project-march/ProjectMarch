@@ -5,9 +5,22 @@ Overview
 --------
 The march_launch package is a collection of launch files which are used to start the exoskeleton and validate its workings.
 
-It also contains a plugin called the ``march_rqt_software_check``. This plugins allows everyone
+It also contains a plugin called the ``march_rqt_software_check``.
+This plugin allows users to easily perform software checks without worrying about the underlying code.
+
+.. code::
+
+  roslaunch march_launch march_rqt_software_check.launch
 
 
+.. figure:: images/march_rqt_software_check.png
+   :align: center
+
+   The march_rqt_software_check window
+
+Some checks will require manual confirmation if the result is not always interpretable (e.g. the amount of slaves found).
+
+Checks will change color based on their result, giving a nice overview of which checks have already been run.
 
 ROS API
 -------
