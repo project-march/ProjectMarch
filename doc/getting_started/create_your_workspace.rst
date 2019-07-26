@@ -31,6 +31,13 @@ Install catkin lint and documentation: ::
   pip install --user catkin_lint
   pip install --user catkin_tools_document
 
+If you get the error that Sphinx requires python 3.5, download python 3.5 using: ::
+
+  sudo apt-get install python3-pip
+
+Then replace the second of the previous lines with: ::
+
+  pip3 install --user catkin_tools_document
 
 Create A Catkin Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^
