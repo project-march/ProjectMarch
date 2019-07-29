@@ -18,7 +18,7 @@ Please see the documentation linked above as it covers everything you need to kn
    Example rqt_multiplot configuration
 
 Configuration
-^^^^^^^^^^^^
+^^^^^^^^^^^^^
 rqt_multiplot allows you to save a configuration that determines which plots are displayed in the ui.
 As configuring a configuration can be time consuming, we have created a :march-iv_repo:`configuration folder<march_launch/rqt_multiplot>>` with commonly used configurations to easily visualize the data you want.
 
