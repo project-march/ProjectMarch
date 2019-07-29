@@ -3,6 +3,8 @@ gaits:
   single_step_normal: {left_close: MIV, right_open: MIV}
   single_step_small: {left_close: MIV_less_hip_flexion, right_open: MIV_less_hip_flexion}
   sit: {sit_down: MIV_fluent, sit_home: MIV}
+  sofa_sit: {sit_down: MIV, sit_home: MIV}
+  sofa_stand: {prepare_stand_up: MIV, stand_up: MIV}
   stand: {prepare_stand_up: MIV, stand_up: MIV_fluent}
   walk: {left_close: MIV, left_swing: 'MIV_1,3sec', right_close: MIV, right_open: MIV,
     right_swing: 'MIV_1,3sec'}
