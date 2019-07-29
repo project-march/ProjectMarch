@@ -17,6 +17,21 @@ Please see the documentation linked above as it covers everything you need to kn
 
    Example rqt_multiplot configuration
 
+Installation
+^^^^^^^^^^^^
+
+Install with
+
+.. code::
+
+  sudo apt-get install ros-kinetic-rqt-multiplot
+
+Launch with
+
+.. code::
+
+  rqt_multiplot
+
 Configuration
 ^^^^^^^^^^^^^
 rqt_multiplot allows you to save a configuration that determines which plots are displayed in the ui.
