@@ -111,39 +111,6 @@ void IMotionCube::actuateRad(float targetRad)
   this->actuateIU(this->encoder.RadtoIU(targetRad));
 }
 
-void IMotionCube::actuateRadFixedSpeed(float targetRad, float radPerSec)
-{
-  if (radPerSec <= 0)
-  {
-    ROS_ERROR("Rad per sec must be bigger than 0, given: %f", radPerSec);
-    return;
-  }
-  if (radPerSec > 0.5)
-  {
-    ROS_ERROR("Rad per sec must be smaller than 0.5, given: %f", radPerSec);
-    return;
-  }
-  if (!this->encoder.isValidTargetPositionIU(this->encoder.RadtoIU(targetRad)))
-  {
-    ROS_ERROR("Target position is outside the allowed range of motion, given: %f", targetRad);
-    return;
-  }
-  float currentRad = this->getAngleRad();
-  ROS_INFO("Trying to go from position %f to position %f with speed %f", currentRad, targetRad, radPerSec);
-  float distance = targetRad - currentRad;
-  int resolution = 250;
-  int cycles = std::floor(std::abs(distance) / radPerSec * resolution) + 1;
-  for (int i = 0; i < cycles; i++)
-  {
-    float index = i;
-    float calculatedTarget = currentRad + (index / cycles * distance);
-    ROS_INFO_STREAM("Target: " << calculatedTarget);
-    ROS_INFO_STREAM("Current: " << this->getAngleRad());
-    usleep(static_cast<__useconds_t>(1000000 / resolution));
-    this->actuateRad(calculatedTarget);
-  }
-}
-
 void IMotionCube::actuateIU(int targetIU)
 {
   if (!this->encoder.isValidTargetPositionIU(targetIU))
