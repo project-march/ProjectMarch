@@ -55,7 +55,6 @@ public:
   void setControlWord(uint16 controlWord);
 
   void actuateRad(float targetRad);
-  void actuateRadFixedSpeed(float targetRad, float radPerSec);
 
   std::string parseStatusWord(uint16 statusWord);
   IMCState getState(uint16 statusWord);
