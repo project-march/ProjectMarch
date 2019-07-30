@@ -13,10 +13,10 @@ private:
   int slaveIndex;
   int totalPositions;
 
-  int positiveHardLimitIU;
-  int negativeHardLimitIU;
-  int positiveSoftLimitIU;
-  int negativeSoftLimitIU;
+  int upperHardLimitIU;
+  int lowerHardLimitIU;
+  int upperSoftLimitIU;
+  int lowerSoftLimitIU;
   int zeroPositionIU;
 
   float safetyMarginRad;
@@ -39,17 +39,17 @@ public:
   void setSlaveIndex(int slaveIndex);
 
   int getSlaveIndex() const;
-  int getPositiveSoftLimitIU() const;
-  int getNegativeSoftLimitIU() const;
-  int getPositiveHardLimitIU() const;
-  int getNegativeHardLimitIU() const;
+  int getUpperSoftLimitIU() const;
+  int getLowerSoftLimitIU() const;
+  int getUpperHardLimitIU() const;
+  int getLowerHardLimitIU() const;
 
   /** @brief Override comparison operator */
   friend bool operator==(const Encoder& lhs, const Encoder& rhs)
   {
     return lhs.slaveIndex == rhs.slaveIndex && lhs.totalPositions == rhs.totalPositions &&
-           lhs.positiveSoftLimitIU == rhs.positiveSoftLimitIU && lhs.negativeSoftLimitIU == rhs.negativeSoftLimitIU &&
-           lhs.positiveHardLimitIU == rhs.positiveHardLimitIU && lhs.negativeHardLimitIU == rhs.negativeHardLimitIU &&
+           lhs.upperSoftLimitIU == rhs.upperSoftLimitIU && lhs.lowerSoftLimitIU == rhs.lowerSoftLimitIU &&
+           lhs.upperHardLimitIU == rhs.upperHardLimitIU && lhs.lowerHardLimitIU == rhs.lowerHardLimitIU &&
            lhs.zeroPositionIU == rhs.zeroPositionIU && lhs.safetyMarginRad == rhs.safetyMarginRad;
   }
   /** @brief Override stream operator for clean printing */
@@ -57,10 +57,10 @@ public:
   {
     return os << "slaveIndex: " << encoder.slaveIndex << ", "
               << "totalPositions: " << encoder.totalPositions << ", "
-              << "positiveHardLimit: " << encoder.positiveHardLimitIU << ", "
-              << "negativeHardLimit: " << encoder.negativeHardLimitIU << ", "
-              << "positiveSoftLimit: " << encoder.positiveSoftLimitIU << ", "
-              << "negativeSoftLimit: " << encoder.negativeSoftLimitIU << ", "
+              << "upperHardLimit: " << encoder.upperHardLimitIU << ", "
+              << "lowerHardLimit: " << encoder.lowerHardLimitIU << ", "
+              << "upperSoftLimit: " << encoder.upperSoftLimitIU << ", "
+              << "lowerSoftLimit: " << encoder.lowerSoftLimitIU << ", "
               << "zeroPositionIU: " << encoder.zeroPositionIU << ", "
               << "safetyMarginRad: " << encoder.safetyMarginRad;
   }

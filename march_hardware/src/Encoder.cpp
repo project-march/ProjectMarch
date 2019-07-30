@@ -17,18 +17,18 @@ Encoder::Encoder(int numberOfBits, int minPositionIU, int maxPositionIU, int zer
 
   this->safetyMarginRad = safetyMarginRad;
   this->slaveIndex = -1;
-  this->positiveHardLimitIU = maxPositionIU;
-  this->negativeHardLimitIU = minPositionIU;
+  this->upperHardLimitIU = maxPositionIU;
+  this->lowerHardLimitIU = minPositionIU;
   this->zeroPositionIU = zeroPositionIU;
   int safetyMarginIU = RadtoIU(safetyMarginRad) - this->zeroPositionIU;
-  this->positiveSoftLimitIU = this->positiveHardLimitIU - safetyMarginIU;
-  this->negativeSoftLimitIU = this->negativeHardLimitIU + safetyMarginIU;
+  this->upperSoftLimitIU = this->upperHardLimitIU - safetyMarginIU;
+  this->lowerSoftLimitIU = this->lowerHardLimitIU + safetyMarginIU;
 
-  ROS_ASSERT_MSG(this->negativeSoftLimitIU < this->positiveSoftLimitIU,
+  ROS_ASSERT_MSG(this->lowerSoftLimitIU < this->upperSoftLimitIU,
                  "Invalid range of motion. Safety margin too large or "
                  "min/max position invalid. Minposition: %i IU, Maxposition: "
                  "%i IU, safetyMargin: %f rad",
-                 this->negativeSoftLimitIU, this->positiveSoftLimitIU, this->safetyMarginRad);
+                 this->lowerSoftLimitIU, this->upperSoftLimitIU, this->safetyMarginRad);
 }
 
 float Encoder::getAngleRad(uint8_t ActualPositionByteOffset)
@@ -69,32 +69,32 @@ int Encoder::getSlaveIndex() const
 
 bool Encoder::isWithinHardLimitsIU(int positionIU)
 {
-  return (positionIU > this->negativeHardLimitIU && positionIU < this->positiveHardLimitIU);
+  return (positionIU > this->lowerHardLimitIU && positionIU < this->upperHardLimitIU);
 }
 
 bool Encoder::isWithinSoftLimitsIU(int positionIU)
 {
-  return (positionIU > this->negativeSoftLimitIU && positionIU < this->positiveSoftLimitIU);
+  return (positionIU > this->lowerSoftLimitIU && positionIU < this->upperSoftLimitIU);
 }
 
-int Encoder::getPositiveSoftLimitIU() const
+int Encoder::getUpperSoftLimitIU() const
 {
-  return positiveSoftLimitIU;
+  return upperSoftLimitIU;
 }
 
-int Encoder::getNegativeSoftLimitIU() const
+int Encoder::getLowerSoftLimitIU() const
 {
-  return negativeSoftLimitIU;
+  return lowerSoftLimitIU;
 }
 
-int Encoder::getPositiveHardLimitIU() const
+int Encoder::getUpperHardLimitIU() const
 {
-  return positiveHardLimitIU;
+  return upperHardLimitIU;
 }
 
-int Encoder::getNegativeHardLimitIU() const
+int Encoder::getLowerHardLimitIU() const
 {
-  return negativeHardLimitIU;
+  return lowerHardLimitIU;
 }
 
 }  // namespace march4cpp
