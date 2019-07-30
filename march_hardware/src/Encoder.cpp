@@ -26,9 +26,10 @@ Encoder::Encoder(int numberOfBits, int minPositionIU, int maxPositionIU, int zer
 
   ROS_ASSERT_MSG(this->lowerSoftLimitIU < this->upperSoftLimitIU,
                  "Invalid range of motion. Safety margin too large or "
-                 "min/max position invalid. Minposition: %i IU, Maxposition: "
-                 "%i IU, safetyMargin: %f rad",
-                 this->lowerSoftLimitIU, this->upperSoftLimitIU, this->safetyMarginRad);
+                 "min/max position invalid. lowerSoftLimit: %i IU, upperSoftLimit: "
+                 "%i IU. lowerHardLimit: %i IU, upperHardLimit %i IU. safetyMargin: %f rad = %i IU",
+                 this->lowerSoftLimitIU, this->upperSoftLimitIU, this->lowerHardLimitIU, this->upperHardLimitIU,
+                 this->safetyMarginRad, safetyMarginIU);
 }
 
 float Encoder::getAngleRad(uint8_t ActualPositionByteOffset)
