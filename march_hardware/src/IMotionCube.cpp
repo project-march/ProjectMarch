@@ -83,9 +83,9 @@ void IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
   success &= sdo_bit32(slaveIndex, 0x6093, 2, 1);
 
   // position limit -- min position
-  success &= sdo_bit32(slaveIndex, 0x607D, 1, this->encoder.getMinPositionIU());
+  success &= sdo_bit32(slaveIndex, 0x607D, 1, this->encoder.getNegativeSoftLimit());
   // position limit -- max position
-  success &= sdo_bit32(slaveIndex, 0x607D, 2, this->encoder.getMaxPositionIU());
+  success &= sdo_bit32(slaveIndex, 0x607D, 2, this->encoder.getPositiveSoftLimit());
 
   // Quick stop option
   success &= sdo_bit16(slaveIndex, 0x605A, 0, 6);
@@ -113,10 +113,10 @@ void IMotionCube::actuateRad(float targetRad)
 
 void IMotionCube::actuateIU(int targetIU)
 {
-  if (!this->encoder.isValidTargetPositionIU(targetIU))
+  if (!this->encoder.isWithinSoftLimits(targetIU))
   {
     ROS_ERROR("Position %i is invalid for slave %d. (%d, %d)", targetIU, this->slaveIndex,
-              this->encoder.getMinPositionIU(), this->encoder.getMaxPositionIU());
+              this->encoder.getNegativeSoftLimit(), this->encoder.getPositiveSoftLimit());
     throw std::runtime_error("Invalid IU actuate command.");
   }
 
@@ -464,7 +464,7 @@ bool IMotionCube::goToOperationEnabled()
   int angleRead = this->encoder.getAngleIU(this->misoByteOffsets[IMCObjectName::ActualPosition]);
   //  If the encoder is functioning correctly, move the joint to its current
   //  position. Otherwise shutdown
-  if (this->encoder.isValidTargetPositionIU(angleRead) && angleRead != 0)
+  if (this->encoder.isWithinHardLimits(angleRead) && angleRead != 0)
   {
     this->actuateIU(angleRead);
   }
@@ -472,7 +472,7 @@ bool IMotionCube::goToOperationEnabled()
   {
     ROS_FATAL("Encoder of iMotionCube (with slaveindex %d) is not functioning properly, read value %d, min value "
               "is %d, max value is %d. Shutting down",
-              this->slaveIndex, angleRead, this->encoder.getMinPositionIU(), this->encoder.getMaxPositionIU());
+              this->slaveIndex, angleRead, this->encoder.getNegativeHardLimit(), this->encoder.getPositiveHardLimit());
     throw std::domain_error("Encoder is not functioning properly");
   }
 
