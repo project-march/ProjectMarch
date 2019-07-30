@@ -33,16 +33,16 @@ public:
   float IUtoRad(int iu);
   int RadtoIU(float rad);
 
-  bool isWithinHardLimits(int positionIU);
-  bool isWithinSoftLimits(int positionIU);
+  bool isWithinHardLimitsIU(int positionIU);
+  bool isWithinSoftLimitsIU(int positionIU);
 
   void setSlaveIndex(int slaveIndex);
 
   int getSlaveIndex() const;
-  int getPositiveSoftLimit() const;
-  int getNegativeSoftLimit() const;
-  int getPositiveHardLimit() const;
-  int getNegativeHardLimit() const;
+  int getPositiveSoftLimitIU() const;
+  int getNegativeSoftLimitIU() const;
+  int getPositiveHardLimitIU() const;
+  int getNegativeHardLimitIU() const;
 
   /** @brief Override comparison operator */
   friend bool operator==(const Encoder& lhs, const Encoder& rhs)

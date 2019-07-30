@@ -67,32 +67,32 @@ int Encoder::getSlaveIndex() const
   return this->slaveIndex;
 }
 
-bool Encoder::isWithinHardLimits(int positionIU)
+bool Encoder::isWithinHardLimitsIU(int positionIU)
 {
   return (positionIU > this->negativeHardLimitIU && positionIU < this->positiveHardLimitIU);
 }
 
-bool Encoder::isWithinSoftLimits(int positionIU)
+bool Encoder::isWithinSoftLimitsIU(int positionIU)
 {
   return (positionIU > this->negativeSoftLimitIU && positionIU < this->positiveSoftLimitIU);
 }
 
-int Encoder::getPositiveSoftLimit() const
+int Encoder::getPositiveSoftLimitIU() const
 {
   return positiveSoftLimitIU;
 }
 
-int Encoder::getNegativeSoftLimit() const
+int Encoder::getNegativeSoftLimitIU() const
 {
   return negativeSoftLimitIU;
 }
 
-int Encoder::getPositiveHardLimit() const
+int Encoder::getPositiveHardLimitIU() const
 {
   return positiveHardLimitIU;
 }
 
-int Encoder::getNegativeHardLimit() const
+int Encoder::getNegativeHardLimitIU() const
 {
   return negativeHardLimitIU;
 }
