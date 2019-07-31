@@ -62,6 +62,7 @@ public:
   void setControlWord(uint16 controlWord);
 
   void actuateRad(float targetRad);
+  void actuateTorque(int targetTorque);
 
   std::string parseStatusWord(uint16 statusWord);
   IMCState getState(uint16 statusWord);

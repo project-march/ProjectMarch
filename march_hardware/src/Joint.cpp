@@ -44,10 +44,9 @@ void Joint::resetIMotionCube()
 
 void Joint::actuateRad(float targetPositionRad)
 {
-  ROS_ASSERT_MSG(this->allowActuation,
-                 "Joint %s is not allowed to actuate, "
-                 "yet its actuate method has been "
-                 "called.",
+  ROS_ASSERT_MSG(this->allowActuation, "Joint %s is not allowed to actuate, "
+                                       "yet its actuate method has been "
+                                       "called.",
                  this->name.c_str());
   // TODO(BaCo) check that the position is allowed and does not exceed (torque)
   // limits.
@@ -62,6 +61,15 @@ float Joint::getAngleRad()
     return -1;
   }
   return this->iMotionCube.getAngleRad();
+}
+
+void Joint::actuateTorque(int targetTorque)
+{
+  ROS_ASSERT_MSG(this->allowActuation, "Joint %s is not allowed to actuate, "
+                                       "yet its actuate method has been "
+                                       "called.",
+                 this->name.c_str());
+  this->iMotionCube.actuateTorque(targetTorque);
 }
 
 float Joint::getTorque()
@@ -96,23 +104,23 @@ float Joint::getTemperature()
 
 IMotionCubeState Joint::getIMotionCubeState()
 {
-    IMotionCubeState states;
+  IMotionCubeState states;
 
-    std::bitset<16> statusWordBits = this->iMotionCube.getStatusWord();
-    states.statusWord = statusWordBits.to_string();
-    std::bitset<16> detailedErrorBits = this->iMotionCube.getDetailedError();
-    states.detailedError = detailedErrorBits.to_string();
-    std::bitset<16> motionErrorBits = this->iMotionCube.getMotionError();
-    states.motionError = motionErrorBits.to_string();
+  std::bitset<16> statusWordBits = this->iMotionCube.getStatusWord();
+  states.statusWord = statusWordBits.to_string();
+  std::bitset<16> detailedErrorBits = this->iMotionCube.getDetailedError();
+  states.detailedError = detailedErrorBits.to_string();
+  std::bitset<16> motionErrorBits = this->iMotionCube.getMotionError();
+  states.motionError = motionErrorBits.to_string();
 
-    states.state = this->iMotionCube.getState(this->iMotionCube.getStatusWord());
-    states.detailedErrorDescription = this->iMotionCube.parseDetailedError(this->iMotionCube.getDetailedError());
-    states.motionErrorDescription = this->iMotionCube.parseMotionError(this->iMotionCube.getMotionError());
+  states.state = this->iMotionCube.getState(this->iMotionCube.getStatusWord());
+  states.detailedErrorDescription = this->iMotionCube.parseDetailedError(this->iMotionCube.getDetailedError());
+  states.motionErrorDescription = this->iMotionCube.parseMotionError(this->iMotionCube.getMotionError());
 
-    states.motorCurrent = this->iMotionCube.getMotorCurrent();
-    states.motorVoltage = this->iMotionCube.getMotorVoltage();
+  states.motorCurrent = this->iMotionCube.getMotorCurrent();
+  states.motorVoltage = this->iMotionCube.getMotorVoltage();
 
-    return states;
+  return states;
 }
 
 void Joint::setName(const std::string& name)
