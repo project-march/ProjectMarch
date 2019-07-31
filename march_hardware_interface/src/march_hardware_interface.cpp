@@ -229,6 +229,8 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
     // alpha=0.2
     joint_velocity_[i] = filters::exponentialSmoothing(joint_velocity, joint_velocity_[i], 0.2);
 
+    joint_effort_[i] = marchRobot.getJoint(joint_names_[i]).getTorque();
+
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(), joint_position_[i]);
   }
 

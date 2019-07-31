@@ -36,6 +36,7 @@ public:
   void actuateRad(float targetPositionRad);
 
   float getAngleRad();
+  float getTorque();
   int getAngleIU();
   float getTemperature();
   IMotionCubeState getIMotionCubeState();
