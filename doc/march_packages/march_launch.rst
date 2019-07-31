@@ -50,7 +50,7 @@ Tutorials
 
 Adding a software check
 ^^^^^^^^^^^^^^^^^^^^^^^
-To add a software check, it should b
+When adding a software check for the first time, make sure to take a look at existing software checks. The ``SlaveCountCheck`` especially is suitable as it runs on another machine. The following steps will guide you through the process.
 
 Add it to the UI
 ~~~~~~~~~~~~~~~~
