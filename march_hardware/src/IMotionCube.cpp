@@ -413,49 +413,25 @@ std::string IMotionCube::parseDetailedError(uint16 detailedError)
   return errorDescription;
 }
 
+bool IMotionCube::goToTargetState(IMotionCubeTargetState targetState)
+{
+  ROS_INFO("\tTry to go to '%s'", targetState.getDescription().c_str());
+  while (!targetState.isReached(this->getStatusWord()))
+  {
+    this->setControlWord(targetState.getControlWord());
+    ROS_INFO_THROTTLE(0.5, "\tWaiting for '%s': %s", targetState.getDescription().c_str(),
+                      std::bitset<16>(this->getStatusWord()).to_string().c_str());
+  }
+  ROS_INFO("\tReached '%s'!", targetState.getDescription().c_str());
+}
+
 bool IMotionCube::goToOperationEnabled()
 {
   this->setControlWord(128);
 
-  ROS_INFO("\tTry to go to 'Switch on Disabled'");
-  bool switchOnDisabled = false;
-  while (!switchOnDisabled)
-  {
-    this->setControlWord(128);
-    int statusWord = this->getStatusWord();
-    int switchOnDisabledMask = 0b0000000001001111;
-    int switchOnDisabledState = 64;
-    switchOnDisabled = (statusWord & switchOnDisabledMask) == switchOnDisabledState;
-    ROS_INFO_STREAM_THROTTLE(0.5, "\tWaiting for 'Switch on Disabled': " << std::bitset<16>(statusWord));
-  }
-  ROS_INFO("\tSwitch on Disabled!");
-
-  ROS_INFO("\tTry to go to 'Ready to Switch On'");
-  bool readyToSwitchOn = false;
-  while (!readyToSwitchOn)
-  {
-    this->setControlWord(6);
-    int statusWord = this->getStatusWord();
-    int readyToSwitchOnMask = 0b0000000001101111;
-    int readyToSwitchOnState = 33;
-    readyToSwitchOn = (statusWord & readyToSwitchOnMask) == readyToSwitchOnState;
-    ROS_INFO_STREAM_THROTTLE(0.5, "\tWaiting for 'Ready to Switch On': " << std::bitset<16>(statusWord));
-  }
-  ROS_INFO("\tReady to Switch On!");
-
-  ROS_INFO("\tTry to go to 'Switched On'");
-  bool switchedOn = false;
-  while (!switchedOn)
-  {
-    this->setControlWord(7);
-    int statusWord = this->getStatusWord();
-    int switchedOnMask = 0b0000000001101111;
-    int switchedOnState = 35;
-    switchedOn = (statusWord & switchedOnMask) == switchedOnState;
-    ROS_INFO_STREAM_THROTTLE(0.5, "\tWaiting for 'Switched On': " << std::bitset<16>(statusWord));
-  }
-  ROS_INFO("\tSwitched On!");
-
+  this->goToTargetState(IMotionCubeTargetState::SWITCH_ON_DISABLED);
+  this->goToTargetState(IMotionCubeTargetState::READY_TO_SWITCH_ON);
+  this->goToTargetState(IMotionCubeTargetState::SWITCHED_ON);
   // If ActualPosition is not defined in PDOmapping, a fatal error is thrown
   // because of safety reasons
   ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO "
@@ -476,18 +452,7 @@ bool IMotionCube::goToOperationEnabled()
     throw std::domain_error("Encoder is not functioning properly");
   }
 
-  ROS_INFO("\tTry to go to 'Operation Enabled'");
-  bool operationEnabled = false;
-  while (!operationEnabled)
-  {
-    this->setControlWord(15);
-    int statusWord = this->getStatusWord();
-    int operationEnabledMask = 0b0000000001101111;
-    int operationEnabledState = 39;
-    operationEnabled = (statusWord & operationEnabledMask) == operationEnabledState;
-    ROS_INFO_STREAM_THROTTLE(0.5, "\tWaiting for 'Operation Enabled': " << std::bitset<16>(statusWord));
-  }
-  ROS_INFO("\tOperation Enabled!");
+  this->goToTargetState(IMotionCubeTargetState::OPERATION_ENABLED);
 }
 
 bool IMotionCube::resetIMotionCube()

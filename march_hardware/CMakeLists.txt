@@ -50,6 +50,7 @@ file(GLOB SOEM_SRC
 add_library(march_hardware
         ${SOEM_SRC}
         include/${PROJECT_NAME}/PowerDistributionBoard.h
+        include/${PROJECT_NAME}/IMotionCubeTargetState.h
         include/${PROJECT_NAME}/EtherCAT/EthercatIO.h
         include/${PROJECT_NAME}/EtherCAT/EthercatMaster.h
         include/${PROJECT_NAME}/EtherCAT/EthercatSDO.h
@@ -76,6 +77,7 @@ add_library(march_hardware
         src/Encoder.cpp
         src/IMotionCube.cpp
         src/Joint.cpp
+        src/IMotionCubeTargetState.cpp
         src/MarchRobot.cpp
         src/TemperatureGES.cpp
         src/PDOmap.cpp
