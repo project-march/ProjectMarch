@@ -5,8 +5,8 @@ gaits:
   single_step_normal: {left_close: MIV, right_open: MIV}
   single_step_small: {left_close: MIV_less_hip_flexion, right_open: MIV_less_hip_flexion}
   sit: {sit_down: MIV_fluent, sit_home: MIV}
-  sofa_sit: {sit_down: MIV, sit_home: MIV}
-  sofa_stand: {prepare_stand_up: MIV, stand_up: MIV}
+  sofa_sit: {sit_down: MIV_changed_velocities, sit_home: MIV}
+  sofa_stand: {prepare_stand_up: MIV, stand_up: MIV_changed_velocities}
   stairs_down: {left_close: MIII_continuous, left_swing: MIII_continuous, right_open: MIII_continuous,
     right_swing: MIII_continuous}
   stairs_down_final_step: {left_final: MIII_continuous, right_final: MIII_continuous}
