@@ -13,6 +13,7 @@ public:
   enum Value : int
   {
     position,
+    torque,
     unknown,
   };
 
@@ -31,6 +32,10 @@ public:
     {
       this->value = unknown;
     }
+    else if (actuationMode == "torque")
+    {
+      this->value = torque;
+    }
     else
     {
       ROS_WARN("Actuation mode (%s) is not recognized, setting to unknown mode", actuationMode.c_str());
@@ -43,6 +48,10 @@ public:
     if (value == position)
     {
       return 8;
+    }
+    else if (value == torque)
+    {
+      return 10;
     }
   }
 
@@ -67,6 +76,8 @@ public:
     {
       case position:
         return "position";
+      case torque:
+        return "torque";
       default:
         ROS_WARN("Actuationmode (%i) is neither 'torque' or 'position", value);
         return "unknown";
