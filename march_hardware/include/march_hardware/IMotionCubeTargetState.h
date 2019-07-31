@@ -6,7 +6,6 @@
 #include <string>
 namespace march4cpp
 {
-
 class IMotionCubeTargetState
 {
 public:
@@ -28,7 +27,8 @@ private:
   }
 
 public:
-  bool isReached(int statusWord){
+  bool isReached(int statusWord)
+  {
     return (statusWord & stateMask) == state;
   }
 
@@ -50,5 +50,5 @@ public:
   }
 };
 
-}
+}  // namespace march4cpp
 #endif  // MARCH_WS_IMOTIONCUBETARGETSTATE_H
