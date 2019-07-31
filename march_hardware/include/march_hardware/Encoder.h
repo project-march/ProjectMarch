@@ -22,8 +22,17 @@ private:
   float safetyMarginRad;
 
 public:
-  Encoder() = default;
-
+  Encoder()
+    : slaveIndex(-1)
+    , totalPositions(0)
+    , upperHardLimitIU(0)
+    , lowerHardLimitIU(0)
+    , upperSoftLimitIU(0)
+    , lowerSoftLimitIU(0)
+    , zeroPositionIU(0)
+    , safetyMarginRad(0)
+  {
+  }
   Encoder(int numberOfBits, int minPositionIU, int maxPositionIU, int zeroPositionIU, float safetyMarginRad);
 
   float getAngleRad(uint8_t ActualPositionByteOffset);

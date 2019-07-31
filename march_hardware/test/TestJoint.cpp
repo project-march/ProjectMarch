@@ -47,3 +47,23 @@ TEST_F(JointDeathTest, ActuateDisableActuation)
     ASSERT_FALSE(joint.canActuate());
     ASSERT_DEATH(joint.actuateRad(0.3), "Joint actuate_false is not allowed to actuate, yet its actuate method has been called.");
 }
+
+TEST_F(JointTest, NoActuationMode)
+{
+  march4cpp::Joint joint;
+  joint.setName("test_joint");
+  ASSERT_DEATH(joint.actuateRad(1), "Joint test_joint is not allowed to actuate, yet its actuate method has been called.");
+}
+
+TEST_F(JointTest, ChangeActuationModeToUnknown)
+{
+  march4cpp::Joint joint;
+
+  joint.setName("test_joint");
+  ASSERT_EQ(joint.getActuationMode().getValue(), march4cpp::ActuationMode::unknown);
+
+  joint.setActuationMode(march4cpp::ActuationMode("position"));
+  ASSERT_EQ(joint.getActuationMode().getValue(), march4cpp::ActuationMode::position);
+
+  ASSERT_THROW(joint.setActuationMode(march4cpp::ActuationMode("unknown")), std::runtime_error);
+}

@@ -10,7 +10,7 @@
 
 namespace march4cpp
 {
-IMotionCube::IMotionCube(int slaveIndex, Encoder encoder) : Slave(slaveIndex)
+IMotionCube::IMotionCube(int slaveIndex, Encoder encoder) : Slave(slaveIndex), actuationMode("unknown")
 {
   this->encoder = encoder;
   this->encoder.setSlaveIndex(this->slaveIndex);
@@ -55,8 +55,12 @@ void IMotionCube::validateMisoPDOs()
 {
   ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::StatusWord) == 1, "StatusWord not mapped");
   ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not mapped");
-  ROS_ASSERT_MSG(this->mosiByteOffsets.count(IMCObjectName::TargetPosition) == 1, "TargetPosition not mapped");
   ROS_ASSERT_MSG(this->mosiByteOffsets.count(IMCObjectName::TargetTorque) == 1, "TargetTorque not mapped");
+
+  if (this->actuationMode == ActuationMode::position)
+  {
+    ROS_ASSERT_MSG(this->mosiByteOffsets.count(IMCObjectName::TargetPosition) == 1, "TargetPosition not mapped");
+  }
 }
 
 // Checks if the compulsory MOSI PDO objects are mapped
@@ -71,8 +75,14 @@ void IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
   ROS_DEBUG("IMotionCube::writeInitialSettings");
   bool success = true;
   // sdo_bit32(slaveIndex, address, subindex, value);
+
+  if (this->actuationMode == ActuationMode::unknown)
+  {
+    throw std::runtime_error("Cannot write initial settings to IMotionCube as it has actuation mode of unknown");
+  }
+
   // mode of operation
-  success &= sdo_bit8(slaveIndex, 0x6060, 0, 8);
+  success &= sdo_bit8(slaveIndex, 0x6060, 0, this->actuationMode.toModeNumber());
 
   // position dimension index
   success &= sdo_bit8(slaveIndex, 0x608A, 0, 1);
@@ -102,6 +112,9 @@ void IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
 
 void IMotionCube::actuateRad(float targetRad)
 {
+  ROS_ASSERT_MSG(this->actuationMode == ActuationMode::position,
+                 "trying to actuate rad, while actuationmode = %s", this->actuationMode.toString().c_str());
+
   if (std::abs(targetRad - this->getAngleRad()) > 0.27)
   {
     ROS_ERROR("Target %f exceeds max difference of 0.27 from current %f for slave %d", targetRad, this->getAngleRad(),
@@ -178,8 +191,8 @@ uint16 IMotionCube::getDetailedError()
 
 float IMotionCube::getMotorCurrent()
 {
-  const float PEAK_CURRENT = 40.0;  // Peak current of iMC drive
-  const float IU_CONVERSION_CONST = 65520.0;   // Conversion parameter, see Technosoft CoE programming manual
+  const float PEAK_CURRENT = 40.0;            // Peak current of iMC drive
+  const float IU_CONVERSION_CONST = 65520.0;  // Conversion parameter, see Technosoft CoE programming manual
   if (this->misoByteOffsets.count(IMCObjectName::ActualTorque) != 1)
   {
     ROS_WARN("ActualTorque not defined in PDO mapping, so can't read it");
@@ -193,7 +206,7 @@ float IMotionCube::getMotorCurrent()
 
 float IMotionCube::getMotorVoltage()
 {
-  const float V_DC_MAX_MEASURABLE = 102.3;  // maximum measurable DC voltage found in EMS Setup/Drive info button
+  const float V_DC_MAX_MEASURABLE = 102.3;    // maximum measurable DC voltage found in EMS Setup/Drive info button
   const float IU_CONVERSION_CONST = 65520.0;  // Conversion parameter, see Technosoft CoE programming manual
   if (this->misoByteOffsets.count(IMCObjectName::DCLinkVoltage) != 1)
   {
@@ -442,7 +455,10 @@ bool IMotionCube::goToOperationEnabled()
   //  position. Otherwise shutdown
   if (this->encoder.isWithinHardLimitsIU(angleRead) && angleRead != 0)
   {
-    this->actuateIU(angleRead);
+    if (this->actuationMode == ActuationMode::position)
+    {
+      this->actuateIU(angleRead);
+    }
   }
   else
   {
@@ -460,6 +476,20 @@ bool IMotionCube::resetIMotionCube()
   this->setControlWord(0);
   ROS_DEBUG("Slave: %d, Try to reset IMC", this->slaveIndex);
   sdo_bit16(slaveIndex, 0x2080, 0, 1);
+}
+
+ActuationMode IMotionCube::getActuationMode() const
+{
+  return this->actuationMode;
+}
+
+void IMotionCube::setActuationMode(ActuationMode mode)
+{
+  if (this->actuationMode != ActuationMode::unknown)
+  {
+    throw std::runtime_error("Cannot change actuation mode at runtime");
+  }
+  this->actuationMode = mode;
 }
 
 bool IMotionCube::get_bit(uint16 value, int index)

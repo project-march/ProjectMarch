@@ -49,6 +49,7 @@ file(GLOB SOEM_SRC
 
 add_library(march_hardware
         ${SOEM_SRC}
+        include/${PROJECT_NAME}/ActuationMode.h
         include/${PROJECT_NAME}/PowerDistributionBoard.h
         include/${PROJECT_NAME}/IMotionCubeTargetState.h
         include/${PROJECT_NAME}/EtherCAT/EthercatIO.h

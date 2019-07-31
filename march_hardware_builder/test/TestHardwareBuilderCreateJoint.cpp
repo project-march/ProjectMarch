@@ -125,15 +125,25 @@ TEST_F(JointTest, NoTemperatureGES)
   ASSERT_NO_THROW(hardwareBuilder.createJoint(jointConfig, "test_joint_no_temperature_ges"));
 }
 
-TEST_F(JointDeathTest, OnlyActuate)
+TEST_F(JointTest, ValidActuationMode)
 {
-  std::string fullPath = this->fullPath("/joint_only_actuate.yaml");
+  std::string fullPath = this->fullPath("/joint_correct_position_mode.yaml");
   YAML::Node jointConfig = YAML::LoadFile(fullPath);
 
-  ASSERT_DEATH(hardwareBuilder.createJoint(jointConfig, "test_joint_only_actuate"), "Joint test_joint_only_actuate has "
-                                                                                    "no IMotionCube and no "
-                                                                                    "TemperatureGES. Please check its "
-                                                                                    "purpose.");
+  march4cpp::Joint createdJoint = hardwareBuilder.createJoint(jointConfig, "test_joint_hip");
+
+  march4cpp::Joint actualJoint;
+  actualJoint.setName("test_joint_hip");
+  actualJoint.setActuationMode(march4cpp::ActuationMode("position"));
+
+  march4cpp::Joint actualJointWrong;
+  actualJointWrong.setName("test_joint_hip");
+  actualJointWrong.setActuationMode(march4cpp::ActuationMode("torque"));
+
+
+  ASSERT_EQ("test_joint_hip", actualJoint.getName());
+  ASSERT_EQ(actualJoint, createdJoint);
+  ASSERT_NE(actualJointWrong, createdJoint);
 }
 
 TEST_F(JointDeathTest, EmptyJoint)

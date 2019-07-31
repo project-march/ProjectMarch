@@ -88,6 +88,16 @@ march4cpp::Joint HardwareBuilder::createJoint(YAML::Node jointConfig, std::strin
     joint.setIMotionCube(imc);
   }
 
+  if (jointConfig["actuationMode"].Type() != YAML::NodeType::Undefined)
+  {
+    std::string mode = jointConfig["actuationMode"].as<std::string>();
+    joint.setActuationMode(march4cpp::ActuationMode(mode));
+  }
+  else
+  {
+    joint.setActuationMode(march4cpp::ActuationMode("unknown"));
+  }
+
   if (jointConfig["netNumber"].Type() == YAML::NodeType::Undefined)
   {
     ROS_WARN("Joint %s does not have a netNumber", jointName.c_str());
@@ -107,12 +117,6 @@ march4cpp::Joint HardwareBuilder::createJoint(YAML::Node jointConfig, std::strin
     temperatureGes = this->createTemperatureGES(jointConfig["temperatureges"]);
     joint.setTemperatureGes(temperatureGes);
   }
-
-  ROS_ASSERT_MSG(joint.hasIMotionCube() || joint.hasTemperatureGES(),
-                 "Joint %s has no IMotionCube and no TemperatureGES. Please "
-                 "check its purpose.",
-                 jointName.c_str());
-
   return joint;
 }
 
