@@ -1,3 +1,5 @@
+.. _how-to-airgait-label:
+
 How to airgait
 ==============
 .. inclusion-introduction-start
