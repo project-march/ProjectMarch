@@ -213,13 +213,16 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
 {
   for (int i = 0; i < num_joints_; i++)
   {
+    
     float oldPosition = joint_position_[i];
 
-    joint_position_[i] = marchRobot.getJoint(joint_names_[i]).getAngleRad();
+    march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
 
-    if (marchRobot.getJoint(joint_names_[i]).hasTemperatureGES())
+    joint_position_[i] = joint.getAngleRad();
+
+    if (joint.hasTemperatureGES())
     {
-      joint_temperature_[i] = marchRobot.getJoint(joint_names_[i]).getTemperature();
+      joint_temperature_[i] = joint.getTemperature();
     }
 
     // Get velocity from encoder position
@@ -229,7 +232,7 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
     // alpha=0.2
     joint_velocity_[i] = filters::exponentialSmoothing(joint_velocity, joint_velocity_[i], 0.2);
 
-    joint_effort_[i] = marchRobot.getJoint(joint_names_[i]).getTorque();
+    joint_effort_[i] = joint.getTorque();
 
     ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(), joint_position_[i]);
   }
