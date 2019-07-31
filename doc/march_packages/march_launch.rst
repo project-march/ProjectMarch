@@ -74,8 +74,8 @@ Creating your software check
 
 Add it to the CheckRunner
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-- Add an instance of your check to :march-iv:`CheckRunner.checks <march_launch/src/CheckRunner.py>`.
-- Connect your check with the UI button in :march-iv:`software_check.__init__() <march_launch/src/software_check.py>`.
+- Add an instance of your check to :march-iv:`CheckRunner.checks <march_launch/src/march_launch/CheckRunner.py>`.
+- Connect your check with the UI button in :march-iv:`software_check.__init__() <march_launch/src/march_launch/software_check.py>`.
 
 Creating the executable (optional)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -87,10 +87,6 @@ Notice how the result is uploaded to ``/check/slave_count``.
 
 When running an executable from another package, it is often preferable to create a launch file in the march_launch package that starts that executable, possibly even on the exoskeleton instead of locally.
 An example can be found in :march-iv:`slave_count.launch <march_launch/launch/checks/slave_count.launch>`.
-
-
-
-
 
 FAQ
 ---
