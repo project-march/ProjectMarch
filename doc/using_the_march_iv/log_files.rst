@@ -29,9 +29,8 @@ A special user **log** has been created to read/write these logs.
 Uploading the logs
 ^^^^^^^^^^^^^^^^^^
 First ssh into the computer of the exoskeleton.
+A tutorial on how to connect with the exoskeleton and ssh into it can be found at :ref:`connecting-to-the-exoskeleton-label`.
 The following command will upload all the logs to the cloudstation and create a folder with the correct <activity_name>.
-
-.. todo:: @Isha, @Tim: Add link to ssh connection when it's done.
 
 .. code::
 
