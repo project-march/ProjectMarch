@@ -11,6 +11,7 @@
 #include <march_hardware/Encoder.h>
 #include <march_hardware/PDOmap.h>
 #include <march_hardware/IMotionCubeState.h>
+#include <march_hardware/IMotionCubeTargetState.h>
 
 namespace march4cpp
 {
@@ -75,6 +76,7 @@ public:
     return os << "slaveIndex: " << iMotionCube.slaveIndex << ", "
               << "encoder: " << iMotionCube.encoder;
   }
+  bool goToTargetState(march4cpp::IMotionCubeTargetState targetState);
 };
 
 }  // namespace march4cpp
