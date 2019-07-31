@@ -44,7 +44,7 @@ To make sure your user is allowed to access the port, add your user to the requi
   sudo usermod -a -G tty <your_username>
   sudo usermod -a -G dialout <your_username>
 
-Now log out and log back in, the error should be resolved.
+Now log out on your computer and log back in, the error should be resolved.
 
 `Source <https://github.com/esp8266/source-code-examples/issues/26>`_
 
