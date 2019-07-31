@@ -155,6 +155,15 @@ float IMotionCube::getAngleRad()
   return this->encoder.getAngleRad(this->misoByteOffsets[IMCObjectName::ActualPosition]);
 }
 
+float IMotionCube::getTorque()
+{
+  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualTorque) == 1, "ActualTorque not defined in PDO "
+                                                                                "mapping, so can't get angle");
+  union bit16 return_byte = get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::ActualTorque]);
+  ROS_DEBUG("Actual Torque read: %d", return_byte.i);
+  return return_byte.i;
+}
+
 int IMotionCube::getAngleIU()
 {
   ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO "
