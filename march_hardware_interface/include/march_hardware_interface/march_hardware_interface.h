@@ -6,6 +6,7 @@
 #include <ros/ros.h>
 #include <realtime_tools/realtime_publisher.h>
 #include <march_shared_resources/ImcErrorState.h>
+#include <march_shared_resources/AfterLimitJointCommand.h>
 #include <march_hardware_builder/HardwareBuilder.h>
 
 #include <march_hardware/MarchRobot.h>
@@ -18,7 +19,8 @@ using joint_limits_interface::PositionJointSoftLimitsInterface;
 using joint_limits_interface::EffortJointSoftLimitsHandle;
 using joint_limits_interface::EffortJointSoftLimitsInterface;
 
-namespace march_hardware_interface {
+namespace march_hardware_interface
+{
 static const double POSITION_STEP_FACTOR = 10;
 static const double VELOCITY_STEP_FACTOR = 10;
 
@@ -27,7 +29,8 @@ static const double VELOCITY_STEP_FACTOR = 10;
  * @details Register an interface for each joint such that they can be actuated
  *     by a controller via ros_control.
  */
-class MarchHardwareInterface : public march_hardware_interface::MarchHardware {
+class MarchHardwareInterface : public march_hardware_interface::MarchHardware
+{
 public:
   MarchHardwareInterface(ros::NodeHandle &nh, AllowedRobot robotName);
   ~MarchHardwareInterface();
@@ -68,6 +71,9 @@ protected:
   bool hasPowerDistributionBoard = false;
   boost::shared_ptr<controller_manager::ControllerManager> controller_manager_;
   typedef boost::shared_ptr<realtime_tools::RealtimePublisher<march_shared_resources::ImcErrorState> > RtPublisherPtr;
+  typedef boost::shared_ptr<realtime_tools::RealtimePublisher<march_shared_resources::AfterLimitJointCommand> >
+      RtPublisherAfterLimitJointCommandPtr;
+  RtPublisherAfterLimitJointCommandPtr after_limit_joint_command_pub_;
   RtPublisherPtr imc_state_pub_;
   double p_error_, v_error_, e_error_;
   std::vector<SoftJointLimits> soft_limits_;
@@ -76,6 +82,7 @@ private:
   void updatePowerNet();
   void updateHighVoltageEnable();
   void updatePowerDistributionBoard();
+  void updateAfterLimitJointCommand();
   void updateIMotionCubeState();
   void resetIMotionCubesUntilTheyWork();
   void outsideLimitsCheck(int joint_index);
