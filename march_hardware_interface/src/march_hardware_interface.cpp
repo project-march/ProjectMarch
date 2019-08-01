@@ -41,6 +41,10 @@ void MarchHardwareInterface::init()
   imc_state_pub_ = RtPublisherPtr(
       new realtime_tools::RealtimePublisher<march_shared_resources::ImcErrorState>(this->nh_, "/march/imc_states/", 4));
 
+  after_limit_joint_command_pub_ = RtPublisherAfterLimitJointCommandPtr(
+      new realtime_tools::RealtimePublisher<march_shared_resources::AfterLimitJointCommand>(
+          this->nh_, "/march/controller/after_limit_joint_command/", 4));
+
   // Start ethercat cycle in the hardware
   this->marchRobot.startEtherCAT();
 
@@ -255,15 +259,19 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
 
   for (int i = 0; i < num_joints_; i++)
   {
-    if (marchRobot.getJoint(joint_names_[i]).canActuate())
+    march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
+
+    if (joint.canActuate())
     {
       ROS_DEBUG("After limits: Trying to actuate joint %s, to %lf rad, %f "
                 "speed, %f effort.",
                 joint_names_[i].c_str(), joint_position_command_[i], joint_velocity_command_[i],
                 joint_effort_command_[i]);
-      marchRobot.getJoint(joint_names_[i]).actuateRad(static_cast<float>(joint_position_command_[i]));
+      joint.actuateRad(static_cast<float>(joint_position_command_[i]));
     }
   }
+
+  this->updateAfterLimitJointCommand();
 
   if (hasPowerDistributionBoard)
   {
@@ -370,6 +378,30 @@ void MarchHardwareInterface::updatePowerNet()
       power_net_on_off_command_.reset();
     }
   }
+}
+
+void MarchHardwareInterface::updateAfterLimitJointCommand()
+{
+  if (!after_limit_joint_command_pub_->trylock())
+  {
+    return;
+  }
+
+  // Clear msg of AfterLimitJointCommand
+  after_limit_joint_command_pub_->msg_.name.clear();
+  after_limit_joint_command_pub_->msg_.position_command.clear();
+  after_limit_joint_command_pub_->msg_.effort_command.clear();
+
+  for (int i = 0; i < num_joints_; i++)
+  {
+    march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
+
+    after_limit_joint_command_pub_->msg_.name.push_back(joint.getName());
+    after_limit_joint_command_pub_->msg_.position_command.push_back(joint_position_command_[i]);
+    after_limit_joint_command_pub_->msg_.effort_command.push_back(joint_effort_command_[i]);
+  }
+
+  after_limit_joint_command_pub_->unlockAndPublish();
 }
 
 void MarchHardwareInterface::updateIMotionCubeState()
