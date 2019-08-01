@@ -44,26 +44,32 @@ TEST_F(AllowedRobotTest, TestMarch3Values)
   march4cpp::Joint leftHip;
   leftHip.setName("left_hip");
   leftHip.setIMotionCube(LHJimc);
+  leftHip.setActuationMode(march4cpp::ActuationMode("position"));
 
   march4cpp::Joint leftKnee;
   leftKnee.setName("left_knee");
   leftKnee.setIMotionCube(LKJimc);
+  leftKnee.setActuationMode(march4cpp::ActuationMode("position"));
 
   march4cpp::Joint leftAnkle;
   leftAnkle.setName("left_ankle");
   leftAnkle.setIMotionCube(LAJimc);
+  leftAnkle.setActuationMode(march4cpp::ActuationMode("position"));
 
   march4cpp::Joint rightHip;
   rightHip.setName("right_hip");
   rightHip.setIMotionCube(RHJimc);
+  rightHip.setActuationMode(march4cpp::ActuationMode("position"));
 
   march4cpp::Joint rightKnee;
   rightKnee.setName("right_knee");
   rightKnee.setIMotionCube(RKJimc);
+  rightKnee.setActuationMode(march4cpp::ActuationMode("position"));
 
   march4cpp::Joint rightAnkle;
   rightAnkle.setName("right_ankle");
   rightAnkle.setIMotionCube(RAJimc);
+  rightAnkle.setActuationMode(march4cpp::ActuationMode("position"));
 
   std::vector<march4cpp::Joint> jointList;
 
