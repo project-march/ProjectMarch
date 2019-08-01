@@ -492,6 +492,10 @@ bool IMotionCube::goToOperationEnabled()
     {
       this->actuateIU(angleRead);
     }
+    if (this->actuationMode == ActuationMode::torque)
+    {
+      this->actuateTorque(0);
+    }
   }
   else
   {
