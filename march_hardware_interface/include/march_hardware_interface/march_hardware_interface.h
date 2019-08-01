@@ -30,7 +30,7 @@ static const double VELOCITY_STEP_FACTOR = 10;
 class MarchHardwareInterface : public march_hardware_interface::MarchHardware
 {
 public:
-  MarchHardwareInterface(ros::NodeHandle& nh, AllowedRobot robotName);
+  MarchHardwareInterface(ros::NodeHandle &nh, AllowedRobot robotName);
   ~MarchHardwareInterface();
 
   /**
@@ -38,7 +38,7 @@ public:
    * for each joint.
    */
   void init();
-  void update(const ros::TimerEvent& e);
+  void update(const ros::TimerEvent &e);
 
   /**
    * @brief Read actual postion from the hardware.

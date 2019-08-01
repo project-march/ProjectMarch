@@ -382,7 +382,6 @@ void MarchHardwareInterface::updatePowerNet()
 
 void MarchHardwareInterface::updateAfterLimitJointCommand()
 {
-  return;
   if (!after_limit_joint_command_pub_->trylock())
   {
     return;
