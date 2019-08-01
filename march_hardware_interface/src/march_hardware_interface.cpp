@@ -394,9 +394,9 @@ void MarchHardwareInterface::updateAfterLimitJointCommand()
 
   for (int i = 0; i < num_joints_; i++)
   {
-    march4cpp::Joint singleJoint = marchRobot.getJoint(joint_names_[i]);
+    march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
 
-    after_limit_joint_command_pub_->msg_.name.push_back(singleJoint.getName());
+    after_limit_joint_command_pub_->msg_.name.push_back(joint.getName());
     after_limit_joint_command_pub_->msg_.position_command.push_back(joint_position_command_[i]);
     after_limit_joint_command_pub_->msg_.effort_command.push_back(joint_effort_command_[i]);
   }
