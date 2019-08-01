@@ -288,6 +288,9 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
       }
       else if (joint.getActuationMode() == march4cpp::ActuationMode::torque)
       {
+        // Enlarge joint_effort_command so dynamic reconfigure can be used inside it's bounds
+        joint_effort_command_[i] = joint_effort_command_[i] * 1000;
+
         joint.actuateTorque(static_cast<int>(joint_effort_command_[i]));
       }
     }

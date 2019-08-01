@@ -9,7 +9,14 @@ march:
     pdb_state:
       type: march_pdb_state_controller/MarchPdbStateController
       publish_rate: 50
-    trajectory:
+    trajectory_position:
         type: position_controllers/JointTrajectoryController
         joints:
           - test_joint
+    trajectory_effort:
+      type: effort_controllers/JointTrajectoryController
+      joints:
+        - test_joint
+      gains: # Required because we're controlling an effort interface
+        test_joint: {p: 50, i: 0, d: 10, i_clamp: 10, publish_state: true, antiwindup: true}
+        # Note: these gains are tuned for the KFE joints in the exoskeleton and not tested on the test-joint
