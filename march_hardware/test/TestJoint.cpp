@@ -67,3 +67,29 @@ TEST_F(JointTest, ChangeActuationModeToUnknown)
 
   ASSERT_THROW(joint.setActuationMode(march4cpp::ActuationMode("unknown")), std::runtime_error);
 }
+
+TEST_F(JointTest, ChangeActuationModeFromPositionToTorque)
+{
+    march4cpp::Joint joint;
+
+    joint.setName("test_joint");
+    ASSERT_EQ(joint.getActuationMode().getValue(), march4cpp::ActuationMode::unknown);
+
+    joint.setActuationMode(march4cpp::ActuationMode("position"));
+    ASSERT_EQ(joint.getActuationMode().getValue(), march4cpp::ActuationMode::position);
+
+    ASSERT_THROW(joint.setActuationMode(march4cpp::ActuationMode("torque")), std::runtime_error);
+}
+
+TEST_F(JointTest, ChangeActuationModeFromTorqueToPosition)
+{
+    march4cpp::Joint joint;
+
+    joint.setName("test_joint");
+    ASSERT_EQ(joint.getActuationMode().getValue(), march4cpp::ActuationMode::unknown);
+
+    joint.setActuationMode(march4cpp::ActuationMode("torque"));
+    ASSERT_EQ(joint.getActuationMode().getValue(), march4cpp::ActuationMode::torque);
+
+    ASSERT_THROW(joint.setActuationMode(march4cpp::ActuationMode("position")), std::runtime_error);
+}
