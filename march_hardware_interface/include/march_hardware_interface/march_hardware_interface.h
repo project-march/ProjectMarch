@@ -15,6 +15,8 @@ using joint_limits_interface::JointLimits;
 using joint_limits_interface::SoftJointLimits;
 using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::PositionJointSoftLimitsInterface;
+using joint_limits_interface::EffortJointSoftLimitsHandle;
+using joint_limits_interface::EffortJointSoftLimitsInterface;
 
 namespace march_hardware_interface {
 static const double POSITION_STEP_FACTOR = 10;
@@ -61,6 +63,7 @@ protected:
   ros::Duration elapsed_time_;
   PositionJointInterface positionJointInterface;
   PositionJointSoftLimitsInterface positionJointSoftLimitsInterface;
+  EffortJointSoftLimitsInterface effortJointSoftLimitsInterface;
   double loop_hz_;
   bool hasPowerDistributionBoard = false;
   boost::shared_ptr<controller_manager::ControllerManager> controller_manager_;
