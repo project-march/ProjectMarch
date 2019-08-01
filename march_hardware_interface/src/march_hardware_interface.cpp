@@ -154,12 +154,11 @@ void MarchHardwareInterface::init()
     {
       // Create position joint interface
       JointHandle jointPositionHandle(jointStateHandle, &joint_position_command_[i]);
+      position_joint_interface_.registerHandle(jointPositionHandle);
 
       // Create joint limit interface
       PositionJointSoftLimitsHandle jointLimitsHandle(jointPositionHandle, limits, soft_limits_[i]);
       positionJointSoftLimitsInterface.registerHandle(jointLimitsHandle);
-
-      position_joint_interface_.registerHandle(jointPositionHandle);
     }
     else if (joint.getActuationMode() == march4cpp::ActuationMode::torque)
     {
@@ -176,15 +175,12 @@ void MarchHardwareInterface::init()
     this->read();
     joint_velocity_[i] = 0;
     joint_effort_[i] = 0;
+    joint_effort_command_[i] = 0;
     joint_position_command_[i] = joint_position_[i];
 
     // Create velocity joint interface
     JointHandle jointVelocityHandle(jointStateHandle, &joint_velocity_command_[i]);
     velocity_joint_interface_.registerHandle(jointVelocityHandle);
-
-    // Create effort joint interface
-    JointHandle jointEffortHandle(jointStateHandle, &joint_effort_command_[i]);
-    effort_joint_interface_.registerHandle(jointEffortHandle);
 
     // Create march_state interface
     MarchTemperatureSensorHandle marchTemperatureSensorHandle(joint_names_[i], &joint_temperature_[i],
@@ -272,12 +268,15 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
 
 void MarchHardwareInterface::write(ros::Duration elapsed_time)
 {
-  positionJointSoftLimitsInterface.enforceLimits(elapsed_time);
-  effortJointSoftLimitsInterface.enforceLimits(elapsed_time);
-
   for (int i = 0; i < num_joints_; i++)
   {
     march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
+
+    // Enlarge joint_effort_command so dynamic reconfigure can be used inside it's bounds
+    joint_effort_command_[i] = joint_effort_command_[i] * 1000;
+
+    positionJointSoftLimitsInterface.enforceLimits(elapsed_time);
+    effortJointSoftLimitsInterface.enforceLimits(elapsed_time);
 
     if (joint.canActuate())
     {
@@ -292,9 +291,6 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
       }
       else if (joint.getActuationMode() == march4cpp::ActuationMode::torque)
       {
-        // Enlarge joint_effort_command so dynamic reconfigure can be used inside it's bounds
-        joint_effort_command_[i] = joint_effort_command_[i] * 1000;
-
         joint.actuateTorque(static_cast<int>(joint_effort_command_[i]));
       }
     }
