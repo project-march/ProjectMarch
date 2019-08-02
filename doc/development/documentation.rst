@@ -69,14 +69,18 @@ html-proofer is a tool that can validate your generated html for mistakes like b
    sudo gem update --system
    sudo gem install html-proofer
 
-Install pygit2
---------------
+Install Additional dependencies
+-------------------------------
 Pygit is used so we can tell Sphinx what branch we are on. That way links to GitHub files can be verified against the proper branch.
 This prevents html-proofer from not being able to find newly added files on develop, as it checks against the current branch.
 
+sphinx-copybutton is used to allow you to copy the contents of code blocks to your clipboard with a single click.
+
+Install all additional dependencies with:
+
 .. code::
 
-  pip install pygit2 --user
+  ./install.sh
 
 Generate the html
 -----------------
