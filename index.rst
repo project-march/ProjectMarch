@@ -100,6 +100,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
   :maxdepth: 4
   :hidden:
 
+  doc/march_packages/march_gait_files
   doc/march_packages/march_hardware_builder
   doc/march_packages/march_launch
   doc/march_packages/march_rqt_launch_menu
