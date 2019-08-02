@@ -38,17 +38,17 @@ before_install: # Use this to prepare the system to install prerequisites or dep
   # Setup rosdep
   - sudo rosdep init
   - rosdep update
-  # Install htmlpoofer
+  # Install htmlproofer
   - gem update --system
   - gem --version
   - gem install html-proofer
   # Install ROS's version of sphinx
   - sudo apt-get -qq install ros-kinetic-rosdoc-lite
   - source /opt/ros/kinetic/setup.bash
-  - pip install pygit2 --user
-  - pip install sphinx-copybutton --user
 
-#install:
+install:
+  # Install additional dependencies
+  - ./install.sh
 
 #before_script:
 
