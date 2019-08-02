@@ -175,8 +175,15 @@ void MarchHardwareInterface::init()
     this->read();
     joint_velocity_[i] = 0;
     joint_effort_[i] = 0;
-    joint_effort_command_[i] = 0;
-    joint_position_command_[i] = joint_position_[i];
+
+    if (joint.getActuationMode() == march4cpp::ActuationMode::position)
+    {
+      joint_position_command_[i] = joint_position_[i];
+    }
+    else if (joint.getActuationMode() == march4cpp::ActuationMode::torque)
+    {
+      joint_effort_command_[i] = 0;
+    }
 
     // Create velocity joint interface
     JointHandle jointVelocityHandle(jointStateHandle, &joint_velocity_command_[i]);
@@ -272,12 +279,6 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
   {
     march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
 
-    // Enlarge joint_effort_command so dynamic reconfigure can be used inside it's bounds
-    joint_effort_command_[i] = joint_effort_command_[i] * 1000;
-
-    positionJointSoftLimitsInterface.enforceLimits(elapsed_time);
-    effortJointSoftLimitsInterface.enforceLimits(elapsed_time);
-
     if (joint.canActuate())
     {
       ROS_DEBUG("After limits: Trying to actuate joint %s, to %lf rad, %f "
@@ -287,10 +288,15 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
 
       if (joint.getActuationMode() == march4cpp::ActuationMode::position)
       {
+        positionJointSoftLimitsInterface.enforceLimits(elapsed_time);
         joint.actuateRad(static_cast<float>(joint_position_command_[i]));
       }
       else if (joint.getActuationMode() == march4cpp::ActuationMode::torque)
       {
+        // Enlarge joint_effort_command so dynamic reconfigure can be used inside it's bounds
+        joint_effort_command_[i] = joint_effort_command_[i] * 1000;
+
+        effortJointSoftLimitsInterface.enforceLimits(elapsed_time);
         joint.actuateTorque(static_cast<int>(joint_effort_command_[i]));
       }
     }
