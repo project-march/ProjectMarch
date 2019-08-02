@@ -30,11 +30,6 @@ Create your workspace
   :start-after: inclusion-introduction-start
   :end-before: inclusion-introduction-end
 
-Intro to ROS
-^^^^^^^^^^^^
-.. include:: doc/getting_started/intro_to_ros.rst
-  :start-after: inclusion-introduction-start
-  :end-before: inclusion-introduction-end
 
 Useful ROS tools
 ^^^^^^^^^^^^^^^^
@@ -64,7 +59,6 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    :hidden:
 
    doc/getting_started/create_your_workspace
-   doc/getting_started/intro_to_ros
 
 .. toctree::
    :caption: Useful ROS tools
