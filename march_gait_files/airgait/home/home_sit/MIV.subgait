@@ -19,7 +19,7 @@ trajectory:
   right_ankle]
   points:
     - 
-      positions: [0.0, 1.2217, 1.5708, 0.0873, 0.0, 1.2217, 1.5708, 0.0873]
+      positions: [0.0, 1.2217, 1.5708, 0.0, 0.0, 1.2217, 1.5708, 0.0]
       velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
