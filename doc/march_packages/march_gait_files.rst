@@ -10,7 +10,6 @@ Most gaits are created by the gait generator, but as they are simply text files 
 
 Structure
 ---------
-The gait files are structured as follows:
 
 .. code::
 
