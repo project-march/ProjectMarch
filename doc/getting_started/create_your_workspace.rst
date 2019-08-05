@@ -107,6 +107,8 @@ This needs to be done for every new terminal you open, so it is advised to
 `add this command to your <https://answers.ros.org/question/206876/how-often-do-i-need-to-source-setupbash/?answer=206976#post-id-206976>`_
 :code:`~/.bashrc`, which is an Ubuntu script ran every time a new terminal is started. Restart your terminal after doing this.
 
+.. note:: If your top level cmake is missing. run this command ``ln -s /opt/ros/kinetic/share/catkin/cmake/toplevel.cmake ./CMakeLists.txt`` in your march_ws/src directory
+
 .. note:: Sourcing the ``setup.bash`` automatically in your ``~/.bashrc`` is
    not required and often skipped by advanced users who use more than one
    catkin workspace at a time, but we recommend it for simplicity.
