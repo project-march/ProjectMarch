@@ -7,8 +7,6 @@
 #include <boost/algorithm/string/split.hpp>
 #include <random>
 
-#include <march_shared_resources/TopicNames.h>
-
 #include <march_fake_sensor_data/TemperaturesConfig.h>
 
 /**
@@ -144,7 +142,7 @@ int main(int argc, char** argv)
   for (std::string sensor_name : sensor_names)
   {
     ros::Publisher temperature_pub =
-        n.advertise<sensor_msgs::Temperature>(createTopicName(TopicNames::temperature, sensor_name.c_str()), 1000);
+        n.advertise<sensor_msgs::Temperature>(createTopicName("/march/temperature", sensor_name.c_str()), 1000);
     temperature_publishers.push_back(temperature_pub);
   }
 
