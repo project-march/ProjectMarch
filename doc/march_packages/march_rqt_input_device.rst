@@ -55,8 +55,8 @@ Create a new publisher in the ``__init__``:
 
   self.this_tutorial_works_pub = rospy.Publisher('/march/this/tutorial/works', Bool, queue_size=10)
 
-Create a callback function
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Create a publish function
+~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code::
 
   def publish_this_tutorial_works(self):
