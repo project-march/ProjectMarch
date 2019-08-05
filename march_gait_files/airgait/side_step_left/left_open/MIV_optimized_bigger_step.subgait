@@ -19,6 +19,11 @@ setpoints:
     joint_names: [right_hip_aa]
   - 
     time_from_start: 
+      secs: 0
+      nsecs: 409900000
+    joint_names: [right_hip_fe]
+  - 
+    time_from_start: 
       secs: 2
       nsecs:         0
     joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
@@ -34,7 +39,7 @@ trajectory:
   right_ankle]
   points: 
     - 
-      positions: [0.0, -0.0873, 0.0, 0.0873, 0.0, -0.0873, 0.0, 0.0873]
+      positions: [0.0, -0.0873, 0.0, 0.0, 0.0, -0.0873, 0.0, 0.0]
       velocities: [0.0, 0.0, 0.0, -0.0, 0.0, 0.0, 0.0, -0.0]
       accelerations: []
       effort: []
@@ -42,23 +47,31 @@ trajectory:
         secs: 0
         nsecs:         0
     - 
-      positions: [0.0002, -0.0873, 0.0, 0.0873, 0.0015, -0.0873, 0.0, 0.0873]
-      velocities: [0.0072, 0.0, 0.0, 0.0, 0.063, 0.0, 0.0, 0.0]
+      positions: [0.0002, -0.0873, 0.0, 0.0, 0.0015, -0.0665, 0.0, 0.0]
+      velocities: [0.0072, 0.0, 0.0, 0.0, 0.063, 0.8835, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs:  50100000
     - 
-      positions: [0.014, -0.0873, 0.0, 0.0873, 0.0524, -0.0873, 0.0, 0.0873]
-      velocities: [0.0653, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      positions: [0.014, -0.0873, 0.0, 0.0, 0.0524, 0.6783, 0.0, 0.0]
+      velocities: [0.0653, 0.0, 0.0, 0.0, 0.0, 0.5955, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs: 400000000
     - 
-      positions: [0.1396, -0.0873, 0.0, 0.0873, 0.1396, -0.0873, 0.0, 0.0873]
+      positions: [0.0147, -0.0873, 0.0, 0.0, 0.0524, 0.6826, 0.0, 0.0]
+      velocities: [0.0666, -0.0, 0.0, 0.0, 0.0063, 0.0, 0.0, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 409900000
+    - 
+      positions: [0.1396, -0.0873, 0.0, 0.0, 0.1396, -0.0873, 0.0, 0.0]
       velocities: [0.0, 0.0, 0.0, -0.0, 0.0, 0.0, 0.0, -0.0]
       accelerations: []
       effort: []
