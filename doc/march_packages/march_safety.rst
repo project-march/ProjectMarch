@@ -17,7 +17,8 @@ All **SafetyType**-objects:
 
 * **TemperatureSafety**, monitors the joint temperatures. Depending on which threshold is exceeded an warning, non-fatal or fatal is thrown.
 * **InputDeviceSafety**, checks if the input device is still connected. Otherwise a non-fatal is thrown.
-* **TrajectorySafety**, checks whether the trajectory controller is within its trajectory constraints. Once the constraints have been passed a position hold command is sent, completed and then the trajectory controller is stopped.
+* **TrajectorySafety**, checks whether the trajectory controller is within its trajectory constraints. Once the constraints
+  have been passed a position hold command is sent, completed and then the trajectory controller is stopped.
 
 Error severity
 --------------
@@ -57,10 +58,73 @@ Published Topics
 Tutorials
 ---------
 
+.. note:: Always add tests when adding code to the *march_safety* package. Bugs in this package can have dangerous consequences for the system.
+
+
 Add new safety rule to existing SafetyType
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+This is pretty straightforward to do. This tutorial will mostly give remarks and tips:
 
+* Add your new rule to the most suited **SafetyType**, if no *SafetyTypes* are suited create a new one (see :ref:`march-safety-add-new-rule-label`).
+* When using values that are probably going to change in the future place them as parameter in the **march_safety.launch** file.
+  Definitely do this with values that are probably going to be changed by other team members, by placing the value in the
+  launch file you make it much easier for them.
+* It's possible that the new rule is automatically called, for example because it's a callback. However, when this is not the case
+  call the new rule in the **update** method of the **SafetyType**. This method is executed every cycle of the **SafetyNode**.
+
+.. _march-safety-add-new-rule-label:
 
 Create new SafetyType
 ^^^^^^^^^^^^^^^^^^^^^
+For this example we will create a safety type which checks the temperature.
+
+* Set temperature threshold in the **march_safety.launch** file, this way the threshold is easy to adjust.
+* Create a class **TemperatureSafety** which extends **SafetyType**
+* In the constructor of this class you probably want to:
+
+    * Pass on a reference to the *NodeHandle* and *SafetyHandle*.
+    * Obtain the threshold parameter form the parameter service.
+
+    .. code::
+
+        n->getParam(ros::this_node::getName() + "/temperature_threshold_non_fatal", non_fatal_temperature_threshold);
+
+    * Subscribe to the temperature topic.
+
+    .. code::
+
+        ros::Subscriber subscriber_temperature = n.subscribe<sensor_msgs::Temperature>("/march/temperature", 1000, temperatureCallback);
+
+* Create a callback method for the temperature subscriber.
+
+    * In this callback you want to compare the received value with the threshold
+
+    .. code::
+
+      if (msg->temperature > non_fatal_temperature_threshold)
+      {
+        // Temperature exceeds threshold
+      }
+
+    * When the threshold is exceeded you probably want to call the non-fatal method form the *SafetyHandle*. This is example code:
+
+    .. code::
+
+        safety_handler->publishNonFatal(error_message);
+
+* You have to overwrite the **update** method from the **SafetyType**. However, in this example we are not using the update method.
+  This method is used when you want to execute some code every **SafetyNode** cycle. For example if you want to check if a certain node
+  is still alive this would be de perfect place to call this code. For this example we will overwrite this method, but keep it empty:
+
+  .. code::
+
+    void update() override
+    {
+    }
+
+* Finally you need to add the **TemperatureSafety** to the **safety_list** in the **SafetyNode.cpp**:
+
+.. code::
+
+    safety_list.push_back(std::unique_ptr<SafetyType>(new TemperatureSafety(&n, &safetyHandler)));
 
