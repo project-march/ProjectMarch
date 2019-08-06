@@ -15,7 +15,7 @@ SMACH makes it easy to get an overview of the behaviour of the exoskeleton.
 It includes a visualization called the Introspection Server.
 
 SMACH is well documented on the `ros wiki <http://wiki.ros.org/smach>`_.
-If you have to work with it, make sure you have completed all their tutorials first.
+If you have to work with SMACH, make sure you have completed all their tutorials first.
 
 .. figure:: images/smach.png
    :align: center
