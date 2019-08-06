@@ -51,8 +51,6 @@ Now log out on your computer and log back in, the error should be resolved.
 How to run wired
 ^^^^^^^^^^^^^^^^
 
-.. todo:: (Electro) Document how to change the input device to wired mode
-
 Upload the code on the input device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Skip this section if the correct code for running wired is already on the input device. More detailed information on how
@@ -63,6 +61,7 @@ to run and upload the code see the :input-device:`ReadMe <>`.
 
 Start the software
 ~~~~~~~~~~~~~~~~~~
+- Make sure the jumper cap in the electronics holder is placed so the input device is powered via the USB cable rather than via batteries.
 - Connect the input device via usb cable, this powers and launches the input device automatically.
 - Type in a terminal:
 
