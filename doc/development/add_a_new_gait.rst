@@ -53,8 +53,6 @@ Make sure to add a transition from standing to your recently created state so th
 
   'gait_<gait_name>': 'GAIT <GAIT_NAME>',
 
-
-
 Add a button to the developer input device
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 To add a gait to the developer input device, follow :ref:`add-a-new-button-label`
@@ -62,3 +60,4 @@ To add a gait to the developer input device, follow :ref:`add-a-new-button-label
 Add the gait to the input device
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 To add a gait to the input device, follow :ref:`how-to-add-a-gait-label`
+
