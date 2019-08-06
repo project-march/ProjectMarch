@@ -37,6 +37,8 @@ Published Topics
 Tutorials
 ---------
 
+.. _add-a-new-button-label:
+
 Add a new button
 ^^^^^^^^^^^^^^^^
 In this tutorial we will add a new button which will have a custom callback that publishes on a new topic
