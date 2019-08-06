@@ -51,8 +51,6 @@ Now log out on your computer and log back in, the error should be resolved.
 How to run wired
 ^^^^^^^^^^^^^^^^
 
-.. todo:: (Electro) Document how to change the input device to wired mode
-
 Upload the code on the input device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Skip this section if the correct code for running wired is already on the input device. More detailed information on how
@@ -63,6 +61,7 @@ to run and upload the code see the :input-device:`ReadMe <>`.
 
 Start the software
 ~~~~~~~~~~~~~~~~~~
+- Make sure the jumper cap in the electronics holder is placed so the input device is powered via the USB cable rather than via batteries.
 - Connect the input device via usb cable, this powers and launches the input device automatically.
 - Type in a terminal:
 
@@ -71,24 +70,22 @@ Start the software
     roslaunch march_launch serial_connection.launch tcp:=false
 
 
-How to run Wireless
+How to run wireless
 ^^^^^^^^^^^^^^^^^^^
-
-.. todo:: (Electro) Document how to change the input device to wireless mode
 
 .. note:: Make sure the pc that needs to receive the messages and the input device are on the same network.
 
 Upload the code on the input device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Skip this section if the correct code for running wired is already on the input device. More detailed information on how
+Skip this section if the correct code for running wireless is already on the input device. More detailed information on how
 to run and upload the code see the :input-device:`ReadMe <>`.
-
-.. note:: If you want to change the network name and password that the input device uses: Change **ssid** and **password** in the *WirelessConnection.h*
 
 - Type in terminal: :code:`hostname -I` Remember the output, this is the hostname. You have to use this address for the next instructions. From this point we call this value **your_hostname**.
 - Uncomment :code:`#define USE_WIRELESS` in the *main.cpp*.
-- Change :code:`IPAddress server(x, x, x, x)` to :code:`IPAddress server(your_hostname)` in the *WirelessConnection.h*
+- Change :code:`IPAddress server(x, x, x, x)` to :code:`IPAddress server(your_hostname)` in the :input-device:`WirelessConnection.h <include/WirelessConnection.h>`
 - Upload to input device.
+
+.. note:: If you want to change the network name and password that the input device uses: Change **ssid** and **password** in the :input-device:`WirelessConnection.h <include/WirelessConnection.h>`
 
 
 Start the software
@@ -106,7 +103,8 @@ Start the software
     roslaunch march_launch serial_connection.launch
 
 - Make sure the batteries are charged and in the input device.
-- Press on button, which is located on the electronics holder.
+- Make sure the jumper cap in the electronics holder is placed so the input device is powered by the batteries rather than via a USB cable.
+- Press the on/off button to turn on the input device. The button is located on the electronics holder of the input device.
 
 How to add a gait
 ^^^^^^^^^^^^^^^^^
