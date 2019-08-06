@@ -1,3 +1,5 @@
+.. _march-gait-files-label:
+
 march_gait_files
 ================
 
