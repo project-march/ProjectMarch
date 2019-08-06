@@ -67,6 +67,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
 
    doc/useful_ros_tools/robot_model
    doc/useful_ros_tools/ros_bag
+   doc/useful_ros_tools/smach
 
 .. toctree::
    :caption: Using the March IV
