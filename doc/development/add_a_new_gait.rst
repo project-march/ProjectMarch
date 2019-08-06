@@ -18,7 +18,7 @@ New gaits should be added to `gait-files repository <https://github.com/project-
 
 Extend the state machine
 ^^^^^^^^^^^^^^^^^^^^^^^^
-Because a gait exists
+Because a gait exists of multiple subgaits, we implement a gait as a state machine.
 
 Create a new python script called ``<gait_name>_sm.py`` that looks like this:
 
@@ -38,6 +38,20 @@ Create a new python script called ``<gait_name>_sm.py`` that looks like this:
           smach.StateMachine.add('<SECOND_SUBSTATE>', GaitState("<gait_name>", "<second_subgait_name"),
                                  transitions={'succeeded': 'succeeded', 'preempted': 'preempted', 'aborted': 'failed'})
       return sm_<gait_name>
+
+In :state-machine:`healthy_sm.py <march_state_machine/src/march_state_machine/healthy_sm.py>` add your new state machine as a state.
+
+.. code::
+
+  smach.StateMachine.add('GAIT <GAIT_NAME>', <gait_name>_sm.py.create(), transitions={'succeeded': 'STANDING', 'preempted': 'failed', 'failed': 'UNKNOWN'})
+
+Make sure to add a transition from standing to your recently created state so the state machine can respond to commands from the input device:
+
+.. code::
+
+  'gait_<gait_name>': 'GAIT <GAIT_NAME>',
+
+
 
 Add a button to the developer input device
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
