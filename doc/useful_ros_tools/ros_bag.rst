@@ -34,3 +34,7 @@ Adding it to the launchfile is the least effort, and is done by starting the fol
   />
 
 Use the option -a to record all topics.
+
+.. hint::
+
+  If you don't specify an output directory, the log files are located in the ros home folder (~/.ros)
