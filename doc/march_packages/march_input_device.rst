@@ -71,7 +71,7 @@ Start the software
     roslaunch march_launch serial_connection.launch tcp:=false
 
 
-How to run Wireless
+How to run wireless
 ^^^^^^^^^^^^^^^^^^^
 
 .. note:: Make sure the pc that needs to receive the messages and the input device are on the same network.
