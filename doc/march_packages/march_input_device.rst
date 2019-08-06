@@ -82,10 +82,10 @@ to run and upload the code see the :input-device:`ReadMe <>`.
 
 - Type in terminal: :code:`hostname -I` Remember the output, this is the hostname. You have to use this address for the next instructions. From this point we call this value **your_hostname**.
 - Uncomment :code:`#define USE_WIRELESS` in the *main.cpp*.
-- Change :code:`IPAddress server(x, x, x, x)` to :code:`IPAddress server(your_hostname)` in the *WirelessConnection.h*.
+- Change :code:`IPAddress server(x, x, x, x)` to :code:`IPAddress server(your_hostname)` in the :input-device:`WirelessConnection.h <include/WirelessConnection.h>`
 - Upload to input device.
 
-.. note:: If you want to change the network name and password that the input device uses: Change **ssid** and **password** in the *WirelessConnection.h*
+.. note:: If you want to change the network name and password that the input device uses: Change **ssid** and **password** in the :input-device:`WirelessConnection.h <include/WirelessConnection.h>`
 
 
 Start the software
