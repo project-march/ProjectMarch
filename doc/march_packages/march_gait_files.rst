@@ -10,6 +10,9 @@ Most gaits are created by the gait generator, but as they are simply text files 
 
 .. todo (Isha) add link to gait generator
 
+
+.. _march-gait-files-structure-label:
+
 Structure
 ---------
 

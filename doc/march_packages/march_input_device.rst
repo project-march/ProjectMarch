@@ -106,6 +106,8 @@ Start the software
 - Make sure the jumper cap in the electronics holder is placed so the input device is powered by the batteries rather than via a USB cable.
 - Press the on/off button to turn on the input device. The button is located on the electronics holder of the input device.
 
+.. _how-to-add-a-gait-label:
+
 How to add a gait
 ^^^^^^^^^^^^^^^^^
 .. todo:: (Karlijn) Document how to add new screens
