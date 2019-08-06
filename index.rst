@@ -79,6 +79,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    doc/using_the_march_iv/how_to_report_bugs
    doc/using_the_march_iv/how_to_view_live_data
    doc/using_the_march_iv/log_files
+   doc/using_the_march_iv/using_the_gait_generator
 
 .. toctree::
    :caption: Development
