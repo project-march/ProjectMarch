@@ -63,7 +63,7 @@ One requirement to do this is that the last setpoint of the left leg has to have
 Otherwise the gait generator will give you a warning that gait mirroring is not possible. Furthermore, either the word ‘left’ or ‘right’ should be in the name of the subgait.
 The mirrored version will be saved with the same version name as the original file, but the word ‘left’ or ‘right’ in the subgait folder is changed to the opposite one.
 
-.. hint::
+.. tip::
 
   Mirroring is not exclusive to gaits and joints with ``left`` or ``right``, you can set custom keys in the settings menu bottom right.
 
