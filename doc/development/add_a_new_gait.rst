@@ -20,6 +20,8 @@ Extend the state machine
 ^^^^^^^^^^^^^^^^^^^^^^^^
 Because a gait exists of multiple subgaits, we implement a gait as a state machine.
 
+An example of a pull request adding states to the state machine can be found in `#64 <https://github.com/project-march/state-machine/pull/64>`_.
+
 Create a new python script called ``<gait_name>_sm.py`` that looks like this:
 
 .. code::
@@ -55,4 +57,8 @@ Make sure to add a transition from standing to your recently created state so th
 
 Add a button to the developer input device
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Adding a button to the developer input device is as simple as following :ref:`add-a-new-button-label`
+To add a gait to the developer input device, follow :ref:`add-a-new-button-label`
+
+Add the gait to the input device
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To add a gait to the input device, follow :ref:`how-to-add-a-gait-label`

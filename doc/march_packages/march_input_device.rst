@@ -108,6 +108,8 @@ Start the software
 - Make sure the batteries are charged and in the input device.
 - Press on button, which is located on the electronics holder.
 
+.. _how-to-add-a-gait-label:
+
 How to add a gait
 ^^^^^^^^^^^^^^^^^
 .. todo:: (Karlijn) Document how to add new screens
