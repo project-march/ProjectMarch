@@ -47,6 +47,9 @@ Our button will publish a boolean message if this tutorial works on the topic ``
 We only need to add code to :march-iv:`input_device.py <march_rqt_input_device/src/march_rqt_input_device/input_device.py>`.
 Make sure to check this file before you start as it contains many examples of existing buttons.
 
+.. hint::
+  If the publisher your button needs already exists, you can skip some of the following steps.
+
 Create a new publisher
 ~~~~~~~~~~~~~~~~~~~~~~
 Create a new publisher in the ``__init__``:
