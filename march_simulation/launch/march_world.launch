@@ -9,7 +9,8 @@
 
   <!-- Load the URDF into the ROS Parameter Server -->
   <param name="robot_description"
-          command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iv.xacro'" />
+          command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iv.xacro'
+          k_velocity_value:=10.0 max_effort_value:=10.0" />
 
   <rosparam file="$(find march_simulation)/config/config_march-iv.yaml" command="load"/>
 
