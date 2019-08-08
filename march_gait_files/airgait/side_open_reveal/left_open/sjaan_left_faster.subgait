@@ -6,12 +6,8 @@ setpoints:
     time_from_start: 
       secs: 0
       nsecs:         0
-    joint_names: [left_hip_aa]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs:  37500000
-    joint_names: [left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee, right_ankle]
+    joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
+  right_ankle]
   - 
     time_from_start: 
       secs: 0
@@ -40,20 +36,12 @@ trajectory:
   points: 
     - 
       positions: [0.0, -0.0873, 0.0, 0.0, 0.0, -0.0873, 0.0, 0.0]
-      velocities: [0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0]
+      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs:         0
-    - 
-      positions: [0.0003, -0.0873, 0.0, 0.0, 0.0, -0.0873, 0.0, 0.0]
-      velocities: [0.0138, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs:  37500000
     - 
       positions: [0.0645, -0.0873, 0.0, 0.0, 0.0, -0.0873, 0.0, 0.0]
       velocities: [0.1943, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
