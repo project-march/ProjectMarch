@@ -11,6 +11,23 @@ The march_rqt_input_device was designed to easily allow you to add custom button
 .. figure:: images/march_rqt_input_device.png
    :align: center
 
+Launching
+^^^^^^^^^
+The *march_rqt_input_device* can be started just as every other package:
+
+.. code::
+
+    roslaunch march_rqt_input_device march_rqt_input_device.launch
+
+In case you don't want to ping the *safety node* with an alive message you can set the launch parameter **ping_safety_node**.
+This can be useful when you are using the normal input device and the *march_rqt_input_device* the same time and losing the
+normal input device should cause the *safety node* to throw an error.
+
+.. code::
+
+    roslaunch march_rqt_input_device march_rqt_input_device.launch ping_safety_node:=false
+
+
 ROS API
 -------
 
