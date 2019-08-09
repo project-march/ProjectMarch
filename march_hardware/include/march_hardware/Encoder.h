@@ -44,6 +44,7 @@ public:
 
   bool isWithinHardLimitsIU(int positionIU);
   bool isWithinSoftLimitsIU(int positionIU);
+  bool isValidTargetIU(int currentIU, int targetIU);
 
   void setSlaveIndex(int slaveIndex);
 
