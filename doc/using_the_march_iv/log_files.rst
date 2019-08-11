@@ -13,8 +13,8 @@ Exoskeleton
 For each session, a new directory should be made with the following structure: **yyyy_mm_dd-activity_name**
 
 Examples:
- - 2019-07-03_first_training
- - 2019-06-01_airgait_with_torque_mode
+ - 2019_07_03-first_training
+ - 2019_06_01-airgait_with_torque_mode
 
 
 The files are located at: ``/home/march/Documents/log_files/<yyyy_mm_dd-activity_name>``
