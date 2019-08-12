@@ -1,6 +1,8 @@
 name: ''
 version: ''
-description: "This gait is used for the reveal to show the HAA movement."
+description: "Stand up gait: from the sitting block to the standing position. This is the same\
+  \ version as MIV, but the velocities at the beginning and end are decreased to make\
+  \ the gait more smooth."
 setpoints: 
   - 
     time_from_start: 
@@ -11,13 +13,13 @@ setpoints:
   - 
     time_from_start: 
       secs: 0
-      nsecs: 562500000
-    joint_names: [left_hip_fe, left_knee, left_ankle, right_hip_fe, right_knee, right_ankle]
+      nsecs: 300000000
+    joint_names: [left_hip_fe, left_knee, right_hip_fe, right_knee]
   - 
     time_from_start: 
-      secs: 0
-      nsecs: 750000000
-    joint_names: [left_hip_fe, left_knee, left_ankle, right_hip_fe, right_knee, right_ankle]
+      secs: 1
+      nsecs: 199999999
+    joint_names: [left_hip_fe, left_knee, right_hip_fe, right_knee]
   - 
     time_from_start: 
       secs: 1
@@ -35,7 +37,7 @@ trajectory:
   right_ankle]
   points: 
     - 
-      positions: [0.2094, -0.0873, 0.0, 0.0, 0.0, -0.0873, 0.0, 0.0]
+      positions: [0.0, 1.5708, 1.5708, 0.0873, 0.0, 1.5708, 1.5708, 0.0873]
       velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
@@ -43,23 +45,23 @@ trajectory:
         secs: 0
         nsecs:         0
     - 
-      positions: [0.1449, -0.0873, 0.0, 0.0, 0.0, -0.0873, 0.0, 0.0]
-      velocities: [-0.1943, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      positions: [0.0, 1.3963, 1.3963, 0.0873, 0.0, 1.3963, 1.3963, 0.0873]
+      velocities: [0.0, -0.8378, -0.8378, 0.0, 0.0, -0.8378, -0.8378, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
-        nsecs: 562500000
+        nsecs: 300000000
     - 
-      positions: [0.1058, -0.0873, 0.0, 0.0, 0.0, -0.0873, 0.0, 0.0]
-      velocities: [-0.2094, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      positions: [0.0, 0.0873, 0.1745, 0.0873, 0.0, 0.0873, 0.1745, 0.0873]
+      velocities: [0.0, -0.8378, -0.8378, -0.0, 0.0, -0.8378, -0.8378, -0.0]
       accelerations: []
       effort: []
       time_from_start: 
-        secs: 0
-        nsecs: 750000000
+        secs: 1
+        nsecs: 199999999
     - 
-      positions: [0.0, -0.0873, 0.0, 0.0, 0.0, -0.0873, 0.0, 0.0]
+      positions: [0.0, -0.0873, 0.0, 0.0873, 0.0, -0.0873, 0.0, 0.0873]
       velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
