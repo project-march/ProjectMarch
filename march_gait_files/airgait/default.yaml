@@ -1,5 +1,7 @@
 gaits:
   home: {home_sit: MIV, home_stand: MIV}
+  set_ankle_to_five: {set_ankle_to_five: angle_to_five_degrees}
+  set_ankle_to_zero: {set_ankle_to_zero: angle_to_zero_degrees}
   side_close_reveal: {left_close: sjaan_left}
   side_open_reveal: {left_open: sjaan_left}
   side_step_left: {left_open: MIV_optimized, right_close: MIV}
@@ -14,5 +16,5 @@ gaits:
   stairs_down_final_step: {left_final: MIII_continuous_new, right_final: MIII_continuous_new}
   stairs_up: {left_swing: MIII_new, right_close: MIII_new, right_open: MIII_new, right_swing: MIII_new}
   stand: {prepare_stand_up: MIV, stand_up: MIV_fluent}
-  walk: {left_close: MIV, left_swing: 'MIV_1,3sec', right_close: MIV, right_open: MIV,
-    right_swing: 'MIV_1,3sec'}
+  walk: {left_close: MIV_more_dorsiflexion, left_swing: 'MIV_more_dorsiflexion_1,3sec',
+    right_close: MIV_more_dorsiflexion, right_open: MIV_more_dorsiflexion, right_swing: 'MIV_more_dorsiflexion_1,3sec'}
