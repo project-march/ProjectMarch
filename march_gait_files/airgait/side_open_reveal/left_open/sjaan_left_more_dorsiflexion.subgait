@@ -1,6 +1,6 @@
 name: ''
 version: ''
-description: "This gait is used for the reveal to show the HAA movement."
+description: "This gait is used for the reveal to show the HAA movement"
 setpoints: 
   - 
     time_from_start: 
@@ -12,12 +12,12 @@ setpoints:
     time_from_start: 
       secs: 0
       nsecs: 562500000
-    joint_names: [left_hip_fe, left_knee, left_ankle, right_hip_fe, right_knee, right_ankle]
+    joint_names: [left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee, right_ankle]
   - 
     time_from_start: 
       secs: 0
       nsecs: 750000000
-    joint_names: [left_hip_fe, left_knee, left_ankle, right_hip_fe, right_knee, right_ankle]
+    joint_names: [left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee, right_ankle]
   - 
     time_from_start: 
       secs: 1
@@ -35,7 +35,7 @@ trajectory:
   right_ankle]
   points: 
     - 
-      positions: [0.0, -0.0873, 0.0, 0.0, 0.0, -0.0873, 0.0, 0.0]
+      positions: [0.0, -0.0873, 0.0, 0.0873, 0.0, -0.0873, 0.0, 0.0873]
       velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
@@ -43,23 +43,23 @@ trajectory:
         secs: 0
         nsecs:         0
     - 
-      positions: [0.0, -0.0873, 0.0, 0.0, 0.0645, -0.0873, 0.0, 0.0]
-      velocities: [0.0, 0.0, 0.0, 0.0, 0.1943, 0.0, 0.0, 0.0]
+      positions: [0.0645, -0.0873, 0.0, 0.0873, 0.0, -0.0873, 0.0, 0.0873]
+      velocities: [0.1943, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs: 562500000
     - 
-      positions: [0.0, -0.0873, 0.0, 0.0, 0.1036, -0.0873, 0.0, 0.0]
-      velocities: [0.0, 0.0, 0.0, 0.0, 0.2094, 0.0, 0.0, 0.0]
+      positions: [0.1036, -0.0873, 0.0, 0.0873, 0.0, -0.0873, 0.0, 0.0873]
+      velocities: [0.2094, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs: 750000000
     - 
-      positions: [0.0, -0.0873, 0.0, 0.0, 0.2094, -0.0873, 0.0, 0.0]
+      positions: [0.2094, -0.0873, 0.0, 0.0873, 0.0, -0.0873, 0.0, 0.0873]
       velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
