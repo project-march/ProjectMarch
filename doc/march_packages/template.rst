@@ -1,8 +1,8 @@
-.. _march-<package-name>-label:
+:orphan:
 
 .. todo:: make sure to remove this orphan tag when copying.
 
-:orphan:
+.. _march-<package-name>-label:
 
 <Package Name>
 ==============
