@@ -1,3 +1,5 @@
+.. _march-launch-label:
+
 march_launch
 ============
 

@@ -1,3 +1,5 @@
+.. _march-rqt-launch-menu-label:
+
 march_rqt_launch_menu
 =====================
 

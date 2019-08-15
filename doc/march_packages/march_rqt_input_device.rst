@@ -1,3 +1,5 @@
+.. _march-rqt-input-device-label:
+
 march_rqt_input_device
 ======================
 
