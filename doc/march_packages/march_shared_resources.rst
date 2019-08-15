@@ -1,3 +1,5 @@
+.. _march-shared-resources-label:
+
 march_shared_resources
 ======================
 

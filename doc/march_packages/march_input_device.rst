@@ -1,3 +1,5 @@
+.. _march-input-device-label:
+
 march_input_device
 ==================
 
