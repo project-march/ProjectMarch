@@ -1,0 +1,5 @@
+name: side_open_reveal
+
+graph:
+  from_subgait: [start,     left_open]
+  to_subgait:   [left_open, end]
