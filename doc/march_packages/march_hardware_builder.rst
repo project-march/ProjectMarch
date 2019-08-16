@@ -1,3 +1,5 @@
+.. _march-hardware-builder-label:
+
 march_hardware_builder
 ======================
 
