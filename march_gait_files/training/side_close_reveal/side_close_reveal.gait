@@ -1,5 +1,0 @@
-name: side_close_reveal
-
-graph:
-  from_subgait: [start,     left_close]
-  to_subgait:   [left_close, end]
