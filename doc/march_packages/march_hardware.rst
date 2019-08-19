@@ -18,11 +18,12 @@ Class Structure
 
 The highest level class is the MarchRobot, it contains a list of Joints which can be accessed.
 Each Joint is identified by a name and optionally has an IMotionCube and TemperatureGES.
-This is enough knowledge to start using
+This is enough knowledge to start interacting with a MarchRobot.
 
 Example usage
 -------------
-Assuming the MarchRobot is already created with the correct joints, here are some commands you
+Here is an example of the commands you can use on a MarchRobot object when it is created with the correct joints.
+
 .. code::
 
   MarchRobot robot;
@@ -33,6 +34,20 @@ Assuming the MarchRobot is already created with the correct joints, here are som
   rightKnee.getRad();
   rightKnee.getTemperature();
   robot.stopEthercat();
+
+Power Distribution Board
+------------------------
+
+.. todo:: (Tim, Martijn) Explain
+
+EtherCAT
+--------
+.. todo:: (Martijn) Explain the EtherCAT loop, master, sdo.
+
+
+IMotionCube
+-----------
+.. todo:: (Martijn) Explain writing to IMC over ethercat
 
 
 ROS API
