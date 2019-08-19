@@ -126,7 +126,7 @@ void IMotionCube::actuateRad(float targetRad)
 
 void IMotionCube::actuateIU(int targetIU)
 {
-  if (!this->encoder.isWithinSoftLimitsIU(targetIU))
+  if (!this->encoder.isValidTargetIU(this->getAngleIU(), targetIU))
   {
     ROS_ERROR("Position %i is invalid for slave %d. (%d, %d)", targetIU, this->slaveIndex,
               this->encoder.getLowerSoftLimitIU(), this->encoder.getUpperSoftLimitIU());

@@ -78,6 +78,26 @@ bool Encoder::isWithinSoftLimitsIU(int positionIU)
   return (positionIU > this->lowerSoftLimitIU && positionIU < this->upperSoftLimitIU);
 }
 
+bool Encoder::isValidTargetIU(int currentIU, int targetIU)
+{
+  if (this->isWithinSoftLimitsIU(targetIU))
+  {
+    return true;
+  }
+
+  if (currentIU >= this->getUpperSoftLimitIU())
+  {
+    return (targetIU <= currentIU) && (targetIU > this->getLowerSoftLimitIU());
+  }
+
+  if (currentIU <= this->getLowerSoftLimitIU())
+  {
+    return (targetIU >= currentIU) && (targetIU < this->getUpperSoftLimitIU());
+  }
+
+  return false;
+}
+
 int Encoder::getUpperSoftLimitIU() const
 {
   return upperSoftLimitIU;
