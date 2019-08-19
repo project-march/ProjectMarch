@@ -2,8 +2,6 @@ gaits:
   home: {home_sit: MIV, home_stand: MIV}
   set_ankle_to_five: {set_ankle_to_five: angle_to_five_degrees}
   set_ankle_to_zero: {set_ankle_to_zero: angle_to_zero_degrees}
-  side_close_reveal: {left_close: sjaan_left}
-  side_open_reveal: {left_open: sjaan_left}
   side_step_left: {left_open: MIV_optimized, right_close: MIV}
   side_step_right: {left_close: MIV, right_open: MIV_optimized}
   single_step_normal: {left_close: MIV, right_open: MIV}
