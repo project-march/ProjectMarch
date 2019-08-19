@@ -8,10 +8,12 @@
   <arg name="debug" default="false"/>
 
   <!-- Load the URDF into the ROS Parameter Server -->
+  <!-- Override effort values as Gazebo uses different units than the actual hardware. -->
   <param name="robot_description"
           command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iv.xacro'
           k_velocity_value:=10.0 max_effort_value:=10.0" />
 
+  <!-- Upload the controller configuration -->
   <rosparam file="$(find march_simulation)/config/config_march-iv.yaml" command="load"/>
 
   <node name="controller_spawner" pkg="controller_manager" type="spawner" ns="/march" output="screen"
@@ -21,6 +23,7 @@
         output="screen" ns="/march">
   </node>
 
+  <!-- Upload the joint names to the parameter server  -->
   <node name="upload_joint_names" pkg="march_simulation" type="upload_joint_names.py"/>
 
   <!-- We resume the logic in empty_world.launch_sm, changing only the name of the world to be launched -->
