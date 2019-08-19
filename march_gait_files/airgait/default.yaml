@@ -1,20 +1,19 @@
 gaits:
-  home: {home_sit: MIV, home_stand: MIV}
-  set_ankle_to_five: {set_ankle_to_five: angle_to_five_degrees}
-  set_ankle_to_zero: {set_ankle_to_zero: angle_to_zero_degrees}
-  side_close_reveal: {left_close: sjaan_left}
-  side_open_reveal: {left_open: sjaan_left}
+  home: {home_sit: MIV_ankle_0, home_stand: MIV_ankle_0}
+  set_ankle_to_five: {set_ankle_to_five: keep_0_degrees}
+  set_ankle_to_zero: {set_ankle_to_zero: keep_0_degrees}
   side_step_left: {left_open: MIV_optimized, right_close: MIV}
   side_step_right: {left_close: MIV, right_open: MIV_optimized}
-  single_step_normal: {left_close: MIV, right_open: MIV}
-  single_step_small: {left_close: MIV_less_hip_flexion, right_open: MIV_less_hip_flexion}
-  sit: {sit_down: MIV_fluent, sit_home: MIV}
+  single_step_normal: {left_close: MIV_ankle_0, right_open: MIV_ankle_0}
+  single_step_small: {left_close: MIV_less_hip_flexion_ankle_0, right_open: MIV_less_hip_flexion_ankle_0}
+  sit: {sit_down: MIV_fluent_ankle_0, sit_home: MIV_ankle_0}
   sofa_sit: {sit_down: MIV_changed_velocities, sit_home: MIV}
   sofa_stand: {prepare_stand_up: MIV, stand_up: MIV_changed_velocities}
   stairs_down: {left_close: MIII_continuous_new, left_swing: MIII_continuous_new,
     right_open: MIII_continuous_new, right_swing: MIII_continuous_new}
   stairs_down_final_step: {left_final: MIII_continuous_new, right_final: MIII_continuous_new}
   stairs_up: {left_swing: MIII_new, right_close: MIII_new, right_open: MIII_new, right_swing: MIII_new}
-  stand: {prepare_stand_up: MIV, stand_up: MIV_fluent}
-  walk: {left_close: MIV_more_dorsiflexion, left_swing: 'MIV_more_dorsiflexion_1,3sec',
-    right_close: MIV_more_dorsiflexion, right_open: MIV_more_dorsiflexion, right_swing: 'MIV_more_dorsiflexion_1,3sec'}
+  stand: {prepare_stand_up: MIV_ankle_0, stand_up: MIV_fluent_ankle_0}
+  walk: {left_close: MIV_ankle_movements_swing_end_0, left_swing: MIV_ankle_movements_swing_0,
+    right_close: MIV_ankle_movements_swing_end_0, right_open: MIV_ankle_movements_swing_start_0,
+    right_swing: MIV_ankle_movements_swing_start_0}
