@@ -122,17 +122,20 @@ We have a python script called :rootdir:`watch.py <watch.py>` that will watch yo
 Browser sync is then notified and will refresh the browser.
 
 Install it globally with npm:
+
 .. code::
 
   npm install -g browser-sync
 
 Start the python watch script:
+
 .. code::
 
   cd ~/march_ws/src/march_tutorials
   python watch.py
 
 In another terminal, start browser-sync:
+
 .. code::
 
   cd ~/march_ws/src/march_tutorials
@@ -150,6 +153,9 @@ Deploy with Travis
 We make use of the `Travis deploy <http://docs.travis-ci.com/user/deployment>`_ feature to deploy our generated documentation to GitHub pages.
 Please check the :rootdir:`.travis.yml of this repository<.travis.yml>` for the details.
 
-Style guide (TODO)
+Add a new tutorial
 ^^^^^^^^^^^^^^^^^^
-.. todo:: (Isha) add a style guide.
+Adding a new tutorial is as simple as creating a new ``.rst`` file.
+To make sure it shows up in the Table of Contents, add it to the :rootdir:`index.rst <index.rst>` under a ``.. toctree::`` directive
+
+.. tip:: If you are creating a new package description, make sure to base it off the :codedir:`package template <march_packages/template.rst>`

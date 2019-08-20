@@ -71,6 +71,7 @@ extlinks = {'codedir': ('https://github.com/' + html_context["github_user"] + '/
             'input-device': ('https://github.com/' + html_context["github_user"] + '/input-device/tree/develop/%s', ''),
             'march-iv': ('https://github.com/' + html_context["github_user"] + '/march-iv/tree/develop/%s', ''),
             'state-machine': ('https://github.com/' + html_context["github_user"] + '/state-machine/tree/develop/%s', ''),
+            'simulation': ('https://github.com/' + html_context["github_user"] + '/simulation/tree/develop/%s', ''),
             'gait-files': ('https://github.com/' + html_context["github_user"] + '/gait-files/tree/develop/%s', ''),
             'ethercat-slaves': ('https://github.com/' + html_context["github_user"] + '/ethercat-slaves/tree/develop/%s', ''),
             'gait-generation': ('https://github.com/' + html_context["github_user"] + '/gait-generation/tree/develop/%s', ''),

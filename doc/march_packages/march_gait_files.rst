@@ -11,6 +11,25 @@ Most gaits are created by the gait generator, but as they are simply text files 
 .. todo (Isha) add link to gait generator
 
 
+Terminology
+-----------
+``Version``: A filled `JointTrajectory Message <http://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/JointTrajectory.html>`_.
+
+``Subgait``: A name for a physical movement, can contain multiple versions.
+
+``Gait``: A directed graph of subgaits with defined transitions from subgait to subgait.
+
+Example:
+
+====  ===========  =======
+Gait  Subgait      Version
+----  -----------  -------
+walk  right_open   default
+walk  right_open   slower
+walk  left_swing   move_ankle_higher
+sit   prepare_sit  now_a_bit_slower
+====  ===========  =======
+
 .. _march-gait-files-structure-label:
 
 Structure
@@ -47,22 +66,3 @@ Clarification
 
 ``<gait_name>.gait`` is used to combine the subgaits together. It defines a graph of transitions between subgaits.
 :gait-files:`Example <march_gait_files/airgait/walk/walk.gait>`
-
-Terminology
------------
-``Version``: A filled `JointTrajectory Message <http://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/JointTrajectory.html>`_.
-
-``Subgait``: A name for a physical movement, can contain multiple versions.
-
-``Gait``: A directed graph of subgaits with defined transitions from subgait to subgait.
-
-Example:
-
-====  ===========  =======
-Gait  Subgait      Version
-----  -----------  -------
-walk  right_open   default
-walk  right_open   slower
-walk  left_swing   move_ankle_higher
-sit   prepare_sit  now_a_bit_slower
-====  ===========  =======
