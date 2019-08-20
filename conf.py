@@ -72,6 +72,7 @@ extlinks = {'codedir': ('https://github.com/' + html_context["github_user"] + '/
             'march-iv': ('https://github.com/' + html_context["github_user"] + '/march-iv/tree/develop/%s', ''),
             'state-machine': ('https://github.com/' + html_context["github_user"] + '/state-machine/tree/develop/%s', ''),
             'gait-files': ('https://github.com/' + html_context["github_user"] + '/gait-files/tree/develop/%s', ''),
+            'ethercat-slaves': ('https://github.com/' + html_context["github_user"] + '/ethercat-slaves/tree/develop/%s', ''),
             'gait-generation': ('https://github.com/' + html_context["github_user"] + '/gait-generation/tree/develop/%s', ''),
             'march_website': ('http://projectmarch.nl', '')}
 
