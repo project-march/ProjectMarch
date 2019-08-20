@@ -5,13 +5,21 @@ march_simulation
 
 Overview
 --------
-The march simulation package launches `Gazebo <http://gazebosim.org/>`_ and spawns the :ref:`URDF <robot-model-label` of the |m4| exoskeleton.
+The march simulation package launches `Gazebo <http://gazebosim.org/>`_ and spawns the :ref:`URDF <robot-model-label>` of the |m4| exoskeleton.
 Its goal is to provide an interface for our high-level code to call similar to that of the :ref:`march-hardware-interface-label`.
 
+As we only use Gazebo for actuating joints, using it is very simple.
+Please check :simulation:`march_world.launch <march_simulation/launch/march_world.launch>` to see how its used.
 
 Config
 ^^^^^^
-The :simulation:`config files <config>` contain controller configuration according to the `Gazebo ros control tutorial <http://gazebosim.org/tutorials/?tut=ros_control>`_
+The :simulation:`config files <march_simulation/config>` contain controller configuration according to the `Gazebo ros control tutorial <http://gazebosim.org/tutorials/?tut=ros_control>`_
+
+Upload joint names
+^^^^^^^^^^^^^^^^^^
+
+The :simulation:`upload_joint_names.py <march_simulation/src/upload_joint_names.py>` script loads the URDF and uploads the joint names to the topic ``/march/joint_names``.
+This is used by the rest of the system to check which joints are active.
 
 Tutorials
 ---------
