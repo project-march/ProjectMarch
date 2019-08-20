@@ -4,5 +4,5 @@
 
 .. _march-hardware-interface-label:
 
-<Package Name>
-==============
+march_hardware_interface
+========================

@@ -5,9 +5,13 @@ march_simulation
 
 Overview
 --------
-The march simulation package launches Gazebo and spawns the URDF of the |m4| exoskeleton.
+The march simulation package launches `Gazebo <http://gazebosim.org/>`_ and spawns the :ref:`URDF <robot-model-label` of the |m4| exoskeleton.
 Its goal is to provide an interface for our high-level code to call similar to that of the :ref:`march-hardware-interface-label`.
 
+
+Config
+^^^^^^
+The :simulation:`config files <config>` contain controller configuration according to the `Gazebo ros control tutorial <http://gazebosim.org/tutorials/?tut=ros_control>`_
 
 Tutorials
 ---------
