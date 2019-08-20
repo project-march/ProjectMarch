@@ -11,9 +11,10 @@ Its goal is to provide an interface for our high-level code to call similar to t
 As we only use Gazebo for actuating joints, using it is very simple.
 Please check :simulation:`march_world.launch <march_simulation/launch/march_world.launch>` to see how its used.
 
-Config
-^^^^^^
-The :simulation:`config files <march_simulation/config>` contain controller configuration according to the `Gazebo ros control tutorial <http://gazebosim.org/tutorials/?tut=ros_control>`_
+ROS Control
+^^^^^^^^^^^
+To integrate Gazebo with ROS Control, we highly recommend checking out the `Gazebo ros control tutorial <http://gazebosim.org/tutorials/?tut=ros_control>`_
+The :simulation:`config files <march_simulation/config>` contain example controller configuration.
 
 Upload joint names
 ^^^^^^^^^^^^^^^^^^
