@@ -42,7 +42,18 @@ Power Distribution Board
 
 EtherCAT
 --------
-.. todo:: (Martijn) Explain the EtherCAT loop, master, sdo.
+The EthercatMaster class contains the main EtherCAT functionality and the main interface with SOEM. EtherCAT can be started and stopped via the EthercatMaster. When EtherCAT is started, a parallel thread is started that continuously sends and receives the latest EtherCAT PDO data and monitors if all slaves are still present and operational. When EtherCAT is stopped, this parallel thread is stopped.
+
+The EthercatMaster class expects several arguments in its constructor: a pointer to a vector of Joints of the robot, the network interface name of your device, the number of EtherCAT slaves in  your robot, and the cycle time of the EtherCAT thread in milliseconds. An example is provided below.
+    
+.. code::
+  EthercatMaster ethercat(&jointList, "enp2s0", maxSlaveIndex, ecatCycleTimeMs);
+
+.. tip::
+  Find out your devices ifname by running :code:`ifconfig` in a terminal.
+
+Reading and writing EtherCAT data is possible through the other classes in the march_hardware package (e.g. Joint, IMotionCube, Encoder). For example, the :hardware:`Encoder class <march_hardware/src/Encoder.cpp>` getAngleIU() method reads the latest encoder value that was received by the EthercatMaster.
+
 
 
 IMotionCube
