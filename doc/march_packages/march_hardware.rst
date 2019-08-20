@@ -102,7 +102,7 @@ The PowerDistributionBoard class contains a HighVoltage and a LowVoltage class w
 
 .. note::
     The functionality of the PowerDistributionBoard is highly dependent on the software running on the LPC1768 of the Power Distribution Board.
-    See :ethercat-slaves:`the ethercat slaves repository <pdb-slave/MARCH4-PDB>` for the LPC1768 code.
+    See the :ethercat-slaves:`ethercat-slaves repository <pdb-slave/MARCH4-PDB>` for the LPC1768 code.
 
 ROS API
 -------
