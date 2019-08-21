@@ -104,6 +104,18 @@ The PowerDistributionBoard class contains a HighVoltage and a LowVoltage class w
     The functionality of the PowerDistributionBoard is highly dependent on the software running on the LPC1768 of the Power Distribution Board.
     See the :ethercat-slaves:`ethercat-slaves repository <pdb-slave/MARCH4-PDB>` for the LPC1768 code.
 
+Exceptions
+----------
+Because safety is very important, the march_hardware package will throw an exception whenever it encounters something that shouldn't happen.
+
+The main exceptions are
+
+  * Incorrect configuration of joints (e.g. higher min position than max position)
+  * Hardware failures
+  * Incorrect actuate command is send (outside of limits or too far from current position)
+
+When such an exception occurs, the high voltage is turned off and the exoskeleton will stop moving.
+
 ROS API
 -------
 The hardware package is written without depending on ROS to ensure that it can remain functional even when ROS will no longer be used.
