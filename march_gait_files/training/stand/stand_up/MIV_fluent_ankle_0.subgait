@@ -1,4 +1,4 @@
-ame: ''
+name: ''
 version: ''
 description: "Stand up gait: from the sitting block to the standing position. This is the same\
   \ version as MIV, but the velocities at the beginning and end are decreased to make\
