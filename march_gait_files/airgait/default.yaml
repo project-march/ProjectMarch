@@ -14,6 +14,5 @@ gaits:
   stairs_down_final_step: {left_final: MIII_continuous_new, right_final: MIII_continuous_new}
   stairs_up: {left_swing: MIII_new, right_close: MIII_new, right_open: MIII_new, right_swing: MIII_new}
   stand: {prepare_stand_up: MIV_ankle_0, stand_up: MIV_fluent_ankle_0}
-  walk: {left_close: MIV_ankle_movements_swing_end_0, left_swing: MIV_ankle_movements_swing_0,
-    right_close: MIV_ankle_movements_swing_end_0, right_open: MIV_ankle_movements_swing_start_0,
-    right_swing: MIV_ankle_movements_swing_start_0}
+  walk: {left_close: MIV_ankle_5_to_0, left_swing: 'MIV_1,2sec_ankle_5', right_close: MIV_ankle_5_to_0,
+    right_open: MIV_optimized_ankle_0_to_5, right_swing: 'MIV_1,2sec_ankle_5'}
