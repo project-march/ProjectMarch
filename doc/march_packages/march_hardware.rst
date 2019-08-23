@@ -72,7 +72,7 @@ These generic functions are defined in :hardware-interface:`EthercatIO.cpp <marc
 .. note::
     When reading or writing PDO messages over EtherCAT via SOEM, you need three things:
 
-    * The index of the slave you want to read from or write to, and the byte offset of the data you want to read.
+    * The index of the slave you want to read from or write to.
     * The amount of bytes you want to read or write.
     * The byte offset of the data you want to read or write for a particular slave.
 
