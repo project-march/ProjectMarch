@@ -62,7 +62,6 @@ This is a very simple test to make sure you followed :ref:`preparation-before-co
 
 - Run :code:`roscore` in a terminal on the |M4| exoskeleton computer (you can always do this via SSH).
 - Run :code:`rostopic list` in a terminal on your computer. This command should give the output **/rosout /rosout_agg**
-- Terminate the :code:`rostopic list` command by pressing **ctrl + c**.
 - Run :code:`rostopic echo /march/test` in a new terminal on the |M4| exoskeleton computer. This command gives a warning.
 - Now publish a message with the command :code:`rostopic pub /march/test std_msgs/String "data: 'Hello World'"`
 - The message is send and received successful if you received the message in the |M4| exoskeleton computer.
