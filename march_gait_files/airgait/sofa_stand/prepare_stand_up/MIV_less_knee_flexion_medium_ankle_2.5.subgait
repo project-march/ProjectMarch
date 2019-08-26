@@ -1,21 +1,21 @@
 name: ''
 version: ''
-description: "Set the ankle angle from zero to five degrees"
+description: "Prepare stand up: perform hip flexion before the actual standing up from the sofa."
 setpoints: 
   - 
     time_from_start: 
       secs: 0
       nsecs:         0
-    joint_names: [left_ankle, right_ankle]
+    joint_names: [left_hip_aa, left_hip_fe, left_knee, right_hip_fe, right_knee]
   - 
     time_from_start: 
       secs: 0
-      nsecs:  75000000
-    joint_names: [left_hip_aa, left_hip_fe, left_knee, right_hip_aa, right_hip_fe, right_knee]
+      nsecs:  25000000
+    joint_names: [left_ankle, right_hip_aa, right_ankle]
   - 
     time_from_start: 
-      secs: 0
-      nsecs: 500000000
+      secs: 1
+      nsecs:         0
     joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
   right_ankle]
 trajectory: 
@@ -29,30 +29,30 @@ trajectory:
   right_ankle]
   points: 
     - 
-      positions: [0.0, -0.0873, 0.0, 0.0436, 0.0, -0.0873, 0.0, 0.0436]
-      velocities: [-0.0, 0.0, -0.0, 0.0, -0.0, 0.0, -0.0, 0.0]
+      positions: [0.0, 1.5708, 1.8326, 0.0436, 0.0, 1.5708, 1.8326, 0.0436]
+      velocities: [0.0, 0.0, 0.0, 0.0, -0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs:         0
     - 
-      positions: [0.0, -0.0873, 0.0, 0.0436, 0.0, -0.0873, 0.0, 0.0436]
-      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      positions: [0.0, 1.5709, 1.8326, 0.0436, 0.0, 1.5709, 1.8326, 0.0436]
+      velocities: [0.0, 0.0078, -0.0, 0.0, 0.0, 0.0078, -0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
-        nsecs:  75000000
+        nsecs:  25000000
     - 
-      positions: [0.0, -0.0873, 0.0, 0.0436, 0.0, -0.0873, 0.0, 0.0436]
+      positions: [0.0, 1.6581, 1.8326, 0.0436, 0.0, 1.6581, 1.8326, 0.0436]
       velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
-        secs: 0
-        nsecs: 500000000
+        secs: 1
+        nsecs:         0
 duration: 
-  secs: 0
-  nsecs: 500000000
+  secs: 1
+  nsecs:         0
 sounds: []
