@@ -9,9 +9,9 @@ gaits:
   sit: {sit_down: MIV_fluent_ankle_0, sit_home: MIV_ankle_0}
   sofa_sit: {sit_down: MIV_less_knee_flexion, sit_home: MIV_less_knee_flexion}
   sofa_stand: {prepare_stand_up: MIV_less_knee_flexion, stand_up: MIV_less_knee_flexion}
-  stairs_down: {left_close: MIII_continuous_new, left_swing: MIII_continuous_new,
-    right_open: MIII_continuous_new, right_swing: MIII_continuous_new}
-  stairs_down_final_step: {left_final: MIII_continuous_new, right_final: MIII_continuous_new}
+  stairs_down: {left_close: MIV, left_swing: MIV,
+    right_open: MIV, right_swing: MIV}
+  stairs_down_final_step: {left_final: MIV, right_final: MIV}
   stairs_up: {left_close: MIV, left_swing: MIV, right_close: MIV, right_open: MIV, right_swing: MIV}
   stand: {prepare_stand_up: MIV_ankle_0, stand_up: MIV_fluent_ankle_0}
   walk: {left_close: MIV_ankle_5_to_0, left_swing: 'MIV_1,2sec_ankle_5', right_close: MIV_ankle_5_to_0,
