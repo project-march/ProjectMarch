@@ -52,5 +52,4 @@ Tutorials
 
 Add a state to the state machine
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
+See :ref:`add-gait-label` on how to add a gait state to the **HEALTY** state machine. Adding other non-gait states is similar.

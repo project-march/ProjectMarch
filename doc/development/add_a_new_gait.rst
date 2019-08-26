@@ -1,3 +1,5 @@
+.. _add-gait-label:
+
 Add a new gait
 ==============
 .. inclusion-introduction-start
