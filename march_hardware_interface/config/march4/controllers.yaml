@@ -11,6 +11,7 @@ march:
       publish_rate: 1
     trajectory:
       type: position_controllers/JointTrajectoryController
+      allow_partial_joints_goal: true
       # When you switch to effort actuationmode, 'position_controllers' must be substituted with 'effort_controllers' and the gains must be added
       joints:
         - right_hip_fe
@@ -26,8 +27,8 @@ march:
 #        left_hip_fe: {p: 80, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
 #        right_knee: {p: 50, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
 #        left_knee: {p: 50, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
-#        right_ankle: {p: 50, i: 50, d: 3, i_clamp: 100, publish_state: true, antiwindup: true}
-#        left_ankle: {p: 50, i: 50, d: 3, i_clamp: 100, publish_state: true, antiwindup: true}
-#        right_hip_aa: {p: 20, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true} # TODO(BaCo) tune HAA joints
-#        left_hip_aa: {p: 20, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
+#        right_ankle: {p: 140, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
+#        left_ankle: {p: 160, i: 0, d: 6, i_clamp: 100, publish_state: true, antiwindup: true}
+#        right_hip_aa: {p: 340, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true} # TODO(BaCo) tune HAA joints
+#        left_hip_aa: {p: 340, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
 
