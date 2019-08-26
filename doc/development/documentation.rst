@@ -112,6 +112,24 @@ Simply run the :rootdir:`build_locally <build_locally.sh>` script to generate th
     pip uninstall sphinx
 
 .. note::
+  You might get the following error if sphinx is installed using pip3:
+
+  .. code::
+
+    Exception occurred:
+      File "<frozen importlib._bootstrap>", line 222, in _call_with_frames_removed
+      File "/home/olav/march_ws/src/march_tutorials/_scripts/tutorialformatter.py", line 121
+        print 'tutorialformatter.py error: sub-tutorial %s not found.' % sub_name
+                                                                     ^
+    SyntaxError: Missing parentheses in call to 'print'
+
+  You can fix this by uninstalling python3 sphinx:
+
+  .. code::
+
+    pip3 uninstall sphinx
+
+.. note::
   If you have added new files but not pushed to GitHub yet, html-proofer will probably complain about invalid links.
   Push your files and build locally again to solve this problem.
 
