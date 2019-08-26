@@ -43,6 +43,10 @@ Install catkin lint and documentation: ::
 
     pip3 install --user catkin_tools_document
 
+Install additional ROS Kinetic packages: ::
+
+  sudo apt-get install ros-kinetic-ros-control ros-kinetic-ros-controllers ros-kinetic-effort-controllers ros-kinetic-joint-state-controller ros-kinetic-joint-trajectory-controller
+
 Create A Catkin Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 You will need to have a `catkin <http://wiki.ros.org/catkin>`_ workspace setup: ::
