@@ -292,7 +292,8 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
 
       if (joint_effort_command_[i] != joint_effort_command_copy[i])
       {
-          ROS_WARN("Effort command (%f) changed to random high number (%f) for joint(%s), but set back to the normal value (%f)",
+          ROS_WARN("Effort command (%f) changed to random high number (%f) for joint(%s), "
+                   "but set back to the normal value (%f)",
                    joint_effort_command_[i], joint_names_[i].c_str(), joint_effort_command_copy[i]);
         joint_effort_command_[i] = joint_effort_command_copy[i];
       }
