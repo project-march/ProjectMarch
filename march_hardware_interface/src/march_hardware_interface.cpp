@@ -292,9 +292,9 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
 
       if (joint_effort_command_[i] != joint_effort_command_copy[i])
       {
+          ROS_WARN("Effort command (%f) is not the same as the copied effort command (%f) for joint (%s)",
+                   joint_effort_command_[i], joint_effort_command_copy[i], joint_names_[i].c_str());
         joint_effort_command_[i] = joint_effort_command_copy[i];
-        ROS_WARN("Effort command (%f) is not the same as the copied effort command (%f) for joint (%s)",
-                 joint_effort_command_[i], joint_effort_command_copy[i], joint_names_[i].c_str());
       }
 
       if (joint.getActuationMode() == march4cpp::ActuationMode::position)
