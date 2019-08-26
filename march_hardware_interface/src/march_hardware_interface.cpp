@@ -275,6 +275,10 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
 
 void MarchHardwareInterface::write(ros::Duration elapsed_time)
 {
+  joint_effort_command_copy.clear();
+  joint_effort_command_copy.resize(joint_effort_command_.size());
+  joint_effort_command_copy = joint_effort_command_;
+
   for (int i = 0; i < num_joints_; i++)
   {
     march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
@@ -285,6 +289,13 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
                 "speed, %f effort.",
                 joint_names_[i].c_str(), joint_position_command_[i], joint_velocity_command_[i],
                 joint_effort_command_[i]);
+
+      if (joint_effort_command_[i] != joint_effort_command_copy[i])
+      {
+        joint_effort_command_[i] = joint_effort_command_copy[i];
+        ROS_WARN("Effort command (%i) is not the same as the copied effort command (%i) for joint (%s)",
+                 joint_effort_command_[i], joint_effort_command_copy[i], joint_names_[i].c_str());
+      }
 
       if (joint.getActuationMode() == march4cpp::ActuationMode::position)
       {
