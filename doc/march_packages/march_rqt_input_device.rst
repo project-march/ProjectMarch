@@ -90,7 +90,7 @@ Create a button object
 ~~~~~~~~~~~~~~~~~~~~~~
 .. code::
 
-  this_tutorial_works_button = MarchButton(name="Publish True", callback=lambda: publish_this_tutorial_works())
+  this_tutorial_works_button = MarchButton(name="Publish True", callback=lambda: self.publish_this_tutorial_works())
 
 Add it to the march_button_layout
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
