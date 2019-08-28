@@ -1,0 +1,164 @@
+name: ''
+version: ''
+description: "Swing step for stairs up, same version as MIII used. The first version of the MIII\
+  \ gait was probably not correct, so this version has to be the correct MIII version."
+setpoints: 
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs:         0
+    joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
+  left_ankle]
+  - 
+    time_from_start: 
+      secs: 1
+      nsecs: 163599999
+    joint_names: [left_hip_fe]
+  - 
+    time_from_start: 
+      secs: 1
+      nsecs: 280000000
+    joint_names: [left_knee]
+  - 
+    time_from_start: 
+      secs: 1
+      nsecs: 600000000
+    joint_names: [right_knee]
+  - 
+    time_from_start: 
+      secs: 2
+      nsecs:         0
+    joint_names: [right_hip_fe]
+  - 
+    time_from_start: 
+      secs: 2
+      nsecs: 319999999
+    joint_names: [right_knee]
+  - 
+    time_from_start: 
+      secs: 2
+      nsecs: 480000000
+    joint_names: [right_hip_fe]
+  - 
+    time_from_start: 
+      secs: 3
+      nsecs:    100000
+    joint_names: [right_hip_aa, right_ankle, left_hip_aa, left_ankle]
+  - 
+    time_from_start: 
+      secs: 3
+      nsecs: 200000000
+    joint_names: [left_hip_fe, left_knee]
+  - 
+    time_from_start: 
+      secs: 3
+      nsecs: 759999999
+    joint_names: [left_hip_fe]
+  - 
+    time_from_start: 
+      secs: 4
+      nsecs:         0
+    joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
+  left_ankle]
+trajectory: 
+  header: 
+    seq: 0
+    stamp: 
+      secs: 0
+      nsecs:         0
+    frame_id: ''
+  joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
+  left_ankle]
+  points: 
+    - 
+      positions: [0.0, -0.1396, 0.3491, 0.0, 0.0, 0.3491, 0.4363, 0.0]
+      velocities: [0.0, 0.0, 1.228, 0.0, 0.0, -0.9425, -0.9425, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs:         0
+    - 
+      positions: [0.0, 0.7384, 1.5962, 0.0, 0.0, 0.0, 0.0011, 0.0]
+      velocities: [0.0, 1.0338, 0.6496, 0.0, 0.0, 0.0, -0.0224, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs: 163599999
+    - 
+      positions: [0.0, 0.8497, 1.6596, 0.0, 0.0, 0.0, 0.0, 0.0]
+      velocities: [0.0, 0.984, 0.5098, 0.0, 0.0, 0.0, 0.0, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs: 280000000
+    - 
+      positions: [0.0, 1.123, 1.7453, 0.0, 0.0, 0.0, 0.0, 0.0]
+      velocities: [0.0, 0.6925, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs: 600000000
+    - 
+      positions: [0.0, 1.2741, 1.6761, 0.0, 0.0, 0.0, 0.0, 0.0]
+      velocities: [0.0, 0.0, -0.2972, 0.0, 0.0, 0.0, 0.0, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 2
+        nsecs:         0
+    - 
+      positions: [0.0, 1.2741, 1.5708, 0.0, 0.0, 0.0, 0.0, 0.0]
+      velocities: [0.0, 0.0, -0.3142, 0.0, 0.0, 0.0, 0.0, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 2
+        nsecs: 319999999
+    - 
+      positions: [0.0, 1.2741, 1.5152, 0.0, 0.0, 0.0, 0.0, 0.0]
+      velocities: [0.0, 0.0, -0.3938, 0.0, 0.0, 0.0, 0.0, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 2
+        nsecs: 480000000
+    - 
+      positions: [0.0, 1.135, 1.244, 0.0, 0.0, 0.0, 0.0, 0.0]
+      velocities: [0.0, -0.5019, -0.6333, 0.0, 0.0, 0.0, 0.0, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 3
+        nsecs:    100000
+    - 
+      positions: [0.0, 1.0186, 1.1087, 0.0, 0.0, 0.0, 0.0, 0.0]
+      velocities: [0.0, -0.6473, -0.711, 0.0, 0.0, 0.0, 0.0, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 3
+        nsecs: 200000000
+    - 
+      positions: [0.0, 0.572, 0.6566, 0.0, 0.0, -0.1396, 0.1289, 0.0]
+      velocities: [0.0, -0.9018, -0.8858, 0.0, 0.0, 0.0, 0.6242, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 3
+        nsecs: 759999999
+    - 
+      positions: [0.0, 0.3491, 0.4363, 0.0, 0.0, -0.1396, 0.3491, 0.0]
+      velocities: [0.0, -0.9425, -0.9425, 0.0, 0.0, 0.0, 1.228, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 4
+        nsecs:         0
+duration: 
+  secs: 4
+  nsecs:         0
+sounds: []
