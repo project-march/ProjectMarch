@@ -1,15 +1,14 @@
 gaits:
-  home: {home_sit: MIV_ankle_0, home_stand: MIV_ankle_0}
-  set_ankle_to_five: {set_ankle_to_five: keep_0_degrees}
-  set_ankle_to_zero: {set_ankle_to_zero: keep_0_degrees}
-  side_step_left: {left_open: MIV_optimized, right_close: MIV}
+  home: {home_sit: MIV_ankle_2.5, home_stand: MIV_ankle_2.5}
+  side_step_left: {left_open: MIV_optimized_bigger_10deg_step_ankle_2.5, right_close: MIV_bigger_10deg_step_ankle_2.5}
   side_step_right: {left_close: MIV, right_open: MIV_optimized}
-  single_step_normal: {left_close: MIV_ankle_0, right_open: MIV_ankle_0}
-  single_step_small: {left_close: MIV_less_hip_flexion_ankle_0, right_open: MIV_less_hip_flexion_ankle_0}
-  sit: {sit_down: MIV_fluent_ankle_0, sit_home: MIV_ankle_0}
-  sofa_sit: {sit_down: MIV_changed_velocities, sit_home: MIV}
+  single_step_normal: {left_close: MIV_ankle_2.5, right_open: MIV_ankle_2.5}
+  single_step_small: {left_close: MIV_less_hip_flexion_ankle_2.5, right_open: MIV_less_hip_flexion_ankle_2.5}
+  sit: {sit_down: MIV_fluent_ankle_2.5, sit_home: MIV_ankle_2.5}
+  sofa_sit: {sit_down: MIV_changed_velocities_ankle_0, sit_home: MIV_more_hip_flexion_ankle_0}
   sofa_stand: {prepare_stand_up: MIV, stand_up: MIV_changed_velocities}
-  stairs_up: {left_swing: MIII_new, right_close: MIII_new, right_open: MIII_new, right_swing: MIII_new}
-  stand: {prepare_stand_up: MIV_ankle_0, stand_up: MIV_fluent_ankle_0}
-  walk: {left_close: MIV_ankle_5_to_0, left_swing: 'MIV_1,2sec_ankle_5', right_close: MIV_ankle_5_to_0,
-    right_open: MIV_optimized_ankle_0_to_5, right_swing: 'MIV_1,2sec_ankle_5'}
+  stairs_up: {left_swing: MIV_slow_ankle_2.5, right_close: MIV_slow_ankle_2.5, right_open: MIV_slow_ankle_2.5,
+    right_swing: MIV_slow_ankle_2.5}
+  stand: {prepare_stand_up: MIV_ankle_2.5, stand_up: MIV_fluent_ankle_2.5}
+  walk: {left_close: MIV_ankle_2.5, left_swing: 'MIV_1,2sec_ankle_2.5', right_close: MIV_ankle_2.5,
+    right_open: MIV_optimized_ankle_2.5, right_swing: 'MIV_1,2sec_ankle_2.5'}
