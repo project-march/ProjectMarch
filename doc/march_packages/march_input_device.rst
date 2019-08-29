@@ -112,9 +112,50 @@ Start the software
 
 How to add a gait
 ^^^^^^^^^^^^^^^^^
-.. todo:: (Karlijn) Document how to add new screens
+.. todo:: 
 
-- Add new screens.
+- Make new screens for the new gait. 
+- Make sure the new gait/new screens fit in the menu & create a selected & activated screen for the new gait.
+- Put the screens on the SD card. Use the progamm 'Workshop' for this.
+- Create a new state, a new gait, in the *StateMachine.cpp*.
+
+.. code::
+
+   case State::NewGait:;
+   
+- Make sure you implement the correct button actions to the code. For example:
+
+.. code::
+   
+   if(joystickState == "RIGHT"){
+                this->currentState = State::StandUp;
+            }
+            else if(joystickState == "LEFT"){
+                this->currentState = State::TurnOffStart;
+            }
+            else if(joystickPress == "PUSH"){
+                this->currentState = State::NewGaitSelected;
+            }
+            break;    
+
+-  Create a new state for your selected and activated gait.
+
+.. code::
+
+   case State::NewGaitSelected:
+            if(triggerPress == "PUSH"){
+                this->currentState = State::NewGaitActivated;
+            }
+            else if(joystickPress == "DOUBLE"){
+                this->currentState = State::NewGait;
+            }
+            break;
+   case State::NewGaitActivated:
+            if(triggerPress == "EXIT_GAIT"){
+                this->currentState = State::StandUp; //Automatically
+            }
+            break;
+            
 - Add a new entry to the *stateToGaitMapping*. By adding a extra line in the constructor of the *StateMachine.cpp*:
 
 .. code::
@@ -124,3 +165,33 @@ How to add a gait
 **<name_activated_state>** name of the activated state
 
 **<gait_name>** name of the gait
+
+- Make sure you return the SD addresses of the image that should be drawn in the current state in the *StateMachine.cpp*:
+
+.. code::
+   int * StateMachine::getScreenImage(){
+    static int currentSdAddresses[2] = {0, 0};
+    switch (this->currentState)
+    {
+        case State::NewGait:
+            currentSdAddresses[0] = NewGait_Hi;
+            currentSdAddresses[1] = NewGait_Lo;
+            break;
+
+- Make sure you add the created states in the *Statemachin.h*
+
+.. code::
+
+   enum class State {   NewGait,
+                        NewGaitSelected,
+                        NewGaitActivated};
+                        
+- Make sure you define the sector address of the images to be loaded on the screen in the *SD_sector_addresses.h*. These addresses can be found via the 4D System Workshop programm. So first load the desired images on the uSD card and then find the sector addresses of said images via generated .Gc file.
+
+.. code::
+
+   // NewGait
+      #define NewGait_Hi     0x0000
+      #define NewGait_Lo     0x0051
+
+
