@@ -1,6 +1,6 @@
 gaits:
   home: {home_sit: MIV_ankle_2.5, home_stand: MIV_ankle_2.5}
-  side_step_left: {left_open: MIV_optimized_bigger_10deg_step_ankle_2.5_knee_hip, right_close: MIV_bigger_10deg_step_ankle_2.5_knee_hip}
+  side_step_left: {left_open: MIV_10deg_ankle_-5_knee_hip, right_close: MIV_10deg_ankle_-5_knee_hip}
   side_step_right: {left_close: MIV, right_open: MIV_optimized}
   single_step_normal: {left_close: MIV_ankle_2.5, right_open: MIV_optimized_ankle_2.5}
   single_step_small: {left_close: MIV_less_hip_flexion_ankle_2.5, right_open: MIV_less_hip_flexion_ankle_2.5}
@@ -8,13 +8,14 @@ gaits:
   sofa_sit: {sit_down: MIV_less_knee_flexion_ankle_2.5, sit_home: MIV_less_knee_flexion_ankle_2.5}
   sofa_stand: {prepare_stand_up: MIV_less_knee_flexion_ankle_2.5, stand_up: MIV_less_knee_flexion_ankle_2.5}
   stairs_down: {left_close: MIV_less_knee_extension_slow_ankle_2.5, left_swing: MIV_less_knee_extension_slow_ankle_2.5,
-                right_open: MIV_less_knee_extension_slow_ankle_2.5, right_swing: MIV_less_knee_extension_slow_ankle_2.5}
-  stairs_down_final_step: {left_final: MIV_less_knee_extension_ankle_2.5, right_final: MIV_less_knee_extension_ankle_2.5}
+    right_close: MIV_less_knee_extension_slow_ankle_2.5, right_open: MIV_less_knee_extension_slow_ankle_2.5,
+    right_swing: MIV_less_knee_extension_slow_ankle_2.5}
   stairs_up: {left_close: MIV_earlier_knee_flexion_ankle_2.5, left_swing: MIV_earlier_knee_flexion_ankle_2.5,
-              right_close: MIV_earlier_knee_flexion_ankle_2.5, right_open: MIV_earlier_knee_flexion_ankle_2.5,
-              right_swing: MIV_earlier_knee_flexion_ankle_2.5}
+    right_close: MIV_earlier_knee_flexion_ankle_2.5, right_open: MIV_earlier_knee_flexion_ankle_2.5,
+    right_swing: MIV_earlier_knee_flexion_ankle_2.5}
   stand: {prepare_stand_up: MIV_ankle_2.5, stand_up: MIV_fluent_ankle_2.5}
   walk: {left_close: MIV_ankle_2.5, left_swing: 'MIV_1,2sec_ankle_2.5', right_close: MIV_ankle_2.5,
-         right_open: MIV_optimized_ankle_2.5, right_swing: 'MIV_1,2sec_ankle_2.5'}
-  walk_small: {left_close: MIV_less_hip_flexion_ankle_2.5, left_swing: 'MIV_less_hip_flexion_1,2sec_ankle_2.5', right_close: MIV_less_hip_flexion_ankle_2.5,
-               right_open: MIV_less_hip_flexion_ankle_2.5, right_swing: 'MIV_less_hip_flexion_1,2sec_ankle_2.5'}
+    right_open: MIV_optimized_ankle_2.5, right_swing: 'MIV_1,2sec_ankle_2.5'}
+  walk_small: {left_close: MIV_less_hip_flexion_ankle_2.5, left_swing: 'MIV_less_hip_flexion_1,2sec_ankle_2.5',
+    right_close: MIV_less_hip_flexion_ankle_2.5, right_open: MIV_less_hip_flexion_ankle_2.5,
+    right_swing: 'MIV_less_hip_flexion_1,2sec_ankle_2.5'}
