@@ -112,7 +112,6 @@ Start the software
 
 How to add a gait
 ^^^^^^^^^^^^^^^^^
-.. todo:: 
 
 - Make new screens for the new gait. 
 - Make sure the new gait/new screens fit in the menu & create a selected & activated screen for the new gait.
