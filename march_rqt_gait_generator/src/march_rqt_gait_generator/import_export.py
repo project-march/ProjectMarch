@@ -50,7 +50,7 @@ def export_to_file(gait, gait_directory):
     output_file.close()
 
 
-def import_from_file_name(robot, file_name):
+def import_from_file_name(gait_generator, robot, file_name):
     if file_name is None or file_name == "":
         return None
     try:
@@ -63,4 +63,4 @@ def import_from_file_name(robot, file_name):
     except Exception as e:
         rospy.logerr(str(e))
         return None
-    return GaitFactory.from_msg(robot, march_subgait, gait_name, subgait_name, version)
+    return GaitFactory.from_msg(gait_generator, robot, march_subgait, gait_name, subgait_name, version)

@@ -7,7 +7,7 @@ from model.Limits import Limits
 from model.Setpoint import Setpoint
 
 
-def empty_gait(robot, duration):
+def empty_gait(gait_generator, robot, duration):
     if robot is None:
         rospy.logerr("Cannot create gait without a loaded robot.")
     joint_list = []
@@ -32,13 +32,14 @@ def empty_gait(robot, duration):
                              urdf_joint.safety_controller.soft_upper_limit,
                              urdf_joint.limit.velocity),
                       default_setpoints,
-                      duration
+                      duration,
+                      gait_generator
                       )
         joint_list.append(joint)
     return Gait(joint_list, duration)
 
 
-def from_msg(robot, march_gait, gait_name, subgait_name, version):
+def from_msg(gait_generator, robot, march_gait, gait_name, subgait_name, version):
     if robot is None:
         rospy.logerr("Cannot create gait without a loaded robot.")
         return None
@@ -84,7 +85,8 @@ def from_msg(robot, march_gait, gait_name, subgait_name, version):
         joint = Joint(joint_name,
                       limits,
                       setpoints,
-                      duration
+                      duration,
+                      gait_generator
                       )
         joint_list.append(joint)
 
