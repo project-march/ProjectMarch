@@ -242,7 +242,7 @@ class GaitGeneratorPlugin(Plugin):
                          joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration,
                          show_velocity_markers=self.show_velocity_markers_checked()),
                      self.publish_preview()
-                    ]
+                     ]
         )
 
         self.velocity_markers_check_box.stateChanged.connect(
