@@ -112,10 +112,44 @@ Start the software
 
 How to add a gait
 ^^^^^^^^^^^^^^^^^
-.. todo:: (Karlijn) Document how to add new screens
 
-- Add new screens.
-- Add a new entry to the *stateToGaitMapping*. By adding a extra line in the constructor of the *StateMachine.cpp*:
+- Make new screens for the new gait. 
+- Make sure the new gait/new screens fit in the menu & create a selected & activated screen for the new gait.
+- Put the screens on the SD card. Use the 4D Systems Workshop4 IDE software for this.
+- Create a new state, a new gait, in the *StateMachine.cpp*.
+
+.. code::
+
+   case State::NewGait:;
+   
+- Implement the correct button actions which cause state transitions to the code. For example:
+
+.. code::
+    
+   if(joystickPress == "PUSH"){
+       this->currentState = State::NewGaitSelected;
+   }
+   break;    
+
+-  Create a new state for your selected and activated gait.
+
+.. code::
+
+   case State::NewGaitSelected:
+            if(triggerPress == "PUSH"){
+                this->currentState = State::NewGaitActivated;
+            }
+            else if(joystickPress == "DOUBLE"){
+                this->currentState = State::NewGait;
+            }
+            break;
+   case State::NewGaitActivated:
+            if(triggerPress == "EXIT_GAIT"){
+                this->currentState = State::StandUp;
+            }
+            break;
+            
+- Add a new entry to the *stateToGaitMapping*. Do this by adding a extra line in the constructor of the *StateMachine.cpp*:
 
 .. code::
 
@@ -124,3 +158,30 @@ How to add a gait
 **<name_activated_state>** name of the activated state
 
 **<gait_name>** name of the gait
+
+- Return the SD addresses of the image that should be drawn in the current state in the *getScreenImage()* method in *StateMachine.cpp*:
+
+.. code::
+
+  case State::NewGait:
+      currentSdAddresses[0] = NewGait_Hi;
+      currentSdAddresses[1] = NewGait_Lo;
+      break;
+
+- Add the created states in the *Statemachine.h*.
+
+.. code::
+
+   enum class State {NewGait,
+                     NewGaitSelected,
+                     NewGaitActivated};
+                        
+- Define the sector address of the images to be loaded on the screen in the *SD_sector_addresses.h*. These addresses can be found via the 4D Systems Workshop4 IDE software. First load the desired images on the uSD card, then find the sector addresses of said images via the generated .Gc file.
+
+.. code::
+
+   // NewGait
+      #define NewGait_Hi     0x0000
+      #define NewGait_Lo     0x0051
+
+
