@@ -239,10 +239,10 @@ class GaitGeneratorPlugin(Plugin):
         self.redo_button.clicked.connect(
             lambda: [self.redo,
                      UserInterfaceController.update_ui_elements(
-                joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration,
-                show_velocity_markers=self.show_velocity_markers_checked()),
-                self.publish_preview()
-            ]
+                         joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration,
+                         show_velocity_markers=self.show_velocity_markers_checked()),
+                     self.publish_preview()
+                    ]
         )
 
         self.velocity_markers_check_box.stateChanged.connect(

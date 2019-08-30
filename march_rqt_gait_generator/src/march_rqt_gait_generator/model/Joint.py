@@ -135,3 +135,15 @@ class Joint:
     def redo(self):
         self.setpoints_history.append(list(self.setpoints))
         self.setpoints = self.setpoints_redo_list.pop()
+
+
+
+
+
+
+
+
+
+
+
+
