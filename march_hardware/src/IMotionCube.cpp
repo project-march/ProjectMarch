@@ -467,6 +467,13 @@ bool IMotionCube::goToTargetState(IMotionCubeTargetState targetState)
     this->setControlWord(targetState.getControlWord());
     ROS_INFO_THROTTLE(0.5, "\tWaiting for '%s': %s", targetState.getDescription().c_str(),
                       std::bitset<16>(this->getStatusWord()).to_string().c_str());
+    if (targetState.getState() == IMotionCubeTargetState::OPERATION_ENABLED.getState()
+    && this->getState(this->getStatusWord()) == IMCState::fault)
+    {
+      ROS_FATAL("IMotionCube went to fault state while attempting to go to %s. Shutting down.",
+                targetState.getDescription().c_str());
+      throw std::domain_error("IMC to fault state");
+    }
   }
   ROS_INFO("\tReached '%s'!", targetState.getDescription().c_str());
 }
