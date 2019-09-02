@@ -1,0 +1,25 @@
+name: ''
+version: ''
+description: "Home stand gait: go to the standing position. This version has 5 degrees more hip extension in comparison to the MIII standing position"
+trajectory: 
+  header: 
+    seq: 0
+    stamp: 
+      secs: 0
+      nsecs:         0
+    frame_id: ''
+  joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
+  right_ankle]
+  points: 
+    -
+      positions: [0.0, -0.0873, 0.0, -0.1745, 0.0, -0.0873, 0.0, -0.1745]
+      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 3
+        nsecs: 0
+duration: 
+  secs: 3
+  nsecs: 0
+sounds: []
