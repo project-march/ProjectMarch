@@ -1,4 +1,4 @@
-name: side_step_left
+name: side_step_left_small
 
 graph:
   from_subgait: [start,     left_open, right_close]
