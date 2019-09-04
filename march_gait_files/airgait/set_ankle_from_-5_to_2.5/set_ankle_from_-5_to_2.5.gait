@@ -1,5 +1,0 @@
-name: set_ankle_from_-5_to_2.5
-
-graph:
-  from_subgait: [start,     set_ankle_from_-5_to_2.5]
-  to_subgait:   [set_ankle_from_-5_to_2.5, end]
