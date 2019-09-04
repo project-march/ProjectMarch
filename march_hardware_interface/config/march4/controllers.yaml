@@ -29,8 +29,8 @@ march:
 #        left_knee: {p: 50, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
 #        right_ankle: {p: 140, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
 #        left_ankle: {p: 160, i: 0, d: 6, i_clamp: 100, publish_state: true, antiwindup: true}
-#        right_hip_aa: {p: 340, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true} # TODO(BaCo) tune HAA joints
-#        left_hip_aa: {p: 340, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
+#        right_hip_aa: {p: 290, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true} # TODO(BaCo) tune HAA joints
+#        left_hip_aa: {p: 290, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
 
       constraints:
         right_hip_fe:
