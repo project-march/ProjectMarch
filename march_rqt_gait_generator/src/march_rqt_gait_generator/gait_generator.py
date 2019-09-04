@@ -159,10 +159,10 @@ class GaitGeneratorPlugin(Plugin):
 
     def save_changed_joint(self, joint):
         self.joint_changed_history.append(joint)
+        self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
 
     def undo(self):
         if not self.joint_changed_history:
-            print("undo_full")
             return
 
         joint = self.joint_changed_history.pop()
@@ -171,7 +171,6 @@ class GaitGeneratorPlugin(Plugin):
 
     def redo(self):
         if not self.joint_changed_redo_list:
-            print("redo_full")
             return
 
         joint = self.joint_changed_redo_list.pop()
