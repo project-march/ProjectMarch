@@ -16,17 +16,23 @@ Install ROS and Catkin
 `Install ROS Kinetic <http://wiki.ros.org/kinetic/Installation/Ubuntu>`_.
 It is easy to miss steps when going through the ROS installation tutorial. If you run into errors in the next few steps, a good place to start is to go back and make sure you have installed ROS correctly.
 
-Once you have ROS installed, make sure you have the most up to date packages: ::
+Once you have ROS installed, make sure you have the most up to date packages:
+
+.. code::
 
   rosdep update  # No sudo
   sudo apt-get update
   sudo apt-get dist-upgrade
 
-Install `catkin <http://wiki.ros.org/catkin>`_ the ROS build system: ::
+Install `catkin <http://wiki.ros.org/catkin>`_ the ROS build system:
+
+.. code::
 
   sudo apt-get install ros-kinetic-catkin python-catkin-tools
 
-Install catkin lint and documentation: ::
+Install catkin lint and documentation:
+
+.. code::
 
   pip install --user catkin_lint
   pip install --user catkin_tools_document
@@ -43,9 +49,17 @@ Install catkin lint and documentation: ::
 
     pip3 install --user catkin_tools_document
 
+Install additional ROS Kinetic packages:
+
+.. code::
+
+  sudo apt-get install ros-kinetic-ros-control ros-kinetic-ros-controllers ros-kinetic-effort-controllers ros-kinetic-joint-state-controller ros-kinetic-joint-trajectory-controller
+
 Create A Catkin Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-You will need to have a `catkin <http://wiki.ros.org/catkin>`_ workspace setup: ::
+You will need to have a `catkin <http://wiki.ros.org/catkin>`_ workspace setup:
+
+.. code::
 
   mkdir -p ~/march_ws/src
   cd march_ws
@@ -92,11 +106,15 @@ Then call wstool with your edited ``.rosinstall`` file:
 
 Build your Catkin Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The following will install from Debian any package dependencies not already in your workspace: ::
+The following will install from Debian any package dependencies not already in your workspace:
+
+.. code::
 
   rosdep install -y --from-paths src --ignore-src --rosdistro kinetic
 
-The next command will configure your catkin workspace: ::
+The next command will configure your catkin workspace:
+
+.. code::
 
   catkin build
 
