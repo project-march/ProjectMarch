@@ -45,7 +45,7 @@ In :state-machine:`healthy_sm.py <march_state_machine/src/march_state_machine/he
 
 .. code::
 
-  smach.StateMachine.add('GAIT <GAIT_NAME>', <gait_name>_sm.py.create(), transitions={'succeeded': 'STANDING', 'preempted': 'failed', 'failed': 'UNKNOWN'})
+  smach.StateMachine.add('GAIT <GAIT_NAME>', <gait_name>_sm.create(), transitions={'succeeded': 'STANDING', 'preempted': 'failed', 'failed': 'UNKNOWN'})
 
 Make sure to add a transition from the ``STANDING`` state to your recently created state so the state machine can respond to commands from the input device:
 
