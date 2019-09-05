@@ -1,9 +1,9 @@
 gaits:
   home: {home_sit: MIV_ankle_2.5, home_stand: MIV_ankle_2.5}
-  set_ankle_from_-10_to_-5: {set_ankle_from_-10_to_-5: from_-10_to_-5_degrees}
-  set_ankle_from_-5_to_-10: {set_ankle_from_-5_to_-10: from_-5_to_-10_degrees}
-  set_ankle_from_-5_to_2.5: {set_ankle_from_-5_to_2.5: from_-5_to_2.5_degrees}
-  set_ankle_from_2.5_to_-5: {set_ankle_from_2.5_to_-5: from_2.5_to_-5_degrees}
+  set_ankle_from_min10_to_min5: {set_ankle_from_min10_to_min5: from_-10_to_-5_degrees}
+  set_ankle_from_min5_to_min10: {set_ankle_from_min5_to_min10: from_-5_to_-10_degrees}
+  set_ankle_from_min5_to_2_5: {set_ankle_from_min5_to_2_5: from_-5_to_2.5_degrees}
+  set_ankle_from_2_5_to_min5: {set_ankle_from_2_5_to_min5: from_2.5_to_-5_degrees}
   side_step_left: {left_open: MIV_10deg_ankle_2.5, right_close: MIV_10deg_ankle_2.5}
   side_step_left_small: {left_open: MIV_5deg_ankle_2.5, right_close: MIV_5deg_ankle_2.5}
   side_step_right: {left_close: MIV_10deg_ankle_2.5, right_open: MIV_10deg_ankle_2.5}
