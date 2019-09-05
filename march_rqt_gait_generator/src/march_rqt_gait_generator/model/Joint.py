@@ -13,8 +13,8 @@ class Joint:
         self.limits = limits
         self.setpoints = setpoints
         self.gait_generator = gait_generator
-        self.setpoints_history = RingBuffer(capacity=50, dtype=list)
-        self.setpoints_redo_list = RingBuffer(capacity=50, dtype=list)
+        self.setpoints_history = RingBuffer(capacity=100, dtype=list)
+        self.setpoints_redo_list = RingBuffer(capacity=100, dtype=list)
         self.duration = duration
 
         self.enforce_limits()
