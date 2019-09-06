@@ -25,8 +25,9 @@ gaits:
   tilted_path_middle_step: {left_open: MIV_10deg_more_hip_extension, right_close: MIV_10deg_more_hip_extension}
   tilted_path_second_ending_step: {left_open: MIV_end2_12deg_ankle_-5, right_close: MIV_end2_12deg_ankle_-5}
   tilted_path_second_starting_step: {left_open: MIV_start2_12deg_ankle_-5, right_close: MIV_start2_12deg_ankle_-5}
-  walk: {left_close: MIV_ankle_2.5, left_swing: 'MIV_1,2sec_ankle_2.5', right_close: MIV_ankle_2.5,
-    right_open: MIV_optimized_ankle_2.5, right_swing: 'MIV_1,2sec_ankle_2.5'}
+  walk: {left_close: MIV_less_hip_flexion_ankle_2.5, left_swing: 'MIV_less_hip_flexion_1,2sec_ankle_2.5',
+    right_close: MIV_less_hip_flexion_ankle_2.5, right_open: MIV_less_hip_flexion_ankle_2.5,
+    right_swing: 'MIV_less_hip_flexion_1,2sec_ankle_2.5'}
   walk_small: {left_close: MIV_less_hip_flexion_ankle_2.5, left_swing: 'MIV_less_hip_flexion_1,2sec_ankle_2.5',
     right_close: MIV_less_hip_flexion_ankle_2.5, right_open: MIV_less_hip_flexion_ankle_2.5,
     right_swing: 'MIV_less_hip_flexion_1,2sec_ankle_2.5'}
