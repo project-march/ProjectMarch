@@ -1,16 +1,20 @@
 import numpy as np
 import rospy
 from scipy.interpolate import BPoly
+from numpy_ringbuffer import RingBuffer
 
 from march_rqt_gait_generator.model.Setpoint import Setpoint
 
 
 class Joint:
 
-    def __init__(self, name, limits, setpoints, duration):
+    def __init__(self, name, limits, setpoints, duration, gait_generator):
         self.name = name
         self.limits = limits
         self.setpoints = setpoints
+        self.gait_generator = gait_generator
+        self.setpoints_history = RingBuffer(capacity=100, dtype=list)
+        self.setpoints_redo_list = RingBuffer(capacity=100, dtype=list)
         self.duration = duration
 
         self.enforce_limits()
@@ -100,6 +104,7 @@ class Joint:
         self.add_setpoint(self.get_interpolated_setpoint(time))
 
     def add_setpoint(self, setpoint):
+        self.save_setpoints()
         # Calculate at what index the new setpoint should be added.
         new_index = len(self.setpoints)
         for i in range(0, len(self.setpoints)):
@@ -114,6 +119,19 @@ class Joint:
         self.interpolated_setpoints = self.interpolate_setpoints()
 
     def remove_setpoint(self, index):
+        self.save_setpoints()
         del self.setpoints[index]
         self.enforce_limits()
         self.interpolated_setpoints = self.interpolate_setpoints()
+
+    def save_setpoints(self):
+        self.setpoints_history.append(list(self.setpoints))    # list(...) to copy instead of pointer
+        self.gait_generator.save_changed_joint(self)
+
+    def undo(self):
+        self.setpoints_redo_list.append(list(self.setpoints))
+        self.setpoints = self.setpoints_history.pop()
+
+    def redo(self):
+        self.setpoints_history.append(list(self.setpoints))
+        self.setpoints = self.setpoints_redo_list.pop()

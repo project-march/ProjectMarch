@@ -36,6 +36,7 @@ class JointSettingPlot(pg.PlotItem):
         self.lower_limit = math.degrees(joint.limits.lower)
         self.upper_limit = math.degrees(joint.limits.upper)
         self.duration = duration
+        self.joint = joint
 
         self.createPlots(joint)
 
@@ -159,6 +160,7 @@ class JointSettingPlot(pg.PlotItem):
             pos = ev.buttonDownScenePos()
             # Switch position into local coords using viewbox
             local_pos = self.vb.mapSceneToView(pos)
+            self.joint.save_setpoints()
 
             for item in self.dataItems:
                 new_pts = item.scatter.pointsAt(local_pos)
