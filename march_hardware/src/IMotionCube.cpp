@@ -472,13 +472,9 @@ bool IMotionCube::goToTargetState(IMotionCubeTargetState targetState)
     {
       ROS_FATAL("IMotionCube went to fault state while attempting to go to %s. Shutting down.",
                 targetState.getDescription().c_str());
-        std::ostringstream errorStream;
-        errorStream << "Detailed Error: " <<
-        this->parseDetailedError(this->getDetailedError()) << std::endl;
-        errorStream << "Motion Error: " <<
-        this->parseMotionError(this->getMotionError()) << std::endl;
-
-        throw std::runtime_error(errorStream.str());
+      ROS_FATAL("Detailed Error: %s", this->parseDetailedError(this->getDetailedError()).c_str());
+      ROS_FATAL("Motion Error: %s", this->parseMotionError(this->getMotionError()).c_str());
+      throw std::domain_error("IMC to fault state");
     }
   }
   ROS_INFO("\tReached '%s'!", targetState.getDescription().c_str());
