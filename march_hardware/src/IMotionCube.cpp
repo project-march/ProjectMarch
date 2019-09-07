@@ -153,9 +153,9 @@ void IMotionCube::actuateTorque(int targetTorque)
   ROS_ASSERT_MSG(this->actuationMode == ActuationMode::torque, "trying to actuate torque, while actuationmode = %s",
                  this->actuationMode.toString().c_str());
 
-  // The targetTorque must not exceed the value of 27300 IU, this is 25 A. This value could be increased in the future
-  // (to 30A) with good reasoning.
-  ROS_ASSERT_MSG(targetTorque < 27300, "Torque of %d is too high.", targetTorque);
+  // The targetTorque must not exceed the value of 32760 IU, this is 26.5 A for the rotary joints and 40 A for the
+  // lineair joints. These are the peak currents. A safety margin of 760 is applied.
+  ROS_ASSERT_MSG(targetTorque < 32000, "Torque of %d is too high.", targetTorque);
 
   union bit16 targetTorqueStruct;
   targetTorqueStruct.i = targetTorque;
