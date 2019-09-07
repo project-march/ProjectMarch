@@ -23,26 +23,26 @@ march:
 
       constraints:
         right_hip_fe:
-          trajectory: 0.27
-          goal: 0.27
+          trajectory: 0.305
+          goal: 0.305
         left_hip_fe:
-          trajectory: 0.27
-          goal: 0.27
+          trajectory: 0.305
+          goal: 0.305
         right_knee:
-          trajectory: 0.27
-          goal: 0.27
+          trajectory: 0.305
+          goal: 0.305
         left_knee:
-          trajectory: 0.27
-          goal: 0.27
+          trajectory: 0.305
+          goal: 0.305
         right_ankle:
-          trajectory: 0.27
-          goal: 0.27
+          trajectory: 0.305
+          goal: 0.305
         left_ankle:
-          trajectory: 0.27
-          goal: 0.27
+          trajectory: 0.305
+          goal: 0.305
         right_hip_aa:
-          trajectory: 0.27
-          goal: 0.27
+          trajectory: 0.305
+          goal: 0.305
         left_hip_aa:
-          trajectory: 0.27
-          goal: 0.27
+          trajectory: 0.305
+          goal: 0.305
