@@ -493,7 +493,7 @@ bool IMotionCube::goToOperationEnabled()
                                                                                   "mapping, so can't get angle");
 
   int angleRead = this->encoder.getAngleIU(this->misoByteOffsets[IMCObjectName::ActualPosition]);
-  //  If the encoder is functioning correctly, move the joint to its current
+  //  If the encoder is functioning correctly and the joint is not outside hardlimits, move the joint to its current
   //  position. Otherwise shutdown
   if (this->encoder.isWithinHardLimitsIU(angleRead) && angleRead != 0)
   {
@@ -506,12 +506,16 @@ bool IMotionCube::goToOperationEnabled()
       this->actuateTorque(0);
     }
   }
+  else if (angleRead == 0)
+  {
+    ROS_FATAL("Encoder of IMotionCube with slaveIndex %d has reset to zero", this->slaveIndex);
+    throw std::domain_error("Encoder reset");
+  }
   else
   {
-    ROS_FATAL("Encoder of iMotionCube (with slaveindex %d) is not functioning properly, read value %d, min value "
-              "is %d, max value is %d. Shutting down",
+    ROS_FATAL("Joint with slaveIndex %d is outside hard limits (read value %d IU, limits from %d IU to %d IU)",
               this->slaveIndex, angleRead, this->encoder.getLowerHardLimitIU(), this->encoder.getUpperHardLimitIU());
-    throw std::domain_error("Encoder is not functioning properly");
+    throw std::domain_error("Joint outside hard limits");
   }
 
   this->goToTargetState(IMotionCubeTargetState::OPERATION_ENABLED);
