@@ -115,11 +115,11 @@ void IMotionCube::actuateRad(float targetRad)
   ROS_ASSERT_MSG(this->actuationMode == ActuationMode::position, "trying to actuate rad, while actuationmode = %s",
                  this->actuationMode.toString().c_str());
 
-  if (std::abs(targetRad - this->getAngleRad()) > 0.27)
+  if (std::abs(targetRad - this->getAngleRad()) > 0.349)
   {
-    ROS_ERROR("Target %f exceeds max difference of 0.27 from current %f for slave %d", targetRad, this->getAngleRad(),
+    ROS_ERROR("Target %f exceeds max difference of 0.349 from current %f for slave %d", targetRad, this->getAngleRad(),
               this->slaveIndex);
-    throw std::runtime_error("Target exceeds max difference of 0.27 from current position");
+    throw std::runtime_error("Target exceeds max difference of 0.349 from current position");
   }
   this->actuateIU(this->encoder.RadtoIU(targetRad));
 }
@@ -467,6 +467,15 @@ bool IMotionCube::goToTargetState(IMotionCubeTargetState targetState)
     this->setControlWord(targetState.getControlWord());
     ROS_INFO_THROTTLE(0.5, "\tWaiting for '%s': %s", targetState.getDescription().c_str(),
                       std::bitset<16>(this->getStatusWord()).to_string().c_str());
+    if (targetState.getState() == IMotionCubeTargetState::OPERATION_ENABLED.getState()
+    && this->getState(this->getStatusWord()) == IMCState::fault)
+    {
+      ROS_FATAL("IMotionCube went to fault state while attempting to go to %s. Shutting down.",
+                targetState.getDescription().c_str());
+      ROS_FATAL("Detailed Error: %s", this->parseDetailedError(this->getDetailedError()).c_str());
+      ROS_FATAL("Motion Error: %s", this->parseMotionError(this->getMotionError()).c_str());
+      throw std::domain_error("IMC to fault state");
+    }
   }
   ROS_INFO("\tReached '%s'!", targetState.getDescription().c_str());
 }

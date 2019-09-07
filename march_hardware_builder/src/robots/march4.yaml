@@ -1,28 +1,9 @@
 march4:
   ifName: enp2s0
   ecatCycleTime: 4
-  powerDistributionBoard:
-    slaveIndex: 7
-    bootShutdownOffsets:
-      masterOk: 0
-      shutdown: 0
-      shutdownAllowed: 1
-    netMonitorByteOffsets:
-      powerDistributionBoardCurrent: 5
-      lowVoltageNet1Current: 9
-      lowVoltageNet2Current: 13
-      highVoltageNetCurrent: 17
-      lowVoltageState: 3
-      highVoltageOvercurrentTrigger: 2
-      highVoltageEnabled: 1
-      highVoltageState: 4
-    netDriverByteOffsets:
-      lowVoltageNetOnOff: 4
-      highVoltageNetOnOff: 3
-      highVoltageNetEnableDisable: 2
   joints:
     - right_hip_aa:
-        actuationMode: torque
+        actuationMode: position
         allowActuation: true
         netNumber: 1
         temperatureges: {slaveIndex: 7, byteOffset: 4}
@@ -31,7 +12,7 @@ march4:
           encoder: {resolution: 12, minPositionIU: 3688, maxPositionIU: 4070, zeroPositionIU: 3884, safetyMarginRad: 0.05}
 
     - left_hip_aa:
-        actuationMode: torque
+        actuationMode: position
         allowActuation: true
         netNumber: 5
         temperatureges: {slaveIndex: 7, byteOffset: 0}
@@ -40,7 +21,7 @@ march4:
           encoder: {resolution: 12, minPositionIU: 1010, maxPositionIU: 1401, zeroPositionIU: 1211, safetyMarginRad: 0.05}
 
     - right_hip_fe:
-        actuationMode: torque
+        actuationMode: position
         allowActuation: true
         netNumber: 2
         temperatureges: {slaveIndex: 1, byteOffset: 0}
@@ -49,7 +30,7 @@ march4:
           encoder: {resolution: 17, minPositionIU: 2053, maxPositionIU: 45617, zeroPositionIU: 9314, safetyMarginRad: 0.05}
 
     - left_hip_fe:
-        actuationMode: torque
+        actuationMode: position
         allowActuation: true
         netNumber: 6
         temperatureges: {slaveIndex: 9, byteOffset: 0}
@@ -58,7 +39,7 @@ march4:
           encoder: {resolution: 17, minPositionIU: -3382, maxPositionIU: 40270, zeroPositionIU: 3893, safetyMarginRad: 0.05}
 
     - right_knee:
-        actuationMode: torque
+        actuationMode: position
         allowActuation: true
         netNumber: 3
         temperatureges: {slaveIndex: 1, byteOffset: 4}
@@ -67,7 +48,7 @@ march4:
           encoder: {resolution: 17, minPositionIU: 25190, maxPositionIU: 68874, zeroPositionIU: 27010, safetyMarginRad: 0.05}
 
     - left_knee:
-        actuationMode: torque
+        actuationMode: position
         allowActuation: true
         netNumber: 7
         temperatureges: {slaveIndex: 9, byteOffset: 4}
@@ -76,7 +57,7 @@ march4:
           encoder: {resolution: 17, minPositionIU: 19892, maxPositionIU: 63537, zeroPositionIU: 21711, safetyMarginRad: 0.05}
 
     - right_ankle:
-        actuationMode: torque
+        actuationMode: position
         allowActuation: true
         netNumber: 4
         temperatureges: {slaveIndex: 4, byteOffset: 0}
@@ -85,7 +66,7 @@ march4:
           encoder: {resolution: 12, minPositionIU: 462, maxPositionIU: 937, zeroPositionIU: 759, safetyMarginRad: 0}
 
     - left_ankle:
-        actuationMode: torque
+        actuationMode: position
         allowActuation: true
         netNumber: 8
         temperatureges: {slaveIndex: 11, byteOffset: 0}
