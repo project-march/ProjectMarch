@@ -7,6 +7,7 @@
 
 #include <march_hardware/MarchRobot.h>
 #include <march_hardware/Joint.h>
+#include <march_hardware/ActuationMode.h>
 
 #include <march_hardware_interface/PowerNetOnOffCommand.h>
 #include <march_hardware_interface/march_hardware_interface.h>
@@ -16,6 +17,8 @@
 using joint_limits_interface::JointLimits;
 using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::PositionJointSoftLimitsInterface;
+using joint_limits_interface::EffortJointSoftLimitsHandle;
+using joint_limits_interface::EffortJointSoftLimitsInterface;
 using joint_limits_interface::SoftJointLimits;
 
 namespace march_hardware_interface
@@ -108,6 +111,7 @@ void MarchHardwareInterface::init()
   registerInterface(&position_joint_interface_);
   registerInterface(&effort_joint_interface_);
   registerInterface(&positionJointSoftLimitsInterface);
+  registerInterface(&effortJointSoftLimitsInterface);
 
   hasPowerDistributionBoard = marchRobot.getPowerDistributionBoard()->getSlaveIndex() != -1;
   if (hasPowerDistributionBoard)
@@ -142,32 +146,48 @@ void MarchHardwareInterface::init()
     JointStateHandle jointStateHandle(joint.getName(), &joint_position_[i], &joint_velocity_[i], &joint_effort_[i]);
     joint_state_interface_.registerHandle(jointStateHandle);
 
-    // Create position joint interface
-    JointHandle jointPositionHandle(jointStateHandle, &joint_position_command_[i]);
-
     // Retrieve joint (soft) limits from the urdf
     JointLimits limits;
     getJointLimits(model.getJoint(joint.getName()), limits);
 
-    // Create joint limit interface
-    PositionJointSoftLimitsHandle jointLimitsHandle(jointPositionHandle, limits, soft_limits_[i]);
-    positionJointSoftLimitsInterface.registerHandle(jointLimitsHandle);
+    if (joint.getActuationMode() == march4cpp::ActuationMode::position)
+    {
+      // Create position joint interface
+      JointHandle jointPositionHandle(jointStateHandle, &joint_position_command_[i]);
+      position_joint_interface_.registerHandle(jointPositionHandle);
 
-    position_joint_interface_.registerHandle(jointPositionHandle);
+      // Create joint limit interface
+      PositionJointSoftLimitsHandle jointLimitsHandle(jointPositionHandle, limits, soft_limits_[i]);
+      positionJointSoftLimitsInterface.registerHandle(jointLimitsHandle);
+    }
+    else if (joint.getActuationMode() == march4cpp::ActuationMode::torque)
+    {
+      // Create effort joint interface
+      JointHandle jointEffortHandle(jointStateHandle, &joint_effort_command_[i]);
+      effort_joint_interface_.registerHandle(jointEffortHandle);
+
+      // Create joint effort limit interface
+      EffortJointSoftLimitsHandle jointEffortLimitsHandle(jointEffortHandle, limits, soft_limits_[i]);
+      effortJointSoftLimitsInterface.registerHandle(jointEffortLimitsHandle);
+    }
 
     // Set the first target as the current position
     this->read();
     joint_velocity_[i] = 0;
     joint_effort_[i] = 0;
-    joint_position_command_[i] = joint_position_[i];
+
+    if (joint.getActuationMode() == march4cpp::ActuationMode::position)
+    {
+      joint_position_command_[i] = joint_position_[i];
+    }
+    else if (joint.getActuationMode() == march4cpp::ActuationMode::torque)
+    {
+      joint_effort_command_[i] = 0;
+    }
 
     // Create velocity joint interface
     JointHandle jointVelocityHandle(jointStateHandle, &joint_velocity_command_[i]);
     velocity_joint_interface_.registerHandle(jointVelocityHandle);
-
-    // Create effort joint interface
-    JointHandle jointEffortHandle(jointStateHandle, &joint_effort_command_[i]);
-    effort_joint_interface_.registerHandle(jointEffortHandle);
 
     // Create march_state interface
     MarchTemperatureSensorHandle marchTemperatureSensorHandle(joint_names_[i], &joint_temperature_[i],
@@ -255,7 +275,9 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
 
 void MarchHardwareInterface::write(ros::Duration elapsed_time)
 {
-  positionJointSoftLimitsInterface.enforceLimits(elapsed_time);
+  joint_effort_command_copy.clear();
+  joint_effort_command_copy.resize(joint_effort_command_.size());
+  joint_effort_command_copy = joint_effort_command_;
 
   for (int i = 0; i < num_joints_; i++)
   {
@@ -267,7 +289,28 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
                 "speed, %f effort.",
                 joint_names_[i].c_str(), joint_position_command_[i], joint_velocity_command_[i],
                 joint_effort_command_[i]);
-      joint.actuateRad(static_cast<float>(joint_position_command_[i]));
+
+      if (joint_effort_command_[i] != joint_effort_command_copy[i])
+      {
+          ROS_WARN("Effort command (%f) changed to random high number (%f) for joint(%s), "
+                   "but set back to the normal value.",
+                   joint_effort_command_copy[i], joint_effort_command_[i], joint_names_[i].c_str());
+        joint_effort_command_[i] = joint_effort_command_copy[i];
+      }
+
+      if (joint.getActuationMode() == march4cpp::ActuationMode::position)
+      {
+        positionJointSoftLimitsInterface.enforceLimits(elapsed_time);
+        joint.actuateRad(static_cast<float>(joint_position_command_[i]));
+      }
+      else if (joint.getActuationMode() == march4cpp::ActuationMode::torque)
+      {
+        // Enlarge joint_effort_command so dynamic reconfigure can be used inside it's bounds
+        joint_effort_command_[i] = joint_effort_command_[i] * 1000;
+
+        effortJointSoftLimitsInterface.enforceLimits(elapsed_time);
+        joint.actuateTorque(static_cast<int>(joint_effort_command_[i]));
+      }
     }
   }
 
