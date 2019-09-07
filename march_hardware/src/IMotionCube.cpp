@@ -153,9 +153,9 @@ void IMotionCube::actuateTorque(int targetTorque)
   ROS_ASSERT_MSG(this->actuationMode == ActuationMode::torque, "trying to actuate torque, while actuationmode = %s",
                  this->actuationMode.toString().c_str());
 
-  // The targetTorque must not exceed the value of 32760 IU, this is 26.5 A for the rotary joints and 40 A for the
-  // lineair joints. These are the peak currents. A safety margin of 760 is applied.
-  ROS_ASSERT_MSG(targetTorque < 32000, "Torque of %d is too high.", targetTorque);
+  // The targetTorque must not exceed the value of 23500 IU, this is slightly larger than the current limit of the
+  // linear joints defined in the urdf.
+  ROS_ASSERT_MSG(targetTorque < 23500, "Torque of %d is too high.", targetTorque);
 
   union bit16 targetTorqueStruct;
   targetTorqueStruct.i = targetTorque;
@@ -467,8 +467,8 @@ bool IMotionCube::goToTargetState(IMotionCubeTargetState targetState)
     this->setControlWord(targetState.getControlWord());
     ROS_INFO_THROTTLE(0.5, "\tWaiting for '%s': %s", targetState.getDescription().c_str(),
                       std::bitset<16>(this->getStatusWord()).to_string().c_str());
-    if (targetState.getState() == IMotionCubeTargetState::OPERATION_ENABLED.getState()
-    && this->getState(this->getStatusWord()) == IMCState::fault)
+    if (targetState.getState() == IMotionCubeTargetState::OPERATION_ENABLED.getState() &&
+        this->getState(this->getStatusWord()) == IMCState::fault)
     {
       ROS_FATAL("IMotionCube went to fault state while attempting to go to %s. Shutting down.",
                 targetState.getDescription().c_str());
