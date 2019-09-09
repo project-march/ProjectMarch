@@ -36,7 +36,7 @@ setpoints:
   - 
     time_from_start: 
       secs: 2
-      nsecs: 299999999
+      nsecs: 600000000
     joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
   right_ankle]
 trajectory: 
@@ -59,31 +59,31 @@ trajectory:
         nsecs:         0
     - 
       positions: [0.1745, -0.1745, 0.0, -0.1745, 0.1735, -0.0852, 0.0025, -0.1745]
-      velocities: [-0.0, 0.0, 0.0, 0.0, -0.0421, 0.0892, 0.107, 0.0]
+      velocities: [0.0, -0.0, 0.0, 0.0, -0.0419, 0.0887, 0.1065, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs:  50100000
     - 
-      positions: [0.1745, -0.1745, 0.0, -0.1745, 0.1396, 0.0622, 0.1794, -0.1745]
-      velocities: [0.0, -0.0, 0.0, 0.0, 0.0, 0.622, 0.7462, 0.0]
+      positions: [0.1745, -0.1745, 0.0, -0.1745, 0.1396, 0.061, 0.1779, -0.1745]
+      velocities: [0.0, 0.0, 0.0, -0.0, 0.0, 0.6208, 0.7449, -0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs: 400000000
     - 
-      positions: [0.1745, -0.1745, 0.0, -0.1745, 0.1382, 0.1272, 0.2573, -0.1745]
-      velocities: [0.0, 0.0, 0.0, -0.0, -0.0276, 0.6543, 0.785, -0.0]
+      positions: [0.1745, -0.1745, 0.0, -0.1745, 0.1383, 0.1256, 0.2554, -0.1745]
+      velocities: [0.0, 0.0, 0.0, 0.0, -0.0269, 0.6541, 0.7848, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs: 500000000
     - 
-      positions: [0.1295, -0.1745, 0.0, -0.1745, 0.0956, 0.3491, 0.5236, -0.1745]
-      velocities: [-0.1541, 0.0, 0.0, 0.0, -0.1222, 0.0, 0.0, 0.0]
+      positions: [0.1302, -0.1745, 0.0, -0.1745, 0.0962, 0.3491, 0.5236, -0.1745]
+      velocities: [-0.1533, -0.0, 0.0, 0.0, -0.1218, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
@@ -104,8 +104,8 @@ trajectory:
       effort: []
       time_from_start: 
         secs: 2
-        nsecs: 299999999
+        nsecs: 600000000
 duration: 
   secs: 2
-  nsecs: 299999999
+  nsecs: 600000000
 sounds: []
