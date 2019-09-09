@@ -14,8 +14,9 @@ gaits:
     right_close: MIV_earlier_knee_flexion_ankle_2.5, right_open: MIV_earlier_knee_flexion_ankle_2.5,
     right_swing: MIV_earlier_knee_flexion_ankle_2.5}
   stand: {prepare_stand_up: MIV_ankle_2.5, stand_up: MIV_fluent_ankle_2.5}
-  walk: {left_close: MIV_ankle_2.5, left_swing: 'MIV_1,2sec_ankle_2.5', right_close: MIV_ankle_2.5,
-    right_open: MIV_optimized_ankle_2.5, right_swing: 'MIV_1,2sec_ankle_2.5'}
+  walk: {left_close: MIV_less_hip_flexion_ankle_2.5, left_swing: 'MIV_less_hip_flexion_1,2sec_ankle_2.5',
+         right_close: MIV_less_hip_flexion_ankle_2.5, right_open: MIV_less_hip_flexion_ankle_2.5,
+         right_swing: 'MIV_less_hip_flexion_1,2sec_ankle_2.5'}
   walk_small: {left_close: MIV_less_hip_flexion_ankle_2.5, left_swing: 'MIV_less_hip_flexion_1,2sec_ankle_2.5',
     right_close: MIV_less_hip_flexion_ankle_2.5, right_open: MIV_less_hip_flexion_ankle_2.5,
     right_swing: 'MIV_less_hip_flexion_1,2sec_ankle_2.5'}
