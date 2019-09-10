@@ -467,8 +467,8 @@ bool IMotionCube::goToTargetState(IMotionCubeTargetState targetState)
     this->setControlWord(targetState.getControlWord());
     ROS_INFO_THROTTLE(0.5, "\tWaiting for '%s': %s", targetState.getDescription().c_str(),
                       std::bitset<16>(this->getStatusWord()).to_string().c_str());
-    if (targetState.getState() == IMotionCubeTargetState::OPERATION_ENABLED.getState()
-    && this->getState(this->getStatusWord()) == IMCState::fault)
+    if (targetState.getState() == IMotionCubeTargetState::OPERATION_ENABLED.getState() &&
+        this->getState(this->getStatusWord()) == IMCState::fault)
     {
       ROS_FATAL("IMotionCube went to fault state while attempting to go to %s. Shutting down.",
                 targetState.getDescription().c_str());
@@ -495,7 +495,18 @@ bool IMotionCube::goToOperationEnabled()
   int angleRead = this->encoder.getAngleIU(this->misoByteOffsets[IMCObjectName::ActualPosition]);
   //  If the encoder is functioning correctly and the joint is not outside hardlimits, move the joint to its current
   //  position. Otherwise shutdown
-  if (this->encoder.isWithinHardLimitsIU(angleRead) && angleRead != 0)
+  if (abs(angleRead) <= 2)
+  {
+    ROS_FATAL("Encoder of IMotionCube with slaveIndex %d has reset. Read angle %d IU", this->slaveIndex, angleRead);
+    throw std::domain_error("Encoder reset");
+  }
+  else if (!this->encoder.isWithinHardLimitsIU(angleRead))
+  {
+    ROS_FATAL("Joint with slaveIndex %d is outside hard limits (read value %d IU, limits from %d IU to %d IU)",
+              this->slaveIndex, angleRead, this->encoder.getLowerHardLimitIU(), this->encoder.getUpperHardLimitIU());
+    throw std::domain_error("Joint outside hard limits");
+  }
+  else
   {
     if (this->actuationMode == ActuationMode::position)
     {
@@ -505,17 +516,6 @@ bool IMotionCube::goToOperationEnabled()
     {
       this->actuateTorque(0);
     }
-  }
-  else if (angleRead == 0)
-  {
-    ROS_FATAL("Encoder of IMotionCube with slaveIndex %d has reset to zero", this->slaveIndex);
-    throw std::domain_error("Encoder reset");
-  }
-  else
-  {
-    ROS_FATAL("Joint with slaveIndex %d is outside hard limits (read value %d IU, limits from %d IU to %d IU)",
-              this->slaveIndex, angleRead, this->encoder.getLowerHardLimitIU(), this->encoder.getUpperHardLimitIU());
-    throw std::domain_error("Joint outside hard limits");
   }
 
   this->goToTargetState(IMotionCubeTargetState::OPERATION_ENABLED);
