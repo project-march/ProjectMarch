@@ -175,7 +175,12 @@ void EthercatMaster::sendProcessData()
 
 int EthercatMaster::receiveProcessData()
 {
-  return ec_receive_processdata(EC_TIMEOUTRET);
+  int wkc =  ec_receive_processdata(EC_TIMEOUTRET);
+  if (wkc < this->expectedWKC)
+  {
+    ROS_WARN("Working counter lower than expected. EtherCAT connection may not be optimal");
+  }
+  return wkc;
 }
 
 void EthercatMaster::monitorSlaveConnection()
