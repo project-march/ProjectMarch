@@ -13,9 +13,9 @@ gaits:
   sit: {sit_down: MIV_fluent_ankle_2.5, sit_home: MIV_ankle_2.5}
   sofa_sit: {sit_down: MIV_less_knee_flexion_ankle_2.5, sit_home: MIV_less_knee_flexion_ankle_2.5}
   sofa_stand: {prepare_stand_up: MIV_less_knee_flexion_ankle_2.5, stand_up: MIV_less_knee_flexion_ankle_2.5}
-  stairs_down: {left_close: MIV_less_knee_extension_slow_ankle_2.5, left_swing: MIV_less_knee_extension_slow_ankle_2.5,
+  stairs_down: {left_close: MIV_less_knee_extension_slow_ankle_2.5, left_swing: MIV_less_knee_extension_4sec_ankle_2.5_optimized,
     right_close: MIV_less_knee_extension_slow_ankle_2.5, right_open: MIV_less_knee_extension_slow_ankle_2.5,
-    right_swing: MIV_less_knee_extension_slow_ankle_2.5}
+    right_swing: MIV_less_knee_extension_4sec_ankle_2.5_optimized}
   stairs_up: {left_close: MIV_earlier_knee_flexion_ankle_2.5, left_swing: MIV_earlier_knee_flexion_ankle_2.5,
     right_close: MIV_earlier_knee_flexion_ankle_2.5, right_open: MIV_earlier_knee_flexion_ankle_2.5,
     right_swing: MIV_earlier_knee_flexion_ankle_2.5}
