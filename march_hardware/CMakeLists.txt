@@ -6,9 +6,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 find_package(catkin REQUIRED COMPONENTS
         code_coverage
         roscpp
-        soem
         roslint
         rostest
+        soem
         )
 
 catkin_package(
@@ -18,7 +18,7 @@ catkin_package(
         roscpp
         soem
         LIBRARIES
-        march_hardware
+        ${PROJECT_NAME}
 )
 
 # Roslinter
@@ -43,7 +43,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
         FILES_MATCHING PATTERN "*.h"
         PATTERN ".svn" EXCLUDE)
 
-add_library(march_hardware
+add_library(${PROJECT_NAME}
         include/${PROJECT_NAME}/ActuationMode.h
         include/${PROJECT_NAME}/PowerDistributionBoard.h
         include/${PROJECT_NAME}/IMotionCubeTargetState.h
@@ -79,12 +79,12 @@ add_library(march_hardware
         src/PDOmap.cpp
         )
 
-target_link_libraries(march_hardware ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 add_executable(slave_count_check check/SlaveCount.cpp)
-target_link_libraries(slave_count_check march_hardware)
+target_link_libraries(slave_count_check ${PROJECT_NAME})
 
-install(TARGETS march_hardware
+install(TARGETS ${PROJECT_NAME}
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
@@ -102,7 +102,7 @@ if (CATKIN_ENABLE_TESTING)
 
     if(ENABLE_COVERAGE_TESTING)
         include(CodeCoverage)
-        APPEND_COVERAGE_COMPILER_FLAGS()
+        append_coverage_compiler_flags()
     endif()
 
     add_rostest_gmock(${PROJECT_NAME}-test
@@ -125,7 +125,7 @@ if (CATKIN_ENABLE_TESTING)
             test/mocks/MockIMotionCube.cpp
             test/mocks/MockJoint.cpp
             )
-    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} march_hardware gtest)
+target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} ${PROJECT_NAME} gtest)
 
     if(ENABLE_COVERAGE_TESTING)
         set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*" "*/${PROJECT_NAME}/soem*")
