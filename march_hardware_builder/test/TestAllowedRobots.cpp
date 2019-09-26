@@ -80,7 +80,7 @@ TEST_F(AllowedRobotTest, TestMarch3Values)
   jointList.push_back(rightAnkle);
   jointList.push_back(leftAnkle);
 
-  for (int i = 0; i < jointList.size(); i++)
+  for (unsigned int i = 0; i < jointList.size(); i++)
   {
     jointList.at(i).setAllowActuation(true);
   }

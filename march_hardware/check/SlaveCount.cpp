@@ -2,10 +2,15 @@
 
 #include <ros/ros.h>
 
-extern "C"
-{
-#include "ethercat.h"
-}
+#include <soem/ethercattype.h>
+#include <soem/nicdrv.h>
+#include <soem/ethercatbase.h>
+#include <soem/ethercatmain.h>
+#include <soem/ethercatdc.h>
+#include <soem/ethercatcoe.h>
+#include <soem/ethercatfoe.h>
+#include <soem/ethercatconfig.h>
+#include <soem/ethercatprint.h>
 
 int main(int argc, char** argv)
 {
@@ -16,7 +21,7 @@ int main(int argc, char** argv)
     std::string ifname = "enp2s0";
 
     // Initialise SOEM, bind socket to ifname
-    if (!ec_init(ifname.c_str()))
+    if (!ec_init(&ifname[0]))
     {
         ROS_FATAL("No socket connection on %s. Confirm that you have selected the right ifname", ifname.c_str());
         nh.setParam("/check/slave_count", 0);

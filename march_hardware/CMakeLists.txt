@@ -6,6 +6,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 find_package(catkin REQUIRED COMPONENTS
         code_coverage
         roscpp
+        soem
         roslint
         rostest
         )
@@ -15,6 +16,7 @@ catkin_package(
         include
         CATKIN_DEPENDS
         roscpp
+        soem
         LIBRARIES
         march_hardware
 )
@@ -32,8 +34,8 @@ roslint_cpp(${lintfiles})
 
 include_directories(
         include
-        soem
         ${catkin_INCLUDE_DIRS}
+        ${soem_INCLUDE_DIRS}/soem
 )
 
 install(DIRECTORY include/${PROJECT_NAME}/
@@ -41,14 +43,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
         FILES_MATCHING PATTERN "*.h"
         PATTERN ".svn" EXCLUDE)
 
-
-file(GLOB SOEM_SRC
-        soem/*.h
-        soem/*.c
-        )
-
 add_library(march_hardware
-        ${SOEM_SRC}
         include/${PROJECT_NAME}/ActuationMode.h
         include/${PROJECT_NAME}/PowerDistributionBoard.h
         include/${PROJECT_NAME}/IMotionCubeTargetState.h
