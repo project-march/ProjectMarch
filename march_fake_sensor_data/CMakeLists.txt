@@ -12,7 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
         )
 
 generate_dynamic_reconfigure_options(
-        config/temperatures.cfg
+        config/Temperatures.cfg
 )
 
 catkin_package(
