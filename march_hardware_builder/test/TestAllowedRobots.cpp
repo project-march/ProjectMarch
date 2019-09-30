@@ -96,12 +96,12 @@ TEST_F(AllowedRobotTest, TestMarch3Values)
   ASSERT_EQ(actualRobot, march3);
 }
 
-TEST_F(AllowedRobotTest, TestTestSetupCreation)
+TEST_F(AllowedRobotTest, TestTestRotationalSetupCreation)
 {
-  ASSERT_NO_THROW(march4cpp::MarchRobot testSetup_rot = HardwareBuilder(AllowedRobot::testsetup_rot).createMarchRobot());
+  ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::testjoint_rotational).createMarchRobot());
 }
 
-TEST_F(AllowedRobotTest, TestTestSetupCreation)
+TEST_F(AllowedRobotTest, TestTestLinearSetupCreation)
 {
-  ASSERT_NO_THROW(march4cpp::MarchRobot testSetup_lin = HardwareBuilder(AllowedRobot::testsetup_lin).createMarchRobot());
+  ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::testjoint_linear).createMarchRobot());
 }
