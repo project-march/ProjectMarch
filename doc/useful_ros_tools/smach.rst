@@ -21,3 +21,11 @@ If you have to work with SMACH, make sure you have completed all their tutorials
    :align: center
 
    Snippet of the |m4| state machine
+
+smach_viewer
+^^^^^^^^^^^^
+SMACH also contains a viewer. This displays all state and transitions of the state machine. This visualization can highlight the current state during runtime.
+This package is documented `here <http://wiki.ros.org/smach_viewer>`_.
+
+.. tip::
+  To get started read a few `SMACH tutorials or examples <http://wiki.ros.org/smach/Tutorials>`_.
