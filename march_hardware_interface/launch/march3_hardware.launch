@@ -5,6 +5,8 @@
     <param name="robot_description"
            command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iii.xacro'" />
 
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="true" output="screen" ns="/"
           args="
                 /march/controller/joint_state

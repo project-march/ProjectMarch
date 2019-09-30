@@ -6,11 +6,13 @@
 #include <map>
 #include <string>
 
+#include <march_hardware/ActuationMode.h>
 #include <march_hardware/EtherCAT/EthercatIO.h>
 #include <march_hardware/Slave.h>
 #include <march_hardware/Encoder.h>
 #include <march_hardware/PDOmap.h>
 #include <march_hardware/IMotionCubeState.h>
+#include <march_hardware/IMotionCubeTargetState.h>
 
 namespace march4cpp
 {
@@ -18,6 +20,8 @@ class IMotionCube : public Slave
 {
 private:
   Encoder encoder;
+  ActuationMode actuationMode;
+
   void actuateIU(int iu);
 
   std::map<IMCObjectName, int> misoByteOffsets;
@@ -43,16 +47,22 @@ public:
   void writeInitialSDOs(int ecatCycleTime) override;
 
   float getAngleRad();
+  float getTorque();
   int getAngleIU();
 
   uint16 getStatusWord();
   uint16 getMotionError();
   uint16 getDetailedError();
 
+  ActuationMode getActuationMode() const;
+
+  float getMotorCurrent();
+  float getMotorVoltage();
+
   void setControlWord(uint16 controlWord);
 
   void actuateRad(float targetRad);
-  void actuateRadFixedSpeed(float targetRad, float radPerSec);
+  void actuateTorque(int targetTorque);
 
   std::string parseStatusWord(uint16 statusWord);
   IMCState getState(uint16 statusWord);
@@ -61,6 +71,8 @@ public:
 
   bool goToOperationEnabled();
   bool resetIMotionCube();
+
+  void setActuationMode(ActuationMode mode);
 
   /** @brief Override comparison operator */
   friend bool operator==(const IMotionCube& lhs, const IMotionCube& rhs)
@@ -73,6 +85,7 @@ public:
     return os << "slaveIndex: " << iMotionCube.slaveIndex << ", "
               << "encoder: " << iMotionCube.encoder;
   }
+  bool goToTargetState(march4cpp::IMotionCubeTargetState targetState);
 };
 
 }  // namespace march4cpp

@@ -17,18 +17,19 @@ Encoder::Encoder(int numberOfBits, int minPositionIU, int maxPositionIU, int zer
 
   this->safetyMarginRad = safetyMarginRad;
   this->slaveIndex = -1;
-
+  this->upperHardLimitIU = maxPositionIU;
+  this->lowerHardLimitIU = minPositionIU;
   this->zeroPositionIU = zeroPositionIU;
-
   int safetyMarginIU = RadtoIU(safetyMarginRad) - this->zeroPositionIU;
+  this->upperSoftLimitIU = this->upperHardLimitIU - safetyMarginIU;
+  this->lowerSoftLimitIU = this->lowerHardLimitIU + safetyMarginIU;
 
-  this->minPositionIU = minPositionIU + safetyMarginIU;
-  this->maxPositionIU = maxPositionIU - safetyMarginIU;
-
-  ROS_ASSERT_MSG(this->minPositionIU < this->maxPositionIU, "Invalid range of motion. Safety margin too large or "
-                                                            "min/max position invalid. Minposition: %i, Maxposition: "
-                                                            "%i, safetyMargin: %f",
-                 this->minPositionIU, this->maxPositionIU, this->safetyMarginRad);
+  ROS_ASSERT_MSG(this->lowerSoftLimitIU < this->upperSoftLimitIU,
+                 "Invalid range of motion. Safety margin too large or "
+                 "min/max position invalid. lowerSoftLimit: %i IU, upperSoftLimit: "
+                 "%i IU. lowerHardLimit: %i IU, upperHardLimit %i IU. safetyMargin: %f rad = %i IU",
+                 this->lowerSoftLimitIU, this->upperSoftLimitIU, this->lowerHardLimitIU, this->upperHardLimitIU,
+                 this->safetyMarginRad, safetyMarginIU);
 }
 
 float Encoder::getAngleRad(uint8_t ActualPositionByteOffset)
@@ -67,24 +68,54 @@ int Encoder::getSlaveIndex() const
   return this->slaveIndex;
 }
 
-bool Encoder::isValidTargetPositionIU(int targetPosIU)
+bool Encoder::isWithinHardLimitsIU(int positionIU)
 {
-  return (targetPosIU > this->minPositionIU && targetPosIU < this->maxPositionIU);
+  return (positionIU > this->lowerHardLimitIU && positionIU < this->upperHardLimitIU);
 }
 
-int Encoder::getMinPositionIU() const
+bool Encoder::isWithinSoftLimitsIU(int positionIU)
 {
-  return minPositionIU;
+  return (positionIU > this->lowerSoftLimitIU && positionIU < this->upperSoftLimitIU);
 }
 
-int Encoder::getMaxPositionIU() const
+bool Encoder::isValidTargetIU(int currentIU, int targetIU)
 {
-  return maxPositionIU;
+  if (this->isWithinSoftLimitsIU(targetIU))
+  {
+    return true;
+  }
+
+  if (currentIU >= this->getUpperSoftLimitIU())
+  {
+    return (targetIU <= currentIU) && (targetIU > this->getLowerSoftLimitIU());
+  }
+
+  if (currentIU <= this->getLowerSoftLimitIU())
+  {
+    return (targetIU >= currentIU) && (targetIU < this->getUpperSoftLimitIU());
+  }
+
+  return false;
 }
 
-bool Encoder::isValidPositionIU(int positionIU)
+int Encoder::getUpperSoftLimitIU() const
 {
-  return positionIU > 0 && positionIU <= this->totalPositions;
+  return upperSoftLimitIU;
+}
+
+int Encoder::getLowerSoftLimitIU() const
+{
+  return lowerSoftLimitIU;
+}
+
+int Encoder::getUpperHardLimitIU() const
+{
+  return upperHardLimitIU;
+}
+
+int Encoder::getLowerHardLimitIU() const
+{
+  return lowerHardLimitIU;
 }
 
 }  // namespace march4cpp

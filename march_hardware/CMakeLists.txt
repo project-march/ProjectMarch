@@ -49,7 +49,9 @@ file(GLOB SOEM_SRC
 
 add_library(march_hardware
         ${SOEM_SRC}
+        include/${PROJECT_NAME}/ActuationMode.h
         include/${PROJECT_NAME}/PowerDistributionBoard.h
+        include/${PROJECT_NAME}/IMotionCubeTargetState.h
         include/${PROJECT_NAME}/EtherCAT/EthercatIO.h
         include/${PROJECT_NAME}/EtherCAT/EthercatMaster.h
         include/${PROJECT_NAME}/EtherCAT/EthercatSDO.h
@@ -76,18 +78,13 @@ add_library(march_hardware
         src/Encoder.cpp
         src/IMotionCube.cpp
         src/Joint.cpp
+        src/IMotionCubeTargetState.cpp
         src/MarchRobot.cpp
         src/TemperatureGES.cpp
         src/PDOmap.cpp
-        src/main.cpp
         )
 
 target_link_libraries(march_hardware ${catkin_LIBRARIES})
-
-
-add_executable(hardware_dummy src/main.cpp)
-
-target_link_libraries(hardware_dummy march_hardware)
 
 add_executable(slave_count_check check/SlaveCount.cpp)
 target_link_libraries(slave_count_check march_hardware)
@@ -96,14 +93,6 @@ install(TARGETS march_hardware
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
-
-# Give sudo access to ethernet port
-add_custom_command(
-        TARGET hardware_dummy
-        COMMAND sudo setcap cap_net_raw+ep hardware_dummy
-        WORKING_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}
-        POST_BUILD
-)
 
 # Give sudo access to ethernet port
 add_custom_command(

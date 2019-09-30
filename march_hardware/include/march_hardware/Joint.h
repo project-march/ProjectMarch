@@ -18,17 +18,15 @@ class Joint
 private:
   std::string name;
   // Set this number via the hardware builder
-  int netNumber = -1;
+  int netNumber;
   bool allowActuation;
   IMotionCube iMotionCube;
   TemperatureGES temperatureGES;
 
 public:
-  Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES, IMotionCube iMotionCube);
-  Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES, IMotionCube iMotionCube, int netNumber);
-  Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES);
-  Joint(std::string name, bool allowActuation, IMotionCube iMotionCube);
-  Joint(std::string name, bool allowActuation, IMotionCube iMotionCube, int netNumber);
+  Joint(): name(""), netNumber(-1), allowActuation(false)
+  {
+  }
 
   void initialize(int ecatCycleTime);
   void prepareActuation();
@@ -36,8 +34,10 @@ public:
   void resetIMotionCube();
 
   void actuateRad(float targetPositionRad);
+  void actuateTorque(int targetTorque);
 
   float getAngleRad();
+  float getTorque();
   int getAngleIU();
   float getTemperature();
   IMotionCubeState getIMotionCubeState();
@@ -50,6 +50,10 @@ public:
     return netNumber;
   }
 
+  ActuationMode getActuationMode() const;
+
+  void setActuationMode(ActuationMode actuationMode);
+
   bool hasIMotionCube();
   bool hasTemperatureGES();
   bool canActuate();
@@ -58,7 +62,8 @@ public:
   friend bool operator==(const Joint& lhs, const Joint& rhs)
   {
     return lhs.name == rhs.name && lhs.iMotionCube == rhs.iMotionCube && lhs.temperatureGES == rhs.temperatureGES &&
-           lhs.allowActuation == rhs.allowActuation;
+           lhs.allowActuation == rhs.allowActuation &&
+           lhs.getActuationMode().getValue() == rhs.getActuationMode().getValue();
   }
 
   friend bool operator!=(const Joint& lhs, const Joint& rhs)
@@ -69,10 +74,17 @@ public:
   friend ::std::ostream& operator<<(std::ostream& os, const Joint& joint)
   {
     return os << "name: " << joint.name << ", "
+              << "ActuationMode: " << joint.getActuationMode().toString() << ", "
               << "allowActuation: " << joint.allowActuation << ", "
               << "imotioncube: " << joint.iMotionCube << ","
               << "temperatureges: " << joint.temperatureGES;
   }
+
+  void setName(const std::string& name);
+  void setAllowActuation(bool allowActuation);
+  void setIMotionCube(const IMotionCube& iMotionCube);
+  void setTemperatureGes(const TemperatureGES& temperatureGes);
+  void setNetNumber(int netNumber);
 };
 
 }  // namespace march4cpp

@@ -7,8 +7,8 @@
 #include <march_hardware_builder/HardwareConfigExceptions.h>
 #include <march_hardware_builder/HardwareBuilder.h>
 
-using ::testing::Return;
 using ::testing::AtLeast;
+using ::testing::Return;
 
 class AllowedRobotTest : public ::testing::Test
 {
@@ -41,20 +41,49 @@ TEST_F(AllowedRobotTest, TestMarch3Values)
   march4cpp::IMotionCube RKJimc = march4cpp::IMotionCube(10, RKJenc);
   march4cpp::IMotionCube RAJimc = march4cpp::IMotionCube(12, RAJenc);
 
-  march4cpp::Joint leftHip = march4cpp::Joint("left_hip", true, LHJimc);
-  march4cpp::Joint leftKnee = march4cpp::Joint("left_knee", true, LKJimc);
-  march4cpp::Joint leftAnkle = march4cpp::Joint("left_ankle", true, LAJimc);
-  march4cpp::Joint rightHip = march4cpp::Joint("right_hip", true, RHJimc);
-  march4cpp::Joint rightKnee = march4cpp::Joint("right_knee", true, RKJimc);
-  march4cpp::Joint rightAnkle = march4cpp::Joint("right_ankle", true, RAJimc);
+  march4cpp::Joint leftHip;
+  leftHip.setName("left_hip");
+  leftHip.setIMotionCube(LHJimc);
+  leftHip.setActuationMode(march4cpp::ActuationMode("position"));
+
+  march4cpp::Joint leftKnee;
+  leftKnee.setName("left_knee");
+  leftKnee.setIMotionCube(LKJimc);
+  leftKnee.setActuationMode(march4cpp::ActuationMode("position"));
+
+  march4cpp::Joint leftAnkle;
+  leftAnkle.setName("left_ankle");
+  leftAnkle.setIMotionCube(LAJimc);
+  leftAnkle.setActuationMode(march4cpp::ActuationMode("position"));
+
+  march4cpp::Joint rightHip;
+  rightHip.setName("right_hip");
+  rightHip.setIMotionCube(RHJimc);
+  rightHip.setActuationMode(march4cpp::ActuationMode("position"));
+
+  march4cpp::Joint rightKnee;
+  rightKnee.setName("right_knee");
+  rightKnee.setIMotionCube(RKJimc);
+  rightKnee.setActuationMode(march4cpp::ActuationMode("position"));
+
+  march4cpp::Joint rightAnkle;
+  rightAnkle.setName("right_ankle");
+  rightAnkle.setIMotionCube(RAJimc);
+  rightAnkle.setActuationMode(march4cpp::ActuationMode("position"));
 
   std::vector<march4cpp::Joint> jointList;
+
   jointList.push_back(rightHip);
   jointList.push_back(leftHip);
   jointList.push_back(rightKnee);
   jointList.push_back(leftKnee);
   jointList.push_back(rightAnkle);
   jointList.push_back(leftAnkle);
+
+  for (int i = 0; i < jointList.size(); i++)
+  {
+    jointList.at(i).setAllowActuation(true);
+  }
 
   march4cpp::MarchRobot actualRobot = march4cpp::MarchRobot(jointList, "enp3s0", 4);
 

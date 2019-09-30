@@ -7,38 +7,6 @@
 
 namespace march4cpp
 {
-Joint::Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES, IMotionCube iMotionCube)
-  : temperatureGES(temperatureGES), iMotionCube(iMotionCube)
-{
-  this->name = std::move(name);
-  this->allowActuation = allowActuation;
-}
-Joint::Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES, IMotionCube iMotionCube,
-             int netNumber)
-  : temperatureGES(temperatureGES), iMotionCube(iMotionCube), netNumber(netNumber)
-{
-  this->name = std::move(name);
-  this->allowActuation = allowActuation;
-}
-
-Joint::Joint(std::string name, bool allowActuation, TemperatureGES temperatureGES) : temperatureGES(temperatureGES)
-{
-  this->name = std::move(name);
-  this->allowActuation = allowActuation;
-}
-Joint::Joint(std::string name, bool allowActuation, IMotionCube iMotionCube) : iMotionCube(iMotionCube)
-{
-  this->name = std::move(name);
-  this->allowActuation = allowActuation;
-}
-
-Joint::Joint(std::string name, bool allowActuation, IMotionCube iMotionCube, int netNumber)
-  : iMotionCube(iMotionCube), netNumber(netNumber)
-{
-  this->name = std::move(name);
-  this->allowActuation = allowActuation;
-}
-
 void Joint::initialize(int ecatCycleTime)
 {
   if (hasIMotionCube())
@@ -53,6 +21,8 @@ void Joint::initialize(int ecatCycleTime)
 
 void Joint::prepareActuation()
 {
+  ROS_ASSERT_MSG(this->getActuationMode() != ActuationMode::unknown, "The mode of actuation for joint %s is: %s",
+                 this->name.c_str(), this->getActuationMode().toString().c_str());
   if (this->allowActuation)
   {
     ROS_INFO("Preparing joint %s for actuation", this->name.c_str());
@@ -93,6 +63,25 @@ float Joint::getAngleRad()
   return this->iMotionCube.getAngleRad();
 }
 
+void Joint::actuateTorque(int targetTorque)
+{
+  ROS_ASSERT_MSG(this->allowActuation, "Joint %s is not allowed to actuate, "
+                                       "yet its actuate method has been "
+                                       "called.",
+                 this->name.c_str());
+  this->iMotionCube.actuateTorque(targetTorque);
+}
+
+float Joint::getTorque()
+{
+  if (!hasIMotionCube())
+  {
+    ROS_WARN("Joint %s has no iMotionCube", this->name.c_str());
+    return -1;
+  }
+  return this->iMotionCube.getTorque();
+}
+
 int Joint::getAngleIU()
 {
   if (!hasIMotionCube())
@@ -115,23 +104,40 @@ float Joint::getTemperature()
 
 IMotionCubeState Joint::getIMotionCubeState()
 {
-    // Return an object of strings:
-    // the literal bits of the Status Word, Detailed Error and Motion Error
-    // and the parsed interpretation of these bits
-    IMotionCubeState states;
+  IMotionCubeState states;
 
-    std::bitset<16> statusWordBits = this->iMotionCube.getStatusWord();
-    states.statusWord = statusWordBits.to_string();
-    std::bitset<16> detailedErrorBits = this->iMotionCube.getDetailedError();
-    states.detailedError = detailedErrorBits.to_string();
-    std::bitset<16> motionErrorBits = this->iMotionCube.getMotionError();
-    states.motionError = motionErrorBits.to_string();
+  std::bitset<16> statusWordBits = this->iMotionCube.getStatusWord();
+  states.statusWord = statusWordBits.to_string();
+  std::bitset<16> detailedErrorBits = this->iMotionCube.getDetailedError();
+  states.detailedError = detailedErrorBits.to_string();
+  std::bitset<16> motionErrorBits = this->iMotionCube.getMotionError();
+  states.motionError = motionErrorBits.to_string();
 
-    states.state = this->iMotionCube.getState(this->iMotionCube.getStatusWord());
-    states.detailedErrorDescription = this->iMotionCube.parseDetailedError(this->iMotionCube.getDetailedError());
-    states.motionErrorDescription = this->iMotionCube.parseMotionError(this->iMotionCube.getMotionError());
+  states.state = this->iMotionCube.getState(this->iMotionCube.getStatusWord());
+  states.detailedErrorDescription = this->iMotionCube.parseDetailedError(this->iMotionCube.getDetailedError());
+  states.motionErrorDescription = this->iMotionCube.parseMotionError(this->iMotionCube.getMotionError());
 
-    return states;
+  states.motorCurrent = this->iMotionCube.getMotorCurrent();
+  states.motorVoltage = this->iMotionCube.getMotorVoltage();
+
+  return states;
+}
+
+void Joint::setName(const std::string& name)
+{
+  Joint::name = name;
+}
+void Joint::setAllowActuation(bool allowActuation)
+{
+  Joint::allowActuation = allowActuation;
+}
+void Joint::setIMotionCube(const IMotionCube& iMotionCube)
+{
+  Joint::iMotionCube = iMotionCube;
+}
+void Joint::setTemperatureGes(const TemperatureGES& temperatureGes)
+{
+  temperatureGES = temperatureGes;
 }
 
 int Joint::getTemperatureGESSlaveIndex()
@@ -170,4 +176,20 @@ bool Joint::canActuate()
 {
   return this->allowActuation;
 }
+
+void Joint::setNetNumber(int netNumber)
+{
+  Joint::netNumber = netNumber;
+}
+
+ActuationMode Joint::getActuationMode() const
+{
+  return this->iMotionCube.getActuationMode();
+}
+
+void Joint::setActuationMode(ActuationMode actuationMode)
+{
+  this->iMotionCube.setActuationMode(actuationMode);
+}
+
 }  // namespace march4cpp

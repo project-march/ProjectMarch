@@ -152,7 +152,7 @@ void EthercatMaster::ethercatLoop()
     if (totalLoops >= 10 * rate)  // Every 10 seconds
     {
       float rateNotAchievedPercentage = 100 * (static_cast<float>(rateNotAchievedCount) / totalLoops);
-      if (rateNotAchievedPercentage > 1)  // If percentage greater than 10 percent, do ROS_WARN instead of ROS_INFO
+      if (rateNotAchievedPercentage > 5)  // If percentage greater than 5 percent, do ROS_WARN instead of ROS_DEBUG
       {
         ROS_WARN("EtherCAT rate of %d milliseconds per cycle was not achieved for %f percent of all cycles",
                  ecatCycleTimems, rateNotAchievedPercentage);
@@ -175,7 +175,12 @@ void EthercatMaster::sendProcessData()
 
 int EthercatMaster::receiveProcessData()
 {
-  return ec_receive_processdata(EC_TIMEOUTRET);
+  int wkc =  ec_receive_processdata(EC_TIMEOUTRET);
+  if (wkc < this->expectedWKC)
+  {
+    ROS_WARN("Working counter lower than expected. EtherCAT connection may not be optimal");
+  }
+  return wkc;
 }
 
 void EthercatMaster::monitorSlaveConnection()
@@ -187,6 +192,7 @@ void EthercatMaster::monitorSlaveConnection()
     {
       // TODO(@Tim, @Isha, @Martijn) throw error when it happens multiple times in a short period of time.
       ROS_WARN("EtherCAT train lost connection from slave %d onwards", slave);
+      return;
     }
   }
 }
