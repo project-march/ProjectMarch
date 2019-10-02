@@ -3,7 +3,7 @@
   <name>march_hardware</name>
   <version>0.0.0</version>
   <description>
-    C++ library to interface with the March4 hardware.
+    Communicates with the March4 hardware.
   </description>
 
   <maintainer email="software@projectmarch.nl">Project March</maintainer>
@@ -24,8 +24,4 @@
 
   <exec_depend>roscpp</exec_depend>
   <exec_depend>soem</exec_depend>
-
-  <export>
-
-  </export>
 </package>
