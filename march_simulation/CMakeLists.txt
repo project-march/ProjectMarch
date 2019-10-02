@@ -10,8 +10,21 @@ find_package(catkin REQUIRED COMPONENTS
   robot_state_publisher
   xacro
 )
+
 catkin_package()
-include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
+
+catkin_install_python(PROGRAMS scripts/upload_joint_names
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY launch
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
+
+install(DIRECTORY worlds
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/worlds
+)
+
+install(DIRECTORY config
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
 )
