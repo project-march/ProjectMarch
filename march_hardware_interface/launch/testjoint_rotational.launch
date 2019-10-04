@@ -1,0 +1,17 @@
+<launch>
+    <rosparam file="$(find march_hardware_interface)/config/test_joint_rotational/controllers.yaml" command="load"/>
+
+    <!-- Load the URDF into the ROS Parameter Server -->
+    <param name="robot_description"
+           command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/test-joint-rotational.xacro'" />
+
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="true" output="screen" ns="/"
+          args="
+                /march/controller/joint_state
+                /march/controller/temperature_sensor
+                /march/controller/trajectory
+            "/>
+
+    <node name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" args="testjoint_rotational" output="screen"/>
+
+</launch>
