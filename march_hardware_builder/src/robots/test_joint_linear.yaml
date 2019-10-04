@@ -1,0 +1,15 @@
+testjoint_linear:
+ ifName: enp2s0
+ ecatCycleTime: 4
+ joints:
+   - linear_joint:
+       actuationMode: torque
+       allowActuation: true
+       imotioncube:
+         slaveIndex: 1
+         encoder:
+           resolution: 12
+           minPositionIU: 240
+           maxPositionIU: 445
+           zeroPositionIU: 342
+           safetyMarginRad: 0.005
