@@ -1,8 +1,6 @@
 sudo: required
 dist: trusty
 language: python
-python:
-  - "3.4"
 env:
   global:
     - JOB_PATH=/tmp/ci_job
@@ -10,11 +8,11 @@ env:
     - ROS_DISTRO_NAME=kinetic OS_NAME=ubuntu OS_CODE_NAME=xenial ARCH=amd64
 install:
   - pip install ros_buildfarm
-  - pip install colcon-core colcon-test-result
+  - sudo apt install python3-colcon-common-extensions
   - export PACKAGES_SELECT=`basename $TRAVIS_BUILD_DIR`
   - mkdir -p $JOB_PATH/ws/src
   - cp -R $TRAVIS_BUILD_DIR $JOB_PATH/ws/src/
-  - generate_ci_script.py https://raw.githubusercontent.com/ros2/ros_buildfarm_config/ros2/index.yaml $ROS_DISTRO_NAME default $OS_NAME $OS_CODE_NAME $ARCH --package-selection-args --packages-up-to $PACKAGE_SELECT > $JOB_PATH/ci_job.sh
+  - generate_ci_script.py https://raw.githubusercontent.com/ros2/ros_buildfarm_config/ros2/index.yaml $ROS_DISTRO_NAME default $OS_NAME $OS_CODE_NAME $ARCH --package-selection-args --packages-up-to $PACKAGES_SELECT > $JOB_PATH/ci_job.sh
   - cd $JOB_PATH
   - cat ci_job.sh
   - sh ci_job.sh -y
