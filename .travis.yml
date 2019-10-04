@@ -7,8 +7,7 @@ env:
   matrix:
     - ROS_DISTRO_NAME=kinetic OS_NAME=ubuntu OS_CODE_NAME=xenial ARCH=amd64
 install:
-  - pip install ros_buildfarm
-  - sudo apt install python3-colcon-common-extensions
+  - pip install ros_buildfarm colcon-common-extensions
   - export PACKAGES_SELECT=`basename $TRAVIS_BUILD_DIR`
   - mkdir -p $JOB_PATH/ws/src
   - cp -R $TRAVIS_BUILD_DIR $JOB_PATH/ws/src/
