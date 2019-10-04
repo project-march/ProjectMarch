@@ -24,7 +24,7 @@
   </node>
 
   <!-- Upload the joint names to the parameter server  -->
-  <node name="upload_joint_names" pkg="march_simulation" type="upload_joint_names.py"/>
+  <node name="upload_joint_names" pkg="march_simulation" type="upload_joint_names"/>
 
   <!-- We resume the logic in empty_world.launch_sm, changing only the name of the world to be launched -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
