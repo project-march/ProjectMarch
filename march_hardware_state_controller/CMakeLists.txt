@@ -39,7 +39,7 @@ roslint_cpp(${lintfiles})
 include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
 add_library(${PROJECT_NAME}
-    include/march_hardware_state_controller/march_hardware_state_controller.h
+    include/${PROJECT_NAME}/march_hardware_state_controller.h
     src/march_hardware_state_controller.cpp
 )
 

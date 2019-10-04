@@ -36,7 +36,7 @@ roslint_cpp(${lintfiles})
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_executable(${PROJECT_NAME}_node
-    include/march_hardware_interface/PowerNetOnOffCommand.h
+    include/${PROJECT_NAME}/PowerNetOnOffCommand.h
     src/march_hardware_interface.cpp
     src/march_hardware_interface_node.cpp
 )
@@ -51,6 +51,10 @@ install(DIRECTORY include/${PROJECT_NAME}/
 
 install(TARGETS ${PROJECT_NAME}_node
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY config launch
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
 # Give sudo access to ethernet port
