@@ -26,7 +26,7 @@ install:
   - cd $HOME/ws
   - wstool init src $ROSINSTALL_FILE
   - wstool update -t src
-  - rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO
+  - rosdep install -y --from-paths $TRAVIS_BUILD_DIR --ignore-src --rosdistro $ROS_DISTRO
 
 script:
   - colcon build $COLCON_OPTS
