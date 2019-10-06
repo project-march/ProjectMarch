@@ -5,7 +5,7 @@
 - git:
     local-name: hardware-interface
     uri: https://github.com/project-march/hardware-interface
-    version: develop
+    version: fix/ethercat-grant
 - git:
     local-name: state-machine
     uri: https://github.com/project-march/state-machine
