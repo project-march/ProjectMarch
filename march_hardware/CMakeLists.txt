@@ -94,14 +94,6 @@ install(TARGETS march_hardware
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
 
-# Give sudo access to ethernet port
-add_custom_command(
-        TARGET slave_count_check
-        COMMAND sudo setcap cap_net_raw+ep slave_count_check
-        WORKING_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}
-        POST_BUILD
-)
-
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
 

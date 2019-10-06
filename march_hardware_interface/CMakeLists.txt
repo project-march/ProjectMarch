@@ -59,14 +59,6 @@ install(DIRECTORY include/${PROJECT_NAME}/
         FILES_MATCHING PATTERN "*.h"
         PATTERN ".svn" EXCLUDE)
 
-# Give sudo access to ethernet port
-add_custom_command(
-        TARGET march_hardware_interface_node
-        COMMAND sudo setcap cap_net_raw+ep march_hardware_interface_node
-        WORKING_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}
-        POST_BUILD
-)
-
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
 
