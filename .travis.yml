@@ -26,6 +26,7 @@ env:
     - UPSTREAM_WORKSPACE='dependencies.rosinstall'
   matrix:
     - ROS_DISTRO="kinetic"
+    - ROS_DISTRO="melodic"
 
 # clone and run industrial_ci
 install:
