@@ -3,7 +3,7 @@
   <name>march_hardware</name>
   <version>0.0.0</version>
   <description>
-    C++ library to interface with the March4 hardware.
+    Communicates with the March4 hardware.
   </description>
 
   <maintainer email="software@projectmarch.nl">Project March</maintainer>
@@ -12,19 +12,16 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-
   <build_depend>roscpp</build_depend>
+  <build_depend>soem</build_depend>
   <build_depend>code_coverage</build_depend>
   <build_depend>roslint</build_depend>
   <build_depend>rostest</build_depend>
 
   <build_export_depend>roscpp</build_export_depend>
-  <build_depend>roslint</build_depend>
+  <build_export_depend>soem</build_export_depend>
   <build_export_depend>rostest</build_export_depend>
 
   <exec_depend>roscpp</exec_depend>
-
-  <export>
-
-  </export>
+  <exec_depend>soem</exec_depend>
 </package>

@@ -75,8 +75,9 @@ bool MarchPdbStateController::init(march_hardware_interface::MarchPdbStateInterf
     realtime_pubs_ = rt_pub;
   }
 
-  enable_disable_high_voltage_service = controller_nh.advertiseService("enable_all_high_voltage",
-                                                                       &MarchPdbStateController::serviceDisableEnableHighVoltage, this);
+  enable_disable_high_voltage_service =
+      controller_nh.advertiseService("enable_all_high_voltage",
+                                     &MarchPdbStateController::serviceDisableEnableHighVoltage, this);
 
   sub_master_shutdown_allowed =
       controller_nh.subscribe("shutdown_allowed", 1000, &MarchPdbStateController::masterShutdownAllowedCallback, this);
