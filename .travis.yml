@@ -24,9 +24,10 @@ env:
     - BUILDER=colcon
     - CATKIN_LINT=pedantic
     - UPSTREAM_WORKSPACE='dependencies.rosinstall'
+    - AFTER_SCRIPT='colcon build --cmake-target-skip-unavailable --cmake-target roslint'
   matrix:
     - ROS_DISTRO="kinetic"
-    - ROS_DISTRO="melodic"
+#   - ROS_DISTRO="melodic"
 
 # clone and run industrial_ci
 install:
