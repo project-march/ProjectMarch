@@ -10,10 +10,15 @@
 
 #include <march_hardware/EtherCAT/EthercatMaster.h>
 
-extern "C"
-{
-#include "ethercat.h"
-}
+#include <soem/ethercattype.h>
+#include <soem/nicdrv.h>
+#include <soem/ethercatbase.h>
+#include <soem/ethercatmain.h>
+#include <soem/ethercatdc.h>
+#include <soem/ethercatcoe.h>
+#include <soem/ethercatfoe.h>
+#include <soem/ethercatconfig.h>
+#include <soem/ethercatprint.h>
 
 namespace march4cpp
 {
@@ -33,7 +38,7 @@ void EthercatMaster::start()
   ROS_INFO("Trying to start EtherCAT");
 
   // Initialise SOEM, bind socket to ifname
-  if (!ec_init(ifname.c_str()))
+  if (!ec_init(&ifname[0]))
   {
     ROS_FATAL("No socket connection on %s. Confirm that you have selected the right ifname", ifname.c_str());
     throw std::runtime_error("No socket connection on %s. Confirm that you have selected the right ifname");
@@ -188,7 +193,7 @@ void EthercatMaster::monitorSlaveConnection()
   for (int slave = 1; slave <= ec_slavecount; slave++)
   {
     ec_statecheck(slave, EC_STATE_OPERATIONAL, EC_TIMEOUTRET);
-    if (ec_slave[slave].state == EC_STATE_NONE)
+    if (!ec_slave[slave].state)
     {
       // TODO(@Tim, @Isha, @Martijn) throw error when it happens multiple times in a short period of time.
       ROS_WARN("EtherCAT train lost connection from slave %d onwards", slave);
