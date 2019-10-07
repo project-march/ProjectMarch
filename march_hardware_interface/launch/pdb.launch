@@ -6,6 +6,6 @@
                 /march/controller/pdb_state
             "/>
 
-    <node name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" args="pdb" output="screen"/>
+    <node launch-prefix="ethercat_grant" name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" args="pdb" output="screen"/>
 
 </launch>

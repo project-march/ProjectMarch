@@ -57,14 +57,6 @@ install(DIRECTORY config launch
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
-# Give sudo access to ethernet port
-add_custom_command(
-    TARGET ${PROJECT_NAME}_node
-    COMMAND sudo setcap cap_net_raw+ep ${PROJECT_NAME}_node
-    WORKING_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}
-    POST_BUILD
-)
-
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
 
