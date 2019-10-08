@@ -5,6 +5,7 @@ add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
     controller_manager
+    joint_limits_interface
     march_description
     march_hardware
     march_hardware_builder
@@ -19,7 +20,16 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
     INCLUDE_DIRS include
     CATKIN_DEPENDS
+    controller_manager
+    joint_limits_interface
+    march_description
+    march_hardware
+    march_hardware_builder
+    march_shared_resources
+    realtime_tools
+    roscpp
     std_msgs
+    urdf
 )
 
 set(ROSLINT_CPP_OPTS "--filter=-build/include,-build/header_guard,-runtime/references" "--linelength=120")

@@ -12,6 +12,7 @@
 
   <depend>roscpp</depend>
   <depend>std_msgs</depend>
+  <depend>joint_limits_interface</depend>
   <depend>controller_manager</depend>
   <depend>realtime_tools</depend>
   <depend>urdf</depend>
