@@ -18,6 +18,7 @@ generate_dynamic_reconfigure_options(
 
 catkin_package(
     CATKIN_DEPENDS
+    sensor_msgs
     std_msgs
 )
 
