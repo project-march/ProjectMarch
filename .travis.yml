@@ -1,90 +1,40 @@
-dist: xenial
-sudo: required
-language:
-- cpp
-cache:
-- apt
+# This config uses industrial_ci (https://github.com/ros-industrial/industrial_ci.git).
+# For troubleshooting, see readme (https://github.com/ros-industrial/industrial_ci/blob/master/README.rst)
+
+language: generic # optional, just removes the language badge
+
+services:
+  - docker
+
 notifications:
   slack:
-    secure: I7/Kqj/ZiaoW9bZzlDFYU2aFv1J3R0z5+6kDf9TI8AHsN9K/GYs05kG8gfpORmaBobF22AwpB/I5o8ga5nJGAP25SgX8bcP3jJaKUyfMxXj3ThkfINTMKeLhZqzh5c3ppBwHy62vdSDry4fyuIhtaWOa+8GqmI3D37/0yzFCPQLLYnSXoF5EKSFkKPytfVdwbOKE/uSgPbAy0xsPUKLEGdIhvFjyDzfj5KIHcYWFu9eus0GpuCJVJE/nGTz7PrQ9Rhuh3eVeJNn5CEXo+0Lgn8lghUY0xRH/0xn+mhjYZnxTNO18YRoiF8lUB+/phQx2E3GiDrtPd7BjtluKGIkgFMZM/dyzHN7lSeCJZ0nDhOuALNwdbhS8Hw18q5a6SanT4Kegno8ebDNwsEyHuiHy6D3XNE2PHIZ5SbSgX9MOaLBtarcHccAR19T+96mWJANS6rIKnhe0zW9+Jxl99mTCgcNjTmcm2YG5Axm8xOBmoK920I4ke1wfb9QLeMIOnQ/JM6DxkMbQGtoN49ztrg4cv+JwUOUnEn/yiLsz+p8EdaFiRLfAbww9VJ+1geDdGifv+TRq72RpTzGnNveNnRRysxBjfei3EwwoZqUFhZyVWQWqHuwSa8xFpxS3FMmDzP16oMAB/TuMV03MBTqNK/JDSMXq54Bs1pmtPJ4kvfGiKKo=
-addons:
-  apt:
-    packages:
-    - doxygen
-matrix:
-  include:
-  - name: Xenial kinetic
-    dist: xenial
-    env: ROS_DISTRO=kinetic
+    secure: n8eup/26IVzzxg8wP55EL4wJvkEOAYMEt/ByltUtOAnrp+NipZiNPIheY062mXYRnc7iKI/7X7WVkSCcIlggalT06q1SoC1FBJn061oLz+s8eoXzUJhX08FCv3ZRVmNnbS45TCq9Xo3Oq+M/siPxeCwej8dOv61aqJJuLLsyRQpFPIyV5tw07ElZKWAMrzd4dIwzIiKJm0MaIyTpPcKKURX3wMzHSffgih+dm0wyNjtpL7jHpCvGTo7JAqQgDmMNoOWUquQw3cozbMEOWsl/4sU1U5716Dvnr8Ug9gqdehbYdwkq/6xDlsEGV/jUOy8810GCRADrR23FLm+He63PuWO2EUnwO4bHCqYRfQ+65qkRu1T29j63Z72sYx7lkQO4UVjad36M3mT7ipg86QzsC1ianXDD7mQC/XAw4INncrp1uBoROHiTUda3ri3JpmQTNcElmesfVnJnVrXXIwwxXchOptyTLDF+LaecQC5pKmQqK/NyWzestCWR/F8Yw8gp+AlVfV19dvnYScmxew+Y0wo855A7Sn/11MtdDzEdeTFXc35JvhFyT4sbi0AHpoZOatt+8/WfT2Lu9eoAnNjjYlNK7//OssZpF6uo+Mhw0isSnuJQpM9TNkrR1J9B+8IGvq7n2fKtkuh2tu5JgkeodRfMIj9sp2KvueQAl5sYkrI=
+  email: false
+
+# include the following block if the C/C++ build artifacts should get cached by Travis,
+# CCACHE_DIR needs to get set as well to actually fill the cache
+cache:
+  directories:
+    - $HOME/.ccache
+
+git:
+  quiet: true # optional, silences the cloning of the target repository
+
+# configure the build environment(s)
+# https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#variables-you-can-configure
 env:
   global:
-    ROS_DISTRO: kinetic
-    ROS_CI_DESKTOP: "`lsb_release -cs`"
-    CI_SOURCE_PATH: "$(pwd)"
-    ROSINSTALL_FILE: "$CI_SOURCE_PATH/dependencies.rosinstall"
-    CATKIN_OPTIONS: "$CI_SOURCE_PATH/catkin.options"
-    ROS_PARALLEL_JOBS: "-j8 -l6"
-    PYTHONPATH: "$PYTHONPATH:/usr/lib/python2.7/dist-packages:/usr/local/lib/python2.7/dist-packages"
-before_install:
-- sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu $ROS_CI_DESKTOP main\"
-  > /etc/apt/sources.list.d/ros-latest.list"
-- sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key $ROS_KEY
-- sudo apt-get update -qq
-- sudo apt-get install dpkg
-- sudo apt-get install -y python-catkin-pkg python-rosdep python-wstool ros-$ROS_DISTRO-ros-base
-- sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -sc` main"
-  > /etc/apt/sources.list.d/ros-latest.list'
-- wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
-- source /opt/ros/$ROS_DISTRO/setup.bash
-- sudo rosdep init
-- rosdep update
-- sudo apt-get install ros-kinetic-rosbash
-- sudo apt-get install ros-kinetic-roslaunch
-- pip install --user catkin_lint
-- pip install --user catkin_tools_document
-- sudo apt-get install python-catkin-tools
+    - ROS_REPO=ros
+    - CCACHE_DIR=$HOME/.ccache # enables C/C++ caching in industrial_ci
+    - BUILDER=colcon
+    - CATKIN_LINT=pedantic
+    - UPSTREAM_WORKSPACE='dependencies.rosinstall -march-iv/march_gait_scheduler -march-iv/march_gait_selection -march-iv/march_launch -march-iv/march_rqt_gait_selection -march-iv/march_rqt_input_device -march-iv/march_rqt_training_log -march-iv/march_safety -march-iv/march_sound_scheduler'
+  matrix:
+    - ROS_DISTRO=kinetic
+    - ROS_DISTRO=melodic
+
+# clone and run industrial_ci
 install:
-- mkdir -p ~/catkin_ws/src
-- cd ~/catkin_ws
-- catkin init
-- catkin build
-- source devel/setup.bash
-- cd ~/catkin_ws/src
-- ln -s $CI_SOURCE_PATH .
-before_script:
-- cd ~/catkin_ws/src
-- wstool init
-- if [[ -f $ROSINSTALL_FILE ]] ; then wstool merge $ROSINSTALL_FILE ; fi
-- wstool up
-- cd ~/catkin_ws
-- rosdep update
-- rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO
-- cd src
-- cd ~/catkin_ws
+  - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci -b master
 script:
-- source /opt/ros/$ROS_DISTRO/setup.bash
-- cd ~/catkin_ws
-- src/hardware-interface/build.sh
-- src/hardware-interface/doc.sh
-
-
-# Code coverage
-after_success:
-- catkin build march_hardware -v --no-deps --catkin-make-args march_hardware_coverage
-- catkin build march_hardware_builder -v --no-deps --catkin-make-args march_hardware_builder_coverage
-- catkin build march_hardware_interface -v --no-deps --catkin-make-args march_hardware_interface_coverage
-- catkin build march_temperature_sensor_controller -v --no-deps --catkin-make-args march_temperature_sensor_controller_coverage
-- cd ~/catkin_ws/src/hardware-interface
-- bash <(curl -s https://codecov.io/bash) -f ~/catkin_ws/build/march_hardware/march_hardware_coverage.info
-- bash <(curl -s https://codecov.io/bash) -f ~/catkin_ws/build/march_hardware_builder/march_hardware_builder_coverage.info
-- bash <(curl -s https://codecov.io/bash) -f ~/catkin_ws/build/march_hardware_interface/march_hardware_interface_coverage.info
-- bash <(curl -s https://codecov.io/bash) -f ~/catkin_ws/build/march_temperature_sensor_controller/march_temperature_sensor_controller_coverage.info
-
-
-deploy:
-  provider: pages
-  skip_cleanup: true
-  local_dir: "/home/travis/catkin_ws/docs/html"
-  github_token: "$GH_REPO_TOKEN"
-  on:
-    branch: develop
+  - .industrial_ci/travis.sh
