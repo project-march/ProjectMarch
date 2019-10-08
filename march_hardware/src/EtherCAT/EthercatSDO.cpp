@@ -2,10 +2,15 @@
 #include "march_hardware/EtherCAT/EthercatSDO.h"
 #include "ros/ros.h"
 
-extern "C"
-{
-#include "ethercat.h"
-}
+#include <soem/ethercattype.h>
+#include <soem/nicdrv.h>
+#include <soem/ethercatbase.h>
+#include <soem/ethercatmain.h>
+#include <soem/ethercatdc.h>
+#include <soem/ethercatcoe.h>
+#include <soem/ethercatfoe.h>
+#include <soem/ethercatconfig.h>
+#include <soem/ethercatprint.h>
 
 namespace march4cpp
 {

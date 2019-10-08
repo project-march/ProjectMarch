@@ -14,6 +14,6 @@
                 /march/controller/trajectory
             "/>
 
-    <node name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" args="march3" output="screen"/>
+    <node launch-prefix="ethercat_grant" name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" args="march3" output="screen"/>
 
 </launch>
