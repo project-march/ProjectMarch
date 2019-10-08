@@ -5,10 +5,6 @@ find_package(catkin REQUIRED COMPONENTS
     march_shared_resources
     robot_state_publisher
     roslint
-    rospy
-    rqt_gui
-    rqt_gui_py
-    rviz
 )
 
 catkin_python_setup()

@@ -9,14 +9,16 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <depend>rospy</depend>
-  <depend>rqt_gui</depend>
-  <depend>rqt_gui_py</depend>
   <depend>march_shared_resources</depend>
 
   <build_depend>roslint</build_depend>
-  <build_depend>rviz</build_depend>
-  <build_depend>robot_state_publisher</build_depend>
+
+  <build_export_depend>robot_state_publisher</build_export_depend>
+
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>rqt_gui</exec_depend>
+  <exec_depend>rqt_gui_py</exec_depend>
+  <exec_depend>rviz</exec_depend>
 
   <export>
     <rqt_gui plugin="${prefix}/plugin.xml"/>
