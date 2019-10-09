@@ -4,6 +4,7 @@ project(march_hardware_interface)
 add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
+    control_toolbox
     controller_manager
     joint_limits_interface
     march_description

@@ -15,6 +15,7 @@
   <depend>joint_limits_interface</depend>
   <depend>controller_manager</depend>
   <depend>realtime_tools</depend>
+  <depend>control_toolbox</depend>
   <depend>urdf</depend>
   <depend>march_shared_resources</depend>
   <depend>march_description</depend>
