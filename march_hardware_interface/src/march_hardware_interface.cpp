@@ -431,6 +431,7 @@ void MarchHardwareInterface::updateAfterLimitJointCommand()
   }
 
   // Clear msg of AfterLimitJointCommand
+  after_limit_joint_command_pub_->msg_.header.stamp.clear();
   after_limit_joint_command_pub_->msg_.name.clear();
   after_limit_joint_command_pub_->msg_.position_command.clear();
   after_limit_joint_command_pub_->msg_.effort_command.clear();
@@ -439,6 +440,7 @@ void MarchHardwareInterface::updateAfterLimitJointCommand()
   {
     march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
 
+    after_limit_joint_command_pub_->msg_.header.stamp.push_back(ros::Time::now());
     after_limit_joint_command_pub_->msg_.name.push_back(joint.getName());
     after_limit_joint_command_pub_->msg_.position_command.push_back(joint_position_command_[i]);
     after_limit_joint_command_pub_->msg_.effort_command.push_back(joint_effort_command_[i]);
@@ -454,6 +456,7 @@ void MarchHardwareInterface::updateIMotionCubeState()
     return;
   }
   // Clear msg of IMotionCubeStates
+  imc_state_pub_->msg_.header.stamp.clear();
   imc_state_pub_->msg_.joint_names.clear();
   imc_state_pub_->msg_.status_word.clear();
   imc_state_pub_->msg_.detailed_error.clear();
@@ -467,6 +470,7 @@ void MarchHardwareInterface::updateIMotionCubeState()
   for (int i = 0; i < num_joints_; i++)
   {
     march4cpp::IMotionCubeState iMotionCubeState = marchRobot.getJoint(joint_names_[i]).getIMotionCubeState();
+    imc_state_pub_->msg_.header.stamp.push_back(ros::Time::now());
     imc_state_pub_->msg_.joint_names.push_back(joint_names_[i]);
     imc_state_pub_->msg_.status_word.push_back(iMotionCubeState.statusWord);
     imc_state_pub_->msg_.detailed_error.push_back(iMotionCubeState.detailedError);
