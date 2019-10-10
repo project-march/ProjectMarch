@@ -9,9 +9,10 @@
 
   <!-- Load the URDF into the ROS Parameter Server -->
   <!-- Override effort values as Gazebo uses different units than the actual hardware. -->
+  <!-- 40 seems to work well, I do not know why. -->
   <param name="robot_description"
           command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iv.xacro'
-          k_velocity_value:=10.0 max_effort_value:=10.0" />
+          k_velocity_value:=40.0 max_effort_rotary:=40.0 max_effort_linear:=40.0" />
 
   <!-- Upload the controller configuration -->
   <rosparam file="$(find march_simulation)/config/config_march-iv.yaml" command="load"/>
