@@ -22,12 +22,13 @@ env:
     - BUILDER=colcon
     - CATKIN_LINT=pedantic
     - UPSTREAM_WORKSPACE='dependencies.rosinstall -march-iv/march_description -march-iv/march_gait_scheduler -march-iv/march_gait_selection -march-iv/march_launch -march-iv/march_rqt_gait_selection -march-iv/march_rqt_input_device -march-iv/march_rqt_training_log -march-iv/march_safety -march-iv/march_sound_scheduler'
+    - AFTER_SCRIPT='builder_run_build "$target_ws" "$target_ws" --cmake-target-skip-unavailable --cmake-target roslint'
   matri:
-    - ROS_DISTRO=kinetic AFTER_RUN_TARGET_TEST="cd /root/target_ws && export PYTHONPATH=/opt/ros/kinetic/lib/python2.7/dist-packages && colcon build --event-handlers status- desktop_notification- --cmake-target-skip-unavailable --cmake-target roslint"
-    - ROS_DISTRO=melodic AFTER_RUN_TARGET_TEST="cd /root/target_ws && export PYTHONPATH=/opt/ros/melodic/lib/python2.7/dist-packages && colcon build --event-handlers status- desktop_notification- --cmake-target-skip-unavailable --cmake-target roslint"
+    - ROS_DISTRO=kinetic
+    - ROS_DISTRO=melodic
 
 # clone and run industrial_ci
 install:
-  - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci -b master
+  - git clone --quiet --depth 1 https://github.com/ipa-mdl/industrial_ci.git .industrial_ci -b fix-master-rosenv
 script:
   - .industrial_ci/travis.sh
