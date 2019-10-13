@@ -13,7 +13,7 @@ Class Structure
 ---------------
 .. tip::
   The :ref:`march-hardware-builder-label` can help with the class structure of the hardware package,
-  especially when looking at an :hardware-interface:`example yaml <march_hardware_builder/src/robots/march4.yaml>`.
+  especially when looking at an :hardware-interface:`example yaml <march_hardware_builder/robots/march4.yaml>`.
 
 The highest level class is the MarchRobot, it contains a list of Joints which can be accessed.
 Each Joint is identified by a name and optionally has an IMotionCube and TemperatureGES.
