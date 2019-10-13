@@ -10,7 +10,8 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <depend>march_shared_resources</depend>
-  <depend>roslint</depend>
+
+  <build_depend>roslint</build_depend>
 
   <build_export_depend>robot_state_publisher</build_export_depend>
 
