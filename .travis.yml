@@ -17,11 +17,9 @@ notifications:
 env:
   global:
     - ROS_DISTRO=kinetic
-    - CI_SOURCE_PATH='$(pwd)'
-    - ROS_PARALLEL_JOBS='-j8 -l6'
-    - PYTHONPATH='$PYTHONPATH:/usr/lib/python2.7/dist-packages:/usr/local/lib/python2.7/dist-packages'
+    - CI_SOURCE_PATH="$(pwd)"
+    - PYTHONPATH="$PYTHONPATH:/usr/lib/python2.7/dist-packages:/usr/local/lib/python2.7/dist-packages"
     - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
-
 
 before_install:
   - sudo -E sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
