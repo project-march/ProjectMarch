@@ -11,12 +11,6 @@ notifications:
     secure: DiI/mSwPdfkwTxu3/JsCvIOFUW/PyEzJdmr19UA6afC7whLJuykj2Xz+dXCsABTk9DMwmI220epVPkKXmDJSgPGLvuMjvXYlWLXSYb3pqy7km6XXkEH3RxlS5FW/4ou2QlVEzFBHFg8Yr9KjT73KsXsbOSa3PQHtYBjMF5qflAjV83d6ZkRRQtkwfjdT6mtfw65XlpsZCcWa0xBvIL6FB7zUHL/SHCC2SSFV8YQwbW0hI6fzACP9S6Tt0kOq/pdnR6h/Tl9QVJXGHbLqcCQpCOKg14/QcJvhgDv9AHttn2y9qykd5L34jJuqJE+hNp1YTGY/vWV0WiC+Jtc5bDbqtgWXD96c8lH0oGMQ+7verrToljyLu98M7UlkhNCFWbJIrnL5HYsN27KfXzpO90t6m9JNPPf3qYurSswZn0Q4q8Zv0D8nCkyi7Rh6RlaiqGC4FddNdl2Ipaf7DqfKkYFiKy/MwzqFuQjGrFi+8TjmHErb8+zCwjVp8mAylpX+ZMJaoSEVk6CHtXLzdu5sO7E6/Gpbkq10Iv5KgHfllsMzdoY550a8KGr+Jm3EOZt9KE2vYMs7YA3CL5FLAi0HFQfA4L2MvbN5gfFTIGvWExTZdyiwu/cqY8Y20qBYXE3o8gvuTYkxwe4OpMNMMfH/e2hzZmGTDN7TtZbQlNriUoBOlRs=
   email: false
 
-# include the following block if the C/C++ build artifacts should get cached by Travis,
-# CCACHE_DIR needs to get set as well to actually fill the cache
-cache:
-  directories:
-    - $HOME/.ccache
-
 git:
   quiet: true # optional, silences the cloning of the target repository
 
@@ -25,13 +19,12 @@ git:
 env:
   global:
     - ROS_REPO=ros
-    - CCACHE_DIR=$HOME/.ccache # enables C/C++ caching in industrial_ci
     - BUILDER=colcon
     - CATKIN_LINT=pedantic
     - UPSTREAM_WORKSPACE='dependencies.rosinstall -march-iv/march_description -march-iv/march_gait_scheduler -march-iv/march_gait_selection -march-iv/march_launch -march-iv/march_rqt_gait_selection -march-iv/march_rqt_input_device -march-iv/march_rqt_training_log -march-iv/march_safety -march-iv/march_sound_scheduler'
-  matrix:
-    - ROS_DISTRO=kinetic AFTER_RUN_TARGET_TEST="cd /root/target_ws && export PYTHONPATH=/opt/ros/kinetic/lib/python2.7/dist-packages && colcon build --cmake-target-skip-unavailable --cmake-target roslint"
-    - ROS_DISTRO=melodic AFTER_RUN_TARGET_TEST="cd /root/target_ws && export PYTHONPATH=/opt/ros/melodic/lib/python2.7/dist-packages && colcon build --cmake-target-skip-unavailable --cmake-target roslint"
+  matri:
+    - ROS_DISTRO=kinetic AFTER_RUN_TARGET_TEST="cd /root/target_ws && export PYTHONPATH=/opt/ros/kinetic/lib/python2.7/dist-packages && colcon build --event-handlers status- desktop_notification- --cmake-target-skip-unavailable --cmake-target roslint"
+    - ROS_DISTRO=melodic AFTER_RUN_TARGET_TEST="cd /root/target_ws && export PYTHONPATH=/opt/ros/melodic/lib/python2.7/dist-packages && colcon build --event-handlers status- desktop_notification- --cmake-target-skip-unavailable --cmake-target roslint"
 
 # clone and run industrial_ci
 install:
