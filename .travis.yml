@@ -8,40 +8,25 @@ rvm:
   - 2.4
 python:
   - "2.7"
-compiler:
-  - gcc
 
 notifications:
   slack:
     secure: n1ryyjsiSykennfhd/xLqsT4Hs7gkiCiILByK7AoeazJ+rtvAkoH9RQBlSoakUGrwfv7/m67gnHEJzjADUylq0OBcQ6xnA5Acflet4Sn8ZZY8l9uB9ryQ67S6KC8NNP67tr1KQtB0fYnXk/PIAKseEjfDlTzoHIiFeI+0SruYkXAF/Pm7tuXUAgRww6S4Tl1r2nAn8yhjYPttDMORmVMcJdRS/fx5J2Iqo6I4J8tHQDGM4kJHGfKdbLiY754ObC3lTYmYFDAx3c2TG8ZSP0GP2KGYGJ17e9W7KgYrC9Nihguxc1mp4lhWJHlL4KO5NFbl1zrwQl1CRIQJ5mvLtEx3/FyQOkR50voP5nveKCdcE2tPeMhZ7L+RTUO9sLvamiBEV2eYkmWVkjfeTrkpvBH6NkaiYW6vxztu2hIHgFB8Ys82CPY5zcr3jm75i4eLdN/RAji0bKi5i5JKPCO+ZjDrhAGaB53odoqpG+yyr/8yGz5F4nBwDE64Nr2XlWn91m2wunNP9UD51bbGhp9q2k1Ivc451jx9euZyOKK62KruHwcCgvo6mgb06m8keitU6J/6s+urVmjXpDUGH8xjhxyX7GaCmCmT8DZbkBhb6tDXFY3K3x9rrPzFFaIIlHNskVx5J5S8LcIQxKW95euz7XV3nt0r3e3NEcxLtzi3QfA88Y=
+  email: false
 
 env:
   global:
-    ROS_DISTRO: kinetic
-    ROS_CI_DESKTOP: "`lsb_release -cs`"
-    CI_SOURCE_PATH: "$(pwd)"
-    ROSINSTALL_FILE: "$CI_SOURCE_PATH/dependencies.rosinstall"
-    CATKIN_OPTIONS: "$CI_SOURCE_PATH/catkin.options"
-    ROS_PARALLEL_JOBS: "-j8 -l6"
-    PYTHONPATH: "$PYTHONPATH:/usr/lib/python2.7/dist-packages:/usr/local/lib/python2.7/dist-packages"
-    NOKOGIRI_USE_SYSTEM_LIBRARIES: true
-    BRANCH: $TRAVIS_BRANCH
+    - ROS_DISTRO=kinetic
+    - CI_SOURCE_PATH='$(pwd)'
+    - ROS_PARALLEL_JOBS='-j8 -l6'
+    - PYTHONPATH='$PYTHONPATH:/usr/lib/python2.7/dist-packages:/usr/local/lib/python2.7/dist-packages'
+    - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
 
 
-before_install: # Use this to prepare the system to install prerequisites or dependencies
-  # Define some config vars
-  - export NOKOGIRI_USE_SYSTEM_LIBRARIES=true
-  - export CI_SOURCE_PATH=$(pwd)
-  - export REPOSITORY_NAME=${PWD##*/}
-  - echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
+before_install:
   - sudo -E sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
   - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
   - sudo apt-get update -qq
-  - sudo apt-get install -qq -y python-rosdep python-wstool python-catkin-tools
-
-  # Setup rosdep
-  - sudo rosdep init
-  - rosdep update
   # Install htmlproofer
   - gem update --system
   - gem --version
@@ -53,8 +38,6 @@ before_install: # Use this to prepare the system to install prerequisites or dep
 install:
   # Install additional dependencies
   - ./install.sh
-
-#before_script:
 
 script:
   # Test build with non-ROS wrapped Sphinx command to allow warnings and errors to be caught
