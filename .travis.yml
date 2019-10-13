@@ -29,10 +29,9 @@ env:
     - BUILDER=colcon
     - CATKIN_LINT=pedantic
     - UPSTREAM_WORKSPACE='dependencies.rosinstall -march-iv/march_description -march-iv/march_gait_scheduler -march-iv/march_gait_selection -march-iv/march_launch -march-iv/march_rqt_gait_selection -march-iv/march_rqt_input_device -march-iv/march_rqt_training_log -march-iv/march_safety -march-iv/march_sound_scheduler'
-    - AFTER_RUN_TARGET_TEST="cd $target_ws && rosenv && source /opt/ros/$ROS_DISTRO/setup.bash && colcon build --cmake-target-skip-unavailable --cmake-target roslint"
   matrix:
-    - ROS_DISTRO=kinetic
-    - ROS_DISTRO=melodic
+    - ROS_DISTRO=kinetic AFTER_RUN_TARGET_TEST="cd $target_ws && source /opt/ros/kinetic/setup.bash && colcon build --cmake-target-skip-unavailable --cmake-target roslint"
+    - ROS_DISTRO=melodic AFTER_RUN_TARGET_TEST="cd $target_ws && source /opt/ros/melodic/setup.bash && colcon build --cmake-target-skip-unavailable --cmake-target roslint"
 
 # clone and run industrial_ci
 install:
