@@ -11,9 +11,9 @@ This tutorial will help you set up a ROS workspace with all packages needed to r
 .. note:: If you already have ros installed and are familiar with ros installations, you can skip to the :ref:`automated-script-label` below.
   We strongly recommend to follow the manual guide at least once to familiarize yourself with the commands.
 
-Install ROS and Catkin
+Install ROS and Colcon
 ^^^^^^^^^^^^^^^^^^^^^^
-`Install ROS Kinetic <http://wiki.ros.org/kinetic/Installation/Ubuntu>`_.
+`Install ROS Kinetic <https://wiki.ros.org/kinetic/Installation/Ubuntu>`_.
 It is easy to miss steps when going through the ROS installation tutorial. If you run into errors in the next few steps, a good place to start is to go back and make sure you have installed ROS correctly.
 
 Once you have ROS installed, make sure you have the most up to date packages:
@@ -24,11 +24,14 @@ Once you have ROS installed, make sure you have the most up to date packages:
   sudo apt-get update
   sudo apt-get dist-upgrade
 
-Install `catkin <http://wiki.ros.org/catkin>`_ the ROS build system:
+For building our packages we use colcon. Install `colcon <https://github.com/colcon>`_:
 
 .. code::
 
-  sudo apt-get install ros-kinetic-catkin python-catkin-tools
+  sudo apt-get install python3-colcon-common-extensions
+  # The following two steps are only necessary on ROS Kinetic
+  sudo apt-get install python3-pip
+  pip3 install -U setuptools
 
 Install catkin lint and documentation:
 
@@ -49,26 +52,20 @@ Install catkin lint and documentation:
 
     pip3 install --user catkin_tools_document
 
-Install additional ROS Kinetic packages:
 
-.. code::
-
-  sudo apt-get install ros-kinetic-ros-control ros-kinetic-ros-controllers ros-kinetic-effort-controllers ros-kinetic-joint-state-controller ros-kinetic-joint-trajectory-controller
-
-Create A Catkin Workspace
+Create A Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-You will need to have a `catkin <http://wiki.ros.org/catkin>`_ workspace setup:
+You will need to have a ROS workspace setup:
 
 .. code::
 
   mkdir -p ~/march_ws/src
   cd march_ws
-  catkin init --workspace .
-  catkin build
+
 
 Download the march source code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-We us `wstool <http://wiki.ros.org/wstool>`_ to easily maintain the multiple repositories in our workspace.
+We use `wstool <http://wiki.ros.org/wstool>`_ to easily maintain the multiple repositories in our workspace.
 The process differs a bit, depending on if you have write access to our repositories or not.
 
 With write access
@@ -79,6 +76,14 @@ If you have write access, you can use our provided ``.rosinstall`` file to pull 
 
   wstool init src https://raw.githubusercontent.com/project-march/tutorials/develop/doc/getting_started/.rosinstall
   wstool update -t src
+
+The above rosinstall file uses https URLs to the git repositories. If you prefer ssh URLs use the following commands:
+
+.. code::
+
+  wstool init src https://raw.githubusercontent.com/project-march/tutorials/develop/doc/getting_started/ssh.rosinstall
+  wstool update -t src
+
 
 Without write access
 --------------------
@@ -102,9 +107,10 @@ Then call wstool with your edited ``.rosinstall`` file:
   wstool init src ~/local/path/to/the/edited/.rosinstall
   wstool update -t src
 
-.. _build-your-catkin-workspace-label:
 
-Build your Catkin Workspace
+.. _build-your-workspace-label:
+
+Build your Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The following will install from Debian any package dependencies not already in your workspace:
 
@@ -112,24 +118,23 @@ The following will install from Debian any package dependencies not already in y
 
   rosdep install -y --from-paths src --ignore-src --rosdistro kinetic
 
-The next command will configure your catkin workspace:
+The next command will build and install your workspace:
 
 .. code::
 
-  catkin build
+  colcon build
 
-In order for catkin to know where your files are located, you have to provide a source. You do this with:
-:code:`source ~/path/to/your/repo/march-iv/march_ws/devel/setup.bash`.
+In order for ROS to know where your files are installed, you have to provide a source. You do this with:
+:code:`source ~/march_ws/install/setup.bash`.
 
 This needs to be done for every new terminal you open, so it is advised to
 `add this command to your <https://answers.ros.org/question/206876/how-often-do-i-need-to-source-setupbash/?answer=206976#post-id-206976>`_
 :code:`~/.bashrc`, which is an Ubuntu script ran every time a new terminal is started. Restart your terminal after doing this.
 
-.. note:: If your top level cmake is missing. run this command ``ln -s /opt/ros/kinetic/share/catkin/cmake/toplevel.cmake ./CMakeLists.txt`` in your march_ws/src directory
-
 .. note:: Sourcing the ``setup.bash`` automatically in your ``~/.bashrc`` is
    not required and often skipped by advanced users who use more than one
    catkin workspace at a time, but we recommend it for simplicity.
+
 
 .. _automated-script-label:
 
