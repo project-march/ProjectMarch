@@ -29,6 +29,6 @@ env:
 
 # clone and run industrial_ci
 install:
-  - git clone --quiet --depth 1 https://github.com/industrial_ci/industrial_ci.git .industrial_ci -b master
+  - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci -b master
 script:
   - .industrial_ci/travis.sh
