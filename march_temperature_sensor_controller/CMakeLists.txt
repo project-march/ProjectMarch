@@ -4,7 +4,6 @@ project(march_temperature_sensor_controller)
 add_compile_options(-std=c++11 -Wall -g)
 
 find_package(catkin REQUIRED COMPONENTS
-    code_coverage
     controller_interface
     hardware_interface
     march_hardware_interface
@@ -12,7 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
     realtime_tools
     roscpp
     roslint
-    rostest
     sensor_msgs
 )
 
@@ -20,12 +18,6 @@ catkin_package(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
     CATKIN_DEPENDS 
-    controller_interface
-    hardware_interface
-    march_hardware_interface
-    pluginlib
-    realtime_tools
-    roscpp
     sensor_msgs
 )
 
@@ -62,6 +54,8 @@ install(FILES march_temperature_sensor_plugin.xml
 
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
+    find_package(code_coverage REQUIRED)
+    find_package(rostest REQUIRED)
 
     if(ENABLE_COVERAGE_TESTING)
         include(CodeCoverage)
