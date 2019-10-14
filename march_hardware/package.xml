@@ -12,16 +12,11 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>roscpp</build_depend>
-  <build_depend>soem</build_depend>
-  <build_depend>code_coverage</build_depend>
+  <depend>roscpp</depend>
+  <depend>soem</depend>
+
   <build_depend>roslint</build_depend>
-  <build_depend>rostest</build_depend>
 
-  <build_export_depend>roscpp</build_export_depend>
-  <build_export_depend>soem</build_export_depend>
-  <build_export_depend>rostest</build_export_depend>
-
-  <exec_depend>roscpp</exec_depend>
-  <exec_depend>soem</exec_depend>
+  <test_depend>rostest</test_depend>
+  <test_depend>code_coverage</test_depend>
 </package>

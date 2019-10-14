@@ -4,18 +4,14 @@ project(march_hardware)
 add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
-    code_coverage
     roscpp
     roslint
-    rostest
     soem
 )
 
 catkin_package(
     INCLUDE_DIRS include
     CATKIN_DEPENDS
-    roscpp
-    soem
     LIBRARIES ${PROJECT_NAME}
 )
 
@@ -91,6 +87,8 @@ install(TARGETS slave_count_check
 
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
+    find_package(code_coverage REQUIRED)
+    find_package(rostest REQUIRED)
 
     if(ENABLE_COVERAGE_TESTING)
         include(CodeCoverage)
@@ -120,7 +118,7 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} ${PROJECT_NAME} gtest)
 
     if(ENABLE_COVERAGE_TESTING)
-        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*" "*/${PROJECT_NAME}/soem*")
+        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*")
         add_code_coverage(
             NAME ${PROJECT_NAME}_coverage
             DEPENDS tests
