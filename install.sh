@@ -3,4 +3,4 @@
 # Exit on the first error
 set -e
 
-pip install --user pygit2 sphinx-copybutton
+python -m pip install --user pygit2 sphinx-copybutton
