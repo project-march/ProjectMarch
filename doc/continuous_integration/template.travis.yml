@@ -1,0 +1,34 @@
+# This config uses industrial_ci (https://github.com/ros-industrial/industrial_ci.git).
+# For troubleshooting, see readme (https://github.com/ros-industrial/industrial_ci/blob/master/README.rst)
+
+language: generic # optional, just removes the language badge
+
+services:
+  - docker
+
+notifications:
+  slack:
+    secure: <secure string>
+  email: false
+
+git:
+  quiet: true # optional, silences the cloning of the target repository
+
+# configure the build environment(s)
+# https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#variables-you-can-configure
+env:
+  global:
+    - ROS_REPO=ros
+    - BUILDER=colcon
+    - CATKIN_LINT=pedantic
+    - UPSTREAM_WORKSPACE='dependencies.rosinstall'
+    - AFTER_SCRIPT='builder_run_build "$target_ws/install" "$target_ws" --cmake-target-skip-unavailable --cmake-target roslint'
+  matrix:
+    - ROS_DISTRO=kinetic
+    - ROS_DISTRO=melodic
+
+# clone and run industrial_ci
+install:
+  - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci -b master
+script:
+  - .industrial_ci/travis.sh
