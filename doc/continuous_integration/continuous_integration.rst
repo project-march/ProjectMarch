@@ -13,7 +13,7 @@ Before reading this tutorial it is useful to read the documentation on `Travis C
 
 Setup
 ^^^^^
-The march repositories all use `open source Travis CI <https://travis-ci.org/project-march>`_
+The march repositories all use `open source Travis CI <https://travis-ci.com/project-march>`_
 for builds, which run on commit pushes. There are no extra builds configured
 for pull requests since branches have to be up to date with the target branch
 in order to merge. You can download a template :codedir:`.travis.yml <continuous_integration/template.travis.yml>`
@@ -93,7 +93,7 @@ These steps assume you already have a public Project March repository with ROS
 packages and you are a member of the Project March organization on GitHub.
 
 1. Go to `Project March Travis CI settings
-   <https://travis-ci.org/organizations/project-march/repositories>`_
+   <https://travis-ci.com/organizations/project-march/repositories>`_
 2. Enable Travis for your repository
 3. Travis will only start building once a ``.travis.yml`` file is present in
    the master branch, so add the template to the root of your repository.
