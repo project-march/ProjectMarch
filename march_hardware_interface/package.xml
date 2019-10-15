@@ -8,32 +8,22 @@
 
   <license>TODO</license>
 
-  <depend>realtime_tools</depend>
-  <build_depend>march_shared_resources</build_depend>
-
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>code_coverage</build_depend>
-  <build_depend>roscpp</build_depend>
+
+  <depend>roscpp</depend>
+  <depend>std_msgs</depend>
+  <depend>joint_limits_interface</depend>
+  <depend>controller_manager</depend>
+  <depend>realtime_tools</depend>
+  <depend>control_toolbox</depend>
+  <depend>urdf</depend>
+  <depend>march_shared_resources</depend>
+  <depend>march_description</depend>
+  <depend>march_hardware</depend>
+  <depend>march_hardware_builder</depend>
+
   <build_depend>roslint</build_depend>
-  <build_depend>rostest</build_depend>
-  <build_depend>urdf</build_depend>
 
-  <build_depend>std_msgs</build_depend>
-  <build_depend>controller_manager</build_depend>
-  <build_depend>march_hardware</build_depend>
-  <build_depend>march_hardware_builder</build_depend>
-  <build_export_depend>roscpp</build_export_depend>
-  <build_export_depend>std_msgs</build_export_depend>
-
-
-  <exec_depend>roscpp</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
-  <exec_depend>march_description</exec_depend>
-  <exec_depend>controller_manager</exec_depend>
-
-  <!-- The export tag contains other, unspecified, tags -->
-  <export>
-    <!-- Other tools can request additional information be placed here -->
-
-  </export>
+  <test_depend>rostest</test_depend>
+  <test_depend>code_coverage</test_depend>
 </package>

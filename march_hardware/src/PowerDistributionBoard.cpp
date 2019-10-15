@@ -14,6 +14,7 @@ PowerDistributionBoard::PowerDistributionBoard(int slaveIndex, NetMonitorOffsets
   this->netDriverOffsets = netDriverOffsets;
   this->highVoltage = HighVoltage(slaveIndex, netMonitoringOffsets, netDriverOffsets);
   this->lowVoltage = LowVoltage(slaveIndex, netMonitoringOffsets, netDriverOffsets);
+  this->masterOnlineToggle = false;
 }
 
 float PowerDistributionBoard::getPowerDistributionBoardCurrent()

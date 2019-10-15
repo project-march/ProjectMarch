@@ -4,7 +4,6 @@ project(march_hardware_state_controller)
 add_compile_options(-std=c++11 -Wall -g)
 
 find_package(catkin REQUIRED COMPONENTS
-    code_coverage
     controller_interface
     hardware_interface
     march_hardware_interface
@@ -12,19 +11,12 @@ find_package(catkin REQUIRED COMPONENTS
     realtime_tools
     roscpp
     roslint
-    rostest
 )
 
 catkin_package(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
     CATKIN_DEPENDS
-    controller_interface
-    hardware_interface
-    march_hardware_interface
-    pluginlib
-    realtime_tools
-    roscpp
 )
 
 set(ROSLINT_CPP_OPTS "--filter=-build/include,-build/header_guard,-runtime/references" "--linelength=120")
@@ -59,6 +51,8 @@ install(FILES march_hardware_state_plugin.xml
 
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
+    find_package(code_coverage REQUIRED)
+    find_package(rostest REQUIRED)
 
     if(ENABLE_COVERAGE_TESTING)
         include(CodeCoverage)
