@@ -4,18 +4,15 @@ project(march_hardware_builder)
 add_compile_options(-std=c++11 -Wall -g)
 
 find_package(catkin REQUIRED COMPONENTS
-    code_coverage
     march_hardware
     roscpp
     roslib
     roslint
-    rostest
 )
 
 catkin_package(
     INCLUDE_DIRS include
     CATKIN_DEPENDS
-    roscpp
     LIBRARIES ${PROJECT_NAME}
 )
 
@@ -58,6 +55,8 @@ install(TARGETS ${PROJECT_NAME}
 
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
+    find_package(code_coverage REQUIRED)
+    find_package(rostest REQUIRED)
 
     if(ENABLE_COVERAGE_TESTING)
         include(CodeCoverage)

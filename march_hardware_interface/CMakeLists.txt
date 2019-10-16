@@ -4,15 +4,16 @@ project(march_hardware_interface)
 add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
-    code_coverage
+    control_toolbox
     controller_manager
+    joint_limits_interface
+    march_description
     march_hardware
     march_hardware_builder
     march_shared_resources
     realtime_tools
     roscpp
     roslint
-    rostest
     std_msgs
     urdf
 )
@@ -20,7 +21,16 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
     INCLUDE_DIRS include
     CATKIN_DEPENDS
+    controller_manager
+    joint_limits_interface
+    march_description
+    march_hardware
+    march_hardware_builder
+    march_shared_resources
+    realtime_tools
+    roscpp
     std_msgs
+    urdf
 )
 
 set(ROSLINT_CPP_OPTS "--filter=-build/include,-build/header_guard,-runtime/references" "--linelength=120")
@@ -59,6 +69,8 @@ install(DIRECTORY config launch
 
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
+    find_package(code_coverage REQUIRED)
+    find_package(rostest REQUIRED)
 
     if(ENABLE_COVERAGE_TESTING)
         include(CodeCoverage)
