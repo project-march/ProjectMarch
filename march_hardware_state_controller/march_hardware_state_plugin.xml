@@ -1,7 +1,0 @@
-<library path="lib/libmarch_hardware_state_controller">
-  <class name="march_hardware_state_controller/MarchHardwareStateController" type="march_hardware_state_controller::MarchHardwareStateController" base_class_type="controller_interface::ControllerBase">
-  <description>
-    This controller publishes the hardware state of the exoskeleton
-  </description>
-  </class>
-</library>
