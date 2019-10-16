@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
+sudo apt-get update
 
-sudo apt-get install python-catkin-tools -y
-pip install --user catkin_lint
-pip install --user catkin_tools_document
+sudo apt-get install -y python3-colcon-common-extensions python3-pip
+pip3 install -U setuptools catkin_lint catkin_tools_document
 
-source /opt/ros/kinetic/setup.bash
-mkdir -p march_ws/src
-cd march_ws
-catkin init --workspace .
-catkin build
+mkdir -p ~/march_ws/src
+cd ~/march_ws
+
 wstool init src https://raw.githubusercontent.com/project-march/tutorials/develop/doc/getting_started/.rosinstall
 wstool update -t src
 
 # Install dependencies
 rosdep install --from-paths src --ignore-src --rosdistro kinetic -y
-catkin build
-source devel/setup.bash
+
+colcon build
+source install/setup.bash

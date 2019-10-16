@@ -40,7 +40,7 @@ There are four main ways to interact with the hardware builder:
     HardwareBuilder hardwareBuilder = HardwareBuilder("path/to/robot/march4.yaml");
     marchRobot = hardwareBuilder.createMarchRobot();
 
-  An example yaml file can be seen in :hardware-interface:`src/robots/march4.yaml <march_hardware_builder/src/robots/march4.yaml>`
+  An example yaml file can be seen in :hardware-interface:`robots/march4.yaml <march_hardware_builder/robots/march4.yaml>`
 
 * Instantiate empty. This function is mostly used for testing wrongly configured robots and is not needed in a release.
 

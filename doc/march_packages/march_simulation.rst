@@ -19,7 +19,7 @@ The :simulation:`config files <march_simulation/config>` contain example control
 Upload joint names
 ^^^^^^^^^^^^^^^^^^
 
-The :simulation:`upload_joint_names.py <march_simulation/src/upload_joint_names.py>` script loads the URDF and uploads the joint names to the topic ``/march/joint_names``.
+The :simulation:`upload_joint_names <march_simulation/scripts/upload_joint_names>` script loads the URDF and uploads the joint names to the topic ``/march/joint_names``.
 This is used by the rest of the system to check which joints are active.
 
 Tutorials
