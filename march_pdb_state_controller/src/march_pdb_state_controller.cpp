@@ -139,6 +139,7 @@ void MarchPdbStateController::update(const ros::Time& time, const ros::Duration&
       // we're actually publishing, so increment time
       last_publish_times_ = last_publish_times_ + ros::Duration(1.0 / publish_rate_);
       march4cpp::PowerDistributionBoard* pBoard = pdb_state_.getPowerDistributionBoard();
+      realtime_pubs_->msg_.header.stamp = ros::Time::now();
       realtime_pubs_->msg_.low_voltage_nets = createLowVoltageNetsMessage(pBoard->getLowVoltage());
       realtime_pubs_->msg_.high_voltage_nets = createHighVoltageNetsMessage(pBoard->getHighVoltage());
       realtime_pubs_->msg_.master_shutdown_requested = pBoard->getMasterShutdownRequested();
