@@ -1,2 +1,2 @@
 gaits:
-  home: {home_sit: MIV_ankle_2.5, home_stand: MIV_ankle_2.5}
+  home: {home_sit: MIV_ankle_2.5, home_stand: MIV_ankle_2.0}
