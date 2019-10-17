@@ -46,10 +46,10 @@ Published Topics
 */march/input_device/alive* (`std_msgs/Empty <http://docs.ros.org/kinetic/api/std_msgs/html/msg/Empty.html>`_)
   Publish empty alive messages so the Safety node doesn't throw a warning.
 
-*/march/input_device/instruction* (:march-iv:`march_shared_resources/GaitInstruction <march_shared_resources/msg/GaitInstruction.msg>`)
+*/march/input_device/instruction* (:march:`march_shared_resources/GaitInstruction <march_shared_resources/msg/GaitInstruction.msg>`)
   Send instructions to the state machine.
 
-*/march/error* (:march-iv:`march_shared_resources/Error <march_shared_resources/msg/Error.msg>`)
+*/march/error* (:march:`march_shared_resources/Error <march_shared_resources/msg/Error.msg>`)
   Throw a fake error for the state machine to react to.
 
 
@@ -63,7 +63,7 @@ Add a new button
 In this tutorial we will add a new button which will have a custom callback that publishes on a new topic
 Our button will publish a boolean message if this tutorial works on the topic ``/march/this/tutorial/works``
 
-We only need to add code to :march-iv:`input_device.py <march_rqt_input_device/src/march_rqt_input_device/input_device.py>`.
+We only need to add code to :monitor:`input_device.py <march_rqt_input_device/src/march_rqt_input_device/input_device.py>`.
 Make sure to check this file before you start as it contains many examples of existing buttons.
 
 .. hint::

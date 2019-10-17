@@ -49,10 +49,10 @@ Nodes
 Published Topics
 ^^^^^^^^^^^^^^^^
 
-*/march/error* (:march-iv:`march_shared_resources/Error <march_shared_resources/msg/Error.msg>`)
+*/march/error* (:march:`march_shared_resources/Error <march_shared_resources/msg/Error.msg>`)
   Publish error for other packages to make it able to respond to errors. This error message is also logged.
 
-*/march/input_device/instruction* (:march-iv:`march_shared_resources/GaitInstruction <march_shared_resources/msg/GaitInstruction.msg>`)
+*/march/input_device/instruction* (:march:`march_shared_resources/GaitInstruction <march_shared_resources/msg/GaitInstruction.msg>`)
   Send instructions to the state machine. This topic is only used to send an stop instruction.
 
 Tutorials

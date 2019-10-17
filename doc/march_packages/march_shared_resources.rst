@@ -9,8 +9,8 @@ march_shared_resources is a static package which contains custom ROS `messages <
 
 All messages, services and actions should be self documenting.
 
-:march-iv:`messages <march_shared_resources/msg>`
+:march:`messages <march_shared_resources/msg>`
 
-:march-iv:`services <march_shared_resources/srv>`
+:march:`services <march_shared_resources/srv>`
 
-:march-iv:`actions <march_shared_resources/action>`
+:march:`actions <march_shared_resources/action>`
