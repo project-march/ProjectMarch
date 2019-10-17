@@ -1,3 +1,0 @@
-<launch>
-    <test test-name="march_hardware_state_controller_test" pkg="march_hardware_state_controller" type="march_hardware_state_controller-test"/>
-</launch>
