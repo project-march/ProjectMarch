@@ -1,0 +1,27 @@
+<launch>
+    <rosparam file="$(find march_hardware_interface)/config/test_joint_linear/controllers.yaml" command="load"/>
+
+    <!-- Load the URDF into the ROS Parameter Server -->
+    <param name="robot_description"
+           command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/test-joint-linear.xacro'" />
+
+    <node
+            pkg="rosbag"
+            name="record"
+            type="record"
+            output="screen"
+            args="-o /home/projectmarch/Documents/logs/Testjoint.bag /march/controller/trajectory/state /clock"
+    />
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="true" output="screen" ns="/"
+          args="
+                /march/controller/joint_state
+                /march/controller/temperature_sensor
+                /march/controller/trajectory
+            "/>
+
+    <node launch-prefix="ethercat_grant" name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" args="testjoint_linear" output="screen"/>
+
+</launch>

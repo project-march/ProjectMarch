@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>march_hardware_interface</name>
+  <version>0.0.0</version>
+  <description>A bridge between ros_control and the march_hardware</description>
+
+  <maintainer email="software@projectmarch.nl">Project March</maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>roscpp</depend>
+  <depend>std_msgs</depend>
+  <depend>joint_limits_interface</depend>
+  <depend>controller_manager</depend>
+  <depend>realtime_tools</depend>
+  <depend>control_toolbox</depend>
+  <depend>urdf</depend>
+  <depend>march_shared_resources</depend>
+  <depend>march_description</depend>
+  <depend>march_hardware</depend>
+  <depend>march_hardware_builder</depend>
+
+  <build_depend>roslint</build_depend>
+
+  <test_depend>rostest</test_depend>
+  <test_depend>code_coverage</test_depend>
+</package>

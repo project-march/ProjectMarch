@@ -1,0 +1,11 @@
+<launch>
+    <rosparam file="$(find march_hardware_interface)/config/test_setup/controllers.yaml" command="load"/>
+
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="true" output="screen" ns="/"
+          args="
+                /march/controller/pdb_state
+            "/>
+
+    <node launch-prefix="ethercat_grant" name="march_hardware_interface" pkg="march_hardware_interface" type="march_hardware_interface_node" args="pdb" output="screen"/>
+
+</launch>
