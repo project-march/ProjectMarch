@@ -12,18 +12,17 @@
     uri: git@github.com:project-march/hardware-interface.git
     version: develop
 - git:
-    local-name: march-iv
-    uri: git@github.com:project-march/march-iv.git
+    local-name: march
+    uri: git@github.com:project-march/march.git
     version: develop
 - git:
     local-name: march_tutorials
     uri: git@github.com:project-march/tutorials.git
+- git:
+    local-name: monitor
+    uri: git@github.com:project-march/monitor.git
     version: develop
 - git:
     local-name: simulation
     uri: git@github.com:project-march/simulation.git
-    version: develop
-- git:
-    local-name: state-machine
-    uri: git@github.com:project-march/state-machine.git
     version: develop

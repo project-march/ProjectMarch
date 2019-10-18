@@ -16,9 +16,9 @@ This can be run wired via usb cable or wireless via wifi connection.
 
 Sending messages
 ^^^^^^^^^^^^^^^^
-:march-iv:`Gait Instruction Message <march_shared_resources/msg/GaitInstruction.msg>` This is a instruction to start the sent gait right now, if this is possible.
+:march:`Gait Instruction Message <march_shared_resources/msg/GaitInstruction.msg>` This is a instruction to start the sent gait right now, if this is possible.
 
-:march-iv:`Stop Message <march_shared_resources/msg/GaitInstruction.msg>` This message can stop a repeating gait (such as walk). After receiving the stop message the exoskeleton will go to the standing pose.
+:march:`Stop Message <march_shared_resources/msg/GaitInstruction.msg>` This message can stop a repeating gait (such as walk). After receiving the stop message the exoskeleton will go to the standing pose.
 
 .. todo:: (Tim) link this to the march_safety documentation.
 

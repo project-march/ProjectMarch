@@ -63,7 +63,7 @@ against those. This type of workspace is used for example by
 The other type of workspace that can be used is the ``DOWNSTREAM_WORKSPACE``.
 The downstream workspace contains packages that depend on the current package.
 It builds and runs tests on downstream packages to check if there are any
-breaking changes. This is currently only used in :march-iv:`march-iv <.travis.yml>`.
+breaking changes. This is currently only used in :march:`march <.travis.yml>`.
 
 Finally there is the ``AFTER_SCRIPT`` option. This runs the given script after
 all the default tests. Currently it is set in the template to run roslint on

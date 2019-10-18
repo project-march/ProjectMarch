@@ -11,20 +11,17 @@
     uri: https://github.com/project-march/hardware-interface
     version: develop
 - git:
-    local-name: march-iv
-    uri: https://github.com/project-march/march-iv
+    local-name: march
+    uri: https://github.com/project-march/march
+    version: develop
+- git:
+    local-name: monitor
+    uri: https://github.com/project-march/monitor
     version: develop
 - git:
     local-name: simulation
     uri: https://github.com/project-march/march-simulation
     version: develop
 - git:
-    local-name: state-machine
-    uri: https://github.com/project-march/state-machine
-    version: develop
-- git:
     local-name: march_tutorials
     uri: https://github.com/project-march/tutorials
-    version: develop
-
-
