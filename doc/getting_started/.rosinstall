@@ -25,4 +25,3 @@
 - git:
     local-name: march_tutorials
     uri: https://github.com/project-march/tutorials
-    version: develop

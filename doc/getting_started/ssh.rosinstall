@@ -18,7 +18,6 @@
 - git:
     local-name: march_tutorials
     uri: git@github.com:project-march/tutorials.git
-    version: develop
 - git:
     local-name: monitor
     uri: git@github.com:project-march/monitor.git
