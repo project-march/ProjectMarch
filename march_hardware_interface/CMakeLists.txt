@@ -7,6 +7,8 @@ find_package(catkin REQUIRED COMPONENTS
     control_toolbox
     controller_manager
     joint_limits_interface
+    joint_state_controller
+    joint_trajectory_controller
     march_description
     march_hardware
     march_hardware_builder
