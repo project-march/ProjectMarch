@@ -6,6 +6,8 @@ find_package(catkin REQUIRED COMPONENTS
     gazebo_plugins
     gazebo_ros
     gazebo_ros_control
+    joint_state_controller
+    joint_trajectory_controller
     march_description
     robot_state_publisher
     xacro
