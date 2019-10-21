@@ -15,4 +15,7 @@
     <depend>march_description</depend>
     <depend>robot_state_publisher</depend>
     <depend>xacro</depend>
+
+    <exec_depend>joint_state_controller</exec_depend>
+    <exec_depend>joint_trajectory_controller</exec_depend>
 </package>
