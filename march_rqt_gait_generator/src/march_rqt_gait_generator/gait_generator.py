@@ -80,7 +80,7 @@ class GaitGeneratorPlugin(Plugin):
         self.stop_button = self._widget.RvizFrame.findChild(QPushButton, "Stop")
         self.undo_button = self._widget.RvizFrame.findChild(QPushButton, "Undo")
         self.redo_button = self._widget.RvizFrame.findChild(QPushButton, "Redo")
-        self.playback_speed_line_edit = self._widget.RvizFrame.findChild(QSpinBox, "PlaybackSpeed")
+        self.playback_speed_spin_box = self._widget.RvizFrame.findChild(QSpinBox, "PlaybackSpeed")
         self.topic_name_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "TopicName")
         self.gait_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Gait")
         self.subgait_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait")
@@ -126,8 +126,8 @@ class GaitGeneratorPlugin(Plugin):
         self.redo_button.clicked.connect(self.redo)
 
         # Line edits / spin boxes
-        self.playback_speed_line_edit.valueChanged.connect(
-            lambda: self.set_playback_speed(self.playback_speed_line_edit.value())
+        self.playback_speed_spin_box.valueChanged.connect(
+            lambda: self.set_playback_speed(self.playback_speed_spin_box.value())
         )
         self.topic_name_line_edit.editingFinished.connect(
             lambda: self.set_topic_name(self.topic_name_line_edit.text())
