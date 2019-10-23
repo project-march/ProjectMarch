@@ -1,0 +1,4 @@
+- git:
+    local-name: march
+    uri: https://github.com/project-march/march
+    version: develop
