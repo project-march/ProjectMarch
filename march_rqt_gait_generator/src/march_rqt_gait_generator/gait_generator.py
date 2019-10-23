@@ -52,10 +52,7 @@ class GaitGeneratorPlugin(Plugin):
         self.gait = GaitFactory.empty_gait(self, self.robot, self.DEFAULT_GAIT_DURATION)
 
         self.build_ui(context)
-
-        # Initialize the publisher on startup
         self.set_topic_name(self.topic_name_line_edit.text())
-
         self.load_gait_into_ui()
 
     # Called by __init__
@@ -178,9 +175,7 @@ class GaitGeneratorPlugin(Plugin):
         self.duration_spin_box.setValue(self.gait.duration)
         self.duration_spin_box.blockSignals(False)
 
-        print ('load gait into ui')
         self.create_joint_settings()
-
         self.publish_preview()
 
     # Called by load_gait_into_ui.
@@ -246,15 +241,17 @@ class GaitGeneratorPlugin(Plugin):
         self.redo_button.clicked.connect(update_joint_ui)
 
         self.velocity_markers_check_box.stateChanged.connect(
-            lambda: [joint.set_setpoints(UserInterfaceController.plot_to_setpoints(joint_setting_plot)),
-                     update_joint_ui()
-                     ])
+            lambda: [
+                joint.set_setpoints(UserInterfaceController.plot_to_setpoints(joint_setting_plot)),
+                update_joint_ui()
+            ])
 
         # Connect a function to update the model and to update the table.
         joint_setting_plot.plot_item.sigPlotChanged.connect(
-            lambda: [joint.set_setpoints(UserInterfaceController.plot_to_setpoints(joint_setting_plot)),
-                     update_joint_ui()
-                     ])
+            lambda: [
+                joint.set_setpoints(UserInterfaceController.plot_to_setpoints(joint_setting_plot)),
+                update_joint_ui()
+            ])
 
         joint_setting_plot.add_setpoint.connect(
             lambda time, position, button: [
@@ -270,12 +267,13 @@ class GaitGeneratorPlugin(Plugin):
             ])
 
         joint_setting.Table.itemChanged.connect(
-            lambda: [joint.set_setpoints(UserInterfaceController.table_to_setpoints(joint_setting.Table)),
-                     UserInterfaceController.update_ui_elements(
-                         joint, table=None, plot=joint_setting_plot, duration=self.gait.duration,
-                         show_velocity_markers=self.velocity_markers_check_box.isChecked()),
-                     self.publish_preview()
-                     ])
+            lambda: [
+                joint.set_setpoints(UserInterfaceController.table_to_setpoints(joint_setting.Table)),
+                UserInterfaceController.update_ui_elements(
+                    joint, table=None, plot=joint_setting_plot, duration=self.gait.duration,
+                    show_velocity_markers=self.velocity_markers_check_box.isChecked()),
+                self.publish_preview()
+            ])
 
         return joint_setting
 
