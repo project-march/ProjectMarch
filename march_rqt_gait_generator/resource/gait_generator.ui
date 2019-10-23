@@ -204,15 +204,12 @@
        </widget>
       </item>
       <item row="3" column="0">
-       <widget class="QLineEdit" name="PlaybackSpeed">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <widget class="QSpinBox" name="PlaybackSpeed">
+        <property name="maximum">
+         <double>500</double>
         </property>
-        <property name="text">
-         <string>100</string>
+        <property name="value">
+         <double>100</double>
         </property>
        </widget>
       </item>
@@ -316,7 +313,7 @@ Text-align: right
 }</string>
         </property>
         <property name="text">
-         <string>Change Gait Directory</string>
+         <string>Select a gait directory...</string>
         </property>
        </widget>
       </item>
