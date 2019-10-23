@@ -4,16 +4,19 @@ project(march_imu_manager)
 add_compile_options(-std=c++11 -Wall -g)
 
 find_package(catkin REQUIRED COMPONENTS
+    geometry_msgs
     roscpp
     roslint
-    std_msgs
     sensor_msgs
-    geometry_msgs
+    std_msgs
 )
 
 catkin_package(
-    INCLUDE_DIRS include
+    INCLUDE_DIRS
     CATKIN_DEPENDS
+    geometry_msgs
+    sensor_msgs
+    std_msgs
 )
 
 include_directories(
@@ -57,7 +60,14 @@ target_link_libraries(${PROJECT_NAME}_node
     ${catkin_LIBRARIES}
 )
 
-install(FILES ${xsensdeviceapi_LOCATION} ${xstypes_LOCATION} ${xsensdeviceapi_LOCATION}.4 ${xstypes_LOCATION}.4 ${xsensdeviceapi_LOCATION}.4.6.0 ${xstypes_LOCATION}.4.6.0
+install(
+    FILES
+    ${xsensdeviceapi_LOCATION}
+    ${xsensdeviceapi_LOCATION}.4
+    ${xsensdeviceapi_LOCATION}.4.6.0
+    ${xstypes_LOCATION}
+    ${xstypes_LOCATION}.4
+    ${xstypes_LOCATION}.4.6.0
     DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
