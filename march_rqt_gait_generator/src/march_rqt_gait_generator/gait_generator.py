@@ -279,7 +279,6 @@ class GaitGeneratorPlugin(Plugin):
 
     # Functions below are connected to buttons, text boxes, joint graphs etc.
 
-    # Connected to joint graphs.
     def publish_preview(self):
         joint_state = JointState()
         joint_state.header.stamp = rospy.get_rostime()
