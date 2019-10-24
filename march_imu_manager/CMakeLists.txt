@@ -37,8 +37,8 @@ roslint_cpp(${lintfiles})
 set(xsensdeviceapi_LOCATION ${PROJECT_SOURCE_DIR}/lib/libxsensdeviceapi.so)
 set(xstypes_LOCATION ${PROJECT_SOURCE_DIR}/lib/libxstypes.so)
 
-find_library(xsensdeviceapi_LIBRARY xsensdeviceapi ${xsensdeviceapi_LOCATION})
-find_library(xstypes_LIBRARY xstypes ${xstypes_LOCATION})
+find_library(xsensdeviceapi_LIBRARY NAMES xsensdeviceapi PATHS ${PROJECT_SOURCE_DIR}/lib)
+find_library(xstypes_LIBRARY NAMES xstypes PATHS ${PROJECT_SOURCE_DIR}/lib)
 
 set(xsensdeviceapi_DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}/libxsensdeviceapi.so)
 add_library(xsensdeviceapi SHARED IMPORTED)
