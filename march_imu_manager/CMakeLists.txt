@@ -39,15 +39,11 @@ set(xstypes_LOCATION ${PROJECT_SOURCE_DIR}/lib/libxstypes.so)
 find_library(xsensdeviceapi_LIBRARY NAMES xsensdeviceapi PATHS ${PROJECT_SOURCE_DIR}/lib)
 find_library(xstypes_LIBRARY NAMES xstypes PATHS ${PROJECT_SOURCE_DIR}/lib)
 
-set(xsensdeviceapi_DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}/libxsensdeviceapi.so)
 add_library(xsensdeviceapi SHARED IMPORTED)
 set_property(TARGET xsensdeviceapi PROPERTY IMPORTED_LOCATION ${xsensdeviceapi_LOCATION})
-file(COPY ${xsensdeviceapi_LOCATION} DESTINATION ${xsensdeviceapi_DESTINATION})
 
-set(xstypes_DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}/libxstypes.so)
 add_library(xstypes SHARED IMPORTED)
 set_property(TARGET xstypes PROPERTY IMPORTED_LOCATION ${xstypes_LOCATION})
-file(COPY ${xstypes_LOCATION} DESTINATION ${xstypes_DESTINATION})
 
 add_executable(${PROJECT_NAME}_node
     src/main.cpp
