@@ -20,6 +20,7 @@ catkin_package(
 )
 
 include_directories(
+    include
     lib/include
     ${catkin_INCLUDE_DIRS}
 )
@@ -47,6 +48,8 @@ set_property(TARGET xstypes PROPERTY IMPORTED_LOCATION ${xstypes_LOCATION})
 
 add_executable(${PROJECT_NAME}_node
     src/main.cpp
+    src/MtwCallback.cpp
+    src/MasterCallback.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}_node
