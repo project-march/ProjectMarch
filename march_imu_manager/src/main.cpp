@@ -38,11 +38,9 @@
 
 #include <xsensdeviceapi.h>
 #include <xstypes.h>
-#include <xsens/xsmutex.h>
 
 #include "march_imu_manager/MasterCallback.h"
 #include "march_imu_manager/MtwCallback.h"
-#include "march_imu_manager/findClosestUpdateRate.h"
 
 /*
    | MTw  | desiredUpdateRate (max) |
@@ -56,6 +54,33 @@
 */
 #define UPDATE_RATE 120
 #define RADIO_CHANNEL 25
+
+int findClosestUpdateRate(const XsIntArray& supportedUpdateRates, const int desiredUpdateRate)
+{
+    if (supportedUpdateRates.empty())
+    {
+        return 0;
+    }
+
+    if (supportedUpdateRates.size() == 1)
+    {
+        return supportedUpdateRates[0];
+    }
+
+    int uRateDist = -1;
+    int closestUpdateRate = -1;
+    for (XsIntArray::const_iterator itUpRate = supportedUpdateRates.begin(); itUpRate != supportedUpdateRates.end(); ++itUpRate)
+    {
+        const int currDist = std::abs(*itUpRate - desiredUpdateRate);
+
+        if ((uRateDist == -1) || (currDist < uRateDist))
+        {
+            uRateDist = currDist;
+            closestUpdateRate = *itUpRate;
+        }
+    }
+    return closestUpdateRate;
+}
 
 XsDevicePtr createMaster(XsControl* control)
 {
@@ -90,13 +115,59 @@ XsDevicePtr createMaster(XsControl* control)
 
 int configureMaster(XsDevicePtr master)
 {
+    if (!master->gotoConfig())
+    {
+        ROS_FATAL("Failed to go to config mode");
+        return -1;
+    }
 
+    ROS_DEBUG("Getting the list of the supported update rates...");
+    const XsIntArray supportedUpdateRates = master->supportedUpdateRates();
+
+    std::ostringstream updateRates;
+    for (XsIntArray::const_iterator itUpRate = supportedUpdateRates.begin(); itUpRate != supportedUpdateRates.end(); ++itUpRate)
+    {
+        updateRates << *itUpRate << " ";
+    }
+    ROS_DEBUG_STREAM("Supported update rates: " << updateRates.str());
+
+    const int newUpdateRate = findClosestUpdateRate(supportedUpdateRates, UPDATE_RATE);
+
+    ROS_DEBUG_STREAM("Setting update rate to " << newUpdateRate << " Hz...");
+    if (!master->setUpdateRate(newUpdateRate))
+    {
+        ROS_FATAL_STREAM("Failed to set update rate");
+        return -1;
+    }
+
+    ROS_DEBUG("Disabling radio channel if previously enabled...");
+    if (master->isRadioEnabled())
+    {
+        if (!master->disableRadio())
+        {
+            ROS_FATAL_STREAM("Failed to disable radio channel");
+            return -1;
+        }
+    }
+
+    ROS_DEBUG_STREAM("Setting radio channel to " << RADIO_CHANNEL << " and enabling radio...");
+    if (!master->enableRadio(RADIO_CHANNEL))
+    {
+        ROS_FATAL_STREAM("Failed to set radio channel");
+        return -1;
+    }
+
+    return 0;
 }
 
 int main(int argc, char *argv[])
 {
     ros::init(argc, argv, "march_imu_manager");
     ros::NodeHandle node;
+
+    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) ) {
+        ros::console::notifyLoggerLevelsChanged();
+    }
 
     XsControl* control = XsControl::construct();
     if (control == 0)
@@ -112,10 +183,27 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    ROS_INFO("Found wireless master");
+
     WirelessMasterCallback wirelessMasterCallback;
     std::vector<std::unique_ptr<MtwCallback>> mtwCallbacks;
 
-    ROS_INFO("Found wireless master");
+    ROS_DEBUG("Attaching callback handler for master...");
+    wirelessMaster->addCallbackHandler(&wirelessMasterCallback);
+
+    configureMaster(wirelessMaster);
+
+    ROS_DEBUG("Disabling radio for shutdown...");
+    if (!wirelessMaster->gotoConfig())
+    {
+        ROS_FATAL("Failed to go to config mode");
+        return -1;
+    }
+    if (!wirelessMaster->disableRadio())
+    {
+        ROS_FATAL_STREAM("Failed to disable radio channel");
+        return -1;
+    }
 
     control->close();
 

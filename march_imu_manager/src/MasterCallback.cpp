@@ -1,3 +1,4 @@
+// Copyright 2019 Project March
 #include <ros/ros.h>
 
 #include "march_imu_manager/MasterCallback.h"
@@ -13,29 +14,27 @@ void WirelessMasterCallback::onConnectivityChanged(XsDevice* dev, XsConnectivity
     XsMutexLocker lock(m_mutex);
     switch (newState)
     {
-        case XCS_Disconnected:          /*!< Device has disconnected, only limited informational functionality is available. */
-
-            //std::cout << "\nEVENT: MTW Disconnected -> " << *dev << std::endl;
+        case XCS_Disconnected:
             ROS_INFO_STREAM("EVENT: MTW Disconnected -> " << dev->deviceId().toString().toStdString() );
             m_connectedMTWs.erase(dev);
             break;
-        case XCS_Rejected:                      /*!< Device has been rejected and is disconnected, only limited informational functionality is available. */
+        case XCS_Rejected:
             ROS_INFO_STREAM("EVENT: MTW Rejected -> " << dev->deviceId().toString().toStdString() );
             m_connectedMTWs.erase(dev);
             break;
-        case XCS_PluggedIn:                     /*!< Device is connected through a cable. */
+        case XCS_PluggedIn:
             ROS_INFO_STREAM("EVENT: MTW PluggedIn -> " << dev->deviceId().toString().toStdString() );
             m_connectedMTWs.erase(dev);
             break;
-        case XCS_Wireless:                      /*!< Device is connected wirelessly. */
+        case XCS_Wireless:
             ROS_INFO_STREAM("EVENT: MTW Connected -> " << dev->deviceId().toString().toStdString() );
             m_connectedMTWs.insert(dev);
             break;
-        case XCS_File:                          /*!< Device is reading from a file. */
+        case XCS_File:
             ROS_INFO_STREAM("EVENT: MTW File -> " << dev->deviceId().toString().toStdString() );
             m_connectedMTWs.erase(dev);
             break;
-        case XCS_Unknown:                       /*!< Device is in an unknown state. */
+        case XCS_Unknown:
             ROS_INFO_STREAM("EVENT: MTW Unkown -> " << dev->deviceId().toString().toStdString() );
             m_connectedMTWs.erase(dev);
             break;
