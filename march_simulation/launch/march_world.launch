@@ -11,7 +11,7 @@
   <!-- Override effort values as Gazebo uses different units than the actual hardware. -->
   <!-- 40 seems to work well, I do not know why. -->
     <param name="robot_description"
-            command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iv-test.xacro'
+            command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iv-simulation.xacro'
             k_velocity_value:=10000.0 k_position_value:=20000.0 max_effort_rotary:=20000.0 max_effort_linear:=50000.0" />
 
   <!-- Upload the controller configuration -->
