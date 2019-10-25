@@ -69,14 +69,14 @@ int findClosestUpdateRate(const XsIntArray& supportedUpdateRates, const int desi
 
     int uRateDist = -1;
     int closestUpdateRate = -1;
-    for (XsIntArray::const_iterator itUpRate = supportedUpdateRates.begin(); itUpRate != supportedUpdateRates.end(); ++itUpRate)
+    for (const int updateRate : supportedUpdateRates)
     {
-        const int currDist = std::abs(*itUpRate - desiredUpdateRate);
+        const int currDist = std::abs(updateRate - desiredUpdateRate);
 
         if ((uRateDist == -1) || (currDist < uRateDist))
         {
             uRateDist = currDist;
-            closestUpdateRate = *itUpRate;
+            closestUpdateRate = updateRate;
         }
     }
     return closestUpdateRate;
@@ -99,7 +99,8 @@ XsDevicePtr createMaster(XsControl* control)
         return nullptr;
     }
 
-    ROS_DEBUG("Found a device with ID: %s @ port: %s, baudrate: %d", wirelessMasterPort->deviceId().toString().toStdString().c_str(), 
+    ROS_DEBUG("Found a device with ID: %s @ port: %s, baudrate: %d",
+            wirelessMasterPort->deviceId().toString().toStdString().c_str(),
             wirelessMasterPort->portName().toStdString().c_str(), wirelessMasterPort->baudrate());
 
     if (!control->openPort(wirelessMasterPort->portName().toStdString(), wirelessMasterPort->baudrate()))
@@ -125,9 +126,9 @@ int configureMaster(XsDevicePtr master)
     const XsIntArray supportedUpdateRates = master->supportedUpdateRates();
 
     std::ostringstream updateRates;
-    for (XsIntArray::const_iterator itUpRate = supportedUpdateRates.begin(); itUpRate != supportedUpdateRates.end(); ++itUpRate)
+    for (const int updateRate : supportedUpdateRates)
     {
-        updateRates << *itUpRate << " ";
+        updateRates << updateRate << " ";
     }
     ROS_DEBUG_STREAM("Supported update rates: " << updateRates.str());
 
@@ -165,7 +166,8 @@ int main(int argc, char *argv[])
     ros::init(argc, argv, "march_imu_manager");
     ros::NodeHandle node;
 
-    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) ) {
+    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug))
+    {
         ros::console::notifyLoggerLevelsChanged();
     }
 

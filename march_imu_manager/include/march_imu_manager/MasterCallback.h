@@ -1,6 +1,6 @@
 #pragma once
 
-#include <xsensdeviceapi.h> // The Xsens device API header 
+#include <xsensdeviceapi.h>
 #include <xstypes.h>
 #include <set>
 
