@@ -57,25 +57,12 @@
 #define UPDATE_RATE 120
 #define RADIO_CHANNEL 25
 
-int main(int argc, char *argv[])
+XsDevicePtr createMaster(XsControl* control)
 {
-    ros::init(argc, argv, "march_imu_manager");
-    ros::NodeHandle node;
-
-    WirelessMasterCallback wirelessMasterCallback;
-    std::vector<std::unique_ptr<MtwCallback>> mtwCallbacks;
-
-    XsControl* control = XsControl::construct();
-    if (control == 0)
-    {
-        ROS_ERROR("Failed to construct XsControl instance");
-        return -1;
-    }
-
     XsPortInfoArray detectedDevices = XsScanner::scanPorts();
     XsPortInfoArray::const_iterator wirelessMasterPort = detectedDevices.begin();
 
-    ROS_INFO("Scanning for devices...");
+    ROS_DEBUG("Scanning for dongles...");
 
     while (wirelessMasterPort != detectedDevices.end() && !wirelessMasterPort->deviceId().isWirelessMaster())
     {
@@ -83,9 +70,52 @@ int main(int argc, char *argv[])
     }
     if (wirelessMasterPort == detectedDevices.end())
     {
-        ROS_ERROR("No dongle found");
+        ROS_FATAL("No dongle found");
+        return nullptr;
+    }
+
+    ROS_DEBUG("Found a device with ID: %s @ port: %s, baudrate: %d", wirelessMasterPort->deviceId().toString().toStdString().c_str(), 
+            wirelessMasterPort->portName().toStdString().c_str(), wirelessMasterPort->baudrate());
+
+    if (!control->openPort(wirelessMasterPort->portName().toStdString(), wirelessMasterPort->baudrate()))
+    {
+        ROS_FATAL_STREAM("Failed to open port " << *wirelessMasterPort);
+        return nullptr;
+    }
+
+    ROS_DEBUG("Getting XsDevice instance for wireless master...");
+
+    return control->device(wirelessMasterPort->deviceId());
+}
+
+int configureMaster(XsDevicePtr master)
+{
+
+}
+
+int main(int argc, char *argv[])
+{
+    ros::init(argc, argv, "march_imu_manager");
+    ros::NodeHandle node;
+
+    XsControl* control = XsControl::construct();
+    if (control == 0)
+    {
+        ROS_FATAL("Failed to construct XsControl instance");
         return -1;
     }
+
+    XsDevicePtr wirelessMaster = createMaster(control);
+    if (wirelessMaster == nullptr)
+    {
+        ROS_FATAL_STREAM("Failed to construct XsDevice instance");
+        return -1;
+    }
+
+    WirelessMasterCallback wirelessMasterCallback;
+    std::vector<std::unique_ptr<MtwCallback>> mtwCallbacks;
+
+    ROS_INFO("Found wireless master");
 
     control->close();
 
