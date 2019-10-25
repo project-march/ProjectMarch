@@ -47,9 +47,9 @@ add_library(xstypes SHARED IMPORTED)
 set_property(TARGET xstypes PROPERTY IMPORTED_LOCATION ${xstypes_LOCATION})
 
 add_executable(${PROJECT_NAME}_node
-    src/main.cpp
-    src/MtwCallback.cpp
     src/MasterCallback.cpp
+    src/MtwCallback.cpp
+    src/main.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}_node
