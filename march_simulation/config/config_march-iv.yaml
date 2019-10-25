@@ -21,14 +21,14 @@ march:
       gains: # Required because we're controlling an effort interface
         # The pid values are working, but they seem to be heavily dependent
         # on the max effort values (in the march_world.launch file) for reasons unknown.
-        left_hip_aa: {p: 10000,  d: 10, i: 1, i_clamp: 1}
-        left_hip_fe: {p: 10000,  d: 10, i: 1, i_clamp: 1}
-        left_knee: {p: 10000,  d: 10, i: 1, i_clamp: 1}
-        left_ankle: {p: 10000,  d: 10, i: 1, i_clamp: 1}
-        right_hip_aa: {p: 10000,  d: 10, i: 1, i_clamp: 1}
-        right_hip_fe: {p: 10000,  d: 10, i: 1, i_clamp: 1}
-        right_knee: {p: 10000,  d: 10, i: 1, i_clamp: 1}
-        right_ankle: {p: 10000,  d: 10, i: 1, i_clamp: 1}
+        left_hip_aa: {p: 1000,  d: 10, i: 0, i_clamp: 0}
+        left_hip_fe: {p: 1000,  d: 10, i: 0, i_clamp: 0}
+        left_knee: {p: 1000,  d: 10, i: 0, i_clamp: 0}
+        left_ankle: {p: 1000,  d: 10, i: 0, i_clamp: 0}
+        right_hip_aa: {p: 1000,  d: 10, i: 0, i_clamp: 0}
+        right_hip_fe: {p: 1000,  d: 10, i: 0, i_clamp: 0}
+        right_knee: {p: 1000,  d: 10, i: 0, i_clamp: 0}
+        right_ankle: {p: 1000,  d: 10, i: 0, i_clamp: 0}
 
       state_publish_rate:  25            # Override default
       action_monitor_rate: 30            # Override default

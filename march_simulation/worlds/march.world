@@ -11,6 +11,8 @@
       <uri>model://sun</uri>
     </include>
 
+    <gravity>0 0 -9.81</gravity>
+
     <!-- User camera -->
     <gui fullscreen='0'>
       <camera name='user_camera'>
