@@ -47,8 +47,8 @@ add_library(xstypes SHARED IMPORTED)
 set_property(TARGET xstypes PROPERTY IMPORTED_LOCATION ${xstypes_LOCATION})
 
 add_executable(${PROJECT_NAME}_node
-    src/MasterCallback.cpp
     src/MtwCallback.cpp
+    src/WirelessMaster.cpp
     src/main.cpp
 )
 
