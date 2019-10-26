@@ -11,9 +11,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <depend>roscpp</depend>
-  <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>
-  <depend>geometry_msgs</depend>
 
   <build_depend>roslint</build_depend>
 </package>

@@ -31,16 +31,9 @@
 /////////////////////////////////////////////////////////////////////////
 // Further adapted for the March exoskeleton by Project March 2019
 
-#include <memory>
-
 #include <ros/ros.h>
-#include <sensor_msgs/Imu.h>
-
-#include <xsensdeviceapi.h>
-#include <xstypes.h>
 
 #include "march_imu_manager/WirelessMaster.h"
-#include "march_imu_manager/MtwCallback.h"
 
 /*
    | MTw  | desiredUpdateRate (max) |
@@ -65,22 +58,41 @@ int main(int argc, char *argv[])
         ros::console::notifyLoggerLevelsChanged();
     }
 
-    WirelessMaster wirelessMaster;
-    if (wirelessMaster.init())
+    WirelessMaster wirelessMaster(&node);
+    int error = wirelessMaster.init();
+    if (error)
     {
         ROS_FATAL_STREAM("Failed to construct wireless master instance");
         return -1;
     }
     ROS_INFO("Found wireless master");
-    if (wirelessMaster.configure(UPDATE_RATE, RADIO_CHANNEL))
+
+    error = wirelessMaster.configure(UPDATE_RATE, RADIO_CHANNEL);
+    if (error)
     {
         ROS_FATAL_STREAM("Failed to configure wireless master instance");
         return -1;
     }
 
-    std::vector<std::unique_ptr<MtwCallback>> mtwCallbacks;
+    ROS_DEBUG("Starting measurement...");
+    error = wirelessMaster.startMeasurement();
+    if (error)
+    {
+        ROS_FATAL("Failed to start measurement");
+        return -1;
+    }
 
-    ros::spin();
+    std::vector<ros::Publisher> imuPublishers;
+    ros::Rate loop_rate = 2000;
+
+    ROS_DEBUG("Publish loop starting...");
+
+    while (ros::ok())
+    {
+        wirelessMaster.update();
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
 
     return 0;
 }

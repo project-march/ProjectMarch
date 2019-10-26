@@ -1,36 +1,42 @@
 // Copyright 2019 Project March
-#include <ros/ros.h>
-
 #include "march_imu_manager/WirelessMaster.h"
 
-WirelessMaster::WirelessMaster()
+#include <sensor_msgs/Imu.h>
+
+WirelessMaster::WirelessMaster(ros::NodeHandle* node) :
+    m_node(node)
 {
     this->m_control = XsControl::construct();
 }
 
 WirelessMaster::~WirelessMaster()
 {
-    ROS_DEBUG("Disabling radio for shutdown...");
-    if (!this->m_master->gotoConfig())
+    if (this->m_master)
     {
-        ROS_FATAL("Failed to go to config mode");
-    }
-    if (!this->m_master->disableRadio())
-    {
-        ROS_FATAL_STREAM("Failed to disable radio channel");
+        ROS_DEBUG("Disabling radio for shutdown...");
+        if (!this->m_master->gotoConfig())
+        {
+            ROS_FATAL("Failed to go to config mode");
+        }
+        if (!this->m_master->disableRadio())
+        {
+            ROS_FATAL_STREAM("Failed to disable radio channel");
+        }
     }
 
-    this->m_control->close();
-
-    delete m_control;
+    if (this->m_control)
+    {
+        ROS_DEBUG("Closing XsControl...");
+        this->m_control->close();
+        delete m_control;
+    }
 }
 
 int WirelessMaster::init()
 {
+    ROS_DEBUG("Scanning for wireless masters...");
     XsPortInfoArray detectedDevices = XsScanner::scanPorts();
     XsPortInfoArray::const_iterator wirelessMasterPort = detectedDevices.begin();
-
-    ROS_DEBUG("Scanning for dongles...");
 
     while (wirelessMasterPort != detectedDevices.end() && !wirelessMasterPort->deviceId().isWirelessMaster())
     {
@@ -38,7 +44,7 @@ int WirelessMaster::init()
     }
     if (wirelessMasterPort == detectedDevices.end())
     {
-        ROS_FATAL("No dongle found");
+        ROS_FATAL("No wireless master found");
         return -1;
     }
 
@@ -63,7 +69,7 @@ int WirelessMaster::init()
 
 int WirelessMaster::configure(const int updateRate, const int channel)
 {
-    if (!this->m_master->gotoConfig())
+    if (this->m_master && !this->m_master->gotoConfig())
     {
         ROS_FATAL("Failed to go to config mode");
         return -1;
@@ -108,44 +114,98 @@ int WirelessMaster::configure(const int updateRate, const int channel)
     return 0;
 }
 
-XsDeviceSet WirelessMaster::getWirelessMTWs() const
+int WirelessMaster::startMeasurement()
 {
-    XsMutexLocker lock(this->m_mutex);
-    return this->m_connectedMTWs;
+    return this->m_master && this->m_master->gotoMeasurement();
+}
+
+void WirelessMaster::update()
+{
+    for (const auto& mtw : this->m_connectedMtws)
+    {
+        if (mtw.second->dataAvailable())
+        {
+            const XsDataPacket* packet = mtw.second->getOldestPacket();
+
+            if (packet->containsCalibratedData())
+            {
+                sensor_msgs::Imu imu_msg;
+
+                imu_msg.header.frame_id = "imu_" + std::to_string(mtw.first);
+
+                // [m/s²]
+                imu_msg.linear_acceleration.x = packet->calibratedAcceleration().value(0);
+                imu_msg.linear_acceleration.y = packet->calibratedAcceleration().value(1);
+                imu_msg.linear_acceleration.z = packet->calibratedAcceleration().value(2);
+                imu_msg.linear_acceleration_covariance[0] = -1;
+
+                // [rad/s]
+                imu_msg.angular_velocity.x = packet->calibratedGyroscopeData().value(0);
+                imu_msg.angular_velocity.y = packet->calibratedGyroscopeData().value(1);
+                imu_msg.angular_velocity.z = packet->calibratedGyroscopeData().value(2);
+                imu_msg.angular_velocity_covariance[0] = -1;
+
+                // unit quaternion
+                imu_msg.orientation.x = packet->orientationQuaternion().x();
+                imu_msg.orientation.y = packet->orientationQuaternion().y();
+                imu_msg.orientation.z = packet->orientationQuaternion().z();
+                imu_msg.orientation.w = packet->orientationQuaternion().w();
+                imu_msg.orientation_covariance[0] = -1;
+
+                this->m_publishers[mtw.first].publish(imu_msg);
+            }
+
+            mtw.second->deleteOldestPacket();
+        }
+    }
 }
 
 void WirelessMaster::onConnectivityChanged(XsDevice* dev, XsConnectivityState newState)
 {
     XsMutexLocker lock(this->m_mutex);
+    const uint32_t deviceId = dev->deviceId().toInt();
+    const std::string deviceIdString = std::to_string(deviceId);
     switch (newState)
     {
         case XCS_Disconnected:
-            ROS_INFO_STREAM("EVENT: MTW Disconnected -> " << dev->deviceId().toString().toStdString() );
-            this->m_connectedMTWs.erase(dev);
+            ROS_INFO_STREAM("EVENT: MTW Disconnected -> " << deviceIdString);
+            this->m_connectedMtws.erase(deviceId);
+            this->m_publishers.erase(deviceId);
             break;
         case XCS_Rejected:
-            ROS_INFO_STREAM("EVENT: MTW Rejected -> " << dev->deviceId().toString().toStdString() );
-            this->m_connectedMTWs.erase(dev);
+            ROS_INFO_STREAM("EVENT: MTW Rejected -> " << deviceIdString);
+            this->m_connectedMtws.erase(deviceId);
+            this->m_publishers.erase(deviceId);
             break;
         case XCS_PluggedIn:
-            ROS_INFO_STREAM("EVENT: MTW PluggedIn -> " << dev->deviceId().toString().toStdString() );
-            this->m_connectedMTWs.erase(dev);
+            ROS_INFO_STREAM("EVENT: MTW PluggedIn -> " << deviceIdString);
+            this->m_connectedMtws.erase(deviceId);
+            this->m_publishers.erase(deviceId);
             break;
         case XCS_Wireless:
-            ROS_INFO_STREAM("EVENT: MTW Connected -> " << dev->deviceId().toString().toStdString() );
-            this->m_connectedMTWs.insert(dev);
-            break;
+            {
+                ROS_INFO_STREAM("EVENT: MTW Connected -> " << deviceIdString);
+                this->m_connectedMtws.insert(std::make_pair(deviceId, std::unique_ptr<Mtw>(new Mtw(dev))));
+
+                ros::Publisher publisher =
+                    this->m_node->advertise<sensor_msgs::Imu>("march/imu/" + deviceIdString, 10);
+                this->m_publishers.insert(std::make_pair(deviceId, publisher));
+                break;
+            }
         case XCS_File:
-            ROS_INFO_STREAM("EVENT: MTW File -> " << dev->deviceId().toString().toStdString() );
-            this->m_connectedMTWs.erase(dev);
+            ROS_INFO_STREAM("EVENT: MTW File -> " << deviceIdString);
+            this->m_connectedMtws.erase(deviceId);
+            this->m_publishers.erase(deviceId);
             break;
         case XCS_Unknown:
-            ROS_INFO_STREAM("EVENT: MTW Unkown -> " << dev->deviceId().toString().toStdString() );
-            this->m_connectedMTWs.erase(dev);
+            ROS_INFO_STREAM("EVENT: MTW Unkown -> " << deviceIdString);
+            this->m_connectedMtws.erase(deviceId);
+            this->m_publishers.erase(deviceId);
             break;
         default:
-            ROS_INFO_STREAM("EVENT: MTW Error -> " << dev->deviceId().toString().toStdString() );
-            this->m_connectedMTWs.erase(dev);
+            ROS_INFO_STREAM("EVENT: MTW Error -> " << deviceIdString);
+            this->m_connectedMtws.erase(deviceId);
+            this->m_publishers.erase(deviceId);
             break;
     }
 }

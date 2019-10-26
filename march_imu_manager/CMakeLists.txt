@@ -1,22 +1,18 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(march_imu_manager)
 
-add_compile_options(-std=c++11 -Wall -g)
+add_compile_options(-std=c++11 -Wall -Wextra -g)
 
 find_package(catkin REQUIRED COMPONENTS
-    geometry_msgs
     roscpp
     roslint
     sensor_msgs
-    std_msgs
 )
 
 catkin_package(
     INCLUDE_DIRS
     CATKIN_DEPENDS
-    geometry_msgs
     sensor_msgs
-    std_msgs
 )
 
 include_directories(
@@ -47,7 +43,7 @@ add_library(xstypes SHARED IMPORTED)
 set_property(TARGET xstypes PROPERTY IMPORTED_LOCATION ${xstypes_LOCATION})
 
 add_executable(${PROJECT_NAME}_node
-    src/MtwCallback.cpp
+    src/Mtw.cpp
     src/WirelessMaster.cpp
     src/main.cpp
 )
