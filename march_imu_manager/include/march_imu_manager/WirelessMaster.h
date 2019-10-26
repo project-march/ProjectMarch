@@ -23,12 +23,12 @@ class WirelessMaster : public XsCallback
 
         void update();
 
+        static int findClosestUpdateRate(const XsIntArray& supportedUpdateRates, const int desiredUpdateRate);
+
     protected:
         virtual void onConnectivityChanged(XsDevice* dev, XsConnectivityState newState);
 
     private:
-        static int findClosestUpdateRate(const XsIntArray& supportedUpdateRates, const int desiredUpdateRate);
-
         ros::NodeHandle* m_node;
 
         XsControl* m_control = nullptr;
