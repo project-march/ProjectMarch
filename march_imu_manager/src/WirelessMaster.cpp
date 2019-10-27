@@ -1,6 +1,8 @@
 // Copyright 2019 Project March
 #include "march_imu_manager/WirelessMaster.h"
 
+#include <limits>
+
 #include <sensor_msgs/Imu.h>
 
 WirelessMaster::WirelessMaster(ros::NodeHandle* node) :
@@ -212,25 +214,15 @@ void WirelessMaster::onConnectivityChanged(XsDevice* dev, XsConnectivityState ne
 
 int WirelessMaster::findClosestUpdateRate(const XsIntArray& supportedUpdateRates, const int desiredUpdateRate)
 {
-    if (supportedUpdateRates.empty())
-    {
-        return 0;
-    }
-
-    if (supportedUpdateRates.size() == 1)
-    {
-        return supportedUpdateRates[0];
-    }
-
-    int uRateDist = -1;
-    int closestUpdateRate = -1;
+    int minDistance = std::numeric_limits<int>::max();
+    int closestUpdateRate = 0;
     for (const int updateRate : supportedUpdateRates)
     {
-        const int currDist = std::abs(updateRate - desiredUpdateRate);
+        const int distance = std::abs(updateRate - desiredUpdateRate);
 
-        if ((uRateDist == -1) || (currDist < uRateDist))
+        if (distance < minDistance)
         {
-            uRateDist = currDist;
+            minDistance = distance;
             closestUpdateRate = updateRate;
         }
     }

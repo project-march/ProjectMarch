@@ -47,6 +47,7 @@
 */
 #define UPDATE_RATE 120
 #define RADIO_CHANNEL 25
+#define LOOP_RATE 2000
 
 int main(int argc, char *argv[])
 {
@@ -82,8 +83,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    std::vector<ros::Publisher> imuPublishers;
-    ros::Rate loop_rate = 2000;
+    ros::Rate loop_rate = LOOP_RATE;
 
     ROS_DEBUG("Publish loop starting...");
 
