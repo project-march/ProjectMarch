@@ -49,7 +49,7 @@
 #define RADIO_CHANNEL 25
 #define LOOP_RATE 2000
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     ros::init(argc, argv, "march_imu_manager");
     ros::NodeHandle node;

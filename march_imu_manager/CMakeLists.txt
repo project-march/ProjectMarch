@@ -22,8 +22,6 @@ include_directories(
     ${catkin_INCLUDE_DIRS}
 )
 
-set(ROSLINT_CPP_OPTS "--filter=-build/include,-build/header_guard,-runtime/references" "--linelength=120")
-
 file(GLOB_RECURSE lintfiles
     "src/*.cpp"
     "src/*.h"

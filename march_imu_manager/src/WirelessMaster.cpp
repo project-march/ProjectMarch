@@ -2,6 +2,7 @@
 #include "march_imu_manager/WirelessMaster.h"
 
 #include <limits>
+#include <string>
 
 #include <sensor_msgs/Imu.h>
 
