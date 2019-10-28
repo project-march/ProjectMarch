@@ -21,22 +21,22 @@ void Mtw::configure()
     this->m_device->setOutputSettings(outputSettings);
 }
 
-bool Mtw::dataAvailable() const
+bool Mtw::dataAvailable()
 {
-    XsMutexLocker lock(this->m_mutex);
+    std::unique_lock<std::mutex> lck(this->m_mutex);
     return !this->m_packetBuffer.empty();
 }
 
-const XsDataPacket* Mtw::getOldestPacket() const
+const XsDataPacket* Mtw::getOldestPacket()
 {
-    XsMutexLocker lock(this->m_mutex);
+    std::unique_lock<std::mutex> lck(this->m_mutex);
     XsDataPacket const * packet = &this->m_packetBuffer.front();
     return packet;
 }
 
 void Mtw::deleteOldestPacket()
 {
-    XsMutexLocker lock(this->m_mutex);
+    std::unique_lock<std::mutex> lck(this->m_mutex);
     this->m_packetBuffer.pop_front();
 }
 
@@ -48,7 +48,7 @@ const XsDeviceId Mtw::getId() const
 
 void Mtw::onLiveDataAvailable(XsDevice*, const XsDataPacket* packet)
 {
-    XsMutexLocker lock(this->m_mutex);
+    std::unique_lock<std::mutex> lck(this->m_mutex);
 
     // NOTE: Processing of packets should not be done in this thread.
     this->m_packetBuffer.push_back(*packet);

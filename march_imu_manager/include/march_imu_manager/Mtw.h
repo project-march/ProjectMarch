@@ -1,13 +1,12 @@
 #pragma once
 
 #include <deque>
+#include <mutex>
 
 #include <ros/ros.h>
 
-#include <xsens/xscallback.h>
-#include <xsens/xsdatapacket.h>
-#include <xsens/xsdevice.h>
-#include <xsens/xsmutex.h>
+#include <xsensdeviceapi.h>
+#include <xstypes.h>
 
 class Mtw : public XsCallback
 {
@@ -17,13 +16,13 @@ class Mtw : public XsCallback
         /**
          * Returns whether any new packets are available.
          */
-        bool dataAvailable() const;
+        bool dataAvailable();
 
         /**
          * Returns the oldest packet received from the MTw.
          * Does not delete it.
          */
-        const XsDataPacket* getOldestPacket() const;
+        const XsDataPacket* getOldestPacket();
 
         /**
          * Deletes the oldest packet received from the MTw.
@@ -49,9 +48,10 @@ class Mtw : public XsCallback
          */
         void configure();
 
-        mutable XsMutex m_mutex;
-        std::deque<XsDataPacket> m_packetBuffer;
+        std::mutex m_mutex;
+
         XsDevice* m_device;
 
         size_t m_maxBufferSize;
+        std::deque<XsDataPacket> m_packetBuffer;
 };
