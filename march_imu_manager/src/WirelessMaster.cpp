@@ -129,7 +129,7 @@ bool WirelessMaster::startMeasurement()
     return this->m_master && this->m_master->gotoMeasurement();
 }
 
-bool WirelessMaster::isMeasuring()
+bool WirelessMaster::isMeasuring() const
 {
     return this->m_master && this->m_master->isMeasuring();
 }
