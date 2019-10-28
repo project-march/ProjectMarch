@@ -117,9 +117,21 @@ int WirelessMaster::configure(const int updateRate, const int channel)
     return 0;
 }
 
-int WirelessMaster::startMeasurement()
+void WirelessMaster::waitForConnections(const size_t connections)
+{
+    std::unique_lock<std::mutex> lck(this->m_mutex);
+
+    this->m_cv.wait(lck, [this, connections] { return this->m_connectedMtws.size() == connections; });
+}
+
+bool WirelessMaster::startMeasurement()
 {
     return this->m_master && this->m_master->gotoMeasurement();
+}
+
+bool WirelessMaster::isMeasuring()
+{
+    return this->m_master && this->m_master->isMeasuring();
 }
 
 void WirelessMaster::update()
@@ -134,7 +146,7 @@ void WirelessMaster::update()
             {
                 sensor_msgs::Imu imu_msg;
 
-                imu_msg.header.frame_id = "imu_" + std::to_string(mtw.first);
+                imu_msg.header.frame_id = "imu_" + mtw.second->getId().toString().toStdString();
 
                 // [m/s²]
                 imu_msg.linear_acceleration.x = packet->calibratedAcceleration().value(0);
@@ -165,9 +177,9 @@ void WirelessMaster::update()
 
 void WirelessMaster::onConnectivityChanged(XsDevice* dev, XsConnectivityState newState)
 {
-    XsMutexLocker lock(this->m_mutex);
+    std::unique_lock<std::mutex> lck(this->m_mutex);
     const uint32_t deviceId = dev->deviceId().toInt();
-    const std::string deviceIdString = std::to_string(deviceId);
+    const std::string deviceIdString = dev->deviceId().toString().toStdString();
     switch (newState)
     {
         case XCS_Disconnected:
@@ -211,6 +223,8 @@ void WirelessMaster::onConnectivityChanged(XsDevice* dev, XsConnectivityState ne
             this->m_publishers.erase(deviceId);
             break;
     }
+    lck.unlock();
+    this->m_cv.notify_one();
 }
 
 int WirelessMaster::findClosestUpdateRate(const XsIntArray& supportedUpdateRates, const int desiredUpdateRate)

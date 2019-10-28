@@ -1,7 +1,9 @@
 #pragma once
 
-#include <unordered_map>
+#include <condition_variable>
 #include <memory>
+#include <mutex>
+#include <unordered_map>
 
 #include <ros/ros.h>
 
@@ -19,7 +21,11 @@ class WirelessMaster : public XsCallback
         int init();
         int configure(const int updateRate, const int channel);
 
-        int startMeasurement();
+        void waitForConnections(const size_t connections = 1);
+
+        bool startMeasurement();
+
+        bool isMeasuring();
 
         void update();
 
@@ -31,9 +37,12 @@ class WirelessMaster : public XsCallback
     private:
         ros::NodeHandle* m_node;
 
+        std::mutex m_mutex;
+        std::condition_variable m_cv;
+
         XsControl* m_control = nullptr;
         XsDevicePtr m_master = nullptr;
-        mutable XsMutex m_mutex;
+
         std::unordered_map<uint32_t, std::unique_ptr<Mtw>> m_connectedMtws;
         std::unordered_map<uint32_t, ros::Publisher> m_publishers;
 };
