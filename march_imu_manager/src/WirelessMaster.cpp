@@ -185,12 +185,12 @@ void WirelessMaster::onConnectivityChanged(XsDevice* dev, XsConnectivityState ne
     switch (newState)
     {
         case XCS_Disconnected:
-            ROS_WARNING_STREAM("EVENT: MTW Disconnected -> " << deviceIdString);
+            ROS_WARN_STREAM("EVENT: MTW Disconnected -> " << deviceIdString);
             this->m_connectedMtws.erase(deviceId);
             this->m_publishers.erase(deviceId);
             break;
         case XCS_Rejected:
-            ROS_WARNING_STREAM("EVENT: MTW Rejected -> " << deviceIdString);
+            ROS_WARN_STREAM("EVENT: MTW Rejected -> " << deviceIdString);
             this->m_connectedMtws.erase(deviceId);
             this->m_publishers.erase(deviceId);
             break;
