@@ -121,7 +121,11 @@ void WirelessMaster::waitForConnections(const size_t connections)
 {
     std::unique_lock<std::mutex> lck(this->m_mutex);
 
-    this->m_cv.wait(lck, [this, connections] { return this->m_connectedMtws.size() == connections; });
+    auto hasConnections = [this, connections]
+    {
+        return this->m_connectedMtws.size() == connections;
+    }
+    this->m_cv.wait(lck, hasConnections);
 }
 
 bool WirelessMaster::startMeasurement()
