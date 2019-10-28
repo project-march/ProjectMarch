@@ -1,15 +1,15 @@
 <launch>
 
   <!-- these are the arguments you can pass this launch_sm file, for example paused:=true -->
-  <arg name="paused" default="true"/>
   <arg name="use_sim_time" default="true"/>
   <arg name="gazebo_ui" default="true"/>
+  <arg name="paused" default="$(arg gazebo_ui)"/>
   <arg name="headless" default="false"/>
   <arg name="debug" default="false"/>
 
   <!-- Load the URDF into the ROS Parameter Server -->
   <!-- Override effort values as Gazebo uses different units than the actual hardware. -->
-  <!-- 40 seems to work well, I do not know why. -->
+  <!-- If the controller is properly tuned, these values can be arbitrarily large. -->
     <param name="robot_description"
             command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iv-simulation.xacro'
             k_velocity_value:=10000.0 k_position_value:=20000.0 max_effort_rotary:=20000.0 max_effort_linear:=50000.0" />
