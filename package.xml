@@ -1,24 +1,22 @@
 <?xml version="1.0"?>
-<package>
+<package format="2">
   <name>march_tutorials</name>
   <version>0.1.0</version>
   <description>The march_tutorials package</description>
   <license>BSD</license>
 
+  <maintainer email="software@projectmarch.nl">Project March</maintainer>
+
   <author email="isha@projectmarch.nl">Isha Dijcks</author>
   <author email="tim@projectmarch.nl">Tim Buckers</author>
-
-  <maintainer email="isha@projectmarch.nl">Isha Dijcks</maintainer>
-  <maintainer email="tim@projectmarch.nl">Tim Buckers</maintainer>
+  <author email="o.dehaas@projectmarch.nl">Olav de Haas</author>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <buildtool_depend>march_shared_resources</buildtool_depend>
-  <buildtool_depend>rosdoc_lite</buildtool_depend>
 
-  <build_depend>pluginlib</build_depend>
+  <depend>roscpp</depend>
+
   <test_depend>rosunit</test_depend>
+  <test_depend>rostest</test_depend>
 
-  <export>
-  </export>
-
+  <doc_depend>rosdoc_lite</doc_depend>
 </package>
