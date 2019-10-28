@@ -1,7 +1,6 @@
 <launch>
 
   <!-- these are the arguments you can pass this launch_sm file, for example paused:=true -->
-  <arg name="paused" default="true"/>
   <arg name="use_sim_time" default="true"/>
   <arg name="gazebo_ui" default="true"/>
   <arg name="headless" default="false"/>
@@ -32,7 +31,7 @@
     <arg name="world_name" value="$(find march_simulation)/worlds/march.world"/>
     <arg name="debug" value="$(arg debug)" />
     <arg name="gui" value="$(arg gazebo_ui)" />
-    <arg name="paused" value="$(arg paused)"/>
+    <arg name="paused" value="$(arg gazebo_ui)"/>
     <arg name="use_sim_time" value="$(arg use_sim_time)"/>
     <arg name="headless" value="$(arg headless)"/>
   </include>
