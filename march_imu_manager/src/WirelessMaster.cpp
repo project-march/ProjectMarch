@@ -150,8 +150,6 @@ void WirelessMaster::update()
             {
                 sensor_msgs::Imu imu_msg;
 
-                imu_msg.header.frame_id = "imu_" + mtw.second->getId().toString().toStdString();
-
                 // [m/s²]
                 imu_msg.linear_acceleration.x = packet->calibratedAcceleration().value(0);
                 imu_msg.linear_acceleration.y = packet->calibratedAcceleration().value(1);
