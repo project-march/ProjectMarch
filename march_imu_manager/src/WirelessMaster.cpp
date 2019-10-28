@@ -124,7 +124,7 @@ void WirelessMaster::waitForConnections(const size_t connections)
     auto hasConnections = [this, connections]
     {
         return this->m_connectedMtws.size() == connections;
-    }
+    };
     this->m_cv.wait(lck, hasConnections);
 }
 
