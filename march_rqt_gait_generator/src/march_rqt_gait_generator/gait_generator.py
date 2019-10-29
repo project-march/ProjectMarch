@@ -440,9 +440,9 @@ class GaitGeneratorPlugin(Plugin):
 
     # Called to update values in Heigt left foot etc.
     def set_feet_distances(self, msg):
-        self.height_left_line_edit.setText(str(msg.linear.x))
-        self.height_right_line_edit.setText(str(msg.linear.y))
-        self.heel_distance_line_edit.setText(str(msg.linear.z))
+        self.height_left_line_edit.setText(str(round(msg.linear.x, 4)))
+        self.height_right_line_edit.setText(str(round(msg.linear.y, 4)))
+        self.heel_distance_line_edit.setText(str(round(msg.linear.z, 4)))
 
     @QtCore.pyqtSlot(int)
     def update_main_time_slider(self, time):

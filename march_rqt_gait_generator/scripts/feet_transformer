@@ -15,8 +15,8 @@ feet_distances = rospy.Publisher('feet_distances',
 rate = rospy.Rate(10.0)
 while not rospy.is_shutdown():
     try:
-        (trans_right, rot_right) = listener.lookupTransform('/foot_left', '/foot_right', rospy.Time(0))
-        (trans_left, rot_left) = listener.lookupTransform('/foot_right', '/foot_left', rospy.Time(0))
+        (trans_right, rot_right) = listener.lookupTransform('/foot_right', '/foot_left', rospy.Time(0))
+        (trans_left, rot_left) = listener.lookupTransform('/foot_left', '/foot_right', rospy.Time(0))
     except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
         continue
 
