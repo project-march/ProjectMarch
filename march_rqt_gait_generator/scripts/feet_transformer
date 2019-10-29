@@ -23,3 +23,4 @@ while not rospy.is_shutdown():
     feet_distances.publish(feet_distances_msg)
 
     rate.sleep()
+    
