@@ -159,6 +159,7 @@ first start by writing our test. So create the ``MultiplyTest.py`` file to your
     #!/usr/bin/env python
 
     import unittest
+    import rosunit
 
     from ros_test_tutorial import multiply
 
@@ -167,16 +168,27 @@ first start by writing our test. So create the ``MultiplyTest.py`` file to your
         def test_multiply_one_and_one():
             self.assertEqual(multiply(1, 1), 1)
 
-Next we must tell ``cmake`` to build and how to run the tests. We do this by adding
-``catkin_add_nosetests(test)`` inside our ``CATKIN_ENABLE_TESTING``.
+    if __name__ == '__main__':
+        rosunit.unitrun(PKG, 'test_multiply', MultiplyTest)
+
+The actual tests are written as functions inside the ``MultiplyTest`` class.
+See if you can add more tests (and make them fail). See the `python unittest
+documentation <https://docs.python.org/3/library/unittest.html>`_ for more
+information on writing tests.
+
+Next we must tell ``cmake`` to build and how to run the tests. We do this by
+adding ``catkin_add_nosetests()`` inside our ``CATKIN_ENABLE_TESTING``.
 
 .. code::
 
     if(CATKIN_ENABLE_TESTING)
         ...
-        catkin_add_nosetests(test)
+        catkin_add_nosetests(test/MultiplyTest.py)
         ...
     endif()
+
+The tests can also be run with ``colcon test``.
+Also see the `ros wiki on writing unit tests for python <https://wiki.ros.org/unittest#Code-level_Python_Unit_Tests>`_.
 
 Writing python node tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^
