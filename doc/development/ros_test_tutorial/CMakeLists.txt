@@ -1,12 +1,10 @@
-set(TUTORIAL_NAME cpp_ros_unit_test_tutorial)
+set(TUTORIAL_NAME ros_test_tutorial)
 
 add_library(${TUTORIAL_NAME}
     src/Add.cpp
 )
 
-target_link_libraries(${TUTORIAL_NAME}
-    ${catkin_LIBRARIES}
-)
+target_link_libraries(${TUTORIAL_NAME} ${catkin_LIBRARIES})
 
 install(TARGETS ${TUTORIAL_NAME}
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

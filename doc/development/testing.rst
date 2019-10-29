@@ -69,3 +69,76 @@ This will output any notes, warnings or errors with an explanation. This
 command is normally run when you have created a new package or made changes to
 a ``package.xml`` or ``CMakeLists.txt`` file.
 
+Writing your own tests
+----------------------
+For testing ROS packages we make a distinction between two different kinds of tests.
+
+1. Unit tests (library level)
+2. Integration tests (node level)
+
+Also see the `ROS wiki on testing <https://wiki.ros.org/Quality/Tutorials/UnitTesting>`_.
+The unit tests are different for c++ and python projects. C++ projects use the
+`gtest <https://github.com/google/googletest>`_ framework, whereas Python projects use
+`unittest <http://pythontesting.net/framework/unittest/unittest-introduction/>`_.
+For node level tests, `rostest <https://wiki.ros.org/rostest>`_ is used.
+Rostest uses launch files to launch the nodes under test and the actual tests.
+
+The next sections will describe the process of writing tests. For this
+tutorial we will use the :codedir:`ros_test_tutorial package <development/ros_test_tutorial>`.
+This package already includes some c++ and python code to write tests for.
+
+Writing c++ unit tests
+^^^^^^^^^^^^^^^^^^^^^^
+Tests are always located in the ``test/`` directory of a package. To create a
+test we create a new cpp file in the ``test`` directory called ``AddTest.cpp``
+with the following contents.
+
+.. code::
+
+    #include <gtest/gtest.h>
+
+    #include "ros_test_tutorial/Add.h"
+
+    TEST(AddTest, addTwoAndOne)
+    {
+        Add add;
+        ASSERT_EQ(add.add(2, 1), 3);
+    }
+
+    int main(int argc, char* argv[])
+    {
+        testing::InitGoogleTest(&argc, argv);
+        return RUN_ALL_TESTS();
+    }
+
+In order to build and run the unit tests we must add ``rosunit`` as test
+dependency to our package. So normally we would add the following to the
+``package.xml``. However, this has already been done in highlevel ``package.xml``.
+
+.. code::
+
+  <test_depend>rosunit</test_depend>
+
+Next we must tell cmake which tests it has to build. So add the following to the ``CMakeLists.txt``.
+
+.. code::
+
+    if(CATKIN_ENABLE_TESTING)
+        catkin_add_gtest(add_test test/AddTest.cpp)
+        target_link_libraries(add_test ${PROJECT_NAME} ${catkin_LIBRARIES})
+    endif()
+
+Here we tell ``cmake`` to build the test and use our library. Now when
+``colcon test`` is run from the workspace root you should see tests passing.
+
+Writing c++ node tests
+^^^^^^^^^^^^^^^^^^^^^^
+
+
+Writing python unit tests
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+Writing python node tests
+^^^^^^^^^^^^^^^^^^^^^^^^^
+

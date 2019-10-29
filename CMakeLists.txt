@@ -14,10 +14,10 @@ catkin_package(
 )
 
 set(THIS_PACKAGE_INCLUDE_DIRS
-    doc/development/cpp_ros_unit_test_tutorial/include
+    doc/development/ros_test_tutorial/include
 )
 
 include_directories(${THIS_PACKAGE_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
 # Add tutorials with a CMakeLists.txt here
-add_subdirectory(doc/development/cpp_ros_unit_test_tutorial)
+add_subdirectory(doc/development/ros_test_tutorial)
