@@ -7,6 +7,8 @@ find_package(catkin REQUIRED COMPONENTS
     roscpp
 )
 
+catkin_python_setup()
+
 catkin_package(
   LIBRARIES
   INCLUDE_DIRS

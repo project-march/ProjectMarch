@@ -111,9 +111,23 @@ with the following contents.
         return RUN_ALL_TESTS();
     }
 
+Feel free to experiment with writing tests. The actual test is written using
+the ``TEST`` macro.  The first argument is the test suite, the same as the
+filename in this case.  The second argument is name of the actual test. So this
+would be another example of a test.
+
+.. code::
+
+    TEST(AddTest, addNegative)
+    {
+        Add add;
+        ASSERT_EQ(add.add(0, -1), -1);
+    }
+
 In order to build and run the unit tests we must add ``rosunit`` as test
 dependency to our package. So normally we would add the following to the
-``package.xml``. However, this has already been done in highlevel ``package.xml``.
+``package.xml``. However, this has already been done in highlevel
+``package.xml``.
 
 .. code::
 
@@ -137,7 +151,32 @@ Writing c++ node tests
 
 Writing python unit tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^
+Tests for python are also always located in the ``test/`` directory. We will
+first start by writing our test. So create the ``MultiplyTest.py`` file to your
+``test/`` directory and fill it with the following contents.
 
+.. code::
+    #!/usr/bin/env python
+
+    import unittest
+
+    from ros_test_tutorial import multiply
+
+    class MultiplyTest(unittest.TestCase):
+
+        def test_multiply_one_and_one():
+            self.assertEqual(multiply(1, 1), 1)
+
+Next we must tell ``cmake`` to build and how to run the tests. We do this by adding
+``catkin_add_nosetests(test)`` inside our ``CATKIN_ENABLE_TESTING``.
+
+.. code::
+
+    if(CATKIN_ENABLE_TESTING)
+        ...
+        catkin_add_nosetests(test)
+        ...
+    endif()
 
 Writing python node tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^
