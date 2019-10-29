@@ -1,0 +1,3 @@
+<launch>
+    <node name="feet_transformer" pkg="march_rqt_gait_generator" type="feet_transformer" output="screen"/>
+</launch>

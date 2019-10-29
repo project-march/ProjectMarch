@@ -20,8 +20,7 @@ import rviz
 
 from trajectory_msgs.msg import JointTrajectory
 from sensor_msgs.msg import JointState
-import tf
-import geometry_msgs.msg
+from march_shared_resources.msg import FeetDistances
 
 import GaitFactory
 import UserInterfaceController
@@ -32,8 +31,6 @@ from import_export import export_to_file, import_from_file_name
 
 from JointSettingPlot import JointSettingPlot
 from TimeSliderThread import TimeSliderThread
-
-import geometry_msgs.msg
 
 class GaitGeneratorPlugin(Plugin):
     DEFAULT_GAIT_DURATION = 8
@@ -57,9 +54,6 @@ class GaitGeneratorPlugin(Plugin):
         self.build_ui(context)
         self.set_topic_name(self.topic_name_line_edit.text())
         self.load_gait_into_ui()
-        rospy.Subscriber("feet_distances",
-                         geometry_msgs.msg.Twist,
-                         self.set_feet_distances)
 
     # Called by __init__
     def build_ui(self, context):
@@ -162,6 +156,10 @@ class GaitGeneratorPlugin(Plugin):
                 self.mirror_key2_line_edit.setEnabled(state)
             ]
         )
+        # Continuously update the step height and step length.
+        rospy.Subscriber("feet_distances",
+                         FeetDistances,
+                         self.set_feet_distances)
 
     # Called by __init__ and import_gait.
     def load_gait_into_ui(self):
@@ -440,9 +438,9 @@ class GaitGeneratorPlugin(Plugin):
 
     # Called to update values in Heigt left foot etc.
     def set_feet_distances(self, msg):
-        self.height_left_line_edit.setText(str(round(msg.linear.x, 4)))
-        self.height_right_line_edit.setText(str(round(msg.linear.y, 4)))
-        self.heel_distance_line_edit.setText(str(round(msg.linear.z, 4)))
+        self.height_left_line_edit.setText('%.3f' % msg.foot_height_left)
+        self.height_right_line_edit.setText('%.3f' % msg.foot_height_right)
+        self.heel_distance_line_edit.setText('%.3f' % msg.step_distance)
 
     @QtCore.pyqtSlot(int)
     def update_main_time_slider(self, time):
