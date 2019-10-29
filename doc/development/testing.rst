@@ -69,6 +69,16 @@ This will output any notes, warnings or errors with an explanation. This
 command is normally run when you have created a new package or made changes to
 a ``package.xml`` or ``CMakeLists.txt`` file.
 
+General guidelines to writing tests
+-----------------------------------
+Here are some rules of thumb to follow when writing tests:
+
+1. Write short understandable tests.
+2. Seperate setup code that is necessary for every test.
+3. Do not depend on writing and reading from external files.
+4. Do not depend on timing in your tests.
+5. Use one ``assert`` per test (i.e. only test one function)
+
 Writing your own tests
 ----------------------
 For testing ROS packages we make a distinction between two different kinds of tests.
@@ -156,6 +166,7 @@ first start by writing our test. So create the ``MultiplyTest.py`` file to your
 ``test/`` directory and fill it with the following contents.
 
 .. code::
+
     #!/usr/bin/env python
 
     import unittest
