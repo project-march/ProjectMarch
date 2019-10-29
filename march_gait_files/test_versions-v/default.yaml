@@ -1,2 +1,2 @@
 gaits:
-  home: {home_sit: MIV_ankle_2.5, home_stand: MIV_ankle_2.0}
+  rough_terrain_high_step: {right_open: MV_RT_highstep_rightopen_v1, left_close: MV_RT_leftclose_v1}
