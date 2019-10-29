@@ -17,7 +17,7 @@ install(DIRECTORY config launch resource
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
-install(PROGRAMS scripts/${PROJECT_NAME}
+install(PROGRAMS scripts/${PROJECT_NAME} scripts/feet_transformer
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

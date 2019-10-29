@@ -4,6 +4,7 @@
            command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iv.xacro'" />
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+    <node name="feet_transformer" pkg="march_rqt_gait_generator" type="feet_transformer" output="screen"/>
 
     <rosparam file="$(find march_rqt_gait_generator)/config/layout.yaml" command="load"/>
 

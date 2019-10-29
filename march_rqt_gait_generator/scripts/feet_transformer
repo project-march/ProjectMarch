@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+import rospy
+import math
+import tf
+import geometry_msgs.msg
+
+rospy.init_node('feet_transformer')
+
+listener = tf.TransformListener()
+
+feet_distances = rospy.Publisher('feet_distances',
+                                      geometry_msgs.msg.Twist,
+                                      queue_size=10)
+
+rate = rospy.Rate(10.0)
+while not rospy.is_shutdown():
+    try:
+        (trans_right, rot_right) = listener.lookupTransform('/foot_left', '/foot_right', rospy.Time(0))
+        (trans_left, rot_left) = listener.lookupTransform('/foot_right', '/foot_left', rospy.Time(0))
+    except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+        continue
+
+    foot_height_right = trans_right[2]
+    foot_height_left = trans_left[2]
+    step_distance = math.sqrt(trans_right[0] ** 2 + trans_right[2] ** 2)
+    cmd = geometry_msgs.msg.Twist()
+    cmd.linear.x = foot_height_right
+    cmd.linear.y = foot_height_left
+    cmd.linear.z = step_distance
+    feet_distances.publish(cmd)
+
+    rate.sleep()

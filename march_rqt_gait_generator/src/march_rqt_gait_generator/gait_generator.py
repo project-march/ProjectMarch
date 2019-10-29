@@ -12,14 +12,16 @@ from numpy_ringbuffer import RingBuffer
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget, QFileDialog, QPushButton, QFrame, QShortcut, \
+from python_qt_binding.QtWidgets import QWidget, QFileDialog, QPushButton, QTextBrowser, QShortcut, \
                                         QLineEdit, QSlider, QHeaderView, QTableWidgetItem, \
-                                        QCheckBox, QMessageBox, QSpinBox, QDoubleSpinBox
+                                        QCheckBox, QMessageBox, QSpinBox, QDoubleSpinBox, QFrame
 
 import rviz
 
 from trajectory_msgs.msg import JointTrajectory
 from sensor_msgs.msg import JointState
+import tf
+import geometry_msgs.msg
 
 import GaitFactory
 import UserInterfaceController
@@ -31,6 +33,7 @@ from import_export import export_to_file, import_from_file_name
 from JointSettingPlot import JointSettingPlot
 from TimeSliderThread import TimeSliderThread
 
+import geometry_msgs.msg
 
 class GaitGeneratorPlugin(Plugin):
     DEFAULT_GAIT_DURATION = 8
@@ -54,6 +57,9 @@ class GaitGeneratorPlugin(Plugin):
         self.build_ui(context)
         self.set_topic_name(self.topic_name_line_edit.text())
         self.load_gait_into_ui()
+        rospy.Subscriber("feet_distances",
+                         geometry_msgs.msg.Twist,
+                         self.set_feet_distances)
 
     # Called by __init__
     def build_ui(self, context):
@@ -78,6 +84,9 @@ class GaitGeneratorPlugin(Plugin):
         self.undo_button = self._widget.RvizFrame.findChild(QPushButton, "Undo")
         self.redo_button = self._widget.RvizFrame.findChild(QPushButton, "Redo")
         self.playback_speed_spin_box = self._widget.RvizFrame.findChild(QSpinBox, "PlaybackSpeed")
+        self.height_left_line_edit = self._widget.RvizFrame.findChild(QLineEdit, "HeightLeft")
+        self.height_right_line_edit = self._widget.RvizFrame.findChild(QLineEdit, "HeightRight")
+        self.heel_distance_line_edit = self._widget.RvizFrame.findChild(QLineEdit, "HeelHeelDistance")
         self.topic_name_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "TopicName")
         self.gait_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Gait")
         self.subgait_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait")
@@ -428,6 +437,12 @@ class GaitGeneratorPlugin(Plugin):
     def save_changed_joint(self, joint):
         self.joint_changed_history.append(joint)
         self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
+
+    # Called to update values in Heigt left foot etc.
+    def set_feet_distances(self, msg):
+        self.height_left_line_edit.setText(str(msg.linear.x))
+        self.height_right_line_edit.setText(str(msg.linear.y))
+        self.heel_distance_line_edit.setText(str(msg.linear.z))
 
     @QtCore.pyqtSlot(int)
     def update_main_time_slider(self, time):
