@@ -139,7 +139,7 @@ Next we must tell cmake which tests it has to build. So add the following to the
 
     if(CATKIN_ENABLE_TESTING)
         catkin_add_gtest(add_test test/AddTest.cpp)
-        target_link_libraries(add_test ${PROJECT_NAME} ${catkin_LIBRARIES})
+        target_link_libraries(add_test ros_test_tutorial ${catkin_LIBRARIES})
     endif()
 
 Here we tell ``cmake`` to build the test and use our library. Now when
