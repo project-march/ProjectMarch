@@ -22,9 +22,9 @@ Running all the tests within your workspace can be done by the following command
   colcon test
 
 The ``build`` step also builds the automated tests, so it is important to run
-``build`` when you modify tests. This will run all the tests and will fail when
-tests fail. Colcon also gives the possibility to review the test results and
-give more information on any failing tests.
+``build`` when you modify tests. The ``test`` step will run all the tests and
+will fail when tests fail. Colcon also gives the possibility to review the test
+results and give more information on any failing tests.
 
 .. code::
 
@@ -42,13 +42,13 @@ specified packages.
 
 Running roslint
 ^^^^^^^^^^^^^^^
-The march packages that contain are also checked for code style with
+All march packages are also checked for code style with
 `roslint <https://wiki.ros.org/roslint>`_. The ``roslint`` target should also
 be run from the workspace root like so.
 
 .. code::
 
-  colcon build --cmake-target-skip-unavailable --cmake-target roslint
+  colcon build --event-handlers console_direct+ --cmake-target-skip-unavailable --cmake-target roslint
 
 This command will run the ``roslint`` target on any packages that use
 ``roslint``. It will also output any linter warnings that you should fix,
@@ -87,7 +87,7 @@ For testing ROS packages we make a distinction between two different kinds of te
 2. Integration tests (node level)
 
 Also see the `ROS wiki on testing <https://wiki.ros.org/Quality/Tutorials/UnitTesting>`_.
-The unit tests are different for c++ and python projects. C++ projects use the
+The unit tests are different for C++ and python projects. C++ projects use the
 `gtest <https://github.com/google/googletest>`_ framework, whereas Python projects use
 `unittest <http://pythontesting.net/framework/unittest/unittest-introduction/>`_.
 For node level tests, `rostest <https://wiki.ros.org/rostest>`_ is used.
@@ -95,13 +95,14 @@ Rostest uses launch files to launch the nodes under test and the actual tests.
 
 The next sections will describe the process of writing tests. For this
 tutorial we will use the :codedir:`ros_test_tutorial package <development/ros_test_tutorial>`.
-This package already includes some c++ and python code to write tests for.
+This package already includes some C++ and python code to write tests for.
 
-Writing c++ unit tests
+Writing C++ unit tests
 ^^^^^^^^^^^^^^^^^^^^^^
-Tests are always located in the ``test/`` directory of a package. To create a
-test we create a new cpp file in the ``test`` directory called ``AddTest.cpp``
-with the following contents.
+As an example we will create tests for the ``Add.cpp`` class that is located in
+this repository. Tests are always located in the ``test/`` directory of a
+package. To create a test we create a new cpp file in the ``test`` directory
+called ``AddTest.cpp`` with the following contents.
 
 .. code::
 
@@ -136,8 +137,8 @@ would be another example of a test.
 
 In order to build and run the unit tests we must add ``rosunit`` as test
 dependency to our package. So normally we would add the following to the
-``package.xml``. However, this has already been done in highlevel
-``package.xml``.
+``package.xml``. However, this has already been done in the highlevel
+``package.xml`` for this repository, so this is not necessary in this example.
 
 .. code::
 
@@ -152,18 +153,22 @@ Next we must tell cmake which tests it has to build. So add the following to the
         target_link_libraries(add_test ros_test_tutorial ${catkin_LIBRARIES})
     endif()
 
-Here we tell ``cmake`` to build the test and use our library. Now when
-``colcon test`` is run from the workspace root you should see tests passing.
+Here we tell ``cmake`` to build the test and use our library. The
+``catkin_add_gtest`` command creates a new test called ``add_test`` from the
+source file ``AddTest.cpp``. Now when ``colcon test`` is run from the workspace
+root you should see tests passing.
 
-Writing c++ node tests
+Writing C++ node tests
 ^^^^^^^^^^^^^^^^^^^^^^
 
 
 Writing python unit tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-Tests for python are also always located in the ``test/`` directory. We will
-first start by writing our test. So create the ``MultiplyTest.py`` file to your
-``test/`` directory and fill it with the following contents.
+As an example we will create tests for the function ``Multiply.py`` that is
+located in this repository. Tests are also always located in the ``test/``
+directory. We will first start by writing our test. So create the
+``MultiplyTest.py`` file to your ``test/`` directory and fill it with the
+following contents.
 
 .. code::
 
@@ -182,13 +187,14 @@ first start by writing our test. So create the ``MultiplyTest.py`` file to your
     if __name__ == '__main__':
         rosunit.unitrun(PKG, 'test_multiply', MultiplyTest)
 
-The actual tests are written as functions inside the ``MultiplyTest`` class.
+The last line will run all test methods inside the ``MultiplyTest`` class that
+start with ``test``, where ``'test_multiply'`` is the name of the test case.
 See if you can add more tests (and make them fail). See the `python unittest
 documentation <https://docs.python.org/3/library/unittest.html>`_ for more
 information on writing tests.
 
-Next we must tell ``cmake`` to build and how to run the tests. We do this by
-adding ``catkin_add_nosetests()`` inside our ``CATKIN_ENABLE_TESTING``.
+Next we must tell ``cmake`` how to build the tests. We do this by adding
+``catkin_add_nosetests()`` inside our ``CATKIN_ENABLE_TESTING``.
 
 .. code::
 
@@ -198,7 +204,7 @@ adding ``catkin_add_nosetests()`` inside our ``CATKIN_ENABLE_TESTING``.
         ...
     endif()
 
-The tests can also be run with ``colcon test``.
+After building, the tests can now be run with ``colcon test``.
 Also see the `ros wiki on writing unit tests for python <https://wiki.ros.org/unittest#Code-level_Python_Unit_Tests>`_.
 
 Writing python node tests
