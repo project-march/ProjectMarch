@@ -461,23 +461,23 @@ std::string IMotionCube::parseDetailedError(uint16 detailedError)
 
 bool IMotionCube::goToTargetState(IMotionCubeTargetState targetState)
 {
-  ROS_INFO("\tTry to go to '%s'", targetState.getDescription().c_str());
+  ROS_DEBUG("\tTry to go to '%s'", targetState.getDescription().c_str());
   while (!targetState.isReached(this->getStatusWord()))
   {
     this->setControlWord(targetState.getControlWord());
-    ROS_INFO_THROTTLE(0.5, "\tWaiting for '%s': %s", targetState.getDescription().c_str(),
+    ROS_DEBUG_THROTTLE(0.5, "\tWaiting for '%s': %s", targetState.getDescription().c_str(),
                       std::bitset<16>(this->getStatusWord()).to_string().c_str());
     if (targetState.getState() == IMotionCubeTargetState::OPERATION_ENABLED.getState() &&
         this->getState(this->getStatusWord()) == IMCState::fault)
     {
-      ROS_FATAL("IMotionCube went to fault state while attempting to go to %s. Shutting down.",
+      ROS_FATAL("IMotionCube went to fault state while attempting to go to '%s'. Shutting down.",
                 targetState.getDescription().c_str());
       ROS_FATAL("Detailed Error: %s", this->parseDetailedError(this->getDetailedError()).c_str());
       ROS_FATAL("Motion Error: %s", this->parseMotionError(this->getMotionError()).c_str());
       throw std::domain_error("IMC to fault state");
     }
   }
-  ROS_INFO("\tReached '%s'!", targetState.getDescription().c_str());
+  ROS_DEBUG("\tReached '%s'!", targetState.getDescription().c_str());
 }
 
 bool IMotionCube::goToOperationEnabled()

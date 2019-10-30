@@ -25,13 +25,13 @@ void Joint::prepareActuation()
                  this->name.c_str(), this->getActuationMode().toString().c_str());
   if (this->allowActuation)
   {
-    ROS_INFO("Preparing joint %s for actuation", this->name.c_str());
+    ROS_INFO("[%s] Preparing for actuation", this->name.c_str());
     this->iMotionCube.goToOperationEnabled();
-    ROS_INFO("\tJoint %s successfully prepared for actuation", this->name.c_str());
+    ROS_INFO("[%s] Successfully prepared for actuation", this->name.c_str());
   }
   else
   {
-    ROS_ERROR("Trying to prepare joint %s for actuation while it is not "
+    ROS_ERROR("[%s] Trying to prepare for actuation while it is not "
               "allowed to actuate",
               this->name.c_str());
   }
@@ -44,9 +44,9 @@ void Joint::resetIMotionCube()
 
 void Joint::actuateRad(float targetPositionRad)
 {
-  ROS_ASSERT_MSG(this->allowActuation, "Joint %s is not allowed to actuate, "
-                                       "yet its actuate method has been "
-                                       "called.",
+  ROS_ASSERT_MSG(this->allowActuation,
+                 "Joint %s is not allowed to actuate, "
+                 "yet its actuate method has been called",
                  this->name.c_str());
   // TODO(BaCo) check that the position is allowed and does not exceed (torque)
   // limits.
@@ -57,7 +57,7 @@ float Joint::getAngleRad()
 {
   if (!hasIMotionCube())
   {
-    ROS_WARN("Joint %s has no iMotionCube", this->name.c_str());
+    ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
     return -1;
   }
   return this->iMotionCube.getAngleRad();
@@ -65,9 +65,9 @@ float Joint::getAngleRad()
 
 void Joint::actuateTorque(int targetTorque)
 {
-  ROS_ASSERT_MSG(this->allowActuation, "Joint %s is not allowed to actuate, "
-                                       "yet its actuate method has been "
-                                       "called.",
+  ROS_ASSERT_MSG(this->allowActuation,
+                 "Joint %s is not allowed to actuate, "
+                 "yet its actuate method has been called",
                  this->name.c_str());
   this->iMotionCube.actuateTorque(targetTorque);
 }
@@ -76,7 +76,7 @@ float Joint::getTorque()
 {
   if (!hasIMotionCube())
   {
-    ROS_WARN("Joint %s has no iMotionCube", this->name.c_str());
+    ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
     return -1;
   }
   return this->iMotionCube.getTorque();
@@ -86,7 +86,7 @@ int Joint::getAngleIU()
 {
   if (!hasIMotionCube())
   {
-    ROS_WARN("Joint %s has no iMotionCube", this->name.c_str());
+    ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
     return -1;
   }
   return this->iMotionCube.getAngleIU();
@@ -96,7 +96,7 @@ float Joint::getTemperature()
 {
   if (!hasTemperatureGES())
   {
-    ROS_WARN("Joint %s has no temperature sensor", this->name.c_str());
+    ROS_WARN("[%s] Has no temperature sensor", this->name.c_str());
     return -1;
   }
   return this->temperatureGES.getTemperature();

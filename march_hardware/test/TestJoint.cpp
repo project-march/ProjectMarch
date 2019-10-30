@@ -45,14 +45,16 @@ TEST_F(JointDeathTest, ActuateDisableActuation)
     joint.setAllowActuation(false);
     joint.setName("actuate_false");
     ASSERT_FALSE(joint.canActuate());
-    ASSERT_DEATH(joint.actuateRad(0.3), "Joint actuate_false is not allowed to actuate, yet its actuate method has been called.");
+    ASSERT_DEATH(joint.actuateRad(0.3), "Joint actuate_false is not allowed to actuate, "
+                                        "yet its actuate method has been called");
 }
 
 TEST_F(JointTest, NoActuationMode)
 {
   march4cpp::Joint joint;
   joint.setName("test_joint");
-  ASSERT_DEATH(joint.actuateRad(1), "Joint test_joint is not allowed to actuate, yet its actuate method has been called.");
+  ASSERT_DEATH(joint.actuateRad(1), "Joint test_joint is not allowed to actuate, "
+                                    "yet its actuate method has been called");
 }
 
 TEST_F(JointTest, ChangeActuationModeToUnknown)

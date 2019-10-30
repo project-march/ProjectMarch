@@ -10,7 +10,7 @@
             name="record"
             type="record"
             output="screen"
-            args="-o /home/projectmarch/Documents/logs/Testjoint.bag /march/controller/trajectory/state /clock"
+            args="-q -o /home/projectmarch/Documents/logs/Testjoint.bag /march/controller/trajectory/state /clock"
     />
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
