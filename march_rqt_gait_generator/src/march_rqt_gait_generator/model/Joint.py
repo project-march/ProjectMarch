@@ -131,7 +131,9 @@ class Joint:
     def undo(self):
         self.setpoints_redo_list.append(list(self.setpoints))
         self.setpoints = self.setpoints_history.pop()
+        self.interpolated_setpoints = self.interpolate_setpoints()
 
     def redo(self):
         self.setpoints_history.append(list(self.setpoints))
         self.setpoints = self.setpoints_redo_list.pop()
+        self.interpolated_setpoints = self.interpolate_setpoints()

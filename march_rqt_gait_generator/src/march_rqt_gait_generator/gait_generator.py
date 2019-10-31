@@ -12,11 +12,12 @@ from numpy_ringbuffer import RingBuffer
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget, QFileDialog, QPushButton, QFrame, QShortcut, \
+from python_qt_binding.QtWidgets import QWidget, QFileDialog, QPushButton, QTextBrowser, QShortcut, \
                                         QLineEdit, QSlider, QHeaderView, QTableWidgetItem, \
-                                        QCheckBox, QMessageBox, QSpinBox, QDoubleSpinBox
+                                        QCheckBox, QMessageBox, QSpinBox, QDoubleSpinBox, QFrame
 
 import rviz
+from tf import TransformListener, LookupException, ConnectivityException, ExtrapolationException
 
 from trajectory_msgs.msg import JointTrajectory
 from sensor_msgs.msg import JointState
@@ -44,6 +45,7 @@ class GaitGeneratorPlugin(Plugin):
         self.gait_directory = None
         self.playback_speed = 100
         self.time_slider_thread = None
+        self.tf_listener = TransformListener()
         self.joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=10)
         self.joint_changed_history = RingBuffer(capacity=100, dtype=list)
         self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
@@ -78,6 +80,9 @@ class GaitGeneratorPlugin(Plugin):
         self.undo_button = self._widget.RvizFrame.findChild(QPushButton, "Undo")
         self.redo_button = self._widget.RvizFrame.findChild(QPushButton, "Redo")
         self.playback_speed_spin_box = self._widget.RvizFrame.findChild(QSpinBox, "PlaybackSpeed")
+        self.height_left_line_edit = self._widget.RvizFrame.findChild(QLineEdit, "HeightLeft")
+        self.height_right_line_edit = self._widget.RvizFrame.findChild(QLineEdit, "HeightRight")
+        self.heel_distance_line_edit = self._widget.RvizFrame.findChild(QLineEdit, "HeelHeelDistance")
         self.topic_name_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "TopicName")
         self.gait_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Gait")
         self.subgait_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait")
@@ -288,6 +293,7 @@ class GaitGeneratorPlugin(Plugin):
             joint_state.name.append(self.gait.joints[i].name)
             joint_state.position.append(self.gait.joints[i].get_interpolated_position(time))
         self.joint_state_pub.publish(joint_state)
+        self.set_feet_distances()
 
     def toggle_velocity_markers(self):
         self.velocity_markers_check_box.toggle()
@@ -415,6 +421,7 @@ class GaitGeneratorPlugin(Plugin):
         joint = self.joint_changed_history.pop()
         joint.undo()
         self.joint_changed_redo_list.append(joint)
+        self.publish_preview()
 
     def redo(self):
         if not self.joint_changed_redo_list:
@@ -423,11 +430,26 @@ class GaitGeneratorPlugin(Plugin):
         joint = self.joint_changed_redo_list.pop()
         joint.redo()
         self.joint_changed_history.append(joint)
+        self.publish_preview()
 
     # Called by Joint.save_setpoints. Needed for undo and redo.
     def save_changed_joint(self, joint):
         self.joint_changed_history.append(joint)
         self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
+
+    # Called to update values in Heigt left foot etc.
+    def set_feet_distances(self):
+        try:
+            # The translation from the right foot to the left foot is the position of the
+            # left foot from the right foot's frame of reference.
+            (trans_left, rot_right) = self.tf_listener.lookupTransform('/foot_right', '/foot_left', rospy.Time(0))
+            (trans_right, rot_left) = self.tf_listener.lookupTransform('/foot_left', '/foot_right', rospy.Time(0))
+        except (LookupException, ConnectivityException, ExtrapolationException):
+            return
+
+        self.height_left_line_edit.setText('%.3f' % trans_left[2])
+        self.height_right_line_edit.setText('%.3f' % trans_right[2])
+        self.heel_distance_line_edit.setText('%.3f' % math.sqrt(trans_left[0] ** 2 + trans_left[2] ** 2))
 
     @QtCore.pyqtSlot(int)
     def update_main_time_slider(self, time):
