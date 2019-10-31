@@ -445,7 +445,6 @@ class GaitGeneratorPlugin(Plugin):
             (trans_left, rot_right) = self.tf_listener.lookupTransform('/foot_right', '/foot_left', rospy.Time(0))
             (trans_right, rot_left) = self.tf_listener.lookupTransform('/foot_left', '/foot_right', rospy.Time(0))
         except (LookupException, ConnectivityException, ExtrapolationException):
-            print("crap")
             return
 
         self.height_left_line_edit.setText('%.3f' % trans_left[2])
