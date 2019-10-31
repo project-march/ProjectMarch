@@ -465,7 +465,7 @@ bool IMotionCube::goToTargetState(IMotionCubeTargetState targetState)
   while (!targetState.isReached(this->getStatusWord()))
   {
     this->setControlWord(targetState.getControlWord());
-    ROS_DEBUG_THROTTLE(0.5, "\tWaiting for '%s': %s", targetState.getDescription().c_str(),
+    ROS_INFO_DELAYED_THROTTLE(2, "\tWaiting for '%s': %s", targetState.getDescription().c_str(),
                       std::bitset<16>(this->getStatusWord()).to_string().c_str());
     if (targetState.getState() == IMotionCubeTargetState::OPERATION_ENABLED.getState() &&
         this->getState(this->getStatusWord()) == IMCState::fault)
