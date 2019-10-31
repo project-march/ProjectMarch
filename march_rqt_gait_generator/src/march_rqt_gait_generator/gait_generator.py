@@ -17,10 +17,10 @@ from python_qt_binding.QtWidgets import QWidget, QFileDialog, QPushButton, QText
                                         QCheckBox, QMessageBox, QSpinBox, QDoubleSpinBox, QFrame
 
 import rviz
+from tf import TransformListener, LookupException, ConnectivityException, ExtrapolationException
 
 from trajectory_msgs.msg import JointTrajectory
 from sensor_msgs.msg import JointState
-from march_shared_resources.msg import FeetDistances
 
 import GaitFactory
 import UserInterfaceController
@@ -31,6 +31,7 @@ from import_export import export_to_file, import_from_file_name
 
 from JointSettingPlot import JointSettingPlot
 from TimeSliderThread import TimeSliderThread
+
 
 class GaitGeneratorPlugin(Plugin):
     DEFAULT_GAIT_DURATION = 8
@@ -44,6 +45,7 @@ class GaitGeneratorPlugin(Plugin):
         self.gait_directory = None
         self.playback_speed = 100
         self.time_slider_thread = None
+        self.tf_listener = TransformListener()
         self.joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=10)
         self.joint_changed_history = RingBuffer(capacity=100, dtype=list)
         self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
@@ -156,10 +158,6 @@ class GaitGeneratorPlugin(Plugin):
                 self.mirror_key2_line_edit.setEnabled(state)
             ]
         )
-        # Continuously update the step height and step length.
-        rospy.Subscriber("feet_distances",
-                         FeetDistances,
-                         self.set_feet_distances)
 
     # Called by __init__ and import_gait.
     def load_gait_into_ui(self):
@@ -170,6 +168,7 @@ class GaitGeneratorPlugin(Plugin):
             self.gait.set_current_time(float(self.time_slider.value()) / 100),
             self.publish_preview(),
             self.update_time_sliders(),
+            self.set_feet_distances(),
         ])
 
         self.gait_name_line_edit.setText(self.gait.name)
@@ -329,6 +328,7 @@ class GaitGeneratorPlugin(Plugin):
         max = self.time_slider.maximum()
         self.time_slider_thread = TimeSliderThread(current, playback_speed, max)
         self.time_slider_thread.update_signal.connect(self.update_main_time_slider)
+        self.time_slider_thread.update_signal.connect(self.set_feet_distances)
         self.time_slider_thread.start()
 
     def stop_time_slider_thread(self):
@@ -437,10 +437,19 @@ class GaitGeneratorPlugin(Plugin):
         self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
 
     # Called to update values in Heigt left foot etc.
-    def set_feet_distances(self, msg):
-        self.height_left_line_edit.setText('%.3f' % msg.foot_height_left)
-        self.height_right_line_edit.setText('%.3f' % msg.foot_height_right)
-        self.heel_distance_line_edit.setText('%.3f' % msg.step_distance)
+    def set_feet_distances(self):
+        try:
+            # The translation from the right foot to the left foot is the position of the
+            # left foot from the right foot's frame of reference.
+            (trans_left, rot_right) = self.tf_listener.lookupTransform('/foot_right', '/foot_left', rospy.Time(0))
+            (trans_right, rot_left) = self.tf_listener.lookupTransform('/foot_left', '/foot_right', rospy.Time(0))
+        except (LookupException, ConnectivityException, ExtrapolationException):
+            print("crap")
+            return
+
+        self.height_left_line_edit.setText('%.3f' % trans_left[2])
+        self.height_right_line_edit.setText('%.3f' % trans_right[2])
+        self.heel_distance_line_edit.setText('%.3f' % math.sqrt(trans_left[0] ** 2 + trans_left[2] ** 2))
 
     @QtCore.pyqtSlot(int)
     def update_main_time_slider(self, time):
