@@ -87,8 +87,9 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    :hidden:
 
    doc/development/documentation
-   doc/development/add_a_new_gait
    doc/continuous_integration/continuous_integration
+   doc/development/testing
+   doc/development/add_a_new_gait
 
 
 .. toctree::
