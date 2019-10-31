@@ -165,7 +165,7 @@ Writing C++ node tests
 Writing python unit tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 As an example we will create tests for the function ``Multiply.py`` that is
-located in this repository. Tests are also always located in the ``test/``
+located in this repository. Tests are always located in the ``test/``
 directory. We will first start by writing our test. So create the
 ``MultiplyTest.py`` file to your ``test/`` directory and fill it with the
 following contents.
