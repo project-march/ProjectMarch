@@ -168,7 +168,6 @@ class GaitGeneratorPlugin(Plugin):
             self.gait.set_current_time(float(self.time_slider.value()) / 100),
             self.publish_preview(),
             self.update_time_sliders(),
-            self.set_feet_distances(),
         ])
 
         self.gait_name_line_edit.setText(self.gait.name)
@@ -294,6 +293,7 @@ class GaitGeneratorPlugin(Plugin):
             joint_state.name.append(self.gait.joints[i].name)
             joint_state.position.append(self.gait.joints[i].get_interpolated_position(time))
         self.joint_state_pub.publish(joint_state)
+        self.set_feet_distances()
 
     def toggle_velocity_markers(self):
         self.velocity_markers_check_box.toggle()
@@ -328,7 +328,6 @@ class GaitGeneratorPlugin(Plugin):
         max = self.time_slider.maximum()
         self.time_slider_thread = TimeSliderThread(current, playback_speed, max)
         self.time_slider_thread.update_signal.connect(self.update_main_time_slider)
-        self.time_slider_thread.update_signal.connect(self.set_feet_distances)
         self.time_slider_thread.start()
 
     def stop_time_slider_thread(self):
@@ -422,6 +421,7 @@ class GaitGeneratorPlugin(Plugin):
         joint = self.joint_changed_history.pop()
         joint.undo()
         self.joint_changed_redo_list.append(joint)
+        self.publish_preview()
 
     def redo(self):
         if not self.joint_changed_redo_list:
@@ -430,6 +430,7 @@ class GaitGeneratorPlugin(Plugin):
         joint = self.joint_changed_redo_list.pop()
         joint.redo()
         self.joint_changed_history.append(joint)
+        self.publish_preview()
 
     # Called by Joint.save_setpoints. Needed for undo and redo.
     def save_changed_joint(self, joint):
