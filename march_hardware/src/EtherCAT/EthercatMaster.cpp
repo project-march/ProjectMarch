@@ -183,7 +183,7 @@ int EthercatMaster::receiveProcessData()
   int wkc =  ec_receive_processdata(EC_TIMEOUTRET);
   if (wkc < this->expectedWKC)
   {
-    ROS_WARN("Working counter lower than expected. EtherCAT connection may not be optimal");
+    ROS_WARN_THROTTLE(1, "Working counter lower than expected. EtherCAT connection may not be optimal");
   }
   return wkc;
 }
