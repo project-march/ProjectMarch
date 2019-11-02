@@ -77,6 +77,7 @@ class GaitGeneratorPlugin(Plugin):
         self.publish_gait_button = self._widget.SettingsFrame.findChild(QPushButton, "Publish")
         self.start_button = self._widget.RvizFrame.findChild(QPushButton, "Start")
         self.stop_button = self._widget.RvizFrame.findChild(QPushButton, "Stop")
+        self.invert_button = self._widget.RvizFrame.findChild(QPushButton, "Invert")
         self.undo_button = self._widget.RvizFrame.findChild(QPushButton, "Undo")
         self.redo_button = self._widget.RvizFrame.findChild(QPushButton, "Redo")
         self.playback_speed_spin_box = self._widget.RvizFrame.findChild(QSpinBox, "PlaybackSpeed")
@@ -124,6 +125,7 @@ class GaitGeneratorPlugin(Plugin):
 
         self.start_button.clicked.connect(self.start_time_slider_thread)
         self.stop_button.clicked.connect(self.stop_time_slider_thread)
+        self.invert_button.clicked.connect(self.invert_gait)
         self.undo_button.clicked.connect(self.undo)
         self.redo_button.clicked.connect(self.redo)
 
@@ -244,6 +246,7 @@ class GaitGeneratorPlugin(Plugin):
 
         self.undo_button.clicked.connect(update_joint_ui)
         self.redo_button.clicked.connect(update_joint_ui)
+        self.invert_button.clicked.connect(update_joint_ui)
 
         self.velocity_markers_check_box.stateChanged.connect(
             lambda: [
@@ -414,27 +417,35 @@ class GaitGeneratorPlugin(Plugin):
         else:
             self.change_gait_directory_button.setText(self.gait_directory)
 
+    def invert_gait(self):
+        for joint in self.gait.joints:
+            joint.invert()
+        self.save_changed_joints(self.gait.joints)
+        self.publish_preview()
+
     def undo(self):
         if not self.joint_changed_history:
             return
 
-        joint = self.joint_changed_history.pop()
-        joint.undo()
-        self.joint_changed_redo_list.append(joint)
+        joints = self.joint_changed_history.pop()
+        for joint in joints:
+            joint.undo()
+        self.joint_changed_redo_list.append(joints)
         self.publish_preview()
 
     def redo(self):
         if not self.joint_changed_redo_list:
             return
 
-        joint = self.joint_changed_redo_list.pop()
-        joint.redo()
-        self.joint_changed_history.append(joint)
+        joints = self.joint_changed_redo_list.pop()
+        for joint in joints:
+            joint.redo()
+        self.joint_changed_history.append(joints)
         self.publish_preview()
 
     # Called by Joint.save_setpoints. Needed for undo and redo.
-    def save_changed_joint(self, joint):
-        self.joint_changed_history.append(joint)
+    def save_changed_joints(self, joints):
+        self.joint_changed_history.append(joints)
         self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
 
     # Called to update values in Heigt left foot etc.
