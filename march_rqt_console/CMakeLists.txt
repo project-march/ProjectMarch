@@ -20,5 +20,5 @@ install(PROGRAMS scripts/${PROJECT_NAME}
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-file(GLOB_RECURSE lintfiles "src/*.py" "scripts/march_rqt_console")
+file(GLOB_RECURSE lintfiles "src/*.py")
 roslint_python(${lintfiles})
