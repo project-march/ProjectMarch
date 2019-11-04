@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 import rospy
 from scipy.interpolate import BPoly
 from numpy_ringbuffer import RingBuffer
@@ -124,9 +125,17 @@ class Joint:
         self.enforce_limits()
         self.interpolated_setpoints = self.interpolate_setpoints()
 
-    def save_setpoints(self):
-        self.setpoints_history.append(list(self.setpoints))    # list(...) to copy instead of pointer
-        self.gait_generator.save_changed_joint(self)
+    def save_setpoints(self, single_joint_change=True):
+        self.setpoints_history.append(copy.deepcopy(self.setpoints))    # list(...) to copy instead of pointer
+        if single_joint_change:
+            self.gait_generator.save_changed_joints([self])
+
+    def invert(self):
+        self.save_setpoints(single_joint_change=False)
+        self.setpoints = list(reversed(self.setpoints))
+        for setpoint in self.setpoints:
+            setpoint.invert(self.duration)
+        self.interpolated_setpoints = self.interpolate_setpoints()
 
     def undo(self):
         self.setpoints_redo_list.append(list(self.setpoints))

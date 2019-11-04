@@ -15,5 +15,9 @@ class Setpoint:
     def set_velocity(self, velocity):
         self.velocity = round(velocity, self.digits)
 
+    def invert(self, duration):
+        self.time = duration - self.time
+        self.velocity = -self.velocity
+
     def __repr__(self):
         return 'Time: %s, Position: %s, Velocity: %s' % (self.time, self.position, self.velocity)
