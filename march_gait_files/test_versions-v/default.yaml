@@ -1,2 +1,2 @@
 gaits:
-  rough_terrain_high_step: {right_open: MV_RT_highstep_rightopen_v1, left_close: MV_RT_leftclose_v1}
+  rough_terrain_high_step: {right_open: MV_RT_highstep_rightopen_v1, left_close: MV_RT_highstep_leftclose_v1}
