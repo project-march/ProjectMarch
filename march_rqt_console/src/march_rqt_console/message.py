@@ -1,5 +1,6 @@
 from python_qt_binding.QtCore import QDateTime, QObject
 
+
 class Message(QObject):
 
     DEBUG = 1
@@ -21,4 +22,3 @@ class Message(QObject):
 
         self.message = message
         self.level = level
-

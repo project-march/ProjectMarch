@@ -2,6 +2,7 @@ from python_qt_binding.QtCore import QAbstractTableModel, QModelIndex, Qt
 
 from march_rqt_console.message import Message
 
+
 class MessageModel(QAbstractTableModel):
 
     columns = ['time', 'level', 'message']
@@ -36,7 +37,7 @@ class MessageModel(QAbstractTableModel):
                 elif column == 2:
                     return msg.message
 
-        return None;
+        return None
 
     def insert_row(self, message):
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
