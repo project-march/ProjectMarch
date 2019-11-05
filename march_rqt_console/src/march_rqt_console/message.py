@@ -1,4 +1,4 @@
-from python_qt_binding.QtCore import QDateTime, QObject
+from python_qt_binding.QtCore import QDateTime, QObject, QTime
 
 
 class Message(QObject):
@@ -21,4 +21,8 @@ class Message(QObject):
         super(Message, self).__init__()
 
         self.message = message
+        self.time = QTime.currentTime()
         self.level = level
+
+    def time_string(self):
+        return self.time.toString()

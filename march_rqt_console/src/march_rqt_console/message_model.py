@@ -32,6 +32,8 @@ class MessageModel(QAbstractTableModel):
             msg = self._messages[row]
 
             if role == Qt.DisplayRole:
+                if column == 0:
+                    return msg.time_string()
                 if column == 1:
                     return Message.LEVEL_LABELS[msg.level]
                 elif column == 2:
