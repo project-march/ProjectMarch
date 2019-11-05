@@ -22,6 +22,7 @@ class ConsolePlugin(Plugin):
         self._model = MessageModel()
 
         self._widget.table_view.setModel(self._model)
+        self._widget.table_view.verticalScrollBar().rangeChanged.connect(self.change_scroll)
         self._widget.input_field.returnPressed.connect(self.insert_message)
 
     def init_ui(self, context):
@@ -35,3 +36,6 @@ class ConsolePlugin(Plugin):
         if msg:
             self._model.insert_row(Message(msg))
             self._widget.input_field.clear()
+
+    def change_scroll(self, min, max):
+        self._widget.table_view.verticalScrollBar().setSliderPosition(max)
