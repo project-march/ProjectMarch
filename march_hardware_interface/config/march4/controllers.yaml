@@ -20,8 +20,8 @@ march:
         - left_knee
         - right_ankle
         - right_hip_aa
-        - right_knee
         - right_hip_fe
+        - right_knee
 #      gains: # Required because we're controlling an effort interface
 #        left_ankle: {p: 160, i: 0, d: 6, i_clamp: 100, publish_state: true, antiwindup: true}
 #        left_hip_aa: {p: 290, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
