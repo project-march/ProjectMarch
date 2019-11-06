@@ -23,7 +23,10 @@ class NotesPlugin(Plugin):
 
         self._widget.table_view.setModel(self._model)
         self._widget.table_view.verticalScrollBar().rangeChanged.connect(self.change_scroll)
+
         self._widget.input_field.returnPressed.connect(self.insert_entry)
+
+        self._widget.take_button.clicked.connect(self.start_take)
 
     def init_ui(self, context):
         ui_file = os.path.join(rospkg.RosPack().get_path('march_rqt_note_taker'), 'resource', 'plugin.ui')
@@ -36,6 +39,10 @@ class NotesPlugin(Plugin):
         if entry:
             self._model.insert_row(Entry(entry))
             self._widget.input_field.clear()
+
+    def start_take(self):
+        take = self._widget.camera_spin_box.value()
+        self._model.insert_row(Entry('Started camera take {}'.format(take)))
 
     def change_scroll(self, min, max):
         self._widget.table_view.verticalScrollBar().setSliderPosition(max)

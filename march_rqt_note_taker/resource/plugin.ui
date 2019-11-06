@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>NotesWidget</class>
+ <class>notes_widget</class>
  <widget class="QWidget" name="notes_widget">
   <property name="geometry">
    <rect>
@@ -137,19 +137,29 @@
       <widget class="QLineEdit" name="input_field"/>
      </item>
      <item row="0" column="0">
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="entry_label">
        <property name="text">
         <string>Entry:</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QSpinBox" name="spinBox"/>
+      <widget class="QSpinBox" name="camera_spin_box"/>
      </item>
      <item row="0" column="1">
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="take_label">
        <property name="text">
         <string>Camera take:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QPushButton" name="take_button">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start the camera take number&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Start take</string>
        </property>
       </widget>
      </item>
