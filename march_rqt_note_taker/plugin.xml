@@ -1,12 +1,12 @@
 <library path="src">
-    <class name="ConsolePlugin" type="march_rqt_console.console_plugin.ConsolePlugin" base_class_type="rqt_gui_py::Plugin">
+    <class name="NotesPlugin" type="march_rqt_note_taker.notes_plugin.NotesPlugin" base_class_type="rqt_gui_py::Plugin">
         <description>
             An RQT plugin for monitoring log messages and writing logs.
         </description>
         <qtgui>
-            <label>March Console</label>
+            <label>March Minutes</label>
             <icon>resource/img/march-walking.png</icon>
-            <statustip>March Console</statustip>
+            <statustip>March Minutes</statustip>
         </qtgui>
     </class>
 </library>

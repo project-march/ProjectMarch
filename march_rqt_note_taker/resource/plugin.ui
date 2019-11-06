@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ConsoleWidget</class>
- <widget class="QWidget" name="ConsoleWidget">
+ <class>NotesWidget</class>
+ <widget class="QWidget" name="notes_widget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -26,7 +26,7 @@
      <item>
       <widget class="QPushButton" name="load_button">
        <property name="toolTip">
-        <string>Load a Message file</string>
+        <string>Load a log file</string>
        </property>
        <property name="text">
         <string>Load</string>
@@ -139,7 +139,7 @@
      <item row="0" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Message:</string>
+        <string>Entry:</string>
        </property>
       </widget>
      </item>

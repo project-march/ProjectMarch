@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(march_rqt_console)
+project(march_rqt_note_taker)
 
 find_package(catkin REQUIRED COMPONENTS
     roslint

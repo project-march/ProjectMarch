@@ -1,7 +1,7 @@
 from python_qt_binding.QtCore import QDateTime, QObject, QTime
 
 
-class Message(QObject):
+class Entry(QObject):
 
     DEBUG = 1
     INFO = 2
@@ -17,10 +17,10 @@ class Message(QObject):
         FATAL: 'Fatal',
     }
 
-    def __init__(self, message, level=INFO):
-        super(Message, self).__init__()
+    def __init__(self, content, level=INFO):
+        super(Entry, self).__init__()
 
-        self.message = message
+        self.content = content
         self.time = QTime.currentTime()
         self.level = level
 

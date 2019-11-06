@@ -2,9 +2,9 @@
 
 import sys
 
-from march_rqt_console.console_plugin import ConsolePlugin
+from march_rqt_note_taker.notes_plugin import NotesPlugin
 from rqt_gui.main import Main
 
-plugin = 'march_rqt_console'
+plugin = 'march_rqt_note_taker'
 main = Main(filename=plugin)
 sys.exit(main.main(standalone=plugin))
