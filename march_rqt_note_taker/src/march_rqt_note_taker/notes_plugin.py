@@ -29,7 +29,7 @@ class NotesPlugin(Plugin):
         self._widget.take_button.clicked.connect(self.start_take)
 
     def init_ui(self, context):
-        ui_file = os.path.join(rospkg.RosPack().get_path('march_rqt_note_taker'), 'resource', 'plugin.ui')
+        ui_file = os.path.join(rospkg.RosPack().get_path('march_rqt_note_taker'), 'resource', 'note_taker.ui')
         loadUi(ui_file, self._widget)
 
         context.add_widget(self._widget)
