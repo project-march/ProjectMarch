@@ -8,11 +8,14 @@
   <arg name="debug" default="false"/>
 
   <!-- Load the URDF into the ROS Parameter Server -->
-  <!-- Override effort values as Gazebo uses different units than the actual hardware. -->
-  <!-- If the controller is properly tuned, these values can be arbitrarily large. -->
+  <!-- Override effort values as Gazebo uses different units than the actual IMC. -->
+  <!-- In theory, if the controller is properly tuned, these values can be arbitrarily large. -->
+  <!-- However, to limit the safety controller, we need to limit them. -->
     <param name="robot_description"
-            command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iv-simulation.xacro'
-            k_velocity_value:=10000.0 k_position_value:=20000.0 max_effort_rotary:=20000.0 max_effort_linear:=50000.0" />
+            command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iv.xacro'
+            k_velocity_value_rotary:=60.0 k_velocity_value_linear:=60.0
+            k_position_value_rotary:=50.0 k_position_value_linear:=50.0
+            max_effort_rotary:=200.0 max_effort_linear:=70.0" />
 
   <!-- Upload the controller configuration -->
   <rosparam file="$(find march_simulation)/config/config_march-iv.yaml" command="load"/>
