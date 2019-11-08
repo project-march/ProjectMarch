@@ -368,7 +368,7 @@ class GaitGeneratorPlugin(Plugin):
     def import_gait(self):
         file_name, f = QFileDialog.getOpenFileName(self._widget,
                                                    "Open Image",
-                                                   rospkg.RosPack().get_path('march_gait_files'),
+                                                   os.getenv("HOME") + "/march_ws/src/gait-files/march_gait_files",
                                                    "March Subgait (*.subgait)")
 
         gait = import_from_file_name(self, self.robot, file_name)
