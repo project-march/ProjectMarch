@@ -220,7 +220,7 @@ class InputDevicePlugin(Plugin):
 
         self.error_pub = rospy.Publisher('march/error', Error, queue_size=10)
 
-        if rospy.get_param("ping_safety_node", "true"):
+        if rospy.get_param(rospy.get_name() + "/ping_safety_node", "true"):
             self.alive_thread = PublishAliveThread()
             self.alive_thread.start()
 
