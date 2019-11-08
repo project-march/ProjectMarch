@@ -1,44 +1,41 @@
 <launch>
-
-  <!-- these are the arguments you can pass this launch_sm file, for example paused:=true -->
-  <arg name="use_sim_time" default="true"/>
-  <arg name="gazebo_ui" default="true"/>
-  <arg name="paused" default="$(arg gazebo_ui)"/>
-  <arg name="headless" default="false"/>
-  <arg name="debug" default="false"/>
+  <arg name="use_sim_time" default="true" doc="Uses simulated time and publishes on /clock."/>
+  <arg name="fake_sensor_data" default="true" doc="Publishes fake sensor data."/>
+  <arg name="gazebo_ui" default="true" doc="Launches the Gazebo UI."/>
+  <arg name="paused" default="$(arg gazebo_ui)" doc="Starts the simulation paused."/>
+  <arg name="debug" default="false" doc="Starts gazebo debugging with gdb."/>
 
   <!-- Load the URDF into the ROS Parameter Server -->
   <!-- Override effort values as Gazebo uses different units than the actual hardware. -->
   <!-- If the controller is properly tuned, these values can be arbitrarily large. -->
-    <param name="robot_description"
+  <param name="/robot_description"
             command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iv-simulation.xacro'
             k_velocity_value:=10000.0 k_position_value:=20000.0 max_effort_rotary:=20000.0 max_effort_linear:=50000.0" />
 
   <!-- Upload the controller configuration -->
   <rosparam file="$(find march_simulation)/config/config_march-iv.yaml" command="load"/>
 
-  <node name="controller_spawner" pkg="controller_manager" type="spawner" ns="/march" output="screen"
-        args="controller/trajectory joint_state_controller"/>
+  <group ns="march">
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" output="screen"
+          args="controller/trajectory joint_state_controller"/>
 
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
-        output="screen" ns="/march">
-  </node>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen"/>
+    <node name="upload_joint_names" pkg="march_simulation" type="upload_joint_names"/>
+    <include file="$(find march_fake_sensor_data)/launch/march_fake_sensor_data.launch" if="$(arg fake_sensor_data)"/>
+  </group>
 
-  <!-- Upload the joint names to the parameter server  -->
-  <node name="upload_joint_names" pkg="march_simulation" type="upload_joint_names"/>
+  <group>
+    <!-- We resume the logic in empty_world.launch_sm, changing only the name of the world to be launched -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+      <arg name="world_name" value="$(find march_simulation)/worlds/march.world"/>
+      <arg name="debug" value="$(arg debug)" />
+      <arg name="gui" value="$(arg gazebo_ui)" />
+      <arg name="paused" value="$(arg paused)"/>
+      <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    </include>
 
-  <!-- We resume the logic in empty_world.launch_sm, changing only the name of the world to be launched -->
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find march_simulation)/worlds/march.world"/>
-    <arg name="debug" value="$(arg debug)" />
-    <arg name="gui" value="$(arg gazebo_ui)" />
-    <arg name="paused" value="$(arg paused)"/>
-    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
-    <arg name="headless" value="$(arg headless)"/>
-  </include>
-
-  <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
-  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
-    args="-urdf -model march -param robot_description"/>
-
+    <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+          args="-urdf -model march -param robot_description"/>
+  </group>
 </launch>

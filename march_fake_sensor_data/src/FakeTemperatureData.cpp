@@ -116,9 +116,8 @@ int main(int argc, char** argv)
   ros::NodeHandle n;
   ros::Rate rate(10);
 
-  n.getParam(n.getNamespace() + "/min_temperature", min_temperature);
-  n.getParam(n.getNamespace() + "/max_temperature", max_temperature);
-
+  n.getParam(ros::this_node::getName() + "/min_temperature", min_temperature);
+  n.getParam(ros::this_node::getName() + "/max_temperature", max_temperature);
 
   int count = 0;
   while (!n.hasParam("/march/joint_names"))
