@@ -86,7 +86,10 @@ void MarchHardwareInterface::init()
   {
     SoftJointLimits soft_limits;
     getSoftJointLimits(model.getJoint(joint_names_[i]), soft_limits);
-    ROS_INFO("%s soft_limits_ (%f, %f).", joint_names_[i].c_str(), soft_limits.min_position, soft_limits.max_position);
+    ROS_DEBUG("[%s] Soft limits set to (%f, %f)",
+              joint_names_[i].c_str(),
+              soft_limits.min_position,
+              soft_limits.max_position);
     soft_limits_[i] = soft_limits;
   }
 
@@ -96,7 +99,7 @@ void MarchHardwareInterface::init()
   this->read();
   for (int i = 0; i < num_joints_; ++i)
   {
-    ROS_INFO("Joint %s: first read position: %f", joint_names_[i].c_str(), joint_position_[i]);
+    ROS_DEBUG("[%s] First read position: %f", joint_names_[i].c_str(), joint_position_[i]);
   }
 
   // Create march_pdb_state interface
@@ -129,7 +132,7 @@ void MarchHardwareInterface::init()
       {
         marchRobot.getPowerDistributionBoard()->getHighVoltage().setNetOnOff(true, netNumber);
         usleep(100000);
-        ROS_INFO_THROTTLE(1, "Waiting on high voltage for joint %s", joint_names_[i].c_str());
+        ROS_INFO_THROTTLE(1, "[%s] Waiting on high voltage", joint_names_[i].c_str());
       }
     }
   }
@@ -334,7 +337,7 @@ void MarchHardwareInterface::resetIMotionCubesUntilTheyWork()
       march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
       if (joint.getAngleIU() == 0)
       {
-        ROS_ERROR("Joint %s failed (encoder reset)", joint_names_[i].c_str());
+        ROS_ERROR("[%s] Failed (encoder reset)", joint_names_[i].c_str());
         encoderSetCorrectly = false;
       }
     }

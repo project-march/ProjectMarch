@@ -13,6 +13,8 @@
   <depend>roscpp</depend>
   <depend>std_msgs</depend>
   <depend>joint_limits_interface</depend>
+  <depend>joint_trajectory_controller</depend>
+  <depend>joint_state_controller</depend>
   <depend>controller_manager</depend>
   <depend>realtime_tools</depend>
   <depend>control_toolbox</depend>
