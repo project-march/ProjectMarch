@@ -6,7 +6,7 @@ import rospy
 
 def main():
     rospy.init_node("upload_joint_names")
-    robot = urdf.Robot.from_parameter_server()
+    robot = urdf.Robot.from_parameter_server('/robot_description')
     joint_names = []
     for joint in robot.joints:
         if joint.type != "fixed":
