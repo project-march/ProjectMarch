@@ -1,7 +1,7 @@
 // Copyright 2019 Project March
 #include <gtest/gtest.h>
 
-#include "march_imu_manager/WirelessMaster.h"
+#include "march_imu_manager/wireless_master.h"
 
 TEST(WirelessMasterTest, emptyRates)
 {

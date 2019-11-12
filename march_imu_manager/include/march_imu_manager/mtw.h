@@ -11,7 +11,7 @@
 class Mtw : public XsCallback
 {
 public:
-  Mtw(XsDevice* device, size_t maxBufferSize = 100);
+  Mtw(XsDevice* device, size_t max_buffer_size = 100);
 
   /**
    * Returns whether any new packets are available.
@@ -48,10 +48,10 @@ private:
    */
   void configure();
 
-  std::mutex m_mutex;
+  std::mutex mutex_;
 
-  XsDevice* m_device;
+  XsDevice* device_;
 
-  size_t m_maxBufferSize;
-  std::deque<XsDataPacket> m_packetBuffer;
+  size_t max_buffer_size_;
+  std::deque<XsDataPacket> packet_buffer_;
 };

@@ -43,8 +43,8 @@ add_library(xstypes SHARED IMPORTED)
 set_property(TARGET xstypes PROPERTY IMPORTED_LOCATION ${xstypes_LOCATION})
 
 add_library(${PROJECT_NAME}
-    src/Mtw.cpp
-    src/WirelessMaster.cpp
+    src/mtw.cpp
+    src/wireless_master.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -84,7 +84,7 @@ install(TARGETS ${PROJECT_NAME}_node
 )
 
 if(CATKIN_ENABLE_TESTING)
-    catkin_add_gtest(wireless_master_test test/WirelessMasterTest.cpp)
+    catkin_add_gtest(wireless_master_test test/wireless_master_test.cpp)
     target_link_libraries(wireless_master_test
         ${PROJECT_NAME}
         ${xsensdeviceapi_LIBRARY}

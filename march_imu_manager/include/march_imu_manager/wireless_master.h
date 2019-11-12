@@ -10,7 +10,7 @@
 #include <xsensdeviceapi.h>
 #include <xstypes.h>
 
-#include "march_imu_manager/Mtw.h"
+#include "march_imu_manager/mtw.h"
 
 /**
  * The wireless master class that connects to MTws and publishes the data on
@@ -32,11 +32,11 @@ public:
    * Configures the wireless master with given settings.
    * Can only be configured once init() succeeded.
    *
-   * @param updateRate the desired update rate of the master in Hz.
+   * @param update_rate the desired update rate of the master in Hz.
    * @param channel the desired radio channel, defaults to 25.
    * @returns error code, 0 if successfull, -1 otherwise.
    */
-  int configure(const int updateRate, const int channel = 25);
+  int configure(const int update_rate, const int channel = 25);
 
   /**
    * Waits for the given amount of MTws to connect.
@@ -69,27 +69,27 @@ public:
   /**
    * Finds the closest supported update rate to the given desired rate.
    *
-   * @param supportedUpdateRates rates that are supported by the master.
-   * @param desiredUpdateRate rate that is desired.
+   * @param supported_update_rates rates that are supported by the master.
+   * @param desired_update_rate rate that is desired.
    */
-  static int findClosestUpdateRate(const XsIntArray& supportedUpdateRates, const int desiredUpdateRate);
+  static int findClosestUpdateRate(const XsIntArray& supported_update_rates, const int desired_update_rate);
 
 protected:
   /**
    * Callback for when new MTws connect or disconnect.
-   * Runs in a seperate thread.
+   * Runs in a separate thread.
    */
-  virtual void onConnectivityChanged(XsDevice* dev, XsConnectivityState newState);
+  virtual void onConnectivityChanged(XsDevice* dev, XsConnectivityState new_state);
 
 private:
-  ros::NodeHandle* m_node;
+  ros::NodeHandle* node_;
 
-  std::mutex m_mutex;
-  std::condition_variable m_cv;
+  std::mutex mutex_;
+  std::condition_variable cv_;
 
-  XsControl* m_control = nullptr;
-  XsDevicePtr m_master = nullptr;
+  XsControl* control_ = nullptr;
+  XsDevicePtr master_ = nullptr;
 
-  std::unordered_map<uint32_t, std::unique_ptr<Mtw>> m_connectedMtws;
-  std::unordered_map<uint32_t, ros::Publisher> m_publishers;
+  std::unordered_map<uint32_t, std::unique_ptr<Mtw>> connected_mtws_;
+  std::unordered_map<uint32_t, ros::Publisher> publishers_;
 };
