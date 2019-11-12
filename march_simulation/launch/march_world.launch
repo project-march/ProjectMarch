@@ -13,7 +13,7 @@
            command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march4.xacro'
                     k_velocity_value_rotary:=60.0 k_velocity_value_linear:=60.0
                     k_position_value_rotary:=50.0 k_position_value_linear:=50.0
-                    max_effort_rotary:=200.0 max_effort_linear:=70.0" />
+                    max_effort_rotary:=200.0 max_effort_linear:=40.0" />
 
     <!-- Upload the controller configuration -->
     <rosparam file="$(find march_simulation)/config/config_march-iv.yaml" command="load"/>
