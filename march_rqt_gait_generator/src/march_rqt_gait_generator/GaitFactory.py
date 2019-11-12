@@ -90,7 +90,7 @@ def from_msg(gait_generator, robot, march_gait, gait_name, subgait_name, version
                       )
         joint_list.append(joint)
 
-    return Gait(joint_list, duration, gait_name, subgait_name, version, march_gait.description)
+    return Gait(joint_list, duration, march_gait.gait_type, gait_name, subgait_name, version, march_gait.description)
 
 
 def get_setpoint_at_duration(joint_trajectory, joint_name, duration):
