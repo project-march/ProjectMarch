@@ -17,6 +17,7 @@ def export_to_file(gait, gait_directory):
     # Name and version will be empty as it's stored in the filename.
     subgait = Subgait()
 
+    subgait.gait_type = gait.gait_type
     subgait.trajectory = gait.to_joint_trajectory()
     subgait.setpoints = gait.to_setpoints()
     subgait.description = str(gait.description)

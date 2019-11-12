@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>998</width>
-    <height>722</height>
+    <width>1097</width>
+    <height>754</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,25 +34,39 @@
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QGridLayout" name="gridLayout_5">
-      <item row="2" column="5">
-       <widget class="QLineEdit" name="Description"/>
-      </item>
-      <item row="0" column="6">
-       <widget class="QLabel" name="DurationLabel">
-        <property name="text">
-         <string>Duration (s)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
+      <item row="0" column="1">
        <widget class="QLabel" name="GaitLabel">
         <property name="text">
          <string>Gait</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLineEdit" name="Gait">
+      <item row="2" column="6">
+       <widget class="QLineEdit" name="Description"/>
+      </item>
+      <item row="0" column="7">
+       <widget class="QLabel" name="DurationLabel">
+        <property name="text">
+         <string>Duration (s)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="6">
+       <widget class="QLabel" name="DescriptionLabel">
+        <property name="text">
+         <string>Description</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLabel" name="VersionLabel">
+        <property name="text">
+         <string>Version</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QLineEdit" name="Version">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -61,21 +75,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="5">
-       <widget class="QLabel" name="DescriptionLabel">
-        <property name="text">
-         <string>Description</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="VersionLabel">
-        <property name="text">
-         <string>Version</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="8">
+      <item row="2" column="9">
        <widget class="QCheckBox" name="ScaleSetpoints">
         <property name="toolTip">
          <string>Scale the setpoints based on their relative time when adjusting the duration.</string>
@@ -85,7 +85,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="6">
+      <item row="2" column="7">
        <widget class="QDoubleSpinBox" name="Duration">
         <property name="buttonSymbols">
          <enum>QAbstractSpinBox::NoButtons</enum>
@@ -99,7 +99,17 @@
        </widget>
       </item>
       <item row="2" column="2">
-       <widget class="QLineEdit" name="Version">
+       <widget class="QLineEdit" name="Subgait"/>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="SubgaitLabel">
+        <property name="text">
+         <string>Subgait</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="Gait">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -108,15 +118,15 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="SubgaitLabel">
+      <item row="0" column="0">
+       <widget class="QLabel" name="GaitTypeLabel">
         <property name="text">
-         <string>Subgait</string>
+         <string>Gait type</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="Subgait"/>
+      <item row="2" column="0">
+       <widget class="QComboBox" name="GaitType"/>
       </item>
      </layout>
     </widget>

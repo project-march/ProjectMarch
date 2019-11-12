@@ -9,9 +9,14 @@ from march_rqt_gait_generator.UserInterfaceController import notify
 
 
 class Gait:
-    def __init__(self, joints, duration,
+    def __init__(self, joints, duration, gait_type="walk_like",
                  name="Walk", subgait="right_open", version="First try", description="Just a simple gait"):
+        # Set gait_type to walk_like if an old file with no gait_type is opened
+        if gait_type is "":
+            gait_type = "walk_like"
+
         self.joints = joints
+        self.gait_type = gait_type
         self.name = name
         self.subgait = subgait
         self.version = version
@@ -87,6 +92,9 @@ class Gait:
         return False
 
     # Setters to allow changing values in a callback
+    def set_gait_type(self, gait_type):
+        self.gait_type = str(gait_type)
+
     def set_name(self, name):
         self.name = name
 

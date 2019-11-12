@@ -14,7 +14,8 @@ from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget, QFileDialog, QPushButton, QTextBrowser, QShortcut, \
                                         QLineEdit, QSlider, QHeaderView, QTableWidgetItem, \
-                                        QCheckBox, QMessageBox, QSpinBox, QDoubleSpinBox, QFrame
+                                        QCheckBox, QMessageBox, QSpinBox, QDoubleSpinBox, QFrame, \
+                                        QComboBox
 
 import rviz
 from tf import TransformListener, LookupException, ConnectivityException, ExtrapolationException
@@ -89,6 +90,8 @@ class GaitGeneratorPlugin(Plugin):
         self.subgait_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait")
         self.version_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version")
         self.description_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description")
+        self.gait_type_combo_box = self._widget.GaitPropertiesFrame.findChild(QComboBox, "GaitType")
+        self.gait_type_combo_box.addItems(["walk_like", "sit_like", "stairs_like"])
         self.duration_spin_box = self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration")
         self.mirror_check_box = self._widget.SettingsFrame.findChild(QCheckBox, "Mirror")
         self.mirror_key1_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "Key1")
@@ -129,29 +132,26 @@ class GaitGeneratorPlugin(Plugin):
         self.undo_button.clicked.connect(self.undo)
         self.redo_button.clicked.connect(self.redo)
 
-        # Line edits / spin boxes
-        self.playback_speed_spin_box.valueChanged.connect(
-            lambda: self.set_playback_speed(self.playback_speed_spin_box.value())
+        # Line edits / combo boxes / spin boxes
+        self.gait_type_combo_box.currentTextChanged.connect(
+            lambda text: self.gait.set_gait_type(text)
         )
-        self.topic_name_line_edit.editingFinished.connect(
-            lambda: self.set_topic_name(self.topic_name_line_edit.text())
+        self.gait_name_line_edit.textChanged.connect(
+            lambda text: self.gait.set_name(text)
         )
-        self.gait_name_line_edit.editingFinished.connect(
-            lambda: self.gait.set_name(self.gait_name_line_edit.text())
+        self.version_name_line_edit.textChanged.connect(
+            lambda text: self.gait.set_version(text)
         )
-        self.version_name_line_edit.editingFinished.connect(
-            lambda: self.gait.set_version(self.version_name_line_edit.text())
+        self.subgait_name_line_edit.textChanged.connect(
+            lambda text: self.gait.set_subgait(text)
         )
-        self.subgait_name_line_edit.editingFinished.connect(
-            lambda: self.gait.set_subgait(self.subgait_name_line_edit.text())
+        self.description_line_edit.textChanged.connect(
+            lambda text: self.gait.set_description(text)
         )
-        self.description_line_edit.editingFinished.connect(
-            lambda: self.gait.set_description(self.description_line_edit.text())
-        )
+        self.topic_name_line_edit.textChanged.connect(self.set_topic_name)
+        self.playback_speed_spin_box.valueChanged.connect(self.set_playback_speed)
         self.duration_spin_box.setKeyboardTracking(False)
-        self.duration_spin_box.valueChanged.connect(
-            lambda: self.update_gait_duration(self.duration_spin_box.value())
-        )
+        self.duration_spin_box.valueChanged.connect(self.update_gait_duration)
 
         # Disable key inputs when mirroring is off.
         self.mirror_check_box.stateChanged.connect(
@@ -172,6 +172,7 @@ class GaitGeneratorPlugin(Plugin):
             self.update_time_sliders(),
         ])
 
+        self.gait_type_combo_box.setCurrentText(self.gait.gait_type)
         self.gait_name_line_edit.setText(self.gait.name)
         self.subgait_name_line_edit.setText(self.gait.subgait)
         self.version_name_line_edit.setText(self.gait.version)
