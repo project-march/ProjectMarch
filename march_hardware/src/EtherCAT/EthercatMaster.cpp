@@ -95,8 +95,7 @@ void EthercatMaster::start()
     ec_send_processdata();
     ec_receive_processdata(EC_TIMEOUTRET);
     ec_statecheck(0, EC_STATE_OPERATIONAL, 50000);
-  }
-  while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));
+  } while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));
 
   if (ec_slave[0].state == EC_STATE_OPERATIONAL)
   {
@@ -165,7 +164,7 @@ void EthercatMaster::ethercatLoop()
       else
       {
         ROS_DEBUG("EtherCAT rate of %d milliseconds per cycle was not achieved for %f percent of all cycles",
-                 ecatCycleTimems, rateNotAchievedPercentage);
+                  ecatCycleTimems, rateNotAchievedPercentage);
       }
       totalLoops = 0;
       rateNotAchievedCount = 0;
@@ -180,7 +179,7 @@ void EthercatMaster::sendProcessData()
 
 int EthercatMaster::receiveProcessData()
 {
-  int wkc =  ec_receive_processdata(EC_TIMEOUTRET);
+  int wkc = ec_receive_processdata(EC_TIMEOUTRET);
   if (wkc < this->expectedWKC)
   {
     ROS_WARN_THROTTLE(1, "Working counter lower than expected. EtherCAT connection may not be optimal");

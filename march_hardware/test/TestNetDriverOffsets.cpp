@@ -5,9 +5,9 @@
 #include <gmock/gmock.h>
 #include <sstream>
 
-using ::testing::Return;
 using ::testing::AtLeast;
 using ::testing::AtMost;
+using ::testing::Return;
 
 class TestNetDriverOffsets : public ::testing::Test
 {
@@ -65,5 +65,6 @@ TEST_F(TestNetDriverOffsets, TestStream)
   NetDriverOffsets netDriverOffsets(lowVoltageNetOnOff, highVoltageNetOnOff, highVoltageNetEnableDisable);
   std::stringstream ss;
   ss << netDriverOffsets;
-  EXPECT_EQ("NetDriverOffsets(lowVoltageNetOnOff: 1, highVoltageNetOnOff: 1, highVoltageNetEnableDisable: 1)", ss.str());
+  EXPECT_EQ("NetDriverOffsets(lowVoltageNetOnOff: 1, highVoltageNetOnOff: 1, highVoltageNetEnableDisable: 1)",
+            ss.str());
 }

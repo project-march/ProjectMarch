@@ -140,7 +140,6 @@ TEST_F(JointTest, ValidActuationMode)
   actualJointWrong.setName("test_joint_hip");
   actualJointWrong.setActuationMode(march4cpp::ActuationMode("torque"));
 
-
   ASSERT_EQ("test_joint_hip", actualJoint.getName());
   ASSERT_EQ(actualJoint, createdJoint);
   ASSERT_NE(actualJointWrong, createdJoint);

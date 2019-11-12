@@ -6,7 +6,7 @@ namespace march4cpp
 {
 class TemperatureSensor
 {
- public:
+public:
   virtual float getTemperature() = 0;
 };
 }  // namespace march4cpp

@@ -14,7 +14,7 @@ namespace march_temperature_sensor_controller
 {
 // this controller gets access to the MarchTemperatureSensorInterface
 class MarchTemperatureSensorController
-    : public controller_interface::Controller<march_hardware_interface::MarchTemperatureSensorInterface>
+  : public controller_interface::Controller<march_hardware_interface::MarchTemperatureSensorInterface>
 {
 public:
   MarchTemperatureSensorController()

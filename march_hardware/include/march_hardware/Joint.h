@@ -12,7 +12,6 @@
 
 namespace march4cpp
 {
-
 class Joint
 {
 private:
@@ -24,7 +23,7 @@ private:
   TemperatureGES temperatureGES;
 
 public:
-  Joint(): name(""), netNumber(-1), allowActuation(false)
+  Joint() : name(""), netNumber(-1), allowActuation(false)
   {
   }
 

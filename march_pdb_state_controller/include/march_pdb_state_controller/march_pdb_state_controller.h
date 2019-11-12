@@ -23,7 +23,7 @@
 namespace march_pdb_state_controller
 {
 class MarchPdbStateController
-    : public controller_interface::Controller<march_hardware_interface::MarchPdbStateInterface>
+  : public controller_interface::Controller<march_hardware_interface::MarchPdbStateInterface>
 {
 public:
   MarchPdbStateController()
@@ -53,7 +53,7 @@ private:
   createHighVoltageNetsMessage(march4cpp::HighVoltage high_voltage);
   static std::vector<march_shared_resources::LowVoltageNet>
   createLowVoltageNetsMessage(march4cpp::LowVoltage low_voltage);
-  bool serviceDisableEnableHighVoltage(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res);
+  bool serviceDisableEnableHighVoltage(std_srvs::SetBool::Request& req, std_srvs::SetBool::Response& res);
   void masterShutdownAllowedCallback(const std_msgs::Bool::ConstPtr& msg);
   void turnHighVoltageNetOnOrOffCallBack(const std_msgs::Int8::ConstPtr& msg);
   void turnLowVoltageNetOnOrOffCallBack(const std_msgs::Int8::ConstPtr& msg);

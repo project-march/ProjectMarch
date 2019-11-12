@@ -6,8 +6,8 @@ namespace march_pdb_state_controller
 {
 // TODO(TIM) Remove the callbacks and subscribers when they are not needed anymore
 // These topics make it able to tests write to pdb commands.
-bool MarchPdbStateController::serviceDisableEnableHighVoltage(std_srvs::SetBool::Request &req,
-                                                              std_srvs::SetBool::Response &res)
+bool MarchPdbStateController::serviceDisableEnableHighVoltage(std_srvs::SetBool::Request& req,
+                                                              std_srvs::SetBool::Response& res)
 {
   if (pdb_state_.getHighVoltageEnabled() != req.data)
   {
@@ -57,7 +57,7 @@ bool MarchPdbStateController::init(march_hardware_interface::MarchPdbStateInterf
 {
   // Get all temperature_sensors from the hardware interface
   const std::vector<std::string>& pdb_state_names = hw->getNames();
-  for (unsigned i = 0; i < pdb_state_names.size(); i++)
+
   // get publishing period
   if (!controller_nh.getParam("publish_rate", publish_rate_))
   {
@@ -75,9 +75,8 @@ bool MarchPdbStateController::init(march_hardware_interface::MarchPdbStateInterf
     realtime_pubs_ = rt_pub;
   }
 
-  enable_disable_high_voltage_service =
-      controller_nh.advertiseService("enable_all_high_voltage",
-                                     &MarchPdbStateController::serviceDisableEnableHighVoltage, this);
+  enable_disable_high_voltage_service = controller_nh.advertiseService(
+      "enable_all_high_voltage", &MarchPdbStateController::serviceDisableEnableHighVoltage, this);
 
   sub_master_shutdown_allowed =
       controller_nh.subscribe("shutdown_allowed", 1000, &MarchPdbStateController::masterShutdownAllowedCallback, this);

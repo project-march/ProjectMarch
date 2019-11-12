@@ -7,8 +7,8 @@
 #include <march_hardware_builder/HardwareConfigExceptions.h>
 #include <march_hardware_builder/HardwareBuilder.h>
 
-using ::testing::Return;
 using ::testing::AtLeast;
+using ::testing::Return;
 
 class EncoderTest : public ::testing::Test
 {

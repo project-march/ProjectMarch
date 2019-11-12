@@ -19,8 +19,8 @@ class NetMonitorOffsets
 public:
   NetMonitorOffsets(int powerDistributionBoardCurrentByteOffset, int lowVoltageNet1CurrentByteOffset,
                     int lowVoltageNet2CurrentByteOffset, int highVoltageNetCurrentByteOffset,
-                    int lowVoltageStateByteOffset, int highVoltageOvercurrentTriggerByteOffset,
-                    int highVoltageEnabled, int highVoltageStateByteOffset)
+                    int lowVoltageStateByteOffset, int highVoltageOvercurrentTriggerByteOffset, int highVoltageEnabled,
+                    int highVoltageStateByteOffset)
     : powerDistributionBoardCurrent(powerDistributionBoardCurrentByteOffset)
     , lowVoltageNet1Current(lowVoltageNet1CurrentByteOffset)
     , lowVoltageNet2Current(lowVoltageNet2CurrentByteOffset)

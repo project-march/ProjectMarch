@@ -6,8 +6,8 @@
 #include "march_hardware/TemperatureGES.h"
 #include "mocks/MockTemperatureGES.cpp"
 
-using ::testing::Return;
 using ::testing::AtLeast;
+using ::testing::Return;
 
 class ExampleTest : public ::testing::Test
 {
@@ -23,8 +23,7 @@ TEST_F(ExampleTest, MockTest)
 {
   ASSERT_EQ(3, 3);
   MockTemperatureGES mockTemperatureSensor;
-  EXPECT_CALL(mockTemperatureSensor, getTemperature())
-      .Times(AtLeast(1));
+  EXPECT_CALL(mockTemperatureSensor, getTemperature()).Times(AtLeast(1));
   ON_CALL(mockTemperatureSensor, getTemperature()).WillByDefault(Return(10));
   ASSERT_EQ(10, mockTemperatureSensor.getTemperature());
 }

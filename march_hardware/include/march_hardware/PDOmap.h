@@ -23,7 +23,9 @@ struct IMCObject
     this->length = _length;
   }
 
-  IMCObject(){}
+  IMCObject()
+  {
+  }
 };
 
 enum class dataDirection

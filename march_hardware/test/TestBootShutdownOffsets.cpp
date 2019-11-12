@@ -5,9 +5,9 @@
 #include <gmock/gmock.h>
 #include <sstream>
 
-using ::testing::Return;
 using ::testing::AtLeast;
 using ::testing::AtMost;
+using ::testing::Return;
 
 class TestBootShutdownOffsets : public ::testing::Test
 {
@@ -29,9 +29,9 @@ TEST_F(TestBootShutdownOffsets, EmptyConstructor)
 {
   BootShutdownOffsets bootShutdownOffsets;
 
-  EXPECT_THROW( bootShutdownOffsets.getMasterOkByteOffset(), std::runtime_error);
-  EXPECT_THROW( bootShutdownOffsets.getShutdownByteOffset(), std::runtime_error);
-  EXPECT_THROW( bootShutdownOffsets.getShutdownAllowedByteOffset(), std::runtime_error);
+  EXPECT_THROW(bootShutdownOffsets.getMasterOkByteOffset(), std::runtime_error);
+  EXPECT_THROW(bootShutdownOffsets.getShutdownByteOffset(), std::runtime_error);
+  EXPECT_THROW(bootShutdownOffsets.getShutdownAllowedByteOffset(), std::runtime_error);
 }
 
 TEST_F(TestBootShutdownOffsets, InValidValues)

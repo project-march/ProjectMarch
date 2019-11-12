@@ -49,8 +49,7 @@ public:
   {
     return os << "PowerDistributionBoard(slaveIndex: " << powerDistributionBoard.slaveIndex << ", "
               << "masterOnlineToggle: " << powerDistributionBoard.masterOnlineToggle << ", "
-              << powerDistributionBoard.highVoltage << ", "
-              << powerDistributionBoard.lowVoltage << ")";
+              << powerDistributionBoard.highVoltage << ", " << powerDistributionBoard.lowVoltage << ")";
   }
 };
 }  // namespace march4cpp
