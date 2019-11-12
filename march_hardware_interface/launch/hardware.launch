@@ -1,10 +1,10 @@
 <launch>
-    <arg name="config" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_linear, test_joint_rotational."/>
+    <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_linear, test_joint_rotational."/>
 
-    <rosparam file="$(find march_hardware_interface)/config/$(arg config)/controllers.yaml" command="load"/>
+    <rosparam file="$(find march_hardware_interface)/config/$(arg robot)/controllers.yaml" command="load"/>
 
     <param name="robot_description"
-           command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march-iv.xacro'" />
+           command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/$(arg robot).xacro'" />
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 
@@ -21,7 +21,7 @@
             name="hardware_interface"
             pkg="march_hardware_interface"
             type="march_hardware_interface_node"
-            args="$(arg config)"
+            args="$(arg robot)"
             output="screen"
             required="true"
     />
