@@ -1,7 +1,7 @@
 // Copyright 2019 Project March.
 
-#ifndef MARCH4CPP__MARCH4_H
-#define MARCH4CPP__MARCH4_H
+#ifndef MARCH_HARDWARE_MARCHROBOT_H
+#define MARCH_HARDWARE_MARCHROBOT_H
 
 #include <string>
 #include <vector>
@@ -77,4 +77,4 @@ public:
   }
 };
 }  // namespace march4cpp
-#endif
+#endif  // MARCH_HARDWARE_MARCHROBOT_H

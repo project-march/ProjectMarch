@@ -1,8 +1,8 @@
 // Copyright 2019 Project March.
-
-#ifndef MARCH_IV_HARDWAREBUILDER_H
-#define MARCH_IV_HARDWAREBUILDER_H
-
+#ifndef MARCH_HARDWARE_BUILDER_HARDWAREBUILDER_H
+#define MARCH_HARDWARE_BUILDER_HARDWAREBUILDER_H
+#include <string>
+#include <vector>
 #include <yaml-cpp/yaml.h>
 
 #include <march_hardware/Encoder.h>
@@ -21,15 +21,20 @@
 class HardwareBuilder
 {
 private:
-  const std::vector<std::string> ENCODER_REQUIRED_KEYS = { "resolution", "minPositionIU", "maxPositionIU",
-                                                           "zeroPositionIU", "safetyMarginRad" };
+  // clang-format off
+  const std::vector<std::string> ENCODER_REQUIRED_KEYS =
+    {
+      "resolution", "minPositionIU", "maxPositionIU", "zeroPositionIU", "safetyMarginRad"
+    };
   const std::vector<std::string> IMOTIONCUBE_REQUIRED_KEYS = { "slaveIndex", "encoder" };
   const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS = { "slaveIndex", "byteOffset" };
   // TODO(TIM) ADD all keys
-  const std::vector<std::string> POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS = { "slaveIndex", "bootShutdownOffsets",
-                                                                            "netMonitorByteOffsets",
-                                                                            "netDriverByteOffsets" };
+  const std::vector<std::string> POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS =
+    {
+      "slaveIndex", "bootShutdownOffsets", "netMonitorByteOffsets", "netDriverByteOffsets"
+    };
   const std::vector<std::string> JOINT_REQUIRED_KEYS = { "allowActuation" };
+  // clang-format on
 
   /**
    * @brief Loop over all keys in the keyList and check if they exist in the
@@ -73,4 +78,4 @@ public:
   march4cpp::PowerDistributionBoard createPowerDistributionBoard(YAML::Node powerDistributionBoardConfig);
 };
 
-#endif  // MARCH_IV_HARDWAREBUILDER_H
+#endif  // MARCH_HARDWARE_BUILDER_HARDWAREBUILDER_H

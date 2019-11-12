@@ -3,6 +3,8 @@
 //
 // EtherCAT master class source. Interfaces with SOEM
 //
+#include <string>
+#include <vector>
 
 #include <boost/chrono/chrono.hpp>
 
@@ -95,7 +97,7 @@ void EthercatMaster::start()
     ec_send_processdata();
     ec_receive_processdata(EC_TIMEOUTRET);
     ec_statecheck(0, EC_STATE_OPERATIONAL, 50000);
-  } while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));
+  } while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));  // NOLINT(whitespace/braces)
 
   if (ec_slave[0].state == EC_STATE_OPERATIONAL)
   {

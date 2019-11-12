@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
-#ifndef MARCH4CPP__POWERDISTRIBUTIONBOARD_H
-#define MARCH4CPP__POWERDISTRIBUTIONBOARD_H
+#ifndef MARCH_HARDWARE_POWERDISTRIBUTIONBOARD_H
+#define MARCH_HARDWARE_POWERDISTRIBUTIONBOARD_H
 
 #include <stdint.h>
 #include <march_hardware/Slave.h>
@@ -53,4 +53,4 @@ public:
   }
 };
 }  // namespace march4cpp
-#endif
+#endif  // MARCH_HARDWARE_POWERDISTRIBUTIONBOARD_H

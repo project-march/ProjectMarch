@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
-#ifndef MARCH4CPP__JOINT_H
-#define MARCH4CPP__JOINT_H
+#ifndef MARCH_HARDWARE_JOINT_H
+#define MARCH_HARDWARE_JOINT_H
 
 #include <string>
 #include <vector>
@@ -87,4 +87,4 @@ public:
 };
 
 }  // namespace march4cpp
-#endif
+#endif  // MARCH_HARDWARE_JOINT_H

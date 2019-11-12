@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
-#ifndef MARCH_IV_NETMONITOROFFSETS_H
-#define MARCH_IV_NETMONITOROFFSETS_H
+#ifndef MARCH_HARDWARE_NETMONITOROFFSETS_H
+#define MARCH_HARDWARE_NETMONITOROFFSETS_H
 
 #include <ostream>
 #include <ros/ros.h>
@@ -165,4 +165,4 @@ public:
   }
 };
 
-#endif  // MARCH_IV_NETMONITOROFFSETS_H
+#endif  // MARCH_HARDWARE_NETMONITOROFFSETS_H

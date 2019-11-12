@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(march_temperature_sensor_controller)
 
-add_compile_options(-std=c++11 -Wall -g)
+add_compile_options(-std=c++11 -Wall -Wextra)
 
 find_package(catkin REQUIRED COMPONENTS
     controller_interface
@@ -21,19 +21,18 @@ catkin_package(
     sensor_msgs
 )
 
-set(ROSLINT_CPP_OPTS "--filter=-build/include,-build/header_guard,-runtime/references" "--linelength=120")
+set(ROSLINT_CPP_OPTS "--linelength=120")
 
 file(GLOB_RECURSE lintfiles
-    "*.cpp"
-    "*.h"
+    "include/*.h"
+    "src/*.cpp"
 )
 
 roslint_cpp(${lintfiles})
 
-include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
+include_directories(include SYSTEM ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
 add_library(${PROJECT_NAME}
-    include/${PROJECT_NAME}/march_temperature_sensor_controller.h
     src/march_temperature_sensor_controller.cpp
 )
 

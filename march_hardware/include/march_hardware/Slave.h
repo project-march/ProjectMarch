@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
-#ifndef MARCH4CPP__SLAVE_H
-#define MARCH4CPP__SLAVE_H
+#ifndef MARCH_HARDWARE_SLAVE_H
+#define MARCH_HARDWARE_SLAVE_H
 
 #include <stdexcept>
 #include <ros/ros.h>
@@ -37,4 +37,4 @@ public:
 };
 }  // namespace march4cpp
 
-#endif
+#endif  // MARCH_HARDWARE_SLAVE_H

@@ -1,7 +1,8 @@
 // Copyright 2019 Project March.
 
-#ifndef MARCH_PDB_STATE_CONTROLLER_H
-#define MARCH_PDB_STATE_CONTROLLER_H
+#ifndef MARCH_PDB_STATE_CONTROLLER_MARCH_PDB_STATE_CONTROLLER_H
+#define MARCH_PDB_STATE_CONTROLLER_MARCH_PDB_STATE_CONTROLLER_H
+#include <vector>
 
 #include <boost/lexical_cast.hpp>
 #include <iostream>
@@ -60,4 +61,4 @@ private:
 };
 }  // namespace march_pdb_state_controller
 
-#endif  // MARCH_PDB_STATE_CONTROLLER_H
+#endif  // MARCH_PDB_STATE_CONTROLLER_MARCH_PDB_STATE_CONTROLLER_H

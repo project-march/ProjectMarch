@@ -2,6 +2,7 @@
 #include <ros/ros.h>
 
 #include <bitset>
+#include <string>
 
 #include <march_hardware/Joint.h>
 

@@ -1,8 +1,7 @@
 // Copyright 2019 Project March.
-
-#ifndef MARCH_IV_ALLOWEDROBOT_H
-#define MARCH_IV_ALLOWEDROBOT_H
-
+#ifndef MARCH_HARDWARE_BUILDER_ALLOWEDROBOT_H
+#define MARCH_HARDWARE_BUILDER_ALLOWEDROBOT_H
+#include <string>
 #include <ros/package.h>
 
 class AllowedRobot
@@ -91,4 +90,4 @@ private:
   Value value;
 };
 
-#endif  // MARCH_IV_ALLOWEDROBOT_H
+#endif  // MARCH_HARDWARE_BUILDER_ALLOWEDROBOT_H

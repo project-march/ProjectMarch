@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(march_hardware)
 
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++11 -Wall -Wextra)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
@@ -15,11 +15,11 @@ catkin_package(
     LIBRARIES ${PROJECT_NAME}
 )
 
-set(ROSLINT_CPP_OPTS "--filter=-build/include,-build/header_guard,-runtime/references" "--linelength=120")
+set(ROSLINT_CPP_OPTS "--linelength=120")
 
 file(GLOB_RECURSE lintfiles
-    "src/*.cpp"
     "include/*.h"
+    "src/*.cpp"
 )
 
 roslint_cpp(${lintfiles})
@@ -27,6 +27,7 @@ roslint_cpp(${lintfiles})
 
 include_directories(
     include
+    SYSTEM
     ${catkin_INCLUDE_DIRS}
     ${soem_INCLUDE_DIRS}/soem
 )
@@ -36,26 +37,6 @@ install(DIRECTORY include/${PROJECT_NAME}/
 )
 
 add_library(${PROJECT_NAME}
-    include/${PROJECT_NAME}/ActuationMode.h
-    include/${PROJECT_NAME}/AngleConversions.h
-    include/${PROJECT_NAME}/BootShutdownOffsets.h
-    include/${PROJECT_NAME}/Encoder.h
-    include/${PROJECT_NAME}/EtherCAT/EthercatIO.h
-    include/${PROJECT_NAME}/EtherCAT/EthercatMaster.h
-    include/${PROJECT_NAME}/EtherCAT/EthercatSDO.h
-    include/${PROJECT_NAME}/HighVoltage.h
-    include/${PROJECT_NAME}/IMotionCube.h
-    include/${PROJECT_NAME}/IMotionCubeState.h
-    include/${PROJECT_NAME}/IMotionCubeTargetState.h
-    include/${PROJECT_NAME}/Joint.h
-    include/${PROJECT_NAME}/LowVoltage.h
-    include/${PROJECT_NAME}/MarchRobot.h
-    include/${PROJECT_NAME}/NetDriverOffsets.h
-    include/${PROJECT_NAME}/PDOmap.h
-    include/${PROJECT_NAME}/PowerDistributionBoard.h
-    include/${PROJECT_NAME}/Slave.h
-    include/${PROJECT_NAME}/TemperatureGES.h
-    include/${PROJECT_NAME}/TemperatureSensor.h
     src/Encoder.cpp
     src/EtherCAT/EthercatIO.cpp
     src/EtherCAT/EthercatMaster.cpp

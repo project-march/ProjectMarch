@@ -1,5 +1,6 @@
 // Copyright 2019 Project March.
-
+#include <string>
+#include <vector>
 #include "march_temperature_sensor_controller/march_temperature_sensor_controller.h"
 
 namespace march_temperature_sensor_controller

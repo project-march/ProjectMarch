@@ -1,7 +1,7 @@
 // Copyright 2019 Project March.
-
-#include "gtest/gtest.h"
-#include "ros/ros.h"
+#include <string>
+#include <gtest/gtest.h>
+#include <ros/ros.h>
 #include <gmock/gmock.h>
 #include <ros/package.h>
 #include <march_hardware_builder/HardwareConfigExceptions.h>

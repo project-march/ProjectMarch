@@ -14,6 +14,9 @@
 
 #include <urdf/model.h>
 
+using hardware_interface::JointHandle;
+using hardware_interface::JointStateHandle;
+using hardware_interface::PositionJointInterface;
 using joint_limits_interface::EffortJointSoftLimitsHandle;
 using joint_limits_interface::EffortJointSoftLimitsInterface;
 using joint_limits_interface::JointLimits;

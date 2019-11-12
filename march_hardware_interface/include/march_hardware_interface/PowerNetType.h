@@ -1,8 +1,7 @@
 // Copyright 2019 Project March.
-
-#ifndef MARCH_IV_POWERNETTYPE_H
-#define MARCH_IV_POWERNETTYPE_H
-
+#ifndef MARCH_HARDWARE_INTERFACE_POWERNETTYPE_H
+#define MARCH_HARDWARE_INTERFACE_POWERNETTYPE_H
+#include <string>
 #include <ros/package.h>
 
 class PowerNetType
@@ -76,4 +75,4 @@ private:
   Value value;
 };
 
-#endif  // MARCH_IV_POWERNETTYPE_H
+#endif  // MARCH_HARDWARE_INTERFACE_POWERNETTYPE_H

@@ -1,7 +1,6 @@
 // Copyright 2019 Project March.
-
-#ifndef HARDWARE_INTERFACE_MARCH_PDB_STATE_INTERFACE_H
-#define HARDWARE_INTERFACE_MARCH_PDB_STATE_INTERFACE_H
+#ifndef MARCH_HARDWARE_INTERFACE_MARCH_PDB_STATE_INTERFACE_H
+#define MARCH_HARDWARE_INTERFACE_MARCH_PDB_STATE_INTERFACE_H
 
 #include <string>
 
@@ -81,4 +80,4 @@ class MarchPdbStateInterface : public hardware_interface::HardwareResourceManage
 };
 }  // namespace march_hardware_interface
 
-#endif  // HARDWARE_INTERFACE_MARCH_PDB_STATE_INTERFACE_H
+#endif  // MARCH_HARDWARE_INTERFACE_MARCH_PDB_STATE_INTERFACE_H

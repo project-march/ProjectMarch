@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(march_hardware_builder)
 
-add_compile_options(-std=c++11 -Wall -g)
+add_compile_options(-std=c++11 -Wall -Wextra)
 
 find_package(catkin REQUIRED COMPONENTS
     march_hardware
@@ -16,7 +16,7 @@ catkin_package(
     LIBRARIES ${PROJECT_NAME}
 )
 
-set(ROSLINT_CPP_OPTS "--filter=-build/include,-build/header_guard,-runtime/references" "--linelength=120")
+set(ROSLINT_CPP_OPTS "--linelength=120")
 
 file(GLOB_RECURSE lintfiles
     "*.cpp"
@@ -26,12 +26,9 @@ file(GLOB_RECURSE lintfiles
 roslint_cpp(${lintfiles})
 
 
-include_directories(include ${catkin_INCLUDE_DIRS})
+include_directories(include SYSTEM ${catkin_INCLUDE_DIRS})
 
 add_library(${PROJECT_NAME}
-    include/${PROJECT_NAME}/AllowedRobot.h
-    include/${PROJECT_NAME}/HardwareBuilder.h
-    include/${PROJECT_NAME}/HardwareConfigExceptions.h
     src/HardwareBuilder.cpp
 )
 

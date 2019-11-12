@@ -1,5 +1,8 @@
 // Copyright 2018 Project March.
 #include <bitset>
+#include <string>
+#include <vector>
+
 #include <ros/ros.h>
 
 #include <march_hardware/EtherCAT/EthercatSDO.h>

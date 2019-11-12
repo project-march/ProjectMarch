@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(march_hardware_interface)
 
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++11 -Wall -Wextra)
 
 find_package(catkin REQUIRED COMPONENTS
     control_toolbox
@@ -35,20 +35,19 @@ catkin_package(
     urdf
 )
 
-set(ROSLINT_CPP_OPTS "--filter=-build/include,-build/header_guard,-runtime/references" "--linelength=120")
+set(ROSLINT_CPP_OPTS "--linelength=120")
 
 file(GLOB_RECURSE lintfiles
+    "include/*.h"
     "src/*.cpp"
-    "src/*.h"
 )
 
 roslint_cpp(${lintfiles})
 
 
-include_directories(include ${catkin_INCLUDE_DIRS})
+include_directories(include SYSTEM ${catkin_INCLUDE_DIRS})
 
 add_executable(${PROJECT_NAME}_node
-    include/${PROJECT_NAME}/PowerNetOnOffCommand.h
     src/march_hardware_interface.cpp
     src/march_hardware_interface_node.cpp
 )

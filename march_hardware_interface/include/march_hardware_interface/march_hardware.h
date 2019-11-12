@@ -1,5 +1,8 @@
-#ifndef ROS_CONTROL__MARCH_HARDWARE_H
-#define ROS_CONTROL__MARCH_HARDWARE_H
+// Copyright 2019 Project March
+#ifndef MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_H
+#define MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_H
+#include <string>
+#include <vector>
 
 #include <boost/scoped_ptr.hpp>
 #include <controller_manager/controller_manager.h>
@@ -66,9 +69,8 @@ protected:
   std::vector<double> joint_lower_limits_;
   std::vector<double> joint_upper_limits_;
   std::vector<double> joint_effort_limits_;
-
 };  // class
 
 }  // namespace march_hardware_interface
 
-#endif
+#endif  // MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_H

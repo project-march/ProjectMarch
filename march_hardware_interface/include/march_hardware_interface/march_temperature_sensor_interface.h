@@ -1,7 +1,7 @@
 // Copyright 2019 Project March
 
-#ifndef HARDWARE_INTERFACE_MARCH_TEMPERATURE_SENSOR_INTERFACE_H
-#define HARDWARE_INTERFACE_MARCH_TEMPERATURE_SENSOR_INTERFACE_H
+#ifndef MARCH_HARDWARE_INTERFACE_MARCH_TEMPERATURE_SENSOR_INTERFACE_H
+#define MARCH_HARDWARE_INTERFACE_MARCH_TEMPERATURE_SENSOR_INTERFACE_H
 
 #include <hardware_interface/internal/hardware_resource_manager.h>
 #include <string>
@@ -46,4 +46,4 @@ class MarchTemperatureSensorInterface : public hardware_interface::HardwareResou
 };
 }  // namespace march_hardware_interface
 
-#endif  // HARDWARE_INTERFACE_MARCH_TEMPERATURE_SENSOR_INTERFACE_H
+#endif  // MARCH_HARDWARE_INTERFACE_MARCH_TEMPERATURE_SENSOR_INTERFACE_H

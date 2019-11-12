@@ -1,7 +1,7 @@
 // Copyright 2019 Project March.
-
-#ifndef MARCH_TEMPERATURE_SENSOR_CONTROLLER_H
-#define MARCH_TEMPERATURE_SENSOR_CONTROLLER_H
+#ifndef MARCH_TEMPERATURE_SENSOR_CONTROLLER_MARCH_TEMPERATURE_SENSOR_CONTROLLER_H
+#define MARCH_TEMPERATURE_SENSOR_CONTROLLER_MARCH_TEMPERATURE_SENSOR_CONTROLLER_H
+#include <vector>
 
 #include <controller_interface/controller.h>
 #include <march_hardware_interface/march_temperature_sensor_interface.h>
@@ -36,4 +36,4 @@ private:
 };
 }  // namespace march_temperature_sensor_controller
 
-#endif  // MARCH_TEMPERATURE_SENSOR_CONTROLLER_H
+#endif  // MARCH_TEMPERATURE_SENSOR_CONTROLLER_MARCH_TEMPERATURE_SENSOR_CONTROLLER_H

@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
-#ifndef MARCH_IV_NETDRIVEROFFSETS_H
-#define MARCH_IV_NETDRIVEROFFSETS_H
+#ifndef MARCH_HARDWARE_NETDRIVEROFFSETS_H
+#define MARCH_HARDWARE_NETDRIVEROFFSETS_H
 
 #include <ros/ros.h>
 
@@ -76,4 +76,4 @@ public:
   }
 };
 
-#endif  // MARCH_IV_NETDRIVEROFFSETS_H
+#endif  // MARCH_HARDWARE_NETDRIVEROFFSETS_H
