@@ -10,7 +10,7 @@ class PublishAliveThread(QtCore.QThread):
         QtCore.QThread.__init__(self)
         self.allowed_to_run = True
         self.alive_pub = rospy.Publisher(
-            'march/input_device/alive', Time, queue_size=10)
+            '/march/input_device/alive', Time, queue_size=10)
 
     def run(self):
         rate = rospy.Rate(20)
