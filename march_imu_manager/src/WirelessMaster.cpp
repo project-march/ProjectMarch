@@ -206,7 +206,7 @@ void WirelessMaster::onConnectivityChanged(XsDevice* dev, XsConnectivityState ne
                 this->m_connectedMtws.insert(std::make_pair(deviceId, std::unique_ptr<Mtw>(new Mtw(dev))));
 
                 ros::Publisher publisher =
-                    this->m_node->advertise<sensor_msgs::Imu>("/march/imu/", 10);
+                    this->m_node->advertise<sensor_msgs::Imu>("/march/imu", 10);
                 this->m_publishers.insert(std::make_pair(deviceId, publisher));
                 break;
             }
