@@ -5,14 +5,13 @@ from trajectory_msgs.msg import JointTrajectoryPoint
 from Joint import Joint
 
 from march_shared_resources.msg import Setpoint
-from march_rqt_gait_generator.UserInterfaceController import notify
 
 
 class Gait:
     def __init__(self, joints, duration, gait_type="walk_like",
                  name="Walk", subgait="right_open", version="First try", description="Just a simple gait"):
         # Set gait_type to walk_like if an old file with no gait_type is opened
-        if gait_type is "":
+        if gait_type == "":
             gait_type = "walk_like"
 
         self.joints = joints

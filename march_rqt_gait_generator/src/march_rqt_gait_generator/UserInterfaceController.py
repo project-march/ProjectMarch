@@ -66,7 +66,7 @@ def update_ui_elements(joint, duration, table=None, plot=None, show_velocity_mar
         table.blockSignals(True)
 
     if plot is not None:
-        plot.updateSetpoints(joint, show_velocity_markers)
+        plot.update_set_points(joint, show_velocity_markers)
     if table is not None:
         update_table(table, joint, duration)
 

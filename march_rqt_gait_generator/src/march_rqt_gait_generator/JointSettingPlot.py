@@ -1,10 +1,9 @@
 import math
 
 import pyqtgraph as pg
-from pyqtgraph.Qt import QtCore, QtGui
-from PyQt5.QtCore import QObject, pyqtSignal
+from pyqtgraph.Qt import QtCore
+from PyQt5.QtCore import pyqtSignal
 
-import rospy
 
 # Enable antialiasing for prettier plots
 pg.setConfigOptions(antialias=True)
@@ -38,7 +37,7 @@ class JointSettingPlot(pg.PlotItem):
         self.duration = duration
         self.joint = joint
 
-        self.createPlots(joint)
+        self.create_plots(joint)
 
         self.setTitle(joint.name)
 
@@ -51,12 +50,12 @@ class JointSettingPlot(pg.PlotItem):
         self.setMenuEnabled(False)
         self.hideButtons()
 
-        self.updateSetpoints(joint, show_velocity_markers)
+        self.update_set_points(joint, show_velocity_markers)
 
         time_pen = pg.mkPen(color='y', style=QtCore.Qt.DotLine)
         self.time_line = self.addLine(0, pen=time_pen, bounds=(0, self.duration))
 
-    def createVelocityMarkers(self, setpoints, display=False):
+    def create_velocity_markers(self, setpoints, display=False):
         # Remove old sliders
         while self.velocity_markers:
             self.removeItem(self.velocity_markers.pop())
@@ -82,21 +81,21 @@ class JointSettingPlot(pg.PlotItem):
             self.velocity_markers.append(self.plot([x_start, x_end], [y_start, y_end], pen=velocity_pen))
             self.velocities.append(setpoint.velocity)
 
-    def updateTimeSlider(self, time):
+    def update_time_slider(self, time):
         self.time_line.setValue(time)
 
-    def createPlots(self, joint):
+    def create_plots(self, joint):
         self.plot_item = self.plot(pen=None, symbolBrush=(255, 0, 0), symbolPen='w')
         self.showGrid(True, True, 1)
         self.plot_interpolation = self.plot()
 
-    def updateSetpoints(self, joint, show_velocity_markers=False):
+    def update_set_points(self, joint, show_velocity_markers=False):
         time, position, velocity = joint.get_setpoints_unzipped()
 
         for i in range(0, len(position)):
             position[i] = math.degrees(position[i])
 
-        self.createVelocityMarkers(joint.setpoints, show_velocity_markers)
+        self.create_velocity_markers(joint.setpoints, show_velocity_markers)
 
         self.plot_item.setData(time, position)
 

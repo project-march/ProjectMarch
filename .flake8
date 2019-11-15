@@ -1,2 +1,4 @@
 [flake8]
 max-line-length = 120
+# These function names are inherited from Qt, so we can't rename them
+ignore-names = createEditor, setEditorData, setModelData, updateEditorGeometry, mouseClickEvent, mouseDragEvent
