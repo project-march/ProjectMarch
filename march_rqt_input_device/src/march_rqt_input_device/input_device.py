@@ -174,16 +174,15 @@ class InputDevicePlugin(Plugin):
                                                           text='Tilted path second ending step',
                                                           callback=lambda: self.publish_gait(
                                                               'gait_tilted_path_second_ending_step'))
-                                                              "gait_tilted_path_second_ending_step"))
         gait_rough_terrain_high_step = MarchButton(name="gait_rough_terrain_high_step",
                                                    text="Rough terrain high step",
                                                    callback=lambda: self.publish_gait(
                                                        "gait_rough_terrain_high_step"))
 
         gait_rough_terrain_middle_steps = MarchButton(name="gait_rough_terrain_middle_steps",
-                                                   text="Rough terrain middle steps",
-                                                   callback=lambda: self.publish_gait(
-                                                       "gait_rough_terrain_middle_steps"))
+                                                      text="Rough terrain middle steps",
+                                                      callback=lambda: self.publish_gait(
+                                                          "gait_rough_terrain_middle_steps"))
 
         stop_button = MarchButton(name='gait_stop', image='/stop.png',
                                   callback=lambda: self.publish_stop())
