@@ -7,13 +7,13 @@ import rospkg
 from urdf_parser_py import urdf
 import pyqtgraph as pg
 
-from pyqtgraph.Qt import QtCore, QtGui
+from pyqtgraph.Qt import QtCore
 from numpy_ringbuffer import RingBuffer
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget, QFileDialog, QPushButton, QTextBrowser, QShortcut, \
-                                        QLineEdit, QSlider, QHeaderView, QTableWidgetItem, \
+from python_qt_binding.QtWidgets import QWidget, QFileDialog, QPushButton, \
+                                        QLineEdit, QSlider, QHeaderView, \
                                         QCheckBox, QMessageBox, QSpinBox, QDoubleSpinBox, QFrame, \
                                         QComboBox
 
@@ -191,7 +191,7 @@ class GaitGeneratorPlugin(Plugin):
         graphics_layouts = self._widget.JointSettingContainer.findChildren(pg.GraphicsLayoutWidget)
         for graphics_layout in graphics_layouts:
             joint_settings_plot = graphics_layout.getItem(0, 0)
-            joint_settings_plot.updateTimeSlider(self.gait.current_time)
+            joint_settings_plot.update_time_slider(self.gait.current_time)
 
     # Called by load_gait_into_ui and update_gait_duration.
     def create_joint_settings(self):
