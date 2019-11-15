@@ -179,6 +179,11 @@ class InputDevicePlugin(Plugin):
                                                    callback=lambda: self.publish_gait(
                                                        "gait_rough_terrain_high_step"))
 
+        gait_rough_terrain_middle_steps = MarchButton(name="gait_rough_terrain_middle_steps",
+                                                   text="Rough terrain middle steps",
+                                                   callback=lambda: self.publish_gait(
+                                                       "gait_rough_terrain_middle_steps"))
+
         stop_button = MarchButton(name="gait_stop", image="/stop.png",
                                   callback=lambda: self.publish_stop())
         pause_button = MarchButton(name="gait_pause", text="Pause",
@@ -204,7 +209,7 @@ class InputDevicePlugin(Plugin):
             [gait_set_ankle_from_min5_to_min10, gait_tilted_path_middle_step, gait_set_ankle_from_min10_to_min5,
              gait_tilted_path_first_ending_step],
             [gait_tilted_path_second_ending_step, gait_set_ankle_from_min5_to_2_5, stop_button],
-            [pause_button, continue_button, error_button, gait_rough_terrain_high_step],
+            [pause_button, continue_button, error_button, gait_rough_terrain_high_step, gait_rough_terrain_middle_steps],
         ]
 
         # Create the qt_layout from the button layout.
