@@ -24,7 +24,7 @@
 namespace march_pdb_state_controller
 {
 class MarchPdbStateController
-  : public controller_interface::Controller<march_hardware_interface::MarchPdbStateInterface>
+    : public controller_interface::Controller<march_hardware_interface::MarchPdbStateInterface>
 {
 public:
   MarchPdbStateController()
