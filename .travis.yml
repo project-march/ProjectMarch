@@ -28,11 +28,15 @@ env:
     - CCACHE_DIR=$HOME/.ccache # enables C/C++ caching in industrial_ci
     - BUILDER=colcon
     - CATKIN_LINT=pedantic
-    - UPSTREAM_WORKSPACE='.rosinstall -march/march_gait_scheduler -march/march_gait_selection -march/march_launch -march/march_rqt_launch_menu -march/march_safety -march/march_sound_scheduler -march/march_state_machine'
+    - UPSTREAM_WORKSPACE='.rosinstall -march/march_data_collector -march/march_gait_scheduler -march/march_gain_scheduling -march/march_gait_selection -march/march_launch -march/march_safety -march/march_sound_scheduler -march/march_state_machine'
     - AFTER_SCRIPT='builder_run_build "$target_ws/install" "$target_ws" --cmake-target-skip-unavailable --cmake-target roslint'
-  matrix:
-    - ROS_DISTRO=kinetic
-    - ROS_DISTRO=melodic
+
+jobs:
+  include:
+    - name: "Kinetic"
+      env: ROS_DISTRO=kinetic
+    - name: "Melodic"
+      env: ROS_DISTRO=melodic
 
 # clone and run industrial_ci
 install:
