@@ -33,7 +33,7 @@ jobs:
     - name: "flake8"
       language: python
       python: 2.7
-      before_script:
+      install:
         - pip install flake8 pep8-naming
       script: flake8
 
