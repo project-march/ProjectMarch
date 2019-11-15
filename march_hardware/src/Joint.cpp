@@ -45,8 +45,9 @@ void Joint::resetIMotionCube()
 
 void Joint::actuateRad(float targetPositionRad)
 {
-  ROS_ASSERT_MSG(this->allowActuation, "Joint %s is not allowed to actuate, "
-                                       "yet its actuate method has been called",
+  ROS_ASSERT_MSG(this->allowActuation,
+                 "Joint %s is not allowed to actuate, "
+                 "yet its actuate method has been called",
                  this->name.c_str());
   // TODO(BaCo) check that the position is allowed and does not exceed (torque)
   // limits.
@@ -65,8 +66,9 @@ float Joint::getAngleRad()
 
 void Joint::actuateTorque(int targetTorque)
 {
-  ROS_ASSERT_MSG(this->allowActuation, "Joint %s is not allowed to actuate, "
-                                       "yet its actuate method has been called",
+  ROS_ASSERT_MSG(this->allowActuation,
+                 "Joint %s is not allowed to actuate, "
+                 "yet its actuate method has been called",
                  this->name.c_str());
   this->iMotionCube.actuateTorque(targetTorque);
 }

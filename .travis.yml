@@ -38,7 +38,7 @@ jobs:
     - name: "Melodic"
       env: ROS_DISTRO=melodic
     - name: "clang-format"
-      env: ROS_DISTRO=melodic CLANG_FORMAT_CHECK=file CLANG_FORMAT_VERSION=3.9
+      env: ROS_DISTRO=melodic CLANG_FORMAT_CHECK=file
 
 # clone and run industrial_ci
 install:
