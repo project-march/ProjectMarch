@@ -201,8 +201,8 @@ void WirelessMaster::onConnectivityChanged(XsDevice* dev, XsConnectivityState ne
       ROS_INFO_STREAM("EVENT: MTW Connected -> " << device_id_string);
       this->connected_mtws_.insert(std::make_pair(device_id, std::unique_ptr<Mtw>(new Mtw(dev))));
 
-      ros::Publisher publisher = this->m_node->advertise<sensor_msgs::Imu>("/march/imu", 10);
-      this->m_publishers.insert(std::make_pair(deviceId, publisher));
+      ros::Publisher publisher = this->node_->advertise<sensor_msgs::Imu>("/march/imu", 10);
+      this->publishers_.insert(std::make_pair(device_id, publisher));
       break;
     }
     case XCS_File:
