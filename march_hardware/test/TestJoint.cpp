@@ -9,9 +9,9 @@
 #include "mocks/MockTemperatureGES.cpp"
 #include "mocks/MockIMotionCube.cpp"
 
-using ::testing::Return;
 using ::testing::AtLeast;
 using ::testing::AtMost;
+using ::testing::Return;
 
 class JointTest : public ::testing::Test
 {
@@ -22,31 +22,31 @@ protected:
 class JointDeathTest : public ::testing::Test
 {
 protected:
-    const float temperature = 42;
+  const float temperature = 42;
 };
 
 TEST_F(JointTest, AllowActuation)
 {
-    march4cpp::Joint joint;
-    joint.setAllowActuation(true);
-    ASSERT_TRUE(joint.canActuate());
+  march4cpp::Joint joint;
+  joint.setAllowActuation(true);
+  ASSERT_TRUE(joint.canActuate());
 }
 
 TEST_F(JointTest, DisableActuation)
 {
-    march4cpp::Joint joint;
-    joint.setAllowActuation(false);
-    ASSERT_FALSE(joint.canActuate());
+  march4cpp::Joint joint;
+  joint.setAllowActuation(false);
+  ASSERT_FALSE(joint.canActuate());
 }
 
 TEST_F(JointDeathTest, ActuateDisableActuation)
 {
-    march4cpp::Joint joint;
-    joint.setAllowActuation(false);
-    joint.setName("actuate_false");
-    ASSERT_FALSE(joint.canActuate());
-    ASSERT_DEATH(joint.actuateRad(0.3), "Joint actuate_false is not allowed to actuate, "
-                                        "yet its actuate method has been called");
+  march4cpp::Joint joint;
+  joint.setAllowActuation(false);
+  joint.setName("actuate_false");
+  ASSERT_FALSE(joint.canActuate());
+  ASSERT_DEATH(joint.actuateRad(0.3), "Joint actuate_false is not allowed to actuate, "
+                                      "yet its actuate method has been called");
 }
 
 TEST_F(JointTest, NoActuationMode)
@@ -72,26 +72,26 @@ TEST_F(JointTest, ChangeActuationModeToUnknown)
 
 TEST_F(JointTest, ChangeActuationModeFromPositionToTorque)
 {
-    march4cpp::Joint joint;
+  march4cpp::Joint joint;
 
-    joint.setName("test_joint");
-    ASSERT_EQ(joint.getActuationMode().getValue(), march4cpp::ActuationMode::unknown);
+  joint.setName("test_joint");
+  ASSERT_EQ(joint.getActuationMode().getValue(), march4cpp::ActuationMode::unknown);
 
-    joint.setActuationMode(march4cpp::ActuationMode("position"));
-    ASSERT_EQ(joint.getActuationMode().getValue(), march4cpp::ActuationMode::position);
+  joint.setActuationMode(march4cpp::ActuationMode("position"));
+  ASSERT_EQ(joint.getActuationMode().getValue(), march4cpp::ActuationMode::position);
 
-    ASSERT_THROW(joint.setActuationMode(march4cpp::ActuationMode("torque")), std::runtime_error);
+  ASSERT_THROW(joint.setActuationMode(march4cpp::ActuationMode("torque")), std::runtime_error);
 }
 
 TEST_F(JointTest, ChangeActuationModeFromTorqueToPosition)
 {
-    march4cpp::Joint joint;
+  march4cpp::Joint joint;
 
-    joint.setName("test_joint");
-    ASSERT_EQ(joint.getActuationMode().getValue(), march4cpp::ActuationMode::unknown);
+  joint.setName("test_joint");
+  ASSERT_EQ(joint.getActuationMode().getValue(), march4cpp::ActuationMode::unknown);
 
-    joint.setActuationMode(march4cpp::ActuationMode("torque"));
-    ASSERT_EQ(joint.getActuationMode().getValue(), march4cpp::ActuationMode::torque);
+  joint.setActuationMode(march4cpp::ActuationMode("torque"));
+  ASSERT_EQ(joint.getActuationMode().getValue(), march4cpp::ActuationMode::torque);
 
-    ASSERT_THROW(joint.setActuationMode(march4cpp::ActuationMode("position")), std::runtime_error);
+  ASSERT_THROW(joint.setActuationMode(march4cpp::ActuationMode("position")), std::runtime_error);
 }

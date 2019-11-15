@@ -1,7 +1,7 @@
 // Copyright 2019 Project March.
 
-#ifndef MARCH_WS_IMOTIONCUBETARGETSTATE_H
-#define MARCH_WS_IMOTIONCUBETARGETSTATE_H
+#ifndef MARCH_HARDWARE_IMOTIONCUBETARGETSTATE_H
+#define MARCH_HARDWARE_IMOTIONCUBETARGETSTATE_H
 
 #include <string>
 namespace march4cpp
@@ -51,4 +51,4 @@ public:
 };
 
 }  // namespace march4cpp
-#endif  // MARCH_WS_IMOTIONCUBETARGETSTATE_H
+#endif  // MARCH_HARDWARE_IMOTIONCUBETARGETSTATE_H

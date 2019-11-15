@@ -12,10 +12,10 @@ class TestDummy : public ::testing::Test
 {
 };
 
-TEST_F(TestDummy , AlwaysTrue)
+TEST_F(TestDummy, AlwaysTrue)
 {
-    march_temperature_sensor_controller::MarchTemperatureSensorController marchController;
-    ASSERT_TRUE(true);
+  march_temperature_sensor_controller::MarchTemperatureSensorController marchController;
+  ASSERT_TRUE(true);
 }
 
 int main(int argc, char** argv)

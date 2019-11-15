@@ -1,6 +1,9 @@
 // Copyright 2019 Project March.
+#include <string>
+#include <vector>
 
-#include "ros/ros.h"
+#include <ros/ros.h>
+
 #include <march_hardware_builder/HardwareBuilder.h>
 #include <march_hardware_builder/HardwareConfigExceptions.h>
 
@@ -41,10 +44,10 @@ march4cpp::MarchRobot HardwareBuilder::createMarchRobot(YAML::Node marchRobotCon
   }
 
   ROS_INFO_STREAM("marchRobotConfig " << marchRobotConfig << "\n");
-  if (marchRobotConfig["powerDistributionBoard"].Type() != YAML::NodeType::Undefined)
+  auto pdbConfig = marchRobotConfig["powerDistributionBoard"];
+  if (pdbConfig.Type() != YAML::NodeType::Undefined)
   {
-    march4cpp::PowerDistributionBoard powerDistributionBoard =
-        createPowerDistributionBoard(marchRobotConfig["powerDistributionBoard"]);
+    march4cpp::PowerDistributionBoard powerDistributionBoard = createPowerDistributionBoard(pdbConfig);
 
     ROS_INFO_STREAM("PowerDistributionBoard: " << powerDistributionBoard);
     return march4cpp::MarchRobot(jointList, powerDistributionBoard, ifName, ecatCycleTime);
@@ -58,9 +61,10 @@ march4cpp::MarchRobot HardwareBuilder::createMarchRobot(YAML::Node marchRobotCon
 
 march4cpp::MarchRobot HardwareBuilder::createMarchRobot()
 {
-  ROS_ASSERT_MSG(this->robotConfig.Type() != YAML::NodeType::Null,
-      "Trying to create a MarchRobot without specifying a .yaml file."
-      " Please do so in the constructor of the HardwareBuilder or in the function createMarchRobot");
+  ROS_ASSERT_MSG(this->robotConfig.Type() != YAML::NodeType::Null, "Trying to create a MarchRobot without specifying a "
+                                                                   ".yaml file. Please do so in the constructor of the "
+                                                                   "HardwareBuilder or in the function "
+                                                                   "createMarchRobot");
   return this->createMarchRobot(robotConfig);
 }
 

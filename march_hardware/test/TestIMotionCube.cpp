@@ -5,8 +5,8 @@
 #include "march_hardware/IMotionCube.h"
 #include "mocks/MockEncoder.cpp"
 
-using ::testing::Return;
 using ::testing::AtLeast;
+using ::testing::Return;
 
 class IMotionCubeTest : public ::testing::Test
 {
@@ -59,18 +59,18 @@ TEST_F(IMotionCubeTest, NoActuationMode)
 
 TEST_F(IMotionCubeTest, ActuationModeTorqueActuateRad)
 {
-    march4cpp::IMotionCube imc = march4cpp::IMotionCube(1, encoder);
+  march4cpp::IMotionCube imc = march4cpp::IMotionCube(1, encoder);
 
-    imc.setActuationMode(march4cpp::ActuationMode("torque"));
-    ASSERT_DEATH(imc.actuateRad(1), "trying to actuate rad, while actuationmode = torque");
+  imc.setActuationMode(march4cpp::ActuationMode("torque"));
+  ASSERT_DEATH(imc.actuateRad(1), "trying to actuate rad, while actuationmode = torque");
 }
 
 TEST_F(IMotionCubeTest, ActuationModePositionActuateTorque)
 {
-    march4cpp::IMotionCube imc = march4cpp::IMotionCube(1, encoder);
+  march4cpp::IMotionCube imc = march4cpp::IMotionCube(1, encoder);
 
-    imc.setActuationMode(march4cpp::ActuationMode("position"));
-    ASSERT_DEATH(imc.actuateTorque(1), "trying to actuate torque, while actuationmode = position");
+  imc.setActuationMode(march4cpp::ActuationMode("position"));
+  ASSERT_DEATH(imc.actuateTorque(1), "trying to actuate torque, while actuationmode = position");
 }
 
 TEST_F(IMotionCubeTest, ChangeActuationModePosition)
@@ -84,11 +84,11 @@ TEST_F(IMotionCubeTest, ChangeActuationModePosition)
 
 TEST_F(IMotionCubeTest, ChangeActuationModeTorque)
 {
-    march4cpp::IMotionCube imc = march4cpp::IMotionCube(1, encoder);
-    ASSERT_EQ(march4cpp::ActuationMode::unknown, imc.getActuationMode().getValue());
+  march4cpp::IMotionCube imc = march4cpp::IMotionCube(1, encoder);
+  ASSERT_EQ(march4cpp::ActuationMode::unknown, imc.getActuationMode().getValue());
 
-    imc.setActuationMode(march4cpp::ActuationMode("torque"));
-    ASSERT_EQ(march4cpp::ActuationMode::torque, imc.getActuationMode().getValue());
+  imc.setActuationMode(march4cpp::ActuationMode("torque"));
+  ASSERT_EQ(march4cpp::ActuationMode::torque, imc.getActuationMode().getValue());
 }
 
 TEST_F(IMotionCubeTest, ChangeActuationModeToUnknown)
@@ -104,18 +104,18 @@ TEST_F(IMotionCubeTest, ChangeActuationModeToUnknown)
 
 TEST_F(IMotionCubeTest, ChangeActuationModeFromPositionToTorque)
 {
-    march4cpp::IMotionCube imc = march4cpp::IMotionCube(1, encoder);
-    imc.setActuationMode(march4cpp::ActuationMode("position"));
-    ASSERT_EQ(march4cpp::ActuationMode::position, imc.getActuationMode().getValue());
+  march4cpp::IMotionCube imc = march4cpp::IMotionCube(1, encoder);
+  imc.setActuationMode(march4cpp::ActuationMode("position"));
+  ASSERT_EQ(march4cpp::ActuationMode::position, imc.getActuationMode().getValue());
 
-    ASSERT_THROW(imc.setActuationMode(march4cpp::ActuationMode("torque")), std::runtime_error);
+  ASSERT_THROW(imc.setActuationMode(march4cpp::ActuationMode("torque")), std::runtime_error);
 }
 
 TEST_F(IMotionCubeTest, ChangeActuationModeFromTorqueToPosition)
 {
-    march4cpp::IMotionCube imc = march4cpp::IMotionCube(1, encoder);
-    imc.setActuationMode(march4cpp::ActuationMode("torque"));
-    ASSERT_EQ(march4cpp::ActuationMode::torque, imc.getActuationMode().getValue());
+  march4cpp::IMotionCube imc = march4cpp::IMotionCube(1, encoder);
+  imc.setActuationMode(march4cpp::ActuationMode("torque"));
+  ASSERT_EQ(march4cpp::ActuationMode::torque, imc.getActuationMode().getValue());
 
-    ASSERT_THROW(imc.setActuationMode(march4cpp::ActuationMode("position")), std::runtime_error);
+  ASSERT_THROW(imc.setActuationMode(march4cpp::ActuationMode("position")), std::runtime_error);
 }

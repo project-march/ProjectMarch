@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
-#ifndef MARCH4CPP__TEMPERATURESENSOR_H
-#define MARCH4CPP__TEMPERATURESENSOR_H
+#ifndef MARCH_HARDWARE_TEMPERATUREGES_H
+#define MARCH_HARDWARE_TEMPERATUREGES_H
 
 #include <stdint.h>
 #include <march_hardware/Slave.h>
@@ -37,4 +37,4 @@ public:
   }
 };
 }  // namespace march4cpp
-#endif
+#endif  // MARCH_HARDWARE_TEMPERATUREGES_H

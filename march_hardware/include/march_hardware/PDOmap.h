@@ -1,8 +1,9 @@
 // Copyright 2019 Project March.
-#ifndef MARCH4CPP__PDOMAP_H
-#define MARCH4CPP__PDOMAP_H
+#ifndef MARCH_HARDWARE_PDOMAP_H
+#define MARCH_HARDWARE_PDOMAP_H
 
 #include <string>
+#include <utility>
 #include <vector>
 #include <map>
 
@@ -23,7 +24,9 @@ struct IMCObject
     this->length = _length;
   }
 
-  IMCObject(){}
+  IMCObject()
+  {
+  }
 };
 
 enum class dataDirection
@@ -75,4 +78,4 @@ private:
 };
 }  // namespace march4cpp
 
-#endif
+#endif  // MARCH_HARDWARE_PDOMAP_H

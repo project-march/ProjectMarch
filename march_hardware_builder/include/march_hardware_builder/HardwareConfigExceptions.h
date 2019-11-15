@@ -1,6 +1,8 @@
 // Copyright 2019 Project March.
-
+#ifndef MARCH_HARDWARE_BUILDER_HARDWARECONFIGEXCEPTIONS_H
+#define MARCH_HARDWARE_BUILDER_HARDWARECONFIGEXCEPTIONS_H
 #include <exception>
+#include <string>
 
 #include <ros/ros.h>
 
@@ -38,3 +40,4 @@ public:
     this->msg = stringStream.str();
   }
 };
+#endif  // MARCH_HARDWARE_BUILDER_HARDWARECONFIGEXCEPTIONS_H

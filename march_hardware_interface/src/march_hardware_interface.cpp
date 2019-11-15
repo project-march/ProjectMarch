@@ -14,11 +14,14 @@
 
 #include <urdf/model.h>
 
+using hardware_interface::JointHandle;
+using hardware_interface::JointStateHandle;
+using hardware_interface::PositionJointInterface;
+using joint_limits_interface::EffortJointSoftLimitsHandle;
+using joint_limits_interface::EffortJointSoftLimitsInterface;
 using joint_limits_interface::JointLimits;
 using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::PositionJointSoftLimitsInterface;
-using joint_limits_interface::EffortJointSoftLimitsHandle;
-using joint_limits_interface::EffortJointSoftLimitsInterface;
 using joint_limits_interface::SoftJointLimits;
 
 namespace march_hardware_interface
@@ -86,9 +89,7 @@ void MarchHardwareInterface::init()
   {
     SoftJointLimits soft_limits;
     getSoftJointLimits(model.getJoint(joint_names_[i]), soft_limits);
-    ROS_DEBUG("[%s] Soft limits set to (%f, %f)",
-              joint_names_[i].c_str(),
-              soft_limits.min_position,
+    ROS_DEBUG("[%s] Soft limits set to (%f, %f)", joint_names_[i].c_str(), soft_limits.min_position,
               soft_limits.max_position);
     soft_limits_[i] = soft_limits;
   }
@@ -295,9 +296,9 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
 
       if (joint_effort_command_[i] != joint_effort_command_copy[i])
       {
-          ROS_WARN("Effort command (%f) changed to random high number (%f) for joint(%s), "
-                   "but set back to the normal value.",
-                   joint_effort_command_copy[i], joint_effort_command_[i], joint_names_[i].c_str());
+        ROS_WARN("Effort command (%f) changed to random high number (%f) for joint(%s), "
+                 "but set back to the normal value.",
+                 joint_effort_command_copy[i], joint_effort_command_[i], joint_names_[i].c_str());
         joint_effort_command_[i] = joint_effort_command_copy[i];
       }
 

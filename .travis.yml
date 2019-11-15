@@ -29,7 +29,7 @@ env:
     - BUILDER=colcon
     - CATKIN_LINT=pedantic
     - UPSTREAM_WORKSPACE='.rosinstall -march/march_data_collector -march/march_gait_scheduler -march/march_gain_scheduling -march/march_gait_selection -march/march_launch -march/march_safety -march/march_sound_scheduler -march/march_state_machine'
-    - AFTER_SCRIPT='builder_run_build "$target_ws/install" "$target_ws" --cmake-target-skip-unavailable --cmake-target roslint'
+    - AFTER_BUILD_TARGET_WORKSPACE='builder_run_build "$target_ws/install" "$target_ws" --cmake-target-skip-unavailable --cmake-target roslint'
 
 jobs:
   include:
@@ -37,6 +37,8 @@ jobs:
       env: ROS_DISTRO=kinetic
     - name: "Melodic"
       env: ROS_DISTRO=melodic
+    - name: "clang-format"
+      env: ROS_DISTRO=melodic CLANG_FORMAT_CHECK=file
 
 # clone and run industrial_ci
 install:

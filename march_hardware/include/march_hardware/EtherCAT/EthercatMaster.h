@@ -1,7 +1,8 @@
 // Copyright 2019 Project March.
-#ifndef MARCH4CPP__ETHERCATMASTER_H
-#define MARCH4CPP__ETHERCATMASTER_H
-
+#ifndef MARCH_HARDWARE_ETHERCAT_ETHERCATMASTER_H
+#define MARCH_HARDWARE_ETHERCAT_ETHERCATMASTER_H
+#include <vector>
+#include <string>
 #include <thread>  // NOLINT(build/c++11)
 
 #include <march_hardware/Joint.h>
@@ -38,4 +39,4 @@ public:
 };
 
 }  // namespace march4cpp
-#endif
+#endif  // MARCH_HARDWARE_ETHERCAT_ETHERCATMASTER_H

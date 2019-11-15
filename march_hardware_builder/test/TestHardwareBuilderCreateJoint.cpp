@@ -1,7 +1,8 @@
 // Copyright 2019 Project March.
+#include <string>
 
-#include "gtest/gtest.h"
-#include "ros/ros.h"
+#include <gtest/gtest.h>
+#include <ros/ros.h>
 #include <gmock/gmock.h>
 #include <ros/package.h>
 #include <march_hardware_builder/HardwareConfigExceptions.h>
@@ -139,7 +140,6 @@ TEST_F(JointTest, ValidActuationMode)
   march4cpp::Joint actualJointWrong;
   actualJointWrong.setName("test_joint_hip");
   actualJointWrong.setActuationMode(march4cpp::ActuationMode("torque"));
-
 
   ASSERT_EQ("test_joint_hip", actualJoint.getName());
   ASSERT_EQ(actualJoint, createdJoint);

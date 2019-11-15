@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
-#ifndef PROJECT_ANGLECONVERSIONS_H
-#define PROJECT_ANGLECONVERSIONS_H
+#ifndef MARCH_HARDWARE_ANGLECONVERSIONS_H
+#define MARCH_HARDWARE_ANGLECONVERSIONS_H
 
 #include <cmath>
 
@@ -14,4 +14,4 @@ float RadtoDeg(float rad)
   return static_cast<float>(rad * 180 / M_PI);
 }
 
-#endif  // PROJECT_ANGLECONVERSIONS_H
+#endif  // MARCH_HARDWARE_ANGLECONVERSIONS_H

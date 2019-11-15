@@ -45,8 +45,8 @@ void PowerDistributionBoard::setMasterShutDownAllowed(bool isAllowed)
 
 bool PowerDistributionBoard::getMasterShutdownRequested()
 {
-  union bit8 masterShutdownRequestedBit = get_input_bit8(static_cast<uint16>(this->slaveIndex),
-                                      static_cast<uint8>(this->bootShutdownOffsets.getShutdownByteOffset()));
+  union bit8 masterShutdownRequestedBit = get_input_bit8(
+      static_cast<uint16>(this->slaveIndex), static_cast<uint8>(this->bootShutdownOffsets.getShutdownByteOffset()));
   return masterShutdownRequestedBit.ui;
 }
 

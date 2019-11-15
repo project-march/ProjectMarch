@@ -1,6 +1,9 @@
 // Copyright 2019 Project March.
 #include <march_hardware/PDOmap.h>
 
+#include <map>
+#include <utility>
+
 namespace march4cpp
 {
 PDOmap::PDOmap()

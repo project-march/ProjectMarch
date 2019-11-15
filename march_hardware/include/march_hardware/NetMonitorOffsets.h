@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
-#ifndef MARCH_IV_NETMONITOROFFSETS_H
-#define MARCH_IV_NETMONITOROFFSETS_H
+#ifndef MARCH_HARDWARE_NETMONITOROFFSETS_H
+#define MARCH_HARDWARE_NETMONITOROFFSETS_H
 
 #include <ostream>
 #include <ros/ros.h>
@@ -19,8 +19,8 @@ class NetMonitorOffsets
 public:
   NetMonitorOffsets(int powerDistributionBoardCurrentByteOffset, int lowVoltageNet1CurrentByteOffset,
                     int lowVoltageNet2CurrentByteOffset, int highVoltageNetCurrentByteOffset,
-                    int lowVoltageStateByteOffset, int highVoltageOvercurrentTriggerByteOffset,
-                    int highVoltageEnabled, int highVoltageStateByteOffset)
+                    int lowVoltageStateByteOffset, int highVoltageOvercurrentTriggerByteOffset, int highVoltageEnabled,
+                    int highVoltageStateByteOffset)
     : powerDistributionBoardCurrent(powerDistributionBoardCurrentByteOffset)
     , lowVoltageNet1Current(lowVoltageNet1CurrentByteOffset)
     , lowVoltageNet2Current(lowVoltageNet2CurrentByteOffset)
@@ -165,4 +165,4 @@ public:
   }
 };
 
-#endif  // MARCH_IV_NETMONITOROFFSETS_H
+#endif  // MARCH_HARDWARE_NETMONITOROFFSETS_H

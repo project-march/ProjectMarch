@@ -1,5 +1,7 @@
-#ifndef ROS_CONTROL__MARCH_HARDWARE_INTERFACE_H
-#define ROS_CONTROL__MARCH_HARDWARE_INTERFACE_H
+// Copyright 2019 Project March
+#ifndef MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_H
+#define MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_H
+#include <vector>
 
 #include <control_toolbox/filters.h>
 #include <march_hardware_interface/march_hardware.h>
@@ -11,13 +13,14 @@
 
 #include <march_hardware/MarchRobot.h>
 
-using namespace hardware_interface;
-using joint_limits_interface::JointLimits;
-using joint_limits_interface::SoftJointLimits;
-using joint_limits_interface::PositionJointSoftLimitsHandle;
-using joint_limits_interface::PositionJointSoftLimitsInterface;
+using hardware_interface::JointStateHandle;
+using hardware_interface::PositionJointInterface;
 using joint_limits_interface::EffortJointSoftLimitsHandle;
 using joint_limits_interface::EffortJointSoftLimitsInterface;
+using joint_limits_interface::JointLimits;
+using joint_limits_interface::PositionJointSoftLimitsHandle;
+using joint_limits_interface::PositionJointSoftLimitsInterface;
+using joint_limits_interface::SoftJointLimits;
 
 namespace march_hardware_interface
 {
@@ -32,7 +35,7 @@ static const double VELOCITY_STEP_FACTOR = 10;
 class MarchHardwareInterface : public march_hardware_interface::MarchHardware
 {
 public:
-  MarchHardwareInterface(ros::NodeHandle &nh, AllowedRobot robotName);
+  MarchHardwareInterface(ros::NodeHandle& nh, AllowedRobot robotName);
   ~MarchHardwareInterface();
 
   /**
@@ -40,7 +43,7 @@ public:
    * for each joint.
    */
   void init();
-  void update(const ros::TimerEvent &e);
+  void update(const ros::TimerEvent& e);
 
   /**
    * @brief Read actual postion from the hardware.
@@ -48,8 +51,8 @@ public:
   void read(ros::Duration elapsed_time = ros::Duration(0.01));
 
   /**
-  * @brief Perform all safety checks that might crash the exoskeleton.
- */
+   * @brief Perform all safety checks that might crash the exoskeleton.
+   */
   void validate();
 
   /**
@@ -88,6 +91,6 @@ private:
   void outsideLimitsCheck(int joint_index);
   void iMotionCubeStateCheck(int joint_index);
 };
-}
+}  // namespace march_hardware_interface
 
-#endif
+#endif  // MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_H
