@@ -11,12 +11,6 @@ notifications:
     secure: EMyWU/LU+ONy4bvZ1cRvt+9rXEI/+ND90xL5z1yX/eN6Pby57zXVu4BbI0m+WgRfG+okpTbd3CBwobpW5Xr6hbf2/QdDgbpgu7CP8KQVUduFAXCld2jxXjEpOq7l0IzXAb/kcPRdkqmvhbe9fwL7iyQyEvSqeO4TKJ3cY/DaL3d7qItVrBUwn6035KOS9vOyR3x46ZTZbx8wFCYp4rjOJvZoxR18/LhWX/SNOiv/MEPjc7akoYCpZGPfJ1kEI6QUpphvTyGvcBrea0POtjUJeo+NQk3ZbefPO7+gLTSefxVUuzCFU/UuZxcwJ0yYrWOIahZzkO8xhQz+S1MrVmGNk+rItssFisa5o9M19lL+nr1CwJuEAVZf3IkfGfDma8Q1j5pD0sgZxJmsN8ormppO9hg7dEqzkT1Dsh+qcDtq6JDqq7LbPe11m4k4JB2gLqaFHCTgCfjJ06Q9JFFnL1xyIjVHfn1wMoaRNKH9KIzhjzqw0UQIF7oEGrw5zH5BWIs6A9WRQ8HvaJJebp4x7b1ZtRrYPqPsQkze/vz+b8se9fUh/2BviSjjcd4Q9wm/ORZfFZi2QGJwlGmY7UaJqDNstvdMUC8ZrbFkNBSEWOV8bx42ojoLEkLj+tga9cvGqwEAuzrKqHKdrKgJzDtQz0LDlP2mCvDt79wG1H46bdS8SYA=
   email: false
 
-# include the following block if the C/C++ build artifacts should get cached by Travis,
-# CCACHE_DIR needs to get set as well to actually fill the cache
-cache:
-  directories:
-    - $HOME/.ccache
-
 git:
   quiet: true # optional, silences the cloning of the target repository
 
@@ -25,13 +19,16 @@ git:
 env:
   global:
     - ROS_REPO=ros
-    - CCACHE_DIR=$HOME/.ccache # enables C/C++ caching in industrial_ci
     - BUILDER=colcon
     - CATKIN_LINT=pedantic
-    - AFTER_SCRIPT='builder_run_build "$target_ws/install" "$target_ws" --cmake-target-skip-unavailable --cmake-target roslint'
-  matrix:
-    - ROS_DISTRO=kinetic
-    - ROS_DISTRO=melodic
+    - AFTER_SCRIPT='builder_run_build "$target_ws/install" "$target_ws" --event-handlers console_direct+ --cmake-target-skip-unavailable --cmake-target roslint'
+  
+jobs:
+  include:
+    - name: "Kinetic"
+      env: ROS_DISTRO=kinetic
+    - name: "Melodic"
+      env: ROS_DISTRO=melodic
 
 # clone and run industrial_ci
 install:
