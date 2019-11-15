@@ -209,8 +209,8 @@ class InputDevicePlugin(Plugin):
             [gait_set_ankle_from_min5_to_min10, gait_tilted_path_middle_step, gait_set_ankle_from_min10_to_min5,
              gait_tilted_path_first_ending_step],
             [gait_tilted_path_second_ending_step, gait_set_ankle_from_min5_to_2_5, stop_button],
-            [pause_button, continue_button, error_button, gait_rough_terrain_high_step, gait_rough_terrain_middle_steps],
-        ]
+            [pause_button, continue_button, error_button, gait_rough_terrain_high_step, gait_rough_terrain_middle_steps]
+            ,]
 
         # Create the qt_layout from the button layout.
         layout_builder = LayoutBuilder(march_button_layout)
