@@ -6,23 +6,25 @@
     <param name="robot_description"
            command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/$(arg robot).xacro'" />
 
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+    <group ns="march">
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 
-    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="true" ns="/"
-          args="
-                /march/controller/joint_state
-                /march/controller/temperature_sensor
-                /march/controller/trajectory
-            "
-    />
+        <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="true"
+              args="
+                    /march/controller/joint_state
+                    /march/controller/temperature_sensor
+                    /march/controller/trajectory
+                "
+        />
 
-    <node
-            launch-prefix="ethercat_grant"
-            name="hardware_interface"
-            pkg="march_hardware_interface"
-            type="march_hardware_interface_node"
-            args="$(arg robot)"
-            output="screen"
-            required="true"
-    />
+        <node
+                launch-prefix="ethercat_grant"
+                name="hardware_interface"
+                pkg="march_hardware_interface"
+                type="march_hardware_interface_node"
+                args="$(arg robot)"
+                output="screen"
+                required="true"
+        />
+    </group>
 </launch>
