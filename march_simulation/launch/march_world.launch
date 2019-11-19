@@ -2,7 +2,6 @@
     <arg name="use_sim_time" default="true" doc="Uses simulated time and publishes on /clock."/>
     <arg name="fake_sensor_data" default="true" doc="Publishes fake sensor data."/>
     <arg name="gazebo_ui" default="true" doc="Launches the Gazebo UI."/>
-    <arg name="paused" default="$(arg gazebo_ui)" doc="Starts the simulation paused."/>
     <arg name="debug" default="false" doc="Starts gazebo debugging with gdb."/>
 
     <!-- Load the URDF into the ROS Parameter Server -->
@@ -33,7 +32,7 @@
             <arg name="world_name" value="$(find march_simulation)/worlds/march.world"/>
             <arg name="debug" value="$(arg debug)" />
             <arg name="gui" value="$(arg gazebo_ui)" />
-            <arg name="paused" value="$(arg paused)"/>
+            <arg name="paused" value="true"/>
             <arg name="use_sim_time" value="$(arg use_sim_time)"/>
         </include>
 
