@@ -4,7 +4,7 @@ import math
 from JointSettingSpinBoxDelegate import JointSettingSpinBoxDelegate
 from python_qt_binding.QtWidgets import QTableWidgetItem
 
-from model.Setpoint import Setpoint
+from model.modifiable_setpoint import ModifiableSetpoint
 import subprocess
 
 TABLE_DIGITS = 4
@@ -20,7 +20,7 @@ def table_to_setpoints(table_data):
         time = float(table_data.item(i, 0).text())
         position = math.radians(float(table_data.item(i, 1).text()))
         velocity = math.radians(float(table_data.item(i, 2).text()))
-        setpoints.append(Setpoint(time, position, velocity))
+        setpoints.append(ModifiableSetpoint(time, position, velocity))
     return setpoints
 
 
@@ -55,7 +55,7 @@ def plot_to_setpoints(plot):
         velocity = plot.velocities[i]
         time = plot_data[0][i]
         position = math.radians(plot_data[1][i])
-        setpoints.append(Setpoint(time, position, velocity))
+        setpoints.append(ModifiableSetpoint(time, position, velocity))
     return setpoints
 
 

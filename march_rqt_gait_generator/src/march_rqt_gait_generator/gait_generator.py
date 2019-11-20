@@ -26,7 +26,7 @@ from sensor_msgs.msg import JointState
 import GaitFactory
 import UserInterfaceController
 
-from model.Setpoint import Setpoint
+from model.modifiable_setpoint import ModifiableSetpoint
 
 from import_export import export_to_file, import_from_file_name
 
@@ -46,6 +46,7 @@ class GaitGeneratorPlugin(Plugin):
         self.gait_directory = None
         self.playback_speed = 100
         self.time_slider_thread = None
+        self.current_time = 0
         self.tf_listener = TransformListener()
         self.joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=10)
         self.joint_changed_history = RingBuffer(capacity=100, dtype=list)
@@ -137,13 +138,13 @@ class GaitGeneratorPlugin(Plugin):
             lambda text: self.gait.set_gait_type(text)
         )
         self.gait_name_line_edit.textChanged.connect(
-            lambda text: self.gait.set_name(text)
+            lambda text: self.gait.set_gait_name(text)
         )
         self.version_name_line_edit.textChanged.connect(
             lambda text: self.gait.set_version(text)
         )
         self.subgait_name_line_edit.textChanged.connect(
-            lambda text: self.gait.set_subgait(text)
+            lambda text: self.gait.set_subgait_name(text)
         )
         self.description_line_edit.textChanged.connect(
             lambda text: self.gait.set_description(text)
@@ -167,14 +168,14 @@ class GaitGeneratorPlugin(Plugin):
 
         # Connect TimeSlider to the preview
         self.time_slider.valueChanged.connect(lambda: [
-            self.gait.set_current_time(float(self.time_slider.value()) / 100),
+            self.set_current_time(float(self.time_slider.value()) / 100),
             self.publish_preview(),
             self.update_time_sliders(),
         ])
 
         self.gait_type_combo_box.setCurrentText(self.gait.gait_type)
-        self.gait_name_line_edit.setText(self.gait.name)
-        self.subgait_name_line_edit.setText(self.gait.subgait)
+        self.gait_name_line_edit.setText(self.gait.gait_name)
+        self.subgait_name_line_edit.setText(self.gait.subgait_name)
         self.version_name_line_edit.setText(self.gait.version)
         self.description_line_edit.setText(self.gait.description)
 
@@ -191,7 +192,7 @@ class GaitGeneratorPlugin(Plugin):
         graphics_layouts = self._widget.JointSettingContainer.findChildren(pg.GraphicsLayoutWidget)
         for graphics_layout in graphics_layouts:
             joint_settings_plot = graphics_layout.getItem(0, 0)
-            joint_settings_plot.update_time_slider(self.gait.current_time)
+            joint_settings_plot.update_time_slider(self.current_time)
 
     # Called by load_gait_into_ui and update_gait_duration.
     def create_joint_settings(self):
@@ -243,7 +244,7 @@ class GaitGeneratorPlugin(Plugin):
             if button == QtCore.Qt.ControlModifier:
                 joint.add_interpolated_setpoint(time)
             else:
-                joint.add_setpoint(Setpoint(time, position, 0))
+                joint.add_setpoint(ModifiableSetpoint(time, position, 0))
 
         self.undo_button.clicked.connect(update_joint_ui)
         self.redo_button.clicked.connect(update_joint_ui)
@@ -291,7 +292,7 @@ class GaitGeneratorPlugin(Plugin):
     def publish_preview(self):
         joint_state = JointState()
         joint_state.header.stamp = rospy.get_rostime()
-        time = self.gait.current_time
+        time = self.current_time
 
         for i in range(len(self.gait.joints)):
             joint_state.name.append(self.gait.joints[i].name)
@@ -306,6 +307,9 @@ class GaitGeneratorPlugin(Plugin):
         trajectory = self.gait.to_joint_trajectory()
         rospy.loginfo("Publishing trajectory to topic '" + self.topic_name + "'")
         self.gait_publisher.publish(trajectory)
+
+    def set_current_time(self, current_time):
+        self.current_time = current_time
 
     def set_topic_name(self, topic_name):
         self.topic_name = topic_name

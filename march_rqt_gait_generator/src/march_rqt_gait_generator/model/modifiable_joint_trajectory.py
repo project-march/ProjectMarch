@@ -4,10 +4,11 @@ import rospy
 from scipy.interpolate import BPoly
 from numpy_ringbuffer import RingBuffer
 
-from march_rqt_gait_generator.model.Setpoint import Setpoint
+from march_shared_classes.gait.joint_trajectory import JointTrajectory
+from modifiable_setpoint import ModifiableSetpoint
 
 
-class Joint:
+class ModifiableJointTrajectory(JointTrajectory):
 
     def __init__(self, name, limits, setpoints, duration, gait_generator):
         self.name = name
@@ -41,12 +42,11 @@ class Joint:
                 position = interpolated_setpoints[1][i - 1]
                 velocity = (interpolated_setpoints[1][i - 1] - interpolated_setpoints[1][i - 2]) \
                     / (interpolated_setpoints[0][i - 1] - interpolated_setpoints[0][i - 2])
-                return Setpoint(time, position, velocity)
+                return ModifiableSetpoint(time, position, velocity)
         rospy.logerr("Could not interpolate setpoint at time " + str(time))
-        return Setpoint(0, 0, 0)
+        return ModifiableSetpoint(0, 0, 0)
 
     def interpolate_setpoints(self):
-        # TODO(Isha) implement interpolation using JTC. Maybe from Gait class?
         time, position, velocity = self.get_setpoints_unzipped()
         yi = []
         for i in range(0, len(time)):
@@ -55,22 +55,6 @@ class Joint:
         bpoly = BPoly.from_derivatives(time, yi)
         indices = np.linspace(0, self.duration, self.duration * 100)
         return [indices, bpoly(indices)]
-
-    def get_setpoint(self, index):
-        return self.setpoints[index]
-
-    def set_setpoints(self, setpoints):
-        self.setpoints = setpoints
-        self.enforce_limits()
-        self.interpolated_setpoints = self.interpolate_setpoints()
-
-    def valid_setpoints(self, setpoints):
-        for i in range(0, len(setpoints)):
-            if setpoints[i].position > self.limits.upper or setpoints[i].position < self.limits.lower:
-                return False
-            if i > 0 and setpoints[i].time <= setpoints[i - 1].time:
-                return False
-        return True
 
     def enforce_limits(self):
         for i in range(0, len(self.setpoints)):
@@ -88,18 +72,6 @@ class Joint:
                     self.interpolated_setpoints[i] - self.interpolated_setpoints[i - 1]) > self.limits.velocity:
                 return False
             return True
-
-    def get_setpoints_unzipped(self):
-        time = []
-        position = []
-        velocity = []
-
-        for i in range(0, len(self.setpoints)):
-            time.append(self.setpoints[i].time)
-            position.append(self.setpoints[i].position)
-            velocity.append(self.setpoints[i].velocity)
-
-        return time, position, velocity
 
     def add_interpolated_setpoint(self, time):
         self.add_setpoint(self.get_interpolated_setpoint(time))

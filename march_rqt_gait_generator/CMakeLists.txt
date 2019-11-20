@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(march_rqt_gait_generator)
 
 find_package(catkin REQUIRED COMPONENTS
+    march_shared_classes
     march_shared_resources
     roslint
 )
