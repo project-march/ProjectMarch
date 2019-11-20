@@ -1,6 +1,6 @@
 name: ''
 version: ''
-description: "The left open gait for the slope up."
+description: "The left swing gait for the slope up."
 gait_type: "stairs_like"
 setpoints: 
   - 
@@ -22,7 +22,7 @@ setpoints:
   - 
     time_from_start: 
       secs: 1
-      nsecs: 785700000
+      nsecs: 785600000
     joint_names: [left_hip_fe]
   - 
     time_from_start: 
@@ -41,7 +41,7 @@ trajectory:
   right_ankle]
   points: 
     - 
-      positions: [0.0, -0.1396, 0.1396, 0.0436, 0.0, 0.7278, 0.9031, 0.0]
+      positions: [0.0, -0.1396, 0.1396, 0.0, 0.0, 0.7278, 0.9031, 0.0]
       velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
@@ -50,7 +50,7 @@ trajectory:
         nsecs:         0
     - 
       positions: [0.0, 0.715, 1.2157, 0.0, 0.0, 0.2967, 0.5236, 0.0]
-      velocities: [0.0, 0.6768, 0.3858, 0.0, 0.0, -0.5204, -0.4581, 0.0]
+      velocities: [0.0, 0.6767, 0.3858, 0.0, 0.0, -0.5204, -0.4581, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
@@ -58,7 +58,7 @@ trajectory:
         nsecs: 250000000
     - 
       positions: [0.0, 0.8228, 1.2217, 0.0, 0.0, 0.193, 0.4324, 0.0]
-      velocities: [0.0, 0.3934, -0.3491, 0.0, 0.0, -0.5083, -0.4474, 0.0]
+      velocities: [0.0, 0.3933, -0.3491, 0.0, 0.0, -0.5083, -0.4474, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
@@ -71,7 +71,7 @@ trajectory:
       effort: []
       time_from_start: 
         secs: 1
-        nsecs: 785700000
+        nsecs: 785600000
     - 
       positions: [0.0, 0.7278, 0.9031, 0.0, 0.0, -0.1396, 0.1396, 0.0]
       velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
