@@ -78,6 +78,9 @@ Here are some rules of thumb to follow when writing tests:
 3. Do not depend on writing and reading from external files.
 4. Do not depend on timing in your tests.
 5. Use one ``assert`` per test (i.e. only test one function)
+6. If possible, every method should have at least one unit test
+7. Make a test for every edge case!
+8. Usually, your test code is about as long as your normal code.
 
 Writing your own tests
 ----------------------
@@ -194,7 +197,7 @@ documentation <https://docs.python.org/3/library/unittest.html>`_ for more
 information on writing tests.
 
 Next we must tell ``cmake`` how to build the tests. We do this by adding
-``catkin_add_nosetests()`` inside our ``CATKIN_ENABLE_TESTING``.
+``catkin_add_nosetests()`` inside our ``CATKIN_ENABLE_TESTING`` of ``CMakeLists.txt``.
 
 .. code::
 
