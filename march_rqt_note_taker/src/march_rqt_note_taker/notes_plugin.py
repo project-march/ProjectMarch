@@ -1,14 +1,13 @@
 import os
 
-import rospy
 import rospkg
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget
 
-from march_rqt_note_taker.entry import Entry
-from march_rqt_note_taker.entry_model import EntryModel
+from .entry import Entry
+from .entry_model import EntryModel
 
 
 class NotesPlugin(Plugin):
@@ -20,6 +19,8 @@ class NotesPlugin(Plugin):
         self.init_ui(context)
 
         self._model = EntryModel()
+        self._model.rowsInserted.connect(self.update_status)
+        self._model.rowsRemoved.connect(self.update_status)
 
         self._widget.table_view.setModel(self._model)
         self._widget.table_view.verticalScrollBar().rangeChanged.connect(self.change_scroll)
@@ -40,9 +41,12 @@ class NotesPlugin(Plugin):
             self._model.insert_row(Entry(entry))
             self._widget.input_field.clear()
 
+    def update_status(self):
+        self._widget.messages_label.setText('Displaying {} messages'.format(self._model.rowCount()))
+
     def start_take(self):
         take = self._widget.camera_spin_box.value()
         self._model.insert_row(Entry('Started camera take {}'.format(take)))
 
-    def change_scroll(self, min, max):
-        self._widget.table_view.verticalScrollBar().setSliderPosition(max)
+    def change_scroll(self, scroll_min, scroll_max):
+        self._widget.table_view.verticalScrollBar().setSliderPosition(scroll_max)
