@@ -1,6 +1,8 @@
 import os
 
+from rosgraph_msgs.msg import Log
 import rospkg
+import rospy
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
@@ -29,6 +31,10 @@ class NotesPlugin(Plugin):
 
         self._widget.take_button.clicked.connect(self.start_take)
 
+        self._subscriber = rospy.Subscriber('/rosout_agg',
+                                            Log,
+                                            lambda l: self._model.insert_row(Entry.from_ros_msg(l)))
+
     def init_ui(self, context):
         ui_file = os.path.join(rospkg.RosPack().get_path('march_rqt_note_taker'), 'resource', 'note_taker.ui')
         loadUi(ui_file, self._widget)
@@ -36,10 +42,10 @@ class NotesPlugin(Plugin):
         context.add_widget(self._widget)
 
     def insert_entry(self):
-        entry = self._widget.input_field.text()
+        entry = self._widget.input_field.text().strip()
         if entry:
             self._model.insert_row(Entry(entry))
-            self._widget.input_field.clear()
+        self._widget.input_field.clear()
 
     def update_status(self):
         self._widget.messages_label.setText('Displaying {} messages'.format(self._model.rowCount()))

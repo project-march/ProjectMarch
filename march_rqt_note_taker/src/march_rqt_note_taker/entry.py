@@ -9,5 +9,9 @@ class Entry(QObject):
         self.content = content
         self.time = QTime.currentTime()
 
+    @classmethod
+    def from_ros_msg(cls, log_msg):
+        return cls(log_msg.msg)
+
     def time_string(self):
         return self.time.toString()
