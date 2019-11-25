@@ -184,6 +184,10 @@ class InputDevicePlugin(Plugin):
                                                       callback=lambda: self.publish_gait(
                                                           "gait_rough_terrain_middle_steps"))
 
+        gait_ramp_door_slope_up = MarchButton(name="gait_ramp_door_slope_up",
+                                              text="MV Ramp and Door slope up",
+                                              callback=lambda: self.publish_gait("gait_ramp_door_slope_up"))
+
         stop_button = MarchButton(name='gait_stop', image='/stop.png',
                                   callback=lambda: self.publish_stop())
         pause_button = MarchButton(name='gait_pause', text='Pause',
@@ -203,7 +207,7 @@ class InputDevicePlugin(Plugin):
             [gait_single_step_small_button, gait_side_step_left_button, gait_side_step_right_button,
              gait_stairs_up_button, gait_side_step_right_small_button],
             [gait_stairs_down_button, gait_single_high_step_button, gait_slope_up_button,
-             gait_slope_down_final_step_button],
+             gait_slope_down_final_step_button, gait_ramp_door_slope_up],
             [gait_slope_down_button, gait_set_ankle_from_2_5_to_min5, gait_tilted_path_first_starting_step,
              gait_tilted_path_second_starting_step],
             [gait_set_ankle_from_min5_to_min10, gait_tilted_path_middle_step, gait_set_ankle_from_min10_to_min5,
