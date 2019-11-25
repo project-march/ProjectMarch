@@ -185,9 +185,8 @@ class InputDevicePlugin(Plugin):
                                                           "gait_rough_terrain_middle_steps"))
 
         gait_ramp_door_slope_up = MarchButton(name="gait_ramp_door_slope_up",
-                                                      text="MV Ramp and Door slope up",
-                                                      callback=lambda: self.publish_gait(
-                                                          "gait_ramp_door_slope_up"))
+                                              text="MV Ramp and Door slope up",
+                                              callback=lambda: self.publish_gait("gait_ramp_door_slope_up"))
 
         stop_button = MarchButton(name='gait_stop', image='/stop.png',
                                   callback=lambda: self.publish_stop())
