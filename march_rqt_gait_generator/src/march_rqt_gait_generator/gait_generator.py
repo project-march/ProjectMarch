@@ -23,19 +23,18 @@ from tf import TransformListener, LookupException, ConnectivityException, Extrap
 from trajectory_msgs.msg import JointTrajectory
 from sensor_msgs.msg import JointState
 
-import GaitFactory
 import UserInterfaceController
 
+from model.modifiable_subgait import ModifiableSubgait
 from model.modifiable_setpoint import ModifiableSetpoint
 
-from import_export import export_to_file, import_from_file_name
+from import_export import export_to_file
 
 from JointSettingPlot import JointSettingPlot
 from TimeSliderThread import TimeSliderThread
 
 
 class GaitGeneratorPlugin(Plugin):
-    DEFAULT_GAIT_DURATION = 8
 
     def __init__(self, context):
         super(GaitGeneratorPlugin, self).__init__(context)
@@ -53,7 +52,7 @@ class GaitGeneratorPlugin(Plugin):
         self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
 
         self.robot = urdf.Robot.from_parameter_server()
-        self.gait = GaitFactory.empty_gait(self, self.robot, self.DEFAULT_GAIT_DURATION)
+        self.gait = ModifiableSubgait.empty_subgait(self, self.robot)
 
         self.build_ui(context)
         self.set_topic_name(self.topic_name_line_edit.text())
@@ -304,7 +303,7 @@ class GaitGeneratorPlugin(Plugin):
         self.velocity_markers_check_box.toggle()
 
     def publish_gait(self):
-        trajectory = self.gait.to_joint_trajectory()
+        trajectory = self.gait.to_joint_trajectory_msg()
         rospy.loginfo("Publishing trajectory to topic '" + self.topic_name + "'")
         self.gait_publisher.publish(trajectory)
 
@@ -376,7 +375,7 @@ class GaitGeneratorPlugin(Plugin):
                                                    os.getenv("HOME") + "/march_ws/src/gait-files/march_gait_files",
                                                    "March Subgait (*.subgait)")
 
-        gait = import_from_file_name(self, self.robot, file_name)
+        gait = ModifiableSubgait.from_file(self, self.robot, file_name)
         if gait is None:
             rospy.logwarn("Could not load gait %s", file_name)
             return

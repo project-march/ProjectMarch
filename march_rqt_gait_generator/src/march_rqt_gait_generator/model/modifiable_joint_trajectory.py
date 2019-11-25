@@ -9,19 +9,65 @@ from modifiable_setpoint import ModifiableSetpoint
 
 
 class ModifiableJointTrajectory(JointTrajectory):
+    setpoint_class = ModifiableSetpoint
 
-    def __init__(self, name, limits, setpoints, duration, gait_generator):
-        self.name = name
-        self.limits = limits
-        self.setpoints = setpoints
-        self.gait_generator = gait_generator
+    def __init__(self, name, limits, setpoints, duration, gait_generator=None):
         self.setpoints_history = RingBuffer(capacity=100, dtype=list)
         self.setpoints_redo_list = RingBuffer(capacity=100, dtype=list)
-        self.duration = duration
+        self.gait_generator = gait_generator
 
+        super(ModifiableJointTrajectory, self).__init__(name, limits, setpoints, duration)
+        self.interpolated_setpoints = self.interpolate_setpoints()
+
+    @classmethod
+    def from_dict(cls, subgait_dict, joint_name, limits, duration, gait_generator):
+        user_defined_setpoints = subgait_dict['setpoints']
+        if user_defined_setpoints:
+            joint_trajectory = subgait_dict['trajectory']
+            setpoints = []
+            for actual_setpoint in user_defined_setpoints:
+                if joint_name in actual_setpoint['joint_names']:
+                    setpoints.append(cls._get_setpoint_at_duration(
+                        joint_trajectory, joint_name, actual_setpoint['time_from_start']))
+            if setpoints[0].time != 0:
+                rospy.logwarn('First setpoint of {} has been set '
+                              'from {} to 0'.format(joint_name, setpoints[0].time))
+            if setpoints[-1].time != duration:
+                rospy.logwarn('Last setpoint of {} has been set '
+                              'from {} to {}'.format(joint_name, setpoints[0].time, duration))
+            return cls(joint_name,
+                       limits,
+                       setpoints,
+                       duration,
+                       gait_generator
+                       )
+
+        rospy.logwarn('This subgait has no user defined setpoints.')
+        return super(ModifiableJointTrajectory, cls).from_dict(subgait_dict, joint_name, limits,
+                                                               duration, gait_generator)
+
+    @staticmethod
+    def _get_setpoint_at_duration(joint_trajectory, joint_name, duration):
+        for point in joint_trajectory['points']:
+            if point['time_from_start'] == duration:
+                index = joint_trajectory['joint_names'].index(joint_name)
+                time = rospy.Duration(point['time_from_start']['secs'], point['time_from_start']['nsecs']).to_sec()
+
+                return ModifiableSetpoint(time, point['positions'][index], point['velocities'][index])
+        return None
+
+    def set_setpoints(self, setpoints):
+        self.setpoints = setpoints
         self.enforce_limits()
 
-        self.interpolated_setpoints = self.interpolate_setpoints()
+    @property
+    def duration(self):
+        return self._duration
+
+    @duration.setter
+    def duration(self, duration):
+        self._duration = duration
+        self.enforce_limits()
 
     def get_interpolated_position(self, time):
         for i in range(0, len(self.interpolated_setpoints[0])):
@@ -57,11 +103,16 @@ class ModifiableJointTrajectory(JointTrajectory):
         return [indices, bpoly(indices)]
 
     def enforce_limits(self):
+        self.setpoints[0].time = 0
+        self.setpoints[-1].time = self.duration
+
         for i in range(0, len(self.setpoints)):
-            self.setpoints[i].set_position(min(max(self.setpoints[i].position, self.limits.lower), self.limits.upper))
-            self.setpoints[i].set_velocity(min(
-                max(self.setpoints[i].velocity, -self.limits.velocity),
-                self.limits.velocity))
+            self.setpoints[i].position = min(max(self.setpoints[i].position,
+                                                 self.limits.lower),
+                                             self.limits.upper)
+            self.setpoints[i].velocity = min(max(self.setpoints[i].velocity,
+                                                 -self.limits.velocity),
+                                             self.limits.velocity)
 
     def within_safety_limits(self):
         for i in range(0, len(self.interpolated_setpoints)):

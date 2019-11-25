@@ -1,12 +1,8 @@
 import os
 import rospy
 
-import yaml
-
 from UserInterfaceController import notify
-import GaitFactory
 from march_shared_resources.msg import Subgait
-from rospy_message_converter import message_converter
 from python_qt_binding.QtWidgets import QMessageBox
 
 
@@ -18,14 +14,17 @@ def export_to_file(gait, gait_directory):
     subgait = Subgait()
 
     subgait.gait_type = gait.gait_type
-    subgait.trajectory = gait.to_joint_trajectory()
+    subgait.trajectory = gait.to_joint_trajectory_msg()
     subgait.setpoints = gait.to_setpoints()
     subgait.description = str(gait.description)
 
     subgait.duration = rospy.Duration.from_sec(gait.duration)
 
-    output_file_directory = os.path.join(gait_directory, gait.name.replace(" ", "_"), gait.subgait.replace(" ", "_"))
-    output_file_path = os.path.join(output_file_directory, gait.version.replace(" ", "_") + ".subgait")
+    output_file_directory = os.path.join(gait_directory,
+                                         gait.gait_name.replace(" ", "_"),
+                                         gait.subgait_name.replace(" ", "_"))
+    output_file_path = os.path.join(output_file_directory,
+                                    gait.version.replace(" ", "_") + ".subgait")
 
     file_exists = os.path.isfile(output_file_path)
     if file_exists:
@@ -49,19 +48,3 @@ def export_to_file(gait, gait_directory):
     notify("Gait Saved", output_file_path)
 
     output_file.close()
-
-
-def import_from_file_name(gait_generator, robot, file_name):
-    if file_name is None or file_name == "":
-        return None
-    try:
-        gait_name = file_name.split("/")[-3]
-        subgait_name = file_name.split("/")[-2]
-        version = file_name.split("/")[-1].replace(".subgait", "")
-        march_subgait_yaml = yaml.load(open(file_name))
-        march_subgait = message_converter.convert_dictionary_to_ros_message(
-            'march_shared_resources/Subgait', march_subgait_yaml)
-    except Exception as e:
-        rospy.logerr(str(e))
-        return None
-    return GaitFactory.from_msg(gait_generator, robot, march_subgait, gait_name, subgait_name, version)

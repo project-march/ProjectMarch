@@ -1,34 +1,78 @@
 import rospy
 from march_shared_classes.gait.subgait import Subgait
+from march_shared_classes.gait.limits import Limits
 from modifiable_joint_trajectory import ModifiableJointTrajectory
+from modifiable_setpoint import ModifiableSetpoint
 
-from trajectory_msgs.msg import JointTrajectory
-from trajectory_msgs.msg import JointTrajectoryPoint
+from trajectory_msgs import msg
 from march_shared_resources.msg import Setpoint
 
 
 class ModifiableSubgait(Subgait):
-    def to_joint_trajectory(self):
-        joint_trajectory = JointTrajectory()
+    joint_class = ModifiableJointTrajectory
+
+    @classmethod
+    def empty_subgait(cls, gait_generator, robot, gait_type='walk_like', duration=8):
+        if robot is None:
+            rospy.logerr("Cannot create gait without a loaded robot.")
+            return None
+        joint_list = []
+        for i in range(0, len(robot.joints)):
+            urdf_joint = robot.joints[i]
+            if urdf_joint.type == "fixed":
+                rospy.loginfo("Skipping fixed joint " + urdf_joint.name)
+                continue
+
+            if urdf_joint.limit is None:
+                rospy.logwarn("Skipping joint " + urdf_joint.name + " because it has no limits.")
+                continue
+
+            default_setpoints = [
+                ModifiableSetpoint(0, 0, 0),
+                ModifiableSetpoint(3, 1.3, 0),
+                ModifiableSetpoint(4, 1.3, 0),
+                ModifiableSetpoint(duration, 0, 0)
+            ]
+            joint = ModifiableJointTrajectory(urdf_joint.name,
+                                              Limits(urdf_joint.safety_controller.soft_lower_limit,
+                                                     urdf_joint.safety_controller.soft_upper_limit,
+                                                     urdf_joint.limit.velocity),
+                                              default_setpoints,
+                                              duration,
+                                              gait_generator
+                                              )
+            joint_list.append(joint)
+        return cls(joint_list, duration, gait_type)
+
+    @classmethod
+    def from_file(cls, gait_generator, robot, filename):
+        subgait = super(ModifiableSubgait, cls).from_file(robot, filename, gait_generator)
+        if subgait is None:
+            return
+        return subgait
+
+    def to_joint_trajectory_msg(self):
+        joint_trajectory_msg = msg.JointTrajectory()
 
         timestamps = self.get_unique_timestamps()
 
         for joint in self.joints:
-            joint_trajectory.joint_names.append(joint.name)
+            joint_trajectory_msg.joint_names.append(joint.name)
 
         for timestamp in timestamps:
-            joint_trajectory_point = JointTrajectoryPoint()
+            joint_trajectory_point = msg.JointTrajectoryPoint()
             joint_trajectory_point.time_from_start = rospy.Duration(timestamp)
             for joint in self.joints:
                 interpolated_setpoint = joint.get_interpolated_setpoint(timestamp)
 
                 if interpolated_setpoint.time != timestamp:
-                    rospy.logerr("Time mismatch in joint " + joint.name + " at timestamp " + timestamp)
+                    rospy.logerr("Time mismatch in joint {} at timestamp {}, "
+                                 "got time {}".format(joint.name, timestamp, interpolated_setpoint.time))
                 joint_trajectory_point.positions.append(interpolated_setpoint.position)
                 joint_trajectory_point.velocities.append(interpolated_setpoint.velocity)
-            joint_trajectory.points.append(joint_trajectory_point)
+            joint_trajectory_msg.points.append(joint_trajectory_point)
 
-        return joint_trajectory
+        return joint_trajectory_msg
 
     def to_setpoints(self):
         user_defined_setpoints = []
@@ -126,3 +170,33 @@ class ModifiableSubgait(Subgait):
 
         return ModifiableSubgait(mirrored_joints, self.duration, self.gait_type, self.gait_name, mirrored_subgait_name,
                                  self.version, self.description)
+
+    def set_gait_type(self, gait_type):
+        self.gait_type = str(gait_type)
+
+    def set_gait_name(self, gait_name):
+        self.gait_name = gait_name
+
+    def set_description(self, description):
+        self.description = str(description)
+
+    def set_version(self, version):
+        self.version = version
+
+    def set_subgait_name(self, subgait_name):
+        self.subgait_name = subgait_name
+
+    def set_duration(self, duration, rescale=False):
+        for joint in self.joints:
+            # Loop in reverse to avoid out of bounds errors while deleting.
+            for setpoint in reversed(joint.setpoints):
+                if rescale:
+                    setpoint.time = duration * setpoint.time / self.duration
+                else:
+                    if setpoint.time > duration:
+                        joint.setpoints.remove(setpoint)
+            joint.interpolated_setpoints = joint.interpolate_setpoints()
+
+            joint.duration = duration
+
+        self.duration = duration
