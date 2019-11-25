@@ -1,11 +1,9 @@
 from python_qt_binding.QtCore import QAbstractTableModel, QModelIndex, Qt
 
-from march_rqt_note_taker.entry import Entry
-
 
 class EntryModel(QAbstractTableModel):
 
-    columns = ['time', 'level', 'entry']
+    columns = ['time', 'entry']
 
     def __init__(self):
         super(EntryModel, self).__init__()
@@ -28,15 +26,13 @@ class EntryModel(QAbstractTableModel):
         column = index.column()
         row = index.row()
 
-        if row >= 0 and row < self.rowCount():
+        if 0 <= row < self.rowCount():
             entry = self._entries[row]
 
             if role == Qt.DisplayRole:
                 if column == 0:
                     return entry.time_string()
                 elif column == 1:
-                    return Entry.LEVEL_LABELS[entry.level]
-                elif column == 2:
                     return entry.content
 
         return None
