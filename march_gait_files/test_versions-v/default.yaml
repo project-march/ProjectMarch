@@ -1,5 +1,8 @@
 gaits:
   home: {home_sit: MIV_ankle_2.5, home_stand: MIV_ankle_2.5}
+  ramp_door_slope_up: {right_open: MV_RD_slopeup_rightopen_v1, left_open: MV_RD_slopeup_leftopen_v1,
+                       right_swing: MV_RD_slopeup_rightswing_v1, left_swing: MV_RD_slopeup_leftswing_v1,
+                       right_close: MV_RD_slopeup_rightclose_v1, left_close: MV_RD_slopeup_leftclose_v1}
   rough_terrain_high_step: {right_open: MV_RT_highstep_rightopen_v2, left_close: MV_RT_highstep_leftclose_v2}
   rough_terrain_middle_steps: {right_open: MV_RT_middlestep_rightopen_v1, left_swing: MV_RT_middlestep_leftswing_v1,
-                             right_swing: MV_RT_middlestep_rightswing_v1, left_close: MV_RT_middlestep_leftclose_v1}
+                               right_swing: MV_RT_middlestep_rightswing_v1, left_close: MV_RT_middlestep_leftclose_v1}
