@@ -176,6 +176,7 @@ following contents.
 .. code::
 
     #!/usr/bin/env python
+    PKG = 'march_tutorials'
 
     import unittest
     import rosunit
