@@ -28,8 +28,6 @@ import UserInterfaceController
 from model.modifiable_subgait import ModifiableSubgait
 from model.modifiable_setpoint import ModifiableSetpoint
 
-from import_export import export_to_file
-
 from JointSettingPlot import JointSettingPlot
 from TimeSliderThread import TimeSliderThread
 
@@ -399,12 +397,44 @@ class GaitGeneratorPlugin(Plugin):
         if should_mirror:
             mirror = self.gait.get_mirror(key_1, key_2)
             if mirror:
-                export_to_file(mirror, self.get_gait_directory())
+                self.export_to_file(mirror, self.get_gait_directory())
             else:
                 UserInterfaceController.notify("Could not mirror gait", "Check the logs for more information.")
                 return
 
-        export_to_file(self.gait, self.get_gait_directory())
+        self.export_to_file(self.gait, self.get_gait_directory())
+
+    @staticmethod
+    def export_to_file(gait, gait_directory):
+        if gait_directory is None or gait_directory == "":
+            return
+
+        # Name and version will be empty as it's stored in the filename.
+        subgait_msg = gait.to_subgait_msg()
+
+        output_file_directory = os.path.join(gait_directory,
+                                             gait.gait_name.replace(" ", "_"),
+                                             gait.subgait_name.replace(" ", "_"))
+        output_file_path = os.path.join(output_file_directory,
+                                        gait.version.replace(" ", "_") + ".subgait")
+
+        file_exists = os.path.isfile(output_file_path)
+        if file_exists:
+            overwrite_file = QMessageBox.question(None, 'File already exists',
+                                                  "Do you want to overwrite " + str(output_file_path) + "?",
+                                                  QMessageBox.Yes | QMessageBox.No)
+            if overwrite_file == QMessageBox.No:
+                return
+
+        rospy.loginfo("Writing gait to " + output_file_path)
+
+        if not os.path.isdir(output_file_directory):
+            os.makedirs(output_file_directory)
+
+        with open(output_file_path, 'w') as file:
+            file.write(str(subgait_msg))
+
+        UserInterfaceController.notify("Gait Saved", output_file_path)
 
     # Called by export_gait
     def get_gait_directory(self):
