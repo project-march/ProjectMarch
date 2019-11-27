@@ -22,3 +22,7 @@ install(PROGRAMS scripts/${PROJECT_NAME}
 
 file(GLOB_RECURSE lintfiles "src/*.py")
 roslint_python(${lintfiles})
+
+if(CATKIN_ENABLE_TESTING)
+    catkin_add_nosetests(test)
+endif()
