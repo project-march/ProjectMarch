@@ -8,7 +8,7 @@ class NotesWidget(QWidget):
 
     def __init__(self, model, ui_file):
         super(NotesWidget, self).__init__()
-        
+
         self._model = model
 
         loadUi(ui_file, self)
@@ -18,6 +18,7 @@ class NotesWidget(QWidget):
 
         self.table_view.setModel(self._model)
         self.table_view.verticalScrollBar().rangeChanged.connect(self._handle_change_scroll)
+        self._last_scroll_max = self.table_view.verticalScrollBar().maximum()
 
         self.input_field.returnPressed.connect(self._handle_insert_entry)
 
@@ -28,6 +29,7 @@ class NotesWidget(QWidget):
         if entry:
             self._model.insert_row(Entry(entry))
         self.input_field.clear()
+        self.table_view.verticalScrollBar().setSliderPosition(self._last_scroll_max)
 
     def update_status(self):
         self.messages_label.setText('Displaying {} messages'.format(self._model.rowCount()))
@@ -35,6 +37,9 @@ class NotesWidget(QWidget):
     def _handle_start_take(self):
         take = self.camera_spin_box.value()
         self._model.insert_row(Entry('Started camera take {}'.format(take)))
+        self.table_view.verticalScrollBar().setSliderPosition(self._last_scroll_max)
 
     def _handle_change_scroll(self, scroll_min, scroll_max):
-        self.table_view.verticalScrollBar().setSliderPosition(scroll_max)
+        if self.table_view.verticalScrollBar().value() == self._last_scroll_max:
+            self.table_view.verticalScrollBar().setSliderPosition(scroll_max)
+            self._last_scroll_max = scroll_max
