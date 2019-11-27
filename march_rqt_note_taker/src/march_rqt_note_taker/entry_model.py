@@ -1,5 +1,7 @@
 from python_qt_binding.QtCore import QAbstractTableModel, QModelIndex, Qt
 
+from .entry import Entry
+
 
 class EntryModel(QAbstractTableModel):
 
@@ -38,6 +40,19 @@ class EntryModel(QAbstractTableModel):
         return None
 
     def insert_row(self, entry):
+        """Appends an entry.
+
+        :type entry: Entry
+        :param entry: Entry to append to rows
+        """
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         self._entries.append(entry)
         self.endInsertRows()
+
+    def insert_log_msg(self, log_msg):
+        """Converts a ROS log msg to entry and appends it to the rows.
+
+        :type log_msg: rosgraph_msgs.msg.Log
+        :param log_msg: Log msg to
+        """
+        self.insert_row(Entry.from_ros_msg(log_msg))

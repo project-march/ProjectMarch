@@ -8,6 +8,7 @@ from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget
 
+from .filter import Filter
 from .entry import Entry
 from .entry_model import EntryModel
 
@@ -31,9 +32,12 @@ class NotesPlugin(Plugin):
 
         self._widget.take_button.clicked.connect(self._handle_start_take)
 
+        self._filter = Filter()
+        self._filter.add_filter(lambda l: l.level >= Log.ERROR)
+        self._filter.add_filter_info_level(lambda l: l.msg == 'March is fully operational')
         self._subscriber = rospy.Subscriber('/rosout_agg',
                                             Log,
-                                            lambda l: self._model.insert_row(Entry.from_ros_msg(l)))
+                                            self._rosout_cb)
 
     def _init_ui(self, context):
         ui_file = os.path.join(rospkg.RosPack().get_path('march_rqt_note_taker'), 'resource', 'note_taker.ui')
@@ -56,3 +60,7 @@ class NotesPlugin(Plugin):
 
     def _handle_change_scroll(self, scroll_min, scroll_max):
         self._widget.table_view.verticalScrollBar().setSliderPosition(scroll_max)
+
+    def _rosout_cb(self, log_msg):
+        if self._filter.apply(log_msg):
+            self._model.insert_log_msg(log_msg)
