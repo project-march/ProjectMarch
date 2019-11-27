@@ -32,9 +32,6 @@ class InputDevicePlugin(Plugin):
                             dest='quiet',
                             help='Put plugin in silent mode')
         args, unknowns = parser.parse_known_args(context.argv())
-        if not args.quiet:
-            print 'arguments: ', args
-            print 'unknowns: ', unknowns
 
         # Create QWidget
         self._widget = QWidget()
@@ -276,7 +273,8 @@ class InputDevicePlugin(Plugin):
 
     def publish_error(self):
         rospy.logdebug('Mock Input Device published error')
-        self.error_pub.publish(Error('Fake error thrown by the develop input device.', Error.FATAL))
+        self.error_pub.publish(Error(std_msgs.msg.Header(stamp=rospy.Time.now()),
+                                     'Fake error thrown by the develop input device.', Error.FATAL))
 
     # def trigger_configuration(self):
     # Comment in to signal that the plugin has a way to configure
