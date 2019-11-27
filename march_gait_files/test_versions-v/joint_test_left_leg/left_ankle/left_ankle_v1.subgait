@@ -1,6 +1,6 @@
 name: ''
 version: ''
-description: "Both hips aa at the same time to 10 degrees abduction for the joint performance test."
+description: "Left ankle moves to 8 degrees dorsal flexion and back."
 gait_type: "walk_like"
 setpoints: 
   - 
@@ -11,9 +11,9 @@ setpoints:
   right_ankle]
   - 
     time_from_start: 
-      secs: 4
-      nsecs: 500000000
-    joint_names: [left_hip_aa, right_hip_aa]
+      secs: 3
+      nsecs:         0
+    joint_names: [left_ankle]
   - 
     time_from_start: 
       secs: 6
@@ -39,15 +39,15 @@ trajectory:
         secs: 0
         nsecs:         0
     - 
-      positions: [0.1745, 0.0, 0.0, 0.0, 0.1745, 0.0, 0.0, 0.0]
+      positions: [0.0, 0.0, 0.0, 0.1396, 0.0, 0.0, 0.0, 0.0]
       velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
-        secs: 4
-        nsecs: 500000000
+        secs: 3
+        nsecs:         0
     - 
-      positions: [0.1745, 0.0, 0.0, 0.0, 0.1745, 0.0, 0.0, 0.0]
+      positions: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       velocities: [-0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0]
       accelerations: []
       effort: []
