@@ -1,4 +1,5 @@
 from python_qt_binding.QtCore import QAbstractTableModel, QModelIndex, Qt
+from python_qt_binding.QtGui import QBrush
 
 from .entry import Entry
 
@@ -10,7 +11,6 @@ class EntryModel(QAbstractTableModel):
     def __init__(self):
         super(EntryModel, self).__init__()
         self._entries = []
-        self._entries_limit = 10000
 
     def rowCount(self, parent=None):
         return len(self._entries)
@@ -19,23 +19,26 @@ class EntryModel(QAbstractTableModel):
         return len(EntryModel.columns)
 
     def headerData(self, section, orientation, role=None):
-        if role != Qt.DisplayRole:
-            return None
         if orientation == Qt.Horizontal:
-            return EntryModel.columns[section].capitalize()
+            if role == Qt.DisplayRole:
+                return EntryModel.columns[section].capitalize()
 
     def data(self, index, role=Qt.DisplayRole):
-        column = index.column()
+        column = EntryModel.columns[index.column()]
         row = index.row()
 
         if 0 <= row < self.rowCount():
             entry = self._entries[row]
 
             if role == Qt.DisplayRole:
-                if column == 0:
+                if column == 'time':
                     return entry.time_string()
-                elif column == 1:
+                elif column == 'entry':
                     return entry.content
+
+            if role == Qt.ForegroundRole:
+                if column == 'entry' and entry.is_error:
+                    return QBrush(Qt.darkRed)
 
         return None
 
