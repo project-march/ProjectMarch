@@ -1,6 +1,7 @@
 name: ''
 version: ''
 description: "The left close gait for the high step of the Rough Terrain."
+gait_type: "walk_like"
 setpoints: 
   - 
     time_from_start: 

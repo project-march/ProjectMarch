@@ -2,6 +2,7 @@ name: ''
 version: ''
 description: "Swing step for stairs up, same version as MIII used. The first version of the MIII\
   \ gait was probably not correct, so this version has to be the correct MIII version."
+gait_type: "stairs_like"
 setpoints: 
   - 
     time_from_start: 

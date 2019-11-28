@@ -1,6 +1,7 @@
 name: ''
 version: ''
 description: "Closing step for stairs up, same version as MIII used."
+gait_type: "stairs_like"
 setpoints: 
   - 
     time_from_start: 

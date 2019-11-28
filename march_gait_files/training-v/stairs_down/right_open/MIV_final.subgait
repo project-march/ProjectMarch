@@ -3,6 +3,7 @@ version: ''
 description: "Right open step for stairs down, same version as MIII used for the continuous version.\
   \ The first version we made was probably incorrect, so this has to be the correct\
   \ version of the MIII stairs down gait."
+gait_type: "stairs_like"
 setpoints: 
   - 
     time_from_start: 

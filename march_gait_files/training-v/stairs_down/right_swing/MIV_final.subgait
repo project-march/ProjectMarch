@@ -2,6 +2,7 @@ name: ''
 version: ''
 description: "Right swing step for stairs down, same version as MIII used for the continuous version.\
   \ Corrected version."
+gait_type: "stairs_like"
 setpoints: 
   - 
     time_from_start: 

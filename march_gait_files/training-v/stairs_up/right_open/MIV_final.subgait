@@ -2,6 +2,7 @@ name: ''
 version: ''
 description: "Right open step for stairs up, same version as MIII used. The first MIII version\
   \ was probably not the right one, so this version has to be better."
+gait_type: "stairs_like"
 setpoints: 
   - 
     time_from_start: 
