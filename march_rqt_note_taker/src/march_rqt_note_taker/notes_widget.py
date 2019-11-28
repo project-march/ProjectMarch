@@ -32,11 +32,11 @@ class NotesWidget(QWidget):
         self.table_view.verticalScrollBar().setSliderPosition(self._last_scroll_max)
 
     def update_status(self):
-        self.messages_label.setText('Displaying {} messages'.format(self._model.rowCount()))
+        self.messages_label.setText('Displaying {0} messages'.format(self._model.rowCount()))
 
     def _handle_start_take(self):
         take = self.camera_spin_box.value()
-        self._model.insert_row(Entry('Started camera take {}'.format(take)))
+        self._model.insert_row(Entry('Started camera take {0}'.format(take)))
         self.table_view.verticalScrollBar().setSliderPosition(self._last_scroll_max)
 
     def _handle_change_scroll(self, scroll_min, scroll_max):

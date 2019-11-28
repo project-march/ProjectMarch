@@ -7,7 +7,7 @@ import rospy
 from qt_gui.plugin import Plugin
 
 from .entry_model import EntryModel
-from .filter import Filter
+from .filter_map import FilterMap
 from .notes_widget import NotesWidget
 
 
@@ -22,9 +22,9 @@ class NotesPlugin(Plugin):
         self._widget = NotesWidget(self._model, ui_file)
         context.add_widget(self._widget)
 
-        self._filter = Filter()
-        self._filter.add_filter(lambda l: l.level >= Log.ERROR)
-        self._filter.add_filter_info_level(lambda l: l.msg == 'March is fully operational')
+        self._filter_map = FilterMap()
+        self._filter_map.add_filter(lambda l: l.level >= Log.ERROR)
+        self._filter_map.add_filter_info_level(lambda l: l.msg == 'March is fully operational')
         self._subscriber = rospy.Subscriber('/rosout_agg',
                                             Log,
                                             self._rosout_cb)
@@ -33,5 +33,6 @@ class NotesPlugin(Plugin):
         self._subscriber.unregister()
 
     def _rosout_cb(self, log_msg):
-        if self._filter.apply(log_msg):
-            self._model.insert_log_msg(log_msg)
+        mapped_msg = self._filter_map(log_msg)
+        if mapped_msg:
+            self._model.insert_log_msg(mapped_msg)
