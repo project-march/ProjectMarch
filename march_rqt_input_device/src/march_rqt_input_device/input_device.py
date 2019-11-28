@@ -2,11 +2,9 @@ import os
 import rospy
 import std_msgs.msg
 import rospkg
-import threading
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
-from python_qt_binding.QtCore import QSize
 from python_qt_binding.QtWidgets import QWidget
 from march_shared_resources.msg import Error
 from march_shared_resources.msg import GaitInstruction
@@ -23,18 +21,6 @@ class InputDevicePlugin(Plugin):
         super(InputDevicePlugin, self).__init__(context)
         # Give QObjects reasonable names
         self.setObjectName('InputDevicePlugin')
-
-        # Process standalone plugin command-line arguments
-        from argparse import ArgumentParser
-        parser = ArgumentParser()
-        # Add argument(s) to the parser.
-        parser.add_argument('-q', '--quiet', action='store_true',
-                            dest='quiet',
-                            help='Put plugin in silent mode')
-        args, unknowns = parser.parse_known_args(context.argv())
-        if not args.quiet:
-            print 'arguments: ', args
-            print 'unknowns: ', unknowns
 
         # Create QWidget
         self._widget = QWidget()
@@ -185,9 +171,8 @@ class InputDevicePlugin(Plugin):
                                                           "gait_rough_terrain_middle_steps"))
 
         gait_ramp_door_slope_up = MarchButton(name="gait_ramp_door_slope_up",
-                                                      text="MV Ramp and Door slope up",
-                                                      callback=lambda: self.publish_gait(
-                                                          "gait_ramp_door_slope_up"))
+                                              text="MV Ramp and Door slope up",
+                                              callback=lambda: self.publish_gait("gait_ramp_door_slope_up"))
 
         stop_button = MarchButton(name='gait_stop', image='/stop.png',
                                   callback=lambda: self.publish_stop())
@@ -273,7 +258,8 @@ class InputDevicePlugin(Plugin):
 
     def publish_error(self):
         rospy.logdebug('Mock Input Device published error')
-        self.error_pub.publish(Error('Fake error thrown by the develop input device.', Error.FATAL))
+        self.error_pub.publish(Error(std_msgs.msg.Header(stamp=rospy.Time.now()),
+                                     'Fake error thrown by the develop input device.', Error.FATAL))
 
     # def trigger_configuration(self):
     # Comment in to signal that the plugin has a way to configure
