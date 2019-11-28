@@ -1,12 +1,12 @@
 import math
 
-from python_qt_binding.QtWidgets import QDoubleSpinBox, QAbstractSpinBox
 from pyqtgraph.Qt import QtCore, QtGui
+from python_qt_binding.QtWidgets import QAbstractSpinBox, QDoubleSpinBox
 
 
 class JointSettingSpinBoxDelegate(QtGui.QItemDelegate):
-    """
-    Delegate for the QDoubleSpinBox that opens when you edit a table cell.
+    """Delegate for the QDoubleSpinBox that opens when you edit a table cell.
+
     The min and max allowed value is based on the row (time, position, velocity).
     """
 
@@ -42,7 +42,6 @@ class JointSettingSpinBoxDelegate(QtGui.QItemDelegate):
             else:
                 max_time = float(unicode(max_time_cell)) + time_offset
 
-            print min_time, max_time
             editor.setMinimum(min_time)
             editor.setMaximum(max_time)
         # Position
@@ -75,5 +74,4 @@ class JointSettingSpinBoxDelegate(QtGui.QItemDelegate):
         model.setData(index, str(value), QtCore.Qt.EditRole)
 
     def updateEditorGeometry(self, editor, option, index):
-        print option
         editor.setGeometry(option.rect)

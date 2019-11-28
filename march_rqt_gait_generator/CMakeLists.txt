@@ -4,7 +4,6 @@ project(march_rqt_gait_generator)
 find_package(catkin REQUIRED COMPONENTS
     march_shared_classes
     march_shared_resources
-    roslint
 )
 
 catkin_python_setup()
@@ -21,6 +20,3 @@ install(DIRECTORY config launch resource
 install(PROGRAMS scripts/${PROJECT_NAME}
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-
-file(GLOB_RECURSE lintfiles "src/*.py")
-roslint_python(${lintfiles})

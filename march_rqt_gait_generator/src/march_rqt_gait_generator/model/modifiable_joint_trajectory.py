@@ -1,11 +1,13 @@
-import numpy as np
 import copy
+
+import numpy as np
+from numpy_ringbuffer import RingBuffer
 import rospy
 from scipy.interpolate import BPoly
-from numpy_ringbuffer import RingBuffer
 
 from march_shared_classes.gait.joint_trajectory import JointTrajectory
-from modifiable_setpoint import ModifiableSetpoint
+
+from .modifiable_setpoint import ModifiableSetpoint
 
 
 class ModifiableJointTrajectory(JointTrajectory):
@@ -30,16 +32,16 @@ class ModifiableJointTrajectory(JointTrajectory):
                     setpoints.append(cls._get_setpoint_at_duration(
                         joint_trajectory, joint_name, actual_setpoint['time_from_start']))
             if setpoints[0].time != 0:
-                rospy.logwarn('First setpoint of {} has been set '
-                              'from {} to 0'.format(joint_name, setpoints[0].time))
+                rospy.logwarn('First setpoint of {0} has been set '
+                              'from {1} to 0'.format(joint_name, setpoints[0].time))
             if setpoints[-1].time != duration:
-                rospy.logwarn('Last setpoint of {} has been set '
-                              'from {} to {}'.format(joint_name, setpoints[0].time, duration))
+                rospy.logwarn('Last setpoint of {0} has been set '
+                              'from {1} to {2}'.format(joint_name, setpoints[0].time, duration))
             return cls(joint_name,
                        limits,
                        setpoints,
                        duration,
-                       gait_generator
+                       gait_generator,
                        )
 
         rospy.logwarn('This subgait has no user defined setpoints.')
@@ -89,7 +91,7 @@ class ModifiableJointTrajectory(JointTrajectory):
                 velocity = (interpolated_setpoints[1][i - 1] - interpolated_setpoints[1][i - 2]) \
                     / (interpolated_setpoints[0][i - 1] - interpolated_setpoints[0][i - 2])
                 return ModifiableSetpoint(time, position, velocity)
-        rospy.logerr("Could not interpolate setpoint at time " + str(time))
+        rospy.logerr('Could not interpolate setpoint at time {0}'.format(time))
         return ModifiableSetpoint(0, 0, 0)
 
     def interpolate_setpoints(self):
@@ -136,7 +138,7 @@ class ModifiableJointTrajectory(JointTrajectory):
                 new_index = i
                 break
 
-        rospy.logdebug("adding setpoint " + str(setpoint) + " at index " + str(new_index))
+        rospy.logdebug('adding setpoint {0} at index {1}'.format(setpoint, new_index))
         self.setpoints.insert(new_index, setpoint)
 
         self.enforce_limits()

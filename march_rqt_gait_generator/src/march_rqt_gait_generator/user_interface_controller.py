@@ -1,11 +1,10 @@
 import math
+import subprocess
 
-
-from JointSettingSpinBoxDelegate import JointSettingSpinBoxDelegate
 from python_qt_binding.QtWidgets import QTableWidgetItem
 
-from model.modifiable_setpoint import ModifiableSetpoint
-import subprocess
+from .joint_setting_spin_box_delegate import JointSettingSpinBoxDelegate
+from .model.modifiable_setpoint import ModifiableSetpoint
 
 TABLE_DIGITS = 4
 

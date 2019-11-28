@@ -12,8 +12,6 @@
   <depend>march_shared_resources</depend>
   <depend>march_shared_classes</depend>
 
-  <build_depend>roslint</build_depend>
-
   <build_export_depend>robot_state_publisher</build_export_depend>
 
   <exec_depend>rospy</exec_depend>

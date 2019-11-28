@@ -1,8 +1,10 @@
 import rospy
-from march_shared_classes.gait.subgait import Subgait
+
 from march_shared_classes.gait.limits import Limits
-from modifiable_joint_trajectory import ModifiableJointTrajectory
-from modifiable_setpoint import ModifiableSetpoint
+from march_shared_classes.gait.subgait import Subgait
+
+from .modifiable_joint_trajectory import ModifiableJointTrajectory
+from .modifiable_setpoint import ModifiableSetpoint
 
 
 class ModifiableSubgait(Subgait):
@@ -11,24 +13,24 @@ class ModifiableSubgait(Subgait):
     @classmethod
     def empty_subgait(cls, gait_generator, robot, gait_type='walk_like', duration=8):
         if robot is None:
-            rospy.logerr("Cannot create gait without a loaded robot.")
+            rospy.logerr('Cannot create gait without a loaded robot.')
             return None
         joint_list = []
         for i in range(0, len(robot.joints)):
             urdf_joint = robot.joints[i]
-            if urdf_joint.type == "fixed":
-                rospy.loginfo("Skipping fixed joint " + urdf_joint.name)
+            if urdf_joint.type == 'fixed':
+                rospy.loginfo('Skipping fixed joint ' + urdf_joint.name)
                 continue
 
             if urdf_joint.limit is None:
-                rospy.logwarn("Skipping joint " + urdf_joint.name + " because it has no limits.")
+                rospy.logwarn('Skipping joint ' + urdf_joint.name + ' because it has no limits.')
                 continue
 
             default_setpoints = [
                 ModifiableSetpoint(0, 0, 0),
                 ModifiableSetpoint(3, 1.3, 0),
                 ModifiableSetpoint(4, 1.3, 0),
-                ModifiableSetpoint(duration, 0, 0)
+                ModifiableSetpoint(duration, 0, 0),
             ]
             joint = ModifiableJointTrajectory(urdf_joint.name,
                                               Limits(urdf_joint.safety_controller.soft_lower_limit,
@@ -36,7 +38,7 @@ class ModifiableSubgait(Subgait):
                                                      urdf_joint.limit.velocity),
                                               default_setpoints,
                                               duration,
-                                              gait_generator
+                                              gait_generator,
                                               )
             joint_list.append(joint)
         return cls(joint_list, duration, gait_type)
@@ -67,18 +69,18 @@ class ModifiableSubgait(Subgait):
 
     def can_mirror(self, key_1, key_2):
         if not key_1 or not key_2:
-            rospy.loginfo("Keys are invalid")
+            rospy.loginfo('Keys are invalid')
             return False
 
         # XNOR, only one key can and must exist in the subgait name
         if (key_1 in self.subgait_name) == (key_2 in self.subgait_name):
-            rospy.loginfo("Multiple or no keys exist in subgait %s", self.subgait_name)
+            rospy.loginfo('Multiple or no keys exist in subgait %s', self.subgait_name)
             return False
 
         # If a joint name has both keys, we wouldn't know how to replace them.
         for joint in self.joints:
             if key_1 in joint.name and key_2 in joint.name:
-                rospy.loginfo("Both keys exist in joint %s", joint.name)
+                rospy.loginfo('Both keys exist in joint %s', joint.name)
                 return False
             if key_1 in joint.name:
                 joint_1 = joint
@@ -90,23 +92,23 @@ class ModifiableSubgait(Subgait):
                 continue
 
             if joint_1 is None or joint_2 is None:
-                rospy.logwarn("Joints %s and %s are not valid.", str(joint_1), str(joint_2))
+                rospy.logwarn('Joints %s and %s are not valid.', str(joint_1), str(joint_2))
                 return False
 
             if joint_1.setpoints[0].position != joint_2.setpoints[-1].position \
                     or joint_1.setpoints[0].velocity != joint_2.setpoints[-1].velocity:
-                rospy.loginfo("First setpoint of %s != last setpoint of %s", joint_1.name, joint_2.name)
+                rospy.loginfo('First setpoint of %s != last setpoint of %s', joint_1.name, joint_2.name)
                 return False
             if joint_1.setpoints[-1].position != joint_2.setpoints[0].position \
                     or joint_1.setpoints[-1].velocity != joint_2.setpoints[0].velocity:
-                rospy.loginfo("Last setpoint of %s != first setpoint of %s", joint_1.name, joint_2.name)
+                rospy.loginfo('Last setpoint of %s != first setpoint of %s', joint_1.name, joint_2.name)
                 return False
 
         return True
 
     def get_mirror(self, key_1, key_2):
         if not self.can_mirror(key_1, key_2):
-            rospy.logwarn("Cannot mirror gait %s", self.gait_name)
+            rospy.logwarn('Cannot mirror gait %s', self.gait_name)
             return False
 
         if key_1 in self.subgait_name:
@@ -114,7 +116,7 @@ class ModifiableSubgait(Subgait):
         elif key_2 in self.subgait_name:
             mirrored_subgait_name = self.subgait_name.replace(key_2, key_1)
         else:
-            rospy.logerr("This case should have been caught by can_mirror()")
+            rospy.logerr('This case should have been caught by can_mirror()')
             return False
 
         mirrored_joints = []

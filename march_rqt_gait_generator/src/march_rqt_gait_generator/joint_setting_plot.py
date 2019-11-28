@@ -1,8 +1,8 @@
 import math
 
+from PyQt5.QtCore import pyqtSignal
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore
-from PyQt5.QtCore import pyqtSignal
 
 
 # Enable antialiasing for prettier plots
@@ -41,7 +41,7 @@ class JointSettingPlot(pg.PlotItem):
 
         self.setTitle(joint.name)
 
-        self.setYRange(self.lower_limit-0.1, self.upper_limit+0.1, padding=0)
+        self.setYRange(self.lower_limit - 0.1, self.upper_limit + 0.1, padding=0)
         limit_pen = pg.mkPen(color='r', style=QtCore.Qt.DotLine)
         self.addItem(pg.InfiniteLine(self.lower_limit, angle=0, pen=limit_pen))
         self.addItem(pg.InfiniteLine(self.upper_limit, angle=0, pen=limit_pen))
@@ -61,7 +61,7 @@ class JointSettingPlot(pg.PlotItem):
             self.removeItem(self.velocity_markers.pop())
             self.velocities.pop()
 
-        marker_length = self.duration/10.0
+        marker_length = self.duration / 10.0
         if display:
             velocity_pen = pg.mkPen(color='g', size=3)
         else:
@@ -70,11 +70,11 @@ class JointSettingPlot(pg.PlotItem):
         for setpoint in setpoints:
 
             # Calculate start and endpoint of velocity marker
-            dx = 0.5*marker_length*math.cos(math.atan(setpoint.velocity))
+            dx = 0.5 * marker_length * math.cos(math.atan(setpoint.velocity))
             x_start = setpoint.time - dx
             x_end = setpoint.time + dx
 
-            dy = math.degrees(0.5*marker_length*math.sin(math.atan(setpoint.velocity)))
+            dy = math.degrees(0.5 * marker_length * math.sin(math.atan(setpoint.velocity)))
             y_start = math.degrees(setpoint.position) - dy
             y_end = math.degrees(setpoint.position) + dy
 
@@ -197,9 +197,9 @@ class JointSettingPlot(pg.PlotItem):
                 x_min = 0
                 x_max = self.duration
                 if self.dragIndex > 0:
-                    x_min = x[self.dragIndex-1] + 0.01
-                if self.dragIndex < len(x)-1:
-                    x_max = x[self.dragIndex+1] - 0.01
+                    x_min = x[self.dragIndex - 1] + 0.01
+                if self.dragIndex < len(x) - 1:
+                    x_max = x[self.dragIndex + 1] - 0.01
                 x[self.dragIndex] = min(max(local_pos.x() + self.dragOffset.x(), x_min), x_max)
                 y[self.dragIndex] = min(max(local_pos.y() + self.dragOffset.y(), self.lower_limit), self.upper_limit)
 

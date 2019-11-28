@@ -1,35 +1,29 @@
 import math
 import os
 
-import rospy
-import rospkg
-
-from urdf_parser_py import urdf
-import pyqtgraph as pg
-
-from pyqtgraph.Qt import QtCore
 from numpy_ringbuffer import RingBuffer
-
-from qt_gui.plugin import Plugin
+import pyqtgraph as pg
+from pyqtgraph.Qt import QtCore
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget, QFileDialog, QPushButton, \
-                                        QLineEdit, QSlider, QHeaderView, \
-                                        QCheckBox, QMessageBox, QSpinBox, QDoubleSpinBox, QFrame, \
-                                        QComboBox
-
+from python_qt_binding.QtWidgets import (QCheckBox, QComboBox, QDoubleSpinBox,
+                                         QFileDialog, QFrame, QHeaderView,
+                                         QLineEdit, QMessageBox, QPushButton,
+                                         QSlider, QSpinBox, QWidget)
+from qt_gui.plugin import Plugin
+import rospkg
+import rospy
 import rviz
-from tf import TransformListener, LookupException, ConnectivityException, ExtrapolationException
-
-from trajectory_msgs.msg import JointTrajectory
 from sensor_msgs.msg import JointState
+from tf import (ConnectivityException, ExtrapolationException, LookupException,
+                TransformListener)
+from trajectory_msgs.msg import JointTrajectory
+from urdf_parser_py import urdf
 
-import UserInterfaceController
-
-from model.modifiable_subgait import ModifiableSubgait
-from model.modifiable_setpoint import ModifiableSetpoint
-
-from JointSettingPlot import JointSettingPlot
-from TimeSliderThread import TimeSliderThread
+from . import user_interface_controller
+from .joint_setting_plot import JointSettingPlot
+from .model.modifiable_setpoint import ModifiableSetpoint
+from .model.modifiable_subgait import ModifiableSubgait
+from .time_slider_thread import TimeSliderThread
 
 
 class GaitGeneratorPlugin(Plugin):
@@ -39,7 +33,7 @@ class GaitGeneratorPlugin(Plugin):
 
         # Default values
         self.gait_publisher = None
-        self.topic_name = ""
+        self.topic_name = ''
         self.gait_directory = None
         self.playback_speed = 100
         self.time_slider_thread = None
@@ -70,33 +64,33 @@ class GaitGeneratorPlugin(Plugin):
         self._widget.RvizFrame.layout().addWidget(self.rviz_frame, 1, 0, 1, 3)
 
         # Store ui elements.
-        self.change_gait_directory_button = self._widget.SettingsFrame.findChild(QPushButton, "ChangeGaitDirectory")
-        self.import_gait_button = self._widget.SettingsFrame.findChild(QPushButton, "Import")
-        self.export_gait_button = self._widget.SettingsFrame.findChild(QPushButton, "Export")
-        self.publish_gait_button = self._widget.SettingsFrame.findChild(QPushButton, "Publish")
-        self.start_button = self._widget.RvizFrame.findChild(QPushButton, "Start")
-        self.stop_button = self._widget.RvizFrame.findChild(QPushButton, "Stop")
-        self.invert_button = self._widget.RvizFrame.findChild(QPushButton, "Invert")
-        self.undo_button = self._widget.RvizFrame.findChild(QPushButton, "Undo")
-        self.redo_button = self._widget.RvizFrame.findChild(QPushButton, "Redo")
-        self.playback_speed_spin_box = self._widget.RvizFrame.findChild(QSpinBox, "PlaybackSpeed")
-        self.height_left_line_edit = self._widget.RvizFrame.findChild(QLineEdit, "HeightLeft")
-        self.height_right_line_edit = self._widget.RvizFrame.findChild(QLineEdit, "HeightRight")
-        self.heel_distance_line_edit = self._widget.RvizFrame.findChild(QLineEdit, "HeelHeelDistance")
-        self.topic_name_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "TopicName")
-        self.gait_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Gait")
-        self.subgait_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Subgait")
-        self.version_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Version")
-        self.description_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, "Description")
-        self.gait_type_combo_box = self._widget.GaitPropertiesFrame.findChild(QComboBox, "GaitType")
-        self.gait_type_combo_box.addItems(["walk_like", "sit_like", "stairs_like"])
-        self.duration_spin_box = self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, "Duration")
-        self.mirror_check_box = self._widget.SettingsFrame.findChild(QCheckBox, "Mirror")
-        self.mirror_key1_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "Key1")
-        self.mirror_key2_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, "Key2")
-        self.velocity_markers_check_box = self._widget.SettingsFrame.findChild(QCheckBox, "ShowVelocityMarkers")
-        self.time_slider = self._widget.RvizFrame.findChild(QSlider, "TimeSlider")
-        self.scale_setpoints_check_box = self._widget.GaitPropertiesFrame.findChild(QCheckBox, "ScaleSetpoints")
+        self.change_gait_directory_button = self._widget.SettingsFrame.findChild(QPushButton, 'ChangeGaitDirectory')
+        self.import_gait_button = self._widget.SettingsFrame.findChild(QPushButton, 'Import')
+        self.export_gait_button = self._widget.SettingsFrame.findChild(QPushButton, 'Export')
+        self.publish_gait_button = self._widget.SettingsFrame.findChild(QPushButton, 'Publish')
+        self.start_button = self._widget.RvizFrame.findChild(QPushButton, 'Start')
+        self.stop_button = self._widget.RvizFrame.findChild(QPushButton, 'Stop')
+        self.invert_button = self._widget.RvizFrame.findChild(QPushButton, 'Invert')
+        self.undo_button = self._widget.RvizFrame.findChild(QPushButton, 'Undo')
+        self.redo_button = self._widget.RvizFrame.findChild(QPushButton, 'Redo')
+        self.playback_speed_spin_box = self._widget.RvizFrame.findChild(QSpinBox, 'PlaybackSpeed')
+        self.height_left_line_edit = self._widget.RvizFrame.findChild(QLineEdit, 'HeightLeft')
+        self.height_right_line_edit = self._widget.RvizFrame.findChild(QLineEdit, 'HeightRight')
+        self.heel_distance_line_edit = self._widget.RvizFrame.findChild(QLineEdit, 'HeelHeelDistance')
+        self.topic_name_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, 'TopicName')
+        self.gait_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, 'Gait')
+        self.subgait_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, 'Subgait')
+        self.version_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, 'Version')
+        self.description_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, 'Description')
+        self.gait_type_combo_box = self._widget.GaitPropertiesFrame.findChild(QComboBox, 'GaitType')
+        self.gait_type_combo_box.addItems(['walk_like', 'sit_like', 'stairs_like'])
+        self.duration_spin_box = self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, 'Duration')
+        self.mirror_check_box = self._widget.SettingsFrame.findChild(QCheckBox, 'Mirror')
+        self.mirror_key1_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, 'Key1')
+        self.mirror_key2_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, 'Key2')
+        self.velocity_markers_check_box = self._widget.SettingsFrame.findChild(QCheckBox, 'ShowVelocityMarkers')
+        self.time_slider = self._widget.RvizFrame.findChild(QSlider, 'TimeSlider')
+        self.scale_setpoints_check_box = self._widget.GaitPropertiesFrame.findChild(QCheckBox, 'ScaleSetpoints')
 
         self.connect_buttons()
 
@@ -132,19 +126,19 @@ class GaitGeneratorPlugin(Plugin):
 
         # Line edits / combo boxes / spin boxes
         self.gait_type_combo_box.currentTextChanged.connect(
-            lambda text: self.gait.set_gait_type(text)
+            lambda text: self.gait.set_gait_type(text),
         )
         self.gait_name_line_edit.textChanged.connect(
-            lambda text: self.gait.set_gait_name(text)
+            lambda text: self.gait.set_gait_name(text),
         )
         self.version_name_line_edit.textChanged.connect(
-            lambda text: self.gait.set_version(text)
+            lambda text: self.gait.set_version(text),
         )
         self.subgait_name_line_edit.textChanged.connect(
-            lambda text: self.gait.set_subgait_name(text)
+            lambda text: self.gait.set_subgait_name(text),
         )
         self.description_line_edit.textChanged.connect(
-            lambda text: self.gait.set_description(text)
+            lambda text: self.gait.set_description(text),
         )
         self.topic_name_line_edit.textChanged.connect(self.set_topic_name)
         self.playback_speed_spin_box.valueChanged.connect(self.set_playback_speed)
@@ -155,8 +149,8 @@ class GaitGeneratorPlugin(Plugin):
         self.mirror_check_box.stateChanged.connect(
             lambda state: [
                 self.mirror_key1_line_edit.setEnabled(state),
-                self.mirror_key2_line_edit.setEnabled(state)
-            ]
+                self.mirror_key2_line_edit.setEnabled(state),
+            ],
         )
 
     # Called by __init__ and import_gait.
@@ -201,15 +195,15 @@ class GaitGeneratorPlugin(Plugin):
 
         for i in range(0, len(self.robot.joints)):
 
-            if self.robot.joints[i].type != "fixed":
+            if self.robot.joints[i].type != 'fixed':
                 joint_name = self.robot.joints[i].name
                 joint = self.gait.get_joint(joint_name)
                 if not joint:
                     continue
-                row = rospy.get_param("/joint_layout/" + joint_name + "/row", -1)
-                column = rospy.get_param("/joint_layout/" + joint_name + "/column", -1)
+                row = rospy.get_param('/joint_layout/' + joint_name + '/row', -1)
+                column = rospy.get_param('/joint_layout/' + joint_name + '/column', -1)
                 if row == -1 or column == -1:
-                    rospy.logerr("Could not load the layout for joint %s. Please check config/layout.yaml", joint_name)
+                    rospy.logerr('Could not load the layout for joint %s. Please check config/layout.yaml', joint_name)
                     continue
                 self._widget.JointSettingContainer.layout().addWidget(self.create_joint_setting(joint), row, column)
 
@@ -225,16 +219,16 @@ class GaitGeneratorPlugin(Plugin):
         joint_setting_plot = JointSettingPlot(joint, self.gait.duration, show_velocity_markers)
         joint_setting.Plot.addItem(joint_setting_plot)
 
-        joint_setting.Table = UserInterfaceController.update_table(
+        joint_setting.Table = user_interface_controller.update_table(
             joint_setting.Table, joint, self.gait.duration)
         # Disable scrolling horizontally
         joint_setting.Table.horizontalScrollBar().setDisabled(True)
         joint_setting.Table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         def update_joint_ui():
-            UserInterfaceController.update_ui_elements(
+            user_interface_controller.update_ui_elements(
                 joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration,
-                show_velocity_markers=self.velocity_markers_check_box.isChecked()),
+                show_velocity_markers=self.velocity_markers_check_box.isChecked())
             self.publish_preview()
 
         def add_setpoint(joint, time, position, button):
@@ -249,37 +243,37 @@ class GaitGeneratorPlugin(Plugin):
 
         self.velocity_markers_check_box.stateChanged.connect(
             lambda: [
-                joint.set_setpoints(UserInterfaceController.plot_to_setpoints(joint_setting_plot)),
-                update_joint_ui()
+                joint.set_setpoints(user_interface_controller.plot_to_setpoints(joint_setting_plot)),
+                update_joint_ui(),
             ])
 
         # Connect a function to update the model and to update the table.
         joint_setting_plot.plot_item.sigPlotChanged.connect(
             lambda: [
-                joint.set_setpoints(UserInterfaceController.plot_to_setpoints(joint_setting_plot)),
-                update_joint_ui()
+                joint.set_setpoints(user_interface_controller.plot_to_setpoints(joint_setting_plot)),
+                update_joint_ui(),
             ])
 
         joint_setting_plot.add_setpoint.connect(
             lambda time, position, button: [
                 add_setpoint(joint, time, position, button),
-                update_joint_ui()
+                update_joint_ui(),
             ])
 
         joint_setting_plot.remove_setpoint.connect(
             lambda index: [
                 joint.save_setpoints(),
                 joint.remove_setpoint(index),
-                update_joint_ui()
+                update_joint_ui(),
             ])
 
         joint_setting.Table.itemChanged.connect(
             lambda: [
-                joint.set_setpoints(UserInterfaceController.table_to_setpoints(joint_setting.Table)),
-                UserInterfaceController.update_ui_elements(
+                joint.set_setpoints(user_interface_controller.table_to_setpoints(joint_setting.Table)),
+                user_interface_controller.update_ui_elements(
                     joint, table=None, plot=joint_setting_plot, duration=self.gait.duration,
                     show_velocity_markers=self.velocity_markers_check_box.isChecked()),
-                self.publish_preview()
+                self.publish_preview(),
             ])
 
         return joint_setting
@@ -302,7 +296,7 @@ class GaitGeneratorPlugin(Plugin):
 
     def publish_gait(self):
         trajectory = self.gait.to_joint_trajectory_msg()
-        rospy.loginfo("Publishing trajectory to topic '" + self.topic_name + "'")
+        rospy.loginfo('Publishing trajectory to topic '' + self.topic_name + ''')
         self.gait_publisher.publish(trajectory)
 
     def set_current_time(self, current_time):
@@ -318,20 +312,20 @@ class GaitGeneratorPlugin(Plugin):
         self.stop_time_slider_thread()
 
         self.playback_speed = playback_speed
-        rospy.loginfo("Changing playbackspeed to " + str(self.playback_speed))
+        rospy.loginfo('Changing playbackspeed to ' + str(self.playback_speed))
 
         if was_playing:
             self.start_time_slider_thread()
 
     def start_time_slider_thread(self):
         if self.time_slider_thread is not None:
-            rospy.logdebug("Cannot start another time slider thread as one is already active")
+            rospy.logdebug('Cannot start another time slider thread as one is already active')
             return
 
         current = self.time_slider.value()
         playback_speed = self.playback_speed
-        max = self.time_slider.maximum()
-        self.time_slider_thread = TimeSliderThread(current, playback_speed, max)
+        max_time = self.time_slider.maximum()
+        self.time_slider_thread = TimeSliderThread(current, playback_speed, max_time)
         self.time_slider_thread.update_signal.connect(self.update_main_time_slider)
         self.time_slider_thread.start()
 
@@ -346,12 +340,12 @@ class GaitGeneratorPlugin(Plugin):
         if self.gait.has_setpoints_after_duration(duration) and not rescale_setpoints:
             if not self.gait.has_multiple_setpoints_before_duration(duration):
                 QMessageBox.question(self._widget, 'Could not update gait duration',
-                                     "Not all joints have multiple setpoints before duration " + str(duration),
+                                     'Not all joints have multiple setpoints before duration ' + str(duration),
                                      QMessageBox.Ok)
                 return
             discard_setpoints = QMessageBox.question(self._widget, 'Gait duration lower than highest time setpoint',
-                                                     "Do you want to discard any setpoints higher than the given "
-                                                     "duration?",
+                                                     'Do you want to discard any setpoints higher than the given '
+                                                     'duration?',
                                                      QMessageBox.Yes | QMessageBox.No)
             if discard_setpoints == QMessageBox.No:
                 self.duration_spin_box.setValue(self.gait.duration)
@@ -369,19 +363,19 @@ class GaitGeneratorPlugin(Plugin):
 
     def import_gait(self):
         file_name, f = QFileDialog.getOpenFileName(self._widget,
-                                                   "Open Image",
-                                                   os.getenv("HOME") + "/march_ws/src/gait-files/march_gait_files",
-                                                   "March Subgait (*.subgait)")
+                                                   'Open Image',
+                                                   os.getenv('HOME') + '/march_ws/src/gait-files/march_gait_files',
+                                                   'March Subgait (*.subgait)')
 
         gait = ModifiableSubgait.from_file(self, self.robot, file_name)
         if gait is None:
-            rospy.logwarn("Could not load gait %s", file_name)
+            rospy.logwarn('Could not load gait %s', file_name)
             return
         self.gait = gait
         self.load_gait_into_ui()
 
         self.gait_directory = '/'.join(file_name.split('/')[:-3])
-        rospy.loginfo("Setting gait directory to %s", str(self.gait_directory))
+        rospy.loginfo('Setting gait directory to %s', str(self.gait_directory))
         self.change_gait_directory_button.setText(self.gait_directory)
 
         # Clear undo and redo history
@@ -399,55 +393,55 @@ class GaitGeneratorPlugin(Plugin):
             if mirror:
                 self.export_to_file(mirror, self.get_gait_directory())
             else:
-                UserInterfaceController.notify("Could not mirror gait", "Check the logs for more information.")
+                user_interface_controller.notify('Could not mirror gait', 'Check the logs for more information.')
                 return
 
         self.export_to_file(self.gait, self.get_gait_directory())
 
     @staticmethod
     def export_to_file(gait, gait_directory):
-        if gait_directory is None or gait_directory == "":
+        if gait_directory is None or gait_directory == '':
             return
 
         # Name and version will be empty as it's stored in the filename.
         subgait_msg = gait.to_subgait_msg()
 
         output_file_directory = os.path.join(gait_directory,
-                                             gait.gait_name.replace(" ", "_"),
-                                             gait.subgait_name.replace(" ", "_"))
+                                             gait.gait_name.replace(' ', '_'),
+                                             gait.subgait_name.replace(' ', '_'))
         output_file_path = os.path.join(output_file_directory,
-                                        gait.version.replace(" ", "_") + ".subgait")
+                                        gait.version.replace(' ', '_') + '.subgait')
 
         file_exists = os.path.isfile(output_file_path)
         if file_exists:
             overwrite_file = QMessageBox.question(None, 'File already exists',
-                                                  "Do you want to overwrite " + str(output_file_path) + "?",
+                                                  'Do you want to overwrite ' + str(output_file_path) + '?',
                                                   QMessageBox.Yes | QMessageBox.No)
             if overwrite_file == QMessageBox.No:
                 return
 
-        rospy.loginfo("Writing gait to " + output_file_path)
+        rospy.loginfo('Writing gait to ' + output_file_path)
 
         if not os.path.isdir(output_file_directory):
             os.makedirs(output_file_directory)
 
-        with open(output_file_path, 'w') as file:
-            file.write(str(subgait_msg))
+        with open(output_file_path, 'w') as output_file:
+            output_file.write(str(subgait_msg))
 
-        UserInterfaceController.notify("Gait Saved", output_file_path)
+        user_interface_controller.notify('Gait Saved', output_file_path)
 
     # Called by export_gait
     def get_gait_directory(self):
         if self.gait_directory is None:
             self.change_gait_directory()
-        rospy.loginfo("Selected output directory " + str(self.gait_directory))
+        rospy.loginfo('Selected output directory ' + str(self.gait_directory))
         return self.gait_directory
 
     def change_gait_directory(self):
-        self.gait_directory = str(QFileDialog.getExistingDirectory(None, "Select a directory to save gaits"))
-        if self.gait_directory == "":   # If directory dialogue is canceled
+        self.gait_directory = str(QFileDialog.getExistingDirectory(None, 'Select a directory to save gaits'))
+        if self.gait_directory == '':   # If directory dialogue is canceled
             self.gait_directory = None
-            self.change_gait_directory_button.setText("Select a gait directory...")
+            self.change_gait_directory_button.setText('Select a gait directory...')
         else:
             self.change_gait_directory_button.setText(self.gait_directory)
 
@@ -510,7 +504,7 @@ class GaitGeneratorPlugin(Plugin):
         gait_directory = plugin_settings.value('gait_directory')
 
         if gait_directory is not None:
-            rospy.loginfo("Restoring saved gait directory " + str(gait_directory))
+            rospy.loginfo('Restoring saved gait directory ' + str(gait_directory))
             self.gait_directory = gait_directory
 
         # def trigger_configuration(self):
