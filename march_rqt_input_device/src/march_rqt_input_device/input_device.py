@@ -187,20 +187,16 @@ class InputDevicePlugin(Plugin):
         # The button layout.
         # Position in the array determines position on screen.
         march_button_layout = [
-            [home_sit_button, home_stand_button, gait_walk_button, gait_walk_small_button, gait_sit_button],
-            [gait_stand_button, gait_single_step_normal_button,
-             gait_sofa_sit_button, gait_sofa_stand_button, gait_side_step_left_small_button],
-            [gait_single_step_small_button, gait_side_step_left_button, gait_side_step_right_button,
-             gait_stairs_up_button, gait_side_step_right_small_button],
-            [gait_stairs_down_button, gait_single_high_step_button, gait_slope_up_button,
-             gait_slope_down_final_step_button, gait_ramp_door_slope_up],
-            [gait_slope_down_button, gait_set_ankle_from_2_5_to_min5, gait_tilted_path_first_starting_step,
-             gait_tilted_path_second_starting_step],
-            [gait_set_ankle_from_min5_to_min10, gait_tilted_path_middle_step, gait_set_ankle_from_min10_to_min5,
+            [home_sit_button, home_stand_button, gait_walk_button, gait_walk_small_button, stop_button],
+            [gait_sit_button, gait_stand_button, gait_single_step_normal_button, gait_single_step_small_button,
+             pause_button],
+            [gait_side_step_left_button, gait_side_step_right_button, gait_side_step_left_small_button,
+             gait_side_step_right_small_button, continue_button],
+            [gait_sofa_sit_button, gait_sofa_stand_button, gait_rough_terrain_high_step,
+             gait_rough_terrain_middle_steps, error_button],
+            [gait_stairs_up_button, gait_stairs_down_button, gait_tilted_path_first_starting_step,
              gait_tilted_path_first_ending_step],
-            [gait_tilted_path_second_ending_step, gait_set_ankle_from_min5_to_2_5, stop_button],
-            [pause_button, continue_button, error_button,
-             gait_rough_terrain_high_step, gait_rough_terrain_middle_steps],
+            [gait_ramp_door_slope_up],
         ]
 
         # Create the qt_layout from the button layout.
