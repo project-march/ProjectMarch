@@ -1,14 +1,14 @@
-from python_qt_binding.QtCore import QObject, QTime
+from python_qt_binding.QtCore import QObject, QDateTime
 from rosgraph_msgs.msg import Log
 
 
 class Entry(QObject):
 
-    def __init__(self, content, is_error=False):
+    def __init__(self, content, date_time=QDateTime.currentDateTime(), is_error=False):
         super(Entry, self).__init__()
 
         self.content = content
-        self.time = QTime.currentTime()
+        self.date_time = date_time
         self.is_error = is_error
 
     @classmethod
@@ -18,7 +18,9 @@ class Entry(QObject):
         :type log_msg: rosgraph_msgs.msg.Log
         :param log_msg: The message to convert
         """
-        return cls(log_msg.msg, log_msg.level >= Log.ERROR)
+        date_time = (QDateTime.currentDateTime() if log_msg.header.stamp.is_zero() else
+                     QDateTime.fromSecsSinceEpoch(log_msg.header.stamp.secs))
+        return cls(log_msg.msg, date_time, log_msg.level >= Log.ERROR)
 
     def time_string(self):
-        return self.time.toString()
+        return self.date_time.toString('HH:mm:ss')
