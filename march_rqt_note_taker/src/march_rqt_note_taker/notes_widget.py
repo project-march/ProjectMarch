@@ -37,6 +37,7 @@ class NotesWidget(QWidget):
     def _handle_start_take(self):
         take = self.camera_spin_box.value()
         self._model.insert_row(Entry('Started camera take {0}'.format(take)))
+        self.camera_spin_box.setValue(take + 1)
         self.table_view.verticalScrollBar().setSliderPosition(self._last_scroll_max)
 
     def _handle_change_scroll(self, scroll_min, scroll_max):
