@@ -1,28 +1,26 @@
-from python_qt_binding.QtCore import QDateTime, QObject, QTime
+from python_qt_binding.QtCore import QObject, QDateTime
+from rosgraph_msgs.msg import Log
 
 
 class Entry(QObject):
 
-    DEBUG = 1
-    INFO = 2
-    WARN = 3
-    ERROR = 4
-    FATAL = 5
-
-    LEVEL_LABELS = {
-        DEBUG: 'Debug',
-        INFO: 'Info',
-        WARN: 'Warn',
-        ERROR: 'Error',
-        FATAL: 'Fatal',
-    }
-
-    def __init__(self, content, level=INFO):
+    def __init__(self, content, date_time=QDateTime.currentDateTime(), is_error=False):
         super(Entry, self).__init__()
 
         self.content = content
-        self.time = QTime.currentTime()
-        self.level = level
+        self.date_time = date_time
+        self.is_error = is_error
+
+    @classmethod
+    def from_ros_msg(cls, log_msg):
+        """Returns an Entry from a given ROS log message.
+
+        :type log_msg: rosgraph_msgs.msg.Log
+        :param log_msg: The message to convert
+        """
+        date_time = (QDateTime.currentDateTime() if log_msg.header.stamp.is_zero() else
+                     QDateTime.fromSecsSinceEpoch(log_msg.header.stamp.secs))
+        return cls(log_msg.msg, date_time, log_msg.level >= Log.ERROR)
 
     def time_string(self):
-        return self.time.toString()
+        return self.date_time.toString('HH:mm:ss')

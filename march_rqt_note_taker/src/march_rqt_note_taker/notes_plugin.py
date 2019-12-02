@@ -1,14 +1,14 @@
 import os
 
-import rospy
+from rosgraph_msgs.msg import Log
 import rospkg
+import rospy
 
 from qt_gui.plugin import Plugin
-from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget
 
-from march_rqt_note_taker.entry import Entry
-from march_rqt_note_taker.entry_model import EntryModel
+from .entry_model import EntryModel
+from .filter_map import FilterMap
+from .notes_widget import NotesWidget
 
 
 class NotesPlugin(Plugin):
@@ -16,33 +16,23 @@ class NotesPlugin(Plugin):
     def __init__(self, context):
         super(NotesPlugin, self).__init__(context)
 
-        self._widget = QWidget()
-        self.init_ui(context)
+        ui_file = os.path.join(rospkg.RosPack().get_path('march_rqt_note_taker'), 'resource', 'note_taker.ui')
 
         self._model = EntryModel()
-
-        self._widget.table_view.setModel(self._model)
-        self._widget.table_view.verticalScrollBar().rangeChanged.connect(self.change_scroll)
-
-        self._widget.input_field.returnPressed.connect(self.insert_entry)
-
-        self._widget.take_button.clicked.connect(self.start_take)
-
-    def init_ui(self, context):
-        ui_file = os.path.join(rospkg.RosPack().get_path('march_rqt_note_taker'), 'resource', 'note_taker.ui')
-        loadUi(ui_file, self._widget)
-
+        self._widget = NotesWidget(self._model, ui_file)
         context.add_widget(self._widget)
 
-    def insert_entry(self):
-        entry = self._widget.input_field.text()
-        if entry:
-            self._model.insert_row(Entry(entry))
-            self._widget.input_field.clear()
+        self._filter_map = FilterMap()
+        self._filter_map.add_filter(lambda l: l.level >= Log.ERROR)
+        self._filter_map.add_filter_info_level(lambda l: l.msg == 'March is fully operational')
+        self._subscriber = rospy.Subscriber('/rosout_agg',
+                                            Log,
+                                            self._rosout_cb)
 
-    def start_take(self):
-        take = self._widget.camera_spin_box.value()
-        self._model.insert_row(Entry('Started camera take {}'.format(take)))
+    def shutdown_plugin(self):
+        self._subscriber.unregister()
 
-    def change_scroll(self, min, max):
-        self._widget.table_view.verticalScrollBar().setSliderPosition(max)
+    def _rosout_cb(self, log_msg):
+        mapped_msg = self._filter_map(log_msg)
+        if mapped_msg:
+            self._model.insert_log_msg(mapped_msg)
