@@ -1,2 +1,23 @@
 gaits:
-  home: {home_sit: MIV_ankle_2.5, home_stand: MIV_ankle_2.5}
+  home: {home_sit: MIV_final, home_stand: MIV_final}
+  side_step_left: {left_open: MIV_final, right_close: MIV_final}
+  side_step_left_small: {left_open: MIV_final, right_close: MIV_final}
+  side_step_right: {right_open: MIV_final, left_close: MIV_final}
+  side_step_right_small: {right_open: MIV_final, left_close: MIV_final}
+  single_step_normal: {right_open: MIV_final, left_close: MIV_final}
+  single_step_small: {right_open: MIV_final, left_close: MIV_final}
+  sit: {sit_down: MIV_final, sit_home: MIV_final}
+  stand: {prepare_stand_up: MIV_final, stand_up: MIV_final}
+  sofa_sit: {sit_down: MIV_final, sit_home: MIV_final}
+  sofa_stand: {prepare_stand_up: MIV_final, stand_up: MIV_final}
+  stairs_up: {right_open: MIV_final, left_swing: MIV_final, right_swing: MIV_final, left_close: MIV_final,
+              right_close: MIV_final}
+  stairs_down: {right_open: MIV_final, left_swing: MIV_final, right_swing: MIV_final, left_close: MIV_final,
+                right_close: MIV_final}
+  walk: {right_open: MIV_final, left_swing: MIV_final, right_swing: MIV_final, left_close: MIV_final,
+         right_close: MIV_final}
+  walk_small: {right_open: MIV_final, left_swing: MIV_final, right_swing: MIV_final, left_close: MIV_final,
+               right_close: MIV_final}
+  rough_terrain_high_step: {right_open: MV_RT_highstep_rightopen_v4, left_close: MV_RT_highstep_leftclose_v4}
+  rough_terrain_middle_steps: {right_open: MV_RT_middlestep_rightopen_v2, left_swing: MV_RT_middlestep_leftswing_v2,
+                              right_swing: MV_RT_middlestep_rightswing_v2, left_close: MV_RT_middlestep_leftclose_v2}
