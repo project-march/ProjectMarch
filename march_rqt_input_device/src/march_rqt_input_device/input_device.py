@@ -1,18 +1,17 @@
 import os
-import rospy
-import std_msgs.msg
-import rospkg
 
-from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget
-from march_shared_resources.msg import Error
-from march_shared_resources.msg import GaitInstruction
+from qt_gui.plugin import Plugin
+import rospkg
+import rospy
+import std_msgs.msg
+from std_msgs.msg import Time
 
-from march_rqt_input_device.MarchButton import MarchButton
-from march_rqt_input_device.LayoutBuilder import LayoutBuilder
+from march_shared_resources.msg import Error, GaitInstruction
 
-from march_rqt_input_device.PublishAliveThread import PublishAliveThread
+from .LayoutBuilder import LayoutBuilder
+from .MarchButton import MarchButton
 
 
 class InputDevicePlugin(Plugin):
@@ -40,8 +39,8 @@ class InputDevicePlugin(Plugin):
         # plugin at once, these lines add number to make it easy to
         # tell from pane to pane.
         if context.serial_number() > 1:
-            self._widget.setWindowTitle(self._widget.windowTitle() + (
-                    ' (%d)' % context.serial_number()))
+            self._widget.setWindowTitle('{0} ({1})'.format(self._widget.windowTitle(),
+                                                           context.serial_number()))
         # Add widget to the user interface
         context.add_widget(self._widget)
 
@@ -108,71 +107,27 @@ class InputDevicePlugin(Plugin):
                                               image='/gait_stairs_down.png',
                                               callback=lambda: self.publish_gait(
                                                   'gait_stairs_down'))
-        gait_slope_up_button = MarchButton(name='gait_slope_up',
-                                           image='/gait_slope_up.png',
-                                           callback=lambda: self.publish_gait(
-                                               'gait_slope_up'))
-        gait_slope_down_button = MarchButton(name='gait_slope_down',
-                                             image='/gait_slope_down.png',
-                                             callback=lambda: self.publish_gait(
-                                                 'gait_slope_down'))
-        gait_slope_down_final_step_button = MarchButton(name='gait_slope_down_final_step',
-                                                        image='/gait_slope_down_final_step.png',
-                                                        callback=lambda: self.publish_gait(
-                                                            'gait_slope_down_final_step'))
-        gait_single_high_step_button = MarchButton(name='gait_single_high_step',
-                                                   text='Single high step',
-                                                   callback=lambda: self.publish_gait(
-                                                       'gait_single_high_step'))
-        gait_set_ankle_from_2_5_to_min5 = MarchButton(name='gait_set_ankle_from_2_5_to_min5',
-                                                      text='Set ankle from 2.5 to -5',
-                                                      callback=lambda: self.publish_gait(
-                                                          'gait_set_ankle_from_2_5_to_min5'))
-        gait_set_ankle_from_min5_to_min10 = MarchButton(name='gait_set_ankle_from_min5_to_min10',
-                                                        text='Set ankle from -5 to -10',
-                                                        callback=lambda: self.publish_gait(
-                                                            'gait_set_ankle_from_min5_to_min10'))
-        gait_set_ankle_from_min10_to_min5 = MarchButton(name='gait_set_ankle_from_min10_to_min5',
-                                                        text='Set ankle from -10 to -5',
-                                                        callback=lambda: self.publish_gait(
-                                                            'gait_set_ankle_from_min10_to_min5'))
-        gait_set_ankle_from_min5_to_2_5 = MarchButton(name='gait_set_ankle_from_min5_to_2_5',
-                                                      text='Set ankle from -5 to 2.5',
-                                                      callback=lambda: self.publish_gait(
-                                                          'gait_set_ankle_from_min5_to_2_5'))
         gait_tilted_path_first_starting_step = MarchButton(name='gait_tilted_path_first_starting_step',
                                                            text='Tilted path first starting step',
                                                            callback=lambda: self.publish_gait(
                                                                'gait_tilted_path_first_starting_step'))
-        gait_tilted_path_second_starting_step = MarchButton(name='gait_tilted_path_second_starting_step',
-                                                            text='Tilted path second starting step',
-                                                            callback=lambda: self.publish_gait(
-                                                                'gait_tilted_path_second_starting_step'))
-        gait_tilted_path_middle_step = MarchButton(name='gait_tilted_path_middle_step',
-                                                   text='Tilted path middle step',
-                                                   callback=lambda: self.publish_gait(
-                                                       'gait_tilted_path_middle_step'))
         gait_tilted_path_first_ending_step = MarchButton(name='gait_tilted_path_first_ending_step',
                                                          text='Tilted path first ending step',
                                                          callback=lambda: self.publish_gait(
                                                              'gait_tilted_path_first_ending_step'))
-        gait_tilted_path_second_ending_step = MarchButton(name='gait_tilted_path_second_ending_step',
-                                                          text='Tilted path second ending step',
-                                                          callback=lambda: self.publish_gait(
-                                                              'gait_tilted_path_second_ending_step'))
-        gait_rough_terrain_high_step = MarchButton(name="gait_rough_terrain_high_step",
-                                                   text="Rough terrain high step",
+        gait_rough_terrain_high_step = MarchButton(name='gait_rough_terrain_high_step',
+                                                   text='Rough terrain high step',
                                                    callback=lambda: self.publish_gait(
-                                                       "gait_rough_terrain_high_step"))
+                                                       'gait_rough_terrain_high_step'))
 
-        gait_rough_terrain_middle_steps = MarchButton(name="gait_rough_terrain_middle_steps",
-                                                      text="Rough terrain middle steps",
+        gait_rough_terrain_middle_steps = MarchButton(name='gait_rough_terrain_middle_steps',
+                                                      text='Rough terrain middle steps',
                                                       callback=lambda: self.publish_gait(
-                                                          "gait_rough_terrain_middle_steps"))
+                                                          'gait_rough_terrain_middle_steps'))
 
-        gait_ramp_door_slope_up = MarchButton(name="gait_ramp_door_slope_up",
-                                              text="MV Ramp and Door slope up",
-                                              callback=lambda: self.publish_gait("gait_ramp_door_slope_up"))
+        gait_ramp_door_slope_up = MarchButton(name='gait_ramp_door_slope_up',
+                                              text='MV Ramp and Door slope up',
+                                              callback=lambda: self.publish_gait('gait_ramp_door_slope_up'))
 
         stop_button = MarchButton(name='gait_stop', image='/stop.png',
                                   callback=lambda: self.publish_stop())
@@ -216,12 +171,19 @@ class InputDevicePlugin(Plugin):
 
         self.error_pub = rospy.Publisher('/march/error', Error, queue_size=10)
 
-        if rospy.get_param('~ping_safety_node', 'true'):
-            self.alive_thread = PublishAliveThread()
-            self.alive_thread.start()
+        self._ping = rospy.get_param('~ping_safety_node', True)
+        if self._ping:
+            self._alive_pub = rospy.Publisher(
+                '/march/input_device/alive', Time, queue_size=10)
+            self._alive_timer = rospy.Timer(rospy.Duration(0.05), self._timer_callback)
+
+    def _timer_callback(self, event):
+        self._alive_pub.publish(event.current_real)
 
     def shutdown_plugin(self):
-        self.alive_thread.stop()
+        if self._ping:
+            self._alive_timer.shutdown()
+            self._alive_pub.unregister()
 
     def save_settings(self, plugin_settings, instance_settings):
         # TODO save intrinsic configuration, usually using:

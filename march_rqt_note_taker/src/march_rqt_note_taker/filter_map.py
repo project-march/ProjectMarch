@@ -2,10 +2,7 @@ from rosgraph_msgs.msg import Log
 
 
 class FilterMap:
-    """
-    Filter class that can add custom filters and mappings for accepting
-   `rosgraph_msgs.msg.Log`.
-    """
+    """Filter class that can add custom filters and mappings for accepting `rosgraph_msgs.msg.Log`."""
 
     def __init__(self):
         self._filter_maps = []

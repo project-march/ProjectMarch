@@ -1,10 +1,9 @@
 import os
 
+from qt_gui.plugin import Plugin
 from rosgraph_msgs.msg import Log
 import rospkg
 import rospy
-
-from qt_gui.plugin import Plugin
 
 from .entry_model import EntryModel
 from .filter_map import FilterMap
