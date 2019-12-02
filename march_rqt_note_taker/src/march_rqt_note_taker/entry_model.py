@@ -42,6 +42,21 @@ class EntryModel(QAbstractTableModel):
 
         return None
 
+    def remove_rows(self, position, rows=1):
+        """Removes the rows with given indices.
+
+        :type position: int
+        :param position: Start position to remove
+        :type rows: int
+        :param rows: Amount of rows to remove
+        :returns True when the removal was successful
+        """
+        self.beginRemoveRows(QModelIndex(), position, position + rows - 1)
+        self._entries = self._entries[:position] + self._entries[position + rows:]
+        self.endRemoveRows()
+
+        return True
+
     def insert_row(self, entry):
         """Appends an entry.
 
