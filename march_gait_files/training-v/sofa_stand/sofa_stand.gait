@@ -1,0 +1,5 @@
+name: sofa_stand
+
+graph:
+  from_subgait: [start,      prepare_stand_up, stand_up]
+  to_subgait:   [prepare_stand_up, stand_up,       end]

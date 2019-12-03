@@ -1,0 +1,5 @@
+name: side_step_left
+
+graph:
+  from_subgait: [start,     left_open, right_close]
+  to_subgait:   [left_open, right_close, end]
