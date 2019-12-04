@@ -19,5 +19,5 @@ install(PROGRAMS scripts/${PROJECT_NAME}
 )
 
 if(CATKIN_ENABLE_TESTING)
-    catkin_add_nosetests(test)
+    catkin_add_nosetests(test/run_tests.py)
 endif()
