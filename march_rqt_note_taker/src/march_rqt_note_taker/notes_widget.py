@@ -1,5 +1,6 @@
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget
+from python_qt_binding.QtGui import QKeySequence
+from python_qt_binding.QtWidgets import QShortcut, QWidget
 
 from .entry import Entry
 
@@ -24,6 +25,9 @@ class NotesWidget(QWidget):
 
         self.take_button.clicked.connect(self._handle_start_take)
 
+        self._delete_shortcut = QShortcut(QKeySequence('Delete'), self)
+        self._delete_shortcut.activated.connect(self._delete_selected)
+
     def _handle_insert_entry(self):
         entry = self.input_field.text().strip()
         if entry:
@@ -44,3 +48,10 @@ class NotesWidget(QWidget):
         if self.table_view.verticalScrollBar().value() == self._last_scroll_max:
             self.table_view.verticalScrollBar().setSliderPosition(scroll_max)
             self._last_scroll_max = scroll_max
+
+    def _delete_selected(self):
+        selection_model = self.table_view.selectionModel()
+        if self.table_view.hasFocus() and selection_model.hasSelection():
+            indices = [index for index in selection_model.selectedIndexes() if not index.column()]
+            if indices and indices[0].isValid():
+                self._model.remove_rows(indices[0].row(), len(indices))

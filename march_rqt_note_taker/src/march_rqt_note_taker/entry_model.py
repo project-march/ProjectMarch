@@ -24,10 +24,11 @@ class EntryModel(QAbstractTableModel):
                 return EntryModel.columns[section].capitalize()
 
     def data(self, index, role=Qt.DisplayRole):
-        column = EntryModel.columns[index.column()]
+        column = index.column()
         row = index.row()
 
-        if 0 <= row < self.rowCount():
+        if 0 <= row < self.rowCount() and 0 <= column < self.columnCount():
+            column = EntryModel.columns[index.column()]
             entry = self._entries[row]
 
             if role == Qt.DisplayRole:
@@ -41,6 +42,19 @@ class EntryModel(QAbstractTableModel):
                     return QBrush(Qt.darkRed)
 
         return None
+
+    def remove_rows(self, position, rows=1):
+        """Removes the rows with given indices.
+
+        :type position: int
+        :param position: Start position to remove
+        :type rows: int
+        :param rows: Amount of rows to remove
+        :returns True when the removal was successful
+        """
+        self.beginRemoveRows(QModelIndex(), position, position + rows - 1)
+        self._entries = self._entries[:position] + self._entries[position + rows:]
+        self.endRemoveRows()
 
     def insert_row(self, entry):
         """Appends an entry.
