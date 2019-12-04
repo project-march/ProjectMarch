@@ -11,7 +11,8 @@ class ModifiableSubgait(Subgait):
     joint_class = ModifiableJointTrajectory
 
     @classmethod
-    def empty_subgait(cls, gait_generator, robot, gait_type='walk_like', duration=8):
+    def empty_subgait(cls, gait_generator, robot, duration=8, gait_type='walk_like', gait_name='test_gait',
+                      subgait_name='test_subgait', version='test_subgait_1', description='Just a simple gait'):
         if robot is None:
             rospy.logerr('Cannot create gait without a loaded robot.')
             return None
@@ -28,8 +29,6 @@ class ModifiableSubgait(Subgait):
 
             default_setpoints = [
                 ModifiableSetpoint(0, 0, 0),
-                ModifiableSetpoint(3, 1.3, 0),
-                ModifiableSetpoint(4, 1.3, 0),
                 ModifiableSetpoint(duration, 0, 0),
             ]
             joint = ModifiableJointTrajectory(urdf_joint.name,
@@ -41,7 +40,7 @@ class ModifiableSubgait(Subgait):
                                               gait_generator,
                                               )
             joint_list.append(joint)
-        return cls(joint_list, duration, gait_type)
+        return cls(joint_list, duration, gait_type, gait_name, subgait_name, version, description)
 
     @classmethod
     def from_file(cls, gait_generator, robot, filename):
