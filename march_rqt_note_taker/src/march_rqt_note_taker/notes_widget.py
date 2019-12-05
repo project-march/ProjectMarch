@@ -32,6 +32,12 @@ class NotesWidget(QWidget):
         self._delete_shortcut = QShortcut(QKeySequence('Delete'), self)
         self._delete_shortcut.activated.connect(self._delete_selected)
 
+        self._load_shortcut = QShortcut(QKeySequence('Ctrl+O'), self)
+        self._load_shortcut.activated.connect(self._handle_load)
+
+        self._save_shortcut = QShortcut(QKeySequence('Ctrl+S'), self)
+        self._save_shortcut.activated.connect(self._handle_save)
+
     def _handle_insert_entry(self):
         entry = self.input_field.text().strip()
         if entry:
@@ -78,6 +84,6 @@ class NotesWidget(QWidget):
             except Exception as e:
                 rospy.logwarn('Failed to write to file: {0}'.format(e))
             else:
-                rospy.loginfo('Succesfully written to file {0}'.format(file_name))
+                rospy.loginfo('Successfully written to file {0}'.format(file_name))
             finally:
                 handle.close()
