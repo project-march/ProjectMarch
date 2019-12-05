@@ -74,7 +74,7 @@ class NotesWidget(QWidget):
                 return
 
             try:
-                handle.write(repr(self._model))
+                handle.write(str(self._model))
             except Exception as e:
                 rospy.logwarn('Failed to write to file: {0}'.format(e))
             else:
