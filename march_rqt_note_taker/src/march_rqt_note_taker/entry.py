@@ -27,4 +27,4 @@ class Entry(QObject):
 
     def __str__(self):
         """Returns a string representation of an Entry."""
-        return '[{0}] {1}'.format(self.time_string(), self.content)
+        return '[{0}] {1}'.format(self.date_time.toString(), self.content)
