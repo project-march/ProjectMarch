@@ -126,8 +126,16 @@ class InputDevicePlugin(Plugin):
                                                           'gait_rough_terrain_middle_steps'))
 
         gait_ramp_door_slope_up = MarchButton(name='gait_ramp_door_slope_up',
-                                              text='MV Ramp and Door slope up',
+                                              text='Ramp and Door slope up',
                                               callback=lambda: self.publish_gait('gait_ramp_door_slope_up'))
+
+        gait_ramp_door_slope_down = MarchButton(name='gait_ramp_door_slope_down',
+                                                text='Ramp and Door slope down',
+                                                callback=lambda: self.publish_gait('gait_ramp_door_slope_down'))
+
+        gait_ramp_door_last_step = MarchButton(name='gait_ramp_door_last_step',
+                                               text='Ramp and Door last step',
+                                               callback=lambda: self.publish_gait('gait_ramp_door_last_step'))
 
         stop_button = MarchButton(name='gait_stop', image='/stop.png',
                                   callback=lambda: self.publish_stop())
@@ -151,7 +159,7 @@ class InputDevicePlugin(Plugin):
              gait_rough_terrain_middle_steps, error_button],
             [gait_stairs_up_button, gait_stairs_down_button, gait_tilted_path_first_starting_step,
              gait_tilted_path_first_ending_step],
-            [gait_ramp_door_slope_up],
+            [gait_ramp_door_slope_up, gait_ramp_door_slope_down, gait_ramp_door_last_step],
         ]
 
         # Create the qt_layout from the button layout.
