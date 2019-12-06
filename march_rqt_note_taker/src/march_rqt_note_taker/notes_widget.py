@@ -1,6 +1,7 @@
 from python_qt_binding import loadUi
 from python_qt_binding.QtGui import QKeySequence
-from python_qt_binding.QtWidgets import QShortcut, QWidget
+from python_qt_binding.QtWidgets import QFileDialog, QShortcut, QWidget
+import rospy
 
 from .entry import Entry
 
@@ -25,8 +26,17 @@ class NotesWidget(QWidget):
 
         self.take_button.clicked.connect(self._handle_start_take)
 
+        self.load_button.clicked.connect(self._handle_load)
+        self.save_button.clicked.connect(self._handle_save)
+
         self._delete_shortcut = QShortcut(QKeySequence('Delete'), self)
         self._delete_shortcut.activated.connect(self._delete_selected)
+
+        self._load_shortcut = QShortcut(QKeySequence('Ctrl+O'), self)
+        self._load_shortcut.activated.connect(self._handle_load)
+
+        self._save_shortcut = QShortcut(QKeySequence('Ctrl+S'), self)
+        self._save_shortcut.activated.connect(self._handle_save)
 
     def _handle_insert_entry(self):
         entry = self.input_field.text().strip()
@@ -55,3 +65,21 @@ class NotesWidget(QWidget):
             indices = [index for index in selection_model.selectedIndexes() if not index.column()]
             if indices and indices[0].isValid():
                 self._model.remove_rows(indices[0].row(), len(indices))
+
+    def _handle_load(self):
+        rospy.logwarn('Loading notes from a file is not yet implemented')
+
+    def _handle_save(self):
+        result = QFileDialog.getSaveFileName(self, 'Save File', '.', 'Minute files (*.txt)')
+        file_name = result[0]
+        if file_name:
+            if file_name[-4:] != '.txt':
+                file_name += '.txt'
+            try:
+                with open(file_name, 'w') as f:
+                    f.write(str(self._model))
+            except IOError as e:
+                rospy.logwarn('Failed to open file: {0}'.format(e))
+                return
+            else:
+                rospy.loginfo('Successfully written to file {0}'.format(file_name))

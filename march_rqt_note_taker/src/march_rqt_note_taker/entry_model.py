@@ -73,3 +73,7 @@ class EntryModel(QAbstractTableModel):
         :param log_msg: Log msg to
         """
         self.insert_row(Entry.from_ros_msg(log_msg))
+
+    def __str__(self):
+        """Returns a string representation of the model."""
+        return '\n'.join(str(x) for x in self._entries)
