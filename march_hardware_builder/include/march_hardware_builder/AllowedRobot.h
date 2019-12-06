@@ -11,8 +11,8 @@ public:
   {
     march4,
     march3,
-    testjoint_rotational,
-    testjoint_linear,
+    test_joint_rotational,
+    test_joint_linear,
     pdb,
   };
 
@@ -27,13 +27,13 @@ public:
     {
       this->value = march3;
     }
-    else if (robotName == "testjoint_rotational")
+    else if (robotName == "test_joint_rotational")
     {
-      this->value = testjoint_rotational;
+      this->value = test_joint_rotational;
     }
-    else if (robotName == "testjoint_linear")
+    else if (robotName == "test_joint_linear")
     {
-      this->value = testjoint_linear;
+      this->value = test_joint_linear;
     }
     else if (robotName == "pdb")
     {
@@ -42,7 +42,7 @@ public:
     else
     {
       ROS_ASSERT_MSG(false, "Unknown robot %s", robotName.c_str());
-      this->value = AllowedRobot::testjoint_rotational;
+      this->value = AllowedRobot::test_joint_rotational;
     }
   }
 
@@ -57,11 +57,11 @@ public:
     {
       return basePath.append("/robots/march3.yaml");
     }
-    else if (this->value == AllowedRobot::testjoint_rotational)
+    else if (this->value == AllowedRobot::test_joint_rotational)
     {
       return basePath.append("/robots/test_joint_rotational.yaml");
     }
-    else if (this->value == AllowedRobot::testjoint_linear)
+    else if (this->value == AllowedRobot::test_joint_linear)
     {
       return basePath.append("/robots/test_joint_linear.yaml");
     }

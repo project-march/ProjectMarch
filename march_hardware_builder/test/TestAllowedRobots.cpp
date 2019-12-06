@@ -98,10 +98,10 @@ TEST_F(AllowedRobotTest, TestMarch3Values)
 
 TEST_F(AllowedRobotTest, TestTestRotationalSetupCreation)
 {
-  ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::testjoint_rotational).createMarchRobot());
+  ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::test_joint_rotational).createMarchRobot());
 }
 
 TEST_F(AllowedRobotTest, TestTestLinearSetupCreation)
 {
-  ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::testjoint_linear).createMarchRobot());
+  ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::test_joint_linear).createMarchRobot());
 }
