@@ -4,24 +4,25 @@
 #include <ros/ros.h>
 #include <gmock/gmock.h>
 #include <ros/package.h>
-#include <march_hardware_builder/HardwareConfigExceptions.h>
-#include <march_hardware_builder/HardwareBuilder.h>
+#include <march_hardware_builder/hardware_config_exceptions.h>
+#include <march_hardware_builder/hardware_builder.h>
 
 using ::testing::AtLeast;
 using ::testing::Return;
 
-class AllowedRobotTest : public ::testing::Test
+TEST(AllowedRobotTest, TestMarch4Creation)
 {
-protected:
-};
+  HardwareBuilder hardwareBuilder = HardwareBuilder(AllowedRobot::march4);
+  ASSERT_NO_THROW(march4cpp::MarchRobot march4 = hardwareBuilder.createMarchRobot());
+}
 
-TEST_F(AllowedRobotTest, TestMarch3Creation)
+TEST(AllowedRobotTest, TestMarch3Creation)
 {
   HardwareBuilder hardwareBuilder = HardwareBuilder(AllowedRobot::march3);
   ASSERT_NO_THROW(march4cpp::MarchRobot march3 = hardwareBuilder.createMarchRobot());
 }
 
-TEST_F(AllowedRobotTest, TestMarch3Values)
+TEST(AllowedRobotTest, TestMarch3Values)
 {
   march4cpp::MarchRobot march3 = HardwareBuilder(AllowedRobot::march3).createMarchRobot();
 
@@ -96,12 +97,12 @@ TEST_F(AllowedRobotTest, TestMarch3Values)
   ASSERT_EQ(actualRobot, march3);
 }
 
-TEST_F(AllowedRobotTest, TestTestRotationalSetupCreation)
+TEST(AllowedRobotTest, TestTestRotationalSetupCreation)
 {
   ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::test_joint_rotational).createMarchRobot());
 }
 
-TEST_F(AllowedRobotTest, TestTestLinearSetupCreation)
+TEST(AllowedRobotTest, TestTestLinearSetupCreation)
 {
   ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::test_joint_linear).createMarchRobot());
 }

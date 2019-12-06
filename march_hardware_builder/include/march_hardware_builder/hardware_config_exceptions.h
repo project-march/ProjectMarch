@@ -21,7 +21,6 @@ public:
 
   const char* what() const throw()
   {
-    ROS_ERROR_STREAM(msg);
     return msg.c_str();
   }
 };
@@ -29,15 +28,15 @@ public:
 class MissingKeyException : public HardwareConfigException
 {
 public:
-  std::string keyName;
-  std::string objectName;
+  std::string key_name;
+  std::string object_name;
 
-  explicit MissingKeyException(std::string keyName, std::string objectName)
-    : HardwareConfigException(), keyName(keyName), objectName(objectName)
+  explicit MissingKeyException(std::string key_name, std::string object_name)
+    : HardwareConfigException(), key_name(key_name), object_name(object_name)
   {
-    std::ostringstream stringStream;
-    stringStream << "Missing key '" << keyName << "' while creating object '" << objectName << "'";
-    this->msg = stringStream.str();
+    std::ostringstream ss;
+    ss << "Missing key '" << key_name << "' while creating object '" << object_name << "'";
+    this->msg = ss.str();
   }
 };
 #endif  // MARCH_HARDWARE_BUILDER_HARDWARECONFIGEXCEPTIONS_H

@@ -29,7 +29,7 @@ roslint_cpp(${lintfiles})
 include_directories(include SYSTEM ${catkin_INCLUDE_DIRS})
 
 add_library(${PROJECT_NAME}
-    src/HardwareBuilder.cpp
+    src/hardware_builder.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -53,23 +53,21 @@ install(TARGETS ${PROJECT_NAME}
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
     find_package(code_coverage REQUIRED)
-    find_package(rostest REQUIRED)
 
     if(ENABLE_COVERAGE_TESTING)
         include(CodeCoverage)
         append_coverage_compiler_flags()
     endif()
 
-    add_rostest_gtest(${PROJECT_NAME}-test
-        test/${PROJECT_NAME}.test
-        test/TestRunner.cpp
-        test/TestAllowedRobots.cpp
-        test/TestHardwareBuilderCreateEncoder.cpp
-        test/TestHardwareBuilderCreateIMotionCube.cpp
-        test/TestHardwareBuilderCreateJoint.cpp
-        test/TestHardwareBuilderCreatePowerDistributionBoard.cpp
+    catkin_add_gtest(${PROJECT_NAME}_test
+        test/test_runner.cpp
+        test/allowed_robot_test.cpp
+        test/encoder_builder_test.cpp
+        test/imc_builder_test.cpp
+        test/joint_builder_test.cpp
+        test/pdb_builder_test.cpp
     )
-    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} ${PROJECT_NAME} gtest gmock)
+    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME} gtest gmock)
 
     if(ENABLE_COVERAGE_TESTING)
         set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*")
