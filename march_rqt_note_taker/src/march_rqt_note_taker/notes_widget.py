@@ -70,20 +70,16 @@ class NotesWidget(QWidget):
         rospy.logwarn('Loading notes from a file is not yet implemented')
 
     def _handle_save(self):
-        result = QFileDialog.getSaveFileName(self, 'Save File')
+        result = QFileDialog.getSaveFileName(self, 'Save File', '.', 'Minute files (*.txt)')
         file_name = result[0]
         if file_name:
+            if file_name[-4:] != '.txt':
+                file_name += '.txt'
             try:
-                handle = open(file_name, 'w')
+                with open(file_name, 'w') as f:
+                    f.write(str(self._model))
             except IOError as e:
                 rospy.logwarn('Failed to open file: {0}'.format(e))
                 return
-
-            try:
-                handle.write(str(self._model))
-            except Exception as e:
-                rospy.logwarn('Failed to write to file: {0}'.format(e))
             else:
                 rospy.loginfo('Successfully written to file {0}'.format(file_name))
-            finally:
-                handle.close()
