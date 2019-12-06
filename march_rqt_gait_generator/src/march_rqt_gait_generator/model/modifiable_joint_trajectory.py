@@ -23,7 +23,7 @@ class ModifiableJointTrajectory(JointTrajectory):
 
     @classmethod
     def from_dict(cls, subgait_dict, joint_name, limits, duration, gait_generator):
-        user_defined_setpoints = subgait_dict['setpoints']
+        user_defined_setpoints = subgait_dict.get('setpoints')
         if user_defined_setpoints:
             joint_trajectory = subgait_dict['trajectory']
             setpoints = []
