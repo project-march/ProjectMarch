@@ -1,21 +1,22 @@
 <launch>
     <arg name="use_sim_time" default="true" doc="Uses simulated time and publishes on /clock."/>
-    <arg name="fake_sensor_data" default="true" doc="Publishes fake sensor data."/>
+    <arg name="fake_sensor_data" default="false" doc="Publishes fake sensor data."/>
     <arg name="gazebo_ui" default="true" doc="Launches the Gazebo UI."/>
     <arg name="debug" default="false" doc="Starts gazebo debugging with gdb."/>
+    <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_rotational."/>
 
     <!-- Load the URDF into the ROS Parameter Server -->
     <!-- Override effort values as Gazebo uses different units than the actual IMC. -->
     <!-- In theory, if the controller is properly tuned, these values can be arbitrarily large. -->
     <!-- However, to limit the safety controller, we need to limit them. -->
     <param name="robot_description"
-           command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/march4.xacro'
+           command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/$(arg robot).xacro'
                     k_velocity_value_rotary:=60.0 k_velocity_value_linear:=60.0
                     k_position_value_rotary:=50.0 k_position_value_linear:=50.0
                     max_effort_rotary:=200.0 max_effort_linear:=40.0" />
 
     <!-- Upload the controller configuration -->
-    <rosparam file="$(find march_simulation)/config/config_march-iv.yaml" command="load"/>
+    <rosparam file="$(find march_simulation)/config/$(arg robot).yaml" command="load"/>
 
     <group ns="march">
         <node name="controller_spawner" pkg="controller_manager" type="spawner"
