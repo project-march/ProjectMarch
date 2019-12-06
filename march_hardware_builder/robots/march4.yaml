@@ -63,7 +63,7 @@ march4:
         temperatureges: {slaveIndex: 4, byteOffset: 0}
         imotioncube:
           slaveIndex: 3
-          encoder: {resolution: 12, minPositionIU: 462, maxPositionIU: 937, zeroPositionIU: 759, safetyMarginRad: 0}
+          encoder: {resolution: 12, minPositionIU: 466, maxPositionIU: 930, zeroPositionIU: 762, safetyMarginRad: 0}
 
     - left_ankle:
         actuationMode: position
