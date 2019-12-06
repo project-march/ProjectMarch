@@ -10,11 +10,7 @@
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 
         <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="true"
-              args="
-                    /march/controller/joint_state
-                    /march/controller/temperature_sensor
-                    /march/controller/trajectory
-                "
+              args="controller/joint_state controller/temperature_sensor controller/trajectory"
         />
 
         <node
