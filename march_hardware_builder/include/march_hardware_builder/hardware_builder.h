@@ -44,15 +44,15 @@ public:
    * config. Throws a MissingKeyException when
    *     keys are missing.
    */
-  static void validateRequiredKeysExist(const YAML::Node& config,
-                                 const std::vector<std::string>& key_list,
-                                 const std::string& object_name);
+  static void validateRequiredKeysExist(const YAML::Node& config, const std::vector<std::string>& key_list,
+                                        const std::string& object_name);
 
   static march4cpp::Joint createJoint(const YAML::Node& joint_config, const std::string& joint_name);
   static march4cpp::Encoder createEncoder(const YAML::Node& encoder_config);
   static march4cpp::IMotionCube createIMotionCube(const YAML::Node& imc_config);
   static march4cpp::TemperatureGES createTemperatureGES(const YAML::Node& temperature_ges_config);
-  static march4cpp::PowerDistributionBoard createPowerDistributionBoard(const YAML::Node& power_distribution_board_config);
+  static march4cpp::PowerDistributionBoard
+  createPowerDistributionBoard(const YAML::Node& power_distribution_board_config);
 
   static const std::vector<std::string> ENCODER_REQUIRED_KEYS;
   static const std::vector<std::string> IMOTIONCUBE_REQUIRED_KEYS;

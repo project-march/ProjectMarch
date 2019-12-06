@@ -10,7 +10,8 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
   ros::AsyncSpinner spinner(2);
 
-  if (argc < 2) {
+  if (argc < 2)
+  {
     ROS_FATAL("Missing robot argument\nusage: march_hardware_interface_node ROBOT");
     return 1;
   }

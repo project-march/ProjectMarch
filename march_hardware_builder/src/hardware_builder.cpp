@@ -21,14 +21,12 @@ const std::vector<std::string> HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRE
 const std::vector<std::string> HardwareBuilder::JOINT_REQUIRED_KEYS = { "allowActuation" };
 // clang-format on
 
-HardwareBuilder::HardwareBuilder(AllowedRobot robot)
-    : HardwareBuilder::HardwareBuilder(robot.getFilePath())
+HardwareBuilder::HardwareBuilder(AllowedRobot robot) : HardwareBuilder::HardwareBuilder(robot.getFilePath())
 {
 }
 
 HardwareBuilder::HardwareBuilder(const std::string& yaml_path)
-  : yaml_path_(yaml_path)
-  , robot_config_(YAML::LoadFile(yaml_path))
+  : yaml_path_(yaml_path), robot_config_(YAML::LoadFile(yaml_path))
 {
 }
 
@@ -143,9 +141,8 @@ march4cpp::Encoder HardwareBuilder::createEncoder(const YAML::Node& encoder_conf
 
 march4cpp::TemperatureGES HardwareBuilder::createTemperatureGES(const YAML::Node& temperature_ges_config)
 {
-  HardwareBuilder::validateRequiredKeysExist(temperature_ges_config,
-                                  HardwareBuilder::TEMPERATUREGES_REQUIRED_KEYS,
-                                  "temperatureges");
+  HardwareBuilder::validateRequiredKeysExist(temperature_ges_config, HardwareBuilder::TEMPERATUREGES_REQUIRED_KEYS,
+                                             "temperatureges");
 
   int slave_index = temperature_ges_config["slaveIndex"].as<int>();
   int byte_offset = temperature_ges_config["byteOffset"].as<int>();
@@ -155,7 +152,7 @@ march4cpp::TemperatureGES HardwareBuilder::createTemperatureGES(const YAML::Node
 march4cpp::PowerDistributionBoard HardwareBuilder::createPowerDistributionBoard(const YAML::Node& pdb)
 {
   HardwareBuilder::validateRequiredKeysExist(pdb, HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS,
-                                  "powerdistributionboard");
+                                             "powerdistributionboard");
 
   int slave_index = pdb["slaveIndex"].as<int>();
   YAML::Node net_monitor_byte_offsets = pdb["netMonitorByteOffsets"];
@@ -169,22 +166,20 @@ march4cpp::PowerDistributionBoard HardwareBuilder::createPowerDistributionBoard(
       net_monitor_byte_offsets["highVoltageNetCurrent"].as<int>(),
       net_monitor_byte_offsets["lowVoltageState"].as<int>(),
       net_monitor_byte_offsets["highVoltageOvercurrentTrigger"].as<int>(),
-      net_monitor_byte_offsets["highVoltageEnabled"].as<int>(),
-      net_monitor_byte_offsets["highVoltageState"].as<int>());
+      net_monitor_byte_offsets["highVoltageEnabled"].as<int>(), net_monitor_byte_offsets["highVoltageState"].as<int>());
 
-  NetDriverOffsets net_driver_offsets = NetDriverOffsets(net_driver_byte_offsets["lowVoltageNetOnOff"].as<int>(),
-                                                       net_driver_byte_offsets["highVoltageNetOnOff"].as<int>(),
-                                                       net_driver_byte_offsets["highVoltageNetEnableDisable"].as<int>());
+  NetDriverOffsets net_driver_offsets = NetDriverOffsets(
+      net_driver_byte_offsets["lowVoltageNetOnOff"].as<int>(), net_driver_byte_offsets["highVoltageNetOnOff"].as<int>(),
+      net_driver_byte_offsets["highVoltageNetEnableDisable"].as<int>());
 
-  BootShutdownOffsets boot_shutdown_offsets =
-      BootShutdownOffsets(boot_shutdown_byte_offsets["masterOk"].as<int>(), boot_shutdown_byte_offsets["shutdown"].as<int>(),
-                          boot_shutdown_byte_offsets["shutdownAllowed"].as<int>());
+  BootShutdownOffsets boot_shutdown_offsets = BootShutdownOffsets(
+      boot_shutdown_byte_offsets["masterOk"].as<int>(), boot_shutdown_byte_offsets["shutdown"].as<int>(),
+      boot_shutdown_byte_offsets["shutdownAllowed"].as<int>());
 
   return march4cpp::PowerDistributionBoard(slave_index, net_monitor_offsets, net_driver_offsets, boot_shutdown_offsets);
 }
 
-void HardwareBuilder::validateRequiredKeysExist(const YAML::Node& config,
-                                                const std::vector<std::string>& key_list,
+void HardwareBuilder::validateRequiredKeysExist(const YAML::Node& config, const std::vector<std::string>& key_list,
                                                 const std::string& object_name)
 {
   for (const std::string& key : key_list)

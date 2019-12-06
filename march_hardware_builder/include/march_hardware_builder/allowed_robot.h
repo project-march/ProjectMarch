@@ -87,7 +87,7 @@ public:
     return value != a.value;
   }
 
-  friend std::ostream& operator <<(std::ostream& out, const AllowedRobot& c)
+  friend std::ostream& operator<<(std::ostream& out, const AllowedRobot& c)
   {
     switch (c.value)
     {
