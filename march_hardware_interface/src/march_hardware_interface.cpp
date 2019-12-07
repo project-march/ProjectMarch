@@ -502,7 +502,7 @@ void MarchHardwareInterface::iMotionCubeStateCheck(int joint_index)
       errorStream << "Motion Error: " << iMotionCubeState.motionErrorDescription << "(" << iMotionCubeState.motionError
                   << ")" << std::endl;
 
-      ROS_FATAL_STREAM(errorStream);
+      ROS_FATAL("%s", errorStream.str().c_str());
       throw std::runtime_error(errorStream.str());
     }
   }
@@ -524,7 +524,7 @@ void MarchHardwareInterface::outsideLimitsCheck(int joint_index)
       errorStream << "Joint " << joint_names_[joint_index].c_str() << " is out of its soft limits ("
                   << soft_limits_[joint_index].min_position << ", " << soft_limits_[joint_index].max_position
                   << "). Actual position: " << joint_position_[joint_index];
-      ROS_FATAL_STREAM(errorStream);
+      ROS_FATAL("%s", errorStream.str().c_str());
       throw ::std::runtime_error(errorStream.str());
     }
   }
