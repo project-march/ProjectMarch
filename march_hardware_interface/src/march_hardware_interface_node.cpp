@@ -1,7 +1,4 @@
 // Copyright 2019 Project March.
-#include <string>
-#include <march_hardware_builder/hardware_builder.h>
-#include <march_hardware_builder/hardware_config_exceptions.h>
 #include <march_hardware_interface/march_hardware_interface.h>
 
 int main(int argc, char** argv)
