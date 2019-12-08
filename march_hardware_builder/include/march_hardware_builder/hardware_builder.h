@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
-#ifndef MARCH_HARDWARE_BUILDER_HARDWAREBUILDER_H
-#define MARCH_HARDWARE_BUILDER_HARDWAREBUILDER_H
+#ifndef MARCH_HARDWARE_BUILDER_HARDWARE_BUILDER_H
+#define MARCH_HARDWARE_BUILDER_HARDWARE_BUILDER_H
 #include <string>
 #include <vector>
 #include <yaml-cpp/yaml.h>
@@ -65,4 +65,4 @@ private:
   YAML::Node robot_config_;
 };
 
-#endif  // MARCH_HARDWARE_BUILDER_HARDWAREBUILDER_H
+#endif  // MARCH_HARDWARE_BUILDER_HARDWARE_BUILDER_H
