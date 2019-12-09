@@ -9,7 +9,7 @@
 #include <realtime_tools/realtime_publisher.h>
 #include <march_shared_resources/ImcErrorState.h>
 #include <march_shared_resources/AfterLimitJointCommand.h>
-#include <march_hardware_builder/HardwareBuilder.h>
+#include <march_hardware_builder/hardware_builder.h>
 
 #include <march_hardware/MarchRobot.h>
 

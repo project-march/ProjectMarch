@@ -5,8 +5,8 @@
 #include <ros/ros.h>
 #include <gmock/gmock.h>
 #include <ros/package.h>
-#include <march_hardware_builder/HardwareConfigExceptions.h>
-#include <march_hardware_builder/HardwareBuilder.h>
+#include <march_hardware_builder/hardware_config_exceptions.h>
+#include <march_hardware_builder/hardware_builder.h>
 
 using ::testing::AtLeast;
 using ::testing::Return;
@@ -15,7 +15,6 @@ class PowerDistributionBoardTest : public ::testing::Test
 {
 protected:
   std::string base_path;
-  HardwareBuilder hardwareBuilder;
 
   void SetUp() override
   {
@@ -34,7 +33,7 @@ TEST_F(PowerDistributionBoardTest, ValidPowerDistributionBoard)
   YAML::Node config = YAML::LoadFile(fullPath);
 
   march4cpp::PowerDistributionBoard createdPowerDistributionBoard =
-      hardwareBuilder.createPowerDistributionBoard(config);
+      HardwareBuilder::createPowerDistributionBoard(config);
   NetMonitorOffsets netMonitoringOffsets(5, 9, 13, 17, 3, 2, 1, 4);
   NetDriverOffsets netDriverOffsets(4, 3, 2);
   BootShutdownOffsets bootShutdownOffsets(0, 0, 1);
@@ -48,19 +47,19 @@ TEST_F(PowerDistributionBoardTest, MissingSlaveIndex)
 {
   std::string fullPath = this->fullPath("/power_distribution_board_missing_slave_index.yaml");
   YAML::Node config = YAML::LoadFile(fullPath);
-  ASSERT_THROW(hardwareBuilder.createPowerDistributionBoard(config), MissingKeyException);
+  ASSERT_THROW(HardwareBuilder::createPowerDistributionBoard(config), MissingKeyException);
 }
 
 TEST_F(PowerDistributionBoardTest, MissingHighVoltageStateIndex)
 {
   std::string fullPath = this->fullPath("/power_distribution_board_missing_high_voltage_state_index.yaml");
   YAML::Node config = YAML::LoadFile(fullPath);
-  ASSERT_THROW(hardwareBuilder.createPowerDistributionBoard(config), MissingKeyException);
+  ASSERT_THROW(HardwareBuilder::createPowerDistributionBoard(config), MissingKeyException);
 }
 
 TEST_F(PowerDistributionBoardTest, NegativeOffset)
 {
   std::string fullPath = this->fullPath("/power_distribution_board_negative_offset.yaml");
   YAML::Node config = YAML::LoadFile(fullPath);
-  ASSERT_THROW(hardwareBuilder.createPowerDistributionBoard(config), std::runtime_error);
+  ASSERT_THROW(HardwareBuilder::createPowerDistributionBoard(config), std::runtime_error);
 }
