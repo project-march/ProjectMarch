@@ -217,6 +217,7 @@ void MarchHardwareInterface::init()
       joint.prepareActuation();
     }
   }
+  ROS_INFO("Successfully actuated all joints");
 }
 
 void MarchHardwareInterface::update(const ros::TimerEvent& e)
@@ -501,6 +502,7 @@ void MarchHardwareInterface::iMotionCubeStateCheck(int joint_index)
       errorStream << "Motion Error: " << iMotionCubeState.motionErrorDescription << "(" << iMotionCubeState.motionError
                   << ")" << std::endl;
 
+      ROS_FATAL("%s", errorStream.str().c_str());
       throw std::runtime_error(errorStream.str());
     }
   }
@@ -512,16 +514,17 @@ void MarchHardwareInterface::outsideLimitsCheck(int joint_index)
   if (joint_position_[joint_index] < soft_limits_[joint_index].min_position ||
       joint_position_[joint_index] > soft_limits_[joint_index].max_position)
   {
-    ROS_ERROR_THROTTLE(1, "Joint %s is outside of its soft_limits_ (%f, %f). Actual position: %f",
+    ROS_ERROR_THROTTLE(1, "Joint %s is outside of its soft limits (%f, %f). Actual position: %f",
                        joint_names_[joint_index].c_str(), soft_limits_[joint_index].min_position,
                        soft_limits_[joint_index].max_position, joint_position_[joint_index]);
 
     if (joint.canActuate())
     {
       std::ostringstream errorStream;
-      errorStream << "Joint " << joint_names_[joint_index].c_str() << " is out of its soft_limits_ ("
+      errorStream << "Joint " << joint_names_[joint_index].c_str() << " is out of its soft limits ("
                   << soft_limits_[joint_index].min_position << ", " << soft_limits_[joint_index].max_position
                   << "). Actual position: " << joint_position_[joint_index];
+      ROS_FATAL("%s", errorStream.str().c_str());
       throw ::std::runtime_error(errorStream.str());
     }
   }
