@@ -15,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package()
 
-catkin_install_python(PROGRAMS scripts/upload_joint_names
+catkin_install_python(PROGRAMS scripts/upload_joint_names scripts/to_world_transform
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

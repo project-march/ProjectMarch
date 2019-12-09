@@ -3,6 +3,7 @@
     <arg name="fake_sensor_data" default="false" doc="Publishes fake sensor data."/>
     <arg name="gazebo_ui" default="true" doc="Launches the Gazebo UI."/>
     <arg name="debug" default="false" doc="Starts gazebo debugging with gdb."/>
+    <arg name="fixed" default="true" doc="Fixes the exoskeleton in the world"/>
     <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_rotational."/>
 
     <!-- Load the URDF into the ROS Parameter Server -->
@@ -24,6 +25,8 @@
 
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
         <node name="upload_joint_names" pkg="march_simulation" type="upload_joint_names"/>
+        <node name="world_transformer" pkg="march_simulation" type="to_world_transform" unless="$(arg fixed)"/>
+
         <include file="$(find march_fake_sensor_data)/launch/march_fake_sensor_data.launch" if="$(arg fake_sensor_data)"/>
     </group>
 
