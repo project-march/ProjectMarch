@@ -197,7 +197,7 @@ void EthercatMaster::monitorSlaveConnection()
     if (!ec_slave[slave].state)
     {
       // TODO(@Tim, @Isha, @Martijn) throw error when it happens multiple times in a short period of time.
-      ROS_WARN("EtherCAT train lost connection from slave %d onwards", slave);
+      ROS_WARN_THROTTLE(1, "EtherCAT train lost connection from slave %d onwards", slave);
       return;
     }
   }
