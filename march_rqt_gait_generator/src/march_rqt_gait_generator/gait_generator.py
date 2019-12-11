@@ -295,8 +295,8 @@ class GaitGeneratorPlugin(Plugin):
         self.velocity_markers_check_box.toggle()
 
     def publish_gait(self):
-        trajectory = self.gait.to_joint_trajectory_msg()
-        rospy.loginfo('Publishing trajectory to topic '' + self.topic_name + ''')
+        trajectory = self.gait._to_joint_trajectory_msg()
+        rospy.loginfo('Publishing trajectory to topic ' + self.topic_name + '')
         self.gait_publisher.publish(trajectory)
 
     def set_current_time(self, current_time):
