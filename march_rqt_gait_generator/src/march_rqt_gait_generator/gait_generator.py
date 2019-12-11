@@ -296,7 +296,7 @@ class GaitGeneratorPlugin(Plugin):
 
     def publish_gait(self):
         trajectory = self.gait._to_joint_trajectory_msg()
-        rospy.loginfo('Publishing trajectory to topic ' + self.topic_name + '')
+        rospy.loginfo('Publishing trajectory to topic ' + self.topic_name)
         self.gait_publisher.publish(trajectory)
 
     def set_current_time(self, current_time):
