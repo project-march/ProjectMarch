@@ -43,8 +43,8 @@ include_directories(include SYSTEM ${catkin_INCLUDE_DIRS})
 
 # needed to circumvent LD_LIBRARY_PATH being emptied through ethercat_grant
 # in addition to not propagating march_hardware_interface RUNPATH to dependencies, in contrast to RPATH
-SET(GCC_NEWDTAGS_LINK_FLAGS "-Wl,--disable-new-dtags")
-SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_NEWDTAGS_LINK_FLAGS}")
+set(GCC_NEWDTAGS_LINK_FLAGS "-Wl,--disable-new-dtags")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_NEWDTAGS_LINK_FLAGS}")
 
 add_executable(${PROJECT_NAME}_node
     src/march_hardware_interface.cpp
