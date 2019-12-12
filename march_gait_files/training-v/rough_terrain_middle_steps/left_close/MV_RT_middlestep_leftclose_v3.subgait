@@ -1,7 +1,6 @@
 name: ''
 version: ''
-description: "The left close gait, so the last step, for the steps over the middle beams of the\
-  \ Rough Terrain."
+description: "Adjusted left close gait for the middle beams of the Rough Terrain."
 gait_type: ''
 setpoints: 
   - 
@@ -40,6 +39,11 @@ setpoints:
       secs: 1
       nsecs: 199999999
     joint_names: [left_hip_fe]
+  - 
+    time_from_start: 
+      secs: 1
+      nsecs: 617200000
+    joint_names: [left_knee]
   - 
     time_from_start: 
       secs: 2
@@ -97,21 +101,29 @@ trajectory:
         secs: 0
         nsecs: 783400000
     - 
-      positions: [0.0, 0.0358, 0.1167, 0.0436, 0.0, 0.6671, 1.3238, 0.1108]
-      velocities: [0.0, -0.1833, -0.1171, -0.0, 0.0, 0.6121, -1.0004, -0.0643]
+      positions: [0.0, 0.0358, 0.1167, 0.0436, 0.0, 0.6671, 1.3707, 0.1108]
+      velocities: [0.0, -0.1833, -0.1171, -0.0, 0.0, 0.6121, -0.6312, -0.0643]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 1
         nsecs:         0
     - 
-      positions: [0.0, -0.0006, 0.0893, 0.0436, 0.0, 0.7156, 1.0549, 0.0954]
-      velocities: [0.0, -0.1766, -0.1488, 0.0, 0.0, -0.1745, -1.5812, -0.0847]
+      positions: [0.0, -0.0006, 0.0893, 0.0436, 0.0, 0.7156, 1.1797, 0.0954]
+      velocities: [0.0, -0.1766, -0.1488, 0.0, 0.0, -0.1745, -1.2379, -0.0847]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 1
         nsecs: 199999999
+    - 
+      positions: [0.0, -0.0628, 0.0284, 0.0436, 0.0, 0.285, 0.3881, 0.0602]
+      velocities: [0.0, -0.1166, -0.1284, 0.0, 0.0, -1.461, -2.5, -0.0749]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs: 617200000
     - 
       positions: [0.0, -0.0873, 0.0, 0.0436, 0.0, -0.0873, 0.0, 0.0436]
       velocities: [-0.0, 0.0, 0.0, -0.0, -0.0, 0.0, 0.0, -0.0]
