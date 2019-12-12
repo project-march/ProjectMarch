@@ -33,19 +33,18 @@ catkin_package(
     roscpp
     std_msgs
     urdf
+    CFG_EXTRAS
+    ${PROJECT_NAME}-extras.cmake
 )
 
-set(ROSLINT_CPP_OPTS "--linelength=120")
-
-file(GLOB_RECURSE lintfiles
-    "include/*.h"
-    "src/*.cpp"
-)
-
-roslint_cpp(${lintfiles})
-
+include(cmake/${PROJECT_NAME}-extras.cmake)
 
 include_directories(include SYSTEM ${catkin_INCLUDE_DIRS})
+
+# needed to circumvent LD_LIBRARY_PATH being emptied through ethercat_grant
+# in addition to not propagating march_hardware_interface RUNPATH to dependencies, in contrast to RPATH
+SET(GCC_NEWDTAGS_LINK_FLAGS "-Wl,--disable-new-dtags")
+SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_NEWDTAGS_LINK_FLAGS}")
 
 add_executable(${PROJECT_NAME}_node
     src/march_hardware_interface.cpp
@@ -55,6 +54,7 @@ add_executable(${PROJECT_NAME}_node
 add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES})
+ros_enable_rpath(${PROJECT_NAME}_node)
 
 install(DIRECTORY include/${PROJECT_NAME}/
     DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
@@ -69,7 +69,7 @@ install(DIRECTORY config launch
 )
 
 ## Add gtest based cpp test target and link libraries
-if (CATKIN_ENABLE_TESTING)
+if(CATKIN_ENABLE_TESTING)
     find_package(code_coverage REQUIRED)
     find_package(rostest REQUIRED)
 
@@ -92,4 +92,13 @@ if (CATKIN_ENABLE_TESTING)
             DEPENDS tests
         )
     endif()
-endif ()
+endif()
+
+set(ROSLINT_CPP_OPTS "--linelength=120")
+
+file(GLOB_RECURSE lintfiles
+    "include/*.h"
+    "src/*.cpp"
+)
+
+roslint_cpp(${lintfiles})
