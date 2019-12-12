@@ -26,6 +26,9 @@
 
   <build_depend>roslint</build_depend>
 
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>xacro</exec_depend>
+
   <test_depend>rostest</test_depend>
   <test_depend>code_coverage</test_depend>
 </package>
