@@ -17,5 +17,7 @@
     <depend>joint_state_controller</depend>
     <depend>joint_trajectory_controller</depend>
     <depend>xacro</depend>
+
+    <exec_depend>march_fake_sensor_data</exec_depend>
     
 </package>
