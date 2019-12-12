@@ -59,6 +59,7 @@ class ModifiableJointTrajectory(JointTrajectory):
     def set_setpoints(self, setpoints):
         self.setpoints = setpoints
         self.enforce_limits()
+        self.interpolated_setpoints = self.interpolate_setpoints()
 
     @property
     def duration(self):
