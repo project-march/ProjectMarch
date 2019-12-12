@@ -29,16 +29,10 @@ namespace march_hardware_interface
 MarchHardwareInterface::MarchHardwareInterface(ros::NodeHandle& nh, AllowedRobot robotName)
   : nh_(nh), marchRobot(HardwareBuilder(robotName).createMarchRobot())
 {
-  init();
   controller_manager_.reset(new controller_manager::ControllerManager(this, nh_));
   nh_.param("/march/hardware_interface/loop_hz", loop_hz_, 100.0);
   ros::Duration update_freq = ros::Duration(1.0 / loop_hz_);
   non_realtime_loop_ = nh_.createTimer(update_freq, &MarchHardwareInterface::update, this);
-}
-
-MarchHardwareInterface::~MarchHardwareInterface()
-{
-  this->marchRobot.stopEtherCAT();
 }
 
 void MarchHardwareInterface::init()

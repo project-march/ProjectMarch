@@ -18,6 +18,7 @@ int main(int argc, char** argv)
   spinner.start();
 
   march_hardware_interface::MarchHardwareInterface march(nh, selected_robot);
+  march.init();
 
   ros::waitForShutdown();
   return 0;
