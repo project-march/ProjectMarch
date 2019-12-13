@@ -1,4 +1,5 @@
 // Copyright 2019 Project March.
+#include <ros/ros.h>
 #include <march_hardware_interface/march_hardware_interface.h>
 
 int main(int argc, char** argv)
@@ -18,8 +19,24 @@ int main(int argc, char** argv)
   spinner.start();
 
   march_hardware_interface::MarchHardwareInterface march(nh, selected_robot);
-  march.init();
 
-  ros::waitForShutdown();
+  try
+  {
+    march.init();
+  }
+  catch (const std::exception& e)
+  {
+    ROS_FATAL("Hardware interface caught an exception during init: %s", e.what());
+    return 1;
+  }
+
+  const double loop_hz = ros::param::param("~loop_hz", 100.0);
+  ros::Rate rate(loop_hz);
+  while (ros::ok())
+  {
+    march.update(rate.expectedCycleTime());
+    rate.sleep();
+  }
+
   return 0;
 }

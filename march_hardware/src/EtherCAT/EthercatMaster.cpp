@@ -32,7 +32,6 @@ EthercatMaster::EthercatMaster(std::vector<Joint>* jointListPtr, std::string ifn
 
 EthercatMaster::~EthercatMaster()
 {
-  std::cout << "Ethercat master has been deconstructed\n";
   this->stop();
 }
 
@@ -79,7 +78,7 @@ void EthercatMaster::ethercatMasterInitiation()
  */
 void EthercatMaster::ethercatSlaveInitiation()
 {
-  ROS_INFO("Request per-operational state for all slaves");
+  ROS_INFO("Request pre-operational state for all slaves");
   ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
 
   for (auto& i : *jointListPtr)

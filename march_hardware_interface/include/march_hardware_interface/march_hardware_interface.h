@@ -42,12 +42,12 @@ public:
    * for each joint.
    */
   void init();
-  void update(const ros::TimerEvent& e);
+  void update(const ros::Duration& elapsed_time);
 
   /**
    * @brief Read actual postion from the hardware.
    */
-  void read(ros::Duration elapsed_time = ros::Duration(0.01));
+  void read(const ros::Duration& elapsed_time = ros::Duration(0.01));
 
   /**
    * @brief Perform all safety checks that might crash the exoskeleton.
@@ -58,18 +58,16 @@ public:
    * @brief Write position commands to the hardware.
    * @param elapsed_time Duration since last write action
    */
-  void write(ros::Duration elapsed_time);
+  void write(const ros::Duration& elapsed_time);
 
 protected:
   ::march4cpp::MarchRobot marchRobot;
   ros::NodeHandle nh_;
-  ros::Timer non_realtime_loop_;
   ros::Duration control_period_;
   ros::Duration elapsed_time_;
   PositionJointInterface positionJointInterface;
   PositionJointSoftLimitsInterface positionJointSoftLimitsInterface;
   EffortJointSoftLimitsInterface effortJointSoftLimitsInterface;
-  double loop_hz_;
   bool hasPowerDistributionBoard = false;
   boost::shared_ptr<controller_manager::ControllerManager> controller_manager_;
   typedef boost::shared_ptr<realtime_tools::RealtimePublisher<march_shared_resources::ImcErrorState> > RtPublisherPtr;
