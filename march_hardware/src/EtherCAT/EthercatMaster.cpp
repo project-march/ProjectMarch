@@ -81,9 +81,9 @@ void EthercatMaster::ethercatSlaveInitiation()
   ROS_INFO("Request pre-operational state for all slaves");
   ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
 
-  for (auto& i : *jointListPtr)
+  for (auto& joint : *jointListPtr)
   {
-    i.initialize(ecatCycleTimems);
+    joint.initialize(ecatCycleTimems);
   }
 
   ec_config_map(&IOmap);
