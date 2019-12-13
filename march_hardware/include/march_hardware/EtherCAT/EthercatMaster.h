@@ -18,34 +18,34 @@ namespace march4cpp
  * @param ecatCycleTimems The ethercat cycle time.
  * @param maxSlaveIndex The maximum amount of slaves connected to the train.
  */
-    class EthercatMaster
-    {
-        std::string ifname;
-        char IOmap[4096];
-        int expectedWKC;
+class EthercatMaster
+{
+  std::string ifname;
+  char IOmap[4096];
+  int expectedWKC;
 
-        std::thread EcatThread;
-        std::vector<Joint>* jointListPtr;
+  std::thread EcatThread;
+  std::vector<Joint>* jointListPtr;
 
-        int maxSlaveIndex;
-        int ecatCycleTimems;
+  int maxSlaveIndex;
+  int ecatCycleTimems;
 
-    public:
-        bool isOperational = false;
+public:
+  bool isOperational = false;
 
-        explicit EthercatMaster(std::vector<Joint>* jointListPtr, std::string ifname, int maxSlaveIndex, int ecatCycleTime);
-        ~EthercatMaster();
+  explicit EthercatMaster(std::vector<Joint>* jointListPtr, std::string ifname, int maxSlaveIndex, int ecatCycleTime);
+  ~EthercatMaster();
 
-        void start();
-        void ethercatMasterInitiation();
-        void ethercatSlaveInitiation();
+  void start();
+  void ethercatMasterInitiation();
+  void ethercatSlaveInitiation();
 
-        void ethercatLoop();
-        void SendReceivePDO();
-        static void monitorSlaveConnection();
+  void ethercatLoop();
+  void SendReceivePDO();
+  static void monitorSlaveConnection();
 
-        void stop();
-    };
+  void stop();
+};
 
-}
+}  // namespace march4cpp
 #endif  // MARCH_HARDWARE_ETHERCAT_ETHERCATMASTER_H

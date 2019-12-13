@@ -36,7 +36,6 @@ class MarchHardwareInterface : public march_hardware_interface::MarchHardware
 {
 public:
   MarchHardwareInterface(ros::NodeHandle& nh, AllowedRobot robotName);
-  ~MarchHardwareInterface();
 
   /**
    * @brief Initialize the HardwareInterface by registering position interfaces
