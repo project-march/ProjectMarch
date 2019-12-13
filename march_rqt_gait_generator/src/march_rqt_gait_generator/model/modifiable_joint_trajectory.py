@@ -1,9 +1,7 @@
 import copy
 
-import numpy as np
 from numpy_ringbuffer import RingBuffer
 import rospy
-from scipy.interpolate import BPoly
 
 from march_shared_classes.gait.joint_trajectory import JointTrajectory
 
@@ -61,6 +59,7 @@ class ModifiableJointTrajectory(JointTrajectory):
     def set_setpoints(self, setpoints):
         self.setpoints = setpoints
         self.enforce_limits()
+        self.interpolated_setpoints = self.interpolate_setpoints()
 
     @property
     def duration(self):
@@ -77,32 +76,6 @@ class ModifiableJointTrajectory(JointTrajectory):
                 return self.interpolated_setpoints[1][i - 1]
 
         return self.interpolated_setpoints[1][-1]
-
-    def get_interpolated_setpoint(self, time):
-        # If we have a setpoint this exact time there is no need to interpolate.
-        for setpoint in self.setpoints:
-            if setpoint.time == time:
-                return setpoint
-
-        interpolated_setpoints = self.interpolate_setpoints()
-        for i in range(0, len(interpolated_setpoints[0])):
-            if interpolated_setpoints[0][i] > time:
-                position = interpolated_setpoints[1][i - 1]
-                velocity = (interpolated_setpoints[1][i - 1] - interpolated_setpoints[1][i - 2]) \
-                    / (interpolated_setpoints[0][i - 1] - interpolated_setpoints[0][i - 2])
-                return ModifiableSetpoint(time, position, velocity)
-        rospy.logerr('Could not interpolate setpoint at time {0}'.format(time))
-        return ModifiableSetpoint(0, 0, 0)
-
-    def interpolate_setpoints(self):
-        time, position, velocity = self.get_setpoints_unzipped()
-        yi = []
-        for i in range(0, len(time)):
-            yi.append([position[i], velocity[i]])
-
-        bpoly = BPoly.from_derivatives(time, yi)
-        indices = np.linspace(0, self.duration, self.duration * 100)
-        return [indices, bpoly(indices)]
 
     def enforce_limits(self):
         self.setpoints[0].time = 0
