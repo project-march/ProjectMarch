@@ -9,7 +9,6 @@
 
 namespace march4cpp
 {
-
 /**
  * Base class of the ethercat master supported with the SOEM library
  * @param ifname Network interface name, check ifconfig.
