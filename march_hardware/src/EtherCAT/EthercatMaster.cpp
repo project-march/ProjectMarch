@@ -108,8 +108,7 @@ void EthercatMaster::ethercatSlaveInitiation()
     ec_send_processdata();
     ec_receive_processdata(EC_TIMEOUTRET);
     ec_statecheck(0, EC_STATE_OPERATIONAL, 50000);
-  }
-  while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));
+  } while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));
 
   if (ec_slave[0].state == EC_STATE_OPERATIONAL)
   {
