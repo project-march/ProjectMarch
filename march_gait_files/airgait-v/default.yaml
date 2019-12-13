@@ -3,11 +3,7 @@ gaits:
   ramp_door_slope_up: {right_open: MV_RD_slopeup_rightopen_v1, left_open: MV_RD_slopeup_leftopen_v1,
                        right_swing: MV_RD_slopeup_rightswing_v1, left_swing: MV_RD_slopeup_leftswing_v1,
                        right_close: MV_RD_slopeup_rightclose_v1, left_close: MV_RD_slopeup_leftclose_v1}
-  ramp_door_slope_down: {right_open: MV_RD_slopedown_rightopen_v1, left_open: MV_RD_slopedown_leftopen_v1,
-                         right_swing: MV_RD_slopedown_rightswing_v1, left_swing: MV_RD_slopedown_leftswing_v1,
-                         right_close: MV_RD_slopedown_rightclose_v1, left_close: MV_RD_slopedown_leftclose_v1}
-  ramp_door_last_step: {right_open: MV_RD_laststep_rightopen_v1, left_close: MV_RD_laststep_leftclose_v1}
-  rough_terrain_high_step: {right_open: MV_RT_highstep_rightopen_v4, left_close: MV_RT_highstep_leftclose_v5}
+  rough_terrain_high_step: {right_open: MV_RT_highstep_rightopen_v5, left_close: MV_RT_highstep_leftclose_v6}
   rough_terrain_middle_steps: {right_open: MV_RT_middlestep_rightopen_v2, left_swing: MV_RT_middlestep_leftswing_v2,
                                right_swing: MV_RT_middlestep_rightswing_v2, left_close: MV_RT_middlestep_leftclose_v3}
   walk: {right_open: MV_walk_rightopen_v1, left_swing: MV_walk_leftswing_v1, right_swing: MV_walk_rightswing_v1,
