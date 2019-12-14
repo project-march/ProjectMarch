@@ -29,16 +29,6 @@ namespace march_hardware_interface
 MarchHardwareInterface::MarchHardwareInterface(ros::NodeHandle& nh, AllowedRobot robotName)
   : nh_(nh), marchRobot(HardwareBuilder(robotName).createMarchRobot())
 {
-  init();
-  controller_manager_.reset(new controller_manager::ControllerManager(this, nh_));
-  nh_.param("/march/hardware_interface/loop_hz", loop_hz_, 100.0);
-  ros::Duration update_freq = ros::Duration(1.0 / loop_hz_);
-  non_realtime_loop_ = nh_.createTimer(update_freq, &MarchHardwareInterface::update, this);
-}
-
-MarchHardwareInterface::~MarchHardwareInterface()
-{
-  this->marchRobot.stopEtherCAT();
 }
 
 void MarchHardwareInterface::init()
@@ -218,15 +208,15 @@ void MarchHardwareInterface::init()
     }
   }
   ROS_INFO("Successfully actuated all joints");
+  controller_manager_.reset(new controller_manager::ControllerManager(this, nh_));
 }
 
-void MarchHardwareInterface::update(const ros::TimerEvent& e)
+void MarchHardwareInterface::update(const ros::Duration& elapsed_time)
 {
-  elapsed_time_ = ros::Duration(e.current_real - e.last_real);
-  read(elapsed_time_);
+  read(elapsed_time);
   validate();
-  controller_manager_->update(ros::Time::now(), elapsed_time_);
-  write(elapsed_time_);
+  controller_manager_->update(ros::Time::now(), elapsed_time);
+  write(elapsed_time);
 }
 
 void MarchHardwareInterface::validate()
@@ -238,7 +228,7 @@ void MarchHardwareInterface::validate()
   }
 }
 
-void MarchHardwareInterface::read(ros::Duration elapsed_time)
+void MarchHardwareInterface::read(const ros::Duration& elapsed_time)
 {
   for (int i = 0; i < num_joints_; i++)
   {
@@ -278,7 +268,7 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
   }
 }
 
-void MarchHardwareInterface::write(ros::Duration elapsed_time)
+void MarchHardwareInterface::write(const ros::Duration& elapsed_time)
 {
   joint_effort_command_copy.clear();
   joint_effort_command_copy.resize(joint_effort_command_.size());

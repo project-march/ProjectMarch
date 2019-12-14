@@ -9,33 +9,41 @@
 
 namespace march4cpp
 {
+/**
+ * Base class of the ethercat master supported with the SOEM library
+ * @param ifname Network interface name, check ifconfig.
+ * @param IOmap Holds the mapping of the SOEM message.
+ * @param expectedWKC The expected working counter of the ethercat train.
+ * @param ecatCycleTimems The ethercat cycle time.
+ * @param maxSlaveIndex The maximum amount of slaves connected to the train.
+ */
 class EthercatMaster
 {
-  std::string ifname;      // Network interface name, check ifconfig
-  char IOmap[4096];        // Holds the mapping of the SOEM message
-  int expectedWKC;         // Expected working counter
-  std::thread EcatThread;  // Handler for parallel thread
+  std::string ifname;
+  char IOmap[4096];
+  int expectedWKC;
 
+  std::thread EcatThread;
   std::vector<Joint>* jointListPtr;
+
   int maxSlaveIndex;
   int ecatCycleTimems;
 
 public:
-  bool isOperational = false;  // Is SOEM in operational state
+  bool isOperational = false;
 
   explicit EthercatMaster(std::vector<Joint>* jointListPtr, std::string ifname, int maxSlaveIndex, int ecatCycleTime);
+  ~EthercatMaster();
 
   void start();
-  void stop();
+  void ethercatMasterInitiation();
+  void ethercatSlaveInitiation();
 
-  // Parallel thread
   void ethercatLoop();
+  void SendReceivePDO();
+  static void monitorSlaveConnection();
 
-  void sendProcessData();
-
-  int receiveProcessData();
-
-  void monitorSlaveConnection();
+  void stop();
 };
 
 }  // namespace march4cpp
