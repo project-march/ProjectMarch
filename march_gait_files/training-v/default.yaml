@@ -14,8 +14,8 @@ gaits:
               right_close: MIV_final}
   stairs_down: {right_open: MIV_final, left_swing: MIV_final, right_swing: MIV_final, left_close: MIV_final,
                 right_close: MIV_final}
-  walk: {right_open: MIV_final, left_swing: MIV_final, right_swing: MIV_final,
-         left_close: MIV_final, right_close: MIV_final}
+  walk: {right_open: MV_walk_rightopen_v2, left_swing: MV_walk_leftswing_v2, right_swing: MV_walk_rightswing_v2,
+         left_close: MV_walk_leftclose_v2, right_close: MV_walk_rightclose_v2}
   walk_small: {right_open: MIV_final, left_swing: MIV_final, right_swing: MIV_final, left_close: MIV_final,
                right_close: MIV_final}
   rough_terrain_high_step: {right_open: MV_RT_highstep_rightopen_v5, left_close: MV_RT_highstep_leftclose_v6}
