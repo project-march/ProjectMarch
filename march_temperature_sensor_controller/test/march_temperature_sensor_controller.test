@@ -1,3 +1,0 @@
-<launch>
-    <test test-name="march_temperature_sensor_controller_test" pkg="march_temperature_sensor_controller" type="march_temperature_sensor_controller-test"/>
-</launch>
