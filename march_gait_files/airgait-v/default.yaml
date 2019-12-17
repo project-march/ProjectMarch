@@ -9,4 +9,5 @@ gaits:
   walk: {right_open: MV_walk_rightopen_v1, left_swing: MV_walk_leftswing_v1, right_swing: MV_walk_rightswing_v1,
          left_close: MV_walk_leftclose_v1, right_close: MV_walk_rightclose_v1}
   single_step_normal: {right_open: MIV_final, left_close: MIV_final}
-
+  sit: {sit_down: MIV_final, sit_home: MIV_final}
+  stand: {prepare_stand_up: MIV_final, stand_up: MIV_final}
