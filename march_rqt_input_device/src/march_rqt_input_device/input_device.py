@@ -138,23 +138,23 @@ class InputDevicePlugin(Plugin):
                                                callback=lambda: self.publish_gait('gait_ramp_door_last_step'))
 
         gait_tilted_path_straight_start_right = MarchButton(name='gait_tilted_path_straight_start_right',
-                                               text='Tilted Path straight start right',
-                                               callback=lambda: self.publish_gait(
-                                                   'gait_tilted_path_straight_start_right'))
+                                                            text='Tilted Path straight start right',
+                                                            callback=lambda: self.publish_gait(
+                                                                'gait_tilted_path_straight_start_right'))
 
         gait_tilted_path_straight_start_left = MarchButton(name='gait_tilted_path_straight_start_left',
-                                                            text='Tilted Path straight start left',
-                                                            callback=lambda: self.publish_gait(
+                                                           text='Tilted Path straight start left',
+                                                           callback=lambda: self.publish_gait(
                                                                 'gait_tilted_path_straight_start_left'))
 
         gait_tilted_path_first_start = MarchButton(name='gait_tilted_path_first_start',
-                                                            text='Tilted Path side first start',
-                                                            callback=lambda: self.publish_gait(
+                                                   text='Tilted Path side first start',
+                                                   callback=lambda: self.publish_gait(
                                                                 'gait_tilted_path_first_start'))
 
         gait_tilted_path_second_start = MarchButton(name='gait_tilted_path_second_start',
-                                                   text='Tilted Path side second start',
-                                                   callback=lambda: self.publish_gait(
+                                                    text='Tilted Path side second start',
+                                                    callback=lambda: self.publish_gait(
                                                        'gait_tilted_path_second_start'))
 
         stop_button = MarchButton(name='gait_stop', image='/stop.png',
