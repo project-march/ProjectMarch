@@ -34,8 +34,8 @@ before_install:
   - gem --version
   - gem install html-proofer
   # Install ROS's version of sphinx
-  - sudo apt-get -qq install ros-$ROS_DISTRO-rosdoc-lite
-  - source /opt/ros/$ROS_DISTRO/setup.bash
+  - sudo apt-get -qq install ros-melodic-rosdoc-lite
+  - source /opt/ros/melodic/setup.bash
 
 install:
   # Install additional dependencies
