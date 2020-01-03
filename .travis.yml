@@ -2,7 +2,7 @@
 # Adapted from 'Test build the MoveIt! tutorials'. Original Author: Dave Coleman
 
 os: linux
-dist: xenial
+dist: bionic
 language: ruby
 rvm:
   - 2.4
