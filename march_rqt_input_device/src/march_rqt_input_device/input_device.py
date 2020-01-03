@@ -107,14 +107,6 @@ class InputDevicePlugin(Plugin):
                                               image='/gait_stairs_down.png',
                                               callback=lambda: self.publish_gait(
                                                   'gait_stairs_down'))
-        gait_tilted_path_first_starting_step = MarchButton(name='gait_tilted_path_first_starting_step',
-                                                           text='Tilted path first starting step',
-                                                           callback=lambda: self.publish_gait(
-                                                               'gait_tilted_path_first_starting_step'))
-        gait_tilted_path_first_ending_step = MarchButton(name='gait_tilted_path_first_ending_step',
-                                                         text='Tilted path first ending step',
-                                                         callback=lambda: self.publish_gait(
-                                                             'gait_tilted_path_first_ending_step'))
         gait_rough_terrain_high_step = MarchButton(name='gait_rough_terrain_high_step',
                                                    text='Rough terrain high step',
                                                    callback=lambda: self.publish_gait(
@@ -137,6 +129,26 @@ class InputDevicePlugin(Plugin):
                                                text='Ramp and Door last step',
                                                callback=lambda: self.publish_gait('gait_ramp_door_last_step'))
 
+        gait_tilted_path_straight_start_right = MarchButton(name='gait_tilted_path_straight_start_right',
+                                                            text='Tilted Path straight start right',
+                                                            callback=lambda: self.publish_gait(
+                                                                'gait_tilted_path_straight_start_right'))
+
+        gait_tilted_path_straight_start_left = MarchButton(name='gait_tilted_path_straight_start_left',
+                                                           text='Tilted Path straight start left',
+                                                           callback=lambda: self.publish_gait(
+                                                               'gait_tilted_path_straight_start_left'))
+
+        gait_tilted_path_first_start = MarchButton(name='gait_tilted_path_first_start',
+                                                   text='Tilted Path side first start',
+                                                   callback=lambda: self.publish_gait(
+                                                       'gait_tilted_path_first_start'))
+
+        gait_tilted_path_second_start = MarchButton(name='gait_tilted_path_second_start',
+                                                    text='Tilted Path side second start',
+                                                    callback=lambda: self.publish_gait(
+                                                        'gait_tilted_path_second_start'))
+
         stop_button = MarchButton(name='gait_stop', image='/stop.png',
                                   callback=lambda: self.publish_stop())
         pause_button = MarchButton(name='gait_pause', text='Pause',
@@ -157,9 +169,10 @@ class InputDevicePlugin(Plugin):
              gait_side_step_right_small_button, continue_button],
             [gait_sofa_sit_button, gait_sofa_stand_button, gait_rough_terrain_high_step,
              gait_rough_terrain_middle_steps, error_button],
-            [gait_stairs_up_button, gait_stairs_down_button, gait_tilted_path_first_starting_step,
-             gait_tilted_path_first_ending_step],
-            [gait_ramp_door_slope_up, gait_ramp_door_slope_down, gait_ramp_door_last_step],
+            [gait_stairs_up_button, gait_stairs_down_button, gait_ramp_door_slope_up, gait_ramp_door_slope_down,
+             gait_ramp_door_last_step],
+            [gait_tilted_path_straight_start_right, gait_tilted_path_straight_start_left,
+             gait_tilted_path_first_start, gait_tilted_path_second_start],
         ]
 
         # Create the qt_layout from the button layout.
