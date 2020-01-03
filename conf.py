@@ -29,9 +29,9 @@ project = u'march_tutorials'
 # built documents.
 #
 # The short X.Y version.
-version = 'Kinetic'
+version = 'Melodic'
 # The full version, including alpha/beta/rc tags.
-release = 'Kinetic'
+release = 'Melodic'
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -63,7 +63,7 @@ rst_prolog = """
 """
 
 # Links
-ros_distro = 'kinetic'
+ros_distro = 'melodic'
 extlinks = {'codedir': ('https://github.com/' + html_context["github_user"] + '/tutorials/tree/' + html_context["github_version"] + '/doc/%s', ''),
             'rootdir': ('https://github.com/' + html_context["github_user"] + '/tutorials/tree/' + html_context["github_version"] + '/%s', ''),
             'hardware-interface': ('https://github.com/' + html_context["github_user"] + '/hardware-interface/tree/develop/%s', ''),

@@ -24,7 +24,7 @@ Install with
 
 .. code::
 
-  sudo apt-get install ros-kinetic-rqt-multiplot
+  sudo apt-get install ros-melodic-rqt-multiplot
 
 Launch with
 
