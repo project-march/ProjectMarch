@@ -37,10 +37,6 @@ before_install:
   - sudo apt-get -qq install ros-melodic-rosdoc-lite
   - source /opt/ros/melodic/setup.bash
 
-install:
-  # Install additional dependencies
-  - ./install.sh
-
 script:
   # Test build with non-ROS wrapped Sphinx command to allow warnings and errors to be caught
   # Test build with ROS-version of Sphinx command so that it is generated same as ros.org
