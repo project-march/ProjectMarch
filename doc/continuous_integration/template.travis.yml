@@ -1,6 +1,7 @@
 # This config uses industrial_ci (https://github.com/ros-industrial/industrial_ci.git).
 # For troubleshooting, see readme (https://github.com/ros-industrial/industrial_ci/blob/master/README.rst)
 
+os: linux
 language: generic # optional, just removes the language badge
 
 services:
@@ -21,11 +22,12 @@ env:
     - ROS_REPO=ros
     - BUILDER=colcon
     - CATKIN_LINT=pedantic
-    - UPSTREAM_WORKSPACE='dependencies.rosinstall'
-    - AFTER_SCRIPT='builder_run_build "$target_ws/install" "$target_ws" --cmake-target-skip-unavailable --cmake-target roslint'
-  matrix:
-    - ROS_DISTRO=kinetic
-    - ROS_DISTRO=melodic
+    - UPSTREAM_WORKSPACE='.rosinstall'
+
+jobs:
+  include:
+    - name: "Melodic"
+      env: ROS_DISTRO=melodic
 
 # clone and run industrial_ci
 install:

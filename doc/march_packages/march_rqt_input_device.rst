@@ -43,7 +43,7 @@ Published Topics
 
 .. todo:: (Tim) Add link to march_safety when it's done.
 
-*/march/input_device/alive* (`std_msgs/Empty <http://docs.ros.org/kinetic/api/std_msgs/html/msg/Empty.html>`_)
+*/march/input_device/alive* (`std_msgs/Empty <http://docs.ros.org/melodic/api/std_msgs/html/msg/Empty.html>`_)
   Publish empty alive messages so the Safety node doesn't throw a warning.
 
 */march/input_device/instruction* (:march:`march_shared_resources/GaitInstruction <march_shared_resources/msg/GaitInstruction.msg>`)

@@ -13,7 +13,7 @@ Most gaits are created by the gait generator, but as they are simply text files 
 
 Terminology
 -----------
-``Version``: A filled `JointTrajectory Message <http://docs.ros.org/kinetic/api/trajectory_msgs/html/msg/JointTrajectory.html>`_.
+``Version``: A filled `JointTrajectory Message <http://docs.ros.org/melodic/api/trajectory_msgs/html/msg/JointTrajectory.html>`_.
 
 ``Subgait``: A name for a physical movement, can contain multiple versions.
 

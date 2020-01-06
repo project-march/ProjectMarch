@@ -4,7 +4,7 @@ Create your workspace
 =====================
 .. inclusion-introduction-start
 
-This tutorial will help you set up a ROS workspace with all packages needed to run the |m4| exoskeleton.
+This tutorial will help you set up a ROS workspace with all packages needed to run the March exoskeleton.
 
 .. inclusion-introduction-end
 
@@ -13,7 +13,7 @@ This tutorial will help you set up a ROS workspace with all packages needed to r
 
 Install ROS and Colcon
 ^^^^^^^^^^^^^^^^^^^^^^
-`Install ROS Kinetic <https://wiki.ros.org/kinetic/Installation/Ubuntu>`_.
+`Install ROS Melodic <https://wiki.ros.org/melodic/Installation/Ubuntu>`_.
 It is easy to miss steps when going through the ROS installation tutorial. If you run into errors in the next few steps, a good place to start is to go back and make sure you have installed ROS correctly.
 
 Once you have ROS installed, make sure you have the most up to date packages:
@@ -29,28 +29,14 @@ For building our packages we use colcon. Install `colcon <https://github.com/col
 .. code::
 
   sudo apt-get install python3-colcon-common-extensions
-  # The following two steps are only necessary on ROS Kinetic
-  sudo apt-get install python3-pip
-  pip3 install -U setuptools
 
-Install catkin lint and documentation:
+To install some optional tools that are run by Travis Continuous Integration run:
 
 .. code::
 
   pip install --user catkin_lint
-  pip install --user catkin_tools_document
-
-.. note:: If you get the error that Sphinx requires python 3.5, download python 3.5 using:
-
-  .. code::
-
-    sudo apt-get install python3-pip
-
-  Then replace the second of the previous lines with:
-
-  .. code::
-
-    pip3 install --user catkin_tools_document
+  python2 -m pip install --user flake8 pep8-naming flake8-blind-except flake8-string-format flake8-builtins flake8-commas flake8-quotes flake8-print flake8-docstrings flake8-import-order
+  sudo apt install clang-format
 
 
 Create A Workspace
@@ -112,11 +98,11 @@ Then call wstool with your edited ``.rosinstall`` file:
 
 Build your Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The following will install from Debian any package dependencies not already in your workspace:
+The following will install from the Ubuntu repositories any package dependencies not already in your workspace:
 
 .. code::
 
-  rosdep install -y --from-paths src --ignore-src --rosdistro kinetic
+  rosdep install -y --from-paths src --ignore-src
 
 The next command will build and install your workspace:
 
