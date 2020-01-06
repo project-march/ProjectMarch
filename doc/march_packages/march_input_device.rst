@@ -87,7 +87,7 @@ to run and upload the code see the :input-device:`ReadMe <>`.
 - Change :code:`IPAddress server(x, x, x, x)` to :code:`IPAddress server(your_hostname)` in the :input-device:`wireless_connection.h <include/wireless_connection.h>`
 - Upload to input device.
 
-.. note:: If you want to change the network name and password that the input device uses: Change **ssid** and **password** in the :input-device:`WirelessConnection.h <include/WirelessConnection.h>`
+.. note:: If you want to change the network name and password that the input device uses: Change **ssid** and **password** in the :input-device:`wireless_connection.h <include/wireless_connection.h>`
 
 
 Start the software

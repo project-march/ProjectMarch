@@ -60,14 +60,14 @@ If you have write access, you can use our provided ``.rosinstall`` file to pull 
 
 .. code::
 
-  wstool init src https://raw.githubusercontent.com/project-march/tutorials/develop/doc/getting_started/.rosinstall
+  wstool init src https://raw.githubusercontent.com/project-march/tutorials/master/doc/getting_started/.rosinstall
   wstool update -t src
 
 The above rosinstall file uses https URLs to the git repositories. If you prefer ssh URLs use the following commands:
 
 .. code::
 
-  wstool init src https://raw.githubusercontent.com/project-march/tutorials/develop/doc/getting_started/ssh.rosinstall
+  wstool init src https://raw.githubusercontent.com/project-march/tutorials/master/doc/getting_started/ssh.rosinstall
   wstool update -t src
 
 
@@ -76,7 +76,7 @@ Without write access
 If you do not have write access, you will need to create your own forks of our repositories.
 Please check `this guide <https://guides.github.com/activities/forking/>`_ on how to work with forks if you haven't used them before.
 
-Save the `.rosinstall file <https://raw.githubusercontent.com/project-march/tutorials/develop/doc/getting_started/.rosinstall>`_
+Save the `.rosinstall file <https://raw.githubusercontent.com/project-march/tutorials/master/doc/getting_started/.rosinstall>`_
 locally and change the uri of the repositories you want to develop to the location of your forks. For example:
 
 .. code::
