@@ -22,7 +22,7 @@ Extend the state machine
 ^^^^^^^^^^^^^^^^^^^^^^^^
 Because a gait exists of multiple subgaits, we implement a gait as a state machine.
 
-An example of a pull request adding states to the state machine can be found in `#64 <https://github.com/project-march/state-machine/pull/64>`_.
+An example of a pull request adding states to the state machine can be found in `project-march/march#430 <https://github.com/project-march/march/pull/430>`_.
 
 Create a new python script called ``<gait_name>_sm.py`` that looks like this:
 
@@ -43,7 +43,7 @@ Create a new python script called ``<gait_name>_sm.py`` that looks like this:
                                  transitions={'succeeded': 'succeeded', 'preempted': 'preempted', 'aborted': 'failed'})
       return sm_<gait_name>
 
-In :state-machine:`healthy_sm.py <march_state_machine/src/march_state_machine/healthy_sm.py>` add your new state machine as a state.
+In :march:`healthy_sm.py <march_state_machine/src/march_state_machine/healthy_sm.py>` add your new state machine as a state.
 
 .. code::
 
