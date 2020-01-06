@@ -73,14 +73,11 @@ Install Additional dependencies
 -------------------------------
 Pygit is used so we can tell Sphinx what branch we are on. That way links to GitHub files can be verified against the proper branch.
 This prevents html-proofer from not being able to find newly added files on develop, as it checks against the current branch.
-
-sphinx-copybutton is used to allow you to copy the contents of code blocks to your clipboard with a single click.
-
-Install all additional dependencies with:
+Install Pygit from the Ubuntu repositories:
 
 .. code::
 
-  ./install.sh
+  sudo apt install python-pygit2
 
 Generate the html
 -----------------
