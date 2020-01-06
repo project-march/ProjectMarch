@@ -56,4 +56,4 @@ deploy:
   token: $GH_REPO_TOKEN
   local_dir: build/html
   on:
-    branch: develop
+    branch: master
