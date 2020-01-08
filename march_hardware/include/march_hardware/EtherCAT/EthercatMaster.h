@@ -12,30 +12,23 @@ namespace march4cpp
 /**
  * Base class of the ethercat master supported with the SOEM library
  * @param ifname Network interface name, check ifconfig.
- * @param IOmap Holds the mapping of the SOEM message.
- * @param expectedWKC The expected working counter of the ethercat train.
- * @param ecatCycleTimems The ethercat cycle time.
- * @param maxSlaveIndex The maximum amount of slaves connected to the train.
+ * @param io_map Holds the mapping of the SOEM message.
+ * @param expeted_working_counter The expected working counter of the ethercat train.
+ * @param cycle_time_ms The ethercat cycle time.
+ * @param max_slave_index The maximum amount of slaves connected to the train.
  */
 class EthercatMaster
 {
-  std::string ifname;
-  char IOmap[4096];
-  int expectedWKC;
-
-  std::thread EcatThread;
-  std::vector<Joint>* jointListPtr;
-
-  int maxSlaveIndex;
-  int ecatCycleTimems;
-
 public:
-  bool isOperational = false;
-
-  explicit EthercatMaster(std::vector<Joint>* jointListPtr, std::string ifname, int maxSlaveIndex, int ecatCycleTime);
+  EthercatMaster(std::vector<Joint>* joints_ptr, std::string ifname, int max_slave_index, int cycle_time);
   ~EthercatMaster();
 
+  bool isOperational() const;
+
   void start();
+  void stop();
+
+private:
   void ethercatMasterInitiation();
   void ethercatSlaveInitiation();
 
@@ -43,7 +36,19 @@ public:
   void SendReceivePDO();
   static void monitorSlaveConnection();
 
-  void stop();
+  bool is_operational_ = false;
+
+  std::vector<Joint>* joints_ptr_;
+
+  const std::string ifname_;
+  const int max_slave_index_;
+  const int cycle_time_ms_;
+
+  char io_map_[4096] = { 0 };
+  int expected_working_counter_ = 0;
+
+  std::thread ethercat_thread_;
+
 };
 
 }  // namespace march4cpp

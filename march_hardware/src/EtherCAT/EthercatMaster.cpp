@@ -21,18 +21,20 @@
 
 namespace march4cpp
 {
-EthercatMaster::EthercatMaster(std::vector<Joint>* jointListPtr, std::string ifname, int maxSlaveIndex,
-                               int ecatCycleTime)
-  : jointListPtr(jointListPtr)
+EthercatMaster::EthercatMaster(std::vector<Joint>* joints_ptr, std::string ifname, int max_slave_index,
+                               int cycle_time)
+  : joints_ptr_(joints_ptr), ifname_(ifname), max_slave_index_(max_slave_index), cycle_time_ms_(cycle_time)
 {
-  this->ifname = ifname;
-  this->maxSlaveIndex = maxSlaveIndex;
-  this->ecatCycleTimems = ecatCycleTime;
 }
 
 EthercatMaster::~EthercatMaster()
 {
   this->stop();
+}
+
+bool EthercatMaster::isOperational() const
+{
+  return this->is_operational_;
 }
 
 /**
@@ -88,7 +90,7 @@ void EthercatMaster::ethercatSlaveInitiation()
   ROS_INFO("Request pre-operational state for all slaves");
   ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
 
-  for (auto& joint : *jointListPtr)
+  for (auto& joint : *joints_ptr_)
   {
     if (joint.hasIMotionCube())
     {
@@ -97,13 +99,13 @@ void EthercatMaster::ethercatSlaveInitiation()
     joint.initialize(cycle_time_ms_);
   }
 
-  ec_config_map(&IOmap);
+  ec_config_map(&io_map_);
   ec_configdc();
 
   ROS_INFO("Request safe-operational state for all slaves");
   ec_statecheck(0, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE * 4);
 
-  expectedWKC = (ec_group[0].outputsWKC * 2) + ec_group[0].inputsWKC;
+  expected_working_counter_ = (ec_group[0].outputsWKC * 2) + ec_group[0].inputsWKC;
   ec_slave[0].state = EC_STATE_OPERATIONAL;
 
   ec_send_processdata();
@@ -123,8 +125,8 @@ void EthercatMaster::ethercatSlaveInitiation()
   if (ec_slave[0].state == EC_STATE_OPERATIONAL)
   {
     ROS_INFO("Operational state reached for all slaves");
-    isOperational = true;
-    EcatThread = std::thread(&EthercatMaster::ethercatLoop, this);
+    this->is_operational_ = true;
+    ethercat_thread_ = std::thread(&EthercatMaster::ethercatLoop, this);
   }
   else
   {
@@ -150,9 +152,9 @@ void EthercatMaster::ethercatLoop()
 {
   uint32_t totalLoops = 0;
   uint32_t rateNotAchievedCount = 0;
-  int rate = 1000 / ecatCycleTimems;
+  int rate = 1000 / cycle_time_ms_;
 
-  while (isOperational)
+  while (this->is_operational_)
   {
     auto start = boost::chrono::high_resolution_clock::now();
 
@@ -162,13 +164,13 @@ void EthercatMaster::ethercatLoop()
     auto stop = boost::chrono::high_resolution_clock::now();
     auto duration = boost::chrono::duration_cast<boost::chrono::microseconds>(stop - start);
 
-    if (duration.count() > ecatCycleTimems * 1000)
+    if (duration.count() > cycle_time_ms_ * 1000)
     {
       rateNotAchievedCount++;
     }
     else
     {
-      usleep(ecatCycleTimems * 1000 - duration.count());
+      usleep(cycle_time_ms_ * 1000 - duration.count());
     }
     totalLoops++;
 
@@ -178,12 +180,12 @@ void EthercatMaster::ethercatLoop()
       if (rateNotAchievedPercentage > 5)
       {
         ROS_WARN("EtherCAT rate of %d milliseconds per cycle was not achieved for %f percent of all cycles",
-                 ecatCycleTimems, rateNotAchievedPercentage);
+                 cycle_time_ms_, rateNotAchievedPercentage);
       }
       else
       {
         ROS_DEBUG("EtherCAT rate of %d milliseconds per cycle was not achieved for %f percent of all cycles",
-                  ecatCycleTimems, rateNotAchievedPercentage);
+                  cycle_time_ms_, rateNotAchievedPercentage);
       }
       totalLoops = 0;
       rateNotAchievedCount = 0;
@@ -198,7 +200,7 @@ void EthercatMaster::SendReceivePDO()
 {
   ec_send_processdata();
   int wkc = ec_receive_processdata(EC_TIMEOUTRET);
-  if (wkc < this->expectedWKC)
+  if (wkc < this->expected_working_counter_)
   {
     ROS_WARN_THROTTLE(1, "Working counter lower than expected. EtherCAT connection may not be optimal");
   }
@@ -225,11 +227,11 @@ void EthercatMaster::monitorSlaveConnection()
  */
 void EthercatMaster::stop()
 {
-  if (this->isOperational)
+  if (this->is_operational_)
   {
     ROS_INFO("Stopping EtherCAT");
-    isOperational = false;
-    EcatThread.join();
+    this->is_operational_ = false;
+    ethercat_thread_.join();
 
     ec_slave[0].state = EC_STATE_INIT;
     ec_writestate(0);
