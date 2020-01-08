@@ -45,31 +45,38 @@ void EthercatMaster::start()
 }
 
 /**
- * Open the ethernet port with the given ifname and check amount of slaves
+ * Open the ethernet port with the given ifname_ and check amount of slaves
  */
 void EthercatMaster::ethercatMasterInitiation()
 {
   ROS_INFO("Trying to start EtherCAT");
-  if (!ec_init(&ifname[0]))
+  if (!ec_init(&ifname_[0]))
   {
-    ROS_FATAL("No socket connection on %s. Confirm that you have selected the right ifname", ifname.c_str());
-    throw std::runtime_error("No socket connection on %s. Confirm that you have selected the right ifname");
+    ROS_FATAL("No socket connection on %s. Confirm that you have selected the right ifname_", ifname_.c_str());
+    throw std::runtime_error("No socket connection on %s. Confirm that you have selected the right ifname_");
   }
-  ROS_INFO("ec_init on %s succeeded", ifname.c_str());
+  ROS_INFO("ec_init on %s succeeded", ifname_.c_str());
 
   if (ec_config_init(FALSE) <= 0)
   {
-    ROS_FATAL("No slaves found, shutting down. Confirm that you have selected the right ifname.");
+    ROS_FATAL("No slaves found, shutting down. Confirm that you have selected the right ifname_.");
     ROS_FATAL("Check that the first slave is connected properly");
-    throw std::runtime_error("No slaves found, shutting down. Confirm that you have selected the right ifname.");
+    throw std::runtime_error("No slaves found, shutting down. Confirm that you have selected the right ifname_.");
   }
   ROS_INFO("%d slave(s) found and initialized.", ec_slavecount);
 
-  if (ec_slavecount < this->maxSlaveIndex)
+  if (ec_slavecount < this->max_slave_index_)
   {
-    ROS_FATAL("Slave configured with index %d while soem only found %d slave(s)", this->maxSlaveIndex, ec_slavecount);
+    ROS_FATAL("Slave configured with index %d while soem only found %d slave(s)", this->max_slave_index_, ec_slavecount);
     throw std::runtime_error("More slaves configured than soem could detect.");
   }
+}
+
+int setSlaveWatchdogTimer(uint16 slave) {
+  uint16 configadr = ec_slave[slave].configadr;
+  ec_FPWRw(configadr, 0x0400, IMotionCube::WATCHDOG_DIVIDER, EC_TIMEOUTRET);
+  ec_FPWRw(configadr, 0x0410, IMotionCube::WATCHDOG_TIME, EC_TIMEOUTRET);
+  return 1;
 }
 
 /**
@@ -83,7 +90,11 @@ void EthercatMaster::ethercatSlaveInitiation()
 
   for (auto& joint : *jointListPtr)
   {
-    joint.initialize(ecatCycleTimems);
+    if (joint.hasIMotionCube())
+    {
+      ec_slave[joint.getIMotionCubeSlaveIndex()].PO2SOconfig = setSlaveWatchdogTimer;
+    }
+    joint.initialize(cycle_time_ms_);
   }
 
   ec_config_map(&IOmap);

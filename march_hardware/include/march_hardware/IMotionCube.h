@@ -86,6 +86,9 @@ public:
               << "encoder: " << iMotionCube.encoder;
   }
   bool goToTargetState(march4cpp::IMotionCubeTargetState targetState);
+
+  static const uint16 WATCHDOG_DIVIDER = 0;
+  static const uint16 WATCHDOG_TIME = 0;
 };
 
 }  // namespace march4cpp
