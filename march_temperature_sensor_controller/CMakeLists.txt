@@ -10,7 +10,6 @@ find_package(catkin REQUIRED COMPONENTS
     pluginlib
     realtime_tools
     roscpp
-    roslint
     sensor_msgs
 )
 
@@ -20,15 +19,6 @@ catkin_package(
     CATKIN_DEPENDS 
     sensor_msgs
 )
-
-set(ROSLINT_CPP_OPTS "--linelength=120")
-
-file(GLOB_RECURSE lintfiles
-    "include/*.h"
-    "src/*.cpp"
-)
-
-roslint_cpp(${lintfiles})
 
 include_directories(include SYSTEM ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
