@@ -7,7 +7,6 @@ find_package(catkin REQUIRED COMPONENTS
     march_hardware
     roscpp
     roslib
-    roslint
 )
 
 catkin_package(
@@ -15,16 +14,6 @@ catkin_package(
     CATKIN_DEPENDS
     LIBRARIES ${PROJECT_NAME}
 )
-
-set(ROSLINT_CPP_OPTS "--linelength=120")
-
-file(GLOB_RECURSE lintfiles
-    "*.cpp"
-    "*.h"
-)
-
-roslint_cpp(${lintfiles})
-
 
 include_directories(include SYSTEM ${catkin_INCLUDE_DIRS})
 
