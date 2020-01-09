@@ -15,7 +15,6 @@ find_package(catkin REQUIRED COMPONENTS
     march_shared_resources
     realtime_tools
     roscpp
-    roslint
     std_msgs
     urdf
 )
@@ -93,12 +92,3 @@ if(CATKIN_ENABLE_TESTING)
         )
     endif()
 endif()
-
-set(ROSLINT_CPP_OPTS "--linelength=120")
-
-file(GLOB_RECURSE lintfiles
-    "include/*.h"
-    "src/*.cpp"
-)
-
-roslint_cpp(${lintfiles})

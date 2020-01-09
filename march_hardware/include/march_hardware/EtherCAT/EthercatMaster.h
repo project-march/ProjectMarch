@@ -3,7 +3,7 @@
 #define MARCH_HARDWARE_ETHERCAT_ETHERCATMASTER_H
 #include <vector>
 #include <string>
-#include <thread>  // NOLINT(build/c++11)
+#include <thread>
 
 #include <march_hardware/Joint.h>
 

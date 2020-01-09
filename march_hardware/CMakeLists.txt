@@ -5,7 +5,6 @@ add_compile_options(-std=c++11 -Wall -Wextra)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
-    roslint
     soem
 )
 
@@ -14,16 +13,6 @@ catkin_package(
     CATKIN_DEPENDS
     LIBRARIES ${PROJECT_NAME}
 )
-
-set(ROSLINT_CPP_OPTS "--linelength=120")
-
-file(GLOB_RECURSE lintfiles
-    "include/*.h"
-    "src/*.cpp"
-)
-
-roslint_cpp(${lintfiles})
-
 
 include_directories(
     include

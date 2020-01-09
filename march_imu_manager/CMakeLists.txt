@@ -5,7 +5,6 @@ add_compile_options(-std=c++11 -Wall -Wextra)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
-    roslint
     sensor_msgs
 )
 
@@ -22,14 +21,6 @@ include_directories(
     lib/include
     ${catkin_INCLUDE_DIRS}
 )
-
-file(GLOB_RECURSE lintfiles
-    "src/*.cpp"
-    "src/*.h"
-    "test/*.cpp"
-)
-
-roslint_cpp(${lintfiles})
 
 set(xsensdeviceapi_LOCATION ${PROJECT_SOURCE_DIR}/lib/libxsensdeviceapi.so)
 set(xstypes_LOCATION ${PROJECT_SOURCE_DIR}/lib/libxstypes.so)
