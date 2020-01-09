@@ -4,6 +4,7 @@
 #include <joint_limits_interface/joint_limits_interface.h>
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <sstream>
+#include <string>
 
 #include <march_hardware/MarchRobot.h>
 #include <march_hardware/Joint.h>
@@ -23,6 +24,7 @@ using joint_limits_interface::JointLimits;
 using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::PositionJointSoftLimitsInterface;
 using joint_limits_interface::SoftJointLimits;
+using march4cpp::Joint;
 
 namespace march_hardware_interface
 {
@@ -84,7 +86,7 @@ void MarchHardwareInterface::init()
     soft_limits_[i] = soft_limits;
   }
 
-  resetIMotionCubesUntilTheyWork();
+  initiateIMC();
 
   // Print all joint positions on startup in case initialization fails.
   this->read();
@@ -123,7 +125,7 @@ void MarchHardwareInterface::init()
       {
         marchRobot.getPowerDistributionBoard()->getHighVoltage().setNetOnOff(true, netNumber);
         usleep(100000);
-        ROS_INFO_THROTTLE(1, "[%s] Waiting on high voltage", joint_names_[i].c_str());
+        ROS_WARN("[%s] Waiting on high voltage", joint_names_[i].c_str());
       }
     }
   }
@@ -317,33 +319,34 @@ void MarchHardwareInterface::write(const ros::Duration& elapsed_time)
   }
 }
 
-void MarchHardwareInterface::resetIMotionCubesUntilTheyWork()
+void MarchHardwareInterface::initiateIMC()
 {
-  bool encoderSetCorrectly = false;
-
-  while (!encoderSetCorrectly)
+  ROS_INFO("Resetting all IMC on initialization");
+  for (const std::string& joint_name : joint_names_)
   {
-    encoderSetCorrectly = true;
-    for (int i = 0; i < num_joints_; ++i)
+    Joint joint = marchRobot.getJoint(joint_name);
+
+    if (LOWER_BOUNDARY_ANGLE_IU <= joint.getAngleIU() && joint.getAngleIU() <= UPPER_BOUNDARY_ANGLE_IU)
     {
-      march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
-      if (joint.getAngleIU() == 0)
-      {
-        ROS_ERROR("[%s] Failed (encoder reset)", joint_names_[i].c_str());
-        encoderSetCorrectly = false;
-      }
+      ROS_WARN("Before reset joint: [%s] has angle-value of: %i. Which is within boundary of lower: %i and upper: %i",
+               joint_name.c_str(), joint.getAngleIU(), LOWER_BOUNDARY_ANGLE_IU, UPPER_BOUNDARY_ANGLE_IU);
     }
-    if (!encoderSetCorrectly)
+
+    joint.resetIMotionCube();
+  }
+
+  ROS_INFO("Restarting EtherCAT");
+  marchRobot.stopEtherCAT();
+  marchRobot.startEtherCAT();
+
+  for (const std::string& joint_name : joint_names_)
+  {
+    Joint joint = marchRobot.getJoint(joint_name);
+
+    if (LOWER_BOUNDARY_ANGLE_IU <= joint.getAngleIU() && joint.getAngleIU() <= UPPER_BOUNDARY_ANGLE_IU)
     {
-      // TODO(Martijn) check if you need to reset all joints.
-      for (int i = 0; i < num_joints_; ++i)
-      {
-        march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
-        joint.resetIMotionCube();
-      }
-      ROS_INFO("Restarting EtherCAT");
-      marchRobot.stopEtherCAT();
-      marchRobot.startEtherCAT();
+      ROS_WARN("After reset joint: [%s] has angle-value of: %i. Which is within boundary of lower: %i and upper: %i",
+               joint_name.c_str(), joint.getAngleIU(), LOWER_BOUNDARY_ANGLE_IU, UPPER_BOUNDARY_ANGLE_IU);
     }
   }
 }

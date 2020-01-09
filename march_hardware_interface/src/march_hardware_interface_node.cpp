@@ -32,10 +32,19 @@ int main(int argc, char** argv)
 
   const double loop_hz = ros::param::param("~loop_hz", 100.0);
   ros::Rate rate(loop_hz);
+
   while (ros::ok())
   {
-    march.update(rate.expectedCycleTime());
-    rate.sleep();
+    try
+    {
+      march.update(rate.expectedCycleTime());
+      rate.sleep();
+    }
+    catch (const std::exception& e)
+    {
+      ROS_FATAL("Hardware interface caught an exception during update: %s", e.what());
+      return 1;
+    }
   }
 
   return 0;
