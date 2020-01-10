@@ -7,7 +7,6 @@ find_package(catkin REQUIRED COMPONENTS
     dynamic_reconfigure
     march_shared_resources
     roscpp
-    roslint
     sensor_msgs
     std_msgs
 )
@@ -26,15 +25,6 @@ catkin_package(
 )
 
 include_directories(${catkin_INCLUDE_DIRS})
-
-set(ROSLINT_CPP_OPTS "--filter=-build/include,-build/header_guard,-runtime/references" "--linelength=120")
-
-file(GLOB_RECURSE lintfiles
-    "src/*.cpp"
-    "src/*.h"
-)
-
-roslint_cpp(${lintfiles})
 
 add_executable(march_fake_temperature_data_node src/FakeTemperatureData.cpp)
 
