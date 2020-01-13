@@ -4,7 +4,7 @@ Create your workspace
 =====================
 .. inclusion-introduction-start
 
-This tutorial will help you set up a ROS workspace with all packages needed to run the March exoskeleton.
+This tutorial will help you set up a ROS workspace with all packages needed to run the |march|.
 
 .. inclusion-introduction-end
 

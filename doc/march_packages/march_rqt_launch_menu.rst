@@ -5,7 +5,7 @@ march_rqt_launch_menu
 
 Overview
 --------
-The march_rqt_launch_menu is an rqt plugin that makes it easy to select how you want to run the |m4| exoskeleton.
+The march_rqt_launch_menu is an rqt plugin that makes it easy to select how you want to run the |march|.
 
 It is build with extensibility in mind and therefore it should be incredibly easy to add more launch parameters to the options.
 

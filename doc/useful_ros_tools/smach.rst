@@ -20,7 +20,7 @@ If you have to work with SMACH, make sure you have completed all their tutorials
 .. figure:: images/smach.png
    :align: center
 
-   Snippet of the |m4| state machine
+   Snippet of the March state machine
 
 smach_viewer
 ^^^^^^^^^^^^

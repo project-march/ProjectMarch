@@ -2,14 +2,14 @@ High level overview
 ===================
 .. inclusion-introduction-start
 
-A high level overview of the components that make up the |m4| exoskeleton.
+A high level overview of the components that make up the |march|.
 
 .. inclusion-introduction-end
 
 .. figure:: images/software_stack.png
    :align: center
 
-   The |m4| software stack
+   The March software stack
 
 Simulation versus Exoskeleton
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

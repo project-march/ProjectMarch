@@ -6,7 +6,7 @@ march_hardware
 Overview
 --------
 
-The march_hardware package is a C++ package to interact with the physical |m4| exoskeleton.
+The march_hardware package is a C++ package to interact with the physical |march|.
 Its goal is to provide an api for actuating the exoskeleton without knowledge of the underlying hardware.
 
 Class Structure

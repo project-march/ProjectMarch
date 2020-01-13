@@ -1,15 +1,15 @@
 March Tutorials
 ===============
 
-Welcome to the main documentation on the |m4| exoskeleton.
+Welcome to the main documentation on the |march|.
 Whether you are an experienced ROS developer or have recently started learning, these tutorials contain all knowledge required to work
-with and develop the |m4| exoskeleton.
+with and develop the |march|.
 
 Requirements
 ------------
 In order to follow the tutorials, we expect you to have at least some knowledge of the following tools:
 
-- `Ubuntu 16.04 <http://releases.ubuntu.com/16.04/>`_
+- `Ubuntu 18.04 <http://releases.ubuntu.com/18.04/>`_
 - Linux command line
 - `Git <https://git-scm.com/>`_
 
@@ -21,7 +21,7 @@ In case you are not comfortable with the above tools, please take some time to c
 
 How to use the tutorials
 ------------------------
-The tutorials are designed to provide hands-on experience with ROS and the |m4| exoskeleton.
+The tutorials are designed to provide hands-on experience with ROS and the |march|.
 Here is an overview of the different types of tutorials.
 
 Create your workspace
@@ -70,16 +70,16 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    doc/useful_ros_tools/smach
 
 .. toctree::
-   :caption: Using the March IV
+   :caption: Using the March Exoskeleton
    :maxdepth: 2
    :hidden:
 
-   doc/using_the_march_iv/high_level_overview
-   doc/using_the_march_iv/connecting_to_the_exoskeleton
-   doc/using_the_march_iv/how_to_airgait
-   doc/using_the_march_iv/how_to_view_live_data
-   doc/using_the_march_iv/log_files
-   doc/using_the_march_iv/using_the_gait_generator
+   doc/using_the_march_exoskeleton/high_level_overview
+   doc/using_the_march_exoskeleton/connecting_to_the_exoskeleton
+   doc/using_the_march_exoskeleton/how_to_airgait
+   doc/using_the_march_exoskeleton/how_to_view_live_data
+   doc/using_the_march_exoskeleton/log_files
+   doc/using_the_march_exoskeleton/using_the_gait_generator
 
 .. toctree::
    :caption: Development

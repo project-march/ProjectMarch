@@ -1,4 +1,5 @@
-import sys, os
+import os
+import sys
 
 # Retrieve branch name
 if os.getenv('CI'):
@@ -7,11 +8,11 @@ else:
     import pygit2
     branch_name = pygit2.Repository('.').head.shorthand
 
-sys.path += [ os.path.abspath( '_scripts' )]
+sys.path += [os.path.abspath('_scripts')]
 
-extensions = [ 'sphinx.ext.extlinks',
-               'sphinx.ext.todo',
-               'tutorialformatter' ]
+extensions = ['sphinx.ext.extlinks',
+              'sphinx.ext.todo',
+              'tutorialformatter']
 
 todo_include_todos = True
 
@@ -37,7 +38,7 @@ pygments_style = 'sphinx'
 
 # Name of the style used to generate the html documentation
 html_theme = 'sphinx_rtd_theme'
-html_theme_path = ['_themes',]
+html_theme_path = ['_themes']
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -58,7 +59,7 @@ html_context = {
 
 # Global substitutions
 rst_prolog = """
-.. |m4| replace:: March IV
+.. |march| replace:: March exoskeleton
 """
 
 # Links

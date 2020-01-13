@@ -16,14 +16,14 @@ This tutorial will help you setting up a connection with the exoskeleton.
 Preparation before connecting
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This tutorial is written to establish a connection between your computer and the exoskeleton on the **same wifi**.
-So, make sure you are on the same wifi. A public network such as eduroam will probably not work. Normally the |M4| exoskeleton
+So, make sure you are on the same wifi. A public network such as eduroam will probably not work. Normally the |march|
 automatically connects with the hotspot: **MARCH**.
 
 Running commands on the exoskeleton computer (SSH)
 --------------------------------------------------
 **Secure Shell (SSH)** is a network protocol which allows to run commands on the exoskeleton.
 Connect with the exoskeleton by typing :code:`ssh march@march` in a terminal.
-Now all commands in this terminal are executed on the |M4| exoskeleton computer.
+Now all commands in this terminal are executed on the |march| computer.
 
 ROS Master URI
 --------------
@@ -60,9 +60,9 @@ Test ROS on multiple devices
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This is a very simple test to make sure you followed :ref:`preparation-before-connecting-label` correctly.
 
-- Run :code:`roscore` in a terminal on the |M4| exoskeleton computer (you can always do this via SSH).
+- Run :code:`roscore` in a terminal on the |march| computer (you can always do this via SSH).
 - Run :code:`rostopic list` in a terminal on your computer. This command should give the output **/rosout /rosout_agg**
-- Run :code:`rostopic echo /march/test` in a new terminal on the |M4| exoskeleton computer. This command gives a warning.
+- Run :code:`rostopic echo /march/test` in a new terminal on the |march| computer. This command gives a warning.
 - Now publish a message with the command :code:`rostopic pub /march/test std_msgs/String "data: 'Hello World'"`
-- The message is send and received successful if you received the message in the |M4| exoskeleton computer.
+- The message is send and received successful if you received the message in the |march| computer.
 

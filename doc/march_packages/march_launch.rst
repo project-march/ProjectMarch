@@ -11,7 +11,7 @@ The exoskeleton is launched with
 
 .. code::
 
-  roslaunch march_launch march_iv.launch
+  roslaunch march_launch march.launch
 
 For more information on how to launch the exoskeleton, see :ref:`how-to-airgait-label`.
 

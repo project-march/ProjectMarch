@@ -5,7 +5,7 @@ march_state_machine
 
 Overview
 --------
-The march_state_machine contains the general behavior of the |m4| exoskeleton. Simply put after launching the exoskeleton gait can be performed.
+The march_state_machine contains the general behavior of the |march|. Simply put after launching the exoskeleton gait can be performed.
 The state machine also knows which gait can be executed in every possible state. For example after sitting you can stand-up, but you cannot walk.
 
 We are using an hierarchical state machine, which is a state machines whose states are them- selves state machines. We also use SMACH  this is a task-level
@@ -30,7 +30,7 @@ After this the last sequence starts all remaining packages that are required or 
 HEALTHY
 ^^^^^^^
 When launched successful the **HEALTHY** state machine is active. This part contains all possible gaits. Besides gaits we also have *idle* states such as **STANDING**, **SITTING**, **UNKNOWN**.
-**UNKNOWN** is the state in which the current position is not known. This can be on start-up, but also after an error is thrown and the |m4| exoskeleton did not fully execute the intended gait.
+**UNKNOWN** is the state in which the current position is not known. This can be on start-up, but also after an error is thrown and the |march| did not fully execute the intended gait.
 Transitions between *idle-states* to *gait-states* are present only when it's safe to execute this gait at that moment.
 
 In this state machine the **SAFETY** state is always active. However, this is not the only active state.

@@ -5,13 +5,13 @@ march_input_device
 
 Overview
 --------
-The march_input_device is the software running on the |m4| exoskeleton input device. The input device is used
-to give input to the software running on the |m4| exoskeleton.
+The march_input_device is the software running on the |march| input device. The input device is used
+to give input to the software running on the |march|.
 
 
 Communication
 -------------
-The communication between the input device and the |m4| exoskeleton is done with `rosserial <http://wiki.ros.org/rosserial>`_.
+The communication between the input device and the |march| is done with `rosserial <http://wiki.ros.org/rosserial>`_.
 This can be run wired via usb cable or wireless via wifi connection.
 
 Sending messages
