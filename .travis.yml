@@ -23,7 +23,7 @@ env:
     - BUILDER=colcon
     - CATKIN_LINT=pedantic
     - CATKIN_TEST_COVERAGE=1
-    - AFTER_RUN_TARGET_TEST='cd "$target_ws" && ./src/monitor/coverage.sh && bash <(curl -s https://codecov.io/bash) -Z -f coverage.xml'
+    - AFTER_RUN_TARGET_TEST='cd "$target_ws" && pip install coverage && ./src/monitor/coverage.sh && bash <(curl -s https://codecov.io/bash) -Z -f coverage.xml'
 
 jobs:
   include:
