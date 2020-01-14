@@ -23,8 +23,9 @@ env:
     - ADDITIONAL_DEBS=curl
     - BUILDER=colcon
     - CATKIN_LINT=pedantic
-    - DOCKER_RUN_OPTS='-e CATKIN_TEST_COVERAGE=1'
-    - AFTER_RUN_TARGET_TEST='cd "$target_ws" && pip install coverage && ./src/monitor/coverage.sh && bash <(curl -s https://codecov.io/bash) -Z -f coverage.xml'
+    - DOCKER_RUN_OPTS='-e CATKIN_TEST_COVERAGE=1 -v "/root/shared:/shared"'
+    - AFTER_INSTALL_TARGET_DEPENDENCIES='pip install coverage'
+    - AFTER_RUN_TARGET_TEST='cd "$target_ws" && ./src/monitor/coverage.sh && mv coverage.xml /shared'
 
 jobs:
   include:
@@ -40,5 +41,11 @@ jobs:
 # clone and run industrial_ci
 install:
   - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci -b master
+  - mkdir /root/shared
+
 script:
   - .industrial_ci/travis.sh
+
+after_success:
+  - cd /root/shared
+  - bash <(curl -s https://codecov.io/bash) -Z
