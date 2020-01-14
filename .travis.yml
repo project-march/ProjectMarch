@@ -24,8 +24,7 @@ env:
     - BUILDER=colcon
     - CATKIN_LINT=pedantic
     - CI_ENV=`bash <(curl -s https://codecov.io/env)`
-    - DOCKER_RUN_OPTS='$CI_ENV -e CATKIN_TEST_COVERAGE=1'
-    - AFTER_INSTALL_TARGET_DEPENDENCIES='pip install coverage'
+    - DOCKER_RUN_OPTS='$CI_ENV -e CATKIN_TEST_COVERAGE=1 -e NOSE_COVER_BRANCES=True'
     - AFTER_RUN_TARGET_TEST='cd "$target_ws" && ./src/monitor/coverage.sh && bash <(curl -s https://codecov.io/bash) -Z'
 
 jobs:
