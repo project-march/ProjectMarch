@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>march_gazebo_plugins</name>
+  <version>0.0.0</version>
+  <description>The Gazebo plugins of the March simulation</description>
+
+  <maintainer email="software@projectmarch.nl">Project March</maintainer>
+
+  <license>TODO</license>
+
+  <build_depend>gazebo</build_depend>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>gazebo_ros</depend>
+  <depend>march_shared_resources</depend>
+
+  <export>
+    <gazebo_ros plugin_path="${prefix}/lib" gazebo_media_path="${prefix}" />
+  </export>
+</package>

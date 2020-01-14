@@ -36,7 +36,7 @@ march:
 
       constraints:
         left_ankle:
-          trajectory: 0.2
+          trajectory: 0.25
         left_hip_aa:
           trajectory: 0.2
         left_hip_fe:
@@ -44,7 +44,7 @@ march:
         left_knee:
           trajectory: 0.2
         right_ankle:
-          trajectory: 0.2
+          trajectory: 0.25
         right_hip_aa:
           trajectory: 0.2
         right_hip_fe:

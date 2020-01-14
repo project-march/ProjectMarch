@@ -2,18 +2,19 @@
 
 #include "ros/ros.h"
 #include "sensor_msgs/Temperature.h"
-#include <dynamic_reconfigure/server.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <dynamic_reconfigure/server.h>
 #include <random>
 
 #include <march_fake_sensor_data/TemperaturesConfig.h>
 
 /**
  * @file FakeTemperatureData.cpp
- * @brief Responsible for publishing random temperatures for the fake temperature sensors.
- * @details Apply an autoregression filter to the latest 7 randomly generated temperatures to
- * make the temperature less jittery.
+ * @brief Responsible for publishing random temperatures for the fake
+ * temperature sensors.
+ * @details Apply an autoregression filter to the latest 7 randomly generated
+ * temperatures to make the temperature less jittery.
  */
 
 int min_temperature;
@@ -21,10 +22,12 @@ int max_temperature;
 std::vector<std::string> sensor_names;
 std::vector<ros::Publisher> temperature_publishers;
 
-// Store the 7 most recent generated temperatures so we can take the weighted average of them when we publish.
+// Store the 7 most recent generated temperatures so we can take the weighted
+// average of them when we publish.
 std::vector<int> latest_temperatures;
 
-// The weights of the autoregression, the most recent temperature has the highest weight.
+// The weights of the autoregression, the most recent temperature has the
+// highest weight.
 std::vector<float> ar_values;
 
 // Calculate the weighted average of the latest_temperatures
@@ -39,14 +42,16 @@ double calculateArTemperature(std::vector<int> temperatures, std::vector<float> 
 }
 
 /**
- * This callback is called when parameters from the config file are changed during run-time.
- * This method updates the local values which depend on these parameters to make ensure the values are not out-of-date.
+ * This callback is called when parameters from the config file are changed
+ * during run-time. This method updates the local values which depend on these
+ * parameters to make ensure the values are not out-of-date.
  * @param config the config file with all the parameters
  * @param level A bitmask
  */
 void temperatureConfigCallback(march_fake_sensor_data::TemperaturesConfig& config, uint32_t level)
 {
-  // Make sure there is always a possible interval between min and max temperature.
+  // Make sure there is always a possible interval between min and max
+  // temperature.
   if (config.min_temperature >= config.max_temperature)
   {
     config.max_temperature = config.min_temperature + 1;
@@ -70,14 +75,16 @@ int randBetween(int start, int end)
 }
 
 /**
- * Publish a random temperature within the boundaries of the min and max parameters
+ * Publish a random temperature within the boundaries of the min and max
+ * parameters
  * @param temperature_pub publish the temperature message with this publisher
  */
 void publishTemperature(const ros::Publisher& temperature_pub)
 {
   int random_temperature = randBetween(min_temperature, max_temperature);
 
-  // Update the vector with the latest temperatures by removing the first entry and adding a new one.
+  // Update the vector with the latest temperatures by removing the first entry
+  // and adding a new one.
   latest_temperatures.erase(latest_temperatures.begin());
   latest_temperatures.push_back(random_temperature);
 

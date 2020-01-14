@@ -4,6 +4,7 @@
     <arg name="gazebo_ui" default="true" doc="Launches the Gazebo UI."/>
     <arg name="debug" default="false" doc="Starts gazebo debugging with gdb."/>
     <arg name="fixed" default="true" doc="Fixes the exoskeleton in the world"/>
+    <arg name="ground_gait" default="false" doc="Exoskeleton will ground gait if true."/>
     <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_rotational."/>
 
     <!-- Load the URDF into the ROS Parameter Server -->
@@ -14,7 +15,8 @@
            command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/$(arg robot).xacro'
                     k_velocity_value_rotary:=60.0 k_velocity_value_linear:=60.0
                     k_position_value_rotary:=50.0 k_position_value_linear:=50.0
-                    max_effort_rotary:=200.0 max_effort_linear:=40.0" />
+                    max_effort_rotary:=200.0 max_effort_linear:=40.0
+                    ground_gait:=$(arg ground_gait)" />
 
     <!-- Upload the controller configuration -->
     <rosparam file="$(find march_simulation)/config/$(arg robot).yaml" command="load"/>
@@ -38,6 +40,7 @@
             <arg name="gui" value="$(arg gazebo_ui)" />
             <arg name="paused" value="true"/>
             <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+            <arg name="verbose" value="true" />
         </include>
 
         <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
