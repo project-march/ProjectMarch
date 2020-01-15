@@ -6,6 +6,7 @@
 #include <utility>
 #include <vector>
 #include <map>
+#include <unordered_map>
 
 #include <ros/ros.h>
 
@@ -13,29 +14,32 @@
 
 namespace march4cpp
 {
+/** Store IMC data as a struct to prevent data overlap.*/
 struct IMCObject
 {
-  int address;  // in IMC memory (see IMC manual)
-  int length;   // bits (see IMC manual)
+  uint16_t address;           // in IMC memory (see IMC manual)
+  uint16_t length;            // bits (see IMC manual)
+  uint32_t combined_address;  // combine the address(hex), sub-index(hex) and length(hex)
 
-  explicit IMCObject(int _address, int _length)
+  explicit IMCObject(uint16_t _address, uint16_t _length) : address(_address), length(_length)
   {
-    this->address = _address;
-    this->length = _length;
+    uint32_t MSword = ((address & 0xFFFF) << 16);  // Shift 16 bits left for most significant word
+    uint32_t LSword = (length & 0xFFFF);
+
+    combined_address = (MSword | LSword);
   }
 
-  IMCObject()
-  {
-  }
+  IMCObject(){};
 };
 
+/** The data direction to which the PDO is specified is restricted to master in slave out and slave out master in.*/
 enum class dataDirection
 {
   miso,
   mosi
 };
 
-// If a new object is added to this enum, make sure to also add it to PDOmap::initAllObjects()!
+/** All the available IMC object names divided over the PDO maps. make sure to also add it to PDOmap constructor.*/
 enum class IMCObjectName
 {
   StatusWord,
@@ -57,24 +61,27 @@ enum class IMCObjectName
 class PDOmap
 {
 public:
-  // Constructor
-  PDOmap();
+  /** Initiate all the entered IMC objects to prepare the PDO.*/
+  void addObject(IMCObjectName object_name);
 
-  void addObject(IMCObjectName objectname);
-  std::map<IMCObjectName, int> map(int slaveIndex, dataDirection direction);
+  std::map<IMCObjectName, int> map(int slave_index, dataDirection direction);
+
+  static std::unordered_map<IMCObjectName, IMCObject> all_objects;
 
 private:
-  void initAllObjects();
-  void sortPDOObjects();
-  uint32_t combineAddressLength(uint16_t address, uint16_t length);
-  std::map<IMCObjectName, IMCObject> PDOObjects;
-  std::map<IMCObjectName, IMCObject> allObjects;
-  std::vector<std::pair<IMCObjectName, IMCObject>> sortedPDOObjects;
-  std::map<IMCObjectName, int> byteOffsets;
+  /** Used to sort the objects in the all_objects according to data length.
+   * @return list of pairs <IMCObjectName, IMCObjects> according from object sizes */
+  std::vector<std::pair<IMCObjectName, IMCObject>> sortPDOObjects();
 
-  const int bitsPerReg = 64;
-  const int nrofRegs = 4;
-  const int objectSizes[3] = { 8, 16, 32 };
+  /** Configures the PDO in the IMC using the given base register address and sync manager address.
+   * @return map of the IMC PDO object name in combination with the byte-offset in the PDO register */
+  std::map<IMCObjectName, int> configurePDO(int slave_index, int base_register, int base_sync_manager);
+
+  std::map<IMCObjectName, IMCObject> PDO_objects;
+
+  const int bits_per_register = 64;           // Maximum amount of bits that can be constructed in one PDO message.
+  const int nr_of_regs = 4;                   // Amount of registers available.
+  const int object_sizes[3] = { 32, 16, 8 };  // Available sizes.
 };
 }  // namespace march4cpp
 
