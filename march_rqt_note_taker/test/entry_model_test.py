@@ -1,5 +1,6 @@
 import unittest
 
+from python_qt_binding.QtCore import QDateTime, Qt
 from rosgraph_msgs.msg import Log
 
 from march_rqt_note_taker.entry import Entry
@@ -14,9 +15,19 @@ class EntryModelTest(unittest.TestCase):
         self.assertEqual(self.model.rowCount(), 0)
         self.assertEqual(self.model.columnCount(), 2)
 
+    def test_horizontal_model_header(self):
+        self.assertEqual(self.model.headerData(0, Qt.Horizontal, Qt.DisplayRole), 'Time')
+        self.assertEqual(self.model.headerData(1, Qt.Horizontal, Qt.DisplayRole), 'Entry')
+
     def test_insert_single_row(self):
-        self.model.insert_row(Entry('test'))
+        entry = Entry('test', QDateTime.fromSecsSinceEpoch(5))
+        self.model.insert_row(entry)
         self.assertEqual(self.model.rowCount(), 1)
+
+        time_index = self.model.createIndex(0, 0)
+        content_index = self.model.createIndex(0, 1)
+        self.assertEqual(self.model.data(time_index), entry.time_string())
+        self.assertEqual(self.model.data(content_index), entry.content)
 
     def test_insert_multiple_row(self):
         self.model.insert_row(Entry('test1'))
@@ -61,3 +72,14 @@ class EntryModelTest(unittest.TestCase):
 
     def test_get_column_out_of_bounds(self):
         self.assertIsNone(self.model.data(self.model.createIndex(0, len(self.model.columns))))
+
+    def test_empty_model_to_string(self):
+        self.assertEqual(str(self.model), '')
+
+    def test_entry_model_to_string(self):
+        entry = Entry('test1', QDateTime.fromSecsSinceEpoch(5))
+        self.model.insert_row(entry)
+        self.model.insert_row(entry)
+        self.model.insert_row(entry)
+
+        self.assertEqual(str(self.model), '{0}\n{0}\n{0}'.format(entry))

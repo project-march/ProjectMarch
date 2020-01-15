@@ -56,3 +56,8 @@ class EntryTest(unittest.TestCase):
         entry = Entry(content, date_time)
         self.assertEqual(str(entry),
                          '[{0}] {1}'.format(date_time.toString(), content))
+
+    def test_to_time_string(self):
+        date_time = QDateTime.fromSecsSinceEpoch(5)
+        entry = Entry('', date_time)
+        self.assertEqual(entry.time_string(), '01:00:05')
