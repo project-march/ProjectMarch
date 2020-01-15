@@ -1,6 +1,6 @@
 import unittest
 
-from python_qt_binding.QtCore import QDateTime
+from python_qt_binding.QtCore import QDateTime, QTimeZone
 from rosgraph_msgs.msg import Log
 import rospy
 
@@ -58,6 +58,6 @@ class EntryTest(unittest.TestCase):
                          '[{0}] {1}'.format(date_time.toString(), content))
 
     def test_to_time_string(self):
-        date_time = QDateTime.fromSecsSinceEpoch(5)
+        date_time = QDateTime.fromSecsSinceEpoch(5, QTimeZone.utc())
         entry = Entry('', date_time)
-        self.assertEqual(entry.time_string(), '01:00:05')
+        self.assertEqual(entry.time_string(), '00:00:05')
