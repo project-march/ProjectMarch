@@ -6,8 +6,6 @@
 #include <hardware_interface/internal/hardware_resource_manager.h>
 #include <string>
 
-namespace march_hardware_interface
-{
 class MarchTemperatureSensorHandle
 {
 public:
@@ -44,6 +42,5 @@ private:
 class MarchTemperatureSensorInterface : public hardware_interface::HardwareResourceManager<MarchTemperatureSensorHandle>
 {
 };
-}  // namespace march_hardware_interface
 
 #endif  // MARCH_HARDWARE_INTERFACE_MARCH_TEMPERATURE_SENSOR_INTERFACE_H

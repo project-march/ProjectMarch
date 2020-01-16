@@ -31,8 +31,8 @@ TEST_F(EncoderTest, ValidEncoderHip)
   std::string fullPath = this->fullPath("/encoder_correct_1.yaml");
   YAML::Node encoderConfig = YAML::LoadFile(fullPath);
 
-  march4cpp::Encoder actualEncoder = march4cpp::Encoder(16, 22134, 43436, 24515, 0.05);
-  march4cpp::Encoder createdEncoder = HardwareBuilder::createEncoder(encoderConfig);
+  march::Encoder actualEncoder = march::Encoder(16, 22134, 43436, 24515, 0.05);
+  march::Encoder createdEncoder = HardwareBuilder::createEncoder(encoderConfig);
   ASSERT_EQ(actualEncoder, createdEncoder);
 }
 
@@ -41,9 +41,9 @@ TEST_F(EncoderTest, ValidEncoderAnkle)
   std::string fullPath = this->fullPath("/encoder_correct_2.yaml");
   YAML::Node encoderConfig = YAML::LoadFile(fullPath);
 
-  march4cpp::Encoder actualEncoder = march4cpp::Encoder(12, 1086, 1490, 1301, 0.005);
+  march::Encoder actualEncoder = march::Encoder(12, 1086, 1490, 1301, 0.005);
 
-  march4cpp::Encoder createdEncoder = HardwareBuilder::createEncoder(encoderConfig);
+  march::Encoder createdEncoder = HardwareBuilder::createEncoder(encoderConfig);
   ASSERT_EQ(actualEncoder, createdEncoder);
 }
 

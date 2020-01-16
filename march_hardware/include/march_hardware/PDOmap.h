@@ -12,7 +12,7 @@
 
 #include <march_hardware/EtherCAT/EthercatSDO.h>
 
-namespace march4cpp
+namespace march
 {
 /** Store IMC data as a struct to prevent data overlap.*/
 struct IMCObject
@@ -83,6 +83,6 @@ private:
   const int nr_of_regs = 4;                   // Amount of registers available.
   const int object_sizes[3] = { 32, 16, 8 };  // Available sizes.
 };
-}  // namespace march4cpp
+}  // namespace march
 
 #endif  // MARCH_HARDWARE_PDOMAP_H

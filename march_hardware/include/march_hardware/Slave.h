@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <ros/ros.h>
 
-namespace march4cpp
+namespace march
 {
 class Slave
 {
@@ -35,6 +35,6 @@ public:
     return this->slaveIndex;
   }
 };
-}  // namespace march4cpp
+}  // namespace march
 
 #endif  // MARCH_HARDWARE_SLAVE_H

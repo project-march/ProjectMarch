@@ -6,16 +6,14 @@
 
 #include <hardware_interface/internal/hardware_resource_manager.h>
 #include <march_hardware/PowerDistributionBoard.h>
-#include <march_hardware_interface/PowerNetOnOffCommand.h>
+#include <march_hardware_interface/power_net_on_off_command.h>
 
-namespace march_hardware_interface
-{
 class MarchPdbStateHandle
 {
 public:
   MarchPdbStateHandle(
       /// Pointers to the storage location
-      const std::string& name, march4cpp::PowerDistributionBoard* powerDistributionBoard,
+      const std::string& name, march::PowerDistributionBoard* powerDistributionBoard,
       bool* master_shutdown_allowed_command, bool* all_high_voltage_on_off_command,
       PowerNetOnOffCommand* power_net_on_off_command)
     : name_(name)
@@ -35,9 +33,9 @@ public:
     return name_;
   }
 
-  march4cpp::PowerDistributionBoard* getPowerDistributionBoard()
+  march::PowerDistributionBoard* getPowerDistributionBoard()
   {
-    return const_cast<march4cpp::PowerDistributionBoard*>(powerDistributionBoard_);
+    return const_cast<march::PowerDistributionBoard*>(powerDistributionBoard_);
   }
 
   void setMasterShutdownAllowed(bool is_allowed)
@@ -72,12 +70,11 @@ private:
   bool* master_shutdown_allowed_command_;
   bool* all_high_voltage_on_off_command_;
   PowerNetOnOffCommand* power_net_on_off_command_;
-  march4cpp::PowerDistributionBoard* powerDistributionBoard_;
+  march::PowerDistributionBoard* powerDistributionBoard_;
 };
 
 class MarchPdbStateInterface : public hardware_interface::HardwareResourceManager<MarchPdbStateHandle>
 {
 };
-}  // namespace march_hardware_interface
 
 #endif  // MARCH_HARDWARE_INTERFACE_MARCH_PDB_STATE_INTERFACE_H

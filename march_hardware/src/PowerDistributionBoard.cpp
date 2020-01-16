@@ -2,7 +2,7 @@
 
 #include <march_hardware/PowerDistributionBoard.h>
 
-namespace march4cpp
+namespace march
 {
 PowerDistributionBoard::PowerDistributionBoard(int slaveIndex, NetMonitorOffsets netMonitoringOffsets,
                                                NetDriverOffsets netDriverOffsets,
@@ -60,4 +60,4 @@ LowVoltage PowerDistributionBoard::getLowVoltage()
   return lowVoltage;
 }
 
-}  // namespace march4cpp
+}  // namespace march

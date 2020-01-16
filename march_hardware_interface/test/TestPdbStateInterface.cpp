@@ -12,14 +12,14 @@ using ::testing::Return;
 class TestPdbStateInterface : public ::testing::Test
 {
 protected:
-  march4cpp::PowerDistributionBoard power_distribution_board_read_;
+  march::PowerDistributionBoard power_distribution_board_read_;
   bool master_shutdown_allowed_command = false;
   bool all_high_voltage_on_off_command = true;
   PowerNetOnOffCommand power_net_on_off_command_;
 
   void SetUp() override
   {
-    power_distribution_board_read_ = march4cpp::PowerDistributionBoard();
+    power_distribution_board_read_ = march::PowerDistributionBoard();
     master_shutdown_allowed_command = false;
     all_high_voltage_on_off_command = true;
     power_net_on_off_command_ = PowerNetOnOffCommand();
@@ -28,17 +28,17 @@ protected:
 
 TEST_F(TestPdbStateInterface, GeName)
 {
-  march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
-      &power_net_on_off_command_);
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+                                          &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
+                                          &power_net_on_off_command_);
   EXPECT_EQ("PDBhandle", marchPdbStateHandle.getName());
 }
 
 TEST_F(TestPdbStateInterface, GetPowerDistributionBoardEquals)
 {
-  march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
-      &power_net_on_off_command_);
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+                                          &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
+                                          &power_net_on_off_command_);
   EXPECT_TRUE(power_distribution_board_read_ == *marchPdbStateHandle.getPowerDistributionBoard());
 }
 
@@ -47,19 +47,18 @@ TEST_F(TestPdbStateInterface, GetPowerDistributionBoardNotEqual)
   NetMonitorOffsets currentOffsets = NetMonitorOffsets(5, 9, 13, 17, 3, 2, 1, 4);
   NetDriverOffsets netDriverOffsets = NetDriverOffsets(4, 3, 2);
   BootShutdownOffsets stateOffsets = BootShutdownOffsets(0, 0, 1);
-  march4cpp::PowerDistributionBoard pdb =
-      march4cpp::PowerDistributionBoard(1, currentOffsets, netDriverOffsets, stateOffsets);
-  march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
-      &power_net_on_off_command_);
+  march::PowerDistributionBoard pdb = march::PowerDistributionBoard(1, currentOffsets, netDriverOffsets, stateOffsets);
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+                                          &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
+                                          &power_net_on_off_command_);
   EXPECT_FALSE(pdb == *marchPdbStateHandle.getPowerDistributionBoard());
 }
 
 TEST_F(TestPdbStateInterface, SetMasterShutdownAllowedTrue)
 {
-  march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
-      &power_net_on_off_command_);
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+                                          &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
+                                          &power_net_on_off_command_);
 
   EXPECT_FALSE(master_shutdown_allowed_command);
   marchPdbStateHandle.setMasterShutdownAllowed(true);
@@ -67,9 +66,9 @@ TEST_F(TestPdbStateInterface, SetMasterShutdownAllowedTrue)
 }
 TEST_F(TestPdbStateInterface, SetMasterShutdownAllowedFalse)
 {
-  march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
-      &power_net_on_off_command_);
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+                                          &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
+                                          &power_net_on_off_command_);
 
   EXPECT_FALSE(master_shutdown_allowed_command);
   marchPdbStateHandle.setMasterShutdownAllowed(false);
@@ -78,9 +77,9 @@ TEST_F(TestPdbStateInterface, SetMasterShutdownAllowedFalse)
 
 TEST_F(TestPdbStateInterface, HighVoltageNetEnableDisable)
 {
-  march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
-      &power_net_on_off_command_);
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+                                          &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
+                                          &power_net_on_off_command_);
 
   EXPECT_TRUE(all_high_voltage_on_off_command);
   marchPdbStateHandle.setMasterShutdownAllowed(true);
@@ -88,9 +87,9 @@ TEST_F(TestPdbStateInterface, HighVoltageNetEnableDisable)
 }
 TEST_F(TestPdbStateInterface, TurnLowNetOn)
 {
-  march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
-      &power_net_on_off_command_);
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+                                          &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
+                                          &power_net_on_off_command_);
 
   // Check if the power net type is undefined
   EXPECT_EQ(PowerNetType(), power_net_on_off_command_.getType());
@@ -102,9 +101,9 @@ TEST_F(TestPdbStateInterface, TurnLowNetOn)
 
 TEST_F(TestPdbStateInterface, TurnLowNetOff)
 {
-  march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
-      &power_net_on_off_command_);
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+                                          &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
+                                          &power_net_on_off_command_);
 
   // Check if the power net type is undefined
   EXPECT_EQ(PowerNetType(), power_net_on_off_command_.getType());
@@ -115,9 +114,9 @@ TEST_F(TestPdbStateInterface, TurnLowNetOff)
 }
 TEST_F(TestPdbStateInterface, TurnHighNetOn)
 {
-  march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
-      &power_net_on_off_command_);
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+                                          &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
+                                          &power_net_on_off_command_);
 
   // Check if the power net type is undefined
   EXPECT_EQ(PowerNetType(), power_net_on_off_command_.getType());
@@ -129,9 +128,9 @@ TEST_F(TestPdbStateInterface, TurnHighNetOn)
 
 TEST_F(TestPdbStateInterface, TurnHighNetOff)
 {
-  march_hardware_interface::MarchPdbStateHandle marchPdbStateHandle(
-      "PDBhandle", &power_distribution_board_read_, &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
-      &power_net_on_off_command_);
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+                                          &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
+                                          &power_net_on_off_command_);
 
   // Check if the power net type is undefined
   EXPECT_EQ(PowerNetType(), power_net_on_off_command_.getType());

@@ -7,7 +7,7 @@
 
 #include <march_hardware/Joint.h>
 
-namespace march4cpp
+namespace march
 {
 /**
  * Base class of the ethercat master supported with the SOEM library
@@ -46,5 +46,5 @@ public:
   void stop();
 };
 
-}  // namespace march4cpp
+}  // namespace march
 #endif  // MARCH_HARDWARE_ETHERCAT_ETHERCATMASTER_H

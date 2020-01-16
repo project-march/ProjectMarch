@@ -12,7 +12,7 @@
 #include <march_hardware/EtherCAT/EthercatMaster.h>
 #include <march_hardware/PowerDistributionBoard.h>
 
-namespace march4cpp
+namespace march
 {
 class MarchRobot
 {
@@ -55,8 +55,8 @@ public:
     }
     for (unsigned int i = 0; i < lhs.jointList.size(); i++)
     {
-      const march4cpp::Joint lhsJoint = lhs.jointList.at(i);
-      const march4cpp::Joint rhsJoint = rhs.jointList.at(i);
+      const march::Joint lhsJoint = lhs.jointList.at(i);
+      const march::Joint rhsJoint = rhs.jointList.at(i);
       if (lhsJoint != rhsJoint)
       {
         return false;
@@ -75,5 +75,5 @@ public:
     return os;
   }
 };
-}  // namespace march4cpp
+}  // namespace march
 #endif  // MARCH_HARDWARE_MARCHROBOT_H

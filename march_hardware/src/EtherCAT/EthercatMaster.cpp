@@ -19,7 +19,7 @@
 #include <soem/ethercatconfig.h>
 #include <soem/ethercatprint.h>
 
-namespace march4cpp
+namespace march
 {
 EthercatMaster::EthercatMaster(std::vector<Joint>* jointListPtr, std::string ifname, int maxSlaveIndex,
                                int ecatCycleTime)
@@ -226,4 +226,4 @@ void EthercatMaster::stop()
   }
 }
 
-}  // namespace march4cpp
+}  // namespace march

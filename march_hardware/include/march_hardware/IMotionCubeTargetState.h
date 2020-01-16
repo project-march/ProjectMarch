@@ -4,7 +4,7 @@
 #define MARCH_HARDWARE_IMOTIONCUBETARGETSTATE_H
 
 #include <string>
-namespace march4cpp
+namespace march
 {
 class IMotionCubeTargetState
 {
@@ -50,5 +50,5 @@ public:
   }
 };
 
-}  // namespace march4cpp
+}  // namespace march
 #endif  // MARCH_HARDWARE_IMOTIONCUBETARGETSTATE_H

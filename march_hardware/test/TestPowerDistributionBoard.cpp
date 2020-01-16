@@ -22,14 +22,13 @@ TEST_F(TestPowerDistributionBoard, Unequals)
 {
   NetDriverOffsets netDriverOffsets2(1, 2, 3);
   NetMonitorOffsets netMonitorOffsets2(1, 1, 1, 1, 1, 1, 1, 1);
-  march4cpp::PowerDistributionBoard powerDistributionBoard1(slaveIndex, netMonitoringOffsets, netDriverOffsets,
-                                                            bootShutdownOffsets);
-  march4cpp::PowerDistributionBoard powerDistributionBoard2(3, netMonitoringOffsets, netDriverOffsets,
-                                                            bootShutdownOffsets);
-  march4cpp::PowerDistributionBoard powerDistributionBoard3(slaveIndex, netMonitoringOffsets, netDriverOffsets2,
-                                                            bootShutdownOffsets);
-  march4cpp::PowerDistributionBoard powerDistributionBoard4(slaveIndex, netMonitorOffsets2, netDriverOffsets,
-                                                            bootShutdownOffsets);
+  march::PowerDistributionBoard powerDistributionBoard1(slaveIndex, netMonitoringOffsets, netDriverOffsets,
+                                                        bootShutdownOffsets);
+  march::PowerDistributionBoard powerDistributionBoard2(3, netMonitoringOffsets, netDriverOffsets, bootShutdownOffsets);
+  march::PowerDistributionBoard powerDistributionBoard3(slaveIndex, netMonitoringOffsets, netDriverOffsets2,
+                                                        bootShutdownOffsets);
+  march::PowerDistributionBoard powerDistributionBoard4(slaveIndex, netMonitorOffsets2, netDriverOffsets,
+                                                        bootShutdownOffsets);
 
   EXPECT_FALSE(powerDistributionBoard1 == powerDistributionBoard2);
   EXPECT_FALSE(powerDistributionBoard1 == powerDistributionBoard3);
@@ -40,17 +39,17 @@ TEST_F(TestPowerDistributionBoard, Unequals)
 
 TEST_F(TestPowerDistributionBoard, Equals)
 {
-  march4cpp::PowerDistributionBoard powerDistributionBoard1(slaveIndex, netMonitoringOffsets, netDriverOffsets,
-                                                            bootShutdownOffsets);
-  march4cpp::PowerDistributionBoard powerDistributionBoard2(slaveIndex, netMonitoringOffsets, netDriverOffsets,
-                                                            bootShutdownOffsets);
+  march::PowerDistributionBoard powerDistributionBoard1(slaveIndex, netMonitoringOffsets, netDriverOffsets,
+                                                        bootShutdownOffsets);
+  march::PowerDistributionBoard powerDistributionBoard2(slaveIndex, netMonitoringOffsets, netDriverOffsets,
+                                                        bootShutdownOffsets);
   EXPECT_TRUE(powerDistributionBoard1 == powerDistributionBoard2);
 }
 
 TEST_F(TestPowerDistributionBoard, Stream)
 {
-  march4cpp::PowerDistributionBoard powerDistributionBoard1(slaveIndex, netMonitoringOffsets, netDriverOffsets,
-                                                            bootShutdownOffsets);
+  march::PowerDistributionBoard powerDistributionBoard1(slaveIndex, netMonitoringOffsets, netDriverOffsets,
+                                                        bootShutdownOffsets);
   std::stringstream ss;
   ss << powerDistributionBoard1;
   EXPECT_EQ("PowerDistributionBoard(slaveIndex: 2, masterOnlineToggle: 0, HighVoltage(slaveIndex: 2, "

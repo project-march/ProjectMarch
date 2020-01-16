@@ -23,22 +23,20 @@
 
 namespace march_pdb_state_controller
 {
-class MarchPdbStateController
-  : public controller_interface::Controller<march_hardware_interface::MarchPdbStateInterface>
+class MarchPdbStateController : public controller_interface::Controller<MarchPdbStateInterface>
 {
 public:
   MarchPdbStateController()
   {
   }
 
-  virtual bool init(march_hardware_interface::MarchPdbStateInterface* hw, ros::NodeHandle& root_nh,
-                    ros::NodeHandle& controller_nh);
+  virtual bool init(MarchPdbStateInterface* hw, ros::NodeHandle& root_nh, ros::NodeHandle& controller_nh);
   virtual void starting(const ros::Time& time);
   virtual void update(const ros::Time& time, const ros::Duration& /*period*/);
   virtual void stopping(const ros::Time& /*time*/);
 
 private:
-  march_hardware_interface::MarchPdbStateHandle pdb_state_;
+  MarchPdbStateHandle pdb_state_;
   typedef boost::shared_ptr<realtime_tools::RealtimePublisher<march_shared_resources::PowerDistributionBoardState> >
       RtPublisherPtr;
   RtPublisherPtr realtime_pubs_;
@@ -51,9 +49,8 @@ private:
   ros::Subscriber sub_turn_high_net_on_or_off;
 
   static std::vector<march_shared_resources::HighVoltageNet>
-  createHighVoltageNetsMessage(march4cpp::HighVoltage high_voltage);
-  static std::vector<march_shared_resources::LowVoltageNet>
-  createLowVoltageNetsMessage(march4cpp::LowVoltage low_voltage);
+  createHighVoltageNetsMessage(march::HighVoltage high_voltage);
+  static std::vector<march_shared_resources::LowVoltageNet> createLowVoltageNetsMessage(march::LowVoltage low_voltage);
   bool serviceDisableEnableHighVoltage(std_srvs::SetBool::Request& req, std_srvs::SetBool::Response& res);
   void masterShutdownAllowedCallback(const std_msgs::Bool::ConstPtr& msg);
   void turnHighVoltageNetOnOrOffCallBack(const std_msgs::Int8::ConstPtr& msg);

@@ -5,7 +5,7 @@
 #include <cmath>
 #include <ros/ros.h>
 
-namespace march4cpp
+namespace march
 {
 Encoder::Encoder(int numberOfBits, int minPositionIU, int maxPositionIU, int zeroPositionIU, float safetyMarginRad)
 {
@@ -118,4 +118,4 @@ int Encoder::getLowerHardLimitIU() const
   return lowerHardLimitIU;
 }
 
-}  // namespace march4cpp
+}  // namespace march

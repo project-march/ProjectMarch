@@ -33,7 +33,7 @@ TEST_F(ExampleTest, MockTest)
  */
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "march4cpp_test");
+  ros::init(argc, argv, "march_test");
   testing::InitGoogleTest(&argc, argv);
   ::testing::FLAGS_gtest_death_test_style = "threadsafe";
 

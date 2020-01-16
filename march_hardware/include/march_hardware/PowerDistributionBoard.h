@@ -11,7 +11,7 @@
 #include <march_hardware/LowVoltage.h>
 #include <march_hardware/EtherCAT/EthercatIO.h>
 
-namespace march4cpp
+namespace march
 {
 class PowerDistributionBoard : public Slave
 {
@@ -52,5 +52,5 @@ public:
               << powerDistributionBoard.highVoltage << ", " << powerDistributionBoard.lowVoltage << ")";
   }
 };
-}  // namespace march4cpp
+}  // namespace march
 #endif  // MARCH_HARDWARE_POWERDISTRIBUTIONBOARD_H

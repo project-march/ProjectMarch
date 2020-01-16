@@ -2,7 +2,7 @@
 #ifndef MARCH_HARDWARE_INTERFACE_POWERNETONOFFCOMMAND_H
 #define MARCH_HARDWARE_INTERFACE_POWERNETONOFFCOMMAND_H
 
-#include <march_hardware_interface/PowerNetType.h>
+#include <march_hardware_interface/power_net_type.h>
 
 class PowerNetOnOffCommand
 {

@@ -36,12 +36,12 @@ TEST_F(JointTest, ValidJointHip)
   std::string fullPath = this->fullPath("/joint_correct_1.yaml");
   YAML::Node jointConfig = YAML::LoadFile(fullPath);
 
-  march4cpp::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_hip");
+  march::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_hip");
 
-  march4cpp::Encoder actualEncoder = march4cpp::Encoder(16, 22134, 43436, 24515, 0.05);
-  march4cpp::IMotionCube actualIMotionCube = march4cpp::IMotionCube(2, actualEncoder);
-  march4cpp::TemperatureGES actualTemperatureGes = march4cpp::TemperatureGES(1, 2);
-  march4cpp::Joint actualJoint;
+  march::Encoder actualEncoder = march::Encoder(16, 22134, 43436, 24515, 0.05);
+  march::IMotionCube actualIMotionCube = march::IMotionCube(2, actualEncoder);
+  march::TemperatureGES actualTemperatureGes = march::TemperatureGES(1, 2);
+  march::Joint actualJoint;
   actualJoint.setName("test_joint_hip");
   actualJoint.setAllowActuation(true);
   actualJoint.setIMotionCube(actualIMotionCube);
@@ -56,18 +56,18 @@ TEST_F(JointTest, ValidNotActuated)
   std::string fullPath = this->fullPath("/joint_correct_not_actuated.yaml");
   YAML::Node jointConfig = YAML::LoadFile(fullPath);
 
-  march4cpp::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_hip");
+  march::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_hip");
 
-  march4cpp::Encoder actualEncoder = march4cpp::Encoder(16, 22134, 43436, 24515, 0.05);
-  march4cpp::IMotionCube actualIMotionCube = march4cpp::IMotionCube(2, actualEncoder);
-  march4cpp::TemperatureGES actualTemperatureGes = march4cpp::TemperatureGES(1, 2);
-  march4cpp::Joint actualJoint;
+  march::Encoder actualEncoder = march::Encoder(16, 22134, 43436, 24515, 0.05);
+  march::IMotionCube actualIMotionCube = march::IMotionCube(2, actualEncoder);
+  march::TemperatureGES actualTemperatureGes = march::TemperatureGES(1, 2);
+  march::Joint actualJoint;
   actualJoint.setName("test_joint_hip");
   actualJoint.setAllowActuation(false);
   actualJoint.setIMotionCube(actualIMotionCube);
   actualJoint.setTemperatureGes(actualTemperatureGes);
 
-  march4cpp::Joint actualJointWrong;
+  march::Joint actualJointWrong;
 
   actualJointWrong.setName("test_joint_hip");
   actualJointWrong.setAllowActuation(true);
@@ -84,13 +84,13 @@ TEST_F(JointTest, ValidJointAnkle)
   std::string fullPath = this->fullPath("/joint_correct_2.yaml");
   YAML::Node jointConfig = YAML::LoadFile(fullPath);
 
-  march4cpp::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_ankle");
+  march::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_ankle");
 
-  march4cpp::Encoder actualEncoder = march4cpp::Encoder(20, 3, 40000, 5, 0.05);
-  march4cpp::IMotionCube actualIMotionCube = march4cpp::IMotionCube(10, actualEncoder);
-  march4cpp::TemperatureGES actualTemperatureGes = march4cpp::TemperatureGES(10, 6);
+  march::Encoder actualEncoder = march::Encoder(20, 3, 40000, 5, 0.05);
+  march::IMotionCube actualIMotionCube = march::IMotionCube(10, actualEncoder);
+  march::TemperatureGES actualTemperatureGes = march::TemperatureGES(10, 6);
 
-  march4cpp::Joint actualJoint;
+  march::Joint actualJoint;
 
   actualJoint.setName("test_joint_ankle");
   actualJoint.setAllowActuation(true);
@@ -130,15 +130,15 @@ TEST_F(JointTest, ValidActuationMode)
   std::string fullPath = this->fullPath("/joint_correct_position_mode.yaml");
   YAML::Node jointConfig = YAML::LoadFile(fullPath);
 
-  march4cpp::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_hip");
+  march::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_hip");
 
-  march4cpp::Joint actualJoint;
+  march::Joint actualJoint;
   actualJoint.setName("test_joint_hip");
-  actualJoint.setActuationMode(march4cpp::ActuationMode("position"));
+  actualJoint.setActuationMode(march::ActuationMode("position"));
 
-  march4cpp::Joint actualJointWrong;
+  march::Joint actualJointWrong;
   actualJointWrong.setName("test_joint_hip");
-  actualJointWrong.setActuationMode(march4cpp::ActuationMode("torque"));
+  actualJointWrong.setActuationMode(march::ActuationMode("torque"));
 
   ASSERT_EQ("test_joint_hip", actualJoint.getName());
   ASSERT_EQ(actualJoint, createdJoint);

@@ -66,7 +66,7 @@ if (CATKIN_ENABLE_TESTING)
     endif()
 
     add_rostest_gmock(${PROJECT_NAME}-test
-        test/march4cpp.test
+        test/march_hardware.test
         test/TestRunner.cpp
         test/TestEncoder.cpp
         test/TestIMotionCube.cpp

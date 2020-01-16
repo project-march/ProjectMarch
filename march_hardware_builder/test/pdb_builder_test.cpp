@@ -32,13 +32,12 @@ TEST_F(PowerDistributionBoardTest, ValidPowerDistributionBoard)
   std::string fullPath = this->fullPath("/power_distribution_board.yaml");
   YAML::Node config = YAML::LoadFile(fullPath);
 
-  march4cpp::PowerDistributionBoard createdPowerDistributionBoard =
-      HardwareBuilder::createPowerDistributionBoard(config);
+  march::PowerDistributionBoard createdPowerDistributionBoard = HardwareBuilder::createPowerDistributionBoard(config);
   NetMonitorOffsets netMonitoringOffsets(5, 9, 13, 17, 3, 2, 1, 4);
   NetDriverOffsets netDriverOffsets(4, 3, 2);
   BootShutdownOffsets bootShutdownOffsets(0, 0, 1);
-  march4cpp::PowerDistributionBoard powerDistributionBoard =
-      march4cpp::PowerDistributionBoard(1, netMonitoringOffsets, netDriverOffsets, bootShutdownOffsets);
+  march::PowerDistributionBoard powerDistributionBoard =
+      march::PowerDistributionBoard(1, netMonitoringOffsets, netDriverOffsets, bootShutdownOffsets);
 
   ASSERT_EQ(powerDistributionBoard, createdPowerDistributionBoard);
 }

@@ -1,0 +1,4 @@
+<launch>
+    <!-- Launch the required nodes here -->
+    <test test-name="march_test" pkg="march_hardware" type="march_hardware-test"/>
+</launch>

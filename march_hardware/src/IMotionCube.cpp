@@ -11,7 +11,7 @@
 #include <march_hardware/IMotionCube.h>
 #include <unistd.h>
 
-namespace march4cpp
+namespace march
 {
 IMotionCube::IMotionCube(int slaveIndex, Encoder encoder) : Slave(slaveIndex), actuationMode("unknown")
 {
@@ -546,4 +546,4 @@ bool IMotionCube::get_bit(uint16 value, int index)
 {
   return static_cast<bool>(value & (1 << index));
 }
-}  // namespace march4cpp
+}  // namespace march

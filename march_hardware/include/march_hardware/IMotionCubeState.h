@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace march4cpp
+namespace march
 {
 class IMCState
 {
@@ -97,6 +97,6 @@ public:
   float motorVoltage;
 };
 
-}  // namespace march4cpp
+}  // namespace march
 
 #endif  // MARCH_HARDWARE_IMOTIONCUBESTATE_H

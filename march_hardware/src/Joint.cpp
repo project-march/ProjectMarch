@@ -6,7 +6,7 @@
 
 #include <march_hardware/Joint.h>
 
-namespace march4cpp
+namespace march
 {
 void Joint::initialize(int ecatCycleTime)
 {
@@ -193,4 +193,4 @@ void Joint::setActuationMode(ActuationMode actuationMode)
   this->iMotionCube.setActuationMode(actuationMode);
 }
 
-}  // namespace march4cpp
+}  // namespace march

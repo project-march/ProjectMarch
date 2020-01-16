@@ -12,7 +12,7 @@
 #include <soem/ethercatconfig.h>
 #include <soem/ethercatprint.h>
 
-namespace march4cpp
+namespace march
 {
 // TODO(Isha, Martijn, Tim) refactor this with more generic types
 int sdo_bit8(int slave, uint32_t index, uint8_t sub, uint8_t value)
@@ -50,4 +50,4 @@ int sdo_bit32(int slave, uint32_t index, uint8_t sub, uint32_t value)
   }
   return received_working_counter;
 }
-}  // namespace march4cpp
+}  // namespace march

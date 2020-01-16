@@ -1,7 +1,7 @@
 // Copyright 2019 Project March.
 #include <march_hardware/LowVoltage.h>
 
-namespace march4cpp
+namespace march
 {
 LowVoltage::LowVoltage(int slaveIndex, NetMonitorOffsets netMonitoringOffsets, NetDriverOffsets netDriverOffsets)
   : slaveIndex(slaveIndex), netMonitoringOffsets(netMonitoringOffsets), netDriverOffsets(netDriverOffsets)
@@ -48,4 +48,4 @@ uint8 LowVoltage::getNetsOperational()
   return operational.ui;
 }
 
-}  // namespace march4cpp
+}  // namespace march

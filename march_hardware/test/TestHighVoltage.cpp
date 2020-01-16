@@ -19,8 +19,8 @@ TEST_F(TestHighVoltage, Equals)
   int slaveIndex = 2;
   NetMonitorOffsets netMonitoringOffsets;
   NetDriverOffsets netDriverOffsets;
-  march4cpp::HighVoltage highVoltage1(slaveIndex, netMonitoringOffsets, netDriverOffsets);
-  march4cpp::HighVoltage highVoltage2(slaveIndex, netMonitoringOffsets, netDriverOffsets);
+  march::HighVoltage highVoltage1(slaveIndex, netMonitoringOffsets, netDriverOffsets);
+  march::HighVoltage highVoltage2(slaveIndex, netMonitoringOffsets, netDriverOffsets);
   EXPECT_TRUE(highVoltage1 == highVoltage2);
 }
 
@@ -30,9 +30,9 @@ TEST_F(TestHighVoltage, UnEqual)
   NetMonitorOffsets netMonitoringOffsets;
   NetDriverOffsets netDriverOffsets1;
   NetDriverOffsets netDriverOffsets2(1, 2, 3);
-  march4cpp::HighVoltage highVoltage1(4, netMonitoringOffsets, netDriverOffsets1);
-  march4cpp::HighVoltage highVoltage2(slaveIndex, netMonitoringOffsets, netDriverOffsets1);
-  march4cpp::HighVoltage highVoltage3(slaveIndex, netMonitoringOffsets, netDriverOffsets2);
+  march::HighVoltage highVoltage1(4, netMonitoringOffsets, netDriverOffsets1);
+  march::HighVoltage highVoltage2(slaveIndex, netMonitoringOffsets, netDriverOffsets1);
+  march::HighVoltage highVoltage3(slaveIndex, netMonitoringOffsets, netDriverOffsets2);
   EXPECT_FALSE(highVoltage1 == highVoltage2);
   EXPECT_FALSE(highVoltage1 == highVoltage3);
   EXPECT_FALSE(highVoltage2 == highVoltage3);
@@ -43,7 +43,7 @@ TEST_F(TestHighVoltage, Stream)
   int slaveIndex = 1;
   NetMonitorOffsets netMonitoringOffsets;
   NetDriverOffsets netDriverOffsets;
-  march4cpp::HighVoltage highVoltage(slaveIndex, netMonitoringOffsets, netDriverOffsets);
+  march::HighVoltage highVoltage(slaveIndex, netMonitoringOffsets, netDriverOffsets);
   std::stringstream ss;
   ss << highVoltage;
   EXPECT_EQ("HighVoltage(slaveIndex: 1, netMonitoringOffsets: NetMonitorOffsets(powerDistributionBoardCurrent: -1, "

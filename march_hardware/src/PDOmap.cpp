@@ -4,7 +4,7 @@
 #include <map>
 #include <utility>
 
-namespace march4cpp
+namespace march
 {
 std::unordered_map<IMCObjectName, IMCObject> PDOmap::all_objects = {
   { IMCObjectName::StatusWord, IMCObject(0x6041, 16) },
@@ -153,4 +153,4 @@ std::vector<std::pair<IMCObjectName, IMCObject>> PDOmap::sortPDOObjects()
   }
   return sorted_PDO_objects;
 }
-}  // namespace march4cpp
+}  // namespace march

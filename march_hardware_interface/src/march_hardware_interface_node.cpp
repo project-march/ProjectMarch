@@ -18,7 +18,7 @@ int main(int argc, char** argv)
 
   spinner.start();
 
-  march_hardware_interface::MarchHardwareInterface march(nh, selected_robot);
+  MarchHardwareInterface march(nh, selected_robot);
 
   try
   {
