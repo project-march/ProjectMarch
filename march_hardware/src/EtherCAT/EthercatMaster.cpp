@@ -76,8 +76,9 @@ void EthercatMaster::ethercatMasterInitiation()
 
 int setSlaveWatchdogTimer(uint16 slave) {
   uint16 configadr = ec_slave[slave].configadr;
-  ec_FPWRw(configadr, 0x0400, IMotionCube::WATCHDOG_DIVIDER, EC_TIMEOUTRET);
-  ec_FPWRw(configadr, 0x0410, IMotionCube::WATCHDOG_TIME, EC_TIMEOUTRET);
+  ec_FPWRw(configadr, 0x0400, IMotionCube::WATCHDOG_DIVIDER, EC_TIMEOUTRET); //Set the divider register of the watchdog
+  ec_FPWRw(configadr, 0x0410, IMotionCube::WATCHDOG_TIME, EC_TIMEOUTRET); //Set the PDI watchdog
+  ec_FPWRw(configadr, 0x0420, IMotionCube::WATCHDOG_TIME, EC_TIMEOUTRET); //SET the SM watchdog
   return 1;
 }
 
