@@ -1,7 +1,7 @@
 # Gait Generation
 Robot agnostic rqt plugin which allows the user to create joint trajectories.
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/project-march/gait-generation)
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/project-march/gait-generation?include_prereleases)
 
 | Branch | Build Status |
 | ------ |:------------:|
