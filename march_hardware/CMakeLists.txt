@@ -26,6 +26,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 )
 
 add_library(${PROJECT_NAME}
+    include/${PROJECT_NAME}/error/motion_error.h
     src/Encoder.cpp
     src/EtherCAT/EthercatIO.cpp
     src/EtherCAT/EthercatMaster.cpp
@@ -39,7 +40,7 @@ add_library(${PROJECT_NAME}
     src/PDOmap.cpp
     src/PowerDistributionBoard.cpp
     src/TemperatureGES.cpp
-)
+    src/error/motion_error.cpp)
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 

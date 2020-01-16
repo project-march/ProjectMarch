@@ -4,6 +4,7 @@
 #include <bitset>
 #include <string>
 
+#include <march_hardware/error/motion_error.h>
 #include <march_hardware/Joint.h>
 
 namespace march
@@ -115,8 +116,8 @@ IMotionCubeState Joint::getIMotionCubeState()
   states.motionError = motionErrorBits.to_string();
 
   states.state = this->iMotionCube.getState(this->iMotionCube.getStatusWord());
-  states.detailedErrorDescription = this->iMotionCube.parseDetailedError(this->iMotionCube.getDetailedError());
-  states.motionErrorDescription = this->iMotionCube.parseMotionError(this->iMotionCube.getMotionError());
+  states.detailedErrorDescription = error::parseDetailedError(this->iMotionCube.getDetailedError());
+  states.motionErrorDescription = error::parseMotionError(this->iMotionCube.getMotionError());
 
   states.motorCurrent = this->iMotionCube.getMotorCurrent();
   states.motorVoltage = this->iMotionCube.getMotorVoltage();

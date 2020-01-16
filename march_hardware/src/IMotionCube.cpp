@@ -1,15 +1,15 @@
 // Copyright 2018 Project March.
+#include <march_hardware/IMotionCube.h>
+#include <march_hardware/error/motion_error.h>
+#include <march_hardware/EtherCAT/EthercatSDO.h>
+#include <march_hardware/EtherCAT/EthercatIO.h>
+
 #include <bitset>
 #include <string>
+#include <unistd.h>
 #include <vector>
 
 #include <ros/ros.h>
-
-#include <march_hardware/EtherCAT/EthercatSDO.h>
-
-#include <march_hardware/EtherCAT/EthercatIO.h>
-#include <march_hardware/IMotionCube.h>
-#include <unistd.h>
 
 namespace march
 {
@@ -267,7 +267,8 @@ void IMotionCube::setControlWord(uint16 controlWord)
 std::string IMotionCube::parseStatusWord(uint16 statusWord)
 {
   std::string wordDescription = "";
-  if (get_bit(statusWord, 0) == 1)
+  const std::bitset<sizeof(uint16)> bitset(statusWord);
+  if (bitset.test(0))
   {
     wordDescription += "Axis on. Power stage is enabled. Motor control is performed. ";
   }
@@ -275,15 +276,15 @@ std::string IMotionCube::parseStatusWord(uint16 statusWord)
   {
     wordDescription += "Axis off. Power stage is disabled. Motor control is not performed. ";
   }
-  if (get_bit(statusWord, 2) == 1)
+  if (bitset.test(2))
   {
     wordDescription += "Operation Enabled. ";
   }
-  if (get_bit(statusWord, 3) == 1)
+  if (bitset.test(3))
   {
     wordDescription += "Fault. If set, a fault condition is or was present in the drive. ";
   }
-  if (get_bit(statusWord, 4) == 1)
+  if (bitset.test(4))
   {
     wordDescription += "Motor supply voltage is present. ";
   }
@@ -291,23 +292,23 @@ std::string IMotionCube::parseStatusWord(uint16 statusWord)
   {
     wordDescription += "Motor supply voltage is absent. ";
   }
-  if (get_bit(statusWord, 5) == 0)
+  if (bitset.test(5))
   {
     wordDescription += "Quick Stop. When this bit is zero, the drive is performing a quick stop. ";
   }
-  if (get_bit(statusWord, 6) == 1)
+  if (bitset.test(6))
   {
     wordDescription += "Switch On Disabled. ";
   }
-  if (get_bit(statusWord, 7) == 1)
+  if (bitset.test(7))
   {
     wordDescription += "A TML function  was called, while another TML function is still in execution. ";
   }
-  if (get_bit(statusWord, 8) == 1)
+  if (bitset.test(8))
   {
     wordDescription += "A TML function or homing is executed. ";
   }
-  if (get_bit(statusWord, 9) == 1)
+  if (bitset.test(9))
   {
     wordDescription += "Remote - drive parameters may be modified via CAN. ";
   }
@@ -315,23 +316,23 @@ std::string IMotionCube::parseStatusWord(uint16 statusWord)
   {
     wordDescription += "Remote - drive is in local mode and will not execute the command message. ";
   }
-  if (get_bit(statusWord, 10) == 1)
+  if (bitset.test(10))
   {
     wordDescription += "Target reached. ";
   }
-  if (get_bit(statusWord, 11) == 1)
+  if (bitset.test(11))
   {
     wordDescription += "Internal Limit Active. ";
   }
-  if (get_bit(statusWord, 12) == 0)
+  if (bitset.test(12))
   {
     wordDescription += "Target position ignored. ";
   }
-  if (get_bit(statusWord, 13) == 1)
+  if (bitset.test(13))
   {
     wordDescription += "Following error. ";
   }
-  if (get_bit(statusWord, 14) == 1)
+  if (bitset.test(14))
   {
     wordDescription += "Last event set has occurred. ";
   }
@@ -339,7 +340,7 @@ std::string IMotionCube::parseStatusWord(uint16 statusWord)
   {
     wordDescription += "No event set or the programmed event has not occurred yet. ";
   }
-  if (get_bit(statusWord, 15) == 1)
+  if (bitset.test(15))
   {
     wordDescription += "Axis on. Power stage is enabled. Motor control is performed. ";
   }
@@ -404,61 +405,6 @@ IMCState IMotionCube::getState(uint16 statusWord)
   }
 }
 
-std::string IMotionCube::parseMotionError(uint16 motionError)
-{
-  std::vector<std::string> bitDescriptions = {};
-  bitDescriptions.push_back("EtherCAT communication error. ");
-  bitDescriptions.push_back("Short-circuit. ");
-  bitDescriptions.push_back("Invalid setup (EEPROM) data. ");
-  bitDescriptions.push_back("Control error (position/speed error too big). ");
-  bitDescriptions.push_back("Communication error. ");
-  bitDescriptions.push_back("Motor position wraps around. ");
-  bitDescriptions.push_back("Positive limit switch. ");
-  bitDescriptions.push_back("Negative limit switch. ");
-  bitDescriptions.push_back("Over-current. ");
-  bitDescriptions.push_back("I2T protection. ");
-  bitDescriptions.push_back("Over-temperature motor. ");
-  bitDescriptions.push_back("Over-temperature drive. ");
-  bitDescriptions.push_back("Over-voltage. ");
-  bitDescriptions.push_back("Under-voltage. ");
-  bitDescriptions.push_back("Command error. ");
-  bitDescriptions.push_back("Drive disabled (Emergency button connector not shorted). ");
-
-  std::string errorDescription = "";
-  for (int i = 0; i < 16; i++)
-  {
-    if (get_bit(motionError, i) == 1)
-    {
-      errorDescription = errorDescription + bitDescriptions.at(i);
-    }
-  }
-  return errorDescription;
-}
-
-std::string IMotionCube::parseDetailedError(uint16 detailedError)
-{
-  std::vector<std::string> bitDescriptions = {};
-  bitDescriptions.push_back("TML stack overflow. ");
-  bitDescriptions.push_back("TML stack underflow. ");
-  bitDescriptions.push_back("Homing not available. ");
-  bitDescriptions.push_back("Function not available. ");
-  bitDescriptions.push_back("UPD ignored. ");
-  bitDescriptions.push_back("Cancelable call ignored. ");
-  bitDescriptions.push_back("Positive software limit switch is active. ");
-  bitDescriptions.push_back("Negative software limit switch is active. ");
-  bitDescriptions.push_back("Invalid S-curve profile. ");
-
-  std::string errorDescription = "";
-  for (int i = 0; i < 9; i++)
-  {
-    if (get_bit(detailedError, i) == 1)
-    {
-      errorDescription = errorDescription + bitDescriptions.at(i);
-    }
-  }
-  return errorDescription;
-}
-
 bool IMotionCube::goToTargetState(IMotionCubeTargetState targetState)
 {
   ROS_DEBUG("\tTry to go to '%s'", targetState.getDescription().c_str());
@@ -472,8 +418,8 @@ bool IMotionCube::goToTargetState(IMotionCubeTargetState targetState)
     {
       ROS_FATAL("IMotionCube went to fault state while attempting to go to '%s'. Shutting down.",
                 targetState.getDescription().c_str());
-      ROS_FATAL("Detailed Error: %s", this->parseDetailedError(this->getDetailedError()).c_str());
-      ROS_FATAL("Motion Error: %s", this->parseMotionError(this->getMotionError()).c_str());
+      ROS_FATAL("Detailed Error: %s", error::parseDetailedError(this->getDetailedError()).c_str());
+      ROS_FATAL("Motion Error: %s", error::parseMotionError(this->getMotionError()).c_str());
       throw std::domain_error("IMC to fault state");
     }
   }
@@ -531,10 +477,5 @@ bool IMotionCube::resetIMotionCube()
 ActuationMode IMotionCube::getActuationMode() const
 {
   return this->actuationMode;
-}
-
-bool IMotionCube::get_bit(uint16 value, int index)
-{
-  return static_cast<bool>(value & (1 << index));
 }
 }  // namespace march
