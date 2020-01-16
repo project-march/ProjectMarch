@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(march_temperature_sensor_controller)
 
-add_compile_options(-std=c++11 -Wall -g)
+add_compile_options(-std=c++11 -Wall -Wextra)
 
 find_package(catkin REQUIRED COMPONENTS
     controller_interface
@@ -10,7 +10,6 @@ find_package(catkin REQUIRED COMPONENTS
     pluginlib
     realtime_tools
     roscpp
-    roslint
     sensor_msgs
 )
 
@@ -21,19 +20,9 @@ catkin_package(
     sensor_msgs
 )
 
-set(ROSLINT_CPP_OPTS "--filter=-build/include,-build/header_guard,-runtime/references" "--linelength=120")
-
-file(GLOB_RECURSE lintfiles
-    "*.cpp"
-    "*.h"
-)
-
-roslint_cpp(${lintfiles})
-
-include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
+include_directories(include SYSTEM ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
 add_library(${PROJECT_NAME}
-    include/${PROJECT_NAME}/march_temperature_sensor_controller.h
     src/march_temperature_sensor_controller.cpp
 )
 
@@ -52,27 +41,3 @@ install(FILES march_temperature_sensor_plugin.xml
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
-## Add gtest based cpp test target and link libraries
-if (CATKIN_ENABLE_TESTING)
-    find_package(code_coverage REQUIRED)
-    find_package(rostest REQUIRED)
-
-    if(ENABLE_COVERAGE_TESTING)
-        include(CodeCoverage)
-        append_coverage_compiler_flags()
-    endif()
-
-    add_rostest_gtest(${PROJECT_NAME}-test
-        test/${PROJECT_NAME}.test
-        test/TestRunner.cpp
-    )
-    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} ${PROJECT_NAME} gtest gmock)
-
-    if(ENABLE_COVERAGE_TESTING)
-        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*")
-        add_code_coverage(
-            NAME ${PROJECT_NAME}_coverage
-            DEPENDS tests
-        )
-    endif()
-endif ()

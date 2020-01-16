@@ -1,7 +1,7 @@
 // Copyright 2019 Project March.
 
-#ifndef MARCH4CPP__MARCH4_H
-#define MARCH4CPP__MARCH4_H
+#ifndef MARCH_HARDWARE_MARCHROBOT_H
+#define MARCH_HARDWARE_MARCHROBOT_H
 
 #include <string>
 #include <vector>
@@ -19,10 +19,9 @@ class MarchRobot
 private:
   std::unique_ptr<EthercatMaster> ethercatMaster;
   std::unique_ptr<PowerDistributionBoard> powerDistributionBoard;
-
-public:
   ::std::vector<Joint> jointList;
 
+public:
   MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int ecatCycleTime);
 
   MarchRobot(::std::vector<Joint> jointList, PowerDistributionBoard powerDistributionBoard, ::std::string ifName,
@@ -77,4 +76,4 @@ public:
   }
 };
 }  // namespace march4cpp
-#endif
+#endif  // MARCH_HARDWARE_MARCHROBOT_H

@@ -1,20 +1,19 @@
 // Copyright 2019 Project March.
-
-#include "gtest/gtest.h"
-#include "ros/ros.h"
+#include <string>
+#include <gtest/gtest.h>
+#include <ros/ros.h>
 #include <gmock/gmock.h>
 #include <ros/package.h>
-#include <march_hardware_builder/HardwareConfigExceptions.h>
-#include <march_hardware_builder/HardwareBuilder.h>
+#include <march_hardware_builder/hardware_config_exceptions.h>
+#include <march_hardware_builder/hardware_builder.h>
 
-using ::testing::Return;
 using ::testing::AtLeast;
+using ::testing::Return;
 
 class EncoderTest : public ::testing::Test
 {
 protected:
   std::string base_path;
-  HardwareBuilder hardwareBuilder;
 
   void SetUp() override
   {
@@ -27,17 +26,13 @@ protected:
   }
 };
 
-class EncoderDeathTest : public EncoderTest
-{
-};
-
 TEST_F(EncoderTest, ValidEncoderHip)
 {
   std::string fullPath = this->fullPath("/encoder_correct_1.yaml");
   YAML::Node encoderConfig = YAML::LoadFile(fullPath);
 
   march4cpp::Encoder actualEncoder = march4cpp::Encoder(16, 22134, 43436, 24515, 0.05);
-  march4cpp::Encoder createdEncoder = hardwareBuilder.createEncoder(encoderConfig);
+  march4cpp::Encoder createdEncoder = HardwareBuilder::createEncoder(encoderConfig);
   ASSERT_EQ(actualEncoder, createdEncoder);
 }
 
@@ -48,7 +43,7 @@ TEST_F(EncoderTest, ValidEncoderAnkle)
 
   march4cpp::Encoder actualEncoder = march4cpp::Encoder(12, 1086, 1490, 1301, 0.005);
 
-  march4cpp::Encoder createdEncoder = hardwareBuilder.createEncoder(encoderConfig);
+  march4cpp::Encoder createdEncoder = HardwareBuilder::createEncoder(encoderConfig);
   ASSERT_EQ(actualEncoder, createdEncoder);
 }
 
@@ -57,7 +52,7 @@ TEST_F(EncoderTest, NoResolution)
   std::string fullPath = this->fullPath("/encoder_no_resolution.yaml");
   YAML::Node encoderConfig = YAML::LoadFile(fullPath);
 
-  ASSERT_THROW(hardwareBuilder.createEncoder(encoderConfig), MissingKeyException);
+  ASSERT_THROW(HardwareBuilder::createEncoder(encoderConfig), MissingKeyException);
 }
 
 TEST_F(EncoderTest, NoMinPosition)
@@ -65,7 +60,7 @@ TEST_F(EncoderTest, NoMinPosition)
   std::string fullPath = this->fullPath("/encoder_no_min_position.yaml");
   YAML::Node encoderConfig = YAML::LoadFile(fullPath);
 
-  ASSERT_THROW(hardwareBuilder.createEncoder(encoderConfig), MissingKeyException);
+  ASSERT_THROW(HardwareBuilder::createEncoder(encoderConfig), MissingKeyException);
 }
 
 TEST_F(EncoderTest, NoMaxPosition)
@@ -73,7 +68,7 @@ TEST_F(EncoderTest, NoMaxPosition)
   std::string fullPath = this->fullPath("/encoder_no_max_position.yaml");
   YAML::Node encoderConfig = YAML::LoadFile(fullPath);
 
-  ASSERT_THROW(hardwareBuilder.createEncoder(encoderConfig), MissingKeyException);
+  ASSERT_THROW(HardwareBuilder::createEncoder(encoderConfig), MissingKeyException);
 }
 
 TEST_F(EncoderTest, NoZeroPosition)
@@ -81,7 +76,7 @@ TEST_F(EncoderTest, NoZeroPosition)
   std::string fullPath = this->fullPath("/encoder_no_zero_position.yaml");
   YAML::Node encoderConfig = YAML::LoadFile(fullPath);
 
-  ASSERT_THROW(hardwareBuilder.createEncoder(encoderConfig), MissingKeyException);
+  ASSERT_THROW(HardwareBuilder::createEncoder(encoderConfig), MissingKeyException);
 }
 
 TEST_F(EncoderTest, NoSafetyMargin)
@@ -89,14 +84,5 @@ TEST_F(EncoderTest, NoSafetyMargin)
   std::string fullPath = this->fullPath("/encoder_no_safety_margin.yaml");
   YAML::Node encoderConfig = YAML::LoadFile(fullPath);
 
-  ASSERT_THROW(hardwareBuilder.createEncoder(encoderConfig), MissingKeyException);
-}
-
-TEST_F(EncoderDeathTest, IncorrectResolution)
-{
-  std::string fullPath = this->fullPath("/encoder_incorrect_resolution.yaml");
-  YAML::Node encoderConfig = YAML::LoadFile(fullPath);
-
-  ASSERT_DEATH(hardwareBuilder.createEncoder(encoderConfig), "Encoder resolution of -1 is not within range \\(0, "
-                                                             "32\\)");
+  ASSERT_THROW(HardwareBuilder::createEncoder(encoderConfig), MissingKeyException);
 }

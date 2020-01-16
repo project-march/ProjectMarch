@@ -1,11 +1,12 @@
 // Copyright 2019 Project March.
+#include <string>
 
-#include "gtest/gtest.h"
-#include "ros/ros.h"
+#include <gtest/gtest.h>
+#include <ros/ros.h>
 #include <gmock/gmock.h>
 #include <ros/package.h>
-#include <march_hardware_builder/HardwareConfigExceptions.h>
-#include <march_hardware_builder/HardwareBuilder.h>
+#include <march_hardware_builder/hardware_config_exceptions.h>
+#include <march_hardware_builder/hardware_builder.h>
 
 using ::testing::AtLeast;
 using ::testing::Return;
@@ -14,7 +15,6 @@ class JointTest : public ::testing::Test
 {
 protected:
   std::string base_path;
-  HardwareBuilder hardwareBuilder;
 
   void SetUp() override
   {
@@ -36,7 +36,7 @@ TEST_F(JointTest, ValidJointHip)
   std::string fullPath = this->fullPath("/joint_correct_1.yaml");
   YAML::Node jointConfig = YAML::LoadFile(fullPath);
 
-  march4cpp::Joint createdJoint = hardwareBuilder.createJoint(jointConfig, "test_joint_hip");
+  march4cpp::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_hip");
 
   march4cpp::Encoder actualEncoder = march4cpp::Encoder(16, 22134, 43436, 24515, 0.05);
   march4cpp::IMotionCube actualIMotionCube = march4cpp::IMotionCube(2, actualEncoder);
@@ -56,7 +56,7 @@ TEST_F(JointTest, ValidNotActuated)
   std::string fullPath = this->fullPath("/joint_correct_not_actuated.yaml");
   YAML::Node jointConfig = YAML::LoadFile(fullPath);
 
-  march4cpp::Joint createdJoint = hardwareBuilder.createJoint(jointConfig, "test_joint_hip");
+  march4cpp::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_hip");
 
   march4cpp::Encoder actualEncoder = march4cpp::Encoder(16, 22134, 43436, 24515, 0.05);
   march4cpp::IMotionCube actualIMotionCube = march4cpp::IMotionCube(2, actualEncoder);
@@ -84,7 +84,7 @@ TEST_F(JointTest, ValidJointAnkle)
   std::string fullPath = this->fullPath("/joint_correct_2.yaml");
   YAML::Node jointConfig = YAML::LoadFile(fullPath);
 
-  march4cpp::Joint createdJoint = hardwareBuilder.createJoint(jointConfig, "test_joint_ankle");
+  march4cpp::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_ankle");
 
   march4cpp::Encoder actualEncoder = march4cpp::Encoder(20, 3, 40000, 5, 0.05);
   march4cpp::IMotionCube actualIMotionCube = march4cpp::IMotionCube(10, actualEncoder);
@@ -106,7 +106,7 @@ TEST_F(JointTest, NoActuate)
   std::string fullPath = this->fullPath("/joint_no_actuate.yaml");
   YAML::Node jointConfig = YAML::LoadFile(fullPath);
 
-  ASSERT_THROW(hardwareBuilder.createJoint(jointConfig, "test_joint_no_actuate"), MissingKeyException);
+  ASSERT_THROW(HardwareBuilder::createJoint(jointConfig, "test_joint_no_actuate"), MissingKeyException);
 }
 
 TEST_F(JointTest, NoIMotionCube)
@@ -114,7 +114,7 @@ TEST_F(JointTest, NoIMotionCube)
   std::string fullPath = this->fullPath("/joint_no_imotioncube.yaml");
   YAML::Node jointConfig = YAML::LoadFile(fullPath);
 
-  ASSERT_NO_THROW(hardwareBuilder.createJoint(jointConfig, "test_joint_no_imotioncube"));
+  ASSERT_NO_THROW(HardwareBuilder::createJoint(jointConfig, "test_joint_no_imotioncube"));
 }
 
 TEST_F(JointTest, NoTemperatureGES)
@@ -122,7 +122,7 @@ TEST_F(JointTest, NoTemperatureGES)
   std::string fullPath = this->fullPath("/joint_no_temperature_ges.yaml");
   YAML::Node jointConfig = YAML::LoadFile(fullPath);
 
-  ASSERT_NO_THROW(hardwareBuilder.createJoint(jointConfig, "test_joint_no_temperature_ges"));
+  ASSERT_NO_THROW(HardwareBuilder::createJoint(jointConfig, "test_joint_no_temperature_ges"));
 }
 
 TEST_F(JointTest, ValidActuationMode)
@@ -130,7 +130,7 @@ TEST_F(JointTest, ValidActuationMode)
   std::string fullPath = this->fullPath("/joint_correct_position_mode.yaml");
   YAML::Node jointConfig = YAML::LoadFile(fullPath);
 
-  march4cpp::Joint createdJoint = hardwareBuilder.createJoint(jointConfig, "test_joint_hip");
+  march4cpp::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_hip");
 
   march4cpp::Joint actualJoint;
   actualJoint.setName("test_joint_hip");
@@ -139,7 +139,6 @@ TEST_F(JointTest, ValidActuationMode)
   march4cpp::Joint actualJointWrong;
   actualJointWrong.setName("test_joint_hip");
   actualJointWrong.setActuationMode(march4cpp::ActuationMode("torque"));
-
 
   ASSERT_EQ("test_joint_hip", actualJoint.getName());
   ASSERT_EQ(actualJoint, createdJoint);
@@ -151,5 +150,5 @@ TEST_F(JointDeathTest, EmptyJoint)
   std::string fullPath = this->fullPath("/joint_empty.yaml");
   YAML::Node jointConfig = YAML::LoadFile(fullPath);
 
-  ASSERT_THROW(hardwareBuilder.createJoint(jointConfig, "test_joint_empty"), MissingKeyException);
+  ASSERT_THROW(HardwareBuilder::createJoint(jointConfig, "test_joint_empty"), MissingKeyException);
 }

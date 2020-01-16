@@ -24,7 +24,9 @@
   <depend>march_hardware</depend>
   <depend>march_hardware_builder</depend>
 
-  <build_depend>roslint</build_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>ethercat_grant</exec_depend>
 
   <test_depend>rostest</test_depend>
   <test_depend>code_coverage</test_depend>

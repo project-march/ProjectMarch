@@ -1,7 +1,8 @@
 // Copyright 2019 Project March.
+#ifndef MARCH_HARDWARE_IMOTIONCUBESTATE_H
+#define MARCH_HARDWARE_IMOTIONCUBESTATE_H
 
-#ifndef MARCH_WS_IMOTIONCUBESTATE_H
-#define MARCH_WS_IMOTIONCUBESTATE_H
+#include <string>
 
 namespace march4cpp
 {
@@ -98,4 +99,4 @@ public:
 
 }  // namespace march4cpp
 
-#endif  // MARCH_WS_IMOTIONCUBESTATE_H
+#endif  // MARCH_HARDWARE_IMOTIONCUBESTATE_H

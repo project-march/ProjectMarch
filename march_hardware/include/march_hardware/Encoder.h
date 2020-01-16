@@ -1,7 +1,7 @@
 // Copyright 2019 Project March.
 
-#ifndef PROJECT_ENCODER_H
-#define PROJECT_ENCODER_H
+#ifndef MARCH_HARDWARE_ENCODER_H
+#define MARCH_HARDWARE_ENCODER_H
 
 #include <ostream>
 
@@ -77,4 +77,4 @@ public:
 };
 }  // namespace march4cpp
 
-#endif  // PROJECT_ENCODER_H
+#endif  // MARCH_HARDWARE_ENCODER_H

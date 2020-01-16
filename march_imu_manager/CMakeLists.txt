@@ -1,11 +1,10 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(march_imu_manager)
 
-add_compile_options(-std=c++11 -Wall -Wextra -g)
+add_compile_options(-std=c++11 -Wall -Wextra)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
-    roslint
     sensor_msgs
 )
 
@@ -18,17 +17,10 @@ catkin_package(
 
 include_directories(
     include
+    SYSTEM
     lib/include
     ${catkin_INCLUDE_DIRS}
 )
-
-file(GLOB_RECURSE lintfiles
-    "src/*.cpp"
-    "src/*.h"
-    "test/*.cpp"
-)
-
-roslint_cpp(${lintfiles})
 
 set(xsensdeviceapi_LOCATION ${PROJECT_SOURCE_DIR}/lib/libxsensdeviceapi.so)
 set(xstypes_LOCATION ${PROJECT_SOURCE_DIR}/lib/libxstypes.so)
@@ -43,8 +35,8 @@ add_library(xstypes SHARED IMPORTED)
 set_property(TARGET xstypes PROPERTY IMPORTED_LOCATION ${xstypes_LOCATION})
 
 add_library(${PROJECT_NAME}
-    src/Mtw.cpp
-    src/WirelessMaster.cpp
+    src/mtw.cpp
+    src/wireless_master.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -84,7 +76,7 @@ install(TARGETS ${PROJECT_NAME}_node
 )
 
 if(CATKIN_ENABLE_TESTING)
-    catkin_add_gtest(wireless_master_test test/WirelessMasterTest.cpp)
+    catkin_add_gtest(wireless_master_test test/wireless_master_test.cpp)
     target_link_libraries(wireless_master_test
         ${PROJECT_NAME}
         ${xsensdeviceapi_LIBRARY}

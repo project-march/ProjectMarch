@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(march_hardware_interface)
 
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++11 -Wall -Wextra)
 
 find_package(catkin REQUIRED COMPONENTS
     control_toolbox
@@ -15,7 +15,6 @@ find_package(catkin REQUIRED COMPONENTS
     march_shared_resources
     realtime_tools
     roscpp
-    roslint
     std_msgs
     urdf
 )
@@ -33,22 +32,20 @@ catkin_package(
     roscpp
     std_msgs
     urdf
+    CFG_EXTRAS
+    ${PROJECT_NAME}-extras.cmake
 )
 
-set(ROSLINT_CPP_OPTS "--filter=-build/include,-build/header_guard,-runtime/references" "--linelength=120")
+include(cmake/${PROJECT_NAME}-extras.cmake)
 
-file(GLOB_RECURSE lintfiles
-    "src/*.cpp"
-    "src/*.h"
-)
+include_directories(include SYSTEM ${catkin_INCLUDE_DIRS})
 
-roslint_cpp(${lintfiles})
-
-
-include_directories(include ${catkin_INCLUDE_DIRS})
+# needed to circumvent LD_LIBRARY_PATH being emptied through ethercat_grant
+# in addition to not propagating march_hardware_interface RUNPATH to dependencies, in contrast to RPATH
+set(GCC_NEWDTAGS_LINK_FLAGS "-Wl,--disable-new-dtags")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_NEWDTAGS_LINK_FLAGS}")
 
 add_executable(${PROJECT_NAME}_node
-    include/${PROJECT_NAME}/PowerNetOnOffCommand.h
     src/march_hardware_interface.cpp
     src/march_hardware_interface_node.cpp
 )
@@ -56,6 +53,7 @@ add_executable(${PROJECT_NAME}_node
 add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES})
+ros_enable_rpath(${PROJECT_NAME}_node)
 
 install(DIRECTORY include/${PROJECT_NAME}/
     DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
@@ -70,7 +68,7 @@ install(DIRECTORY config launch
 )
 
 ## Add gtest based cpp test target and link libraries
-if (CATKIN_ENABLE_TESTING)
+if(CATKIN_ENABLE_TESTING)
     find_package(code_coverage REQUIRED)
     find_package(rostest REQUIRED)
 
@@ -93,4 +91,4 @@ if (CATKIN_ENABLE_TESTING)
             DEPENDS tests
         )
     endif()
-endif ()
+endif()

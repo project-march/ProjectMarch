@@ -33,7 +33,7 @@
 
 #include <ros/ros.h>
 
-#include "march_imu_manager/WirelessMaster.h"
+#include "march_imu_manager/wireless_master.h"
 
 /*
    | MTw  | desiredUpdateRate (max) |
@@ -51,50 +51,50 @@
 
 int main(int argc, char* argv[])
 {
-    ros::init(argc, argv, "march_imu_manager");
-    ros::NodeHandle node;
+  ros::init(argc, argv, "march_imu_manager");
+  ros::NodeHandle node;
 
-    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug))
-    {
-        ros::console::notifyLoggerLevelsChanged();
-    }
+  if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug))
+  {
+    ros::console::notifyLoggerLevelsChanged();
+  }
 
-    WirelessMaster wirelessMaster(&node);
-    int error = wirelessMaster.init();
-    if (error)
-    {
-        ROS_FATAL_STREAM("Failed to construct wireless master instance");
-        return -1;
-    }
-    ROS_INFO("Found wireless master");
+  WirelessMaster wireless_master(&node);
+  int error = wireless_master.init();
+  if (error)
+  {
+    ROS_FATAL_STREAM("Failed to construct wireless master instance");
+    return -1;
+  }
+  ROS_INFO("Found wireless master");
 
-    error = wirelessMaster.configure(UPDATE_RATE, RADIO_CHANNEL);
-    if (error)
-    {
-        ROS_FATAL_STREAM("Failed to configure wireless master instance");
-        return -1;
-    }
+  error = wireless_master.configure(UPDATE_RATE, RADIO_CHANNEL);
+  if (error)
+  {
+    ROS_FATAL_STREAM("Failed to configure wireless master instance");
+    return -1;
+  }
 
-    // Blocks this thread until 1 MTw has connected
-    wirelessMaster.waitForConnections(1);
+  // Blocks this thread until 1 MTw has connected
+  wireless_master.waitForConnections(1);
 
-    ROS_DEBUG("Starting measurement...");
-    if (!wirelessMaster.startMeasurement())
-    {
-        ROS_FATAL("Failed to start measurement");
-        return -1;
-    }
+  ROS_DEBUG("Starting measurement...");
+  if (!wireless_master.startMeasurement())
+  {
+    ROS_FATAL("Failed to start measurement");
+    return -1;
+  }
 
-    ros::Rate loop_rate = LOOP_RATE;
+  ros::Rate loop_rate = LOOP_RATE;
 
-    ROS_DEBUG("Publish loop starting...");
+  ROS_DEBUG("Publish loop starting...");
 
-    while (ros::ok())
-    {
-        wirelessMaster.update();
-        ros::spinOnce();
-        loop_rate.sleep();
-    }
+  while (ros::ok())
+  {
+    wireless_master.update();
+    ros::spinOnce();
+    loop_rate.sleep();
+  }
 
-    return 0;
+  return 0;
 }

@@ -5,9 +5,9 @@
 #include <gmock/gmock.h>
 #include <sstream>
 
-using ::testing::Return;
 using ::testing::AtLeast;
 using ::testing::AtMost;
+using ::testing::Return;
 
 class TestHighVoltage : public ::testing::Test
 {

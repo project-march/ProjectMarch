@@ -8,9 +8,9 @@
 #include "march_hardware/IMotionCube.h"
 #include "mocks/MockEncoder.cpp"
 
-using ::testing::Return;
 using ::testing::AtLeast;
 using ::testing::AtMost;
+using ::testing::Return;
 
 class TestEncoder : public ::testing::Test
 {

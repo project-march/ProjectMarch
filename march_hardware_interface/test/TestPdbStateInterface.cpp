@@ -5,9 +5,9 @@
 #include <gmock/gmock.h>
 #include <sstream>
 
-using ::testing::Return;
 using ::testing::AtLeast;
 using ::testing::AtMost;
+using ::testing::Return;
 
 class TestPdbStateInterface : public ::testing::Test
 {
@@ -97,7 +97,7 @@ TEST_F(TestPdbStateInterface, TurnLowNetOn)
   marchPdbStateHandle.turnNetOnOrOff(PowerNetType("low_voltage"), true, 1);
   EXPECT_EQ(PowerNetType("low_voltage"), power_net_on_off_command_.getType());
   EXPECT_EQ(1, power_net_on_off_command_.getNetNumber());
-  EXPECT_TRUE( power_net_on_off_command_.isOnOrOff());
+  EXPECT_TRUE(power_net_on_off_command_.isOnOrOff());
 }
 
 TEST_F(TestPdbStateInterface, TurnLowNetOff)
@@ -111,7 +111,7 @@ TEST_F(TestPdbStateInterface, TurnLowNetOff)
   marchPdbStateHandle.turnNetOnOrOff(PowerNetType("low_voltage"), false, 1);
   EXPECT_EQ(PowerNetType("low_voltage"), power_net_on_off_command_.getType());
   EXPECT_EQ(1, power_net_on_off_command_.getNetNumber());
-  EXPECT_FALSE( power_net_on_off_command_.isOnOrOff());
+  EXPECT_FALSE(power_net_on_off_command_.isOnOrOff());
 }
 TEST_F(TestPdbStateInterface, TurnHighNetOn)
 {
@@ -124,7 +124,7 @@ TEST_F(TestPdbStateInterface, TurnHighNetOn)
   marchPdbStateHandle.turnNetOnOrOff(PowerNetType("high_voltage"), true, 1);
   EXPECT_EQ(PowerNetType("high_voltage"), power_net_on_off_command_.getType());
   EXPECT_EQ(1, power_net_on_off_command_.getNetNumber());
-  EXPECT_TRUE( power_net_on_off_command_.isOnOrOff());
+  EXPECT_TRUE(power_net_on_off_command_.isOnOrOff());
 }
 
 TEST_F(TestPdbStateInterface, TurnHighNetOff)
@@ -138,5 +138,5 @@ TEST_F(TestPdbStateInterface, TurnHighNetOff)
   marchPdbStateHandle.turnNetOnOrOff(PowerNetType("high_voltage"), false, 1);
   EXPECT_EQ(PowerNetType("high_voltage"), power_net_on_off_command_.getType());
   EXPECT_EQ(1, power_net_on_off_command_.getNetNumber());
-  EXPECT_FALSE( power_net_on_off_command_.isOnOrOff());
+  EXPECT_FALSE(power_net_on_off_command_.isOnOrOff());
 }

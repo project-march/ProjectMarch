@@ -4,6 +4,7 @@
 #include <joint_limits_interface/joint_limits_interface.h>
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <sstream>
+#include <string>
 
 #include <march_hardware/MarchRobot.h>
 #include <march_hardware/Joint.h>
@@ -14,28 +15,22 @@
 
 #include <urdf/model.h>
 
+using hardware_interface::JointHandle;
+using hardware_interface::JointStateHandle;
+using hardware_interface::PositionJointInterface;
+using joint_limits_interface::EffortJointSoftLimitsHandle;
+using joint_limits_interface::EffortJointSoftLimitsInterface;
 using joint_limits_interface::JointLimits;
 using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::PositionJointSoftLimitsInterface;
-using joint_limits_interface::EffortJointSoftLimitsHandle;
-using joint_limits_interface::EffortJointSoftLimitsInterface;
 using joint_limits_interface::SoftJointLimits;
+using march4cpp::Joint;
 
 namespace march_hardware_interface
 {
 MarchHardwareInterface::MarchHardwareInterface(ros::NodeHandle& nh, AllowedRobot robotName)
   : nh_(nh), marchRobot(HardwareBuilder(robotName).createMarchRobot())
 {
-  init();
-  controller_manager_.reset(new controller_manager::ControllerManager(this, nh_));
-  nh_.param("/march/hardware_interface/loop_hz", loop_hz_, 100.0);
-  ros::Duration update_freq = ros::Duration(1.0 / loop_hz_);
-  non_realtime_loop_ = nh_.createTimer(update_freq, &MarchHardwareInterface::update, this);
-}
-
-MarchHardwareInterface::~MarchHardwareInterface()
-{
-  this->marchRobot.stopEtherCAT();
 }
 
 void MarchHardwareInterface::init()
@@ -86,14 +81,12 @@ void MarchHardwareInterface::init()
   {
     SoftJointLimits soft_limits;
     getSoftJointLimits(model.getJoint(joint_names_[i]), soft_limits);
-    ROS_DEBUG("[%s] Soft limits set to (%f, %f)",
-              joint_names_[i].c_str(),
-              soft_limits.min_position,
+    ROS_DEBUG("[%s] Soft limits set to (%f, %f)", joint_names_[i].c_str(), soft_limits.min_position,
               soft_limits.max_position);
     soft_limits_[i] = soft_limits;
   }
 
-  resetIMotionCubesUntilTheyWork();
+  initiateIMC();
 
   // Print all joint positions on startup in case initialization fails.
   this->read();
@@ -132,7 +125,7 @@ void MarchHardwareInterface::init()
       {
         marchRobot.getPowerDistributionBoard()->getHighVoltage().setNetOnOff(true, netNumber);
         usleep(100000);
-        ROS_INFO_THROTTLE(1, "[%s] Waiting on high voltage", joint_names_[i].c_str());
+        ROS_WARN("[%s] Waiting on high voltage", joint_names_[i].c_str());
       }
     }
   }
@@ -216,15 +209,16 @@ void MarchHardwareInterface::init()
       joint.prepareActuation();
     }
   }
+  ROS_INFO("Successfully actuated all joints");
+  controller_manager_.reset(new controller_manager::ControllerManager(this, nh_));
 }
 
-void MarchHardwareInterface::update(const ros::TimerEvent& e)
+void MarchHardwareInterface::update(const ros::Duration& elapsed_time)
 {
-  elapsed_time_ = ros::Duration(e.current_real - e.last_real);
-  read(elapsed_time_);
+  read(elapsed_time);
   validate();
-  controller_manager_->update(ros::Time::now(), elapsed_time_);
-  write(elapsed_time_);
+  controller_manager_->update(ros::Time::now(), elapsed_time);
+  write(elapsed_time);
 }
 
 void MarchHardwareInterface::validate()
@@ -236,7 +230,7 @@ void MarchHardwareInterface::validate()
   }
 }
 
-void MarchHardwareInterface::read(ros::Duration elapsed_time)
+void MarchHardwareInterface::read(const ros::Duration& elapsed_time)
 {
   for (int i = 0; i < num_joints_; i++)
   {
@@ -276,7 +270,7 @@ void MarchHardwareInterface::read(ros::Duration elapsed_time)
   }
 }
 
-void MarchHardwareInterface::write(ros::Duration elapsed_time)
+void MarchHardwareInterface::write(const ros::Duration& elapsed_time)
 {
   joint_effort_command_copy.clear();
   joint_effort_command_copy.resize(joint_effort_command_.size());
@@ -295,9 +289,9 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
 
       if (joint_effort_command_[i] != joint_effort_command_copy[i])
       {
-          ROS_WARN("Effort command (%f) changed to random high number (%f) for joint(%s), "
-                   "but set back to the normal value.",
-                   joint_effort_command_copy[i], joint_effort_command_[i], joint_names_[i].c_str());
+        ROS_WARN("Effort command (%f) changed to random high number (%f) for joint(%s), "
+                 "but set back to the normal value.",
+                 joint_effort_command_copy[i], joint_effort_command_[i], joint_names_[i].c_str());
         joint_effort_command_[i] = joint_effort_command_copy[i];
       }
 
@@ -325,33 +319,34 @@ void MarchHardwareInterface::write(ros::Duration elapsed_time)
   }
 }
 
-void MarchHardwareInterface::resetIMotionCubesUntilTheyWork()
+void MarchHardwareInterface::initiateIMC()
 {
-  bool encoderSetCorrectly = false;
-
-  while (!encoderSetCorrectly)
+  ROS_INFO("Resetting all IMC on initialization");
+  for (const std::string& joint_name : joint_names_)
   {
-    encoderSetCorrectly = true;
-    for (int i = 0; i < num_joints_; ++i)
+    Joint joint = marchRobot.getJoint(joint_name);
+
+    if (LOWER_BOUNDARY_ANGLE_IU <= joint.getAngleIU() && joint.getAngleIU() <= UPPER_BOUNDARY_ANGLE_IU)
     {
-      march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
-      if (joint.getAngleIU() == 0)
-      {
-        ROS_ERROR("[%s] Failed (encoder reset)", joint_names_[i].c_str());
-        encoderSetCorrectly = false;
-      }
+      ROS_WARN("Before reset joint: [%s] has angle-value of: %i. Which is within boundary of lower: %i and upper: %i",
+               joint_name.c_str(), joint.getAngleIU(), LOWER_BOUNDARY_ANGLE_IU, UPPER_BOUNDARY_ANGLE_IU);
     }
-    if (!encoderSetCorrectly)
+
+    joint.resetIMotionCube();
+  }
+
+  ROS_INFO("Restarting EtherCAT");
+  marchRobot.stopEtherCAT();
+  marchRobot.startEtherCAT();
+
+  for (const std::string& joint_name : joint_names_)
+  {
+    Joint joint = marchRobot.getJoint(joint_name);
+
+    if (LOWER_BOUNDARY_ANGLE_IU <= joint.getAngleIU() && joint.getAngleIU() <= UPPER_BOUNDARY_ANGLE_IU)
     {
-      // TODO(Martijn) check if you need to reset all joints.
-      for (int i = 0; i < num_joints_; ++i)
-      {
-        march4cpp::Joint joint = marchRobot.getJoint(joint_names_[i]);
-        joint.resetIMotionCube();
-      }
-      ROS_INFO("Restarting EtherCAT");
-      marchRobot.stopEtherCAT();
-      marchRobot.startEtherCAT();
+      ROS_WARN("After reset joint: [%s] has angle-value of: %i. Which is within boundary of lower: %i and upper: %i",
+               joint_name.c_str(), joint.getAngleIU(), LOWER_BOUNDARY_ANGLE_IU, UPPER_BOUNDARY_ANGLE_IU);
     }
   }
 }
@@ -500,6 +495,7 @@ void MarchHardwareInterface::iMotionCubeStateCheck(int joint_index)
       errorStream << "Motion Error: " << iMotionCubeState.motionErrorDescription << "(" << iMotionCubeState.motionError
                   << ")" << std::endl;
 
+      ROS_FATAL("%s", errorStream.str().c_str());
       throw std::runtime_error(errorStream.str());
     }
   }
@@ -511,16 +507,17 @@ void MarchHardwareInterface::outsideLimitsCheck(int joint_index)
   if (joint_position_[joint_index] < soft_limits_[joint_index].min_position ||
       joint_position_[joint_index] > soft_limits_[joint_index].max_position)
   {
-    ROS_ERROR_THROTTLE(1, "Joint %s is outside of its soft_limits_ (%f, %f). Actual position: %f",
+    ROS_ERROR_THROTTLE(1, "Joint %s is outside of its soft limits (%f, %f). Actual position: %f",
                        joint_names_[joint_index].c_str(), soft_limits_[joint_index].min_position,
                        soft_limits_[joint_index].max_position, joint_position_[joint_index]);
 
     if (joint.canActuate())
     {
       std::ostringstream errorStream;
-      errorStream << "Joint " << joint_names_[joint_index].c_str() << " is out of its soft_limits_ ("
+      errorStream << "Joint " << joint_names_[joint_index].c_str() << " is out of its soft limits ("
                   << soft_limits_[joint_index].min_position << ", " << soft_limits_[joint_index].max_position
                   << "). Actual position: " << joint_position_[joint_index];
+      ROS_FATAL("%s", errorStream.str().c_str());
       throw ::std::runtime_error(errorStream.str());
     }
   }

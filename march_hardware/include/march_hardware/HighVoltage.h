@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
-#ifndef MARCH_IV_HIGHVOLTAGE_H
-#define MARCH_IV_HIGHVOLTAGE_H
+#ifndef MARCH_HARDWARE_HIGHVOLTAGE_H
+#define MARCH_HARDWARE_HIGHVOLTAGE_H
 
 #include <ros/ros.h>
 
@@ -47,4 +47,4 @@ public:
 };
 
 }  // namespace march4cpp
-#endif  // MARCH_IV_HIGHVOLTAGE_H
+#endif  // MARCH_HARDWARE_HIGHVOLTAGE_H

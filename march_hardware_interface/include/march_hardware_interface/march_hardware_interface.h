@@ -1,5 +1,7 @@
-#ifndef ROS_CONTROL__MARCH_HARDWARE_INTERFACE_H
-#define ROS_CONTROL__MARCH_HARDWARE_INTERFACE_H
+// Copyright 2019 Project March
+#ifndef MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_H
+#define MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_H
+#include <vector>
 
 #include <control_toolbox/filters.h>
 #include <march_hardware_interface/march_hardware.h>
@@ -7,22 +9,25 @@
 #include <realtime_tools/realtime_publisher.h>
 #include <march_shared_resources/ImcErrorState.h>
 #include <march_shared_resources/AfterLimitJointCommand.h>
-#include <march_hardware_builder/HardwareBuilder.h>
+#include <march_hardware_builder/hardware_builder.h>
 
 #include <march_hardware/MarchRobot.h>
 
-using namespace hardware_interface;
-using joint_limits_interface::JointLimits;
-using joint_limits_interface::SoftJointLimits;
-using joint_limits_interface::PositionJointSoftLimitsHandle;
-using joint_limits_interface::PositionJointSoftLimitsInterface;
+using hardware_interface::JointStateHandle;
+using hardware_interface::PositionJointInterface;
 using joint_limits_interface::EffortJointSoftLimitsHandle;
 using joint_limits_interface::EffortJointSoftLimitsInterface;
+using joint_limits_interface::JointLimits;
+using joint_limits_interface::PositionJointSoftLimitsHandle;
+using joint_limits_interface::PositionJointSoftLimitsInterface;
+using joint_limits_interface::SoftJointLimits;
 
 namespace march_hardware_interface
 {
 static const double POSITION_STEP_FACTOR = 10;
 static const double VELOCITY_STEP_FACTOR = 10;
+static const int LOWER_BOUNDARY_ANGLE_IU = -2;
+static const int UPPER_BOUNDARY_ANGLE_IU = 2;
 
 /**
  * @brief HardwareInterface to allow ros_control to actuate our hardware.
@@ -32,42 +37,39 @@ static const double VELOCITY_STEP_FACTOR = 10;
 class MarchHardwareInterface : public march_hardware_interface::MarchHardware
 {
 public:
-  MarchHardwareInterface(ros::NodeHandle &nh, AllowedRobot robotName);
-  ~MarchHardwareInterface();
+  MarchHardwareInterface(ros::NodeHandle& nh, AllowedRobot robotName);
 
   /**
    * @brief Initialize the HardwareInterface by registering position interfaces
    * for each joint.
    */
   void init();
-  void update(const ros::TimerEvent &e);
+  void update(const ros::Duration& elapsed_time);
 
   /**
    * @brief Read actual postion from the hardware.
    */
-  void read(ros::Duration elapsed_time = ros::Duration(0.01));
+  void read(const ros::Duration& elapsed_time = ros::Duration(0.01));
 
   /**
-  * @brief Perform all safety checks that might crash the exoskeleton.
- */
+   * @brief Perform all safety checks that might crash the exoskeleton.
+   */
   void validate();
 
   /**
    * @brief Write position commands to the hardware.
    * @param elapsed_time Duration since last write action
    */
-  void write(ros::Duration elapsed_time);
+  void write(const ros::Duration& elapsed_time);
 
 protected:
   ::march4cpp::MarchRobot marchRobot;
   ros::NodeHandle nh_;
-  ros::Timer non_realtime_loop_;
   ros::Duration control_period_;
   ros::Duration elapsed_time_;
   PositionJointInterface positionJointInterface;
   PositionJointSoftLimitsInterface positionJointSoftLimitsInterface;
   EffortJointSoftLimitsInterface effortJointSoftLimitsInterface;
-  double loop_hz_;
   bool hasPowerDistributionBoard = false;
   boost::shared_ptr<controller_manager::ControllerManager> controller_manager_;
   typedef boost::shared_ptr<realtime_tools::RealtimePublisher<march_shared_resources::ImcErrorState> > RtPublisherPtr;
@@ -84,10 +86,10 @@ private:
   void updatePowerDistributionBoard();
   void updateAfterLimitJointCommand();
   void updateIMotionCubeState();
-  void resetIMotionCubesUntilTheyWork();
+  void initiateIMC();
   void outsideLimitsCheck(int joint_index);
   void iMotionCubeStateCheck(int joint_index);
 };
-}
+}  // namespace march_hardware_interface
 
-#endif
+#endif  // MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_H
