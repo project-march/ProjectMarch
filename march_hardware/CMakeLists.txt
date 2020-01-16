@@ -40,7 +40,8 @@ add_library(${PROJECT_NAME}
     src/PDOmap.cpp
     src/PowerDistributionBoard.cpp
     src/TemperatureGES.cpp
-    src/error/motion_error.cpp test/error/test_motion_error.cpp)
+    src/error/motion_error.cpp
+)
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
@@ -65,10 +66,9 @@ if (CATKIN_ENABLE_TESTING)
         append_coverage_compiler_flags()
     endif()
 
-    catkin_add_gtest(${PROJECT_NAME}_test
+    catkin_add_gmock(${PROJECT_NAME}_test
         test/error/test_motion_error.cpp
         test/TestRunner.cpp
-        test/TestEncoder.cpp
         test/TestIMotionCube.cpp
         test/TestTemperatureGES.cpp
         test/TestJoint.cpp
@@ -85,7 +85,7 @@ if (CATKIN_ENABLE_TESTING)
         test/mocks/MockIMotionCube.cpp
         test/mocks/MockJoint.cpp
     )
-    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME} gtest gmock)
+    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME} gtest)
 
     if(ENABLE_COVERAGE_TESTING)
         set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*")
