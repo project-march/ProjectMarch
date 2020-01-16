@@ -69,7 +69,7 @@ void EthercatMaster::ethercatMasterInitiation()
   if (ec_slavecount < this->max_slave_index_)
   {
     ROS_FATAL("Slave configured with index %d while soem only found %d slave(s)", this->max_slave_index_,
-      ec_slavecount);
+              ec_slavecount);
     throw std::runtime_error("More slaves configured than soem could detect.");
   }
 }
