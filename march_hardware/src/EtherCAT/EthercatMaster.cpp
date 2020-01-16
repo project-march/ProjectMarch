@@ -21,8 +21,7 @@
 
 namespace march4cpp
 {
-EthercatMaster::EthercatMaster(std::vector<Joint>* joints_ptr, std::string ifname, int max_slave_index,
-                               int cycle_time)
+EthercatMaster::EthercatMaster(std::vector<Joint>* joints_ptr, std::string ifname, int max_slave_index, int cycle_time)
   : joints_ptr_(joints_ptr), ifname_(ifname), max_slave_index_(max_slave_index), cycle_time_ms_(cycle_time)
 {
 }
@@ -69,8 +68,8 @@ void EthercatMaster::ethercatMasterInitiation()
 
   if (ec_slavecount < this->max_slave_index_)
   {
-    ROS_FATAL("Slave configured with index %d while soem only found %d slave(s)",
-      this->max_slave_index_, ec_slavecount);
+    ROS_FATAL("Slave configured with index %d while soem only found %d slave(s)", this->max_slave_index_,
+      ec_slavecount);
     throw std::runtime_error("More slaves configured than soem could detect.");
   }
 }
@@ -79,8 +78,8 @@ int setSlaveWatchdogTimer(uint16 slave)
 {
   uint16 configadr = ec_slave[slave].configadr;
   ec_FPWRw(configadr, 0x0400, IMotionCube::WATCHDOG_DIVIDER, EC_TIMEOUTRET);  // Set the divider register of the WD
-  ec_FPWRw(configadr, 0x0410, IMotionCube::WATCHDOG_TIME, EC_TIMEOUTRET);  // Set the PDI watchdog = WD
-  ec_FPWRw(configadr, 0x0420, IMotionCube::WATCHDOG_TIME, EC_TIMEOUTRET);  // Set the SM watchdog = WD
+  ec_FPWRw(configadr, 0x0410, IMotionCube::WATCHDOG_TIME, EC_TIMEOUTRET);     // Set the PDI watchdog = WD
+  ec_FPWRw(configadr, 0x0420, IMotionCube::WATCHDOG_TIME, EC_TIMEOUTRET);     // Set the SM watchdog = WD
   return 1;
 }
 
