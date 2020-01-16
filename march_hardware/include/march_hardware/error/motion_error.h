@@ -1,4 +1,4 @@
-// Copyright 2019 Project March.
+// Copyright 2020 Project March.
 
 #ifndef MARCH_HARDWARE_MOTION_ERROR_H
 #define MARCH_HARDWARE_MOTION_ERROR_H

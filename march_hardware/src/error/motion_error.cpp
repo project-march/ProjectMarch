@@ -1,4 +1,4 @@
-// Copyright 2019 Project March.
+// Copyright 2020 Project March.
 #include <march_hardware/error/motion_error.h>
 
 namespace march
@@ -39,7 +39,7 @@ const char* DETAILED_MOTION_ERRORS[DETAILED_MOTION_ERRORS_SIZE] = {
 std::string parseMotionError(uint16_t motion_error)
 {
   std::string description;
-  const std::bitset<sizeof(uint16_t)> bitset(motion_error);
+  const std::bitset<16> bitset(motion_error);
   for (size_t i = 0; i < MOTION_ERRORS_SIZE; i++)
   {
     if (bitset.test(i))
@@ -53,7 +53,7 @@ std::string parseMotionError(uint16_t motion_error)
 std::string parseDetailedError(uint16_t detailed_error)
 {
   std::string description;
-  const std::bitset<sizeof(uint16_t)> bitset(detailed_error);
+  const std::bitset<16> bitset(detailed_error);
   for (size_t i = 0; i < DETAILED_MOTION_ERRORS_SIZE; i++)
   {
     if (bitset.test(i))

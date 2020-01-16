@@ -267,7 +267,7 @@ void IMotionCube::setControlWord(uint16 controlWord)
 std::string IMotionCube::parseStatusWord(uint16 statusWord)
 {
   std::string wordDescription = "";
-  const std::bitset<sizeof(uint16)> bitset(statusWord);
+  const std::bitset<16> bitset(statusWord);
   if (bitset.test(0))
   {
     wordDescription += "Axis on. Power stage is enabled. Motor control is performed. ";
