@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(march_hardware)
 
-add_compile_options(-std=c++11 -Wall -Wextra)
+add_compile_options(-std=c++14 -Wall -Wextra)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
@@ -26,6 +26,8 @@ install(DIRECTORY include/${PROJECT_NAME}/
 )
 
 add_library(${PROJECT_NAME}
+    include/${PROJECT_NAME}/error/error_type.h
+    include/${PROJECT_NAME}/error/hardware_exception.h
     include/${PROJECT_NAME}/error/motion_error.h
     src/Encoder.cpp
     src/EtherCAT/EthercatIO.cpp
