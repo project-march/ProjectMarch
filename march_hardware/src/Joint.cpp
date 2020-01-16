@@ -188,9 +188,4 @@ ActuationMode Joint::getActuationMode() const
   return this->iMotionCube.getActuationMode();
 }
 
-void Joint::setActuationMode(ActuationMode actuationMode)
-{
-  this->iMotionCube.setActuationMode(actuationMode);
-}
-
 }  // namespace march

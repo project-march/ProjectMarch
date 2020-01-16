@@ -39,12 +39,11 @@ TEST_F(JointTest, ValidJointHip)
   march::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_hip");
 
   march::Encoder actualEncoder = march::Encoder(16, 22134, 43436, 24515, 0.05);
-  march::IMotionCube actualIMotionCube = march::IMotionCube(2, actualEncoder);
+  march::IMotionCube actualIMotionCube = march::IMotionCube(2, actualEncoder, march::ActuationMode::unknown);
   march::TemperatureGES actualTemperatureGes = march::TemperatureGES(1, 2);
-  march::Joint actualJoint;
+  march::Joint actualJoint(actualIMotionCube);
   actualJoint.setName("test_joint_hip");
   actualJoint.setAllowActuation(true);
-  actualJoint.setIMotionCube(actualIMotionCube);
   actualJoint.setTemperatureGes(actualTemperatureGes);
 
   ASSERT_EQ("test_joint_hip", actualJoint.getName());
@@ -59,19 +58,17 @@ TEST_F(JointTest, ValidNotActuated)
   march::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_hip");
 
   march::Encoder actualEncoder = march::Encoder(16, 22134, 43436, 24515, 0.05);
-  march::IMotionCube actualIMotionCube = march::IMotionCube(2, actualEncoder);
+  march::IMotionCube actualIMotionCube = march::IMotionCube(2, actualEncoder, march::ActuationMode::unknown);
   march::TemperatureGES actualTemperatureGes = march::TemperatureGES(1, 2);
-  march::Joint actualJoint;
+  march::Joint actualJoint(actualIMotionCube);
   actualJoint.setName("test_joint_hip");
   actualJoint.setAllowActuation(false);
-  actualJoint.setIMotionCube(actualIMotionCube);
   actualJoint.setTemperatureGes(actualTemperatureGes);
 
-  march::Joint actualJointWrong;
+  march::Joint actualJointWrong(actualIMotionCube);
 
   actualJointWrong.setName("test_joint_hip");
   actualJointWrong.setAllowActuation(true);
-  actualJointWrong.setIMotionCube(actualIMotionCube);
   actualJointWrong.setTemperatureGes(actualTemperatureGes);
   ASSERT_EQ("test_joint_hip", actualJoint.getName());
   ASSERT_FALSE(actualJoint.canActuate());
@@ -87,14 +84,13 @@ TEST_F(JointTest, ValidJointAnkle)
   march::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_ankle");
 
   march::Encoder actualEncoder = march::Encoder(20, 3, 40000, 5, 0.05);
-  march::IMotionCube actualIMotionCube = march::IMotionCube(10, actualEncoder);
+  march::IMotionCube actualIMotionCube = march::IMotionCube(10, actualEncoder, march::ActuationMode::unknown);
   march::TemperatureGES actualTemperatureGes = march::TemperatureGES(10, 6);
 
-  march::Joint actualJoint;
+  march::Joint actualJoint(actualIMotionCube);
 
   actualJoint.setName("test_joint_ankle");
   actualJoint.setAllowActuation(true);
-  actualJoint.setIMotionCube(actualIMotionCube);
   actualJoint.setTemperatureGes(actualTemperatureGes);
 
   ASSERT_EQ("test_joint_ankle", actualJoint.getName());
@@ -114,7 +110,7 @@ TEST_F(JointTest, NoIMotionCube)
   std::string fullPath = this->fullPath("/joint_no_imotioncube.yaml");
   YAML::Node jointConfig = YAML::LoadFile(fullPath);
 
-  ASSERT_NO_THROW(HardwareBuilder::createJoint(jointConfig, "test_joint_no_imotioncube"));
+  ASSERT_THROW(HardwareBuilder::createJoint(jointConfig, "test_joint_no_imotioncube"), MissingKeyException);
 }
 
 TEST_F(JointTest, NoTemperatureGES)
@@ -132,13 +128,11 @@ TEST_F(JointTest, ValidActuationMode)
 
   march::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_hip");
 
-  march::Joint actualJoint;
+  march::Joint actualJoint(march::IMotionCube(1, march::Encoder(), march::ActuationMode::position));
   actualJoint.setName("test_joint_hip");
-  actualJoint.setActuationMode(march::ActuationMode("position"));
 
-  march::Joint actualJointWrong;
+  march::Joint actualJointWrong(march::IMotionCube(1, march::Encoder(), march::ActuationMode::torque));
   actualJointWrong.setName("test_joint_hip");
-  actualJointWrong.setActuationMode(march::ActuationMode("torque"));
 
   ASSERT_EQ("test_joint_hip", actualJoint.getName());
   ASSERT_EQ(actualJoint, createdJoint);

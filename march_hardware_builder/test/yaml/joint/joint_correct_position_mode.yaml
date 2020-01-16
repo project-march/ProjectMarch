@@ -1,2 +1,10 @@
 actuationMode: position
 allowActuation: false
+imotioncube:
+  slaveIndex: 1
+  encoder:
+    resolution: 0
+    minPositionIU: 0
+    maxPositionIU: 0
+    zeroPositionIU: 0
+    safetyMarginRad: 0

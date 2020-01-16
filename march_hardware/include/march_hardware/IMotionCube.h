@@ -18,29 +18,8 @@ namespace march
 {
 class IMotionCube : public Slave
 {
-private:
-  Encoder encoder;
-  ActuationMode actuationMode;
-
-  void actuateIU(int iu);
-
-  std::map<IMCObjectName, int> misoByteOffsets;
-  std::map<IMCObjectName, int> mosiByteOffsets;
-  void mapMisoPDOs();
-  void mapMosiPDOs();
-  void validateMisoPDOs();
-  void validateMosiPDOs();
-  void writeInitialSettings(uint8 ecatCycleTime);
-
-  bool get_bit(uint16 value, int index);
-
 public:
-  explicit IMotionCube(int slaveIndex, Encoder encoder);
-
-  IMotionCube()
-  {
-    slaveIndex = -1;
-  }
+  IMotionCube(int slave_index, Encoder encoder, ActuationMode actuation_mode);
 
   ~IMotionCube() = default;
 
@@ -69,10 +48,9 @@ public:
   std::string parseMotionError(uint16 motionError);
   std::string parseDetailedError(uint16 detailedError);
 
+  bool goToTargetState(march::IMotionCubeTargetState targetState);
   bool goToOperationEnabled();
   bool resetIMotionCube();
-
-  void setActuationMode(ActuationMode mode);
 
   /** @brief Override comparison operator */
   friend bool operator==(const IMotionCube& lhs, const IMotionCube& rhs)
@@ -85,7 +63,23 @@ public:
     return os << "slaveIndex: " << iMotionCube.slaveIndex << ", "
               << "encoder: " << iMotionCube.encoder;
   }
-  bool goToTargetState(march::IMotionCubeTargetState targetState);
+
+private:
+  void actuateIU(int iu);
+
+  void mapMisoPDOs();
+  void mapMosiPDOs();
+  void validateMisoPDOs();
+  void validateMosiPDOs();
+  void writeInitialSettings(uint8 ecatCycleTime);
+
+  bool get_bit(uint16 value, int index);
+
+  Encoder encoder;
+  ActuationMode actuationMode;
+
+  std::map<IMCObjectName, int> misoByteOffsets;
+  std::map<IMCObjectName, int> mosiByteOffsets;
 };
 
 }  // namespace march

@@ -18,7 +18,7 @@ const std::vector<std::string> HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRE
     {
         "slaveIndex", "bootShutdownOffsets", "netMonitorByteOffsets", "netDriverByteOffsets"
     };
-const std::vector<std::string> HardwareBuilder::JOINT_REQUIRED_KEYS = { "allowActuation" };
+const std::vector<std::string> HardwareBuilder::JOINT_REQUIRED_KEYS = { "allowActuation", "imotioncube" };
 // clang-format on
 
 HardwareBuilder::HardwareBuilder(AllowedRobot robot) : HardwareBuilder::HardwareBuilder(robot.getFilePath())
@@ -70,31 +70,19 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const 
   ROS_DEBUG("Starting creation of joint %s", joint_name.c_str());
   HardwareBuilder::validateRequiredKeysExist(joint_config, HardwareBuilder::JOINT_REQUIRED_KEYS, "joint");
 
-  march::Joint joint;
+  march::ActuationMode mode;
+  if (joint_config["actuationMode"])
+  {
+    mode = march::ActuationMode(joint_config["actuationMode"].as<std::string>());
+  }
+
+  march::IMotionCube imc = HardwareBuilder::createIMotionCube(joint_config["imotioncube"], mode);
+
+  march::Joint joint(imc);
   joint.setName(joint_name);
 
   bool allowActuation = joint_config["allowActuation"].as<bool>();
   joint.setAllowActuation(allowActuation);
-
-  if (joint_config["imotioncube"])
-  {
-    march::IMotionCube imc = HardwareBuilder::createIMotionCube(joint_config["imotioncube"]);
-    joint.setIMotionCube(imc);
-  }
-  else
-  {
-    ROS_WARN("Joint %s does not have a configuration for an IMotionCube", joint_name.c_str());
-  }
-
-  if (joint_config["actuationMode"])
-  {
-    std::string mode = joint_config["actuationMode"].as<std::string>();
-    joint.setActuationMode(march::ActuationMode(mode));
-  }
-  else
-  {
-    joint.setActuationMode(march::ActuationMode("unknown"));
-  }
 
   if (joint_config["netNumber"])
   {
@@ -118,13 +106,13 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const 
   return joint;
 }
 
-march::IMotionCube HardwareBuilder::createIMotionCube(const YAML::Node& imc_config)
+march::IMotionCube HardwareBuilder::createIMotionCube(const YAML::Node& imc_config, march::ActuationMode mode)
 {
   HardwareBuilder::validateRequiredKeysExist(imc_config, HardwareBuilder::IMOTIONCUBE_REQUIRED_KEYS, "imotioncube");
 
   YAML::Node encoder_config = imc_config["encoder"];
   int slave_index = imc_config["slaveIndex"].as<int>();
-  return march::IMotionCube(slave_index, HardwareBuilder::createEncoder(encoder_config));
+  return march::IMotionCube(slave_index, HardwareBuilder::createEncoder(encoder_config), mode);
 }
 
 march::Encoder HardwareBuilder::createEncoder(const YAML::Node& encoder_config)

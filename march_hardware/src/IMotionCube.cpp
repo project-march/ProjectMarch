@@ -13,10 +13,10 @@
 
 namespace march
 {
-IMotionCube::IMotionCube(int slaveIndex, Encoder encoder) : Slave(slaveIndex), actuationMode("unknown")
+IMotionCube::IMotionCube(int slave_index, Encoder encoder, ActuationMode actuation_mode)
+  : Slave(slave_index), encoder(encoder), actuationMode(actuation_mode)
 {
-  this->encoder = encoder;
-  this->encoder.setSlaveIndex(this->slaveIndex);
+  this->encoder.setSlaveIndex(slave_index);
 }
 
 void IMotionCube::writeInitialSDOs(int ecatCycleTime)
@@ -531,15 +531,6 @@ bool IMotionCube::resetIMotionCube()
 ActuationMode IMotionCube::getActuationMode() const
 {
   return this->actuationMode;
-}
-
-void IMotionCube::setActuationMode(ActuationMode mode)
-{
-  if (this->actuationMode != ActuationMode::unknown)
-  {
-    throw std::runtime_error("Cannot change actuation mode at runtime");
-  }
-  this->actuationMode = mode;
 }
 
 bool IMotionCube::get_bit(uint16 value, int index)
