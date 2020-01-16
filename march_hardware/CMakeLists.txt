@@ -40,7 +40,7 @@ add_library(${PROJECT_NAME}
     src/PDOmap.cpp
     src/PowerDistributionBoard.cpp
     src/TemperatureGES.cpp
-    src/error/motion_error.cpp)
+    src/error/motion_error.cpp test/error/test_motion_error.cpp)
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
@@ -59,15 +59,14 @@ install(TARGETS slave_count_check
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
     find_package(code_coverage REQUIRED)
-    find_package(rostest REQUIRED)
 
     if(ENABLE_COVERAGE_TESTING)
         include(CodeCoverage)
         append_coverage_compiler_flags()
     endif()
 
-    add_rostest_gmock(${PROJECT_NAME}-test
-        test/march_hardware.test
+    catkin_add_gtest(${PROJECT_NAME}_test
+        test/error/test_motion_error.cpp
         test/TestRunner.cpp
         test/TestEncoder.cpp
         test/TestIMotionCube.cpp
@@ -86,7 +85,7 @@ if (CATKIN_ENABLE_TESTING)
         test/mocks/MockIMotionCube.cpp
         test/mocks/MockJoint.cpp
     )
-    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} ${PROJECT_NAME} gtest)
+    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME} gtest gmock)
 
     if(ENABLE_COVERAGE_TESTING)
         set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*")
