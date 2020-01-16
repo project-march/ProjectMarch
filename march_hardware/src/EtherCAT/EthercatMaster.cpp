@@ -69,16 +69,18 @@ void EthercatMaster::ethercatMasterInitiation()
 
   if (ec_slavecount < this->max_slave_index_)
   {
-    ROS_FATAL("Slave configured with index %d while soem only found %d slave(s)", this->max_slave_index_, ec_slavecount);
+    ROS_FATAL("Slave configured with index %d while soem only found %d slave(s)",
+      this->max_slave_index_, ec_slavecount);
     throw std::runtime_error("More slaves configured than soem could detect.");
   }
 }
 
-int setSlaveWatchdogTimer(uint16 slave) {
+int setSlaveWatchdogTimer(uint16 slave)
+{
   uint16 configadr = ec_slave[slave].configadr;
-  ec_FPWRw(configadr, 0x0400, IMotionCube::WATCHDOG_DIVIDER, EC_TIMEOUTRET); //Set the divider register of the watchdog
-  ec_FPWRw(configadr, 0x0410, IMotionCube::WATCHDOG_TIME, EC_TIMEOUTRET); //Set the PDI watchdog
-  ec_FPWRw(configadr, 0x0420, IMotionCube::WATCHDOG_TIME, EC_TIMEOUTRET); //SET the SM watchdog
+  ec_FPWRw(configadr, 0x0400, IMotionCube::WATCHDOG_DIVIDER, EC_TIMEOUTRET);  // Set the divider register of the watchdog
+  ec_FPWRw(configadr, 0x0410, IMotionCube::WATCHDOG_TIME, EC_TIMEOUTRET);  // Set the PDI watchdog
+  ec_FPWRw(configadr, 0x0420, IMotionCube::WATCHDOG_TIME, EC_TIMEOUTRET);  // Set the SM watchdog
   return 1;
 }
 

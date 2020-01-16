@@ -48,7 +48,6 @@ private:
   int expected_working_counter_ = 0;
 
   std::thread ethercat_thread_;
-
 };
 
 }  // namespace march4cpp
