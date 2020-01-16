@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>march_rqt_gait_generator</name>
-  <version>0.0.0</version>
+  <version>0.1.0</version>
   <description>rqt plugin to generate gaits for the march-iv exoskeleton</description>
 
   <maintainer email="software@projectmarch.nl">Project March</maintainer>
