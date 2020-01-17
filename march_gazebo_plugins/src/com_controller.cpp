@@ -32,7 +32,7 @@ public:
     this->p_pitch = 60;
     this->d_pitch = 10;
     this->p_roll = 150;
-    this->d_roll = 7.5;
+    this->d_roll = 0;
     this->p_yaw = 500;
     this->d_yaw = 25;
 
@@ -105,6 +105,11 @@ public:
     else if (this->subgait_name.substr(this->subgait_name.size() - 5) == "close")
     {
       goal_position_x += 0.25 * swing_step_size - 0.25 * time_since_start * swing_step_size / subgait_duration;
+    }
+
+    if (time_since_start > subgait_duration)
+    {
+      this->subgait_name = "home_stand";
     }
 
     double error_x = model_com.X() - goal_position_x;
