@@ -33,10 +33,10 @@ struct IMCObject
 };
 
 /** The data direction to which the PDO is specified is restricted to master in slave out and slave out master in.*/
-enum class dataDirection
+enum class DataDirection
 {
-  miso,
-  mosi
+  MISO,
+  MOSI,
 };
 
 /** All the available IMC object names divided over the PDO maps. make sure to also add it to PDOmap constructor.*/
@@ -61,10 +61,15 @@ enum class IMCObjectName
 class PDOmap
 {
 public:
-  /** Initiate all the entered IMC objects to prepare the PDO.*/
+  /**
+   * Initiate all the entered IMC objects to prepare the PDO.
+   *
+   * @param object_name enum of the object to be added.
+   * @throws HardwareException when the object to be added is not defined or the registers overflow.
+   */
   void addObject(IMCObjectName object_name);
 
-  std::map<IMCObjectName, int> map(int slave_index, dataDirection direction);
+  std::map<IMCObjectName, int> map(int slave_index, DataDirection direction);
 
   static std::unordered_map<IMCObjectName, IMCObject> all_objects;
 
@@ -78,6 +83,7 @@ private:
   std::map<IMCObjectName, int> configurePDO(int slave_index, int base_register, int base_sync_manager);
 
   std::map<IMCObjectName, IMCObject> PDO_objects;
+  int total_used_bits = 0;
 
   const int bits_per_register = 64;           // Maximum amount of bits that can be constructed in one PDO message.
   const int nr_of_regs = 4;                   // Amount of registers available.

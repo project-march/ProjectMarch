@@ -39,7 +39,7 @@ void IMotionCube::mapMisoPDOs()
   pdoMapMISO.addObject(IMCObjectName::MotionErrorRegister);
   pdoMapMISO.addObject(IMCObjectName::DetailedErrorRegister);
   pdoMapMISO.addObject(IMCObjectName::DCLinkVoltage);
-  this->misoByteOffsets = pdoMapMISO.map(this->slaveIndex, dataDirection::miso);
+  this->misoByteOffsets = pdoMapMISO.map(this->slaveIndex, DataDirection::MISO);
 }
 
 // Map Process Data Object (PDO) for by sending SDOs to the IMC
@@ -50,7 +50,7 @@ void IMotionCube::mapMosiPDOs()
   pdoMapMOSI.addObject(IMCObjectName::ControlWord);  // Compulsory!
   pdoMapMOSI.addObject(IMCObjectName::TargetPosition);
   pdoMapMOSI.addObject(IMCObjectName::TargetTorque);
-  this->mosiByteOffsets = pdoMapMOSI.map(this->slaveIndex, dataDirection::mosi);
+  this->mosiByteOffsets = pdoMapMOSI.map(this->slaveIndex, DataDirection::MOSI);
 }
 
 // Checks if the compulsory MISO PDO objects are mapped

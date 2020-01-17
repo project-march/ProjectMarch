@@ -1,8 +1,11 @@
 // Copyright 2019 Project March.
 #include <march_hardware/PDOmap.h>
+#include <march_hardware/error/hardware_exception.h>
 
 #include <map>
 #include <utility>
+
+#include <boost/format.hpp>
 
 namespace march
 {
@@ -25,10 +28,10 @@ std::unordered_map<IMCObjectName, IMCObject> PDOmap::all_objects = {
 
 void PDOmap::addObject(IMCObjectName object_name)
 {
-  if (PDOmap::all_objects.find(object_name) == PDOmap::all_objects.end())
+  auto it = PDOmap::all_objects.find(object_name);
+  if (it == PDOmap::all_objects.end())
   {
-    ROS_WARN("IMC does not exists in in initialised objects so can not be added to PDO");
-    return;
+    throw error::HardwareException(error::ErrorType::PDO_OBJECT_NOT_DEFINED);
   }
 
   if (this->PDO_objects.count(object_name) != 0)
@@ -37,35 +40,26 @@ void PDOmap::addObject(IMCObjectName object_name)
     return;
   }
 
-  this->PDO_objects.insert({ object_name, PDOmap::all_objects[object_name] });  // NOLINT(whitespace/braces)
-
-  int total_used_bits = 0;
-  for (const std::pair<IMCObjectName, IMCObject> PDO_object : this->PDO_objects)
-  {
-    total_used_bits = total_used_bits + PDO_object.second.length;
-  }
+  this->PDO_objects.insert({ object_name, it->second });  // NOLINT(whitespace/braces)
+  this->total_used_bits += it->second.length;
 
   if (total_used_bits > this->nr_of_regs * this->bits_per_register)
   {
-    ROS_FATAL("Too many objects in PDO Map (total bits %d, only %d allowed), PDO object: %i could not be added",
-              total_used_bits, this->nr_of_regs * this->bits_per_register, object_name);
-    throw std::exception();
+    throw error::HardwareException(
+        error::ErrorType::PDO_REGISTER_OVERFLOW,
+        boost::str(boost::format("PDO object: %i could not be added (total bits %d, only %d allowed)") %
+                   total_used_bits % (this->nr_of_regs * this->bits_per_register) % static_cast<int>(object_name)));
   }
 }
 
-std::map<IMCObjectName, int> PDOmap::map(int slave_index, enum dataDirection direction)
+std::map<IMCObjectName, int> PDOmap::map(int slave_index, DataDirection direction)
 {
-  if (direction == dataDirection::miso)
+  switch (direction)
   {
-    return configurePDO(slave_index, 0x1A00, 0x1C13);
-  }
-  else if (direction == dataDirection::mosi)
-  {
-    return configurePDO(slave_index, 0x1600, 0x1C12);
-  }
-  else
-  {
-    throw std::runtime_error("Invalid dataDirection argument in PDO mapping");
+    case DataDirection::MISO:
+      return configurePDO(slave_index, 0x1A00, 0x1C13);
+    case DataDirection::MOSI:
+      return configurePDO(slave_index, 0x1600, 0x1C12);
   }
 }
 
