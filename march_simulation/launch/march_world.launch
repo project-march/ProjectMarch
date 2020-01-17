@@ -5,6 +5,7 @@
     <arg name="debug" default="false" doc="Starts gazebo debugging with gdb."/>
     <arg name="fixed" default="true" doc="Fixes the exoskeleton in the world"/>
     <arg name="ground_gait" default="false" doc="Exoskeleton will ground gait if true."/>
+    <arg name="obstacle" default="none" doc="Obstacle to load in the simulation."/>
     <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_rotational."/>
 
     <!-- Load the URDF into the ROS Parameter Server -->
@@ -46,5 +47,14 @@
         <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
         <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false"
           args="-urdf -model march -param robot_description"/>
+    </group>
+
+    <group if="$(eval obstacle != 'none')">
+        <param name="model_description"
+           command="$(find xacro)/xacro '$(find march_simulation)/obstacles/$(arg obstacle).xacro'" />
+
+        <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+        <node name="model_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false"
+          args="-urdf -model stairs -param model_description"/>
     </group>
 </launch>
