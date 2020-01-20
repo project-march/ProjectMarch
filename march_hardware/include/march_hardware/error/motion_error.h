@@ -19,6 +19,6 @@ std::string parseMotionError(uint16_t motion_error);
 
 std::string parseDetailedError(uint16_t detailed_error);
 
-}
-}
+}  // namespace error
+}  // namespace march
 #endif  // MARCH_HARDWARE_MOTION_ERROR_H

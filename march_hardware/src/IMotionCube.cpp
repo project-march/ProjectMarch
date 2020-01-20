@@ -1,5 +1,6 @@
 // Copyright 2018 Project March.
 #include <march_hardware/IMotionCube.h>
+#include <march_hardware/error/hardware_exception.h>
 #include <march_hardware/error/motion_error.h>
 #include <march_hardware/EtherCAT/EthercatSDO.h>
 #include <march_hardware/EtherCAT/EthercatIO.h>
@@ -21,6 +22,13 @@ IMotionCube::IMotionCube(int slave_index, Encoder encoder, ActuationMode actuati
 
 void IMotionCube::writeInitialSDOs(int ecatCycleTime)
 {
+  if (this->actuationMode == ActuationMode::unknown)
+  {
+    throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE, "Cannot write initial settings to "
+                                                                             "IMotionCube "
+                                                                             "as it has actuation mode of unknown");
+  }
+
   mapMisoPDOs();
   mapMosiPDOs();
   validateMisoPDOs();
@@ -77,11 +85,6 @@ void IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
 {
   ROS_DEBUG("IMotionCube::writeInitialSettings");
 
-  if (this->actuationMode == ActuationMode::unknown)
-  {
-    throw std::runtime_error("Cannot write initial settings to IMotionCube as it has actuation mode of unknown");
-  }
-
   // mode of operation
   int mode_of_op = sdo_bit8(slaveIndex, 0x6060, 0, this->actuationMode.toModeNumber());
 
@@ -112,8 +115,11 @@ void IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
 
 void IMotionCube::actuateRad(float targetRad)
 {
-  ROS_ASSERT_MSG(this->actuationMode == ActuationMode::position, "trying to actuate rad, while actuationmode = %s",
-                 this->actuationMode.toString().c_str());
+  if (this->actuationMode != ActuationMode::position)
+  {
+    throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
+                                   "trying to actuate rad, while actuation mode is " + this->actuationMode.toString());
+  }
 
   if (std::abs(targetRad - this->getAngleRad()) > 0.393)
   {
@@ -133,7 +139,7 @@ void IMotionCube::actuateIU(int targetIU)
     throw std::runtime_error("Invalid IU actuate command.");
   }
 
-  union bit32 targetPosition;
+  bit32 targetPosition;
   targetPosition.i = targetIU;
 
   if (this->mosiByteOffsets.count(IMCObjectName::TargetPosition) != 1)
@@ -150,14 +156,18 @@ void IMotionCube::actuateIU(int targetIU)
 
 void IMotionCube::actuateTorque(int targetTorque)
 {
-  ROS_ASSERT_MSG(this->actuationMode == ActuationMode::torque, "trying to actuate torque, while actuationmode = %s",
-                 this->actuationMode.toString().c_str());
+  if (this->actuationMode != ActuationMode::torque)
+  {
+    throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE, "trying to actuate torque, while "
+                                                                             "actuation mode is " +
+                                                                                 this->actuationMode.toString());
+  }
 
   // The targetTorque must not exceed the value of 23500 IU, this is slightly larger than the current limit of the
   // linear joints defined in the urdf.
   ROS_ASSERT_MSG(targetTorque < 23500, "Torque of %d is too high.", targetTorque);
 
-  union bit16 targetTorqueStruct;
+  bit16 targetTorqueStruct;
   targetTorqueStruct.i = targetTorque;
 
   if (this->mosiByteOffsets.count(IMCObjectName::TargetTorque) != 1)

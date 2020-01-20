@@ -29,7 +29,11 @@ public:
 
   friend std::ostream& operator<<(std::ostream& s, const HardwareException& e)
   {
-    s << e.type_ << std::endl << e.message_;
+    s << e.type_;
+    if (!e.message_.empty())
+    {
+      s << std::endl << e.message_;
+    }
     return s;
   }
 
