@@ -117,8 +117,9 @@ void IMotionCube::actuateRad(float target_rad)
 {
   if (this->actuation_mode_ != ActuationMode::position)
   {
-    throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
-                                   "trying to actuate rad, while actuation mode is " + this->actuation_mode_.toString());
+    throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE, "trying to actuate rad, while actuation "
+                                                                             "mode is " +
+                                                                                 this->actuation_mode_.toString());
   }
 
   if (std::abs(target_rad - this->getAngleRad()) > 0.393)
@@ -184,15 +185,16 @@ void IMotionCube::actuateTorque(int target_torque)
 
 float IMotionCube::getAngleRad()
 {
-  ROS_ASSERT_MSG(this->miso_byte_offsets_.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO "
-                                                                                  "mapping, so can't get angle");
+  ROS_ASSERT_MSG(this->miso_byte_offsets_.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in "
+                                                                                     "PDO "
+                                                                                     "mapping, so can't get angle");
   return this->encoder_.getAngleRad(this->miso_byte_offsets_[IMCObjectName::ActualPosition]);
 }
 
 float IMotionCube::getTorque()
 {
   ROS_ASSERT_MSG(this->miso_byte_offsets_.count(IMCObjectName::ActualTorque) == 1, "ActualTorque not defined in PDO "
-                                                                                "mapping, so can't get torque");
+                                                                                   "mapping, so can't get torque");
   union bit16 return_byte = get_input_bit16(this->slaveIndex, this->miso_byte_offsets_[IMCObjectName::ActualTorque]);
   ROS_DEBUG("Actual Torque read: %d", return_byte.i);
   return return_byte.i;
@@ -200,15 +202,16 @@ float IMotionCube::getTorque()
 
 int IMotionCube::getAngleIU()
 {
-  ROS_ASSERT_MSG(this->miso_byte_offsets_.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO "
-                                                                                  "mapping, so can't get angle");
+  ROS_ASSERT_MSG(this->miso_byte_offsets_.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in "
+                                                                                     "PDO "
+                                                                                     "mapping, so can't get angle");
   return this->encoder_.getAngleIU(this->miso_byte_offsets_[IMCObjectName::ActualPosition]);
 }
 
 uint16_t IMotionCube::getStatusWord()
 {
   ROS_ASSERT_MSG(this->miso_byte_offsets_.count(IMCObjectName::StatusWord) == 1, "StatusWord not defined in PDO "
-                                                                              "mapping, so can't get status word");
+                                                                                 "mapping, so can't get status word");
   return get_input_bit16(this->slaveIndex, this->miso_byte_offsets_[IMCObjectName::StatusWord]).ui;
 }
 
@@ -243,7 +246,7 @@ float IMotionCube::getMotorCurrent()
   }
   int16_t motor_current_iu = get_input_bit16(this->slaveIndex, this->miso_byte_offsets_[IMCObjectName::ActualTorque]).i;
   return (2.0f * PEAK_CURRENT / IU_CONVERSION_CONST) *
-      static_cast<float>(motor_current_iu);  // Conversion to Amp, see Technosoft CoE programming manual
+         static_cast<float>(motor_current_iu);  // Conversion to Amp, see Technosoft CoE programming manual
 }
 
 float IMotionCube::getMotorVoltage()
@@ -255,9 +258,10 @@ float IMotionCube::getMotorVoltage()
     ROS_WARN("DC-link Voltage not defined in PDO mapping, so can't read it");
     return 0xFFFF;  // Not fatal, so can return
   }
-  uint16_t motor_voltage_iu = get_input_bit16(this->slaveIndex, this->miso_byte_offsets_[IMCObjectName::DCLinkVoltage]).ui;
+  uint16_t motor_voltage_iu =
+      get_input_bit16(this->slaveIndex, this->miso_byte_offsets_[IMCObjectName::DCLinkVoltage]).ui;
   return (V_DC_MAX_MEASURABLE / IU_CONVERSION_CONST) *
-      static_cast<float>(motor_voltage_iu);  // Conversion to Volt, see Technosoft CoE programming manual
+         static_cast<float>(motor_voltage_iu);  // Conversion to Volt, see Technosoft CoE programming manual
 }
 
 void IMotionCube::setControlWord(uint16_t control_word)
@@ -358,61 +362,6 @@ std::string IMotionCube::parseStatusWord(uint16_t status_word)
   }
 }
 
-IMCState IMotionCube::getState(uint16_t status_word)
-{
-  uint16_t fiveBitMask = 0b0000000001001111;
-  uint16_t sixBitMask = 0b0000000001101111;
-
-  uint16_t notReadyToSwitchOn = 0b0000000000000000;
-  uint16_t switchOnDisabled = 0b0000000001000000;
-  uint16_t readyToSwitchOn = 0b0000000000100001;
-  uint16_t switchedOn = 0b0000000000100011;
-  uint16_t operationEnabled = 0b0000000000100111;
-  uint16_t quickStopActive = 0b0000000000000111;
-  uint16_t faultReactionActive = 0b0000000000001111;
-  uint16_t fault = 0b0000000000001000;
-
-  uint16_t statusWordFiveBitMasked = (status_word & fiveBitMask);
-  uint16_t statusWordSixBitMasked = (status_word & sixBitMask);
-
-  if (statusWordFiveBitMasked == notReadyToSwitchOn)
-  {
-    return IMCState::notReadyToSwitchOn;
-  }
-  else if (statusWordFiveBitMasked == switchOnDisabled)
-  {
-    return IMCState::switchOnDisabled;
-  }
-  else if (statusWordSixBitMasked == readyToSwitchOn)
-  {
-    return IMCState::readyToSwitchOn;
-  }
-  else if (statusWordSixBitMasked == switchedOn)
-  {
-    return IMCState::switchedOn;
-  }
-  else if (statusWordSixBitMasked == operationEnabled)
-  {
-    return IMCState::operationEnabled;
-  }
-  else if (statusWordSixBitMasked == quickStopActive)
-  {
-    return IMCState::quickStopActive;
-  }
-  else if (statusWordFiveBitMasked == faultReactionActive)
-  {
-    return IMCState::faultReactionActive;
-  }
-  else if (statusWordFiveBitMasked == fault)
-  {
-    return IMCState::fault;
-  }
-  else
-  {
-    return IMCState::unknown;
-  }
-}
-
 bool IMotionCube::goToTargetState(IMotionCubeTargetState target_state)
 {
   ROS_DEBUG("\tTry to go to '%s'", target_state.getDescription().c_str());
@@ -422,7 +371,7 @@ bool IMotionCube::goToTargetState(IMotionCubeTargetState target_state)
     ROS_INFO_DELAYED_THROTTLE(5, "\tWaiting for '%s': %s", target_state.getDescription().c_str(),
                               std::bitset<16>(this->getStatusWord()).to_string().c_str());
     if (target_state.getState() == IMotionCubeTargetState::OPERATION_ENABLED.getState() &&
-        this->getState(this->getStatusWord()) == IMCState::fault)
+        IMCState(this->getStatusWord()) == IMCState::FAULT)
     {
       ROS_FATAL("IMotionCube went to fault state while attempting to go to '%s'. Shutting down.",
                 target_state.getDescription().c_str());
@@ -443,8 +392,9 @@ bool IMotionCube::goToOperationEnabled()
   this->goToTargetState(IMotionCubeTargetState::SWITCHED_ON);
   // If ActualPosition is not defined in PDOmapping, a fatal error is thrown
   // because of safety reasons
-  ROS_ASSERT_MSG(this->miso_byte_offsets_.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO "
-                                                                                  "mapping, so can't get angle");
+  ROS_ASSERT_MSG(this->miso_byte_offsets_.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in "
+                                                                                     "PDO "
+                                                                                     "mapping, so can't get angle");
 
   int angle = this->encoder_.getAngleIU(this->miso_byte_offsets_[IMCObjectName::ActualPosition]);
   //  If the encoder is functioning correctly and the joint is not outside hardlimits, move the joint to its current

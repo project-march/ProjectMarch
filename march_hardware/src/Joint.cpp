@@ -115,7 +115,7 @@ IMotionCubeState Joint::getIMotionCubeState()
   std::bitset<16> motionErrorBits = this->iMotionCube.getMotionError();
   states.motionError = motionErrorBits.to_string();
 
-  states.state = this->iMotionCube.getState(this->iMotionCube.getStatusWord());
+  states.state = IMCState(this->iMotionCube.getStatusWord());
   states.detailedErrorDescription = error::parseDetailedError(this->iMotionCube.getDetailedError());
   states.motionErrorDescription = error::parseMotionError(this->iMotionCube.getMotionError());
 

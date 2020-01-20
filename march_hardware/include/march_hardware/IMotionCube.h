@@ -43,7 +43,6 @@ public:
   void actuateTorque(int target_torque);
 
   std::string parseStatusWord(uint16_t status_word);
-  IMCState getState(uint16_t status_word);
 
   bool goToTargetState(march::IMotionCubeTargetState target_state);
   bool goToOperationEnabled();
