@@ -1,7 +1,6 @@
 // Copyright 2019 Project March.
 #include <march_hardware/PDOmap.h>
 
-
 namespace march
 {
 std::unordered_map<IMCObjectName, IMCObject> PDOmap::all_objects = {
