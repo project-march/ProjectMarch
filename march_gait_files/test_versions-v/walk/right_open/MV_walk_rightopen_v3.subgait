@@ -1,4 +1,4 @@
-name: !!python/unicode "right_open"
+name: ''
 version: ''
 description: "The MIV right open gait, but then somewhat faster."
 gait_type: "walk_like"

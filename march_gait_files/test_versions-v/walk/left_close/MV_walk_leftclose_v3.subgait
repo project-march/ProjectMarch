@@ -1,4 +1,4 @@
-name: !!python/unicode "left_close"
+name: ''
 version: ''
 description: "Final left step of the MIV walking gait, but then somewhat faster."
 gait_type: "walk_like"
