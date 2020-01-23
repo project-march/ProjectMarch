@@ -3,7 +3,7 @@
 #ifndef MARCH_HARDWARE_IMOTIONCUBE_H
 #define MARCH_HARDWARE_IMOTIONCUBE_H
 
-#include <map>
+#include <unordered_map>
 #include <string>
 
 #include <march_hardware/ActuationMode.h>
@@ -24,8 +24,8 @@ private:
 
   void actuateIU(int iu);
 
-  std::map<IMCObjectName, int> misoByteOffsets;
-  std::map<IMCObjectName, int> mosiByteOffsets;
+  std::unordered_map<IMCObjectName, int> misoByteOffsets;
+  std::unordered_map<IMCObjectName, int> mosiByteOffsets;
   void mapMisoPDOs();
   void mapMosiPDOs();
   void validateMisoPDOs();
