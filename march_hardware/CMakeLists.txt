@@ -70,6 +70,7 @@ if (CATKIN_ENABLE_TESTING)
     endif()
 
     catkin_add_gmock(${PROJECT_NAME}_test
+        test/error/test_hardware_exception.cpp
         test/error/test_motion_error.cpp
         test/TestRunner.cpp
         test/TestIMotionCube.cpp

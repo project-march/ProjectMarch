@@ -6,6 +6,7 @@
 
 #include <exception>
 #include <ostream>
+#include <vector>
 
 namespace march
 {
@@ -15,7 +16,7 @@ class HardwareException : public std::exception
 {
 public:
   HardwareException() = default;
-  HardwareException(ErrorType type) : type_(type)
+  explicit HardwareException(ErrorType type) : type_(type)
   {
   }
   HardwareException(ErrorType type, std::string message) : type_(type), message_(std::move(message))
@@ -29,12 +30,17 @@ public:
     std::vector<char> buffer(size + 1); // note +1 for null terminator
     std::snprintf(&buffer[0], buffer.size(), format.c_str(), args...);
 
-    this->message_ = std::string(buffer.begin(), buffer.end());
+    this->message_ = std::string(buffer.data(), size);
   }
 
   const char* what() const noexcept override
   {
     return "hardware exception";
+  }
+
+  ErrorType type() const noexcept
+  {
+    return this->type_;
   }
 
   friend std::ostream& operator<<(std::ostream& s, const HardwareException& e)
