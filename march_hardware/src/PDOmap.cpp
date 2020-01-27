@@ -44,8 +44,7 @@ void PDOmap::addObject(IMCObjectName object_name)
   if (total_used_bits > this->nr_of_regs * this->bits_per_register)
   {
     throw error::HardwareException(
-        error::ErrorType::PDO_REGISTER_OVERFLOW,
-        "PDO object: %i could not be added (total bits %d, only %d allowed)",
+        error::ErrorType::PDO_REGISTER_OVERFLOW, "PDO object: %i could not be added (total bits %d, only %d allowed)",
         total_used_bits, (this->nr_of_regs * this->bits_per_register), static_cast<int>(object_name));
   }
 }

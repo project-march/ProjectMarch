@@ -23,11 +23,11 @@ public:
   {
   }
 
-  template<typename... Args>
+  template <typename... Args>
   HardwareException(ErrorType type, const std::string& format, Args... args) : type_(type)
   {
     const size_t size = std::snprintf(nullptr, 0, format.c_str(), args...);
-    std::vector<char> buffer(size + 1); // note +1 for null terminator
+    std::vector<char> buffer(size + 1);  // note +1 for null terminator
     std::snprintf(&buffer[0], buffer.size(), format.c_str(), args...);
 
     this->message_ = std::string(buffer.data(), size);

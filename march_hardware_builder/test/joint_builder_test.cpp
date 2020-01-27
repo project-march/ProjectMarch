@@ -123,7 +123,8 @@ TEST_F(JointTest, ValidActuationMode)
 
   march::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_hip");
 
-  march::Joint actualJoint(march::IMotionCube(1, march::Encoder(16, 22134, 43436, 24515, 0.05), march::ActuationMode::position));
+  march::Joint actualJoint(
+      march::IMotionCube(1, march::Encoder(16, 22134, 43436, 24515, 0.05), march::ActuationMode::position));
   actualJoint.setName("test_joint_hip");
 
   ASSERT_EQ("test_joint_hip", actualJoint.getName());

@@ -51,7 +51,7 @@ TEST(TestHardwareException, TestFormat)
   HardwareException exception(expected, "%s %d", string.c_str(), number);
 
   std::stringstream expected_ss;
-  expected_ss << expected << std::endl << string << " " <<  number;
+  expected_ss << expected << std::endl << string << " " << number;
 
   std::stringstream ss;
   ss << exception;
