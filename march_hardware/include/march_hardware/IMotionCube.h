@@ -42,11 +42,9 @@ public:
   void actuateRad(float target_rad);
   void actuateTorque(int target_torque);
 
-  std::string parseStatusWord(uint16_t status_word);
-
-  bool goToTargetState(IMotionCubeTargetState target_state);
-  bool goToOperationEnabled();
-  bool resetIMotionCube();
+  void goToTargetState(IMotionCubeTargetState target_state);
+  void goToOperationEnabled();
+  void resetIMotionCube();
 
   /** @brief Override comparison operator */
   friend bool operator==(const IMotionCube& lhs, const IMotionCube& rhs)

@@ -212,93 +212,7 @@ void IMotionCube::setControlWord(uint16_t control_word)
   set_output_bit16(slaveIndex, this->mosi_byte_offsets_.at(IMCObjectName::ControlWord), controlwordu);
 }
 
-std::string IMotionCube::parseStatusWord(uint16_t status_word)
-{
-  std::string description;
-  const std::bitset<16> bitset(status_word);
-  if (bitset.test(0))
-  {
-    description += "Axis on. Power stage is enabled. Motor control is performed. ";
-  }
-  else
-  {
-    description += "Axis off. Power stage is disabled. Motor control is not performed. ";
-  }
-  if (bitset.test(2))
-  {
-    description += "Operation Enabled. ";
-  }
-  if (bitset.test(3))
-  {
-    description += "Fault. If set, a fault condition is or was present in the drive. ";
-  }
-  if (bitset.test(4))
-  {
-    description += "Motor supply voltage is present. ";
-  }
-  else
-  {
-    description += "Motor supply voltage is absent. ";
-  }
-  if (bitset.test(5))
-  {
-    description += "Quick Stop. When this bit is zero, the drive is performing a quick stop. ";
-  }
-  if (bitset.test(6))
-  {
-    description += "Switch On Disabled. ";
-  }
-  if (bitset.test(7))
-  {
-    description += "A TML function  was called, while another TML function is still in execution. ";
-  }
-  if (bitset.test(8))
-  {
-    description += "A TML function or homing is executed. ";
-  }
-  if (bitset.test(9))
-  {
-    description += "Remote - drive parameters may be modified via CAN. ";
-  }
-  else
-  {
-    description += "Remote - drive is in local mode and will not execute the command message. ";
-  }
-  if (bitset.test(10))
-  {
-    description += "Target reached. ";
-  }
-  if (bitset.test(11))
-  {
-    description += "Internal Limit Active. ";
-  }
-  if (bitset.test(12))
-  {
-    description += "Target position ignored. ";
-  }
-  if (bitset.test(13))
-  {
-    description += "Following error. ";
-  }
-  if (bitset.test(14))
-  {
-    description += "Last event set has occurred. ";
-  }
-  else
-  {
-    description += "No event set or the programmed event has not occurred yet. ";
-  }
-  if (bitset.test(15))
-  {
-    description += "Axis on. Power stage is enabled. Motor control is performed. ";
-  }
-  else
-  {
-    description += "Axis off. Power stage is disabled. Motor control is not performed. ";
-  }
-}
-
-bool IMotionCube::goToTargetState(IMotionCubeTargetState target_state)
+void IMotionCube::goToTargetState(IMotionCubeTargetState target_state)
 {
   ROS_DEBUG("\tTry to go to '%s'", target_state.getDescription().c_str());
   while (!target_state.isReached(this->getStatusWord()))
@@ -319,7 +233,7 @@ bool IMotionCube::goToTargetState(IMotionCubeTargetState target_state)
   ROS_DEBUG("\tReached '%s'!", target_state.getDescription().c_str());
 }
 
-bool IMotionCube::goToOperationEnabled()
+void IMotionCube::goToOperationEnabled()
 {
   this->setControlWord(128);
 
@@ -356,7 +270,7 @@ bool IMotionCube::goToOperationEnabled()
   this->goToTargetState(IMotionCubeTargetState::OPERATION_ENABLED);
 }
 
-bool IMotionCube::resetIMotionCube()
+void IMotionCube::resetIMotionCube()
 {
   this->setControlWord(0);
   ROS_DEBUG("Slave: %d, Try to reset IMC", this->slaveIndex);
