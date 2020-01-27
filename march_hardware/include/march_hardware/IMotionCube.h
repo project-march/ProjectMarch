@@ -44,7 +44,7 @@ public:
 
   std::string parseStatusWord(uint16_t status_word);
 
-  bool goToTargetState(march::IMotionCubeTargetState target_state);
+  bool goToTargetState(IMotionCubeTargetState target_state);
   bool goToOperationEnabled();
   bool resetIMotionCube();
 
@@ -65,8 +65,6 @@ private:
 
   void mapMisoPDOs();
   void mapMosiPDOs();
-  void validateMisoPDOs();
-  void validateMosiPDOs();
   void writeInitialSettings(uint8_t cycle_time);
 
   Encoder encoder_;

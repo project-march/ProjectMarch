@@ -31,8 +31,6 @@ void IMotionCube::writeInitialSDOs(int cycle_time)
 
   mapMisoPDOs();
   mapMosiPDOs();
-  validateMisoPDOs();
-  validateMosiPDOs();
   writeInitialSettings(cycle_time);
 }
 
@@ -59,25 +57,6 @@ void IMotionCube::mapMosiPDOs()
   map_mosi.addObject(IMCObjectName::TargetPosition);
   map_mosi.addObject(IMCObjectName::TargetTorque);
   this->mosi_byte_offsets_ = map_mosi.map(this->slaveIndex, DataDirection::MOSI);
-}
-
-// Checks if the compulsory MISO PDO objects are mapped
-void IMotionCube::validateMisoPDOs()
-{
-  ROS_ASSERT_MSG(this->miso_byte_offsets_.count(IMCObjectName::StatusWord) == 1, "StatusWord not mapped");
-  ROS_ASSERT_MSG(this->miso_byte_offsets_.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not mapped");
-  ROS_ASSERT_MSG(this->mosi_byte_offsets_.count(IMCObjectName::TargetTorque) == 1, "TargetTorque not mapped");
-
-  if (this->actuation_mode_ == ActuationMode::position)
-  {
-    ROS_ASSERT_MSG(this->mosi_byte_offsets_.count(IMCObjectName::TargetPosition) == 1, "TargetPosition not mapped");
-  }
-}
-
-// Checks if the compulsory MOSI PDO objects are mapped
-void IMotionCube::validateMosiPDOs()
-{
-  ROS_ASSERT_MSG(this->mosi_byte_offsets_.count(IMCObjectName::ControlWord) == 1, "ControlWord not mapped");
 }
 
 // Set configuration parameters to the IMC
@@ -143,12 +122,7 @@ void IMotionCube::actuateIU(int target_iu)
   bit32 target_position;
   target_position.i = target_iu;
 
-  if (this->mosi_byte_offsets_.count(IMCObjectName::TargetPosition) != 1)
-  {
-    ROS_WARN("TargetPosition not defined in PDO mapping, so can't do actuateIU");
-    return;
-  }
-  uint8_t target_position_location = this->mosi_byte_offsets_[IMCObjectName::TargetPosition];
+  uint8_t target_position_location = this->mosi_byte_offsets_.at(IMCObjectName::TargetPosition);
 
   ROS_DEBUG("Trying to actuate slave %d, soem location %d to targetposition %d", this->slaveIndex,
             target_position_location, target_position.i);
@@ -171,12 +145,7 @@ void IMotionCube::actuateTorque(int target_torque)
   bit16 target_torque_struct;
   target_torque_struct.i = target_torque;
 
-  if (this->mosi_byte_offsets_.count(IMCObjectName::TargetTorque) != 1)
-  {
-    ROS_WARN("TargetTorque not defined in PDO mapping, so can't do actuateTorque");
-    return;
-  }
-  uint8_t target_torque_location = this->mosi_byte_offsets_[IMCObjectName::TargetTorque];
+  uint8_t target_torque_location = this->mosi_byte_offsets_.at(IMCObjectName::TargetTorque);
 
   ROS_DEBUG("Trying to actuate slave %d, soem location %d with target torque %d", this->slaveIndex,
             target_torque_location, target_torque_struct.i);
@@ -185,66 +154,42 @@ void IMotionCube::actuateTorque(int target_torque)
 
 float IMotionCube::getAngleRad()
 {
-  ROS_ASSERT_MSG(this->miso_byte_offsets_.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in "
-                                                                                     "PDO "
-                                                                                     "mapping, so can't get angle");
-  return this->encoder_.getAngleRad(this->miso_byte_offsets_[IMCObjectName::ActualPosition]);
+  return this->encoder_.getAngleRad(this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
 }
 
 float IMotionCube::getTorque()
 {
-  ROS_ASSERT_MSG(this->miso_byte_offsets_.count(IMCObjectName::ActualTorque) == 1, "ActualTorque not defined in PDO "
-                                                                                   "mapping, so can't get torque");
-  union bit16 return_byte = get_input_bit16(this->slaveIndex, this->miso_byte_offsets_[IMCObjectName::ActualTorque]);
+  bit16 return_byte = get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::ActualTorque));
   ROS_DEBUG("Actual Torque read: %d", return_byte.i);
   return return_byte.i;
 }
 
 int IMotionCube::getAngleIU()
 {
-  ROS_ASSERT_MSG(this->miso_byte_offsets_.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in "
-                                                                                     "PDO "
-                                                                                     "mapping, so can't get angle");
-  return this->encoder_.getAngleIU(this->miso_byte_offsets_[IMCObjectName::ActualPosition]);
+  return this->encoder_.getAngleIU(this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
 }
 
 uint16_t IMotionCube::getStatusWord()
 {
-  ROS_ASSERT_MSG(this->miso_byte_offsets_.count(IMCObjectName::StatusWord) == 1, "StatusWord not defined in PDO "
-                                                                                 "mapping, so can't get status word");
-  return get_input_bit16(this->slaveIndex, this->miso_byte_offsets_[IMCObjectName::StatusWord]).ui;
+  return get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::StatusWord)).ui;
 }
 
 uint16_t IMotionCube::getMotionError()
 {
-  if (this->miso_byte_offsets_.count(IMCObjectName::MotionErrorRegister) != 1)
-  {
-    ROS_WARN("MotionErrorRegister not defined in PDO mapping, so can't read it");
-    return 0xFFFF;  // Not fatal, so can return
-  }
-  return get_input_bit16(this->slaveIndex, this->miso_byte_offsets_[IMCObjectName::MotionErrorRegister]).ui;
+  return get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::MotionErrorRegister)).ui;
 }
 
 uint16_t IMotionCube::getDetailedError()
 {
-  if (this->miso_byte_offsets_.count(IMCObjectName::DetailedErrorRegister) != 1)
-  {
-    ROS_WARN("DetailedErrorRegister not defined in PDO mapping, so can't read it");
-    return 0xFFFF;  // Not fatal, so can return
-  }
-  return get_input_bit16(this->slaveIndex, this->miso_byte_offsets_[IMCObjectName::DetailedErrorRegister]).ui;
+  return get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::DetailedErrorRegister)).ui;
 }
 
 float IMotionCube::getMotorCurrent()
 {
   const float PEAK_CURRENT = 40.0;            // Peak current of iMC drive
   const float IU_CONVERSION_CONST = 65520.0;  // Conversion parameter, see Technosoft CoE programming manual
-  if (this->miso_byte_offsets_.count(IMCObjectName::ActualTorque) != 1)
-  {
-    ROS_WARN("ActualTorque not defined in PDO mapping, so can't read it");
-    return 0xFFFF;  // Not fatal, so can return
-  }
-  int16_t motor_current_iu = get_input_bit16(this->slaveIndex, this->miso_byte_offsets_[IMCObjectName::ActualTorque]).i;
+
+  int16_t motor_current_iu = get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::ActualTorque)).i;
   return (2.0f * PEAK_CURRENT / IU_CONVERSION_CONST) *
          static_cast<float>(motor_current_iu);  // Conversion to Amp, see Technosoft CoE programming manual
 }
@@ -253,27 +198,18 @@ float IMotionCube::getMotorVoltage()
 {
   const float V_DC_MAX_MEASURABLE = 102.3;    // maximum measurable DC voltage found in EMS Setup/Drive info button
   const float IU_CONVERSION_CONST = 65520.0;  // Conversion parameter, see Technosoft CoE programming manual
-  if (this->miso_byte_offsets_.count(IMCObjectName::DCLinkVoltage) != 1)
-  {
-    ROS_WARN("DC-link Voltage not defined in PDO mapping, so can't read it");
-    return 0xFFFF;  // Not fatal, so can return
-  }
+
   uint16_t motor_voltage_iu =
-      get_input_bit16(this->slaveIndex, this->miso_byte_offsets_[IMCObjectName::DCLinkVoltage]).ui;
+      get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::DCLinkVoltage)).ui;
   return (V_DC_MAX_MEASURABLE / IU_CONVERSION_CONST) *
          static_cast<float>(motor_voltage_iu);  // Conversion to Volt, see Technosoft CoE programming manual
 }
 
 void IMotionCube::setControlWord(uint16_t control_word)
 {
-  if (this->mosi_byte_offsets_.count(IMCObjectName::ControlWord) != 1)
-  {
-    ROS_FATAL("ControlWord not defined in PDO mapping, so can't set Control Word");
-    throw std::exception();
-  }
   bit16 controlwordu;
   controlwordu.i = control_word;
-  set_output_bit16(slaveIndex, this->mosi_byte_offsets_[IMCObjectName::ControlWord], controlwordu);
+  set_output_bit16(slaveIndex, this->mosi_byte_offsets_.at(IMCObjectName::ControlWord), controlwordu);
 }
 
 std::string IMotionCube::parseStatusWord(uint16_t status_word)
@@ -390,13 +326,8 @@ bool IMotionCube::goToOperationEnabled()
   this->goToTargetState(IMotionCubeTargetState::SWITCH_ON_DISABLED);
   this->goToTargetState(IMotionCubeTargetState::READY_TO_SWITCH_ON);
   this->goToTargetState(IMotionCubeTargetState::SWITCHED_ON);
-  // If ActualPosition is not defined in PDOmapping, a fatal error is thrown
-  // because of safety reasons
-  ROS_ASSERT_MSG(this->miso_byte_offsets_.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in "
-                                                                                     "PDO "
-                                                                                     "mapping, so can't get angle");
 
-  int angle = this->encoder_.getAngleIU(this->miso_byte_offsets_[IMCObjectName::ActualPosition]);
+  int angle = this->encoder_.getAngleIU(this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
   //  If the encoder is functioning correctly and the joint is not outside hardlimits, move the joint to its current
   //  position. Otherwise shutdown
   if (abs(angle) <= 2)
