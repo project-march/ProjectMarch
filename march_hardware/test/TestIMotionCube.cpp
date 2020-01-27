@@ -1,18 +1,15 @@
 // Copyright 2018 Project March.
-
-#include "gtest/gtest.h"
-#include <gmock/gmock.h>
-#include "march_hardware/IMotionCube.h"
 #include "mocks/MockEncoder.cpp"
 
-using ::testing::AtLeast;
-using ::testing::Return;
+#include <march_hardware/error/hardware_exception.h>
+#include <march_hardware/IMotionCube.h>
+
+#include <gtest/gtest.h>
 
 class IMotionCubeTest : public ::testing::Test
 {
 protected:
   march::Encoder encoder;
-  march::ActuationMode actuationMode;
   void SetUp() override
   {
     encoder = march::Encoder();
@@ -46,7 +43,7 @@ TEST_F(IMotionCubeTest, SlaveIndexMinusOne)
 TEST_F(IMotionCubeTest, NoActuationMode)
 {
   march::IMotionCube imc(1, encoder, march::ActuationMode::unknown);
-  ASSERT_DEATH(imc.actuateRad(1), "trying to actuate rad, while actuationmode = unknown");
+  ASSERT_THROW(imc.actuateRad(1), march::error::HardwareException);
 }
 
 TEST_F(IMotionCubeTest, ActuationModeTorqueActuateRad)
@@ -54,12 +51,12 @@ TEST_F(IMotionCubeTest, ActuationModeTorqueActuateRad)
   march::IMotionCube imc(1, encoder, march::ActuationMode::torque);
 
   ASSERT_EQ(march::ActuationMode::torque, imc.getActuationMode().getValue());
-  ASSERT_DEATH(imc.actuateRad(1), "trying to actuate rad, while actuationmode = torque");
+  ASSERT_THROW(imc.actuateRad(1), march::error::HardwareException);
 }
 
 TEST_F(IMotionCubeTest, ActuationModePositionActuateTorque)
 {
   march::IMotionCube imc(1, encoder, march::ActuationMode::position);
 
-  ASSERT_DEATH(imc.actuateTorque(1), "trying to actuate torque, while actuationmode = position");
+  ASSERT_THROW(imc.actuateTorque(1), march::error::HardwareException);
 }
