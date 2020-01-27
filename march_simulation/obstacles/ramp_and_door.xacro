@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<robot name="ramp_and_door" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <gazebo>
+        <static>true</static>
+    </gazebo>
+
+
+    <!-- Sizes from the rules of the cybathlon 2020 -->
+    <xacro:property name="platform_height" default="0.48"/>
+    <xacro:property name="platform_length" default="2.920"/>
+    <xacro:property name="platform_width" default="1.4"/>
+    <xacro:property name="ramp_up_length" default="1.403"/>
+    <xacro:property name="ramp_down_length" default="1.854"/>
+    <xacro:property name="distance_to_origin" default="0.4"/>
+
+    <xacro:property name="parent_name" value="world"/>
+    <xacro:property name="mu1" value="1.0"/>
+    <xacro:property name="mu2" value="1.0"/>
+    <!-- Minimum allowable depth before contact correction impulse is applied. -->
+    <xacro:property name="min_depth" value="0.0005"/>
+
+    <!-- Used for fixing robot to Gazebo 'base_link' -->
+    <link name="${parent_name}"/>
+
+
+    <!-- Links -->
+    <link name="platform">
+        <collision>
+          <geometry>
+            <box size="${platform_length} ${platform_width} ${platform_height}" />
+          </geometry>
+        </collision>
+
+        <visual name='visual'>
+          <geometry>
+            <box size="${platform_length} ${platform_width} ${platform_height}" />
+          </geometry>
+        </visual>
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="1"/>
+            <inertia
+                    ixx="1"
+                    ixy="1"
+                    ixz="1"
+                    iyy="1"
+                    iyz="1"
+                    izz="1" />
+        </inertial>
+    </link>
+
+    <link name="ramp_up">
+        <collision>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>
+            <box size="${ramp_up_length} ${platform_width} ${ramp_up_length}" />
+          </geometry>
+        </collision>
+
+        <visual name='visual'>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>
+            <box size="${ramp_up_length} ${platform_width} ${ramp_up_length}" />
+          </geometry>
+        </visual>
+    </link>
+
+    <link name="ramp_down">
+        <collision>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>
+            <box size="${ramp_down_length} ${platform_width} ${ramp_down_length}" />
+          </geometry>
+        </collision>
+
+        <visual name='visual'>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>
+            <box size="${ramp_down_length} ${platform_width} ${ramp_down_length}" />
+          </geometry>
+        </visual>
+    </link>
+
+    <gazebo reference="platform">
+        <mu1>${mu1}</mu1>
+        <mu2>${mu2}</mu2>
+        <minDepth>${min_depth}</minDepth>
+    </gazebo>
+
+    <gazebo reference="ramp_up">
+        <mu1>${mu1}</mu1>
+        <mu2>${mu2}</mu2>
+        <minDepth>${min_depth}</minDepth>
+    </gazebo>
+
+    <gazebo reference="ramp_down">
+        <mu1>${mu1}</mu1>
+        <mu2>${mu2}</mu2>
+        <minDepth>${min_depth}</minDepth>
+    </gazebo>
+
+    <!-- Joints -->
+    <joint name="hip" type="fixed">
+        <parent link="${parent_name}"/>
+        <child link="platform"/>
+        <origin xyz="${-distance_to_origin} 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <joint name="joint_1" type="fixed">
+        <parent link="platform"/>
+        <child link="ramp_up"/>
+        <origin xyz="0.9 0 0" rpy="0 0.35 0"/>
+    </joint>
+
+    <joint name="joint_2" type="fixed">
+        <parent link="platform"/>
+        <child link="ramp_down"/>
+        <origin xyz="-0.9 0 0" rpy="0 -0.26 0"/>
+    </joint>
+
+
+</robot>
