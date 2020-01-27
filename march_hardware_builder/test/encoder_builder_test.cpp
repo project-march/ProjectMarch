@@ -1,14 +1,9 @@
 // Copyright 2019 Project March.
 #include <string>
 #include <gtest/gtest.h>
-#include <ros/ros.h>
-#include <gmock/gmock.h>
 #include <ros/package.h>
 #include <march_hardware_builder/hardware_config_exceptions.h>
 #include <march_hardware_builder/hardware_builder.h>
-
-using ::testing::AtLeast;
-using ::testing::Return;
 
 class EncoderTest : public ::testing::Test
 {

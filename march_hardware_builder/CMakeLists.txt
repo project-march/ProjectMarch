@@ -40,7 +40,7 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 ## Add gtest based cpp test target and link libraries
-if (CATKIN_ENABLE_TESTING)
+if(CATKIN_ENABLE_TESTING)
     find_package(code_coverage REQUIRED)
 
     if(ENABLE_COVERAGE_TESTING)
@@ -56,7 +56,7 @@ if (CATKIN_ENABLE_TESTING)
         test/joint_builder_test.cpp
         test/pdb_builder_test.cpp
     )
-    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME} gtest gmock)
+    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME} gtest)
 
     if(ENABLE_COVERAGE_TESTING)
         set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*")
@@ -65,4 +65,4 @@ if (CATKIN_ENABLE_TESTING)
             DEPENDS tests
         )
     endif()
-endif ()
+endif()

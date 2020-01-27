@@ -2,14 +2,9 @@
 #include <string>
 
 #include <gtest/gtest.h>
-#include <ros/ros.h>
-#include <gmock/gmock.h>
 #include <ros/package.h>
 #include <march_hardware_builder/hardware_config_exceptions.h>
 #include <march_hardware_builder/hardware_builder.h>
-
-using ::testing::AtLeast;
-using ::testing::Return;
 
 class JointTest : public ::testing::Test
 {
@@ -128,15 +123,11 @@ TEST_F(JointTest, ValidActuationMode)
 
   march::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_hip");
 
-  march::Joint actualJoint(march::IMotionCube(1, march::Encoder(), march::ActuationMode::position));
+  march::Joint actualJoint(march::IMotionCube(1, march::Encoder(16, 22134, 43436, 24515, 0.05), march::ActuationMode::position));
   actualJoint.setName("test_joint_hip");
-
-  march::Joint actualJointWrong(march::IMotionCube(1, march::Encoder(), march::ActuationMode::torque));
-  actualJointWrong.setName("test_joint_hip");
 
   ASSERT_EQ("test_joint_hip", actualJoint.getName());
   ASSERT_EQ(actualJoint, createdJoint);
-  ASSERT_NE(actualJointWrong, createdJoint);
 }
 
 TEST_F(JointDeathTest, EmptyJoint)
