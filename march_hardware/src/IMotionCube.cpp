@@ -135,9 +135,9 @@ void IMotionCube::actuateIU(int target_iu)
 {
   if (!this->encoder_.isValidTargetIU(this->getAngleIU(), target_iu))
   {
-    ROS_ERROR("Position %i is invalid for slave %d. (%d, %d)", target_iu, this->slaveIndex,
-              this->encoder_.getLowerSoftLimitIU(), this->encoder_.getUpperSoftLimitIU());
-    throw std::runtime_error("Invalid IU actuate command.");
+    throw error::HardwareException(error::ErrorType::INVALID_ACTUATE_POSITION,
+                                   "Position %i is invalid for slave %d. (%d, %d)", target_iu, this->slaveIndex,
+                                   this->encoder_.getLowerSoftLimitIU(), this->encoder_.getUpperSoftLimitIU());
   }
 
   bit32 target_position;

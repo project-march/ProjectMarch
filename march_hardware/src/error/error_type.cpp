@@ -11,6 +11,8 @@ const char* getErrorDescription(ErrorType type)
   {
     case ErrorType::INVALID_ACTUATION_MODE:
       return "An invalid actuation mode was used to perform an action";
+    case ErrorType::INVALID_ACTUATE_POSITION:
+      return "Invalid IU position command";
     case ErrorType::PDO_OBJECT_NOT_DEFINED:
       return "The to be added PDO object was not defined";
     case ErrorType::PDO_REGISTER_OVERFLOW:
