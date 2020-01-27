@@ -5,8 +5,6 @@
 #include <map>
 #include <utility>
 
-#include <boost/format.hpp>
-
 namespace march
 {
 std::unordered_map<IMCObjectName, IMCObject> PDOmap::all_objects = {
@@ -47,8 +45,8 @@ void PDOmap::addObject(IMCObjectName object_name)
   {
     throw error::HardwareException(
         error::ErrorType::PDO_REGISTER_OVERFLOW,
-        boost::str(boost::format("PDO object: %i could not be added (total bits %d, only %d allowed)") %
-                   total_used_bits % (this->nr_of_regs * this->bits_per_register) % static_cast<int>(object_name)));
+        "PDO object: %i could not be added (total bits %d, only %d allowed)",
+        total_used_bits, (this->nr_of_regs * this->bits_per_register), static_cast<int>(object_name));
   }
 }
 

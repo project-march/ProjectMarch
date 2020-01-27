@@ -117,9 +117,9 @@ void IMotionCube::actuateRad(float target_rad)
 {
   if (this->actuation_mode_ != ActuationMode::position)
   {
-    throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE, "trying to actuate rad, while actuation "
-                                                                             "mode is " +
-                                                                                 this->actuation_mode_.toString());
+    throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
+                                   "trying to actuate rad, while actuation mode is %s",
+                                   this->actuation_mode_.toString().c_str());
   }
 
   if (std::abs(target_rad - this->getAngleRad()) > 0.393)
@@ -159,9 +159,9 @@ void IMotionCube::actuateTorque(int target_torque)
 {
   if (this->actuation_mode_ != ActuationMode::torque)
   {
-    throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE, "trying to actuate torque, while "
-                                                                             "actuation mode is " +
-                                                                                 this->actuation_mode_.toString());
+    throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
+                                   "trying to actuate torque, while actuation mode is %s",
+                                   this->actuation_mode_.toString().c_str());
   }
 
   // The targetTorque must not exceed the value of 23500 IU, this is slightly larger than the current limit of the
