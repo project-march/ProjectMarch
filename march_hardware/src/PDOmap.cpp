@@ -52,7 +52,7 @@ void PDOmap::addObject(IMCObjectName object_name)
   }
 }
 
-std::map<IMCObjectName, int> PDOmap::map(int slave_index, DataDirection direction)
+std::unordered_map<IMCObjectName, int> PDOmap::map(int slave_index, DataDirection direction)
 {
   switch (direction)
   {
@@ -63,28 +63,27 @@ std::map<IMCObjectName, int> PDOmap::map(int slave_index, DataDirection directio
   }
 }
 
-std::map<IMCObjectName, int> PDOmap::configurePDO(int slave_index, int base_register, int base_sync_manager)
+std::unordered_map<IMCObjectName, int> PDOmap::configurePDO(int slave_index, int base_register, int base_sync_manager)
 {
   int counter = 1;
   int current_register = base_register;
   int size_left = this->bits_per_register;
 
-  std::map<IMCObjectName, int> byte_offsets;
+  std::unordered_map<IMCObjectName, int> byte_offsets;
   std::vector<std::pair<IMCObjectName, IMCObject>> sorted_PDO_objects = this->sortPDOObjects();
 
   sdo_bit8(slave_index, current_register, 0, 0);
   for (const auto& nextObject : sorted_PDO_objects)
   {
-    size_left -= nextObject.second.length;
-    if (size_left < 0)
+    if (size_left - nextObject.second.length < 0)
     {
       // PDO is filled so it can be enabled again
       sdo_bit8(slave_index, current_register, 0, counter - 1);
 
       // Update the sync manager with the just configured PDO
       sdo_bit8(slave_index, base_sync_manager, 0, 0);
-      int currentPDONr = (current_register - base_register) + 1;
-      sdo_bit16(slave_index, base_sync_manager, currentPDONr, current_register);
+      int current_pdo_nr = (current_register - base_register) + 1;
+      sdo_bit16(slave_index, base_sync_manager, current_pdo_nr, current_register);
 
       // Move to the next PDO register by incrementing with one
       current_register++;
@@ -93,17 +92,18 @@ std::map<IMCObjectName, int> PDOmap::configurePDO(int slave_index, int base_regi
         ROS_ERROR("Amount of registers was overwritten, amount of parameters does not fit in the PDO messages.");
       }
 
-      size_left = this->bits_per_register - nextObject.second.length;
+      size_left = this->bits_per_register;
       counter = 1;
 
       sdo_bit8(slave_index, current_register, 0, 0);
     }
 
-    int byteOffset = (bits_per_register - (size_left + nextObject.second.length)) / 8;
-    byte_offsets[nextObject.first] = byteOffset;
+    int byte_offset = (current_register - base_register) * 8 + (bits_per_register - size_left) / 8;
+    byte_offsets[nextObject.first] = byte_offset;
 
     sdo_bit32(slave_index, current_register, counter, nextObject.second.combined_address);
     counter++;
+    size_left -= nextObject.second.length;
   }
 
   // Make sure the last PDO is activated

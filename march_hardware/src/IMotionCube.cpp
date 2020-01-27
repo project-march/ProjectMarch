@@ -89,10 +89,10 @@ void IMotionCube::writeInitialSettings(uint8_t cycle_time)
   int mode_of_op = sdo_bit8(slaveIndex, 0x6060, 0, this->actuation_mode_.toModeNumber());
 
   // position limit -- min position
-  int max_pos_lim = sdo_bit32(slaveIndex, 0x607D, 1, this->encoder_.getLowerSoftLimitIU());
+  int min_pos_lim = sdo_bit32(slaveIndex, 0x607D, 1, this->encoder_.getLowerSoftLimitIU());
 
   // position limit -- max position
-  int min_pos_lim = sdo_bit32(slaveIndex, 0x607D, 2, this->encoder_.getUpperSoftLimitIU());
+  int max_pos_lim = sdo_bit32(slaveIndex, 0x607D, 2, this->encoder_.getUpperSoftLimitIU());
 
   // Quick stop option
   int stop_opt = sdo_bit16(slaveIndex, 0x605A, 0, 6);

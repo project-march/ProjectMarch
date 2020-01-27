@@ -5,7 +5,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <map>
 #include <unordered_map>
 
 #include <ros/ros.h>
@@ -69,7 +68,7 @@ public:
    */
   void addObject(IMCObjectName object_name);
 
-  std::map<IMCObjectName, int> map(int slave_index, DataDirection direction);
+  std::unordered_map<IMCObjectName, int> map(int slave_index, DataDirection direction);
 
   static std::unordered_map<IMCObjectName, IMCObject> all_objects;
 
@@ -80,9 +79,9 @@ private:
 
   /** Configures the PDO in the IMC using the given base register address and sync manager address.
    * @return map of the IMC PDO object name in combination with the byte-offset in the PDO register */
-  std::map<IMCObjectName, int> configurePDO(int slave_index, int base_register, int base_sync_manager);
+  std::unordered_map<IMCObjectName, int> configurePDO(int slave_index, int base_register, int base_sync_manager);
 
-  std::map<IMCObjectName, IMCObject> PDO_objects;
+  std::unordered_map<IMCObjectName, IMCObject> PDO_objects;
   int total_used_bits = 0;
 
   const int bits_per_register = 64;           // Maximum amount of bits that can be constructed in one PDO message.

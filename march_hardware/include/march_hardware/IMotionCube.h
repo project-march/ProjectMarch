@@ -10,7 +10,7 @@
 #include <march_hardware/PDOmap.h>
 #include <march_hardware/Slave.h>
 
-#include <map>
+#include <unordered_map>
 #include <string>
 
 namespace march
@@ -72,8 +72,8 @@ private:
   Encoder encoder_;
   ActuationMode actuation_mode_;
 
-  std::map<IMCObjectName, int> miso_byte_offsets_;
-  std::map<IMCObjectName, int> mosi_byte_offsets_;
+  std::unordered_map<IMCObjectName, int> miso_byte_offsets_;
+  std::unordered_map<IMCObjectName, int> mosi_byte_offsets_;
 };
 
 }  // namespace march
