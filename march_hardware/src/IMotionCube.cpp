@@ -8,7 +8,6 @@
 #include <bitset>
 #include <string>
 #include <unistd.h>
-#include <vector>
 
 #include <ros/ros.h>
 
@@ -189,7 +188,8 @@ float IMotionCube::getMotorCurrent()
   const float PEAK_CURRENT = 40.0;            // Peak current of iMC drive
   const float IU_CONVERSION_CONST = 65520.0;  // Conversion parameter, see Technosoft CoE programming manual
 
-  int16_t motor_current_iu = get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::ActualTorque)).i;
+  int16_t motor_current_iu =
+      get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::ActualTorque)).i;
   return (2.0f * PEAK_CURRENT / IU_CONVERSION_CONST) *
          static_cast<float>(motor_current_iu);  // Conversion to Amp, see Technosoft CoE programming manual
 }
@@ -241,19 +241,22 @@ void IMotionCube::goToOperationEnabled()
   this->goToTargetState(IMotionCubeTargetState::READY_TO_SWITCH_ON);
   this->goToTargetState(IMotionCubeTargetState::SWITCHED_ON);
 
-  int angle = this->encoder_.getAngleIU(this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
+  int angle = this->getAngleIU();
   //  If the encoder is functioning correctly and the joint is not outside hardlimits, move the joint to its current
   //  position. Otherwise shutdown
   if (abs(angle) <= 2)
   {
-    ROS_FATAL("Encoder of IMotionCube with slaveIndex %d has reset. Read angle %d IU", this->slaveIndex, angle);
-    throw std::domain_error("Encoder reset");
+    throw error::HardwareException(error::ErrorType::ENCODER_RESET,
+                                   "Encoder of IMotionCube with slave index %d has reset. Read angle %d IU",
+                                   this->slaveIndex, angle);
   }
   else if (!this->encoder_.isWithinHardLimitsIU(angle))
   {
-    ROS_FATAL("Joint with slaveIndex %d is outside hard limits (read value %d IU, limits from %d IU to %d IU)",
-              this->slaveIndex, angle, this->encoder_.getLowerHardLimitIU(), this->encoder_.getUpperHardLimitIU());
-    throw std::domain_error("Joint outside hard limits");
+    throw error::HardwareException(error::ErrorType::OUTSIDE_HARD_LIMITS,
+                                   "Joint with slave index %d is outside hard limits (read value %d IU, limits from %d "
+                                   "IU to %d IU)",
+                                   this->slaveIndex, angle, this->encoder_.getLowerHardLimitIU(),
+                                   this->encoder_.getUpperHardLimitIU());
   }
   else
   {

@@ -13,6 +13,10 @@ const char* getErrorDescription(ErrorType type)
       return "An invalid actuation mode was used to perform an action";
     case ErrorType::INVALID_ACTUATE_POSITION:
       return "Invalid IU position command";
+    case ErrorType::ENCODER_RESET:
+      return "An encoder has reset and reads an incorrect value";
+    case ErrorType::OUTSIDE_HARD_LIMITS:
+      return "A joint is outside its defined hard limits";
     case ErrorType::PDO_OBJECT_NOT_DEFINED:
       return "The to be added PDO object was not defined";
     case ErrorType::PDO_REGISTER_OVERFLOW:
