@@ -145,6 +145,7 @@ void WirelessMaster::update()
       if (packet->containsCalibratedData())
       {
         sensor_msgs::Imu imu_msg;
+        imu_msg.header.stamp = ros::Time::now();
         imu_msg.header.frame_id = "imu_link";
 
         // [m/s²]
