@@ -16,12 +16,12 @@ public:
 
 private:
   ::std::string description;
-  uint16_t controlWord;
+  int controlWord;
   int stateMask;
   int state;
 
 private:
-  IMotionCubeTargetState(const ::std::string& description, uint16_t controlWord, int stateMask, int state)
+  IMotionCubeTargetState(const ::std::string& description, int controlWord, int stateMask, int state)
     : description(description), controlWord(controlWord), stateMask(stateMask), state(state)
   {
   }
@@ -36,7 +36,7 @@ public:
   {
     return this->description;
   }
-  uint16_t getControlWord() const
+  int getControlWord() const
   {
     return this->controlWord;
   }
