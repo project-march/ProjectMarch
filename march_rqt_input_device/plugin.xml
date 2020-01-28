@@ -1,5 +1,5 @@
 <library path="src">
-    <class name="InputDevicePlugin" type="march_rqt_input_device.input_device.InputDevicePlugin" base_class_type="rqt_gui_py::Plugin">
+    <class name="InputDevicePlugin" type="march_rqt_input_device.input_device_view.InputDevicePlugin" base_class_type="rqt_gui_py::Plugin">
         <description>
             An example Python GUI plugin to create a great user interface.
         </description>
