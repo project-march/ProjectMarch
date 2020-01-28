@@ -7,7 +7,8 @@
 
 namespace march
 {
-Encoder::Encoder(int numberOfBits, int minPositionIU, int maxPositionIU, int zeroPositionIU, float safetyMarginRad)
+Encoder::Encoder(int numberOfBits, int32_t minPositionIU, int32_t maxPositionIU, int32_t zeroPositionIU,
+                 float safetyMarginRad)
 {
   ROS_ASSERT_MSG(numberOfBits > 0 && numberOfBits <= 32, "Encoder resolution of %d is not within range (0, 32)",
                  numberOfBits);
@@ -37,7 +38,7 @@ float Encoder::getAngleRad(uint8_t ActualPositionByteOffset)
   return IUtoRad(getAngleIU(ActualPositionByteOffset));
 }
 
-int Encoder::getAngleIU(uint8_t ActualPositionByteOffset)
+int32_t Encoder::getAngleIU(uint8_t ActualPositionByteOffset)
 {
   if (this->slaveIndex == -1)
   {
@@ -48,12 +49,12 @@ int Encoder::getAngleIU(uint8_t ActualPositionByteOffset)
   return return_byte.i;
 }
 
-int Encoder::RadtoIU(float rad)
+int32_t Encoder::RadtoIU(float rad)
 {
-  return static_cast<int>(rad * totalPositions / (2 * M_PI) + zeroPositionIU);
+  return static_cast<int32_t>(rad * totalPositions / (2 * M_PI) + zeroPositionIU);
 }
 
-float Encoder::IUtoRad(int iu)
+float Encoder::IUtoRad(int32_t iu)
 {
   return static_cast<float>(iu - zeroPositionIU) * 2 * M_PI / totalPositions;
 }
@@ -68,17 +69,17 @@ int Encoder::getSlaveIndex() const
   return this->slaveIndex;
 }
 
-bool Encoder::isWithinHardLimitsIU(int positionIU)
+bool Encoder::isWithinHardLimitsIU(int32_t positionIU)
 {
   return (positionIU > this->lowerHardLimitIU && positionIU < this->upperHardLimitIU);
 }
 
-bool Encoder::isWithinSoftLimitsIU(int positionIU)
+bool Encoder::isWithinSoftLimitsIU(int32_t positionIU)
 {
   return (positionIU > this->lowerSoftLimitIU && positionIU < this->upperSoftLimitIU);
 }
 
-bool Encoder::isValidTargetIU(int currentIU, int targetIU)
+bool Encoder::isValidTargetIU(int32_t currentIU, int32_t targetIU)
 {
   if (this->isWithinSoftLimitsIU(targetIU))
   {
@@ -98,22 +99,22 @@ bool Encoder::isValidTargetIU(int currentIU, int targetIU)
   return false;
 }
 
-int Encoder::getUpperSoftLimitIU() const
+int32_t Encoder::getUpperSoftLimitIU() const
 {
   return upperSoftLimitIU;
 }
 
-int Encoder::getLowerSoftLimitIU() const
+int32_t Encoder::getLowerSoftLimitIU() const
 {
   return lowerSoftLimitIU;
 }
 
-int Encoder::getUpperHardLimitIU() const
+int32_t Encoder::getUpperHardLimitIU() const
 {
   return upperHardLimitIU;
 }
 
-int Encoder::getLowerHardLimitIU() const
+int32_t Encoder::getLowerHardLimitIU() const
 {
   return lowerHardLimitIU;
 }
