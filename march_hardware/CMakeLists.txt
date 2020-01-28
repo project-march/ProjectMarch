@@ -42,8 +42,8 @@ add_library(${PROJECT_NAME}
     src/PDOmap.cpp
     src/PowerDistributionBoard.cpp
     src/TemperatureGES.cpp
-    src/error/motion_error.cpp
     src/error/error_type.cpp
+    src/error/motion_error.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
