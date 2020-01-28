@@ -100,11 +100,11 @@ void IMotionCube::actuateRad(float target_rad)
                                    this->actuation_mode_.toString().c_str());
   }
 
-  if (std::abs(target_rad - this->getAngleRad()) > 0.393)
+  if (std::abs(target_rad - this->getAngleRad()) > MAX_TARGET_DIFFERENCE)
   {
-    ROS_ERROR("Target %f exceeds max difference of 0.393 from current %f for slave %d", target_rad, this->getAngleRad(),
-              this->slaveIndex);
-    throw std::runtime_error("Target exceeds max difference of 0.393 from current position");
+    throw error::HardwareException(error::ErrorType::TARGET_EXCEEDS_MAX_DIFFERENCE,
+                                   "Target %f exceeds max difference of %f from current %f for slave %d", target_rad,
+                                   MAX_TARGET_DIFFERENCE, this->getAngleRad(), this->slaveIndex);
   }
   this->actuateIU(this->encoder_.RadtoIU(target_rad));
 }
@@ -137,9 +137,11 @@ void IMotionCube::actuateTorque(int target_torque)
                                    this->actuation_mode_.toString().c_str());
   }
 
-  // The targetTorque must not exceed the value of 23500 IU, this is slightly larger than the current limit of the
-  // linear joints defined in the urdf.
-  ROS_ASSERT_MSG(target_torque < 23500, "Torque of %d is too high.", target_torque);
+  if (target_torque >= MAX_TARGET_TORQUE)
+  {
+    throw error::HardwareException(error::ErrorType::TARGET_TORQUE_EXCEEDS_MAX_TORQUE,
+                                   "Target torque of %d exceeds max torque of %d", target_torque, MAX_TARGET_TORQUE);
+  }
 
   bit16 target_torque_struct;
   target_torque_struct.i = target_torque;

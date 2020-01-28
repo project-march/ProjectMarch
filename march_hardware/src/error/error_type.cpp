@@ -17,12 +17,16 @@ const char* getErrorDescription(ErrorType type)
       return "An encoder has reset and reads an incorrect value";
     case ErrorType::OUTSIDE_HARD_LIMITS:
       return "A joint is outside its defined hard limits";
+    case ErrorType::TARGET_EXCEEDS_MAX_DIFFERENCE:
+      return "The target position exceeds the max allowed difference from the current position";
+    case ErrorType::TARGET_TORQUE_EXCEEDS_MAX_TORQUE:
+      return "The target torque exceeds the max allowed torque";
     case ErrorType::PDO_OBJECT_NOT_DEFINED:
       return "The to be added PDO object was not defined";
     case ErrorType::PDO_REGISTER_OVERFLOW:
       return "The PDO map could not fit within the registers";
     case ErrorType::UNKNOWN:
-      return "Unknown error occured. Please create/use a documented error";
+      return "Unknown error occurred. Please create/use a documented error";
   }
 }
 
