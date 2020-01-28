@@ -1,0 +1,73 @@
+name: ''
+version: ''
+description: "Left open for the second step off the Tilted Path."
+gait_type: ''
+setpoints: 
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs:         0
+    joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
+  right_ankle]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 400000000
+    joint_names: [right_hip_aa]
+  - 
+    time_from_start: 
+      secs: 1
+      nsecs:         0
+    joint_names: [left_hip_fe, left_knee]
+  - 
+    time_from_start: 
+      secs: 2
+      nsecs:         0
+    joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
+  right_ankle]
+trajectory: 
+  header: 
+    seq: 0
+    stamp: 
+      secs: 0
+      nsecs:         0
+    frame_id: ''
+  joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
+  right_ankle]
+  points: 
+    - 
+      positions: [0.0, -0.0873, 0.0, 0.0436, 0.0, 0.1745, 0.4363, 0.0436]
+      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs:         0
+    - 
+      positions: [0.021, 0.0613, 0.1783, 0.0436, 0.0698, 0.1745, 0.4363, 0.0436]
+      velocities: [0.098, 0.6211, 0.7452, -0.0, 0.0, -0.0, -0.0, -0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 400000000
+    - 
+      positions: [0.1039, 0.3491, 0.5236, 0.0436, 0.1134, 0.1745, 0.4363, 0.0436]
+      velocities: [0.157, 0.0, 0.0, -0.0, 0.1219, -0.0, -0.0, -0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs:         0
+    - 
+      positions: [0.2094, -0.0873, 0.0, 0.0436, 0.2094, 0.1745, 0.4363, 0.0436]
+      velocities: [0.0, 0.0, 0.0, -0.0, 0.0, 0.0, 0.0, -0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 2
+        nsecs:         0
+duration: 
+  secs: 2
+  nsecs:         0
+sounds: []
