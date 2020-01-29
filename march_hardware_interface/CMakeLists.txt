@@ -41,7 +41,7 @@ include(cmake/${PROJECT_NAME}-extras.cmake)
 if(CATKIN_ENABLE_TESTING AND ENABLE_COVERAGE_TESTING)
     find_package(code_coverage REQUIRED)
     # Add compiler flags for coverage instrumentation before defining any targets
-    APPEND_COVERAGE_COMPILER_FLAGS()
+    append_coverage_compiler_flags()
 endif()
 
 include_directories(include SYSTEM ${catkin_INCLUDE_DIRS})
