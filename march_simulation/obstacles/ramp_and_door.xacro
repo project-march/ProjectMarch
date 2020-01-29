@@ -27,13 +27,13 @@
     <link name="platform">
         <collision>
           <geometry>
-            <box size="${platform_length} ${platform_width} ${platform_height}" />
+            <box size="${platform_length} ${platform_width} 3" />
           </geometry>
         </collision>
 
         <visual name='visual'>
           <geometry>
-            <box size="${platform_length} ${platform_width} ${platform_height}" />
+            <box size="${platform_length} ${platform_width} 3" />
           </geometry>
         </visual>
         <inertial>
@@ -100,22 +100,23 @@
     </gazebo>
 
     <!-- Joints -->
-    <joint name="hip" type="fixed">
+
+    <joint name="hip_1" type="fixed">
         <parent link="${parent_name}"/>
         <child link="platform"/>
-        <origin xyz="${-distance_to_origin} 0 0" rpy="0 0 0"/>
+        <origin xyz="-3.2 0 -1.02" rpy="0 0 0"/>
     </joint>
 
     <joint name="joint_1" type="fixed">
         <parent link="platform"/>
         <child link="ramp_up"/>
-        <origin xyz="0.9 0 0" rpy="0 0.35 0"/>
+        <origin xyz="1.875 0 0.601" rpy="0 0.35 0"/>
     </joint>
 
     <joint name="joint_2" type="fixed">
         <parent link="platform"/>
         <child link="ramp_down"/>
-        <origin xyz="-0.9 0 0" rpy="0 -0.26 0"/>
+        <origin xyz="-2.115 0 0.365" rpy="0 -0.26 0"/>
     </joint>
 
 
