@@ -15,6 +15,12 @@ catkin_package(
     LIBRARIES ${PROJECT_NAME}
 )
 
+if(CATKIN_ENABLE_TESTING AND ENABLE_COVERAGE_TESTING)
+    find_package(code_coverage REQUIRED)
+    # Add compiler flags for coverage instrumentation before defining any targets
+    APPEND_COVERAGE_COMPILER_FLAGS()
+endif()
+
 include_directories(include SYSTEM ${catkin_INCLUDE_DIRS})
 
 add_library(${PROJECT_NAME}
@@ -41,13 +47,6 @@ install(TARGETS ${PROJECT_NAME}
 
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
-    find_package(code_coverage REQUIRED)
-
-    if(ENABLE_COVERAGE_TESTING)
-        include(CodeCoverage)
-        append_coverage_compiler_flags()
-    endif()
-
     catkin_add_gtest(${PROJECT_NAME}_test
         test/test_runner.cpp
         test/allowed_robot_test.cpp
@@ -61,8 +60,8 @@ if (CATKIN_ENABLE_TESTING)
     if(ENABLE_COVERAGE_TESTING)
         set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*")
         add_code_coverage(
-            NAME ${PROJECT_NAME}_coverage
-            DEPENDS tests
+            NAME coverage_report
+            DEPENDENCIES ${PROJECT_NAME}_test
         )
     endif()
 endif ()

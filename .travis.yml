@@ -29,7 +29,10 @@ env:
     - BUILDER=colcon
     - CATKIN_LINT=pedantic
     - CATKIN_LINT_ARGS='--ignore literal_project_name --ignore target_name_collision'
+    - CI_ENV=`bash <(curl -s https://codecov.io/env)`
+    - DOCKER_RUN_OPTS='$CI_ENV'
     - UPSTREAM_WORKSPACE='.rosinstall -march/march_data_collector -march/march_gait_scheduler -march/march_gain_scheduling -march/march_gait_selection -march/march_launch -march/march_safety -march/march_state_machine'
+    - AFTER_RUN_TARGET_TEST='cd "$target_ws" && builder_run_build "$target_ws/install" "$target_ws" --cmake-args -DENABLE_COVERAGE_TESTING=ON -DCMAKE_BUILD_TYPE=Debug --cmake-target coverage_report --cmake-target-skip-unavailable && bash <(curl -s https://codecov.io/bash)'
 
 jobs:
   include:

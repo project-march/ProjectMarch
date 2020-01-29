@@ -1,7 +1,7 @@
-ignore:
-  - "march_hardware/soem/.*"
-  - "march_hardware/test/.*"
-  - "march_hardware_builder/test/.*"
-  - "march_hardware_interface/test/.*"
-  - "march_temperature_sensor_controller/test/.*"
-  
+fixes:
+  - "src/march_hardware/::"
+  - "src/march_hardware_builder/::"
+  - "src/march_hardware_interface/::"
+  - "src/march_imu_manager/::"
+  - "src/march_pdb_state_controller/::"
+  - "src/march_temperature_sensor_controller/::"
