@@ -9,7 +9,7 @@ march4:
         temperatureges: {slaveIndex: 7, byteOffset: 4}
         imotioncube:
           slaveIndex: 6
-          encoder: {resolution: 12, minPositionIU: 3708, maxPositionIU: 4093, zeroPositionIU: 3906, safetyMarginRad: 0.05}
+          encoder: {resolution: 12, minPositionIU: 3713, maxPositionIU: 4091, zeroPositionIU: 3907, safetyMarginRad: 0.05}
 
     - left_hip_aa:
         actuationMode: position
@@ -18,7 +18,7 @@ march4:
         temperatureges: {slaveIndex: 7, byteOffset: 0}
         imotioncube:
           slaveIndex: 8
-          encoder: {resolution: 12, minPositionIU: 1035, maxPositionIU: 1438, zeroPositionIU: 1242, safetyMarginRad: 0.05}
+          encoder: {resolution: 12, minPositionIU: 1032, maxPositionIU: 1404, zeroPositionIU: 1223, safetyMarginRad: 0.05}
 
     - right_hip_fe:
         actuationMode: position
