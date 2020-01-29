@@ -7,11 +7,11 @@ gaits:
                          right_swing: MV_RD_slopedown_rightswing_v1, left_swing: MV_RD_slopedown_leftswing_v1,
                          right_close: MV_RD_slopedown_rightclose_v1, left_close: MV_RD_slopedown_leftclose_v1}
   ramp_door_last_step: {right_open: MV_RD_laststep_rightopen_v2, left_close: MV_RD_laststep_leftclose_v2}
-  rough_terrain_high_step: {right_open: MV_RT_highstep_rightopen_v5, left_close: MV_RT_highstep_leftclose_v6}
+  rough_terrain_high_step: {right_open: MV_RT_highstep_rightopen_v6, left_close: MV_RT_highstep_leftclose_v7}
   rough_terrain_middle_steps: {right_open: MV_RT_middlestep_rightopen_v2, left_swing: MV_RT_middlestep_leftswing_v2,
                                right_swing: MV_RT_middlestep_rightswing_v2, left_close: MV_RT_middlestep_leftclose_v3}
-  walk: {right_open: MV_walk_rightopen_v2, left_swing: MV_walk_leftswing_v2, right_swing: MV_walk_rightswing_v2,
-         left_close: MV_walk_leftclose_v2, right_close: MV_walk_rightclose_v2}
+  walk: {right_open: MV_walk_rightopen_v3, left_swing: MV_walk_leftswing_v2, right_swing: MV_walk_rightswing_v2,
+         left_close: MV_walk_leftclose_v3, right_close: MV_walk_rightclose_v3}
   single_step_normal: {right_open: MIV_final, left_close: MIV_final}
   sit: {sit_down: MIV_final, sit_home: MIV_final}
   stand: {prepare_stand_up: MIV_final, stand_up: MIV_final}
@@ -19,3 +19,11 @@ gaits:
   tilted_path_second_start: {left_open: MV_TPstart2_leftopen_v1, right_close: MV_TPstart2_rightclose_v1}
   tilted_path_straight_start_right: {right_open: MV_TPstraight_rightopen_v1, left_close: MV_TPstraight_leftclose_v1}
   tilted_path_straight_start_left: {left_open: MV_TPstraight_leftopen_v1, right_close: MV_TPstraight_rightclose_v1}
+  tilted_path_first_end: {left_open: MV_TPend1_leftopen_v1, right_close: MV_TPend1_rightclose_v1}
+  tilted_path_second_end: {left_open: MV_TPend2_leftopen_v1, right_close: MV_TPend2_rightclose_v1}
+  stairs_up: {right_open: MV_stairsup_rightopen_v2, left_swing: MV_stairsup_leftswing_v2,
+              right_swing: MV_stairsup_rightswing_v2, left_close: MV_stairsup_leftclose_v2,
+              right_close: MV_stairsup_rightclose_v2}
+  stairs_down: {right_open: MV_stairsdown_rightopen_v2, left_swing: MV_stairsdown_leftswing_v2,
+                right_swing: MV_stairsdown_rightswing_v2, left_close: MV_stairsdown_leftclose_v2,
+                right_close: MV_stairsdown_rightclose_v2}
