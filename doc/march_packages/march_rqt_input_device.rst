@@ -63,15 +63,15 @@ Add a new button
 In this tutorial we will add a new button which will have a custom callback that publishes on a new topic
 Our button will publish a boolean message if this tutorial works on the topic ``/march/this/tutorial/works``
 
-We only need to add code to :monitor:`input_device.py <march_rqt_input_device/src/march_rqt_input_device/input_device.py>`.
-Make sure to check this file before you start as it contains many examples of existing buttons.
+We will need to add code to :monitor:`input_device.py <march_rqt_input_device/src/march_rqt_input_device/input_device_view.py>` and :monitor:`input_device.py <march_rqt_input_device/src/march_rqt_input_device/input_device_controller.py>`. The ``InputDeviceView`` class contains code for layout, colour and buttons, where the ``InputDeviceController`` class contains code for publishing on topics.
+Make sure to check these files before you start as it contains many examples of existing buttons.
 
 .. hint::
   If the publisher your button needs already exists, you can skip some of the following steps.
 
 Create a new publisher
 ~~~~~~~~~~~~~~~~~~~~~~
-Create a new publisher in the ``__init__``:
+Create a new publisher in the ``__init__`` of ``InputDeviceController``:
 
 .. code::
 
@@ -81,16 +81,18 @@ Create a new publisher in the ``__init__``:
 
 Create a publish function
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+Add a publish function to the ``InputDeviceController`` class, which will be called by our button:
 .. code::
 
-  def publish_this_tutorial_works(self):
+  def publish_true(self):
         self.this_tutorial_works_pub.publish(Bool(True))
 
 Create a button object
 ~~~~~~~~~~~~~~~~~~~~~~
 .. code::
 
-  this_tutorial_works_button = MarchButton(name="Publish True", callback=lambda: self.publish_this_tutorial_works())
+  this_tutorial_works_button = self.create_button('Pulbish True',
+                                                  callback=lambda: self.controller.publish_true())
 
 Add it to the march_button_layout
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
