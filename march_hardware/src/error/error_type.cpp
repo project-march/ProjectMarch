@@ -25,6 +25,8 @@ const char* getErrorDescription(ErrorType type)
       return "The to be added PDO object was not defined";
     case ErrorType::PDO_REGISTER_OVERFLOW:
       return "The PDO map could not fit within the registers";
+    case ErrorType::WRITING_INITIAL_SETTINGS_FAILED:
+      return "Failed to write initial settings to slave required for operation";
     case ErrorType::UNKNOWN:
       return "Unknown error occurred. Please create/use a documented error";
   }

@@ -87,7 +87,8 @@ void IMotionCube::writeInitialSettings(uint8_t cycle_time)
 
   if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && stop_decl && abort_con && rate_ec_x && rate_ec_y))
   {
-    ROS_ERROR("Failed writing initial settings to IMC of slave %i", slaveIndex);
+    throw error::HardwareException(error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
+                                   "Failed writing initial settings to IMC of slave %d", this->slaveIndex);
   }
 }
 
