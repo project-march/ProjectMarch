@@ -21,9 +21,9 @@ gaits:
   tilted_path_straight_start_left: {left_open: MV_TPstraight_leftopen_v1, right_close: MV_TPstraight_rightclose_v1}
   tilted_path_first_end: {left_open: MV_TPend1_leftopen_v1, right_close: MV_TPend1_rightclose_v1}
   tilted_path_second_end: {left_open: MV_TPend2_leftopen_v1, right_close: MV_TPend2_rightclose_v1}
-  stairs_up: {right_open: MV_stairsup_rightopen_v2, left_swing: MV_stairsup_leftswing_v2,
-              right_swing: MV_stairsup_rightswing_v2, left_close: MV_stairsup_leftclose_v2,
-              right_close: MV_stairsup_rightclose_v2}
-  stairs_down: {right_open: MV_stairsdown_rightopen_v2, left_swing: MV_stairsdown_leftswing_v2,
-                right_swing: MV_stairsdown_rightswing_v2, left_close: MV_stairsdown_leftclose_v2,
-                right_close: MV_stairsdown_rightclose_v2}
+  stairs_up: {right_open: MIV_final, left_swing: MIV_final,
+              right_swing: MIV_final, left_close: MIV_final,
+              right_close: MIV_final}
+  stairs_down: {right_open: MIV_final, left_swing: MIV_final,
+                right_swing: MIV_final, left_close: MIV_final,
+                right_close: MIV_final}
