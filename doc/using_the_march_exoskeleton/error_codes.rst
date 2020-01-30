@@ -130,6 +130,21 @@ This error indicates that the added PDO exceeded 4*64=256 bits.
 you are not using until you are at or below the 256 bits.
 
 
+.. _e108:
+
+``E108``: Writing initial settings failed
+-------------------------------
+Failed to write initial settings to slave required for operation.
+
+**Cause:** Before setting all ethercat slaves to operational mode, the master
+writes some settings required during operation. If such a write command fails,
+it means that the master did not get any confirmation that the value was written.
+This could have several causes: A slave was (temporarily) lost during writing
+or the slave does not allow writing the value to that address.
+
+**Fix:** Check the connection between the faulty slave and the master or
+check that you write the correct sized (8, 16, 32 bit) value to the correct address.
+
 .. _e999:
 
 ``E999``: Unknown error
