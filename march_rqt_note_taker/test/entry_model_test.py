@@ -19,10 +19,14 @@ class EntryModelTest(unittest.TestCase):
         self.assertEqual(self.model.headerData(0, Qt.Horizontal, Qt.DisplayRole), 'Time')
         self.assertEqual(self.model.headerData(1, Qt.Horizontal, Qt.DisplayRole), 'Entry')
 
-    def test_insert_single_row(self):
+    def test_insert_single_row_count(self):
         entry = Entry('test', QDateTime.fromSecsSinceEpoch(5))
         self.model.insert_row(entry)
         self.assertEqual(self.model.rowCount(), 1)
+
+    def test_insert_single_row(self):
+        entry = Entry('test', QDateTime.fromSecsSinceEpoch(5))
+        self.model.insert_row(entry)
 
         time_index = self.model.createIndex(0, 0)
         content_index = self.model.createIndex(0, 1)
