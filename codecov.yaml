@@ -1,2 +1,9 @@
+ignore:
+  - "**/*/march_hardware/check/*"
+  - "**/*/march_hardware/test/*"
+  - "**/*/march_hardware_builder/test/*"
+  - "**/*/march_hardware_interface/test/*"
+  - "**/*/march_imu_manager/lib/*"
+  - "**/*/march_imu_manager/test/*"
 fixes:
   - "src/hardware-interface/::"
