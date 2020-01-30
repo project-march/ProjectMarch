@@ -91,7 +91,7 @@ if(CATKIN_ENABLE_TESTING)
     )
 
     if(ENABLE_COVERAGE_TESTING)
-        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*" "*/${PROJECT_NAME}/lib*")
+        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*" "*/${PROJECT_NAME}/lib/*")
         add_code_coverage(
             NAME coverage_report
             DEPENDENCIES wireless_master_test

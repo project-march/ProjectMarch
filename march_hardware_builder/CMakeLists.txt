@@ -58,7 +58,7 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME} gtest gmock)
 
     if(ENABLE_COVERAGE_TESTING)
-        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*")
+        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*")
         add_code_coverage(
             NAME coverage_report
             DEPENDENCIES ${PROJECT_NAME}_test

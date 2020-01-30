@@ -88,7 +88,7 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} ${PROJECT_NAME} gtest)
 
     if(ENABLE_COVERAGE_TESTING)
-        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*" "*/${PROJECT_NAME}/check*")
+        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*" "*/${PROJECT_NAME}/check/*")
         add_code_coverage(
             NAME coverage_report
             DEPENDENCIES ${PROJECT_NAME}-test

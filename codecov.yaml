@@ -1,7 +1,2 @@
 fixes:
-  - "src/march_hardware/::"
-  - "src/march_hardware_builder/::"
-  - "src/march_hardware_interface/::"
-  - "src/march_imu_manager/::"
-  - "src/march_pdb_state_controller/::"
-  - "src/march_temperature_sensor_controller/::"
+  - "src/hardware-interface/::"
