@@ -133,7 +133,7 @@ you are not using until you are at or below the 256 bits.
 .. _e108:
 
 ``E108``: Writing initial settings failed
--------------------------------
+-----------------------------------------
 Failed to write initial settings to slave required for operation.
 
 **Cause:** Before setting all ethercat slaves to operational mode, the master
