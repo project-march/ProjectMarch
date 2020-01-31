@@ -25,10 +25,132 @@ without having to repeat the whole error description.
 
 .. _e100:
 
-``E100``: Placeholder error
----------------------------
-This should be a short description of the error.
+``E100``: Invalid actuation mode
+--------------------------------
+An invalid actuation mode was used to perform an action.
 
-**Cause:** You did this thing wrong
+**Cause:** The motor controllers have two modes for actuation: position and effort.
+With position you can only actuate to a target position using ``actuateRad()``.
+In effort mode you can only actuate using a target torque using ``actuateTorque()``.
+This error was caused by mixing the actuate methods and actuation modes. See
+the detailed description for which mode the controller was actually in.
 
-**Fix:** Do this and that and then it may be solved
+**Fix:** Check if the actuation mode defined in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
+you use is consistent with the methods you are using to actuate the joint.
+
+
+.. _e101:
+
+``E101``: Invalid actuate position
+----------------------------------
+Invalid IU position command.
+
+**Cause:** The position you are trying to actuate to is not a valid target within the range of the joint.
+
+**Fix:** Check that the IU limits defined in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
+under ``joints/<joint_name>/imotioncube/encoder`` match the actual limits of the joint.
+
+
+.. _e102:
+
+``E102``: Encoder reset
+-----------------------
+An encoder has reset and reads an incorrect value.
+
+**Cause:** The cause is still unknown.
+
+**Fix:** This error happens sometimes during startup and the only thing you
+can do is try again. This error will probably be removed once this issue has
+been fixed.
+
+
+.. _e103:
+
+``E103``: Outside hard limits
+-----------------------------
+A joint is outside its defined hard limits.
+
+**Cause:** A joint was found to be outside its defined hard limits in the
+:hardware-interface:`robots yaml <march_hardware_builder/robots>`.
+
+**Fix:** Check that the IU limits defined in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
+under ``joints/<joint_name>/imotioncube/encoder`` match the actual limits of the joint and recalibrate if necessary.
+
+
+.. _e104:
+
+``E104``: Target exceeds max difference
+---------------------------------------
+The target position exceeds the max allowed difference from the current position.
+
+**Cause:** The given target position is greater than the maximum allowed difference
+between target and actual position. This could cause dangerous situations if
+you were to actuate a long distance in a short amount of time.
+
+**Fix:** This is a safety measure and most of time indicates that the joints
+are behind their trajectory path.
+
+
+.. _e105:
+
+``E105``: Target torque exceeds max torque
+------------------------------------------
+The target torque exceeds the max allowed torque
+
+**Cause:** The maximum given target torque is greater than the joints
+can actuate. This could cause dangerous situations where the joints could be
+negatively affected.
+
+**Fix:** This is a safety measure and most of time indicates that the joints
+are behind their trajectory path.
+
+
+.. _e106:
+
+``E106``: PDO object not defined
+--------------------------------
+The to be added PDO object was not defined.
+
+**Cause:** The PDO that is being mapped does not have a defined address and size.
+
+**Fix:** Check that the PDO is defined in the ``all_objects`` map in the
+:hardware-interface:`PDOmap <march_hardware/src/PDOmap.cpp>` class.
+
+
+.. _e107:
+
+``E107``: PDO register overflow
+-------------------------------
+The PDO map could not fit within the registers
+
+**Cause:** There exist 4 registers with 64 bits each to be filled with PDO maps.
+This error indicates that the added PDO exceeded 4*64=256 bits.
+
+**Fix:** Check that you actually need all the mapped PDOs and remove some that
+you are not using until you are at or below the 256 bits.
+
+
+.. _e108:
+
+``E108``: Writing initial settings failed
+-----------------------------------------
+Failed to write initial settings to slave required for operation.
+
+**Cause:** Before setting all ethercat slaves to operational mode, the master
+writes some settings required during operation. If such a write command fails,
+it means that the master did not get any confirmation that the value was written.
+This could have several causes: A slave was (temporarily) lost during writing
+or the slave does not allow writing the value to that address.
+
+**Fix:** Check the connection between the faulty slave and the master or
+check that you write the correct sized (8, 16, 32 bit) value to the correct address.
+
+.. _e999:
+
+``E999``: Unknown error
+-----------------------
+Unknown error occurred which was not given an error code.
+
+**Cause:** An ``HardwareException`` was thrown without specifying an ``ErrorType``.
+
+**Fix:** Find where this exception was thrown and create a documented error.
