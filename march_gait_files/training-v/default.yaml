@@ -18,6 +18,6 @@ gaits:
          left_close: MV_walk_leftclose_v2, right_close: MV_walk_rightclose_v2}
   walk_small: {right_open: MIV_final, left_swing: MIV_final, right_swing: MIV_final, left_close: MIV_final,
                right_close: MIV_final}
-  rough_terrain_high_step: {right_open: MV_RT_highstep_rightopen_v5, left_close: MV_RT_highstep_leftclose_v6}
+  rough_terrain_high_step: {right_open: MV_RT_highstep_rightopen_v6, left_close: MV_RT_highstep_leftclose_v8}
   rough_terrain_middle_steps: {right_open: MV_RT_middlestep_rightopen_v2, left_swing: MV_RT_middlestep_leftswing_v2,
                                right_swing: MV_RT_middlestep_rightswing_v2, left_close: MV_RT_middlestep_leftclose_v3}
