@@ -12,6 +12,8 @@ flags:
   production:
     paths:
       - "*/src/**/*"
+      - "*/src/*"
   test:
     paths:
       - "*/test/**/*"
+      - "*/test/*"
