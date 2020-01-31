@@ -13,6 +13,8 @@ flags:
     paths:
       - "*/src/**/*"
       - "*/src/*"
+      - "*/include/march_*/*"
+      - "*/include/march_*/**/*"
   test:
     paths:
       - "*/test/**/*"
