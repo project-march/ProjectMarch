@@ -25,11 +25,16 @@ git:
 env:
   global:
     - ROS_REPO=ros
+    - ADDITIONAL_DEBS=curl
     - CCACHE_DIR=$HOME/.ccache # enables C/C++ caching in industrial_ci
     - BUILDER=colcon
     - CATKIN_LINT=pedantic
     - CATKIN_LINT_ARGS='--ignore literal_project_name --ignore target_name_collision'
+    - CI_ENV=`bash <(curl -s https://codecov.io/env)`
+    - DOCKER_RUN_OPTS='$CI_ENV'
+    - TARGET_CMAKE_ARGS='-DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE_TESTING=ON'
     - UPSTREAM_WORKSPACE='.rosinstall -march/march_data_collector -march/march_gait_scheduler -march/march_gain_scheduling -march/march_gait_selection -march/march_launch -march/march_safety -march/march_state_machine'
+    - AFTER_RUN_TARGET_TEST='cd "$target_ws" && bash <(curl -s https://codecov.io/bash) -R src/hardware-interface -F test && bash <(curl -s https://codecov.io/bash) -R src/hardware-interface -F production'
 
 jobs:
   include:
