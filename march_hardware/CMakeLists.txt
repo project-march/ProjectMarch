@@ -21,9 +21,11 @@ include_directories(
     ${soem_INCLUDE_DIRS}/soem
 )
 
-install(DIRECTORY include/${PROJECT_NAME}/
-    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-)
+if(CATKIN_ENABLE_TESTING AND ENABLE_COVERAGE_TESTING)
+    find_package(code_coverage REQUIRED)
+    # Add compiler flags for coverage instrumentation before defining any targets
+    append_coverage_compiler_flags()
+endif()
 
 add_library(${PROJECT_NAME}
     include/${PROJECT_NAME}/error/error_type.h
@@ -51,6 +53,10 @@ target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 add_executable(slave_count_check check/SlaveCount.cpp)
 target_link_libraries(slave_count_check ${PROJECT_NAME})
 
+install(DIRECTORY include/${PROJECT_NAME}/
+    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+)
+
 install(TARGETS ${PROJECT_NAME}
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -61,14 +67,7 @@ install(TARGETS slave_count_check
 )
 
 ## Add gtest based cpp test target and link libraries
-if (CATKIN_ENABLE_TESTING)
-    find_package(code_coverage REQUIRED)
-
-    if(ENABLE_COVERAGE_TESTING)
-        include(CodeCoverage)
-        append_coverage_compiler_flags()
-    endif()
-
+if(CATKIN_ENABLE_TESTING)
     catkin_add_gmock(${PROJECT_NAME}_test
         test/TestBootShutdownOffsets.cpp
         test/TestHighVoltage.cpp
@@ -89,13 +88,13 @@ if (CATKIN_ENABLE_TESTING)
         test/mocks/MockTemperatureGES.cpp
         test/mocks/MockTemperatureSensor.cpp
     )
-    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME} gtest)
+    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME})
 
     if(ENABLE_COVERAGE_TESTING)
-        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*")
+        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*" "*/${PROJECT_NAME}/check/*")
         add_code_coverage(
-            NAME ${PROJECT_NAME}_coverage
-            DEPENDS tests
+            NAME coverage_report
+            DEPENDENCIES ${PROJECT_NAME}_test
         )
     endif()
-endif ()
+endif()

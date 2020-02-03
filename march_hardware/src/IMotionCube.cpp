@@ -156,6 +156,11 @@ void IMotionCube::actuateTorque(int target_torque)
 
 float IMotionCube::getAngleRad()
 {
+  if (!IMotionCubeTargetState::SWITCHED_ON.isReached(this->getStatusWord()) &&
+      !IMotionCubeTargetState::OPERATION_ENABLED.isReached(this->getStatusWord()))
+  {
+    ROS_WARN_THROTTLE(10, "Invalid use of encoders, you're not in the correct state.");
+  }
   return this->encoder_.getAngleRad(this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
 }
 
@@ -244,7 +249,7 @@ void IMotionCube::goToOperationEnabled()
   this->goToTargetState(IMotionCubeTargetState::READY_TO_SWITCH_ON);
   this->goToTargetState(IMotionCubeTargetState::SWITCHED_ON);
 
-  int angle = this->getAngleIU();
+  const int angle = this->getAngleIU();
   //  If the encoder is functioning correctly and the joint is not outside hardlimits, move the joint to its current
   //  position. Otherwise shutdown
   if (abs(angle) <= 2)
@@ -261,16 +266,14 @@ void IMotionCube::goToOperationEnabled()
                                    this->slaveIndex, angle, this->encoder_.getLowerHardLimitIU(),
                                    this->encoder_.getUpperHardLimitIU());
   }
-  else
+
+  if (this->actuation_mode_ == ActuationMode::position)
   {
-    if (this->actuation_mode_ == ActuationMode::position)
-    {
-      this->actuateIU(angle);
-    }
-    if (this->actuation_mode_ == ActuationMode::torque)
-    {
-      this->actuateTorque(0);
-    }
+    this->actuateIU(angle);
+  }
+  if (this->actuation_mode_ == ActuationMode::torque)
+  {
+    this->actuateTorque(0);
   }
 
   this->goToTargetState(IMotionCubeTargetState::OPERATION_ENABLED);

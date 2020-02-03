@@ -1,0 +1,21 @@
+coverage:
+  status:
+    project:
+      default: off
+      production:
+        target: auto
+        flags:
+          - production
+fixes:
+  - "src/hardware-interface/::"
+flags:
+  production:
+    paths:
+      - "*/src/**/*"
+      - "*/src/*"
+      - "*/include/march_*/*"
+      - "*/include/march_*/**/*"
+  test:
+    paths:
+      - "*/test/**/*"
+      - "*/test/*"

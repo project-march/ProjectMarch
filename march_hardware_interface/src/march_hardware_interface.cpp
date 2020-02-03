@@ -86,13 +86,6 @@ void MarchHardwareInterface::init()
 
   initiateIMC();
 
-  // Print all joint positions on startup in case initialization fails.
-  this->read();
-  for (int i = 0; i < num_joints_; ++i)
-  {
-    ROS_DEBUG("[%s] First read position: %f", joint_names_[i].c_str(), joint_position_[i]);
-  }
-
   // Create march_pdb_state interface
   MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
                                           &master_shutdown_allowed_command, &enable_high_voltage_command,
@@ -165,20 +158,6 @@ void MarchHardwareInterface::init()
       effortJointSoftLimitsInterface.registerHandle(jointEffortLimitsHandle);
     }
 
-    // Set the first target as the current position
-    this->read();
-    joint_velocity_[i] = 0;
-    joint_effort_[i] = 0;
-
-    if (joint.getActuationMode() == march::ActuationMode::position)
-    {
-      joint_position_command_[i] = joint_position_[i];
-    }
-    else if (joint.getActuationMode() == march::ActuationMode::torque)
-    {
-      joint_effort_command_[i] = 0;
-    }
-
     // Create velocity joint interface
     JointHandle jointVelocityHandle(jointStateHandle, &joint_velocity_command_[i]);
     velocity_joint_interface_.registerHandle(jointVelocityHandle);
@@ -205,6 +184,20 @@ void MarchHardwareInterface::init()
         }
       }
       joint.prepareActuation();
+
+      // Set the first target as the current position
+      joint_position_[i] = joint.getAngleRad();
+      joint_velocity_[i] = 0;
+      joint_effort_[i] = 0;
+
+      if (joint.getActuationMode() == march::ActuationMode::position)
+      {
+        joint_position_command_[i] = joint_position_[i];
+      }
+      else if (joint.getActuationMode() == march::ActuationMode::torque)
+      {
+        joint_effort_command_[i] = 0;
+      }
     }
   }
   ROS_INFO("Successfully actuated all joints");
@@ -323,30 +316,12 @@ void MarchHardwareInterface::initiateIMC()
   for (const std::string& joint_name : joint_names_)
   {
     Joint joint = marchRobot.getJoint(joint_name);
-
-    if (LOWER_BOUNDARY_ANGLE_IU <= joint.getAngleIU() && joint.getAngleIU() <= UPPER_BOUNDARY_ANGLE_IU)
-    {
-      ROS_WARN("Before reset joint: [%s] has angle-value of: %i. Which is within boundary of lower: %i and upper: %i",
-               joint_name.c_str(), joint.getAngleIU(), LOWER_BOUNDARY_ANGLE_IU, UPPER_BOUNDARY_ANGLE_IU);
-    }
-
     joint.resetIMotionCube();
   }
 
   ROS_INFO("Restarting EtherCAT");
   marchRobot.stopEtherCAT();
   marchRobot.startEtherCAT();
-
-  for (const std::string& joint_name : joint_names_)
-  {
-    Joint joint = marchRobot.getJoint(joint_name);
-
-    if (LOWER_BOUNDARY_ANGLE_IU <= joint.getAngleIU() && joint.getAngleIU() <= UPPER_BOUNDARY_ANGLE_IU)
-    {
-      ROS_WARN("After reset joint: [%s] has angle-value of: %i. Which is within boundary of lower: %i and upper: %i",
-               joint_name.c_str(), joint.getAngleIU(), LOWER_BOUNDARY_ANGLE_IU, UPPER_BOUNDARY_ANGLE_IU);
-    }
-  }
 }
 
 void MarchHardwareInterface::updatePowerDistributionBoard()

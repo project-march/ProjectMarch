@@ -22,6 +22,12 @@ include_directories(
     ${catkin_INCLUDE_DIRS}
 )
 
+if(CATKIN_ENABLE_TESTING AND ENABLE_COVERAGE_TESTING)
+    find_package(code_coverage REQUIRED)
+    # Add compiler flags for coverage instrumentation before defining any targets
+    append_coverage_compiler_flags()
+endif()
+
 set(xsensdeviceapi_LOCATION ${PROJECT_SOURCE_DIR}/lib/libxsensdeviceapi.so)
 set(xstypes_LOCATION ${PROJECT_SOURCE_DIR}/lib/libxstypes.so)
 
@@ -83,4 +89,12 @@ if(CATKIN_ENABLE_TESTING)
         ${xstypes_LIBRARY}
         ${catkin_LIBRARIES}
     )
+
+    if(ENABLE_COVERAGE_TESTING)
+        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*" "*/${PROJECT_NAME}/lib/*")
+        add_code_coverage(
+            NAME coverage_report
+            DEPENDENCIES wireless_master_test
+        )
+    endif()
 endif()

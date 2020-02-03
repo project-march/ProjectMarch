@@ -2,12 +2,7 @@
 
 #include "march_hardware_interface/march_pdb_state_interface.h"
 #include "gtest/gtest.h"
-#include <gmock/gmock.h>
 #include <sstream>
-
-using ::testing::AtLeast;
-using ::testing::AtMost;
-using ::testing::Return;
 
 class TestPdbStateInterface : public ::testing::Test
 {
