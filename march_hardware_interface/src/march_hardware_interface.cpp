@@ -224,7 +224,7 @@ void MarchHardwareInterface::validate()
   }
 }
 
-void MarchHardwareInterface::read(const ros::Time& time, const ros::Duration& elapsed_time)
+void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Duration& elapsed_time)
 {
   for (size_t i = 0; i < num_joints_; i++)
   {
@@ -264,7 +264,7 @@ void MarchHardwareInterface::read(const ros::Time& time, const ros::Duration& el
   }
 }
 
-void MarchHardwareInterface::write(const ros::Time& time, const ros::Duration& elapsed_time)
+void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Duration& elapsed_time)
 {
   joint_effort_command_copy.clear();
   joint_effort_command_copy.resize(joint_effort_command_.size());
