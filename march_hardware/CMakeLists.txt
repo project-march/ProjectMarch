@@ -12,7 +12,11 @@ catkin_package(
     INCLUDE_DIRS include
     CATKIN_DEPENDS
     LIBRARIES ${PROJECT_NAME}
+    CFG_EXTRAS
+    ${PROJECT_NAME}-extras.cmake
 )
+
+include(cmake/${PROJECT_NAME}-extras.cmake)
 
 include_directories(
     include
@@ -20,6 +24,11 @@ include_directories(
     ${catkin_INCLUDE_DIRS}
     ${soem_INCLUDE_DIRS}/soem
 )
+
+# needed to circumvent LD_LIBRARY_PATH being emptied through ethercat_grant
+# in addition to not propagating march_hardware_interface RUNPATH to dependencies, in contrast to RPATH
+set(GCC_NEWDTAGS_LINK_FLAGS "-Wl,--disable-new-dtags")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_NEWDTAGS_LINK_FLAGS}")
 
 if(CATKIN_ENABLE_TESTING AND ENABLE_COVERAGE_TESTING)
     find_package(code_coverage REQUIRED)
@@ -50,8 +59,13 @@ add_library(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
-add_executable(slave_count_check check/SlaveCount.cpp)
+add_executable(slave_count_check check/slave_count.cpp)
 target_link_libraries(slave_count_check ${PROJECT_NAME})
+ros_enable_rpath(slave_count_check)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+)
 
 install(DIRECTORY include/${PROJECT_NAME}/
     DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
@@ -64,6 +78,10 @@ install(TARGETS ${PROJECT_NAME}
 
 install(TARGETS slave_count_check
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY launch
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
 ## Add gtest based cpp test target and link libraries

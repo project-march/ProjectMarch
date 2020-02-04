@@ -32,11 +32,12 @@ catkin_package(
     roscpp
     std_msgs
     urdf
-    CFG_EXTRAS
-    ${PROJECT_NAME}-extras.cmake
 )
 
-include(cmake/${PROJECT_NAME}-extras.cmake)
+# needed to circumvent LD_LIBRARY_PATH being emptied through ethercat_grant
+# in addition to not propagating march_hardware_interface RUNPATH to dependencies, in contrast to RPATH
+set(GCC_NEWDTAGS_LINK_FLAGS "-Wl,--disable-new-dtags")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_NEWDTAGS_LINK_FLAGS}")
 
 if(CATKIN_ENABLE_TESTING AND ENABLE_COVERAGE_TESTING)
     find_package(code_coverage REQUIRED)
@@ -46,11 +47,6 @@ endif()
 
 include_directories(include SYSTEM ${catkin_INCLUDE_DIRS})
 
-# needed to circumvent LD_LIBRARY_PATH being emptied through ethercat_grant
-# in addition to not propagating march_hardware_interface RUNPATH to dependencies, in contrast to RPATH
-set(GCC_NEWDTAGS_LINK_FLAGS "-Wl,--disable-new-dtags")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_NEWDTAGS_LINK_FLAGS}")
-
 add_executable(${PROJECT_NAME}_node
     src/march_hardware_interface.cpp
     src/march_hardware_interface_node.cpp
@@ -59,6 +55,7 @@ add_executable(${PROJECT_NAME}_node
 add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES})
+# From march_hardware/cmake
 ros_enable_rpath(${PROJECT_NAME}_node)
 
 install(DIRECTORY include/${PROJECT_NAME}/
