@@ -3,7 +3,7 @@
 
 #include <march_hardware/TemperatureGES.h>
 
-namespace march4cpp
+namespace march
 {
 TemperatureGES::TemperatureGES(int slaveIndex, int temperatureByteOffset) : Slave(slaveIndex)
 {
@@ -19,4 +19,4 @@ float TemperatureGES::getTemperature()
   return temperature.f;
 }
 
-}  // namespace march4cpp
+}  // namespace march

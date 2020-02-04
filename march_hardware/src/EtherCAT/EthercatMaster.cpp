@@ -19,7 +19,7 @@
 #include <soem/ethercatconfig.h>
 #include <soem/ethercatprint.h>
 
-namespace march4cpp
+namespace march
 {
 EthercatMaster::EthercatMaster(std::vector<Joint>* joints_ptr, std::string ifname, int max_slave_index, int cycle_time)
   : joints_ptr_(joints_ptr), ifname_(ifname), max_slave_index_(max_slave_index), cycle_time_ms_(cycle_time)
@@ -122,7 +122,7 @@ void EthercatMaster::ethercatSlaveInitiation()
     ec_send_processdata();
     ec_receive_processdata(EC_TIMEOUTRET);
     ec_statecheck(0, EC_STATE_OPERATIONAL, 50000);
-  } while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));  // NOLINT(whitespace/braces)
+  } while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));
 
   if (ec_slave[0].state == EC_STATE_OPERATIONAL)
   {
@@ -241,4 +241,4 @@ void EthercatMaster::stop()
   }
 }
 
-}  // namespace march4cpp
+}  // namespace march

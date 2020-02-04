@@ -15,8 +15,6 @@
   <depend>roscpp</depend>
   <depend>soem</depend>
 
-  <build_depend>roslint</build_depend>
-
   <test_depend>rostest</test_depend>
   <test_depend>code_coverage</test_depend>
 </package>

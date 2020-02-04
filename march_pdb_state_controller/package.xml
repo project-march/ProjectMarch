@@ -18,8 +18,6 @@
   <depend>controller_interface</depend> 
   <depend>sensor_msgs</depend> 
 
-  <build_depend>roslint</build_depend>
-
   <export>
     <controller_interface plugin="${prefix}/march_pdb_state_plugin.xml"/>
   </export>

@@ -1,7 +1,7 @@
 // Copyright 2019 Project March.
 #include "march_hardware/EtherCAT/EthercatIO.h"
 
-namespace march4cpp
+namespace march
 {
 // TODO(Isha, Martijn, Tim) refactor this with more generic types
 union bit64 get_input_bit64(uint16 slave_no, uint8 module_index)
@@ -152,4 +152,4 @@ void set_output_bit(uint16 slave_no, uint8 module_index, uint8 value)
     *ec_slave[slave_no].outputs |= (1 << (module_index - 1 + startbit));
 }
 
-}  // namespace march4cpp
+}  // namespace march

@@ -22,17 +22,17 @@ using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::PositionJointSoftLimitsInterface;
 using joint_limits_interface::SoftJointLimits;
 
-namespace march_hardware_interface
-{
 static const double POSITION_STEP_FACTOR = 10;
 static const double VELOCITY_STEP_FACTOR = 10;
+static const int LOWER_BOUNDARY_ANGLE_IU = -2;
+static const int UPPER_BOUNDARY_ANGLE_IU = 2;
 
 /**
  * @brief HardwareInterface to allow ros_control to actuate our hardware.
  * @details Register an interface for each joint such that they can be actuated
  *     by a controller via ros_control.
  */
-class MarchHardwareInterface : public march_hardware_interface::MarchHardware
+class MarchHardwareInterface : public MarchHardware
 {
 public:
   MarchHardwareInterface(ros::NodeHandle& nh, AllowedRobot robotName);
@@ -61,7 +61,7 @@ public:
   void write(const ros::Duration& elapsed_time);
 
 protected:
-  ::march4cpp::MarchRobot marchRobot;
+  ::march::MarchRobot marchRobot;
   ros::NodeHandle nh_;
   ros::Duration control_period_;
   ros::Duration elapsed_time_;
@@ -84,10 +84,9 @@ private:
   void updatePowerDistributionBoard();
   void updateAfterLimitJointCommand();
   void updateIMotionCubeState();
-  void resetIMotionCubesUntilTheyWork();
+  void initiateIMC();
   void outsideLimitsCheck(int joint_index);
   void iMotionCubeStateCheck(int joint_index);
 };
-}  // namespace march_hardware_interface
 
 #endif  // MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_H

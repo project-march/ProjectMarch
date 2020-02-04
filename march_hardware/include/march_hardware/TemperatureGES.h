@@ -6,7 +6,7 @@
 #include <march_hardware/Slave.h>
 #include "TemperatureSensor.h"
 
-namespace march4cpp
+namespace march
 {
 class TemperatureGES : public Slave, TemperatureSensor
 {
@@ -36,5 +36,5 @@ public:
               << "temperatureByteOffset: " << temperatureGes.temperatureByteOffset;
   }
 };
-}  // namespace march4cpp
+}  // namespace march
 #endif  // MARCH_HARDWARE_TEMPERATUREGES_H

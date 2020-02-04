@@ -15,7 +15,7 @@
 #include <soem/ethercatconfig.h>
 #include <soem/ethercatprint.h>
 
-namespace march4cpp
+namespace march
 {
 // struct used to easily get specific bytes from a 64 bit variable
 struct packed_bit64
@@ -105,5 +105,5 @@ union bit8 get_output_bit8(uint16 slave_no, uint8 module_index);
 
 void set_output_bit(uint16 slave_no, uint8 module_index, uint8 value);
 
-}  // namespace march4cpp
+}  // namespace march
 #endif  // MARCH_HARDWARE_ETHERCAT_ETHERCATIO_H

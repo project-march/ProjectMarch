@@ -5,7 +5,6 @@ add_compile_options(-std=c++11 -Wall -Wextra)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
-    roslint
     sensor_msgs
 )
 
@@ -23,13 +22,11 @@ include_directories(
     ${catkin_INCLUDE_DIRS}
 )
 
-file(GLOB_RECURSE lintfiles
-    "src/*.cpp"
-    "src/*.h"
-    "test/*.cpp"
-)
-
-roslint_cpp(${lintfiles})
+if(CATKIN_ENABLE_TESTING AND ENABLE_COVERAGE_TESTING)
+    find_package(code_coverage REQUIRED)
+    # Add compiler flags for coverage instrumentation before defining any targets
+    append_coverage_compiler_flags()
+endif()
 
 set(xsensdeviceapi_LOCATION ${PROJECT_SOURCE_DIR}/lib/libxsensdeviceapi.so)
 set(xstypes_LOCATION ${PROJECT_SOURCE_DIR}/lib/libxstypes.so)
@@ -92,4 +89,12 @@ if(CATKIN_ENABLE_TESTING)
         ${xstypes_LIBRARY}
         ${catkin_LIBRARIES}
     )
+
+    if(ENABLE_COVERAGE_TESTING)
+        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*" "*/${PROJECT_NAME}/lib/*")
+        add_code_coverage(
+            NAME coverage_report
+            DEPENDENCIES wireless_master_test
+        )
+    endif()
 endif()

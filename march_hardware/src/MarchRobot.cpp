@@ -14,7 +14,7 @@
 
 #include <march_hardware/MarchRobot.h>
 
-namespace march4cpp
+namespace march
 {
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int ecatCycleTime)
 {
@@ -167,4 +167,4 @@ MarchRobot::~MarchRobot()
   stopEtherCAT();
 }
 
-}  // namespace march4cpp
+}  // namespace march

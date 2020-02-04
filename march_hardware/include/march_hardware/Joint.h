@@ -10,7 +10,7 @@
 #include <march_hardware/TemperatureGES.h>
 #include <march_hardware/IMotionCubeState.h>
 
-namespace march4cpp
+namespace march
 {
 class Joint
 {
@@ -86,5 +86,5 @@ public:
   void setNetNumber(int netNumber);
 };
 
-}  // namespace march4cpp
+}  // namespace march
 #endif  // MARCH_HARDWARE_JOINT_H

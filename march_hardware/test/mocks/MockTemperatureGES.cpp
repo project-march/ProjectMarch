@@ -1,7 +1,7 @@
 #include "gmock/gmock.h"  // Brings in Google Mock.
 #include "march_hardware/TemperatureGES.h"
 
-class MockTemperatureGES : public march4cpp::TemperatureGES
+class MockTemperatureGES : public march::TemperatureGES
 {
 public:
   MOCK_METHOD0(getTemperature, float());

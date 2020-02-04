@@ -2,7 +2,7 @@
 
 #include <march_hardware/IMotionCubeTargetState.h>
 
-namespace march4cpp
+namespace march
 {
 const IMotionCubeTargetState IMotionCubeTargetState::SWITCH_ON_DISABLED =
     IMotionCubeTargetState("Switch on Disabled", 128, 0b0000000001001111, 64);
@@ -12,4 +12,4 @@ const IMotionCubeTargetState IMotionCubeTargetState::SWITCHED_ON =
     IMotionCubeTargetState("Switched On", 7, 0b0000000001101111, 35);
 const IMotionCubeTargetState IMotionCubeTargetState::OPERATION_ENABLED =
     IMotionCubeTargetState("Operation Enabled", 15, 0b0000000001101111, 39);
-}  // namespace march4cpp
+}  // namespace march

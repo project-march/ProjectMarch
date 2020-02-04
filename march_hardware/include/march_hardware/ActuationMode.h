@@ -5,7 +5,7 @@
 #include <string>
 #include <ros/console.h>
 
-namespace march4cpp
+namespace march
 {
 class ActuationMode
 {
@@ -87,6 +87,6 @@ public:
 private:
   Value value = unknown;
 };
-}  // namespace march4cpp
+}  // namespace march
 
 #endif  // MARCH_HARDWARE_ACTUATIONMODE_H

@@ -1,7 +1,7 @@
 // Copyright 2019 Project March.
 #include <march_hardware/HighVoltage.h>
 
-namespace march4cpp
+namespace march
 {
 HighVoltage::HighVoltage(int slaveIndex, NetMonitorOffsets netMonitoringOffsets, NetDriverOffsets netDriverOffsets)
   : slaveIndex(slaveIndex), netMonitoringOffsets(netMonitoringOffsets), netDriverOffsets(netDriverOffsets)
@@ -118,4 +118,4 @@ uint8 HighVoltage::getNetsOperational()
   return operational.ui;
 }
 
-}  // namespace march4cpp
+}  // namespace march

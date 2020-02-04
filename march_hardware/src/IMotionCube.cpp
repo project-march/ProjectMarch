@@ -11,7 +11,7 @@
 #include <march_hardware/IMotionCube.h>
 #include <unistd.h>
 
-namespace march4cpp
+namespace march
 {
 IMotionCube::IMotionCube(int slaveIndex, Encoder encoder) : Slave(slaveIndex), actuationMode("unknown")
 {
@@ -76,8 +76,6 @@ void IMotionCube::validateMosiPDOs()
 void IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
 {
   ROS_DEBUG("IMotionCube::writeInitialSettings");
-  bool success = true;
-  // sdo_bit32(slaveIndex, address, subindex, value);
 
   if (this->actuationMode == ActuationMode::unknown)
   {
@@ -85,32 +83,31 @@ void IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
   }
 
   // mode of operation
-  success &= sdo_bit8(slaveIndex, 0x6060, 0, this->actuationMode.toModeNumber());
-
-  // position dimension index
-  success &= sdo_bit8(slaveIndex, 0x608A, 0, 1);
-
-  // position factor -- scaling factor numerator
-  success &= sdo_bit32(slaveIndex, 0x6093, 1, 1);
-  // position factor -- scaling factor denominator
-  success &= sdo_bit32(slaveIndex, 0x6093, 2, 1);
+  int mode_of_op = sdo_bit8(slaveIndex, 0x6060, 0, this->actuationMode.toModeNumber());
 
   // position limit -- min position
-  success &= sdo_bit32(slaveIndex, 0x607D, 1, this->encoder.getLowerSoftLimitIU());
+  int min_pos_lim = sdo_bit32(slaveIndex, 0x607D, 1, this->encoder.getLowerSoftLimitIU());
+
   // position limit -- max position
-  success &= sdo_bit32(slaveIndex, 0x607D, 2, this->encoder.getUpperSoftLimitIU());
+  int max_pos_lim = sdo_bit32(slaveIndex, 0x607D, 2, this->encoder.getUpperSoftLimitIU());
 
   // Quick stop option
-  success &= sdo_bit16(slaveIndex, 0x605A, 0, 6);
+  int stop_opt = sdo_bit16(slaveIndex, 0x605A, 0, 6);
 
   // Quick stop deceleration
-  success &= sdo_bit32(slaveIndex, 0x6085, 0, 0x7FFFFFFF);
+  int stop_decl = sdo_bit32(slaveIndex, 0x6085, 0, 0x7FFFFFFF);
+
+  // Abort connection option code
+  int abort_con = sdo_bit16(slaveIndex, 0x6007, 0, 1);
 
   // set the ethercat rate of encoder in form x*10^y
-  success &= sdo_bit8(slaveIndex, 0x60C2, 1, ecatCycleTime);
-  success &= sdo_bit8(slaveIndex, 0x60C2, 2, -3);
+  int rate_ec_x = sdo_bit8(slaveIndex, 0x60C2, 1, ecatCycleTime);
+  int rate_ec_y = sdo_bit8(slaveIndex, 0x60C2, 2, -3);
 
-  ROS_ASSERT_MSG(success, "Writing initial settings to IMC %d failed", this->slaveIndex);
+  if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && stop_decl && abort_con && rate_ec_x && rate_ec_y))
+  {
+    ROS_ERROR("Failed writing initial settings to IMC of slave %i", slaveIndex);
+  }
 }
 
 void IMotionCube::actuateRad(float targetRad)
@@ -179,6 +176,11 @@ float IMotionCube::getAngleRad()
 {
   ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO "
                                                                                   "mapping, so can't get angle");
+  if (!IMotionCubeTargetState::SWITCHED_ON.isReached(this->getStatusWord()) &&
+      !IMotionCubeTargetState::OPERATION_ENABLED.isReached(this->getStatusWord()))
+  {
+    ROS_WARN_THROTTLE(10, "Invalid use of encoders, you're not in the correct state.");
+  }
   return this->encoder.getAngleRad(this->misoByteOffsets[IMCObjectName::ActualPosition]);
 }
 
@@ -495,7 +497,7 @@ bool IMotionCube::goToOperationEnabled()
   ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO "
                                                                                   "mapping, so can't get angle");
 
-  int angleRead = this->encoder.getAngleIU(this->misoByteOffsets[IMCObjectName::ActualPosition]);
+  int angleRead = this->getAngleIU();
   //  If the encoder is functioning correctly and the joint is not outside hardlimits, move the joint to its current
   //  position. Otherwise shutdown
   if (abs(angleRead) <= 2)
@@ -509,18 +511,15 @@ bool IMotionCube::goToOperationEnabled()
               this->slaveIndex, angleRead, this->encoder.getLowerHardLimitIU(), this->encoder.getUpperHardLimitIU());
     throw std::domain_error("Joint outside hard limits");
   }
-  else
-  {
-    if (this->actuationMode == ActuationMode::position)
-    {
-      this->actuateIU(angleRead);
-    }
-    if (this->actuationMode == ActuationMode::torque)
-    {
-      this->actuateTorque(0);
-    }
-  }
 
+  if (this->actuationMode == ActuationMode::position)
+  {
+    this->actuateIU(angleRead);
+  }
+  if (this->actuationMode == ActuationMode::torque)
+  {
+    this->actuateTorque(0);
+  }
   this->goToTargetState(IMotionCubeTargetState::OPERATION_ENABLED);
 }
 
@@ -549,4 +548,4 @@ bool IMotionCube::get_bit(uint16 value, int index)
 {
   return static_cast<bool>(value & (1 << index));
 }
-}  // namespace march4cpp
+}  // namespace march

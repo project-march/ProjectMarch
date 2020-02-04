@@ -8,7 +8,7 @@
 #include <march_hardware/NetDriverOffsets.h>
 #include <march_hardware/NetMonitorOffsets.h>
 
-namespace march4cpp
+namespace march
 {
 class HighVoltage
 {
@@ -46,5 +46,5 @@ public:
   }
 };
 
-}  // namespace march4cpp
+}  // namespace march
 #endif  // MARCH_HARDWARE_HIGHVOLTAGE_H

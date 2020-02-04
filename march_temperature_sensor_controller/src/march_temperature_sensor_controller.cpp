@@ -5,8 +5,8 @@
 
 namespace march_temperature_sensor_controller
 {
-bool MarchTemperatureSensorController::init(march_hardware_interface::MarchTemperatureSensorInterface* hw,
-                                            ros::NodeHandle& root_nh, ros::NodeHandle& controller_nh)
+bool MarchTemperatureSensorController::init(MarchTemperatureSensorInterface* hw, ros::NodeHandle& root_nh,
+                                            ros::NodeHandle& controller_nh)
 {
   // get all temperature_sensors from the hardware interface
   const std::vector<std::string>& temperature_sensor_names = hw->getNames();

@@ -2,13 +2,13 @@
 #ifndef MARCH_HARDWARE_TEMPERATURESENSOR_H
 #define MARCH_HARDWARE_TEMPERATURESENSOR_H
 
-namespace march4cpp
+namespace march
 {
 class TemperatureSensor
 {
 public:
   virtual float getTemperature() = 0;
 };
-}  // namespace march4cpp
+}  // namespace march
 
 #endif  // MARCH_HARDWARE_TEMPERATURESENSOR_H

@@ -1,7 +1,7 @@
 #include "gmock/gmock.h"  // Brings in Google Mock.
 #include "march_hardware/Joint.h"
 
-class MockJoint : public march4cpp::Joint
+class MockJoint : public march::Joint
 {
 public:
   MOCK_METHOD0(getAngle, float());

@@ -54,8 +54,7 @@ void MarchPdbStateController::turnLowVoltageNetOnOrOffCallBack(const std_msgs::I
   }
 }
 
-bool MarchPdbStateController::init(march_hardware_interface::MarchPdbStateInterface* hw, ros::NodeHandle& root_nh,
-                                   ros::NodeHandle& controller_nh)
+bool MarchPdbStateController::init(MarchPdbStateInterface* hw, ros::NodeHandle& root_nh, ros::NodeHandle& controller_nh)
 {
   // Get all temperature_sensors from the hardware interface
   const std::vector<std::string>& pdb_state_names = hw->getNames();
@@ -99,7 +98,7 @@ void MarchPdbStateController::starting(const ros::Time& time)
 }
 
 std::vector<march_shared_resources::HighVoltageNet>
-MarchPdbStateController::createHighVoltageNetsMessage(march4cpp::HighVoltage high_voltage)
+MarchPdbStateController::createHighVoltageNetsMessage(march::HighVoltage high_voltage)
 {
   std::vector<march_shared_resources::HighVoltageNet> highVoltageNetMsgs = {};
   for (int i = 1; i < 9; i++)
@@ -113,7 +112,7 @@ MarchPdbStateController::createHighVoltageNetsMessage(march4cpp::HighVoltage hig
   return highVoltageNetMsgs;
 }
 std::vector<march_shared_resources::LowVoltageNet>
-MarchPdbStateController::createLowVoltageNetsMessage(march4cpp::LowVoltage low_voltage)
+MarchPdbStateController::createLowVoltageNetsMessage(march::LowVoltage low_voltage)
 {
   std::vector<march_shared_resources::LowVoltageNet> lowVoltageNetMsgs = {};
   march_shared_resources::LowVoltageNet power_net_msg;
@@ -139,7 +138,7 @@ void MarchPdbStateController::update(const ros::Time& time, const ros::Duration&
     {
       // we're actually publishing, so increment time
       last_publish_times_ = last_publish_times_ + ros::Duration(1.0 / publish_rate_);
-      march4cpp::PowerDistributionBoard* pBoard = pdb_state_.getPowerDistributionBoard();
+      march::PowerDistributionBoard* pBoard = pdb_state_.getPowerDistributionBoard();
       realtime_pubs_->msg_.header.stamp = ros::Time::now();
       realtime_pubs_->msg_.low_voltage_nets = createLowVoltageNetsMessage(pBoard->getLowVoltage());
       realtime_pubs_->msg_.high_voltage_nets = createHighVoltageNetsMessage(pBoard->getHighVoltage());

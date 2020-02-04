@@ -3,11 +3,11 @@
 #define MARCH_HARDWARE_ETHERCAT_ETHERCATMASTER_H
 #include <vector>
 #include <string>
-#include <thread>  // NOLINT(build/c++11)
+#include <thread>
 
 #include <march_hardware/Joint.h>
 
-namespace march4cpp
+namespace march
 {
 /**
  * Base class of the ethercat master supported with the SOEM library
@@ -50,5 +50,5 @@ private:
   std::thread ethercat_thread_;
 };
 
-}  // namespace march4cpp
+}  // namespace march
 #endif  // MARCH_HARDWARE_ETHERCAT_ETHERCATMASTER_H

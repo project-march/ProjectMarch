@@ -4,7 +4,7 @@
 #define MARCH_HARDWARE_IMOTIONCUBETARGETSTATE_H
 
 #include <string>
-namespace march4cpp
+namespace march
 {
 class IMotionCubeTargetState
 {
@@ -27,7 +27,7 @@ private:
   }
 
 public:
-  bool isReached(int statusWord)
+  bool isReached(int statusWord) const
   {
     return (statusWord & stateMask) == state;
   }
@@ -50,5 +50,5 @@ public:
   }
 };
 
-}  // namespace march4cpp
+}  // namespace march
 #endif  // MARCH_HARDWARE_IMOTIONCUBETARGETSTATE_H

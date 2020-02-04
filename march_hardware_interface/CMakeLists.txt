@@ -15,7 +15,6 @@ find_package(catkin REQUIRED COMPONENTS
     march_shared_resources
     realtime_tools
     roscpp
-    roslint
     std_msgs
     urdf
 )
@@ -38,6 +37,12 @@ catkin_package(
 )
 
 include(cmake/${PROJECT_NAME}-extras.cmake)
+
+if(CATKIN_ENABLE_TESTING AND ENABLE_COVERAGE_TESTING)
+    find_package(code_coverage REQUIRED)
+    # Add compiler flags for coverage instrumentation before defining any targets
+    append_coverage_compiler_flags()
+endif()
 
 include_directories(include SYSTEM ${catkin_INCLUDE_DIRS})
 
@@ -70,35 +75,17 @@ install(DIRECTORY config launch
 
 ## Add gtest based cpp test target and link libraries
 if(CATKIN_ENABLE_TESTING)
-    find_package(code_coverage REQUIRED)
-    find_package(rostest REQUIRED)
-
-    if(ENABLE_COVERAGE_TESTING)
-        include(CodeCoverage)
-        append_coverage_compiler_flags()
-    endif()
-
-    add_rostest_gtest(${PROJECT_NAME}-test
-        test/${PROJECT_NAME}.test
+    catkin_add_gtest(${PROJECT_NAME}_test
         test/TestRunner.cpp
         test/TestPdbStateInterface.cpp
     )
-    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} gtest gmock)
+    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} gtest)
 
     if(ENABLE_COVERAGE_TESTING)
-        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*")
+        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*")
         add_code_coverage(
-            NAME ${PROJECT_NAME}_coverage
-            DEPENDS tests
+            NAME coverage_report
+            DEPENDENCIES ${PROJECT_NAME}_test
         )
     endif()
 endif()
-
-set(ROSLINT_CPP_OPTS "--linelength=120")
-
-file(GLOB_RECURSE lintfiles
-    "include/*.h"
-    "src/*.cpp"
-)
-
-roslint_cpp(${lintfiles})

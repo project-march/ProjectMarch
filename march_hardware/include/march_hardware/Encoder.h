@@ -5,7 +5,7 @@
 
 #include <ostream>
 
-namespace march4cpp
+namespace march
 {
 class Encoder
 {
@@ -75,6 +75,6 @@ public:
               << "safetyMarginRad: " << encoder.safetyMarginRad;
   }
 };
-}  // namespace march4cpp
+}  // namespace march
 
 #endif  // MARCH_HARDWARE_ENCODER_H

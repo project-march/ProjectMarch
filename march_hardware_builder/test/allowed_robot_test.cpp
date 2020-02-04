@@ -13,66 +13,66 @@ using ::testing::Return;
 TEST(AllowedRobotTest, TestMarch4Creation)
 {
   HardwareBuilder hardwareBuilder = HardwareBuilder(AllowedRobot::march4);
-  ASSERT_NO_THROW(march4cpp::MarchRobot march4 = hardwareBuilder.createMarchRobot());
+  ASSERT_NO_THROW(march::MarchRobot march4 = hardwareBuilder.createMarchRobot());
 }
 
 TEST(AllowedRobotTest, TestMarch3Creation)
 {
   HardwareBuilder hardwareBuilder = HardwareBuilder(AllowedRobot::march3);
-  ASSERT_NO_THROW(march4cpp::MarchRobot march3 = hardwareBuilder.createMarchRobot());
+  ASSERT_NO_THROW(march::MarchRobot march3 = hardwareBuilder.createMarchRobot());
 }
 
 TEST(AllowedRobotTest, TestMarch3Values)
 {
-  march4cpp::MarchRobot march3 = HardwareBuilder(AllowedRobot::march3).createMarchRobot();
+  march::MarchRobot march3 = HardwareBuilder(AllowedRobot::march3).createMarchRobot();
 
-  march4cpp::Encoder RHJenc = march4cpp::Encoder(16, 22134, 43436, 24515, 0.05);
-  march4cpp::Encoder LHJenc = march4cpp::Encoder(16, 9746, 31557, 11830, 0.05);
+  march::Encoder RHJenc = march::Encoder(16, 22134, 43436, 24515, 0.05);
+  march::Encoder LHJenc = march::Encoder(16, 9746, 31557, 11830, 0.05);
 
-  march4cpp::Encoder RKJenc = march4cpp::Encoder(16, 18120, 39941, 19000, 0.05);
-  march4cpp::Encoder LKJenc = march4cpp::Encoder(16, 21924, 43734, 22552, 0.05);
+  march::Encoder RKJenc = march::Encoder(16, 18120, 39941, 19000, 0.05);
+  march::Encoder LKJenc = march::Encoder(16, 21924, 43734, 22552, 0.05);
 
-  march4cpp::Encoder RAJenc = march4cpp::Encoder(12, 1086, 1490, 1301, 0.005);
-  march4cpp::Encoder LAJenc = march4cpp::Encoder(12, 631, 1022, 918, 0.005);
+  march::Encoder RAJenc = march::Encoder(12, 1086, 1490, 1301, 0.005);
+  march::Encoder LAJenc = march::Encoder(12, 631, 1022, 918, 0.005);
 
-  march4cpp::IMotionCube LHJimc = march4cpp::IMotionCube(3, LHJenc);
-  march4cpp::IMotionCube LKJimc = march4cpp::IMotionCube(5, LKJenc);
-  march4cpp::IMotionCube LAJimc = march4cpp::IMotionCube(7, LAJenc);
-  march4cpp::IMotionCube RHJimc = march4cpp::IMotionCube(8, RHJenc);
-  march4cpp::IMotionCube RKJimc = march4cpp::IMotionCube(10, RKJenc);
-  march4cpp::IMotionCube RAJimc = march4cpp::IMotionCube(12, RAJenc);
+  march::IMotionCube LHJimc = march::IMotionCube(3, LHJenc);
+  march::IMotionCube LKJimc = march::IMotionCube(5, LKJenc);
+  march::IMotionCube LAJimc = march::IMotionCube(7, LAJenc);
+  march::IMotionCube RHJimc = march::IMotionCube(8, RHJenc);
+  march::IMotionCube RKJimc = march::IMotionCube(10, RKJenc);
+  march::IMotionCube RAJimc = march::IMotionCube(12, RAJenc);
 
-  march4cpp::Joint leftHip;
+  march::Joint leftHip;
   leftHip.setName("left_hip");
   leftHip.setIMotionCube(LHJimc);
-  leftHip.setActuationMode(march4cpp::ActuationMode("position"));
+  leftHip.setActuationMode(march::ActuationMode("position"));
 
-  march4cpp::Joint leftKnee;
+  march::Joint leftKnee;
   leftKnee.setName("left_knee");
   leftKnee.setIMotionCube(LKJimc);
-  leftKnee.setActuationMode(march4cpp::ActuationMode("position"));
+  leftKnee.setActuationMode(march::ActuationMode("position"));
 
-  march4cpp::Joint leftAnkle;
+  march::Joint leftAnkle;
   leftAnkle.setName("left_ankle");
   leftAnkle.setIMotionCube(LAJimc);
-  leftAnkle.setActuationMode(march4cpp::ActuationMode("position"));
+  leftAnkle.setActuationMode(march::ActuationMode("position"));
 
-  march4cpp::Joint rightHip;
+  march::Joint rightHip;
   rightHip.setName("right_hip");
   rightHip.setIMotionCube(RHJimc);
-  rightHip.setActuationMode(march4cpp::ActuationMode("position"));
+  rightHip.setActuationMode(march::ActuationMode("position"));
 
-  march4cpp::Joint rightKnee;
+  march::Joint rightKnee;
   rightKnee.setName("right_knee");
   rightKnee.setIMotionCube(RKJimc);
-  rightKnee.setActuationMode(march4cpp::ActuationMode("position"));
+  rightKnee.setActuationMode(march::ActuationMode("position"));
 
-  march4cpp::Joint rightAnkle;
+  march::Joint rightAnkle;
   rightAnkle.setName("right_ankle");
   rightAnkle.setIMotionCube(RAJimc);
-  rightAnkle.setActuationMode(march4cpp::ActuationMode("position"));
+  rightAnkle.setActuationMode(march::ActuationMode("position"));
 
-  std::vector<march4cpp::Joint> jointList;
+  std::vector<march::Joint> jointList;
 
   jointList.push_back(rightHip);
   jointList.push_back(leftHip);
@@ -86,7 +86,7 @@ TEST(AllowedRobotTest, TestMarch3Values)
     jointList.at(i).setAllowActuation(true);
   }
 
-  march4cpp::MarchRobot actualRobot = march4cpp::MarchRobot(jointList, "enp3s0", 4);
+  march::MarchRobot actualRobot = march::MarchRobot(jointList, "enp3s0", 4);
 
   EXPECT_EQ(actualRobot.getJoint("right_hip"), march3.getJoint("right_hip"));
   EXPECT_EQ(actualRobot.getJoint("left_hip"), march3.getJoint("left_hip"));
