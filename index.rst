@@ -16,7 +16,7 @@ In order to follow the tutorials, we expect you to have at least some knowledge 
 In case you are not comfortable with the above tools, please take some time to check the following references:
 
 - `Git & GitHub Crash Course For Beginners <https://www.youtube.com/watch?v=SWYqp7iY_Tc>`_
-- `Linux command line for beginners <https://tutorials.ubuntu.com/tutorial/command-line-for-beginners>`_
+- `Using The Terminal <https://help.ubuntu.com/community/UsingTheTerminal>`_
 
 
 How to use the tutorials
