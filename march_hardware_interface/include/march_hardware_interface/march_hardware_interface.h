@@ -22,11 +22,6 @@ using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::PositionJointSoftLimitsInterface;
 using joint_limits_interface::SoftJointLimits;
 
-static const double POSITION_STEP_FACTOR = 10;
-static const double VELOCITY_STEP_FACTOR = 10;
-static const int LOWER_BOUNDARY_ANGLE_IU = -2;
-static const int UPPER_BOUNDARY_ANGLE_IU = 2;
-
 /**
  * @brief HardwareInterface to allow ros_control to actuate our hardware.
  * @details Register an interface for each joint such that they can be actuated
@@ -35,19 +30,20 @@ static const int UPPER_BOUNDARY_ANGLE_IU = 2;
 class MarchHardwareInterface : public MarchHardware
 {
 public:
-  MarchHardwareInterface(ros::NodeHandle& nh, AllowedRobot robotName);
+  explicit MarchHardwareInterface(AllowedRobot robotName);
 
   /**
    * @brief Initialize the HardwareInterface by registering position interfaces
    * for each joint.
    */
-  void init();
-  void update(const ros::Duration& elapsed_time);
+  bool init(ros::NodeHandle& nh, ros::NodeHandle& robot_hw_nh) override;
 
   /**
-   * @brief Read actual postion from the hardware.
+   * @brief Read actual position from the hardware.
+   * @param time Current time
+   * @param elapsed_time Duration since last write action
    */
-  void read(const ros::Duration& elapsed_time = ros::Duration(0.01));
+  void read(const ros::Time& time, const ros::Duration& elapsed_time) override;
 
   /**
    * @brief Perform all safety checks that might crash the exoskeleton.
@@ -56,26 +52,21 @@ public:
 
   /**
    * @brief Write position commands to the hardware.
+   * @param time Current time
    * @param elapsed_time Duration since last write action
    */
-  void write(const ros::Duration& elapsed_time);
+  void write(const ros::Time& time, const ros::Duration& elapsed_time) override;
 
 protected:
   ::march::MarchRobot marchRobot;
-  ros::NodeHandle nh_;
-  ros::Duration control_period_;
-  ros::Duration elapsed_time_;
-  PositionJointInterface positionJointInterface;
   PositionJointSoftLimitsInterface positionJointSoftLimitsInterface;
   EffortJointSoftLimitsInterface effortJointSoftLimitsInterface;
   bool hasPowerDistributionBoard = false;
-  boost::shared_ptr<controller_manager::ControllerManager> controller_manager_;
   typedef boost::shared_ptr<realtime_tools::RealtimePublisher<march_shared_resources::ImcErrorState> > RtPublisherPtr;
   typedef boost::shared_ptr<realtime_tools::RealtimePublisher<march_shared_resources::AfterLimitJointCommand> >
       RtPublisherAfterLimitJointCommandPtr;
   RtPublisherAfterLimitJointCommandPtr after_limit_joint_command_pub_;
   RtPublisherPtr imc_state_pub_;
-  double p_error_, v_error_, e_error_;
   std::vector<SoftJointLimits> soft_limits_;
 
 private:

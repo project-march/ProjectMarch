@@ -26,20 +26,20 @@ using joint_limits_interface::PositionJointSoftLimitsInterface;
 using joint_limits_interface::SoftJointLimits;
 using march::Joint;
 
-MarchHardwareInterface::MarchHardwareInterface(ros::NodeHandle& nh, AllowedRobot robotName)
-  : nh_(nh), marchRobot(HardwareBuilder(robotName).createMarchRobot())
+MarchHardwareInterface::MarchHardwareInterface(AllowedRobot robotName)
+  : marchRobot(HardwareBuilder(robotName).createMarchRobot())
 {
 }
 
-void MarchHardwareInterface::init()
+bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& robot_hw_nh)
 {
   // Initialize realtime publisher for the IMotionCube states
   imc_state_pub_ = RtPublisherPtr(
-      new realtime_tools::RealtimePublisher<march_shared_resources::ImcErrorState>(this->nh_, "/march/imc_states/", 4));
+      new realtime_tools::RealtimePublisher<march_shared_resources::ImcErrorState>(nh, "/march/imc_states/", 4));
 
   after_limit_joint_command_pub_ = RtPublisherAfterLimitJointCommandPtr(
       new realtime_tools::RealtimePublisher<march_shared_resources::AfterLimitJointCommand>(
-          this->nh_, "/march/controller/after_limit_joint_command/", 4));
+          nh, "/march/controller/after_limit_joint_command/", 4));
 
   // Start ethercat cycle in the hardware
   this->marchRobot.startEtherCAT();
@@ -60,7 +60,7 @@ void MarchHardwareInterface::init()
     }
   }
 
-  nh_.setParam("/march/joint_names", joint_names_);
+  nh.setParam("/march/joint_names", joint_names_);
 
   num_joints_ = joint_names_.size();
 
@@ -201,15 +201,7 @@ void MarchHardwareInterface::init()
     }
   }
   ROS_INFO("Successfully actuated all joints");
-  controller_manager_.reset(new controller_manager::ControllerManager(this, nh_));
-}
-
-void MarchHardwareInterface::update(const ros::Duration& elapsed_time)
-{
-  read(elapsed_time);
-  validate();
-  controller_manager_->update(ros::Time::now(), elapsed_time);
-  write(elapsed_time);
+  return true;
 }
 
 void MarchHardwareInterface::validate()
@@ -221,7 +213,7 @@ void MarchHardwareInterface::validate()
   }
 }
 
-void MarchHardwareInterface::read(const ros::Duration& elapsed_time)
+void MarchHardwareInterface::read(const ros::Time& time, const ros::Duration& elapsed_time)
 {
   for (int i = 0; i < num_joints_; i++)
   {
@@ -261,7 +253,7 @@ void MarchHardwareInterface::read(const ros::Duration& elapsed_time)
   }
 }
 
-void MarchHardwareInterface::write(const ros::Duration& elapsed_time)
+void MarchHardwareInterface::write(const ros::Time& time, const ros::Duration& elapsed_time)
 {
   joint_effort_command_copy.clear();
   joint_effort_command_copy.resize(joint_effort_command_.size());

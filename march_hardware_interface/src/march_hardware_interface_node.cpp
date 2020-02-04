@@ -18,11 +18,11 @@ int main(int argc, char** argv)
 
   spinner.start();
 
-  MarchHardwareInterface march(nh, selected_robot);
+  MarchHardwareInterface march(selected_robot);
 
   try
   {
-    march.init();
+    march.init(nh, nh);
   }
   catch (const std::exception& e)
   {
@@ -33,11 +33,17 @@ int main(int argc, char** argv)
   const double loop_hz = ros::param::param("~loop_hz", 100.0);
   ros::Rate rate(loop_hz);
 
+  controller_manager::ControllerManager controller_manager(&march, nh);
+
   while (ros::ok())
   {
+    ros::Time now = ros::Time::now();
     try
     {
-      march.update(rate.expectedCycleTime());
+      march.read(now, rate.expectedCycleTime());
+      march.validate();
+      controller_manager.update(now, rate.expectedCycleTime());
+      march.write(now, rate.expectedCycleTime());
       rate.sleep();
     }
     catch (const std::exception& e)
