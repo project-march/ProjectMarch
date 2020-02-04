@@ -82,7 +82,7 @@ Add it to the CheckRunner
 Creating the executable (optional)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If your check relies on a calculation from another package, you should create an executable in th package where the check is running.
-An example can be seen with the executable ``slave_count_check`` created in :hardware-interface:`SlaveCount.cpp <march_hardware/check/SlaveCount.cpp>`
+An example can be seen with the executable ``slave_count_check`` created in :hardware-interface:`slave_count.cpp <march_hardware/check/slave_count.cpp>`
 and :hardware-interface:`CMakeLists.txt <march_hardware/CMakeLists.txt>`.
 
 Notice how the result is uploaded to ``/check/slave_count``.
