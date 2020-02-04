@@ -120,6 +120,18 @@ class InputDevicePlugin(Plugin):
             self.create_button('gait_rough_terrain_middle_steps',
                                callback=lambda: self.controller.publish_gait('gait_rough_terrain_middle_steps'))
 
+        gait_rough_terrain_first_middle_step = \
+            self.create_button('gait_rough_terrain_first_middle_step',
+                               callback=lambda: self.controller.publish_gait('gait_rough_terrain_first_middle_step'))
+
+        gait_rough_terrain_second_middle_step = \
+            self.create_button('gait_rough_terrain_second_middle_step',
+                               callback=lambda: self.controller.publish_gait('gait_rough_terrain_second_middle_step'))
+
+        gait_rough_terrain_third_middle_step = \
+            self.create_button('gait_rough_terrain_third_middle_step',
+                               callback=lambda: self.controller.publish_gait('gait_rough_terrain_third_middle_step'))
+
         gait_ramp_door_slope_up = \
             self.create_button('gait_ramp_door_slope_up',
                                callback=lambda: self.controller.publish_gait('gait_ramp_door_slope_up'))
@@ -181,8 +193,10 @@ class InputDevicePlugin(Plugin):
 
             [gait_side_step_left, gait_side_step_right, gait_side_step_left_small, gait_side_step_right_small],
 
-            [gait_rough_terrain_high_step, gait_rough_terrain_middle_steps, gait_ramp_door_slope_up,
-             gait_ramp_door_slope_down, gait_ramp_door_last_step],
+            [gait_rough_terrain_high_step, gait_rough_terrain_middle_steps, gait_rough_terrain_first_middle_step,
+             gait_rough_terrain_second_middle_step, gait_rough_terrain_third_middle_step],
+
+            [gait_ramp_door_slope_up, gait_ramp_door_slope_down, gait_ramp_door_last_step],
 
             [gait_tilted_path_straight_start_right, gait_tilted_path_straight_start_left, gait_tilted_path_first_start,
              gait_tilted_path_second_start, gait_tilted_path_first_end, gait_tilted_path_second_end],
