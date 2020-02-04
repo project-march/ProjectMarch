@@ -17,10 +17,8 @@ using hardware_interface::JointHandle;
 using hardware_interface::JointStateHandle;
 using hardware_interface::PositionJointInterface;
 using joint_limits_interface::EffortJointSoftLimitsHandle;
-using joint_limits_interface::EffortJointSoftLimitsInterface;
 using joint_limits_interface::JointLimits;
 using joint_limits_interface::PositionJointSoftLimitsHandle;
-using joint_limits_interface::PositionJointSoftLimitsInterface;
 using joint_limits_interface::SoftJointLimits;
 using march::Joint;
 

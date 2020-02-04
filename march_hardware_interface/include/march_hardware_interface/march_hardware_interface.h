@@ -24,15 +24,6 @@
 #include <march_shared_resources/AfterLimitJointCommand.h>
 #include <march_shared_resources/ImcErrorState.h>
 
-using hardware_interface::JointStateHandle;
-using hardware_interface::PositionJointInterface;
-using joint_limits_interface::EffortJointSoftLimitsHandle;
-using joint_limits_interface::EffortJointSoftLimitsInterface;
-using joint_limits_interface::JointLimits;
-using joint_limits_interface::PositionJointSoftLimitsHandle;
-using joint_limits_interface::PositionJointSoftLimitsInterface;
-using joint_limits_interface::SoftJointLimits;
-
 template <typename T>
 using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;
 
@@ -118,7 +109,7 @@ private:
   std::vector<double> joint_temperature_;
   std::vector<double> joint_temperature_variance_;
 
-  std::vector<SoftJointLimits> soft_limits_;
+  std::vector<joint_limits_interface::SoftJointLimits> soft_limits_;
 
   /* Real time safe publishers */
   RtPublisherPtr<march_shared_resources::AfterLimitJointCommand> after_limit_joint_command_pub_;
