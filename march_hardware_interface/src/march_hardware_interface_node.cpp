@@ -24,7 +24,11 @@ int main(int argc, char** argv)
 
   try
   {
-    march.init(nh, nh);
+    bool success = march.init(nh, nh);
+    if (!success)
+    {
+      return 1;
+    }
   }
   catch (const std::exception& e)
   {
@@ -39,7 +43,7 @@ int main(int argc, char** argv)
 
   while (ros::ok())
   {
-    ros::Time now = ros::Time::now();
+    const ros::Time now = ros::Time::now();
     try
     {
       march.read(now, rate.expectedCycleTime());

@@ -44,7 +44,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
   if (!model.initParam("/robot_description"))
   {
     ROS_ERROR("Failed to read the urdf from the parameter server.");
-    throw std::runtime_error("Failed to read the urdf from the parameter server.");
+    return false;
   }
 
   // Get joint names from urdf
@@ -191,7 +191,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
         else
         {
           ROS_FATAL("Joint %s has no high voltage net number", joint.getName().c_str());
-          throw std::runtime_error("Joint has no high voltage net number");
+          return false;
         }
       }
       joint.prepareActuation();
