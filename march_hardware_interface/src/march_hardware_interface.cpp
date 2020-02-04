@@ -1,19 +1,17 @@
 // Copyright 2019 Project March.
+#include "march_hardware_interface/march_hardware_interface.h"
+#include "march_hardware_interface/power_net_on_off_command.h"
+
+#include <sstream>
+#include <string>
 
 #include <joint_limits_interface/joint_limits.h>
 #include <joint_limits_interface/joint_limits_interface.h>
 #include <joint_limits_interface/joint_limits_urdf.h>
-#include <sstream>
-#include <string>
-
-#include <march_hardware/MarchRobot.h>
-#include <march_hardware/Joint.h>
-#include <march_hardware/ActuationMode.h>
-
-#include <march_hardware_interface/power_net_on_off_command.h>
-#include <march_hardware_interface/march_hardware_interface.h>
-
 #include <urdf/model.h>
+
+#include <march_hardware/ActuationMode.h>
+#include <march_hardware/Joint.h>
 
 using hardware_interface::JointHandle;
 using hardware_interface::JointStateHandle;
@@ -34,12 +32,9 @@ MarchHardwareInterface::MarchHardwareInterface(AllowedRobot robotName)
 bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& robot_hw_nh)
 {
   // Initialize realtime publisher for the IMotionCube states
-  imc_state_pub_ = RtPublisherPtr(
-      new realtime_tools::RealtimePublisher<march_shared_resources::ImcErrorState>(nh, "/march/imc_states/", 4));
+  this->imc_state_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_resources::ImcErrorState>>(nh, "/march/imc_states/", 4);
 
-  after_limit_joint_command_pub_ = RtPublisherAfterLimitJointCommandPtr(
-      new realtime_tools::RealtimePublisher<march_shared_resources::AfterLimitJointCommand>(
-          nh, "/march/controller/after_limit_joint_command/", 4));
+  this->after_limit_joint_command_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_resources::AfterLimitJointCommand>>(nh, "/march/controller/after_limit_joint_command/", 4);
 
   // Start ethercat cycle in the hardware
   this->marchRobot.startEtherCAT();
@@ -75,7 +70,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& robot_hw
   joint_effort_command_.resize(num_joints_);
   soft_limits_.resize(num_joints_);
 
-  for (int i = 0; i < num_joints_; ++i)
+  for (size_t i = 0; i < num_joints_; ++i)
   {
     SoftJointLimits soft_limits;
     getSoftJointLimits(model.getJoint(joint_names_[i]), soft_limits);
@@ -103,7 +98,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& robot_hw
   hasPowerDistributionBoard = marchRobot.getPowerDistributionBoard()->getSlaveIndex() != -1;
   if (hasPowerDistributionBoard)
   {
-    for (int i = 0; i < num_joints_; i++)
+    for (size_t i = 0; i < num_joints_; i++)
     {
       int netNumber = marchRobot.getJoint(joint_names_[i]).getNetNumber();
       if (netNumber == -1)
@@ -126,7 +121,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& robot_hw
   }
 
   // Initialize interfaces for each joint
-  for (int i = 0; i < num_joints_; ++i)
+  for (size_t i = 0; i < num_joints_; ++i)
   {
     march::Joint joint = marchRobot.getJoint(joint_names_[i]);
     // Create joint state interface
@@ -206,7 +201,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& robot_hw
 
 void MarchHardwareInterface::validate()
 {
-  for (int i = 0; i < num_joints_; i++)
+  for (size_t i = 0; i < num_joints_; i++)
   {
     this->outsideLimitsCheck(i);
     this->iMotionCubeStateCheck(i);
@@ -215,7 +210,7 @@ void MarchHardwareInterface::validate()
 
 void MarchHardwareInterface::read(const ros::Time& time, const ros::Duration& elapsed_time)
 {
-  for (int i = 0; i < num_joints_; i++)
+  for (size_t i = 0; i < num_joints_; i++)
   {
     float oldPosition = joint_position_[i];
 
@@ -259,7 +254,7 @@ void MarchHardwareInterface::write(const ros::Time& time, const ros::Duration& e
   joint_effort_command_copy.resize(joint_effort_command_.size());
   joint_effort_command_copy = joint_effort_command_;
 
-  for (int i = 0; i < num_joints_; i++)
+  for (size_t i = 0; i < num_joints_; i++)
   {
     march::Joint joint = marchRobot.getJoint(joint_names_[i]);
 
@@ -398,7 +393,7 @@ void MarchHardwareInterface::updateAfterLimitJointCommand()
   after_limit_joint_command_pub_->msg_.position_command.clear();
   after_limit_joint_command_pub_->msg_.effort_command.clear();
 
-  for (int i = 0; i < num_joints_; i++)
+  for (size_t i = 0; i < num_joints_; i++)
   {
     march::Joint joint = marchRobot.getJoint(joint_names_[i]);
 
@@ -428,7 +423,7 @@ void MarchHardwareInterface::updateIMotionCubeState()
   imc_state_pub_->msg_.motor_current.clear();
   imc_state_pub_->msg_.motor_voltage.clear();
 
-  for (int i = 0; i < num_joints_; i++)
+  for (size_t i = 0; i < num_joints_; i++)
   {
     march::IMotionCubeState iMotionCubeState = marchRobot.getJoint(joint_names_[i]).getIMotionCubeState();
     imc_state_pub_->msg_.header.stamp = ros::Time::now();

@@ -1,6 +1,8 @@
 // Copyright 2019 Project March.
+#include "march_hardware_interface/march_hardware_interface.h"
+
+#include <controller_manager/controller_manager.h>
 #include <ros/ros.h>
-#include <march_hardware_interface/march_hardware_interface.h>
 
 int main(int argc, char** argv)
 {
