@@ -64,14 +64,29 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
 
   // Resize vectors
   joint_position_.resize(num_joints_);
+  joint_position_command_.resize(num_joints_);
   joint_velocity_.resize(num_joints_);
+  joint_velocity_command_.resize(num_joints_);
   joint_effort_.resize(num_joints_);
+  joint_effort_command_.resize(num_joints_);
+  joint_effort_command_copy.resize(num_joints_);
   joint_temperature_.resize(num_joints_);
   joint_temperature_variance_.resize(num_joints_);
-  joint_position_command_.resize(num_joints_);
-  joint_velocity_command_.resize(num_joints_);
-  joint_effort_command_.resize(num_joints_);
   soft_limits_.resize(num_joints_);
+
+  after_limit_joint_command_pub_->msg_.name.resize(num_joints_);
+  after_limit_joint_command_pub_->msg_.position_command.resize(num_joints_);
+  after_limit_joint_command_pub_->msg_.effort_command.resize(num_joints_);
+
+  imc_state_pub_->msg_.joint_names.resize(num_joints_);
+  imc_state_pub_->msg_.status_word.resize(num_joints_);
+  imc_state_pub_->msg_.detailed_error.resize(num_joints_);
+  imc_state_pub_->msg_.motion_error.resize(num_joints_);
+  imc_state_pub_->msg_.state.resize(num_joints_);
+  imc_state_pub_->msg_.detailed_error_description.resize(num_joints_);
+  imc_state_pub_->msg_.motion_error_description.resize(num_joints_);
+  imc_state_pub_->msg_.motor_current.resize(num_joints_);
+  imc_state_pub_->msg_.motor_voltage.resize(num_joints_);
 
   for (size_t i = 0; i < num_joints_; ++i)
   {
@@ -392,19 +407,14 @@ void MarchHardwareInterface::updateAfterLimitJointCommand()
     return;
   }
 
-  // Clear msg of AfterLimitJointCommand
-  after_limit_joint_command_pub_->msg_.name.clear();
-  after_limit_joint_command_pub_->msg_.position_command.clear();
-  after_limit_joint_command_pub_->msg_.effort_command.clear();
-
+  after_limit_joint_command_pub_->msg_.header.stamp = ros::Time::now();
   for (size_t i = 0; i < num_joints_; i++)
   {
     march::Joint joint = march_robot_.getJoint(joint_names_[i]);
 
-    after_limit_joint_command_pub_->msg_.header.stamp = ros::Time::now();
-    after_limit_joint_command_pub_->msg_.name.push_back(joint.getName());
-    after_limit_joint_command_pub_->msg_.position_command.push_back(joint_position_command_[i]);
-    after_limit_joint_command_pub_->msg_.effort_command.push_back(joint_effort_command_[i]);
+    after_limit_joint_command_pub_->msg_.name[i] = joint.getName();
+    after_limit_joint_command_pub_->msg_.position_command[i] = joint_position_command_[i];
+    after_limit_joint_command_pub_->msg_.effort_command[i] = joint_effort_command_[i];
   }
 
   after_limit_joint_command_pub_->unlockAndPublish();
@@ -416,30 +426,20 @@ void MarchHardwareInterface::updateIMotionCubeState()
   {
     return;
   }
-  // Clear msg of IMotionCubeStates
-  imc_state_pub_->msg_.joint_names.clear();
-  imc_state_pub_->msg_.status_word.clear();
-  imc_state_pub_->msg_.detailed_error.clear();
-  imc_state_pub_->msg_.motion_error.clear();
-  imc_state_pub_->msg_.state.clear();
-  imc_state_pub_->msg_.detailed_error_description.clear();
-  imc_state_pub_->msg_.motion_error_description.clear();
-  imc_state_pub_->msg_.motor_current.clear();
-  imc_state_pub_->msg_.motor_voltage.clear();
 
+  imc_state_pub_->msg_.header.stamp = ros::Time::now();
   for (size_t i = 0; i < num_joints_; i++)
   {
     march::IMotionCubeState iMotionCubeState = march_robot_.getJoint(joint_names_[i]).getIMotionCubeState();
-    imc_state_pub_->msg_.header.stamp = ros::Time::now();
-    imc_state_pub_->msg_.joint_names.push_back(joint_names_[i]);
-    imc_state_pub_->msg_.status_word.push_back(iMotionCubeState.statusWord);
-    imc_state_pub_->msg_.detailed_error.push_back(iMotionCubeState.detailedError);
-    imc_state_pub_->msg_.motion_error.push_back(iMotionCubeState.motionError);
-    imc_state_pub_->msg_.state.push_back(iMotionCubeState.state.getString());
-    imc_state_pub_->msg_.detailed_error_description.push_back(iMotionCubeState.detailedErrorDescription);
-    imc_state_pub_->msg_.motion_error_description.push_back(iMotionCubeState.motionErrorDescription);
-    imc_state_pub_->msg_.motor_current.push_back(iMotionCubeState.motorCurrent);
-    imc_state_pub_->msg_.motor_voltage.push_back(iMotionCubeState.motorVoltage);
+    imc_state_pub_->msg_.joint_names[i] = joint_names_[i];
+    imc_state_pub_->msg_.status_word[i] = iMotionCubeState.statusWord;
+    imc_state_pub_->msg_.detailed_error[i] = iMotionCubeState.detailedError;
+    imc_state_pub_->msg_.motion_error[i] = iMotionCubeState.motionError;
+    imc_state_pub_->msg_.state[i] = iMotionCubeState.state.getString();
+    imc_state_pub_->msg_.detailed_error_description[i] = iMotionCubeState.detailedErrorDescription;
+    imc_state_pub_->msg_.motion_error_description[i] = iMotionCubeState.motionErrorDescription;
+    imc_state_pub_->msg_.motor_current[i] = iMotionCubeState.motorCurrent;
+    imc_state_pub_->msg_.motor_voltage[i] = iMotionCubeState.motorVoltage;
   }
 
   imc_state_pub_->unlockAndPublish();
@@ -447,21 +447,19 @@ void MarchHardwareInterface::updateIMotionCubeState()
 
 void MarchHardwareInterface::iMotionCubeStateCheck(size_t joint_index)
 {
+  march::IMotionCubeState iMotionCubeState = march_robot_.getJoint(joint_names_[joint_index]).getIMotionCubeState();
+  if (iMotionCubeState.state == march::IMCState::fault)
   {
-    march::IMotionCubeState iMotionCubeState = march_robot_.getJoint(joint_names_[joint_index]).getIMotionCubeState();
-    if (iMotionCubeState.state == march::IMCState::fault)
-    {
-      std::ostringstream errorStream;
-      errorStream << "IMotionCube of joint " << joint_names_[joint_index].c_str() << " is in fault state "
-                  << iMotionCubeState.state.getString() << std::endl;
-      errorStream << "Detailed Error: " << iMotionCubeState.detailedErrorDescription << "("
-                  << iMotionCubeState.detailedError << ")" << std::endl;
-      errorStream << "Motion Error: " << iMotionCubeState.motionErrorDescription << "(" << iMotionCubeState.motionError
-                  << ")" << std::endl;
+    std::ostringstream errorStream;
+    errorStream << "IMotionCube of joint " << joint_names_[joint_index].c_str() << " is in fault state "
+                << iMotionCubeState.state.getString() << std::endl;
+    errorStream << "Detailed Error: " << iMotionCubeState.detailedErrorDescription << "("
+                << iMotionCubeState.detailedError << ")" << std::endl;
+    errorStream << "Motion Error: " << iMotionCubeState.motionErrorDescription << "(" << iMotionCubeState.motionError
+                << ")" << std::endl;
 
-      ROS_FATAL("%s", errorStream.str().c_str());
-      throw std::runtime_error(errorStream.str());
-    }
+    ROS_FATAL("%s", errorStream.str().c_str());
+    throw std::runtime_error(errorStream.str());
   }
 }
 
