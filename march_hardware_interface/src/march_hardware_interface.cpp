@@ -99,8 +99,8 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
 
   // Create march_pdb_state interface
   MarchPdbStateHandle march_pdb_state_handle("PDBhandle", &power_distribution_board_read_,
-                                          &master_shutdown_allowed_command_, &enable_high_voltage_command_,
-                                          &power_net_on_off_command_);
+                                             &master_shutdown_allowed_command_, &enable_high_voltage_command_,
+                                             &power_net_on_off_command_);
   march_pdb_interface_.registerHandle(march_pdb_state_handle);
 
   registerInterface(&march_temperature_interface_);
@@ -175,7 +175,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
 
     // Create march_state interface
     MarchTemperatureSensorHandle temperature_sensor_handle(joint_names_[i], &joint_temperature_[i],
-                                                              &joint_temperature_variance_[i]);
+                                                           &joint_temperature_variance_[i]);
     march_temperature_interface_.registerHandle(temperature_sensor_handle);
 
     // Enable high voltage on the IMC
@@ -450,11 +450,11 @@ void MarchHardwareInterface::iMotionCubeStateCheck(size_t joint_index)
   {
     std::ostringstream error_stream;
     error_stream << "IMotionCube of joint " << joint_names_[joint_index].c_str() << " is in fault state "
-                << imc_state.state.getString() << std::endl;
-    error_stream << "Detailed Error: " << imc_state.detailedErrorDescription << "("
-                << imc_state.detailedError << ")" << std::endl;
-    error_stream << "Motion Error: " << imc_state.motionErrorDescription << "(" << imc_state.motionError
-                << ")" << std::endl;
+                 << imc_state.state.getString() << std::endl;
+    error_stream << "Detailed Error: " << imc_state.detailedErrorDescription << "(" << imc_state.detailedError << ")"
+                 << std::endl;
+    error_stream << "Motion Error: " << imc_state.motionErrorDescription << "(" << imc_state.motionError << ")"
+                 << std::endl;
 
     ROS_FATAL("%s", error_stream.str().c_str());
     throw std::runtime_error(error_stream.str());
@@ -475,8 +475,8 @@ void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
     {
       std::ostringstream error_stream;
       error_stream << "Joint " << joint_names_[joint_index].c_str() << " is out of its soft limits ("
-                  << soft_limits_[joint_index].min_position << ", " << soft_limits_[joint_index].max_position
-                  << "). Actual position: " << joint_position_[joint_index];
+                   << soft_limits_[joint_index].min_position << ", " << soft_limits_[joint_index].max_position
+                   << "). Actual position: " << joint_position_[joint_index];
       ROS_FATAL("%s", error_stream.str().c_str());
       throw ::std::runtime_error(error_stream.str());
     }
