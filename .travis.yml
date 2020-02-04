@@ -22,7 +22,7 @@ env:
     - ROS_REPO=ros
     - BUILDER=colcon
     - CATKIN_LINT=pedantic
-    - UPSTREAM_WORKSPACE='.rosinstall -march/march_data_collector -march/march_gain_scheduling -march/march_gait_scheduler -march/march_gait_selection -march/march_launch -march/march_safety -march/march_sound_scheduler -march/march_state_machine'
+    - UPSTREAM_WORKSPACE='.rosinstall -march/march_data_collector -march/march_gain_scheduling -march/march_gait_scheduler -march/march_gait_selection -march/march_launch -march/march_safety -march/march_state_machine'
 
 jobs:
   include:
