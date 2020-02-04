@@ -12,6 +12,8 @@ gaits:
                                right_swing: MV_RT_middlestep_rightswing_v2, left_close: MV_RT_middlestep_leftclose_v3}
   rough_terrain_first_middle_step: {right_open: MV_RT_first_middlestep_rightopen_v1,
                                     left_close: MV_RT_first_middlestep_leftclose_v1}
+  rough_terrain_second_middle_step: {right_open: MV_RT_second_middlestep_rightopen_v1,
+                                     left_close: MV_RT_second_middlestep_leftclose_v1}
   rough_terrain_third_middle_step: {right_open: MV_RT_third_middlestep_rightopen_v1,
                                     left_close: MV_RT_third_middlestep_leftclose_v1}
   walk: {right_open: MV_walk_rightopen_v3, left_swing: MV_walk_leftswing_v2, right_swing: MV_walk_rightswing_v2,
@@ -29,5 +31,3 @@ gaits:
   stairs_down: {right_open: MV_stairsdown_rightopen_v2, left_swing: MV_stairsdown_leftswing_v2,
               right_swing: MV_stairsdown_rightswing_v2, left_close: MV_stairsdown_leftclose_v2,
               right_close: MV_stairsdown_rightclose_v2}
-  rough_terrain_second_middle_step: {right_open: MV_RT_second_middlestep_rightopen_v1,
-                                     left_close: MV_RT_second_middlestep_leftclose_v1}
