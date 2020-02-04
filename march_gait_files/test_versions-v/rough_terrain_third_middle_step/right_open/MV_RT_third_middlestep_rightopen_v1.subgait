@@ -1,4 +1,4 @@
-name: !!python/unicode "right_open"
+name: ''
 version: ''
 description: "The third and therefore last step for the middle steps of the Rough Terrain."
 gait_type: ''
