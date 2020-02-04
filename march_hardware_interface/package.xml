@@ -28,6 +28,6 @@
   <exec_depend>xacro</exec_depend>
   <exec_depend>ethercat_grant</exec_depend>
 
-  <test_depend>rostest</test_depend>
+  <test_depend>rosunit</test_depend>
   <test_depend>code_coverage</test_depend>
 </package>

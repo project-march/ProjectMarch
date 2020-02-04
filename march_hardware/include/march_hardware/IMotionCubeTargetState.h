@@ -27,7 +27,7 @@ private:
   }
 
 public:
-  bool isReached(int statusWord)
+  bool isReached(int statusWord) const
   {
     return (statusWord & stateMask) == state;
   }

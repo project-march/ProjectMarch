@@ -176,6 +176,11 @@ float IMotionCube::getAngleRad()
 {
   ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO "
                                                                                   "mapping, so can't get angle");
+  if (!IMotionCubeTargetState::SWITCHED_ON.isReached(this->getStatusWord()) &&
+      !IMotionCubeTargetState::OPERATION_ENABLED.isReached(this->getStatusWord()))
+  {
+    ROS_WARN_THROTTLE(10, "Invalid use of encoders, you're not in the correct state.");
+  }
   return this->encoder.getAngleRad(this->misoByteOffsets[IMCObjectName::ActualPosition]);
 }
 
@@ -492,7 +497,7 @@ bool IMotionCube::goToOperationEnabled()
   ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO "
                                                                                   "mapping, so can't get angle");
 
-  int angleRead = this->encoder.getAngleIU(this->misoByteOffsets[IMCObjectName::ActualPosition]);
+  int angleRead = this->getAngleIU();
   //  If the encoder is functioning correctly and the joint is not outside hardlimits, move the joint to its current
   //  position. Otherwise shutdown
   if (abs(angleRead) <= 2)
@@ -506,18 +511,15 @@ bool IMotionCube::goToOperationEnabled()
               this->slaveIndex, angleRead, this->encoder.getLowerHardLimitIU(), this->encoder.getUpperHardLimitIU());
     throw std::domain_error("Joint outside hard limits");
   }
-  else
-  {
-    if (this->actuationMode == ActuationMode::position)
-    {
-      this->actuateIU(angleRead);
-    }
-    if (this->actuationMode == ActuationMode::torque)
-    {
-      this->actuateTorque(0);
-    }
-  }
 
+  if (this->actuationMode == ActuationMode::position)
+  {
+    this->actuateIU(angleRead);
+  }
+  if (this->actuationMode == ActuationMode::torque)
+  {
+    this->actuateTorque(0);
+  }
   this->goToTargetState(IMotionCubeTargetState::OPERATION_ENABLED);
 }
 
