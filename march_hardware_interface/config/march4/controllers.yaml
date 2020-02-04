@@ -10,7 +10,7 @@ march:
       type: march_temperature_sensor_controller/MarchTemperatureSensorController
       publish_rate: 1
     trajectory:
-      type: position_controllers/JointTrajectoryController
+      type: effort_controllers/JointTrajectoryController
       allow_partial_joints_goal: true
       # When you switch to effort actuationmode, 'position_controllers' must be substituted with 'effort_controllers' and the gains must be added
       joints:
@@ -22,15 +22,15 @@ march:
         - right_hip_aa
         - right_hip_fe
         - right_knee
-#      gains: # Required because we're controlling an effort interface
-#        left_ankle: {p: 160, i: 0, d: 6, i_clamp: 100, publish_state: true, antiwindup: true}
-#        left_hip_aa: {p: 290, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
-#        left_hip_fe: {p: 80, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
-#        left_knee: {p: 50, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
-#        right_ankle: {p: 140, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
-#        right_hip_aa: {p: 290, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true} # TODO(BaCo) tune HAA joints
-#        right_hip_fe: {p: 80, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
-#        right_knee: {p: 50, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
+      gains: # Required because we're controlling an effort interface
+        left_ankle: {p: 160, i: 0, d: 6, i_clamp: 100, publish_state: true, antiwindup: true}
+        left_hip_aa: {p: 290, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
+        left_hip_fe: {p: 80, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
+        left_knee: {p: 50, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
+        right_ankle: {p: 140, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
+        right_hip_aa: {p: 200, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true} # TODO(BaCo) tune HAA joints
+        right_hip_fe: {p: 80, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
+        right_knee: {p: 50, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
 
       constraints:
         left_ankle:

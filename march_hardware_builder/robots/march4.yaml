@@ -3,7 +3,7 @@ march4:
   ecatCycleTime: 4
   joints:
     - right_hip_aa:
-        actuationMode: position
+        actuationMode: torque
         allowActuation: true
         netNumber: 1
         temperatureges: {slaveIndex: 7, byteOffset: 4}
@@ -12,7 +12,7 @@ march4:
           encoder: {resolution: 12, minPositionIU: 3713, maxPositionIU: 4091, zeroPositionIU: 3907, safetyMarginRad: 0.05}
 
     - left_hip_aa:
-        actuationMode: position
+        actuationMode: torque
         allowActuation: true
         netNumber: 5
         temperatureges: {slaveIndex: 7, byteOffset: 0}
@@ -21,7 +21,7 @@ march4:
           encoder: {resolution: 12, minPositionIU: 1032, maxPositionIU: 1404, zeroPositionIU: 1223, safetyMarginRad: 0.05}
 
     - right_hip_fe:
-        actuationMode: position
+        actuationMode: torque
         allowActuation: true
         netNumber: 2
         temperatureges: {slaveIndex: 1, byteOffset: 0}
@@ -30,7 +30,7 @@ march4:
           encoder: {resolution: 17, minPositionIU: 2053, maxPositionIU: 45617, zeroPositionIU: 9314, safetyMarginRad: 0.05}
 
     - left_hip_fe:
-        actuationMode: position
+        actuationMode: torque
         allowActuation: true
         netNumber: 6
         temperatureges: {slaveIndex: 9, byteOffset: 0}
@@ -39,7 +39,7 @@ march4:
           encoder: {resolution: 17, minPositionIU: -3382, maxPositionIU: 40270, zeroPositionIU: 3893, safetyMarginRad: 0.05}
 
     - right_knee:
-        actuationMode: position
+        actuationMode: torque
         allowActuation: true
         netNumber: 3
         temperatureges: {slaveIndex: 1, byteOffset: 4}
@@ -48,7 +48,7 @@ march4:
           encoder: {resolution: 17, minPositionIU: 25190, maxPositionIU: 68874, zeroPositionIU: 27010, safetyMarginRad: 0.05}
 
     - left_knee:
-        actuationMode: position
+        actuationMode: torque
         allowActuation: true
         netNumber: 7
         temperatureges: {slaveIndex: 9, byteOffset: 4}
@@ -57,7 +57,7 @@ march4:
           encoder: {resolution: 17, minPositionIU: 19808, maxPositionIU: 63543, zeroPositionIU: 21755, safetyMarginRad: 0.05}
 
     - right_ankle:
-        actuationMode: position
+        actuationMode: torque
         allowActuation: true
         netNumber: 4
         temperatureges: {slaveIndex: 4, byteOffset: 0}
@@ -66,7 +66,7 @@ march4:
           encoder: {resolution: 12, minPositionIU: 449, maxPositionIU: 927, zeroPositionIU: 746, safetyMarginRad: 0}
 
     - left_ankle:
-        actuationMode: position
+        actuationMode: torque
         allowActuation: true
         netNumber: 8
         temperatureges: {slaveIndex: 11, byteOffset: 0}
