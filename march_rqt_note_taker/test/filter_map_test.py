@@ -50,6 +50,11 @@ class FilterMapTest(unittest.TestCase):
         self.filter_map.add_filter_on_level(lambda _: True, level)
         self.assertIsNone(self.filter_map(self.log_msg))
 
+    def test_info_level_filter(self):
+        self.log_msg.level = Log.INFO
+        self.filter_map.add_filter_info_level(lambda _: True)
+        self.assertIsNotNone(self.filter_map(self.log_msg))
+
     def test_accept_and_map(self):
         mapped_msg = 'test'
         self.filter_map.add_filter(lambda _: True, lambda _: mapped_msg)

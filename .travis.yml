@@ -20,8 +20,13 @@ git:
 env:
   global:
     - ROS_REPO=ros
+    - ADDITIONAL_DEBS=curl
     - BUILDER=colcon
     - CATKIN_LINT=pedantic
+    - CI_ENV=`bash <(curl -s https://codecov.io/env)`
+    - DOCKER_RUN_OPTS='$CI_ENV -e CATKIN_TEST_COVERAGE=1 -e NOSE_COVER_INCLUSIVE=True -e NOSE_COVER_BRANCHES=True'
+    - AFTER_INSTALL_TARGET_DEPENDENCIES='pip install coverage'
+    - AFTER_RUN_TARGET_TEST='cd "$target_ws" && ./src/monitor/coverage.sh && bash <(curl -s https://codecov.io/bash) -R src/monitor -F test && bash <(curl -s https://codecov.io/bash) -R src/monitor -F production'
 
 jobs:
   include:
@@ -37,5 +42,6 @@ jobs:
 # clone and run industrial_ci
 install:
   - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci -b master
+
 script:
   - .industrial_ci/travis.sh
