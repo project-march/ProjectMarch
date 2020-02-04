@@ -48,11 +48,11 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
   }
 
   // Get joint names from urdf
-  for (auto const& urdfJoint : model.joints_)
+  for (const auto& urdf_joint : model.joints_)
   {
-    if (urdfJoint.second->type != urdf::Joint::FIXED)
+    if (urdf_joint.second->type != urdf::Joint::FIXED)
     {
-      joint_names_.push_back(urdfJoint.first);
+      joint_names_.push_back(urdf_joint.first);
     }
   }
 
@@ -98,10 +98,10 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
   initiateIMC();
 
   // Create march_pdb_state interface
-  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+  MarchPdbStateHandle march_pdb_state_handle("PDBhandle", &power_distribution_board_read_,
                                           &master_shutdown_allowed_command_, &enable_high_voltage_command_,
                                           &power_net_on_off_command_);
-  march_pdb_interface_.registerHandle(marchPdbStateHandle);
+  march_pdb_interface_.registerHandle(march_pdb_state_handle);
 
   registerInterface(&march_temperature_interface_);
   registerInterface(&march_pdb_interface_);
@@ -116,16 +116,16 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
   {
     for (size_t i = 0; i < num_joints_; i++)
     {
-      int netNumber = march_robot_.getJoint(joint_names_[i]).getNetNumber();
-      if (netNumber == -1)
+      int net_number = march_robot_.getJoint(joint_names_[i]).getNetNumber();
+      if (net_number == -1)
       {
-        std::ostringstream errorStream;
-        errorStream << "Joint " << joint_names_[i].c_str() << " has no net number";
-        throw std::runtime_error(errorStream.str());
+        std::ostringstream error_stream;
+        error_stream << "Joint " << joint_names_[i].c_str() << " has no net number";
+        throw std::runtime_error(error_stream.str());
       }
-      while (!march_robot_.getPowerDistributionBoard()->getHighVoltage().getNetOperational(netNumber))
+      while (!march_robot_.getPowerDistributionBoard()->getHighVoltage().getNetOperational(net_number))
       {
-        march_robot_.getPowerDistributionBoard()->getHighVoltage().setNetOnOff(true, netNumber);
+        march_robot_.getPowerDistributionBoard()->getHighVoltage().setNetOnOff(true, net_number);
         usleep(100000);
         ROS_WARN("[%s] Waiting on high voltage", joint_names_[i].c_str());
       }
@@ -141,8 +141,8 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
   {
     march::Joint joint = march_robot_.getJoint(joint_names_[i]);
     // Create joint state interface
-    JointStateHandle jointStateHandle(joint.getName(), &joint_position_[i], &joint_velocity_[i], &joint_effort_[i]);
-    joint_state_interface_.registerHandle(jointStateHandle);
+    JointStateHandle joint_state_handle(joint.getName(), &joint_position_[i], &joint_velocity_[i], &joint_effort_[i]);
+    joint_state_interface_.registerHandle(joint_state_handle);
 
     // Retrieve joint (soft) limits from the urdf
     JointLimits limits;
@@ -151,32 +151,32 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
     if (joint.getActuationMode() == march::ActuationMode::position)
     {
       // Create position joint interface
-      JointHandle jointPositionHandle(jointStateHandle, &joint_position_command_[i]);
-      position_joint_interface_.registerHandle(jointPositionHandle);
+      JointHandle joint_position_handle(joint_state_handle, &joint_position_command_[i]);
+      position_joint_interface_.registerHandle(joint_position_handle);
 
       // Create joint limit interface
-      PositionJointSoftLimitsHandle jointLimitsHandle(jointPositionHandle, limits, soft_limits_[i]);
-      position_joint_soft_limits_interface_.registerHandle(jointLimitsHandle);
+      PositionJointSoftLimitsHandle joint_limits_handle(joint_position_handle, limits, soft_limits_[i]);
+      position_joint_soft_limits_interface_.registerHandle(joint_limits_handle);
     }
     else if (joint.getActuationMode() == march::ActuationMode::torque)
     {
       // Create effort joint interface
-      JointHandle jointEffortHandle(jointStateHandle, &joint_effort_command_[i]);
-      effort_joint_interface_.registerHandle(jointEffortHandle);
+      JointHandle joint_effor_handle(joint_state_handle, &joint_effort_command_[i]);
+      effort_joint_interface_.registerHandle(joint_effor_handle);
 
       // Create joint effort limit interface
-      EffortJointSoftLimitsHandle jointEffortLimitsHandle(jointEffortHandle, limits, soft_limits_[i]);
-      effort_joint_soft_limits_interface_.registerHandle(jointEffortLimitsHandle);
+      EffortJointSoftLimitsHandle joint_effort_limits_handle(joint_effor_handle, limits, soft_limits_[i]);
+      effort_joint_soft_limits_interface_.registerHandle(joint_effort_limits_handle);
     }
 
     // Create velocity joint interface
-    JointHandle jointVelocityHandle(jointStateHandle, &joint_velocity_command_[i]);
-    velocity_joint_interface_.registerHandle(jointVelocityHandle);
+    JointHandle joint_velocity_handle(joint_state_handle, &joint_velocity_command_[i]);
+    velocity_joint_interface_.registerHandle(joint_velocity_handle);
 
     // Create march_state interface
-    MarchTemperatureSensorHandle marchTemperatureSensorHandle(joint_names_[i], &joint_temperature_[i],
+    MarchTemperatureSensorHandle temperature_sensor_handle(joint_names_[i], &joint_temperature_[i],
                                                               &joint_temperature_variance_[i]);
-    march_temperature_interface_.registerHandle(marchTemperatureSensorHandle);
+    march_temperature_interface_.registerHandle(temperature_sensor_handle);
 
     // Enable high voltage on the IMC
     if (joint.canActuate())
@@ -228,7 +228,7 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
 {
   for (size_t i = 0; i < num_joints_; i++)
   {
-    float oldPosition = joint_position_[i];
+    float old_position = joint_position_[i];
 
     march::Joint joint = march_robot_.getJoint(joint_names_[i]);
 
@@ -240,7 +240,7 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
     }
 
     // Get velocity from encoder position
-    float joint_velocity = (joint_position_[i] - oldPosition) * 1 / elapsed_time.toSec();
+    float joint_velocity = (joint_position_[i] - old_position) * 1 / elapsed_time.toSec();
 
     // Apply exponential smoothing to velocity obtained from encoder with
     // alpha=0.2
@@ -428,16 +428,16 @@ void MarchHardwareInterface::updateIMotionCubeState()
   imc_state_pub_->msg_.header.stamp = ros::Time::now();
   for (size_t i = 0; i < num_joints_; i++)
   {
-    march::IMotionCubeState iMotionCubeState = march_robot_.getJoint(joint_names_[i]).getIMotionCubeState();
+    march::IMotionCubeState imc_state = march_robot_.getJoint(joint_names_[i]).getIMotionCubeState();
     imc_state_pub_->msg_.joint_names[i] = joint_names_[i];
-    imc_state_pub_->msg_.status_word[i] = iMotionCubeState.statusWord;
-    imc_state_pub_->msg_.detailed_error[i] = iMotionCubeState.detailedError;
-    imc_state_pub_->msg_.motion_error[i] = iMotionCubeState.motionError;
-    imc_state_pub_->msg_.state[i] = iMotionCubeState.state.getString();
-    imc_state_pub_->msg_.detailed_error_description[i] = iMotionCubeState.detailedErrorDescription;
-    imc_state_pub_->msg_.motion_error_description[i] = iMotionCubeState.motionErrorDescription;
-    imc_state_pub_->msg_.motor_current[i] = iMotionCubeState.motorCurrent;
-    imc_state_pub_->msg_.motor_voltage[i] = iMotionCubeState.motorVoltage;
+    imc_state_pub_->msg_.status_word[i] = imc_state.statusWord;
+    imc_state_pub_->msg_.detailed_error[i] = imc_state.detailedError;
+    imc_state_pub_->msg_.motion_error[i] = imc_state.motionError;
+    imc_state_pub_->msg_.state[i] = imc_state.state.getString();
+    imc_state_pub_->msg_.detailed_error_description[i] = imc_state.detailedErrorDescription;
+    imc_state_pub_->msg_.motion_error_description[i] = imc_state.motionErrorDescription;
+    imc_state_pub_->msg_.motor_current[i] = imc_state.motorCurrent;
+    imc_state_pub_->msg_.motor_voltage[i] = imc_state.motorVoltage;
   }
 
   imc_state_pub_->unlockAndPublish();
@@ -445,19 +445,19 @@ void MarchHardwareInterface::updateIMotionCubeState()
 
 void MarchHardwareInterface::iMotionCubeStateCheck(size_t joint_index)
 {
-  march::IMotionCubeState iMotionCubeState = march_robot_.getJoint(joint_names_[joint_index]).getIMotionCubeState();
-  if (iMotionCubeState.state == march::IMCState::fault)
+  march::IMotionCubeState imc_state = march_robot_.getJoint(joint_names_[joint_index]).getIMotionCubeState();
+  if (imc_state.state == march::IMCState::fault)
   {
-    std::ostringstream errorStream;
-    errorStream << "IMotionCube of joint " << joint_names_[joint_index].c_str() << " is in fault state "
-                << iMotionCubeState.state.getString() << std::endl;
-    errorStream << "Detailed Error: " << iMotionCubeState.detailedErrorDescription << "("
-                << iMotionCubeState.detailedError << ")" << std::endl;
-    errorStream << "Motion Error: " << iMotionCubeState.motionErrorDescription << "(" << iMotionCubeState.motionError
+    std::ostringstream error_stream;
+    error_stream << "IMotionCube of joint " << joint_names_[joint_index].c_str() << " is in fault state "
+                << imc_state.state.getString() << std::endl;
+    error_stream << "Detailed Error: " << imc_state.detailedErrorDescription << "("
+                << imc_state.detailedError << ")" << std::endl;
+    error_stream << "Motion Error: " << imc_state.motionErrorDescription << "(" << imc_state.motionError
                 << ")" << std::endl;
 
-    ROS_FATAL("%s", errorStream.str().c_str());
-    throw std::runtime_error(errorStream.str());
+    ROS_FATAL("%s", error_stream.str().c_str());
+    throw std::runtime_error(error_stream.str());
   }
 }
 
@@ -473,12 +473,12 @@ void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
 
     if (joint.canActuate())
     {
-      std::ostringstream errorStream;
-      errorStream << "Joint " << joint_names_[joint_index].c_str() << " is out of its soft limits ("
+      std::ostringstream error_stream;
+      error_stream << "Joint " << joint_names_[joint_index].c_str() << " is out of its soft limits ("
                   << soft_limits_[joint_index].min_position << ", " << soft_limits_[joint_index].max_position
                   << "). Actual position: " << joint_position_[joint_index];
-      ROS_FATAL("%s", errorStream.str().c_str());
-      throw ::std::runtime_error(errorStream.str());
+      ROS_FATAL("%s", error_stream.str().c_str());
+      throw ::std::runtime_error(error_stream.str());
     }
   }
 }
