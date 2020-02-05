@@ -268,9 +268,6 @@ void MarchHardwareInterface::write(const ros::Duration& elapsed_time)
     // Enlarge joint_effort_command because ROS control limits the pid values to a certain maximum
     joint_effort_command_[i] = joint_effort_command_[i] * 1000;
   }
-  joint_effort_command_copy.clear();
-  joint_effort_command_copy.resize(joint_effort_command_.size());
-  joint_effort_command_copy = joint_effort_command_;
 
   // Enforce limits on all joints in effort mode
   effortJointSoftLimitsInterface.enforceLimits(elapsed_time);
@@ -288,14 +285,6 @@ void MarchHardwareInterface::write(const ros::Duration& elapsed_time)
                 "speed, %f effort.",
                 joint_names_[i].c_str(), joint_position_command_[i], joint_velocity_command_[i],
                 joint_effort_command_[i]);
-
-      if (joint_effort_command_[i] != joint_effort_command_copy[i])
-      {
-        ROS_WARN("Effort command (%f) changed to random high number (%f) for joint(%s), "
-                 "but set back to the normal value.",
-                 joint_effort_command_copy[i], joint_effort_command_[i], joint_names_[i].c_str());
-        joint_effort_command_[i] = joint_effort_command_copy[i];
-      }
 
       if (joint.getActuationMode() == march::ActuationMode::position)
       {
