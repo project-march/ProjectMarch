@@ -265,7 +265,7 @@ void MarchHardwareInterface::write(const ros::Duration& elapsed_time)
 {
   for (int i = 0; i < num_joints_; i++)
   {
-    // Enlarge joint_effort_command so dynamic reconfigure can be used inside it's bounds
+    // Enlarge joint_effort_command because ROS control limits the pid values to a certain maximum
     joint_effort_command_[i] = joint_effort_command_[i] * 1000;
   }
   joint_effort_command_copy.clear();
