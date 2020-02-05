@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<robot name="tilted_path" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <gazebo>
+        <static>true</static>
+    </gazebo>
+
+    <!-- Sizes from the rules of the cybathlon 2020 -->
+    <xacro:property name="middle_block_length" default="3"/>
+    <xacro:property name="middle_block_width" default="1.474"/>
+    <xacro:property name="middle_block_height" default="0.5"/>
+    <xacro:property name="middle_block_angle" default="0.21"/>
+    <xacro:property name="side_blocks_length" default="1.474"/>
+    <xacro:property name="side_blocks_width" default="1.5"/>
+    <xacro:property name="side_blocks_height" default="0.5"/>
+    <xacro:property name="side_blocks_angle" default="0.192"/>
+    <xacro:property name="distance_to_origin" default="0.4"/>
+
+    <xacro:property name="parent_name" value="world"/>
+    <xacro:property name="mu1" value="1.0"/>
+    <xacro:property name="mu2" value="1.0"/>
+    <!-- Minimum allowable depth before contact correction impulse is applied. -->
+    <xacro:property name="min_depth" value="0.0005"/>
+
+    <!-- Used for fixing robot to Gazebo 'base_link' -->
+    <link name="${parent_name}"/>
+
+
+    <!-- Links -->
+    <link name="middle_block">
+        <collision>
+          <geometry>
+            <box size="${middle_block_length} ${middle_block_width} ${middle_block_height}" />
+          </geometry>
+        </collision>
+
+        <visual name='visual'>
+          <geometry>
+            <box size="${middle_block_length} ${middle_block_width} ${middle_block_height}" />
+          </geometry>
+        </visual>
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="1"/>
+            <inertia
+                    ixx="1"
+                    ixy="1"
+                    ixz="1"
+                    iyy="1"
+                    iyz="1"
+                    izz="1" />
+        </inertial>
+    </link>
+
+    <link name="side_block_1">
+        <collision>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>
+            <box size="${side_blocks_length} ${side_blocks_width} ${side_blocks_height}" />
+          </geometry>
+        </collision>
+
+        <visual name='visual'>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>
+            <box size="${side_blocks_length} ${side_blocks_width} ${side_blocks_height}" />
+          </geometry>
+        </visual>
+    </link>
+
+    <link name="side_block_2">
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${side_blocks_length} ${side_blocks_width} ${side_blocks_height}" />
+            </geometry>
+        </collision>
+
+        <visual name='visual'>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${side_blocks_length} ${side_blocks_width} ${side_blocks_height}" />
+            </geometry>
+        </visual>
+    </link>
+
+
+
+    <gazebo reference="middle_block">
+        <mu1>${mu1}</mu1>
+        <mu2>${mu2}</mu2>
+        <minDepth>${min_depth}</minDepth>
+    </gazebo>
+
+    <gazebo reference="side_block_1">
+        <mu1>${mu1}</mu1>
+        <mu2>${mu2}</mu2>
+        <minDepth>${min_depth}</minDepth>
+    </gazebo>
+
+    <gazebo reference="side_block_2">
+        <mu1>${mu1}</mu1>
+        <mu2>${mu2}</mu2>
+        <minDepth>${min_depth}</minDepth>
+    </gazebo>
+
+
+    <!-- Joints -->
+    <joint name="joint_1" type="fixed">
+        <parent link="${parent_name}"/>
+        <child link="middle_block"/>
+        <origin xyz="${-distance_to_origin-2.5} 0 -0.15" rpy="${- middle_block_angle} 0 0"/>
+    </joint>
+
+    <joint name="joint_2" type="fixed">
+        <parent link="middle_block"/>
+        <child link="side_block_1"/>
+        <origin xyz="2.17 0.01 -0.135" rpy="0 ${side_blocks_angle} 0"/>
+    </joint>
+
+    <joint name="joint_3" type="fixed">
+        <parent link="middle_block"/>
+        <child link="side_block_2"/>
+        <origin xyz="-2.17 0.01 -0.135" rpy="0 ${-side_blocks_angle} 0"/>
+    </joint>
+
+</robot>
