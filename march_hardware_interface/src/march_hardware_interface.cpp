@@ -263,9 +263,23 @@ void MarchHardwareInterface::read(const ros::Duration& elapsed_time)
 
 void MarchHardwareInterface::write(const ros::Duration& elapsed_time)
 {
-  joint_effort_command_copy.clear();
-  joint_effort_command_copy.resize(joint_effort_command_.size());
-  joint_effort_command_copy = joint_effort_command_;
+  if (joint.getActuationMode() == march::ActuationMode::position)
+  {
+    positionJointSoftLimitsInterface.enforceLimits(elapsed_time);
+  }
+  else if (joint.getActuationMode() == march::ActuationMode::torque)
+  {
+    for (int i = 0; i < num_joints_; i++)
+    {
+      // Enlarge joint_effort_command so dynamic reconfigure can be used inside it's bounds
+      joint_effort_command_[i] = joint_effort_command_[i] * 1000;
+    }
+    joint_effort_command_copy.clear();
+    joint_effort_command_copy.resize(joint_effort_command_.size());
+    joint_effort_command_copy = joint_effort_command_;
+
+    effortJointSoftLimitsInterface.enforceLimits(elapsed_time);
+  }
 
   for (int i = 0; i < num_joints_; i++)
   {
@@ -288,15 +302,10 @@ void MarchHardwareInterface::write(const ros::Duration& elapsed_time)
 
       if (joint.getActuationMode() == march::ActuationMode::position)
       {
-        positionJointSoftLimitsInterface.enforceLimits(elapsed_time);
         joint.actuateRad(static_cast<float>(joint_position_command_[i]));
       }
       else if (joint.getActuationMode() == march::ActuationMode::torque)
       {
-        // Enlarge joint_effort_command so dynamic reconfigure can be used inside it's bounds
-        joint_effort_command_[i] = joint_effort_command_[i] * 1000;
-
-        effortJointSoftLimitsInterface.enforceLimits(elapsed_time);
         joint.actuateTorque(static_cast<int>(joint_effort_command_[i]));
       }
     }
