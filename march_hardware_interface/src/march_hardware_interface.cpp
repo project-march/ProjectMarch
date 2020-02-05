@@ -263,23 +263,20 @@ void MarchHardwareInterface::read(const ros::Duration& elapsed_time)
 
 void MarchHardwareInterface::write(const ros::Duration& elapsed_time)
 {
-  if (joint.getActuationMode() == march::ActuationMode::position)
+  for (int i = 0; i < num_joints_; i++)
   {
-    positionJointSoftLimitsInterface.enforceLimits(elapsed_time);
+    // Enlarge joint_effort_command so dynamic reconfigure can be used inside it's bounds
+    joint_effort_command_[i] = joint_effort_command_[i] * 1000;
   }
-  else if (joint.getActuationMode() == march::ActuationMode::torque)
-  {
-    for (int i = 0; i < num_joints_; i++)
-    {
-      // Enlarge joint_effort_command so dynamic reconfigure can be used inside it's bounds
-      joint_effort_command_[i] = joint_effort_command_[i] * 1000;
-    }
-    joint_effort_command_copy.clear();
-    joint_effort_command_copy.resize(joint_effort_command_.size());
-    joint_effort_command_copy = joint_effort_command_;
+  joint_effort_command_copy.clear();
+  joint_effort_command_copy.resize(joint_effort_command_.size());
+  joint_effort_command_copy = joint_effort_command_;
 
-    effortJointSoftLimitsInterface.enforceLimits(elapsed_time);
-  }
+  // Enforce limits on all joints in effort mode
+  effortJointSoftLimitsInterface.enforceLimits(elapsed_time);
+
+  // Enforce limits on all joints in position mode
+  positionJointSoftLimitsInterface.enforceLimits(elapsed_time);
 
   for (int i = 0; i < num_joints_; i++)
   {
