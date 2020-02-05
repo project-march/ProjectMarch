@@ -27,13 +27,13 @@
     <link name="platform">
         <collision>
           <geometry>
-            <box size="${platform_length} ${platform_width} 3" />
+            <box size="${platform_length} ${platform_width} ${platform_height}" />
           </geometry>
         </collision>
 
         <visual name='visual'>
           <geometry>
-            <box size="${platform_length} ${platform_width} 3" />
+            <box size="${platform_length} ${platform_width} ${platform_height}" />
           </geometry>
         </visual>
         <inertial>
@@ -104,19 +104,19 @@
     <joint name="hip_1" type="fixed">
         <parent link="${parent_name}"/>
         <child link="platform"/>
-        <origin xyz="-3.2 0 -1.02" rpy="0 0 0"/>
+        <origin xyz="-3.2 0 ${platform_height / 2}" rpy="0 0 0"/>
     </joint>
 
     <joint name="joint_1" type="fixed">
         <parent link="platform"/>
         <child link="ramp_up"/>
-        <origin xyz="1.875 0 0.601" rpy="0 0.35 0"/>
+        <origin xyz="1.875 0 -0.659" rpy="0 0.35 0"/>
     </joint>
 
     <joint name="joint_2" type="fixed">
         <parent link="platform"/>
         <child link="ramp_down"/>
-        <origin xyz="-2.115 0 0.365" rpy="0 -0.26 0"/>
+        <origin xyz="-2.115 0 -0.895" rpy="0 -0.26 0"/>
     </joint>
 
 
