@@ -53,7 +53,6 @@ protected:
   std::vector<double> joint_position_command_;
   std::vector<double> joint_velocity_command_;
   std::vector<double> joint_effort_command_;
-  std::vector<double> joint_effort_command_copy;
 
   march::PowerDistributionBoard power_distribution_board_read_;
   bool master_shutdown_allowed_command = false;
