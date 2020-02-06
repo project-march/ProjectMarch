@@ -67,7 +67,6 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
   joint_velocity_command_.resize(num_joints_);
   joint_effort_.resize(num_joints_);
   joint_effort_command_.resize(num_joints_);
-  joint_effort_command_copy.resize(num_joints_);
   joint_temperature_.resize(num_joints_);
   joint_temperature_variance_.resize(num_joints_);
   soft_limits_.resize(num_joints_);
@@ -266,9 +265,17 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
 
 void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Duration& elapsed_time)
 {
-  joint_effort_command_copy.clear();
-  joint_effort_command_copy.resize(joint_effort_command_.size());
-  joint_effort_command_copy = joint_effort_command_;
+  for (size_t i = 0; i < num_joints_; i++)
+  {
+    // Enlarge joint_effort_command because ROS control limits the pid values to a certain maximum
+    joint_effort_command_[i] = joint_effort_command_[i] * 1000;
+  }
+
+  // Enforce limits on all joints in effort mode
+  effort_joint_soft_limits_interface_.enforceLimits(elapsed_time);
+
+  // Enforce limits on all joints in position mode
+  position_joint_soft_limits_interface_.enforceLimits(elapsed_time);
 
   for (size_t i = 0; i < num_joints_; i++)
   {
@@ -281,25 +288,12 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
                 joint_names_[i].c_str(), joint_position_command_[i], joint_velocity_command_[i],
                 joint_effort_command_[i]);
 
-      if (joint_effort_command_[i] != joint_effort_command_copy[i])
-      {
-        ROS_WARN("Effort command (%f) changed to random high number (%f) for joint(%s), "
-                 "but set back to the normal value.",
-                 joint_effort_command_copy[i], joint_effort_command_[i], joint_names_[i].c_str());
-        joint_effort_command_[i] = joint_effort_command_copy[i];
-      }
-
       if (joint.getActuationMode() == march::ActuationMode::position)
       {
-        position_joint_soft_limits_interface_.enforceLimits(elapsed_time);
         joint.actuateRad(static_cast<float>(joint_position_command_[i]));
       }
       else if (joint.getActuationMode() == march::ActuationMode::torque)
       {
-        // Enlarge joint_effort_command so dynamic reconfigure can be used inside it's bounds
-        joint_effort_command_[i] = joint_effort_command_[i] * 1000;
-
-        effort_joint_soft_limits_interface_.enforceLimits(elapsed_time);
         joint.actuateTorque(static_cast<int>(joint_effort_command_[i]));
       }
     }

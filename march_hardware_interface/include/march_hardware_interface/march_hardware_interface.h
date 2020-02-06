@@ -104,7 +104,6 @@ private:
 
   std::vector<double> joint_effort_;
   std::vector<double> joint_effort_command_;
-  std::vector<double> joint_effort_command_copy;
 
   std::vector<double> joint_temperature_;
   std::vector<double> joint_temperature_variance_;
