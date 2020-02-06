@@ -1,0 +1,112 @@
+name: ''
+version: ''
+description: "Ending step for Tilted Path straight, based on RT high step."
+gait_type: "walk_like"
+setpoints: 
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs:         0
+    joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
+  left_ankle]
+  - 
+    time_from_start: 
+      secs: 1
+      nsecs:  12399999
+    joint_names: [right_hip_aa, left_hip_aa]
+  - 
+    time_from_start: 
+      secs: 1
+      nsecs: 176500000
+    joint_names: [left_knee]
+  - 
+    time_from_start: 
+      secs: 1
+      nsecs: 336500000
+    joint_names: [left_hip_fe]
+  - 
+    time_from_start: 
+      secs: 1
+      nsecs: 350000000
+    joint_names: [right_hip_aa, left_hip_aa]
+  - 
+    time_from_start: 
+      secs: 2
+      nsecs: 466200000
+    joint_names: [left_knee]
+  - 
+    time_from_start: 
+      secs: 2
+      nsecs: 700000000
+    joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
+  left_ankle]
+trajectory: 
+  header: 
+    seq: 0
+    stamp: 
+      secs: 0
+      nsecs:         0
+    frame_id: ''
+  joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
+  left_ankle]
+  points: 
+    - 
+      positions: [0.0, -0.0873, 0.0, 0.0436, 0.0, 0.4014, 0.6981, 0.0436]
+      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs:         0
+    - 
+      positions: [0.0, -0.1308, 0.1959, 0.0436, 0.0, 0.7734, 1.4618, 0.0436]
+      velocities: [0.0, -0.0723, 0.3254, -0.0, 0.0, 0.3089, 0.2419, -0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs:  12399999
+    - 
+      positions: [0.0, -0.1436, 0.2532, 0.0436, 0.0, 0.8085, 1.4392, 0.0436]
+      velocities: [0.0, -0.0762, 0.3428, 0.0, 0.0, 0.1019, -0.5236, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs: 176500000
+    - 
+      positions: [0.0, -0.1559, 0.3089, 0.0436, 0.0, 0.8029, 1.3213, 0.0436]
+      velocities: [0.0, -0.0775, 0.349, 0.0, 0.0, -0.1745, -0.9303, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs: 336500000
+    - 
+      positions: [0.0, -0.1567, 0.3124, 0.0436, 0.0, 0.8014, 1.3118, 0.0436]
+      velocities: [0.0, -0.0776, 0.349, -0.0, 0.0, -0.1775, -0.9525, -0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 1
+        nsecs: 350000000
+    - 
+      positions: [0.0, -0.2238, 0.6142, 0.0436, 0.0, 0.3093, 0.1396, 0.0436]
+      velocities: [0.0, -0.0257, 0.1156, 0.0, 0.0, -0.4715, 0.0, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 2
+        nsecs: 466200000
+    - 
+      positions: [0.0, -0.2269, 0.6283, 0.0436, 0.0, 0.2094, 0.1396, 0.0436]
+      velocities: [-0.0, 0.0, 0.0, -0.0, -0.0, -0.3491, 0.0, -0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 2
+        nsecs: 700000000
+duration: 
+  secs: 2
+  nsecs: 700000000
+sounds: []
