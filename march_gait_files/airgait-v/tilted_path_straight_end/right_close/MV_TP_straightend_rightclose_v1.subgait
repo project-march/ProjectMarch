@@ -1,7 +1,7 @@
 name: ''
 version: ''
 description: "Right close for ending step off the Tilted Path."
-gait_type: "walk_like"
+gait_type: "stairs_like"
 setpoints: 
   - 
     time_from_start: 

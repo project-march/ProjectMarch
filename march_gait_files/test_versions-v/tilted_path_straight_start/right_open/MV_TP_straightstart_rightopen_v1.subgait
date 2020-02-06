@@ -1,7 +1,7 @@
 name: ''
 version: ''
 description: "This the right open for the Tilted Path, just a high step actually."
-gait_type: "walk_like"
+gait_type: "stairs_like"
 setpoints: 
   - 
     time_from_start: 

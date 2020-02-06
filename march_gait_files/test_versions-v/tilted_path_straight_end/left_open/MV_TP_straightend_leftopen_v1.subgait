@@ -1,7 +1,7 @@
 name: ''
 version: ''
 description: "Ending step for Tilted Path straight, based on RT high step."
-gait_type: "walk_like"
+gait_type: "stairs_like"
 setpoints: 
   - 
     time_from_start: 
