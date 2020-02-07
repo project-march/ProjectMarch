@@ -160,11 +160,11 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
     else if (joint.getActuationMode() == march::ActuationMode::torque)
     {
       // Create effort joint interface
-      JointHandle joint_effor_handle(joint_state_handle, &joint_effort_command_[i]);
-      effort_joint_interface_.registerHandle(joint_effor_handle);
+      JointHandle joint_effort_handle_(joint_state_handle, &joint_effort_command_[i]);
+      effort_joint_interface_.registerHandle(joint_effort_handle_);
 
       // Create joint effort limit interface
-      EffortJointSoftLimitsHandle joint_effort_limits_handle(joint_effor_handle, limits, soft_limits_[i]);
+      EffortJointSoftLimitsHandle joint_effort_limits_handle(joint_effort_handle_, limits, soft_limits_[i]);
       effort_joint_soft_limits_interface_.registerHandle(joint_effort_limits_handle);
     }
 
