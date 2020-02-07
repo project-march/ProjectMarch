@@ -74,11 +74,7 @@ private:
 
   /* March hardware */
   march::MarchRobot march_robot_;
-  march::PowerDistributionBoard power_distribution_board_read_;
-  PowerNetOnOffCommand power_net_on_off_command_;
   bool has_power_distribution_board_ = false;
-  bool master_shutdown_allowed_command_ = false;
-  bool enable_high_voltage_command_ = true;
 
   /* Interfaces */
   hardware_interface::JointStateInterface joint_state_interface_;
@@ -109,6 +105,11 @@ private:
   std::vector<double> joint_temperature_variance_;
 
   std::vector<joint_limits_interface::SoftJointLimits> soft_limits_;
+
+  march::PowerDistributionBoard power_distribution_board_read_;
+  PowerNetOnOffCommand power_net_on_off_command_;
+  bool master_shutdown_allowed_command_ = false;
+  bool enable_high_voltage_command_ = true;
 
   /* Real time safe publishers */
   RtPublisherPtr<march_shared_resources::AfterLimitJointCommand> after_limit_joint_command_pub_;

@@ -23,7 +23,8 @@ using joint_limits_interface::SoftJointLimits;
 using march::Joint;
 
 MarchHardwareInterface::MarchHardwareInterface(march::MarchRobot robot)
-  : march_robot_(std::move(robot))
+  : march_robot_(std::move(robot)),
+    has_power_distribution_board_(march_robot_.getPowerDistributionBoard()->getSlaveIndex() != -1)
 {
 }
 
@@ -110,7 +111,6 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
   registerInterface(&position_joint_soft_limits_interface_);
   registerInterface(&effort_joint_soft_limits_interface_);
 
-  has_power_distribution_board_ = march_robot_.getPowerDistributionBoard()->getSlaveIndex() != -1;
   if (has_power_distribution_board_)
   {
     for (size_t i = 0; i < num_joints_; i++)
