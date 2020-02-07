@@ -144,13 +144,17 @@ class InputDevicePlugin(Plugin):
             self.create_button('gait_ramp_door_last_step',
                                callback=lambda: self.controller.publish_gait('gait_ramp_door_last_step'))
 
-        gait_tilted_path_straight_start_right = \
-            self.create_button('gait_tilted_path_straight_start_right',
-                               callback=lambda: self.controller.publish_gait('gait_tilted_path_straight_start_right'))
+        gait_tilted_path_straight_start = \
+            self.create_button('gait_tilted_path_straight_start',
+                               callback=lambda: self.controller.publish_gait('gait_tilted_path_straight_start'))
 
-        gait_tilted_path_straight_start_left = \
-            self.create_button('gait_tilted_path_straight_start_left',
-                               callback=lambda: self.controller.publish_gait('gait_tilted_path_straight_start_left'))
+        gait_tilted_path_single_step = \
+            self.create_button('gait_tilted_path_single_step',
+                               callback=lambda: self.controller.publish_gait('gait_tilted_path_single_step'))
+
+        gait_tilted_path_straight_end = \
+            self.create_button('gait_tilted_path_straight_end',
+                               callback=lambda: self.controller.publish_gait('gait_tilted_path_straight_end'))
 
         gait_tilted_path_first_start = \
             self.create_button('gait_tilted_path_first_start',
@@ -198,8 +202,10 @@ class InputDevicePlugin(Plugin):
 
             [gait_ramp_door_slope_up, gait_ramp_door_slope_down, gait_ramp_door_last_step],
 
-            [gait_tilted_path_straight_start_right, gait_tilted_path_straight_start_left, gait_tilted_path_first_start,
-             gait_tilted_path_second_start, gait_tilted_path_first_end, gait_tilted_path_second_end],
+            [gait_tilted_path_straight_start, gait_tilted_path_single_step, gait_tilted_path_straight_end],
+
+            [gait_tilted_path_first_start, gait_tilted_path_second_start, gait_tilted_path_first_end,
+             gait_tilted_path_second_end],
         ]
 
         # Create the qt_layout from the button layout.
