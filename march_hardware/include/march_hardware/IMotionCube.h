@@ -2,90 +2,79 @@
 
 #ifndef MARCH_HARDWARE_IMOTIONCUBE_H
 #define MARCH_HARDWARE_IMOTIONCUBE_H
+#include <march_hardware/ActuationMode.h>
+#include <march_hardware/Encoder.h>
+#include <march_hardware/EtherCAT/EthercatIO.h>
+#include <march_hardware/IMotionCubeState.h>
+#include <march_hardware/IMotionCubeTargetState.h>
+#include <march_hardware/PDOmap.h>
+#include <march_hardware/Slave.h>
 
 #include <unordered_map>
 #include <string>
-
-#include <march_hardware/ActuationMode.h>
-#include <march_hardware/EtherCAT/EthercatIO.h>
-#include <march_hardware/Slave.h>
-#include <march_hardware/Encoder.h>
-#include <march_hardware/PDOmap.h>
-#include <march_hardware/IMotionCubeState.h>
-#include <march_hardware/IMotionCubeTargetState.h>
 
 namespace march
 {
 class IMotionCube : public Slave
 {
-private:
-  Encoder encoder;
-  ActuationMode actuationMode;
-
-  void actuateIU(int iu);
-
-  std::unordered_map<IMCObjectName, int> misoByteOffsets;
-  std::unordered_map<IMCObjectName, int> mosiByteOffsets;
-  void mapMisoPDOs();
-  void mapMosiPDOs();
-  void validateMisoPDOs();
-  void validateMosiPDOs();
-  void writeInitialSettings(uint8 ecatCycleTime);
-
-  bool get_bit(uint16 value, int index);
-
 public:
-  explicit IMotionCube(int slaveIndex, Encoder encoder);
-
-  IMotionCube()
-  {
-    slaveIndex = -1;
-  }
+  IMotionCube(int slave_index, Encoder encoder, ActuationMode actuation_mode);
 
   ~IMotionCube() = default;
 
-  void writeInitialSDOs(int ecatCycleTime) override;
+  void writeInitialSDOs(int cycle_time) override;
 
   float getAngleRad();
   float getTorque();
   int getAngleIU();
 
-  uint16 getStatusWord();
-  uint16 getMotionError();
-  uint16 getDetailedError();
+  uint16_t getStatusWord();
+  uint16_t getMotionError();
+  uint16_t getDetailedError();
 
   ActuationMode getActuationMode() const;
 
   float getMotorCurrent();
   float getMotorVoltage();
 
-  void setControlWord(uint16 controlWord);
+  void setControlWord(uint16_t control_word);
 
-  void actuateRad(float targetRad);
-  void actuateTorque(int targetTorque);
+  void actuateRad(float target_rad);
+  void actuateTorque(int target_torque);
 
-  std::string parseStatusWord(uint16 statusWord);
-  IMCState getState(uint16 statusWord);
-  std::string parseMotionError(uint16 motionError);
-  std::string parseDetailedError(uint16 detailedError);
-
-  bool goToOperationEnabled();
-  bool resetIMotionCube();
-
-  void setActuationMode(ActuationMode mode);
+  void goToTargetState(IMotionCubeTargetState target_state);
+  void goToOperationEnabled();
+  void resetIMotionCube();
 
   /** @brief Override comparison operator */
   friend bool operator==(const IMotionCube& lhs, const IMotionCube& rhs)
   {
-    return lhs.slaveIndex == rhs.slaveIndex && lhs.encoder == rhs.encoder;
+    return lhs.slaveIndex == rhs.slaveIndex && lhs.encoder_ == rhs.encoder_;
   }
   /** @brief Override stream operator for clean printing */
-  friend ::std::ostream& operator<<(std::ostream& os, const IMotionCube& iMotionCube)
+  friend std::ostream& operator<<(std::ostream& os, const IMotionCube& imc)
   {
-    return os << "slaveIndex: " << iMotionCube.slaveIndex << ", "
-              << "encoder: " << iMotionCube.encoder;
+    return os << "slaveIndex: " << imc.slaveIndex << ", "
+              << "encoder: " << imc.encoder_;
   }
-  bool goToTargetState(march::IMotionCubeTargetState targetState);
+
+  constexpr static float MAX_TARGET_DIFFERENCE = 0.393;
+  // This value is slightly larger than the current limit of the
+  // linear joints defined in the URDF.
+  const static int MAX_TARGET_TORQUE = 23500;
+
+private:
+  void actuateIU(int target_iu);
+
+  void mapMisoPDOs();
+  void mapMosiPDOs();
+  void writeInitialSettings(uint8_t cycle_time);
+
+  Encoder encoder_;
+  ActuationMode actuation_mode_;
+
+  std::unordered_map<IMCObjectName, int> miso_byte_offsets_;
+  std::unordered_map<IMCObjectName, int> mosi_byte_offsets_;
 };
 
 }  // namespace march

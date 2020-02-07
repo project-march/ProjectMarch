@@ -76,7 +76,7 @@ if(CATKIN_ENABLE_TESTING)
         test/TestRunner.cpp
         test/TestPdbStateInterface.cpp
     )
-    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} gtest)
+    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES})
 
     if(ENABLE_COVERAGE_TESTING)
         set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*")

@@ -23,7 +23,7 @@ private:
   TemperatureGES temperatureGES;
 
 public:
-  Joint() : name(""), netNumber(-1), allowActuation(false)
+  explicit Joint(const IMotionCube& imc) : name(""), netNumber(-1), allowActuation(false), iMotionCube(imc)
   {
   }
 
@@ -50,8 +50,6 @@ public:
   }
 
   ActuationMode getActuationMode() const;
-
-  void setActuationMode(ActuationMode actuationMode);
 
   bool hasIMotionCube();
   bool hasTemperatureGES();

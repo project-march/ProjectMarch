@@ -49,7 +49,7 @@ public:
 
   static march::Joint createJoint(const YAML::Node& joint_config, const std::string& joint_name);
   static march::Encoder createEncoder(const YAML::Node& encoder_config);
-  static march::IMotionCube createIMotionCube(const YAML::Node& imc_config);
+  static march::IMotionCube createIMotionCube(const YAML::Node& imc_config, march::ActuationMode mode);
   static march::TemperatureGES createTemperatureGES(const YAML::Node& temperature_ges_config);
   static march::PowerDistributionBoard createPowerDistributionBoard(const YAML::Node& power_distribution_board_config);
 

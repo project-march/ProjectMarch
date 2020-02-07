@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(march_hardware)
 
-add_compile_options(-std=c++11 -Wall -Wextra)
+add_compile_options(-std=c++14 -Wall -Wextra)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
@@ -37,6 +37,9 @@ if(CATKIN_ENABLE_TESTING AND ENABLE_COVERAGE_TESTING)
 endif()
 
 add_library(${PROJECT_NAME}
+    include/${PROJECT_NAME}/error/error_type.h
+    include/${PROJECT_NAME}/error/hardware_exception.h
+    include/${PROJECT_NAME}/error/motion_error.h
     src/Encoder.cpp
     src/EtherCAT/EthercatIO.cpp
     src/EtherCAT/EthercatMaster.cpp
@@ -50,6 +53,8 @@ add_library(${PROJECT_NAME}
     src/PDOmap.cpp
     src/PowerDistributionBoard.cpp
     src/TemperatureGES.cpp
+    src/error/error_type.cpp
+    src/error/motion_error.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
@@ -80,36 +85,34 @@ install(DIRECTORY launch
 )
 
 ## Add gtest based cpp test target and link libraries
-if (CATKIN_ENABLE_TESTING)
-    find_package(rostest REQUIRED)
-
-    add_rostest_gmock(${PROJECT_NAME}-test
-        test/march_hardware.test
-        test/TestRunner.cpp
-        test/TestEncoder.cpp
-        test/TestIMotionCube.cpp
-        test/TestTemperatureGES.cpp
-        test/TestJoint.cpp
-        test/TestPDOmap.cpp
+if(CATKIN_ENABLE_TESTING)
+    catkin_add_gmock(${PROJECT_NAME}_test
         test/TestBootShutdownOffsets.cpp
+        test/TestHighVoltage.cpp
+        test/TestIMotionCube.cpp
+        test/TestJoint.cpp
+        test/TestLowVoltage.cpp
         test/TestNetDriverOffsets.cpp
         test/TestNetMonitorOffsets.cpp
-        test/TestLowVoltage.cpp
-        test/TestHighVoltage.cpp
+        test/TestPDOmap.cpp
         test/TestPowerDistributionBoard.cpp
-        test/mocks/MockTemperatureGES.cpp
-        test/mocks/MockTemperatureSensor.cpp
+        test/TestRunner.cpp
+        test/TestTemperatureGES.cpp
+        test/error/test_hardware_exception.cpp
+        test/error/test_motion_error.cpp
         test/mocks/MockEncoder.cpp
         test/mocks/MockIMotionCube.cpp
         test/mocks/MockJoint.cpp
+        test/mocks/MockTemperatureGES.cpp
+        test/mocks/MockTemperatureSensor.cpp
     )
-    target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES} ${PROJECT_NAME} gtest)
+    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME})
 
     if(ENABLE_COVERAGE_TESTING)
         set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*" "*/${PROJECT_NAME}/check/*")
         add_code_coverage(
             NAME coverage_report
-            DEPENDENCIES ${PROJECT_NAME}-test
+            DEPENDENCIES ${PROJECT_NAME}_test
         )
     endif()
-endif ()
+endif()

@@ -4,6 +4,7 @@
 #include <bitset>
 #include <string>
 
+#include <march_hardware/error/motion_error.h>
 #include <march_hardware/Joint.h>
 
 namespace march
@@ -114,9 +115,9 @@ IMotionCubeState Joint::getIMotionCubeState()
   std::bitset<16> motionErrorBits = this->iMotionCube.getMotionError();
   states.motionError = motionErrorBits.to_string();
 
-  states.state = this->iMotionCube.getState(this->iMotionCube.getStatusWord());
-  states.detailedErrorDescription = this->iMotionCube.parseDetailedError(this->iMotionCube.getDetailedError());
-  states.motionErrorDescription = this->iMotionCube.parseMotionError(this->iMotionCube.getMotionError());
+  states.state = IMCState(this->iMotionCube.getStatusWord());
+  states.detailedErrorDescription = error::parseDetailedError(this->iMotionCube.getDetailedError());
+  states.motionErrorDescription = error::parseMotionError(this->iMotionCube.getMotionError());
 
   states.motorCurrent = this->iMotionCube.getMotorCurrent();
   states.motorVoltage = this->iMotionCube.getMotorVoltage();
@@ -186,11 +187,6 @@ void Joint::setNetNumber(int netNumber)
 ActuationMode Joint::getActuationMode() const
 {
   return this->iMotionCube.getActuationMode();
-}
-
-void Joint::setActuationMode(ActuationMode actuationMode)
-{
-  this->iMotionCube.setActuationMode(actuationMode);
 }
 
 }  // namespace march

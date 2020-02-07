@@ -1,95 +1,76 @@
 // Copyright 2018 Project March.
+#include <march_hardware/IMotionCube.h>
+#include <march_hardware/error/hardware_exception.h>
+#include <march_hardware/error/motion_error.h>
+#include <march_hardware/EtherCAT/EthercatSDO.h>
+#include <march_hardware/EtherCAT/EthercatIO.h>
+
 #include <bitset>
 #include <string>
-#include <vector>
+#include <unistd.h>
 
 #include <ros/ros.h>
 
-#include <march_hardware/EtherCAT/EthercatSDO.h>
-
-#include <march_hardware/EtherCAT/EthercatIO.h>
-#include <march_hardware/IMotionCube.h>
-#include <unistd.h>
-
 namespace march
 {
-IMotionCube::IMotionCube(int slaveIndex, Encoder encoder) : Slave(slaveIndex), actuationMode("unknown")
+IMotionCube::IMotionCube(int slave_index, Encoder encoder, ActuationMode actuation_mode)
+  : Slave(slave_index), encoder_(encoder), actuation_mode_(actuation_mode)
 {
-  this->encoder = encoder;
-  this->encoder.setSlaveIndex(this->slaveIndex);
+  this->encoder_.setSlaveIndex(slave_index);
 }
 
-void IMotionCube::writeInitialSDOs(int ecatCycleTime)
+void IMotionCube::writeInitialSDOs(int cycle_time)
 {
+  if (this->actuation_mode_ == ActuationMode::unknown)
+  {
+    throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE, "Cannot write initial settings to "
+                                                                             "IMotionCube "
+                                                                             "as it has actuation mode of unknown");
+  }
+
   mapMisoPDOs();
   mapMosiPDOs();
-  validateMisoPDOs();
-  validateMosiPDOs();
-  writeInitialSettings(ecatCycleTime);
+  writeInitialSettings(cycle_time);
 }
 
 // Map Process Data Object (PDO) for by sending SDOs to the IMC
 // Master In, Slave Out
 void IMotionCube::mapMisoPDOs()
 {
-  PDOmap pdoMapMISO = PDOmap();
-  pdoMapMISO.addObject(IMCObjectName::StatusWord);      // Compulsory!
-  pdoMapMISO.addObject(IMCObjectName::ActualPosition);  // Compulsory!
-  pdoMapMISO.addObject(IMCObjectName::ActualTorque);    // Compulsory!
-  pdoMapMISO.addObject(IMCObjectName::MotionErrorRegister);
-  pdoMapMISO.addObject(IMCObjectName::DetailedErrorRegister);
-  pdoMapMISO.addObject(IMCObjectName::DCLinkVoltage);
-  this->misoByteOffsets = pdoMapMISO.map(this->slaveIndex, dataDirection::miso);
+  PDOmap map_miso = PDOmap();
+  map_miso.addObject(IMCObjectName::StatusWord);      // Compulsory!
+  map_miso.addObject(IMCObjectName::ActualPosition);  // Compulsory!
+  map_miso.addObject(IMCObjectName::ActualTorque);    // Compulsory!
+  map_miso.addObject(IMCObjectName::MotionErrorRegister);
+  map_miso.addObject(IMCObjectName::DetailedErrorRegister);
+  map_miso.addObject(IMCObjectName::DCLinkVoltage);
+  this->miso_byte_offsets_ = map_miso.map(this->slaveIndex, DataDirection::MISO);
 }
 
 // Map Process Data Object (PDO) for by sending SDOs to the IMC
 // Master Out, Slave In
 void IMotionCube::mapMosiPDOs()
 {
-  PDOmap pdoMapMOSI = PDOmap();
-  pdoMapMOSI.addObject(IMCObjectName::ControlWord);  // Compulsory!
-  pdoMapMOSI.addObject(IMCObjectName::TargetPosition);
-  pdoMapMOSI.addObject(IMCObjectName::TargetTorque);
-  this->mosiByteOffsets = pdoMapMOSI.map(this->slaveIndex, dataDirection::mosi);
-}
-
-// Checks if the compulsory MISO PDO objects are mapped
-void IMotionCube::validateMisoPDOs()
-{
-  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::StatusWord) == 1, "StatusWord not mapped");
-  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not mapped");
-  ROS_ASSERT_MSG(this->mosiByteOffsets.count(IMCObjectName::TargetTorque) == 1, "TargetTorque not mapped");
-
-  if (this->actuationMode == ActuationMode::position)
-  {
-    ROS_ASSERT_MSG(this->mosiByteOffsets.count(IMCObjectName::TargetPosition) == 1, "TargetPosition not mapped");
-  }
-}
-
-// Checks if the compulsory MOSI PDO objects are mapped
-void IMotionCube::validateMosiPDOs()
-{
-  ROS_ASSERT_MSG(this->mosiByteOffsets.count(IMCObjectName::ControlWord) == 1, "ControlWord not mapped");
+  PDOmap map_mosi = PDOmap();
+  map_mosi.addObject(IMCObjectName::ControlWord);  // Compulsory!
+  map_mosi.addObject(IMCObjectName::TargetPosition);
+  map_mosi.addObject(IMCObjectName::TargetTorque);
+  this->mosi_byte_offsets_ = map_mosi.map(this->slaveIndex, DataDirection::MOSI);
 }
 
 // Set configuration parameters to the IMC
-void IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
+void IMotionCube::writeInitialSettings(uint8_t cycle_time)
 {
   ROS_DEBUG("IMotionCube::writeInitialSettings");
 
-  if (this->actuationMode == ActuationMode::unknown)
-  {
-    throw std::runtime_error("Cannot write initial settings to IMotionCube as it has actuation mode of unknown");
-  }
-
   // mode of operation
-  int mode_of_op = sdo_bit8(slaveIndex, 0x6060, 0, this->actuationMode.toModeNumber());
+  int mode_of_op = sdo_bit8(slaveIndex, 0x6060, 0, this->actuation_mode_.toModeNumber());
 
   // position limit -- min position
-  int min_pos_lim = sdo_bit32(slaveIndex, 0x607D, 1, this->encoder.getLowerSoftLimitIU());
+  int min_pos_lim = sdo_bit32(slaveIndex, 0x607D, 1, this->encoder_.getLowerSoftLimitIU());
 
   // position limit -- max position
-  int max_pos_lim = sdo_bit32(slaveIndex, 0x607D, 2, this->encoder.getUpperSoftLimitIU());
+  int max_pos_lim = sdo_bit32(slaveIndex, 0x607D, 2, this->encoder_.getUpperSoftLimitIU());
 
   // Quick stop option
   int stop_opt = sdo_bit16(slaveIndex, 0x605A, 0, 6);
@@ -101,429 +82,204 @@ void IMotionCube::writeInitialSettings(uint8 ecatCycleTime)
   int abort_con = sdo_bit16(slaveIndex, 0x6007, 0, 1);
 
   // set the ethercat rate of encoder in form x*10^y
-  int rate_ec_x = sdo_bit8(slaveIndex, 0x60C2, 1, ecatCycleTime);
+  int rate_ec_x = sdo_bit8(slaveIndex, 0x60C2, 1, cycle_time);
   int rate_ec_y = sdo_bit8(slaveIndex, 0x60C2, 2, -3);
 
   if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && stop_decl && abort_con && rate_ec_x && rate_ec_y))
   {
-    ROS_ERROR("Failed writing initial settings to IMC of slave %i", slaveIndex);
+    throw error::HardwareException(error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
+                                   "Failed writing initial settings to IMC of slave %d", this->slaveIndex);
   }
 }
 
-void IMotionCube::actuateRad(float targetRad)
+void IMotionCube::actuateRad(float target_rad)
 {
-  ROS_ASSERT_MSG(this->actuationMode == ActuationMode::position, "trying to actuate rad, while actuationmode = %s",
-                 this->actuationMode.toString().c_str());
-
-  if (std::abs(targetRad - this->getAngleRad()) > 0.393)
+  if (this->actuation_mode_ != ActuationMode::position)
   {
-    ROS_ERROR("Target %f exceeds max difference of 0.393 from current %f for slave %d", targetRad, this->getAngleRad(),
-              this->slaveIndex);
-    throw std::runtime_error("Target exceeds max difference of 0.393 from current position");
+    throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
+                                   "trying to actuate rad, while actuation mode is %s",
+                                   this->actuation_mode_.toString().c_str());
   }
-  this->actuateIU(this->encoder.RadtoIU(targetRad));
+
+  if (std::abs(target_rad - this->getAngleRad()) > MAX_TARGET_DIFFERENCE)
+  {
+    throw error::HardwareException(error::ErrorType::TARGET_EXCEEDS_MAX_DIFFERENCE,
+                                   "Target %f exceeds max difference of %f from current %f for slave %d", target_rad,
+                                   MAX_TARGET_DIFFERENCE, this->getAngleRad(), this->slaveIndex);
+  }
+  this->actuateIU(this->encoder_.RadtoIU(target_rad));
 }
 
-void IMotionCube::actuateIU(int targetIU)
+void IMotionCube::actuateIU(int target_iu)
 {
-  if (!this->encoder.isValidTargetIU(this->getAngleIU(), targetIU))
+  if (!this->encoder_.isValidTargetIU(this->getAngleIU(), target_iu))
   {
-    ROS_ERROR("Position %i is invalid for slave %d. (%d, %d)", targetIU, this->slaveIndex,
-              this->encoder.getLowerSoftLimitIU(), this->encoder.getUpperSoftLimitIU());
-    throw std::runtime_error("Invalid IU actuate command.");
+    throw error::HardwareException(error::ErrorType::INVALID_ACTUATE_POSITION,
+                                   "Position %i is invalid for slave %d. (%d, %d)", target_iu, this->slaveIndex,
+                                   this->encoder_.getLowerSoftLimitIU(), this->encoder_.getUpperSoftLimitIU());
   }
 
-  union bit32 targetPosition;
-  targetPosition.i = targetIU;
+  bit32 target_position;
+  target_position.i = target_iu;
 
-  if (this->mosiByteOffsets.count(IMCObjectName::TargetPosition) != 1)
-  {
-    ROS_WARN("TargetPosition not defined in PDO mapping, so can't do actuateIU");
-    return;
-  }
-  uint8 targetPositionLocation = this->mosiByteOffsets[IMCObjectName::TargetPosition];
+  uint8_t target_position_location = this->mosi_byte_offsets_.at(IMCObjectName::TargetPosition);
 
   ROS_DEBUG("Trying to actuate slave %d, soem location %d to targetposition %d", this->slaveIndex,
-            targetPositionLocation, targetPosition.i);
-  set_output_bit32(this->slaveIndex, targetPositionLocation, targetPosition);
+            target_position_location, target_position.i);
+  set_output_bit32(this->slaveIndex, target_position_location, target_position);
 }
 
-void IMotionCube::actuateTorque(int targetTorque)
+void IMotionCube::actuateTorque(int target_torque)
 {
-  ROS_ASSERT_MSG(this->actuationMode == ActuationMode::torque, "trying to actuate torque, while actuationmode = %s",
-                 this->actuationMode.toString().c_str());
-
-  // The targetTorque must not exceed the value of 23500 IU, this is slightly larger than the current limit of the
-  // linear joints defined in the urdf.
-  ROS_ASSERT_MSG(targetTorque < 23500, "Torque of %d is too high.", targetTorque);
-
-  union bit16 targetTorqueStruct;
-  targetTorqueStruct.i = targetTorque;
-
-  if (this->mosiByteOffsets.count(IMCObjectName::TargetTorque) != 1)
+  if (this->actuation_mode_ != ActuationMode::torque)
   {
-    ROS_WARN("TargetTorque not defined in PDO mapping, so can't do actuateTorque");
-    return;
+    throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
+                                   "trying to actuate torque, while actuation mode is %s",
+                                   this->actuation_mode_.toString().c_str());
   }
-  uint8 targetTorqueLocation = this->mosiByteOffsets[IMCObjectName::TargetTorque];
+
+  if (target_torque >= MAX_TARGET_TORQUE)
+  {
+    throw error::HardwareException(error::ErrorType::TARGET_TORQUE_EXCEEDS_MAX_TORQUE,
+                                   "Target torque of %d exceeds max torque of %d", target_torque, MAX_TARGET_TORQUE);
+  }
+
+  bit16 target_torque_struct;
+  target_torque_struct.i = target_torque;
+
+  uint8_t target_torque_location = this->mosi_byte_offsets_.at(IMCObjectName::TargetTorque);
 
   ROS_DEBUG("Trying to actuate slave %d, soem location %d with target torque %d", this->slaveIndex,
-            targetTorqueLocation, targetTorqueStruct.i);
-  set_output_bit16(this->slaveIndex, targetTorqueLocation, targetTorqueStruct);
+            target_torque_location, target_torque_struct.i);
+  set_output_bit16(this->slaveIndex, target_torque_location, target_torque_struct);
 }
 
 float IMotionCube::getAngleRad()
 {
-  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO "
-                                                                                  "mapping, so can't get angle");
   if (!IMotionCubeTargetState::SWITCHED_ON.isReached(this->getStatusWord()) &&
       !IMotionCubeTargetState::OPERATION_ENABLED.isReached(this->getStatusWord()))
   {
     ROS_WARN_THROTTLE(10, "Invalid use of encoders, you're not in the correct state.");
   }
-  return this->encoder.getAngleRad(this->misoByteOffsets[IMCObjectName::ActualPosition]);
+  return this->encoder_.getAngleRad(this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
 }
 
 float IMotionCube::getTorque()
 {
-  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualTorque) == 1, "ActualTorque not defined in PDO "
-                                                                                "mapping, so can't get torque");
-  union bit16 return_byte = get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::ActualTorque]);
+  bit16 return_byte = get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::ActualTorque));
   ROS_DEBUG("Actual Torque read: %d", return_byte.i);
   return return_byte.i;
 }
 
 int IMotionCube::getAngleIU()
 {
-  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO "
-                                                                                  "mapping, so can't get angle");
-  return this->encoder.getAngleIU(this->misoByteOffsets[IMCObjectName::ActualPosition]);
+  return this->encoder_.getAngleIU(this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
 }
 
-uint16 IMotionCube::getStatusWord()
+uint16_t IMotionCube::getStatusWord()
 {
-  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::StatusWord) == 1, "StatusWord not defined in PDO "
-                                                                              "mapping, so can't get status word");
-  return get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::StatusWord]).ui;
+  return get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::StatusWord)).ui;
 }
 
-uint16 IMotionCube::getMotionError()
+uint16_t IMotionCube::getMotionError()
 {
-  if (this->misoByteOffsets.count(IMCObjectName::MotionErrorRegister) != 1)
-  {
-    ROS_WARN("MotionErrorRegister not defined in PDO mapping, so can't read it");
-    return 0xFFFF;  // Not fatal, so can return
-  }
-  return get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::MotionErrorRegister]).ui;
+  return get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::MotionErrorRegister)).ui;
 }
 
-uint16 IMotionCube::getDetailedError()
+uint16_t IMotionCube::getDetailedError()
 {
-  if (this->misoByteOffsets.count(IMCObjectName::DetailedErrorRegister) != 1)
-  {
-    ROS_WARN("DetailedErrorRegister not defined in PDO mapping, so can't read it");
-    return 0xFFFF;  // Not fatal, so can return
-  }
-  return get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::DetailedErrorRegister]).ui;
+  return get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::DetailedErrorRegister)).ui;
 }
 
 float IMotionCube::getMotorCurrent()
 {
   const float PEAK_CURRENT = 40.0;            // Peak current of iMC drive
   const float IU_CONVERSION_CONST = 65520.0;  // Conversion parameter, see Technosoft CoE programming manual
-  if (this->misoByteOffsets.count(IMCObjectName::ActualTorque) != 1)
-  {
-    ROS_WARN("ActualTorque not defined in PDO mapping, so can't read it");
-    return 0xFFFF;  // Not fatal, so can return
-  }
-  int16_t motorCurrentIU = get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::ActualTorque]).i;
-  float motorCurrentA = (2.0 * PEAK_CURRENT / IU_CONVERSION_CONST) *
-                        motorCurrentIU;  // Conversion to Amp, see Technosoft CoE programming manual
-  return motorCurrentA;
+
+  int16_t motor_current_iu =
+      get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::ActualTorque)).i;
+  return (2.0f * PEAK_CURRENT / IU_CONVERSION_CONST) *
+         static_cast<float>(motor_current_iu);  // Conversion to Amp, see Technosoft CoE programming manual
 }
 
 float IMotionCube::getMotorVoltage()
 {
   const float V_DC_MAX_MEASURABLE = 102.3;    // maximum measurable DC voltage found in EMS Setup/Drive info button
   const float IU_CONVERSION_CONST = 65520.0;  // Conversion parameter, see Technosoft CoE programming manual
-  if (this->misoByteOffsets.count(IMCObjectName::DCLinkVoltage) != 1)
-  {
-    ROS_WARN("DC-link Voltage not defined in PDO mapping, so can't read it");
-    return 0xFFFF;  // Not fatal, so can return
-  }
-  uint16_t motorVoltageIU = get_input_bit16(this->slaveIndex, this->misoByteOffsets[IMCObjectName::DCLinkVoltage]).ui;
-  float motorVoltageV = (V_DC_MAX_MEASURABLE / IU_CONVERSION_CONST) *
-                        motorVoltageIU;  // Conversion to Volt, see Technosoft CoE programming manual
-  return motorVoltageV;
+
+  uint16_t motor_voltage_iu =
+      get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::DCLinkVoltage)).ui;
+  return (V_DC_MAX_MEASURABLE / IU_CONVERSION_CONST) *
+         static_cast<float>(motor_voltage_iu);  // Conversion to Volt, see Technosoft CoE programming manual
 }
 
-void IMotionCube::setControlWord(uint16 controlWord)
+void IMotionCube::setControlWord(uint16_t control_word)
 {
-  if (this->mosiByteOffsets.count(IMCObjectName::ControlWord) != 1)
-  {
-    ROS_FATAL("ControlWord not defined in PDO mapping, so can't set Control Word");
-    throw std::exception();
-  }
-  union bit16 controlwordu;
-  controlwordu.i = controlWord;
-  set_output_bit16(slaveIndex, this->mosiByteOffsets[IMCObjectName::ControlWord], controlwordu);
+  bit16 controlwordu;
+  controlwordu.i = control_word;
+  set_output_bit16(slaveIndex, this->mosi_byte_offsets_.at(IMCObjectName::ControlWord), controlwordu);
 }
 
-std::string IMotionCube::parseStatusWord(uint16 statusWord)
+void IMotionCube::goToTargetState(IMotionCubeTargetState target_state)
 {
-  std::string wordDescription = "";
-  if (get_bit(statusWord, 0) == 1)
+  ROS_DEBUG("\tTry to go to '%s'", target_state.getDescription().c_str());
+  while (!target_state.isReached(this->getStatusWord()))
   {
-    wordDescription += "Axis on. Power stage is enabled. Motor control is performed. ";
-  }
-  else
-  {
-    wordDescription += "Axis off. Power stage is disabled. Motor control is not performed. ";
-  }
-  if (get_bit(statusWord, 2) == 1)
-  {
-    wordDescription += "Operation Enabled. ";
-  }
-  if (get_bit(statusWord, 3) == 1)
-  {
-    wordDescription += "Fault. If set, a fault condition is or was present in the drive. ";
-  }
-  if (get_bit(statusWord, 4) == 1)
-  {
-    wordDescription += "Motor supply voltage is present. ";
-  }
-  else
-  {
-    wordDescription += "Motor supply voltage is absent. ";
-  }
-  if (get_bit(statusWord, 5) == 0)
-  {
-    wordDescription += "Quick Stop. When this bit is zero, the drive is performing a quick stop. ";
-  }
-  if (get_bit(statusWord, 6) == 1)
-  {
-    wordDescription += "Switch On Disabled. ";
-  }
-  if (get_bit(statusWord, 7) == 1)
-  {
-    wordDescription += "A TML function  was called, while another TML function is still in execution. ";
-  }
-  if (get_bit(statusWord, 8) == 1)
-  {
-    wordDescription += "A TML function or homing is executed. ";
-  }
-  if (get_bit(statusWord, 9) == 1)
-  {
-    wordDescription += "Remote - drive parameters may be modified via CAN. ";
-  }
-  else
-  {
-    wordDescription += "Remote - drive is in local mode and will not execute the command message. ";
-  }
-  if (get_bit(statusWord, 10) == 1)
-  {
-    wordDescription += "Target reached. ";
-  }
-  if (get_bit(statusWord, 11) == 1)
-  {
-    wordDescription += "Internal Limit Active. ";
-  }
-  if (get_bit(statusWord, 12) == 0)
-  {
-    wordDescription += "Target position ignored. ";
-  }
-  if (get_bit(statusWord, 13) == 1)
-  {
-    wordDescription += "Following error. ";
-  }
-  if (get_bit(statusWord, 14) == 1)
-  {
-    wordDescription += "Last event set has occurred. ";
-  }
-  else
-  {
-    wordDescription += "No event set or the programmed event has not occurred yet. ";
-  }
-  if (get_bit(statusWord, 15) == 1)
-  {
-    wordDescription += "Axis on. Power stage is enabled. Motor control is performed. ";
-  }
-  else
-  {
-    wordDescription += "Axis off. Power stage is disabled. Motor control is not performed. ";
-  }
-}
-
-IMCState IMotionCube::getState(uint16 statusWord)
-{
-  uint16 fiveBitMask = 0b0000000001001111;
-  uint16 sixBitMask = 0b0000000001101111;
-
-  uint16 notReadyToSwitchOn = 0b0000000000000000;
-  uint16 switchOnDisabled = 0b0000000001000000;
-  uint16 readyToSwitchOn = 0b0000000000100001;
-  uint16 switchedOn = 0b0000000000100011;
-  uint16 operationEnabled = 0b0000000000100111;
-  uint16 quickStopActive = 0b0000000000000111;
-  uint16 faultReactionActive = 0b0000000000001111;
-  uint16 fault = 0b0000000000001000;
-
-  uint16 statusWordFiveBitMasked = (statusWord & fiveBitMask);
-  uint16 statusWordSixBitMasked = (statusWord & sixBitMask);
-
-  if (statusWordFiveBitMasked == notReadyToSwitchOn)
-  {
-    return IMCState::notReadyToSwitchOn;
-  }
-  else if (statusWordFiveBitMasked == switchOnDisabled)
-  {
-    return IMCState::switchOnDisabled;
-  }
-  else if (statusWordSixBitMasked == readyToSwitchOn)
-  {
-    return IMCState::readyToSwitchOn;
-  }
-  else if (statusWordSixBitMasked == switchedOn)
-  {
-    return IMCState::switchedOn;
-  }
-  else if (statusWordSixBitMasked == operationEnabled)
-  {
-    return IMCState::operationEnabled;
-  }
-  else if (statusWordSixBitMasked == quickStopActive)
-  {
-    return IMCState::quickStopActive;
-  }
-  else if (statusWordFiveBitMasked == faultReactionActive)
-  {
-    return IMCState::faultReactionActive;
-  }
-  else if (statusWordFiveBitMasked == fault)
-  {
-    return IMCState::fault;
-  }
-  else
-  {
-    return IMCState::unknown;
-  }
-}
-
-std::string IMotionCube::parseMotionError(uint16 motionError)
-{
-  std::vector<std::string> bitDescriptions = {};
-  bitDescriptions.push_back("EtherCAT communication error. ");
-  bitDescriptions.push_back("Short-circuit. ");
-  bitDescriptions.push_back("Invalid setup (EEPROM) data. ");
-  bitDescriptions.push_back("Control error (position/speed error too big). ");
-  bitDescriptions.push_back("Communication error. ");
-  bitDescriptions.push_back("Motor position wraps around. ");
-  bitDescriptions.push_back("Positive limit switch. ");
-  bitDescriptions.push_back("Negative limit switch. ");
-  bitDescriptions.push_back("Over-current. ");
-  bitDescriptions.push_back("I2T protection. ");
-  bitDescriptions.push_back("Over-temperature motor. ");
-  bitDescriptions.push_back("Over-temperature drive. ");
-  bitDescriptions.push_back("Over-voltage. ");
-  bitDescriptions.push_back("Under-voltage. ");
-  bitDescriptions.push_back("Command error. ");
-  bitDescriptions.push_back("Drive disabled (Emergency button connector not shorted). ");
-
-  std::string errorDescription = "";
-  for (int i = 0; i < 16; i++)
-  {
-    if (get_bit(motionError, i) == 1)
-    {
-      errorDescription = errorDescription + bitDescriptions.at(i);
-    }
-  }
-  return errorDescription;
-}
-
-std::string IMotionCube::parseDetailedError(uint16 detailedError)
-{
-  std::vector<std::string> bitDescriptions = {};
-  bitDescriptions.push_back("TML stack overflow. ");
-  bitDescriptions.push_back("TML stack underflow. ");
-  bitDescriptions.push_back("Homing not available. ");
-  bitDescriptions.push_back("Function not available. ");
-  bitDescriptions.push_back("UPD ignored. ");
-  bitDescriptions.push_back("Cancelable call ignored. ");
-  bitDescriptions.push_back("Positive software limit switch is active. ");
-  bitDescriptions.push_back("Negative software limit switch is active. ");
-  bitDescriptions.push_back("Invalid S-curve profile. ");
-
-  std::string errorDescription = "";
-  for (int i = 0; i < 9; i++)
-  {
-    if (get_bit(detailedError, i) == 1)
-    {
-      errorDescription = errorDescription + bitDescriptions.at(i);
-    }
-  }
-  return errorDescription;
-}
-
-bool IMotionCube::goToTargetState(IMotionCubeTargetState targetState)
-{
-  ROS_DEBUG("\tTry to go to '%s'", targetState.getDescription().c_str());
-  while (!targetState.isReached(this->getStatusWord()))
-  {
-    this->setControlWord(targetState.getControlWord());
-    ROS_INFO_DELAYED_THROTTLE(5, "\tWaiting for '%s': %s", targetState.getDescription().c_str(),
+    this->setControlWord(target_state.getControlWord());
+    ROS_INFO_DELAYED_THROTTLE(5, "\tWaiting for '%s': %s", target_state.getDescription().c_str(),
                               std::bitset<16>(this->getStatusWord()).to_string().c_str());
-    if (targetState.getState() == IMotionCubeTargetState::OPERATION_ENABLED.getState() &&
-        this->getState(this->getStatusWord()) == IMCState::fault)
+    if (target_state.getState() == IMotionCubeTargetState::OPERATION_ENABLED.getState() &&
+        IMCState(this->getStatusWord()) == IMCState::FAULT)
     {
       ROS_FATAL("IMotionCube went to fault state while attempting to go to '%s'. Shutting down.",
-                targetState.getDescription().c_str());
-      ROS_FATAL("Detailed Error: %s", this->parseDetailedError(this->getDetailedError()).c_str());
-      ROS_FATAL("Motion Error: %s", this->parseMotionError(this->getMotionError()).c_str());
+                target_state.getDescription().c_str());
+      ROS_FATAL("Detailed Error: %s", error::parseDetailedError(this->getDetailedError()).c_str());
+      ROS_FATAL("Motion Error: %s", error::parseMotionError(this->getMotionError()).c_str());
       throw std::domain_error("IMC to fault state");
     }
   }
-  ROS_DEBUG("\tReached '%s'!", targetState.getDescription().c_str());
+  ROS_DEBUG("\tReached '%s'!", target_state.getDescription().c_str());
 }
 
-bool IMotionCube::goToOperationEnabled()
+void IMotionCube::goToOperationEnabled()
 {
   this->setControlWord(128);
 
   this->goToTargetState(IMotionCubeTargetState::SWITCH_ON_DISABLED);
   this->goToTargetState(IMotionCubeTargetState::READY_TO_SWITCH_ON);
   this->goToTargetState(IMotionCubeTargetState::SWITCHED_ON);
-  // If ActualPosition is not defined in PDOmapping, a fatal error is thrown
-  // because of safety reasons
-  ROS_ASSERT_MSG(this->misoByteOffsets.count(IMCObjectName::ActualPosition) == 1, "ActualPosition not defined in PDO "
-                                                                                  "mapping, so can't get angle");
 
-  int angleRead = this->getAngleIU();
+  const int angle = this->getAngleIU();
   //  If the encoder is functioning correctly and the joint is not outside hardlimits, move the joint to its current
   //  position. Otherwise shutdown
-  if (abs(angleRead) <= 2)
+  if (abs(angle) <= 2)
   {
-    ROS_FATAL("Encoder of IMotionCube with slaveIndex %d has reset. Read angle %d IU", this->slaveIndex, angleRead);
-    throw std::domain_error("Encoder reset");
+    throw error::HardwareException(error::ErrorType::ENCODER_RESET,
+                                   "Encoder of IMotionCube with slave index %d has reset. Read angle %d IU",
+                                   this->slaveIndex, angle);
   }
-  else if (!this->encoder.isWithinHardLimitsIU(angleRead))
+  else if (!this->encoder_.isWithinHardLimitsIU(angle))
   {
-    ROS_FATAL("Joint with slaveIndex %d is outside hard limits (read value %d IU, limits from %d IU to %d IU)",
-              this->slaveIndex, angleRead, this->encoder.getLowerHardLimitIU(), this->encoder.getUpperHardLimitIU());
-    throw std::domain_error("Joint outside hard limits");
+    throw error::HardwareException(error::ErrorType::OUTSIDE_HARD_LIMITS,
+                                   "Joint with slave index %d is outside hard limits (read value %d IU, limits from %d "
+                                   "IU to %d IU)",
+                                   this->slaveIndex, angle, this->encoder_.getLowerHardLimitIU(),
+                                   this->encoder_.getUpperHardLimitIU());
   }
 
-  if (this->actuationMode == ActuationMode::position)
+  if (this->actuation_mode_ == ActuationMode::position)
   {
-    this->actuateIU(angleRead);
+    this->actuateIU(angle);
   }
-  if (this->actuationMode == ActuationMode::torque)
+  if (this->actuation_mode_ == ActuationMode::torque)
   {
     this->actuateTorque(0);
   }
+
   this->goToTargetState(IMotionCubeTargetState::OPERATION_ENABLED);
 }
 
-bool IMotionCube::resetIMotionCube()
+void IMotionCube::resetIMotionCube()
 {
   this->setControlWord(0);
   ROS_DEBUG("Slave: %d, Try to reset IMC", this->slaveIndex);
@@ -532,20 +288,6 @@ bool IMotionCube::resetIMotionCube()
 
 ActuationMode IMotionCube::getActuationMode() const
 {
-  return this->actuationMode;
-}
-
-void IMotionCube::setActuationMode(ActuationMode mode)
-{
-  if (this->actuationMode != ActuationMode::unknown)
-  {
-    throw std::runtime_error("Cannot change actuation mode at runtime");
-  }
-  this->actuationMode = mode;
-}
-
-bool IMotionCube::get_bit(uint16 value, int index)
-{
-  return static_cast<bool>(value & (1 << index));
+  return this->actuation_mode_;
 }
 }  // namespace march

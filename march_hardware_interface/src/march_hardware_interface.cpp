@@ -453,7 +453,7 @@ void MarchHardwareInterface::iMotionCubeStateCheck(int joint_index)
 {
   {
     march::IMotionCubeState iMotionCubeState = marchRobot.getJoint(joint_names_[joint_index]).getIMotionCubeState();
-    if (iMotionCubeState.state == march::IMCState::fault)
+    if (iMotionCubeState.state == march::IMCState::FAULT)
     {
       std::ostringstream errorStream;
       errorStream << "IMotionCube of joint " << joint_names_[joint_index].c_str() << " is in fault state "
