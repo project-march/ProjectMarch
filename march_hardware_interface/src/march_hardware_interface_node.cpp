@@ -4,6 +4,8 @@
 #include <controller_manager/controller_manager.h>
 #include <ros/ros.h>
 
+#include <march_hardware/error/hardware_exception.h>
+
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "march_hardware_interface");
@@ -30,6 +32,11 @@ int main(int argc, char** argv)
       return 1;
     }
   }
+  catch (const march::error::HardwareException& e)
+  {
+    ROS_FATAL_STREAM(e);
+    return 1;
+  }
   catch (const std::exception& e)
   {
     ROS_FATAL("Hardware interface caught an exception during init: %s", e.what());
@@ -51,6 +58,11 @@ int main(int argc, char** argv)
       controller_manager.update(now, rate.expectedCycleTime());
       march.write(now, rate.expectedCycleTime());
       rate.sleep();
+    }
+    catch (const march::error::HardwareException& e)
+    {
+      ROS_FATAL_STREAM(e);
+      return 1;
     }
     catch (const std::exception& e)
     {

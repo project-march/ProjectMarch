@@ -1,14 +1,7 @@
 // Copyright 2019 Project March.
 #include <vector>
 #include <gtest/gtest.h>
-#include <ros/ros.h>
-#include <gmock/gmock.h>
-#include <ros/package.h>
-#include <march_hardware_builder/hardware_config_exceptions.h>
 #include <march_hardware_builder/hardware_builder.h>
-
-using ::testing::AtLeast;
-using ::testing::Return;
 
 TEST(AllowedRobotTest, TestMarch4Creation)
 {
@@ -35,42 +28,30 @@ TEST(AllowedRobotTest, TestMarch3Values)
   march::Encoder RAJenc = march::Encoder(12, 1086, 1490, 1301, 0.005);
   march::Encoder LAJenc = march::Encoder(12, 631, 1022, 918, 0.005);
 
-  march::IMotionCube LHJimc = march::IMotionCube(3, LHJenc);
-  march::IMotionCube LKJimc = march::IMotionCube(5, LKJenc);
-  march::IMotionCube LAJimc = march::IMotionCube(7, LAJenc);
-  march::IMotionCube RHJimc = march::IMotionCube(8, RHJenc);
-  march::IMotionCube RKJimc = march::IMotionCube(10, RKJenc);
-  march::IMotionCube RAJimc = march::IMotionCube(12, RAJenc);
+  march::IMotionCube LHJimc = march::IMotionCube(3, LHJenc, march::ActuationMode::position);
+  march::IMotionCube LKJimc = march::IMotionCube(5, LKJenc, march::ActuationMode::position);
+  march::IMotionCube LAJimc = march::IMotionCube(7, LAJenc, march::ActuationMode::position);
+  march::IMotionCube RHJimc = march::IMotionCube(8, RHJenc, march::ActuationMode::position);
+  march::IMotionCube RKJimc = march::IMotionCube(10, RKJenc, march::ActuationMode::position);
+  march::IMotionCube RAJimc = march::IMotionCube(12, RAJenc, march::ActuationMode::position);
 
-  march::Joint leftHip;
+  march::Joint leftHip(LHJimc);
   leftHip.setName("left_hip");
-  leftHip.setIMotionCube(LHJimc);
-  leftHip.setActuationMode(march::ActuationMode("position"));
 
-  march::Joint leftKnee;
+  march::Joint leftKnee(LKJimc);
   leftKnee.setName("left_knee");
-  leftKnee.setIMotionCube(LKJimc);
-  leftKnee.setActuationMode(march::ActuationMode("position"));
 
-  march::Joint leftAnkle;
+  march::Joint leftAnkle(LAJimc);
   leftAnkle.setName("left_ankle");
-  leftAnkle.setIMotionCube(LAJimc);
-  leftAnkle.setActuationMode(march::ActuationMode("position"));
 
-  march::Joint rightHip;
+  march::Joint rightHip(RHJimc);
   rightHip.setName("right_hip");
-  rightHip.setIMotionCube(RHJimc);
-  rightHip.setActuationMode(march::ActuationMode("position"));
 
-  march::Joint rightKnee;
+  march::Joint rightKnee(RKJimc);
   rightKnee.setName("right_knee");
-  rightKnee.setIMotionCube(RKJimc);
-  rightKnee.setActuationMode(march::ActuationMode("position"));
 
-  march::Joint rightAnkle;
+  march::Joint rightAnkle(RAJimc);
   rightAnkle.setName("right_ankle");
-  rightAnkle.setIMotionCube(RAJimc);
-  rightAnkle.setActuationMode(march::ActuationMode("position"));
 
   std::vector<march::Joint> jointList;
 
@@ -81,9 +62,9 @@ TEST(AllowedRobotTest, TestMarch3Values)
   jointList.push_back(rightAnkle);
   jointList.push_back(leftAnkle);
 
-  for (unsigned int i = 0; i < jointList.size(); i++)
+  for (march::Joint& joint : jointList)
   {
-    jointList.at(i).setAllowActuation(true);
+    joint.setAllowActuation(true);
   }
 
   march::MarchRobot actualRobot = march::MarchRobot(jointList, "enp3s0", 4);
