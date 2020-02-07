@@ -22,8 +22,8 @@ using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::SoftJointLimits;
 using march::Joint;
 
-MarchHardwareInterface::MarchHardwareInterface(AllowedRobot robotName)
-  : march_robot_(HardwareBuilder(robotName).createMarchRobot())
+MarchHardwareInterface::MarchHardwareInterface(march::MarchRobot robot)
+  : march_robot_(std::move(robot))
 {
 }
 

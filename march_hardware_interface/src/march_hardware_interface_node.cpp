@@ -5,6 +5,7 @@
 #include <ros/ros.h>
 
 #include <march_hardware/error/hardware_exception.h>
+#include <march_hardware_builder/hardware_builder.h>
 
 int main(int argc, char** argv)
 {
@@ -22,7 +23,8 @@ int main(int argc, char** argv)
 
   spinner.start();
 
-  MarchHardwareInterface march(selected_robot);
+  HardwareBuilder builder(selected_robot);
+  MarchHardwareInterface march(builder.createMarchRobot());
 
   try
   {
