@@ -23,8 +23,8 @@ using joint_limits_interface::SoftJointLimits;
 using march::Joint;
 
 MarchHardwareInterface::MarchHardwareInterface(march::MarchRobot robot)
-  : march_robot_(std::move(robot)),
-    has_power_distribution_board_(march_robot_.getPowerDistributionBoard()->getSlaveIndex() != -1)
+  : march_robot_(std::move(robot))
+  , has_power_distribution_board_(march_robot_.getPowerDistributionBoard()->getSlaveIndex() != -1)
 {
 }
 
