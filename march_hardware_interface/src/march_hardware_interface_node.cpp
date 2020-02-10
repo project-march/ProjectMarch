@@ -1,8 +1,11 @@
 // Copyright 2019 Project March.
+#include "march_hardware_interface/march_hardware_interface.h"
+
+#include <controller_manager/controller_manager.h>
 #include <ros/ros.h>
-#include <sstream>
-#include <march_hardware_interface/march_hardware_interface.h>
+
 #include <march_hardware/error/hardware_exception.h>
+#include <march_hardware_builder/hardware_builder.h>
 
 int main(int argc, char** argv)
 {
@@ -20,11 +23,16 @@ int main(int argc, char** argv)
 
   spinner.start();
 
-  MarchHardwareInterface march(nh, selected_robot);
+  HardwareBuilder builder(selected_robot);
+  MarchHardwareInterface march(builder.createMarchRobot());
 
   try
   {
-    march.init();
+    bool success = march.init(nh, nh);
+    if (!success)
+    {
+      return 1;
+    }
   }
   catch (const march::error::HardwareException& e)
   {
@@ -40,11 +48,17 @@ int main(int argc, char** argv)
   const double loop_hz = ros::param::param("~loop_hz", 100.0);
   ros::Rate rate(loop_hz);
 
+  controller_manager::ControllerManager controller_manager(&march, nh);
+
   while (ros::ok())
   {
+    const ros::Time now = ros::Time::now();
     try
     {
-      march.update(rate.expectedCycleTime());
+      march.read(now, rate.expectedCycleTime());
+      march.validate();
+      controller_manager.update(now, rate.expectedCycleTime());
+      march.write(now, rate.expectedCycleTime());
       rate.sleep();
     }
     catch (const march::error::HardwareException& e)

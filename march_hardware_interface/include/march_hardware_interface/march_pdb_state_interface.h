@@ -17,16 +17,14 @@ public:
       bool* master_shutdown_allowed_command, bool* all_high_voltage_on_off_command,
       PowerNetOnOffCommand* power_net_on_off_command)
     : name_(name)
-    , powerDistributionBoard_(powerDistributionBoard)
     , master_shutdown_allowed_command_(master_shutdown_allowed_command)
     , all_high_voltage_on_off_command_(all_high_voltage_on_off_command)
     , power_net_on_off_command_(power_net_on_off_command)
+    , powerDistributionBoard_(powerDistributionBoard)
   {
   }
 
-  MarchPdbStateHandle()
-  {
-  }
+  MarchPdbStateHandle() = default;
 
   std::string getName() const
   {
