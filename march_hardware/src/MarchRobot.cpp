@@ -17,19 +17,17 @@
 namespace march
 {
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int ecatCycleTime)
+  : jointList(std::move(jointList))
+  , ethercatMaster(EthercatMaster(&this->jointList, ifName, this->getMaxSlaveIndex(), ecatCycleTime))
 {
-  this->jointList = std::move(jointList);
-  this->powerDistributionBoard = std::unique_ptr<PowerDistributionBoard>(new PowerDistributionBoard());
-  ethercatMaster.reset(new EthercatMaster(&this->jointList, ifName, this->getMaxSlaveIndex(), ecatCycleTime));
 }
 
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, PowerDistributionBoard powerDistributionBoard,
                        ::std::string ifName, int ecatCycleTime)
+    : jointList(std::move(jointList))
+    , powerDistributionBoard(powerDistributionBoard)
+    , ethercatMaster(EthercatMaster(&this->jointList, ifName, this->getMaxSlaveIndex(), ecatCycleTime))
 {
-  this->jointList = std::move(jointList);
-  this->powerDistributionBoard =
-      std::unique_ptr<PowerDistributionBoard>(new PowerDistributionBoard(powerDistributionBoard));
-  ethercatMaster.reset(new EthercatMaster(&this->jointList, ifName, this->getMaxSlaveIndex(), ecatCycleTime));
 }
 
 void MarchRobot::startEtherCAT()
@@ -43,23 +41,23 @@ void MarchRobot::startEtherCAT()
 
   ROS_INFO("Slave configuration is non-conflicting");
 
-  if (ethercatMaster->isOperational)
+  if (ethercatMaster.isOperational)
   {
     ROS_ERROR("Trying to start EtherCAT while it is already active.");
     return;
   }
-  ethercatMaster->start();
+  ethercatMaster.start();
 }
 
 void MarchRobot::stopEtherCAT()
 {
-  if (!ethercatMaster->isOperational)
+  if (!ethercatMaster.isOperational)
   {
     ROS_ERROR("Trying to stop EtherCAT while it is not active.");
     return;
   }
 
-  ethercatMaster->stop();
+  ethercatMaster.stop();
 }
 
 int MarchRobot::getMaxSlaveIndex()
@@ -135,12 +133,12 @@ bool MarchRobot::hasValidSlaves()
 
 bool MarchRobot::isEthercatOperational()
 {
-  return ethercatMaster->isOperational;
+  return ethercatMaster.isOperational;
 }
 
 Joint MarchRobot::getJoint(::std::string jointName)
 {
-  if (!ethercatMaster->isOperational)
+  if (!ethercatMaster.isOperational)
   {
     ROS_WARN("Trying to access joints while ethercat is not operational. This "
              "may lead to incorrect sensor data.");
@@ -157,7 +155,12 @@ Joint MarchRobot::getJoint(::std::string jointName)
   throw ::std::runtime_error("Could not find joint with name " + jointName);
 }
 
-const std::unique_ptr<PowerDistributionBoard>& MarchRobot::getPowerDistributionBoard() const
+PowerDistributionBoard& MarchRobot::getPowerDistributionBoard()
+{
+  return powerDistributionBoard;
+}
+
+const PowerDistributionBoard& MarchRobot::getPowerDistributionBoard() const
 {
   return powerDistributionBoard;
 }

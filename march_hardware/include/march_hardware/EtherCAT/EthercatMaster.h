@@ -35,6 +35,10 @@ public:
   explicit EthercatMaster(std::vector<Joint>* jointListPtr, std::string ifname, int maxSlaveIndex, int ecatCycleTime);
   ~EthercatMaster();
 
+  EthercatMaster(const EthercatMaster&) = delete;
+  EthercatMaster& operator=(const EthercatMaster&) = delete;
+  EthercatMaster(EthercatMaster&&) = default;
+
   void start();
   void ethercatMasterInitiation();
   void ethercatSlaveInitiation();
