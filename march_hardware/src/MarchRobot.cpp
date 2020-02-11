@@ -17,8 +17,7 @@
 namespace march
 {
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int ecatCycleTime)
-  : jointList(std::move(jointList))
-  , ethercatMaster(EthercatMaster(&this->jointList, ifName, this->getMaxSlaveIndex(), ecatCycleTime))
+  : jointList(std::move(jointList)), ethercatMaster(EthercatMaster(ifName, this->getMaxSlaveIndex(), ecatCycleTime))
 {
 }
 
@@ -26,7 +25,7 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, PowerDistributionBoard po
                        ::std::string ifName, int ecatCycleTime)
   : jointList(std::move(jointList))
   , powerDistributionBoard(powerDistributionBoard)
-  , ethercatMaster(EthercatMaster(&this->jointList, ifName, this->getMaxSlaveIndex(), ecatCycleTime))
+  , ethercatMaster(EthercatMaster(ifName, this->getMaxSlaveIndex(), ecatCycleTime))
 {
 }
 
@@ -46,7 +45,7 @@ void MarchRobot::startEtherCAT()
     ROS_ERROR("Trying to start EtherCAT while it is already active.");
     return;
   }
-  ethercatMaster.start();
+  ethercatMaster.start(this->jointList);
 }
 
 void MarchRobot::stopEtherCAT()
