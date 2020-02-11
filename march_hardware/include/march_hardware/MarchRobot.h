@@ -29,10 +29,13 @@ public:
 
   ~MarchRobot();
 
+  /* Delete copy constructor/assignment since the ethercat master can not be copied */
   MarchRobot(const MarchRobot&) = delete;
   MarchRobot& operator=(const MarchRobot&) = delete;
 
+  /* Enable the move constructor and assignment */
   MarchRobot(MarchRobot&&) = default;
+  MarchRobot& operator=(MarchRobot&&) = default;
 
   void startEtherCAT();
 

@@ -35,9 +35,13 @@ public:
   explicit EthercatMaster(std::vector<Joint>* jointListPtr, std::string ifname, int maxSlaveIndex, int ecatCycleTime);
   ~EthercatMaster();
 
+  /* Delete copy constructor/assignment since the member thread can not be copied */
   EthercatMaster(const EthercatMaster&) = delete;
   EthercatMaster& operator=(const EthercatMaster&) = delete;
+
+  /* Enable the move constructor and assignment */
   EthercatMaster(EthercatMaster&&) = default;
+  EthercatMaster& operator=(EthercatMaster&&) = default;
 
   void start();
   void ethercatMasterInitiation();
