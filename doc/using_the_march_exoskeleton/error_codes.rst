@@ -145,6 +145,60 @@ or the slave does not allow writing the value to that address.
 **Fix:** Check the connection between the faulty slave and the master or
 check that you write the correct sized (8, 16, 32 bit) value to the correct address.
 
+
+.. _e109:
+
+``E109``: No socket connection
+------------------------------
+The ethercat master failed to open a raw network socket.
+
+**Cause:** This can have several causes:
+
+1. The master tries to open a socket with an ``ifname`` that does not exist.
+2. The user executing the program does not have permissions for opening a raw socket. Only root can do this.
+3. The ethernet port on the machine is not connected.
+
+**Fix:** First, make sure that you connected your machine to a slave.
+Next, check if the ``ifname`` defined in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
+has an existing socket name. You can list available sockets with
+
+.. code::
+
+  ip link show
+
+The permissions for opening raw sockets while executing the hardware interface
+are added by `ethercat_grant <https://github.com/shadow-robot/ethercat_grant>`_.
+So this should not be an issue unless you changed something very specific.
+
+
+.. _e110:
+
+``E110``: Not all slaves found
+------------------------------
+The ethercat master was not able to find all configured slaves during initialization.
+
+**Cause:** The ethercat master was not able to establish a connection with the configured amount of slaves
+in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`, because a cable is not connected or the
+configuration contains more slaves than actually connected.
+
+**Fix:** Check if all ethernet cables are correctly connected to the in- and outputs of the slaves you want to
+connect to. Finally, check if the slaves configured in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
+have the correct slave indices.
+
+
+.. _e111:
+
+``E111``: Failed to reach operational state
+-------------------------------------------
+At least one slave was not able to reach operational state.
+
+**Cause:** The connection to the slave was lost during initialization or the PDO mapping is incorrect.
+
+**Fix:** The error lists the slaves that were not able to go to operational state,
+so check the connection on those specific slaves. If you made any changes to the PDO mapping
+verify that it is correct.
+
+
 .. _e999:
 
 ``E999``: Unknown error
