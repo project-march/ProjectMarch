@@ -24,9 +24,9 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int
 
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, PowerDistributionBoard powerDistributionBoard,
                        ::std::string ifName, int ecatCycleTime)
-    : jointList(std::move(jointList))
-    , powerDistributionBoard(powerDistributionBoard)
-    , ethercatMaster(EthercatMaster(&this->jointList, ifName, this->getMaxSlaveIndex(), ecatCycleTime))
+  : jointList(std::move(jointList))
+  , powerDistributionBoard(powerDistributionBoard)
+  , ethercatMaster(EthercatMaster(&this->jointList, ifName, this->getMaxSlaveIndex(), ecatCycleTime))
 {
 }
 

@@ -361,8 +361,8 @@ void MarchHardwareInterface::updatePowerNet()
       if (march_robot_.getPowerDistributionBoard().getHighVoltage().getNetOperational(
               power_net_on_off_command_.getNetNumber()) != power_net_on_off_command_.isOnOrOff())
       {
-        march_robot_.getPowerDistributionBoard().getHighVoltage().setNetOnOff(
-            power_net_on_off_command_.isOnOrOff(), power_net_on_off_command_.getNetNumber());
+        march_robot_.getPowerDistributionBoard().getHighVoltage().setNetOnOff(power_net_on_off_command_.isOnOrOff(),
+                                                                              power_net_on_off_command_.getNetNumber());
       }
     }
     catch (std::exception& exception)
@@ -380,7 +380,7 @@ void MarchHardwareInterface::updatePowerNet()
               power_net_on_off_command_.getNetNumber()) != power_net_on_off_command_.isOnOrOff())
       {
         march_robot_.getPowerDistributionBoard().getLowVoltage().setNetOnOff(power_net_on_off_command_.isOnOrOff(),
-                                                                              power_net_on_off_command_.getNetNumber());
+                                                                             power_net_on_off_command_.getNetNumber());
       }
     }
     catch (std::exception& exception)
