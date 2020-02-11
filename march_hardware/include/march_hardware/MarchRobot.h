@@ -17,9 +17,9 @@ namespace march
 class MarchRobot
 {
 private:
+  ::std::vector<Joint> jointList;
   EthercatMaster ethercatMaster;
   PowerDistributionBoard powerDistributionBoard;
-  ::std::vector<Joint> jointList;
 
 public:
   MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int ecatCycleTime);
