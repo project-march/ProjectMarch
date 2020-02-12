@@ -24,7 +24,6 @@ class EthercatMaster
   int expectedWKC;
 
   std::thread EcatThread;
-  std::vector<Joint>* jointListPtr;
 
   int maxSlaveIndex;
   int ecatCycleTimems;
@@ -32,12 +31,20 @@ class EthercatMaster
 public:
   bool isOperational = false;
 
-  explicit EthercatMaster(std::vector<Joint>* jointListPtr, std::string ifname, int maxSlaveIndex, int ecatCycleTime);
+  explicit EthercatMaster(std::string ifname, int maxSlaveIndex, int ecatCycleTime);
   ~EthercatMaster();
 
-  void start();
+  /* Delete copy constructor/assignment since the member thread can not be copied */
+  EthercatMaster(const EthercatMaster&) = delete;
+  EthercatMaster& operator=(const EthercatMaster&) = delete;
+
+  /* Enable the move constructor and assignment */
+  EthercatMaster(EthercatMaster&&) = default;
+  EthercatMaster& operator=(EthercatMaster&&) = default;
+
+  void start(std::vector<Joint>& joints);
   void ethercatMasterInitiation();
-  void ethercatSlaveInitiation();
+  void ethercatSlaveInitiation(std::vector<Joint>& joints);
 
   void ethercatLoop();
   void SendReceivePDO();

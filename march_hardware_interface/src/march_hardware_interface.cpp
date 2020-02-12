@@ -24,7 +24,7 @@ using march::Joint;
 
 MarchHardwareInterface::MarchHardwareInterface(march::MarchRobot robot)
   : march_robot_(std::move(robot))
-  , has_power_distribution_board_(march_robot_.getPowerDistributionBoard()->getSlaveIndex() != -1)
+  , has_power_distribution_board_(this->march_robot_.getPowerDistributionBoard().getSlaveIndex() != -1)
 {
 }
 
@@ -122,9 +122,9 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
         error_stream << "Joint " << joint_names_[i].c_str() << " has no net number";
         throw std::runtime_error(error_stream.str());
       }
-      while (!march_robot_.getPowerDistributionBoard()->getHighVoltage().getNetOperational(net_number))
+      while (!march_robot_.getPowerDistributionBoard().getHighVoltage().getNetOperational(net_number))
       {
-        march_robot_.getPowerDistributionBoard()->getHighVoltage().setNetOnOff(true, net_number);
+        march_robot_.getPowerDistributionBoard().getHighVoltage().setNetOnOff(true, net_number);
         usleep(100000);
         ROS_WARN("[%s] Waiting on high voltage", joint_names_[i].c_str());
       }
@@ -185,7 +185,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
         int net_number = joint.getNetNumber();
         if (net_number != -1)
         {
-          march_robot_.getPowerDistributionBoard()->getHighVoltage().setNetOnOff(true, net_number);
+          march_robot_.getPowerDistributionBoard().getHighVoltage().setNetOnOff(true, net_number);
         }
         else
         {
@@ -254,7 +254,7 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
 
   if (has_power_distribution_board_)
   {
-    power_distribution_board_read_ = *march_robot_.getPowerDistributionBoard();
+    power_distribution_board_read_ = march_robot_.getPowerDistributionBoard();
 
     if (!power_distribution_board_read_.getHighVoltage().getHighVoltageEnabled())
     {
@@ -323,8 +323,8 @@ void MarchHardwareInterface::initiateIMC()
 
 void MarchHardwareInterface::updatePowerDistributionBoard()
 {
-  march_robot_.getPowerDistributionBoard()->setMasterOnline();
-  march_robot_.getPowerDistributionBoard()->setMasterShutDownAllowed(master_shutdown_allowed_command_);
+  march_robot_.getPowerDistributionBoard().setMasterOnline();
+  march_robot_.getPowerDistributionBoard().setMasterShutDownAllowed(master_shutdown_allowed_command_);
   updateHighVoltageEnable();
   updatePowerNet();
 }
@@ -333,12 +333,12 @@ void MarchHardwareInterface::updateHighVoltageEnable()
 {
   try
   {
-    if (march_robot_.getPowerDistributionBoard()->getHighVoltage().getHighVoltageEnabled() !=
+    if (march_robot_.getPowerDistributionBoard().getHighVoltage().getHighVoltageEnabled() !=
         enable_high_voltage_command_)
     {
-      march_robot_.getPowerDistributionBoard()->getHighVoltage().enableDisableHighVoltage(enable_high_voltage_command_);
+      march_robot_.getPowerDistributionBoard().getHighVoltage().enableDisableHighVoltage(enable_high_voltage_command_);
     }
-    else if (!march_robot_.getPowerDistributionBoard()->getHighVoltage().getHighVoltageEnabled())
+    else if (!march_robot_.getPowerDistributionBoard().getHighVoltage().getHighVoltageEnabled())
     {
       ROS_WARN_THROTTLE(2, "High voltage disabled");
     }
@@ -358,11 +358,11 @@ void MarchHardwareInterface::updatePowerNet()
   {
     try
     {
-      if (march_robot_.getPowerDistributionBoard()->getHighVoltage().getNetOperational(
+      if (march_robot_.getPowerDistributionBoard().getHighVoltage().getNetOperational(
               power_net_on_off_command_.getNetNumber()) != power_net_on_off_command_.isOnOrOff())
       {
-        march_robot_.getPowerDistributionBoard()->getHighVoltage().setNetOnOff(
-            power_net_on_off_command_.isOnOrOff(), power_net_on_off_command_.getNetNumber());
+        march_robot_.getPowerDistributionBoard().getHighVoltage().setNetOnOff(power_net_on_off_command_.isOnOrOff(),
+                                                                              power_net_on_off_command_.getNetNumber());
       }
     }
     catch (std::exception& exception)
@@ -376,11 +376,11 @@ void MarchHardwareInterface::updatePowerNet()
   {
     try
     {
-      if (march_robot_.getPowerDistributionBoard()->getLowVoltage().getNetOperational(
+      if (march_robot_.getPowerDistributionBoard().getLowVoltage().getNetOperational(
               power_net_on_off_command_.getNetNumber()) != power_net_on_off_command_.isOnOrOff())
       {
-        march_robot_.getPowerDistributionBoard()->getLowVoltage().setNetOnOff(power_net_on_off_command_.isOnOrOff(),
-                                                                              power_net_on_off_command_.getNetNumber());
+        march_robot_.getPowerDistributionBoard().getLowVoltage().setNetOnOff(power_net_on_off_command_.isOnOrOff(),
+                                                                             power_net_on_off_command_.getNetNumber());
       }
     }
     catch (std::exception& exception)

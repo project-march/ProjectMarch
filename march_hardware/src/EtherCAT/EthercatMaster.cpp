@@ -21,9 +21,7 @@
 
 namespace march
 {
-EthercatMaster::EthercatMaster(std::vector<Joint>* jointListPtr, std::string ifname, int maxSlaveIndex,
-                               int ecatCycleTime)
-  : jointListPtr(jointListPtr)
+EthercatMaster::EthercatMaster(std::string ifname, int maxSlaveIndex, int ecatCycleTime)
 {
   this->ifname = ifname;
   this->maxSlaveIndex = maxSlaveIndex;
@@ -38,10 +36,10 @@ EthercatMaster::~EthercatMaster()
 /**
  * Initiate the ethercat train and start the loop
  */
-void EthercatMaster::start()
+void EthercatMaster::start(std::vector<Joint>& joints)
 {
   EthercatMaster::ethercatMasterInitiation();
-  EthercatMaster::ethercatSlaveInitiation();
+  EthercatMaster::ethercatSlaveInitiation(joints);
 }
 
 /**
@@ -76,12 +74,12 @@ void EthercatMaster::ethercatMasterInitiation()
  * Set the found slaves to pre-operational state, configure the slaves and move to safe-operational state. If everything
  * went good move to operational state.
  */
-void EthercatMaster::ethercatSlaveInitiation()
+void EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
 {
   ROS_INFO("Request pre-operational state for all slaves");
   ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
 
-  for (auto& joint : *jointListPtr)
+  for (Joint& joint : joints)
   {
     joint.initialize(ecatCycleTimems);
   }
