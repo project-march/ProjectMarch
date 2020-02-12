@@ -42,15 +42,44 @@ public:
   EthercatMaster(EthercatMaster&&) = default;
   EthercatMaster& operator=(EthercatMaster&&) = default;
 
+  /**
+   * Initializes the ethercat train and starts a thread for the loop.
+   * @throws HardwareException If not the configured amount of slaves was found
+   *                           or they did not all reach operational state
+   */
   void start(std::vector<Joint>& joints);
+
+  /**
+   * Stops the ethercat loop and joins the thread.
+   */
+  void stop();
+
+private:
+  /**
+   * Opens the ethernet port with the given ifname and checks the amount of slaves.
+   */
   void ethercatMasterInitiation();
+
+  /**
+   * Configures the found slaves to operational state.
+   */
   void ethercatSlaveInitiation(std::vector<Joint>& joints);
 
+  /**
+   * The ethercat train PDO loop. If the working counter is lower than
+   * expected 5% of the time, the program displays an error.
+   */
   void ethercatLoop();
-  void SendReceivePDO();
-  static void monitorSlaveConnection();
 
-  void stop();
+  /**
+   * Sends the PDO and receives the working counter and check if this is lower than expected.
+   */
+  void SendReceivePDO();
+
+  /**
+   * Checks if all the slaves are connected and in operational state.
+   */
+  static void monitorSlaveConnection();
 };
 
 }  // namespace march

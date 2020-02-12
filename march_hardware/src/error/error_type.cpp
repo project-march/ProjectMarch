@@ -27,6 +27,12 @@ const char* getErrorDescription(ErrorType type)
       return "The PDO map could not fit within the registers";
     case ErrorType::WRITING_INITIAL_SETTINGS_FAILED:
       return "Failed to write initial settings to slave required for operation";
+    case ErrorType::NO_SOCKET_CONNECTION:
+      return "Failed to connect to socket";
+    case ErrorType::NOT_ALL_SLAVES_FOUND:
+      return "Not all configured slaves were able to be found";
+    case ErrorType::FAILED_TO_REACH_OPERATIONAL_STATE:
+      return "At least one slave failed to reach ethercat operational state";
     case ErrorType::UNKNOWN:
       return "Unknown error occurred. Please create/use a documented error";
   }
