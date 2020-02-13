@@ -92,7 +92,7 @@ void IMotionCube::writeInitialSettings(uint8_t cycle_time)
   }
 }
 
-void IMotionCube::actuateRad(float target_rad)
+void IMotionCube::actuateRad(double target_rad)
 {
   if (this->actuation_mode_ != ActuationMode::position)
   {
@@ -110,7 +110,7 @@ void IMotionCube::actuateRad(float target_rad)
   this->actuateIU(this->encoder_.RadtoIU(target_rad));
 }
 
-void IMotionCube::actuateIU(int target_iu)
+void IMotionCube::actuateIU(int32_t target_iu)
 {
   if (!this->encoder_.isValidTargetIU(this->getAngleIU(), target_iu))
   {
@@ -119,8 +119,7 @@ void IMotionCube::actuateIU(int target_iu)
                                    this->encoder_.getLowerSoftLimitIU(), this->encoder_.getUpperSoftLimitIU());
   }
 
-  bit32 target_position;
-  target_position.i = target_iu;
+  bit32 target_position = { .i = target_iu };
 
   uint8_t target_position_location = this->mosi_byte_offsets_.at(IMCObjectName::TargetPosition);
 
@@ -129,7 +128,7 @@ void IMotionCube::actuateIU(int target_iu)
   set_output_bit32(this->slaveIndex, target_position_location, target_position);
 }
 
-void IMotionCube::actuateTorque(int target_torque)
+void IMotionCube::actuateTorque(int16_t target_torque)
 {
   if (this->actuation_mode_ != ActuationMode::torque)
   {
@@ -144,8 +143,7 @@ void IMotionCube::actuateTorque(int target_torque)
                                    "Target torque of %d exceeds max torque of %d", target_torque, MAX_TARGET_TORQUE);
   }
 
-  bit16 target_torque_struct;
-  target_torque_struct.i = target_torque;
+  bit16 target_torque_struct = { .i = target_torque };
 
   uint8_t target_torque_location = this->mosi_byte_offsets_.at(IMCObjectName::TargetTorque);
 
@@ -154,7 +152,7 @@ void IMotionCube::actuateTorque(int target_torque)
   set_output_bit16(this->slaveIndex, target_torque_location, target_torque_struct);
 }
 
-float IMotionCube::getAngleRad()
+double IMotionCube::getAngleRad()
 {
   if (!IMotionCubeTargetState::SWITCHED_ON.isReached(this->getStatusWord()) &&
       !IMotionCubeTargetState::OPERATION_ENABLED.isReached(this->getStatusWord()))
@@ -164,14 +162,14 @@ float IMotionCube::getAngleRad()
   return this->encoder_.getAngleRad(this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
 }
 
-float IMotionCube::getTorque()
+int16_t IMotionCube::getTorque()
 {
   bit16 return_byte = get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::ActualTorque));
   ROS_DEBUG("Actual Torque read: %d", return_byte.i);
   return return_byte.i;
 }
 
-int IMotionCube::getAngleIU()
+int32_t IMotionCube::getAngleIU()
 {
   return this->encoder_.getAngleIU(this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
 }
@@ -215,9 +213,8 @@ float IMotionCube::getMotorVoltage()
 
 void IMotionCube::setControlWord(uint16_t control_word)
 {
-  bit16 controlwordu;
-  controlwordu.i = control_word;
-  set_output_bit16(slaveIndex, this->mosi_byte_offsets_.at(IMCObjectName::ControlWord), controlwordu);
+  bit16 control_word_ui = { .ui = control_word };
+  set_output_bit16(slaveIndex, this->mosi_byte_offsets_.at(IMCObjectName::ControlWord), control_word_ui);
 }
 
 void IMotionCube::goToTargetState(IMotionCubeTargetState target_state)

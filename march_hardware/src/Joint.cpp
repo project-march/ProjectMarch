@@ -44,7 +44,7 @@ void Joint::resetIMotionCube()
   this->iMotionCube.resetIMotionCube();
 }
 
-void Joint::actuateRad(float targetPositionRad)
+void Joint::actuateRad(double targetPositionRad)
 {
   ROS_ASSERT_MSG(this->allowActuation,
                  "Joint %s is not allowed to actuate, "
@@ -55,7 +55,7 @@ void Joint::actuateRad(float targetPositionRad)
   this->iMotionCube.actuateRad(targetPositionRad);
 }
 
-float Joint::getAngleRad()
+double Joint::getAngleRad()
 {
   if (!hasIMotionCube())
   {
@@ -65,7 +65,7 @@ float Joint::getAngleRad()
   return this->iMotionCube.getAngleRad();
 }
 
-void Joint::actuateTorque(int targetTorque)
+void Joint::actuateTorque(int16_t targetTorque)
 {
   ROS_ASSERT_MSG(this->allowActuation,
                  "Joint %s is not allowed to actuate, "
@@ -74,7 +74,7 @@ void Joint::actuateTorque(int targetTorque)
   this->iMotionCube.actuateTorque(targetTorque);
 }
 
-float Joint::getTorque()
+int16_t Joint::getTorque()
 {
   if (!hasIMotionCube())
   {
@@ -84,7 +84,7 @@ float Joint::getTorque()
   return this->iMotionCube.getTorque();
 }
 
-int Joint::getAngleIU()
+int32_t Joint::getAngleIU()
 {
   if (!hasIMotionCube())
   {

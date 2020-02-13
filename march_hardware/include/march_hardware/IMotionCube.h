@@ -24,9 +24,9 @@ public:
 
   void writeInitialSDOs(int cycle_time) override;
 
-  float getAngleRad();
-  float getTorque();
-  int getAngleIU();
+  double getAngleRad();
+  int16_t getTorque();
+  int32_t getAngleIU();
 
   uint16_t getStatusWord();
   uint16_t getMotionError();
@@ -39,8 +39,8 @@ public:
 
   void setControlWord(uint16_t control_word);
 
-  void actuateRad(float target_rad);
-  void actuateTorque(int target_torque);
+  void actuateRad(double target_rad);
+  void actuateTorque(int16_t target_torque);
 
   void goToTargetState(IMotionCubeTargetState target_state);
   void goToOperationEnabled();
@@ -58,13 +58,13 @@ public:
               << "encoder: " << imc.encoder_;
   }
 
-  constexpr static float MAX_TARGET_DIFFERENCE = 0.393;
+  constexpr static double MAX_TARGET_DIFFERENCE = 0.393;
   // This value is slightly larger than the current limit of the
   // linear joints defined in the URDF.
-  const static int MAX_TARGET_TORQUE = 23500;
+  const static int16_t MAX_TARGET_TORQUE = 23500;
 
 private:
-  void actuateIU(int target_iu);
+  void actuateIU(int32_t target_iu);
 
   void mapMisoPDOs();
   void mapMosiPDOs();
@@ -73,8 +73,8 @@ private:
   Encoder encoder_;
   ActuationMode actuation_mode_;
 
-  std::unordered_map<IMCObjectName, int> miso_byte_offsets_;
-  std::unordered_map<IMCObjectName, int> mosi_byte_offsets_;
+  std::unordered_map<IMCObjectName, uint8_t> miso_byte_offsets_;
+  std::unordered_map<IMCObjectName, uint8_t> mosi_byte_offsets_;
 };
 
 }  // namespace march

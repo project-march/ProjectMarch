@@ -46,7 +46,7 @@ public:
     }
   }
 
-  int toModeNumber()
+  uint8_t toModeNumber()
   {
     if (this->value_ == position)
     {

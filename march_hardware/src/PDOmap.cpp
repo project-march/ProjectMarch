@@ -49,7 +49,7 @@ void PDOmap::addObject(IMCObjectName object_name)
   }
 }
 
-std::unordered_map<IMCObjectName, int> PDOmap::map(int slave_index, DataDirection direction)
+std::unordered_map<IMCObjectName, uint8_t> PDOmap::map(int slave_index, DataDirection direction)
 {
   switch (direction)
   {
@@ -60,13 +60,14 @@ std::unordered_map<IMCObjectName, int> PDOmap::map(int slave_index, DataDirectio
   }
 }
 
-std::unordered_map<IMCObjectName, int> PDOmap::configurePDO(int slave_index, int base_register, int base_sync_manager)
+std::unordered_map<IMCObjectName, uint8_t> PDOmap::configurePDO(int slave_index, int base_register,
+                                                                uint16_t base_sync_manager)
 {
   int counter = 1;
   int current_register = base_register;
   int size_left = this->bits_per_register;
 
-  std::unordered_map<IMCObjectName, int> byte_offsets;
+  std::unordered_map<IMCObjectName, uint8_t> byte_offsets;
   std::vector<std::pair<IMCObjectName, IMCObject>> sorted_PDO_objects = this->sortPDOObjects();
 
   sdo_bit8(slave_index, current_register, 0, 0);

@@ -196,7 +196,7 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
 {
   for (size_t i = 0; i < num_joints_; i++)
   {
-    float old_position = joint_position_[i];
+    const double old_position = joint_position_[i];
 
     march::Joint joint = march_robot_.getJoint(joint_names_[i]);
 
@@ -208,7 +208,7 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
     }
 
     // Get velocity from encoder position
-    float joint_velocity = (joint_position_[i] - old_position) * 1 / elapsed_time.toSec();
+    const double joint_velocity = (joint_position_[i] - old_position) / elapsed_time.toSec();
 
     // Apply exponential smoothing to velocity obtained from encoder with
     // alpha=0.2
@@ -237,7 +237,7 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
   for (size_t i = 0; i < num_joints_; i++)
   {
     // Enlarge joint_effort_command because ROS control limits the pid values to a certain maximum
-    joint_effort_command_[i] = joint_effort_command_[i] * 1000;
+    joint_effort_command_[i] = joint_effort_command_[i] * 1000.0;
   }
 
   // Enforce limits on all joints in effort mode
@@ -259,11 +259,11 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
 
       if (joint.getActuationMode() == march::ActuationMode::position)
       {
-        joint.actuateRad(static_cast<float>(joint_position_command_[i]));
+        joint.actuateRad(joint_position_command_[i]);
       }
       else if (joint.getActuationMode() == march::ActuationMode::torque)
       {
-        joint.actuateTorque(static_cast<int>(joint_effort_command_[i]));
+        joint.actuateTorque(std::round(joint_effort_command_[i]));
       }
     }
   }

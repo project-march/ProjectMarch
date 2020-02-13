@@ -94,7 +94,7 @@ private:
   MarchPdbStateInterface march_pdb_interface_;
 
   /* Shared memory */
-  size_t num_joints_;
+  size_t num_joints_ = 0;
   std::vector<std::string> joint_names_;
 
   std::vector<double> joint_position_;
