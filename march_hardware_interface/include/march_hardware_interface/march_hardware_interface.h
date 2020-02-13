@@ -63,6 +63,11 @@ public:
   void write(const ros::Time& time, const ros::Duration& elapsed_time) override;
 
 private:
+  /**
+   * Uses the num_joints_ member to resize all vectors
+   * in order to avoid allocation at runtime.
+   */
+  void reserveMemory();
   void updatePowerNet();
   void updateHighVoltageEnable();
   void updatePowerDistributionBoard();

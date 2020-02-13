@@ -26,6 +26,16 @@ MarchHardwareInterface::MarchHardwareInterface(march::MarchRobot robot)
   : march_robot_(std::move(robot))
   , has_power_distribution_board_(this->march_robot_.getPowerDistributionBoard().getSlaveIndex() != -1)
 {
+  // Get joint names from urdf
+  for (const auto& urdf_joint : this->march_robot_.getUrdf().joints_)
+  {
+    if (urdf_joint.second->type != urdf::Joint::FIXED)
+    {
+      this->joint_names_.push_back(urdf_joint.first);
+    }
+  }
+
+  this->num_joints_ = this->joint_names_.size();
 }
 
 bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot_hw_nh */)
@@ -38,58 +48,17 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
       std::make_unique<realtime_tools::RealtimePublisher<march_shared_resources::AfterLimitJointCommand>>(
           nh, "/march/controller/after_limit_joint_command/", 4);
 
+  nh.setParam("/march/joint_names", this->joint_names_);
+
+  this->reserveMemory();
+
   // Start ethercat cycle in the hardware
   this->march_robot_.startEtherCAT();
-
-  urdf::Model model;
-  if (!model.initParam("/robot_description"))
-  {
-    ROS_ERROR("Failed to read the urdf from the parameter server.");
-    return false;
-  }
-
-  // Get joint names from urdf
-  for (const auto& urdf_joint : model.joints_)
-  {
-    if (urdf_joint.second->type != urdf::Joint::FIXED)
-    {
-      joint_names_.push_back(urdf_joint.first);
-    }
-  }
-
-  nh.setParam("/march/joint_names", joint_names_);
-
-  num_joints_ = joint_names_.size();
-
-  // Resize vectors
-  joint_position_.resize(num_joints_);
-  joint_position_command_.resize(num_joints_);
-  joint_velocity_.resize(num_joints_);
-  joint_velocity_command_.resize(num_joints_);
-  joint_effort_.resize(num_joints_);
-  joint_effort_command_.resize(num_joints_);
-  joint_temperature_.resize(num_joints_);
-  joint_temperature_variance_.resize(num_joints_);
-  soft_limits_.resize(num_joints_);
-
-  after_limit_joint_command_pub_->msg_.name.resize(num_joints_);
-  after_limit_joint_command_pub_->msg_.position_command.resize(num_joints_);
-  after_limit_joint_command_pub_->msg_.effort_command.resize(num_joints_);
-
-  imc_state_pub_->msg_.joint_names.resize(num_joints_);
-  imc_state_pub_->msg_.status_word.resize(num_joints_);
-  imc_state_pub_->msg_.detailed_error.resize(num_joints_);
-  imc_state_pub_->msg_.motion_error.resize(num_joints_);
-  imc_state_pub_->msg_.state.resize(num_joints_);
-  imc_state_pub_->msg_.detailed_error_description.resize(num_joints_);
-  imc_state_pub_->msg_.motion_error_description.resize(num_joints_);
-  imc_state_pub_->msg_.motor_current.resize(num_joints_);
-  imc_state_pub_->msg_.motor_voltage.resize(num_joints_);
 
   for (size_t i = 0; i < num_joints_; ++i)
   {
     SoftJointLimits soft_limits;
-    getSoftJointLimits(model.getJoint(joint_names_[i]), soft_limits);
+    getSoftJointLimits(this->march_robot_.getUrdf().getJoint(joint_names_[i]), soft_limits);
     ROS_DEBUG("[%s] Soft limits set to (%f, %f)", joint_names_[i].c_str(), soft_limits.min_position,
               soft_limits.max_position);
     soft_limits_[i] = soft_limits;
@@ -145,7 +114,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
 
     // Retrieve joint (soft) limits from the urdf
     JointLimits limits;
-    getJointLimits(model.getJoint(joint.getName()), limits);
+    getJointLimits(this->march_robot_.getUrdf().getJoint(joint.getName()), limits);
 
     if (joint.getActuationMode() == march::ActuationMode::position)
     {
@@ -305,6 +274,33 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
   {
     updatePowerDistributionBoard();
   }
+}
+
+void MarchHardwareInterface::reserveMemory()
+{
+  joint_position_.resize(num_joints_);
+  joint_position_command_.resize(num_joints_);
+  joint_velocity_.resize(num_joints_);
+  joint_velocity_command_.resize(num_joints_);
+  joint_effort_.resize(num_joints_);
+  joint_effort_command_.resize(num_joints_);
+  joint_temperature_.resize(num_joints_);
+  joint_temperature_variance_.resize(num_joints_);
+  soft_limits_.resize(num_joints_);
+
+  after_limit_joint_command_pub_->msg_.name.resize(num_joints_);
+  after_limit_joint_command_pub_->msg_.position_command.resize(num_joints_);
+  after_limit_joint_command_pub_->msg_.effort_command.resize(num_joints_);
+
+  imc_state_pub_->msg_.joint_names.resize(num_joints_);
+  imc_state_pub_->msg_.status_word.resize(num_joints_);
+  imc_state_pub_->msg_.detailed_error.resize(num_joints_);
+  imc_state_pub_->msg_.motion_error.resize(num_joints_);
+  imc_state_pub_->msg_.state.resize(num_joints_);
+  imc_state_pub_->msg_.detailed_error_description.resize(num_joints_);
+  imc_state_pub_->msg_.motion_error_description.resize(num_joints_);
+  imc_state_pub_->msg_.motor_current.resize(num_joints_);
+  imc_state_pub_->msg_.motor_voltage.resize(num_joints_);
 }
 
 void MarchHardwareInterface::initiateIMC()

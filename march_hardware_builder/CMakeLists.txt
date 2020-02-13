@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
     march_hardware
     roscpp
     roslib
+    urdf
 )
 
 catkin_package(

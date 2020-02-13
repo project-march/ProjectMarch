@@ -1,23 +1,34 @@
 // Copyright 2019 Project March.
+#include "march_hardware_builder/hardware_builder.h"
+#include "march_hardware_builder/hardware_config_exceptions.h"
+
 #include <vector>
+
 #include <gtest/gtest.h>
-#include <march_hardware_builder/hardware_builder.h>
+#include <ros/package.h>
+#include <urdf/model.h>
 
 TEST(AllowedRobotTest, TestMarch4Creation)
 {
-  HardwareBuilder hardwareBuilder = HardwareBuilder(AllowedRobot::march4);
+  urdf::Model urdf;
+  urdf.initFile(ros::package::getPath("march_description").append("/urdf/march4.xacro"));
+  HardwareBuilder hardwareBuilder = HardwareBuilder(AllowedRobot::march4, urdf);
   ASSERT_NO_THROW(march::MarchRobot march4 = hardwareBuilder.createMarchRobot());
 }
 
 TEST(AllowedRobotTest, TestMarch3Creation)
 {
-  HardwareBuilder hardwareBuilder = HardwareBuilder(AllowedRobot::march3);
+  urdf::Model urdf;
+  urdf.initFile(ros::package::getPath("march_description").append("/urdf/march3.xacro"));
+  HardwareBuilder hardwareBuilder = HardwareBuilder(AllowedRobot::march3, urdf);
   ASSERT_NO_THROW(march::MarchRobot march3 = hardwareBuilder.createMarchRobot());
 }
 
 TEST(AllowedRobotTest, TestMarch3Values)
 {
-  march::MarchRobot march3 = HardwareBuilder(AllowedRobot::march3).createMarchRobot();
+  urdf::Model urdf;
+  urdf.initFile(ros::package::getPath("march_description").append("/urdf/march3.xacro"));
+  march::MarchRobot march3 = HardwareBuilder(AllowedRobot::march3, urdf).createMarchRobot();
 
   march::Encoder RHJenc = march::Encoder(16, 22134, 43436, 24515, 0.05);
   march::Encoder LHJenc = march::Encoder(16, 9746, 31557, 11830, 0.05);
@@ -67,7 +78,7 @@ TEST(AllowedRobotTest, TestMarch3Values)
     joint.setAllowActuation(true);
   }
 
-  march::MarchRobot actualRobot = march::MarchRobot(jointList, "enp3s0", 4);
+  march::MarchRobot actualRobot = march::MarchRobot(jointList, urdf, "enp3s0", 4);
 
   EXPECT_EQ(actualRobot.getJoint("right_hip"), march3.getJoint("right_hip"));
   EXPECT_EQ(actualRobot.getJoint("left_hip"), march3.getJoint("left_hip"));
@@ -80,10 +91,14 @@ TEST(AllowedRobotTest, TestMarch3Values)
 
 TEST(AllowedRobotTest, TestTestRotationalSetupCreation)
 {
-  ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::test_joint_rotational).createMarchRobot());
+  urdf::Model urdf;
+  urdf.initFile(ros::package::getPath("march_description").append("/urdf/test_joint_rotational.xacro"));
+  ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::test_joint_rotational, urdf).createMarchRobot());
 }
 
 TEST(AllowedRobotTest, TestTestLinearSetupCreation)
 {
-  ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::test_joint_linear).createMarchRobot());
+  urdf::Model urdf;
+  urdf.initFile(ros::package::getPath("march_description").append("/urdf/test_joint_linear.xacro"));
+  ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::test_joint_linear, urdf).createMarchRobot());
 }

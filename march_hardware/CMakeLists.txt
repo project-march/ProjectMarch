@@ -6,6 +6,7 @@ add_compile_options(-std=c++14 -Wall -Wextra)
 find_package(catkin REQUIRED COMPONENTS
     roscpp
     soem
+    urdf
 )
 
 catkin_package(

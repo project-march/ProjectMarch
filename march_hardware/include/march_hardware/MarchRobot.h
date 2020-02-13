@@ -7,6 +7,8 @@
 #include <vector>
 #include <stdint.h>
 
+#include <urdf/model.h>
+
 #include <march_hardware/Joint.h>
 
 #include <march_hardware/EtherCAT/EthercatMaster.h>
@@ -18,14 +20,15 @@ class MarchRobot
 {
 private:
   ::std::vector<Joint> jointList;
+  urdf::Model urdf_;
   EthercatMaster ethercatMaster;
   PowerDistributionBoard powerDistributionBoard;
 
 public:
-  MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int ecatCycleTime);
+  MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, ::std::string ifName, int ecatCycleTime);
 
-  MarchRobot(::std::vector<Joint> jointList, PowerDistributionBoard powerDistributionBoard, ::std::string ifName,
-             int ecatCycleTime);
+  MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, PowerDistributionBoard powerDistributionBoard,
+             ::std::string ifName, int ecatCycleTime);
 
   ~MarchRobot();
 
@@ -51,6 +54,8 @@ public:
 
   PowerDistributionBoard& getPowerDistributionBoard();
   const PowerDistributionBoard& getPowerDistributionBoard() const;
+
+  const urdf::Model& getUrdf() const;
 
   /** @brief Override comparison operator */
   friend bool operator==(const MarchRobot& lhs, const MarchRobot& rhs)

@@ -16,16 +16,19 @@
 
 namespace march
 {
-MarchRobot::MarchRobot(::std::vector<Joint> jointList, ::std::string ifName, int ecatCycleTime)
-  : jointList(std::move(jointList)), ethercatMaster(EthercatMaster(ifName, this->getMaxSlaveIndex(), ecatCycleTime))
+MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, ::std::string ifName, int ecatCycleTime)
+  : jointList(std::move(jointList))
+  , urdf_(std::move(urdf))
+  , ethercatMaster(EthercatMaster(ifName, this->getMaxSlaveIndex(), ecatCycleTime))
 {
 }
 
-MarchRobot::MarchRobot(::std::vector<Joint> jointList, PowerDistributionBoard powerDistributionBoard,
+MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, PowerDistributionBoard powerDistributionBoard,
                        ::std::string ifName, int ecatCycleTime)
   : jointList(std::move(jointList))
-  , powerDistributionBoard(powerDistributionBoard)
+  , urdf_(std::move(urdf))
   , ethercatMaster(EthercatMaster(ifName, this->getMaxSlaveIndex(), ecatCycleTime))
+  , powerDistributionBoard(powerDistributionBoard)
 {
 }
 
@@ -167,6 +170,11 @@ const PowerDistributionBoard& MarchRobot::getPowerDistributionBoard() const
 MarchRobot::~MarchRobot()
 {
   stopEtherCAT();
+}
+
+const urdf::Model& MarchRobot::getUrdf() const
+{
+  return this->urdf_;
 }
 
 }  // namespace march

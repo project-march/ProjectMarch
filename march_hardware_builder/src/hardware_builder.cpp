@@ -1,11 +1,11 @@
 // Copyright 2019 Project March.
+#include "march_hardware_builder/hardware_builder.h"
+#include "march_hardware_builder/hardware_config_exceptions.h"
+
 #include <string>
 #include <vector>
 
 #include <ros/ros.h>
-
-#include <march_hardware_builder/hardware_builder.h>
-#include <march_hardware_builder/hardware_config_exceptions.h>
 
 // clang-format off
 const std::vector<std::string> HardwareBuilder::ENCODER_REQUIRED_KEYS =
@@ -21,17 +21,28 @@ const std::vector<std::string> HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRE
 const std::vector<std::string> HardwareBuilder::JOINT_REQUIRED_KEYS = { "allowActuation", "imotioncube" };
 // clang-format on
 
-HardwareBuilder::HardwareBuilder(AllowedRobot robot) : HardwareBuilder::HardwareBuilder(robot.getFilePath())
+HardwareBuilder::HardwareBuilder(AllowedRobot robot) : HardwareBuilder(robot.getFilePath())
 {
 }
 
-HardwareBuilder::HardwareBuilder(const std::string& yaml_path)
-  : yaml_path_(yaml_path), robot_config_(YAML::LoadFile(yaml_path))
+HardwareBuilder::HardwareBuilder(AllowedRobot robot, urdf::Model urdf)
+  : robot_config_(YAML::LoadFile(robot.getFilePath())), urdf_(std::move(urdf)), init_urdf_(false)
+{
+}
+
+HardwareBuilder::HardwareBuilder(const std::string& yaml_path) : robot_config_(YAML::LoadFile(yaml_path))
+{
+}
+
+HardwareBuilder::HardwareBuilder(const std::string& yaml_path, urdf::Model urdf)
+  : robot_config_(YAML::LoadFile(yaml_path)), urdf_(std::move(urdf)), init_urdf_(false)
 {
 }
 
 march::MarchRobot HardwareBuilder::createMarchRobot()
 {
+  this->initUrdf();
+
   std::string robot_name = this->robot_config_.begin()->first.as<std::string>();
   ROS_DEBUG_STREAM("Starting creation of robot " << robot_name);
 
@@ -56,12 +67,12 @@ march::MarchRobot HardwareBuilder::createMarchRobot()
   if (pdb_config)
   {
     march::PowerDistributionBoard pdb = HardwareBuilder::createPowerDistributionBoard(pdb_config);
-    return march::MarchRobot(joint_list, pdb, if_name, cycle_time);
+    return march::MarchRobot(joint_list, this->urdf_, pdb, if_name, cycle_time);
   }
   else
   {
     ROS_INFO("powerDistributionBoard is NOT defined");
-    return march::MarchRobot(joint_list, if_name, cycle_time);
+    return march::MarchRobot(joint_list, this->urdf_, if_name, cycle_time);
   }
 }
 
@@ -176,5 +187,17 @@ void HardwareBuilder::validateRequiredKeysExist(const YAML::Node& config, const 
     {
       throw MissingKeyException(key, object_name);
     }
+  }
+}
+
+void HardwareBuilder::initUrdf()
+{
+  if (this->init_urdf_)
+  {
+    if (!this->urdf_.initParam("/robot_description"))
+    {
+      throw HardwareConfigException("Failed to load urdf from parameter server");
+    }
+    this->init_urdf_ = false;
   }
 }
