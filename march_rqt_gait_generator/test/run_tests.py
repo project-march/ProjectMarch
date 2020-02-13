@@ -8,6 +8,6 @@ from .modifiable_subgait_test import ModifiableSubgaitTest
 PKG = 'march_shared_classes'
 
 if __name__ == '__main__':
-    rosunit.unitrun(PKG, 'setpoint_test', SetpointTest)
-    rosunit.unitrun(PKG, 'joint_trajectory_test', JointTrajectoryTest)
-    rosunit.unitrun(PKG, 'subgait_test', SubgaitTest)
+    rosunit.unitrun(PKG, 'setpoint_test', ModifiableSetpointTest)
+    rosunit.unitrun(PKG, 'joint_trajectory_test', ModifiableJointTrajectoryTest)
+    rosunit.unitrun(PKG, 'subgait_test', ModifiableSubgaitTest)
