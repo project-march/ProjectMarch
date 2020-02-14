@@ -36,3 +36,5 @@ gaits:
   stairs_down: {right_open: MIV_final, left_swing: MIV_final,
                 right_swing: MIV_final, left_close: MIV_final,
                 right_close: MIV_final}
+  sofa_sit: {sit_down: MIV_final, sit_home: MIV_final}
+  sofa_stand: {prepare_stand_up: MIV_final, stand_up: MIV_final}
