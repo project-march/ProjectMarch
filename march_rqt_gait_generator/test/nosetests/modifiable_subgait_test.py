@@ -21,6 +21,5 @@ class ModifiableSubgaitTest(unittest.TestCase):
         # self.subgait = ModifiableSubgait.from_file(self.robot, self.subgait_path)
         # self.subgait_msg = self.subgait.to_subgait_msg()
 
-
     def test_something(self):
         self.assertTrue(True)
