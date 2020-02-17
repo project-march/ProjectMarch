@@ -4,5 +4,5 @@
     <param name="robot_description"
            command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/$(arg robot).xacro' "/>
 
-    <test test-name="test_gait_generator" pkg="march_rqt_gait_generator" type="run_tests" name="gait_generator_tests"/>
+    <test  name="gait_generator_tests" test-name="test_gait_generator" pkg="march_rqt_gait_generator" type="gait_generator_test"/>
 </launch>

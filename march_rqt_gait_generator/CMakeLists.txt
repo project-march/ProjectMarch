@@ -13,7 +13,7 @@ install(FILES plugin.xml
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
-install(DIRECTORY config launch resource test test/launch
+install(DIRECTORY config launch resource
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
@@ -24,4 +24,5 @@ install(PROGRAMS scripts/${PROJECT_NAME}
 if (CATKIN_ENABLE_TESTING)
     find_package(rostest REQUIRED)
     add_rostest(test/launch/testing_gait_generator.test)
+    catkin_add_nosetests(test/run_tests.py)
 endif()

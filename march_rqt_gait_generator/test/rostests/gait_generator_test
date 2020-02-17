@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-import rostest
-
 import unittest
 import rospy
 
@@ -13,14 +11,19 @@ import threading
 PKG = 'march_rqt_gait_generator'
 
 class GaitGeneratorPluginTest(unittest.TestCase):
+    def __init__(self, *args):
+        super(GaitGeneratorPluginTest, self).__init__(*args)
+        rospy.init_node("test_gait_generator", anonymous=True)
+
+
     def setUp(self):
         pass
 
     def test_something(self):
-        rospy.init_node("gait_generator_tests")
-        self.gait_generator = GaitGeneratorPlugin(None)
         self.assertTrue(False)
 
+    def test_something_else(self):
+        self.assertTrue(True)
 
 if __name__ == '__main__':
     rostest.rosrun(PKG, 'gait_generator_test', GaitGeneratorPluginTest)
