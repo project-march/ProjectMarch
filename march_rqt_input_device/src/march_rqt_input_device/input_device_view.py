@@ -68,6 +68,10 @@ class InputDevicePlugin(Plugin):
             self.create_button('gait_walk_small', image_path='/gait_walk_small.png',
                                callback=lambda: self.controller.publish_gait('gait_walk_small'))
 
+        gait_walk_large = \
+            self.create_button('gait_walk_large',
+                               callback=lambda: self.controller.publish_gait('gait_walk_large'))
+
         gait_single_step_small = \
             self.create_button('gait_single_step_small', image_path='/gait_single_step_small.png',
                                callback=lambda: self.controller.publish_gait('gait_single_step_small'))
@@ -188,7 +192,7 @@ class InputDevicePlugin(Plugin):
         # Position in the array determines position on screen.
         march_button_layout = [
 
-            [home_sit, home_stand, gait_walk, gait_walk_small, stop_button, pause_button],
+            [home_sit, home_stand, gait_walk, gait_walk_small, gait_walk_large, stop_button, pause_button],
 
             [gait_sit, gait_stand, gait_single_step_normal, gait_single_step_small, continue_button, error_button],
 
