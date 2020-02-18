@@ -1,56 +1,55 @@
-name: "right_swing"
-version: "MV_walksmall_rightswing_v1"
-description: "The right swing of the walk small gait. This gait has some less hip flexion compared\
-  \ to the normal walking gait."
-gait_type: ''
+name: "left_swing"
+version: "MV_walksmall_leftswing_v1"
+description: "The left swing for the walk small."
+gait_type: "walk_like"
 setpoints: 
   - 
     time_from_start: 
       secs: 0
       nsecs:         0
-    joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
-  left_ankle]
+    joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
+  right_ankle]
   - 
     time_from_start: 
       secs: 0
       nsecs: 220000000
-    joint_names: [left_knee]
+    joint_names: [right_knee]
   - 
     time_from_start: 
       secs: 0
       nsecs: 412500000
-    joint_names: [right_hip_aa, left_hip_aa]
+    joint_names: [left_hip_aa, right_hip_aa]
   - 
     time_from_start: 
       secs: 0
       nsecs: 462000000
-    joint_names: [right_knee]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 550000000
-    joint_names: [right_hip_aa, left_hip_aa]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 660000000
-    joint_names: [right_hip_fe]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 748000000
     joint_names: [left_knee]
   - 
     time_from_start: 
       secs: 0
-      nsecs: 990000000
+      nsecs: 550000000
+    joint_names: [left_hip_aa, right_hip_aa]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 660000000
+    joint_names: [left_hip_fe]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 748000000
     joint_names: [right_knee]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 990000000
+    joint_names: [left_knee]
   - 
     time_from_start: 
       secs: 1
       nsecs: 100000000
-    joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
-  left_ankle]
+    joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
+  right_ankle]
 trajectory: 
   header: 
     seq: 0
@@ -58,8 +57,8 @@ trajectory:
       secs: 0
       nsecs:         0
     frame_id: ''
-  joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
-  left_ankle]
+  joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
+  right_ankle]
   points: 
     - 
       positions: [0.0, -0.1667, 0.1396, 0.0436, 0.0, 0.192, 0.1396, 0.0436]
