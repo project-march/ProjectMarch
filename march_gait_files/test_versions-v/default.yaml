@@ -18,6 +18,12 @@ gaits:
                                     left_close: MV_RT_third_middlestep_leftclose_v1}
   walk: {right_open: MV_walk_rightopen_v3, left_swing: MV_walk_leftswing_v2, right_swing: MV_walk_rightswing_v2,
          left_close: MV_walk_leftclose_v3, right_close: MV_walk_rightclose_v3}
+  walk_small: {right_open: MV_walksmall_rightopen_v1, left_swing: MV_walksmall_leftswing_v1,
+               right_swing: MV_walksmall_rightswing_v1, left_close: MV_walksmall_leftclose_v1,
+               right_close: MV_walksmall_rightclose_v1}
+  walk_large: {right_open: MV_walklarge_rightopen_v1, left_swing: MV_walklarge_leftswing_v1,
+               right_swing: MV_walklarge_rightswing_v1, left_close: MV_walklarge_leftclose_v1,
+               right_close: MV_walklarge_rightclose_v1}
   single_step_normal: {right_open: MIV_final, left_close: MIV_final}
   tilted_path_first_start: {left_open: MV_TPstart1_leftopen_v1, right_close: MV_TPstart1_rightclose_v1}
   tilted_path_second_start: {left_open: MV_TPstart2_leftopen_v1, right_close: MV_TPstart2_rightclose_v1}
