@@ -1,4 +1,4 @@
-name: !!python/unicode "right_close"
+name: "right_close"
 version: "MV_walksmall_rightclose_v1"
 description: "The right close of the MV walk small gait"
 gait_type: "walk_like"
