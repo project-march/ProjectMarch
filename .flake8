@@ -2,7 +2,7 @@
 show-source = true
 max-line-length = 120
 exclude = .git
-application-package-names = march_shared_classes, march_shared_resources
+application-package-names = march_shared_classes, march_shared_resources, march_rqt_gait_generator
 import-order-style = appnexus
 ignore =
     # D100: Missing docstring in public module
