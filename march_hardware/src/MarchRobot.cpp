@@ -66,15 +66,15 @@ int MarchRobot::getMaxSlaveIndex()
 {
   int maxSlaveIndex = -1;
 
-  for (int i = 0; i < jointList.size(); i++)
+  for (Joint& joint : jointList)
   {
-    int temperatureSlaveIndex = jointList.at(i).getTemperatureGESSlaveIndex();
+    int temperatureSlaveIndex = joint.getTemperatureGESSlaveIndex();
     if (temperatureSlaveIndex > maxSlaveIndex)
     {
       maxSlaveIndex = temperatureSlaveIndex;
     }
 
-    int iMotionCubeSlaveIndex = jointList.at(i).getIMotionCubeSlaveIndex();
+    int iMotionCubeSlaveIndex = joint.getIMotionCubeSlaveIndex();
 
     if (iMotionCubeSlaveIndex > maxSlaveIndex)
     {
@@ -89,17 +89,17 @@ bool MarchRobot::hasValidSlaves()
   ::std::vector<int> iMotionCubeIndices;
   ::std::vector<int> temperatureSlaveIndices;
 
-  for (int i = 0; i < jointList.size(); i++)
+  for (auto& joint : jointList)
   {
-    if (jointList[i].hasTemperatureGES())
+    if (joint.hasTemperatureGES())
     {
-      int temperatureSlaveIndex = jointList[i].getTemperatureGESSlaveIndex();
+      int temperatureSlaveIndex = joint.getTemperatureGESSlaveIndex();
       temperatureSlaveIndices.push_back(temperatureSlaveIndex);
     }
 
-    if (jointList[i].hasIMotionCube())
+    if (joint.hasIMotionCube())
     {
-      int iMotionCubeSlaveIndex = jointList[i].getIMotionCubeSlaveIndex();
+      int iMotionCubeSlaveIndex = joint.getIMotionCubeSlaveIndex();
       iMotionCubeIndices.push_back(iMotionCubeSlaveIndex);
     }
   }
@@ -145,11 +145,11 @@ Joint MarchRobot::getJoint(::std::string jointName)
     ROS_WARN("Trying to access joints while ethercat is not operational. This "
              "may lead to incorrect sensor data.");
   }
-  for (int i = 0; i < jointList.size(); i++)
+  for (auto& joint : jointList)
   {
-    if (jointList.at(i).getName() == jointName)
+    if (joint.getName() == jointName)
     {
-      return jointList.at(i);
+      return joint;
     }
   }
 

@@ -121,9 +121,9 @@ void EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
 
 void EthercatMaster::ethercatLoop()
 {
-  uint32_t totalLoops = 0;
-  uint32_t rateNotAchievedCount = 0;
-  int rate = 1000 / ecatCycleTimems;
+  size_t totalLoops = 0;
+  size_t rateNotAchievedCount = 0;
+  size_t rate = 1000 / ecatCycleTimems;
 
   while (isOperational)
   {
