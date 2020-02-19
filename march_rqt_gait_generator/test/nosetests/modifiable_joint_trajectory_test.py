@@ -1,6 +1,7 @@
 import unittest
 
 from mock import Mock
+import copy
 
 from march_rqt_gait_generator.model.modifiable_joint_trajectory import ModifiableJointTrajectory
 from march_rqt_gait_generator.model.modifiable_setpoint import ModifiableSetpoint
@@ -15,7 +16,7 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
         self.duration = 2.0
         self.times = [0, self.duration / 2.0, self.duration]
         self.setpoints = [ModifiableSetpoint(t, 0.5 * t, t) for t in self.times]
-        self.joint_trajectory = ModifiableJointTrajectory(self.joint_name, self.limits, self.setpoints,
+        self.joint_trajectory = ModifiableJointTrajectory(self.joint_name, self.limits, copy.deepcopy(self.setpoints),
                                                           self.duration, self.gait_generator)
 
     # enforce_limits tests
@@ -93,9 +94,170 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
         self.joint_trajectory.add_setpoint(new_setpoint)
         self.gait_generator.save_changed_joints.assert_called_once_with([self.joint_trajectory])
 
+    # remove_setpoint tests
+    def test_remove_setpoint_removal_correct_setpoint(self):
+        self.joint_trajectory.remove_setpoint(0)
+        new_first_setpoint = ModifiableSetpoint(0, 0.5, 1)
+        self.assertEqual(self.joint_trajectory.setpoints[0], new_first_setpoint)
+
+    def test_remove_setpoint_number_of_setpoints(self):
+        self.joint_trajectory.remove_setpoint(1)
+        self.assertEqual(len(self.joint_trajectory.setpoints), 2)
+
+    def test_remove_setpoint_save_changed_joints_call(self):
+        self.joint_trajectory.remove_setpoint(2)
+        self.gait_generator.save_changed_joints.assert_called_once_with([self.joint_trajectory])
+
+    # save_setpoints test
+    def test_save_setpoints_content(self):
+        self.joint_trajectory.save_setpoints()
+        old_setpoints = self.joint_trajectory.setpoints_history[0]
+        self.assertEqual(old_setpoints, self.setpoints)
+
+    def test_save_setpoints_save_changed_joints_call(self):
+        self.joint_trajectory.save_setpoints()
+        self.gait_generator.save_changed_joints.assert_called_once_with([self.joint_trajectory])
+
+    def test_save_setpoints_no_save_changed_joints_call(self):
+        self.joint_trajectory.save_setpoints(single_joint_change=False)
+        self.gait_generator.save_changed_joints.assert_not_called()
+
+    # invert tests
+    def test_invert_test_symmetric_times(self):
+        self.joint_trajectory.invert()
+        self.setpoints.reverse()
+        for setpoint in self.setpoints:
+            setpoint.velocity = - setpoint.velocity
+            setpoint.time = self.duration - setpoint.time
+        self.assertEqual(self.joint_trajectory.setpoints, self.setpoints)
+
+    def test_invert_test_setpoints_saved(self):
+        self.joint_trajectory.invert()
+        self.assertEqual(self.joint_trajectory.setpoints_history[0], self.setpoints)
+        self.gait_generator.save_changed_joints.assert_not_called()
+
+    # undo tests
+    def test_undo_empty_history(self):
+        self.joint_trajectory.undo()
+        self.assertEqual(self.joint_trajectory.setpoints, self.setpoints)
+
+    def test_undo_add_setpoint(self):
+        new_setpoint = ModifiableSetpoint(0.5, 0, 0)
+        self.joint_trajectory.add_setpoint(new_setpoint)
+        self.joint_trajectory.undo()
+        self.assertEqual(self.joint_trajectory.setpoints, self.setpoints)
+
+    def test_undo_multiple_things(self):
+        new_setpoint = ModifiableSetpoint(0.5, 0, 0)
+        self.joint_trajectory.add_setpoint(new_setpoint)
+        setpoints_copy = copy.deepcopy(self.joint_trajectory.setpoints)
+        new_setpoint = ModifiableSetpoint(0.7, 0, 0)
+        self.joint_trajectory.add_setpoint(new_setpoint)
+        self.joint_trajectory.invert()
+        self.joint_trajectory.remove_setpoint(2)
+        self.joint_trajectory.remove_setpoint(2)
+        self.joint_trajectory.undo()
+        self.joint_trajectory.undo()
+        self.joint_trajectory.undo()
+        self.joint_trajectory.undo()
+        self.assertEqual(self.joint_trajectory.setpoints, setpoints_copy)
+
+    def test_undo_max_history_memory(self):
+        new_setpoint = ModifiableSetpoint(1.5, 0, 0)
+        self.joint_trajectory.add_setpoint(new_setpoint)
+        setpoints_copy = copy.deepcopy(self.joint_trajectory.setpoints)
+        for i in range(100):
+            new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
+            self.joint_trajectory.add_setpoint(new_setpoint)
+
+        for i in range(110):
+            self.joint_trajectory.undo()
+        self.assertEqual(self.joint_trajectory.setpoints, setpoints_copy)
 
 
+    def test_undo_max_history_memory_redo_list_length(self):
+        new_setpoint = ModifiableSetpoint(1.5, 0, 0)
+        self.joint_trajectory.add_setpoint(new_setpoint)
+        setpoints_copy = copy.deepcopy(self.joint_trajectory.setpoints)
+        for i in range(100):
+            new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
+            self.joint_trajectory.add_setpoint(new_setpoint)
 
+        for i in range(110):
+            self.joint_trajectory.undo()
+        self.assertEqual(len(self.joint_trajectory.setpoints_redo_list), 100)
 
+    def test_undo_history_length(self):
+        for i in range(100):
+            new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
+            self.joint_trajectory.add_setpoint(new_setpoint)
 
+        for i in range(80):
+            self.joint_trajectory.undo()
+        self.assertEqual(len(self.joint_trajectory.setpoints_history), 20)
 
+    def test_undo_redo_list_length(self):
+        for i in range(100):
+            new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
+            self.joint_trajectory.add_setpoint(new_setpoint)
+
+        for i in range(80):
+            self.joint_trajectory.undo()
+        self.assertEqual(len(self.joint_trajectory.setpoints_redo_list), 80)
+
+    # redo tests
+    def test_redo_empty_redo_list(self):
+        self.joint_trajectory.redo()
+        self.assertEqual(self.joint_trajectory.setpoints, self.setpoints)
+
+    def test_undo_redo_add_setpoint(self):
+        new_setpoint = ModifiableSetpoint(0.5, 0, 0)
+        self.joint_trajectory.add_setpoint(new_setpoint)
+        setpoints_copy = copy.deepcopy(self.joint_trajectory.setpoints)
+        self.joint_trajectory.undo()
+        self.joint_trajectory.redo()
+        print(self.joint_trajectory.setpoints)
+        print(setpoints_copy)
+        self.assertEqual(self.joint_trajectory.setpoints, setpoints_copy)
+
+    def test_undo_redo_multiple_things(self):
+        new_setpoint = ModifiableSetpoint(0.5, 0, 0)
+        self.joint_trajectory.add_setpoint(new_setpoint)
+        new_setpoint = ModifiableSetpoint(0.7, 0, 0)
+        self.joint_trajectory.add_setpoint(new_setpoint)
+        self.joint_trajectory.invert()
+        self.joint_trajectory.remove_setpoint(2)
+        setpoints_copy = copy.deepcopy(self.joint_trajectory.setpoints)
+        self.joint_trajectory.remove_setpoint(2)
+        self.joint_trajectory.undo()
+        self.joint_trajectory.undo()
+        self.joint_trajectory.undo()
+        self.joint_trajectory.undo()
+        self.joint_trajectory.redo()
+        self.joint_trajectory.redo()
+        self.joint_trajectory.redo()
+        self.assertEqual(self.joint_trajectory.setpoints, setpoints_copy)
+
+    def test_undo_redo_history_length(self):
+        for i in range(100):
+            new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
+            self.joint_trajectory.add_setpoint(new_setpoint)
+
+        for i in range(80):
+            self.joint_trajectory.undo()
+
+        for i in range(50):
+            self.joint_trajectory.redo()
+        self.assertEqual(len(self.joint_trajectory.setpoints_history), 70)
+
+    def test_undo_redo_list_length(self):
+        for i in range(100):
+            new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
+            self.joint_trajectory.add_setpoint(new_setpoint)
+
+        for i in range(80):
+            self.joint_trajectory.undo()
+
+        for i in range(50):
+            self.joint_trajectory.redo()
+        self.assertEqual(len(self.joint_trajectory.setpoints_redo_list), 30)

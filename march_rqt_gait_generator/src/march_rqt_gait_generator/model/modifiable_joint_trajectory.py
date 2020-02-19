@@ -101,9 +101,7 @@ class ModifiableJointTrajectory(JointTrajectory):
                 new_index = i
                 break
 
-        rospy.logdebug('adding setpoint {0} at index {1}'.format(setpoint, new_index))
         self.setpoints.insert(new_index, setpoint)
-
         self.enforce_limits()
         self.interpolated_setpoints = self.interpolate_setpoints()
 
@@ -126,11 +124,17 @@ class ModifiableJointTrajectory(JointTrajectory):
         self.interpolated_setpoints = self.interpolate_setpoints()
 
     def undo(self):
+        if not self.setpoints_history:
+            return
+
         self.setpoints_redo_list.append(list(self.setpoints))
         self.setpoints = self.setpoints_history.pop()
         self.interpolated_setpoints = self.interpolate_setpoints()
 
     def redo(self):
+        if not self.setpoints_redo_list:
+            return
+
         self.setpoints_history.append(list(self.setpoints))
         self.setpoints = self.setpoints_redo_list.pop()
         self.interpolated_setpoints = self.interpolate_setpoints()
