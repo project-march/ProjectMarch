@@ -28,6 +28,18 @@ TEST(TestHardwareException, TestNoMessage)
   ASSERT_EQ(ss.str(), expected_ss.str());
 }
 
+TEST(TestHardwareException, TestWhat)
+{
+  ErrorType expected = ErrorType::UNKNOWN;
+  const std::string message = "test";
+  HardwareException exception(expected, message);
+
+  std::stringstream expected_ss;
+  expected_ss << expected << std::endl << message;
+
+  ASSERT_EQ(expected_ss.str(), std::string(exception.what()));
+}
+
 TEST(TestHardwareException, TestMessage)
 {
   ErrorType expected = ErrorType::UNKNOWN;
