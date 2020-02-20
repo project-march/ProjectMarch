@@ -48,7 +48,7 @@ double calculateArTemperature(std::vector<int> temperatures, std::vector<float> 
  * @param config the config file with all the parameters
  * @param level A bitmask
  */
-void temperatureConfigCallback(march_fake_sensor_data::TemperaturesConfig& config, uint32_t level)
+void temperatureConfigCallback(march_fake_sensor_data::TemperaturesConfig& config, uint32_t /* level */)
 {
   // Make sure there is always a possible interval between min and max
   // temperature.
