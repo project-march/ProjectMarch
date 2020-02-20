@@ -22,6 +22,13 @@ TEST_F(PDOTest, sortPDOmap)
   ASSERT_EQ(4u, misoByteOffsets[march::IMCObjectName::StatusWord]);
 }
 
+TEST_F(PDOTest, InvalidDataDirection)
+{
+  march::PDOmap map;
+  std::unordered_map<march::IMCObjectName, uint8_t> expected;
+  ASSERT_EQ(map.map(1, (march::DataDirection)7), expected);
+}
+
 TEST_F(PDOTest, multipleAddObjects)
 {
   march::PDOmap pdoMapMISO = march::PDOmap();
