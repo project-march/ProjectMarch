@@ -6,6 +6,8 @@
 
 #include <exception>
 #include <ostream>
+#include <string>
+#include <sstream>
 #include <vector>
 
 namespace march
@@ -15,11 +17,12 @@ namespace error
 class HardwareException : public std::exception
 {
 public:
-  HardwareException() = default;
-  explicit HardwareException(ErrorType type) : type_(type)
+  explicit HardwareException(ErrorType type) : HardwareException(type, "")
   {
   }
-  HardwareException(ErrorType type, std::string message) : type_(type), message_(std::move(message))
+
+  HardwareException(ErrorType type, const std::string& message)
+    : type_(type), description_(this->createDescription(message))
   {
   }
 
@@ -30,12 +33,12 @@ public:
     std::vector<char> buffer(size + 1);  // note +1 for null terminator
     std::snprintf(&buffer[0], buffer.size(), format.c_str(), args...);
 
-    this->message_ = std::string(buffer.data(), size);
+    this->description_ = this->createDescription(std::string(buffer.data(), size));
   }
 
   const char* what() const noexcept override
   {
-    return "hardware exception";
+    return this->description_.c_str();
   }
 
   ErrorType type() const noexcept
@@ -45,17 +48,25 @@ public:
 
   friend std::ostream& operator<<(std::ostream& s, const HardwareException& e)
   {
-    s << e.type_;
-    if (!e.message_.empty())
-    {
-      s << std::endl << e.message_;
-    }
+    s << e.description_;
     return s;
   }
 
 private:
+  std::string createDescription(const std::string& message)
+  {
+    std::stringstream ss;
+    ss << this->type_;
+    if (!message.empty())
+    {
+      ss << std::endl;
+      ss << message;
+    }
+    return ss.str();
+  }
+
   const ErrorType type_ = ErrorType::UNKNOWN;
-  std::string message_;
+  std::string description_;
 };
 
 }  // namespace error

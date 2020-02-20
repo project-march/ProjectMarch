@@ -34,14 +34,10 @@ int main(int argc, char** argv)
       return 1;
     }
   }
-  catch (const march::error::HardwareException& e)
-  {
-    ROS_FATAL_STREAM(e);
-    return 1;
-  }
   catch (const std::exception& e)
   {
-    ROS_FATAL("Hardware interface caught an exception during init: %s", e.what());
+    ROS_FATAL("Hardware interface caught an exception during init");
+    ROS_FATAL("%s", e.what());
     return 1;
   }
 
@@ -61,14 +57,10 @@ int main(int argc, char** argv)
       march.write(now, rate.expectedCycleTime());
       rate.sleep();
     }
-    catch (const march::error::HardwareException& e)
-    {
-      ROS_FATAL_STREAM(e);
-      return 1;
-    }
     catch (const std::exception& e)
     {
-      ROS_FATAL("Hardware interface caught an exception during update: %s", e.what());
+      ROS_FATAL("Hardware interface caught an exception during update");
+      ROS_FATAL("%s", e.what());
       return 1;
     }
   }
