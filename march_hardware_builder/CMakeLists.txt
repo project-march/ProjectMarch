@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
     march_hardware
     roscpp
     roslib
+    urdf
 )
 
 catkin_package(
@@ -46,7 +47,7 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 ## Add gtest based cpp test target and link libraries
-if (CATKIN_ENABLE_TESTING)
+if(CATKIN_ENABLE_TESTING)
     catkin_add_gtest(${PROJECT_NAME}_test
         test/test_runner.cpp
         test/allowed_robot_test.cpp
@@ -55,7 +56,7 @@ if (CATKIN_ENABLE_TESTING)
         test/joint_builder_test.cpp
         test/pdb_builder_test.cpp
     )
-    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME} gtest gmock)
+    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME})
 
     if(ENABLE_COVERAGE_TESTING)
         set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*")
@@ -64,4 +65,4 @@ if (CATKIN_ENABLE_TESTING)
             DEPENDENCIES ${PROJECT_NAME}_test
         )
     endif()
-endif ()
+endif()

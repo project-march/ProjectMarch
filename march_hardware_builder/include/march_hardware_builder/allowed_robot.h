@@ -3,7 +3,9 @@
 #define MARCH_HARDWARE_BUILDER_ALLOWED_ROBOT_H
 #include <iostream>
 #include <string>
+
 #include <ros/package.h>
+#include <ros/ros.h>
 
 class AllowedRobot
 {

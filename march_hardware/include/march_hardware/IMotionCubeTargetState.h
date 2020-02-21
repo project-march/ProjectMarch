@@ -16,18 +16,18 @@ public:
 
 private:
   ::std::string description;
-  int controlWord;
-  int stateMask;
-  int state;
+  uint16_t controlWord;
+  uint16_t stateMask;
+  uint16_t state;
 
 private:
-  IMotionCubeTargetState(const ::std::string& description, int controlWord, int stateMask, int state)
+  IMotionCubeTargetState(const ::std::string& description, uint16_t controlWord, uint16_t stateMask, uint16_t state)
     : description(description), controlWord(controlWord), stateMask(stateMask), state(state)
   {
   }
 
 public:
-  bool isReached(int statusWord) const
+  bool isReached(uint16_t statusWord) const
   {
     return (statusWord & stateMask) == state;
   }
@@ -36,15 +36,15 @@ public:
   {
     return this->description;
   }
-  int getControlWord() const
+  uint16_t getControlWord() const
   {
     return this->controlWord;
   }
-  int getStateMask() const
+  uint16_t getStateMask() const
   {
     return this->stateMask;
   }
-  int getState() const
+  uint16_t getState() const
   {
     return this->state;
   }

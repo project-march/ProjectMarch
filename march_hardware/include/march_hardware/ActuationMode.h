@@ -17,39 +17,42 @@ public:
     unknown,
   };
 
-  ActuationMode()
+  ActuationMode() : value_(unknown)
   {
-    this->value = unknown;
-  };
+  }
+
+  ActuationMode(Value value) : value_(value)
+  {
+  }
 
   explicit ActuationMode(const std::string& actuationMode)
   {
     if (actuationMode == "position")
     {
-      this->value = position;
+      this->value_ = position;
     }
     else if (actuationMode == "unknown")
     {
-      this->value = unknown;
+      this->value_ = unknown;
     }
     else if (actuationMode == "torque")
     {
-      this->value = torque;
+      this->value_ = torque;
     }
     else
     {
       ROS_WARN("Actuation mode (%s) is not recognized, setting to unknown mode", actuationMode.c_str());
-      this->value = ActuationMode::unknown;
+      this->value_ = ActuationMode::unknown;
     }
   }
 
-  int toModeNumber()
+  uint8_t toModeNumber()
   {
-    if (value == position)
+    if (this->value_ == position)
     {
       return 8;
     }
-    else if (value == torque)
+    else if (this->value_ == torque)
     {
       return 10;
     }
@@ -57,35 +60,35 @@ public:
 
   int getValue() const
   {
-    return value;
+    return this->value_;
   }
 
   bool operator==(ActuationMode::Value a) const
   {
-    return value == a;
+    return this->value_ == a;
   }
 
   bool operator!=(ActuationMode::Value a) const
   {
-    return value != a;
+    return this->value_ != a;
   }
 
   std::string toString() const
   {
-    switch (this->value)
+    switch (this->value_)
     {
       case position:
         return "position";
       case torque:
         return "torque";
       default:
-        ROS_WARN("Actuationmode (%i) is neither 'torque' or 'position", value);
+        ROS_WARN("Actuationmode (%i) is neither 'torque' or 'position", this->value_);
         return "unknown";
     }
   }
 
 private:
-  Value value = unknown;
+  Value value_ = unknown;
 };
 }  // namespace march
 

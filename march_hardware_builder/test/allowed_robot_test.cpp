@@ -1,30 +1,34 @@
 // Copyright 2019 Project March.
-#include <vector>
-#include <gtest/gtest.h>
-#include <ros/ros.h>
-#include <gmock/gmock.h>
-#include <ros/package.h>
-#include <march_hardware_builder/hardware_config_exceptions.h>
-#include <march_hardware_builder/hardware_builder.h>
+#include "march_hardware_builder/hardware_builder.h"
+#include "march_hardware_builder/hardware_config_exceptions.h"
 
-using ::testing::AtLeast;
-using ::testing::Return;
+#include <vector>
+
+#include <gtest/gtest.h>
+#include <ros/package.h>
+#include <urdf/model.h>
 
 TEST(AllowedRobotTest, TestMarch4Creation)
 {
-  HardwareBuilder hardwareBuilder = HardwareBuilder(AllowedRobot::march4);
+  urdf::Model urdf;
+  urdf.initFile(ros::package::getPath("march_description").append("/urdf/march4.xacro"));
+  HardwareBuilder hardwareBuilder = HardwareBuilder(AllowedRobot::march4, urdf);
   ASSERT_NO_THROW(march::MarchRobot march4 = hardwareBuilder.createMarchRobot());
 }
 
 TEST(AllowedRobotTest, TestMarch3Creation)
 {
-  HardwareBuilder hardwareBuilder = HardwareBuilder(AllowedRobot::march3);
+  urdf::Model urdf;
+  urdf.initFile(ros::package::getPath("march_description").append("/urdf/march3.xacro"));
+  HardwareBuilder hardwareBuilder = HardwareBuilder(AllowedRobot::march3, urdf);
   ASSERT_NO_THROW(march::MarchRobot march3 = hardwareBuilder.createMarchRobot());
 }
 
 TEST(AllowedRobotTest, TestMarch3Values)
 {
-  march::MarchRobot march3 = HardwareBuilder(AllowedRobot::march3).createMarchRobot();
+  urdf::Model urdf;
+  urdf.initFile(ros::package::getPath("march_description").append("/urdf/march3.xacro"));
+  march::MarchRobot march3 = HardwareBuilder(AllowedRobot::march3, urdf).createMarchRobot();
 
   march::Encoder RHJenc = march::Encoder(16, 22134, 43436, 24515, 0.05);
   march::Encoder LHJenc = march::Encoder(16, 9746, 31557, 11830, 0.05);
@@ -35,42 +39,30 @@ TEST(AllowedRobotTest, TestMarch3Values)
   march::Encoder RAJenc = march::Encoder(12, 1086, 1490, 1301, 0.005);
   march::Encoder LAJenc = march::Encoder(12, 631, 1022, 918, 0.005);
 
-  march::IMotionCube LHJimc = march::IMotionCube(3, LHJenc);
-  march::IMotionCube LKJimc = march::IMotionCube(5, LKJenc);
-  march::IMotionCube LAJimc = march::IMotionCube(7, LAJenc);
-  march::IMotionCube RHJimc = march::IMotionCube(8, RHJenc);
-  march::IMotionCube RKJimc = march::IMotionCube(10, RKJenc);
-  march::IMotionCube RAJimc = march::IMotionCube(12, RAJenc);
+  march::IMotionCube LHJimc = march::IMotionCube(3, LHJenc, march::ActuationMode::position);
+  march::IMotionCube LKJimc = march::IMotionCube(5, LKJenc, march::ActuationMode::position);
+  march::IMotionCube LAJimc = march::IMotionCube(7, LAJenc, march::ActuationMode::position);
+  march::IMotionCube RHJimc = march::IMotionCube(8, RHJenc, march::ActuationMode::position);
+  march::IMotionCube RKJimc = march::IMotionCube(10, RKJenc, march::ActuationMode::position);
+  march::IMotionCube RAJimc = march::IMotionCube(12, RAJenc, march::ActuationMode::position);
 
-  march::Joint leftHip;
+  march::Joint leftHip(LHJimc);
   leftHip.setName("left_hip");
-  leftHip.setIMotionCube(LHJimc);
-  leftHip.setActuationMode(march::ActuationMode("position"));
 
-  march::Joint leftKnee;
+  march::Joint leftKnee(LKJimc);
   leftKnee.setName("left_knee");
-  leftKnee.setIMotionCube(LKJimc);
-  leftKnee.setActuationMode(march::ActuationMode("position"));
 
-  march::Joint leftAnkle;
+  march::Joint leftAnkle(LAJimc);
   leftAnkle.setName("left_ankle");
-  leftAnkle.setIMotionCube(LAJimc);
-  leftAnkle.setActuationMode(march::ActuationMode("position"));
 
-  march::Joint rightHip;
+  march::Joint rightHip(RHJimc);
   rightHip.setName("right_hip");
-  rightHip.setIMotionCube(RHJimc);
-  rightHip.setActuationMode(march::ActuationMode("position"));
 
-  march::Joint rightKnee;
+  march::Joint rightKnee(RKJimc);
   rightKnee.setName("right_knee");
-  rightKnee.setIMotionCube(RKJimc);
-  rightKnee.setActuationMode(march::ActuationMode("position"));
 
-  march::Joint rightAnkle;
+  march::Joint rightAnkle(RAJimc);
   rightAnkle.setName("right_ankle");
-  rightAnkle.setIMotionCube(RAJimc);
-  rightAnkle.setActuationMode(march::ActuationMode("position"));
 
   std::vector<march::Joint> jointList;
 
@@ -81,12 +73,12 @@ TEST(AllowedRobotTest, TestMarch3Values)
   jointList.push_back(rightAnkle);
   jointList.push_back(leftAnkle);
 
-  for (unsigned int i = 0; i < jointList.size(); i++)
+  for (march::Joint& joint : jointList)
   {
-    jointList.at(i).setAllowActuation(true);
+    joint.setAllowActuation(true);
   }
 
-  march::MarchRobot actualRobot = march::MarchRobot(jointList, "enp3s0", 4);
+  march::MarchRobot actualRobot = march::MarchRobot(jointList, urdf, "enp3s0", 4);
 
   EXPECT_EQ(actualRobot.getJoint("right_hip"), march3.getJoint("right_hip"));
   EXPECT_EQ(actualRobot.getJoint("left_hip"), march3.getJoint("left_hip"));
@@ -99,10 +91,14 @@ TEST(AllowedRobotTest, TestMarch3Values)
 
 TEST(AllowedRobotTest, TestTestRotationalSetupCreation)
 {
-  ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::test_joint_rotational).createMarchRobot());
+  urdf::Model urdf;
+  urdf.initFile(ros::package::getPath("march_description").append("/urdf/test_joint_rotational.xacro"));
+  ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::test_joint_rotational, urdf).createMarchRobot());
 }
 
 TEST(AllowedRobotTest, TestTestLinearSetupCreation)
 {
-  ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::test_joint_linear).createMarchRobot());
+  urdf::Model urdf;
+  urdf.initFile(ros::package::getPath("march_description").append("/urdf/test_joint_linear.xacro"));
+  ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::test_joint_linear, urdf).createMarchRobot());
 }

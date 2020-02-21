@@ -1,13 +1,14 @@
 // Copyright 2019 Project March.
+#include "march_hardware/EtherCAT/EthercatMaster.h"
+#include "march_hardware/error/hardware_exception.h"
 
+#include <sstream>
 #include <string>
 #include <vector>
 
 #include <boost/chrono/chrono.hpp>
 
 #include <ros/ros.h>
-
-#include <march_hardware/EtherCAT/EthercatMaster.h>
 
 #include <soem/ethercattype.h>
 #include <soem/nicdrv.h>
@@ -21,8 +22,8 @@
 
 namespace march
 {
-EthercatMaster::EthercatMaster(std::vector<Joint>* joints_ptr, std::string ifname, int max_slave_index, int cycle_time)
-  : joints_ptr_(joints_ptr), ifname_(ifname), max_slave_index_(max_slave_index), cycle_time_ms_(cycle_time)
+EthercatMaster::EthercatMaster(std::string ifname, int max_slave_index, int cycle_time)
+  : ifname_(ifname), max_slave_index_(max_slave_index), cycle_time_ms_(cycle_time)
 {
 }
 
@@ -36,42 +37,32 @@ bool EthercatMaster::isOperational() const
   return this->is_operational_;
 }
 
-/**
- * Initiate the ethercat train and start the loop
- */
-void EthercatMaster::start()
+
+void EthercatMaster::start(std::vector<Joint>& joints)
 {
   EthercatMaster::ethercatMasterInitiation();
-  EthercatMaster::ethercatSlaveInitiation();
+  EthercatMaster::ethercatSlaveInitiation(joints);
 }
 
-/**
- * Open the ethernet port with the given ifname_ and check amount of slaves
- */
 void EthercatMaster::ethercatMasterInitiation()
 {
   ROS_INFO("Trying to start EtherCAT");
-  if (!ec_init(&ifname_[0]))
+  if (!ec_init(this->ifname_.c_str()))
   {
-    ROS_FATAL("No socket connection on %s. Confirm that you have selected the right ifname_", ifname_.c_str());
-    throw std::runtime_error("No socket connection on %s. Confirm that you have selected the right ifname_");
+    throw error::HardwareException(error::ErrorType::NO_SOCKET_CONNECTION, "No socket connection on %s",
+                                   this->ifname_.c_str());
   }
-  ROS_INFO("ec_init on %s succeeded", ifname_.c_str());
+  ROS_INFO("ec_init on %s succeeded", this->ifname_.c_str());
 
-  if (ec_config_init(FALSE) <= 0)
+  const int slave_count = ec_config_init(FALSE);
+  if (slave_count < this->max_slave_index_)
   {
-    ROS_FATAL("No slaves found, shutting down. Confirm that you have selected the right ifname_.");
-    ROS_FATAL("Check that the first slave is connected properly");
-    throw std::runtime_error("No slaves found, shutting down. Confirm that you have selected the right ifname_.");
+    ec_close();
+    throw error::HardwareException(error::ErrorType::NOT_ALL_SLAVES_FOUND,
+                                   "%d slaves configured while soem only found %d slave(s)", this->max_slave_index_,
+                                   slave_count);
   }
-  ROS_INFO("%d slave(s) found and initialized.", ec_slavecount);
-
-  if (ec_slavecount < this->max_slave_index_)
-  {
-    ROS_FATAL("Slave configured with index %d while soem only found %d slave(s)", this->max_slave_index_,
-              ec_slavecount);
-    throw std::runtime_error("More slaves configured than soem could detect.");
-  }
+  ROS_INFO("%d slave(s) found and initialized.", slave_count);
 }
 
 int setSlaveWatchdogTimer(uint16 slave)
@@ -83,16 +74,12 @@ int setSlaveWatchdogTimer(uint16 slave)
   return 1;
 }
 
-/**
- * Set the found slaves to pre-operational state, configure the slaves and move to safe-operational state. If everything
- * went good move to operational state.
- */
-void EthercatMaster::ethercatSlaveInitiation()
+void EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
 {
   ROS_INFO("Request pre-operational state for all slaves");
   ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
 
-  for (auto& joint : *joints_ptr_)
+  for (Joint& joint : joints)
   {
     if (joint.hasIMotionCube())
     {
@@ -107,7 +94,7 @@ void EthercatMaster::ethercatSlaveInitiation()
   ROS_INFO("Request safe-operational state for all slaves");
   ec_statecheck(0, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE * 4);
 
-  expected_working_counter_ = (ec_group[0].outputsWKC * 2) + ec_group[0].inputsWKC;
+  this->expected_working_counter_ = (ec_group[0].outputsWKC * 2) + ec_group[0].inputsWKC;
   ec_slave[0].state = EC_STATE_OPERATIONAL;
 
   ec_send_processdata();
@@ -132,24 +119,23 @@ void EthercatMaster::ethercatSlaveInitiation()
   }
   else
   {
-    ROS_FATAL("Not all slaves reached operational state. Non-operational slave(s) listed below.");
     ec_readstate();
+    std::ostringstream ss;
     for (int i = 1; i <= ec_slavecount; i++)
     {
       if (ec_slave[i].state != EC_STATE_OPERATIONAL)
       {
-        ROS_INFO("Slave %d State=0x%2.2x StatusCode=0x%4.4x : %s\n", i, ec_slave[i].state, ec_slave[i].ALstatuscode,
-                 ec_ALstatuscode2string(ec_slave[i].ALstatuscode));
+        ss << std::endl
+           << "Slave " << i << " State=" << std::hex << std::showbase << ec_slave[i].state
+           << " StatusCode=" << ec_slave[i].ALstatuscode << " (" << ec_ALstatuscode2string(ec_slave[i].ALstatuscode)
+           << ")";
       }
     }
-    throw std::runtime_error("Not all slaves reached operational state.");
+    throw error::HardwareException(error::ErrorType::FAILED_TO_REACH_OPERATIONAL_STATE, "Not operational slaves: %s",
+                                   ss.str().c_str());
   }
 }
 
-/**
- * The ethercat train PDO loop. If the working counter is lower then expected 5% of the time the program displays an
- * error
- */
 void EthercatMaster::ethercatLoop()
 {
   uint32_t totalLoops = 0;
@@ -195,9 +181,6 @@ void EthercatMaster::ethercatLoop()
   }
 }
 
-/**
- * Send the PDO and receive the working counter and check if this is lower then expected.
- */
 void EthercatMaster::SendReceivePDO()
 {
   ec_send_processdata();
@@ -208,9 +191,6 @@ void EthercatMaster::SendReceivePDO()
   }
 }
 
-/**
- * Check if all the slaves are connected and in operational state.
- */
 void EthercatMaster::monitorSlaveConnection()
 {
   for (int slave = 1; slave <= ec_slavecount; slave++)
@@ -224,16 +204,13 @@ void EthercatMaster::monitorSlaveConnection()
   }
 }
 
-/**
- * Stop the ethercat loop and terminate the thread
- */
 void EthercatMaster::stop()
 {
   if (this->is_operational_)
   {
     ROS_INFO("Stopping EtherCAT");
     this->is_operational_ = false;
-    ethercat_thread_.join();
+    this->ethercat_thread_.join();
 
     ec_slave[0].state = EC_STATE_INIT;
     ec_writestate(0);

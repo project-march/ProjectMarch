@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(march_hardware_interface)
 
-add_compile_options(-std=c++11 -Wall -Wextra)
+add_compile_options(-std=c++14 -Wall -Wextra)
 
 find_package(catkin REQUIRED COMPONENTS
     control_toolbox
@@ -76,7 +76,7 @@ if(CATKIN_ENABLE_TESTING)
         test/TestRunner.cpp
         test/TestPdbStateInterface.cpp
     )
-    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} gtest)
+    target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES})
 
     if(ENABLE_COVERAGE_TESTING)
         set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test/*")

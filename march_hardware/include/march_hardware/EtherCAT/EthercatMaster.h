@@ -20,25 +20,59 @@ namespace march
 class EthercatMaster
 {
 public:
-  EthercatMaster(std::vector<Joint>* joints_ptr, std::string ifname, int max_slave_index, int cycle_time);
+  EthercatMaster(std::string ifname, int max_slave_index, int cycle_time);
   ~EthercatMaster();
+
+  /* Delete copy constructor/assignment since the member thread can not be copied */
+  EthercatMaster(const EthercatMaster&) = delete;
+  EthercatMaster& operator=(const EthercatMaster&) = delete;
+
+  /* Enable the move constructor and assignment */
+  EthercatMaster(EthercatMaster&&) = default;
+  EthercatMaster& operator=(EthercatMaster&&) = default;
 
   bool isOperational() const;
 
-  void start();
+  /**
+   * Initializes the ethercat train and starts a thread for the loop.
+   * @throws HardwareException If not the configured amount of slaves was found
+   *                           or they did not all reach operational state
+   */
+  void start(std::vector<Joint>& joints);
+
+  /**
+   * Stops the ethercat loop and joins the thread.
+   */
   void stop();
 
 private:
+  /**
+   * Opens the ethernet port with the given ifname and checks the amount of slaves.
+   */
   void ethercatMasterInitiation();
-  void ethercatSlaveInitiation();
 
+  /**
+   * Configures the found slaves to operational state.
+   */
+  void ethercatSlaveInitiation(std::vector<Joint>& joints);
+
+  /**
+   * The ethercat train PDO loop. If the working counter is lower than
+   * expected 5% of the time, the program displays an error.
+   */
   void ethercatLoop();
+
+  /**
+   * Sends the PDO and receives the working counter and check if this is lower than expected.
+   */
   void SendReceivePDO();
+
+  /**
+   * Checks if all the slaves are connected and in operational state.
+   */
   static void monitorSlaveConnection();
 
   bool is_operational_ = false;
-
-  std::vector<Joint>* joints_ptr_;
 
   const std::string ifname_;
   const int max_slave_index_;
