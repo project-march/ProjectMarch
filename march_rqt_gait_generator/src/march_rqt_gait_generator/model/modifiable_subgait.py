@@ -44,19 +44,14 @@ class ModifiableSubgait(Subgait):
 
     def has_multiple_setpoints_before_duration(self, duration):
         for joint in self.joints:
-            count = 0
-            for setpoint in joint.setpoints:
-                if setpoint.time <= duration:
-                    count += 1
-            if count < 2:
+            if joint.setpoints[1].time > duration:
                 return False
         return True
 
     def has_setpoints_after_duration(self, duration):
         for joint in self.joints:
-            for setpoint in joint.setpoints:
-                if setpoint.time > duration:
-                    return True
+            if joint.setpoints[-1].time > duration:
+                return True
         return False
 
     def can_mirror(self, key_1, key_2):
