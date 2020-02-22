@@ -31,10 +31,14 @@ class ModifiableSubgait(Subgait):
                 ModifiableSetpoint(0, 0, 0),
                 ModifiableSetpoint(duration, 0, 0),
             ]
+            limits = Limits(urdf_joint.safety_controller.soft_lower_limit,
+                            urdf_joint.safety_controller.soft_upper_limit,
+                            urdf_joint.limit.velocity,
+                            urdf_joint.limit.effort,
+                            urdf_joint.safety_controller.k_position,
+                            urdf_joint.safety_controller.k_velocity)
             joint = ModifiableJointTrajectory(urdf_joint.name,
-                                              Limits(urdf_joint.safety_controller.soft_lower_limit,
-                                                     urdf_joint.safety_controller.soft_upper_limit,
-                                                     urdf_joint.limit.velocity),
+                                              limits,
                                               default_setpoints,
                                               duration,
                                               gait_generator,

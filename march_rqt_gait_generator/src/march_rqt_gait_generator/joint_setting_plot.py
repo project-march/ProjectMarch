@@ -18,7 +18,7 @@ class JointSettingPlot(pg.PlotItem):
     # index
     remove_setpoint = pyqtSignal(int)
 
-    def __init__(self, joint, duration, show_velocity_markers=False):
+    def __init__(self, joint, duration, show_velocity_plot=False, show_effort_plot=False):
         pg.PlotItem.__init__(self)
 
         self.dragPoint = None
@@ -27,15 +27,18 @@ class JointSettingPlot(pg.PlotItem):
         self.plot_item = None
         self.plot_position_interpolation = None
         self.plot_velocity_interpolation = None
+        self.plot_min_effort = None
+        self.plot_max_effort = None
 
         self.velocity_markers = []
 
         # Store the velocities so a plot can be converted to a setpoint.
         self.velocities = []
 
-        self.lower_limit = math.degrees(joint.limits.lower)
-        self.upper_limit = math.degrees(joint.limits.upper)
-        self.velocity_limit = joint.limits.velocity
+        self.limits = joint.limits
+        self.lower_limit = math.degrees(self.limits.lower)
+        self.upper_limit = math.degrees(self.limits.upper)
+
         self.duration = duration
         self.joint = joint
 
@@ -45,7 +48,7 @@ class JointSettingPlot(pg.PlotItem):
 
         self.setYRange(self.lower_limit - 0.1, self.upper_limit + 0.1, padding=0)
         middle_y = (self.upper_limit+self.lower_limit) / 2
-        self.velocity_line = self.addLine(y=middle_y)
+        self.zero_line = self.addLine(y=middle_y)
         limit_pen = pg.mkPen(color='r', style=QtCore.Qt.DotLine)
         self.addLine(y=self.lower_limit, pen=limit_pen)
         self.addLine(y=self.upper_limit, pen=limit_pen)
@@ -54,7 +57,7 @@ class JointSettingPlot(pg.PlotItem):
         self.setMenuEnabled(False)
         self.hideButtons()
 
-        self.update_set_points(joint, show_velocity_markers)
+        self.update_set_points(joint, show_velocity_plot, show_effort_plot)
 
         time_pen = pg.mkPen(color='y', style=QtCore.Qt.DotLine)
         self.time_line = self.addLine(0, pen=time_pen, bounds=(0, self.duration))
@@ -93,33 +96,61 @@ class JointSettingPlot(pg.PlotItem):
         self.showGrid(True, True, 1)
         self.plot_position_interpolation = self.plot()
         self.plot_velocity_interpolation = self.plot(pen=pg.mkPen(color='g'))
+        self.plot_min_effort = self.plot(pen=pg.mkPen(color='r'))
+        self.plot_max_effort = self.plot(pen=pg.mkPen(color='r'))
 
-    def update_set_points(self, joint, show_velocity_markers=False):
+    def update_set_points(self, joint, show_velocity_plot=False, show_effort_plot=False):
         time, position, velocity = joint.get_setpoints_unzipped()
 
         for i in range(0, len(position)):
             position[i] = math.degrees(position[i])
 
-        self.create_velocity_markers(joint.setpoints, show_velocity_markers)
+        self.create_velocity_markers(joint.setpoints, show_velocity_plot)
 
         self.plot_item.setData(time, position)
 
-        [indices, values1, values2] = joint.interpolate_setpoints()
-        for i in range(0, len(values1)):
-            values1[i] = math.degrees(values1[i])
-            values2[i] = self.scale_velocity(values2[i])
+        [indices, position_data, velocity_data] = joint.interpolate_setpoints()
+        min_effort_data, max_effort_data = self.calculate_min_max_effort(position_data, velocity_data)
+        for i in range(0, len(position_data)):
+            position_data[i] = math.degrees(position_data[i])
+            velocity_data[i] = self.scale_parameter(velocity_data[i], self.limits.velocity)
+            min_effort_data[i] = self.scale_parameter(min_effort_data[i], self.limits.effort)
+            max_effort_data[i] = self.scale_parameter(max_effort_data[i], self.limits.effort)
 
-        self.plot_position_interpolation.setData(indices, values1)
-        if show_velocity_markers:
-            self.plot_velocity_interpolation.setData(indices, values2)
-            self.velocity_line.setPen(pg.mkPen(color=(0, 110, 0), style=QtCore.Qt.DashLine))
+        self.plot_position_interpolation.setData(indices, position_data)
+        self.zero_line.setPen(None)
+        if show_velocity_plot:
+            self.plot_velocity_interpolation.setData(indices, velocity_data)
+            self.zero_line.setPen(pg.mkPen(color=(0, 0, 200), style=QtCore.Qt.DashLine))
         else:
             self.plot_velocity_interpolation.clear()
-            self.velocity_line.setPen(None)
+        if show_effort_plot:
+            self.plot_min_effort.setData(indices, min_effort_data)
+            self.plot_max_effort.setData(indices, max_effort_data)
+            self.zero_line.setPen(pg.mkPen(color=(0, 0, 200), style=QtCore.Qt.DashLine))
+        else:
+            self.plot_min_effort.clear()
+            self.plot_max_effort.clear()
 
-    def scale_velocity(self, velocity):
-        range = self.upper_limit - self.lower_limit
-        return (0.5 + 0.5 * velocity / self.velocity_limit) * range + self.lower_limit
+    def calculate_min_max_effort(self, position, velocity):
+        max_velocity = [0]*len(position)
+        min_velocity = [0]*len(position)
+        max_effort = [0]*len(position)
+        min_effort = [0]*len(position)
+        for i in range(len(position)):
+            max_velocity[i] = min(-self.limits.k_position * (position[i] - self.limits.upper), self.limits.velocity)
+            min_velocity[i] = max(-self.limits.k_position * (position[i] - self.limits.lower), -self.limits.velocity)
+            max_effort[i] = min(-self.limits.k_velocity * (velocity[i] - max_velocity[i]), self.limits.effort)
+            min_effort[i] = max(-self.limits.k_velocity * (velocity[i] - min_velocity[i]), -self.limits.effort)
+        return min_effort, max_effort
+
+
+    def scale_parameter(self, parameter, max_paramter, min_parameter=None):
+        if min_parameter is None:
+            min_parameter = -max_paramter
+        plot_range = self.upper_limit - self.lower_limit
+        parameter_range = max_paramter - min_parameter
+        return self.lower_limit + plot_range * (parameter - min_parameter) / parameter_range
 
     def mouseClickEvent(self, event):
 
