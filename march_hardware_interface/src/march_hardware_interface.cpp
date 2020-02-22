@@ -64,8 +64,6 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
     soft_limits_[i] = soft_limits;
   }
 
-  initiateIMC();
-
   // Create march_pdb_state interface
   MarchPdbStateHandle march_pdb_state_handle("PDBhandle", &power_distribution_board_read_,
                                              &master_shutdown_allowed_command_, &enable_high_voltage_command_,
@@ -301,20 +299,6 @@ void MarchHardwareInterface::reserveMemory()
   imc_state_pub_->msg_.motion_error_description.resize(num_joints_);
   imc_state_pub_->msg_.motor_current.resize(num_joints_);
   imc_state_pub_->msg_.motor_voltage.resize(num_joints_);
-}
-
-void MarchHardwareInterface::initiateIMC()
-{
-  ROS_INFO("Resetting all IMC on initialization");
-  for (const std::string& joint_name : joint_names_)
-  {
-    Joint joint = march_robot_.getJoint(joint_name);
-    joint.resetIMotionCube();
-  }
-
-  ROS_INFO("Restarting EtherCAT");
-  march_robot_.stopEtherCAT();
-  march_robot_.startEtherCAT();
 }
 
 void MarchHardwareInterface::updatePowerDistributionBoard()

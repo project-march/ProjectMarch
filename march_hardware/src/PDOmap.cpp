@@ -57,6 +57,9 @@ std::unordered_map<IMCObjectName, uint8_t> PDOmap::map(int slave_index, DataDire
       return configurePDO(slave_index, 0x1A00, 0x1C13);
     case DataDirection::MOSI:
       return configurePDO(slave_index, 0x1600, 0x1C12);
+    default:
+      ROS_ERROR("Invalid data direction given, returning empty map");
+      return {};
   }
 }
 

@@ -33,7 +33,7 @@ const char* getErrorDescription(ErrorType type)
       return "Not all configured slaves were able to be found";
     case ErrorType::FAILED_TO_REACH_OPERATIONAL_STATE:
       return "At least one slave failed to reach ethercat operational state";
-    case ErrorType::UNKNOWN:
+    default:
       return "Unknown error occurred. Please create/use a documented error";
   }
 }

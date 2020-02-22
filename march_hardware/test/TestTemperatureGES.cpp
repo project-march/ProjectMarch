@@ -46,7 +46,7 @@ TEST_F(TemperatureJointDeathTest, ByteOffsetMinusOne)
 
 TEST_F(TemperatureJointTest, NoSlaveIndexConstructor)
 {
-  ASSERT_NO_THROW(march::TemperatureGES tempSens = march::TemperatureGES());
+  ASSERT_NO_THROW(march::TemperatureGES());
 }
 TEST_F(TemperatureJointTest, NoSlaveIndexConstructorGetIndex)
 {

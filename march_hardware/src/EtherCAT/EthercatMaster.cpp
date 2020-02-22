@@ -37,7 +37,6 @@ bool EthercatMaster::isOperational() const
   return this->is_operational_;
 }
 
-
 void EthercatMaster::start(std::vector<Joint>& joints)
 {
   EthercatMaster::ethercatMasterInitiation();
@@ -138,9 +137,9 @@ void EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
 
 void EthercatMaster::ethercatLoop()
 {
-  uint32_t totalLoops = 0;
-  uint32_t rateNotAchievedCount = 0;
-  int rate = 1000 / cycle_time_ms_;
+  size_t totalLoops = 0;
+  size_t rateNotAchievedCount = 0;
+  size_t rate = 1000 / cycle_time_ms_;
 
   while (this->is_operational_)
   {

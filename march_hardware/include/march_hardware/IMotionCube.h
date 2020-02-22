@@ -44,7 +44,6 @@ public:
 
   void goToTargetState(IMotionCubeTargetState target_state);
   void goToOperationEnabled();
-  void resetIMotionCube();
 
   /** @brief Override comparison operator */
   friend bool operator==(const IMotionCube& lhs, const IMotionCube& rhs)
