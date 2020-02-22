@@ -1,7 +1,7 @@
+import copy
 import unittest
 
 from mock import Mock
-import copy
 
 from march_rqt_gait_generator.model.modifiable_joint_trajectory import ModifiableJointTrajectory
 from march_rqt_gait_generator.model.modifiable_setpoint import ModifiableSetpoint
@@ -174,11 +174,9 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
             self.joint_trajectory.undo()
         self.assertEqual(self.joint_trajectory.setpoints, setpoints_copy)
 
-
     def test_undo_max_history_memory_redo_list_length(self):
         new_setpoint = ModifiableSetpoint(1.5, 0, 0)
         self.joint_trajectory.add_setpoint(new_setpoint)
-        setpoints_copy = copy.deepcopy(self.joint_trajectory.setpoints)
         for i in range(100):
             new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
             self.joint_trajectory.add_setpoint(new_setpoint)
@@ -216,8 +214,6 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
         setpoints_copy = copy.deepcopy(self.joint_trajectory.setpoints)
         self.joint_trajectory.undo()
         self.joint_trajectory.redo()
-        print(self.joint_trajectory.setpoints)
-        print(setpoints_copy)
         self.assertEqual(self.joint_trajectory.setpoints, setpoints_copy)
 
     def test_undo_redo_multiple_things(self):
@@ -250,7 +246,7 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
             self.joint_trajectory.redo()
         self.assertEqual(len(self.joint_trajectory.setpoints_history), 70)
 
-    def test_undo_redo_list_length(self):
+    def test_undo_redo_redo_list_length(self):
         for i in range(100):
             new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
             self.joint_trajectory.add_setpoint(new_setpoint)
