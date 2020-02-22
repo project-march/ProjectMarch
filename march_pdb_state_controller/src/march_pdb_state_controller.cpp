@@ -9,7 +9,7 @@ namespace march_pdb_state_controller
 // TODO(TIM) Remove the callbacks and subscribers when they are not needed anymore
 // These topics make it able to tests write to pdb commands.
 bool MarchPdbStateController::serviceDisableEnableHighVoltage(std_srvs::SetBool::Request& req,
-                                                              std_srvs::SetBool::Response& res)
+                                                              std_srvs::SetBool::Response& /* res */)
 {
   if (pdb_state_.getHighVoltageEnabled() != req.data)
   {

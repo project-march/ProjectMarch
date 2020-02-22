@@ -26,7 +26,7 @@ public:
 
   ~Slave() = default;
 
-  virtual void writeInitialSDOs(int ecatCycleTime)
+  virtual void writeInitialSDOs(int /* cycle_time */)
   {
   }
 

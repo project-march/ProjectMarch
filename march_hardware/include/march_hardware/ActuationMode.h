@@ -48,13 +48,14 @@ public:
 
   uint8_t toModeNumber()
   {
-    if (this->value_ == position)
+    switch (this->value_)
     {
-      return 8;
-    }
-    else if (this->value_ == torque)
-    {
-      return 10;
+      case position:
+        return 8;
+      case torque:
+        return 10;
+      default:
+        return 0;
     }
   }
 

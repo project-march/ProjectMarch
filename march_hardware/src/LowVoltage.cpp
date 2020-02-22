@@ -36,7 +36,7 @@ bool LowVoltage::getNetOperational(int netNumber)
   return ((operational.ui >> (netNumber - 1)) & 1);
 }
 
-void LowVoltage::setNetOnOff(bool on, int netNumber)
+void LowVoltage::setNetOnOff(bool /* on */, int /* netNumber */)
 {
   ROS_ERROR_THROTTLE(2, "Can't control low voltage nets from master");
 }
