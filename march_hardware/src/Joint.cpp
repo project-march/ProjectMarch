@@ -39,11 +39,6 @@ void Joint::prepareActuation()
   }
 }
 
-void Joint::resetIMotionCube()
-{
-  this->iMotionCube.resetIMotionCube();
-}
-
 void Joint::actuateRad(double targetPositionRad)
 {
   ROS_ASSERT_MSG(this->allowActuation,

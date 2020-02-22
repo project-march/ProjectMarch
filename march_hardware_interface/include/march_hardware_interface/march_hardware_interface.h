@@ -73,7 +73,6 @@ private:
   void updatePowerDistributionBoard();
   void updateAfterLimitJointCommand();
   void updateIMotionCubeState();
-  void initiateIMC();
   void outsideLimitsCheck(size_t joint_index);
   void iMotionCubeStateCheck(size_t joint_index);
 
