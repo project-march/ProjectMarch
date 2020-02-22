@@ -137,16 +137,16 @@ class ModifiableSubgait(Subgait):
         self.gait_type = str(gait_type)
 
     def set_gait_name(self, gait_name):
-        self.gait_name = gait_name
+        self.gait_name = str(gait_name)
 
     def set_description(self, description):
         self.description = str(description)
 
     def set_version(self, version):
-        self.version = version
+        self.version = str(version)
 
     def set_subgait_name(self, subgait_name):
-        self.subgait_name = subgait_name
+        self.subgait_name = str(subgait_name)
 
     def set_duration(self, duration, rescale=False):
         for joint in self.joints:
