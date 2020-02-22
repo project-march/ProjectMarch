@@ -42,13 +42,6 @@ class ModifiableSubgait(Subgait):
             joint_list.append(joint)
         return cls(joint_list, duration, gait_type, gait_name, subgait_name, version, description)
 
-    @classmethod
-    def from_file(cls, gait_generator, robot, filename):
-        subgait = super(ModifiableSubgait, cls).from_file(robot, filename, gait_generator)
-        if subgait is None:
-            return
-        return subgait
-
     def has_multiple_setpoints_before_duration(self, duration):
         for joint in self.joints:
             count = 0

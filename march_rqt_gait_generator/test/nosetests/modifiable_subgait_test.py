@@ -9,7 +9,7 @@ from march_rqt_gait_generator.model.modifiable_subgait import ModifiableSubgait
 
 class ModifiableSubgaitTest(unittest.TestCase):
     def setUp(self):
-        self.gait_generator = Mock({'save_changed_joints': None})
+        self.gait_generator = Mock()
         self.gait_name = 'walk'
         self.subgait_name = 'left_swing'
         self.version = 'MV_walk_leftswing_v2'
@@ -19,8 +19,30 @@ class ModifiableSubgaitTest(unittest.TestCase):
                                                                               gait=self.gait_name,
                                                                               subgait=self.subgait_name,
                                                                               version=self.version)
-        self.subgait = ModifiableSubgait.from_file(self.gait_generator, self.robot, self.subgait_path)
+        self.subgait = ModifiableSubgait.from_file(self.robot, self.subgait_path, self.gait_generator)
         self.subgait_msg = self.subgait.to_subgait_msg()
 
-    def test_something(self):
-        self.assertTrue(True)
+    # empty_subgait tests
+    def test_empty_subgait_type(self):
+        empty_subgait = ModifiableSubgait.empty_subgait(self.gait_generator, self.robot)
+        self.assertIsInstance(empty_subgait, ModifiableSubgait)
+
+    def test_empty_subgait_length(self):
+        empty_subgait = ModifiableSubgait.empty_subgait(self.gait_generator, self.robot)
+        number_of_joints = sum([1 for joint in self.robot.joints if joint.type == 'revolute'])
+        self.assertEqual(len(empty_subgait.joints), number_of_joints)
+
+    def test_empty_subgait_no_robot(self):
+        empty_subgait = ModifiableSubgait.empty_subgait(self.gait_generator, None)
+        self.assertIsNone(empty_subgait)
+
+    # has_multiple_setpoints_before_duration tests
+    def test_has_multiple_setpoints
+
+
+
+
+
+
+
+

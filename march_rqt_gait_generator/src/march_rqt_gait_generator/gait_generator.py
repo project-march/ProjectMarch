@@ -367,7 +367,7 @@ class GaitGeneratorPlugin(Plugin):
                                                    os.getenv('HOME') + '/march_ws/src/gait-files/march_gait_files',
                                                    'March Subgait (*.subgait)')
 
-        gait = ModifiableSubgait.from_file(self, self.robot, file_name)
+        gait = ModifiableSubgait.from_file(self.robot, file_name, self)
         if gait is None:
             rospy.logwarn('Could not load gait %s', file_name)
             return
