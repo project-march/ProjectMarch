@@ -1,8 +1,12 @@
 [flake8]
 show-source = true
 max-line-length = 120
+format = ${cyan}%(path)s${reset}:${yellow_bold}%(row)d${reset}:${green_bold}%(col)d${reset}: ${red_bold}%(code)s${reset} %(text)s
 exclude = .git
-application-package-names = march_shared_classes, march_shared_resources
+application-package-names =
+    march_shared_classes,
+    march_shared_resources,
+    march_rqt_gait_generator
 import-order-style = appnexus
 ignore =
     # D100: Missing docstring in public module
@@ -22,4 +26,4 @@ ignore =
     # D107: Missing docstring in __init__
     D107,
 # These function names are inherited from Qt, so we can't rename them
-ignore-names = createEditor, setEditorData, setModelData, updateEditorGeometry, mouseClickEvent, mouseDragEvent
+ignore-names = createEditor, setEditorData, setModelData, updateEditorGeometry, mouseClickEvent, mouseDragEvent, setUp

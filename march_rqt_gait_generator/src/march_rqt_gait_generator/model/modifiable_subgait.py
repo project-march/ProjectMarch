@@ -42,28 +42,16 @@ class ModifiableSubgait(Subgait):
             joint_list.append(joint)
         return cls(joint_list, duration, gait_type, gait_name, subgait_name, version, description)
 
-    @classmethod
-    def from_file(cls, gait_generator, robot, filename):
-        subgait = super(ModifiableSubgait, cls).from_file(robot, filename, gait_generator)
-        if subgait is None:
-            return
-        return subgait
-
     def has_multiple_setpoints_before_duration(self, duration):
         for joint in self.joints:
-            count = 0
-            for setpoint in joint.setpoints:
-                if setpoint.time <= duration:
-                    count += 1
-            if count < 2:
+            if joint.setpoints[1].time > duration:
                 return False
         return True
 
     def has_setpoints_after_duration(self, duration):
         for joint in self.joints:
-            for setpoint in joint.setpoints:
-                if setpoint.time > duration:
-                    return True
+            if joint.setpoints[-1].time > duration:
+                return True
         return False
 
     def can_mirror(self, key_1, key_2):
