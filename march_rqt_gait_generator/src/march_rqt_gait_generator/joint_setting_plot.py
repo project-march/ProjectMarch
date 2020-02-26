@@ -44,7 +44,7 @@ class JointSettingPlot(pg.PlotItem):
         self.setTitle(joint.name)
 
         self.setYRange(self.lower_limit - 0.1, self.upper_limit + 0.1, padding=0)
-        middle_y = (self.upper_limit+self.lower_limit) / 2
+        middle_y = (self.upper_limit + self.lower_limit) / 2
         self.velocity_line = self.addLine(y=middle_y)
         limit_pen = pg.mkPen(color='r', style=QtCore.Qt.DotLine)
         self.addLine(y=self.lower_limit, pen=limit_pen)
@@ -118,8 +118,8 @@ class JointSettingPlot(pg.PlotItem):
             self.velocity_line.setPen(None)
 
     def scale_velocity(self, velocity):
-        range = self.upper_limit - self.lower_limit
-        return (0.5 + 0.5 * velocity / self.velocity_limit) * range + self.lower_limit
+        position_range = self.upper_limit - self.lower_limit
+        return (0.5 + 0.5 * velocity / self.velocity_limit) * position_range + self.lower_limit
 
     def mouseClickEvent(self, event):
 
