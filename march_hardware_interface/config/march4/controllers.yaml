@@ -23,14 +23,14 @@ march:
         - right_hip_fe
         - right_knee
       gains: # Required because we're controlling an effort interface
-        left_ankle: {p: 130, i: 0, d: 6, i_clamp: 100, publish_state: true, antiwindup: true}
-        left_hip_aa: {p: 220, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
-        left_hip_fe: {p: 120, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
-        left_knee: {p: 50, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
-        right_ankle: {p: 130, i: 0, d: 5, i_clamp: 100, publish_state: true, antiwindup: true}
-        right_hip_aa: {p: 220, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true} # TODO(BaCo) tune HAA joints
-        right_hip_fe: {p: 120, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
-        right_knee: {p: 50, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}
+        left_ankle: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
+        left_hip_aa: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
+        left_hip_fe: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
+        left_knee: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
+        right_ankle: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
+        right_hip_aa: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true} # TODO(BaCo) tune HAA joints
+        right_hip_fe: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
+        right_knee: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
 
       constraints:
         left_ankle:
