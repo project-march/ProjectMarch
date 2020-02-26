@@ -22,6 +22,7 @@ env:
     - ROS_REPO=ros
     - BUILDER=colcon
     - CATKIN_LINT=pedantic
+    - AFTER_INSTALL_TARGET_DEPENDENCIES='pip install numpy_ringbuffer'
     - UPSTREAM_WORKSPACE='.rosinstall -march/march_data_collector -march/march_gain_scheduling -march/march_gait_scheduler -march/march_gait_selection -march/march_launch -march/march_safety -march/march_state_machine'
 
 jobs:
