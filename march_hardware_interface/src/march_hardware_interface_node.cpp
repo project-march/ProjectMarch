@@ -3,14 +3,9 @@
 
 #include <controller_manager/controller_manager.h>
 #include <ros/ros.h>
-#include <control_msgs/JointTrajectoryControllerState.h>
 
 #include <march_hardware/error/hardware_exception.h>
 #include <march_hardware_builder/hardware_builder.h>
-
-void callback(const control_msgs::JointTrajectoryControllerState&)
-{
-}
 
 int main(int argc, char** argv)
 {
@@ -50,10 +45,6 @@ int main(int argc, char** argv)
   ros::Rate rate(loop_hz);
 
   controller_manager::ControllerManager controller_manager(&march, nh);
-
-  ros::Subscriber sub = nh.subscribe("/march/controller/trajectory/state", 1, callback);
-
-  while (sub.getNumPublishers() == 0) {}
 
   while (ros::ok())
   {
