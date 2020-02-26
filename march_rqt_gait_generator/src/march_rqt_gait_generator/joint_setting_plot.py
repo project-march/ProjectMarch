@@ -25,7 +25,8 @@ class JointSettingPlot(pg.PlotItem):
         self.dragIndex = -1
         self.dragOffset = 0
         self.plot_item = None
-        self.plot_interpolation = None
+        self.plot_position_interpolation = None
+        self.plot_velocity_interpolation = None
 
         self.velocity_markers = []
 
@@ -34,6 +35,7 @@ class JointSettingPlot(pg.PlotItem):
 
         self.lower_limit = math.degrees(joint.limits.lower)
         self.upper_limit = math.degrees(joint.limits.upper)
+        self.velocity_limit = joint.limits.velocity
         self.duration = duration
         self.joint = joint
 
@@ -42,9 +44,11 @@ class JointSettingPlot(pg.PlotItem):
         self.setTitle(joint.name)
 
         self.setYRange(self.lower_limit - 0.1, self.upper_limit + 0.1, padding=0)
+        middle_y = (self.upper_limit + self.lower_limit) / 2
+        self.velocity_line = self.addLine(y=middle_y)
         limit_pen = pg.mkPen(color='r', style=QtCore.Qt.DotLine)
-        self.addItem(pg.InfiniteLine(self.lower_limit, angle=0, pen=limit_pen))
-        self.addItem(pg.InfiniteLine(self.upper_limit, angle=0, pen=limit_pen))
+        self.addLine(y=self.lower_limit, pen=limit_pen)
+        self.addLine(y=self.upper_limit, pen=limit_pen)
         self.setXRange(-0.1, self.duration + 0.1, padding=0)
         self.setMouseEnabled(False, False)
         self.setMenuEnabled(False)
@@ -87,7 +91,8 @@ class JointSettingPlot(pg.PlotItem):
     def create_plots(self, joint):
         self.plot_item = self.plot(pen=None, symbolBrush=(255, 0, 0), symbolPen='w')
         self.showGrid(True, True, 1)
-        self.plot_interpolation = self.plot()
+        self.plot_position_interpolation = self.plot()
+        self.plot_velocity_interpolation = self.plot(pen=pg.mkPen(color='g'))
 
     def update_set_points(self, joint, show_velocity_markers=False):
         time, position, velocity = joint.get_setpoints_unzipped()
@@ -99,11 +104,22 @@ class JointSettingPlot(pg.PlotItem):
 
         self.plot_item.setData(time, position)
 
-        [indices, values] = joint.interpolate_setpoints()
-        for i in range(0, len(values)):
-            values[i] = math.degrees(values[i])
+        [indices, values1, values2] = joint.interpolate_setpoints()
+        for i in range(0, len(values1)):
+            values1[i] = math.degrees(values1[i])
+            values2[i] = self.scale_velocity(values2[i])
 
-        self.plot_interpolation.setData(indices, values)
+        self.plot_position_interpolation.setData(indices, values1)
+        if show_velocity_markers:
+            self.plot_velocity_interpolation.setData(indices, values2)
+            self.velocity_line.setPen(pg.mkPen(color=(0, 110, 0), style=QtCore.Qt.DashLine))
+        else:
+            self.plot_velocity_interpolation.clear()
+            self.velocity_line.setPen(None)
+
+    def scale_velocity(self, velocity):
+        position_range = self.upper_limit - self.lower_limit
+        return (0.5 + 0.5 * velocity / self.velocity_limit) * position_range + self.lower_limit
 
     def mouseClickEvent(self, event):
 
