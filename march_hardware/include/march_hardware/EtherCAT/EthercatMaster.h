@@ -13,7 +13,7 @@ namespace march
  * Base class of the ethercat master supported with the SOEM library
  * @param ifname Network interface name, check ifconfig.
  * @param io_map Holds the mapping of the SOEM message.
- * @param expeted_working_counter The expected working counter of the ethercat train.
+ * @param expected_working_counter The expected working counter of the ethercat train.
  * @param cycle_time_ms The ethercat cycle time.
  * @param max_slave_index The maximum amount of slaves connected to the train.
  */
@@ -27,11 +27,16 @@ public:
   EthercatMaster(const EthercatMaster&) = delete;
   EthercatMaster& operator=(const EthercatMaster&) = delete;
 
-  /* Enable the move constructor and assignment */
+  /* Enable the move constructor */
   EthercatMaster(EthercatMaster&&) = default;
-  EthercatMaster& operator=(EthercatMaster&&) = default;
+  EthercatMaster& operator=(EthercatMaster&&) = delete;
 
   bool isOperational() const;
+
+  /**
+   * Returns the cycle time in milliseconds.
+   */
+  int getCycleTime() const;
 
   /**
    * Initializes the ethercat train and starts a thread for the loop.

@@ -274,6 +274,11 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
   }
 }
 
+int MarchHardwareInterface::getEthercatCycleTime() const
+{
+  return this->march_robot_.getEthercatCycleTime();
+}
+
 void MarchHardwareInterface::reserveMemory()
 {
   joint_position_.resize(num_joints_);

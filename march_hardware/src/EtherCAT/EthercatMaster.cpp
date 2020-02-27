@@ -23,7 +23,7 @@
 namespace march
 {
 EthercatMaster::EthercatMaster(std::string ifname, int max_slave_index, int cycle_time)
-  : ifname_(ifname), max_slave_index_(max_slave_index), cycle_time_ms_(cycle_time)
+  : ifname_(std::move(ifname)), max_slave_index_(max_slave_index), cycle_time_ms_(cycle_time)
 {
 }
 
@@ -35,6 +35,11 @@ EthercatMaster::~EthercatMaster()
 bool EthercatMaster::isOperational() const
 {
   return this->is_operational_;
+}
+
+int EthercatMaster::getCycleTime() const
+{
+  return this->cycle_time_ms_;
 }
 
 void EthercatMaster::start(std::vector<Joint>& joints)
