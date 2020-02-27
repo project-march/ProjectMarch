@@ -8,8 +8,7 @@
 
     <rosparam file="$(find march_hardware_interface)/config/$(arg robot)/controllers.yaml" command="load"/>
 
-    <param name="robot_description"
-           command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/$(arg robot).xacro'" />
+    <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot).urdf"/>
 
     <group ns="march">
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
