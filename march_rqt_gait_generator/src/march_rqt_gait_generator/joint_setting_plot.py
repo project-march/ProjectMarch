@@ -133,17 +133,16 @@ class JointSettingPlot(pg.PlotItem):
             self.plot_max_effort.clear()
 
     def calculate_min_max_effort(self, position, velocity):
-        max_velocity = [0]*len(position)
-        min_velocity = [0]*len(position)
-        max_effort = [0]*len(position)
-        min_effort = [0]*len(position)
+        max_velocity = [0] * len(position)
+        min_velocity = [0] * len(position)
+        max_effort = [0] * len(position)
+        min_effort = [0] * len(position)
         for i in range(len(position)):
             max_velocity[i] = min(-self.limits.k_position * (position[i] - self.limits.upper), self.limits.velocity)
             min_velocity[i] = max(-self.limits.k_position * (position[i] - self.limits.lower), -self.limits.velocity)
             max_effort[i] = min(-self.limits.k_velocity * (velocity[i] - max_velocity[i]), self.limits.effort)
             min_effort[i] = max(-self.limits.k_velocity * (velocity[i] - min_velocity[i]), -self.limits.effort)
         return min_effort, max_effort
-
 
     def scale_parameter(self, parameter, max_paramter, min_parameter=None):
         if min_parameter is None:
