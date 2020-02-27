@@ -1,6 +1,7 @@
 name: ''
 version: ''
 description: "Home sit gait for the sitting block. This version has 5 degrees more hip extension in comparison to the MIII home gait"
+gait_type: "sit_like"
 setpoints: 
   - 
     time_from_start: 
