@@ -13,7 +13,7 @@
     <!-- In theory, if the controller is properly tuned, these values can be arbitrarily large. -->
     <!-- However, to limit the safety controller, we need to limit them. -->
     <param name="robot_description"
-           command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/$(arg robot).xacro'
+           command="$(find xacro)/xacro '$(find march_description)/urdf/$(arg robot).xacro'
                     k_velocity_value_hfe:=60.0 k_velocity_value_kfe:=60.0
                     k_velocity_value_haa:=60.0 k_velocity_value_adpf:=60.0
                     k_position_value_hfe:=50.0 k_position_value_kfe:=50.0
