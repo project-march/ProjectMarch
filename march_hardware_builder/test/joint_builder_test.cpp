@@ -1,140 +1,128 @@
 // Copyright 2019 Project March.
+#include "march_hardware_builder/hardware_builder.h"
+#include "march_hardware_builder/hardware_config_exceptions.h"
+
 #include <string>
 
 #include <gtest/gtest.h>
 #include <ros/package.h>
-#include <march_hardware_builder/hardware_config_exceptions.h>
-#include <march_hardware_builder/hardware_builder.h>
+#include <urdf/model.h>
 
 class JointTest : public ::testing::Test
 {
 protected:
   std::string base_path;
+  urdf::JointSharedPtr joint;
 
   void SetUp() override
   {
-    base_path = ros::package::getPath("march_hardware_builder").append("/test/yaml/joint");
+    this->base_path = ros::package::getPath("march_hardware_builder").append("/test/yaml/joint");
+    this->joint = std::make_shared<urdf::Joint>();
+    this->joint->limits = std::make_shared<urdf::JointLimits>();
+    this->joint->safety = std::make_shared<urdf::JointSafety>();
   }
 
-  std::string fullPath(const std::string& relativePath)
+  YAML::Node loadTestYaml(const std::string& relative_path)
   {
-    return this->base_path.append(relativePath);
+    return YAML::LoadFile(this->base_path.append(relative_path));
   }
-};
-
-class JointDeathTest : public JointTest
-{
 };
 
 TEST_F(JointTest, ValidJointHip)
 {
-  std::string fullPath = this->fullPath("/joint_correct_1.yaml");
-  YAML::Node jointConfig = YAML::LoadFile(fullPath);
+  YAML::Node config = this->loadTestYaml("/joint_correct.yaml");
+  this->joint->limits->lower = 0.0;
+  this->joint->limits->upper = 2.0;
+  this->joint->safety->soft_lower_limit = 0.1;
+  this->joint->safety->soft_upper_limit = 1.9;
 
-  march::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_hip");
+  march::Joint created = HardwareBuilder::createJoint(config, "test_joint_hip", this->joint);
 
-  march::Encoder actualEncoder = march::Encoder(16, 22134, 43436, 24515, 0.05);
-  march::IMotionCube actualIMotionCube = march::IMotionCube(2, actualEncoder, march::ActuationMode::unknown);
-  march::TemperatureGES actualTemperatureGes = march::TemperatureGES(1, 2);
-  march::Joint actualJoint(actualIMotionCube);
-  actualJoint.setName("test_joint_hip");
-  actualJoint.setAllowActuation(true);
-  actualJoint.setTemperatureGes(actualTemperatureGes);
+  march::Encoder encoder = march::Encoder(16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper,
+                                          this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit);
+  march::IMotionCube imc = march::IMotionCube(2, encoder, march::ActuationMode::unknown);
+  march::TemperatureGES ges = march::TemperatureGES(1, 2);
+  march::Joint expected(imc);
+  expected.setName("test_joint_hip");
+  expected.setAllowActuation(true);
+  expected.setTemperatureGes(ges);
 
-  ASSERT_EQ("test_joint_hip", actualJoint.getName());
-  ASSERT_EQ(actualJoint, createdJoint);
+  ASSERT_EQ("test_joint_hip", expected.getName());
+  ASSERT_EQ(expected, created);
 }
 
 TEST_F(JointTest, ValidNotActuated)
 {
-  std::string fullPath = this->fullPath("/joint_correct_not_actuated.yaml");
-  YAML::Node jointConfig = YAML::LoadFile(fullPath);
+  YAML::Node config = this->loadTestYaml("/joint_correct_not_actuated.yaml");
+  this->joint->limits->lower = 0.0;
+  this->joint->limits->upper = 2.0;
+  this->joint->safety->soft_lower_limit = 0.1;
+  this->joint->safety->soft_upper_limit = 1.9;
 
-  march::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_hip");
+  march::Joint created = HardwareBuilder::createJoint(config, "test_joint_hip", this->joint);
 
-  march::Encoder actualEncoder = march::Encoder(16, 22134, 43436, 24515, 0.05);
-  march::IMotionCube actualIMotionCube = march::IMotionCube(2, actualEncoder, march::ActuationMode::unknown);
-  march::TemperatureGES actualTemperatureGes = march::TemperatureGES(1, 2);
-  march::Joint actualJoint(actualIMotionCube);
-  actualJoint.setName("test_joint_hip");
-  actualJoint.setAllowActuation(false);
-  actualJoint.setTemperatureGes(actualTemperatureGes);
+  march::Encoder encoder = march::Encoder(16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper,
+                                          this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit);
+  march::IMotionCube imc = march::IMotionCube(2, encoder, march::ActuationMode::unknown);
+  march::TemperatureGES ges = march::TemperatureGES(1, 2);
+  march::Joint expected(imc);
+  expected.setName("test_joint_hip");
+  expected.setAllowActuation(false);
+  expected.setTemperatureGes(ges);
 
-  march::Joint actualJointWrong(actualIMotionCube);
-
-  actualJointWrong.setName("test_joint_hip");
-  actualJointWrong.setAllowActuation(true);
-  actualJointWrong.setTemperatureGes(actualTemperatureGes);
-  ASSERT_EQ("test_joint_hip", actualJoint.getName());
-  ASSERT_FALSE(actualJoint.canActuate());
-  ASSERT_EQ(actualJoint, createdJoint);
-  ASSERT_NE(actualJointWrong, createdJoint);
-}
-
-TEST_F(JointTest, ValidJointAnkle)
-{
-  std::string fullPath = this->fullPath("/joint_correct_2.yaml");
-  YAML::Node jointConfig = YAML::LoadFile(fullPath);
-
-  march::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_ankle");
-
-  march::Encoder actualEncoder = march::Encoder(20, 3, 40000, 5, 0.05);
-  march::IMotionCube actualIMotionCube = march::IMotionCube(10, actualEncoder, march::ActuationMode::unknown);
-  march::TemperatureGES actualTemperatureGes = march::TemperatureGES(10, 6);
-
-  march::Joint actualJoint(actualIMotionCube);
-
-  actualJoint.setName("test_joint_ankle");
-  actualJoint.setAllowActuation(true);
-  actualJoint.setTemperatureGes(actualTemperatureGes);
-
-  ASSERT_EQ("test_joint_ankle", actualJoint.getName());
-  ASSERT_EQ(actualJoint, createdJoint);
+  ASSERT_EQ("test_joint_hip", expected.getName());
+  ASSERT_FALSE(expected.canActuate());
+  ASSERT_EQ(expected, created);
 }
 
 TEST_F(JointTest, NoActuate)
 {
-  std::string fullPath = this->fullPath("/joint_no_actuate.yaml");
-  YAML::Node jointConfig = YAML::LoadFile(fullPath);
+  YAML::Node config = this->loadTestYaml("/joint_no_actuate.yaml");
 
-  ASSERT_THROW(HardwareBuilder::createJoint(jointConfig, "test_joint_no_actuate"), MissingKeyException);
+  ASSERT_THROW(HardwareBuilder::createJoint(config, "test_joint_no_actuate", this->joint), MissingKeyException);
 }
 
 TEST_F(JointTest, NoIMotionCube)
 {
-  std::string fullPath = this->fullPath("/joint_no_imotioncube.yaml");
-  YAML::Node jointConfig = YAML::LoadFile(fullPath);
+  YAML::Node config = this->loadTestYaml("/joint_no_imotioncube.yaml");
 
-  ASSERT_THROW(HardwareBuilder::createJoint(jointConfig, "test_joint_no_imotioncube"), MissingKeyException);
+  ASSERT_THROW(HardwareBuilder::createJoint(config, "test_joint_no_imotioncube", this->joint), MissingKeyException);
 }
 
 TEST_F(JointTest, NoTemperatureGES)
 {
-  std::string fullPath = this->fullPath("/joint_no_temperature_ges.yaml");
-  YAML::Node jointConfig = YAML::LoadFile(fullPath);
+  YAML::Node config = this->loadTestYaml("/joint_no_temperature_ges.yaml");
+  this->joint->limits->lower = 0.0;
+  this->joint->limits->upper = 0.24;
+  this->joint->safety->soft_lower_limit = 0.1;
+  this->joint->safety->soft_upper_limit = 0.15;
 
-  ASSERT_NO_THROW(HardwareBuilder::createJoint(jointConfig, "test_joint_no_temperature_ges"));
+  ASSERT_NO_THROW(HardwareBuilder::createJoint(config, "test_joint_no_temperature_ges", this->joint));
 }
 
 TEST_F(JointTest, ValidActuationMode)
 {
-  std::string fullPath = this->fullPath("/joint_correct_position_mode.yaml");
-  YAML::Node jointConfig = YAML::LoadFile(fullPath);
+  YAML::Node config = this->loadTestYaml("/joint_correct_position_mode.yaml");
+  this->joint->limits->lower = 0.0;
+  this->joint->limits->upper = 2.0;
+  this->joint->safety->soft_lower_limit = 0.1;
+  this->joint->safety->soft_upper_limit = 1.9;
 
-  march::Joint createdJoint = HardwareBuilder::createJoint(jointConfig, "test_joint_hip");
+  march::Joint created = HardwareBuilder::createJoint(config, "test_joint_hip", this->joint);
 
-  march::Joint actualJoint(
-      march::IMotionCube(1, march::Encoder(16, 22134, 43436, 24515, 0.05), march::ActuationMode::position));
-  actualJoint.setName("test_joint_hip");
+  march::Joint expected(
+      march::IMotionCube(1,
+                         march::Encoder(16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper,
+                                        this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit),
+                         march::ActuationMode::position));
+  expected.setName("test_joint_hip");
 
-  ASSERT_EQ("test_joint_hip", actualJoint.getName());
-  ASSERT_EQ(actualJoint, createdJoint);
+  ASSERT_EQ("test_joint_hip", expected.getName());
+  ASSERT_EQ(expected, created);
 }
 
-TEST_F(JointDeathTest, EmptyJoint)
+TEST_F(JointTest, EmptyJoint)
 {
-  std::string fullPath = this->fullPath("/joint_empty.yaml");
-  YAML::Node jointConfig = YAML::LoadFile(fullPath);
-
-  ASSERT_THROW(HardwareBuilder::createJoint(jointConfig, "test_joint_empty"), MissingKeyException);
+  YAML::Node config;
+  ASSERT_THROW(HardwareBuilder::createJoint(config, "test_joint_empty", this->joint), MissingKeyException);
 }

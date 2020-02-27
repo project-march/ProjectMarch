@@ -1,4 +1,2 @@
 resolution: 16
 minPositionIU: 22134
-zeroPositionIU: 24515
-safetyMarginRad: 0.05

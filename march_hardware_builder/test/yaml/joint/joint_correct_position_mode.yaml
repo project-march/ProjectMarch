@@ -6,5 +6,3 @@ imotioncube:
     resolution: 16
     minPositionIU: 22134
     maxPositionIU: 43436
-    zeroPositionIU: 24515
-    safetyMarginRad: 0.05

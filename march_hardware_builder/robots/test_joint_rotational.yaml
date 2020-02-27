@@ -11,5 +11,3 @@ testsetup:
             resolution: 17
             minPositionIU: 82805
             maxPositionIU: 102499
-            zeroPositionIU: 94540
-            safetyMarginRad: 0.005
