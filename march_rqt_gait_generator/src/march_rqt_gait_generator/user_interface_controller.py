@@ -58,14 +58,14 @@ def plot_to_setpoints(plot):
     return setpoints
 
 
-def update_ui_elements(joint, duration, table=None, plot=None, show_velocity_markers=False):
+def update_ui_elements(joint, duration, table=None, plot=None, show_velocity_plot=False, show_effort_plot=False):
     if plot is not None:
         plot.plot_item.blockSignals(True)
     if table is not None:
         table.blockSignals(True)
 
     if plot is not None:
-        plot.update_set_points(joint, show_velocity_markers)
+        plot.update_set_points(joint, show_velocity_plot, show_effort_plot)
     if table is not None:
         update_table(table, joint, duration)
 
