@@ -62,9 +62,11 @@ public:
   static void validateRequiredKeysExist(const YAML::Node& config, const std::vector<std::string>& key_list,
                                         const std::string& object_name);
 
-  static march::Joint createJoint(const YAML::Node& joint_config, const std::string& joint_name);
-  static march::Encoder createEncoder(const YAML::Node& encoder_config);
-  static march::IMotionCube createIMotionCube(const YAML::Node& imc_config, march::ActuationMode mode);
+  static march::Joint createJoint(const YAML::Node& joint_config, const std::string& joint_name,
+                                  const urdf::JointConstSharedPtr& urdf_joint);
+  static march::Encoder createEncoder(const YAML::Node& encoder_config, const urdf::JointConstSharedPtr& urdf_joint);
+  static march::IMotionCube createIMotionCube(const YAML::Node& imc_config, march::ActuationMode mode,
+                                              const urdf::JointConstSharedPtr& urdf_joint);
   static march::TemperatureGES createTemperatureGES(const YAML::Node& temperature_ges_config);
   static march::PowerDistributionBoard createPowerDistributionBoard(const YAML::Node& power_distribution_board_config);
 

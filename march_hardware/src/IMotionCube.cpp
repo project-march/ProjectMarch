@@ -107,7 +107,7 @@ void IMotionCube::actuateRad(double target_rad)
                                    "Target %f exceeds max difference of %f from current %f for slave %d", target_rad,
                                    MAX_TARGET_DIFFERENCE, this->getAngleRad(), this->slaveIndex);
   }
-  this->actuateIU(this->encoder_.RadtoIU(target_rad));
+  this->actuateIU(this->encoder_.fromRad(target_rad));
 }
 
 void IMotionCube::actuateIU(int32_t target_iu)

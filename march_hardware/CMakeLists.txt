@@ -89,6 +89,7 @@ install(DIRECTORY launch
 if(CATKIN_ENABLE_TESTING)
     catkin_add_gmock(${PROJECT_NAME}_test
         test/TestBootShutdownOffsets.cpp
+        test/TestEncoder.cpp
         test/TestHighVoltage.cpp
         test/TestIMotionCube.cpp
         test/TestJoint.cpp
