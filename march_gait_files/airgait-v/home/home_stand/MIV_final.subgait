@@ -1,6 +1,7 @@
 name: ''
 version: ''
 description: "Home stand gait: go to the standing position. This version has 5 degrees more hip extension in comparison to the MIII standing position"
+gait_type: "walk_like"
 trajectory: 
   header: 
     seq: 0
