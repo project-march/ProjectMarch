@@ -88,7 +88,8 @@ class GaitGeneratorPlugin(Plugin):
         self.mirror_check_box = self._widget.SettingsFrame.findChild(QCheckBox, 'Mirror')
         self.mirror_key1_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, 'Key1')
         self.mirror_key2_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, 'Key2')
-        self.velocity_markers_check_box = self._widget.SettingsFrame.findChild(QCheckBox, 'ShowVelocityMarkers')
+        self.velocity_plot_check_box = self._widget.SettingsFrame.findChild(QCheckBox, 'ShowVelocityPlot')
+        self.effort_plot_check_box = self._widget.SettingsFrame.findChild(QCheckBox, 'ShowEffortPlot')
         self.time_slider = self._widget.RvizFrame.findChild(QSlider, 'TimeSlider')
         self.scale_setpoints_check_box = self._widget.GaitPropertiesFrame.findChild(QCheckBox, 'ScaleSetpoints')
 
@@ -215,8 +216,9 @@ class GaitGeneratorPlugin(Plugin):
         joint_setting = QFrame()
         loadUi(joint_setting_file, joint_setting)
 
-        show_velocity_markers = self.velocity_markers_check_box.isChecked()
-        joint_setting_plot = JointSettingPlot(joint, self.gait.duration, show_velocity_markers)
+        show_velocity_plot = self.velocity_plot_check_box.isChecked()
+        show_effort_plot = self.effort_plot_check_box.isChecked()
+        joint_setting_plot = JointSettingPlot(joint, self.gait.duration, show_velocity_plot, show_effort_plot)
         joint_setting.Plot.addItem(joint_setting_plot)
 
         joint_setting.Table = user_interface_controller.update_table(
@@ -228,7 +230,8 @@ class GaitGeneratorPlugin(Plugin):
         def update_joint_ui():
             user_interface_controller.update_ui_elements(
                 joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration,
-                show_velocity_markers=self.velocity_markers_check_box.isChecked())
+                show_velocity_plot=self.velocity_plot_check_box.isChecked(),
+                show_effort_plot=self.effort_plot_check_box.isChecked())
             self.publish_preview()
 
         def add_setpoint(joint, time, position, button):
@@ -241,9 +244,13 @@ class GaitGeneratorPlugin(Plugin):
         self.redo_button.clicked.connect(update_joint_ui)
         self.invert_button.clicked.connect(update_joint_ui)
 
-        self.velocity_markers_check_box.stateChanged.connect(
+        self.velocity_plot_check_box.stateChanged.connect(
             lambda: [
-                joint.set_setpoints(user_interface_controller.plot_to_setpoints(joint_setting_plot)),
+                update_joint_ui(),
+            ])
+
+        self.effort_plot_check_box.stateChanged.connect(
+            lambda: [
                 update_joint_ui(),
             ])
 
@@ -272,7 +279,8 @@ class GaitGeneratorPlugin(Plugin):
                 joint.set_setpoints(user_interface_controller.table_to_setpoints(joint_setting.Table)),
                 user_interface_controller.update_ui_elements(
                     joint, table=None, plot=joint_setting_plot, duration=self.gait.duration,
-                    show_velocity_markers=self.velocity_markers_check_box.isChecked()),
+                    show_velocity_plot=self.velocity_plot_check_box.isChecked(),
+                    show_effort_plot=self.effort_plot_check_box.isChecked()),
                 self.publish_preview(),
             ])
 

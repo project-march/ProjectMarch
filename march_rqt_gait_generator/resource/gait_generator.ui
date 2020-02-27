@@ -253,9 +253,16 @@ Text-align: right
        </widget>
       </item>
       <item row="0" column="2">
-       <widget class="QCheckBox" name="ShowVelocityMarkers">
+       <widget class="QCheckBox" name="ShowVelocityPlot">
         <property name="text">
-         <string>Velocity Markers</string>
+         <string>Velocity Plot</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QCheckBox" name="ShowEffortPlot">
+        <property name="text">
+         <string>Effort Plot</string>
         </property>
        </widget>
       </item>
