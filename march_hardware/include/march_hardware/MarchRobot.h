@@ -36,9 +36,9 @@ public:
   MarchRobot(const MarchRobot&) = delete;
   MarchRobot& operator=(const MarchRobot&) = delete;
 
-  /* Enable the move constructor and assignment */
+  /* Enable the move constructor */
   MarchRobot(MarchRobot&&) = default;
-  MarchRobot& operator=(MarchRobot&&) = default;
+  MarchRobot& operator=(MarchRobot&&) = delete;
 
   void startEtherCAT();
 
@@ -49,6 +49,8 @@ public:
   bool hasValidSlaves();
 
   bool isEthercatOperational();
+
+  int getEthercatCycleTime() const;
 
   Joint getJoint(::std::string jointName);
 

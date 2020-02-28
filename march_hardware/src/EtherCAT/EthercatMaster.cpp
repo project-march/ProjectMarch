@@ -22,16 +22,24 @@
 
 namespace march
 {
-EthercatMaster::EthercatMaster(std::string ifname, int maxSlaveIndex, int ecatCycleTime)
+EthercatMaster::EthercatMaster(std::string ifname, int max_slave_index, int cycle_time)
+  : ifname_(std::move(ifname)), max_slave_index_(max_slave_index), cycle_time_ms_(cycle_time)
 {
-  this->ifname = ifname;
-  this->maxSlaveIndex = maxSlaveIndex;
-  this->ecatCycleTimems = ecatCycleTime;
 }
 
 EthercatMaster::~EthercatMaster()
 {
   this->stop();
+}
+
+bool EthercatMaster::isOperational() const
+{
+  return this->is_operational_;
+}
+
+int EthercatMaster::getCycleTime() const
+{
+  return this->cycle_time_ms_;
 }
 
 void EthercatMaster::start(std::vector<Joint>& joints)
@@ -43,22 +51,31 @@ void EthercatMaster::start(std::vector<Joint>& joints)
 void EthercatMaster::ethercatMasterInitiation()
 {
   ROS_INFO("Trying to start EtherCAT");
-  if (!ec_init(ifname.c_str()))
+  if (!ec_init(this->ifname_.c_str()))
   {
     throw error::HardwareException(error::ErrorType::NO_SOCKET_CONNECTION, "No socket connection on %s",
-                                   ifname.c_str());
+                                   this->ifname_.c_str());
   }
-  ROS_INFO("ec_init on %s succeeded", ifname.c_str());
+  ROS_INFO("ec_init on %s succeeded", this->ifname_.c_str());
 
   const int slave_count = ec_config_init(FALSE);
-  if (slave_count < this->maxSlaveIndex)
+  if (slave_count < this->max_slave_index_)
   {
     ec_close();
     throw error::HardwareException(error::ErrorType::NOT_ALL_SLAVES_FOUND,
-                                   "%d slaves configured while soem only found %d slave(s)", this->maxSlaveIndex,
+                                   "%d slaves configured while soem only found %d slave(s)", this->max_slave_index_,
                                    slave_count);
   }
   ROS_INFO("%d slave(s) found and initialized.", slave_count);
+}
+
+int setSlaveWatchdogTimer(uint16 slave)
+{
+  uint16 configadr = ec_slave[slave].configadr;
+  ec_FPWRw(configadr, 0x0400, IMotionCube::WATCHDOG_DIVIDER, EC_TIMEOUTRET);  // Set the divider register of the WD
+  ec_FPWRw(configadr, 0x0410, IMotionCube::WATCHDOG_TIME, EC_TIMEOUTRET);     // Set the PDI watchdog = WD
+  ec_FPWRw(configadr, 0x0420, IMotionCube::WATCHDOG_TIME, EC_TIMEOUTRET);     // Set the SM watchdog = WD
+  return 1;
 }
 
 void EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
@@ -68,16 +85,20 @@ void EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
 
   for (Joint& joint : joints)
   {
-    joint.initialize(ecatCycleTimems);
+    if (joint.hasIMotionCube())
+    {
+      ec_slave[joint.getIMotionCubeSlaveIndex()].PO2SOconfig = setSlaveWatchdogTimer;
+    }
+    joint.initialize(cycle_time_ms_);
   }
 
-  ec_config_map(&IOmap);
+  ec_config_map(&io_map_);
   ec_configdc();
 
   ROS_INFO("Request safe-operational state for all slaves");
   ec_statecheck(0, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE * 4);
 
-  expectedWKC = (ec_group[0].outputsWKC * 2) + ec_group[0].inputsWKC;
+  this->expected_working_counter_ = (ec_group[0].outputsWKC * 2) + ec_group[0].inputsWKC;
   ec_slave[0].state = EC_STATE_OPERATIONAL;
 
   ec_send_processdata();
@@ -97,8 +118,8 @@ void EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
   if (ec_slave[0].state == EC_STATE_OPERATIONAL)
   {
     ROS_INFO("Operational state reached for all slaves");
-    isOperational = true;
-    EcatThread = std::thread(&EthercatMaster::ethercatLoop, this);
+    this->is_operational_ = true;
+    ethercat_thread_ = std::thread(&EthercatMaster::ethercatLoop, this);
   }
   else
   {
@@ -123,9 +144,9 @@ void EthercatMaster::ethercatLoop()
 {
   size_t totalLoops = 0;
   size_t rateNotAchievedCount = 0;
-  size_t rate = 1000 / ecatCycleTimems;
+  size_t rate = 1000 / cycle_time_ms_;
 
-  while (isOperational)
+  while (this->is_operational_)
   {
     auto start = boost::chrono::high_resolution_clock::now();
 
@@ -135,13 +156,13 @@ void EthercatMaster::ethercatLoop()
     auto stop = boost::chrono::high_resolution_clock::now();
     auto duration = boost::chrono::duration_cast<boost::chrono::microseconds>(stop - start);
 
-    if (duration.count() > ecatCycleTimems * 1000)
+    if (duration.count() > cycle_time_ms_ * 1000)
     {
       rateNotAchievedCount++;
     }
     else
     {
-      usleep(ecatCycleTimems * 1000 - duration.count());
+      usleep(cycle_time_ms_ * 1000 - duration.count());
     }
     totalLoops++;
 
@@ -151,12 +172,12 @@ void EthercatMaster::ethercatLoop()
       if (rateNotAchievedPercentage > 5)
       {
         ROS_WARN("EtherCAT rate of %d milliseconds per cycle was not achieved for %f percent of all cycles",
-                 ecatCycleTimems, rateNotAchievedPercentage);
+                 cycle_time_ms_, rateNotAchievedPercentage);
       }
       else
       {
         ROS_DEBUG("EtherCAT rate of %d milliseconds per cycle was not achieved for %f percent of all cycles",
-                  ecatCycleTimems, rateNotAchievedPercentage);
+                  cycle_time_ms_, rateNotAchievedPercentage);
       }
       totalLoops = 0;
       rateNotAchievedCount = 0;
@@ -168,7 +189,7 @@ void EthercatMaster::SendReceivePDO()
 {
   ec_send_processdata();
   int wkc = ec_receive_processdata(EC_TIMEOUTRET);
-  if (wkc < this->expectedWKC)
+  if (wkc < this->expected_working_counter_)
   {
     ROS_WARN_THROTTLE(1, "Working counter lower than expected. EtherCAT connection may not be optimal");
   }
@@ -189,11 +210,11 @@ void EthercatMaster::monitorSlaveConnection()
 
 void EthercatMaster::stop()
 {
-  if (this->isOperational)
+  if (this->is_operational_)
   {
     ROS_INFO("Stopping EtherCAT");
-    isOperational = false;
-    EcatThread.join();
+    this->is_operational_ = false;
+    this->ethercat_thread_.join();
 
     ec_slave[0].state = EC_STATE_INIT;
     ec_writestate(0);

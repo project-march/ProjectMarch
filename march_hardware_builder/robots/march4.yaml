@@ -3,7 +3,7 @@ march4:
   ecatCycleTime: 4
   joints:
     - right_hip_aa:
-        actuationMode: position
+        actuationMode: torque
         allowActuation: true
         netNumber: 1
         temperatureges: {slaveIndex: 7, byteOffset: 4}
@@ -15,7 +15,7 @@ march4:
             maxPositionIU: 4091
 
     - left_hip_aa:
-        actuationMode: position
+        actuationMode: torque
         allowActuation: true
         netNumber: 5
         temperatureges: {slaveIndex: 7, byteOffset: 0}
@@ -27,7 +27,7 @@ march4:
             maxPositionIU: 1426
 
     - right_hip_fe:
-        actuationMode: position
+        actuationMode: torque
         allowActuation: true
         netNumber: 2
         temperatureges: {slaveIndex: 9, byteOffset: 0}
@@ -39,7 +39,7 @@ march4:
             maxPositionIU: 45617
 
     - left_hip_fe:
-        actuationMode: position
+        actuationMode: torque
         allowActuation: true
         netNumber: 6
         temperatureges: {slaveIndex: 5, byteOffset: 0}
@@ -51,7 +51,7 @@ march4:
             maxPositionIU: 40270
 
     - right_knee:
-        actuationMode: position
+        actuationMode: torque
         allowActuation: true
         netNumber: 3
         temperatureges: {slaveIndex: 9, byteOffset: 4}
@@ -63,7 +63,7 @@ march4:
             maxPositionIU: 68874
 
     - left_knee:
-        actuationMode: position
+        actuationMode: torque
         allowActuation: true
         netNumber: 7
         temperatureges: {slaveIndex: 5, byteOffset: 4}
@@ -75,7 +75,7 @@ march4:
             maxPositionIU: 63543
 
     - right_ankle:
-        actuationMode: position
+        actuationMode: torque
         allowActuation: true
         netNumber: 4
         temperatureges: {slaveIndex: 13, byteOffset: 0}
@@ -87,7 +87,7 @@ march4:
             maxPositionIU: 1210
 
     - left_ankle:
-        actuationMode: position
+        actuationMode: torque
         allowActuation: true
         netNumber: 8
         temperatureges: {slaveIndex: 1, byteOffset: 0}

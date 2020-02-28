@@ -43,7 +43,7 @@ void MarchRobot::startEtherCAT()
 
   ROS_INFO("Slave configuration is non-conflicting");
 
-  if (ethercatMaster.isOperational)
+  if (ethercatMaster.isOperational())
   {
     ROS_ERROR("Trying to start EtherCAT while it is already active.");
     return;
@@ -53,7 +53,7 @@ void MarchRobot::startEtherCAT()
 
 void MarchRobot::stopEtherCAT()
 {
-  if (!ethercatMaster.isOperational)
+  if (!ethercatMaster.isOperational())
   {
     ROS_ERROR("Trying to stop EtherCAT while it is not active.");
     return;
@@ -135,12 +135,17 @@ bool MarchRobot::hasValidSlaves()
 
 bool MarchRobot::isEthercatOperational()
 {
-  return ethercatMaster.isOperational;
+  return ethercatMaster.isOperational();
+}
+
+int MarchRobot::getEthercatCycleTime() const
+{
+  return this->ethercatMaster.getCycleTime();
 }
 
 Joint MarchRobot::getJoint(::std::string jointName)
 {
-  if (!ethercatMaster.isOperational)
+  if (!ethercatMaster.isOperational())
   {
     ROS_WARN("Trying to access joints while ethercat is not operational. This "
              "may lead to incorrect sensor data.");

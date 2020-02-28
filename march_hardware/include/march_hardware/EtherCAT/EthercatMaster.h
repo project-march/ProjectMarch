@@ -12,35 +12,31 @@ namespace march
 /**
  * Base class of the ethercat master supported with the SOEM library
  * @param ifname Network interface name, check ifconfig.
- * @param IOmap Holds the mapping of the SOEM message.
- * @param expectedWKC The expected working counter of the ethercat train.
- * @param ecatCycleTimems The ethercat cycle time.
- * @param maxSlaveIndex The maximum amount of slaves connected to the train.
+ * @param io_map Holds the mapping of the SOEM message.
+ * @param expected_working_counter The expected working counter of the ethercat train.
+ * @param cycle_time_ms The ethercat cycle time.
+ * @param max_slave_index The maximum amount of slaves connected to the train.
  */
 class EthercatMaster
 {
-  std::string ifname;
-  char IOmap[4096];
-  int expectedWKC;
-
-  std::thread EcatThread;
-
-  int maxSlaveIndex;
-  int ecatCycleTimems;
-
 public:
-  bool isOperational = false;
-
-  explicit EthercatMaster(std::string ifname, int maxSlaveIndex, int ecatCycleTime);
+  EthercatMaster(std::string ifname, int max_slave_index, int cycle_time);
   ~EthercatMaster();
 
   /* Delete copy constructor/assignment since the member thread can not be copied */
   EthercatMaster(const EthercatMaster&) = delete;
   EthercatMaster& operator=(const EthercatMaster&) = delete;
 
-  /* Enable the move constructor and assignment */
+  /* Enable the move constructor */
   EthercatMaster(EthercatMaster&&) = default;
-  EthercatMaster& operator=(EthercatMaster&&) = default;
+  EthercatMaster& operator=(EthercatMaster&&) = delete;
+
+  bool isOperational() const;
+
+  /**
+   * Returns the cycle time in milliseconds.
+   */
+  int getCycleTime() const;
 
   /**
    * Initializes the ethercat train and starts a thread for the loop.
@@ -80,6 +76,17 @@ private:
    * Checks if all the slaves are connected and in operational state.
    */
   static void monitorSlaveConnection();
+
+  bool is_operational_ = false;
+
+  const std::string ifname_;
+  const int max_slave_index_;
+  const int cycle_time_ms_;
+
+  char io_map_[4096] = { 0 };
+  int expected_working_counter_ = 0;
+
+  std::thread ethercat_thread_;
 };
 
 }  // namespace march

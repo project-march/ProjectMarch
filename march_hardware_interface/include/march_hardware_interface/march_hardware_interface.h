@@ -62,6 +62,11 @@ public:
    */
   void write(const ros::Time& time, const ros::Duration& elapsed_time) override;
 
+  /**
+   * Returns the ethercat cycle time in milliseconds.
+   */
+  int getEthercatCycleTime() const;
+
 private:
   /**
    * Uses the num_joints_ member to resize all vectors
