@@ -41,8 +41,7 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  const ros::Duration cycle_time(march.getEthercatCycleTime() * ros::param::param<int>("~control_loop_multiplier", 1));
-  ros::Rate rate(cycle_time);
+  ros::Rate rate(march.getEthercatCycleTime() * ros::param::param<int>("~control_loop_multiplier", 1) / 1000.0);
 
   controller_manager::ControllerManager controller_manager(&march, nh);
 
