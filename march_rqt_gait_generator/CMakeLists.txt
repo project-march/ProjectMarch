@@ -22,5 +22,7 @@ install(PROGRAMS scripts/${PROJECT_NAME}
 )
 
 if (CATKIN_ENABLE_TESTING)
+    find_package(rostest REQUIRED)
+    add_rostest(test/launch/testing_gait_generator.test)
     catkin_add_nosetests(test/run_tests.py)
 endif()
