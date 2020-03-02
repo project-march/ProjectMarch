@@ -239,11 +239,14 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
   {
     // Enlarge joint_effort_command because ROS control limits the pid values to a certain maximum
     joint_effort_command_[i] = joint_effort_command_[i] * 1000.0;
-    if (abs(joint_effort_command_copy_[i] - joint_effort_command[i]) > MAX_EFFORT_CHANGE) {
-        joint_effort_command_[i] = joint_effort_command_copy_[i] + copysign
+    if (abs(joint_effort_command_copy_[i] - joint_effort_command_[i]) > MAX_EFFORT_CHANGE)
+    {
+      joint_effort_command_[i] = joint_effort_command_copy_[i] +
+                                 copysign(MAX_EFFORT_CHANGE, joint_effort_command_[i] - joint_effort_command_copy_[i]);
     }
-    joint_effort_command_copy_[i] = joint_effort_command_[i] +
-            copysign(MAX_EFFORT_CHANGE, joint_effort_command_[i]-joint_effort_command_copy_[i]);
+    joint_effort_command_copy_[i] =
+        joint_effort_command_[i] +
+        copysign(MAX_EFFORT_CHANGE, joint_effort_command_[i] - joint_effort_command_copy_[i]);
   }
 
   // Enforce limits on all joints in effort mode
