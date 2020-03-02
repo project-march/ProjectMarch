@@ -2,6 +2,7 @@
 #include "march_hardware_interface/march_hardware_interface.h"
 #include "march_hardware_interface/power_net_on_off_command.h"
 
+#include <cmath>
 #include <sstream>
 #include <string>
 
@@ -12,6 +13,8 @@
 
 #include <march_hardware/ActuationMode.h>
 #include <march_hardware/Joint.h>
+
+#define MAX_EFFORT_CHANGE 2000
 
 using hardware_interface::JointHandle;
 using hardware_interface::JointStateHandle;
@@ -236,6 +239,11 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
   {
     // Enlarge joint_effort_command because ROS control limits the pid values to a certain maximum
     joint_effort_command_[i] = joint_effort_command_[i] * 1000.0;
+    if (abs(joint_effort_command_copy_[i] - joint_effort_command[i]) > MAX_EFFORT_CHANGE) {
+        joint_effort_command_[i] = joint_effort_command_copy_[i] + copysign
+    }
+    joint_effort_command_copy_[i] = joint_effort_command_[i] +
+            copysign(MAX_EFFORT_CHANGE, joint_effort_command_[i]-joint_effort_command_copy_[i]);
   }
 
   // Enforce limits on all joints in effort mode
@@ -287,6 +295,7 @@ void MarchHardwareInterface::reserveMemory()
   joint_velocity_command_.resize(num_joints_);
   joint_effort_.resize(num_joints_);
   joint_effort_command_.resize(num_joints_);
+  joint_effort_command_copy_.resize(num_joints_);
   joint_temperature_.resize(num_joints_);
   joint_temperature_variance_.resize(num_joints_);
   soft_limits_.resize(num_joints_);
