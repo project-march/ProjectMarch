@@ -17,7 +17,7 @@ setpoints:
   - 
     time_from_start: 
       secs: 1
-      nsecs: 963700000
+      nsecs: 527300000
     joint_names: [right_hip_fe]
   - 
     time_from_start: 
@@ -49,24 +49,24 @@ trajectory:
         secs: 0
         nsecs:         0
     - 
-      positions: [0.0, -0.0275, 0.0655, 0.0436, 0.0, 0.8684, 1.7453, 0.0436]
-      velocities: [0.0, 0.0946, 0.084, 0.0, 0.0, 1.0299, 0.0, 0.0]
+      positions: [0.0, -0.0275, 0.0655, 0.0436, 0.0, 1.1634, 1.7453, 0.0436]
+      velocities: [0.0, 0.0946, 0.084, 0.0, 0.0, 0.9029, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 1
         nsecs: 199999999
     - 
-      positions: [0.0, 0.0619, 0.1231, 0.0436, 0.0, 1.309, 1.5123, 0.0436]
-      velocities: [0.0, 0.1376, 0.0566, 0.0, 0.0, -0.1222, -0.4961, 0.0]
+      positions: [0.0, 0.0072, 0.093, 0.0436, 0.0, 1.309, 1.6927, 0.0436]
+      velocities: [0.0, 0.1149, 0.0798, 0.0, 0.0, -0.1222, -0.3013, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 1
-        nsecs: 963700000
+        nsecs: 527300000
     - 
-      positions: [0.0, 0.1412, 0.1396, 0.0436, 0.0, 1.2223, 1.2545, 0.0436]
-      velocities: [0.0, 0.1596, 0.0, 0.0, 0.0, -0.1707, -0.4143, 0.0]
+      positions: [0.0, 0.1412, 0.1396, 0.0436, 0.0, 1.1941, 1.2545, 0.0436]
+      velocities: [0.0, 0.1596, 0.0, 0.0, 0.0, -0.0883, -0.4143, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
