@@ -198,3 +198,10 @@ class GaitGeneratorView(Plugin):
         # Comment in to signal that the plugin has a way to configure
         # This will enable a setting button (gear icon) in each dock widget title bar
         # Usually used to open a modal configuration dialog
+
+    def message(self, title=None, msg=None):
+        QMessageBox.question(self._widget, title, msg, QMessageBox.Ok)
+
+    def yes_no_question(self, title=None, msg=None):
+        answer = QMessageBox.question(self._widget, title, msg, QMessageBox.Yes | QMessageBox.No)
+        return answer == QMessageBox.Yes

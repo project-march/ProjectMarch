@@ -224,15 +224,14 @@ class GaitGeneratorController(object):
 
         if self.gait.has_setpoints_after_duration(duration) and not rescale_setpoints:
             if not self.gait.has_multiple_setpoints_before_duration(duration):
-                QMessageBox.question(self.view._widget, 'Could not update gait duration',
-                                     'Not all joints have multiple setpoints before duration ' + str(duration),
-                                     QMessageBox.Ok)
+                self.view.message(title='Could not update gait duration',
+                                  msg='Not all joints have multiple setpoints before duration ' + str(duration))
+                self.view.duration_spin_box.setValue(self.gait.duration)
                 return
-            discard_setpoints = QMessageBox.question(self.view._widget, 'Gait duration lower than highest time setpoint',
-                                                     'Do you want to discard any setpoints higher than the given '
-                                                     'duration?',
-                                                     QMessageBox.Yes | QMessageBox.No)
-            if discard_setpoints == QMessageBox.No:
+            discard_setpoints = self.veiw.yes_no_question(title='Gait duration lower than highest time setpoint',
+                                                         msg = 'Do you want to discard any setpoints higher than the '
+                                                         'given duration?')
+            if not discard_setpoints:
                 self.view.duration_spin_box.setValue(self.gait.duration)
                 return
         self.gait.set_duration(duration, rescale_setpoints)
@@ -283,8 +282,7 @@ class GaitGeneratorController(object):
 
         self.export_to_file(self.gait, self.get_gait_directory())
 
-    @staticmethod
-    def export_to_file(gait, gait_directory):
+    def export_to_file(self, gait, gait_directory):
         if gait_directory is None or gait_directory == '':
             return
 
@@ -299,10 +297,9 @@ class GaitGeneratorController(object):
 
         file_exists = os.path.isfile(output_file_path)
         if file_exists:
-            overwrite_file = QMessageBox.question(None, 'File already exists',
-                                                  'Do you want to overwrite ' + str(output_file_path) + '?',
-                                                  QMessageBox.Yes | QMessageBox.No)
-            if overwrite_file == QMessageBox.No:
+            overwrite_file = self.view.yes_no_question(title='File already exists',
+                                                       msg='Do you want to overwrite ' + str(output_file_path) + '?')
+            if not overwrite_file:
                 return
 
         rospy.loginfo('Writing gait to ' + output_file_path)
