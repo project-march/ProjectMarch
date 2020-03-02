@@ -1,4 +1,4 @@
-name: !!python/unicode "right_open"
+name: "right_open"
 version: "MV_RT_highstep_rightopen_v7"
 description: "A little lower velocity in the hip."
 gait_type: "walk_like"
