@@ -1,7 +1,6 @@
 import math
 import os
 
-from numpy_ringbuffer import RingBuffer
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore
 from python_qt_binding import loadUi
@@ -16,14 +15,6 @@ import rviz
 from sensor_msgs.msg import JointState
 from tf import (ConnectivityException, ExtrapolationException, LookupException,
                 TransformListener)
-from trajectory_msgs.msg import JointTrajectory
-from urdf_parser_py import urdf
-
-from . import user_interface_controller
-from .joint_setting_plot import JointSettingPlot
-from .model.modifiable_setpoint import ModifiableSetpoint
-from .model.modifiable_subgait import ModifiableSubgait
-from .time_slider_thread import TimeSliderThread
 from .gait_generator_controller import GaitGeneratorController
 
 
@@ -32,14 +23,12 @@ class GaitGeneratorView(Plugin):
     def __init__(self, context):
         super(GaitGeneratorView, self).__init__(context)
 
-        self.current_time = 0
         self.tf_listener = TransformListener()
         self.joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=10)
 
         self.build_ui(context)
 
         self.controller = GaitGeneratorController(self)
-        self.load_gait_into_ui(self.controller.gait)
 
     # Called by __init__
     def build_ui(self, context):
@@ -101,15 +90,8 @@ class GaitGeneratorView(Plugin):
         return frame
 
     # Called by __init__ and import_gait.
-    def load_gait_into_ui(self, gait):
+    def load_gait_into_ui(self, gait, joint_plots):
         self.time_slider.setRange(0, 100 * gait.duration)
-
-        # Connect TimeSlider to the preview
-        self.time_slider.valueChanged.connect(lambda: [
-            self.set_current_time(float(self.time_slider.value()) / 100),
-            self.publish_preview(),
-            self.update_time_sliders(),
-        ])
 
         self.gait_type_combo_box.setCurrentText(gait.gait_type)
         self.gait_name_line_edit.setText(gait.gait_name)
@@ -122,25 +104,25 @@ class GaitGeneratorView(Plugin):
         self.duration_spin_box.setValue(gait.duration)
         self.duration_spin_box.blockSignals(False)
 
-        self.build_joint_plots()
-        self.publish_preview()
+        self.load_joint_plots(joint_plots)
+        self.publish_preview(gait, time=0)
 
     # Called by load_gait_into_ui.
-    def update_time_sliders(self):
+    def update_time_sliders(self, time):
         graphics_layouts = self._widget.JointSettingContainer.findChildren(pg.GraphicsLayoutWidget)
         for graphics_layout in graphics_layouts:
             joint_settings_plot = graphics_layout.getItem(0, 0)
-            joint_settings_plot.update_time_slider(self.current_time)
+            joint_settings_plot.update_time_slider(time)
 
     # Called by load_gait_into_ui and update_gait_duration.
-    def build_joint_plots(self):
+    def load_joint_plots(self, joint_plots):
         layout = self._widget.JointSettingContainer.layout()
         for i in reversed(range(layout.count())):
             widget = layout.itemAt(i).widget()
             layout.removeWidget(widget)
             widget.setParent(None)
 
-        for joint_name, joint_plot in self.controller.create_joint_settings():
+        for joint_name, joint_plot in joint_plots:
                 row = rospy.get_param('/joint_layout/' + joint_name + '/row', -1)
                 column = rospy.get_param('/joint_layout/' + joint_name + '/column', -1)
                 if row == -1 or column == -1:
@@ -149,20 +131,15 @@ class GaitGeneratorView(Plugin):
                 self._widget.JointSettingContainer.layout().addWidget(joint_plot, row, column)
 
     # Functions below are connected to buttons, text boxes, joint graphs etc.
-    def publish_preview(self):
+    def publish_preview(self, gait, time):
         joint_state = JointState()
         joint_state.header.stamp = rospy.get_rostime()
-        time = self.current_time
 
-        for i in range(len(self.controller.gait.joints)):
-            joint_state.name.append(self.controller.gait.joints[i].name)
-            joint_state.position.append(self.controller.gait.joints[i].get_interpolated_position(time))
+        for i in range(len(gait.joints)):
+            joint_state.name.append(gait.joints[i].name)
+            joint_state.position.append(gait.joints[i].get_interpolated_position(time))
         self.joint_state_pub.publish(joint_state)
         self.set_feet_distances()
-
-    # Called to update values in Heigt left foot etc.
-    def set_current_time(self, current_time):
-        self.current_time = current_time
 
     def set_feet_distances(self):
         try:
@@ -183,9 +160,6 @@ class GaitGeneratorView(Plugin):
 
     def shutdown_plugin(self):
         self.controller.stop_time_slider_thread()
-
-    def save_settings(self, plugin_settings, instance_settings):
-        plugin_settings.set_value('gait_directory', self.gait_directory)
 
     def restore_settings(self, plugin_settings, instance_settings):
         gait_directory = plugin_settings.value('gait_directory')

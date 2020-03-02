@@ -1,21 +1,14 @@
-import math
 import os
 
 from numpy_ringbuffer import RingBuffer
-import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import (QCheckBox, QComboBox, QDoubleSpinBox,
                                          QFileDialog, QFrame, QHeaderView,
                                          QLineEdit, QMessageBox, QPushButton,
                                          QSlider, QSpinBox, QWidget)
-from qt_gui.plugin import Plugin
 import rospkg
 import rospy
-import rviz
-from sensor_msgs.msg import JointState
-from tf import (ConnectivityException, ExtrapolationException, LookupException,
-                TransformListener)
 from trajectory_msgs.msg import JointTrajectory
 from urdf_parser_py import urdf
 
@@ -33,18 +26,20 @@ class GaitGeneratorController(object):
 
         # Default values
         self.gait_publisher = None
-        self.topic_name = ''
+        self.set_topic_name(self.view.topic_name_line_edit.text())
         self.gait_directory = None
+
         self.playback_speed = 100
         self.time_slider_thread = None
-        self.set_topic_name(self.view.topic_name_line_edit.text())
-        self.joint_changed_history = RingBuffer(capacity=100, dtype=list)
-        self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
+        self.current_time = 0
 
         self.robot = urdf.Robot.from_parameter_server()
         self.gait = ModifiableSubgait.empty_subgait(self, self.robot)
+        self.joint_changed_history = RingBuffer(capacity=100, dtype=list)
+        self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
 
         self.connect_buttons()
+        self.view.load_gait_into_ui(self.gait, self.create_joint_plots())
 
 
     # Called by __init__
@@ -82,6 +77,13 @@ class GaitGeneratorController(object):
         self.view.duration_spin_box.setKeyboardTracking(False)
         self.view.duration_spin_box.valueChanged.connect(self.update_gait_duration)
 
+        # Connect TimeSlider to the preview
+        self.view.time_slider.valueChanged.connect(lambda time: [
+            self.set_current_time(time / 100.0),
+            self.view.publish_preview(self.gait, self.current_time),
+            self.view.update_time_sliders(self.current_time),
+        ])
+
         # Disable key inputs when mirroring is off.
         self.view.mirror_check_box.stateChanged.connect(
             lambda state: [
@@ -91,7 +93,7 @@ class GaitGeneratorController(object):
         )
 
     # Called by load_gait_into_ui and update_gait_duration.
-    def create_joint_settings(self):
+    def create_joint_plots(self):
         joint_plots = []
         for urdf_joint in self.robot.joints:
             if urdf_joint.type != 'fixed':
@@ -100,11 +102,11 @@ class GaitGeneratorController(object):
                 joint = self.gait.get_joint(joint_name)
                 if not joint:
                     continue
-                joint_plots.append([joint_name, self.create_joint_setting(joint)])
+                joint_plots.append([joint_name, self.create_joint_plot(joint)])
         return joint_plots
 
-    # Called 8 times by create_joint_settings.
-    def create_joint_setting(self, joint):
+    # Called 8 times by create_joint_plots.
+    def create_joint_plot(self, joint):
         joint_setting_file = os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'), 'resource',
                                           'joint_setting.ui')
 
@@ -127,7 +129,7 @@ class GaitGeneratorController(object):
                 joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration,
                 show_velocity_plot=self.view.velocity_plot_check_box.isChecked(),
                 show_effort_plot=self.view.effort_plot_check_box.isChecked())
-            self.view.publish_preview()
+            self.view.publish_preview(self.gait, self.current_time)
 
         def add_setpoint(joint, time, position, button):
             if button == QtCore.Qt.ControlModifier:
@@ -176,7 +178,7 @@ class GaitGeneratorController(object):
                     joint, table=None, plot=joint_setting_plot, duration=self.gait.duration,
                     show_velocity_plot=self.view.velocity_plot_check_box.isChecked(),
                     show_effort_plot=self.view.effort_plot_check_box.isChecked()),
-                self.view.publish_preview(),
+                self.view.publish_preview(self.gait, self.current_time),
             ])
 
         return joint_setting
@@ -201,6 +203,9 @@ class GaitGeneratorController(object):
 
         if was_playing:
             self.start_time_slider_thread()
+
+    def set_current_time(self, current_time):
+        self.current_time = current_time
 
     def start_time_slider_thread(self):
         if self.time_slider_thread is not None:
@@ -240,7 +245,7 @@ class GaitGeneratorController(object):
         was_playing = self.time_slider_thread is not None
         self.stop_time_slider_thread()
 
-        self.view.build_joint_plots()
+        self.view.load_joint_plots(self.create_joint_plots())
 
         if was_playing:
             self.start_time_slider_thread()
@@ -257,6 +262,7 @@ class GaitGeneratorController(object):
             return
         self.gait = gait
         self.view.load_gait_into_ui(self.gait)
+        self.current_time = 0
 
         self.gait_directory = '/'.join(file_name.split('/')[:-3])
         rospy.loginfo('Setting gait directory to %s', str(self.gait_directory))
@@ -331,7 +337,7 @@ class GaitGeneratorController(object):
         for joint in self.gait.joints:
             joint.invert()
         self.save_changed_joints(self.gait.joints)
-        self.view.publish_preview()
+        self.view.publish_preview(self.gait, self.current_time)
 
     def undo(self):
         if not self.joint_changed_history:
@@ -341,7 +347,7 @@ class GaitGeneratorController(object):
         for joint in joints:
             joint.undo()
         self.joint_changed_redo_list.append(joints)
-        self.view.publish_preview()
+        self.view.publish_preview(self.gait, self.current_time)
 
     def redo(self):
         if not self.joint_changed_redo_list:
@@ -351,7 +357,7 @@ class GaitGeneratorController(object):
         for joint in joints:
             joint.redo()
         self.joint_changed_history.append(joints)
-        self.view.publish_preview()
+        self.view.publish_preview(self.gait, self.current_time)
 
     # Called by Joint.save_setpoints. Needed for undo and redo.
     def save_changed_joints(self, joints):
