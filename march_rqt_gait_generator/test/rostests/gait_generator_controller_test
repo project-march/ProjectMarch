@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+import copy
+import unittest
+import rostest
+
+from mock import Mock
+import rospkg
+from urdf_parser_py import urdf
+
+
+from march_rqt_gait_generator.gait_generator_controller import GaitGeneratorController
+import threading
+
+PKG = 'march_rqt_gait_generator'
+
+class GaitGeneratorControllerTest(unittest.TestCase):
+    # def __init__(self, *args):
+    #     super(GaitGeneratorControllerTest, self).__init__(*args)
+    #     rospy.init_node("test_gait_generator", anonymous=True)
+
+    def setUp(self):
+        self.gait_generator_view = Mock()
+        self.gait_generator_view.topic_name_line_edit.text = Mock(return_value='/march/my_fancy_topic')
+        # self.gait_name = 'walk'
+        # self.subgait_name = 'left_swing'
+        # self.version = 'MV_walk_leftswing_v2'
+        # self.resources_folder = rospkg.RosPack().get_path('march_rqt_gait_generator') + '/test/resources'
+        # self.robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
+        # self.subgait_path = '{rsc}/{gait}/{subgait}/{version}.subgait'.format(rsc=self.resources_folder,
+        #                                                                       gait=self.gait_name,
+        #                                                                       subgait=self.subgait_name,
+        #                                                                       version=self.version)
+        self.gait_generator_controller = GaitGeneratorController(self.gait_generator_view)
+
+    # def test_init_load_gui_call(self):
+    #     self.gait_generator_view.assert_called_once()
+
+    def test_something_else(self):
+        self.assertTrue(False)
+
+if __name__ == '__main__':
+    rostest.rosrun(PKG, 'gait_generator_controller_test', GaitGeneratorControllerTest)

@@ -3,10 +3,7 @@ import os
 from numpy_ringbuffer import RingBuffer
 from pyqtgraph.Qt import QtCore
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import (QCheckBox, QComboBox, QDoubleSpinBox,
-                                         QFileDialog, QFrame, QHeaderView,
-                                         QLineEdit, QMessageBox, QPushButton,
-                                         QSlider, QSpinBox, QWidget)
+from python_qt_binding.QtWidgets import QFileDialog, QFrame, QHeaderView
 import rospkg
 import rospy
 from trajectory_msgs.msg import JointTrajectory
