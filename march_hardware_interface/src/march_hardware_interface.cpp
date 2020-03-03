@@ -14,7 +14,7 @@
 #include <march_hardware/ActuationMode.h>
 #include <march_hardware/Joint.h>
 
-#define MAX_EFFORT_CHANGE 2000
+#define MAX_EFFORT_CHANGE 4000
 
 using hardware_interface::JointHandle;
 using hardware_interface::JointStateHandle;
