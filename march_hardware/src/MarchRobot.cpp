@@ -174,9 +174,12 @@ const PowerDistributionBoard& MarchRobot::getPowerDistributionBoard() const
 
 MarchRobot::~MarchRobot()
 {
-  for (auto& joint : jointList)
+  if (this->ethercatMaster.isOperational())
   {
-    joint.shutdown();
+    for (auto& joint : jointList)
+    {
+      joint.shutdown();
+    }
   }
   stopEtherCAT();
 }
