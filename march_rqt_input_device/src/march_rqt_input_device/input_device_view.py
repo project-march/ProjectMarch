@@ -184,6 +184,10 @@ class InputDevicePlugin(Plugin):
             self.create_button('gait_tilted_path_second_end',
                                callback=lambda: self.controller.publish_gait('gait_tilted_path_second_end'))
 
+        gait_tilted_path_flexed_knee_step = \
+            self.create_button('gait_tilted_path_flexed_knee_step',
+                               callback=lambda: self.controller.publish_gait('gait_tilted_path_flexed_knee_step'))
+
         stop_button = self.create_button('gait_stop', image_path='/stop.png',
                                          callback=lambda: self.controller.publish_stop())
 
@@ -215,7 +219,8 @@ class InputDevicePlugin(Plugin):
 
             [gait_ramp_door_slope_up, gait_ramp_door_slope_down, gait_ramp_door_last_step],
 
-            [gait_tilted_path_straight_start, gait_tilted_path_single_step, gait_tilted_path_straight_end],
+            [gait_tilted_path_straight_start, gait_tilted_path_single_step, gait_tilted_path_straight_end,
+             gait_tilted_path_flexed_knee_step],
 
             [gait_tilted_path_first_start, gait_tilted_path_second_start, gait_tilted_path_first_end,
              gait_tilted_path_second_end],
