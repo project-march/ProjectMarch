@@ -32,7 +32,7 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, PowerDi
 {
 }
 
-void MarchRobot::startEtherCAT()
+void MarchRobot::startEtherCAT(bool do_reset_imc)
 {
   if (!hasValidSlaves())
   {
@@ -48,7 +48,7 @@ void MarchRobot::startEtherCAT()
     ROS_ERROR("Trying to start EtherCAT while it is already active.");
     return;
   }
-  ethercatMaster.start(this->jointList);
+  ethercatMaster.start(this->jointList, do_reset_imc);
 }
 
 void MarchRobot::stopEtherCAT()

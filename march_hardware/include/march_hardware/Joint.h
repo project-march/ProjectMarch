@@ -27,6 +27,8 @@ public:
   {
   }
 
+  void resetIMotionCube();
+
   void initialize(int ecatCycleTime);
   void prepareActuation();
 

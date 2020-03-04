@@ -42,10 +42,10 @@ int EthercatMaster::getCycleTime() const
   return this->cycle_time_ms_;
 }
 
-void EthercatMaster::start(std::vector<Joint>& joints)
+void EthercatMaster::start(std::vector<Joint>& joints, bool do_reset_imc)
 {
   EthercatMaster::ethercatMasterInitiation();
-  EthercatMaster::ethercatSlaveInitiation(joints);
+  EthercatMaster::ethercatSlaveInitiation(joints, do_reset_imc);
 }
 
 void EthercatMaster::ethercatMasterInitiation()
@@ -78,10 +78,15 @@ int setSlaveWatchdogTimer(uint16 slave)
   return 1;
 }
 
-void EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
+void EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints, bool do_reset_imc)
 {
   ROS_INFO("Request pre-operational state for all slaves");
   ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
+
+  if (do_reset_imc)
+  {
+    ROS_INFO("Initializing IMC with reset");
+  }
 
   for (Joint& joint : joints)
   {
@@ -89,6 +94,7 @@ void EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
     {
       ec_slave[joint.getIMotionCubeSlaveIndex()].PO2SOconfig = setSlaveWatchdogTimer;
     }
+    joint.resetIMotionCube();
     joint.initialize(cycle_time_ms_);
   }
 

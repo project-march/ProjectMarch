@@ -35,7 +35,7 @@ using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;
 class MarchHardwareInterface : public hardware_interface::RobotHW
 {
 public:
-  explicit MarchHardwareInterface(march::MarchRobot robot);
+  explicit MarchHardwareInterface(march::MarchRobot robot, bool do_reset_imc);
 
   /**
    * @brief Initialize the HardwareInterface by registering position interfaces
@@ -119,6 +119,8 @@ private:
   PowerNetOnOffCommand power_net_on_off_command_;
   bool master_shutdown_allowed_command_ = false;
   bool enable_high_voltage_command_ = true;
+
+  bool reset_imc_ = false;
 
   /* Real time safe publishers */
   RtPublisherPtr<march_shared_resources::AfterLimitJointCommand> after_limit_joint_command_pub_;

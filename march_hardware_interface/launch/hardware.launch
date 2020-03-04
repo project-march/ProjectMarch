@@ -1,5 +1,7 @@
 <launch>
     <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_linear, test_joint_rotational."/>
+    <arg name="do_reset_imc" default="false" doc="Reset the IMC on start-up"/>
+
     <arg name="control_loop_multiplier" default="1"
          doc="Multiplier for the duration of the control loop cycle time compared
               to the ethercat cycle time. This must be a positive integer and

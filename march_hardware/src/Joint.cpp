@@ -179,6 +179,11 @@ void Joint::setNetNumber(int netNumber)
   Joint::netNumber = netNumber;
 }
 
+void Joint::resetIMotionCube()
+{
+  this->iMotionCube.resetIMotionCube();
+}
+
 ActuationMode Joint::getActuationMode() const
 {
   return this->iMotionCube.getActuationMode();

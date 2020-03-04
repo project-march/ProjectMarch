@@ -43,7 +43,7 @@ public:
    * @throws HardwareException If not the configured amount of slaves was found
    *                           or they did not all reach operational state
    */
-  void start(std::vector<Joint>& joints);
+  void start(std::vector<Joint>& joints, bool do_reset_imc);
 
   /**
    * Stops the ethercat loop and joins the thread.
@@ -59,7 +59,7 @@ private:
   /**
    * Configures the found slaves to operational state.
    */
-  void ethercatSlaveInitiation(std::vector<Joint>& joints);
+  void ethercatSlaveInitiation(std::vector<Joint>& joints, bool do_reset_imc);
 
   /**
    * The ethercat train PDO loop. If the working counter is lower than

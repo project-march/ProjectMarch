@@ -40,7 +40,7 @@ public:
   MarchRobot(MarchRobot&&) = default;
   MarchRobot& operator=(MarchRobot&&) = delete;
 
-  void startEtherCAT();
+  void startEtherCAT(bool do_reset_imc);
 
   void stopEtherCAT();
 
