@@ -278,7 +278,7 @@ void IMotionCube::goToOperationEnabled()
 
 void IMotionCube::shutdown()
 {
-    this->goToTargetState(IMotionCubeTargetState::READY_TO_SWITCH_ON);
+  this->goToTargetState(IMotionCubeTargetState::READY_TO_SWITCH_ON);
 }
 
 ActuationMode IMotionCube::getActuationMode() const
