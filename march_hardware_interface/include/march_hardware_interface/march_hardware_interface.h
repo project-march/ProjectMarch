@@ -35,7 +35,7 @@ using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;
 class MarchHardwareInterface : public hardware_interface::RobotHW
 {
 public:
-  explicit MarchHardwareInterface(march::MarchRobot robot, bool do_reset_imc);
+  explicit MarchHardwareInterface(march::MarchRobot robot, bool use_reset_imc);
 
   /**
    * @brief Initialize the HardwareInterface by registering position interfaces
@@ -66,6 +66,8 @@ public:
    * Returns the ethercat cycle time in milliseconds.
    */
   int getEthercatCycleTime() const;
+
+  void initiateIMC();
 
 private:
   /**

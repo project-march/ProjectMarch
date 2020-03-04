@@ -22,7 +22,7 @@ using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::SoftJointLimits;
 using march::Joint;
 
-MarchHardwareInterface::MarchHardwareInterface(march::MarchRobot robot, bool do_reset_imc)
+MarchHardwareInterface::MarchHardwareInterface(march::MarchRobot robot, bool use_reset_imc)
   : march_robot_(std::move(robot))
   , has_power_distribution_board_(this->march_robot_.getPowerDistributionBoard().getSlaveIndex() != -1)
 {
@@ -34,11 +34,12 @@ MarchHardwareInterface::MarchHardwareInterface(march::MarchRobot robot, bool do_
       this->joint_names_.push_back(urdf_joint.first);
     }
   }
-  if (do_reset_imc)
+  this->num_joints_ = this->joint_names_.size();
+
+  if (use_reset_imc)
   {
     this->reset_imc_ = true;
   }
-  this->num_joints_ = this->joint_names_.size();
 }
 
 bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot_hw_nh */)
@@ -56,7 +57,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
   this->reserveMemory();
 
   // Start ethercat cycle in the hardware
-  this->march_robot_.startEtherCAT(this->reset_imc_);
+  this->march_robot_.startEtherCAT();
 
   for (size_t i = 0; i < num_joints_; ++i)
   {
@@ -65,6 +66,11 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
     ROS_DEBUG("[%s] Soft limits set to (%f, %f)", joint_names_[i].c_str(), soft_limits.min_position,
               soft_limits.max_position);
     soft_limits_[i] = soft_limits;
+  }
+
+  if (this->reset_imc_)
+  {
+    initiateIMC();
   }
 
   // Create march_pdb_state interface
@@ -463,4 +469,18 @@ void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
       throw ::std::runtime_error(error_stream.str());
     }
   }
+}
+
+void MarchHardwareInterface::initiateIMC()
+{
+  ROS_INFO("Resetting all IMC on initialization");
+  for (const std::string& joint_name : joint_names_)
+  {
+    Joint joint = this->march_robot_.getJoint(joint_name);
+    joint.resetIMotionCube();
+  }
+
+  ROS_INFO("Restarting EtherCAT");
+  this->march_robot_.stopEtherCAT();
+  this->march_robot_.startEtherCAT();
 }
