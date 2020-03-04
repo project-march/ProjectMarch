@@ -39,6 +39,14 @@ void Joint::prepareActuation()
   }
 }
 
+void Joint::shutdown()
+{
+    if (hasIMotionCube())
+    {
+        iMotionCube.shutdown();
+    }
+}
+
 void Joint::actuateRad(double targetPositionRad)
 {
   ROS_ASSERT_MSG(this->allowActuation,
