@@ -1,4 +1,4 @@
-name: !!python/unicode "right_open"
+name: "right_open"
 version: "MV_stairsdown_single_rightopen_v2"
 description: "Single step for stairs down with more knee flexion"
 gait_type: "stairs_like"
