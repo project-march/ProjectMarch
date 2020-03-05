@@ -8,6 +8,10 @@
 #include <ros/package.h>
 #include <urdf/model.h>
 
+#include <march_hardware/encoder/AbsoluteEncoder.h>
+#include <march_hardware/encoder/IncrementalEncoder.h>
+#include <march_hardware/IMotionCube.h>
+
 class IMotionCubeTest : public ::testing::Test
 {
 protected:
@@ -38,16 +42,27 @@ TEST_F(IMotionCubeTest, ValidIMotionCubeHip)
 
   march::IMotionCube created = HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, this->joint);
 
-  march::Encoder encoder = march::Encoder(16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper,
-                                          this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit);
-  march::IMotionCube expected = march::IMotionCube(2, encoder, march::ActuationMode::unknown);
+  march::AbsoluteEncoder absolute_encoder =
+      march::AbsoluteEncoder(16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper,
+                             this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit);
+  march::IncrementalEncoder incremental_encoder = march::IncrementalEncoder(12, 101.0);
+  march::IMotionCube expected =
+      march::IMotionCube(2, absolute_encoder, incremental_encoder, march::ActuationMode::unknown);
 
   ASSERT_EQ(expected, created);
 }
 
-TEST_F(IMotionCubeTest, NoEncoder)
+TEST_F(IMotionCubeTest, NoAbsoluteEncoder)
 {
-  YAML::Node iMotionCubeConfig = this->loadTestYaml("/imotioncube_no_encoder.yaml");
+  YAML::Node iMotionCubeConfig = this->loadTestYaml("/imotioncube_no_absolute_encoder.yaml");
+
+  ASSERT_THROW(HardwareBuilder::createIMotionCube(iMotionCubeConfig, march::ActuationMode::unknown, this->joint),
+               MissingKeyException);
+}
+
+TEST_F(IMotionCubeTest, NoIncrementalEncoder)
+{
+  YAML::Node iMotionCubeConfig = this->loadTestYaml("/imotioncube_no_incremental_encoder.yaml");
 
   ASSERT_THROW(HardwareBuilder::createIMotionCube(iMotionCubeConfig, march::ActuationMode::unknown, this->joint),
                MissingKeyException);

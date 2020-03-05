@@ -10,7 +10,8 @@
 #include <yaml-cpp/yaml.h>
 
 #include <march_hardware/ActuationMode.h>
-#include <march_hardware/Encoder.h>
+#include <march_hardware/encoder/AbsoluteEncoder.h>
+#include <march_hardware/encoder/IncrementalEncoder.h>
 #include <march_hardware/IMotionCube.h>
 #include <march_hardware/Joint.h>
 #include <march_hardware/MarchRobot.h>
@@ -64,13 +65,16 @@ public:
 
   static march::Joint createJoint(const YAML::Node& joint_config, const std::string& joint_name,
                                   const urdf::JointConstSharedPtr& urdf_joint);
-  static march::Encoder createEncoder(const YAML::Node& encoder_config, const urdf::JointConstSharedPtr& urdf_joint);
+  static march::AbsoluteEncoder createAbsoluteEncoder(const YAML::Node& absolute_encoder_config,
+                                                      const urdf::JointConstSharedPtr& urdf_joint);
+  static march::IncrementalEncoder createIncrementalEncoder(const YAML::Node& incremental_encoder_config);
   static march::IMotionCube createIMotionCube(const YAML::Node& imc_config, march::ActuationMode mode,
                                               const urdf::JointConstSharedPtr& urdf_joint);
   static march::TemperatureGES createTemperatureGES(const YAML::Node& temperature_ges_config);
   static march::PowerDistributionBoard createPowerDistributionBoard(const YAML::Node& power_distribution_board_config);
 
-  static const std::vector<std::string> ENCODER_REQUIRED_KEYS;
+  static const std::vector<std::string> INCREMENTAL_ENCODER_REQUIRED_KEYS;
+  static const std::vector<std::string> ABSOLUTE_ENCODER_REQUIRED_KEYS;
   static const std::vector<std::string> IMOTIONCUBE_REQUIRED_KEYS;
   static const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS;
   static const std::vector<std::string> POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS;

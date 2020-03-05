@@ -6,7 +6,6 @@
 
 #include <ros/ros.h>
 
-#include <march_hardware/Encoder.h>
 #include <march_hardware/Joint.h>
 #include <march_hardware/TemperatureSensor.h>
 

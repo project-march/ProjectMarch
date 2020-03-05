@@ -1,5 +1,5 @@
-// Copyright 2018 Project March.
-#include "march_hardware/Encoder.h"
+// Copyright 2020 Project March.
+#include "march_hardware/encoder/AbsoluteEncoder.h"
 #include "march_hardware/error/hardware_exception.h"
 
 #include <cmath>
@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-class TestEncoder : public testing::Test
+class TestAbsoluteEncoder : public testing::Test
 {
 protected:
   const size_t resolution = 17;
@@ -23,97 +23,84 @@ protected:
   const int32_t lower_soft_limit = lower_soft_limit_rad * total_positions / (2 * M_PI) + zero_position;
   const int32_t upper_soft_limit = upper_soft_limit_rad * total_positions / (2 * M_PI) + zero_position;
 
-  march::Encoder encoder = march::Encoder(resolution, lower_limit, upper_limit, lower_limit_rad, upper_limit_rad,
-                                          lower_soft_limit_rad, upper_soft_limit_rad);
+  march::AbsoluteEncoder encoder = march::AbsoluteEncoder(resolution, lower_limit, upper_limit, lower_limit_rad,
+                                                          upper_limit_rad, lower_soft_limit_rad, upper_soft_limit_rad);
 };
 
-class TestEncoderParameterizedLimits : public TestEncoder, public testing::WithParamInterface<std::tuple<int32_t, bool>>
+class TestEncoderParameterizedLimits : public TestAbsoluteEncoder,
+                                       public testing::WithParamInterface<std::tuple<int32_t, bool>>
 {
 };
 
-class TestEncoderParameterizedSoftLimits : public TestEncoder,
+class TestEncoderParameterizedSoftLimits : public TestAbsoluteEncoder,
                                            public testing::WithParamInterface<std::tuple<int32_t, bool>>
 {
 };
 
-class TestEncoderParameterizedValidTarget : public TestEncoder,
+class TestEncoderParameterizedValidTarget : public TestAbsoluteEncoder,
                                             public testing::WithParamInterface<std::tuple<int32_t, int32_t, bool>>
 {
 };
 
-TEST_F(TestEncoder, CorrectLowerHardLimits)
+TEST_F(TestAbsoluteEncoder, CorrectLowerHardLimits)
 {
   ASSERT_EQ(this->encoder.getLowerHardLimitIU(), this->lower_limit);
 }
 
-TEST_F(TestEncoder, CorrectUpperHardLimit)
+TEST_F(TestAbsoluteEncoder, CorrectUpperHardLimit)
 {
   ASSERT_EQ(this->encoder.getUpperHardLimitIU(), this->upper_limit);
 }
 
-TEST_F(TestEncoder, CorrectLowerSoftLimits)
+TEST_F(TestAbsoluteEncoder, CorrectLowerSoftLimits)
 {
   ASSERT_EQ(this->encoder.getLowerSoftLimitIU(), this->lower_soft_limit);
 }
 
-TEST_F(TestEncoder, CorrectUpperSoftLimits)
+TEST_F(TestAbsoluteEncoder, CorrectUpperSoftLimits)
 {
   ASSERT_EQ(this->encoder.getUpperSoftLimitIU(), this->upper_soft_limit);
 }
 
-TEST_F(TestEncoder, ResolutionBelowRange)
+TEST_F(TestAbsoluteEncoder, LowerSoftLimitAboveUpperSoftLimit)
 {
-  ASSERT_THROW(march::Encoder(0, this->lower_limit, this->upper_limit, this->lower_limit_rad, this->upper_limit_rad,
-                              this->lower_soft_limit_rad, this->upper_soft_limit_rad),
+  ASSERT_THROW(march::AbsoluteEncoder(this->resolution, this->lower_limit, this->upper_limit, this->lower_limit_rad,
+                                      this->upper_limit_rad, this->upper_soft_limit_rad, this->lower_soft_limit_rad),
                march::error::HardwareException);
 }
 
-TEST_F(TestEncoder, ResolutionAboveRange)
+TEST_F(TestAbsoluteEncoder, LowerSoftLimitLowerThanLowerHardLimit)
 {
-  ASSERT_THROW(march::Encoder(50, this->lower_limit, this->upper_limit, this->lower_limit_rad, this->upper_limit_rad,
-                              this->lower_soft_limit_rad, this->upper_soft_limit_rad),
+  ASSERT_THROW(march::AbsoluteEncoder(this->resolution, this->lower_limit, this->upper_limit, this->lower_limit_rad,
+                                      this->upper_limit_rad, -0.4, this->upper_soft_limit_rad),
                march::error::HardwareException);
 }
 
-TEST_F(TestEncoder, LowerSoftLimitAboveUpperSoftLimit)
+TEST_F(TestAbsoluteEncoder, UpperSoftLimitHigherThanUpperHardLimit)
 {
-  ASSERT_THROW(march::Encoder(this->resolution, this->lower_limit, this->upper_limit, this->lower_limit_rad,
-                              this->upper_limit_rad, this->upper_soft_limit_rad, this->lower_soft_limit_rad),
+  ASSERT_THROW(march::AbsoluteEncoder(this->resolution, this->lower_limit, this->upper_limit, this->lower_limit_rad,
+                                      this->upper_limit_rad, this->lower_soft_limit_rad, 2.0),
                march::error::HardwareException);
 }
 
-TEST_F(TestEncoder, LowerSoftLimitLowerThanLowerHardLimit)
-{
-  ASSERT_THROW(march::Encoder(this->resolution, this->lower_limit, this->upper_limit, this->lower_limit_rad,
-                              this->upper_limit_rad, -0.4, this->upper_soft_limit_rad),
-               march::error::HardwareException);
-}
-
-TEST_F(TestEncoder, UpperSoftLimitHigherThanUpperHardLimit)
-{
-  ASSERT_THROW(march::Encoder(this->resolution, this->lower_limit, this->upper_limit, this->lower_limit_rad,
-                              this->upper_limit_rad, this->lower_soft_limit_rad, 2.0),
-               march::error::HardwareException);
-}
-
-TEST_F(TestEncoder, ZeroPositionRadToZeroPosition)
+TEST_F(TestAbsoluteEncoder, ZeroPositionRadToZeroPosition)
 {
   ASSERT_EQ(this->encoder.fromRad(0.0), this->zero_position);
 }
 
-TEST_F(TestEncoder, CorrectFromRad)
+TEST_F(TestAbsoluteEncoder, CorrectFromRad)
 {
   const double radians = 1.0;
   const int32_t expected = (radians * this->total_positions / (2 * M_PI)) + this->zero_position;
   ASSERT_EQ(this->encoder.fromRad(radians), expected);
 }
 
-TEST_F(TestEncoder, ZeroPositionToZeroRadians)
+TEST_F(TestAbsoluteEncoder, ZeroPositionToZeroRadians)
 {
   ASSERT_DOUBLE_EQ(this->encoder.toRad(this->zero_position), 0.0);
 }
 
-TEST_F(TestEncoder, CorrectToRad)
+TEST_F(TestAbsoluteEncoder, CorrectToRad)
 {
   const int32_t iu = 1.0;
   const double expected = (iu - this->zero_position) * 2 * M_PI / this->total_positions;

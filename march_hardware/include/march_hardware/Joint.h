@@ -34,9 +34,11 @@ public:
   void actuateRad(double targetPositionRad);
   void actuateTorque(int16_t targetTorque);
 
-  double getAngleRad();
+  double getAngleRadAbsolute();
+  double getAngleRadIncremental();
   int16_t getTorque();
-  int32_t getAngleIU();
+  int32_t getAngleIUAbsolute();
+  int32_t getAngleIUIncremental();
   float getTemperature();
   IMotionCubeState getIMotionCubeState();
 
@@ -78,7 +80,6 @@ public:
 
   void setName(const std::string& name);
   void setAllowActuation(bool allowActuation);
-  void setIMotionCube(const IMotionCube& iMotionCube);
   void setTemperatureGes(const TemperatureGES& temperatureGes);
   void setNetNumber(int netNumber);
 };

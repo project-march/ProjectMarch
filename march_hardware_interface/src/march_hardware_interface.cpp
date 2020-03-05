@@ -163,7 +163,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
       joint.prepareActuation();
 
       // Set the first target as the current position
-      joint_position_[i] = joint.getAngleRad();
+      joint_position_[i] = joint.getAngleRadAbsolute();
       joint_velocity_[i] = 0;
       joint_effort_[i] = 0;
 
@@ -198,7 +198,7 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
 
     march::Joint joint = march_robot_.getJoint(joint_names_[i]);
 
-    joint_position_[i] = joint.getAngleRad();
+    joint_position_[i] = joint.getAngleRadAbsolute();
 
     if (joint.hasTemperatureGES())
     {
@@ -304,6 +304,7 @@ void MarchHardwareInterface::reserveMemory()
   imc_state_pub_->msg_.motion_error_description.resize(num_joints_);
   imc_state_pub_->msg_.motor_current.resize(num_joints_);
   imc_state_pub_->msg_.motor_voltage.resize(num_joints_);
+  imc_state_pub_->msg_.incremental_encoder_value.resize(num_joints_);
 }
 
 void MarchHardwareInterface::updatePowerDistributionBoard()
@@ -408,6 +409,7 @@ void MarchHardwareInterface::updateIMotionCubeState()
   for (size_t i = 0; i < num_joints_; i++)
   {
     march::IMotionCubeState imc_state = march_robot_.getJoint(joint_names_[i]).getIMotionCubeState();
+    imc_state_pub_->msg_.header.stamp = ros::Time::now();
     imc_state_pub_->msg_.joint_names[i] = joint_names_[i];
     imc_state_pub_->msg_.status_word[i] = imc_state.statusWord;
     imc_state_pub_->msg_.detailed_error[i] = imc_state.detailedError;
@@ -417,6 +419,7 @@ void MarchHardwareInterface::updateIMotionCubeState()
     imc_state_pub_->msg_.motion_error_description[i] = imc_state.motionErrorDescription;
     imc_state_pub_->msg_.motor_current[i] = imc_state.motorCurrent;
     imc_state_pub_->msg_.motor_voltage[i] = imc_state.motorVoltage;
+    imc_state_pub_->msg_.incremental_encoder_value[i] = imc_state.incrementalEncoderValue;
   }
 
   imc_state_pub_->unlockAndPublish();

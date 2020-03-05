@@ -9,10 +9,13 @@ march4:
         temperatureges: {slaveIndex: 7, byteOffset: 4}
         imotioncube:
           slaveIndex: 8
-          encoder:
+          absoluteEncoder:
             resolution: 12
             minPositionIU: 3713
             maxPositionIU: 4091
+          incrementalEncoder:
+            resolution: 13
+            transmission: 200
 
     - left_hip_aa:
         actuationMode: torque
@@ -21,10 +24,13 @@ march4:
         temperatureges: {slaveIndex: 7, byteOffset: 0}
         imotioncube:
           slaveIndex: 6
-          encoder:
+          absoluteEncoder:
             resolution: 12
             minPositionIU: 1030
             maxPositionIU: 1426
+          incrementalEncoder:
+            resolution: 13
+            transmission: 200
 
     - right_hip_fe:
         actuationMode: torque
@@ -33,10 +39,13 @@ march4:
         temperatureges: {slaveIndex: 9, byteOffset: 0}
         imotioncube:
           slaveIndex: 10
-          encoder:
+          absoluteEncoder:
             resolution: 17
             minPositionIU: 2053
             maxPositionIU: 45617
+          incrementalEncoder:
+            resolution: 12
+            transmission: 101
 
     - left_hip_fe:
         actuationMode: torque
@@ -45,10 +54,13 @@ march4:
         temperatureges: {slaveIndex: 5, byteOffset: 0}
         imotioncube:
           slaveIndex: 4
-          encoder:
+          absoluteEncoder:
             resolution: 17
             minPositionIU: -3382
             maxPositionIU: 40270
+          incrementalEncoder:
+            resolution: 12
+            transmission: 101
 
     - right_knee:
         actuationMode: torque
@@ -57,10 +69,13 @@ march4:
         temperatureges: {slaveIndex: 9, byteOffset: 4}
         imotioncube:
           slaveIndex: 11
-          encoder:
+          absoluteEncoder:
             resolution: 17
             minPositionIU: 25190
             maxPositionIU: 68874
+          incrementalEncoder:
+            resolution: 12
+            transmission: 101
 
     - left_knee:
         actuationMode: torque
@@ -69,10 +84,13 @@ march4:
         temperatureges: {slaveIndex: 5, byteOffset: 4}
         imotioncube:
           slaveIndex: 3
-          encoder:
+          absoluteEncoder:
             resolution: 17
             minPositionIU: 19808
             maxPositionIU: 63543
+          incrementalEncoder:
+            resolution: 12
+            transmission: 101
 
     - right_ankle:
         actuationMode: torque
@@ -81,10 +99,13 @@ march4:
         temperatureges: {slaveIndex: 13, byteOffset: 0}
         imotioncube:
           slaveIndex: 12
-          encoder:
+          absoluteEncoder:
             resolution: 12
             minPositionIU: 810
             maxPositionIU: 1210
+          incrementalEncoder:
+            resolution: 13
+            transmission: 200
 
     - left_ankle:
         actuationMode: torque
@@ -93,7 +114,10 @@ march4:
         temperatureges: {slaveIndex: 1, byteOffset: 0}
         imotioncube:
           slaveIndex: 2
-          encoder:
+          absoluteEncoder:
             resolution: 12
             minPositionIU: 3641
             maxPositionIU: 4082
+          incrementalEncoder:
+            resolution: 13
+            transmission: 200
