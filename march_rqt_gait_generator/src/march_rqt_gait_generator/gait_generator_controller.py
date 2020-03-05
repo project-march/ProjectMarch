@@ -2,15 +2,11 @@ import os
 
 from numpy_ringbuffer import RingBuffer
 from pyqtgraph.Qt import QtCore
-from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QFileDialog, QFrame, QHeaderView
-import rospkg
 import rospy
 from trajectory_msgs.msg import JointTrajectory
 from urdf_parser_py import urdf
 
 from . import user_interface_controller
-from .joint_setting_plot import JointSettingPlot
 from .model.modifiable_setpoint import ModifiableSetpoint
 from .model.modifiable_subgait import ModifiableSubgait
 from .time_slider_thread import TimeSliderThread
@@ -104,22 +100,8 @@ class GaitGeneratorController(object):
 
     # Called 8 times by create_joint_plots.
     def create_joint_plot(self, joint):
-        joint_setting_file = os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'), 'resource',
-                                          'joint_setting.ui')
-
-        joint_setting = QFrame()
-        loadUi(joint_setting_file, joint_setting)
-
-        show_velocity_plot = self.view.velocity_plot_check_box.isChecked()
-        show_effort_plot = self.view.effort_plot_check_box.isChecked()
-        joint_setting_plot = JointSettingPlot(joint, self.gait.duration, show_velocity_plot, show_effort_plot)
-        joint_setting.Plot.addItem(joint_setting_plot)
-
-        joint_setting.Table = user_interface_controller.update_table(
-            joint_setting.Table, joint, self.gait.duration)
-        # Disable scrolling horizontally
-        joint_setting.Table.horizontalScrollBar().setDisabled(True)
-        joint_setting.Table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        joint_setting = self.view.create_joint_plot_widget(joint)
+        joint_setting_plot = joint_setting.Plot.getItem(0, 0)
 
         def update_joint_ui():
             user_interface_controller.update_ui_elements(
@@ -248,10 +230,7 @@ class GaitGeneratorController(object):
             self.start_time_slider_thread()
 
     def import_gait(self):
-        file_name, f = QFileDialog.getOpenFileName(self.view._widget,
-                                                   'Open Image',
-                                                   os.getenv('HOME') + '/march_ws/src/gait-files/march_gait_files',
-                                                   'March Subgait (*.subgait)')
+        file_name, f = self.view.open_file_dialogue()
 
         gait = ModifiableSubgait.from_file(self.robot, file_name, self)
         if gait is None:
@@ -323,7 +302,7 @@ class GaitGeneratorController(object):
         return self.gait_directory
 
     def change_gait_directory(self):
-        self.gait_directory = str(QFileDialog.getExistingDirectory(None, 'Select a directory to save gaits'))
+        self.gait_directory = str(self.view.open_directory_dialogue())
         if self.gait_directory == '':   # If directory dialogue is canceled
             self.gait_directory = None
             self.view.change_gait_directory_button.setText('Select a gait directory...')

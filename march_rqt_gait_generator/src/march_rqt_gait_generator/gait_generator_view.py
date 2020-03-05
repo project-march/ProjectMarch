@@ -16,6 +16,8 @@ from sensor_msgs.msg import JointState
 from tf import (ConnectivityException, ExtrapolationException, LookupException,
                 TransformListener)
 from .gait_generator_controller import GaitGeneratorController
+from .joint_setting_plot import JointSettingPlot
+from . import user_interface_controller
 
 
 class GaitGeneratorView(Plugin):
@@ -154,6 +156,22 @@ class GaitGeneratorView(Plugin):
         self.height_right_line_edit.setText('%.3f' % trans_right[2])
         self.heel_distance_line_edit.setText('%.3f' % math.sqrt(trans_left[0] ** 2 + trans_left[2] ** 2))
 
+    def message(self, title=None, msg=None):
+        QMessageBox.question(self._widget, title, msg, QMessageBox.Ok)
+
+    def yes_no_question(self, title=None, msg=None):
+        answer = QMessageBox.question(self._widget, title, msg, QMessageBox.Yes | QMessageBox.No)
+        return answer == QMessageBox.Yes
+
+    def open_file_dialogue(self):
+        return QFileDialog.getOpenFileName(self._widget,
+                                           'Open Image',
+                                           os.getenv('HOME') + '/march_ws/src/gait-files/march_gait_files',
+                                           'March Subgait (*.subgait)')
+
+    def open_directory_dialogue(self):
+        return QFileDialog.getExistingDirectory(None, 'Select a directory to save gaits')
+
     @QtCore.pyqtSlot(int)
     def update_main_time_slider(self, time):
         self.time_slider.setValue(time)
@@ -161,21 +179,22 @@ class GaitGeneratorView(Plugin):
     def shutdown_plugin(self):
         self.controller.stop_time_slider_thread()
 
-    def restore_settings(self, plugin_settings, instance_settings):
-        gait_directory = plugin_settings.value('gait_directory')
+    def create_joint_plot_widget(self, joint):
+        joint_setting_file = os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'), 'resource',
+                                          'joint_setting.ui')
 
-        if gait_directory is not None:
-            rospy.loginfo('Restoring saved gait directory ' + str(gait_directory))
-            self.gait_directory = gait_directory
+        joint_setting = QFrame()
+        loadUi(joint_setting_file, joint_setting)
 
-        # def trigger_configuration(self):
-        # Comment in to signal that the plugin has a way to configure
-        # This will enable a setting button (gear icon) in each dock widget title bar
-        # Usually used to open a modal configuration dialog
+        show_velocity_plot = self.velocity_plot_check_box.isChecked()
+        show_effort_plot = self.effort_plot_check_box.isChecked()
+        joint_setting_plot = JointSettingPlot(joint, show_velocity_plot, show_effort_plot)
+        joint_setting.Plot.addItem(joint_setting_plot)
 
-    def message(self, title=None, msg=None):
-        QMessageBox.question(self._widget, title, msg, QMessageBox.Ok)
+        joint_setting.Table = user_interface_controller.update_table(
+            joint_setting.Table, joint)
+        # Disable scrolling horizontally
+        joint_setting.Table.horizontalScrollBar().setDisabled(True)
+        joint_setting.Table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
-    def yes_no_question(self, title=None, msg=None):
-        answer = QMessageBox.question(self._widget, title, msg, QMessageBox.Yes | QMessageBox.No)
-        return answer == QMessageBox.Yes
+        return joint_setting

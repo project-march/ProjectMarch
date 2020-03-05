@@ -18,7 +18,7 @@ class JointSettingPlot(pg.PlotItem):
     # index
     remove_setpoint = pyqtSignal(int)
 
-    def __init__(self, joint, duration, show_velocity_plot=False, show_effort_plot=False):
+    def __init__(self, joint, show_velocity_plot=False, show_effort_plot=False):
         pg.PlotItem.__init__(self)
 
         self.dragPoint = None
@@ -39,7 +39,7 @@ class JointSettingPlot(pg.PlotItem):
         self.lower_limit = math.degrees(self.limits.lower)
         self.upper_limit = math.degrees(self.limits.upper)
 
-        self.duration = duration
+        self.duration = joint.duration
         self.joint = joint
 
         self.create_plots(joint)

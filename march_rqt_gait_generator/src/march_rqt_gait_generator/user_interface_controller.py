@@ -23,7 +23,7 @@ def table_to_setpoints(table_data):
     return setpoints
 
 
-def update_table(table, joint, duration):
+def update_table(table, joint):
     table.setRowCount(len(joint.setpoints))
 
     for i in range(0, len(joint.setpoints)):
@@ -41,7 +41,7 @@ def update_table(table, joint, duration):
         table.setItem(i, 2, velocity_item)
 
     table.setItemDelegate(JointSettingSpinBoxDelegate(
-        joint.limits.velocity, joint.limits.lower, joint.limits.upper, duration))
+        joint.limits.velocity, joint.limits.lower, joint.limits.upper, joint.duration))
     # table.resizeRowsToContents()
     table.resizeColumnsToContents()
     return table
@@ -67,7 +67,7 @@ def update_ui_elements(joint, duration, table=None, plot=None, show_velocity_plo
     if plot is not None:
         plot.update_set_points(joint, show_velocity_plot, show_effort_plot)
     if table is not None:
-        update_table(table, joint, duration)
+        update_table(table, joint)
 
     if plot is not None:
         plot.plot_item.blockSignals(False)
