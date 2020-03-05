@@ -197,3 +197,11 @@ class GaitGeneratorView(Plugin):
         joint_setting.Table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         return joint_setting
+
+    def update_joint_ui(self, joint, joint_setting):
+        user_interface_controller.update_ui_elements(
+            joint, table=joint_setting.Table, plot=joint_setting.Plot.getItem(0, 0),
+            show_velocity_plot=self.velocity_plot_check_box.isChecked(),
+            show_effort_plot=self.effort_plot_check_box.isChecked())
+        self.view.publish_preview(self.gait, self.current_time)
+

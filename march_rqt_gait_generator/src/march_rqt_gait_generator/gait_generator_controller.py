@@ -103,51 +103,55 @@ class GaitGeneratorController(object):
         joint_setting = self.view.create_joint_plot_widget(joint)
         joint_setting_plot = joint_setting.Plot.getItem(0, 0)
 
-        def update_joint_ui():
-            user_interface_controller.update_ui_elements(
-                joint, table=joint_setting.Table, plot=joint_setting_plot,
-                show_velocity_plot=self.view.velocity_plot_check_box.isChecked(),
-                show_effort_plot=self.view.effort_plot_check_box.isChecked())
-            self.view.publish_preview(self.gait, self.current_time)
-
         def add_setpoint(joint, time, position, button):
             if button == QtCore.Qt.ControlModifier:
                 joint.add_interpolated_setpoint(time)
             else:
                 joint.add_setpoint(ModifiableSetpoint(time, position, 0))
 
-        self.view.undo_button.clicked.connect(update_joint_ui)
-        self.view.redo_button.clicked.connect(update_joint_ui)
-        self.view.invert_button.clicked.connect(update_joint_ui)
+        self.view.undo_button.clicked.connect(
+            lambda: [
+                self.view.update_joint_ui(joint, joint_setting),
+            ])
+
+        self.view.redo_button.clicked.connect(
+            lambda: [
+                self.view.update_joint_ui(joint, joint_setting),
+            ])
+
+        self.view.invert_button.clicked.connect(
+            lambda: [
+                self.view.update_joint_ui(joint, joint_setting),
+            ])
 
         self.view.velocity_plot_check_box.stateChanged.connect(
             lambda: [
-                update_joint_ui(),
+                self.view.update_joint_ui(joint, joint_setting),
             ])
 
         self.view.effort_plot_check_box.stateChanged.connect(
             lambda: [
-                update_joint_ui(),
+                self.view.update_joint_ui(joint, joint_setting),
             ])
 
         # Connect a function to update the model and to update the table.
         joint_setting_plot.plot_item.sigPlotChanged.connect(
             lambda: [
                 joint.set_setpoints(user_interface_controller.plot_to_setpoints(joint_setting_plot)),
-                update_joint_ui(),
+                self.view.update_joint_ui(joint, joint_setting),
             ])
 
         joint_setting_plot.add_setpoint.connect(
             lambda time, position, button: [
                 add_setpoint(joint, time, position, button),
-                update_joint_ui(),
+                self.view.update_joint_ui(joint, joint_setting),
             ])
 
         joint_setting_plot.remove_setpoint.connect(
             lambda index: [
                 joint.save_setpoints(),
                 joint.remove_setpoint(index),
-                update_joint_ui(),
+                self.view.update_joint_ui(joint, joint_setting),
             ])
 
         joint_setting.Table.itemChanged.connect(
