@@ -116,6 +116,14 @@ class InputDevicePlugin(Plugin):
             self.create_button('gait_stairs_down', image_path='/gait_stairs_down.png',
                                callback=lambda: self.controller.publish_gait('gait_stairs_down'))
 
+        gait_stairs_up_single_step = \
+            self.create_button('gait_stairs_up_single_step',
+                               callback=lambda: self.controller.publish_gait('gait_stairs_up_single_step'))
+
+        gait_stairs_down_single_step = \
+            self.create_button('gait_stairs_down_single_step',
+                               callback=lambda: self.controller.publish_gait('gait_stairs_down_single_step'))
+
         gait_rough_terrain_high_step = \
             self.create_button('gait_rough_terrain_high_step',
                                callback=lambda: self.controller.publish_gait('gait_rough_terrain_high_step'))
@@ -200,8 +208,9 @@ class InputDevicePlugin(Plugin):
 
             [gait_sit, gait_stand, gait_single_step_normal, gait_single_step_small, continue_button, error_button],
 
-            [gait_sofa_sit, gait_sofa_stand, gait_stairs_up, gait_stairs_down, rocker_switch_increment,
-             rocker_switch_decrement],
+            [gait_sofa_sit, gait_sofa_stand, rocker_switch_increment, rocker_switch_decrement],
+
+            [gait_stairs_up, gait_stairs_down, gait_stairs_up_single_step, gait_stairs_down_single_step],
 
             [gait_side_step_left, gait_side_step_right, gait_side_step_left_small, gait_side_step_right_small],
 
