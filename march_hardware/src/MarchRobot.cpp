@@ -58,7 +58,6 @@ void MarchRobot::startEtherCAT(bool do_reset_imc)
     ROS_INFO("Restarting the EtherCAT Master");
     ethercatMaster.stop();
     ethercatMaster.start(this->jointList);
-
   }
 }
 
@@ -80,7 +79,6 @@ void MarchRobot::resetIMC()
   {
     joint.resetIMotionCube();
   }
-
 }
 
 int MarchRobot::getMaxSlaveIndex()
