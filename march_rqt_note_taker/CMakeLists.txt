@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(march_rqt_note_taker)
 
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED COMPONENTS march_shared_resources std_msgs)
 
 catkin_python_setup()
-catkin_package()
+catkin_package(CATKIN_DEPENDS march_shared_resources std_msgs)
 
 install(FILES plugin.xml
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}

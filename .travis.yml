@@ -27,6 +27,7 @@ env:
     - DOCKER_RUN_OPTS='$CI_ENV -e CATKIN_TEST_COVERAGE=1 -e NOSE_COVER_INCLUSIVE=True -e NOSE_COVER_BRANCHES=True'
     - AFTER_INSTALL_TARGET_DEPENDENCIES='pip install coverage'
     - AFTER_RUN_TARGET_TEST='cd "$target_ws" && ./src/monitor/coverage.sh && bash <(curl -s https://codecov.io/bash) -R src/monitor -F test && bash <(curl -s https://codecov.io/bash) -R src/monitor -F production'
+    - UPSTREAM_WORKSPACE='.rosinstall -march/march_data_collector -march/march_description -march/march_gain_scheduling -march/march_gait_scheduler -march/march_gait_selection -march/march_launch -march/march_safety -march/march_shared_classes -march/march_state_machine'
 
 jobs:
   include:

@@ -4,11 +4,11 @@ from rosgraph_msgs.msg import Log
 
 class Entry(QObject):
 
-    def __init__(self, content, date_time=QDateTime.currentDateTime(), is_error=False):
+    def __init__(self, content, date_time=None, is_error=False):
         super(Entry, self).__init__()
 
         self.content = content
-        self.date_time = date_time
+        self.date_time = QDateTime.currentDateTime() if date_time is None else date_time
         self.is_error = is_error
 
     @classmethod
