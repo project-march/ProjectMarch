@@ -105,7 +105,7 @@ class GaitGeneratorController(object):
 
         def update_joint_ui():
             user_interface_controller.update_ui_elements(
-                joint, table=joint_setting.Table, plot=joint_setting_plot, duration=self.gait.duration,
+                joint, table=joint_setting.Table, plot=joint_setting_plot,
                 show_velocity_plot=self.view.velocity_plot_check_box.isChecked(),
                 show_effort_plot=self.view.effort_plot_check_box.isChecked())
             self.view.publish_preview(self.gait, self.current_time)
@@ -154,7 +154,7 @@ class GaitGeneratorController(object):
             lambda: [
                 joint.set_setpoints(user_interface_controller.table_to_setpoints(joint_setting.Table)),
                 user_interface_controller.update_ui_elements(
-                    joint, table=None, plot=joint_setting_plot, duration=self.gait.duration,
+                    joint, table=None, plot=joint_setting_plot,
                     show_velocity_plot=self.view.velocity_plot_check_box.isChecked(),
                     show_effort_plot=self.view.effort_plot_check_box.isChecked()),
                 self.view.publish_preview(self.gait, self.current_time),
@@ -237,7 +237,7 @@ class GaitGeneratorController(object):
             rospy.logwarn('Could not load gait %s', file_name)
             return
         self.gait = gait
-        self.view.load_gait_into_ui(self.gait)
+        self.view.load_gait_into_ui(self.gait, self.create_joint_plots())
         self.current_time = 0
 
         self.gait_directory = '/'.join(file_name.split('/')[:-3])

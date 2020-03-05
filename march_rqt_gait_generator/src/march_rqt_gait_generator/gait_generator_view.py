@@ -191,8 +191,7 @@ class GaitGeneratorView(Plugin):
         joint_setting_plot = JointSettingPlot(joint, show_velocity_plot, show_effort_plot)
         joint_setting.Plot.addItem(joint_setting_plot)
 
-        joint_setting.Table = user_interface_controller.update_table(
-            joint_setting.Table, joint)
+        joint_setting.Table = user_interface_controller.update_table(joint_setting.Table, joint)
         # Disable scrolling horizontally
         joint_setting.Table.horizontalScrollBar().setDisabled(True)
         joint_setting.Table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
