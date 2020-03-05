@@ -32,7 +32,7 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, PowerDi
 {
 }
 
-void MarchRobot::startEtherCAT()
+void MarchRobot::startEtherCAT(bool do_reset_imc)
 {
   if (!hasValidSlaves())
   {
@@ -49,6 +49,17 @@ void MarchRobot::startEtherCAT()
     return;
   }
   ethercatMaster.start(this->jointList);
+
+  if (do_reset_imc)
+  {
+    ROS_INFO("Resetting all IMC");
+    resetIMC();
+
+    ROS_INFO("Restarting the EtherCAT Master");
+    ethercatMaster.stop();
+    ethercatMaster.start(this->jointList);
+
+  }
 }
 
 void MarchRobot::stopEtherCAT()
@@ -60,6 +71,16 @@ void MarchRobot::stopEtherCAT()
   }
 
   ethercatMaster.stop();
+}
+
+void MarchRobot::resetIMC()
+{
+  ROS_INFO("Resetting all IMC on initialization");
+  for (auto& joint : jointList)
+  {
+    joint.resetIMotionCube();
+  }
+
 }
 
 int MarchRobot::getMaxSlaveIndex()
@@ -174,6 +195,14 @@ const PowerDistributionBoard& MarchRobot::getPowerDistributionBoard() const
 
 MarchRobot::~MarchRobot()
 {
+  if (this->ethercatMaster.isOperational())
+  {
+    for (auto& joint : jointList)
+    {
+      joint.shutdown();
+    }
+  }
+
   stopEtherCAT();
 }
 

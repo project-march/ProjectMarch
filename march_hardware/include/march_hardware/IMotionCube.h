@@ -44,6 +44,7 @@ public:
 
   void goToTargetState(IMotionCubeTargetState target_state);
   void goToOperationEnabled();
+  void shutdown();
 
   void resetIMotionCube();
 

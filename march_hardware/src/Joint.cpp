@@ -39,6 +39,22 @@ void Joint::prepareActuation()
   }
 }
 
+void Joint::shutdown()
+{
+  if (hasIMotionCube())
+  {
+    iMotionCube.shutdown();
+  }
+}
+
+void Joint::resetIMotionCube()
+{
+  if (hasIMotionCube())
+  {
+    this->iMotionCube.resetIMotionCube();
+  }
+}
+
 void Joint::actuateRad(double targetPositionRad)
 {
   ROS_ASSERT_MSG(this->allowActuation,
@@ -177,11 +193,6 @@ bool Joint::canActuate()
 void Joint::setNetNumber(int netNumber)
 {
   Joint::netNumber = netNumber;
-}
-
-void Joint::resetIMotionCube()
-{
-  this->iMotionCube.resetIMotionCube();
 }
 
 ActuationMode Joint::getActuationMode() const

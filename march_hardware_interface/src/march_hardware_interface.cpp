@@ -57,7 +57,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
   this->reserveMemory();
 
   // Start ethercat cycle in the hardware
-  this->march_robot_.startEtherCAT();
+  this->march_robot_.startEtherCAT(this->reset_imc_);
 
   for (size_t i = 0; i < num_joints_; ++i)
   {
@@ -66,11 +66,6 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
     ROS_DEBUG("[%s] Soft limits set to (%f, %f)", joint_names_[i].c_str(), soft_limits.min_position,
               soft_limits.max_position);
     soft_limits_[i] = soft_limits;
-  }
-
-  if (this->reset_imc_)
-  {
-    initiateIMC();
   }
 
   // Create march_pdb_state interface
@@ -471,16 +466,3 @@ void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
   }
 }
 
-void MarchHardwareInterface::initiateIMC()
-{
-  ROS_INFO("Resetting all IMC on initialization");
-  for (const std::string& joint_name : joint_names_)
-  {
-    Joint joint = this->march_robot_.getJoint(joint_name);
-    joint.resetIMotionCube();
-  }
-
-  ROS_INFO("Restarting EtherCAT");
-  this->march_robot_.stopEtherCAT();
-  this->march_robot_.startEtherCAT();
-}

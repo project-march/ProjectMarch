@@ -31,6 +31,7 @@ public:
 
   void initialize(int ecatCycleTime);
   void prepareActuation();
+  void shutdown();
 
   void actuateRad(double targetPositionRad);
   void actuateTorque(int16_t targetTorque);
