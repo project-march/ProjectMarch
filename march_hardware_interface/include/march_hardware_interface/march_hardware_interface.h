@@ -8,7 +8,6 @@
 #include <memory>
 #include <vector>
 
-#include <control_toolbox/filters.h>
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
@@ -80,6 +79,9 @@ private:
   void updateIMotionCubeState();
   void outsideLimitsCheck(size_t joint_index);
   void iMotionCubeStateCheck(size_t joint_index);
+
+  /* Exponential smoothing constant of the velocity */
+  static constexpr double ALPHA = 0.2;
 
   /* March hardware */
   march::MarchRobot march_robot_;
