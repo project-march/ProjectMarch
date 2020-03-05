@@ -10,10 +10,15 @@ gaits:
   stand: {prepare_stand_up: MIV_final, stand_up: MIV_final}
   sofa_sit: {sit_down: MIV_final, sit_home: MIV_final}
   sofa_stand: {prepare_stand_up: MIV_final, stand_up: MIV_final}
-  stairs_up: {right_open: MIV_final, left_swing: MIV_final, right_swing: MIV_final, left_close: MIV_final,
-              right_close: MIV_final}
-  stairs_down: {right_open: MIV_final, left_swing: MIV_final, right_swing: MIV_final, left_close: MIV_final,
-                right_close: MIV_final}
+  stairs_up: {right_open: MV_stairsup_rightopen_v8, left_swing: MV_stairsup_leftswing_v8,
+              right_swing: MV_stairsup_rightswing_v8, left_close: MV_stairsup_leftclose_v12,
+              right_close: MV_stairsup_rightclose_v12}
+  stairs_up_single_step: {right_open: MV_stairsup_single_rightopen_v2, left_close: MV_stairsup_single_leftclose_v2}
+  stairs_down_single_step: {right_open: MV_stairsdown_single_rightopen_v2,
+                            left_close: MV_stairsdown_single_leftclose_v2}
+  stairs_down: {right_open: MV_stairsdown_rightopen_v4, left_swing: MV_stairsdown_leftswing_v4,
+                right_swing: MV_stairsdown_rightswing_v4, left_close: MV_stairsdown_leftclose_v4,
+                right_close: MV_stairsdown_rightclose_v4}
   walk: {right_open: MV_walk_rightopen_v2, left_swing: MV_walk_leftswing_v2, right_swing: MV_walk_rightswing_v2,
          left_close: MV_walk_leftclose_v2, right_close: MV_walk_rightclose_v2}
   rough_terrain_high_step: {right_open: MV_RT_highstep_rightopen_v7, left_close: MV_RT_highstep_leftclose_v8}
