@@ -9,8 +9,8 @@ testsetup:
           slaveIndex: 1
           absoluteEncoder:
             resolution: 17
-            minPositionIU: 82805
-            maxPositionIU: 102499
+            minPositionIU: 97242
+            maxPositionIU: 119617
           incrementalEncoder:
             resolution: 12
             transmission: 101
