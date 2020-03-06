@@ -129,8 +129,6 @@ void IMotionCube::actuateIU(int32_t target_iu)
 
   uint8_t target_position_location = this->mosi_byte_offsets_.at(IMCObjectName::TargetPosition);
 
-  ROS_DEBUG("Trying to actuate slave %d, soem location %d to targetposition %d", this->slaveIndex,
-            target_position_location, target_position.i);
   set_output_bit32(this->slaveIndex, target_position_location, target_position);
 }
 
@@ -153,8 +151,6 @@ void IMotionCube::actuateTorque(int16_t target_torque)
 
   uint8_t target_torque_location = this->mosi_byte_offsets_.at(IMCObjectName::TargetTorque);
 
-  ROS_DEBUG("Trying to actuate slave %d, soem location %d with target torque %d", this->slaveIndex,
-            target_torque_location, target_torque_struct.i);
   set_output_bit16(this->slaveIndex, target_torque_location, target_torque_struct);
 }
 
@@ -176,7 +172,6 @@ double IMotionCube::getAngleRadIncremental()
 int16_t IMotionCube::getTorque()
 {
   bit16 return_byte = get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::ActualTorque));
-  ROS_DEBUG("Actual Torque read: %d", return_byte.i);
   return return_byte.i;
 }
 

@@ -174,11 +174,6 @@ void EthercatMaster::ethercatLoop()
         ROS_WARN("EtherCAT rate of %d milliseconds per cycle was not achieved for %f percent of all cycles",
                  cycle_time_ms_, rateNotAchievedPercentage);
       }
-      else
-      {
-        ROS_DEBUG("EtherCAT rate of %d milliseconds per cycle was not achieved for %f percent of all cycles",
-                  cycle_time_ms_, rateNotAchievedPercentage);
-      }
       totalLoops = 0;
       rateNotAchievedCount = 0;
     }

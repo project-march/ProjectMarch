@@ -3,6 +3,7 @@
 #define MARCH_HARDWARE_BUILDER_HARDWARE_BUILDER_H
 #include "march_hardware_builder/allowed_robot.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -52,7 +53,7 @@ public:
    * @throws HardwareConfigException When the urdf could not be loaded from the parameter server
    * @throws MissingKeyException When a required key is missing from the given config
    */
-  march::MarchRobot createMarchRobot();
+  std::unique_ptr<march::MarchRobot> createMarchRobot();
 
   /**
    * @brief Loops over all keys in the keyList and check if they exist in the
