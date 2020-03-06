@@ -18,7 +18,7 @@ namespace march
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, ::std::string ifName, int ecatCycleTime)
   : jointList(std::move(jointList))
   , urdf_(std::move(urdf))
-  , ethercatMaster(EthercatMaster(ifName, this->getMaxSlaveIndex(), ecatCycleTime))
+  , ethercatMaster(ifName, this->getMaxSlaveIndex(), ecatCycleTime)
 {
 }
 
@@ -26,7 +26,7 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, PowerDi
                        ::std::string ifName, int ecatCycleTime)
   : jointList(std::move(jointList))
   , urdf_(std::move(urdf))
-  , ethercatMaster(EthercatMaster(ifName, this->getMaxSlaveIndex(), ecatCycleTime))
+  , ethercatMaster(ifName, this->getMaxSlaveIndex(), ecatCycleTime)
   , powerDistributionBoard(powerDistributionBoard)
 {
 }
