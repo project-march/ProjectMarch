@@ -28,7 +28,7 @@ public:
   EthercatMaster(const EthercatMaster&) = delete;
   EthercatMaster& operator=(const EthercatMaster&) = delete;
 
-  /* Enable the move constructor */
+  /* Delete move constructor/assignment since atomic bool can not be moved */
   EthercatMaster(EthercatMaster&&) = delete;
   EthercatMaster& operator=(EthercatMaster&&) = delete;
 
