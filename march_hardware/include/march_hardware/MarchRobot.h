@@ -3,9 +3,9 @@
 #ifndef MARCH_HARDWARE_MARCHROBOT_H
 #define MARCH_HARDWARE_MARCHROBOT_H
 
+#include <cstdint>
 #include <string>
 #include <vector>
-#include <stdint.h>
 
 #include <urdf/model.h>
 
@@ -37,7 +37,7 @@ public:
   MarchRobot& operator=(const MarchRobot&) = delete;
 
   /* Enable the move constructor */
-  MarchRobot(MarchRobot&&) = default;
+  MarchRobot(MarchRobot&&) = delete;
   MarchRobot& operator=(MarchRobot&&) = delete;
 
   void startEtherCAT();

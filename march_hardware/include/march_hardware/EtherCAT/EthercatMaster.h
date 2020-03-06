@@ -1,6 +1,7 @@
 // Copyright 2019 Project March.
 #ifndef MARCH_HARDWARE_ETHERCAT_ETHERCATMASTER_H
 #define MARCH_HARDWARE_ETHERCAT_ETHERCATMASTER_H
+#include <atomic>
 #include <vector>
 #include <string>
 #include <thread>
@@ -28,7 +29,7 @@ public:
   EthercatMaster& operator=(const EthercatMaster&) = delete;
 
   /* Enable the move constructor */
-  EthercatMaster(EthercatMaster&&) = default;
+  EthercatMaster(EthercatMaster&&) = delete;
   EthercatMaster& operator=(EthercatMaster&&) = delete;
 
   bool isOperational() const;
@@ -77,7 +78,7 @@ private:
    */
   static void monitorSlaveConnection();
 
-  bool is_operational_ = false;
+  std::atomic<bool> is_operational_;
 
   const std::string ifname_;
   const int max_slave_index_;
