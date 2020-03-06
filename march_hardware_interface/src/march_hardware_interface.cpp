@@ -428,7 +428,6 @@ void MarchHardwareInterface::iMotionCubeStateCheck(size_t joint_index)
     error_stream << "Motion Error: " << imc_state.motionErrorDescription << "(" << imc_state.motionError << ")"
                  << std::endl;
 
-
     throw std::runtime_error(error_stream.str());
   }
 }
