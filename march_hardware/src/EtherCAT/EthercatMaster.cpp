@@ -23,7 +23,7 @@
 namespace march
 {
 EthercatMaster::EthercatMaster(std::string ifname, int max_slave_index, int cycle_time)
-  : ifname_(std::move(ifname)), max_slave_index_(max_slave_index), cycle_time_ms_(cycle_time)
+    : ifname_(std::move(ifname)), max_slave_index_(max_slave_index), cycle_time_ms_(cycle_time)
 {
 }
 
