@@ -2,6 +2,7 @@
 #include "march_hardware_builder/hardware_builder.h"
 #include "march_hardware_builder/hardware_config_exceptions.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -43,7 +44,7 @@ HardwareBuilder::HardwareBuilder(const std::string& yaml_path, urdf::Model urdf)
 {
 }
 
-march::MarchRobot HardwareBuilder::createMarchRobot()
+std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
 {
   this->initUrdf();
 
@@ -71,12 +72,12 @@ march::MarchRobot HardwareBuilder::createMarchRobot()
   if (pdb_config)
   {
     march::PowerDistributionBoard pdb = HardwareBuilder::createPowerDistributionBoard(pdb_config);
-    return { joint_list, this->urdf_, pdb, if_name, cycle_time };
+    return std::make_unique<march::MarchRobot>(joint_list, this->urdf_, pdb, if_name, cycle_time);
   }
   else
   {
     ROS_INFO("powerDistributionBoard is NOT defined");
-    return { joint_list, this->urdf_, if_name, cycle_time };
+    return std::make_unique<march::MarchRobot>(joint_list, this->urdf_, if_name, cycle_time);
   }
 }
 
