@@ -2,11 +2,10 @@
 #include "march_hardware/EtherCAT/EthercatMaster.h"
 #include "march_hardware/error/hardware_exception.h"
 
+#include <chrono>
 #include <sstream>
 #include <string>
 #include <vector>
-
-#include <boost/chrono/chrono.hpp>
 
 #include <ros/ros.h>
 
@@ -44,8 +43,8 @@ int EthercatMaster::getCycleTime() const
 
 void EthercatMaster::start(std::vector<Joint>& joints)
 {
-  EthercatMaster::ethercatMasterInitiation();
-  EthercatMaster::ethercatSlaveInitiation(joints);
+  this->ethercatMasterInitiation();
+  this->ethercatSlaveInitiation(joints);
 }
 
 void EthercatMaster::ethercatMasterInitiation()
@@ -89,10 +88,10 @@ void EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
     {
       ec_slave[joint.getIMotionCubeSlaveIndex()].PO2SOconfig = setSlaveWatchdogTimer;
     }
-    joint.initialize(cycle_time_ms_);
+    joint.initialize(this->cycle_time_ms_);
   }
 
-  ec_config_map(&io_map_);
+  ec_config_map(&this->io_map_);
   ec_configdc();
 
   ROS_INFO("Request safe-operational state for all slaves");
@@ -119,7 +118,7 @@ void EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
   {
     ROS_INFO("Operational state reached for all slaves");
     this->is_operational_ = true;
-    ethercat_thread_ = std::thread(&EthercatMaster::ethercatLoop, this);
+    this->ethercat_thread_ = std::thread(&EthercatMaster::ethercatLoop, this);
   }
   else
   {
@@ -142,45 +141,46 @@ void EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
 
 void EthercatMaster::ethercatLoop()
 {
-  size_t totalLoops = 0;
-  size_t rateNotAchievedCount = 0;
-  size_t rate = 1000 / cycle_time_ms_;
+  size_t total_loops = 0;
+  size_t not_achieved_count = 0;
+  const size_t rate = 1000 / this->cycle_time_ms_;
+  const std::chrono::milliseconds cycle_time(this->cycle_time_ms_);
 
   while (this->is_operational_)
   {
-    auto start = boost::chrono::high_resolution_clock::now();
+    const auto begin = std::chrono::high_resolution_clock::now();
 
-    SendReceivePDO();
+    this->sendReceivePdo();
     monitorSlaveConnection();
 
-    auto stop = boost::chrono::high_resolution_clock::now();
-    auto duration = boost::chrono::duration_cast<boost::chrono::microseconds>(stop - start);
+    const auto end = std::chrono::high_resolution_clock::now();
+    const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
 
-    if (duration.count() > cycle_time_ms_ * 1000)
+    if (duration > cycle_time)
     {
-      rateNotAchievedCount++;
+      not_achieved_count++;
     }
     else
     {
-      usleep(cycle_time_ms_ * 1000 - duration.count());
+      std::this_thread::sleep_for(cycle_time - duration);
     }
-    totalLoops++;
+    total_loops++;
 
-    if (totalLoops >= (10 * rate))
+    if (total_loops >= 10 * rate)
     {
-      float rateNotAchievedPercentage = 100 * (static_cast<float>(rateNotAchievedCount) / totalLoops);
-      if (rateNotAchievedPercentage > 5)
+      const double not_achieved_percentage = 100.0 * ((double)not_achieved_count / total_loops);
+      if (not_achieved_percentage > 5.0)
       {
         ROS_WARN("EtherCAT rate of %d milliseconds per cycle was not achieved for %f percent of all cycles",
-                 cycle_time_ms_, rateNotAchievedPercentage);
+                 this->cycle_time_ms_, not_achieved_percentage);
       }
-      totalLoops = 0;
-      rateNotAchievedCount = 0;
+      total_loops = 0;
+      not_achieved_count = 0;
     }
   }
 }
 
-void EthercatMaster::SendReceivePDO()
+void EthercatMaster::sendReceivePdo()
 {
   ec_send_processdata();
   int wkc = ec_receive_processdata(EC_TIMEOUTRET);

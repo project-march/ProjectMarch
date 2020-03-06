@@ -71,7 +71,7 @@ private:
   /**
    * Sends the PDO and receives the working counter and check if this is lower than expected.
    */
-  void SendReceivePDO();
+  void sendReceivePdo();
 
   /**
    * Checks if all the slaves are connected and in operational state.
