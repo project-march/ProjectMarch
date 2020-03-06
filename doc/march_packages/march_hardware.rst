@@ -65,7 +65,7 @@ PDO messages
 **********************
 Process Data Objects (PDOs) are the cyclic and continuous type of messages of EtherCAT, and the main form of exchanging data with the slaves.
 Reading and writing EtherCAT PDO messages is possible through the other classes in the march_hardware package (e.g. Joint, IMotionCube, Encoder, PowerDistributionBoard).
-For example, the :hardware-interface:`Encoder class <march_hardware/src/Encoder.cpp>` ``getAngleIU()`` function reads and returns the latest encoder value that was received by the EthercatMaster.
+For example, the :hardware-interface:`Encoder class <march_hardware/src/encoder/Encoder.cpp>` ``getAngleIU()`` function reads and returns the latest encoder value that was received by the EthercatMaster.
 Functions such as ``getAngleIU()`` all call the same generic functions for reading from and writing to slaves.
 These generic functions are defined in :hardware-interface:`EthercatIO.cpp <march_hardware/src/EtherCAT/EthercatIO.cpp>`.
 
