@@ -43,7 +43,8 @@ public:
   bool init(ros::NodeHandle& nh, ros::NodeHandle& robot_hw_nh) override;
 
   /**
-   * @brief Read actual position from the hardware.
+   * Reads (in realtime) the state from the march robot.
+   *
    * @param time Current time
    * @param elapsed_time Duration since last write action
    */
@@ -55,7 +56,8 @@ public:
   void validate();
 
   /**
-   * @brief Write position commands to the hardware.
+   * Writes (in realtime) the commands from the controllers to the march robot.
+   *
    * @param time Current time
    * @param elapsed_time Duration since last write action
    */

@@ -129,7 +129,6 @@ MarchPdbStateController::createLowVoltageNetsMessage(march::LowVoltage low_volta
 
 void MarchPdbStateController::update(const ros::Time& time, const ros::Duration& /*period*/)
 {
-  ROS_DEBUG_THROTTLE(1, "update MarchPdbStateController");
   // limit rate of publishing
   if (publish_rate_ > 0.0 && last_publish_times_ + ros::Duration(1.0 / publish_rate_) < time)
   {

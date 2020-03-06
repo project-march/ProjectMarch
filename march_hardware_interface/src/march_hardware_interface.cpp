@@ -213,8 +213,6 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
         MarchHardwareInterface::ALPHA * joint_velocity + (1 - MarchHardwareInterface::ALPHA) * joint_velocity_[i];
 
     joint_effort_[i] = joint.getTorque();
-
-    ROS_DEBUG("Joint %s: read position %f", joint_names_[i].c_str(), joint_position_[i]);
   }
 
   this->updateIMotionCubeState();
@@ -222,11 +220,6 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
   if (has_power_distribution_board_)
   {
     power_distribution_board_read_ = march_robot_.getPowerDistributionBoard();
-
-    if (!power_distribution_board_read_.getHighVoltage().getHighVoltageEnabled())
-    {
-      ROS_WARN_THROTTLE(10, "All-High-Voltage disabled");
-    }
   }
 }
 
@@ -250,11 +243,6 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
 
     if (joint.canActuate())
     {
-      ROS_DEBUG("After limits: Trying to actuate joint %s, to %lf rad, %f "
-                "speed, %f effort.",
-                joint_names_[i].c_str(), joint_position_command_[i], joint_velocity_command_[i],
-                joint_effort_command_[i]);
-
       if (joint.getActuationMode() == march::ActuationMode::position)
       {
         joint.actuateRad(joint_position_command_[i]);
@@ -438,7 +426,6 @@ void MarchHardwareInterface::iMotionCubeStateCheck(size_t joint_index)
     error_stream << "Motion Error: " << imc_state.motionErrorDescription << "(" << imc_state.motionError << ")"
                  << std::endl;
 
-    ROS_FATAL("%s", error_stream.str().c_str());
     throw std::runtime_error(error_stream.str());
   }
 }
@@ -459,8 +446,7 @@ void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
       error_stream << "Joint " << joint_names_[joint_index].c_str() << " is out of its soft limits ("
                    << soft_limits_[joint_index].min_position << ", " << soft_limits_[joint_index].max_position
                    << "). Actual position: " << joint_position_[joint_index];
-      ROS_FATAL("%s", error_stream.str().c_str());
-      throw ::std::runtime_error(error_stream.str());
+      throw std::runtime_error(error_stream.str());
     }
   }
 }
