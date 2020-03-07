@@ -186,7 +186,7 @@ void EthercatMaster::sendReceivePdo()
   int wkc = ec_receive_processdata(EC_TIMEOUTRET);
   if (wkc < this->expected_working_counter_)
   {
-    ROS_WARN_THROTTLE(1, "Working counter lower than expected. EtherCAT connection may not be optimal");
+    ROS_WARN_THROTTLE(1, "Working counter: %d  is lower than expected: %d", wkc, this->expected_working_counter_);
   }
 }
 
