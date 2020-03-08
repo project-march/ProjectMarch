@@ -16,7 +16,7 @@ from sensor_msgs.msg import JointState
 from tf import (ConnectivityException, ExtrapolationException, LookupException,
                 TransformListener)
 from .gait_generator_controller import GaitGeneratorController
-from .joint_setting_plot import JointSettingPlot
+from .joint_plot import JointPlot
 from . import user_interface_controller
 
 
@@ -25,6 +25,7 @@ class GaitGeneratorView(Plugin):
     def __init__(self, context):
         super(GaitGeneratorView, self).__init__(context)
 
+        self.joint_widgets = {}
         self.tf_listener = TransformListener()
         self.joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=10)
 
@@ -92,7 +93,7 @@ class GaitGeneratorView(Plugin):
         return frame
 
     # Called by __init__ and import_gait.
-    def load_gait_into_ui(self, gait, joint_plots):
+    def load_gait_into_ui(self, gait):
         self.time_slider.setRange(0, 100 * gait.duration)
 
         self.gait_type_combo_box.setCurrentText(gait.gait_type)
@@ -106,33 +107,52 @@ class GaitGeneratorView(Plugin):
         self.duration_spin_box.setValue(gait.duration)
         self.duration_spin_box.blockSignals(False)
 
-        self.load_joint_plots(joint_plots)
+        self.load_joint_plots(gait.joints)
         self.publish_preview(gait, time=0)
 
-    # Called by load_gait_into_ui.
+    # Methods below are called by load_gait_into_ui.
     def update_time_sliders(self, time):
         graphics_layouts = self._widget.JointSettingContainer.findChildren(pg.GraphicsLayoutWidget)
         for graphics_layout in graphics_layouts:
             joint_settings_plot = graphics_layout.getItem(0, 0)
             joint_settings_plot.update_time_slider(time)
 
-    # Called by load_gait_into_ui and update_gait_duration.
-    def load_joint_plots(self, joint_plots):
+    def load_joint_plots(self, joints):
         layout = self._widget.JointSettingContainer.layout()
         for i in reversed(range(layout.count())):
             widget = layout.itemAt(i).widget()
             layout.removeWidget(widget)
             widget.setParent(None)
 
-        for joint_name, joint_plot in joint_plots:
-                row = rospy.get_param('/joint_layout/' + joint_name + '/row', -1)
-                column = rospy.get_param('/joint_layout/' + joint_name + '/column', -1)
-                if row == -1 or column == -1:
-                    rospy.logerr('Could not load the layout for joint %s. Please check config/layout.yaml', joint_name)
-                    continue
-                self._widget.JointSettingContainer.layout().addWidget(joint_plot, row, column)
+        for joint in joints:
+            self.joint_widgets[joint.name] = self.create_joint_plot_widget(joint)
+            row = rospy.get_param('/joint_layout/' + joint.name + '/row', -1)
+            column = rospy.get_param('/joint_layout/' + joint.name + '/column', -1)
+            if row == -1 or column == -1:
+                rospy.logerr('Could not load the layout for joint %s. Please check config/layout.yaml', joint.name)
+                continue
+            self._widget.JointSettingContainer.layout().addWidget(self.joint_widgets[joint.name], row, column)
 
-    # Functions below are connected to buttons, text boxes, joint graphs etc.
+    def create_joint_plot_widget(self, joint):
+        joint_setting_file = os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'), 'resource',
+                                          'joint_setting.ui')
+
+        joint_plot_widget = QFrame()
+        loadUi(joint_setting_file, joint_plot_widget)
+
+        show_velocity_plot = self.velocity_plot_check_box.isChecked()
+        show_effort_plot = self.effort_plot_check_box.isChecked()
+        joint_plot = JointPlot(joint, show_velocity_plot, show_effort_plot)
+        joint_plot_widget.Plot.addItem(joint_plot)
+
+        joint_plot_widget.Table = user_interface_controller.update_table(joint_plot_widget.Table, joint)
+        # Disable scrolling horizontally
+        joint_plot_widget.Table.horizontalScrollBar().setDisabled(True)
+        joint_plot_widget.Table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+        return joint_plot_widget
+
+    # Methods below are called during runtime
     def publish_preview(self, gait, time):
         joint_state = JointState()
         joint_state.header.stamp = rospy.get_rostime()
@@ -176,32 +196,23 @@ class GaitGeneratorView(Plugin):
     def update_main_time_slider(self, time):
         self.time_slider.setValue(time)
 
+    def update_joint_widgets(self, joints):
+        for joint in joints:
+            self.update_joint_widget(joint)
+
+    def update_joint_widget(self, joint):
+        table=self.joint_widgets[joint.name].Table
+        plot=self.joint_widgets[joint.name].Plot.getItem(0, 0)
+
+        plot.plot_item.blockSignals(True)
+        table.blockSignals(True)
+
+        plot.update_set_points(joint, show_velocity_plot=self.velocity_plot_check_box.isChecked(),
+                               show_effort_plot=self.effort_plot_check_box.isChecked())
+        user_interface_controller.update_table(table, joint)
+
+        plot.plot_item.blockSignals(False)
+        table.blockSignals(False)
+
     def shutdown_plugin(self):
         self.controller.stop_time_slider_thread()
-
-    def create_joint_plot_widget(self, joint):
-        joint_setting_file = os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'), 'resource',
-                                          'joint_setting.ui')
-
-        joint_setting = QFrame()
-        loadUi(joint_setting_file, joint_setting)
-
-        show_velocity_plot = self.velocity_plot_check_box.isChecked()
-        show_effort_plot = self.effort_plot_check_box.isChecked()
-        joint_setting_plot = JointSettingPlot(joint, show_velocity_plot, show_effort_plot)
-        joint_setting.Plot.addItem(joint_setting_plot)
-
-        joint_setting.Table = user_interface_controller.update_table(joint_setting.Table, joint)
-        # Disable scrolling horizontally
-        joint_setting.Table.horizontalScrollBar().setDisabled(True)
-        joint_setting.Table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-
-        return joint_setting
-
-    def update_joint_ui(self, joint, joint_setting):
-        user_interface_controller.update_ui_elements(
-            joint, table=joint_setting.Table, plot=joint_setting.Plot.getItem(0, 0),
-            show_velocity_plot=self.velocity_plot_check_box.isChecked(),
-            show_effort_plot=self.effort_plot_check_box.isChecked())
-        self.view.publish_preview(self.gait, self.current_time)
-

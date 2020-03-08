@@ -9,7 +9,7 @@ from pyqtgraph.Qt import QtCore
 pg.setConfigOptions(antialias=True)
 
 
-class JointSettingPlot(pg.PlotItem):
+class JointPlot(pg.PlotItem):
     # Custom signals
 
     # time, position, button_pressed

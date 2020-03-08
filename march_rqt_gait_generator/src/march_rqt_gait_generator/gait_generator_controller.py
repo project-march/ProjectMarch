@@ -32,7 +32,9 @@ class GaitGeneratorController(object):
         self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
 
         self.connect_buttons()
-        self.view.load_gait_into_ui(self.gait, self.create_joint_plots())
+        self.view.load_gait_into_ui(self.gait)
+        for joint in self.gait.joints:
+            self.connect_plot(joint)
 
 
     # Called by __init__
@@ -70,6 +72,20 @@ class GaitGeneratorController(object):
         self.view.duration_spin_box.setKeyboardTracking(False)
         self.view.duration_spin_box.valueChanged.connect(self.update_gait_duration)
 
+        # Check boxes
+        self.view.velocity_plot_check_box.stateChanged.connect(
+            lambda: self.view.update_joint_widgets(self.gait.joints),
+        )
+        self.view.effort_plot_check_box.stateChanged.connect(
+            lambda: self.view.update_joint_widgets(self.gait.joints),
+        )
+        # Disable key inputs when mirroring is off.
+        self.view.mirror_check_box.stateChanged.connect(
+            lambda state: [
+                self.view.mirror_key1_line_edit.setEnabled(state),
+                self.view.mirror_key2_line_edit.setEnabled(state),
+            ])
+
         # Connect TimeSlider to the preview
         self.view.time_slider.valueChanged.connect(lambda time: [
             self.set_current_time(time / 100.0),
@@ -77,31 +93,9 @@ class GaitGeneratorController(object):
             self.view.update_time_sliders(self.current_time),
         ])
 
-        # Disable key inputs when mirroring is off.
-        self.view.mirror_check_box.stateChanged.connect(
-            lambda state: [
-                self.view.mirror_key1_line_edit.setEnabled(state),
-                self.view.mirror_key2_line_edit.setEnabled(state),
-            ],
-        )
-
-    # Called by load_gait_into_ui and update_gait_duration.
-    def create_joint_plots(self):
-        joint_plots = []
-        for urdf_joint in self.robot.joints:
-            if urdf_joint.type != 'fixed':
-                joint_name = urdf_joint.name
-
-                joint = self.gait.get_joint(joint_name)
-                if not joint:
-                    continue
-                joint_plots.append([joint_name, self.create_joint_plot(joint)])
-        return joint_plots
-
-    # Called 8 times by create_joint_plots.
-    def create_joint_plot(self, joint):
-        joint_setting = self.view.create_joint_plot_widget(joint)
-        joint_setting_plot = joint_setting.Plot.getItem(0, 0)
+    def connect_plot(self, joint):
+        joint_widget = self.view.joint_widgets[joint.name]
+        joint_plot = joint_widget.Plot.getItem(0, 0)
 
         def add_setpoint(joint, time, position, button):
             if button == QtCore.Qt.ControlModifier:
@@ -109,62 +103,34 @@ class GaitGeneratorController(object):
             else:
                 joint.add_setpoint(ModifiableSetpoint(time, position, 0))
 
-        self.view.undo_button.clicked.connect(
-            lambda: [
-                self.view.update_joint_ui(joint, joint_setting),
-            ])
-
-        self.view.redo_button.clicked.connect(
-            lambda: [
-                self.view.update_joint_ui(joint, joint_setting),
-            ])
-
-        self.view.invert_button.clicked.connect(
-            lambda: [
-                self.view.update_joint_ui(joint, joint_setting),
-            ])
-
-        self.view.velocity_plot_check_box.stateChanged.connect(
-            lambda: [
-                self.view.update_joint_ui(joint, joint_setting),
-            ])
-
-        self.view.effort_plot_check_box.stateChanged.connect(
-            lambda: [
-                self.view.update_joint_ui(joint, joint_setting),
-            ])
-
         # Connect a function to update the model and to update the table.
-        joint_setting_plot.plot_item.sigPlotChanged.connect(
+        joint_plot.plot_item.sigPlotChanged.connect(
             lambda: [
-                joint.set_setpoints(user_interface_controller.plot_to_setpoints(joint_setting_plot)),
-                self.view.update_joint_ui(joint, joint_setting),
-            ])
-
-        joint_setting_plot.add_setpoint.connect(
-            lambda time, position, button: [
-                add_setpoint(joint, time, position, button),
-                self.view.update_joint_ui(joint, joint_setting),
-            ])
-
-        joint_setting_plot.remove_setpoint.connect(
-            lambda index: [
-                joint.save_setpoints(),
-                joint.remove_setpoint(index),
-                self.view.update_joint_ui(joint, joint_setting),
-            ])
-
-        joint_setting.Table.itemChanged.connect(
-            lambda: [
-                joint.set_setpoints(user_interface_controller.table_to_setpoints(joint_setting.Table)),
-                user_interface_controller.update_ui_elements(
-                    joint, table=None, plot=joint_setting_plot,
-                    show_velocity_plot=self.view.velocity_plot_check_box.isChecked(),
-                    show_effort_plot=self.view.effort_plot_check_box.isChecked()),
+                joint.set_setpoints(user_interface_controller.plot_to_setpoints(joint_plot)),
+                self.view.update_joint_widget(joint),
                 self.view.publish_preview(self.gait, self.current_time),
             ])
 
-        return joint_setting
+        joint_plot.add_setpoint.connect(
+            lambda time, position, button: [
+                add_setpoint(joint, time, position, button),
+                self.view.update_joint_widget(joint),
+                self.view.publish_preview(self.gait, self.current_time),
+            ])
+
+        joint_plot.remove_setpoint.connect(
+            lambda index: [
+                joint.remove_setpoint(index),
+                self.view.update_joint_widget(joint),
+                self.view.publish_preview(self.gait, self.current_time),
+            ])
+
+        joint_widget.Table.itemChanged.connect(
+            lambda: [
+                joint.set_setpoints(user_interface_controller.table_to_setpoints(joint_widget.Table)),
+                self.view.update_joint_widget(joint),
+                self.view.publish_preview(self.gait, self.current_time),
+            ])
 
     # Functions below are connected to buttons, text boxes, joint graphs etc.
     def publish_gait(self):
@@ -228,7 +194,7 @@ class GaitGeneratorController(object):
         was_playing = self.time_slider_thread is not None
         self.stop_time_slider_thread()
 
-        self.view.load_joint_plots(self.create_joint_plots())
+        self.view.update_joint_widgets(self.gait.joints)
 
         if was_playing:
             self.start_time_slider_thread()
@@ -241,7 +207,9 @@ class GaitGeneratorController(object):
             rospy.logwarn('Could not load gait %s', file_name)
             return
         self.gait = gait
-        self.view.load_gait_into_ui(self.gait, self.create_joint_plots())
+        self.view.load_gait_into_ui(self.gait)
+        for joint in self.gait.joints:
+            self.connect_plot(joint)
         self.current_time = 0
 
         self.gait_directory = '/'.join(file_name.split('/')[:-3])
@@ -316,6 +284,7 @@ class GaitGeneratorController(object):
     def invert_gait(self):
         for joint in self.gait.joints:
             joint.invert()
+            self.view.update_joint_widget(joint)
         self.save_changed_joints(self.gait.joints)
         self.view.publish_preview(self.gait, self.current_time)
 
@@ -326,6 +295,7 @@ class GaitGeneratorController(object):
         joints = self.joint_changed_history.pop()
         for joint in joints:
             joint.undo()
+            self.view.update_joint_widget(joint)
         self.joint_changed_redo_list.append(joints)
         self.view.publish_preview(self.gait, self.current_time)
 
@@ -337,9 +307,10 @@ class GaitGeneratorController(object):
         for joint in joints:
             joint.redo()
         self.joint_changed_history.append(joints)
+        self.view.update_joint_widgets(joints)
         self.view.publish_preview(self.gait, self.current_time)
 
-    # Called by Joint.save_setpoints. Needed for undo and redo.
+    # Needed for undo and redo.
     def save_changed_joints(self, joints):
         self.joint_changed_history.append(joints)
         self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
