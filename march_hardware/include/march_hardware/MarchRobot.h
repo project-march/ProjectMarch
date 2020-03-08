@@ -36,7 +36,7 @@ public:
   MarchRobot(const MarchRobot&) = delete;
   MarchRobot& operator=(const MarchRobot&) = delete;
 
-  /* Enable the move constructor */
+  /* Delete move constructor/assignment since atomic bool cannot be moved */
   MarchRobot(MarchRobot&&) = delete;
   MarchRobot& operator=(MarchRobot&&) = delete;
 
