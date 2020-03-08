@@ -145,16 +145,29 @@ void EthercatMaster::ethercatLoop()
   size_t not_achieved_count = 0;
   const size_t rate = 1000 / this->cycle_time_ms_;
   const std::chrono::milliseconds cycle_time(this->cycle_time_ms_);
+  auto end_time = std::chrono::high_resolution_clock::now();
 
   while (this->is_operational_)
   {
-    const auto begin = std::chrono::high_resolution_clock::now();
+    const auto start_time = std::chrono::high_resolution_clock::now();
+    const auto down_time = std::chrono::duration_cast<std::chrono::microseconds>(start_time - end_time);
+    if (down_time > cycle_time)
+    {
+      ROS_WARN("There was %d milliseconds between two EtherCAT calls, while cycle time is %d milliseconds",
+               down_time.count(), this->cycle_time_ms_);
+    }
 
     this->sendReceivePdo();
     monitorSlaveConnection();
 
-    const auto end = std::chrono::high_resolution_clock::now();
-    const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
+    end_time = std::chrono::high_resolution_clock::now();
+    const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+
+    if (duration > 2 * cycle_time)
+    {
+      ROS_WARN("EtherCAT execution took %d milliseconds, while cycle time is %d milliseconds", duration.count(),
+               this->cycle_time_ms_);
+    }
 
     if (duration > cycle_time)
     {
