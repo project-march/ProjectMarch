@@ -21,22 +21,50 @@ class GaitGeneratorControllerTest(unittest.TestCase):
     def setUp(self):
         self.gait_generator_view = Mock()
         self.gait_generator_view.topic_name_line_edit.text = Mock(return_value='/march/my_fancy_topic')
-        # self.gait_name = 'walk'
-        # self.subgait_name = 'left_swing'
-        # self.version = 'MV_walk_leftswing_v2'
-        # self.resources_folder = rospkg.RosPack().get_path('march_rqt_gait_generator') + '/test/resources'
-        # self.robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
-        # self.subgait_path = '{rsc}/{gait}/{subgait}/{version}.subgait'.format(rsc=self.resources_folder,
-        #                                                                       gait=self.gait_name,
-        #                                                                       subgait=self.subgait_name,
-        #                                                                       version=self.version)
+        self.gait_generator_view.joint_widgets.__getitem__ = Mock()
+        self.gait_name = 'walk'
+        self.subgait_name = 'left_swing'
+        self.version = 'MV_walk_leftswing_v2'
+        self.resources_folder = rospkg.RosPack().get_path('march_rqt_gait_generator') + '/test/resources'
+        self.robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
+        self.subgait_path = '{rsc}/{gait}/{subgait}/{version}.subgait'.format(rsc=self.resources_folder,
+                                                                              gait=self.gait_name,
+                                                                              subgait=self.subgait_name,
+                                                                              version=self.version)
         self.gait_generator_controller = GaitGeneratorController(self.gait_generator_view)
 
-    # def test_init_load_gui_call(self):
-    #     self.gait_generator_view.assert_called_once()
+    def test_init_load_gui_call(self):
+        self.gait_generator_view.load_gait_into_ui.assert_called_once_with(self.gait_generator_controller.subgait)
 
-    def test_something_else(self):
-        self.assertTrue(False)
+    # connect_buttons tests
+    def test_connect_import_gait_button_call(self):
+        self.gait_generator_view.import_gait_button.clicked.\
+            connect.assert_called_once_with(self.gait_generator_controller.import_gait)
+
+    def test_connect_export_gait_button_call(self):
+        self.gait_generator_view.export_gait_button.clicked. \
+            connect.assert_called_once_with(self.gait_generator_controller.export_gait)
+
+    def test_connect_gait_type_combo_box_call(self):
+        self.gait_generator_view.gait_type_combo_box.currentTextChanged.connect.assert_called_once()
+
+    def test_connect_gait_name_line_edit_call(self):
+        self.gait_generator_view.gait_name_line_edit.textChanged.connect.assert_called_once()
+
+    def test_connect_version_name_line_edit_call(self):
+        self.gait_generator_view.version_name_line_edit.textChanged.connect.assert_called_once()
+
+    def test_connect_subgait_name_line_edit_call(self):
+        self.gait_generator_view.subgait_name_line_edit.textChanged.connect.assert_called_once()
+
+    def test_connect_duration_spin_box_call(self):
+        self.gait_generator_view.duration_spin_box.valueChanged. \
+            connect.assert_called_once_with(self.gait_generator_controller.update_gait_duration)
+
+    def test_connect_time_slider_call(self):
+        self.gait_generator_view.time_slider.valueChanged.connect.assert_called_once()
+
+
 
 if __name__ == '__main__':
     rostest.rosrun(PKG, 'gait_generator_controller_test', GaitGeneratorControllerTest)

@@ -27,15 +27,14 @@ class GaitGeneratorController(object):
         self.current_time = 0
 
         self.robot = urdf.Robot.from_parameter_server()
-        self.gait = ModifiableSubgait.empty_subgait(self, self.robot)
+        self.subgait = ModifiableSubgait.empty_subgait(self, self.robot)
         self.joint_changed_history = RingBuffer(capacity=100, dtype=list)
         self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
 
         self.connect_buttons()
-        self.view.load_gait_into_ui(self.gait)
-        for joint in self.gait.joints:
+        self.view.load_gait_into_ui(self.subgait)
+        for joint in self.subgait.joints:
             self.connect_plot(joint)
-
 
     # Called by __init__
     def connect_buttons(self):
@@ -53,19 +52,19 @@ class GaitGeneratorController(object):
 
         # Line edits / combo boxes / spin boxes
         self.view.gait_type_combo_box.currentTextChanged.connect(
-            lambda text: self.gait.set_gait_type(text),
+            lambda text: self.subgait.set_gait_type(text),
         )
         self.view.gait_name_line_edit.textChanged.connect(
-            lambda text: self.gait.set_gait_name(text),
+            lambda text: self.subgait.set_gait_name(text),
         )
         self.view.version_name_line_edit.textChanged.connect(
-            lambda text: self.gait.set_version(text),
+            lambda text: self.subgait.set_version(text),
         )
         self.view.subgait_name_line_edit.textChanged.connect(
-            lambda text: self.gait.set_subgait_name(text),
+            lambda text: self.subgait.set_subgait_name(text),
         )
         self.view.description_line_edit.textChanged.connect(
-            lambda text: self.gait.set_description(text),
+            lambda text: self.subgait.set_description(text),
         )
         self.view.topic_name_line_edit.textChanged.connect(self.set_topic_name)
         self.view.playback_speed_spin_box.valueChanged.connect(self.set_playback_speed)
@@ -74,10 +73,10 @@ class GaitGeneratorController(object):
 
         # Check boxes
         self.view.velocity_plot_check_box.stateChanged.connect(
-            lambda: self.view.update_joint_widgets(self.gait.joints),
+            lambda: self.view.update_joint_widgets(self.subgait.joints),
         )
         self.view.effort_plot_check_box.stateChanged.connect(
-            lambda: self.view.update_joint_widgets(self.gait.joints),
+            lambda: self.view.update_joint_widgets(self.subgait.joints),
         )
         # Disable key inputs when mirroring is off.
         self.view.mirror_check_box.stateChanged.connect(
@@ -89,10 +88,11 @@ class GaitGeneratorController(object):
         # Connect TimeSlider to the preview
         self.view.time_slider.valueChanged.connect(lambda time: [
             self.set_current_time(time / 100.0),
-            self.view.publish_preview(self.gait, self.current_time),
+            self.view.publish_preview(self.subgait, self.current_time),
             self.view.update_time_sliders(self.current_time),
         ])
 
+    # Called by __init__
     def connect_plot(self, joint):
         joint_widget = self.view.joint_widgets[joint.name]
         joint_plot = joint_widget.Plot.getItem(0, 0)
@@ -108,33 +108,33 @@ class GaitGeneratorController(object):
             lambda: [
                 joint.set_setpoints(user_interface_controller.plot_to_setpoints(joint_plot)),
                 self.view.update_joint_widget(joint),
-                self.view.publish_preview(self.gait, self.current_time),
+                self.view.publish_preview(self.subgait, self.current_time),
             ])
 
         joint_plot.add_setpoint.connect(
             lambda time, position, button: [
                 add_setpoint(joint, time, position, button),
                 self.view.update_joint_widget(joint),
-                self.view.publish_preview(self.gait, self.current_time),
+                self.view.publish_preview(self.subgait, self.current_time),
             ])
 
         joint_plot.remove_setpoint.connect(
             lambda index: [
                 joint.remove_setpoint(index),
                 self.view.update_joint_widget(joint),
-                self.view.publish_preview(self.gait, self.current_time),
+                self.view.publish_preview(self.subgait, self.current_time),
             ])
 
         joint_widget.Table.itemChanged.connect(
             lambda: [
                 joint.set_setpoints(user_interface_controller.table_to_setpoints(joint_widget.Table)),
                 self.view.update_joint_widget(joint),
-                self.view.publish_preview(self.gait, self.current_time),
+                self.view.publish_preview(self.subgait, self.current_time),
             ])
 
     # Functions below are connected to buttons, text boxes, joint graphs etc.
     def publish_gait(self):
-        trajectory = self.gait._to_joint_trajectory_msg()
+        trajectory = self.subgait._to_joint_trajectory_msg()
         rospy.loginfo('Publishing trajectory to topic ' + self.topic_name)
         self.gait_publisher.publish(trajectory)
 
@@ -176,25 +176,25 @@ class GaitGeneratorController(object):
     def update_gait_duration(self, duration):
         rescale_setpoints = self.view.scale_setpoints_check_box.isChecked()
 
-        if self.gait.has_setpoints_after_duration(duration) and not rescale_setpoints:
-            if not self.gait.has_multiple_setpoints_before_duration(duration):
+        if self.subgait.has_setpoints_after_duration(duration) and not rescale_setpoints:
+            if not self.subgait.has_multiple_setpoints_before_duration(duration):
                 self.view.message(title='Could not update gait duration',
                                   msg='Not all joints have multiple setpoints before duration ' + str(duration))
-                self.view.duration_spin_box.setValue(self.gait.duration)
+                self.view.duration_spin_box.setValue(self.subgait.duration)
                 return
             discard_setpoints = self.veiw.yes_no_question(title='Gait duration lower than highest time setpoint',
                                                          msg = 'Do you want to discard any setpoints higher than the '
                                                          'given duration?')
             if not discard_setpoints:
-                self.view.duration_spin_box.setValue(self.gait.duration)
+                self.view.duration_spin_box.setValue(self.subgait.duration)
                 return
-        self.gait.set_duration(duration, rescale_setpoints)
-        self.view.time_slider.setRange(0, 100 * self.gait.duration)
+        self.subgait.set_duration(duration, rescale_setpoints)
+        self.view.time_slider.setRange(0, 100 * self.subgait.duration)
 
         was_playing = self.time_slider_thread is not None
         self.stop_time_slider_thread()
 
-        self.view.update_joint_widgets(self.gait.joints)
+        self.view.update_joint_widgets(self.subgait.joints)
 
         if was_playing:
             self.start_time_slider_thread()
@@ -206,13 +206,13 @@ class GaitGeneratorController(object):
         if gait is None:
             rospy.logwarn('Could not load gait %s', file_name)
             return
-        self.gait = gait
-        self.view.load_gait_into_ui(self.gait)
-        for joint in self.gait.joints:
+        self.subgait = gait
+        self.view.load_gait_into_ui(self.subgait)
+        for joint in self.subgait.joints:
             self.connect_plot(joint)
         self.current_time = 0
 
-        self.gait_directory = '/'.join(file_name.split('/')[:-3])
+        self.subgait_directory = '/'.join(file_name.split('/')[:-3])
         rospy.loginfo('Setting gait directory to %s', str(self.gait_directory))
         self.view.change_gait_directory_button.setText(self.gait_directory)
 
@@ -227,14 +227,14 @@ class GaitGeneratorController(object):
         key_2 = self.view.mirror_key2_line_edit.text()
 
         if should_mirror:
-            mirror = self.gait.get_mirror(key_1, key_2)
+            mirror = self.subgait.get_mirror(key_1, key_2)
             if mirror:
                 self.export_to_file(mirror, self.get_gait_directory())
             else:
                 user_interface_controller.notify('Could not mirror gait', 'Check the logs for more information.')
                 return
 
-        self.export_to_file(self.gait, self.get_gait_directory())
+        self.export_to_file(self.subgait, self.get_gait_directory())
 
     def export_to_file(self, gait, gait_directory):
         if gait_directory is None or gait_directory == '':
@@ -282,11 +282,11 @@ class GaitGeneratorController(object):
             self.view.change_gait_directory_button.setText(self.gait_directory)
 
     def invert_gait(self):
-        for joint in self.gait.joints:
+        for joint in self.subgait.joints:
             joint.invert()
             self.view.update_joint_widget(joint)
-        self.save_changed_joints(self.gait.joints)
-        self.view.publish_preview(self.gait, self.current_time)
+        self.save_changed_joints(self.subgait.joints)
+        self.view.publish_preview(self.subgait, self.current_time)
 
     def undo(self):
         if not self.joint_changed_history:
@@ -297,7 +297,7 @@ class GaitGeneratorController(object):
             joint.undo()
             self.view.update_joint_widget(joint)
         self.joint_changed_redo_list.append(joints)
-        self.view.publish_preview(self.gait, self.current_time)
+        self.view.publish_preview(self.subgait, self.current_time)
 
     def redo(self):
         if not self.joint_changed_redo_list:
@@ -308,7 +308,7 @@ class GaitGeneratorController(object):
             joint.redo()
         self.joint_changed_history.append(joints)
         self.view.update_joint_widgets(joints)
-        self.view.publish_preview(self.gait, self.current_time)
+        self.view.publish_preview(self.subgait, self.current_time)
 
     # Needed for undo and redo.
     def save_changed_joints(self, joints):
