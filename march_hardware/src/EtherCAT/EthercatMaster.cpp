@@ -148,13 +148,13 @@ void EthercatMaster::ethercatLoop()
 
   while (this->is_operational_)
   {
-    const auto begin = std::chrono::high_resolution_clock::now();
+    const auto begin_time = std::chrono::high_resolution_clock::now();
 
     this->sendReceivePdo();
     monitorSlaveConnection();
 
-    const auto end = std::chrono::high_resolution_clock::now();
-    const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
+    const auto end_time = std::chrono::high_resolution_clock::now();
+    const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - begin_time);
 
     if (duration > cycle_time)
     {
