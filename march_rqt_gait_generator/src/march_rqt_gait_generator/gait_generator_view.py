@@ -15,9 +15,10 @@ import rviz
 from sensor_msgs.msg import JointState
 from tf import (ConnectivityException, ExtrapolationException, LookupException,
                 TransformListener)
+
+from . import user_interface_controller
 from .gait_generator_controller import GaitGeneratorController
 from .joint_plot import JointPlot
-from . import user_interface_controller
 
 
 class GaitGeneratorView(Plugin):
@@ -201,8 +202,8 @@ class GaitGeneratorView(Plugin):
             self.update_joint_widget(joint)
 
     def update_joint_widget(self, joint):
-        table=self.joint_widgets[joint.name].Table
-        plot=self.joint_widgets[joint.name].Plot.getItem(0, 0)
+        table = self.joint_widgets[joint.name].Table
+        plot = self.joint_widgets[joint.name].Plot.getItem(0, 0)
 
         plot.plot_item.blockSignals(True)
         table.blockSignals(True)

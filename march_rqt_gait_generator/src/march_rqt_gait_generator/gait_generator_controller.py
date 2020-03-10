@@ -183,8 +183,8 @@ class GaitGeneratorController(object):
                 self.view.duration_spin_box.setValue(self.subgait.duration)
                 return
             discard_setpoints = self.veiw.yes_no_question(title='Gait duration lower than highest time setpoint',
-                                                         msg = 'Do you want to discard any setpoints higher than the '
-                                                         'given duration?')
+                                                          msg='Do you want to discard any setpoints higher than the '
+                                                          'given duration?')
             if not discard_setpoints:
                 self.view.duration_spin_box.setValue(self.subgait.duration)
                 return
