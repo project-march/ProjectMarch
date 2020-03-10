@@ -1,4 +1,4 @@
-name: tilted_path_flexed_knee_step
+name: tilted_path_left_flexed_knee_step
 
 graph:
   from_subgait: [start,     right_open, left_close]

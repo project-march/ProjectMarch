@@ -1,4 +1,4 @@
-name: tilted_path_left_straight_end
+name: tilted_path_right_single_step
 
 graph:
   from_subgait: [start,     left_open, right_close]
