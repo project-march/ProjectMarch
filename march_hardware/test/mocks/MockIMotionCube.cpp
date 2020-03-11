@@ -1,12 +1,14 @@
-#include "gmock/gmock.h"  // Brings in Google Mock.
+#include "MockAbsoluteEncoder.cpp"
+#include "MockIncrementalEncoder.cpp"
+
 #include "march_hardware/IMotionCube.h"
 
-#include "MockEncoder.cpp"
+#include <gmock/gmock.h>
 
 class MockIMotionCube : public march::IMotionCube
 {
 public:
-  MockIMotionCube() : march::IMotionCube(1, MockEncoder(), march::ActuationMode::unknown)
+  MockIMotionCube() : IMotionCube(1, MockAbsoluteEncoder(), MockIncrementalEncoder(), march::ActuationMode::unknown)
   {
   }
   MOCK_METHOD0(getAngle, float());

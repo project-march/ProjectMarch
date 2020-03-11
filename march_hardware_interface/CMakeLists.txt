@@ -4,7 +4,6 @@ project(march_hardware_interface)
 add_compile_options(-std=c++14 -Wall -Wextra -Werror)
 
 find_package(catkin REQUIRED COMPONENTS
-    control_toolbox
     controller_manager
     joint_limits_interface
     joint_state_controller

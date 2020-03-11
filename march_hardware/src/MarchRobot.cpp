@@ -6,7 +6,6 @@
 
 #include <ros/ros.h>
 
-#include <march_hardware/Encoder.h>
 #include <march_hardware/Joint.h>
 #include <march_hardware/TemperatureSensor.h>
 
@@ -158,8 +157,7 @@ Joint MarchRobot::getJoint(::std::string jointName)
     }
   }
 
-  ROS_ERROR("Could not find joint with name %s", jointName.c_str());
-  throw ::std::runtime_error("Could not find joint with name " + jointName);
+  throw std::runtime_error("Could not find joint with name " + jointName);
 }
 
 PowerDistributionBoard& MarchRobot::getPowerDistributionBoard()

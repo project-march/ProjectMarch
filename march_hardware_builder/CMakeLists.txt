@@ -49,12 +49,13 @@ install(TARGETS ${PROJECT_NAME}
 ## Add gtest based cpp test target and link libraries
 if(CATKIN_ENABLE_TESTING)
     catkin_add_gtest(${PROJECT_NAME}_test
-        test/test_runner.cpp
+        test/absolute_encoder_builder_test.cpp
         test/allowed_robot_test.cpp
-        test/encoder_builder_test.cpp
         test/imc_builder_test.cpp
+        test/incremental_encoder_builder_test.cpp
         test/joint_builder_test.cpp
         test/pdb_builder_test.cpp
+        test/test_runner.cpp
     )
     target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME})
 

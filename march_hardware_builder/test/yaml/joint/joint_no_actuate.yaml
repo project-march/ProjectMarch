@@ -1,9 +1,12 @@
 imotioncube:
   slaveIndex: 2
-  encoder:
+  absoluteEncoder:
     resolution: 16
     minPositionIU: 22134
     maxPositionIU: 43436
+  incrementalEncoder:
+    resolution: 12
+    transmission: 14.0
 temperatureges:
   slaveIndex: 1
   byteOffset: 2

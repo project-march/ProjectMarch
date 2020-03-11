@@ -2,17 +2,22 @@
 #include "march_hardware_builder/hardware_builder.h"
 #include "march_hardware_builder/hardware_config_exceptions.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 
 #include <ros/ros.h>
 
 // clang-format off
-const std::vector<std::string> HardwareBuilder::ENCODER_REQUIRED_KEYS =
+const std::vector<std::string> HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS =
     {
         "resolution", "minPositionIU", "maxPositionIU"
     };
-const std::vector<std::string> HardwareBuilder::IMOTIONCUBE_REQUIRED_KEYS = { "slaveIndex", "encoder" };
+const std::vector<std::string> HardwareBuilder::INCREMENTAL_ENCODER_REQUIRED_KEYS = { "resolution", "transmission" };
+const std::vector<std::string> HardwareBuilder::IMOTIONCUBE_REQUIRED_KEYS =
+    {
+        "slaveIndex", "incrementalEncoder", "absoluteEncoder"
+    };
 const std::vector<std::string> HardwareBuilder::TEMPERATUREGES_REQUIRED_KEYS = { "slaveIndex", "byteOffset" };
 const std::vector<std::string> HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS =
     {
@@ -39,7 +44,7 @@ HardwareBuilder::HardwareBuilder(const std::string& yaml_path, urdf::Model urdf)
 {
 }
 
-march::MarchRobot HardwareBuilder::createMarchRobot()
+std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
 {
   this->initUrdf();
 
@@ -67,12 +72,12 @@ march::MarchRobot HardwareBuilder::createMarchRobot()
   if (pdb_config)
   {
     march::PowerDistributionBoard pdb = HardwareBuilder::createPowerDistributionBoard(pdb_config);
-    return { joint_list, this->urdf_, pdb, if_name, cycle_time };
+    return std::make_unique<march::MarchRobot>(joint_list, this->urdf_, pdb, if_name, cycle_time);
   }
   else
   {
     ROS_INFO("powerDistributionBoard is NOT defined");
-    return { joint_list, this->urdf_, if_name, cycle_time };
+    return std::make_unique<march::MarchRobot>(joint_list, this->urdf_, if_name, cycle_time);
   }
 }
 
@@ -123,19 +128,22 @@ march::IMotionCube HardwareBuilder::createIMotionCube(const YAML::Node& imc_conf
 {
   HardwareBuilder::validateRequiredKeysExist(imc_config, HardwareBuilder::IMOTIONCUBE_REQUIRED_KEYS, "imotioncube");
 
-  YAML::Node encoder_config = imc_config["encoder"];
+  YAML::Node incremental_encoder_config = imc_config["incrementalEncoder"];
+  YAML::Node absolute_encoder_config = imc_config["absoluteEncoder"];
   int slave_index = imc_config["slaveIndex"].as<int>();
-  return { slave_index, HardwareBuilder::createEncoder(encoder_config, urdf_joint), mode };
+  return { slave_index, HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, urdf_joint),
+           HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), mode };
 }
 
-march::Encoder HardwareBuilder::createEncoder(const YAML::Node& encoder_config,
-                                              const urdf::JointConstSharedPtr& urdf_joint)
+march::AbsoluteEncoder HardwareBuilder::createAbsoluteEncoder(const YAML::Node& absolute_encoder_config,
+                                                              const urdf::JointConstSharedPtr& urdf_joint)
 {
-  HardwareBuilder::validateRequiredKeysExist(encoder_config, HardwareBuilder::ENCODER_REQUIRED_KEYS, "encoder");
+  HardwareBuilder::validateRequiredKeysExist(absolute_encoder_config, HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS,
+                                             "absoluteEncoder");
 
-  auto resolution = encoder_config["resolution"].as<size_t>();
-  auto min_position = encoder_config["minPositionIU"].as<int32_t>();
-  auto max_position = encoder_config["maxPositionIU"].as<int32_t>();
+  auto resolution = absolute_encoder_config["resolution"].as<size_t>();
+  auto min_position = absolute_encoder_config["minPositionIU"].as<int32_t>();
+  auto max_position = absolute_encoder_config["maxPositionIU"].as<int32_t>();
 
   double soft_lower_limit;
   double soft_upper_limit;
@@ -153,6 +161,16 @@ march::Encoder HardwareBuilder::createEncoder(const YAML::Node& encoder_config,
 
   return { resolution,       min_position,    max_position, urdf_joint->limits->lower, urdf_joint->limits->upper,
            soft_lower_limit, soft_upper_limit };
+}
+
+march::IncrementalEncoder HardwareBuilder::createIncrementalEncoder(const YAML::Node& incremental_encoder_config)
+{
+  HardwareBuilder::validateRequiredKeysExist(incremental_encoder_config,
+                                             HardwareBuilder::INCREMENTAL_ENCODER_REQUIRED_KEYS, "incrementalEncoder");
+
+  auto resolution = incremental_encoder_config["resolution"].as<size_t>();
+  auto transmission = incremental_encoder_config["transmission"].as<double>();
+  return { resolution, transmission };
 }
 
 march::TemperatureGES HardwareBuilder::createTemperatureGES(const YAML::Node& temperature_ges_config)

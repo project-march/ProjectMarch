@@ -174,11 +174,6 @@ void EthercatMaster::ethercatLoop()
         ROS_WARN("EtherCAT rate of %d milliseconds per cycle was not achieved for %f percent of all cycles",
                  cycle_time_ms_, rateNotAchievedPercentage);
       }
-      else
-      {
-        ROS_DEBUG("EtherCAT rate of %d milliseconds per cycle was not achieved for %f percent of all cycles",
-                  cycle_time_ms_, rateNotAchievedPercentage);
-      }
       totalLoops = 0;
       rateNotAchievedCount = 0;
     }
@@ -191,7 +186,7 @@ void EthercatMaster::SendReceivePDO()
   int wkc = ec_receive_processdata(EC_TIMEOUTRET);
   if (wkc < this->expected_working_counter_)
   {
-    ROS_WARN_THROTTLE(1, "Working counter lower than expected. EtherCAT connection may not be optimal");
+    ROS_WARN_THROTTLE(1, "Working counter: %d  is lower than expected: %d", wkc, this->expected_working_counter_);
   }
 }
 
