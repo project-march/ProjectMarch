@@ -251,11 +251,6 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
 
     if (joint.canActuate())
     {
-      ROS_DEBUG("After limits: Trying to actuate joint %s, to %lf rad, %f "
-                "speed, %f effort.",
-                joint_names_[i].c_str(), joint_position_command_[i], joint_velocity_command_[i],
-                joint_effort_command_[i]);
-
       joint_effort_command_copy_[i] = joint_effort_command_[i];
 
       if (joint.getActuationMode() == march::ActuationMode::position)
