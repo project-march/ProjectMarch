@@ -128,7 +128,7 @@ class GaitGeneratorController(object):
         joint_widget.Table.itemChanged.connect(
             lambda: [
                 joint.set_setpoints(user_interface_controller.table_to_setpoints(joint_widget.Table)),
-                self.view.update_joint_widget(joint),
+                self.view.update_joint_widget(joint, update_table=False),
                 self.view.publish_preview(self.subgait, self.current_time),
             ])
 
@@ -212,7 +212,7 @@ class GaitGeneratorController(object):
             self.connect_plot(joint)
         self.current_time = 0
 
-        self.subgait_directory = '/'.join(file_name.split('/')[:-3])
+        self.gait_directory = '/'.join(file_name.split('/')[:-3])
         rospy.loginfo('Setting gait directory to %s', str(self.gait_directory))
         self.view.change_gait_directory_button.setText(self.gait_directory)
 

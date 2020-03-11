@@ -201,7 +201,7 @@ class GaitGeneratorView(Plugin):
         for joint in joints:
             self.update_joint_widget(joint)
 
-    def update_joint_widget(self, joint):
+    def update_joint_widget(self, joint, update_table=True):
         table = self.joint_widgets[joint.name].Table
         plot = self.joint_widgets[joint.name].Plot.getItem(0, 0)
 
@@ -210,7 +210,8 @@ class GaitGeneratorView(Plugin):
 
         plot.update_set_points(joint, show_velocity_plot=self.velocity_plot_check_box.isChecked(),
                                show_effort_plot=self.effort_plot_check_box.isChecked())
-        user_interface_controller.update_table(table, joint)
+        if update_table:
+            user_interface_controller.update_table(table, joint)
 
         plot.plot_item.blockSignals(False)
         table.blockSignals(False)

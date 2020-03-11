@@ -73,11 +73,23 @@ class ModifiableSubgait(Subgait):
             if key_1 in joint.name and key_2 in joint.name:
                 rospy.loginfo('Both keys exist in joint %s', joint.name)
                 return False
+
             if key_1 in joint.name:
                 joint_1 = joint
-                joint_2 = self.get_joint(joint.name.replace(key_1, key_2))
+                joint_2_name = joint.name.replace(key_1, key_2)
+
+                if joint_2_name not in self.get_joint_names():
+                    rospy.loginfo('joint %s does not exist', joint_2_name)
+                    return False
+                joint_2 = self.get_joint(joint_2_name)
+
             elif key_2 in joint.name:
-                joint_1 = self.get_joint(joint.name.replace(key_2, key_1))
+                joint_1_name = joint.name.replace(key_2, key_1)
+                if joint_1_name not in self.get_joint_names():
+                    rospy.loginfo('joint %s does not exist', joint_1_name)
+                    return False
+                joint_1 = self.get_joint(joint_1_name)
+
                 joint_2 = joint
             else:
                 continue
