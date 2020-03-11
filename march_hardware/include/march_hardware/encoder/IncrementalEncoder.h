@@ -14,6 +14,7 @@ public:
   IncrementalEncoder(size_t number_of_bits, double transmission);
 
   double toRad(int32_t iu) const override;
+  double getTransmission() const;
 
   /** @brief Override comparison operator */
   friend bool operator==(const IncrementalEncoder& lhs, const IncrementalEncoder& rhs)

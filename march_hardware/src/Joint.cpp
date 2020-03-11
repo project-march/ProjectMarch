@@ -70,6 +70,16 @@ double Joint::getAngleRadIncremental()
   return this->iMotionCube.getAngleRadIncremental();
 }
 
+double Joint::getAngleRadMostPrecise()
+{
+  if (!hasIMotionCube())
+  {
+    ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
+    return -1;
+  }
+  return this->iMotionCube.getAngleRadMostPrecise();
+}
+
 void Joint::actuateTorque(int16_t targetTorque)
 {
   ROS_ASSERT_MSG(this->allowActuation,

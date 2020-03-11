@@ -36,6 +36,7 @@ public:
 
   double getAngleRadAbsolute();
   double getAngleRadIncremental();
+  double getAngleRadMostPrecise();
   int16_t getTorque();
   int32_t getAngleIUAbsolute();
   int32_t getAngleIUIncremental();

@@ -22,6 +22,11 @@ IMotionCube::IMotionCube(int slave_index, AbsoluteEncoder absolute_encoder, Incr
 {
   this->absolute_encoder_.setSlaveIndex(slave_index);
   this->incremental_encoder_.setSlaveIndex(slave_index);
+  this->is_incremental_more_precise_ =
+      (this->incremental_encoder_.getTotalPositions() * this->incremental_encoder_.getTransmission() >
+       this->absolute_encoder_.getTotalPositions() * 10);
+  // Multiply by ten to ensure the rotational joints keep using absolute encoders. These are somehow more accurate
+  // even though they theoretically shouldn't be.
 }
 
 void IMotionCube::writeInitialSDOs(int cycle_time)
@@ -166,7 +171,24 @@ double IMotionCube::getAngleRadAbsolute()
 
 double IMotionCube::getAngleRadIncremental()
 {
+  if (!IMotionCubeTargetState::SWITCHED_ON.isReached(this->getStatusWord()) &&
+      !IMotionCubeTargetState::OPERATION_ENABLED.isReached(this->getStatusWord()))
+  {
+    ROS_WARN_THROTTLE(10, "Invalid use of encoders, you're not in the correct state.");
+  }
   return this->incremental_encoder_.getAngleRad(this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
+}
+
+double IMotionCube::getAngleRadMostPrecise()
+{
+  if (this->is_incremental_more_precise_)
+  {
+    return this->getAngleRadIncremental();
+  }
+  else
+  {
+    return this->getAngleRadAbsolute();
+  }
 }
 
 int16_t IMotionCube::getTorque()
