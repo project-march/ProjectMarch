@@ -68,7 +68,7 @@ Creating your software check
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - Create a new class that extends from the type of check you want to create.
-- Make sure to closely inspect the :march:`SoftwareCheck<march_launch/src/march_launch/checks/SoftwareCheck.py>` base class and the :march:`LaunchCheck <march_launch/src/march_launch/checks/SoftwareCheck.py>` derived class to see the available methods.
+- Make sure to closely inspect the :march:`SoftwareCheck<march_launch/src/march_launch/checks/software_check.py>` base class and the :march:`LaunchCheck <march_launch/src/march_launch/checks/software_check.py>` derived class to see the available methods.
 - Make sure your check calls ``self.launch()`` if it extends the ``LaunchCheck``
 - Perform your check.
 - Set ``self.done`` and ``self.passed`` accordingly during your check.
@@ -76,7 +76,7 @@ Creating your software check
 
 Add it to the CheckRunner
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-- Add an instance of your check to :march:`CheckRunner.checks <march_launch/src/march_launch/CheckRunner.py>`.
+- Add an instance of your check to :march:`CheckRunner.checks <march_launch/src/march_launch/check_runner.py>`.
 - Connect your check with the UI button in :march:`software_check.__init__() <march_launch/src/march_launch/software_check.py>`.
 
 Creating the executable (optional)
@@ -101,4 +101,4 @@ The easiest way is to launch the software check plugin and look at which buttons
 
   roslaunch march_launch march_rqt_software_check
 
-Or take a look at the :march:`CheckRunner source code<march_launch/src/march_launch/CheckRunner.py>`.
+Or take a look at the :march:`CheckRunner source code<march_launch/src/march_launch/check_runner.py>`.
