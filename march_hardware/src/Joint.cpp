@@ -26,7 +26,7 @@ void Joint::prepareActuation()
 {
   if (!this->allowActuation)
   {
-    throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE, "Trying to prepare joint %s for actuation",
+    throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE, "Failed to prepare joint %s for actuation",
                                    this->name.c_str());
   }
   ROS_INFO("[%s] Preparing for actuation", this->name.c_str());
