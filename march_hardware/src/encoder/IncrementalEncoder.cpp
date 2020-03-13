@@ -10,6 +10,11 @@ IncrementalEncoder::IncrementalEncoder(size_t number_of_bits, double transmissio
 
 double IncrementalEncoder::toRad(int32_t iu) const
 {
-  return iu * this->transmission_ * PI_2 / this->getTotalPositions();
+  return iu * PI_2 / (this->getTotalPositions() * this->transmission_);
+}
+
+double IncrementalEncoder::getTransmission() const
+{
+  return this->transmission_;
 }
 }  //  namespace march

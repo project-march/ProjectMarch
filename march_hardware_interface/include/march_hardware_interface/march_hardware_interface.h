@@ -83,7 +83,7 @@ private:
   void iMotionCubeStateCheck(size_t joint_index);
 
   /* Exponential smoothing constant of the velocity */
-  static constexpr double ALPHA = 0.2;
+  static constexpr double ALPHA = 1;
   /* Limit of the change in effort command over one cycle, can be overridden by safety controller */
   static constexpr double MAX_EFFORT_CHANGE = 5000;
 
@@ -108,6 +108,7 @@ private:
   std::vector<std::string> joint_names_;
 
   std::vector<double> joint_position_;
+  std::vector<double> relative_joint_position_;
   std::vector<double> joint_position_command_;
 
   std::vector<double> joint_velocity_;
