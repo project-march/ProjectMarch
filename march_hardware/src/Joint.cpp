@@ -70,14 +70,24 @@ double Joint::getAngleRadIncremental()
   return this->iMotionCube.getAngleRadIncremental();
 }
 
-double Joint::getAngleRadMostPrecise()
+double Joint::getAbsoluteRadPerBit()
 {
   if (!hasIMotionCube())
   {
     ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
     return -1;
   }
-  return this->iMotionCube.getAngleRadMostPrecise();
+  return this->iMotionCube.getAbsoluteRadPerBit();
+}
+
+double Joint::getIncrementalRadPerBit()
+{
+  if (!hasIMotionCube())
+  {
+    ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
+    return -1;
+  }
+  return this->iMotionCube.getIncrementalRadPerBit();
 }
 
 void Joint::actuateTorque(int16_t targetTorque)

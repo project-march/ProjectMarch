@@ -28,7 +28,8 @@ public:
 
   double getAngleRadAbsolute();
   double getAngleRadIncremental();
-  double getAngleRadMostPrecise();
+  double getAbsoluteRadPerBit();
+  double getIncrementalRadPerBit();
   int16_t getTorque();
   int32_t getAngleIUAbsolute();
   int32_t getAngleIUIncremental();

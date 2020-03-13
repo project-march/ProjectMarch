@@ -10,4 +10,6 @@ public:
   }
 
   MOCK_CONST_METHOD1(toRad, double(int32_t));
+
+  MOCK_CONST_METHOD0(getRadPerBit, double());
 };

@@ -107,6 +107,7 @@ private:
 
   std::vector<double> joint_position_;
   std::vector<double> incremental_joint_position_;
+  std::vector<double> absolute_joint_position_;
   std::vector<double> joint_position_command_;
 
   std::vector<double> joint_velocity_;

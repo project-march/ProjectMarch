@@ -179,16 +179,14 @@ double IMotionCube::getAngleRadIncremental()
   return this->incremental_encoder_.getAngleRad(this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
 }
 
-double IMotionCube::getAngleRadMostPrecise()
+double IMotionCube::getAbsoluteRadPerBit()
 {
-  if (this->is_incremental_more_precise_)
-  {
-    return this->getAngleRadIncremental();
-  }
-  else
-  {
-    return this->getAngleRadAbsolute();
-  }
+  return this->absolute_encoder_.getRadPerBit();
+}
+
+double IMotionCube::getIncrementalRadPerBit()
+{
+  return this->incremental_encoder_.getRadPerBit();
 }
 
 int16_t IMotionCube::getTorque()
