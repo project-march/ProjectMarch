@@ -165,7 +165,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
 
       // Set the first target as the current position
       joint_position_[i] = joint.getAngleRadAbsolute();
-      relative_joint_position_[i] = joint.getAngleRadMostPrecise();
+      incremental_joint_position_[i] = joint.getAngleRadMostPrecise();
       joint_velocity_[i] = 0;
       joint_effort_[i] = 0;
 
@@ -196,25 +196,92 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
 {
   for (size_t i = 0; i < num_joints_; i++)
   {
-    const double old_relative_position = relative_joint_position_[i];
-
     march::Joint joint = march_robot_->getJoint(joint_names_[i]);
-
-    joint_position_[i] = joint.getAngleRadAbsolute();
-    relative_joint_position_[i] = joint.getAngleRadMostPrecise();
-
-    if (joint.hasTemperatureGES())
-    {
-      joint_temperature_[i] = joint.getTemperature();
-    }
+    new_absolute_joint_position = joint.getAngleRadAbsolute();
+    new_incremental_joint_position = joint.getAngleRadIncremental();
 
     // Get velocity from encoder position
-    const double joint_velocity = (relative_joint_position_[i] - old_relative_position) / elapsed_time.toSec();
+    const double incremental_joint_velocity = (new_incremental_joint_position - incremental_joint_position_[i]) / elapsed_time.toSec();
+    const double absolute_joint_velocity = (new_absolute_joint_position - joint_position_[i]) / elapsed_time.toSec();
+    const double incremental_joint_acceleration = (incremental_joint_velocity - joint_velocity[i]) / elapsed_time.toSec();
+    const double absolute_joint_acceleration = (absolute_joint_velocity - joint_velocity[i]) / elapsed_time.toSec();
 
-    // Apply exponential smoothing to velocity obtained from encoder with
-    joint_velocity_[i] =
-        MarchHardwareInterface::ALPHA * joint_velocity + (1 - MarchHardwareInterface::ALPHA) * joint_velocity_[i];
+    if (std::abs(incremental_joint_velocity - absolute_joint_velocity) > 2 * (joint.getAbsoluteResolution + joint.getIncrementalResolution)) {
+        // Take the velocity that is closest to that of the previous timestep.
+        if (std::abs(incremental_joint_velocity - joint_velocity[i]) < std::abs(absolute_joint_velocity - joint_velocity[i])) {
+            joint_velocity[i] = incremental_joint_velocity;
+        }
+        else {
+            joint_velocity[i] = absolute_joint_velocity;
+        }
+    }
+    else {
+        // Take the velocity with the highest resolution.
+        if (joint.is_incremental_more_precise()) {
+            joint_velocity[i] = incremental_joint_velocity;
+        }
+        else {
+            joint_velocity[i] = absolute_joint_velocity;
+        }
+    }
 
+    // Update position with he most accurate velocity
+    joint_position[i] += joint_velocity[i] * elapsed_time.toSec();
+
+
+
+
+
+    if (std::abs(incremental_joint_acceleration) > max_acceleration[i] &&
+        std::abs(absolute_joint_acceleration) > max_acceleration[i]) {
+
+    }
+    else if (std::abs(incremental_joint_acceleration) > max_acceleration[i]) {
+
+    }
+    else if (std::abs(absolute_joint_acceleration) > max_acceleration[i]) {
+
+    }
+    else {
+        if (joint.is_incremental_more_precise()) {
+
+        }
+    }
+
+
+
+    if (std::abs(incremental_joint_acceleration) < max_acceleration[i]) {
+        joint_velocity[i] = incremental_joint_velocity;
+        incremental_joint_position_[i]= new_incremental_joint_position;
+    }
+    else {
+        outlier_incremental[i] = true;
+
+        if (std::abs(absolute_joint_acceleration) < max_acceleration[i]) {
+            joint_velocity[i] = absolute_joint_velocity;
+        }
+
+        incremental_joint_position_[i] += joint_velocity[i] * elapsed_time.toSec();
+    }
+
+      if (std::abs(absolute_joint_acceleration) < max_acceleration[i]) {
+          joint_position[i] = new_absolute_joint_position;
+      }
+      else {
+          joint_position[i] += joint_velocity[i];
+      }
+
+
+
+
+
+
+
+
+      if (joint.hasTemperatureGES())
+      {
+          joint_temperature_[i] = joint.getTemperature();
+      }
     joint_effort_[i] = joint.getTorque();
   }
 
@@ -273,7 +340,7 @@ int MarchHardwareInterface::getEthercatCycleTime() const
 void MarchHardwareInterface::reserveMemory()
 {
   joint_position_.resize(num_joints_);
-  relative_joint_position_.resize(num_joints_);
+  incremental_joint_position_.resize(num_joints_);
   joint_position_command_.resize(num_joints_);
   joint_velocity_.resize(num_joints_);
   joint_velocity_command_.resize(num_joints_);
