@@ -1,26 +1,21 @@
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
-project(march_gazebo_plugins)
+cmake_minimum_required(VERSION 3.10.2)
+project(march_gazebo_plugins LANGUAGES CXX)
 
-add_compile_options(-std=c++14 -Wall -Wextra -Werror)
-
-# Load catkin and all dependencies required for this package
 find_package(catkin REQUIRED COMPONENTS
-        gazebo_ros
-        march_shared_resources
-        )
+    gazebo_ros
+    march_shared_resources
+)
 find_package(gazebo REQUIRED)
 
-catkin_package()
-
-include_directories(
-    ${catkin_INCLUDE_DIRS}
-    ${GAZEBO_INCLUDE_DIRS}
-)
+catkin_package(CATKIN_DEPENDS march_shared_resources)
 
 add_library(${PROJECT_NAME} src/com_controller.cpp)
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+target_include_directories(${PROJECT_NAME} PRIVATE ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${catkin_LIBRARIES})
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_14)
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror)
 
 install(TARGETS ${PROJECT_NAME}
-        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-        )
+    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
