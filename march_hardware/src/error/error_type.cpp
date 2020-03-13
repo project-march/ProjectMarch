@@ -41,6 +41,8 @@ const char* getErrorDescription(ErrorType type)
       return "The slave configuration contains duplicate slave indices";
     case ErrorType::NOT_ALLOWED_TO_ACTUATE:
       return "A joint is not allowed to actuate, yet it's trying to actuate";
+    case ErrorType::INVALID_SLAVE_INDEX:
+      return "Slave index has an invalid value";
     default:
       return "Unknown error occurred. Please create/use a documented error";
   }
