@@ -212,9 +212,9 @@ The encoder resolution is outside the allowed range.
 within this range.
 
 
-.. _e113:
+.. _e114:
 
-``E113``: Invalid range of motion
+``E114``: Invalid range of motion
 ---------------------------------
 The lower and upper limits of an encoder are conflicting.
 
@@ -226,6 +226,45 @@ joints can safely actuate.
 make sure that the lower limit is lower than the upper limit in incremental units. If the encoder is built from the
 ``march_hardware_builder`` then the soft limits are extracted from the :march:`URDF <march_description/urdf>` of the used robot.
 Make sure that the limits in the URDF are also non-conflicting.
+
+
+.. _e115:
+
+``E115``: Invalid slave configuration
+-------------------------------------
+The slave configuration contains duplicate slave indices
+
+**Cause:** Before the ethercat train is started, the configured slaves indices are checked for duplicate indices.
+This makes sure that no two controllers will write to the same slave.
+
+**Fix:** Check the :hardware-interface:`robots yaml <march_hardware_builder/robots>`, so that it does not contain
+duplicate indices on imotioncubes. Temperature sensors can have duplicate slave indices, since multiple temperature
+sensors can be connected to a slave.
+
+
+.. _e116:
+
+``E116``: Not allowed to actuate
+--------------------------------
+A joint is not allowed to actuate, yet it's trying to actuate.
+
+**Cause:** A joint must have enabled actuation in order to actuate. This value can be set in the
+:hardware-interface:`robots yaml <march_hardware_builder/robots>`.
+
+**Fix:** Check that the joints that you are trying to actuate are actually allowed to actuate.
+
+
+.. _e117:
+
+``E117``: Invalid slave index
+-----------------------------
+Slave index has an invalid value.
+
+**Cause:** When slaves are created with a slave index, it is made sure that the indices are not lower than 1.
+Since index 0 is the master itself and values lower than 0 are not valid indices.
+
+**Fix:** If you are using a :hardware-interface:`robots yaml <march_hardware_builder/robots>`, make sure that all
+slave indices are defined as integers higher than 0.
 
 
 .. _e999:
