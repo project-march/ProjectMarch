@@ -38,8 +38,8 @@ void Joint::prepareActuation()
               this->name.c_str());
   }
 
-  this->incremental_position_ = this->getAngleRadIncremental();
-  this->absolute_position_ = this->getAngleRadAbsolute();
+  this->incremental_position_ = this->iMotionCube.getAngleRadIncremental();
+  this->absolute_position_ = this->iMotionCube.getAngleRadAbsolute();
   this->position_ = this->absolute_position_;
   this->velocity_ = 0;
 }
@@ -55,36 +55,16 @@ void Joint::actuateRad(double targetPositionRad)
   this->iMotionCube.actuateRad(targetPositionRad);
 }
 
-double Joint::getAngleRadAbsolute()
-{
-  if (!hasIMotionCube())
-  {
-    ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
-    return -1;
-  }
-  return this->iMotionCube.getAngleRadAbsolute();
-}
-
-double Joint::getAngleRadIncremental()
-{
-  if (!hasIMotionCube())
-  {
-    ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
-    return -1;
-  }
-  return this->iMotionCube.getAngleRadIncremental();
-}
-
 void Joint::readEncoders(const ros::Duration& elapsed_time)
 {
-  const double new_incremental_position = this->getAngleRadIncremental();
-  const double new_absolute_position = this->getAngleRadAbsolute();
+  const double new_incremental_position = this->iMotionCube.getAngleRadIncremental();
+  const double new_absolute_position = this->iMotionCube.getAngleRadAbsolute();
 
   // Get velocity from encoder position
   const double incremental_velocity = (new_incremental_position - this->incremental_position_) / elapsed_time.toSec();
   const double absolute_velocity = (new_absolute_position - this->absolute_position_) / elapsed_time.toSec();
 
-  if (std::abs(incremental_velocity - absolute_velocity) >
+  if (std::abs(incremental_velocity - absolute_velocity) * elapsed_time.toSec() >
       2 * (this->iMotionCube.getAbsoluteRadPerBit() + this->iMotionCube.getIncrementalRadPerBit()))
   {
     // Take the velocity that is closest to that of the previous timestep.
@@ -103,7 +83,7 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
     if (std::abs(this->absolute_position_ - this->position_) > 2 * this->iMotionCube.getAbsoluteRadPerBit())
     {
       this->position_ = this->absolute_position_;
-      ROS_INFO("Recalibrated joint position");
+      ROS_INFO("Recalibrated joint position %s", this->name.c_str());
     }
 
     // Take the velocity with the highest resolution.
@@ -117,7 +97,7 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
     }
   }
 
-  // Update position with he most accurate velocity
+  // Update position with the most accurate velocity
   this->position_ += this->velocity_ * elapsed_time.toSec();
   this->incremental_position_ = new_incremental_position;
   this->absolute_position_ = new_absolute_position;

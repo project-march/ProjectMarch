@@ -39,7 +39,7 @@ AbsoluteEncoder::AbsoluteEncoder(size_t number_of_bits, int32_t lower_limit_iu, 
 
 double AbsoluteEncoder::toRad(int32_t iu) const
 {
-  return (iu - this->zero_position_iu_) * getRadPerBit();
+  return (iu - this->zero_position_iu_) * this->getRadPerBit();
 }
 
 double AbsoluteEncoder::getRadPerBit() const

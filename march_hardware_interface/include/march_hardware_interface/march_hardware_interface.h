@@ -82,9 +82,6 @@ private:
   void outsideLimitsCheck(size_t joint_index);
   void iMotionCubeStateCheck(size_t joint_index);
 
-  /* Exponential smoothing constant of the velocity */
-  static constexpr double ALPHA = 1;
-
   /* March hardware */
   std::unique_ptr<march::MarchRobot> march_robot_;
   bool has_power_distribution_board_ = false;

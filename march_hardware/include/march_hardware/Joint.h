@@ -39,8 +39,6 @@ public:
   void actuateTorque(int16_t targetTorque);
   void readEncoders(const ros::Duration& elapsed_time);
 
-  double getAngleRadAbsolute();
-  double getAngleRadIncremental();
   double getPosition();
   double getVelocity();
   int16_t getTorque();

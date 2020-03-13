@@ -10,7 +10,7 @@ IncrementalEncoder::IncrementalEncoder(size_t number_of_bits, double transmissio
 
 double IncrementalEncoder::toRad(int32_t iu) const
 {
-  return iu * getRadPerBit();
+  return iu * this->getRadPerBit();
 }
 
 double IncrementalEncoder::getRadPerBit() const
