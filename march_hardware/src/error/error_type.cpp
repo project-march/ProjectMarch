@@ -39,6 +39,8 @@ const char* getErrorDescription(ErrorType type)
       return "The lower and upper limits of an encoder are conflicting";
     case ErrorType::INVALID_SLAVE_CONFIGURATION:
       return "The slave configuration contains duplicate slave indices";
+    case ErrorType::NOT_ALLOWED_TO_ACTUATE:
+      return "A joint is not allowed to actuate, yet it's trying to actuate";
     default:
       return "Unknown error occurred. Please create/use a documented error";
   }
