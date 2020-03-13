@@ -199,6 +199,35 @@ so check the connection on those specific slaves. If you made any changes to the
 verify that it is correct.
 
 
+.. _e112:
+
+``E112``: Invalid encoder resolution
+------------------------------------
+The encoder resolution is outside the allowed range.
+
+**Cause:** The given encoder resolution to construct an encoder are outside of its allowed limits defined in
+:hardware-interface:`Encoder.h <march_hardware/include/march_hardware/encoder/Encoder.h>`.
+
+**Fix:** Check if the resolutions given in the :hardware-interface:`robots yaml <march_hardware_builder/robots>` are
+within this range.
+
+
+.. _e113:
+
+``E113``: Invalid range of motion
+---------------------------------
+The lower and upper limits of an encoder are conflicting.
+
+**Cause:** When an encoder is constructed it checks that its lower limits are below its upper limits, for hard and soft
+limits. Furthermore, it checks if the soft limits are within the defined hard limits. This is to make sure that the
+joints can safely actuate.
+
+**Fix:** The encoder limits are defined in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`, so
+make sure that the lower limit is lower than the upper limit in incremental units. If the encoder is built from the
+``march_hardware_builder`` then the soft limits are extracted from the :march:`URDF <march_description/urdf>` of the used robot.
+Make sure that the limits in the URDF are also non-conflicting.
+
+
 .. _e999:
 
 ``E999``: Unknown error
