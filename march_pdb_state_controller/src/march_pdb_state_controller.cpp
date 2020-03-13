@@ -39,8 +39,9 @@ bool MarchPdbStateController::init(MarchPdbStateInterface* hw, ros::NodeHandle& 
     // sensor handle
     this->pdb_state_ = (hw->getHandle(pdb_state_names[0]));
     // realtime publisher
-    this->rt_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_resources::PowerDistributionBoardState>>(
-        root_nh, "/march/pdb/" + pdb_state_names[0], 4);
+    this->rt_pub_ =
+        std::make_unique<realtime_tools::RealtimePublisher<march_shared_resources::PowerDistributionBoardState>>(
+            root_nh, "/march/pdb/" + pdb_state_names[0], 4);
   }
 
   return true;
