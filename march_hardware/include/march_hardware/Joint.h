@@ -21,6 +21,10 @@ private:
   bool allowActuation;
   IMotionCube iMotionCube;
   TemperatureGES temperatureGES;
+  double position_;
+  double incremental_position_;
+  double absolute_position_;
+  double velocity_;
 
 public:
   explicit Joint(const IMotionCube& imc) : name(""), netNumber(-1), allowActuation(false), iMotionCube(imc)
@@ -33,11 +37,12 @@ public:
 
   void actuateRad(double targetPositionRad);
   void actuateTorque(int16_t targetTorque);
+  void readEncoders(const ros::Duration& elapsed_time);
 
   double getAngleRadAbsolute();
   double getAngleRadIncremental();
-  double getAbsoluteRadPerBit();
-  double getIncrementalRadPerBit();
+  double getPosition();
+  double getVelocity();
   int16_t getTorque();
   int32_t getAngleIUAbsolute();
   int32_t getAngleIUIncremental();

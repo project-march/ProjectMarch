@@ -164,10 +164,8 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
       joint.prepareActuation();
 
       // Set the first target as the current position
-      joint_position_[i] = joint.getAngleRadAbsolute();
-      incremental_joint_position_[i] = joint.getAngleRadIncremental();
-      absolute_joint_position_[i] = joint.getAngleRadAbsolute();
-      joint_velocity_[i] = 0;
+      joint_position_[i] = joint.getPosition();
+      joint_velocity_[i] = joint.getVelocity();
       joint_effort_[i] = 0;
 
       if (joint.getActuationMode() == march::ActuationMode::position)
@@ -198,53 +196,11 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
   for (size_t i = 0; i < num_joints_; i++)
   {
     march::Joint joint = march_robot_->getJoint(joint_names_[i]);
-    const double new_incremental_joint_position = joint.getAngleRadIncremental();
-    const double new_absolute_joint_position = joint.getAngleRadAbsolute();
-
-    // Get velocity from encoder position
-    const double incremental_joint_velocity =
-        (new_incremental_joint_position - incremental_joint_position_[i]) / elapsed_time.toSec();
-    const double absolute_joint_velocity =
-        (new_absolute_joint_position - absolute_joint_position_[i]) / elapsed_time.toSec();
-
-    if (std::abs(incremental_joint_velocity - absolute_joint_velocity) >
-        2 * (joint.getAbsoluteRadPerBit() + joint.getIncrementalRadPerBit()))
-    {
-      // Take the velocity that is closest to that of the previous timestep.
-      if (std::abs(incremental_joint_velocity - joint_velocity_[i]) <
-          std::abs(absolute_joint_velocity - joint_velocity_[i]))
-      {
-        joint_velocity_[i] = incremental_joint_velocity;
-      }
-      else
-      {
-        joint_velocity_[i] = absolute_joint_velocity;
-      }
-    }
-    else
-    {
-      // Recalibrate joint position if it has drifted
-      if (std::abs(absolute_joint_position_[i] - joint_position_[i]) > 2 * joint.getAbsoluteRadPerBit())
-      {
-        joint_position_[i] = absolute_joint_position_[i];
-        ROS_INFO("Recalibrated joint position");
-      }
-
-      // Take the velocity with the highest resolution.
-      if (joint.getIncrementalRadPerBit() < joint.getAbsoluteRadPerBit())
-      {
-        joint_velocity_[i] = incremental_joint_velocity;
-      }
-      else
-      {
-        joint_velocity_[i] = absolute_joint_velocity;
-      }
-    }
 
     // Update position with he most accurate velocity
-    joint_position_[i] += joint_velocity_[i] * elapsed_time.toSec();
-    incremental_joint_position_[i] = new_incremental_joint_position;
-    absolute_joint_position_[i] = new_absolute_joint_position;
+    joint.readEncoders(elapsed_time);
+    joint_position_[i] = joint.getPosition();
+    joint_velocity_[i] = joint.getVelocity();
 
     if (joint.hasTemperatureGES())
     {
@@ -308,8 +264,6 @@ int MarchHardwareInterface::getEthercatCycleTime() const
 void MarchHardwareInterface::reserveMemory()
 {
   joint_position_.resize(num_joints_);
-  incremental_joint_position_.resize(num_joints_);
-  absolute_joint_position_.resize(num_joints_);
   joint_position_command_.resize(num_joints_);
   joint_velocity_.resize(num_joints_);
   joint_velocity_command_.resize(num_joints_);

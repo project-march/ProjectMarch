@@ -85,7 +85,6 @@ private:
   AbsoluteEncoder absolute_encoder_;
   IncrementalEncoder incremental_encoder_;
   ActuationMode actuation_mode_;
-  bool is_incremental_more_precise_;
 
   std::unordered_map<IMCObjectName, uint8_t> miso_byte_offsets_;
   std::unordered_map<IMCObjectName, uint8_t> mosi_byte_offsets_;

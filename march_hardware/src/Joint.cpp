@@ -37,6 +37,11 @@ void Joint::prepareActuation()
               "allowed to actuate",
               this->name.c_str());
   }
+
+  this->incremental_position_ = this->getAngleRadIncremental();
+  this->absolute_position_ = this->getAngleRadAbsolute();
+  this->position_ = this->absolute_position_;
+  this->velocity_ = 0;
 }
 
 void Joint::actuateRad(double targetPositionRad)
@@ -70,24 +75,62 @@ double Joint::getAngleRadIncremental()
   return this->iMotionCube.getAngleRadIncremental();
 }
 
-double Joint::getAbsoluteRadPerBit()
+void Joint::readEncoders(const ros::Duration& elapsed_time)
 {
-  if (!hasIMotionCube())
+  const double new_incremental_position = this->getAngleRadIncremental();
+  const double new_absolute_position = this->getAngleRadAbsolute();
+
+  // Get velocity from encoder position
+  const double incremental_velocity = (new_incremental_position - this->incremental_position_) / elapsed_time.toSec();
+  const double absolute_velocity = (new_absolute_position - this->absolute_position_) / elapsed_time.toSec();
+
+  if (std::abs(incremental_velocity - absolute_velocity) >
+      2 * (this->iMotionCube.getAbsoluteRadPerBit() + this->iMotionCube.getIncrementalRadPerBit()))
   {
-    ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
-    return -1;
+    // Take the velocity that is closest to that of the previous timestep.
+    if (std::abs(incremental_velocity - this->velocity_) < std::abs(absolute_velocity - this->velocity_))
+    {
+      this->velocity_ = incremental_velocity;
+    }
+    else
+    {
+      this->velocity_ = absolute_velocity;
+    }
   }
-  return this->iMotionCube.getAbsoluteRadPerBit();
+  else
+  {
+    // Recalibrate joint position if it has drifted
+    if (std::abs(this->absolute_position_ - this->position_) > 2 * this->iMotionCube.getAbsoluteRadPerBit())
+    {
+      this->position_ = this->absolute_position_;
+      ROS_INFO("Recalibrated joint position");
+    }
+
+    // Take the velocity with the highest resolution.
+    if (this->iMotionCube.getIncrementalRadPerBit() < this->iMotionCube.getAbsoluteRadPerBit())
+    {
+      this->velocity_ = incremental_velocity;
+    }
+    else
+    {
+      this->velocity_ = absolute_velocity;
+    }
+  }
+
+  // Update position with he most accurate velocity
+  this->position_ += this->velocity_ * elapsed_time.toSec();
+  this->incremental_position_ = new_incremental_position;
+  this->absolute_position_ = new_absolute_position;
 }
 
-double Joint::getIncrementalRadPerBit()
+double Joint::getPosition()
 {
-  if (!hasIMotionCube())
-  {
-    ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
-    return -1;
-  }
-  return this->iMotionCube.getIncrementalRadPerBit();
+  return this->position_;
+}
+
+double Joint::getVelocity()
+{
+  return this->velocity_;
 }
 
 void Joint::actuateTorque(int16_t targetTorque)
