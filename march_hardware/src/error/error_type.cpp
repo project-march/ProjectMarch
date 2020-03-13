@@ -37,6 +37,8 @@ const char* getErrorDescription(ErrorType type)
       return "The encoder resolution is outside the allowed range";
     case ErrorType::INVALID_RANGE_OF_MOTION:
       return "The lower and upper limits of an encoder are conflicting";
+    case ErrorType::INVALID_SLAVE_CONFIGURATION:
+      return "The slave configuration contains duplicate slave indices";
     default:
       return "Unknown error occurred. Please create/use a documented error";
   }
