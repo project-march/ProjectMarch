@@ -41,7 +41,6 @@ void Joint::actuateRad(double targetPositionRad)
     throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE, "Joint %s is not allowed to actuate",
                                    this->name.c_str());
   }
-  // TODO(BaCo) check that the position is allowed and does not exceed (torque) limits.
   this->iMotionCube.actuateRad(targetPositionRad);
 }
 
