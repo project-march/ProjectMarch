@@ -98,6 +98,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
   :maxdepth: 4
   :hidden:
 
+  doc/march_packages/march_fake_sensor_data
   doc/march_packages/march_gait_files
   doc/march_packages/march_hardware
   doc/march_packages/march_hardware_builder
