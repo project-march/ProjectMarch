@@ -238,7 +238,7 @@ The slave configuration contains duplicate slave indices
 This makes sure that no two controllers will write to the same slave.
 
 **Fix:** Check the :hardware-interface:`robots yaml <march_hardware_builder/robots>`, so that it does not contain
-duplicate indices on imotioncubes. Temperature sensors can have duplicate slave indices, since multiple temperature
+duplicate indices on iMOTIONCUBES. Temperature sensors can have duplicate slave indices, since multiple temperature
 sensors can be connected to a slave.
 
 
