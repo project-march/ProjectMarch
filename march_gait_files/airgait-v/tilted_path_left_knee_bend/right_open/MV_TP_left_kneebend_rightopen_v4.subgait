@@ -1,4 +1,4 @@
-name: !!python/unicode "right_open"
+name: "right_open"
 version: "MV_TP_left_kneebend_rightopen_v4"
 description: "The left knee flexes a little more, right hip abduction and left hip adduction."
 gait_type: ''
