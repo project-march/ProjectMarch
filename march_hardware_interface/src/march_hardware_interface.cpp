@@ -243,7 +243,7 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
       }
       else if (joint.getActuationMode() == march::ActuationMode::torque)
       {
-        joint.actuateTorque(std::round(joint_effort_command_[i]));
+        joint.actuateTorque(0);
       }
     }
   }
