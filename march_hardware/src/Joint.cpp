@@ -62,6 +62,8 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
   const double incremental_velocity = (new_incremental_position - this->incremental_position_) / elapsed_time.toSec();
   const double absolute_velocity = (new_absolute_position - this->absolute_position_) / elapsed_time.toSec();
 
+  // If the difference in movement of the two encoders is larger than twice the sum of their precisions,
+  // one of them is probably an outlier.
   if (std::abs(incremental_velocity - absolute_velocity) * elapsed_time.toSec() >
       2 * (this->iMotionCube.getAbsoluteRadPerBit() + this->iMotionCube.getIncrementalRadPerBit()))
   {
