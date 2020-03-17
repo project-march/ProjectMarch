@@ -1,0 +1,3 @@
+<launch>
+    <node name="march_rqt_software_check" pkg="march_rqt_software_check" type="march_rqt_software_check" output="screen"/>
+</launch>
