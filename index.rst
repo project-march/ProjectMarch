@@ -66,6 +66,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    :hidden:
 
    doc/useful_ros_tools/robot_model
+   doc/useful_ros_tools/rqt
    doc/useful_ros_tools/ros_bag
    doc/useful_ros_tools/smach
 

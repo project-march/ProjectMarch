@@ -1,3 +1,5 @@
+.. _how-to-view-live-data-label:
+
 How to view live data
 =====================
 
