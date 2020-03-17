@@ -90,6 +90,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    doc/development/documentation
    doc/continuous_integration/continuous_integration
    doc/development/testing
+   doc/development/style_guide
    doc/development/add_a_new_gait
 
 
