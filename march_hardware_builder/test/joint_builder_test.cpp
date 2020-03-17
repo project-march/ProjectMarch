@@ -8,6 +8,10 @@
 #include <ros/package.h>
 #include <urdf/model.h>
 
+#include <march_hardware/encoder/AbsoluteEncoder.h>
+#include <march_hardware/encoder/IncrementalEncoder.h>
+#include <march_hardware/IMotionCube.h>
+
 class JointTest : public ::testing::Test
 {
 protected:
@@ -38,9 +42,11 @@ TEST_F(JointTest, ValidJointHip)
 
   march::Joint created = HardwareBuilder::createJoint(config, "test_joint_hip", this->joint);
 
-  march::Encoder encoder = march::Encoder(16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper,
-                                          this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit);
-  march::IMotionCube imc = march::IMotionCube(2, encoder, march::ActuationMode::unknown);
+  march::AbsoluteEncoder absolute_encoder =
+      march::AbsoluteEncoder(16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper,
+                             this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit);
+  march::IncrementalEncoder incremental_encoder = march::IncrementalEncoder(12, 50.0);
+  march::IMotionCube imc = march::IMotionCube(2, absolute_encoder, incremental_encoder, march::ActuationMode::unknown);
   march::TemperatureGES ges = march::TemperatureGES(1, 2);
   march::Joint expected(imc);
   expected.setName("test_joint_hip");
@@ -61,9 +67,11 @@ TEST_F(JointTest, ValidNotActuated)
 
   march::Joint created = HardwareBuilder::createJoint(config, "test_joint_hip", this->joint);
 
-  march::Encoder encoder = march::Encoder(16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper,
-                                          this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit);
-  march::IMotionCube imc = march::IMotionCube(2, encoder, march::ActuationMode::unknown);
+  march::AbsoluteEncoder absolute_encoder =
+      march::AbsoluteEncoder(16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper,
+                             this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit);
+  march::IncrementalEncoder incremental_encoder = march::IncrementalEncoder(12, 50.0);
+  march::IMotionCube imc = march::IMotionCube(2, absolute_encoder, incremental_encoder, march::ActuationMode::unknown);
   march::TemperatureGES ges = march::TemperatureGES(1, 2);
   march::Joint expected(imc);
   expected.setName("test_joint_hip");
@@ -110,11 +118,11 @@ TEST_F(JointTest, ValidActuationMode)
 
   march::Joint created = HardwareBuilder::createJoint(config, "test_joint_hip", this->joint);
 
-  march::Joint expected(
-      march::IMotionCube(1,
-                         march::Encoder(16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper,
-                                        this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit),
-                         march::ActuationMode::position));
+  march::Joint expected(march::IMotionCube(
+      1,
+      march::AbsoluteEncoder(16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper,
+                             this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit),
+      march::IncrementalEncoder(12, 50.0), march::ActuationMode::position));
   expected.setName("test_joint_hip");
 
   ASSERT_EQ("test_joint_hip", expected.getName());

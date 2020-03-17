@@ -39,14 +39,6 @@ void Joint::prepareActuation()
   }
 }
 
-void Joint::shutdown()
-{
-  if (hasIMotionCube())
-  {
-    iMotionCube.shutdown();
-  }
-}
-
 void Joint::resetIMotionCube()
 {
   if (hasIMotionCube())
@@ -61,19 +53,37 @@ void Joint::actuateRad(double targetPositionRad)
                  "Joint %s is not allowed to actuate, "
                  "yet its actuate method has been called",
                  this->name.c_str());
-  // TODO(BaCo) check that the position is allowed and does not exceed (torque)
-  // limits.
   this->iMotionCube.actuateRad(targetPositionRad);
 }
 
-double Joint::getAngleRad()
+double Joint::getAngleRadAbsolute()
 {
   if (!hasIMotionCube())
   {
     ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
     return -1;
   }
-  return this->iMotionCube.getAngleRad();
+  return this->iMotionCube.getAngleRadAbsolute();
+}
+
+double Joint::getAngleRadIncremental()
+{
+  if (!hasIMotionCube())
+  {
+    ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
+    return -1;
+  }
+  return this->iMotionCube.getAngleRadIncremental();
+}
+
+double Joint::getAngleRadMostPrecise()
+{
+  if (!hasIMotionCube())
+  {
+    ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
+    return -1;
+  }
+  return this->iMotionCube.getAngleRadMostPrecise();
 }
 
 void Joint::actuateTorque(int16_t targetTorque)
@@ -95,14 +105,24 @@ int16_t Joint::getTorque()
   return this->iMotionCube.getTorque();
 }
 
-int32_t Joint::getAngleIU()
+int32_t Joint::getAngleIUAbsolute()
 {
   if (!hasIMotionCube())
   {
     ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
     return -1;
   }
-  return this->iMotionCube.getAngleIU();
+  return this->iMotionCube.getAngleIUAbsolute();
+}
+
+int32_t Joint::getAngleIUIncremental()
+{
+  if (!hasIMotionCube())
+  {
+    ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
+    return -1;
+  }
+  return this->iMotionCube.getAngleIUIncremental();
 }
 
 float Joint::getTemperature()
@@ -133,6 +153,8 @@ IMotionCubeState Joint::getIMotionCubeState()
   states.motorCurrent = this->iMotionCube.getMotorCurrent();
   states.motorVoltage = this->iMotionCube.getMotorVoltage();
 
+  states.incrementalEncoderValue = this->iMotionCube.getAngleIUIncremental();
+
   return states;
 }
 
@@ -144,10 +166,7 @@ void Joint::setAllowActuation(bool allowActuation)
 {
   Joint::allowActuation = allowActuation;
 }
-void Joint::setIMotionCube(const IMotionCube& iMotionCube)
-{
-  Joint::iMotionCube = iMotionCube;
-}
+
 void Joint::setTemperatureGes(const TemperatureGES& temperatureGes)
 {
   temperatureGES = temperatureGes;

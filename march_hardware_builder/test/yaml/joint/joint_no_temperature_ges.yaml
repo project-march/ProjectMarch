@@ -1,7 +1,10 @@
 allowActuation: true
 imotioncube:
   slaveIndex: 10
-  encoder:
+  absoluteEncoder:
     resolution: 20
     minPositionIU: 3
     maxPositionIU: 40000
+  incrementalEncoder:
+    resolution: 12
+    transmission: 45.0

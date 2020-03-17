@@ -2,13 +2,14 @@
 
 #ifndef MARCH_HARDWARE_IMOTIONCUBE_H
 #define MARCH_HARDWARE_IMOTIONCUBE_H
-#include <march_hardware/ActuationMode.h>
-#include <march_hardware/Encoder.h>
-#include <march_hardware/EtherCAT/EthercatIO.h>
-#include <march_hardware/IMotionCubeState.h>
-#include <march_hardware/IMotionCubeTargetState.h>
-#include <march_hardware/PDOmap.h>
-#include <march_hardware/Slave.h>
+#include "march_hardware/ActuationMode.h"
+#include "march_hardware/encoder/AbsoluteEncoder.h"
+#include "march_hardware/encoder/IncrementalEncoder.h"
+#include "march_hardware/EtherCAT/EthercatIO.h"
+#include "march_hardware/IMotionCubeState.h"
+#include "march_hardware/IMotionCubeTargetState.h"
+#include "march_hardware/PDOmap.h"
+#include "march_hardware/Slave.h"
 
 #include <unordered_map>
 #include <string>
@@ -18,15 +19,19 @@ namespace march
 class IMotionCube : public Slave
 {
 public:
-  IMotionCube(int slave_index, Encoder encoder, ActuationMode actuation_mode);
+  IMotionCube(int slave_index, AbsoluteEncoder absolute_encoder, IncrementalEncoder incremental_encoder,
+              ActuationMode actuation_mode);
 
   ~IMotionCube() = default;
 
   void writeInitialSDOs(int cycle_time) override;
 
-  double getAngleRad();
+  double getAngleRadAbsolute();
+  double getAngleRadIncremental();
+  double getAngleRadMostPrecise();
   int16_t getTorque();
-  int32_t getAngleIU();
+  int32_t getAngleIUAbsolute();
+  int32_t getAngleIUIncremental();
 
   uint16_t getStatusWord();
   uint16_t getMotionError();
@@ -44,20 +49,21 @@ public:
 
   void goToTargetState(IMotionCubeTargetState target_state);
   void goToOperationEnabled();
-  void shutdown();
 
   void resetIMotionCube();
 
   /** @brief Override comparison operator */
   friend bool operator==(const IMotionCube& lhs, const IMotionCube& rhs)
   {
-    return lhs.slaveIndex == rhs.slaveIndex && lhs.encoder_ == rhs.encoder_;
+    return lhs.slaveIndex == rhs.slaveIndex && lhs.absolute_encoder_ == rhs.absolute_encoder_ &&
+           lhs.incremental_encoder_ == rhs.incremental_encoder_;
   }
   /** @brief Override stream operator for clean printing */
   friend std::ostream& operator<<(std::ostream& os, const IMotionCube& imc)
   {
     return os << "slaveIndex: " << imc.slaveIndex << ", "
-              << "encoder: " << imc.encoder_;
+              << "incrementalEncoder: " << imc.incremental_encoder_ << ", "
+              << "absoluteEncoder: " << imc.absolute_encoder_;
   }
 
   constexpr static double MAX_TARGET_DIFFERENCE = 0.393;
@@ -77,8 +83,10 @@ private:
   void mapMosiPDOs();
   void writeInitialSettings(uint8_t cycle_time);
 
-  Encoder encoder_;
+  AbsoluteEncoder absolute_encoder_;
+  IncrementalEncoder incremental_encoder_;
   ActuationMode actuation_mode_;
+  bool is_incremental_more_precise_;
 
   std::unordered_map<IMCObjectName, uint8_t> miso_byte_offsets_;
   std::unordered_map<IMCObjectName, uint8_t> mosi_byte_offsets_;

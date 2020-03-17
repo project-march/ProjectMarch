@@ -1,6 +1,7 @@
 // Copyright 2019 Project March.
 #ifndef MARCH_HARDWARE_ETHERCAT_ETHERCATMASTER_H
 #define MARCH_HARDWARE_ETHERCAT_ETHERCATMASTER_H
+#include <atomic>
 #include <vector>
 #include <string>
 #include <thread>
@@ -27,8 +28,8 @@ public:
   EthercatMaster(const EthercatMaster&) = delete;
   EthercatMaster& operator=(const EthercatMaster&) = delete;
 
-  /* Enable the move constructor */
-  EthercatMaster(EthercatMaster&&) = default;
+  /* Delete move constructor/assignment since atomic bool cannot be moved */
+  EthercatMaster(EthercatMaster&&) = delete;
   EthercatMaster& operator=(EthercatMaster&&) = delete;
 
   bool isOperational() const;
@@ -70,14 +71,14 @@ private:
   /**
    * Sends the PDO and receives the working counter and check if this is lower than expected.
    */
-  void SendReceivePDO();
+  void sendReceivePdo();
 
   /**
    * Checks if all the slaves are connected and in operational state.
    */
   static void monitorSlaveConnection();
 
-  bool is_operational_ = false;
+  std::atomic<bool> is_operational_;
 
   const std::string ifname_;
   const int max_slave_index_;

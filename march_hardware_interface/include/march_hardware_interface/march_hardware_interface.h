@@ -8,7 +8,6 @@
 #include <memory>
 #include <vector>
 
-#include <control_toolbox/filters.h>
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
@@ -35,7 +34,7 @@ using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;
 class MarchHardwareInterface : public hardware_interface::RobotHW
 {
 public:
-  explicit MarchHardwareInterface(march::MarchRobot robot, bool use_reset_imc);
+  explicit MarchHardwareInterface(std::unique_ptr<march::MarchRobot> robot, bool use_reset_imc);
 
   /**
    * @brief Initialize the HardwareInterface by registering position interfaces
@@ -44,7 +43,8 @@ public:
   bool init(ros::NodeHandle& nh, ros::NodeHandle& robot_hw_nh) override;
 
   /**
-   * @brief Read actual position from the hardware.
+   * Reads (in realtime) the state from the march robot.
+   *
    * @param time Current time
    * @param elapsed_time Duration since last write action
    */
@@ -56,7 +56,8 @@ public:
   void validate();
 
   /**
-   * @brief Write position commands to the hardware.
+   * Writes (in realtime) the commands from the controllers to the march robot.
+   *
    * @param time Current time
    * @param elapsed_time Duration since last write action
    */
@@ -81,8 +82,11 @@ private:
   void outsideLimitsCheck(size_t joint_index);
   void iMotionCubeStateCheck(size_t joint_index);
 
+  /* Exponential smoothing constant of the velocity */
+  static constexpr double ALPHA = 1;
+
   /* March hardware */
-  march::MarchRobot march_robot_;
+  std::unique_ptr<march::MarchRobot> march_robot_;
   bool has_power_distribution_board_ = false;
 
   /* Interfaces */
@@ -102,6 +106,7 @@ private:
   std::vector<std::string> joint_names_;
 
   std::vector<double> joint_position_;
+  std::vector<double> relative_joint_position_;
   std::vector<double> joint_position_command_;
 
   std::vector<double> joint_velocity_;
@@ -119,7 +124,6 @@ private:
   PowerNetOnOffCommand power_net_on_off_command_;
   bool master_shutdown_allowed_command_ = false;
   bool enable_high_voltage_command_ = true;
-
   bool reset_imc_ = false;
 
   /* Real time safe publishers */
