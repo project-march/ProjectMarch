@@ -2,7 +2,7 @@
     <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_rotational."/>
 
     <param name="robot_description"
-           command="$(find xacro)/xacro --inorder '$(find march_description)/urdf/$(arg robot).xacro' "/>
+           command="$(find xacro)/xacro '$(find march_description)/urdf/$(arg robot).xacro' "/>
 
     <test  test-name="test_gait_generator_controller" pkg="march_rqt_gait_generator" type="gait_generator_controller_test"/>
 </launch>

@@ -122,6 +122,13 @@ class ModifiableSubgait(Subgait):
             rospy.logerr('This case should have been caught by can_mirror()')
             return False
 
+        if key_1 in self.version:
+            mirrored_version = self.version.replace(key_1, key_2)
+        elif key_2 in self.version:
+            mirrored_version = self.version.replace(key_2, key_1)
+        else:
+            mirrored_version = self.version
+
         mirrored_joints = []
         for joint in self.joints:
             if key_1 in joint.name:
@@ -135,7 +142,7 @@ class ModifiableSubgait(Subgait):
             mirrored_joints.append(mirrored_joint)
 
         return ModifiableSubgait(mirrored_joints, self.duration, self.gait_type, self.gait_name, mirrored_subgait_name,
-                                 self.version, self.description)
+                                 mirrored_version, self.description)
 
     def set_gait_type(self, gait_type):
         self.gait_type = str(gait_type)

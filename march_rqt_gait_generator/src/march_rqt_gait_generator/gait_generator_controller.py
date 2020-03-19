@@ -182,7 +182,7 @@ class GaitGeneratorController(object):
                                   msg='Not all joints have multiple setpoints before duration ' + str(duration))
                 self.view.duration_spin_box.setValue(self.subgait.duration)
                 return
-            discard_setpoints = self.veiw.yes_no_question(title='Gait duration lower than highest time setpoint',
+            discard_setpoints = self.view.yes_no_question(title='Gait duration lower than highest time setpoint',
                                                           msg='Do you want to discard any setpoints higher than the '
                                                           'given duration?')
             if not discard_setpoints:
@@ -221,33 +221,30 @@ class GaitGeneratorController(object):
         self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
 
     def export_gait(self):
-        should_mirror = self.view.mirror_check_box.isChecked()
-
-        key_1 = self.view.mirror_key1_line_edit.text()
-        key_2 = self.view.mirror_key2_line_edit.text()
-
-        if should_mirror:
+        if self.view.mirror_check_box.isChecked():
+            key_1 = self.view.mirror_key1_line_edit.text()
+            key_2 = self.view.mirror_key2_line_edit.text()
             mirror = self.subgait.get_mirror(key_1, key_2)
+
             if mirror:
                 self.export_to_file(mirror, self.get_gait_directory())
             else:
-                user_interface_controller.notify('Could not mirror gait', 'Check the logs for more information.')
+                self.view.notify('Could not mirror gait', 'Check the logs for more information.')
                 return
 
         self.export_to_file(self.subgait, self.get_gait_directory())
 
-    def export_to_file(self, gait, gait_directory):
+    def export_to_file(self, subgait, gait_directory):
         if gait_directory is None or gait_directory == '':
             return
 
-        # Name and version will be empty as it's stored in the filename.
-        subgait_msg = gait.to_subgait_msg()
+        subgait_msg = subgait.to_subgait_msg()
 
         output_file_directory = os.path.join(gait_directory,
-                                             gait.gait_name.replace(' ', '_'),
-                                             gait.subgait_name.replace(' ', '_'))
+                                             subgait.gait_name.replace(' ', '_'),
+                                             subgait.subgait_name.replace(' ', '_'))
         output_file_path = os.path.join(output_file_directory,
-                                        gait.version.replace(' ', '_') + '.subgait')
+                                        subgait.version.replace(' ', '_') + '.subgait')
 
         file_exists = os.path.isfile(output_file_path)
         if file_exists:
@@ -264,7 +261,7 @@ class GaitGeneratorController(object):
         with open(output_file_path, 'w') as output_file:
             output_file.write(str(subgait_msg))
 
-        user_interface_controller.notify('Gait Saved', output_file_path)
+        self.view.notify('Gait Saved', output_file_path)
 
     # Called by export_gait
     def get_gait_directory(self):

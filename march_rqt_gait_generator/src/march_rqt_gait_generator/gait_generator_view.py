@@ -1,5 +1,6 @@
 import math
 import os
+import subprocess
 
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore
@@ -218,3 +219,7 @@ class GaitGeneratorView(Plugin):
 
     def shutdown_plugin(self):
         self.controller.stop_time_slider_thread()
+
+    @staticmethod
+    def notify(title, message):
+        subprocess.Popen(['notify-send', str(title), str(message)])

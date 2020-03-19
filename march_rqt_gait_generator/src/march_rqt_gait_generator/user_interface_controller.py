@@ -1,5 +1,4 @@
 import math
-import subprocess
 
 from python_qt_binding.QtWidgets import QTableWidgetItem
 
@@ -7,10 +6,6 @@ from .joint_setting_spin_box_delegate import JointSettingSpinBoxDelegate
 from .model.modifiable_setpoint import ModifiableSetpoint
 
 TABLE_DIGITS = 4
-
-
-def notify(title, message):
-    subprocess.Popen(['notify-send', str(title), str(message)])
 
 
 def table_to_setpoints(table_data):
