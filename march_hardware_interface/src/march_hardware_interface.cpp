@@ -42,7 +42,7 @@ MarchHardwareInterface::MarchHardwareInterface(std::unique_ptr<march::MarchRobot
 bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot_hw_nh */)
 {
   // Initialize realtime publisher for the IMotionCube states
-  this->imc_state_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_resources::ImcErrorState>>(
+  this->imc_state_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_resources::ImcState>>(
       nh, "/march/imc_states/", 4);
 
   this->after_limit_joint_command_pub_ =
