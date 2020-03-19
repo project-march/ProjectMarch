@@ -41,6 +41,8 @@ public:
 
   double getPosition();
   double getVelocity();
+  double getIncremental_position();
+  double getAbsolute_position();
   int16_t getTorque();
   int32_t getAngleIUAbsolute();
   int32_t getAngleIUIncremental();
