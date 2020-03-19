@@ -223,3 +223,7 @@ class GaitGeneratorView(Plugin):
     @staticmethod
     def notify(title, message):
         subprocess.Popen(['notify-send', str(title), str(message)])
+
+    @property
+    def control_button(self):
+        return QtCore.Qt.ControlModifier

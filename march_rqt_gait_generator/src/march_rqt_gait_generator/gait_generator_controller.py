@@ -1,7 +1,6 @@
 import os
 
 from numpy_ringbuffer import RingBuffer
-from pyqtgraph.Qt import QtCore
 import rospy
 from trajectory_msgs.msg import JointTrajectory
 from urdf_parser_py import urdf
@@ -98,7 +97,7 @@ class GaitGeneratorController(object):
         joint_plot = joint_widget.Plot.getItem(0, 0)
 
         def add_setpoint(joint, time, position, button):
-            if button == QtCore.Qt.ControlModifier:
+            if button == self.view.control_button:
                 joint.add_interpolated_setpoint(time)
             else:
                 joint.add_setpoint(ModifiableSetpoint(time, position, 0))
