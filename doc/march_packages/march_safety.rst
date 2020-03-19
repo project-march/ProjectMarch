@@ -17,8 +17,6 @@ All **SafetyType**-objects:
 
 * **TemperatureSafety**, monitors the joint temperatures. Depending on which threshold is exceeded an warning, non-fatal or fatal is thrown.
 * **InputDeviceSafety**, checks if the input device is still connected. Otherwise a non-fatal is thrown.
-* **TrajectorySafety**, checks whether the trajectory controller is within its trajectory constraints. Once the constraints
-  have been passed a position hold command is sent, completed and then the trajectory controller is stopped.
 
 Error severity
 --------------
