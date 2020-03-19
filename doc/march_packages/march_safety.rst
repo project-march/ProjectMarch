@@ -88,49 +88,48 @@ For this example we will create a safety type which checks the temperature.
 * Create a class **TemperatureSafety** which extends **SafetyType**
 * In the constructor of this class you probably want to:
 
-    * Pass on a reference to the *NodeHandle* and *SafetyHandle*.
-    * Obtain the threshold parameter form the parameter service.
+    * Pass on a pointer to the *NodeHandle* and *SafetyHandle*.
+    * Obtain the threshold parameter from the parameter service.
 
-    .. code::
+    .. code:: cpp
 
-        n->getParam(ros::this_node::getName() + "/temperature_threshold_non_fatal", non_fatal_temperature_threshold);
+      ros::param::get("~non_fatal_temperature_threshold", this->non_fatal_temperature_threshold_);
 
     * Subscribe to the temperature topic.
 
-    .. code::
+    .. code:: cpp
 
-        ros::Subscriber subscriber_temperature = n.subscribe<sensor_msgs::Temperature>("/march/temperature", 1000, temperatureCallback);
+      ros::Subscriber subscriber_temperature = n->subscribe<sensor_msgs::Temperature>("/march/temperature", 1000, temperatureCallback);
 
 * Create a callback method for the temperature subscriber.
 
     * In this callback you want to compare the received value with the threshold
 
-    .. code::
+    .. code:: cpp
 
-      if (msg->temperature > non_fatal_temperature_threshold)
+      if (msg->temperature > this->non_fatal_temperature_threshold_)
       {
         // Temperature exceeds threshold
       }
 
-    * When the threshold is exceeded you probably want to call the non-fatal method form the *SafetyHandle*. This is example code:
+    * When the threshold is exceeded you probably want to call the non-fatal method from the *SafetyHandle*. This is example code:
 
-    .. code::
+    .. code:: cpp
 
-        safety_handler->publishNonFatal(error_message);
+      this->safety_handler_->publishNonFatal(error_message);
 
 * You have to overwrite the **update** method from the **SafetyType**. However, in this example we are not using the update method.
   This method is used when you want to execute some code every **SafetyNode** cycle. For example if you want to check if a certain node
   is still alive this would be de perfect place to call this code. For this example we will overwrite this method, but keep it empty:
 
-  .. code::
+  .. code:: cpp
 
-    void update() override
+    void update(const ros::Time& /* now */) override
     {
     }
 
-* Finally you need to add the **TemperatureSafety** to the **safety_list** in the **SafetyNode.cpp**:
+* Finally you need to add the **TemperatureSafety** to the **safety_list** in the **safety_node.cpp**:
 
-.. code::
+.. code:: cpp
 
-    safety_list.push_back(std::unique_ptr<SafetyType>(new TemperatureSafety(&n, &safetyHandler)));
-
+  safety_list.push_back(std::make_unique<TemperatureSafety>(&n, &safety_handler, joint_names));
