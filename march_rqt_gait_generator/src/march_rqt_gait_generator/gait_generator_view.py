@@ -8,7 +8,7 @@ from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import (QCheckBox, QComboBox, QDoubleSpinBox,
                                          QFileDialog, QFrame, QHeaderView,
                                          QLineEdit, QMessageBox, QPushButton,
-                                         QSlider, QSpinBox, QWidget)
+                                         QSlider, QSpinBox, QWidget, QTableWidgetItem)
 from qt_gui.plugin import Plugin
 import rospkg
 import rospy
@@ -17,12 +17,13 @@ from sensor_msgs.msg import JointState
 from tf import (ConnectivityException, ExtrapolationException, LookupException,
                 TransformListener)
 
-from . import user_interface_controller
 from .gait_generator_controller import GaitGeneratorController
 from .joint_plot import JointPlot
+from .joint_setting_spin_box_delegate import JointSettingSpinBoxDelegate
 
 
 class GaitGeneratorView(Plugin):
+    TABLE_DIGITS = 4
 
     def __init__(self, context):
         super(GaitGeneratorView, self).__init__(context)
@@ -128,6 +129,7 @@ class GaitGeneratorView(Plugin):
 
         for joint in joints:
             self.joint_widgets[joint.name] = self.create_joint_plot_widget(joint)
+            self.update_table(joint)
             row = rospy.get_param('/joint_layout/' + joint.name + '/row', -1)
             column = rospy.get_param('/joint_layout/' + joint.name + '/column', -1)
             if row == -1 or column == -1:
@@ -147,7 +149,6 @@ class GaitGeneratorView(Plugin):
         joint_plot = JointPlot(joint, show_velocity_plot, show_effort_plot)
         joint_plot_widget.Plot.addItem(joint_plot)
 
-        joint_plot_widget.Table = user_interface_controller.update_table(joint_plot_widget.Table, joint)
         # Disable scrolling horizontally
         joint_plot_widget.Table.horizontalScrollBar().setDisabled(True)
         joint_plot_widget.Table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -203,19 +204,43 @@ class GaitGeneratorView(Plugin):
             self.update_joint_widget(joint)
 
     def update_joint_widget(self, joint, update_table=True):
-        table = self.joint_widgets[joint.name].Table
         plot = self.joint_widgets[joint.name].Plot.getItem(0, 0)
 
         plot.plot_item.blockSignals(True)
-        table.blockSignals(True)
 
         plot.update_set_points(joint, show_velocity_plot=self.velocity_plot_check_box.isChecked(),
                                show_effort_plot=self.effort_plot_check_box.isChecked())
         if update_table:
-            user_interface_controller.update_table(table, joint)
+            self.update_table(joint)
 
         plot.plot_item.blockSignals(False)
+
+    def update_table(self, joint):
+        table = self.joint_widgets[joint.name].Table
+        table.blockSignals(True)
+
+        table.setRowCount(len(joint.setpoints))
+
+        for i in range(0, len(joint.setpoints)):
+            time_item = QTableWidgetItem(str(round(joint.setpoints[i].time, self.TABLE_DIGITS)))
+
+            position_item = QTableWidgetItem(
+                str(round(math.degrees(joint.setpoints[i].position), self.TABLE_DIGITS)))
+
+            velocity_item = QTableWidgetItem(
+                str(round(math.degrees(joint.setpoints[i].velocity), self.TABLE_DIGITS)))
+
+            table.setItem(i, 0, time_item)
+            table.setItem(i, 1, position_item)
+            table.setItem(i, 2, velocity_item)
+
+        table.setItemDelegate(JointSettingSpinBoxDelegate(
+            joint.limits.velocity, joint.limits.lower, joint.limits.upper, joint.duration))
+        # table.resizeRowsToContents()
+        table.resizeColumnsToContents()
+
         table.blockSignals(False)
+        return table
 
     def shutdown_plugin(self):
         self.controller.stop_time_slider_thread()
