@@ -44,6 +44,13 @@ Nodes
 
 *march_safety* - This node reads parameters from the parameter server and runs all **SafetyType**-objects.
 
+Subscribed Topics
+^^^^^^^^^^^^^^^^^
+
+*/march/input_device/alive* (`std_msgs/Time <http://docs.ros.org/melodic/api/std_msgs/html/msg/Time.html>`_)
+  Listens to connected input devices and throws an error when an input device lost connection and
+  logs when a new input device reconnects.
+
 Published Topics
 ^^^^^^^^^^^^^^^^
 
@@ -52,6 +59,7 @@ Published Topics
 
 */march/input_device/instruction* (:march:`march_shared_resources/GaitInstruction <march_shared_resources/msg/GaitInstruction.msg>`)
   Send instructions to the state machine. This topic is only used to send an stop instruction.
+
 
 Tutorials
 ---------
