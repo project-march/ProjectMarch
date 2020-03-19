@@ -22,8 +22,8 @@ input device and the gait selection tool next to each other in one window.
 
    Example rqt perspective
 
-The :monitor:`project-march/monitor <>` repository contains all the rqt plugins used for
-the |march|.
+The :monitor:`project-march/monitor <>` repository contains RQT plugins used
+to monitor and control the |march| and the :gait-generation:`gait generator <>` is also an RQT plugin.
 
 See also
 ^^^^^^^^
