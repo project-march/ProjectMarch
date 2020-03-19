@@ -115,17 +115,17 @@ class ModifiableSubgait(Subgait):
             return False
 
         if key_1 in self.subgait_name:
-            mirrored_subgait_name = self.subgait_name.replace(key_1, key_2)
+            mirrored_subgait_name = str(self.subgait_name.replace(key_1, key_2))
         elif key_2 in self.subgait_name:
-            mirrored_subgait_name = self.subgait_name.replace(key_2, key_1)
+            mirrored_subgait_name = str(self.subgait_name.replace(key_2, key_1))
         else:
             rospy.logerr('This case should have been caught by can_mirror()')
             return False
 
         if key_1 in self.version:
-            mirrored_version = self.version.replace(key_1, key_2)
+            mirrored_version = str(self.version.replace(key_1, key_2))
         elif key_2 in self.version:
-            mirrored_version = self.version.replace(key_2, key_1)
+            mirrored_version = str(self.version.replace(key_2, key_1))
         else:
             mirrored_version = self.version
 

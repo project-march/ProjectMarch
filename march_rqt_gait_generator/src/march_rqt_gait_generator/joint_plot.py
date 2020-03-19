@@ -46,21 +46,22 @@ class JointPlot(pg.PlotItem):
 
         self.setTitle(joint.name)
 
+        self.setXRange(-0.1, self.duration + 0.1, padding=0)
         self.setYRange(self.lower_limit - 0.1, self.upper_limit + 0.1, padding=0)
         middle_y = (self.upper_limit + self.lower_limit) / 2
         self.zero_line = self.addLine(y=middle_y)
         limit_pen = pg.mkPen(color='r', style=QtCore.Qt.DotLine)
         self.addLine(y=self.lower_limit, pen=limit_pen)
         self.addLine(y=self.upper_limit, pen=limit_pen)
-        self.setXRange(-0.1, self.duration + 0.1, padding=0)
+
+        time_pen = pg.mkPen(color='y', style=QtCore.Qt.DotLine)
+        self.time_line = self.addLine(0, pen=time_pen, bounds=(0, self.duration))
+
         self.setMouseEnabled(False, False)
         self.setMenuEnabled(False)
         self.hideButtons()
 
         self.update_set_points(joint, show_velocity_plot, show_effort_plot)
-
-        time_pen = pg.mkPen(color='y', style=QtCore.Qt.DotLine)
-        self.time_line = self.addLine(0, pen=time_pen, bounds=(0, self.duration))
 
     def create_velocity_markers(self, setpoints, display=False):
         # Remove old sliders
@@ -101,6 +102,10 @@ class JointPlot(pg.PlotItem):
 
     def update_set_points(self, joint, show_velocity_plot=False, show_effort_plot=False):
         time, position, velocity = joint.get_setpoints_unzipped()
+
+        self.duration = joint.duration
+        self.setXRange(-0.1, self.duration + 0.1, padding=0)
+        self.time_line.setBounds((0, self.duration))
 
         for i in range(0, len(position)):
             position[i] = math.degrees(position[i])
