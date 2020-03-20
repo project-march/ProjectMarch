@@ -32,7 +32,11 @@ public:
   IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
               std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
 
-  ~IMotionCube() = default;
+  ~IMotionCube() noexcept override = default;
+
+  /* Delete copy constructor/assignment since the unique_ptrs cannot be copied */
+  IMotionCube(const IMotionCube&) = delete;
+  IMotionCube& operator=(const IMotionCube&) = delete;
 
   void writeInitialSDOs(int cycle_time) override;
 

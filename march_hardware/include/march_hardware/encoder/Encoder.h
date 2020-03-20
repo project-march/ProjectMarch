@@ -13,6 +13,8 @@ class Encoder
 public:
   explicit Encoder(size_t number_of_bits);
 
+  virtual ~Encoder() noexcept = default;
+
   /**
    * Reads out the encoder from the slave and returns the value in Internal Units (IU).
    * @param byte_offset the byte offset in the slave register for the IU position

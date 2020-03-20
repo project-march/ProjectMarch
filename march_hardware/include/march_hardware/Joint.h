@@ -27,6 +27,12 @@ private:
 public:
   explicit Joint(std::unique_ptr<IMotionCube> imc);
 
+  virtual ~Joint() noexcept = default;
+
+  /* Delete copy constructor/assignment since the unique_ptr cannot be copied */
+  Joint(const Joint&) = delete;
+  Joint& operator=(const Joint&) = delete;
+
   void initialize(int ecatCycleTime);
   void prepareActuation();
   void shutdown();

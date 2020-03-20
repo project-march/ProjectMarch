@@ -14,6 +14,8 @@ public:
   AbsoluteEncoder(size_t number_of_bits, int32_t lower_limit_iu, int32_t upper_limit_iu, double lower_limit_rad,
                   double upper_limit_rad, double lower_soft_limit_rad, double upper_soft_limit_rad);
 
+  ~AbsoluteEncoder() noexcept override = default;
+
   double toRad(int32_t iu) const override;
 
   /**
