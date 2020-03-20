@@ -3,8 +3,6 @@
 #include "mocks/MockIncrementalEncoder.cpp"
 
 #include <march_hardware/IMotionCube.h>
-#include <march_hardware/encoder/AbsoluteEncoder.h>
-#include <march_hardware/encoder/IncrementalEncoder.h>
 #include <march_hardware/error/hardware_exception.h>
 
 #include <memory>
@@ -58,6 +56,6 @@ TEST_F(IMotionCubeTest, ActuationModePositionActuateTorque)
 
 TEST_F(IMotionCubeTest, OperationEnabledWithoutActuationMode)
 {
-  march::IMotionCube imc(1, this->mock_absolute_encoder, this->mock_incremental_encoder, march::ActuationMode::unknown);
+  march::IMotionCube imc(1, std::move(this->mock_absolute_encoder), std::move(this->mock_incremental_encoder), march::ActuationMode::unknown);
   ASSERT_THROW(imc.goToOperationEnabled(), march::error::HardwareException);
 }
