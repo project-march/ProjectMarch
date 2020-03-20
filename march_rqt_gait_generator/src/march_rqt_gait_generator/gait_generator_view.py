@@ -16,6 +16,8 @@ import rviz
 from sensor_msgs.msg import JointState
 from tf import (ConnectivityException, ExtrapolationException, LookupException,
                 TransformListener)
+from trajectory_msgs.msg import JointTrajectory
+from urdf_parser_py import urdf
 
 from .gait_generator_controller import GaitGeneratorController
 from .joint_plot import JointPlot
@@ -33,7 +35,11 @@ class GaitGeneratorView(Plugin):
 
         self.build_ui(context)
 
-        self.controller = GaitGeneratorController(self)
+        self.gait_publisher = None
+        self.set_topic_name(self.topic_name_line_edit.text())
+
+        robot = urdf.Robot.from_parameter_server()
+        self.controller = GaitGeneratorController(self, robot)
 
     # Called by __init__
     def build_ui(self, context):
@@ -229,3 +235,11 @@ class GaitGeneratorView(Plugin):
     @staticmethod
     def create_time_slider_thread(current, playback_speed, max_time):
         return TimeSliderThread(current, playback_speed, max_time)
+
+    def publish_gait(self, trajectory):
+        rospy.loginfo('Publishing trajectory to topic ' + self.topic_name)
+        self.gait_publisher.publish(trajectory)
+
+    def set_topic_name(self, topic_name):
+        self.topic_name = topic_name
+        self.gait_publisher = rospy.Publisher(topic_name, JointTrajectory, queue_size=10)

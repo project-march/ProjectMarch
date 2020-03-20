@@ -115,7 +115,7 @@ class JointPlot(pg.PlotItem):
         time, position, velocity = joint.get_setpoints_unzipped()
 
         self.duration = joint.duration
-        self.setXRange(-0.1, self.duration + 0.1, padding=0)
+        self.setXRange(-0.01 * self.duration, 1.01 * self.duration, padding=0)
         self.time_line.setBounds((0, self.duration))
 
         for i in range(0, len(position)):

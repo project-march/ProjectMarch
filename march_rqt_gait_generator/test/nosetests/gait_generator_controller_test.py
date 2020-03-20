@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 import unittest
-import rospy
-import rostest
 
 from mock import Mock
 import rospkg
@@ -14,27 +12,25 @@ from march_rqt_gait_generator.model.modifiable_subgait import ModifiableSubgait
 PKG = 'march_rqt_gait_generator'
 
 class GaitGeneratorControllerTest(unittest.TestCase):
-    # def __init__(self, *args):
-    #     super(GaitGeneratorControllerTest, self).__init__(*args)
-    #     rospy.init_node("test_gait_generator", anonymous=True)
-
     def setUp(self):
-        rospy.init_node('gait_generator_controller_test', anonymous=True)
         self.gait_generator_view = Mock()
         self.gait_generator_view.topic_name_line_edit.text = Mock(return_value='/march/my_fancy_topic')
         self.gait_generator_view.joint_widgets.__getitem__ = Mock()
+
+        self.robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
+        self.gait_generator_controller = GaitGeneratorController(self.gait_generator_view, self.robot)
+
+        self.duration = self.gait_generator_controller.subgait.duration
+        self.num_joints = len(self.gait_generator_controller.subgait.joints)
+
         self.gait_name = 'walk'
         self.subgait_name = 'left_swing'
         self.version = 'MV_walk_leftswing_v2'
         self.resources_folder = rospkg.RosPack().get_path('march_rqt_gait_generator') + '/test/resources'
-        self.robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
         self.subgait_path = '{rsc}/{gait}/{subgait}/{version}.subgait'.format(rsc=self.resources_folder,
                                                                               gait=self.gait_name,
                                                                               subgait=self.subgait_name,
                                                                               version=self.version)
-        self.gait_generator_controller = GaitGeneratorController(self.gait_generator_view)
-        self.duration = self.gait_generator_controller.subgait.duration
-        self.num_joints = len(self.gait_generator_controller.subgait.joints)
 
     def test_init_load_gui_call(self):
         self.gait_generator_view.load_gait_into_ui.assert_called_once_with(self.gait_generator_controller.subgait)
@@ -89,10 +85,7 @@ class GaitGeneratorControllerTest(unittest.TestCase):
     # publish_gait test
     def test_publish_gait(self):
         self.gait_generator_controller.publish_gait()
-
-    # set_topic_name test
-    def test_set_topic_name(self):
-        self.gait_generator_controller.set_topic_name("/march/blaat")
+        self.gait_generator_view.publish.assert_called_once()
 
     # set_playback_speed test
     def test_set_playback_speed(self):
@@ -356,6 +349,3 @@ class GaitGeneratorControllerTest(unittest.TestCase):
         self.gait_generator_controller.undo()
         self.gait_generator_controller.redo()
         self.assertEqual(self.gait_generator_view.publish_preview.call_count, 2)
-
-if __name__ == '__main__':
-    rostest.rosrun(PKG, 'gait_generator_controller_test', GaitGeneratorControllerTest)

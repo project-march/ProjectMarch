@@ -2,8 +2,6 @@ import os
 
 from numpy_ringbuffer import RingBuffer
 import rospy
-from trajectory_msgs.msg import JointTrajectory
-from urdf_parser_py import urdf
 
 from .model.modifiable_setpoint import ModifiableSetpoint
 from .model.modifiable_subgait import ModifiableSubgait
@@ -11,19 +9,17 @@ from .model.modifiable_subgait import ModifiableSubgait
 
 class GaitGeneratorController(object):
 
-    def __init__(self, view):
+    def __init__(self, view, robot):
         self.view = view
 
         # Default values
-        self.gait_publisher = None
-        self.set_topic_name(self.view.topic_name_line_edit.text())
         self.gait_directory = None
 
         self.playback_speed = 100
         self.time_slider_thread = None
         self.current_time = 0
 
-        self.robot = urdf.Robot.from_parameter_server()
+        self.robot = robot
         self.subgait = ModifiableSubgait.empty_subgait(self, self.robot)
         self.joint_changed_history = RingBuffer(capacity=100, dtype=list)
         self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
@@ -63,7 +59,7 @@ class GaitGeneratorController(object):
         self.view.description_line_edit.textChanged.connect(
             lambda text: self.subgait.set_description(text),
         )
-        self.view.topic_name_line_edit.textChanged.connect(self.set_topic_name)
+        self.view.topic_name_line_edit.textChanged.connect(self.view.set_topic_name)
         self.view.playback_speed_spin_box.valueChanged.connect(self.set_playback_speed)
         self.view.duration_spin_box.setKeyboardTracking(False)
         self.view.duration_spin_box.valueChanged.connect(self.update_gait_duration)
@@ -132,13 +128,7 @@ class GaitGeneratorController(object):
     # Functions below are connected to buttons, text boxes, joint graphs etc.
     def publish_gait(self):
         trajectory = self.subgait._to_joint_trajectory_msg()
-        rospy.loginfo('Publishing trajectory to topic ' + self.topic_name)
-        self.gait_publisher.publish(trajectory)
-
-    def set_topic_name(self, topic_name):
-        self.topic_name = topic_name
-        self.gait_publisher = rospy.Publisher(topic_name,
-                                              JointTrajectory, queue_size=10)
+        self.view.publish(trajectory)
 
     def set_playback_speed(self, playback_speed):
         was_playing = self.time_slider_thread is not None
