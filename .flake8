@@ -7,6 +7,7 @@ application-package-names =
     march_rqt_gait_selection,
     march_rqt_input_device,
     march_rqt_note_taker,
+    march_rqt_software_check,
     march_shared_classes,
     march_shared_resources
 import-order-style = appnexus
