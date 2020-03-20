@@ -1,4 +1,3 @@
-import math
 import os
 
 from numpy_ringbuffer import RingBuffer
@@ -8,7 +7,6 @@ from urdf_parser_py import urdf
 
 from .model.modifiable_setpoint import ModifiableSetpoint
 from .model.modifiable_subgait import ModifiableSubgait
-from .time_slider_thread import TimeSliderThread
 
 
 class GaitGeneratorController(object):
@@ -105,7 +103,7 @@ class GaitGeneratorController(object):
         # Connect a function to update the model and to update the table.
         joint_plot.plot_item.sigPlotChanged.connect(
             lambda: [
-                joint.set_setpoints(self.plot_to_setpoints(joint_plot)),
+                joint.set_setpoints(joint_plot.to_setpoints()),
                 self.view.update_joint_widget(joint),
                 self.view.publish_preview(self.subgait, self.current_time),
             ])
@@ -126,33 +124,12 @@ class GaitGeneratorController(object):
 
         joint_widget.Table.itemChanged.connect(
             lambda: [
-                joint.set_setpoints(self.table_to_setpoints(joint_widget.Table)),
+                joint.set_setpoints(joint_widget.Table.controller.to_setpoints()),
                 self.view.update_joint_widget(joint, update_table=False),
                 self.view.publish_preview(self.subgait, self.current_time),
             ])
 
     # Functions below are connected to buttons, text boxes, joint graphs etc.
-    @staticmethod
-    def table_to_setpoints(table_data):
-        setpoints = []
-        for i in range(0, table_data.rowCount()):
-            time = float(table_data.item(i, 0).text())
-            position = math.radians(float(table_data.item(i, 1).text()))
-            velocity = math.radians(float(table_data.item(i, 2).text()))
-            setpoints.append(ModifiableSetpoint(time, position, velocity))
-        return setpoints
-
-    @staticmethod
-    def plot_to_setpoints(plot):
-        plot_data = plot.plot_item.getData()
-        setpoints = []
-        for i in range(0, len(plot_data[0])):
-            velocity = plot.velocities[i]
-            time = plot_data[0][i]
-            position = math.radians(plot_data[1][i])
-            setpoints.append(ModifiableSetpoint(time, position, velocity))
-        return setpoints
-
     def publish_gait(self):
         trajectory = self.subgait._to_joint_trajectory_msg()
         rospy.loginfo('Publishing trajectory to topic ' + self.topic_name)
@@ -184,7 +161,7 @@ class GaitGeneratorController(object):
         current = self.view.time_slider.value()
         playback_speed = self.playback_speed
         max_time = self.view.time_slider.maximum()
-        self.time_slider_thread = TimeSliderThread(current, playback_speed, max_time)
+        self.time_slider_thread = self.view.create_time_slider_thread(current, playback_speed, max_time)
         self.time_slider_thread.update_signal.connect(self.view.update_main_time_slider)
         self.time_slider_thread.start()
 

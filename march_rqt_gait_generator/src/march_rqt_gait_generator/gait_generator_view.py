@@ -8,7 +8,7 @@ from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import (QCheckBox, QComboBox, QDoubleSpinBox,
                                          QFileDialog, QFrame, QHeaderView,
                                          QLineEdit, QMessageBox, QPushButton,
-                                         QSlider, QSpinBox, QWidget, QTableWidgetItem)
+                                         QSlider, QSpinBox, QWidget)
 from qt_gui.plugin import Plugin
 import rospkg
 import rospy
@@ -19,12 +19,11 @@ from tf import (ConnectivityException, ExtrapolationException, LookupException,
 
 from .gait_generator_controller import GaitGeneratorController
 from .joint_plot import JointPlot
-from .joint_setting_spin_box_delegate import JointSettingSpinBoxDelegate
+from .joint_table_controller import JointTableController
+from .time_slider_thread import TimeSliderThread
 
 
 class GaitGeneratorView(Plugin):
-    TABLE_DIGITS = 4
-
     def __init__(self, context):
         super(GaitGeneratorView, self).__init__(context)
 
@@ -129,7 +128,6 @@ class GaitGeneratorView(Plugin):
 
         for joint in joints:
             self.joint_widgets[joint.name] = self.create_joint_plot_widget(joint)
-            self.update_table(joint)
             row = rospy.get_param('/joint_layout/' + joint.name + '/row', -1)
             column = rospy.get_param('/joint_layout/' + joint.name + '/column', -1)
             if row == -1 or column == -1:
@@ -152,6 +150,7 @@ class GaitGeneratorView(Plugin):
         # Disable scrolling horizontally
         joint_plot_widget.Table.horizontalScrollBar().setDisabled(True)
         joint_plot_widget.Table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        joint_plot_widget.Table.controller = JointTableController(joint_plot_widget.Table, joint)
 
         return joint_plot_widget
 
@@ -205,42 +204,16 @@ class GaitGeneratorView(Plugin):
 
     def update_joint_widget(self, joint, update_table=True):
         plot = self.joint_widgets[joint.name].Plot.getItem(0, 0)
-
         plot.plot_item.blockSignals(True)
-
-        plot.update_set_points(joint, show_velocity_plot=self.velocity_plot_check_box.isChecked(),
-                               show_effort_plot=self.effort_plot_check_box.isChecked())
-        if update_table:
-            self.update_table(joint)
-
+        plot.update_setpoints(joint, show_velocity_plot=self.velocity_plot_check_box.isChecked(),
+                              show_effort_plot=self.effort_plot_check_box.isChecked())
         plot.plot_item.blockSignals(False)
 
-    def update_table(self, joint):
-        table = self.joint_widgets[joint.name].Table
-        table.blockSignals(True)
-
-        table.setRowCount(len(joint.setpoints))
-
-        for i in range(0, len(joint.setpoints)):
-            time_item = QTableWidgetItem(str(round(joint.setpoints[i].time, self.TABLE_DIGITS)))
-
-            position_item = QTableWidgetItem(
-                str(round(math.degrees(joint.setpoints[i].position), self.TABLE_DIGITS)))
-
-            velocity_item = QTableWidgetItem(
-                str(round(math.degrees(joint.setpoints[i].velocity), self.TABLE_DIGITS)))
-
-            table.setItem(i, 0, time_item)
-            table.setItem(i, 1, position_item)
-            table.setItem(i, 2, velocity_item)
-
-        table.setItemDelegate(JointSettingSpinBoxDelegate(
-            joint.limits.velocity, joint.limits.lower, joint.limits.upper, joint.duration))
-        # table.resizeRowsToContents()
-        table.resizeColumnsToContents()
-
-        table.blockSignals(False)
-        return table
+        if update_table:
+            table = self.joint_widgets[joint.name].Table
+            table.blockSignals(True)
+            table.controller.update_setpoints(joint)
+            table.blockSignals(False)
 
     def shutdown_plugin(self):
         self.controller.stop_time_slider_thread()
@@ -252,3 +225,7 @@ class GaitGeneratorView(Plugin):
     @property
     def control_button(self):
         return QtCore.Qt.ControlModifier
+
+    @staticmethod
+    def create_time_slider_thread(current, playback_speed, max_time):
+        return TimeSliderThread(current, playback_speed, max_time)

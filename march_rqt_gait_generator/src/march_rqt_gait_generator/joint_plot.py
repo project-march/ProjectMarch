@@ -4,6 +4,7 @@ from PyQt5.QtCore import pyqtSignal
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore
 
+from .model.modifiable_setpoint import ModifiableSetpoint
 
 # Enable antialiasing for prettier plots
 pg.setConfigOptions(antialias=True)
@@ -61,7 +62,7 @@ class JointPlot(pg.PlotItem):
         self.setMenuEnabled(False)
         self.hideButtons()
 
-        self.update_set_points(joint, show_velocity_plot, show_effort_plot)
+        self.update_setpoints(joint, show_velocity_plot, show_effort_plot)
 
     def create_velocity_markers(self, setpoints, display=False):
         # Remove old sliders
@@ -100,7 +101,17 @@ class JointPlot(pg.PlotItem):
         self.plot_min_effort = self.plot(pen=pg.mkPen(color='r'))
         self.plot_max_effort = self.plot(pen=pg.mkPen(color='r'))
 
-    def update_set_points(self, joint, show_velocity_plot=False, show_effort_plot=False):
+    def to_setpoints(self):
+        plot_data = self.plot_item.getData()
+        setpoints = []
+        for i in range(0, len(plot_data[0])):
+            velocity = self.velocities[i]
+            time = plot_data[0][i]
+            position = math.radians(plot_data[1][i])
+            setpoints.append(ModifiableSetpoint(time, position, velocity))
+        return setpoints
+
+    def update_setpoints(self, joint, show_velocity_plot=False, show_effort_plot=False):
         time, position, velocity = joint.get_setpoints_unzipped()
 
         self.duration = joint.duration
