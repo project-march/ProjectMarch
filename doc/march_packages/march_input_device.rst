@@ -20,9 +20,7 @@ Sending messages
 
 :march:`Stop Message <march_shared_resources/msg/GaitInstruction.msg>` This message can stop a repeating gait (such as walk). After receiving the stop message the exoskeleton will go to the standing pose.
 
-.. todo:: (Tim) link this to the march_safety documentation.
-
-`Stay Alive Message <http://docs.ros.org/melodic/api/std_msgs/html/msg/Time.html>`_  Every loop a stay alive message is send. This way *march_safety* can detect when the input device loses connection.
+`Stay Alive Message <http://docs.ros.org/melodic/api/std_msgs/html/msg/Time.html>`_  Every loop a stay alive message is send. This way :ref:`march-safety-label` can detect when the input device loses connection.
 
 Receiving messages
 ^^^^^^^^^^^^^^^^^^
