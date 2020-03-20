@@ -2,7 +2,9 @@
 #include <ros/ros.h>
 
 #include <bitset>
+#include <memory>
 #include <string>
+#include <utility>
 
 #include <march_hardware/error/motion_error.h>
 #include <march_hardware/Joint.h>
@@ -10,11 +12,20 @@
 
 namespace march
 {
+Joint::Joint(std::unique_ptr<IMotionCube> imc)
+  : name(""), netNumber(-1), allowActuation(false), iMotionCube(std::move(imc))
+{
+  if (!this->iMotionCube)
+  {
+    throw std::invalid_argument("IMotionCube argument cannot be nullptr");
+  }
+}
+
 void Joint::initialize(int ecatCycleTime)
 {
   if (hasIMotionCube())
   {
-    iMotionCube.writeInitialSDOs(ecatCycleTime);
+    iMotionCube->writeInitialSDOs(ecatCycleTime);
   }
   if (hasTemperatureGES())
   {
@@ -30,7 +41,7 @@ void Joint::prepareActuation()
                                    this->name.c_str());
   }
   ROS_INFO("[%s] Preparing for actuation", this->name.c_str());
-  this->iMotionCube.goToOperationEnabled();
+  this->iMotionCube->goToOperationEnabled();
   ROS_INFO("[%s] Successfully prepared for actuation", this->name.c_str());
 }
 
@@ -41,7 +52,7 @@ void Joint::actuateRad(double targetPositionRad)
     throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE, "Joint %s is not allowed to actuate",
                                    this->name.c_str());
   }
-  this->iMotionCube.actuateRad(targetPositionRad);
+  this->iMotionCube->actuateRad(targetPositionRad);
 }
 
 double Joint::getAngleRadAbsolute()
@@ -51,7 +62,7 @@ double Joint::getAngleRadAbsolute()
     ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
     return -1;
   }
-  return this->iMotionCube.getAngleRadAbsolute();
+  return this->iMotionCube->getAngleRadAbsolute();
 }
 
 double Joint::getAngleRadIncremental()
@@ -61,7 +72,7 @@ double Joint::getAngleRadIncremental()
     ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
     return -1;
   }
-  return this->iMotionCube.getAngleRadIncremental();
+  return this->iMotionCube->getAngleRadIncremental();
 }
 
 double Joint::getAngleRadMostPrecise()
@@ -71,7 +82,7 @@ double Joint::getAngleRadMostPrecise()
     ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
     return -1;
   }
-  return this->iMotionCube.getAngleRadMostPrecise();
+  return this->iMotionCube->getAngleRadMostPrecise();
 }
 
 void Joint::actuateTorque(int16_t targetTorque)
@@ -81,7 +92,7 @@ void Joint::actuateTorque(int16_t targetTorque)
     throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE, "Joint %s is not allowed to actuate",
                                    this->name.c_str());
   }
-  this->iMotionCube.actuateTorque(targetTorque);
+  this->iMotionCube->actuateTorque(targetTorque);
 }
 
 int16_t Joint::getTorque()
@@ -91,7 +102,7 @@ int16_t Joint::getTorque()
     ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
     return -1;
   }
-  return this->iMotionCube.getTorque();
+  return this->iMotionCube->getTorque();
 }
 
 int32_t Joint::getAngleIUAbsolute()
@@ -101,7 +112,7 @@ int32_t Joint::getAngleIUAbsolute()
     ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
     return -1;
   }
-  return this->iMotionCube.getAngleIUAbsolute();
+  return this->iMotionCube->getAngleIUAbsolute();
 }
 
 int32_t Joint::getAngleIUIncremental()
@@ -111,7 +122,7 @@ int32_t Joint::getAngleIUIncremental()
     ROS_WARN("[%s] Has no iMotionCube", this->name.c_str());
     return -1;
   }
-  return this->iMotionCube.getAngleIUIncremental();
+  return this->iMotionCube->getAngleIUIncremental();
 }
 
 float Joint::getTemperature()
@@ -128,22 +139,22 @@ IMotionCubeState Joint::getIMotionCubeState()
 {
   IMotionCubeState states;
 
-  std::bitset<16> statusWordBits = this->iMotionCube.getStatusWord();
+  std::bitset<16> statusWordBits = this->iMotionCube->getStatusWord();
   states.statusWord = statusWordBits.to_string();
-  std::bitset<16> detailedErrorBits = this->iMotionCube.getDetailedError();
+  std::bitset<16> detailedErrorBits = this->iMotionCube->getDetailedError();
   states.detailedError = detailedErrorBits.to_string();
-  std::bitset<16> motionErrorBits = this->iMotionCube.getMotionError();
+  std::bitset<16> motionErrorBits = this->iMotionCube->getMotionError();
   states.motionError = motionErrorBits.to_string();
 
-  states.state = IMCState(this->iMotionCube.getStatusWord());
-  states.detailedErrorDescription = error::parseDetailedError(this->iMotionCube.getDetailedError());
-  states.motionErrorDescription = error::parseMotionError(this->iMotionCube.getMotionError());
+  states.state = IMCState(this->iMotionCube->getStatusWord());
+  states.detailedErrorDescription = error::parseDetailedError(this->iMotionCube->getDetailedError());
+  states.motionErrorDescription = error::parseMotionError(this->iMotionCube->getMotionError());
 
-  states.motorCurrent = this->iMotionCube.getMotorCurrent();
-  states.motorVoltage = this->iMotionCube.getMotorVoltage();
+  states.motorCurrent = this->iMotionCube->getMotorCurrent();
+  states.motorVoltage = this->iMotionCube->getMotorVoltage();
 
-  states.absoluteEncoderValue = this->iMotionCube.getAngleIUAbsolute();
-  states.incrementalEncoderValue = this->iMotionCube.getAngleIUIncremental();
+  states.absoluteEncoderValue = this->iMotionCube->getAngleIUAbsolute();
+  states.incrementalEncoderValue = this->iMotionCube->getAngleIUIncremental();
 
   return states;
 }
@@ -175,7 +186,7 @@ int Joint::getIMotionCubeSlaveIndex()
 {
   if (hasIMotionCube())
   {
-    return this->iMotionCube.getSlaveIndex();
+    return this->iMotionCube->getSlaveIndex();
   }
   return -1;
 }
@@ -186,7 +197,7 @@ std::string Joint::getName()
 
 bool Joint::hasIMotionCube()
 {
-  return this->iMotionCube.getSlaveIndex() != -1;
+  return this->iMotionCube->getSlaveIndex() != -1;
 }
 
 bool Joint::hasTemperatureGES()
@@ -206,7 +217,7 @@ void Joint::setNetNumber(int netNumber)
 
 ActuationMode Joint::getActuationMode() const
 {
-  return this->iMotionCube.getActuationMode();
+  return this->iMotionCube->getActuationMode();
 }
 
 }  // namespace march

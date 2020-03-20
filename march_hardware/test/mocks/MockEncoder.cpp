@@ -5,7 +5,7 @@
 class MockEncoder : public march::Encoder
 {
 public:
-  MockEncoder(size_t number_of_bits) : Encoder(number_of_bits)
+  explicit MockEncoder(size_t number_of_bits) : Encoder(number_of_bits)
   {
   }
 

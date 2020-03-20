@@ -1,6 +1,9 @@
 // Copyright 2018 Project March.
+#include <memory>
+#include <utility>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/Joint.h"
@@ -12,27 +15,32 @@
 class JointTest : public ::testing::Test
 {
 protected:
+  void SetUp() override
+  {
+    this->imc = std::make_unique<MockIMotionCube>();
+  }
+
   const float temperature = 42;
-  const MockIMotionCube imc;
+  std::unique_ptr<MockIMotionCube> imc;
 };
 
 TEST_F(JointTest, AllowActuation)
 {
-  march::Joint joint(this->imc);
+  march::Joint joint(std::move(this->imc));
   joint.setAllowActuation(true);
   ASSERT_TRUE(joint.canActuate());
 }
 
 TEST_F(JointTest, DisableActuation)
 {
-  march::Joint joint(this->imc);
+  march::Joint joint(std::move(this->imc));
   joint.setAllowActuation(false);
   ASSERT_FALSE(joint.canActuate());
 }
 
 TEST_F(JointTest, ActuatePositionDisableActuation)
 {
-  march::Joint joint(this->imc);
+  march::Joint joint(std::move(this->imc));
   joint.setAllowActuation(false);
   joint.setName("actuate_false");
   EXPECT_FALSE(joint.canActuate());
@@ -41,7 +49,7 @@ TEST_F(JointTest, ActuatePositionDisableActuation)
 
 TEST_F(JointTest, ActuateTorqueDisableActuation)
 {
-  march::Joint joint(this->imc);
+  march::Joint joint(std::move(this->imc));
   joint.setAllowActuation(false);
   joint.setName("actuate_false");
   EXPECT_FALSE(joint.canActuate());
@@ -50,7 +58,7 @@ TEST_F(JointTest, ActuateTorqueDisableActuation)
 
 TEST_F(JointTest, PrepareForActuationWithUnknownMode)
 {
-  march::Joint joint(this->imc);
+  march::Joint joint(std::move(this->imc));
   joint.setAllowActuation(true);
   ASSERT_THROW(joint.prepareActuation(), march::error::HardwareException);
 }

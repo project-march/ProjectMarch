@@ -16,7 +16,7 @@ public:
 
   double toRad(int32_t iu) const override;
 
-  /*
+  /**
    * Converts radians to encoder Internal Units (IU).
    */
   int32_t fromRad(double rad) const;

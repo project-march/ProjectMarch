@@ -2,7 +2,9 @@
 #ifndef MARCH_HARDWARE_JOINT_H
 #define MARCH_HARDWARE_JOINT_H
 
+#include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <march_hardware/IMotionCube.h>
@@ -19,13 +21,11 @@ private:
   // Set this number via the hardware builder
   int netNumber;
   bool allowActuation;
-  IMotionCube iMotionCube;
+  std::unique_ptr<IMotionCube> iMotionCube;
   TemperatureGES temperatureGES;
 
 public:
-  explicit Joint(const IMotionCube& imc) : name(""), netNumber(-1), allowActuation(false), iMotionCube(imc)
-  {
-  }
+  explicit Joint(std::unique_ptr<IMotionCube> imc);
 
   void initialize(int ecatCycleTime);
   void prepareActuation();
@@ -75,7 +75,7 @@ public:
     return os << "name: " << joint.name << ", "
               << "ActuationMode: " << joint.getActuationMode().toString() << ", "
               << "allowActuation: " << joint.allowActuation << ", "
-              << "imotioncube: " << joint.iMotionCube << ","
+              << "imotioncube: " << joint.iMotionCube.get() << ","
               << "temperatureges: " << joint.temperatureGES;
   }
 

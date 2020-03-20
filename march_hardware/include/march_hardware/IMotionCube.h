@@ -11,6 +11,7 @@
 #include "march_hardware/PDOmap.h"
 #include "march_hardware/Slave.h"
 
+#include <memory>
 #include <unordered_map>
 #include <string>
 
@@ -19,8 +20,17 @@ namespace march
 class IMotionCube : public Slave
 {
 public:
-  IMotionCube(int slave_index, AbsoluteEncoder absolute_encoder, IncrementalEncoder incremental_encoder,
-              ActuationMode actuation_mode);
+  /**
+   * Constructs an IMotionCube with an incremental and absolute encoder.
+   *
+   * @param slave_index index of the IMotionCube slave
+   * @param absolute_encoder pointer to absolute encoder, required so cannot be nullptr
+   * @param incremental_encoder pointer to incremental encoder, required so cannot be nullptr
+   * @param actuation_mode actuation mode in which the IMotionCube must operate
+   * @throws std::invalid_argument When an absolute or incremental encoder is nullptr.
+   */
+  IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+              std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
 
   ~IMotionCube() = default;
 
@@ -60,8 +70,8 @@ public:
   friend std::ostream& operator<<(std::ostream& os, const IMotionCube& imc)
   {
     return os << "slaveIndex: " << imc.slaveIndex << ", "
-              << "incrementalEncoder: " << imc.incremental_encoder_ << ", "
-              << "absoluteEncoder: " << imc.absolute_encoder_;
+              << "incrementalEncoder: " << imc.incremental_encoder_.get() << ", "
+              << "absoluteEncoder: " << imc.absolute_encoder_.get();
   }
 
   constexpr static double MAX_TARGET_DIFFERENCE = 0.393;
@@ -81,8 +91,12 @@ private:
   void mapMosiPDOs();
   void writeInitialSettings(uint8_t cycle_time);
 
-  AbsoluteEncoder absolute_encoder_;
-  IncrementalEncoder incremental_encoder_;
+  // Use of smart pointers are necessary here to make dependency injection
+  // possible and thus allow for mocking the encoders. A unique pointer is
+  // is chosen since the IMotionCube should be the owner and the encoders
+  // do not need to be passed around.
+  std::unique_ptr<AbsoluteEncoder> absolute_encoder_;
+  std::unique_ptr<IncrementalEncoder> incremental_encoder_;
   ActuationMode actuation_mode_;
   bool is_incremental_more_precise_;
 
