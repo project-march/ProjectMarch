@@ -11,14 +11,14 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>Untitled Axis</custom_title>
-                                <title_type>0</title_type>
-                                <title_visible>true</title_visible>
+                                <custom_title>Time</custom_title>
+                                <title_type>1</title_type>
+                                <title_visible>false</title_visible>
                             </x_axis>
                             <y_axis>
-                                <custom_title>Untitled Axis</custom_title>
-                                <title_type>0</title_type>
-                                <title_visible>true</title_visible>
+                                <custom_title>P-value</custom_title>
+                                <title_type>1</title_type>
+                                <title_visible>false</title_visible>
                             </y_axis>
                         </axes>
                     </axes>
@@ -495,14 +495,14 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>Untitled Axis</custom_title>
-                                <title_type>0</title_type>
-                                <title_visible>true</title_visible>
+                                <custom_title>Time</custom_title>
+                                <title_type>1</title_type>
+                                <title_visible>false</title_visible>
                             </x_axis>
                             <y_axis>
-                                <custom_title>Untitled Axis</custom_title>
-                                <title_type>0</title_type>
-                                <title_visible>true</title_visible>
+                                <custom_title>I-value</custom_title>
+                                <title_type>1</title_type>
+                                <title_visible>false</title_visible>
                             </y_axis>
                         </axes>
                     </axes>
@@ -971,7 +971,7 @@
                         <visible>true</visible>
                     </legend>
                     <plot_rate>30</plot_rate>
-                    <title>P</title>
+                    <title>I</title>
                 </column_0>
             </row_1>
             <row_2>
@@ -979,14 +979,14 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>Untitled Axis</custom_title>
-                                <title_type>0</title_type>
-                                <title_visible>true</title_visible>
+                                <custom_title>Time</custom_title>
+                                <title_type>1</title_type>
+                                <title_visible>false</title_visible>
                             </x_axis>
                             <y_axis>
-                                <custom_title>Untitled Axis</custom_title>
-                                <title_type>0</title_type>
-                                <title_visible>true</title_visible>
+                                <custom_title>D-value</custom_title>
+                                <title_type>1</title_type>
+                                <title_visible>false</title_visible>
                             </y_axis>
                         </axes>
                     </axes>
@@ -1455,7 +1455,7 @@
                         <visible>true</visible>
                     </legend>
                     <plot_rate>30</plot_rate>
-                    <title>P</title>
+                    <title>D</title>
                 </column_0>
             </row_2>
         </plots>
