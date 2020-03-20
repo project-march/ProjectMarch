@@ -104,6 +104,28 @@ class GaitGeneratorControllerTest(unittest.TestCase):
         self.gait_generator_controller.set_current_time(50)
         self.assertEqual(self.gait_generator_controller.current_time, 50)
 
+    # start_time_slider_thread tests
+    def test_start_time_slider_while_it_is_running(self):
+        self.gait_generator_controller.time_slider_thread = 1
+        self.gait_generator_controller.start_time_slider_thread()
+        self.gait_generator_view.create_time_slider_thread.assert_not_called()
+
+    def test_start_time_slider_thread(self):
+        self.gait_generator_controller.start_time_slider_thread()
+        self.gait_generator_view.create_time_slider_thread.assert_called_once()
+        self.gait_generator_view.create_time_slider_thread().update_signal.connect.assert_called_once()
+        self.gait_generator_view.create_time_slider_thread().start.assert_called_once()
+
+    # stop_time_slider_thread tests
+    def test_stop_time_slider_thread_not_running(self):
+        self.gait_generator_controller.stop_time_slider_thread()
+        self.gait_generator_view.create_time_slider_thread().stop.assert_not_called()
+
+    def test_stop_time_slider_thread(self):
+        self.gait_generator_controller.start_time_slider_thread()
+        self.gait_generator_controller.stop_time_slider_thread()
+        self.gait_generator_view.create_time_slider_thread().stop.assert_called_once()
+
     # update_gait_duration tests
     def test_update_gait_duration_no_rescale_one_setpoint_before_duration(self):
         self.gait_generator_view.scale_setpoints_check_box.isChecked = Mock(return_value=False)
