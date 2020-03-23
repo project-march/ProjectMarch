@@ -11,6 +11,7 @@ from march_rqt_gait_generator.model.modifiable_subgait import ModifiableSubgait
 
 PKG = 'march_rqt_gait_generator'
 
+
 class GaitGeneratorControllerTest(unittest.TestCase):
     def setUp(self):
         self.gait_generator_view = Mock()
@@ -68,19 +69,20 @@ class GaitGeneratorControllerTest(unittest.TestCase):
 
     # connect_plot tests
     def test_connect_plot_sig_plot_changed_call(self):
-        self.assertEqual(self.gait_generator_view.joint_widgets[''].Plot.getItem(0,0).plot_item.sigPlotChanged.
+        self.assertEqual(self.gait_generator_view.joint_widgets[''].Plot.getItem(0, 0).plot_item.sigPlotChanged.
                          connect.call_count, self.num_joints)
 
     def test_connect_plot_add_setpoint_call(self):
-        self.assertEqual(self.gait_generator_view.joint_widgets[''].Plot.getItem(0,0).add_setpoint.
+        self.assertEqual(self.gait_generator_view.joint_widgets[''].Plot.getItem(0, 0).add_setpoint.
                          connect.call_count, self.num_joints)
 
     def test_connect_plot_remove_setpoint_call(self):
-        self.assertEqual(self.gait_generator_view.joint_widgets[''].Plot.getItem(0,0).add_setpoint.
+        self.assertEqual(self.gait_generator_view.joint_widgets[''].Plot.getItem(0, 0).add_setpoint.
                          connect.call_count, self.num_joints)
 
     def test_connect_plot_table_changed_call(self):
-        self.assertEqual(self.gait_generator_view.joint_widgets[''].Table.itemChanged.connect.call_count, self.num_joints)
+        self.assertEqual(self.gait_generator_view.joint_widgets[''].Table.itemChanged.connect.call_count,
+                         self.num_joints)
 
     # set_playback_speed test
     def test_set_playback_speed(self):
@@ -265,7 +267,6 @@ class GaitGeneratorControllerTest(unittest.TestCase):
 
         self.gait_generator_view.notify.assert_called_once_with('Could not mirror gait',
                                                                 'Check the logs for more information.')
-
 
     # change_gait_directory tests
     def test_change_gait_directory(self):

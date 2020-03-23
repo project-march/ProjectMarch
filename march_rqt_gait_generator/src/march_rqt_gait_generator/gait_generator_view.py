@@ -5,10 +5,8 @@ import subprocess
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import (QCheckBox, QComboBox, QDoubleSpinBox,
-                                         QFileDialog, QFrame, QHeaderView,
-                                         QLineEdit, QMessageBox, QPushButton,
-                                         QSlider, QSpinBox, QWidget)
+from python_qt_binding.QtWidgets import (QFileDialog, QFrame, QHeaderView,
+                                         QMessageBox, QWidget)
 import rospkg
 import rospy
 import rviz
@@ -174,7 +172,6 @@ class GaitGeneratorView(QWidget):
             table.blockSignals(True)
             table.controller.update_setpoints(joint)
             table.blockSignals(False)
-
 
     @staticmethod
     def notify(title, message):

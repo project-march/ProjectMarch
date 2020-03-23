@@ -1,7 +1,7 @@
 from qt_gui.plugin import Plugin
 import rospy
-from urdf_parser_py import urdf
 from trajectory_msgs.msg import JointTrajectory
+from urdf_parser_py import urdf
 
 from .gait_generator_controller import GaitGeneratorController
 from .gait_generator_view import GaitGeneratorView
@@ -34,4 +34,3 @@ class GaitGeneratorPlugin(Plugin):
     def set_topic_name(self, topic_name):
         self.topic_name = topic_name
         self.gait_publisher = rospy.Publisher(topic_name, JointTrajectory, queue_size=10)
-
