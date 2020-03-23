@@ -5,8 +5,11 @@ march_hardware_builder
 
 Overview
 --------
-This package contains a library which can be included to to create a MarchRobot from .yaml config files.
-The implementation is rather straightforward and nearly all of the logic can be found in the :hardware-interface:`HardwareBuilder class <march_hardware_builder/src/hardware_builder.cpp>`.
+This package contains a library which can be included to create a ``MarchRobot`` from YAML config files
+and a robot description in URDF. Whereas the YAML describes some properties of the hardware used in the robot,
+the hardware builder uses the URDF for joint limits. The joints in the YAML and the URDF must match.
+The implementation is rather straightforward and nearly all of the logic can be found in the
+:hardware-interface:`HardwareBuilder class <march_hardware_builder/src/hardware_builder.cpp>`.
 
 ROS API
 -------
