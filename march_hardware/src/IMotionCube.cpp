@@ -273,6 +273,11 @@ void IMotionCube::goToTargetState(IMotionCubeTargetState target_state)
 
 void IMotionCube::goToOperationEnabled()
 {
+  if (this->actuation_mode_ == ActuationMode::unknown)
+  {
+    throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE, "Trying to go to operation enabled with "
+                                                                             "unknown actuation mode");
+  }
   this->setControlWord(128);
 
   this->goToTargetState(IMotionCubeTargetState::SWITCH_ON_DISABLED);

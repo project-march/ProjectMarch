@@ -18,16 +18,6 @@ TEST_F(TemperatureJointTest, SlaveIndexOne)
   ASSERT_EQ(1, tempSens.getSlaveIndex());
 }
 
-TEST_F(TemperatureJointDeathTest, SlaveIndexZero)
-{
-  ASSERT_DEATH(march::TemperatureGES(0, 0), "Slave configuration error: slaveindex 0 can not be smaller than 1.");
-}
-
-TEST_F(TemperatureJointDeathTest, SlaveIndexMinusOne)
-{
-  ASSERT_DEATH(march::TemperatureGES(-1, 0), "Slave configuration error: slaveindex -1 can not be smaller than 1.");
-}
-
 TEST_F(TemperatureJointTest, ByteOffsetOne)
 {
   ASSERT_NO_THROW(march::TemperatureGES(2, 1));

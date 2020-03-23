@@ -1,26 +1,15 @@
 // Copyright 2018 Project March.
 
 #include "gtest/gtest.h"
-#include <gmock/gmock.h>
 
+#include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/Joint.h"
 #include "march_hardware/TemperatureGES.h"
 #include "march_hardware/IMotionCube.h"
 #include "mocks/MockTemperatureGES.cpp"
 #include "mocks/MockIMotionCube.cpp"
 
-using ::testing::AtLeast;
-using ::testing::AtMost;
-using ::testing::Return;
-
 class JointTest : public ::testing::Test
-{
-protected:
-  const float temperature = 42;
-  const MockIMotionCube imc;
-};
-
-class JointDeathTest : public ::testing::Test
 {
 protected:
   const float temperature = 42;
@@ -41,20 +30,27 @@ TEST_F(JointTest, DisableActuation)
   ASSERT_FALSE(joint.canActuate());
 }
 
-TEST_F(JointDeathTest, ActuateDisableActuation)
+TEST_F(JointTest, ActuatePositionDisableActuation)
 {
   march::Joint joint(this->imc);
   joint.setAllowActuation(false);
   joint.setName("actuate_false");
-  ASSERT_FALSE(joint.canActuate());
-  ASSERT_DEATH(joint.actuateRad(0.3), "Joint actuate_false is not allowed to actuate, "
-                                      "yet its actuate method has been called");
+  EXPECT_FALSE(joint.canActuate());
+  ASSERT_THROW(joint.actuateRad(0.3), march::error::HardwareException);
 }
 
-TEST_F(JointTest, NoActuationMode)
+TEST_F(JointTest, ActuateTorqueDisableActuation)
 {
   march::Joint joint(this->imc);
-  joint.setName("test_joint");
-  ASSERT_DEATH(joint.actuateRad(1), "Joint test_joint is not allowed to actuate, "
-                                    "yet its actuate method has been called");
+  joint.setAllowActuation(false);
+  joint.setName("actuate_false");
+  EXPECT_FALSE(joint.canActuate());
+  ASSERT_THROW(joint.actuateTorque(3), march::error::HardwareException);
+}
+
+TEST_F(JointTest, PrepareForActuationWithUnknownMode)
+{
+  march::Joint joint(this->imc);
+  joint.setAllowActuation(true);
+  ASSERT_THROW(joint.prepareActuation(), march::error::HardwareException);
 }
