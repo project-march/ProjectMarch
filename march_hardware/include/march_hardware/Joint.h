@@ -40,6 +40,10 @@ public:
   Joint(const Joint&) = delete;
   Joint& operator=(const Joint&) = delete;
 
+  /* Delete move assignment since string cannot be move assigned */
+  Joint(Joint&&) = default;
+  Joint& operator=(Joint&&) = delete;
+
   void initialize(int cycle_time);
   void prepareActuation();
 
@@ -70,7 +74,9 @@ public:
   /** @brief Override comparison operator */
   friend bool operator==(const Joint& lhs, const Joint& rhs)
   {
-    return lhs.name_ == rhs.name_ && lhs.imc_ == rhs.imc_ && lhs.temperature_ges_ == rhs.temperature_ges_ &&
+    return lhs.name_ == rhs.name_ && ((lhs.imc_ && rhs.imc_ && *lhs.imc_ == *rhs.imc_) || (!lhs.imc_ && !rhs.imc_)) &&
+           ((lhs.temperature_ges_ && rhs.temperature_ges_ && *lhs.temperature_ges_ == *rhs.temperature_ges_) ||
+            (!lhs.temperature_ges_ && !rhs.temperature_ges_)) &&
            lhs.allow_actuation_ == rhs.allow_actuation_ &&
            lhs.getActuationMode().getValue() == rhs.getActuationMode().getValue();
   }
@@ -82,11 +88,30 @@ public:
   /** @brief Override stream operator for clean printing */
   friend ::std::ostream& operator<<(std::ostream& os, const Joint& joint)
   {
-    return os << "name: " << joint.name_ << ", "
-              << "ActuationMode: " << joint.getActuationMode().toString() << ", "
-              << "allowActuation: " << joint.allow_actuation_ << ", "
-              << "imotioncube: " << joint.imc_.get() << ","
-              << "temperatureges: " << joint.temperature_ges_.get();
+    os << "name: " << joint.name_ << ", "
+       << "ActuationMode: " << joint.getActuationMode().toString() << ", "
+       << "allowActuation: " << joint.allow_actuation_ << ", "
+       << "imotioncube: ";
+    if (joint.imc_)
+    {
+      os << *joint.imc_;
+    }
+    else
+    {
+      os << "none";
+    }
+
+    os << ", temperatureges: ";
+    if (joint.temperature_ges_)
+    {
+      os << *joint.temperature_ges_;
+    }
+    else
+    {
+      os << "none";
+    }
+
+    return os;
   }
 
 private:

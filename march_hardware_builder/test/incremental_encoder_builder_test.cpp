@@ -30,8 +30,14 @@ TEST_F(TestIncrementalEncoderBuilder, ValidIncrementalEncoder)
   YAML::Node config = this->loadTestYaml("/incremental_encoder_correct.yaml");
 
   march::IncrementalEncoder expected = march::IncrementalEncoder(12, 45.5);
-  march::IncrementalEncoder created = HardwareBuilder::createIncrementalEncoder(config);
-  ASSERT_EQ(expected, created);
+  auto created = HardwareBuilder::createIncrementalEncoder(config);
+  ASSERT_EQ(expected, *created);
+}
+
+TEST_F(TestIncrementalEncoderBuilder, NoConfig)
+{
+  YAML::Node config;
+  ASSERT_EQ(nullptr, HardwareBuilder::createIncrementalEncoder(config[""]));
 }
 
 TEST_F(TestIncrementalEncoderBuilder, NoResolution)
