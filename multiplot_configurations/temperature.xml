@@ -11,12 +11,12 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title></custom_title>
+                                <custom_title>Time (s)</custom_title>
                                 <title_type>1</title_type>
                                 <title_visible>false</title_visible>
                             </x_axis>
                             <y_axis>
-                                <custom_title>Untitled Axis</custom_title>
+                                <custom_title>Temperactuer (C)</custom_title>
                                 <title_type>1</title_type>
                                 <title_visible>false</title_visible>
                             </y_axis>

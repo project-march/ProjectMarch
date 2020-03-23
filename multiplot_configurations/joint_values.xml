@@ -32,8 +32,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -83,8 +83,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -134,8 +134,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -185,8 +185,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -236,8 +236,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -287,8 +287,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -338,8 +338,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -389,8 +389,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -463,8 +463,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -514,8 +514,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -565,8 +565,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -616,8 +616,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -667,8 +667,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -718,8 +718,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -769,8 +769,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -820,8 +820,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -896,8 +896,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -947,8 +947,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -998,8 +998,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -1049,8 +1049,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -1100,8 +1100,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -1151,8 +1151,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -1202,8 +1202,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -1253,8 +1253,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -1327,8 +1327,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -1378,8 +1378,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -1429,8 +1429,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -1480,8 +1480,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -1531,8 +1531,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -1582,8 +1582,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -1633,8 +1633,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>
@@ -1684,8 +1684,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/joint_values</topic>
                                     <type>march_shared_resources/JointValues</type>

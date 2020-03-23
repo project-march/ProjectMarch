@@ -11,7 +11,7 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>Time</custom_title>
+                                <custom_title>Time (s)</custom_title>
                                 <title_type>1</title_type>
                                 <title_visible>false</title_visible>
                             </x_axis>
@@ -495,7 +495,7 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>Time</custom_title>
+                                <custom_title>Time (s)</custom_title>
                                 <title_type>1</title_type>
                                 <title_visible>false</title_visible>
                             </x_axis>
@@ -979,7 +979,7 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>Time</custom_title>
+                                <custom_title>Time (s)</custom_title>
                                 <title_type>1</title_type>
                                 <title_visible>false</title_visible>
                             </x_axis>

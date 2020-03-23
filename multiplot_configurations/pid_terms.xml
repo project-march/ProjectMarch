@@ -11,14 +11,14 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>Time</custom_title>
+                                <custom_title>Time (s)</custom_title>
                                 <title_type>1</title_type>
-                                <title_visible>true</title_visible>
+                                <title_visible>false</title_visible>
                             </x_axis>
                             <y_axis>
-                                <custom_title>controller output</custom_title>
+                                <custom_title>Controller output </custom_title>
                                 <title_type>1</title_type>
-                                <title_visible>true</title_visible>
+                                <title_visible>false</title_visible>
                             </y_axis>
                         </axes>
                     </axes>
@@ -26,14 +26,14 @@
                         <curve_0>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_ankle/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -77,14 +77,14 @@
                         <curve_1>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_ankle/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -128,14 +128,14 @@
                         <curve_2>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_ankle/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -187,14 +187,14 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>Time</custom_title>
+                                <custom_title>Time (s)</custom_title>
                                 <title_type>1</title_type>
-                                <title_visible>true</title_visible>
+                                <title_visible>false</title_visible>
                             </x_axis>
                             <y_axis>
-                                <custom_title>controller output</custom_title>
+                                <custom_title>Controller output</custom_title>
                                 <title_type>1</title_type>
-                                <title_visible>true</title_visible>
+                                <title_visible>false</title_visible>
                             </y_axis>
                         </axes>
                     </axes>
@@ -202,14 +202,14 @@
                         <curve_0>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_ankle/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -253,14 +253,14 @@
                         <curve_1>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_ankle/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -304,14 +304,14 @@
                         <curve_2>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_ankle/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -365,14 +365,14 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>Time</custom_title>
+                                <custom_title>Time (s)</custom_title>
                                 <title_type>1</title_type>
-                                <title_visible>true</title_visible>
+                                <title_visible>false</title_visible>
                             </x_axis>
                             <y_axis>
-                                <custom_title>controller output</custom_title>
+                                <custom_title>Controller output</custom_title>
                                 <title_type>1</title_type>
-                                <title_visible>true</title_visible>
+                                <title_visible>false</title_visible>
                             </y_axis>
                         </axes>
                     </axes>
@@ -380,14 +380,14 @@
                         <curve_0>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_hip_aa/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -431,14 +431,14 @@
                         <curve_1>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_hip_aa/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -482,14 +482,14 @@
                         <curve_2>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_hip_aa/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -541,14 +541,14 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>Time</custom_title>
+                                <custom_title>Time (s)</custom_title>
                                 <title_type>1</title_type>
-                                <title_visible>true</title_visible>
+                                <title_visible>false</title_visible>
                             </x_axis>
                             <y_axis>
-                                <custom_title>controller output</custom_title>
+                                <custom_title>Controller output</custom_title>
                                 <title_type>1</title_type>
-                                <title_visible>true</title_visible>
+                                <title_visible>false</title_visible>
                             </y_axis>
                         </axes>
                     </axes>
@@ -556,14 +556,14 @@
                         <curve_0>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_hip_aa/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -607,14 +607,14 @@
                         <curve_1>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_hip_aa/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -658,14 +658,14 @@
                         <curve_2>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_hip_aa/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -719,14 +719,14 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>Time</custom_title>
+                                <custom_title>Time (s)</custom_title>
                                 <title_type>1</title_type>
-                                <title_visible>true</title_visible>
+                                <title_visible>false</title_visible>
                             </x_axis>
                             <y_axis>
-                                <custom_title>controller output</custom_title>
+                                <custom_title>Controller output</custom_title>
                                 <title_type>1</title_type>
-                                <title_visible>true</title_visible>
+                                <title_visible>false</title_visible>
                             </y_axis>
                         </axes>
                     </axes>
@@ -734,14 +734,14 @@
                         <curve_0>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_hip_fe/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -785,14 +785,14 @@
                         <curve_1>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_hip_fe/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -836,14 +836,14 @@
                         <curve_2>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_hip_fe/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -895,14 +895,14 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>Time</custom_title>
+                                <custom_title>Time (s)</custom_title>
                                 <title_type>1</title_type>
-                                <title_visible>true</title_visible>
+                                <title_visible>false</title_visible>
                             </x_axis>
                             <y_axis>
-                                <custom_title>controller output</custom_title>
+                                <custom_title>Controller output</custom_title>
                                 <title_type>1</title_type>
-                                <title_visible>true</title_visible>
+                                <title_visible>false</title_visible>
                             </y_axis>
                         </axes>
                     </axes>
@@ -910,14 +910,14 @@
                         <curve_0>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_hip_fe/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -961,14 +961,14 @@
                         <curve_1>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_hip_fe/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -1012,14 +1012,14 @@
                         <curve_2>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_hip_fe/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -1073,14 +1073,14 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>Time</custom_title>
+                                <custom_title>Time (s)</custom_title>
                                 <title_type>1</title_type>
-                                <title_visible>true</title_visible>
+                                <title_visible>false</title_visible>
                             </x_axis>
                             <y_axis>
-                                <custom_title>controller output</custom_title>
+                                <custom_title>Controller output</custom_title>
                                 <title_type>1</title_type>
-                                <title_visible>true</title_visible>
+                                <title_visible>false</title_visible>
                             </y_axis>
                         </axes>
                     </axes>
@@ -1088,14 +1088,14 @@
                         <curve_0>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_knee/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -1139,14 +1139,14 @@
                         <curve_1>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_knee/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -1190,14 +1190,14 @@
                         <curve_2>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_knee/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -1249,14 +1249,14 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>Time</custom_title>
+                                <custom_title>Time (s)</custom_title>
                                 <title_type>1</title_type>
-                                <title_visible>true</title_visible>
+                                <title_visible>false</title_visible>
                             </x_axis>
                             <y_axis>
-                                <custom_title>controller output</custom_title>
+                                <custom_title>Controller output</custom_title>
                                 <title_type>1</title_type>
-                                <title_visible>true</title_visible>
+                                <title_visible>false</title_visible>
                             </y_axis>
                         </axes>
                     </axes>
@@ -1264,14 +1264,14 @@
                         <curve_0>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_knee/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -1315,14 +1315,14 @@
                         <curve_1>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_knee/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -1366,14 +1366,14 @@
                         <curve_2>
                             <axes>
                                 <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
+                                    <field>header/stamp</field>
+                                    <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-10</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_knee/state</topic>
                                     <type>control_msgs/PidState</type>
