@@ -11,12 +11,12 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>Time</custom_title>
+                                <custom_title>Time (s)</custom_title>
                                 <title_type>1</title_type>
                                 <title_visible>true</title_visible>
                             </x_axis>
                             <y_axis>
-                                <custom_title>controller output</custom_title>
+                                <custom_title>Effort</custom_title>
                                 <title_type>1</title_type>
                                 <title_visible>true</title_visible>
                             </y_axis>
@@ -33,7 +33,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-10</relative_minimum>
-                                        <type>0</type>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_ankle/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -84,7 +84,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-10</relative_minimum>
-                                        <type>0</type>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_hip_aa/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -135,7 +135,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-10</relative_minimum>
-                                        <type>0</type>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_hip_fe/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -186,7 +186,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-10</relative_minimum>
-                                        <type>0</type>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_knee/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -237,7 +237,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-10</relative_minimum>
-                                        <type>0</type>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_ankle/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -288,7 +288,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-10</relative_minimum>
-                                        <type>0</type>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_hip_aa/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -339,7 +339,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-10</relative_minimum>
-                                        <type>0</type>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_hip_fe/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -390,7 +390,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-10</relative_minimum>
-                                        <type>0</type>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_knee/state</topic>
                                     <type>control_msgs/PidState</type>
@@ -436,7 +436,7 @@
                         <visible>true</visible>
                     </legend>
                     <plot_rate>30</plot_rate>
-                    <title>Controller output</title>
+                    <title>Controller Output</title>
                 </column_0>
             </row_0>
             <row_1>
@@ -444,12 +444,12 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>Time</custom_title>
+                                <custom_title>Time (s)</custom_title>
                                 <title_type>1</title_type>
                                 <title_visible>false</title_visible>
                             </x_axis>
                             <y_axis>
-                                <custom_title>I-value</custom_title>
+                                <custom_title>Effort</custom_title>
                                 <title_type>1</title_type>
                                 <title_visible>false</title_visible>
                             </y_axis>
@@ -466,7 +466,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-10</relative_minimum>
-                                        <type>0</type>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/after_limit_joint_command</topic>
                                     <type>march_shared_resources/AfterLimitJointCommand</type>
@@ -517,7 +517,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-10</relative_minimum>
-                                        <type>0</type>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/after_limit_joint_command</topic>
                                     <type>march_shared_resources/AfterLimitJointCommand</type>
@@ -568,7 +568,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-10</relative_minimum>
-                                        <type>0</type>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/after_limit_joint_command</topic>
                                     <type>march_shared_resources/AfterLimitJointCommand</type>
@@ -619,7 +619,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-10</relative_minimum>
-                                        <type>0</type>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/after_limit_joint_command</topic>
                                     <type>march_shared_resources/AfterLimitJointCommand</type>
@@ -670,7 +670,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-10</relative_minimum>
-                                        <type>0</type>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/after_limit_joint_command</topic>
                                     <type>march_shared_resources/AfterLimitJointCommand</type>
@@ -721,7 +721,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-10</relative_minimum>
-                                        <type>0</type>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/after_limit_joint_command</topic>
                                     <type>march_shared_resources/AfterLimitJointCommand</type>
@@ -772,7 +772,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-10</relative_minimum>
-                                        <type>0</type>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/after_limit_joint_command</topic>
                                     <type>march_shared_resources/AfterLimitJointCommand</type>
@@ -823,7 +823,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-10</relative_minimum>
-                                        <type>0</type>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/controller/after_limit_joint_command</topic>
                                     <type>march_shared_resources/AfterLimitJointCommand</type>
