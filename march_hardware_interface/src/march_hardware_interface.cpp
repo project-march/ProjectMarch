@@ -192,6 +192,16 @@ void MarchHardwareInterface::validate()
   }
 }
 
+bool MarchHardwareInterface::getTrainReturned()
+{
+  return this->march_robot_->getTrainReturned();
+}
+
+void MarchHardwareInterface::setTrainReturned(bool train_returned)
+{
+  return this->march_robot_->setTrainReturned(train_returned);
+}
+
 void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Duration& elapsed_time)
 {
   for (size_t i = 0; i < num_joints_; i++)

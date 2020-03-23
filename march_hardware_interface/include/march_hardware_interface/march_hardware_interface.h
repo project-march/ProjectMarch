@@ -68,6 +68,9 @@ public:
    */
   int getEthercatCycleTime() const;
 
+  bool getTrainReturned();
+  void setTrainReturned(bool train_returned);
+
 private:
   /**
    * Uses the num_joints_ member to resize all vectors

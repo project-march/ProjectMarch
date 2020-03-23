@@ -33,6 +33,8 @@ public:
   EthercatMaster& operator=(EthercatMaster&&) = delete;
 
   bool isOperational() const;
+  bool getTrainReturned();
+  void setTrainReturned(bool train_returned);
 
   /**
    * Returns the cycle time in milliseconds.
@@ -83,6 +85,7 @@ private:
   const std::string ifname_;
   const int max_slave_index_;
   const int cycle_time_ms_;
+  bool train_returned_ = false;
 
   char io_map_[4096] = { 0 };
   int expected_working_counter_ = 0;

@@ -50,6 +50,9 @@ public:
 
   bool isEthercatOperational();
 
+  bool getTrainReturned();
+  void setTrainReturned(bool train_returned);
+
   int getEthercatCycleTime() const;
 
   Joint getJoint(::std::string jointName);

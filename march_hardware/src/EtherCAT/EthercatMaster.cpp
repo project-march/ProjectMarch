@@ -41,6 +41,16 @@ int EthercatMaster::getCycleTime() const
   return this->cycle_time_ms_;
 }
 
+bool EthercatMaster::getTrainReturned()
+{
+  return this->train_returned_;
+}
+
+void EthercatMaster::setTrainReturned(bool train_returned)
+{
+  this->train_returned_ = train_returned;
+}
+
 void EthercatMaster::start(std::vector<Joint>& joints)
 {
   this->ethercatMasterInitiation();
@@ -152,6 +162,8 @@ void EthercatMaster::ethercatLoop()
 
     this->sendReceivePdo();
     monitorSlaveConnection();
+
+    this->train_returned_ = true;
 
     const auto end_time = std::chrono::high_resolution_clock::now();
     const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - begin_time);
