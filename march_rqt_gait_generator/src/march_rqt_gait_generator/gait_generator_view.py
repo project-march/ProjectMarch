@@ -22,7 +22,7 @@ from .time_slider_thread import TimeSliderThread
 
 
 class GaitGeneratorView(QWidget):
-    def __init__(self, context):
+    def __init__(self):
         super(GaitGeneratorView, self).__init__()
 
         self.joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=10)
@@ -32,8 +32,6 @@ class GaitGeneratorView(QWidget):
 
         ui_file = os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'), 'resource', 'gait_generator.ui')
         loadUi(ui_file, self)
-
-        context.add_widget(self)
 
         self.rviz_frame = self.create_rviz_frame()
         self.RvizFrame.layout().addWidget(self.rviz_frame, 1, 0, 1, 3)

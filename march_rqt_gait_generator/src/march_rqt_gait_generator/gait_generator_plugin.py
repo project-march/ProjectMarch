@@ -11,7 +11,8 @@ class GaitGeneratorPlugin(Plugin):
     def __init__(self, context):
         super(GaitGeneratorPlugin, self).__init__(context)
 
-        self.view = GaitGeneratorView(context)
+        self.view = GaitGeneratorView()
+        context.add_widget(self.view)
 
         robot = urdf.Robot.from_parameter_server()
         self.controller = GaitGeneratorController(self.view, robot)
