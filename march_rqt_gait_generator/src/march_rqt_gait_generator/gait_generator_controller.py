@@ -35,8 +35,6 @@ class GaitGeneratorController(object):
         self.view.import_gait_button.clicked.connect(self.import_gait)
         self.view.export_gait_button.clicked.connect(self.export_gait)
 
-        self.view.publish_gait_button.clicked.connect(self.publish_gait)
-
         self.view.start_button.clicked.connect(self.start_time_slider_thread)
         self.view.stop_button.clicked.connect(self.stop_time_slider_thread)
         self.view.invert_button.clicked.connect(self.invert_gait)
@@ -59,7 +57,6 @@ class GaitGeneratorController(object):
         self.view.description_line_edit.textChanged.connect(
             lambda text: self.subgait.set_description(text),
         )
-        self.view.topic_name_line_edit.textChanged.connect(self.view.set_topic_name)
         self.view.playback_speed_spin_box.valueChanged.connect(self.set_playback_speed)
         self.view.duration_spin_box.setKeyboardTracking(False)
         self.view.duration_spin_box.valueChanged.connect(self.update_gait_duration)
@@ -126,10 +123,6 @@ class GaitGeneratorController(object):
             ])
 
     # Functions below are connected to buttons, text boxes, joint graphs etc.
-    def publish_gait(self):
-        trajectory = self.subgait._to_joint_trajectory_msg()
-        self.view.publish(trajectory)
-
     def set_playback_speed(self, playback_speed):
         was_playing = self.time_slider_thread is not None
         self.stop_time_slider_thread()
@@ -194,10 +187,17 @@ class GaitGeneratorController(object):
             rospy.logwarn('Could not load gait %s', file_name)
             return
         self.subgait = gait
+
+        was_playing = self.time_slider_thread is not None
+        self.stop_time_slider_thread()
+
         self.view.load_gait_into_ui(self.subgait)
         for joint in self.subgait.joints:
             self.connect_plot(joint)
         self.current_time = 0
+
+        if was_playing:
+            self.start_time_slider_thread()
 
         self.gait_directory = '/'.join(file_name.split('/')[:-3])
         rospy.loginfo('Setting gait directory to %s', str(self.gait_directory))

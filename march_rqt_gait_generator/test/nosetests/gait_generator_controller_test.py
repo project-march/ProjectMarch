@@ -82,11 +82,6 @@ class GaitGeneratorControllerTest(unittest.TestCase):
     def test_connect_plot_table_changed_call(self):
         self.assertEqual(self.gait_generator_view.joint_widgets[''].Table.itemChanged.connect.call_count, self.num_joints)
 
-    # publish_gait test
-    def test_publish_gait(self):
-        self.gait_generator_controller.publish_gait()
-        self.gait_generator_view.publish.assert_called_once()
-
     # set_playback_speed test
     def test_set_playback_speed(self):
         self.gait_generator_controller.set_playback_speed(50)

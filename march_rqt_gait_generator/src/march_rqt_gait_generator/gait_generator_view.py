@@ -9,80 +9,36 @@ from python_qt_binding.QtWidgets import (QCheckBox, QComboBox, QDoubleSpinBox,
                                          QFileDialog, QFrame, QHeaderView,
                                          QLineEdit, QMessageBox, QPushButton,
                                          QSlider, QSpinBox, QWidget)
-from qt_gui.plugin import Plugin
 import rospkg
 import rospy
 import rviz
 from sensor_msgs.msg import JointState
 from tf import (ConnectivityException, ExtrapolationException, LookupException,
                 TransformListener)
-from trajectory_msgs.msg import JointTrajectory
-from urdf_parser_py import urdf
 
-from .gait_generator_controller import GaitGeneratorController
 from .joint_plot import JointPlot
 from .joint_table_controller import JointTableController
 from .time_slider_thread import TimeSliderThread
 
 
-class GaitGeneratorView(Plugin):
+class GaitGeneratorView(QWidget):
     def __init__(self, context):
-        super(GaitGeneratorView, self).__init__(context)
+        super(GaitGeneratorView, self).__init__()
+
+        self.joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=10)
 
         self.joint_widgets = {}
         self.tf_listener = TransformListener()
-        self.joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=10)
-
-        self.build_ui(context)
-
-        self.gait_publisher = None
-        self.set_topic_name(self.topic_name_line_edit.text())
-
-        robot = urdf.Robot.from_parameter_server()
-        self.controller = GaitGeneratorController(self, robot)
-
-    # Called by __init__
-    def build_ui(self, context):
-        # Start UI construction
-        self._widget = QWidget()
 
         ui_file = os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'), 'resource', 'gait_generator.ui')
-        loadUi(ui_file, self._widget)
+        loadUi(ui_file, self)
 
-        context.add_widget(self._widget)
+        context.add_widget(self)
 
         self.rviz_frame = self.create_rviz_frame()
-        self._widget.RvizFrame.layout().addWidget(self.rviz_frame, 1, 0, 1, 3)
+        self.RvizFrame.layout().addWidget(self.rviz_frame, 1, 0, 1, 3)
 
-        # Store ui elements.
-        self.change_gait_directory_button = self._widget.SettingsFrame.findChild(QPushButton, 'ChangeGaitDirectory')
-        self.import_gait_button = self._widget.SettingsFrame.findChild(QPushButton, 'Import')
-        self.export_gait_button = self._widget.SettingsFrame.findChild(QPushButton, 'Export')
-        self.publish_gait_button = self._widget.SettingsFrame.findChild(QPushButton, 'Publish')
-        self.start_button = self._widget.RvizFrame.findChild(QPushButton, 'Start')
-        self.stop_button = self._widget.RvizFrame.findChild(QPushButton, 'Stop')
-        self.invert_button = self._widget.RvizFrame.findChild(QPushButton, 'Invert')
-        self.undo_button = self._widget.RvizFrame.findChild(QPushButton, 'Undo')
-        self.redo_button = self._widget.RvizFrame.findChild(QPushButton, 'Redo')
-        self.playback_speed_spin_box = self._widget.RvizFrame.findChild(QSpinBox, 'PlaybackSpeed')
-        self.height_left_line_edit = self._widget.RvizFrame.findChild(QLineEdit, 'HeightLeft')
-        self.height_right_line_edit = self._widget.RvizFrame.findChild(QLineEdit, 'HeightRight')
-        self.heel_distance_line_edit = self._widget.RvizFrame.findChild(QLineEdit, 'HeelHeelDistance')
-        self.topic_name_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, 'TopicName')
-        self.gait_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, 'Gait')
-        self.subgait_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, 'Subgait')
-        self.version_name_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, 'Version')
-        self.description_line_edit = self._widget.GaitPropertiesFrame.findChild(QLineEdit, 'Description')
-        self.gait_type_combo_box = self._widget.GaitPropertiesFrame.findChild(QComboBox, 'GaitType')
         self.gait_type_combo_box.addItems(['walk_like', 'sit_like', 'stairs_like'])
-        self.duration_spin_box = self._widget.GaitPropertiesFrame.findChild(QDoubleSpinBox, 'Duration')
-        self.mirror_check_box = self._widget.SettingsFrame.findChild(QCheckBox, 'Mirror')
-        self.mirror_key1_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, 'Key1')
-        self.mirror_key2_line_edit = self._widget.SettingsFrame.findChild(QLineEdit, 'Key2')
-        self.velocity_plot_check_box = self._widget.SettingsFrame.findChild(QCheckBox, 'ShowVelocityPlot')
-        self.effort_plot_check_box = self._widget.SettingsFrame.findChild(QCheckBox, 'ShowEffortPlot')
-        self.time_slider = self._widget.RvizFrame.findChild(QSlider, 'TimeSlider')
-        self.scale_setpoints_check_box = self._widget.GaitPropertiesFrame.findChild(QCheckBox, 'ScaleSetpoints')
 
     # Called by build_ui
     def create_rviz_frame(self):
@@ -120,13 +76,13 @@ class GaitGeneratorView(Plugin):
 
     # Methods below are called by load_gait_into_ui.
     def update_time_sliders(self, time):
-        graphics_layouts = self._widget.JointSettingContainer.findChildren(pg.GraphicsLayoutWidget)
+        graphics_layouts = self.JointSettingContainer.findChildren(pg.GraphicsLayoutWidget)
         for graphics_layout in graphics_layouts:
             joint_settings_plot = graphics_layout.getItem(0, 0)
             joint_settings_plot.update_time_slider(time)
 
     def load_joint_plots(self, joints):
-        layout = self._widget.JointSettingContainer.layout()
+        layout = self.JointSettingContainer.layout()
         for i in reversed(range(layout.count())):
             widget = layout.itemAt(i).widget()
             layout.removeWidget(widget)
@@ -139,7 +95,7 @@ class GaitGeneratorView(Plugin):
             if row == -1 or column == -1:
                 rospy.logerr('Could not load the layout for joint %s. Please check config/layout.yaml', joint.name)
                 continue
-            self._widget.JointSettingContainer.layout().addWidget(self.joint_widgets[joint.name], row, column)
+            self.JointSettingContainer.layout().addWidget(self.joint_widgets[joint.name], row, column)
 
     def create_joint_plot_widget(self, joint):
         joint_setting_file = os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'), 'resource',
@@ -185,14 +141,14 @@ class GaitGeneratorView(Plugin):
         self.heel_distance_line_edit.setText('%.3f' % math.sqrt(trans_left[0] ** 2 + trans_left[2] ** 2))
 
     def message(self, title=None, msg=None):
-        QMessageBox.question(self._widget, title, msg, QMessageBox.Ok)
+        QMessageBox.question(self, title, msg, QMessageBox.Ok)
 
     def yes_no_question(self, title=None, msg=None):
-        answer = QMessageBox.question(self._widget, title, msg, QMessageBox.Yes | QMessageBox.No)
+        answer = QMessageBox.question(self, title, msg, QMessageBox.Yes | QMessageBox.No)
         return answer == QMessageBox.Yes
 
     def open_file_dialogue(self):
-        return QFileDialog.getOpenFileName(self._widget,
+        return QFileDialog.getOpenFileName(self,
                                            'Open Image',
                                            os.getenv('HOME') + '/march_ws/src/gait-files/march_gait_files',
                                            'March Subgait (*.subgait)')
@@ -221,8 +177,6 @@ class GaitGeneratorView(Plugin):
             table.controller.update_setpoints(joint)
             table.blockSignals(False)
 
-    def shutdown_plugin(self):
-        self.controller.stop_time_slider_thread()
 
     @staticmethod
     def notify(title, message):
@@ -235,11 +189,3 @@ class GaitGeneratorView(Plugin):
     @staticmethod
     def create_time_slider_thread(current, playback_speed, max_time):
         return TimeSliderThread(current, playback_speed, max_time)
-
-    def publish_gait(self, trajectory):
-        rospy.loginfo('Publishing trajectory to topic ' + self.topic_name)
-        self.gait_publisher.publish(trajectory)
-
-    def set_topic_name(self, topic_name):
-        self.topic_name = topic_name
-        self.gait_publisher = rospy.Publisher(topic_name, JointTrajectory, queue_size=10)

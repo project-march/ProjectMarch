@@ -1,5 +1,5 @@
 <library path="src">
-    <class name="GaitGeneratorView" type="march_rqt_gait_generator.gait_generator_view.GaitGeneratorView" base_class_type="rqt_gui_py::Plugin">
+    <class name="GaitGeneratorPlugin" type="march_rqt_gait_generator.gait_generator_plugin.GaitGeneratorPlugin" base_class_type="rqt_gui_py::Plugin">
         <description>
             RQT plugin to create and visualize gaits.
         </description>
