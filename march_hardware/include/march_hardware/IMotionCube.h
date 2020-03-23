@@ -58,11 +58,11 @@ public:
 
   void setControlWord(uint16_t control_word);
 
-  void actuateRad(double target_rad);
-  void actuateTorque(int16_t target_torque);
+  virtual void actuateRad(double target_rad);
+  virtual void actuateTorque(int16_t target_torque);
 
   void goToTargetState(IMotionCubeTargetState target_state);
-  void goToOperationEnabled();
+  virtual void goToOperationEnabled();
 
   /** @brief Override comparison operator */
   friend bool operator==(const IMotionCube& lhs, const IMotionCube& rhs)

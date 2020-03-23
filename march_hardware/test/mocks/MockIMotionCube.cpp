@@ -15,5 +15,10 @@ public:
                   march::ActuationMode::unknown)
   {
   }
-  MOCK_METHOD0(getAngle, float());
+
+  MOCK_METHOD1(writeInitialSDOs, void(int));
+  MOCK_METHOD0(goToOperationEnabled, void());
+
+  MOCK_METHOD1(actuateRad, void(double));
+  MOCK_METHOD1(actuateTorque, void(int16_t));
 };

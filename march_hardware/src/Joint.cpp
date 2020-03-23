@@ -12,17 +12,12 @@
 
 namespace march
 {
-Joint::Joint(std::string name, int net_number)
-  : name_(std::move(name))
-  , net_number_(net_number)
+Joint::Joint(std::string name, int net_number) : name_(std::move(name)), net_number_(net_number)
 {
 }
 
 Joint::Joint(std::string name, int net_number, bool allow_actuation, std::unique_ptr<IMotionCube> imc)
-  : name_(std::move(name))
-  , net_number_(net_number)
-  , allow_actuation_(allow_actuation)
-  , imc_(std::move(imc))
+  : name_(std::move(name)), net_number_(net_number), allow_actuation_(allow_actuation), imc_(std::move(imc))
 {
 }
 
@@ -50,7 +45,7 @@ void Joint::initialize(int cycle_time)
 
 void Joint::prepareActuation()
 {
-  if (!this->allow_actuation_)
+  if (!this->canActuate())
   {
     throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE, "Failed to prepare joint %s for actuation",
                                    this->name_.c_str());
@@ -62,7 +57,7 @@ void Joint::prepareActuation()
 
 void Joint::actuateRad(double target_position)
 {
-  if (!this->allow_actuation_)
+  if (!this->canActuate())
   {
     throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE, "Joint %s is not allowed to actuate",
                                    this->name_.c_str());
@@ -102,7 +97,7 @@ double Joint::getAngleRadMostPrecise()
 
 void Joint::actuateTorque(int16_t target_torque)
 {
-  if (!this->allow_actuation_)
+  if (!this->canActuate())
   {
     throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE, "Joint %s is not allowed to actuate",
                                    this->name_.c_str());
@@ -145,7 +140,7 @@ float Joint::getTemperature()
   if (!this->hasTemperatureGES())
   {
     ROS_WARN("[%s] Has no temperature sensor", this->name_.c_str());
-    return -1;
+    return -1.0;
   }
   return this->temperature_ges_->getTemperature();
 }
@@ -219,7 +214,7 @@ bool Joint::hasTemperatureGES() const
 
 bool Joint::canActuate() const
 {
-  return this->allow_actuation_;
+  return this->allow_actuation_ && this->hasIMotionCube();
 }
 
 ActuationMode Joint::getActuationMode() const
