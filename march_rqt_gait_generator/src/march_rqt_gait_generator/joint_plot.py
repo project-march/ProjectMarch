@@ -4,12 +4,13 @@ from PyQt5.QtCore import pyqtSignal
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore
 
+from .model.modifiable_setpoint import ModifiableSetpoint
 
 # Enable antialiasing for prettier plots
 pg.setConfigOptions(antialias=True)
 
 
-class JointSettingPlot(pg.PlotItem):
+class JointPlot(pg.PlotItem):
     # Custom signals
 
     # time, position, button_pressed
@@ -18,7 +19,7 @@ class JointSettingPlot(pg.PlotItem):
     # index
     remove_setpoint = pyqtSignal(int)
 
-    def __init__(self, joint, duration, show_velocity_plot=False, show_effort_plot=False):
+    def __init__(self, joint, show_velocity_plot=False, show_effort_plot=False):
         pg.PlotItem.__init__(self)
 
         self.dragPoint = None
@@ -39,28 +40,29 @@ class JointSettingPlot(pg.PlotItem):
         self.lower_limit = math.degrees(self.limits.lower)
         self.upper_limit = math.degrees(self.limits.upper)
 
-        self.duration = duration
+        self.duration = joint.duration
         self.joint = joint
 
         self.create_plots(joint)
 
         self.setTitle(joint.name)
 
+        self.setXRange(-0.1, self.duration + 0.1, padding=0)
         self.setYRange(self.lower_limit - 0.1, self.upper_limit + 0.1, padding=0)
         middle_y = (self.upper_limit + self.lower_limit) / 2
         self.zero_line = self.addLine(y=middle_y)
         limit_pen = pg.mkPen(color='r', style=QtCore.Qt.DotLine)
         self.addLine(y=self.lower_limit, pen=limit_pen)
         self.addLine(y=self.upper_limit, pen=limit_pen)
-        self.setXRange(-0.1, self.duration + 0.1, padding=0)
+
+        time_pen = pg.mkPen(color='y', style=QtCore.Qt.DotLine)
+        self.time_line = self.addLine(0, pen=time_pen, bounds=(0, self.duration))
+
         self.setMouseEnabled(False, False)
         self.setMenuEnabled(False)
         self.hideButtons()
 
-        self.update_set_points(joint, show_velocity_plot, show_effort_plot)
-
-        time_pen = pg.mkPen(color='y', style=QtCore.Qt.DotLine)
-        self.time_line = self.addLine(0, pen=time_pen, bounds=(0, self.duration))
+        self.update_setpoints(joint, show_velocity_plot, show_effort_plot)
 
     def create_velocity_markers(self, setpoints, display=False):
         # Remove old sliders
@@ -99,8 +101,22 @@ class JointSettingPlot(pg.PlotItem):
         self.plot_min_effort = self.plot(pen=pg.mkPen(color='r'))
         self.plot_max_effort = self.plot(pen=pg.mkPen(color='r'))
 
-    def update_set_points(self, joint, show_velocity_plot=False, show_effort_plot=False):
+    def to_setpoints(self):
+        plot_data = self.plot_item.getData()
+        setpoints = []
+        for i in range(0, len(plot_data[0])):
+            velocity = self.velocities[i]
+            time = plot_data[0][i]
+            position = math.radians(plot_data[1][i])
+            setpoints.append(ModifiableSetpoint(time, position, velocity))
+        return setpoints
+
+    def update_setpoints(self, joint, show_velocity_plot=False, show_effort_plot=False):
         time, position, velocity = joint.get_setpoints_unzipped()
+
+        self.duration = joint.duration
+        self.setXRange(-0.01 * self.duration, 1.01 * self.duration, padding=0)
+        self.time_line.setBounds((0, self.duration))
 
         for i in range(0, len(position)):
             position[i] = math.degrees(position[i])

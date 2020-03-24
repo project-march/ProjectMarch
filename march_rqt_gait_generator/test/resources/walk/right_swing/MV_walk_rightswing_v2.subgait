@@ -1,5 +1,5 @@
-name: ''
-version: ''
+name: "right_swing"
+version: "MV_walk_rightswing_v2"
 description: "The MIV walking gait, but with a somewhat faster swing."
 gait_type: "walk_like"
 setpoints: 
@@ -70,7 +70,7 @@ trajectory:
         nsecs:         0
     - 
       positions: [0.0, -0.0138, 0.4609, 0.0436, 0.0, 0.1956, 0.2094, 0.0436]
-      velocities: [0.0, 1.2357, 2.3539, -0.0, 0.0, -0.5022, 0.0, -0.0]
+      velocities: [0.0, 1.2524, 2.364, 0.0, 0.0, -0.5047, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
@@ -78,7 +78,7 @@ trajectory:
         nsecs: 220000000
     - 
       positions: [0.0, 0.2555, 0.8406, 0.0436, 0.0, 0.0928, 0.1899, 0.0436]
-      velocities: [0.0, 1.4092, 1.1265, -0.0, 0.0, -0.5537, -0.1775, -0.0]
+      velocities: [0.0, 1.4012, 1.0503, 0.0, 0.0, -0.5539, -0.1799, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
@@ -86,7 +86,7 @@ trajectory:
         nsecs: 412500000
     - 
       positions: [0.0, 0.3236, 0.8727, 0.0436, 0.0, 0.0648, 0.1804, 0.0436]
-      velocities: [0.0, 1.2994, 0.0, 0.0, 0.0, -0.5527, -0.1948, 0.0]
+      velocities: [0.0, 1.285, 0.0, 0.0, 0.0, -0.5523, -0.1958, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
@@ -94,7 +94,7 @@ trajectory:
         nsecs: 462000000
     - 
       positions: [0.0, 0.425, 0.8213, 0.0436, 0.0, 0.0153, 0.1626, 0.0436]
-      velocities: [0.0, 0.9386, -1.1086, -0.0, 0.0, -0.5358, -0.1894, -0.0]
+      velocities: [0.0, 0.9125, -1.1675, 0.0, 0.0, -0.5343, -0.1877, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
@@ -102,7 +102,7 @@ trajectory:
         nsecs: 550000000
     - 
       positions: [0.0, 0.4887, 0.6355, 0.0436, 0.0, -0.0416, 0.1452, 0.0436]
-      velocities: [0.0, 0.1396, -2.0254, 0.0, 0.0, -0.4887, -0.119, 0.0]
+      velocities: [0.0, 0.1396, -2.0489, 0.0, 0.0, -0.4858, -0.1142, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
@@ -110,7 +110,7 @@ trajectory:
         nsecs: 660000000
     - 
       positions: [0.0, 0.481, 0.4391, 0.0436, 0.0, -0.083, 0.1396, 0.0436]
-      velocities: [0.0, -0.27, -2.1959, 0.0, 0.0, -0.4284, 0.0, 0.0]
+      velocities: [0.0, -0.2906, -2.1903, 0.0, 0.0, -0.4245, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
@@ -118,7 +118,7 @@ trajectory:
         nsecs: 748000000
     - 
       positions: [0.0, 0.3445, 0.0969, 0.0436, 0.0, -0.1573, 0.1396, 0.0436]
-      velocities: [0.0, -0.6295, 0.0, -0.0, 0.0, -0.172, 0.0, -0.0]
+      velocities: [0.0, -0.6235, 0.0, 0.0, 0.0, -0.1652, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 

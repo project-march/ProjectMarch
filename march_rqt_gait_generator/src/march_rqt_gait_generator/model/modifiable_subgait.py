@@ -73,11 +73,23 @@ class ModifiableSubgait(Subgait):
             if key_1 in joint.name and key_2 in joint.name:
                 rospy.loginfo('Both keys exist in joint %s', joint.name)
                 return False
+
             if key_1 in joint.name:
                 joint_1 = joint
-                joint_2 = self.get_joint(joint.name.replace(key_1, key_2))
+                joint_2_name = joint.name.replace(key_1, key_2)
+
+                if joint_2_name not in self.get_joint_names():
+                    rospy.loginfo('joint %s does not exist', joint_2_name)
+                    return False
+                joint_2 = self.get_joint(joint_2_name)
+
             elif key_2 in joint.name:
-                joint_1 = self.get_joint(joint.name.replace(key_2, key_1))
+                joint_1_name = joint.name.replace(key_2, key_1)
+                if joint_1_name not in self.get_joint_names():
+                    rospy.loginfo('joint %s does not exist', joint_1_name)
+                    return False
+                joint_1 = self.get_joint(joint_1_name)
+
                 joint_2 = joint
             else:
                 continue
@@ -103,12 +115,19 @@ class ModifiableSubgait(Subgait):
             return False
 
         if key_1 in self.subgait_name:
-            mirrored_subgait_name = self.subgait_name.replace(key_1, key_2)
+            mirrored_subgait_name = str(self.subgait_name.replace(key_1, key_2))
         elif key_2 in self.subgait_name:
-            mirrored_subgait_name = self.subgait_name.replace(key_2, key_1)
+            mirrored_subgait_name = str(self.subgait_name.replace(key_2, key_1))
         else:
             rospy.logerr('This case should have been caught by can_mirror()')
             return False
+
+        if key_1 in self.version:
+            mirrored_version = str(self.version.replace(key_1, key_2))
+        elif key_2 in self.version:
+            mirrored_version = str(self.version.replace(key_2, key_1))
+        else:
+            mirrored_version = self.version
 
         mirrored_joints = []
         for joint in self.joints:
@@ -123,7 +142,7 @@ class ModifiableSubgait(Subgait):
             mirrored_joints.append(mirrored_joint)
 
         return ModifiableSubgait(mirrored_joints, self.duration, self.gait_type, self.gait_name, mirrored_subgait_name,
-                                 self.version, self.description)
+                                 mirrored_version, self.description)
 
     def set_gait_type(self, gait_type):
         self.gait_type = str(gait_type)

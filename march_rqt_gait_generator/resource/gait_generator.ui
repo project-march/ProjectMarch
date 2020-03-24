@@ -42,7 +42,7 @@
        </widget>
       </item>
       <item row="2" column="6">
-       <widget class="QLineEdit" name="Description"/>
+       <widget class="QLineEdit" name="description_line_edit"/>
       </item>
       <item row="0" column="7">
        <widget class="QLabel" name="DurationLabel">
@@ -66,7 +66,7 @@
        </widget>
       </item>
       <item row="2" column="3">
-       <widget class="QLineEdit" name="Version">
+       <widget class="QLineEdit" name="version_name_line_edit">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -76,7 +76,7 @@
        </widget>
       </item>
       <item row="2" column="9">
-       <widget class="QCheckBox" name="ScaleSetpoints">
+       <widget class="QCheckBox" name="scale_setpoints_check_box">
         <property name="toolTip">
          <string>Scale the setpoints based on their relative time when adjusting the duration.</string>
         </property>
@@ -86,7 +86,7 @@
        </widget>
       </item>
       <item row="2" column="7">
-       <widget class="QDoubleSpinBox" name="Duration">
+       <widget class="QDoubleSpinBox" name="duration_spin_box">
         <property name="buttonSymbols">
          <enum>QAbstractSpinBox::NoButtons</enum>
         </property>
@@ -99,7 +99,7 @@
        </widget>
       </item>
       <item row="2" column="2">
-       <widget class="QLineEdit" name="Subgait"/>
+       <widget class="QLineEdit" name="subgait_name_line_edit"/>
       </item>
       <item row="0" column="2">
        <widget class="QLabel" name="SubgaitLabel">
@@ -109,7 +109,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLineEdit" name="Gait">
+       <widget class="QLineEdit" name="gait_name_line_edit">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -126,7 +126,7 @@
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QComboBox" name="GaitType"/>
+       <widget class="QComboBox" name="gait_type_combo_box"/>
       </item>
      </layout>
     </widget>
@@ -153,7 +153,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
       <item row="7" column="2" colspan="4">
-       <widget class="QLineEdit" name="TopicName">
+       <widget class="QLineEdit" name="topic_name_line_edit">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -166,21 +166,21 @@
        </widget>
       </item>
       <item row="2" column="3" colspan="3">
-       <widget class="QPushButton" name="Export">
+       <widget class="QPushButton" name="export_gait_button">
         <property name="text">
          <string>Export Gait</string>
         </property>
        </widget>
       </item>
       <item row="2" column="2">
-       <widget class="QCheckBox" name="Mirror">
+       <widget class="QCheckBox" name="mirror_check_box">
         <property name="text">
          <string>Mirror</string>
         </property>
        </widget>
       </item>
       <item row="8" column="1" colspan="5">
-       <widget class="QPushButton" name="Publish">
+       <widget class="QPushButton" name="publish_gait_button">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -193,7 +193,7 @@
        </widget>
       </item>
       <item row="1" column="3" colspan="3">
-       <widget class="QPushButton" name="Import">
+       <widget class="QPushButton" name="import_gait_button">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -206,7 +206,7 @@
        </widget>
       </item>
       <item row="1" column="2">
-       <widget class="QPushButton" name="ChangeGaitDirectory">
+       <widget class="QPushButton" name="change_gait_directory_button">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -233,7 +233,7 @@ Text-align: right
        </widget>
       </item>
       <item row="3" column="2">
-       <widget class="QLineEdit" name="Key1">
+       <widget class="QLineEdit" name="mirror_key1_line_edit">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -243,7 +243,7 @@ Text-align: right
        </widget>
       </item>
       <item row="3" column="4">
-       <widget class="QLineEdit" name="Key2">
+       <widget class="QLineEdit" name="mirror_key2_line_edit">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -253,14 +253,14 @@ Text-align: right
        </widget>
       </item>
       <item row="0" column="2">
-       <widget class="QCheckBox" name="ShowVelocityPlot">
+       <widget class="QCheckBox" name="velocity_plot_check_box">
         <property name="text">
          <string>Velocity Plot</string>
         </property>
        </widget>
       </item>
       <item row="0" column="4">
-       <widget class="QCheckBox" name="ShowEffortPlot">
+       <widget class="QCheckBox" name="effort_plot_check_box">
         <property name="text">
          <string>Effort Plot</string>
         </property>
@@ -310,35 +310,35 @@ Text-align: right
        </widget>
       </item>
       <item row="3" column="2">
-       <widget class="QPushButton" name="Stop">
+       <widget class="QPushButton" name="stop_button">
         <property name="text">
          <string>Stop</string>
         </property>
        </widget>
       </item>
       <item row="2" column="0" colspan="3">
-       <widget class="QSlider" name="TimeSlider">
+       <widget class="QSlider" name="time_slider">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QPushButton" name="Start">
+       <widget class="QPushButton" name="start_button">
         <property name="text">
          <string>Start</string>
         </property>
        </widget>
       </item>
       <item row="4" column="2">
-       <widget class="QPushButton" name="Redo">
+       <widget class="QPushButton" name="redo_button">
         <property name="text">
          <string>Redo</string>
         </property>
        </widget>
       </item>
       <item row="4" column="1">
-       <widget class="QPushButton" name="Undo">
+       <widget class="QPushButton" name="undo_button">
         <property name="text">
          <string>Undo</string>
         </property>
@@ -352,7 +352,7 @@ Text-align: right
        </widget>
       </item>
       <item row="3" column="0">
-       <widget class="QSpinBox" name="PlaybackSpeed">
+       <widget class="QSpinBox" name="playback_speed_spin_box">
         <property name="maximum">
          <number>500</number>
         </property>
@@ -362,21 +362,21 @@ Text-align: right
        </widget>
       </item>
       <item row="6" column="0">
-       <widget class="QLineEdit" name="HeightLeft">
+       <widget class="QLineEdit" name="height_left_line_edit">
         <property name="readOnly">
          <bool>true</bool>
         </property>
        </widget>
       </item>
       <item row="5" column="2">
-       <widget class="QLabel" name="HeelHeelDistanceLabel">
+       <widget class="QLabel" name="heel_distance_lable">
         <property name="text">
          <string>Heel-heel distance</string>
         </property>
        </widget>
       </item>
       <item row="6" column="1">
-       <widget class="QLineEdit" name="HeightRight">
+       <widget class="QLineEdit" name="height_right_line_edit">
         <property name="readOnly">
          <bool>true</bool>
         </property>
@@ -397,14 +397,14 @@ Text-align: right
        </widget>
       </item>
       <item row="6" column="2">
-       <widget class="QLineEdit" name="HeelHeelDistance">
+       <widget class="QLineEdit" name="heel_distance_line_edit">
         <property name="readOnly">
          <bool>true</bool>
         </property>
        </widget>
       </item>
       <item row="4" column="0">
-       <widget class="QPushButton" name="Invert">
+       <widget class="QPushButton" name="invert_button">
         <property name="text">
          <string>Invert gait</string>
         </property>
