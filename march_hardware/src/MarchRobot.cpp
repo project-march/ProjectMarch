@@ -136,14 +136,9 @@ bool MarchRobot::isEthercatOperational()
   return ethercatMaster.isOperational();
 }
 
-bool MarchRobot::getTrainReturned()
+void MarchRobot::waitForPdo()
 {
-  return this->ethercatMaster.getTrainReturned();
-}
-
-void MarchRobot::setTrainReturned(bool train_returned)
-{
-  return this->ethercatMaster.setTrainReturned(train_returned);
+  this->ethercatMaster.waitForPdo();
 }
 
 int MarchRobot::getEthercatCycleTime() const

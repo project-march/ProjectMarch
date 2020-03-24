@@ -68,8 +68,7 @@ public:
    */
   int getEthercatCycleTime() const;
 
-  bool getTrainReturned();
-  void setTrainReturned(bool train_returned);
+  void waitForPdo();
 
 private:
   /**

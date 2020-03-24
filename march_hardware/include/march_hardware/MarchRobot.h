@@ -50,8 +50,7 @@ public:
 
   bool isEthercatOperational();
 
-  bool getTrainReturned();
-  void setTrainReturned(bool train_returned);
+  void waitForPdo();
 
   int getEthercatCycleTime() const;
 

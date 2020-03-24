@@ -192,14 +192,9 @@ void MarchHardwareInterface::validate()
   }
 }
 
-bool MarchHardwareInterface::getTrainReturned()
+void MarchHardwareInterface::waitForPdo()
 {
-  return this->march_robot_->getTrainReturned();
-}
-
-void MarchHardwareInterface::setTrainReturned(bool train_returned)
-{
-  return this->march_robot_->setTrainReturned(train_returned);
+  this->march_robot_->waitForPdo();
 }
 
 void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Duration& elapsed_time)

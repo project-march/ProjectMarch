@@ -49,18 +49,19 @@ int main(int argc, char** argv)
 
   while (ros::ok())
   {
-    const ros::Time now = ros::Time::now();
     try
     {
-      if (march.getTrainReturned())
-      {
-        march.setTrainReturned(false);
-        march.read(now, now - last_update_time);
-        last_update_time = now;
-        march.validate();
-        controller_manager.update(now, rate.expectedCycleTime());
-        march.write(now, rate.expectedCycleTime());
-      }
+      march.waitForPdo();
+
+      const ros::Time now = ros::Time::now();
+      ros::Duration elapsed_time = now - last_update_time;
+      last_update_time = now;
+
+      march.read(now, elapsed_time);
+      march.validate();
+      controller_manager.update(now, elapsed_time);
+      march.write(now, elapsed_time);
+
       rate.sleep();
     }
     catch (const std::exception& e)
