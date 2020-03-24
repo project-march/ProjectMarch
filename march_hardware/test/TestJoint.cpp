@@ -68,6 +68,28 @@ TEST_F(JointTest, DisableActuation)
   ASSERT_FALSE(joint.canActuate());
 }
 
+TEST_F(JointTest, SetAllowActuation)
+{
+  march::Joint joint("test", 0, false, std::move(this->imc));
+  ASSERT_FALSE(joint.canActuate());
+  joint.setAllowActuation(true);
+  ASSERT_TRUE(joint.canActuate());
+}
+
+TEST_F(JointTest, GetName)
+{
+  const std::string expected_name = "test";
+  march::Joint joint(expected_name, 0, false, std::move(this->imc));
+  ASSERT_EQ(expected_name, joint.getName());
+}
+
+TEST_F(JointTest, GetNetNumber)
+{
+  const int expected_net_number = 2;
+  march::Joint joint("test", expected_net_number, false, std::move(this->imc));
+  ASSERT_EQ(expected_net_number, joint.getNetNumber());
+}
+
 TEST_F(JointTest, ActuatePositionDisableActuation)
 {
   march::Joint joint("actuate_false", 0, false, std::move(this->imc));

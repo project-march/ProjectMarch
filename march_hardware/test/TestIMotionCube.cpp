@@ -6,6 +6,7 @@
 #include <march_hardware/error/hardware_exception.h>
 
 #include <memory>
+#include <stdexcept>
 #include <utility>
 
 #include <gtest/gtest.h>
@@ -22,6 +23,18 @@ protected:
   std::unique_ptr<MockAbsoluteEncoder> mock_absolute_encoder;
   std::unique_ptr<MockIncrementalEncoder> mock_incremental_encoder;
 };
+
+TEST_F(IMotionCubeTest, NoAbsoluteEncoder)
+{
+  ASSERT_THROW(march::IMotionCube(1, nullptr, std::move(this->mock_incremental_encoder), march::ActuationMode::unknown),
+               std::invalid_argument);
+}
+
+TEST_F(IMotionCubeTest, NoIncrementalEncoder)
+{
+  ASSERT_THROW(march::IMotionCube(1, std::move(this->mock_absolute_encoder), nullptr, march::ActuationMode::unknown),
+               std::invalid_argument);
+}
 
 TEST_F(IMotionCubeTest, SlaveIndexOne)
 {
