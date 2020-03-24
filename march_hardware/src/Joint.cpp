@@ -199,6 +199,15 @@ bool Joint::canActuate()
   return this->allowActuation;
 }
 
+bool Joint::receivedDataUpdate()
+{
+  // We assume that the motor voltage cannot remain precisely constant.
+  float new_motor_volt = this->iMotionCube.getMotorVoltage();
+  bool data_updated = (new_motor_volt != this->previous_motor_volt_);
+  this->previous_motor_volt_ = new_motor_volt;
+  return data_updated;
+}
+
 void Joint::setNetNumber(int netNumber)
 {
   Joint::netNumber = netNumber;
