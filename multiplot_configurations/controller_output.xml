@@ -69,7 +69,7 @@
                                 <steps_invert>false</steps_invert>
                                 <sticks_baseline>0</sticks_baseline>
                                 <sticks_orientation>2</sticks_orientation>
-                                <type>3</type>
+                                <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
                             <title>left_ankle</title>
@@ -120,7 +120,7 @@
                                 <steps_invert>false</steps_invert>
                                 <sticks_baseline>0</sticks_baseline>
                                 <sticks_orientation>2</sticks_orientation>
-                                <type>3</type>
+                                <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
                             <title>left_hip_aa</title>
@@ -171,7 +171,7 @@
                                 <steps_invert>false</steps_invert>
                                 <sticks_baseline>0</sticks_baseline>
                                 <sticks_orientation>2</sticks_orientation>
-                                <type>3</type>
+                                <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
                             <title>left_hip_fe</title>
@@ -222,7 +222,7 @@
                                 <steps_invert>false</steps_invert>
                                 <sticks_baseline>0</sticks_baseline>
                                 <sticks_orientation>2</sticks_orientation>
-                                <type>3</type>
+                                <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
                             <title>left_knee</title>
@@ -273,7 +273,7 @@
                                 <steps_invert>false</steps_invert>
                                 <sticks_baseline>0</sticks_baseline>
                                 <sticks_orientation>2</sticks_orientation>
-                                <type>3</type>
+                                <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
                             <title>right_ankle</title>
@@ -324,7 +324,7 @@
                                 <steps_invert>false</steps_invert>
                                 <sticks_baseline>0</sticks_baseline>
                                 <sticks_orientation>2</sticks_orientation>
-                                <type>3</type>
+                                <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
                             <title>right_hip_aa</title>
@@ -375,7 +375,7 @@
                                 <steps_invert>false</steps_invert>
                                 <sticks_baseline>0</sticks_baseline>
                                 <sticks_orientation>2</sticks_orientation>
-                                <type>3</type>
+                                <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
                             <title>right_hip_fe</title>
@@ -426,7 +426,7 @@
                                 <steps_invert>false</steps_invert>
                                 <sticks_baseline>0</sticks_baseline>
                                 <sticks_orientation>2</sticks_orientation>
-                                <type>3</type>
+                                <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
                             <title>right_knee</title>
@@ -502,7 +502,7 @@
                                 <steps_invert>false</steps_invert>
                                 <sticks_baseline>0</sticks_baseline>
                                 <sticks_orientation>2</sticks_orientation>
-                                <type>3</type>
+                                <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
                             <title>left_ankle</title>
@@ -553,7 +553,7 @@
                                 <steps_invert>false</steps_invert>
                                 <sticks_baseline>0</sticks_baseline>
                                 <sticks_orientation>2</sticks_orientation>
-                                <type>3</type>
+                                <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
                             <title>left_hip_aa</title>
@@ -604,7 +604,7 @@
                                 <steps_invert>false</steps_invert>
                                 <sticks_baseline>0</sticks_baseline>
                                 <sticks_orientation>2</sticks_orientation>
-                                <type>3</type>
+                                <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
                             <title>left_hip_fe</title>
@@ -655,7 +655,7 @@
                                 <steps_invert>false</steps_invert>
                                 <sticks_baseline>0</sticks_baseline>
                                 <sticks_orientation>2</sticks_orientation>
-                                <type>3</type>
+                                <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
                             <title>left_knee</title>
@@ -706,7 +706,7 @@
                                 <steps_invert>false</steps_invert>
                                 <sticks_baseline>0</sticks_baseline>
                                 <sticks_orientation>2</sticks_orientation>
-                                <type>3</type>
+                                <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
                             <title>right_ankle</title>
@@ -757,7 +757,7 @@
                                 <steps_invert>false</steps_invert>
                                 <sticks_baseline>0</sticks_baseline>
                                 <sticks_orientation>2</sticks_orientation>
-                                <type>3</type>
+                                <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
                             <title>right_hip_aa</title>
@@ -808,7 +808,7 @@
                                 <steps_invert>false</steps_invert>
                                 <sticks_baseline>0</sticks_baseline>
                                 <sticks_orientation>2</sticks_orientation>
-                                <type>3</type>
+                                <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
                             <title>right_hip_fe</title>
@@ -859,7 +859,7 @@
                                 <steps_invert>false</steps_invert>
                                 <sticks_baseline>0</sticks_baseline>
                                 <sticks_orientation>2</sticks_orientation>
-                                <type>3</type>
+                                <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
                             <title>right_knee</title>

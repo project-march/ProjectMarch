@@ -32,8 +32,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-60</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/temperature/left_ankle</topic>
                                     <type>sensor_msgs/Temperature</type>
@@ -83,8 +83,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-60</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/temperature/left_hip_aa</topic>
                                     <type>sensor_msgs/Temperature</type>
@@ -134,8 +134,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-60</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/temperature/left_hip_fe</topic>
                                     <type>sensor_msgs/Temperature</type>
@@ -185,8 +185,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-60</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/temperature/left_knee</topic>
                                     <type>sensor_msgs/Temperature</type>
@@ -236,8 +236,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-60</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/temperature/right_ankle</topic>
                                     <type>sensor_msgs/Temperature</type>
@@ -287,8 +287,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-60</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/temperature/right_hip_aa</topic>
                                     <type>sensor_msgs/Temperature</type>
@@ -338,8 +338,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-60</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/temperature/right_hip_fe</topic>
                                     <type>sensor_msgs/Temperature</type>
@@ -389,8 +389,8 @@
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
+                                        <relative_minimum>-60</relative_minimum>
+                                        <type>2</type>
                                     </scale>
                                     <topic>/march/temperature/right_knee</topic>
                                     <type>sensor_msgs/Temperature</type>

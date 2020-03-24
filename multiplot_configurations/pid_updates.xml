@@ -46,7 +46,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_ankle/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -97,7 +97,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_ankle/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -148,7 +148,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>500</relative_maximum>
                                         <relative_minimum>0</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_hip_aa/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -199,7 +199,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_hip_fe/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -250,7 +250,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_knee/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -301,7 +301,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_ankle/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -352,7 +352,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_hip_aa/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -403,7 +403,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_hip_fe/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -454,7 +454,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_knee/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -530,7 +530,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_ankle/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -581,7 +581,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_ankle/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -632,7 +632,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>500</relative_maximum>
                                         <relative_minimum>0</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_hip_aa/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -683,7 +683,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_hip_fe/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -734,7 +734,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_knee/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -785,7 +785,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_ankle/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -836,7 +836,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_hip_aa/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -887,7 +887,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_hip_fe/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -938,7 +938,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_knee/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -1014,7 +1014,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_ankle/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -1065,7 +1065,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_ankle/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -1116,7 +1116,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>500</relative_maximum>
                                         <relative_minimum>0</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_hip_aa/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -1167,7 +1167,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_hip_fe/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -1218,7 +1218,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/left_knee/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -1269,7 +1269,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_ankle/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -1320,7 +1320,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_hip_aa/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -1371,7 +1371,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_hip_fe/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
@@ -1422,7 +1422,7 @@
                                         <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
-                                        <type>1</type>
+                                        <type>0</type>
                                     </scale>
                                     <topic>/march/controller/trajectory/gains/right_knee/parameter_updates</topic>
                                     <type>dynamic_reconfigure/Config</type>
