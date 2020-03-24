@@ -43,7 +43,7 @@ When adding a software check for the first time, make sure to take a look at exi
 
 Add it to the UI
 ~~~~~~~~~~~~~~~~
-- Open :march:`software_check.ui <march_launch/resource/software_check.ui>` in Qt designer/creator.
+- Open :monitor:`software_check.ui <march_rqt_software_check/resource/software_check.ui>` in Qt designer/creator.
 - Add another button following the steps below:
 
 .. figure:: images/adding-a-check.gif
@@ -55,7 +55,9 @@ Creating your software check
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - Create a new class that extends from the type of check you want to create.
-- Make sure to closely inspect the :march:`SoftwareCheck<march_launch/src/march_launch/checks/software_check.py>` base class and the :march:`LaunchCheck <march_launch/src/march_launch/checks/software_check.py>` derived class to see the available methods.
+- Make sure to closely inspect the :monitor:`SoftwareCheck <march_rqt_software_check/src/march_rqt_software_check/checks/software_check.py>`
+  base class and the :monitor:`LaunchCheck <march_rqt_software_check/src/march_rqt_software_check/checks/software_check.py>`
+  derived class to see the available methods.
 - Make sure your check calls ``self.launch()`` if it extends the ``LaunchCheck``
 - Perform your check.
 - Set ``self.done`` and ``self.passed`` accordingly during your check.
@@ -63,8 +65,8 @@ Creating your software check
 
 Add it to the CheckRunner
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-- Add an instance of your check to :march:`CheckRunner.checks <march_launch/src/march_launch/check_runner.py>`.
-- Connect your check with the UI button in :march:`software_check.__init__() <march_launch/src/march_launch/software_check.py>`.
+- Add an instance of your check to :monitor:`CheckRunner.checks <march_rqt_software_check/src/march_rqt_software_check/check_runner.py>`.
+- Connect your check with the UI button in :monitor:`software_check.__init__() <march_rqt_software_check/src/march_rqt_software_check/software_check.py>`.
 
 Creating the executable (optional)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -75,7 +77,7 @@ and :hardware-interface:`CMakeLists.txt <march_hardware/CMakeLists.txt>`.
 Notice how the result is uploaded to ``/check/slave_count``.
 
 When running an executable from another package, it is often preferable to create a launch file in the march_launch package that starts that executable, possibly even on the exoskeleton instead of locally.
-An example can be found in :march:`slave_count.launch <march_launch/launch/checks/slave_count.launch>`.
+An example can be found in :monitor:`slave_count.launch <march_rqt_software_check/launch/checks/slave_count.launch>`.
 
 FAQ
 ---
@@ -88,4 +90,4 @@ The easiest way is to launch the software check plugin and look at which buttons
 
   roslaunch march_launch march_rqt_software_check
 
-Or take a look at the :march:`CheckRunner source code<march_launch/src/march_launch/check_runner.py>`.
+Or take a look at the :monitor:`CheckRunner source code<march_rqt_software_check/src/march_rqt_software_check/check_runner.py>`.
