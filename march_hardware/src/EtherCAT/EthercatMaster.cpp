@@ -46,7 +46,6 @@ void EthercatMaster::waitForPdo()
   std::unique_lock<std::mutex> lock(this->wait_on_pdo_condition_mutex_);
   this->wait_on_pdo_condition_var_.wait(lock, [&] { return this->pdo_received_; });
   this->pdo_received_ = false;
-  lock.unlock();
 }
 
 void EthercatMaster::start(std::vector<Joint>& joints)
@@ -158,7 +157,6 @@ void EthercatMaster::ethercatLoop()
   {
     const auto begin_time = std::chrono::high_resolution_clock::now();
 
-    this->sendReceivePdo();
     monitorSlaveConnection();
 
     const auto end_time = std::chrono::high_resolution_clock::now();
@@ -170,8 +168,10 @@ void EthercatMaster::ethercatLoop()
     }
     else
     {
-      std::lock_guard<std::mutex> lock(this->wait_on_pdo_condition_mutex_);
-      this->pdo_received_ = true;
+      {
+        std::lock_guard<std::mutex> lock(this->wait_on_pdo_condition_mutex_);
+        this->pdo_received_ = true;
+      }
       this->wait_on_pdo_condition_var_.notify_one();
       std::this_thread::sleep_for(cycle_time - duration);
     }
