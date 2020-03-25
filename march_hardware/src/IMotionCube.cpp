@@ -133,7 +133,7 @@ void IMotionCube::actuateIU(int32_t target_iu)
   if (!this->absolute_encoder_->isValidTargetIU(this->getAngleIUAbsolute(), target_iu))
   {
     throw error::HardwareException(error::ErrorType::INVALID_ACTUATE_POSITION,
-                                   "Position %i is invalid for slave %d. (%d, %d)", target_iu, this->slaveIndex,
+                                   "Position %d is invalid for slave %d. (%d, %d)", target_iu, this->slaveIndex,
                                    this->absolute_encoder_->getLowerSoftLimitIU(),
                                    this->absolute_encoder_->getUpperSoftLimitIU());
   }

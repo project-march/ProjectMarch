@@ -97,7 +97,7 @@ private:
 
   // Use of smart pointers are necessary here to make dependency injection
   // possible and thus allow for mocking the encoders. A unique pointer is
-  // is chosen since the IMotionCube should be the owner and the encoders
+  // chosen since the IMotionCube should be the owner and the encoders
   // do not need to be passed around.
   std::unique_ptr<AbsoluteEncoder> absolute_encoder_;
   std::unique_ptr<IncrementalEncoder> incremental_encoder_;
