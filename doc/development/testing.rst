@@ -40,30 +40,16 @@ specified packages.
 
   colcon test --packages-select march_some_package march_some_other_package
 
-Running roslint
-^^^^^^^^^^^^^^^
-All march packages are also checked for code style with
-`roslint <https://wiki.ros.org/roslint>`_. The ``roslint`` target should also
-be run from the workspace root like so.
-
-.. code::
-
-  colcon build --event-handlers console_direct+ --cmake-target-skip-unavailable --cmake-target roslint
-
-This command will run the ``roslint`` target on any packages that use
-``roslint``. It will also output any linter warnings that you should fix,
-otherwise the build will fail.
-
 Running catkin_lint
 ^^^^^^^^^^^^^^^^^^^
 Another tool that is used to lint packages is `catkin_lint <https://github.com/fkie/catkin_lint>`_.
-``catkin_lint`` checks the package manifest and cmake configuration files for
+``catkin_lint`` checks the package manifest and CMake configuration files for
 any common errors. This command can be run anywhere in the workspace and will recurse into directories.
 So in order to check all packages you should run this command in the root of the workspace.
 
 .. code::
 
-  catkin_lint -W2 --explain .
+  catkin_lint -W2 --explain --strict .
 
 This will output any notes, warnings or errors with an explanation. This
 command is normally run when you have created a new package or made changes to

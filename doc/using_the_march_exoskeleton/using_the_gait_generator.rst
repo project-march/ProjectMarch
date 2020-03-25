@@ -7,7 +7,7 @@ Using the gait generator
 
 .. inclusion-introduction-start
 
-This tutorial will teach how to use the |m4| gait generator to create your own gaits and subgaits.
+This tutorial will teach how to use the March gait generator to create your own gaits and subgaits.
 
 .. inclusion-introduction-end
 

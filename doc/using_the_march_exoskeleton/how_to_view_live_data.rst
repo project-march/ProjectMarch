@@ -1,3 +1,5 @@
+.. _how-to-view-live-data-label:
+
 How to view live data
 =====================
 
@@ -24,7 +26,7 @@ Install with
 
 .. code::
 
-  sudo apt-get install ros-kinetic-rqt-multiplot
+  sudo apt-get install ros-melodic-rqt-multiplot
 
 Launch with
 

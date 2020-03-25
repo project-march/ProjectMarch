@@ -1,4 +1,5 @@
-import sys, os
+import os
+import sys
 
 # Retrieve branch name
 if os.getenv('CI'):
@@ -7,12 +8,11 @@ else:
     import pygit2
     branch_name = pygit2.Repository('.').head.shorthand
 
-sys.path += [ os.path.abspath( '_scripts' )]
+sys.path += [os.path.abspath('_scripts')]
 
-extensions = [ 'sphinx.ext.extlinks',
-               'sphinx.ext.todo',
-               'sphinx_copybutton',
-               'tutorialformatter' ]
+extensions = ['sphinx.ext.extlinks',
+              'sphinx.ext.todo',
+              'tutorialformatter']
 
 todo_include_todos = True
 
@@ -22,23 +22,23 @@ master_doc = 'index'
 # The suffix of source filenames.
 source_suffix = '.rst'
 
-project = u'march_tutorials'
+project = u'Project March'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = 'Kinetic'
+version = 'Melodic'
 # The full version, including alpha/beta/rc tags.
-release = 'Kinetic'
+release = 'Melodic'
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
 # Name of the style used to generate the html documentation
 html_theme = 'sphinx_rtd_theme'
-html_theme_path = ['_themes',]
+html_theme_path = ['_themes']
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -59,11 +59,11 @@ html_context = {
 
 # Global substitutions
 rst_prolog = """
-.. |m4| replace:: March IV
+.. |march| replace:: March exoskeleton
 """
 
 # Links
-ros_distro = 'kinetic'
+ros_distro = 'melodic'
 extlinks = {'codedir': ('https://github.com/' + html_context["github_user"] + '/tutorials/tree/' + html_context["github_version"] + '/doc/%s', ''),
             'rootdir': ('https://github.com/' + html_context["github_user"] + '/tutorials/tree/' + html_context["github_version"] + '/%s', ''),
             'hardware-interface': ('https://github.com/' + html_context["github_user"] + '/hardware-interface/tree/develop/%s', ''),
