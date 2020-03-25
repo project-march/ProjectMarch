@@ -84,6 +84,8 @@ private:
 
   /* Exponential smoothing constant of the velocity */
   static constexpr double ALPHA = 1;
+  /* Limit of the change in effort command over one cycle, can be overridden by safety controller */
+  static constexpr double MAX_EFFORT_CHANGE = 5000;
 
   /* March hardware */
   std::unique_ptr<march::MarchRobot> march_robot_;
@@ -114,6 +116,7 @@ private:
 
   std::vector<double> joint_effort_;
   std::vector<double> joint_effort_command_;
+  std::vector<double> joint_last_effort_command_;
 
   std::vector<double> joint_temperature_;
   std::vector<double> joint_temperature_variance_;
