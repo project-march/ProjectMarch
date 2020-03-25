@@ -119,6 +119,9 @@ void EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
     ROS_INFO("Operational state reached for all slaves");
     this->is_operational_ = true;
     this->ethercat_thread_ = std::thread(&EthercatMaster::ethercatLoop, this);
+    struct sched_param param;
+    param.sched_priority = 40;
+    pthread_setschedparam(this->ethercat_thread_.native_handle(), SCHED_FIFO, &param);
   }
   else
   {
