@@ -51,6 +51,8 @@ public:
    */
   void stop();
 
+  static const int THREAD_PRIORITY = 40;
+
 private:
   /**
    * Opens the ethernet port with the given ifname and checks the amount of slaves.
@@ -77,6 +79,15 @@ private:
    * Checks if all the slaves are connected and in operational state.
    */
   static void monitorSlaveConnection();
+
+  /**
+   * Sets the ethercat thread priority and scheduling
+   * to SCHED_FIFO using pthread.
+   * Note: Only works on POSIX compliant systems.
+   *
+   * @param priority a pthread priority value between 1 and 99 for SCHED_FIFO threads.
+   */
+  void setThreadPriority(int priority);
 
   std::atomic<bool> is_operational_;
 
