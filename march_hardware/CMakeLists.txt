@@ -103,6 +103,7 @@ if(CATKIN_ENABLE_TESTING)
         test/TestPDOmap.cpp
         test/TestPowerDistributionBoard.cpp
         test/TestRunner.cpp
+        test/TestSlave.cpp
         test/TestTemperatureGES.cpp
         test/encoder/TestAbsoluteEncoder.cpp
         test/encoder/TestIncrementalEncoder.cpp

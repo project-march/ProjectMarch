@@ -6,6 +6,7 @@
 
 #include <march_hardware/error/motion_error.h>
 #include <march_hardware/Joint.h>
+#include <march_hardware/error/hardware_exception.h>
 
 namespace march
 {
@@ -23,20 +24,14 @@ void Joint::initialize(int ecatCycleTime)
 
 void Joint::prepareActuation()
 {
-  ROS_ASSERT_MSG(this->getActuationMode() != ActuationMode::unknown, "The mode of actuation for joint %s is: %s",
-                 this->name.c_str(), this->getActuationMode().toString().c_str());
-  if (this->allowActuation)
+  if (!this->allowActuation)
   {
-    ROS_INFO("[%s] Preparing for actuation", this->name.c_str());
-    this->iMotionCube.goToOperationEnabled();
-    ROS_INFO("[%s] Successfully prepared for actuation", this->name.c_str());
+    throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE, "Failed to prepare joint %s for actuation",
+                                   this->name.c_str());
   }
-  else
-  {
-    ROS_ERROR("[%s] Trying to prepare for actuation while it is not "
-              "allowed to actuate",
-              this->name.c_str());
-  }
+  ROS_INFO("[%s] Preparing for actuation", this->name.c_str());
+  this->iMotionCube.goToOperationEnabled();
+  ROS_INFO("[%s] Successfully prepared for actuation", this->name.c_str());
 }
 
 void Joint::resetIMotionCube()
@@ -49,10 +44,11 @@ void Joint::resetIMotionCube()
 
 void Joint::actuateRad(double targetPositionRad)
 {
-  ROS_ASSERT_MSG(this->allowActuation,
-                 "Joint %s is not allowed to actuate, "
-                 "yet its actuate method has been called",
-                 this->name.c_str());
+  if (!this->allowActuation)
+  {
+    throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE, "Joint %s is not allowed to actuate",
+                                   this->name.c_str());
+  }
   this->iMotionCube.actuateRad(targetPositionRad);
 }
 
@@ -88,10 +84,11 @@ double Joint::getAngleRadMostPrecise()
 
 void Joint::actuateTorque(int16_t targetTorque)
 {
-  ROS_ASSERT_MSG(this->allowActuation,
-                 "Joint %s is not allowed to actuate, "
-                 "yet its actuate method has been called",
-                 this->name.c_str());
+  if (!this->allowActuation)
+  {
+    throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE, "Joint %s is not allowed to actuate",
+                                   this->name.c_str());
+  }
   this->iMotionCube.actuateTorque(targetTorque);
 }
 
@@ -153,6 +150,7 @@ IMotionCubeState Joint::getIMotionCubeState()
   states.motorCurrent = this->iMotionCube.getMotorCurrent();
   states.motorVoltage = this->iMotionCube.getMotorVoltage();
 
+  states.absoluteEncoderValue = this->iMotionCube.getAngleIUAbsolute();
   states.incrementalEncoderValue = this->iMotionCube.getAngleIUIncremental();
 
   return states;

@@ -20,26 +20,6 @@ TEST_F(IMotionCubeTest, SlaveIndexOne)
   ASSERT_EQ(1, imc.getSlaveIndex());
 }
 
-TEST_F(IMotionCubeTest, SlaveIndexZero)
-{
-  ASSERT_DEATH(
-      march::IMotionCube(0, this->mock_absolute_encoder, this->mock_incremental_encoder, march::ActuationMode::unknown),
-      "Slave configuration error: "
-      "slaveindex 0 "
-      "can not be smaller than "
-      "1.");
-}
-
-TEST_F(IMotionCubeTest, SlaveIndexMinusOne)
-{
-  ASSERT_DEATH(march::IMotionCube(-1, this->mock_absolute_encoder, this->mock_incremental_encoder,
-                                  march::ActuationMode::unknown),
-               "Slave configuration error: "
-               "slaveindex "
-               "-1 can not be smaller than "
-               "1.");
-}
-
 TEST_F(IMotionCubeTest, NoActuationMode)
 {
   march::IMotionCube imc(1, this->mock_absolute_encoder, this->mock_incremental_encoder, march::ActuationMode::unknown);
@@ -60,4 +40,10 @@ TEST_F(IMotionCubeTest, ActuationModePositionActuateTorque)
                          march::ActuationMode::position);
 
   ASSERT_THROW(imc.actuateTorque(1), march::error::HardwareException);
+}
+
+TEST_F(IMotionCubeTest, OperationEnabledWithoutActuationMode)
+{
+  march::IMotionCube imc(1, this->mock_absolute_encoder, this->mock_incremental_encoder, march::ActuationMode::unknown);
+  ASSERT_THROW(imc.goToOperationEnabled(), march::error::HardwareException);
 }

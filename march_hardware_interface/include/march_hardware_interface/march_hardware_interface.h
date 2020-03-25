@@ -21,7 +21,7 @@
 #include <march_hardware/MarchRobot.h>
 #include <march_hardware_builder/hardware_builder.h>
 #include <march_shared_resources/AfterLimitJointCommand.h>
-#include <march_shared_resources/ImcErrorState.h>
+#include <march_shared_resources/ImcState.h>
 
 template <typename T>
 using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;
@@ -84,6 +84,8 @@ private:
 
   /* Exponential smoothing constant of the velocity */
   static constexpr double ALPHA = 1;
+  /* Limit of the change in effort command over one cycle, can be overridden by safety controller */
+  static constexpr double MAX_EFFORT_CHANGE = 5000;
 
   /* March hardware */
   std::unique_ptr<march::MarchRobot> march_robot_;
@@ -114,6 +116,7 @@ private:
 
   std::vector<double> joint_effort_;
   std::vector<double> joint_effort_command_;
+  std::vector<double> joint_last_effort_command_;
 
   std::vector<double> joint_temperature_;
   std::vector<double> joint_temperature_variance_;
@@ -128,7 +131,7 @@ private:
 
   /* Real time safe publishers */
   RtPublisherPtr<march_shared_resources::AfterLimitJointCommand> after_limit_joint_command_pub_;
-  RtPublisherPtr<march_shared_resources::ImcErrorState> imc_state_pub_;
+  RtPublisherPtr<march_shared_resources::ImcState> imc_state_pub_;
 };
 
 #endif  // MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_H
