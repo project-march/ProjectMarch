@@ -19,7 +19,7 @@ private:
   // Set this number via the hardware builder
   int netNumber;
   bool allowActuation;
-  float previous_motor_volt_;
+  float previous_motor_volt_ = 0.0;
   IMotionCube iMotionCube;
   TemperatureGES temperatureGES;
 
