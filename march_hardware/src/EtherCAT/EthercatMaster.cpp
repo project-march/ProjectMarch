@@ -163,17 +163,18 @@ void EthercatMaster::ethercatLoop()
     const auto end_time = std::chrono::high_resolution_clock::now();
     const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - begin_time);
 
+    {
+      std::lock_guard<std::mutex> lock(this->wait_on_pdo_condition_mutex_);
+      this->pdo_received_ = true;
+    }
+    this->wait_on_pdo_condition_var_.notify_one();
+
     if (duration > cycle_time)
     {
       not_achieved_count++;
     }
     else
     {
-      {
-        std::lock_guard<std::mutex> lock(this->wait_on_pdo_condition_mutex_);
-        this->pdo_received_ = true;
-      }
-      this->wait_on_pdo_condition_var_.notify_one();
       std::this_thread::sleep_for(cycle_time - duration);
     }
     total_loops++;
