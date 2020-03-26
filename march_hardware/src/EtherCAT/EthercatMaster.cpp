@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include <pthread.h>
 #include <ros/ros.h>
 
 #include <soem/ethercattype.h>
@@ -119,6 +120,7 @@ void EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
     ROS_INFO("Operational state reached for all slaves");
     this->is_operational_ = true;
     this->ethercat_thread_ = std::thread(&EthercatMaster::ethercatLoop, this);
+    this->setThreadPriority(EthercatMaster::THREAD_PRIORITY);
   }
   else
   {
@@ -217,4 +219,19 @@ void EthercatMaster::stop()
   }
 }
 
+void EthercatMaster::setThreadPriority(int priority)
+{
+  struct sched_param param = { priority };
+  // SCHED_FIFO scheduling preempts other threads with lower priority as soon as it becomes runnable.
+  // See http://man7.org/linux/man-pages/man7/sched.7.html for more info.
+  const int error = pthread_setschedparam(this->ethercat_thread_.native_handle(), SCHED_FIFO, &param);
+  if (error != 0)
+  {
+    ROS_ERROR("Failed to set the ethercat thread priority to %d. (error code: %d)", priority, error);
+  }
+  else
+  {
+    ROS_DEBUG("Set ethercat thread priority to %d", param.sched_priority);
+  }
+}
 }  // namespace march
