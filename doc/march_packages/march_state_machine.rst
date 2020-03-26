@@ -24,6 +24,28 @@ machines. As mentioned above this is possible in a hierarchical state machine.
 .. figure:: images/march_state_machine.png
    :align: center
 
+The above image is a screenshot from the
+`smach_viewer <https://wiki.ros.org/smach_viewer>`_. This visualizes the states
+of the state machine and makes active ones green. This screenshot only shows
+the high level states. The smach_viewer can be launched with the
+``state_machine_viewer`` launch argument, which defaults to ``false``.
+
+.. code::
+
+  roslaunch march_state_machine state_machine.launch state_machine_viewer:=true
+
+.. note::
+
+  When you get an error saying that it failed to load Gtk, you need to install
+  ``python-gi-cairo`` from the Ubuntu repositories:
+
+  .. code::
+
+    sudo apt install python-gi-cairo
+
+  See https://github.com/ros-visualization/executive_smach_visualization/issues/20
+  for more info.
+
 LAUNCH
 ^^^^^^
 Launch starts with a **WAIT FOR GAIT SERVER** state. This state waits for the
