@@ -136,6 +136,11 @@ bool MarchRobot::isEthercatOperational()
   return ethercatMaster.isOperational();
 }
 
+void MarchRobot::waitForPdo()
+{
+  this->ethercatMaster.waitForPdo();
+}
+
 int MarchRobot::getEthercatCycleTime() const
 {
   return this->ethercatMaster.getCycleTime();

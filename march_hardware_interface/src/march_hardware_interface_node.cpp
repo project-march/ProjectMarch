@@ -41,21 +41,23 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  ros::Rate rate(
-      ros::Duration(march.getEthercatCycleTime() * ros::param::param<int>("~control_loop_multiplier", 1) / 1000.0));
-
   controller_manager::ControllerManager controller_manager(&march, nh);
+  ros::Time last_update_time = ros::Time::now() - ros::Duration(march.getEthercatCycleTime() / 1000.0);
 
   while (ros::ok())
   {
-    const ros::Time now = ros::Time::now();
     try
     {
-      march.read(now, rate.expectedCycleTime());
+      march.waitForPdo();
+
+      const ros::Time now = ros::Time::now();
+      ros::Duration elapsed_time = now - last_update_time;
+      last_update_time = now;
+
+      march.read(now, elapsed_time);
       march.validate();
-      controller_manager.update(now, rate.expectedCycleTime());
-      march.write(now, rate.expectedCycleTime());
-      rate.sleep();
+      controller_manager.update(now, elapsed_time);
+      march.write(now, elapsed_time);
     }
     catch (const std::exception& e)
     {

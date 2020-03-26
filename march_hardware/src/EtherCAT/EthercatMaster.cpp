@@ -42,6 +42,13 @@ int EthercatMaster::getCycleTime() const
   return this->cycle_time_ms_;
 }
 
+void EthercatMaster::waitForPdo()
+{
+  std::unique_lock<std::mutex> lock(this->wait_on_pdo_condition_mutex_);
+  this->wait_on_pdo_condition_var_.wait(lock, [&] { return this->pdo_received_; });
+  this->pdo_received_ = false;
+}
+
 void EthercatMaster::start(std::vector<Joint>& joints)
 {
   this->ethercatMasterInitiation();
@@ -157,6 +164,12 @@ void EthercatMaster::ethercatLoop()
 
     const auto end_time = std::chrono::high_resolution_clock::now();
     const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - begin_time);
+
+    {
+      std::lock_guard<std::mutex> lock(this->wait_on_pdo_condition_mutex_);
+      this->pdo_received_ = true;
+    }
+    this->wait_on_pdo_condition_var_.notify_one();
 
     if (duration > cycle_time)
     {

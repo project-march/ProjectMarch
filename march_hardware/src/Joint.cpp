@@ -217,6 +217,19 @@ bool Joint::canActuate() const
   return this->allow_actuation_ && this->hasIMotionCube();
 }
 
+bool Joint::receivedDataUpdate()
+{
+  if (!this->hasIMotionCube())
+  {
+    return false;
+  }
+  // We assume that the motor voltage cannot remain precisely constant.
+  float new_motor_volt = this->imc_->getMotorVoltage();
+  bool data_updated = (new_motor_volt != this->previous_motor_volt_);
+  this->previous_motor_volt_ = new_motor_volt;
+  return data_updated;
+}
+
 ActuationMode Joint::getActuationMode() const
 {
   return this->imc_->getActuationMode();
