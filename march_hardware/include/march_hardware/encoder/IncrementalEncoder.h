@@ -13,6 +13,8 @@ class IncrementalEncoder : public Encoder
 public:
   IncrementalEncoder(size_t number_of_bits, double transmission);
 
+  ~IncrementalEncoder() noexcept override = default;
+
   double toRad(int32_t iu) const override;
   double getRadPerBit() const override;
   double getTransmission() const;

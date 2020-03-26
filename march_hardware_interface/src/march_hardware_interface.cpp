@@ -2,6 +2,7 @@
 #include "march_hardware_interface/march_hardware_interface.h"
 #include "march_hardware_interface/power_net_on_off_command.h"
 
+#include <cmath>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -42,7 +43,7 @@ MarchHardwareInterface::MarchHardwareInterface(std::unique_ptr<march::MarchRobot
 bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot_hw_nh */)
 {
   // Initialize realtime publisher for the IMotionCube states
-  this->imc_state_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_resources::ImcErrorState>>(
+  this->imc_state_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_resources::ImcState>>(
       nh, "/march/imc_states/", 4);
 
   this->after_limit_joint_command_pub_ =
@@ -106,7 +107,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
   // Initialize interfaces for each joint
   for (size_t i = 0; i < num_joints_; ++i)
   {
-    march::Joint joint = march_robot_->getJoint(joint_names_[i]);
+    march::Joint& joint = march_robot_->getJoint(joint_names_[i]);
     // Create joint state interface
     JointStateHandle joint_state_handle(joint.getName(), &joint_position_[i], &joint_velocity_[i], &joint_effort_[i]);
     joint_state_interface_.registerHandle(joint_state_handle);
@@ -191,6 +192,11 @@ void MarchHardwareInterface::validate()
   }
 }
 
+void MarchHardwareInterface::waitForPdo()
+{
+  this->march_robot_->waitForPdo();
+}
+
 void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Duration& elapsed_time)
 {
   for (size_t i = 0; i < num_joints_; i++)
@@ -223,6 +229,12 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
   {
     // Enlarge joint_effort_command because ROS control limits the pid values to a certain maximum
     joint_effort_command_[i] = joint_effort_command_[i] * 1000.0;
+    if (std::abs(joint_last_effort_command_[i] - joint_effort_command_[i]) > MAX_EFFORT_CHANGE)
+    {
+      joint_effort_command_[i] =
+          joint_last_effort_command_[i] +
+          std::copysign(MAX_EFFORT_CHANGE, joint_effort_command_[i] - joint_last_effort_command_[i]);
+    }
   }
 
   // Enforce limits on all joints in effort mode
@@ -233,10 +245,12 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
 
   for (size_t i = 0; i < num_joints_; i++)
   {
-    march::Joint joint = march_robot_->getJoint(joint_names_[i]);
+    march::Joint& joint = march_robot_->getJoint(joint_names_[i]);
 
     if (joint.canActuate())
     {
+      joint_last_effort_command_[i] = joint_effort_command_[i];
+
       if (joint.getActuationMode() == march::ActuationMode::position)
       {
         joint.actuateRad(joint_position_command_[i]);
@@ -269,6 +283,7 @@ void MarchHardwareInterface::reserveMemory()
   joint_velocity_command_.resize(num_joints_);
   joint_effort_.resize(num_joints_);
   joint_effort_command_.resize(num_joints_);
+  joint_last_effort_command_.resize(num_joints_);
   joint_temperature_.resize(num_joints_);
   joint_temperature_variance_.resize(num_joints_);
   soft_limits_.resize(num_joints_);
@@ -286,6 +301,7 @@ void MarchHardwareInterface::reserveMemory()
   imc_state_pub_->msg_.motion_error_description.resize(num_joints_);
   imc_state_pub_->msg_.motor_current.resize(num_joints_);
   imc_state_pub_->msg_.motor_voltage.resize(num_joints_);
+  imc_state_pub_->msg_.absolute_encoder_value.resize(num_joints_);
   imc_state_pub_->msg_.incremental_encoder_value.resize(num_joints_);
 }
 
@@ -370,7 +386,7 @@ void MarchHardwareInterface::updateAfterLimitJointCommand()
   after_limit_joint_command_pub_->msg_.header.stamp = ros::Time::now();
   for (size_t i = 0; i < num_joints_; i++)
   {
-    march::Joint joint = march_robot_->getJoint(joint_names_[i]);
+    march::Joint& joint = march_robot_->getJoint(joint_names_[i]);
 
     after_limit_joint_command_pub_->msg_.name[i] = joint.getName();
     after_limit_joint_command_pub_->msg_.position_command[i] = joint_position_command_[i];
@@ -401,6 +417,7 @@ void MarchHardwareInterface::updateIMotionCubeState()
     imc_state_pub_->msg_.motion_error_description[i] = imc_state.motionErrorDescription;
     imc_state_pub_->msg_.motor_current[i] = imc_state.motorCurrent;
     imc_state_pub_->msg_.motor_voltage[i] = imc_state.motorVoltage;
+    imc_state_pub_->msg_.absolute_encoder_value[i] = imc_state.absoluteEncoderValue;
     imc_state_pub_->msg_.incremental_encoder_value[i] = imc_state.incrementalEncoderValue;
   }
 
@@ -427,7 +444,7 @@ void MarchHardwareInterface::iMotionCubeStateCheck(size_t joint_index)
 
 void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
 {
-  march::Joint joint = march_robot_->getJoint(joint_names_[joint_index]);
+  march::Joint& joint = march_robot_->getJoint(joint_names_[joint_index]);
   if (joint_position_[joint_index] < soft_limits_[joint_index].min_position ||
       joint_position_[joint_index] > soft_limits_[joint_index].max_position)
   {

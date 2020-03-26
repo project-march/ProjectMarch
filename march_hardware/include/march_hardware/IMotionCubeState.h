@@ -132,6 +132,7 @@ public:
   std::string motionErrorDescription;
   float motorCurrent;
   float motorVoltage;
+  int absoluteEncoderValue;
   int incrementalEncoderValue;
 };
 

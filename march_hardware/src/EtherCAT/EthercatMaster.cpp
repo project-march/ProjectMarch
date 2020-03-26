@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include <pthread.h>
 #include <ros/ros.h>
 
 #include <soem/ethercattype.h>
@@ -39,6 +40,13 @@ bool EthercatMaster::isOperational() const
 int EthercatMaster::getCycleTime() const
 {
   return this->cycle_time_ms_;
+}
+
+void EthercatMaster::waitForPdo()
+{
+  std::unique_lock<std::mutex> lock(this->wait_on_pdo_condition_mutex_);
+  this->wait_on_pdo_condition_var_.wait(lock, [&] { return this->pdo_received_; });
+  this->pdo_received_ = false;
 }
 
 void EthercatMaster::start(std::vector<Joint>& joints)
@@ -119,6 +127,7 @@ void EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
     ROS_INFO("Operational state reached for all slaves");
     this->is_operational_ = true;
     this->ethercat_thread_ = std::thread(&EthercatMaster::ethercatLoop, this);
+    this->setThreadPriority(EthercatMaster::THREAD_PRIORITY);
   }
   else
   {
@@ -155,6 +164,12 @@ void EthercatMaster::ethercatLoop()
 
     const auto end_time = std::chrono::high_resolution_clock::now();
     const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - begin_time);
+
+    {
+      std::lock_guard<std::mutex> lock(this->wait_on_pdo_condition_mutex_);
+      this->pdo_received_ = true;
+    }
+    this->wait_on_pdo_condition_var_.notify_one();
 
     if (duration > cycle_time)
     {
@@ -217,4 +232,19 @@ void EthercatMaster::stop()
   }
 }
 
+void EthercatMaster::setThreadPriority(int priority)
+{
+  struct sched_param param = { priority };
+  // SCHED_FIFO scheduling preempts other threads with lower priority as soon as it becomes runnable.
+  // See http://man7.org/linux/man-pages/man7/sched.7.html for more info.
+  const int error = pthread_setschedparam(this->ethercat_thread_.native_handle(), SCHED_FIFO, &param);
+  if (error != 0)
+  {
+    ROS_ERROR("Failed to set the ethercat thread priority to %d. (error code: %d)", priority, error);
+  }
+  else
+  {
+    ROS_DEBUG("Set ethercat thread priority to %d", param.sched_priority);
+  }
+}
 }  // namespace march

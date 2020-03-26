@@ -40,20 +40,18 @@ TEST_F(JointTest, ValidJointHip)
   this->joint->safety->soft_lower_limit = 0.1;
   this->joint->safety->soft_upper_limit = 1.9;
 
-  march::Joint created = HardwareBuilder::createJoint(config, "test_joint_hip", this->joint);
+  const std::string name = "test_joint_hip";
+  march::Joint created = HardwareBuilder::createJoint(config, name, this->joint);
 
-  march::AbsoluteEncoder absolute_encoder =
-      march::AbsoluteEncoder(16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper,
-                             this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit);
-  march::IncrementalEncoder incremental_encoder = march::IncrementalEncoder(12, 50.0);
-  march::IMotionCube imc = march::IMotionCube(2, absolute_encoder, incremental_encoder, march::ActuationMode::unknown);
-  march::TemperatureGES ges = march::TemperatureGES(1, 2);
-  march::Joint expected(imc);
-  expected.setName("test_joint_hip");
-  expected.setAllowActuation(true);
-  expected.setTemperatureGes(ges);
+  auto absolute_encoder = std::make_unique<march::AbsoluteEncoder>(
+      16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper, this->joint->safety->soft_lower_limit,
+      this->joint->safety->soft_upper_limit);
+  auto incremental_encoder = std::make_unique<march::IncrementalEncoder>(12, 50.0);
+  auto imc = std::make_unique<march::IMotionCube>(2, std::move(absolute_encoder), std::move(incremental_encoder),
+                                                  march::ActuationMode::unknown);
+  auto ges = std::make_unique<march::TemperatureGES>(1, 2);
+  march::Joint expected(name, -1, true, std::move(imc), std::move(ges));
 
-  ASSERT_EQ("test_joint_hip", expected.getName());
   ASSERT_EQ(expected, created);
 }
 
@@ -67,19 +65,15 @@ TEST_F(JointTest, ValidNotActuated)
 
   march::Joint created = HardwareBuilder::createJoint(config, "test_joint_hip", this->joint);
 
-  march::AbsoluteEncoder absolute_encoder =
-      march::AbsoluteEncoder(16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper,
-                             this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit);
-  march::IncrementalEncoder incremental_encoder = march::IncrementalEncoder(12, 50.0);
-  march::IMotionCube imc = march::IMotionCube(2, absolute_encoder, incremental_encoder, march::ActuationMode::unknown);
-  march::TemperatureGES ges = march::TemperatureGES(1, 2);
-  march::Joint expected(imc);
-  expected.setName("test_joint_hip");
-  expected.setAllowActuation(false);
-  expected.setTemperatureGes(ges);
+  auto absolute_encoder = std::make_unique<march::AbsoluteEncoder>(
+      16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper, this->joint->safety->soft_lower_limit,
+      this->joint->safety->soft_upper_limit);
+  auto incremental_encoder = std::make_unique<march::IncrementalEncoder>(12, 50.0);
+  auto imc = std::make_unique<march::IMotionCube>(2, std::move(absolute_encoder), std::move(incremental_encoder),
+                                                  march::ActuationMode::unknown);
+  auto ges = std::make_unique<march::TemperatureGES>(1, 2);
+  march::Joint expected("test_joint_hip", -1, false, std::move(imc), std::move(ges));
 
-  ASSERT_EQ("test_joint_hip", expected.getName());
-  ASSERT_FALSE(expected.canActuate());
   ASSERT_EQ(expected, created);
 }
 
@@ -118,14 +112,14 @@ TEST_F(JointTest, ValidActuationMode)
 
   march::Joint created = HardwareBuilder::createJoint(config, "test_joint_hip", this->joint);
 
-  march::Joint expected(march::IMotionCube(
-      1,
-      march::AbsoluteEncoder(16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper,
-                             this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit),
-      march::IncrementalEncoder(12, 50.0), march::ActuationMode::position));
-  expected.setName("test_joint_hip");
+  march::Joint expected("test_joint_hip", -1, false,
+                        std::make_unique<march::IMotionCube>(
+                            1,
+                            std::make_unique<march::AbsoluteEncoder>(
+                                16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper,
+                                this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit),
+                            std::make_unique<march::IncrementalEncoder>(12, 50.0), march::ActuationMode::position));
 
-  ASSERT_EQ("test_joint_hip", expected.getName());
   ASSERT_EQ(expected, created);
 }
 

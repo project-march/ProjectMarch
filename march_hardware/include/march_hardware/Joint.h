@@ -2,7 +2,9 @@
 #ifndef MARCH_HARDWARE_JOINT_H
 #define MARCH_HARDWARE_JOINT_H
 
+#include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <march_hardware/IMotionCube.h>
@@ -14,30 +16,40 @@ namespace march
 {
 class Joint
 {
-private:
-  std::string name;
-  // Set this number via the hardware builder
-  int netNumber;
-  bool allowActuation;
-  IMotionCube iMotionCube;
-  TemperatureGES temperatureGES;
-  double position_;
-  double incremental_position_;
-  double absolute_position_;
-  double velocity_;
-
 public:
-  explicit Joint(const IMotionCube& imc) : name(""), netNumber(-1), allowActuation(false), iMotionCube(imc)
-  {
-  }
+  /**
+   * Initializes a Joint without motor controller and temperature slave.
+   * Actuation will be disabled.
+   */
+  Joint(std::string name, int net_number);
 
-  void initialize(int ecatCycleTime);
+  /**
+   * Initializes a Joint with motor controller and without temperature slave.
+   */
+  Joint(std::string name, int net_number, bool allow_actuation, std::unique_ptr<IMotionCube> imc);
+
+  /**
+   * Initializes a Joint with motor controller and temperature slave.
+   */
+  Joint(std::string name, int net_number, bool allow_actuation, std::unique_ptr<IMotionCube> imc,
+        std::unique_ptr<TemperatureGES> temperature_ges);
+
+  virtual ~Joint() noexcept = default;
+
+  /* Delete copy constructor/assignment since the unique_ptr cannot be copied */
+  Joint(const Joint&) = delete;
+  Joint& operator=(const Joint&) = delete;
+
+  /* Delete move assignment since string cannot be move assigned */
+  Joint(Joint&&) = default;
+  Joint& operator=(Joint&&) = delete;
+
+  void initialize(int cycle_time);
   void prepareActuation();
-  void shutdown();
 
-  void actuateRad(double targetPositionRad);
-  void actuateTorque(int16_t targetTorque);
-  void readEncoders(const ros::Duration& elapsed_time);
+  void actuateRad(double target_position);
+  void actuateTorque(int16_t target_torque);
+    void readEncoders(const ros::Duration& elapsed_time);
 
   double getPosition();
   double getVelocity();
@@ -49,25 +61,26 @@ public:
   float getTemperature();
   IMotionCubeState getIMotionCubeState();
 
-  std::string getName();
-  int getTemperatureGESSlaveIndex();
-  int getIMotionCubeSlaveIndex();
-  int getNetNumber()
-  {
-    return netNumber;
-  }
+  std::string getName() const;
+  int getTemperatureGESSlaveIndex() const;
+  int getIMotionCubeSlaveIndex() const;
+  int getNetNumber() const;
 
   ActuationMode getActuationMode() const;
 
-  bool hasIMotionCube();
-  bool hasTemperatureGES();
-  bool canActuate();
+  bool hasIMotionCube() const;
+  bool hasTemperatureGES() const;
+  bool canActuate() const;
+  bool receivedDataUpdate();
+  void setAllowActuation(bool allow_actuation);
 
   /** @brief Override comparison operator */
   friend bool operator==(const Joint& lhs, const Joint& rhs)
   {
-    return lhs.name == rhs.name && lhs.iMotionCube == rhs.iMotionCube && lhs.temperatureGES == rhs.temperatureGES &&
-           lhs.allowActuation == rhs.allowActuation &&
+    return lhs.name_ == rhs.name_ && ((lhs.imc_ && rhs.imc_ && *lhs.imc_ == *rhs.imc_) || (!lhs.imc_ && !rhs.imc_)) &&
+           ((lhs.temperature_ges_ && rhs.temperature_ges_ && *lhs.temperature_ges_ == *rhs.temperature_ges_) ||
+            (!lhs.temperature_ges_ && !rhs.temperature_ges_)) &&
+           lhs.allow_actuation_ == rhs.allow_actuation_ &&
            lhs.getActuationMode().getValue() == rhs.getActuationMode().getValue();
   }
 
@@ -78,17 +91,45 @@ public:
   /** @brief Override stream operator for clean printing */
   friend ::std::ostream& operator<<(std::ostream& os, const Joint& joint)
   {
-    return os << "name: " << joint.name << ", "
-              << "ActuationMode: " << joint.getActuationMode().toString() << ", "
-              << "allowActuation: " << joint.allowActuation << ", "
-              << "imotioncube: " << joint.iMotionCube << ","
-              << "temperatureges: " << joint.temperatureGES;
+    os << "name: " << joint.name_ << ", "
+       << "ActuationMode: " << joint.getActuationMode().toString() << ", "
+       << "allowActuation: " << joint.allow_actuation_ << ", "
+       << "imotioncube: ";
+    if (joint.imc_)
+    {
+      os << *joint.imc_;
+    }
+    else
+    {
+      os << "none";
+    }
+
+    os << ", temperatureges: ";
+    if (joint.temperature_ges_)
+    {
+      os << *joint.temperature_ges_;
+    }
+    else
+    {
+      os << "none";
+    }
+
+    return os;
   }
 
-  void setName(const std::string& name);
-  void setAllowActuation(bool allowActuation);
-  void setTemperatureGes(const TemperatureGES& temperatureGes);
-  void setNetNumber(int netNumber);
+private:
+  const std::string name_;
+  const int net_number_;
+  bool allow_actuation_ = false;
+  float previous_motor_volt_ = 0.0;
+
+  double position_;
+  double incremental_position_;
+  double absolute_position_;
+  double velocity_;
+
+  std::unique_ptr<IMotionCube> imc_ = nullptr;
+  std::unique_ptr<TemperatureGES> temperature_ges_ = nullptr;
 };
 
 }  // namespace march

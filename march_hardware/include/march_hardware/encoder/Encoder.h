@@ -13,21 +13,23 @@ class Encoder
 public:
   explicit Encoder(size_t number_of_bits);
 
-  /*
+  virtual ~Encoder() noexcept = default;
+
+  /**
    * Reads out the encoder from the slave and returns the value in Internal Units (IU).
    * @param byte_offset the byte offset in the slave register for the IU position
    * @returns The current position of the encoder in Internal Units (IU)
    */
   int32_t getAngleIU(uint8_t byte_offset) const;
 
-  /*
+  /**
    * Reads out the encoder from the slave and transforms the result to radians.
    * @param byte_offset the byte offset in the slave register for the IU position
    * @returns The current position of the encoder in radians
    */
   double getAngleRad(uint8_t byte_offset) const;
 
-  /*
+  /**
    * Converts encoder Internal Units (IU) to radians.
    * This is a pure virtual function and must be implemented by subclasses,
    * since each type of encoder has a different way of calculating radians.
@@ -52,7 +54,7 @@ public:
   static constexpr double PI_2 = 2 * M_PI;
 
 private:
-  /*
+  /**
    * Returns the total number of positions possible on an encoder
    * with the given amount of bits.
    * @param number_of_bits The resolution of the encoder

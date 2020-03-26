@@ -12,6 +12,7 @@
 #include <march_hardware/EtherCAT/EthercatIO.h>
 
 #include <march_hardware/MarchRobot.h>
+#include <march_hardware/error/hardware_exception.h>
 
 namespace march
 {
@@ -35,16 +36,14 @@ void MarchRobot::startEtherCAT()
 {
   if (!hasValidSlaves())
   {
-    ROS_FATAL("Slaves are not configured properly. Confirm the slave indices "
-              "are correct.");
-    return;
+    throw error::HardwareException(error::ErrorType::INVALID_SLAVE_CONFIGURATION);
   }
 
   ROS_INFO("Slave configuration is non-conflicting");
 
   if (ethercatMaster.isOperational())
   {
-    ROS_ERROR("Trying to start EtherCAT while it is already active.");
+    ROS_WARN("Trying to start EtherCAT while it is already active.");
     return;
   }
   ethercatMaster.start(this->jointList);
@@ -54,7 +53,7 @@ void MarchRobot::stopEtherCAT()
 {
   if (!ethercatMaster.isOperational())
   {
-    ROS_ERROR("Trying to stop EtherCAT while it is not active.");
+    ROS_WARN("Trying to stop EtherCAT while it is not active.");
     return;
   }
 
@@ -137,12 +136,17 @@ bool MarchRobot::isEthercatOperational()
   return ethercatMaster.isOperational();
 }
 
+void MarchRobot::waitForPdo()
+{
+  this->ethercatMaster.waitForPdo();
+}
+
 int MarchRobot::getEthercatCycleTime() const
 {
   return this->ethercatMaster.getCycleTime();
 }
 
-Joint MarchRobot::getJoint(::std::string jointName)
+Joint& MarchRobot::getJoint(::std::string jointName)
 {
   if (!ethercatMaster.isOperational())
   {
@@ -157,7 +161,7 @@ Joint MarchRobot::getJoint(::std::string jointName)
     }
   }
 
-  throw std::runtime_error("Could not find joint with name " + jointName);
+  throw std::out_of_range("Could not find joint with name " + jointName);
 }
 
 PowerDistributionBoard& MarchRobot::getPowerDistributionBoard()

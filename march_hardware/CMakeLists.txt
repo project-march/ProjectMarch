@@ -63,7 +63,7 @@ add_library(${PROJECT_NAME}
     src/error/motion_error.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} pthread)
 
 add_executable(slave_count_check check/slave_count.cpp)
 target_link_libraries(slave_count_check ${PROJECT_NAME})
@@ -103,6 +103,7 @@ if(CATKIN_ENABLE_TESTING)
         test/TestPDOmap.cpp
         test/TestPowerDistributionBoard.cpp
         test/TestRunner.cpp
+        test/TestSlave.cpp
         test/TestTemperatureGES.cpp
         test/encoder/TestAbsoluteEncoder.cpp
         test/encoder/TestIncrementalEncoder.cpp

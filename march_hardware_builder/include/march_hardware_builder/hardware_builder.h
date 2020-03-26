@@ -66,12 +66,13 @@ public:
 
   static march::Joint createJoint(const YAML::Node& joint_config, const std::string& joint_name,
                                   const urdf::JointConstSharedPtr& urdf_joint);
-  static march::AbsoluteEncoder createAbsoluteEncoder(const YAML::Node& absolute_encoder_config,
-                                                      const urdf::JointConstSharedPtr& urdf_joint);
-  static march::IncrementalEncoder createIncrementalEncoder(const YAML::Node& incremental_encoder_config);
-  static march::IMotionCube createIMotionCube(const YAML::Node& imc_config, march::ActuationMode mode,
-                                              const urdf::JointConstSharedPtr& urdf_joint);
-  static march::TemperatureGES createTemperatureGES(const YAML::Node& temperature_ges_config);
+  static std::unique_ptr<march::AbsoluteEncoder> createAbsoluteEncoder(const YAML::Node& absolute_encoder_config,
+                                                                       const urdf::JointConstSharedPtr& urdf_joint);
+  static std::unique_ptr<march::IncrementalEncoder>
+  createIncrementalEncoder(const YAML::Node& incremental_encoder_config);
+  static std::unique_ptr<march::IMotionCube> createIMotionCube(const YAML::Node& imc_config, march::ActuationMode mode,
+                                                               const urdf::JointConstSharedPtr& urdf_joint);
+  static std::unique_ptr<march::TemperatureGES> createTemperatureGES(const YAML::Node& temperature_ges_config);
   static march::PowerDistributionBoard createPowerDistributionBoard(const YAML::Node& power_distribution_board_config);
 
   static const std::vector<std::string> INCREMENTAL_ENCODER_REQUIRED_KEYS;
