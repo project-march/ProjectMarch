@@ -8,53 +8,56 @@ Overview
 The march simulation package launches `Gazebo <http://gazebosim.org/>`_ and spawns the :ref:`URDF <robot-model-label>` of the |march|.
 Its goal is to provide an interface for our high-level code to call similar to that of the :ref:`march-hardware-interface-label`.
 
-As we only use Gazebo for actuating joints, using it is very simple.
-Please check :simulation:`march_world.launch <march_simulation/launch/march_world.launch>` to see how its used.
+Usage
+-----
 
-ROS Control
-^^^^^^^^^^^
-To integrate Gazebo with ROS Control, we highly recommend checking out the `Gazebo ros control tutorial <http://gazebosim.org/tutorials/?tut=ros_control>`_
-The :simulation:`config files <march_simulation/config>` contain example controller configuration.
-
-Upload joint names
-^^^^^^^^^^^^^^^^^^
-
-The :simulation:`upload_joint_names <march_simulation/scripts/upload_joint_names>` script loads the URDF and uploads the joint names to the topic ``/march/joint_names``.
-This is used by the rest of the system to check which joints are active.
-
-Tutorials
----------
-
-Sending commands through the action topic
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Start the simulation with
+The simulation can be launched using
 
 .. code::
 
-  roslaunch march_simulation march_world.launch
+  roslaunch march_launch march_simulation.launch
 
-Then send a command to the controller with
+This will launch the simulation using the rviz GUI. The backpack is fixed in space so the exoskeleton will move
+similarly to airgaiting. It is also possible to groundgait in the simulation. We will need the Gazebo GUI for that,
+so that the exoskeleton can move relative to the world. The launch command becomes
 
 .. code::
 
-  rostopic pub /march/controller/trajectory/command trajectory_msgs/JointTrajectory "
-  header:
-    seq: 0
-    stamp:
-      secs: 0
-      nsecs:         0
-    frame_id: ''
-  joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
-  right_ankle]
-  points:
-    -
-      positions: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start:
-        secs: 3
-        nsecs: 0
-        "
+  roslaunch march_launch march_simulation.launch rviz:=false gazebo_ui:=true ground_gait:=true
 
-You should now see the exoskeleton move in Gazebo.
+One can add an obstacle in simulation by adding the "obstacle:=<<obstacle_name>>" to the command. The possible
+obstacles can be found in the obstacles folder of the march_simulation package. The current obstacles were created
+after four of the obstacles in the Cybathlon 2020.
+
+Code structure
+--------------
+
+There are two important packages in the simulation repository.
+
+march_simulation contains all basic functionality: launch file, world description, controller configuration
+(config folder). It also contains URDFs of the obstacles.
+
+march_gazebo_plugins contains the CoM controller gazebo plugin that allows the exoskeleton to groundgait without
+falling in simulation.
+
+CoM controller plugin
+---------------------
+
+Just like the real exoskeleton, the exoskeleton in simulation cannot stably walk without help. For this purpose the
+CoM controller plugin was created. It seeks to mock not the pilot, but the coach during a ground gait session. This
+for the simple reason that the behaviour of the pilot is more erratic and therefore much harder to accurately simulate.
+
+The plugin works by controlling the position of the Center of Mass (CoM). There is a target function describing the
+desired location of the CoM. This target function moves in the x-direction (movement direction of exo) with speed
+step_size / step_duration. The y-direction target is constantly the stable leg during a swing. It therefore switches
+discontinuously from one leg to the other at the end of each swing.
+
+The plugin ensures that the CoM does not stray far from the target through a PID controller. The controller applies
+a compensating *torque* to each of the links (parts) in the exoskeleton.
+
+Note the following:
+1. The plugin assumes the subgait names start with left/right and end with open/swing/close. It will do nothing for
+other subgaits.
+2. The plugin might have to be re-tuned for an obstacle.
+
+
