@@ -54,8 +54,8 @@ void Joint::prepareActuation()
   this->imc_->goToOperationEnabled();
   ROS_INFO("[%s] Successfully prepared for actuation", this->name_.c_str());
 
-  this->incremental_position_ = this->iMotionCube.getAngleRadIncremental();
-  this->absolute_position_ = this->iMotionCube.getAngleRadAbsolute();
+  this->incremental_position_ = this->imc_->getAngleRadIncremental();
+  this->absolute_position_ = this->imc_->getAngleRadAbsolute();
   this->position_ = this->absolute_position_;
   this->velocity_ = 0;
 }
@@ -72,62 +72,72 @@ void Joint::actuateRad(double target_position)
 
 void Joint::readEncoders(const ros::Duration& elapsed_time)
 {
-    if (!this->hasIMotionCube())
-    {
-        ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
-        return -1;
-    }
-
-  const double new_incremental_position = this->iMotionCube.getAngleRadIncremental();
-  const double new_absolute_position = this->iMotionCube.getAngleRadAbsolute();
-
-  // Get velocity from encoder position
-  const double incremental_velocity = (new_incremental_position - this->incremental_position_) / elapsed_time.toSec();
-  const double absolute_velocity = (new_absolute_position - this->absolute_position_) / elapsed_time.toSec();
-
-  // If the difference in movement of the two encoders is larger than twice the sum of their precisions,
-  // one of them is probably an outlier.
-  if (std::abs(incremental_velocity - absolute_velocity) * elapsed_time.toSec() >
-      2 * (this->iMotionCube.getAbsoluteRadPerBit() + this->iMotionCube.getIncrementalRadPerBit()))
+  if (!this->hasIMotionCube())
   {
-    // Take the velocity that is closest to that of the previous timestep.
-    if (std::abs(incremental_velocity - this->velocity_) < std::abs(absolute_velocity - this->velocity_))
+    ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
+    return;
+  }
+
+  if (this->receivedDataUpdate())
+  {
+    const double new_incremental_position = this->imc_->getAngleRadIncremental();
+    const double new_absolute_position = this->imc_->getAngleRadAbsolute();
+
+    // Get velocity from encoder position
+    const double incremental_velocity = (new_incremental_position - this->incremental_position_) / elapsed_time.toSec();
+    const double absolute_velocity = (new_absolute_position - this->absolute_position_) / elapsed_time.toSec();
+
+    // If the difference in movement of the two encoders is larger than twice the sum of their precisions,
+    // one of them is probably an outlier.
+    if (std::abs(incremental_velocity - absolute_velocity) * elapsed_time.toSec() >
+        2 * (this->imc_->getAbsoluteRadPerBit() + this->imc_->getIncrementalRadPerBit()))
     {
-      ROS_WARN("There was an outlier in the absolute encoder; old value: %f, new value: %f",
-               this->incremental_position_, new_incremental_position);
-      this->velocity_ = incremental_velocity;
+      // Take the velocity that is closest to that of the previous timestep.
+      if (std::abs(incremental_velocity - this->velocity_) < std::abs(absolute_velocity - this->velocity_))
+      {
+        ROS_WARN("There was an outlier in the absolute encoder; old value: %f, new value: %f",
+                 this->incremental_position_, new_incremental_position);
+        this->velocity_ = incremental_velocity;
+      }
+      else
+      {
+        ROS_WARN("There was an outlier in the absolute encoder; old value: %f, new value: %f", this->absolute_position_,
+                 new_absolute_position);
+        this->velocity_ = absolute_velocity;
+      }
     }
     else
     {
-      ROS_WARN("There was an outlier in the absolute encoder; old value: %f, new value: %f", this->absolute_position_,
-               new_absolute_position);
-      this->velocity_ = absolute_velocity;
+      // Recalibrate joint position if it has drifted
+      if (std::abs(this->absolute_position_ - this->position_) > 2 * this->imc_->getAbsoluteRadPerBit())
+      {
+        this->position_ = this->absolute_position_;
+        ROS_INFO("Recalibrated joint position %s", this->name_.c_str());
+      }
+
+      // Take the velocity with the highest resolution.
+      if (this->imc_->getIncrementalRadPerBit() < this->imc_->getAbsoluteRadPerBit())
+      {
+        this->velocity_ = incremental_velocity;
+      }
+      else
+      {
+        this->velocity_ = absolute_velocity;
+      }
     }
+
+    // Update position with the most accurate velocity
+    this->position_ += this->velocity_ * elapsed_time.toSec();
+    this->incremental_position_ = new_incremental_position;
+    this->absolute_position_ = new_absolute_position;
   }
   else
   {
-    // Recalibrate joint position if it has drifted
-    if (std::abs(this->absolute_position_ - this->position_) > 2 * this->iMotionCube.getAbsoluteRadPerBit())
-    {
-      this->position_ = this->absolute_position_;
-      ROS_INFO("Recalibrated joint position %s", this->name.c_str());
-    }
-
-    // Take the velocity with the highest resolution.
-    if (this->iMotionCube.getIncrementalRadPerBit() < this->iMotionCube.getAbsoluteRadPerBit())
-    {
-      this->velocity_ = incremental_velocity;
-    }
-    else
-    {
-      this->velocity_ = absolute_velocity;
-    }
+    // Update positions with velocity from last time step
+    this->position_ += this->velocity_ * elapsed_time.toSec();
+    this->incremental_position_ += this->velocity_ * elapsed_time.toSec();
+    this->absolute_position_ += this->velocity_ * elapsed_time.toSec();
   }
-
-  // Update position with the most accurate velocity
-  this->position_ += this->velocity_ * elapsed_time.toSec();
-  this->incremental_position_ = new_incremental_position;
-  this->absolute_position_ = new_absolute_position;
 }
 
 double Joint::getPosition()

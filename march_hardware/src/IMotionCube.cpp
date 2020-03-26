@@ -184,12 +184,12 @@ double IMotionCube::getAngleRadIncremental()
 
 double IMotionCube::getAbsoluteRadPerBit()
 {
-  return this->absolute_encoder_.getRadPerBit();
+  return this->absolute_encoder_->getRadPerBit();
 }
 
 double IMotionCube::getIncrementalRadPerBit()
 {
-  return this->incremental_encoder_.getRadPerBit();
+  return this->incremental_encoder_->getRadPerBit();
 }
 
 int16_t IMotionCube::getTorque()

@@ -201,7 +201,7 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
 {
   for (size_t i = 0; i < num_joints_; i++)
   {
-    march::Joint joint = march_robot_->getJoint(joint_names_[i]);
+    march::Joint& joint = march_robot_->getJoint(joint_names_[i]);
 
     // Update position with he most accurate velocity
     joint.readEncoders(elapsed_time);
