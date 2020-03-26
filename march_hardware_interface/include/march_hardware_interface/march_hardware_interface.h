@@ -34,7 +34,7 @@ using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;
 class MarchHardwareInterface : public hardware_interface::RobotHW
 {
 public:
-  explicit MarchHardwareInterface(std::unique_ptr<march::MarchRobot> robot, bool use_reset_imc);
+  explicit MarchHardwareInterface(std::unique_ptr<march::MarchRobot> robot, bool reset_imc);
 
   /**
    * @brief Initialize the HardwareInterface by registering position interfaces
