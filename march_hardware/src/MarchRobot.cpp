@@ -51,7 +51,7 @@ void MarchRobot::startEtherCAT(bool reset_imc)
   if (reset_imc)
   {
     ROS_INFO("Resetting all ImotionCubes");
-    resetImotionCubes();
+    resetIMotionCubes();
 
     ROS_INFO("Restarting the EtherCAT Master");
     ethercatMaster.stop();
@@ -70,7 +70,7 @@ void MarchRobot::stopEtherCAT()
   ethercatMaster.stop();
 }
 
-void MarchRobot::resetImotionCubes()
+void MarchRobot::resetIMotionCubes()
 {
   for (auto& joint : jointList)
   {
