@@ -54,7 +54,7 @@ public:
 
   int getEthercatCycleTime() const;
 
-  Joint getJoint(::std::string jointName);
+  Joint& getJoint(::std::string jointName);
 
   PowerDistributionBoard& getPowerDistributionBoard();
   const PowerDistributionBoard& getPowerDistributionBoard() const;
@@ -70,8 +70,8 @@ public:
     }
     for (unsigned int i = 0; i < lhs.jointList.size(); i++)
     {
-      const march::Joint lhsJoint = lhs.jointList.at(i);
-      const march::Joint rhsJoint = rhs.jointList.at(i);
+      const march::Joint& lhsJoint = lhs.jointList.at(i);
+      const march::Joint& rhsJoint = rhs.jointList.at(i);
       if (lhsJoint != rhsJoint)
       {
         return false;

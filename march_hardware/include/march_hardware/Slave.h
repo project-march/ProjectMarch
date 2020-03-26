@@ -28,7 +28,7 @@ public:
     slaveIndex = -1;
   };
 
-  ~Slave() = default;
+  virtual ~Slave() noexcept = default;
 
   virtual void writeInitialSDOs(int /* cycle_time */)
   {
