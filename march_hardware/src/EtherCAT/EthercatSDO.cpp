@@ -26,7 +26,7 @@ int sdo_bit8_write(uint16_t slave, uint16_t index, uint8_t sub, uint8_t value)
   return received_working_counter;
 }
 
-int sdo_bit8_read(uint16_t slave, uint16_t index, uint8_t sub, int *val_size, uint8_t *value)
+int sdo_bit8_read(uint16_t slave, uint16_t index, uint8_t sub, int* val_size, uint8_t* value)
 {
   ROS_DEBUG("sdo_bit8: slaveIndex %i, reg 0x%X, subindex %i, value 0x%X", slave, index, sub, value);
   int received_working_counter = ec_SDOread(slave, index, sub, FALSE, val_size, value, EC_TIMEOUTRXM);
@@ -50,7 +50,7 @@ int sdo_bit16_write(uint16_t slave, uint16_t index, uint8_t sub, uint16_t value)
   return received_working_counter;
 }
 
-int sdo_bit16_read(uint16_t slave, uint16_t index, uint8_t sub, int *val_size, uint16_t *value)
+int sdo_bit16_read(uint16_t slave, uint16_t index, uint8_t sub, int* val_size, uint16_t* value)
 {
   ROS_DEBUG("sdo_bit16: slaveIndex %i, reg 0x%X, subindex %i, value 0x%X", slave, index, sub, value);
   int received_working_counter = ec_SDOread(slave, index, sub, FALSE, val_size, value, EC_TIMEOUTRXM);
@@ -74,7 +74,7 @@ int sdo_bit32_write(uint16_t slave, uint16_t index, uint8_t sub, uint32_t value)
   return received_working_counter;
 }
 
-int sdo_bit32_read(uint16_t slave, uint16_t index, uint8_t sub, int *val_size, uint32_t *value)
+int sdo_bit32_read(uint16_t slave, uint16_t index, uint8_t sub, int* val_size, uint32_t* value)
 {
   ROS_DEBUG("sdo_bit32: slaveIndex %i, reg 0x%X, subindex %i, value 0x%X", slave, index, sub, value);
   int received_working_counter = ec_SDOread(slave, index, sub, FALSE, val_size, value, EC_TIMEOUTRXM);
