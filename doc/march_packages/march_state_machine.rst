@@ -85,6 +85,46 @@ Furthermore, it tries to kill the Gazebo server sending a ``SIGTERM``, since
 Gazebo has trouble shutting down by itself.
 
 
+ROS API
+-------
+
+Nodes
+^^^^^
+*march_state_machine* - Launches the state machine and keeps track of states.
+
+Subscribed Topics
+^^^^^^^^^^^^^^^^^
+*/march/input_device/instruction* (:march:`march_shared_resources/GaitInstruction <march_shared_resources/msg/GaitInstruction.msg>`)
+  Listens for instructions and executes them when there are possible state transitions.
+
+Published Topics
+^^^^^^^^^^^^^^^^
+*/march/gait/current* (`std_msgs/String <https://docs.ros.org/melodic/api/std_msgs/html/msg/String.html>`_)
+  Publishes the current active gait once when it starts.
+
+*/march/input_device/instruction_response* (:march:`march_shared_resources/GaitInstructionResponse <march_shared_resources/msg/GaitInstructionResponse.msg>`)
+  Publishes whether a gait was accepted, rejected or finished.
+
+Services
+^^^^^^^^
+*/march/state_machine/get_possible_gaits* (:march:`march_shared_resources/PossibleGaits <march_shared_resources/srv/PossibleGaits.srv>`)
+  Returns a list of names of possible gaits than can be executed next.
+
+*/march/state_machine/current_states* (:march:`march_shared_resources/CurrentState <march_shared_resources/srv/CurrentState.srv>`)
+  Returns the current active state and its type.
+
+Parameters
+^^^^^^^^^^
+*state_machine/state_machine_viewer* (*bool*, default: ``false``)
+  Whether to launch the smach_viewer.
+
+*state_machine/unpause* (*bool*, default: ``true``)
+  Unpauses the simulation, since the Gazebo simulation always starts paused.
+
+*state_machine/sounds* (*bool*, default: ``false``)
+  Whether to play sounds using the soundplay_node.
+
+
 Tutorials
 ---------
 
