@@ -1,4 +1,4 @@
-.. _march-simulation-label:
+.. _march-shared-classes-label:
 
 march_shared_classes
 ====================
