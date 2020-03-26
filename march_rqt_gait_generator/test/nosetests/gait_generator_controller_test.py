@@ -123,7 +123,7 @@ class GaitGeneratorControllerTest(unittest.TestCase):
         self.gait_generator_view.message.assert_called_once_with(title='Could not update gait duration',
                                                                  msg='Not all joints have multiple setpoints before '
                                                                      'duration ' + str(self.duration / 2.0))
-        self.gait_generator_view.duration_spin_box.setValue.assert_called_once_with(self.duration)
+        self.gait_generator_view.set_duration_spinbox.assert_called_once_with(self.duration)
         self.assertEqual(self.gait_generator_controller.subgait.duration, self.duration)
 
     def test_update_gait_duration_no_rescale_dont_discard_setpoints(self):
@@ -133,7 +133,7 @@ class GaitGeneratorControllerTest(unittest.TestCase):
             joint.add_interpolated_setpoint(self.duration / 2.0)
         self.gait_generator_controller.update_gait_duration(self.duration / 2.0)
 
-        self.gait_generator_view.duration_spin_box.setValue.assert_called_once_with(self.duration)
+        self.gait_generator_view.set_duration_spinbox.assert_called_once_with(self.duration)
         self.assertEqual(self.gait_generator_controller.subgait.duration, self.duration)
 
     def test_update_gait_duration_no_rescale_do_discard_setpoints(self):
@@ -324,6 +324,13 @@ class GaitGeneratorControllerTest(unittest.TestCase):
         self.gait_generator_controller.undo()
         self.gait_generator_view.publish_preview.assert_called_once()
 
+    def test_undo_duration_changed(self):
+        self.gait_generator_view.scale_setpoints_check_box.isChecked = Mock(return_value=False)
+        self.gait_generator_controller.update_gait_duration(self.duration + 1)
+        self.gait_generator_controller.undo()
+        self.assertEqual(self.gait_generator_controller.subgait.duration, self.duration)
+        self.gait_generator_view.set_duration_spinbox.assert_called_once_with(self.duration)
+
     # redo tests
     def test_redo_no_history(self):
         self.gait_generator_controller.redo()
@@ -344,3 +351,11 @@ class GaitGeneratorControllerTest(unittest.TestCase):
         self.gait_generator_controller.undo()
         self.gait_generator_controller.redo()
         self.assertEqual(self.gait_generator_view.publish_preview.call_count, 2)
+
+    def test_redo_duration_changed(self):
+        self.gait_generator_view.scale_setpoints_check_box.isChecked = Mock(return_value=False)
+        self.gait_generator_controller.update_gait_duration(self.duration + 1)
+        self.gait_generator_controller.undo()
+        self.gait_generator_controller.redo()
+        self.assertEqual(self.gait_generator_controller.subgait.duration, self.duration + 1)
+        self.assertEqual(self.gait_generator_view.set_duration_spinbox.call_count, 2)

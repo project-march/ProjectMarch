@@ -40,6 +40,8 @@ class GaitGeneratorController(object):
         self.view.invert_button.clicked.connect(self.invert_gait)
         self.view.undo_button.clicked.connect(self.undo)
         self.view.redo_button.clicked.connect(self.redo)
+        self.view.ctrl_z.activated.connect(self.undo)
+        self.view.ctrl_shift_z.activated.connect(self.redo)
 
         # Line edits / combo boxes / spin boxes
         self.view.gait_type_combo_box.currentTextChanged.connect(
@@ -117,6 +119,8 @@ class GaitGeneratorController(object):
 
         joint_widget.Table.itemChanged.connect(
             lambda: [
+                joint.save_setpoints(),
+                self.save_changed_joints([joint]),
                 joint.set_setpoints(joint_widget.Table.controller.to_setpoints()),
                 self.view.update_joint_widget(joint, update_table=False),
                 self.view.publish_preview(self.subgait, self.current_time),
@@ -160,14 +164,19 @@ class GaitGeneratorController(object):
             if not self.subgait.has_multiple_setpoints_before_duration(duration):
                 self.view.message(title='Could not update gait duration',
                                   msg='Not all joints have multiple setpoints before duration ' + str(duration))
-                self.view.duration_spin_box.setValue(self.subgait.duration)
+                self.view.set_duration_spinbox(self.subgait.duration)
                 return
             discard_setpoints = self.view.yes_no_question(title='Gait duration lower than highest time setpoint',
                                                           msg='Do you want to discard any setpoints higher than the '
                                                           'given duration?')
             if not discard_setpoints:
-                self.view.duration_spin_box.setValue(self.subgait.duration)
+                self.view.set_duration_spinbox(self.subgait.duration)
                 return
+
+        for joint in self.subgait.joints:
+            joint.save_setpoints(single_joint_change=False)
+        self.save_changed_joints(self.subgait.joints)
+
         self.subgait.set_duration(duration, rescale_setpoints)
         self.view.time_slider.setRange(0, 100 * self.subgait.duration)
 
@@ -279,8 +288,11 @@ class GaitGeneratorController(object):
         joints = self.joint_changed_history.pop()
         for joint in joints:
             joint.undo()
-            self.view.update_joint_widget(joint)
+        self.subgait.set_duration(joints[0].setpoints[-1].time)
+        self.view.set_duration_spinbox(self.subgait.duration)
+
         self.joint_changed_redo_list.append(joints)
+        self.view.update_joint_widgets(joints)
         self.view.publish_preview(self.subgait, self.current_time)
 
     def redo(self):
@@ -290,6 +302,9 @@ class GaitGeneratorController(object):
         joints = self.joint_changed_redo_list.pop()
         for joint in joints:
             joint.redo()
+        self.subgait.set_duration(joints[0].setpoints[-1].time)
+        self.view.set_duration_spinbox(self.subgait.duration)
+
         self.joint_changed_history.append(joints)
         self.view.update_joint_widgets(joints)
         self.view.publish_preview(self.subgait, self.current_time)

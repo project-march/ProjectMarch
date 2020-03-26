@@ -5,8 +5,9 @@ import subprocess
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore
 from python_qt_binding import loadUi
+from python_qt_binding.QtGui import QKeySequence
 from python_qt_binding.QtWidgets import (QFileDialog, QFrame, QHeaderView,
-                                         QMessageBox, QWidget)
+                                         QMessageBox, QShortcut, QWidget)
 import rospkg
 import rospy
 import rviz
@@ -35,6 +36,12 @@ class GaitGeneratorView(QWidget):
         self.RvizFrame.layout().addWidget(self.rviz_frame, 1, 0, 1, 3)
 
         self.gait_type_combo_box.addItems(['walk_like', 'sit_like', 'stairs_like'])
+
+        self.initialize_shortcuts(self)
+
+    def initialize_shortcuts(self, parent):
+        self.ctrl_z = QShortcut(QKeySequence(self.tr('Ctrl+Z')), parent)
+        self.ctrl_shift_z = QShortcut(QKeySequence(self.tr('Ctrl+Shift+Z')), parent)
 
     # Called by build_ui
     def create_rviz_frame(self):
@@ -172,6 +179,11 @@ class GaitGeneratorView(QWidget):
             table.blockSignals(True)
             table.controller.update_setpoints(joint)
             table.blockSignals(False)
+
+    def set_duration_spinbox(self, duration):
+        self.duration_spin_box.blockSignals(True)
+        self.duration_spin_box.setValue(duration)
+        self.duration_spin_box.blockSignals(False)
 
     @staticmethod
     def notify(title, message):
