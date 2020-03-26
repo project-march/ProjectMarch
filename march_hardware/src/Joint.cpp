@@ -140,7 +140,7 @@ IMotionCubeState Joint::getIMotionCubeState()
   states.motionErrorDescription = error::parseMotionError(this->iMotionCube.getMotionError());
 
   states.motorCurrent = this->iMotionCube.getMotorCurrent();
-  states.motorVoltage = this->iMotionCube.getMotorVoltage();
+  states.IMCVoltage = this->iMotionCube.getIMCVoltage();
 
   states.absoluteEncoderValue = this->iMotionCube.getAngleIUAbsolute();
   states.incrementalEncoderValue = this->iMotionCube.getAngleIUIncremental();

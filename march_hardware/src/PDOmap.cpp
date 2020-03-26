@@ -21,6 +21,7 @@ std::unordered_map<IMCObjectName, IMCObject> PDOmap::all_objects = {
   { IMCObjectName::TargetPosition, IMCObject(0x607A, 32) },
   { IMCObjectName::TargetTorque, IMCObject(0x6071, 16) },
   { IMCObjectName::QuickStopDeceleration, IMCObject(0x6085, 32) },
+  { IMCObjectName::MotorVoltage, IMCObject(0x2066, 32) },
   { IMCObjectName::QuickStopOption, IMCObject(0x605A, 16) }
 };
 
