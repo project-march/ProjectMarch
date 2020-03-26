@@ -52,6 +52,8 @@ public:
 
   bool isEthercatOperational();
 
+  void waitForPdo();
+
   int getEthercatCycleTime() const;
 
   Joint getJoint(::std::string jointName);

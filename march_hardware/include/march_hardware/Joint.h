@@ -19,6 +19,7 @@ private:
   // Set this number via the hardware builder
   int netNumber;
   bool allowActuation;
+  float previous_motor_volt_ = 0.0;
   IMotionCube iMotionCube;
   TemperatureGES temperatureGES;
 
@@ -58,6 +59,7 @@ public:
   bool hasIMotionCube();
   bool hasTemperatureGES();
   bool canActuate();
+  bool receivedDataUpdate();
 
   /** @brief Override comparison operator */
   friend bool operator==(const Joint& lhs, const Joint& rhs)

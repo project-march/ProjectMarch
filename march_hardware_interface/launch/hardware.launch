@@ -1,5 +1,6 @@
 <launch>
     <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_linear, test_joint_rotational."/>
+
     <arg name="reset_imc" default="false" doc="Reset the IMC if this argument is set to true"/>
 
     <arg name="control_loop_multiplier" default="1"

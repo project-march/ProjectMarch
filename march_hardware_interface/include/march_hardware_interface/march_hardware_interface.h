@@ -68,6 +68,8 @@ public:
    */
   int getEthercatCycleTime() const;
 
+  void waitForPdo();
+
 private:
   /**
    * Uses the num_joints_ member to resize all vectors
