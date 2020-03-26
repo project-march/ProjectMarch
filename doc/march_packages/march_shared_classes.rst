@@ -1,7 +1,7 @@
 .. _march-simulation-label:
 
 march_shared_classes
-================
+====================
 
 Overview
 --------
