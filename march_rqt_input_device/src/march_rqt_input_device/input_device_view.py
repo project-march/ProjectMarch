@@ -41,11 +41,11 @@ class InputDevicePlugin(Plugin):
 
         # Create buttons here
         rocker_switch_increment = \
-            self.create_button('rocker_switch_up', color_code='#239b56',
+            self.create_button('rocker_switch_up', image_path='/rocker_switch_up.png',
                                callback=lambda: self.controller.publish_increment_step_size())
 
         rocker_switch_decrement = \
-            self.create_button('rocker_switch_down', color_code='#239b56',
+            self.create_button('rocker_switch_down', image_path='/rocker_switch_down.png',
                                callback=lambda: self.controller.publish_decrement_step_size())
 
         home_sit = \
@@ -61,7 +61,7 @@ class InputDevicePlugin(Plugin):
                                callback=lambda: self.controller.publish_gait('gait_sit'))
 
         gait_walk = \
-            self.create_button('gait_walk', image_path='/gait_walk_normal.png',
+            self.create_button('gait_walk', image_path='/gait_walk.png',
                                callback=lambda: self.controller.publish_gait('gait_walk'))
 
         gait_walk_small = \
@@ -69,7 +69,7 @@ class InputDevicePlugin(Plugin):
                                callback=lambda: self.controller.publish_gait('gait_walk_small'))
 
         gait_walk_large = \
-            self.create_button('gait_walk_large',
+            self.create_button('gait_walk_large', image_path='/gait_walk_large.png',
                                callback=lambda: self.controller.publish_gait('gait_walk_large'))
 
         gait_single_step_small = \
@@ -77,7 +77,7 @@ class InputDevicePlugin(Plugin):
                                callback=lambda: self.controller.publish_gait('gait_single_step_small'))
 
         gait_single_step_normal = \
-            self.create_button('gait_single_step_normal', image_path='/gait_single_step_normal.png',
+            self.create_button('gait_single_step_normal', image_path='/gait_single_step_medium.png',
                                callback=lambda: self.controller.publish_gait('gait_single_step_normal'))
 
         gait_side_step_left = \
@@ -207,10 +207,10 @@ class InputDevicePlugin(Plugin):
         stop_button = self.create_button('gait_stop', image_path='/stop.png',
                                          callback=lambda: self.controller.publish_stop())
 
-        pause_button = self.create_button('gait_pause',
+        pause_button = self.create_button('gait_pause', image_path='/pause.png',
                                           callback=lambda: self.controller.publish_pause())
 
-        continue_button = self.create_button('gait_continue',
+        continue_button = self.create_button('gait_continue', image_path='/continue.png',
                                              callback=lambda: self.controller.publish_continue())
 
         error_button = self.create_button('error', image_path='/error.png',
