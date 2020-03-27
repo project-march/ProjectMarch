@@ -5,6 +5,8 @@
 #include <vector>
 #include <string>
 #include <thread>
+#include <mutex>
+#include <condition_variable>
 
 #include <march_hardware/Joint.h>
 
@@ -33,6 +35,7 @@ public:
   EthercatMaster& operator=(EthercatMaster&&) = delete;
 
   bool isOperational() const;
+  void waitForPdo();
 
   /**
    * Returns the cycle time in milliseconds.
@@ -50,6 +53,8 @@ public:
    * Stops the ethercat loop and joins the thread.
    */
   void stop();
+
+  static const int THREAD_PRIORITY = 40;
 
 private:
   /**
@@ -78,11 +83,24 @@ private:
    */
   static void monitorSlaveConnection();
 
+  /**
+   * Sets the ethercat thread priority and scheduling
+   * to SCHED_FIFO using pthread.
+   * Note: Only works on POSIX compliant systems.
+   *
+   * @param priority a pthread priority value between 1 and 99 for SCHED_FIFO threads.
+   */
+  void setThreadPriority(int priority);
+
   std::atomic<bool> is_operational_;
 
   const std::string ifname_;
   const int max_slave_index_;
   const int cycle_time_ms_;
+
+  std::mutex wait_on_pdo_condition_mutex_;
+  std::condition_variable wait_on_pdo_condition_var_;
+  bool pdo_received_ = false;
 
   char io_map_[4096] = { 0 };
   int expected_working_counter_ = 0;

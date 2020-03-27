@@ -6,25 +6,32 @@
 #include "march_hardware/EtherCAT/EthercatIO.h"
 
 #include <bitset>
+#include <memory>
+#include <stdexcept>
 #include <string>
 #include <unistd.h>
+#include <utility>
 
 #include <ros/ros.h>
 
 namespace march
 {
-IMotionCube::IMotionCube(int slave_index, AbsoluteEncoder absolute_encoder, IncrementalEncoder incremental_encoder,
-                         ActuationMode actuation_mode)
+IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+                         std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode)
   : Slave(slave_index)
-  , absolute_encoder_(absolute_encoder)
-  , incremental_encoder_(incremental_encoder)
+  , absolute_encoder_(std::move(absolute_encoder))
+  , incremental_encoder_(std::move(incremental_encoder))
   , actuation_mode_(actuation_mode)
 {
-  this->absolute_encoder_.setSlaveIndex(slave_index);
-  this->incremental_encoder_.setSlaveIndex(slave_index);
+  if (!this->absolute_encoder_ || !this->incremental_encoder_)
+  {
+    throw std::invalid_argument("Incremental or absolute encoder cannot be nullptr");
+  }
+  this->absolute_encoder_->setSlaveIndex(slave_index);
+  this->incremental_encoder_->setSlaveIndex(slave_index);
   this->is_incremental_more_precise_ =
-      (this->incremental_encoder_.getTotalPositions() * this->incremental_encoder_.getTransmission() >
-       this->absolute_encoder_.getTotalPositions() * 10);
+      (this->incremental_encoder_->getTotalPositions() * this->incremental_encoder_->getTransmission() >
+       this->absolute_encoder_->getTotalPositions() * 10);
   // Multiply by ten to ensure the rotational joints keep using absolute encoders. These are somehow more accurate
   // even though they theoretically shouldn't be.
 }
@@ -38,9 +45,9 @@ void IMotionCube::writeInitialSDOs(int cycle_time)
                                                                              "as it has actuation mode of unknown");
   }
 
-  mapMisoPDOs();
-  mapMosiPDOs();
-  writeInitialSettings(cycle_time);
+  this->mapMisoPDOs();
+  this->mapMosiPDOs();
+  this->writeInitialSettings(cycle_time);
 }
 
 // Map Process Data Object (PDO) for by sending SDOs to the IMC
@@ -118,16 +125,17 @@ void IMotionCube::actuateRad(double target_rad)
                                    "Target %f exceeds max difference of %f from current %f for slave %d", target_rad,
                                    MAX_TARGET_DIFFERENCE, this->getAngleRadAbsolute(), this->slaveIndex);
   }
-  this->actuateIU(this->absolute_encoder_.fromRad(target_rad));
+  this->actuateIU(this->absolute_encoder_->fromRad(target_rad));
 }
 
 void IMotionCube::actuateIU(int32_t target_iu)
 {
-  if (!this->absolute_encoder_.isValidTargetIU(this->getAngleIUAbsolute(), target_iu))
+  if (!this->absolute_encoder_->isValidTargetIU(this->getAngleIUAbsolute(), target_iu))
   {
-    throw error::HardwareException(
-        error::ErrorType::INVALID_ACTUATE_POSITION, "Position %i is invalid for slave %d. (%d, %d)", target_iu,
-        this->slaveIndex, this->absolute_encoder_.getLowerSoftLimitIU(), this->absolute_encoder_.getUpperSoftLimitIU());
+    throw error::HardwareException(error::ErrorType::INVALID_ACTUATE_POSITION,
+                                   "Position %d is invalid for slave %d. (%d, %d)", target_iu, this->slaveIndex,
+                                   this->absolute_encoder_->getLowerSoftLimitIU(),
+                                   this->absolute_encoder_->getUpperSoftLimitIU());
   }
 
   bit32 target_position = { .i = target_iu };
@@ -166,7 +174,7 @@ double IMotionCube::getAngleRadAbsolute()
   {
     ROS_WARN_THROTTLE(10, "Invalid use of encoders, you're not in the correct state.");
   }
-  return this->absolute_encoder_.getAngleRad(this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
+  return this->absolute_encoder_->getAngleRad(this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
 }
 
 double IMotionCube::getAngleRadIncremental()
@@ -176,7 +184,7 @@ double IMotionCube::getAngleRadIncremental()
   {
     ROS_WARN_THROTTLE(10, "Invalid use of encoders, you're not in the correct state.");
   }
-  return this->incremental_encoder_.getAngleRad(this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
+  return this->incremental_encoder_->getAngleRad(this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
 }
 
 double IMotionCube::getAngleRadMostPrecise()
@@ -199,12 +207,12 @@ int16_t IMotionCube::getTorque()
 
 int32_t IMotionCube::getAngleIUAbsolute()
 {
-  return this->absolute_encoder_.getAngleIU(this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
+  return this->absolute_encoder_->getAngleIU(this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
 }
 
 int IMotionCube::getAngleIUIncremental()
 {
-  return this->incremental_encoder_.getAngleIU(this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
+  return this->incremental_encoder_->getAngleIU(this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
 }
 
 uint16_t IMotionCube::getStatusWord()
@@ -293,13 +301,13 @@ void IMotionCube::goToOperationEnabled()
                                    "Encoder of IMotionCube with slave index %d has reset. Read angle %d IU",
                                    this->slaveIndex, angle);
   }
-  else if (!this->absolute_encoder_.isWithinHardLimitsIU(angle))
+  else if (!this->absolute_encoder_->isWithinHardLimitsIU(angle))
   {
     throw error::HardwareException(error::ErrorType::OUTSIDE_HARD_LIMITS,
                                    "Joint with slave index %d is outside hard limits (read value %d IU, limits from %d "
                                    "IU to %d IU)",
-                                   this->slaveIndex, angle, this->absolute_encoder_.getLowerHardLimitIU(),
-                                   this->absolute_encoder_.getUpperHardLimitIU());
+                                   this->slaveIndex, angle, this->absolute_encoder_->getLowerHardLimitIU(),
+                                   this->absolute_encoder_->getUpperHardLimitIU());
   }
 
   if (this->actuation_mode_ == ActuationMode::position)
