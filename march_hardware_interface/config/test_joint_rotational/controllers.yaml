@@ -10,8 +10,6 @@ march:
       type: march_pdb_state_controller/MarchPdbStateController
       publish_rate: 50
     trajectory:
-      type: effort_controllers/JointTrajectoryController
+      type: position_controllers/JointTrajectoryController
       joints:
         - rotational_joint
-      gains:
-        rotational_joint: {p: 10, i: 0, d: 10, i_clamp: 100, publish_state: true, antiwindup: true}

@@ -3,7 +3,7 @@ testsetup:
   ecatCycleTime: 4
   joints:
     - rotational_joint:
-        actuationMode: torque
+        actuationMode: position
         allowActuation: true
         imotioncube:
           slaveIndex: 1
