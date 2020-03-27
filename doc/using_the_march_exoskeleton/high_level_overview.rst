@@ -23,3 +23,10 @@ exoskeleton.
 
 Input Device
 ^^^^^^^^^^^^
+The pilot of the exoskeleton can give input on which gait they want to perform
+through the input device embedded in one of the crutches, see
+:ref:`march-input-device-label`. Furthermore, there exists a developer input
+device in the form of an RQT plugin, see :ref:`march-rqt-input-device-label`.
+Both of these ways of input can either be used in the simulation or the
+hardware. They are not dependent on the configuration in which the exoskeleton
+is run.
