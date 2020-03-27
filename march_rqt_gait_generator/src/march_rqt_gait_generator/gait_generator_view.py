@@ -37,11 +37,11 @@ class GaitGeneratorView(QWidget):
 
         self.gait_type_combo_box.addItems(['walk_like', 'sit_like', 'stairs_like'])
 
-        self.initialize_shortcuts(self)
+        self.initialize_shortcuts()
 
-    def initialize_shortcuts(self, parent):
-        self.ctrl_z = QShortcut(QKeySequence(self.tr('Ctrl+Z')), parent)
-        self.ctrl_shift_z = QShortcut(QKeySequence(self.tr('Ctrl+Shift+Z')), parent)
+    def initialize_shortcuts(self):
+        self.ctrl_z = QShortcut(QKeySequence(self.tr('Ctrl+Z')), self)
+        self.ctrl_shift_z = QShortcut(QKeySequence(self.tr('Ctrl+Shift+Z')), self)
 
     # Called by build_ui
     def create_rviz_frame(self):
