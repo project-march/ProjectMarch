@@ -75,7 +75,7 @@ void IMotionCube::writeInitialSettings(uint8_t cycle_time)
   ROS_DEBUG("IMotionCube::writeInitialSettings");
 
   // mode of operation First read and print the mode of operation as a test
-  uint8_t = moor;
+  uint8_t moor;
   int moorl = sizeof(moor);
 
   int mode_of_op_r = int mode_of_op = sdo_bit8_read(slaveIndex, 0x6060, 0, &moorl, &moor);
@@ -83,7 +83,7 @@ void IMotionCube::writeInitialSettings(uint8_t cycle_time)
 
   int mode_of_op = sdo_bit8_write(slaveIndex, 0x6060, 0, this->actuation_mode_.toModeNumber());
 
-  int mode_of_op_r = int mode_of_op = sdo_bit8_read(slaveIndex, 0x6060, 0, &moorl, &moor);
+  int mode_of_op_r = sdo_bit8_read(slaveIndex, 0x6060, 0, &moorl, &moor);
   ROS_INFO("After writing it hsa been set to: ", moor);
 
   // position limit -- min position
