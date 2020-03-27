@@ -3,11 +3,6 @@
 
     <arg name="reset_imc" default="false" doc="Reset the IMC if this argument is set to true"/>
 
-    <arg name="control_loop_multiplier" default="1"
-         doc="Multiplier for the duration of the control loop cycle time compared
-              to the ethercat cycle time. This must be a positive integer and
-              always assures that the control loop cycle time is a multiple of
-              the ethercat cycle time."/>
 
     <rosparam file="$(find march_hardware_interface)/config/$(arg robot)/controllers.yaml" command="load"/>
 
@@ -29,7 +24,6 @@
                 output="screen"
                 required="true"
         >
-            <param name="control_loop_multiplier" value="$(arg control_loop_multiplier)"/>
             <param name="reset_imc" value="$(arg reset_imc)"/>
 
         </node>

@@ -42,7 +42,7 @@ public:
 
   void resetIMotionCubes();
 
-  void startEtherCAT(bool do_reset_imc);
+  void startEtherCAT(bool reset_imc);
 
   void stopEtherCAT();
 

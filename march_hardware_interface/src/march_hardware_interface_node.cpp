@@ -21,8 +21,7 @@ int main(int argc, char** argv)
   AllowedRobot selected_robot = AllowedRobot(argv[1]);
   ROS_INFO_STREAM("Selected robot: " << selected_robot);
 
-  bool reset_imc = ros::param::param<bool>("~reset_imc", 1);
-  ROS_INFO_STREAM("Use the reset of the IMC: " << reset_imc);
+  bool reset_imc = ros::param::param<bool>("~reset_imc", false);
 
   spinner.start();
 

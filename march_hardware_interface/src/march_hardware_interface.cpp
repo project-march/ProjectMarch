@@ -27,6 +27,7 @@ using march::Joint;
 MarchHardwareInterface::MarchHardwareInterface(std::unique_ptr<march::MarchRobot> robot, bool reset_imc)
   : march_robot_(std::move(robot))
   , has_power_distribution_board_(this->march_robot_->getPowerDistributionBoard().getSlaveIndex() != -1)
+  , reset_imc_(reset_imc)
 {
   // Get joint names from urdf
   for (const auto& urdf_joint : this->march_robot_->getUrdf().joints_)
@@ -37,8 +38,6 @@ MarchHardwareInterface::MarchHardwareInterface(std::unique_ptr<march::MarchRobot
     }
   }
   this->num_joints_ = this->joint_names_.size();
-
-  this->reset_imc_ = reset_imc;
 }
 
 bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot_hw_nh */)
