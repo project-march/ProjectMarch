@@ -96,8 +96,7 @@ void IMotionCube::writeInitialSettings(uint8_t cycle_time)
   int rate_ec_x = sdo_bit8_write(slaveIndex, 0x60C2, 1, cycle_time);
   int rate_ec_y = sdo_bit8_write(slaveIndex, 0x60C2, 2, -3);
 
-  if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && stop_decl && abort_con && rate_ec_x && rate_ec_y) &&
-      mode_of_op_r)
+  if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && stop_decl && abort_con && rate_ec_x && rate_ec_y))
   {
     throw error::HardwareException(error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
                                    "Failed writing initial settings to IMC of slave %d", this->slaveIndex);
