@@ -157,7 +157,8 @@ Tutorials
 Adding a publisher into `ESP`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 1. Add a source window to the :march:`model <march_data_collector/esp_models/march.xml>`.
-2. Create a callback function that takes a ROS msgs and calls the  ``send_to_esp`` function with the msgs as csv string in :march:`esp_adapter.py <march_data_collector/srcmarch_data_collector/esp_adapter.py>`
+2. Create a callback function that takes a ROS msgs and calls the  ``send_to_esp`` function with the msgs as csv
+string in :march:`esp_adapter.py <march_data_collector/src/march_data_collector/esp_adapter.py>`
 3. In the same file add a call to ``configure_source`` to the ``__init__``.
 
 Launching with `ESP`
