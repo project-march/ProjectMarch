@@ -119,7 +119,7 @@ private:
   const std::string name_;
   const int net_number_;
   bool allow_actuation_ = false;
-  float previous_motor_volt_ = 0.0;
+  float previous_imc_volt_ = 0.0;
 
   std::unique_ptr<IMotionCube> imc_ = nullptr;
   std::unique_ptr<TemperatureGES> temperature_ges_ = nullptr;
