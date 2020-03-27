@@ -32,7 +32,7 @@ int sdo_bit8_read(uint16_t slave, uint16_t index, uint8_t sub, int* val_size, ui
   int received_working_counter = ec_SDOread(slave, index, sub, FALSE, val_size, value, EC_TIMEOUTRXM);
   if (received_working_counter == 0)
   {
-    ROS_FATAL("(sdo_bit8) Error occurred when writing, reg 0x%X, sub-index %i, data: 0x%X to slave %i", index, sub,
+    ROS_FATAL("(sdo_bit8) Error occurred when reading, reg 0x%X, sub-index %i, data: 0x%X from slave %i", index, sub,
               value, slave);
   }
   return received_working_counter;
