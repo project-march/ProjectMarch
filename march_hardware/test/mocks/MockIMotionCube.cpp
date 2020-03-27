@@ -19,6 +19,10 @@ public:
   MOCK_METHOD1(writeInitialSDOs, void(int));
   MOCK_METHOD0(goToOperationEnabled, void());
 
+  MOCK_METHOD0(getAngleRadIncremental, double());
+  MOCK_METHOD0(getAngleRadAbsolute, double());
+  MOCK_METHOD0(getMotorVoltage, float());
+
   MOCK_METHOD1(actuateRad, void(double));
   MOCK_METHOD1(actuateTorque, void(int16_t));
 };

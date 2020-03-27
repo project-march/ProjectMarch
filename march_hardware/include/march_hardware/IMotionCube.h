@@ -40,8 +40,8 @@ public:
 
   void writeInitialSDOs(int cycle_time) override;
 
-  double getAngleRadAbsolute();
-  double getAngleRadIncremental();
+  virtual double getAngleRadAbsolute();
+  virtual double getAngleRadIncremental();
   double getAbsoluteRadPerBit();
   double getIncrementalRadPerBit();
   int16_t getTorque();
@@ -55,7 +55,7 @@ public:
   ActuationMode getActuationMode() const;
 
   float getMotorCurrent();
-  float getMotorVoltage();
+  virtual float getMotorVoltage();
 
   void setControlWord(uint16_t control_word);
 
