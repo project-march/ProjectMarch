@@ -15,6 +15,9 @@ In case an IMU is used, the :ref:`march-data-collector-label` uses IMU data to s
 The resulting `tf frames` are used by `rviz` for creating a visualisation. The `tf frames` are also used in the :ref:`march-data-collector-label`
 to calculate the center of mass and capture point.
 
+When you select to unfix the exoskeleton in simulation a script in the :ref:`march-simulation-label` is used to produce
+a transform that copies the movements of the exoskeleton with respect to the world. The movements are then also visible in `rviz`.
+
 urdf
 ^^^^
 

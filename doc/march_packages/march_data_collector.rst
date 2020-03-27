@@ -38,7 +38,7 @@ The data is send to other windows with different functions, like joining differe
 event stream, transforming an event stream or using the data in the events for an algorithm. The windows should form an acyclic graph together.
 A group of windows is called a :march:`model <march_data_collector/esp_models/march.xml>`.
 Other applications can  subscribe to a windows to use the data in the window. This can be done for data visualisation, csv output or streaming bag into our software.
-The :march:`esp_adapter.py <march_data_collector/srcmarch_data_collector/esp_adapter.py>` subscribes to ROS msgs and transforms incoming messages to csv strings. The csv strings are send to the ESP engine.
+The :march:`esp_adapter.py <march_data_collector/src/march_data_collector/esp_adapter.py>` subscribes to ROS msgs and transforms incoming messages to csv strings. The csv strings are send to the ESP engine.
 
 
 Pressure Soles
