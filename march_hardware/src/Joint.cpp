@@ -161,7 +161,7 @@ IMotionCubeState Joint::getIMotionCubeState()
   states.motionErrorDescription = error::parseMotionError(this->imc_->getMotionError());
 
   states.motorCurrent = this->imc_->getMotorCurrent();
-  states.motorVoltage = this->imc_->getMotorVoltage();
+  states.IMCVoltage = this->imc_->getIMCVoltage();
 
   states.absoluteEncoderValue = this->imc_->getAngleIUAbsolute();
   states.incrementalEncoderValue = this->imc_->getAngleIUIncremental();
