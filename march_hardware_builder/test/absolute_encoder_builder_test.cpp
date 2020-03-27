@@ -41,8 +41,14 @@ TEST_F(TestAbsoluteEncoderBuilder, ValidEncoderHip)
   march::AbsoluteEncoder expected =
       march::AbsoluteEncoder(16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper,
                              this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit);
-  march::AbsoluteEncoder created = HardwareBuilder::createAbsoluteEncoder(config, this->joint);
-  ASSERT_EQ(expected, created);
+  auto created = HardwareBuilder::createAbsoluteEncoder(config, this->joint);
+  ASSERT_EQ(expected, *created);
+}
+
+TEST_F(TestAbsoluteEncoderBuilder, NoConfig)
+{
+  YAML::Node config;
+  ASSERT_EQ(nullptr, HardwareBuilder::createAbsoluteEncoder(config[""], this->joint));
 }
 
 TEST_F(TestAbsoluteEncoderBuilder, NoResolution)

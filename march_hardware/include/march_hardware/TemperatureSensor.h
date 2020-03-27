@@ -7,6 +7,8 @@ namespace march
 class TemperatureSensor
 {
 public:
+  virtual ~TemperatureSensor() noexcept = default;
+
   virtual float getTemperature() = 0;
 };
 }  // namespace march

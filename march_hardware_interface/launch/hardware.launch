@@ -1,10 +1,5 @@
 <launch>
     <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_linear, test_joint_rotational."/>
-    <arg name="control_loop_multiplier" default="1"
-         doc="Multiplier for the duration of the control loop cycle time compared
-              to the ethercat cycle time. This must be a positive integer and
-              always assures that the control loop cycle time is a multiple of
-              the ethercat cycle time."/>
 
     <rosparam file="$(find march_hardware_interface)/config/$(arg robot)/controllers.yaml" command="load"/>
 
@@ -25,8 +20,6 @@
                 args="$(arg robot)"
                 output="screen"
                 required="true"
-        >
-            <param name="control_loop_multiplier" value="$(arg control_loop_multiplier)"/>
-        </node>
+        />
     </group>
 </launch>
