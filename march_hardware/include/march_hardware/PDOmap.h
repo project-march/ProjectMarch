@@ -55,7 +55,6 @@ enum class IMCObjectName
   TargetTorque,
   QuickStopDeceleration,
   QuickStopOption,
-  MotorVoltage
 };
 
 class PDOmap
