@@ -54,15 +54,25 @@ All devices should be connected to the same WiFi for optimal functioning.
 
 1. First you open the app on the phone and you pair the insoles with the phone.
 
-..note::
+.. note::
 
     The pressure soles are turned on by moving/shaking them, because the internal IMU is triggered.
     Shake the pressure soles when they do not automatically turn on.
 
-2. Next you should set the record mode to live capture. Open the Moticon desktop app and go to the record section. Set the following things:
+2. Next you should set the record mode to live capture. Open the Moticon desktop app and go to the record section and settings. Set the following things:
 
-* Set the IP-address
-* Set the incoming data
+    * UDP Input:
+        - `Channel name:`           Joint_positions
+        - `Number rof Channels:`    8
+        - `Datatype:`               float32
+        - `Port:`                   9999
+
+    * UDP Output
+        - `IP addess:`              \<exoskeleton_ip\>
+        - `Port:`                   8888
+        - `Filter:`                 force pressure cop
+
+More info on this step can be found `here <https://www.moticon.de/doc/science_desktop_software/record/udp/>`_.
 
 3. Lastly use should set the correct launch arguments. You should set pressure_soles to true and if you are not using the
 standard SWitch laptop connected to the project March router, you should set the IP-address on which the Moticon desktop app is running.
@@ -73,8 +83,11 @@ ROS API
 Nodes
 ^^^^^
 *march_data_collector_node* - Responsible for processing IMU data and calculating the jerk.
+
 *com_calculator* - Responsible for calculating the center of mass.
+
 *cp_calculator* - Responsible for calculating the capture points.
+
 *esp_adapter* - Responsible for sending data to the ESP engine.
 
 Subscribed Topics
@@ -150,31 +163,19 @@ Adding a publisher into `ESP`
 Launching with `ESP`
 ^^^^^^^^^^^^^^^^^^^^
 
-..note::
+.. note::
 
     The ESP engine should be installed on the machine. You need a license for this.
     An engine is installed on the exoskeleton.
 
 1. Launch an `ESP` server. On the exoskeleton the following terminal command is configured to start an `ESP` with the correct settings.
 
-    ..code::
+    .. code::
 
         esp_start
 
 2. Do a normal launch (simulation, headless, normal) and set the launch argument ``esp`` to true. For instance:
 
-    ..code::
+    .. code::
 
         roslaunch march_launch march.launch esp:=true
-
-
-FAQ
----
-
-How do I x?
-^^^^^^^^^^^
-Please check the tutorials.
-
-How do I z?
-^^^^^^^^^^^
-z is not available at the moment.
