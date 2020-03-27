@@ -164,7 +164,7 @@ int MarchRobot::getEthercatCycleTime() const
   return this->ethercatMaster.getCycleTime();
 }
 
-Joint MarchRobot::getJoint(::std::string jointName)
+Joint& MarchRobot::getJoint(::std::string jointName)
 {
   if (!ethercatMaster.isOperational())
   {

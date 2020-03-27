@@ -108,7 +108,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
   // Initialize interfaces for each joint
   for (size_t i = 0; i < num_joints_; ++i)
   {
-    march::Joint joint = march_robot_->getJoint(joint_names_[i]);
+    march::Joint& joint = march_robot_->getJoint(joint_names_[i]);
     // Create joint state interface
     JointStateHandle joint_state_handle(joint.getName(), &joint_position_[i], &joint_velocity_[i], &joint_effort_[i]);
     joint_state_interface_.registerHandle(joint_state_handle);
@@ -203,7 +203,7 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
 {
   for (size_t i = 0; i < num_joints_; i++)
   {
-    march::Joint joint = march_robot_->getJoint(joint_names_[i]);
+    march::Joint& joint = march_robot_->getJoint(joint_names_[i]);
     if (joint.receivedDataUpdate())
     {
       const double old_relative_position = relative_joint_position_[i];
@@ -263,7 +263,7 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
 
   for (size_t i = 0; i < num_joints_; i++)
   {
-    march::Joint joint = march_robot_->getJoint(joint_names_[i]);
+    march::Joint& joint = march_robot_->getJoint(joint_names_[i]);
 
     if (joint.canActuate())
     {
@@ -405,7 +405,7 @@ void MarchHardwareInterface::updateAfterLimitJointCommand()
   after_limit_joint_command_pub_->msg_.header.stamp = ros::Time::now();
   for (size_t i = 0; i < num_joints_; i++)
   {
-    march::Joint joint = march_robot_->getJoint(joint_names_[i]);
+    march::Joint& joint = march_robot_->getJoint(joint_names_[i]);
 
     after_limit_joint_command_pub_->msg_.name[i] = joint.getName();
     after_limit_joint_command_pub_->msg_.position_command[i] = joint_position_command_[i];
@@ -463,7 +463,7 @@ void MarchHardwareInterface::iMotionCubeStateCheck(size_t joint_index)
 
 void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
 {
-  march::Joint joint = march_robot_->getJoint(joint_names_[joint_index]);
+  march::Joint& joint = march_robot_->getJoint(joint_names_[joint_index]);
   if (joint_position_[joint_index] < soft_limits_[joint_index].min_position ||
       joint_position_[joint_index] > soft_limits_[joint_index].max_position)
   {

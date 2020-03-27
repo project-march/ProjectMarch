@@ -22,6 +22,8 @@ public:
     slaveIndex = -1;
   };
 
+  ~TemperatureGES() noexcept override = default;
+
   float getTemperature() override;
 
   /** @brief Override comparison operator */
