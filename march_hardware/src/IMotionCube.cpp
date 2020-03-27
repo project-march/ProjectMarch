@@ -88,7 +88,7 @@ void IMotionCube::writeInitialSettings(uint8_t cycle_time)
   int min_pos_lim = sdo_bit32_write(slaveIndex, 0x607D, 1, this->absolute_encoder_->getLowerSoftLimitIU());
 
   // position limit -- max position
-  int max_pos_lim = sdo_bit32_write(slaveIndex, 0x607D, 2, this->absolute_encoder_.getUpperSoftLimitIU());
+  int max_pos_lim = sdo_bit32_write(slaveIndex, 0x607D, 2, this->absolute_encoder_->getUpperSoftLimitIU());
 
   // Quick stop option
   int stop_opt = sdo_bit16_write(slaveIndex, 0x605A, 0, 6);
