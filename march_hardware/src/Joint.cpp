@@ -59,7 +59,7 @@ void Joint::resetIMotionCube()
 {
   if (hasIMotionCube())
   {
-    this->iMotionCube.resetIMotionCube();
+    this->imc_->resetIMotionCube();
   }
 }
 
