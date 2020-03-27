@@ -125,7 +125,7 @@ class InputDevicePlugin(Plugin):
                                callback=lambda: self.controller.publish_gait('gait_stairs_down_single_step'))
 
         gait_rough_terrain_high_step = \
-            self.create_button('gait_rough_terrain_high_step',
+            self.create_button('gait_rough_terrain_high_step', image_path='/gait_rough_terrain_high_step.png',
                                callback=lambda: self.controller.publish_gait('gait_rough_terrain_high_step'))
 
         gait_rough_terrain_middle_steps = \
