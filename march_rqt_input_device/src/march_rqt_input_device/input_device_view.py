@@ -117,11 +117,11 @@ class InputDevicePlugin(Plugin):
                                callback=lambda: self.controller.publish_gait('gait_stairs_down'))
 
         gait_stairs_up_single_step = \
-            self.create_button('gait_stairs_up_single_step',
+            self.create_button('gait_stairs_up_single_step', image_path='/gait_stairs_up_single_step.png',
                                callback=lambda: self.controller.publish_gait('gait_stairs_up_single_step'))
 
         gait_stairs_down_single_step = \
-            self.create_button('gait_stairs_down_single_step',
+            self.create_button('gait_stairs_down_single_step', image_path='/gait_stairs_down_single_step.png',
                                callback=lambda: self.controller.publish_gait('gait_stairs_down_single_step'))
 
         gait_rough_terrain_high_step = \
@@ -220,11 +220,11 @@ class InputDevicePlugin(Plugin):
         # Position in the array determines position on screen.
         march_button_layout = [
 
-            [home_sit, home_stand, gait_walk, gait_walk_small, gait_walk_large, stop_button, pause_button],
+            [home_sit, home_stand, gait_walk, gait_walk_small, gait_walk_large],
 
-            [gait_sit, gait_stand, gait_single_step_normal, gait_single_step_small, continue_button, error_button],
+            [gait_sit, gait_stand, rocker_switch_increment, rocker_switch_decrement, stop_button, error_button],
 
-            [gait_sofa_sit, gait_sofa_stand, rocker_switch_increment, rocker_switch_decrement],
+            [gait_sofa_sit, gait_sofa_stand, gait_single_step_normal, gait_single_step_small, continue_button, pause_button],
 
             [gait_stairs_up, gait_stairs_down, gait_stairs_up_single_step, gait_stairs_down_single_step],
 
