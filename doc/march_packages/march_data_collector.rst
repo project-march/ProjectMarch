@@ -5,9 +5,9 @@ march_data_collector
 
 Overview
 --------
-The `march_data_collector` package subscribes to the topics on which data is published to process the date. Basically three things are happening to the data:
+The `march_data_collector` package subscribes to the topics on which data is published to process the data. Basically three things are happening to the data:
 
-* Based on the position also the acceleration and jerk are calculated for future analysis.
+* Based on the position, the acceleration and jerk are calculated for future analysis.
 
 * The IMU is used to adapt the tf frames and based on this the center of mass (CoM) and the capture point (CP) are calculated.
 
@@ -18,7 +18,7 @@ Furthermore the  package also publishes incoming data from the pressure soles an
 Calculating `CoM` and `CP`
 --------------------------
 The data from the IMU (:ref:`march-imu-manager-label`) is used to change the tf frames (see :ref:`robot-model-label`).
-Now the tf frames are orientated with respect to the world correctly.
+such that the tf frames are orientated with respect to the world correctly.
 The tf frames together with the masses of the links from the :ref:`URDF <robot-model-label>` can be used to calculate the center of mass.
 This is then published as a marker on ``/march/com_marker``.
 The calculation is based on an implementation from `Hamburg Bit-Bots <https://github.com/bit-bots>`_.
@@ -33,11 +33,11 @@ An `Event Stream Processing` engine from `SAS <https://www.sas.com/nl_nl/home.ht
 There is a lot of documentation on this engine at
 `ESP documentation <https://documentation.sas.com/?cdcId=espcdc&cdcVersion=6.2&docsetId=espov&docsetTarget=home.htm&locale=nl>`_.
 The Engine allows for real-time data analysis and processing.
-An engine consists of multiple windows. The data comes in at several `source windows`.
-The data is send to other windows with different functions, like joining different event streams, aggregating an
+An engine consists of multiple windows. The data comes in at so-called `source windows`.
+From the source windows data is send to other windows with different functions, like joining different event streams, aggregating an
 event stream, transforming an event stream or using the data in the events for an algorithm. The windows should form an acyclic graph together.
 A group of windows is called a :march:`model <march_data_collector/esp_models/march.xml>`.
-Other applications can  subscribe to a windows to use the data in the window. This can be done for data visualisation, csv output or streaming bag into our software.
+Other applications can  subscribe to a windows to use the data in the window. This can be done for data visualisation, csv output or streaming back into our software.
 The :march:`esp_adapter.py <march_data_collector/src/march_data_collector/esp_adapter.py>` subscribes to ROS msgs and transforms incoming messages to csv strings. The csv strings are send to the ESP engine.
 
 
@@ -52,11 +52,11 @@ At March we currently use the `Moticon <https://www.moticon.de/>`_ pressure sole
 
 All devices should be connected to the same WiFi for optimal functioning.
 
-1. First you open the app on the phone and you pair the insoles with the phone.
+1. First you open the app on the phone and pair the insoles with the phone.
 
 .. note::
 
-    The pressure soles are turned on by moving/shaking them, because the internal IMU is triggered.
+    The pressure soles are turned on by moving them, because the internal IMU is triggered.
     Shake the pressure soles when they do not automatically turn on.
 
 2. Next you should set the record mode to live capture. Open the Moticon desktop app and go to the record section and settings. Set the following things:
@@ -75,7 +75,7 @@ All devices should be connected to the same WiFi for optimal functioning.
 More info on this step can be found `here <https://www.moticon.de/doc/science_desktop_software/record/udp/>`_.
 
 3. Lastly use should set the correct launch arguments. You should set pressure_soles to true and if you are not using the
-standard SWitch laptop connected to the project March router, you should set the IP-address on which the Moticon desktop app is running.
+standard Switch laptop connected to the project March router, you should set the IP-address on which the Moticon desktop app is running.
 
 ROS API
 -------
@@ -111,7 +111,7 @@ Subscribed Topics
   Send center of mass to `ESP`.
 
 */march/joint_values* (march_shared_resources/JointValues)
-  Send position, velocity, acceleration and jerk of joints `ESP`.
+  Send position, velocity, acceleration and jerk of joints to `ESP`.
 
 */march/joint_states* (sensor_msgs/JointState)
   Send actual effort to `ESP`.
@@ -139,9 +139,9 @@ Published Topics
   A marker with the capture point for the right foot.
 
 */march/pressure_soles* (march_shared_resources/JointValues)
-  A marker with the capture point for the right foot.
+  Send the data from the pressure soles.
 
-Publishes tf frames via a `tf2 <http://wiki.ros.org/tf2>`_ broadcaster.
+Publishes into tf via a `tf2 <http://wiki.ros.org/tf2>`_ broadcaster.
 
 Parameters
 ^^^^^^^^^^
@@ -150,16 +150,18 @@ Parameters
 */march/march_data_collector/pressure_soles* (*bool*, default: false)
   Whether to connect with the pressure soles.
 
-
 Tutorials
 ---------
 
 Adding a publisher into `ESP`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 1. Add a source window to the :march:`model <march_data_collector/esp_models/march.xml>`.
-2. Create a callback function that takes a ROS msgs and calls the  ``send_to_esp`` function with the msgs as csv
+
+2. Create a callback function that takes a ROS msgs and calls the ``send_to_esp`` function with the msgs as csv
 string in :march:`esp_adapter.py <march_data_collector/src/march_data_collector/esp_adapter.py>`
+
 3. In the same file add a call to ``configure_source`` to the ``__init__``.
+
 
 Launching with `ESP`
 ^^^^^^^^^^^^^^^^^^^^
