@@ -13,7 +13,7 @@ The `march_data_collector` package subscribes to the topics on which data is pub
 
 * The data is send to an `Event Stream Processing` Engine.
 
-Furthermore the  package also publishes incoming data from the pressure soles and sends data to the software coming with the pressure soles.
+Furthermore the  package also publishes incoming data from the pressure soles and sends data to the software that came with the pressure soles.
 
 Calculating `CoM` and `CP`
 --------------------------
