@@ -85,26 +85,28 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
     const double new_absolute_position = this->imc_->getAngleRadAbsolute();
 
     // Get velocity from encoder position
-    const double incremental_velocity = (new_incremental_position - this->incremental_position_) / elapsed_time.toSec();
-    const double absolute_velocity = (new_absolute_position - this->absolute_position_) / elapsed_time.toSec();
+    const double incremental_displacement = (new_incremental_position - this->incremental_position_);
+    const double absolute_displacement = (new_absolute_position - this->absolute_position_);
+    double best_displacement;
 
     // If the difference in movement of the two encoders is larger than twice the sum of their precisions,
     // one of them is probably an outlier.
-    if (std::abs(incremental_velocity - absolute_velocity) * elapsed_time.toSec() >
+    if (std::abs(incremental_displacement - absolute_displacement) >
         2 * (this->imc_->getAbsoluteRadPerBit() + this->imc_->getIncrementalRadPerBit()))
     {
       // Take the velocity that is closest to that of the previous timestep.
-      if (std::abs(incremental_velocity - this->velocity_) < std::abs(absolute_velocity - this->velocity_))
+      if (std::abs(incremental_displacement / elapsed_time.toSec() - this->velocity_) <
+          std::abs(absolute_displacement / elapsed_time.toSec() - this->velocity_))
       {
         ROS_WARN("There was an outlier in the absolute encoder; old value: %f", this->absolute_position_,
                  new_absolute_position);
-        this->velocity_ = incremental_velocity;
+        best_displacement = incremental_displacement;
       }
       else
       {
         ROS_WARN("There was an outlier in the incremental encoder; old value: %f, new value: %f",
                  this->incremental_position_, new_incremental_position);
-        this->velocity_ = absolute_velocity;
+        best_displacement = absolute_displacement;
       }
     }
     else
@@ -119,16 +121,17 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
       // Take the velocity with the highest resolution.
       if (this->imc_->getIncrementalRadPerBit() < this->imc_->getAbsoluteRadPerBit())
       {
-        this->velocity_ = incremental_velocity;
+        best_displacement = incremental_displacement;
       }
       else
       {
-        this->velocity_ = absolute_velocity;
+        best_displacement = absolute_displacement;
       }
     }
 
     // Update position with the most accurate velocity
-    this->position_ += this->velocity_ * elapsed_time.toSec();
+    this->position_ += best_displacement;
+    this->velocity_ = best_displacement / elapsed_time.toSec();
     this->incremental_position_ = new_incremental_position;
     this->absolute_position_ = new_absolute_position;
   }

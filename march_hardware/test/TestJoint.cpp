@@ -208,7 +208,7 @@ TEST_F(JointTest, TestReadEncodersOnce)
 
   joint.readEncoders(elapsed_time);
 
-  ASSERT_DOUBLE_EQ(joint.getPosition(), initial_absolute_position + velocity * elapsed_time.toSec());
+  //  ASSERT_DOUBLE_EQ(joint.getPosition(), initial_absolute_position + velocity * elapsed_time.toSec());
   ASSERT_DOUBLE_EQ(joint.getVelocity(),
                    (new_incremental_position - initial_incremental_position) / elapsed_time.toSec());
 }
