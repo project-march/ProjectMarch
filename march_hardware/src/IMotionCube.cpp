@@ -326,7 +326,7 @@ void IMotionCube::reset()
 {
   this->setControlWord(0);
   ROS_DEBUG("Slave: %d, Try to reset IMC", this->slaveIndex);
-  sdo_bit16(this->slaveIndex, 0x2080, 0, 1);
+  sdo_bit16_write(this->slaveIndex, 0x2080, 0, 1);
 }
 
 ActuationMode IMotionCube::getActuationMode() const
