@@ -5,16 +5,17 @@ march_gait_selection
 
 Overview
 --------
-The march_gait_selection module is used provide the exoskeleton operating system with information to perform the
-requested gait. It uses the march-gait-files, which are parsed using the march-shared-classes, to gather this
-information in a standard format.
+The march_gait_selection module provides the exoskeleton operating system with gait-specific information to perform the
+requested movement. It uses the march-gait-files, which are parsed using the march-shared-classes, to gather this
+information in a standard format. These class objects are stored as attributes in the gait-selection object. The gait
+selection node can use this gait-selection object to extract the data corresponding to the requested gait/subgait name.
 
 Behavior
 --------
 The march-state-machine accepts or declines a gait request originating from the input device. If the gait is accepted
-by the state machine the request will be send to the march-gait-selection module using a subgait sequence. Within
-this node the gait and subgait data which corresponds with the requested gait will be collected. This more detailed
-information is send over to the hardware-interface part of the exoskeleton software.
+by the state machine the request will be send over to the march-gait-selection module using the subgait sequence defined
+in the state machine. The gait selection module will extract the data from the parsed gaits, if possible, and if executed
+correctly, will send the required data in a new format to the hardware-interface/simulation part of the exoskeleton software.
 
 Transition-subgait
 ^^^^^^^^^^^^^^^^^^
@@ -38,26 +39,26 @@ Nodes
 
 Subscribed Topics
 ^^^^^^^^^^^^^^^^^
-*/march/gait/perform* (:march: `march_shared_resources/action/GaitName <march_shared_resources/action/GaitName.action>`)
+*/march/gait/perform* (:march:`march_shared_resources/action/GaitName <march_shared_resources/action/GaitName.action>`)
   Receives requested subgait, with gait(s), originating from the march-state-machine.
 
 Published Topics
 ^^^^^^^^^^^^^^^^
-*/march/gait/schedule* (:march: `march_shared_resources/action/Gait <march_shared_resources/action/Gait.action>`)
+*/march/gait/schedule* (:march:`march_shared_resources/action/Gait <march_shared_resources/action/Gait.action>`)
   Send subgait data to the hardware interface of the exoskeleton software.
 
 Services
 ^^^^^^^^
-*/march/gait_selection/get_version_map* (`std_srvs/srv/Trigger <http://docs.ros.org/melodic/api/std_srvs/html/srv/Trigger.html>`)
+*/march/gait_selection/get_version_map* (`std_srvs/srv/Trigger <http://docs.ros.org/melodic/api/std_srvs/html/srv/Trigger.html>`_)
   Returns the name of the gait_version map of the gait_selection.
 
-*/march/gait_selection/set_version_map* (:march: `march_shared_resources/srv/StringTrigger <march_shared_resources/srv/StringTrigger.srv>`)
+*/march/gait_selection/set_version_map* (:march:`march_shared_resources/srv/StringTrigger <march_shared_resources/srv/StringTrigger.srv>`)
   Sets a new gait version map in the gait_selection.
 
-*/march/gait_selection/get_directory_structure* (`std_srvs/srv/Trigger <http://docs.ros.org/melodic/api/std_srvs/html/srv/Trigger.html>`)
+*/march/gait_selection/get_directory_structure* (`std_srvs/srv/Trigger <http://docs.ros.org/melodic/api/std_srvs/html/srv/Trigger.html>`_)
   Return the directory structure of the gait-files repository.
 
-*/march/gait_selection/update_default_versions* (`std_srvs/srv/Trigger <http://docs.ros.org/melodic/api/std_srvs/html/srv/Trigger.html>`)
+*/march/gait_selection/update_default_versions* (`std_srvs/srv/Trigger <http://docs.ros.org/melodic/api/std_srvs/html/srv/Trigger.html>`_)
   Calls the update_default_versions function of the gait_selection.
 
 
