@@ -32,7 +32,7 @@ Event Stream Processing
 An `Event Stream Processing` engine from `SAS <https://www.sas.com/nl_nl/home.html>`_ is used.
 There is a lot of documentation on this engine at
 `ESP documentation <https://documentation.sas.com/?cdcId=espcdc&cdcVersion=6.2&docsetId=espov&docsetTarget=home.htm&locale=nl>`_.
-The Engine allows for real-time data analysis and processing.
+The engine allows for real-time data analysis and processing.
 An engine consists of multiple windows. The data comes in at so-called `source windows`.
 From the source windows data is send to other windows with different functions, like joining different event streams, aggregating an
 event stream, transforming an event stream or using the data in the events for an algorithm. The windows should form an acyclic graph together.
