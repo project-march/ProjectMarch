@@ -84,6 +84,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    doc/using_the_march_exoskeleton/log_files
    doc/using_the_march_exoskeleton/using_the_gait_generator
    doc/using_the_march_exoskeleton/error_codes
+   doc/using_the_march_exoskeleton/using_the_pressure_soles
 
 .. toctree::
    :caption: Development
