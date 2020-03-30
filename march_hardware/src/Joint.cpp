@@ -2,6 +2,7 @@
 #include <ros/ros.h>
 
 #include <bitset>
+#include <cmath>
 #include <memory>
 #include <string>
 #include <utility>
@@ -95,8 +96,8 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
       // Take the velocity that is closest to that of the previous timestep.
       if (std::abs(incremental_velocity - this->velocity_) < std::abs(absolute_velocity - this->velocity_))
       {
-        ROS_WARN("There was an outlier in the absolute encoder; old value: %f",
-                 this->absolute_position_, new_absolute_position);
+        ROS_WARN("There was an outlier in the absolute encoder; old value: %f", this->absolute_position_,
+                 new_absolute_position);
         this->velocity_ = incremental_velocity;
       }
       else
@@ -140,22 +141,22 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
   }
 }
 
-double Joint::getPosition()
+double Joint::getPosition() const
 {
   return this->position_;
 }
 
-double Joint::getVelocity()
+double Joint::getVelocity() const
 {
   return this->velocity_;
 }
 
-double Joint::getIncremental_position()
+double Joint::getIncrementalPosition() const
 {
   return this->incremental_position_;
 }
 
-double Joint::getAbsolute_position()
+double Joint::getAbsolutePosition() const
 {
   return this->absolute_position_;
 }

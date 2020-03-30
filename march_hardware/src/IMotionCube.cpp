@@ -182,12 +182,12 @@ double IMotionCube::getAngleRadIncremental()
   return this->incremental_encoder_->getAngleRad(this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
 }
 
-double IMotionCube::getAbsoluteRadPerBit()
+double IMotionCube::getAbsoluteRadPerBit() const
 {
   return this->absolute_encoder_->getRadPerBit();
 }
 
-double IMotionCube::getIncrementalRadPerBit()
+double IMotionCube::getIncrementalRadPerBit() const
 {
   return this->incremental_encoder_->getRadPerBit();
 }

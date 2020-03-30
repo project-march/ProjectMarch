@@ -157,8 +157,8 @@ TEST_F(JointTest, TestPrepareActuation)
   EXPECT_CALL(*this->imc, goToOperationEnabled()).Times(1);
   march::Joint joint("actuate_true", 0, true, std::move(this->imc));
   joint.prepareActuation();
-  ASSERT_EQ(joint.getIncremental_position(), 5);
-  ASSERT_EQ(joint.getAbsolute_position(), 3);
+  ASSERT_EQ(joint.getIncrementalPosition(), 5);
+  ASSERT_EQ(joint.getAbsolutePosition(), 3);
 }
 
 TEST_F(JointTest, TestReceivedDataUpdateFirstTimeTrue)
@@ -208,8 +208,9 @@ TEST_F(JointTest, TestReadEncodersOnce)
 
   joint.readEncoders(elapsed_time);
 
-  ASSERT_NEAR(joint.getPosition(), initial_absolute_position + velocity * elapsed_time.toSec(), std::pow(10, -9));
-  ASSERT_NEAR(joint.getVelocity(), velocity, std::pow(10, -9));
+  ASSERT_DOUBLE_EQ(joint.getPosition(), initial_absolute_position + velocity * elapsed_time.toSec());
+  ASSERT_DOUBLE_EQ(joint.getVelocity(),
+                   (new_incremental_position - initial_incremental_position) / elapsed_time.toSec());
 }
 
 TEST_F(JointTest, TestReadEncodersTwice)
@@ -243,9 +244,10 @@ TEST_F(JointTest, TestReadEncodersTwice)
   joint.readEncoders(elapsed_time);
   joint.readEncoders(elapsed_time);
 
-  ASSERT_NEAR(joint.getPosition(),
-              initial_absolute_position + (first_velocity + second_velocity) * elapsed_time.toSec(), std::pow(10, -9));
-  ASSERT_NEAR(joint.getVelocity(), second_velocity, std::pow(10, -9));
+  ASSERT_DOUBLE_EQ(joint.getPosition(),
+                   initial_absolute_position + (first_velocity + second_velocity) * elapsed_time.toSec());
+  ASSERT_DOUBLE_EQ(joint.getVelocity(),
+                   (third_incremental_position - second_incremental_position) / elapsed_time.toSec());
 }
 
 TEST_F(JointTest, TestReadEncodersRecalibratePosition)
@@ -279,10 +281,10 @@ TEST_F(JointTest, TestReadEncodersRecalibratePosition)
   joint.readEncoders(elapsed_time);
   joint.readEncoders(elapsed_time);
 
-  ASSERT_NEAR(joint.getPosition(),
-              initial_absolute_position + absolute_noise + (first_velocity + second_velocity) * elapsed_time.toSec(),
-              std::pow(10, -9));
-  ASSERT_NEAR(joint.getVelocity(), second_velocity, std::pow(10, -9));
+  ASSERT_DOUBLE_EQ(joint.getPosition(), initial_absolute_position + absolute_noise +
+                                            (first_velocity + second_velocity) * elapsed_time.toSec());
+  ASSERT_DOUBLE_EQ(joint.getVelocity(),
+                   (third_incremental_position - second_incremental_position) / elapsed_time.toSec());
 }
 
 TEST_F(JointTest, TestReadEncodersIncrementalOutlier)
@@ -309,6 +311,6 @@ TEST_F(JointTest, TestReadEncodersIncrementalOutlier)
 
   joint.readEncoders(elapsed_time);
 
-  ASSERT_NEAR(joint.getPosition(), initial_absolute_position + velocity * elapsed_time.toSec(), std::pow(10, -9));
-  ASSERT_NEAR(joint.getVelocity(), velocity, std::pow(10, -9));
+  ASSERT_DOUBLE_EQ(joint.getPosition(), initial_absolute_position + velocity * elapsed_time.toSec());
+  ASSERT_DOUBLE_EQ(joint.getVelocity(), velocity);
 }

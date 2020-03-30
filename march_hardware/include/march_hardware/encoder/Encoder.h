@@ -36,7 +36,7 @@ public:
    */
   virtual double toRad(int32_t iu) const = 0;
 
-  /*
+  /**
    * Returns the radians corresponding to the distance between two bits.
    * This is a pure virtual function and must be implemented by subclasses,
    * since each type of encoder has a different way of calculating radians.

@@ -51,10 +51,10 @@ public:
   void actuateTorque(int16_t target_torque);
   void readEncoders(const ros::Duration& elapsed_time);
 
-  double getPosition();
-  double getVelocity();
-  double getIncremental_position();
-  double getAbsolute_position();
+  double getPosition() const;
+  double getVelocity() const;
+  double getIncrementalPosition() const;
+  double getAbsolutePosition() const;
   int16_t getTorque();
   int32_t getAngleIUAbsolute();
   int32_t getAngleIUIncremental();
@@ -123,10 +123,10 @@ private:
   bool allow_actuation_ = false;
   float previous_motor_volt_ = 0.0;
 
-  double position_;
-  double incremental_position_;
-  double absolute_position_;
-  double velocity_;
+  double position_ = 0.0;
+  double incremental_position_ = 0.0;
+  double absolute_position_ = 0.0;
+  double velocity_ = 0.0;
 
   std::unique_ptr<IMotionCube> imc_ = nullptr;
   std::unique_ptr<TemperatureGES> temperature_ges_ = nullptr;

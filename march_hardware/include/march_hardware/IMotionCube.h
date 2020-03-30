@@ -42,8 +42,8 @@ public:
 
   virtual double getAngleRadAbsolute();
   virtual double getAngleRadIncremental();
-  double getAbsoluteRadPerBit();
-  double getIncrementalRadPerBit();
+  double getAbsoluteRadPerBit() const;
+  double getIncrementalRadPerBit() const;
   int16_t getTorque();
   int32_t getAngleIUAbsolute();
   int32_t getAngleIUIncremental();
