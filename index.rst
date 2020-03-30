@@ -108,11 +108,13 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
   doc/march_packages/march_hardware
   doc/march_packages/march_hardware_builder
   doc/march_packages/march_hardware_interface
+  doc/march_packages/march_imu_manager
   doc/march_packages/march_input_device
   doc/march_packages/march_launch
   doc/march_packages/march_rqt_input_device
   doc/march_packages/march_rqt_software_check
   doc/march_packages/march_safety
+  doc/march_packages/march_shared_classes
   doc/march_packages/march_shared_resources
   doc/march_packages/march_state_machine
   doc/march_packages/march_simulation
