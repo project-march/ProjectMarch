@@ -64,7 +64,6 @@ void Joint::resetIMotionCube()
 }
 
 void Joint::actuateRad(double target_position)
-
 {
   if (!this->canActuate())
   {

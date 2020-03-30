@@ -3,7 +3,6 @@
 
     <arg name="reset_imc" default="false" doc="Reset the IMC if this argument is set to true"/>
 
-
     <rosparam file="$(find march_hardware_interface)/config/$(arg robot)/controllers.yaml" command="load"/>
 
     <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot).urdf"/>
@@ -25,7 +24,6 @@
                 required="true"
         >
             <param name="reset_imc" value="$(arg reset_imc)"/>
-
         </node>
     </group>
 </launch>
