@@ -57,9 +57,9 @@ void Joint::prepareActuation()
 
 void Joint::resetIMotionCube()
 {
-  if (!this->hasTemperatureGES())
+  if (!this->hasIMotionCube())
   {
-    ROS_WARN("[%s] Has no iMotionCube sensor", this->name_.c_str());
+    ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
   }
   else
   {
