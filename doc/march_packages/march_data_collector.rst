@@ -82,7 +82,7 @@ ROS API
 
 Nodes
 ^^^^^
-*march_data_collector_node* - Responsible for processing IMU data and calculating the jerk.
+*march_data_collector_node* - Responsible for processing IMU data and calculating the acceleration and jerk.
 
 *com_calculator* - Responsible for calculating the center of mass.
 
