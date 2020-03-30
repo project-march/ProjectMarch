@@ -43,7 +43,7 @@ Please check the `official userguide <http://wiki.ros.org/rviz/UserGuide>`_ to s
 
 Example
 ^^^^^^^
-An example launchfile has been provided in :codedir:`robot_model.launch <useful_ros_tools/launch/robot_model.launch>`.
+An example launchfile has been provided in :codedir:`robot_model.launch <useful_tools/launch/robot_model.launch>`.
 
 Inspect the file to see how the different nodes are launched, and try it out yourself with the following command!
 
