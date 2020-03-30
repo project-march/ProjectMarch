@@ -32,7 +32,7 @@ Create your workspace
 
 
 Useful tools
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^
 A selection of existing tools to speed up development.
 
 March Packages
@@ -61,7 +61,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    doc/getting_started/create_your_workspace
 
 .. toctree::
-   :caption: Useful ROS tools
+   :caption: Useful tools
    :maxdepth: 2
    :hidden:
 

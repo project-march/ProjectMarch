@@ -31,7 +31,7 @@ Join window
     A couple of join windows can put all the temperature values for the different joints in one event.
 
 Aggregate windows
-    An aggregate windows can calculate summary statistics per group.
+    An aggregate window can calculate summary statistics per group.
     A field is selected to group by. The window can then calculate things like maxima, minima, weighted averages or sums of other fields per group.
     At March we can use this to get the maximal difference in actual and desired position per gait, if we have an event stream with both the
     difference in actual and desired position and the gait name.
@@ -43,7 +43,7 @@ Compute windows
 Calculate windows
     A calculate window can apply an algorithm to the event it processes.
     The `list <https://documentation.sas.com/?cdcId=espcdc&cdcVersion=6.2&docsetId=espan&docsetTarget=p1iyy8xvfytolsn16djcp243wkx3.htm&locale=nl>`_
-    of possible algorithms is quite long, but a few to names is Streaming Linear regression, K Nearest Neighbour, Lag monitoring, Image Processing encoding and Random Forests.
+    of possible algorithms is quite long, but to name a few: Streaming Linear Regression, K Nearest Neighbour, Lag Monitoring, Image Processing and Random Forests.
 
 Output
 ^^^^^^

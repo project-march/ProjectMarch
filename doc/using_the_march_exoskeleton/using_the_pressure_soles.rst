@@ -11,14 +11,14 @@ At March we currently use the `Moticon <https://www.moticon.de/>`_ pressure sole
 
 All devices should be connected to the same WiFi for optimal functioning.
 
-1. First you open the app on the phone and pair the insoles with the phone.
+1. Open the app on the phone and pair the soles with the phone.
 
 .. note::
 
     The pressure soles are turned on by moving them, because the internal IMU is triggered.
     Shake the pressure soles when they do not automatically turn on.
 
-2. Next you should set the record mode to live capture. Open the Moticon desktop app and go to the record section and settings. Set the following things:
+2. Set the record mode to live capture. Open the Moticon desktop app and go to the record section and settings. Set the following things:
 
     * UDP Input:
         - `Channel name:`           Joint_positions
@@ -33,5 +33,5 @@ All devices should be connected to the same WiFi for optimal functioning.
 
 More info on this step can be found `here <https://www.moticon.de/doc/science_desktop_software/record/udp/>`_.
 
-3. Lastly use should set the correct launch arguments. You should set pressure_soles to true and if you are not using the
+3. Set the correct launch arguments. You should set pressure_soles to true and if you are not using the
 standard Switch laptop connected to the project March router, you should set the IP-address on which the Moticon desktop app is running.

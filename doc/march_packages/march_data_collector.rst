@@ -63,13 +63,7 @@ ROS API
 
 Nodes
 ^^^^^
-*march_data_collector_node* - Responsible for processing IMU data and calculating the acceleration and jerk.
-
-*com_calculator* - Responsible for calculating the center of mass.
-
-*cp_calculator* - Responsible for calculating the capture points.
-
-*esp_adapter* - Responsible for sending data to the ESP engine.
+*march_data_collector_node* - Responsible for processing data.
 
 Subscribed Topics
 ^^^^^^^^^^^^^^^^^
@@ -97,7 +91,7 @@ Subscribed Topics
 */march/joint_states* (sensor_msgs/JointState)
   Send actual effort to `ESP`.
 
-*/march/controller/after_limit_joint_command'* (march_shared_resources/AfterLimitJointCommand)
+*/march/controller/after_limit_joint_command* (march_shared_resources/AfterLimitJointCommand)
   Send effort command to `ESP`.
 
 */march/temperature/\** (sensor_msgs/Temperature)
