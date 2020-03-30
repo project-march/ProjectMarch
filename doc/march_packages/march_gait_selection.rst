@@ -15,16 +15,17 @@ Behavior
 The march-state-machine accepts or declines a gait request originating from the input device. If the gait is accepted
 by the state machine the request will be send over to the march-gait-selection module using the subgait sequence defined
 in the state machine. The gait selection module will extract the data from the parsed gaits, if possible, and if executed
-correctly, will send the required data in a new format to the hardware-interface/simulation part of the exoskeleton software.
+correctly, will send the required data in a new format to the hardware-interface or simulation part of the exoskeleton
+software.
 
 Transition-subgait
 ^^^^^^^^^^^^^^^^^^
-Is is possible to transition between two matching named subgaits of two different gaits (for example between the right
+It is possible to transition between two matching named subgaits of two different gaits (for example between the right
 swing of the walk small and walk large). The gait-selection module is able to accomplish this if the requested
 gait/sub-gait format consists of an old and new gait name. This structure requires that both gait names have matching
 subgait names to use for the transition. The transition algorithm calculates a new trajectory using the two subgait
-trajectories. If this is executed correctly the new trajectory is translated to a subgait file which is eventually send
-to the hardware-interface part of the exoskeleton software.
+trajectories. If this is calculated correctly the new trajectory is translated to a subgait file which is eventually
+send to the hardware-interface or simulation part of the exoskeleton software.
 
 
 ROS API
