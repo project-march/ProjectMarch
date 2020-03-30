@@ -117,4 +117,5 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
   doc/march_packages/march_shared_classes
   doc/march_packages/march_shared_resources
   doc/march_packages/march_state_machine
+  doc/march_packages/march_gait_selection
   doc/march_packages/march_simulation
