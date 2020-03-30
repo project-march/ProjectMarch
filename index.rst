@@ -31,9 +31,9 @@ Create your workspace
   :end-before: inclusion-introduction-end
 
 
-Useful ROS tools
+Useful tools
 ^^^^^^^^^^^^^^^^
-A selection of existing ROS tools to speed up development.
+A selection of existing tools to speed up development.
 
 March Packages
 ^^^^^^^^^^^^^^
@@ -65,12 +65,13 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    :maxdepth: 2
    :hidden:
 
-   doc/useful_ros_tools/robot_model
-   doc/useful_ros_tools/ros_control
-   doc/useful_ros_tools/rqt
-   doc/useful_ros_tools/ros_bag
-   doc/useful_ros_tools/gazebo
-   doc/useful_ros_tools/smach
+   doc/useful_tools/robot_model
+   doc/useful_tools/ros_control
+   doc/useful_tools/rqt
+   doc/useful_tools/ros_bag
+   doc/useful_tools/gazebo
+   doc/useful_tools/smach
+   doc/useful_tools/event_stream_processing
 
 .. toctree::
    :caption: Using the March Exoskeleton

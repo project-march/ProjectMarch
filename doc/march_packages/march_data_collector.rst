@@ -29,17 +29,25 @@ The center of mass and capture point are used for (research on) balancing the ex
 
 Event Stream Processing
 -----------------------
-An `Event Stream Processing` engine from `SAS <https://www.sas.com/nl_nl/home.html>`_ is used.
-There is a lot of documentation on this engine at
-`ESP documentation <https://documentation.sas.com/?cdcId=espcdc&cdcVersion=6.2&docsetId=espov&docsetTarget=home.htm&locale=nl>`_.
-The engine allows for real-time data analysis and processing.
-An engine consists of multiple windows. The data comes in at so-called `source windows`.
-From the source windows data is send to other windows with different functions, like joining different event streams, aggregating an
-event stream, transforming an event stream or using the data in the events for an algorithm. The windows should form an acyclic graph together.
-A group of windows is called a :march:`model <march_data_collector/esp_models/march.xml>`.
-Other applications can subscribe to a windows to use the data in the window. This can be done for data visualisation, csv output or streaming back into our software.
-The :march:`esp_adapter.py <march_data_collector/src/march_data_collector/esp_adapter.py>` subscribes to ROS msgs and transforms incoming messages to csv strings. The csv strings are send to the ESP engine.
+At March we use the `Event Stream Processing` engine from `SAS <https://www.sas.com/nl_nl/home.html>`_.
+Here we will just describe the integration in the `march_data_collector`, but more information on `ESP` and how we use it can be found at :ref:`event stream processing <event-stream-processing-label>`.
+The engine allows for real-time data analysis and processing. With the installation also comes a module to inject events, which is used in this package.
+The :march:`esp_adapter.py <march_data_collector/src/march_data_collector/esp_adapter.py>` functions as the interface between our software and ESP. This ROS node subscribes to
+ROS topics containing interesting data. It converts the ROS messages into csv strings and injects the data into the correct window of the ESP engine.
+Injecting data can only happen into a source window.
 
+
+Adding a publisher into `ESP`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1.
+    Add a source window to the :march:`model <march_data_collector/esp_models/march.xml>`.
+
+2.
+    Create a callback function that takes a ROS message and calls the ``send_to_esp`` function with the msgs as csv
+    string in :march:`esp_adapter.py <march_data_collector/src/march_data_collector/esp_adapter.py>`.
+
+3.
+    In the same file add a call to ``configure_source`` to the ``__init__``.
 
 Pressure Soles
 --------------
@@ -123,35 +131,3 @@ Parameters
 */march/march_data_collector/pressure_soles* (*bool*, default: false)
   Whether to connect with the pressure soles.
 
-Tutorials
----------
-
-Adding a publisher into `ESP`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-1. Add a source window to the :march:`model <march_data_collector/esp_models/march.xml>`.
-
-2. Create a callback function that takes a ROS msgs and calls the ``send_to_esp`` function with the msgs as csv
-string in :march:`esp_adapter.py <march_data_collector/src/march_data_collector/esp_adapter.py>`
-
-3. In the same file add a call to ``configure_source`` to the ``__init__``.
-
-
-Launching with `ESP`
-^^^^^^^^^^^^^^^^^^^^
-
-.. note::
-
-    The ESP engine should be installed on the machine. You need a license for this.
-    An engine is installed on the exoskeleton.
-
-1. Launch an `ESP` server. On the exoskeleton the following terminal command is configured to start an `ESP` with the correct settings.
-
-    .. code::
-
-        esp_start
-
-2. Do a normal launch (simulation, headless, normal) and set the launch argument ``esp`` to true. For instance:
-
-    .. code::
-
-        roslaunch march_launch march.launch esp:=true
