@@ -22,7 +22,7 @@ such that the tf frames are orientated with respect to the world correctly.
 The tf frames together with the masses of the links from the :ref:`URDF <robot-model-label>` can be used to calculate the center of mass.
 This is then published as a marker on ``/march/com_marker``.
 The calculation is based on an implementation from `Hamburg Bit-Bots <https://github.com/bit-bots>`_.
-The marker can also be visualized in :ref:`rviz <robot-model-label>`. The tf frames and CoM together can be used to calculate the capture point.
+The marker can also be visualized in :ref:`rviz <robot-model-label>`. The tf frames and CoM can be combined to calculate the capture point.
 This is the point in a walking gait where one should step in order to return to a stable standing position.
 This calculation is done for both feet and published as a marker on ``/march/cp_marker_ankle_plate_{left|right}``
 The center of mass and capture point are used for (research on) balancing the exoskeleton.
