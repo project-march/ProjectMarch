@@ -101,7 +101,7 @@ class InputDevicePlugin(Plugin):
                                callback=lambda: self.controller.publish_gait('gait_stand'))
 
         gait_sofa_stand = \
-            self.create_button('gait_sofa_stand', image_path='/gait_sofa_stand_up.png',
+            self.create_button('gait_sofa_stand', image_path='/gait_sofa_stand.png',
                                callback=lambda: self.controller.publish_gait('gait_sofa_stand'))
 
         gait_sofa_sit = \
@@ -134,30 +134,34 @@ class InputDevicePlugin(Plugin):
 
         gait_rough_terrain_first_middle_step = \
             self.create_button('gait_rough_terrain_first_middle_step',
+                               image_path='/gait_rough_terrain_first_middle_step.png',
                                callback=lambda: self.controller.publish_gait('gait_rough_terrain_first_middle_step'))
 
         gait_rough_terrain_second_middle_step = \
             self.create_button('gait_rough_terrain_second_middle_step',
+                               image_path='/gait_rough_terrain_second_middle_step.png',
                                callback=lambda: self.controller.publish_gait('gait_rough_terrain_second_middle_step'))
 
         gait_rough_terrain_third_middle_step = \
             self.create_button('gait_rough_terrain_third_middle_step',
+                               image_path='/gait_rough_terrain_third_middle_step.png',
                                callback=lambda: self.controller.publish_gait('gait_rough_terrain_third_middle_step'))
 
         gait_ramp_door_slope_up = \
-            self.create_button('gait_ramp_door_slope_up',
+            self.create_button('gait_ramp_door_slope_up', image_path='/gait_ramp_door_slope_up.png',
                                callback=lambda: self.controller.publish_gait('gait_ramp_door_slope_up'))
 
         gait_ramp_door_slope_down = \
-            self.create_button('gait_ramp_door_slope_down',
+            self.create_button('gait_ramp_door_slope_down', image_path='/gait_ramp_door_slope_down.png',
                                callback=lambda: self.controller.publish_gait('gait_ramp_door_slope_down'))
 
         gait_ramp_door_last_step = \
-            self.create_button('gait_ramp_door_last_step',
+            self.create_button('gait_ramp_door_last_step', image_path='/gait_ramp_door_last_step.png',
                                callback=lambda: self.controller.publish_gait('gait_ramp_door_last_step'))
 
         gait_tilted_path_left_straight_start = \
             self.create_button('gait_tilted_path_left_straight_start',
+                               image_path='/gait_tilted_path_left_straight_start.png',
                                callback=lambda: self.controller.publish_gait('gait_tilted_path_left_straight_start'))
 
         gait_tilted_path_left_single_step = \
@@ -166,6 +170,7 @@ class InputDevicePlugin(Plugin):
 
         gait_tilted_path_left_straight_end = \
             self.create_button('gait_tilted_path_left_straight_end',
+                               image_path='/gait_tilted_path_left_straight_end.png',
                                callback=lambda: self.controller.publish_gait('gait_tilted_path_left_straight_end'))
 
         gait_tilted_path_left_flexed_knee_step = \
@@ -174,6 +179,7 @@ class InputDevicePlugin(Plugin):
 
         gait_tilted_path_right_straight_start = \
             self.create_button('gait_tilted_path_right_straight_start',
+                               image_path='/gait_tilted_path_right_straight_start.png',
                                callback=lambda: self.controller.publish_gait('gait_tilted_path_right_straight_start'))
 
         gait_tilted_path_right_single_step = \
@@ -182,6 +188,7 @@ class InputDevicePlugin(Plugin):
 
         gait_tilted_path_right_straight_end = \
             self.create_button('gait_tilted_path_right_straight_end',
+                               image_path='/gait_tilted_path_right_straight_end.png',
                                callback=lambda: self.controller.publish_gait('gait_tilted_path_right_straight_end'))
 
         gait_tilted_path_right_flexed_knee_step = \
