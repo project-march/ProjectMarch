@@ -7,7 +7,7 @@ Overview
 --------
 The `march_data_collector` package subscribes to the topics on which data is published to process the data. Basically three things are happening to the data:
 
-* Based on the position, the acceleration and jerk are calculated for future analysis.
+* Based on the position, the acceleration and jerk (through second and third order backward Euler) are calculated for future analysis.
 
 * The IMU is used to adapt the tf frames and based on this the center of mass (CoM) and the capture point (CP) are calculated.
 
