@@ -3,11 +3,11 @@
 
 os: linux
 dist: bionic
-language: ruby
+version: ~> 1.0
 rvm:
   - 2.4
 python:
-  - "2.7"
+  - 2.7
 
 notifications:
   slack:
@@ -25,33 +25,34 @@ before_install:
   - sudo -E sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
   - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
   - sudo apt-get update -qq
-  - sudo apt-get install -qq -y python-rosdep python-wstool python-catkin-tools python-pygit2
+  - sudo apt-get install -qq -y python-rosdep ros-melodic-rosdoc-lite
   # Setup rosdep
   - sudo rosdep init
   - rosdep update
+  - source /opt/ros/melodic/setup.bash
+
+install:
   # Install htmlproofer
   - gem update --system
   - gem --version
   - gem install html-proofer
-  # Install ROS's version of sphinx
-  - sudo apt-get -qq install ros-melodic-rosdoc-lite
-  - source /opt/ros/melodic/setup.bash
 
 script:
   # Test build with non-ROS wrapped Sphinx command to allow warnings and errors to be caught
   # Test build with ROS-version of Sphinx command so that it is generated same as ros.org
   # Run HTML tests on generated build output to check for 404 errors, etc
-  - sphinx-build -W -b html . native_build || travis_terminate 1;
-  - rosdoc_lite -o build .;
-  - htmlproofer ./build --only-4xx --check-html --file-ignore ./build/html/genindex.html,./build/html/search.html,./build/html/index-msg.html --alt-ignore '/.*/' --url-ignore '#';
+  - sphinx-build -W -b html . native_build || travis_terminate 1
+  - rosdoc_lite -o build .
+  - htmlproofer ./build --only-4xx --check-html --file-ignore ./build/html/genindex.html,./build/html/search.html,./build/html/index-msg.html --alt-ignore '/.*/' --url-ignore '#'
 
 # after_success and deploy are skipped if build is broken
 after_success:
-  # Tell GitHub Pages not to bypass Jekyll processing
+  # Tell GitHub Pages to bypass Jekyll processing
   - touch build/html/.nojekyll
 
 deploy:
   provider: pages
+  strategy: git
   edge: true
   token: $GH_REPO_TOKEN
   local_dir: build/html
