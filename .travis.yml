@@ -1,6 +1,8 @@
 # This config uses industrial_ci (https://github.com/ros-industrial/industrial_ci.git).
 # For troubleshooting, see readme (https://github.com/ros-industrial/industrial_ci/blob/master/README.rst)
 
+os: linux
+dist: bionic
 language: generic # optional, just removes the language badge
 
 services:
@@ -29,7 +31,7 @@ env:
     - BUILDER=colcon
     - CATKIN_LINT=pedantic
     - CATKIN_LINT_ARGS='--ignore missing_catkin_include'
-    - UPSTREAM_WORKSPACE='.rosinstall -march/march_data_collector -march/march_gain_scheduling -march/march_gait_scheduler -march/march_gait_selection -march/march_launch -march/march_safety -march/march_state_machine'
+    - UPSTREAM_WORKSPACE='.rosinstall -march/march_data_collector -march/march_gain_scheduling -march/march_gait_scheduler -march/march_gait_selection -march/march_launch -march/march_safety -march_shared_classes -march/march_state_machine'
 
 jobs:
   include:
