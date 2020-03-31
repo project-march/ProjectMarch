@@ -6,7 +6,7 @@ march_imu_manager
 Overview
 --------
 The ``march_imu_manager`` interfaces between ROS and the `XSense MTw Awinda IMU's <https://www.xsens.com/products/mtw-awinda>`_.
-The IMU's connect wireless to an USB dongle, which should be inserted in the computer before the node is launched.
+The IMU's connect wireless to a USB dongle, which should be inserted in the computer before the node is launched.
 The package contains and uses the Xsens library belonging to the IMU to read the data from the dongle. The data is then published in a
 `sensors_msgs/imu message <http://docs.ros.org/melodic/api/sensor_msgs/html/msg/Imu.html>`_ on the ``/march/imu`` rostopic.
 

@@ -30,7 +30,7 @@ without having to repeat the whole error description.
 An invalid actuation mode was used to perform an action.
 
 **Cause:** The motor controllers have two modes for actuation: position and effort.
-With position you can only actuate to a target position using ``actuateRad()``.
+With position, you can only actuate to a target position using ``actuateRad()``.
 In effort mode you can only actuate using a target torque using ``actuateTorque()``.
 This error was caused by mixing the actuate methods and actuation modes. See
 the detailed description for which mode the controller was actually in.
@@ -59,7 +59,7 @@ An encoder has reset and reads an incorrect value.
 
 **Cause:** The cause is still unknown.
 
-**Fix:** This error happens sometimes during startup and the only thing you
+**Fix:** This error sometimes happens during startup and the only thing you
 can do is try again. This error will probably be removed once this issue has
 been fixed.
 
@@ -87,7 +87,7 @@ The target position exceeds the max allowed difference from the current position
 between target and actual position. This could cause dangerous situations if
 you were to actuate a long distance in a short amount of time.
 
-**Fix:** This is a safety measure and most of time indicates that the joints
+**Fix:** This is a safety measure and most of the time indicates that the joints
 are behind their trajectory path.
 
 
@@ -101,7 +101,7 @@ The target torque exceeds the max allowed torque
 can actuate. This could cause dangerous situations where the joints could be
 negatively affected.
 
-**Fix:** This is a safety measure and most of time indicates that the joints
+**Fix:** This is a safety measure and most of the time indicates that the joints
 are behind their trajectory path.
 
 
@@ -195,8 +195,8 @@ At least one slave was not able to reach operational state.
 **Cause:** The connection to the slave was lost during initialization or the PDO mapping is incorrect.
 
 **Fix:** The error lists the slaves that were not able to go to operational state,
-so check the connection on those specific slaves. If you made any changes to the PDO mapping
-verify that it is correct.
+so check the connection on those specific slaves. If you made any changes to the PDO mapping,
+verify that those are correct.
 
 
 .. _e112:
@@ -205,7 +205,7 @@ verify that it is correct.
 ------------------------------------
 The encoder resolution is outside the allowed range.
 
-**Cause:** The given encoder resolution to construct an encoder are outside of its allowed limits defined in
+**Cause:** The given encoder resolution to construct an encoder are outside its allowed limits defined in
 :hardware-interface:`Encoder.h <march_hardware/include/march_hardware/encoder/Encoder.h>`.
 
 **Fix:** Check if the resolutions given in the :hardware-interface:`robots yaml <march_hardware_builder/robots>` are

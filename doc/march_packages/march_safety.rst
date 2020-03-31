@@ -15,8 +15,9 @@ March safety consists of a list of ``SafetyType``-objects. Such an object monito
 violated, the object will call the ``SafetyHandler`` to invoke an error. The ``SafetyHandler`` is responsible for sending error messages and sounds.
 All ``SafetyType``-objects:
 
-* ``TemperatureSafety``, monitors the joint temperatures. Depending on which threshold is exceeded an warning, non-fatal or fatal is thrown.
-* ``InputDeviceSafety``, checks if the input device is still connected. Otherwise a non-fatal is thrown.
+* ``TemperatureSafety``, monitors the joint temperatures. Depending on which threshold is exceeded a warning,
+non-fatal or fatal is thrown.
+* ``InputDeviceSafety``, checks if the input device is still connected. Otherwise, a non-fatal is thrown.
 
 Error severity
 --------------
@@ -28,13 +29,13 @@ The system will continue running. The event will only be logged.
 
 Non-Fatal
 ^^^^^^^^^
-This event is a deviation from the normal behavior. Which has consequences the system should deal with.
-An stop message is send indistinguishable from a stop message from an input device.
+This event is a deviation from the normal behavior, which has consequences the system should deal with.
+A stop message is send indistinguishable from a stop message from an input device.
 
 Fatal
 ^^^^^
-This event is a unrecoverable deviation from the normal behavior. There is no (safe) way to make the system behave properly again.
-Therefore, the system should terminate.
+This event is an unrecoverable deviation from the normal behavior. There is no (safe) way to make the system behave
+properly again. Therefore, the system should terminate.
 
 ROS API
 -------

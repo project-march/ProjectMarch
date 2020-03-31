@@ -16,15 +16,19 @@ This can be run wired via usb cable or wireless via wifi connection.
 
 Sending messages
 ^^^^^^^^^^^^^^^^
-:march:`Gait Instruction Message <march_shared_resources/msg/GaitInstruction.msg>` This is a instruction to start the sent gait right now, if this is possible.
+:march:`Gait Instruction Message <march_shared_resources/msg/GaitInstruction.msg>` This is an instruction to start
+the sent gait right now, if this is possible.
 
-:march:`Stop Message <march_shared_resources/msg/GaitInstruction.msg>` This message can stop a repeating gait (such as walk). After receiving the stop message the exoskeleton will go to the standing pose.
+:march:`Stop Message <march_shared_resources/msg/GaitInstruction.msg>` This message can stop a repeating gait (such
+as walk). After receiving the stop message, the exoskeleton will go to the standing pose.
 
-`Stay Alive Message <http://docs.ros.org/melodic/api/std_msgs/html/msg/Time.html>`_  Every loop a stay alive message is send. This way :ref:`march-safety-label` can detect when the input device loses connection.
+`Stay Alive Message <http://docs.ros.org/melodic/api/std_msgs/html/msg/Time.html>`_  Every loop a stay alive message is
+sent. This way :ref:`march-safety-label` can detect when the input device loses connection.
 
 Receiving messages
 ^^^^^^^^^^^^^^^^^^
-`Gait Instruction Response Message <http://docs.ros.org/melodic/api/std_msgs/html/msg/Bool.html>`_  This message indicate that the last gait instruction is handled. The value represent successful handled or rejected.
+`Gait Instruction Response Message <http://docs.ros.org/melodic/api/std_msgs/html/msg/Bool.html>`_  This message
+indicates that the last gait instruction is handled. The value represents success or rejection.
 
 Tutorials
 ---------
@@ -147,7 +151,8 @@ How to add a gait
             }
             break;
             
-- Add a new entry to the *stateToGaitMapping*. Do this by adding a extra line in the constructor of the *StateMachine.cpp*:
+- Add a new entry to the *stateToGaitMapping*. Do this by adding an extra line in the constructor of the
+  *StateMachine.cpp*:
 
 .. code::
 

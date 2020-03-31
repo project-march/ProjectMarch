@@ -11,9 +11,10 @@ The `march_data_collector` package subscribes to the topics on which data is pub
 
 * The IMU is used to adapt the tf frames and based on this the center of mass (CoM) and the capture point (CP) are calculated.
 
-* The data is send to an `Event Stream Processing` Engine.
+* The data is sent to an `Event Stream Processing` Engine.
 
-Furthermore the  package also publishes incoming data from the pressure soles and sends data to the software that came with the pressure soles.
+Furthermore, the package also publishes incoming data from the pressure soles and sends data to the software that
+came with the pressure soles.
 
 Calculating `CoM` and `CP`
 --------------------------
@@ -53,7 +54,7 @@ Pressure Soles
 --------------
 The `march_data_collector` interfaces between the Moticon pressure soles and the exoskeleton software.
 It  sends data to and receives data from the desktop software that came with the pressure soles.
-This data is send over `UDP <https://nl.wikipedia.org/wiki/User_Datagram_Protocol>`_.
+This data is sent over `UDP <https://nl.wikipedia.org/wiki/User_Datagram_Protocol>`_.
 More information on interacting with the Moticon software can be found `here <https://www.moticon.de/doc/science_desktop_software/record/udp/>`_.
 The package assumes that the filter used in the Moticon software is ``force pressure cop``.
 More information on using the pressure soles can be found at :ref:`using the pressure soles <using-the-pressure-soles-label>`.

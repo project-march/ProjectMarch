@@ -6,7 +6,7 @@ the march packages.
 
 Prerequisites
 -------------
-In order to run the tests you must have already have a workspace setup.
+In order to run the tests you must already have a workspace setup.
 See :ref:`create-your-workspace-label`.
 
 
@@ -75,7 +75,7 @@ For testing ROS packages we make a distinction between two different kinds of te
 1. Unit tests (library level)
 2. Integration tests (node level)
 
-Also see the `ROS wiki on testing <https://wiki.ros.org/Quality/Tutorials/UnitTesting>`_.
+Also, see the `ROS wiki on testing <https://wiki.ros.org/Quality/Tutorials/UnitTesting>`_.
 The unit tests are different for C++ and python projects. C++ projects use the
 `gtest <https://github.com/google/googletest>`_ framework, whereas Python projects use
 `unittest <http://pythontesting.net/framework/unittest/unittest-introduction/>`_.

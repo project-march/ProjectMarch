@@ -3,7 +3,8 @@
 Using the gait generator
 ========================
 
-.. note:: It is highly recommended to follow the :ref:`robot-model-label` to better understand how ros works with robots.
+.. note:: It is highly recommended following the :ref:`robot-model-label` to better understand how ros works with
+robots.
 
 .. inclusion-introduction-start
 
@@ -48,7 +49,7 @@ Duration
 In the bottom right of the gait generator it is possible to change the duration of the gait file.
 By ticking the box ``Scale Setpoints``, you can scale all the setpoints to the new duration of the gait, so that the relative amount of time between the setpoints will stay the same.
 Without ticking this box the total amount of time of the gait will change without changing the absolute amount of time between setpoints.
-This means, when decreasing the total amount of time it is possible that some of the last setpoints will be deleted as they exceed the new duration.
+This means, when decreasing the total amount of time it is possible that some last setpoints will be deleted as they exceed the new duration.
 When this happens, a warning will be given by the gait generator.
 
 Velocity Markers
@@ -60,7 +61,8 @@ Mirroring
 ^^^^^^^^^
 The feature called mirroring allows you to mirror a gait. This means, for the mirrored gait the trajectories of the left and right joints are switched.
 One requirement to do this is that the last setpoint of the left leg has to have the same values as the first setpoint of the right leg and the other way around.
-Otherwise the gait generator will give you a warning that gait mirroring is not possible. Furthermore, either the word ‘left’ or ‘right’ should be in the name of the subgait.
+Otherwise, the gait generator will give you a warning that gait mirroring is not possible. Furthermore, either the
+word ‘left’ or ‘right’ should be in the name of the subgait.
 The mirrored version will be saved with the same version name as the original file, but the word ‘left’ or ‘right’ in the subgait folder is changed to the opposite one.
 
 .. tip::

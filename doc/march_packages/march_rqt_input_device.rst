@@ -5,7 +5,7 @@ march_rqt_input_device
 
 Overview
 --------
-The march_rqt_input_device is an rqt plugin that features as a mock input device during training and development.
+The march_rqt_input_device is a rqt plugin that features as a mock input device during training and development.
 It allows you to easily send gait instructions and stop commands, as well as fake errors.
 
 The march_rqt_input_device was designed to easily allow you to add custom buttons.

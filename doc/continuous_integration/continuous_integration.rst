@@ -21,7 +21,7 @@ for new repositories.
 
 Build Notifications
 -------------------
-Travis builds can send notifications when builds succeed or fail. By default
+Travis builds can send notifications when builds succeed or fail. By default,
 Travis sends emails about builds. The march repositories disable the email
 notifications and enable secure slack integration. This is done by the
 following setting in ``.travis.yml``.
@@ -65,8 +65,8 @@ The downstream workspace contains packages that depend on the current package.
 It builds and runs tests on downstream packages to check if there are any
 breaking changes. This is currently only used in :march:`march <.travis.yml>`.
 
-Finally there is the ``AFTER_SCRIPT`` option. This runs the given script after
-all the default tests. Currently it is set in the template to run roslint on
+Finally, there is the ``AFTER_SCRIPT`` option. This runs the given script after
+all the default tests. Currently, it is set in the template to run roslint on
 the target packages. The build can fail if the after script fails.
 
 Running Industrial CI

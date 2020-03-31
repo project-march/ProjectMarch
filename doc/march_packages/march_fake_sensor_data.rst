@@ -16,7 +16,7 @@ A dynamically reconfigurable temperature publisher is implemented in fake_temper
 The fake temperature sensors are generated automatically from the joint names from the ``/march/joint_names`` parameter
 on the parameter server. The min and max for random temperatures can be configured in
 :simulation:`march_fake_sensor_data.launch <march_fake_sensor_data/launch/march_fake_sensor_data.launch>`.
-These min and max will apply to all fake temperature sensors.
+The min and max will apply to all fake temperature sensors.
 
 How to use
 """"""""""
