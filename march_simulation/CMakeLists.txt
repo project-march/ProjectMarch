@@ -1,18 +1,7 @@
 cmake_minimum_required(VERSION 3.10.2)
 project(march_simulation)
 
-find_package(catkin REQUIRED COMPONENTS
-    controller_manager
-    gazebo_plugins
-    gazebo_ros
-    gazebo_ros_control
-    joint_state_controller
-    joint_trajectory_controller
-    march_description
-    march_gazebo_plugins
-    robot_state_publisher
-    xacro
-)
+find_package(catkin REQUIRED)
 
 catkin_package()
 

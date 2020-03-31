@@ -3,7 +3,6 @@ project(march_fake_sensor_data LANGUAGES CXX)
 
 find_package(catkin REQUIRED COMPONENTS
     dynamic_reconfigure
-    march_shared_resources
     roscpp
     sensor_msgs
 )
@@ -15,7 +14,6 @@ generate_dynamic_reconfigure_options(
 catkin_package(
     CATKIN_DEPENDS
     dynamic_reconfigure
-    march_shared_resources
     roscpp
     sensor_msgs
 )
