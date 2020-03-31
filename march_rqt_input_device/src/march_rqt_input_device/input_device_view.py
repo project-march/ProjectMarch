@@ -233,7 +233,8 @@ class InputDevicePlugin(Plugin):
 
             [gait_sit, gait_stand, rocker_switch_increment, rocker_switch_decrement, stop_button, error_button],
 
-            [gait_sofa_sit, gait_sofa_stand, gait_single_step_normal, gait_single_step_small, continue_button, pause_button],
+            [gait_sofa_sit, gait_sofa_stand, gait_single_step_normal, gait_single_step_small, continue_button,
+             pause_button],
 
             [gait_stairs_up, gait_stairs_down, gait_stairs_up_single_step, gait_stairs_down_single_step],
 
