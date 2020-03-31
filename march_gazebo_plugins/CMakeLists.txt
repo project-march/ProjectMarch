@@ -4,6 +4,7 @@ project(march_gazebo_plugins LANGUAGES CXX)
 find_package(catkin REQUIRED COMPONENTS
     gazebo_ros
     march_shared_resources
+    roscpp
 )
 find_package(gazebo REQUIRED)
 
