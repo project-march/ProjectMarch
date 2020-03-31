@@ -8,9 +8,15 @@ As the official documentation of these components is sufficient, we will only pr
 
 tf2
 ^^^
-`tf2 <http://wiki.ros.org/tf2>`_ is the second generation of the transform library.
-There is very rarely a need to interact with tf frames directly, but it is still important to be aware of their existence.
-They are used by the robot_state_publisher and rviz to properly visualize your robot.
+`tf2 <http://wiki.ros.org/tf2>`_ is the second generation of the transform library. It produces so called `tf frames`.
+These are the positions and orientations of all the parts in the `urdf`. The tf frames have input from the `robot_state_publisher`.
+In case an IMU is used, the :ref:`march-data-collector-label` uses IMU data to send a transform of the ``imu_link`` to tf2.
+
+The resulting `tf frames` are used by `rviz` for creating a visualisation. The `tf frames` are also used in the :ref:`march-data-collector-label`
+to calculate the center of mass and capture point.
+
+When you select to unfix the exoskeleton in simulation a script in the :ref:`march-simulation-label` is used to produce
+a transform that copies the movements of the exoskeleton with respect to the world. The movements are then also visible in `rviz`.
 
 urdf
 ^^^^
@@ -37,7 +43,7 @@ Please check the `official userguide <http://wiki.ros.org/rviz/UserGuide>`_ to s
 
 Example
 ^^^^^^^
-An example launchfile has been provided in :codedir:`robot_model.launch <useful_ros_tools/launch/robot_model.launch>`.
+An example launchfile has been provided in :codedir:`robot_model.launch <useful_tools/launch/robot_model.launch>`.
 
 Inspect the file to see how the different nodes are launched, and try it out yourself with the following command!
 

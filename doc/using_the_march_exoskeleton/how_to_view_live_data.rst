@@ -38,3 +38,5 @@ Configuration
 ^^^^^^^^^^^^^
 rqt_multiplot allows you to save a configuration that determines which plots are displayed in the ui.
 You can save and load configurations in the top right of the application.
+
+The :monitor:`monitor <multiplot_configurations>` repository contains a lot of these configurations, which you can load when you are in the rqt_multiplot GUI.
