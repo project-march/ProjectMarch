@@ -16,7 +16,8 @@ violated, the object will call the ``SafetyHandler`` to invoke an error. The ``S
 All ``SafetyType``-objects:
 
 * ``TemperatureSafety``, monitors the joint temperatures. Depending on which threshold is exceeded a warning,
-non-fatal or fatal is thrown.
+  non-fatal or fatal is thrown.
+
 * ``InputDeviceSafety``, checks if the input device is still connected. Otherwise, a non-fatal is thrown.
 
 Error severity

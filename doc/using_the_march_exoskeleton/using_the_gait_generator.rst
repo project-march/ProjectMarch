@@ -3,8 +3,8 @@
 Using the gait generator
 ========================
 
-.. note:: It is highly recommended following the :ref:`robot-model-label` to better understand how ros works with
-robots.
+.. note::
+  It is highly recommended following the :ref:`robot-model-label` to better understand how ros works with robots.
 
 .. inclusion-introduction-start
 
@@ -14,7 +14,9 @@ This tutorial will teach how to use the March gait generator to create your own 
 
 .. todo:: (Isha) add link to march_gait_generator when it's done.
 
-.. note:: This tutorial covers how to use the gait generator, if you want to develop the gait generator, please check the package description.
+.. note::
+  This tutorial covers how to use the gait generator, if you want to develop the gait generator, please check the
+  package description.
 
 The Basics
 ^^^^^^^^^^
