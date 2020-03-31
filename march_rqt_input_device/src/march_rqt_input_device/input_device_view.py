@@ -166,6 +166,7 @@ class InputDevicePlugin(Plugin):
 
         gait_tilted_path_left_single_step = \
             self.create_button('gait_tilted_path_left_single_step',
+                               image_path='/gait_tilted_path_left_single_step.png',
                                callback=lambda: self.controller.publish_gait('gait_tilted_path_left_single_step'))
 
         gait_tilted_path_left_straight_end = \
@@ -184,6 +185,7 @@ class InputDevicePlugin(Plugin):
 
         gait_tilted_path_right_single_step = \
             self.create_button('gait_tilted_path_right_single_step',
+                               image_path='/gait_tilted_path_right_single_step.png',
                                callback=lambda: self.controller.publish_gait('gait_tilted_path_right_single_step'))
 
         gait_tilted_path_right_straight_end = \
