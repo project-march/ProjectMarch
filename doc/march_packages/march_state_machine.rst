@@ -11,7 +11,7 @@ can be performed. The state machine also knows which gait can be executed in
 every possible state. For example after sitting you can stand-up, but you
 cannot walk.
 
-We are using an hierarchical state machine, which is a state machine whose
+We are using a hierarchical state machine, which is a state machine whose
 states can be state machines as well. We also use SMACH, this is a task-level
 architecture for rapidly creating complex robot behavior(see :ref:`smach-label`).
 
@@ -19,7 +19,7 @@ Behavior
 --------
 There are 4 general states in the state machine: **LAUNCH**, **HEALTHY**,
 **SHUTDOWN**, **ERROR**, where **LAUNCH** and **HEALTHY** are also state
-machines. As mentioned above this is possible in a hierarchical state machine.
+machines. As mentioned above, this is possible in a hierarchical state machine.
 
 .. figure:: images/march_state_machine.png
    :align: center
@@ -55,7 +55,7 @@ sends requests for executing gaits.
 HEALTHY
 ^^^^^^^
 When launched successful the **HEALTHY** state machine is active. This part
-contains all possible gaits. Besides gaits we also have *idle* states such as
+contains all possible gaits. Besides gaits, we also have *idle* states such as
 **STANDING**, **SITTING** and **UNKNOWN**. **UNKNOWN** is the state in which
 the current position is not known. This can be on start-up, but also after an
 error is thrown and the |march| did not fully execute the intended gait.

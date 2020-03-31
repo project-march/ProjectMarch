@@ -112,7 +112,7 @@ The main exceptions are
 
   * Incorrect configuration of joints (e.g. higher min position than max position)
   * Hardware failures
-  * Incorrect actuate command is send (outside of limits or too far from current position)
+  * Incorrect actuate command is sent (outside of limits or too far from current position)
 
 When such an exception occurs, the high voltage is turned off and the exoskeleton will stop moving.
 

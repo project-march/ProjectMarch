@@ -3,7 +3,7 @@
 ros_control
 ===========
 `ros_control <https://wiki.ros.org/ros_control>`_ is a set of packages to use/write different controllers and
-write an hardware interface to interface the ROS framework with your robot hardware. ros_control has already created
+write a hardware interface to interface the ROS framework with your robot hardware. ros_control has already created
 some standard controllers, for example, a position controller and an effort controller. These are implemented in
 `ros_controllers <https://wiki.ros.org/ros_controllers>`_.
 

@@ -14,9 +14,9 @@ gait/subgait name.
 Behavior
 --------
 The march_state_machine accepts or declines a gait request originating from the input device. If the gait is accepted
-by the state machine the request will be send over to the march_gait_selection module using the subgait sequence defined
-in the state machine. The gait selection module will extract the data from the parsed gaits, found in the
-``GaitSelection``, in order to perform the movement. If executed correctly a subgait trajectories will be sent over to
+by the state machine, the request will be sent over to the march_gait_selection module using the subgait sequence
+defined in the state machine. The gait selection module will extract the data from the parsed gaits, found in the
+``GaitSelection``, in order to perform the movement. If executed correctly, a subgait trajectories will be sent over to
 the march_gait_scheduler of the exoskeleton.
 
 Transition_subgait
@@ -26,7 +26,7 @@ swing of the walk small and walk large). The gait_selection module will create a
 gait format, found in :march:`GaitName <march_shared_resources/action/GaitName.action>`, consists
 of an old and new gait name. This structure requires that both gait names have matching subgait names to use for the
 transition. Using the two subgait trajectories a new transition trajectory is calculated and stored as a subgait object.
-If this is calculated correctly the new subgait trajectory is sent to the march_gait_scheduler.
+If this is calculated correctly, the new subgait trajectory is sent to the march_gait_scheduler.
 
 
 ROS API

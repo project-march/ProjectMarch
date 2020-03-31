@@ -9,7 +9,7 @@ This tutorial will help you set up a ROS workspace with all packages needed to r
 .. inclusion-introduction-end
 
 .. note:: If you already have ros installed and are familiar with ros installations, you can skip to the :ref:`automated-script-label` below.
-  We strongly recommend to follow the manual guide at least once to familiarize yourself with the commands.
+  We strongly recommend following the manual guide at least once to familiarize yourself with the commands.
 
 Install ROS and Colcon
 ^^^^^^^^^^^^^^^^^^^^^^

@@ -21,7 +21,7 @@ Checks will change color based on their result, giving a nice overview of which 
 
 ROS API
 -------
-As this package contains an rqt plugin which can start arbitrary launch files,
+As this package contains a rqt plugin which can start arbitrary launch files,
 it can spawn any amount of nodes, topics and parameters.
 
 

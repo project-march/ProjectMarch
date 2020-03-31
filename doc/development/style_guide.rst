@@ -45,7 +45,7 @@ flake8
 ^^^^^^
 What makes flake8 so useful is that it is able to install plugins, which add checks.
 Flake8 checks by default for `PEP 8 <https://www.python.org/dev/peps/pep-0008>`_ style guide.
-At March we also use more plugins. To install flake8 with the plugins run:
+At March, we also use more plugins. To install flake8 with the plugins run:
 
 .. code::
 

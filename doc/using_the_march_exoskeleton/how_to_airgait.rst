@@ -13,7 +13,7 @@ Airgait on the exoskeleton directly
 
 The setup
 ---------
-- Screen connected with a HDMI cable to the |march|.
+- Screen connected with an HDMI cable to the |march|.
 - The |march| wireless keyboard and mouse.
 - Exoskeleton hanging in the cage.
 - Tools needed to power the |march|.

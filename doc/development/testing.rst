@@ -6,7 +6,7 @@ the march packages.
 
 Prerequisites
 -------------
-In order to run the tests you must have already have a workspace setup.
+In order to run the tests you must already have a workspace setup.
 See :ref:`create-your-workspace-label`.
 
 
@@ -60,7 +60,7 @@ General guidelines to writing tests
 Here are some rules of thumb to follow when writing tests:
 
 1. Write short understandable tests.
-2. Seperate setup code that is necessary for every test.
+2. Separate setup code that is necessary for every test.
 3. Do not depend on writing and reading from external files.
 4. Do not depend on timing in your tests.
 5. Use one ``assert`` per test (i.e. only test one function)
@@ -75,7 +75,7 @@ For testing ROS packages we make a distinction between two different kinds of te
 1. Unit tests (library level)
 2. Integration tests (node level)
 
-Also see the `ROS wiki on testing <https://wiki.ros.org/Quality/Tutorials/UnitTesting>`_.
+Also, see the `ROS wiki on testing <https://wiki.ros.org/Quality/Tutorials/UnitTesting>`_.
 The unit tests are different for C++ and python projects. C++ projects use the
 `gtest <https://github.com/google/googletest>`_ framework, whereas Python projects use
 `unittest <http://pythontesting.net/framework/unittest/unittest-introduction/>`_.

@@ -12,7 +12,7 @@ window can include multiple RQT plugins. For example, if you run
     rqt  # a roscore has to be running
 
 You can select multiple plugins from the ``Plugins`` menu in the top left. Once you have
-selected a few plugins you can save the current 'perspective'. A perspective is a combination
+selected a few plugins, you can save the current 'perspective'. A perspective is a combination
 of RQT plugins in a defined configuration. In the ``Perspectives`` menu you can save, import,
 export and set perspectives as default. This is useful if you want, for example, to have the
 input device and the gait selection tool next to each other in one window.

@@ -8,7 +8,7 @@ This tutorial will teach you how to build the documentation locally and contribu
 
 Introduction
 ^^^^^^^^^^^^
-These tutorials are written in `rst <http://docutils.sourceforge.net/rst.html>`_, an easy to understand plaintext markup language.
+These tutorials are written in `rst <http://docutils.sourceforge.net/rst.html>`_, an easy-to-understand plaintext markup language.
 It is then build by `Sphinx <http://www.sphinx-doc.org/en/master/>`_ using the `rosdoc_lite <http://wiki.ros.org/rosdoc_lite>`_ package.
 You can either build the documentation locally when following the tutorials or deploy it to `GitHub pages <https://pages.github.com/>`_ with the help of `Travis <https://travis-ci.org>`_.
 
