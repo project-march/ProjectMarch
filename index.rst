@@ -31,9 +31,9 @@ Create your workspace
   :end-before: inclusion-introduction-end
 
 
-Useful ROS tools
-^^^^^^^^^^^^^^^^
-A selection of existing ROS tools to speed up development.
+Useful tools
+^^^^^^^^^^^^
+A selection of existing tools to speed up development.
 
 March Packages
 ^^^^^^^^^^^^^^
@@ -61,16 +61,17 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    doc/getting_started/create_your_workspace
 
 .. toctree::
-   :caption: Useful ROS tools
+   :caption: Useful tools
    :maxdepth: 2
    :hidden:
 
-   doc/useful_ros_tools/robot_model
-   doc/useful_ros_tools/ros_control
-   doc/useful_ros_tools/rqt
-   doc/useful_ros_tools/ros_bag
-   doc/useful_ros_tools/gazebo
-   doc/useful_ros_tools/smach
+   doc/useful_tools/robot_model
+   doc/useful_tools/ros_control
+   doc/useful_tools/rqt
+   doc/useful_tools/ros_bag
+   doc/useful_tools/gazebo
+   doc/useful_tools/smach
+   doc/useful_tools/event_stream_processing
 
 .. toctree::
    :caption: Using the March Exoskeleton
@@ -84,6 +85,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    doc/using_the_march_exoskeleton/log_files
    doc/using_the_march_exoskeleton/using_the_gait_generator
    doc/using_the_march_exoskeleton/error_codes
+   doc/using_the_march_exoskeleton/using_the_pressure_soles
 
 .. toctree::
    :caption: Development
@@ -102,6 +104,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
   :maxdepth: 4
   :hidden:
 
+  doc/march_packages/march_data_collector
   doc/march_packages/march_description
   doc/march_packages/march_fake_sensor_data
   doc/march_packages/march_gait_files
@@ -117,4 +120,5 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
   doc/march_packages/march_shared_classes
   doc/march_packages/march_shared_resources
   doc/march_packages/march_state_machine
+  doc/march_packages/march_gait_selection
   doc/march_packages/march_simulation
