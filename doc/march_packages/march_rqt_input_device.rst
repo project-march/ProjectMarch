@@ -61,7 +61,7 @@ Add a new button
 In this tutorial we will add a new button which will have a custom callback that publishes on a new topic
 Our button will publish a boolean message if this tutorial works on the topic ``/march/this/tutorial/works``
 
-We will need to add code to :monitor:`input_device.py <march_rqt_input_device/src/march_rqt_input_device/input_device_view.py>` and :monitor:`input_device.py <march_rqt_input_device/src/march_rqt_input_device/input_device_controller.py>`. The ``InputDeviceView`` class contains code for layout, colour and buttons, where the ``InputDeviceController`` class contains code for publishing on topics.
+We will need to add code to :monitor:`input_device.py <march_rqt_input_device/src/march_rqt_input_device/input_device_view.py>` and :monitor:`input_device.py <march_rqt_input_device/src/march_rqt_input_device/input_device_controller.py>`. The ``InputDeviceView`` class contains code for layout, color and buttons, where the ``InputDeviceController`` class contains code for publishing on topics.
 Make sure to check these files before you start as it contains many examples of existing buttons.
 
 .. hint::

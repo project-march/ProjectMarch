@@ -43,7 +43,7 @@ Compute windows
 Calculate windows
     A calculate window can apply an algorithm to the event it processes.
     The `list <https://documentation.sas.com/?cdcId=espcdc&cdcVersion=6.2&docsetId=espan&docsetTarget=p1iyy8xvfytolsn16djcp243wkx3.htm&locale=nl>`_
-    of possible algorithms is quite long, but to name a few: Streaming Linear Regression, K Nearest Neighbour, Lag Monitoring, Image Processing and Random Forests.
+    of possible algorithms is quite long, but to name a few: Streaming Linear Regression, K Nearest Neighbor, Lag Monitoring, Image Processing and Random Forests.
 
 Output
 ^^^^^^
@@ -57,7 +57,7 @@ There are a few built-in connectors, but there are also several API's. The most 
 *
     One can use the Python 3 module `esppy <https://github.com/sassoftware/python-esppy>`_.
     Using this with `Jupyter Lab  <https://jupyter.org/>`_ for instance can give you live information on your model.
-    This can also be used for live data visualisation.
+    This can also be used for live data visualization.
 
 *
     One can also let the March software subscribe to a window.

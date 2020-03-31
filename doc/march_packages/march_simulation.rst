@@ -45,7 +45,7 @@ CoM controller plugin
 
 Just like the real exoskeleton, the exoskeleton in simulation cannot stably walk without help. For this purpose the
 CoM controller plugin was created. It seeks to mock not the pilot, but the coach during a ground gait session. This
-for the simple reason that the behaviour of the pilot is more erratic and therefore much harder to accurately simulate.
+for the simple reason that the behavior of the pilot is more erratic and therefore much harder to accurately simulate.
 
 The plugin works by controlling the position of the Center of Mass (CoM). There is a target function describing the
 desired location of the CoM. This target function moves in the x-direction (movement direction of exo) with speed

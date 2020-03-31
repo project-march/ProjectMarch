@@ -60,7 +60,7 @@ General guidelines to writing tests
 Here are some rules of thumb to follow when writing tests:
 
 1. Write short understandable tests.
-2. Seperate setup code that is necessary for every test.
+2. Separate setup code that is necessary for every test.
 3. Do not depend on writing and reading from external files.
 4. Do not depend on timing in your tests.
 5. Use one ``assert`` per test (i.e. only test one function)

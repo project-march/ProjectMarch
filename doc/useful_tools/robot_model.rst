@@ -12,7 +12,7 @@ tf2
 These are the positions and orientations of all the parts in the `urdf`. The tf frames have input from the `robot_state_publisher`.
 In case an IMU is used, the :ref:`march-data-collector-label` uses IMU data to send a transform of the ``imu_link`` to tf2.
 
-The resulting `tf frames` are used by `rviz` for creating a visualisation. The `tf frames` are also used in the :ref:`march-data-collector-label`
+The resulting `tf frames` are used by `rviz` for creating a visualization. The `tf frames` are also used in the :ref:`march-data-collector-label`
 to calculate the center of mass and capture point.
 
 When you select to unfix the exoskeleton in simulation a script in the :ref:`march-simulation-label` is used to produce
