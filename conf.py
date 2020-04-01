@@ -1,8 +1,6 @@
 import os
 import sys
 
-import sphinx_rtd_theme
-
 # Retrieve branch name
 if os.getenv('CI'):
     branch_name = os.environ['TRAVIS_BRANCH']
@@ -16,6 +14,7 @@ extensions = ['sphinx.ext.extlinks',
               'sphinx.ext.todo',
               'tutorialformatter',
               'sphinx_rtd_theme',
+              'sphinx_copybutton',
               ]
 
 todo_include_todos = True

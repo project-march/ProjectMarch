@@ -89,13 +89,6 @@ a:hover {
     position: relative;
 }
 
-a.copybtn img {
-    position: absolute;
-    width: 1.2em;
-    bottom: 10px;
-    right: 10px
-}
-
 /* Caption for images */
 .figure p span.caption-text {
     color: black;
