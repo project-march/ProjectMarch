@@ -36,13 +36,14 @@ version = 'Melodic'
 release = 'Melodic'
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'default'
 
 # Name of the style used to generate the html documentation
 html_theme = 'sphinx_rtd_theme'
 html_theme_options = {
     'logo_only': True,
     'display_version': False,
+    'style_external_links': True,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
