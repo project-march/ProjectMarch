@@ -98,13 +98,13 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
       if (std::abs(incremental_displacement / elapsed_time.toSec() - this->velocity_) <
           std::abs(absolute_displacement / elapsed_time.toSec() - this->velocity_))
       {
-        ROS_WARN("There was an outlier in the absolute encoder; old value: %f", this->absolute_position_,
+        ROS_WARN("There was an outlier in the absolute encoder of joint %s; old value: %f, new value: %f", this->name_.c_str(), this->absolute_position_,
                  new_absolute_position);
         best_displacement = incremental_displacement;
       }
       else
       {
-        ROS_WARN("There was an outlier in the incremental encoder; old value: %f, new value: %f",
+        ROS_WARN("There was an outlier in the incremental encoder of joint %s; old value: %f, new value: %f", this->name_.c_str(),
                  this->incremental_position_, new_incremental_position);
         best_displacement = absolute_displacement;
       }
