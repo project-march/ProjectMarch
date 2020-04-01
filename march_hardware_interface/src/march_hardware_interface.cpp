@@ -228,7 +228,7 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
     {
       // If no update was received, assume constant velocity.
       joint_position_[i] += joint_velocity_[i] * elapsed_time.toSec();
-      relative_joint_position_[i] = joint_velocity_[i] * elapsed_time.toSec();
+      relative_joint_position_[i] += joint_velocity_[i] * elapsed_time.toSec();
     }
   }
 
