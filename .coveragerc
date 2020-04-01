@@ -1,0 +1,5 @@
+[report]
+include =
+    *march_rqt_gait_generator*
+omit =
+    *__init__.py

@@ -1,0 +1,18 @@
+coverage:
+  status:
+    project:
+      default: off
+      production:
+        target: auto
+        flags:
+          - production
+fixes:
+  - "src/gait-generation/::"
+flags:
+  production:
+    paths:
+      - "*/src/**/*"
+  test:
+    paths:
+      - "*/test/*"
+      - "*/test/**/*"

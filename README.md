@@ -2,6 +2,7 @@
 Robot agnostic rqt plugin which allows the user to create joint trajectories.
 
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/project-march/gait-generation?include_prereleases)
+[![codecov](https://codecov.io/gh/project-march/gait-generation/branch/master/graph/badge.svg?flag=production)](https://codecov.io/gh/project-march/gait-generation)
 
 | Branch | Build Status |
 | ------ |:------------:|

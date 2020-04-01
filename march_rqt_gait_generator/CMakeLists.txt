@@ -21,6 +21,6 @@ install(PROGRAMS scripts/${PROJECT_NAME}
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-if (CATKIN_ENABLE_TESTING)
+if(CATKIN_ENABLE_TESTING)
     catkin_add_nosetests(test/run_tests.py)
 endif()

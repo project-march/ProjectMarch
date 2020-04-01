@@ -2,7 +2,9 @@
 show-source = true
 max-line-length = 120
 format = ${cyan}%(path)s${reset}:${yellow_bold}%(row)d${reset}:${green_bold}%(col)d${reset}: ${red_bold}%(code)s${reset} %(text)s
-exclude = .git
+exclude =
+    .git
+    __init__.py
 application-package-names =
     march_shared_classes,
     march_shared_resources,
