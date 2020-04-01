@@ -36,6 +36,8 @@ install:
   - gem update --system
   - gem --version
   - gem install html-proofer
+  # Install python dependencies
+  - pip install -r requirements.txt
 
 script:
   # Test build with non-ROS wrapped Sphinx command to allow warnings and errors to be caught

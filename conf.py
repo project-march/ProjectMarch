@@ -1,6 +1,8 @@
 import os
 import sys
 
+import sphinx_rtd_theme
+
 # Retrieve branch name
 if os.getenv('CI'):
     branch_name = os.environ['TRAVIS_BRANCH']
@@ -12,17 +14,17 @@ sys.path += [os.path.abspath('_scripts')]
 
 extensions = ['sphinx.ext.extlinks',
               'sphinx.ext.todo',
-              'tutorialformatter']
+              'tutorialformatter',
+              'sphinx_rtd_theme',
+              ]
 
 todo_include_todos = True
 
 # The master toctree document.
 master_doc = 'index'
 
-# The suffix of source filenames.
-source_suffix = '.rst'
-
-project = u'Project March'
+project = 'Project March'
+copyright = '2020, Project March'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -38,23 +40,27 @@ pygments_style = 'sphinx'
 
 # Name of the style used to generate the html documentation
 html_theme = 'sphinx_rtd_theme'
-html_theme_path = ['_themes']
+html_theme_options = {
+    'logo_only': True,
+    'display_version': False,
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+html_css_files = ['css/override.css']
+
+html_logo = 'logo.png'
+html_favicon = 'favicon.ico'
+html_last_updated_fmt = '%b %d, %Y'
+html_show_copyright = True
 
 html_context = {
     "display_github": True,
     "github_user": "project-march",
     "github_repo": "tutorials",
     "github_version": branch_name,
-    "conf_py_path": "",
-    "source_suffix": source_suffix,
-    "css_files": ['_static/override.css'],
-    "favicon": "favicon.ico",
-    "logo": "logo.png"
 }
 
 # Global substitutions
@@ -63,7 +69,6 @@ rst_prolog = """
 """
 
 # Links
-ros_distro = 'melodic'
 extlinks = {'codedir': ('https://github.com/' + html_context["github_user"] + '/tutorials/tree/' + html_context["github_version"] + '/doc/%s', ''),
             'rootdir': ('https://github.com/' + html_context["github_user"] + '/tutorials/tree/' + html_context["github_version"] + '/%s', ''),
             'hardware-interface': ('https://github.com/' + html_context["github_user"] + '/hardware-interface/tree/develop/%s', ''),
