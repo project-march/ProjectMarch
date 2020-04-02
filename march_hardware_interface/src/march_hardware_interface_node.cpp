@@ -21,10 +21,12 @@ int main(int argc, char** argv)
   AllowedRobot selected_robot = AllowedRobot(argv[1]);
   ROS_INFO_STREAM("Selected robot: " << selected_robot);
 
+  bool reset_imc = ros::param::param<bool>("~reset_imc", false);
+
   spinner.start();
 
   HardwareBuilder builder(selected_robot);
-  MarchHardwareInterface march(builder.createMarchRobot());
+  MarchHardwareInterface march(builder.createMarchRobot(), reset_imc);
 
   try
   {
