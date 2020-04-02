@@ -57,10 +57,10 @@ html_last_updated_fmt = '%b %d, %Y'
 html_show_copyright = True
 
 html_context = {
-    "display_github": True,
-    "github_user": "project-march",
-    "github_repo": "tutorials",
-    "github_version": branch_name,
+    'display_github': True,
+    'github_user': 'project-march',
+    'github_repo': 'tutorials',
+    'github_version': branch_name,
 }
 
 # Global substitutions
@@ -69,17 +69,17 @@ rst_prolog = """
 """
 
 # Links
-extlinks = {'codedir': ('https://github.com/' + html_context["github_user"] + '/tutorials/tree/' + html_context["github_version"] + '/doc/%s', ''),
-            'rootdir': ('https://github.com/' + html_context["github_user"] + '/tutorials/tree/' + html_context["github_version"] + '/%s', ''),
-            'hardware-interface': ('https://github.com/' + html_context["github_user"] + '/hardware-interface/tree/develop/%s', ''),
-            'input-device': ('https://github.com/' + html_context["github_user"] + '/input-device/tree/develop/%s', ''),
-            'march': ('https://github.com/' + html_context["github_user"] + '/march/tree/develop/%s', ''),
-            'monitor': ('https://github.com/' + html_context["github_user"] + '/monitor/tree/develop/%s', ''),
-            'state-machine': ('https://github.com/' + html_context["github_user"] + '/state-machine/tree/develop/%s', ''),
-            'simulation': ('https://github.com/' + html_context["github_user"] + '/simulation/tree/develop/%s', ''),
-            'gait-files': ('https://github.com/' + html_context["github_user"] + '/gait-files/tree/develop/%s', ''),
-            'ethercat-slaves': ('https://github.com/' + html_context["github_user"] + '/ethercat-slaves/tree/develop/%s', ''),
-            'gait-generation': ('https://github.com/' + html_context["github_user"] + '/gait-generation/tree/develop/%s', ''),
+extlinks = {'codedir': ('https://github.com/' + html_context['github_user'] + '/tutorials/tree/' + html_context['github_version'] + '/doc/%s', ''),
+            'rootdir': ('https://github.com/' + html_context['github_user'] + '/tutorials/tree/' + html_context['github_version'] + '/%s', ''),
+            'hardware-interface': ('https://github.com/' + html_context['github_user'] + '/hardware-interface/tree/develop/%s', ''),
+            'input-device': ('https://github.com/' + html_context['github_user'] + '/input-device/tree/develop/%s', ''),
+            'march': ('https://github.com/' + html_context['github_user'] + '/march/tree/develop/%s', ''),
+            'monitor': ('https://github.com/' + html_context['github_user'] + '/monitor/tree/develop/%s', ''),
+            'state-machine': ('https://github.com/' + html_context['github_user'] + '/state-machine/tree/develop/%s', ''),
+            'simulation': ('https://github.com/' + html_context['github_user'] + '/simulation/tree/develop/%s', ''),
+            'gait-files': ('https://github.com/' + html_context['github_user'] + '/gait-files/tree/develop/%s', ''),
+            'ethercat-slaves': ('https://github.com/' + html_context['github_user'] + '/ethercat-slaves/tree/develop/%s', ''),
+            'gait-generation': ('https://github.com/' + html_context['github_user'] + '/gait-generation/tree/develop/%s', ''),
             'march_website': ('http://projectmarch.nl', '')}
 
 # Output file base name for HTML help builder.
