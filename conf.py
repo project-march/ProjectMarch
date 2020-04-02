@@ -60,6 +60,7 @@ html_context = {
     'github_user': 'project-march',
     'github_repo': 'tutorials',
     'github_version': branch_name,
+    "conf_py_path": "/",
 }
 
 # Global substitutions
