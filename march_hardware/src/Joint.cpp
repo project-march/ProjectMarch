@@ -173,7 +173,7 @@ IMotionCubeState Joint::getIMotionCubeState()
   states.motionErrorDescription = error::parseMotionError(this->imc_->getMotionError());
 
   states.motorCurrent = this->imc_->getMotorCurrent();
-  states.motorVoltage = this->imc_->getMotorVoltage();
+  states.IMCVoltage = this->imc_->getIMCVoltage();
 
   states.absoluteEncoderValue = this->imc_->getAngleIUAbsolute();
   states.incrementalEncoderValue = this->imc_->getAngleIUIncremental();
@@ -235,10 +235,10 @@ bool Joint::receivedDataUpdate()
   {
     return false;
   }
-  // We assume that the motor voltage cannot remain precisely constant.
-  float new_motor_volt = this->imc_->getMotorVoltage();
-  bool data_updated = (new_motor_volt != this->previous_motor_volt_);
-  this->previous_motor_volt_ = new_motor_volt;
+  // We assume that the IMC voltage cannot remain precisely constant.
+  float new_imc_volt = this->imc_->getIMCVoltage();
+  bool data_updated = (new_imc_volt != this->previous_imc_volt_);
+  this->previous_imc_volt_ = new_imc_volt;
   return data_updated;
 }
 
