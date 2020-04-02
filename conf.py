@@ -50,8 +50,6 @@ html_theme_options = {
 html_static_path = ['_static']
 html_css_files = ['css/override.css']
 
-html_logo = 'logo.png'
-html_favicon = 'favicon.ico'
 html_last_updated_fmt = '%b %d, %Y'
 html_show_copyright = True
 
@@ -61,6 +59,8 @@ html_context = {
     'github_repo': 'tutorials',
     'github_version': branch_name,
     "conf_py_path": "/",
+    "favicon": "favicon.ico",
+    "logo": "logo.png"
 }
 
 # Global substitutions
