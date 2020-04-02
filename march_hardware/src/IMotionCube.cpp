@@ -243,8 +243,10 @@ float IMotionCube::getMotorCurrent()
 
 float IMotionCube::getIMCVoltage()
 {
-  const float V_DC_MAX_MEASURABLE = 102.3;    // maximum measurable DC voltage found in EMS Setup/Drive info button
-  const float IU_CONVERSION_CONST = 65520.0;  // Conversion parameter, see Technosoft CoE programming manual (2015 page 89)
+  // maximum measurable DC voltage found in EMS Setup/Drive info button
+  const float V_DC_MAX_MEASURABLE = 102.3;
+  // Conversion parameter, see Technosoft CoE programming manual (2015 page 89)
+  const float IU_CONVERSION_CONST = 65520.0;
 
   uint16_t imc_voltage_iu =
       get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::DCLinkVoltage)).ui;
