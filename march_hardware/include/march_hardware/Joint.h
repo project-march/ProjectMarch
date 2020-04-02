@@ -40,6 +40,8 @@ public:
   Joint(const Joint&) = delete;
   Joint& operator=(const Joint&) = delete;
 
+  void resetIMotionCube();
+
   /* Delete move assignment since string cannot be move assigned */
   Joint(Joint&&) = default;
   Joint& operator=(Joint&&) = delete;

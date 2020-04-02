@@ -55,6 +55,18 @@ void Joint::prepareActuation()
   ROS_INFO("[%s] Successfully prepared for actuation", this->name_.c_str());
 }
 
+void Joint::resetIMotionCube()
+{
+  if (!this->hasIMotionCube())
+  {
+    ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
+  }
+  else
+  {
+    this->imc_->reset();
+  }
+}
+
 void Joint::actuateRad(double target_position)
 {
   if (!this->canActuate())

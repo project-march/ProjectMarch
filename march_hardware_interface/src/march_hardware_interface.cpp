@@ -24,9 +24,10 @@ using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::SoftJointLimits;
 using march::Joint;
 
-MarchHardwareInterface::MarchHardwareInterface(std::unique_ptr<march::MarchRobot> robot)
+MarchHardwareInterface::MarchHardwareInterface(std::unique_ptr<march::MarchRobot> robot, bool reset_imc)
   : march_robot_(std::move(robot))
   , has_power_distribution_board_(this->march_robot_->getPowerDistributionBoard().getSlaveIndex() != -1)
+  , reset_imc_(reset_imc)
 {
   // Get joint names from urdf
   for (const auto& urdf_joint : this->march_robot_->getUrdf().joints_)
@@ -36,7 +37,6 @@ MarchHardwareInterface::MarchHardwareInterface(std::unique_ptr<march::MarchRobot
       this->joint_names_.push_back(urdf_joint.first);
     }
   }
-
   this->num_joints_ = this->joint_names_.size();
 }
 
@@ -55,7 +55,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
   this->reserveMemory();
 
   // Start ethercat cycle in the hardware
-  this->march_robot_->startEtherCAT();
+  this->march_robot_->startEtherCAT(this->reset_imc_);
 
   for (size_t i = 0; i < num_joints_; ++i)
   {

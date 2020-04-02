@@ -1,5 +1,6 @@
 <launch>
     <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_linear, test_joint_rotational."/>
+    <arg name="reset_imc" default="false" doc="Reset the IMC if this argument is set to true"/>
 
     <rosparam file="$(find march_hardware_interface)/config/$(arg robot)/controllers.yaml" command="load"/>
 
@@ -20,6 +21,8 @@
                 args="$(arg robot)"
                 output="screen"
                 required="true"
-        />
+        >
+            <param name="reset_imc" value="$(arg reset_imc)"/>
+        </node>
     </group>
 </launch>
