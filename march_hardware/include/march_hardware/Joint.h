@@ -122,6 +122,8 @@ private:
   const int net_number_;
   bool allow_actuation_ = false;
   float previous_imc_volt_ = 0.0;
+  double previous_absolute_position = 0.0;
+  double previous_incremental_position = 0.0;
 
   std::unique_ptr<IMotionCube> imc_ = nullptr;
   std::unique_ptr<TemperatureGES> temperature_ges_ = nullptr;

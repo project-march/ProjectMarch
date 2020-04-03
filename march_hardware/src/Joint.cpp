@@ -235,10 +235,16 @@ bool Joint::receivedDataUpdate()
   {
     return false;
   }
-  // We assume that the IMC voltage cannot remain precisely constant.
+  // If motor voltage, and both encoders positions did not change, we probably did not receive an update for this joint.
   float new_imc_volt = this->imc_->getIMCVoltage();
-  bool data_updated = (new_imc_volt != this->previous_imc_volt_);
+  double new_absolute_position = this->imc_->getAngleRadAbsolute();
+  double new_incremental_position = this->imc_->getAngleRadIncremental();
+  bool data_updated =
+      (new_imc_volt != this->previous_imc_volt_ && new_absolute_position != this->previous_absolute_position &&
+       new_incremental_position != this->previous_incremental_position);
   this->previous_imc_volt_ = new_imc_volt;
+  this->previous_absolute_position = new_absolute_position;
+  this->previous_incremental_position = new_incremental_position;
   return data_updated;
 }
 
