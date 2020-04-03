@@ -337,9 +337,10 @@ int IMotionCube::computeSWCheckSum()
   int sum = 0;
   std::string delimiter = "\n";
   std::string token;
-  while ((pos = this->sw_stream_.find(delimiter, old_pos)) != std::string::npos)
+  while ((pos = this->sw_stream_.str().find(delimiter, old_pos)) != std::string::npos)
   {
-    token = this->sw_stream_.substr(old_pos, pos) sum += std::stoi(token);
+    token = this->sw_stream_.str().substr(old_pos, pos);
+    sum += std::stoi(token);
     old_pos = pos + token.length() + delimiter.length();
     if (pos - old_pos < 2)  // delimiter has length of 1 two \n in a row has difference in positions of 1
     {
