@@ -93,4 +93,13 @@ private:
   bool init_urdf_ = true;
 };
 
+/*
+ * Adds zeros to left of unsigned int (which is in the form of a string)
+ */
+std::string rightHandJustifyString(std::string input);
+/*
+ * Converts the input filestream object to a stringstream object so that is easier to test for in IMotionCUbe.cpp
+ */
+std::stringstream convertSWFileToStringStream(std::ifstream& sw_file);
+
 #endif  // MARCH_HARDWARE_BUILDER_HARDWARE_BUILDER_H

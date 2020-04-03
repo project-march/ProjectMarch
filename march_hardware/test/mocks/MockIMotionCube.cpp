@@ -11,11 +11,11 @@
 class MockIMotionCube : public march::IMotionCube
 {
 private:
-  std::ifstream sw_file_empty_;
+  std::stringstream sw_stream_empty_;
 public:
   MockIMotionCube()
     : IMotionCube(1, std::make_unique<MockAbsoluteEncoder>(), std::make_unique<MockIncrementalEncoder>(),
-                  sw_file_empty_, march::ActuationMode::unknown)
+                  sw_stream_empty_, march::ActuationMode::unknown)
   {
   }
 

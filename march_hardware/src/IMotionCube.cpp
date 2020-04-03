@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <iomanip>
-#include <fstream>
+#include <sstream>
 #include <sstream>
 #include <string>
 
@@ -23,12 +23,12 @@
 namespace march
 {
 IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::ifstream& sw_file,
+                         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::stringstream& sw_stream,
                          ActuationMode actuation_mode)
   : Slave(slave_index)
   , absolute_encoder_(std::move(absolute_encoder))
   , incremental_encoder_(std::move(incremental_encoder))
-  , sw_file_(sw_file)
+  , sw_stream_(sw_stream)
   , actuation_mode_(actuation_mode)
 {
   if (!this->absolute_encoder_ || !this->incremental_encoder_)
@@ -332,25 +332,6 @@ void IMotionCube::goToOperationEnabled()
 
 int IMotionCube::computeSWCheckSum()
 {
-  std::string line;
-  int sum = 0;
-  while (std::getline(this->sw_file_, line))
-  {
-    std::istringstream iss(line);
-    int a;
-    if (!(iss >> a))
-    {
-      return -1;
-    }  // error
-    if (line.empty())
-    {
-      return sum;
-    }
-    else
-    {
-      sum += a;
-    }
-  }
   return 0;
 }
 

@@ -40,7 +40,7 @@ TEST_F(JointTest, ValidJointHip)
   this->joint->safety->soft_lower_limit = 0.1;
   this->joint->safety->soft_upper_limit = 1.9;
 
-  std::ifstream sw_file_empty_;
+  std::stringstream sw_stream_empty_;
 
   const std::string name = "test_joint_hip";
   march::Joint created = HardwareBuilder::createJoint(config, name, this->joint);
@@ -50,7 +50,7 @@ TEST_F(JointTest, ValidJointHip)
       this->joint->safety->soft_upper_limit);
   auto incremental_encoder = std::make_unique<march::IncrementalEncoder>(12, 50.0);
   auto imc = std::make_unique<march::IMotionCube>(2, std::move(absolute_encoder), std::move(incremental_encoder),
-                                                  sw_file_empty_, march::ActuationMode::unknown);
+                                                  sw_stream_empty_, march::ActuationMode::unknown);
   auto ges = std::make_unique<march::TemperatureGES>(1, 2);
   march::Joint expected(name, -1, true, std::move(imc), std::move(ges));
 
@@ -65,7 +65,7 @@ TEST_F(JointTest, ValidNotActuated)
   this->joint->safety->soft_lower_limit = 0.1;
   this->joint->safety->soft_upper_limit = 1.9;
 
-  std::ifstream sw_file_empty_;
+  std::stringstream sw_stream_empty_;
 
   march::Joint created = HardwareBuilder::createJoint(config, "test_joint_hip", this->joint);
 
@@ -74,7 +74,7 @@ TEST_F(JointTest, ValidNotActuated)
       this->joint->safety->soft_upper_limit);
   auto incremental_encoder = std::make_unique<march::IncrementalEncoder>(12, 50.0);
   auto imc = std::make_unique<march::IMotionCube>(2, std::move(absolute_encoder), std::move(incremental_encoder),
-                                                  sw_file_empty_, march::ActuationMode::unknown);
+                                                  sw_stream_empty_, march::ActuationMode::unknown);
   auto ges = std::make_unique<march::TemperatureGES>(1, 2);
   march::Joint expected("test_joint_hip", -1, false, std::move(imc), std::move(ges));
 
@@ -114,7 +114,7 @@ TEST_F(JointTest, ValidActuationMode)
   this->joint->safety->soft_lower_limit = 0.1;
   this->joint->safety->soft_upper_limit = 1.9;
 
-  std::ifstream sw_file_empty_;
+  std::stringstream sw_stream_empty_;
 
   march::Joint created = HardwareBuilder::createJoint(config, "test_joint_hip", this->joint);
 
@@ -125,7 +125,7 @@ TEST_F(JointTest, ValidActuationMode)
           std::make_unique<march::AbsoluteEncoder>(16, 22134, 43436, this->joint->limits->lower,
                                                    this->joint->limits->upper, this->joint->safety->soft_lower_limit,
                                                    this->joint->safety->soft_upper_limit),
-          std::make_unique<march::IncrementalEncoder>(12, 50.0), sw_file_empty_, march::ActuationMode::position));
+          std::make_unique<march::IncrementalEncoder>(12, 50.0), sw_stream_empty_, march::ActuationMode::position));
 
   ASSERT_EQ(expected, created);
 }

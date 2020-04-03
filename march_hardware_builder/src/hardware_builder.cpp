@@ -6,6 +6,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <fstream>
 
 #include <ros/ros.h>
 
@@ -129,7 +130,7 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
   {
     return nullptr;
   }
-  //std::cout << imc_config;
+  // std::cout << imc_config;
   HardwareBuilder::validateRequiredKeysExist(imc_config, HardwareBuilder::IMOTIONCUBE_REQUIRED_KEYS, "imotioncube");
 
   YAML::Node incremental_encoder_config = imc_config["incrementalEncoder"];
@@ -137,11 +138,12 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
   int slave_index = imc_config["slaveIndex"].as<int>();
 
   std::ifstream imc_setup_data;
-  imc_setup_data.open(urdf_joint->name+".sw");
+  imc_setup_data.open(urdf_joint->name + ".sw");
+  std::stringstream imc_setup_data_sstream = convertSWFileToStringStream(imc_setup_data);
 
   return std::make_unique<march::IMotionCube>(
       slave_index, HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, urdf_joint),
-      HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), imc_setup_data, mode);
+      HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), imc_setup_data_sstream, mode);
 }
 
 std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
@@ -260,4 +262,27 @@ void HardwareBuilder::initUrdf()
     }
     this->init_urdf_ = false;
   }
+}
+
+std::string rightHandJustifyString(std::string input)
+{
+  while (input.size() < 4)
+  {
+    input.insert(0, "0");
+  }
+  return input;
+}
+
+std::stringstream convertSWFileToStringStream(std::ifstream& sw_file)
+{
+  std::string line;
+  std::stringstream iss;
+  while (std::getline(sw_file, line))
+  {
+    if (!(iss << rightHandJustifyString(line)))  // error
+    {
+      break;
+    }
+  }
+  return iss;
 }

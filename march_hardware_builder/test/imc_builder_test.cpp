@@ -40,7 +40,7 @@ TEST_F(IMotionCubeTest, ValidIMotionCubeHip)
   this->joint->safety->soft_lower_limit = 0.1;
   this->joint->safety->soft_upper_limit = 1.9;
 
-  std::ifstream sw_file_empty_;
+  std::stringstream sw_stream_empty_;
 
   auto created = HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, this->joint);
 
@@ -48,7 +48,7 @@ TEST_F(IMotionCubeTest, ValidIMotionCubeHip)
       16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper, this->joint->safety->soft_lower_limit,
       this->joint->safety->soft_upper_limit);
   auto incremental_encoder = std::make_unique<march::IncrementalEncoder>(12, 101.0);
-  march::IMotionCube expected(2, std::move(absolute_encoder), std::move(incremental_encoder), sw_file_empty_,
+  march::IMotionCube expected(2, std::move(absolute_encoder), std::move(incremental_encoder), sw_stream_empty_,
                               march::ActuationMode::unknown);
 
   ASSERT_EQ(expected, *created);
