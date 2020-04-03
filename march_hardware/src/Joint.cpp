@@ -240,7 +240,7 @@ bool Joint::receivedDataUpdate()
   double new_absolute_position = this->imc_->getAngleRadAbsolute();
   double new_incremental_position = this->imc_->getAngleRadIncremental();
   bool data_updated =
-      (new_imc_volt != this->previous_imc_volt_ && new_absolute_position != this->previous_absolute_position &&
+      (new_imc_volt != this->previous_imc_volt_ || new_absolute_position != this->previous_absolute_position ||
        new_incremental_position != this->previous_incremental_position);
   this->previous_imc_volt_ = new_imc_volt;
   this->previous_absolute_position = new_absolute_position;
