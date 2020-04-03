@@ -318,7 +318,7 @@ void MarchHardwareInterface::reserveMemory()
   imc_state_pub_->msg_.detailed_error_description.resize(num_joints_);
   imc_state_pub_->msg_.motion_error_description.resize(num_joints_);
   imc_state_pub_->msg_.motor_current.resize(num_joints_);
-  imc_state_pub_->msg_.motor_voltage.resize(num_joints_);
+  imc_state_pub_->msg_.imc_voltage.resize(num_joints_);
   imc_state_pub_->msg_.absolute_encoder_value.resize(num_joints_);
   imc_state_pub_->msg_.incremental_encoder_value.resize(num_joints_);
 }
@@ -434,7 +434,7 @@ void MarchHardwareInterface::updateIMotionCubeState()
     imc_state_pub_->msg_.detailed_error_description[i] = imc_state.detailedErrorDescription;
     imc_state_pub_->msg_.motion_error_description[i] = imc_state.motionErrorDescription;
     imc_state_pub_->msg_.motor_current[i] = imc_state.motorCurrent;
-    imc_state_pub_->msg_.motor_voltage[i] = imc_state.motorVoltage;
+    imc_state_pub_->msg_.imc_voltage[i] = imc_state.motorVoltage;
     imc_state_pub_->msg_.absolute_encoder_value[i] = imc_state.absoluteEncoderValue;
     imc_state_pub_->msg_.incremental_encoder_value[i] = imc_state.incrementalEncoderValue;
   }
