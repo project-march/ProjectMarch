@@ -266,9 +266,13 @@ void HardwareBuilder::initUrdf()
 
 std::string rightHandJustifyString(std::string input)
 {
-  while (input.size() < 4)
+  std::string delimiter = "\n";
+  if (input != "\n")
   {
-    input.insert(0, "0");
+    while (input.size() < 4 + delimiter.length())
+    {
+      input.insert(0, "0");
+    }
   }
   return input;
 }
