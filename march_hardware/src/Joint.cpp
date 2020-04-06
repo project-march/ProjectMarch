@@ -235,7 +235,8 @@ bool Joint::receivedDataUpdate()
   {
     return false;
   }
-  // If imc voltage, and both encoders positions did not change, we probably did not receive an update for this joint.
+  // If imc voltage, motor current, and both encoders positions did not change,
+  // we probably did not receive an update for this joint.
   float new_imc_volt = this->imc_->getIMCVoltage();
   float new_motor_current = this->imc_->getMotorCurrent();
   double new_absolute_position = this->imc_->getAngleRadAbsolute();
