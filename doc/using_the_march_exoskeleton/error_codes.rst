@@ -1,3 +1,5 @@
+.. _error-codes:
+
 Error Codes
 ===========
 This page tries to document all possible errors that can arise.
