@@ -82,26 +82,26 @@ void IMotionCube::writeInitialSettings(uint8_t cycle_time)
   ROS_DEBUG("IMotionCube::writeInitialSettings");
 
   // mode of operation
-  int mode_of_op = sdo_bit8(slaveIndex, 0x6060, 0, this->actuation_mode_.toModeNumber());
+  int mode_of_op = sdo_bit8_write(slaveIndex, 0x6060, 0, this->actuation_mode_.toModeNumber());
 
   // position limit -- min position
-  int min_pos_lim = sdo_bit32(slaveIndex, 0x607D, 1, this->absolute_encoder_->getLowerSoftLimitIU());
+  int min_pos_lim = sdo_bit32_write(slaveIndex, 0x607D, 1, this->absolute_encoder_->getLowerSoftLimitIU());
 
   // position limit -- max position
-  int max_pos_lim = sdo_bit32(slaveIndex, 0x607D, 2, this->absolute_encoder_->getUpperSoftLimitIU());
+  int max_pos_lim = sdo_bit32_write(slaveIndex, 0x607D, 2, this->absolute_encoder_->getUpperSoftLimitIU());
 
   // Quick stop option
-  int stop_opt = sdo_bit16(slaveIndex, 0x605A, 0, 6);
+  int stop_opt = sdo_bit16_write(slaveIndex, 0x605A, 0, 6);
 
   // Quick stop deceleration
-  int stop_decl = sdo_bit32(slaveIndex, 0x6085, 0, 0x7FFFFFFF);
+  int stop_decl = sdo_bit32_write(slaveIndex, 0x6085, 0, 0x7FFFFFFF);
 
   // Abort connection option code
-  int abort_con = sdo_bit16(slaveIndex, 0x6007, 0, 1);
+  int abort_con = sdo_bit16_write(slaveIndex, 0x6007, 0, 1);
 
   // set the ethercat rate of encoder in form x*10^y
-  int rate_ec_x = sdo_bit8(slaveIndex, 0x60C2, 1, cycle_time);
-  int rate_ec_y = sdo_bit8(slaveIndex, 0x60C2, 2, -3);
+  int rate_ec_x = sdo_bit8_write(slaveIndex, 0x60C2, 1, cycle_time);
+  int rate_ec_y = sdo_bit8_write(slaveIndex, 0x60C2, 2, -3);
 
   if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && stop_decl && abort_con && rate_ec_x && rate_ec_y))
   {
@@ -241,15 +241,17 @@ float IMotionCube::getMotorCurrent()
          static_cast<float>(motor_current_iu);  // Conversion to Amp, see Technosoft CoE programming manual
 }
 
-float IMotionCube::getMotorVoltage()
+float IMotionCube::getIMCVoltage()
 {
-  const float V_DC_MAX_MEASURABLE = 102.3;    // maximum measurable DC voltage found in EMS Setup/Drive info button
-  const float IU_CONVERSION_CONST = 65520.0;  // Conversion parameter, see Technosoft CoE programming manual
+  // maximum measurable DC voltage found in EMS Setup/Drive info button
+  const float V_DC_MAX_MEASURABLE = 102.3;
+  // Conversion parameter, see Technosoft CoE programming manual (2015 page 89)
+  const float IU_CONVERSION_CONST = 65520.0;
 
-  uint16_t motor_voltage_iu =
+  uint16_t imc_voltage_iu =
       get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::DCLinkVoltage)).ui;
   return (V_DC_MAX_MEASURABLE / IU_CONVERSION_CONST) *
-         static_cast<float>(motor_voltage_iu);  // Conversion to Volt, see Technosoft CoE programming manual
+         static_cast<float>(imc_voltage_iu);  // Conversion to Volt, see Technosoft CoE programming manual
 }
 
 void IMotionCube::setControlWord(uint16_t control_word)
@@ -320,6 +322,13 @@ void IMotionCube::goToOperationEnabled()
   }
 
   this->goToTargetState(IMotionCubeTargetState::OPERATION_ENABLED);
+}
+
+void IMotionCube::reset()
+{
+  this->setControlWord(0);
+  ROS_DEBUG("Slave: %d, Try to reset IMC", this->slaveIndex);
+  sdo_bit16_write(this->slaveIndex, 0x2080, 0, 1);
 }
 
 ActuationMode IMotionCube::getActuationMode() const
