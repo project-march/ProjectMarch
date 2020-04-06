@@ -25,6 +25,9 @@ private:
   PowerDistributionBoard powerDistributionBoard;
 
 public:
+  using iterator = std::vector<Joint>::iterator;
+  using const_iterator = std::vector<Joint>::const_iterator;
+
   MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, ::std::string ifName, int ecatCycleTime);
 
   MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, PowerDistributionBoard powerDistributionBoard,
@@ -57,6 +60,12 @@ public:
   int getEthercatCycleTime() const;
 
   Joint& getJoint(::std::string jointName);
+
+  iterator begin();
+  iterator end();
+
+  const_iterator begin() const;
+  const_iterator end() const;
 
   PowerDistributionBoard& getPowerDistributionBoard();
   const PowerDistributionBoard& getPowerDistributionBoard() const;

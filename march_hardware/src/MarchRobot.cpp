@@ -182,6 +182,36 @@ Joint& MarchRobot::getJoint(::std::string jointName)
   throw std::out_of_range("Could not find joint with name " + jointName);
 }
 
+MarchRobot::iterator MarchRobot::begin()
+{
+  if (!ethercatMaster.isOperational())
+  {
+    ROS_WARN("Trying to access joints while ethercat is not operational. This "
+             "may lead to incorrect sensor data.");
+  }
+  return this->jointList.begin();
+}
+
+MarchRobot::iterator MarchRobot::end()
+{
+  return this->jointList.end();
+}
+
+MarchRobot::const_iterator MarchRobot::begin() const
+{
+  if (!ethercatMaster.isOperational())
+  {
+    ROS_WARN("Trying to access joints while ethercat is not operational. This "
+             "may lead to incorrect sensor data.");
+  }
+  return this->jointList.begin();
+}
+
+MarchRobot::const_iterator MarchRobot::end() const
+{
+  return this->jointList.end();
+}
+
 PowerDistributionBoard& MarchRobot::getPowerDistributionBoard()
 {
   return powerDistributionBoard;
