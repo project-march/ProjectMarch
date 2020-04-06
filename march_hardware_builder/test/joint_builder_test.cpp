@@ -128,3 +128,9 @@ TEST_F(JointTest, EmptyJoint)
   YAML::Node config;
   ASSERT_THROW(HardwareBuilder::createJoint(config, "test_joint_empty", this->joint), MissingKeyException);
 }
+
+TEST_F(JointTest, NoUrdfJoint)
+{
+  YAML::Node config = this->loadTestYaml("/joint_correct.yaml");
+  ASSERT_THROW(HardwareBuilder::createJoint(config, "test", nullptr), HardwareConfigException);
+}
