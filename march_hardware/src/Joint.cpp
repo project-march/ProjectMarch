@@ -97,48 +97,16 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
     const double new_absolute_position = this->imc_->getAngleRadAbsolute();
 
     // Get velocity from encoder position
-    const double incremental_displacement = (new_incremental_position - this->incremental_position_);
-    const double absolute_displacement = (new_absolute_position - this->absolute_position_);
     double best_displacement;
 
-    // If the difference in movement of the two encoders is larger than twice the sum of their precisions,
-    // one of them is probably an outlier.
-    if (std::abs(incremental_displacement - absolute_displacement) >
-        2 * (this->imc_->getAbsoluteRadPerBit() + this->imc_->getIncrementalRadPerBit()))
+    // Take the velocity with the highest resolution.
+    if (this->imc_->getIncrementalRadPerBit() < this->imc_->getAbsoluteRadPerBit())
     {
-      // Take the velocity that is closest to that of the previous timestep.
-      if (std::abs(incremental_displacement / elapsed_time.toSec() - this->velocity_) <
-          std::abs(absolute_displacement / elapsed_time.toSec() - this->velocity_))
-      {
-        ROS_WARN("There was an outlier in the absolute encoder of joint %s; old value: %f, new value: %f",
-                 this->name_.c_str(), this->absolute_position_, new_absolute_position);
-        best_displacement = incremental_displacement;
-      }
-      else
-      {
-        ROS_WARN("There was an outlier in the incremental encoder of joint %s; old value: %f, new value: %f",
-                 this->name_.c_str(), this->incremental_position_, new_incremental_position);
-        best_displacement = absolute_displacement;
-      }
+      best_displacement = new_incremental_position - this->incremental_position_;
     }
     else
     {
-      // Recalibrate joint position if it has drifted
-      if (std::abs(this->absolute_position_ - this->position_) > 2 * this->imc_->getAbsoluteRadPerBit())
-      {
-        this->position_ = this->absolute_position_;
-        ROS_INFO("Recalibrated joint position %s", this->name_.c_str());
-      }
-
-      // Take the velocity with the highest resolution.
-      if (this->imc_->getIncrementalRadPerBit() < this->imc_->getAbsoluteRadPerBit())
-      {
-        best_displacement = incremental_displacement;
-      }
-      else
-      {
-        best_displacement = absolute_displacement;
-      }
+      best_displacement = new_absolute_position - this->absolute_position_;
     }
 
     // Update position with the most accurate velocity
