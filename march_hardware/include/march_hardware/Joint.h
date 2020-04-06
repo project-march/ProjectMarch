@@ -122,6 +122,7 @@ private:
   const int net_number_;
   bool allow_actuation_ = false;
   float previous_imc_volt_ = 0.0;
+  float previous_motor_current_ = 0.0;
   double previous_absolute_position_ = 0.0;
   double previous_incremental_position_ = 0.0;
 
