@@ -225,11 +225,14 @@ class InputDevicePlugin(Plugin):
         error_button = self.create_button('error', image_path='/error.png',
                                           callback=lambda: self.controller.publish_error())
 
+        sm_to_unknown_button = self.create_button('force unknown',
+                                                  callback=lambda: self.controller.publish_sm_to_unknown())
+
         # The button layout.
         # Position in the array determines position on screen.
         march_button_layout = [
 
-            [home_sit, home_stand, gait_walk, gait_walk_small, gait_walk_large],
+            [home_sit, home_stand, gait_walk, gait_walk_small, gait_walk_large, sm_to_unknown_button],
 
             [gait_sit, gait_stand, rocker_switch_increment, rocker_switch_decrement, stop_button, error_button],
 

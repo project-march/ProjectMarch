@@ -57,3 +57,8 @@ class InputDeviceController(object):
         rospy.logdebug('Mock Input Device published error')
         self.error_pub.publish(Error(std_msgs.msg.Header(stamp=rospy.Time.now()),
                                      'Fake error thrown by the develop input device.', Error.FATAL))
+
+    def publish_sm_to_unknown(self):
+        rospy.logdebug('Mock Input Device published state machine to unknown')
+        self.instruction_gait_pub.publish(GaitInstruction(std_msgs.msg.Header(stamp=rospy.Time.now()),
+                                                          GaitInstruction.UNKNOWN, ''))
