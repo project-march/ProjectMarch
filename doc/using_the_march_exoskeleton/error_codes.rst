@@ -269,6 +269,52 @@ Since index 0 is the master itself and values lower than 0 are not valid indices
 slave indices are defined as integers higher than 0.
 
 
+.. _e118:
+
+``E118``: Missing URDF joint
+----------------------------
+A required joint was not defined in URDF.
+
+**Cause:** The ``march_hardware_builder`` package uses the URDF and the robots
+yaml for building a March robot. The joints defined in the URDF are required for
+soft and hard limits of the joint and the builder cannot continue without them.
+
+**Fix:** Check that all the joints defined in the
+:hardware-interface:`robots yaml <march_hardware_builder/robots>` are defined
+in the URDF that you are using from :march:`march_description/urdf <march_description/urdf>`.
+
+
+.. _e119:
+
+``E119``: Missing required key
+------------------------------
+A required robot config key from the robots yaml was not defined.
+
+**Cause:** Some of the keys in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
+are required to build a functional robot and the build cannot be finished without
+these keys.
+
+**Fix:** Define the missing key in the robots yaml that you are using.
+
+
+.. _e120:
+
+``E120``: URDF Initialization failed
+------------------------------------
+The URDF could not be loaded from the ROS parameter server.
+
+**Cause:** The ``march_hardware_builder`` retrieves the URDF from the ROS
+parameter server under the ``/robot_description`` parameter. It throws this
+exception when it was not able to retrieve it, probably because was not uploaded.
+
+**Fix:** Check if the URDF has been uploaded to the ROS parameter server. To
+check the value of a ROS parameter run:
+
+.. code::
+
+  rosparam get /robot_description
+
+
 .. _e999:
 
 ``E999``: Unknown error
