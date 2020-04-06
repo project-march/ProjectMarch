@@ -29,13 +29,9 @@ MarchHardwareInterface::MarchHardwareInterface(std::unique_ptr<march::MarchRobot
   , has_power_distribution_board_(this->march_robot_->getPowerDistributionBoard().getSlaveIndex() != -1)
   , reset_imc_(reset_imc)
 {
-  // Get joint names from urdf
-  for (const auto& urdf_joint : this->march_robot_->getUrdf().joints_)
+  for (const auto& joint : *this->march_robot_)
   {
-    if (urdf_joint.second->type != urdf::Joint::FIXED)
-    {
-      this->joint_names_.push_back(urdf_joint.first);
-    }
+    this->joint_names_.push_back(joint.getName());
   }
   this->num_joints_ = this->joint_names_.size();
 }
