@@ -2,6 +2,7 @@
 #include "march_hardware_interface/march_hardware_interface.h"
 #include "march_hardware_interface/power_net_on_off_command.h"
 
+#include <algorithm>
 #include <cmath>
 #include <memory>
 #include <sstream>
@@ -47,7 +48,9 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
       std::make_unique<realtime_tools::RealtimePublisher<march_shared_resources::AfterLimitJointCommand>>(
           nh, "/march/controller/after_limit_joint_command/", 4);
 
-  nh.setParam("/march/joint_names", this->joint_names_);
+  auto sorted_joint_names(this->joint_names_);
+  std::sort(sorted_joint_names.begin(), sorted_joint_names.end());
+  nh.setParam("/march/joint_names", sorted_joint_names);
 
   this->reserveMemory();
 
