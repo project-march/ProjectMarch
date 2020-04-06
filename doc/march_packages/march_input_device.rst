@@ -6,47 +6,46 @@ march_input_device
 Overview
 --------
 The march_input_device is the software running on the |march| input device. The input device is used
-to give input to the software running on the |march|.
+to give input to the software running on the |march|. See the
+:input-device:`project-march/input-device <>` repository for more info.
 
 
-Communication
+ROS API
 -------------
 The communication between the input device and the |march| is done with `rosserial <http://wiki.ros.org/rosserial>`_.
 This can be run wired via usb cable or wireless via wifi connection.
 
-Sending messages
+Published Topics
 ^^^^^^^^^^^^^^^^
-:march:`Gait Instruction Message <march_shared_resources/msg/GaitInstruction.msg>` This is an instruction to start
-the sent gait right now, if this is possible.
+*/march/input_device/instruction* (:march:`march_shared_resources/GaitInstruction <march_shared_resources/msg/GaitInstruction.msg>`)
+  Sends instructions to execute
 
-:march:`Stop Message <march_shared_resources/msg/GaitInstruction.msg>` This message can stop a repeating gait (such
-as walk). After receiving the stop message, the exoskeleton will go to the standing pose.
+*/march/input_device/alive* (`std_msgs/Time <http://docs.ros.org/melodic/api/std_msgs/html/msg/Time.html>`_)
+  Publish empty alive messages so :ref:`march-safety-label` does not throw an error.
 
-`Stay Alive Message <http://docs.ros.org/melodic/api/std_msgs/html/msg/Time.html>`_  Every loop a stay alive message is
-sent. This way :ref:`march-safety-label` can detect when the input device loses connection.
+Subscribed Topics
+^^^^^^^^^^^^^^^^^
+*/march/input_device/instruction_response* (:march:`march_shared_resources/GaitInstructionResponse <march_shared_resources/msg/GaitInstructionResponse.msg>`)
+  Receives responses to instructions executed on */march/input_device/instruction*
 
-Receiving messages
-^^^^^^^^^^^^^^^^^^
-`Gait Instruction Response Message <http://docs.ros.org/melodic/api/std_msgs/html/msg/Bool.html>`_  This message
-indicates that the last gait instruction is handled. The value represents success or rejection.
 
 Tutorials
 ---------
 
-Set correct ubuntu permissions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Set correct permissions on Linux
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The following error can occur when trying to access the ttyUSB port:
 
 .. code::
 
-   Cannot open /dev/ttyUSB0: Permission denied
+  Cannot open /dev/ttyUSB0: Permission denied
 
 To make sure your user is allowed to access the port, add your user to the required groups:
 
 .. code::
 
-  sudo usermod -a -G tty <your_username>
-  sudo usermod -a -G dialout <your_username>
+  sudo usermod -a -G tty $USER
+  sudo usermod -a -G dialout $USER
 
 Now log out on your computer and log back in, the error should be resolved.
 
@@ -57,11 +56,12 @@ How to run wired
 
 Upload the code on the input device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Skip this section if the correct code for running wired is already on the input device. More detailed information on how
-to run and upload the code see the :input-device:`ReadMe <>`.
+Skip this section if the correct code for running wired is already on the input device.
+For more detailed information on how to run and upload the code see the :input-device:`README <>`.
 
-- Comment :code:`#define USE_WIRELESS` in the main.cpp.
-- Upload to input device.
+.. code::
+
+  pio run -t upload
 
 Start the software
 ~~~~~~~~~~~~~~~~~~
@@ -71,7 +71,7 @@ Start the software
 
 .. code::
 
-    roslaunch march_launch serial_connection.launch tcp:=false
+  roslaunch march_launch serial_connection.launch
 
 
 How to run wireless
@@ -81,110 +81,82 @@ How to run wireless
 
 Upload the code on the input device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Skip this section if the correct code for running wireless is already on the input device. More detailed information on how
-to run and upload the code see the :input-device:`ReadMe <>`.
+Skip this section if the correct code for running wireless is already on the input device.
+For more detailed information on how to run and upload the code see the :input-device:`README <>`.
 
-- Type in terminal: :code:`hostname -I` Remember the output, this is the hostname. You have to use this address for the next instructions. From this point we call this value **your_hostname**.
-- Uncomment :code:`#define USE_WIRELESS` in the *main.cpp*.
-- Change :code:`IPAddress server(x, x, x, x)` to :code:`IPAddress server(your_hostname)` in the :input-device:`wireless_connection.h <include/wireless_connection.h>`
-- Upload to input device.
+- Uncomment ``#define USE_WIRELESS`` in the *main.cpp*.
+- Type in terminal: ``hostname -I``, this is your IP address.
+- Open :input-device:`wireless_connection.h <include/wireless_connection.h>`
 
-.. note:: If you want to change the network name and password that the input device uses: Change **ssid** and **password** in the :input-device:`wireless_connection.h <include/wireless_connection.h>`
+  - at ``IPAddress server(x, x, x, x)`` fill the xs with the four numbers
+    of your IP address from the previous step.
+  - Change the value of ``ssid`` to the name of the WiFi network.
+  - Change the value of ``password`` to the password of the WiFi network.
+
+- Compile and upload to the input device.
 
 
 Start the software
 ~~~~~~~~~~~~~~~~~~
-- Type in every terminal you are going to use:
+- Type in every terminal you are going to use (replace ``<your_ip_address>`` with the output from ``hostname -I``):
 
-.. code::
+  .. code-block:: bash
 
-    export ROS_MASTER_URI=http://<your_hostname>:11311/
+    export ROS_MASTER_URI=http://<your_ip_address>:11311/
 
 - Type in a terminal:
 
-.. code::
+  .. code::
 
-    roslaunch march_launch serial_connection.launch
+    roslaunch march_launch serial_connection.launch wireless:=true
 
 - Make sure the batteries are charged and in the input device.
 - Make sure the jumper cap in the electronics holder is placed so the input device is powered by the batteries rather than via a USB cable.
 - Press the on/off button to turn on the input device. The button is located on the electronics holder of the input device.
+
 
 .. _how-to-add-a-gait-label:
 
 How to add a gait
 ^^^^^^^^^^^^^^^^^
 
-- Make new screens for the new gait. 
+- Make new screens for the new gait, for normal, selected and activated.
 - Make sure the new gait/new screens fit in the menu & create a selected & activated screen for the new gait.
 - Put the screens on the SD card. Use the 4D Systems Workshop4 IDE software for this.
-- Create a new state, a new gait, in the *StateMachine.cpp*.
+- Define the sector address of the images to be loaded on the screen in *sd_sector_addresses.h*.
+  These addresses can be found via the 4D Systems Workshop4 IDE software. First
+  load the desired images on the uSD card, then find the sector addresses of
+  said images via the generated .Gc file. Example:
 
-.. code::
+  .. code-block:: cpp
 
-   case State::NewGait:;
-   
-- Implement the correct button actions which cause state transitions to the code. For example:
+    // New gait
+    #define NEW_GAIT SectorAddress { 0x0000, 0x0050 }
+    #define NEW_GAIT_SELECTED SectorAddress { 0x0000, 0x0100 }
+    #define NEW_GAIT_ACTIVATED SectorAddress { 0x0000, 0x0200 }
 
-.. code::
-    
-   if(joystickPress == "PUSH"){
-       this->currentState = State::NewGaitSelected;
-   }
-   break;    
+  The first value is the high part of the address and the second the low part.
 
--  Create a new state for your selected and activated gait.
+- For this example, we will create a new gait screen next to the walk screen.
+  Create a new state, i.e. gait, in the constructor of *state_machine.cpp*.
 
-.. code::
+  .. code-block:: cpp
 
-   case State::NewGaitSelected:
-            if(triggerPress == "PUSH"){
-                this->currentState = State::NewGaitActivated;
-            }
-            else if(joystickPress == "DOUBLE"){
-                this->currentState = State::NewGait;
-            }
-            break;
-   case State::NewGaitActivated:
-            if(triggerPress == "EXIT_GAIT"){
-                this->currentState = State::StandUp;
-            }
-            break;
-            
-- Add a new entry to the *stateToGaitMapping*. Do this by adding an extra line in the constructor of the
-  *StateMachine.cpp*:
+    State& new_gait = this->createGaitState(NEW_GAIT, NEW_GAIT_SELECTED, NEW_GAIT_ACTIVATED, "new_gait", nullptr);
 
-.. code::
+  The ``createGaitState`` function automatically creates 3 new states for the
+  normal, selected and activated screen with connections between them and adds
+  the state to the state machine. The final argument is a pointer to a state the
+  gait should go to once succeeded. In our case we want to return to the
+  new_gait screen after it succeeded, so we pass ``nullptr``.
 
-    stateToGaitMapping[State::<name_activated_state>] = "<gait_name>";
+- Now connect the new state to the walk state
 
-**<name_activated_state>** name of the activated state
+  .. code-block:: cpp
 
-**<gait_name>** name of the gait
+    new_gait.withRight(&walk);
 
-- Return the SD addresses of the image that should be drawn in the current state in the *getScreenImage()* method in *StateMachine.cpp*:
-
-.. code::
-
-  case State::NewGait:
-      currentSdAddresses[0] = NewGait_Hi;
-      currentSdAddresses[1] = NewGait_Lo;
-      break;
-
-- Add the created states in the *Statemachine.h*.
-
-.. code::
-
-   enum class State {NewGait,
-                     NewGaitSelected,
-                     NewGaitActivated};
-                        
-- Define the sector address of the images to be loaded on the screen in the *SD_sector_addresses.h*. These addresses can be found via the 4D Systems Workshop4 IDE software. First load the desired images on the uSD card, then find the sector addresses of said images via the generated .Gc file.
-
-.. code::
-
-   // NewGait
-      #define NewGait_Hi     0x0000
-      #define NewGait_Lo     0x0051
-
-
+  This creates a connection between the new_gait and walk screens. From new_gait
+  we can move right to walk and from walk we can move left to new_gait. See the
+  :input-device:`state.h <include/state.h>` header file for more methods to
+  connect states.
