@@ -43,6 +43,12 @@ const char* getErrorDescription(ErrorType type)
       return "A joint is not allowed to actuate, yet it's trying to actuate";
     case ErrorType::INVALID_SLAVE_INDEX:
       return "Slave index has an invalid value";
+    case ErrorType::MISSING_URDF_JOINT:
+      return "Required joint not defined in URDF";
+    case ErrorType::MISSING_REQUIRED_KEY:
+      return "Required robot config key not defined";
+    case ErrorType::INIT_URDF_FAILED:
+      return "Failed to initialize URDF";
     default:
       return "Unknown error occurred. Please create/use a documented error";
   }

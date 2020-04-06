@@ -10,6 +10,9 @@
 
 #include <ros/ros.h>
 
+#include <march_hardware/error/error_type.h>
+#include <march_hardware/error/hardware_exception.h>
+
 // clang-format off
 const std::vector<std::string> HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS =
     {
@@ -25,7 +28,7 @@ const std::vector<std::string> HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRE
     {
         "slaveIndex", "bootShutdownOffsets", "netMonitorByteOffsets", "netDriverByteOffsets"
     };
-const std::vector<std::string> HardwareBuilder::JOINT_REQUIRED_KEYS = { "allowActuation", "imotioncube" };
+const std::vector<std::string> HardwareBuilder::JOINT_REQUIRED_KEYS = { "allowActuation" };
 // clang-format on
 
 HardwareBuilder::HardwareBuilder(AllowedRobot robot) : HardwareBuilder(robot.getFilePath())
@@ -80,7 +83,8 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const 
   ROS_DEBUG("Starting creation of joint %s", joint_name.c_str());
   if (!urdf_joint)
   {
-    throw HardwareConfigException("No URDF joint given for joint " + joint_name);
+    throw march::error::HardwareException(march::error::ErrorType::MISSING_URDF_JOINT,
+                                          "No URDF joint given for joint " + joint_name);
   }
   HardwareBuilder::validateRequiredKeysExist(joint_config, HardwareBuilder::JOINT_REQUIRED_KEYS, "joint");
 
@@ -247,7 +251,7 @@ void HardwareBuilder::initUrdf()
   {
     if (!this->urdf_.initParam("/robot_description"))
     {
-      throw HardwareConfigException("Failed to load urdf from parameter server");
+      throw march::error::HardwareException(march::error::ErrorType::INIT_URDF_FAILED);
     }
     this->init_urdf_ = false;
   }

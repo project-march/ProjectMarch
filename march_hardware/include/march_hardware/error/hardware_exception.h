@@ -36,6 +36,8 @@ public:
     this->description_ = this->createDescription(std::string(buffer.data(), size));
   }
 
+  virtual ~HardwareException() noexcept = default;
+
   const char* what() const noexcept override
   {
     return this->description_.c_str();
@@ -52,7 +54,7 @@ public:
     return s;
   }
 
-private:
+protected:
   std::string createDescription(const std::string& message)
   {
     std::stringstream ss;

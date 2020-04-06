@@ -10,6 +10,7 @@
 
 #include <march_hardware/encoder/AbsoluteEncoder.h>
 #include <march_hardware/encoder/IncrementalEncoder.h>
+#include <march_hardware/error/hardware_exception.h>
 #include <march_hardware/IMotionCube.h>
 
 class JointTest : public ::testing::Test
@@ -87,8 +88,9 @@ TEST_F(JointTest, NoActuate)
 TEST_F(JointTest, NoIMotionCube)
 {
   YAML::Node config = this->loadTestYaml("/joint_no_imotioncube.yaml");
+  march::Joint joint = HardwareBuilder::createJoint(config, "test_joint_no_imotioncube", this->joint);
 
-  ASSERT_THROW(HardwareBuilder::createJoint(config, "test_joint_no_imotioncube", this->joint), MissingKeyException);
+  ASSERT_FALSE(joint.hasIMotionCube());
 }
 
 TEST_F(JointTest, NoTemperatureGES)
@@ -132,5 +134,5 @@ TEST_F(JointTest, EmptyJoint)
 TEST_F(JointTest, NoUrdfJoint)
 {
   YAML::Node config = this->loadTestYaml("/joint_correct.yaml");
-  ASSERT_THROW(HardwareBuilder::createJoint(config, "test", nullptr), HardwareConfigException);
+  ASSERT_THROW(HardwareBuilder::createJoint(config, "test", nullptr), march::error::HardwareException);
 }
