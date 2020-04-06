@@ -13,8 +13,11 @@ The implementation is rather straightforward and nearly all the logic can be fou
 
 ROS API
 -------
-The hardware builder is written without depending on ROS to ensure that it can remain functional even when ROS will no longer be used.
-The package does depend on ROS for logging, but that can be easily changed if needed.
+The hardware builder is written without depending on ROS for its core
+functionality to ensure that it can remain functional even when ROS will no
+longer be used. The package does depend on ROS for logging and the urdf ROS
+package for parsing URDF, but that can be easily changed if needed, since none
+of these functionalities are ROS specific.
 
 
 Tutorials
