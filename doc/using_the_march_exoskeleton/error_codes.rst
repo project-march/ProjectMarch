@@ -290,7 +290,7 @@ in the URDF that you are using from :march:`march_description/urdf <march_descri
 ------------------------------
 A required robot config key from the robots yaml was not defined.
 
-**Cause:** Some of the keys in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
+**Cause:** Some keys in the :hardware-interface:`robots yaml <march_hardware_builder/robots>`
 are required to build a functional robot and the build cannot be finished without
 these keys.
 
