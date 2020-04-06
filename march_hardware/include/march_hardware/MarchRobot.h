@@ -61,6 +61,10 @@ public:
 
   Joint& getJoint(::std::string jointName);
 
+  Joint& getJoint(size_t index);
+
+  size_t size() const;
+
   iterator begin();
   iterator end();
 

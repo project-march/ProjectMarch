@@ -182,6 +182,21 @@ Joint& MarchRobot::getJoint(::std::string jointName)
   throw std::out_of_range("Could not find joint with name " + jointName);
 }
 
+Joint& MarchRobot::getJoint(size_t index)
+{
+  if (!ethercatMaster.isOperational())
+  {
+    ROS_WARN("Trying to access joints while ethercat is not operational. This "
+             "may lead to incorrect sensor data.");
+  }
+  return this->jointList.at(index);
+}
+
+size_t MarchRobot::size() const
+{
+  return this->jointList.size();
+}
+
 MarchRobot::iterator MarchRobot::begin()
 {
   if (!ethercatMaster.isOperational())
