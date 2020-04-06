@@ -55,7 +55,7 @@ public:
   ActuationMode getActuationMode() const;
 
   float getMotorCurrent();
-  virtual float getMotorVoltage();
+  virtual float getIMCVoltage();
 
   void setControlWord(uint16_t control_word);
 
@@ -64,6 +64,8 @@ public:
 
   void goToTargetState(IMotionCubeTargetState target_state);
   virtual void goToOperationEnabled();
+
+  virtual void reset();
 
   /** @brief Override comparison operator */
   friend bool operator==(const IMotionCube& lhs, const IMotionCube& rhs)

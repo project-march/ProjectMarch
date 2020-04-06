@@ -150,6 +150,20 @@ TEST_F(JointTest, GetTemperatureWithoutTemperatureGes)
   ASSERT_FLOAT_EQ(joint.getTemperature(), -1.0);
 }
 
+TEST_F(JointTest, ResetController)
+{
+  EXPECT_CALL(*this->imc, reset()).Times(1);
+  march::Joint joint("reset_controller", 0, true, std::move(this->imc));
+  ASSERT_NO_THROW(joint.resetIMotionCube());
+}
+
+TEST_F(JointTest, ResetControllerWithoutController)
+{
+  EXPECT_CALL(*this->imc, reset()).Times(0);
+  march::Joint joint("reset_controller", 0, true, nullptr, std::move(this->temperature_ges));
+  ASSERT_NO_THROW(joint.resetIMotionCube());
+}
+
 TEST_F(JointTest, TestPrepareActuation)
 {
   EXPECT_CALL(*this->imc, getAngleRadIncremental()).WillOnce(Return(5));

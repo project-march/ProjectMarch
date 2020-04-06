@@ -234,15 +234,17 @@ float IMotionCube::getMotorCurrent()
          static_cast<float>(motor_current_iu);  // Conversion to Amp, see Technosoft CoE programming manual
 }
 
-float IMotionCube::getMotorVoltage()
+float IMotionCube::getIMCVoltage()
 {
-  const float V_DC_MAX_MEASURABLE = 102.3;    // maximum measurable DC voltage found in EMS Setup/Drive info button
-  const float IU_CONVERSION_CONST = 65520.0;  // Conversion parameter, see Technosoft CoE programming manual
+  // maximum measurable DC voltage found in EMS Setup/Drive info button
+  const float V_DC_MAX_MEASURABLE = 102.3;
+  // Conversion parameter, see Technosoft CoE programming manual (2015 page 89)
+  const float IU_CONVERSION_CONST = 65520.0;
 
-  uint16_t motor_voltage_iu =
+  uint16_t imc_voltage_iu =
       get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::DCLinkVoltage)).ui;
   return (V_DC_MAX_MEASURABLE / IU_CONVERSION_CONST) *
-         static_cast<float>(motor_voltage_iu);  // Conversion to Volt, see Technosoft CoE programming manual
+         static_cast<float>(imc_voltage_iu);  // Conversion to Volt, see Technosoft CoE programming manual
 }
 
 void IMotionCube::setControlWord(uint16_t control_word)
@@ -313,6 +315,13 @@ void IMotionCube::goToOperationEnabled()
   }
 
   this->goToTargetState(IMotionCubeTargetState::OPERATION_ENABLED);
+}
+
+void IMotionCube::reset()
+{
+  this->setControlWord(0);
+  ROS_DEBUG("Slave: %d, Try to reset IMC", this->slaveIndex);
+  sdo_bit16_write(this->slaveIndex, 0x2080, 0, 1);
 }
 
 ActuationMode IMotionCube::getActuationMode() const

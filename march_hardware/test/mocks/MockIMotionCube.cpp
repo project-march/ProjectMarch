@@ -18,6 +18,7 @@ public:
 
   MOCK_METHOD1(writeInitialSDOs, void(int));
   MOCK_METHOD0(goToOperationEnabled, void());
+  MOCK_METHOD0(reset, void());
 
   MOCK_METHOD0(getAngleRadIncremental, double());
   MOCK_METHOD0(getAngleRadAbsolute, double());
