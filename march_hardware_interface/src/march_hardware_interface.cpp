@@ -448,15 +448,21 @@ void MarchHardwareInterface::iMotionCubeStateCheck(size_t joint_index)
   if (imc_state.state == march::IMCState::FAULT)
   {
     this->march_robot_->stopEtherCAT();
-    std::ostringstream error_stream;
-    error_stream << "IMotionCube of joint " << joint_names_[joint_index].c_str() << " is in fault state "
-                 << imc_state.state.getString() << std::endl;
-    error_stream << "Detailed Error: " << imc_state.detailedErrorDescription << "(" << imc_state.detailedError << ")"
-                 << std::endl;
-    error_stream << "Motion Error: " << imc_state.motionErrorDescription << "(" << imc_state.motionError << ")"
-                 << std::endl;
+      for (int i = 0; i<8; i++){
+          march::IMotionCubeState imc_state = march_robot_->getJoint(joint_names_[joint_index]).getIMotionCubeState();
+          if (imc_state.state == march::IMCState::FAULT){
+              std::ostringstream error_stream;
+              error_stream << "IMotionCube of joint " << joint_names_[joint_index].c_str() << " is in fault state "
+                           << imc_state.state.getString() << std::endl;
+              error_stream << "Detailed Error: " << imc_state.detailedErrorDescription << "(" << imc_state.detailedError << ")"
+                           << std::endl;
+              error_stream << "Motion Error: " << imc_state.motionErrorDescription << "(" << imc_state.motionError << ")"
+                           << std::endl;
 
-    throw std::runtime_error(error_stream.str());
+              throw std::runtime_error(error_stream.str());
+          }
+      }
+
   }
 }
 
