@@ -1,4 +1,4 @@
-name: !!python/unicode "right_open"
+name: "right_open"
 version: "MV_TP_left_kneebend_rightopen_v7"
 description: "A combination of v5 and v6, so both exaggerated stance and ankle adjustment."
 gait_type: ''

@@ -1,4 +1,4 @@
-name: !!python/unicode "right_open"
+name: "right_open"
 version: "MV_TP_left_kneebend_rightopen_v8"
 description: "Version 7 but with less knee flexion left."
 gait_type: ''
