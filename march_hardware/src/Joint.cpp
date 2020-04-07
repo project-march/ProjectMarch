@@ -241,9 +241,9 @@ bool Joint::receivedDataUpdate()
   float new_motor_current = this->imc_->getMotorCurrent();
   double new_absolute_position = this->imc_->getAngleRadAbsolute();
   double new_incremental_position = this->imc_->getAngleRadIncremental();
-  bool data_updated =
-      (new_imc_volt != this->previous_imc_volt_ || new_motor_current != this->previous_motor_current_ ||
-       new_absolute_position != this->previous_absolute_position_ || new_incremental_position != this->previous_incremental_position_);
+  bool data_updated = (new_imc_volt != this->previous_imc_volt_ || new_motor_current != this->previous_motor_current_ ||
+                       new_absolute_position != this->previous_absolute_position_ ||
+                       new_incremental_position != this->previous_incremental_position_);
   this->previous_imc_volt_ = new_imc_volt;
   this->previous_motor_current_ = new_motor_current;
   this->previous_absolute_position_ = new_absolute_position;
