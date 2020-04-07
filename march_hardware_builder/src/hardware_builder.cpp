@@ -138,9 +138,12 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
   int slave_index = imc_config["slaveIndex"].as<int>();
 
   std::ifstream imc_setup_data;
-  imc_setup_data.open(urdf_joint->name + ".sw");
+  imc_setup_data.open(ros::package::getPath("march_hardware_builder").append("/config/" + urdf_joint->name + ".sw"));
+  std::cout << "jointname: " << urdf_joint->name << "path to file"
+            << ros::package::getPath("march_hardware_builder").append("/config/" + urdf_joint->name + ".sw")
+            << std::endl;
   std::stringstream imc_setup_data_sstream = convertSWFileToStringStream(imc_setup_data);
-
+  std::cout << "length of received: " << imc_setup_data_sstream.str().length() << std::endl;
   return std::make_unique<march::IMotionCube>(
       slave_index, HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, urdf_joint),
       HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), imc_setup_data_sstream, mode);
@@ -267,7 +270,7 @@ void HardwareBuilder::initUrdf()
 std::string rightHandJustifyString(std::string input)
 {
   std::string delimiter = "\n";
-  if (input != "\n")
+  if (input.length() > delimiter.length())
   {
     while (input.size() < 4 + delimiter.length())
     {
@@ -283,10 +286,13 @@ std::stringstream convertSWFileToStringStream(std::ifstream& sw_file)
   std::stringstream iss;
   while (std::getline(sw_file, line))
   {
+    std::cout << rightHandJustifyString(line) << std::endl;
     if (!(iss << rightHandJustifyString(line)))  // error
     {
+      //std::cout << "the end of all we know error: " << iss.str() << std::endl;
       break;
     }
   }
+  std::cout << iss.str().length() << std::endl;
   return iss;
 }

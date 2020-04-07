@@ -35,6 +35,7 @@ IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absol
   {
     throw std::invalid_argument("Incremental or absolute encoder cannot be nullptr");
   }
+  std::cout << "length in constructor: " << this->sw_stream_.str().length() << std::endl;
   this->absolute_encoder_->setSlaveIndex(slave_index);
   this->incremental_encoder_->setSlaveIndex(slave_index);
   this->is_incremental_more_precise_ =
@@ -110,6 +111,10 @@ void IMotionCube::writeInitialSettings(uint8_t cycle_time)
   // set the ethercat rate of encoder in form x*10^y
   int rate_ec_x = sdo_bit8_write(slaveIndex, 0x60C2, 1, cycle_time);
   int rate_ec_y = sdo_bit8_write(slaveIndex, 0x60C2, 2, -3);
+
+  int cs = this->computeSWCheckSum();
+
+  ROS_INFO("This is the computed checksum of the .sw file: %d", cs);
 
   if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && stop_decl && abort_con && rate_ec_x && rate_ec_y))
   {
@@ -337,15 +342,20 @@ int IMotionCube::computeSWCheckSum()
   int sum = 0;
   std::string delimiter = "\n";
   std::string token;
+  ROS_INFO("This is the calculated sum: %d", sum);
+  ROS_INFO("This is the length of the received sstream: %d", this->Slave);
+  //std::cout << this->sw_stream_ << std::endl;
+
   while ((pos = this->sw_stream_.str().find(delimiter, old_pos)) != std::string::npos)
   {
     token = this->sw_stream_.str().substr(old_pos, pos);
     sum += std::stoi(token);
-    old_pos = pos + token.length() + delimiter.length();
+    ROS_INFO("This is the calculated sum: %d", sum);
     if (pos - old_pos < 2)  // delimiter has length of 1 two \n in a row has difference in positions of 1
     {
       return sum;
     }
+    old_pos = pos + token.length() + delimiter.length();
   }
   return sum;  // Only reached if something goes wrong and the code doesn't enter the while loop
 }
