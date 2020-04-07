@@ -5,11 +5,11 @@ from march_shared_resources.msg import Error, GaitInstruction
 
 
 class InputDeviceController(object):
-    def __init__(self):
+    def __init__(self, ping):
         self._instruction_gait_pub = rospy.Publisher('/march/input_device/instruction', GaitInstruction, queue_size=10)
         self._error_pub = rospy.Publisher('/march/error', Error, queue_size=10)
 
-        self._ping = rospy.get_param('~ping_safety_node', True)
+        self._ping = ping
 
         if self._ping:
             self._alive_pub = rospy.Publisher('/march/input_device/alive', std_msgs.msg.Time, queue_size=10)
