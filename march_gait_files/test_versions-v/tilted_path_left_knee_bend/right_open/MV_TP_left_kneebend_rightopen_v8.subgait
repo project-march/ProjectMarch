@@ -1,6 +1,6 @@
 name: !!python/unicode "right_open"
-version: "MV_TP_left_kneebend_rightopen_v7"
-description: "A combination of v5 and v6, so both exaggerated stance and ankle adjustment."
+version: "MV_TP_left_kneebend_rightopen_v8"
+description: "Version 7 but with less knee flexion left."
 gait_type: ''
 setpoints: 
   - 
@@ -34,7 +34,7 @@ trajectory:
         secs: 0
         nsecs:         0
     - 
-      positions: [-0.0873, 0.6109, 0.9076, 0.1309, 0.1222, -0.0873, 0.0, 0.0436]
+      positions: [-0.0873, 0.4712, 0.733, 0.1309, 0.1222, -0.0873, 0.0, 0.0436]
       velocities: [-0.0, 0.0, 0.0, 0.0, -0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
