@@ -1,4 +1,4 @@
-name: !!python/unicode "left_open"
+name: "left_open"
 version: "MV_TP_left_straightend_leftopen_v6"
 description: "Straight end corresponding to version 6."
 gait_type: "stairs_like"
