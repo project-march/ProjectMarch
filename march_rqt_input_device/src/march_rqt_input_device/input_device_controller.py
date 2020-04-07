@@ -13,7 +13,8 @@ class InputDeviceController(object):
 
         if self._ping:
             self._alive_pub = rospy.Publisher('/march/input_device/alive', std_msgs.msg.Time, queue_size=10)
-            self._alive_timer = rospy.Timer(rospy.Duration(0.05), self._timer_callback)
+            period = rospy.Duration().from_sec(0.2)
+            self._alive_timer = rospy.Timer(period, self._timer_callback)
 
     def shutdown_plugin(self):
         if self._ping:
