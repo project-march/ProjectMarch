@@ -1,5 +1,5 @@
-name: !!python/unicode "right_open"
-version: !!python/unicode "MV_TP_left_singlestep_rightopen_v7"
+name: "right_open"
+version: "MV_TP_left_singlestep_rightopen_v7"
 description: "Version 5 but with left ankle dorsiflexion."
 gait_type: ''
 setpoints: 
