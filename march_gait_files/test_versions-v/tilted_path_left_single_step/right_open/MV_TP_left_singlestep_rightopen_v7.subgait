@@ -1,5 +1,5 @@
-name: "right_open"
-version: "MV_TP_left_singlestep_rightopen_v7"
+name: !!python/unicode "right_open"
+version: !!python/unicode "MV_TP_left_singlestep_rightopen_v7"
 description: "Version 5 but with left ankle dorsiflexion."
 gait_type: ''
 setpoints: 
@@ -54,39 +54,39 @@ trajectory:
         secs: 0
         nsecs:         0
     - 
-      positions: [0.1222, 0.3952, 0.8727, 0.0436, -0.0873, 0.5847, 0.9425, 0.1309]
-      velocities: [0.0, 0.9229, 0.0, 0.0, 0.0, -0.0678, 0.0732, 0.0]
+      positions: [0.1222, 0.3952, 0.8727, 0.0436, -0.0873, 0.5454, 0.9425, 0.1309]
+      velocities: [0.0, 0.9229, 0.0, 0.0, 0.0, -0.1697, 0.0732, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs: 630000000
     - 
-      positions: [0.1222, 0.5585, 0.6333, 0.0436, -0.0873, 0.5659, 0.9579, 0.1309]
-      velocities: [0.0, 0.1396, -1.506, 0.0, 0.0, -0.0672, 0.0329, 0.0]
+      positions: [0.1222, 0.5585, 0.6333, 0.0436, -0.0873, 0.4984, 0.9579, 0.1309]
+      velocities: [0.0, 0.1396, -1.506, 0.0, 0.0, -0.168, 0.0329, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 0
         nsecs: 900000000
     - 
-      positions: [0.1222, 0.5513, 0.4416, 0.0436, -0.0873, 0.5582, 0.96, 0.1309]
-      velocities: [0.0, -0.2399, -1.6073, 0.0, 0.0, -0.061, 0.0, 0.0]
+      positions: [0.1222, 0.5513, 0.4416, 0.0436, -0.0873, 0.479, 0.96, 0.1309]
+      velocities: [0.0, -0.2399, -1.6073, 0.0, 0.0, -0.1525, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 1
         nsecs:  20000000
     - 
-      positions: [0.1222, 0.3863, 0.0969, 0.0436, -0.0873, 0.5431, 0.96, 0.1309]
-      velocities: [0.0, -0.5678, 0.0, 0.0, 0.0, -0.0253, 0.0, 0.0]
+      positions: [0.1222, 0.3863, 0.0969, 0.0436, -0.0873, 0.4413, 0.96, 0.1309]
+      velocities: [0.0, -0.5678, 0.0, 0.0, 0.0, -0.0632, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 1
         nsecs: 350000000
     - 
-      positions: [0.1222, 0.3142, 0.1396, 0.0436, -0.0873, 0.5411, 0.96, 0.1309]
+      positions: [0.1222, 0.3142, 0.1396, 0.0436, -0.0873, 0.4363, 0.96, 0.1309]
       velocities: [-0.0, -0.3491, 0.0, -0.0, -0.0, 0.0, 0.0, -0.0]
       accelerations: []
       effort: []
