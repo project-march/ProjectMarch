@@ -273,10 +273,10 @@ slave indices are defined as integers higher than 0.
 
 ``E118``: Missing URDF joint
 ----------------------------
-A required joint was not defined in URDF.
+A required joint was not defined in the URDF.
 
 **Cause:** The ``march_hardware_builder`` package uses the URDF and the robots
-yaml for building a March robot. The joints defined in the URDF are required for
+yaml for building a March robot. The joints defined in the URDF are required for the
 soft and hard limits of the joint and the builder cannot continue without them.
 
 **Fix:** Check that all the joints defined in the
@@ -305,7 +305,7 @@ The URDF could not be loaded from the ROS parameter server.
 
 **Cause:** The ``march_hardware_builder`` retrieves the URDF from the ROS
 parameter server under the ``/robot_description`` parameter. It throws this
-exception when it was not able to retrieve it, probably because was not uploaded.
+exception when it was not able to retrieve it, probably because it was not uploaded.
 
 **Fix:** Check if the URDF has been uploaded to the ROS parameter server. To
 check the value of a ROS parameter run:
