@@ -191,6 +191,11 @@ void MarchHardwareInterface::validate()
     this->outsideLimitsCheck(i);
     this->iMotionCubeStateCheck(i);
   }
+  if (fault_state)
+  {
+    this->march_robot_->stopEtherCAT();
+    throw std::runtime_error("One or more IMC's are in fault state");
+  }
 }
 
 void MarchHardwareInterface::waitForPdo()
@@ -444,28 +449,18 @@ void MarchHardwareInterface::updateIMotionCubeState()
 
 void MarchHardwareInterface::iMotionCubeStateCheck(size_t joint_index)
 {
-  march::IMotionCubeState imc_state = march_robot_->getJoint(joint_names_[joint_index]).getIMotionCubeState();
-  if (imc_state.state == march::IMCState::FAULT)
-  {
-    this->march_robot_->stopEtherCAT();
-    for (int i = 0; i < 8; i++)
+    march::IMotionCubeState imc_state = march_robot_->getJoint(joint_names_[joint_index]).getIMotionCubeState();
+    if (imc_state.state == march::IMCState::FAULT)
     {
-      march::IMotionCubeState imc_state = march_robot_->getJoint(joint_names_[joint_index]).getIMotionCubeState();
-      if (imc_state.state == march::IMCState::FAULT)
-      {
-        std::ostringstream error_stream;
-        error_stream << "IMotionCube of joint " << joint_names_[joint_index].c_str() << " is in fault state "
-                     << imc_state.state.getString() << std::endl;
-        error_stream << "Detailed Error: " << imc_state.detailedErrorDescription << "(" << imc_state.detailedError << ")"
-                     << std::endl;
-        error_stream << "Motion Error: " << imc_state.motionErrorDescription << "(" << imc_state.motionError << ")"
-                     << std::endl;
+        ROS_ERROR(<< "IMotionCube of joint " << joint_names_[joint_index].c_str() << " is in fault state "
+                  << imc_state.state.getString() << std::endl );
+        ROS_ERROR(<< "Detailed Error: " << imc_state.detailedErrorDescription << "(" << imc_state.detailedError << ")"
+                  << std::endl);
+        ROS_ERROR(<< "Motion Error: " << imc_state.motionErrorDescription << "(" << imc_state.motionError << ")"
+                  << std::endl;)
+        fault_state = true;
 
-        throw std::runtime_error(error_stream.str());
-      }
     }
-
-  }
 }
 
 void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
