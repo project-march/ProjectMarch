@@ -1,6 +1,6 @@
 name: "right_open"
-version: "MV_TP_left_singlestep_rightopen_v7"
-description: "Version 5 but with left ankle dorsiflexion."
+version: "MV_TP_left_singlestep_rightopen_v5"
+description: "More abduction and adduction in the hips and more flexion in the left leg."
 gait_type: ''
 setpoints: 
   - 
@@ -46,7 +46,7 @@ trajectory:
   left_ankle]
   points: 
     - 
-      positions: [0.1222, -0.0873, 0.0, 0.0436, -0.0873, 0.6109, 0.9076, 0.1309]
+      positions: [0.1222, -0.0873, 0.0, 0.0436, -0.0873, 0.6109, 0.9076, 0.0436]
       velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       accelerations: []
       effort: []
@@ -54,7 +54,7 @@ trajectory:
         secs: 0
         nsecs:         0
     - 
-      positions: [0.1222, 0.3952, 0.8727, 0.0436, -0.0873, 0.5454, 0.9425, 0.1309]
+      positions: [0.1222, 0.3952, 0.8727, 0.0436, -0.0873, 0.5454, 0.9425, 0.0436]
       velocities: [0.0, 0.9229, 0.0, 0.0, 0.0, -0.1697, 0.0732, 0.0]
       accelerations: []
       effort: []
@@ -62,7 +62,7 @@ trajectory:
         secs: 0
         nsecs: 630000000
     - 
-      positions: [0.1222, 0.5585, 0.6333, 0.0436, -0.0873, 0.4984, 0.9579, 0.1309]
+      positions: [0.1222, 0.5585, 0.6333, 0.0436, -0.0873, 0.4984, 0.9579, 0.0436]
       velocities: [0.0, 0.1396, -1.506, 0.0, 0.0, -0.168, 0.0329, 0.0]
       accelerations: []
       effort: []
@@ -70,7 +70,7 @@ trajectory:
         secs: 0
         nsecs: 900000000
     - 
-      positions: [0.1222, 0.5513, 0.4416, 0.0436, -0.0873, 0.479, 0.96, 0.1309]
+      positions: [0.1222, 0.5513, 0.4416, 0.0436, -0.0873, 0.479, 0.96, 0.0436]
       velocities: [0.0, -0.2399, -1.6073, 0.0, 0.0, -0.1525, 0.0, 0.0]
       accelerations: []
       effort: []
@@ -78,7 +78,7 @@ trajectory:
         secs: 1
         nsecs:  20000000
     - 
-      positions: [0.1222, 0.3863, 0.0969, 0.0436, -0.0873, 0.4413, 0.96, 0.1309]
+      positions: [0.1222, 0.3863, 0.0969, 0.0436, -0.0873, 0.4413, 0.96, 0.0436]
       velocities: [0.0, -0.5678, 0.0, 0.0, 0.0, -0.0632, 0.0, 0.0]
       accelerations: []
       effort: []
@@ -86,7 +86,7 @@ trajectory:
         secs: 1
         nsecs: 350000000
     - 
-      positions: [0.1222, 0.3142, 0.1396, 0.0436, -0.0873, 0.4363, 0.96, 0.1309]
+      positions: [0.1222, 0.3142, 0.1396, 0.0436, -0.0873, 0.4363, 0.96, 0.0436]
       velocities: [-0.0, -0.3491, 0.0, -0.0, -0.0, 0.0, 0.0, -0.0]
       accelerations: []
       effort: []
