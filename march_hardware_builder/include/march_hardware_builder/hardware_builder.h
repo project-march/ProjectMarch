@@ -100,6 +100,6 @@ std::string rightHandJustifyString(std::string input);
 /*
  * Converts the input filestream object to a stringstream object so that is easier to test for in IMotionCUbe.cpp
  */
-std::stringstream convertSWFileToStringStream(std::ifstream& sw_file);
+std::string convertSWFileToStringStream(std::ifstream& sw_file);
 
 #endif  // MARCH_HARDWARE_BUILDER_HARDWARE_BUILDER_H

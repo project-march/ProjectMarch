@@ -142,8 +142,8 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
   std::cout << "jointname: " << urdf_joint->name << "path to file"
             << ros::package::getPath("march_hardware_builder").append("/config/" + urdf_joint->name + ".sw")
             << std::endl;
-  std::stringstream imc_setup_data_sstream = convertSWFileToStringStream(imc_setup_data);
-  std::cout << "length of received: " << imc_setup_data_sstream.str().length() << std::endl;
+  std::string imc_setup_data_sstream = convertSWFileToStringStream(imc_setup_data);
+  std::cout << "length of received: " << imc_setup_data_sstream.length() << std::endl;
   return std::make_unique<march::IMotionCube>(
       slave_index, HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, urdf_joint),
       HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), imc_setup_data_sstream, mode);
@@ -280,19 +280,16 @@ std::string rightHandJustifyString(std::string input)
   return input;
 }
 
-std::stringstream convertSWFileToStringStream(std::ifstream& sw_file)
+std::string convertSWFileToStringStream(std::ifstream& sw_file)
 {
   std::string line;
-  std::stringstream iss;
+  std::string result;
   while (std::getline(sw_file, line))
   {
-    std::cout << rightHandJustifyString(line) << std::endl;
-    if (!(iss << rightHandJustifyString(line)))  // error
-    {
-      //std::cout << "the end of all we know error: " << iss.str() << std::endl;
-      break;
-    }
+    std::string justified = rightHandJustifyString(line);
+    result += justified;
   }
-  std::cout << iss.str().length() << std::endl;
-  return iss;
+  std::cout << result.size() << std::endl << result;
+  return result;
 }
+

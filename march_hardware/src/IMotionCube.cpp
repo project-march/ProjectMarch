@@ -10,6 +10,7 @@
 #include <sstream>
 #include <sstream>
 #include <string>
+#include <typeinfo>
 
 #include <bitset>
 #include <memory>
@@ -23,19 +24,19 @@
 namespace march
 {
 IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::stringstream& sw_stream,
+                         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::string sw_stream,
                          ActuationMode actuation_mode)
   : Slave(slave_index)
   , absolute_encoder_(std::move(absolute_encoder))
   , incremental_encoder_(std::move(incremental_encoder))
-  , sw_stream_(sw_stream)
+  , sw_stream_(std::move(sw_stream))
   , actuation_mode_(actuation_mode)
 {
   if (!this->absolute_encoder_ || !this->incremental_encoder_)
   {
     throw std::invalid_argument("Incremental or absolute encoder cannot be nullptr");
   }
-  std::cout << "length in constructor: " << this->sw_stream_.str().length() << std::endl;
+  std::cout << "length in constructor: " << this->sw_stream_.length() << std::endl;
   this->absolute_encoder_->setSlaveIndex(slave_index);
   this->incremental_encoder_->setSlaveIndex(slave_index);
   this->is_incremental_more_precise_ =
@@ -342,20 +343,17 @@ int IMotionCube::computeSWCheckSum()
   int sum = 0;
   std::string delimiter = "\n";
   std::string token;
-  ROS_INFO("This is the calculated sum: %d", sum);
-  ROS_INFO("This is the length of the received sstream: %d", this->Slave);
-  //std::cout << this->sw_stream_ << std::endl;
 
-  while ((pos = this->sw_stream_.str().find(delimiter, old_pos)) != std::string::npos)
+  while ((pos = sw_stream_.find(delimiter, old_pos)) != std::string::npos)
   {
-    token = this->sw_stream_.str().substr(old_pos, pos);
+    token = sw_stream_.substr(old_pos, pos);
     sum += std::stoi(token);
-    ROS_INFO("This is the calculated sum: %d", sum);
+
     if (pos - old_pos < 2)  // delimiter has length of 1 two \n in a row has difference in positions of 1
     {
       return sum;
     }
-    old_pos = pos + token.length() + delimiter.length();
+    old_pos = pos; // + token.length() + delimiter.length();
   }
   return sum;  // Only reached if something goes wrong and the code doesn't enter the while loop
 }

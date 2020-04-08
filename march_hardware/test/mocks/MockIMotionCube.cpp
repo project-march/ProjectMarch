@@ -11,7 +11,7 @@
 class MockIMotionCube : public march::IMotionCube
 {
 private:
-  std::stringstream sw_stream_empty_;
+  std::string sw_stream_empty_;
 
 public:
   MockIMotionCube()
