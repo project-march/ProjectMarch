@@ -1,5 +1,0 @@
-name: tilted_path_right_straight_start
-
-graph:
-  from_subgait: [start,     left_open, right_close]
-  to_subgait:   [left_open, right_close, end]
