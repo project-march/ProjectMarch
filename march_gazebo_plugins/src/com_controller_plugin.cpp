@@ -4,7 +4,6 @@
 
 namespace gazebo
 {
-
 void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
 {
   // Make sure the ROS node for Gazebo has already been initialized
@@ -33,7 +32,8 @@ void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf
 
   // Create a named topic, and subscribe to it.
   ros::SubscribeOptions so = ros::SubscribeOptions::create<march_shared_resources::GaitActionGoal>(
-      "/march/gait/schedule/goal", 1, boost::bind(&ComControllerPlugin::onRosMsg, this, _1), ros::VoidPtr(),&this->ros_queue);
+      "/march/gait/schedule/goal", 1, boost::bind(&ComControllerPlugin::onRosMsg, this, _1), ros::VoidPtr(),
+      &this->ros_queue);
   this->ros_sub = this->ros_node->subscribe(so);
 
   // Spin up the queue helper thread.
@@ -42,6 +42,7 @@ void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf
 
 void ComControllerPlugin::onRosMsg(const march_shared_resources::GaitActionGoalConstPtr& _msg)
 {
+  this->subgait_name = _msg->goal.current_subgait.name;
   // The left foot is stable for gaits that do not start with "left" (so also home stand etc.)
   if (this->subgait_name.substr(0, 4) == "left")
   {
@@ -52,14 +53,14 @@ void ComControllerPlugin::onRosMsg(const march_shared_resources::GaitActionGoalC
     this->stable_side = "left";
   }
 
-  this->subgait_name = _msg->goal.current_subgait.name;
   this->controller_->newSubgait(_msg);
 }
 
 // Called by the world update start event
 void ComControllerPlugin::onUpdate()
 {
-  ignition::math::v4::Vector3<double> torque_all;     // -roll, pitch, -yawconst ignition::math::v4::Vector3<double> torque_all(0, T_pitch, T_yaw);
+  ignition::math::v4::Vector3<double> torque_all;     // -roll, pitch, -yawconst ignition::math::v4::Vector3<double>
+                                                      // torque_all(0, T_pitch, T_yaw);
   ignition::math::v4::Vector3<double> torque_stable;  // -roll, pitch, -yaw
 
   this->controller_->update(torque_all, torque_stable);

@@ -7,11 +7,10 @@
 
 namespace gazebo
 {
-class WalkController : public ObstacleController
+class StairsController : public ObstacleController
 {
 public:
-  //  explicit WalkController();
-  explicit WalkController(physics::ModelPtr model);
+  explicit StairsController(physics::ModelPtr model);
   void update(ignition::math::v4::Vector3<double>& torque_all, ignition::math::v4::Vector3<double>& torque_stable);
 
 private:

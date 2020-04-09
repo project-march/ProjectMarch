@@ -5,19 +5,7 @@
 
 namespace gazebo
 {
-//    WalkController::WalkController() : ObstacleController()
-//    {
-//        this->swing_step_size = 0.7;  // This estimate will be adjusted every step
-//
-//        this->p_pitch = 60;
-//        this->d_pitch = 10;
-//        this->p_roll = 150;
-//        this->d_roll = 0;
-//        this->p_yaw = 500;
-//        this->d_yaw = 25;
-//    }
-
-WalkController::WalkController(physics::ModelPtr model) : ObstacleController(model)
+StairsController::StairsController(physics::ModelPtr model) : ObstacleController(model)
 {
   this->swing_step_size = 0.7;  // This estimate will be adjusted every step
 
@@ -33,8 +21,8 @@ WalkController::WalkController(physics::ModelPtr model) : ObstacleController(mod
   this->error_yaw_last_timestep = 0;
 }
 
-void WalkController::update(ignition::math::v4::Vector3<double>& torque_all,
-                            ignition::math::v4::Vector3<double>& torque_stable)
+void StairsController::update(ignition::math::v4::Vector3<double>& torque_all,
+                              ignition::math::v4::Vector3<double>& torque_stable)
 {
   // Note: the exo moves in the negative x direction, and the right leg is in
   // the positive y direction
