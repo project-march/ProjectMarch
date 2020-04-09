@@ -366,25 +366,11 @@ def get_image_path(img_name):
 
 
 def check_string(text):
-    """Split text into two lines if sentence is to long.
+    """Split text into new lines on every third word.
 
-    :param text:
-        The text to split in half.
-
-    :return:
-        New string which contains of an enter in the middle.
+    :type text: str
+    :param text: The text to split
+    :return New string which contains newlines
     """
-    text = text.replace('_', ' ')
-    split_text = text.split(' ')
-    if len(split_text) >= 3:
-
-        new_string = ''
-        middle = len(split_text) / 2
-
-        new_string += ' '.join(split_text[:middle])
-        new_string += '\n'
-        new_string += ' '.join(split_text[middle:])
-        return new_string
-
-    else:
-        return text
+    words = enumerate(text.replace('_', ' ').split(' '))
+    return reduce(lambda acc, (i, x): acc + '\n' + x if i % 3 == 0 else acc + ' ' + x, words, '')[1:]
