@@ -186,7 +186,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
 
 void MarchHardwareInterface::validate()
 {
-  bool fault_state;
+  bool fault_state = false;
   for (size_t i = 0; i < num_joints_; i++)
   {
     this->outsideLimitsCheck(i);
