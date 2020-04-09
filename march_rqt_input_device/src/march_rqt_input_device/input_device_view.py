@@ -23,6 +23,7 @@ class InputDeviceView(QWidget):
         self._controller.accepted_cb = self._accepted_cb
         self._controller.finished_cb = self._finished_cb
         self._controller.rejected_cb = self._rejected_cb
+        self._controller.current_gait_cb = self._current_gait_cb
 
         # Extend the widget with all attributes and children from UI file
         loadUi(ui_file, self)
@@ -263,11 +264,16 @@ class InputDeviceView(QWidget):
 
     def _finished_cb(self):
         self.status_label.setText('Gait finished')
+        self.gait_label.setText('')
         self._update_possible_gaits()
 
     def _rejected_cb(self):
         self.status_label.setText('Gait rejected')
+        self.gait_label.setText('')
         self._update_possible_gaits()
+
+    def _current_gait_cb(self, gait_name):
+        self.gait_label.setText(gait_name)
 
     def _update_possible_gaits(self):
         possible_gaits = self._controller.get_possible_gaits()
