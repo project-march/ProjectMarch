@@ -55,6 +55,18 @@ void Joint::prepareActuation()
   ROS_INFO("[%s] Successfully prepared for actuation", this->name_.c_str());
 }
 
+void Joint::resetIMotionCube()
+{
+  if (!this->hasIMotionCube())
+  {
+    ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
+  }
+  else
+  {
+    this->imc_->reset();
+  }
+}
+
 void Joint::actuateRad(double target_position)
 {
   if (!this->canActuate())
@@ -161,7 +173,7 @@ IMotionCubeState Joint::getIMotionCubeState()
   states.motionErrorDescription = error::parseMotionError(this->imc_->getMotionError());
 
   states.motorCurrent = this->imc_->getMotorCurrent();
-  states.motorVoltage = this->imc_->getMotorVoltage();
+  states.IMCVoltage = this->imc_->getIMCVoltage();
 
   states.absoluteEncoderValue = this->imc_->getAngleIUAbsolute();
   states.incrementalEncoderValue = this->imc_->getAngleIUIncremental();
@@ -223,10 +235,19 @@ bool Joint::receivedDataUpdate()
   {
     return false;
   }
-  // We assume that the motor voltage cannot remain precisely constant.
-  float new_motor_volt = this->imc_->getMotorVoltage();
-  bool data_updated = (new_motor_volt != this->previous_motor_volt_);
-  this->previous_motor_volt_ = new_motor_volt;
+  // If imc voltage, motor current, and both encoders positions did not change,
+  // we probably did not receive an update for this joint.
+  float new_imc_volt = this->imc_->getIMCVoltage();
+  float new_motor_current = this->imc_->getMotorCurrent();
+  double new_absolute_position = this->imc_->getAngleRadAbsolute();
+  double new_incremental_position = this->imc_->getAngleRadIncremental();
+  bool data_updated = (new_imc_volt != this->previous_imc_volt_ || new_motor_current != this->previous_motor_current_ ||
+                       new_absolute_position != this->previous_absolute_position_ ||
+                       new_incremental_position != this->previous_incremental_position_);
+  this->previous_imc_volt_ = new_imc_volt;
+  this->previous_motor_current_ = new_motor_current;
+  this->previous_absolute_position_ = new_absolute_position;
+  this->previous_incremental_position_ = new_incremental_position;
   return data_updated;
 }
 
