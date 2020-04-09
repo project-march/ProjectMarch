@@ -40,7 +40,7 @@ TEST_F(IMotionCubeTest, ValidIMotionCubeHip)
   this->joint->safety->soft_lower_limit = 0.1;
   this->joint->safety->soft_upper_limit = 1.9;
 
-  std::string sw_stream_empty_;
+  std::stringstream sw_stream_empty_;
 
   auto created = HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, this->joint);
 

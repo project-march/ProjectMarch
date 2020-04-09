@@ -2,11 +2,14 @@
 #include "march_hardware_builder/hardware_builder.h"
 #include "march_hardware_builder/hardware_config_exceptions.h"
 
+#include <algorithm>
+#include <iterator>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 #include <fstream>
+#include <sstream>
 
 #include <ros/ros.h>
 
@@ -142,8 +145,8 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
   std::cout << "jointname: " << urdf_joint->name << "path to file"
             << ros::package::getPath("march_hardware_builder").append("/config/" + urdf_joint->name + ".sw")
             << std::endl;
-  std::string imc_setup_data_sstream = convertSWFileToStringStream(imc_setup_data);
-  std::cout << "length of received: " << imc_setup_data_sstream.length() << std::endl;
+  std::stringstream imc_setup_data_sstream = convertSWFileToStringStream(imc_setup_data);
+  std::cout << "length of received: " << imc_setup_data_sstream.str().length() << std::endl;
   return std::make_unique<march::IMotionCube>(
       slave_index, HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, urdf_joint),
       HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), imc_setup_data_sstream, mode);
@@ -280,16 +283,10 @@ std::string rightHandJustifyString(std::string input)
   return input;
 }
 
-std::string convertSWFileToStringStream(std::ifstream& sw_file)
+std::stringstream convertSWFileToStringStream(std::ifstream& sw_file)
 {
-  std::string line;
-  std::string result;
-  while (std::getline(sw_file, line))
-  {
-    std::string justified = rightHandJustifyString(line);
-    result += justified;
-  }
-  std::cout << result.size() << std::endl << result;
-  return result;
+  std::stringstream sw_stream;
+  std::copy(std::istreambuf_iterator<char>(sw_file), std::istreambuf_iterator<char>(),
+            std::ostreambuf_iterator<char>(sw_stream));
+  return sw_stream;
 }
-

@@ -40,7 +40,7 @@ TEST_F(JointTest, ValidJointHip)
   this->joint->safety->soft_lower_limit = 0.1;
   this->joint->safety->soft_upper_limit = 1.9;
 
-  std::string sw_stream_empty_;
+  std::stringstream sw_stream_empty_;
 
   const std::string name = "test_joint_hip";
   march::Joint created = HardwareBuilder::createJoint(config, name, this->joint);
@@ -65,7 +65,7 @@ TEST_F(JointTest, ValidNotActuated)
   this->joint->safety->soft_lower_limit = 0.1;
   this->joint->safety->soft_upper_limit = 1.9;
 
-  std::string sw_stream_empty_;
+  std::stringstream sw_stream_empty_;
 
   march::Joint created = HardwareBuilder::createJoint(config, "test_joint_hip", this->joint);
 
@@ -114,7 +114,7 @@ TEST_F(JointTest, ValidActuationMode)
   this->joint->safety->soft_lower_limit = 0.1;
   this->joint->safety->soft_upper_limit = 1.9;
 
-  std::string sw_stream_empty_;
+  std::stringstream sw_stream_empty_;
 
   march::Joint created = HardwareBuilder::createJoint(config, "test_joint_hip", this->joint);
 

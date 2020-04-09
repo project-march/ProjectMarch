@@ -22,7 +22,7 @@ protected:
 
   std::unique_ptr<MockAbsoluteEncoder> mock_absolute_encoder;
   std::unique_ptr<MockIncrementalEncoder> mock_incremental_encoder;
-  std::string sw_stream_empty_;
+  std::stringstream sw_stream_empty_;
 };
 
 TEST_F(IMotionCubeTest, NoAbsoluteEncoder)

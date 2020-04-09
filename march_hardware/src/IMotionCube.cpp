@@ -24,7 +24,7 @@
 namespace march
 {
 IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::string sw_stream,
+                         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::stringstream& sw_stream,
                          ActuationMode actuation_mode)
   : Slave(slave_index)
   , absolute_encoder_(std::move(absolute_encoder))
@@ -36,7 +36,7 @@ IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absol
   {
     throw std::invalid_argument("Incremental or absolute encoder cannot be nullptr");
   }
-  std::cout << "length in constructor: " << this->sw_stream_.length() << std::endl;
+  std::cout << "length in constructor: " << this->sw_stream_.str().length() << std::endl;
   this->absolute_encoder_->setSlaveIndex(slave_index);
   this->incremental_encoder_->setSlaveIndex(slave_index);
   this->is_incremental_more_precise_ =
@@ -343,17 +343,15 @@ int IMotionCube::computeSWCheckSum()
   int sum = 0;
   std::string delimiter = "\n";
   std::string token;
-
-  while ((pos = sw_stream_.find(delimiter, old_pos)) != std::string::npos)
+  while ((pos = sw_stream_.str().find(delimiter, old_pos)) != std::string::npos)
   {
-    token = sw_stream_.substr(old_pos, pos);
-    sum += std::stoi(token);
-
+    token = sw_stream_.str().substr(old_pos, pos - old_pos);
     if (pos - old_pos < 2)  // delimiter has length of 1 two \n in a row has difference in positions of 1
     {
       return sum;
     }
-    old_pos = pos; // + token.length() + delimiter.length();
+    sum += std::stoi(token, nullptr, 16);  // State that we are looking at hexadecimal numbers
+    old_pos = pos + 1;                     // Make sure to check the position after the previous one
   }
   return sum;  // Only reached if something goes wrong and the code doesn't enter the while loop
 }
