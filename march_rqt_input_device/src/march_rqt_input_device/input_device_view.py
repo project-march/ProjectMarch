@@ -286,7 +286,7 @@ class InputDeviceView(QWidget):
                 button.update()
 
     @staticmethod
-    def create_button(text, callback=None, image_path=None, size=(125, 150), visible=True):
+    def create_button(text, callback=None, image_path=None, size=(128, 160), visible=True):
         """Create a push button which the mock input device can register.
 
         :param text:
@@ -346,9 +346,7 @@ class InputDeviceView(QWidget):
 def create_image_button_css(img_path):
     """CSS of a button with a background-image."""
     css_base = """
-    background: url(<img_path>) no-repeat center center;
-    background-color:#1F1E24;
-    color: #000000;
+    background: url(<img_path>) no-repeat center;
     """
     return css_base.replace('<img_path>', img_path)
 
