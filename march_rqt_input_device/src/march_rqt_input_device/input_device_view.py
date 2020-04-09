@@ -20,10 +20,17 @@ class InputDeviceView(QWidget):
         """
         super(InputDeviceView, self).__init__()
         self._controller = controller
+        self._controller.accepted_cb = self._accepted_cb
+        self._controller.finished_cb = self._finished_cb
+        self._controller.rejected_cb = self._rejected_cb
 
         # Extend the widget with all attributes and children from UI file
         loadUi(ui_file, self)
 
+        self._create_buttons()
+        self._update_possible_gaits()
+
+    def _create_buttons(self):
         # Create buttons here
         rocker_switch_increment = \
             self.create_button('rocker_switch_up', image_path='/rocker_switch_up.png',
@@ -245,14 +252,41 @@ class InputDeviceView(QWidget):
         qt_layout = self.create_layout(march_button_layout)
 
         # Apply the qt_layout to the top level widget.
-        self.frame.findChild(QWidget, 'content').setLayout(qt_layout)
+        self.content.setLayout(qt_layout)
 
         # Make the frame as tight as possible with spacing between the buttons.
         qt_layout.setSpacing(15)
-        self.frame.findChild(QWidget, 'content').adjustSize()
+        self.content.adjustSize()
+
+    def _accepted_cb(self):
+        self.status_label.setText('Gait accepted')
+
+    def _finished_cb(self):
+        self.status_label.setText('Gait finished')
+        self._update_possible_gaits()
+
+    def _rejected_cb(self):
+        self.status_label.setText('Gait rejected')
+        self._update_possible_gaits()
+
+    def _update_possible_gaits(self):
+        possible_gaits = self._controller.get_possible_gaits()
+        layout = self.content.layout()
+        if layout:
+            for i in range(0, layout.count()):
+                button = layout.itemAt(i).widget()
+                name = button.objectName()
+                if name in possible_gaits:
+                    button.setEnabled(True)
+                else:
+                    button.setEnabled(False)
+                # The following is necessary for updating the button's stylesheet
+                button.style().unpolish(button)
+                button.style().polish(button)
+                button.update()
 
     @staticmethod
-    def create_button(text, callback=None, image_path=None, size=(125, 150), visible=True, color_code='#1F1E24'):
+    def create_button(text, callback=None, image_path=None, size=(125, 150), visible=True):
         """Create a push button which the mock input device can register.
 
         :param text:
@@ -265,22 +299,21 @@ class InputDeviceView(QWidget):
             Default size of the button
         :param visible:
             Turn button invisible on the gui
-        :param color_code:
-            Possible background color of the button
 
         :return:
             A QPushButton object which contains the passed arguments
         """
         qt_button = QPushButton()
+        qt_button.setObjectName(text)
 
         if image_path:
             qt_button.setStyleSheet(create_image_button_css(get_image_path(image_path)))
         else:
             text = check_string(text)
-            qt_button.setStyleSheet(create_color_button_css(color_code))
             qt_button.setText(text)
 
         qt_button.setMinimumSize(QSize(*size))
+        qt_button.setMaximumSize(QSize(*size))
 
         if not visible:
             qt_button.setVisible(False)
@@ -318,15 +351,6 @@ def create_image_button_css(img_path):
     color: #000000;
     """
     return css_base.replace('<img_path>', img_path)
-
-
-def create_color_button_css(color_code):
-    """CSS of a button with a background-color."""
-    css_base = """
-    background-color: <color_code>;
-    color: #FFFFFF;
-    """
-    return css_base.replace('<color_code>', color_code)
 
 
 def get_image_path(img_name):
