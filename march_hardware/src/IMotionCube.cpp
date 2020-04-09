@@ -91,6 +91,22 @@ void IMotionCube::writeInitialSettings(uint8_t cycle_time)
 {
   ROS_DEBUG("IMotionCube::writeInitialSettings");
 
+  int start_address, end_address;
+  int cs = this->computeSWCheckSum(start_address, end_address);
+
+  ROS_INFO("This is the computed checksum of the .sw file: %d", cs);
+
+  // set parameters to compute checksum on the imc
+  int check_sum =
+      sdo_bit32_write(slaveIndex, 0x2069, 0, end_address * 65536 + start_address);  // Endaddress leftshifted 4 times
+
+  uint32_t read_value;
+  int value_size = sizeof(read_value);
+  // read computed checksum on imc
+  int check_sum_read = sdo_bit32_read(slaveIndex, 0x206A, 0, value_size, read_value);
+
+  ROS_INFO("This is the computed checksum of the imc: %d", read_value);
+
   // mode of operation
   int mode_of_op = sdo_bit8_write(slaveIndex, 0x6060, 0, this->actuation_mode_.toModeNumber());
 
@@ -113,11 +129,8 @@ void IMotionCube::writeInitialSettings(uint8_t cycle_time)
   int rate_ec_x = sdo_bit8_write(slaveIndex, 0x60C2, 1, cycle_time);
   int rate_ec_y = sdo_bit8_write(slaveIndex, 0x60C2, 2, -3);
 
-  int cs = this->computeSWCheckSum();
-
-  ROS_INFO("This is the computed checksum of the .sw file: %d", cs);
-
-  if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && stop_decl && abort_con && rate_ec_x && rate_ec_y))
+  if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && stop_decl && abort_con && rate_ec_x && rate_ec_y &&
+        check_sum && check_sum_read))
   {
     throw error::HardwareException(error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
                                    "Failed writing initial settings to IMC of slave %d", this->slaveIndex);
@@ -336,20 +349,27 @@ void IMotionCube::goToOperationEnabled()
   this->goToTargetState(IMotionCubeTargetState::OPERATION_ENABLED);
 }
 
-int IMotionCube::computeSWCheckSum()
+uint16_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
 {
   size_t pos = 0;
   size_t old_pos = 0;
-  int sum = 0;
+  uint16_t sum = 0;
   std::string delimiter = "\n";
   std::string token;
   while ((pos = sw_stream_.str().find(delimiter, old_pos)) != std::string::npos)
   {
     token = sw_stream_.str().substr(old_pos, pos - old_pos);
+    if (old_pos == 0)
+    {
+      start_address = std::stoi(token, nullptr, 16);
+      token = "0";
+    }
     if (pos - old_pos < 2)  // delimiter has length of 1 two \n in a row has difference in positions of 1
     {
+      end_address = end_address + start_address - 2;  // The -2 compensates the offset of the end_address
       return sum;
     }
+    end_address++;
     sum += std::stoi(token, nullptr, 16);  // State that we are looking at hexadecimal numbers
     old_pos = pos + 1;                     // Make sure to check the position after the previous one
   }

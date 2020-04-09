@@ -96,7 +96,7 @@ private:
   void mapMisoPDOs();
   void mapMosiPDOs();
   void writeInitialSettings(uint8_t cycle_time);
-  int computeSWCheckSum();
+  uint16_t computeSWCheckSum(int& start_address, int& end_address);
 
   // Use of smart pointers are necessary here to make dependency injection
   // possible and thus allow for mocking the encoders. A unique pointer is
