@@ -186,10 +186,14 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
 
 void MarchHardwareInterface::validate()
 {
+  bool fault_state;
   for (size_t i = 0; i < num_joints_; i++)
   {
     this->outsideLimitsCheck(i);
-    this->iMotionCubeStateCheck(i);
+    if (!this->iMotionCubeStateCheck(i))
+    {
+      fault_state = true;
+    }
   }
   if (fault_state)
   {
@@ -447,18 +451,18 @@ void MarchHardwareInterface::updateIMotionCubeState()
   imc_state_pub_->unlockAndPublish();
 }
 
-void MarchHardwareInterface::iMotionCubeStateCheck(size_t joint_index)
+bool MarchHardwareInterface::iMotionCubeStateCheck(size_t joint_index)
 {
-    march::IMotionCubeState imc_state = march_robot_->getJoint(joint_names_[joint_index]).getIMotionCubeState();
-    if (imc_state.state == march::IMCState::FAULT)
-    {
-        ROS_ERROR("IMotionCube of joint %d is in fault state %s \n", joint_names_[joint_index],
-                  imc_state.state.getString());
-        ROS_ERROR("Detailed Error: %s (%s) \n", imc_state.detailedErrorDescription, imc_state.detailedError);
-        ROS_ERROR("Motion Error: %s (%s) \n", imc_state.motionErrorDescription, imc_state.motionError);
-        fault_state = true;
-
-    }
+  march::IMotionCubeState imc_state = march_robot_->getJoint(joint_names_[joint_index]).getIMotionCubeState();
+  if (imc_state.state == march::IMCState::FAULT)
+  {
+    ROS_ERROR("IMotionCube of joint %d is in fault state %s \n", joint_names_[joint_index],
+              imc_state.state.getString());
+    ROS_ERROR("Detailed Error: %s (%s) \n", imc_state.detailedErrorDescription, imc_state.detailedError);
+    ROS_ERROR("Motion Error: %s (%s) \n", imc_state.motionErrorDescription, imc_state.motionError);
+    return false;
+  }
+  return true;
 }
 
 void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
