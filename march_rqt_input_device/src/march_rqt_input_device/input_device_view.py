@@ -300,10 +300,14 @@ class InputDeviceView(QWidget):
                 else:
                     button.setEnabled(False)
 
-                # The following is necessary for updating the button's stylesheet
+                # The following is necessary for updating the stylesheet
                 button.style().unpolish(button)
                 button.style().polish(button)
                 button.update()
+
+            self.content.style().unpolish(self.content)
+            self.content.style().polish(self.content)
+            self.content.update()
 
     def create_button(self, name, callback=None, image_path=None, size=(128, 160), visible=True, always_enabled=False):
         """Create a push button which the mock input device can register.
