@@ -18,7 +18,7 @@
     <enum>QLayout::SetMinAndMaxSize</enum>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="status_bar">
      <item>
       <widget class="QLabel" name="status_label">
        <property name="maximumSize">
@@ -52,6 +52,16 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="refresh_button">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Refreshes the buttons with possible gaits&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Refresh</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -68,7 +78,7 @@
         <x>0</x>
         <y>0</y>
         <width>870</width>
-        <height>501</height>
+        <height>493</height>
        </rect>
       </property>
       <property name="styleSheet">

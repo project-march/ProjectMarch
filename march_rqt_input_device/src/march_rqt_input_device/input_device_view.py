@@ -30,6 +30,8 @@ class InputDeviceView(QWidget):
         # Extend the widget with all attributes and children from UI file
         loadUi(ui_file, self)
 
+        self.refresh_button.clicked.connect(self._update_possible_gaits)
+
         self._create_buttons()
         self._update_possible_gaits()
 
