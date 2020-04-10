@@ -25,6 +25,8 @@ class InputDeviceView(QWidget):
         self._controller.rejected_cb = self._rejected_cb
         self._controller.current_gait_cb = self._current_gait_cb
 
+        self._always_enabled_buttons = []
+
         # Extend the widget with all attributes and children from UI file
         loadUi(ui_file, self)
 
@@ -35,11 +37,13 @@ class InputDeviceView(QWidget):
         # Create buttons here
         rocker_switch_increment = \
             self.create_button('rocker_switch_up', image_path='/rocker_switch_up.png',
-                               callback=lambda: self._controller.publish_increment_step_size())
+                               callback=lambda: self._controller.publish_increment_step_size(),
+                               always_enabled=True)
 
         rocker_switch_decrement = \
             self.create_button('rocker_switch_down', image_path='/rocker_switch_down.png',
-                               callback=lambda: self._controller.publish_decrement_step_size())
+                               callback=lambda: self._controller.publish_decrement_step_size(),
+                               always_enabled=True)
 
         home_sit = \
             self.create_button('home_sit', image_path='/home_sit.png',
@@ -208,16 +212,20 @@ class InputDeviceView(QWidget):
                                callback=lambda: self._controller.publish_gait('gait_tilted_path_second_end'))
 
         stop_button = self.create_button('gait_stop', image_path='/stop.png',
-                                         callback=lambda: self._controller.publish_stop())
+                                         callback=lambda: self._controller.publish_stop(),
+                                         always_enabled=True)
 
         pause_button = self.create_button('gait_pause', image_path='/pause.png',
-                                          callback=lambda: self._controller.publish_pause())
+                                          callback=lambda: self._controller.publish_pause(),
+                                          always_enabled=True)
 
         continue_button = self.create_button('gait_continue', image_path='/continue.png',
-                                             callback=lambda: self._controller.publish_continue())
+                                             callback=lambda: self._controller.publish_continue(),
+                                             always_enabled=True)
 
         error_button = self.create_button('error', image_path='/error.png',
-                                          callback=lambda: self._controller.publish_error())
+                                          callback=lambda: self._controller.publish_error(),
+                                          always_enabled=True)
 
         # The button layout.
         # Position in the array determines position on screen.
@@ -279,24 +287,27 @@ class InputDeviceView(QWidget):
         possible_gaits = self._controller.get_possible_gaits()
         layout = self.content.layout()
         if layout:
-            for i in range(0, layout.count()):
+            for i in range(layout.count()):
                 button = layout.itemAt(i).widget()
                 name = button.objectName()
+                if name in self._always_enabled_buttons:
+                    continue
+
                 if name in possible_gaits:
                     button.setEnabled(True)
                 else:
                     button.setEnabled(False)
+
                 # The following is necessary for updating the button's stylesheet
                 button.style().unpolish(button)
                 button.style().polish(button)
                 button.update()
 
-    @staticmethod
-    def create_button(text, callback=None, image_path=None, size=(128, 160), visible=True):
+    def create_button(self, name, callback=None, image_path=None, size=(128, 160), visible=True, always_enabled=False):
         """Create a push button which the mock input device can register.
 
-        :param text:
-            Possible name of the button
+        :param name:
+            Name of the button
         :param callback:
             The callback to attach to the button when pressed
         :param image_path:
@@ -305,17 +316,23 @@ class InputDeviceView(QWidget):
             Default size of the button
         :param visible:
             Turn button invisible on the gui
+        :param always_enabled:
+            Never disable the button if it's not in possible gaits
 
         :return:
             A QPushButton object which contains the passed arguments
         """
         qt_button = QPushButton()
-        qt_button.setObjectName(text)
+        qt_button.setObjectName(name)
+
+        if always_enabled:
+            self._always_enabled_buttons.append(name)
+            qt_button.setEnabled(True)
 
         if image_path:
             qt_button.setStyleSheet(create_image_button_css(get_image_path(image_path)))
         else:
-            text = check_string(text)
+            text = check_string(name)
             qt_button.setText(text)
 
         qt_button.setMinimumSize(QSize(*size))
