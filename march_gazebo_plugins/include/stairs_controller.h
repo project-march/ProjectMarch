@@ -11,6 +11,7 @@ class StairsController : public ObstacleController
 {
 public:
   explicit StairsController(physics::ModelPtr model);
+  explicit StairsController(ObstacleController other);
   void update(ignition::math::v4::Vector3<double>& torque_all, ignition::math::v4::Vector3<double>& torque_stable);
 
 private:

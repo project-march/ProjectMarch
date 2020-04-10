@@ -12,6 +12,7 @@ class ObstacleController
 {
 public:
   explicit ObstacleController(physics::ModelPtr model);
+  explicit ObstacleController(ObstacleController other);
 
   void newSubgait(const march_shared_resources::GaitActionGoalConstPtr& _msg);
   double getMass();

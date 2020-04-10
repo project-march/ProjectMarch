@@ -42,6 +42,16 @@ void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf
 
 void ComControllerPlugin::onRosMsg(const march_shared_resources::GaitActionGoalConstPtr& _msg)
 {
+  std::string new_gait_type = _msg->goal.name;
+  if (new_gait_name != this->old_gait_name) {
+    if (new_gait_name.substr(0, 6) == "stairs") {
+        this->controller_.reset(new StairsController(this->controller));
+    }
+    else {
+        this->controller_.reset(new WalkController(this->controller));
+    }
+  }
+
   this->subgait_name = _msg->goal.current_subgait.name;
   // The left foot is stable for gaits that do not start with "left" (so also home stand etc.)
   if (this->subgait_name.substr(0, 4) == "left")

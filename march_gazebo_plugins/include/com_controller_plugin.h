@@ -6,6 +6,7 @@
 #include <ros/callback_queue.h>
 #include <ros/ros.h>
 #include <walk_controller.h>
+#include <stairs_controller.h>
 
 #ifndef MARCH_GAZEBO_PLUGINS_COM_CONTROLLER_PLUGIN_H
 #define MARCH_GAZEBO_PLUGINS_COM_CONTROLLER_PLUGIN_H
