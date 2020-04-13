@@ -6,17 +6,14 @@
 #include <memory>
 
 #include <gmock/gmock.h>
-#include <fstream>
+#include <sstream>
 
 class MockIMotionCube : public march::IMotionCube
 {
-private:
-  std::stringstream sw_stream_empty_;
-
 public:
   MockIMotionCube()
     : IMotionCube(1, std::make_unique<MockAbsoluteEncoder>(), std::make_unique<MockIncrementalEncoder>(),
-                  sw_stream_empty_, march::ActuationMode::unknown)
+                  march::ActuationMode::unknown)
   {
   }
 

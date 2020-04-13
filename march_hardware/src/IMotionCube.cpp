@@ -24,6 +24,27 @@
 namespace march
 {
 IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+                         std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode)
+  : Slave(slave_index)
+  , absolute_encoder_(std::move(absolute_encoder))
+  , incremental_encoder_(std::move(incremental_encoder))
+  , sw_stream_("empty")
+  , actuation_mode_(actuation_mode)
+{
+  if (!this->absolute_encoder_ || !this->incremental_encoder_)
+  {
+    throw std::invalid_argument("Incremental or absolute encoder cannot be nullptr");
+  }
+  std::cout << "length in constructor: " << this->sw_stream_.str().length() << std::endl;
+  this->absolute_encoder_->setSlaveIndex(slave_index);
+  this->incremental_encoder_->setSlaveIndex(slave_index);
+  this->is_incremental_more_precise_ =
+      (this->incremental_encoder_->getTotalPositions() * this->incremental_encoder_->getTransmission() >
+       this->absolute_encoder_->getTotalPositions() * 10);
+  // Multiply by ten to ensure the rotational joints keep using absolute encoders. These are somehow more accurate
+  // even though they theoretically shouldn't be.
+}
+IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
                          std::unique_ptr<IncrementalEncoder> incremental_encoder, std::stringstream& sw_stream,
                          ActuationMode actuation_mode)
   : Slave(slave_index)

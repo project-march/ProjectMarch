@@ -31,6 +31,8 @@ public:
    * @throws std::invalid_argument When an absolute or incremental encoder is nullptr.
    */
   IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+              std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
+  IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
               std::unique_ptr<IncrementalEncoder> incremental_encoder, std::stringstream& sw_stream,
               ActuationMode actuation_mode);
 
