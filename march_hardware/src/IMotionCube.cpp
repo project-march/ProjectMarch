@@ -56,7 +56,7 @@ IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absol
   {
     throw std::invalid_argument("Incremental or absolute encoder cannot be nullptr");
   }
-  std::cout << "length in constructor: " << this->sw_stream_.str().length() << std::endl;
+  ROS_INFO("length in constructor: %d", this->sw_stream_.str().length());
   this->absolute_encoder_->setSlaveIndex(slave_index);
   this->incremental_encoder_->setSlaveIndex(slave_index);
   this->is_incremental_more_precise_ =
