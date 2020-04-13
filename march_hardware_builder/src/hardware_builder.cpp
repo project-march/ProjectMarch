@@ -275,7 +275,7 @@ std::string rightHandJustifyString(std::string input)
   std::string delimiter = "\n";
   if (input.length() > delimiter.length())
   {
-    while (input.size() < 4 + delimiter.length())
+    while (input.size() < 4 + delimiter.length()) // check until the 16-bit number has been filled
     {
       input.insert(0, "0");
     }

@@ -94,7 +94,7 @@ private:
 };
 
 /*
- * Adds zeros to left of unsigned int (which is in the form of a string)
+ * Adds zeros to left of unsigned int (which is in the form of a string) until the 16 bits have been accounted for
  */
 std::string rightHandJustifyString(std::string input);
 /*
