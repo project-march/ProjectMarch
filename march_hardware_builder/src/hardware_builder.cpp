@@ -2,10 +2,14 @@
 #include "march_hardware_builder/hardware_builder.h"
 #include "march_hardware_builder/hardware_config_exceptions.h"
 
+#include <algorithm>
+#include <iterator>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
+#include <fstream>
+#include <sstream>
 
 #include <ros/ros.h>
 
@@ -129,15 +133,23 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
   {
     return nullptr;
   }
-
+  // std::cout << imc_config;
   HardwareBuilder::validateRequiredKeysExist(imc_config, HardwareBuilder::IMOTIONCUBE_REQUIRED_KEYS, "imotioncube");
 
   YAML::Node incremental_encoder_config = imc_config["incrementalEncoder"];
   YAML::Node absolute_encoder_config = imc_config["absoluteEncoder"];
   int slave_index = imc_config["slaveIndex"].as<int>();
+
+  std::ifstream imc_setup_data;
+  imc_setup_data.open(ros::package::getPath("march_hardware_builder").append("/config/" + urdf_joint->name + ".sw"));
+  std::cout << "jointname: " << urdf_joint->name << "path to file"
+            << ros::package::getPath("march_hardware_builder").append("/config/" + urdf_joint->name + ".sw")
+            << std::endl;
+  std::stringstream imc_setup_data_sstream = convertSWFileToStringStream(imc_setup_data);
+  std::cout << "length of received: " << imc_setup_data_sstream.str().length() << std::endl;
   return std::make_unique<march::IMotionCube>(
       slave_index, HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, urdf_joint),
-      HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), mode);
+      HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), imc_setup_data_sstream, mode);
 }
 
 std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
@@ -256,4 +268,25 @@ void HardwareBuilder::initUrdf()
     }
     this->init_urdf_ = false;
   }
+}
+
+std::string rightHandJustifyString(std::string input)
+{
+  std::string delimiter = "\n";
+  if (input.length() > delimiter.length())
+  {
+    while (input.size() < 4 + delimiter.length())  // check until the 16-bit number has been filled
+    {
+      input.insert(0, "0");
+    }
+  }
+  return input;
+}
+
+std::stringstream convertSWFileToStringStream(std::ifstream& sw_file)
+{
+  std::stringstream sw_stream;
+  std::copy(std::istreambuf_iterator<char>(sw_file), std::istreambuf_iterator<char>(),
+            std::ostreambuf_iterator<char>(sw_stream));
+  return sw_stream;
 }

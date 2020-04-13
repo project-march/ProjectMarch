@@ -8,6 +8,7 @@
 #include <memory>
 #include <stdexcept>
 #include <utility>
+#include <sstream>
 
 #include <gtest/gtest.h>
 

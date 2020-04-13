@@ -14,6 +14,7 @@
 #include <memory>
 #include <unordered_map>
 #include <string>
+#include <sstream>
 
 namespace march
 {
@@ -31,6 +32,9 @@ public:
    */
   IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
               std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
+  IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+              std::unique_ptr<IncrementalEncoder> incremental_encoder, std::stringstream& sw_stream,
+              ActuationMode actuation_mode);
 
   ~IMotionCube() noexcept override = default;
 
@@ -96,6 +100,7 @@ private:
   void mapMisoPDOs();
   void mapMosiPDOs();
   void writeInitialSettings(uint8_t cycle_time);
+  uint16_t computeSWCheckSum(int& start_address, int& end_address);
 
   // Use of smart pointers are necessary here to make dependency injection
   // possible and thus allow for mocking the encoders. A unique pointer is
@@ -103,6 +108,7 @@ private:
   // do not need to be passed around.
   std::unique_ptr<AbsoluteEncoder> absolute_encoder_;
   std::unique_ptr<IncrementalEncoder> incremental_encoder_;
+  std::stringstream sw_stream_;
   ActuationMode actuation_mode_;
   bool is_incremental_more_precise_;
 
