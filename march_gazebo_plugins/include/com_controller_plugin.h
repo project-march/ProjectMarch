@@ -25,26 +25,26 @@ public:
 private:
   void queueThread();
 
-  physics::ModelPtr model;
+  physics::ModelPtr model_;
 
   std::unique_ptr<ObstacleController> controller_;
-  std::string subgait_name;
-  std::string stable_side;
+  std::string subgait_name_;
+  std::string stable_side_;
 
   // Pointer to the update event connection
-  event::ConnectionPtr update_connection;
+  event::ConnectionPtr update_connection_;
 
   /// \brief A node use for ROS transport
-  std::unique_ptr<ros::NodeHandle> ros_node;
+  std::unique_ptr<ros::NodeHandle> ros_node_;
 
   /// \brief A ROS subscriber
-  ros::Subscriber ros_sub;
+  ros::Subscriber ros_sub_;
 
   /// \brief A ROS callbackqueue that helps process messages
-  ros::CallbackQueue ros_queue;
+  ros::CallbackQueue ros_queue_;
 
   /// \brief A thread the keeps running the ros_queue
-  std::thread ros_queue_thread;
+  std::thread ros_queue_thread_;
 };
 
 // Register this plugin with the simulator

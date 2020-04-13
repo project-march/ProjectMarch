@@ -12,7 +12,6 @@ class ObstacleController
 {
 public:
   explicit ObstacleController(physics::ModelPtr model);
-  explicit ObstacleController(ObstacleController other);
 
   void newSubgait(const march_shared_resources::GaitActionGoalConstPtr& _msg);
   double getMass();
@@ -23,13 +22,13 @@ public:
 protected:
   physics::ModelPtr model_;
 
-  physics::LinkPtr foot_left;
-  physics::LinkPtr foot_right;
+  physics::LinkPtr foot_left_;
+  physics::LinkPtr foot_right_;
 
-  std::string subgait_name;
-  double subgait_start_time;
-  double swing_step_size;
-  double subgait_duration;
+  std::string subgait_name_;
+  double subgait_start_time_;
+  double swing_step_size_;
+  double subgait_duration_;
 };
 }  // namespace gazebo
 

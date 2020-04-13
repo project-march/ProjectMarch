@@ -1,6 +1,7 @@
 // Copyright 2019 Project March.
 
 #include <com_controller_plugin.h>
+#include <typeinfo>
 
 namespace gazebo
 {
@@ -17,50 +18,58 @@ void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf
   }
 
   // Initialise variables
-  this->model = _parent;
-  this->controller_.reset(new WalkController(this->model));
+  this->model_ = _parent;
+  this->controller_.reset(new WalkController(this->model_));
 
-  this->subgait_name = "home_stand";
-  this->stable_side = "left";
+  this->subgait_name_ = "home_stand";
+  this->stable_side_ = "left";
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
-  this->update_connection = event::Events::ConnectWorldUpdateBegin(std::bind(&ComControllerPlugin::onUpdate, this));
+  this->update_connection_ = event::Events::ConnectWorldUpdateBegin(std::bind(&ComControllerPlugin::onUpdate, this));
 
   // Create our ROS node.
-  this->ros_node = std::make_unique<ros::NodeHandle>(ros::NodeHandle("gazebo_client"));
+  this->ros_node_ = std::make_unique<ros::NodeHandle>(ros::NodeHandle("gazebo_client"));
 
   // Create a named topic, and subscribe to it.
   ros::SubscribeOptions so = ros::SubscribeOptions::create<march_shared_resources::GaitActionGoal>(
       "/march/gait/schedule/goal", 1, boost::bind(&ComControllerPlugin::onRosMsg, this, _1), ros::VoidPtr(),
-      &this->ros_queue);
-  this->ros_sub = this->ros_node->subscribe(so);
+      &this->ros_queue_);
+  this->ros_sub_ = this->ros_node_->subscribe(so);
 
   // Spin up the queue helper thread.
-  this->ros_queue_thread = std::thread(std::bind(&ComControllerPlugin::queueThread, this));
+  this->ros_queue_thread_ = std::thread(std::bind(&ComControllerPlugin::queueThread, this));
 }
 
 void ComControllerPlugin::onRosMsg(const march_shared_resources::GaitActionGoalConstPtr& _msg)
 {
-  std::string new_gait_type = _msg->goal.name;
-  if (new_gait_name != this->old_gait_name) {
-    if (new_gait_name.substr(0, 6) == "stairs") {
-        this->controller_.reset(new StairsController(this->controller));
-    }
-    else {
-        this->controller_.reset(new WalkController(this->controller));
-    }
-  }
-
-  this->subgait_name = _msg->goal.current_subgait.name;
-  // The left foot is stable for gaits that do not start with "left" (so also home stand etc.)
-  if (this->subgait_name.substr(0, 4) == "left")
+  std::string new_gait_name = _msg->goal.name;
+  if (new_gait_name.substr(0, 6) == "stairs")
   {
-    this->stable_side = "right";
+    if (typeid(*this->controller_) != typeid(StairsController))
+    {
+      ROS_INFO("Switch to stairs controller");
+      this->controller_.reset(new StairsController(this->model_));
+    }
   }
   else
   {
-    this->stable_side = "left";
+    if (typeid(*this->controller_) != typeid(WalkController))
+    {
+      ROS_INFO("Switch to walk controller");
+      this->controller_.reset(new WalkController(this->model_));
+    }
+  }
+
+  this->subgait_name_ = _msg->goal.current_subgait.name;
+  // The left foot is stable for gaits that do not start with "left" (so also home stand etc.)
+  if (this->subgait_name_.substr(0, 4) == "left")
+  {
+    this->stable_side_ = "right";
+  }
+  else
+  {
+    this->stable_side_ = "left";
   }
 
   this->controller_->newSubgait(_msg);
@@ -75,12 +84,12 @@ void ComControllerPlugin::onUpdate()
 
   this->controller_->update(torque_all, torque_stable);
 
-  for (auto const& link : this->model->GetLinks())
+  for (auto const& link : this->model_->GetLinks())
   {
     link->AddTorque(torque_all);
 
     // Apply rolling torque to all links in the stable leg
-    if (link->GetName().find(this->stable_side) != std::string::npos)
+    if (link->GetName().find(this->stable_side_) != std::string::npos)
     {
       link->AddTorque(torque_stable);
     }
@@ -90,9 +99,9 @@ void ComControllerPlugin::onUpdate()
 void ComControllerPlugin::queueThread()
 {
   static const double timeout = 0.01;
-  while (this->ros_node->ok())
+  while (this->ros_node_->ok())
   {
-    this->ros_queue.callAvailable(ros::WallDuration(timeout));
+    this->ros_queue_.callAvailable(ros::WallDuration(timeout));
   }
 }
 
