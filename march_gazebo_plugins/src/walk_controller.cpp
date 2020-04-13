@@ -28,6 +28,12 @@ void WalkController::update(ignition::math::v4::Vector3<double>& torque_all,
   // the positive y direction
 
   double time_since_start = this->model_->GetWorld()->SimTime().Double() - this->subgait_start_time_;
+  if (time_since_start > this->subgait_duration_)
+  {
+    this->subgait_name_ = "home_stand";
+    this->subgait_changed_ = true;
+  }
+
   auto model_com = this->GetCom();
 
   // Left foot is stable unless subgait name starts with left
@@ -51,21 +57,26 @@ void WalkController::update(ignition::math::v4::Vector3<double>& torque_all,
   }
   else if (this->subgait_name_.substr(this->subgait_name_.size() - 5) == "swing")
   {
-    goal_position_x += 0.25 * this->swing_step_size_ - 0.5 * time_since_start * this->swing_step_size_ / this->subgait_duration_;
+    goal_position_x +=
+        0.25 * this->swing_step_size_ - 0.5 * time_since_start * this->swing_step_size_ / this->subgait_duration_;
   }
   else if (this->subgait_name_.substr(this->subgait_name_.size() - 5) == "close")
   {
-    goal_position_x += 0.25 * this->swing_step_size_ - 0.25 * time_since_start * this->swing_step_size_ / this->subgait_duration_;
-  }
-
-  if (time_since_start > this->subgait_duration_)
-  {
-    this->subgait_name_ = "home_stand";
+    goal_position_x +=
+        0.25 * this->swing_step_size_ - 0.25 * time_since_start * this->swing_step_size_ / this->subgait_duration_;
   }
 
   double error_x = model_com.X() - goal_position_x;
   double error_y = model_com.Y() - goal_position_y;
   double error_yaw = this->foot_left_->WorldPose().Rot().Z();
+
+  // Deactivate d if the subgait just changed to peaks when the target function jumps
+  if (this->subgait_changed_)
+  {
+    this->error_y_last_timestep_ = error_x;
+    this->error_y_last_timestep_ = error_y;
+    this->subgait_changed_ = false;
+  }
 
   double T_pitch = -this->p_pitch_ * error_x - this->d_pitch_ * (error_x - this->error_x_last_timestep_);
   double T_roll = this->p_roll_ * error_y + this->d_roll_ * (error_y - this->error_y_last_timestep_);

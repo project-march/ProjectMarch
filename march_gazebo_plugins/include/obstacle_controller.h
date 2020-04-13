@@ -29,6 +29,8 @@ protected:
   double subgait_start_time_;
   double swing_step_size_;
   double subgait_duration_;
+
+  bool subgait_changed_;
 };
 }  // namespace gazebo
 
