@@ -5,6 +5,13 @@
 #include "march_hardware/EtherCAT/EthercatSDO.h"
 #include "march_hardware/EtherCAT/EthercatIO.h"
 
+#include <iostream>
+#include <iomanip>
+#include <sstream>
+#include <sstream>
+#include <string>
+#include <typeinfo>
+
 #include <bitset>
 #include <memory>
 #include <stdexcept>
@@ -18,15 +25,39 @@ namespace march
 {
 IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
                          std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode)
-  : Slave(slave_index)
-  , absolute_encoder_(std::move(absolute_encoder))
-  , incremental_encoder_(std::move(incremental_encoder))
-  , actuation_mode_(actuation_mode)
+    : Slave(slave_index)
+    , absolute_encoder_(std::move(absolute_encoder))
+    , incremental_encoder_(std::move(incremental_encoder))
+    , sw_stream_("empty")
+    , actuation_mode_(actuation_mode)
 {
   if (!this->absolute_encoder_ || !this->incremental_encoder_)
   {
     throw std::invalid_argument("Incremental or absolute encoder cannot be nullptr");
   }
+  std::cout << "length in constructor: " << this->sw_stream_.str().length() << std::endl;
+  this->absolute_encoder_->setSlaveIndex(slave_index);
+  this->incremental_encoder_->setSlaveIndex(slave_index);
+  this->is_incremental_more_precise_ =
+      (this->incremental_encoder_->getTotalPositions() * this->incremental_encoder_->getTransmission() >
+       this->absolute_encoder_->getTotalPositions() * 10);
+  // Multiply by ten to ensure the rotational joints keep using absolute encoders. These are somehow more accurate
+  // even though they theoretically shouldn't be.
+}
+IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+                         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::stringstream& sw_stream,
+                         ActuationMode actuation_mode)
+    : Slave(slave_index)
+    , absolute_encoder_(std::move(absolute_encoder))
+    , incremental_encoder_(std::move(incremental_encoder))
+    , sw_stream_(std::move(sw_stream))
+    , actuation_mode_(actuation_mode)
+{
+  if (!this->absolute_encoder_ || !this->incremental_encoder_)
+  {
+    throw std::invalid_argument("Incremental or absolute encoder cannot be nullptr");
+  }
+  std::cout << "length in constructor: " << this->sw_stream_.str().length() << std::endl;
   this->absolute_encoder_->setSlaveIndex(slave_index);
   this->incremental_encoder_->setSlaveIndex(slave_index);
   this->is_incremental_more_precise_ =
@@ -81,6 +112,33 @@ void IMotionCube::writeInitialSettings(uint8_t cycle_time)
 {
   ROS_DEBUG("IMotionCube::writeInitialSettings");
 
+  int dtd = 1;
+  int start_address, end_address;
+  uint32_t cs = this->computeSWCheckSum(start_address, end_address);
+
+  ROS_INFO("This is the computed checksum of the .sw file: %d", cs);
+
+  // set parameters to compute checksum on the imc
+  int check_sum =
+      sdo_bit32_write(slaveIndex, 0x2069, 0, end_address * 65536 + start_address);  // Endaddress leftshifted 4 times
+
+  uint32_t read_value;
+  int value_size = sizeof(read_value);
+  // read computed checksum on imc
+  int check_sum_read = sdo_bit32_read(slaveIndex, 0x206A, 0, value_size, read_value);
+
+  if (cs != read_value)
+  {
+    dtd = DownloadSetupToDrive();
+    check_sum_read = sdo_bit32_read(slaveIndex, 0x206A, 0, value_size, read_value);
+    if (cs != read_value)
+    {
+      check_sum_read = 0;
+    }
+  }
+
+  ROS_INFO("This is the computed checksum of the imc: %d", read_value);
+
   // mode of operation
   int mode_of_op = sdo_bit8_write(slaveIndex, 0x6060, 0, this->actuation_mode_.toModeNumber());
 
@@ -103,7 +161,8 @@ void IMotionCube::writeInitialSettings(uint8_t cycle_time)
   int rate_ec_x = sdo_bit8_write(slaveIndex, 0x60C2, 1, cycle_time);
   int rate_ec_y = sdo_bit8_write(slaveIndex, 0x60C2, 2, -3);
 
-  if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && stop_decl && abort_con && rate_ec_x && rate_ec_y))
+  if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && stop_decl && abort_con && rate_ec_x && rate_ec_y &&
+        check_sum && check_sum_read && dtd))
   {
     throw error::HardwareException(error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
                                    "Failed writing initial settings to IMC of slave %d", this->slaveIndex);
@@ -329,6 +388,75 @@ void IMotionCube::reset()
   this->setControlWord(0);
   ROS_DEBUG("Slave: %d, Try to reset IMC", this->slaveIndex);
   sdo_bit16_write(this->slaveIndex, 0x2080, 0, 1);
+}
+
+uint32_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
+{
+  size_t pos = 0;
+  size_t old_pos = 0;
+  uint16_t sum = 0;
+  std::string delimiter = "\n";
+  std::string token;
+  while ((pos = sw_stream_.str().find(delimiter, old_pos)) != std::string::npos)
+  {
+    token = sw_stream_.str().substr(old_pos, pos - old_pos);
+    if (old_pos == 0)
+    {
+      start_address = std::stoi(token, nullptr, 16);
+      token = "0";
+    }
+    if (pos - old_pos < 2)  // delimiter has length of 1 two \n in a row has difference in positions of 1
+    {
+      end_address = end_address + start_address - 2;  // The -2 compensates the offset of the end_address
+      return sum;
+    }
+    end_address++;
+    sum += std::stoi(token, nullptr, 16);  // State that we are looking at hexadecimal numbers
+    old_pos = pos + 1;                     // Make sure to check the position after the previous one
+  }
+  return sum;  // Only reached if something goes wrong and the code doesn't enter the while loop
+}
+
+int IMotionCube::DownloadSetupToDrive()
+{
+  int mem_location;
+  int hex_ls_four = 65536;  // multiplying this number with another will result in left-shifting the original 4 spots in
+  // hexdecimal notation
+  uint32_t mem_setup = 8;   // send 16-bits and auto increment
+  int result = 0;
+  int final_result = 0;
+  uint32_t data;
+
+  size_t pos = 0;
+  size_t old_pos = 0;
+  std::string delimiter = "\n";
+  std::string token;
+  while ((pos = sw_stream_.str().find(delimiter, old_pos)) != std::string::npos)
+  {
+    token = sw_stream_.str().substr(old_pos, pos - old_pos);
+    if (old_pos == 0)
+    {
+      mem_location = std::stoi(token, nullptr, 16) * hex_ls_four;
+      result = sdo_bit32_write(slaveIndex, 0x2064, 0, mem_location + mem_setup);  // write the write-configuration
+      final_result = result;
+    }
+    else
+    {
+      if (pos - old_pos < 2)  // delimiter has length of 1 two \n in a row has difference in positions of 1
+      {
+        mem_location = std::stoi(sw_stream_.str().substr(old_pos - 5, pos - old_pos - 5), nullptr, 16) * hex_ls_four;
+        result = sdo_bit32_write(slaveIndex, 0x2064, 0, mem_location + mem_setup);  // write the write-configuration
+      }
+      else
+      {
+        data = std::stoi(token, nullptr, 16) * hex_ls_four;
+        result = sdo_bit32_write(slaveIndex, 0x2065, 0, data + mem_setup);  // write the write-configuration
+      }
+    }
+    final_result &= result;
+    old_pos = pos + 1;  // Make sure to check the position after the previous one
+  }
+  return final_result;
 }
 
 ActuationMode IMotionCube::getActuationMode() const
