@@ -18,11 +18,11 @@ namespace march
 {
 IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
                          std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode)
-    : Slave(slave_index)
-    , absolute_encoder_(std::move(absolute_encoder))
-    , incremental_encoder_(std::move(incremental_encoder))
-    , sw_stream_("empty")
-    , actuation_mode_(actuation_mode)
+  : Slave(slave_index)
+  , absolute_encoder_(std::move(absolute_encoder))
+  , incremental_encoder_(std::move(incremental_encoder))
+  , sw_stream_("empty")
+  , actuation_mode_(actuation_mode)
 {
   if (!this->absolute_encoder_ || !this->incremental_encoder_)
   {
@@ -119,13 +119,21 @@ void IMotionCube::writeInitialSettings(uint8_t cycle_time)
   // read computed checksum on imc
   int check_sum_read = sdo_bit32_read(slaveIndex, 0x206A, 0, value_size, read_value);
 
+  ROS_INFO("This is the computed checksum of the imc: %d", read_value);
+
   if (cs != read_value)
   {
     dtd = DownloadSetupToDrive();
+    check_sum = sdo_bit32_write(slaveIndex, 0x2069, 0, end_address * 65536 + start_address);
     check_sum_read = sdo_bit32_read(slaveIndex, 0x206A, 0, value_size, read_value);
     if (cs != read_value)
     {
       check_sum_read = 0;
+      ROS_INFO("writing the setup data has failed");
+    }
+    else
+    {
+      this->reset();
     }
   }
 
@@ -414,7 +422,7 @@ int IMotionCube::DownloadSetupToDrive()
   int mem_location;
   int hex_ls_four = 65536;  // multiplying this number with another will result in left-shifting the original 4 spots in
   // hexdecimal notation
-  uint32_t mem_setup = 8;   // send 16-bits and auto increment
+  uint32_t mem_setup = 9;  // send 16-bits and auto increment
   int result = 0;
   int final_result = 0;
   uint32_t data;
@@ -436,13 +444,15 @@ int IMotionCube::DownloadSetupToDrive()
     {
       if (pos - old_pos < 2)  // delimiter has length of 1 two \n in a row has difference in positions of 1
       {
-        mem_location = std::stoi(sw_stream_.str().substr(old_pos - 5, pos - old_pos - 5), nullptr, 16) * hex_ls_four;
-        result = sdo_bit32_write(slaveIndex, 0x2064, 0, mem_location + mem_setup);  // write the write-configuration
+        return final_result;
       }
       else
       {
-        data = std::stoi(token, nullptr, 16) * hex_ls_four;
-        result = sdo_bit32_write(slaveIndex, 0x2065, 0, data + mem_setup);  // write the write-configuration
+        old_pos = pos + 1;
+        pos = sw_stream_.str().find(delimiter, old_pos);
+        data = std::stoi(token, nullptr, 16) * hex_ls_four +
+               std::stoi(sw_stream_.str().substr(old_pos, pos - old_pos), nullptr, 16);
+        result = sdo_bit32_write(slaveIndex, 0x2065, 0, data);  // write the write-configuration
       }
     }
     final_result &= result;

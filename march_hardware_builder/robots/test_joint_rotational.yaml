@@ -1,5 +1,5 @@
 testsetup:
-  ifName: enp2s0
+  ifName: enp4s0
   ecatCycleTime: 4
   joints:
     - rotational_joint:
