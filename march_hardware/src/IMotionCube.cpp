@@ -123,7 +123,7 @@ void IMotionCube::writeInitialSettings(uint8_t cycle_time)
     }
     else
     {
-      this->reset();
+      reset();
     }
   }
 
@@ -414,21 +414,21 @@ int IMotionCube::DownloadSetupToDrive()
   // hexdecimal notation
   uint32_t mem_setup = 9;  // send 16-bits and auto increment
   int result = 0;
-  int final_result = 0;
+  int final_result = 1;
   uint32_t data;
 
   size_t pos = 0;
   size_t old_pos = 0;
   std::string delimiter = "\n";
-  std::string token;
-  while ((pos = sw_stream_.str().find(delimiter, old_pos)) != std::string::npos)
+  std::string token, next_token;
+  while ((pos = sw_stream_.find(delimiter, old_pos)) != std::string::npos)
   {
-    token = sw_stream_.str().substr(old_pos, pos - old_pos);
+    token = sw_stream_.substr(old_pos, pos - old_pos);
     if (old_pos == 0)
     {
       mem_location = std::stoi(token, nullptr, 16) * hex_ls_four;
       result = sdo_bit32_write(slaveIndex, 0x2064, 0, mem_location + mem_setup);  // write the write-configuration
-      final_result = result;
+      final_result &= result;
     }
     else
     {
@@ -439,9 +439,17 @@ int IMotionCube::DownloadSetupToDrive()
       else
       {
         old_pos = pos + 1;
-        pos = sw_stream_.str().find(delimiter, old_pos);
-        data = std::stoi(token, nullptr, 16) * hex_ls_four +
-               std::stoi(sw_stream_.str().substr(old_pos, pos - old_pos), nullptr, 16);
+        pos = sw_stream_.find(delimiter, old_pos);
+        next_token = sw_stream_.substr(old_pos, pos - old_pos);
+
+        if (pos - old_pos != 1)
+        {
+          data = std::stoi(next_token, nullptr, 16) * hex_ls_four + std::stoi(token, nullptr, 16);
+        }
+        else
+        {
+          data = std::stoi(token, nullptr, 16);
+        }
         result = sdo_bit32_write(slaveIndex, 0x2065, 0, data);  // write the write-configuration
       }
     }
