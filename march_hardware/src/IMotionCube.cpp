@@ -344,7 +344,7 @@ void IMotionCube::reset()
   sdo_bit16_write(this->slaveIndex, 0x2080, 0, 1);
 }
 
-uint16_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
+uint32_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
 {
   size_t pos = 0;
   size_t old_pos = 0;

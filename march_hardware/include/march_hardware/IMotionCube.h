@@ -99,7 +99,15 @@ private:
   void mapMisoPDOs();
   void mapMosiPDOs();
   void writeInitialSettings(uint8_t cycle_time);
-  uint16_t computeSWCheckSum(int& start_address, int& end_address);
+  /**
+   * This method uses the sw_stream private variable to calculate the sum of all the numbers (delimited by \n) until
+   * the first empty line. This is also how the imc computes its checksums on the drive. For the acquisition of that
+   * checksum a start and end address at the imc are required. These can both be obtained from the .sw file and are
+   * passed as references in this function (they are filled inside the method).
+   * return value is the value of the checksum and is 32 bits for comparisson to the result of the 32bit read of the imc
+   * checksum.
+   */
+  uint32_t computeSWCheckSum(int& start_address, int& end_address);
 
   // Use of smart pointers are necessary here to make dependency injection
   // possible and thus allow for mocking the encoders. A unique pointer is
