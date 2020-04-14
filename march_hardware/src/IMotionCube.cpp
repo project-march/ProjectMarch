@@ -5,6 +5,10 @@
 #include "march_hardware/EtherCAT/EthercatSDO.h"
 #include "march_hardware/EtherCAT/EthercatIO.h"
 
+#include <iostream>
+#include <iomanip>
+#include <string>
+
 #include <bitset>
 #include <memory>
 #include <stdexcept>
@@ -37,26 +41,12 @@ IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absol
   // even though they theoretically shouldn't be.
 }
 IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::stringstream& sw_stream,
+                         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::string& sw_stream,
                          ActuationMode actuation_mode)
-  : Slave(slave_index)
-  , absolute_encoder_(std::move(absolute_encoder))
-  , incremental_encoder_(std::move(incremental_encoder))
-  , sw_stream_(std::move(sw_stream))
-  , actuation_mode_(actuation_mode)
+  : IMotionCube(slave_index, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode)
 {
-  if (!this->absolute_encoder_ || !this->incremental_encoder_)
-  {
-    throw std::invalid_argument("Incremental or absolute encoder cannot be nullptr");
-  }
-  ROS_INFO("length in constructor: %d", this->sw_stream_.str().length());
-  this->absolute_encoder_->setSlaveIndex(slave_index);
-  this->incremental_encoder_->setSlaveIndex(slave_index);
-  this->is_incremental_more_precise_ =
-      (this->incremental_encoder_->getTotalPositions() * this->incremental_encoder_->getTransmission() >
-       this->absolute_encoder_->getTotalPositions() * 10);
-  // Multiply by ten to ensure the rotational joints keep using absolute encoders. These are somehow more accurate
-  // even though they theoretically shouldn't be.
+  this->sw_stream_ = std::move(sw_stream);
+  ROS_INFO("length in constructor: %lu", this->sw_stream_.length());
 }
 
 void IMotionCube::writeInitialSDOs(int cycle_time)
@@ -397,9 +387,9 @@ uint32_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
   uint16_t sum = 0;
   std::string delimiter = "\n";
   std::string token;
-  while ((pos = sw_stream_.str().find(delimiter, old_pos)) != std::string::npos)
+  while ((pos = sw_stream_.find(delimiter, old_pos)) != std::string::npos)
   {
-    token = sw_stream_.str().substr(old_pos, pos - old_pos);
+    token = sw_stream_.substr(old_pos, pos - old_pos);
     if (old_pos == 0)
     {
       start_address = std::stoi(token, nullptr, 16);

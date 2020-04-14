@@ -6,7 +6,6 @@
 #include <memory>
 
 #include <gmock/gmock.h>
-#include <sstream>
 
 class MockIMotionCube : public march::IMotionCube
 {

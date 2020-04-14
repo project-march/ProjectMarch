@@ -133,7 +133,7 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
   {
     return nullptr;
   }
-  // std::cout << imc_config;
+
   HardwareBuilder::validateRequiredKeysExist(imc_config, HardwareBuilder::IMOTIONCUBE_REQUIRED_KEYS, "imotioncube");
 
   YAML::Node incremental_encoder_config = imc_config["incrementalEncoder"];
@@ -145,11 +145,12 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
   std::cout << "jointname: " << urdf_joint->name << "path to file"
             << ros::package::getPath("march_hardware_builder").append("/config/" + urdf_joint->name + ".sw")
             << std::endl;
-  std::stringstream imc_setup_data_sstream = convertSWFileToStringStream(imc_setup_data);
-  std::cout << "length of received: " << imc_setup_data_sstream.str().length() << std::endl;
+  std::string setup = convertSWFileToString(imc_setup_data);
+  std::string setup_justified = rightHandJustifyString(setup);
+  std::cout << "length of received: " << setup_justified.length() << std::endl;
   return std::make_unique<march::IMotionCube>(
       slave_index, HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, urdf_joint),
-      HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), imc_setup_data_sstream, mode);
+      HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), setup_justified, mode);
 }
 
 std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
@@ -272,21 +273,27 @@ void HardwareBuilder::initUrdf()
 
 std::string rightHandJustifyString(std::string input)
 {
+  size_t pos = 0;
+  size_t old_pos = 0;
   std::string delimiter = "\n";
-  if (input.length() > delimiter.length())
+  std::string token, result;
+  while ((pos = input.find(delimiter, old_pos)) != std::string::npos)
   {
-    while (input.size() < 4 + delimiter.length())  // check until the 16-bit number has been filled
+    token = input.substr(old_pos, pos - old_pos);
+    if (token.length() > delimiter.length())
     {
-      input.insert(0, "0");
+      while (token.size() < 4 + delimiter.length())  // check until the 16-bit number has been filled
+      {
+        token.insert(0, "0");
+      }
     }
+    result += input;
+    old_pos = pos + 1;  // Make sure to check the position after the previous one
   }
   return input;
 }
 
-std::stringstream convertSWFileToStringStream(std::ifstream& sw_file)
+std::string convertSWFileToString(std::ifstream& sw_file)
 {
-  std::stringstream sw_stream;
-  std::copy(std::istreambuf_iterator<char>(sw_file), std::istreambuf_iterator<char>(),
-            std::ostreambuf_iterator<char>(sw_stream));
-  return sw_stream;
+  return std::string(std::istreambuf_iterator<char>(sw_file), std::istreambuf_iterator<char>());
 }
