@@ -133,7 +133,7 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
   {
     return nullptr;
   }
-  // std::cout << imc_config;
+  
   HardwareBuilder::validateRequiredKeysExist(imc_config, HardwareBuilder::IMOTIONCUBE_REQUIRED_KEYS, "imotioncube");
 
   YAML::Node incremental_encoder_config = imc_config["incrementalEncoder"];
