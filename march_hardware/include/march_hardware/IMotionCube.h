@@ -115,7 +115,7 @@ private:
   // do not need to be passed around.
   std::unique_ptr<AbsoluteEncoder> absolute_encoder_;
   std::unique_ptr<IncrementalEncoder> incremental_encoder_;
-  std::string sw_stream_;
+  std::string sw_string_;
   ActuationMode actuation_mode_;
   bool is_incremental_more_precise_;
 

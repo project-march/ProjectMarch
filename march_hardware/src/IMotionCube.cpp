@@ -25,7 +25,7 @@ IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absol
   : Slave(slave_index)
   , absolute_encoder_(std::move(absolute_encoder))
   , incremental_encoder_(std::move(incremental_encoder))
-  , sw_stream_("empty")
+  , sw_string_("empty")
   , actuation_mode_(actuation_mode)
 {
   if (!this->absolute_encoder_ || !this->incremental_encoder_)
@@ -45,8 +45,7 @@ IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absol
                          ActuationMode actuation_mode)
   : IMotionCube(slave_index, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode)
 {
-  this->sw_stream_ = std::move(sw_stream);
-  ROS_INFO("length in constructor: %lu", this->sw_stream_.length());
+  this->sw_string_ = std::move(sw_stream);
 }
 
 void IMotionCube::writeInitialSDOs(int cycle_time)
@@ -351,9 +350,9 @@ uint32_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
   uint16_t sum = 0;
   std::string delimiter = "\n";
   std::string token;
-  while ((pos = sw_stream_.find(delimiter, old_pos)) != std::string::npos)
+  while ((pos = sw_string_.find(delimiter, old_pos)) != std::string::npos)
   {
-    token = sw_stream_.substr(old_pos, pos - old_pos);
+    token = sw_string_.substr(old_pos, pos - old_pos);
     if (old_pos == 0)
     {
       start_address = std::stoi(token, nullptr, 16);
@@ -368,7 +367,8 @@ uint32_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
     sum += std::stoi(token, nullptr, 16);  // State that we are looking at hexadecimal numbers
     old_pos = pos + 1;                     // Make sure to check the position after the previous one
   }
-  return sum;  // Only reached if something goes wrong and the code doesn't enter the while loop
+  throw error::HardwareException(error::ErrorType::INVALID_SW_STRING,
+                                 "The .sw file has no delimiter of type %s", delimiter);
 }
 
 ActuationMode IMotionCube::getActuationMode() const
