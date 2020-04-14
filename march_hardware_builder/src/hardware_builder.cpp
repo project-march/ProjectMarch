@@ -142,9 +142,6 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
 
   std::ifstream imc_setup_data;
   imc_setup_data.open(ros::package::getPath("march_hardware_builder").append("/config/" + urdf_joint->name + ".sw"));
-  std::cout << "jointname: " << urdf_joint->name << "path to file"
-            << ros::package::getPath("march_hardware_builder").append("/config/" + urdf_joint->name + ".sw")
-            << std::endl;
   std::string setup = convertSWFileToString(imc_setup_data);
   std::string setup_justified = rightHandJustifyString(setup);
   std::cout << "length of received: " << setup_justified.length() << std::endl;
