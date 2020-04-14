@@ -283,10 +283,8 @@ std::string rightHandJustifyString(std::string input)
   return input;
 }
 
-std::stringstream convertSWFileToStringStream(std::ifstream& sw_file)
+std::string convertSWFileToString(std::ifstream& sw_file)
 {
-  std::stringstream sw_stream;
-  std::copy(std::istreambuf_iterator<char>(sw_file), std::istreambuf_iterator<char>(),
-            std::ostreambuf_iterator<char>(sw_stream));
-  return sw_stream;
+  return std::string(std::istreambuf_iterator<char>(sw_file),
+                     std::istreambuf_iterator<char>());
 }
