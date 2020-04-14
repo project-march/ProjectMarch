@@ -7,10 +7,7 @@
 
 #include <iostream>
 #include <iomanip>
-#include <sstream>
-#include <sstream>
 #include <string>
-#include <typeinfo>
 
 #include <bitset>
 #include <memory>
@@ -44,7 +41,7 @@ IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absol
   // even though they theoretically shouldn't be.
 }
 IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::stringstream& sw_stream,
+                         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::string& sw_stream,
                          ActuationMode actuation_mode)
   : Slave(slave_index)
   , absolute_encoder_(std::move(absolute_encoder))
@@ -56,7 +53,7 @@ IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absol
   {
     throw std::invalid_argument("Incremental or absolute encoder cannot be nullptr");
   }
-  ROS_INFO("length in constructor: %d", this->sw_stream_.str().length());
+  ROS_INFO("length in constructor: %d", this->sw_stream_.length());
   this->absolute_encoder_->setSlaveIndex(slave_index);
   this->incremental_encoder_->setSlaveIndex(slave_index);
   this->is_incremental_more_precise_ =
@@ -368,9 +365,9 @@ uint16_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
   uint16_t sum = 0;
   std::string delimiter = "\n";
   std::string token;
-  while ((pos = sw_stream_.str().find(delimiter, old_pos)) != std::string::npos)
+  while ((pos = sw_stream_.find(delimiter, old_pos)) != std::string::npos)
   {
-    token = sw_stream_.str().substr(old_pos, pos - old_pos);
+    token = sw_stream_.substr(old_pos, pos - old_pos);
     if (old_pos == 0)
     {
       start_address = std::stoi(token, nullptr, 16);

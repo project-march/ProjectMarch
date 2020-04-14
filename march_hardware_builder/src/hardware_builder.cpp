@@ -145,8 +145,8 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
   std::cout << "jointname: " << urdf_joint->name << "path to file"
             << ros::package::getPath("march_hardware_builder").append("/config/" + urdf_joint->name + ".sw")
             << std::endl;
-  std::stringstream imc_setup_data_sstream = convertSWFileToStringStream(imc_setup_data);
-  std::cout << "length of received: " << imc_setup_data_sstream.str().length() << std::endl;
+  std::string imc_setup_data_sstream = convertSWFileToString(imc_setup_data);
+  std::cout << "length of received: " << imc_setup_data_sstream.length() << std::endl;
   return std::make_unique<march::IMotionCube>(
       slave_index, HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, urdf_joint),
       HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), imc_setup_data_sstream, mode);
