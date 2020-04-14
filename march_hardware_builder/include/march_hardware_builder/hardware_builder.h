@@ -97,7 +97,7 @@ private:
  * Adds zeros to left of unsigned int (which is in the form of a string) until the 16 bits have been accounted for
  */
 std::string rightHandJustifyString(std::string input);
-/*
+/**
  * Converts the input filestream object to a stringstream object so that is easier to test for in IMotionCUbe.cpp
  */
 std::string convertSWFileToString(std::ifstream& sw_file);
