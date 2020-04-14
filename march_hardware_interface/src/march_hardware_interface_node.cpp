@@ -44,7 +44,7 @@ int main(int argc, char** argv)
   }
 
   controller_manager::ControllerManager controller_manager(&march, nh);
-  ros::Duration minimal_elapsed_time = ros::Duration(march.getEthercatCycleTime() / 1000.0);
+  const ros::Duration minimal_elapsed_time = ros::Duration(march.getEthercatCycleTime() / 1000.0);
   ros::Time last_update_time = ros::Time::now() - minimal_elapsed_time;
 
   while (ros::ok())
