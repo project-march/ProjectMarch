@@ -142,15 +142,10 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
 
   std::ifstream imc_setup_data;
   imc_setup_data.open(ros::package::getPath("march_hardware_builder").append("/config/" + urdf_joint->name + ".sw"));
-  std::cout << "jointname: " << urdf_joint->name << "path to file"
-            << ros::package::getPath("march_hardware_builder").append("/config/" + urdf_joint->name + ".sw")
-            << std::endl;
   std::string setup = convertSWFileToString(imc_setup_data);
-  std::string setup_justified = rightHandJustifyString(setup);
-  std::cout << "length of received: " << setup_justified.length() << std::endl;
   return std::make_unique<march::IMotionCube>(
       slave_index, HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, urdf_joint),
-      HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), setup_justified, mode);
+      HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), setup, mode);
 }
 
 std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
@@ -269,28 +264,6 @@ void HardwareBuilder::initUrdf()
     }
     this->init_urdf_ = false;
   }
-}
-
-std::string rightHandJustifyString(std::string input)
-{
-  size_t pos = 0;
-  size_t old_pos = 0;
-  std::string delimiter = "\n";
-  std::string token, result;
-  while ((pos = input.find(delimiter, old_pos)) != std::string::npos)
-  {
-    token = input.substr(old_pos, pos - old_pos);
-    if (token.length() > delimiter.length())
-    {
-      while (token.size() < 4 + delimiter.length())  // check until the 16-bit number has been filled
-      {
-        token.insert(0, "0");
-      }
-    }
-    result += input;
-    old_pos = pos + 1;  // Make sure to check the position after the previous one
-  }
-  return input;
 }
 
 std::string convertSWFileToString(std::ifstream& sw_file)
