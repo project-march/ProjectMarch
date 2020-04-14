@@ -14,7 +14,6 @@ catkin_package(
     CATKIN_DEPENDS march_shared_resources
 )
 
-
 include_directories(
         include
 )
@@ -30,7 +29,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${catkin_LIBRARIES})
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_14)
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror)
 
-install(TARGETS ${PROJECT_NAME}
+install(DIRECTORY include
+    TARGETS ${PROJECT_NAME}
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
