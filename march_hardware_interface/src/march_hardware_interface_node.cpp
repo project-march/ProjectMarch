@@ -6,10 +6,11 @@
 #include <controller_manager/controller_manager.h>
 #include <ros/ros.h>
 
+#include <march_hardware/MarchRobot.h>
 #include <march_hardware/error/hardware_exception.h>
 #include <march_hardware_builder/hardware_builder.h>
 
-MarchHardwareInterface build(ros::NodeHandle& nh, AllowedRobot robot, bool reset_imc);
+std::unique_ptr<march::MarchRobot> build(AllowedRobot robot);
 
 int main(int argc, char** argv)
 {
@@ -29,7 +30,22 @@ int main(int argc, char** argv)
 
   spinner.start();
 
-  MarchHardwareInterface march = build(nh, selected_robot, reset_imc);
+  MarchHardwareInterface march(build(selected_robot), reset_imc);
+
+  try
+  {
+    bool success = march.init(nh, nh);
+    if (!success)
+    {
+      std::exit(1);
+    }
+  }
+  catch (const std::exception& e)
+  {
+    ROS_FATAL("Hardware interface caught an exception during init");
+    ROS_FATAL("%s", e.what());
+    std::exit(1);
+  }
 
   controller_manager::ControllerManager controller_manager(&march, nh);
   ros::Time last_update_time = ros::Time::now() - ros::Duration(march.getEthercatCycleTime() / 1000.0);
@@ -60,24 +76,16 @@ int main(int argc, char** argv)
   return 0;
 }
 
-MarchHardwareInterface build(ros::NodeHandle& nh, AllowedRobot robot, bool reset_imc)
+std::unique_ptr<march::MarchRobot> build(AllowedRobot robot)
 {
+  HardwareBuilder builder(robot);
   try
   {
-    HardwareBuilder builder(robot);
-    MarchHardwareInterface march(builder.createMarchRobot(), reset_imc);
-
-    bool success = march.init(nh, nh);
-    if (!success)
-    {
-      std::exit(1);
-    }
-
-    return march;
+    return builder.createMarchRobot();
   }
   catch (const std::exception& e)
   {
-    ROS_FATAL("Hardware interface caught an exception during init");
+    ROS_FATAL("Hardware interface caught an exception during building hardware");
     ROS_FATAL("%s", e.what());
     std::exit(1);
   }
