@@ -54,7 +54,7 @@ public:
 
   ActuationMode getActuationMode() const;
 
-  float getMotorCurrent();
+  virtual float getMotorCurrent();
   virtual float getIMCVoltage();
 
   void setControlWord(uint16_t control_word);

@@ -23,6 +23,7 @@ public:
   MOCK_METHOD0(getAngleRadIncremental, double());
   MOCK_METHOD0(getAngleRadAbsolute, double());
   MOCK_METHOD0(getIMCVoltage, float());
+  MOCK_METHOD0(getMotorCurrent, float());
 
   MOCK_METHOD1(actuateRad, void(double));
   MOCK_METHOD1(actuateTorque, void(int16_t));
