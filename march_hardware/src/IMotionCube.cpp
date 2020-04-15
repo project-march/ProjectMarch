@@ -49,7 +49,7 @@ IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absol
   ROS_INFO("length in constructor: %lu", this->sw_stream_.length());
 }
 
-void IMotionCube::writeInitialSDOs(int cycle_time)
+void IMotionCube::writeInitialSDOs(int cycle_time, bool& reset)
 {
   if (this->actuation_mode_ == ActuationMode::unknown)
   {
@@ -60,7 +60,7 @@ void IMotionCube::writeInitialSDOs(int cycle_time)
 
   this->mapMisoPDOs();
   this->mapMosiPDOs();
-  this->writeInitialSettings(cycle_time);
+  this->writeInitialSettings(cycle_time, reset);
 }
 
 // Map Process Data Object (PDO) for by sending SDOs to the IMC
@@ -90,7 +90,7 @@ void IMotionCube::mapMosiPDOs()
 }
 
 // Set configuration parameters to the IMC
-void IMotionCube::writeInitialSettings(uint8_t cycle_time)
+void IMotionCube::writeInitialSettings(uint8_t cycle_time, bool& reset)
 {
   ROS_DEBUG("IMotionCube::writeInitialSettings");
 
@@ -118,12 +118,9 @@ void IMotionCube::writeInitialSettings(uint8_t cycle_time)
     check_sum_read = sdo_bit32_read(slaveIndex, 0x206A, 0, value_size, read_value);
     if (cs != read_value)
     {
-      check_sum_read = 0;
       ROS_INFO("writing the setup data has failed");
-    }
-    else
-    {
-      reset();
+      reset = true;
+      return;
     }
   }
 

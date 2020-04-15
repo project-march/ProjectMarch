@@ -51,8 +51,12 @@ void EthercatMaster::waitForPdo()
 
 void EthercatMaster::start(std::vector<Joint>& joints)
 {
-  this->ethercatMasterInitiation();
-  this->ethercatSlaveInitiation(joints);
+  bool reset = true;
+  while (reset)
+  {
+    this->ethercatMasterInitiation();
+    reset &= this->ethercatSlaveInitiation(joints);
+  }
 }
 
 void EthercatMaster::ethercatMasterInitiation()
@@ -85,9 +89,10 @@ int setSlaveWatchdogTimer(uint16 slave)
   return 1;
 }
 
-void EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
+bool EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
 {
   ROS_INFO("Request pre-operational state for all slaves");
+  bool reset = false;
   ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
 
   for (Joint& joint : joints)
@@ -96,7 +101,11 @@ void EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
     {
       ec_slave[joint.getIMotionCubeSlaveIndex()].PO2SOconfig = setSlaveWatchdogTimer;
     }
-    joint.initialize(this->cycle_time_ms_);
+    reset |= joint.initialize(this->cycle_time_ms_);
+  }
+  if (reset)
+  {
+    return reset;
   }
 
   ec_config_map(&this->io_map_);
@@ -146,6 +155,7 @@ void EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
     throw error::HardwareException(error::ErrorType::FAILED_TO_REACH_OPERATIONAL_STATE, "Not operational slaves: %s",
                                    ss.str().c_str());
   }
+  return reset;
 }
 
 void EthercatMaster::ethercatLoop()

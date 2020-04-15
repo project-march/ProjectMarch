@@ -65,7 +65,7 @@ private:
   /**
    * Configures the found slaves to operational state.
    */
-  void ethercatSlaveInitiation(std::vector<Joint>& joints);
+  bool ethercatSlaveInitiation(std::vector<Joint>& joints);
 
   /**
    * The ethercat train PDO loop. If the working counter is lower than

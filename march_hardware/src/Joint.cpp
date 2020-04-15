@@ -31,16 +31,18 @@ Joint::Joint(std::string name, int net_number, bool allow_actuation, std::unique
 {
 }
 
-void Joint::initialize(int cycle_time)
+bool Joint::initialize(int cycle_time)
 {
+  bool reset;
   if (this->hasIMotionCube())
   {
-    this->imc_->writeInitialSDOs(cycle_time);
+    this->imc_->writeInitialSDOs(cycle_time, reset);
   }
   if (this->hasTemperatureGES())
   {
     this->temperature_ges_->writeInitialSDOs(cycle_time);
   }
+  return reset;
 }
 
 void Joint::prepareActuation()

@@ -42,7 +42,7 @@ public:
   IMotionCube(const IMotionCube&) = delete;
   IMotionCube& operator=(const IMotionCube&) = delete;
 
-  void writeInitialSDOs(int cycle_time) override;
+  void writeInitialSDOs(int cycle_time, bool& reset);
 
   double getAngleRadAbsolute();
   double getAngleRadIncremental();
@@ -99,7 +99,7 @@ private:
 
   void mapMisoPDOs();
   void mapMosiPDOs();
-  void writeInitialSettings(uint8_t cycle_time);
+  void writeInitialSettings(uint8_t cycle_time, bool& reset);
   /**
    * This method uses the sw_stream private variable to calculate the sum of all the numbers (delimited by \n) until
    * the first empty line. This is also how the imc computes its checksums on the drive. For the acquisition of that
