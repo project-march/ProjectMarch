@@ -23,7 +23,6 @@ using joint_limits_interface::EffortJointSoftLimitsHandle;
 using joint_limits_interface::JointLimits;
 using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::SoftJointLimits;
-using march::Joint;
 
 MarchHardwareInterface::MarchHardwareInterface(std::unique_ptr<march::MarchRobot> robot, bool reset_imc)
   : march_robot_(std::move(robot))
