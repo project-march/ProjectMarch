@@ -101,12 +101,8 @@ private:
   void mapMosiPDOs();
   bool writeInitialSettings(uint8_t cycle_time);
   /**
-   * This method uses the sw_stream private variable to calculate the sum of all the numbers (delimited by \n) until
-   * the first empty line. This is also how the imc computes its checksums on the drive. For the acquisition of that
-   * checksum a start and end address at the imc are required. These can both be obtained from the .sw file and are
-   * passed as references in this function (they are filled inside the method).
-   * return value is the value of the checksum and is 32 bits for comparisson to the result of the 32bit read of the imc
-   * checksum.
+   * Calculates checksum on .sw file passed in string format in sw_string_ by simple summation until next empty line.
+   * Start_address and end_address are filled in the method and used for downloading the .sw file to the drive.
    */
   uint32_t computeSWCheckSum(int& start_address, int& end_address);
   int DownloadSetupToDrive();
@@ -117,7 +113,7 @@ private:
   // do not need to be passed around.
   std::unique_ptr<AbsoluteEncoder> absolute_encoder_;
   std::unique_ptr<IncrementalEncoder> incremental_encoder_;
-  std::string sw_stream_;
+  std::string sw_string_;
   ActuationMode actuation_mode_;
   bool is_incremental_more_precise_;
 
