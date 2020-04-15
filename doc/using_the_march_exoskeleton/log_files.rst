@@ -10,29 +10,12 @@ Please check the `official documentation <http://wiki.ros.org/rosbag>`_ or :ref:
 
 Exoskeleton
 ^^^^^^^^^^^
-For each session, a new directory should be made with the following structure: **yyyy_mm_dd-activity_name**
-
-Examples:
- - 2019_07_03-first_training
- - 2019_06_01-airgait_with_torque_mode
-
-
-The files are located at: ``/home/march/Documents/log_files/<yyyy_mm_dd-activity_name>``
+The log files are created by default with the following name: ``log_yyyy-mm-dd-hh-mm-ss.bag``. You can find them in the
+``~/.ros`` directory.
 
 Cloudstation
 ^^^^^^^^^^^^
 
-The log files are stored on the Cloudstation in a shared folder called **March IV log files**.
-A special user **log** has been created to read/write these logs.
-
-
-Uploading the logs
-^^^^^^^^^^^^^^^^^^
-First ssh into the computer of the exoskeleton.
-A tutorial on how to connect with the exoskeleton and ssh into it can be found at :ref:`connecting-to-the-exoskeleton-label`.
-The following command will upload all the logs to the cloudstation and create a folder with the correct <activity_name>.
-
-.. code::
-
-  scp -r </path/to/yyyy_mm_dd-activity_name> log@cloudstation.projectmarch.nl:"/volume1/Log\ Files/March\ IV\ Log\ Files/"
+The log files are stored on the Cloudstation in the ``/logs`` folder. You can find the log files in the folder corresponding to the right year.
+There is a folder per session with the following structure: ``yyyy-mm-dd_<activity_name>``
 
