@@ -14,7 +14,6 @@
 #include <memory>
 #include <unordered_map>
 #include <string>
-#include <sstream>
 
 namespace march
 {
@@ -105,7 +104,14 @@ private:
    * Start_address and end_address are filled in the method and used for downloading the .sw file to the drive.
    */
   uint32_t computeSWCheckSum(int& start_address, int& end_address);
-  int DownloadSetupToDrive();
+  /**
+   * Compares the checksum of the .sw file and the setup on the drive. If both are equal 1 is returned.
+   */
+  int verifySetup();
+  /**
+   * Downloads the setup on the .sw file onto the drive.
+   */
+  void downloadSetupToDrive();
 
   // Use of smart pointers are necessary here to make dependency injection
   // possible and thus allow for mocking the encoders. A unique pointer is

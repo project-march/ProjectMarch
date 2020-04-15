@@ -92,37 +92,14 @@ void IMotionCube::mapMosiPDOs()
 bool IMotionCube::writeInitialSettings(uint8_t cycle_time)
 {
   ROS_DEBUG("IMotionCube::writeInitialSettings");
-
-  int dtd = 1;
-  int start_address, end_address;
-  uint32_t cs = this->computeSWCheckSum(start_address, end_address);
-
-  ROS_INFO("This is the computed checksum of the .sw file: %d", cs);
-
-  // set parameters to compute checksum on the imc
-  int check_sum =
-      sdo_bit32_write(slaveIndex, 0x2069, 0, end_address * 65536 + start_address);  // Endaddress leftshifted 4 times
-
-  uint32_t read_value;
-  int value_size = sizeof(read_value);
-  // read computed checksum on imc
-  int check_sum_read = sdo_bit32_read(slaveIndex, 0x206A, 0, value_size, read_value);
-
-  ROS_INFO("This is the computed checksum of the imc: %d", read_value);
-
-  if (cs != read_value)
+  int checksum_verified = verifySetup();
+  if (!checksum_verified)
   {
-    dtd = DownloadSetupToDrive();
-    check_sum = sdo_bit32_write(slaveIndex, 0x2069, 0, end_address * 65536 + start_address);
-    check_sum_read = sdo_bit32_read(slaveIndex, 0x206A, 0, value_size, read_value);
-    if (cs != read_value)
-    {
-      ROS_INFO("writing the setup data has failed");
-      return true;
-    }
+    downloadSetupToDrive();
+    checksum_verified = verifySetup();
+    ROS_DEBUG("writing of the setup data has succeeded: %b", checksum_verified);
+    return true;
   }
-
-  ROS_INFO("This is the computed checksum of the imc: %d", read_value);
 
   // mode of operation
   int mode_of_op = sdo_bit8_write(slaveIndex, 0x6060, 0, this->actuation_mode_.toModeNumber());
@@ -147,7 +124,7 @@ bool IMotionCube::writeInitialSettings(uint8_t cycle_time)
   int rate_ec_y = sdo_bit8_write(slaveIndex, 0x60C2, 2, -3);
 
   if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && stop_decl && abort_con && rate_ec_x && rate_ec_y &&
-        check_sum && check_sum_read && dtd))
+        checksum_verified))
   {
     throw error::HardwareException(error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
                                    "Failed writing initial settings to IMC of slave %d", this->slaveIndex);
@@ -400,46 +377,75 @@ uint32_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
     sum += std::stoi(token, nullptr, 16);  // State that we are looking at hexadecimal numbers
     old_pos = pos + 1;                     // Make sure to check the position after the previous one
   }
-  throw error::HardwareException(error::ErrorType::INVALID_SW_STRING,
-                                 "The .sw file has no delimiter of type %s", delimiter);
+  throw error::HardwareException(error::ErrorType::INVALID_SW_STRING, "The .sw file has no delimiter of type %s",
+                                 delimiter);
 }
 
-int IMotionCube::DownloadSetupToDrive()
+int IMotionCube::verifySetup()
+{
+  int start_address, end_address;
+  uint32_t sw_value = this->computeSWCheckSum(start_address, end_address);
+
+  // set parameters to compute checksum on the imc
+  int checksum_setup =
+      sdo_bit32_write(slaveIndex, 0x2069, 0, end_address * 65536 + start_address);  // Endaddress leftshifted 4 times
+
+  uint32_t imc_value;
+  int value_size = sizeof(imc_value);
+  // read computed checksum on imc
+  int check_sum_read = sdo_bit32_read(slaveIndex, 0x206A, 0, value_size, imc_value);
+
+  if (checksum_setup && check_sum_read)
+  {
+    throw error::HardwareException(error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
+                                   "Failed checking the checksum on slave: %d", this->slaveIndex);
+  }
+
+  if (sw_value == imc_value)
+  {
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+void IMotionCube::downloadSetupToDrive()
 {
   int mem_location;
-  int hex_ls_four = 65536;  // multiplying this number with another will result in left-shifting the original 4 spots in
-  // hexdecimal notation
-  uint32_t mem_setup = 9;  // send 16-bits and auto increment
+  int hex_ls_four = 65536;  // multiplying with this number will left-shift the other by 4 in hexadecimal notation
+  uint32_t mem_setup = 9;   // send 16-bits and auto increment
   int result = 0;
-  int final_result = 1;
+  int final_result = 0;
   uint32_t data;
 
   size_t pos = 0;
   size_t old_pos = 0;
   std::string delimiter = "\n";
   std::string token, next_token;
-  while ((pos = sw_stream_.find(delimiter, old_pos)) != std::string::npos)
+  while ((pos = sw_string_.find(delimiter, old_pos)) != std::string::npos)
   {
-    token = sw_stream_.substr(old_pos, pos - old_pos);
+    token = sw_string_.substr(old_pos, pos - old_pos);
     if (old_pos == 0)
     {
       mem_location = std::stoi(token, nullptr, 16) * hex_ls_four;
       result = sdo_bit32_write(slaveIndex, 0x2064, 0, mem_location + mem_setup);  // write the write-configuration
-      final_result &= result;
+      final_result |= result;
     }
     else
     {
-      if (pos - old_pos < 2)  // delimiter has length of 1 two \n in a row has difference in positions of 1
+      if (pos - old_pos == delimiter.length())
       {
-        return final_result;
+        break;
       }
       else
       {
         old_pos = pos + 1;
-        pos = sw_stream_.find(delimiter, old_pos);
-        next_token = sw_stream_.substr(old_pos, pos - old_pos);
+        pos = sw_string_.find(delimiter, old_pos);
+        next_token = sw_string_.substr(old_pos, pos - old_pos);
 
-        if (pos - old_pos != 1)
+        if (pos - old_pos != delimiter.length())
         {
           data = std::stoi(next_token, nullptr, 16) * hex_ls_four + std::stoi(token, nullptr, 16);
         }
@@ -453,7 +459,11 @@ int IMotionCube::DownloadSetupToDrive()
     final_result &= result;
     old_pos = pos + 1;  // Make sure to check the position after the previous one
   }
-  return final_result;
+  if (final_result == 0)
+  {
+    throw error::HardwareException(error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
+                                   "Failed writing .sw file to IMC of slave %d", this->slaveIndex);
+  }
 }
 
 ActuationMode IMotionCube::getActuationMode() const
