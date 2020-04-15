@@ -98,7 +98,7 @@ bool IMotionCube::writeInitialSettings(uint8_t cycle_time)
     downloadSetupToDrive();
     checksum_verified = verifySetup();
     ROS_DEBUG("writing of the setup data has succeeded: %b", checksum_verified);
-    return true;
+    return true;  // Resets the etherCAT train and imc, necessary after downloading a "new" setup to the drive
   }
 
   // mode of operation
