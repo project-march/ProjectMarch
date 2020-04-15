@@ -46,6 +46,8 @@ public:
   int16_t getTorque();
   int32_t getAngleIUAbsolute();
   int32_t getAngleIUIncremental();
+  int32_t getVelocityIUAbsolute();
+  int32_t getVelocityIUIncremental();
 
   uint16_t getStatusWord();
   uint16_t getMotionError();

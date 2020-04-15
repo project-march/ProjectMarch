@@ -62,6 +62,8 @@ void IMotionCube::mapMisoPDOs()
   map_miso.addObject(IMCObjectName::DetailedErrorRegister);
   map_miso.addObject(IMCObjectName::DCLinkVoltage);
   map_miso.addObject(IMCObjectName::MotorPosition);
+  map_miso.addObject(IMCObjectName::MotorVelocity);
+  map_miso.addObject(IMCObjectName::ActualVelocity);
   this->miso_byte_offsets_ = map_miso.map(this->slaveIndex, DataDirection::MISO);
 }
 
@@ -213,6 +215,16 @@ int32_t IMotionCube::getAngleIUAbsolute()
 int IMotionCube::getAngleIUIncremental()
 {
   return this->incremental_encoder_->getAngleIU(this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
+}
+
+int32_t IMotionCube::getVelocityIUAbsolute()
+{
+    return this->absolute_encoder_->getVelocityIU(this->miso_byte_offsets_.at(IMCObjectName::ActualVelocity));
+}
+
+int IMotionCube::getVelocityIUIncremental()
+{
+    return this->incremental_encoder_->getVelocityIU(this->miso_byte_offsets_.at(IMCObjectName::MotorVelocity));
 }
 
 uint16_t IMotionCube::getStatusWord()

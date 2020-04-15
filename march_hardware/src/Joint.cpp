@@ -147,6 +147,26 @@ int32_t Joint::getAngleIUIncremental()
   return this->imc_->getAngleIUIncremental();
 }
 
+int32_t Joint::getVelocityIUAbsolute()
+{
+    if (!this->hasIMotionCube())
+    {
+        ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
+        return -1;
+    }
+    return this->imc_->getVelocityIUAbsolute();
+}
+
+int32_t Joint::getVelocityIUIncremental()
+{
+    if (!this->hasIMotionCube())
+    {
+        ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
+        return -1;
+    }
+    return this->imc_->getVelocityIUIncremental();
+}
+
 float Joint::getTemperature()
 {
   if (!this->hasTemperatureGES())
@@ -177,6 +197,8 @@ IMotionCubeState Joint::getIMotionCubeState()
 
   states.absoluteEncoderValue = this->imc_->getAngleIUAbsolute();
   states.incrementalEncoderValue = this->imc_->getAngleIUIncremental();
+  states.absoluteEncoderValue = this->imc_->getVelocityIUAbsolute();
+  states.incrementalEncoderValue = this->imc_->getVelocityIUIncremental();
 
   return states;
 }

@@ -321,6 +321,8 @@ void MarchHardwareInterface::reserveMemory()
   imc_state_pub_->msg_.imc_voltage.resize(num_joints_);
   imc_state_pub_->msg_.absolute_encoder_value.resize(num_joints_);
   imc_state_pub_->msg_.incremental_encoder_value.resize(num_joints_);
+  imc_state_pub_->msg_.absolute_velocity.resize(num_joints_);
+  imc_state_pub_->msg_.incremental_velocity.resize(num_joints_);
 }
 
 void MarchHardwareInterface::updatePowerDistributionBoard()
@@ -437,6 +439,8 @@ void MarchHardwareInterface::updateIMotionCubeState()
     imc_state_pub_->msg_.imc_voltage[i] = imc_state.IMCVoltage;
     imc_state_pub_->msg_.absolute_encoder_value[i] = imc_state.absoluteEncoderValue;
     imc_state_pub_->msg_.incremental_encoder_value[i] = imc_state.incrementalEncoderValue;
+    imc_state_pub_->msg_.absolute_velocity[i] = imc_state.absoluteVelocity;
+    imc_state_pub_->msg_.incremental_velocity[i] = imc_state.incrementalVelocity;
   }
 
   imc_state_pub_->unlockAndPublish();
