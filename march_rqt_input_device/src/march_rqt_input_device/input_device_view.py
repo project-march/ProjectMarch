@@ -177,6 +177,10 @@ class InputDeviceView(QWidget):
             self.create_button('gait_tilted_path_left_flexed_knee_step',
                                callback=lambda: self._controller.publish_gait('gait_tilted_path_left_flexed_knee_step'))
 
+        gait_tilted_path_left_knee_bend = \
+            self.create_button('gait_tilted_path_left_knee_bend',
+                               callback=lambda: self.controller.publish_gait('gait_tilted_path_left_knee_bend'))
+
         gait_tilted_path_right_straight_start = \
             self.create_button('gait_tilted_path_right_straight_start',
                                image_path='/gait_tilted_path_right_straight_start.png',
@@ -229,11 +233,15 @@ class InputDeviceView(QWidget):
                                           callback=lambda: self._controller.publish_error(),
                                           always_enabled=True)
 
+        sm_to_unknown_button = self.create_button('force unknown',
+                                                  callback=lambda: self._controller.publish_sm_to_unknown(),
+                                                  always_enabled=True)
+
         # The button layout.
         # Position in the array determines position on screen.
         march_button_layout = [
 
-            [home_sit, home_stand, gait_walk, gait_walk_small, gait_walk_large],
+            [home_sit, home_stand, gait_walk, gait_walk_small, gait_walk_large, sm_to_unknown_button],
 
             [gait_sit, gait_stand, rocker_switch_increment, rocker_switch_decrement, stop_button, error_button],
 
@@ -250,7 +258,8 @@ class InputDeviceView(QWidget):
             [gait_ramp_door_slope_up, gait_ramp_door_slope_down, gait_ramp_door_last_step],
 
             [gait_tilted_path_left_straight_start, gait_tilted_path_left_single_step,
-             gait_tilted_path_left_straight_end, gait_tilted_path_left_flexed_knee_step],
+             gait_tilted_path_left_straight_end, gait_tilted_path_left_flexed_knee_step,
+             gait_tilted_path_left_knee_bend],
 
             [gait_tilted_path_right_straight_start, gait_tilted_path_right_single_step,
              gait_tilted_path_right_straight_end, gait_tilted_path_right_flexed_knee_step],
