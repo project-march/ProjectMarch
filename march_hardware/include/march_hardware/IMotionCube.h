@@ -109,7 +109,7 @@ private:
    */
   int verifySetup();
   /**
-   * Downloads the setup on the .sw file onto the drive.
+   * Downloads the setup on the .sw file onto the drive using 32bit SDO write functions.
    */
   void downloadSetupToDrive();
 
