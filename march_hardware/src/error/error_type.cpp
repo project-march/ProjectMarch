@@ -49,6 +49,8 @@ const char* getErrorDescription(ErrorType type)
       return "Required robot config key not defined";
     case ErrorType::INIT_URDF_FAILED:
       return "Failed to initialize URDF";
+    case ErrorType::INVALID_SW_STRING:
+      return "Slave has incorrect SW file";
     default:
       return "Unknown error occurred. Please create/use a documented error";
   }
