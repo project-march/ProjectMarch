@@ -31,6 +31,9 @@ public:
    */
   IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
               std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
+  IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+              std::unique_ptr<IncrementalEncoder> incremental_encoder, std::string& sw_stream,
+              ActuationMode actuation_mode);
 
   ~IMotionCube() noexcept override = default;
 
@@ -97,6 +100,11 @@ private:
   void mapMisoPDOs();
   void mapMosiPDOs();
   void writeInitialSettings(uint8_t cycle_time);
+  /**
+   * Calculates checksum on .sw file passed in string format in sw_string_ by simple summation until next empty line.
+   * Start_address and end_address are filled in the method and used for downloading the .sw file to the drive.
+   */
+  uint32_t computeSWCheckSum(int& start_address, int& end_address);
 
   // Use of smart pointers are necessary here to make dependency injection
   // possible and thus allow for mocking the encoders. A unique pointer is
@@ -104,6 +112,7 @@ private:
   // do not need to be passed around.
   std::unique_ptr<AbsoluteEncoder> absolute_encoder_;
   std::unique_ptr<IncrementalEncoder> incremental_encoder_;
+  std::string sw_string_;
   ActuationMode actuation_mode_;
 
   std::unordered_map<IMCObjectName, uint8_t> miso_byte_offsets_;

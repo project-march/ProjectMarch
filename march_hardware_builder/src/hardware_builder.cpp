@@ -2,10 +2,14 @@
 #include "march_hardware_builder/hardware_builder.h"
 #include "march_hardware_builder/hardware_config_exceptions.h"
 
+#include <algorithm>
+#include <iterator>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
+#include <fstream>
+#include <sstream>
 
 #include <ros/ros.h>
 
@@ -135,9 +139,13 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
   YAML::Node incremental_encoder_config = imc_config["incrementalEncoder"];
   YAML::Node absolute_encoder_config = imc_config["absoluteEncoder"];
   int slave_index = imc_config["slaveIndex"].as<int>();
+
+  std::ifstream imc_setup_data;
+  imc_setup_data.open(ros::package::getPath("march_hardware_builder").append("/config/" + urdf_joint->name + ".sw"));
+  std::string setup = convertSWFileToString(imc_setup_data);
   return std::make_unique<march::IMotionCube>(
       slave_index, HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, urdf_joint),
-      HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), mode);
+      HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), setup, mode);
 }
 
 std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
@@ -256,4 +264,9 @@ void HardwareBuilder::initUrdf()
     }
     this->init_urdf_ = false;
   }
+}
+
+std::string convertSWFileToString(std::ifstream& sw_file)
+{
+  return std::string(std::istreambuf_iterator<char>(sw_file), std::istreambuf_iterator<char>());
 }
