@@ -71,6 +71,7 @@ public:
   void waitForPdo();
 
 private:
+  void uploadJointNames(ros::NodeHandle& nh) const;
   /**
    * Uses the num_joints_ member to resize all vectors
    * in order to avoid allocation at runtime.
@@ -107,7 +108,6 @@ private:
 
   /* Shared memory */
   size_t num_joints_ = 0;
-  std::vector<std::string> joint_names_;
 
   std::vector<double> joint_position_;
   std::vector<double> relative_joint_position_;

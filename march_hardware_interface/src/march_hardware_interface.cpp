@@ -31,11 +31,6 @@ MarchHardwareInterface::MarchHardwareInterface(std::unique_ptr<march::MarchRobot
   , num_joints_(this->march_robot_->size())
   , reset_imc_(reset_imc)
 {
-  this->joint_names_.reserve(this->num_joints_);
-  for (const auto& joint : *this->march_robot_)
-  {
-    this->joint_names_.push_back(joint.getName());
-  }
 }
 
 bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot_hw_nh */)
@@ -48,9 +43,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
       std::make_unique<realtime_tools::RealtimePublisher<march_shared_resources::AfterLimitJointCommand>>(
           nh, "/march/controller/after_limit_joint_command/", 4);
 
-  auto sorted_joint_names(this->joint_names_);
-  std::sort(sorted_joint_names.begin(), sorted_joint_names.end());
-  nh.setParam("/march/joint_names", sorted_joint_names);
+  this->uploadJointNames(nh);
 
   this->reserveMemory();
 
@@ -59,9 +52,10 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
 
   for (size_t i = 0; i < num_joints_; ++i)
   {
+    const std::string name = this->march_robot_->getJoint(i).getName();
     SoftJointLimits soft_limits;
-    getSoftJointLimits(this->march_robot_->getUrdf().getJoint(joint_names_[i]), soft_limits);
-    ROS_DEBUG("[%s] Soft limits set to (%f, %f)", joint_names_[i].c_str(), soft_limits.min_position,
+    getSoftJointLimits(this->march_robot_->getUrdf().getJoint(name), soft_limits);
+    ROS_DEBUG("[%s] Soft limits set to (%f, %f)", name.c_str(), soft_limits.min_position,
               soft_limits.max_position);
     soft_limits_[i] = soft_limits;
   }
@@ -108,6 +102,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
   for (size_t i = 0; i < num_joints_; ++i)
   {
     march::Joint& joint = march_robot_->getJoint(i);
+
     // Create joint state interface
     JointStateHandle joint_state_handle(joint.getName(), &joint_position_[i], &joint_velocity_[i], &joint_effort_[i]);
     joint_state_interface_.registerHandle(joint_state_handle);
@@ -292,6 +287,17 @@ int MarchHardwareInterface::getEthercatCycleTime() const
   return this->march_robot_->getEthercatCycleTime();
 }
 
+void MarchHardwareInterface::uploadJointNames(ros::NodeHandle& nh) const
+{
+  std::vector<std::string> joint_names;
+  for (const auto& joint : *this->march_robot_)
+  {
+    joint_names.push_back(joint.getName());
+  }
+  std::sort(joint_names.begin(), joint_names.end());
+  nh.setParam("/march/joint_names", joint_names);
+}
+
 void MarchHardwareInterface::reserveMemory()
 {
   joint_position_.resize(num_joints_);
@@ -469,7 +475,7 @@ void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
       joint_position_[joint_index] > soft_limits_[joint_index].max_position)
   {
     ROS_ERROR_THROTTLE(1, "Joint %s is outside of its soft limits (%f, %f). Actual position: %f",
-                       joint_names_[joint_index].c_str(), soft_limits_[joint_index].min_position,
+                       joint.getName().c_str(), soft_limits_[joint_index].min_position,
                        soft_limits_[joint_index].max_position, joint_position_[joint_index]);
 
     if (joint.canActuate())
