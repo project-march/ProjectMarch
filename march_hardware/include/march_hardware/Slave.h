@@ -30,8 +30,9 @@ public:
 
   virtual ~Slave() noexcept = default;
 
-  virtual void writeInitialSDOs(int /* cycle_time */)
+  virtual bool writeInitialSDOs(int /* cycle_time */)
   {
+    return false;
   }
 
   int getSlaveIndex()
