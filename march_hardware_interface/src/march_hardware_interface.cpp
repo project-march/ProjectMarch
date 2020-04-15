@@ -55,8 +55,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
     const std::string name = this->march_robot_->getJoint(i).getName();
     SoftJointLimits soft_limits;
     getSoftJointLimits(this->march_robot_->getUrdf().getJoint(name), soft_limits);
-    ROS_DEBUG("[%s] Soft limits set to (%f, %f)", name.c_str(), soft_limits.min_position,
-              soft_limits.max_position);
+    ROS_DEBUG("[%s] Soft limits set to (%f, %f)", name.c_str(), soft_limits.min_position, soft_limits.max_position);
     soft_limits_[i] = soft_limits;
   }
 
@@ -65,14 +64,6 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
                                              &master_shutdown_allowed_command_, &enable_high_voltage_command_,
                                              &power_net_on_off_command_);
   march_pdb_interface_.registerHandle(march_pdb_state_handle);
-
-  registerInterface(&march_temperature_interface_);
-  registerInterface(&march_pdb_interface_);
-  registerInterface(&joint_state_interface_);
-  registerInterface(&position_joint_interface_);
-  registerInterface(&effort_joint_interface_);
-  registerInterface(&position_joint_soft_limits_interface_);
-  registerInterface(&effort_joint_soft_limits_interface_);
 
   if (has_power_distribution_board_)
   {
@@ -176,6 +167,15 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
     }
   }
   ROS_INFO("Successfully actuated all joints");
+
+  this->registerInterface(&this->march_temperature_interface_);
+  this->registerInterface(&this->march_pdb_interface_);
+  this->registerInterface(&this->joint_state_interface_);
+  this->registerInterface(&this->position_joint_interface_);
+  this->registerInterface(&this->effort_joint_interface_);
+  this->registerInterface(&this->position_joint_soft_limits_interface_);
+  this->registerInterface(&this->effort_joint_soft_limits_interface_);
+
   return true;
 }
 
