@@ -367,8 +367,8 @@ uint32_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
     sum += std::stoi(token, nullptr, 16);  // State that we are looking at hexadecimal numbers
     old_pos = pos + 1;                     // Make sure to check the position after the previous one
   }
-  throw error::HardwareException(error::ErrorType::INVALID_SW_STRING,
-                                 "The .sw file has no delimiter of type %s", delimiter);
+  throw error::HardwareException(error::ErrorType::INVALID_SW_STRING, "The .sw file has no delimiter of type %s",
+                                 delimiter);
 }
 
 ActuationMode IMotionCube::getActuationMode() const
