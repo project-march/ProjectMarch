@@ -15,8 +15,8 @@ public:
 
   void newSubgait(const march_shared_resources::GaitActionGoalConstPtr& _msg);
   ignition::math::v4::Vector3<double> GetCom();
-  virtual void update(ignition::math::v4::Vector3<double>& torque_all,
-                      ignition::math::v4::Vector3<double>& torque_stable) = 0;
+  void update(ignition::math::v4::Vector3<double>& torque_all, ignition::math::v4::Vector3<double>& torque_stable);
+  virtual void getGoalPosition(double time_since_start, double& goal_position_x, double& goal_position_y) = 0;
 
 protected:
   physics::ModelPtr model_;
@@ -31,6 +31,16 @@ protected:
   double subgait_duration_;
 
   bool subgait_changed_;
+
+  double p_yaw_;
+  double d_yaw_;
+  double p_pitch_;
+  double d_pitch_;
+  double p_roll_;
+  double d_roll_;
+  double error_x_last_timestep_;
+  double error_y_last_timestep_;
+  double error_yaw_last_timestep_;
 };
 }  // namespace gazebo
 
