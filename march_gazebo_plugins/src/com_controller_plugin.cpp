@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
 
-#include <com_controller_plugin.h>
+#include <march_gazebo_plugins/com_controller_plugin.h>
 #include <typeinfo>
 
 namespace gazebo

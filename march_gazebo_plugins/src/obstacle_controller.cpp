@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
 
-#include <obstacle_controller.h>
+#include <march_gazebo_plugins/obstacle_controller.h>
 
 namespace gazebo
 {

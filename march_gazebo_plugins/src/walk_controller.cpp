@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
 
-#include <walk_controller.h>
+#include <march_gazebo_plugins/walk_controller.h>
 #include <gazebo/physics/physics.hh>
 
 namespace gazebo

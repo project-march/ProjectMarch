@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
 
-#include <stairs_controller.h>
+#include <march_gazebo_plugins/stairs_controller.h>
 #include <gazebo/physics/physics.hh>
 
 namespace gazebo

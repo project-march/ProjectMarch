@@ -1,16 +1,17 @@
 // Copyright 2019 Project March.
 
-#include <obstacle_controller.h>
+#include <march_gazebo_plugins/obstacle_controller.h>
 
-#ifndef MARCH_GAZEBO_PLUGINS_STAIRS_CONTROLLER_H
-#define MARCH_GAZEBO_PLUGINS_STAIRS_CONTROLLER_H
+#ifndef MARCH_GAZEBO_PLUGINS_WALK_CONTROLLER_H
+#define MARCH_GAZEBO_PLUGINS_WALK_CONTROLLER_H
 
 namespace gazebo
 {
-class StairsController : public ObstacleController
+class WalkController : public ObstacleController
 {
 public:
-  explicit StairsController(physics::ModelPtr model);
+  //  explicit WalkController();
+  explicit WalkController(physics::ModelPtr model);
   void update(ignition::math::v4::Vector3<double>& torque_all, ignition::math::v4::Vector3<double>& torque_stable);
 
 private:
