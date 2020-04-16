@@ -32,14 +32,13 @@ gaits:
   tilted_path_left_straight_end: {left_open: MV_TP_left_straightend_leftopen_v5,
                                   right_close: MV_TP_left_straightend_rightclose_v5}
   tilted_path_left_knee_bend: {right_open: MV_TP_left_kneebend_rightopen_v5}
-  tilted_path_right_straight_start: {left_open: MV_TP_right_straightstart_leftopen_v1,
-                                     right_close: MV_TP_right_straightstart_rightclose_v1}
-  tilted_path_right_single_step: {left_open: MV_TP_right_singlestep_leftopen_v1,
-                                  right_close: MV_TP_right_singlestep_rightclose_v1}
-  tilted_path_right_straight_end: {right_open: MV_TP_right_straightend_rightopen_v1,
-                                   left_close: MV_TP_right_straightend_leftclose_v1}
-  tilted_path_right_flexed_knee_step: {left_open: MV_TP_right_flexed_knee_step_leftopen_v1,
-                                       right_close: MV_TP_right_flexed_knee_step_rightclose_v1}
+  tilted_path_right_straight_start: {left_open: MV_TP_right_straightstart_leftopen_v5,
+                                     right_close: MV_TP_right_straightstart_rightclose_v5}
+  tilted_path_right_single_step: {left_open: MV_TP_right_singlestep_leftopen_v5,
+                                  right_close: MV_TP_right_singlestep_rightclose_v5}
+  tilted_path_right_straight_end: {right_open: MV_TP_right_straightend_rightopen_v5,
+                                   left_close: MV_TP_right_straightend_leftclose_v5}
+  tilted_path_right_knee_bend: {right_open: MV_TP_right_kneebend_rightopen_v5}
   stairs_up: {right_open: MV_stairsup_rightopen_v8, left_swing: MV_stairsup_leftswing_v8,
               right_swing: MV_stairsup_rightswing_v8, left_close: MV_stairsup_leftclose_v12,
               right_close: MV_stairsup_rightclose_v12}
