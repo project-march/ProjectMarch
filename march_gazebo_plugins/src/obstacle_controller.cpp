@@ -1,6 +1,7 @@
 // Copyright 2019 Project March.
 
 #include <march_gazebo_plugins/obstacle_controller.h>
+#include <ros/ros.h>
 
 namespace gazebo
 {
@@ -30,10 +31,15 @@ void ObstacleController::newSubgait(const march_shared_resources::GaitActionGoal
   if (this->subgait_name_ == "right_open" or this->subgait_name_ == "right_swing" or
       this->subgait_name_ == "left_swing")
   {
+    // Exponential smoothing with alpha = 0.2
     this->swing_step_size_ = 0.8 * this->swing_step_size_ + 0.4 * std::abs(this->foot_right_->WorldPose().Pos().X() -
                                                                            this->foot_left_->WorldPose().Pos().X());
   }
 
+  if (this->subgait_name_ == "home_stand" and _msg->goal.current_subgait.name.substr(0, 4) == "left")
+  {
+    ROS_WARN("Gait starts with left. CoM controller plugin might not work properly.");
+  }
   this->subgait_name_ = _msg->goal.current_subgait.name;
   this->subgait_duration_ =
       _msg->goal.current_subgait.duration.sec + 0.000000001 * _msg->goal.current_subgait.duration.nsec;
