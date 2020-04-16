@@ -201,6 +201,10 @@ class InputDeviceView(QWidget):
                                callback=lambda: self._controller.publish_gait(
                                    'gait_tilted_path_right_flexed_knee_step'))
 
+        gait_tilted_path_right_knee_bend = \
+            self.create_button('gait_tilted_path_right_knee_bend',
+                               callback=lambda: self._controller.publish_gait('gait_tilted_path_right_knee_bend'))
+
         gait_tilted_path_first_start = \
             self.create_button('gait_tilted_path_first_start',
                                callback=lambda: self._controller.publish_gait('gait_tilted_path_first_start'))
@@ -262,7 +266,8 @@ class InputDeviceView(QWidget):
              gait_tilted_path_left_knee_bend],
 
             [gait_tilted_path_right_straight_start, gait_tilted_path_right_single_step,
-             gait_tilted_path_right_straight_end, gait_tilted_path_right_flexed_knee_step],
+             gait_tilted_path_right_straight_end, gait_tilted_path_right_flexed_knee_step,
+             gait_tilted_path_right_knee_bend],
 
             [gait_tilted_path_first_start, gait_tilted_path_second_start, gait_tilted_path_first_end,
              gait_tilted_path_second_end],
