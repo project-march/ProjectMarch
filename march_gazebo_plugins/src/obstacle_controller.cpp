@@ -4,13 +4,20 @@
 
 namespace gazebo
 {
-ObstacleController::ObstacleController(physics::ModelPtr model) : model_(model)
+ObstacleController::ObstacleController(physics::ModelPtr model)
+  : model_(model), subgait_name_("home_stand"), subgait_changed_(true)
 {
   this->foot_left_ = this->model_->GetLink("ankle_plate_left");
   this->foot_right_ = this->model_->GetLink("ankle_plate_right");
 
   this->subgait_name_ = "home_stand";
   this->subgait_changed_ = true;
+
+  this->mass = 0.0;
+  for (auto const& link : this->model_->GetLinks())
+  {
+    this->mass += link->GetInertial()->Mass();
+  }
 }
 
 void ObstacleController::newSubgait(const march_shared_resources::GaitActionGoalConstPtr& _msg)
@@ -30,17 +37,6 @@ void ObstacleController::newSubgait(const march_shared_resources::GaitActionGoal
 }
 
 // Called by the world update start event
-double ObstacleController::getMass()
-{
-  double mass = 0.0;
-  for (auto const& link : this->model_->GetLinks())
-  {
-    mass += link->GetInertial()->Mass();
-  }
-  return mass;
-}
-
-// Called by the world update start event
 ignition::math::v4::Vector3<double> ObstacleController::GetCom()
 {
   ignition::math::v4::Vector3<double> com(0.0, 0.0, 0.0);
@@ -48,6 +44,6 @@ ignition::math::v4::Vector3<double> ObstacleController::GetCom()
   {
     com += link->WorldCoGPose().Pos() * link->GetInertial()->Mass();
   }
-  return com / this->getMass();
+  return com / this->mass;
 }
 }  // namespace gazebo

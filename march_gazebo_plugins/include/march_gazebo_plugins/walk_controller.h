@@ -12,7 +12,8 @@ class WalkController : public ObstacleController
 public:
   //  explicit WalkController();
   explicit WalkController(physics::ModelPtr model);
-  void update(ignition::math::v4::Vector3<double>& torque_all, ignition::math::v4::Vector3<double>& torque_stable);
+  void update(ignition::math::v4::Vector3<double>& torque_all,
+              ignition::math::v4::Vector3<double>& torque_stable) override;
 
 private:
   double p_yaw_;

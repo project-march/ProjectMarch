@@ -29,7 +29,7 @@ void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf
   this->update_connection_ = event::Events::ConnectWorldUpdateBegin(std::bind(&ComControllerPlugin::onUpdate, this));
 
   // Create our ROS node.
-  this->ros_node_ = std::make_unique<ros::NodeHandle>(ros::NodeHandle("gazebo_client"));
+  this->ros_node_ = std::make_unique<ros::NodeHandle>("com_controller_plugin");
 
   // Create a named topic, and subscribe to it.
   ros::SubscribeOptions so = ros::SubscribeOptions::create<march_shared_resources::GaitActionGoal>(
@@ -78,7 +78,7 @@ void ComControllerPlugin::onRosMsg(const march_shared_resources::GaitActionGoalC
 // Called by the world update start event
 void ComControllerPlugin::onUpdate()
 {
-  ignition::math::v4::Vector3<double> torque_all;     // -roll, pitch, -yawconst ignition::math::v4::Vector3<double>
+  ignition::math::v4::Vector3<double> torque_all;     // -roll, pitch, -yaw
                                                       // torque_all(0, T_pitch, T_yaw);
   ignition::math::v4::Vector3<double> torque_stable;  // -roll, pitch, -yaw
 

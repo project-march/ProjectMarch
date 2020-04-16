@@ -14,10 +14,6 @@ catkin_package(
     CATKIN_DEPENDS march_shared_resources
 )
 
-include_directories(
-        include
-)
-
 add_library(${PROJECT_NAME}
     src/com_controller_plugin.cpp
     src/obstacle_controller.cpp

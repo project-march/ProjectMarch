@@ -5,7 +5,8 @@
 
 namespace gazebo
 {
-WalkController::WalkController(physics::ModelPtr model) : ObstacleController(model)
+WalkController::WalkController(physics::ModelPtr model)
+  : ObstacleController(model), error_x_last_timestep_(0), error_y_last_timestep_(0), error_yaw_last_timestep_(0)
 {
   this->swing_step_size_ = 0.7;  // This estimate will be adjusted every step
 
@@ -15,10 +16,6 @@ WalkController::WalkController(physics::ModelPtr model) : ObstacleController(mod
   this->d_roll_ = 0;
   this->p_yaw_ = 500;
   this->d_yaw_ = 25;
-
-  this->error_x_last_timestep_ = 0;
-  this->error_y_last_timestep_ = 0;
-  this->error_yaw_last_timestep_ = 0;
 }
 
 void WalkController::update(ignition::math::v4::Vector3<double>& torque_all,

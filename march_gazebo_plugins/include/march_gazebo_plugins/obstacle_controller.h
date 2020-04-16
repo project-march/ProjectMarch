@@ -14,7 +14,6 @@ public:
   explicit ObstacleController(physics::ModelPtr model);
 
   void newSubgait(const march_shared_resources::GaitActionGoalConstPtr& _msg);
-  double getMass();
   ignition::math::v4::Vector3<double> GetCom();
   virtual void update(ignition::math::v4::Vector3<double>& torque_all,
                       ignition::math::v4::Vector3<double>& torque_stable) = 0;
@@ -24,6 +23,7 @@ protected:
 
   physics::LinkPtr foot_left_;
   physics::LinkPtr foot_right_;
+  double mass;
 
   std::string subgait_name_;
   double subgait_start_time_;
