@@ -8,6 +8,10 @@ find_package(catkin REQUIRED COMPONENTS
 )
 find_package(gazebo REQUIRED)
 
+include_directories(
+    include
+)
+
 catkin_package(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
@@ -20,7 +24,7 @@ add_library(${PROJECT_NAME}
     src/stairs_controller.cpp
     src/walk_controller.cpp
 )
-target_include_directories(${PROJECT_NAME} PRIVATE include ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${catkin_LIBRARIES})
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_14)
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror)
