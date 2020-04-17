@@ -7,6 +7,8 @@ from python_qt_binding.QtWidgets import QPushButton
 from python_qt_binding.QtWidgets import QWidget
 import rospkg
 
+from .image_button import ImageButton
+
 
 class InputDeviceView(QWidget):
     def __init__(self, ui_file, controller):
@@ -323,7 +325,7 @@ class InputDeviceView(QWidget):
             self.content.style().polish(self.content)
             self.content.update()
 
-    def create_button(self, name, callback=None, image_path=None, size=(128, 160), visible=True, always_enabled=False):
+    def create_button(self, name, callback=None, image_path=None, size=(128, 160), always_enabled=False):
         """Create a push button which the mock input device can register.
 
         :param name:
@@ -334,32 +336,28 @@ class InputDeviceView(QWidget):
             The name of the image file
         :param size:
             Default size of the button
-        :param visible:
-            Turn button invisible on the gui
         :param always_enabled:
             Never disable the button if it's not in possible gaits
 
         :return:
             A QPushButton object which contains the passed arguments
         """
-        qt_button = QPushButton()
+        if image_path is None:
+            qt_button = QPushButton()
+
+            text = check_string(name)
+            qt_button.setText(text)
+        else:
+            qt_button = ImageButton(get_image_path(image_path))
+
         qt_button.setObjectName(name)
 
         if always_enabled:
             self._always_enabled_buttons.append(name)
             qt_button.setEnabled(True)
 
-        if image_path:
-            qt_button.setStyleSheet(create_image_button_css(get_image_path(image_path)))
-        else:
-            text = check_string(name)
-            qt_button.setText(text)
-
         qt_button.setMinimumSize(QSize(*size))
         qt_button.setMaximumSize(QSize(*size))
-
-        if not visible:
-            qt_button.setVisible(False)
 
         if callback:
             qt_button.clicked.connect(callback)
@@ -384,14 +382,6 @@ class InputDeviceView(QWidget):
                 qt_button_layout.addWidget(user_input_object, row, column, 1, 1)
 
         return qt_button_layout
-
-
-def create_image_button_css(img_path):
-    """CSS of a button with a background-image."""
-    css_base = """
-    background: url(<img_path>) no-repeat center;
-    """
-    return css_base.replace('<img_path>', img_path)
 
 
 def get_image_path(img_name):
