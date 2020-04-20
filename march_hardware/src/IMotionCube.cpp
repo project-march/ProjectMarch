@@ -91,13 +91,14 @@ void IMotionCube::mapMosiPDOs()
 // Set configuration parameters to the IMC
 bool IMotionCube::writeInitialSettings(uint8_t cycle_time)
 {
-  ROS_DEBUG("IMotionCube::writeInitialSettings");
+  ROS_INFO("IMotionCube::writeInitialSettings");
   int checksum_verified = verifySetup();
   if (!checksum_verified)
   {
+    ROS_INFO("IMotionCube::mohge");
     downloadSetupToDrive();
     checksum_verified = verifySetup();
-    ROS_DEBUG("writing of the setup data has succeeded: %b", checksum_verified);
+    ROS_INFO("writing of the setup data has succeeded: %d", checksum_verified);
     return true;  // Resets the etherCAT train and imc, necessary after downloading a "new" setup to the drive
   }
 
@@ -383,9 +384,9 @@ uint32_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
 
 int IMotionCube::verifySetup()
 {
-  int start_address, end_address;
+  int start_address = 0, end_address = 0;
   uint32_t sw_value = this->computeSWCheckSum(start_address, end_address);
-
+  ROS_INFO("Start address: %d end address: %d", start_address, end_address);
   // set parameters to compute checksum on the imc
   int checksum_setup =
       sdo_bit32_write(slaveIndex, 0x2069, 0, end_address * 65536 + start_address);  // Endaddress leftshifted 4 times
@@ -395,12 +396,13 @@ int IMotionCube::verifySetup()
   // read computed checksum on imc
   int check_sum_read = sdo_bit32_read(slaveIndex, 0x206A, 0, value_size, imc_value);
 
-  if (checksum_setup && check_sum_read)
+  if (!(checksum_setup && check_sum_read))
   {
     throw error::HardwareException(error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
                                    "Failed checking the checksum on slave: %d", this->slaveIndex);
   }
 
+  ROS_INFO("The computed checksums are: %d, and %d", sw_value, imc_value);
   if (sw_value == imc_value)
   {
     return 1;
