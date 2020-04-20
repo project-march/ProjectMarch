@@ -287,6 +287,7 @@ class InputDeviceView(QWidget):
 
     def _accepted_cb(self):
         self.status_label.setText('Gait accepted')
+        self._update_possible_gaits()
 
     def _finished_cb(self):
         self.status_label.setText('Gait finished')
