@@ -83,22 +83,12 @@
       </property>
       <property name="styleSheet">
        <string notr="true">QPushButton {
-  background-color: #1F1E24;
-  color: #FFFFFF;
+  background-color: #B6BDC9;
+  color: #000000;
 }
 
-QPushButton[enabled=&quot;true&quot;] {
-  border: 3px solid rgb(67, 173, 5);
-}
-QPushButton[enabled=&quot;true&quot;]:hover {
-  border: 3px solid rgb(114, 159, 207);
-}
-QPushButton[enabled=&quot;true&quot;]:pressed {
-  border: 3px solid rgb(252, 175, 62);
-}
-
-QPushButton[enabled=&quot;false&quot;] {
-  border: 3px solid rgb(191, 64, 64);
+QPushButton:disabled {
+  background-color: #80858D;
 }</string>
       </property>
      </widget>
