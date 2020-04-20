@@ -48,7 +48,6 @@ html_theme_options = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
-html_css_files = ['css/override.css']
 
 html_last_updated_fmt = '%b %d, %Y'
 html_show_copyright = True
@@ -59,6 +58,7 @@ html_context = {
     'github_repo': 'tutorials',
     'github_version': branch_name,
     "conf_py_path": "/",
+    "css_files": ['_static/css/override.css'],
     "favicon": "favicon.ico",
     "logo": "logo.png"
 }
