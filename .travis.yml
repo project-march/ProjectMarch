@@ -4,6 +4,7 @@
 os: linux
 dist: bionic
 version: ~> 1.0
+language: generic
 rvm:
   - 2.4
 python:
@@ -58,5 +59,6 @@ deploy:
   edge: true
   token: $GH_REPO_TOKEN
   local_dir: build/html
+  fqdn: docs.projectmarch.nl
   on:
     branch: master
