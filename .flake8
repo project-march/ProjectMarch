@@ -34,4 +34,4 @@ ignore =
     W503,
     # C815: Trailing comma in Python 3.5
     C815
-ignore-names = rowCount, columnCount, headerData, setUp
+ignore-names = rowCount, columnCount, headerData, setUp, paintEvent
