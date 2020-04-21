@@ -82,7 +82,7 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_all,
   double error_y = model_com.Y() - goal_position_y;
   double error_yaw = this->foot_left_->WorldPose().Rot().Z();
 
-  // Deactivate d if the subgait just changed to peaks when the target function jumps
+  // Deactivate d if the subgait just changed to avoid effort peaks when the target function jumps
   if (this->subgait_changed_)
   {
     this->error_y_last_timestep_ = error_x;
@@ -90,12 +90,14 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_all,
     this->subgait_changed_ = false;
   }
 
+  // roll, pitch and yaw are defined in
+  // https://docs.projectmarch.nl/doc/march_packages/march_simulation.html#torque-application
   double T_pitch = -this->p_pitch_ * error_x - this->d_pitch_ * (error_x - this->error_x_last_timestep_);
   double T_roll = this->p_roll_ * error_y + this->d_roll_ * (error_y - this->error_y_last_timestep_);
   double T_yaw = -this->p_yaw_ * error_yaw - this->d_yaw_ * (error_yaw - this->error_yaw_last_timestep_);
 
-  torque_all = ignition::math::v4::Vector3<double>(0, T_pitch, T_yaw);  // -roll, pitch, -yaw
-  torque_stable = ignition::math::v4::Vector3<double>(T_roll, 0, 0);    // -roll, pitch, -yaw
+  torque_all = ignition::math::v4::Vector3<double>(0, T_pitch, T_yaw);
+  torque_stable = ignition::math::v4::Vector3<double>(T_roll, 0, 0);
 
   this->error_x_last_timestep_ = error_x;
   this->error_y_last_timestep_ = error_y;
