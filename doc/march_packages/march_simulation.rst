@@ -27,7 +27,8 @@ so that the exoskeleton can move relative to the world. The launch command becom
 
 One can add an obstacle in simulation by adding the "obstacle:=<<obstacle_name>>" to the command. The possible
 obstacles can be found in the obstacles folder of the march_simulation package. The current obstacles were created
-after four of the obstacles in the Cybathlon 2020.
+after four of the obstacles in the Cybathlon 2020. Creating a new xacro file in the obstacles folder is all that is
+needed to create a new obstacle for the simulation.
 
 Code structure
 --------------
@@ -47,17 +48,43 @@ Just like the real exoskeleton, the exoskeleton in simulation cannot stably walk
 CoM controller plugin was created. It seeks to mock not the pilot, but the coach during a ground gait session. This
 for the simple reason that the behavior of the pilot is more erratic and therefore much harder to accurately simulate.
 
-The plugin works by controlling the position of the Center of Mass (CoM). There is a target function describing the
-desired location of the CoM. This target function moves in the x-direction (movement direction of exo) with speed
-step_size / step_duration. The y-direction target is constantly the stable leg during a swing. It therefore switches
-discontinuously from one leg to the other at the end of each swing.
-
-The plugin ensures that the CoM does not stray far from the target through a PID controller. The controller applies
-a compensating *torque* to each of the links (parts) in the exoskeleton.
+The controller consists of two parts: a target function that describes a desired x and y coordinate for the CoM, and a
+PID controller that manipulates the CoM by applying *torque* to each of the parts. More details below.
 
 Note the following:
 1. The plugin assumes the subgait names start with left/right and end with open/swing/close. It will do nothing for
 other subgaits.
 2. The plugin might have to be re-tuned for an obstacle.
+
+Target function
+^^^^^^^^^^^^^^^
+
+The target function for the CoM can depend on the obstacle. Furthermore, it needs to know which leg is stable (i.e. not
+in swing), so it listens to the gait scheduler topic.
+
+Walk target function
+~~~~~~~~~~~~~~~~~~~~
+
+The target function for walk moves in the x-direction (movement direction of exo) with speed step_size / step_duration.
+The y-direction target is constantly the stable leg during a swing. It therefore switches discontinuously from one leg
+to the other at the end of each swing.
+
+Torque application
+^^^^^^^^^^^^^^^^^^
+
+The plugin ensures that the CoM does not stray far from the target through a PID controller. The controller applies a
+compensating *torque* to each of the links (parts) in the exoskeleton. See image below for the definition of the axes
+of rotation. Note that these axes are relative to the world, and do not change if the exoskeleton rotates. Hence the
+exoskeleton will always walk in a fixed direction (along the negative x-axis).
+
+.. figure:: images/axes_of_rotation.png
+   :align: center
+
+   The definition of the axes of rotation in the simulation. The axes are relative to the world.
+
+Pitch and yaw torque is applied to each of the links. Roll toque is only applied to the 4 links in the stable leg.
+This is necessary because roll torque will force the LHAA's apart when applied to both legs.
+
+
 
 
