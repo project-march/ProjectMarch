@@ -8,9 +8,6 @@ Introduction
 This is a static package that contains only information about the gaits.
 Most gaits are created by the gait generator, but as they are simply text files they can also be edited manually.
 
-.. todo (Isha) add link to gait generator
-
-
 Terminology
 -----------
 
