@@ -13,11 +13,23 @@ Most gaits are created by the gait generator, but as they are simply text files 
 
 Terminology
 -----------
-``Version``: A filled `JointTrajectory Message <http://docs.ros.org/melodic/api/trajectory_msgs/html/msg/JointTrajectory.html>`_.
 
-``Subgait``: A name for a physical movement, can contain multiple versions.
+``Subgait folder``: A folder named after a physical movement. Contains multiple subgait files for different versions.
 
-``Gait``: A directed graph of subgaits with defined transitions from subgait to subgait.
+``Subgait file``: A text file containing a version of a subgait in the form of a
+`JointTrajectory Message <http://docs.ros.org/melodic/api/trajectory_msgs/html/msg/JointTrajectory.html>`_.
+The file is named <version>.subgait.
+
+``Gait folder``: A folder containing a gait file and the subgait folders that constitute the gait.
+
+``Gait file``: A text file defining the gait's transitions from subgait to subgait.
+:gait-files:`Example <march_gait_files/airgait/walk/walk.gait>`
+
+``<gait_directory>`` is a folder used to group gaits together, some gaits are ready for a training, while some are only for airgaiting.
+:gait-files:`Example <march_gait_files/airgait>`
+
+``default.yaml`` is required for each gait_directory. It specifies which versions of gaits are loaded by default when loading this gait_directory.
+:gait-files:`Example <march_gait_files/airgait/default.yaml>`
 
 Example:
 
@@ -54,15 +66,3 @@ Structure
        │    │    └─── a_bit_faster.subgait
        │    └─── walk.gait
        └─── default.yaml
-
-Clarification
-^^^^^^^^^^^^^
-
-``<gait_directory>`` is a folder used to group gaits together, some gaits are ready for a training, while some are only for airgaiting.
-:gait-files:`Example <march_gait_files/airgait>`
-
-``default.yaml`` is required for each gait_directory. It specifies which versions of gaits are loaded by default when loading this gait_directory.
-:gait-files:`Example <march_gait_files/airgait/default.yaml>`
-
-``<gait_name>.gait`` is used to combine the subgaits together. It defines a graph of transitions between subgaits.
-:gait-files:`Example <march_gait_files/airgait/walk/walk.gait>`
