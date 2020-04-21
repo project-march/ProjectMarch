@@ -5,11 +5,9 @@ march_gait_files
 
 Introduction
 ------------
-This is a static package that contains only information about the gaits.
-Most gaits are created by the gait generator, but as they are simply text files they can also be edited manually.
-
-.. todo (Isha) add link to gait generator
-
+This is a static package that contains only information about the gaits. Most gaits are created by the
+`gait generator <https://docs.projectmarch.nl/doc/using_the_march_exoskeleton/using_the_gait_generator.html>`,
+but as they are simply text files they can also be edited manually.
 
 Terminology
 -----------
