@@ -62,3 +62,4 @@ deploy:
   fqdn: docs.projectmarch.nl
   on:
     branch: master
+    condition: $TRAVIS_EVENT_TYPE = push
