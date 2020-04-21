@@ -69,8 +69,11 @@
      <property name="enabled">
       <bool>true</bool>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="widgetResizable">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <widget class="QWidget" name="content">
       <property name="geometry">

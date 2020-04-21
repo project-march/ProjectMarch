@@ -303,6 +303,8 @@ class InputDeviceView(QWidget):
         self.gait_label.setText(gait_name)
 
     def _update_possible_gaits(self):
+        self.frame.setEnabled(False)
+        self.frame.verticalScrollBar().setEnabled(False)
         possible_gaits = self._controller.get_possible_gaits()
         layout = self.content.layout()
         if layout:
@@ -316,15 +318,8 @@ class InputDeviceView(QWidget):
                     button.setEnabled(True)
                 else:
                     button.setEnabled(False)
-
-                # The following is necessary for updating the stylesheet
-                button.style().unpolish(button)
-                button.style().polish(button)
-                button.update()
-
-            self.content.style().unpolish(self.content)
-            self.content.style().polish(self.content)
-            self.content.update()
+        self.frame.setEnabled(True)
+        self.frame.verticalScrollBar().setEnabled(True)
 
     def create_button(self, name, callback=None, image_path=None, size=(128, 160), always_enabled=False):
         """Create a push button which the mock input device can register.
