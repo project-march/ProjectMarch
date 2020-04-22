@@ -43,9 +43,10 @@ public:
 
   bool writeInitialSDOs(int cycle_time) override;
 
-  double getAngleRadAbsolute();
-  double getAngleRadIncremental();
-  double getAngleRadMostPrecise();
+  virtual double getAngleRadAbsolute();
+  virtual double getAngleRadIncremental();
+  double getAbsoluteRadPerBit() const;
+  double getIncrementalRadPerBit() const;
   int16_t getTorque();
   int32_t getAngleIUAbsolute();
   int32_t getAngleIUIncremental();
@@ -56,8 +57,8 @@ public:
 
   ActuationMode getActuationMode() const;
 
-  float getMotorCurrent();
-  float getIMCVoltage();
+  virtual float getMotorCurrent();
+  virtual float getIMCVoltage();
 
   void setControlWord(uint16_t control_word);
 
@@ -121,7 +122,6 @@ private:
   std::unique_ptr<IncrementalEncoder> incremental_encoder_;
   std::string sw_string_;
   ActuationMode actuation_mode_;
-  bool is_incremental_more_precise_;
 
   std::unordered_map<IMCObjectName, uint8_t> miso_byte_offsets_;
   std::unordered_map<IMCObjectName, uint8_t> mosi_byte_offsets_;
