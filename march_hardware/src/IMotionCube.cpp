@@ -92,15 +92,19 @@ void IMotionCube::mapMosiPDOs()
 bool IMotionCube::writeInitialSettings(uint8_t cycle_time)
 {
   int checksum_verified = verifySetup();
-  ROS_INFO("The .sw file for slave %d is %s", this->slaveIndex,
-           checksum_verified ? "equal to the setup of the drive." :
-                               "not equal to the setup of the drive, downloading is necessary");
+
   if (!checksum_verified)
   {
+    ROS_WARN("The .sw file for slave %d is not equal to the setup of the drive, downloading is necessary",
+             this->slaveIndex);
     downloadSetupToDrive();
     checksum_verified = verifySetup();
     ROS_INFO(checksum_verified ? "writing of the setup data has succeeded" : "writing of the setup data has failed");
     return true;  // Resets the etherCAT train and imc, necessary after downloading a "new" setup to the drive
+  }
+  else
+  {
+    ROS_DEBUG("The .sw file for slave %d is equal to the setup of the drive.", this->slaveIndex);
   }
 
   // mode of operation
@@ -403,14 +407,7 @@ int IMotionCube::verifySetup()
   }
 
   ROS_DEBUG("The .sw checksum is : %d, and the drive checksum is %d", sw_value, imc_value);
-  if (sw_value == imc_value)
-  {
-    return 1;
-  }
-  else
-  {
-    return 0;
-  }
+  return sw_value == imc_value;
 }
 
 void IMotionCube::downloadSetupToDrive()
