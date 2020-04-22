@@ -5,6 +5,10 @@
 #include "march_hardware/EtherCAT/EthercatSDO.h"
 #include "march_hardware/EtherCAT/EthercatIO.h"
 
+#include <iostream>
+#include <iomanip>
+#include <string>
+
 #include <bitset>
 #include <memory>
 #include <stdexcept>
@@ -21,6 +25,7 @@ IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absol
   : Slave(slave_index)
   , absolute_encoder_(std::move(absolute_encoder))
   , incremental_encoder_(std::move(incremental_encoder))
+  , sw_string_("empty")
   , actuation_mode_(actuation_mode)
 {
   if (!this->absolute_encoder_ || !this->incremental_encoder_)
@@ -29,11 +34,13 @@ IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absol
   }
   this->absolute_encoder_->setSlaveIndex(slave_index);
   this->incremental_encoder_->setSlaveIndex(slave_index);
-  this->is_incremental_more_precise_ =
-      (this->incremental_encoder_->getTotalPositions() * this->incremental_encoder_->getTransmission() >
-       this->absolute_encoder_->getTotalPositions() * 10);
-  // Multiply by ten to ensure the rotational joints keep using absolute encoders. These are somehow more accurate
-  // even though they theoretically shouldn't be.
+}
+IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+                         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::string& sw_stream,
+                         ActuationMode actuation_mode)
+  : IMotionCube(slave_index, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode)
+{
+  this->sw_string_ = std::move(sw_stream);
 }
 
 void IMotionCube::writeInitialSDOs(int cycle_time)
@@ -187,16 +194,14 @@ double IMotionCube::getAngleRadIncremental()
   return this->incremental_encoder_->getAngleRad(this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
 }
 
-double IMotionCube::getAngleRadMostPrecise()
+double IMotionCube::getAbsoluteRadPerBit() const
 {
-  if (this->is_incremental_more_precise_)
-  {
-    return this->getAngleRadIncremental();
-  }
-  else
-  {
-    return this->getAngleRadAbsolute();
-  }
+  return this->absolute_encoder_->getRadPerBit();
+}
+
+double IMotionCube::getIncrementalRadPerBit() const
+{
+  return this->incremental_encoder_->getRadPerBit();
 }
 
 int16_t IMotionCube::getTorque()
@@ -329,6 +334,34 @@ void IMotionCube::reset()
   this->setControlWord(0);
   ROS_DEBUG("Slave: %d, Try to reset IMC", this->slaveIndex);
   sdo_bit16_write(this->slaveIndex, 0x2080, 0, 1);
+}
+
+uint32_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
+{
+  size_t pos = 0;
+  size_t old_pos = 0;
+  uint16_t sum = 0;
+  std::string delimiter = "\n";
+  std::string token;
+  while ((pos = sw_string_.find(delimiter, old_pos)) != std::string::npos)
+  {
+    token = sw_string_.substr(old_pos, pos - old_pos);
+    if (old_pos == 0)
+    {
+      start_address = std::stoi(token, nullptr, 16);
+      token = "0";
+    }
+    if (pos - old_pos < 2)  // delimiter has length of 1 two \n in a row has difference in positions of 1
+    {
+      end_address = end_address + start_address - 2;  // The -2 compensates the offset of the end_address
+      return sum;
+    }
+    end_address++;
+    sum += std::stoi(token, nullptr, 16);  // State that we are looking at hexadecimal numbers
+    old_pos = pos + 1;                     // Make sure to check the position after the previous one
+  }
+  throw error::HardwareException(error::ErrorType::INVALID_SW_STRING, "The .sw file has no delimiter of type %s",
+                                 delimiter);
 }
 
 ActuationMode IMotionCube::getActuationMode() const
