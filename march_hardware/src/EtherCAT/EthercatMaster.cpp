@@ -52,7 +52,7 @@ void EthercatMaster::waitForPdo()
 void EthercatMaster::start(std::vector<Joint>& joints)
 {
   bool reset = true;
-  for (int i=0; i<5; i++)
+  for (int i = 0; i < 5; i++)
   {
     if (reset)
     {
