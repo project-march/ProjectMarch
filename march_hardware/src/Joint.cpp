@@ -2,6 +2,7 @@
 #include <ros/ros.h>
 
 #include <bitset>
+#include <cmath>
 #include <memory>
 #include <string>
 #include <utility>
@@ -53,6 +54,23 @@ void Joint::prepareActuation()
   ROS_INFO("[%s] Preparing for actuation", this->name_.c_str());
   this->imc_->goToOperationEnabled();
   ROS_INFO("[%s] Successfully prepared for actuation", this->name_.c_str());
+
+  this->incremental_position_ = this->imc_->getAngleRadIncremental();
+  this->absolute_position_ = this->imc_->getAngleRadAbsolute();
+  this->position_ = this->absolute_position_;
+  this->velocity_ = 0;
+}
+
+void Joint::resetIMotionCube()
+{
+  if (!this->hasIMotionCube())
+  {
+    ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
+  }
+  else
+  {
+    this->imc_->reset();
+  }
 }
 
 void Joint::actuateRad(double target_position)
@@ -65,34 +83,65 @@ void Joint::actuateRad(double target_position)
   this->imc_->actuateRad(target_position);
 }
 
-double Joint::getAngleRadAbsolute()
+void Joint::readEncoders(const ros::Duration& elapsed_time)
 {
   if (!this->hasIMotionCube())
   {
     ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
-    return -1;
+    return;
   }
-  return this->imc_->getAngleRadAbsolute();
+
+  if (this->receivedDataUpdate())
+  {
+    const double new_incremental_position = this->imc_->getAngleRadIncremental();
+    const double new_absolute_position = this->imc_->getAngleRadAbsolute();
+
+    // Get velocity from encoder position
+    double best_displacement;
+
+    // Take the velocity with the highest resolution.
+    if (this->imc_->getIncrementalRadPerBit() < this->imc_->getAbsoluteRadPerBit())
+    {
+      best_displacement = new_incremental_position - this->incremental_position_;
+    }
+    else
+    {
+      best_displacement = new_absolute_position - this->absolute_position_;
+    }
+
+    // Update position with the most accurate velocity
+    this->position_ += best_displacement;
+    this->velocity_ = best_displacement / elapsed_time.toSec();
+    this->incremental_position_ = new_incremental_position;
+    this->absolute_position_ = new_absolute_position;
+  }
+  else
+  {
+    // Update positions with velocity from last time step
+    this->position_ += this->velocity_ * elapsed_time.toSec();
+    this->incremental_position_ += this->velocity_ * elapsed_time.toSec();
+    this->absolute_position_ += this->velocity_ * elapsed_time.toSec();
+  }
 }
 
-double Joint::getAngleRadIncremental()
+double Joint::getPosition() const
 {
-  if (!this->hasIMotionCube())
-  {
-    ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
-    return -1;
-  }
-  return this->imc_->getAngleRadIncremental();
+  return this->position_;
 }
 
-double Joint::getAngleRadMostPrecise()
+double Joint::getVelocity() const
 {
-  if (!this->hasIMotionCube())
-  {
-    ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
-    return -1;
-  }
-  return this->imc_->getAngleRadMostPrecise();
+  return this->velocity_;
+}
+
+double Joint::getIncrementalPosition() const
+{
+  return this->incremental_position_;
+}
+
+double Joint::getAbsolutePosition() const
+{
+  return this->absolute_position_;
 }
 
 void Joint::actuateTorque(int16_t target_torque)
@@ -161,7 +210,7 @@ IMotionCubeState Joint::getIMotionCubeState()
   states.motionErrorDescription = error::parseMotionError(this->imc_->getMotionError());
 
   states.motorCurrent = this->imc_->getMotorCurrent();
-  states.motorVoltage = this->imc_->getMotorVoltage();
+  states.IMCVoltage = this->imc_->getIMCVoltage();
 
   states.absoluteEncoderValue = this->imc_->getAngleIUAbsolute();
   states.incrementalEncoderValue = this->imc_->getAngleIUIncremental();
@@ -223,10 +272,19 @@ bool Joint::receivedDataUpdate()
   {
     return false;
   }
-  // We assume that the motor voltage cannot remain precisely constant.
-  float new_motor_volt = this->imc_->getMotorVoltage();
-  bool data_updated = (new_motor_volt != this->previous_motor_volt_);
-  this->previous_motor_volt_ = new_motor_volt;
+  // If imc voltage, motor current, and both encoders positions did not change,
+  // we probably did not receive an update for this joint.
+  float new_imc_volt = this->imc_->getIMCVoltage();
+  float new_motor_current = this->imc_->getMotorCurrent();
+  double new_absolute_position = this->imc_->getAngleRadAbsolute();
+  double new_incremental_position = this->imc_->getAngleRadIncremental();
+  bool data_updated = (new_imc_volt != this->previous_imc_volt_ || new_motor_current != this->previous_motor_current_ ||
+                       new_absolute_position != this->previous_absolute_position_ ||
+                       new_incremental_position != this->previous_incremental_position_);
+  this->previous_imc_volt_ = new_imc_volt;
+  this->previous_motor_current_ = new_motor_current;
+  this->previous_absolute_position_ = new_absolute_position;
+  this->previous_incremental_position_ = new_incremental_position;
   return data_updated;
 }
 

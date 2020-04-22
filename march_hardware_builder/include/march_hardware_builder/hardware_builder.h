@@ -93,4 +93,9 @@ private:
   bool init_urdf_ = true;
 };
 
+/**
+ * Converts the input filestream object to a stringstream object so that is easier to test for in IMotionCUbe.cpp
+ */
+std::string convertSWFileToString(std::ifstream& sw_file);
+
 #endif  // MARCH_HARDWARE_BUILDER_HARDWARE_BUILDER_H

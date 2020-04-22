@@ -24,9 +24,10 @@ using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::SoftJointLimits;
 using march::Joint;
 
-MarchHardwareInterface::MarchHardwareInterface(std::unique_ptr<march::MarchRobot> robot)
+MarchHardwareInterface::MarchHardwareInterface(std::unique_ptr<march::MarchRobot> robot, bool reset_imc)
   : march_robot_(std::move(robot))
   , has_power_distribution_board_(this->march_robot_->getPowerDistributionBoard().getSlaveIndex() != -1)
+  , reset_imc_(reset_imc)
 {
   // Get joint names from urdf
   for (const auto& urdf_joint : this->march_robot_->getUrdf().joints_)
@@ -36,7 +37,6 @@ MarchHardwareInterface::MarchHardwareInterface(std::unique_ptr<march::MarchRobot
       this->joint_names_.push_back(urdf_joint.first);
     }
   }
-
   this->num_joints_ = this->joint_names_.size();
 }
 
@@ -55,7 +55,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
   this->reserveMemory();
 
   // Start ethercat cycle in the hardware
-  this->march_robot_->startEtherCAT();
+  this->march_robot_->startEtherCAT(this->reset_imc_);
 
   for (size_t i = 0; i < num_joints_; ++i)
   {
@@ -165,9 +165,8 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
       joint.prepareActuation();
 
       // Set the first target as the current position
-      joint_position_[i] = joint.getAngleRadAbsolute();
-      relative_joint_position_[i] = joint.getAngleRadMostPrecise();
-      joint_velocity_[i] = 0;
+      joint_position_[i] = joint.getPosition();
+      joint_velocity_[i] = joint.getVelocity();
       joint_effort_[i] = 0;
 
       if (joint.getActuationMode() == march::ActuationMode::position)
@@ -203,33 +202,17 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
   for (size_t i = 0; i < num_joints_; i++)
   {
     march::Joint& joint = march_robot_->getJoint(joint_names_[i]);
-    if (joint.receivedDataUpdate())
+
+    // Update position with he most accurate velocity
+    joint.readEncoders(elapsed_time);
+    joint_position_[i] = joint.getPosition();
+    joint_velocity_[i] = joint.getVelocity();
+
+    if (joint.hasTemperatureGES())
     {
-      const double old_relative_position = relative_joint_position_[i];
-
-      joint_position_[i] = joint.getAngleRadAbsolute();
-      relative_joint_position_[i] = joint.getAngleRadMostPrecise();
-
-      if (joint.hasTemperatureGES())
-      {
-        joint_temperature_[i] = joint.getTemperature();
-      }
-
-      // Get velocity from encoder position
-      const double joint_velocity = (relative_joint_position_[i] - old_relative_position) / elapsed_time.toSec();
-
-      // Apply exponential smoothing to velocity obtained from encoder with
-      joint_velocity_[i] =
-          MarchHardwareInterface::ALPHA * joint_velocity + (1 - MarchHardwareInterface::ALPHA) * joint_velocity_[i];
-
-      joint_effort_[i] = joint.getTorque();
+      joint_temperature_[i] = joint.getTemperature();
     }
-    else
-    {
-      // If no update was received, assume constant velocity.
-      joint_position_[i] += joint_velocity_[i] * elapsed_time.toSec();
-      relative_joint_position_[i] += joint_velocity_[i] * elapsed_time.toSec();
-    }
+    joint_effort_[i] = joint.getTorque();
   }
 
   this->updateIMotionCubeState();
@@ -295,7 +278,6 @@ int MarchHardwareInterface::getEthercatCycleTime() const
 void MarchHardwareInterface::reserveMemory()
 {
   joint_position_.resize(num_joints_);
-  relative_joint_position_.resize(num_joints_);
   joint_position_command_.resize(num_joints_);
   joint_velocity_.resize(num_joints_);
   joint_velocity_command_.resize(num_joints_);
@@ -318,7 +300,7 @@ void MarchHardwareInterface::reserveMemory()
   imc_state_pub_->msg_.detailed_error_description.resize(num_joints_);
   imc_state_pub_->msg_.motion_error_description.resize(num_joints_);
   imc_state_pub_->msg_.motor_current.resize(num_joints_);
-  imc_state_pub_->msg_.motor_voltage.resize(num_joints_);
+  imc_state_pub_->msg_.imc_voltage.resize(num_joints_);
   imc_state_pub_->msg_.absolute_encoder_value.resize(num_joints_);
   imc_state_pub_->msg_.incremental_encoder_value.resize(num_joints_);
 }
@@ -434,7 +416,7 @@ void MarchHardwareInterface::updateIMotionCubeState()
     imc_state_pub_->msg_.detailed_error_description[i] = imc_state.detailedErrorDescription;
     imc_state_pub_->msg_.motion_error_description[i] = imc_state.motionErrorDescription;
     imc_state_pub_->msg_.motor_current[i] = imc_state.motorCurrent;
-    imc_state_pub_->msg_.motor_voltage[i] = imc_state.motorVoltage;
+    imc_state_pub_->msg_.imc_voltage[i] = imc_state.IMCVoltage;
     imc_state_pub_->msg_.absolute_encoder_value[i] = imc_state.absoluteEncoderValue;
     imc_state_pub_->msg_.incremental_encoder_value[i] = imc_state.incrementalEncoderValue;
   }
