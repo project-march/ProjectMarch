@@ -5,6 +5,8 @@
 
 namespace gazebo
 {
+// The documentation on the CoM controller Plugin can be found at
+// https://docs.projectmarch.nl/doc/march_packages/march_simulation.html#com-controller-plugin
 void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
 {
   // Make sure the ROS node for Gazebo has already been initialized
