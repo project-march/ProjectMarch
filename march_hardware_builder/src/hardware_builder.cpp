@@ -231,9 +231,9 @@ march::PowerDistributionBoard HardwareBuilder::createPowerDistributionBoard(cons
       net_monitor_byte_offsets["highVoltageOvercurrentTrigger"].as<int>(),
       net_monitor_byte_offsets["highVoltageEnabled"].as<int>(), net_monitor_byte_offsets["highVoltageState"].as<int>());
 
-  NetDriverOffsets net_driver_offsets = NetDriverOffsets(
-      net_driver_byte_offsets["lowVoltageNetOnOff"].as<int>(), net_driver_byte_offsets["highVoltageNetOnOff"].as<int>(),
-      net_driver_byte_offsets["highVoltageNetEnableDisable"].as<int>());
+  NetDriverOffsets net_driver_offsets = NetDriverOffsets(net_driver_byte_offsets["lowVoltageNetOnOff"].as<int>(),
+                                                         net_driver_byte_offsets["highVoltageNetOnOff"].as<int>(),
+                                                         net_driver_byte_offsets["allhighVoltageOnOff"].as<int>());
 
   BootShutdownOffsets boot_shutdown_offsets = BootShutdownOffsets(
       boot_shutdown_byte_offsets["masterOk"].as<int>(), boot_shutdown_byte_offsets["shutdown"].as<int>(),
