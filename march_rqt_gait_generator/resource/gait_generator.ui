@@ -262,7 +262,7 @@ Text-align: right
       <item row="0" column="4">
        <widget class="QCheckBox" name="effort_plot_check_box">
         <property name="text">
-         <string>Effort Plot</string>
+         <string>Max Effort Plot</string>
         </property>
        </widget>
       </item>
