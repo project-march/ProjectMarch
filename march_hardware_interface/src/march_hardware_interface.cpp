@@ -150,9 +150,8 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
       joint.prepareActuation();
 
       // Set the first target as the current position
-      joint_position_[i] = joint.getAngleRadAbsolute();
-      relative_joint_position_[i] = joint.getAngleRadMostPrecise();
-      joint_velocity_[i] = 0;
+      joint_position_[i] = joint.getPosition();
+      joint_velocity_[i] = joint.getVelocity();
       joint_effort_[i] = 0;
 
       if (joint.getActuationMode() == march::ActuationMode::position)
@@ -197,33 +196,17 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
   for (size_t i = 0; i < num_joints_; i++)
   {
     march::Joint& joint = march_robot_->getJoint(i);
-    if (joint.receivedDataUpdate())
+
+    // Update position with he most accurate velocity
+    joint.readEncoders(elapsed_time);
+    joint_position_[i] = joint.getPosition();
+    joint_velocity_[i] = joint.getVelocity();
+
+    if (joint.hasTemperatureGES())
     {
-      const double old_relative_position = relative_joint_position_[i];
-
-      joint_position_[i] = joint.getAngleRadAbsolute();
-      relative_joint_position_[i] = joint.getAngleRadMostPrecise();
-
-      if (joint.hasTemperatureGES())
-      {
-        joint_temperature_[i] = joint.getTemperature();
-      }
-
-      // Get velocity from encoder position
-      const double joint_velocity = (relative_joint_position_[i] - old_relative_position) / elapsed_time.toSec();
-
-      // Apply exponential smoothing to velocity obtained from encoder with
-      joint_velocity_[i] =
-          MarchHardwareInterface::ALPHA * joint_velocity + (1 - MarchHardwareInterface::ALPHA) * joint_velocity_[i];
-
-      joint_effort_[i] = joint.getTorque();
+      joint_temperature_[i] = joint.getTemperature();
     }
-    else
-    {
-      // If no update was received, assume constant velocity.
-      joint_position_[i] += joint_velocity_[i] * elapsed_time.toSec();
-      relative_joint_position_[i] += joint_velocity_[i] * elapsed_time.toSec();
-    }
+    joint_effort_[i] = joint.getTorque();
   }
 
   this->updateIMotionCubeState();
@@ -300,7 +283,6 @@ void MarchHardwareInterface::uploadJointNames(ros::NodeHandle& nh) const
 void MarchHardwareInterface::reserveMemory()
 {
   joint_position_.resize(num_joints_);
-  relative_joint_position_.resize(num_joints_);
   joint_position_command_.resize(num_joints_);
   joint_velocity_.resize(num_joints_);
   joint_velocity_command_.resize(num_joints_);
