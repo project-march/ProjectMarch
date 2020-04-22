@@ -34,11 +34,6 @@ IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absol
   }
   this->absolute_encoder_->setSlaveIndex(slave_index);
   this->incremental_encoder_->setSlaveIndex(slave_index);
-  this->is_incremental_more_precise_ =
-      (this->incremental_encoder_->getTotalPositions() * this->incremental_encoder_->getTransmission() >
-       this->absolute_encoder_->getTotalPositions() * 10);
-  // Multiply by ten to ensure the rotational joints keep using absolute encoders. These are somehow more accurate
-  // even though they theoretically shouldn't be.
 }
 IMotionCube::IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
                          std::unique_ptr<IncrementalEncoder> incremental_encoder, std::string& sw_stream,
@@ -211,16 +206,14 @@ double IMotionCube::getAngleRadIncremental()
   return this->incremental_encoder_->getAngleRad(this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
 }
 
-double IMotionCube::getAngleRadMostPrecise()
+double IMotionCube::getAbsoluteRadPerBit() const
 {
-  if (this->is_incremental_more_precise_)
-  {
-    return this->getAngleRadIncremental();
-  }
-  else
-  {
-    return this->getAngleRadAbsolute();
-  }
+  return this->absolute_encoder_->getRadPerBit();
+}
+
+double IMotionCube::getIncrementalRadPerBit() const
+{
+  return this->incremental_encoder_->getRadPerBit();
 }
 
 int16_t IMotionCube::getTorque()
