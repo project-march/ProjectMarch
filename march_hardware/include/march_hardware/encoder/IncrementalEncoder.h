@@ -16,6 +16,7 @@ public:
   ~IncrementalEncoder() noexcept override = default;
 
   double toRad(int32_t iu) const override;
+  double getRadPerBit() const override;
   double getTransmission() const;
 
   /** @brief Override comparison operator */
