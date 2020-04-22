@@ -100,10 +100,6 @@ bool EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
     }
     reset |= joint.initialize(this->cycle_time_ms_);
   }
-  if (reset)
-  {
-    return reset;
-  }
 
   ec_config_map(&this->io_map_);
   ec_configdc();

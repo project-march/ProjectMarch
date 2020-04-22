@@ -51,7 +51,7 @@ void MarchRobot::startEtherCAT(bool reset_imc)
     }
     if (!sw_reset)
     {
-      sw_reset |= ethercatMaster.start(this->jointList);
+      sw_reset = ethercatMaster.start(this->jointList);
     }
 
     if (reset_imc || sw_reset)
@@ -61,7 +61,7 @@ void MarchRobot::startEtherCAT(bool reset_imc)
 
       ROS_INFO("Restarting the EtherCAT Master");
       ethercatMaster.stop();
-      sw_reset |= ethercatMaster.start(this->jointList);
+      sw_reset = ethercatMaster.start(this->jointList);
     }
     if (!sw_reset)
     {
