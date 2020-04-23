@@ -100,12 +100,12 @@ class ModifiableSubgait(Subgait):
 
             if joint_1.setpoints[0].position != joint_2.setpoints[-1].position \
                     or joint_1.setpoints[0].velocity != joint_2.setpoints[-1].velocity:
-                rospy.loginfo('First setpoint of %s != last setpoint of %s', joint_1.name, joint_2.name)
-                return False
+                rospy.loginfo('First setpoint of %s != last setpoint of %s. These subgaits will not be able to loop.',
+                              joint_1.name, joint_2.name)
             if joint_1.setpoints[-1].position != joint_2.setpoints[0].position \
                     or joint_1.setpoints[-1].velocity != joint_2.setpoints[0].velocity:
-                rospy.loginfo('Last setpoint of %s != first setpoint of %s', joint_1.name, joint_2.name)
-                return False
+                rospy.loginfo('Last setpoint of %s != first setpoint of %s. These subgaits will not be able to loop.',
+                              joint_1.name, joint_2.name)
 
         return True
 
