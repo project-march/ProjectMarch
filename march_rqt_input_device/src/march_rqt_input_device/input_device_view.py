@@ -7,6 +7,8 @@ from python_qt_binding.QtWidgets import QPushButton
 from python_qt_binding.QtWidgets import QWidget
 import rospkg
 
+from .image_button import ImageButton
+
 
 class InputDeviceView(QWidget):
     def __init__(self, ui_file, controller):
@@ -20,18 +22,32 @@ class InputDeviceView(QWidget):
         """
         super(InputDeviceView, self).__init__()
         self._controller = controller
+        self._controller.accepted_cb = self._accepted_cb
+        self._controller.finished_cb = self._finished_cb
+        self._controller.rejected_cb = self._rejected_cb
+        self._controller.current_gait_cb = self._current_gait_cb
+
+        self._always_enabled_buttons = []
 
         # Extend the widget with all attributes and children from UI file
         loadUi(ui_file, self)
 
+        self.refresh_button.clicked.connect(self._update_possible_gaits)
+
+        self._create_buttons()
+        self._update_possible_gaits()
+
+    def _create_buttons(self):
         # Create buttons here
         rocker_switch_increment = \
             self.create_button('rocker_switch_up', image_path='/rocker_switch_up.png',
-                               callback=lambda: self._controller.publish_increment_step_size())
+                               callback=lambda: self._controller.publish_increment_step_size(),
+                               always_enabled=True)
 
         rocker_switch_decrement = \
             self.create_button('rocker_switch_down', image_path='/rocker_switch_down.png',
-                               callback=lambda: self._controller.publish_decrement_step_size())
+                               callback=lambda: self._controller.publish_decrement_step_size(),
+                               always_enabled=True)
 
         home_sit = \
             self.create_button('home_sit', image_path='/home_sit.png',
@@ -208,19 +224,24 @@ class InputDeviceView(QWidget):
                                callback=lambda: self._controller.publish_gait('gait_tilted_path_second_end'))
 
         stop_button = self.create_button('gait_stop', image_path='/stop.png',
-                                         callback=lambda: self._controller.publish_stop())
+                                         callback=lambda: self._controller.publish_stop(),
+                                         always_enabled=True)
 
         pause_button = self.create_button('gait_pause', image_path='/pause.png',
-                                          callback=lambda: self._controller.publish_pause())
+                                          callback=lambda: self._controller.publish_pause(),
+                                          always_enabled=True)
 
         continue_button = self.create_button('gait_continue', image_path='/continue.png',
-                                             callback=lambda: self._controller.publish_continue())
+                                             callback=lambda: self._controller.publish_continue(),
+                                             always_enabled=True)
 
         error_button = self.create_button('error', image_path='/error.png',
-                                          callback=lambda: self._controller.publish_error())
+                                          callback=lambda: self._controller.publish_error(),
+                                          always_enabled=True)
 
         sm_to_unknown_button = self.create_button('force unknown',
-                                                  callback=lambda: self.controller.publish_sm_to_unknown())
+                                                  callback=lambda: self._controller.publish_sm_to_unknown(),
+                                                  always_enabled=True)
 
         # The button layout.
         # Position in the array determines position on screen.
@@ -258,45 +279,81 @@ class InputDeviceView(QWidget):
         qt_layout = self.create_layout(march_button_layout)
 
         # Apply the qt_layout to the top level widget.
-        self.frame.findChild(QWidget, 'content').setLayout(qt_layout)
+        self.content.setLayout(qt_layout)
 
         # Make the frame as tight as possible with spacing between the buttons.
         qt_layout.setSpacing(15)
-        self.frame.findChild(QWidget, 'content').adjustSize()
+        self.content.adjustSize()
 
-    @staticmethod
-    def create_button(text, callback=None, image_path=None, size=(125, 150), visible=True, color_code='#1F1E24'):
+    def _accepted_cb(self):
+        self.status_label.setText('Gait accepted')
+        self._update_possible_gaits()
+
+    def _finished_cb(self):
+        self.status_label.setText('Gait finished')
+        self.gait_label.setText('')
+        self._update_possible_gaits()
+
+    def _rejected_cb(self):
+        self.status_label.setText('Gait rejected')
+        self.gait_label.setText('')
+        self._update_possible_gaits()
+
+    def _current_gait_cb(self, gait_name):
+        self.gait_label.setText(gait_name)
+
+    def _update_possible_gaits(self):
+        self.frame.setEnabled(False)
+        self.frame.verticalScrollBar().setEnabled(False)
+        possible_gaits = self._controller.get_possible_gaits()
+        layout = self.content.layout()
+        if layout:
+            for i in range(layout.count()):
+                button = layout.itemAt(i).widget()
+                name = button.objectName()
+                if name in self._always_enabled_buttons:
+                    continue
+
+                if name in possible_gaits:
+                    button.setEnabled(True)
+                else:
+                    button.setEnabled(False)
+        self.frame.setEnabled(True)
+        self.frame.verticalScrollBar().setEnabled(True)
+
+    def create_button(self, name, callback=None, image_path=None, size=(128, 160), always_enabled=False):
         """Create a push button which the mock input device can register.
 
-        :param text:
-            Possible name of the button
+        :param name:
+            Name of the button
         :param callback:
             The callback to attach to the button when pressed
         :param image_path:
             The name of the image file
         :param size:
             Default size of the button
-        :param visible:
-            Turn button invisible on the gui
-        :param color_code:
-            Possible background color of the button
+        :param always_enabled:
+            Never disable the button if it's not in possible gaits
 
         :return:
             A QPushButton object which contains the passed arguments
         """
-        qt_button = QPushButton()
+        if image_path is None:
+            qt_button = QPushButton()
 
-        if image_path:
-            qt_button.setStyleSheet(create_image_button_css(get_image_path(image_path)))
-        else:
-            text = check_string(text)
-            qt_button.setStyleSheet(create_color_button_css(color_code))
+            text = check_string(name)
             qt_button.setText(text)
+        else:
+            qt_button = ImageButton(get_image_path(image_path))
+
+        qt_button.setObjectName(name)
+
+        if always_enabled:
+            self._always_enabled_buttons.append(name)
+            qt_button.setEnabled(True)
 
         qt_button.setMinimumSize(QSize(*size))
-
-        if not visible:
-            qt_button.setVisible(False)
+        qt_button.setMaximumSize(QSize(*size))
 
         if callback:
             qt_button.clicked.connect(callback)
@@ -323,25 +380,6 @@ class InputDeviceView(QWidget):
         return qt_button_layout
 
 
-def create_image_button_css(img_path):
-    """CSS of a button with a background-image."""
-    css_base = """
-    background: url(<img_path>) no-repeat center center;
-    background-color:#1F1E24;
-    color: #000000;
-    """
-    return css_base.replace('<img_path>', img_path)
-
-
-def create_color_button_css(color_code):
-    """CSS of a button with a background-color."""
-    css_base = """
-    background-color: <color_code>;
-    color: #FFFFFF;
-    """
-    return css_base.replace('<color_code>', color_code)
-
-
 def get_image_path(img_name):
     """Create an absolute image path to an image."""
     return os.path.join(
@@ -351,25 +389,11 @@ def get_image_path(img_name):
 
 
 def check_string(text):
-    """Split text into two lines if sentence is to long.
+    """Split text into new lines on every third word.
 
-    :param text:
-        The text to split in half.
-
-    :return:
-        New string which contains of an enter in the middle.
+    :type text: str
+    :param text: The text to split
+    :return New string which contains newlines
     """
-    text = text.replace('_', ' ')
-    split_text = text.split(' ')
-    if len(split_text) >= 3:
-
-        new_string = ''
-        middle = len(split_text) / 2
-
-        new_string += ' '.join(split_text[:middle])
-        new_string += '\n'
-        new_string += ' '.join(split_text[middle:])
-        return new_string
-
-    else:
-        return text
+    words = enumerate(text.replace('_', ' ').split(' '))
+    return reduce(lambda acc, (i, x): acc + '\n' + x if i % 3 == 0 else acc + ' ' + x, words, '')[1:]
