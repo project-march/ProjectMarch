@@ -70,8 +70,8 @@ There are three information boxes in the gait generator: two foot height boxes a
 
 The foot height boxes can be used to estimate how high the exo will step, for example when making a stairs or a rough
 terrain gait. Height left foot shows the height of the left foot, assuming the right foot is flat on the ground.
-Similarly for the height of the right foot. The will be a bit counter intuitive as it does not match with what is shown
-in the preview. The reason it works like this, is because the backpack will usually not be vertically as it is held in
+Similarly for the height of the right foot. The will be a bit counterintuitive as it does not match with what is shown
+in the preview. The reason for this is that the backpack will usually not be completely vertical like it is in
 the preview. Assuming flatness of the feet on the ground is a better approximation in this case (not perfect either!).
 
 The heel-heel distance is the distance between the feet *in the x-z plane*. The y-axis is disregarded. Here the z-axis
@@ -81,7 +81,7 @@ be useful in estimating step size.
 Velocity and Max Effort Plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The velocity plot plots the velocity from axis -max_velocity to max_velocity. The blue dotted line is the zero line.
-If the the velocity comes near the top or the bottom of the graph, the gait will probably not be followed very well,
+If the velocity comes near the top or the bottom of the graph, the gait will probably not be followed very well,
 because the `safety controller <https://wiki.ros.org/pr2_controller_manager/safety_limits/>`_ will prevent the joints
 from rotating that quickly.
 
@@ -89,7 +89,7 @@ The max effort plot shows how much effort the
 `safety controller <https://wiki.ros.org/pr2_controller_manager/safety_limits/>`_ will allow at any point in time.
 The axis is -max_effort to max_effort. This plot contains two lines, one for the maximum negative effort, and one for
 the maximum positive effort. If your gait does not approach either the max velocity or the soft limits, the lines will
-be constant at -max_effort and +max_effort, at at top and bottom of your graph respectively.
+be constant at -max_effort and +max_effort at the top and bottom of your graph respectively.
 
 If a joint comes close to the max_velocity you will see peaks in your max_effort plot. If you joint exceeds the
 max_velocity, the peaks will cross the zero line. This means that the safety controller will apply a minimal effort to
