@@ -26,7 +26,6 @@ private:
 
 public:
   using iterator = std::vector<Joint>::iterator;
-  using const_iterator = std::vector<Joint>::const_iterator;
 
   MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, ::std::string ifName, int ecatCycleTime);
 
@@ -67,9 +66,6 @@ public:
 
   iterator begin();
   iterator end();
-
-  const_iterator begin() const;
-  const_iterator end() const;
 
   PowerDistributionBoard& getPowerDistributionBoard();
   const PowerDistributionBoard& getPowerDistributionBoard() const;

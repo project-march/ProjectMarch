@@ -212,21 +212,6 @@ MarchRobot::iterator MarchRobot::end()
   return this->jointList.end();
 }
 
-MarchRobot::const_iterator MarchRobot::begin() const
-{
-  if (!ethercatMaster.isOperational())
-  {
-    ROS_WARN("Trying to access joints while ethercat is not operational. This "
-             "may lead to incorrect sensor data.");
-  }
-  return this->jointList.begin();
-}
-
-MarchRobot::const_iterator MarchRobot::end() const
-{
-  return this->jointList.end();
-}
-
 PowerDistributionBoard& MarchRobot::getPowerDistributionBoard()
 {
   return powerDistributionBoard;
