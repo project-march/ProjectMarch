@@ -181,7 +181,7 @@ class InputDeviceView(QWidget):
 
         gait_tilted_path_left_knee_bend = \
             self.create_button('gait_tilted_path_left_knee_bend',
-                               callback=lambda: self.controller.publish_gait('gait_tilted_path_left_knee_bend'))
+                               callback=lambda: self._controller.publish_gait('gait_tilted_path_left_knee_bend'))
 
         gait_tilted_path_right_straight_start = \
             self.create_button('gait_tilted_path_right_straight_start',
