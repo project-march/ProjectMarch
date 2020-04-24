@@ -108,7 +108,7 @@ private:
   /**
    * Compares the checksum of the .sw file and the setup on the drive. If both are equal 1 is returned.
    */
-  int verifySetup();
+  bool verifySetup();
   /**
    * Downloads the setup on the .sw file onto the drive using 32bit SDO write functions.
    */

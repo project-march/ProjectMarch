@@ -94,8 +94,16 @@ bool IMotionCube::writeInitialSettings(uint8_t cycle_time)
              this->slaveIndex);
     downloadSetupToDrive();
     checksum_verified = verifySetup();
-    ROS_INFO(checksum_verified ? "writing of the setup data has succeeded" : "writing of the setup data has failed");
-    return true;  // Resets the etherCAT train and imc, necessary after downloading a "new" setup to the drive
+    if (checksum_verified)
+    {
+      ROS_INFO("writing of the setup data has succeeded");
+    }
+    else
+    {
+      ROS_FATAL("writing of the setup data has failed");
+    }
+    return true;  // Resets all imcs and restart the EtherCAT train (necessary after downloading a "new" setup to the
+                  // drive)
   }
   else
   {
@@ -380,7 +388,7 @@ uint32_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
                                  delimiter);
 }
 
-int IMotionCube::verifySetup()
+bool IMotionCube::verifySetup()
 {
   int start_address = 0, end_address = 0;
   uint32_t sw_value = this->computeSWCheckSum(start_address, end_address);

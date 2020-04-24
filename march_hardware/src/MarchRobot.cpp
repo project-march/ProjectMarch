@@ -34,40 +34,30 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, PowerDi
 
 void MarchRobot::startEtherCAT(bool reset_imc)
 {
-  bool sw_reset = false;
-  for (int i = 0; i < 5; i++)
+  if (!hasValidSlaves())
   {
-    if (!hasValidSlaves())
-    {
-      throw error::HardwareException(error::ErrorType::INVALID_SLAVE_CONFIGURATION);
-    }
+    throw error::HardwareException(error::ErrorType::INVALID_SLAVE_CONFIGURATION);
+  }
 
-    ROS_INFO("Slave configuration is non-conflicting");
+  ROS_INFO("Slave configuration is non-conflicting");
 
-    if (ethercatMaster.isOperational())
-    {
-      ROS_WARN("Trying to start EtherCAT while it is already active.");
-      return;
-    }
-    if (!sw_reset)
-    {
-      sw_reset = ethercatMaster.start(this->jointList);
-    }
+  if (ethercatMaster.isOperational())
+  {
+    ROS_WARN("Trying to start EtherCAT while it is already active.");
+    return;
+  }
 
-    if (reset_imc || sw_reset)
-    {
-      ROS_DEBUG("Resetting all IMotionCubes due to either: reset arg: %d or downloading of .sw fie: %d", reset_imc,
-                sw_reset);
-      resetIMotionCubes();
+  bool sw_reset = ethercatMaster.start(this->jointList);
 
-      ROS_INFO("Restarting the EtherCAT Master");
-      ethercatMaster.stop();
-      sw_reset = ethercatMaster.start(this->jointList);
-    }
-    if (!sw_reset)
-    {
-      break;
-    }
+  if (reset_imc || sw_reset)
+  {
+    ROS_DEBUG("Resetting all IMotionCubes due to either: reset arg: %d or downloading of .sw fie: %d", reset_imc,
+              sw_reset);
+    resetIMotionCubes();
+
+    ROS_INFO("Restarting the EtherCAT Master");
+    ethercatMaster.stop();
+    sw_reset = ethercatMaster.start(this->jointList);
   }
 }
 
