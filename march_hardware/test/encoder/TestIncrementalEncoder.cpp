@@ -22,5 +22,5 @@ TEST_F(TestIncrementalEncoder, CorrectToRad)
 {
   const int32_t iu = 1000;
   const double expected = iu * 2.0 * M_PI / (std::pow(2, this->resolution) * this->transmission);
-  ASSERT_EQ(expected, this->encoder.toRad(iu));
+  ASSERT_DOUBLE_EQ(expected, this->encoder.toRad(iu));
 }

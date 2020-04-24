@@ -31,6 +31,9 @@ public:
    */
   IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
               std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
+  IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+              std::unique_ptr<IncrementalEncoder> incremental_encoder, std::string& sw_stream,
+              ActuationMode actuation_mode);
 
   ~IMotionCube() noexcept override = default;
 
@@ -40,9 +43,10 @@ public:
 
   void writeInitialSDOs(int cycle_time) override;
 
-  double getAngleRadAbsolute();
-  double getAngleRadIncremental();
-  double getAngleRadMostPrecise();
+  virtual double getAngleRadAbsolute();
+  virtual double getAngleRadIncremental();
+  double getAbsoluteRadPerBit() const;
+  double getIncrementalRadPerBit() const;
   int16_t getTorque();
   int32_t getAngleIUAbsolute();
   int32_t getAngleIUIncremental();
@@ -55,8 +59,8 @@ public:
 
   ActuationMode getActuationMode() const;
 
-  float getMotorCurrent();
-  float getIMCVoltage();
+  virtual float getMotorCurrent();
+  virtual float getIMCVoltage();
 
   void setControlWord(uint16_t control_word);
 
@@ -98,6 +102,11 @@ private:
   void mapMisoPDOs();
   void mapMosiPDOs();
   void writeInitialSettings(uint8_t cycle_time);
+  /**
+   * Calculates checksum on .sw file passed in string format in sw_string_ by simple summation until next empty line.
+   * Start_address and end_address are filled in the method and used for downloading the .sw file to the drive.
+   */
+  uint32_t computeSWCheckSum(int& start_address, int& end_address);
 
   // Use of smart pointers are necessary here to make dependency injection
   // possible and thus allow for mocking the encoders. A unique pointer is
@@ -105,8 +114,8 @@ private:
   // do not need to be passed around.
   std::unique_ptr<AbsoluteEncoder> absolute_encoder_;
   std::unique_ptr<IncrementalEncoder> incremental_encoder_;
+  std::string sw_string_;
   ActuationMode actuation_mode_;
-  bool is_incremental_more_precise_;
 
   std::unordered_map<IMCObjectName, uint8_t> miso_byte_offsets_;
   std::unordered_map<IMCObjectName, uint8_t> mosi_byte_offsets_;

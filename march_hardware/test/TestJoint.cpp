@@ -163,3 +163,141 @@ TEST_F(JointTest, ResetControllerWithoutController)
   march::Joint joint("reset_controller", 0, true, nullptr, std::move(this->temperature_ges));
   ASSERT_NO_THROW(joint.resetIMotionCube());
 }
+
+TEST_F(JointTest, TestPrepareActuation)
+{
+  EXPECT_CALL(*this->imc, getAngleRadIncremental()).WillOnce(Return(5));
+  EXPECT_CALL(*this->imc, getAngleRadAbsolute()).WillOnce(Return(3));
+  EXPECT_CALL(*this->imc, goToOperationEnabled()).Times(1);
+  march::Joint joint("actuate_true", 0, true, std::move(this->imc));
+  joint.prepareActuation();
+  ASSERT_EQ(joint.getIncrementalPosition(), 5);
+  ASSERT_EQ(joint.getAbsolutePosition(), 3);
+}
+
+TEST_F(JointTest, TestReceivedDataUpdateFirstTimeTrue)
+{
+  EXPECT_CALL(*this->imc, getIMCVoltage()).WillOnce(Return(48));
+  march::Joint joint("actuate_true", 0, true, std::move(this->imc));
+  ASSERT_TRUE(joint.receivedDataUpdate());
+}
+
+TEST_F(JointTest, TestReceivedDataUpdateTrue)
+{
+  EXPECT_CALL(*this->imc, getIMCVoltage()).WillOnce(Return(48)).WillOnce(Return(48.001));
+  march::Joint joint("actuate_true", 0, true, std::move(this->imc));
+  joint.receivedDataUpdate();
+  ASSERT_TRUE(joint.receivedDataUpdate());
+}
+
+TEST_F(JointTest, TestReceivedDataUpdateFalse)
+{
+  EXPECT_CALL(*this->imc, getIMCVoltage()).WillRepeatedly(Return(48));
+  march::Joint joint("actuate_true", 0, true, std::move(this->imc));
+  joint.receivedDataUpdate();
+  ASSERT_FALSE(joint.receivedDataUpdate());
+}
+
+TEST_F(JointTest, TestReadEncodersOnce)
+{
+  ros::Duration elapsed_time(0.2);
+  double velocity = 0.5;
+  double absolute_noise = -2 * this->imc->getAbsoluteRadPerBit();
+
+  double initial_incremental_position = 5;
+  double initial_absolute_position = 3;
+  double new_incremental_position = initial_incremental_position + velocity * elapsed_time.toSec();
+  double new_absolute_position = initial_absolute_position + velocity * elapsed_time.toSec() + absolute_noise;
+
+  EXPECT_CALL(*this->imc, getIMCVoltage()).WillOnce(Return(48));
+  EXPECT_CALL(*this->imc, getMotorCurrent()).WillOnce(Return(5));
+  EXPECT_CALL(*this->imc, getAngleRadIncremental())
+      .WillOnce(Return(initial_incremental_position))
+      .WillOnce(Return(new_incremental_position))
+      .WillOnce(Return(new_incremental_position));
+  EXPECT_CALL(*this->imc, getAngleRadAbsolute())
+      .WillOnce(Return(initial_absolute_position))
+      .WillOnce(Return(new_absolute_position))
+      .WillOnce(Return(new_absolute_position));
+
+  march::Joint joint("actuate_true", 0, true, std::move(this->imc));
+  joint.prepareActuation();
+
+  joint.readEncoders(elapsed_time);
+
+  ASSERT_DOUBLE_EQ(joint.getPosition(), initial_absolute_position + velocity * elapsed_time.toSec());
+  ASSERT_DOUBLE_EQ(joint.getVelocity(),
+                   (new_incremental_position - initial_incremental_position) / elapsed_time.toSec());
+}
+
+TEST_F(JointTest, TestReadEncodersTwice)
+{
+  ros::Duration elapsed_time(0.2);
+  double first_velocity = 0.5;
+  double second_velocity = 0.8;
+
+  double absolute_noise = -this->imc->getAbsoluteRadPerBit();
+
+  double initial_incremental_position = 5;
+  double initial_absolute_position = 3;
+  double second_incremental_position = initial_incremental_position + first_velocity * elapsed_time.toSec();
+  double second_absolute_position = initial_absolute_position + first_velocity * elapsed_time.toSec() + absolute_noise;
+  double third_incremental_position = second_incremental_position + second_velocity * elapsed_time.toSec();
+  double third_absolute_position = second_absolute_position + second_velocity * elapsed_time.toSec() + absolute_noise;
+
+  EXPECT_CALL(*this->imc, getIMCVoltage()).WillOnce(Return(48)).WillOnce(Return(48.01));
+  EXPECT_CALL(*this->imc, getAngleRadIncremental())
+      .WillOnce(Return(initial_incremental_position))
+      .WillOnce(Return(second_incremental_position))
+      .WillOnce(Return(second_incremental_position))
+      .WillOnce(Return(third_incremental_position))
+      .WillOnce(Return(third_incremental_position));
+  EXPECT_CALL(*this->imc, getAngleRadAbsolute())
+      .WillOnce(Return(initial_absolute_position))
+      .WillOnce(Return(second_absolute_position))
+      .WillOnce(Return(second_absolute_position))
+      .WillOnce(Return(third_absolute_position))
+      .WillOnce(Return(third_absolute_position));
+
+  march::Joint joint("actuate_true", 0, true, std::move(this->imc));
+  joint.prepareActuation();
+
+  joint.readEncoders(elapsed_time);
+  joint.readEncoders(elapsed_time);
+
+  ASSERT_DOUBLE_EQ(joint.getPosition(),
+                   initial_absolute_position + (first_velocity + second_velocity) * elapsed_time.toSec());
+  ASSERT_DOUBLE_EQ(joint.getVelocity(),
+                   (third_incremental_position - second_incremental_position) / elapsed_time.toSec());
+}
+
+TEST_F(JointTest, TestReadEncodersNoUpdate)
+{
+  ros::Duration elapsed_time(0.2);
+  double first_velocity = 0.5;
+
+  double absolute_noise = -this->imc->getAbsoluteRadPerBit();
+
+  double initial_incremental_position = 5;
+  double initial_absolute_position = 3;
+  double second_incremental_position = initial_incremental_position + first_velocity * elapsed_time.toSec();
+  double second_absolute_position = initial_absolute_position + first_velocity * elapsed_time.toSec() + absolute_noise;
+
+  EXPECT_CALL(*this->imc, getIMCVoltage()).WillRepeatedly(Return(48));
+  EXPECT_CALL(*this->imc, getAngleRadIncremental())
+      .WillOnce(Return(initial_incremental_position))
+      .WillRepeatedly(Return(second_incremental_position));
+  EXPECT_CALL(*this->imc, getAngleRadAbsolute())
+      .WillOnce(Return(initial_absolute_position))
+      .WillRepeatedly(Return(second_absolute_position));
+
+  march::Joint joint("actuate_true", 0, true, std::move(this->imc));
+  joint.prepareActuation();
+
+  joint.readEncoders(elapsed_time);
+  joint.readEncoders(elapsed_time);
+
+  ASSERT_DOUBLE_EQ(joint.getPosition(), initial_absolute_position + 2 * first_velocity * elapsed_time.toSec());
+  ASSERT_DOUBLE_EQ(joint.getVelocity(),
+                   (second_incremental_position - initial_incremental_position) / elapsed_time.toSec());
+}

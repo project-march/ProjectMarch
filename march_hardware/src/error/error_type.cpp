@@ -43,6 +43,8 @@ const char* getErrorDescription(ErrorType type)
       return "A joint is not allowed to actuate, yet it's trying to actuate";
     case ErrorType::INVALID_SLAVE_INDEX:
       return "Slave index has an invalid value";
+    case ErrorType::INVALID_SW_STRING:
+      return "Slave has incorrect SW file";
     default:
       return "Unknown error occurred. Please create/use a documented error";
   }
