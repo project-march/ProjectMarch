@@ -28,7 +28,7 @@ public:
     * @param byte_offset the byte offset in the slave register for the IU position
     * @returns The current position of the encoder in Internal Units (IU)
     */
-  int32_t getVelocityIU(uint8_t byte_offset) const;
+  float getVelocityIU(uint8_t byte_offset) const;
 
   /**
    * Reads out the encoder from the slave and transforms the result to radians.

@@ -217,12 +217,12 @@ int IMotionCube::getAngleIUIncremental()
   return this->incremental_encoder_->getAngleIU(this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
 }
 
-int32_t IMotionCube::getVelocityIUAbsolute()
+float IMotionCube::getVelocityIUAbsolute()
 {
     return this->absolute_encoder_->getVelocityIU(this->miso_byte_offsets_.at(IMCObjectName::ActualVelocity));
 }
 
-int IMotionCube::getVelocityIUIncremental()
+float IMotionCube::getVelocityIUIncremental()
 {
     return this->incremental_encoder_->getVelocityIU(this->miso_byte_offsets_.at(IMCObjectName::MotorVelocity));
 }

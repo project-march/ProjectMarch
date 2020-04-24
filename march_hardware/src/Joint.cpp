@@ -147,7 +147,7 @@ int32_t Joint::getAngleIUIncremental()
   return this->imc_->getAngleIUIncremental();
 }
 
-int32_t Joint::getVelocityIUAbsolute()
+float Joint::getVelocityIUAbsolute()
 {
     if (!this->hasIMotionCube())
     {
@@ -157,7 +157,7 @@ int32_t Joint::getVelocityIUAbsolute()
     return this->imc_->getVelocityIUAbsolute();
 }
 
-int32_t Joint::getVelocityIUIncremental()
+float Joint::getVelocityIUIncremental()
 {
     if (!this->hasIMotionCube())
     {
@@ -197,8 +197,8 @@ IMotionCubeState Joint::getIMotionCubeState()
 
   states.absoluteEncoderValue = this->imc_->getAngleIUAbsolute();
   states.incrementalEncoderValue = this->imc_->getAngleIUIncremental();
-  states.absoluteEncoderValue = this->imc_->getVelocityIUAbsolute();
-  states.incrementalEncoderValue = this->imc_->getVelocityIUIncremental();
+  states.absoluteVelocity = this->imc_->getVelocityIUAbsolute();
+  states.incrementalVelocity = this->imc_->getVelocityIUIncremental();
 
   return states;
 }
