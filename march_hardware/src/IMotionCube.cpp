@@ -414,7 +414,7 @@ bool IMotionCube::verifySetup()
 void IMotionCube::downloadSetupToDrive()
 {
   int mem_location;
-  uint32_t mem_setup = 9;   // send 16-bits and auto increment
+  uint32_t mem_setup = 9;  // send 16-bits and auto increment
   int result = 0;
   int final_result = 0;
   uint32_t data;
