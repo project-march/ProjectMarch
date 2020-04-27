@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
-#ifndef MARCH_HARDWARE_ETHERCAT_ETHERCATIO_H
-#define MARCH_HARDWARE_ETHERCAT_ETHERCATIO_H
+#ifndef MARCH_HARDWARE_ETHERCAT_PDO_TYPES_H
+#define MARCH_HARDWARE_ETHERCAT_PDO_TYPES_H
 #include <cstdint>
 
 namespace march
@@ -47,4 +47,4 @@ union bit8
   uint8_t b0;
 };
 }  // namespace march
-#endif  // MARCH_HARDWARE_ETHERCAT_ETHERCATIO_H
+#endif  // MARCH_HARDWARE_ETHERCAT_PDO_TYPES_H
