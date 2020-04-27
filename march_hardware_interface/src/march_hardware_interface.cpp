@@ -253,7 +253,7 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
     }
     if (found_non_zero)
     {
-      ROS_FATAL("Safety limits acted on start-up");
+      throw std::runtime_error("Safety limits acted on start-up");
     }
     has_actuated_ = true;
   }
