@@ -1,42 +1,21 @@
 // Copyright 2019 Project March.
 #ifndef MARCH_HARDWARE_BUILDER_HARDWARE_CONFIG_EXCEPTIONS_H
 #define MARCH_HARDWARE_BUILDER_HARDWARE_CONFIG_EXCEPTIONS_H
-#include <exception>
+#include <sstream>
 #include <string>
 
-#include <ros/ros.h>
+#include <march_hardware/error/error_type.h>
+#include <march_hardware/error/hardware_exception.h>
 
-class HardwareConfigException : public std::exception
+class MissingKeyException : public march::error::HardwareException
 {
 public:
-  std::string msg;
-
-  HardwareConfigException() : std::exception(), msg("Invalid hardware configuration")
-  {
-  }
-
-  explicit HardwareConfigException(std::string msg) : std::exception(), msg(msg)
-  {
-  }
-
-  const char* what() const throw()
-  {
-    return msg.c_str();
-  }
-};
-
-class MissingKeyException : public HardwareConfigException
-{
-public:
-  std::string key_name;
-  std::string object_name;
-
-  explicit MissingKeyException(std::string key_name, std::string object_name)
-    : HardwareConfigException(), key_name(key_name), object_name(object_name)
+  MissingKeyException(const std::string& key_name, const std::string& object_name)
+    : march::error::HardwareException(march::error::ErrorType::MISSING_REQUIRED_KEY)
   {
     std::ostringstream ss;
-    ss << "Missing key '" << key_name << "' while creating object '" << object_name << "'";
-    this->msg = ss.str();
+    ss << "Missing required key '" << key_name << "' while creating object '" << object_name << "'";
+    this->description_ = this->createDescription(ss.str());
   }
 };
 #endif  // MARCH_HARDWARE_BUILDER_HARDWARE_CONFIG_EXCEPTIONS_H
