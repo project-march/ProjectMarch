@@ -23,11 +23,11 @@ public:
   int32_t getAngleIU(uint8_t byte_offset) const;
 
   /**
-    * Reads out the velocity of the encoder from the slave and returns the value in Internal Units (IU).
-    * (IU changed in last second)
-    * @param byte_offset the byte offset in the slave register for the IU position
-    * @returns The current position of the encoder in Internal Units (IU)
-    */
+   * Reads out the velocity of the encoder from the slave and returns the value in Internal Units (IU).
+   * (IU changed in last second)
+   *  @param byte_offset the byte offset in the slave register for the IU position
+   *  @returns The current velocity measured by the encoder in Internal Units (IU)
+   */
   float getVelocityIU(uint8_t byte_offset) const;
 
   /**
