@@ -59,6 +59,9 @@ public:
   static const size_t MIN_RESOLUTION = 1;
   static const size_t MAX_RESOLUTION = 32;
 
+  // constant used for converting a fixed point 16.16 bit number to a float, which is done by dividing by 2^16
+  static constexpr float FIXED_POINT_TO_FLOAT_CONVERSION = 65536.0;
+
   static constexpr double PI_2 = 2 * M_PI;
 
 private:

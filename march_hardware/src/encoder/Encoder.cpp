@@ -28,7 +28,7 @@ float Encoder::getVelocityIU(uint8_t byte_offset) const
         ROS_FATAL("Encoder has slaveIndex of -1");
     }
     union bit32 return_byte = get_input_bit32(this->slave_index_, byte_offset);
-    return return_byte.i / 65536.0;
+    return return_byte.i / FIXED_POINT_TO_FLOAT_CONVERSION;
 }
 
 double Encoder::getAngleRad(uint8_t byte_offset) const
