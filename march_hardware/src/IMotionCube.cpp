@@ -394,7 +394,7 @@ bool IMotionCube::verifySetup()
   uint32_t sw_value = this->computeSWCheckSum(start_address, end_address);
   // set parameters to compute checksum on the imc
   int checksum_setup =
-      sdo_bit32_write(slaveIndex, 0x2069, 0, end_address * 65536 + start_address);  // Endaddress leftshifted 4 times
+      sdo_bit32_write(slaveIndex, 0x2069, 0, end_address << 16 + start_address);  // Endaddress leftshifted 4 times
 
   uint32_t imc_value;
   int value_size = sizeof(imc_value);
