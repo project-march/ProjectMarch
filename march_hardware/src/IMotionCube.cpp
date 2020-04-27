@@ -86,7 +86,7 @@ void IMotionCube::mapMosiPDOs()
 // Set configuration parameters to the IMC
 bool IMotionCube::writeInitialSettings(uint8_t cycle_time)
 {
-  int checksum_verified = verifySetup();
+  bool checksum_verified = verifySetup();
 
   if (!checksum_verified)
   {
@@ -394,7 +394,7 @@ bool IMotionCube::verifySetup()
   uint32_t sw_value = this->computeSWCheckSum(start_address, end_address);
   // set parameters to compute checksum on the imc
   int checksum_setup =
-      sdo_bit32_write(slaveIndex, 0x2069, 0, end_address << 16 + start_address);  // Endaddress leftshifted 4 times
+      sdo_bit32_write(slaveIndex, 0x2069, 0, (end_address << 16) + start_address);  // Endaddress leftshifted 4 times
 
   uint32_t imc_value;
   int value_size = sizeof(imc_value);
@@ -414,7 +414,6 @@ bool IMotionCube::verifySetup()
 void IMotionCube::downloadSetupToDrive()
 {
   int mem_location;
-  int hex_ls_four = 65536;  // multiplying with this number will left-shift the other by 4 in hexadecimal notation
   uint32_t mem_setup = 9;   // send 16-bits and auto increment
   int result = 0;
   int final_result = 0;
@@ -447,7 +446,7 @@ void IMotionCube::downloadSetupToDrive()
 
         if (pos - old_pos != delimiter.length())
         {
-          data = std::stoi(next_token, nullptr, 16) * hex_ls_four + std::stoi(token, nullptr, 16);
+          data = (std::stoi(next_token, nullptr, 16) << 16) + std::stoi(token, nullptr, 16);
         }
         else
         {

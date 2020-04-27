@@ -107,10 +107,14 @@ private:
   uint32_t computeSWCheckSum(int& start_address, int& end_address);
   /**
    * Compares the checksum of the .sw file and the setup on the drive. If both are equal 1 is returned.
+   * This method makes use of the computeSWCheckSum(int&, int&) method. The start and end addresses are used in
+   * conjunction with the registers 0x2069 and 0x206A (described in the CoE manual fro Technosoft(2019) in par. 16.2.5
+   * and 16.2.6) to determine the checksum on the drive.
    */
   bool verifySetup();
   /**
    * Downloads the setup on the .sw file onto the drive using 32bit SDO write functions.
+   * The general process is specified in chapter 16.4 of the CoE manual from Technosoft(2019).
    */
   void downloadSetupToDrive();
 
