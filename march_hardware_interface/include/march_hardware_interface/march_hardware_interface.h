@@ -128,6 +128,8 @@ private:
   bool enable_high_voltage_command_ = true;
   bool reset_imc_ = false;
 
+  bool has_actuated_ = false;
+
   /* Real time safe publishers */
   RtPublisherPtr<march_shared_resources::AfterLimitJointCommand> after_limit_joint_command_pub_;
   RtPublisherPtr<march_shared_resources::ImcState> imc_state_pub_;
