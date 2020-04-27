@@ -429,7 +429,7 @@ void IMotionCube::downloadSetupToDrive()
     token = sw_string_.substr(old_pos, pos - old_pos);
     if (old_pos == 0)
     {
-      mem_location = std::stoi(token, nullptr, 16) * hex_ls_four;
+      mem_location = std::stoi(token, nullptr, 16) << 16;
       result = sdo_bit32_write(slaveIndex, 0x2064, 0, mem_location + mem_setup);  // write the write-configuration
       final_result |= result;
     }
