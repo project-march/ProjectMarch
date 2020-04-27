@@ -38,15 +38,19 @@ if(CATKIN_ENABLE_TESTING AND ENABLE_COVERAGE_TESTING)
 endif()
 
 add_library(${PROJECT_NAME}
+    include/${PROJECT_NAME}/EtherCAT/pdo_interface.h
+    include/${PROJECT_NAME}/EtherCAT/pdo_types.h
+    include/${PROJECT_NAME}/EtherCAT/sdo_interface.h
+    include/${PROJECT_NAME}/EtherCAT/slave.h
     include/${PROJECT_NAME}/encoder/AbsoluteEncoder.h
     include/${PROJECT_NAME}/encoder/Encoder.h
     include/${PROJECT_NAME}/encoder/IncrementalEncoder.h
     include/${PROJECT_NAME}/error/error_type.h
     include/${PROJECT_NAME}/error/hardware_exception.h
     include/${PROJECT_NAME}/error/motion_error.h
-    src/EtherCAT/EthercatIO.cpp
     src/EtherCAT/EthercatMaster.cpp
-    src/EtherCAT/EthercatSDO.cpp
+    src/EtherCAT/pdo_interface.cpp
+    src/EtherCAT/sdo_interface.cpp
     src/HighVoltage.cpp
     src/IMotionCube.cpp
     src/IMotionCubeTargetState.cpp
