@@ -1,0 +1,11 @@
+pub_rate: 1.0
+base_path: ''
+analyzers:
+  temperatures:
+    type: diagnostic_aggregator/GenericAnalyzer
+    path: Temperatures
+    contains: 'Temperature'
+  inputs:
+    type: diagnostic_aggregator/GenericAnalyzer
+    path: Inputs
+    contains: 'input_device'
