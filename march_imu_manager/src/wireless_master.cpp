@@ -92,8 +92,8 @@ int WirelessMaster::configure(const int update_rate, const int channel)
   ROS_DEBUG_STREAM("Setting update rate to " << new_update_rate << " Hz...");
   if (!this->master_->setUpdateRate(new_update_rate))
   {
-      ROS_FATAL_STREAM("Failed to set update rate");
-      return -1;
+    ROS_FATAL_STREAM("Failed to set update rate");
+    return -1;
   }
 
   ROS_DEBUG("Disabling radio channel if previously enabled...");
