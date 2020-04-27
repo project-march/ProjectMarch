@@ -87,8 +87,8 @@ int WirelessMaster::configure(const int update_rate, const int channel)
   }
   ROS_DEBUG_STREAM("Supported update rates: " << update_rates.str());
 
-  int new_update_rate = findClosestUpdateRate(supported_update_rates, update_rate);
-  new_update_rate = 60;
+  const int new_update_rate = findClosestUpdateRate(supported_update_rates, update_rate);
+  
   ROS_DEBUG_STREAM("Setting update rate to " << new_update_rate << " Hz...");
   if (!this->master_->setUpdateRate(new_update_rate))
   {
