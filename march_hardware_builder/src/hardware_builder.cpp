@@ -9,9 +9,11 @@
 #include <utility>
 #include <vector>
 #include <fstream>
-#include <sstream>
 
 #include <ros/ros.h>
+
+#include <march_hardware/error/error_type.h>
+#include <march_hardware/error/hardware_exception.h>
 
 // clang-format off
 const std::vector<std::string> HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS =
@@ -28,7 +30,7 @@ const std::vector<std::string> HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRE
     {
         "slaveIndex", "bootShutdownOffsets", "netMonitorByteOffsets", "netDriverByteOffsets"
     };
-const std::vector<std::string> HardwareBuilder::JOINT_REQUIRED_KEYS = { "allowActuation", "imotioncube" };
+const std::vector<std::string> HardwareBuilder::JOINT_REQUIRED_KEYS = { "allowActuation" };
 // clang-format on
 
 HardwareBuilder::HardwareBuilder(AllowedRobot robot) : HardwareBuilder(robot.getFilePath())
@@ -61,29 +63,19 @@ std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
   const auto if_name = config["ifName"].as<std::string>();
   const auto cycle_time = config["ecatCycleTime"].as<int>();
 
-  YAML::Node joint_list_config = config["joints"];
-
-  std::vector<march::Joint> joint_list;
-
-  for (const YAML::Node& joint_config : joint_list_config)
-  {
-    const auto joint_name = joint_config.begin()->first.as<std::string>();
-    march::Joint joint(
-        HardwareBuilder::createJoint(joint_config[joint_name], joint_name, this->urdf_.getJoint(joint_name)));
-    joint_list.push_back(std::move(joint));
-  }
+  std::vector<march::Joint> joints = this->createJoints(config["joints"]);
 
   ROS_INFO_STREAM("Robot config:\n" << config);
   YAML::Node pdb_config = config["powerDistributionBoard"];
   if (pdb_config)
   {
     auto pdb = HardwareBuilder::createPowerDistributionBoard(pdb_config);
-    return std::make_unique<march::MarchRobot>(std::move(joint_list), this->urdf_, pdb, if_name, cycle_time);
+    return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_, pdb, if_name, cycle_time);
   }
   else
   {
     ROS_INFO("powerDistributionBoard is NOT defined");
-    return std::make_unique<march::MarchRobot>(std::move(joint_list), this->urdf_, if_name, cycle_time);
+    return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_, if_name, cycle_time);
   }
 }
 
@@ -91,6 +83,11 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const 
                                           const urdf::JointConstSharedPtr& urdf_joint)
 {
   ROS_DEBUG("Starting creation of joint %s", joint_name.c_str());
+  if (!urdf_joint)
+  {
+    throw march::error::HardwareException(march::error::ErrorType::MISSING_URDF_JOINT,
+                                          "No URDF joint given for joint " + joint_name);
+  }
   HardwareBuilder::validateRequiredKeysExist(joint_config, HardwareBuilder::JOINT_REQUIRED_KEYS, "joint");
 
   auto net_number = -1;
@@ -129,7 +126,7 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
                                                                        march::ActuationMode mode,
                                                                        const urdf::JointConstSharedPtr& urdf_joint)
 {
-  if (!imc_config)
+  if (!imc_config || !urdf_joint)
   {
     return nullptr;
   }
@@ -151,7 +148,7 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
 std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
     const YAML::Node& absolute_encoder_config, const urdf::JointConstSharedPtr& urdf_joint)
 {
-  if (!absolute_encoder_config)
+  if (!absolute_encoder_config || !urdf_joint)
   {
     return nullptr;
   }
@@ -260,10 +257,41 @@ void HardwareBuilder::initUrdf()
   {
     if (!this->urdf_.initParam("/robot_description"))
     {
-      throw HardwareConfigException("Failed to load urdf from parameter server");
+      throw march::error::HardwareException(march::error::ErrorType::INIT_URDF_FAILED);
     }
     this->init_urdf_ = false;
   }
+}
+
+std::vector<march::Joint> HardwareBuilder::createJoints(const YAML::Node& joints_config) const
+{
+  std::vector<march::Joint> joints;
+  for (const YAML::Node& joint_config : joints_config)
+  {
+    const auto joint_name = joint_config.begin()->first.as<std::string>();
+    const auto urdf_joint = this->urdf_.getJoint(joint_name);
+    if (urdf_joint->type == urdf::Joint::FIXED)
+    {
+      ROS_WARN("Joint %s is fixed in the URDF, but defined in the robot yaml", joint_name.c_str());
+    }
+    joints.push_back(HardwareBuilder::createJoint(joint_config[joint_name], joint_name, urdf_joint));
+  }
+
+  for (const auto& urdf_joint : this->urdf_.joints_)
+  {
+    if (urdf_joint.second->type != urdf::Joint::FIXED)
+    {
+      auto equals_joint_name = [&](const auto& joint) { return joint.getName() == urdf_joint.first; };
+      auto result = std::find_if(joints.begin(), joints.end(), equals_joint_name);
+      if (result == joints.end())
+      {
+        ROS_WARN("Joint %s in URDF is not defined in robot yaml", urdf_joint.first.c_str());
+      }
+    }
+  }
+
+  joints.shrink_to_fit();
+  return joints;
 }
 
 std::string convertSWFileToString(std::ifstream& sw_file)

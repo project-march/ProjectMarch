@@ -83,10 +83,19 @@ public:
   static const std::vector<std::string> JOINT_REQUIRED_KEYS;
 
 private:
-  /*
+  /**
    * Initializes the URDF if necessary.
    */
   void initUrdf();
+
+  /**
+   * Returns all joints found in the given config.
+   * Warns when joints are defined as FIXED in the URDF and when a non-FIXED
+   * joint is not contained in the config.
+   * @param joints_config YAML node that contains a sequence of joint objects
+   * @return list of created joints
+   */
+  std::vector<march::Joint> createJoints(const YAML::Node& joints_config) const;
 
   YAML::Node robot_config_;
   urdf::Model urdf_;
