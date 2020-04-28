@@ -12,7 +12,7 @@ namespace march
 class Slave : public PdoInterface
 {
 public:
-  explicit Slave(int slave_index, PdoInterface& pdo_interface, SdoInterface& sdo_interface)
+  Slave(uint16_t slave_index, PdoInterface& pdo_interface, SdoInterface& sdo_interface)
     : slave_index_(slave_index)
     , pdo_interface_(pdo_interface)
     , sdo_interface_(sdo_interface)
@@ -26,7 +26,7 @@ public:
 
   virtual ~Slave() noexcept = default;
 
-  int getSlaveIndex() const
+  uint16_t getSlaveIndex() const
   {
     return this->slave_index_;
   }
@@ -68,7 +68,7 @@ protected:
   }
 
 private:
-  const int slave_index_;
+  const uint16_t slave_index_;
   PdoInterface& pdo_interface_;
   SdoInterface& sdo_interface_;
 };
