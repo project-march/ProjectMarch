@@ -18,7 +18,7 @@ int SdoInterfaceImpl::write(uint16_t slave, uint16_t index, uint8_t sub, std::si
   return working_counter;
 }
 
-int SdoInterfaceImpl::read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size, void* value)
+int SdoInterfaceImpl::read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size, void* value) const
 {
   ROS_DEBUG("sdo_read: slave %i, reg 0x%X, sub index %i", slave, index, sub);
   const int working_counter =  ec_SDOread(slave, index, sub, FALSE, &val_size, value, EC_TIMEOUTRXM);

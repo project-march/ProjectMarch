@@ -38,7 +38,7 @@ public:
    * @return received working counter from the read operation. Returns 0 when a failure occurred, positive otherwise.
    */
   template <typename T>
-  int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size, T& value)
+  int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size, T& value) const
   {
     return this->read(slave, index, sub, val_size, &value);
   }
@@ -46,7 +46,7 @@ public:
 protected:
   virtual int write(uint16_t slave, uint16_t index, uint8_t sub, std::size_t size, void* value) = 0;
 
-  virtual int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size, void* value) = 0;
+  virtual int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size, void* value) const = 0;
 };
 
 class SdoInterfaceImpl : public SdoInterface
@@ -54,7 +54,7 @@ class SdoInterfaceImpl : public SdoInterface
 protected:
   int write(uint16_t slave, uint16_t index, uint8_t sub, std::size_t size, void* value) override;
 
-  int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size, void* value) override;
+  int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size, void* value) const override;
 };
 }
 #endif  // MARCH_HARDWARE_SDO_INTERFACE_H
