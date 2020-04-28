@@ -59,26 +59,32 @@ TEST_F(IMotionCubeTest, NoConfig)
             HardwareBuilder::createIMotionCube(config["imotioncube"], march::ActuationMode::unknown, this->joint));
 }
 
+TEST_F(IMotionCubeTest, NoUrdfJoint)
+{
+  YAML::Node config = this->loadTestYaml("/imotioncube_correct.yaml");
+  ASSERT_EQ(nullptr, HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, nullptr));
+}
+
 TEST_F(IMotionCubeTest, NoAbsoluteEncoder)
 {
-  YAML::Node iMotionCubeConfig = this->loadTestYaml("/imotioncube_no_absolute_encoder.yaml");
+  YAML::Node config = this->loadTestYaml("/imotioncube_no_absolute_encoder.yaml");
 
-  ASSERT_THROW(HardwareBuilder::createIMotionCube(iMotionCubeConfig, march::ActuationMode::unknown, this->joint),
+  ASSERT_THROW(HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, this->joint),
                MissingKeyException);
 }
 
 TEST_F(IMotionCubeTest, NoIncrementalEncoder)
 {
-  YAML::Node iMotionCubeConfig = this->loadTestYaml("/imotioncube_no_incremental_encoder.yaml");
+  YAML::Node config = this->loadTestYaml("/imotioncube_no_incremental_encoder.yaml");
 
-  ASSERT_THROW(HardwareBuilder::createIMotionCube(iMotionCubeConfig, march::ActuationMode::unknown, this->joint),
+  ASSERT_THROW(HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, this->joint),
                MissingKeyException);
 }
 
 TEST_F(IMotionCubeTest, NoSlaveIndex)
 {
-  YAML::Node iMotionCubeConfig = this->loadTestYaml("/imotioncube_no_slave_index.yaml");
+  YAML::Node config = this->loadTestYaml("/imotioncube_no_slave_index.yaml");
 
-  ASSERT_THROW(HardwareBuilder::createIMotionCube(iMotionCubeConfig, march::ActuationMode::unknown, this->joint),
+  ASSERT_THROW(HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, this->joint),
                MissingKeyException);
 }
