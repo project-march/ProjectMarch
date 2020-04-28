@@ -241,7 +241,7 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
     {
       if (joint_effort_command_[i] != 0)
       {
-        ROS_ERROR("Non-zero effort on first actuation for joint %s", joint_names_[i].c_str());
+        ROS_ERROR("Non-zero effort on first actuation for joint %s", getJoint(i).getName.c_str());
         found_non_zero = true;
       }
     }
