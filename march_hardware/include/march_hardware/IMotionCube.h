@@ -3,13 +3,14 @@
 #ifndef MARCH_HARDWARE_IMOTIONCUBE_H
 #define MARCH_HARDWARE_IMOTIONCUBE_H
 #include "march_hardware/ActuationMode.h"
-#include "march_hardware/encoder/AbsoluteEncoder.h"
-#include "march_hardware/encoder/IncrementalEncoder.h"
-#include "march_hardware/EtherCAT/EthercatIO.h"
+#include "march_hardware/EtherCAT/pdo_types.h"
+#include "march_hardware/EtherCAT/sdo_interface.h"
+#include "march_hardware/EtherCAT/slave.h"
 #include "march_hardware/IMotionCubeState.h"
 #include "march_hardware/IMotionCubeTargetState.h"
 #include "march_hardware/PDOmap.h"
-#include "march_hardware/Slave.h"
+#include "march_hardware/encoder/AbsoluteEncoder.h"
+#include "march_hardware/encoder/IncrementalEncoder.h"
 
 #include <memory>
 #include <unordered_map>
@@ -29,9 +30,9 @@ public:
    * @param actuation_mode actuation mode in which the IMotionCube must operate
    * @throws std::invalid_argument When an absolute or incremental encoder is nullptr.
    */
-  IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+  IMotionCube(Slave slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
               std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
-  IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+  IMotionCube(Slave slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
               std::unique_ptr<IncrementalEncoder> incremental_encoder, std::string& sw_stream,
               ActuationMode actuation_mode);
 
@@ -40,8 +41,6 @@ public:
   /* Delete copy constructor/assignment since the unique_ptrs cannot be copied */
   IMotionCube(const IMotionCube&) = delete;
   IMotionCube& operator=(const IMotionCube&) = delete;
-
-  void writeInitialSDOs(int cycle_time) override;
 
   virtual double getAngleRadAbsolute();
   virtual double getAngleRadIncremental();
@@ -73,13 +72,13 @@ public:
   /** @brief Override comparison operator */
   friend bool operator==(const IMotionCube& lhs, const IMotionCube& rhs)
   {
-    return lhs.slaveIndex == rhs.slaveIndex && *lhs.absolute_encoder_ == *rhs.absolute_encoder_ &&
+    return lhs.getSlaveIndex() == rhs.getSlaveIndex() && *lhs.absolute_encoder_ == *rhs.absolute_encoder_ &&
            *lhs.incremental_encoder_ == *rhs.incremental_encoder_;
   }
   /** @brief Override stream operator for clean printing */
   friend std::ostream& operator<<(std::ostream& os, const IMotionCube& imc)
   {
-    return os << "slaveIndex: " << imc.slaveIndex << ", "
+    return os << "slaveIndex: " << imc.getSlaveIndex() << ", "
               << "incrementalEncoder: " << *imc.incremental_encoder_ << ", "
               << "absoluteEncoder: " << *imc.absolute_encoder_;
   }
@@ -94,12 +93,15 @@ public:
   // 500 * 100us = 50 ms = watchdog timer
   static const uint16_t WATCHDOG_TIME = 500;
 
+protected:
+  void initSdo(SdoInterface& sdo, int cycle_time) override;
+
 private:
   void actuateIU(int32_t target_iu);
 
-  void mapMisoPDOs();
-  void mapMosiPDOs();
-  void writeInitialSettings(uint8_t cycle_time);
+  void mapMisoPDOs(SdoInterface& sdo);
+  void mapMosiPDOs(SdoInterface& sdo);
+  void writeInitialSettings(SdoInterface& sdo, int cycle_time);
   /**
    * Calculates checksum on .sw file passed in string format in sw_string_ by simple summation until next empty line.
    * Start_address and end_address are filled in the method and used for downloading the .sw file to the drive.
