@@ -36,8 +36,17 @@ public:
     this->initSdo(this->sdo_interface_, cycle_time);
   }
 
+  void reset()
+  {
+    this->reset(this->sdo_interface_);
+  }
+
 protected:
   virtual void initSdo(SdoInterface& /* sdo */, int /* cycle_time */)
+  {
+  }
+
+  virtual void reset(SdoInterface& /* sdo */)
   {
   }
 

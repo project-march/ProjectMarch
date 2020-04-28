@@ -328,11 +328,11 @@ void IMotionCube::goToOperationEnabled()
   this->goToTargetState(IMotionCubeTargetState::OPERATION_ENABLED);
 }
 
-void IMotionCube::reset()
+void IMotionCube::reset(SdoInterface& sdo)
 {
   this->setControlWord(0);
   ROS_DEBUG("Slave: %d, Try to reset IMC", this->getSlaveIndex());
-  sdo_bit16_write(this->getSlaveIndex(), 0x2080, 0, 1);
+  sdo.write<uint16_t>(this->getSlaveIndex(), 0x2080, 0, 1);
 }
 
 uint32_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)

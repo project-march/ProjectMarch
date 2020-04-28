@@ -67,8 +67,6 @@ public:
   void goToTargetState(IMotionCubeTargetState target_state);
   virtual void goToOperationEnabled();
 
-  virtual void reset();
-
   /** @brief Override comparison operator */
   friend bool operator==(const IMotionCube& lhs, const IMotionCube& rhs)
   {
@@ -95,6 +93,8 @@ public:
 
 protected:
   void initSdo(SdoInterface& sdo, int cycle_time) override;
+
+  void reset(SdoInterface& sdo) override;
 
 private:
   void actuateIU(int32_t target_iu);
