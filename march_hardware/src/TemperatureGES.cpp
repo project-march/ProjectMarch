@@ -5,8 +5,8 @@
 
 namespace march
 {
-TemperatureGES::TemperatureGES(int slave_index, uint8_t byte_offset)
-  : Slave(slave_index)
+TemperatureGES::TemperatureGES(Slave slave, uint8_t byte_offset)
+  : Slave(slave)
   , temperature_byte_offset_(byte_offset)
 {
   ROS_ASSERT_MSG(byte_offset >= 0, "Slave configuration error: temperatureByteOffset %d can not be negative.",

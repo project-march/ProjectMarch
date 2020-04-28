@@ -11,7 +11,7 @@ namespace march
 class TemperatureGES : public Slave, TemperatureSensor
 {
 public:
-  TemperatureGES(int slave_index, uint8_t byte_offset);
+  TemperatureGES(Slave slave, uint8_t byte_offset);
 
   ~TemperatureGES() noexcept override = default;
 
