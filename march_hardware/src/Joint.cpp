@@ -37,7 +37,7 @@ void Joint::initialize(int cycle_time)
 {
   if (this->hasIMotionCube())
   {
-    this->imc_->initSdo(cycle_time);
+    this->imc_->Slave::initSdo(cycle_time);
   }
   if (this->hasTemperatureGES())
   {
@@ -70,7 +70,7 @@ void Joint::resetIMotionCube()
   }
   else
   {
-    this->imc_->reset();
+    this->imc_->Slave::reset();
   }
 }
 

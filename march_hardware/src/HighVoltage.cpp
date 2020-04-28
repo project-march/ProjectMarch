@@ -4,15 +4,15 @@
 
 namespace march
 {
-HighVoltage::HighVoltage(PdoInterface& pdo, int slaveIndex, NetMonitorOffsets netMonitoringOffsets, NetDriverOffsets netDriverOffsets)
+HighVoltage::HighVoltage(PdoInterface& pdo, int slaveIndex, NetMonitorOffsets netMonitoringOffsets,
+                         NetDriverOffsets netDriverOffsets)
   : pdo_(pdo), slaveIndex(slaveIndex), netMonitoringOffsets(netMonitoringOffsets), netDriverOffsets(netDriverOffsets)
 {
 }
 
 float HighVoltage::getNetCurrent()
 {
-  bit32 current = this->pdo_.read32(this->slaveIndex,
-                                    this->netMonitoringOffsets.getHighVoltageNetCurrent());
+  bit32 current = this->pdo_.read32(this->slaveIndex, this->netMonitoringOffsets.getHighVoltageNetCurrent());
   return current.f;
 }
 
@@ -24,8 +24,7 @@ bool HighVoltage::getNetOperational(int netNumber)
                        netNumber);
     throw std::invalid_argument("Only high voltage net 1 and 8 exist");
   }
-  bit8 operational = this->pdo_.read8(this->slaveIndex,
-                                      this->netMonitoringOffsets.getHighVoltageState());
+  bit8 operational = this->pdo_.read8(this->slaveIndex, this->netMonitoringOffsets.getHighVoltageState());
   // The first bit of the 8 bits represents net 1 and so on till the last 8th bit which represents net 8.
   return ((operational.ui >> (netNumber - 1)) & 1);
 }
@@ -38,8 +37,7 @@ bool HighVoltage::getOvercurrentTrigger(int netNumber)
                        netNumber);
     throw std::exception();
   }
-  bit8 overcurrent = this->pdo_.read8(this->slaveIndex,
-                                      this->netMonitoringOffsets.getHighVoltageOvercurrentTrigger());
+  bit8 overcurrent = this->pdo_.read8(this->slaveIndex, this->netMonitoringOffsets.getHighVoltageOvercurrentTrigger());
   return ((overcurrent.ui >> (netNumber - 1)) & 1);
 }
 
@@ -74,8 +72,7 @@ void HighVoltage::setNetOnOff(bool on, int netNumber)
     highVoltageNets.ui = ~highVoltageNets.ui;
     highVoltageNets.ui &= currentStateHighVoltageNets;
   }
-  this->pdo_.write8(this->slaveIndex,
-                    this->netDriverOffsets.getHighVoltageNetOnOff(), highVoltageNets);
+  this->pdo_.write8(this->slaveIndex, this->netDriverOffsets.getHighVoltageNetOnOff(), highVoltageNets);
 }
 
 void HighVoltage::enableDisableHighVoltage(bool enable)
@@ -101,14 +98,12 @@ void HighVoltage::enableDisableHighVoltage(bool enable)
 
   bit8 isEnabled;
   isEnabled.ui = enable;
-  this->pdo_.write8(this->slaveIndex,
-                    this->netDriverOffsets.getHighVoltageEnableDisable(), isEnabled);
+  this->pdo_.write8(this->slaveIndex, this->netDriverOffsets.getHighVoltageEnableDisable(), isEnabled);
 }
 
 uint8_t HighVoltage::getNetsOperational()
 {
-  bit8 operational = this->pdo_.read8(this->slaveIndex,
-                                      this->netMonitoringOffsets.getHighVoltageState());
+  bit8 operational = this->pdo_.read8(this->slaveIndex, this->netMonitoringOffsets.getHighVoltageState());
   return operational.ui;
 }
 

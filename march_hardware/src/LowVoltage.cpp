@@ -5,15 +5,15 @@
 
 namespace march
 {
-LowVoltage::LowVoltage(PdoInterface& pdo, int slaveIndex, NetMonitorOffsets netMonitoringOffsets, NetDriverOffsets netDriverOffsets)
+LowVoltage::LowVoltage(PdoInterface& pdo, int slaveIndex, NetMonitorOffsets netMonitoringOffsets,
+                       NetDriverOffsets netDriverOffsets)
   : pdo_(pdo), slaveIndex(slaveIndex), netMonitoringOffsets(netMonitoringOffsets), netDriverOffsets(netDriverOffsets)
 {
 }
 
 float LowVoltage::getNetCurrent(int netNumber)
 {
-  bit32 current = this->pdo_.read32(this->slaveIndex,
-                                          this->netMonitoringOffsets.getLowVoltageNetCurrent(netNumber));
+  bit32 current = this->pdo_.read32(this->slaveIndex, this->netMonitoringOffsets.getLowVoltageNetCurrent(netNumber));
   return current.f;
 }
 
@@ -25,8 +25,7 @@ bool LowVoltage::getNetOperational(int netNumber)
                        netNumber);
     throw std::invalid_argument("Only low voltage net 1 and 2 exist");
   }
-  bit8 operational = this->pdo_.read8(this->slaveIndex,
-                                      this->netMonitoringOffsets.getLowVoltageState());
+  bit8 operational = this->pdo_.read8(this->slaveIndex, this->netMonitoringOffsets.getLowVoltageState());
   // The last bit of the 8 bits represents net 1
   // The second to last bit of the 8 bits represents net 2
   return ((operational.ui >> (netNumber - 1)) & 1);
@@ -39,8 +38,7 @@ void LowVoltage::setNetOnOff(bool /* on */, int /* netNumber */)
 
 uint8_t LowVoltage::getNetsOperational()
 {
-  bit8 operational = this->pdo_.read8(this->slaveIndex,
-                                      this->netMonitoringOffsets.getLowVoltageState());
+  bit8 operational = this->pdo_.read8(this->slaveIndex, this->netMonitoringOffsets.getLowVoltageState());
   return operational.ui;
 }
 

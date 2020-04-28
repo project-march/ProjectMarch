@@ -21,7 +21,8 @@ private:
   uint8_t getNetsOperational();
 
 public:
-  LowVoltage(PdoInterface& pdo, int slaveIndex, NetMonitorOffsets netMonitoringOffsets, NetDriverOffsets netDriverOffsets);
+  LowVoltage(PdoInterface& pdo, int slaveIndex, NetMonitorOffsets netMonitoringOffsets,
+             NetDriverOffsets netDriverOffsets);
 
   float getNetCurrent(int netNumber);
   bool getNetOperational(int netNumber);

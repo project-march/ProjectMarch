@@ -56,5 +56,5 @@ protected:
 
   int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size, void* value) const override;
 };
-}
+}  // namespace march
 #endif  // MARCH_HARDWARE_SDO_INTERFACE_H

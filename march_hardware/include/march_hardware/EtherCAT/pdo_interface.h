@@ -32,5 +32,5 @@ public:
   bit16 read16(uint16_t slave_index, uint8_t module_index) const override;
   bit32 read32(uint16_t slave_index, uint8_t module_index) const override;
 };
-}
+}  // namespace march
 #endif  // MARCH_HARDWARE_PDO_INTERFACE_H

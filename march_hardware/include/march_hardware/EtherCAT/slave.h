@@ -13,9 +13,7 @@ class Slave : public PdoInterface
 {
 public:
   Slave(uint16_t slave_index, PdoInterface& pdo_interface, SdoInterface& sdo_interface)
-    : slave_index_(slave_index)
-    , pdo_interface_(pdo_interface)
-    , sdo_interface_(sdo_interface)
+    : slave_index_(slave_index), pdo_interface_(pdo_interface), sdo_interface_(sdo_interface)
   {
     if (this->slave_index_ < 1)
     {

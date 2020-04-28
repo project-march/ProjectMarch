@@ -19,8 +19,7 @@ PowerDistributionBoard::PowerDistributionBoard(Slave slave, NetMonitorOffsets ne
 
 float PowerDistributionBoard::getPowerDistributionBoardCurrent()
 {
-  bit32 current = this->read32(this->getSlaveIndex(),
-                               this->netMonitoringOffsets.getPowerDistributionBoardCurrent());
+  bit32 current = this->read32(this->getSlaveIndex(), this->netMonitoringOffsets.getPowerDistributionBoardCurrent());
   return current.f;
 }
 
@@ -42,7 +41,8 @@ void PowerDistributionBoard::setMasterShutDownAllowed(bool isAllowed)
 
 bool PowerDistributionBoard::getMasterShutdownRequested()
 {
-  bit8 masterShutdownRequestedBit = this->read8(this->getSlaveIndex(), this->bootShutdownOffsets.getShutdownByteOffset());
+  bit8 masterShutdownRequestedBit =
+      this->read8(this->getSlaveIndex(), this->bootShutdownOffsets.getShutdownByteOffset());
   return masterShutdownRequestedBit.ui;
 }
 
