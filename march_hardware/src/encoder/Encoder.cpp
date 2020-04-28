@@ -23,12 +23,12 @@ int32_t Encoder::getAngleIU(uint8_t byte_offset) const
 
 float Encoder::getVelocityIU(uint8_t byte_offset) const
 {
-    if (this->slave_index_ == -1)
-    {
-        ROS_FATAL("Encoder has slaveIndex of -1");
-    }
-    union bit32 return_byte = get_input_bit32(this->slave_index_, byte_offset);
-    return return_byte.i / FIXED_POINT_TO_FLOAT_CONVERSION;
+  if (this->slave_index_ == -1)
+  {
+    ROS_FATAL("Encoder has slaveIndex of -1");
+  }
+  union bit32 return_byte = get_input_bit32(this->slave_index_, byte_offset);
+  return return_byte.i / FIXED_POINT_TO_FLOAT_CONVERSION;
 }
 
 double Encoder::getAngleRad(uint8_t byte_offset) const

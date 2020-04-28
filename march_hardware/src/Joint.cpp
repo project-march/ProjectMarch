@@ -186,22 +186,22 @@ int32_t Joint::getAngleIUIncremental()
 
 float Joint::getVelocityIUAbsolute()
 {
-    if (!this->hasIMotionCube())
-    {
-        ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
-        return -1;
-    }
-    return this->imc_->getVelocityIUAbsolute();
+  if (!this->hasIMotionCube())
+  {
+    ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
+    return -1;
+  }
+  return this->imc_->getVelocityIUAbsolute();
 }
 
 float Joint::getVelocityIUIncremental()
 {
-    if (!this->hasIMotionCube())
-    {
-        ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
-        return -1;
-    }
-    return this->imc_->getVelocityIUIncremental();
+  if (!this->hasIMotionCube())
+  {
+    ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
+    return -1;
+  }
+  return this->imc_->getVelocityIUIncremental();
 }
 
 float Joint::getTemperature()
