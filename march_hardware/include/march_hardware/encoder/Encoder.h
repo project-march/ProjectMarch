@@ -2,6 +2,8 @@
 
 #ifndef MARCH_HARDWARE_ENCODER_H
 #define MARCH_HARDWARE_ENCODER_H
+#include "march_hardware/EtherCAT/pdo_interface.h"
+
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -17,17 +19,19 @@ public:
 
   /**
    * Reads out the encoder from the slave and returns the value in Internal Units (IU).
+   * @param pdo PDO interface to use for reading
    * @param byte_offset the byte offset in the slave register for the IU position
    * @returns The current position of the encoder in Internal Units (IU)
    */
-  int32_t getAngleIU(uint8_t byte_offset) const;
+  int32_t getAngleIU(const PdoInterface& pdo, uint8_t byte_offset) const;
 
   /**
    * Reads out the encoder from the slave and transforms the result to radians.
+   * @param pdo PDO interface to use for reading
    * @param byte_offset the byte offset in the slave register for the IU position
    * @returns The current position of the encoder in radians
    */
-  double getAngleRad(uint8_t byte_offset) const;
+  double getAngleRad(const PdoInterface& pdo, uint8_t byte_offset) const;
 
   /**
    * Converts encoder Internal Units (IU) to radians.

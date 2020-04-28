@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
 #include "march_hardware/encoder/Encoder.h"
-#include "march_hardware/EtherCAT/EthercatIO.h"
+#include "march_hardware/EtherCAT/pdo_types.h"
 #include "march_hardware/error/hardware_exception.h"
 
 #include <ros/ros.h>
@@ -11,19 +11,19 @@ Encoder::Encoder(size_t number_of_bits) : total_positions_(Encoder::calculateTot
 {
 }
 
-int32_t Encoder::getAngleIU(uint8_t byte_offset) const
+int32_t Encoder::getAngleIU(const PdoInterface& pdo, uint8_t byte_offset) const
 {
   if (this->slave_index_ == -1)
   {
     ROS_FATAL("Encoder has slaveIndex of -1");
   }
-  union bit32 return_byte = get_input_bit32(this->slave_index_, byte_offset);
+  bit32 return_byte = pdo.read32(this->slave_index_, byte_offset);
   return return_byte.i;
 }
 
-double Encoder::getAngleRad(uint8_t byte_offset) const
+double Encoder::getAngleRad(const PdoInterface& pdo, uint8_t byte_offset) const
 {
-  return this->toRad(Encoder::getAngleIU(byte_offset));
+  return this->toRad(this->getAngleIU(pdo, byte_offset));
 }
 
 size_t Encoder::getTotalPositions() const
