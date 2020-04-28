@@ -41,7 +41,7 @@ Injecting data can only happen into a source window.
 Adding a publisher into `ESP`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 1.
-    Add a source window to the :march:`model <march_data_collector/esp_models/march.xml>`.
+    Add a source window to the :march:`model <march_data_collector/esp_models/project_march.xml>`.
 
 2.
     Create a callback function that takes a ROS message and calls the ``send_to_esp`` function with the msgs as csv
