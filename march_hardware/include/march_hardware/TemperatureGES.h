@@ -1,26 +1,17 @@
 // Copyright 2019 Project March.
 #ifndef MARCH_HARDWARE_TEMPERATUREGES_H
 #define MARCH_HARDWARE_TEMPERATUREGES_H
+#include "march_hardware/EtherCAT/slave.h"
+#include "TemperatureSensor.h"
 
 #include <stdint.h>
-#include <march_hardware/Slave.h>
-#include "TemperatureSensor.h"
 
 namespace march
 {
 class TemperatureGES : public Slave, TemperatureSensor
 {
-private:
-  int temperatureByteOffset;
-
 public:
-  TemperatureGES(int slaveIndex, int temperatureByteOffset);
-
-  TemperatureGES()
-  {
-    temperatureByteOffset = -1;
-    slaveIndex = -1;
-  };
+  TemperatureGES(int slave_index, uint8_t byte_offset);
 
   ~TemperatureGES() noexcept override = default;
 
@@ -29,14 +20,17 @@ public:
   /** @brief Override comparison operator */
   friend bool operator==(const TemperatureGES& lhs, const TemperatureGES& rhs)
   {
-    return lhs.slaveIndex == rhs.slaveIndex && lhs.temperatureByteOffset == rhs.temperatureByteOffset;
+    return lhs.getSlaveIndex() == rhs.getSlaveIndex() && lhs.temperature_byte_offset_ == rhs.temperature_byte_offset_;
   }
   /** @brief Override stream operator for clean printing */
   friend ::std::ostream& operator<<(std::ostream& os, const TemperatureGES& temperatureGes)
   {
-    return os << "slaveIndex: " << temperatureGes.slaveIndex << ", "
-              << "temperatureByteOffset: " << temperatureGes.temperatureByteOffset;
+    return os << "slaveIndex: " << temperatureGes.getSlaveIndex() << ", "
+              << "temperatureByteOffset: " << temperatureGes.temperature_byte_offset_;
   }
+
+private:
+  const uint8_t temperature_byte_offset_;
 };
 }  // namespace march
 #endif  // MARCH_HARDWARE_TEMPERATUREGES_H

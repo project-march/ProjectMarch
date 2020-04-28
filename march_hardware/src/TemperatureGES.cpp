@@ -1,21 +1,21 @@
 // Copyright 2019 Project March.
-#include "march_hardware/EtherCAT/EthercatIO.h"
+#include "march_hardware/EtherCAT/pdo_types.h"
 
 #include <march_hardware/TemperatureGES.h>
 
 namespace march
 {
-TemperatureGES::TemperatureGES(int slaveIndex, int temperatureByteOffset) : Slave(slaveIndex)
+TemperatureGES::TemperatureGES(int slave_index, uint8_t byte_offset)
+  : Slave(slave_index)
+  , temperature_byte_offset_(byte_offset)
 {
-  ROS_ASSERT_MSG(temperatureByteOffset >= 0, "Slave configuration error: temperatureByteOffset %d can not be negative.",
-                 temperatureByteOffset);
-  this->temperatureByteOffset = temperatureByteOffset;
+  ROS_ASSERT_MSG(byte_offset >= 0, "Slave configuration error: temperatureByteOffset %d can not be negative.",
+                 byte_offset);
 }
 
 float TemperatureGES::getTemperature()
 {
-  union bit32 temperature =
-      get_input_bit32(static_cast<uint16>(slaveIndex), static_cast<uint8>(this->temperatureByteOffset));
+  bit32 temperature = this->read32(this->getSlaveIndex(), this->temperature_byte_offset_);
   return temperature.f;
 }
 
