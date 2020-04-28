@@ -2,17 +2,16 @@
 
 #ifndef MARCH_HARDWARE_MARCHROBOT_H
 #define MARCH_HARDWARE_MARCHROBOT_H
+#include "march_hardware/EtherCAT/EthercatMaster.h"
+#include "march_hardware/Joint.h"
+#include "march_hardware/PowerDistributionBoard.h"
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include <urdf/model.h>
-
-#include <march_hardware/Joint.h>
-
-#include <march_hardware/EtherCAT/EthercatMaster.h>
-#include <march_hardware/PowerDistributionBoard.h>
 
 namespace march
 {
@@ -22,7 +21,7 @@ private:
   ::std::vector<Joint> jointList;
   urdf::Model urdf_;
   EthercatMaster ethercatMaster;
-  PowerDistributionBoard powerDistributionBoard;
+  std::shared_ptr<PowerDistributionBoard> pdb_;
 
 public:
   MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, ::std::string ifName, int ecatCycleTime);
@@ -58,8 +57,8 @@ public:
 
   Joint& getJoint(::std::string jointName);
 
-  PowerDistributionBoard& getPowerDistributionBoard();
-  const PowerDistributionBoard& getPowerDistributionBoard() const;
+  bool hasPowerDistributionboard() const;
+  std::shared_ptr<PowerDistributionBoard> getPowerDistributionBoard() const;
 
   const urdf::Model& getUrdf() const;
 

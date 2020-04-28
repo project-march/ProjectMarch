@@ -1,4 +1,8 @@
 // Copyright 2018 Project March.
+#include "march_hardware/Joint.h"
+#include "march_hardware/MarchRobot.h"
+#include "march_hardware/TemperatureSensor.h"
+#include "march_hardware/error/hardware_exception.h"
 
 #include <algorithm>
 #include <string>
@@ -6,20 +10,13 @@
 
 #include <ros/ros.h>
 
-#include <march_hardware/Joint.h>
-#include <march_hardware/TemperatureSensor.h>
-
-#include <march_hardware/EtherCAT/EthercatIO.h>
-
-#include <march_hardware/MarchRobot.h>
-#include <march_hardware/error/hardware_exception.h>
-
 namespace march
 {
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, ::std::string ifName, int ecatCycleTime)
   : jointList(std::move(jointList))
   , urdf_(std::move(urdf))
   , ethercatMaster(ifName, this->getMaxSlaveIndex(), ecatCycleTime)
+  , pdb_(nullptr)
 {
 }
 
@@ -28,7 +25,7 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, PowerDi
   : jointList(std::move(jointList))
   , urdf_(std::move(urdf))
   , ethercatMaster(ifName, this->getMaxSlaveIndex(), ecatCycleTime)
-  , powerDistributionBoard(powerDistributionBoard)
+  , pdb_(std::make_shared<PowerDistributionBoard>(powerDistributionBoard))
 {
 }
 
@@ -182,14 +179,14 @@ Joint& MarchRobot::getJoint(::std::string jointName)
   throw std::out_of_range("Could not find joint with name " + jointName);
 }
 
-PowerDistributionBoard& MarchRobot::getPowerDistributionBoard()
+bool MarchRobot::hasPowerDistributionboard() const
 {
-  return powerDistributionBoard;
+  return this->pdb_ != nullptr;
 }
 
-const PowerDistributionBoard& MarchRobot::getPowerDistributionBoard() const
+std::shared_ptr<PowerDistributionBoard> MarchRobot::getPowerDistributionBoard() const
 {
-  return powerDistributionBoard;
+  return this->pdb_;
 }
 
 MarchRobot::~MarchRobot()
