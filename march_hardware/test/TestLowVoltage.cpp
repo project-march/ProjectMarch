@@ -1,17 +1,16 @@
 // Copyright 2018 Project March.
-
+#include "mocks/MockPdoInterface.h"
 #include "march_hardware/LowVoltage.h"
-#include "gtest/gtest.h"
-#include <gmock/gmock.h>
+
 #include <sstream>
 
-using ::testing::AtLeast;
-using ::testing::AtMost;
-using ::testing::Return;
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 class TestLowVoltage : public ::testing::Test
 {
 protected:
+  MockPdoInterface mock_pdo;
 };
 
 TEST_F(TestLowVoltage, Equals)
@@ -19,8 +18,8 @@ TEST_F(TestLowVoltage, Equals)
   int slaveIndex = 1;
   NetMonitorOffsets netMonitoringOffsets;
   NetDriverOffsets netDriverOffsets;
-  march::LowVoltage lowVoltage1(slaveIndex, netMonitoringOffsets, netDriverOffsets);
-  march::LowVoltage lowVoltage2(slaveIndex, netMonitoringOffsets, netDriverOffsets);
+  march::LowVoltage lowVoltage1(this->mock_pdo, slaveIndex, netMonitoringOffsets, netDriverOffsets);
+  march::LowVoltage lowVoltage2(this->mock_pdo, slaveIndex, netMonitoringOffsets, netDriverOffsets);
   EXPECT_TRUE(lowVoltage1 == lowVoltage2);
 }
 
@@ -30,9 +29,9 @@ TEST_F(TestLowVoltage, NotEquals)
   NetMonitorOffsets netMonitoringOffsets;
   NetDriverOffsets netDriverOffsets;
   NetDriverOffsets netDriverOffsets2(1, 2, 3);
-  march::LowVoltage lowVoltage1(slaveIndex, netMonitoringOffsets, netDriverOffsets);
-  march::LowVoltage lowVoltage2(2, netMonitoringOffsets, netDriverOffsets);
-  march::LowVoltage lowVoltage3(2, netMonitoringOffsets, netDriverOffsets2);
+  march::LowVoltage lowVoltage1(this->mock_pdo, slaveIndex, netMonitoringOffsets, netDriverOffsets);
+  march::LowVoltage lowVoltage2(this->mock_pdo, 2, netMonitoringOffsets, netDriverOffsets);
+  march::LowVoltage lowVoltage3(this->mock_pdo, 2, netMonitoringOffsets, netDriverOffsets2);
 
   EXPECT_FALSE(lowVoltage1 == lowVoltage2);
   EXPECT_FALSE(lowVoltage1 == lowVoltage3);
@@ -44,7 +43,7 @@ TEST_F(TestLowVoltage, Stream)
   int slaveIndex = 1;
   NetMonitorOffsets netMonitoringOffsets;
   NetDriverOffsets netDriverOffsets;
-  march::LowVoltage lowVoltage1(slaveIndex, netMonitoringOffsets, netDriverOffsets);
+  march::LowVoltage lowVoltage1(this->mock_pdo, slaveIndex, netMonitoringOffsets, netDriverOffsets);
   std::stringstream ss;
   ss << lowVoltage1;
   EXPECT_EQ("LowVoltage(slaveIndex: 1, netMonitoringOffsets: NetMonitorOffsets(powerDistributionBoardCurrent: -1, "

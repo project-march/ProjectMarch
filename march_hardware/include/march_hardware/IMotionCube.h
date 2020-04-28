@@ -92,9 +92,9 @@ public:
   static const uint16_t WATCHDOG_TIME = 500;
 
 protected:
-  void initSdo(SdoInterface& sdo, int cycle_time) override;
+  virtual void initSdo(SdoInterface& sdo, int cycle_time) override;
 
-  void reset(SdoInterface& sdo) override;
+  virtual void reset(SdoInterface& sdo) override;
 
 private:
   void actuateIU(int32_t target_iu);

@@ -114,13 +114,15 @@ if(CATKIN_ENABLE_TESTING)
         test/encoder/TestEncoder.cpp
         test/error/test_hardware_exception.cpp
         test/error/test_motion_error.cpp
-        test/mocks/MockAbsoluteEncoder.cpp
-        test/mocks/MockEncoder.cpp
-        test/mocks/MockIMotionCube.cpp
-        test/mocks/MockIncrementalEncoder.cpp
-        test/mocks/MockJoint.cpp
-        test/mocks/MockTemperatureGES.cpp
-        test/mocks/MockTemperatureSensor.cpp
+        test/mocks/MockAbsoluteEncoder.h
+        test/mocks/MockEncoder.h
+        test/mocks/MockIMotionCube.h
+        test/mocks/MockIncrementalEncoder.h
+        test/mocks/MockJoint.h
+        test/mocks/MockPdoInterface.h
+        test/mocks/MockSdoInterface.h
+        test/mocks/MockSlave.h
+        test/mocks/MockTemperatureGES.h
     )
     target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME})
 

@@ -1,5 +1,5 @@
 // Copyright 2020 Project March.
-#include "../mocks/MockEncoder.cpp"
+#include "../mocks/MockEncoder.h"
 #include "march_hardware/error/hardware_exception.h"
 
 #include <cmath>

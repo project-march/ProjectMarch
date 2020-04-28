@@ -9,7 +9,7 @@ TemperatureGES::TemperatureGES(Slave slave, uint8_t byte_offset) : Slave(slave),
 {
 }
 
-float TemperatureGES::getTemperature()
+float TemperatureGES::getTemperature() const
 {
   bit32 temperature = this->read32(this->getSlaveIndex(), this->temperature_byte_offset_);
   return temperature.f;

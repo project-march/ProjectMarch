@@ -15,7 +15,7 @@ public:
 
   ~TemperatureGES() noexcept override = default;
 
-  float getTemperature() override;
+  float getTemperature() const override;
 
   /** @brief Override comparison operator */
   friend bool operator==(const TemperatureGES& lhs, const TemperatureGES& rhs)
