@@ -1,27 +1,27 @@
 // Copyright 2019 Project March.
 #ifndef MARCH_HARDWARE_LOWVOLTAGE_H
 #define MARCH_HARDWARE_LOWVOLTAGE_H
+#include "march_hardware/EtherCAT/pdo_interface.h"
+#include "march_hardware/NetDriverOffsets.h"
+#include "march_hardware/NetMonitorOffsets.h"
 
-#include <ros/ros.h>
-
-#include <march_hardware/EtherCAT/EthercatIO.h>
-#include <march_hardware/NetDriverOffsets.h>
-#include <march_hardware/NetMonitorOffsets.h>
+#include <cstdint>
+#include <iostream>
 
 namespace march
 {
 class LowVoltage
 {
 private:
+  PdoInterface& pdo_;
   int slaveIndex;
   NetMonitorOffsets netMonitoringOffsets;
   NetDriverOffsets netDriverOffsets;
 
-  uint8 getNetsOperational();
+  uint8_t getNetsOperational();
 
 public:
-  LowVoltage(int slaveIndex, NetMonitorOffsets netMonitoringOffsets, NetDriverOffsets netDriverOffsets);
-  LowVoltage();
+  LowVoltage(PdoInterface& pdo, int slaveIndex, NetMonitorOffsets netMonitoringOffsets, NetDriverOffsets netDriverOffsets);
 
   float getNetCurrent(int netNumber);
   bool getNetOperational(int netNumber);

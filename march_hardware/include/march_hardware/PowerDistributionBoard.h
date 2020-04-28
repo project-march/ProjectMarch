@@ -1,15 +1,12 @@
 // Copyright 2019 Project March.
 #ifndef MARCH_HARDWARE_POWERDISTRIBUTIONBOARD_H
 #define MARCH_HARDWARE_POWERDISTRIBUTIONBOARD_H
-
-#include <stdint.h>
-#include <march_hardware/Slave.h>
-#include <march_hardware/BootShutdownOffsets.h>
-#include <march_hardware/NetMonitorOffsets.h>
-#include <march_hardware/NetDriverOffsets.h>
-#include <march_hardware/HighVoltage.h>
-#include <march_hardware/LowVoltage.h>
-#include <march_hardware/EtherCAT/EthercatIO.h>
+#include "march_hardware/BootShutdownOffsets.h"
+#include "march_hardware/EtherCAT/slave.h"
+#include "march_hardware/HighVoltage.h"
+#include "march_hardware/LowVoltage.h"
+#include "march_hardware/NetDriverOffsets.h"
+#include "march_hardware/NetMonitorOffsets.h"
 
 namespace march
 {
@@ -24,10 +21,8 @@ private:
   bool masterOnlineToggle;
 
 public:
-  PowerDistributionBoard(int slaveIndex, NetMonitorOffsets netMonitoringOffsets, NetDriverOffsets netDriverOffsets,
+  PowerDistributionBoard(Slave slave, NetMonitorOffsets netMonitoringOffsets, NetDriverOffsets netDriverOffsets,
                          BootShutdownOffsets bootShutdownOffsets);
-
-  PowerDistributionBoard() = default;
 
   float getPowerDistributionBoardCurrent();
   bool getMasterShutdownRequested();
@@ -40,14 +35,14 @@ public:
   /** @brief Override comparison operator */
   friend bool operator==(const PowerDistributionBoard& lhs, const PowerDistributionBoard& rhs)
   {
-    return lhs.slaveIndex == rhs.slaveIndex && lhs.netMonitoringOffsets == rhs.netMonitoringOffsets &&
+    return lhs.getSlaveIndex() == rhs.getSlaveIndex() && lhs.netMonitoringOffsets == rhs.netMonitoringOffsets &&
            lhs.netDriverOffsets == rhs.netDriverOffsets && lhs.lowVoltage == rhs.lowVoltage &&
            lhs.highVoltage == rhs.highVoltage;
   }
   /** @brief Override stream operator for clean printing */
   friend ::std::ostream& operator<<(std::ostream& os, const PowerDistributionBoard& powerDistributionBoard)
   {
-    return os << "PowerDistributionBoard(slaveIndex: " << powerDistributionBoard.slaveIndex << ", "
+    return os << "PowerDistributionBoard(slaveIndex: " << powerDistributionBoard.getSlaveIndex() << ", "
               << "masterOnlineToggle: " << powerDistributionBoard.masterOnlineToggle << ", "
               << powerDistributionBoard.highVoltage << ", " << powerDistributionBoard.lowVoltage << ")";
   }
