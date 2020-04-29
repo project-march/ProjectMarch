@@ -12,6 +12,7 @@ catkin_package(CATKIN_DEPENDS
     diagnostic_updater
     std_msgs
 )
+
 catkin_python_setup()
 
 install(DIRECTORY launch resource
