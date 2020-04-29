@@ -229,6 +229,7 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
           joint_last_effort_command_[i] +
           std::copysign(MAX_EFFORT_CHANGE, joint_effort_command_[i] - joint_last_effort_command_[i]);
     }
+    has_actuated_ |= (joint_effort_command_[i] != 0);
   }
 
   // Enforce limits on all joints in effort mode
@@ -249,7 +250,6 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
     {
       throw std::runtime_error("Safety limits acted on start-up");
     }
-    has_actuated_ = true;
   }
   // Enforce limits on all joints in position mode
   position_joint_soft_limits_interface_.enforceLimits(elapsed_time);
