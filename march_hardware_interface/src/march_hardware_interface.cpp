@@ -248,7 +248,7 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
     }
     if (found_non_zero)
     {
-      throw std::runtime_error("Safety limits acted on start-up");
+      throw std::runtime_error("Safety limits acted before actual controller started actuating");
     }
   }
   // Enforce limits on all joints in position mode
