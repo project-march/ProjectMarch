@@ -24,6 +24,8 @@ private:
   std::shared_ptr<PowerDistributionBoard> pdb_;
 
 public:
+  using iterator = std::vector<Joint>::iterator;
+
   MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, ::std::string ifName, int ecatCycleTime);
 
   MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, PowerDistributionBoard powerDistributionBoard,
@@ -56,6 +58,13 @@ public:
   int getEthercatCycleTime() const;
 
   Joint& getJoint(::std::string jointName);
+
+  Joint& getJoint(size_t index);
+
+  size_t size() const;
+
+  iterator begin();
+  iterator end();
 
   bool hasPowerDistributionboard() const;
   std::shared_ptr<PowerDistributionBoard> getPowerDistributionBoard() const;
