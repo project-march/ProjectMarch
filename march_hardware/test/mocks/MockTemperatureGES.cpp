@@ -9,7 +9,7 @@ public:
   {
   }
 
-  MOCK_METHOD1(writeInitialSDOs, void(int));
+  MOCK_METHOD1(writeInitialSDOs, bool(int));
   MOCK_METHOD0(getTemperature, float());
   MOCK_METHOD0(getSlaveIndex, int());
 };

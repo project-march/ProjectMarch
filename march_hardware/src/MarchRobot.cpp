@@ -46,16 +46,18 @@ void MarchRobot::startEtherCAT(bool reset_imc)
     ROS_WARN("Trying to start EtherCAT while it is already active.");
     return;
   }
-  ethercatMaster.start(this->jointList);
 
-  if (reset_imc)
+  bool sw_reset = ethercatMaster.start(this->jointList);
+
+  if (reset_imc || sw_reset)
   {
-    ROS_INFO("Resetting all IMotionCubes");
+    ROS_DEBUG("Resetting all IMotionCubes due to either: reset arg: %d or downloading of .sw fie: %d", reset_imc,
+              sw_reset);
     resetIMotionCubes();
 
     ROS_INFO("Restarting the EtherCAT Master");
     ethercatMaster.stop();
-    ethercatMaster.start(this->jointList);
+    sw_reset = ethercatMaster.start(this->jointList);
   }
 }
 
