@@ -31,6 +31,11 @@ float Encoder::getVelocityIU(uint8_t byte_offset) const
   return return_byte.i / FIXED_POINT_TO_FLOAT_CONVERSION;
 }
 
+double Encoder::getVelocityRad(uint8_t byte_offset) const
+{
+  return Encoder::getVelocityIU(byte_offset) * this->getRadPerBit();
+}
+
 double Encoder::getAngleRad(uint8_t byte_offset) const
 {
   return this->toRad(Encoder::getAngleIU(byte_offset));

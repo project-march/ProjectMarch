@@ -29,6 +29,7 @@ public:
    *  @returns The current velocity measured by the encoder in Internal Units (IU)
    */
   float getVelocityIU(uint8_t byte_offset) const;
+  double getVelocityRad(uint8_t byte_offset) const;
 
   /**
    * Reads out the encoder from the slave and transforms the result to radians.

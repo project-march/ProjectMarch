@@ -232,6 +232,16 @@ float IMotionCube::getVelocityIUIncremental()
   return this->incremental_encoder_->getVelocityIU(this->miso_byte_offsets_.at(IMCObjectName::MotorVelocity));
 }
 
+double IMotionCube::getVelocityRadAbsolute()
+{
+  return this->absolute_encoder_->getVelocityRad(this->miso_byte_offsets_.at(IMCObjectName::ActualVelocity));
+}
+
+double IMotionCube::getVelocityRadIncremental()
+{
+  return this->incremental_encoder_->getVelocityRad(this->miso_byte_offsets_.at(IMCObjectName::MotorVelocity));
+}
+
 uint16_t IMotionCube::getStatusWord()
 {
   return get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::StatusWord)).ui;

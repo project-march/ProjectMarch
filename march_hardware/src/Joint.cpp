@@ -131,7 +131,7 @@ double Joint::getPosition() const
 
 double Joint::getVelocity() const
 {
-  return this->velocity_;
+  return this->imc_->getVelocityRadIncremental();
 }
 
 double Joint::getIncrementalPosition() const
