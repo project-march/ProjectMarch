@@ -41,7 +41,7 @@ public:
   IMotionCube(const IMotionCube&) = delete;
   IMotionCube& operator=(const IMotionCube&) = delete;
 
-  void writeInitialSDOs(int cycle_time) override;
+  bool writeInitialSDOs(int cycle_time) override;
 
   virtual double getAngleRadAbsolute();
   virtual double getAngleRadIncremental();
@@ -103,12 +103,33 @@ private:
 
   void mapMisoPDOs();
   void mapMosiPDOs();
-  void writeInitialSettings(uint8_t cycle_time);
+  /**
+   * Initializes all iMC by checking the setup on the drive and writing necessary SDO registers.
+   * @param cycle_time the cycle time of the EtherCAT
+   * @return 1 if reset is necessary, otherwise it returns 0
+   */
+  bool writeInitialSettings(uint8_t cycle_time);
   /**
    * Calculates checksum on .sw file passed in string format in sw_string_ by simple summation until next empty line.
    * Start_address and end_address are filled in the method and used for downloading the .sw file to the drive.
+   * @param start_address the found start address of the setup in the .sw file
+   * @param end_address the found end address of the setup in the .sw file
+   * @return the computed checksum in the .sw file
    */
   uint32_t computeSWCheckSum(int& start_address, int& end_address);
+  /**
+   * Compares the checksum of the .sw file and the setup on the drive. If both are equal 1 is returned.
+   * This method makes use of the computeSWCheckSum(int&, int&) method. The start and end addresses are used in
+   * conjunction with the registers 0x2069 and 0x206A (described in the CoE manual fro Technosoft(2019) in par. 16.2.5
+   * and 16.2.6) to determine the checksum on the drive.
+   * @return true or 1 if the setup is verified and therefore correct, otherwise returns 0
+   */
+  bool verifySetup();
+  /**
+   * Downloads the setup on the .sw file onto the drive using 32bit SDO write functions.
+   * The general process is specified in chapter 16.4 of the CoE manual from Technosoft(2019).
+   */
+  void downloadSetupToDrive();
 
   // Use of smart pointers are necessary here to make dependency injection
   // possible and thus allow for mocking the encoders. A unique pointer is
