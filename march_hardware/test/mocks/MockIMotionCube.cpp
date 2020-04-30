@@ -16,7 +16,7 @@ public:
   {
   }
 
-  MOCK_METHOD1(writeInitialSDOs, void(int));
+  MOCK_METHOD1(writeInitialSDOs, bool(int));
   MOCK_METHOD0(goToOperationEnabled, void());
   MOCK_METHOD0(reset, void());
 
