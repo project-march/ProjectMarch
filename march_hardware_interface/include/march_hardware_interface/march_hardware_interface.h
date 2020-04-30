@@ -83,7 +83,7 @@ private:
   void updateAfterLimitJointCommand();
   void updateIMotionCubeState();
   void outsideLimitsCheck(size_t joint_index);
-  void iMotionCubeStateCheck(size_t joint_index);
+  bool iMotionCubeStateCheck(size_t joint_index);
 
   /* Limit of the change in effort command over one cycle, can be overridden by safety controller */
   static constexpr double MAX_EFFORT_CHANGE = 5000;
