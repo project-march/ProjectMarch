@@ -51,7 +51,7 @@ class CheckJointTemperature(object):
         if self._temperature < self._thresholds_warning:
             stat.summary(DiagnosticStatus.OK, 'OK')
         elif self._thresholds_warning < self._temperature < self._thresholds_non_fatal:
-            stat.summary(DiagnosticStatus.WARN, 'Temperature almost to high.')
+            stat.summary(DiagnosticStatus.WARN, 'Temperature almost too high.')
         else:
             stat.summary(DiagnosticStatus.ERROR, 'Temperature to high.')
 
