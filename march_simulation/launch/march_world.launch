@@ -41,7 +41,7 @@
             <arg name="world_name" value="$(find march_simulation)/worlds/march.world"/>
             <arg name="debug" value="$(arg debug)" />
             <arg name="gui" value="$(arg gazebo_ui)" />
-            <arg name="paused" value="true"/>
+            <arg name="paused" value="false"/>
             <arg name="use_sim_time" value="$(arg use_sim_time)"/>
             <arg name="verbose" value="true" />
         </include>
