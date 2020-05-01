@@ -238,11 +238,28 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
           joint_last_effort_command_[i] +
           std::copysign(MAX_EFFORT_CHANGE, joint_effort_command_[i] - joint_last_effort_command_[i]);
     }
+    has_actuated_ |= (joint_effort_command_[i] != 0);
   }
 
   // Enforce limits on all joints in effort mode
   effort_joint_soft_limits_interface_.enforceLimits(elapsed_time);
 
+  if (not has_actuated_)
+  {
+    bool found_non_zero = false;
+    for (size_t i = 0; i < num_joints_; i++)
+    {
+      if (joint_effort_command_[i] != 0)
+      {
+        ROS_ERROR("Non-zero effort on first actuation for joint %s", march_robot_->getJoint(i).getName().c_str());
+        found_non_zero = true;
+      }
+    }
+    if (found_non_zero)
+    {
+      throw std::runtime_error("Safety limits acted before actual controller started actuating");
+    }
+  }
   // Enforce limits on all joints in position mode
   position_joint_soft_limits_interface_.enforceLimits(elapsed_time);
 
