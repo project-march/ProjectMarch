@@ -11,7 +11,7 @@ def main():
     rospy.init_node('Diagnostic_updater')
 
     updater = diagnostic_updater.Updater()
-    updater.setHardwareID('MARCH IV')
+    updater.setHardwareID('MARCH IVc')
 
     CheckTopicFrequency('Input_Device', '/march/input_device/alive', Time, updater, 5)
     temperature_updater(updater)

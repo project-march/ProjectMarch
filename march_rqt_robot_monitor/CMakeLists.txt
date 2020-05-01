@@ -15,7 +15,7 @@ catkin_package(CATKIN_DEPENDS
 
 catkin_python_setup()
 
-install(DIRECTORY launch resource
+install(DIRECTORY launch config
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 

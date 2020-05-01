@@ -4,8 +4,8 @@ import rospy
 from sensor_msgs.msg import Temperature
 
 
-LOWER_THRESHOLD_VALID_VALUE = 0
-UPPER_THRESHOLD_VALID_VALUE = 100
+LOWER_THRESHOLD_VALID_TEMPERATURE_VALUE = 0
+UPPER_THRESHOLD_VALID_TEMPERATURE_VALUE = 100
 
 
 class CheckJointTemperature(object):
@@ -15,13 +15,13 @@ class CheckJointTemperature(object):
         rospy.Subscriber(topic, Temperature, self.cb)
 
         self._default_thresholds = \
-            rospy.get_param('/safety_node/default_temperature_threshold', None)
+            rospy.get_param('safety_node/default_temperature_threshold', None)
         self._thresholds_warning = \
-            rospy.get_param('/safety_node/temperature_thresholds_warning/{jn}'.format(jn=joint_name), None)
+            rospy.get_param('safety_node/temperature_thresholds_warning/{jn}'.format(jn=joint_name), None)
         self._thresholds_non_fatal = \
-            rospy.get_param('/safety_node/temperature_thresholds_non_fatal/{jn}'.format(jn=joint_name), None)
+            rospy.get_param('safety_node/temperature_thresholds_non_fatal/{jn}'.format(jn=joint_name), None)
         self._thresholds_fatal = \
-            rospy.get_param('/safety_node/temperature_thresholds_fatal/{jn}'.format(jn=joint_name), None)
+            rospy.get_param('safety_node/temperature_thresholds_fatal/{jn}'.format(jn=joint_name), None)
 
         self._timestamp = None
         self._temperature = None
@@ -37,7 +37,8 @@ class CheckJointTemperature(object):
             stat.add(' Topic error ', 'No events recorded.')
             return stat
 
-        if self._temperature < LOWER_THRESHOLD_VALID_VALUE or self._temperature < UPPER_THRESHOLD_VALID_VALUE:
+        if not LOWER_THRESHOLD_VALID_TEMPERATURE_VALUE < self._temperature < UPPER_THRESHOLD_VALID_TEMPERATURE_VALUE:
+            stat.add('Current temperature', self._temperature)
             stat.summary(DiagnosticStatus.WARN, 'No valid temperature value.')
             return stat
 
@@ -50,7 +51,7 @@ class CheckJointTemperature(object):
         if self._temperature < self._thresholds_warning:
             stat.summary(DiagnosticStatus.OK, 'OK')
         elif self._thresholds_warning < self._temperature < self._thresholds_non_fatal:
-            stat.summary(DiagnosticStatus.WARN, 'Temperature in warning zone.')
+            stat.summary(DiagnosticStatus.WARN, 'Temperature almost to high.')
         else:
             stat.summary(DiagnosticStatus.ERROR, 'Temperature to high.')
 
