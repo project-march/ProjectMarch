@@ -5,7 +5,9 @@
 #include "march_hardware/error/hardware_exception.h"
 
 #include <algorithm>
+#include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <ros/ros.h>
@@ -20,12 +22,13 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, ::std::
 {
 }
 
-MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, PowerDistributionBoard powerDistributionBoard,
-                       ::std::string ifName, int ecatCycleTime)
+MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
+                       std::unique_ptr<PowerDistributionBoard> powerDistributionBoard, ::std::string ifName,
+                       int ecatCycleTime)
   : jointList(std::move(jointList))
   , urdf_(std::move(urdf))
   , ethercatMaster(ifName, this->getMaxSlaveIndex(), ecatCycleTime)
-  , pdb_(std::make_shared<PowerDistributionBoard>(powerDistributionBoard))
+  , pdb_(std::move(powerDistributionBoard))
 {
 }
 
@@ -216,9 +219,9 @@ bool MarchRobot::hasPowerDistributionboard() const
   return this->pdb_ != nullptr;
 }
 
-std::shared_ptr<PowerDistributionBoard> MarchRobot::getPowerDistributionBoard() const
+PowerDistributionBoard* MarchRobot::getPowerDistributionBoard() const
 {
-  return this->pdb_;
+  return this->pdb_.get();
 }
 
 MarchRobot::~MarchRobot()

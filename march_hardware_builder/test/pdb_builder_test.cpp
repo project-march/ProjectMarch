@@ -31,7 +31,7 @@ TEST_F(PowerDistributionBoardTest, ValidPowerDistributionBoard)
   std::string fullPath = this->fullPath("/power_distribution_board.yaml");
   YAML::Node config = YAML::LoadFile(fullPath);
 
-  march::PowerDistributionBoard createdPowerDistributionBoard =
+  auto createdPowerDistributionBoard =
       HardwareBuilder::createPowerDistributionBoard(config, this->pdo_interface, this->sdo_interface);
   NetMonitorOffsets netMonitoringOffsets(5, 9, 13, 17, 3, 2, 1, 4);
   NetDriverOffsets netDriverOffsets(4, 3, 2);
@@ -40,7 +40,14 @@ TEST_F(PowerDistributionBoardTest, ValidPowerDistributionBoard)
       march::PowerDistributionBoard(march::Slave(1, this->pdo_interface, this->sdo_interface), netMonitoringOffsets,
                                     netDriverOffsets, bootShutdownOffsets);
 
-  ASSERT_EQ(powerDistributionBoard, createdPowerDistributionBoard);
+  ASSERT_EQ(powerDistributionBoard, *createdPowerDistributionBoard);
+}
+
+TEST_F(PowerDistributionBoardTest, NoConfig)
+{
+  YAML::Node config;
+  ASSERT_EQ(nullptr,
+            HardwareBuilder::createPowerDistributionBoard(config["pdb"], this->pdo_interface, this->sdo_interface));
 }
 
 TEST_F(PowerDistributionBoardTest, MissingSlaveIndex)

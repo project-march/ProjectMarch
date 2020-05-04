@@ -80,9 +80,9 @@ public:
   static std::unique_ptr<march::TemperatureGES> createTemperatureGES(const YAML::Node& temperature_ges_config,
                                                                      march::PdoInterfacePtr pdo_interface,
                                                                      march::SdoInterfacePtr sdo_interface);
-  static march::PowerDistributionBoard createPowerDistributionBoard(const YAML::Node& power_distribution_board_config,
-                                                                    march::PdoInterfacePtr pdo_interface,
-                                                                    march::SdoInterfacePtr sdo_interface);
+  static std::unique_ptr<march::PowerDistributionBoard>
+  createPowerDistributionBoard(const YAML::Node& power_distribution_board_config, march::PdoInterfacePtr pdo_interface,
+                               march::SdoInterfacePtr sdo_interface);
 
   static const std::vector<std::string> INCREMENTAL_ENCODER_REQUIRED_KEYS;
   static const std::vector<std::string> ABSOLUTE_ENCODER_REQUIRED_KEYS;

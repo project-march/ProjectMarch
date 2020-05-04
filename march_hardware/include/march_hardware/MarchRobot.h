@@ -21,15 +21,15 @@ private:
   ::std::vector<Joint> jointList;
   urdf::Model urdf_;
   EthercatMaster ethercatMaster;
-  std::shared_ptr<PowerDistributionBoard> pdb_;
+  std::unique_ptr<PowerDistributionBoard> pdb_;
 
 public:
   using iterator = std::vector<Joint>::iterator;
 
   MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, ::std::string ifName, int ecatCycleTime);
 
-  MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, PowerDistributionBoard powerDistributionBoard,
-             ::std::string ifName, int ecatCycleTime);
+  MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
+             std::unique_ptr<PowerDistributionBoard> powerDistributionBoard, ::std::string ifName, int ecatCycleTime);
 
   ~MarchRobot();
 
@@ -67,7 +67,7 @@ public:
   iterator end();
 
   bool hasPowerDistributionboard() const;
-  std::shared_ptr<PowerDistributionBoard> getPowerDistributionBoard() const;
+  PowerDistributionBoard* getPowerDistributionBoard() const;
 
   const urdf::Model& getUrdf() const;
 

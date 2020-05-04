@@ -3,7 +3,6 @@
 #include "march_hardware_builder/hardware_config_exceptions.h"
 
 #include <algorithm>
-#include <iterator>
 #include <memory>
 #include <string>
 #include <utility>
@@ -71,16 +70,8 @@ std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
 
   ROS_INFO_STREAM("Robot config:\n" << config);
   YAML::Node pdb_config = config["powerDistributionBoard"];
-  if (pdb_config)
-  {
-    auto pdb = HardwareBuilder::createPowerDistributionBoard(pdb_config, pdo_interface, sdo_interface);
-    return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_, pdb, if_name, cycle_time);
-  }
-  else
-  {
-    ROS_INFO("powerDistributionBoard is NOT defined");
-    return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_, if_name, cycle_time);
-  }
+  auto pdb = HardwareBuilder::createPowerDistributionBoard(pdb_config, pdo_interface, sdo_interface);
+  return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_, std::move(pdb), if_name, cycle_time);
 }
 
 march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const std::string& joint_name,
@@ -220,10 +211,14 @@ std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(con
   return std::make_unique<march::TemperatureGES>(march::Slave(slave_index, pdo_interface, sdo_interface), byte_offset);
 }
 
-march::PowerDistributionBoard HardwareBuilder::createPowerDistributionBoard(const YAML::Node& pdb,
-                                                                            march::PdoInterfacePtr pdo_interface,
-                                                                            march::SdoInterfacePtr sdo_interface)
+std::unique_ptr<march::PowerDistributionBoard> HardwareBuilder::createPowerDistributionBoard(
+    const YAML::Node& pdb, march::PdoInterfacePtr pdo_interface, march::SdoInterfacePtr sdo_interface)
 {
+  if (!pdb)
+  {
+    return nullptr;
+  }
+
   HardwareBuilder::validateRequiredKeysExist(pdb, HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS,
                                              "powerdistributionboard");
 
@@ -249,8 +244,9 @@ march::PowerDistributionBoard HardwareBuilder::createPowerDistributionBoard(cons
       boot_shutdown_byte_offsets["masterOk"].as<int>(), boot_shutdown_byte_offsets["shutdown"].as<int>(),
       boot_shutdown_byte_offsets["shutdownAllowed"].as<int>());
 
-  return { march::Slave(slave_index, pdo_interface, sdo_interface), net_monitor_offsets, net_driver_offsets,
-           boot_shutdown_offsets };
+  return std::make_unique<march::PowerDistributionBoard>(march::Slave(slave_index, pdo_interface, sdo_interface),
+                                                         net_monitor_offsets, net_driver_offsets,
+                                                         boot_shutdown_offsets);
 }
 
 void HardwareBuilder::validateRequiredKeysExist(const YAML::Node& config, const std::vector<std::string>& key_list,
