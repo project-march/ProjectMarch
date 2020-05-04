@@ -83,7 +83,7 @@ private:
   void updateAfterLimitJointCommand();
   void updateIMotionCubeState();
   void outsideLimitsCheck(size_t joint_index);
-  void iMotionCubeStateCheck(size_t joint_index);
+  bool iMotionCubeStateCheck(size_t joint_index);
 
   /* Limit of the change in effort command over one cycle, can be overridden by safety controller */
   static constexpr double MAX_EFFORT_CHANGE = 5000;
@@ -127,6 +127,8 @@ private:
   bool master_shutdown_allowed_command_ = false;
   bool enable_high_voltage_command_ = true;
   bool reset_imc_ = false;
+
+  bool has_actuated_ = false;
 
   /* Real time safe publishers */
   RtPublisherPtr<march_shared_resources::AfterLimitJointCommand> after_limit_joint_command_pub_;
