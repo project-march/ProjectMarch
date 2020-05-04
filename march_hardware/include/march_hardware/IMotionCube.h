@@ -52,8 +52,8 @@ public:
   int32_t getAngleIUIncremental();
   float getVelocityIUAbsolute();
   float getVelocityIUIncremental();
-  double getVelocityRadAbsolute();
-  double getVelocityRadIncremental();
+  virtual double getVelocityRadAbsolute();
+  virtual double getVelocityRadIncremental();
 
   uint16_t getStatusWord();
   uint16_t getMotionError();
