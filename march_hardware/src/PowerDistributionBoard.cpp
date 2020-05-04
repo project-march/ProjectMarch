@@ -4,22 +4,22 @@
 
 namespace march
 {
-PowerDistributionBoard::PowerDistributionBoard(Slave slave, NetMonitorOffsets netMonitoringOffsets,
+PowerDistributionBoard::PowerDistributionBoard(const Slave& slave, NetMonitorOffsets netMonitoringOffsets,
                                                NetDriverOffsets netDriverOffsets,
                                                BootShutdownOffsets bootShutdownOffsets)
   : Slave(slave)
   , netMonitoringOffsets(netMonitoringOffsets)
   , netDriverOffsets(netDriverOffsets)
   , bootShutdownOffsets(bootShutdownOffsets)
-  , highVoltage(*this, this->getSlaveIndex(), netMonitoringOffsets, netDriverOffsets)
-  , lowVoltage(*this, this->getSlaveIndex(), netMonitoringOffsets, netDriverOffsets)
+  , highVoltage(*this, netMonitoringOffsets, netDriverOffsets)
+  , lowVoltage(*this, netMonitoringOffsets, netDriverOffsets)
   , masterOnlineToggle(false)
 {
 }
 
 float PowerDistributionBoard::getPowerDistributionBoardCurrent()
 {
-  bit32 current = this->read32(this->getSlaveIndex(), this->netMonitoringOffsets.getPowerDistributionBoardCurrent());
+  bit32 current = this->read32(this->netMonitoringOffsets.getPowerDistributionBoardCurrent());
   return current.f;
 }
 
@@ -29,20 +29,19 @@ void PowerDistributionBoard::setMasterOnline()
   // By continuously flipping the master online toggle we let the pdb know we are still connected.
   this->masterOnlineToggle = !this->masterOnlineToggle;
   isOkBit.ui = this->masterOnlineToggle;
-  this->write8(this->getSlaveIndex(), this->bootShutdownOffsets.getMasterOkByteOffset(), isOkBit);
+  this->write8(this->bootShutdownOffsets.getMasterOkByteOffset(), isOkBit);
 }
 
 void PowerDistributionBoard::setMasterShutDownAllowed(bool isAllowed)
 {
   bit8 isAllowedBit;
   isAllowedBit.ui = isAllowed;
-  this->write8(this->getSlaveIndex(), this->bootShutdownOffsets.getShutdownAllowedByteOffset(), isAllowedBit);
+  this->write8(this->bootShutdownOffsets.getShutdownAllowedByteOffset(), isAllowedBit);
 }
 
 bool PowerDistributionBoard::getMasterShutdownRequested()
 {
-  bit8 masterShutdownRequestedBit =
-      this->read8(this->getSlaveIndex(), this->bootShutdownOffsets.getShutdownByteOffset());
+  bit8 masterShutdownRequestedBit = this->read8(this->bootShutdownOffsets.getShutdownByteOffset());
   return masterShutdownRequestedBit.ui;
 }
 

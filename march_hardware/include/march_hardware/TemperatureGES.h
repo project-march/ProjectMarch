@@ -4,14 +4,14 @@
 #include "march_hardware/EtherCAT/slave.h"
 #include "TemperatureSensor.h"
 
-#include <stdint.h>
+#include <cstddef>
 
 namespace march
 {
 class TemperatureGES : public Slave, TemperatureSensor
 {
 public:
-  TemperatureGES(Slave slave, uint8_t byte_offset);
+  TemperatureGES(const Slave& slave, uint8_t byte_offset);
 
   ~TemperatureGES() noexcept override = default;
 

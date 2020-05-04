@@ -21,7 +21,7 @@ private:
   bool masterOnlineToggle;
 
 public:
-  PowerDistributionBoard(Slave slave, NetMonitorOffsets netMonitoringOffsets, NetDriverOffsets netDriverOffsets,
+  PowerDistributionBoard(const Slave& slave, NetMonitorOffsets netMonitoringOffsets, NetDriverOffsets netDriverOffsets,
                          BootShutdownOffsets bootShutdownOffsets);
 
   float getPowerDistributionBoardCurrent();

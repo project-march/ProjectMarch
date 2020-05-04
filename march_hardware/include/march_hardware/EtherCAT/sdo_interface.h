@@ -49,6 +49,36 @@ protected:
   virtual int read(uint16_t slave, uint16_t index, uint8_t sub, int& val_size, void* value) const = 0;
 };
 
+/**
+ * An interface to read and write Service Data Objects (SDOs) for a given slave.
+ */
+class SdoSlaveInterface
+{
+public:
+  SdoSlaveInterface(uint16_t slave_index, SdoInterface& sdo) : slave_index_(slave_index), sdo_(sdo)
+  {
+  }
+
+  template <typename T>
+  int write(uint16_t index, uint8_t sub, T value)
+  {
+    return this->sdo_.write(this->slave_index_, index, sub, value);
+  }
+
+  template <typename T>
+  int read(uint16_t index, uint8_t sub, int& val_size, T& value) const
+  {
+    return this->sdo_.read(this->slave_index_, index, sub, val_size, value);
+  }
+
+private:
+  const uint16_t slave_index_;
+  SdoInterface& sdo_;
+};
+
+/**
+ * An implementation of the SdoInterface using SOEM.
+ */
 class SdoInterfaceImpl : public SdoInterface
 {
 protected:

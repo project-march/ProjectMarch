@@ -23,7 +23,7 @@ public:
    * @param byte_offset the byte offset in the slave register for the IU position
    * @returns The current position of the encoder in Internal Units (IU)
    */
-  int32_t getAngleIU(const PdoInterface& pdo, uint8_t byte_offset) const;
+  int32_t getAngleIU(const PdoSlaveInterface& pdo, uint8_t byte_offset) const;
 
   /**
    * Reads out the encoder from the slave and transforms the result to radians.
@@ -31,7 +31,7 @@ public:
    * @param byte_offset the byte offset in the slave register for the IU position
    * @returns The current position of the encoder in radians
    */
-  double getAngleRad(const PdoInterface& pdo, uint8_t byte_offset) const;
+  double getAngleRad(const PdoSlaveInterface& pdo, uint8_t byte_offset) const;
 
   /**
    * Converts encoder Internal Units (IU) to radians.
@@ -48,9 +48,6 @@ public:
   virtual double getRadPerBit() const = 0;
 
   size_t getTotalPositions() const;
-
-  int getSlaveIndex() const;
-  void setSlaveIndex(int slave_index);
 
   static const size_t MIN_RESOLUTION = 1;
   static const size_t MAX_RESOLUTION = 32;
@@ -69,7 +66,6 @@ private:
    */
   static size_t calculateTotalPositions(size_t number_of_bits);
 
-  int slave_index_ = -1;
   size_t total_positions_ = 0;
 };
 }  // namespace march

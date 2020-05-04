@@ -3,25 +3,19 @@
 #include "march_hardware/EtherCAT/pdo_types.h"
 #include "march_hardware/error/hardware_exception.h"
 
-#include <ros/ros.h>
-
 namespace march
 {
 Encoder::Encoder(size_t number_of_bits) : total_positions_(Encoder::calculateTotalPositions(number_of_bits))
 {
 }
 
-int32_t Encoder::getAngleIU(const PdoInterface& pdo, uint8_t byte_offset) const
+int32_t Encoder::getAngleIU(const PdoSlaveInterface& pdo, uint8_t byte_offset) const
 {
-  if (this->slave_index_ == -1)
-  {
-    ROS_FATAL("Encoder has slaveIndex of -1");
-  }
-  bit32 return_byte = pdo.read32(this->slave_index_, byte_offset);
+  bit32 return_byte = pdo.read32(byte_offset);
   return return_byte.i;
 }
 
-double Encoder::getAngleRad(const PdoInterface& pdo, uint8_t byte_offset) const
+double Encoder::getAngleRad(const PdoSlaveInterface& pdo, uint8_t byte_offset) const
 {
   return this->toRad(this->getAngleIU(pdo, byte_offset));
 }
@@ -29,16 +23,6 @@ double Encoder::getAngleRad(const PdoInterface& pdo, uint8_t byte_offset) const
 size_t Encoder::getTotalPositions() const
 {
   return this->total_positions_;
-}
-
-int Encoder::getSlaveIndex() const
-{
-  return this->slave_index_;
-}
-
-void Encoder::setSlaveIndex(int slave_index)
-{
-  this->slave_index_ = slave_index;
 }
 
 size_t Encoder::calculateTotalPositions(size_t number_of_bits)

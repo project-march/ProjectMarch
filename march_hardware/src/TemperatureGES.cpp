@@ -5,13 +5,14 @@
 
 namespace march
 {
-TemperatureGES::TemperatureGES(Slave slave, uint8_t byte_offset) : Slave(slave), temperature_byte_offset_(byte_offset)
+TemperatureGES::TemperatureGES(const Slave& slave, uint8_t byte_offset)
+  : Slave(slave), temperature_byte_offset_(byte_offset)
 {
 }
 
 float TemperatureGES::getTemperature() const
 {
-  bit32 temperature = this->read32(this->getSlaveIndex(), this->temperature_byte_offset_);
+  bit32 temperature = this->read32(this->temperature_byte_offset_);
   return temperature.f;
 }
 
