@@ -15,10 +15,10 @@
     <param name="robot_description"
            command="$(find xacro)/xacro '$(find march_description)/urdf/$(arg robot).xacro'
                     k_velocity_value_hfe:=60.0 k_velocity_value_kfe:=60.0
-                    k_velocity_value_haa:=60.0 k_velocity_value_adpf:=60.0
+                    k_velocity_value_haa:=60.0 k_velocity_value_adpf:=15.0
                     k_position_value_hfe:=50.0 k_position_value_kfe:=50.0
                     k_position_value_haa:=50.0 k_position_value_adpf:=50.0
-                    max_effort_rotary:=200.0 max_effort_linear:=40.0
+                    max_effort_rotary:=200.0 max_effort_linear:=200.0
                     ground_gait:=$(arg ground_gait)" />
 
     <!-- Upload the controller configuration -->

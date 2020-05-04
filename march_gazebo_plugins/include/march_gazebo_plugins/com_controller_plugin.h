@@ -28,8 +28,6 @@ private:
   physics::ModelPtr model_;
 
   std::unique_ptr<ObstacleController> controller_;
-  std::string subgait_name_;
-  std::string stable_side_;
 
   // Pointer to the update event connection
   event::ConnectionPtr update_connection_;

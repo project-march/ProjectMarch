@@ -11,7 +11,6 @@ class StairsController : public ObstacleController
 {
 public:
   explicit StairsController(physics::ModelPtr model);
-  void getGoalPosition(double time_since_start, double& goal_position_x, double& goal_position_y) override;
 };
 }  // namespace gazebo
 

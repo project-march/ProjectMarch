@@ -23,9 +23,6 @@ void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf
   this->model_ = _parent;
   this->controller_.reset(new WalkController(this->model_));
 
-  this->subgait_name_ = "home_stand";
-  this->stable_side_ = "left";
-
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   this->update_connection_ = event::Events::ConnectWorldUpdateBegin(std::bind(&ComControllerPlugin::onUpdate, this));
@@ -63,37 +60,26 @@ void ComControllerPlugin::onRosMsg(const march_shared_resources::GaitActionGoalC
     }
   }
 
-  this->subgait_name_ = _msg->goal.current_subgait.name;
-  // The left foot is stable for gaits that do not start with "left" (so also home stand etc.)
-  if (this->subgait_name_.substr(0, 4) == "left")
-  {
-    this->stable_side_ = "right";
-  }
-  else
-  {
-    this->stable_side_ = "left";
-  }
-
   this->controller_->newSubgait(_msg);
 }
 
 // Called by the world update start event
 void ComControllerPlugin::onUpdate()
 {
-  ignition::math::v4::Vector3<double> torque_all;     // -roll, pitch, -yaw
-                                                      // torque_all(0, T_pitch, T_yaw);
-  ignition::math::v4::Vector3<double> torque_stable;  // -roll, pitch, -yaw
+  ignition::math::v4::Vector3<double> torque_left;
+  ignition::math::v4::Vector3<double> torque_right;
 
-  this->controller_->update(torque_all, torque_stable);
+  this->controller_->update(torque_left, torque_right);
 
   for (auto const& link : this->model_->GetLinks())
   {
-    link->AddTorque(torque_all);
-
-    // Apply rolling torque to all links in the stable leg
-    if (link->GetName().find(this->stable_side_) != std::string::npos)
+    if (link->GetName().find("left") != std::string::npos)
     {
-      link->AddTorque(torque_stable);
+      link->AddTorque(torque_left);
+    }
+    else if (link->GetName().find("right") != std::string::npos)
+    {
+      link->AddTorque(torque_right);
     }
   }
 }
