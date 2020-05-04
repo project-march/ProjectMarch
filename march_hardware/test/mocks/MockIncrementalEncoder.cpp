@@ -11,5 +11,4 @@ public:
 
   MOCK_METHOD0(getAngleIU, int32_t());
   MOCK_METHOD0(getAngleRad, double());
-  MOCK_METHOD0(getVelocityRad, double());
 };
