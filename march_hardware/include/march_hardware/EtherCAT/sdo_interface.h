@@ -2,6 +2,7 @@
 #define MARCH_HARDWARE_SDO_INTERFACE_H
 #include <cstdint>
 #include <memory>
+#include <utility>
 
 namespace march
 {
@@ -87,6 +88,16 @@ private:
  */
 class SdoInterfaceImpl : public SdoInterface
 {
+public:
+  /**
+   * Creates a new shared SdoInterfaceImpl.
+   * @return Generic PdoInterface shared ptr
+   */
+  static SdoInterfacePtr create()
+  {
+    return std::make_shared<SdoInterfaceImpl>();
+  }
+
 protected:
   int write(uint16_t slave, uint16_t index, uint8_t sub, std::size_t size, void* value) override;
 

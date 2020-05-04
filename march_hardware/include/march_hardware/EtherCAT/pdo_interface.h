@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <utility>
 
 namespace march
 {
@@ -76,6 +77,15 @@ private:
 class PdoInterfaceImpl : public PdoInterface
 {
 public:
+  /**
+   * Creates a new shared PdoInterfaceImpl.
+   * @return Generic PdoInterface shared ptr
+   */
+  static PdoInterfacePtr create()
+  {
+    return std::make_shared<PdoInterfaceImpl>();
+  }
+
   void write8(uint16_t slave_index, uint8_t module_index, bit8 value) override;
   void write16(uint16_t slave_index, uint8_t module_index, bit16 value) override;
   void write32(uint16_t slave_index, uint8_t module_index, bit32 value) override;

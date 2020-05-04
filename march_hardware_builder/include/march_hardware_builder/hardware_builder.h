@@ -13,6 +13,8 @@
 #include <march_hardware/ActuationMode.h>
 #include <march_hardware/encoder/AbsoluteEncoder.h>
 #include <march_hardware/encoder/IncrementalEncoder.h>
+#include <march_hardware/EtherCAT/pdo_interface.h>
+#include <march_hardware/EtherCAT/sdo_interface.h>
 #include <march_hardware/IMotionCube.h>
 #include <march_hardware/Joint.h>
 #include <march_hardware/MarchRobot.h>
@@ -65,15 +67,22 @@ public:
                                         const std::string& object_name);
 
   static march::Joint createJoint(const YAML::Node& joint_config, const std::string& joint_name,
-                                  const urdf::JointConstSharedPtr& urdf_joint);
+                                  const urdf::JointConstSharedPtr& urdf_joint, march::PdoInterfacePtr pdo_interface,
+                                  march::SdoInterfacePtr sdo_interface);
   static std::unique_ptr<march::AbsoluteEncoder> createAbsoluteEncoder(const YAML::Node& absolute_encoder_config,
                                                                        const urdf::JointConstSharedPtr& urdf_joint);
   static std::unique_ptr<march::IncrementalEncoder>
   createIncrementalEncoder(const YAML::Node& incremental_encoder_config);
   static std::unique_ptr<march::IMotionCube> createIMotionCube(const YAML::Node& imc_config, march::ActuationMode mode,
-                                                               const urdf::JointConstSharedPtr& urdf_joint);
-  static std::unique_ptr<march::TemperatureGES> createTemperatureGES(const YAML::Node& temperature_ges_config);
-  static march::PowerDistributionBoard createPowerDistributionBoard(const YAML::Node& power_distribution_board_config);
+                                                               const urdf::JointConstSharedPtr& urdf_joint,
+                                                               march::PdoInterfacePtr pdo_interface,
+                                                               march::SdoInterfacePtr sdo_interface);
+  static std::unique_ptr<march::TemperatureGES> createTemperatureGES(const YAML::Node& temperature_ges_config,
+                                                                     march::PdoInterfacePtr pdo_interface,
+                                                                     march::SdoInterfacePtr sdo_interface);
+  static march::PowerDistributionBoard createPowerDistributionBoard(const YAML::Node& power_distribution_board_config,
+                                                                    march::PdoInterfacePtr pdo_interface,
+                                                                    march::SdoInterfacePtr sdo_interface);
 
   static const std::vector<std::string> INCREMENTAL_ENCODER_REQUIRED_KEYS;
   static const std::vector<std::string> ABSOLUTE_ENCODER_REQUIRED_KEYS;
@@ -95,7 +104,8 @@ private:
    * @param joints_config YAML node that contains a sequence of joint objects
    * @return list of created joints
    */
-  std::vector<march::Joint> createJoints(const YAML::Node& joints_config) const;
+  std::vector<march::Joint> createJoints(const YAML::Node& joints_config, march::PdoInterfacePtr pdo_interface,
+                                         march::SdoInterfacePtr sdo_interface) const;
 
   YAML::Node robot_config_;
   urdf::Model urdf_;
