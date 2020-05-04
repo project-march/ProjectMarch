@@ -179,10 +179,19 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
 
 void MarchHardwareInterface::validate()
 {
+  bool fault_state = false;
   for (size_t i = 0; i < num_joints_; i++)
   {
     this->outsideLimitsCheck(i);
-    this->iMotionCubeStateCheck(i);
+    if (!this->iMotionCubeStateCheck(i))
+    {
+      fault_state = true;
+    }
+  }
+  if (fault_state)
+  {
+    this->march_robot_->stopEtherCAT();
+    throw std::runtime_error("One or more IMC's are in fault state");
   }
 }
 
@@ -430,23 +439,20 @@ void MarchHardwareInterface::updateIMotionCubeState()
   imc_state_pub_->unlockAndPublish();
 }
 
-void MarchHardwareInterface::iMotionCubeStateCheck(size_t joint_index)
+bool MarchHardwareInterface::iMotionCubeStateCheck(size_t joint_index)
 {
   march::Joint& joint = march_robot_->getJoint(joint_index);
   march::IMotionCubeState imc_state = joint.getIMotionCubeState();
   if (imc_state.state == march::IMCState::FAULT)
   {
-    this->march_robot_->stopEtherCAT();
-    std::ostringstream error_stream;
-    error_stream << "IMotionCube of joint " << joint.getName() << " is in fault state " << imc_state.state.getString()
-                 << std::endl;
-    error_stream << "Detailed Error: " << imc_state.detailedErrorDescription << "(" << imc_state.detailedError << ")"
-                 << std::endl;
-    error_stream << "Motion Error: " << imc_state.motionErrorDescription << "(" << imc_state.motionError << ")"
-                 << std::endl;
-
-    throw std::runtime_error(error_stream.str());
+    ROS_ERROR("IMotionCube of joint %s is in fault state %s \n", joint.getName().c_str(),
+              imc_state.state.getString().c_str());
+    ROS_ERROR("Detailed Error: %s (%s) \n", imc_state.detailedErrorDescription.c_str(),
+              imc_state.detailedError.c_str());
+    ROS_ERROR("Motion Error: %s (%s) \n", imc_state.motionErrorDescription.c_str(), imc_state.motionError.c_str());
+    return false;
   }
+  return true;
 }
 
 void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)

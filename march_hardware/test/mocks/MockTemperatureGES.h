@@ -14,5 +14,5 @@ public:
 
   MOCK_CONST_METHOD0(getTemperature, float());
 
-  MOCK_METHOD2(initSdo, void(march::SdoInterface& sdo, int cycle_time));
+  MOCK_METHOD2(initSdo, bool(march::SdoInterface& sdo, int cycle_time));
 };

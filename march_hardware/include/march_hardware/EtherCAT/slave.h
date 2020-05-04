@@ -29,9 +29,9 @@ public:
     return this->slave_index_;
   }
 
-  void initSdo(int cycle_time)
+  bool initSdo(int cycle_time)
   {
-    this->initSdo(this->sdo_interface_, cycle_time);
+    return this->initSdo(this->sdo_interface_, cycle_time);
   }
 
   void reset()
@@ -40,8 +40,9 @@ public:
   }
 
 protected:
-  virtual void initSdo(SdoInterface& /* sdo */, int /* cycle_time */)
+  virtual bool initSdo(SdoInterface& /* sdo */, int /* cycle_time */)
   {
+    return false;
   }
 
   virtual void reset(SdoInterface& /* sdo */)

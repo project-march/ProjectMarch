@@ -29,6 +29,6 @@ public:
   MOCK_METHOD1(actuateRad, void(double));
   MOCK_METHOD1(actuateTorque, void(int16_t));
 
-  MOCK_METHOD2(initSdo, void(march::SdoInterface& sdo, int cycle_time));
+  MOCK_METHOD2(initSdo, bool(march::SdoInterface& sdo, int cycle_time));
   MOCK_METHOD1(reset, void(march::SdoInterface&));
 };

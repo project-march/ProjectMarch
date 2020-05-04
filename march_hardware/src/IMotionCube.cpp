@@ -4,10 +4,6 @@
 #include "march_hardware/error/motion_error.h"
 #include "march_hardware/EtherCAT/pdo_types.h"
 
-#include <iostream>
-#include <iomanip>
-#include <string>
-
 #include <bitset>
 #include <memory>
 #include <stdexcept>
@@ -42,7 +38,7 @@ IMotionCube::IMotionCube(Slave slave, std::unique_ptr<AbsoluteEncoder> absolute_
   this->sw_string_ = std::move(sw_stream);
 }
 
-void IMotionCube::initSdo(SdoInterface& sdo, int cycle_time)
+bool IMotionCube::initSdo(SdoInterface& sdo, int cycle_time)
 {
   if (this->actuation_mode_ == ActuationMode::unknown)
   {
@@ -53,7 +49,7 @@ void IMotionCube::initSdo(SdoInterface& sdo, int cycle_time)
 
   this->mapMisoPDOs(sdo);
   this->mapMosiPDOs(sdo);
-  this->writeInitialSettings(sdo, cycle_time);
+  return this->writeInitialSettings(sdo, cycle_time);
 }
 
 // Map Process Data Object (PDO) for by sending SDOs to the IMC
@@ -83,9 +79,31 @@ void IMotionCube::mapMosiPDOs(SdoInterface& sdo)
 }
 
 // Set configuration parameters to the IMC
-void IMotionCube::writeInitialSettings(SdoInterface& sdo, int cycle_time)
+bool IMotionCube::writeInitialSettings(SdoInterface& sdo, int cycle_time)
 {
-  ROS_DEBUG("IMotionCube::writeInitialSettings");
+  bool checksum_verified = this->verifySetup(sdo);
+
+  if (!checksum_verified)
+  {
+    ROS_WARN("The .sw file for slave %d is not equal to the setup of the drive, downloading is necessary",
+             this->getSlaveIndex());
+    this->downloadSetupToDrive(sdo);
+    checksum_verified = this->verifySetup(sdo);
+    if (checksum_verified)
+    {
+      ROS_INFO("writing of the setup data has succeeded");
+    }
+    else
+    {
+      ROS_FATAL("writing of the setup data has failed");
+    }
+    return true;  // Resets all imcs and restart the EtherCAT train (necessary after downloading a "new" setup to the
+                  // drive)
+  }
+  else
+  {
+    ROS_DEBUG("The .sw file for slave %d is equal to the setup of the drive.", this->getSlaveIndex());
+  }
 
   // mode of operation
   int mode_of_op = sdo.write(this->getSlaveIndex(), 0x6060, 0, this->actuation_mode_.toModeNumber());
@@ -114,6 +132,7 @@ void IMotionCube::writeInitialSettings(SdoInterface& sdo, int cycle_time)
     throw error::HardwareException(error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
                                    "Failed writing initial settings to IMC of slave %d", this->getSlaveIndex());
   }
+  return false;
 }
 
 void IMotionCube::actuateRad(double target_rad)
@@ -361,6 +380,83 @@ uint32_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
   }
   throw error::HardwareException(error::ErrorType::INVALID_SW_STRING, "The .sw file has no delimiter of type %s",
                                  delimiter.c_str());
+}
+
+bool IMotionCube::verifySetup(SdoInterface& sdo)
+{
+  int start_address = 0, end_address = 0;
+  uint32_t sw_value = this->computeSWCheckSum(start_address, end_address);
+  // set parameters to compute checksum on the imc
+  int checksum_setup = sdo.write<uint32_t>(this->getSlaveIndex(), 0x2069, 0, (end_address << 16) + start_address);
+
+  uint32_t imc_value;
+  int value_size = sizeof(imc_value);
+  // read computed checksum on imc
+  int check_sum_read = sdo.read<uint32_t>(this->getSlaveIndex(), 0x206A, 0, value_size, imc_value);
+
+  if (!(checksum_setup && check_sum_read))
+  {
+    throw error::HardwareException(error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
+                                   "Failed checking the checksum on slave: %d", this->getSlaveIndex());
+  }
+
+  ROS_DEBUG("The .sw checksum is : %d, and the drive checksum is %d", sw_value, imc_value);
+  return sw_value == imc_value;
+}
+
+void IMotionCube::downloadSetupToDrive(SdoInterface& sdo)
+{
+  int mem_location;
+  uint32_t mem_setup = 9;  // send 16-bits and auto increment
+  int result = 0;
+  int final_result = 0;
+  uint32_t data;
+
+  size_t pos = 0;
+  size_t old_pos = 0;
+  std::string delimiter = "\n";
+  std::string token, next_token;
+  while ((pos = sw_string_.find(delimiter, old_pos)) != std::string::npos)
+  {
+    token = sw_string_.substr(old_pos, pos - old_pos);
+    if (old_pos == 0)
+    {
+      mem_location = std::stoi(token, nullptr, 16) << 16;
+      result = sdo.write<uint32_t>(this->getSlaveIndex(), 0x2064, 0,
+                                   mem_location + mem_setup);  // write the write-configuration
+      final_result |= result;
+    }
+    else
+    {
+      if (pos - old_pos == delimiter.length())
+      {
+        break;
+      }
+      else
+      {
+        old_pos = pos + 1;
+        pos = sw_string_.find(delimiter, old_pos);
+        next_token = sw_string_.substr(old_pos, pos - old_pos);
+
+        if (pos - old_pos != delimiter.length())
+        {
+          data = (std::stoi(next_token, nullptr, 16) << 16) + std::stoi(token, nullptr, 16);
+        }
+        else
+        {
+          data = std::stoi(token, nullptr, 16);
+        }
+        result = sdo.write<uint32_t>(this->getSlaveIndex(), 0x2065, 0, data);  // write the write-configuration
+      }
+    }
+    final_result &= result;
+    old_pos = pos + 1;  // Make sure to check the position after the previous one
+  }
+  if (final_result == 0)
+  {
+    throw error::HardwareException(error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
+                                   "Failed writing .sw file to IMC of slave %d", this->getSlaveIndex());
+  }
 }
 
 ActuationMode IMotionCube::getActuationMode() const
