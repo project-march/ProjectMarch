@@ -10,7 +10,7 @@ namespace march
 std::unordered_map<IMCObjectName, IMCObject> PDOmap::all_objects = {
   { IMCObjectName::StatusWord, IMCObject(0x6041, 16) },
   { IMCObjectName::ActualPosition, IMCObject(0x6064, 32) },
-  { IMCObjectName::ActualVelocity, IMCObject(0x606C, 32) },
+  { IMCObjectName::ActualVelocity, IMCObject(0x6069, 32) },
   { IMCObjectName::MotionErrorRegister, IMCObject(0x2000, 16) },
   { IMCObjectName::DetailedErrorRegister, IMCObject(0x2002, 16) },
   { IMCObjectName::DCLinkVoltage, IMCObject(0x2055, 16) },
