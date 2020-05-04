@@ -21,7 +21,9 @@ protected:
     this->mock_incremental_encoder = std::make_unique<MockIncrementalEncoder>();
   }
 
-  MockSlave mock_slave;
+  MockPdoInterfacePtr mock_pdo = std::make_shared<MockPdoInterface>();
+  MockSdoInterfacePtr mock_sdo = std::make_shared<MockSdoInterface>();
+  MockSlave mock_slave = MockSlave(this->mock_pdo, this->mock_sdo);
   std::unique_ptr<MockAbsoluteEncoder> mock_absolute_encoder;
   std::unique_ptr<MockIncrementalEncoder> mock_incremental_encoder;
 };

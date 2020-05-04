@@ -9,7 +9,9 @@
 class TestPowerDistributionBoard : public ::testing::Test
 {
 protected:
-  MockSlave mock_slave;
+  MockPdoInterfacePtr mock_pdo = std::make_shared<MockPdoInterface>();
+  MockSdoInterfacePtr mock_sdo = std::make_shared<MockSdoInterface>();
+  MockSlave mock_slave = MockSlave(this->mock_pdo, this->mock_sdo);
   NetMonitorOffsets netMonitoringOffsets;
   NetDriverOffsets netDriverOffsets;
   BootShutdownOffsets bootShutdownOffsets;

@@ -41,10 +41,10 @@ TEST_F(TestEncoder, GetAngleIU)
   const uint8_t expected_offset = 4;
   march::bit32 result;
   result.i = expected;
-  MockPdoInterface mock_pdo;
+  MockPdoInterfacePtr mock_pdo = std::make_shared<MockPdoInterface>();
   march::PdoSlaveInterface pdo(this->slave_index, mock_pdo);
 
-  EXPECT_CALL(mock_pdo, read32(this->slave_index, Eq(expected_offset))).WillOnce(Return(result));
+  EXPECT_CALL(*mock_pdo, read32(this->slave_index, Eq(expected_offset))).WillOnce(Return(result));
 
   ASSERT_EQ(expected, encoder.getAngleIU(pdo, expected_offset));
 }

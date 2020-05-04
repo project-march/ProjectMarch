@@ -1,6 +1,7 @@
 #ifndef MARCH_HARDWARE_SDO_INTERFACE_H
 #define MARCH_HARDWARE_SDO_INTERFACE_H
 #include <cstdint>
+#include <memory>
 
 namespace march
 {
@@ -50,30 +51,35 @@ protected:
 };
 
 /**
+ * Shared pointer to an SdoInterface.
+ */
+using SdoInterfacePtr = std::shared_ptr<SdoInterface>;
+
+/**
  * An interface to read and write Service Data Objects (SDOs) for a given slave.
  */
 class SdoSlaveInterface
 {
 public:
-  SdoSlaveInterface(uint16_t slave_index, SdoInterface& sdo) : slave_index_(slave_index), sdo_(sdo)
+  SdoSlaveInterface(uint16_t slave_index, SdoInterfacePtr sdo) : slave_index_(slave_index), sdo_(sdo)
   {
   }
 
   template <typename T>
   int write(uint16_t index, uint8_t sub, T value)
   {
-    return this->sdo_.write(this->slave_index_, index, sub, value);
+    return this->sdo_->write(this->slave_index_, index, sub, value);
   }
 
   template <typename T>
   int read(uint16_t index, uint8_t sub, int& val_size, T& value) const
   {
-    return this->sdo_.read(this->slave_index_, index, sub, val_size, value);
+    return this->sdo_->read(this->slave_index_, index, sub, val_size, value);
   }
 
 private:
   const uint16_t slave_index_;
-  SdoInterface& sdo_;
+  SdoInterfacePtr sdo_;
 };
 
 /**

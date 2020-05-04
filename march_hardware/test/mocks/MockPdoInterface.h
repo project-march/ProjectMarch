@@ -2,6 +2,8 @@
 #include "march_hardware/EtherCAT/pdo_interface.h"
 #include "march_hardware/EtherCAT/pdo_types.h"
 
+#include <memory>
+
 #include <gmock/gmock.h>
 
 class MockPdoInterface : public march::PdoInterface
@@ -17,3 +19,5 @@ public:
   MOCK_CONST_METHOD2(read16, march::bit16(uint16_t, uint8_t));
   MOCK_CONST_METHOD2(read32, march::bit32(uint16_t, uint8_t));
 };
+
+using MockPdoInterfacePtr = std::shared_ptr<MockPdoInterface>;

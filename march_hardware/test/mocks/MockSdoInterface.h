@@ -1,6 +1,8 @@
 #pragma once
 #include "march_hardware/EtherCAT/sdo_interface.h"
 
+#include <memory>
+
 #include <gmock/gmock.h>
 
 class MockSdoInterface : public march::SdoInterface
@@ -13,3 +15,5 @@ protected:
 
   MOCK_CONST_METHOD5(read, int(uint16_t, uint16_t, uint8_t, int&, void*));
 };
+
+using MockSdoInterfacePtr = std::shared_ptr<MockSdoInterface>;

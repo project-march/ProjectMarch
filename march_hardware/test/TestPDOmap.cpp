@@ -7,7 +7,7 @@
 class PDOTest : public ::testing::Test
 {
 protected:
-  MockSdoInterface mock_sdo;
+  MockSdoInterfacePtr mock_sdo = std::make_shared<MockSdoInterface>();
   march::SdoSlaveInterface sdo = march::SdoSlaveInterface(1, mock_sdo);
 };
 

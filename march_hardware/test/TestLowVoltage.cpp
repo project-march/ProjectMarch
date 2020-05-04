@@ -9,7 +9,7 @@
 class TestLowVoltage : public ::testing::Test
 {
 protected:
-  MockPdoInterface mock_pdo;
+  MockPdoInterfacePtr mock_pdo;
   march::PdoSlaveInterface pdo = march::PdoSlaveInterface(1, this->mock_pdo);
 };
 
