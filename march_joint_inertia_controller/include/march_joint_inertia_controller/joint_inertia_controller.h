@@ -7,7 +7,7 @@
 #include <hardware_interface/joint_command_interface.h>
 #include <pluginlib/class_list_macros.h>
 
-namespace joint_inertia_controller {
+namespace joint_inertia_controller_ns {
 
     class InertiaController: public controller_interface::Controller<hardware_interface::PositionJointInterface>
     {

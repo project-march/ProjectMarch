@@ -61,7 +61,7 @@ add_library(${PROJECT_NAME}
     src/encoder/IncrementalEncoder.cpp
     src/error/error_type.cpp
     src/error/motion_error.cpp
-        ../march_joint_inertia_controller/include/march_joint_inertia_controller/joint_inertia_controller.h)
+        ../march_joint_inertia_controller/include/march_joint_inertia_controller/joint_inertia_controller.h ../march_joint_inertia_controller/src/joint_inertia_controller.cpp)
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} pthread)
 
