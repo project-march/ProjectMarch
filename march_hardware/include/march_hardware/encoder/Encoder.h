@@ -61,7 +61,7 @@ public:
   static const size_t MAX_RESOLUTION = 32;
 
   // constant used for converting a fixed point 16.16 bit number to a float, which is done by dividing by 2^16
-  static constexpr float FIXED_POINT_TO_FLOAT_CONVERSION = float (1 << 16);
+  static constexpr float FIXED_POINT_TO_FLOAT_CONVERSION = float(1 << 16);
 
   // iMOTIONCUBE setting (slow loop sample period
   static constexpr float TIME_PER_VELOCITY_SAMPLE = 0.001;

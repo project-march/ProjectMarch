@@ -100,13 +100,13 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
     // Take the velocity and position from the encoder with the highest resolution.
     if (this->imc_->getIncrementalRadPerBit() < this->imc_->getAbsoluteRadPerBit())
     {
-	    this->velocity_ = this->imc_->getVelocityRadIncremental();
-	    this->position_ += incremental_position_change;
+      this->velocity_ = this->imc_->getVelocityRadIncremental();
+      this->position_ += incremental_position_change;
     }
     else
     {
-	    this->velocity_ = this->imc_->getVelocityRadAbsolute();
-	    this->position_ = this->imc_->getAngleRadAbsolute();
+      this->velocity_ = this->imc_->getVelocityRadAbsolute();
+      this->position_ = this->imc_->getAngleRadAbsolute();
     }
     this->incremental_position_ += incremental_position_change;
     this->absolute_position_ = this->imc_->getAngleRadAbsolute();
