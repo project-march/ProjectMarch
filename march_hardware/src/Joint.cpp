@@ -95,27 +95,21 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
 
   if (this->receivedDataUpdate())
   {
-    const double new_incremental_position = this->imc_->getAngleRadIncremental();
-    const double new_absolute_position = this->imc_->getAngleRadAbsolute();
+    const double incremental_position_change = this->imc_->getAngleRadIncremental() - this->incremental_position_;
 
-    // Get velocity from encoder position
-    double best_displacement;
-
-    // Take the velocity with the highest resolution.
+    // Take the velocity and position from the encoder with the highest resolution.
     if (this->imc_->getIncrementalRadPerBit() < this->imc_->getAbsoluteRadPerBit())
     {
-      best_displacement = new_incremental_position - this->incremental_position_;
+	    this->velocity_ = this->imc_->getVelocityRadIncremental();
+	    this->position_ += incremental_position_change;
     }
     else
     {
-      best_displacement = new_absolute_position - this->absolute_position_;
+	    this->velocity_ = this->imc_->getVelocityRadAbsolute();
+	    this->position_ = this->imc_->getAngleRadAbsolute();
     }
-
-    // Update position with the most accurate velocity
-    this->position_ += best_displacement;
-    this->velocity_ = best_displacement / elapsed_time.toSec();
-    this->incremental_position_ = new_incremental_position;
-    this->absolute_position_ = new_absolute_position;
+    this->incremental_position_ += incremental_position_change;
+    this->absolute_position_ = this->imc_->getAngleRadAbsolute();
   }
   else
   {
@@ -133,7 +127,7 @@ double Joint::getPosition() const
 
 double Joint::getVelocity() const
 {
-  return this->imc_->getVelocityRadIncremental();
+  return this->velocity_;
 }
 
 double Joint::getIncrementalPosition() const
