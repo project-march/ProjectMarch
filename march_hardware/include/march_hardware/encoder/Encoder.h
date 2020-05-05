@@ -30,17 +30,16 @@ public:
   double getAngleRad(uint8_t byte_offset) const;
 
   /**
-   * Reads out the velocity of the encoder from the slave and returns the value in Internal Units (IU).
-   * (IU changed in last second)
-   *  @param byte_offset the byte offset in the slave register for the IU position
-   *  @returns The current velocity measured by the encoder in Internal Units (IU)
+   * Reads out the velocity of the encoder from the slave and returns the value in Internal Units per second (IU/s).
+   *  @param byte_offset the byte offset in the slave register for the IU velocity
+   *  @returns The current velocity measured by the encoder in Internal Units per second (IU/s)
    */
   double getVelocityIU(uint8_t byte_offset) const;
 
   /**
    * Reads out the velocity of the encoder from the slave and transforms the result to radians.
    * @param byte_offset the byte offset in the slave register for the IU position
-   * @returns The current position of the encoder in radians
+   * @returns The current velocity measured by the encoder in radians
    */
   double getVelocityRad(uint8_t byte_offset) const;
 
@@ -67,9 +66,9 @@ public:
   static const size_t MAX_RESOLUTION = 32;
 
   // constant used for converting a fixed point 16.16 bit number to a double, which is done by dividing by 2^16
-  static constexpr double FIXED_POINT_TO_FLOAT_CONVERSION = float(1 << 16);
+  static constexpr double FIXED_POINT_TO_FLOAT_CONVERSION = 1 << 16;
 
-  // iMOTIONCUBE setting (slow loop sample period
+  // iMOTIONCUBE setting (slow loop sample period)
   static constexpr double TIME_PER_VELOCITY_SAMPLE = 0.001;
 
   static constexpr double PI_2 = 2 * M_PI;
