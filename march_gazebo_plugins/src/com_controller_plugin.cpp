@@ -21,7 +21,7 @@ void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf
 
   // Initialise variables
   this->model_ = _parent;
-  this->controller_.reset(new WalkController(this->model_));
+  this->controller_ = std::make_unique<WalkController>(this->model_);
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
@@ -42,22 +42,6 @@ void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf
 
 void ComControllerPlugin::onRosMsg(const march_shared_resources::GaitActionGoalConstPtr& _msg)
 {
-  std::string new_gait_name = _msg->goal.name;
-  if (new_gait_name.substr(0, 6) == "tilted")
-  {
-  }
-  else
-  {
-    std::cout << typeid(*this->controller_).name() << '\n';
-    std::cout << typeid(WalkController).name() << '\n';
-
-    if (typeid(*this->controller_) != typeid(WalkController))
-    {
-      ROS_INFO("Switch to walk controller");
-      this->controller_.reset(new WalkController(this->model_));
-    }
-  }
-
   this->controller_->newSubgait(_msg);
 }
 
