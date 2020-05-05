@@ -7,6 +7,7 @@
     <arg name="ground_gait" default="false" doc="Exoskeleton will ground gait if true."/>
     <arg name="obstacle" default="none" doc="Obstacle to load in the simulation."/>
     <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_rotational."/>
+    <arg name="balance" default="false" doc="Uses the dynamic balance gaits instead of the predefined gaits."/>
 
     <!-- Load the URDF into the ROS Parameter Server -->
     <!-- Override effort values as Gazebo uses different units than the actual IMC. -->
@@ -41,7 +42,7 @@
             <arg name="world_name" value="$(find march_simulation)/worlds/march.world"/>
             <arg name="debug" value="$(arg debug)" />
             <arg name="gui" value="$(arg gazebo_ui)" />
-            <arg name="paused" value="true"/>
+            <arg name="paused" value="$(eval not balance)"/>
             <arg name="use_sim_time" value="$(arg use_sim_time)"/>
             <arg name="verbose" value="true" />
         </include>
