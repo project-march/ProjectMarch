@@ -50,8 +50,8 @@ public:
   int16_t getTorque();
   int32_t getAngleIUAbsolute();
   int32_t getAngleIUIncremental();
-  float getVelocityIUAbsolute();
-  float getVelocityIUIncremental();
+  double getVelocityIUAbsolute();
+  double getVelocityIUIncremental();
   virtual double getVelocityRadAbsolute();
   virtual double getVelocityRadIncremental();
 

@@ -35,7 +35,7 @@ public:
    *  @param byte_offset the byte offset in the slave register for the IU position
    *  @returns The current velocity measured by the encoder in Internal Units (IU)
    */
-  float getVelocityIU(uint8_t byte_offset) const;
+  double getVelocityIU(uint8_t byte_offset) const;
 
   /**
    * Reads out the velocity of the encoder from the slave and transforms the result to radians.
@@ -66,11 +66,11 @@ public:
   static const size_t MIN_RESOLUTION = 1;
   static const size_t MAX_RESOLUTION = 32;
 
-  // constant used for converting a fixed point 16.16 bit number to a float, which is done by dividing by 2^16
-  static constexpr float FIXED_POINT_TO_FLOAT_CONVERSION = float(1 << 16);
+  // constant used for converting a fixed point 16.16 bit number to a double, which is done by dividing by 2^16
+  static constexpr double FIXED_POINT_TO_FLOAT_CONVERSION = float(1 << 16);
 
   // iMOTIONCUBE setting (slow loop sample period
-  static constexpr float TIME_PER_VELOCITY_SAMPLE = 0.001;
+  static constexpr double TIME_PER_VELOCITY_SAMPLE = 0.001;
 
   static constexpr double PI_2 = 2 * M_PI;
 

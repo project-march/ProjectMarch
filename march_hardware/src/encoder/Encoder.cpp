@@ -21,7 +21,7 @@ int32_t Encoder::getAngleIU(uint8_t byte_offset) const
   return return_byte.i;
 }
 
-float Encoder::getVelocityIU(uint8_t byte_offset) const
+double Encoder::getVelocityIU(uint8_t byte_offset) const
 {
   if (this->slave_index_ == -1)
   {

@@ -180,7 +180,7 @@ int32_t Joint::getAngleIUIncremental()
   return this->imc_->getAngleIUIncremental();
 }
 
-float Joint::getVelocityIUAbsolute()
+double Joint::getVelocityIUAbsolute()
 {
   if (!this->hasIMotionCube())
   {
@@ -190,7 +190,7 @@ float Joint::getVelocityIUAbsolute()
   return this->imc_->getVelocityIUAbsolute();
 }
 
-float Joint::getVelocityIUIncremental()
+double Joint::getVelocityIUIncremental()
 {
   if (!this->hasIMotionCube())
   {
@@ -296,8 +296,8 @@ bool Joint::receivedDataUpdate()
   float new_motor_current = this->imc_->getMotorCurrent();
   double new_absolute_position = this->imc_->getAngleRadAbsolute();
   double new_incremental_position = this->imc_->getAngleRadIncremental();
-  float new_absolute_velocity = this->imc_->getVelocityRadAbsolute();
-  float new_incremental_velocity = this->imc_->getVelocityRadIncremental();
+  double new_absolute_velocity = this->imc_->getVelocityRadAbsolute();
+  double new_incremental_velocity = this->imc_->getVelocityRadIncremental();
 
   bool data_updated = (new_imc_volt != this->previous_imc_volt_ || new_motor_current != this->previous_motor_current_ ||
                        new_absolute_position != this->previous_absolute_position_ ||

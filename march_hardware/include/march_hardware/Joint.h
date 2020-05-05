@@ -60,8 +60,8 @@ public:
   int16_t getTorque();
   int32_t getAngleIUAbsolute();
   int32_t getAngleIUIncremental();
-  float getVelocityIUAbsolute();
-  float getVelocityIUIncremental();
+  double getVelocityIUAbsolute();
+  double getVelocityIUIncremental();
   float getTemperature();
   IMotionCubeState getIMotionCubeState();
 
@@ -129,8 +129,8 @@ private:
   float previous_motor_current_ = 0.0;
   double previous_absolute_position_ = 0.0;
   double previous_incremental_position_ = 0.0;
-  float previous_absolute_velocity_ = 0.0;
-  float previous_incremental_velocity_ = 0.0;
+  double previous_absolute_velocity_ = 0.0;
+  double previous_incremental_velocity_ = 0.0;
 
   double position_ = 0.0;
   double incremental_position_ = 0.0;
