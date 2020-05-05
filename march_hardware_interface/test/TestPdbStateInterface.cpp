@@ -1,20 +1,25 @@
 // Copyright 2018 Project March.
-
 #include "march_hardware_interface/march_pdb_state_interface.h"
-#include "gtest/gtest.h"
+
+#include <memory>
 #include <sstream>
+#include <utility>
+
+#include <gtest/gtest.h>
 
 class TestPdbStateInterface : public ::testing::Test
 {
 protected:
-  march::PowerDistributionBoard power_distribution_board_read_;
+  std::unique_ptr<march::PowerDistributionBoard> power_distribution_board_read_;
   bool master_shutdown_allowed_command = false;
   bool all_high_voltage_on_off_command = true;
   PowerNetOnOffCommand power_net_on_off_command_;
 
   void SetUp() override
   {
-    power_distribution_board_read_ = march::PowerDistributionBoard();
+    power_distribution_board_read_ = std::make_unique<march::PowerDistributionBoard>(
+        march::Slave(1, march::PdoInterfaceImpl::create(), march::SdoInterfaceImpl::create()), NetMonitorOffsets(),
+        NetDriverOffsets(), BootShutdownOffsets());
     master_shutdown_allowed_command = false;
     all_high_voltage_on_off_command = true;
     power_net_on_off_command_ = PowerNetOnOffCommand();
@@ -23,7 +28,7 @@ protected:
 
 TEST_F(TestPdbStateInterface, GeName)
 {
-  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", power_distribution_board_read_.get(),
                                           &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
                                           &power_net_on_off_command_);
   EXPECT_EQ("PDBhandle", marchPdbStateHandle.getName());
@@ -31,10 +36,10 @@ TEST_F(TestPdbStateInterface, GeName)
 
 TEST_F(TestPdbStateInterface, GetPowerDistributionBoardEquals)
 {
-  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", power_distribution_board_read_.get(),
                                           &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
                                           &power_net_on_off_command_);
-  EXPECT_TRUE(power_distribution_board_read_ == *marchPdbStateHandle.getPowerDistributionBoard());
+  EXPECT_TRUE(*power_distribution_board_read_ == *marchPdbStateHandle.getPowerDistributionBoard());
 }
 
 TEST_F(TestPdbStateInterface, GetPowerDistributionBoardNotEqual)
@@ -42,8 +47,10 @@ TEST_F(TestPdbStateInterface, GetPowerDistributionBoardNotEqual)
   NetMonitorOffsets currentOffsets = NetMonitorOffsets(5, 9, 13, 17, 3, 2, 1, 4);
   NetDriverOffsets netDriverOffsets = NetDriverOffsets(4, 3, 2);
   BootShutdownOffsets stateOffsets = BootShutdownOffsets(0, 0, 1);
-  march::PowerDistributionBoard pdb = march::PowerDistributionBoard(1, currentOffsets, netDriverOffsets, stateOffsets);
-  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+  march::PowerDistributionBoard pdb = march::PowerDistributionBoard(
+      march::Slave(1, march::PdoInterfaceImpl::create(), march::SdoInterfaceImpl::create()), currentOffsets,
+      netDriverOffsets, stateOffsets);
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", power_distribution_board_read_.get(),
                                           &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
                                           &power_net_on_off_command_);
   EXPECT_FALSE(pdb == *marchPdbStateHandle.getPowerDistributionBoard());
@@ -51,7 +58,7 @@ TEST_F(TestPdbStateInterface, GetPowerDistributionBoardNotEqual)
 
 TEST_F(TestPdbStateInterface, SetMasterShutdownAllowedTrue)
 {
-  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", power_distribution_board_read_.get(),
                                           &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
                                           &power_net_on_off_command_);
 
@@ -61,7 +68,7 @@ TEST_F(TestPdbStateInterface, SetMasterShutdownAllowedTrue)
 }
 TEST_F(TestPdbStateInterface, SetMasterShutdownAllowedFalse)
 {
-  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", power_distribution_board_read_.get(),
                                           &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
                                           &power_net_on_off_command_);
 
@@ -72,7 +79,7 @@ TEST_F(TestPdbStateInterface, SetMasterShutdownAllowedFalse)
 
 TEST_F(TestPdbStateInterface, HighVoltageNetEnableDisable)
 {
-  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", power_distribution_board_read_.get(),
                                           &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
                                           &power_net_on_off_command_);
 
@@ -82,7 +89,7 @@ TEST_F(TestPdbStateInterface, HighVoltageNetEnableDisable)
 }
 TEST_F(TestPdbStateInterface, TurnLowNetOn)
 {
-  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", power_distribution_board_read_.get(),
                                           &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
                                           &power_net_on_off_command_);
 
@@ -96,7 +103,7 @@ TEST_F(TestPdbStateInterface, TurnLowNetOn)
 
 TEST_F(TestPdbStateInterface, TurnLowNetOff)
 {
-  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", power_distribution_board_read_.get(),
                                           &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
                                           &power_net_on_off_command_);
 
@@ -109,7 +116,7 @@ TEST_F(TestPdbStateInterface, TurnLowNetOff)
 }
 TEST_F(TestPdbStateInterface, TurnHighNetOn)
 {
-  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", power_distribution_board_read_.get(),
                                           &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
                                           &power_net_on_off_command_);
 
@@ -123,7 +130,7 @@ TEST_F(TestPdbStateInterface, TurnHighNetOn)
 
 TEST_F(TestPdbStateInterface, TurnHighNetOff)
 {
-  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", &power_distribution_board_read_,
+  MarchPdbStateHandle marchPdbStateHandle("PDBhandle", power_distribution_board_read_.get(),
                                           &master_shutdown_allowed_command, &all_high_voltage_on_off_command,
                                           &power_net_on_off_command_);
 
