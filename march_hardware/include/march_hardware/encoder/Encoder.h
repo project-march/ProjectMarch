@@ -37,11 +37,11 @@ public:
    */
   float getVelocityIU(uint8_t byte_offset) const;
 
-	/**
-	 * Reads out the velocity of the encoder from the slave and transforms the result to radians.
-	 * @param byte_offset the byte offset in the slave register for the IU position
-	 * @returns The current position of the encoder in radians
-	 */
+  /**
+   * Reads out the velocity of the encoder from the slave and transforms the result to radians.
+   * @param byte_offset the byte offset in the slave register for the IU position
+   * @returns The current position of the encoder in radians
+   */
   double getVelocityRad(uint8_t byte_offset) const;
 
   /**
