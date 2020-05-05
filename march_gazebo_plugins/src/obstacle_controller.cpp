@@ -24,13 +24,6 @@ ObstacleController::ObstacleController(physics::ModelPtr model)
   {
     this->mass += link->GetInertial()->Mass();
   }
-
-    this->p_pitch_ = 120;
-    this->d_pitch_ = 40000;
-    this->p_roll_ = 150;
-    this->d_roll_ = 40000;
-    this->p_yaw_ = 1000;
-    this->d_yaw_ = 40000;
 }
 
 void ObstacleController::newSubgait(const march_shared_resources::GaitActionGoalConstPtr& _msg)
@@ -107,15 +100,13 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left
 
   if (this->subgait_name_.substr(0, 4) == "left")
   {
-      torque_right = ignition::math::v4::Vector3<double>(0, T_pitch, T_yaw);
-    torque_right += ignition::math::v4::Vector3<double>(T_roll, 0, 0);
-      torque_left += ignition::math::v4::Vector3<double>(0, 0, 0);
+      torque_right = ignition::math::v4::Vector3<double>(T_roll, T_pitch, T_yaw);
+      torque_left = ignition::math::v4::Vector3<double>(0, 0, 0);
   }
   else
   {
-      torque_left = ignition::math::v4::Vector3<double>(0, T_pitch, T_yaw);
-    torque_left += ignition::math::v4::Vector3<double>(T_roll, 0, 0);
-      torque_right += ignition::math::v4::Vector3<double>(0, 0, 0);
+      torque_left = ignition::math::v4::Vector3<double>(T_roll, T_pitch, T_yaw);
+      torque_right = ignition::math::v4::Vector3<double>(0, 0, 0);
   }
 
   this->error_x_last_timestep_ = error_x;

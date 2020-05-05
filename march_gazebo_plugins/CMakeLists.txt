@@ -21,7 +21,6 @@ catkin_package(
 add_library(${PROJECT_NAME}
     src/com_controller_plugin.cpp
     src/obstacle_controller.cpp
-    src/stairs_controller.cpp
     src/walk_controller.cpp
 )
 target_include_directories(${PROJECT_NAME} PRIVATE ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})

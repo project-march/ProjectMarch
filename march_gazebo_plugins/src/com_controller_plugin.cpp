@@ -43,16 +43,14 @@ void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf
 void ComControllerPlugin::onRosMsg(const march_shared_resources::GaitActionGoalConstPtr& _msg)
 {
   std::string new_gait_name = _msg->goal.name;
-  if (new_gait_name.substr(0, 6) == "stairs")
+  if (new_gait_name.substr(0, 6) == "tilted")
   {
-    if (typeid(*this->controller_) != typeid(StairsController))
-    {
-      ROS_INFO("Switch to stairs controller");
-      this->controller_.reset(new StairsController(this->model_));
-    }
   }
   else
   {
+    std::cout << typeid(*this->controller_).name() << '\n';
+    std::cout << typeid(WalkController).name() << '\n';
+
     if (typeid(*this->controller_) != typeid(WalkController))
     {
       ROS_INFO("Switch to walk controller");
