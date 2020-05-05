@@ -58,7 +58,7 @@ int main(int argc, char** argv)
       march.waitForPdo();
 
       const ros::Time now = ros::Time::now();
-      ros::Duration elapsed_time = std::min(now - last_update_time, minimal_elapsed_time);
+      ros::Duration elapsed_time = now - last_update_time;
       last_update_time = now;
 
       march.read(now, elapsed_time);
