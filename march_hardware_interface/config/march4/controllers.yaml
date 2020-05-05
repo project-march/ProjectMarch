@@ -5,7 +5,7 @@ march:
       publish_rate: 50
     joint_state:
       type: joint_state_controller/JointStateController
-      publish_rate: 50
+      publish_rate: 250
     temperature_sensor:
       type: march_temperature_sensor_controller/MarchTemperatureSensorController
       publish_rate: 1
