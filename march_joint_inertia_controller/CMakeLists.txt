@@ -10,6 +10,9 @@ project(march_joint_inertia_controller)
 find_package(catkin REQUIRED COMPONENTS
   controller_interface
   pluginlib
+  roscpp
+  std_msgs
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -145,9 +148,10 @@ include_directories(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
+
+## my_controller_file library
+add_library(joint_inertia_controller_lib src/my_controller.cpp)
+target_link_libraries(joint_inertia_controller_lib ${catkin_LIBRARIES})
 
 #############
 ## Install ##
