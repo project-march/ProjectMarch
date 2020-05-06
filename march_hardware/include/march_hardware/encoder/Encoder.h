@@ -69,7 +69,7 @@ public:
   static constexpr double FIXED_POINT_TO_FLOAT_CONVERSION = 1 << 16;
 
   // iMOTIONCUBE setting (slow loop sample period)
-  static constexpr double TIME_PER_VELOCITY_SAMPLE = 0.001;
+  static constexpr double TIME_PER_VELOCITY_SAMPLE = 0.004;
 
   static constexpr double PI_2 = 2 * M_PI;
 
