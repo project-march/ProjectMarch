@@ -48,7 +48,7 @@ int main(int argc, char** argv)
   }
 
   controller_manager::ControllerManager controller_manager(&march, nh);
-  ros::Time last_update_time = ros::Time::now()
+  ros::Time last_update_time = ros::Time::now();
 
   while (ros::ok())
   {
