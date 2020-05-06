@@ -1,0 +1,5 @@
+<library path="lib/libjoint_inertia_controller_lib">
+  <class name="joint_inertia_controller_ns/InertiaController"
+         type="joint_inertia_controller_ns::InertiaController"
+         base_class_type="controller_interface::ControllerBase" />
+</library>

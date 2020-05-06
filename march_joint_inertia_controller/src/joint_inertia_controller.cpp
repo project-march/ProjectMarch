@@ -11,7 +11,7 @@ namespace joint_inertia_controller_ns {
             ROS_ERROR("No joint_name specified");
             return false;
         }
-        joint_ = hw->getHandle("shoulder_pan_joint");
+        joint_ = hw->getHandle(joint_name);
         return true;
     }
 
