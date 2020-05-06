@@ -132,8 +132,12 @@ bool IMotionCube::writeInitialSettings(uint8_t cycle_time)
   int rate_ec_x = sdo_bit8_write(slaveIndex, 0x60C2, 1, cycle_time);
   int rate_ec_y = sdo_bit8_write(slaveIndex, 0x60C2, 2, -3);
 
+  // use filter object to read motor voltage
+  int volt_address = sdo_bit16_write(slaveIndex, 0x2081, 1, 0x0232);
+  int volt_filter = sdo_bit16_write(slaveIndex, 0x2081, 2, 32767);
+
   if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && stop_decl && abort_con && rate_ec_x && rate_ec_y &&
-        checksum_verified))
+        checksum_verified && volt_address && volt_filter))
   {
     throw error::HardwareException(error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
                                    "Failed writing initial settings to IMC of slave %d", this->slaveIndex);
@@ -281,6 +285,11 @@ float IMotionCube::getIMCVoltage()
       get_input_bit16(this->slaveIndex, this->miso_byte_offsets_.at(IMCObjectName::DCLinkVoltage)).ui;
   return (V_DC_MAX_MEASURABLE / IU_CONVERSION_CONST) *
          static_cast<float>(imc_voltage_iu);  // Conversion to Volt, see Technosoft CoE programming manual
+}
+
+float IMotionCube::getMotorVoltage()
+{
+
 }
 
 void IMotionCube::setControlWord(uint16_t control_word)

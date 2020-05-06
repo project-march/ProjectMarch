@@ -213,6 +213,7 @@ IMotionCubeState Joint::getIMotionCubeState()
 
   states.motorCurrent = this->imc_->getMotorCurrent();
   states.IMCVoltage = this->imc_->getIMCVoltage();
+  states.motorVoltage = this->imc_->getMotorVoltage();
 
   states.absoluteEncoderValue = this->imc_->getAngleIUAbsolute();
   states.incrementalEncoderValue = this->imc_->getAngleIUIncremental();
@@ -277,13 +278,15 @@ bool Joint::receivedDataUpdate()
   // If imc voltage, motor current, and both encoders positions did not change,
   // we probably did not receive an update for this joint.
   float new_imc_volt = this->imc_->getIMCVoltage();
+  float new_motor_volt = this->imc_->getMotorVoltage();
   float new_motor_current = this->imc_->getMotorCurrent();
   double new_absolute_position = this->imc_->getAngleRadAbsolute();
   double new_incremental_position = this->imc_->getAngleRadIncremental();
-  bool data_updated = (new_imc_volt != this->previous_imc_volt_ || new_motor_current != this->previous_motor_current_ ||
+  bool data_updated = (new_imc_volt != this->previous_imc_volt_ new_motor_volt != this->previous_motor_volt_ || new_motor_current != this->previous_motor_current_ ||
                        new_absolute_position != this->previous_absolute_position_ ||
                        new_incremental_position != this->previous_incremental_position_);
   this->previous_imc_volt_ = new_imc_volt;
+  this->previous_motor_volt_ = new_motor_volt;
   this->previous_motor_current_ = new_motor_current;
   this->previous_absolute_position_ = new_absolute_position;
   this->previous_incremental_position_ = new_incremental_position;
