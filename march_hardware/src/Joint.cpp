@@ -1,4 +1,9 @@
 // Copyright 2019 Project March.
+#include "march_hardware/EtherCAT/slave.h"
+#include "march_hardware/Joint.h"
+#include "march_hardware/error/hardware_exception.h"
+#include "march_hardware/error/motion_error.h"
+
 #include <ros/ros.h>
 
 #include <bitset>
@@ -6,10 +11,6 @@
 #include <memory>
 #include <string>
 #include <utility>
-
-#include <march_hardware/error/motion_error.h>
-#include <march_hardware/Joint.h>
-#include <march_hardware/error/hardware_exception.h>
 
 namespace march
 {
@@ -37,11 +38,11 @@ bool Joint::initialize(int cycle_time)
   bool reset = false;
   if (this->hasIMotionCube())
   {
-    reset |= this->imc_->writeInitialSDOs(cycle_time);
+    reset |= this->imc_->Slave::initSdo(cycle_time);
   }
   if (this->hasTemperatureGES())
   {
-    reset |= this->temperature_ges_->writeInitialSDOs(cycle_time);
+    reset |= this->temperature_ges_->initSdo(cycle_time);
   }
   return reset;
 }
@@ -71,7 +72,7 @@ void Joint::resetIMotionCube()
   }
   else
   {
-    this->imc_->reset();
+    this->imc_->Slave::reset();
   }
 }
 
@@ -271,12 +272,12 @@ std::string Joint::getName() const
 
 bool Joint::hasIMotionCube() const
 {
-  return this->imc_ && this->imc_->getSlaveIndex() != -1;
+  return this->imc_ != nullptr;
 }
 
 bool Joint::hasTemperatureGES() const
 {
-  return this->temperature_ges_ && this->temperature_ges_->getSlaveIndex() != -1;
+  return this->temperature_ges_ != nullptr;
 }
 
 bool Joint::canActuate() const

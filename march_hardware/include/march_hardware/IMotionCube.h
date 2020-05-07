@@ -3,13 +3,14 @@
 #ifndef MARCH_HARDWARE_IMOTIONCUBE_H
 #define MARCH_HARDWARE_IMOTIONCUBE_H
 #include "march_hardware/ActuationMode.h"
-#include "march_hardware/encoder/AbsoluteEncoder.h"
-#include "march_hardware/encoder/IncrementalEncoder.h"
-#include "march_hardware/EtherCAT/EthercatIO.h"
+#include "march_hardware/EtherCAT/pdo_types.h"
+#include "march_hardware/EtherCAT/sdo_interface.h"
+#include "march_hardware/EtherCAT/slave.h"
 #include "march_hardware/IMotionCubeState.h"
 #include "march_hardware/IMotionCubeTargetState.h"
 #include "march_hardware/PDOmap.h"
-#include "march_hardware/Slave.h"
+#include "march_hardware/encoder/AbsoluteEncoder.h"
+#include "march_hardware/encoder/IncrementalEncoder.h"
 
 #include <memory>
 #include <unordered_map>
@@ -23,15 +24,15 @@ public:
   /**
    * Constructs an IMotionCube with an incremental and absolute encoder.
    *
-   * @param slave_index index of the IMotionCube slave
+   * @param slave slave of the IMotionCube
    * @param absolute_encoder pointer to absolute encoder, required so cannot be nullptr
    * @param incremental_encoder pointer to incremental encoder, required so cannot be nullptr
    * @param actuation_mode actuation mode in which the IMotionCube must operate
    * @throws std::invalid_argument When an absolute or incremental encoder is nullptr.
    */
-  IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+  IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
               std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
-  IMotionCube(int slave_index, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+  IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
               std::unique_ptr<IncrementalEncoder> incremental_encoder, std::string& sw_stream,
               ActuationMode actuation_mode);
 
@@ -40,8 +41,6 @@ public:
   /* Delete copy constructor/assignment since the unique_ptrs cannot be copied */
   IMotionCube(const IMotionCube&) = delete;
   IMotionCube& operator=(const IMotionCube&) = delete;
-
-  bool writeInitialSDOs(int cycle_time) override;
 
   virtual double getAngleRadAbsolute();
   virtual double getAngleRadIncremental();
@@ -72,18 +71,16 @@ public:
   void goToTargetState(IMotionCubeTargetState target_state);
   virtual void goToOperationEnabled();
 
-  virtual void reset();
-
   /** @brief Override comparison operator */
   friend bool operator==(const IMotionCube& lhs, const IMotionCube& rhs)
   {
-    return lhs.slaveIndex == rhs.slaveIndex && *lhs.absolute_encoder_ == *rhs.absolute_encoder_ &&
+    return lhs.getSlaveIndex() == rhs.getSlaveIndex() && *lhs.absolute_encoder_ == *rhs.absolute_encoder_ &&
            *lhs.incremental_encoder_ == *rhs.incremental_encoder_;
   }
   /** @brief Override stream operator for clean printing */
   friend std::ostream& operator<<(std::ostream& os, const IMotionCube& imc)
   {
-    return os << "slaveIndex: " << imc.slaveIndex << ", "
+    return os << "slaveIndex: " << imc.getSlaveIndex() << ", "
               << "incrementalEncoder: " << *imc.incremental_encoder_ << ", "
               << "absoluteEncoder: " << *imc.absolute_encoder_;
   }
@@ -98,17 +95,23 @@ public:
   // 500 * 100us = 50 ms = watchdog timer
   static const uint16_t WATCHDOG_TIME = 500;
 
+protected:
+  bool initSdo(SdoSlaveInterface& sdo, int cycle_time) override;
+
+  void reset(SdoSlaveInterface& sdo) override;
+
 private:
   void actuateIU(int32_t target_iu);
 
-  void mapMisoPDOs();
-  void mapMosiPDOs();
+  void mapMisoPDOs(SdoSlaveInterface& sdo);
+  void mapMosiPDOs(SdoSlaveInterface& sdo);
   /**
    * Initializes all iMC by checking the setup on the drive and writing necessary SDO registers.
+   * @param sdo SDO interface to write to
    * @param cycle_time the cycle time of the EtherCAT
    * @return 1 if reset is necessary, otherwise it returns 0
    */
-  bool writeInitialSettings(uint8_t cycle_time);
+  bool writeInitialSettings(SdoSlaveInterface& sdo, int cycle_time);
   /**
    * Calculates checksum on .sw file passed in string format in sw_string_ by simple summation until next empty line.
    * Start_address and end_address are filled in the method and used for downloading the .sw file to the drive.
@@ -124,12 +127,12 @@ private:
    * and 16.2.6) to determine the checksum on the drive.
    * @return true or 1 if the setup is verified and therefore correct, otherwise returns 0
    */
-  bool verifySetup();
+  bool verifySetup(SdoSlaveInterface& sdo);
   /**
    * Downloads the setup on the .sw file onto the drive using 32bit SDO write functions.
    * The general process is specified in chapter 16.4 of the CoE manual from Technosoft(2019).
    */
-  void downloadSetupToDrive();
+  void downloadSetupToDrive(SdoSlaveInterface& sdo);
 
   // Use of smart pointers are necessary here to make dependency injection
   // possible and thus allow for mocking the encoders. A unique pointer is

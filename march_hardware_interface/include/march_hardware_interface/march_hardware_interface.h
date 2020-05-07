@@ -90,7 +90,6 @@ private:
 
   /* March hardware */
   std::unique_ptr<march::MarchRobot> march_robot_;
-  bool has_power_distribution_board_ = false;
 
   /* Interfaces */
   hardware_interface::JointStateInterface joint_state_interface_;
@@ -122,7 +121,6 @@ private:
 
   std::vector<joint_limits_interface::SoftJointLimits> soft_limits_;
 
-  march::PowerDistributionBoard power_distribution_board_read_;
   PowerNetOnOffCommand power_net_on_off_command_;
   bool master_shutdown_allowed_command_ = false;
   bool enable_high_voltage_command_ = true;

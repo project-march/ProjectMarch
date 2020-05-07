@@ -1,6 +1,6 @@
 // Copyright 2018 Project March.
-#include "mocks/MockTemperatureGES.cpp"
-#include "mocks/MockIMotionCube.cpp"
+#include "mocks/MockTemperatureGES.h"
+#include "mocks/MockIMotionCube.h"
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/Joint.h"
 
@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+using testing::_;
 using testing::Eq;
 using testing::Return;
 
@@ -35,7 +36,7 @@ TEST_F(JointTest, InitializeWithoutMotorControllerAndGes)
 TEST_F(JointTest, InitializeWithoutTemperatureGes)
 {
   const int expected_cycle = 3;
-  EXPECT_CALL(*this->imc, writeInitialSDOs(Eq(expected_cycle))).Times(1);
+  EXPECT_CALL(*this->imc, initSdo(_, Eq(expected_cycle))).Times(1);
 
   march::Joint joint("test", 0, false, std::move(this->imc));
   ASSERT_NO_THROW(joint.initialize(expected_cycle));
@@ -44,7 +45,7 @@ TEST_F(JointTest, InitializeWithoutTemperatureGes)
 TEST_F(JointTest, InitializeWithoutMotorController)
 {
   const int expected_cycle = 3;
-  EXPECT_CALL(*this->temperature_ges, writeInitialSDOs(Eq(expected_cycle))).Times(1);
+  EXPECT_CALL(*this->temperature_ges, initSdo(_, Eq(expected_cycle))).Times(1);
 
   march::Joint joint("test", 0, false, nullptr, std::move(this->temperature_ges));
   ASSERT_NO_THROW(joint.initialize(expected_cycle));
@@ -152,14 +153,14 @@ TEST_F(JointTest, GetTemperatureWithoutTemperatureGes)
 
 TEST_F(JointTest, ResetController)
 {
-  EXPECT_CALL(*this->imc, reset()).Times(1);
+  EXPECT_CALL(*this->imc, reset(_)).Times(1);
   march::Joint joint("reset_controller", 0, true, std::move(this->imc));
   ASSERT_NO_THROW(joint.resetIMotionCube());
 }
 
 TEST_F(JointTest, ResetControllerWithoutController)
 {
-  EXPECT_CALL(*this->imc, reset()).Times(0);
+  EXPECT_CALL(*this->imc, reset(_)).Times(0);
   march::Joint joint("reset_controller", 0, true, nullptr, std::move(this->temperature_ges));
   ASSERT_NO_THROW(joint.resetIMotionCube());
 }

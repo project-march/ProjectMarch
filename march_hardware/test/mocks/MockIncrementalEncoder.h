@@ -1,3 +1,4 @@
+#pragma once
 #include "march_hardware/encoder/IncrementalEncoder.h"
 
 #include <gmock/gmock.h>

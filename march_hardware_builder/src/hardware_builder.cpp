@@ -3,7 +3,6 @@
 #include "march_hardware_builder/hardware_config_exceptions.h"
 
 #include <algorithm>
-#include <iterator>
 #include <memory>
 #include <string>
 #include <utility>
@@ -13,6 +12,8 @@
 #include <ros/ros.h>
 
 #include <march_hardware/error/error_type.h>
+#include <march_hardware/EtherCAT/pdo_interface.h>
+#include <march_hardware/EtherCAT/sdo_interface.h>
 #include <march_hardware/error/hardware_exception.h>
 
 // clang-format off
@@ -54,6 +55,8 @@ HardwareBuilder::HardwareBuilder(const std::string& yaml_path, urdf::Model urdf)
 std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
 {
   this->initUrdf();
+  auto pdo_interface = march::PdoInterfaceImpl::create();
+  auto sdo_interface = march::SdoInterfaceImpl::create();
 
   const auto robot_name = this->robot_config_.begin()->first.as<std::string>();
   ROS_DEBUG_STREAM("Starting creation of robot " << robot_name);
@@ -63,24 +66,17 @@ std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
   const auto if_name = config["ifName"].as<std::string>();
   const auto cycle_time = config["ecatCycleTime"].as<int>();
 
-  std::vector<march::Joint> joints = this->createJoints(config["joints"]);
+  std::vector<march::Joint> joints = this->createJoints(config["joints"], pdo_interface, sdo_interface);
 
   ROS_INFO_STREAM("Robot config:\n" << config);
   YAML::Node pdb_config = config["powerDistributionBoard"];
-  if (pdb_config)
-  {
-    auto pdb = HardwareBuilder::createPowerDistributionBoard(pdb_config);
-    return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_, pdb, if_name, cycle_time);
-  }
-  else
-  {
-    ROS_INFO("powerDistributionBoard is NOT defined");
-    return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_, if_name, cycle_time);
-  }
+  auto pdb = HardwareBuilder::createPowerDistributionBoard(pdb_config, pdo_interface, sdo_interface);
+  return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_, std::move(pdb), if_name, cycle_time);
 }
 
 march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const std::string& joint_name,
-                                          const urdf::JointConstSharedPtr& urdf_joint)
+                                          const urdf::JointConstSharedPtr& urdf_joint,
+                                          march::PdoInterfacePtr pdo_interface, march::SdoInterfacePtr sdo_interface)
 {
   ROS_DEBUG("Starting creation of joint %s", joint_name.c_str());
   if (!urdf_joint)
@@ -108,13 +104,14 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const 
     mode = march::ActuationMode(joint_config["actuationMode"].as<std::string>());
   }
 
-  auto imc = HardwareBuilder::createIMotionCube(joint_config["imotioncube"], mode, urdf_joint);
+  auto imc =
+      HardwareBuilder::createIMotionCube(joint_config["imotioncube"], mode, urdf_joint, pdo_interface, sdo_interface);
   if (!imc)
   {
     ROS_WARN("Joint %s does not have a configuration for an IMotionCube", joint_name.c_str());
   }
 
-  auto ges = HardwareBuilder::createTemperatureGES(joint_config["temperatureges"]);
+  auto ges = HardwareBuilder::createTemperatureGES(joint_config["temperatureges"], pdo_interface, sdo_interface);
   if (!ges)
   {
     ROS_WARN("Joint %s does not have a configuration for a TemperatureGes", joint_name.c_str());
@@ -124,7 +121,9 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const 
 
 std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAML::Node& imc_config,
                                                                        march::ActuationMode mode,
-                                                                       const urdf::JointConstSharedPtr& urdf_joint)
+                                                                       const urdf::JointConstSharedPtr& urdf_joint,
+                                                                       march::PdoInterfacePtr pdo_interface,
+                                                                       march::SdoInterfacePtr sdo_interface)
 {
   if (!imc_config || !urdf_joint)
   {
@@ -141,7 +140,8 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
   imc_setup_data.open(ros::package::getPath("march_hardware_builder").append("/config/" + urdf_joint->name + ".sw"));
   std::string setup = convertSWFileToString(imc_setup_data);
   return std::make_unique<march::IMotionCube>(
-      slave_index, HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, urdf_joint),
+      march::Slave(slave_index, pdo_interface, sdo_interface),
+      HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, urdf_joint),
       HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), setup, mode);
 }
 
@@ -194,7 +194,9 @@ HardwareBuilder::createIncrementalEncoder(const YAML::Node& incremental_encoder_
   return std::make_unique<march::IncrementalEncoder>(resolution, transmission);
 }
 
-std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(const YAML::Node& temperature_ges_config)
+std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(const YAML::Node& temperature_ges_config,
+                                                                             march::PdoInterfacePtr pdo_interface,
+                                                                             march::SdoInterfacePtr sdo_interface)
 {
   if (!temperature_ges_config)
   {
@@ -206,11 +208,17 @@ std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(con
 
   const auto slave_index = temperature_ges_config["slaveIndex"].as<int>();
   const auto byte_offset = temperature_ges_config["byteOffset"].as<int>();
-  return std::make_unique<march::TemperatureGES>(slave_index, byte_offset);
+  return std::make_unique<march::TemperatureGES>(march::Slave(slave_index, pdo_interface, sdo_interface), byte_offset);
 }
 
-march::PowerDistributionBoard HardwareBuilder::createPowerDistributionBoard(const YAML::Node& pdb)
+std::unique_ptr<march::PowerDistributionBoard> HardwareBuilder::createPowerDistributionBoard(
+    const YAML::Node& pdb, march::PdoInterfacePtr pdo_interface, march::SdoInterfacePtr sdo_interface)
 {
+  if (!pdb)
+  {
+    return nullptr;
+  }
+
   HardwareBuilder::validateRequiredKeysExist(pdb, HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS,
                                              "powerdistributionboard");
 
@@ -236,7 +244,9 @@ march::PowerDistributionBoard HardwareBuilder::createPowerDistributionBoard(cons
       boot_shutdown_byte_offsets["masterOk"].as<int>(), boot_shutdown_byte_offsets["shutdown"].as<int>(),
       boot_shutdown_byte_offsets["shutdownAllowed"].as<int>());
 
-  return { slave_index, net_monitor_offsets, net_driver_offsets, boot_shutdown_offsets };
+  return std::make_unique<march::PowerDistributionBoard>(march::Slave(slave_index, pdo_interface, sdo_interface),
+                                                         net_monitor_offsets, net_driver_offsets,
+                                                         boot_shutdown_offsets);
 }
 
 void HardwareBuilder::validateRequiredKeysExist(const YAML::Node& config, const std::vector<std::string>& key_list,
@@ -263,7 +273,9 @@ void HardwareBuilder::initUrdf()
   }
 }
 
-std::vector<march::Joint> HardwareBuilder::createJoints(const YAML::Node& joints_config) const
+std::vector<march::Joint> HardwareBuilder::createJoints(const YAML::Node& joints_config,
+                                                        march::PdoInterfacePtr pdo_interface,
+                                                        march::SdoInterfacePtr sdo_interface) const
 {
   std::vector<march::Joint> joints;
   for (const YAML::Node& joint_config : joints_config)
@@ -274,7 +286,8 @@ std::vector<march::Joint> HardwareBuilder::createJoints(const YAML::Node& joints
     {
       ROS_WARN("Joint %s is fixed in the URDF, but defined in the robot yaml", joint_name.c_str());
     }
-    joints.push_back(HardwareBuilder::createJoint(joint_config[joint_name], joint_name, urdf_joint));
+    joints.push_back(
+        HardwareBuilder::createJoint(joint_config[joint_name], joint_name, urdf_joint, pdo_interface, sdo_interface));
   }
 
   for (const auto& urdf_joint : this->urdf_.joints_)

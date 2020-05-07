@@ -1,3 +1,4 @@
+#pragma once
 #include "march_hardware/encoder/AbsoluteEncoder.h"
 
 #include <gmock/gmock.h>
