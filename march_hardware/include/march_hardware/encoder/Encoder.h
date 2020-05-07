@@ -34,6 +34,22 @@ public:
   double getAngleRad(const PdoSlaveInterface& pdo, uint8_t byte_offset) const;
 
   /**
+   * Reads out the velocity of the encoder from the slave and returns the value in Internal Units per second (IU/s).
+   * @param pdo PDO interface to use for reading
+   * @param byte_offset the byte offset in the slave register for the IU velocity
+   * @returns The current velocity measured by the encoder in Internal Units per second (IU/s)
+   */
+  double getVelocityIU(const PdoSlaveInterface& pdo, uint8_t byte_offset) const;
+
+  /**
+   * Reads out the velocity of the encoder from the slave and transforms the result to radians per second.
+   * @param pdo PDO interface to use for reading
+   * @param byte_offset the byte offset in the slave register for the IU velocity
+   * @returns The current velocity measured by the encoder in radians per second
+   */
+  double getVelocityRad(const PdoSlaveInterface& pdo, uint8_t byte_offset) const;
+
+  /**
    * Converts encoder Internal Units (IU) to radians.
    * This is a pure virtual function and must be implemented by subclasses,
    * since each type of encoder has a different way of calculating radians.
@@ -51,6 +67,12 @@ public:
 
   static const size_t MIN_RESOLUTION = 1;
   static const size_t MAX_RESOLUTION = 32;
+
+  // constant used for converting a fixed point 16.16 bit number to a double, which is done by dividing by 2^16
+  static constexpr double FIXED_POINT_TO_FLOAT_CONVERSION = 1 << 16;
+
+  // iMOTIONCUBE setting (slow loop sample period)
+  static constexpr double TIME_PER_VELOCITY_SAMPLE = 0.004;
 
   static constexpr double PI_2 = 2 * M_PI;
 

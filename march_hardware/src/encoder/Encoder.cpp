@@ -20,6 +20,17 @@ double Encoder::getAngleRad(const PdoSlaveInterface& pdo, uint8_t byte_offset) c
   return this->toRad(this->getAngleIU(pdo, byte_offset));
 }
 
+double Encoder::getVelocityIU(const PdoSlaveInterface& pdo, uint8_t byte_offset) const
+{
+  bit32 return_byte = pdo.read32(byte_offset);
+  return return_byte.i / (TIME_PER_VELOCITY_SAMPLE * FIXED_POINT_TO_FLOAT_CONVERSION);
+}
+
+double Encoder::getVelocityRad(const PdoSlaveInterface& pdo, uint8_t byte_offset) const
+{
+  return this->getVelocityIU(pdo, byte_offset) * this->getRadPerBit();
+}
+
 size_t Encoder::getTotalPositions() const
 {
   return this->total_positions_;

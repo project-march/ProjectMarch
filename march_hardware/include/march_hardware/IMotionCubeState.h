@@ -134,6 +134,8 @@ public:
   float IMCVoltage;
   int absoluteEncoderValue;
   int incrementalEncoderValue;
+  double absoluteVelocity;
+  double incrementalVelocity;
 };
 
 }  // namespace march
