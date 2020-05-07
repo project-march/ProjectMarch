@@ -114,8 +114,8 @@ std::unordered_map<IMCObjectName, uint8_t> PDOmap::configurePDO(SdoSlaveInterfac
 
   // Deactivated the sync manager and configure with the new PDO
   sdo.write<uint8_t>(base_sync_manager, 0, 0);
-  int current_pdo = (current_register - base_register) + 1;
-  sdo.write<uint16_t>(base_sync_manager, current_pdo, current_register);
+  int current_pdo_number = (current_register - base_register) + 1;
+  sdo.write<uint16_t>(base_sync_manager, current_pdo_number, current_register);
 
   // Explicitly disable PDO registers which are not used
   current_register++;
