@@ -48,8 +48,7 @@ int main(int argc, char** argv)
   }
 
   controller_manager::ControllerManager controller_manager(&march, nh);
-  const ros::Duration minimal_elapsed_time = ros::Duration(march.getEthercatCycleTime() / 1000.0);
-  ros::Time last_update_time = ros::Time::now() - minimal_elapsed_time;
+  ros::Time last_update_time = ros::Time::now();
 
   while (ros::ok())
   {
@@ -58,7 +57,7 @@ int main(int argc, char** argv)
       march.waitForPdo();
 
       const ros::Time now = ros::Time::now();
-      ros::Duration elapsed_time = std::min(now - last_update_time, minimal_elapsed_time);
+      ros::Duration elapsed_time = now - last_update_time;
       last_update_time = now;
 
       march.read(now, elapsed_time);

@@ -1,45 +1,39 @@
 // Copyright 2018 Project March.
-
-#include "gtest/gtest.h"
+#include "mocks/MockSlave.h"
 #include "march_hardware/TemperatureGES.h"
 
-class TemperatureJointTest : public ::testing::Test
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+
+using testing::Eq;
+using testing::Return;
+
+class TemperatureGESTest : public ::testing::Test
 {
 protected:
+  MockPdoInterfacePtr mock_pdo = std::make_shared<MockPdoInterface>();
+  MockSdoInterfacePtr mock_sdo = std::make_shared<MockSdoInterface>();
+  MockSlave mock_slave = MockSlave(this->mock_pdo, this->mock_sdo);
 };
 
-class TemperatureJointDeathTest : public TemperatureJointTest
+TEST_F(TemperatureGESTest, ByteOffsetOne)
 {
-};
-
-TEST_F(TemperatureJointTest, SlaveIndexOne)
-{
-  march::TemperatureGES tempSens = march::TemperatureGES(1, 2);
-  ASSERT_EQ(1, tempSens.getSlaveIndex());
+  ASSERT_NO_THROW(march::TemperatureGES(this->mock_slave, 1));
 }
 
-TEST_F(TemperatureJointTest, ByteOffsetOne)
+TEST_F(TemperatureGESTest, ByteOffsetZero)
 {
-  ASSERT_NO_THROW(march::TemperatureGES(2, 1));
+  ASSERT_NO_THROW(march::TemperatureGES(this->mock_slave, 0));
 }
 
-TEST_F(TemperatureJointTest, ByteOffsetZero)
+TEST_F(TemperatureGESTest, GetTemperature)
 {
-  ASSERT_NO_THROW(march::TemperatureGES(2, 0));
-}
+  const uint8_t expected_offset = 3;
+  const float temperature = 1.0;
+  EXPECT_CALL(*this->mock_pdo, read32(Eq(this->mock_slave.getSlaveIndex()), Eq(expected_offset)))
+      .WillOnce(Return(march::bit32{ .f = temperature }));
 
-TEST_F(TemperatureJointDeathTest, ByteOffsetMinusOne)
-{
-  ASSERT_DEATH(march::TemperatureGES(2, -1), "Slave configuration error: temperatureByteOffset -1 can not be "
-                                             "negative.");
-}
+  const march::TemperatureGES ges(this->mock_slave, expected_offset);
 
-TEST_F(TemperatureJointTest, NoSlaveIndexConstructor)
-{
-  ASSERT_NO_THROW(march::TemperatureGES());
-}
-TEST_F(TemperatureJointTest, NoSlaveIndexConstructorGetIndex)
-{
-  march::TemperatureGES tempSens = march::TemperatureGES();
-  ASSERT_EQ(-1, tempSens.getSlaveIndex());
+  ASSERT_FLOAT_EQ(ges.getTemperature(), temperature);
 }

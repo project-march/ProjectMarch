@@ -36,16 +36,14 @@ public:
   /** @brief Override comparison operator */
   friend bool operator==(const AbsoluteEncoder& lhs, const AbsoluteEncoder& rhs)
   {
-    return lhs.getSlaveIndex() == rhs.getSlaveIndex() && lhs.getTotalPositions() == rhs.getTotalPositions() &&
-           lhs.upper_soft_limit_iu_ == rhs.upper_soft_limit_iu_ &&
+    return lhs.getTotalPositions() == rhs.getTotalPositions() && lhs.upper_soft_limit_iu_ == rhs.upper_soft_limit_iu_ &&
            lhs.lower_soft_limit_iu_ == rhs.lower_soft_limit_iu_ && lhs.upper_limit_iu_ == rhs.upper_limit_iu_ &&
            lhs.lower_limit_iu_ == rhs.lower_limit_iu_ && lhs.zero_position_iu_ == rhs.zero_position_iu_;
   }
   /** @brief Override stream operator for clean printing */
   friend std::ostream& operator<<(std::ostream& os, const AbsoluteEncoder& encoder)
   {
-    return os << "slaveIndex: " << encoder.getSlaveIndex() << ", "
-              << "totalPositions: " << encoder.getTotalPositions() << ", "
+    return os << "totalPositions: " << encoder.getTotalPositions() << ", "
               << "upperHardLimit: " << encoder.upper_limit_iu_ << ", "
               << "lowerHardLimit: " << encoder.lower_limit_iu_ << ", "
               << "upperSoftLimit: " << encoder.upper_soft_limit_iu_ << ", "
