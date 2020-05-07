@@ -22,6 +22,10 @@ public:
 
   MOCK_METHOD0(getAngleRadIncremental, double());
   MOCK_METHOD0(getAngleRadAbsolute, double());
+
+  MOCK_METHOD0(getVelocityRadIncremental, double());
+  MOCK_METHOD0(getVelocityRadAbsolute, double());
+
   MOCK_METHOD0(getIMCVoltage, float());
   MOCK_METHOD0(getMotorCurrent, float());
 

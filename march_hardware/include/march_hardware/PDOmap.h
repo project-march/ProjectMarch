@@ -43,6 +43,7 @@ enum class IMCObjectName
 {
   StatusWord,
   ActualPosition,
+  ActualVelocity,
   MotionErrorRegister,
   DetailedErrorRegister,
   DCLinkVoltage,
@@ -50,6 +51,7 @@ enum class IMCObjectName
   ActualTorque,
   CurrentLimit,
   MotorPosition,
+  MotorVelocity,
   ControlWord,
   TargetPosition,
   TargetTorque,
