@@ -150,7 +150,7 @@ include_directories(
 ## Specify libraries to link a library or executable target against
 
 ## my_controller_file library
-add_library(joint_inertia_controller_lib src/my_controller.cpp)
+add_library(joint_inertia_controller_lib src/joint_inertia_controller.cpp)
 target_link_libraries(joint_inertia_controller_lib ${catkin_LIBRARIES})
 
 #############

@@ -1,9 +1,10 @@
 // Copyright 2020 Project March.
-#include "my_controller.h"
+#include "../include/march_joint_inertia_controller/joint_inertia_controller.h"
+#include <math.h>
 
 namespace joint_inertia_controller_ns {
     //Controller initialization
-    bool InertiaController::init(hardware_interface::PositionJointInterface* hw, ros::NodeHandle &n)
+    bool InertiaController::init(hardware_interface::PositionJointInterface* hw, ros::NodeHandle &nh)
     {
         //Retrieve the joint object to control
         std::string joint_name;
@@ -16,23 +17,21 @@ namespace joint_inertia_controller_ns {
     }
 
     //Controller startup
-    void InertiaController::starting(const ros::Time& time) {
+    void InertiaController::starting(const ros::Time& /* time */) {
         //Get initial position to use in the control procedure
         init_pos_ = joint_.getPosition();
     }
 
     //Controller running
-    void InertiaController::update(const ros::Time& time, const ros::Duration& period)
+    void InertiaController::update(const ros::Time& /* time */, const ros::Duration& /* period */)
     {
-        //---Perform a sinusoidal motion for joint shoulder_pan_joint
+        //---Perform a sinusoidal motion for joint
         double dpos = init_pos_ + 10 * sin(ros::Time::now().toSec());
         double cpos = joint_.getPosition();
         joint_.setCommand( -10*(cpos-dpos)); //Apply command to the selected joint
-        //---
     }
     //Controller exiting
-    void InertiaController::stopping(const ros::Time& time) { }
+    void InertiaController::stopping(const ros::Time& /* time */) { }
 }
-//Register the plugin: PLUGINLIB_EXPORT_CLASS(my_namespace::MyPlugin, base_class_namespace::PluginBaseClass)
 PLUGINLIB_EXPORT_CLASS(joint_inertia_controller_ns::InertiaController, controller_interface::ControllerBase);
 
