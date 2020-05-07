@@ -58,14 +58,14 @@ ignition::math::v4::Vector3<double> ObstacleController::GetCom()
   return com / this->mass;
 }
 
-void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_all,
-                                ignition::math::v4::Vector3<double>& torque_stable)
+void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left,
+                                ignition::math::v4::Vector3<double>& torque_right)
 {
   // Note: the exo moves in the negative x direction, and the right leg is in
   // the positive y direction
 
   double time_since_start = this->model_->GetWorld()->SimTime().Double() - this->subgait_start_time_;
-  if (time_since_start > this->subgait_duration_)
+  if (time_since_start > 1.05 * this->subgait_duration_)
   {
     this->subgait_name_ = "home_stand";
     this->subgait_changed_ = true;
@@ -85,8 +85,9 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_all,
   // Deactivate d if the subgait just changed to avoid effort peaks when the target function jumps
   if (this->subgait_changed_)
   {
-    this->error_y_last_timestep_ = error_x;
+    this->error_x_last_timestep_ = error_x;
     this->error_y_last_timestep_ = error_y;
+    this->error_yaw_last_timestep_ = error_yaw;
     this->subgait_changed_ = false;
   }
 
@@ -96,12 +97,51 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_all,
   double T_roll = this->p_roll_ * error_y + this->d_roll_ * (error_y - this->error_y_last_timestep_);
   double T_yaw = -this->p_yaw_ * error_yaw - this->d_yaw_ * (error_yaw - this->error_yaw_last_timestep_);
 
-  torque_all = ignition::math::v4::Vector3<double>(0, T_pitch, T_yaw);
-  torque_stable = ignition::math::v4::Vector3<double>(T_roll, 0, 0);
+  if (this->subgait_name_.substr(0, 4) == "left")
+  {
+    torque_right = ignition::math::v4::Vector3<double>(T_roll, T_pitch, T_yaw);
+    torque_left = ignition::math::v4::Vector3<double>(0, 0, 0);
+  }
+  else
+  {
+    torque_left = ignition::math::v4::Vector3<double>(T_roll, T_pitch, T_yaw);
+    torque_right = ignition::math::v4::Vector3<double>(0, 0, 0);
+  }
 
   this->error_x_last_timestep_ = error_x;
   this->error_y_last_timestep_ = error_y;
   this->error_yaw_last_timestep_ = error_yaw;
+}
+
+void ObstacleController::getGoalPosition(double time_since_start, double& goal_position_x, double& goal_position_y)
+{
+  // Left foot is stable unless subgait name starts with left
+  auto stable_foot_pose = this->foot_left_->WorldCoGPose().Pos();
+  if (this->subgait_name_.substr(0, 4) == "left")
+  {
+    stable_foot_pose = this->foot_right_->WorldCoGPose().Pos();
+  }
+
+  // Goal position is determined from the location of the stable foot
+  goal_position_x = stable_foot_pose.X();
+  goal_position_y = stable_foot_pose.Y();
+
+  // Start goal position a quarter step size behind the stable foot
+  // Move the goal position forward with v = 0.5 * swing_step_size/subgait_duration
+  if (this->subgait_name_.substr(this->subgait_name_.size() - 4) == "open")
+  {
+    goal_position_x += -0.25 * time_since_start * this->swing_step_size_ / this->subgait_duration_;
+  }
+  else if (this->subgait_name_.substr(this->subgait_name_.size() - 5) == "swing")
+  {
+    goal_position_x +=
+        0.25 * this->swing_step_size_ - 0.5 * time_since_start * this->swing_step_size_ / this->subgait_duration_;
+  }
+  else if (this->subgait_name_.substr(this->subgait_name_.size() - 5) == "close")
+  {
+    goal_position_x +=
+        0.25 * this->swing_step_size_ - 0.25 * time_since_start * this->swing_step_size_ / this->subgait_duration_;
+  }
 }
 
 }  // namespace gazebo

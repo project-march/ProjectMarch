@@ -23,11 +23,11 @@ march:
         # on the max effort values (in the march_world.launch file) for reasons unknown.
         left_ankle: {p: 1000,  d: 10, i: 0, i_clamp: 0}
         left_hip_aa: {p: 1000,  d: 10, i: 0, i_clamp: 0}
-        left_hip_fe: {p: 1000,  d: 10, i: 0, i_clamp: 0}
+        left_hip_fe: {p: 1500,  d: 150, i: 0, i_clamp: 0}
         left_knee: {p: 1000,  d: 10, i: 0, i_clamp: 0}
         right_ankle: {p: 1000,  d: 10, i: 0, i_clamp: 0}
         right_hip_aa: {p: 1000,  d: 10, i: 0, i_clamp: 0}
-        right_hip_fe: {p: 1000,  d: 10, i: 0, i_clamp: 0}
+        right_hip_fe: {p: 1500,  d: 150, i: 0, i_clamp: 0}
         right_knee: {p: 1000,  d: 10, i: 0, i_clamp: 0}
 
       state_publish_rate:  25            # Override default
@@ -36,18 +36,18 @@ march:
 
       constraints:
         left_ankle:
-          trajectory: 0.25
+          trajectory: 0.5
         left_hip_aa:
-          trajectory: 0.2
+          trajectory: 0.5
         left_hip_fe:
-          trajectory: 0.2
+          trajectory: 0.5
         left_knee:
-          trajectory: 0.2
+          trajectory: 0.5
         right_ankle:
-          trajectory: 0.25
+          trajectory: 0.5
         right_hip_aa:
-          trajectory: 0.2
+          trajectory: 0.5
         right_hip_fe:
-          trajectory: 0.2
+          trajectory: 0.5
         right_knee:
-          trajectory: 0.2
+          trajectory: 0.5

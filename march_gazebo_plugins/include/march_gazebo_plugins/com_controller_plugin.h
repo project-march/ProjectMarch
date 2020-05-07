@@ -6,7 +6,6 @@
 #include <ros/callback_queue.h>
 #include <ros/ros.h>
 #include <march_gazebo_plugins/walk_controller.h>
-#include <march_gazebo_plugins/stairs_controller.h>
 
 #ifndef MARCH_GAZEBO_PLUGINS_COM_CONTROLLER_PLUGIN_H
 #define MARCH_GAZEBO_PLUGINS_COM_CONTROLLER_PLUGIN_H
@@ -28,8 +27,6 @@ private:
   physics::ModelPtr model_;
 
   std::unique_ptr<ObstacleController> controller_;
-  std::string subgait_name_;
-  std::string stable_side_;
 
   // Pointer to the update event connection
   event::ConnectionPtr update_connection_;

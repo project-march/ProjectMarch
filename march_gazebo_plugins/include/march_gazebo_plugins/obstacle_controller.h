@@ -16,7 +16,7 @@ public:
   void newSubgait(const march_shared_resources::GaitActionGoalConstPtr& _msg);
   ignition::math::v4::Vector3<double> GetCom();
   void update(ignition::math::v4::Vector3<double>& torque_all, ignition::math::v4::Vector3<double>& torque_stable);
-  virtual void getGoalPosition(double time_since_start, double& goal_position_x, double& goal_position_y) = 0;
+  void getGoalPosition(double time_since_start, double& goal_position_x, double& goal_position_y);
 
 protected:
   physics::ModelPtr model_;
