@@ -24,7 +24,7 @@ struct IMCObject
     : address(_address), sub_index(_sub_index), length(_length)
   {
     uint32_t MSword = ((address & 0xFFFF) << 16);
-    uint32_t LSword = ((sub_index & 0xFFFF) << 8) | (length & 0xFFFF);
+    uint32_t LSword = ((sub_index & 0xFFFF) << 8) | length;
 
     combined_address = (MSword | LSword);
   }
