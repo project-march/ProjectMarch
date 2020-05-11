@@ -445,7 +445,6 @@
         <origin xyz="-2.5  0 ${plate_height}" rpy="0 0 0"/>
     </joint>
 
-
     <joint name="joint_1" type="fixed">
         <parent link="bottom_plate"/>
         <child link="side_rod_1"/>
