@@ -101,7 +101,7 @@
 
     <!-- Joints -->
 
-    <joint name="hip_1" type="fixed">
+    <joint name="joint_0" type="fixed">
         <parent link="${parent_name}"/>
         <child link="platform"/>
         <origin xyz="-3.2 0 ${platform_height / 2}" rpy="0 0 0"/>

@@ -164,7 +164,7 @@
     </gazebo>
 
     <!-- Joints -->
-    <joint name="hip" type="fixed">
+    <joint name="joint_0" type="fixed">
         <parent link="${parent_name}"/>
         <child link="step_1"/>
         <origin xyz="${-distance_to_origin - stairs_length / 2} 0 ${step_height / 2}" rpy="0 0 0"/>
