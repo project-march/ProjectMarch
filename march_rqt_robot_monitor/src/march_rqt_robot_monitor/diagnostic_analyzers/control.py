@@ -58,4 +58,3 @@ class CheckJointValues(object):
 
         for index in range(len(self._joint_names)):
             stat.add(self._joint_names[index], self._position[index])
-
