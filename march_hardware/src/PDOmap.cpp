@@ -10,22 +10,22 @@
 namespace march
 {
 std::unordered_map<IMCObjectName, IMCObject> PDOmap::all_objects = {
-  { IMCObjectName::StatusWord, IMCObject(0x6041, 16) },
-  { IMCObjectName::ActualPosition, IMCObject(0x6064, 32) },
-  { IMCObjectName::ActualVelocity, IMCObject(0x6069, 32) },
-  { IMCObjectName::MotionErrorRegister, IMCObject(0x2000, 16) },
-  { IMCObjectName::DetailedErrorRegister, IMCObject(0x2002, 16) },
-  { IMCObjectName::DCLinkVoltage, IMCObject(0x2055, 16) },
-  { IMCObjectName::DriveTemperature, IMCObject(0x2058, 16) },
-  { IMCObjectName::ActualTorque, IMCObject(0x6077, 16) },
-  { IMCObjectName::CurrentLimit, IMCObject(0x207F, 16) },
-  { IMCObjectName::MotorPosition, IMCObject(0x2088, 32) },
-  { IMCObjectName::MotorVelocity, IMCObject(0x2087, 32) },
-  { IMCObjectName::ControlWord, IMCObject(0x6040, 16) },
-  { IMCObjectName::TargetPosition, IMCObject(0x607A, 32) },
-  { IMCObjectName::TargetTorque, IMCObject(0x6071, 16) },
-  { IMCObjectName::QuickStopDeceleration, IMCObject(0x6085, 32) },
-  { IMCObjectName::QuickStopOption, IMCObject(0x605A, 16) }
+  { IMCObjectName::StatusWord, IMCObject(0x6041, 0, 16) },
+  { IMCObjectName::ActualPosition, IMCObject(0x6064, 0, 32) },
+  { IMCObjectName::ActualVelocity, IMCObject(0x6069, 0, 32) },
+  { IMCObjectName::MotionErrorRegister, IMCObject(0x2000, 0, 16) },
+  { IMCObjectName::DetailedErrorRegister, IMCObject(0x2002, 0, 16) },
+  { IMCObjectName::DCLinkVoltage, IMCObject(0x2055, 0, 16) },
+  { IMCObjectName::DriveTemperature, IMCObject(0x2058, 0, 16) },
+  { IMCObjectName::ActualTorque, IMCObject(0x6077, 0, 16) },
+  { IMCObjectName::CurrentLimit, IMCObject(0x207F, 0, 16) },
+  { IMCObjectName::MotorPosition, IMCObject(0x2088, 0, 32) },
+  { IMCObjectName::MotorVelocity, IMCObject(0x2087, 0, 32) },
+  { IMCObjectName::ControlWord, IMCObject(0x6040, 0, 16) },
+  { IMCObjectName::TargetPosition, IMCObject(0x607A, 0, 32) },
+  { IMCObjectName::TargetTorque, IMCObject(0x6071, 0, 16) },
+  { IMCObjectName::QuickStopDeceleration, IMCObject(0x6085, 0, 32) },
+  { IMCObjectName::QuickStopOption, IMCObject(0x605A, 0, 16) }
 };
 
 void PDOmap::addObject(IMCObjectName object_name)
