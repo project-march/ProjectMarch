@@ -129,8 +129,8 @@ bool IMotionCube::writeInitialSettings(SdoSlaveInterface& sdo, int cycle_time)
   int rate_ec_y = sdo.write<int8_t>(0x60C2, 2, -3);
 
   // use filter object to read motor voltage
-  int volt_address = sdo_bit16_write(slaveIndex, 0x2081, 1, 0x0232);
-  int volt_filter = sdo_bit16_write(slaveIndex, 0x2081, 2, 32767);
+  int volt_address = sdo.write<int16_t>(0x2081, 1, 0x0232);
+  int volt_filter = sdo.write<int16_t>(0x2081, 2, 32767);
 
   if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && stop_decl && abort_con && rate_ec_x && rate_ec_y &&
         volt_address && volt_filter))
@@ -241,8 +241,29 @@ int32_t IMotionCube::getAngleIUAbsolute()
 
 int IMotionCube::getAngleIUIncremental()
 {
-  return this->incremental_encoder_->getAngleIU(this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
+    return this->incremental_encoder_->getAngleIU(*this, this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
 }
+
+double IMotionCube::getVelocityIUAbsolute()
+{
+    return this->absolute_encoder_->getVelocityIU(*this, this->miso_byte_offsets_.at(IMCObjectName::ActualVelocity));
+}
+
+double IMotionCube::getVelocityIUIncremental()
+{
+    return this->incremental_encoder_->getVelocityIU(*this, this->miso_byte_offsets_.at(IMCObjectName::MotorVelocity));
+}
+
+double IMotionCube::getVelocityRadAbsolute()
+{
+    return this->absolute_encoder_->getVelocityRad(*this, this->miso_byte_offsets_.at(IMCObjectName::ActualVelocity));
+}
+
+double IMotionCube::getVelocityRadIncremental()
+{
+    return this->incremental_encoder_->getVelocityRad(*this, this->miso_byte_offsets_.at(IMCObjectName::MotorVelocity));
+}
+
 
 uint16_t IMotionCube::getStatusWord()
 {
