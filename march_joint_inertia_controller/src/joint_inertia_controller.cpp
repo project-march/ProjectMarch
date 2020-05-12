@@ -4,10 +4,8 @@
 
 namespace joint_inertia_controller
 {
-
 bool InertiaController::init(hardware_interface::PositionJointInterface* hw, ros::NodeHandle& nh)
 {
-
   std::string joint_name;
   if (!nh.getParam("joint_name", joint_name))
   {
@@ -32,5 +30,5 @@ void InertiaController::update(const ros::Time& /* time */, const ros::Duration&
 void InertiaController::stopping(const ros::Time& /* time */)
 {
 }
-}
+}  // namespace joint_inertia_controller
 PLUGINLIB_EXPORT_CLASS(joint_inertia_controller::InertiaController, controller_interface::ControllerBase);

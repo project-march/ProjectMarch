@@ -21,6 +21,6 @@ private:
   hardware_interface::JointHandle joint_;
   double init_pos_;
 };
-}  // namespace joint_inertia_controller_ns
+}  // namespace joint_inertia_controller
 
 #endif  // MARCH_HARDWARE_JOINT_INERTIA_CONTROLLER_H
