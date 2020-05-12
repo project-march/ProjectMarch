@@ -1,3 +1,4 @@
+#pragma once
 #include "gmock/gmock.h"  // Brings in Google Mock.
 #include "march_hardware/Joint.h"
 

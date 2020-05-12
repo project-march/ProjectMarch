@@ -9,7 +9,7 @@ class TemperatureSensor
 public:
   virtual ~TemperatureSensor() noexcept = default;
 
-  virtual float getTemperature() = 0;
+  virtual float getTemperature() const = 0;
 };
 }  // namespace march
 

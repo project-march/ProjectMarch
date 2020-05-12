@@ -17,6 +17,8 @@ class IMotionCubeTest : public ::testing::Test
 protected:
   std::string base_path;
   urdf::JointSharedPtr joint;
+  march::PdoInterfacePtr pdo_interface;
+  march::SdoInterfacePtr sdo_interface;
 
   void SetUp() override
   {
@@ -24,6 +26,8 @@ protected:
     this->joint = std::make_shared<urdf::Joint>();
     this->joint->limits = std::make_shared<urdf::JointLimits>();
     this->joint->safety = std::make_shared<urdf::JointSafety>();
+    this->pdo_interface = march::PdoInterfaceImpl::create();
+    this->sdo_interface = march::SdoInterfaceImpl::create();
   }
 
   YAML::Node loadTestYaml(const std::string& relative_path)
@@ -40,14 +44,15 @@ TEST_F(IMotionCubeTest, ValidIMotionCubeHip)
   this->joint->safety->soft_lower_limit = 0.1;
   this->joint->safety->soft_upper_limit = 1.9;
 
-  auto created = HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, this->joint);
+  auto created = HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, this->joint,
+                                                    this->pdo_interface, this->sdo_interface);
 
   auto absolute_encoder = std::make_unique<march::AbsoluteEncoder>(
       16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper, this->joint->safety->soft_lower_limit,
       this->joint->safety->soft_upper_limit);
   auto incremental_encoder = std::make_unique<march::IncrementalEncoder>(12, 101.0);
-  march::IMotionCube expected(2, std::move(absolute_encoder), std::move(incremental_encoder),
-                              march::ActuationMode::unknown);
+  march::IMotionCube expected(march::Slave(2, this->pdo_interface, this->sdo_interface), std::move(absolute_encoder),
+                              std::move(incremental_encoder), march::ActuationMode::unknown);
 
   ASSERT_EQ(expected, *created);
 }
@@ -55,21 +60,23 @@ TEST_F(IMotionCubeTest, ValidIMotionCubeHip)
 TEST_F(IMotionCubeTest, NoConfig)
 {
   YAML::Node config;
-  ASSERT_EQ(nullptr,
-            HardwareBuilder::createIMotionCube(config["imotioncube"], march::ActuationMode::unknown, this->joint));
+  ASSERT_EQ(nullptr, HardwareBuilder::createIMotionCube(config["imotioncube"], march::ActuationMode::unknown,
+                                                        this->joint, this->pdo_interface, this->sdo_interface));
 }
 
 TEST_F(IMotionCubeTest, NoUrdfJoint)
 {
   YAML::Node config = this->loadTestYaml("/imotioncube_correct.yaml");
-  ASSERT_EQ(nullptr, HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, nullptr));
+  ASSERT_EQ(nullptr, HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, nullptr,
+                                                        this->pdo_interface, this->sdo_interface));
 }
 
 TEST_F(IMotionCubeTest, NoAbsoluteEncoder)
 {
   YAML::Node config = this->loadTestYaml("/imotioncube_no_absolute_encoder.yaml");
 
-  ASSERT_THROW(HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, this->joint),
+  ASSERT_THROW(HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, this->joint,
+                                                  this->pdo_interface, this->sdo_interface),
                MissingKeyException);
 }
 
@@ -77,7 +84,8 @@ TEST_F(IMotionCubeTest, NoIncrementalEncoder)
 {
   YAML::Node config = this->loadTestYaml("/imotioncube_no_incremental_encoder.yaml");
 
-  ASSERT_THROW(HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, this->joint),
+  ASSERT_THROW(HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, this->joint,
+                                                  this->pdo_interface, this->sdo_interface),
                MissingKeyException);
 }
 
@@ -85,6 +93,7 @@ TEST_F(IMotionCubeTest, NoSlaveIndex)
 {
   YAML::Node config = this->loadTestYaml("/imotioncube_no_slave_index.yaml");
 
-  ASSERT_THROW(HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, this->joint),
+  ASSERT_THROW(HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, this->joint,
+                                                  this->pdo_interface, this->sdo_interface),
                MissingKeyException);
 }

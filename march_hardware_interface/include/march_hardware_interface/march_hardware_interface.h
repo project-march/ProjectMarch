@@ -83,14 +83,13 @@ private:
   void updateAfterLimitJointCommand();
   void updateIMotionCubeState();
   void outsideLimitsCheck(size_t joint_index);
-  void iMotionCubeStateCheck(size_t joint_index);
+  bool iMotionCubeStateCheck(size_t joint_index);
 
   /* Limit of the change in effort command over one cycle, can be overridden by safety controller */
   static constexpr double MAX_EFFORT_CHANGE = 5000;
 
   /* March hardware */
   std::unique_ptr<march::MarchRobot> march_robot_;
-  bool has_power_distribution_board_ = false;
 
   /* Interfaces */
   hardware_interface::JointStateInterface joint_state_interface_;
@@ -122,11 +121,12 @@ private:
 
   std::vector<joint_limits_interface::SoftJointLimits> soft_limits_;
 
-  march::PowerDistributionBoard power_distribution_board_read_;
   PowerNetOnOffCommand power_net_on_off_command_;
   bool master_shutdown_allowed_command_ = false;
   bool enable_high_voltage_command_ = true;
   bool reset_imc_ = false;
+
+  bool has_actuated_ = false;
 
   /* Real time safe publishers */
   RtPublisherPtr<march_shared_resources::AfterLimitJointCommand> after_limit_joint_command_pub_;

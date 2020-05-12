@@ -18,6 +18,8 @@ class JointTest : public ::testing::Test
 protected:
   std::string base_path;
   urdf::JointSharedPtr joint;
+  march::PdoInterfacePtr pdo_interface;
+  march::SdoInterfacePtr sdo_interface;
 
   void SetUp() override
   {
@@ -25,6 +27,8 @@ protected:
     this->joint = std::make_shared<urdf::Joint>();
     this->joint->limits = std::make_shared<urdf::JointLimits>();
     this->joint->safety = std::make_shared<urdf::JointSafety>();
+    this->pdo_interface = march::PdoInterfaceImpl::create();
+    this->sdo_interface = march::SdoInterfaceImpl::create();
   }
 
   YAML::Node loadTestYaml(const std::string& relative_path)
@@ -42,15 +46,17 @@ TEST_F(JointTest, ValidJointHip)
   this->joint->safety->soft_upper_limit = 1.9;
 
   const std::string name = "test_joint_hip";
-  march::Joint created = HardwareBuilder::createJoint(config, name, this->joint);
+  march::Joint created =
+      HardwareBuilder::createJoint(config, name, this->joint, this->pdo_interface, this->sdo_interface);
 
   auto absolute_encoder = std::make_unique<march::AbsoluteEncoder>(
       16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper, this->joint->safety->soft_lower_limit,
       this->joint->safety->soft_upper_limit);
   auto incremental_encoder = std::make_unique<march::IncrementalEncoder>(12, 50.0);
-  auto imc = std::make_unique<march::IMotionCube>(2, std::move(absolute_encoder), std::move(incremental_encoder),
+  auto imc = std::make_unique<march::IMotionCube>(march::Slave(2, this->pdo_interface, this->sdo_interface),
+                                                  std::move(absolute_encoder), std::move(incremental_encoder),
                                                   march::ActuationMode::unknown);
-  auto ges = std::make_unique<march::TemperatureGES>(1, 2);
+  auto ges = std::make_unique<march::TemperatureGES>(march::Slave(1, this->pdo_interface, this->sdo_interface), 2);
   march::Joint expected(name, -1, true, std::move(imc), std::move(ges));
 
   ASSERT_EQ(expected, created);
@@ -64,15 +70,17 @@ TEST_F(JointTest, ValidNotActuated)
   this->joint->safety->soft_lower_limit = 0.1;
   this->joint->safety->soft_upper_limit = 1.9;
 
-  march::Joint created = HardwareBuilder::createJoint(config, "test_joint_hip", this->joint);
+  march::Joint created =
+      HardwareBuilder::createJoint(config, "test_joint_hip", this->joint, this->pdo_interface, this->sdo_interface);
 
   auto absolute_encoder = std::make_unique<march::AbsoluteEncoder>(
       16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper, this->joint->safety->soft_lower_limit,
       this->joint->safety->soft_upper_limit);
   auto incremental_encoder = std::make_unique<march::IncrementalEncoder>(12, 50.0);
-  auto imc = std::make_unique<march::IMotionCube>(2, std::move(absolute_encoder), std::move(incremental_encoder),
+  auto imc = std::make_unique<march::IMotionCube>(march::Slave(2, this->pdo_interface, this->sdo_interface),
+                                                  std::move(absolute_encoder), std::move(incremental_encoder),
                                                   march::ActuationMode::unknown);
-  auto ges = std::make_unique<march::TemperatureGES>(1, 2);
+  auto ges = std::make_unique<march::TemperatureGES>(march::Slave(1, this->pdo_interface, this->sdo_interface), 2);
   march::Joint expected("test_joint_hip", -1, false, std::move(imc), std::move(ges));
 
   ASSERT_EQ(expected, created);
@@ -82,13 +90,16 @@ TEST_F(JointTest, NoActuate)
 {
   YAML::Node config = this->loadTestYaml("/joint_no_actuate.yaml");
 
-  ASSERT_THROW(HardwareBuilder::createJoint(config, "test_joint_no_actuate", this->joint), MissingKeyException);
+  ASSERT_THROW(HardwareBuilder::createJoint(config, "test_joint_no_actuate", this->joint, this->pdo_interface,
+                                            this->sdo_interface),
+               MissingKeyException);
 }
 
 TEST_F(JointTest, NoIMotionCube)
 {
   YAML::Node config = this->loadTestYaml("/joint_no_imotioncube.yaml");
-  march::Joint joint = HardwareBuilder::createJoint(config, "test_joint_no_imotioncube", this->joint);
+  march::Joint joint = HardwareBuilder::createJoint(config, "test_joint_no_imotioncube", this->joint,
+                                                    this->pdo_interface, this->sdo_interface);
 
   ASSERT_FALSE(joint.hasIMotionCube());
 }
@@ -101,7 +112,8 @@ TEST_F(JointTest, NoTemperatureGES)
   this->joint->safety->soft_lower_limit = 0.1;
   this->joint->safety->soft_upper_limit = 0.15;
 
-  ASSERT_NO_THROW(HardwareBuilder::createJoint(config, "test_joint_no_temperature_ges", this->joint));
+  ASSERT_NO_THROW(HardwareBuilder::createJoint(config, "test_joint_no_temperature_ges", this->joint,
+                                               this->pdo_interface, this->sdo_interface));
 }
 
 TEST_F(JointTest, ValidActuationMode)
@@ -112,11 +124,12 @@ TEST_F(JointTest, ValidActuationMode)
   this->joint->safety->soft_lower_limit = 0.1;
   this->joint->safety->soft_upper_limit = 1.9;
 
-  march::Joint created = HardwareBuilder::createJoint(config, "test_joint_hip", this->joint);
+  march::Joint created =
+      HardwareBuilder::createJoint(config, "test_joint_hip", this->joint, this->pdo_interface, this->sdo_interface);
 
   march::Joint expected("test_joint_hip", -1, false,
                         std::make_unique<march::IMotionCube>(
-                            1,
+                            march::Slave(1, this->pdo_interface, this->sdo_interface),
                             std::make_unique<march::AbsoluteEncoder>(
                                 16, 22134, 43436, this->joint->limits->lower, this->joint->limits->upper,
                                 this->joint->safety->soft_lower_limit, this->joint->safety->soft_upper_limit),
@@ -128,11 +141,14 @@ TEST_F(JointTest, ValidActuationMode)
 TEST_F(JointTest, EmptyJoint)
 {
   YAML::Node config;
-  ASSERT_THROW(HardwareBuilder::createJoint(config, "test_joint_empty", this->joint), MissingKeyException);
+  ASSERT_THROW(
+      HardwareBuilder::createJoint(config, "test_joint_empty", this->joint, this->pdo_interface, this->sdo_interface),
+      MissingKeyException);
 }
 
 TEST_F(JointTest, NoUrdfJoint)
 {
   YAML::Node config = this->loadTestYaml("/joint_correct.yaml");
-  ASSERT_THROW(HardwareBuilder::createJoint(config, "test", nullptr), march::error::HardwareException);
+  ASSERT_THROW(HardwareBuilder::createJoint(config, "test", nullptr, this->pdo_interface, this->sdo_interface),
+               march::error::HardwareException);
 }

@@ -1,4 +1,9 @@
 // Copyright 2019 Project March.
+#include "march_hardware/EtherCAT/slave.h"
+#include "march_hardware/Joint.h"
+#include "march_hardware/error/hardware_exception.h"
+#include "march_hardware/error/motion_error.h"
+
 #include <ros/ros.h>
 
 #include <bitset>
@@ -6,10 +11,6 @@
 #include <memory>
 #include <string>
 #include <utility>
-
-#include <march_hardware/error/motion_error.h>
-#include <march_hardware/Joint.h>
-#include <march_hardware/error/hardware_exception.h>
 
 namespace march
 {
@@ -37,11 +38,11 @@ bool Joint::initialize(int cycle_time)
   bool reset = false;
   if (this->hasIMotionCube())
   {
-    reset |= this->imc_->writeInitialSDOs(cycle_time);
+    reset |= this->imc_->Slave::initSdo(cycle_time);
   }
   if (this->hasTemperatureGES())
   {
-    reset |= this->temperature_ges_->writeInitialSDOs(cycle_time);
+    reset |= this->temperature_ges_->initSdo(cycle_time);
   }
   return reset;
 }
@@ -71,7 +72,7 @@ void Joint::resetIMotionCube()
   }
   else
   {
-    this->imc_->reset();
+    this->imc_->Slave::reset();
   }
 }
 
@@ -95,27 +96,21 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
 
   if (this->receivedDataUpdate())
   {
-    const double new_incremental_position = this->imc_->getAngleRadIncremental();
-    const double new_absolute_position = this->imc_->getAngleRadAbsolute();
+    const double incremental_position_change = this->imc_->getAngleRadIncremental() - this->incremental_position_;
 
-    // Get velocity from encoder position
-    double best_displacement;
-
-    // Take the velocity with the highest resolution.
+    // Take the velocity and position from the encoder with the highest resolution.
     if (this->imc_->getIncrementalRadPerBit() < this->imc_->getAbsoluteRadPerBit())
     {
-      best_displacement = new_incremental_position - this->incremental_position_;
+      this->velocity_ = this->imc_->getVelocityRadIncremental();
+      this->position_ += incremental_position_change;
     }
     else
     {
-      best_displacement = new_absolute_position - this->absolute_position_;
+      this->velocity_ = this->imc_->getVelocityRadAbsolute();
+      this->position_ = this->imc_->getAngleRadAbsolute();
     }
-
-    // Update position with the most accurate velocity
-    this->position_ += best_displacement;
-    this->velocity_ = best_displacement / elapsed_time.toSec();
-    this->incremental_position_ = new_incremental_position;
-    this->absolute_position_ = new_absolute_position;
+    this->incremental_position_ += incremental_position_change;
+    this->absolute_position_ = this->imc_->getAngleRadAbsolute();
   }
   else
   {
@@ -186,6 +181,26 @@ int32_t Joint::getAngleIUIncremental()
   return this->imc_->getAngleIUIncremental();
 }
 
+double Joint::getVelocityIUAbsolute()
+{
+  if (!this->hasIMotionCube())
+  {
+    ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
+    return -1;
+  }
+  return this->imc_->getVelocityIUAbsolute();
+}
+
+double Joint::getVelocityIUIncremental()
+{
+  if (!this->hasIMotionCube())
+  {
+    ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
+    return -1;
+  }
+  return this->imc_->getVelocityIUIncremental();
+}
+
 float Joint::getTemperature()
 {
   if (!this->hasTemperatureGES())
@@ -216,6 +231,8 @@ IMotionCubeState Joint::getIMotionCubeState()
 
   states.absoluteEncoderValue = this->imc_->getAngleIUAbsolute();
   states.incrementalEncoderValue = this->imc_->getAngleIUIncremental();
+  states.absoluteVelocity = this->imc_->getVelocityIUAbsolute();
+  states.incrementalVelocity = this->imc_->getVelocityIUIncremental();
 
   return states;
 }
@@ -255,12 +272,12 @@ std::string Joint::getName() const
 
 bool Joint::hasIMotionCube() const
 {
-  return this->imc_ && this->imc_->getSlaveIndex() != -1;
+  return this->imc_ != nullptr;
 }
 
 bool Joint::hasTemperatureGES() const
 {
-  return this->temperature_ges_ && this->temperature_ges_->getSlaveIndex() != -1;
+  return this->temperature_ges_ != nullptr;
 }
 
 bool Joint::canActuate() const
@@ -274,19 +291,27 @@ bool Joint::receivedDataUpdate()
   {
     return false;
   }
-  // If imc voltage, motor current, and both encoders positions did not change,
+  // If imc voltage, motor current, and both encoders positions and velocities did not change,
   // we probably did not receive an update for this joint.
   float new_imc_volt = this->imc_->getIMCVoltage();
   float new_motor_current = this->imc_->getMotorCurrent();
   double new_absolute_position = this->imc_->getAngleRadAbsolute();
   double new_incremental_position = this->imc_->getAngleRadIncremental();
+  double new_absolute_velocity = this->imc_->getVelocityRadAbsolute();
+  double new_incremental_velocity = this->imc_->getVelocityRadIncremental();
+
   bool data_updated = (new_imc_volt != this->previous_imc_volt_ || new_motor_current != this->previous_motor_current_ ||
                        new_absolute_position != this->previous_absolute_position_ ||
-                       new_incremental_position != this->previous_incremental_position_);
+                       new_incremental_position != this->previous_incremental_position_ ||
+                       new_absolute_velocity != this->previous_absolute_velocity_ ||
+                       new_incremental_velocity != this->previous_incremental_velocity_);
+
   this->previous_imc_volt_ = new_imc_volt;
   this->previous_motor_current_ = new_motor_current;
   this->previous_absolute_position_ = new_absolute_position;
   this->previous_incremental_position_ = new_incremental_position;
+  this->previous_absolute_velocity_ = new_absolute_velocity;
+  this->previous_incremental_velocity_ = new_incremental_velocity;
   return data_updated;
 }
 
