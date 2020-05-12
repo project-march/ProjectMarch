@@ -22,14 +22,12 @@ public:
   /** @brief Override comparison operator */
   friend bool operator==(const IncrementalEncoder& lhs, const IncrementalEncoder& rhs)
   {
-    return lhs.getSlaveIndex() == rhs.getSlaveIndex() && lhs.getTotalPositions() == rhs.getTotalPositions() &&
-           lhs.transmission_ == rhs.transmission_;
+    return lhs.getTotalPositions() == rhs.getTotalPositions() && lhs.transmission_ == rhs.transmission_;
   }
   /** @brief Override stream operator for clean printing */
   friend std::ostream& operator<<(std::ostream& os, const IncrementalEncoder& encoder)
   {
-    return os << "slaveIndex: " << encoder.getSlaveIndex() << ", "
-              << "totalPositions: " << encoder.getTotalPositions() << ", "
+    return os << "totalPositions: " << encoder.getTotalPositions() << ", "
               << "transmission: " << encoder.transmission_;
   }
 

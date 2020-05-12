@@ -1,18 +1,16 @@
 // Copyright 2018 Project March.
+#include "march_hardware/Joint.h"
+#include "march_hardware/MarchRobot.h"
+#include "march_hardware/TemperatureSensor.h"
+#include "march_hardware/error/hardware_exception.h"
 
 #include <algorithm>
+#include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <ros/ros.h>
-
-#include <march_hardware/Joint.h>
-#include <march_hardware/TemperatureSensor.h>
-
-#include <march_hardware/EtherCAT/EthercatIO.h>
-
-#include <march_hardware/MarchRobot.h>
-#include <march_hardware/error/hardware_exception.h>
 
 namespace march
 {
@@ -20,15 +18,17 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, ::std::
   : jointList(std::move(jointList))
   , urdf_(std::move(urdf))
   , ethercatMaster(ifName, this->getMaxSlaveIndex(), ecatCycleTime)
+  , pdb_(nullptr)
 {
 }
 
-MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, PowerDistributionBoard powerDistributionBoard,
-                       ::std::string ifName, int ecatCycleTime)
+MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
+                       std::unique_ptr<PowerDistributionBoard> powerDistributionBoard, ::std::string ifName,
+                       int ecatCycleTime)
   : jointList(std::move(jointList))
   , urdf_(std::move(urdf))
   , ethercatMaster(ifName, this->getMaxSlaveIndex(), ecatCycleTime)
-  , powerDistributionBoard(powerDistributionBoard)
+  , pdb_(std::move(powerDistributionBoard))
 {
 }
 
@@ -214,14 +214,14 @@ MarchRobot::iterator MarchRobot::end()
   return this->jointList.end();
 }
 
-PowerDistributionBoard& MarchRobot::getPowerDistributionBoard()
+bool MarchRobot::hasPowerDistributionboard() const
 {
-  return powerDistributionBoard;
+  return this->pdb_ != nullptr;
 }
 
-const PowerDistributionBoard& MarchRobot::getPowerDistributionBoard() const
+PowerDistributionBoard* MarchRobot::getPowerDistributionBoard() const
 {
-  return powerDistributionBoard;
+  return this->pdb_.get();
 }
 
 MarchRobot::~MarchRobot()

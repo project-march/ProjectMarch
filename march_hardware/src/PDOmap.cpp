@@ -1,27 +1,31 @@
 // Copyright 2019 Project March.
-#include <march_hardware/PDOmap.h>
-#include <march_hardware/error/hardware_exception.h>
+#include "march_hardware/EtherCAT/sdo_interface.h"
+#include "march_hardware/PDOmap.h"
+#include "march_hardware/error/hardware_exception.h"
 
+#include <cstdint>
 #include <map>
 #include <utility>
 
 namespace march
 {
 std::unordered_map<IMCObjectName, IMCObject> PDOmap::all_objects = {
-  { IMCObjectName::StatusWord, IMCObject(0x6041, 16) },
-  { IMCObjectName::ActualPosition, IMCObject(0x6064, 32) },
-  { IMCObjectName::MotionErrorRegister, IMCObject(0x2000, 16) },
-  { IMCObjectName::DetailedErrorRegister, IMCObject(0x2002, 16) },
-  { IMCObjectName::DCLinkVoltage, IMCObject(0x2055, 16) },
-  { IMCObjectName::DriveTemperature, IMCObject(0x2058, 16) },
-  { IMCObjectName::ActualTorque, IMCObject(0x6077, 16) },
-  { IMCObjectName::CurrentLimit, IMCObject(0x207F, 16) },
-  { IMCObjectName::MotorPosition, IMCObject(0x2088, 32) },
-  { IMCObjectName::ControlWord, IMCObject(0x6040, 16) },
-  { IMCObjectName::TargetPosition, IMCObject(0x607A, 32) },
-  { IMCObjectName::TargetTorque, IMCObject(0x6071, 16) },
-  { IMCObjectName::QuickStopDeceleration, IMCObject(0x6085, 32) },
-  { IMCObjectName::QuickStopOption, IMCObject(0x605A, 16) },
+  { IMCObjectName::StatusWord, IMCObject(0x6041, 0, 16) },
+  { IMCObjectName::ActualPosition, IMCObject(0x6064, 0, 32) },
+  { IMCObjectName::ActualVelocity, IMCObject(0x6069, 0, 32) },
+  { IMCObjectName::MotionErrorRegister, IMCObject(0x2000, 0, 16) },
+  { IMCObjectName::DetailedErrorRegister, IMCObject(0x2002, 0, 16) },
+  { IMCObjectName::DCLinkVoltage, IMCObject(0x2055, 0, 16) },
+  { IMCObjectName::DriveTemperature, IMCObject(0x2058, 0, 16) },
+  { IMCObjectName::ActualTorque, IMCObject(0x6077, 0, 16) },
+  { IMCObjectName::CurrentLimit, IMCObject(0x207F, 0, 16) },
+  { IMCObjectName::MotorPosition, IMCObject(0x2088, 0, 32) },
+  { IMCObjectName::MotorVelocity, IMCObject(0x2087, 0, 32) },
+  { IMCObjectName::ControlWord, IMCObject(0x6040, 0, 16) },
+  { IMCObjectName::TargetPosition, IMCObject(0x607A, 0, 32) },
+  { IMCObjectName::TargetTorque, IMCObject(0x6071, 0, 16) },
+  { IMCObjectName::QuickStopDeceleration, IMCObject(0x6085, 0, 32) },
+  { IMCObjectName::QuickStopOption, IMCObject(0x605A, 0, 16) },
   { IMCObjectName::MotorVoltage, IMCObject(0x2108, 16) }
 };
 
@@ -50,21 +54,21 @@ void PDOmap::addObject(IMCObjectName object_name)
   }
 }
 
-std::unordered_map<IMCObjectName, uint8_t> PDOmap::map(int slave_index, DataDirection direction)
+std::unordered_map<IMCObjectName, uint8_t> PDOmap::map(SdoSlaveInterface& sdo, DataDirection direction)
 {
   switch (direction)
   {
     case DataDirection::MISO:
-      return configurePDO(slave_index, 0x1A00, 0x1C13);
+      return configurePDO(sdo, 0x1A00, 0x1C13);
     case DataDirection::MOSI:
-      return configurePDO(slave_index, 0x1600, 0x1C12);
+      return configurePDO(sdo, 0x1600, 0x1C12);
     default:
       ROS_ERROR("Invalid data direction given, returning empty map");
       return {};
   }
 }
 
-std::unordered_map<IMCObjectName, uint8_t> PDOmap::configurePDO(int slave_index, int base_register,
+std::unordered_map<IMCObjectName, uint8_t> PDOmap::configurePDO(SdoSlaveInterface& sdo, int base_register,
                                                                 uint16_t base_sync_manager)
 {
   int counter = 1;
@@ -74,18 +78,18 @@ std::unordered_map<IMCObjectName, uint8_t> PDOmap::configurePDO(int slave_index,
   std::unordered_map<IMCObjectName, uint8_t> byte_offsets;
   std::vector<std::pair<IMCObjectName, IMCObject>> sorted_PDO_objects = this->sortPDOObjects();
 
-  sdo_bit8_write(slave_index, current_register, 0, 0);
-  for (const auto& nextObject : sorted_PDO_objects)
+  sdo.write<uint8_t>(current_register, 0, 0);
+  for (const auto& next_object : sorted_PDO_objects)
   {
-    if (size_left - nextObject.second.length < 0)
+    if (size_left - next_object.second.length < 0)
     {
       // PDO is filled so it can be enabled again
-      sdo_bit8_write(slave_index, current_register, 0, counter - 1);
+      sdo.write<uint8_t>(current_register, 0, counter - 1);
 
       // Update the sync manager with the just configured PDO
-      sdo_bit8_write(slave_index, base_sync_manager, 0, 0);
+      sdo.write<uint8_t>(base_sync_manager, 0, 0);
       int current_pdo_nr = (current_register - base_register) + 1;
-      sdo_bit16_write(slave_index, base_sync_manager, current_pdo_nr, current_register);
+      sdo.write<uint16_t>(base_sync_manager, current_pdo_nr, current_register);
 
       // Move to the next PDO register by incrementing with one
       current_register++;
@@ -97,38 +101,39 @@ std::unordered_map<IMCObjectName, uint8_t> PDOmap::configurePDO(int slave_index,
       size_left = this->bits_per_register;
       counter = 1;
 
-      sdo_bit8_write(slave_index, current_register, 0, 0);
+      sdo.write<uint8_t>(current_register, 0, 0);
     }
 
     int byte_offset = (current_register - base_register) * 8 + (bits_per_register - size_left) / 8;
-    byte_offsets[nextObject.first] = byte_offset;
+    byte_offsets[next_object.first] = byte_offset;
 
-    sdo_bit32_write(slave_index, current_register, counter, nextObject.second.combined_address);
+    sdo.write<uint32_t>(current_register, counter, next_object.second.combined_address);
     counter++;
-    size_left -= nextObject.second.length;
+    size_left -= next_object.second.length;
   }
 
   // Make sure the last PDO is activated
-  sdo_bit8_write(slave_index, current_register, 0, counter - 1);
+  sdo.write<uint8_t>(current_register, 0, counter - 1);
 
   // Deactivated the sync manager and configure with the new PDO
-  sdo_bit8_write(slave_index, base_sync_manager, 0, 0);
-  int currentPDONr = (current_register - base_register) + 1;
-  sdo_bit16_write(slave_index, base_sync_manager, currentPDONr, current_register);
+  sdo.write<uint8_t>(base_sync_manager, 0, 0);
+  int current_pdo_number = (current_register - base_register) + 1;
+  sdo.write<uint16_t>(base_sync_manager, current_pdo_number, current_register);
 
   // Explicitly disable PDO registers which are not used
   current_register++;
   if (current_register < (base_register + nr_of_regs))
   {
-    for (int unusedRegister = current_register; unusedRegister < (base_register + this->nr_of_regs); unusedRegister++)
+    for (int unused_register = current_register; unused_register < (base_register + this->nr_of_regs);
+         unused_register++)
     {
-      sdo_bit8_write(slave_index, unusedRegister, 0, 0);
+      sdo.write<uint8_t>(unused_register, 0, 0);
     }
   }
 
   // Activate the sync manager again
-  int totalAmountPDO = (current_register - base_register);
-  sdo_bit8_write(slave_index, base_sync_manager, 0, totalAmountPDO);
+  int total_pdos = (current_register - base_register);
+  sdo.write<uint8_t>(base_sync_manager, 0, total_pdos);
 
   return byte_offsets;
 }

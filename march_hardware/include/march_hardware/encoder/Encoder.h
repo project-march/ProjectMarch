@@ -2,6 +2,8 @@
 
 #ifndef MARCH_HARDWARE_ENCODER_H
 #define MARCH_HARDWARE_ENCODER_H
+#include "march_hardware/EtherCAT/pdo_interface.h"
+
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -17,17 +19,35 @@ public:
 
   /**
    * Reads out the encoder from the slave and returns the value in Internal Units (IU).
+   * @param pdo PDO interface to use for reading
    * @param byte_offset the byte offset in the slave register for the IU position
    * @returns The current position of the encoder in Internal Units (IU)
    */
-  int32_t getAngleIU(uint8_t byte_offset) const;
+  int32_t getAngleIU(const PdoSlaveInterface& pdo, uint8_t byte_offset) const;
 
   /**
    * Reads out the encoder from the slave and transforms the result to radians.
+   * @param pdo PDO interface to use for reading
    * @param byte_offset the byte offset in the slave register for the IU position
    * @returns The current position of the encoder in radians
    */
-  double getAngleRad(uint8_t byte_offset) const;
+  double getAngleRad(const PdoSlaveInterface& pdo, uint8_t byte_offset) const;
+
+  /**
+   * Reads out the velocity of the encoder from the slave and returns the value in Internal Units per second (IU/s).
+   * @param pdo PDO interface to use for reading
+   * @param byte_offset the byte offset in the slave register for the IU velocity
+   * @returns The current velocity measured by the encoder in Internal Units per second (IU/s)
+   */
+  double getVelocityIU(const PdoSlaveInterface& pdo, uint8_t byte_offset) const;
+
+  /**
+   * Reads out the velocity of the encoder from the slave and transforms the result to radians per second.
+   * @param pdo PDO interface to use for reading
+   * @param byte_offset the byte offset in the slave register for the IU velocity
+   * @returns The current velocity measured by the encoder in radians per second
+   */
+  double getVelocityRad(const PdoSlaveInterface& pdo, uint8_t byte_offset) const;
 
   /**
    * Converts encoder Internal Units (IU) to radians.
@@ -45,11 +65,14 @@ public:
 
   size_t getTotalPositions() const;
 
-  int getSlaveIndex() const;
-  void setSlaveIndex(int slave_index);
-
   static const size_t MIN_RESOLUTION = 1;
   static const size_t MAX_RESOLUTION = 32;
+
+  // constant used for converting a fixed point 16.16 bit number to a double, which is done by dividing by 2^16
+  static constexpr double FIXED_POINT_TO_FLOAT_CONVERSION = 1 << 16;
+
+  // iMOTIONCUBE setting (slow loop sample period)
+  static constexpr double TIME_PER_VELOCITY_SAMPLE = 0.004;
 
   static constexpr double PI_2 = 2 * M_PI;
 
@@ -65,7 +88,6 @@ private:
    */
   static size_t calculateTotalPositions(size_t number_of_bits);
 
-  int slave_index_ = -1;
   size_t total_positions_ = 0;
 };
 }  // namespace march

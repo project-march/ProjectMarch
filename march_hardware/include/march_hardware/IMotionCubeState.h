@@ -135,6 +135,8 @@ public:
   float motorVoltage;
   int absoluteEncoderValue;
   int incrementalEncoderValue;
+  double absoluteVelocity;
+  double incrementalVelocity;
 };
 
 }  // namespace march
