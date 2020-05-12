@@ -7,20 +7,20 @@
 #include <hardware_interface/joint_command_interface.h>
 #include <pluginlib/class_list_macros.h>
 
-namespace joint_inertia_controller_ns {
+namespace joint_inertia_controller_ns
+{
+class InertiaController : public controller_interface::Controller<hardware_interface::PositionJointInterface>
+{
+public:
+  bool init(hardware_interface::PositionJointInterface* hw, ros::NodeHandle& n);
+  void update(const ros::Time& time, const ros::Duration& period);
+  void starting(const ros::Time& time);
+  void stopping(const ros::Time& time);
 
-    class InertiaController: public controller_interface::Controller<hardware_interface::PositionJointInterface>
-    {
-    public:
-        bool init(hardware_interface::PositionJointInterface* hw, ros::NodeHandle &n);
-        void update(const ros::Time& time, const ros::Duration& period);
-        void starting(const ros::Time& time);
-        void stopping(const ros::Time& time);
+private:
+  hardware_interface::JointHandle joint_;
+  double init_pos_;
+};
+}  // namespace joint_inertia_controller_ns
 
-    private:
-        hardware_interface::JointHandle joint_;
-        double init_pos_;
-    };
-}
-
-#endif //MARCH_HARDWARE_JOINT_INERTIA_CONTROLLER_H
+#endif  // MARCH_HARDWARE_JOINT_INERTIA_CONTROLLER_H
