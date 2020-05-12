@@ -2,7 +2,7 @@
 #include "../include/march_joint_inertia_controller/joint_inertia_controller.h"
 #include <math.h>
 
-namespace joint_inertia_controller_ns
+namespace joint_inertia_controller
 {
 
 bool InertiaController::init(hardware_interface::PositionJointInterface* hw, ros::NodeHandle& nh)
@@ -33,4 +33,4 @@ void InertiaController::stopping(const ros::Time& /* time */)
 {
 }
 }
-PLUGINLIB_EXPORT_CLASS(joint_inertia_controller_ns::InertiaController, controller_interface::ControllerBase);
+PLUGINLIB_EXPORT_CLASS(joint_inertia_controller::InertiaController, controller_interface::ControllerBase);

@@ -1,6 +1,6 @@
 march:
   joint_inertia_controller:
-    type: joint_inertia_controller_ns/InertiaController
+    type: joint_inertia_controller/InertiaController
     joints:
       - left_ankle
       - left_hip_aa
