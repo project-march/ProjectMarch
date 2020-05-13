@@ -62,6 +62,7 @@ void IMotionCube::mapMisoPDOs(SdoSlaveInterface& sdo)
   map_miso.addObject(IMCObjectName::MotionErrorRegister);
   map_miso.addObject(IMCObjectName::DetailedErrorRegister);
   map_miso.addObject(IMCObjectName::DCLinkVoltage);
+  map_miso.addObject(IMCObjectName::MotorVoltage);
   map_miso.addObject(IMCObjectName::MotorPosition);
   map_miso.addObject(IMCObjectName::MotorVelocity);
   map_miso.addObject(IMCObjectName::ActualVelocity);
