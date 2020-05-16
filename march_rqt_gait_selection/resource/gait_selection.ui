@@ -681,6 +681,26 @@ background-color: #F2F1F0
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
+         <widget class="QPushButton" name="pushButton">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>10</y>
+            <width>31</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This tool is used to set subgait-versions of a gait when the exoskeleton is running. If a change is made it has to be applied before selecting a new gait, otherwise the changes will be lost.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton{background:  #287cbc}
+QPushButton{color:  #FFFFFF}</string>
+          </property>
+          <property name="text">
+           <string>?</string>
+          </property>
+         </widget>
         </widget>
        </widget>
       </item>

@@ -213,7 +213,7 @@ class GaitSelectionView(QWidget):
         version_map = self._controller.get_version_map()
         version_map_string = ''
 
-        for gait_name in version_map.keys():
+        for gait_name in sorted(version_map.keys()):
             version_map_string += '{gait} \n'.format(gait=gait_name)
             for subgait_name, version in version_map[gait_name].items():
                 version_map_string += '\t{sb:<30} \t {vs} \n'.format(sb=subgait_name, vs=version)
