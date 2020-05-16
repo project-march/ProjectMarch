@@ -1,10 +1,8 @@
-
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import \
     QComboBox, QDialog, QGridLayout, QLabel, QPlainTextEdit, QPushButton, QScrollArea, QSizePolicy, QWidget
 from python_qt_binding import loadUi
 import rospy
-
 
 AMOUNT_OF_AVAILABLE_SUBGAITS = 5
 
@@ -43,14 +41,17 @@ class GaitSelectionView(QWidget):
             self._subgait_menus.append(self._gait_content.findChild(QComboBox, 'SubgaitMenu_{nr}'.format(nr=index)))
 
         # bind functions to callbacks of buttons and menus
-        self.findChild(QPushButton, 'Refresh').clicked.connect(lambda: self._refresh())
-        self.findChild(QPushButton, 'Apply').clicked.connect(lambda: [self._apply(), self._refresh()])
-        self.findChild(QPushButton, 'SaveDefault').clicked.connect(lambda: self._save_default())
+        self.findChild(QPushButton, 'Refresh').pressed.connect(
+            lambda: self._refresh())
+        self.findChild(QPushButton, 'Apply').pressed.connect(
+            lambda: [self._apply(), self._refresh()])
+        self.findChild(QPushButton, 'SaveDefault').pressed.connect(
+            lambda: [self._apply(), self._save_default(), self._refresh()])
+
         self.findChild(QPushButton, 'ClearLogger').clicked.connect(lambda: self._logger.clear())
         self.findChild(QPushButton, 'SeeAllVersions').clicked.connect(lambda: self._show_version_map_pop_up())
 
         self._gait_menu.currentIndexChanged.connect(lambda: self.update_version_menus())
-
         for subgait_menu in self._subgait_menus:
             subgait_menu.currentIndexChanged.connect(lambda: self.update_version_colors())
 
@@ -143,8 +144,6 @@ class GaitSelectionView(QWidget):
 
     def _refresh(self):
         """Request the gait map from the gait selection node and display the available gaits in the gait menu."""
-        self._log('Starting refresh', 'warning')
-
         self._is_refresh_active = True
         self._clear_gui(clear_gait_menu=True)
 
@@ -193,7 +192,6 @@ class GaitSelectionView(QWidget):
 
     def _save_default(self):
         """Save the currently selected subgait versions as default values."""
-        self._log('Starting saving default', 'warning')
         if self._controller.set_default_versions():
             self._log('Set new default versions', 'success')
         else:
@@ -201,7 +199,6 @@ class GaitSelectionView(QWidget):
 
     def _apply(self):
         """Apply newly selected subgait versions to the gait selection node."""
-        self._log('Starting apply', 'warning')
         self.update_selected_versions()
         if self._controller.set_version_map(self.version_map):
             self._log('Version change applied', 'success')
