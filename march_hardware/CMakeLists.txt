@@ -65,7 +65,8 @@ add_library(${PROJECT_NAME}
     src/encoder/IncrementalEncoder.cpp
     src/error/error_type.cpp
     src/error/motion_error.cpp
-        )
+)
+
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} pthread)
 
 add_executable(slave_count_check check/slave_count.cpp)
