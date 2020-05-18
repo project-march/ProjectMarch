@@ -1,3 +1,4 @@
+# For convenience it is easiest if the joint order is maintained, it is chosen to sort the joints alphabetically.
 march4:
   ifName: enp2s0
   ecatCycleTime: 4
