@@ -2,8 +2,7 @@
     <node name="march_rqt_robot_monitor_node"
           pkg="march_rqt_robot_monitor"
           type="march_rqt_robot_monitor_node"
-          output="screen"
-          respawn="true">
+          output="screen">
     </node>
 
     <node pkg="diagnostic_aggregator" type="aggregator_node" name="diag_agg" output="screen">
