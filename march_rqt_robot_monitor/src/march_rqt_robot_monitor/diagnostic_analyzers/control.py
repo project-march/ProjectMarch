@@ -1,7 +1,7 @@
 
 from diagnostic_msgs.msg import DiagnosticStatus
-from urdf_parser_py import urdf
 import rospy
+from urdf_parser_py import urdf
 
 
 class CheckJointValues(object):
@@ -30,7 +30,6 @@ class CheckJointValues(object):
                 self._upper_soft_limits[joint.name] = joint.safety_controller.soft_upper_limit
                 self._velocity_limits[joint.name] = joint.limit.velocity
                 self._effort_limits[joint.name] = joint.limit.effort
-                print(joint.name)
             except AttributeError:
                 pass
 
