@@ -1,8 +1,10 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import \
-    QComboBox, QDialog, QGridLayout, QLabel, QPlainTextEdit, QPushButton, QScrollArea, QSizePolicy, QWidget
+from PyQt5.QtWidgets import QComboBox, QLabel, QPlainTextEdit, QPushButton, QScrollArea, QWidget
 from python_qt_binding import loadUi
 import rospy
+
+from .gait_selection_pop_up import PopUpWindow
+
 
 AMOUNT_OF_AVAILABLE_SUBGAITS = 5
 
@@ -14,7 +16,7 @@ class GaitSelectionView(QWidget):
         :param ui_file:
             Path to the .ui file to load with the widget
         :param controller:
-            A refrence to the controller corresponding to the rqt gait selection functionalities
+            A reference to the controller corresponding to the rqt gait selection functionality
         """
         super(GaitSelectionView, self).__init__(flags=Qt.Window)
 
@@ -29,9 +31,9 @@ class GaitSelectionView(QWidget):
         self._is_update_active = True
 
         # Search for children in GUI
-        self._gait_content = self.Gaits.findChild(QScrollArea, 'GaitSelectionInterface')
-        self._gait_menu = self._gait_content.findChild(QComboBox, 'GaitMenu')
-        self._logger = self._gait_content.findChild(QPlainTextEdit, 'Log')
+        self._gait_content = self.GaitSelectionInterface
+        self._gait_menu = self.GaitMenu
+        self._logger = self.Log
 
         self._subgait_labels = []
         self._subgait_menus = []
@@ -41,15 +43,12 @@ class GaitSelectionView(QWidget):
             self._subgait_menus.append(self._gait_content.findChild(QComboBox, 'SubgaitMenu_{nr}'.format(nr=index)))
 
         # bind functions to callbacks of buttons and menus
-        self.findChild(QPushButton, 'Refresh').pressed.connect(
-            lambda: self._refresh())
-        self.findChild(QPushButton, 'Apply').pressed.connect(
-            lambda: [self._apply(), self._refresh()])
-        self.findChild(QPushButton, 'SaveDefault').pressed.connect(
-            lambda: [self._apply(), self._save_default(), self._refresh()])
+        self.Refresh.pressed.connect(lambda: self._refresh())
+        self.Apply.pressed.connect(lambda: [self._apply(), self._refresh()])
+        self.SaveDefault.pressed.connect(lambda: [self._apply(), self._save_default(), self._refresh()])
 
-        self.findChild(QPushButton, 'ClearLogger').clicked.connect(lambda: self._logger.clear())
-        self.findChild(QPushButton, 'SeeAllVersions').clicked.connect(lambda: self._show_version_map_pop_up())
+        self.ClearLogger.clicked.connect(lambda: self._logger.clear())
+        self.SeeAllVersions.clicked.connect(lambda: self._show_version_map_pop_up())
 
         self._gait_menu.currentIndexChanged.connect(lambda: self.update_version_menus())
         for subgait_menu in self._subgait_menus:
@@ -217,43 +216,3 @@ class GaitSelectionView(QWidget):
             version_map_string += '\n'
 
         self._version_map_pop_up.show_message(version_map_string)
-
-
-class PopUpWindow(QDialog):
-    def __init__(self, parent, width=500, height=600):
-        """Base class for creating a pop up window over an existing widget.
-
-        :param parent:
-            The parent widget to connect to the pop up
-        :param width:
-            Starting width of the the pop up widget
-        :param height:
-            Starting height of the the pop up widget
-        """
-        super(PopUpWindow, self).__init__(parent=parent, flags=Qt.Window)
-        self.resize(width, height)
-        self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-
-        self._layout = QGridLayout(self)
-
-        self._scroll_area = QScrollArea()
-        self._scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self._scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self._scroll_area.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-        self._scroll_area.setWidgetResizable(True)
-
-        self._content_frame = QWidget(self._scroll_area, flags=Qt.Window)
-        self._content_frame.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-        self._content = QGridLayout(self._content_frame)
-
-        self.msg_label = QLabel(self)
-        self._content.addWidget(self.msg_label)
-
-        self._scroll_area.setWidget(self._content_frame)
-        self._layout.addWidget(self._scroll_area)
-
-    def show_message(self, message):
-        """Add message to the pop up and show the window."""
-        self.msg_label.clear()
-        self.msg_label.setText(message)
-        return super(PopUpWindow, self).show()
