@@ -47,15 +47,9 @@ class GaitSelectionController(object):
             The new gait version map as dictionary to parse to the gait selection node
         """
         result = self._set_version_map(str(gait_version_map))
-        if result.success:
-            return True
-        else:
-            return False
+        return result.success
 
     def set_default_versions(self):
         """Save the current gait version map in the gait selection node as a default."""
         result = self._set_default_versions()
-        if result.success:
-            return True
-        else:
-            return False
+        return result.success
