@@ -1,5 +1,5 @@
 // Copyright 2020 Project March.
-#include "../include/march_joint_inertia_controller/joint_inertia_controller.h"
+#include "march_joint_inertia_controller/joint_inertia_controller.h"
 #include <math.h>
 
 namespace joint_inertia_controller
