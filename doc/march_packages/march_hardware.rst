@@ -81,8 +81,8 @@ march_hardware package (e.g. Joint, IMotionCube, Encoder, PowerDistributionBoard
 For example, the :hardware-interface:`Encoder class <march_hardware/include/march_hardware/encoder/Encoder.h>`
 ``getAngleIU()`` function reads and returns the latest encoder value that was
 received by the EthercatMaster. Functions such as ``getAngleIU()`` all call the
-same generic functions for reading from and writing to slaves. These generic
-functions are defined in :hardware-interface:`EthercatIO.cpp <march_hardware/src/EtherCAT/EthercatIO.cpp>`.
+same generic interface for reading from and writing to slaves. The generic
+interface is defined in :hardware-interface:`pdo_interface.cpp <march_hardware/include/march_hardware/EtherCAT/pdo_interface.h>`.
 
 .. note::
   When reading or writing PDO messages over EtherCAT via SOEM, you need three
@@ -100,7 +100,7 @@ SDO messages
 ************
 Service Data Objects (SDOs) are non-cyclic EtherCAT messages. They are used for
 sending one-time messages, for example when initializing an IMotionCube.
-The generic SDO messaging functions can be found in :hardware-interface:`EthercatSDO.cpp <march_hardware/src/EtherCAT/EthercatSDO.cpp>`.
+The generic SDO interface can be found in :hardware-interface:`sdo_interface.h <march_hardware/include/march_hardware/EtherCAT/sdo_interface.h>`.
 
 Power Distribution Board
 ------------------------
