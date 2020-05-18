@@ -39,8 +39,8 @@ class GaitSelectionView(QWidget):
         self._subgait_menus = []
 
         for index in range(AMOUNT_OF_AVAILABLE_SUBGAITS):
-            self._subgait_labels.append(self._gait_content.findChild(QLabel, 'SubgaitLabel_{nr}'.format(nr=index)))
-            self._subgait_menus.append(self._gait_content.findChild(QComboBox, 'SubgaitMenu_{nr}'.format(nr=index)))
+            self._subgait_labels.append(getattr(self, 'SubgaitLabel_{nr}'.format(nr=index)))
+            self._subgait_menus.append(getattr(self, 'SubgaitMenu_{nr}'.format(nr=index)))
 
         # bind functions to callbacks of buttons and menus
         self.Refresh.pressed.connect(lambda: self._refresh())
@@ -169,7 +169,7 @@ class GaitSelectionView(QWidget):
             color = self._colors['error']
 
         self._logger.appendHtml('<p style="color:' + str(color) + '">' + msg + '</p>')
-        scrollbar = self.findChild(QPlainTextEdit, 'Log').verticalScrollBar()
+        scrollbar = self.Log.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
 
     # button functions
