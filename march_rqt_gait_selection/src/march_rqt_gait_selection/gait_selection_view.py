@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QComboBox, QLabel, QPlainTextEdit, QPushButton, QScrollArea, QWidget
+from PyQt5.QtWidgets import QWidget
 from python_qt_binding import loadUi
 import rospy
 
