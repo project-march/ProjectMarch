@@ -1,18 +1,19 @@
+# For convenience it is easiest if the joint order is maintained, it is chosen to sort the joints alphabetically.
 march4:
   ifName: enp2s0
   ecatCycleTime: 4
   joints:
-    - right_hip_aa:
+    - left_ankle:
         actuationMode: torque
         allowActuation: true
-        netNumber: 1
-        temperatureges: {slaveIndex: 7, byteOffset: 4}
+        netNumber: 8
+        temperatureges: {slaveIndex: 1, byteOffset: 0}
         imotioncube:
-          slaveIndex: 8
+          slaveIndex: 2
           absoluteEncoder:
             resolution: 12
-            minPositionIU: 3713
-            maxPositionIU: 4091
+            minPositionIU: 3641
+            maxPositionIU: 4082
           incrementalEncoder:
             resolution: 13
             transmission: 200
@@ -32,21 +33,6 @@ march4:
             resolution: 13
             transmission: 200
 
-    - right_hip_fe:
-        actuationMode: torque
-        allowActuation: true
-        netNumber: 2
-        temperatureges: {slaveIndex: 9, byteOffset: 0}
-        imotioncube:
-          slaveIndex: 10
-          absoluteEncoder:
-            resolution: 17
-            minPositionIU: 2053
-            maxPositionIU: 45617
-          incrementalEncoder:
-            resolution: 12
-            transmission: 101
-
     - left_hip_fe:
         actuationMode: torque
         allowActuation: true
@@ -58,21 +44,6 @@ march4:
             resolution: 17
             minPositionIU: 45699
             maxPositionIU: 89391
-          incrementalEncoder:
-            resolution: 12
-            transmission: 101
-
-    - right_knee:
-        actuationMode: torque
-        allowActuation: true
-        netNumber: 3
-        temperatureges: {slaveIndex: 9, byteOffset: 4}
-        imotioncube:
-          slaveIndex: 11
-          absoluteEncoder:
-            resolution: 17
-            minPositionIU: 41547
-            maxPositionIU: 85287
           incrementalEncoder:
             resolution: 12
             transmission: 101
@@ -107,17 +78,47 @@ march4:
             resolution: 13
             transmission: 200
 
-    - left_ankle:
+    - right_hip_aa:
         actuationMode: torque
         allowActuation: true
-        netNumber: 8
-        temperatureges: {slaveIndex: 1, byteOffset: 0}
+        netNumber: 1
+        temperatureges: {slaveIndex: 7, byteOffset: 4}
         imotioncube:
-          slaveIndex: 2
+          slaveIndex: 8
           absoluteEncoder:
             resolution: 12
-            minPositionIU: 3641
-            maxPositionIU: 4082
+            minPositionIU: 3713
+            maxPositionIU: 4091
           incrementalEncoder:
             resolution: 13
             transmission: 200
+
+    - right_hip_fe:
+        actuationMode: torque
+        allowActuation: true
+        netNumber: 2
+        temperatureges: {slaveIndex: 9, byteOffset: 0}
+        imotioncube:
+          slaveIndex: 10
+          absoluteEncoder:
+            resolution: 17
+            minPositionIU: 2053
+            maxPositionIU: 45617
+          incrementalEncoder:
+            resolution: 12
+            transmission: 101
+
+    - right_knee:
+        actuationMode: torque
+        allowActuation: true
+        netNumber: 3
+        temperatureges: {slaveIndex: 9, byteOffset: 4}
+        imotioncube:
+          slaveIndex: 11
+          absoluteEncoder:
+            resolution: 17
+            minPositionIU: 41547
+            maxPositionIU: 85287
+          incrementalEncoder:
+            resolution: 12
+            transmission: 101
