@@ -4,6 +4,9 @@ import rospy
 from urdf_parser_py import urdf
 
 
+WARN_PERCENTAGE = 5
+
+
 class CheckJointValues(object):
     """Base class to diagnose the joint movement values."""
 
@@ -48,7 +51,9 @@ class CheckJointValues(object):
             return stat
 
         stat.add('Timestamp', self._timestamp)
+
         joint_outside_soft_limits = []
+        joint_in_warning_zone_soft_limits = []
 
         for index in range(len(self._joint_names)):
             joint_name = self._joint_names[index]
@@ -56,12 +61,20 @@ class CheckJointValues(object):
 
             if self._position[index] >= self._upper_soft_limits[joint_name]:
                 joint_outside_soft_limits.append(self._joint_names[index])
+            elif self._position[index] >= (self._upper_soft_limits[joint_name] * (1 - WARN_PERCENTAGE / 100)):
+                joint_in_warning_zone_soft_limits.append(self._joint_names[index])
 
             if self._position[index] <= self._lower_soft_limits[joint_name]:
                 joint_outside_soft_limits.append(self._joint_names[index])
+            elif self._position[index] <= (self._lower_soft_limits[joint_name] * (1 - WARN_PERCENTAGE / 100)):
+                joint_in_warning_zone_soft_limits.append(self._joint_names[index])
 
         if joint_outside_soft_limits:
-            stat.summary(DiagnosticStatus.ERROR, 'Outside soft limits: {ls}'.format(ls=str(joint_outside_soft_limits)))
+            stat.summary(DiagnosticStatus.ERROR, 'Outside soft limits: {ls}'
+                         .format(ls=str(joint_outside_soft_limits)))
+        elif joint_in_warning_zone_soft_limits:
+            stat.summary(DiagnosticStatus.WARN, 'Close to soft limits: {ls}'
+                         .format(ls=str(joint_in_warning_zone_soft_limits)))
         else:
             stat.summary(DiagnosticStatus.OK, 'OK')
 
@@ -74,17 +87,25 @@ class CheckJointValues(object):
             return stat
 
         stat.add('Timestamp', self._timestamp)
+
         joints_at_velocity_limit = []
+        joint_in_warning_zone_velocity_limit = []
 
         for index in range(len(self._joint_names)):
             joint_name = self._joint_names[index]
             stat.add(self._joint_names[index], self._velocity[index])
 
-            if self._position[index] >= self._velocity_limits[joint_name]:
+            if self._velocity[index] >= self._velocity_limits[joint_name]:
                 joints_at_velocity_limit.append(self._joint_names[index])
+            elif self._velocity[index] >= (self._velocity_limits[joint_name] * (1 - WARN_PERCENTAGE / 100)):
+                joint_in_warning_zone_velocity_limit.append(self._joint_names[index])
 
         if joints_at_velocity_limit:
-            stat.summary(DiagnosticStatus.ERROR, 'At velocity limit: {ls}'.format(ls=str(joints_at_velocity_limit)))
+            stat.summary(DiagnosticStatus.ERROR, 'At velocity limit: {ls}'
+                         .format(ls=str(joints_at_velocity_limit)))
+        elif joint_in_warning_zone_velocity_limit:
+            stat.summary(DiagnosticStatus.WARN, 'Close to velocity limit: {ls}'
+                         .format(ls=str(joint_in_warning_zone_velocity_limit)))
         else:
             stat.summary(DiagnosticStatus.OK, 'OK')
 
@@ -97,17 +118,25 @@ class CheckJointValues(object):
             return stat
 
         stat.add('Timestamp', self._timestamp)
+
         joints_at_effort_limit = []
+        joints_in_warning_zone_effort_limits = []
 
         for index in range(len(self._joint_names)):
             joint_name = self._joint_names[index]
             stat.add(self._joint_names[index], self._position[index])
 
-            if self._position[index] >= self._effort_limits[joint_name]:
+            if self._effort[index] >= self._effort_limits[joint_name]:
                 joints_at_effort_limit.append(self._joint_names[index])
+            elif self._effort[index] >= (self._effort_limits[joint_name] * (1 - WARN_PERCENTAGE / 100)):
+                joints_in_warning_zone_effort_limits.append(self._joint_names[index])
 
         if joints_at_effort_limit:
-            stat.summary(DiagnosticStatus.ERROR, 'At effort limit: {ls}'.format(ls=str(joints_at_effort_limit)))
+            stat.summary(DiagnosticStatus.ERROR, 'At effort limit: {ls}'
+                         .format(ls=str(joints_at_effort_limit)))
+        elif joints_in_warning_zone_effort_limits:
+            stat.summary(DiagnosticStatus.WARN, 'Close to effort limit: {ls}'
+                         .format(ls=str(joints_in_warning_zone_effort_limits)))
         else:
             stat.summary(DiagnosticStatus.OK, 'OK')
 
