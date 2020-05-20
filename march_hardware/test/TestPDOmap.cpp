@@ -53,3 +53,27 @@ TEST_F(PDOTest, ObjectCounts)
   ASSERT_EQ(1u, misoByteOffsets.count(march::IMCObjectName::CurrentLimit));
   ASSERT_EQ(0u, misoByteOffsets.count(march::IMCObjectName::DCLinkVoltage));
 }
+
+TEST_F(PDOTest, CombinedAddressConstruct)
+{
+  march::PDOmap pdoMap;
+
+  auto status_word = pdoMap.all_objects.find(march::IMCObjectName::StatusWord);
+  uint32_t combined_address = status_word->second.combined_address;
+
+  ASSERT_EQ(16u, (combined_address & 0xFF));
+  ASSERT_EQ(0u, ((combined_address >> 8) & 0xFF));
+  ASSERT_EQ(0x6041u, ((combined_address >> 16) & 0xFFFF));
+}
+
+TEST_F(PDOTest, CombinedAdressConstructWithSubindexValue)
+{
+  march::PDOmap pdoMap;
+
+  auto test_object = march::IMCObject(0x6060, 2, 16);
+  uint32_t combined_address = test_object.combined_address;
+
+  ASSERT_EQ(16u, (combined_address & 0xFF));
+  ASSERT_EQ(2u, ((combined_address >> 8) & 0xFF));
+  ASSERT_EQ(0x6060u, ((combined_address >> 16) & 0xFFFF));
+}
