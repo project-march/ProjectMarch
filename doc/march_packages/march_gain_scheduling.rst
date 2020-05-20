@@ -49,4 +49,3 @@ Tuning using gainscheduling is rather easy. You can freely change the PID values
     Pay attention when tuning these values! Always double check if your values aren't absurdly large and pay attention to
     the amount these values change when a different gait_type is used. Too large changes can cause instability in the system.
 
-.. warning::
