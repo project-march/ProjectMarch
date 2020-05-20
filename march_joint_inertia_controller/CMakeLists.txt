@@ -16,8 +16,8 @@ catkin_package(
 
 include_directories(include SYSTEM ${catkin_INCLUDE_DIRS})
 
-add_library(joint_inertia_controller_lib src/joint_inertia_controller.cpp)
-target_link_libraries(joint_inertia_controller_lib ${catkin_LIBRARIES})
+add_library(${PROJECT_NAME} src/joint_inertia_controller.cpp)
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
