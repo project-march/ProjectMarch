@@ -35,8 +35,6 @@ If you do want to launch it manualy run the following lines in a terinal:
 
   roslaunch march_gain_scheduling march_gain_scheduling.launch
 
-.. code::
-
 you can change the used configuration (exoskeleton, test_joint_rotational, test_joint_linear) using the configuration argument.
 Your are able to set or reset the use of the linearization using the linear argument and lastly you can influency the slope with which the PID values are linearized using the slope argument.
 
@@ -48,7 +46,7 @@ Tuning using gainscheduling is rather easy. You can freely change the PID values
 
 .. warning::
 
-Pay attention when tuning these values! Always double check if your values aren't absurdly large and pay attention to
-the amount these values change when a different gait_type is used. Too large changes can cause instability in the system.
+    Pay attention when tuning these values! Always double check if your values aren't absurdly large and pay attention to
+    the amount these values change when a different gait_type is used. Too large changes can cause instability in the system.
 
 .. warning::
