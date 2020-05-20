@@ -304,7 +304,7 @@ float IMotionCube::getIMCVoltage()
 
 float IMotionCube::getMotorVoltage()
 {
-  return this->read16(this->miso_byte_offsets_.at(IMCObjectName::MotorVoltage)).f;
+  return this->read16(this->miso_byte_offsets_.at(IMCObjectName::MotorVoltage)).ui;
 }
 
 void IMotionCube::setControlWord(uint16_t control_word)
