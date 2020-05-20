@@ -380,6 +380,7 @@ uint32_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
   uint16_t sum = 0;
   std::string delimiter = "\n";
   std::string token;
+  std::cout << sw_string_.size() << "\n";
   while ((pos = sw_string_.find(delimiter, old_pos)) != std::string::npos)
   {
     token = sw_string_.substr(old_pos, pos - old_pos);
