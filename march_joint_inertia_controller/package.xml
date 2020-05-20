@@ -12,7 +12,6 @@
   <depend>roscpp</depend>
   <depend>controller_interface</depend>
   <depend>pluginlib</depend>
-  <depend>controller_interface</depend>
 
   <export>
     <controller_interface plugin="${prefix}/controller_plugins.xml" />

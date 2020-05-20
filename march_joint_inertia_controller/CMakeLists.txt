@@ -7,8 +7,6 @@ find_package(catkin REQUIRED COMPONENTS
   controller_interface
   pluginlib
   roscpp
-  std_msgs
-  message_generation
 )
 
 catkin_package(
