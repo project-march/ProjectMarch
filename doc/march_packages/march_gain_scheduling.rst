@@ -38,7 +38,7 @@ If you do want to launch it manually run the following lines in a terminal:
 you can change the used configuration (exoskeleton, test_joint_rotational, test_joint_linear) using the ``configuration`` argument.
 Your are able to set or reset the use of the linearization using the ``linear`` argument and lastly you can influency the slope with which the PID values are linearized using the ``slope`` argument.
 
-.. note:: Always launch the gainscheduling node after starting the hardware interface. This prevents the node fro searching for parameters and topics that are not yet alive.
+.. note:: Always launch the gainscheduling node after starting the hardware interface. This prevents the node from searching for parameters and topics that are not yet alive.
 
 How to tune
 """""""""""
@@ -62,4 +62,3 @@ Please tune the exoskeleton in the following order:
     When using the ``linear`` argument (set to true by default) pay attention to the ``slope`` argument as well.
     large changes in gains need to be applied accordingly. Neither too slow (low slope value) for the gait to perform well, or too quick (high slope value)
     so that it won't introduce instability into the system.
-
