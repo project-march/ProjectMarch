@@ -36,7 +36,7 @@ If you do want to launch it manually run the following lines in a terminal:
   roslaunch march_gain_scheduling march_gain_scheduling.launch
 
 you can change the used configuration (exoskeleton, test_joint_rotational, test_joint_linear) using the ``configuration`` argument.
-Your are able to set or reset the use of the linearization using the ``linear`` argument and lastly you can influency the slope with which the PID values are linearized using the ``slope`` argument.
+You can set or reset the use of the linearization using the ``linear`` argument and lastly you can set the slope with which the PID values are linearized using the ``slope`` argument.
 
 .. note:: Always launch the gainscheduling node after starting the hardware interface. This prevents the node from searching for parameters and topics that are not yet alive.
 
