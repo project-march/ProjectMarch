@@ -4,6 +4,7 @@ from sensor_msgs.msg import JointState, Temperature
 from std_msgs.msg import Time
 
 from .diagnostic_analyzers.control import CheckJointValues
+from .diagnostic_analyzers.imc_state import CheckImcStatus
 from .diagnostic_analyzers.temperature import CheckJointTemperature
 from .diagnostic_analyzers.topic_frequency import CheckTopicFrequency
 
@@ -55,6 +56,8 @@ def main():
     updater.add('Control position values', check_current_movement_values.position_diagnostics)
     updater.add('Control velocity values', check_current_movement_values.velocity_diagnostics)
     updater.add('Control effort values', check_current_movement_values.effort_diagnostics)
+
+    CheckImcStatus(updater)
 
     updater.force_update()
 

@@ -54,3 +54,5 @@ class CheckJointTemperature(object):
             stat.summary(DiagnosticStatus.WARN, 'Temperature almost too high ({tp}).'.format(tp=self._temperature))
         else:
             stat.summary(DiagnosticStatus.ERROR, 'Temperature to high ({tp}).'.format(tp=self._temperature))
+
+        return stat
