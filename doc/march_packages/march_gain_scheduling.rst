@@ -4,8 +4,8 @@ march_gain_scheduling
 =====================
 
 The march_gain_scheduling package is used to implement the gainscheduling control method. More about this control method
-can be found on `this confluence page <https://confluence.projectmarch.nl:8443/display/51/31+-+Gain+Scheduling>`_.
-If this page is unavailable to you, please consider reading the `following page <https://en.wikipedia.org/wiki/Gain_scheduling>`_.
+can be found on the `following page <https://en.wikipedia.org/wiki/Gain_scheduling>`_.
+We implemented the method in such a way that it changes the PID gains/values when a different type of gait is selected.
 
 Principle
 ---------
