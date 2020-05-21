@@ -28,8 +28,8 @@ This node also offers the ability to change PID values linearly through the sett
 How to use
 """"""""""
 
-Gainscheduling is already set to run alongside the exoskeleton. You will most likely not need to launch this node manualy.
-If you do want to launch it manualy run the following lines in a terinal:
+Gainscheduling is already set to run alongside the exoskeleton. You will most likely not need to launch this node manually.
+If you do want to launch it manually run the following lines in a terminal:
 
 .. code::
 
