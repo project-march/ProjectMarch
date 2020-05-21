@@ -35,17 +35,31 @@ If you do want to launch it manualy run the following lines in a terinal:
 
   roslaunch march_gain_scheduling march_gain_scheduling.launch
 
-you can change the used configuration (exoskeleton, test_joint_rotational, test_joint_linear) using the configuration argument.
-Your are able to set or reset the use of the linearization using the linear argument and lastly you can influency the slope with which the PID values are linearized using the slope argument.
+you can change the used configuration (exoskeleton, test_joint_rotational, test_joint_linear) using the ``configuration`` argument.
+Your are able to set or reset the use of the linearization using the ``linear`` argument and lastly you can influency the slope with which the PID values are linearized using the ``slope`` argument.
 
 .. note:: Always launch the gainscheduling node after starting the hardware interface. This prevents the node fro searching for parameters and topics that are not yet alive.
 
 How to tune
 """""""""""
 Tuning using gainscheduling is rather easy. You can freely change the PID values in the `config folder <https://github.com/project-march/march/tree/develop/march_gain_scheduling/config>`_.
+In this folder you'll find a number of ``.yaml`` files which correspond to different configurations of the exoskeleton and different test/run modes.
+
+Please tune the exoskeleton in the following order:
+
+- `try the tuning on a testjoint with a relevant load`
+- `tune in airgait stand`
+- `tune whilst groundgaiting`
+- `tune with the pilot in the exo`
 
 .. warning::
 
     Pay attention when tuning these values! Always double check if your values aren't absurdly large and pay attention to
     the amount these values change when a different gait_type is used. Too large changes can cause instability in the system.
+
+.. warning::
+
+    When using the ``linear`` argument (set to true by default) pay attention to the ``slope`` argument as well.
+    large changes in gains need to be applied accordingly. Neither too slow (low slope value) for the gait to perform well, or too quick (high slope value)
+    so that it won't introduce instability into the system.
 
