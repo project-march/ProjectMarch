@@ -28,6 +28,7 @@ public:
   MOCK_METHOD0(getVelocityRadAbsolute, double());
 
   MOCK_METHOD0(getIMCVoltage, float());
+  MOCK_METHOD0(getMotorVoltage, float());
   MOCK_METHOD0(getMotorCurrent, float());
 
   MOCK_METHOD1(actuateRad, void(double));

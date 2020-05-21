@@ -62,6 +62,7 @@ void IMotionCube::mapMisoPDOs(SdoSlaveInterface& sdo)
   map_miso.addObject(IMCObjectName::MotionErrorRegister);
   map_miso.addObject(IMCObjectName::DetailedErrorRegister);
   map_miso.addObject(IMCObjectName::DCLinkVoltage);
+  map_miso.addObject(IMCObjectName::MotorVoltage);
   map_miso.addObject(IMCObjectName::MotorPosition);
   map_miso.addObject(IMCObjectName::MotorVelocity);
   map_miso.addObject(IMCObjectName::ActualVelocity);
@@ -128,7 +129,12 @@ bool IMotionCube::writeInitialSettings(SdoSlaveInterface& sdo, int cycle_time)
   int rate_ec_x = sdo.write<uint8_t>(0x60C2, 1, cycle_time);
   int rate_ec_y = sdo.write<int8_t>(0x60C2, 2, -3);
 
-  if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && stop_decl && abort_con && rate_ec_x && rate_ec_y))
+  // use filter object to read motor voltage
+  int volt_address = sdo.write<int16_t>(0x2108, 1, 0x0232);
+  int volt_filter = sdo.write<int16_t>(0x2108, 2, 32767);
+
+  if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && stop_decl && abort_con && rate_ec_x && rate_ec_y &&
+        volt_address && volt_filter))
   {
     throw error::HardwareException(error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
                                    "Failed writing initial settings to IMC of slave %d", this->getSlaveIndex());
@@ -294,6 +300,11 @@ float IMotionCube::getIMCVoltage()
   uint16_t imc_voltage_iu = this->read16(this->miso_byte_offsets_.at(IMCObjectName::DCLinkVoltage)).ui;
   return (V_DC_MAX_MEASURABLE / IU_CONVERSION_CONST) *
          static_cast<float>(imc_voltage_iu);  // Conversion to Volt, see Technosoft CoE programming manual
+}
+
+float IMotionCube::getMotorVoltage()
+{
+  return this->read16(this->miso_byte_offsets_.at(IMCObjectName::MotorVoltage)).ui;
 }
 
 void IMotionCube::setControlWord(uint16_t control_word)
