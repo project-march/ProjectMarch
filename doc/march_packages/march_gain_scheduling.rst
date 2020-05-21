@@ -9,7 +9,7 @@ If this page is unavailable to you, please consider reading the `following page 
 
 Principle
 ---------
-The Gainscheduling package uses the definition of gait_type as, for example, seen in `this gait file < https://github.com/project-march/gait-files/blob/develop/march_gait_files/training-v/sit/sit_down/MIV_final.subgait>`_.
+The Gainscheduling package uses the definition of gait_type as, for example, seen in `this gait file <https://github.com/project-march/gait-files/blob/develop/march_gait_files/training-v/sit/sit_down/MIV_final.subgait>`_.
 to change all the PID values for the relevant joints.
 
 The following gait_types are supported:
