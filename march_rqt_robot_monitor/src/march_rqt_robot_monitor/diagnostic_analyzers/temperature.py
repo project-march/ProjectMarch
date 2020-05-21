@@ -33,7 +33,8 @@ class CheckJointTemperature(object):
     def diagnostics(self, stat):
         """The diagnostic message to display in the standard stat format."""
         if self._timestamp is None:
-            stat.add(' Topic error ', 'No events recorded.')
+            stat.add('Topic error', 'No events recorded')
+            stat.summary(DiagnosticStatus.STALE, 'No temperature recorded')
             return stat
 
         if not LOWER_THRESHOLD_VALID_TEMPERATURE_VALUE < self._temperature < UPPER_THRESHOLD_VALID_TEMPERATURE_VALUE:
@@ -53,3 +54,5 @@ class CheckJointTemperature(object):
             stat.summary(DiagnosticStatus.WARN, 'Temperature almost too high ({tp}).'.format(tp=self._temperature))
         else:
             stat.summary(DiagnosticStatus.ERROR, 'Temperature to high ({tp}).'.format(tp=self._temperature))
+
+        return stat

@@ -47,7 +47,8 @@ class CheckJointValues(object):
     def position_diagnostics(self, stat):
         """The diagnostic message to display the positions in standard format."""
         if self._timestamp is None:
-            stat.add(' Topic error ', 'No events recorded.')
+            stat.add('Topic error', 'No events recorded')
+            stat.summary(DiagnosticStatus.STALE, 'No position recorded')
             return stat
 
         stat.add('Timestamp', self._timestamp)
@@ -83,7 +84,8 @@ class CheckJointValues(object):
     def velocity_diagnostics(self, stat):
         """The diagnostic message to display the velocities in standard format."""
         if self._timestamp is None:
-            stat.add(' Topic error ', 'No events recorded.')
+            stat.add('Topic error', 'No events recorded')
+            stat.summary(DiagnosticStatus.STALE, 'No velocity recorded')
             return stat
 
         stat.add('Timestamp', self._timestamp)
@@ -114,7 +116,8 @@ class CheckJointValues(object):
     def effort_diagnostics(self, stat):
         """The diagnostic message to display the efforts in standard format."""
         if self._timestamp is None:
-            stat.add(' Topic error ', 'No events recorded.')
+            stat.add('Topic error', 'No events recorded')
+            stat.summary(DiagnosticStatus.STALE, 'No effort recorded')
             return stat
 
         stat.add('Timestamp', self._timestamp)
