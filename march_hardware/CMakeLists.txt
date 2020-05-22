@@ -56,11 +56,12 @@ add_library(${PROJECT_NAME}
     include/${PROJECT_NAME}/power/net_driver_offsets.h
     include/${PROJECT_NAME}/power/net_monitor_offsets.h
     include/${PROJECT_NAME}/power/power_distribution_board.h
+    include/${PROJECT_NAME}/temperature/temperature_ges.h
+    include/${PROJECT_NAME}/temperature/temperature_sensor.h
     src/IMotionCube.cpp
     src/IMotionCubeTargetState.cpp
     src/Joint.cpp
     src/MarchRobot.cpp
-    src/TemperatureGES.cpp
     src/encoder/absolute_encoder.cpp
     src/encoder/encoder.cpp
     src/encoder/incremental_encoder.cpp
@@ -73,6 +74,7 @@ add_library(${PROJECT_NAME}
     src/power/high_voltage.cpp
     src/power/low_voltage.cpp
     src/power/power_distribution_board.cpp
+    src/temperature/temperature_ges.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} pthread)

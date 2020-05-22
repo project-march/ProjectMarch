@@ -1,8 +1,8 @@
 // Copyright 2019 Project March.
-#ifndef MARCH_HARDWARE_TEMPERATUREGES_H
-#define MARCH_HARDWARE_TEMPERATUREGES_H
+#ifndef MARCH_HARDWARE_TEMPERATURE_GES_H
+#define MARCH_HARDWARE_TEMPERATURE_GES_H
 #include "march_hardware/ethercat/slave.h"
-#include "TemperatureSensor.h"
+#include "temperature_sensor.h"
 
 #include <cstddef>
 
@@ -33,4 +33,4 @@ private:
   const uint8_t temperature_byte_offset_;
 };
 }  // namespace march
-#endif  // MARCH_HARDWARE_TEMPERATUREGES_H
+#endif  // MARCH_HARDWARE_TEMPERATURE_GES_H

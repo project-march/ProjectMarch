@@ -1,6 +1,6 @@
 // Copyright 2018 Project March.
 #include "mocks/MockSlave.h"
-#include "march_hardware/TemperatureGES.h"
+#include "march_hardware/temperature/temperature_ges.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

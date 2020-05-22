@@ -19,7 +19,7 @@
 #include <march_hardware/Joint.h>
 #include <march_hardware/MarchRobot.h>
 #include <march_hardware/power/power_distribution_board.h>
-#include <march_hardware/TemperatureGES.h>
+#include <march_hardware/temperature/temperature_ges.h>
 
 /**
  * @brief Creates a MarchRobot from a robot yaml and URDF.
