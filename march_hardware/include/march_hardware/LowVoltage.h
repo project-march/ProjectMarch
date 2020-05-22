@@ -1,7 +1,7 @@
 // Copyright 2019 Project March.
 #ifndef MARCH_HARDWARE_LOWVOLTAGE_H
 #define MARCH_HARDWARE_LOWVOLTAGE_H
-#include "march_hardware/EtherCAT/pdo_interface.h"
+#include "march_hardware/ethercat/pdo_interface.h"
 #include "march_hardware/NetDriverOffsets.h"
 #include "march_hardware/NetMonitorOffsets.h"
 

@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
 #include "march_hardware/encoder/Encoder.h"
-#include "march_hardware/EtherCAT/pdo_types.h"
+#include "march_hardware/ethercat/pdo_types.h"
 #include "march_hardware/error/hardware_exception.h"
 
 namespace march

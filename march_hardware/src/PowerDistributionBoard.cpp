@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
 #include "march_hardware/PowerDistributionBoard.h"
-#include "march_hardware/EtherCAT/pdo_types.h"
+#include "march_hardware/ethercat/pdo_types.h"
 
 namespace march
 {

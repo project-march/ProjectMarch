@@ -2,7 +2,7 @@
 #ifndef MARCH_HARDWARE_POWERDISTRIBUTIONBOARD_H
 #define MARCH_HARDWARE_POWERDISTRIBUTIONBOARD_H
 #include "march_hardware/BootShutdownOffsets.h"
-#include "march_hardware/EtherCAT/slave.h"
+#include "march_hardware/ethercat/slave.h"
 #include "march_hardware/HighVoltage.h"
 #include "march_hardware/LowVoltage.h"
 #include "march_hardware/NetDriverOffsets.h"

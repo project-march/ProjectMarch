@@ -1,7 +1,7 @@
 // Copyright 2019 Project March.
 #ifndef MARCH_HARDWARE_TEMPERATUREGES_H
 #define MARCH_HARDWARE_TEMPERATUREGES_H
-#include "march_hardware/EtherCAT/slave.h"
+#include "march_hardware/ethercat/slave.h"
 #include "TemperatureSensor.h"
 
 #include <cstddef>

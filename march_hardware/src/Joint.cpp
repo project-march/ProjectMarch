@@ -1,5 +1,5 @@
 // Copyright 2019 Project March.
-#include "march_hardware/EtherCAT/slave.h"
+#include "march_hardware/ethercat/slave.h"
 #include "march_hardware/Joint.h"
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/error/motion_error.h"

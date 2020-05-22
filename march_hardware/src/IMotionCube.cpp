@@ -2,7 +2,7 @@
 #include "march_hardware/IMotionCube.h"
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/error/motion_error.h"
-#include "march_hardware/EtherCAT/pdo_types.h"
+#include "march_hardware/ethercat/pdo_types.h"
 
 #include <bitset>
 #include <memory>

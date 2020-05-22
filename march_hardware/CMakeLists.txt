@@ -27,7 +27,7 @@ include_directories(
 )
 
 # needed to circumvent LD_LIBRARY_PATH being emptied through ethercat_grant
-# in addition to not propagating march_hardware_interface RUNPATH to dependencies, in contrast to RPATH
+# in addition to not propagating march_hardware RUNPATH to dependencies, in contrast to RPATH
 set(GCC_NEWDTAGS_LINK_FLAGS "-Wl,--disable-new-dtags")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_NEWDTAGS_LINK_FLAGS}")
 
@@ -38,26 +38,24 @@ if(CATKIN_ENABLE_TESTING AND ENABLE_COVERAGE_TESTING)
 endif()
 
 add_library(${PROJECT_NAME}
-    include/${PROJECT_NAME}/EtherCAT/pdo_interface.h
-    include/${PROJECT_NAME}/EtherCAT/pdo_types.h
-    include/${PROJECT_NAME}/EtherCAT/sdo_interface.h
-    include/${PROJECT_NAME}/EtherCAT/slave.h
     include/${PROJECT_NAME}/encoder/AbsoluteEncoder.h
     include/${PROJECT_NAME}/encoder/Encoder.h
     include/${PROJECT_NAME}/encoder/IncrementalEncoder.h
     include/${PROJECT_NAME}/error/error_type.h
     include/${PROJECT_NAME}/error/hardware_exception.h
     include/${PROJECT_NAME}/error/motion_error.h
-    src/EtherCAT/EthercatMaster.cpp
-    src/EtherCAT/pdo_interface.cpp
-    src/EtherCAT/sdo_interface.cpp
+    include/${PROJECT_NAME}/ethercat/ethercat_master.h
+    include/${PROJECT_NAME}/ethercat/pdo_interface.h
+    include/${PROJECT_NAME}/ethercat/pdo_map.h
+    include/${PROJECT_NAME}/ethercat/pdo_types.h
+    include/${PROJECT_NAME}/ethercat/sdo_interface.h
+    include/${PROJECT_NAME}/ethercat/slave.h
     src/HighVoltage.cpp
     src/IMotionCube.cpp
     src/IMotionCubeTargetState.cpp
     src/Joint.cpp
     src/LowVoltage.cpp
     src/MarchRobot.cpp
-    src/PDOmap.cpp
     src/PowerDistributionBoard.cpp
     src/TemperatureGES.cpp
     src/encoder/AbsoluteEncoder.cpp
@@ -65,6 +63,10 @@ add_library(${PROJECT_NAME}
     src/encoder/IncrementalEncoder.cpp
     src/error/error_type.cpp
     src/error/motion_error.cpp
+    src/ethercat/ethercat_master.cpp
+    src/ethercat/pdo_interface.cpp
+    src/ethercat/pdo_map.cpp
+    src/ethercat/sdo_interface.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} pthread)

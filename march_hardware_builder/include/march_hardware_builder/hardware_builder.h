@@ -13,8 +13,8 @@
 #include <march_hardware/ActuationMode.h>
 #include <march_hardware/encoder/AbsoluteEncoder.h>
 #include <march_hardware/encoder/IncrementalEncoder.h>
-#include <march_hardware/EtherCAT/pdo_interface.h>
-#include <march_hardware/EtherCAT/sdo_interface.h>
+#include <march_hardware/ethercat/pdo_interface.h>
+#include <march_hardware/ethercat/sdo_interface.h>
 #include <march_hardware/IMotionCube.h>
 #include <march_hardware/Joint.h>
 #include <march_hardware/MarchRobot.h>
