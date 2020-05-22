@@ -6,7 +6,7 @@
 using march::error::ErrorType;
 using march::error::HardwareException;
 
-TEST(TestHardwareException, TestErrorType)
+TEST(HardwareExceptionTest, TestErrorType)
 {
   ErrorType expected = ErrorType::UNKNOWN;
   HardwareException exception(expected);
@@ -14,7 +14,7 @@ TEST(TestHardwareException, TestErrorType)
   ASSERT_EQ(exception.type(), expected);
 }
 
-TEST(TestHardwareException, TestNoMessage)
+TEST(HardwareExceptionTest, TestNoMessage)
 {
   ErrorType expected = ErrorType::UNKNOWN;
   HardwareException exception(expected);
@@ -28,7 +28,7 @@ TEST(TestHardwareException, TestNoMessage)
   ASSERT_EQ(ss.str(), expected_ss.str());
 }
 
-TEST(TestHardwareException, TestWhat)
+TEST(HardwareExceptionTest, TestWhat)
 {
   ErrorType expected = ErrorType::UNKNOWN;
   const std::string message = "test";
@@ -40,7 +40,7 @@ TEST(TestHardwareException, TestWhat)
   ASSERT_EQ(expected_ss.str(), std::string(exception.what()));
 }
 
-TEST(TestHardwareException, TestMessage)
+TEST(HardwareExceptionTest, TestMessage)
 {
   ErrorType expected = ErrorType::UNKNOWN;
   std::string message = "message";
@@ -55,7 +55,7 @@ TEST(TestHardwareException, TestMessage)
   ASSERT_EQ(ss.str(), expected_ss.str());
 }
 
-TEST(TestHardwareException, TestFormat)
+TEST(HardwareExceptionTest, TestFormat)
 {
   ErrorType expected = ErrorType::UNKNOWN;
   std::string string = "string";

@@ -1,15 +1,11 @@
 // Copyright 2018 Project March.
-
 #include "march_hardware/power/net_driver_offsets.h"
-#include "gtest/gtest.h"
-#include <gmock/gmock.h>
+
 #include <sstream>
 
-using ::testing::AtLeast;
-using ::testing::AtMost;
-using ::testing::Return;
+#include <gtest/gtest.h>
 
-class TestNetDriverOffsets : public ::testing::Test
+class NetDriverOffsetsTest : public ::testing::Test
 {
 protected:
   const int lowVoltageNetOnOff = 1;
@@ -17,7 +13,7 @@ protected:
   const int highVoltageNetEnableDisable = 1;
 };
 
-TEST_F(TestNetDriverOffsets, ValidValues)
+TEST_F(NetDriverOffsetsTest, ValidValues)
 {
   NetDriverOffsets netDriverOffsets(lowVoltageNetOnOff, highVoltageNetOnOff, highVoltageNetEnableDisable);
 
@@ -25,7 +21,7 @@ TEST_F(TestNetDriverOffsets, ValidValues)
   EXPECT_EQ(highVoltageNetOnOff, netDriverOffsets.getHighVoltageNetOnOff());
   EXPECT_EQ(highVoltageNetEnableDisable, netDriverOffsets.getHighVoltageEnableDisable());
 }
-TEST_F(TestNetDriverOffsets, EmptyConstructor)
+TEST_F(NetDriverOffsetsTest, EmptyConstructor)
 {
   NetDriverOffsets netDriverOffsets;
   EXPECT_THROW(netDriverOffsets.getLowVoltageNetOnOff(), std::runtime_error);
@@ -33,7 +29,7 @@ TEST_F(TestNetDriverOffsets, EmptyConstructor)
   EXPECT_THROW(netDriverOffsets.getHighVoltageEnableDisable(), std::runtime_error);
 }
 
-TEST_F(TestNetDriverOffsets, InValidValues)
+TEST_F(NetDriverOffsetsTest, InValidValues)
 {
   EXPECT_THROW(NetDriverOffsets netDriverOffsets(lowVoltageNetOnOff, -7, highVoltageNetEnableDisable),
                std::runtime_error);
@@ -42,14 +38,14 @@ TEST_F(TestNetDriverOffsets, InValidValues)
   EXPECT_THROW(NetDriverOffsets netDriverOffsets(lowVoltageNetOnOff, highVoltageNetOnOff, -12), std::runtime_error);
 }
 
-TEST_F(TestNetDriverOffsets, Equals)
+TEST_F(NetDriverOffsetsTest, Equals)
 {
   NetDriverOffsets netDriverOffsets1(lowVoltageNetOnOff, highVoltageNetOnOff, highVoltageNetEnableDisable);
   NetDriverOffsets netDriverOffsets2(lowVoltageNetOnOff, highVoltageNetOnOff, highVoltageNetEnableDisable);
 
   EXPECT_TRUE(netDriverOffsets1 == netDriverOffsets2);
 }
-TEST_F(TestNetDriverOffsets, NotEquals)
+TEST_F(NetDriverOffsetsTest, NotEquals)
 {
   NetDriverOffsets netDriverOffsets1(11, highVoltageNetOnOff, highVoltageNetEnableDisable);
   NetDriverOffsets netDriverOffsets2(lowVoltageNetOnOff, 22, highVoltageNetEnableDisable);
@@ -60,7 +56,7 @@ TEST_F(TestNetDriverOffsets, NotEquals)
   EXPECT_FALSE(netDriverOffsets2 == netDriverOffsets3);
 }
 
-TEST_F(TestNetDriverOffsets, TestStream)
+TEST_F(NetDriverOffsetsTest, TestStream)
 {
   NetDriverOffsets netDriverOffsets(lowVoltageNetOnOff, highVoltageNetOnOff, highVoltageNetEnableDisable);
   std::stringstream ss;

@@ -1,15 +1,11 @@
 // Copyright 2018 Project March.
-
 #include "march_hardware/power/net_monitor_offsets.h"
-#include "gtest/gtest.h"
-#include <gmock/gmock.h>
+
 #include <sstream>
 
-using ::testing::AtLeast;
-using ::testing::AtMost;
-using ::testing::Return;
+#include <gtest/gtest.h>
 
-class TestNetMonitorOffsets : public ::testing::Test
+class NetMonitorOffsetsTest : public ::testing::Test
 {
 protected:
   const int powerDistributionBoardCurrent = 1;
@@ -21,7 +17,7 @@ protected:
   const int highVoltageEnabled = 7;
   const int highVoltageState = 8;
 };
-TEST_F(TestNetMonitorOffsets, ValidValues)
+TEST_F(NetMonitorOffsetsTest, ValidValues)
 {
   NetMonitorOffsets netMonitorOffsets(powerDistributionBoardCurrent, lowVoltageNet1Current, lowVoltageNet2Current,
                                       highVoltageNetCurrent, lowVoltageState, highVoltageOvercurrentTrigger,
@@ -36,7 +32,7 @@ TEST_F(TestNetMonitorOffsets, ValidValues)
   EXPECT_EQ(highVoltageEnabled, netMonitorOffsets.getHighVoltageEnabled());
   EXPECT_EQ(highVoltageState, netMonitorOffsets.getHighVoltageState());
 }
-TEST_F(TestNetMonitorOffsets, EmptyConstructor)
+TEST_F(NetMonitorOffsetsTest, EmptyConstructor)
 {
   NetMonitorOffsets netMonitorOffsets;
 
@@ -50,7 +46,7 @@ TEST_F(TestNetMonitorOffsets, EmptyConstructor)
   EXPECT_THROW(netMonitorOffsets.getHighVoltageState(), std::runtime_error);
 }
 
-TEST_F(TestNetMonitorOffsets, GetNotExistingNet)
+TEST_F(NetMonitorOffsetsTest, GetNotExistingNet)
 {
   NetMonitorOffsets netMonitorOffsets(powerDistributionBoardCurrent, lowVoltageNet1Current, lowVoltageNet2Current,
                                       highVoltageNetCurrent, lowVoltageState, highVoltageOvercurrentTrigger,
@@ -58,7 +54,7 @@ TEST_F(TestNetMonitorOffsets, GetNotExistingNet)
   EXPECT_THROW(netMonitorOffsets.getLowVoltageNetCurrent(42), std::runtime_error);
 }
 
-TEST_F(TestNetMonitorOffsets, InValidValues)
+TEST_F(NetMonitorOffsetsTest, InValidValues)
 {
   EXPECT_THROW(NetMonitorOffsets netMonitorOffsets(powerDistributionBoardCurrent, lowVoltageNet1Current,
                                                    lowVoltageNet2Current, highVoltageNetCurrent, lowVoltageState,
@@ -66,7 +62,7 @@ TEST_F(TestNetMonitorOffsets, InValidValues)
                std::runtime_error);
 }
 
-TEST_F(TestNetMonitorOffsets, Equals)
+TEST_F(NetMonitorOffsetsTest, Equals)
 {
   NetMonitorOffsets netMonitorOffsets1(powerDistributionBoardCurrent, lowVoltageNet1Current, lowVoltageNet2Current,
                                        highVoltageNetCurrent, lowVoltageState, highVoltageOvercurrentTrigger,
@@ -76,7 +72,7 @@ TEST_F(TestNetMonitorOffsets, Equals)
                                        highVoltageEnabled, highVoltageState);
   EXPECT_TRUE(netMonitorOffsets1 == netMonitorOffsets2);
 }
-TEST_F(TestNetMonitorOffsets, NotEquals)
+TEST_F(NetMonitorOffsetsTest, NotEquals)
 {
   NetMonitorOffsets netMonitorOffsets1(24, lowVoltageNet1Current, lowVoltageNet2Current, highVoltageNetCurrent,
                                        lowVoltageState, highVoltageOvercurrentTrigger, highVoltageEnabled,
@@ -93,7 +89,7 @@ TEST_F(TestNetMonitorOffsets, NotEquals)
   EXPECT_FALSE(netMonitorOffsets2 == netMonitorOffsets3);
 }
 
-TEST_F(TestNetMonitorOffsets, TestStream)
+TEST_F(NetMonitorOffsetsTest, TestStream)
 {
   NetMonitorOffsets netMonitorOffsets(powerDistributionBoardCurrent, lowVoltageNet1Current, lowVoltageNet2Current,
                                       highVoltageNetCurrent, lowVoltageState, highVoltageOvercurrentTrigger,

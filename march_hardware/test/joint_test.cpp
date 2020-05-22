@@ -1,6 +1,6 @@
 // Copyright 2018 Project March.
-#include "mocks/MockTemperatureGES.h"
-#include "mocks/MockIMotionCube.h"
+#include "mocks/mock_temperature_ges.h"
+#include "mocks/mock_imotioncube.h"
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/joint.h"
 

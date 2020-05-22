@@ -1,18 +1,18 @@
 // Copyright 2018 Project March.
-#include "mocks/MockPdoInterface.h"
+#include "../mocks/mock_pdo_interface.h"
 #include "march_hardware/power/high_voltage.h"
 
 #include <gtest/gtest.h>
 #include <sstream>
 
-class TestHighVoltage : public ::testing::Test
+class HighVoltageTest : public ::testing::Test
 {
 protected:
   MockPdoInterfacePtr mock_pdo;
   march::PdoSlaveInterface pdo = march::PdoSlaveInterface(1, this->mock_pdo);
 };
 
-TEST_F(TestHighVoltage, Equals)
+TEST_F(HighVoltageTest, Equals)
 {
   NetMonitorOffsets netMonitoringOffsets;
   NetDriverOffsets netDriverOffsets;
@@ -21,7 +21,7 @@ TEST_F(TestHighVoltage, Equals)
   EXPECT_TRUE(highVoltage1 == highVoltage2);
 }
 
-TEST_F(TestHighVoltage, UnEqual)
+TEST_F(HighVoltageTest, UnEqual)
 {
   NetMonitorOffsets netMonitoringOffsets;
   NetDriverOffsets netDriverOffsets1;
@@ -31,7 +31,7 @@ TEST_F(TestHighVoltage, UnEqual)
   EXPECT_FALSE(highVoltage1 == highVoltage2);
 }
 
-TEST_F(TestHighVoltage, Stream)
+TEST_F(HighVoltageTest, Stream)
 {
   NetMonitorOffsets netMonitoringOffsets;
   NetDriverOffsets netDriverOffsets;

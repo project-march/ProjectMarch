@@ -113,32 +113,32 @@ install(DIRECTORY launch
 ## Add gtest based cpp test target and link libraries
 if(CATKIN_ENABLE_TESTING)
     catkin_add_gmock(${PROJECT_NAME}_test
-        test/TestBootShutdownOffsets.cpp
-        test/TestHighVoltage.cpp
-        test/TestIMotionCube.cpp
-        test/TestJoint.cpp
-        test/TestLowVoltage.cpp
-        test/TestNetDriverOffsets.cpp
-        test/TestNetMonitorOffsets.cpp
-        test/TestPDOmap.cpp
-        test/TestPowerDistributionBoard.cpp
-        test/TestRunner.cpp
-        test/TestSlave.cpp
-        test/TestTemperatureGES.cpp
-        test/encoder/TestAbsoluteEncoder.cpp
-        test/encoder/TestIncrementalEncoder.cpp
-        test/encoder/TestEncoder.cpp
-        test/error/test_hardware_exception.cpp
-        test/error/test_motion_error.cpp
-        test/mocks/MockAbsoluteEncoder.h
-        test/mocks/MockEncoder.h
-        test/mocks/MockIMotionCube.h
-        test/mocks/MockIncrementalEncoder.h
-        test/mocks/MockJoint.h
-        test/mocks/MockPdoInterface.h
-        test/mocks/MockSdoInterface.h
-        test/mocks/MockSlave.h
-        test/mocks/MockTemperatureGES.h
+        test/encoder/absolute_encoder_test.cpp
+        test/encoder/encoder_test.cpp
+        test/encoder/incremental_encoder_test.cpp
+        test/error/hardware_exception_test.cpp
+        test/error/motion_error_test.cpp
+        test/ethercat/pdo_map_test.cpp
+        test/ethercat/slave_test.cpp
+        test/imotioncube/imotioncube_test.cpp
+        test/joint_test.cpp
+        test/mocks/mock_absolute_encoder.h
+        test/mocks/mock_encoder.h
+        test/mocks/mock_imotioncube.h
+        test/mocks/mock_incremental_encoder.h
+        test/mocks/mock_joint.h
+        test/mocks/mock_pdo_interface.h
+        test/mocks/mock_sdo_interface.h
+        test/mocks/mock_slave.h
+        test/mocks/mock_temperature_ges.h
+        test/power/boot_shutdown_offsets_test.cpp
+        test/power/high_voltage_test.cpp
+        test/power/low_voltage_test.cpp
+        test/power/net_driver_offsets_test.cpp
+        test/power/net_monitor_offsets_test.cpp
+        test/power/power_distribution_board_test.cpp
+        test/temperature/temperature_ges_test.cpp
+        test/test_runner.cpp
     )
     target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME})
 

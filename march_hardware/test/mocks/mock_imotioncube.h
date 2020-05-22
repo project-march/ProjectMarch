@@ -1,7 +1,7 @@
 #pragma once
-#include "MockAbsoluteEncoder.h"
-#include "MockIncrementalEncoder.h"
-#include "MockSlave.h"
+#include "mock_absolute_encoder.h"
+#include "mock_incremental_encoder.h"
+#include "mock_slave.h"
 
 #include "march_hardware/imotioncube/imotioncube.h"
 #include "march_hardware/ethercat/sdo_interface.h"

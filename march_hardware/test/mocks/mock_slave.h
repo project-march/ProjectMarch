@@ -1,6 +1,6 @@
 #pragma once
-#include "MockPdoInterface.h"
-#include "MockSdoInterface.h"
+#include "mock_pdo_interface.h"
+#include "mock_sdo_interface.h"
 
 #include "march_hardware/ethercat/slave.h"
 

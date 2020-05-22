@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-class TestAbsoluteEncoder : public testing::Test
+class AbsoluteEncoderTest : public testing::Test
 {
 protected:
   const size_t resolution = 17;
@@ -27,80 +27,80 @@ protected:
                                                           upper_limit_rad, lower_soft_limit_rad, upper_soft_limit_rad);
 };
 
-class TestEncoderParameterizedLimits : public TestAbsoluteEncoder,
+class TestEncoderParameterizedLimits : public AbsoluteEncoderTest,
                                        public testing::WithParamInterface<std::tuple<int32_t, bool>>
 {
 };
 
-class TestEncoderParameterizedSoftLimits : public TestAbsoluteEncoder,
+class TestEncoderParameterizedSoftLimits : public AbsoluteEncoderTest,
                                            public testing::WithParamInterface<std::tuple<int32_t, bool>>
 {
 };
 
-class TestEncoderParameterizedValidTarget : public TestAbsoluteEncoder,
+class TestEncoderParameterizedValidTarget : public AbsoluteEncoderTest,
                                             public testing::WithParamInterface<std::tuple<int32_t, int32_t, bool>>
 {
 };
 
-TEST_F(TestAbsoluteEncoder, CorrectLowerHardLimits)
+TEST_F(AbsoluteEncoderTest, CorrectLowerHardLimits)
 {
   ASSERT_EQ(this->encoder.getLowerHardLimitIU(), this->lower_limit);
 }
 
-TEST_F(TestAbsoluteEncoder, CorrectUpperHardLimit)
+TEST_F(AbsoluteEncoderTest, CorrectUpperHardLimit)
 {
   ASSERT_EQ(this->encoder.getUpperHardLimitIU(), this->upper_limit);
 }
 
-TEST_F(TestAbsoluteEncoder, CorrectLowerSoftLimits)
+TEST_F(AbsoluteEncoderTest, CorrectLowerSoftLimits)
 {
   ASSERT_EQ(this->encoder.getLowerSoftLimitIU(), this->lower_soft_limit);
 }
 
-TEST_F(TestAbsoluteEncoder, CorrectUpperSoftLimits)
+TEST_F(AbsoluteEncoderTest, CorrectUpperSoftLimits)
 {
   ASSERT_EQ(this->encoder.getUpperSoftLimitIU(), this->upper_soft_limit);
 }
 
-TEST_F(TestAbsoluteEncoder, LowerSoftLimitAboveUpperSoftLimit)
+TEST_F(AbsoluteEncoderTest, LowerSoftLimitAboveUpperSoftLimit)
 {
   ASSERT_THROW(march::AbsoluteEncoder(this->resolution, this->lower_limit, this->upper_limit, this->lower_limit_rad,
                                       this->upper_limit_rad, this->upper_soft_limit_rad, this->lower_soft_limit_rad),
                march::error::HardwareException);
 }
 
-TEST_F(TestAbsoluteEncoder, LowerSoftLimitLowerThanLowerHardLimit)
+TEST_F(AbsoluteEncoderTest, LowerSoftLimitLowerThanLowerHardLimit)
 {
   ASSERT_THROW(march::AbsoluteEncoder(this->resolution, this->lower_limit, this->upper_limit, this->lower_limit_rad,
                                       this->upper_limit_rad, -0.4, this->upper_soft_limit_rad),
                march::error::HardwareException);
 }
 
-TEST_F(TestAbsoluteEncoder, UpperSoftLimitHigherThanUpperHardLimit)
+TEST_F(AbsoluteEncoderTest, UpperSoftLimitHigherThanUpperHardLimit)
 {
   ASSERT_THROW(march::AbsoluteEncoder(this->resolution, this->lower_limit, this->upper_limit, this->lower_limit_rad,
                                       this->upper_limit_rad, this->lower_soft_limit_rad, 2.0),
                march::error::HardwareException);
 }
 
-TEST_F(TestAbsoluteEncoder, ZeroPositionRadToZeroPosition)
+TEST_F(AbsoluteEncoderTest, ZeroPositionRadToZeroPosition)
 {
   ASSERT_EQ(this->encoder.fromRad(0.0), this->zero_position);
 }
 
-TEST_F(TestAbsoluteEncoder, CorrectFromRad)
+TEST_F(AbsoluteEncoderTest, CorrectFromRad)
 {
   const double radians = 1.0;
   const int32_t expected = (radians * this->total_positions / (2 * M_PI)) + this->zero_position;
   ASSERT_EQ(this->encoder.fromRad(radians), expected);
 }
 
-TEST_F(TestAbsoluteEncoder, ZeroPositionToZeroRadians)
+TEST_F(AbsoluteEncoderTest, ZeroPositionToZeroRadians)
 {
   ASSERT_DOUBLE_EQ(this->encoder.toRad(this->zero_position), 0.0);
 }
 
-TEST_F(TestAbsoluteEncoder, CorrectToRad)
+TEST_F(AbsoluteEncoderTest, CorrectToRad)
 {
   const int32_t iu = 1.0;
   const double expected = (iu - this->zero_position) * 2 * M_PI / this->total_positions;

@@ -1,12 +1,12 @@
 // Copyright 2018 Project March.
-#include "mocks/MockSlave.h"
+#include "../mocks/mock_slave.h"
 #include "march_hardware/power/power_distribution_board.h"
 
 #include <sstream>
 
 #include <gtest/gtest.h>
 
-class TestPowerDistributionBoard : public ::testing::Test
+class PowerDistributionBoardTest : public ::testing::Test
 {
 protected:
   MockPdoInterfacePtr mock_pdo = std::make_shared<MockPdoInterface>();
@@ -18,7 +18,7 @@ protected:
   int slaveIndex = 2;
 };
 
-TEST_F(TestPowerDistributionBoard, Unequals)
+TEST_F(PowerDistributionBoardTest, Unequals)
 {
   NetDriverOffsets netDriverOffsets2(1, 2, 3);
   NetMonitorOffsets netMonitorOffsets2(1, 1, 1, 1, 1, 1, 1, 1);
@@ -34,7 +34,7 @@ TEST_F(TestPowerDistributionBoard, Unequals)
   EXPECT_FALSE(powerDistributionBoard2 == powerDistributionBoard3);
 }
 
-TEST_F(TestPowerDistributionBoard, Equals)
+TEST_F(PowerDistributionBoardTest, Equals)
 {
   march::PowerDistributionBoard powerDistributionBoard1(this->mock_slave, netMonitoringOffsets, netDriverOffsets,
                                                         bootShutdownOffsets);

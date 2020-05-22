@@ -3,18 +3,18 @@
 
 #include <gtest/gtest.h>
 
-TEST(TestMotionError, ParseNoMotionError)
+TEST(MotionErrorTest, ParseNoMotionError)
 {
   ASSERT_EQ(march::error::parseMotionError(0), "");
 }
 
-TEST(TestMotionError, ParseCorrectMotionError)
+TEST(MotionErrorTest, ParseCorrectMotionError)
 {
   const uint16_t error = 1;
   ASSERT_EQ(march::error::parseMotionError(error), march::error::MOTION_ERRORS[0]);
 }
 
-TEST(TestMotionError, ParseMultipleErrors)
+TEST(MotionErrorTest, ParseMultipleErrors)
 {
   const uint16_t error = 0b1000000000001100;
   std::string expected;

@@ -1,19 +1,19 @@
 // Copyright 2018 Project March.
-#include "mocks/MockPdoInterface.h"
+#include "../mocks/mock_pdo_interface.h"
 #include "march_hardware/power/low_voltage.h"
 
 #include <sstream>
 
 #include <gtest/gtest.h>
 
-class TestLowVoltage : public ::testing::Test
+class LowVoltageTest : public ::testing::Test
 {
 protected:
   MockPdoInterfacePtr mock_pdo;
   march::PdoSlaveInterface pdo = march::PdoSlaveInterface(1, this->mock_pdo);
 };
 
-TEST_F(TestLowVoltage, Equals)
+TEST_F(LowVoltageTest, Equals)
 {
   NetMonitorOffsets netMonitoringOffsets;
   NetDriverOffsets netDriverOffsets;
@@ -22,7 +22,7 @@ TEST_F(TestLowVoltage, Equals)
   EXPECT_TRUE(lowVoltage1 == lowVoltage2);
 }
 
-TEST_F(TestLowVoltage, NotEquals)
+TEST_F(LowVoltageTest, NotEquals)
 {
   NetMonitorOffsets netMonitoringOffsets;
   NetDriverOffsets netDriverOffsets;
@@ -33,7 +33,7 @@ TEST_F(TestLowVoltage, NotEquals)
   EXPECT_FALSE(lowVoltage1 == lowVoltage2);
 }
 
-TEST_F(TestLowVoltage, Stream)
+TEST_F(LowVoltageTest, Stream)
 {
   NetMonitorOffsets netMonitoringOffsets;
   NetDriverOffsets netDriverOffsets;

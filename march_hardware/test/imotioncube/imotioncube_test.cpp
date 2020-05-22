@@ -1,7 +1,7 @@
 // Copyright 2018 Project March.
-#include "mocks/MockAbsoluteEncoder.h"
-#include "mocks/MockIncrementalEncoder.h"
-#include "mocks/MockSlave.h"
+#include "../mocks/mock_absolute_encoder.h"
+#include "../mocks/mock_incremental_encoder.h"
+#include "../mocks/mock_slave.h"
 
 #include <march_hardware/imotioncube/imotioncube.h>
 #include <march_hardware/error/hardware_exception.h>

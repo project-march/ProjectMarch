@@ -1,6 +1,6 @@
 // Copyright 2020 Project March.
-#include "../mocks/MockEncoder.h"
-#include "../mocks/MockPdoInterface.h"
+#include "../mocks/mock_encoder.h"
+#include "../mocks/mock_pdo_interface.h"
 #include "march_hardware/error/hardware_exception.h"
 
 #include <cmath>
@@ -17,24 +17,24 @@ using testing::Return;
  * instantiate a pure abstract class. So as long as the non virtual
  * methods are tested all is ok.
  */
-class TestEncoder : public testing::Test
+class EncoderTest : public testing::Test
 {
 protected:
   const uint16_t slave_index = 1;
   const size_t resolution = 12;
 };
 
-TEST_F(TestEncoder, ResolutionBelowRange)
+TEST_F(EncoderTest, ResolutionBelowRange)
 {
   ASSERT_THROW(MockEncoder(0), march::error::HardwareException);
 }
 
-TEST_F(TestEncoder, ResolutionAboveRange)
+TEST_F(EncoderTest, ResolutionAboveRange)
 {
   ASSERT_THROW(MockEncoder(50), march::error::HardwareException);
 }
 
-TEST_F(TestEncoder, GetAngleIU)
+TEST_F(EncoderTest, GetAngleIU)
 {
   MockEncoder encoder(this->resolution);
   const int32_t expected = 101;
@@ -49,7 +49,7 @@ TEST_F(TestEncoder, GetAngleIU)
   ASSERT_EQ(expected, encoder.getAngleIU(pdo, expected_offset));
 }
 
-TEST_F(TestEncoder, CorrectTotalPositions)
+TEST_F(EncoderTest, CorrectTotalPositions)
 {
   MockEncoder encoder(this->resolution);
   ASSERT_EQ(std::pow(2, this->resolution), encoder.getTotalPositions());

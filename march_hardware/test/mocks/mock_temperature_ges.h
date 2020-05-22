@@ -1,5 +1,5 @@
 #pragma once
-#include "MockSlave.h"
+#include "mock_slave.h"
 
 #include "march_hardware/temperature/temperature_ges.h"
 

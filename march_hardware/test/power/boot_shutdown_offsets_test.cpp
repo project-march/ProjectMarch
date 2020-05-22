@@ -1,15 +1,9 @@
 // Copyright 2018 Project March.
-
 #include "march_hardware/power/boot_shutdown_offsets.h"
 #include "gtest/gtest.h"
-#include <gmock/gmock.h>
 #include <sstream>
 
-using ::testing::AtLeast;
-using ::testing::AtMost;
-using ::testing::Return;
-
-class TestBootShutdownOffsets : public ::testing::Test
+class BootShutdownOffsetsTest : public ::testing::Test
 {
 protected:
   const int masterOkByteOffset = 4;
@@ -17,7 +11,7 @@ protected:
   const int shutdownAllowedByteOffset = 2;
 };
 
-TEST_F(TestBootShutdownOffsets, ValidValues)
+TEST_F(BootShutdownOffsetsTest, ValidValues)
 {
   BootShutdownOffsets bootShutdownOffsets(masterOkByteOffset, shutdownByteOffset, shutdownAllowedByteOffset);
 
@@ -25,7 +19,7 @@ TEST_F(TestBootShutdownOffsets, ValidValues)
   EXPECT_EQ(shutdownByteOffset, bootShutdownOffsets.getShutdownByteOffset());
   EXPECT_EQ(shutdownAllowedByteOffset, bootShutdownOffsets.getShutdownAllowedByteOffset());
 }
-TEST_F(TestBootShutdownOffsets, EmptyConstructor)
+TEST_F(BootShutdownOffsetsTest, EmptyConstructor)
 {
   BootShutdownOffsets bootShutdownOffsets;
 
@@ -34,7 +28,7 @@ TEST_F(TestBootShutdownOffsets, EmptyConstructor)
   EXPECT_THROW(bootShutdownOffsets.getShutdownAllowedByteOffset(), std::runtime_error);
 }
 
-TEST_F(TestBootShutdownOffsets, InValidValues)
+TEST_F(BootShutdownOffsetsTest, InValidValues)
 {
   EXPECT_THROW(BootShutdownOffsets bootShutdownOffsets(masterOkByteOffset, -7, shutdownAllowedByteOffset),
                std::runtime_error);
@@ -44,14 +38,14 @@ TEST_F(TestBootShutdownOffsets, InValidValues)
                std::runtime_error);
 }
 
-TEST_F(TestBootShutdownOffsets, Equals)
+TEST_F(BootShutdownOffsetsTest, Equals)
 {
   BootShutdownOffsets bootShutdownOffsets1(masterOkByteOffset, shutdownByteOffset, shutdownAllowedByteOffset);
   BootShutdownOffsets bootShutdownOffsets2(masterOkByteOffset, shutdownByteOffset, shutdownAllowedByteOffset);
 
   EXPECT_TRUE(bootShutdownOffsets1 == bootShutdownOffsets2);
 }
-TEST_F(TestBootShutdownOffsets, NotEquals)
+TEST_F(BootShutdownOffsetsTest, NotEquals)
 {
   BootShutdownOffsets bootShutdownOffsets1(masterOkByteOffset, shutdownByteOffset, shutdownAllowedByteOffset);
   BootShutdownOffsets bootShutdownOffsets2(masterOkByteOffset, 17, shutdownAllowedByteOffset);
@@ -62,7 +56,7 @@ TEST_F(TestBootShutdownOffsets, NotEquals)
   EXPECT_FALSE(bootShutdownOffsets2 == bootShutdownOffsets3);
 }
 
-TEST_F(TestBootShutdownOffsets, TestStream)
+TEST_F(BootShutdownOffsetsTest, TestStream)
 {
   BootShutdownOffsets bootShutdownOffsets(masterOkByteOffset, shutdownByteOffset, shutdownAllowedByteOffset);
   std::stringstream ss;
