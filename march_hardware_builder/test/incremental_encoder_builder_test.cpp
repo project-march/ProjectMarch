@@ -9,7 +9,7 @@
 
 #include <march_hardware/encoder/incremental_encoder.h>
 
-class TestIncrementalEncoderBuilder : public ::testing::Test
+class IncrementalEncoderBuilderTest : public ::testing::Test
 {
 protected:
   std::string base_path;
@@ -25,7 +25,7 @@ protected:
   }
 };
 
-TEST_F(TestIncrementalEncoderBuilder, ValidIncrementalEncoder)
+TEST_F(IncrementalEncoderBuilderTest, ValidIncrementalEncoder)
 {
   YAML::Node config = this->loadTestYaml("/incremental_encoder_correct.yaml");
 
@@ -34,20 +34,20 @@ TEST_F(TestIncrementalEncoderBuilder, ValidIncrementalEncoder)
   ASSERT_EQ(expected, *created);
 }
 
-TEST_F(TestIncrementalEncoderBuilder, NoConfig)
+TEST_F(IncrementalEncoderBuilderTest, NoConfig)
 {
   YAML::Node config;
   ASSERT_EQ(nullptr, HardwareBuilder::createIncrementalEncoder(config[""]));
 }
 
-TEST_F(TestIncrementalEncoderBuilder, NoResolution)
+TEST_F(IncrementalEncoderBuilderTest, NoResolution)
 {
   YAML::Node config = this->loadTestYaml("/incremental_encoder_no_resolution.yaml");
 
   ASSERT_THROW(HardwareBuilder::createIncrementalEncoder(config), MissingKeyException);
 }
 
-TEST_F(TestIncrementalEncoderBuilder, NoTransmission)
+TEST_F(IncrementalEncoderBuilderTest, NoTransmission)
 {
   YAML::Node config = this->loadTestYaml("/incremental_encoder_no_transmission.yaml");
 
