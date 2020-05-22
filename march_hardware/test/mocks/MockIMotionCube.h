@@ -3,7 +3,7 @@
 #include "MockIncrementalEncoder.h"
 #include "MockSlave.h"
 
-#include "march_hardware/IMotionCube.h"
+#include "march_hardware/imotioncube/imotioncube.h"
 #include "march_hardware/ethercat/sdo_interface.h"
 
 #include <memory>

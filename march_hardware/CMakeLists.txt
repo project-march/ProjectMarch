@@ -50,6 +50,10 @@ add_library(${PROJECT_NAME}
     include/${PROJECT_NAME}/ethercat/pdo_types.h
     include/${PROJECT_NAME}/ethercat/sdo_interface.h
     include/${PROJECT_NAME}/ethercat/slave.h
+    include/${PROJECT_NAME}/imotioncube/actuation_mode.h
+    include/${PROJECT_NAME}/imotioncube/imotioncube.h
+    include/${PROJECT_NAME}/imotioncube/imotioncube_state.h
+    include/${PROJECT_NAME}/imotioncube/imotioncube_target_state.h
     include/${PROJECT_NAME}/power/boot_shutdown_offsets.h
     include/${PROJECT_NAME}/power/high_voltage.h
     include/${PROJECT_NAME}/power/low_voltage.h
@@ -58,8 +62,6 @@ add_library(${PROJECT_NAME}
     include/${PROJECT_NAME}/power/power_distribution_board.h
     include/${PROJECT_NAME}/temperature/temperature_ges.h
     include/${PROJECT_NAME}/temperature/temperature_sensor.h
-    src/IMotionCube.cpp
-    src/IMotionCubeTargetState.cpp
     src/Joint.cpp
     src/MarchRobot.cpp
     src/encoder/absolute_encoder.cpp
@@ -71,6 +73,8 @@ add_library(${PROJECT_NAME}
     src/ethercat/pdo_interface.cpp
     src/ethercat/pdo_map.cpp
     src/ethercat/sdo_interface.cpp
+    src/imotioncube/imotioncube.cpp
+    src/imotioncube/imotioncube_target_state.cpp
     src/power/high_voltage.cpp
     src/power/low_voltage.cpp
     src/power/power_distribution_board.cpp

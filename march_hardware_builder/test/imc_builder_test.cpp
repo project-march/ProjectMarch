@@ -10,7 +10,7 @@
 
 #include <march_hardware/encoder/absolute_encoder.h>
 #include <march_hardware/encoder/incremental_encoder.h>
-#include <march_hardware/IMotionCube.h>
+#include <march_hardware/imotioncube/imotioncube.h>
 
 class IMotionCubeTest : public ::testing::Test
 {

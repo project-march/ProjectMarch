@@ -1,7 +1,7 @@
 // Copyright 2019 Project March.
 
-#ifndef MARCH_HARDWARE_ACTUATIONMODE_H
-#define MARCH_HARDWARE_ACTUATIONMODE_H
+#ifndef MARCH_HARDWARE_ACTUATION_MODE_H
+#define MARCH_HARDWARE_ACTUATION_MODE_H
 #include <string>
 #include <ros/console.h>
 
@@ -93,4 +93,4 @@ private:
 };
 }  // namespace march
 
-#endif  // MARCH_HARDWARE_ACTUATIONMODE_H
+#endif  // MARCH_HARDWARE_ACTUATION_MODE_H

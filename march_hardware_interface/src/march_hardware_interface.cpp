@@ -13,7 +13,7 @@
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <urdf/model.h>
 
-#include <march_hardware/ActuationMode.h>
+#include <march_hardware/imotioncube/actuation_mode.h>
 #include <march_hardware/Joint.h>
 
 using hardware_interface::JointHandle;

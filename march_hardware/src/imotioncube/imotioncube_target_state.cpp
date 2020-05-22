@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
 
-#include <march_hardware/IMotionCubeTargetState.h>
+#include <march_hardware/imotioncube/imotioncube_target_state.h>
 
 namespace march
 {
