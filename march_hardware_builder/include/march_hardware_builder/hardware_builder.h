@@ -11,8 +11,8 @@
 #include <yaml-cpp/yaml.h>
 
 #include <march_hardware/ActuationMode.h>
-#include <march_hardware/encoder/AbsoluteEncoder.h>
-#include <march_hardware/encoder/IncrementalEncoder.h>
+#include <march_hardware/encoder/absolute_encoder.h>
+#include <march_hardware/encoder/incremental_encoder.h>
 #include <march_hardware/ethercat/pdo_interface.h>
 #include <march_hardware/ethercat/sdo_interface.h>
 #include <march_hardware/IMotionCube.h>

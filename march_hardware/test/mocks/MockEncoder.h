@@ -1,5 +1,5 @@
 #pragma once
-#include "march_hardware/encoder/Encoder.h"
+#include "march_hardware/encoder/encoder.h"
 
 #include <gmock/gmock.h>
 

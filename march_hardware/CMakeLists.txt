@@ -38,9 +38,9 @@ if(CATKIN_ENABLE_TESTING AND ENABLE_COVERAGE_TESTING)
 endif()
 
 add_library(${PROJECT_NAME}
-    include/${PROJECT_NAME}/encoder/AbsoluteEncoder.h
-    include/${PROJECT_NAME}/encoder/Encoder.h
-    include/${PROJECT_NAME}/encoder/IncrementalEncoder.h
+    include/${PROJECT_NAME}/encoder/absolute_encoder.h
+    include/${PROJECT_NAME}/encoder/encoder.h
+    include/${PROJECT_NAME}/encoder/incremental_encoder.h
     include/${PROJECT_NAME}/error/error_type.h
     include/${PROJECT_NAME}/error/hardware_exception.h
     include/${PROJECT_NAME}/error/motion_error.h
@@ -58,9 +58,9 @@ add_library(${PROJECT_NAME}
     src/MarchRobot.cpp
     src/PowerDistributionBoard.cpp
     src/TemperatureGES.cpp
-    src/encoder/AbsoluteEncoder.cpp
-    src/encoder/Encoder.cpp
-    src/encoder/IncrementalEncoder.cpp
+    src/encoder/absolute_encoder.cpp
+    src/encoder/encoder.cpp
+    src/encoder/incremental_encoder.cpp
     src/error/error_type.cpp
     src/error/motion_error.cpp
     src/ethercat/ethercat_master.cpp

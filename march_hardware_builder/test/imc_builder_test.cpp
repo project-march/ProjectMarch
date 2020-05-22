@@ -8,8 +8,8 @@
 #include <ros/package.h>
 #include <urdf/model.h>
 
-#include <march_hardware/encoder/AbsoluteEncoder.h>
-#include <march_hardware/encoder/IncrementalEncoder.h>
+#include <march_hardware/encoder/absolute_encoder.h>
+#include <march_hardware/encoder/incremental_encoder.h>
 #include <march_hardware/IMotionCube.h>
 
 class IMotionCubeTest : public ::testing::Test

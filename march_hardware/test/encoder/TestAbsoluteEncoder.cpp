@@ -1,5 +1,5 @@
 // Copyright 2020 Project March.
-#include "march_hardware/encoder/AbsoluteEncoder.h"
+#include "march_hardware/encoder/absolute_encoder.h"
 #include "march_hardware/error/hardware_exception.h"
 
 #include <cmath>
