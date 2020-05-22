@@ -12,5 +12,4 @@
   <depend>roscpp</depend>
   <depend>rospy</depend>
   <depend>std_msgs</depend>
-  <depend>ODrive</depend>
 </package>

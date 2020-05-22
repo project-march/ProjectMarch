@@ -33,6 +33,7 @@ env:
     # DEBIAN_FRONTEND disables interactive frontends when installing packages. This is necessary for tzdata.
     - DOCKER_RUN_OPTS='-e DEBIAN_FRONTEND=noninteractive'
     - DOWNSTREAM_WORKSPACE=.rosinstall
+    - AFTER_INSTALL_TARGET_DEPENDENCIES='pip3 install odrive'
 
 jobs:
   include:
@@ -42,7 +43,7 @@ jobs:
       env: ROS_DISTRO=melodic CLANG_FORMAT_CHECK=file
     - name: "flake8"
       language: python
-      python: 2.7
+      python: 3.0
       install:
         - pip install flake8 pep8-naming flake8-blind-except flake8-string-format flake8-builtins flake8-commas flake8-quotes flake8-print flake8-docstrings flake8-import-order flake8-colors
       script: flake8
