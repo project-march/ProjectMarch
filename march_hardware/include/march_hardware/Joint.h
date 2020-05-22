@@ -8,7 +8,7 @@
 #include <vector>
 
 #include <march_hardware/IMotionCube.h>
-#include <march_hardware/PowerDistributionBoard.h>
+#include <march_hardware/power/power_distribution_board.h>
 #include <march_hardware/TemperatureGES.h>
 #include <march_hardware/IMotionCubeState.h>
 

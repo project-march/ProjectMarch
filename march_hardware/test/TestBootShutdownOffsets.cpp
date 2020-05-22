@@ -1,6 +1,6 @@
 // Copyright 2018 Project March.
 
-#include "march_hardware/BootShutdownOffsets.h"
+#include "march_hardware/power/boot_shutdown_offsets.h"
 #include "gtest/gtest.h"
 #include <gmock/gmock.h>
 #include <sstream>

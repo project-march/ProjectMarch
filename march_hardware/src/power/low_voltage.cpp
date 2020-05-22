@@ -1,5 +1,5 @@
 // Copyright 2019 Project March.
-#include "march_hardware/LowVoltage.h"
+#include "march_hardware/power/low_voltage.h"
 #include "march_hardware/ethercat/pdo_interface.h"
 #include "march_hardware/ethercat/pdo_types.h"
 

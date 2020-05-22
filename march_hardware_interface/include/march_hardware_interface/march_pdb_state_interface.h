@@ -5,7 +5,7 @@
 #include <string>
 
 #include <hardware_interface/internal/hardware_resource_manager.h>
-#include <march_hardware/PowerDistributionBoard.h>
+#include <march_hardware/power/power_distribution_board.h>
 #include <march_hardware_interface/power_net_on_off_command.h>
 
 class MarchPdbStateHandle

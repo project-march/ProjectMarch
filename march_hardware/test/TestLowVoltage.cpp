@@ -1,6 +1,6 @@
 // Copyright 2018 Project March.
 #include "mocks/MockPdoInterface.h"
-#include "march_hardware/LowVoltage.h"
+#include "march_hardware/power/low_voltage.h"
 
 #include <sstream>
 

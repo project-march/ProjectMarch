@@ -1,6 +1,6 @@
 // Copyright 2018 Project March.
 #include "mocks/MockSlave.h"
-#include "march_hardware/PowerDistributionBoard.h"
+#include "march_hardware/power/power_distribution_board.h"
 
 #include <sstream>
 

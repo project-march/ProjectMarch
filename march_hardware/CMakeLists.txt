@@ -50,13 +50,16 @@ add_library(${PROJECT_NAME}
     include/${PROJECT_NAME}/ethercat/pdo_types.h
     include/${PROJECT_NAME}/ethercat/sdo_interface.h
     include/${PROJECT_NAME}/ethercat/slave.h
-    src/HighVoltage.cpp
+    include/${PROJECT_NAME}/power/boot_shutdown_offsets.h
+    include/${PROJECT_NAME}/power/high_voltage.h
+    include/${PROJECT_NAME}/power/low_voltage.h
+    include/${PROJECT_NAME}/power/net_driver_offsets.h
+    include/${PROJECT_NAME}/power/net_monitor_offsets.h
+    include/${PROJECT_NAME}/power/power_distribution_board.h
     src/IMotionCube.cpp
     src/IMotionCubeTargetState.cpp
     src/Joint.cpp
-    src/LowVoltage.cpp
     src/MarchRobot.cpp
-    src/PowerDistributionBoard.cpp
     src/TemperatureGES.cpp
     src/encoder/absolute_encoder.cpp
     src/encoder/encoder.cpp
@@ -67,6 +70,9 @@ add_library(${PROJECT_NAME}
     src/ethercat/pdo_interface.cpp
     src/ethercat/pdo_map.cpp
     src/ethercat/sdo_interface.cpp
+    src/power/high_voltage.cpp
+    src/power/low_voltage.cpp
+    src/power/power_distribution_board.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} pthread)

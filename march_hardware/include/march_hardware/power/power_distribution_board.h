@@ -1,12 +1,12 @@
 // Copyright 2019 Project March.
-#ifndef MARCH_HARDWARE_POWERDISTRIBUTIONBOARD_H
-#define MARCH_HARDWARE_POWERDISTRIBUTIONBOARD_H
-#include "march_hardware/BootShutdownOffsets.h"
+#ifndef MARCH_HARDWARE_POWER_DISTRIBUTION_BOARD_H
+#define MARCH_HARDWARE_POWER_DISTRIBUTION_BOARD_H
+#include "boot_shutdown_offsets.h"
 #include "march_hardware/ethercat/slave.h"
-#include "march_hardware/HighVoltage.h"
-#include "march_hardware/LowVoltage.h"
-#include "march_hardware/NetDriverOffsets.h"
-#include "march_hardware/NetMonitorOffsets.h"
+#include "high_voltage.h"
+#include "low_voltage.h"
+#include "net_driver_offsets.h"
+#include "net_monitor_offsets.h"
 
 namespace march
 {
@@ -48,4 +48,4 @@ public:
   }
 };
 }  // namespace march
-#endif  // MARCH_HARDWARE_POWERDISTRIBUTIONBOARD_H
+#endif  // MARCH_HARDWARE_POWER_DISTRIBUTION_BOARD_H

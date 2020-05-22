@@ -4,7 +4,7 @@
 #define MARCH_HARDWARE_MARCHROBOT_H
 #include "march_hardware/ethercat/ethercat_master.h"
 #include "march_hardware/Joint.h"
-#include "march_hardware/PowerDistributionBoard.h"
+#include "march_hardware/power/power_distribution_board.h"
 
 #include <cstdint>
 #include <memory>

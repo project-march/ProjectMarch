@@ -1,6 +1,6 @@
 // Copyright 2018 Project March.
 #include "mocks/MockPdoInterface.h"
-#include "march_hardware/HighVoltage.h"
+#include "march_hardware/power/high_voltage.h"
 
 #include <gtest/gtest.h>
 #include <sstream>

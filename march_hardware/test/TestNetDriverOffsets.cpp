@@ -1,6 +1,6 @@
 // Copyright 2018 Project March.
 
-#include "march_hardware/NetDriverOffsets.h"
+#include "march_hardware/power/net_driver_offsets.h"
 #include "gtest/gtest.h"
 #include <gmock/gmock.h>
 #include <sstream>

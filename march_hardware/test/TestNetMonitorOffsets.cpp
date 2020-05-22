@@ -1,6 +1,6 @@
 // Copyright 2018 Project March.
 
-#include "march_hardware/NetMonitorOffsets.h"
+#include "march_hardware/power/net_monitor_offsets.h"
 #include "gtest/gtest.h"
 #include <gmock/gmock.h>
 #include <sstream>

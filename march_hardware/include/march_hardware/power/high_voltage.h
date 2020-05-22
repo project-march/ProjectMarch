@@ -1,9 +1,9 @@
 // Copyright 2019 Project March.
-#ifndef MARCH_HARDWARE_HIGHVOLTAGE_H
-#define MARCH_HARDWARE_HIGHVOLTAGE_H
+#ifndef MARCH_HARDWARE_HIGH_VOLTAGE_H
+#define MARCH_HARDWARE_HIGH_VOLTAGE_H
 #include "march_hardware/ethercat/pdo_interface.h"
-#include "march_hardware/NetDriverOffsets.h"
-#include "march_hardware/NetMonitorOffsets.h"
+#include "net_driver_offsets.h"
+#include "net_monitor_offsets.h"
 
 #include <cstdint>
 #include <iostream>
@@ -44,4 +44,4 @@ public:
 };
 
 }  // namespace march
-#endif  // MARCH_HARDWARE_HIGHVOLTAGE_H
+#endif  // MARCH_HARDWARE_HIGH_VOLTAGE_H

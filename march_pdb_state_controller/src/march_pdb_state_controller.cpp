@@ -9,8 +9,8 @@
 #include <realtime_tools/realtime_publisher.h>
 #include <ros/ros.h>
 
-#include <march_hardware/HighVoltage.h>
-#include <march_hardware/LowVoltage.h>
+#include <march_hardware/power/high_voltage.h>
+#include <march_hardware/power/low_voltage.h>
 #include <march_hardware_interface/march_pdb_state_interface.h>
 #include <march_shared_resources/HighVoltageNet.h>
 #include <march_shared_resources/LowVoltageNet.h>
