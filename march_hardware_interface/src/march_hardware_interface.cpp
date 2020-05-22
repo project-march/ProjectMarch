@@ -14,7 +14,7 @@
 #include <urdf/model.h>
 
 #include <march_hardware/imotioncube/actuation_mode.h>
-#include <march_hardware/Joint.h>
+#include <march_hardware/joint.h>
 
 using hardware_interface::JointHandle;
 using hardware_interface::JointStateHandle;

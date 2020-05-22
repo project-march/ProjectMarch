@@ -1,6 +1,6 @@
 // Copyright 2018 Project March.
-#include "march_hardware/Joint.h"
-#include "march_hardware/MarchRobot.h"
+#include "march_hardware/joint.h"
+#include "march_hardware/march_robot.h"
 #include "march_hardware/temperature/temperature_sensor.h"
 #include "march_hardware/error/hardware_exception.h"
 

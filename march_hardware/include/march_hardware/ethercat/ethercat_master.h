@@ -8,7 +8,7 @@
 #include <mutex>
 #include <condition_variable>
 
-#include <march_hardware/Joint.h>
+#include <march_hardware/joint.h>
 
 namespace march
 {

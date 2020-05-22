@@ -1,6 +1,6 @@
 #pragma once
 #include "gmock/gmock.h"  // Brings in Google Mock.
-#include "march_hardware/Joint.h"
+#include "march_hardware/joint.h"
 
 class MockJoint : public march::Joint
 {

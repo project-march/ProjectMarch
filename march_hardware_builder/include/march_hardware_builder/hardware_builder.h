@@ -16,8 +16,8 @@
 #include <march_hardware/ethercat/pdo_interface.h>
 #include <march_hardware/ethercat/sdo_interface.h>
 #include <march_hardware/imotioncube/imotioncube.h>
-#include <march_hardware/Joint.h>
-#include <march_hardware/MarchRobot.h>
+#include <march_hardware/joint.h>
+#include <march_hardware/march_robot.h>
 #include <march_hardware/power/power_distribution_board.h>
 #include <march_hardware/temperature/temperature_ges.h>
 

@@ -1,9 +1,9 @@
 // Copyright 2019 Project March.
 
-#ifndef MARCH_HARDWARE_MARCHROBOT_H
-#define MARCH_HARDWARE_MARCHROBOT_H
+#ifndef MARCH_HARDWARE_MARCH_ROBOT_H
+#define MARCH_HARDWARE_MARCH_ROBOT_H
 #include "march_hardware/ethercat/ethercat_master.h"
-#include "march_hardware/Joint.h"
+#include "march_hardware/joint.h"
 #include "march_hardware/power/power_distribution_board.h"
 
 #include <cstdint>
@@ -101,4 +101,4 @@ public:
   }
 };
 }  // namespace march
-#endif  // MARCH_HARDWARE_MARCHROBOT_H
+#endif  // MARCH_HARDWARE_MARCH_ROBOT_H

@@ -6,7 +6,7 @@
 #include <controller_manager/controller_manager.h>
 #include <ros/ros.h>
 
-#include <march_hardware/MarchRobot.h>
+#include <march_hardware/march_robot.h>
 #include <march_hardware/error/hardware_exception.h>
 #include <march_hardware_builder/hardware_builder.h>
 

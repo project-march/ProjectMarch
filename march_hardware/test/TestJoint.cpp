@@ -2,7 +2,7 @@
 #include "mocks/MockTemperatureGES.h"
 #include "mocks/MockIMotionCube.h"
 #include "march_hardware/error/hardware_exception.h"
-#include "march_hardware/Joint.h"
+#include "march_hardware/joint.h"
 
 #include <memory>
 #include <utility>
