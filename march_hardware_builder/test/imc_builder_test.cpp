@@ -8,11 +8,11 @@
 #include <ros/package.h>
 #include <urdf/model.h>
 
-#include <march_hardware/encoder/AbsoluteEncoder.h>
-#include <march_hardware/encoder/IncrementalEncoder.h>
-#include <march_hardware/IMotionCube.h>
+#include <march_hardware/encoder/absolute_encoder.h>
+#include <march_hardware/encoder/incremental_encoder.h>
+#include <march_hardware/imotioncube/imotioncube.h>
 
-class IMotionCubeTest : public ::testing::Test
+class IMotionCubeBuilderTest : public ::testing::Test
 {
 protected:
   std::string base_path;
@@ -36,7 +36,7 @@ protected:
   }
 };
 
-TEST_F(IMotionCubeTest, ValidIMotionCubeHip)
+TEST_F(IMotionCubeBuilderTest, ValidIMotionCubeHip)
 {
   YAML::Node config = this->loadTestYaml("/imotioncube_correct.yaml");
   this->joint->limits->lower = 0.0;
@@ -57,21 +57,21 @@ TEST_F(IMotionCubeTest, ValidIMotionCubeHip)
   ASSERT_EQ(expected, *created);
 }
 
-TEST_F(IMotionCubeTest, NoConfig)
+TEST_F(IMotionCubeBuilderTest, NoConfig)
 {
   YAML::Node config;
   ASSERT_EQ(nullptr, HardwareBuilder::createIMotionCube(config["imotioncube"], march::ActuationMode::unknown,
                                                         this->joint, this->pdo_interface, this->sdo_interface));
 }
 
-TEST_F(IMotionCubeTest, NoUrdfJoint)
+TEST_F(IMotionCubeBuilderTest, NoUrdfJoint)
 {
   YAML::Node config = this->loadTestYaml("/imotioncube_correct.yaml");
   ASSERT_EQ(nullptr, HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, nullptr,
                                                         this->pdo_interface, this->sdo_interface));
 }
 
-TEST_F(IMotionCubeTest, NoAbsoluteEncoder)
+TEST_F(IMotionCubeBuilderTest, NoAbsoluteEncoder)
 {
   YAML::Node config = this->loadTestYaml("/imotioncube_no_absolute_encoder.yaml");
 
@@ -80,7 +80,7 @@ TEST_F(IMotionCubeTest, NoAbsoluteEncoder)
                MissingKeyException);
 }
 
-TEST_F(IMotionCubeTest, NoIncrementalEncoder)
+TEST_F(IMotionCubeBuilderTest, NoIncrementalEncoder)
 {
   YAML::Node config = this->loadTestYaml("/imotioncube_no_incremental_encoder.yaml");
 
@@ -89,7 +89,7 @@ TEST_F(IMotionCubeTest, NoIncrementalEncoder)
                MissingKeyException);
 }
 
-TEST_F(IMotionCubeTest, NoSlaveIndex)
+TEST_F(IMotionCubeBuilderTest, NoSlaveIndex)
 {
   YAML::Node config = this->loadTestYaml("/imotioncube_no_slave_index.yaml");
 

@@ -18,7 +18,7 @@
 #include <realtime_tools/realtime_publisher.h>
 #include <ros/ros.h>
 
-#include <march_hardware/MarchRobot.h>
+#include <march_hardware/march_robot.h>
 #include <march_hardware_builder/hardware_builder.h>
 #include <march_shared_resources/AfterLimitJointCommand.h>
 #include <march_shared_resources/ImcState.h>

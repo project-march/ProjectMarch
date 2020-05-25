@@ -72,8 +72,8 @@ install(DIRECTORY config launch
 ## Add gtest based cpp test target and link libraries
 if(CATKIN_ENABLE_TESTING)
     catkin_add_gtest(${PROJECT_NAME}_test
-        test/TestRunner.cpp
-        test/TestPdbStateInterface.cpp
+        test/pdb_state_interface_test.cpp
+        test/test_runner.cpp
     )
     target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES})
 

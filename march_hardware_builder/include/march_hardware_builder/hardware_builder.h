@@ -10,16 +10,16 @@
 #include <urdf/model.h>
 #include <yaml-cpp/yaml.h>
 
-#include <march_hardware/ActuationMode.h>
-#include <march_hardware/encoder/AbsoluteEncoder.h>
-#include <march_hardware/encoder/IncrementalEncoder.h>
-#include <march_hardware/EtherCAT/pdo_interface.h>
-#include <march_hardware/EtherCAT/sdo_interface.h>
-#include <march_hardware/IMotionCube.h>
-#include <march_hardware/Joint.h>
-#include <march_hardware/MarchRobot.h>
-#include <march_hardware/PowerDistributionBoard.h>
-#include <march_hardware/TemperatureGES.h>
+#include <march_hardware/imotioncube/actuation_mode.h>
+#include <march_hardware/encoder/absolute_encoder.h>
+#include <march_hardware/encoder/incremental_encoder.h>
+#include <march_hardware/ethercat/pdo_interface.h>
+#include <march_hardware/ethercat/sdo_interface.h>
+#include <march_hardware/imotioncube/imotioncube.h>
+#include <march_hardware/joint.h>
+#include <march_hardware/march_robot.h>
+#include <march_hardware/power/power_distribution_board.h>
+#include <march_hardware/temperature/temperature_ges.h>
 
 /**
  * @brief Creates a MarchRobot from a robot yaml and URDF.
