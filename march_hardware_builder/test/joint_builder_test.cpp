@@ -8,12 +8,12 @@
 #include <ros/package.h>
 #include <urdf/model.h>
 
-#include <march_hardware/encoder/AbsoluteEncoder.h>
-#include <march_hardware/encoder/IncrementalEncoder.h>
+#include <march_hardware/encoder/absolute_encoder.h>
+#include <march_hardware/encoder/incremental_encoder.h>
 #include <march_hardware/error/hardware_exception.h>
-#include <march_hardware/IMotionCube.h>
+#include <march_hardware/imotioncube/imotioncube.h>
 
-class JointTest : public ::testing::Test
+class JointBuilderTest : public ::testing::Test
 {
 protected:
   std::string base_path;
@@ -37,7 +37,7 @@ protected:
   }
 };
 
-TEST_F(JointTest, ValidJointHip)
+TEST_F(JointBuilderTest, ValidJointHip)
 {
   YAML::Node config = this->loadTestYaml("/joint_correct.yaml");
   this->joint->limits->lower = 0.0;
@@ -62,7 +62,7 @@ TEST_F(JointTest, ValidJointHip)
   ASSERT_EQ(expected, created);
 }
 
-TEST_F(JointTest, ValidNotActuated)
+TEST_F(JointBuilderTest, ValidNotActuated)
 {
   YAML::Node config = this->loadTestYaml("/joint_correct_not_actuated.yaml");
   this->joint->limits->lower = 0.0;
@@ -86,7 +86,7 @@ TEST_F(JointTest, ValidNotActuated)
   ASSERT_EQ(expected, created);
 }
 
-TEST_F(JointTest, NoActuate)
+TEST_F(JointBuilderTest, NoActuate)
 {
   YAML::Node config = this->loadTestYaml("/joint_no_actuate.yaml");
 
@@ -95,7 +95,7 @@ TEST_F(JointTest, NoActuate)
                MissingKeyException);
 }
 
-TEST_F(JointTest, NoIMotionCube)
+TEST_F(JointBuilderTest, NoIMotionCube)
 {
   YAML::Node config = this->loadTestYaml("/joint_no_imotioncube.yaml");
   march::Joint joint = HardwareBuilder::createJoint(config, "test_joint_no_imotioncube", this->joint,
@@ -104,7 +104,7 @@ TEST_F(JointTest, NoIMotionCube)
   ASSERT_FALSE(joint.hasIMotionCube());
 }
 
-TEST_F(JointTest, NoTemperatureGES)
+TEST_F(JointBuilderTest, NoTemperatureGES)
 {
   YAML::Node config = this->loadTestYaml("/joint_no_temperature_ges.yaml");
   this->joint->limits->lower = 0.0;
@@ -116,7 +116,7 @@ TEST_F(JointTest, NoTemperatureGES)
                                                this->pdo_interface, this->sdo_interface));
 }
 
-TEST_F(JointTest, ValidActuationMode)
+TEST_F(JointBuilderTest, ValidActuationMode)
 {
   YAML::Node config = this->loadTestYaml("/joint_correct_position_mode.yaml");
   this->joint->limits->lower = 0.0;
@@ -138,7 +138,7 @@ TEST_F(JointTest, ValidActuationMode)
   ASSERT_EQ(expected, created);
 }
 
-TEST_F(JointTest, EmptyJoint)
+TEST_F(JointBuilderTest, EmptyJoint)
 {
   YAML::Node config;
   ASSERT_THROW(
@@ -146,7 +146,7 @@ TEST_F(JointTest, EmptyJoint)
       MissingKeyException);
 }
 
-TEST_F(JointTest, NoUrdfJoint)
+TEST_F(JointBuilderTest, NoUrdfJoint)
 {
   YAML::Node config = this->loadTestYaml("/joint_correct.yaml");
   ASSERT_THROW(HardwareBuilder::createJoint(config, "test", nullptr, this->pdo_interface, this->sdo_interface),

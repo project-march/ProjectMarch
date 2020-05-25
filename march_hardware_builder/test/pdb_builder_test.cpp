@@ -6,7 +6,7 @@
 #include <march_hardware_builder/hardware_config_exceptions.h>
 #include <march_hardware_builder/hardware_builder.h>
 
-class PowerDistributionBoardTest : public ::testing::Test
+class PowerDistributionBoardBuilderTest : public ::testing::Test
 {
 protected:
   std::string base_path;
@@ -26,7 +26,7 @@ protected:
   }
 };
 
-TEST_F(PowerDistributionBoardTest, ValidPowerDistributionBoard)
+TEST_F(PowerDistributionBoardBuilderTest, ValidPowerDistributionBoard)
 {
   std::string fullPath = this->fullPath("/power_distribution_board.yaml");
   YAML::Node config = YAML::LoadFile(fullPath);
@@ -43,14 +43,14 @@ TEST_F(PowerDistributionBoardTest, ValidPowerDistributionBoard)
   ASSERT_EQ(powerDistributionBoard, *createdPowerDistributionBoard);
 }
 
-TEST_F(PowerDistributionBoardTest, NoConfig)
+TEST_F(PowerDistributionBoardBuilderTest, NoConfig)
 {
   YAML::Node config;
   ASSERT_EQ(nullptr,
             HardwareBuilder::createPowerDistributionBoard(config["pdb"], this->pdo_interface, this->sdo_interface));
 }
 
-TEST_F(PowerDistributionBoardTest, MissingSlaveIndex)
+TEST_F(PowerDistributionBoardBuilderTest, MissingSlaveIndex)
 {
   std::string fullPath = this->fullPath("/power_distribution_board_missing_slave_index.yaml");
   YAML::Node config = YAML::LoadFile(fullPath);
@@ -58,7 +58,7 @@ TEST_F(PowerDistributionBoardTest, MissingSlaveIndex)
                MissingKeyException);
 }
 
-TEST_F(PowerDistributionBoardTest, MissingHighVoltageStateIndex)
+TEST_F(PowerDistributionBoardBuilderTest, MissingHighVoltageStateIndex)
 {
   std::string fullPath = this->fullPath("/power_distribution_board_missing_high_voltage_state_index.yaml");
   YAML::Node config = YAML::LoadFile(fullPath);
@@ -66,7 +66,7 @@ TEST_F(PowerDistributionBoardTest, MissingHighVoltageStateIndex)
                MissingKeyException);
 }
 
-TEST_F(PowerDistributionBoardTest, NegativeOffset)
+TEST_F(PowerDistributionBoardBuilderTest, NegativeOffset)
 {
   std::string fullPath = this->fullPath("/power_distribution_board_negative_offset.yaml");
   YAML::Node config = YAML::LoadFile(fullPath);

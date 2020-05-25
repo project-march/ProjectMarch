@@ -12,8 +12,8 @@
 #include <ros/ros.h>
 
 #include <march_hardware/error/error_type.h>
-#include <march_hardware/EtherCAT/pdo_interface.h>
-#include <march_hardware/EtherCAT/sdo_interface.h>
+#include <march_hardware/ethercat/pdo_interface.h>
+#include <march_hardware/ethercat/sdo_interface.h>
 #include <march_hardware/error/hardware_exception.h>
 
 // clang-format off
