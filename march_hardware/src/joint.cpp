@@ -131,6 +131,13 @@ double Joint::getVelocity() const
   return this->velocity_;
 }
 
+float Joint::getVoltageVelocity() const
+{
+  float R = 0.05;
+  float Ke = 355 * M_PI / 30;
+  return (this->imc_->getMotorVoltage() + this->imc_->getMotorCurrent() * R) / Ke;
+}
+
 double Joint::getIncrementalPosition() const
 {
   return this->incremental_position_;

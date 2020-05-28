@@ -195,6 +195,7 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
     joint.readEncoders(elapsed_time);
     joint_position_[i] = joint.getPosition();
     joint_velocity_[i] = joint.getVelocity();
+    joint_voltage_velocity_[i] = joint.getVoltageVelocity();
 
     if (joint.hasTemperatureGES())
     {
