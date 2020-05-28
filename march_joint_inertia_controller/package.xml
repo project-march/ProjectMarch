@@ -2,7 +2,7 @@
 <package format="2">
   <name>march_joint_inertia_controller</name>
   <version>0.0.0</version>
-  <description>This package creates a ROS controller which can be customized to operate in different circumstances.  </description>
+  <description>ROS controller which can be customized to operate in different circumstances.  </description>
 
   <maintainer email="software@projectmarch.nl">Project March</maintainer>
 
