@@ -9,7 +9,8 @@ from march_shared_resources.srv import PossibleGaits
 
 
 class InputDeviceController(object):
-    """Format of the identifier for the alive message."""
+
+    # Format of the identifier for the alive message
     ID_FORMAT = 'rqt@{machine}@{user}'
 
     def __init__(self, ping):
