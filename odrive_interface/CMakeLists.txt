@@ -16,6 +16,14 @@ catkin_package(CATKIN_DEPENDS
   std_msgs
 )
 
+catkin_install_python(PROGRAMS scripts/${PROJECT_NAME}_node
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    )
+
+install(DIRECTORY config launch
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+    )
+
 include_directories(
   ${catkin_INCLUDE_DIRS}
 )
