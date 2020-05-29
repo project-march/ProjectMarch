@@ -38,8 +38,6 @@ class GaitGeneratorController(object):
         self.view.import_gait_button.clicked.connect(self.import_gait)
         self.view.export_gait_button.clicked.connect(self.export_gait)
 
-
-
         self.view.import_previous_subgait_button.clicked.connect(lambda: self.import_side_subgait('previous'))
         # self.view.previous_is_standing_check_box.stateChanged.connect(self.toggle_previous_is_standing)
         self.view.lock_startpoint_check_box.stateChanged.connect(self.toggle_lock_startpoint)
@@ -237,9 +235,9 @@ class GaitGeneratorController(object):
             rospy.logwarn('Could not load gait %s', file_name)
             return
 
-        if position is 'previous':
+        if position == 'previous':
             self.previous_subgait = subgait
-        elif position is 'next':
+        elif position == 'next':
             self.next_subgait = subgait
 
     def export_gait(self):
@@ -342,11 +340,12 @@ class GaitGeneratorController(object):
 
     def toggle_lock_startpoint(self, value):
         if value and self.previous_subgait is not None:
-            print('Lock that start to ' + self.previous_subgait.gait_name + '/' + self.previous_subgait.subgait_name)
+            rospy.loginfo('Lock that start to ' + self.previous_subgait.gait_name + '/'
+                          + self.previous_subgait.subgait_name)
 
     def toggle_lock_endpoint(self, value):
         if value and self.previous_subgait is not None:
-            print('Lock that end to ' + self.next_subgait.gait_name + '/' + self.next_subgait.subgait_name)
+            rospy.loginfo('Lock that end to ' + self.next_subgait.gait_name + '/' + self.next_subgait.subgait_name)
 
     @property
     def previous_subgait(self):
@@ -357,7 +356,9 @@ class GaitGeneratorController(object):
 
     @previous_subgait.setter
     def previous_subgait(self, new_subgait):
-        self.view.import_previous_subgait_button.setText(new_subgait.gait_name + '/' + new_subgait.subgait_name)
+        self.view.import_previous_subgait_button.setText(new_subgait.gait_name
+                                                         + '/' + new_subgait.subgait_name
+                                                         + '/' + new_subgait.version)
         self._previous_subgait = new_subgait
 
     @property
@@ -369,5 +370,7 @@ class GaitGeneratorController(object):
 
     @next_subgait.setter
     def next_subgait(self, new_subgait):
-        self.view.import_next_subgait_button.setText(new_subgait.gait_name + '/' + new_subgait.subgait_name)
+        self.view.import_next_subgait_button.setText(new_subgait.gait_name
+                                                     + '/' + new_subgait.subgait_name
+                                                     + '/' + new_subgait.version)
         self._next_subgait = new_subgait

@@ -1,6 +1,4 @@
 from qt_gui.plugin import Plugin
-import rospy
-from trajectory_msgs.msg import JointTrajectory
 from urdf_parser_py import urdf
 
 from .gait_generator_controller import GaitGeneratorController
