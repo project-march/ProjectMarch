@@ -23,6 +23,9 @@ class GaitGeneratorController(object):
         self.subgait = ModifiableSubgait.empty_subgait(self, self.robot)
         self.joint_changed_history = RingBuffer(capacity=100, dtype=list)
         self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
+        self._previous_subgait = None
+        self._next_subgait = None
+        self._standing = ModifiableSubgait.empty_subgait(self, self.robot)
 
         self.connect_buttons()
         self.view.load_gait_into_ui(self.subgait)
@@ -34,6 +37,16 @@ class GaitGeneratorController(object):
         self.view.change_gait_directory_button.clicked.connect(self.change_gait_directory)
         self.view.import_gait_button.clicked.connect(self.import_gait)
         self.view.export_gait_button.clicked.connect(self.export_gait)
+
+
+
+        self.view.import_previous_subgait_button.clicked.connect(lambda: self.import_side_subgait('previous'))
+        # self.view.previous_is_standing_check_box.stateChanged.connect(self.toggle_previous_is_standing)
+        self.view.lock_startpoint_check_box.stateChanged.connect(self.toggle_lock_startpoint)
+
+        self.view.import_next_subgait_button.clicked.connect(lambda: self.import_side_subgait('next'))
+        # self.view.previous_is_standing_check_box.stateChanged.connect(self.toggle_next_is_standing)
+        self.view.lock_endpoint_check_box.stateChanged.connect(self.toggle_lock_endpoint)
 
         self.view.start_button.clicked.connect(self.start_time_slider_thread)
         self.view.stop_button.clicked.connect(self.stop_time_slider_thread)
@@ -216,6 +229,19 @@ class GaitGeneratorController(object):
         self.joint_changed_history = RingBuffer(capacity=100, dtype=list)
         self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
 
+    def import_side_subgait(self, position='previous'):
+        file_name, f = self.view.open_file_dialogue()
+
+        subgait = ModifiableSubgait.from_file(self.robot, file_name, self)
+        if subgait is None:
+            rospy.logwarn('Could not load gait %s', file_name)
+            return
+
+        if position is 'previous':
+            self.previous_subgait = subgait
+        elif position is 'next':
+            self.next_subgait = subgait
+
     def export_gait(self):
         if self.view.mirror_check_box.isChecked():
             key_1 = self.view.mirror_key1_line_edit.text()
@@ -313,3 +339,35 @@ class GaitGeneratorController(object):
     def save_changed_joints(self, joints):
         self.joint_changed_history.append(joints)
         self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
+
+    def toggle_lock_startpoint(self, value):
+        if value and self.previous_subgait is not None:
+            print('Lock that start to ' + self.previous_subgait.gait_name + '/' + self.previous_subgait.subgait_name)
+
+    def toggle_lock_endpoint(self, value):
+        if value and self.previous_subgait is not None:
+            print('Lock that end to ' + self.next_subgait.gait_name + '/' + self.next_subgait.subgait_name)
+
+    @property
+    def previous_subgait(self):
+        if self.view.previous_is_standing_check_box.isChecked():
+            return self._standing
+        else:
+            return self._previous_subgait
+
+    @previous_subgait.setter
+    def previous_subgait(self, new_subgait):
+        self.view.import_previous_subgait_button.setText(new_subgait.gait_name + '/' + new_subgait.subgait_name)
+        self._previous_subgait = new_subgait
+
+    @property
+    def next_subgait(self):
+        if self.view.next_is_standing_check_box.isChecked():
+            return self._standing
+        else:
+            return self._next_subgait
+
+    @next_subgait.setter
+    def next_subgait(self, new_subgait):
+        self.view.import_next_subgait_button.setText(new_subgait.gait_name + '/' + new_subgait.subgait_name)
+        self._next_subgait = new_subgait
