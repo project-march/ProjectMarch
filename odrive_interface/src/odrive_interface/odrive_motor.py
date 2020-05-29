@@ -2,10 +2,6 @@
 
 import rospy
 
-from .odrive_connection_manager import OdriveConnectionManager
-
-
-ODRIVE_CONNECTION_MANAGER = OdriveConnectionManager(serial_numbers=['2084387E304E'])
 
 TYPE_ERROR_MSG = 'Given type {gt} for {nm} is insufficient, requested type is {rt}'
 
@@ -21,13 +17,14 @@ class OdriveMotor(object):
         self._motor = odrive_axis
 
     @classmethod
-    def create_odrive(cls, serial_number, axis_nr):
+    def create_odrive(cls, odrive_connection_manager, serial_number, axis_nr):
         """Create an Odrive object to communicate with a specific motor.
 
+        :param odrive_connection_manager: The object which holds all the connections to the odrives
         :param serial_number: Serial number reference of the odrive in hex
         :param axis_nr: The axis number of the motor ['axis0', 'axis1']
         """
-        odrive = ODRIVE_CONNECTION_MANAGER[serial_number]
+        odrive = odrive_connection_manager[serial_number]
 
         if odrive is None:
             rospy.logerr('Odrive with serial number: {sn}, could not be found'.format(sn=serial_number))
