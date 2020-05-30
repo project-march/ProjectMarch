@@ -356,9 +356,9 @@ class GaitGeneratorController(object):
 
     @previous_subgait.setter
     def previous_subgait(self, new_subgait):
-        self.view.import_previous_subgait_button.setText(new_subgait.gait_name
-                                                         + '/' + new_subgait.subgait_name
-                                                         + '/' + new_subgait.version)
+        self.view.import_previous_subgait_button.setText(new_subgait.gait_name +
+                                                         '/' + new_subgait.subgait_name +
+                                                         '/' + new_subgait.version)
         self._previous_subgait = new_subgait
 
     @property
@@ -370,7 +370,7 @@ class GaitGeneratorController(object):
 
     @next_subgait.setter
     def next_subgait(self, new_subgait):
-        self.view.import_next_subgait_button.setText(new_subgait.gait_name
-                                                     + '/' + new_subgait.subgait_name
-                                                     + '/' + new_subgait.version)
+        self.view.import_next_subgait_button.setText(new_subgait.gait_name +
+                                                     '/' + new_subgait.subgait_name +
+                                                     '/' + new_subgait.version)
         self._next_subgait = new_subgait
