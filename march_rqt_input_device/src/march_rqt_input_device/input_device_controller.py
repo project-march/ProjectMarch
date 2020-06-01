@@ -1,11 +1,18 @@
-import rospy
-from std_msgs.msg import Header, String, Time
+import getpass
+import socket
 
-from march_shared_resources.msg import Error, GaitInstruction, GaitInstructionResponse
+import rospy
+from std_msgs.msg import Header, String
+
+from march_shared_resources.msg import Alive, Error, GaitInstruction, GaitInstructionResponse
 from march_shared_resources.srv import PossibleGaits
 
 
 class InputDeviceController(object):
+
+    # Format of the identifier for the alive message
+    ID_FORMAT = 'rqt@{machine}@{user}'
+
     def __init__(self, ping):
         self._instruction_gait_pub = rospy.Publisher('/march/input_device/instruction', GaitInstruction, queue_size=10)
         self._instruction_response_pub = rospy.Subscriber('/march/input_device/instruction_response',
@@ -22,9 +29,11 @@ class InputDeviceController(object):
         self.current_gait_cb = None
 
         self._ping = ping
+        self._id = self.ID_FORMAT.format(machine=socket.gethostname(),
+                                         user=getpass.getuser())
 
         if self._ping:
-            self._alive_pub = rospy.Publisher('/march/input_device/alive', Time, queue_size=10)
+            self._alive_pub = rospy.Publisher('/march/input_device/alive', Alive, queue_size=10)
             period = rospy.Duration().from_sec(0.2)
             self._alive_timer = rospy.Timer(period, self._timer_callback)
 
@@ -59,7 +68,8 @@ class InputDeviceController(object):
             self.current_gait_cb(msg.data)
 
     def _timer_callback(self, event):
-        self._alive_pub.publish(event.current_real)
+        msg = Alive(stamp=event.current_real, id=self._id)
+        self._alive_pub.publish(msg)
 
     def get_possible_gaits(self):
         """
@@ -77,32 +87,32 @@ class InputDeviceController(object):
     def publish_increment_step_size(self):
         rospy.logdebug('Mock Input Device published step size increment')
         self._instruction_gait_pub.publish(GaitInstruction(Header(stamp=rospy.Time.now()),
-                                                           GaitInstruction.INCREMENT_STEP_SIZE, ''))
+                                                           GaitInstruction.INCREMENT_STEP_SIZE, '', self._id))
 
     def publish_decrement_step_size(self):
         rospy.logdebug('Mock Input Device published step size decrement')
         self._instruction_gait_pub.publish(GaitInstruction(Header(stamp=rospy.Time.now()),
-                                                           GaitInstruction.DECREMENT_STEP_SIZE, ''))
+                                                           GaitInstruction.DECREMENT_STEP_SIZE, '', self._id))
 
     def publish_gait(self, string):
         rospy.logdebug('Mock Input Device published gait: ' + string)
         self._instruction_gait_pub.publish(GaitInstruction(Header(stamp=rospy.Time.now()),
-                                                           GaitInstruction.GAIT, string))
+                                                           GaitInstruction.GAIT, string, self._id))
 
     def publish_stop(self):
         rospy.logdebug('Mock Input Device published stop')
         self._instruction_gait_pub.publish(GaitInstruction(Header(stamp=rospy.Time.now()),
-                                                           GaitInstruction.STOP, ''))
+                                                           GaitInstruction.STOP, '', self._id))
 
     def publish_continue(self):
         rospy.logdebug('Mock Input Device published continue')
         self._instruction_gait_pub.publish(GaitInstruction(Header(stamp=rospy.Time.now()),
-                                                           GaitInstruction.CONTINUE, ''))
+                                                           GaitInstruction.CONTINUE, '', self._id))
 
     def publish_pause(self):
         rospy.logdebug('Mock Input Device published pause')
         self._instruction_gait_pub.publish(GaitInstruction(Header(stamp=rospy.Time.now()),
-                                                           GaitInstruction.PAUSE, ''))
+                                                           GaitInstruction.PAUSE, '', self._id))
 
     def publish_error(self):
         rospy.logdebug('Mock Input Device published error')
@@ -112,4 +122,4 @@ class InputDeviceController(object):
     def publish_sm_to_unknown(self):
         rospy.logdebug('Mock Input Device published state machine to unknown')
         self._instruction_gait_pub.publish(GaitInstruction(Header(stamp=rospy.Time.now()),
-                                                           GaitInstruction.UNKNOWN, ''))
+                                                           GaitInstruction.UNKNOWN, '', self._id))
