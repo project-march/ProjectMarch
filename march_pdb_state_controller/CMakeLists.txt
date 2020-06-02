@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(march_pdb_state_controller)
 
 add_compile_options(-std=c++14 -Wall -Wextra -Werror)
