@@ -12,6 +12,9 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
     INCLUDE_DIRS include
     CATKIN_DEPENDS
+    roscpp
+    soem
+    urdf
     LIBRARIES ${PROJECT_NAME}
     CFG_EXTRAS
     ${PROJECT_NAME}-extras.cmake
@@ -88,10 +91,6 @@ target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} pthread)
 add_executable(slave_count_check check/slave_count.cpp)
 target_link_libraries(slave_count_check ${PROJECT_NAME})
 ros_enable_rpath(slave_count_check)
-
-install(DIRECTORY include/${PROJECT_NAME}/
-    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-)
 
 install(DIRECTORY include/${PROJECT_NAME}/
     DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}

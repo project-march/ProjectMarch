@@ -16,7 +16,13 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
-    CATKIN_DEPENDS 
+    CATKIN_DEPENDS
+    controller_interface
+    hardware_interface
+    march_hardware_interface
+    pluginlib
+    realtime_tools
+    roscpp
     sensor_msgs
 )
 

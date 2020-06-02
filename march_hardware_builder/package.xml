@@ -10,9 +10,9 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <depend>march_hardware</depend>
   <depend>roscpp</depend>
   <depend>roslib</depend>
-  <depend>march_hardware</depend>
   <depend>urdf</depend>
   <depend>yaml-cpp</depend>
 
