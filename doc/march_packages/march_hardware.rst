@@ -78,11 +78,11 @@ Process Data Objects (PDOs) are the cyclic and continuous type of messages of
 EtherCAT, and the main form of exchanging data with the slaves. Reading and
 writing EtherCAT PDO messages is possible through the other classes in the
 march_hardware package (e.g. Joint, IMotionCube, Encoder, PowerDistributionBoard).
-For example, the :hardware-interface:`Encoder class <march_hardware/include/march_hardware/encoder/Encoder.h>`
+For example, the :hardware-interface:`Encoder class <march_hardware/include/march_hardware/encoder/encoder.h>`
 ``getAngleIU()`` function reads and returns the latest encoder value that was
 received by the EthercatMaster. Functions such as ``getAngleIU()`` all call the
 same generic interface for reading from and writing to slaves. The generic
-interface is defined in :hardware-interface:`pdo_interface.cpp <march_hardware/include/march_hardware/EtherCAT/pdo_interface.h>`.
+interface is defined in :hardware-interface:`pdo_interface.cpp <march_hardware/include/march_hardware/ethercat/pdo_interface.h>`.
 
 .. note::
   When reading or writing PDO messages over EtherCAT via SOEM, you need three
@@ -100,7 +100,7 @@ SDO messages
 ************
 Service Data Objects (SDOs) are non-cyclic EtherCAT messages. They are used for
 sending one-time messages, for example when initializing an IMotionCube.
-The generic SDO interface can be found in :hardware-interface:`sdo_interface.h <march_hardware/include/march_hardware/EtherCAT/sdo_interface.h>`.
+The generic SDO interface can be found in :hardware-interface:`sdo_interface.h <march_hardware/include/march_hardware/ethercat/sdo_interface.h>`.
 
 Power Distribution Board
 ------------------------

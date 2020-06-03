@@ -116,7 +116,7 @@ The to be added PDO object was not defined.
 **Cause:** The PDO that is being mapped does not have a defined address and size.
 
 **Fix:** Check that the PDO is defined in the ``all_objects`` map in the
-:hardware-interface:`PDOmap <march_hardware/src/PDOmap.cpp>` class.
+:hardware-interface:`PDOmap <march_hardware/src/ethercat/pdo_map.cpp>` class.
 
 
 .. _e107:
@@ -208,7 +208,7 @@ verify that those are correct.
 The encoder resolution is outside the allowed range.
 
 **Cause:** The given encoder resolution to construct an encoder are outside its allowed limits defined in
-:hardware-interface:`Encoder.h <march_hardware/include/march_hardware/encoder/Encoder.h>`.
+:hardware-interface:`encoder.h <march_hardware/include/march_hardware/encoder/encoder.h>`.
 
 **Fix:** Check if the resolutions given in the :hardware-interface:`robots yaml <march_hardware_builder/robots>` are
 within this range.
