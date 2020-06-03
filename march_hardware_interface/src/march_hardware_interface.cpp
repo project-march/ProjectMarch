@@ -194,7 +194,7 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
     // Update position with he most accurate velocity
     joint.readEncoders(elapsed_time);
     joint_position_[i] = joint.getPosition();
-    joint_voltage_velocity_[i] = joint.getVoltageVelocity();
+    joint_velocity_[i] = joint.getVelocity();
 
     if (joint.hasTemperatureGES())
     {
