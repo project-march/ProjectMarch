@@ -55,7 +55,7 @@ public:
 
   double getPosition() const;
   double getVelocity() const;
-  float getVoltageVelocity() const;
+  double getVoltageVelocity() const;
   double getIncrementalPosition() const;
   double getAbsolutePosition() const;
   int16_t getTorque();
