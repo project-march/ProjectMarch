@@ -131,12 +131,12 @@ double Joint::getVelocity() const
   return this->velocity_;
 }
 
-float Joint::getVoltageVelocity() const
+double Joint::getVoltageVelocity() const
 {
-  float R_motor = 0.05;
-  float Kv_motor = 355;
-  float rpmToRad = M_PI / 30;
-  float Ke = Kv_motor * rpmToRad;
+  double R_motor = 0.05;
+  double Kv_motor = 355;
+  double rpmToRad = M_PI / 30;
+  double Ke = Kv_motor * rpmToRad;
   return (this->imc_->getMotorVoltage() + this->imc_->getMotorCurrent() * R_motor) / Ke;
 }
 
