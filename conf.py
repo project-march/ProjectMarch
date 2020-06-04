@@ -8,11 +8,8 @@ else:
     import pygit2
     branch_name = pygit2.Repository('.').head.shorthand
 
-sys.path += [os.path.abspath('_scripts')]
-
 extensions = ['sphinx.ext.extlinks',
               'sphinx.ext.todo',
-              'tutorialformatter',
               'sphinx_rtd_theme',
               ]
 
