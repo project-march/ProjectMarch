@@ -81,3 +81,8 @@ The unit tests are different for C++ and python projects. C++ projects use the
 `unittest <http://pythontesting.net/framework/unittest/unittest-introduction/>`_.
 For node level tests, `rostest <https://wiki.ros.org/rostest>`_ is used.
 Rostest uses launch files to launch the nodes under test and the actual tests.
+See the following tutorials on writing tests using ROS:
+
+* `Writing C++ tests with gtest <https://wiki.ros.org/gtest>`_
+* `Writing Python tests with unittest <https://wiki.ros.org/unittest>`_
+* `Writing rostest files <https://wiki.ros.org/rostest/Writing>`_
