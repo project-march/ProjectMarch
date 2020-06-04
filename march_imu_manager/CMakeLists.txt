@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(march_imu_manager)
 
 add_compile_options(-std=c++14 -Wall -Wextra -Werror)
@@ -12,6 +12,7 @@ catkin_package(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
     CATKIN_DEPENDS
+    roscpp
     sensor_msgs
 )
 

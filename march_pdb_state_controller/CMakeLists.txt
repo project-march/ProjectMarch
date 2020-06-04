@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(march_pdb_state_controller)
 
 add_compile_options(-std=c++14 -Wall -Wextra -Werror)
@@ -19,6 +19,14 @@ catkin_package(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
     CATKIN_DEPENDS
+    controller_interface
+    hardware_interface
+    march_hardware
+    march_hardware_interface
+    march_shared_resources
+    pluginlib
+    realtime_tools
+    roscpp
     sensor_msgs
 )
 
