@@ -59,14 +59,25 @@ General guidelines to writing tests
 -----------------------------------
 Here are some rules of thumb to follow when writing tests:
 
-1. Write short understandable tests.
-2. Separate setup code that is necessary for every test.
-3. Do not depend on writing and reading from external files.
-4. Do not depend on timing in your tests.
-5. Use one ``assert`` per test (i.e. only test one function)
-6. If possible, every method should have at least one unit test
-7. Make a test for every edge case!
-8. Usually, your test code is about as long as your normal code.
+#. Write short understandable tests.
+#. Separate setup code that is necessary for every test.
+#. Do not depend on writing and reading from external files.
+#. Do not depend on timing in your tests.
+#. Use one ``assert`` per test (i.e. only test one function)
+#. If possible, every method should have at least one unit test
+#. Make a test for every edge case!
+#. Usually, your test code is about as long as your normal code.
+
+Next to these rules there exist some conventions in structuring tests:
+
+#. Put your tests in a separate directory next to ``src/`` named ``test/``.
+#. The same as for all filenames, name the test files using snake_case.
+#. Put rostest ``.test`` launch files inside ``test/launch/``.
+#. Put rostest source files inside ``test/rostest/``.
+#. If writing unittests and rostests for Python, put the unit tests inside ``test/nosetests/``.
+#. Put necessary resources, e.g. files, for tests in a separate directory inside ``test/``.
+
+See the March packages for examples on how to write and structure tests.
 
 Writing your own tests
 ----------------------
