@@ -1,8 +1,9 @@
 # March Tutorials
 
-[https://project-march.github.io/tutorials/](https://project-march.github.io/tutorials/)
+https://docs.projectmarch.nl
 
 [![Travis Status](https://travis-ci.com/project-march/tutorials.svg?branch=master)](https://travis-ci.com/project-march/tutorials)
+![reviewdog](https://github.com/project-march/tutorials/workflows/reviewdog/badge.svg)
 
 ----------------
 
@@ -24,8 +25,6 @@ The local website ``<LOCAL_PACKAGE_PATH>/build/html/index.html`` should automati
 **Code Formatting**
 
 * Tutorials should exemplify best coding practices. If a contribution wouldn't pass review elsewhere, then it shouldn't pass review in the tutorials.
-* Relevant code should be included and explained using the ``.. tutorial-formatter::`` tag.
-* Irrelevant code should be excluded from the generated html using the ``BEGIN_TUTORIAL``, ``END_TUTORIAL``, ``BEGIN_SUB_TUTORIAL``, and ``END_SUB_TUTORIAL`` tags.
 * Whenever possible, links should be created using the ``extlinks`` dictionary defined in ``conf.py``.
 * All demo code should be runnable from within the ``march_tutorials`` package.
 * Python code should be run using ``rosrun``.
@@ -38,5 +37,5 @@ The local website ``<LOCAL_PACKAGE_PATH>/build/html/index.html`` should automati
 
 ### Directory Structure
 
-* Each tutorial should live in its own subdirectory within the `./doc/ <>` directory.
-* Add your tutorial to `index.rst` in the root directory.
+* Each tutorial should live in its own subdirectory within the `doc/` directory.
+* Add your tutorial to the table of contents in `index.rst` in the root directory.
