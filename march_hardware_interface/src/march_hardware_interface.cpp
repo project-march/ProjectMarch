@@ -449,11 +449,9 @@ bool MarchHardwareInterface::iMotionCubeStateCheck(size_t joint_index)
   march::IMotionCubeState imc_state = joint.getIMotionCubeState();
   if (imc_state.state == march::IMCState::FAULT)
   {
-    ROS_ERROR("IMotionCube of joint %s is in fault state %s \n", joint.getName().c_str(),
-              imc_state.state.getString().c_str());
-    ROS_ERROR("Detailed Error: %s (%s) \n", imc_state.detailedErrorDescription.c_str(),
-              imc_state.detailedError.c_str());
-    ROS_ERROR("Motion Error: %s (%s) \n", imc_state.motionErrorDescription.c_str(), imc_state.motionError.c_str());
+    ROS_ERROR("IMotionCube of joint %s is in fault state %s\nDetailed Error: %s (%s)\nMotion Error: %s (%s)",
+              joint.getName().c_str(), imc_state.state.getString().c_str(), imc_state.detailedErrorDescription.c_str(),
+              imc_state.detailedError.c_str(), imc_state.motionErrorDescription.c_str(), imc_state.motionError.c_str());
     return false;
   }
   return true;
