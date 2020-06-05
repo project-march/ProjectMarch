@@ -1,5 +1,4 @@
 import os
-import sys
 
 # Retrieve branch name
 if os.getenv('CI'):
