@@ -59,14 +59,25 @@ General guidelines to writing tests
 -----------------------------------
 Here are some rules of thumb to follow when writing tests:
 
-1. Write short understandable tests.
-2. Separate setup code that is necessary for every test.
-3. Do not depend on writing and reading from external files.
-4. Do not depend on timing in your tests.
-5. Use one ``assert`` per test (i.e. only test one function)
-6. If possible, every method should have at least one unit test
-7. Make a test for every edge case!
-8. Usually, your test code is about as long as your normal code.
+#. Write short understandable tests.
+#. Separate setup code that is necessary for every test.
+#. Do not depend on writing and reading from external files.
+#. Do not depend on timing in your tests.
+#. Use one ``assert`` per test (i.e. only test one function)
+#. If possible, every method should have at least one unit test
+#. Make a test for every edge case!
+#. Usually, your test code is about as long as your normal code.
+
+Next to these rules there exist some conventions in structuring tests:
+
+#. Put your tests in a separate directory next to ``src/`` named ``test/``.
+#. The same as for all filenames, name the test files using snake_case.
+#. Put rostest ``.test`` launch files inside ``test/launch/``.
+#. Put rostest source files inside ``test/rostest/``.
+#. If writing unittests and rostests for Python, put the unit tests inside ``test/unittests/``.
+#. Put necessary resources, e.g. files, for tests in a separate directory inside ``test/``.
+
+See the March packages for examples on how to write and structure tests.
 
 Writing your own tests
 ----------------------
@@ -81,122 +92,8 @@ The unit tests are different for C++ and python projects. C++ projects use the
 `unittest <http://pythontesting.net/framework/unittest/unittest-introduction/>`_.
 For node level tests, `rostest <https://wiki.ros.org/rostest>`_ is used.
 Rostest uses launch files to launch the nodes under test and the actual tests.
+See the following tutorials on writing tests using ROS:
 
-The next sections will describe the process of writing tests. For this
-tutorial we will use the :codedir:`ros_test_tutorial package <development/ros_test_tutorial>`.
-This package already includes some C++ and python code to write tests for.
-
-Writing C++ unit tests
-^^^^^^^^^^^^^^^^^^^^^^
-As an example we will create tests for the ``Add.cpp`` class that is located in
-this repository. Tests are always located in the ``test/`` directory of a
-package. To create a test we create a new cpp file in the ``test`` directory
-called ``AddTest.cpp`` with the following contents.
-
-.. code::
-
-    #include <gtest/gtest.h>
-
-    #include "ros_test_tutorial/Add.h"
-
-    TEST(AddTest, addTwoAndOne)
-    {
-        Add add;
-        ASSERT_EQ(add.add(2, 1), 3);
-    }
-
-    int main(int argc, char* argv[])
-    {
-        testing::InitGoogleTest(&argc, argv);
-        return RUN_ALL_TESTS();
-    }
-
-Feel free to experiment with writing tests. The actual test is written using
-the ``TEST`` macro.  The first argument is the test suite, the same as the
-filename in this case.  The second argument is name of the actual test. So this
-would be another example of a test.
-
-.. code::
-
-    TEST(AddTest, addNegative)
-    {
-        Add add;
-        ASSERT_EQ(add.add(0, -1), -1);
-    }
-
-In order to build and run the unit tests we must add ``rosunit`` as test
-dependency to our package. So normally we would add the following to the
-``package.xml``. However, this has already been done in the highlevel
-``package.xml`` for this repository, so this is not necessary in this example.
-
-.. code::
-
-  <test_depend>rosunit</test_depend>
-
-Next we must tell cmake which tests it has to build. So add the following to the ``CMakeLists.txt``.
-
-.. code::
-
-    if(CATKIN_ENABLE_TESTING)
-        catkin_add_gtest(add_test test/AddTest.cpp)
-        target_link_libraries(add_test ros_test_tutorial ${catkin_LIBRARIES})
-    endif()
-
-Here we tell ``cmake`` to build the test and use our library. The
-``catkin_add_gtest`` command creates a new test called ``add_test`` from the
-source file ``AddTest.cpp``. Now when ``colcon test`` is run from the workspace
-root you should see tests passing.
-
-Writing C++ node tests
-^^^^^^^^^^^^^^^^^^^^^^
-
-
-Writing python unit tests
-^^^^^^^^^^^^^^^^^^^^^^^^^
-As an example we will create tests for the function ``Multiply.py`` that is
-located in this repository. Tests are always located in the ``test/``
-directory. We will first start by writing our test. So create the
-``MultiplyTest.py`` file to your ``test/`` directory and fill it with the
-following contents.
-
-.. code::
-
-    #!/usr/bin/env python
-    PKG = 'march_tutorials'
-
-    import unittest
-    import rosunit
-
-    from ros_test_tutorial import multiply
-
-    class MultiplyTest(unittest.TestCase):
-
-        def test_multiply_one_and_one():
-            self.assertEqual(multiply(1, 1), 1)
-
-    if __name__ == '__main__':
-        rosunit.unitrun(PKG, 'test_multiply', MultiplyTest)
-
-The last line will run all test methods inside the ``MultiplyTest`` class that
-start with ``test``, where ``'test_multiply'`` is the name of the test case.
-See if you can add more tests (and make them fail). See the `python unittest
-documentation <https://docs.python.org/3/library/unittest.html>`_ for more
-information on writing tests.
-
-Next we must tell ``cmake`` how to build the tests. We do this by adding
-``catkin_add_nosetests()`` inside our ``CATKIN_ENABLE_TESTING`` of ``CMakeLists.txt``.
-
-.. code::
-
-    if(CATKIN_ENABLE_TESTING)
-        ...
-        catkin_add_nosetests(test/MultiplyTest.py)
-        ...
-    endif()
-
-After building, the tests can now be run with ``colcon test``.
-Also see the `ros wiki on writing unit tests for python <https://wiki.ros.org/unittest#Code-level_Python_Unit_Tests>`_.
-
-Writing python node tests
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
+* `Writing C++ tests with gtest <https://wiki.ros.org/gtest>`_
+* `Writing Python tests with unittest <https://wiki.ros.org/unittest>`_
+* `Writing rostest files <https://wiki.ros.org/rostest/Writing>`_
