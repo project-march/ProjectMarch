@@ -9,16 +9,17 @@ https://docs.projectmarch.nl
 
 Welcome to the primary documentation for the March exoskeleton.
 
-These tutorials use the [reStructuredText](http://www.sphinx-doc.org/en/stable/rest.html) format commonly used in the Sphinx "Python Documentation Generator". This unfortunately differs from the common Markdown format, but its advantage is that it supports embedding code directly from source files for inline code tutorials.
+These tutorials use the [reStructuredText](http://www.sphinx-doc.org/en/stable/rest.html)
+format commonly used in the Sphinx "Python Documentation Generator". This
+unfortunately differs from the common Markdown format, but its advantage is that
+it supports embedding code directly from source files for inline code tutorials.
 
 ## Build Locally
 
-If you want to test the tutorials by generating the html pages locally on your machine, use the ``build_locally`` script.
-
-    source /opt/ros/$ROS_DISTRO/setup.bash
-    ./build_locally.sh
-
-The local website ``<LOCAL_PACKAGE_PATH>/build/html/index.html`` should automatically open in your web browser.
+If you want to test the tutorials by generating the html pages locally on your
+machine, see https://docs.projectmarch.nl/doc/development/documentation.html or
+[documentation.rst](doc/development/documentation.rst) when the URL is not
+available.
 
 ### Formatting and Style
 
