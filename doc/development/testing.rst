@@ -74,7 +74,7 @@ Next to these rules there exist some conventions in structuring tests:
 #. The same as for all filenames, name the test files using snake_case.
 #. Put rostest ``.test`` launch files inside ``test/launch/``.
 #. Put rostest source files inside ``test/rostest/``.
-#. If writing unittests and rostests for Python, put the unit tests inside ``test/nosetests/``.
+#. If writing unittests and rostests for Python, put the unit tests inside ``test/unittests/``.
 #. Put necessary resources, e.g. files, for tests in a separate directory inside ``test/``.
 
 See the March packages for examples on how to write and structure tests.
