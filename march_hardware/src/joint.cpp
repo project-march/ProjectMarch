@@ -134,6 +134,7 @@ double Joint::getVelocity() const
 double Joint::getVoltageVelocity() const
 {
   // https://en.wikipedia.org/wiki/Motor_constants#Motor_velocity_constant,_back_EMF_constant
+  // https://www.motioncontroltips.com/faq-whats-relationship-voltage-dc-motor-output-speed/
   const double resistance = 0.05;
   const double velocity_constant = 355;
   const double rpm_to_rad = M_PI / 30;
