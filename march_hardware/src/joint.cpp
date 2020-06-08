@@ -133,11 +133,12 @@ double Joint::getVelocity() const
 
 double Joint::getVoltageVelocity() const
 {
-  double R_motor = 0.05;
-  double Kv_motor = 355;
-  double rpmToRad = M_PI / 30;
-  double Ke = Kv_motor * rpmToRad;
-  return (this->imc_->getMotorVoltage() + this->imc_->getMotorCurrent() * R_motor) / Ke;
+  // https://en.wikipedia.org/wiki/Motor_constants#Motor_velocity_constant,_back_EMF_constant
+  const double resistance = 0.05;
+  const double velocity_constant = 355;
+  const double rpm_to_rad = M_PI / 30;
+  const double electric_constant = velocity_constant * rpm_to_rad;
+  return (this->imc_->getMotorVoltage() + this->imc_->getMotorCurrent() * resistance) / electric_constant;
 }
 
 double Joint::getIncrementalPosition() const
