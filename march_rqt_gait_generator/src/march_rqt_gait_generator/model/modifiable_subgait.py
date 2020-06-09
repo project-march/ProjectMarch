@@ -63,7 +63,7 @@ class ModifiableSubgait(Subgait):
 
     def has_multiple_setpoints_before_duration(self, duration):
         """Check if all setpoints are before a given duration."""
-        return all(joint.setpoints[-1].time <= duration for joint in self.joints)
+        return not any(joint.setpoints[1].time > duration for joint in self.joints)
 
     def has_setpoints_after_duration(self, duration):
         """Check if a joint has a setpoint which is larger then the given duration."""
@@ -182,6 +182,12 @@ class ModifiableSubgait(Subgait):
                           joint_1.name, joint_2.name)
 
         return True
+
+    def scale_timestamps_subgait(self, new_duration, rescale=True):
+        """Update the interpolated setpoints whenever a new duration is set to the subgait."""
+        super(ModifiableSubgait, self).scale_timestamps_subgait(new_duration, rescale)
+        for joint in self.joints:
+            joint.interpolated_setpoints = joint.interpolate_setpoints()
 
     def set_gait_type(self, gait_type):
         """Set the subgait type as string."""
