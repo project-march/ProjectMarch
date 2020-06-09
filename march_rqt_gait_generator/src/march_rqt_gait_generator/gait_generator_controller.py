@@ -288,7 +288,7 @@ class GaitGeneratorController(object):
         joints = self.joint_changed_history.pop()
         for joint in joints:
             joint.undo()
-        self.subgait.set_duration(joints[0].setpoints[-1].time)
+        self.subgait.set_duration(joints[0].setpoints[-1].time, rescale=False)
         self.view.set_duration_spinbox(self.subgait.duration)
 
         self.joint_changed_redo_list.append(joints)
@@ -302,7 +302,7 @@ class GaitGeneratorController(object):
         joints = self.joint_changed_redo_list.pop()
         for joint in joints:
             joint.redo()
-        self.subgait.set_duration(joints[0].setpoints[-1].time)
+        self.subgait.set_duration(joints[0].setpoints[-1].time, rescale=False)
         self.view.set_duration_spinbox(self.subgait.duration)
 
         self.joint_changed_history.append(joints)
