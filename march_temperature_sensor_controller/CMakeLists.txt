@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(march_temperature_sensor_controller)
 
 add_compile_options(-std=c++14 -Wall -Wextra -Werror)
@@ -16,7 +16,13 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
-    CATKIN_DEPENDS 
+    CATKIN_DEPENDS
+    controller_interface
+    hardware_interface
+    march_hardware_interface
+    pluginlib
+    realtime_tools
+    roscpp
     sensor_msgs
 )
 

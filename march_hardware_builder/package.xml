@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<package format="2">
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>march_hardware_builder</name>
   <version>0.0.0</version>
   <description>Generate hardware configuration from yaml files.</description>
@@ -10,9 +11,9 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <depend>march_hardware</depend>
   <depend>roscpp</depend>
   <depend>roslib</depend>
-  <depend>march_hardware</depend>
   <depend>urdf</depend>
   <depend>yaml-cpp</depend>
 

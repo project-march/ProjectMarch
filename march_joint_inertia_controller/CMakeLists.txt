@@ -1,18 +1,12 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(march_pdb_state_controller)
+project(march_joint_inertia_controller)
 
 add_compile_options(-std=c++14 -Wall -Wextra -Werror)
 
 find_package(catkin REQUIRED COMPONENTS
     controller_interface
-    hardware_interface
-    march_hardware
-    march_hardware_interface
-    march_shared_resources
     pluginlib
-    realtime_tools
     roscpp
-    sensor_msgs
 )
 
 catkin_package(
@@ -20,22 +14,13 @@ catkin_package(
     LIBRARIES ${PROJECT_NAME}
     CATKIN_DEPENDS
     controller_interface
-    hardware_interface
-    march_hardware
-    march_hardware_interface
-    march_shared_resources
     pluginlib
-    realtime_tools
     roscpp
-    sensor_msgs
 )
 
-include_directories(include SYSTEM ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
+include_directories(include SYSTEM ${catkin_INCLUDE_DIRS})
 
-add_library(${PROJECT_NAME}
-    src/march_pdb_state_controller.cpp
-)
-
+add_library(${PROJECT_NAME} src/joint_inertia_controller.cpp)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 install(DIRECTORY include/${PROJECT_NAME}/
@@ -47,6 +32,6 @@ install(TARGETS ${PROJECT_NAME}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
-install(FILES march_pdb_state_plugin.xml
+install(FILES controller_plugins.xml
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )

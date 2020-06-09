@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<package format="2">
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>march_hardware_interface</name>
   <version>0.0.0</version>
   <description>A bridge between ros_control and the march_hardware</description>
@@ -10,23 +11,23 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <depend>roscpp</depend>
-  <depend>std_msgs</depend>
-  <depend>joint_limits_interface</depend>
-  <depend>joint_trajectory_controller</depend>
-  <depend>joint_state_controller</depend>
   <depend>controller_manager</depend>
-  <depend>realtime_tools</depend>
-  <depend>urdf</depend>
-  <depend>march_shared_resources</depend>
+  <depend>joint_limits_interface</depend>
+  <depend>joint_state_controller</depend>
+  <depend>joint_trajectory_controller</depend>
   <depend>march_description</depend>
   <depend>march_hardware</depend>
   <depend>march_hardware_builder</depend>
+  <depend>march_shared_resources</depend>
+  <depend>realtime_tools</depend>
+  <depend>roscpp</depend>
+  <depend>std_msgs</depend>
+  <depend>urdf</depend>
 
+  <exec_depend>ethercat_grant</exec_depend>
   <exec_depend>robot_state_publisher</exec_depend>
   <exec_depend>xacro</exec_depend>
-  <exec_depend>ethercat_grant</exec_depend>
 
-  <test_depend>rosunit</test_depend>
   <test_depend>code_coverage</test_depend>
+  <test_depend>rosunit</test_depend>
 </package>

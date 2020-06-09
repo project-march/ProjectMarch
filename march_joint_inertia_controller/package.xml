@@ -1,11 +1,9 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>march_hardware</name>
+  <name>march_joint_inertia_controller</name>
   <version>0.0.0</version>
-  <description>
-    Communicates with the March4 hardware.
-  </description>
+  <description>ROS controller which can be customized to operate in different circumstances.  </description>
 
   <maintainer email="software@projectmarch.nl">Project March</maintainer>
 
@@ -13,10 +11,11 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <depend>controller_interface</depend>
+  <depend>pluginlib</depend>
   <depend>roscpp</depend>
-  <depend>soem</depend>
-  <depend>urdf</depend>
 
-  <test_depend>rosunit</test_depend>
-  <test_depend>code_coverage</test_depend>
+  <export>
+    <controller_interface plugin="${prefix}/controller_plugins.xml" />
+  </export>
 </package>
