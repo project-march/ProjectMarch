@@ -177,7 +177,7 @@ class GaitGeneratorController(object):
             joint.save_setpoints(single_joint_change=False)
         self.save_changed_joints(self.subgait.joints)
 
-        self.subgait.set_duration(duration, rescale_setpoints)
+        self.subgait.scale_timestamps_subgaits(duration, rescale_setpoints)
         self.view.time_slider.setRange(0, 100 * self.subgait.duration)
 
         was_playing = self.time_slider_thread is not None
@@ -288,7 +288,7 @@ class GaitGeneratorController(object):
         joints = self.joint_changed_history.pop()
         for joint in joints:
             joint.undo()
-        self.subgait.set_duration(joints[0].setpoints[-1].time, rescale=False)
+        self.subgait.scale_timestamps_subgaits(joints[0].setpoints[-1].time, rescale=False)
         self.view.set_duration_spinbox(self.subgait.duration)
 
         self.joint_changed_redo_list.append(joints)
@@ -302,7 +302,7 @@ class GaitGeneratorController(object):
         joints = self.joint_changed_redo_list.pop()
         for joint in joints:
             joint.redo()
-        self.subgait.set_duration(joints[0].setpoints[-1].time, rescale=False)
+        self.subgait.scale_timestamps_subgaits(joints[0].setpoints[-1].time, rescale=False)
         self.view.set_duration_spinbox(self.subgait.duration)
 
         self.joint_changed_history.append(joints)
