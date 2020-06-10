@@ -189,8 +189,8 @@ class ModifiableSubgait(Subgait):
 
         for joint in self.joints:
             joint.interpolated_setpoints = joint.interpolate_setpoints()
-	
-	return parent_function
+
+        return parent_function
 
     def set_gait_type(self, gait_type):
         """Set the subgait type as string."""
