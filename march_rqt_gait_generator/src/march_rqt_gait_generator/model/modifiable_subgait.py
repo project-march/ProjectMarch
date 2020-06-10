@@ -185,12 +185,10 @@ class ModifiableSubgait(Subgait):
 
     def scale_timestamps_subgait(self, new_duration, rescale=True):
         """Update the interpolated setpoints whenever a new duration is set to the subgait."""
-        parent_function = super(ModifiableSubgait, self).scale_timestamps_subgait(new_duration, rescale)
+        super(ModifiableSubgait, self).scale_timestamps_subgait(new_duration, rescale)
 
         for joint in self.joints:
             joint.interpolated_setpoints = joint.interpolate_setpoints()
-
-        return parent_function
 
     def set_gait_type(self, gait_type):
         """Set the subgait type as string."""
