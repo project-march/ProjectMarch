@@ -384,7 +384,7 @@ void IMotionCube::reset(SdoSlaveInterface& sdo)
   sdo.write<uint16_t>(0x2080, 0, 1);
 }
 
-uint32_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
+uint16_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
 {
   size_t pos = 0;
   size_t old_pos = 0;
@@ -399,9 +399,9 @@ uint32_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
       start_address = std::stoi(token, nullptr, 16);
       token = "0";
     }
-    if (pos - old_pos < 2)  // delimiter has length of 1 two \n in a row has difference in positions of 1
+    if (pos == old_pos)
     {
-      end_address = end_address + start_address - 2;  // The -2 compensates the offset of the end_address
+      end_address = end_address + start_address - 1;  // The -1 compensates the offset of the end_address
       return sum;
     }
     end_address++;
@@ -419,11 +419,10 @@ bool IMotionCube::verifySetup(SdoSlaveInterface& sdo)
   // set parameters to compute checksum on the imc
   int checksum_setup = sdo.write<uint32_t>(0x2069, 0, (end_address << 16) + start_address);
 
-  uint32_t imc_value;
+  uint16_t imc_value;
   int value_size = sizeof(imc_value);
   // read computed checksum on imc
-  int check_sum_read = sdo.read<uint32_t>(0x206A, 0, value_size, imc_value);
-
+  int check_sum_read = sdo.read<uint16_t>(0x206A, 0, value_size, imc_value);
   if (!(checksum_setup && check_sum_read))
   {
     throw error::HardwareException(error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
@@ -457,7 +456,7 @@ void IMotionCube::downloadSetupToDrive(SdoSlaveInterface& sdo)
     }
     else
     {
-      if (pos - old_pos == delimiter.length())
+      if (pos - old_pos == 0)
       {
         break;
       }
@@ -467,7 +466,7 @@ void IMotionCube::downloadSetupToDrive(SdoSlaveInterface& sdo)
         pos = sw_string_.find(delimiter, old_pos);
         next_token = sw_string_.substr(old_pos, pos - old_pos);
 
-        if (pos - old_pos != delimiter.length())
+        if (pos - old_pos != 0)
         {
           data = (std::stoi(next_token, nullptr, 16) << 16) + std::stoi(token, nullptr, 16);
         }
