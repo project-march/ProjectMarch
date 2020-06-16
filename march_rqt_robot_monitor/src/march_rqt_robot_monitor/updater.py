@@ -1,12 +1,13 @@
 import diagnostic_updater
 import rospy
 from sensor_msgs.msg import JointState, Temperature
-from std_msgs.msg import Time
 
+from march_shared_resources.msg import Alive
+
+from .diagnostic_analyzers.check_input_device import CheckInputDevice
 from .diagnostic_analyzers.control import CheckJointValues
 from .diagnostic_analyzers.imc_state import CheckImcStatus
 from .diagnostic_analyzers.temperature import CheckJointTemperature
-from .diagnostic_analyzers.topic_frequency import CheckTopicFrequency
 
 
 def main():
@@ -16,7 +17,7 @@ def main():
     updater.setHardwareID('MARCH IVc')
 
     # Frequency checks
-    CheckTopicFrequency('Input_Device', '/march/input_device/alive', Time, updater, 5)
+    CheckInputDevice('/march/input_device/alive', Alive, updater, 5)
 
     # Temperature checks
     check_temp_joint_left_ankle = \
