@@ -4,6 +4,11 @@
             RQT plugin to perform all software checks.
         </description>
         <qtgui>
+            <group>
+                <label>March</label>
+                <icon>resource/img/march-walking.png</icon>
+                <statustip>Plugins related to the March exoskeleton.</statustip>
+            </group>
             <label>March Software Check</label>
             <icon>resource/img/march-walking.png</icon>
             <statustip>March Software Check</statustip>
