@@ -4,6 +4,7 @@ from sensor_msgs.msg import JointState, Temperature
 from std_msgs.msg import Time
 
 from .diagnostic_analyzers.control import CheckJointValues
+from .diagnostic_analyzers.gait_state import CheckGaitStatus
 from .diagnostic_analyzers.imc_state import CheckImcStatus
 from .diagnostic_analyzers.temperature import CheckJointTemperature
 from .diagnostic_analyzers.topic_frequency import CheckTopicFrequency
@@ -16,7 +17,7 @@ def main():
     updater.setHardwareID('MARCH IVc')
 
     # Frequency checks
-    CheckTopicFrequency('Input_Device', '/march/input_device/alive', Time, updater, 5)
+    # CheckTopicFrequency('Input_Device', '/march/input_device/alive', Time, updater, 5)
 
     # Temperature checks
     check_temp_joint_left_ankle = \
@@ -57,7 +58,11 @@ def main():
     updater.add('Control velocity values', check_current_movement_values.velocity_diagnostics)
     updater.add('Control effort values', check_current_movement_values.effort_diagnostics)
 
+    # IMC state check
     CheckImcStatus(updater)
+
+    # Gait information
+    CheckGaitStatus(updater)
 
     updater.force_update()
 
