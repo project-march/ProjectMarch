@@ -4,9 +4,14 @@
             An RQT plugin for monitoring log messages and writing logs.
         </description>
         <qtgui>
-            <label>March note taker</label>
+            <group>
+                <label>March</label>
+                <icon>resource/img/march-walking.png</icon>
+                <statustip>Plugins related to the March exoskeleton.</statustip>
+            </group>
+            <label>March Note Taker</label>
             <icon>resource/img/march-walking.png</icon>
-            <statustip>March note taker</statustip>
+            <statustip>GUI to take notes while using the March exoskeleton.</statustip>
         </qtgui>
     </class>
 </library>
