@@ -384,29 +384,28 @@ void IMotionCube::reset(SdoSlaveInterface& sdo)
   sdo.write<uint16_t>(0x2080, 0, 1);
 }
 
-uint32_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
+uint16_t IMotionCube::computeSWCheckSum(uint16_t& start_address, uint16_t& end_address)
 {
   size_t pos = 0;
   size_t old_pos = 0;
   uint16_t sum = 0;
-  std::string delimiter = "\n";
-  std::string token;
+  const std::string delimiter = "\n";
   while ((pos = sw_string_.find(delimiter, old_pos)) != std::string::npos)
   {
-    token = sw_string_.substr(old_pos, pos - old_pos);
+    std::string token = sw_string_.substr(old_pos, pos - old_pos);
     if (old_pos == 0)
     {
       start_address = std::stoi(token, nullptr, 16);
       token = "0";
     }
-    if (pos - old_pos < 2)  // delimiter has length of 1 two \n in a row has difference in positions of 1
+    if (pos == old_pos)
     {
-      end_address = end_address + start_address - 2;  // The -2 compensates the offset of the end_address
+      end_address = end_address + start_address - 1;  // The -1 compensates the offset of the end_address
       return sum;
     }
     end_address++;
     sum += std::stoi(token, nullptr, 16);  // State that we are looking at hexadecimal numbers
-    old_pos = pos + 1;                     // Make sure to check the position after the previous one
+    old_pos = pos + delimiter.length();    // Make sure to check the position after the previous one
   }
   throw error::HardwareException(error::ErrorType::INVALID_SW_STRING, "The .sw file has no delimiter of type %s",
                                  delimiter.c_str());
@@ -414,16 +413,16 @@ uint32_t IMotionCube::computeSWCheckSum(int& start_address, int& end_address)
 
 bool IMotionCube::verifySetup(SdoSlaveInterface& sdo)
 {
-  int start_address = 0, end_address = 0;
-  uint32_t sw_value = this->computeSWCheckSum(start_address, end_address);
+  uint16_t start_address = 0;
+  uint16_t end_address = 0;
+  const uint32_t sw_value = this->computeSWCheckSum(start_address, end_address);
   // set parameters to compute checksum on the imc
-  int checksum_setup = sdo.write<uint32_t>(0x2069, 0, (end_address << 16) + start_address);
+  const int checksum_setup = sdo.write<uint32_t>(0x2069, 0, (end_address << 16) | start_address);
 
-  uint32_t imc_value;
+  uint16_t imc_value;
   int value_size = sizeof(imc_value);
   // read computed checksum on imc
-  int check_sum_read = sdo.read<uint32_t>(0x206A, 0, value_size, imc_value);
-
+  const int check_sum_read = sdo.read<uint16_t>(0x206A, 0, value_size, imc_value);
   if (!(checksum_setup && check_sum_read))
   {
     throw error::HardwareException(error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
@@ -436,40 +435,38 @@ bool IMotionCube::verifySetup(SdoSlaveInterface& sdo)
 
 void IMotionCube::downloadSetupToDrive(SdoSlaveInterface& sdo)
 {
-  int mem_location;
-  uint32_t mem_setup = 9;  // send 16-bits and auto increment
   int result = 0;
   int final_result = 0;
-  uint32_t data;
 
   size_t pos = 0;
   size_t old_pos = 0;
-  std::string delimiter = "\n";
-  std::string token, next_token;
+  const std::string delimiter = "\n";
   while ((pos = sw_string_.find(delimiter, old_pos)) != std::string::npos)
   {
-    token = sw_string_.substr(old_pos, pos - old_pos);
+    const std::string token = sw_string_.substr(old_pos, pos - old_pos);
     if (old_pos == 0)
     {
-      mem_location = std::stoi(token, nullptr, 16) << 16;
-      result = sdo.write<uint32_t>(0x2064, 0, mem_location + mem_setup);  // write the write-configuration
+      const uint16_t mem_location = std::stoi(token, nullptr, 16);
+      const uint16_t mem_setup = 9;                                               // send 16-bits and auto increment
+      result = sdo.write<uint32_t>(0x2064, 0, (mem_location << 16) | mem_setup);  // write the write-configuration
       final_result |= result;
     }
     else
     {
-      if (pos - old_pos == delimiter.length())
+      if (pos == old_pos)
       {
         break;
       }
       else
       {
-        old_pos = pos + 1;
+        old_pos = pos + delimiter.length();
         pos = sw_string_.find(delimiter, old_pos);
-        next_token = sw_string_.substr(old_pos, pos - old_pos);
+        const std::string next_token = sw_string_.substr(old_pos, pos - old_pos);
 
-        if (pos - old_pos != delimiter.length())
+        uint32_t data = 0;
+        if (pos != old_pos)
         {
-          data = (std::stoi(next_token, nullptr, 16) << 16) + std::stoi(token, nullptr, 16);
+          data = (std::stoi(next_token, nullptr, 16) << 16) | std::stoi(token, nullptr, 16);
         }
         else
         {
@@ -479,7 +476,7 @@ void IMotionCube::downloadSetupToDrive(SdoSlaveInterface& sdo)
       }
     }
     final_result &= result;
-    old_pos = pos + 1;  // Make sure to check the position after the previous one
+    old_pos = pos + delimiter.length();  // Make sure to check the position after the previous one
   }
   if (final_result == 0)
   {
