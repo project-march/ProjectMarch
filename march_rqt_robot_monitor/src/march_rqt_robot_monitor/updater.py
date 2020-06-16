@@ -17,7 +17,7 @@ def main():
     updater.setHardwareID('MARCH IVc')
 
     # Frequency checks
-    # CheckTopicFrequency('Input_Device', '/march/input_device/alive', Time, updater, 5)
+    CheckTopicFrequency('Input_Device', '/march/input_device/alive', Time, updater, 5)
 
     # Temperature checks
     check_temp_joint_left_ankle = \
