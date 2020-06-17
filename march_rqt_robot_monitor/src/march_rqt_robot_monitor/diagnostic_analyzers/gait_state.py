@@ -10,30 +10,32 @@ class CheckGaitStatus(object):
 
         :type updater: diagnostic_updater.Updater
         """
-        self._updater = updater
-
         self._goal_sub = rospy.Subscriber('/march/gait/schedule/goal', GaitActionGoal, self._cb_goal)
+        self._goal_msg = None
+
+        self._updater = updater
+        self._updater.add('Gait', self._diagnostics)
 
     def _cb_goal(self, msg):
         """Callback for the gait scheduler goal.
 
         :param msg: GaitGoal
         """
-        diagnostic = self._diagnostics(msg.goal.name, msg.goal.current_subgait)
-        self._updater.add('(Sub)gait status', diagnostic)
+        self._goal_msg = msg
 
-    @staticmethod
-    def _diagnostics(name, subgait):
-        """Create a diagnostic function corresponding to gait and subgait data.
-
-        :param name: the gait name
-        :param subgait: the subgait object from the GaitGoal message
-        """
-        def d(stat):
-            stat.add('Gait type', subgait.gait_type)
-            stat.add('Subgait version', subgait.version)
-            stat.summary(DiagnosticStatus.OK, '{gait}, {subgait}'.format(gait=name, subgait=subgait.name))
-
+    def _diagnostics(self, stat):
+        """Create a diagnostic function corresponding to gait and subgait data."""
+        if self._goal_msg is None:
+            stat.add('Topic error', 'No events recorded')
+            stat.summary(DiagnosticStatus.STALE, 'No gait activity recorded')
             return stat
 
-        return d
+        stat.add('Gait', str(self._goal_msg.goal.name))
+        stat.add('Subgait', str(self._goal_msg.goal.current_subgait.name))
+        stat.add('Gait type', str(self._goal_msg.goal.current_subgait.gait_type))
+        stat.add('Subgait version', str(self._goal_msg.goal.current_subgait.version))
+
+        stat.summary(DiagnosticStatus.OK, 'Gait: {gait}, {subgait}'
+                     .format(gait=str(self._goal_msg.goal.name), subgait=str(self._goal_msg.goal.current_subgait.name)))
+
+        return stat
