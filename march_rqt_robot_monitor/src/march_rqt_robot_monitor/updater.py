@@ -21,35 +21,35 @@ def main():
 
     # Temperature checks
     check_temp_joint_left_ankle = \
-        CheckJointTemperature('Temperature left ankle', '/march/temperature/left_ankle', Temperature)
+        CheckJointTemperature('left_ankle', '/march/temperature/left_ankle', Temperature)
     updater.add('Temperature left ankle', check_temp_joint_left_ankle.diagnostics)
 
     check_temp_joint_left_knee = \
-        CheckJointTemperature('Temperature left knee', '/march/temperature/left_knee', Temperature)
+        CheckJointTemperature('left_knee', '/march/temperature/left_knee', Temperature)
     updater.add('Temperature left knee', check_temp_joint_left_knee.diagnostics)
 
     check_temp_joint_left_hip_fe = \
-        CheckJointTemperature('Temperature left hip FE', '/march/temperature/left_hip_fe', Temperature)
+        CheckJointTemperature('left_hip_fe', '/march/temperature/left_hip_fe', Temperature)
     updater.add('Temperature left hip FE', check_temp_joint_left_hip_fe.diagnostics)
 
     check_temp_joint_left_hip_aa = \
-        CheckJointTemperature('Temperature left hip AA', '/march/temperature/left_hip_aa', Temperature)
+        CheckJointTemperature('left_hip_aa', '/march/temperature/left_hip_aa', Temperature)
     updater.add('Temperature left hip AA', check_temp_joint_left_hip_aa.diagnostics)
 
     check_temp_joint_right_ankle = \
-        CheckJointTemperature('Temperature right ankle', '/march/temperature/right_ankle', Temperature)
+        CheckJointTemperature('right_ankle', '/march/temperature/right_ankle', Temperature)
     updater.add('Temperature right ankle', check_temp_joint_right_ankle.diagnostics)
 
     check_temp_joint_right_knee = \
-        CheckJointTemperature('Temperature right knee', '/march/temperature/right_knee', Temperature)
+        CheckJointTemperature('right_knee', '/march/temperature/right_knee', Temperature)
     updater.add('Temperature right knee', check_temp_joint_right_knee.diagnostics)
 
     check_temp_joint_right_hip_fe = \
-        CheckJointTemperature('Temperature right hip FE', '/march/temperature/right_hip_fe', Temperature)
+        CheckJointTemperature('right_hip_fe', '/march/temperature/right_hip_fe', Temperature)
     updater.add('Temperature right hip FE', check_temp_joint_right_hip_fe.diagnostics)
 
     check_temp_joint_right_hip_aa = \
-        CheckJointTemperature('Temperature right hip AA', '/march/temperature/right_hip_aa', Temperature)
+        CheckJointTemperature('right_hip_aa', '/march/temperature/right_hip_aa', Temperature)
     updater.add('Temperature right hip AA', check_temp_joint_right_hip_aa.diagnostics)
 
     # control checks
