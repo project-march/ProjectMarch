@@ -49,11 +49,13 @@ class CheckJointTemperature(object):
         stat.add('Fatal threshold', self._thresholds_fatal)
         stat.add('Current temperature', self._temperature)
 
-        if self._temperature < self._thresholds_warning:
+        if self._default_threshold is None:
+            stat.summary(DiagnosticStatus.WARN, 'No thresholds found')
+        elif self._temperature < self._thresholds_warning:
             stat.summary(DiagnosticStatus.OK, 'OK ({tp}).'.format(tp=self._temperature))
-        elif self._thresholds_warning < self._temperature < self._thresholds_non_fatal:
+        elif self._temperature < self._thresholds_non_fatal:
             stat.summary(DiagnosticStatus.WARN, 'Temperature almost too high ({tp}).'.format(tp=self._temperature))
         else:
-            stat.summary(DiagnosticStatus.ERROR, 'Temperature to high ({tp}).'.format(tp=self._temperature))
+            stat.summary(DiagnosticStatus.ERROR, 'Temperature too high ({tp}).'.format(tp=self._temperature))
 
         return stat
