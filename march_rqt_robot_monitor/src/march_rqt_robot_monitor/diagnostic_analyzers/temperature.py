@@ -1,7 +1,5 @@
-
 from diagnostic_msgs.msg import DiagnosticStatus
 import rospy
-
 
 LOWER_THRESHOLD_VALID_TEMPERATURE_VALUE = 0
 UPPER_THRESHOLD_VALID_TEMPERATURE_VALUE = 100
@@ -11,21 +9,24 @@ class CheckJointTemperature(object):
     """Base class to diagnose the joint temperatures."""
 
     def __init__(self, joint_name, topic, msg_type):
-        rospy.Subscriber(topic, msg_type, self.cb)
+        rospy.Subscriber(topic, msg_type, self._cb)
 
-        self._default_thresholds = \
-            rospy.get_param('safety_node/default_temperature_threshold', None)
+        self._default_threshold = \
+            rospy.get_param('/march/safety_node/default_temperature_threshold', None)
         self._thresholds_warning = \
-            rospy.get_param('safety_node/temperature_thresholds_warning/{jn}'.format(jn=joint_name), None)
+            rospy.get_param('/march/safety_node/temperature_thresholds_warning/{jn}'.format(jn=joint_name),
+                            self._default_threshold)
         self._thresholds_non_fatal = \
-            rospy.get_param('safety_node/temperature_thresholds_non_fatal/{jn}'.format(jn=joint_name), None)
+            rospy.get_param('/march/safety_node/temperature_thresholds_non_fatal/{jn}'.format(jn=joint_name),
+                            self._default_threshold)
         self._thresholds_fatal = \
-            rospy.get_param('safety_node/temperature_thresholds_fatal/{jn}'.format(jn=joint_name), None)
+            rospy.get_param('/march/safety_node/temperature_thresholds_fatal/{jn}'.format(jn=joint_name),
+                            self._default_threshold)
 
         self._timestamp = None
         self._temperature = None
 
-    def cb(self, msg):
+    def _cb(self, msg):
         """Save the latest published temperature with corresponding timestamp."""
         self._temperature = float(msg.temperature)
         self._timestamp = msg.header.stamp
@@ -42,7 +43,7 @@ class CheckJointTemperature(object):
             stat.summary(DiagnosticStatus.WARN, 'No valid temperature value ({tp}).'.format(tp=self._temperature))
             return stat
 
-        stat.add('Default threshold', self._default_thresholds)
+        stat.add('Default threshold', self._default_threshold)
         stat.add('Warning threshold', self._thresholds_warning)
         stat.add('Non fatal threshold', self._thresholds_non_fatal)
         stat.add('Fatal threshold', self._thresholds_fatal)
