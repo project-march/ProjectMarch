@@ -4,9 +4,14 @@
             RQT plugin to configure which version of gaits will be performed at runtime.
         </description>
         <qtgui>
+            <group>
+                <label>March</label>
+                <icon>resource/img/march-walking.png</icon>
+                <statustip>Plugins related to the March exoskeleton.</statustip>
+            </group>
             <label>March Gait Selection</label>
             <icon>resource/img/march-walking.png</icon>
-            <statustip>March IV Gait Selection</statustip>
+            <statustip>GUI to select gait versions for the March exoskeleton.</statustip>
         </qtgui>
     </class>
 </library>
