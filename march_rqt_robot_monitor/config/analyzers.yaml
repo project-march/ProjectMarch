@@ -21,8 +21,8 @@ analyzers:
     path: iMotioncubes
     contains: 'IMC'
     remove_prefix: 'march_rqt_robot_monitor_node: IMC '
-  Gait:
+  gait:
     type: diagnostic_aggregator/GenericAnalyzer
-    path: gait
+    path: Gait
     contains: 'gait'
     remove_prefix: 'march_rqt_robot_monitor_node: '

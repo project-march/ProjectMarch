@@ -1,5 +1,3 @@
-
-
 from diagnostic_msgs.msg import DiagnosticStatus
 import rospy
 
