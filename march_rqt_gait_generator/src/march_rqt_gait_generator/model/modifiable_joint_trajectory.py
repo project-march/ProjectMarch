@@ -17,7 +17,6 @@ class ModifiableJointTrajectory(JointTrajectory):
         self.gait_generator = gait_generator
 
         super(ModifiableJointTrajectory, self).__init__(name, limits, setpoints, duration)
-        self.interpolated_setpoints = self.interpolate_setpoints()
 
     @classmethod
     def from_dict(cls, subgait_dict, joint_name, limits, duration, gait_generator):
@@ -59,7 +58,7 @@ class ModifiableJointTrajectory(JointTrajectory):
     def set_setpoints(self, setpoints):
         self.setpoints = setpoints
         self.enforce_limits()
-        self.interpolated_setpoints = self.interpolate_setpoints()
+        [self.interpolated_position, self.interpolated_velocity] = self.interpolate_setpoints()
 
     @property
     def duration(self):
@@ -69,13 +68,6 @@ class ModifiableJointTrajectory(JointTrajectory):
     def duration(self, duration):
         self._duration = duration
         self.enforce_limits()
-
-    def get_interpolated_position(self, time):
-        for i in range(0, len(self.interpolated_setpoints[0])):
-            if self.interpolated_setpoints[0][i] > time:
-                return self.interpolated_setpoints[1][i]
-
-        return self.interpolated_setpoints[1][-1]
 
     def enforce_limits(self):
         self.setpoints[0].time = 0
@@ -103,13 +95,13 @@ class ModifiableJointTrajectory(JointTrajectory):
 
         self.setpoints.insert(new_index, setpoint)
         self.enforce_limits()
-        self.interpolated_setpoints = self.interpolate_setpoints()
+        [self.interpolated_position, self.interpolated_velocity] = self.interpolate_setpoints()
 
     def remove_setpoint(self, index):
         self.save_setpoints()
         del self.setpoints[index]
         self.enforce_limits()
-        self.interpolated_setpoints = self.interpolate_setpoints()
+        [self.interpolated_position, self.interpolated_velocity] = self.interpolate_setpoints()
 
     def save_setpoints(self, single_joint_change=True):
         self.setpoints_history.append(copy.deepcopy(self.setpoints))    # list(...) to copy instead of pointer
@@ -121,7 +113,7 @@ class ModifiableJointTrajectory(JointTrajectory):
         self.setpoints = list(reversed(self.setpoints))
         for setpoint in self.setpoints:
             setpoint.invert(self.duration)
-        self.interpolated_setpoints = self.interpolate_setpoints()
+        [self.interpolated_position, self.interpolated_velocity] = self.interpolate_setpoints()
 
     def undo(self):
         if not self.setpoints_history:
@@ -129,7 +121,7 @@ class ModifiableJointTrajectory(JointTrajectory):
 
         self.setpoints_redo_list.append(list(self.setpoints))
         self.setpoints = self.setpoints_history.pop()
-        self.interpolated_setpoints = self.interpolate_setpoints()
+        [self.interpolated_position, self.interpolated_velocity] = self.interpolate_setpoints()
 
     def redo(self):
         if not self.setpoints_redo_list:
@@ -137,4 +129,4 @@ class ModifiableJointTrajectory(JointTrajectory):
 
         self.setpoints_history.append(list(self.setpoints))
         self.setpoints = self.setpoints_redo_list.pop()
-        self.interpolated_setpoints = self.interpolate_setpoints()
+        [self.interpolated_position, self.interpolated_velocity] = self.interpolate_setpoints()

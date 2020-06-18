@@ -64,19 +64,6 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
         self.joint_trajectory.duration = self.duration * 2
         self.assertEqual(self.joint_trajectory.setpoints[-1].time, self.duration * 2)
 
-    # get_interpolated_position tests
-    def test_get_interpolated_position_below_zero(self):
-        interpolated_position = self.joint_trajectory.get_interpolated_position(-1)
-        self.assertEqual(interpolated_position, self.joint_trajectory.setpoints[0].position)
-
-    def test_get_interpolated_position_above_duration(self):
-        interpolated_position = self.joint_trajectory.get_interpolated_position(self.duration + 1)
-        self.assertEqual(interpolated_position, self.joint_trajectory.setpoints[-1].position)
-
-    def test_get_interpolated_position_middle(self):
-        interpolated_position = self.joint_trajectory.get_interpolated_position(self.duration * 0.5)
-        self.assertTrue(abs(interpolated_position - self.joint_trajectory.setpoints[1].position) < 0.02)
-
     # add_setpoint tests
     def test_add_setpoint_existence_new_setpoint(self):
         new_setpoint = ModifiableSetpoint(0.5, self.limits.upper + 1, 0)
