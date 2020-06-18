@@ -6,7 +6,7 @@ import rospy
 from .gait_selection_pop_up import PopUpWindow
 
 
-AMOUNT_OF_AVAILABLE_SUBGAITS = 5
+AMOUNT_OF_AVAILABLE_SUBGAITS = 6
 
 
 class GaitSelectionView(QWidget):
