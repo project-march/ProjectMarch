@@ -6,6 +6,7 @@ from march_shared_resources.msg import Alive
 
 from .diagnostic_analyzers.check_input_device import CheckInputDevice
 from .diagnostic_analyzers.control import CheckJointValues
+from .diagnostic_analyzers.gait_state import CheckGaitStatus
 from .diagnostic_analyzers.imc_state import CheckImcStatus
 from .diagnostic_analyzers.temperature import CheckJointTemperature
 
@@ -58,7 +59,11 @@ def main():
     updater.add('Control velocity values', check_current_movement_values.velocity_diagnostics)
     updater.add('Control effort values', check_current_movement_values.effort_diagnostics)
 
+    # IMC state check
     CheckImcStatus(updater)
+
+    # Gait information
+    CheckGaitStatus(updater)
 
     updater.force_update()
 
