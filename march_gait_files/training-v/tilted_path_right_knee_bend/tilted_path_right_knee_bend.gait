@@ -1,0 +1,5 @@
+name: tilted_path_right_knee_bend
+
+graph:
+  from_subgait: [start, right_open]
+  to_subgait:   [right_open, end]
