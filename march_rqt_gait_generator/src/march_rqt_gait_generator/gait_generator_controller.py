@@ -3,7 +3,9 @@ import os
 from numpy_ringbuffer import RingBuffer
 import rospy
 
+from .model.modifiable_subgait import ModifiableJointTrajectory
 from .model.modifiable_setpoint import ModifiableSetpoint
+from .side_subgait_controller import SideSubgaitController
 from .model.modifiable_subgait import ModifiableSubgait
 
 
@@ -23,9 +25,9 @@ class GaitGeneratorController(object):
         self.subgait = ModifiableSubgait.empty_subgait(self, self.robot)
         self.joint_changed_history = RingBuffer(capacity=100, dtype=list)
         self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
-        self._previous_subgait = None
-        self._next_subgait = None
-        self._standing = ModifiableSubgait.empty_subgait(self, self.robot)
+        standing = ModifiableSubgait.empty_subgait(self, self.robot)
+        self.previous_subgait_controller = SideSubgaitController(default=standing)
+        self.next_subgait_controller = SideSubgaitController(default=standing)
 
         self.connect_buttons()
         self.view.load_gait_into_ui(self.subgait)
@@ -39,9 +41,11 @@ class GaitGeneratorController(object):
         self.view.export_gait_button.clicked.connect(self.export_gait)
 
         self.view.import_previous_subgait_button.clicked.connect(lambda: self.import_side_subgait('previous'))
+        self.view.previous_is_standing_check_box.stateChanged.connect(self.toggle_standing_start)
         self.view.lock_startpoint_check_box.stateChanged.connect(self.toggle_lock_startpoint)
 
         self.view.import_next_subgait_button.clicked.connect(lambda: self.import_side_subgait('next'))
+        self.view.next_is_standing_check_box.stateChanged.connect(self.toggle_standing_end)
         self.view.lock_endpoint_check_box.stateChanged.connect(self.toggle_lock_endpoint)
 
         self.view.start_button.clicked.connect(self.start_time_slider_thread)
@@ -129,7 +133,7 @@ class GaitGeneratorController(object):
         joint_widget.Table.itemChanged.connect(
             lambda: [
                 joint.save_setpoints(),
-                self.save_changed_joints([joint]),
+                self.save_changed_joints({'joints': [joint]}),
                 joint.set_setpoints(joint_widget.Table.controller.to_setpoints()),
                 self.view.update_joint_widget(joint, update_table=False),
                 self.view.publish_preview(self.subgait, self.current_time),
@@ -184,7 +188,7 @@ class GaitGeneratorController(object):
 
         for joint in self.subgait.joints:
             joint.save_setpoints(single_joint_change=False)
-        self.save_changed_joints(self.subgait.joints)
+        self.save_changed_joints({'joints': [self.subgait.joints]})
 
         self.subgait.set_duration(duration, rescale_setpoints)
         self.view.time_slider.setRange(0, 100 * self.subgait.duration)
@@ -300,36 +304,54 @@ class GaitGeneratorController(object):
         for joint in self.subgait.joints:
             joint.invert()
             self.view.update_joint_widget(joint)
-        self.save_changed_joints(self.subgait.joints)
+        self.save_changed_joints({'joints': [self.subgait.joints]})
         self.view.publish_preview(self.subgait, self.current_time)
 
     def undo(self):
         if not self.joint_changed_history:
             return
 
-        joints = self.joint_changed_history.pop()
-        for joint in joints:
-            joint.undo()
-        self.subgait.set_duration(joints[0].setpoints[-1].time)
-        self.view.set_duration_spinbox(self.subgait.duration)
+        changed_dict = self.joint_changed_history.pop()
 
-        self.joint_changed_redo_list.append(joints)
-        self.view.update_joint_widgets(joints)
+        if changed_dict.has_key('joints'):
+            joints = changed_dict['joints']
+            for joint in joints:
+                joint.undo()
+            self.subgait.set_duration(joints[0].setpoints[-1].time)
+            self.view.set_duration_spinbox(self.subgait.duration)
+
+        if changed_dict.has_key('side_subgaits'):
+            side_subgait_controllers = changed_dict['side_subgaits']
+            for controller in side_subgait_controllers:
+                controller.undo()
+            self.view.update_side_subgait_widgets(self.previous_subgait_controller, self.next_subgait_controller)
+
+        self.view.update_joint_widgets(self.subgait.joints)
         self.view.publish_preview(self.subgait, self.current_time)
+        self.joint_changed_redo_list.append(changed_dict)
 
     def redo(self):
         if not self.joint_changed_redo_list:
             return
 
-        joints = self.joint_changed_redo_list.pop()
-        for joint in joints:
-            joint.redo()
-        self.subgait.set_duration(joints[0].setpoints[-1].time)
-        self.view.set_duration_spinbox(self.subgait.duration)
+        changed_dict = self.joint_changed_redo_list.pop()
 
-        self.joint_changed_history.append(joints)
-        self.view.update_joint_widgets(joints)
+        if changed_dict.has_key('joints'):
+            joints = changed_dict['joints']
+            for joint in joints:
+                joint.redo()
+            self.subgait.set_duration(joints[0].setpoints[-1].time)
+            self.view.set_duration_spinbox(self.subgait.duration)
+
+        if changed_dict.has_key('side_subgaits'):
+            side_subgait_controllers = changed_dict['side_subgaits']
+            for controller in side_subgait_controllers:
+                controller.redo()
+            self.view.update_side_subgait_widgets(self.previous_subgait_controller, self.next_subgait_controller)
+
+        self.view.update_joint_widgets(self.subgait.joints)
         self.view.publish_preview(self.subgait, self.current_time)
+        self.joint_changed_history.append(changed_dict)
 
     # Needed for undo and redo.
     def save_changed_joints(self, joints):
@@ -337,34 +359,78 @@ class GaitGeneratorController(object):
         self.joint_changed_redo_list = RingBuffer(capacity=100, dtype=list)
 
     # Functions related to previous/next subgait
+    def toggle_standing_start(self, value):
+        self.save_changed_joints({'joints': self.subgait.joints, 'side_subgaits': [self.previous_subgait_controller]})
+        for joint in self.subgait.joints:
+            joint.save_setpoints(single_joint_change=False)
+        self.previous_subgait_controller.default_checked = value
+        self.handle_startpoint_lock()
+
+    def toggle_standing_end(self, value):
+        self.save_changed_joints({'joints': self.subgait.joints, 'side_subgaits': [self.next_subgait_controller]})
+        for joint in self.subgait.joints:
+            joint.save_setpoints(single_joint_change=False)
+        self.next_subgait_controller.default_checked = value
+        self.handle_endpoint_lock()
+
     def toggle_lock_startpoint(self, value):
-        if value and self.previous_subgait is not None:
-            rospy.loginfo('Lock that start to ' + self.previous_subgait.version)
+        self.save_changed_joints({'joints': self.subgait.joints, 'side_subgaits': [self.previous_subgait_controller]})
+        for joint in self.subgait.joints:
+            joint.save_setpoints(single_joint_change=False)
+        self.previous_subgait_controller.lock_checked = value
+        self.handle_startpoint_lock()
 
     def toggle_lock_endpoint(self, value):
-        if value and self.next_subgait is not None:
-            rospy.loginfo('Lock that end to ' + self.next_subgait.version)
+        self.save_changed_joints({'joints': self.subgait.joints, 'side_subgaits': [self.next_subgait_controller]})
+        for joint in self.subgait.joints:
+            joint.save_setpoints(single_joint_change=False)
+        self.next_subgait_controller.lock_checked = value
+        self.handle_endpoint_lock()
+
+    def handle_startpoint_lock(self):
+        if self.previous_subgait_controller.lock_checked and self.previous_subgait is not None:
+            for joint, previous_joint in zip(self.subgait.joints, self.previous_subgait.joints):
+                joint.start_point = previous_joint.setpoints[-1]
+        else:
+            for joint in self.subgait.joints:
+                joint.start_point = None
+
+        self.view.update_joint_widgets(self.subgait.joints)
+        self.view.publish_preview(self.subgait, self.current_time)
+
+    def handle_endpoint_lock(self):
+        if self.next_subgait_controller.lock_checked and self.next_subgait is not None:
+            for joint, next_joint in zip(self.subgait.joints, self.next_subgait.joints):
+                joint.end_point = next_joint.setpoints[0]
+        else:
+            for joint in self.subgait.joints:
+                joint.end_point = None
+
+        self.view.update_joint_widgets(self.subgait.joints)
+        self.view.publish_preview(self.subgait, self.current_time)
 
     @property
     def previous_subgait(self):
-        if self.view.previous_is_standing_check_box.isChecked():
-            return self._standing
-        else:
-            return self._previous_subgait
+        return self.previous_subgait_controller.subgait
 
     @previous_subgait.setter
     def previous_subgait(self, new_subgait):
-        self.view.import_previous_subgait_button.setText(new_subgait.version)
-        self._previous_subgait = new_subgait
+        self.save_changed_joints({'joints': self.subgait.joints, 'side_subgaits': [self.previous_subgait_controller]})
+        for joint in self.subgait.joints:
+            joint.save_setpoints(single_joint_change=False)
+        self.previous_subgait_controller.subgait = new_subgait
+        self.handle_endpoint_lock()
+        self.view.import_previous_subgait_button.setText(self.previous_subgait_controller.subgait_text)
 
     @property
     def next_subgait(self):
-        if self.view.next_is_standing_check_box.isChecked():
-            return self._standing
-        else:
-            return self._next_subgait
+        return self.next_subgait_controller.subgait
 
     @next_subgait.setter
     def next_subgait(self, new_subgait):
-        self.view.import_next_subgait_button.setText(new_subgait.version)
-        self._next_subgait = new_subgait
+        self.save_changed_joints({'joints': self.subgait.joints, 'side_subgaits': [self.next_subgait_controller]})
+        for joint in self.subgait.joints:
+            joint.save_setpoints(single_joint_change=False)
+        self.next_subgait_controller.subgait = new_subgait
+        self.handle_endpoint_lock()
+        self.view.import_next_subgait_button.setText(self.next_subgait_controller.subgait_text)

@@ -173,3 +173,37 @@ class ModifiableSubgait(Subgait):
             joint.duration = duration
 
         self.duration = duration
+
+    def set_previous_subgait(self, previous_subgait):
+        if previous_subgait:
+            for joint, previous_joint in zip(self.joints, previous_subgait.joints):
+                joint.start_point = previous_joint.setpoints[-1]
+        else:
+            for joint in self.joints:
+                joint.start_point = None
+
+    def set_next_subgait(self, next_subgait):
+        if next_subgait:
+            for joint, next_joint in zip(self.joints, next_subgait.joints):
+                joint.end_point = next_joint.setpoints[0]
+        else:
+            for joint in self.joints:
+                joint.end_point = None
+
+    @property
+    def previous_subgait(self):
+        return self._previous_subgait
+
+    @previous_subgait.setter
+    def previous_subgait(self, new_subgait):
+        self.view.import_previous_subgait_button.setText(new_subgait.version)
+        self._previous_subgait = new_subgait
+
+    @property
+    def next_subgait(self):
+        return self._next_subgait
+
+    @next_subgait.setter
+    def next_subgait(self, new_subgait):
+        self.view.import_next_subgait_button.setText(new_subgait.version)
+        self._next_subgait = new_subgait

@@ -16,6 +16,9 @@ class ModifiableJointTrajectory(JointTrajectory):
         self.setpoints_redo_list = RingBuffer(capacity=100, dtype=list)
         self.gait_generator = gait_generator
 
+        self._start_point = None
+        self._end_point = None
+
         super(ModifiableJointTrajectory, self).__init__(name, limits, setpoints, duration)
         self.interpolated_setpoints = self.interpolate_setpoints()
 
@@ -78,6 +81,10 @@ class ModifiableJointTrajectory(JointTrajectory):
         return self.interpolated_setpoints[1][-1]
 
     def enforce_limits(self):
+        if self.start_point:
+            self.setpoints[0] = self.start_point
+        if self.end_point:
+            self.setpoints[-1] = self.end_point
         self.setpoints[0].time = 0
         self.setpoints[-1].time = self.duration
 
@@ -112,9 +119,10 @@ class ModifiableJointTrajectory(JointTrajectory):
         self.interpolated_setpoints = self.interpolate_setpoints()
 
     def save_setpoints(self, single_joint_change=True):
-        self.setpoints_history.append(copy.deepcopy(self.setpoints))    # list(...) to copy instead of pointer
+        self.setpoints_history.append({'setpoints': copy.deepcopy(self.setpoints), 'start_point': self.start_point,
+                                       'end_point': self.end_point})
         if single_joint_change:
-            self.gait_generator.save_changed_joints([self])
+            self.gait_generator.save_changed_joints({'joints': [self]})
 
     def invert(self):
         self.save_setpoints(single_joint_change=False)
@@ -124,17 +132,50 @@ class ModifiableJointTrajectory(JointTrajectory):
         self.interpolated_setpoints = self.interpolate_setpoints()
 
     def undo(self):
+
         if not self.setpoints_history:
             return
 
-        self.setpoints_redo_list.append(list(self.setpoints))
-        self.setpoints = self.setpoints_history.pop()
+        self.setpoints_redo_list.append({'setpoints': copy.deepcopy(self.setpoints), 'start_point': self.start_point,
+                                         'end_point': self.end_point})
+        setpoints = self.setpoints_history.pop()
+        self.setpoints = setpoints['setpoints']
+        self._start_point = setpoints['start_point']
+        self._end_point = setpoints['end_point']
         self.interpolated_setpoints = self.interpolate_setpoints()
+        self.enforce_limits()
 
     def redo(self):
         if not self.setpoints_redo_list:
             return
 
-        self.setpoints_history.append(list(self.setpoints))
-        self.setpoints = self.setpoints_redo_list.pop()
+        self.setpoints_history.append({'setpoints': copy.deepcopy(self.setpoints), 'start_point': self.start_point,
+                                       'end_point': self.end_point})
+        setpoints = self.setpoints_redo_list.pop()
+        self.setpoints = setpoints['setpoints']
+        self._start_point = setpoints['start_point']
+        self._end_point = setpoints['end_point']
         self.interpolated_setpoints = self.interpolate_setpoints()
+        self.enforce_limits()
+
+    @property
+    def start_point(self):
+        return self._start_point
+
+    @start_point.setter
+    def start_point(self, start_point):
+        self._start_point = start_point
+        if start_point:
+            self._start_point.time = 0
+        self.enforce_limits()
+
+    @property
+    def end_point(self):
+        return self._end_point
+
+    @end_point.setter
+    def end_point(self, end_point):
+        self._end_point = end_point
+        if end_point:
+            self._end_point.time = self.duration
+        self.enforce_limits()
