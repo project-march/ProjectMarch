@@ -4,9 +4,9 @@ from numpy_ringbuffer import RingBuffer
 import rospy
 
 from .model.modifiable_setpoint import ModifiableSetpoint
+from .model.modifiable_subgait import ModifiableSubgait
 from .side_subgait_controller import SideSubgaitController
 from .side_subgait_view import SideSubgaitView
-from .model.modifiable_subgait import ModifiableSubgait
 
 
 class GaitGeneratorController(object):
@@ -322,14 +322,14 @@ class GaitGeneratorController(object):
 
         changed_dict = self.settings_changed_history.pop()
 
-        if changed_dict.has_key('joints'):
+        if 'joints' in changed_dict:
             joints = changed_dict['joints']
             for joint in joints:
                 joint.undo()
             self.subgait.set_duration(joints[0].setpoints[-1].time)
             self.view.set_duration_spinbox(self.subgait.duration)
 
-        if changed_dict.has_key('side_subgaits'):
+        if 'side_subgaits' in changed_dict:
             side_subgait_controllers = changed_dict['side_subgaits']
             for controller in side_subgait_controllers:
                 controller.undo()
@@ -344,14 +344,14 @@ class GaitGeneratorController(object):
 
         changed_dict = self.settings_changed_redo_list.pop()
 
-        if changed_dict.has_key('joints'):
+        if 'joints' in changed_dict:
             joints = changed_dict['joints']
             for joint in joints:
                 joint.redo()
             self.subgait.set_duration(joints[0].setpoints[-1].time)
             self.view.set_duration_spinbox(self.subgait.duration)
 
-        if changed_dict.has_key('side_subgaits'):
+        if 'side_subgaits' in changed_dict:
             side_subgait_controllers = changed_dict['side_subgaits']
             for controller in side_subgait_controllers:
                 controller.redo()
@@ -366,13 +366,13 @@ class GaitGeneratorController(object):
         self.settings_changed_redo_list = RingBuffer(capacity=100, dtype=list)
 
     # Functions related to previous/next subgait
-    def toggle_side_subgait_checkbox(self, value, side_subgait_controller, side, type):
+    def toggle_side_subgait_checkbox(self, value, side_subgait_controller, side, box_type):
         self.save_changed_settings({'joints': self.subgait.joints, 'side_subgaits': [side_subgait_controller]})
         for joint in self.subgait.joints:
             joint.save_setpoints(single_joint_change=False)
-        if type == 'lock':
+        if box_type == 'lock':
             side_subgait_controller.lock_checked = value
-        elif type == 'standing':
+        elif box_type == 'standing':
             side_subgait_controller.default_checked = value
         self.handle_sidepoint_lock(side_subgait_controller, side)
 

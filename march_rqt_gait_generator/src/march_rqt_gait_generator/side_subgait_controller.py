@@ -69,4 +69,4 @@ class SideSubgaitController(object):
         if self._subgait:
             return self._subgait.version
         else:
-            return "Import"
+            return 'Import'
