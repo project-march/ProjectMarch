@@ -1,14 +1,13 @@
 from numpy_ringbuffer import RingBuffer
 
-from .model.modifiable_subgait import ModifiableSubgait
-
 
 class SideSubgaitController(object):
-    def __init__(self, default, lock_checked=False, default_checked=False, subgait=None):
+    def __init__(self, default, view, lock_checked=False, default_checked=False, subgait=None):
         self._lock_checked = lock_checked
         self._default_checked = default_checked
         self._subgait = subgait
         self._default = default
+        self.view = view
 
         self.settings_history = RingBuffer(capacity=100, dtype=list)
         self.settings_redo_list = RingBuffer(capacity=100, dtype=list)
@@ -20,6 +19,7 @@ class SideSubgaitController(object):
         self._lock_checked = settings['lock_checked']
         self._default_checked = settings['default_checked']
         self._subgait = settings['subgait']
+        self.view.update_widget(self)
 
     def redo(self):
         self.save_changed_settings()
@@ -27,6 +27,7 @@ class SideSubgaitController(object):
         self._lock_checked = settings['lock_checked']
         self._default_checked = settings['default_checked']
         self._subgait = settings['subgait']
+        self.view.update_widget(self)
 
     def save_changed_settings(self):
         self.settings_history.append({'lock_checked': self._lock_checked, 'default_checked': self._default_checked,
@@ -61,6 +62,7 @@ class SideSubgaitController(object):
     def subgait(self, subgait):
         self.save_changed_settings()
         self._subgait = subgait
+        self.view.update_widget(self)
 
     @property
     def subgait_text(self):

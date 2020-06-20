@@ -185,24 +185,6 @@ class GaitGeneratorView(QWidget):
         self.duration_spin_box.setValue(duration)
         self.duration_spin_box.blockSignals(False)
 
-    def update_side_subgait_widgets(self, previous_subgait_controller, next_subgait_controller):
-        self.import_previous_subgait_button.setText(previous_subgait_controller.subgait_text)
-        self.import_next_subgait_button.setText(next_subgait_controller.subgait_text)
-
-        self.previous_is_standing_check_box.blockSignals(True)
-        self.lock_startpoint_check_box.blockSignals(True)
-        self.previous_is_standing_check_box.setChecked(previous_subgait_controller.default_checked)
-        self.lock_startpoint_check_box.setChecked(previous_subgait_controller.lock_checked)
-        self.previous_is_standing_check_box.blockSignals(False)
-        self.lock_startpoint_check_box.blockSignals(False)
-
-        self.next_is_standing_check_box.blockSignals(True)
-        self.lock_endpoint_check_box.blockSignals(True)
-        self.next_is_standing_check_box.setChecked(next_subgait_controller.default_checked)
-        self.lock_endpoint_check_box.setChecked(next_subgait_controller.lock_checked)
-        self.next_is_standing_check_box.blockSignals(False)
-        self.lock_endpoint_check_box.blockSignals(False)
-
     @staticmethod
     def notify(title, message):
         subprocess.Popen(['notify-send', str(title), str(message)])

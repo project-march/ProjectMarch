@@ -122,7 +122,7 @@ class ModifiableJointTrajectory(JointTrajectory):
         self.setpoints_history.append({'setpoints': copy.deepcopy(self.setpoints), 'start_point': self.start_point,
                                        'end_point': self.end_point})
         if single_joint_change:
-            self.gait_generator.save_changed_joints({'joints': [self]})
+            self.gait_generator.save_changed_settings({'joints': [self]})
 
     def invert(self):
         self.save_setpoints(single_joint_change=False)
