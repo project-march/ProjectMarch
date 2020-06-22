@@ -16,6 +16,7 @@ class GaitGeneratorControllerTest(unittest.TestCase):
         self.gait_generator_view = Mock()
         self.gait_generator_view.topic_name_line_edit.text = Mock(return_value='/march/my_fancy_topic')
         self.gait_generator_view.joint_widgets.__getitem__ = Mock()
+        self.gait_generator_view.side_subgait_view.__getitem__ = Mock()
 
         self.robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
         self.gait_generator_controller = GaitGeneratorController(self.gait_generator_view, self.robot)
@@ -296,14 +297,14 @@ class GaitGeneratorControllerTest(unittest.TestCase):
     # save_changed_joints tests
     def test_save_changed_joints(self):
         joint = self.gait_generator_controller.subgait.joints[0]
-        self.gait_generator_controller.save_changed_joints([joint])
-        self.assertEqual(self.gait_generator_controller.joint_changed_history.pop()[0], joint)
+        self.gait_generator_controller.save_changed_settings({'joints': [joint]})
+        self.assertEqual(self.gait_generator_controller.settings_changed_history.pop()['joints'][0], joint)
 
     def test_save_changed_joints_reset_redo(self):
         joint = self.gait_generator_controller.subgait.joints[0]
-        self.gait_generator_controller.joint_changed_redo_list.append([joint])
-        self.gait_generator_controller.save_changed_joints([joint])
-        self.assertEqual(len(self.gait_generator_controller.joint_changed_redo_list), 0)
+        self.gait_generator_controller.settings_changed_redo_list.append({'joints': [joint]})
+        self.gait_generator_controller.save_changed_settings({'joints': [joint]})
+        self.assertEqual(len(self.gait_generator_controller.settings_changed_redo_list), 0)
 
     # undo tests
     def test_undo_no_history(self):
@@ -313,20 +314,21 @@ class GaitGeneratorControllerTest(unittest.TestCase):
     def test_undo_change(self):
         joint = self.gait_generator_controller.subgait.joints[0]
         joint.add_interpolated_setpoint(self.duration / 2.0)
-        self.gait_generator_controller.joint_changed_history.append([joint])
+        self.gait_generator_controller.settings_changed_history.append({'joints': [joint]})
         self.gait_generator_controller.undo()
         self.assertEqual(len(joint.setpoints), 2)
 
     def test_undo_publish_preview(self):
         joint = self.gait_generator_controller.subgait.joints[0]
         joint.add_interpolated_setpoint(self.duration / 2.0)
-        self.gait_generator_controller.joint_changed_history.append([joint])
+        self.gait_generator_controller.settings_changed_history.append([joint])
         self.gait_generator_controller.undo()
         self.gait_generator_view.publish_preview.assert_called_once()
 
     def test_undo_duration_changed(self):
         self.gait_generator_view.scale_setpoints_check_box.isChecked = Mock(return_value=False)
         self.gait_generator_controller.update_gait_duration(self.duration + 1)
+        print(self.gait_generator_controller.settings_changed_history)
         self.gait_generator_controller.undo()
         self.assertEqual(self.gait_generator_controller.subgait.duration, self.duration)
         self.gait_generator_view.set_duration_spinbox.assert_called_once_with(self.duration)
@@ -339,7 +341,7 @@ class GaitGeneratorControllerTest(unittest.TestCase):
     def test_redo(self):
         joint = self.gait_generator_controller.subgait.joints[0]
         joint.add_interpolated_setpoint(self.duration / 2.0)
-        self.gait_generator_controller.joint_changed_history.append([joint])
+        self.gait_generator_controller.settings_changed_history.append([joint])
         self.gait_generator_controller.undo()
         self.gait_generator_controller.redo()
         self.assertEqual(len(joint.setpoints), 3)
@@ -347,7 +349,7 @@ class GaitGeneratorControllerTest(unittest.TestCase):
     def test_redo_publish_preview(self):
         joint = self.gait_generator_controller.subgait.joints[0]
         joint.add_interpolated_setpoint(self.duration / 2.0)
-        self.gait_generator_controller.joint_changed_history.append([joint])
+        self.gait_generator_controller.settings_changed_history.append([joint])
         self.gait_generator_controller.undo()
         self.gait_generator_controller.redo()
         self.assertEqual(self.gait_generator_view.publish_preview.call_count, 2)

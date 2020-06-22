@@ -17,6 +17,7 @@ from tf import (ConnectivityException, ExtrapolationException, LookupException,
 
 from .joint_plot import JointPlot
 from .joint_table_controller import JointTableController
+from .side_subgait_view import SideSubgaitView
 from .time_slider_thread import TimeSliderThread
 
 
@@ -36,6 +37,10 @@ class GaitGeneratorView(QWidget):
         self.RvizFrame.layout().addWidget(self.rviz_frame, 1, 0, 1, 3)
 
         self.gait_type_combo_box.addItems(['walk_like', 'sit_like', 'stairs_like'])
+
+        previous_subgait_view = SideSubgaitView(widget=self.view.previous_subgait_container)
+        next_subgait_view = SideSubgaitView(widget=self.view.next_subgait_container)
+        self.side_subgait_view = {'previous': previous_subgait_view, 'next': next_subgait_view}
 
         self.initialize_shortcuts()
 

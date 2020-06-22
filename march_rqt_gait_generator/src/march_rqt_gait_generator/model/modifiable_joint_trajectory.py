@@ -132,7 +132,6 @@ class ModifiableJointTrajectory(JointTrajectory):
         self.interpolated_setpoints = self.interpolate_setpoints()
 
     def undo(self):
-
         if not self.setpoints_history:
             return
 
@@ -142,6 +141,7 @@ class ModifiableJointTrajectory(JointTrajectory):
         self.setpoints = setpoints['setpoints']
         self._start_point = setpoints['start_point']
         self._end_point = setpoints['end_point']
+        self._duration = self.setpoints[-1].time
         self.interpolated_setpoints = self.interpolate_setpoints()
         self.enforce_limits()
 
@@ -155,6 +155,7 @@ class ModifiableJointTrajectory(JointTrajectory):
         self.setpoints = setpoints['setpoints']
         self._start_point = setpoints['start_point']
         self._end_point = setpoints['end_point']
+        self._duration = self.setpoints[-1].time
         self.interpolated_setpoints = self.interpolate_setpoints()
         self.enforce_limits()
 
