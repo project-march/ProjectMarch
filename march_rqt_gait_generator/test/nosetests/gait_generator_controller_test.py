@@ -328,7 +328,6 @@ class GaitGeneratorControllerTest(unittest.TestCase):
     def test_undo_duration_changed(self):
         self.gait_generator_view.scale_setpoints_check_box.isChecked = Mock(return_value=False)
         self.gait_generator_controller.update_gait_duration(self.duration + 1)
-        print(self.gait_generator_controller.settings_changed_history)
         self.gait_generator_controller.undo()
         self.assertEqual(self.gait_generator_controller.subgait.duration, self.duration)
         self.gait_generator_view.set_duration_spinbox.assert_called_once_with(self.duration)
