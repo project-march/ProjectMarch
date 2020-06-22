@@ -360,3 +360,144 @@ class GaitGeneratorControllerTest(unittest.TestCase):
         self.gait_generator_controller.redo()
         self.assertEqual(self.gait_generator_controller.subgait.duration, self.duration + 1)
         self.assertEqual(self.gait_generator_view.set_duration_spinbox.call_count, 2)
+
+    # Side subgait tests
+    def test_import_previous_subgait(self):
+        self.gait_generator_view.open_file_dialogue = Mock(return_value=(self.subgait_path, None))
+
+        self.gait_generator_controller.import_side_subgait('previous')
+        self.assertEqual(self.gait_generator_controller.previous_subgait.subgait_name, 'left_swing')
+
+    def test_import_next_subgait(self):
+        self.gait_generator_view.open_file_dialogue = Mock(return_value=(self.subgait_path, None))
+
+        self.gait_generator_controller.import_side_subgait('next')
+        self.assertEqual(self.gait_generator_controller.next_subgait.subgait_name, 'left_swing')
+
+    def test_import_previous_subgait_lock_start(self):
+        self.gait_generator_view.open_file_dialogue = Mock(return_value=(self.subgait_path, None))
+
+        self.gait_generator_controller.import_side_subgait('previous')
+        self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'previous', 'lock')
+
+        previous_endpoints = [joint[-1] for joint in self.gait_generator_controller.previous_subgait.joints]
+        for setpoint in previous_endpoints:
+            setpoint.time = 0
+
+        self.assertEqual([joint[0] for joint in self.gait_generator_controller.subgait.joints], previous_endpoints)
+
+    def test_import_next_subgait_lock_end(self):
+        self.gait_generator_view.open_file_dialogue = Mock(return_value=(self.subgait_path, None))
+
+        self.gait_generator_controller.import_side_subgait('next')
+        self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'next', 'lock')
+
+        next_startpoints = [joint[0] for joint in self.gait_generator_controller.next_subgait.joints]
+        for setpoint in next_startpoints:
+            setpoint.time = self.duration
+
+        self.assertEqual([joint[-1] for joint in self.gait_generator_controller.subgait.joints], next_startpoints)
+
+    def test_locked_start_standing(self):
+        self.gait_generator_view.open_file_dialogue = Mock(return_value=(self.subgait_path, None))
+
+        self.gait_generator_controller.import_side_subgait('previous')
+        self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'previous', 'lock')
+        self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'previous', 'standing')
+
+        empty_subgait = ModifiableSubgait.empty_subgait(self, self.robot, duration=self.duration)
+        previous_endpoints = [joint[0] for joint in empty_subgait]
+
+        self.assertEqual([joint[0] for joint in self.gait_generator_controller.subgait.joints], previous_endpoints)
+
+    def test_locked_end_standing(self):
+        self.gait_generator_view.open_file_dialogue = Mock(return_value=(self.subgait_path, None))
+
+        self.gait_generator_controller.import_side_subgait('next')
+        self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'next', 'lock')
+        self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'next', 'standing')
+
+        empty_subgait = ModifiableSubgait.empty_subgait(self, self.robot, duration=self.duration)
+        next_startpoints = [joint[-1] for joint in empty_subgait]
+
+        self.assertEqual([joint[-1] for joint in self.gait_generator_controller.subgait.joints], next_startpoints)
+
+    def test_locked_start_undo_standing(self):
+        self.gait_generator_view.open_file_dialogue = Mock(return_value=(self.subgait_path, None))
+
+        self.gait_generator_controller.import_side_subgait('previous')
+        self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'previous', 'lock')
+        self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'previous', 'standing')
+        self.gait_generator_controller.undo()
+
+        previous_endpoints = [joint[-1] for joint in self.gait_generator_controller.previous_subgait.joints]
+        for setpoint in previous_endpoints:
+            setpoint.time = 0
+
+        self.assertEqual([joint[0] for joint in self.gait_generator_controller.subgait.joints], previous_endpoints)
+
+    def test_locked_end_undo_standing(self):
+        self.gait_generator_view.open_file_dialogue = Mock(return_value=(self.subgait_path, None))
+
+        self.gait_generator_controller.import_side_subgait('next')
+        self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'next', 'lock')
+        self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'next', 'standing')
+        self.gait_generator_controller.undo()
+
+        next_startpoints = [joint[0] for joint in self.gait_generator_controller.next_subgait.joints]
+        for setpoint in next_startpoints:
+            setpoint.time = self.duration
+
+        self.assertEqual([joint[-1] for joint in self.gait_generator_controller.subgait.joints], next_startpoints)
+
+    def test_undo_lock_start_standing(self):
+        self.gait_generator_view.open_file_dialogue = Mock(return_value=(self.subgait_path, None))
+
+        self.gait_generator_controller.import_side_subgait('previous')
+        self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'previous', 'lock')
+        self.gait_generator_controller.undo()
+
+        empty_subgait = ModifiableSubgait.empty_subgait(self, self.robot, duration=self.duration)
+        previous_endpoints = [joint[0] for joint in empty_subgait]
+
+        self.assertEqual([joint[0] for joint in self.gait_generator_controller.subgait.joints], previous_endpoints)
+
+    def test_undo_lock_end_standing(self):
+        self.gait_generator_view.open_file_dialogue = Mock(return_value=(self.subgait_path, None))
+
+        self.gait_generator_controller.import_side_subgait('next')
+        self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'next', 'lock')
+        self.gait_generator_controller.undo()
+
+        empty_subgait = ModifiableSubgait.empty_subgait(self, self.robot, duration=self.duration)
+        next_startpoints = [joint[-1] for joint in empty_subgait]
+
+        self.assertEqual([joint[-1] for joint in self.gait_generator_controller.subgait.joints], next_startpoints)
+
+    def test_redo_lock_start_standing(self):
+        self.gait_generator_view.open_file_dialogue = Mock(return_value=(self.subgait_path, None))
+
+        self.gait_generator_controller.import_side_subgait('previous')
+        self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'previous', 'lock')
+        self.gait_generator_controller.undo()
+        self.gait_generator_controller.redo()
+
+        previous_endpoints = [joint[-1] for joint in self.gait_generator_controller.previous_subgait.joints]
+        for setpoint in previous_endpoints:
+            setpoint.time = 0
+
+        self.assertEqual([joint[0] for joint in self.gait_generator_controller.subgait.joints], previous_endpoints)
+
+    def test_redo_lock_end_standing(self):
+        self.gait_generator_view.open_file_dialogue = Mock(return_value=(self.subgait_path, None))
+
+        self.gait_generator_controller.import_side_subgait('next')
+        self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'next', 'lock')
+        self.gait_generator_controller.undo()
+        self.gait_generator_controller.redo()
+
+        next_startpoints = [joint[0] for joint in self.gait_generator_controller.next_subgait.joints]
+        for setpoint in next_startpoints:
+            setpoint.time = self.duration
+
+        self.assertEqual([joint[-1] for joint in self.gait_generator_controller.subgait.joints], next_startpoints)

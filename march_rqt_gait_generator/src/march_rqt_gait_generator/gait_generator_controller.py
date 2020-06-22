@@ -353,20 +353,20 @@ class GaitGeneratorController(object):
         self.settings_changed_history.append(changed_dict)
 
     # Needed for undo and redo.
-    def save_changed_settings(self, joints):
-        self.settings_changed_history.append(joints)
+    def save_changed_settings(self, settings):
+        self.settings_changed_history.append(settings)
         self.settings_changed_redo_list = RingBuffer(capacity=100, dtype=list)
 
     # Functions related to previous/next subgait
     def toggle_side_subgait_checkbox(self, value, side, box_type):
         self.save_changed_settings({'joints': self.subgait.joints,
-                                    'side_subgaits': [self.side_subgait_controller['side']]})
+                                    'side_subgaits': [self.side_subgait_controller[side]]})
         for joint in self.subgait.joints:
             joint.save_setpoints(single_joint_change=False)
         if box_type == 'lock':
-            self.side_subgait_controller['side'].lock_checked = value
+            self.side_subgait_controller[side].lock_checked = value
         elif box_type == 'standing':
-            self.side_subgait_controller['side'].default_checked = value
+            self.side_subgait_controller[side].default_checked = value
         self.handle_sidepoint_lock(side)
 
     def handle_sidepoint_lock(self, side):
