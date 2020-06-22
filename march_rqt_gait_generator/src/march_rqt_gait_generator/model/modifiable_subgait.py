@@ -11,14 +11,6 @@ class ModifiableSubgait(Subgait):
 
     joint_class = ModifiableJointTrajectory
 
-    def __init__(self, joints, duration,
-                 gait_type='walk_like', gait_name='test_gait',
-                 subgait_name='test_subgait', version='test_subgait_1',
-                 description='Just a simple gait'):
-
-        super(ModifiableSubgait, self).__init__(joints, duration, gait_type, gait_name,
-                                                subgait_name, version, description)
-
     @classmethod
     def empty_subgait(cls, gait_generator, robot, duration=8):
         """Create an empty subgait object using the joint defined in the URDF.
@@ -59,7 +51,8 @@ class ModifiableSubgait(Subgait):
 
             joint_list.append(joint)
 
-        return cls(joint_list, duration)
+        return cls(joint_list, duration, gait_type='walk_like', gait_name='test_gait', subgait_name='test_subgait',
+                   version='test_subgait_1', description='Just a simple gait')
 
     def has_multiple_setpoints_before_duration(self, duration):
         """Check if all setpoints are before a given duration."""
