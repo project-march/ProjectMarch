@@ -1,4 +1,4 @@
-name: !!python/unicode "right_swing"
+name: "right_swing"
 version: "MV_walk_rightswing_v4a"
 description: "The same right swing gait as the previous version, but then with moving ankles as\
   \ well."
