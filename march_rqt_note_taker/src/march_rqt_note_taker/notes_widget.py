@@ -12,11 +12,12 @@ class NotesWidget(QWidget):
         super(NotesWidget, self).__init__()
 
         self._model = model
+        self._can_save = True
 
         loadUi(ui_file, self)
 
-        self._model.rowsInserted.connect(self.update_status)
-        self._model.rowsRemoved.connect(self.update_status)
+        self._model.rowsInserted.connect(lambda: [self.update_status(), self._set_saved(False)])
+        self._model.rowsRemoved.connect(lambda: [self.update_status(), self._set_saved(False)])
 
         self.table_view.setModel(self._model)
         self.table_view.verticalScrollBar().rangeChanged.connect(self._handle_change_scroll)
@@ -66,6 +67,10 @@ class NotesWidget(QWidget):
             if indices and indices[0].isValid():
                 self._model.remove_rows(indices[0].row(), len(indices))
 
+    def _set_saved(self, saved):
+        self._can_save = not saved
+        self.save_button.setEnabled(not saved)
+
     def _handle_load(self):
         rospy.logwarn('Loading notes from a file is not yet implemented')
 
@@ -83,3 +88,4 @@ class NotesWidget(QWidget):
                 return
             else:
                 rospy.loginfo('Successfully written to file {0}'.format(file_name))
+                self._set_saved(True)
