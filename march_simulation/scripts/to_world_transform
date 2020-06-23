@@ -22,7 +22,8 @@ world_properties_request = GetWorldPropertiesRequest()
 model = GetModelStateRequest()
 model.model_name = model_name
 
-rate = rospy.Rate(10)
+# set this rate equal to the rate of the joint state publisher, such that the TF frames are updated at the same rate.
+rate = rospy.Rate(50)
 
 while not rospy.is_shutdown() and model_name not in get_world_properties(world_properties_request).model_names:
     try:
