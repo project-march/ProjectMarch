@@ -90,13 +90,13 @@ class ModifiableSubgaitTest(unittest.TestCase):
         self.subgait.get_joint('right_ankle').add_setpoint(extra_setpoint)
         self.subgait.get_joint('left_ankle').add_setpoint(extra_setpoint)
         self.subgait.get_joint('right_hip_fe').add_setpoint(extra_setpoint)
-        self.subgait.set_duration(0.8, False)
+        self.subgait.scale_timestamps_subgait(0.8, False)
         self.assertEqual(len(self.subgait.get_joint('left_knee').setpoints), 2)
         self.assertEqual(self.subgait.duration, 0.8)
         self.assertEqual([joint.duration for joint in self.subgait.joints], [0.8] * 8)
 
     def test_set_duration_no_rescale_longer(self):
-        self.subgait.set_duration(1.8, False)
+        self.subgait.scale_timestamps_subgait(1.8, False)
         self.assertEqual(self.subgait.duration, 1.8)
         self.assertEqual([joint.duration for joint in self.subgait.joints], [1.8] * 8)
 
@@ -104,7 +104,7 @@ class ModifiableSubgaitTest(unittest.TestCase):
         test_setpoint = copy.deepcopy(self.subgait.get_joint('left_knee').setpoints[2])
         test_setpoint.time = test_setpoint.time * 2
         new_duration = self.subgait.duration * 2
-        self.subgait.set_duration(new_duration, True)
+        self.subgait.scale_timestamps_subgait(new_duration, True)
         self.assertEqual(self.subgait.get_joint('left_knee').setpoints[2], test_setpoint)
         self.assertEqual(self.subgait.duration, new_duration)
         self.assertEqual([joint.duration for joint in self.subgait.joints], [new_duration] * 8)
@@ -113,7 +113,7 @@ class ModifiableSubgaitTest(unittest.TestCase):
         test_setpoint = copy.deepcopy(self.subgait.get_joint('left_knee').setpoints[2])
         test_setpoint.time = test_setpoint.time * 2
         new_duration = self.subgait.duration * 2
-        self.subgait.set_duration(new_duration, True)
+        self.subgait.scale_timestamps_subgait(new_duration, True)
         self.assertEqual(self.subgait.get_joint('left_knee').setpoints[2], test_setpoint)
         self.assertEqual(self.subgait.duration, new_duration)
         self.assertEqual([joint.duration for joint in self.subgait.joints], [new_duration] * 8)
