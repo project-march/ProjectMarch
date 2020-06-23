@@ -19,7 +19,7 @@ class ModifiableJointTrajectory(JointTrajectory):
         super(ModifiableJointTrajectory, self).__init__(name, limits, setpoints, duration)
 
     @classmethod
-    def from_dict(cls, subgait_dict, joint_name, limits, duratiointerpolate_setpointsn, gait_generator):
+    def from_dict(cls, subgait_dict, joint_name, limits, duration, gait_generator):
         user_defined_setpoints = subgait_dict.get('setpoints')
         if user_defined_setpoints:
             joint_trajectory_dict = subgait_dict['trajectory']
