@@ -1,4 +1,4 @@
-from python_qt_binding import loadUi
+from python_qt_binding import loadUi, QtCore
 from python_qt_binding.QtGui import QKeySequence
 from python_qt_binding.QtWidgets import QFileDialog, QShortcut, QWidget
 import rospy
@@ -13,6 +13,7 @@ class NotesWidget(QWidget):
 
         self._model = model
         self._can_save = True
+        self._has_autosave = True
 
         loadUi(ui_file, self)
 
@@ -29,6 +30,8 @@ class NotesWidget(QWidget):
 
         self.load_button.clicked.connect(self._handle_load)
         self.save_button.clicked.connect(self._handle_save)
+        self.autosave_check_box.stateChanged.connect(self._handle_autosave)
+        self.autosave_check_box.setChecked(self._has_autosave)
 
         self._delete_shortcut = QShortcut(QKeySequence('Delete'), self)
         self._delete_shortcut.activated.connect(self._delete_selected)
@@ -89,3 +92,6 @@ class NotesWidget(QWidget):
             else:
                 rospy.loginfo('Successfully written to file {0}'.format(file_name))
                 self._set_saved(True)
+
+    def _handle_autosave(self, state):
+        self._has_autosave = state == QtCore.Qt.Checked

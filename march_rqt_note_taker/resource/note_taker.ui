@@ -56,6 +56,16 @@
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="autosave_check_box">
+       <property name="text">
+        <string>Autosave</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontal_spacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
