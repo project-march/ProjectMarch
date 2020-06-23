@@ -42,12 +42,17 @@ class GaitGeneratorController(object):
         self.view.import_gait_button.clicked.connect(self.import_gait)
         self.view.export_gait_button.clicked.connect(self.export_gait)
 
-        for side in self.side_subgait_controller.keys():
-            self.view.side_subgait_view[side].import_button.clicked.connect(lambda: self.import_side_subgait(side))
-            self.view.side_subgait_view[side].default_checkbox.stateChanged.connect(
-                lambda value: self.toggle_side_subgait_checkbox(value, side, 'standing'))
-            self.view.side_subgait_view[side].lock_checkbox.stateChanged.connect(
-                lambda value: self.toggle_side_subgait_checkbox(value, side, 'lock'))
+        self.view.side_subgait_view['previous'].import_button.clicked.connect(lambda: self.import_side_subgait('previous'))
+        self.view.side_subgait_view['previous'].default_checkbox.stateChanged.connect(
+            lambda value: self.toggle_side_subgait_checkbox(value, 'previous', 'standing'))
+        self.view.side_subgait_view['previous'].lock_checkbox.stateChanged.connect(
+            lambda value: self.toggle_side_subgait_checkbox(value, 'previous', 'lock'))
+
+        self.view.side_subgait_view['next'].import_button.clicked.connect(lambda: self.import_side_subgait('next'))
+        self.view.side_subgait_view['next'].default_checkbox.stateChanged.connect(
+            lambda value: self.toggle_side_subgait_checkbox(value, 'next', 'standing'))
+        self.view.side_subgait_view['next'].lock_checkbox.stateChanged.connect(
+            lambda value: self.toggle_side_subgait_checkbox(value, 'next', 'lock'))
 
         self.view.start_button.clicked.connect(self.start_time_slider_thread)
         self.view.stop_button.clicked.connect(self.stop_time_slider_thread)
