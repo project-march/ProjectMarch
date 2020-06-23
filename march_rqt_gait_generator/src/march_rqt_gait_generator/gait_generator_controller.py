@@ -42,13 +42,15 @@ class GaitGeneratorController(object):
         self.view.import_gait_button.clicked.connect(self.import_gait)
         self.view.export_gait_button.clicked.connect(self.export_gait)
 
-        self.view.side_subgait_view['previous'].import_button.clicked.connect(lambda: self.import_side_subgait('previous'))
+        self.view.side_subgait_view['previous'].import_button.clicked.connect(
+            lambda: self.import_side_subgait('previous'))
         self.view.side_subgait_view['previous'].default_checkbox.stateChanged.connect(
             lambda value: self.toggle_side_subgait_checkbox(value, 'previous', 'standing'))
         self.view.side_subgait_view['previous'].lock_checkbox.stateChanged.connect(
             lambda value: self.toggle_side_subgait_checkbox(value, 'previous', 'lock'))
 
-        self.view.side_subgait_view['next'].import_button.clicked.connect(lambda: self.import_side_subgait('next'))
+        self.view.side_subgait_view['next'].import_button.clicked.connect(
+            lambda: self.import_side_subgait('next'))
         self.view.side_subgait_view['next'].default_checkbox.stateChanged.connect(
             lambda value: self.toggle_side_subgait_checkbox(value, 'next', 'standing'))
         self.view.side_subgait_view['next'].lock_checkbox.stateChanged.connect(
