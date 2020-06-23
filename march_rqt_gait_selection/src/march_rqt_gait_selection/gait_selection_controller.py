@@ -5,6 +5,8 @@ from std_srvs.srv import Trigger
 
 from march_shared_resources.srv import SetGaitVersion
 
+from .gait_selection_errors import GaitServiceError, InvalidResponseError
+
 
 class GaitSelectionController(object):
     def __init__(self):
@@ -19,15 +21,19 @@ class GaitSelectionController(object):
         """Get the gait version map used in the gait selection node."""
         try:
             return dict(ast.literal_eval(self._get_version_map().message))
-        except (ValueError, rospy.ServiceException):
-            return dict()
+        except ValueError:
+            raise InvalidResponseError
+        except rospy.ServiceException:
+            raise GaitServiceError
 
     def get_directory_structure(self):
         """Get the gait directory of the selected gait_directory in the gait selection node."""
         try:
             return dict(ast.literal_eval(self._get_directory_structure().message))
-        except (ValueError, rospy.ServiceException):
-            return dict()
+        except ValueError:
+            raise InvalidResponseError
+        except rospy.ServiceException:
+            raise GaitServiceError
 
     def set_gait_version(self, gait_name, subgait_names, versions):
         """Set a new gait version map to use in the gait selection node.
@@ -38,16 +44,14 @@ class GaitSelectionController(object):
         """
         try:
             result = self._set_gait_version(gait_name, subgait_names, versions)
-            if result.message:
-                rospy.logwarn(result.message)
-            return result.success
+            return result.success, result.message
         except rospy.ServiceException:
-            return False
+            raise GaitServiceError
 
     def set_default_versions(self):
         """Save the current gait version map in the gait selection node as a default."""
         try:
             result = self._set_default_versions()
-            return result.success
+            return result.success, result.message
         except rospy.ServiceException:
-            return False
+            raise GaitServiceError

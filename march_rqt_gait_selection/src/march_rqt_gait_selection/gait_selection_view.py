@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QWidget
 from python_qt_binding import loadUi
 import rospy
 
+from .gait_selection_errors import GaitSelectionError
 from .gait_selection_pop_up import PopUpWindow
 
 
@@ -134,13 +135,17 @@ class GaitSelectionView(QWidget):
         self._is_refresh_active = True
         self._clear_gui(clear_gait_menu=True)
 
-        self.available_gaits = self._controller.get_directory_structure()
-        self.version_map = self._controller.get_version_map()
+        try:
+            self.available_gaits = self._controller.get_directory_structure()
+            self.version_map = self._controller.get_version_map()
 
-        self._gait_menu.addItems(sorted(self.available_gaits.keys()))
+            self._gait_menu.addItems(sorted(self.available_gaits.keys()))
 
-        self._log('Directory data refreshed', 'success')
-        self._is_refresh_active = False
+            self._log('Directory data refreshed', 'success')
+        except GaitSelectionError as e:
+            self._log(str(e), 'error')
+        finally:
+            self._is_refresh_active = False
 
     # logger
     def _log(self, msg, color_tag='info'):
@@ -179,10 +184,14 @@ class GaitSelectionView(QWidget):
 
     def _save_default(self):
         """Save the currently selected subgait versions as default values."""
-        if self._controller.set_default_versions():
-            self._log('Set new default versions', 'success')
-        else:
-            self._log('Set new default versions failed', 'error')
+        try:
+            success, msg = self._controller.set_default_versions()
+            if success:
+                self._log(msg if msg else 'Set new default versions', 'success')
+            else:
+                self._log(msg if msg else 'Failed to set default versions', 'error')
+        except GaitSelectionError as e:
+            self._log(str(e), 'error')
 
     def _apply(self):
         """Apply newly selected subgait versions to the gait selection node."""
@@ -195,16 +204,24 @@ class GaitSelectionView(QWidget):
                 subgait_names.append(subgait_label.text())
                 versions.append(subgait_menu.currentText())
 
-        if self._controller.set_gait_version(gait_name, subgait_names, versions):
-            self._log('Version change applied', 'success')
-        else:
-            self._log('Version change applied failed', 'failed')
+        try:
+            success, msg = self._controller.set_gait_version(gait_name, subgait_names, versions)
+            if success:
+                self._log(msg if msg else 'Version change applied', 'success')
+            else:
+                self._log(msg if msg else 'Version change applied failed', 'failed')
+        except GaitSelectionError as e:
+            self._log(str(e), 'error')
 
     def _show_version_map_pop_up(self):
         """Use a pop up window to display all the gait, subgaits and currently used versions."""
-        version_map = self._controller.get_version_map()
-        version_map_string = ''
+        try:
+            version_map = self._controller.get_version_map()
+        except GaitSelectionError as e:
+            self._log(str(e), 'error')
+            return
 
+        version_map_string = ''
         for gait_name in sorted(version_map.keys()):
             version_map_string += '{gait} \n'.format(gait=gait_name)
             for subgait_name, version in version_map[gait_name].items():
