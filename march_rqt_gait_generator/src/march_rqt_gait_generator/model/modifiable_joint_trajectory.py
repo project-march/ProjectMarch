@@ -111,9 +111,9 @@ class ModifiableJointTrajectory(JointTrajectory):
 
     def invert(self):
         self.save_setpoints(single_joint_change=False)
-        self.setpoints = list(reversed(self.setpoints))
         for setpoint in self.setpoints:
             setpoint.invert(self.duration)
+        self.setpoints = list(reversed(self.setpoints))
         self.interpolate_setpoints()
 
     def undo(self):
@@ -121,11 +121,13 @@ class ModifiableJointTrajectory(JointTrajectory):
             return
 
         self.setpoints_redo_list.append(list(self.setpoints))
-        self.setpoints = self.setpoints_history.pop()
+        self._setpoints = self.setpoints_history.pop()
+        self.duration = self.setpoints[-1].time
 
     def redo(self):
         if not self.setpoints_redo_list:
             return
 
         self.setpoints_history.append(list(self.setpoints))
-        self.setpoints = self.setpoints_redo_list.pop()
+        self._setpoints = self.setpoints_redo_list.pop()
+        self.duration = self.setpoints[-1].time
