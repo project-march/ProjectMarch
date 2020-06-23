@@ -74,7 +74,7 @@ class GaitSelectionView(QWidget):
         self._clear_gui()
 
         gait_name = self._gait_menu.currentText()
-        subgaits = self.available_gaits[gait_name]['subgaits']
+        subgaits = self.available_gaits[gait_name]
 
         latest_used_index = 0
         for index, (subgait_name, versions) in enumerate(subgaits.items()):
@@ -111,18 +111,6 @@ class GaitSelectionView(QWidget):
             self._subgait_menus[unused_index].setDisabled(1)
 
         self._is_update_active = False
-
-    def update_selected_versions(self):
-        """Read the subgait version menus and save the newly selected versions to the local version map."""
-        gait_name = self._gait_menu.currentText()
-
-        for subgait_label, subgait_menu in zip(self._subgait_labels, self._subgait_menus):
-            subgait_name = subgait_label.text()
-            if subgait_name != 'Unused':
-                try:
-                    self.version_map[gait_name][subgait_name] = subgait_menu.currentText()
-                except KeyError:
-                    pass
 
     def update_version_colors(self):
         """Update the subgait labels with a specific color to represent a change in version."""
@@ -198,8 +186,16 @@ class GaitSelectionView(QWidget):
 
     def _apply(self):
         """Apply newly selected subgait versions to the gait selection node."""
-        self.update_selected_versions()
-        if self._controller.set_version_map(self.version_map):
+        gait_name = self._gait_menu.currentText()
+        subgait_names = []
+        versions = []
+
+        for subgait_label, subgait_menu in zip(self._subgait_labels, self._subgait_menus):
+            if subgait_label.text() != 'Unused':
+                subgait_names.append(subgait_label.text())
+                versions.append(subgait_menu.currentText())
+
+        if self._controller.set_gait_version(gait_name, subgait_names, versions):
             self._log('Version change applied', 'success')
         else:
             self._log('Version change applied failed', 'failed')
