@@ -77,3 +77,9 @@ class EntryModel(QAbstractTableModel):
     def __str__(self):
         """Returns a string representation of the model."""
         return '\n'.join(str(x) for x in self._entries)
+
+    def __len__(self):
+        return len(self._entries)
+
+    def __getitem__(self, index):
+        return self._entries[index]
