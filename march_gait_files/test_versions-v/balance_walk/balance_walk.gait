@@ -1,0 +1,5 @@
+name: balance_walk
+
+graph:
+  from_subgait: [start, right_open]
+  to_subgait:   [right_open, end]
