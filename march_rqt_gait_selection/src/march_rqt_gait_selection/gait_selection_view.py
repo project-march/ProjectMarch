@@ -48,6 +48,7 @@ class GaitSelectionView(QWidget):
 
         self.ClearLogger.clicked.connect(lambda: self._logger.clear())
         self.SeeAllVersions.clicked.connect(lambda: self._show_version_map_pop_up())
+        self.LoadSubgaits.clicked.connect(lambda: self.update_version_menus())
 
         self._gait_menu.currentIndexChanged.connect(lambda: self.update_version_menus())
         for subgait_menu in self._subgait_menus:
