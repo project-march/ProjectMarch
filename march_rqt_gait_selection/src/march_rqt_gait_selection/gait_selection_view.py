@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QWidget
 from python_qt_binding import loadUi
 import rospy
 
+from .gait_selection_errors import GaitSelectionError
 from .gait_selection_pop_up import PopUpWindow
 
 
@@ -74,7 +75,7 @@ class GaitSelectionView(QWidget):
         self._clear_gui()
 
         gait_name = self._gait_menu.currentText()
-        subgaits = self.available_gaits[gait_name]['subgaits']
+        subgaits = self.available_gaits[gait_name]
 
         latest_used_index = 0
         for index, (subgait_name, versions) in enumerate(subgaits.items()):
@@ -112,18 +113,6 @@ class GaitSelectionView(QWidget):
 
         self._is_update_active = False
 
-    def update_selected_versions(self):
-        """Read the subgait version menus and save the newly selected versions to the local version map."""
-        gait_name = self._gait_menu.currentText()
-
-        for subgait_label, subgait_menu in zip(self._subgait_labels, self._subgait_menus):
-            subgait_name = subgait_label.text()
-            if subgait_name != 'Unused':
-                try:
-                    self.version_map[gait_name][subgait_name] = subgait_menu.currentText()
-                except KeyError:
-                    pass
-
     def update_version_colors(self):
         """Update the subgait labels with a specific color to represent a change in version."""
         if self._is_update_active or self._is_refresh_active:
@@ -146,13 +135,17 @@ class GaitSelectionView(QWidget):
         self._is_refresh_active = True
         self._clear_gui(clear_gait_menu=True)
 
-        self.available_gaits = self._controller.get_directory_structure()
-        self.version_map = self._controller.get_version_map()
+        try:
+            self.available_gaits = self._controller.get_directory_structure()
+            self.version_map = self._controller.get_version_map()
 
-        self._gait_menu.addItems(sorted(self.available_gaits.keys()))
+            self._gait_menu.addItems(sorted(self.available_gaits.keys()))
 
-        self._log('Directory data refreshed', 'success')
-        self._is_refresh_active = False
+            self._log('Directory data refreshed', 'success')
+        except GaitSelectionError as e:
+            self._log(str(e), 'error')
+        finally:
+            self._is_refresh_active = False
 
     # logger
     def _log(self, msg, color_tag='info'):
@@ -191,24 +184,44 @@ class GaitSelectionView(QWidget):
 
     def _save_default(self):
         """Save the currently selected subgait versions as default values."""
-        if self._controller.set_default_versions():
-            self._log('Set new default versions', 'success')
-        else:
-            self._log('Set new default versions failed', 'error')
+        try:
+            success, msg = self._controller.set_default_versions()
+            if success:
+                self._log(msg if msg else 'Set new default versions', 'success')
+            else:
+                self._log(msg if msg else 'Failed to set default versions', 'error')
+        except GaitSelectionError as e:
+            self._log(str(e), 'error')
 
     def _apply(self):
         """Apply newly selected subgait versions to the gait selection node."""
-        self.update_selected_versions()
-        if self._controller.set_version_map(self.version_map):
-            self._log('Version change applied', 'success')
-        else:
-            self._log('Version change applied failed', 'failed')
+        gait_name = self._gait_menu.currentText()
+        subgait_names = []
+        versions = []
+
+        for subgait_label, subgait_menu in zip(self._subgait_labels, self._subgait_menus):
+            if subgait_label.text() != 'Unused':
+                subgait_names.append(subgait_label.text())
+                versions.append(subgait_menu.currentText())
+
+        try:
+            success, msg = self._controller.set_gait_version(gait_name, subgait_names, versions)
+            if success:
+                self._log(msg if msg else 'Version change applied', 'success')
+            else:
+                self._log(msg if msg else 'Version change applied failed', 'failed')
+        except GaitSelectionError as e:
+            self._log(str(e), 'error')
 
     def _show_version_map_pop_up(self):
         """Use a pop up window to display all the gait, subgaits and currently used versions."""
-        version_map = self._controller.get_version_map()
-        version_map_string = ''
+        try:
+            version_map = self._controller.get_version_map()
+        except GaitSelectionError as e:
+            self._log(str(e), 'error')
+            return
 
+        version_map_string = ''
         for gait_name in sorted(version_map.keys()):
             version_map_string += '{gait} \n'.format(gait=gait_name)
             for subgait_name, version in version_map[gait_name].items():
