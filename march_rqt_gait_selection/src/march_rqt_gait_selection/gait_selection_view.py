@@ -102,12 +102,16 @@ class GaitSelectionView(QWidget):
             self.add_subgait_menus(amount_of_new_subgait_menus)
 
         latest_used_index = 0
+
         for index, (subgait_name, versions) in enumerate(subgaits.items()):
             subgait_label = self._subgait_labels[index]
             subgait_menu = self._subgait_menus[index]
 
             subgait_menu.setDisabled(0)
             subgait_label.setDisabled(0)
+
+            subgait_menu.show()
+            subgait_label.show()
 
             subgait_label.setText(subgait_name)
             subgait_menu.addItems(versions)
@@ -129,6 +133,9 @@ class GaitSelectionView(QWidget):
         for unused_index in range(latest_used_index, len(self._subgait_labels)):
             self._subgait_labels[unused_index].setDisabled(1)
             self._subgait_menus[unused_index].setDisabled(1)
+
+            self._subgait_labels[unused_index].hide()
+            self._subgait_menus[unused_index].hide()
 
         self._is_update_active = False
 
