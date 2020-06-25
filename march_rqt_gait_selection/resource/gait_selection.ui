@@ -340,7 +340,7 @@ QPushButton{color:  #FFFFFF}</string>
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>200</width>
+                 <width>150</width>
                  <height>0</height>
                 </size>
                </property>
@@ -385,7 +385,7 @@ QPushButton{color:  #FFFFFF}</string>
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>200</width>
+                 <width>150</width>
                  <height>0</height>
                 </size>
                </property>
@@ -427,7 +427,7 @@ QPushButton{color:  #FFFFFF}</string>
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>200</width>
+                 <width>150</width>
                  <height>0</height>
                 </size>
                </property>
