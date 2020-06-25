@@ -389,6 +389,12 @@ class GaitGeneratorController(object):
                     joint.start_point = side_subgait_joint.setpoints[-1]
                 elif side == 'next':
                     joint.end_point = side_subgait_joint.setpoints[0]
+        elif self.side_subgait_controller[side].subgait is None:
+            for joint in self.subgait.joints:
+                if side == 'previous':
+                    joint.start_point = joint.setpoints[0]
+                elif side == 'next':
+                    joint.end_point = joint.setpoints[-1]
 
         else:
             for joint in self.subgait.joints:
