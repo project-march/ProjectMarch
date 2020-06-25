@@ -1,5 +1,6 @@
 import math
 
+import numpy as np
 from PyQt5.QtCore import pyqtSignal
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore
@@ -125,7 +126,9 @@ class JointPlot(pg.PlotItem):
 
         self.plot_item.setData(time, position)
 
-        [indices, position_data, velocity_data] = joint.interpolate_setpoints()
+        indices = np.linspace(0, self.duration, self.duration * 100)
+        position_data = joint.interpolated_position(indices)
+        velocity_data = joint.interpolated_velocity(indices)
         min_effort_data, max_effort_data = self.calculate_min_max_effort(position_data, velocity_data)
         for i in range(0, len(position_data)):
             position_data[i] = math.degrees(position_data[i])

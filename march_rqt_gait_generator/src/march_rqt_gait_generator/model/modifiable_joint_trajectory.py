@@ -20,7 +20,6 @@ class ModifiableJointTrajectory(JointTrajectory):
         self._end_point = None
 
         super(ModifiableJointTrajectory, self).__init__(name, limits, setpoints, duration)
-        self.interpolated_setpoints = self.interpolate_setpoints()
 
     @classmethod
     def from_dict(cls, subgait_dict, joint_name, limits, duration, gait_generator):
@@ -61,24 +60,16 @@ class ModifiableJointTrajectory(JointTrajectory):
 
     def set_setpoints(self, setpoints):
         self.setpoints = setpoints
-        self.enforce_limits()
-        self.interpolated_setpoints = self.interpolate_setpoints()
 
-    @property
-    def duration(self):
-        return self._duration
-
-    @duration.setter
-    def duration(self, duration):
-        self._duration = duration
+    def set_duration(self, new_duration, rescale=True):
+        super(ModifiableJointTrajectory, self).set_duration(new_duration, rescale)
         self.enforce_limits()
 
-    def get_interpolated_position(self, time):
-        for i in range(0, len(self.interpolated_setpoints[0])):
-            if self.interpolated_setpoints[0][i] > time:
-                return self.interpolated_setpoints[1][i]
-
-        return self.interpolated_setpoints[1][-1]
+    @JointTrajectory.setpoints.setter
+    def setpoints(self, setpoints):
+        self._setpoints = setpoints
+        self.enforce_limits()
+        self.interpolate_setpoints()
 
     def enforce_limits(self):
         if self.start_point:
@@ -113,13 +104,13 @@ class ModifiableJointTrajectory(JointTrajectory):
 
         self.setpoints.insert(new_index, setpoint)
         self.enforce_limits()
-        self.interpolated_setpoints = self.interpolate_setpoints()
+        self.interpolate_setpoints()
 
     def remove_setpoint(self, index):
         self.save_setpoints()
         del self.setpoints[index]
         self.enforce_limits()
-        self.interpolated_setpoints = self.interpolate_setpoints()
+        self.interpolate_setpoints()
 
     def save_setpoints(self, single_joint_change=True):
         self.setpoints_history.append({'setpoints': copy.deepcopy(self.setpoints), 'start_point': self.start_point,
@@ -129,10 +120,10 @@ class ModifiableJointTrajectory(JointTrajectory):
 
     def invert(self):
         self.save_setpoints(single_joint_change=False)
-        self.setpoints = list(reversed(self.setpoints))
         for setpoint in self.setpoints:
             setpoint.invert(self.duration)
-        self.interpolated_setpoints = self.interpolate_setpoints()
+        self.setpoints = list(reversed(self.setpoints))
+        self.interpolate_setpoints()
 
     def undo(self):
         if not self.setpoints_history:
@@ -141,12 +132,12 @@ class ModifiableJointTrajectory(JointTrajectory):
         self.setpoints_redo_list.append({'setpoints': copy.deepcopy(self.setpoints), 'start_point': self.start_point,
                                          'end_point': self.end_point})
         setpoints = self.setpoints_history.pop()
-        self.setpoints = setpoints['setpoints']
+        self._setpoints = setpoints['setpoints']
         self._start_point = setpoints['start_point']
         self._end_point = setpoints['end_point']
         self._duration = self.setpoints[-1].time
         self.enforce_limits()
-        self.interpolated_setpoints = self.interpolate_setpoints()
+        self.interpolate_setpoints()
 
     def redo(self):
         if not self.setpoints_redo_list:
@@ -155,12 +146,12 @@ class ModifiableJointTrajectory(JointTrajectory):
         self.setpoints_history.append({'setpoints': copy.deepcopy(self.setpoints), 'start_point': self.start_point,
                                        'end_point': self.end_point})
         setpoints = self.setpoints_redo_list.pop()
-        self.setpoints = setpoints['setpoints']
+        self._setpoints = setpoints['setpoints']
         self._start_point = setpoints['start_point']
         self._end_point = setpoints['end_point']
         self._duration = self.setpoints[-1].time
         self.enforce_limits()
-        self.interpolated_setpoints = self.interpolate_setpoints()
+        self.interpolate_setpoints()
 
     @property
     def start_point(self):
