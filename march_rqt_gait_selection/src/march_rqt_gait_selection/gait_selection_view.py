@@ -1,13 +1,12 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QComboBox, QLabel, QWidget
 from python_qt_binding import loadUi
-import rospy
 
 from .gait_selection_errors import GaitSelectionError
 from .gait_selection_pop_up import PopUpWindow
 
 
-AMOUNT_OF_AVAILABLE_SUBGAITS = 6
+DEFAULT_AMOUNT_OF_AVAILABLE_SUBGAITS = 3
 
 
 class GaitSelectionView(QWidget):
@@ -32,14 +31,14 @@ class GaitSelectionView(QWidget):
         self._is_update_active = True
 
         # Search for children in GUI
-        self._gait_content = self.GaitSelectionInterface
+        self._subgaits = self.SubgaitsFrame
         self._gait_menu = self.GaitMenu
         self._logger = self.Log
 
         self._subgait_labels = []
         self._subgait_menus = []
 
-        for index in range(AMOUNT_OF_AVAILABLE_SUBGAITS):
+        for index in range(DEFAULT_AMOUNT_OF_AVAILABLE_SUBGAITS):
             self._subgait_labels.append(getattr(self, 'SubgaitLabel_{nr}'.format(nr=index)))
             self._subgait_menus.append(getattr(self, 'SubgaitMenu_{nr}'.format(nr=index)))
 
@@ -50,6 +49,7 @@ class GaitSelectionView(QWidget):
 
         self.ClearLogger.clicked.connect(lambda: self._logger.clear())
         self.SeeAllVersions.clicked.connect(lambda: self._show_version_map_pop_up())
+        self.LoadSubgaits.clicked.connect(lambda: self.update_version_menus())
 
         self._gait_menu.currentIndexChanged.connect(lambda: self.update_version_menus())
         for subgait_menu in self._subgait_menus:
@@ -66,6 +66,26 @@ class GaitSelectionView(QWidget):
         self._refresh()
 
     # gait and subgait related layout functions
+    def add_subgait_menus(self, amount_of_new_subgait_menus):
+        """Add subgait labels and dropdown menu's in case a gait has more subgaits then available menu's.
+
+        :param amount_of_new_subgait_menus: the amount of new subgait labels and menu's
+        """
+        for new_subgait in range(amount_of_new_subgait_menus):
+
+            new_subgait_label = QLabel(self)
+            new_subgait_label.setFont(self._subgait_labels[0].font())
+            new_subgait_label.setAlignment(self._subgait_labels[0].alignment())
+
+            new_subgait_menu = QComboBox(self)
+            new_subgait_menu.setFont(self._subgait_menus[0].font())
+            new_subgait_menu.currentIndexChanged.connect(lambda: self.update_version_colors())
+
+            self._subgait_labels.append(new_subgait_label)
+            self._subgait_menus.append(new_subgait_menu)
+
+            self._subgaits.layout().addRow(new_subgait_label, new_subgait_menu)
+
     def update_version_menus(self):
         """When a gait is selected set the subgait labels and populate the subgait menus with the available versions."""
         self._is_update_active = True
@@ -77,18 +97,18 @@ class GaitSelectionView(QWidget):
         gait_name = self._gait_menu.currentText()
         subgaits = self.available_gaits[gait_name]
 
+        if len(subgaits) > len(self._subgait_labels):
+            amount_of_new_subgait_menus = len(subgaits) - len(self._subgait_labels)
+            self.add_subgait_menus(amount_of_new_subgait_menus)
+
         latest_used_index = 0
+
         for index, (subgait_name, versions) in enumerate(subgaits.items()):
+            subgait_label = self._subgait_labels[index]
+            subgait_menu = self._subgait_menus[index]
 
-            try:
-                subgait_menu = self._subgait_menus[index]
-                subgait_label = self._subgait_labels[index]
-            except index:
-                rospy.logfatal('Not enough labels and menus available in GUI, change layout using Qt tool.')
-                return
-
-            subgait_menu.setDisabled(0)
-            subgait_label.setDisabled(0)
+            subgait_menu.show()
+            subgait_label.show()
 
             subgait_label.setText(subgait_name)
             subgait_menu.addItems(versions)
@@ -107,9 +127,9 @@ class GaitSelectionView(QWidget):
 
             latest_used_index = index + 1
 
-        for unused_index in range(latest_used_index, AMOUNT_OF_AVAILABLE_SUBGAITS):
-            self._subgait_labels[unused_index].setDisabled(1)
-            self._subgait_menus[unused_index].setDisabled(1)
+        for unused_index in range(latest_used_index, len(self._subgait_labels)):
+            self._subgait_labels[unused_index].hide()
+            self._subgait_menus[unused_index].hide()
 
         self._is_update_active = False
 
