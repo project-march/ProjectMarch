@@ -125,13 +125,13 @@ class GaitGeneratorView(QWidget):
         return joint_plot_widget
 
     # Methods below are called during runtime
-    def publish_preview(self, gait, time):
+    def publish_preview(self, subgait, time):
         joint_state = JointState()
         joint_state.header.stamp = rospy.get_rostime()
 
-        for i in range(len(gait.joints)):
-            joint_state.name.append(gait.joints[i].name)
-            joint_state.position.append(gait.joints[i].get_interpolated_position(time))
+        for joint in subgait.joints:
+            joint_state.name.append(joint.name)
+            joint_state.position.append(joint.get_interpolated_position(time))
         self.joint_state_pub.publish(joint_state)
         self.set_feet_distances()
 

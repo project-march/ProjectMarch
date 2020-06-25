@@ -309,10 +309,15 @@ class GaitGeneratorController(object):
             self.view.change_gait_directory_button.setText(self.gait_directory)
 
     def invert_gait(self):
+        for side, controller in self.side_subgait_controller.items():
+            controller.lock_checked = False
+            self.handle_sidepoint_lock(side)
+
         for joint in self.subgait.joints:
             joint.invert()
             self.view.update_joint_widget(joint)
-        self.save_changed_settings({'joints': [self.subgait.joints]})
+        self.save_changed_settings({'joints': self.subgait.joints,
+                                    'side_subgaits': self.side_subgait_controller.values()})
         self.view.publish_preview(self.subgait, self.current_time)
 
     def undo(self):

@@ -41,6 +41,7 @@ class SideSubgaitController(object):
     def lock_checked(self, lock_checked):
         self.save_changed_settings()
         self._lock_checked = lock_checked
+        self.view.update_widget(self)
 
     @property
     def default_checked(self):
@@ -50,6 +51,7 @@ class SideSubgaitController(object):
     def default_checked(self, default_checked):
         self.save_changed_settings()
         self._default_checked = default_checked
+        self.view.update_widget(self)
 
     @property
     def subgait(self):

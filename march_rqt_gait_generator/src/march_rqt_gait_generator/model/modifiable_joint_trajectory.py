@@ -142,8 +142,8 @@ class ModifiableJointTrajectory(JointTrajectory):
         self._start_point = setpoints['start_point']
         self._end_point = setpoints['end_point']
         self._duration = self.setpoints[-1].time
-        self.interpolated_setpoints = self.interpolate_setpoints()
         self.enforce_limits()
+        self.interpolated_setpoints = self.interpolate_setpoints()
 
     def redo(self):
         if not self.setpoints_redo_list:
@@ -156,8 +156,8 @@ class ModifiableJointTrajectory(JointTrajectory):
         self._start_point = setpoints['start_point']
         self._end_point = setpoints['end_point']
         self._duration = self.setpoints[-1].time
-        self.interpolated_setpoints = self.interpolate_setpoints()
         self.enforce_limits()
+        self.interpolated_setpoints = self.interpolate_setpoints()
 
     @property
     def start_point(self):
@@ -169,6 +169,7 @@ class ModifiableJointTrajectory(JointTrajectory):
         if start_point:
             self._start_point.time = 0
         self.enforce_limits()
+        self.interpolated_setpoints = self.interpolate_setpoints()
 
     @property
     def end_point(self):
@@ -180,3 +181,4 @@ class ModifiableJointTrajectory(JointTrajectory):
         if end_point:
             self._end_point.time = self.duration
         self.enforce_limits()
+        self.interpolated_setpoints = self.interpolate_setpoints()
