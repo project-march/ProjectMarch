@@ -59,11 +59,6 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
         last_setpoint = ModifiableSetpoint(self.duration, 0.5 * self.duration, self.duration)
         self.assertEqual(self.joint_trajectory.setpoints[-1], last_setpoint)
 
-    # duration.setter test
-    def test_duration_setter(self):
-        self.joint_trajectory.duration = self.duration * 2
-        self.assertEqual(self.joint_trajectory.setpoints[-1].time, self.duration * 2)
-
     # add_setpoint tests
     def test_add_setpoint_existence_new_setpoint(self):
         new_setpoint = ModifiableSetpoint(0.5, self.limits.upper + 1, 0)

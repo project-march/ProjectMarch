@@ -58,11 +58,9 @@ class ModifiableJointTrajectory(JointTrajectory):
     def set_setpoints(self, setpoints):
         self.setpoints = setpoints
 
-    @JointTrajectory.duration.setter
-    def duration(self, duration):
-        self._duration = duration
+    def set_duration(self, new_duration, rescale=True):
+        super(ModifiableJointTrajectory, self).set_duration(new_duration, rescale)
         self.enforce_limits()
-        self.interpolate_setpoints()
 
     @JointTrajectory.setpoints.setter
     def setpoints(self, setpoints):
@@ -122,7 +120,9 @@ class ModifiableJointTrajectory(JointTrajectory):
 
         self.setpoints_redo_list.append(list(self.setpoints))
         self._setpoints = self.setpoints_history.pop()
-        self.duration = self.setpoints[-1].time
+        self._duration = self.setpoints[-1].time
+        self.enforce_limits()
+        self.interpolate_setpoints()
 
     def redo(self):
         if not self.setpoints_redo_list:
@@ -130,4 +130,6 @@ class ModifiableJointTrajectory(JointTrajectory):
 
         self.setpoints_history.append(list(self.setpoints))
         self._setpoints = self.setpoints_redo_list.pop()
-        self.duration = self.setpoints[-1].time
+        self._duration = self.setpoints[-1].time
+        self.enforce_limits()
+        self.interpolate_setpoints()
