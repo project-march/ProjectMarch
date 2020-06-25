@@ -1,7 +1,6 @@
 import diagnostic_updater
 import rospy
 from sensor_msgs.msg import JointState
-from sensor_msgs.msg import Temperature
 
 from march_shared_resources.msg import Alive
 
@@ -9,7 +8,6 @@ from .diagnostic_analyzers.check_input_device import CheckInputDevice
 from .diagnostic_analyzers.control import CheckJointValues
 from .diagnostic_analyzers.gait_state import CheckGaitStatus
 from .diagnostic_analyzers.imc_state import CheckImcStatus
-from .diagnostic_analyzers.temperature import CheckJointTemperature
 
 
 def main():
