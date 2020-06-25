@@ -131,7 +131,7 @@ class GaitGeneratorView(QWidget):
 
         for joint in subgait.joints:
             joint_state.name.append(joint.name)
-            joint_state.position.append(joint.get_interpolated_position(time))
+            joint_state.position.append(joint.get_interpolated_setpoint(time).position)
         self.joint_state_pub.publish(joint_state)
         self.set_feet_distances()
 
