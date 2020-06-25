@@ -1,11 +1,6 @@
 pub_rate: 1.0
 base_path: ''
 analyzers:
-#  temperatures:
-#    type: diagnostic_aggregator/GenericAnalyzer
-#    path: Temperatures
-#    contains: 'Temperature'
-#    remove_prefix: 'march_rqt_robot_monitor_node: '
   inputs:
     type: diagnostic_aggregator/GenericAnalyzer
     path: Inputs
