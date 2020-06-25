@@ -73,9 +73,12 @@ class ModifiableJointTrajectory(JointTrajectory):
 
     def enforce_limits(self):
         if self.start_point:
-            self.setpoints[0] = self.start_point
+            self.setpoints[0].position = self.start_point.position
+            self.setpoints[0].velocity = self.start_point.velocity
         if self.end_point:
-            self.setpoints[-1] = self.end_point
+            self.setpoints[-1].position = self.end_point.position
+            self.setpoints[-1].velocity = self.end_point.velocity
+
         self.setpoints[0].time = 0
         self.setpoints[-1].time = self.duration
 
@@ -157,8 +160,6 @@ class ModifiableJointTrajectory(JointTrajectory):
     @start_point.setter
     def start_point(self, start_point):
         self._start_point = start_point
-        if start_point:
-            self._start_point.time = 0
         self.enforce_limits()
         self.interpolated_setpoints = self.interpolate_setpoints()
 
@@ -169,7 +170,5 @@ class ModifiableJointTrajectory(JointTrajectory):
     @end_point.setter
     def end_point(self, end_point):
         self._end_point = end_point
-        if end_point:
-            self._end_point.time = self.duration
         self.enforce_limits()
         self.interpolated_setpoints = self.interpolate_setpoints()
