@@ -6,8 +6,7 @@ from rosgraph_msgs.msg import Log
 import rospkg
 import rospy
 from std_msgs.msg import String
-
-from march_shared_resources.srv import Trigger
+from std_srvs.srv import Trigger
 
 from .entry import Entry
 from .entry_model import EntryModel
