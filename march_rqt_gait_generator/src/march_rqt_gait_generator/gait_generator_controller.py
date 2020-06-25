@@ -382,20 +382,20 @@ class GaitGeneratorController(object):
         self.handle_sidepoint_lock(side)
 
     def handle_sidepoint_lock(self, side):
-        if self.side_subgait_controller[side].lock_checked and self.side_subgait_controller[side].subgait is not None:
-            for joint, side_subgait_joint in zip(self.subgait.joints,
-                                                 self.side_subgait_controller[side].subgait.joints):
-                if side == 'previous':
-                    joint.start_point = side_subgait_joint.setpoints[-1]
-                elif side == 'next':
-                    joint.end_point = side_subgait_joint.setpoints[0]
-        elif self.side_subgait_controller[side].subgait is None:
-            for joint in self.subgait.joints:
-                if side == 'previous':
-                    joint.start_point = joint.setpoints[0]
-                elif side == 'next':
-                    joint.end_point = joint.setpoints[-1]
-
+        if self.side_subgait_controller[side].lock_checked:
+            if self.side_subgait_controller[side].subgait is not None:
+                for joint, side_subgait_joint in zip(self.subgait.joints,
+                                                     self.side_subgait_controller[side].subgait.joints):
+                    if side == 'previous':
+                        joint.start_point = side_subgait_joint.setpoints[-1]
+                    elif side == 'next':
+                        joint.end_point = side_subgait_joint.setpoints[0]
+            else:
+                for joint in self.subgait.joints:
+                    if side == 'previous':
+                        joint.start_point = joint.setpoints[0]
+                    elif side == 'next':
+                        joint.end_point = joint.setpoints[-1]
         else:
             for joint in self.subgait.joints:
                 if side == 'previous':
