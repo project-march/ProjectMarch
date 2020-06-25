@@ -17,6 +17,7 @@ from tf import (ConnectivityException, ExtrapolationException, LookupException,
 
 from .joint_plot import JointPlot
 from .joint_table_controller import JointTableController
+from .side_subgait_view import SideSubgaitView
 from .time_slider_thread import TimeSliderThread
 
 
@@ -36,6 +37,10 @@ class GaitGeneratorView(QWidget):
         self.RvizFrame.layout().addWidget(self.rviz_frame, 1, 0, 1, 3)
 
         self.gait_type_combo_box.addItems(['walk_like', 'sit_like', 'stairs_like'])
+
+        previous_subgait_view = SideSubgaitView(widget=self.previous_subgait_container)
+        next_subgait_view = SideSubgaitView(widget=self.next_subgait_container)
+        self.side_subgait_view = {'previous': previous_subgait_view, 'next': next_subgait_view}
 
         self.initialize_shortcuts()
 
@@ -120,13 +125,13 @@ class GaitGeneratorView(QWidget):
         return joint_plot_widget
 
     # Methods below are called during runtime
-    def publish_preview(self, gait, time):
+    def publish_preview(self, subgait, time):
         joint_state = JointState()
         joint_state.header.stamp = rospy.get_rostime()
 
-        for i in range(len(gait.joints)):
-            joint_state.name.append(gait.joints[i].name)
-            joint_state.position.append(gait.joints[i].get_interpolated_setpoint(time).position)
+        for joint in subgait.joints:
+            joint_state.name.append(joint.name)
+            joint_state.position.append(joint.get_interpolated_position(time))
         self.joint_state_pub.publish(joint_state)
         self.set_feet_distances()
 

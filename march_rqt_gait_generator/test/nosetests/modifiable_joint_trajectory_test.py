@@ -74,7 +74,7 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
     def test_add_setpoint_save_changed_joints_call(self):
         new_setpoint = ModifiableSetpoint(0.5, 0, 0)
         self.joint_trajectory.add_setpoint(new_setpoint)
-        self.gait_generator.save_changed_joints.assert_called_once_with([self.joint_trajectory])
+        self.gait_generator.save_changed_settings.assert_called_once_with({'joints': [self.joint_trajectory]})
 
     # remove_setpoint tests
     def test_remove_setpoint_removal_correct_setpoint(self):
@@ -88,21 +88,21 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
 
     def test_remove_setpoint_save_changed_joints_call(self):
         self.joint_trajectory.remove_setpoint(2)
-        self.gait_generator.save_changed_joints.assert_called_once_with([self.joint_trajectory])
+        self.gait_generator.save_changed_settings.assert_called_once_with({'joints': [self.joint_trajectory]})
 
     # save_setpoints test
     def test_save_setpoints_content(self):
         self.joint_trajectory.save_setpoints()
-        old_setpoints = self.joint_trajectory.setpoints_history[0]
+        old_setpoints = self.joint_trajectory.setpoints_history[0]['setpoints']
         self.assertEqual(old_setpoints, self.setpoints)
 
     def test_save_setpoints_save_changed_joints_call(self):
         self.joint_trajectory.save_setpoints()
-        self.gait_generator.save_changed_joints.assert_called_once_with([self.joint_trajectory])
+        self.gait_generator.save_changed_settings.assert_called_once_with({'joints': [self.joint_trajectory]})
 
     def test_save_setpoints_no_save_changed_joints_call(self):
         self.joint_trajectory.save_setpoints(single_joint_change=False)
-        self.gait_generator.save_changed_joints.assert_not_called()
+        self.gait_generator.save_changed_settings.assert_not_called()
 
     # invert tests
     def test_invert_test_symmetric_times(self):
@@ -115,8 +115,8 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
 
     def test_invert_test_setpoints_saved(self):
         self.joint_trajectory.invert()
-        self.assertEqual(self.joint_trajectory.setpoints_history[0], self.setpoints)
-        self.gait_generator.save_changed_joints.assert_not_called()
+        self.assertEqual(self.joint_trajectory.setpoints_history[0]['setpoints'], self.setpoints)
+        self.gait_generator.save_changed_settings.assert_not_called()
 
     # undo tests
     def test_undo_empty_history(self):
