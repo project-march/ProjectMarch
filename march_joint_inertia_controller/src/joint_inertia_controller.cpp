@@ -2,17 +2,27 @@
 #include "march_joint_inertia_controller/joint_inertia_controller.h"
 #include <math.h>
 
+using joint_limits_interface::JointLimits;
+using joint_limits_interface::PositionJointSoftLimitsHandle;
+using joint_limits_interface::PositionJointSoftLimitsInterface;
+using joint_limits_interface::SoftJointLimits;
+
 namespace joint_inertia_controller
 {
 bool InertiaController::init(hardware_interface::PositionJointInterface* hw, ros::NodeHandle& nh)
 {
-  std::string joint_name;
-  if (!nh.getParam("joint_name", joint_name))
+  if (!nh.getParam("joint_names", joint_names_))
   {
-    ROS_ERROR("No joint_name specified");
+    ROS_ERROR("No joint_names specified");
     return false;
   }
-  joint_ = hw->getHandle(joint_name);
+  num_joints_ = joint_names_.size();
+  joint_ = hw->getHandle(joint_names_);
+
+  // setup acceleration and torque arrays
+
+  // Setup Butterworth filter
+
   return true;
 }
 
@@ -23,12 +33,21 @@ void InertiaController::starting(const ros::Time& /* time */)
 
 void InertiaController::update(const ros::Time& /* time */, const ros::Duration& /* period */)
 {
-  double dpos = init_pos_ + 10 * sin(ros::Time::now().toSec());
-  double cpos = joint_.getPosition();
-  joint_.setCommand(-10 * (cpos - dpos));
+  joint_.setCommand(0);
 }
 void InertiaController::stopping(const ros::Time& /* time */)
 {
 }
+
+// Estimate the inertia using the acceleration and torque
+void InertiaController::inertia_estimate()
+{
+}
+
+// Calculate a discrete derivative of the speed measurements
+void InertiaController::discrete_speed_derivative(const ros::Duration&)
+{
+}
+
 }  // namespace joint_inertia_controller
 PLUGINLIB_EXPORT_CLASS(joint_inertia_controller::InertiaController, controller_interface::ControllerBase);
