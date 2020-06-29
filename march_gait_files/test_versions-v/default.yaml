@@ -57,5 +57,3 @@ gaits:
   tilted_path_right_knee_bend: {right_open: MV_TP_right_kneebend_rightopen_v5}
   tilted_path_right_flexed_knee_step: {left_open: MV_TP_right_flexed_knee_step_leftopen_v1,
                                        right_close: MV_TP_right_flexed_knee_step_rightclose_v1}
-  balance_walk: {right_open: MV_balancewalk_rightopen_v1, left_swing: MV_balancewalk_leftswing_v1,
-                 right_swing: MV_balancewalk_rightswing_v1}
