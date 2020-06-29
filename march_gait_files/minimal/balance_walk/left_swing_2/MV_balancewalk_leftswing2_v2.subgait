@@ -1,0 +1,86 @@
+name: "left_swing_2"
+version: "MV_balancewalk_leftswing2_v2"
+description: "The left swing cut in half, this is the second part."
+gait_type: "walk_like"
+setpoints: 
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs:         0
+    joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
+  right_ankle]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 110000000
+    joint_names: [left_hip_fe]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 198000000
+    joint_names: [right_knee]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 440000000
+    joint_names: [left_knee]
+  - 
+    time_from_start: 
+      secs: 0
+      nsecs: 550000000
+    joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
+  right_ankle]
+trajectory: 
+  header: 
+    seq: 0
+    stamp: 
+      secs: 0
+      nsecs:         0
+    frame_id: ''
+  joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
+  right_ankle]
+  points: 
+    - 
+      positions: [0.0, 0.4365, 0.8102, 0.0436, 0.0, 0.0062, 0.1609, 0.0436]
+      velocities: [0.0, 0.8411, -1.2691, 0.0, 0.0, -0.5287, -0.1843, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs:         0
+    - 
+      positions: [0.0, 0.4887, 0.6202, 0.0436, 0.0, -0.049, 0.1445, 0.0436]
+      velocities: [0.0, 0.1396, -2.0617, 0.0, 0.0, -0.471, -0.1048, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 110000000
+    - 
+      positions: [0.0, 0.4806, 0.4309, 0.0436, 0.0, -0.0878, 0.1396, 0.0436]
+      velocities: [0.0, -0.2955, -2.1631, 0.0, 0.0, -0.4075, 0.0, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 198000000
+    - 
+      positions: [0.0, 0.3438, 0.0969, 0.0436, 0.0, -0.158, 0.1396, 0.0436]
+      velocities: [0.0, -0.6222, 0.0, 0.0, 0.0, -0.1538, 0.0, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 440000000
+    - 
+      positions: [0.0, 0.288, 0.1396, 0.0436, 0.0, -0.1667, 0.1396, 0.0436]
+      velocities: [0.0, -0.3491, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      accelerations: []
+      effort: []
+      time_from_start: 
+        secs: 0
+        nsecs: 550000000
+duration: 
+  secs: 0
+  nsecs: 550000000
+sounds: []
