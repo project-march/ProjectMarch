@@ -123,9 +123,10 @@ void InertiaController::starting(const ros::Time& /* time */)
 
 void InertiaController::update(const ros::Time& /* time */, const ros::Duration& period /* period */)
 {
-  if (this->fill_buffers(period))
-  {
-  }
+  this->fill_buffers(period);
+  this->inertia_estimate();
+  // TO DO: Provide lookup table for gain selection
+  // TO DO: apply PID control
   joint_.setCommand(0);
 }
 void InertiaController::stopping(const ros::Time& /* time */)
@@ -157,14 +158,20 @@ bool InertiaController::fill_buffers(const ros::Duration& period)
   return false;
 }
 
+void InertiaController::apply_butter()
+{
+  // Dingen doen met de sos filter ofzo
+}
+
 // Estimate the inertia using the acceleration and torque
 void InertiaController::inertia_estimate()
 {
+  this->apply_butter();
   this->correlation_calculation();
   double K_i = this->gain_calculation();
   double K_a = this->alpha_calculation();
-  double torque_e = joint_torque_[0] - joint_torque_[1];
-  double acc_e = joint_acceleration_[0] - joint_acceleration_[1];
+  double torque_e = filtered_joint_torque_[0] - filtered_joint_torque_[1];
+  double acc_e = filtered_joint_acceleration_[0] - filtered_joint_acceleration_[1];
   joint_inertia_ = (torque_e - (acc_e * joint_inertia_)) * K_i * K_a + joint_inertia_;
 }
 
@@ -186,14 +193,15 @@ double InertiaController::alpha_calculation()
 // Calculate the inertia gain for the inertia estimate
 double InertiaController::gain_calculation()
 {
-  return (corr_coeff_ * (joint_acceleration_[0] - joint_acceleration_[1])) /
-         (lambda_ + corr_coeff_ * pow(joint_acceleration_[0] - joint_acceleration_[1], 2));
+  return (corr_coeff_ * (filtered_joint_acceleration_[0] - filtered_joint_acceleration_[1])) /
+         (lambda_ + corr_coeff_ * pow(filtered_joint_acceleration_[0] - filtered_joint_acceleration_[1], 2));
 }
 
 // Calculate the correlation coefficient of the acceleration buffer
 void InertiaController::correlation_calculation()
 {
-  corr_coeff_ = corr_coeff_ / (lambda_ + corr_coeff_ * pow(joint_acceleration_[0] - joint_acceleration_[1], 2));
+  corr_coeff_ =
+      corr_coeff_ / (lambda_ + corr_coeff_ * pow(filtered_joint_acceleration_[0] - filtered_joint_acceleration_[1], 2));
   double large_number = pow(10, 8);
   if (corr_coeff_ > large_number)
   {
@@ -204,13 +212,13 @@ void InertiaController::correlation_calculation()
 // Calculate the vibration based on the acceleration
 double InertiaController::vibration_calculation()
 {
-  size_t len = sizeof(joint_acceleration_) / sizeof(joint_acceleration_[0]);
+  size_t len = sizeof(filtered_joint_acceleration_) / sizeof(filtered_joint_acceleration_[0]);
   double b[len];
-  absolute(joint_acceleration_, b, len);
+  absolute(filtered_joint_acceleration_, b, len);
   // moa = mean of the absolute
   double moa = mean(b, len);
   // aom = absolute of the mean
-  double aom = absolute(mean(joint_acceleration_, len));
+  double aom = absolute(mean(filtered_joint_acceleration_, len));
   return moa / aom;
 }
 

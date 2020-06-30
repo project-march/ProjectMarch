@@ -27,6 +27,9 @@ public:
   void starting(const ros::Time& time);
   void stopping(const ros::Time& time);
 
+  // Applies the Butterworth filter over the last two samples and returns the resulting filtered value.
+  void apply_butter();
+
   // Estimate the inertia using the acceleration and torque
   void inertia_estimate();
   // Calculate a discrete derivative of the speed measurements
@@ -53,12 +56,18 @@ private:
   float min_alpha_ = 0.4;  // You might want to be able to adjust this value from a yaml/launch file
   float max_alpha_ = 0.9;  // You might want to be able to adjust this value from a yaml/launch file
 
+  double sos[3][6];
+
   // Of length 12 for the acceleration buffer
   double joint_velocity_[12];
   // Of length 12 for the alpha calculation
   double joint_acceleration_[12];
+  // Of length 2 for the error calculation
+  double filtered_joint_acceleration_[2];
   // Of length 2 for the butterworth filter
   double joint_torque_[2];
+  // Of length 2 for the error calculation
+  double filtered_joint_torque_[2];
 
   // Correlation coefficient used to calculate the inertia gain
   double corr_coeff_;
