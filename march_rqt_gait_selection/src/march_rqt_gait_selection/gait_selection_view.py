@@ -95,7 +95,7 @@ class GaitSelectionView(QWidget):
             """
             try:
                 length = len(version)
-                version_number = ''.join(letter for letter in version[length - 2: length] if letter.isdigit())
+                version_number = ''.join(char for char in version[length - 2: length] if char.isdigit())
                 return int(version_number)
             except ValueError:
                 return version
