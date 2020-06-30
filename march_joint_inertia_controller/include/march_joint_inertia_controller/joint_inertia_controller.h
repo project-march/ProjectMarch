@@ -28,7 +28,7 @@ public:
   void stopping(const ros::Time& time);
 
   // Estimate the inertia using the acceleration and torque
-  double inertia_estimate();
+  void inertia_estimate();
   // Calculate a discrete derivative of the speed measurements
   void discrete_speed_derivative(const ros::Duration&);
   // Calculate the alpha coefficient for the inertia estimate
@@ -36,7 +36,7 @@ public:
   // Calculate the inertia gain for the inertia estimate
   double gain_calculation();
   // Calculate the correlation coefficient of the acceleration buffer
-  double correlation_calculation();
+  void correlation_calculation();
   // Calculate the vibration based on the acceleration
   double vibration_calculation();
 
@@ -50,12 +50,20 @@ private:
   std::string joint_names_;
   int num_joints_;
 
+  float min_alpha_ = 0.4;  // You might want to be able to adjust this value from a yaml/launch file
+  float max_alpha_ = 0.9;  // You might want to be able to adjust this value from a yaml/launch file
+
   // Of length 12 for the acceleration buffer
   double joint_velocity_[12];
   // Of length 12 for the alpha calculation
   double joint_acceleration_[12];
   // Of length 2 for the butterworth filter
   double joint_torque_[2];
+
+  // Correlation coefficient used to calculate the inertia gain
+  double corr_coeff_;
+  double joint_inertia_ = 0;
+  double lambda_ = 0.96;  // You might want to be able to adjust this value from a yaml/launch file
 };
 }  // namespace joint_inertia_controller
 

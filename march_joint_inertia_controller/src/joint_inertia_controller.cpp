@@ -94,6 +94,9 @@ bool InertiaController::init(hardware_interface::PositionJointInterface* hw, ros
     this->fill_buffers(first);
   }
 
+  // Setup the initial value for the correlation coefficient 100*standarddeviation(acceleration)^2
+  corr_coeff_ = 0.0;
+
   // Setup Butterworth filter
 
   return true;
@@ -155,27 +158,47 @@ bool InertiaController::fill_buffers(const ros::Duration& period)
 }
 
 // Estimate the inertia using the acceleration and torque
-double InertiaController::inertia_estimate()
+void InertiaController::inertia_estimate()
 {
-  return 0.0;
+  this->correlation_calculation();
+  double K_i = this->gain_calculation();
+  double K_a = this->alpha_calculation();
+  double torque_e = joint_torque_[0] - joint_torque_[1];
+  double acc_e = joint_acceleration_[0] - joint_acceleration_[1];
+  joint_inertia_ = (torque_e - (acc_e * joint_inertia_)) * K_i * K_a + joint_inertia_;
 }
 
 // Calculate the alpha coefficient for the inertia estimate
 double InertiaController::alpha_calculation()
 {
-  return 0.0;
+  double vib = this->vibration_calculation();
+  if (vib < min_alpha_)
+  {
+    vib = min_alpha_;
+  }
+  else if (vib > max_alpha_)
+  {
+    vib = max_alpha_;
+  }
+  return (vib - min_alpha_) / (max_alpha_ - min_alpha_);
 }
 
 // Calculate the inertia gain for the inertia estimate
 double InertiaController::gain_calculation()
 {
-  return 0.0;
+  return (corr_coeff_ * (joint_acceleration_[0] - joint_acceleration_[1])) /
+         (lambda_ + corr_coeff_ * pow(joint_acceleration_[0] - joint_acceleration_[1], 2));
 }
 
 // Calculate the correlation coefficient of the acceleration buffer
-double InertiaController::correlation_calculation()
+void InertiaController::correlation_calculation()
 {
-  return 0.0;
+  corr_coeff_ = corr_coeff_ / (lambda_ + corr_coeff_ * pow(joint_acceleration_[0] - joint_acceleration_[1], 2));
+  double large_number = pow(10, 8);
+  if (corr_coeff_ > large_number)
+  {
+    corr_coeff_ = large_number;
+  }
 }
 
 // Calculate the vibration based on the acceleration
