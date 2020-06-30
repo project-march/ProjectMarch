@@ -88,15 +88,14 @@ class GaitSelectionView(QWidget):
 
     def update_version_menus(self):
         """When a gait is selected set the subgait labels and populate the subgait menus with the available versions."""
-
         def version_sorter(version):
-            """Used in the sort function to sort numbers which are 9<
+            """Used in the sort function to sort numbers which are 9<.
 
             :param version: str of the version
             """
             try:
                 length = len(version)
-                version_number = ''.join(letter for letter in version[length-2: length] if letter.isdigit())
+                version_number = ''.join(letter for letter in version[length - 2: length] if letter.isdigit())
                 return int(version_number)
             except ValueError:
                 return version
