@@ -1,4 +1,4 @@
-name: !!python/unicode "left_open"
+name: "left_open"
 version: "MV_TP_right_singlestep_leftopen_v13"
 description: "More peak flexion and longer duration, no ankle movement."
 gait_type: ''
