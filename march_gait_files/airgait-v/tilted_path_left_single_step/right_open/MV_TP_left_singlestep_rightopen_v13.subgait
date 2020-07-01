@@ -1,4 +1,4 @@
-name: !!python/unicode "right_open"
+name: "right_open"
 version: "MV_TP_left_singlestep_rightopen_v13"
 description: "The hip and knee flex a little more and the duration is longer, ankle does not move."
 gait_type: ''
