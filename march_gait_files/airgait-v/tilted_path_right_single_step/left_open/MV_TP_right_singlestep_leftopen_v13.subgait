@@ -1,4 +1,4 @@
-name: "left_open"
+name: !!python/unicode "left_open"
 version: "MV_TP_right_singlestep_leftopen_v13"
 description: "More peak flexion and longer duration, no ankle movement."
 gait_type: ''
@@ -70,16 +70,16 @@ trajectory:
         secs: 0
         nsecs: 672000000
     - 
-      positions: [-0.0524, 0.3913, 0.8727, 0.1309, 0.0873, 0.6365, 0.4163, 0.0436]
-      velocities: [0.0, -0.1424, 0.0, 0.0, 0.0, -0.6823, -1.4706, 0.0]
+      positions: [-0.0524, 0.3913, 0.8727, 0.1309, 0.0873, 0.6387, 0.4163, 0.0436]
+      velocities: [0.0, -0.1424, 0.0, 0.0, 0.0, -0.6759, -1.4706, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
         secs: 1
         nsecs:  88000000
     - 
-      positions: [-0.0524, 0.354, 0.8727, 0.1309, 0.0873, 0.3902, 0.0969, 0.0436]
-      velocities: [0.0, -0.0589, 0.0, 0.0, 0.0, -0.5989, 0.0, 0.0]
+      positions: [-0.0524, 0.354, 0.8727, 0.1309, 0.0873, 0.3926, 0.0969, 0.0436]
+      velocities: [0.0, -0.0589, 0.0, 0.0, 0.0, -0.6076, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
@@ -87,7 +87,7 @@ trajectory:
         nsecs: 439999999
     - 
       positions: [-0.0524, 0.3491, 0.8727, 0.1309, 0.0873, 0.3142, 0.1396, 0.0436]
-      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, -0.3273, 0.0, 0.0]
+      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, -0.3491, 0.0, 0.0]
       accelerations: []
       effort: []
       time_from_start: 
