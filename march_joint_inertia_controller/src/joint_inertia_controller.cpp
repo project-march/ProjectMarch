@@ -8,9 +8,9 @@ using joint_limits_interface::PositionJointSoftLimitsInterface;
 using joint_limits_interface::SoftJointLimits;
 
 // Compute the absolute value of array a and store it back in b so that a remains intact.
-void absolute(double a[], double b[], size_t sz)
+void absolute(std::vector<double> a, std::vector<double> b)
 {
-  for (size_t i = 0; i < sz; ++i)
+  for (size_t i = 0; i < a.size(); ++i)
   {
     if (a[i] < 0)
     {
@@ -57,14 +57,14 @@ double median(double a[], size_t sz)
   return 0.0;
 }
 
-double mean(double a[], size_t sz)
+double mean(std::vector<double> a)
 {
   double sum = 0.0;
-  for (size_t i = 0; i < sz; ++i)
+  for (size_t i = 0; i < a.size(); ++i)
   {
     sum += a[i];
   }
-  return sum / sz;
+  return sum / a.size();
 }
 
 namespace joint_inertia_controller
@@ -77,14 +77,50 @@ bool InertiaController::init(hardware_interface::PositionJointInterface* hw, ros
     return false;
   }
   num_joints_ = joint_names_.size();
-  joint_ = hw->getHandle(joint_names_);
+
+  if (num_joints_ == 0)
+  {
+    ROS_ERROR_STREAM("List of joint names is empty.");
+    return false;
+  }
+  for (unsigned int i = 0; i < num_joints_; i++)
+  {
+    try
+    {
+      joints_.push_back(hw->getHandle(joint_names_[i]));
+    }
+    catch (const hardware_interface::HardwareInterfaceException& e)
+    {
+      ROS_ERROR_STREAM("Exception thrown: " << e.what());
+      return false;
+    }
+  }
 
   // Fill the buffers
-  int vel_len = sizeof(velocity_array_[0]) / sizeof(velocity_array_[0][0]);
-  int acc_len = sizeof(acceleration_array_[0]) / sizeof(acceleration_array_[0][0]);
-  int tor_len = sizeof(joint_torque_[0]) / sizeof(joint_torque_[0][0]);
+  velocity_array_.resize(num_joints_);
+  for (unsigned int j = 0; j < num_joints_; ++j)
+    velocity_array_[j].resize(vel_size_);
 
-  int longest_array = maximum(vel_len, acc_len, tor_len);
+  acceleration_array_.resize(num_joints_);
+  for (unsigned int j = 0; j < num_joints_; ++j)
+    acceleration_array_[j].resize(acc_size_);
+
+  filtered_acceleration_array_.resize(num_joints_);
+  for (unsigned int j = 0; j < num_joints_; ++j)
+    filtered_acceleration_array_[j].resize(fil_acc_size_);
+
+  joint_torque_.resize(num_joints_);
+  for (unsigned int j = 0; j < num_joints_; ++j)
+    joint_torque_[j].resize(torque_size_);
+
+  filtered_joint_torque_.resize(num_joints_);
+  for (unsigned int j = 0; j < num_joints_; ++j)
+    filtered_joint_torque_[j].resize(fil_tor_size_);
+
+  corr_coeff_.resize(num_joints_);
+  joint_inertia_.resize(num_joints_);
+
+  int longest_array = maximum(velocity_array_[0].size(), acceleration_array_[0].size(), joint_torque_[0].size());
 
   ros::Duration first(0.004);
   for (int i = 0; i < longest_array; i++)
@@ -95,9 +131,14 @@ bool InertiaController::init(hardware_interface::PositionJointInterface* hw, ros
   }
 
   // Setup the initial value for the correlation coefficient 100*standarddeviation(acceleration)^2
-  corr_coeff_ = 0.0;
+  for (unsigned int j = 0; j < num_joints_; ++j)
+    corr_coeff_[j] = 0.0;
 
   // Setup Butterworth filter
+
+  commands_buffer_.writeFromNonRT(std::vector<double>(num_joints_, 0.0));
+
+  sub_command_ = nh.subscribe<std_msgs::Float64MultiArray>("command", 1, &InertiaController::commandCB, this);
 
   return true;
 }
@@ -106,20 +147,20 @@ bool InertiaController::init(hardware_interface::PositionJointInterface* hw, ros
 void InertiaController::starting(const ros::Time& /* time */)
 {
   // Add ros delay or something so that we fill these buffers with actual values.
-  for (int j = 0; j < num_joints_; ++j)
+  for (unsigned int j = 0; j < num_joints_; ++j)
   {
-    init_pos_ = this->march_robot_->getJoint(j).getPosition();
-    for (size_t i = 1; i < sizeof(velocity_array_[j]) / sizeof(velocity_array_[j][0]); ++i)
+    // init_pos_ = this->march_robot_->getJoint(j).getPosition();
+    for (size_t i = 1; i < velocity_array_[j].size(); ++i)
     {
       velocity_array_[j][i] = 0.0;
     }
 
-    for (size_t i = 1; i < sizeof(acceleration_array_[j]) / sizeof(acceleration_array_[j][0]); ++i)
+    for (size_t i = 1; i < acceleration_array_[j].size(); ++i)
     {
       acceleration_array_[j][i] = 0.0;
     }
 
-    for (size_t i = 1; i < sizeof(joint_torque_[j]) / sizeof(joint_torque_[j][0]); ++i)
+    for (size_t i = 1; i < joint_torque_[j].size(); ++i)
     {
       joint_torque_[j][i] = 0.0;
     }
@@ -132,35 +173,44 @@ void InertiaController::update(const ros::Time& /* time */, const ros::Duration&
   this->inertia_estimate();
   // TO DO: Provide lookup table for gain selection
   // TO DO: apply PID control
-  joint_.setCommand(0);
+  std::vector<double>& commands = *commands_buffer_.readFromRT();
+  for (unsigned int i = 0; i < num_joints_; i++)
+  {
+    joints_[i].setCommand(commands[i]);
+  }
 }
 void InertiaController::stopping(const ros::Time& /* time */)
 {
 }
 
+void InertiaController::commandCB(const std_msgs::Float64MultiArrayConstPtr& msg)
+{
+  if (msg->data.size() != num_joints_)
+  {
+    ROS_ERROR_STREAM("Dimension of command (" << msg->data.size() << ") does not match number of joints ("
+                                              << num_joints_ << ")! Not executing!");
+    return;
+  }
+  commands_buffer_.writeFromNonRT(msg->data);
+}
+
 // Fills the buffers so that non-zero values may be computed by the inertia estimator
 bool InertiaController::fill_buffers(const ros::Duration& period)
 {
-  for (int j = 0; j < num_joints_; ++j)
+  auto it = velocity_array_[0].begin();
+  for (unsigned int j = 0; j < num_joints_; ++j)
   {
-    for (size_t i = 1; i < sizeof(velocity_array_[j]) / sizeof(velocity_array_[j][0]); ++i)
-    {
-      velocity_array_[j][i] = velocity_array_[j][i - 1];
-    }
-    velocity_array_[j][0] = joint_velocity_[j];
+    it = velocity_array_[j].begin();
+    it = velocity_array_[j].insert(it, joints_[j].getVelocity());
+    velocity_array_.resize(vel_size_);
 
-    for (size_t i = 1; i < sizeof(acceleration_array_[j]) / sizeof(acceleration_array_[j][0]); ++i)
-    {
-      acceleration_array_[j][i] = acceleration_array_[j][i - 1];
-    }
     // Automatically fills the zero'th position of the acceleration array
-    this->discrete_speed_derivative(period);
+    this->discrete_speed_derivative(j, period);
+    acceleration_array_[j].resize(acc_size_);
 
-    for (size_t i = 1; i < sizeof(joint_torque_[j]) / sizeof(joint_torque_[j][0]); ++i)
-    {
-      joint_torque_[j][i] = joint_torque_[j][i - 1];
-    }
-    joint_torque_[j][0] = joint_effort_[j];
+    it = joint_torque_[j].begin();
+    it = joint_torque_[j].insert(it, joints_[j].getEffort());
+    joint_torque_[j].resize(torque_size_);
   }
   return false;
 }
@@ -170,28 +220,29 @@ void InertiaController::apply_butter()
   // Dingen doen met de sos filter ofzo
   // Also doe pushback dingen anders dan werkt dit niet
   double temp = 1.0;
-  for (int j = 0; j < num_joints_; ++j)
+  auto it = filtered_acceleration_array_[0].begin();
+  for (unsigned int j = 0; j < num_joints_; ++j)
   {
-    for (int i = 0; i < 3; ++i)
+    for (unsigned int i = 0; i < (sizeof(sos_) / sizeof(sos_[0])); ++i)
     {
       temp *= (acceleration_array_[j][0] * sos_[i][0] + acceleration_array_[j][1] * sos_[i][1] +
                acceleration_array_[j][2] * sos_[i][2]) /
               (acceleration_array_[j][0] * sos_[i][3] + acceleration_array_[j][1] * sos_[i][4] +
                acceleration_array_[j][2] * sos_[i][5]);
     }
-    // Push back the new value
-    filtered_acceleration_array_[j][1] = filtered_acceleration_array_[j][0];
-    filtered_acceleration_array_[j][0] = temp;
+    it = filtered_acceleration_array_[j].begin();
+    it = filtered_acceleration_array_[j].insert(it, temp);
+    filtered_acceleration_array_[j].resize(fil_acc_size_);
 
     temp = 1.0;
-    for (int i = 0; i < 3; ++i)
+    for (unsigned int i = 0; i < (sizeof(sos_) / sizeof(sos_[0])); ++i)
     {
       temp *= (joint_torque_[j][0] * sos_[i][0] + joint_torque_[j][1] * sos_[i][1] + joint_torque_[j][2] * sos_[i][2]) /
               (joint_torque_[j][0] * sos_[i][3] + joint_torque_[j][1] * sos_[i][4] + joint_torque_[j][2] * sos_[i][5]);
     }
-    // Push back the new value
-    filtered_joint_torque_[j][1] = filtered_joint_torque_[j][0];
-    filtered_joint_torque_[j][0] = temp;
+    it = filtered_joint_torque_[j].begin();
+    it = filtered_joint_torque_[j].insert(it, temp);
+    filtered_joint_torque_[j].resize(fil_tor_size_);
 
     temp = 1.0;
   }
@@ -200,26 +251,26 @@ void InertiaController::apply_butter()
 // Estimate the inertia using the acceleration and torque
 void InertiaController::inertia_estimate()
 {
-  double K_i[num_joints];
-  double K_a[num_joints];
+  double K_i[num_joints_];
+  double K_a[num_joints_];
   double torque_e[num_joints_];
   double acc_e[num_joints_];
-  for (int i = 0; i < num_joints_; ++i)
+  this->apply_butter();
+  for (unsigned int i = 0; i < num_joints_; ++i)
   {
-    this->apply_butter(i);
     this->correlation_calculation(i);
-    K_i[i] = this->gain_calculation();
-    K_a[i] = this->alpha_calculation();
-    torque_e[i] = filtered_joint_torque_[j][0] - filtered_joint_torque_[j][1];
-    acc_e[i] = filtered_acceleration_array_[j][0] - filtered_acceleration_array_[j][1];
-    joint_inertia_[i] = (torque_e - (acc_e * joint_inertia_)) * K_i * K_a + joint_inertia_;
+    K_i[i] = this->gain_calculation(i);
+    K_a[i] = this->alpha_calculation(i);
+    torque_e[i] = filtered_joint_torque_[i][0] - filtered_joint_torque_[i][1];
+    acc_e[i] = filtered_acceleration_array_[i][0] - filtered_acceleration_array_[i][1];
+    joint_inertia_[i] = (torque_e[i] - (acc_e[i] * joint_inertia_[i])) * K_i[i] * K_a[i] + joint_inertia_[i];
   }
 }
 
 // Calculate the alpha coefficient for the inertia estimate
-double InertiaController::alpha_calculation()
+double InertiaController::alpha_calculation(int joint_nr)
 {
-  double vib = this->vibration_calculation();
+  double vib = this->vibration_calculation(joint_nr);
   if (vib < min_alpha_)
   {
     vib = min_alpha_;
@@ -232,49 +283,44 @@ double InertiaController::alpha_calculation()
 }
 
 // Calculate the inertia gain for the inertia estimate
-double InertiaController::gain_calculation(int joint_nr)
+double InertiaController::gain_calculation(int jn)
 {
-  return (corr_coeff_[joint_nr] * (filtered_acceleration_array_[j][0] - filtered_acceleration_array_[j][1])) /
+  return (corr_coeff_[jn] * (filtered_acceleration_array_[jn][0] - filtered_acceleration_array_[jn][1])) /
          (lambda_ +
-          corr_coeff_[joint_nr] * pow(filtered_acceleration_array_[j][0] - filtered_acceleration_array_[j][1], 2));
+          corr_coeff_[jn] * pow(filtered_acceleration_array_[jn][0] - filtered_acceleration_array_[jn][1], 2));
 }
 
 // Calculate the correlation coefficient of the acceleration buffer
-void InertiaController::correlation_calculation()
+void InertiaController::correlation_calculation(int jn)
 {
-  for (int i = 0; i < num_joints_; ++i)
+  corr_coeff_[jn] =
+      corr_coeff_[jn] /
+      (lambda_ + corr_coeff_[jn] * pow(filtered_acceleration_array_[jn][0] - filtered_acceleration_array_[jn][1], 2));
+  double large_number = pow(10, 8);
+  if (corr_coeff_[jn] > large_number)
   {
-    corr_coeff_[i] =
-        corr_coeff_[i] /
-        (lambda_ + corr_coeff_[i] * pow(filtered_acceleration_array_[j][0] - filtered_acceleration_array_[j][1], 2));
-    double large_number = pow(10, 8);
-    if (corr_coeff_[i] > large_number)
-    {
-      corr_coeff_[i] = large_number;
-    }
+    corr_coeff_[jn] = large_number;
   }
 }
 
 // Calculate the vibration based on the acceleration
-double InertiaController::vibration_calculation()
+double InertiaController::vibration_calculation(int joint_nr)
 {
-  size_t len = sizeof(filtered_acceleration_array_[j]) / sizeof(filtered_acceleration_array_[j][0]);
-  double b[len];
-  absolute(filtered_acceleration_array_[j], b, len);
+  std::vector<double> b;
+  absolute(filtered_acceleration_array_[joint_nr], b);
   // moa = mean of the absolute
-  double moa = mean(b, len);
+  double moa = mean(b);
   // aom = absolute of the mean
-  double aom = absolute(mean(filtered_acceleration_array_[j], len));
+  double aom = absolute(mean(filtered_acceleration_array_[joint_nr]));
   return moa / aom;
 }
 
 // Calculate a discrete derivative of the speed measurements
-void InertiaController::discrete_speed_derivative(const ros::Duration& period)
+void InertiaController::discrete_speed_derivative(int joint_nr, const ros::Duration& period)
 {
-  for (int i = 0; i < num_joints_; ++i)
-  {
-    acceleration_array_[i][0] = (joint_velocity[i] - velocity_array_[i][1]) / period.toSec();
-  }
+  auto it = acceleration_array_[joint_nr].begin();
+  it = acceleration_array_[joint_nr].insert(it, (joints_[joint_nr].getVelocity() - velocity_array_[joint_nr][1]) /
+                                                    period.toSec());
 }
 
 }  // namespace joint_inertia_controller
