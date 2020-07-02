@@ -56,22 +56,28 @@ private:
   float min_alpha_ = 0.4;  // You might want to be able to adjust this value from a yaml/launch file
   float max_alpha_ = 0.9;  // You might want to be able to adjust this value from a yaml/launch file
 
-  double sos[3][6];
+  double sos_[3][6] = {
+    { 2.31330497e-05, 4.62660994e-05, 2.31330497e-05, 1.00000000e+00, -1.37177561e+00, 4.75382129e-01 },
+    { 1.00000000e+00, 2.00000000e+00, 1.00000000e+00, 1.00000000e+00, -1.47548044e+00, 5.86919508e-01 },
+    { 1.00000000e+00, 2.00000000e+00, 1.00000000e+00, 1.00000000e+00, -1.69779140e+00, 8.26021017e-01 }
+  };
+  // namespace joint_inertia_controller
 
+  // Replace the 8 with he number of joints later
   // Of length 12 for the acceleration buffer
-  double joint_velocity_[12];
+  double velocity_array_[march->num_joints_][12];
   // Of length 12 for the alpha calculation
-  double joint_acceleration_[12];
+  double acceleration_array_[num_joints_][12];
   // Of length 2 for the error calculation
-  double filtered_joint_acceleration_[2];
-  // Of length 2 for the butterworth filter
-  double joint_torque_[2];
+  double filtered_acceleration_array_[num_joints_][2];
+  // Of length 3 for the butterworth filter
+  double joint_torque_[num_joints_][3];
   // Of length 2 for the error calculation
-  double filtered_joint_torque_[2];
+  double filtered_joint_torque_[num_joints_][2];
 
   // Correlation coefficient used to calculate the inertia gain
-  double corr_coeff_;
-  double joint_inertia_ = 0;
+  double corr_coeff_[num_joints_];
+  double joint_inertia_[num_joints_];
   double lambda_ = 0.96;  // You might want to be able to adjust this value from a yaml/launch file
 };
 }  // namespace joint_inertia_controller
