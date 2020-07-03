@@ -3,6 +3,7 @@
 #ifndef MARCH_HARDWARE_JOINT_INERTIA_CONTROLLER_H
 #define MARCH_HARDWARE_JOINT_INERTIA_CONTROLLER_H
 
+#include <actionlib/server/simple_action_server.h>
 #include <controller_interface/controller.h>
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/joint_command_interface.h>
@@ -21,7 +22,7 @@ using joint_limits_interface::SoftJointLimits;
 
 namespace joint_inertia_controller
 {
-class InertiaController : public controller_interface::Controller<hardware_interface::PositionJointInterface>
+class InertiaController : public controller_interface::Controller<hardware_interface::EffortJointInterface>
 {
 public:
   bool init(hardware_interface::PositionJointInterface* hw, ros::NodeHandle& n);
@@ -48,6 +49,8 @@ public:
   // Fill the buffers with corresponding values. Are arrays efficient enough/is this method efficient enough? There
   // exist vector methods such as pushback() and resize as well. HALP!
   bool fill_buffers(const ros::Duration& period);
+
+  actionlib_msgs::GoalStatus trajectory_status;
 
 private:
   ros::Subscriber sub_command_;

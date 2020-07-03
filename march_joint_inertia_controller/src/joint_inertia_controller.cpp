@@ -1,6 +1,11 @@
 // Copyright 2020 Project March.
 #include "march_joint_inertia_controller/joint_inertia_controller.h"
+#include <control_msgs/FollowJointTrajectoryAction.h>
+#include <trajectory_msgs/JointTrajectory.h>
 #include <math.h>
+#include <effort_controllers/joint_position_controller.h>
+#include <angles/angles.h>
+#include <pluginlib/class_list_macros.hpp>
 
 using joint_limits_interface::JointLimits;
 using joint_limits_interface::PositionJointSoftLimitsHandle;
@@ -96,7 +101,7 @@ bool InertiaController::init(hardware_interface::PositionJointInterface* hw, ros
     }
   }
 
-  // Fill the buffers
+  // Size the buffers
   velocity_array_.resize(num_joints_);
   for (unsigned int j = 0; j < num_joints_; ++j)
     velocity_array_[j].resize(vel_size_);
@@ -139,6 +144,11 @@ bool InertiaController::init(hardware_interface::PositionJointInterface* hw, ros
   commands_buffer_.writeFromNonRT(std::vector<double>(num_joints_, 0.0));
 
   sub_command_ = nh.subscribe<std_msgs::Float64MultiArray>("command", 1, &InertiaController::commandCB, this);
+
+  ServerFollowJoint server_follow_joint_trajectory(
+      n, ActionNames::follow_joint_trajectory,
+      boost::bind(&executeFollowJointTrajectory, _1, &server_follow_joint_trajectory), false);
+  server_follow_joint_trajectory.start();
 
   return true;
 }
