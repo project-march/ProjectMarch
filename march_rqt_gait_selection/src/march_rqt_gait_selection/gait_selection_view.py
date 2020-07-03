@@ -122,8 +122,10 @@ class GaitSelectionView(QWidget):
             subgait_menu.show()
             subgait_label.show()
 
+            versions = sorted(versions, key=version_sorter)
+
             subgait_label.setText(subgait_name)
-            subgait_menu.addItems(sorted(versions, key=version_sorter))
+            subgait_menu.addItems(versions)
 
             try:
                 current_version = self.version_map[gait_name][subgait_name]
