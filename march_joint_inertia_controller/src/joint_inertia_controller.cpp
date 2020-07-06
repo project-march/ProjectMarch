@@ -73,6 +73,15 @@ double mean(std::vector<double> a)
 
 namespace joint_inertia_controller
 {
+InertiaController::InertiaController()
+    : loop_count_(0)
+{}
+
+InertiaController::~InertiaController()
+{
+  sub_command_.shutdown();
+}
+
 bool InertiaController::init(hardware_interface::PositionJointInterface* hw, ros::NodeHandle& nh)
 {
   if (!nh.getParam("joint_name", joint_name))
@@ -144,6 +153,16 @@ void InertiaController::getGains(double& p, double& i, double& d, double& i_max,
 void InertiaController::printDebug()
 {
   pid_controller_.printValues();
+}
+
+std::string InertiaController::getJointName()
+{
+  return joint_.getName();
+}
+
+double InertiaController::getPosition()
+{
+  return joint_.getPosition();
 }
 
 // Wait what is difference between starting and init????
@@ -220,8 +239,8 @@ void InertiaController::update(const ros::Time& /* time */, const ros::Duration&
     commanded_effort = pid_controller_.computeCommand(error, period);
   }
 
-  this->fill_buffers(period);
-  this->inertia_estimate();
+//  this->fill_buffers(period);
+//  this->inertia_estimate();
   // TO DO: Provide lookup table for gain selection
   // TO DO: apply PID control
 

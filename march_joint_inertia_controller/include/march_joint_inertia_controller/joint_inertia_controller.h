@@ -36,6 +36,9 @@ public:
     bool has_velocity_;  // false if no velocity command has been specified
   };
 
+  InertiaController();
+  ~InertiaController();
+
   bool init(hardware_interface::PositionJointInterface* hw, ros::NodeHandle& n);
   void update(const ros::Time& time, const ros::Duration& period);
   void starting(const ros::Time& time);
@@ -63,6 +66,10 @@ public:
    */
   void setGains(const double& p, const double& i, const double& d, const double& i_max, const double& i_min,
                 const bool& antiwindup = false);
+
+  double getPosition();
+
+  std::string getJointName();
 
   // Applies the Butterworth filter over the last two samples and returns the resulting filtered value.
   void apply_butter();
