@@ -73,9 +73,9 @@ double mean(std::vector<double> a)
 
 namespace joint_inertia_controller
 {
-InertiaController::InertiaController()
-    : loop_count_(0)
-{}
+InertiaController::InertiaController() : loop_count_(0)
+{
+}
 
 InertiaController::~InertiaController()
 {
@@ -239,8 +239,8 @@ void InertiaController::update(const ros::Time& /* time */, const ros::Duration&
     commanded_effort = pid_controller_.computeCommand(error, period);
   }
 
-//  this->fill_buffers(period);
-//  this->inertia_estimate();
+  //  this->fill_buffers(period);
+  //  this->inertia_estimate();
   // TO DO: Provide lookup table for gain selection
   // TO DO: apply PID control
 

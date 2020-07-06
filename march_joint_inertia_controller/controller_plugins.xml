@@ -1,5 +1,5 @@
 <library path="lib/libmarch_joint_inertia_controller">
-  <class name="joint_inertia_controller/InertiaController"
-         type="joint_inertia_controller::InertiaController"
-         base_class_type="controller_interface::ControllerBase" />
+    <class name="joint_inertia_controller/InertiaController"
+           type="joint_inertia_controller::InertiaController"
+           base_class_type="controller_interface::ControllerBase"/>
 </library>
