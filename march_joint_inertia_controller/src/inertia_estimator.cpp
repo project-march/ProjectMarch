@@ -1,4 +1,6 @@
 // Copyright 2020 Project March.
+#include "march_joint_inertia_controller/inertia_estimator.h"
+#include "ros/ros.h"
 
 void absolute(std::vector<double> a, std::vector<double> b)
 {
@@ -75,7 +77,7 @@ InertiaEstimator::InertiaEstimator()
   ros::Duration first(0.004);
   // Bad practice (de time attribute), maar wat anders? en gaat dit wel goed met elke keer dat we data ontvangen?
   // Krijgen we niet dubbele waarden op deze manier?
-  this->fill_buffers(first);
+  fill_buffers(first);
 
   // Setup the initial value for the correlation coefficient 100*standarddeviation(acceleration)^2
   corr_coeff_ = 0.0;
@@ -83,7 +85,7 @@ InertiaEstimator::InertiaEstimator()
   // Setup Butterworth filter
 }
 
-InertiaEstimator::InertiaEstimator(hardware_interface::JointHandle joint) : joint_(joint)
+InertiaEstimator::InertiaEstimator(hardware_interface::JointHandle joint)
 {
   // Size the buffers
   velocity_array_.resize(vel_size_);
@@ -96,10 +98,12 @@ InertiaEstimator::InertiaEstimator(hardware_interface::JointHandle joint) : join
 
   filtered_joint_torque_.resize(fil_tor_size_);
 
+  setJoint(joint);
+
   ros::Duration first(0.004);
   // Bad practice (de time attribute), maar wat anders? en gaat dit wel goed met elke keer dat we data ontvangen?
   // Krijgen we niet dubbele waarden op deze manier?
-  this->fill_buffers(first);
+  fill_buffers(first);
 
   // Setup the initial value for the correlation coefficient 100*standarddeviation(acceleration)^2
   corr_coeff_ = 0.0;
@@ -113,7 +117,7 @@ InertiaEstimator::~InertiaEstimator()
 
 void InertiaEstimator::setJoint(hardware_interface::JointHandle joint)
 {
-  this->joint_ = joint;
+  joint_ = joint;
 }
 
 // Fills the buffers so that non-zero values may be computed by the inertia estimator
@@ -126,7 +130,7 @@ bool InertiaEstimator::fill_buffers(const ros::Duration& period)
   velocity_array_.resize(vel_size_);
 
   // Automatically fills the zero'th position of the acceleration array
-  this->discrete_speed_derivative(period);
+  discrete_speed_derivative(period);
   acceleration_array_.resize(acc_size_);
 
   it = joint_torque_.begin();
@@ -173,11 +177,11 @@ void InertiaEstimator::inertia_estimate()
   double K_a;
   double torque_e;
   double acc_e;
-  this->apply_butter();
+  apply_butter();
 
-  this->correlation_calculation();
-  K_i = this->gain_calculation();
-  K_a = this->alpha_calculation();
+  correlation_calculation();
+  K_i = gain_calculation();
+  K_a = alpha_calculation();
   torque_e = filtered_joint_torque_[0] - filtered_joint_torque_[1];
   acc_e = filtered_acceleration_array_[0] - filtered_acceleration_array_[1];
   joint_inertia_ = (torque_e - (acc_e * joint_inertia_)) * K_i * K_a + joint_inertia_;
@@ -186,7 +190,7 @@ void InertiaEstimator::inertia_estimate()
 // Calculate the alpha coefficient for the inertia estimate
 double InertiaEstimator::alpha_calculation()
 {
-  double vib = this->vibration_calculation();
+  double vib = vibration_calculation();
   if (vib < min_alpha_)
   {
     vib = min_alpha_;

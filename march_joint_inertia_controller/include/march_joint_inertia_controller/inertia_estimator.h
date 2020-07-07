@@ -6,18 +6,27 @@
 #include <control_toolbox/pid.h>
 #include <controller_interface/controller.h>
 #include <trajectory_interface/quintic_spline_segment.h>
-#include <joint_trajectory_controller/joint_trajectory_controller.h>
-#include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/joint_command_interface.h>
 #include <memory>
 #include <urdf/model.h>
 #include <realtime_tools/realtime_buffer.h>
 #include <realtime_tools/realtime_publisher.h>
+#include <ros/ros.h>
 #include <pluginlib/class_list_macros.h>
 #include <std_msgs/Float64MultiArray.h>
 #include <std_msgs/Float64.h>
 
-template <>
+void absolute(std::vector<double> a, std::vector<double> b);
+
+// Compute the absolute value of a double and return it.
+double absolute(double a);
+
+int maximum(int a, int b, int c);
+
+double median(double a[], size_t sz);
+
+double mean(std::vector<double> a);
+
 class InertiaEstimator
 {
 public:
@@ -27,7 +36,7 @@ public:
 
   double getPosition();
 
-  void setJoint();
+  void setJoint(hardware_interface::JointHandle joint);
 
   std::string getJointName();
 
@@ -88,6 +97,5 @@ private:
   double joint_inertia_;
   double lambda_ = 0.96;  // You might want to be able to adjust this value from a yaml/launch file
 };
-}  // namespace joint_inertia_controller
 
 #endif  // MARCH_WS_INERTIA_ESTIMATOR_H

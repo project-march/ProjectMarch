@@ -1,7 +1,7 @@
 // Copyright 2020 Project March.
 
-#ifndef MARCH_HARDWARE_JOINT_INERTIA_CONTROLLER_H
-#define MARCH_HARDWARE_JOINT_INERTIA_CONTROLLER_H
+#ifndef MARCH_HARDWARE_JOINT_TRAJECTORY_INERTIA_CONTROLLER_H
+#define MARCH_HARDWARE_JOINT_TRAJECTORY_INERTIA_CONTROLLER_H
 
 #include <control_toolbox/pid.h>
 #include <controller_interface/controller.h>
@@ -9,6 +9,7 @@
 #include <joint_trajectory_controller/joint_trajectory_controller.h>
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/joint_command_interface.h>
+#include "march_joint_inertia_controller/inertia_estimator.h"
 #include <memory>
 #include <urdf/model.h>
 #include <realtime_tools/realtime_buffer.h>
@@ -28,6 +29,10 @@ template <>
 class HardwareInterfaceAdapter<hardware_interface::EffortJointInterface, joint_trajectory_controller::State>
 {
 public:
+  HardwareInterfaceAdapter::HardwareInterfaceAdapter() : joint_handles_ptr(0)
+  {
+  }
+
   struct Commands
   {
     double position_;            // Last commanded position
@@ -35,7 +40,7 @@ public:
     bool has_velocity_ = false;  // false if no velocity command has been specified
   };
 
-  bool init(hardware_interface::PositionJointInterface* hw, ros::NodeHandle& n);
+  bool init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh);
   void updateCommand(const ros::Time& time, const ros::Duration& period,
                      const joint_trajectory_controller::State& desired_state,
                      const joint_trajectory_controller::State& state_error);
@@ -78,17 +83,19 @@ private:
   int loop_count_;
   control_toolbox::Pid pid_controller_; /**< Internal PID controller. */
 
+  std::vector<hardware_interface::JointHandle>* joint_handles_ptr;
+
   ros::Subscriber sub_command_;
   hardware_interface::JointHandle joint_;
   double init_pos_;
 
-  std::vector<InertiaEstimator> inertia_estimators;
+  std::vector<InertiaEstimator> inertia_estimators_;
 
   /**
    * \brief Callback from /command subscriber for setpoint
    */
   void setCommandCB(const std_msgs::Float64ConstPtr& msg);
 };
-}  // namespace joint_inertia_controller
+}  // namespace joint_trajectory_controller
 
-#endif  // MARCH_HARDWARE_JOINT_INERTIA_CONTROLLER_H
+#endif  // MARCH_HARDWARE_JOINT_TRAJECTORY_INERTIA_CONTROLLER_H

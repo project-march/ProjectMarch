@@ -1,6 +1,4 @@
 // Copyright 2020 Project March.
-#include "march_joint_inertia_controller/joint_inertia_controller.h"
-#include "march_joint_inertia_controller/inertia_estimator.h"
 #include <pluginlib/class_list_macros.h>
 #include <control_msgs/FollowJointTrajectoryAction.h>
 #include <trajectory_msgs/JointTrajectory.h>
@@ -13,11 +11,7 @@ using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::PositionJointSoftLimitsInterface;
 using joint_limits_interface::SoftJointLimits;
 
-HardwareInterfaceAdapter::HardwareInterfaceAdapter() : joint_handles_ptr(0)
-{
-}
-
-bool HardwareInterfaceAdapter::init(hardware_interface::PositionJointInterface* hw, ros::NodeHandle& nh)
+bool HardwareInterfaceAdapter::init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
 {
   if (!nh.getParam("joint_name", joint_name))
   {
@@ -26,7 +20,7 @@ bool HardwareInterfaceAdapter::init(hardware_interface::PositionJointInterface* 
   }
 
   // May be totally unnecessary as we have direct access to deired state in updateCommand method...
-  sub_command_ = nh.subscribe<std_msgs::Float64>("command", 1, &InertiaController::commandCB, this);
+  sub_command_ = nh.subscribe<std_msgs::Float64>("command", 1, &HardwareInterfaceAdapter::commandCB, this);
 
   // Get joint handle from hardware interface
   joint_ = hw->getHandle(joint_name);
