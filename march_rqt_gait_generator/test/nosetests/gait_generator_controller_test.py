@@ -24,6 +24,7 @@ class GaitGeneratorControllerTest(unittest.TestCase):
         self.duration = self.gait_generator_controller.subgait.duration
         self.num_joints = len(self.gait_generator_controller.subgait.joints)
 
+        self.maxDiff = None
         self.gait_name = 'walk'
         self.subgait_name = 'left_swing'
         self.version = 'MV_walk_leftswing_v2'

@@ -241,10 +241,11 @@ class GaitGeneratorController(object):
     def import_side_subgait(self, side='previous'):
         file_name, f = self.view.open_file_dialogue()
 
-        subgait = ModifiableSubgait.from_file(self.robot, file_name, self)
+        subgait = ModifiableSubgait.from_file(self.robot, file_name)
         if subgait is None:
             rospy.logwarn('Could not load gait %s', file_name)
             return
+        subgait.set_gait_generator(self)
 
         if side == 'previous':
             self.previous_subgait = subgait

@@ -27,9 +27,7 @@ class ModifiableSubgait(Subgait):
             return None
 
         joint_list = []
-        for joint_index in range(len(robot.joints)):
-            urdf_joint = robot.joints[joint_index]
-
+        for urdf_joint in sorted(robot.joints, key=lambda j: j.name):
             if urdf_joint.type == 'fixed':
                 rospy.loginfo('Skipping fixed joint ' + urdf_joint.name)
                 continue
