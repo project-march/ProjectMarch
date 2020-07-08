@@ -515,7 +515,7 @@ void MarchHardwareInterface::getSoftJointLimitsError(const std::string& name,
   float margin;
   ros::param::param<float>(param_name.str(), margin, 0.0);
 
-  if (!urdf_joint || !urdf_joint->safety || !urdf_joint->limits || margin == 0.0)
+  if (!urdf_joint || !urdf_joint->safety || !urdf_joint->limits || margin <= 0.0 || margin > 1.0)
   {
     error_stream << "Could not construct the soft limits for joint: " << name;
     throw std::runtime_error(error_stream.str());
