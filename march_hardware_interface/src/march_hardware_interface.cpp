@@ -44,7 +44,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
   this->reserveMemory();
 
   // Start ethercat cycle in the hardware
-  // this->march_robot_->startEtherCAT(this->reset_imc_);
+  this->march_robot_->startEtherCAT(this->reset_imc_);
 
   for (size_t i = 0; i < num_joints_; ++i)
   {
@@ -522,7 +522,7 @@ void MarchHardwareInterface::getSoftJointLimitsError(const std::string& name,
   }
 
   error_soft_limits.min_position =
-      urdf_joint->limits->lower + ((urdf_joint->limits->lower - urdf_joint->safety->soft_lower_limit) * margin);
+      urdf_joint->limits->lower + ((urdf_joint->safety->soft_lower_limit - urdf_joint->limits->lower) * margin);
   error_soft_limits.max_position =
       urdf_joint->limits->upper - ((urdf_joint->limits->upper - urdf_joint->safety->soft_upper_limit) * margin);
 }

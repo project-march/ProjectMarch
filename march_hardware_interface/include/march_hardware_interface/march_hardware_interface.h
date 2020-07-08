@@ -77,8 +77,6 @@ public:
    * Construct the soft limit error based on the margin defined in the controller yaml and the soft limits and hard
    * limits in the URDF.
    */
-  static void getSoftJointLimitsError(const std::string& name, const urdf::JointConstSharedPtr& urdf_joint,
-                                      joint_limits_interface::SoftJointLimits& error_soft_limits);
 
 private:
   void uploadJointNames(ros::NodeHandle& nh) const;
@@ -94,6 +92,8 @@ private:
   void updateIMotionCubeState();
   void outsideLimitsCheck(size_t joint_index);
   bool iMotionCubeStateCheck(size_t joint_index);
+  static void getSoftJointLimitsError(const std::string& name, const urdf::JointConstSharedPtr& urdf_joint,
+                                      joint_limits_interface::SoftJointLimits& error_soft_limits);
 
   /* Limit of the change in effort command over one cycle, can be overridden by safety controller */
   static constexpr double MAX_EFFORT_CHANGE = 5000;
