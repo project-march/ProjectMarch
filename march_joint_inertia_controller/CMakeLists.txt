@@ -22,7 +22,9 @@ include_directories(include SYSTEM ${catkin_INCLUDE_DIRS})
 
 add_library(${PROJECT_NAME} src/joint_inertia_controller.cpp
     include/${PROJECT_NAME}/inertia_estimator.h
-    src/inertia_estimator.cpp)
+    include/${PROJECT_NAME}/joint_trajectory_inertia_controller.h
+    src/inertia_estimator.cpp
+    src/joint_trajectory_inertia_controller.cpp)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 install(DIRECTORY include/${PROJECT_NAME}/

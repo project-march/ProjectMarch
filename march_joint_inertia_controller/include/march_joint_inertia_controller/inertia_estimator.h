@@ -5,16 +5,16 @@
 
 #include <control_toolbox/pid.h>
 #include <controller_interface/controller.h>
-#include <trajectory_interface/quintic_spline_segment.h>
 #include <hardware_interface/joint_command_interface.h>
 #include <memory>
-#include <urdf/model.h>
+#include <pluginlib/class_list_macros.h>
 #include <realtime_tools/realtime_buffer.h>
 #include <realtime_tools/realtime_publisher.h>
 #include <ros/ros.h>
-#include <pluginlib/class_list_macros.h>
-#include <std_msgs/Float64MultiArray.h>
 #include <std_msgs/Float64.h>
+#include <std_msgs/Float64MultiArray.h>
+#include <trajectory_interface/quintic_spline_segment.h>
+#include <urdf/model.h>
 
 void absolute(std::vector<double> a, std::vector<double> b);
 
