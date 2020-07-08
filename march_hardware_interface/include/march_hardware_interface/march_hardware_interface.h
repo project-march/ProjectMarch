@@ -68,7 +68,17 @@ public:
    */
   int getEthercatCycleTime() const;
 
+  /**
+   * Wait for received PDO.
+   */
   void waitForPdo();
+
+  /**
+   * Construct the soft limit error based on the margin defined in the controller yaml and the soft limits and hard
+   * limits in the URDF.
+   */
+  static void getSoftJointLimitsError(const std::string& name, const urdf::JointConstSharedPtr& urdf_joint,
+                                      joint_limits_interface::SoftJointLimits& error_soft_limits);
 
 private:
   void uploadJointNames(ros::NodeHandle& nh) const;
@@ -120,6 +130,7 @@ private:
   std::vector<double> joint_temperature_variance_;
 
   std::vector<joint_limits_interface::SoftJointLimits> soft_limits_;
+  std::vector<joint_limits_interface::SoftJointLimits> soft_limits_error_;
 
   PowerNetOnOffCommand power_net_on_off_command_;
   bool master_shutdown_allowed_command_ = false;
