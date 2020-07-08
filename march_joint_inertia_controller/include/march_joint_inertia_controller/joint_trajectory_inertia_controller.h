@@ -101,8 +101,6 @@ public:
       const double command = (pids_[i]->computeCommand(state_error.position[i], state_error.velocity[i], period));
       (*joint_handles_ptr_)[i].setCommand(command);
     }
-
-    // Example says to update state p[ublisher but we already do that somewhere else?
   }
 
   void starting(const ros::Time& /*time*/)
