@@ -42,12 +42,7 @@ public:
 
   bool init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
   {
-    if (!nh.getParam("/march_hardware_interface/joints", joint_names))
-    {
-      ROS_ERROR("No joint_names specified");
-      return false;
-    }
-    num_joints_ = joint_names.size();
+    const unsigned int num_joints_ = joint_handles_ptr_->size();
 
     // Store pointer to joint handles
     joint_handles_ptr_ = &joint_handles;
