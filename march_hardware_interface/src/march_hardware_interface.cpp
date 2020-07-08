@@ -470,21 +470,30 @@ bool MarchHardwareInterface::iMotionCubeStateCheck(size_t joint_index)
 void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
 {
   march::Joint& joint = march_robot_->getJoint(joint_index);
+
   if (joint_position_[joint_index] < soft_limits_[joint_index].min_position ||
       joint_position_[joint_index] > soft_limits_[joint_index].max_position)
   {
-    ROS_ERROR_THROTTLE(1, "Joint %s is outside of its soft limits (%f, %f). Actual position: %f",
-                       joint.getName().c_str(), soft_limits_[joint_index].min_position,
-                       soft_limits_[joint_index].max_position, joint_position_[joint_index]);
-
-    if (joint.canActuate())
+    if (joint_position_[joint_index] < soft_limits_error_[joint_index].min_position ||
+        joint_position_[joint_index] > soft_limits_error_[joint_index].max_position)
     {
-      std::ostringstream error_stream;
-      error_stream << "Joint " << joint.getName() << " is out of its soft limits ("
-                   << soft_limits_[joint_index].min_position << ", " << soft_limits_[joint_index].max_position
-                   << "). Actual position: " << joint_position_[joint_index];
-      throw std::runtime_error(error_stream.str());
+      ROS_ERROR_THROTTLE(1, "Joint %s is outside of its error soft limits (%f, %f). Actual position: %f",
+                         joint.getName().c_str(), soft_limits_error_[joint_index].min_position,
+                         soft_limits_error_[joint_index].max_position, joint_position_[joint_index]);
+
+      if (joint.canActuate())
+      {
+        std::ostringstream error_stream;
+        error_stream << "Joint " << joint.getName() << " is out of its soft limits ("
+                     << soft_limits_[joint_index].min_position << ", " << soft_limits_[joint_index].max_position
+                     << "). Actual position: " << joint_position_[joint_index];
+        throw std::runtime_error(error_stream.str());
+      }
     }
+
+    ROS_WARN_THROTTLE(1, "Joint %s is outside of its soft limits (%f, %f). Actual position: %f",
+                      joint.getName().c_str(), soft_limits_[joint_index].min_position,
+                      soft_limits_[joint_index].max_position, joint_position_[joint_index]);
   }
 }
 
