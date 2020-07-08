@@ -212,11 +212,12 @@ class GaitGeneratorController(object):
     def import_gait(self):
         file_name, f = self.view.open_file_dialogue()
 
-        gait = ModifiableSubgait.from_file(self.robot, file_name, self)
+        gait = ModifiableSubgait.from_file(self.robot, file_name)
         if gait is None:
             rospy.logwarn('Could not load gait %s', file_name)
             return
         self.subgait = gait
+        self.subgait.set_gait_generator(self)
 
         was_playing = self.time_slider_thread is not None
         self.stop_time_slider_thread()
@@ -268,8 +269,6 @@ class GaitGeneratorController(object):
         if gait_directory is None or gait_directory == '':
             return
 
-        subgait_msg = subgait.to_subgait_msg()
-
         output_file_directory = os.path.join(gait_directory,
                                              subgait.gait_name.replace(' ', '_'),
                                              subgait.subgait_name.replace(' ', '_'))
@@ -289,7 +288,7 @@ class GaitGeneratorController(object):
             os.makedirs(output_file_directory)
 
         with open(output_file_path, 'w') as output_file:
-            output_file.write(str(subgait_msg))
+            output_file.write(subgait.to_yaml())
 
         self.view.notify('Gait Saved', output_file_path)
 

@@ -12,6 +12,8 @@ class ModifiableJointTrajectory(JointTrajectory):
     setpoint_class = ModifiableSetpoint
 
     def __init__(self, name, limits, setpoints, duration, gait_generator=None):
+        super(ModifiableJointTrajectory, self).__init__(name, limits, setpoints, duration)
+
         self.setpoints_history = RingBuffer(capacity=100, dtype=list)
         self.setpoints_redo_list = RingBuffer(capacity=100, dtype=list)
         self.gait_generator = gait_generator
@@ -19,44 +21,15 @@ class ModifiableJointTrajectory(JointTrajectory):
         self._start_point = None
         self._end_point = None
 
-        super(ModifiableJointTrajectory, self).__init__(name, limits, setpoints, duration)
+        if self.setpoints[0].time != 0:
+            rospy.logwarn('First setpoint of {0} has been set '
+                          'from {1} to 0'.format(name, self.setpoints[0].time))
+        if self.setpoints[-1].time != duration:
+            rospy.logwarn('Last setpoint of {0} has been set '
+                          'from {1} to {2}'.format(name, self.setpoints[0].time, duration))
 
-    @classmethod
-    def from_dict(cls, subgait_dict, joint_name, limits, duration, gait_generator):
-        user_defined_setpoints = subgait_dict.get('setpoints')
-        if user_defined_setpoints:
-            joint_trajectory_dict = subgait_dict['trajectory']
-            setpoints = []
-            for actual_setpoint in user_defined_setpoints:
-                if joint_name in actual_setpoint['joint_names']:
-                    setpoints.append(cls._get_setpoint_at_duration(
-                        joint_trajectory_dict, joint_name, actual_setpoint['time_from_start']))
-            if setpoints[0].time != 0:
-                rospy.logwarn('First setpoint of {0} has been set '
-                              'from {1} to 0'.format(joint_name, setpoints[0].time))
-            if setpoints[-1].time != duration:
-                rospy.logwarn('Last setpoint of {0} has been set '
-                              'from {1} to {2}'.format(joint_name, setpoints[0].time, duration))
-            return cls(joint_name,
-                       limits,
-                       setpoints,
-                       duration,
-                       gait_generator,
-                       )
-
-        rospy.logwarn('This subgait has no user defined setpoints.')
-        return super(ModifiableJointTrajectory, cls).from_dict(subgait_dict, joint_name, limits,
-                                                               duration, gait_generator)
-
-    @staticmethod
-    def _get_setpoint_at_duration(joint_trajectory_dict, joint_name, duration):
-        for point in joint_trajectory_dict['points']:
-            if point['time_from_start'] == duration:
-                index = joint_trajectory_dict['joint_names'].index(joint_name)
-                time = rospy.Duration(point['time_from_start']['secs'], point['time_from_start']['nsecs']).to_sec()
-
-                return ModifiableSetpoint(time, point['positions'][index], point['velocities'][index])
-        return None
+    def set_gait_generator(self, gait_generator):
+        self.gait_generator = gait_generator
 
     def set_setpoints(self, setpoints):
         self.setpoints = setpoints
