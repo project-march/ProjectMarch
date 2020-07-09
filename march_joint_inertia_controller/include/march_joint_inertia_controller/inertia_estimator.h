@@ -48,7 +48,10 @@ public:
   // Calculate the vibration based on the acceleration
   double vibration_calculation();
 
-  std::vector<double> getFilAcc(){return filtered_acceleration_array_;}
+  std::vector<double> getFilAcc()
+  {
+    return filtered_acceleration_array_;
+  }
 
   // Fill the buffers with corresponding values.
   bool fill_buffers(const ros::Duration& period);

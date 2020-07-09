@@ -5,14 +5,16 @@ add_compile_options(-std=c++14 -Wall -Wextra -Werror)
 
 find_package(catkin REQUIRED COMPONENTS
     actionlib
-    actionlib_msgs
-    control_msgs
-    controller_manager
     controller_interface
+    controller_manager
     joint_state_controller
     joint_trajectory_controller
+    march_hardware
+    march_shared_resources
     pluginlib
+    realtime_tools
     roscpp
+    std_msgs
     urdf
     )
 
@@ -20,6 +22,8 @@ catkin_package(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
     CATKIN_DEPENDS
+    actionlib_msgs
+    control_msgs
     controller_interface
     pluginlib
     roscpp
