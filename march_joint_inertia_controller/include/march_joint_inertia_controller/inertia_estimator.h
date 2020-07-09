@@ -3,16 +3,8 @@
 #ifndef MARCH_WS_INERTIA_ESTIMATOR_H
 #define MARCH_WS_INERTIA_ESTIMATOR_H
 
-#include <control_toolbox/pid.h>
-#include <controller_interface/controller.h>
 #include <hardware_interface/joint_command_interface.h>
-#include <memory>
-#include <pluginlib/class_list_macros.h>
-#include <realtime_tools/realtime_buffer.h>
-#include <realtime_tools/realtime_publisher.h>
 #include <ros/ros.h>
-#include <std_msgs/Float64.h>
-#include <std_msgs/Float64MultiArray.h>
 #include <trajectory_interface/quintic_spline_segment.h>
 #include <urdf/model.h>
 
@@ -46,7 +38,7 @@ public:
   // Estimate the inertia using the acceleration and torque
   void inertia_estimate();
   // Calculate a discrete derivative of the speed measurements
-  void discrete_speed_derivative(const ros::Duration&);
+  void discrete_speed_derivative(double velocity, const ros::Duration&);
   // Calculate the alpha coefficient for the inertia estimate
   double alpha_calculation();
   // Calculate the inertia gain for the inertia estimate
@@ -56,8 +48,12 @@ public:
   // Calculate the vibration based on the acceleration
   double vibration_calculation();
 
+  std::vector<double> getFilAcc(){return filtered_acceleration_array_;}
+
   // Fill the buffers with corresponding values.
   bool fill_buffers(const ros::Duration& period);
+  bool fill_buffers(double velocity, double effort, const ros::Duration& period);
+  bool fill_buffers(double velocity, double effort);
 
   urdf::JointConstSharedPtr joint_urdf_;
   std::string joint_name;
@@ -83,7 +79,7 @@ private:
   size_t acc_size_ = 12;
   std::vector<double> acceleration_array_;
   // Of length 2 for the error calculation
-  size_t fil_acc_size_ = 2;
+  size_t fil_acc_size_ = acc_size_;
   std::vector<double> filtered_acceleration_array_;
   // Of length 3 for the butterworth filter
   size_t torque_size_ = 2;

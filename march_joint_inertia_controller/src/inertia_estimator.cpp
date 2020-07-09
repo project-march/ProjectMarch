@@ -1,28 +1,15 @@
 // Copyright 2020 Project March.
+#include <hardware_interface/joint_command_interface.h>
+#include <hardware_interface/joint_state_interface.h>
 #include "march_joint_inertia_controller/inertia_estimator.h"
+#include "math.h"
 #include "ros/ros.h"
 
 void absolute(std::vector<double> a, std::vector<double> b)
 {
   for (size_t i = 0; i < a.size(); ++i)
   {
-    if (a[i] < 0)
-    {
-      b[i] = a[i] - 1;
-    }
-  }
-}
-
-// Compute the absolute value of a double and return it.
-double absolute(double a)
-{
-  if (a < 0)
-  {
-    return a * (-1);
-  }
-  else
-  {
-    return a;
+    b[i] = abs(a[i]);
   }
 }
 
@@ -58,6 +45,10 @@ double mean(std::vector<double> a)
   {
     sum += a[i];
   }
+  if (sum == 0.0)
+  {
+    return 0.0;
+  }
   return sum / a.size();
 }
 
@@ -74,10 +65,20 @@ InertiaEstimator::InertiaEstimator()
 
   filtered_joint_torque_.resize(fil_tor_size_);
 
-  ros::Duration first(0.004);
-  // Bad practice (de time attribute), maar wat anders? en gaat dit wel goed met elke keer dat we data ontvangen?
-  // Krijgen we niet dubbele waarden op deze manier?
-  fill_buffers(first);
+  for (unsigned int i = 0; i < vel_size_; ++i)
+  {
+    velocity_array_[i] = 0.0;
+  }
+
+  for (unsigned int i = 0; i < acc_size_; ++i)
+  {
+    acceleration_array_[i] = 0.0;
+  }
+
+  for (unsigned int i = 0; i < torque_size_; ++i)
+  {
+    joint_torque_[i] = 0.0;
+  }
 
   // Setup the initial value for the correlation coefficient 100*standarddeviation(acceleration)^2
   corr_coeff_ = 0.0;
@@ -100,10 +101,20 @@ InertiaEstimator::InertiaEstimator(hardware_interface::JointHandle joint)
 
   setJoint(joint);
 
-  ros::Duration first(0.004);
-  // Bad practice (de time attribute), maar wat anders? en gaat dit wel goed met elke keer dat we data ontvangen?
-  // Krijgen we niet dubbele waarden op deze manier?
-  fill_buffers(first);
+  for (unsigned int i = 0; i < vel_size_; ++i)
+  {
+    velocity_array_[i] = 0.0;
+  }
+
+  for (unsigned int i = 0; i < acc_size_; ++i)
+  {
+    acceleration_array_[i] = 0.0;
+  }
+
+  for (unsigned int i = 0; i < torque_size_; ++i)
+  {
+    joint_torque_[i] = 0.0;
+  }
 
   // Setup the initial value for the correlation coefficient 100*standarddeviation(acceleration)^2
   corr_coeff_ = 0.0;
@@ -130,11 +141,50 @@ bool InertiaEstimator::fill_buffers(const ros::Duration& period)
   velocity_array_.resize(vel_size_);
 
   // Automatically fills the zero'th position of the acceleration array
-  discrete_speed_derivative(period);
+  discrete_speed_derivative(joint_.getVelocity(), period);
   acceleration_array_.resize(acc_size_);
 
   it = joint_torque_.begin();
   it = joint_torque_.insert(it, joint_.getEffort());
+  joint_torque_.resize(torque_size_);
+  return false;
+}
+
+// Fills the buffers so that non-zero values may be computed by the inertia estimator
+bool InertiaEstimator::fill_buffers(double velocity, double effort, const ros::Duration& period)
+{
+  auto it = velocity_array_.begin();
+
+  it = velocity_array_.begin();
+  it = velocity_array_.insert(it, velocity);
+  velocity_array_.resize(vel_size_);
+
+  // Automatically fills the zero'th position of the acceleration array
+  discrete_speed_derivative(velocity, period);
+  acceleration_array_.resize(acc_size_);
+
+  it = joint_torque_.begin();
+  it = joint_torque_.insert(it, effort);
+  joint_torque_.resize(torque_size_);
+  return false;
+}
+
+// Fills the buffers so that non-zero values may be computed by the inertia estimator
+bool InertiaEstimator::fill_buffers(double velocity, double effort)
+{
+  auto it = velocity_array_.begin();
+
+  it = velocity_array_.begin();
+  it = velocity_array_.insert(it, velocity);
+  velocity_array_.resize(vel_size_);
+
+  // Automatically fills the zero'th position of the acceleration array
+  ros::Duration period(0.004);
+  discrete_speed_derivative(velocity, period);
+  acceleration_array_.resize(acc_size_);
+
+  it = joint_torque_.begin();
+  it = joint_torque_.insert(it, effort);
   joint_torque_.resize(torque_size_);
   return false;
 }
@@ -225,17 +275,23 @@ void InertiaEstimator::correlation_calculation()
 double InertiaEstimator::vibration_calculation()
 {
   std::vector<double> b;
+  b.resize(acc_size_);
   absolute(filtered_acceleration_array_, b);
   // moa = mean of the absolute
   double moa = mean(b);
   // aom = absolute of the mean
-  double aom = absolute(mean(filtered_acceleration_array_));
+  double aom = abs(mean(filtered_acceleration_array_));
+  if (aom == 0.0)
+  {
+    ROS_INFO("omaigod we gaan toch niet delen door nul hey");
+    return 0.0;
+  }
   return moa / aom;
 }
 
 // Calculate a discrete derivative of the speed measurements
-void InertiaEstimator::discrete_speed_derivative(const ros::Duration& period)
+void InertiaEstimator::discrete_speed_derivative(double velocity, const ros::Duration& period)
 {
   auto it = acceleration_array_.begin();
-  it = acceleration_array_.insert(it, (joint_.getVelocity() - velocity_array_[1]) / period.toSec());
+  it = acceleration_array_.insert(it, (velocity - velocity_array_[1]) / period.toSec());
 }

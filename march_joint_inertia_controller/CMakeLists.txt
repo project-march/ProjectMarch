@@ -4,9 +4,16 @@ project(march_joint_inertia_controller)
 add_compile_options(-std=c++14 -Wall -Wextra -Werror)
 
 find_package(catkin REQUIRED COMPONENTS
+    actionlib
+    actionlib_msgs
+    control_msgs
+    controller_manager
     controller_interface
+    joint_state_controller
+    joint_trajectory_controller
     pluginlib
     roscpp
+    urdf
     )
 
 catkin_package(

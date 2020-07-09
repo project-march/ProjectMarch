@@ -3,6 +3,7 @@
 #ifndef MARCH_HARDWARE_JOINT_TRAJECTORY_INERTIA_CONTROLLER_H
 #define MARCH_HARDWARE_JOINT_TRAJECTORY_INERTIA_CONTROLLER_H
 
+#include <cassert>
 #include <control_toolbox/pid.h>
 #include <controller_interface/controller.h>
 #include <hardware_interface/joint_command_interface.h>
@@ -13,8 +14,8 @@
 #include <pluginlib/class_list_macros.h>
 #include <realtime_tools/realtime_buffer.h>
 #include <realtime_tools/realtime_publisher.h>
-#include <std_msgs/Float64.h>
-#include <std_msgs/Float64MultiArray.h>
+#include <ros/node_handle.h>
+#include <ros/time.h>
 #include <trajectory_interface/quintic_spline_segment.h>
 #include <urdf/model.h>
 
@@ -29,26 +30,19 @@ template <>
 class HardwareInterfaceAdapter<hardware_interface::EffortJointInterface, joint_trajectory_controller::State>
 {
 public:
-  HardwareInterfaceAdapter() : joint_handles_ptr_(0)
+  HardwareInterfaceAdapter() : joint_handles_ptr_(nullptr)
   {
   }
 
-  struct Commands
-  {
-    double position_;            // Last commanded position
-    double velocity_;            // Last commanded velocity
-    bool has_velocity_ = false;  // false if no velocity command has been specified
-  };
-
   bool init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
   {
-    const unsigned int num_joints_ = joint_handles_ptr_->size();
-
     // Store pointer to joint handles
     joint_handles_ptr_ = &joint_handles;
 
+    const unsigned int num_joints_ = joint_handles_ptr_->size();
+
     // Initialize PIDs
-    pids_.resize(joint_handles.size());
+    pids_.resize(num_joints_);
     for (unsigned int i = 0; i < pids_.size(); ++i)
     {
       // Node handle to PID gains
@@ -65,13 +59,6 @@ public:
 
     inertia_estimators_.resize(num_joints_);
 
-    // Get joint handle from hardware interface
-    for (unsigned int i = 0; i < num_joints_; ++i)
-    {
-      joints_.push_back((*joint_handles_ptr_)[i]);
-      inertia_estimators_.push_back((*joint_handles_ptr_)[i]);
-    }
-
     return true;
   }
 
@@ -79,16 +66,25 @@ public:
                      const joint_trajectory_controller::State& /*desired state*/,
                      const joint_trajectory_controller::State& state_error)
   {
+    const unsigned int num_joints_ = joint_handles_ptr_->size();
+
     // Preconditions
     if (!joint_handles_ptr_)
       return;
     assert(num_joints_ == state_error.position.size());
     assert(num_joints_ == state_error.velocity.size());
 
-    //  this->fill_buffers(period);
-    //  this->inertia_estimate();
-    // TO DO: Provide lookup table for gain selection
-    // TO DO: apply PID control
+    for (unsigned int j = 0; j < num_joints_; ++j)
+    {
+      inertia_estimators_[j].fill_buffers((*joint_handles_ptr_)[j].getVelocity(), (*joint_handles_ptr_)[j].getEffort(),
+                                          period);
+      if (loopc_ > 120)
+      {
+        inertia_estimators_[j].inertia_estimate();
+        // TO DO: Provide lookup table for gain selection
+        // TO DO: apply PID control
+      }
+    }
 
     // Update PIDs
     for (unsigned int i = 0; i < num_joints_; ++i)
@@ -96,20 +92,15 @@ public:
       const double command = (pids_[i]->computeCommand(state_error.position[i], state_error.velocity[i], period));
       (*joint_handles_ptr_)[i].setCommand(command);
     }
+    loopc_++;
   }
 
   void starting(const ros::Time& /*time*/)
   {
-    std::vector<double> pos_command;
-    pos_command.resize(num_joints_);
-    for (unsigned int i = 0; i < num_joints_; ++i)
+    if (!joint_handles_ptr_)
     {
-      pos_command[i] = joints_[i].getPosition();
-
-      command_struct_.position_ = pos_command[i];
+      return;
     }
-
-    command_.initRT(command_struct_);
 
     // Reset PIDs, zero commands
     for (unsigned int i = 0; i < pids_.size(); ++i)
@@ -121,23 +112,6 @@ public:
 
   void stopping(const ros::Time& /*time*/)
   {
-  }
-
-  void setCommand(double pos_command)
-  {
-    command_struct_.position_ = pos_command;
-    command_struct_.has_velocity_ =
-        false;  // Flag to ignore the velocity command since our setCommand method did not include it
-
-    // the writeFromNonRT can be used in RT, if you have the guarantee that
-    //  * no non-rt thread is calling the same function (we're not subscribing to ros callbacks)
-    //  * there is only one single rt thread
-    command_.writeFromNonRT(command_struct_);
-  }
-
-  void commandCB(const std_msgs::Float64ConstPtr& msg)
-  {
-    setCommand(msg->data);
   }
 
   /**
@@ -175,8 +149,6 @@ public:
   }
 
   std::string joint_names;
-  realtime_tools::RealtimeBuffer<Commands> command_;
-  Commands command_struct_;  // pre-allocated memory that is re-used to set the realtime buffer
 
 private:
   typedef std::shared_ptr<control_toolbox::Pid> PidPtr;
@@ -187,6 +159,8 @@ private:
   unsigned int num_joints_;
   std::vector<hardware_interface::JointHandle> joints_;
   double init_pos_;
+
+  size_t loopc_;
 
   std::vector<InertiaEstimator> inertia_estimators_;
 };
