@@ -73,11 +73,6 @@ public:
    */
   void waitForPdo();
 
-  /**
-   * Construct the soft limit error based on the margin defined in the controller yaml and the soft limits and hard
-   * limits in the URDF.
-   */
-
 private:
   void uploadJointNames(ros::NodeHandle& nh) const;
   /**
