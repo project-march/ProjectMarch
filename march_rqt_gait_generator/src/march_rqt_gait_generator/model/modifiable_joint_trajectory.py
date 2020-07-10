@@ -28,9 +28,6 @@ class ModifiableJointTrajectory(JointTrajectory):
             rospy.logwarn('Last setpoint of {0} has been set '
                           'from {1} to {2}'.format(name, self.setpoints[0].time, duration))
 
-    def set_gait_generator(self, gait_generator):
-        self.gait_generator = gait_generator
-
     def set_setpoints(self, setpoints):
         self.setpoints = setpoints
 

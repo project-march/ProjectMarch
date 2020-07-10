@@ -52,10 +52,6 @@ class ModifiableSubgait(Subgait):
         return cls(joint_list, duration, gait_type='walk_like', gait_name='test_gait', subgait_name='test_subgait',
                    version='test_subgait_1', description='Just a simple gait')
 
-    def set_gait_generator(self, gait_generator):
-        for joint in self.joints:
-            joint.set_gait_generator(gait_generator)
-
     def has_multiple_setpoints_before_duration(self, duration):
         """Check if all setpoints are before a given duration."""
         return not any(joint.setpoints[1].time > duration for joint in self.joints)

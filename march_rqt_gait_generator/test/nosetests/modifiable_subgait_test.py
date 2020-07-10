@@ -21,8 +21,7 @@ class ModifiableSubgaitTest(unittest.TestCase):
                                                                               gait=self.gait_name,
                                                                               subgait=self.subgait_name,
                                                                               version=self.version)
-        self.subgait = ModifiableSubgait.from_file(self.robot, self.subgait_path)
-        self.subgait.set_gait_generator(self.gait_generator)
+        self.subgait = ModifiableSubgait.from_file(self.robot, self.subgait_path, self.gait_generator)
 
     # empty_subgait tests
     def test_empty_subgait_type(self):
