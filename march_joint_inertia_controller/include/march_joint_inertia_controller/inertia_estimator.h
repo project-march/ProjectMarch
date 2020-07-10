@@ -8,7 +8,7 @@
 #include <trajectory_interface/quintic_spline_segment.h>
 #include <urdf/model.h>
 
-void absolute(std::vector<double> a, std::vector<double> b);
+void absolute(std::vector<double> a, std::vector<double> &b);
 
 // Compute the absolute value of a double and return it.
 double absolute(double a);
@@ -29,6 +29,9 @@ public:
   double getPosition();
 
   void setJoint(hardware_interface::JointHandle joint);
+  void setNodeHandle(ros::NodeHandle& nh);
+  void configurePublisher(std::string name);
+  void publishInertia();
 
   std::string getJointName();
 
@@ -62,6 +65,9 @@ public:
   std::string joint_name;
 
 private:
+  ros::NodeHandle nh_;
+  ros::Publisher pub_;
+
   hardware_interface::JointHandle joint_;
 
   float min_alpha_ = 0.4;  // You might want to be able to adjust this value from a yaml/launch file
@@ -93,7 +99,11 @@ private:
 
   // Correlation coefficient used to calculate the inertia gain
   double corr_coeff_;
-  double joint_inertia_;
+  double K_a_;
+  double K_i_;
+  double moa_;
+  double aom_;
+  double joint_inertia_ = 0.0;
   double lambda_ = 0.96;  // You might want to be able to adjust this value from a yaml/launch file
 };
 

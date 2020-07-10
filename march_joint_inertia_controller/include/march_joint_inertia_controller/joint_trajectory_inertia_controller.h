@@ -59,6 +59,12 @@ public:
 
     inertia_estimators_.resize(num_joints_);
 
+    for (unsigned int j = 0; j < num_joints_; ++j)
+    {
+      inertia_estimators_[j].setNodeHandle(nh);
+      inertia_estimators_[j].configurePublisher(joint_handles[j].getName());
+    }
+
     return true;
   }
 
@@ -81,6 +87,7 @@ public:
       if (loopc_ > 120)
       {
         inertia_estimators_[j].inertia_estimate();
+        inertia_estimators_[j].publishInertia();
         // TO DO: Provide lookup table for gain selection
         // TO DO: apply PID control
       }

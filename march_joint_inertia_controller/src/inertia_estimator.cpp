@@ -4,8 +4,9 @@
 #include "march_joint_inertia_controller/inertia_estimator.h"
 #include "math.h"
 #include "ros/ros.h"
+#include "std_msgs/Float64.h"
 
-void absolute(std::vector<double> a, std::vector<double> b)
+void absolute(std::vector<double> a, std::vector<double>& b)
 {
   for (size_t i = 0; i < a.size(); ++i)
   {
@@ -81,7 +82,7 @@ InertiaEstimator::InertiaEstimator()
   }
 
   // Setup the initial value for the correlation coefficient 100*standarddeviation(acceleration)^2
-  corr_coeff_ = 0.0;
+  corr_coeff_ = 3000.0;
 
   // Setup Butterworth filter
 }
@@ -117,7 +118,7 @@ InertiaEstimator::InertiaEstimator(hardware_interface::JointHandle joint)
   }
 
   // Setup the initial value for the correlation coefficient 100*standarddeviation(acceleration)^2
-  corr_coeff_ = 0.0;
+  corr_coeff_ = 3000.0;
 
   // Setup Butterworth filter
 }
@@ -129,6 +130,24 @@ InertiaEstimator::~InertiaEstimator()
 void InertiaEstimator::setJoint(hardware_interface::JointHandle joint)
 {
   joint_ = joint;
+}
+
+void InertiaEstimator::setNodeHandle(ros::NodeHandle& nh)
+{
+  nh_ = nh;
+}
+
+void InertiaEstimator::configurePublisher(std::string name)
+{
+  std::string publisher_name = "/inertia_publisher/" + name;
+  pub_ = nh_.advertise<std_msgs::Float64>(publisher_name, 100);
+}
+
+void InertiaEstimator::publishInertia()
+{
+  std_msgs::Float64 msg;
+  msg.data = joint_inertia_;
+  pub_.publish(msg);
 }
 
 // Fills the buffers so that non-zero values may be computed by the inertia estimator
@@ -193,48 +212,57 @@ void InertiaEstimator::apply_butter()
 {
   // Dingen doen met de sos filter ofzo
   // Also doe pushback dingen anders dan werkt dit niet
-  double temp = 1.0;
+  std::vector<double> z = { 0.0, 0.0, 0.0 };
   auto it = filtered_acceleration_array_.begin();
+  auto x_n = acceleration_array_[0];
+  double x;
 
   for (unsigned int i = 0; i < (sizeof(sos_) / sizeof(sos_[0])); ++i)
   {
-    temp *= (acceleration_array_[0] * sos_[i][0] + acceleration_array_[1] * sos_[i][1] +
-             acceleration_array_[2] * sos_[i][2]) /
-            (acceleration_array_[0] * sos_[i][3] + acceleration_array_[1] * sos_[i][4] +
-             acceleration_array_[2] * sos_[i][5]);
+    x_n = acceleration_array_[0];
+    x = sos_[i][0] * x_n + z[0];
+    z[0] = sos_[i][1] * x_n - sos_[i][3] * x + z[1];
+    z[1] = sos_[i][2] * x_n - sos_[i][4] * x;
+
+    //    temp *= (acceleration_array_[0] * sos_[i][0] + acceleration_array_[1] * sos_[i][1] +
+    //             acceleration_array_[2] * sos_[i][2]) /
+    //            (acceleration_array_[0] * sos_[i][3] + acceleration_array_[1] * sos_[i][4] +
+    //             acceleration_array_[2] * sos_[i][5]);
   }
   it = filtered_acceleration_array_.begin();
-  it = filtered_acceleration_array_.insert(it, temp);
+  it = filtered_acceleration_array_.insert(it, x);
   filtered_acceleration_array_.resize(fil_acc_size_);
 
-  temp = 1.0;
+  z = { 0.0, 0.0, 0.0 };
   for (unsigned int i = 0; i < (sizeof(sos_) / sizeof(sos_[0])); ++i)
   {
-    temp *= (joint_torque_[0] * sos_[i][0] + joint_torque_[1] * sos_[i][1] + joint_torque_[2] * sos_[i][2]) /
-            (joint_torque_[0] * sos_[i][3] + joint_torque_[1] * sos_[i][4] + joint_torque_[2] * sos_[i][5]);
+    x_n = joint_torque_[0];
+    x = sos_[i][0] * x_n + z[0];
+    z[0] = sos_[i][1] * x_n - sos_[i][3] * x + z[1];
+    z[1] = sos_[i][2] * x_n - sos_[i][4] * x;
+    //    temp *= (joint_torque_[0] * sos_[i][0] + joint_torque_[1] * sos_[i][1] + joint_torque_[2] * sos_[i][2]) /
+    //            (joint_torque_[0] * sos_[i][3] + joint_torque_[1] * sos_[i][4] + joint_torque_[2] * sos_[i][5]);
   }
   it = filtered_joint_torque_.begin();
-  it = filtered_joint_torque_.insert(it, temp);
+  it = filtered_joint_torque_.insert(it, x);
   filtered_joint_torque_.resize(fil_tor_size_);
 
-  temp = 1.0;
+  // temp = 1.0;
 }
 
 // Estimate the inertia using the acceleration and torque
 void InertiaEstimator::inertia_estimate()
 {
-  double K_i;
-  double K_a;
   double torque_e;
   double acc_e;
   apply_butter();
 
   correlation_calculation();
-  K_i = gain_calculation();
-  K_a = alpha_calculation();
+  K_i_ = gain_calculation();
+  K_a_ = alpha_calculation();
   torque_e = filtered_joint_torque_[0] - filtered_joint_torque_[1];
   acc_e = filtered_acceleration_array_[0] - filtered_acceleration_array_[1];
-  joint_inertia_ = (torque_e - (acc_e * joint_inertia_)) * K_i * K_a + joint_inertia_;
+  joint_inertia_ = (torque_e - (acc_e * joint_inertia_)) * K_i_ * K_a_ + joint_inertia_;
 }
 
 // Calculate the alpha coefficient for the inertia estimate
@@ -278,15 +306,15 @@ double InertiaEstimator::vibration_calculation()
   b.resize(acc_size_);
   absolute(filtered_acceleration_array_, b);
   // moa = mean of the absolute
-  double moa = mean(b);
+  moa_ = mean(b);
   // aom = absolute of the mean
-  double aom = abs(mean(filtered_acceleration_array_));
-  if (aom == 0.0)
+  aom_ = abs(mean(filtered_acceleration_array_));
+  if (aom_ == 0.0)
   {
     ROS_INFO("omaigod we gaan toch niet delen door nul hey");
     return 0.0;
   }
-  return moa / aom;
+  return moa_ / aom_;
 }
 
 // Calculate a discrete derivative of the speed measurements
