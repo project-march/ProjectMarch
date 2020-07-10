@@ -1,138 +1,83 @@
-name: "left_open"
-version: "MV_TP_right_singlestep_leftopen_v10"
-description: "Same as v9 but with dorsal flexion in the ankle"
+description: Same as v9 but with dorsal flexion in the ankle
+duration: {nsecs: 500000000, secs: 1}
 gait_type: ''
-setpoints: 
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs:         0
-    joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
-  left_ankle]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 250000000
-    joint_names: [left_ankle]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 400300000
-    joint_names: [left_ankle]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 550000000
-    joint_names: [left_knee]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 630000000
-    joint_names: [left_hip_fe]
-  - 
-    time_from_start: 
-      secs: 1
-      nsecs:    299999
-    joint_names: [left_ankle]
-  - 
-    time_from_start: 
-      secs: 1
-      nsecs:  20000000
-    joint_names: [right_knee]
-  - 
-    time_from_start: 
-      secs: 1
-      nsecs: 350000000
-    joint_names: [left_knee]
-  - 
-    time_from_start: 
-      secs: 1
-      nsecs: 500000000
-    joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
-  left_ankle]
-trajectory: 
-  header: 
-    seq: 0
-    stamp: 
-      secs: 0
-      nsecs:         0
-    frame_id: ''
-  joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
-  left_ankle]
-  points: 
-    - 
-      positions: [-0.0524, 0.5236, 0.8203, 0.1309, 0.0873, -0.0873, 0.0, 0.0436]
-      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs:         0
-    - 
-      positions: [-0.0524, 0.5107, 0.8282, 0.1309, 0.0873, 0.1772, 0.377, 0.1047]
-      velocities: [0.0, -0.0969, 0.057, 0.0, 0.0, 1.7455, 2.3604, 0.1745]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 250000000
-    - 
-      positions: [-0.0524, 0.493, 0.8382, 0.1309, 0.0873, 0.4481, 0.7139, 0.1222]
-      velocities: [0.0, -0.1366, 0.0735, 0.0, 0.0, 1.7246, 1.886, 0.0355]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 400300000
-    - 
-      positions: [-0.0524, 0.4704, 0.8496, 0.1309, 0.0873, 0.6548, 0.8727, 0.1192]
-      velocities: [0.0, -0.1621, 0.0766, 0.0, 0.0, 0.9047, 0.0, -0.068]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 550000000
-    - 
-      positions: [-0.0524, 0.4571, 0.8556, 0.1309, 0.0873, 0.6981, 0.851, 0.1122]
-      velocities: [0.0, -0.17, 0.0728, 0.0, 0.0, 0.1396, -0.5237, -0.1062]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 630000000
-    - 
-      positions: [-0.0524, 0.3943, 0.8726, 0.1309, 0.0873, 0.5973, 0.412, 0.0611]
-      velocities: [0.0, -0.1551, 0.0058, 0.0, 0.0, -0.562, -1.4316, -0.1272]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 1
-        nsecs:    299999
-    - 
-      positions: [-0.0524, 0.3913, 0.8727, 0.1309, 0.0873, 0.5861, 0.384, 0.0587]
-      velocities: [0.0, -0.1519, 0.0, 0.0, 0.0, -0.5788, -1.4101, -0.1157]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 1
-        nsecs:  20000000
-    - 
-      positions: [-0.0524, 0.354, 0.8727, 0.1309, 0.0873, 0.3834, 0.0969, 0.0434]
-      velocities: [0.0, -0.0628, 0.0, 0.0, 0.0, -0.5529, 0.0, -0.0022]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 1
-        nsecs: 350000000
-    - 
-      positions: [-0.0524, 0.3491, 0.8727, 0.1309, 0.0873, 0.3142, 0.1396, 0.0436]
-      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, -0.3491, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 1
-        nsecs: 500000000
-duration: 
-  secs: 1
-  nsecs: 500000000
-sounds: []
+joints:
+  left_ankle:
+  - position: 0.0436
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.1047
+    time_from_start: {nsecs: 250000000, secs: 0}
+    velocity: 0.1745
+  - position: 0.1222
+    time_from_start: {nsecs: 400300000, secs: 0}
+    velocity: 0.0355
+  - position: 0.0611
+    time_from_start: {nsecs: 299999, secs: 1}
+    velocity: -0.1272
+  - position: 0.0436
+    time_from_start: {nsecs: 500000000, secs: 1}
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0873
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.0873
+    time_from_start: {nsecs: 500000000, secs: 1}
+    velocity: 0.0
+  left_hip_fe:
+  - position: -0.0873
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.6981
+    time_from_start: {nsecs: 630000000, secs: 0}
+    velocity: 0.1396
+  - position: 0.3142
+    time_from_start: {nsecs: 500000000, secs: 1}
+    velocity: -0.3491
+  left_knee:
+  - position: 0.0
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.8727
+    time_from_start: {nsecs: 550000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0969
+    time_from_start: {nsecs: 350000000, secs: 1}
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: {nsecs: 500000000, secs: 1}
+    velocity: 0.0
+  right_ankle:
+  - position: 0.1309
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.1309
+    time_from_start: {nsecs: 500000000, secs: 1}
+    velocity: 0.0
+  right_hip_aa:
+  - position: -0.0524
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: -0.0524
+    time_from_start: {nsecs: 500000000, secs: 1}
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.5236
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.3491
+    time_from_start: {nsecs: 500000000, secs: 1}
+    velocity: 0.0
+  right_knee:
+  - position: 0.8203
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.8727
+    time_from_start: {nsecs: 20000000, secs: 1}
+    velocity: 0.0
+  - position: 0.8727
+    time_from_start: {nsecs: 500000000, secs: 1}
+    velocity: 0.0
+name: left_open
+version: MV_TP_right_singlestep_leftopen_v10
