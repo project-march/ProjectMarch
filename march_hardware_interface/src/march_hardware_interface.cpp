@@ -504,7 +504,7 @@ void MarchHardwareInterface::getSoftJointLimitsError(const std::string& name,
   std::ostringstream param_name;
   std::ostringstream error_stream;
 
-  param_name << "/march/controller/trajectory/constraints/" << name << "/percent_soft_limit_error";
+  param_name << "/march/controller/trajectory/constraints/" << name << "/margin_soft_limit_error";
 
   if (!ros::param::has(param_name.str()))
   {
