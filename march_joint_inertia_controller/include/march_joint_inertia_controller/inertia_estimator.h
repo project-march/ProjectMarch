@@ -8,7 +8,7 @@
 #include <trajectory_interface/quintic_spline_segment.h>
 #include <urdf/model.h>
 
-void absolute(std::vector<double> a, std::vector<double> &b);
+void absolute(std::vector<double> a, std::vector<double>& b);
 
 // Compute the absolute value of a double and return it.
 double absolute(double a);
