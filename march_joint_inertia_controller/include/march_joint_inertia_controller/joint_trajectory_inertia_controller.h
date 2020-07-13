@@ -64,7 +64,6 @@ public:
       inertia_estimators_[j].setNodeHandle(nh);
       inertia_estimators_[j].configurePublisher(joint_handles[j].getName());
     }
-
     return true;
   }
 
@@ -84,13 +83,10 @@ public:
     {
       inertia_estimators_[j].fill_buffers((*joint_handles_ptr_)[j].getVelocity(), (*joint_handles_ptr_)[j].getEffort(),
                                           period);
-      if (loopc_ > 120)
-      {
-        inertia_estimators_[j].inertia_estimate();
-        inertia_estimators_[j].publishInertia();
-        // TO DO: Provide lookup table for gain selection
-        // TO DO: apply PID control
-      }
+      inertia_estimators_[j].inertia_estimate();
+      inertia_estimators_[j].publishInertia();
+      // TO DO: Provide lookup table for gain selection
+      // TO DO: apply PID control
     }
 
     // Update PIDs
