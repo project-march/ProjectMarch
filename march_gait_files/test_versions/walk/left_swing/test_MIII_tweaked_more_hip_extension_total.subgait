@@ -1,269 +1,154 @@
-name: ''
-version: ''
-description: "The setpoints of this walking gait are the same as the setpoints of the MIII walking\
-  \ gait, except for the fact that the timing of the setpoints in different. More\
-  \ hip extension is added at heel strike in this version."
-setpoints: 
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs:         0
-    joint_names: [left_hip_fe, left_knee, right_hip_fe, right_knee]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs:  38800000
-    joint_names: [left_hip_aa, left_ankle, right_hip_aa, right_ankle]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 310000000
-    joint_names: [right_knee]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 581200000
-    joint_names: [left_hip_aa, right_hip_aa]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 651000000
-    joint_names: [left_knee]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 775000000
-    joint_names: [left_hip_aa, right_hip_aa]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 930000000
-    joint_names: [left_hip_fe]
-  - 
-    time_from_start: 
-      secs: 1
-      nsecs:  54000000
-    joint_names: [right_knee]
-  - 
-    time_from_start: 
-      secs: 1
-      nsecs: 395000000
-    joint_names: [left_knee]
-  - 
-    time_from_start: 
-      secs: 1
-      nsecs: 550000000
-    joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
-  right_ankle]
-  - 
-    time_from_start: 
-      secs: 1
-      nsecs: 588800000
-    joint_names: [left_hip_aa, left_ankle, right_hip_aa, right_ankle]
-  - 
-    time_from_start: 
-      secs: 1
-      nsecs: 860000000
-    joint_names: [left_knee]
-  - 
-    time_from_start: 
-      secs: 2
-      nsecs: 131200000
-    joint_names: [left_hip_aa, right_hip_aa]
-  - 
-    time_from_start: 
-      secs: 2
-      nsecs: 201000000
-    joint_names: [right_knee]
-  - 
-    time_from_start: 
-      secs: 2
-      nsecs: 325000000
-    joint_names: [left_hip_aa, right_hip_aa]
-  - 
-    time_from_start: 
-      secs: 2
-      nsecs: 480000000
-    joint_names: [right_hip_fe]
-  - 
-    time_from_start: 
-      secs: 2
-      nsecs: 604000000
-    joint_names: [left_knee]
-  - 
-    time_from_start: 
-      secs: 2
-      nsecs: 944999999
-    joint_names: [right_knee]
-  - 
-    time_from_start: 
-      secs: 3
-      nsecs: 100000000
-    joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
-  right_ankle]
-trajectory: 
-  header: 
-    seq: 0
-    stamp: 
-      secs: 0
-      nsecs:         0
-    frame_id: ''
-  joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
-  right_ankle]
-  points: 
-    - 
-      positions: [0.0, -0.2269, 0.1396, 0.1658, 0.0, 0.3491, 0.1396, 0.1658]
-      velocities: [-0.0, 0.0, 0.0, -0.0, -0.0, -0.3491, 0.0, -0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs:         0
-    - 
-      positions: [0.0, -0.2246, 0.1442, 0.1658, 0.0, 0.3384, 0.1414, 0.1658]
-      velocities: [0.0, 0.1257, 0.2502, 0.0, 0.0, -0.3623, 0.1003, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs:  38800000
-    - 
-      positions: [0.0, -0.0426, 0.4648, 0.1658, 0.0, 0.2242, 0.2094, 0.1658]
-      velocities: [0.0, 1.0529, 1.6751, 0.0, 0.0, -0.4651, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 310000000
-    - 
-      positions: [0.0, 0.2799, 0.8428, 0.1658, 0.0, 0.0922, 0.1895, 0.1658]
-      velocities: [0.0, 1.1914, 0.7605, -0.0, 0.0, -0.4957, -0.1272, -0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 581200000
-    - 
-      positions: [0.0, 0.3601, 0.8727, 0.1658, 0.0, 0.0576, 0.1801, 0.1658]
-      velocities: [0.0, 1.0986, 0.0, 0.0, 0.0, -0.4918, -0.1387, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 651000000
-    - 
-      positions: [0.0, 0.4834, 0.8174, 0.1658, 0.0, -0.0054, 0.162, 0.1658]
-      velocities: [0.0, 0.7855, -0.826, 0.0, 0.0, -0.4718, -0.1333, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 775000000
-    - 
-      positions: [0.0, 0.5585, 0.6375, 0.1658, 0.0, -0.0731, 0.1453, 0.1658]
-      velocities: [0.0, 0.1396, -1.4393, 0.0, 0.0, -0.4279, -0.0841, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 930000000
-    - 
-      positions: [0.0, 0.5548, 0.4374, 0.1658, 0.0, -0.1252, 0.1396, 0.1658]
-      velocities: [0.0, -0.1696, -1.5567, 0.0, 0.0, -0.3718, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 1
-        nsecs:  54000000
-    - 
-      positions: [0.0, 0.4166, 0.0969, 0.1658, 0.0, -0.2156, 0.1396, 0.1658]
-      velocities: [0.0, -0.4908, 0.0, 0.0, 0.0, -0.1459, -0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 1
-        nsecs: 395000000
-    - 
-      positions: [0.0, 0.3491, 0.1396, 0.1658, 0.0, -0.2269, 0.1396, 0.1658]
-      velocities: [-0.0, -0.3491, 0.0, -0.0, -0.0, 0.0, 0.0, -0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 1
-        nsecs: 550000000
-    - 
-      positions: [0.0, 0.3365, 0.1421, 0.1658, 0.0, -0.2238, 0.1458, 0.1658]
-      velocities: [0.0, -0.3648, 0.1183, 0.0, 0.0, 0.15, 0.2978, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 1
-        nsecs: 588800000
-    - 
-      positions: [0.0, 0.2218, 0.2094, 0.1658, 0.0, -0.0372, 0.4732, 0.1658]
-      velocities: [0.0, -0.4663, 0.0, 0.0, 0.0, 1.0626, 1.6794, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 1
-        nsecs: 860000000
-    - 
-      positions: [0.0, 0.0898, 0.1889, 0.1658, 0.0, 0.2858, 0.8463, 0.1658]
-      velocities: [0.0, -0.4956, -0.1284, -0.0, 0.0, 1.1865, 0.7215, -0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 2
-        nsecs: 131200000
-    - 
-      positions: [0.0, 0.0551, 0.1794, 0.1658, 0.0, 0.3656, 0.8727, 0.1658]
-      velocities: [0.0, -0.4914, -0.1391, -0.0, 0.0, 1.0899, 0.0, -0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 2
-        nsecs: 201000000
-    - 
-      positions: [0.0, -0.003, 0.1627, 0.1658, 0.0, 0.4795, 0.8216, 0.1658]
-      velocities: [0.0, -0.4729, -0.1341, 0.0, 0.0, 0.8009, -0.7968, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 2
-        nsecs: 325000000
-    - 
-      positions: [0.0, -0.0752, 0.1449, 0.1658, 0.0, 0.5585, 0.6302, 0.1658]
-      velocities: [0.0, -0.426, -0.0817, 0.0, 0.0, 0.1396, -1.4509, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 2
-        nsecs: 480000000
-    - 
-      positions: [0.0, -0.1233, 0.1396, 0.1658, 0.0, 0.5557, 0.4452, 0.1658]
-      velocities: [0.0, -0.3743, 0.0, -0.0, 0.0, -0.1586, -1.5593, -0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 2
-        nsecs: 604000000
-    - 
-      positions: [0.0, -0.2148, 0.1396, 0.1658, 0.0, 0.419, 0.0969, 0.1658]
-      velocities: [0.0, -0.1501, 0.0, 0.0, 0.0, -0.4922, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 2
-        nsecs: 944999999
-    - 
-      positions: [0.0, -0.2269, 0.1396, 0.1658, 0.0, 0.3491, 0.1396, 0.1658]
-      velocities: [-0.0, 0.0, 0.0, -0.0, -0.0, -0.3491, 0.0, -0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 3
-        nsecs: 100000000
-duration: 
-  secs: 3
-  nsecs: 100000000
-sounds: []
+description: The setpoints of this walking gait are the same as the setpoints of the
+  MIII walking gait, except for the fact that the timing of the setpoints in different.
+  More hip extension is added at heel strike in this version.
+duration: {nsecs: 100000000, secs: 3}
+gait_type: ''
+joints:
+  left_ankle:
+  - position: 0.1658
+    time_from_start: {nsecs: 38800000, secs: 0}
+    velocity: 0.0
+  - position: 0.1658
+    time_from_start: {nsecs: 550000000, secs: 1}
+    velocity: -0.0
+  - position: 0.1658
+    time_from_start: {nsecs: 588800000, secs: 1}
+    velocity: 0.0
+  - position: 0.1658
+    time_from_start: {nsecs: 100000000, secs: 3}
+    velocity: -0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: {nsecs: 38800000, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 581200000, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 775000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 550000000, secs: 1}
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: {nsecs: 588800000, secs: 1}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 131200000, secs: 2}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 325000000, secs: 2}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 100000000, secs: 3}
+    velocity: -0.0
+  left_hip_fe:
+  - position: -0.2269
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.5585
+    time_from_start: {nsecs: 930000000, secs: 0}
+    velocity: 0.1396
+  - position: 0.3491
+    time_from_start: {nsecs: 550000000, secs: 1}
+    velocity: -0.3491
+  - position: -0.2269
+    time_from_start: {nsecs: 100000000, secs: 3}
+    velocity: 0.0
+  left_knee:
+  - position: 0.1396
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.8727
+    time_from_start: {nsecs: 651000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0969
+    time_from_start: {nsecs: 395000000, secs: 1}
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: {nsecs: 550000000, secs: 1}
+    velocity: 0.0
+  - position: 0.2094
+    time_from_start: {nsecs: 860000000, secs: 1}
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: {nsecs: 604000000, secs: 2}
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: {nsecs: 100000000, secs: 3}
+    velocity: 0.0
+  right_ankle:
+  - position: 0.1658
+    time_from_start: {nsecs: 38800000, secs: 0}
+    velocity: 0.0
+  - position: 0.1658
+    time_from_start: {nsecs: 550000000, secs: 1}
+    velocity: -0.0
+  - position: 0.1658
+    time_from_start: {nsecs: 588800000, secs: 1}
+    velocity: 0.0
+  - position: 0.1658
+    time_from_start: {nsecs: 100000000, secs: 3}
+    velocity: -0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: {nsecs: 38800000, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 581200000, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 775000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 550000000, secs: 1}
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: {nsecs: 588800000, secs: 1}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 131200000, secs: 2}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 325000000, secs: 2}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 100000000, secs: 3}
+    velocity: -0.0
+  right_hip_fe:
+  - position: 0.3491
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: -0.3491
+  - position: -0.2269
+    time_from_start: {nsecs: 550000000, secs: 1}
+    velocity: 0.0
+  - position: 0.5585
+    time_from_start: {nsecs: 480000000, secs: 2}
+    velocity: 0.1396
+  - position: 0.3491
+    time_from_start: {nsecs: 100000000, secs: 3}
+    velocity: -0.3491
+  right_knee:
+  - position: 0.1396
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.2094
+    time_from_start: {nsecs: 310000000, secs: 0}
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: {nsecs: 54000000, secs: 1}
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: {nsecs: 550000000, secs: 1}
+    velocity: 0.0
+  - position: 0.8727
+    time_from_start: {nsecs: 201000000, secs: 2}
+    velocity: 0.0
+  - position: 0.0969
+    time_from_start: {nsecs: 944999999, secs: 2}
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: {nsecs: 100000000, secs: 3}
+    velocity: 0.0
+name: left_swing
+version: test_MIII_tweaked_more_hip_extension_total
