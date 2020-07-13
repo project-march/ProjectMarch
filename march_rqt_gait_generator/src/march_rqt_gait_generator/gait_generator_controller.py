@@ -268,8 +268,6 @@ class GaitGeneratorController(object):
         if gait_directory is None or gait_directory == '':
             return
 
-        subgait_msg = subgait.to_subgait_msg()
-
         output_file_directory = os.path.join(gait_directory,
                                              subgait.gait_name.replace(' ', '_'),
                                              subgait.subgait_name.replace(' ', '_'))
@@ -289,7 +287,7 @@ class GaitGeneratorController(object):
             os.makedirs(output_file_directory)
 
         with open(output_file_path, 'w') as output_file:
-            output_file.write(str(subgait_msg))
+            output_file.write(subgait.to_yaml())
 
         self.view.notify('Gait Saved', output_file_path)
 
