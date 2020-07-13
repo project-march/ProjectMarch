@@ -1,5 +1,6 @@
 name: home
-
-graph:
-  from_subgait: [start     , home_stand]
-  to_subgait:   [home_stand, end       ]
+subgaits:
+  start:
+    to: home_stand
+  home_stand:
+    to: end
