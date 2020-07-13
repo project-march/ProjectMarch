@@ -1,165 +1,96 @@
-name: "left_close"
-version: "MV_walk_leftclose_v4a"
-description: "The same left close gait as the previous version, but then with moving ankles as\
-  \ well."
-gait_type: "walk_like"
-setpoints: 
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs:         0
-    joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
-  right_ankle]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 250000000
-    joint_names: [left_ankle]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 300000000
-    joint_names: [right_ankle]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 416000000
-    joint_names: [left_knee]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 487500000
-    joint_names: [left_hip_aa, right_hip_aa]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 520000000
-    joint_names: [left_hip_fe]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 600000000
-    joint_names: [left_ankle]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 650000000
-    joint_names: [left_hip_aa, right_hip_aa]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 780000000
-    joint_names: [right_hip_fe]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 900000000
-    joint_names: [left_ankle]
-  - 
-    time_from_start: 
-      secs: 1
-      nsecs: 300000000
-    joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
-  right_ankle]
-trajectory: 
-  header: 
-    seq: 0
-    stamp: 
-      secs: 0
-      nsecs:         0
-    frame_id: ''
-  joint_names: [left_hip_aa, left_hip_fe, left_knee, left_ankle, right_hip_aa, right_hip_fe, right_knee,
-  right_ankle]
-  points: 
-    - 
-      positions: [0.0, -0.1667, 0.1396, 0.0436, 0.0, 0.288, 0.1396, 0.0436]
-      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, -0.3491, 0.0, -0.3491]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs:         0
-    - 
-      positions: [0.0, 0.1496, 0.5949, -0.1047, 0.0, 0.1939, 0.1269, 0.0404]
-      velocities: [0.0, 2.0425, 2.5733, 0.0, 0.0, -0.4045, -0.0976, 0.096]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 250000000
-    - 
-      positions: [0.0, 0.253, 0.7167, -0.0987, 0.0, 0.1737, 0.1216, 0.0436]
-      velocities: [0.0, 2.0351, 2.2097, 0.2698, 0.0, -0.3975, -0.1123, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 300000000
-    - 
-      positions: [0.0, 0.4698, 0.8727, -0.0381, 0.0, 0.1278, 0.1063, 0.0436]
-      velocities: [0.0, 1.4084, 0.0, 0.6327, 0.0, -0.3548, -0.1397, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 416000000
-    - 
-      positions: [0.0, 0.544, 0.8581, 0.0054, 0.0, 0.1042, 0.096, 0.0436]
-      velocities: [0.0, 0.6457, -0.419, 0.564, 0.0, -0.3128, -0.1505, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 487500000
-    - 
-      positions: [0.0, 0.5585, 0.8429, 0.0211, 0.0, 0.0951, 0.0914, 0.0436]
-      velocities: [0.0, 0.1396, -0.5836, 0.4714, 0.0, -0.291, -0.154, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 520000000
-    - 
-      positions: [0.0, 0.5504, 0.7803, 0.0436, 0.0, 0.0743, 0.0787, 0.0436]
-      velocities: [0.0, -0.3395, -0.9548, 0.0, 0.0, -0.2216, -0.1599, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 600000000
-    - 
-      positions: [0.0, 0.5264, 0.7274, 0.0436, 0.0, 0.0644, 0.0706, 0.0436]
-      velocities: [0.0, -0.6075, -1.1368, 0.0, 0.0, -0.17, -0.1611, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 650000000
-    - 
-      positions: [0.0, 0.4116, 0.5564, 0.0436, 0.0, 0.0524, 0.0498, 0.0436]
-      velocities: [0.0, -1.0938, -1.4298, 0.0, 0.0, 0.0, -0.155, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 780000000
-    - 
-      positions: [0.0, 0.2659, 0.3789, 0.0436, 0.0, 0.0344, 0.0319, 0.0436]
-      velocities: [0.0, -1.273, -1.4694, 0.0, 0.0, -0.2809, -0.1378, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 900000000
-    - 
-      positions: [0.0, -0.0873, 0.0, 0.0436, 0.0, -0.0873, 0.0, 0.0436]
-      velocities: [-0.0, 0.0, 0.0, -0.0, -0.0, 0.0, 0.0, -0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 1
-        nsecs: 300000000
-duration: 
-  secs: 1
-  nsecs: 300000000
-sounds: []
+description: The same left close gait as the previous version, but then with moving
+  ankles as well.
+duration: {nsecs: 300000000, secs: 1}
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: 0.0436
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: -0.1047
+    time_from_start: {nsecs: 250000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0436
+    time_from_start: {nsecs: 600000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0436
+    time_from_start: {nsecs: 900000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0436
+    time_from_start: {nsecs: 300000000, secs: 1}
+    velocity: -0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 487500000, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 650000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 300000000, secs: 1}
+    velocity: -0.0
+  left_hip_fe:
+  - position: -0.1667
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.5585
+    time_from_start: {nsecs: 520000000, secs: 0}
+    velocity: 0.1396
+  - position: -0.0873
+    time_from_start: {nsecs: 300000000, secs: 1}
+    velocity: 0.0
+  left_knee:
+  - position: 0.1396
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.8727
+    time_from_start: {nsecs: 416000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 300000000, secs: 1}
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0436
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: -0.3491
+  - position: 0.0436
+    time_from_start: {nsecs: 300000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0436
+    time_from_start: {nsecs: 300000000, secs: 1}
+    velocity: -0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 487500000, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 650000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 300000000, secs: 1}
+    velocity: -0.0
+  right_hip_fe:
+  - position: 0.288
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: -0.3491
+  - position: 0.0524
+    time_from_start: {nsecs: 780000000, secs: 0}
+    velocity: 0.0
+  - position: -0.0873
+    time_from_start: {nsecs: 300000000, secs: 1}
+    velocity: 0.0
+  right_knee:
+  - position: 0.1396
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 300000000, secs: 1}
+    velocity: 0.0
+name: left_close
+version: MV_walk_leftclose_v4a
