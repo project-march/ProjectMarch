@@ -13,7 +13,7 @@ gaits:
   rough_terrain_middle_steps: {right_open: MV_RT_middlestep_rightopen_v2, left_swing: MV_RT_middlestep_leftswing_v2,
                                right_swing: MV_RT_middlestep_rightswing_v2, left_close: MV_RT_middlestep_leftclose_v3}
   rough_terrain_first_middle_step: {right_open: MV_RT_first_middlestep_rightopen_v2,
-                                    left_close: MV_RT_first_middlestep_leftclose_v2}
+                                    left_close: MV_RT_first_middlestep_leftclose_v3}
   rough_terrain_second_middle_step: {right_open: MV_RT_second_middlestep_rightopen_v1,
                                      left_close: MV_RT_second_middlestep_leftclose_v1}
   rough_terrain_third_middle_step: {right_open: MV_RT_third_middlestep_rightopen_v2,
@@ -41,10 +41,10 @@ gaits:
   tilted_path_right_straight_end: {right_open: MV_TP_right_straightend_rightopen_v6,
                                    left_close: MV_TP_right_straightend_leftclose_v6}
   tilted_path_right_knee_bend: {right_open: MV_TP_right_kneebend_rightopen_v6}
-  stairs_up: {right_open: MV_stairsup_rightopen_v13, left_swing: MV_stairsup_leftswing_v13,
-              right_swing: MV_stairsup_rightswing_v13, left_close: MV_stairsup_leftclose_v13,
-              right_close: MV_stairsup_rightclose_v13}
-  stairs_up_single_step: {right_open: MV_stairsup_single_rightopen_v4, left_close: MV_stairsup_single_leftclose_v4}
+  stairs_up: {right_open: MV_stairsup_rightopen_v15a, left_swing: MV_stairsup_leftswing_v15,
+              right_swing: MV_stairsup_rightswing_v15, left_close: MV_stairsup_leftclose_v15,
+              right_close: MV_stairsup_rightclose_v15}
+  stairs_up_single_step: {right_open: MV_stairsup_single_rightopen_v7, left_close: MV_stairsup_single_leftclose_v7}
   stairs_down_single_step: {right_open: MV_stairsdown_single_rightopen_v3,
                             left_close: MV_stairsdown_single_leftclose_v3}
   stairs_down: {right_open: MV_stairsdown_rightopen_v5, left_swing: MV_stairsdown_leftswing_v5,
