@@ -1,151 +1,90 @@
-name: "right_open"
-version: "MV_balancewalk_rightopen_v1"
-description: "A right_open gait for the balanced walk, in which the right leg is in the air longer."
-gait_type: "walk_like"
-setpoints: 
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs:         0
-    joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
-  left_ankle]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 524800000
-    joint_names: [right_hip_aa]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 588000000
-    joint_names: [right_knee]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 700000000
-    joint_names: [right_hip_aa, left_hip_aa]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 757000000
-    joint_names: [right_knee]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 840000000
-    joint_names: [right_hip_fe]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 952000000
-    joint_names: [left_knee]
-  - 
-    time_from_start: 
-      secs: 1
-      nsecs:  26799999
-    joint_names: [right_hip_fe]
-  - 
-    time_from_start: 
-      secs: 1
-      nsecs: 260000000
-    joint_names: [right_knee]
-  - 
-    time_from_start: 
-      secs: 1
-      nsecs: 399999999
-    joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
-  left_ankle]
-trajectory: 
-  header: 
-    seq: 0
-    stamp: 
-      secs: 0
-      nsecs:         0
-    frame_id: ''
-  joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
-  left_ankle]
-  points: 
-    - 
-      positions: [0.0, -0.0873, 0.0, 0.0436, 0.0, -0.0873, 0.0, 0.0436]
-      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs:         0
-    - 
-      positions: [0.0, 0.3732, 0.8446, 0.0436, 0.0, -0.1124, 0.0805, 0.0436]
-      velocities: [0.0, 1.1586, 0.8543, 0.0, 0.0, -0.0797, 0.2176, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 524800000
-    - 
-      positions: [0.0, 0.4435, 0.8727, 0.0436, 0.0, -0.1176, 0.094, 0.0436]
-      velocities: [0.0, 1.0567, 0.0, 0.0, 0.0, -0.0829, 0.2078, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 588000000
-    - 
-      positions: [0.0, 0.5461, 0.8727, 0.0436, 0.0, -0.127, 0.1154, 0.0436]
-      velocities: [0.0, 0.7487, 0.0, 0.0, 0.0, -0.0851, 0.1712, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 700000000
-    - 
-      positions: [0.0, 0.5827, 0.8727, 0.0436, 0.0, -0.1318, 0.1244, 0.0436]
-      velocities: [0.0, 0.5294, 0.0, 0.0, 0.0, -0.0845, 0.1433, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 757000000
-    - 
-      positions: [0.0, 0.6109, 0.8163, 0.0436, 0.0, -0.1388, 0.1343, 0.0436]
-      velocities: [0.0, 0.1346, -1.275, 0.0, 0.0, -0.0817, 0.0913, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 840000000
-    - 
-      positions: [0.0, 0.6133, 0.6133, 0.0436, 0.0, -0.1475, 0.1396, 0.0436]
-      velocities: [0.0, -0.043, -2.1968, 0.0, 0.0, -0.074, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 952000000
-    - 
-      positions: [0.0, 0.6109, 0.4425, 0.0436, 0.0, -0.1528, 0.1396, 0.0436]
-      velocities: [0.0, 0.0, -2.3013, 0.0, 0.0, -0.0665, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 1
-        nsecs:  26799999
-    - 
-      positions: [0.0, 0.4086, 0.0969, 0.0436, 0.0, -0.1645, 0.1396, 0.0436]
-      velocities: [0.0, -1.1905, 0.0, 0.0, 0.0, -0.0306, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 1
-        nsecs: 260000000
-    - 
-      positions: [0.0, 0.288, 0.1396, 0.0436, 0.0, -0.1667, 0.1396, 0.0436]
-      velocities: [0.0, -0.3366, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 1
-        nsecs: 399999999
-duration: 
-  secs: 1
-  nsecs: 399999999
-sounds: []
+description: A right_open gait for the balanced walk, in which the right leg is in
+  the air longer.
+duration: {nsecs: 399999999, secs: 1}
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: 0.0436
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.0436
+    time_from_start: {nsecs: 399999999, secs: 1}
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 700000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 399999999, secs: 1}
+    velocity: 0.0
+  left_hip_fe:
+  - position: -0.0873
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: -0.1667
+    time_from_start: {nsecs: 399999999, secs: 1}
+    velocity: 0.0
+  left_knee:
+  - position: 0.0
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: {nsecs: 952000000, secs: 0}
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: {nsecs: 399999999, secs: 1}
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0436
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.0436
+    time_from_start: {nsecs: 399999999, secs: 1}
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 524800000, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 700000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 399999999, secs: 1}
+    velocity: 0.0
+  right_hip_fe:
+  - position: -0.0873
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.6109
+    time_from_start: {nsecs: 840000000, secs: 0}
+    velocity: 0.1346
+  - position: 0.6109
+    time_from_start: {nsecs: 26799999, secs: 1}
+    velocity: 0.0
+  - position: 0.288
+    time_from_start: {nsecs: 399999999, secs: 1}
+    velocity: -0.3366
+  right_knee:
+  - position: 0.0
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.8727
+    time_from_start: {nsecs: 588000000, secs: 0}
+    velocity: 0.0
+  - position: 0.8727
+    time_from_start: {nsecs: 757000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0969
+    time_from_start: {nsecs: 260000000, secs: 1}
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: {nsecs: 399999999, secs: 1}
+    velocity: 0.0
+name: right_open
+version: MV_balancewalk_rightopen_v1
