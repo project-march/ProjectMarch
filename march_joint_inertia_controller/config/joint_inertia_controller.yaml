@@ -30,7 +30,9 @@ march:
         right_hip_aa: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
         right_hip_fe: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
         right_knee: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
-
+      control_points:
+        rotary_joint: {inertia: {0.0, 1.0}, p:{150, 300}, d:{0, 5}}
+        linear_joint: {inertia: {0.0, 1.0}, p:{150, 300}, d:{0, 5}}
       constraints:
         left_ankle:
           trajectory: 0.305
