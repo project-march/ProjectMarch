@@ -31,7 +31,7 @@ joints:
     time_from_start: {nsecs: 0, secs: 0}
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: {nsecs: 200000000, secs: 2}
     velocity: 0.0873
   - position: 1.4486
     time_from_start: {nsecs: 0, secs: 4}
@@ -54,8 +54,11 @@ joints:
   - position: -0.0873
     time_from_start: {nsecs: 0, secs: 0}
     velocity: 0.0
-  - position: 0.8029
+  - position: 1.0472
     time_from_start: {nsecs: 429999999, secs: 1}
+    velocity: 0.0
+  - position: 1.0472
+    time_from_start: {nsecs: 0, secs: 2}
     velocity: 0.0
   - position: 0.5061
     time_from_start: {nsecs: 0, secs: 4}
@@ -66,7 +69,7 @@ joints:
     velocity: 0.0
   - position: 1.6581
     time_from_start: {nsecs: 500000000, secs: 1}
-    velocity: -0.2618
+    velocity: -0.5236
   - position: 0.6109
     time_from_start: {nsecs: 0, secs: 4}
     velocity: 0.0
