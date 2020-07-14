@@ -1,124 +1,101 @@
-name: ''
-version: ''
-description: "Closing step for stairs up, same version as MIII used."
-setpoints: 
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs:         0
-    joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
-  left_ankle]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 770000000
-    joint_names: [right_hip_fe, right_knee]
-  - 
-    time_from_start: 
-      secs: 1
-      nsecs: 100000000
-    joint_names: [right_hip_fe, left_hip_fe, left_knee]
-  - 
-    time_from_start: 
-      secs: 2
-      nsecs: 859999999
-    joint_names: [left_hip_fe, left_knee]
-  - 
-    time_from_start: 
-      secs: 2
-      nsecs: 970000000
-    joint_names: [right_knee]
-  - 
-    time_from_start: 
-      secs: 3
-      nsecs: 299999999
-    joint_names: [right_hip_fe]
-  - 
-    time_from_start: 
-      secs: 4
-      nsecs: 125200000
-    joint_names: [right_hip_aa, right_ankle, left_hip_aa, left_ankle]
-  - 
-    time_from_start: 
-      secs: 5
-      nsecs: 500000000
-    joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
-  left_ankle]
-trajectory: 
-  header: 
-    seq: 0
-    stamp: 
-      secs: 0
-      nsecs:         0
-    frame_id: ''
-  joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
-  left_ankle]
-  points: 
-    - 
-      positions: [0.0, 0.0, 0.0, 0.0, 0.0, 1.0472, 1.1345, 0.0]
-      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, -0.5236, -0.5236, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs:         0
-    - 
-      positions: [0.0, -0.1396, 0.1738, 0.0, 0.0, 0.554, 0.6412, 0.0]
-      velocities: [0.0, 0.0, 0.8727, 0.0, 0.0, -0.6667, -0.6668, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 770000000
-    - 
-      positions: [0.0, -0.1396, 0.4292, 0.0, 0.0, 0.3491, 0.4363, 0.0]
-      velocities: [0.0, 0.0, 0.7178, 0.0, 0.0, -0.5236, -0.5236, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 1
-        nsecs: 100000000
-    - 
-      positions: [0.0, 0.6092, 1.0453, 0.0, 0.0, 0.0, 0.0, 0.0]
-      velocities: [0.0, 0.3716, 0.0354, 0.0, 0.0, 0.0, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 2
-        nsecs: 859999999
-    - 
-      positions: [0.0, 0.6459, 1.0472, 0.0, 0.0, -0.0004, 0.0, 0.0]
-      velocities: [0.0, 0.2982, 0.0, 0.0, 0.0, -0.0073, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 2
-        nsecs: 970000000
-    - 
-      positions: [0.0, 0.6981, 0.9995, 0.0, 0.0, -0.0064, 0.0, 0.0]
-      velocities: [0.0, 0.0, -0.2751, 0.0, 0.0, -0.0271, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 3
-        nsecs: 299999999
-    - 
-      positions: [0.0, 0.4534, 0.5964, 0.0, 0.0, -0.0406, 0.0, 0.0]
-      velocities: [0.0, -0.4989, -0.615, 0.0, 0.0, -0.0495, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 4
-        nsecs: 125200000
-    - 
-      positions: [0.0, -0.0873, 0.0, 0.0, 0.0, -0.0873, 0.0, 0.0]
-      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 5
-        nsecs: 500000000
-duration: 
-  secs: 5
-  nsecs: 500000000
-sounds: []
+description: Closing step for stairs up, same version as MIII used.
+duration: {nsecs: 500000000, secs: 5}
+gait_type: ''
+joints:
+  left_ankle:
+  - position: 0.0
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 125200000, secs: 4}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 500000000, secs: 5}
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 125200000, secs: 4}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 500000000, secs: 5}
+    velocity: 0.0
+  left_hip_fe:
+  - position: 1.0472
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: -0.5236
+  - position: 0.3491
+    time_from_start: {nsecs: 100000000, secs: 1}
+    velocity: -0.5236
+  - position: 0.0
+    time_from_start: {nsecs: 859999999, secs: 2}
+    velocity: 0.0
+  - position: -0.0873
+    time_from_start: {nsecs: 500000000, secs: 5}
+    velocity: 0.0
+  left_knee:
+  - position: 1.1345
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: -0.5236
+  - position: 0.4363
+    time_from_start: {nsecs: 100000000, secs: 1}
+    velocity: -0.5236
+  - position: 0.0
+    time_from_start: {nsecs: 859999999, secs: 2}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 500000000, secs: 5}
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 125200000, secs: 4}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 500000000, secs: 5}
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 125200000, secs: 4}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 500000000, secs: 5}
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.0
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: -0.1396
+    time_from_start: {nsecs: 770000000, secs: 0}
+    velocity: 0.0
+  - position: -0.1396
+    time_from_start: {nsecs: 100000000, secs: 1}
+    velocity: 0.0
+  - position: 0.6981
+    time_from_start: {nsecs: 299999999, secs: 3}
+    velocity: 0.0
+  - position: -0.0873
+    time_from_start: {nsecs: 500000000, secs: 5}
+    velocity: 0.0
+  right_knee:
+  - position: 0.0
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.1738
+    time_from_start: {nsecs: 770000000, secs: 0}
+    velocity: 0.8727
+  - position: 1.0472
+    time_from_start: {nsecs: 970000000, secs: 2}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 500000000, secs: 5}
+    velocity: 0.0
+name: right_close
+version: MIII_slow

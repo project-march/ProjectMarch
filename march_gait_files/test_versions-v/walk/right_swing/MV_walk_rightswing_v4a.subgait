@@ -1,191 +1,108 @@
-name: "right_swing"
-version: "MV_walk_rightswing_v4a"
-description: "The same right swing gait as the previous version, but then with moving ankles as\
-  \ well."
-gait_type: "walk_like"
-setpoints: 
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs:         0
-    joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
-  left_ankle]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 220000000
-    joint_names: [left_knee, left_ankle]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 250000000
-    joint_names: [right_ankle]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 412500000
-    joint_names: [right_hip_aa, left_hip_aa]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 440000000
-    joint_names: [left_ankle]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 462000000
-    joint_names: [right_knee]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 550000000
-    joint_names: [right_hip_aa, left_hip_aa]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 650000000
-    joint_names: [right_ankle]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 660000000
-    joint_names: [right_hip_fe]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 748000000
-    joint_names: [left_knee]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 880000000
-    joint_names: [right_ankle, left_ankle]
-  - 
-    time_from_start: 
-      secs: 0
-      nsecs: 990000000
-    joint_names: [right_knee]
-  - 
-    time_from_start: 
-      secs: 1
-      nsecs: 100000000
-    joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
-  left_ankle]
-trajectory: 
-  header: 
-    seq: 0
-    stamp: 
-      secs: 0
-      nsecs:         0
-    frame_id: ''
-  joint_names: [right_hip_aa, right_hip_fe, right_knee, right_ankle, left_hip_aa, left_hip_fe, left_knee,
-  left_ankle]
-  points: 
-    - 
-      positions: [0.0, -0.1667, 0.1396, 0.0436, 0.0, 0.288, 0.1396, 0.0436]
-      velocities: [0.0, 0.0, 0.0, 0.0, 0.0, -0.3491, 0.0, -0.3491]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs:         0
-    - 
-      positions: [0.0, -0.0138, 0.4609, -0.0954, 0.0, 0.1956, 0.2094, -0.0436]
-      velocities: [0.0, 1.2524, 2.364, -0.4595, 0.0, -0.5047, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 220000000
-    - 
-      positions: [0.0, 0.0255, 0.5328, -0.1047, 0.0, 0.1802, 0.209, -0.0418]
-      velocities: [0.0, 1.338, 2.3746, 0.0, 0.0, -0.5183, -0.032, 0.156]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 250000000
-    - 
-      positions: [0.0, 0.2555, 0.8406, -0.0542, 0.0, 0.0928, 0.1899, 0.0284]
-      velocities: [0.0, 1.4012, 1.0503, 0.5677, 0.0, -0.5539, -0.1799, 0.4749]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 412500000
-    - 
-      positions: [0.0, 0.2971, 0.8649, -0.0362, 0.0, 0.076, 0.1843, 0.0436]
-      velocities: [0.0, 1.3392, 0.543, 0.6158, 0.0, -0.5537, -0.1912, 0.3491]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 440000000
-    - 
-      positions: [0.0, 0.3236, 0.8727, -0.0235, 0.0, 0.0648, 0.1804, 0.0485]
-      velocities: [0.0, 1.285, 0.0, 0.6361, 0.0, -0.5523, -0.1958, 0.3423]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 462000000
-    - 
-      positions: [0.0, 0.425, 0.8213, 0.0346, 0.0, 0.0153, 0.1626, 0.0774]
-      velocities: [0.0, 0.9125, -1.1675, 0.6123, 0.0, -0.5343, -0.1877, 0.2918]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 550000000
-    - 
-      positions: [0.0, 0.4859, 0.656, 0.0873, 0.0, -0.0366, 0.1464, 0.1034]
-      velocities: [0.0, 0.2527, -2.0009, 0.3491, 0.0, -0.4915, -0.1237, 0.2214]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 650000000
-    - 
-      positions: [0.0, 0.4887, 0.6355, 0.0893, 0.0, -0.0416, 0.1452, 0.1056]
-      velocities: [0.0, 0.1396, -2.0489, 0.3366, 0.0, -0.4858, -0.1142, 0.2135]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 660000000
-    - 
-      positions: [0.0, 0.481, 0.4391, 0.112, 0.0, -0.083, 0.1396, 0.1216]
-      velocities: [0.0, -0.2906, -2.1903, 0.1688, 0.0, -0.4245, 0.0, 0.1359]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 748000000
-    - 
-      positions: [0.0, 0.4165, 0.1868, 0.1222, 0.0, -0.1311, 0.1396, 0.1309]
-      velocities: [0.0, -0.6295, -1.4735, 0.0, 0.0, -0.3013, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 880000000
-    - 
-      positions: [0.0, 0.3445, 0.0969, 0.093, 0.0, -0.1573, 0.1396, 0.0879]
-      velocities: [0.0, -0.6235, 0.0, -0.447, 0.0, -0.1652, 0.0, -0.5952]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 0
-        nsecs: 990000000
-    - 
-      positions: [0.0, 0.288, 0.1396, 0.0436, 0.0, -0.1667, 0.1396, 0.0436]
-      velocities: [-0.0, -0.3491, 0.0, -0.3491, -0.0, 0.0, 0.0, 0.0]
-      accelerations: []
-      effort: []
-      time_from_start: 
-        secs: 1
-        nsecs: 100000000
-duration: 
-  secs: 1
-  nsecs: 100000000
-sounds: []
+description: The same right swing gait as the previous version, but then with moving
+  ankles as well.
+duration: {nsecs: 100000000, secs: 1}
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: 0.0436
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: -0.3491
+  - position: -0.0436
+    time_from_start: {nsecs: 220000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0436
+    time_from_start: {nsecs: 440000000, secs: 0}
+    velocity: 0.3491
+  - position: 0.1309
+    time_from_start: {nsecs: 880000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0436
+    time_from_start: {nsecs: 100000000, secs: 1}
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 412500000, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 550000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 100000000, secs: 1}
+    velocity: -0.0
+  left_hip_fe:
+  - position: 0.288
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: -0.3491
+  - position: -0.1667
+    time_from_start: {nsecs: 100000000, secs: 1}
+    velocity: 0.0
+  left_knee:
+  - position: 0.1396
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.2094
+    time_from_start: {nsecs: 220000000, secs: 0}
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: {nsecs: 748000000, secs: 0}
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: {nsecs: 100000000, secs: 1}
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0436
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: -0.1047
+    time_from_start: {nsecs: 250000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0873
+    time_from_start: {nsecs: 650000000, secs: 0}
+    velocity: 0.3491
+  - position: 0.1222
+    time_from_start: {nsecs: 880000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0436
+    time_from_start: {nsecs: 100000000, secs: 1}
+    velocity: -0.3491
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 412500000, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 550000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: {nsecs: 100000000, secs: 1}
+    velocity: -0.0
+  right_hip_fe:
+  - position: -0.1667
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.4887
+    time_from_start: {nsecs: 660000000, secs: 0}
+    velocity: 0.1396
+  - position: 0.288
+    time_from_start: {nsecs: 100000000, secs: 1}
+    velocity: -0.3491
+  right_knee:
+  - position: 0.1396
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.8727
+    time_from_start: {nsecs: 462000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0969
+    time_from_start: {nsecs: 990000000, secs: 0}
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: {nsecs: 100000000, secs: 1}
+    velocity: 0.0
+name: right_swing
+version: MV_walk_rightswing_v4a
