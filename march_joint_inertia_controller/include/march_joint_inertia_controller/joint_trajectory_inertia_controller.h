@@ -61,11 +61,43 @@ public:
       }
     }
 
+    // Initialize the estimator parameters
+    double lambda[2];
+    int alpha_filter_size[2];
+    ros::NodeHandle rotary_estimator_nh(nh, std::string("inertia_estimator/rotary"));
+
+    if (!rotary_estimator_nh.getParam("/lambda", lambda[0]))
+    {
+      ROS_ERROR("No lambda specified");
+      return false;
+    }
+
+    if (!rotary_estimator_nh.getParam("/alpha_filter_size", alpha_filter_size[0]))
+    {
+      ROS_ERROR("No alpha_filter_size specified");
+      return false;
+    }
+
+    ros::NodeHandle linear_estimator_nh(nh, std::string("inertia_estimator/linear"));
+    if (!linear_estimator_nh.getParam("/lambda", lambda[1]))
+    {
+      ROS_ERROR("No lambda specified");
+      return false;
+    }
+
+    if (!linear_estimator_nh.getParam("/alpha_filter_size", alpha_filter_size[1]))
+    {
+      ROS_ERROR("No alpha_filter_size specified");
+      return false;
+    }
+
     inertia_estimators_.resize(num_joints_);
 
     for (unsigned int j = 0; j < num_joints_; ++j)
     {
       inertia_estimators_[j].setNodeHandle(nh);
+      inertia_estimators_[j].setLambda(lambda[(int)floor(j / 2) % 2]);  // Produce sequence 00110011
+      inertia_estimators_[j].setAcc_size(alpha_filter_size[(int)floor(j / 2) % 2]);
       inertia_estimators_[j].configurePublisher(joint_handles[j].getName());
     }
     return true;

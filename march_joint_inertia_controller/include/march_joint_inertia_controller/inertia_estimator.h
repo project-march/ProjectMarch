@@ -57,6 +57,8 @@ public:
   double getPosition();
 
   void setJoint(hardware_interface::JointHandle joint);
+  void setLambda(double lambda);
+  void setAcc_size(size_t acc_size);
   void setNodeHandle(ros::NodeHandle& nh);
   /**
    * \brief Initialize the publisher with a name
@@ -120,12 +122,12 @@ private:
   };
   // namespace joint_inertia_controller
 
-  // Of length 12 for the alpha calculation
+  // Default length 12 for the alpha calculation
   size_t acc_size_;
   std::vector<double> acceleration_array_;
-  // Of length 12 for the acceleration buffer
+  // Equal to atwo, because two values are needed to calculate the derivative
+  size_t vel_size_ = 2;
   std::vector<double> velocity_array_;
-  // Of length 2 for the error calculation
   std::vector<double> filtered_acceleration_array_;
   // Of length 3 for the butterworth filter
   size_t torque_size_ = 2;
@@ -140,8 +142,8 @@ private:
   double K_i_;
   double moa_;
   double aom_;
-  double joint_inertia_ = 0.0;
-  double lambda_;  // You might want to be able to adjust this value from a yaml/launch file
+  double joint_inertia_;
+  double lambda_;
 };
 
 #endif  // MARCH_WS_INERTIA_ESTIMATOR_H

@@ -32,9 +32,10 @@ InertiaEstimator::InertiaEstimator(double lambda, size_t acc_size)
 {
   lambda_ = lambda;
   acc_size_ = acc_size;
+  joint_inertia_ = 0.0;
 
   // Size the buffers
-  velocity_array_.resize(acc_size_);
+  velocity_array_.resize(vel_size_);
 
   acceleration_array_.resize(acc_size_);
 
@@ -44,7 +45,7 @@ InertiaEstimator::InertiaEstimator(double lambda, size_t acc_size)
 
   filtered_joint_torque_.resize(fil_tor_size_);
 
-  for (unsigned int i = 0; i < acc_size_; ++i)
+  for (unsigned int i = 0; i < vel_size_; ++i)
   {
     velocity_array_[i] = 0.0;
   }
@@ -69,9 +70,10 @@ InertiaEstimator::InertiaEstimator(hardware_interface::JointHandle joint, double
 {
   lambda_ = lambda;
   acc_size_ = acc_size;
+  joint_inertia_ = 0.0;
 
   // Size the buffers
-  velocity_array_.resize(acc_size_);
+  velocity_array_.resize(vel_size_);
 
   acceleration_array_.resize(acc_size_);
 
@@ -83,7 +85,7 @@ InertiaEstimator::InertiaEstimator(hardware_interface::JointHandle joint, double
 
   setJoint(joint);
 
-  for (unsigned int i = 0; i < acc_size_; ++i)
+  for (unsigned int i = 0; i < vel_size_; ++i)
   {
     velocity_array_[i] = 0.0;
   }
@@ -113,6 +115,15 @@ void InertiaEstimator::setJoint(hardware_interface::JointHandle joint)
   joint_ = joint;
 }
 
+void InertiaEstimator::setLambda(double lambda)
+{
+  lambda_ = lambda;
+}
+void InertiaEstimator::setAcc_size(size_t acc_size)
+{
+  acc_size_ = acc_size;
+}
+
 void InertiaEstimator::setNodeHandle(ros::NodeHandle& nh)
 {
   nh_ = nh;
@@ -138,7 +149,7 @@ bool InertiaEstimator::fill_buffers(double velocity, double effort, const ros::D
 
   it = velocity_array_.begin();
   it = velocity_array_.insert(it, velocity);
-  velocity_array_.resize(acc_size_);
+  velocity_array_.resize(vel_size_);
 
   // Automatically fills the zero'th position of the acceleration array
   discrete_speed_derivative(velocity, period);
