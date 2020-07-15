@@ -159,6 +159,10 @@ class InputDeviceView(QWidget):
             self.create_button('gait_ramp_door_slope_down', image_path='/gait_ramp_door_slope_down.png',
                                callback=lambda: self._controller.publish_gait('gait_ramp_door_slope_down'))
 
+        gait_ramp_door_slope_down_fixed = \
+            self.create_button('gait_ramp_door_slope_down_fixed',
+                               callback=lambda: self._controller.publish_gait('gait_ramp_door_slope_down_fixed'))
+
         gait_ramp_door_slope_down_single = \
             self.create_button('gait_ramp_door_slope_down_single',
                                callback=lambda: self._controller.publish_gait('gait_ramp_door_slope_down_single'))
@@ -269,8 +273,8 @@ class InputDeviceView(QWidget):
             [gait_rough_terrain_high_step, gait_rough_terrain_middle_steps, gait_rough_terrain_first_middle_step,
              gait_rough_terrain_second_middle_step, gait_rough_terrain_third_middle_step],
 
-            [gait_ramp_door_slope_up, gait_ramp_door_slope_down, gait_ramp_door_last_step,
-             gait_ramp_door_slope_down_single],
+            [gait_ramp_door_slope_up, gait_ramp_door_slope_down, gait_ramp_door_slope_down_fixed,
+             gait_ramp_door_last_step, gait_ramp_door_slope_down_single],
 
             [gait_tilted_path_left_straight_start, gait_tilted_path_left_single_step,
              gait_tilted_path_left_straight_end, gait_tilted_path_left_flexed_knee_step,
