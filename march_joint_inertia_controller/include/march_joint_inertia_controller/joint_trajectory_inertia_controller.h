@@ -126,8 +126,8 @@ public:
   }
 
   /**
-  * \brief No specific implementation needed I guess, but if necessary later then here it is.
-  */
+   * \brief No specific implementation needed I guess, but if necessary later then here it is.
+   */
   void stopping(const ros::Time& /*time*/)
   {
   }
