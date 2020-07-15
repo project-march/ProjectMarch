@@ -14,7 +14,7 @@ using joint_limits_interface::SoftJointLimits;
 
 namespace joint_inertia_controller
 {
-InertiaController::InertiaController() : loop_count_(0)
+InertiaController::InertiaController()
 {
 }
 
@@ -39,8 +39,6 @@ bool InertiaController::init(hardware_interface::PositionJointInterface* hw, ros
   inertia_estimator_.setJoint(joint_);
 
   ros::Duration first(0.004);
-  // Bad practice (de time attribute), maar wat anders? en gaat dit wel goed met elke keer dat we data ontvangen?
-  // Krijgen we niet dubbele waarden op deze manier?
   inertia_estimator_.fill_buffers(joint_.getVelocity(), joint_.getEffort(), first);
 
   // Get URDF info about joint
@@ -92,7 +90,6 @@ double InertiaController::getPosition()
   return joint_.getPosition();
 }
 
-// Wait what is difference between starting and init????
 void InertiaController::starting(const ros::Time& /* time */)
 {
   double pos_command = joint_.getPosition();
@@ -116,8 +113,6 @@ void InertiaController::update(const ros::Time& /* time */, const ros::Duration&
   double commanded_effort;
 
   double current_position = joint_.getPosition();
-
-  // Example says to chweck limits here, but we already do that in the validate() function in the HWI_node
 
   if (joint_urdf_->type == urdf::Joint::REVOLUTE)
   {
@@ -157,10 +152,6 @@ void InertiaController::update(const ros::Time& /* time */, const ros::Duration&
   // TO DO: apply PID control
 
   joint_.setCommand(commanded_effort);
-
-  // Example says to update state p[ublisher but we already do that somewhere else?
-
-  loop_count_++;
 }
 void InertiaController::stopping(const ros::Time& /* time */)
 {

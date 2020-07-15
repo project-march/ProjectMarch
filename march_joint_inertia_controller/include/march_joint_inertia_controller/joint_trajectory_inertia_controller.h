@@ -40,16 +40,13 @@ public:
    */
   bool init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
   {
-    // Store pointer to joint handles
     joint_handles_ptr_ = &joint_handles;
-
     const unsigned int num_joints_ = joint_handles_ptr_->size();
 
     // Initialize PIDs
     pids_.resize(num_joints_);
     for (unsigned int i = 0; i < pids_.size(); ++i)
     {
-      // Node handle to PID gains
       ros::NodeHandle joint_nh(nh, std::string("gains/") + joint_handles[i].getName());
 
       // Init PID gains from ROS parameter server
@@ -61,7 +58,7 @@ public:
       }
     }
 
-    // Initialize the estimator parameters
+    // Obtain inertia estimator parameters from server
     double lambda[2];
     int alpha_filter_size[2];
     ros::NodeHandle rotary_estimator_nh(nh, std::string("inertia_estimator/rotary"));
@@ -91,8 +88,8 @@ public:
       return false;
     }
 
+    // Initialize the estimator parameters
     inertia_estimators_.resize(num_joints_);
-
     for (unsigned int j = 0; j < num_joints_; ++j)
     {
       inertia_estimators_[j].setNodeHandle(nh);
@@ -119,6 +116,7 @@ public:
     assert(num_joints_ == state_error.position.size());
     assert(num_joints_ == state_error.velocity.size());
 
+    // Update inertia estimator
     for (unsigned int j = 0; j < num_joints_; ++j)
     {
       inertia_estimators_[j].fill_buffers((*joint_handles_ptr_)[j].getVelocity(), (*joint_handles_ptr_)[j].getEffort(),
@@ -135,7 +133,6 @@ public:
       const double command = (pids_[i]->computeCommand(state_error.position[i], state_error.velocity[i], period));
       (*joint_handles_ptr_)[i].setCommand(command);
     }
-    loopc_++;
   }
 
   /**
@@ -209,8 +206,6 @@ private:
   unsigned int num_joints_;
   std::vector<hardware_interface::JointHandle> joints_;
   double init_pos_;
-
-  size_t loopc_;
 
   std::vector<InertiaEstimator> inertia_estimators_;
 };
