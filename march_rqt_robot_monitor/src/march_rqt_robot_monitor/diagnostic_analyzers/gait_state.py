@@ -30,12 +30,12 @@ class CheckGaitStatus(object):
             stat.summary(DiagnosticStatus.STALE, 'No gait activity recorded')
             return stat
 
-        stat.add('Gait', str(self._goal_msg.goal.name))
-        stat.add('Subgait', str(self._goal_msg.goal.current_subgait.name))
-        stat.add('Gait type', str(self._goal_msg.goal.current_subgait.gait_type))
-        stat.add('Subgait version', str(self._goal_msg.goal.current_subgait.version))
+        stat.add('Gait', str(self._goal_msg.goal.gait_name))
+        stat.add('Subgait', str(self._goal_msg.goal.subgait_name))
+        stat.add('Gait type', str(self._goal_msg.goal.gait_type))
+        stat.add('Subgait version', str(self._goal_msg.goal.version))
 
         stat.summary(DiagnosticStatus.OK, 'Gait: {gait}, {subgait}'
-                     .format(gait=str(self._goal_msg.goal.name), subgait=str(self._goal_msg.goal.current_subgait.name)))
+                     .format(gait=str(self._goal_msg.goal.gait_name), subgait=str(self._goal_msg.goal.subgait_name)))
 
         return stat
