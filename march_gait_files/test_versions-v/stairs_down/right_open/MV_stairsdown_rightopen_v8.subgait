@@ -91,5 +91,5 @@ joints:
   - position: 0.3491
     time_from_start: {nsecs: 0, secs: 4}
     velocity: -0.5236
-name: !!python/unicode 'right_open'
+name: 'right_open'
 version: MV_stairsdown_rightopen_v8
