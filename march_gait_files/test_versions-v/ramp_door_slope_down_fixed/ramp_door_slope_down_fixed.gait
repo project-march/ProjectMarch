@@ -1,0 +1,6 @@
+name: ramp_door_slope_down_fixed
+
+graph:
+  from_subgait: [start, right_open, left_swing, right_swing, left_close]
+  to_subgait:   [right_open, left_swing, right_swing, left_close, end]
+
