@@ -7,11 +7,6 @@
 #include "march_joint_inertia_controller/inertia_estimator.h"
 #include <pluginlib/class_list_macros.hpp>
 
-using joint_limits_interface::JointLimits;
-using joint_limits_interface::PositionJointSoftLimitsHandle;
-using joint_limits_interface::PositionJointSoftLimitsInterface;
-using joint_limits_interface::SoftJointLimits;
-
 namespace joint_inertia_controller
 {
 InertiaController::InertiaController()

@@ -5,25 +5,8 @@
 
 #include <control_toolbox/pid.h>
 #include <controller_interface/controller.h>
-#include <hardware_interface/joint_state_interface.h>
-#include <hardware_interface/joint_command_interface.h>
 #include "march_joint_inertia_controller/inertia_estimator.h"
-#include <memory>
-#include <joint_limits_interface/joint_limits_interface.h>
-#include <joint_limits_interface/joint_limits.h>
-#include <joint_limits_interface/joint_limits_urdf.h>
-#include <joint_limits_interface/joint_limits_rosparam.h>
-#include <urdf/model.h>
-#include <realtime_tools/realtime_buffer.h>
-#include <realtime_tools/realtime_publisher.h>
-#include <pluginlib/class_list_macros.h>
-#include <std_msgs/Float64MultiArray.h>
 #include <std_msgs/Float64.h>
-
-using joint_limits_interface::JointLimits;
-using joint_limits_interface::PositionJointSoftLimitsHandle;
-using joint_limits_interface::PositionJointSoftLimitsInterface;
-using joint_limits_interface::SoftJointLimits;
 
 namespace joint_inertia_controller
 {

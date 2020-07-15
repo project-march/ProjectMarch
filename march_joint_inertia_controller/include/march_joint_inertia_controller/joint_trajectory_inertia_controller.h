@@ -17,7 +17,6 @@
 #include <ros/node_handle.h>
 #include <ros/time.h>
 #include <trajectory_interface/quintic_spline_segment.h>
-#include <urdf/model.h>
 
 namespace joint_trajectory_controller
 {
