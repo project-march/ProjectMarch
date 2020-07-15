@@ -68,8 +68,14 @@ public:
   void setGains(const double& p, const double& i, const double& d, const double& i_max, const double& i_min,
                 const bool& antiwindup = false);
 
+  /**
+   * \brief Return the current position of the corresponding joint
+   */
   double getPosition();
 
+  /**
+   * \brief Return the name of the corresponding joint is string format
+   */
   std::string getJointName();
 
   urdf::JointConstSharedPtr joint_urdf_;

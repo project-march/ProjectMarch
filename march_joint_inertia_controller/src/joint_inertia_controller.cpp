@@ -41,7 +41,7 @@ bool InertiaController::init(hardware_interface::PositionJointInterface* hw, ros
   ros::Duration first(0.004);
   // Bad practice (de time attribute), maar wat anders? en gaat dit wel goed met elke keer dat we data ontvangen?
   // Krijgen we niet dubbele waarden op deze manier?
-  inertia_estimator_.fill_buffers(first);
+  inertia_estimator_.fill_buffers(joint_.getVelocity(), joint_.getEffort(), first);
 
   // Get URDF info about joint
   urdf::Model urdf;
@@ -150,8 +150,9 @@ void InertiaController::update(const ros::Time& /* time */, const ros::Duration&
     commanded_effort = pid_controller_.computeCommand(error, period);
   }
 
-  //  this->fill_buffers(period);
-  //  this->inertia_estimate();
+  inertia_estimator_.fill_buffers(joint_.getVelocity(), joint_.getEffort(), period);
+  inertia_estimator_.inertia_estimate();
+  inertia_estimator_.publishInertia();
   // TO DO: Provide lookup table for gain selection
   // TO DO: apply PID control
 

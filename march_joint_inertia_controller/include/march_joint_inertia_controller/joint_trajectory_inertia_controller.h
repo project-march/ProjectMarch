@@ -34,6 +34,10 @@ public:
   {
   }
 
+  /**
+   * \brief Initialize the controller by establishing the pointer to the joints, the pid calculators and the inertia
+   * estimators
+   */
   bool init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
   {
     // Store pointer to joint handles
@@ -67,6 +71,10 @@ public:
     return true;
   }
 
+  /**
+   * \brief Updates the commanded effort for each individual joint and estimates the inertia on each joint and publishes
+   * that information on a topic
+   */
   void updateCommand(const ros::Time& /*time*/, const ros::Duration& period,
                      const joint_trajectory_controller::State& /*desired state*/,
                      const joint_trajectory_controller::State& state_error)
@@ -98,6 +106,10 @@ public:
     loopc_++;
   }
 
+  /**
+   * \brief Starts the controller by checking if the joint handle pointer is filled, resets the pid calculators and sets
+   * the intial command to zero so that the joint doesn't start moving without a desired trajectory
+   */
   void starting(const ros::Time& /*time*/)
   {
     if (!joint_handles_ptr_)
@@ -113,6 +125,9 @@ public:
     }
   }
 
+  /**
+  * \brief No specific implementation needed I guess, but if necessary later then here it is.
+  */
   void stopping(const ros::Time& /*time*/)
   {
   }
@@ -127,7 +142,7 @@ public:
   }
 
   /**
-   * \brief Get the PID parameters
+   * \brief Get the PID parameters with specification if anti windup is used
    */
   void getGains(int joint_nr, double& p, double& i, double& d, double& i_max, double& i_min, bool& antiwindup)
   {
