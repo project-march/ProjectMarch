@@ -49,10 +49,19 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
   for (size_t i = 0; i < num_joints_; ++i)
   {
     const std::string name = this->march_robot_->getJoint(i).getName();
+
     SoftJointLimits soft_limits;
+    SoftJointLimits soft_limits_error;
+
     getSoftJointLimits(this->march_robot_->getUrdf().getJoint(name), soft_limits);
-    ROS_DEBUG("[%s] Soft limits set to (%f, %f)", name.c_str(), soft_limits.min_position, soft_limits.max_position);
+    getSoftJointLimitsError(name, this->march_robot_->getUrdf().getJoint(name), soft_limits_error);
+
+    ROS_DEBUG("[%s] ROS soft limits set to (%f, %f) and error limits set to (%f, %f)", name.c_str(),
+              soft_limits.min_position, soft_limits.max_position, soft_limits_error.min_position,
+              soft_limits_error.max_position);
+
     soft_limits_[i] = soft_limits;
+    soft_limits_error_[i] = soft_limits_error;
   }
 
   if (this->march_robot_->hasPowerDistributionboard())
@@ -298,6 +307,7 @@ void MarchHardwareInterface::reserveMemory()
   joint_temperature_.resize(num_joints_);
   joint_temperature_variance_.resize(num_joints_);
   soft_limits_.resize(num_joints_);
+  soft_limits_error_.resize(num_joints_);
 
   after_limit_joint_command_pub_->msg_.name.resize(num_joints_);
   after_limit_joint_command_pub_->msg_.position_command.resize(num_joints_);
@@ -460,20 +470,59 @@ bool MarchHardwareInterface::iMotionCubeStateCheck(size_t joint_index)
 void MarchHardwareInterface::outsideLimitsCheck(size_t joint_index)
 {
   march::Joint& joint = march_robot_->getJoint(joint_index);
+
   if (joint_position_[joint_index] < soft_limits_[joint_index].min_position ||
       joint_position_[joint_index] > soft_limits_[joint_index].max_position)
   {
-    ROS_ERROR_THROTTLE(1, "Joint %s is outside of its soft limits (%f, %f). Actual position: %f",
-                       joint.getName().c_str(), soft_limits_[joint_index].min_position,
-                       soft_limits_[joint_index].max_position, joint_position_[joint_index]);
-
-    if (joint.canActuate())
+    if (joint_position_[joint_index] < soft_limits_error_[joint_index].min_position ||
+        joint_position_[joint_index] > soft_limits_error_[joint_index].max_position)
     {
-      std::ostringstream error_stream;
-      error_stream << "Joint " << joint.getName() << " is out of its soft limits ("
-                   << soft_limits_[joint_index].min_position << ", " << soft_limits_[joint_index].max_position
-                   << "). Actual position: " << joint_position_[joint_index];
-      throw std::runtime_error(error_stream.str());
+      ROS_ERROR_THROTTLE(1, "Joint %s is outside of its error soft limits (%f, %f). Actual position: %f",
+                         joint.getName().c_str(), soft_limits_error_[joint_index].min_position,
+                         soft_limits_error_[joint_index].max_position, joint_position_[joint_index]);
+
+      if (joint.canActuate())
+      {
+        std::ostringstream error_stream;
+        error_stream << "Joint " << joint.getName() << " is out of its soft limits ("
+                     << soft_limits_[joint_index].min_position << ", " << soft_limits_[joint_index].max_position
+                     << "). Actual position: " << joint_position_[joint_index];
+        throw std::runtime_error(error_stream.str());
+      }
     }
+
+    ROS_WARN_THROTTLE(1, "Joint %s is outside of its soft limits (%f, %f). Actual position: %f",
+                      joint.getName().c_str(), soft_limits_[joint_index].min_position,
+                      soft_limits_[joint_index].max_position, joint_position_[joint_index]);
   }
+}
+
+void MarchHardwareInterface::getSoftJointLimitsError(const std::string& name,
+                                                     const urdf::JointConstSharedPtr& urdf_joint,
+                                                     joint_limits_interface::SoftJointLimits& error_soft_limits)
+{
+  std::ostringstream param_name;
+  std::ostringstream error_stream;
+
+  param_name << "/march/controller/trajectory/constraints/" << name << "/margin_soft_limit_error";
+
+  if (!ros::param::has(param_name.str()))
+  {
+    error_stream << "Margin soft limits error of joint: " << name << " could not be found";
+    throw std::runtime_error(error_stream.str());
+  }
+
+  float margin;
+  ros::param::param<float>(param_name.str(), margin, 0.0);
+
+  if (!urdf_joint || !urdf_joint->safety || !urdf_joint->limits || margin <= 0.0 || margin > 1.0)
+  {
+    error_stream << "Could not construct the soft limits for joint: " << name;
+    throw std::runtime_error(error_stream.str());
+  }
+
+  error_soft_limits.min_position =
+      urdf_joint->limits->lower + ((urdf_joint->safety->soft_lower_limit - urdf_joint->limits->lower) * margin);
+  error_soft_limits.max_position =
+      urdf_joint->limits->upper - ((urdf_joint->limits->upper - urdf_joint->safety->soft_upper_limit) * margin);
 }
