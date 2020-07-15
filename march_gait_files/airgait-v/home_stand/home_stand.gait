@@ -1,4 +1,4 @@
-name: home
+name: home_stand
 subgaits:
   start:
     to: home_stand
