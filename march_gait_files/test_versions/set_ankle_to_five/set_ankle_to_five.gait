@@ -1,5 +1,6 @@
 name: set_ankle_to_five
-
-graph:
-  from_subgait: [start,     set_ankle_to_five]
-  to_subgait:   [set_ankle_to_five, end]
+subgaits:
+  set_ankle_to_five:
+    to: end
+  start:
+    to: set_ankle_to_five

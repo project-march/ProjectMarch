@@ -1,5 +1,9 @@
 name: home
-
-graph:
-  from_subgait: [start   , home_sit, start     , home_stand]
-  to_subgait:   [home_sit, end     , home_stand, end       ]
+subgaits:
+  home_sit:
+    to: end
+  home_stand:
+    to: end
+  start:
+    stop: home_stand
+    to: home_sit

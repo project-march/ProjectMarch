@@ -1,5 +1,8 @@
 name: side_step_left_small
-
-graph:
-  from_subgait: [start,     left_open, right_close]
-  to_subgait:   [left_open, right_close, end]
+subgaits:
+  left_open:
+    to: right_close
+  right_close:
+    to: end
+  start:
+    to: left_open
