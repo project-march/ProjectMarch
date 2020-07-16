@@ -7,7 +7,7 @@ march:
 
   controller:
     trajectory:
-      type: "effort_controllers/JointTrajectoryController"
+      type: "inertia_trajectory_controller/JointTrajectoryController"
       joints:
         - left_ankle
         - left_hip_aa
@@ -29,6 +29,24 @@ march:
         right_hip_aa: {p: 1000,  d: 10, i: 0, i_clamp: 0}
         right_hip_fe: {p: 1500,  d: 150, i: 0, i_clamp: 0}
         right_knee: {p: 1000,  d: 10, i: 0, i_clamp: 0}
+      inertia_estimator:
+        rotary:
+          std_samples: 100 # number of samples used to calculate the standard deviation
+          lambda: 0.96
+          alpha_filter_size: 12
+          control_points:
+            inertia: [0.0, 1.0]
+            p: [150, 300]
+            d: [0, 5]
+        linear:
+          std_samples: 100 # number of samples used to calculate the standard deviation
+          lambda: 0.96
+          alpha_filter_size: 12
+          control_points:
+            inertia: [0.0, 1.0]
+            p: [150, 300]
+            d: [0, 5]
+
 
       state_publish_rate:  25            # Override default
       action_monitor_rate: 30            # Override default
