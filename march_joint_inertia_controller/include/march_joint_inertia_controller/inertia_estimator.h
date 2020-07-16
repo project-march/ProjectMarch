@@ -133,7 +133,7 @@ private:
   // Default length 12 for the alpha calculation
   size_t acc_size_;
   std::vector<double> acceleration_array_;
-  // Equal to atwo, because two values are needed to calculate the derivative
+  // Equal to two, because two values are needed to calculate the derivative
   size_t vel_size_ = 2;
   std::vector<double> velocity_array_;
   std::vector<double> filtered_acceleration_array_;

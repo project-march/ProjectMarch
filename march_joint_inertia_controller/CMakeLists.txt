@@ -18,7 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
     roscpp
     std_msgs
     urdf
-    )
+)
 
 catkin_package(
     INCLUDE_DIRS include
