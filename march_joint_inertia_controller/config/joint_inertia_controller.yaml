@@ -1,3 +1,5 @@
+# This is a template for the controllers.yaml used in the HWI and in the simulation, note the inertia_estimator.
+
 march:
   controller:
     pdb_state:
@@ -32,9 +34,9 @@ march:
         right_knee: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
       inertia_estimator:
         rotary:
-          lambda: 0.96
-          alpha_filter_size: 12
-          control_points:
+          lambda: 0.96 # Usually chosen between 0.9 and 1.0, but not bigger than one or less than zero
+          alpha_filter_size: 12 # Determines the filter size in the alpha calculation, recommended between 8 and 32
+          control_points: # All arrays must be of same size. Each inertia corresponds to a gain
             inertia: [0.0, 1.0]
             p: [150, 300]
             d: [0, 5]
