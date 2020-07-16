@@ -44,23 +44,6 @@ InertiaEstimator::InertiaEstimator(double lambda, size_t acc_size)
   joint_torque_.resize(torque_size_);
 
   filtered_joint_torque_.resize(fil_tor_size_);
-
-  for (unsigned int i = 0; i < vel_size_; ++i)
-  {
-    velocity_array_[i] = 0.0;
-  }
-
-  for (unsigned int i = 0; i < acc_size_; ++i)
-  {
-    acceleration_array_[i] = 0.0;
-  }
-
-  for (unsigned int i = 0; i < torque_size_; ++i)
-  {
-    joint_torque_[i] = 0.0;
-  }
-
-  // Setup Butterworth filter
 }
 
 InertiaEstimator::InertiaEstimator(hardware_interface::JointHandle joint, double lambda, size_t acc_size)
@@ -81,23 +64,6 @@ InertiaEstimator::InertiaEstimator(hardware_interface::JointHandle joint, double
   filtered_joint_torque_.resize(fil_tor_size_);
 
   setJoint(joint);
-
-  for (unsigned int i = 0; i < vel_size_; ++i)
-  {
-    velocity_array_[i] = 0.0;
-  }
-
-  for (unsigned int i = 0; i < acc_size_; ++i)
-  {
-    acceleration_array_[i] = 0.0;
-  }
-
-  for (unsigned int i = 0; i < torque_size_; ++i)
-  {
-    joint_torque_[i] = 0.0;
-  }
-
-  // Setup Butterworth filter
 }
 
 InertiaEstimator::~InertiaEstimator()
