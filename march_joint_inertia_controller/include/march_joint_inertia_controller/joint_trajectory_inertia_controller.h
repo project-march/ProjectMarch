@@ -62,28 +62,28 @@ public:
     int alpha_filter_size[2];
     ros::NodeHandle rotary_estimator_nh(nh, std::string("inertia_estimator/rotary"));
 
-    if (!rotary_estimator_nh.getParam("/lambda", lambda[0]))
+    if (!rotary_estimator_nh.getParam("lambda", lambda[0]))
     {
-      ROS_ERROR("No lambda specified");
+      ROS_ERROR("No rotary lambda specified");
       return false;
     }
 
-    if (!rotary_estimator_nh.getParam("/alpha_filter_size", alpha_filter_size[0]))
+    if (!rotary_estimator_nh.getParam("alpha_filter_size", alpha_filter_size[0]))
     {
-      ROS_ERROR("No alpha_filter_size specified");
+      ROS_ERROR("No rotary alpha_filter_size specified");
       return false;
     }
 
     ros::NodeHandle linear_estimator_nh(nh, std::string("inertia_estimator/linear"));
-    if (!linear_estimator_nh.getParam("/lambda", lambda[1]))
+    if (!linear_estimator_nh.getParam("lambda", lambda[1]))
     {
-      ROS_ERROR("No lambda specified");
+      ROS_ERROR("No linear lambda specified");
       return false;
     }
 
-    if (!linear_estimator_nh.getParam("/alpha_filter_size", alpha_filter_size[1]))
+    if (!linear_estimator_nh.getParam("alpha_filter_size", alpha_filter_size[1]))
     {
-      ROS_ERROR("No alpha_filter_size specified");
+      ROS_ERROR("No linear alpha_filter_size specified");
       return false;
     }
 
@@ -143,6 +143,12 @@ public:
     if (!joint_handles_ptr_)
     {
       return;
+    }
+    const unsigned int num_joints_ = joint_handles_ptr_->size();
+
+    for (unsigned int j = 0; j < num_joints_; ++j)
+    {
+      ROS_INFO("wow i can read this %d %d %f", num_joints_, j, (*joint_handles_ptr_)[j].getVelocity());
     }
 
     // Reset PIDs, zero commands
