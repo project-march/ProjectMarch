@@ -61,37 +61,13 @@ public:
     double lambda[2];
     int alpha_filter_size[2];
     ros::NodeHandle rotary_estimator_nh(nh, std::string("inertia_estimator/rotary"));
-
-    if (!rotary_estimator_nh.getParam("std_samples", samples_))
-    {
-      ROS_ERROR("No std_samples specified");
-      return false;
-    }
-
-    if (!rotary_estimator_nh.getParam("lambda", lambda[0]))
-    {
-      ROS_ERROR("No rotary lambda specified");
-      return false;
-    }
-
-    if (!rotary_estimator_nh.getParam("alpha_filter_size", alpha_filter_size[0]))
-    {
-      ROS_ERROR("No rotary alpha_filter_size specified");
-      return false;
-    }
+    rotary_estimator_nh.param("std_samples", samples_, 100);
+    rotary_estimator_nh.param("lambda", lambda[0], 0.96);
+    rotary_estimator_nh.param("alpha_filter_size", alpha_filter_size[0], 12);
 
     ros::NodeHandle linear_estimator_nh(nh, std::string("inertia_estimator/linear"));
-    if (!linear_estimator_nh.getParam("lambda", lambda[1]))
-    {
-      ROS_ERROR("No linear lambda specified");
-      return false;
-    }
-
-    if (!linear_estimator_nh.getParam("alpha_filter_size", alpha_filter_size[1]))
-    {
-      ROS_ERROR("No linear alpha_filter_size specified");
-      return false;
-    }
+    linear_estimator_nh.param("lambda", lambda[1], 0.96);
+    linear_estimator_nh.param("alpha_filter_size", alpha_filter_size[1], 12);
 
     // Initialize the estimator parameters
     inertia_estimators_.resize(num_joints_);
