@@ -21,7 +21,7 @@ double mean(std::vector<double> a)
   {
     sum += a[i];
   }
-  if (sum == 0.0)
+  if (a.size() == 0.0)
   {
     return 0.0;
   }
