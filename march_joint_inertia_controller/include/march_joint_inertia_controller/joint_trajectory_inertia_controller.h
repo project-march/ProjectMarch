@@ -62,6 +62,12 @@ public:
     int alpha_filter_size[2];
     ros::NodeHandle rotary_estimator_nh(nh, std::string("inertia_estimator/rotary"));
 
+    if (!rotary_estimator_nh.getParam("std_samples", samples_))
+    {
+      ROS_ERROR("No std_samples specified");
+      return false;
+    }
+
     if (!rotary_estimator_nh.getParam("lambda", lambda[0]))
     {
       ROS_ERROR("No rotary lambda specified");
@@ -115,22 +121,36 @@ public:
     assert(num_joints_ == state_error.position.size());
     assert(num_joints_ == state_error.velocity.size());
 
-    // Update inertia estimator
-    for (unsigned int j = 0; j < num_joints_; ++j)
+    if (count_ < samples_)
     {
-      inertia_estimators_[j].fill_buffers((*joint_handles_ptr_)[j].getVelocity(), (*joint_handles_ptr_)[j].getEffort(),
-                                          period);
-      inertia_estimators_[j].inertia_estimate();
-      inertia_estimators_[j].publishInertia();
-      // TO DO: Provide lookup table for gain selection
-      // TO DO: apply PID control
+      count_++;
+      for (unsigned int i = 0; i < num_joints_; ++i)
+      {
+        inertia_estimators_[i].fill_buffers((*joint_handles_ptr_)[i].getVelocity(),
+                                            (*joint_handles_ptr_)[i].getEffort(), period);
+        inertia_estimators_[i].standard_deviation.push_back(inertia_estimators_[i].getAcceleration(0));
+        if (count_ == samples_)
+        {
+          inertia_estimators_[i].init_p(samples_);
+        }
+      }
     }
-
-    // Update PIDs
-    for (unsigned int i = 0; i < num_joints_; ++i)
+    else
     {
-      const double command = (pids_[i]->computeCommand(state_error.position[i], state_error.velocity[i], period));
-      (*joint_handles_ptr_)[i].setCommand(command);
+      for (unsigned int i = 0; i < num_joints_; ++i)
+      {
+        // Update inertia estimator
+        inertia_estimators_[i].fill_buffers((*joint_handles_ptr_)[i].getVelocity(),
+                                            (*joint_handles_ptr_)[i].getEffort(), period);
+        inertia_estimators_[i].inertia_estimate();
+        inertia_estimators_[i].publishInertia();
+        // TO DO: Provide lookup table for gain selection
+        // TO DO: apply PID control
+
+        // Update PIDs
+        const double command = (pids_[i]->computeCommand(state_error.position[i], state_error.velocity[i], period));
+        (*joint_handles_ptr_)[i].setCommand(command);
+      }
     }
   }
 
@@ -143,12 +163,6 @@ public:
     if (!joint_handles_ptr_)
     {
       return;
-    }
-    const unsigned int num_joints_ = joint_handles_ptr_->size();
-
-    for (unsigned int j = 0; j < num_joints_; ++j)
-    {
-      ROS_INFO("wow i can read this %d %d %f", num_joints_, j, (*joint_handles_ptr_)[j].getVelocity());
     }
 
     // Reset PIDs, zero commands
@@ -203,6 +217,9 @@ public:
   std::string joint_names;
 
 private:
+  int count_ = 0;
+  int samples_;
+
   typedef std::shared_ptr<control_toolbox::Pid> PidPtr;
   std::vector<PidPtr> pids_;
 

@@ -60,9 +60,6 @@ InertiaEstimator::InertiaEstimator(double lambda, size_t acc_size)
     joint_torque_[i] = 0.0;
   }
 
-  // Setup the initial value for the correlation coefficient 100*standarddeviation(acceleration)^2
-  corr_coeff_ = 3000.0;
-
   // Setup Butterworth filter
 }
 
@@ -100,14 +97,16 @@ InertiaEstimator::InertiaEstimator(hardware_interface::JointHandle joint, double
     joint_torque_[i] = 0.0;
   }
 
-  // Setup the initial value for the correlation coefficient 100*standarddeviation(acceleration)^2
-  corr_coeff_ = 3000.0;
-
   // Setup Butterworth filter
 }
 
 InertiaEstimator::~InertiaEstimator()
 {
+}
+
+double InertiaEstimator::getAcceleration(unsigned int index)
+{
+  return acceleration_array_[index];
 }
 
 void InertiaEstimator::setJoint(hardware_interface::JointHandle joint)
@@ -275,4 +274,17 @@ void InertiaEstimator::discrete_speed_derivative(double velocity, const ros::Dur
 {
   auto it = acceleration_array_.begin();
   it = acceleration_array_.insert(it, (velocity - velocity_array_[1]) / period.toSec());
+}
+
+void InertiaEstimator::init_p(unsigned int samples)
+{
+  // Setup the initial value for the correlation coefficient 100*standarddeviation(acceleration)^2
+  double mean_value = mean(standard_deviation);
+  double sum = 0;
+  for (unsigned int i = 0; i < standard_deviation.size(); ++i)
+  {
+    sum += pow((standard_deviation[i] - mean_value), 2);
+  }
+  corr_coeff_ = 100 * (sum / samples);
+  return;
 }

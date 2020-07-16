@@ -55,6 +55,7 @@ public:
    * \brief Get the position of the joint stored in the private variable
    */
   double getPosition();
+  double getAcceleration(unsigned int index);
 
   void setJoint(hardware_interface::JointHandle joint);
   void setLambda(double lambda);
@@ -103,8 +104,15 @@ public:
    */
   bool fill_buffers(double velocity, double effort, const ros::Duration& period);
 
+  /**
+   * \brief Fill the rolling buffers with corresponding values.
+   */
+  void init_p(unsigned int samples);
+
   urdf::JointConstSharedPtr joint_urdf_;
   std::string joint_name;
+  // Vector to be filled with samples of acceleration to determine the standard deviation from
+  std::vector<double> standard_deviation;
 
 private:
   ros::NodeHandle nh_;
