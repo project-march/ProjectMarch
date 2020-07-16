@@ -33,26 +33,34 @@ march:
 
       constraints:
         left_ankle:
+          margin_soft_limit_error: 0.5
           trajectory: 0.305
           goal: 0.305
         left_hip_aa:
+          margin_soft_limit_error: 0.5
           trajectory: 0.305
           goal: 0.305
         left_hip_fe:
+          margin_soft_limit_error: 0.5
           trajectory: 0.305
           goal: 0.305
         left_knee:
+          margin_soft_limit_error: 0.5
           trajectory: 0.305
           goal: 0.305
         right_ankle:
+          margin_soft_limit_error: 0.5
           trajectory: 0.305
           goal: 0.305
         right_hip_aa:
+          margin_soft_limit_error: 0.5
           trajectory: 0.305
           goal: 0.305
         right_hip_fe:
+          margin_soft_limit_error: 0.5
           trajectory: 0.305
           goal: 0.305
         right_knee:
+          margin_soft_limit_error: 0.5
           trajectory: 0.305
           goal: 0.305

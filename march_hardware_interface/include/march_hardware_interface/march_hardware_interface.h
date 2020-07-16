@@ -68,6 +68,9 @@ public:
    */
   int getEthercatCycleTime() const;
 
+  /**
+   * Wait for received PDO.
+   */
   void waitForPdo();
 
 private:
@@ -84,6 +87,8 @@ private:
   void updateIMotionCubeState();
   void outsideLimitsCheck(size_t joint_index);
   bool iMotionCubeStateCheck(size_t joint_index);
+  static void getSoftJointLimitsError(const std::string& name, const urdf::JointConstSharedPtr& urdf_joint,
+                                      joint_limits_interface::SoftJointLimits& error_soft_limits);
 
   /* Limit of the change in effort command over one cycle, can be overridden by safety controller */
   static constexpr double MAX_EFFORT_CHANGE = 5000;
@@ -120,6 +125,7 @@ private:
   std::vector<double> joint_temperature_variance_;
 
   std::vector<joint_limits_interface::SoftJointLimits> soft_limits_;
+  std::vector<joint_limits_interface::SoftJointLimits> soft_limits_error_;
 
   PowerNetOnOffCommand power_net_on_off_command_;
   bool master_shutdown_allowed_command_ = false;
