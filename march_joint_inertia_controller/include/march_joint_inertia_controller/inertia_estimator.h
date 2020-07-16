@@ -105,7 +105,7 @@ public:
   bool fill_buffers(double velocity, double effort, const ros::Duration& period);
 
   /**
-   * \brief Fill the rolling buffers with corresponding values.
+   * \brief Calculate the initial correlation coefficient
    */
   void init_p(unsigned int samples);
 
