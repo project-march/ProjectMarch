@@ -55,17 +55,17 @@ std::string parseError(uint16_t error, ErrorRegisters error_register)
   {
     if (bitset.test(i))
     {
-      if (error_register == ErrorRegisters::MOTION_ERROR)
+      switch (error_register)
       {
-        description += MOTION_ERRORS[i];
-      }
-      else if (error_register == ErrorRegisters::DETAILED_ERROR)
-      {
-        description += DETAILED_MOTION_ERRORS[i];
-      }
-      else if (error_register == ErrorRegisters::SECOND_DETAILED_ERROR)
-      {
-        description += SECOND_DETAILED_MOTION_ERRORS[i];
+        case ErrorRegisters::MOTION_ERROR:
+          description += MOTION_ERRORS[i];
+          continue;
+        case ErrorRegisters::DETAILED_ERROR:
+          description += DETAILED_MOTION_ERRORS[i];
+          continue;
+        case ErrorRegisters::SECOND_DETAILED_ERROR:
+          description += SECOND_DETAILED_MOTION_ERRORS[i];
+          continue;
       }
     }
   }
