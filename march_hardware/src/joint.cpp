@@ -237,9 +237,12 @@ IMotionCubeState Joint::getIMotionCubeState()
   states.secondDetailedError = secondDetailedErrorBits.to_string();
 
   states.state = IMCState(this->imc_->getStatusWord());
-  states.motionErrorDescription = error::parseMotionError(this->imc_->getMotionError());
-  states.detailedErrorDescription = error::parseDetailedError(this->imc_->getDetailedError());
-  states.secondDetailedErrorDescription = error::parseSecondDetailedError(this->imc_->getSecondDetailedError());
+
+  states.motionErrorDescription = error::parseError(this->imc_->getMotionError(), error::ErrorRegisters::MOTION_ERROR);
+  states.detailedErrorDescription =
+      error::parseError(this->imc_->getDetailedError(), error::ErrorRegisters::DETAILED_ERROR);
+  states.secondDetailedErrorDescription =
+      error::parseError(this->imc_->getSecondDetailedError(), error::ErrorRegisters::SECOND_DETAILED_ERROR);
 
   states.motorCurrent = this->imc_->getMotorCurrent();
   states.IMCVoltage = this->imc_->getIMCVoltage();

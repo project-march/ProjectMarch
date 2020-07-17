@@ -332,9 +332,14 @@ void IMotionCube::goToTargetState(IMotionCubeTargetState target_state)
     {
       ROS_FATAL("IMotionCube went to fault state while attempting to go to '%s'. Shutting down.",
                 target_state.getDescription().c_str());
-      ROS_FATAL("Motion Error (MER): %s", error::parseMotionError(this->getMotionError()).c_str());
-      ROS_FATAL("Detailed Error (DER): %s", error::parseDetailedError(this->getDetailedError()).c_str());
-      ROS_FATAL("Detailed Error 2 (DER2): %s", error::parseSecondDetailedError(this->getSecondDetailedError()).c_str());
+      ROS_FATAL("Motion Error (MER): %s",
+                error::parseError(this->getMotionError(), error::ErrorRegisters::MOTION_ERROR).c_str());
+      ROS_FATAL("Detailed Error (DER): %s",
+                error::parseError(this->getDetailedError(), error::ErrorRegisters::DETAILED_ERROR).c_str());
+      ROS_FATAL(
+          "Detailed Error 2 (DER2): %s",
+          error::parseError(this->getSecondDetailedError(), error::ErrorRegisters::SECOND_DETAILED_ERROR).c_str());
+
       throw std::domain_error("IMC to fault state");
     }
   }
