@@ -44,3 +44,23 @@ TEST(TestDetailedMotionError, ParseMultipleDetailedErrors)
   expected += march::error::DETAILED_MOTION_ERRORS[8];
   ASSERT_EQ(march::error::parseDetailedError(error), expected);
 }
+
+TEST(TestSecondDetailedMotionError, ParseNoSecondDetailedMotionError)
+{
+  ASSERT_EQ(march::error::parseSecondDetailedError(0), "");
+}
+
+TEST(TestSecondDetailedMotionError, ParseCorrectSecondDetailedMotionError)
+{
+  const uint16_t error = 1;
+  ASSERT_EQ(march::error::parseSecondDetailedError(error), march::error::SECOND_DETAILED_MOTION_ERRORS[0]);
+}
+
+TEST(TestSecondDetailedMotionError, ParseMultipleSecondDetailedErrors)
+{
+  const uint16_t error = 0b0001100;
+  std::string expected;
+  expected += march::error::SECOND_DETAILED_MOTION_ERRORS[2];
+  expected += march::error::SECOND_DETAILED_MOTION_ERRORS[3];
+  ASSERT_EQ(march::error::parseSecondDetailedError(error), expected);
+}
