@@ -1,5 +1,8 @@
 name: sit
-
-graph:
-  from_subgait: [start,      sit_down, sit_home]
-  to_subgait:   [sit_down, sit_home,       end]
+subgaits:
+  sit_down:
+    to: sit_home
+  sit_home:
+    to: end
+  start:
+    to: sit_down
