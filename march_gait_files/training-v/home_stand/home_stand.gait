@@ -1,6 +1,0 @@
-name: home_stand
-subgaits:
-  start:
-    to: home_stand
-  home_stand:
-    to: end
