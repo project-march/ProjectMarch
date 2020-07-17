@@ -453,10 +453,10 @@ bool MarchHardwareInterface::iMotionCubeStateCheck(size_t joint_index)
               "\nMotion Error: %s (%s)"
               "\nDetailed Error: %s (%s)"
               "\nSecond Detailed Error: %s (%s)",
-              joint.getName().c_str(), imc_state.state.getString().c_str(), imc_state.motionErrorDescription.c_str(),
-              imc_state.motionError.c_str(), imc_state.detailedErrorDescription.c_str(),
-              imc_state.detailedError.c_str(), imc_state.secondDetailedErrorDescription.c_str(),
-              imc_state.secondDetailedError.c_str());
+              joint.getName().c_str(), imc_state.state.getString().c_str(), 
+              imc_state.motionErrorDescription.c_str(), imc_state.motionError.c_str(), 
+              imc_state.detailedErrorDescription.c_str(), imc_state.detailedError.c_str(), 
+              imc_state.secondDetailedErrorDescription.c_str(), imc_state.secondDetailedError.c_str());
     return false;
   }
   return true;

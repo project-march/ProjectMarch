@@ -43,7 +43,7 @@ const char* SECOND_DETAILED_MOTION_ERRORS[SECOND_DETAILED_MOTION_ERROR_SIZE] = {
   "BiSS sensor missing. ",
   "Absolute Encoder Interface (AEI) interface error. ",
   "Hall sensor missing. ",
-  "Position wraparound. The position 2 31 was exceeded. ",
+  "Position wraparound. The position 2^31 was exceeded. ",
 };
 
 std::string parseMotionError(uint16_t motion_error)
