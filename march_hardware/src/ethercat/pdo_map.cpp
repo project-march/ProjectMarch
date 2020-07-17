@@ -15,6 +15,7 @@ std::unordered_map<IMCObjectName, IMCObject> PDOmap::all_objects = {
   { IMCObjectName::ActualVelocity, IMCObject(0x6069, 0, 32) },
   { IMCObjectName::MotionErrorRegister, IMCObject(0x2000, 0, 16) },
   { IMCObjectName::DetailedErrorRegister, IMCObject(0x2002, 0, 16) },
+  { IMCObjectName::SecondDetailedErrorRegister, IMCObject(0x2009, 0, 16) },
   { IMCObjectName::DCLinkVoltage, IMCObject(0x2055, 0, 16) },
   { IMCObjectName::DriveTemperature, IMCObject(0x2058, 0, 16) },
   { IMCObjectName::ActualTorque, IMCObject(0x6077, 0, 16) },
