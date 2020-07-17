@@ -1,5 +1,8 @@
 name: stairs_down_final_step
-
-graph:
-  from_subgait: [start, right_final, left_final]
-  to_subgait:   [right_final, left_final, end]
+subgaits:
+  left_final:
+    to: end
+  right_final:
+    to: left_final
+  start:
+    to: right_final

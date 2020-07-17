@@ -1,5 +1,6 @@
 name: tilted_path_left_knee_bend
-
-graph:
-  from_subgait: [start, right_open]
-  to_subgait:   [right_open, end]
+subgaits:
+  right_open:
+    to: end
+  start:
+    to: right_open
