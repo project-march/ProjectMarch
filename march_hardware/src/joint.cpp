@@ -229,14 +229,17 @@ IMotionCubeState Joint::getIMotionCubeState()
 
   std::bitset<16> statusWordBits = this->imc_->getStatusWord();
   states.statusWord = statusWordBits.to_string();
-  std::bitset<16> detailedErrorBits = this->imc_->getDetailedError();
-  states.detailedError = detailedErrorBits.to_string();
   std::bitset<16> motionErrorBits = this->imc_->getMotionError();
   states.motionError = motionErrorBits.to_string();
+  std::bitset<16> detailedErrorBits = this->imc_->getDetailedError();
+  states.detailedError = detailedErrorBits.to_string();
+  std::bitset<16> secondDetailedErrorBits = this->imc_->getSecondDetailedError();
+  states.secondDetailedError = secondDetailedErrorBits.to_string();
 
   states.state = IMCState(this->imc_->getStatusWord());
-  states.detailedErrorDescription = error::parseDetailedError(this->imc_->getDetailedError());
   states.motionErrorDescription = error::parseMotionError(this->imc_->getMotionError());
+  states.detailedErrorDescription = error::parseDetailedError(this->imc_->getDetailedError());
+  states.secondDetailedErrorDescription = error::parseSecondDetailedError(this->imc_->getSecondDetailedError());
 
   states.motorCurrent = this->imc_->getMotorCurrent();
   states.IMCVoltage = this->imc_->getIMCVoltage();
