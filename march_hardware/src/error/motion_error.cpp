@@ -59,13 +59,15 @@ std::string parseError(uint16_t error, ErrorRegisters error_register)
       {
         case ErrorRegisters::MOTION_ERROR:
           description += MOTION_ERRORS[i];
-          continue;
+          break;
         case ErrorRegisters::DETAILED_ERROR:
           description += DETAILED_MOTION_ERRORS[i];
-          continue;
+          break;
         case ErrorRegisters::SECOND_DETAILED_ERROR:
           description += SECOND_DETAILED_MOTION_ERRORS[i];
-          continue;
+          break;
+        default:
+          break;
       }
     }
   }
