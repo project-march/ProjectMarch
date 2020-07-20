@@ -14,7 +14,7 @@
  * @param[in] a input vector with values that need to be converted to absolutes
  * @param[out] b output vector with copies of the absolute values of a.
  */
-void absolute(std::vector<double> a, std::vector<double>& b);
+std:vector<double> absolute(const std::vector<double>& a);
 
 /**
  * \brief determiness the mean value of the given vector
@@ -22,7 +22,7 @@ void absolute(std::vector<double> a, std::vector<double>& b);
  * @param[in] a input vector from which the mean gets calculated
  * @returns the mean value of a
  */
-double mean(std::vector<double> a);
+double mean(const std::vector<double>& a);
 
 /**
  * \brief Class that bundles functionality to estimate inertia on a Revolute Joint.
@@ -120,8 +120,8 @@ private:
 
   hardware_interface::JointHandle joint_;
 
-  float min_alpha_ = 0.4;  // You might want to be able to adjust this value from a yaml/launch file
-  float max_alpha_ = 0.9;  // You might want to be able to adjust this value from a yaml/launch file
+  double min_alpha_ = 0.4;  // You might want to be able to adjust this value from a yaml/launch file
+  double max_alpha_ = 0.9;  // You might want to be able to adjust this value from a yaml/launch file
 
   double sos_[3][6] = {
     { 2.31330497e-05, 4.62660994e-05, 2.31330497e-05, 1.00000000e+00, -1.37177561e+00, 4.75382129e-01 },
