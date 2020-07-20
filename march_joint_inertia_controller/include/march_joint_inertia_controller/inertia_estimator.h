@@ -14,7 +14,7 @@
  * @param[in] a input vector with values that need to be converted to absolutes
  * @param[out] b output vector with copies of the absolute values of a.
  */
-void absolute(std::vector<double> a, std::vector<double>& b);
+std:vector<double> absolute(const std::vector<double>& a);
 
 /**
  * \brief determiness the mean value of the given vector
@@ -22,7 +22,7 @@ void absolute(std::vector<double> a, std::vector<double>& b);
  * @param[in] a input vector from which the mean gets calculated
  * @returns the mean value of a
  */
-double mean(std::vector<double> a);
+double mean(const std::vector<double>& a);
 
 /**
  * \brief Class that bundles functionality to estimate inertia on a Revolute Joint.
@@ -119,7 +119,7 @@ private:
   // Default length 12 for the alpha calculation
   size_t acc_size_;
   std::vector<double> acceleration_array_;
-  // Equal to atwo, because two values are needed to calculate the derivative
+  // Equal to two, because two values are needed to calculate the derivative
   size_t vel_size_ = 2;
   std::vector<double> velocity_array_;
   std::vector<double> filtered_acceleration_array_;
