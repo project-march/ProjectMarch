@@ -1,20 +1,23 @@
 // Copyright 2020 Project March.
+#include <cmath>
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
 #include "march_joint_inertia_controller/inertia_estimator.h"
-#include "math.h"
 #include "ros/ros.h"
 #include "std_msgs/Float64.h"
 
-void absolute(std::vector<double> a, std::vector<double>& b)
+std::vector<double> absolute(const std::vector<double>& a)
 {
+  std::vector<double> b;
+  b.resize(a.size());
   for (size_t i = 0; i < a.size(); ++i)
   {
     b[i] = abs(a[i]);
   }
+  return b;
 }
 
-double mean(std::vector<double> a)
+double mean(const std::vector<double>& a)
 {
   double sum = 0.0;
   for (size_t i = 0; i < a.size(); ++i)
@@ -64,10 +67,6 @@ InertiaEstimator::InertiaEstimator(hardware_interface::JointHandle joint, double
   filtered_joint_torque_.resize(fil_tor_size_);
 
   setJoint(joint);
-}
-
-InertiaEstimator::~InertiaEstimator()
-{
 }
 
 double InertiaEstimator::getAcceleration(unsigned int index)

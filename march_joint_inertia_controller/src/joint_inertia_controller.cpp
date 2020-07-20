@@ -1,18 +1,13 @@
 // Copyright 2020 Project March.
-#include "march_joint_inertia_controller/joint_inertia_controller.h"
-#include <control_msgs/FollowJointTrajectoryAction.h>
-#include <trajectory_msgs/JointTrajectory.h>
-#include <math.h>
 #include <angles/angles.h>
+#include <cmath>
 #include "march_joint_inertia_controller/inertia_estimator.h"
+#include "march_joint_inertia_controller/joint_inertia_controller.h"
 #include <pluginlib/class_list_macros.hpp>
+#include <trajectory_msgs/JointTrajectory.h>
 
 namespace joint_inertia_controller
 {
-InertiaController::InertiaController()
-{
-}
-
 InertiaController::~InertiaController()
 {
   sub_command_.shutdown();

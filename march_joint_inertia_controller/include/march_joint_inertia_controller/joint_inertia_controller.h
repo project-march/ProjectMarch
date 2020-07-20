@@ -15,18 +15,18 @@ class InertiaController : public controller_interface::Controller<hardware_inter
 public:
   struct Commands
   {
-    double position_;    // Last commanded position
-    double velocity_;    // Last commanded velocity
-    bool has_velocity_;  // false if no velocity command has been specified
+    double position;    // Last commanded position
+    double velocity;    // Last commanded velocity
+    bool has_velocity;  // false if no velocity command has been specified
   };
 
-  InertiaController();
-  ~InertiaController();
+  InertiaController() = default;
+  ~InertiaController() override;
 
-  bool init(hardware_interface::PositionJointInterface* hw, ros::NodeHandle& n);
-  void update(const ros::Time& time, const ros::Duration& period);
-  void starting(const ros::Time& time);
-  void stopping(const ros::Time& time);
+  bool init(hardware_interface::PositionJointInterface* hw, ros::NodeHandle& n) override;
+  void update(const ros::Time& time, const ros::Duration& period) override;
+  void starting(const ros::Time& time) override;
+  void stopping(const ros::Time& time) override;
   void setCommand(double pos_command);
   void setCommand(double pos_command, double vel_command);
   void commandCB(const std_msgs::Float64ConstPtr& msg);
@@ -67,18 +67,12 @@ public:
   Commands command_struct_;  // pre-allocated memory that is re-used to set the realtime buffer
 
 private:
-  int loop_count_;
   control_toolbox::Pid pid_controller_; /**< Internal PID controller. */
 
   ros::Subscriber sub_command_;
   hardware_interface::JointHandle joint_;
-  double init_pos_;
 
   InertiaEstimator inertia_estimator_;
-  /**
-   * \brief Callback from /command subscriber for setpoint
-   */
-  void setCommandCB(const std_msgs::Float64ConstPtr& msg);
 };
 }  // namespace joint_inertia_controller
 

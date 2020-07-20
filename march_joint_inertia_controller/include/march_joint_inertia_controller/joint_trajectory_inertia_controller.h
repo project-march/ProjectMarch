@@ -40,7 +40,7 @@ public:
   bool init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
   {
     joint_handles_ptr_ = &joint_handles;
-    const unsigned int num_joints_ = joint_handles_ptr_->size();
+    num_joints_ = joint_handles_ptr_->size();
 
     // Initialize PIDs
     pids_.resize(num_joints_);
@@ -89,11 +89,13 @@ public:
                      const joint_trajectory_controller::State& /*desired state*/,
                      const joint_trajectory_controller::State& state_error)
   {
-    const unsigned int num_joints_ = joint_handles_ptr_->size();
+    num_joints_ = joint_handles_ptr_->size();
 
     // Preconditions
     if (!joint_handles_ptr_)
+    {
       return;
+    }
     assert(num_joints_ == state_error.position.size());
     assert(num_joints_ == state_error.velocity.size());
 
@@ -190,8 +192,6 @@ public:
     (*pids_[joint_nr]).setGains(p, i, d, i_max, i_min, antiwindup);
   }
 
-  std::string joint_names;
-
 private:
   int count_ = 0;
   int samples_;
@@ -202,8 +202,6 @@ private:
   std::vector<hardware_interface::JointHandle>* joint_handles_ptr_;
 
   unsigned int num_joints_;
-  std::vector<hardware_interface::JointHandle> joints_;
-  double init_pos_;
 
   std::vector<InertiaEstimator> inertia_estimators_;
 };

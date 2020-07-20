@@ -46,15 +46,6 @@ public:
    */
   InertiaEstimator(hardware_interface::JointHandle joint, double lambda = 0.96, size_t acc_size = 12);
 
-  /**
-   * \brief Destructor
-   */
-  ~InertiaEstimator();
-
-  /**
-   * \brief Get the position of the joint stored in the private variable
-   */
-  double getPosition();
   double getAcceleration(unsigned int index);
 
   void setJoint(hardware_interface::JointHandle joint);
@@ -66,8 +57,6 @@ public:
    */
   void configurePublisher(std::string name);
   void publishInertia();
-
-  std::string getJointName();
 
   /**
    * \brief Applies the Butterworth filter over the last two samples and returns the resulting filtered value
@@ -81,7 +70,7 @@ public:
   /**
    * \brief Calculate a discrete derivative of the speed measurements
    */
-  void discrete_speed_derivative(double velocity, const ros::Duration&);
+  void discrete_speed_derivative(double velocity, const ros::Duration& period);
   /**
    * \brief Calculate the alpha coefficient for the inertia estimate
    */
@@ -109,8 +98,6 @@ public:
    */
   void init_p(unsigned int samples);
 
-  urdf::JointConstSharedPtr joint_urdf_;
-  std::string joint_name;
   // Vector to be filled with samples of acceleration to determine the standard deviation from
   std::vector<double> standard_deviation;
 
@@ -118,11 +105,10 @@ private:
   ros::NodeHandle nh_;
   ros::Publisher pub_;
 
-  hardware_interface::JointHandle joint_;
-
   float min_alpha_ = 0.4;  // You might want to be able to adjust this value from a yaml/launch file
   float max_alpha_ = 0.9;  // You might want to be able to adjust this value from a yaml/launch file
 
+  // This is a sixth order butterworth filter with a cutoff frequency at 15Hz in Second Order Sections form
   double sos_[3][6] = {
     { 2.31330497e-05, 4.62660994e-05, 2.31330497e-05, 1.00000000e+00, -1.37177561e+00, 4.75382129e-01 },
     { 1.00000000e+00, 2.00000000e+00, 1.00000000e+00, 1.00000000e+00, -1.47548044e+00, 5.86919508e-01 },
