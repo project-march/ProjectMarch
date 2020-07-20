@@ -53,7 +53,7 @@ joints:
     velocity: 0.0
   - position: 0.7086
     time_from_start: {nsecs: 0, secs: 3}
-    velocity: 1.6754
+    velocity: 1.6755
   right_ankle:
   - position: 0.0436
     time_from_start: {nsecs: 0, secs: 0}
