@@ -53,7 +53,7 @@ class GaitSelectionView(QWidget):
 
         self._gait_menu.currentIndexChanged.connect(lambda: self.update_version_menus())
         for subgait_menu in self._subgait_menus:
-            subgait_menu.currentIndexChanged.connect(lambda: self.update_version_colors())
+            subgait_menu.currentIndexChanged.connect(lambda: self.update_version())
 
         # loaded gaits from gait selection node
         self.available_gaits = {}
@@ -79,7 +79,7 @@ class GaitSelectionView(QWidget):
 
             new_subgait_menu = QComboBox(self)
             new_subgait_menu.setFont(self._subgait_menus[0].font())
-            new_subgait_menu.currentIndexChanged.connect(lambda: self.update_version_colors())
+            new_subgait_menu.currentIndexChanged.connect(lambda: self.update_version())
 
             self._subgait_labels.append(new_subgait_label)
             self._subgait_menus.append(new_subgait_menu)
@@ -123,6 +123,7 @@ class GaitSelectionView(QWidget):
             subgait_label.show()
 
             versions = sorted(versions, key=version_sorter)
+            versions.append('parametric')
 
             subgait_label.setText(subgait_name)
             subgait_menu.addItems(versions)
@@ -147,7 +148,7 @@ class GaitSelectionView(QWidget):
 
         self._is_update_active = False
 
-    def update_version_colors(self):
+    def update_version(self):
         """Update the subgait labels with a specific color to represent a change in version."""
         if self._is_update_active or self._is_refresh_active:
             return
@@ -157,6 +158,9 @@ class GaitSelectionView(QWidget):
             subgait_name = subgait_label.text()
             if subgait_name != 'Unused':
                 try:
+                    if 'parametric' == str(subgait_menu.currentText()):
+                        # make a pop up menu to select the parametric gait _version1_version2_param
+                        print('here')
                     if str(self.version_map[gait_name][subgait_name]) != str(subgait_menu.currentText()):
                         subgait_label.setStyleSheet('color:{color}'.format(color=self._colors['warning']))
                     else:
