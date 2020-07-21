@@ -8,6 +8,7 @@ from .parametric_pop_up import ParametricPopUpWindow
 
 
 DEFAULT_AMOUNT_OF_AVAILABLE_SUBGAITS = 3
+PARAMETRIC_GAIT_CHARACTER = '_'
 
 
 class GaitSelectionView(QWidget):
@@ -137,8 +138,12 @@ class GaitSelectionView(QWidget):
                 subgait_menu.setCurrentIndex(current_version_index)
 
             except ValueError:
-                self._log('Default version of {gn} {sgn} does not exist in loaded gaits.'
-                          .format(gn=gait_name, sgn=subgait_name), 'error')
+                if current_version[0] == PARAMETRIC_GAIT_CHARACTER:
+                    subgait_menu.addItem(current_version)
+                    subgait_menu.setCurrentIndex(subgait_menu.count() - 1)
+                else:
+                    self._log('Default version of {gn} {sgn} does not exist in loaded gaits.'
+                              .format(gn=gait_name, sgn=subgait_name), 'error')
             except KeyError:
                 self._log('{gn} has no default version for {sgn}.'
                           .format(gn=gait_name, sgn=subgait_name), 'error')
@@ -163,11 +168,15 @@ class GaitSelectionView(QWidget):
                 try:
                     if 'parametric' == str(subgait_menu.currentText()):
                         versions = self.available_gaits[gait_name][subgait_name]
-                        self._parametric_pop_up.show_pop_up(versions)
-                        new_version = self.get_parametric_version()
-                        subgait_label.setStyleSheet('color:{color}'.format(color=self._colors['warning']))
-                        subgait_menu.addItem(new_version)
-                        subgait_menu.setCurrentIndex(subgait_menu.count() - 1)
+                        if self._parametric_pop_up.show_pop_up(versions):
+                            new_version = self.get_parametric_version()
+                            subgait_label.setStyleSheet('color:{color}'.format(color=self._colors['warning']))
+                            subgait_menu.addItem(new_version)
+                            subgait_menu.setCurrentIndex(subgait_menu.count() - 1)
+                        else:
+                            subgait_label.setStyleSheet('color:{color}'.format(color=self._colors['error']))
+                            current_version_index = versions.index(self.version_map[gait_name][subgait_name])
+                            subgait_menu.setCurrentIndex(current_version_index - 1)
                     if str(self.version_map[gait_name][subgait_name]) != str(subgait_menu.currentText()):
                         subgait_label.setStyleSheet('color:{color}'.format(color=self._colors['warning']))
                     else:
@@ -280,5 +289,5 @@ class GaitSelectionView(QWidget):
         self._parametric_pop_up.show_pop_up()
 
     def get_parametric_version(self):
-        return '%{0}_({1})_({2})'.format(self._parametric_pop_up.parameter, self._parametric_pop_up.base_version,
-                                     self._parametric_pop_up.other_version)
+        return '{0}{1}_({2})_({3})'.format(PARAMETRIC_GAIT_CHARACTER, self._parametric_pop_up.parameter,
+                                           self._parametric_pop_up.base_version, self._parametric_pop_up.other_version)
