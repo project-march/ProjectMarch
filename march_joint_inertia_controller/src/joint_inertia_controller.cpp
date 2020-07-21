@@ -90,7 +90,7 @@ void InertiaController::starting(const ros::Time& /* time */)
   pid_controller_.reset();
 }
 
-void InertiaController::update(const ros::Time& /* time */, const ros::Duration& period /* period */)
+void InertiaController::update(const ros::Time& /* time */, const ros::Duration& period)
 {
   command_struct_ = *(command_.readFromRT());
   double command_position = command_struct_.position;

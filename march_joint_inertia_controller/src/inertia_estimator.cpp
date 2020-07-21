@@ -20,9 +20,9 @@ std::vector<double> absolute(const std::vector<double>& a)
 double mean(const std::vector<double>& a)
 {
   double sum = 0.0;
-  for (size_t i = 0; i < a.size(); ++i)
+  for (const double x : a)
   {
-    sum += a[i];
+    sum += x;
   }
   if (a.size() == 0.0)
   {
@@ -68,7 +68,7 @@ void InertiaEstimator::setNodeHandle(ros::NodeHandle& nh)
   nh_ = nh;
 }
 
-void InertiaEstimator::configurePublisher(std::string name)
+void InertiaEstimator::configurePublisher(const std::string& name)
 {
   std::string publisher_name = "/inertia_publisher/" + name;
   pub_ = nh_.advertise<std_msgs::Float64>(publisher_name, 100);
@@ -109,7 +109,7 @@ void InertiaEstimator::apply_butter()
   auto x_n = acceleration_array_[0];
   double x;
 
-  for (unsigned int i = 0; i < (sizeof(sos_) / sizeof(sos_[0])); ++i)
+  for (const auto& so : sos_)
   {
     x_n = acceleration_array_[0];
     x = sos_[i][0] * x_n + z[0];
@@ -126,7 +126,7 @@ void InertiaEstimator::apply_butter()
   filtered_acceleration_array_.resize(acc_size_);
 
   z = { 0.0, 0.0, 0.0 };
-  for (unsigned int i = 0; i < (sizeof(sos_) / sizeof(sos_[0])); ++i)
+  for (const auto& so : sos_)
   {
     x_n = joint_torque_[0];
     x = sos_[i][0] * x_n + z[0];
@@ -152,23 +152,15 @@ void InertiaEstimator::inertia_estimate()
   correlation_calculation();
   K_i_ = gain_calculation();
   K_a_ = alpha_calculation();
-  torque_e = filtered_joint_torque_[0] - filtered_joint_torque_[1];
-  acc_e = filtered_acceleration_array_[0] - filtered_acceleration_array_[1];
+  const double torque_e = filtered_joint_torque_[0] - filtered_joint_torque_[1];
+  const double acc_e = filtered_acceleration_array_[0] - filtered_acceleration_array_[1];
   joint_inertia_ = (torque_e - (acc_e * joint_inertia_)) * K_i_ * K_a_ + joint_inertia_;
 }
 
 // Calculate the alpha coefficient for the inertia estimate
 double InertiaEstimator::alpha_calculation()
 {
-  double vib = vibration_calculation();
-  if (vib < min_alpha_)
-  {
-    vib = min_alpha_;
-  }
-  else if (vib > max_alpha_)
-  {
-    vib = max_alpha_;
-  }
+  double vib = std::max(std::min(vibration_calculation(), min_alpha_), max_alpha_);
   return (vib - min_alpha_) / (max_alpha_ - min_alpha_);
 }
 
@@ -184,7 +176,7 @@ void InertiaEstimator::correlation_calculation()
 {
   corr_coeff_ =
       corr_coeff_ / (lambda_ + corr_coeff_ * pow(filtered_acceleration_array_[0] - filtered_acceleration_array_[1], 2));
-  double large_number = pow(10, 8);
+  const double large_number = 10e8;
   if (corr_coeff_ > large_number)
   {
     corr_coeff_ = large_number;
@@ -198,7 +190,7 @@ double InertiaEstimator::vibration_calculation()
   moa_ = mean(absolute(filtered_acceleration_array_));
   // aom = absolute of the mean
   aom_ = abs(mean(filtered_acceleration_array_));
-  // Divide by zero protection, necessary when exo hasn't homed yet
+  // Divide by zero protection, necessary when there has not been any acceleration yet
   if (aom_ == 0.0)
   {
     return 0.0;
@@ -218,9 +210,9 @@ void InertiaEstimator::init_p(unsigned int samples)
   // Setup the initial value for the correlation coefficient 100*standarddeviation(acceleration)^2
   double mean_value = mean(standard_deviation);
   double sum = 0;
-  for (unsigned int i = 0; i < standard_deviation.size(); ++i)
+  for (const auto& deviation : standard_deviation)
   {
-    sum += pow((standard_deviation[i] - mean_value), 2);
+    sum += std::pow(deviation - mean_value, 2);
   }
   corr_coeff_ = 100 * (sum / samples);
   return;
