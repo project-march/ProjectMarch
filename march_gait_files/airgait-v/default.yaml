@@ -1,9 +1,9 @@
 gaits:
   home_sit: {home_sit: MIV_final}
   home_stand: {home_stand: MIV_final}
-  ramp_door_slope_up: {right_open: MV_RD_slopeup_rightopen_v2, left_open: MV_RD_slopeup_leftopen_v2,
-                       right_swing: MV_RD_slopeup_rightswing_v2, left_swing: MV_RD_slopeup_leftswing_v2,
-                       right_close: MV_RD_slopeup_rightclose_v1, left_close: MV_RD_slopeup_leftclose_v1}
+  ramp_door_slope_up: {right_open: MV_RD_slopeup_rightopen_v4, left_open: MV_RD_slopeup_leftopen_v4,
+                       right_swing: MV_RD_slopeup_rightswing_v4, left_swing: MV_RD_slopeup_leftswing_v4,
+                       right_close: MV_RD_slopeup_rightclose_v4, left_close: MV_RD_slopeup_leftclose_v4}
   ramp_door_slope_down: {right_open: MV_RD_slopedown_rightopen_v5, left_open: MV_RD_slopedown_leftopen_v5,
                          right_swing: MV_RD_slopedown_rightswing_v5, left_swing: MV_RD_slopedown_leftswing_v5,
                          right_close: MV_RD_slopedown_rightclose_v5, left_close: MV_RD_slopedown_leftclose_v5}
