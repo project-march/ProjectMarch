@@ -14,7 +14,7 @@
  * @param[in] a input vector with values that need to be converted to absolutes
  * @param[out] b output vector with copies of the absolute values of a.
  */
-std:vector<double> absolute(const std::vector<double>& a);
+std::vector<double> absolute(const std::vector<double>& a);
 
 /**
  * \brief determiness the mean value of the given vector
@@ -41,14 +41,8 @@ public:
    */
   InertiaEstimator(double lambda = 0.96, size_t acc_size = 12);
 
-  /**
-   * \brief Constructor that accepts a joint
-   */
-  InertiaEstimator(hardware_interface::JointHandle joint, double lambda = 0.96, size_t acc_size = 12);
-
   double getAcceleration(unsigned int index);
 
-  void setJoint(hardware_interface::JointHandle joint);
   void setLambda(double lambda);
   void setAcc_size(size_t acc_size);
   void setNodeHandle(ros::NodeHandle& nh);

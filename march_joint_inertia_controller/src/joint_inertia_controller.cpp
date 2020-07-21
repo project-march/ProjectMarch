@@ -26,8 +26,6 @@ bool InertiaController::init(hardware_interface::PositionJointInterface* hw, ros
   // Get joint handle from hardware interface
   joint_ = hw->getHandle(joint_name);
 
-  inertia_estimator_.setJoint(joint_);
-
   ros::Duration first(0.004);
   inertia_estimator_.fill_buffers(joint_.getVelocity(), joint_.getEffort(), first);
 
@@ -84,8 +82,8 @@ void InertiaController::starting(const ros::Time& /* time */)
 {
   double pos_command = joint_.getPosition();
 
-  command_struct_.position_ = pos_command;
-  command_struct_.has_velocity_ = false;
+  command_struct_.position = pos_command;
+  command_struct_.has_velocity = false;
 
   command_.initRT(command_struct_);
 
@@ -95,9 +93,9 @@ void InertiaController::starting(const ros::Time& /* time */)
 void InertiaController::update(const ros::Time& /* time */, const ros::Duration& period /* period */)
 {
   command_struct_ = *(command_.readFromRT());
-  double command_position = command_struct_.position_;
-  double command_velocity = command_struct_.velocity_;
-  bool has_velocity_ = command_struct_.has_velocity_;
+  double command_position = command_struct_.position;
+  double command_velocity = command_struct_.velocity;
+  bool has_velocity_ = command_struct_.has_velocity;
 
   double error, vel_error;
   double commanded_effort;
@@ -154,17 +152,17 @@ void InertiaController::commandCB(const std_msgs::Float64ConstPtr& msg)
 
 void InertiaController::setCommand(double pos_command, double vel_command)
 {
-  command_struct_.position_ = pos_command;
-  command_struct_.velocity_ = vel_command;
-  command_struct_.has_velocity_ = true;
+  command_struct_.position = pos_command;
+  command_struct_.velocity = vel_command;
+  command_struct_.has_velocity = true;
 
   command_.writeFromNonRT(command_struct_);
 }
 
 void InertiaController::setCommand(double pos_command)
 {
-  command_struct_.position_ = pos_command;
-  command_struct_.has_velocity_ =
+  command_struct_.position = pos_command;
+  command_struct_.has_velocity =
       false;  // Flag to ignore the velocity command since our setCommand method did not include it
 
   // the writeFromNonRT can be used in RT, if you have the guarantee that

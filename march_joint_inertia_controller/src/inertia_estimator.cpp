@@ -49,34 +49,9 @@ InertiaEstimator::InertiaEstimator(double lambda, size_t acc_size)
   filtered_joint_torque_.resize(fil_tor_size_);
 }
 
-InertiaEstimator::InertiaEstimator(hardware_interface::JointHandle joint, double lambda, size_t acc_size)
-{
-  lambda_ = lambda;
-  acc_size_ = acc_size;
-  joint_inertia_ = 0.0;
-
-  // Size the buffers
-  velocity_array_.resize(vel_size_);
-
-  acceleration_array_.resize(acc_size_);
-
-  filtered_acceleration_array_.resize(acc_size_);
-
-  joint_torque_.resize(torque_size_);
-
-  filtered_joint_torque_.resize(fil_tor_size_);
-
-  setJoint(joint);
-}
-
 double InertiaEstimator::getAcceleration(unsigned int index)
 {
   return acceleration_array_[index];
-}
-
-void InertiaEstimator::setJoint(hardware_interface::JointHandle joint)
-{
-  joint_ = joint;
 }
 
 void InertiaEstimator::setLambda(double lambda)
@@ -219,11 +194,8 @@ void InertiaEstimator::correlation_calculation()
 // Calculate the vibration based on the acceleration
 double InertiaEstimator::vibration_calculation()
 {
-  std::vector<double> b;
-  b.resize(acc_size_);
-  absolute(filtered_acceleration_array_, b);
   // moa = mean of the absolute
-  moa_ = mean(b);
+  moa_ = mean(absolute(filtered_acceleration_array_));
   // aom = absolute of the mean
   aom_ = abs(mean(filtered_acceleration_array_));
   // Divide by zero protection, necessary when exo hasn't homed yet
