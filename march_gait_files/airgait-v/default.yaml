@@ -46,8 +46,8 @@ gaits:
               right_swing: MV_stairsup_rightswing_v15, left_close: MV_stairsup_leftclose_v15,
               right_close: MV_stairsup_rightclose_v15}
   stairs_up_single_step: {right_open: MV_stairsup_single_rightopen_v7, left_close: MV_stairsup_single_leftclose_v7}
-  stairs_down_single_step: {right_open: MV_stairsdown_single_rightopen_v3,
-                            left_close: MV_stairsdown_single_leftclose_v3}
+  stairs_down_single_step: {right_open: MV_stairsdown_single_rightopen_v4,
+                            left_close: MV_stairsdown_single_leftclose_v4}
   stairs_down: {right_open: MV_stairsdown_rightopen_v5, left_swing: MV_stairsdown_leftswing_v5,
                 right_swing: MV_stairsdown_rightswing_v5, left_close: MV_stairsdown_leftclose_v5,
                 right_close: MV_stairsdown_rightclose_v5}
