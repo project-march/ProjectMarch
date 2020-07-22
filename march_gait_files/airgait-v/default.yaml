@@ -7,6 +7,10 @@ gaits:
   ramp_door_slope_down: {right_open: MV_RD_slopedown_rightopen_v5, left_open: MV_RD_slopedown_leftopen_v5,
                          right_swing: MV_RD_slopedown_rightswing_v5, left_swing: MV_RD_slopedown_leftswing_v5,
                          right_close: MV_RD_slopedown_rightclose_v5, left_close: MV_RD_slopedown_leftclose_v5}
+  ramp_door_slope_down_fixed: {right_open: MV_RD_slopedown_fixed_rightopen_v1,
+                               left_swing: MV_RD_slopedown_fixed_leftswing_v1,
+                               right_swing: MV_RD_slopedown_fixed_rightswing_v1,
+                               left_close: MV_RD_slopedown_fixed_leftclose_v1}
   ramp_door_last_step: {right_open: MV_RD_laststep_rightopen_v2, left_close: MV_RD_laststep_leftclose_v2}
   ramp_door_slope_down_single: {right_open: MV_RD_slopedownsingle_rightopen_v1,
                                 left_close: MV_RD_slopedownsingle_leftclose_v1}
@@ -48,8 +52,8 @@ gaits:
   stairs_up_single_step: {right_open: MV_stairsup_single_rightopen_v7, left_close: MV_stairsup_single_leftclose_v7}
   stairs_down_single_step: {right_open: MV_stairsdown_single_rightopen_v3,
                             left_close: MV_stairsdown_single_leftclose_v3}
-  stairs_down: {right_open: MV_stairsdown_rightopen_v5, left_swing: MV_stairsdown_leftswing_v5,
-                right_swing: MV_stairsdown_rightswing_v5, left_close: MV_stairsdown_leftclose_v5,
-                right_close: MV_stairsdown_rightclose_v5}
+  stairs_down: {right_open: MV_stairsdown_rightopen_v9, left_swing: MV_stairsdown_leftswing_v9,
+                right_swing: MV_stairsdown_rightswing_v9, left_close: MV_stairsdown_leftclose_v9,
+                right_close: MV_stairsdown_rightclose_v9}
   sofa_sit: {sit_down: MIV_final, sit_home: MIV_final}
   sofa_stand: {prepare_stand_up: MIV_final, stand_up: MIV_final}
