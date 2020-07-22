@@ -7,6 +7,10 @@ gaits:
   ramp_door_slope_down: {right_open: MV_RD_slopedown_rightopen_v2, left_open: MV_RD_slopedown_leftopen_v2,
                          right_swing: MV_RD_slopedown_rightswing_v1, left_swing: MV_RD_slopedown_leftswing_v1,
                          right_close: MV_RD_slopedown_rightclose_v1, left_close: MV_RD_slopedown_leftclose_v1}
+  ramp_door_slope_down_fixed: {right_open: MV_RD_slopedown_fixed_rightopen_v1,
+                               left_swing: MV_RD_slopedown_fixed_leftswing_v1,
+                               right_swing: MV_RD_slopedown_fixed_rightswing_v1,
+                               left_close: MV_RD_slopedown_fixed_leftclose_v1}
   ramp_door_last_step: {right_open: MV_RD_laststep_rightopen_v2, left_close: MV_RD_laststep_leftclose_v2}
   ramp_door_slope_down_single: {right_open: MV_RD_slopedownsingle_rightopen_v1,
                                 left_close: MV_RD_slopedownsingle_leftclose_v1}
