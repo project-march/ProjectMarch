@@ -47,6 +47,7 @@ enum class IMCObjectName
   ActualVelocity,
   MotionErrorRegister,
   DetailedErrorRegister,
+  SecondDetailedErrorRegister,
   DCLinkVoltage,
   DriveTemperature,
   ActualTorque,

@@ -125,11 +125,14 @@ public:
   IMotionCubeState() = default;
 
   std::string statusWord;
-  std::string detailedError;
   std::string motionError;
+  std::string detailedError;
+  std::string secondDetailedError;
   IMCState state;
   std::string detailedErrorDescription;
   std::string motionErrorDescription;
+  std::string secondDetailedErrorDescription;
+
   float motorCurrent;
   float IMCVoltage;
   float motorVoltage;
