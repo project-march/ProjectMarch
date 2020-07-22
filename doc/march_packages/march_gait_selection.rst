@@ -28,6 +28,16 @@ of an old and new gait name. This structure requires that both gait names have m
 transition. Using the two subgait trajectories a new transition trajectory is calculated and stored as a subgait object.
 If this is calculated correctly, the new subgait trajectory is sent to the march_gait_scheduler.
 
+Balance walk
+^^^^^^^^^^^^
+There is a special gait that is dynamic. The graph of the balance walk gait is defined in the :ref:march-gait-files-label.
+Some of the subgaits in this gait are just regular subgaits defined by in a subgaitfile. However, some of the subgaits are dynamic.
+In these subgaits we try to move towards a capture point. A capture point is a point on the ground such that if you would
+place your foot there, you would come to a stall. Capture point is calculated in the :ref:march-data-collector based on
+the inverted pendulum model. We use the motion planning framework MoveIt to calculate a trajectory towards this point.
+The balance gait class then uses the python moveIt commander Interface (linkie) to plan. More information on MoveIt and
+the integration can be found at :ref:march-moveit-label.
+
 
 ROS API
 -------
