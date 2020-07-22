@@ -5,8 +5,8 @@ from PyQt5.QtWidgets import QComboBox, QDialog, QDialogButtonBox, QFormLayout, Q
 
 
 class ParametricPopUpWindow(QDialog):
-    def __init__(self, parent, width=500, height=200):
-        """Base class for creating a pop up window over an existing widget.
+    def __init__(self, parent, width=500, height=160):
+        """A pop up window for retrieving a base version, other version and parameter for a parametric subgait.
 
         :param parent:
             The parent widget to connect to the pop up
@@ -35,22 +35,21 @@ class ParametricPopUpWindow(QDialog):
         self._button_box.centerButtons()
         base_subgait_label = QLabel('base subgait', self)
         self._base_subgait_menu = QComboBox(self)
-        self._base_subgait_menu.currentIndexChanged.connect(self.base_subgait_changed)
+        self._base_subgait_menu.currentIndexChanged.connect(lambda: None)
         self._form_layout.addRow(base_subgait_label, self._base_subgait_menu)
 
         other_subgait_label = QLabel('other subgait', self)
         self._other_subgait_menu = QComboBox(self)
-        self._other_subgait_menu.currentIndexChanged.connect(self.base_subgait_changed)
+        self._other_subgait_menu.currentIndexChanged.connect(lambda: None)
         self._form_layout.addRow(other_subgait_label, self._other_subgait_menu)
         self._form_layout.setHorizontalSpacing(80)
 
     def show_pop_up(self, versions):
-        """Add message to the pop up and show the window."""
+        """Reset and show pop up."""
         self._base_subgait_menu.clear()
         self._base_subgait_menu.addItems(versions)
         self._other_subgait_menu.clear()
         self._other_subgait_menu.addItems(versions)
-
         self._parameter_line_edit.setText('')
 
         self.base_version = ''
@@ -59,9 +58,11 @@ class ParametricPopUpWindow(QDialog):
         return super(ParametricPopUpWindow, self).exec_()
 
     def cancel(self):
+        """Close without applying the values."""
         self.reject()
 
     def save(self):
+        """Check and save value while closing, close if successful."""
         self.base_version = self._base_subgait_menu.currentText()
         self.other_version = self._other_subgait_menu.currentText()
         try:
@@ -75,6 +76,3 @@ class ParametricPopUpWindow(QDialog):
             QMessageBox.warning(self, '', 'Enter a float greater or equal than zero and smaller or equal to one.')
             return
         self.accept()
-
-    def base_subgait_changed(self):
-        pass
