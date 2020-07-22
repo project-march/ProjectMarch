@@ -115,6 +115,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
   doc/march_packages/march_imu_manager
   doc/march_packages/march_input_device
   doc/march_packages/march_launch
+  doc/march_packages/march_moveit
   doc/march_packages/march_rqt_input_device
   doc/march_packages/march_rqt_software_check
   doc/march_packages/march_safety
