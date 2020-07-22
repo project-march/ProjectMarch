@@ -36,29 +36,39 @@ const char* DETAILED_MOTION_ERRORS[DETAILED_MOTION_ERRORS_SIZE] = {
   "Invalid S-curve profile. ",
 };
 
-std::string parseMotionError(uint16_t motion_error)
-{
-  std::string description;
-  const std::bitset<16> bitset(motion_error);
-  for (size_t i = 0; i < MOTION_ERRORS_SIZE; i++)
-  {
-    if (bitset.test(i))
-    {
-      description += MOTION_ERRORS[i];
-    }
-  }
-  return description;
-}
+const char* SECOND_DETAILED_MOTION_ERRORS[SECOND_DETAILED_MOTION_ERROR_SIZE] = {
+  "BiSS data CRC error. ",
+  "BiSS data warning bit is set. ",
+  "BiSS data error bit is set. ",
+  "BiSS sensor missing. ",
+  "Absolute Encoder Interface (AEI) interface error. ",
+  "Hall sensor missing. ",
+  "Position wraparound. The position 2^31 was exceeded. ",
+};
 
-std::string parseDetailedError(uint16_t detailed_error)
+std::string parseError(uint16_t error, ErrorRegisters error_register)
 {
   std::string description;
-  const std::bitset<16> bitset(detailed_error);
-  for (size_t i = 0; i < DETAILED_MOTION_ERRORS_SIZE; i++)
+  const std::bitset<16> bitset(error);
+
+  for (size_t i = 0; i < 16; i++)
   {
     if (bitset.test(i))
     {
-      description += DETAILED_MOTION_ERRORS[i];
+      switch (error_register)
+      {
+        case ErrorRegisters::MOTION_ERROR:
+          description += MOTION_ERRORS[i];
+          break;
+        case ErrorRegisters::DETAILED_ERROR:
+          description += DETAILED_MOTION_ERRORS[i];
+          break;
+        case ErrorRegisters::SECOND_DETAILED_ERROR:
+          description += SECOND_DETAILED_MOTION_ERRORS[i];
+          break;
+        default:
+          break;
+      }
     }
   }
   return description;
