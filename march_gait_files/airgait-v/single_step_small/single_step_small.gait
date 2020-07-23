@@ -1,4 +1,4 @@
-name: single_step_normal
+name: single_step_small
 subgaits:
   left_close:
     to: end
