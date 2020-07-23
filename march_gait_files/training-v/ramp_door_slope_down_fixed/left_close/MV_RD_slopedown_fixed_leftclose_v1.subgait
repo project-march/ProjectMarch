@@ -1,4 +1,4 @@
-description: Just the left swing of the stairs down v9 gait, but with ankles at -15
+description: Just the left close as the stairs down v9, only with the ankles at -15
   degrees.
 duration: {nsecs: 0, secs: 4}
 gait_type: stairs_like
@@ -25,27 +25,27 @@ joints:
     time_from_start: {nsecs: 0, secs: 0}
     velocity: 0.0
   - position: 0.3491
-    time_from_start: {nsecs: 360000000, secs: 1}
+    time_from_start: {nsecs: 280000000, secs: 1}
     velocity: 0.0
-  - position: 1.3439
-    time_from_start: {nsecs: 960000000, secs: 2}
-    velocity: 0.1449
-  - position: 0.5236
+  - position: 0.9599
+    time_from_start: {nsecs: 399999999, secs: 2}
+    velocity: 0.0
+  - position: -0.0873
     time_from_start: {nsecs: 0, secs: 4}
-    velocity: -1.1345
+    velocity: 0.0
   left_knee:
   - position: 0.7086
     time_from_start: {nsecs: 0, secs: 0}
     velocity: 1.2566
   - position: 1.7453
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: {nsecs: 439999999, secs: 1}
     velocity: 0.0
   - position: 1.7453
-    time_from_start: {nsecs: 560000000, secs: 2}
+    time_from_start: {nsecs: 80000000, secs: 2}
     velocity: 0.0
-  - position: 0.2878
+  - position: 0.0
     time_from_start: {nsecs: 0, secs: 4}
-    velocity: -0.5236
+    velocity: 0.0
   right_ankle:
   - position: -0.2618
     time_from_start: {nsecs: 0, secs: 0}
@@ -67,30 +67,21 @@ joints:
   - position: 0.5236
     time_from_start: {nsecs: 0, secs: 0}
     velocity: -1.1345
-  - position: 0.0
-    time_from_start: {nsecs: 0, secs: 1}
-    velocity: 0.0
-  - position: 0.0
+  - position: -0.0337
     time_from_start: {nsecs: 600000000, secs: 1}
     velocity: 0.0
-  - position: 0.3491
-    time_from_start: {nsecs: 560000000, secs: 2}
-    velocity: 0.0
-  - position: 0.3491
+  - position: -0.0873
     time_from_start: {nsecs: 0, secs: 4}
     velocity: 0.0
   right_knee:
   - position: 0.2878
     time_from_start: {nsecs: 0, secs: 0}
     velocity: -0.5236
-  - position: 0.0873
-    time_from_start: {nsecs: 600000000, secs: 1}
+  - position: 0.0
+    time_from_start: {nsecs: 199999999, secs: 1}
     velocity: 0.0
-  - position: 0.0873
-    time_from_start: {nsecs: 799999999, secs: 2}
-    velocity: 0.0
-  - position: 0.7086
+  - position: 0.0
     time_from_start: {nsecs: 0, secs: 4}
-    velocity: 1.2566
-name: left_swing
-version: MV_RD_slopedown_fixed_leftswing_v1
+    velocity: 0.0
+name: left_close
+version: MV_RD_slopedown_fixed_leftclose_v1
