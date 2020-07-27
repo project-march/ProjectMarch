@@ -47,7 +47,6 @@ add_library(${PROJECT_NAME}
     include/${PROJECT_NAME}/error/error_type.h
     include/${PROJECT_NAME}/error/hardware_exception.h
     include/${PROJECT_NAME}/error/motion_error.h
-    include/${PROJECT_NAME}/ethercat/ethercat_watchdog.h
     include/${PROJECT_NAME}/ethercat/ethercat_master.h
     include/${PROJECT_NAME}/ethercat/pdo_interface.h
     include/${PROJECT_NAME}/ethercat/pdo_map.h
@@ -73,7 +72,6 @@ add_library(${PROJECT_NAME}
     src/encoder/incremental_encoder.cpp
     src/error/error_type.cpp
     src/error/motion_error.cpp
-    src/ethercat/ethercat_watchdog.cpp
     src/ethercat/ethercat_master.cpp
     src/ethercat/pdo_interface.cpp
     src/ethercat/pdo_map.cpp
