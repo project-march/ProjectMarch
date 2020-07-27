@@ -13,8 +13,12 @@
 
 namespace march
 {
-EthercatMaster::EthercatMaster(std::string ifname, int max_slave_index, int cycle_time)
-  : is_operational_(false), ifname_(std::move(ifname)), max_slave_index_(max_slave_index), cycle_time_ms_(cycle_time)
+EthercatMaster::EthercatMaster(std::string ifname, int max_slave_index, int cycle_time, int slave_timeout)
+  : is_operational_(false)
+  , ifname_(std::move(ifname))
+  , max_slave_index_(max_slave_index)
+  , cycle_time_ms_(cycle_time)
+  , slave_watchdog_timeout_(slave_timeout)
 {
 }
 
@@ -185,6 +189,15 @@ void EthercatMaster::ethercatLoop()
       total_loops = 0;
       not_achieved_count = 0;
     }
+
+    const auto delta_t = std::chrono::high_resolution_clock::now() - this->valid_slaves_timestamp_ms_;
+    const auto slave_lost_duration = std::chrono::duration_cast<std::chrono::microseconds>(delta_t);
+    const std::chrono::milliseconds slave_watchdog_timeout(this->slave_watchdog_timeout_);
+
+    if (slave_lost_duration > slave_watchdog_timeout)
+    {
+      ROS_ERROR("EtherCAT slave monitor timer elapsed, connection has been lost");
+    }
   }
 }
 
@@ -209,6 +222,7 @@ void EthercatMaster::monitorSlaveConnection()
       return;
     }
   }
+  this->valid_slaves_timestamp_ms_ = std::chrono::high_resolution_clock::now();
 }
 
 void EthercatMaster::stop()

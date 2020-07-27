@@ -23,7 +23,7 @@ namespace march
 class EthercatMaster
 {
 public:
-  EthercatMaster(std::string ifname, int max_slave_index, int cycle_time);
+  EthercatMaster(std::string ifname, int max_slave_index, int cycle_time, int slave_timeout);
   ~EthercatMaster();
 
   /* Delete copy constructor/assignment since the member thread can not be copied */
@@ -81,7 +81,7 @@ private:
   /**
    * Checks if all the slaves are connected and in operational state.
    */
-  static void monitorSlaveConnection();
+  void monitorSlaveConnection();
 
   /**
    * Sets the ethercat thread priority and scheduling
@@ -104,6 +104,9 @@ private:
 
   char io_map_[4096] = { 0 };
   int expected_working_counter_ = 0;
+
+  const int slave_watchdog_timeout_;
+  std::chrono::high_resolution_clock::time_point valid_slaves_timestamp_ms_;
 
   std::thread ethercat_thread_;
 };
