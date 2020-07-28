@@ -26,6 +26,9 @@ class ModifiableSubgait(Subgait):
             rospy.logerr('Cannot create gait without a loaded robot.')
             return None
 
+        standing_file = os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'), 'resource', 'standing.subgait')
+        standing_subgait = cls.from_file(standing_file)
+
         joint_list = []
         for urdf_joint in sorted(robot.joints, key=lambda j: j.name):
             if urdf_joint.type == 'fixed':
@@ -36,7 +39,9 @@ class ModifiableSubgait(Subgait):
                 rospy.logwarn('Skipping joint ' + urdf_joint.name + ' because it has no limits.')
                 continue
 
-            default_setpoints = [ModifiableSetpoint(0, 0, 0), ModifiableSetpoint(duration, 0, 0)]
+            standing_position = standing_subgait.get_joint(urdf_joint.name).setpoints[0].position
+            default_setpoints = [ModifiableSetpoint(0, standing_position, 0),
+                                 ModifiableSetpoint(duration, standing_position, 0)]
 
             limits = Limits(urdf_joint.safety_controller.soft_lower_limit,
                             urdf_joint.safety_controller.soft_upper_limit,
