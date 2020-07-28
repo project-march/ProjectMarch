@@ -63,7 +63,7 @@ class GaitSelectionView(QWidget):
 
         # pop up windows
         self._version_map_pop_up = PopUpWindow(self)
-        self._parametric_pop_up = ParametricPopUpWindow(self)
+        self._parametric_pop_up = ParametricPopUpWindow(self, ui_file.replace('gait_selection.ui', 'parametric_pop_up.ui'))
 
         # populate gait menu for the first time
         self._refresh()
@@ -167,7 +167,7 @@ class GaitSelectionView(QWidget):
                 try:
                     if 'parametric' == str(subgait_menu.currentText()):
                         versions = self.available_gaits[gait_name][subgait_name]
-                        if self._parametric_pop_up.show_pop_up(versions):
+                        if self._show_parametric_pop_up(versions):
                             new_version = self.get_parametric_version()
                             subgait_label.setStyleSheet('color:{color}'.format(color=self._colors['warning']))
                             subgait_menu.addItem(new_version)
@@ -283,9 +283,9 @@ class GaitSelectionView(QWidget):
 
         self._version_map_pop_up.show_message(version_map_string)
 
-    def _show_parametric_pop_up(self):
+    def _show_parametric_pop_up(self, versions):
         """Use a pop up window to get the base version, other version and parameter for a parametric subgait."""
-        self._parametric_pop_up.show_pop_up()
+        return self._parametric_pop_up.show_pop_up(versions)
 
     def get_parametric_version(self):
         return '{0}{1}_({2})_({3})'.format(PARAMETRIC_GAIT_CHARACTER, self._parametric_pop_up.parameter,

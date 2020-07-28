@@ -370,6 +370,9 @@ QPushButton{color:  #FFFFFF}</string>
                  <family>Ubuntu Condensed</family>
                 </font>
                </property>
+               <property name="focusPolicy">
+                <enum>Qt::StrongFocus</enum>
+               </property>
                <property name="editable">
                 <bool>false</bool>
                </property>
@@ -415,6 +418,9 @@ QPushButton{color:  #FFFFFF}</string>
                  <family>Ubuntu Condensed</family>
                 </font>
                </property>
+               <property name="focusPolicy">
+                <enum>Qt::ClickFocus</enum>
+               </property>
               </widget>
              </item>
              <item row="5" column="0">
@@ -456,6 +462,9 @@ QPushButton{color:  #FFFFFF}</string>
                 <font>
                  <family>Ubuntu Condensed</family>
                 </font>
+               </property>
+               <property name="focusPolicy">
+                <enum>Qt::TabFocus</enum>
                </property>
               </widget>
              </item>
