@@ -63,7 +63,8 @@ class GaitSelectionView(QWidget):
 
         # pop up windows
         self._version_map_pop_up = PopUpWindow(self)
-        self._parametric_pop_up = ParametricPopUpWindow(self, ui_file.replace('gait_selection.ui', 'parametric_pop_up.ui'))
+        self._parametric_pop_up = ParametricPopUpWindow(self, ui_file.replace('gait_selection.ui',
+                                                                              'parametric_pop_up.ui'))
 
         # populate gait menu for the first time
         self._refresh()
@@ -175,7 +176,7 @@ class GaitSelectionView(QWidget):
                         else:
                             # parametric pop up window unsuccessful stopped, reset version to default
                             current_version_index = versions.index(self.version_map[gait_name][subgait_name])
-                            subgait_menu.setCurrentIndex(current_version_index - 1)
+                            subgait_menu.setCurrentIndex(max(current_version_index - 1, 0))
                     if str(self.version_map[gait_name][subgait_name]) != str(subgait_menu.currentText()):
                         subgait_label.setStyleSheet('color:{color}'.format(color=self._colors['warning']))
                     else:

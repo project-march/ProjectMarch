@@ -1,7 +1,6 @@
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QComboBox, QDialog, QDialogButtonBox, QFormLayout, QGridLayout, QLabel, QLineEdit,\
-    QMessageBox
+from PyQt5.QtWidgets import QDialog
 from python_qt_binding import loadUi
 
 
@@ -19,7 +18,6 @@ class ParametricPopUpWindow(QDialog):
         super(ParametricPopUpWindow, self).__init__(parent=parent, flags=Qt.Window)
         loadUi(ui_file, self)
 
-
         self.buttonBox.accepted.connect(self.save)
         self.buttonBox.rejected.connect(self.cancel)
         self.parameterSlider.valueChanged.connect(self.value_changed)
@@ -30,8 +28,8 @@ class ParametricPopUpWindow(QDialog):
         self.baseVersionComboBox.addItems(versions)
         self.otherVersionComboBox.clear()
         self.otherVersionComboBox.addItems(versions)
-        self.parameterSlider.setTickPosition(50)
-        self.parameterLabel.setText('parameter = 0.0')
+        self.parameterSlider.setValue(50)
+        self.parameterLabel.setText('parameter = 0.50')
 
         self.base_version = ''
         self.other_version = ''
@@ -40,7 +38,7 @@ class ParametricPopUpWindow(QDialog):
 
     def value_changed(self):
         """Puts the new slider value in the label next to it."""
-        self.parameterLabel.setText('parameter = {0}'.format(self.parameterSlider.value() / 100.0))
+        self.parameterLabel.setText('parameter = {val:.2f}'.format(val=self.parameterSlider.value() / 100.0))
 
     def cancel(self):
         """Close without applying the values."""
