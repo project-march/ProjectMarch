@@ -1,6 +1,7 @@
 testjoint_linear:
  ifName: enp2s0
  ecatCycleTime: 4
+ ecatSlaveTimeout: 50
  joints:
    - linear_joint:
        actuationMode: torque

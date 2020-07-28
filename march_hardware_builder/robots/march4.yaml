@@ -2,7 +2,7 @@
 march4:
   ifName: enp2s0
   ecatCycleTime: 4
-  ecatSlaveTimeout: 1
+  ecatSlaveTimeout: 50
   joints:
     - left_ankle:
         actuationMode: torque

@@ -191,12 +191,13 @@ void EthercatMaster::ethercatLoop()
     }
 
     const auto delta_t = std::chrono::high_resolution_clock::now() - this->valid_slaves_timestamp_ms_;
-    const auto slave_lost_duration = std::chrono::duration_cast<std::chrono::microseconds>(delta_t);
+    const auto slave_lost_duration = std::chrono::duration_cast<std::chrono::milliseconds>(delta_t);
     const std::chrono::milliseconds slave_watchdog_timeout(this->slave_watchdog_timeout_);
 
     if (slave_lost_duration > slave_watchdog_timeout)
     {
-      ROS_ERROR("EtherCAT slave monitor timer elapsed, connection has been lost");
+      throw error::HardwareException(error::ErrorType::SLAVE_LOST_TIMOUT, "Slave connection lost for %i ms",
+                                     this->slave_watchdog_timeout_);
     }
   }
 }
