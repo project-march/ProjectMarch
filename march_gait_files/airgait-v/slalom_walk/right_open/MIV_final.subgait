@@ -1,17 +1,17 @@
-description: The right open gait for the MIV walking gait with less hip flexion
+description: The right open gait for the MIV walking gait
 duration: {nsecs: 500000000, secs: 1}
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: {nsecs: 37600000, secs: 0}
     velocity: 0.0
   - position: 0.0436
     time_from_start: {nsecs: 500000000, secs: 1}
     velocity: -0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: {nsecs: 37600000, secs: 0}
     velocity: 0.0
   - position: 0.0
     time_from_start: {nsecs: 562400000, secs: 0}
@@ -41,14 +41,14 @@ joints:
     velocity: 0.0
   right_ankle:
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: {nsecs: 37600000, secs: 0}
     velocity: 0.0
   - position: 0.0436
     time_from_start: {nsecs: 500000000, secs: 1}
     velocity: -0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: {nsecs: 37600000, secs: 0}
     velocity: 0.0
   - position: 0.0
     time_from_start: {nsecs: 562400000, secs: 0}
@@ -63,10 +63,10 @@ joints:
   - position: -0.0873
     time_from_start: {nsecs: 0, secs: 0}
     velocity: 0.0
-  - position: 0.4014
-    time_from_start: {nsecs: 675000000, secs: 0}
-    velocity: 0.1582
-  - position: 0.2618
+  - position: 0.4887
+    time_from_start: {nsecs: 900000000, secs: 0}
+    velocity: 0.1396
+  - position: 0.288
     time_from_start: {nsecs: 500000000, secs: 1}
     velocity: -0.3491
   right_knee:
@@ -74,7 +74,7 @@ joints:
     time_from_start: {nsecs: 0, secs: 0}
     velocity: 0.0
   - position: 0.8727
-    time_from_start: {nsecs: 476500000, secs: 0}
+    time_from_start: {nsecs: 630000000, secs: 0}
     velocity: 0.0
   - position: 0.0969
     time_from_start: {nsecs: 350000000, secs: 1}
@@ -82,5 +82,5 @@ joints:
   - position: 0.1396
     time_from_start: {nsecs: 500000000, secs: 1}
     velocity: 0.0
-name: 'right_open'
-version: 'MIV_final_v2'
+name: right_open
+version: MIV_final
