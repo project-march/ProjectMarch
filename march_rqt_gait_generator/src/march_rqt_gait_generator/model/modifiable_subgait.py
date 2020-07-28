@@ -1,61 +1,13 @@
 import rospy
 
-from march_shared_classes.gait.limits import Limits
 from march_shared_classes.gait.subgait import Subgait
 
 from .modifiable_joint_trajectory import ModifiableJointTrajectory
-from .modifiable_setpoint import ModifiableSetpoint
 
 
 class ModifiableSubgait(Subgait):
 
     joint_class = ModifiableJointTrajectory
-
-    @classmethod
-    def empty_subgait(cls, gait_generator, robot, duration=8):
-        """Create an empty subgait object using the joint defined in the URDF.
-
-        :param gait_generator: A gait generator controller object
-        :param robot: The robot constructed using the URDF
-        :param duration: The default duration used for the subgait
-
-        :return:
-            An empty modifiable subgait object
-        """
-        if robot is None:
-            rospy.logerr('Cannot create gait without a loaded robot.')
-            return None
-
-        standing_file = os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'), 'resource', 'standing.subgait')
-        standing_subgait = cls.from_file(standing_file)
-
-        joint_list = []
-        for urdf_joint in sorted(robot.joints, key=lambda j: j.name):
-            if urdf_joint.type == 'fixed':
-                rospy.loginfo('Skipping fixed joint ' + urdf_joint.name)
-                continue
-
-            if urdf_joint.limit is None:
-                rospy.logwarn('Skipping joint ' + urdf_joint.name + ' because it has no limits.')
-                continue
-
-            standing_position = standing_subgait.get_joint(urdf_joint.name).setpoints[0].position
-            default_setpoints = [ModifiableSetpoint(0, standing_position, 0),
-                                 ModifiableSetpoint(duration, standing_position, 0)]
-
-            limits = Limits(urdf_joint.safety_controller.soft_lower_limit,
-                            urdf_joint.safety_controller.soft_upper_limit,
-                            urdf_joint.limit.velocity,
-                            urdf_joint.limit.effort,
-                            urdf_joint.safety_controller.k_position,
-                            urdf_joint.safety_controller.k_velocity)
-
-            joint = ModifiableJointTrajectory(urdf_joint.name, limits, default_setpoints, duration, gait_generator)
-
-            joint_list.append(joint)
-
-        return cls(joint_list, duration, gait_type='walk_like', gait_name='test_gait', subgait_name='test_subgait',
-                   version='test_subgait_1', description='Just a simple gait')
 
     def has_multiple_setpoints_before_duration(self, duration):
         """Check if all setpoints are before a given duration."""

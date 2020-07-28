@@ -23,20 +23,6 @@ class ModifiableSubgaitTest(unittest.TestCase):
                                                                               version=self.version)
         self.subgait = ModifiableSubgait.from_file(self.robot, self.subgait_path, self.gait_generator)
 
-    # empty_subgait tests
-    def test_empty_subgait_type(self):
-        empty_subgait = ModifiableSubgait.empty_subgait(self.gait_generator, self.robot)
-        self.assertIsInstance(empty_subgait, ModifiableSubgait)
-
-    def test_empty_subgait_length(self):
-        empty_subgait = ModifiableSubgait.empty_subgait(self.gait_generator, self.robot)
-        number_of_joints = sum([1 for joint in self.robot.joints if joint.type == 'revolute'])
-        self.assertEqual(len(empty_subgait.joints), number_of_joints)
-
-    def test_empty_subgait_no_robot(self):
-        empty_subgait = ModifiableSubgait.empty_subgait(self.gait_generator, None)
-        self.assertIsNone(empty_subgait)
-
     # has_multiple_setpoints_before_duration tests
     def test_has_multiple_setpoints_before_duration_true(self):
         self.assertTrue(self.subgait.has_multiple_setpoints_before_duration(duration=self.subgait.duration + 1))

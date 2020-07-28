@@ -33,6 +33,12 @@ class GaitGeneratorControllerTest(unittest.TestCase):
                                                                               subgait=self.subgait_name,
                                                                               version=self.version)
 
+        empty_subgait_file = '{rsc}/{gait}/{subgait}/{version}.subgait'.format(rsc=self.resources_folder,
+                                                                               gait='empty_gait',
+                                                                               subgait='empty_subgait',
+                                                                               version='empty_subgait')
+        self.standing = ModifiableSubgait.from_file(self.robot, empty_subgait_file, self)
+
     def test_init_load_gui_call(self):
         self.gait_generator_view.load_gait_into_ui.assert_called_once_with(self.gait_generator_controller.subgait)
 
@@ -207,7 +213,7 @@ class GaitGeneratorControllerTest(unittest.TestCase):
                                                                              version=self.version)
         self.gait_generator_controller.export_to_file(self.gait_generator_controller.subgait, self.resources_folder)
 
-        self.gait_generator_controller.subgait = ModifiableSubgait.empty_subgait(self, self.robot)
+        self.gait_generator_controller.subgait = None
         self.gait_generator_view.open_file_dialogue = Mock(return_value=(new_subgait_path, None))
         self.gait_generator_controller.import_gait()
         self.assertEqual(self.gait_generator_controller.subgait.subgait_name, new_subgait_name,
@@ -405,8 +411,7 @@ class GaitGeneratorControllerTest(unittest.TestCase):
         self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'previous', 'lock')
         self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'previous', 'standing')
 
-        empty_subgait = ModifiableSubgait.empty_subgait(self, self.robot, duration=self.duration)
-        previous_endpoints = [joint[0] for joint in empty_subgait]
+        previous_endpoints = [joint[0] for joint in self.standing]
 
         self.assertEqual([joint[0] for joint in self.gait_generator_controller.subgait.joints], previous_endpoints)
 
@@ -417,8 +422,7 @@ class GaitGeneratorControllerTest(unittest.TestCase):
         self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'next', 'lock')
         self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'next', 'standing')
 
-        empty_subgait = ModifiableSubgait.empty_subgait(self, self.robot, duration=self.duration)
-        next_startpoints = [joint[-1] for joint in empty_subgait]
+        next_startpoints = [joint[-1] for joint in self.standing]
 
         self.assertEqual([joint[-1] for joint in self.gait_generator_controller.subgait.joints], next_startpoints)
 
@@ -457,8 +461,7 @@ class GaitGeneratorControllerTest(unittest.TestCase):
         self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'previous', 'lock')
         self.gait_generator_controller.undo()
 
-        empty_subgait = ModifiableSubgait.empty_subgait(self, self.robot, duration=self.duration)
-        previous_endpoints = [joint[0] for joint in empty_subgait]
+        previous_endpoints = [joint[0] for joint in self.standing]
 
         self.assertEqual([joint[0] for joint in self.gait_generator_controller.subgait.joints], previous_endpoints)
 
@@ -469,8 +472,7 @@ class GaitGeneratorControllerTest(unittest.TestCase):
         self.gait_generator_controller.toggle_side_subgait_checkbox(True, 'next', 'lock')
         self.gait_generator_controller.undo()
 
-        empty_subgait = ModifiableSubgait.empty_subgait(self, self.robot, duration=self.duration)
-        next_startpoints = [joint[-1] for joint in empty_subgait]
+        next_startpoints = [joint[-1] for joint in self.standing]
 
         self.assertEqual([joint[-1] for joint in self.gait_generator_controller.subgait.joints], next_startpoints)
 

@@ -1,6 +1,7 @@
 import os
 
 from numpy_ringbuffer import RingBuffer
+import rospkg
 import rospy
 
 from .model.modifiable_setpoint import ModifiableSetpoint
@@ -19,13 +20,15 @@ class GaitGeneratorController(object):
         self.playback_speed = 100
         self.time_slider_thread = None
         self.current_time = 0
-
         self.robot = robot
-        self.subgait = ModifiableSubgait.empty_subgait(self, self.robot)
+
+        empty_subgait_file = os.path.join(rospkg.RosPack().get_path('march_rqt_gait_generator'),
+                                          'resource/empty_gait/empty_subgait/empty_subgait.subgait')
+        self.subgait = ModifiableSubgait.from_file(robot, empty_subgait_file, self)
         self.settings_changed_history = RingBuffer(capacity=100, dtype=list)
         self.settings_changed_redo_list = RingBuffer(capacity=100, dtype=list)
 
-        standing = ModifiableSubgait.empty_subgait(self, self.robot)
+        standing = ModifiableSubgait.from_file(robot, empty_subgait_file, self)
         previous_subgait_controller = SideSubgaitController(view=self.view.side_subgait_view['previous'],
                                                             default=standing)
         next_subgait_controller = SideSubgaitController(view=self.view.side_subgait_view['next'], default=standing)
