@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>120</height>
+    <height>185</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -37,15 +37,15 @@
      <x>10</x>
      <y>10</y>
      <width>481</width>
-     <height>106</height>
+     <height>121</height>
     </rect>
    </property>
    <layout class="QFormLayout" name="formLayout">
     <property name="horizontalSpacing">
-     <number>2</number>
+     <number>6</number>
     </property>
     <property name="verticalSpacing">
-     <number>3</number>
+     <number>6</number>
     </property>
     <item row="0" column="0">
      <widget class="QLabel" name="parameterLabel">
@@ -54,6 +54,31 @@
       </property>
       <property name="text">
        <string>parameter = 0.00</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QSlider" name="parameterSlider">
+      <property name="toolTip">
+       <string extracomment="The parameter decides 'how much' of the base version is done. ">The parameter decides 'how much' of the base version is done. </string>
+      </property>
+      <property name="whatsThis">
+       <string>ello</string>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="singleStep">
+       <number>1</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksBelow</enum>
+      </property>
+      <property name="tickInterval">
+       <number>10</number>
       </property>
      </widget>
     </item>
@@ -91,42 +116,20 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="QSlider" name="parameterSlider">
-      <property name="toolTip">
-       <string extracomment="The parameter decides 'how much' of the base version is done. ">The parameter decides 'how much' of the base version is done. </string>
-      </property>
-      <property name="whatsThis">
-       <string>ello</string>
-      </property>
-      <property name="maximum">
-       <number>100</number>
-      </property>
-      <property name="singleStep">
-       <number>1</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="tickPosition">
-       <enum>QSlider::TicksBelow</enum>
-      </property>
-      <property name="tickInterval">
-       <number>10</number>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="1">
-     <widget class="QDialogButtonBox" name="buttonBox">
-      <property name="standardButtons">
-       <set>QDialogButtonBox::Abort|QDialogButtonBox::Ok</set>
-      </property>
-      <property name="centerButtons">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
    </layout>
+  </widget>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>150</y>
+     <width>166</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

@@ -8,7 +8,7 @@ from .parametric_pop_up import ParametricPopUpWindow
 
 
 DEFAULT_AMOUNT_OF_AVAILABLE_SUBGAITS = 3
-PARAMETRIC_GAIT_CHARACTER = '_'
+PARAMETRIC_GAIT_PREFIX = '_pg_'
 
 
 class GaitSelectionView(QWidget):
@@ -138,7 +138,7 @@ class GaitSelectionView(QWidget):
                 subgait_menu.setCurrentIndex(current_version_index)
 
             except ValueError:
-                if current_version[0] == PARAMETRIC_GAIT_CHARACTER:
+                if current_version.startswith(PARAMETRIC_GAIT_PREFIX):
                     subgait_menu.addItem(current_version)
                     subgait_menu.setCurrentIndex(subgait_menu.count() - 1)
                 else:
@@ -289,5 +289,5 @@ class GaitSelectionView(QWidget):
         return self._parametric_pop_up.show_pop_up(versions)
 
     def get_parametric_version(self):
-        return '{0}{1}_({2})_({3})'.format(PARAMETRIC_GAIT_CHARACTER, self._parametric_pop_up.parameter,
+        return '{0}{1}_({2})_({3})'.format(PARAMETRIC_GAIT_PREFIX, self._parametric_pop_up.parameter,
                                            self._parametric_pop_up.base_version, self._parametric_pop_up.other_version)
