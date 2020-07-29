@@ -72,6 +72,11 @@ class InputDeviceView(QWidget):
         gait_walk_large = \
             self.create_button('gait_walk_large', image_path='/gait_walk_large.png',
                                callback=lambda: self._controller.publish_gait('gait_walk_large'))
+
+        gait_slalom_walk = \
+            self.create_button('gait_slalom_walk',
+                               callback=lambda: self._controller.publish_gait('gait_slalom_walk'))
+
         gait_balanced_walk = \
             self.create_button('gait_balanced_walk',
                                callback=lambda: self._controller.publish_gait('gait_balanced_walk'))
@@ -258,10 +263,10 @@ class InputDeviceView(QWidget):
         # Position in the array determines position on screen.
         march_button_layout = [
 
-            [home_sit, home_stand, gait_walk, gait_walk_small, gait_walk_large, gait_balanced_walk,
-             sm_to_unknown_button],
+            [home_sit, home_stand, gait_walk, gait_walk_small, gait_walk_large, gait_balanced_walk, gait_slalom_walk],
 
-            [gait_sit, gait_stand, rocker_switch_increment, rocker_switch_decrement, stop_button, error_button],
+            [gait_sit, gait_stand, rocker_switch_increment, rocker_switch_decrement, stop_button, error_button,
+             sm_to_unknown_button],
 
             [gait_sofa_sit, gait_sofa_stand, gait_single_step_normal, gait_single_step_small, continue_button,
              pause_button],
