@@ -21,7 +21,7 @@ class InputDeviceController(object):
         self._current_gait = rospy.Subscriber('/march/gait/current', String,
                                               callback=self._current_gait_callback, queue_size=1)
         self._error_pub = rospy.Publisher('/march/error', Error, queue_size=10)
-        self._get_possible_gaits = rospy.ServiceProxy('/march/state_machine/get_possible_gaits', PossibleGaits)
+        self._get_possible_gaits = rospy.ServiceProxy('/march/gait_selection/get_possible_gaits', PossibleGaits)
 
         self.accepted_cb = None
         self.finished_cb = None
