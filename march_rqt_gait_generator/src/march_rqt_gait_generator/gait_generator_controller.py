@@ -4,6 +4,8 @@ from numpy_ringbuffer import RingBuffer
 import rospkg
 import rospy
 
+from march_shared_classes.gait.subgait import Subgait
+
 from .model.modifiable_setpoint import ModifiableSetpoint
 from .model.modifiable_subgait import ModifiableSubgait
 from .side_subgait_controller import SideSubgaitController
@@ -28,7 +30,7 @@ class GaitGeneratorController(object):
         self.settings_changed_history = RingBuffer(capacity=100, dtype=list)
         self.settings_changed_redo_list = RingBuffer(capacity=100, dtype=list)
 
-        standing = ModifiableSubgait.from_file(robot, empty_subgait_file, self)
+        standing = Subgait.from_file(robot, empty_subgait_file)
         previous_subgait_controller = SideSubgaitController(view=self.view.side_subgait_view['previous'],
                                                             default=standing)
         next_subgait_controller = SideSubgaitController(view=self.view.side_subgait_view['next'], default=standing)
