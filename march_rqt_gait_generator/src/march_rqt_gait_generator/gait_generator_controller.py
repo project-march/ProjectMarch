@@ -221,6 +221,8 @@ class GaitGeneratorController(object):
         if gait is None:
             rospy.logwarn('Could not load gait %s', file_name)
             return
+        if gait.gait_type is None or gait.gait_type == '':
+            gait.gait_type = 'walk_like'
         self.subgait = gait
 
         was_playing = self.time_slider_thread is not None
