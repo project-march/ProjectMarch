@@ -110,7 +110,7 @@ gaits:
     right_open: MV_walk_rightopen_v3
     right_swing: MV_walk_rightswing_v2
 positions:
-  idle_0:
+  stand:
     left_ankle: 0.0436
     left_hip_aa: 0.0
     left_hip_fe: -0.0873
@@ -119,7 +119,7 @@ positions:
     right_hip_aa: 0.0
     right_hip_fe: -0.0873
     right_knee: 0.0
-  idle_1:
+  tilted_path_right_stand:
     left_ankle: 0.0436
     left_hip_aa: 0.0873
     left_hip_fe: -0.0873
@@ -128,7 +128,7 @@ positions:
     right_hip_aa: -0.0524
     right_hip_fe: 0.5236
     right_knee: 0.8203
-  idle_2:
+  sofa_sit:
     left_ankle: 0.0436
     left_hip_aa: 0.0
     left_hip_fe: 1.5708
@@ -146,7 +146,7 @@ positions:
     right_hip_aa: 0.0
     right_hip_fe: 0.1745
     right_knee: 0.4363
-  idle_4:
+  slope_down_stand:
     left_ankle: -0.2618
     left_hip_aa: 0.0
     left_hip_fe: -0.0873
@@ -155,7 +155,7 @@ positions:
     right_hip_aa: 0.0
     right_hip_fe: -0.0873
     right_knee: 0.0
-  idle_5:
+  sit:
     left_ankle: 0.0436
     left_hip_aa: 0.0
     left_hip_fe: 1.2217
@@ -173,7 +173,7 @@ positions:
     right_hip_aa: 0.0
     right_hip_fe: -0.0873
     right_knee: 0.0
-  idle_7:
+  tilted_path_left_stand:
     left_ankle: 0.1309
     left_hip_aa: -0.0524
     left_hip_fe: 0.5236
