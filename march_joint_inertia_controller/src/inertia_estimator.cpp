@@ -38,15 +38,21 @@ InertiaEstimator::InertiaEstimator(double lambda, size_t acc_size)
   joint_inertia_ = 0.0;
 
   // Size the buffers
-  velocity_array_.resize(vel_size_);
+  z1a.resize(sos_.size(), 0.0);
+  z2a.resize(sos_.size(), 0.0);
 
-  acceleration_array_.resize(acc_size_);
+  z1t.resize(sos_.size(), 0.0);
+  z2t.resize(sos_.size(), 0.0);
 
-  filtered_acceleration_array_.resize(acc_size_);
+  velocity_array_.resize(vel_size_, 0.0);
 
-  joint_torque_.resize(torque_size_);
+  acceleration_array_.resize(acc_size_, 0.0);
 
-  filtered_joint_torque_.resize(fil_tor_size_);
+  filtered_acceleration_array_.resize(acc_size_, 0.0);
+
+  joint_torque_.resize(torque_size_, 0.0);
+
+  filtered_joint_torque_.resize(fil_tor_size_, 0.0);
 }
 
 double InertiaEstimator::getAcceleration(unsigned int index)
@@ -82,71 +88,62 @@ void InertiaEstimator::publishInertia()
 }
 
 // Fills the buffers so that non-zero values may be computed by the inertia estimator
-bool InertiaEstimator::fill_buffers(double velocity, double effort, const ros::Duration& period)
+void InertiaEstimator::fill_buffers(double velocity, double effort, const ros::Duration& period)
 {
   auto it = velocity_array_.begin();
-
   it = velocity_array_.begin();
   it = velocity_array_.insert(it, velocity);
   velocity_array_.resize(vel_size_);
 
   // Automatically fills the zero'th position of the acceleration array
-  discrete_speed_derivative(velocity, period);
+  double acc = discrete_speed_derivative(period);
+  it = acceleration_array_.begin();
+  it = acceleration_array_.insert(it, acc);
   acceleration_array_.resize(acc_size_);
 
   it = joint_torque_.begin();
   it = joint_torque_.insert(it, effort);
   joint_torque_.resize(torque_size_);
-  return false;
 }
 
 void InertiaEstimator::apply_butter()
 {
   // Dingen doen met de sos filter ofzo
-  // Also doe pushback dingen anders dan werkt dit niet
-  std::vector<double> z = { 0.0, 0.0, 0.0 };
   auto it = filtered_acceleration_array_.begin();
-  auto x_n = acceleration_array_[0];
-  double x;
+  double x = 1.0;
 
+  int i = 0;
   for (const auto& so : sos_)
   {
-    x_n = acceleration_array_[0];
-    x = sos_[i][0] * x_n + z[0];
-    z[0] = sos_[i][1] * x_n - sos_[i][3] * x + z[1];
-    z[1] = sos_[i][2] * x_n - sos_[i][4] * x;
-
-    //    temp *= (acceleration_array_[0] * sos_[i][0] + acceleration_array_[1] * sos_[i][1] +
-    //             acceleration_array_[2] * sos_[i][2]) /
-    //            (acceleration_array_[0] * sos_[i][3] + acceleration_array_[1] * sos_[i][4] +
-    //             acceleration_array_[2] * sos_[i][5]);
+    x = acceleration_array_[0];
+    filtered_acceleration_array_[0] = so[0] * acceleration_array_[0] + z1a[i];
+    z1a[i] = so[1] * x - so[4] * filtered_acceleration_array_[0] + z2a[i];
+    z2a[i] = so[2] * x - so[5] * filtered_acceleration_array_[0];
+    i++;
   }
+
   it = filtered_acceleration_array_.begin();
   it = filtered_acceleration_array_.insert(it, x);
   filtered_acceleration_array_.resize(acc_size_);
 
-  z = { 0.0, 0.0, 0.0 };
+  x = 1.0;
+  i = 0;
   for (const auto& so : sos_)
   {
-    x_n = joint_torque_[0];
-    x = sos_[i][0] * x_n + z[0];
-    z[0] = sos_[i][1] * x_n - sos_[i][3] * x + z[1];
-    z[1] = sos_[i][2] * x_n - sos_[i][4] * x;
-    //    temp *= (joint_torque_[0] * sos_[i][0] + joint_torque_[1] * sos_[i][1] + joint_torque_[2] * sos_[i][2]) /
-    //            (joint_torque_[0] * sos_[i][3] + joint_torque_[1] * sos_[i][4] + joint_torque_[2] * sos_[i][5]);
+    x = joint_torque_[0];
+    filtered_joint_torque_[0] = so[0] * joint_torque_[0] + z1t[i];
+    z1t[i] = so[1] * x - so[4] * filtered_joint_torque_[0] + z2t[i];
+    z2t[i] = so[2] * x - so[5] * filtered_joint_torque_[0];
+    i++;
   }
   it = filtered_joint_torque_.begin();
   it = filtered_joint_torque_.insert(it, x);
   filtered_joint_torque_.resize(fil_tor_size_);
-
-  // temp = 1.0;
 }
 
 // Estimate the inertia using the acceleration and torque
 void InertiaEstimator::inertia_estimate()
 {
-  double torque_e;
-  double acc_e;
   apply_butter();
 
   correlation_calculation();
@@ -186,23 +183,20 @@ void InertiaEstimator::correlation_calculation()
 // Calculate the vibration based on the acceleration
 double InertiaEstimator::vibration_calculation()
 {
-  // moa = mean of the absolute
-  moa_ = mean(absolute(filtered_acceleration_array_));
-  // aom = absolute of the mean
-  aom_ = abs(mean(filtered_acceleration_array_));
+  mean_of_absolute_ = mean(absolute(filtered_acceleration_array_));
+  absolute_of_mean_ = abs(mean(filtered_acceleration_array_));
   // Divide by zero protection, necessary when there has not been any acceleration yet
-  if (aom_ == 0.0)
+  if (absolute_of_mean_ == 0.0)
   {
     return 0.0;
   }
-  return moa_ / aom_;
+  return mean_of_absolute_ / absolute_of_mean_;
 }
 
 // Calculate a discrete derivative of the speed measurements
-void InertiaEstimator::discrete_speed_derivative(double velocity, const ros::Duration& period)
+double InertiaEstimator::discrete_speed_derivative(const ros::Duration& period)
 {
-  auto it = acceleration_array_.begin();
-  it = acceleration_array_.insert(it, (velocity - velocity_array_[1]) / period.toSec());
+  return (velocity_array_[0] - velocity_array_[1]) / period.toSec();
 }
 
 void InertiaEstimator::init_p(unsigned int samples)

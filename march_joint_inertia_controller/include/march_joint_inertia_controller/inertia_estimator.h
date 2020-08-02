@@ -49,7 +49,7 @@ public:
   /**
    * \brief Initialize the publisher with a name
    */
-  void configurePublisher(std::string name);
+  void configurePublisher(const std::string& name);
   void publishInertia();
 
   /**
@@ -64,7 +64,7 @@ public:
   /**
    * \brief Calculate a discrete derivative of the speed measurements
    */
-  void discrete_speed_derivative(double velocity, const ros::Duration& period);
+  double discrete_speed_derivative(const ros::Duration& period);
   /**
    * \brief Calculate the alpha coefficient for the inertia estimate
    */
@@ -85,7 +85,7 @@ public:
   /**
    * \brief Fill the rolling buffers with corresponding values.
    */
-  bool fill_buffers(double velocity, double effort, const ros::Duration& period);
+  void fill_buffers(double velocity, double effort, const ros::Duration& period);
 
   /**
    * \brief Calculate the initial correlation coefficient
@@ -99,26 +99,31 @@ private:
   ros::NodeHandle nh_;
   ros::Publisher pub_;
 
-  float min_alpha_ = 0.4;  // You might want to be able to adjust this value from a yaml/launch file
-  float max_alpha_ = 0.9;  // You might want to be able to adjust this value from a yaml/launch file
+  double min_alpha_ = 0.4;  // You might want to be able to adjust this value from a yaml/launch file
+  double max_alpha_ = 0.9;  // You might want to be able to adjust this value from a yaml/launch file
 
   // This is a sixth order butterworth filter with a cutoff frequency at 15Hz in Second Order Sections form
-  double sos_[3][6] = {
-    { 2.31330497e-05, 4.62660994e-05, 2.31330497e-05, 1.00000000e+00, -1.37177561e+00, 4.75382129e-01 },
-    { 1.00000000e+00, 2.00000000e+00, 1.00000000e+00, 1.00000000e+00, -1.47548044e+00, 5.86919508e-01 },
-    { 1.00000000e+00, 2.00000000e+00, 1.00000000e+00, 1.00000000e+00, -1.69779140e+00, 8.26021017e-01 }
+  std::vector<std::vector<double>> sos_{
+    { 9.16782507e-09, 1.83356501e-08, 9.16782507e-09, 1.00000000e+00, -1.82520938e+00, 8.33345838e-01 },
+    { 1.00000000e+00, 2.00000000e+00, 1.00000000e+00, 1.00000000e+00, -1.86689228e+00, 8.75214548e-01 },
+    { 1.00000000e+00, 2.00000000e+00, 1.00000000e+00, 1.00000000e+00, -1.94377925e+00, 9.52444269e-01 }
   };
   // namespace joint_inertia_controller
+  std::vector<double> z1a;
+  std::vector<double> z2a;
+
+  std::vector<double> z1t;
+  std::vector<double> z2t;
 
   // Default length 12 for the alpha calculation
   size_t acc_size_;
   std::vector<double> acceleration_array_;
   // Equal to two, because two values are needed to calculate the derivative
-  size_t vel_size_ = 2;
+  size_t vel_size_ = 8;
   std::vector<double> velocity_array_;
   std::vector<double> filtered_acceleration_array_;
   // Of length 3 for the butterworth filter
-  size_t torque_size_ = 2;
+  size_t torque_size_ = 3;
   std::vector<double> joint_torque_;
   // Of length 2 for the error calculation
   size_t fil_tor_size_ = 2;
@@ -128,8 +133,8 @@ private:
   double corr_coeff_;
   double K_a_;
   double K_i_;
-  double moa_;
-  double aom_;
+  double mean_of_absolute_;
+  double absolute_of_mean_;
   double joint_inertia_;
   double lambda_;
 };
