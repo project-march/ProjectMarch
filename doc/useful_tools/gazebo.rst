@@ -6,7 +6,7 @@ Gazebo
 Gazebo can integrate with ros using the packages in `gazebo_ros_pkgs <https://wiki.ros.org/gazebo_ros_pkgs>`_.
 
 The simulation packages and plugins for the |march| are contained in the :simulation:`project-march/simulation <>`
-repository.
+repository. See the :ref:`march-simulation-label` for more info.
 
 .. figure:: images/gazebo.png
    :align: center
