@@ -108,7 +108,7 @@ void InertiaEstimator::fill_buffers(double velocity, double effort, const ros::D
 
 void InertiaEstimator::apply_butter()
 {
-  // Dingen doen met de sos filter ofzo
+  // Apply a sixth order Butterworth filter over the effort and acceleration signals
   auto it = filtered_acceleration_array_.begin();
   double x = 1.0;
 

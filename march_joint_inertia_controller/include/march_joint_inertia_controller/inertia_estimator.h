@@ -108,7 +108,10 @@ private:
     { 1.00000000e+00, 2.00000000e+00, 1.00000000e+00, 1.00000000e+00, -1.86689228e+00, 8.75214548e-01 },
     { 1.00000000e+00, 2.00000000e+00, 1.00000000e+00, 1.00000000e+00, -1.94377925e+00, 9.52444269e-01 }
   };
-  // namespace joint_inertia_controller
+
+  // z1 and z2 vectors are containers for previous time-step values in the butterworth filter
+  // Might be neater to design a separate class for the filter application for arbitrary filter sizes, datasets and
+  // number of signals such as: https://github.com/scipy/scipy/blob/v1.5.2/scipy/signal/_sosfilt.pyx
   std::vector<double> z1a;
   std::vector<double> z2a;
 
