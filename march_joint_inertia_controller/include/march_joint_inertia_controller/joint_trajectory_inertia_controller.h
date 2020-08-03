@@ -64,11 +64,11 @@ public:
     int alpha_filter_size[2];
     ros::NodeHandle rotary_estimator_nh(nh, std::string("inertia_estimator/rotary"));
     rotary_estimator_nh.param("std_samples", samples_, 100);
-    rotary_estimator_nh.param("lambda", lambda[0], 0.96);
+    rotary_estimator_nh.param("lambda", lambda[0], 1.0);
     rotary_estimator_nh.param("alpha_filter_size", alpha_filter_size[0], 12);
 
     ros::NodeHandle linear_estimator_nh(nh, std::string("inertia_estimator/linear"));
-    linear_estimator_nh.param("lambda", lambda[1], 0.96);
+    linear_estimator_nh.param("lambda", lambda[1], 1.0);
     linear_estimator_nh.param("alpha_filter_size", alpha_filter_size[1], 12);
 
     // Initialize the estimator parameters
