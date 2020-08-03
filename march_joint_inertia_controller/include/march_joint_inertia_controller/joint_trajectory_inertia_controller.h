@@ -77,7 +77,7 @@ public:
     {
       inertia_estimators_[j].setLambda(lambda[(int)floor(j / 2) % 2]);  // Produce sequence 00110011
       inertia_estimators_[j].setAccSize(alpha_filter_size[(int)floor(j / 2) % 2]);
-      pub_[j] = nh.advertise<std_msgs::Float64>(joint_handles[j].getName(), 100);
+      pub_[j] = nh.advertise<std_msgs::Float64>("/inertia_publisher/" + joint_handles[j].getName(), 100);
     }
     return true;
   }
