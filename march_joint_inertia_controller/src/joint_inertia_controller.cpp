@@ -27,7 +27,7 @@ bool InertiaController::init(hardware_interface::PositionJointInterface* hw, ros
   joint_ = hw->getHandle(joint_name);
 
   ros::Duration first(0.004);
-  inertia_estimator_.fill_buffers(joint_.getVelocity(), joint_.getEffort(), first);
+  inertia_estimator_.fillBuffers(joint_.getVelocity(), joint_.getEffort(), first);
 
   // Get URDF info about joint
   urdf::Model urdf;
@@ -133,8 +133,8 @@ void InertiaController::update(const ros::Time& /* time */, const ros::Duration&
     commanded_effort = pid_controller_.computeCommand(error, period);
   }
 
-  inertia_estimator_.fill_buffers(joint_.getVelocity(), joint_.getEffort(), period);
-  inertia_estimator_.inertia_estimate();
+  inertia_estimator_.fillBuffers(joint_.getVelocity(), joint_.getEffort(), period);
+  inertia_estimator_.inertiaEstimate();
   inertia_estimator_.publishInertia();
   // TO DO: Provide lookup table for gain selection
   // TO DO: apply PID control

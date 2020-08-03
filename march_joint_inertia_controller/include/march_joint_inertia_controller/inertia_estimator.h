@@ -44,7 +44,7 @@ public:
   double getAcceleration(unsigned int index);
 
   void setLambda(double lambda);
-  void setAcc_size(size_t acc_size);
+  void setAccSize(size_t acc_size);
   void setNodeHandle(ros::NodeHandle& nh);
   /**
    * \brief Initialize the publisher with a name
@@ -55,42 +55,42 @@ public:
   /**
    * \brief Applies the Butterworth filter over the last two samples and returns the resulting filtered value
    */
-  void apply_butter();
+  void applyButter();
 
   /**
    * \brief Estimate the inertia using the acceleration and torque
    */
-  void inertia_estimate();
+  void inertiaEstimate();
   /**
    * \brief Calculate a discrete derivative of the speed measurements
    */
-  double discrete_speed_derivative(const ros::Duration& period);
+  double discreteSpeedDerivative(const ros::Duration& period);
   /**
    * \brief Calculate the alpha coefficient for the inertia estimate
    */
-  double alpha_calculation();
+  double alphaCalculation();
   /**
    * \brief Calculate the inertia gain for the inertia estimate
    */
-  double gain_calculation();
+  double gainCalculation();
   /**
    * \brief Calculate the correlation coefficient of the acceleration buffer
    */
-  void correlation_calculation();
+  void correlationCalculation();
   /**
    * \brief Calculate the vibration based on the acceleration
    */
-  double vibration_calculation();
+  double vibrationCalculation();
 
   /**
    * \brief Fill the rolling buffers with corresponding values.
    */
-  void fill_buffers(double velocity, double effort, const ros::Duration& period);
+  void fillBuffers(double velocity, double effort, const ros::Duration& period);
 
   /**
    * \brief Calculate the initial correlation coefficient
    */
-  void init_p(unsigned int samples);
+  void initP(unsigned int samples);
 
   // Vector to be filled with samples of acceleration to determine the standard deviation from
   std::vector<double> standard_deviation;

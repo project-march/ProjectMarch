@@ -24,7 +24,7 @@ double mean(const std::vector<double>& a)
   {
     sum += x;
   }
-  if (a.size() == 0.0)
+  if (a.size() == 0)
   {
     return 0.0;
   }
@@ -64,7 +64,7 @@ void InertiaEstimator::setLambda(double lambda)
 {
   lambda_ = lambda;
 }
-void InertiaEstimator::setAcc_size(size_t acc_size)
+void InertiaEstimator::setAccSize(size_t acc_size)
 {
   acc_size_ = acc_size;
 }
@@ -88,7 +88,7 @@ void InertiaEstimator::publishInertia()
 }
 
 // Fills the buffers so that non-zero values may be computed by the inertia estimator
-void InertiaEstimator::fill_buffers(double velocity, double effort, const ros::Duration& period)
+void InertiaEstimator::fillBuffers(double velocity, double effort, const ros::Duration& period)
 {
   auto it = velocity_array_.begin();
   it = velocity_array_.begin();
@@ -96,7 +96,7 @@ void InertiaEstimator::fill_buffers(double velocity, double effort, const ros::D
   velocity_array_.resize(vel_size_);
 
   // Automatically fills the zero'th position of the acceleration array
-  double acc = discrete_speed_derivative(period);
+  double acc = discreteSpeedDerivative(period);
   it = acceleration_array_.begin();
   it = acceleration_array_.insert(it, acc);
   acceleration_array_.resize(acc_size_);
@@ -106,7 +106,7 @@ void InertiaEstimator::fill_buffers(double velocity, double effort, const ros::D
   joint_torque_.resize(torque_size_);
 }
 
-void InertiaEstimator::apply_butter()
+void InertiaEstimator::applyButter()
 {
   // Apply a sixth order Butterworth filter over the effort and acceleration signals
   auto it = filtered_acceleration_array_.begin();
@@ -142,34 +142,34 @@ void InertiaEstimator::apply_butter()
 }
 
 // Estimate the inertia using the acceleration and torque
-void InertiaEstimator::inertia_estimate()
+void InertiaEstimator::inertiaEstimate()
 {
-  apply_butter();
+  applyButter();
 
-  correlation_calculation();
-  K_i_ = gain_calculation();
-  K_a_ = alpha_calculation();
+  correlationCalculation();
+  K_i_ = gainCalculation();
+  K_a_ = alphaCalculation();
   const double torque_e = filtered_joint_torque_[0] - filtered_joint_torque_[1];
   const double acc_e = filtered_acceleration_array_[0] - filtered_acceleration_array_[1];
   joint_inertia_ = (torque_e - (acc_e * joint_inertia_)) * K_i_ * K_a_ + joint_inertia_;
 }
 
 // Calculate the alpha coefficient for the inertia estimate
-double InertiaEstimator::alpha_calculation()
+double InertiaEstimator::alphaCalculation()
 {
-  double vib = std::max(std::min(vibration_calculation(), min_alpha_), max_alpha_);
+  double vib = std::max(std::min(vibrationCalculation(), min_alpha_), max_alpha_);
   return (vib - min_alpha_) / (max_alpha_ - min_alpha_);
 }
 
 // Calculate the inertia gain for the inertia estimate
-double InertiaEstimator::gain_calculation()
+double InertiaEstimator::gainCalculation()
 {
   return (corr_coeff_ * (filtered_acceleration_array_[0] - filtered_acceleration_array_[1])) /
          (lambda_ + corr_coeff_ * pow(filtered_acceleration_array_[0] - filtered_acceleration_array_[1], 2));
 }
 
 // Calculate the correlation coefficient of the acceleration buffer
-void InertiaEstimator::correlation_calculation()
+void InertiaEstimator::correlationCalculation()
 {
   corr_coeff_ =
       corr_coeff_ / (lambda_ + corr_coeff_ * pow(filtered_acceleration_array_[0] - filtered_acceleration_array_[1], 2));
@@ -181,7 +181,7 @@ void InertiaEstimator::correlation_calculation()
 }
 
 // Calculate the vibration based on the acceleration
-double InertiaEstimator::vibration_calculation()
+double InertiaEstimator::vibrationCalculation()
 {
   mean_of_absolute_ = mean(absolute(filtered_acceleration_array_));
   absolute_of_mean_ = abs(mean(filtered_acceleration_array_));
@@ -194,12 +194,12 @@ double InertiaEstimator::vibration_calculation()
 }
 
 // Calculate a discrete derivative of the speed measurements
-double InertiaEstimator::discrete_speed_derivative(const ros::Duration& period)
+double InertiaEstimator::discreteSpeedDerivative(const ros::Duration& period)
 {
   return (velocity_array_[0] - velocity_array_[1]) / period.toSec();
 }
 
-void InertiaEstimator::init_p(unsigned int samples)
+void InertiaEstimator::initP(unsigned int samples)
 {
   // Setup the initial value for the correlation coefficient 100*standarddeviation(acceleration)^2
   double mean_value = mean(standard_deviation);

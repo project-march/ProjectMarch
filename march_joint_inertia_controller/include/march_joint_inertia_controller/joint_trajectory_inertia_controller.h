@@ -75,7 +75,7 @@ public:
     {
       inertia_estimators_[j].setNodeHandle(nh);
       inertia_estimators_[j].setLambda(lambda[(int)floor(j / 2) % 2]);  // Produce sequence 00110011
-      inertia_estimators_[j].setAcc_size(alpha_filter_size[(int)floor(j / 2) % 2]);
+      inertia_estimators_[j].setAccSize(alpha_filter_size[(int)floor(j / 2) % 2]);
       inertia_estimators_[j].configurePublisher(joint_handles[j].getName());
     }
     return true;
@@ -104,12 +104,12 @@ public:
       count_++;
       for (unsigned int i = 0; i < num_joints_; ++i)
       {
-        inertia_estimators_[i].fill_buffers((*joint_handles_ptr_)[i].getVelocity(),
+        inertia_estimators_[i].fillBuffers((*joint_handles_ptr_)[i].getVelocity(),
                                             (*joint_handles_ptr_)[i].getEffort(), period);
         inertia_estimators_[i].standard_deviation.push_back(inertia_estimators_[i].getAcceleration(0));
         if (count_ == samples_)
         {
-          inertia_estimators_[i].init_p(samples_);
+          inertia_estimators_[i].initP(samples_);
         }
       }
     }
@@ -118,9 +118,9 @@ public:
       for (unsigned int i = 0; i < num_joints_; ++i)
       {
         // Update inertia estimator
-        inertia_estimators_[i].fill_buffers((*joint_handles_ptr_)[i].getVelocity(),
+        inertia_estimators_[i].fillBuffers((*joint_handles_ptr_)[i].getVelocity(),
                                             (*joint_handles_ptr_)[i].getEffort(), period);
-        inertia_estimators_[i].inertia_estimate();
+        inertia_estimators_[i].inertiaEstimate();
         inertia_estimators_[i].publishInertia();
         // TO DO: Provide lookup table for gain selection
         // TO DO: apply PID control
