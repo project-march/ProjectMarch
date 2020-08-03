@@ -69,22 +69,9 @@ void InertiaEstimator::setAccSize(size_t acc_size)
   acc_size_ = acc_size;
 }
 
-void InertiaEstimator::setNodeHandle(ros::NodeHandle& nh)
+double InertiaEstimator::getJointInertia()
 {
-  nh_ = nh;
-}
-
-void InertiaEstimator::configurePublisher(const std::string& name)
-{
-  std::string publisher_name = "/inertia_publisher/" + name;
-  pub_ = nh_.advertise<std_msgs::Float64>(publisher_name, 100);
-}
-
-void InertiaEstimator::publishInertia()
-{
-  std_msgs::Float64 msg;
-  msg.data = joint_inertia_;
-  pub_.publish(msg);
+  return joint_inertia_;
 }
 
 // Fills the buffers so that non-zero values may be computed by the inertia estimator

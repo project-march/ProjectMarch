@@ -42,6 +42,7 @@ public:
   InertiaEstimator(double lambda = 0.96, size_t acc_size = 12);
 
   double getAcceleration(unsigned int index);
+  double getJointInertia();
 
   void setLambda(double lambda);
   void setAccSize(size_t acc_size);
@@ -97,7 +98,7 @@ public:
 
 private:
   ros::NodeHandle nh_;
-  ros::Publisher pub_;
+
 
   double min_alpha_ = 0.4;  // You might want to be able to adjust this value from a yaml/launch file
   double max_alpha_ = 0.9;  // You might want to be able to adjust this value from a yaml/launch file

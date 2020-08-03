@@ -135,7 +135,6 @@ void InertiaController::update(const ros::Time& /* time */, const ros::Duration&
 
   inertia_estimator_.fillBuffers(joint_.getVelocity(), joint_.getEffort(), period);
   inertia_estimator_.inertiaEstimate();
-  inertia_estimator_.publishInertia();
   // TO DO: Provide lookup table for gain selection
   // TO DO: apply PID control
 
