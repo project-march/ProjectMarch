@@ -46,12 +46,6 @@ public:
 
   void setLambda(double lambda);
   void setAccSize(size_t acc_size);
-  void setNodeHandle(ros::NodeHandle& nh);
-  /**
-   * \brief Initialize the publisher with a name
-   */
-  void configurePublisher(const std::string& name);
-  void publishInertia();
 
   /**
    * \brief Applies the Butterworth filter over the last two samples and returns the resulting filtered value
@@ -97,9 +91,6 @@ public:
   std::vector<double> standard_deviation;
 
 private:
-  ros::NodeHandle nh_;
-
-
   double min_alpha_ = 0.4;  // You might want to be able to adjust this value from a yaml/launch file
   double max_alpha_ = 0.9;  // You might want to be able to adjust this value from a yaml/launch file
 

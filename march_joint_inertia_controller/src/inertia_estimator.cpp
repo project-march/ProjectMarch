@@ -1,4 +1,5 @@
 // Copyright 2020 Project March.
+#include <algorithm>
 #include <cmath>
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
@@ -144,7 +145,7 @@ void InertiaEstimator::inertiaEstimate()
 // Calculate the alpha coefficient for the inertia estimate
 double InertiaEstimator::alphaCalculation()
 {
-  double vib = std::max(std::min(vibrationCalculation(), min_alpha_), max_alpha_);
+  double vib = std::clamp(vibrationCalculation(), min_alpha_, max_alpha_);
   return (vib - min_alpha_) / (max_alpha_ - min_alpha_);
 }
 

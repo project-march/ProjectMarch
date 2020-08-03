@@ -105,8 +105,8 @@ public:
       count_++;
       for (unsigned int i = 0; i < num_joints_; ++i)
       {
-        inertia_estimators_[i].fillBuffers((*joint_handles_ptr_)[i].getVelocity(),
-                                            (*joint_handles_ptr_)[i].getEffort(), period);
+        inertia_estimators_[i].fillBuffers((*joint_handles_ptr_)[i].getVelocity(), (*joint_handles_ptr_)[i].getEffort(),
+                                           period);
         inertia_estimators_[i].standard_deviation.push_back(inertia_estimators_[i].getAcceleration(0));
         if (count_ == samples_)
         {
@@ -119,8 +119,8 @@ public:
       for (unsigned int i = 0; i < num_joints_; ++i)
       {
         // Update inertia estimator
-        inertia_estimators_[i].fillBuffers((*joint_handles_ptr_)[i].getVelocity(),
-                                            (*joint_handles_ptr_)[i].getEffort(), period);
+        inertia_estimators_[i].fillBuffers((*joint_handles_ptr_)[i].getVelocity(), (*joint_handles_ptr_)[i].getEffort(),
+                                           period);
         inertia_estimators_[i].inertiaEstimate();
         msg_.data = inertia_estimators_[i].getJointInertia();
         pub_[i].publish(msg_);
