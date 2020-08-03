@@ -61,6 +61,7 @@ void IMotionCube::mapMisoPDOs(SdoSlaveInterface& sdo)
   map_miso.addObject(IMCObjectName::ActualTorque);    // Compulsory!
   map_miso.addObject(IMCObjectName::MotionErrorRegister);
   map_miso.addObject(IMCObjectName::DetailedErrorRegister);
+  map_miso.addObject(IMCObjectName::SecondDetailedErrorRegister);
   map_miso.addObject(IMCObjectName::DCLinkVoltage);
   map_miso.addObject(IMCObjectName::MotorVoltage);
   map_miso.addObject(IMCObjectName::MotorPosition);
@@ -280,6 +281,11 @@ uint16_t IMotionCube::getDetailedError()
   return this->read16(this->miso_byte_offsets_.at(IMCObjectName::DetailedErrorRegister)).ui;
 }
 
+uint16_t IMotionCube::getSecondDetailedError()
+{
+  return this->read16(this->miso_byte_offsets_.at(IMCObjectName::SecondDetailedErrorRegister)).ui;
+}
+
 float IMotionCube::getMotorCurrent()
 {
   const float PEAK_CURRENT = 40.0;            // Peak current of iMC drive
@@ -326,8 +332,14 @@ void IMotionCube::goToTargetState(IMotionCubeTargetState target_state)
     {
       ROS_FATAL("IMotionCube went to fault state while attempting to go to '%s'. Shutting down.",
                 target_state.getDescription().c_str());
-      ROS_FATAL("Detailed Error: %s", error::parseDetailedError(this->getDetailedError()).c_str());
-      ROS_FATAL("Motion Error: %s", error::parseMotionError(this->getMotionError()).c_str());
+      ROS_FATAL("Motion Error (MER): %s",
+                error::parseError(this->getMotionError(), error::ErrorRegisters::MOTION_ERROR).c_str());
+      ROS_FATAL("Detailed Error (DER): %s",
+                error::parseError(this->getDetailedError(), error::ErrorRegisters::DETAILED_ERROR).c_str());
+      ROS_FATAL(
+          "Detailed Error 2 (DER2): %s",
+          error::parseError(this->getSecondDetailedError(), error::ErrorRegisters::SECOND_DETAILED_ERROR).c_str());
+
       throw std::domain_error("IMC to fault state");
     }
   }
