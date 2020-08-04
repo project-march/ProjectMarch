@@ -113,6 +113,7 @@ private:
   char io_map_[4096] = { 0 };
   int expected_working_counter_ = 0;
 
+  int latest_lost_slave_;
   const int slave_watchdog_timeout_;
   std::chrono::high_resolution_clock::time_point valid_slaves_timestamp_ms_;
 

@@ -204,7 +204,8 @@ void EthercatMaster::ethercatLoop()
     if (slave_lost_duration > slave_watchdog_timeout)
     {
       this->last_exception_ = std::make_exception_ptr(error::HardwareException(
-          error::ErrorType::SLAVE_LOST_TIMOUT, "Slave connection lost for %i ms", this->slave_watchdog_timeout_));
+          error::ErrorType::SLAVE_LOST_TIMOUT, "Slave connection lost for %i ms from slave %i and onwards.",
+          this->slave_watchdog_timeout_, this->latest_lost_slave_));
       this->is_operational_ = false;
 
       this->closeEthercat();
@@ -230,6 +231,7 @@ void EthercatMaster::monitorSlaveConnection()
     if (!ec_slave[slave].state)
     {
       ROS_WARN_THROTTLE(1, "EtherCAT train lost connection from slave %d onwards", slave);
+      this->latest_lost_slave_ = slave;
       return;
     }
   }
