@@ -37,8 +37,8 @@ gaits:
   tilted_path_second_start: {left_open: MV_TPstart2_leftopen_v1, right_close: MV_TPstart2_rightclose_v1}
   tilted_path_first_end: {left_open: MV_TPend1_leftopen_v1, right_close: MV_TPend1_rightclose_v1}
   tilted_path_second_end: {left_open: MV_TPend2_leftopen_v1, right_close: MV_TPend2_rightclose_v1}
-  tilted_path_left_straight_start: {right_open: MV_TP_left_straightstart_rightopen_v6,
-                                    left_close: MV_TP_left_straightstart_leftclose_v6}
+  tilted_path_left_straight_start: {right_open: MV_TP_left_straightstart_rightopen_v10,
+                                    left_close: MV_TP_left_straightstart_leftclose_v10}
   tilted_path_left_single_step: {right_open: MV_TP_left_singlestep_rightopen_v6,
                                  left_close: MV_TP_left_singlestep_leftclose_v6}
   tilted_path_left_straight_end: {left_open: MV_TP_left_straightend_leftopen_v6,
