@@ -70,7 +70,6 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    doc/useful_tools/rqt
    doc/useful_tools/ros_bag
    doc/useful_tools/gazebo
-   doc/useful_tools/smach
    doc/useful_tools/event_stream_processing
 
 .. toctree::
@@ -110,6 +109,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
   doc/march_packages/march_fake_sensor_data
   doc/march_packages/march_gain_scheduling
   doc/march_packages/march_gait_files
+  doc/march_packages/march_gait_selection
   doc/march_packages/march_hardware
   doc/march_packages/march_hardware_builder
   doc/march_packages/march_hardware_interface
@@ -120,6 +120,4 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
   doc/march_packages/march_safety
   doc/march_packages/march_shared_classes
   doc/march_packages/march_shared_resources
-  doc/march_packages/march_state_machine
-  doc/march_packages/march_gait_selection
   doc/march_packages/march_simulation
