@@ -26,7 +26,7 @@ ObstacleController::ObstacleController(physics::ModelPtr model)
   }
 }
 
-void ObstacleController::newSubgait(const march_shared_resources::GaitActionGoalConstPtr& _msg)
+void ObstacleController::newSubgait(const march_shared_resources::CurrentGaitConstPtr& msg)
 {
   if (this->subgait_name_ == "right_open" or this->subgait_name_ == "right_swing" or
       this->subgait_name_ == "left_swing")
@@ -36,12 +36,12 @@ void ObstacleController::newSubgait(const march_shared_resources::GaitActionGoal
                                                                            this->foot_left_->WorldPose().Pos().X());
   }
 
-  if (this->subgait_name_ == "home_stand" and _msg->goal.subgait_name.substr(0, 4) == "left")
+  if (this->subgait_name_ == "home_stand" and msg->subgait.substr(0, 4) == "left")
   {
     ROS_WARN("Gait starts with left. CoM controller plugin might not work properly.");
   }
-  this->subgait_name_ = _msg->goal.subgait_name;
-  this->subgait_duration_ = _msg->goal.duration.toSec();
+  this->subgait_name_ = msg->subgait.empty() ? "home_stand" : msg->subgait;
+  this->subgait_duration_ = msg->duration.toSec();
   this->subgait_start_time_ = this->model_->GetWorld()->SimTime().Double();
   this->subgait_changed_ = true;
 }
