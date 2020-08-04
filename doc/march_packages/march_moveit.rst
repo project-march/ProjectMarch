@@ -20,7 +20,7 @@ recommended.
 ROS API
 -------
 
-The packages has a very extensive ROS API, because MoveIt is very well integrated with ROS. This will not all be listed
+The package has a very extensive ROS API, because MoveIt is very well integrated with ROS. This will not all be listed
 here as most of it is only used by MoveIt itself. An important thing to note is that MoveIt can publish position and
 velocity commands directly to the controller. We are avoiding this, because we want to stay in control.
 
