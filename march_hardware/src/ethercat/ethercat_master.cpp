@@ -3,6 +3,7 @@
 #include "march_hardware/error/hardware_exception.h"
 
 #include <chrono>
+#include <exception>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -40,12 +41,18 @@ int EthercatMaster::getCycleTime() const
 void EthercatMaster::waitForPdo()
 {
   std::unique_lock<std::mutex> lock(this->wait_on_pdo_condition_mutex_);
-  this->wait_on_pdo_condition_var_.wait(lock, [&] { return this->pdo_received_; });
+  this->wait_on_pdo_condition_var_.wait(lock, [&] { return this->pdo_received_ && this->is_operational_; });
   this->pdo_received_ = false;
+}
+
+std::exception_ptr EthercatMaster::getLastException() const noexcept
+{
+  return this->last_exception_;
 }
 
 bool EthercatMaster::start(std::vector<Joint>& joints)
 {
+  this->last_exception_ = nullptr;
   this->ethercatMasterInitiation();
   return this->ethercatSlaveInitiation(joints);
 }
@@ -196,8 +203,11 @@ void EthercatMaster::ethercatLoop()
 
     if (slave_lost_duration > slave_watchdog_timeout)
     {
-      throw error::HardwareException(error::ErrorType::SLAVE_LOST_TIMOUT, "Slave connection lost for %i ms",
-                                     this->slave_watchdog_timeout_);
+      this->last_exception_ = std::make_exception_ptr(error::HardwareException(
+          error::ErrorType::SLAVE_LOST_TIMOUT, "Slave connection lost for %i ms", this->slave_watchdog_timeout_));
+      this->is_operational_ = false;
+
+      this->closeEthercat();
     }
   }
 }
@@ -226,6 +236,13 @@ void EthercatMaster::monitorSlaveConnection()
   this->valid_slaves_timestamp_ms_ = std::chrono::high_resolution_clock::now();
 }
 
+void EthercatMaster::closeEthercat()
+{
+  ec_slave[0].state = EC_STATE_INIT;
+  ec_writestate(0);
+  ec_close();
+}
+
 void EthercatMaster::stop()
 {
   if (this->is_operational_)
@@ -234,9 +251,7 @@ void EthercatMaster::stop()
     this->is_operational_ = false;
     this->ethercat_thread_.join();
 
-    ec_slave[0].state = EC_STATE_INIT;
-    ec_writestate(0);
-    ec_close();
+    this->closeEthercat();
   }
 }
 

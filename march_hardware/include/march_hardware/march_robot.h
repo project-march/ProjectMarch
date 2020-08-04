@@ -55,6 +55,8 @@ public:
 
   bool isEthercatOperational();
 
+  std::exception_ptr getLastEthercatException() const noexcept;
+
   void waitForPdo();
 
   int getEthercatCycleTime() const;

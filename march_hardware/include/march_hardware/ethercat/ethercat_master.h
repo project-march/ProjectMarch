@@ -2,6 +2,7 @@
 #ifndef MARCH_HARDWARE_ETHERCAT_ETHERCATMASTER_H
 #define MARCH_HARDWARE_ETHERCAT_ETHERCATMASTER_H
 #include <atomic>
+#include <exception>
 #include <vector>
 #include <string>
 #include <thread>
@@ -36,6 +37,8 @@ public:
 
   bool isOperational() const;
   void waitForPdo();
+
+  std::exception_ptr getLastException() const noexcept;
 
   /**
    * Returns the cycle time in milliseconds.
@@ -84,6 +87,11 @@ private:
   void monitorSlaveConnection();
 
   /**
+   * Sets ethercat state to INIT and closes port.
+   */
+  void closeEthercat();
+
+  /**
    * Sets the ethercat thread priority and scheduling
    * to SCHED_FIFO using pthread.
    * Note: Only works on POSIX compliant systems.
@@ -109,6 +117,7 @@ private:
   std::chrono::high_resolution_clock::time_point valid_slaves_timestamp_ms_;
 
   std::thread ethercat_thread_;
+  std::exception_ptr last_exception_;
 };
 
 }  // namespace march

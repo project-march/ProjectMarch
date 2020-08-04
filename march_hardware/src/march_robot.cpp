@@ -157,6 +157,11 @@ bool MarchRobot::isEthercatOperational()
   return ethercatMaster.isOperational();
 }
 
+std::exception_ptr MarchRobot::getLastEthercatException() const noexcept
+{
+  return this->ethercatMaster.getLastException();
+}
+
 void MarchRobot::waitForPdo()
 {
   this->ethercatMaster.waitForPdo();
