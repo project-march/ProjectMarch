@@ -239,7 +239,7 @@ void EthercatMaster::monitorSlaveConnection()
     {
       ROS_WARN_THROTTLE(1, "EtherCAT train lost connection from slave %d onwards", slave);
 
-      if (!attemptSlaveRecover(slave))
+      if (!this->attemptSlaveRecover(slave))
       {
         this->latest_lost_slave_ = slave;
         return;

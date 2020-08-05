@@ -78,6 +78,8 @@ private:
 
   /**
    * Sends the PDO and receives the working counter and check if this is lower than expected.
+   *
+   * @returns true if and only if all PDOs have been successfully sent and received, otherwise false.
    */
   bool sendReceivePdo();
 
@@ -86,6 +88,11 @@ private:
    */
   void monitorSlaveConnection();
 
+  /**
+   * Attempts to recover a slave to operational state.
+   *
+   * @returns true when recovery was successfull, otherwise false.
+   */
   bool attemptSlaveRecover(int slave);
 
   /**
