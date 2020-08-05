@@ -79,12 +79,14 @@ private:
   /**
    * Sends the PDO and receives the working counter and check if this is lower than expected.
    */
-  void sendReceivePdo();
+  bool sendReceivePdo();
 
   /**
    * Checks if all the slaves are connected and in operational state.
    */
   void monitorSlaveConnection();
+
+  bool attemptSlaveRecover(int slave);
 
   /**
    * Sets ethercat state to INIT and closes port.
@@ -113,7 +115,7 @@ private:
   char io_map_[4096] = { 0 };
   int expected_working_counter_ = 0;
 
-  int latest_lost_slave_;
+  int latest_lost_slave_ = -1;
   const int slave_watchdog_timeout_;
   std::chrono::high_resolution_clock::time_point valid_slaves_timestamp_ms_;
 
