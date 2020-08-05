@@ -4,6 +4,7 @@
 #define MARCH_WS_INERTIA_ESTIMATOR_H
 
 #include <hardware_interface/joint_command_interface.h>
+#include <list>
 #include <ros/ros.h>
 #include <trajectory_interface/quintic_spline_segment.h>
 #include <urdf/model.h>
@@ -14,7 +15,7 @@
  * @param[in] a input vector with values that need to be converted to absolutes
  * @param[out] b output vector with copies of the absolute values of a.
  */
-std::vector<double> absolute(const std::vector<double>& a);
+std::list<double> absolute(const std::list<double>& a);
 
 /**
  * \brief determiness the mean value of the given vector
@@ -22,7 +23,7 @@ std::vector<double> absolute(const std::vector<double>& a);
  * @param[in] a input vector from which the mean gets calculated
  * @returns the mean value of a
  */
-double mean(const std::vector<double>& a);
+double mean(const std::list<double>& a);
 
 /**
  * \brief Class that bundles functionality to estimate inertia on a Revolute Joint.
@@ -41,8 +42,9 @@ public:
    */
   InertiaEstimator(double lambda = 0.96, size_t acc_size = 12);
 
-  double getAcceleration(unsigned int index);
+  double getAcceleration();
   double getJointInertia();
+  double getJointVibration();
 
   void setLambda(double lambda);
   void setAccSize(size_t acc_size);
@@ -88,11 +90,11 @@ public:
   void initP(unsigned int samples);
 
   // Vector to be filled with samples of acceleration to determine the standard deviation from
-  std::vector<double> standard_deviation;
+  std::list<double> standard_deviation;
 
 private:
-  double min_alpha_ = 0.4;  // You might want to be able to adjust this value from a yaml/launch file
-  double max_alpha_ = 0.9;  // You might want to be able to adjust this value from a yaml/launch file
+  double min_alpha_ = 1.4;  // You might want to be able to adjust this value from a yaml/launch file
+  double max_alpha_ = 1.9;  // You might want to be able to adjust this value from a yaml/launch file
 
   // This is a sixth order butterworth filter with a cutoff frequency at 15Hz in Second Order Sections form
   std::vector<std::vector<double>> sos_{
@@ -104,28 +106,29 @@ private:
   // z1 and z2 vectors are containers for previous time-step values in the butterworth filter
   // Might be neater to design a separate class for the filter application for arbitrary filter sizes, datasets and
   // number of signals such as: https://github.com/scipy/scipy/blob/v1.5.2/scipy/signal/_sosfilt.pyx
-  std::vector<double> z1a;
-  std::vector<double> z2a;
+  std::list<double> z1a;
+  std::list<double> z2a;
 
-  std::vector<double> z1t;
-  std::vector<double> z2t;
+  std::list<double> z1t;
+  std::list<double> z2t;
 
   // Default length 12 for the alpha calculation
-  size_t acc_size_;
-  std::vector<double> acceleration_array_;
+  size_t acc_size_ = 12;
+  std::list<double> acceleration_array_;
   // Equal to two, because two values are needed to calculate the derivative
-  size_t vel_size_ = 8;
-  std::vector<double> velocity_array_;
-  std::vector<double> filtered_acceleration_array_;
+  size_t vel_size_ = acc_size_;
+  std::list<double> velocity_array_;
+  std::list<double> filtered_acceleration_array_;
   // Of length 3 for the butterworth filter
   size_t torque_size_ = 3;
-  std::vector<double> joint_torque_;
+  std::list<double> joint_torque_;
   // Of length 2 for the error calculation
   size_t fil_tor_size_ = 2;
-  std::vector<double> filtered_joint_torque_;
+  std::list<double> filtered_joint_torque_;
 
   // Correlation coefficient used to calculate the inertia gain
   double corr_coeff_;
+  double vibration_;
   double K_a_;
   double K_i_;
   double mean_of_absolute_;

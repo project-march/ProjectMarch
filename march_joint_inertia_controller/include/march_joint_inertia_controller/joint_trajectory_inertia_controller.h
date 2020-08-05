@@ -112,7 +112,7 @@ public:
       {
         inertia_estimators_[i].fillBuffers((*joint_handles_ptr_)[i].getVelocity(), (*joint_handles_ptr_)[i].getEffort(),
                                            period);
-        inertia_estimators_[i].standard_deviation.push_back(inertia_estimators_[i].getAcceleration(0));
+        inertia_estimators_[i].standard_deviation.push_back(inertia_estimators_[i].getAcceleration());
         if (count_ == samples_)
         {
           inertia_estimators_[i].initP(samples_);

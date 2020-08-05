@@ -13,7 +13,7 @@ InertiaController::~InertiaController()
   sub_command_.shutdown();
 }
 
-bool InertiaController::init(hardware_interface::PositionJointInterface* hw, ros::NodeHandle& nh)
+bool InertiaController::init(hardware_interface::EffortJointInterface* hw, ros::NodeHandle& nh)
 {
   if (!nh.getParam("joint_name", joint_name))
   {

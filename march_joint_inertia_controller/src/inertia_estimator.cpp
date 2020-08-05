@@ -7,23 +7,22 @@
 #include "ros/ros.h"
 #include "std_msgs/Float64.h"
 
-std::vector<double> absolute(const std::vector<double>& a)
+std::list<double> absolute(const std::list<double>& a)
 {
-  std::vector<double> b;
-  b.resize(a.size());
-  for (size_t i = 0; i < a.size(); ++i)
+  std::list<double> b;
+  for (auto it = a.begin(); it != a.end(); it++)
   {
-    b[i] = abs(a[i]);
+    b.push_back(abs(*it));
   }
   return b;
 }
 
-double mean(const std::vector<double>& a)
+double mean(const std::list<double>& a)
 {
   double sum = 0.0;
-  for (const double x : a)
+  for (auto it = a.begin(); it != a.end(); it++)
   {
-    sum += x;
+    sum += *it;
   }
   if (a.size() == 0)
   {
@@ -56,9 +55,10 @@ InertiaEstimator::InertiaEstimator(double lambda, size_t acc_size)
   filtered_joint_torque_.resize(fil_tor_size_, 0.0);
 }
 
-double InertiaEstimator::getAcceleration(unsigned int index)
+double InertiaEstimator::getAcceleration()
 {
-  return acceleration_array_[index];
+  auto a = *acceleration_array_.begin();
+  return a;
 }
 
 void InertiaEstimator::setLambda(double lambda)
@@ -68,6 +68,10 @@ void InertiaEstimator::setLambda(double lambda)
 void InertiaEstimator::setAccSize(size_t acc_size)
 {
   acc_size_ = acc_size;
+
+  velocity_array_.resize(acc_size_, 0.0);
+  acceleration_array_.resize(acc_size_, 0.0);
+  filtered_acceleration_array_.resize(acc_size_, 0.0);
 }
 
 double InertiaEstimator::getJointInertia()
@@ -75,58 +79,60 @@ double InertiaEstimator::getJointInertia()
   return joint_inertia_;
 }
 
+double InertiaEstimator::getJointVibration()
+{
+  return vibration_;
+}
+
 // Fills the buffers so that non-zero values may be computed by the inertia estimator
 void InertiaEstimator::fillBuffers(double velocity, double effort, const ros::Duration& period)
 {
-  auto it = velocity_array_.begin();
-  it = velocity_array_.begin();
-  it = velocity_array_.insert(it, velocity);
-  velocity_array_.resize(vel_size_);
+  velocity_array_.push_front(velocity);
+  velocity_array_.pop_back();
 
   // Automatically fills the zero'th position of the acceleration array
   double acc = discreteSpeedDerivative(period);
-  it = acceleration_array_.begin();
-  it = acceleration_array_.insert(it, acc);
-  acceleration_array_.resize(acc_size_);
+  acceleration_array_.push_front(acc);
+  acceleration_array_.pop_back();
 
-  it = joint_torque_.begin();
-  it = joint_torque_.insert(it, effort);
-  joint_torque_.resize(torque_size_);
+  joint_torque_.push_front(effort);
+  joint_torque_.pop_back();
 }
 
 void InertiaEstimator::applyButter()
 {
   // Apply a sixth order Butterworth filter over the effort and acceleration signals
-  auto it = filtered_acceleration_array_.begin();
-  double x = 1.0;
+  auto it1 = z1a.begin();
+  auto it2 = z2a.begin();
+  double x;
+  double x_n;
 
-  int i = 0;
   for (const auto& so : sos_)
   {
-    x = acceleration_array_[0];
-    filtered_acceleration_array_[0] = so[0] * acceleration_array_[0] + z1a[i];
-    z1a[i] = so[1] * x - so[4] * filtered_acceleration_array_[0] + z2a[i];
-    z2a[i] = so[2] * x - so[5] * filtered_acceleration_array_[0];
-    i++;
+    x_n = *acceleration_array_.begin();
+    x = so[0] * *acceleration_array_.begin() + *it1;
+    *it1 = so[1] * x_n - so[4] * x + *it2;
+    *it2 = so[2] * x_n - so[5] * x;
+    it1++;
+    it2++;
   }
 
-  it = filtered_acceleration_array_.begin();
-  it = filtered_acceleration_array_.insert(it, x);
-  filtered_acceleration_array_.resize(acc_size_);
+  filtered_acceleration_array_.push_front(x);
+  filtered_acceleration_array_.pop_back();
 
-  x = 1.0;
-  i = 0;
+  it1 = z1t.begin();
+  it2 = z2t.begin();
   for (const auto& so : sos_)
   {
-    x = joint_torque_[0];
-    filtered_joint_torque_[0] = so[0] * joint_torque_[0] + z1t[i];
-    z1t[i] = so[1] * x - so[4] * filtered_joint_torque_[0] + z2t[i];
-    z2t[i] = so[2] * x - so[5] * filtered_joint_torque_[0];
-    i++;
+    x_n = *joint_torque_.begin();
+    x = so[0] * *joint_torque_.begin() + *it1;
+    *it1 = so[1] * x_n - so[4] * x + *it2;
+    *it2 = so[2] * x_n - so[5] * x;
+    it1++;
+    it2++;
   }
-  it = filtered_joint_torque_.begin();
-  it = filtered_joint_torque_.insert(it, x);
-  filtered_joint_torque_.resize(fil_tor_size_);
+  filtered_joint_torque_.push_front(x);
+  filtered_joint_torque_.pop_back();
 }
 
 // Estimate the inertia using the acceleration and torque
@@ -137,8 +143,10 @@ void InertiaEstimator::inertiaEstimate()
   correlationCalculation();
   K_i_ = gainCalculation();
   K_a_ = alphaCalculation();
-  const double torque_e = filtered_joint_torque_[0] - filtered_joint_torque_[1];
-  const double acc_e = filtered_acceleration_array_[0] - filtered_acceleration_array_[1];
+  auto ita = filtered_acceleration_array_.begin();
+  auto itt = filtered_joint_torque_.begin();
+  const double torque_e = *itt - *(++itt);
+  const double acc_e = *ita - *(++ita);
   joint_inertia_ = (torque_e - (acc_e * joint_inertia_)) * K_i_ * K_a_ + joint_inertia_;
 }
 
@@ -146,21 +154,23 @@ void InertiaEstimator::inertiaEstimate()
 double InertiaEstimator::alphaCalculation()
 {
   double vib = std::clamp(vibrationCalculation(), min_alpha_, max_alpha_);
-  return (vib - min_alpha_) / (max_alpha_ - min_alpha_);
+  vibration_ = (vib - min_alpha_) / (max_alpha_ - min_alpha_);
+  return vibration_;
 }
 
 // Calculate the inertia gain for the inertia estimate
 double InertiaEstimator::gainCalculation()
 {
-  return (corr_coeff_ * (filtered_acceleration_array_[0] - filtered_acceleration_array_[1])) /
-         (lambda_ + corr_coeff_ * pow(filtered_acceleration_array_[0] - filtered_acceleration_array_[1], 2));
+  auto it = filtered_acceleration_array_.begin();
+  auto error = *it - *(++it);
+  return (corr_coeff_ * error) / (lambda_ + corr_coeff_ * pow(error, 2));
 }
 
 // Calculate the correlation coefficient of the acceleration buffer
 void InertiaEstimator::correlationCalculation()
 {
-  corr_coeff_ =
-      corr_coeff_ / (lambda_ + corr_coeff_ * pow(filtered_acceleration_array_[0] - filtered_acceleration_array_[1], 2));
+  auto it = filtered_acceleration_array_.begin();
+  corr_coeff_ = corr_coeff_ / (lambda_ + corr_coeff_ * pow(*it - *(++it), 2));
   const double large_number = 10e8;
   if (corr_coeff_ > large_number)
   {
@@ -184,7 +194,8 @@ double InertiaEstimator::vibrationCalculation()
 // Calculate a discrete derivative of the speed measurements
 double InertiaEstimator::discreteSpeedDerivative(const ros::Duration& period)
 {
-  return (velocity_array_[0] - velocity_array_[1]) / period.toSec();
+  auto it = velocity_array_.begin();
+  return (*it - *(++it)) / period.toSec();
 }
 
 void InertiaEstimator::initP(unsigned int samples)
@@ -192,9 +203,10 @@ void InertiaEstimator::initP(unsigned int samples)
   // Setup the initial value for the correlation coefficient 100*standarddeviation(acceleration)^2
   double mean_value = mean(standard_deviation);
   double sum = 0;
-  for (const auto& deviation : standard_deviation)
+
+  for (auto it = standard_deviation.begin(); it != standard_deviation.end(); it++)
   {
-    sum += std::pow(deviation - mean_value, 2);
+    sum += std::pow(*it - mean_value, 2);
   }
   corr_coeff_ = 100 * (sum / samples);
   return;
