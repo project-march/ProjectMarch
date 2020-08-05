@@ -15,7 +15,7 @@ InertiaController::~InertiaController()
 
 bool InertiaController::init(hardware_interface::EffortJointInterface* hw, ros::NodeHandle& nh)
 {
-  if (!nh.getParam("joint_name", joint_name))
+  if (!nh.getParam("joint_name", joint_name_))
   {
     ROS_ERROR("No joint_names specified");
     return false;
@@ -24,7 +24,7 @@ bool InertiaController::init(hardware_interface::EffortJointInterface* hw, ros::
   sub_command_ = nh.subscribe<std_msgs::Float64>("command", 1, &InertiaController::commandCB, this);
 
   // Get joint handle from hardware interface
-  joint_ = hw->getHandle(joint_name);
+  joint_ = hw->getHandle(joint_name_);
 
   ros::Duration first(0.004);
   inertia_estimator_.fillBuffers(joint_.getVelocity(), joint_.getEffort(), first);
@@ -36,10 +36,10 @@ bool InertiaController::init(hardware_interface::EffortJointInterface* hw, ros::
     ROS_ERROR("Failed to parse urdf file");
     return false;
   }
-  joint_urdf_ = urdf.getJoint(joint_name);
+  joint_urdf_ = urdf.getJoint(joint_name_);
   if (!joint_urdf_)
   {
-    ROS_ERROR("Could not find joint '%s' in urdf", joint_name.c_str());
+    ROS_ERROR("Could not find joint '%s' in urdf", joint_name_.c_str());
     return false;
   }
 

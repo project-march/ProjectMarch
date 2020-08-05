@@ -61,16 +61,16 @@ public:
    */
   std::string getJointName();
 
-  urdf::JointConstSharedPtr joint_urdf_;
-  std::string joint_name;
-  realtime_tools::RealtimeBuffer<Commands> command_;
-  Commands command_struct_;  // pre-allocated memory that is re-used to set the realtime buffer
-
 private:
   control_toolbox::Pid pid_controller_; /**< Internal PID controller. */
 
   ros::Subscriber sub_command_;
   hardware_interface::JointHandle joint_;
+
+  urdf::JointConstSharedPtr joint_urdf_;
+  std::string joint_name_;
+  realtime_tools::RealtimeBuffer<Commands> command_;
+  Commands command_struct_;  // pre-allocated memory that is re-used to set the realtime buffer
 
   InertiaEstimator inertia_estimator_;
 };

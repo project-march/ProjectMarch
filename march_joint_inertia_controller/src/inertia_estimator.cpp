@@ -153,7 +153,7 @@ void InertiaEstimator::inertiaEstimate()
 // Calculate the alpha coefficient for the inertia estimate
 double InertiaEstimator::alphaCalculation()
 {
-  double vib = std::clamp(vibrationCalculation(), min_alpha_, max_alpha_);
+  double vib = std::min(std::max(vibrationCalculation(), min_alpha_), max_alpha_);
   vibration_ = (vib - min_alpha_) / (max_alpha_ - min_alpha_);
   return vibration_;
 }
