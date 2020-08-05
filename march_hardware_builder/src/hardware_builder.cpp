@@ -65,13 +65,15 @@ std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
   YAML::Node config = this->robot_config_[robot_name];
   const auto if_name = config["ifName"].as<std::string>();
   const auto cycle_time = config["ecatCycleTime"].as<int>();
+  const auto slave_timeout = config["ecatSlaveTimeout"].as<int>();
 
   std::vector<march::Joint> joints = this->createJoints(config["joints"], pdo_interface, sdo_interface);
 
   ROS_INFO_STREAM("Robot config:\n" << config);
   YAML::Node pdb_config = config["powerDistributionBoard"];
   auto pdb = HardwareBuilder::createPowerDistributionBoard(pdb_config, pdo_interface, sdo_interface);
-  return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_, std::move(pdb), if_name, cycle_time);
+  return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_, std::move(pdb), if_name, cycle_time,
+                                             slave_timeout);
 }
 
 march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const std::string& joint_name,
