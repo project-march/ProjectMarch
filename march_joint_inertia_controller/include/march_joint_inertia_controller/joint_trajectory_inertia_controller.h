@@ -54,7 +54,7 @@ public:
       ros::NodeHandle joint_nh(nh, std::string("gains/") + joint_handles[i].getName());
 
       // Init PID gains from ROS parameter server
-      pids_[i].reset(new control_toolbox::Pid());
+      pids_[i] = std::make_shared<control_toolbox::Pid>();
       if (!pids_[i]->init(joint_nh))
       {
         ROS_WARN_STREAM("Failed to initialize PID gains from ROS parameter server.");

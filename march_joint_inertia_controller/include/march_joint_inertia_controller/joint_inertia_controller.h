@@ -23,7 +23,7 @@ public:
   InertiaController() = default;
   ~InertiaController() override;
 
-  bool init(hardware_interface::PositionJointInterface* hw, ros::NodeHandle& n);
+  bool init(hardware_interface::EffortJointInterface* hw, ros::NodeHandle& n) override;
   void update(const ros::Time& time, const ros::Duration& period) override;
   void starting(const ros::Time& time) override;
   void stopping(const ros::Time& time) override;
