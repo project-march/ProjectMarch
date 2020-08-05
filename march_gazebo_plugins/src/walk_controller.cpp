@@ -11,7 +11,7 @@ WalkController::WalkController(physics::ModelPtr model) : ObstacleController(mod
 
   this->p_pitch_ = 120;
   this->d_pitch_ = 40000;
-  this->p_roll_ = 150;
+  this->p_roll_ = 85;
   this->d_roll_ = 40000;
   this->p_yaw_ = 1000;
   this->d_yaw_ = 40000;
