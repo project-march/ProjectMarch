@@ -82,5 +82,5 @@ joints:
   - position: 0.1396
     time_from_start: {nsecs: 500000000, secs: 1}
     velocity: 0.0
-name: !!python/unicode 'right_open'
-version: !!python/unicode 'MIV_final_v2'
+name: 'right_open'
+version: 'MIV_final_v2'
