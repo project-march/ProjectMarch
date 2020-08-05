@@ -235,6 +235,7 @@ void EthercatMaster::monitorSlaveConnection()
   ec_readstate();
   for (int slave = 1; slave <= ec_slavecount; slave++)
   {
+
     if (ec_slave[slave].state != EC_STATE_OPERATIONAL)
     {
       ROS_WARN_THROTTLE(1, "EtherCAT train lost connection from slave %d onwards", slave);
@@ -246,6 +247,12 @@ void EthercatMaster::monitorSlaveConnection()
       }
     }
   }
+
+  if (this->latest_lost_slave_ > -1)
+  {
+    ROS_INFO("All slaves returned to operational state.");
+  }
+
   this->latest_lost_slave_ = -1;
   this->valid_slaves_timestamp_ms_ = std::chrono::high_resolution_clock::now();
 }
