@@ -235,7 +235,6 @@ void EthercatMaster::monitorSlaveConnection()
   ec_readstate();
   for (int slave = 1; slave <= ec_slavecount; slave++)
   {
-
     if (ec_slave[slave].state != EC_STATE_OPERATIONAL)
     {
       ROS_WARN_THROTTLE(1, "EtherCAT train lost connection from slave %d onwards", slave);
