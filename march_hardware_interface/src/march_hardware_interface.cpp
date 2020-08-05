@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <exception>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -173,6 +174,12 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
 
 void MarchHardwareInterface::validate()
 {
+  const auto last_exception = this->march_robot_->getLastEthercatException();
+  if (last_exception)
+  {
+    std::rethrow_exception(last_exception);
+  }
+
   bool fault_state = false;
   for (size_t i = 0; i < num_joints_; i++)
   {

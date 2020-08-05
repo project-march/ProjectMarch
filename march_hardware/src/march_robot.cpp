@@ -14,20 +14,21 @@
 
 namespace march
 {
-MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, ::std::string ifName, int ecatCycleTime)
+MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, ::std::string ifName, int ecatCycleTime,
+                       int ecatSlaveTimeout)
   : jointList(std::move(jointList))
   , urdf_(std::move(urdf))
-  , ethercatMaster(ifName, this->getMaxSlaveIndex(), ecatCycleTime)
+  , ethercatMaster(ifName, this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout)
   , pdb_(nullptr)
 {
 }
 
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
                        std::unique_ptr<PowerDistributionBoard> powerDistributionBoard, ::std::string ifName,
-                       int ecatCycleTime)
+                       int ecatCycleTime, int ecatSlaveTimeout)
   : jointList(std::move(jointList))
   , urdf_(std::move(urdf))
-  , ethercatMaster(ifName, this->getMaxSlaveIndex(), ecatCycleTime)
+  , ethercatMaster(ifName, this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout)
   , pdb_(std::move(powerDistributionBoard))
 {
 }
@@ -154,6 +155,11 @@ bool MarchRobot::hasValidSlaves()
 bool MarchRobot::isEthercatOperational()
 {
   return ethercatMaster.isOperational();
+}
+
+std::exception_ptr MarchRobot::getLastEthercatException() const noexcept
+{
+  return this->ethercatMaster.getLastException();
 }
 
 void MarchRobot::waitForPdo()

@@ -51,6 +51,8 @@ const char* getErrorDescription(ErrorType type)
       return "Failed to load URDF from parameter server";
     case ErrorType::INVALID_SW_STRING:
       return "Slave has incorrect SW file";
+    case ErrorType::SLAVE_LOST_TIMOUT:
+      return "EtherCAT slave monitor timer elapsed, connection has been lost";
     default:
       return "Unknown error occurred. Please create/use a documented error";
   }

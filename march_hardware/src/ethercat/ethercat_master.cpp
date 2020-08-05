@@ -3,6 +3,7 @@
 #include "march_hardware/error/hardware_exception.h"
 
 #include <chrono>
+#include <exception>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -13,8 +14,12 @@
 
 namespace march
 {
-EthercatMaster::EthercatMaster(std::string ifname, int max_slave_index, int cycle_time)
-  : is_operational_(false), ifname_(std::move(ifname)), max_slave_index_(max_slave_index), cycle_time_ms_(cycle_time)
+EthercatMaster::EthercatMaster(std::string ifname, int max_slave_index, int cycle_time, int slave_timeout)
+  : is_operational_(false)
+  , ifname_(std::move(ifname))
+  , max_slave_index_(max_slave_index)
+  , cycle_time_ms_(cycle_time)
+  , slave_watchdog_timeout_(slave_timeout)
 {
 }
 
@@ -36,12 +41,18 @@ int EthercatMaster::getCycleTime() const
 void EthercatMaster::waitForPdo()
 {
   std::unique_lock<std::mutex> lock(this->wait_on_pdo_condition_mutex_);
-  this->wait_on_pdo_condition_var_.wait(lock, [&] { return this->pdo_received_; });
+  this->wait_on_pdo_condition_var_.wait(lock, [&] { return this->pdo_received_ || !this->is_operational_; });
   this->pdo_received_ = false;
+}
+
+std::exception_ptr EthercatMaster::getLastException() const noexcept
+{
+  return this->last_exception_;
 }
 
 bool EthercatMaster::start(std::vector<Joint>& joints)
 {
+  this->last_exception_ = nullptr;
   this->ethercatMasterInitiation();
   return this->ethercatSlaveInitiation(joints);
 }
@@ -152,15 +163,15 @@ void EthercatMaster::ethercatLoop()
   {
     const auto begin_time = std::chrono::high_resolution_clock::now();
 
-    this->sendReceivePdo();
-    monitorSlaveConnection();
+    const bool pdo_received = this->sendReceivePdo();
+    this->monitorSlaveConnection();
 
     const auto end_time = std::chrono::high_resolution_clock::now();
     const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - begin_time);
 
     {
       std::lock_guard<std::mutex> lock(this->wait_on_pdo_condition_mutex_);
-      this->pdo_received_ = true;
+      this->pdo_received_ = pdo_received;
     }
     this->wait_on_pdo_condition_var_.notify_one();
 
@@ -185,30 +196,132 @@ void EthercatMaster::ethercatLoop()
       total_loops = 0;
       not_achieved_count = 0;
     }
+
+    const auto delta_t = std::chrono::high_resolution_clock::now() - this->valid_slaves_timestamp_ms_;
+    const auto slave_lost_duration = std::chrono::duration_cast<std::chrono::milliseconds>(delta_t);
+    const std::chrono::milliseconds slave_watchdog_timeout(this->slave_watchdog_timeout_);
+
+    if (slave_lost_duration > slave_watchdog_timeout)
+    {
+      this->last_exception_ = std::make_exception_ptr(error::HardwareException(
+          error::ErrorType::SLAVE_LOST_TIMOUT, "Slave connection lost for %i ms from slave %i and onwards.",
+          this->slave_watchdog_timeout_, this->latest_lost_slave_));
+      this->is_operational_ = false;
+      this->wait_on_pdo_condition_var_.notify_one();
+
+      this->closeEthercat();
+    }
   }
 }
 
-void EthercatMaster::sendReceivePdo()
+bool EthercatMaster::sendReceivePdo()
 {
-  ec_send_processdata();
-  int wkc = ec_receive_processdata(EC_TIMEOUTRET);
-  if (wkc < this->expected_working_counter_)
+  if (this->latest_lost_slave_ == -1)
   {
-    ROS_WARN_THROTTLE(1, "Working counter: %d  is lower than expected: %d", wkc, this->expected_working_counter_);
+    ec_send_processdata();
+    const int wkc = ec_receive_processdata(EC_TIMEOUTRET);
+    if (wkc < this->expected_working_counter_)
+    {
+      ROS_WARN_THROTTLE(1, "Working counter: %d  is lower than expected: %d", wkc, this->expected_working_counter_);
+      return false;
+    }
+    return true;
   }
+  return false;
 }
 
 void EthercatMaster::monitorSlaveConnection()
 {
+  ec_readstate();
   for (int slave = 1; slave <= ec_slavecount; slave++)
   {
-    ec_statecheck(slave, EC_STATE_OPERATIONAL, EC_TIMEOUTRET);
-    if (!ec_slave[slave].state)
+    if (ec_slave[slave].state != EC_STATE_OPERATIONAL)
     {
       ROS_WARN_THROTTLE(1, "EtherCAT train lost connection from slave %d onwards", slave);
-      return;
+
+      if (!this->attemptSlaveRecover(slave))
+      {
+        this->latest_lost_slave_ = slave;
+        return;
+      }
     }
   }
+
+  if (this->latest_lost_slave_ > -1)
+  {
+    ROS_INFO("All slaves returned to operational state.");
+  }
+
+  this->latest_lost_slave_ = -1;
+  this->valid_slaves_timestamp_ms_ = std::chrono::high_resolution_clock::now();
+}
+
+bool EthercatMaster::attemptSlaveRecover(int slave)
+{
+  if (ec_slave[slave].state != EC_STATE_OPERATIONAL)
+  {
+    if (ec_slave[slave].state == EC_STATE_PRE_OP)
+    {
+      ec_slave[slave].state = EC_STATE_SAFE_OP;
+      ec_writestate(slave);
+    }
+
+    if (ec_slave[slave].state == EC_STATE_SAFE_OP)
+    {
+      ec_slave[slave].state = EC_STATE_OPERATIONAL;
+      ec_writestate(slave);
+    }
+
+    if (ec_slave[slave].state > EC_STATE_NONE)
+    {
+      if (ec_reconfig_slave(slave, 500))
+      {
+        ec_slave[slave].islost = FALSE;
+      }
+    }
+
+    if (!ec_slave[slave].islost)
+    {
+      ec_statecheck(slave, EC_STATE_OPERATIONAL, EC_TIMEOUTRET);
+      if (ec_slave[slave].state == EC_STATE_NONE)
+      {
+        ec_slave[slave].islost = TRUE;
+        ROS_ERROR("Ethercat lost connection to slave %d", slave);
+      }
+    }
+  }
+
+  if (ec_slave[slave].islost)
+  {
+    if (ec_slave[slave].state == EC_STATE_NONE)
+    {
+      if (ec_recover_slave(slave, 500))
+      {
+        ec_slave[slave].islost = FALSE;
+      }
+    }
+    else
+    {
+      ec_slave[slave].islost = FALSE;
+    }
+  }
+
+  if (ec_slave[slave].state == EC_STATE_OPERATIONAL)
+  {
+    ROS_INFO("Slave %i resumed operational state", slave);
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+void EthercatMaster::closeEthercat()
+{
+  ec_slave[0].state = EC_STATE_INIT;
+  ec_writestate(0);
+  ec_close();
 }
 
 void EthercatMaster::stop()
@@ -219,9 +332,7 @@ void EthercatMaster::stop()
     this->is_operational_ = false;
     this->ethercat_thread_.join();
 
-    ec_slave[0].state = EC_STATE_INIT;
-    ec_writestate(0);
-    ec_close();
+    this->closeEthercat();
   }
 }
 
