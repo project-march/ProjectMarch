@@ -19,6 +19,9 @@
 #include "std_msgs/Float64.h"
 #include <trajectory_interface/quintic_spline_segment.h>
 
+template <typename T>
+using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;
+
 namespace joint_trajectory_controller
 {
 typedef trajectory_interface::QuinticSplineSegment<double> SegmentImpl;
@@ -77,7 +80,9 @@ public:
     {
       inertia_estimators_[j].setLambda(lambda[(int)floor(j / 2) % 2]);  // Produce sequence 00110011
       inertia_estimators_[j].setAccSize(alpha_filter_size[(int)floor(j / 2) % 2]);
-      pub_[j] = nh.advertise<std_msgs::Float64>("/inertia_publisher/" + joint_handles[j].getName(), 100);
+//      pub_[j] = nh.advertise<std_msgs::Float64>("/inertia_publisher/" + joint_handles[j].getName(), 100);
+      this->pub_[j] = std::make_unique<realtime_tools::RealtimePublisher<std_msgs::Float64>>(
+          nh, "/inertia_publisher/" + joint_handles[j].getName(), 4);
     }
     return true;
   }
@@ -122,8 +127,13 @@ public:
         inertia_estimators_[i].fillBuffers((*joint_handles_ptr_)[i].getVelocity(), (*joint_handles_ptr_)[i].getEffort(),
                                            period);
         inertia_estimators_[i].inertiaEstimate();
-        msg_.data = inertia_estimators_[i].getJointInertia();
-        pub_[i].publish(msg_);
+
+        if (!pub_[i]->trylock())
+        {
+          return;
+        }
+        pub_[i]->msg_.data = inertia_estimators_[i].getJointInertia();
+        pub_[i]->unlockAndPublish();
         // TO DO: Provide lookup table for gain selection
         // TO DO: apply PID control
 
@@ -205,7 +215,7 @@ private:
 
   unsigned int num_joints_;
 
-  std::vector<ros::Publisher> pub_;
+  std::vector<RtPublisherPtr<std_msgs::Float64>> pub_;
   std_msgs::Float64 msg_;
 
   std::vector<InertiaEstimator> inertia_estimators_;
