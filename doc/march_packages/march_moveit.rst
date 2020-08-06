@@ -36,4 +36,5 @@ How to use the setup-assistant
   roslaunch moveit_setup_assistant setup_assistant.launch
 
 Select the `march_moveit` as the package to alter.
-You can now change the MoveIt integration. The necessary files will be automatically generated.
+You can now change the MoveIt integration. The necessary files will be automatically generated. More information on this
+can be found at `setup assistant tutorials <https://ros-planning.github.io/moveit_tutorials/doc/setup_assistant/setup_assistant_tutorial.html>`_.
