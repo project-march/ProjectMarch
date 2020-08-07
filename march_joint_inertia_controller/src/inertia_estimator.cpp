@@ -102,34 +102,30 @@ void InertiaEstimator::fillBuffers(double velocity, double effort, const ros::Du
 void InertiaEstimator::applyButter()
 {
   // Apply a sixth order Butterworth filter over the effort and acceleration signals
-  auto it1 = z1a.begin();
-  auto it2 = z2a.begin();
+  int i = 0;
   double x;
   double x_n;
 
   for (const auto& so : sos_)
   {
     x_n = *acceleration_array_.begin();
-    x = so[0] * *acceleration_array_.begin() + *it1;
-    *it1 = so[1] * x_n - so[4] * x + *it2;
-    *it2 = so[2] * x_n - so[5] * x;
-    it1++;
-    it2++;
+    x = so[0] * *acceleration_array_.begin() + z1a[i];
+    z1a[i] = so[1] * x_n - so[4] * x + z2a[i];
+    z2a[i] = so[2] * x_n - so[5] * x;
+    i++;
   }
 
   filtered_acceleration_array_.push_front(x);
   filtered_acceleration_array_.pop_back();
 
-  it1 = z1t.begin();
-  it2 = z2t.begin();
+  i = 0;
   for (const auto& so : sos_)
   {
     x_n = *joint_torque_.begin();
-    x = so[0] * *joint_torque_.begin() + *it1;
-    *it1 = so[1] * x_n - so[4] * x + *it2;
-    *it2 = so[2] * x_n - so[5] * x;
-    it1++;
-    it2++;
+    x = so[0] * *joint_torque_.begin() + z1t[i];
+    z1t[i] = so[1] * x_n - so[4] * x + z2t[i];
+    z2t[i] = so[2] * x_n - so[5] * x;
+    i++;
   }
   filtered_joint_torque_.push_front(x);
   filtered_joint_torque_.pop_back();

@@ -106,11 +106,11 @@ private:
   // z1 and z2 vectors are containers for previous time-step values in the butterworth filter
   // Might be neater to design a separate class for the filter application for arbitrary filter sizes, datasets and
   // number of signals such as: https://github.com/scipy/scipy/blob/v1.5.2/scipy/signal/_sosfilt.pyx
-  std::list<double> z1a;
-  std::list<double> z2a;
+  std::vector<double> z1a;
+  std::vector<double> z2a;
 
-  std::list<double> z1t;
-  std::list<double> z2t;
+  std::vector<double> z1t;
+  std::vector<double> z2t;
 
   // Default length 12 for the alpha calculation
   size_t acc_size_ = 12;
