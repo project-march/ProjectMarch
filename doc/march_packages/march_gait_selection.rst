@@ -28,6 +28,22 @@ of an old and new gait name. This structure requires that both gait names have m
 transition. Using the two subgait trajectories a new transition trajectory is calculated and stored as a subgait object.
 If this is calculated correctly, the new subgait trajectory is sent to the march_gait_scheduler.
 
+Balance walk
+^^^^^^^^^^^^
+The gait selection packages is currently also the package where we store dynamic gaits. One such dynamic gait is the
+balance walk gait. The graph of the balance walk gait is defined in the :ref:`march-gait-files-label`.
+Some of the subgaits in this gait are just static subgaits defined by a subgaitfile. However, some of the subgaits are dynamic.
+In these subgaits we try to move towards a capture point. A capture point is a point on the ground such that if you would
+place your foot there, you would come to a full stop. There are a lot of papers on the internet about this, most importantly
+the one introducing the principle is this `paper <https://ieeexplore-ieee-org.tudelft.idm.oclc.org/document/4115602>`_
+A capture point is calculated in the :ref:`march-data-collector-label` based on the inverted pendulum model and the movement of the center of mass.
+We use the motion planning framework MoveIt to calculate a trajectory for the swing leg towards this point. For the stance leg, the regular
+gait file is used to determine the endpoint and MoveIt is then used to calculate a trajectory towards this point.
+The balance gait class then uses the `python moveIt commander Interface <http://docs.ros.org/jade/api/moveit_commander/html/classmoveit__commander_1_1move__group_1_1MoveGroupCommander.html>`_ to plan. More information on MoveIt and
+the integration can be found at :ref:`march-moveit-label`.
+
+.. note:: Improved versions of the balance walk gait are continuously researched and developed.
+    The above description is likely slightly outdated.
 
 ROS API
 -------
