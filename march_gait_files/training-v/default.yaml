@@ -37,8 +37,8 @@ gaits:
   tilted_path_second_start: {left_open: MV_TPstart2_leftopen_v1, right_close: MV_TPstart2_rightclose_v1}
   tilted_path_first_end: {left_open: MV_TPend1_leftopen_v1, right_close: MV_TPend1_rightclose_v1}
   tilted_path_second_end: {left_open: MV_TPend2_leftopen_v1, right_close: MV_TPend2_rightclose_v1}
-  tilted_path_left_straight_start: {right_open: MV_TP_left_straightstart_rightopen_v9,
-                                  left_close: MV_TP_left_straightstart_leftclose_v6}
+  tilted_path_left_straight_start: {right_open: MV_TP_left_straightstart_rightopen_v10,
+                                  left_close: MV_TP_left_straightstart_leftclose_v10}
   tilted_path_left_single_step: {right_open: MV_TP_left_singlestep_rightopen_v12,
                                  left_close: MV_TP_left_singlestep_leftclose_v6}
   tilted_path_left_straight_end: {left_open: MV_TP_left_straightend_leftopen_v6,
@@ -57,7 +57,7 @@ gaits:
   ramp_door_slope_down: {right_open: MV_RD_slopedown_rightopen_v6, left_open: MV_RD_slopedown_leftopen_v6,
                            right_swing: MV_RD_slopedown_rightswing_v6, left_swing: MV_RD_slopedown_leftswing_v6,
                            right_close: MV_RD_slopedown_rightclose_v6, left_close: MV_RD_slopedown_leftclose_v6}
-  ramp_door_last_step: {right_open: MV_RD_laststep_rightopen_v2, left_close: MV_RD_laststep_leftclose_v2}
+  ramp_door_last_step: {right_open: MV_RD_laststep_rightopen_v2, left_close: MV_RD_laststep_leftclose_v5}
   ramp_door_slope_down_single: {right_open: MV_RD_slopedownsingle_rightopen_v2,
                                 left_close: MV_RD_slopedownsingle_leftclose_v2}
   ramp_door_slope_down_fixed: {right_open: MV_RD_slopedown_fixed_rightopen_v1,
