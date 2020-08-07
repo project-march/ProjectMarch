@@ -20,9 +20,9 @@ std::list<double> absolute(const std::list<double>& a)
 double mean(const std::list<double>& a)
 {
   double sum = 0.0;
-  for (auto it = a.begin(); it != a.end(); it++)
+  for (const auto& it : a)
   {
-    sum += *it;
+    sum += it;
   }
   if (a.size() == 0)
   {
@@ -77,11 +77,6 @@ void InertiaEstimator::setAccSize(size_t acc_size)
 double InertiaEstimator::getJointInertia()
 {
   return joint_inertia_;
-}
-
-double InertiaEstimator::getJointVibration()
-{
-  return vibration_;
 }
 
 // Fills the buffers so that non-zero values may be computed by the inertia estimator
@@ -200,9 +195,9 @@ void InertiaEstimator::initP(unsigned int samples)
   double mean_value = mean(standard_deviation);
   double sum = 0;
 
-  for (auto it = standard_deviation.begin(); it != standard_deviation.end(); it++)
+  for (const auto& it : standard_deviation)
   {
-    sum += std::pow(*it - mean_value, 2);
+    sum += std::pow(it - mean_value, 2);
   }
   corr_coeff_ = 100 * (sum / samples);
 }

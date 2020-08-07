@@ -44,7 +44,6 @@ public:
 
   double getAcceleration();
   double getJointInertia();
-  double getJointVibration();
 
   void setLambda(double lambda);
   void setAccSize(size_t acc_size);
