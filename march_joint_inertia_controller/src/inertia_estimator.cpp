@@ -57,8 +57,7 @@ InertiaEstimator::InertiaEstimator(double lambda, size_t acc_size)
 
 double InertiaEstimator::getAcceleration()
 {
-  auto a = *acceleration_array_.begin();
-  return a;
+  return acceleration_array_.front();
 }
 
 void InertiaEstimator::setLambda(double lambda)
@@ -108,7 +107,7 @@ void InertiaEstimator::applyButter()
 
   for (const auto& so : sos_)
   {
-    x_n = *acceleration_array_.begin();
+    x_n = acceleration_array_.front();
     x = so[0] * *acceleration_array_.begin() + z1a[i];
     z1a[i] = so[1] * x_n - so[4] * x + z2a[i];
     z2a[i] = so[2] * x_n - so[5] * x;
@@ -141,8 +140,8 @@ void InertiaEstimator::inertiaEstimate()
   K_a_ = alphaCalculation();
   auto ita = filtered_acceleration_array_.begin();
   auto itt = filtered_joint_torque_.begin();
-  const double torque_e = *itt - *(++itt);
-  const double acc_e = *ita - *(++ita);
+  const double torque_e = *itt - *(itt + 1);
+  const double acc_e = *ita - *(ita + 1);
   joint_inertia_ = (torque_e - (acc_e * joint_inertia_)) * K_i_ * K_a_ + joint_inertia_;
 }
 
@@ -158,7 +157,7 @@ double InertiaEstimator::alphaCalculation()
 double InertiaEstimator::gainCalculation()
 {
   auto it = filtered_acceleration_array_.begin();
-  auto error = *it - *(++it);
+  auto error = *it - *(it + 1);
   return (corr_coeff_ * error) / (lambda_ + corr_coeff_ * pow(error, 2));
 }
 
@@ -166,7 +165,7 @@ double InertiaEstimator::gainCalculation()
 void InertiaEstimator::correlationCalculation()
 {
   auto it = filtered_acceleration_array_.begin();
-  corr_coeff_ = corr_coeff_ / (lambda_ + corr_coeff_ * pow(*it - *(++it), 2));
+  corr_coeff_ = corr_coeff_ / (lambda_ + corr_coeff_ * pow(*it - *(it + 1), 2));
   const double large_number = 10e8;
   if (corr_coeff_ > large_number)
   {
@@ -191,7 +190,7 @@ double InertiaEstimator::vibrationCalculation()
 double InertiaEstimator::discreteSpeedDerivative(const ros::Duration& period)
 {
   auto it = velocity_array_.begin();
-  return (*it - *(++it)) / period.toSec();
+  return (*it - *(it + 1)) / period.toSec();
 }
 
 void InertiaEstimator::initP(unsigned int samples)
