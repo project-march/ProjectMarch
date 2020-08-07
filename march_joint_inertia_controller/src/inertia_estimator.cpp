@@ -205,5 +205,4 @@ void InertiaEstimator::initP(unsigned int samples)
     sum += std::pow(*it - mean_value, 2);
   }
   corr_coeff_ = 100 * (sum / samples);
-  return;
 }
