@@ -37,18 +37,20 @@ march:
           std_samples: 100 # number of samples used to calculate the standard deviation
           lambda: 0.96 # Usually chosen between 0.9 and 1.0, but not bigger than one or less than zero
           alpha_filter_size: 12 # Determines the filter size in the alpha calculation, recommended between 8 and 32
+          vibration_boundaries: {1.4, 1.9}
           control_points: # All arrays must be of same size. Each inertia corresponds to a gain
-            inertia: [0.0, 1.0]
-            p: [150, 300]
-            d: [0, 5]
+            inertia: {0.0, 1.0}
+            p: {150, 300}
+            d: {0, 5}
         linear:
           std_samples: 100 # number of samples used to calculate the standard deviation
           lambda: 0.96
           alpha_filter_size: 12
+          vibration_boundaries: {1.4, 1.9}
           control_points:
-            inertia: [0.0, 1.0]
-            p: [150, 300]
-            d: [0, 5]
+            inertia: {0.0, 1.0}
+            p: {150, 300}
+            d: {0, 5}
       constraints:
         left_ankle:
           trajectory: 0.305

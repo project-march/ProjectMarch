@@ -73,6 +73,12 @@ void InertiaEstimator::setAccSize(size_t acc_size)
   filtered_acceleration_array_.resize(acc_size_, 0.0);
 }
 
+void InertiaEstimator::setVibrationBoundaries(std::vector<double> boundaries)
+{
+  min_alpha_ = boundaries[0];
+  max_alpha_ = boundaries[1];
+}
+
 double InertiaEstimator::getJointInertia()
 {
   return joint_inertia_;
@@ -135,8 +141,8 @@ void InertiaEstimator::inertiaEstimate()
   K_a_ = alphaCalculation();
   auto ita = filtered_acceleration_array_.begin();
   auto itt = filtered_joint_torque_.begin();
-  const double torque_e = *itt - *(itt++);
-  const double acc_e = *ita - *(ita++);
+  const double torque_e = *itt - *(++itt);
+  const double acc_e = *ita - *(++ita);
   joint_inertia_ = (torque_e - (acc_e * joint_inertia_)) * K_i_ * K_a_ + joint_inertia_;
 }
 
@@ -152,7 +158,7 @@ double InertiaEstimator::alphaCalculation()
 double InertiaEstimator::gainCalculation()
 {
   auto it = filtered_acceleration_array_.begin();
-  auto error = *it - *(it++);
+  auto error = *it - *(++it);
   return (corr_coeff_ * error) / (lambda_ + corr_coeff_ * pow(error, 2));
 }
 
@@ -160,7 +166,7 @@ double InertiaEstimator::gainCalculation()
 void InertiaEstimator::correlationCalculation()
 {
   auto it = filtered_acceleration_array_.begin();
-  corr_coeff_ = corr_coeff_ / (lambda_ + corr_coeff_ * pow(*it - *(it++), 2));
+  corr_coeff_ = corr_coeff_ / (lambda_ + corr_coeff_ * pow(*it - *(++it), 2));
   const double large_number = 10e8;
   if (corr_coeff_ > large_number)
   {
@@ -185,7 +191,7 @@ double InertiaEstimator::vibrationCalculation()
 double InertiaEstimator::discreteSpeedDerivative(const ros::Duration& period)
 {
   auto it = velocity_array_.begin();
-  return (*it - *(it++)) / period.toSec();
+  return (*it - *(++it)) / period.toSec();
 }
 
 void InertiaEstimator::initP(unsigned int samples)

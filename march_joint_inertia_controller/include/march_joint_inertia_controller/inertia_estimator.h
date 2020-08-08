@@ -47,6 +47,7 @@ public:
 
   void setLambda(double lambda);
   void setAccSize(size_t acc_size);
+  void setVibrationBoundaries(std::vector<double> boundaries);
 
   /**
    * \brief Applies the Butterworth filter over the last two samples and returns the resulting filtered value
@@ -92,8 +93,8 @@ public:
   std::list<double> standard_deviation;
 
 private:
-  double min_alpha_ = 1.4;  // You might want to be able to adjust this value from a yaml/launch file
-  double max_alpha_ = 1.9;  // You might want to be able to adjust this value from a yaml/launch file
+  double min_alpha_;  // You might want to be able to adjust this value from a yaml/launch file
+  double max_alpha_;  // You might want to be able to adjust this value from a yaml/launch file
 
   // This is a sixth order butterworth filter with a cutoff frequency at 15Hz in Second Order Sections form
   std::vector<std::vector<double>> sos_{

@@ -65,14 +65,18 @@ public:
     // Obtain inertia estimator parameters from server
     double lambda[2];
     int alpha_filter_size[2];
+    std::vector<std::vector<double>> vibration_boundaries{ { 0.0, 0.0 }, { 0.0, 0.0 } };
+    std::vector<double> default_vibration = { 0.0, 1.0 };
     ros::NodeHandle rotary_estimator_nh(nh, std::string("inertia_estimator/rotary"));
     rotary_estimator_nh.param("std_samples", samples_, 100);
     rotary_estimator_nh.param("lambda", lambda[0], 1.0);
     rotary_estimator_nh.param("alpha_filter_size", alpha_filter_size[0], 12);
+    rotary_estimator_nh.param("vibration_boundaries", vibration_boundaries[0], default_vibration);
 
     ros::NodeHandle linear_estimator_nh(nh, std::string("inertia_estimator/linear"));
     linear_estimator_nh.param("lambda", lambda[1], 1.0);
     linear_estimator_nh.param("alpha_filter_size", alpha_filter_size[1], 12);
+    linear_estimator_nh.param("vibration_boundaries", vibration_boundaries[1], default_vibration);
 
     // Initialize the estimator parameters
     inertia_estimators_.resize(num_joints_);
@@ -80,6 +84,7 @@ public:
     {
       inertia_estimators_[j].setLambda(lambda[(int)floor(j / 2) % 2]);  // Produce sequence 00110011
       inertia_estimators_[j].setAccSize(alpha_filter_size[(int)floor(j / 2) % 2]);
+      inertia_estimators_[j].setVibrationBoundaries(vibration_boundaries[(int)floor(j / 2) % 2]);
       //      pub_[j] = nh.advertise<std_msgs::Float64>("/inertia_publisher/" + joint_handles[j].getName(), 100);
       this->pub_[j] = std::make_unique<realtime_tools::RealtimePublisher<std_msgs::Float64>>(
           nh, "/inertia_publisher/" + joint_handles[j].getName(), 4);
