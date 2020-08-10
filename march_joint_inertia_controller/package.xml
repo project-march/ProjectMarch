@@ -3,7 +3,7 @@
 <package format="3">
   <name>march_joint_inertia_controller</name>
   <version>0.0.0</version>
-  <description>ROS controller which can be customized to operate in different circumstances.  </description>
+  <description>ROS controller which can be customized to operate in different circumstances.</description>
 
   <maintainer email="software@projectmarch.nl">Project March</maintainer>
 
@@ -11,11 +11,22 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <depend>actionlib</depend>
+  <depend>actionlib_msgs</depend>
+  <depend>control_msgs</depend>
+  <depend>controller_manager</depend>
   <depend>controller_interface</depend>
+  <depend>joint_state_controller</depend>
+  <depend>joint_trajectory_controller</depend>
+  <depend>march_hardware</depend>
+  <depend>march_shared_resources</depend>
   <depend>pluginlib</depend>
+  <depend>realtime_tools</depend>
   <depend>roscpp</depend>
+  <depend>std_msgs</depend>
+  <depend>urdf</depend>
 
   <export>
-    <controller_interface plugin="${prefix}/controller_plugins.xml" />
+    <controller_interface plugin="${prefix}/controller_plugins.xml"/>
   </export>
 </package>

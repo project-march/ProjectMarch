@@ -1,5 +1,8 @@
-<library path="lib/libjoint_inertia_controller_lib">
-  <class name="joint_inertia_controller/InertiaController"
-         type="joint_inertia_controller::InertiaController"
-         base_class_type="controller_interface::ControllerBase" />
+<library path="lib/libmarch_joint_inertia_controller">
+    <class name="joint_inertia_controller/InertiaController"
+           type="joint_inertia_controller::InertiaController"
+           base_class_type="controller_interface::ControllerBase"/>
+    <class name="inertia_trajectory_controller/JointTrajectoryController"
+           type="inertia_trajectory_controller::JointTrajectoryController"
+           base_class_type="controller_interface::ControllerBase"/>
 </library>

@@ -1,12 +1,94 @@
+# This is a template for the controllers.yaml used in the HWI and in the simulation, note the inertia_estimator.
+
 march:
-  joint_inertia_controller:
-    type: joint_inertia_controller/InertiaController
-    joints:
-      - left_ankle
-      - left_hip_aa
-      - left_hip_fe
-      - left_knee
-      - right_ankle
-      - right_hip_aa
-      - right_hip_fe
-      - right_knee
+  controller:
+    pdb_state:
+      type: march_pdb_state_controller/MarchPdbStateController
+      publish_rate: 50
+    joint_state:
+      type: joint_state_controller/JointStateController
+      publish_rate: 250
+    temperature_sensor:
+      type: march_temperature_sensor_controller/MarchTemperatureSensorController
+      publish_rate: 1
+    joint_inertia_controller:
+      type: joint_inertia_controller/InertiaController
+      allow_partial_joints_goal: true
+      joints:
+        - left_ankle
+        - left_hip_aa
+        - left_hip_fe
+        - left_knee
+        - right_ankle
+        - right_hip_aa
+        - right_hip_fe
+        - right_knee
+      gains: # Required because we're controlling an effort interface
+        left_ankle: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
+        left_hip_aa: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
+        left_hip_fe: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
+        left_knee: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
+        right_ankle: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
+        right_hip_aa: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
+        right_hip_fe: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
+        right_knee: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
+      inertia_estimator:
+        rotary:
+          std_samples: 100 # number of samples used to calculate the standard deviation
+          lambda: 0.96 # Usually chosen between 0.9 and 1.0, but not bigger than one or less than zero
+          alpha_filter_size: 12 # Determines the filter size in the alpha calculation, recommended between 8 and 32
+          vibration_boundaries:
+            - 1.4
+            - 1.9
+          control_points:
+            inertia:
+              - 0.0
+              - 1.0
+            p:
+              - 150
+              - 300
+            d:
+              - 0
+              - 5
+        linear:
+          std_samples: 100 # number of samples used to calculate the standard deviation
+          lambda: 0.96
+          alpha_filter_size: 12
+          vibration_boundaries:
+            - 1.4
+            - 1.9
+          control_points:
+            inertia:
+              - 0.0
+              - 1.0
+            p:
+              - 150
+              - 300
+            d:
+              - 0
+              - 5
+      constraints:
+        left_ankle:
+          trajectory: 0.305
+          goal: 0.305
+        left_hip_aa:
+          trajectory: 0.305
+          goal: 0.305
+        left_hip_fe:
+          trajectory: 0.305
+          goal: 0.305
+        left_knee:
+          trajectory: 0.305
+          goal: 0.305
+        right_ankle:
+          trajectory: 0.305
+          goal: 0.305
+        right_hip_aa:
+          trajectory: 0.305
+          goal: 0.305
+        right_hip_fe:
+          trajectory: 0.305
+          goal: 0.305
+        right_knee:
+          trajectory: 0.305
+          goal: 0.305
