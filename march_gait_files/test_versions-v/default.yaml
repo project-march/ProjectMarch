@@ -117,110 +117,134 @@ gaits:
     right_swing: MV_walksmall_rightswing_v1
 positions:
   stand:
-    left_ankle: 0.0436
-    left_hip_aa: 0.0
-    left_hip_fe: -0.0873
-    left_knee: 0.0
-    right_ankle: 0.0436
-    right_hip_aa: 0.0
-    right_hip_fe: -0.0873
-    right_knee: 0.0
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.0436
+      left_hip_aa: 0.0
+      left_hip_fe: -0.0873
+      left_knee: 0.0
+      right_ankle: 0.0436
+      right_hip_aa: 0.0
+      right_hip_fe: -0.0873
+      right_knee: 0.0
   idle_1:
-    left_ankle: 0.0436
-    left_hip_aa: 0.0873
-    left_hip_fe: -0.0873
-    left_knee: 0.0
-    right_ankle: 0.1309
-    right_hip_aa: -0.0524
-    right_hip_fe: 0.5236
-    right_knee: 0.8203
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.0436
+      left_hip_aa: 0.0873
+      left_hip_fe: -0.0873
+      left_knee: 0.0
+      right_ankle: 0.1309
+      right_hip_aa: -0.0524
+      right_hip_fe: 0.5236
+      right_knee: 0.8203
   idle_2:
-    left_ankle: 0.0436
-    left_hip_aa: 0.0
-    left_hip_fe: 1.5708
-    left_knee: 1.7453
-    right_ankle: 0.0436
-    right_hip_aa: 0.0
-    right_hip_fe: 1.5708
-    right_knee: 1.7453
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.0436
+      left_hip_aa: 0.0
+      left_hip_fe: 1.5708
+      left_knee: 1.7453
+      right_ankle: 0.0436
+      right_hip_aa: 0.0
+      right_hip_fe: 1.5708
+      right_knee: 1.7453
   idle_3:
-    left_ankle: 0.0436
-    left_hip_aa: 0.0
-    left_hip_fe: -0.0873
-    left_knee: 0.0
-    right_ankle: 0.0436
-    right_hip_aa: 0.0
-    right_hip_fe: 0.1745
-    right_knee: 0.4363
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.0436
+      left_hip_aa: 0.0
+      left_hip_fe: -0.0873
+      left_knee: 0.0
+      right_ankle: 0.0436
+      right_hip_aa: 0.0
+      right_hip_fe: 0.1745
+      right_knee: 0.4363
   idle_4:
-    left_ankle: -0.2618
-    left_hip_aa: 0.0
-    left_hip_fe: -0.0873
-    left_knee: 0.0
-    right_ankle: -0.2618
-    right_hip_aa: 0.0
-    right_hip_fe: -0.0873
-    right_knee: 0.0
+    gait_type: walk_like
+    joints:
+      left_ankle: -0.2618
+      left_hip_aa: 0.0
+      left_hip_fe: -0.0873
+      left_knee: 0.0
+      right_ankle: -0.2618
+      right_hip_aa: 0.0
+      right_hip_fe: -0.0873
+      right_knee: 0.0
   sit:
-    left_ankle: 0.0436
-    left_hip_aa: 0.0
-    left_hip_fe: 1.2217
-    left_knee: 1.5708
-    right_ankle: 0.0436
-    right_hip_aa: 0.0
-    right_hip_fe: 1.2217
-    right_knee: 1.5708
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.0436
+      left_hip_aa: 0.0
+      left_hip_fe: 1.2217
+      left_knee: 1.5708
+      right_ankle: 0.0436
+      right_hip_aa: 0.0
+      right_hip_fe: 1.2217
+      right_knee: 1.5708
   idle_6:
-    left_ankle: 0.0436
-    left_hip_aa: 0.0
-    left_hip_fe: 0.1745
-    left_knee: 0.4363
-    right_ankle: 0.0436
-    right_hip_aa: 0.0
-    right_hip_fe: -0.0873
-    right_knee: 0.0
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.0436
+      left_hip_aa: 0.0
+      left_hip_fe: 0.1745
+      left_knee: 0.4363
+      right_ankle: 0.0436
+      right_hip_aa: 0.0
+      right_hip_fe: -0.0873
+      right_knee: 0.0
   idle_7:
-    left_ankle: 0.1309
-    left_hip_aa: -0.0524
-    left_hip_fe: 0.5236
-    left_knee: 0.8203
-    right_ankle: 0.0436
-    right_hip_aa: 0.0873
-    right_hip_fe: -0.0873
-    right_knee: 0.0
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.1309
+      left_hip_aa: -0.0524
+      left_hip_fe: 0.5236
+      left_knee: 0.8203
+      right_ankle: 0.0436
+      right_hip_aa: 0.0873
+      right_hip_fe: -0.0873
+      right_knee: 0.0
   idle_8:
-    left_ankle: 0.0436
-    left_hip_aa: 0.1222
-    left_hip_fe: -0.0873
-    left_knee: 0.0
-    right_ankle: 0.0436
-    right_hip_aa: -0.0873
-    right_hip_fe: 0.6109
-    right_knee: 0.9076
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.0436
+      left_hip_aa: 0.1222
+      left_hip_fe: -0.0873
+      left_knee: 0.0
+      right_ankle: 0.0436
+      right_hip_aa: -0.0873
+      right_hip_fe: 0.6109
+      right_knee: 0.9076
   idle_9:
-    left_ankle: 0.0436
-    left_hip_aa: -0.0873
-    left_hip_fe: 0.6109
-    left_knee: 0.9076
-    right_ankle: 0.0436
-    right_hip_aa: 0.1222
-    right_hip_fe: -0.0873
-    right_knee: 0.0
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.0436
+      left_hip_aa: -0.0873
+      left_hip_fe: 0.6109
+      left_knee: 0.9076
+      right_ankle: 0.0436
+      right_hip_aa: 0.1222
+      right_hip_fe: -0.0873
+      right_knee: 0.0
   idle_10:
-    left_ankle: 0.0436
-    left_hip_aa: 0.0
-    left_hip_fe: -0.0873
-    left_knee: 0.0
-    right_ankle: 0.0436
-    right_hip_aa: 0.0
-    right_hip_fe: 0.4014
-    right_knee: 0.6981
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.0436
+      left_hip_aa: 0.0
+      left_hip_fe: -0.0873
+      left_knee: 0.0
+      right_ankle: 0.0436
+      right_hip_aa: 0.0
+      right_hip_fe: 0.4014
+      right_knee: 0.6981
   idle_11:
-    left_ankle: 0.0436
-    left_hip_aa: 0.0
-    left_hip_fe: 0.4014
-    left_knee: 0.6981
-    right_ankle: 0.0436
-    right_hip_aa: 0.0
-    right_hip_fe: -0.0873
-    right_knee: 0.0
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.0436
+      left_hip_aa: 0.0
+      left_hip_fe: 0.4014
+      left_knee: 0.6981
+      right_ankle: 0.0436
+      right_hip_aa: 0.0
+      right_hip_fe: -0.0873
+      right_knee: 0.0
