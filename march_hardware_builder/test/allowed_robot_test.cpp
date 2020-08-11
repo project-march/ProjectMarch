@@ -36,3 +36,10 @@ TEST(AllowedRobotTest, TestTestLinearSetupCreation)
   urdf.initFile(ros::package::getPath("march_description").append("/urdf/test_joint_linear.urdf"));
   ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::test_joint_linear, urdf).createMarchRobot());
 }
+
+TEST(AllowedRobotTest, TestTestRotationalSetupCreation)
+{
+  urdf::Model urdf;
+  urdf.initFile(ros::package::getPath("march_description").append("/urdf/test_joint_rotational.urdf"));
+  ASSERT_NO_THROW(HardwareBuilder(AllowedRobot::test_joint_rotational, urdf).createMarchRobot());
+}
