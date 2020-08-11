@@ -17,3 +17,9 @@ march:
 #      gains: # Required because we're controlling an effort interface
 #        test_joint: {p: 50, i: 0, d: 10, i_clamp: 10, publish_state: true, antiwindup: true}
         # Note: these gains are tuned for the KFE joints in the exoskeleton
+
+      constraints:
+        linear_joint:
+          margin_soft_limit_error: 0.5
+          trajectory: 0.305
+          goal: 0.305
