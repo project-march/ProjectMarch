@@ -13,3 +13,8 @@ march:
       type: position_controllers/JointTrajectoryController
       joints:
         - rotational_joint
+      constraints:
+        rotational_joint:
+          margin_soft_limit_error: 0.5
+          trajectory: 0.305
+          goal: 0.305
