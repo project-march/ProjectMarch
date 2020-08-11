@@ -8,6 +8,7 @@
     <arg name="obstacle" default="none" doc="Obstacle to load in the simulation."/>
     <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_rotational."/>
     <arg name="balance" default="false" doc="Uses the dynamic balance gaits instead of the predefined gaits."/>
+    <arg name="controller" default="effort_control" doc="Changes the controller used by simulation."/>
 
     <!-- Load the URDF into the ROS Parameter Server -->
     <!-- Override effort values as Gazebo uses different units than the actual IMC. -->
@@ -23,7 +24,7 @@
                     ground_gait:=$(arg ground_gait)" />
 
     <!-- Upload the controller configuration -->
-    <rosparam file="$(find march_simulation)/config/$(arg robot).yaml" command="load"/>
+    <rosparam file="$(find march_simulation)/config/$(arg controller)/$(arg robot).yaml" command="load"/>
 
     <group ns="march">
         <node name="controller_spawner" pkg="controller_manager" type="controller_manager"
