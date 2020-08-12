@@ -27,10 +27,11 @@ gaits:
                                     left_close: MV_RT_third_middlestep_leftclose_v2}
   walk: {right_open: MV_walk_rightopen_v3, left_swing: MV_walk_leftswing_v2, right_swing: MV_walk_rightswing_v2,
          left_close: MV_walk_leftclose_v3a, right_close: MV_walk_rightclose_v3a}
-  slalom_walk: {right_open: MIV_final, left_swing: MIV_final, right_swing: MIV_final,
+  slalom_walk: {right_open: MIV_final, left_swing: MV_slalom_leftswing_v2, right_swing: MV_slalom_rightswing_v2,
                 left_close: MIV_final, right_close: MIV_final}
   single_step_normal: {right_open: MIV_final, left_close: MIV_final}
   single_step_small: {right_open: MIV_final_v2, left_close: MIV_final}
+  single_step_mini: {right_open: MV_singlemini_rightopen_v1, left_close: MV_singlemini_leftclose_v1}
   sit: {sit_down: MIV_final, sit_home: MIV_final}
   stand: {prepare_stand_up: MIV_final, stand_up: MIV_final}
   tilted_path_first_start: {left_open: MV_TPstart1_leftopen_v1, right_close: MV_TPstart1_rightclose_v1}
@@ -51,9 +52,9 @@ gaits:
   tilted_path_right_straight_end: {right_open: MV_TP_right_straightend_rightopen_v6,
                                    left_close: MV_TP_right_straightend_leftclose_v6}
   tilted_path_right_knee_bend: {right_open: MV_TP_right_kneebend_rightopen_v6}
-  stairs_up: {right_open: MV_stairsup_rightopen_v15, left_swing: MV_stairsup_leftswing_v15,
-              right_swing: MV_stairsup_rightswing_v15, left_close: MV_stairsup_leftclose_v15,
-              right_close: MV_stairsup_rightclose_v15}
+  stairs_up: {right_open: MV_stairsup_rightopen_v17, left_swing: MV_stairsup_leftswing_v17,
+              right_swing: MV_stairsup_rightswing_v17, left_close: MV_stairsup_leftclose_v17,
+              right_close: MV_stairsup_rightclose_v17}
   stairs_up_single_step: {right_open: MV_stairsup_single_rightopen_v7, left_close: MV_stairsup_single_leftclose_v7}
   stairs_down_single_step: {right_open: MV_stairsdown_single_rightopen_v4,
                             left_close: MV_stairsdown_single_leftclose_v4}
