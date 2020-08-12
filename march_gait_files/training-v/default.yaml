@@ -7,6 +7,7 @@ gaits:
   side_step_right_small: {right_open: MIV_final, left_close: MIV_final}
   single_step_normal: {right_open: MIV_final, left_close: MIV_final}
   single_step_small: {right_open: MIV_final_v2, left_close: MIV_final}
+  single_step_mini: {right_open: MV_singlemini_rightopen_v1, left_close: MV_singlemini_leftclose_v1}
   sit: {sit_down: MIV_final, sit_home: MIV_final}
   stand: {prepare_stand_up: MIV_final, stand_up: MIV_final}
   sofa_sit: {sit_down: MIV_final, sit_home: MIV_final}
