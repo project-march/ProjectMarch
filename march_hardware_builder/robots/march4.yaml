@@ -28,7 +28,7 @@ march4:
           slaveIndex: 6
           absoluteEncoder:
             resolution: 12
-            minPositionIU: 1040
+            minPositionIU: 1039
             maxPositionIU: 1427
           incrementalEncoder:
             resolution: 13
@@ -88,8 +88,8 @@ march4:
           slaveIndex: 8
           absoluteEncoder:
             resolution: 12
-            minPositionIU: 3700
-            maxPositionIU: 4082
+            minPositionIU: 3694
+            maxPositionIU: 4076
           incrementalEncoder:
             resolution: 13
             transmission: 200
