@@ -10,10 +10,14 @@ gaits:
     right_swing_2: MV_balancewalk_rightswing2_v2
   walk:
     left_close: MV_walk_leftclose_v2
+    left_close_large: MV_walklarge_leftclose_v1
     left_swing: MV_walk_leftswing_v2
+    left_swing_large: MV_walklarge_leftswing_v1
     right_close: MV_walk_rightclose_v2
+    right_close_large: MV_walklarge_rightclose_v1
     right_open: MV_walk_rightopen_v2
     right_swing: MV_walk_rightswing_v2
+    right_swing_large: MV_walklarge_rightswing_v1
 positions:
   stand:
     gait_type: walk_like
