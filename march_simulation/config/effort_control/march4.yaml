@@ -7,7 +7,7 @@ march:
 
   controller:
     trajectory:
-      type: "effort_controllers/JointTrajectoryController"
+      type: effort_controllers/JointTrajectoryController
       joints:
         - left_ankle
         - left_hip_aa

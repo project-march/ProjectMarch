@@ -116,14 +116,16 @@ void ObstacleController::getGoalPosition(double time_since_start, double& goal_p
 {
   // Left foot is stable unless subgait name starts with left
   auto stable_foot_pose = this->foot_left_->WorldCoGPose().Pos();
+  auto swing_foot_pose = this->foot_right_->WorldCoGPose().Pos();
   if (this->subgait_name_.substr(0, 4) == "left")
   {
     stable_foot_pose = this->foot_right_->WorldCoGPose().Pos();
+    swing_foot_pose = this->foot_left_->WorldCoGPose().Pos();
   }
 
   // Goal position is determined from the location of the stable foot
   goal_position_x = stable_foot_pose.X();
-  goal_position_y = stable_foot_pose.Y();
+  goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
 
   // Start goal position a quarter step size behind the stable foot
   // Move the goal position forward with v = 0.5 * swing_step_size/subgait_duration
