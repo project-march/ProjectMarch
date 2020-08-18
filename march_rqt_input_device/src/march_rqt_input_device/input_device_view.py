@@ -86,8 +86,8 @@ class InputDeviceView(QWidget):
                                callback=lambda: self._controller.publish_gait('single_step_small'))
 
         gait_single_step_mini = \
-            self.create_button('gait_single_step_mini',
-                               callback=lambda: self._controller.publish_gait('gait_single_step_mini'))
+            self.create_button('single_step_mini',
+                               callback=lambda: self._controller.publish_gait('single_step_mini'))
 
         gait_single_step_normal = \
             self.create_button('single_step_normal', image_path='/gait_single_step_medium.png',
