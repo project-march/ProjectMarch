@@ -7,6 +7,7 @@ from urdf_parser_py import urdf
 
 from march_rqt_gait_generator.gait_generator_controller import GaitGeneratorController
 from march_rqt_gait_generator.model.modifiable_subgait import ModifiableSubgait
+from march_shared_classes.exceptions.general_exceptions import FileNotFoundError
 
 PKG = 'march_rqt_gait_generator'
 
@@ -176,9 +177,8 @@ class GaitGeneratorControllerTest(unittest.TestCase):
                                                                                version=self.version)
         self.gait_generator_view.open_file_dialogue = Mock(return_value=(wrong_subgait_path, None))
 
-        subgait = self.gait_generator_controller.subgait
-        self.gait_generator_controller.import_gait()
-        self.assertEqual(self.gait_generator_controller.subgait, subgait)
+        with self.assertRaises(FileNotFoundError):
+            self.gait_generator_controller.import_gait()
 
     def test_import_gait(self):
         self.gait_generator_view.open_file_dialogue = Mock(return_value=(self.subgait_path, None))
