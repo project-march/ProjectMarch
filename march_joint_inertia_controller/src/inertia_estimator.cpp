@@ -103,8 +103,8 @@ void InertiaEstimator::applyButter()
 {
   // Apply a sixth order Butterworth filter over the effort and acceleration signals
   int i = 0;
-  double x;
-  double x_n;
+  double x = 0.0;
+  double x_n = 0.0;
 
   for (const auto& so : sos_)
   {
