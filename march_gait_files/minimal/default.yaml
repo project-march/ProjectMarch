@@ -4,8 +4,8 @@ gaits:
     left_swing_1: MV_balancewalk_leftswing1_v2
     left_swing_2: MV_balancewalk_leftswing2_v2
     right_close: MV_walk_rightclose_v2
-    right_open_1: MV_balancewalk_rightopen1_v2
-    right_open_2: MV_balancewalk_rightopen2_v2
+    right_open_1: MV_balancewalk_rightopen1_v6_4
+    right_open_2: MV_balancewalk_rightopen2_v6_3
     right_swing_1: MV_balancewalk_rightswing1_v2
     right_swing_2: MV_balancewalk_rightswing2_v2
   walk:
@@ -34,3 +34,4 @@ positions:
       right_hip_aa: 0.0
       right_hip_fe: -0.0873
       right_knee: 0.0
+
