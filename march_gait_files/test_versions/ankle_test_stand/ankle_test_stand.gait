@@ -1,0 +1,6 @@
+name: ankle_test_stand
+subgaits:
+  ankle_test_stand:
+    to: end
+  start:
+    to: ankle_test_stand
