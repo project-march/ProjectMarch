@@ -2,8 +2,8 @@ gaits:
   home_stand: {home_stand: MIV_final}
   walk: {right_open: MV_walk_rightopen_v2, left_swing: MV_walk_leftswing_v2, right_swing: MV_walk_rightswing_v2,
          left_close: MV_walk_leftclose_v2, right_close: MV_walk_rightclose_v2}
-  balance_walk: {right_open_1: MV_balancewalk_rightopen1_v2,
-                 right_open_2: MV_balancewalk_rightopen2_v2,
+  balance_walk: {right_open_1: MV_balancewalk_rightopen1_v6_4,
+                 right_open_2: MV_balancewalk_rightopen2_v6_3,
                  left_swing_1: MV_balancewalk_leftswing1_v2,
                  left_swing_2: MV_balancewalk_leftswing2_v2,
                  right_swing_1: MV_balancewalk_rightswing1_v2,
