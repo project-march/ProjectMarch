@@ -1,8 +1,4 @@
 gaits:
-  home_sit:
-    home_sit: MIV_final
-  home_stand:
-    home_stand: MIV_final
   side_step_left:
     left_open: MIV_final
     right_close: MIV_final

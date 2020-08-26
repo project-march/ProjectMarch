@@ -1,8 +1,4 @@
 gaits:
-  home_sit:
-    home_sit: MIV_final
-  home_stand:
-    home_stand: MIV_final
   ramp_door_slope_up:
     right_open: MV_RD_slopeup_rightopen_v4
     left_open: MV_RD_slopeup_leftopen_v4

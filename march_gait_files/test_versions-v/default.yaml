@@ -1,8 +1,4 @@
 gaits:
-  home_sit:
-    home_sit: MIV_ankle_2.5
-  home_stand:
-    home_stand: MIV_ankle_2.5
   ramp_door_slope_up:
     right_open: MV_RD_slopeup_rightopen_v1
     left_open: MV_RD_slopeup_leftopen_v1
