@@ -15,7 +15,7 @@ corresponding to the requested gait/subgait name.
 
 Behavior
 --------
-The gait state machine accepts or declines a gait request originating from the
+The gait state machine accepts or declines a gait request originating from an
 input device. If the gait is accepted by the state machine, the requested gait
 will be loaded from the ``GaitSelection`` instance and performed. If executed
 correctly, subgait trajectories will be sent over to the trajectory controller.
