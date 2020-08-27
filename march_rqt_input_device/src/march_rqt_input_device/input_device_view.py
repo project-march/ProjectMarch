@@ -93,7 +93,6 @@ class InputDeviceView(QWidget):
             self.create_button('gait_single_step_normal', image_path='/gait_single_step_medium.png',
                                callback=lambda: self._controller.publish_gait('gait_single_step_normal'))
 
-
         gait_side_step_left = \
             self.create_button('gait_side_step_left', image_path='/gait_side_step_left.png',
                                callback=lambda: self._controller.publish_gait('gait_side_step_left'))
