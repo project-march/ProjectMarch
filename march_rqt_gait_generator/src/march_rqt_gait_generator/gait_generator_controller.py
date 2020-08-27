@@ -217,7 +217,11 @@ class GaitGeneratorController(object):
     def import_gait(self):
         file_name, f = self.view.open_file_dialogue()
 
-        gait = ModifiableSubgait.from_file(self.robot, file_name, self)
+        if file_name != '':
+            gait = ModifiableSubgait.from_file(self.robot, file_name, self)
+        else:
+            gait = None
+
         if gait is None:
             rospy.logwarn('Could not load gait %s', file_name)
             return
@@ -247,7 +251,11 @@ class GaitGeneratorController(object):
     def import_side_subgait(self, side='previous'):
         file_name, f = self.view.open_file_dialogue()
 
-        subgait = ModifiableSubgait.from_file(self.robot, file_name, self)
+        if file_name != '':
+            subgait = ModifiableSubgait.from_file(self.robot, file_name, self)
+        else:
+            subgait = None
+
         if subgait is None:
             rospy.logwarn('Could not load gait %s', file_name)
             return
