@@ -93,6 +93,10 @@ class InputDeviceView(QWidget):
             self.create_button('gait_single_step_normal', image_path='/gait_single_step_medium.png',
                                callback=lambda: self._controller.publish_gait('gait_single_step_normal'))
 
+        gait_test_left_right = \
+            self.create_button('gait_test_left_right',
+                               callback=lambda: self._controller.publish_gait('gait_test_left_right'))
+
         gait_side_step_left = \
             self.create_button('gait_side_step_left', image_path='/gait_side_step_left.png',
                                callback=lambda: self._controller.publish_gait('gait_side_step_left'))
@@ -275,7 +279,8 @@ class InputDeviceView(QWidget):
             [gait_sofa_sit, gait_sofa_stand, gait_single_step_normal, gait_single_step_small, continue_button,
              pause_button],
 
-            [gait_stairs_up, gait_stairs_down, gait_stairs_up_single_step, gait_stairs_down_single_step],
+            [gait_stairs_up, gait_stairs_down, gait_stairs_up_single_step, gait_stairs_down_single_step,
+             gait_test_left_right],
 
             [gait_side_step_left, gait_side_step_right, gait_side_step_left_small, gait_side_step_right_small],
 
