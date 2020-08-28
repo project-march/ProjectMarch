@@ -78,8 +78,8 @@ class NotesWidget(QWidget):
         selection_model = self.table_view.selectionModel()
         if self.table_view.hasFocus() and selection_model.hasSelection():
             indices = [index for index in selection_model.selectedIndexes() if not index.column()]
-            if indices and indices[0].isValid():
-                self._model.remove_rows(indices[0].row(), len(indices))
+            if indices and all([index.isValid() for index in indices]):
+                self._model.remove_rows([index.row() for index in indices])
 
     def _set_saved(self, saved):
         self._can_save = not saved

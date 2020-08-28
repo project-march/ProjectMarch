@@ -50,26 +50,21 @@ class EntryModelTest(unittest.TestCase):
 
     def test_remove_one_row(self):
         self.model.insert_row(Entry('test'))
-        self.model.remove_rows(0)
+        self.model.remove_rows([0])
         self.assertEqual(self.model.rowCount(), 0)
 
     def test_remove_multiple_rows(self):
         self.model.insert_row(Entry('test1'))
         self.model.insert_row(Entry('test2'))
         self.model.insert_row(Entry('test3'))
-        self.model.remove_rows(1, 2)
+        self.model.remove_rows([1, 2])
         self.assertEqual(self.model.rowCount(), 1)
         self.assertEqual(self.model.data(self.model.createIndex(0, 1)), 'test1')
 
     def test_remove_rows_out_of_range(self):
         self.model.insert_row(Entry('test2'))
-        self.model.remove_rows(2, 2)
+        self.model.remove_rows([3])
         self.assertEqual(self.model.rowCount(), 1)
-
-    def test_remove_too_many_rows(self):
-        self.model.insert_row(Entry('test'))
-        self.model.remove_rows(0, 2)
-        self.assertEqual(self.model.rowCount(), 0)
 
     def test_get_row_out_of_bounds(self):
         self.assertIsNone(self.model.data(self.model.createIndex(0, 1)))
