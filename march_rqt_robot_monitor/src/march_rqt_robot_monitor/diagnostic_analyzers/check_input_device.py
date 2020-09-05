@@ -24,4 +24,3 @@ class CheckInputDevice(object):
         else:
             self._diagnostics[msg.id] = HeaderlessTopicDiagnostic('input_device {0}'.format(msg.id),
                                                                   self._updater, self._frequency_params)
-            self._updater.force_update()
