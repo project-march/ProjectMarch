@@ -5,10 +5,10 @@ Before you publish a pull request think about the definition of done for the iss
 -->
 
 <!--
-Provide the key for the Jira issue this PR resolves.
+Provide the key for the issue this PR resolves.
 -->
 
-Closes PM-
+Closes #x
 
 ## Description
 <!--
@@ -18,7 +18,6 @@ Provide a concise description on the feature/fix your pull request implements.
 ## Changes
 <!--
 Provide a list of important changes.
-
 e.g.
 * Added tests
 * Renamed variable
