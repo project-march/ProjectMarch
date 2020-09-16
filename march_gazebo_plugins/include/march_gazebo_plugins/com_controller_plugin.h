@@ -2,7 +2,7 @@
 
 #include <gazebo/common/common.hh>
 #include <gazebo/physics/physics.hh>
-#include <march_shared_resources/GaitActionGoal.h>
+#include <march_shared_resources/CurrentGait.h>
 #include <ros/callback_queue.h>
 #include <ros/ros.h>
 #include <march_gazebo_plugins/walk_controller.h>
@@ -16,7 +16,7 @@ class ComControllerPlugin : public ModelPlugin
 {
 public:
   void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/) override;
-  void onRosMsg(const march_shared_resources::GaitActionGoalConstPtr& _msg);
+  void onRosMsg(const march_shared_resources::CurrentGaitConstPtr& msg);
 
   // Called by the world update start event
   void onUpdate();

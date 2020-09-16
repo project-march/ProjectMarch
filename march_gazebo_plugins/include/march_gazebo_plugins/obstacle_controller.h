@@ -1,7 +1,7 @@
 // Copyright 2019 Project March.
 
 #include <gazebo/physics/physics.hh>
-#include <march_shared_resources/GaitActionGoal.h>
+#include <march_shared_resources/CurrentGait.h>
 
 #ifndef MARCH_GAZEBO_PLUGINS_OBSTACLE_CONTROLLER_H
 #define MARCH_GAZEBO_PLUGINS_OBSTACLE_CONTROLLER_H
@@ -13,7 +13,7 @@ class ObstacleController
 public:
   explicit ObstacleController(physics::ModelPtr model);
 
-  void newSubgait(const march_shared_resources::GaitActionGoalConstPtr& _msg);
+  void newSubgait(const march_shared_resources::CurrentGaitConstPtr& msg);
   ignition::math::v4::Vector3<double> GetCom();
   void update(ignition::math::v4::Vector3<double>& torque_all, ignition::math::v4::Vector3<double>& torque_stable);
   void getGoalPosition(double time_since_start, double& goal_position_x, double& goal_position_y);

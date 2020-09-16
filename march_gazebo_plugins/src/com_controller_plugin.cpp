@@ -31,8 +31,8 @@ void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf
   this->ros_node_ = std::make_unique<ros::NodeHandle>("com_controller_plugin");
 
   // Create a named topic, and subscribe to it.
-  ros::SubscribeOptions so = ros::SubscribeOptions::create<march_shared_resources::GaitActionGoal>(
-      "/march/gait/schedule/goal", 1, boost::bind(&ComControllerPlugin::onRosMsg, this, _1), ros::VoidPtr(),
+  ros::SubscribeOptions so = ros::SubscribeOptions::create<march_shared_resources::CurrentGait>(
+      "/march/gait_selection/current_gait", 1, boost::bind(&ComControllerPlugin::onRosMsg, this, _1), ros::VoidPtr(),
       &this->ros_queue_);
   this->ros_sub_ = this->ros_node_->subscribe(so);
 
@@ -40,9 +40,9 @@ void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf
   this->ros_queue_thread_ = std::thread(std::bind(&ComControllerPlugin::queueThread, this));
 }
 
-void ComControllerPlugin::onRosMsg(const march_shared_resources::GaitActionGoalConstPtr& _msg)
+void ComControllerPlugin::onRosMsg(const march_shared_resources::CurrentGaitConstPtr& msg)
 {
-  this->controller_->newSubgait(_msg);
+  this->controller_->newSubgait(msg);
 }
 
 // Called by the world update start event
