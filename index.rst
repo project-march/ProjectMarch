@@ -70,7 +70,6 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    doc/useful_tools/rqt
    doc/useful_tools/ros_bag
    doc/useful_tools/gazebo
-   doc/useful_tools/smach
    doc/useful_tools/event_stream_processing
 
 .. toctree::
@@ -122,5 +121,4 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
   doc/march_packages/march_safety
   doc/march_packages/march_shared_classes
   doc/march_packages/march_shared_resources
-  doc/march_packages/march_state_machine
   doc/march_packages/march_simulation
