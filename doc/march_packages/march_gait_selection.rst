@@ -103,7 +103,7 @@ Nodes
 
 Subscribed Topics
 ^^^^^^^^^^^^^^^^^
-*/march/error* (:march:`march_shared_resources/msg/Error <march_shared_resources/msg/Error.msg`)
+*/march/error* (:march:`march_shared_resources/msg/Error <march_shared_resources/msg/Error.msg>`)
   Listens for errors and shuts down when a fatal is thrown.
 
 Published Topics
