@@ -5,8 +5,9 @@ from qt_gui.plugin import Plugin
 from rosgraph_msgs.msg import Log
 import rospkg
 import rospy
-from std_msgs.msg import String
 from std_srvs.srv import Trigger
+
+from march_shared_resources.msg import CurrentState
 
 from .entry import Entry
 from .entry_model import EntryModel
@@ -33,9 +34,9 @@ class NotesPlugin(Plugin):
         self._subscribers.append(rospy.Subscriber('/rosout_agg',
                                                   Log,
                                                   self._rosout_cb))
-        self._subscribers.append(rospy.Subscriber('/march/gait/current',
-                                                  String,
-                                                  self._current_gait_cb))
+        self._subscribers.append(rospy.Subscriber('/march/gait_selection/current_state',
+                                                  CurrentState,
+                                                  self._current_state_cb))
 
         self._get_gait_version_map = rospy.ServiceProxy('/march/gait_selection/get_version_map',
                                                         Trigger)
@@ -49,22 +50,25 @@ class NotesPlugin(Plugin):
         if mapped_msg:
             self._model.insert_log_msg(mapped_msg)
 
-    def _current_gait_cb(self, current_gait):
+    def _current_state_cb(self, current_state):
         """
         Inserts an entry, which logs the current gait version used.
 
-        :type current_gait: String
-        :param current_gait: Current gait goal being executed
+        :param current_state: Current state being executed
         """
-        try:
-            gait_version_map = ast.literal_eval(self._get_gait_version_map().message)
-
-            message = 'Starting gait {0}: {1}'.format(current_gait.data,
-                                                      str(gait_version_map[current_gait.data]))
+        if current_state.state_type == CurrentState.IDLE:
+            message = 'March is idle in {state}'.format(state=current_state.state)
             self._model.insert_row(Entry(message))
-        except rospy.ServiceException as e:
-            rospy.logwarn('Failed to contact gait selection node for gait versions: {0}'.format(e))
-        except KeyError:
-            pass
-        except ValueError as e:
-            rospy.logerr('Failed to parse gait version map: {0}'.format(e))
+        elif current_state.state_type == CurrentState.GAIT:
+            try:
+                gait_version_map = ast.literal_eval(self._get_gait_version_map().message)
+
+                message = 'Starting gait {0}: {1}'.format(current_state.state,
+                                                          str(gait_version_map[current_state.state]))
+                self._model.insert_row(Entry(message))
+            except rospy.ServiceException as e:
+                rospy.logwarn('Failed to contact gait selection node for gait versions: {0}'.format(e))
+            except KeyError:
+                pass
+            except ValueError as e:
+                rospy.logerr('Failed to parse gait version map: {0}'.format(e))
