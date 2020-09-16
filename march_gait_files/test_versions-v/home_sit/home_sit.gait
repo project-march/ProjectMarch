@@ -1,6 +1,0 @@
-name: home_sit
-subgaits:
-  start:
-    to: home_sit
-  home_sit:
-    to: end
