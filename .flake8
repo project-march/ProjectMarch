@@ -1,8 +1,7 @@
 [flake8]
 show-source = true
 max-line-length = 120
-format = ${cyan}%(path)s${reset}:${yellow_bold}%(row)d${reset}:${green_bold}%(col)d${reset}: ${red_bold}%(code)s${reset} %(text)s
-exclude = .git, __init__.py, bin, install
+exclude = .git, __init__.py, build, install, log
 application-package-names =
     march_description,
     march_gain_scheduling,
@@ -48,4 +47,4 @@ ignore =
     W503,
     # C815: Trailing comma in Python 3.5
     C815
-ignore-names = rowCount, columnCount, headerData, setUp, paintEvent, createEditor, setEditorData, setModelData, updateEditorGeometry, mouseClickEvent, mouseDragEvent, setUp
+ignore-names = rowCount, columnCount, headerData, setUp, paintEvent, createEditor, setEditorData, setModelData, updateEditorGeometry, mouseClickEvent, mouseDragEvent, setUp, setUpClass

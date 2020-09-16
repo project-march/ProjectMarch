@@ -21,17 +21,19 @@ _deps
 ### ROS ###
 devel/
 logs/
+log/
 build/
 bin/
 lib/
+
+# Binary libraries
+*.so
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
-*.so
 
 # Distribution / packaging
 .Python
@@ -41,7 +43,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/

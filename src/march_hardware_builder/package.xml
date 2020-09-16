@@ -19,4 +19,5 @@
 
   <test_depend>code_coverage</test_depend>
   <test_depend>rosunit</test_depend>
+  <test_depend>march_description</test_depend>
 </package>

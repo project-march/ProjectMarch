@@ -29,7 +29,7 @@ class CoMCalculator(object):
     def __init__(self, robot, tf_buffer):
         self.tf_buffer = tf_buffer
 
-        self.links = dict(filter(lambda (_, l): l.inertial is not None, robot.link_map.items()))
+        self.links = dict(filter(lambda __l: __l[1].inertial is not None, robot.link_map.items()))
         self.mass = sum(l.inertial.mass for (_, l) in self.links.items())
 
         self.marker = Marker()

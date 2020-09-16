@@ -25,6 +25,8 @@ target_link_libraries(march_fake_temperature_data_node PRIVATE ${catkin_LIBRARIE
 target_compile_features(march_fake_temperature_data_node PRIVATE cxx_std_14)
 target_compile_options(march_fake_temperature_data_node PRIVATE -Wall -Wextra -Werror)
 
+include_directories(${catkin_INCLUDE_DIRS})
+
 install(TARGETS march_fake_temperature_data_node
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
