@@ -1,5 +1,6 @@
 - git:
 <<<<<<< HEAD
+<<<<<<< HEAD
     local-name: gait-generation
     uri: https://github.com/project-march/gait-generation
     version: develop
@@ -14,4 +15,8 @@
     local-name: march
     uri: https://github.com/project-march/march
 >>>>>>> simulation/develop
+=======
+    local-name: march
+    uri: https://github.com/project-march/march
+>>>>>>> monitor/develop
     version: develop

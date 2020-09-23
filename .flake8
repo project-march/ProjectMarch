@@ -2,6 +2,7 @@
 show-source = true
 max-line-length = 120
 format = ${cyan}%(path)s${reset}:${yellow_bold}%(row)d${reset}:${green_bold}%(col)d${reset}: ${red_bold}%(code)s${reset} %(text)s
+<<<<<<< HEAD
 exclude = .git
 application-package-names =
     march_description,
@@ -11,6 +12,16 @@ application-package-names =
     march_safety,
     march_shared_classes,
     march_shared_resources,
+=======
+exclude = .git, __init__.py
+application-package-names =
+    march_rqt_gait_selection,
+    march_rqt_input_device,
+    march_rqt_note_taker,
+    march_rqt_software_check,
+    march_shared_classes,
+    march_shared_resources
+>>>>>>> monitor/develop
 import-order-style = appnexus
 ignore =
     # D100: Missing docstring in public module
@@ -35,3 +46,7 @@ ignore =
     W503,
     # C815: Trailing comma in Python 3.5
     C815
+<<<<<<< HEAD
+=======
+ignore-names = rowCount, columnCount, headerData, setUp, paintEvent
+>>>>>>> monitor/develop

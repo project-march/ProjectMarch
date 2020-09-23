@@ -1,0 +1,7 @@
+<launch>
+    <arg name="ping_safety_node" default="true"/>
+
+    <node name="$(anon rqt_input_device)" pkg="march_rqt_input_device" type="march_rqt_input_device" output="screen">
+        <param name="ping_safety_node" value="$(arg ping_safety_node)"/>
+    </node>
+</launch>

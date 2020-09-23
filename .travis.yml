@@ -2,10 +2,14 @@
 # For troubleshooting, see readme (https://github.com/ros-industrial/industrial_ci/blob/master/README.rst)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 os: linux
 dist: bionic
 >>>>>>> simulation/develop
+=======
+os: linux
+>>>>>>> monitor/develop
 language: generic # optional, just removes the language badge
 
 services:
@@ -13,6 +17,7 @@ services:
 
 notifications:
   slack:
+<<<<<<< HEAD
 <<<<<<< HEAD
     secure: dN+sNePHYq1PMm+E9S6Dk4UobyKS4r+fs0Xr8378UGt189HYV0al4DXPF95mnbQXknd9SbMA/qAWM7HRIt5plS4DjuR/7I5yrZnlnl1P6GPKtyhsCWrwgAyFWK5m+6bewzf/8pUg2YYGODGPBDReFqfli6c4Web1g/XW3M/DaVa4L7TqlKsmDEbYFDmooT8a1WFuxcYMSdgr3LGF2FBoPQVuBxYLYQX2xJ93KeniSzvsY5YMtBvMd5NP2C2/TWmJEMCvkLRbmFsl/eo8Nf4W9rNVt08kErQoRuABYO433ipZ+0zyFgzz2VVm0hxfVsSKUEt+uOarO/xP1z7mAnhrPeNWoM7Kw57djqEoqVRbr9EdKf5fg+UKLFWmlTvGagtzU4PB2/0Zq4sw/cdyXDDdMXwxjokpN9swvCM1faIWcG3A7M9mscIW/32hTmstqLtHG/1w0nNtg/N0Y16NOzCk98G2qiuCK+x031/TQDs0PE4JmilftW2nNhg5834dmMYsqKelLn5tVsXWKWMnQuZx22a7JQNQst9/Pt09+HuEzHfpUIZimjd8UoSIWlLJfocqM63ymUKY/t6TlTlLSkLexAAR/mzhyNQxZoYLHyxyJI8EjXu5KEVWH4Tw34oM2AcGE4bvg43LAajUQ/iz/7sxGcKN048uTzGF4uAz1Vutksk=
 =======
@@ -26,6 +31,11 @@ cache:
   directories:
     - $HOME/.ccache
 
+=======
+    secure: EMyWU/LU+ONy4bvZ1cRvt+9rXEI/+ND90xL5z1yX/eN6Pby57zXVu4BbI0m+WgRfG+okpTbd3CBwobpW5Xr6hbf2/QdDgbpgu7CP8KQVUduFAXCld2jxXjEpOq7l0IzXAb/kcPRdkqmvhbe9fwL7iyQyEvSqeO4TKJ3cY/DaL3d7qItVrBUwn6035KOS9vOyR3x46ZTZbx8wFCYp4rjOJvZoxR18/LhWX/SNOiv/MEPjc7akoYCpZGPfJ1kEI6QUpphvTyGvcBrea0POtjUJeo+NQk3ZbefPO7+gLTSefxVUuzCFU/UuZxcwJ0yYrWOIahZzkO8xhQz+S1MrVmGNk+rItssFisa5o9M19lL+nr1CwJuEAVZf3IkfGfDma8Q1j5pD0sgZxJmsN8ormppO9hg7dEqzkT1Dsh+qcDtq6JDqq7LbPe11m4k4JB2gLqaFHCTgCfjJ06Q9JFFnL1xyIjVHfn1wMoaRNKH9KIzhjzqw0UQIF7oEGrw5zH5BWIs6A9WRQ8HvaJJebp4x7b1ZtRrYPqPsQkze/vz+b8se9fUh/2BviSjjcd4Q9wm/ORZfFZi2QGJwlGmY7UaJqDNstvdMUC8ZrbFkNBSEWOV8bx42ojoLEkLj+tga9cvGqwEAuzrKqHKdrKgJzDtQz0LDlP2mCvDt79wG1H46bdS8SYA=
+  email: false
+
+>>>>>>> monitor/develop
 git:
   quiet: true # optional, silences the cloning of the target repository
 
@@ -34,6 +44,7 @@ git:
 env:
   global:
     - ROS_REPO=ros
+<<<<<<< HEAD
 <<<<<<< HEAD
     - ADDITIONAL_DEBS='python-lxml python-pyqtgraph'
     - CCACHE_DIR=$HOME/.ccache # enables C/C++ caching in industrial_ci
@@ -52,25 +63,45 @@ env:
     - CATKIN_LINT_ARGS='--ignore missing_catkin_include'
     - UPSTREAM_WORKSPACE='.rosinstall -march/march_data_collector -march/march_gain_scheduling -march/march_gait_selection -march/march_launch -march/march_safety -march/march_shared_classes'
 >>>>>>> simulation/develop
+=======
+    - ADDITIONAL_DEBS=curl
+    - BUILDER=colcon
+    - CATKIN_LINT=pedantic
+    - CI_ENV=`bash <(curl -s https://codecov.io/env)`
+    - DOCKER_RUN_OPTS='$CI_ENV -e CATKIN_TEST_COVERAGE=1 -e NOSE_COVER_INCLUSIVE=True -e NOSE_COVER_BRANCHES=True'
+    - AFTER_INSTALL_TARGET_DEPENDENCIES='pip install coverage'
+    - AFTER_RUN_TARGET_TEST='cd "$target_ws" && ./src/monitor/coverage.sh && bash <(curl -s https://codecov.io/bash) -R src/monitor -F test && bash <(curl -s https://codecov.io/bash) -R src/monitor -F production'
+    - UPSTREAM_WORKSPACE='.rosinstall -march/march_data_collector -march/march_description -march/march_gain_scheduling -march/march_gait_selection -march/march_launch -march/march_moveit -march/march_safety -march/march_shared_classes'
+>>>>>>> monitor/develop
 
 jobs:
   include:
     - name: "Melodic"
       env: ROS_DISTRO=melodic
+<<<<<<< HEAD
     - name: "clang-format"
       env: ROS_DISTRO=melodic CLANG_FORMAT_CHECK=file
 <<<<<<< HEAD
+=======
+>>>>>>> monitor/develop
     - name: "flake8"
       language: python
       python: 2.7
       install:
         - pip install flake8 pep8-naming flake8-blind-except flake8-string-format flake8-builtins flake8-commas flake8-quotes flake8-print flake8-docstrings flake8-import-order flake8-colors
       script: flake8
+<<<<<<< HEAD
 =======
 >>>>>>> simulation/develop
+=======
+>>>>>>> monitor/develop
 
 # clone and run industrial_ci
 install:
   - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci -b master
+<<<<<<< HEAD
+=======
+
+>>>>>>> monitor/develop
 script:
   - .industrial_ci/travis.sh

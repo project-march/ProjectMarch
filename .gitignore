@@ -22,11 +22,16 @@ devel_isolated/
 /cfg/*.py
 
 # Ignore generated docs
+<<<<<<< HEAD
 *.wikidoc
 <<<<<<< HEAD
 docs/build/*
 =======
 >>>>>>> simulation/develop
+=======
+*.dox
+*.wikidoc
+>>>>>>> monitor/develop
 
 # eclipse stuff
 .project
@@ -36,9 +41,12 @@ docs/build/*
 CMakeLists.txt.user
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.egg-info/
 =======
 >>>>>>> simulation/develop
+=======
+>>>>>>> monitor/develop
 srv/_*.py
 *.pcd
 *.pyc
@@ -46,10 +54,13 @@ qtcreator-*
 *.user
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 .idea/*
 */cmake-build-debug/*
 =======
 >>>>>>> simulation/develop
+=======
+>>>>>>> monitor/develop
 /planning/cfg
 /planning/docs
 /planning/src
@@ -62,6 +73,7 @@ qtcreator-*
 # Catkin custom files
 CATKIN_IGNORE
 <<<<<<< HEAD
+<<<<<<< HEAD
 COLCON_IGNORE
 
 install/*
@@ -69,3 +81,5 @@ install/*
 venv/
 =======
 >>>>>>> simulation/develop
+=======
+>>>>>>> monitor/develop
