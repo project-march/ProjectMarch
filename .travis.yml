@@ -3,6 +3,7 @@
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 os: linux
 dist: bionic
@@ -10,6 +11,8 @@ dist: bionic
 =======
 os: linux
 >>>>>>> monitor/develop
+=======
+>>>>>>> hardware-interface/develop
 language: generic # optional, just removes the language badge
 
 services:
@@ -19,10 +22,14 @@ notifications:
   slack:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     secure: dN+sNePHYq1PMm+E9S6Dk4UobyKS4r+fs0Xr8378UGt189HYV0al4DXPF95mnbQXknd9SbMA/qAWM7HRIt5plS4DjuR/7I5yrZnlnl1P6GPKtyhsCWrwgAyFWK5m+6bewzf/8pUg2YYGODGPBDReFqfli6c4Web1g/XW3M/DaVa4L7TqlKsmDEbYFDmooT8a1WFuxcYMSdgr3LGF2FBoPQVuBxYLYQX2xJ93KeniSzvsY5YMtBvMd5NP2C2/TWmJEMCvkLRbmFsl/eo8Nf4W9rNVt08kErQoRuABYO433ipZ+0zyFgzz2VVm0hxfVsSKUEt+uOarO/xP1z7mAnhrPeNWoM7Kw57djqEoqVRbr9EdKf5fg+UKLFWmlTvGagtzU4PB2/0Zq4sw/cdyXDDdMXwxjokpN9swvCM1faIWcG3A7M9mscIW/32hTmstqLtHG/1w0nNtg/N0Y16NOzCk98G2qiuCK+x031/TQDs0PE4JmilftW2nNhg5834dmMYsqKelLn5tVsXWKWMnQuZx22a7JQNQst9/Pt09+HuEzHfpUIZimjd8UoSIWlLJfocqM63ymUKY/t6TlTlLSkLexAAR/mzhyNQxZoYLHyxyJI8EjXu5KEVWH4Tw34oM2AcGE4bvg43LAajUQ/iz/7sxGcKN048uTzGF4uAz1Vutksk=
 =======
     secure: Giv3kL87piDCRK0r7o1chD734C0X/54DTVqAuW5tKmGDuie2GC8TtfFtltf9VHDis9Lonryr07zs0H7cUgtLRvse6vFkg2ISoXY2L7kBavIWCFjR9m69lEVymlfOONwAQ0Bx+x6gG6YlcTUg50IVj1MXHnosXtzPQ1HS0erhUT/x1M3HOjqcLp8rt5k71VczAE3ET/G6cCENaV1TwIvFqrgBu/hK0gTPIwGLcstXzsoBiBkgaFGkEcm0pgZS05K/TEeMq+R1ynNlcajEPwNfxicAQlKmfvq5IL7+bs9K6Wag7xJPbcmFV8lJF/MNP2WeGrT/XTSJgKdQW0/C+CuB/ljiYu2kfu1RsMCyCoMo1cNM8gjoivct13RtqKtpTL9x5ZF/guKw49kg5PRUVOXVfo88l8te26ib/lbRAMHDZn5D/iflAJcJX4eMk/SA8dkrJi0ftYYBJo5xGghUcTg1p+1u74wpgLmUNKu3XuXQDcq6+Ldipy/H/Zcq0m2iBRGblDTnaYewPVegKHJ2GnYKzluFtiielnuK+LxP+uyBXxX3vPXnFxRv/Z55w3WBvVf0garHmaQzSwMv0VE1qntmNDKgKB8yFR+QyL+Ze3jVmuBj2fZT61vDbuADx53vjBD4XnlC0zscuYBdKsLzPiZZbkqiiCWweBU6VcLhrArRdho=
 >>>>>>> simulation/develop
+=======
+    secure: I7/Kqj/ZiaoW9bZzlDFYU2aFv1J3R0z5+6kDf9TI8AHsN9K/GYs05kG8gfpORmaBobF22AwpB/I5o8ga5nJGAP25SgX8bcP3jJaKUyfMxXj3ThkfINTMKeLhZqzh5c3ppBwHy62vdSDry4fyuIhtaWOa+8GqmI3D37/0yzFCPQLLYnSXoF5EKSFkKPytfVdwbOKE/uSgPbAy0xsPUKLEGdIhvFjyDzfj5KIHcYWFu9eus0GpuCJVJE/nGTz7PrQ9Rhuh3eVeJNn5CEXo+0Lgn8lghUY0xRH/0xn+mhjYZnxTNO18YRoiF8lUB+/phQx2E3GiDrtPd7BjtluKGIkgFMZM/dyzHN7lSeCJZ0nDhOuALNwdbhS8Hw18q5a6SanT4Kegno8ebDNwsEyHuiHy6D3XNE2PHIZ5SbSgX9MOaLBtarcHccAR19T+96mWJANS6rIKnhe0zW9+Jxl99mTCgcNjTmcm2YG5Axm8xOBmoK920I4ke1wfb9QLeMIOnQ/JM6DxkMbQGtoN49ztrg4cv+JwUOUnEn/yiLsz+p8EdaFiRLfAbww9VJ+1geDdGifv+TRq72RpTzGnNveNnRRysxBjfei3EwwoZqUFhZyVWQWqHuwSa8xFpxS3FMmDzP16oMAB/TuMV03MBTqNK/JDSMXq54Bs1pmtPJ4kvfGiKKo=
+>>>>>>> hardware-interface/develop
   email: false
 
 # include the following block if the C/C++ build artifacts should get cached by Travis,
@@ -31,11 +38,14 @@ cache:
   directories:
     - $HOME/.ccache
 
+<<<<<<< HEAD
 =======
     secure: EMyWU/LU+ONy4bvZ1cRvt+9rXEI/+ND90xL5z1yX/eN6Pby57zXVu4BbI0m+WgRfG+okpTbd3CBwobpW5Xr6hbf2/QdDgbpgu7CP8KQVUduFAXCld2jxXjEpOq7l0IzXAb/kcPRdkqmvhbe9fwL7iyQyEvSqeO4TKJ3cY/DaL3d7qItVrBUwn6035KOS9vOyR3x46ZTZbx8wFCYp4rjOJvZoxR18/LhWX/SNOiv/MEPjc7akoYCpZGPfJ1kEI6QUpphvTyGvcBrea0POtjUJeo+NQk3ZbefPO7+gLTSefxVUuzCFU/UuZxcwJ0yYrWOIahZzkO8xhQz+S1MrVmGNk+rItssFisa5o9M19lL+nr1CwJuEAVZf3IkfGfDma8Q1j5pD0sgZxJmsN8ormppO9hg7dEqzkT1Dsh+qcDtq6JDqq7LbPe11m4k4JB2gLqaFHCTgCfjJ06Q9JFFnL1xyIjVHfn1wMoaRNKH9KIzhjzqw0UQIF7oEGrw5zH5BWIs6A9WRQ8HvaJJebp4x7b1ZtRrYPqPsQkze/vz+b8se9fUh/2BviSjjcd4Q9wm/ORZfFZi2QGJwlGmY7UaJqDNstvdMUC8ZrbFkNBSEWOV8bx42ojoLEkLj+tga9cvGqwEAuzrKqHKdrKgJzDtQz0LDlP2mCvDt79wG1H46bdS8SYA=
   email: false
 
 >>>>>>> monitor/develop
+=======
+>>>>>>> hardware-interface/develop
 git:
   quiet: true # optional, silences the cloning of the target repository
 
@@ -44,6 +54,7 @@ git:
 env:
   global:
     - ROS_REPO=ros
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     - ADDITIONAL_DEBS='python-lxml python-pyqtgraph'
@@ -73,11 +84,24 @@ env:
     - AFTER_RUN_TARGET_TEST='cd "$target_ws" && ./src/monitor/coverage.sh && bash <(curl -s https://codecov.io/bash) -R src/monitor -F test && bash <(curl -s https://codecov.io/bash) -R src/monitor -F production'
     - UPSTREAM_WORKSPACE='.rosinstall -march/march_data_collector -march/march_description -march/march_gain_scheduling -march/march_gait_selection -march/march_launch -march/march_moveit -march/march_safety -march/march_shared_classes'
 >>>>>>> monitor/develop
+=======
+    - ADDITIONAL_DEBS=curl
+    - CCACHE_DIR=$HOME/.ccache # enables C/C++ caching in industrial_ci
+    - BUILDER=colcon
+    - CATKIN_LINT=pedantic
+    - CATKIN_LINT_ARGS='--ignore literal_project_name --ignore target_name_collision'
+    - CI_ENV=`bash <(curl -s https://codecov.io/env)`
+    - DOCKER_RUN_OPTS='$CI_ENV'
+    - TARGET_CMAKE_ARGS='-DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE_TESTING=ON'
+    - UPSTREAM_WORKSPACE='.rosinstall -march/march_data_collector -march/march_gain_scheduling -march/march_gait_selection -march/march_launch -march/march_moveit -march/march_safety -march/march_shared_classes'
+    - AFTER_RUN_TARGET_TEST='cd "$target_ws" && bash <(curl -s https://codecov.io/bash) -R src/hardware-interface -F test && bash <(curl -s https://codecov.io/bash) -R src/hardware-interface -F production'
+>>>>>>> hardware-interface/develop
 
 jobs:
   include:
     - name: "Melodic"
       env: ROS_DISTRO=melodic
+<<<<<<< HEAD
 <<<<<<< HEAD
     - name: "clang-format"
       env: ROS_DISTRO=melodic CLANG_FORMAT_CHECK=file
@@ -95,13 +119,20 @@ jobs:
 >>>>>>> simulation/develop
 =======
 >>>>>>> monitor/develop
+=======
+    - name: "clang-format"
+      env: ROS_DISTRO=melodic CLANG_FORMAT_CHECK=file
+>>>>>>> hardware-interface/develop
 
 # clone and run industrial_ci
 install:
   - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci -b master
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> monitor/develop
+=======
+>>>>>>> hardware-interface/develop
 script:
   - .industrial_ci/travis.sh

@@ -9,9 +9,12 @@ AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: None
 <<<<<<< HEAD
+<<<<<<< HEAD
 AllowShortLoopsOnASingleLine: false
 =======
 >>>>>>> simulation/develop
+=======
+>>>>>>> hardware-interface/develop
 AlwaysBreakTemplateDeclarations: true
 AlwaysBreakBeforeMultilineStrings: false
 BreakBeforeBinaryOperators: false

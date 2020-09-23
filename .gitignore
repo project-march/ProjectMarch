@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 # Created by https://www.gitignore.io/api/ros,cmake
@@ -125,3 +126,8 @@ venv/
 
 # End of https://www.gitignore.io/api/ros,cmake
 >>>>>>> gait-files/develop
+=======
+.idea/*
+*/cmake-build-debug/**
+.vscode/settings.json
+>>>>>>> hardware-interface/develop

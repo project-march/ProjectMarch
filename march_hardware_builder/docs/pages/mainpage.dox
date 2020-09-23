@@ -1,0 +1,41 @@
+/** @mainpage March Hardware Builder
+ * @section introduction Introduction
+ * This package contains a library which can be included to to create a MarchRobot from .yaml config files.
+ *
+ * The implementation is rather straightforward and nearly all of the logic can be found in the HardwareBuilder class.
+ *
+ * @section features Features
+ * - Parse .yaml files to create a MarchRobot.
+ * - Easily switch between .yaml files to use different hardware.
+ *
+ * @section how_to_use How to use
+ * Include this package in your project and `#include <march_hardware_builder/HardwareBuilder.h>` to start using the
+ * HardwareBuilder class.
+ *
+ * There are four main ways to interact with the hardware builder:
+ * - Instantiate with an AllowedRobot.
+ * @verbatim
+HardwareBuilder hardwareBuilder = HardwareBuilder(AllowedRobot::march4);
+marchRobot = hardwareBuilder.createMarchRobot();
+@endverbatim
+ * - Instantiate with a path to a yaml file.
+ * @verbatim
+HardwareBuilder hardwareBuilder = HardwareBuilder("path/to/robot/march4.yaml");
+marchRobot = hardwareBuilder.createMarchRobot();
+@endverbatim
+ * - Instantiate empty.
+ * This function is mostly used for testing wrongly configured robots and is not needed in a release.
+ * @note This means you are responsible for passing a YAML::Node to the .createMarchRobot() function! @endnote
+ *
+ * @verbatim
+YAML::Node robotConfig = YAML::LoadFile("path/to/robot.yaml");
+HardwareBuilder hardwareBuilder = HardwareBuilder();
+marchRobot = hardwareBuilder.createMarchRobot(robotConfig);
+@endverbatim
+ * - It is also possible to create parts of a MarchRobot (IMotionCubes, Encoders, etc...) in a similar way.
+ * @verbatim
+YAML::Node encoderConfig = YAML::LoadFile("path/to/encoder.yaml");
+HardwareBuilder hardwareBuilder = HardwareBuilder();
+marchRobot = hardwareBuilder.createEncoder(encoderConfig);
+@endverbatim
+ */
