@@ -1,0 +1,6 @@
+name: ankle_test_sit
+subgaits:
+  ankle_test_sit:
+    to: end
+  start:
+    to: ankle_test_sit

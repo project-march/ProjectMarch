@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 # March
 The main repository of the MARCH exoskeleton.
 
@@ -51,3 +52,7 @@ Monitor RQt plugins for the March exoskeleton
 | master | [![Build Status](https://api.travis-ci.com/project-march/monitor.svg?branch=master)](https://travis-ci.com/project-march/monitor) |
 | develop | [![Build Status](https://api.travis-ci.com/project-march/monitor.svg?branch=develop)](https://travis-ci.com/project-march/monitor) |
 >>>>>>> monitor/develop
+=======
+# gait-files
+A collection of gait files to run on the march-iv exoskeleton
+>>>>>>> gait-files/develop

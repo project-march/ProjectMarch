@@ -1,3 +1,28 @@
+<<<<<<< HEAD
+=======
+
+# Created by https://www.gitignore.io/api/ros,cmake
+# Edit at https://www.gitignore.io/?templates=ros,cmake
+
+### CMake ###
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+
+### CMake Patch ###
+# External projects
+*-prefix/
+
+### ROS ###
+>>>>>>> gait-files/develop
 devel/
 logs/
 build/
@@ -23,6 +48,7 @@ devel_isolated/
 
 # Ignore generated docs
 <<<<<<< HEAD
+<<<<<<< HEAD
 *.wikidoc
 <<<<<<< HEAD
 docs/build/*
@@ -32,12 +58,17 @@ docs/build/*
 *.dox
 *.wikidoc
 >>>>>>> monitor/develop
+=======
+*.dox
+*.wikidoc
+>>>>>>> gait-files/develop
 
 # eclipse stuff
 .project
 .cproject
 
 # qcreator stuff
+<<<<<<< HEAD
 CMakeLists.txt.user
 
 <<<<<<< HEAD
@@ -47,6 +78,9 @@ CMakeLists.txt.user
 >>>>>>> simulation/develop
 =======
 >>>>>>> monitor/develop
+=======
+
+>>>>>>> gait-files/develop
 srv/_*.py
 *.pcd
 *.pyc
@@ -55,12 +89,15 @@ qtcreator-*
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 .idea/*
 */cmake-build-debug/*
 =======
 >>>>>>> simulation/develop
 =======
 >>>>>>> monitor/develop
+=======
+>>>>>>> gait-files/develop
 /planning/cfg
 /planning/docs
 /planning/src
@@ -74,6 +111,7 @@ qtcreator-*
 CATKIN_IGNORE
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 COLCON_IGNORE
 
 install/*
@@ -83,3 +121,7 @@ venv/
 >>>>>>> simulation/develop
 =======
 >>>>>>> monitor/develop
+=======
+
+# End of https://www.gitignore.io/api/ros,cmake
+>>>>>>> gait-files/develop

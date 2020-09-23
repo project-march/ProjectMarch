@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 * @Olavhaasie @project-march/v-software
 
 /march_data_collector/ @RutgerVanBeek @project-march/v-software @Olavhaasie
@@ -10,3 +11,10 @@
 =======
 * @project-march/v-software
 >>>>>>> monitor/develop
+=======
+* @Olavhaasie
+
+*.gait @gaiavdh @marnixbrands
+*.subgait @gaiavdh @marnixbrands
+*.yaml @gaiavdh @marnixbrands
+>>>>>>> gait-files/develop
