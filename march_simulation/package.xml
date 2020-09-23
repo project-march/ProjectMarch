@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>march_simulation</name>
+    <version>0.0.0</version>
+    <description>The simulation world in which the exoskeleton can be placed</description>
+    <maintainer email="software@projectmarch.nl">Project March</maintainer>
+    <license>TODO</license>
+
+    <buildtool_depend>catkin</buildtool_depend>
+
+    <exec_depend>controller_manager</exec_depend>
+    <exec_depend>gazebo_msgs</exec_depend>
+    <exec_depend>gazebo_ros</exec_depend>
+    <exec_depend>gazebo_ros_control</exec_depend>
+    <exec_depend>geometry_msgs</exec_depend>
+    <exec_depend>joint_state_controller</exec_depend>
+    <exec_depend>joint_trajectory_controller</exec_depend>
+    <exec_depend>march_description</exec_depend>
+    <exec_depend>march_fake_sensor_data</exec_depend>
+    <exec_depend>march_gazebo_plugins</exec_depend>
+    <exec_depend>robot_state_publisher</exec_depend>
+    <exec_depend>rospy</exec_depend>
+    <exec_depend>tf2_ros</exec_depend>
+    <exec_depend>urdfdom_py</exec_depend>
+    <exec_depend>xacro</exec_depend>
+</package>

@@ -8,7 +8,10 @@ AllowAllParametersOfDeclarationOnNextLine: false
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: None
+<<<<<<< HEAD
 AllowShortLoopsOnASingleLine: false
+=======
+>>>>>>> simulation/develop
 AlwaysBreakTemplateDeclarations: true
 AlwaysBreakBeforeMultilineStrings: false
 BreakBeforeBinaryOperators: false

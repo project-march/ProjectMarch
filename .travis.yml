@@ -1,6 +1,11 @@
 # This config uses industrial_ci (https://github.com/ros-industrial/industrial_ci.git).
 # For troubleshooting, see readme (https://github.com/ros-industrial/industrial_ci/blob/master/README.rst)
 
+<<<<<<< HEAD
+=======
+os: linux
+dist: bionic
+>>>>>>> simulation/develop
 language: generic # optional, just removes the language badge
 
 services:
@@ -8,7 +13,11 @@ services:
 
 notifications:
   slack:
+<<<<<<< HEAD
     secure: dN+sNePHYq1PMm+E9S6Dk4UobyKS4r+fs0Xr8378UGt189HYV0al4DXPF95mnbQXknd9SbMA/qAWM7HRIt5plS4DjuR/7I5yrZnlnl1P6GPKtyhsCWrwgAyFWK5m+6bewzf/8pUg2YYGODGPBDReFqfli6c4Web1g/XW3M/DaVa4L7TqlKsmDEbYFDmooT8a1WFuxcYMSdgr3LGF2FBoPQVuBxYLYQX2xJ93KeniSzvsY5YMtBvMd5NP2C2/TWmJEMCvkLRbmFsl/eo8Nf4W9rNVt08kErQoRuABYO433ipZ+0zyFgzz2VVm0hxfVsSKUEt+uOarO/xP1z7mAnhrPeNWoM7Kw57djqEoqVRbr9EdKf5fg+UKLFWmlTvGagtzU4PB2/0Zq4sw/cdyXDDdMXwxjokpN9swvCM1faIWcG3A7M9mscIW/32hTmstqLtHG/1w0nNtg/N0Y16NOzCk98G2qiuCK+x031/TQDs0PE4JmilftW2nNhg5834dmMYsqKelLn5tVsXWKWMnQuZx22a7JQNQst9/Pt09+HuEzHfpUIZimjd8UoSIWlLJfocqM63ymUKY/t6TlTlLSkLexAAR/mzhyNQxZoYLHyxyJI8EjXu5KEVWH4Tw34oM2AcGE4bvg43LAajUQ/iz/7sxGcKN048uTzGF4uAz1Vutksk=
+=======
+    secure: Giv3kL87piDCRK0r7o1chD734C0X/54DTVqAuW5tKmGDuie2GC8TtfFtltf9VHDis9Lonryr07zs0H7cUgtLRvse6vFkg2ISoXY2L7kBavIWCFjR9m69lEVymlfOONwAQ0Bx+x6gG6YlcTUg50IVj1MXHnosXtzPQ1HS0erhUT/x1M3HOjqcLp8rt5k71VczAE3ET/G6cCENaV1TwIvFqrgBu/hK0gTPIwGLcstXzsoBiBkgaFGkEcm0pgZS05K/TEeMq+R1ynNlcajEPwNfxicAQlKmfvq5IL7+bs9K6Wag7xJPbcmFV8lJF/MNP2WeGrT/XTSJgKdQW0/C+CuB/ljiYu2kfu1RsMCyCoMo1cNM8gjoivct13RtqKtpTL9x5ZF/guKw49kg5PRUVOXVfo88l8te26ib/lbRAMHDZn5D/iflAJcJX4eMk/SA8dkrJi0ftYYBJo5xGghUcTg1p+1u74wpgLmUNKu3XuXQDcq6+Ldipy/H/Zcq0m2iBRGblDTnaYewPVegKHJ2GnYKzluFtiielnuK+LxP+uyBXxX3vPXnFxRv/Z55w3WBvVf0garHmaQzSwMv0VE1qntmNDKgKB8yFR+QyL+Ze3jVmuBj2fZT61vDbuADx53vjBD4XnlC0zscuYBdKsLzPiZZbkqiiCWweBU6VcLhrArRdho=
+>>>>>>> simulation/develop
   email: false
 
 # include the following block if the C/C++ build artifacts should get cached by Travis,
@@ -25,6 +34,7 @@ git:
 env:
   global:
     - ROS_REPO=ros
+<<<<<<< HEAD
     - ADDITIONAL_DEBS='python-lxml python-pyqtgraph'
     - CCACHE_DIR=$HOME/.ccache # enables C/C++ caching in industrial_ci
     - BUILDER=colcon
@@ -35,6 +45,13 @@ env:
     - DOWNSTREAM_WORKSPACE=.rosinstall
     - NOT_TEST_DOWNSTREAM=true
     - AFTER_INSTALL_TARGET_DEPENDENCIES='pip install numpy_ringbuffer'
+=======
+    - CCACHE_DIR=$HOME/.ccache # enables C/C++ caching in industrial_ci
+    - BUILDER=colcon
+    - CATKIN_LINT=pedantic
+    - CATKIN_LINT_ARGS='--ignore missing_catkin_include'
+    - UPSTREAM_WORKSPACE='.rosinstall -march/march_data_collector -march/march_gain_scheduling -march/march_gait_selection -march/march_launch -march/march_safety -march/march_shared_classes'
+>>>>>>> simulation/develop
 
 jobs:
   include:
@@ -42,12 +59,15 @@ jobs:
       env: ROS_DISTRO=melodic
     - name: "clang-format"
       env: ROS_DISTRO=melodic CLANG_FORMAT_CHECK=file
+<<<<<<< HEAD
     - name: "flake8"
       language: python
       python: 2.7
       install:
         - pip install flake8 pep8-naming flake8-blind-except flake8-string-format flake8-builtins flake8-commas flake8-quotes flake8-print flake8-docstrings flake8-import-order flake8-colors
       script: flake8
+=======
+>>>>>>> simulation/develop
 
 # clone and run industrial_ci
 install:

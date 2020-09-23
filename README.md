@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # March
 The main repository of the MARCH exoskeleton.
 
@@ -25,3 +26,15 @@ find . -name '*.h' -or -name '*.cpp' | xargs clang-format -i -style=file
 
 If you would like to show a diff and not use `find`, install
 [`clang_format_check`](https://github.com/cloderic/clang_format_check).
+=======
+# Simulation
+The simulation of the exoskeleton.
+
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/project-march/simulation?include_prereleases)
+
+| Branch | Build Status |
+| ------ |:------------:|
+| master | [![Build Status](https://api.travis-ci.com/project-march/simulation.svg?branch=master)](https://travis-ci.com/project-march/simulation) |
+| develop | [![Build Status](https://api.travis-ci.com/project-march/simulation.svg?branch=develop)](https://travis-ci.com/project-march/simulation) |
+
+>>>>>>> simulation/develop
