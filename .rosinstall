@@ -3,6 +3,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     local-name: gait-generation
     uri: https://github.com/project-march/gait-generation
     version: develop
@@ -29,4 +30,8 @@
     local-name: march
     uri: https://github.com/project-march/march
 >>>>>>> gait-generation/develop
+=======
+    local-name: march
+    uri: https://github.com/project-march/march
+>>>>>>> controller-research/develop
     version: develop

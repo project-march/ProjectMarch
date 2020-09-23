@@ -10,11 +10,14 @@ AllowShortLoopsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: None
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 AllowShortLoopsOnASingleLine: false
 =======
 >>>>>>> simulation/develop
 =======
 >>>>>>> hardware-interface/develop
+=======
+>>>>>>> controller-research/develop
 AlwaysBreakTemplateDeclarations: true
 AlwaysBreakBeforeMultilineStrings: false
 BreakBeforeBinaryOperators: false

@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 # Created by https://www.gitignore.io/api/ros,cmake
@@ -268,3 +269,8 @@ venv/
 
 # End of https://www.gitignore.io/api/ros,cmake,python
 >>>>>>> gait-generation/develop
+=======
+.idea/*
+*/cmake-build-debug/**
+.vscode/settings.json
+>>>>>>> controller-research/develop

@@ -3,6 +3,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 # March
 The main repository of the MARCH exoskeleton.
 
@@ -93,3 +94,14 @@ To install run
     
 Then you can run `flake8` from the root and it will give errors you should fix, otherwise the Travis build will fail.
 >>>>>>> gait-generation/develop
+=======
+# Controller research
+The controller research of the MARCH exoskeleton.
+
+
+| Branch | Build Status |
+| ------ |:------------:|
+| master | [![Build Status](https://api.travis-ci.com/project-march/controller-research.svg?branch=master)](https://travis-ci.com/project-march/controller-research) |
+| develop | [![Build Status](https://api.travis-ci.com/project-march/controller-research.svg?branch=develop)](https://travis-ci.com/project-march/controller-research) |
+
+>>>>>>> controller-research/develop
