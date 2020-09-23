@@ -8,14 +8,19 @@ coverage:
           - production
 fixes:
 <<<<<<< HEAD
+<<<<<<< HEAD
   - "src/monitor/::"
 =======
   - "src/hardware-interface/::"
 >>>>>>> hardware-interface/develop
+=======
+  - "src/gait-generation/::"
+>>>>>>> gait-generation/develop
 flags:
   production:
     paths:
       - "*/src/**/*"
+<<<<<<< HEAD
 <<<<<<< HEAD
   test:
     paths:
@@ -28,3 +33,9 @@ flags:
       - "*/test/**/*"
 >>>>>>> hardware-interface/develop
       - "*/test/*"
+=======
+  test:
+    paths:
+      - "*/test/*"
+      - "*/test/**/*"
+>>>>>>> gait-generation/develop

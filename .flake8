@@ -3,6 +3,7 @@ show-source = true
 max-line-length = 120
 format = ${cyan}%(path)s${reset}:${yellow_bold}%(row)d${reset}:${green_bold}%(col)d${reset}: ${red_bold}%(code)s${reset} %(text)s
 <<<<<<< HEAD
+<<<<<<< HEAD
 exclude = .git
 application-package-names =
     march_description,
@@ -22,6 +23,15 @@ application-package-names =
     march_shared_classes,
     march_shared_resources
 >>>>>>> monitor/develop
+=======
+exclude =
+    .git
+    __init__.py
+application-package-names =
+    march_shared_classes,
+    march_shared_resources,
+    march_rqt_gait_generator
+>>>>>>> gait-generation/develop
 import-order-style = appnexus
 ignore =
     # D100: Missing docstring in public module
@@ -40,6 +50,7 @@ ignore =
     D106,
     # D107: Missing docstring in __init__
     D107,
+<<<<<<< HEAD
     # D401: First line should be in imperative mood
     D401,
     # W503: Line break before operator
@@ -50,3 +61,7 @@ ignore =
 =======
 ignore-names = rowCount, columnCount, headerData, setUp, paintEvent
 >>>>>>> monitor/develop
+=======
+# These function names are inherited from Qt, so we can't rename them
+ignore-names = createEditor, setEditorData, setModelData, updateEditorGeometry, mouseClickEvent, mouseDragEvent, setUp
+>>>>>>> gait-generation/develop

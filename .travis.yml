@@ -4,6 +4,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 os: linux
 dist: bionic
@@ -13,6 +14,9 @@ os: linux
 >>>>>>> monitor/develop
 =======
 >>>>>>> hardware-interface/develop
+=======
+os: linux
+>>>>>>> gait-generation/develop
 language: generic # optional, just removes the language badge
 
 services:
@@ -20,6 +24,7 @@ services:
 
 notifications:
   slack:
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -46,6 +51,11 @@ cache:
 >>>>>>> monitor/develop
 =======
 >>>>>>> hardware-interface/develop
+=======
+    secure: DiI/mSwPdfkwTxu3/JsCvIOFUW/PyEzJdmr19UA6afC7whLJuykj2Xz+dXCsABTk9DMwmI220epVPkKXmDJSgPGLvuMjvXYlWLXSYb3pqy7km6XXkEH3RxlS5FW/4ou2QlVEzFBHFg8Yr9KjT73KsXsbOSa3PQHtYBjMF5qflAjV83d6ZkRRQtkwfjdT6mtfw65XlpsZCcWa0xBvIL6FB7zUHL/SHCC2SSFV8YQwbW0hI6fzACP9S6Tt0kOq/pdnR6h/Tl9QVJXGHbLqcCQpCOKg14/QcJvhgDv9AHttn2y9qykd5L34jJuqJE+hNp1YTGY/vWV0WiC+Jtc5bDbqtgWXD96c8lH0oGMQ+7verrToljyLu98M7UlkhNCFWbJIrnL5HYsN27KfXzpO90t6m9JNPPf3qYurSswZn0Q4q8Zv0D8nCkyi7Rh6RlaiqGC4FddNdl2Ipaf7DqfKkYFiKy/MwzqFuQjGrFi+8TjmHErb8+zCwjVp8mAylpX+ZMJaoSEVk6CHtXLzdu5sO7E6/Gpbkq10Iv5KgHfllsMzdoY550a8KGr+Jm3EOZt9KE2vYMs7YA3CL5FLAi0HFQfA4L2MvbN5gfFTIGvWExTZdyiwu/cqY8Y20qBYXE3o8gvuTYkxwe4OpMNMMfH/e2hzZmGTDN7TtZbQlNriUoBOlRs=
+  email: false
+
+>>>>>>> gait-generation/develop
 git:
   quiet: true # optional, silences the cloning of the target repository
 
@@ -54,6 +64,7 @@ git:
 env:
   global:
     - ROS_REPO=ros
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -76,10 +87,14 @@ env:
 >>>>>>> simulation/develop
 =======
     - ADDITIONAL_DEBS=curl
+=======
+    - ADDITIONAL_DEBS='curl python-pyqtgraph'
+>>>>>>> gait-generation/develop
     - BUILDER=colcon
     - CATKIN_LINT=pedantic
     - CI_ENV=`bash <(curl -s https://codecov.io/env)`
     - DOCKER_RUN_OPTS='$CI_ENV -e CATKIN_TEST_COVERAGE=1 -e NOSE_COVER_INCLUSIVE=True -e NOSE_COVER_BRANCHES=True'
+<<<<<<< HEAD
     - AFTER_INSTALL_TARGET_DEPENDENCIES='pip install coverage'
     - AFTER_RUN_TARGET_TEST='cd "$target_ws" && ./src/monitor/coverage.sh && bash <(curl -s https://codecov.io/bash) -R src/monitor -F test && bash <(curl -s https://codecov.io/bash) -R src/monitor -F production'
     - UPSTREAM_WORKSPACE='.rosinstall -march/march_data_collector -march/march_description -march/march_gain_scheduling -march/march_gait_selection -march/march_launch -march/march_moveit -march/march_safety -march/march_shared_classes'
@@ -96,6 +111,11 @@ env:
     - UPSTREAM_WORKSPACE='.rosinstall -march/march_data_collector -march/march_gain_scheduling -march/march_gait_selection -march/march_launch -march/march_moveit -march/march_safety -march/march_shared_classes'
     - AFTER_RUN_TARGET_TEST='cd "$target_ws" && bash <(curl -s https://codecov.io/bash) -R src/hardware-interface -F test && bash <(curl -s https://codecov.io/bash) -R src/hardware-interface -F production'
 >>>>>>> hardware-interface/develop
+=======
+    - AFTER_INSTALL_TARGET_DEPENDENCIES='pip install coverage numpy_ringbuffer'
+    - AFTER_RUN_TARGET_TEST='cd "$target_ws" && ./src/gait-generation/coverage.sh && bash <(curl -s https://codecov.io/bash) -R src/gait-generation -F test && bash <(curl -s https://codecov.io/bash) -R src/gait-generation -F production'
+    - UPSTREAM_WORKSPACE='.rosinstall -march/march_data_collector -march/march_gain_scheduling -march/march_gait_selection -march/march_launch -march/march_safety'
+>>>>>>> gait-generation/develop
 
 jobs:
   include:
@@ -103,15 +123,19 @@ jobs:
       env: ROS_DISTRO=melodic
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     - name: "clang-format"
       env: ROS_DISTRO=melodic CLANG_FORMAT_CHECK=file
 <<<<<<< HEAD
 =======
 >>>>>>> monitor/develop
+=======
+>>>>>>> gait-generation/develop
     - name: "flake8"
       language: python
       python: 2.7
       install:
+<<<<<<< HEAD
         - pip install flake8 pep8-naming flake8-blind-except flake8-string-format flake8-builtins flake8-commas flake8-quotes flake8-print flake8-docstrings flake8-import-order flake8-colors
       script: flake8
 <<<<<<< HEAD
@@ -123,10 +147,15 @@ jobs:
     - name: "clang-format"
       env: ROS_DISTRO=melodic CLANG_FORMAT_CHECK=file
 >>>>>>> hardware-interface/develop
+=======
+        - pip install flake8 pep8-naming flake8-blind-except flake8-string-format flake8-builtins flake8-commas flake8-quotes flake8-print flake8-docstrings flake8-import-order
+      script: flake8
+>>>>>>> gait-generation/develop
 
 # clone and run industrial_ci
 install:
   - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci -b master
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -134,5 +163,7 @@ install:
 >>>>>>> monitor/develop
 =======
 >>>>>>> hardware-interface/develop
+=======
+>>>>>>> gait-generation/develop
 script:
   - .industrial_ci/travis.sh
