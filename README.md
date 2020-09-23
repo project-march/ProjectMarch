@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 # March
 The main repository of the MARCH exoskeleton.
 
@@ -31,19 +25,7 @@ find . -name '*.h' -or -name '*.cpp' | xargs clang-format -i -style=file
 
 If you would like to show a diff and not use `find`, install
 [`clang_format_check`](https://github.com/cloderic/clang_format_check).
-=======
-# Simulation
-The simulation of the exoskeleton.
 
-![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/project-march/simulation?include_prereleases)
-
-| Branch | Build Status |
-| ------ |:------------:|
-| master | [![Build Status](https://api.travis-ci.com/project-march/simulation.svg?branch=master)](https://travis-ci.com/project-march/simulation) |
-| develop | [![Build Status](https://api.travis-ci.com/project-march/simulation.svg?branch=develop)](https://travis-ci.com/project-march/simulation) |
-
->>>>>>> simulation/develop
-=======
 # monitor
 Monitor RQt plugins for the March exoskeleton
 
@@ -54,12 +36,10 @@ Monitor RQt plugins for the March exoskeleton
 | ------ |:------------:|
 | master | [![Build Status](https://api.travis-ci.com/project-march/monitor.svg?branch=master)](https://travis-ci.com/project-march/monitor) |
 | develop | [![Build Status](https://api.travis-ci.com/project-march/monitor.svg?branch=develop)](https://travis-ci.com/project-march/monitor) |
->>>>>>> monitor/develop
-=======
+
 # gait-files
 A collection of gait files to run on the march-iv exoskeleton
->>>>>>> gait-files/develop
-=======
+
 # Hardware Interface
 The hardware interface of the MARCH exoskeleton. This includes EtherCAT master and uses the SOEM library.
 
@@ -72,8 +52,16 @@ The hardware interface of the MARCH exoskeleton. This includes EtherCAT master a
 | master | [![Build Status](https://api.travis-ci.com/project-march/hardware-interface.svg?branch=master)](https://travis-ci.com/project-march/hardware-interface) |
 | develop | [![Build Status](https://api.travis-ci.com/project-march/hardware-interface.svg?branch=develop)](https://travis-ci.com/project-march/hardware-interface) |
 
->>>>>>> hardware-interface/develop
-=======
+# Simulation
+The simulation of the exoskeleton.
+
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/project-march/simulation?include_prereleases)
+
+| Branch | Build Status |
+| ------ |:------------:|
+| master | [![Build Status](https://api.travis-ci.com/project-march/simulation.svg?branch=master)](https://travis-ci.com/project-march/simulation) |
+| develop | [![Build Status](https://api.travis-ci.com/project-march/simulation.svg?branch=develop)](https://travis-ci.com/project-march/simulation) |
+
 # Gait Generation
 Robot agnostic rqt plugin which allows the user to create joint trajectories.
 
@@ -93,8 +81,7 @@ To install run
     python2 -m pip install flake8 pep8-naming --user
     
 Then you can run `flake8` from the root and it will give errors you should fix, otherwise the Travis build will fail.
->>>>>>> gait-generation/develop
-=======
+
 # Controller research
 The controller research of the MARCH exoskeleton.
 
@@ -104,4 +91,3 @@ The controller research of the MARCH exoskeleton.
 | master | [![Build Status](https://api.travis-ci.com/project-march/controller-research.svg?branch=master)](https://travis-ci.com/project-march/controller-research) |
 | develop | [![Build Status](https://api.travis-ci.com/project-march/controller-research.svg?branch=develop)](https://travis-ci.com/project-march/controller-research) |
 
->>>>>>> controller-research/develop

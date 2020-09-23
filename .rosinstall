@@ -1,9 +1,4 @@
 - git:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     local-name: gait-generation
     uri: https://github.com/project-march/gait-generation
     version: develop
@@ -14,24 +9,8 @@
 - git:
     local-name: simulation
     uri: https://github.com/project-march/simulation
-=======
+    version: develop
+- git:
     local-name: march
     uri: https://github.com/project-march/march
->>>>>>> simulation/develop
-=======
-    local-name: march
-    uri: https://github.com/project-march/march
->>>>>>> monitor/develop
-=======
-    local-name: march
-    uri: https://github.com/project-march/march
->>>>>>> hardware-interface/develop
-=======
-    local-name: march
-    uri: https://github.com/project-march/march
->>>>>>> gait-generation/develop
-=======
-    local-name: march
-    uri: https://github.com/project-march/march
->>>>>>> controller-research/develop
     version: develop

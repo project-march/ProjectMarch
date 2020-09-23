@@ -2,42 +2,28 @@
 show-source = true
 max-line-length = 120
 format = ${cyan}%(path)s${reset}:${yellow_bold}%(row)d${reset}:${green_bold}%(col)d${reset}: ${red_bold}%(code)s${reset} %(text)s
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-exclude = .git
+exclude = .git, __init__.py, bin, install
 application-package-names =
     march_description,
     march_gain_scheduling,
+    march_gait_scheduler,
     march_gait_selection,
     march_launch,
     march_safety,
     march_shared_classes,
     march_shared_resources,
-=======
-exclude = .git, __init__.py
-application-package-names =
+    march_sound_scheduler,
+    march_state_machine
     march_rqt_gait_selection,
     march_rqt_input_device,
     march_rqt_note_taker,
     march_rqt_software_check,
     march_shared_classes,
     march_shared_resources
->>>>>>> monitor/develop
-=======
-exclude =
-    .git
-    __init__.py
-application-package-names =
     march_shared_classes,
     march_shared_resources,
-    march_rqt_gait_generator
->>>>>>> gait-generation/develop
-=======
-exclude = .git
-application-package-names =
+    march_rqt_gait_generator,
     odrive_interface
->>>>>>> controller-research/develop
 import-order-style = appnexus
 ignore =
     # D100: Missing docstring in public module
@@ -56,24 +42,10 @@ ignore =
     D106,
     # D107: Missing docstring in __init__
     D107,
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> controller-research/develop
     # D401: First line should be in imperative mood
     D401,
     # W503: Line break before operator
     W503,
     # C815: Trailing comma in Python 3.5
     C815
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-ignore-names = rowCount, columnCount, headerData, setUp, paintEvent
->>>>>>> monitor/develop
-=======
-# These function names are inherited from Qt, so we can't rename them
-ignore-names = createEditor, setEditorData, setModelData, updateEditorGeometry, mouseClickEvent, mouseDragEvent, setUp
->>>>>>> gait-generation/develop
-=======
->>>>>>> controller-research/develop
+ignore-names = rowCount, columnCount, headerData, setUp, paintEvent, createEditor, setEditorData, setModelData, updateEditorGeometry, mouseClickEvent, mouseDragEvent, setUp

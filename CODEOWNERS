@@ -1,32 +1,13 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
+* @project-march/v-software
 * @Olavhaasie @project-march/v-software
 
 /march_data_collector/ @RutgerVanBeek @project-march/v-software @Olavhaasie
 /march_gain_scheduling/ @project-march/v-control @project-march/v-software @Olavhaasie
-=======
-* @Olavhaasie @Roelemans
->>>>>>> simulation/develop
-=======
-* @project-march/v-software
->>>>>>> monitor/develop
-=======
 * @Olavhaasie
 
 *.gait @gaiavdh @marnixbrands
 *.subgait @gaiavdh @marnixbrands
 *.yaml @gaiavdh @marnixbrands
->>>>>>> gait-files/develop
-=======
 * @project-march/v-software @bjornminderman @Olavhaasie
->>>>>>> hardware-interface/develop
-=======
 * @Olavhaasie @Roelemans
->>>>>>> gait-generation/develop
-=======
 * @project-march/v-software @JorisWeeda @Roelemans
->>>>>>> controller-research/develop
