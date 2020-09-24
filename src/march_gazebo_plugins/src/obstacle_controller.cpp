@@ -2,19 +2,20 @@
 
 #include <march_gazebo_plugins/obstacle_controller.h>
 #include <ros/ros.h>
-
 namespace gazebo
 {
 ObstacleController::ObstacleController(physics::ModelPtr model)
   : model_(model)
   , subgait_name_("home_stand")
   , subgait_changed_(true)
+  , balance_(false)
   , error_x_last_timestep_(0)
   , error_y_last_timestep_(0)
   , error_yaw_last_timestep_(0)
 {
   this->foot_left_ = this->model_->GetLink("ankle_plate_left");
   this->foot_right_ = this->model_->GetLink("ankle_plate_right");
+  ros::param::get("balance", this->balance_);
 
   this->subgait_name_ = "home_stand";
   this->subgait_changed_ = true;
@@ -76,10 +77,10 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left
   double goal_position_y;
 
   this->getGoalPosition(time_since_start, goal_position_x, goal_position_y);
-
   double error_x = model_com.X() - goal_position_x;
   double error_y = model_com.Y() - goal_position_y;
   double error_yaw = this->foot_left_->WorldPose().Rot().Z();
+
 
   // Deactivate d if the subgait just changed to avoid effort peaks when the target function jumps
   if (this->subgait_changed_)
@@ -89,12 +90,46 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left
     this->error_yaw_last_timestep_ = error_yaw;
     this->subgait_changed_ = false;
   }
+  double p_pitch_actual, p_roll_actual, p_yaw_actual, d_pitch_actual, d_roll_actual, d_yaw_actual;
 
   // roll, pitch and yaw are defined in
   // https://docs.projectmarch.nl/doc/march_packages/march_simulation.html#torque-application
-  double T_pitch = -this->p_pitch_ * error_x - this->d_pitch_ * (error_x - this->error_x_last_timestep_);
-  double T_roll = this->p_roll_ * error_y + this->d_roll_ * (error_y - this->error_y_last_timestep_);
-  double T_yaw = -this->p_yaw_ * error_yaw - this->d_yaw_ * (error_yaw - this->error_yaw_last_timestep_);
+  // turn (bodge) off plug-in at right time when balance is set to true
+  if(balance_ == true)
+    {
+      if(this->subgait_name_ == "home_stand" || this->subgait_name_ == "idle_state")
+      {
+        p_pitch_actual = this->p_pitch_;
+        p_roll_actual = this->p_roll_;
+        p_yaw_actual = this->p_yaw_;
+        d_pitch_actual = this->d_pitch_;
+        d_roll_actual = this->d_roll_;
+        d_yaw_actual = this->d_yaw_;
+      }
+      else
+      {
+        p_pitch_actual = this->p_pitch_off_;
+        p_roll_actual = this->p_roll_off_;
+        p_yaw_actual = this->p_yaw_off_;
+        d_pitch_actual = this->d_pitch_off_;
+        d_roll_actual = this->d_roll_off_;
+        d_yaw_actual = this->d_yaw_off_;
+      }
+      std::cout << p_pitch_actual << std::endl;
+    }
+  else
+  {
+    p_pitch_actual = this->p_pitch_;
+    p_roll_actual = this->p_roll_;
+    p_yaw_actual = this->p_yaw_;
+    d_pitch_actual = this->d_pitch_;
+    d_roll_actual = this->d_roll_;
+    d_yaw_actual = this->d_yaw_;
+  }
+
+  double T_pitch = -p_pitch_actual * error_x - d_pitch_actual * (error_x - this->error_x_last_timestep_);
+  double T_roll = p_roll_actual * error_y + d_roll_actual * (error_y - this->error_y_last_timestep_);
+  double T_yaw = -p_yaw_actual * error_yaw - d_yaw_actual * (error_yaw - this->error_yaw_last_timestep_);
 
   if (this->subgait_name_.substr(0, 4) == "left")
   {
@@ -110,6 +145,7 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left
   this->error_x_last_timestep_ = error_x;
   this->error_y_last_timestep_ = error_y;
   this->error_yaw_last_timestep_ = error_yaw;
+
 }
 
 void ObstacleController::getGoalPosition(double time_since_start, double& goal_position_x, double& goal_position_y)
