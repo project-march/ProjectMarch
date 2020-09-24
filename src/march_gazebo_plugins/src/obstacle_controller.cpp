@@ -115,7 +115,6 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left
         d_roll_actual = this->d_roll_off_;
         d_yaw_actual = this->d_yaw_off_;
       }
-      std::cout << p_pitch_actual << std::endl;
     }
   else
   {
