@@ -2,6 +2,9 @@
 #include "march_hardware_interface/march_hardware_interface.h"
 #include "march_hardware_interface/power_net_on_off_command.h"
 
+#include <march_hardware/imotioncube/actuation_mode.h>
+#include <march_hardware/joint.h>
+
 #include <algorithm>
 #include <cmath>
 #include <exception>
@@ -13,9 +16,6 @@
 #include <joint_limits_interface/joint_limits_interface.h>
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <urdf/model.h>
-
-#include <march_hardware/imotioncube/actuation_mode.h>
-#include <march_hardware/joint.h>
 
 using hardware_interface::JointHandle;
 using hardware_interface::JointStateHandle;

@@ -1,0 +1,88 @@
+stages:
+  - approval
+  - docker
+  - lint
+  - build
+  - test
+  - static_analysis
+
+image: registry.gitlab.com/project-march/march:latest
+
+cache:
+  key: "${CI_JOB_NAME}"
+  paths:
+    - ccache
+
+colcon build:
+  stage: build
+  artifacts:
+    paths:
+      - build/
+      - install/
+      - log/
+  script:
+    - colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
+
+colcon test:
+  stage: test
+  dependencies:
+    - colcon build
+  script:
+    - source install/setup.bash && colcon test --event-handlers console_direct+
+    - colcon test-result --verbose
+
+catkin_lint:
+  stage: lint
+  script:
+    - catkin_lint -W1 --strict src
+
+pep8:
+  stage: lint
+  script:
+    - python -m autopep8 --diff -r --aggressive --aggressive --exit-code src
+    - python -m flake8
+  only:
+    changes:
+      - "**/*.py"
+  allow_failure: true
+
+
+gitlab-ci.yml changed:
+  stage: approval
+  image: alpine:latest
+  script:
+    - echo "Approved!"
+  rules:
+    - changes:
+        - ".gitlab-ci.yml"
+      when: manual
+      allow_failure: false
+
+docker:
+  stage: docker
+  image: docker:latest
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build -t registry.gitlab.com/project-march/march .
+    - docker push registry.gitlab.com/project-march/march
+  rules:
+    - changes:
+        - Dockerfile
+      when: manual
+      allow_failure: false
+
+clang tidy:
+  needs: ["colcon build"]
+  stage: static_analysis
+  script:
+    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
+  only:
+    changes:
+      - "**/*.{hpp,h,cpp}"
+  allow_failure: true
