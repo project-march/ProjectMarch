@@ -23,6 +23,7 @@ devel/
 logs/
 build/
 bin/
+log/
 lib/
 ### Python ###
 # Byte-compiled / optimized / DLL files
