@@ -14,8 +14,3 @@
 
 <!-- Suggest next steps -->
 
-<!---
-LINES BELOW WILL SET GITLAB ISSUE PROPERTIES
---->
-/label ~feature
-

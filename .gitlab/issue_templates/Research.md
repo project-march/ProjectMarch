@@ -10,7 +10,3 @@
 
 <!-- How are you going to answer the research question -->
 
-<!---
-LINES BELOW WILL SET GITLAB ISSUE PROPERTIES
---->
-/label ~research
