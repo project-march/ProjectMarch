@@ -190,7 +190,8 @@ qtcreator-*
 CATKIN_IGNORE
 COLCON_IGNORE
 
-install/*
+*install/*
+*install_isolated/*
 
 venv/
 
