@@ -4,6 +4,7 @@ import rclpy
 from rclpy.time import Time as RclTime
 from rclpy.clock import ClockType
 from rclpy.node import Node
+from rclpy.parameter import Parameter
 from std_msgs.msg import Header, String
 from rosgraph_msgs.msg import Clock
 from builtin_interfaces.msg import Time
@@ -26,13 +27,15 @@ class InputDeviceController(Node):
         self._error_pub = self.create_publisher(Error, '/march/error', 10)
         self._get_possible_gaits = self.create_client(PossibleGaits, '/march/state_machine/get_possible_gaits')
 
+        self.set_parameters([Parameter("use_sim_time", value=True)])
+
         self.accepted_cb = None
         self.finished_cb = None
         self.rejected_cb = None
         self.current_gait_cb = None
-        self.use_sim_time=True
         self.get_logger().info(str(type(self.get_clock())))
         self.get_logger().info(str(self.get_clock()))
+        self.get_logger().info(str(self.get_clock().now().nanoseconds))
         self._ping = ping
         self._id = self.ID_FORMAT.format(machine=socket.gethostname(),
                                          user=getpass.getuser())
@@ -44,7 +47,7 @@ class InputDeviceController(Node):
             self._alive_pub = self.create_publisher(Alive, '/march/input_device/alive', 10)
             period = 0.02 #secs
             self._alive_timer = self.create_timer(period, self._timer_callback)
-            msg = Alive(stamp=self._get_time(), id=self._id)
+            msg = Alive(stamp=self.get_clock().now().to_msg(), id=self._id)
             self._alive_pub.publish(msg)
             self.get_logger().info('Published alive timer')
 
@@ -57,8 +60,9 @@ class InputDeviceController(Node):
             self._alive_pub.unregister()
 
     def _clock_callback(self, msg):
-        self.get_logger().info(msg)
-        self.get_clock().set_ros_time_override(RclTime.from_msg(msg), clock_type=ClockType.ROS_TIME)
+        return
+        # self.get_logger().info(msg)
+        # self.get_clock().set_ros_time_override(RclTime.from_msg(msg), clock_type=ClockType.ROS_TIME)
 
     def _callback_test(self):
         self.get_logger().info('TEST')
@@ -86,9 +90,9 @@ class InputDeviceController(Node):
             self.current_gait_cb(msg.data)
 
     def _timer_callback(self, event):
-        self.get_logger.info(str(type(event)))
+        self.get_logger().info(str(type(event)))
         msg = Alive(stamp=self.get_clock.now().to_msg(), id=self._id)
-        self.get_logger.info('Sending ALIVE')
+        self.get_logger().info('Sending ALIVE: {0}'.format(self.get_clock.now()))
         self._alive_pub.publish(msg)
 
     def get_possible_gaits(self):
@@ -107,14 +111,6 @@ class InputDeviceController(Node):
     def _default_callback_group(self, msg):
         self.get_logger().info(msg)
         return
-
-    def _get_time(self):
-        self.get_logger().info(str(self.get_clock().now().nanoseconds))
-        seconds = int(self.get_clock().now().nanoseconds / 1000000000)
-        self.get_logger().info(str(seconds))
-        self.get_logger().info(str(self.get_clock().now().nanoseconds % 1000000000))
-        time_msg = Time(sec=seconds, nanosec=self.get_clock().now().nanoseconds % 1000000000)
-        return time_msg
 
     def publish_increment_step_size(self):
         self.get_logger().debug('Mock Input Device published step size increment')

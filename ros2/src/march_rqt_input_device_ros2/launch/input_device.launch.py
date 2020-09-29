@@ -15,6 +15,6 @@ def generate_launch_description():
             default_value='true',
             description='Whether the safety node should be pinged'),
         launch_ros.actions.Node(
-            package='march_rqt_input_device_ros2', executable='march_rqt_input_device_ros2', output='screen',
-            name='input_device', use_sim_time='true', ping_safety_node=launch.substitutions.LaunchConfiguration('node_prefix')),
+            package='march_rqt_input_device_ros2', executable='input_device', output='screen',
+            name='input_device', parameters=[{'use_sim_time': True}])
     ])
