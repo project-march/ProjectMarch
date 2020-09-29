@@ -1,0 +1,7 @@
+<library path="lib/libmarch_pdb_state_controller">
+  <class name="march_pdb_state_controller/MarchPdbStateController" type="march_pdb_state_controller::MarchPdbStateController" base_class_type="controller_interface::ControllerBase">
+  <description>
+    This controller publishes the state pdb.
+  </description>
+  </class>
+</library>

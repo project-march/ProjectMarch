@@ -1,0 +1,17 @@
+<library path="src">
+    <class name="InputDevicePlugin" type="march_rqt_input_device.input_device_plugin.InputDevicePlugin" base_class_type="rqt_gui_py::Plugin">
+        <description>
+            An example Python GUI plugin to create a great user interface.
+        </description>
+        <qtgui>
+            <group>
+                <label>March</label>
+                <icon>resource/img/march-walking.png</icon>
+                <statustip>Plugins related to the March exoskeleton.</statustip>
+            </group>
+            <label>March Input Device</label>
+            <icon>resource/img/march-walking.png</icon>
+            <statustip>GUI to control the March exoskeleton.</statustip>
+        </qtgui>
+    </class>
+</library>

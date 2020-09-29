@@ -1,0 +1,11 @@
+<launch>
+    <node name="march_monitor"
+          pkg="rqt_gui"
+          type="rqt_gui"
+          output="screen"
+          args="--perspective-file $(find march_monitor)/config/full_monitor.perspective"/>
+
+    <include file="$(find march_rqt_robot_monitor)/launch/march_rqt_robot_monitor.launch">
+        <arg name="rqt" value="false"/>
+    </include>
+</launch>

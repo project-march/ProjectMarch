@@ -1,0 +1,15 @@
+name: stairs_up
+subgaits:
+  left_swing:
+    stop: right_swing
+    to: right_close
+  right_close:
+    to: end
+  right_open:
+    stop: left_swing
+    to: left_swing
+  right_swing:
+    to: end
+  start:
+    stop: right_open
+    to: right_open

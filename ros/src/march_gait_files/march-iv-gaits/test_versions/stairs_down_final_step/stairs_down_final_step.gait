@@ -1,0 +1,8 @@
+name: stairs_down_final_step
+subgaits:
+  left_final:
+    to: end
+  right_final:
+    to: left_final
+  start:
+    to: right_final

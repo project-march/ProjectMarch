@@ -1,0 +1,11 @@
+-
+  ros1_package_name: 'march_shared_resources'
+  ros1_message_name: 'GaitInstruction'
+  ros2_package_name: 'march_shared_msgs'
+  ros2_message_name: 'GaitInstruction2'
+-
+  ros1_package_name: 'march_shared_resources'
+  ros2_package_name: 'march_shared_msgs'
+#  fields_1_to_2:
+#    header: 'header'
+#    header.stamp:
