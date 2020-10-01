@@ -7,11 +7,26 @@ namespace gazebo
 ObstacleController::ObstacleController(physics::ModelPtr model)
   : model_(model)
   , subgait_name_("home_stand")
+  , subgait_start_time_(0)
+  , subgait_duration_(0)
   , subgait_changed_(true)
   , balance_(false)
+  , p_yaw_(0)
+  , d_yaw_(0)
+  , p_yaw_off_(0)
+  , d_yaw_off_(0)
+  , p_pitch_(0)
+  , d_pitch_(0)
+  , p_pitch_off_(0)
+  , d_pitch_off_(0)
+  , p_roll_(0)
+  , d_roll_(0)
+  , p_roll_off_(0)
+  , d_roll_off_(0)
   , error_x_last_timestep_(0)
   , error_y_last_timestep_(0)
   , error_yaw_last_timestep_(0)
+
 {
   this->foot_left_ = this->model_->GetLink("ankle_plate_left");
   this->foot_right_ = this->model_->GetLink("ankle_plate_right");
@@ -95,27 +110,15 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left
   // roll, pitch and yaw are defined in
   // https://docs.projectmarch.nl/doc/march_packages/march_simulation.html#torque-application
   // turn (bodge) off plug-in at right time when balance is set to true
-  if(balance_ == true)
-    {
-      if(this->subgait_name_ == "home_stand" || this->subgait_name_ == "idle_state")
-      {
-        p_pitch_actual = this->p_pitch_;
-        p_roll_actual = this->p_roll_;
-        p_yaw_actual = this->p_yaw_;
-        d_pitch_actual = this->d_pitch_;
-        d_roll_actual = this->d_roll_;
-        d_yaw_actual = this->d_yaw_;
-      }
-      else
-      {
-        p_pitch_actual = this->p_pitch_off_;
-        p_roll_actual = this->p_roll_off_;
-        p_yaw_actual = this->p_yaw_off_;
-        d_pitch_actual = this->d_pitch_off_;
-        d_roll_actual = this->d_roll_off_;
-        d_yaw_actual = this->d_yaw_off_;
-      }
-    }
+  if (balance_ == true && this->subgait_name_ != "home_stand" && this->subgait_name_ != "idle_state")
+  {
+    p_pitch_actual = this->p_pitch_off_;
+    p_roll_actual = this->p_roll_off_;
+    p_yaw_actual = this->p_yaw_off_;
+    d_pitch_actual = this->d_pitch_off_;
+    d_roll_actual = this->d_roll_off_;
+    d_yaw_actual = this->d_yaw_off_;
+  }
   else
   {
     p_pitch_actual = this->p_pitch_;
@@ -125,6 +128,7 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left
     d_roll_actual = this->d_roll_;
     d_yaw_actual = this->d_yaw_;
   }
+
 
   double T_pitch = -p_pitch_actual * error_x - d_pitch_actual * (error_x - this->error_x_last_timestep_);
   double T_roll = p_roll_actual * error_y + d_roll_actual * (error_y - this->error_y_last_timestep_);
