@@ -1,4 +1,6 @@
 import os
+from time import sleep
+
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import QSize
 from python_qt_binding.QtWidgets import QGridLayout
@@ -25,6 +27,9 @@ class InputDeviceView(QWidget):
         self._controller.finished_cb = self._finished_cb
         self._controller.rejected_cb = self._rejected_cb
         self._controller.current_gait_cb = self._current_gait_cb
+        self.possible_gaits_future = None
+        self._alive_timer = self._controller._node.create_timer(0.5, self._update_possible_gaits_view,
+                                                                clock=self._controller._node.get_clock())
 
         self._always_enabled_buttons = []
 
@@ -34,6 +39,7 @@ class InputDeviceView(QWidget):
         self.refresh_button.clicked.connect(self._update_possible_gaits)
 
         self._create_buttons()
+        self.possible_gaits = []
         self._update_possible_gaits()
 
     def _create_buttons(self):
@@ -57,242 +63,241 @@ class InputDeviceView(QWidget):
                                callback=lambda: self._controller.publish_gait('home_stand'))
 
         gait_sit = \
-            self.create_button('gait_sit', image_path='/gait_sit.png',
-                               callback=lambda: self._controller.publish_gait('gait_sit'))
+            self.create_button('sit', image_path='/gait_sit.png',
+                               callback=lambda: self._controller.publish_gait('sit'))
 
         gait_walk = \
-            self.create_button('gait_walk', image_path='/gait_walk.png',
-                               callback=lambda: self._controller.publish_gait('gait_walk'))
+            self.create_button('walk', image_path='/gait_walk.png',
+                               callback=lambda: self._controller.publish_gait('walk'))
 
         gait_walk_small = \
-            self.create_button('gait_walk_small', image_path='/gait_walk_small.png',
-                               callback=lambda: self._controller.publish_gait('gait_walk_small'))
+            self.create_button('walk_small', image_path='/gait_walk_small.png',
+                               callback=lambda: self._controller.publish_gait('walk_small'))
 
         gait_walk_large = \
-            self.create_button('gait_walk_large', image_path='/gait_walk_large.png',
-                               callback=lambda: self._controller.publish_gait('gait_walk_large'))
+            self.create_button('walk_large', image_path='/gait_walk_large.png',
+                               callback=lambda: self._controller.publish_gait('walk_large'))
 
         gait_slalom_walk = \
-            self.create_button('gait_slalom_walk',
-                               callback=lambda: self._controller.publish_gait('gait_slalom_walk'))
+            self.create_button('slalom_walk',
+                               callback=lambda: self._controller.publish_gait('slalom_walk'))
 
         gait_balanced_walk = \
-            self.create_button('gait_balanced_walk',
-                               callback=lambda: self._controller.publish_gait('gait_balanced_walk'))
+            self.create_button('balanced_walk',
+                               callback=lambda: self._controller.publish_gait('balanced_walk'))
 
         gait_single_step_small = \
-            self.create_button('gait_single_step_small', image_path='/gait_single_step_small.png',
-                               callback=lambda: self._controller.publish_gait('gait_single_step_small'))
+            self.create_button('single_step_small', image_path='/gait_single_step_small.png',
+                               callback=lambda: self._controller.publish_gait('single_step_small'))
 
         gait_single_step_mini = \
-            self.create_button('gait_single_step_mini',
-                               callback=lambda: self._controller.publish_gait('gait_single_step_mini'))
+            self.create_button('single_step_mini',
+                               callback=lambda: self._controller.publish_gait('single_step_mini'))
 
         gait_single_step_normal = \
-            self.create_button('gait_single_step_normal', image_path='/gait_single_step_medium.png',
-                               callback=lambda: self._controller.publish_gait('gait_single_step_normal'))
+            self.create_button('single_step_normal', image_path='/gait_single_step_medium.png',
+                               callback=lambda: self._controller.publish_gait('single_step_normal'))
 
         gait_side_step_left = \
-            self.create_button('gait_side_step_left', image_path='/gait_side_step_left.png',
-                               callback=lambda: self._controller.publish_gait('gait_side_step_left'))
+            self.create_button('side_step_left', image_path='/gait_side_step_left.png',
+                               callback=lambda: self._controller.publish_gait('side_step_left'))
 
         gait_side_step_right = \
-            self.create_button('gait_side_step_right', image_path='/gait_side_step_right.png',
-                               callback=lambda: self._controller.publish_gait('gait_side_step_right'))
+            self.create_button('side_step_right', image_path='/gait_side_step_right.png',
+                               callback=lambda: self._controller.publish_gait('side_step_right'))
 
         gait_side_step_left_small = \
-            self.create_button('gait_side_step_left_small',
-                               callback=lambda: self._controller.publish_gait('gait_side_step_left_small'))
+            self.create_button('side_step_left_small',
+                               callback=lambda: self._controller.publish_gait('side_step_left_small'))
 
         gait_side_step_right_small = \
-            self.create_button('gait_side_step_right_small',
-                               callback=lambda: self._controller.publish_gait('gait_side_step_right_small'))
+            self.create_button('side_step_right_small',
+                               callback=lambda: self._controller.publish_gait('side_step_right_small'))
 
         gait_stand = \
-            self.create_button('gait_stand', image_path='/gait_stand.png',
-                               callback=lambda: self._controller.publish_gait('gait_stand'))
+            self.create_button('stand', image_path='/gait_stand.png',
+                               callback=lambda: self._controller.publish_gait('stand'))
 
         gait_sofa_stand = \
-            self.create_button('gait_sofa_stand', image_path='/gait_sofa_stand.png',
-                               callback=lambda: self._controller.publish_gait('gait_sofa_stand'))
+            self.create_button('sofa_stand', image_path='/gait_sofa_stand.png',
+                               callback=lambda: self._controller.publish_gait('sofa_stand'))
 
         gait_sofa_sit = \
-            self.create_button('gait_sofa_sit', image_path='/gait_sofa_sit.png',
-                               callback=lambda: self._controller.publish_gait('gait_sofa_sit'))
+            self.create_button('sofa_sit', image_path='/gait_sofa_sit.png',
+                               callback=lambda: self._controller.publish_gait('sofa_sit'))
 
         gait_stairs_up = \
-            self.create_button('gait_stairs_up', image_path='/gait_stairs_up.png',
-                               callback=lambda: self._controller.publish_gait('gait_stairs_up'))
+            self.create_button('stairs_up', image_path='/gait_stairs_up.png',
+                               callback=lambda: self._controller.publish_gait('stairs_up'))
 
         gait_stairs_down = \
-            self.create_button('gait_stairs_down', image_path='/gait_stairs_down.png',
-                               callback=lambda: self._controller.publish_gait('gait_stairs_down'))
+            self.create_button('stairs_down', image_path='/gait_stairs_down.png',
+                               callback=lambda: self._controller.publish_gait('stairs_down'))
 
         gait_stairs_up_single_step = \
-            self.create_button('gait_stairs_up_single_step', image_path='/gait_stairs_up_single_step.png',
-                               callback=lambda: self._controller.publish_gait('gait_stairs_up_single_step'))
+            self.create_button('stairs_up_single_step', image_path='/gait_stairs_up_single_step.png',
+                               callback=lambda: self._controller.publish_gait('stairs_up_single_step'))
 
         gait_stairs_down_single_step = \
-            self.create_button('gait_stairs_down_single_step', image_path='/gait_stairs_down_single_step.png',
-                               callback=lambda: self._controller.publish_gait('gait_stairs_down_single_step'))
+            self.create_button('stairs_down_single_step', image_path='/gait_stairs_down_single_step.png',
+                               callback=lambda: self._controller.publish_gait('stairs_down_single_step'))
 
         gait_rough_terrain_high_step = \
-            self.create_button('gait_rough_terrain_high_step', image_path='/gait_rough_terrain_high_step.png',
-                               callback=lambda: self._controller.publish_gait('gait_rough_terrain_high_step'))
+            self.create_button('rough_terrain_high_step', image_path='/gait_rough_terrain_high_step.png',
+                               callback=lambda: self._controller.publish_gait('rough_terrain_high_step'))
 
         gait_rough_terrain_middle_steps = \
-            self.create_button('gait_rough_terrain_middle_steps',
-                               callback=lambda: self._controller.publish_gait('gait_rough_terrain_middle_steps'))
+            self.create_button('rough_terrain_middle_steps',
+                               callback=lambda: self._controller.publish_gait('rough_terrain_middle_steps'))
 
         gait_rough_terrain_first_middle_step = \
-            self.create_button('gait_rough_terrain_first_middle_step',
+            self.create_button('rough_terrain_first_middle_step',
                                image_path='/gait_rough_terrain_first_middle_step.png',
-                               callback=lambda: self._controller.publish_gait('gait_rough_terrain_first_middle_step'))
+                               callback=lambda: self._controller.publish_gait('rough_terrain_first_middle_step'))
 
         gait_rough_terrain_second_middle_step = \
-            self.create_button('gait_rough_terrain_second_middle_step',
+            self.create_button('rough_terrain_second_middle_step',
                                image_path='/gait_rough_terrain_second_middle_step.png',
-                               callback=lambda: self._controller.publish_gait('gait_rough_terrain_second_middle_step'))
+                               callback=lambda: self._controller.publish_gait('rough_terrain_second_middle_step'))
 
         gait_rough_terrain_third_middle_step = \
-            self.create_button('gait_rough_terrain_third_middle_step',
+            self.create_button('rough_terrain_third_middle_step',
                                image_path='/gait_rough_terrain_third_middle_step.png',
-                               callback=lambda: self._controller.publish_gait('gait_rough_terrain_third_middle_step'))
+                               callback=lambda: self._controller.publish_gait('rough_terrain_third_middle_step'))
 
         gait_ramp_door_slope_up = \
-            self.create_button('gait_ramp_door_slope_up', image_path='/gait_ramp_door_slope_up.png',
-                               callback=lambda: self._controller.publish_gait('gait_ramp_door_slope_up'))
+            self.create_button('ramp_door_slope_up', image_path='/gait_ramp_door_slope_up.png',
+                               callback=lambda: self._controller.publish_gait('ramp_door_slope_up'))
 
         gait_ramp_door_slope_down = \
-            self.create_button('gait_ramp_door_slope_down', image_path='/gait_ramp_door_slope_down.png',
-                               callback=lambda: self._controller.publish_gait('gait_ramp_door_slope_down'))
+            self.create_button('ramp_door_slope_down', image_path='/gait_ramp_door_slope_down.png',
+                               callback=lambda: self._controller.publish_gait('ramp_door_slope_down'))
 
         gait_ramp_door_slope_down_fixed = \
-            self.create_button('gait_ramp_door_slope_down_fixed',
-                               callback=lambda: self._controller.publish_gait('gait_ramp_door_slope_down_fixed'))
+            self.create_button('ramp_door_slope_down_fixed',
+                               callback=lambda: self._controller.publish_gait('ramp_door_slope_down_fixed'))
 
         gait_ramp_door_slope_down_single = \
-            self.create_button('gait_ramp_door_slope_down_single',
-                               callback=lambda: self._controller.publish_gait('gait_ramp_door_slope_down_single'))
+            self.create_button('ramp_door_slope_down_single',
+                               callback=lambda: self._controller.publish_gait('ramp_door_slope_down_single'))
 
         gait_ramp_door_last_step = \
-            self.create_button('gait_ramp_door_last_step', image_path='/gait_ramp_door_last_step.png',
-                               callback=lambda: self._controller.publish_gait('gait_ramp_door_last_step'))
+            self.create_button('ramp_door_last_step', image_path='/gait_ramp_door_last_step.png',
+                               callback=lambda: self._controller.publish_gait('ramp_door_last_step'))
 
         gait_tilted_path_left_straight_start = \
-            self.create_button('gait_tilted_path_left_straight_start',
+            self.create_button('tilted_path_left_straight_start',
                                image_path='/gait_tilted_path_left_straight_start.png',
-                               callback=lambda: self._controller.publish_gait('gait_tilted_path_left_straight_start'))
+                               callback=lambda: self._controller.publish_gait('tilted_path_left_straight_start'))
 
         gait_tilted_path_left_single_step = \
-            self.create_button('gait_tilted_path_left_single_step',
+            self.create_button('tilted_path_left_single_step',
                                image_path='/gait_tilted_path_left_single_step.png',
-                               callback=lambda: self._controller.publish_gait('gait_tilted_path_left_single_step'))
+                               callback=lambda: self._controller.publish_gait('tilted_path_left_single_step'))
 
         gait_tilted_path_left_straight_end = \
-            self.create_button('gait_tilted_path_left_straight_end',
+            self.create_button('tilted_path_left_straight_end',
                                image_path='/gait_tilted_path_left_straight_end.png',
-                               callback=lambda: self._controller.publish_gait('gait_tilted_path_left_straight_end'))
+                               callback=lambda: self._controller.publish_gait('tilted_path_left_straight_end'))
 
         gait_tilted_path_left_flexed_knee_step = \
-            self.create_button('gait_tilted_path_left_flexed_knee_step',
-                               callback=lambda: self._controller.publish_gait('gait_tilted_path_left_flexed_knee_step'))
+            self.create_button('tilted_path_left_flexed_knee_step',
+                               callback=lambda: self._controller.publish_gait('tilted_path_left_flexed_knee_step'))
 
         gait_tilted_path_left_knee_bend = \
-            self.create_button('gait_tilted_path_left_knee_bend',
-                               callback=lambda: self._controller.publish_gait('gait_tilted_path_left_knee_bend'))
+            self.create_button('tilted_path_left_knee_bend',
+                               callback=lambda: self._controller.publish_gait('tilted_path_left_knee_bend'))
 
         gait_tilted_path_right_straight_start = \
-            self.create_button('gait_tilted_path_right_straight_start',
+            self.create_button('tilted_path_right_straight_start',
                                image_path='/gait_tilted_path_right_straight_start.png',
-                               callback=lambda: self._controller.publish_gait('gait_tilted_path_right_straight_start'))
+                               callback=lambda: self._controller.publish_gait('tilted_path_right_straight_start'))
 
         gait_tilted_path_right_single_step = \
-            self.create_button('gait_tilted_path_right_single_step',
+            self.create_button('tilted_path_right_single_step',
                                image_path='/gait_tilted_path_right_single_step.png',
-                               callback=lambda: self._controller.publish_gait('gait_tilted_path_right_single_step'))
+                               callback=lambda: self._controller.publish_gait('tilted_path_right_single_step'))
 
         gait_tilted_path_right_straight_end = \
-            self.create_button('gait_tilted_path_right_straight_end',
+            self.create_button('tilted_path_right_straight_end',
                                image_path='/gait_tilted_path_right_straight_end.png',
-                               callback=lambda: self._controller.publish_gait('gait_tilted_path_right_straight_end'))
+                               callback=lambda: self._controller.publish_gait('tilted_path_right_straight_end'))
 
         gait_tilted_path_right_flexed_knee_step = \
-            self.create_button('gait_tilted_path_right_flexed_knee_step',
+            self.create_button('tilted_path_right_flexed_knee_step',
                                callback=lambda: self._controller.publish_gait(
-                                   'gait_tilted_path_right_flexed_knee_step'))
+                                   'tilted_path_right_flexed_knee_step'))
 
         gait_tilted_path_right_knee_bend = \
-            self.create_button('gait_tilted_path_right_knee_bend',
-                               callback=lambda: self._controller.publish_gait('gait_tilted_path_right_knee_bend'))
+            self.create_button('tilted_path_right_knee_bend',
+                               callback=lambda: self._controller.publish_gait('tilted_path_right_knee_bend'))
 
         gait_tilted_path_first_start = \
-            self.create_button('gait_tilted_path_first_start',
-                               callback=lambda: self._controller.publish_gait('gait_tilted_path_first_start'))
+            self.create_button('tilted_path_first_start',
+                               callback=lambda: self._controller.publish_gait('tilted_path_first_start'))
 
         gait_tilted_path_second_start = \
-            self.create_button('gait_tilted_path_second_start',
-                               callback=lambda: self._controller.publish_gait('gait_tilted_path_second_start'))
+            self.create_button('tilted_path_second_start',
+                               callback=lambda: self._controller.publish_gait('tilted_path_second_start'))
 
         gait_tilted_path_first_end = \
-            self.create_button('gait_tilted_path_first_end',
-                               callback=lambda: self._controller.publish_gait('gait_tilted_path_first_end'))
+            self.create_button('tilted_path_first_end',
+                               callback=lambda: self._controller.publish_gait('tilted_path_first_end'))
 
         gait_tilted_path_second_end = \
-            self.create_button('gait_tilted_path_second_end',
-                               callback=lambda: self._controller.publish_gait('gait_tilted_path_second_end'))
+            self.create_button('tilted_path_second_end',
+                               callback=lambda: self._controller.publish_gait('tilted_path_second_end'))
 
-        stop_button = self.create_button('gait_stop', image_path='/stop.png',
+        stop_button = self.create_button('stop', image_path='/stop.png',
                                          callback=lambda: self._controller.publish_stop(),
                                          always_enabled=True)
-        #
-        # pause_button = self.create_button('gait_pause', image_path='/pause.png',
-        #                                   callback=lambda: self._controller.publish_pause(),
-        #                                   always_enabled=True)
-        #
-        # continue_button = self.create_button('gait_continue', image_path='/continue.png',
-        #                                      callback=lambda: self._controller.publish_continue(),
-        #                                      always_enabled=True)
-        #
-        # error_button = self.create_button('error', image_path='/error.png',
-        #                                   callback=lambda: self._controller.publish_error(),
-        #                                   always_enabled=True)
-        #
-        # sm_to_unknown_button = self.create_button('force unknown',
-        #                                           callback=lambda: self._controller.publish_sm_to_unknown(),
-        #                                           always_enabled=True)
+
+        pause_button = self.create_button('pause', image_path='/pause.png',
+                                          callback=lambda: self._controller.publish_pause(),
+                                          always_enabled=True)
+
+        continue_button = self.create_button('continue', image_path='/continue.png',
+                                             callback=lambda: self._controller.publish_continue(),
+                                             always_enabled=True)
+
+        error_button = self.create_button('error', image_path='/error.png',
+                                          callback=lambda: self._controller.publish_error(),
+                                          always_enabled=True)
+
+        sm_to_unknown_button = self.create_button('force unknown',
+                                                  callback=lambda: self._controller.publish_sm_to_unknown(),
+                                                  always_enabled=True)
 
         # The button layout.
         # Position in the array determines position on screen.
         march_button_layout = [
-            # [stop_button]
             [home_sit, home_stand, gait_walk, gait_walk_small, gait_walk_large, gait_balanced_walk, gait_slalom_walk],
-            #
-            [gait_sit, gait_stand, rocker_switch_increment, rocker_switch_decrement, stop_button],#, error_button,
-            #  sm_to_unknown_button],
-            #
-            [gait_sofa_sit, gait_sofa_stand, gait_single_step_normal, gait_single_step_small],#, continue_button,
-            #  pause_button],
-            #
+
+            [gait_sit, gait_stand, rocker_switch_increment, rocker_switch_decrement, stop_button, error_button,
+             sm_to_unknown_button],
+
+            [gait_sofa_sit, gait_sofa_stand, gait_single_step_normal, gait_single_step_small, continue_button,
+             pause_button],
+
             [gait_stairs_up, gait_stairs_down, gait_stairs_up_single_step, gait_stairs_down_single_step],
-            #
+
             [gait_side_step_left, gait_side_step_right, gait_side_step_left_small, gait_side_step_right_small],
-            #
+
             [gait_rough_terrain_high_step, gait_single_step_mini, gait_rough_terrain_middle_steps,
              gait_rough_terrain_first_middle_step, gait_rough_terrain_second_middle_step,
              gait_rough_terrain_third_middle_step],
 
             [gait_ramp_door_slope_up, gait_ramp_door_slope_down, gait_ramp_door_slope_down_fixed,
              gait_ramp_door_last_step, gait_ramp_door_slope_down_single],
-            #
+
             [gait_tilted_path_left_straight_start, gait_tilted_path_left_single_step,
              gait_tilted_path_left_straight_end, gait_tilted_path_left_flexed_knee_step,
              gait_tilted_path_left_knee_bend],
-            #
+
             [gait_tilted_path_right_straight_start, gait_tilted_path_right_single_step,
              gait_tilted_path_right_straight_end, gait_tilted_path_right_flexed_knee_step,
              gait_tilted_path_right_knee_bend],
-            #
+
             [gait_tilted_path_first_start, gait_tilted_path_second_start, gait_tilted_path_first_end,
              gait_tilted_path_second_end],
         ]
@@ -325,23 +330,30 @@ class InputDeviceView(QWidget):
         self.gait_label.setText(gait_name)
 
     def _update_possible_gaits(self):
-        self.frame.setEnabled(False)
-        self.frame.verticalScrollBar().setEnabled(False)
-        possible_gaits = self._controller.get_possible_gaits()
-        layout = self.content.layout()
-        if layout:
-            for i in range(layout.count()):
-                button = layout.itemAt(i).widget()
-                name = button.objectName()
-                if name in self._always_enabled_buttons:
-                    continue
+        self._controller.update_possible_gaits()
 
-                if name in possible_gaits:
-                    button.setEnabled(True)
-                else:
-                    button.setEnabled(False)
-        self.frame.setEnabled(True)
-        self.frame.verticalScrollBar().setEnabled(True)
+    def _update_possible_gaits_view(self):
+        new_possible_gaits = self._controller.get_possible_gaits()
+        if set(self.possible_gaits) != set(new_possible_gaits):
+            self._controller._node.get_logger().info('New gaits: {0} after {1}'.format(new_possible_gaits,
+                                                                                       self.possible_gaits))
+            self.frame.setEnabled(False)
+            self.frame.verticalScrollBar().setEnabled(False)
+            self.possible_gaits = new_possible_gaits
+
+            layout = self.content.layout()
+            if layout:
+                for i in range(layout.count()):
+                    button = layout.itemAt(i).widget()
+                    name = button.objectName()
+                    if name in self._always_enabled_buttons:
+                        continue
+                    if name in self.possible_gaits:
+                        button.setEnabled(True)
+                    else:
+                        button.setEnabled(False)
+            self.frame.setEnabled(True)
+            self.frame.verticalScrollBar().setEnabled(True)
 
     def create_button(self, name, callback=None, image_path=None, size=(128, 160), always_enabled=False):
         """Create a push button which the mock input device can register.

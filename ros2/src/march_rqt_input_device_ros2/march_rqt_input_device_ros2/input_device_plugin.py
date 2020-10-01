@@ -4,8 +4,8 @@ from ament_index_python.packages import get_package_share_directory
 from rqt_gui.main import Main
 import sys
 import rclpy
-
-
+from rclpy.parameter import Parameter
+from rosgraph_msgs.msg import Clock
 from .input_device_controller import InputDeviceController
 from .input_device_view import InputDeviceView
 
@@ -27,14 +27,19 @@ class InputDevicePlugin(Plugin):
         super(InputDevicePlugin, self).__init__(context)
 
         self.setObjectName('InputDevicePlugin')
+        context.node.set_parameters([Parameter("use_sim_time", value=True)])
 
         # ping = rclpy.get_param('~ping_safety_node', True)
         ui_file = os.path.join(get_package_share_directory('march_rqt_input_device_ros2'), 'input_device.ui')
 
-        self._controller = InputDeviceController(True)
+        self._node = context.node
+        self._controller = InputDeviceController(self._node, True)
+        # self._timesource = self.create_subscription(Clock, '/clock', self._clock_callback, 10)
         self._widget = InputDeviceView(ui_file, self._controller)
         context.add_widget(self._widget)
 
         # Show _widget.windowTitle on left-top of each plugin (when it's set in _widget). (useful for multiple windows)
         if context.serial_number() > 1:
             self._widget.setWindowTitle('{0} ({1})'.format(self._widget.windowTitle(), context.serial_number()))
+
+        # rclpy.spin(self._controller)

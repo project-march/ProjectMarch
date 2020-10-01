@@ -24,7 +24,7 @@ find_package(std_msgs REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/GaitInstruction2.msg"
+  "msg/GaitInstruction.msg"
   "msg/Alive.msg"
   "msg/Error.msg"
   "msg/GaitInstructionResponse.msg"
