@@ -2,7 +2,7 @@ import os
 
 # Retrieve branch name
 if os.getenv('CI'):
-    branch_name = os.environ['TRAVIS_BRANCH']
+    branch_name = os.environ['CI_COMMIT_BRANCH']
 else:
     import pygit2
     branch_name = pygit2.Repository('.').head.shorthand
@@ -49,10 +49,11 @@ html_last_updated_fmt = '%b %d, %Y'
 html_show_copyright = True
 
 html_context = {
-    'display_github': True,
-    'github_user': 'project-march',
-    'github_repo': 'tutorials',
-    'github_version': branch_name,
+    'display_gitlab': True,
+    'gitlab_user': 'project-march',
+    'gitlab_repo': 'tutorials',
+    'gitlab_version': branch_name,
+    'gitlab_url': 'https://gitlab.com/',
     "conf_py_path": "/",
     "css_files": ['_static/css/override.css'],
     "favicon": "favicon.ico",
@@ -65,17 +66,16 @@ rst_prolog = """
 """
 
 # Links
-extlinks = {'codedir': ('https://github.com/' + html_context['github_user'] + '/tutorials/tree/' + html_context['github_version'] + '/doc/%s', ''),
-            'rootdir': ('https://github.com/' + html_context['github_user'] + '/tutorials/tree/' + html_context['github_version'] + '/%s', ''),
-            'hardware-interface': ('https://github.com/' + html_context['github_user'] + '/hardware-interface/tree/develop/%s', ''),
-            'input-device': ('https://github.com/' + html_context['github_user'] + '/input-device/tree/develop/%s', ''),
-            'march': ('https://github.com/' + html_context['github_user'] + '/march/tree/develop/%s', ''),
-            'monitor': ('https://github.com/' + html_context['github_user'] + '/monitor/tree/develop/%s', ''),
-            'state-machine': ('https://github.com/' + html_context['github_user'] + '/state-machine/tree/develop/%s', ''),
-            'simulation': ('https://github.com/' + html_context['github_user'] + '/simulation/tree/develop/%s', ''),
-            'gait-files': ('https://github.com/' + html_context['github_user'] + '/gait-files/tree/develop/%s', ''),
-            'ethercat-slaves': ('https://github.com/' + html_context['github_user'] + '/ethercat-slaves/tree/develop/%s', ''),
-            'gait-generation': ('https://github.com/' + html_context['github_user'] + '/gait-generation/tree/develop/%s', ''),
+extlinks = {'codedir': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/tutorials/tree/' + html_context['gitlab_version'] + '/doc/%s', ''),
+            'rootdir': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/tutorials/tree/' + html_context['gitlab_version'] + '/%s', ''),
+            'hardware-interface': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/march/-/tree/main/src/march_hardware_interface/%s', ''),
+            'input-device': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/input-device/-/tree/main/%s', ''),
+            'march': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/march/-/tree/main/%s', ''),
+            'monitor': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/march/-/tree/main/src/march_monitor/%s', ''),
+            'simulation': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/march/-/tree/main/src/march_simulation/%s', ''),
+            'gait-files': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/march/-/tree/main/src/march_gait_files/%s', ''),
+            'ethercat-slaves': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/ethercat-slaves/-/tree/main/%s', ''),
+            'gait-generation': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/march/-/tree/main/src/march_rqt_gait_generator/%s', ''),
             'march_website': ('http://projectmarch.nl', '')}
 
 # Output file base name for HTML help builder.

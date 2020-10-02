@@ -11,8 +11,8 @@ without having to repeat the whole error description.
 
 .. note:: This page is still a work in progress and might not contain all errors you can encounter.
           If you encounter an error that is not documented, consider creating
-          `an issue <https://github.com/project-march/tutorials/issues/new/choose>`_ or
-          `pull request <https://github.com/project-march/tutorials>`_.
+          `an issue <https://gitlab.com/project-march/project-march.gitlab.io/-/issues>`_ or
+          `merge request <https://gitlab.com/project-march/project-march.gitlab.io/-/merge_requests>`_.
 
 **Error list**
 
