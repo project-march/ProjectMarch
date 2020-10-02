@@ -16,7 +16,7 @@ Create new subgait files
 First create a new gait folder in the :ref:`march-gait-files-label` according to the :ref:`march-gait-files-structure-label`
 
 Subgait files can be created with the gait generator (:ref:`using-the-gait-generator-label`) or manually.
-New gaits should be added to `gait-files repository <https://github.com/project-march/gait-files>`_ with a pull request.
+New gaits should be added to `gait-files folder <hhttps://gitlab.com/project-march/march/-/tree/main/src/march_gait_files>`_ with a pull request.
 
 Create new gait file
 --------------------

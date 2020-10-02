@@ -1,7 +1,7 @@
 .. _style-guide:
 
-Style Guide
-===========
+Style Guide (Outdated)
+======================
 All code in the March repositories should adhere to a certain set of style guides.
 Since most of the March packages are ROS packages, these should all adhere to the
 ROS style guide for `C++ <https://wiki.ros.org/CppStyleGuide>`_ and `Python <https://wiki.ros.org/PyStyleGuide>`_.

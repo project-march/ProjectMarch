@@ -1,7 +1,7 @@
 .. _create-your-workspace-label:
 
-Create your workspace
-=====================
+Create your workspace (Outdated)
+================================
 .. inclusion-introduction-start
 
 This tutorial will help you set up a ROS workspace with all packages needed to run the |march|.

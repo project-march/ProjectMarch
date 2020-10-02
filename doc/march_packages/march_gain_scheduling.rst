@@ -9,7 +9,7 @@ We implemented the method in such a way that it changes the PID gains/values whe
 
 Principle
 ---------
-The Gainscheduling package uses the definition of gait_type as, for example, seen in `this gait file <https://github.com/project-march/gait-files/blob/develop/march_gait_files/training-v/sit/sit_down/MIV_final.subgait>`_.
+The Gainscheduling package uses the definition of gait_type as, for example, seen in `this gait file <https://gitlab.com/project-march/march/-/tree/main/src/march_gait_files/training-v/sit/sit_down/MIV_final.subgait>`_.
 to change all the PID values for the relevant joints.
 
 The following gait_types are supported:
@@ -42,7 +42,7 @@ You can set or reset the use of the linearization using the ``linear`` argument 
 
 How to tune
 """""""""""
-Tuning using gainscheduling is rather easy. You can freely change the PID values in the `config folder <https://github.com/project-march/march/tree/develop/march_gain_scheduling/config>`_.
+Tuning using gainscheduling is rather easy. You can freely change the PID values in the `config folder <https://gitlab.com/project-march/march/-/tree/main/src/march_gain_scheduling/config>`_.
 In this folder you'll find a number of ``.yaml`` files which correspond to different configurations of the exoskeleton and different test/run modes.
 
 Please tune the exoskeleton in the following order:

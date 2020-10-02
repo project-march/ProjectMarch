@@ -1,0 +1,56 @@
+stages:
+  - docker
+  - test
+  - build
+  - deploy
+
+image: registry.gitlab.com/project-march/project-march.gitlab.io:latest
+
+docker:
+  stage: docker
+  image: docker:latest
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build -t registry.gitlab.com/project-march/project-march.gitlab.io .
+    - docker push registry.gitlab.com/project-march/project-march.gitlab.io
+  rules:
+    - changes:
+        - Dockerfile
+      when: manual
+      allow_failure: false
+
+sphinx-test:
+  stage: test
+  script:
+    # Test build with non-ROS wrapped Sphinx command to allow warnings and errors to be caught
+    - sphinx-build -W -b html . native_build
+
+sphinx-build:
+  stage: build
+  script:
+    # Test build with ROS-version of Sphinx command so that it is generated same as ros.org
+    - rosdoc_lite -o build .
+    # Run HTML tests on generated build output to check for 404 errors, etc
+    - htmlproofer ./build --only-4xx --check-html --file-ignore ./build/html/genindex.html,./build/html/search.html,./build/html/index-msg.html --alt-ignore '/.*/' --url-ignore '#'
+  artifacts:
+    paths:
+    - build
+
+pages:
+  stage: deploy
+  dependencies:
+    - sphinx-build
+  script:
+  - echo 'Publishing pages'
+  - cp -R build/html/ public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - main

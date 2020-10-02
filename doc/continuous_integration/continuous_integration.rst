@@ -1,5 +1,5 @@
-Continuous Integration
-======================
+Continuous Integration (Outdated)
+=================================
 .. inclusion-introduction-start
 
 This tutorial will describe the current Continuous Integration (CI) setup and
@@ -16,8 +16,10 @@ Setup
 The march repositories all use `open source Travis CI <https://travis-ci.com/project-march>`_
 for builds, which run on commit pushes. There are no extra builds configured
 for pull requests since branches have to be up to date with the target branch
-in order to merge. You can download a template :codedir:`.travis.yml <continuous_integration/template.travis.yml>`
-for new repositories.
+in order to merge.
+
+..
+    You can download a template :codedir:`.travis.yml <continuous_integration/template.travis.yml>` for new repositories.
 
 Build Notifications
 -------------------
