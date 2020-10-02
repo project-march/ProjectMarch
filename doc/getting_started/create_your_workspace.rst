@@ -1,7 +1,7 @@
 .. _create-your-workspace-label:
 
-Create your workspace (Outdated)
-================================
+Create your workspace
+=====================
 .. inclusion-introduction-start
 
 This tutorial will help you set up a ROS workspace with all packages needed to run the |march|.
@@ -30,7 +30,7 @@ For building our packages we use colcon. Install `colcon <https://github.com/col
 
   sudo apt-get install python3-colcon-common-extensions
 
-To install some optional tools that are run by Travis Continuous Integration run:
+To install some optional tools that are run by Gitlab Continuous Integration run:
 
 .. code::
 
@@ -45,56 +45,23 @@ You will need to have a ROS workspace setup:
 
 .. code::
 
-  mkdir -p ~/march_ws/src
+  mkdir -p ~/march_ws/
   cd march_ws
 
 
 Download the march source code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-We use `wstool <http://wiki.ros.org/wstool>`_ to easily maintain the multiple repositories in our workspace.
-The process differs a bit, depending on if you have write access to our repositories or not.
-
-With write access
------------------
-If you have write access, you can use our provided ``.rosinstall`` file to pull all repositories in our workspace
+To download the source code, you can either use ssh (recommended):
 
 .. code::
 
-  wstool init src https://raw.githubusercontent.com/project-march/tutorials/master/doc/getting_started/.rosinstall
-  wstool update -t src
+ git clone git@gitlab.com:project-march/march.git
 
-The above rosinstall file uses https URLs to the git repositories. If you prefer ssh URLs use the following commands:
-
-.. code::
-
-  wstool init src https://raw.githubusercontent.com/project-march/tutorials/master/doc/getting_started/ssh.rosinstall
-  wstool update -t src
-
-
-Without write access
---------------------
-If you do not have write access, you will need to create your own forks of our repositories.
-Please check `this guide <https://guides.github.com/activities/forking/>`_ on how to work with forks if you haven't used them before.
-
-Save the `.rosinstall file <https://raw.githubusercontent.com/project-march/tutorials/master/doc/getting_started/.rosinstall>`_
-locally and change the uri of the repositories you want to develop to the location of your forks. For example:
+Or use https:
 
 .. code::
 
-  - git:
-      local-name: simulation
-      uri: https://github.com/<your-username>/march-simulation
-      version: develop
-
-Then call wstool with your edited ``.rosinstall`` file:
-
-.. code::
-
-  wstool init src ~/local/path/to/the/edited/.rosinstall
-  wstool update -t src
-
-
-.. _build-your-workspace-label:
+ git clone https://gitlab.com/project-march/march.git
 
 Build your Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -102,6 +69,7 @@ The following will install from the Ubuntu repositories any package dependencies
 
 .. code::
 
+  cd ~/march_ws/march
   rosdep install -y --from-paths src --ignore-src
 
 The next command will build and install your workspace:
@@ -111,7 +79,7 @@ The next command will build and install your workspace:
   colcon build
 
 In order for ROS to know where your files are installed, you have to provide a source. You do this with:
-:code:`source ~/march_ws/install/setup.bash`.
+:code:`source ~/march_ws/march/install/setup.bash`.
 
 This needs to be done for every new terminal you open, so it is advised to
 `add this command to your <https://answers.ros.org/question/206876/how-often-do-i-need-to-source-setupbash/?answer=206976#post-id-206976>`_
