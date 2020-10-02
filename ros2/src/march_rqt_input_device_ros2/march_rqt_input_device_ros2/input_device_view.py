@@ -28,8 +28,6 @@ class InputDeviceView(QWidget):
         self._controller.rejected_cb = self._rejected_cb
         self._controller.current_gait_cb = self._current_gait_cb
         self.possible_gaits_future = None
-        self._alive_timer = self._controller._node.create_timer(0.5, self._update_possible_gaits_view,
-                                                                clock=self._controller._node.get_clock())
 
         self._always_enabled_buttons = []
 
@@ -331,29 +329,32 @@ class InputDeviceView(QWidget):
 
     def _update_possible_gaits(self):
         self._controller.update_possible_gaits()
+        self._update_timer = self._controller._node.create_timer(0.5, self._update_possible_gaits_view,
+                                                                clock=self._controller._node.get_clock())
 
     def _update_possible_gaits_view(self):
-        new_possible_gaits = self._controller.get_possible_gaits()
-        if set(self.possible_gaits) != set(new_possible_gaits):
-            self._controller._node.get_logger().info('New gaits: {0} after {1}'.format(new_possible_gaits,
-                                                                                       self.possible_gaits))
-            self.frame.setEnabled(False)
-            self.frame.verticalScrollBar().setEnabled(False)
-            self.possible_gaits = new_possible_gaits
+        new_possible_gaits_future = self._controller.get_possible_gaits()
+        if new_possible_gaits_future.done():
+            self._update_timer.cancel()
+            new_possible_gaits = new_possible_gaits_future.result().gaits
+            if set(self.possible_gaits) != set(new_possible_gaits):
+                self.frame.setEnabled(False)
+                self.frame.verticalScrollBar().setEnabled(False)
+                self.possible_gaits = new_possible_gaits
 
-            layout = self.content.layout()
-            if layout:
-                for i in range(layout.count()):
-                    button = layout.itemAt(i).widget()
-                    name = button.objectName()
-                    if name in self._always_enabled_buttons:
-                        continue
-                    if name in self.possible_gaits:
-                        button.setEnabled(True)
-                    else:
-                        button.setEnabled(False)
-            self.frame.setEnabled(True)
-            self.frame.verticalScrollBar().setEnabled(True)
+                layout = self.content.layout()
+                if layout:
+                    for i in range(layout.count()):
+                        button = layout.itemAt(i).widget()
+                        name = button.objectName()
+                        if name in self._always_enabled_buttons:
+                            continue
+                        if name in self.possible_gaits:
+                            button.setEnabled(True)
+                        else:
+                            button.setEnabled(False)
+                self.frame.setEnabled(True)
+                self.frame.verticalScrollBar().setEnabled(True)
 
     def create_button(self, name, callback=None, image_path=None, size=(128, 160), always_enabled=False):
         """Create a push button which the mock input device can register.

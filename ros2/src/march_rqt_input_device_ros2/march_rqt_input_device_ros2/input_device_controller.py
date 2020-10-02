@@ -34,13 +34,11 @@ class InputDeviceController(object):
         self.finished_cb = None
         self.rejected_cb = None
         self.current_gait_cb = None
-        self._node.get_logger().info(str(type(self._node.get_clock())))
-        self._node.get_logger().info(str(self._node.get_clock()))
-        self._node.get_logger().info(str(self._node.get_clock().now().nanoseconds))
+
         self._ping = ping
         self._id = self.ID_FORMAT.format(machine=socket.gethostname(),
                                          user=getpass.getuser())
-        self._node.get_logger().info(str(self._ping))
+
         self._timesource = self._node.create_subscription(Clock, '/clock', self._clock_callback, 10)
 
         if self._ping:
@@ -97,39 +95,36 @@ class InputDeviceController(object):
 
     def get_possible_gaits(self):
         """
-        Returns a list of names of possible gaits.
+        Returns a future for the list of names of possible gaits.
 
         :rtype: list(str)
         :return: List of possible gaits
         """
-        if self.gait_future.done():
-            return self.gait_future.result().gaits
-        else:
-            return []
+        return self.gait_future
 
     def publish_increment_step_size(self):
         self._node.get_logger().debug('Mock Input Device published step size increment')
         self._instruction_gait_pub.publish(GaitInstruction(header=Header(stamp=self._node.get_clock().now().to_msg()),
-                                                            type=GaitInstruction.INCREMENT_STEP_SIZE,
-                                                            gait_name='', id=str(self._id)))
-    #
+                                                           type=GaitInstruction.INCREMENT_STEP_SIZE,
+                                                           gait_name='', id=str(self._id)))
+
     def publish_decrement_step_size(self):
         self._node.get_logger().debug('Mock Input Device published step size decrement')
         self._instruction_gait_pub.publish(GaitInstruction(header=Header(stamp=self._node.get_clock().now().to_msg()),
-                                                            type=GaitInstruction.DECREMENT_STEP_SIZE,
-                                                            gait_name='', id=str(self._id)))
+                                                           type=GaitInstruction.DECREMENT_STEP_SIZE,
+                                                           gait_name='', id=str(self._id)))
 
     def publish_gait(self, string):
-        self._node.get_logger().info('Mock Input Device published gait: ' + string)
+        self._node.get_logger().debug('Mock Input Device published gait: ' + string)
         self._instruction_gait_pub.publish(GaitInstruction(header=Header(stamp=self._node.get_clock().now().to_msg()),
-                                                            type=GaitInstruction.GAIT,
-                                                            gait_name=string, id=str(self._id)))
+                                                           type=GaitInstruction.GAIT,
+                                                           gait_name=string, id=str(self._id)))
 
     def publish_stop(self):
+        self._node.get_logger().debug('Mock input device published stop')
         msg = GaitInstruction(header=Header(stamp=self._node.get_clock().now().to_msg()),
-                                            type=GaitInstruction.STOP,
-                                            gait_name='', id=str(self._id))
-        self._node.get_logger().info('Mock input device published stop: "{0}"'.format(msg))
+                              type=GaitInstruction.STOP,
+                              gait_name='', id=str(self._id))
         self._instruction_gait_pub.publish(msg)
 
     def publish_continue(self):
