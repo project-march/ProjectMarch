@@ -64,3 +64,8 @@ class Setpoint(object):
         position = parameter * base_setpoint.position + (1 - parameter) * other_setpoint.position
         velocity = parameter * base_setpoint.velocity + (1 - parameter) * other_setpoint.velocity
         return Setpoint(time, position, velocity)
+
+    @staticmethod
+    def interpolate_setopints_position(base_setpoints, other_setpoints, parameter):
+
+        return

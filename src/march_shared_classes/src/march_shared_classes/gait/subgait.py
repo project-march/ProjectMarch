@@ -4,6 +4,7 @@ import re
 import rospy
 from trajectory_msgs import msg as trajectory_msg
 import yaml
+import numpy as np
 
 from march_shared_classes.exceptions.gait_exceptions import NonValidGaitContent, SubgaitInterpolationError
 from march_shared_classes.exceptions.general_exceptions import FileNotFoundError
@@ -258,16 +259,43 @@ class Subgait(object):
                                             ' subgait has {0}, while other subgait has {1}'.
                                             format(sorted(base_subgait.get_joint_names()),
                                                    sorted(other_subgait.get_joint_names())))
-        joints = []
+        num_setpoints = 0
         try:
             for base_joint in base_subgait.joints:
                 other_joint = other_subgait.get_joint(base_joint.name)
                 if other_joint is None:
                     raise SubgaitInterpolationError('Could not find a matching joint for base joint with name {0}.'.
                                                     format(base_joint.name))
-                joints.append(cls.joint_class.interpolate_joint_trajectories(base_joint, other_joint, parameter))
+                if num_setpoints == 0:
+                    num_setpoints = len(base_joint.subgaits())
+                elif len(base_joint.subgaits()) != num_setpoints:
+                    raise SubgaitInterpolationError('Number of setpoints differs in subgait {0} in joint {1}.'.
+                                                    format(base_subgait.subgait_name, base_joint.name))
+                elif len(base_joint.subgaits()) != num_setpoints:
+                    raise SubgaitInterpolationError('Number of setpoint differs in subgait {0} in joint {1}.'.
+                                                    format(other_subgait.subgait_name, base_joint.name))
         except SubgaitInterpolationError as e:
             raise e
+
+        base_setpoint_matrix = np.zeros((num_setpoints, len(base_subgait.joints)))
+        other_setpoint_matrix = np.zeros((num_setpoints, len(other_subgait.joints)))
+
+        current_setpoint_index = 0
+        for base_joint in base_subgait.joints:
+            other_joint = other_subgait.get_joint(base_joint.name)
+            base_setpoint_matrix[:, current_setpoint_index] = base_joint.subgaits()
+            other_setpoint_matrix[:, current_setpoint_index] = other_joint.subgaits()
+            current_setpoint_index += 1
+
+        new_setpoints = []
+        for current_setpoint_number in range(0,num_setpoints):
+            base_setpoints_to_interpolate = base_setpoint_matrix[current_setpoint_number]
+            other_setpoints_to_interpolate = other_setpoint_matrix[current_setpoint_number]
+            new_setpoints.append(setpoint.interpolate_setopints_position(base_setpoints_to_interpolate,
+                                                                         other_setpoints_to_interpolate,
+                                                                         parameter))
+
+        #doe nog iets met die joints
 
         description = 'Interpolation between base version {0}, and other version {1} with parameter{2}'.format(
             base_subgait.version, other_subgait.version, parameter)
