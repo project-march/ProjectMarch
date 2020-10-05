@@ -2,8 +2,7 @@
 
 https://docs.projectmarch.nl
 
-[![Travis Status](https://travis-ci.com/project-march/tutorials.svg?branch=master)](https://travis-ci.com/project-march/tutorials)
-![reviewdog](https://github.com/project-march/tutorials/workflows/reviewdog/badge.svg)
+![Pipeline Status](https://gitlab.com/project-march/tutorials/badges/main/pipeline.svg)
 
 ----------------
 
