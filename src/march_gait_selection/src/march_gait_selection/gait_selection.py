@@ -84,9 +84,8 @@ class GaitSelection(object):
                     subgait_path = os.path.join(gait_path, subgait)
 
                     if os.path.isdir(subgait_path):
-                        versions = [v.replace('.subgait', '') for v in os.listdir(os.path.join(subgait_path)) if
-                                    v.endswith('.subgait')]
-                        versions.sort()
+                        versions = sorted([v.replace('.subgait', '') for v in os.listdir(os.path.join(subgait_path)) if
+                                           v.endswith('.subgait')])
                         subgaits[subgait] = versions
 
                 gaits[gait] = subgaits

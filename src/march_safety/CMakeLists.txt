@@ -62,12 +62,6 @@ install(DIRECTORY launch sound
 if(CATKIN_ENABLE_TESTING)
     find_package(rostest REQUIRED)
 
-    add_rostest_gtest(${PROJECT_NAME}_temperature_test
-        test/launch/${PROJECT_NAME}_temperature.test
-        test/rostest/temperature_error_test.cpp
-        test/rostest/no_temperature_error_test.cpp
-        test/rostest/temperature_parameterized_test.cpp
-    )
     add_rostest_gtest(${PROJECT_NAME}_connection_lost_test
         test/launch/${PROJECT_NAME}_connection_lost.test
         test/rostest/connection_lost_test.cpp
@@ -82,7 +76,6 @@ if(CATKIN_ENABLE_TESTING)
         test/launch/${PROJECT_NAME}_connection_not_lost.test
         test/rostest/connection_not_lost_test.cpp
     )
-    target_link_libraries(${PROJECT_NAME}_temperature_test ${catkin_LIBRARIES})
     target_link_libraries(${PROJECT_NAME}_connection_lost_test ${catkin_LIBRARIES})
     target_link_libraries(${PROJECT_NAME}_connection_never_started_test ${catkin_LIBRARIES})
     target_link_libraries(${PROJECT_NAME}_connection_not_lost_test ${catkin_LIBRARIES})
@@ -92,7 +85,6 @@ if(CATKIN_ENABLE_TESTING)
         add_code_coverage(
             NAME coverage_report
             DEPENDENCIES
-            ${PROJECT_NAME}_temperature_test
             ${PROJECT_NAME}_connection_lost_test
             ${PROJECT_NAME}_connection_never_started_test
             ${PROJECT_NAME}_connection_not_lost_test
