@@ -9,7 +9,7 @@ This tutorial will help you set up a connection with the exoskeleton.
 
 .. inclusion-introduction-end
 
-.. note:: Make sure your workspace is sourced and set-up correctly: :ref:`build-your-workspace-label`.
+.. note:: Make sure your workspace is sourced and set-up correctly: :ref:`create-your-workspace-label`.
 
 .. _preparation-before-connecting-label:
 
