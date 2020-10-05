@@ -1,13 +1,10 @@
 import os
-from time import sleep
-
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import QSize
 from python_qt_binding.QtWidgets import QGridLayout
 from python_qt_binding.QtWidgets import QPushButton
 from python_qt_binding.QtWidgets import QWidget
 from ament_index_python.packages import get_package_share_directory
-
 from .image_button import ImageButton
 
 
@@ -37,7 +34,10 @@ class InputDeviceView(QWidget):
         self.refresh_button.clicked.connect(self._update_possible_gaits)
 
         self._create_buttons()
+        # Start with only 'always available' buttons
         self.possible_gaits = []
+        self._update_gait_buttons([])
+        # Request actual possible gaits
         self._update_possible_gaits()
 
     def _create_buttons(self):
@@ -329,8 +329,8 @@ class InputDeviceView(QWidget):
 
     def _update_possible_gaits(self):
         self._controller.update_possible_gaits()
-        self._update_timer = self._controller._node.create_timer(0.5, self._update_possible_gaits_view,
-                                                                clock=self._controller._node.get_clock())
+        self._update_timer = self._controller.get_node().create_timer(0.5, self._update_possible_gaits_view,
+                                                                      clock=self._controller.get_node().get_clock())
 
     def _update_possible_gaits_view(self):
         new_possible_gaits_future = self._controller.get_possible_gaits()
@@ -338,23 +338,26 @@ class InputDeviceView(QWidget):
             self._update_timer.cancel()
             new_possible_gaits = new_possible_gaits_future.result().gaits
             if set(self.possible_gaits) != set(new_possible_gaits):
-                self.frame.setEnabled(False)
-                self.frame.verticalScrollBar().setEnabled(False)
-                self.possible_gaits = new_possible_gaits
+                self._update_gait_buttons(new_possible_gaits)
 
-                layout = self.content.layout()
-                if layout:
-                    for i in range(layout.count()):
-                        button = layout.itemAt(i).widget()
-                        name = button.objectName()
-                        if name in self._always_enabled_buttons:
-                            continue
-                        if name in self.possible_gaits:
-                            button.setEnabled(True)
-                        else:
-                            button.setEnabled(False)
-                self.frame.setEnabled(True)
-                self.frame.verticalScrollBar().setEnabled(True)
+    def _update_gait_buttons(self, possible_gaits):
+        self.frame.setEnabled(False)
+        self.frame.verticalScrollBar().setEnabled(False)
+        self.possible_gaits = possible_gaits
+
+        layout = self.content.layout()
+        if layout:
+            for i in range(layout.count()):
+                button = layout.itemAt(i).widget()
+                name = button.objectName()
+                if name in self._always_enabled_buttons:
+                    continue
+                if name in self.possible_gaits:
+                    button.setEnabled(True)
+                else:
+                    button.setEnabled(False)
+        self.frame.setEnabled(True)
+        self.frame.verticalScrollBar().setEnabled(True)
 
     def create_button(self, name, callback=None, image_path=None, size=(128, 160), always_enabled=False):
         """Create a push button which the mock input device can register.
@@ -430,6 +433,8 @@ def check_string(text):
     :param text: The text to split
     :return New string which contains newlines
     """
-    words = enumerate(text.replace('_', ' ').split(' '))
-    # return reduce(lambda acc, (i, x): acc + '\n' + x if i % 3 == 0 else acc + ' ' + x, words, '')[1:]
-    return text.replace('_', ' ')
+    words = text.replace('_', ' ').split(' ')
+    new_string = words[0]
+    for index, word in enumerate(words[1:], 1):
+        new_string = new_string + '\n' + word if index % 3 == 0 else new_string + ' ' + word
+    return new_string

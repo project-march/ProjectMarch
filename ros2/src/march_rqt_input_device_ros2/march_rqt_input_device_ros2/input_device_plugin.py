@@ -5,22 +5,23 @@ from rqt_gui.main import Main
 import sys
 import rclpy
 from rclpy.parameter import Parameter
-from rosgraph_msgs.msg import Clock
 from .input_device_controller import InputDeviceController
 from .input_device_view import InputDeviceView
+
 
 def main(args=None):
     rclpy.init(args=args)
 
     try:
         plugin = 'rqt_input_device'
-        main = Main(filename=plugin)
-        sys.exit(main.main(standalone=plugin))
+        main_plugin = Main(filename=plugin)
+        sys.exit(main_plugin.main(standalone=plugin))
 
     except KeyboardInterrupt:
         pass
 
     rclpy.shutdown()
+
 
 class InputDevicePlugin(Plugin):
     def __init__(self, context):

@@ -1,17 +1,10 @@
 import getpass
 import socket
-from time import sleep
-import rclpy
-from rclpy.time import Time as RclTime
-from rclpy.clock import ClockType
-from rclpy.node import Node
-from rclpy.clock import ROSClock
-from rclpy.parameter import Parameter
 from std_msgs.msg import Header, String
 from rosgraph_msgs.msg import Clock
-from builtin_interfaces.msg import Time
 from march_shared_msgs.msg import Alive, Error, GaitInstruction, GaitInstructionResponse
 from march_shared_msgs.srv import PossibleGaits
+
 
 class InputDeviceController(object):
 
@@ -19,7 +12,6 @@ class InputDeviceController(object):
     ID_FORMAT = 'rqt@{machine}@{user}ros2'
 
     def __init__(self, node, ping):
-        # super().__init__()
         self._node = node
         self._instruction_gait_pub = self._node.create_publisher(GaitInstruction, '/march/input_device/instruction', 10)
         self._instruction_response_pub = self._node.create_subscription(GaitInstructionResponse,
@@ -86,12 +78,10 @@ class InputDeviceController(object):
         return
 
     def update_possible_gaits(self):
-        try:
+        if self._possible_gait_client.service_is_ready():
             self.gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
-
-        except Exception:
+        else:
             self._node.get_logger().warn('Failed to contact get_possible_gaits service')
-            return []
 
     def get_possible_gaits(self):
         """
@@ -101,6 +91,9 @@ class InputDeviceController(object):
         :return: List of possible gaits
         """
         return self.gait_future
+
+    def get_node(self):
+        return self._node
 
     def publish_increment_step_size(self):
         self._node.get_logger().debug('Mock Input Device published step size increment')
@@ -148,5 +141,5 @@ class InputDeviceController(object):
     def publish_sm_to_unknown(self):
         self._node.get_logger().debug('Mock Input Device published state machine to unknown')
         self._instruction_gait_pub.publish(GaitInstruction(header=Header(stamp=self._node.get_clock().now().to_msg()),
-                                            type=GaitInstruction.UNKNOWN,
-                                            gait_name='', id=str(self._id)))
+                                                           type=GaitInstruction.UNKNOWN,
+                                                           gait_name='', id=str(self._id)))
