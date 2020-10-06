@@ -28,7 +28,7 @@ except (ImportError, KeyError) as e:
 
 
 class ESPAdapter:
-    """Class streams ros messages into an ESP engine."""
+    """Class streams ros1 messages into an ESP engine."""
 
     def __init__(self):
 

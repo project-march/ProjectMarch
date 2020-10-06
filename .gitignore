@@ -192,6 +192,7 @@ COLCON_IGNORE
 
 */install/*
 */install_isolated/*
+install/*
 
 venv/
 
