@@ -17,10 +17,11 @@ colcon build:
   stage: build
   artifacts:
     paths:
-      - build/
-      - install/
-      - log/
+      - ros1/build/
+      - ros1/install/
+      - ros1/log/
   script:
+    - cd ros1/
     - colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
 
 colcon test:
@@ -28,17 +29,20 @@ colcon test:
   dependencies:
     - colcon build
   script:
+    - cd ros1/
     - source install/setup.bash && colcon test --event-handlers console_direct+
     - colcon test-result --verbose
 
 catkin_lint:
   stage: lint
   script:
+    - cd ros1/
     - catkin_lint -W1 --strict src
 
 pep8:
   stage: lint
   script:
+    - cd ros1/
     - python -m autopep8 --diff -r --aggressive --aggressive --exit-code src
     - python -m flake8
   only:
@@ -81,6 +85,7 @@ clang tidy:
   needs: ["colcon build"]
   stage: static_analysis
   script:
+    - cd ros1/
     - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
   only:
     changes:

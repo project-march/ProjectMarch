@@ -121,7 +121,7 @@ class JointTrajectory(object):
         for i in range(0, len(time)):
             yi.append([position[i], velocity[i]])
 
-        # We do a cubic spline here, just like the ros joint_trajectory_action_controller,
+        # We do a cubic spline here, just like the ros1 joint_trajectory_action_controller,
         # see https://wiki.ros.org/robot_mechanism_controllers/JointTrajectoryActionController
         self.interpolated_position = BPoly.from_derivatives(time, yi)
         self.interpolated_velocity = self.interpolated_position.derivative()

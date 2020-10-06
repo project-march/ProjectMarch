@@ -27,7 +27,7 @@ class OdriveConnectionManager:
 
     @staticmethod
     def get_ros_package_path(package):
-        """Get the path of where the given (ros) package is located."""
+        """Get the path of where the given (ros1) package is located."""
         return rospkg.RosPack().get_path(package)
 
     def setup_odrive(self, config, crc):
