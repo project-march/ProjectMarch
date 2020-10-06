@@ -277,25 +277,45 @@ class Subgait(object):
         except SubgaitInterpolationError as e:
             raise e
 
-        base_setpoint_matrix = np.zeros((num_setpoints, len(base_subgait.joints)))
-        other_setpoint_matrix = np.zeros((num_setpoints, len(other_subgait.joints)))
-
-        current_setpoint_index = 0
-        for base_joint in base_subgait.joints:
-            other_joint = other_subgait.get_joint(base_joint.name)
-            base_setpoint_matrix[:, current_setpoint_index] = base_joint.subgaits()
-            other_setpoint_matrix[:, current_setpoint_index] = other_joint.subgaits()
-            current_setpoint_index += 1
-
         new_setpoints = []
-        for current_setpoint_number in range(0,num_setpoints):
-            base_setpoints_to_interpolate = base_setpoint_matrix[current_setpoint_number]
-            other_setpoints_to_interpolate = other_setpoint_matrix[current_setpoint_number]
-            new_setpoints.append(setpoint.interpolate_setopints_position(base_setpoints_to_interpolate,
+        for current_setpoints_index in range(0, num_setpoints):
+            base_setpoints_to_interpolate = {}
+            other_setpoints_to_interpolate = {}
+            for base_joint in base_subgait.joints:
+                other_joint = other_subgait.get_joint(base_joint.name)
+                base_joint_setpoints = base_joint.setpoints()
+                other_joint_setpoints = other_joint.setpoints()
+                base_setpoints_to_interpolate[base_joint.name] = base_joint_setpoints[current_setpoints_index]
+                other_setpoints_to_interpolate[other_joint.name] = other_joint_setpoints[current_setpoints_index]
+            new_setpoints.append(Setpoint.interpolate_setpoints_position(base_setpoints_to_interpolate,
                                                                          other_setpoints_to_interpolate,
                                                                          parameter))
 
-        #doe nog iets met die joints
+
+
+        # base_setpoint_matrix = np.zeros((num_setpoints, len(base_subgait.joints)))
+        # other_setpoint_matrix = np.zeros((num_setpoints, len(other_subgait.joints)))
+        #
+        # current_setpoint_index = 0
+        # for base_joint in base_subgait.joints:
+        #     other_joint = other_subgait.get_joint(base_joint.name)
+        #     base_setpoint_matrix[:, current_setpoint_index] = base_joint.subgaits()
+        #     other_setpoint_matrix[:, current_setpoint_index] = other_joint.subgaits()
+        #     current_setpoint_index += 1
+        #
+        # new_setpoints = []
+        # for current_setpoint_number in range(0,num_setpoints):
+        #     base_setpoints_to_interpolate = base_setpoint_matrix[current_setpoint_number]
+        #     other_setpoints_to_interpolate = other_setpoint_matrix[current_setpoint_number]
+        #     new_setpoints.append(Setpoint.interpolate_setopints_position(base_setpoints_to_interpolate,
+        #                                                                  other_setpoints_to_interpolate,
+        #                                                                  parameter))
+        # joints = []
+        # for base_joint in base_subgait.joints:
+        #     other_joint = other_subgait.get_joint(base_joint.name)
+        #     duration = parameter * base_joint.duration + (1 - parameter) * other_joint.duration
+        #     joints.append(cls.joint_class(base_joint.name, base_joint.limits, new_setpoints, duration,
+        #                                   base_joint.interpolated_position, base_joint.interpolated_velocity))
 
         description = 'Interpolation between base version {0}, and other version {1} with parameter{2}'.format(
             base_subgait.version, other_subgait.version, parameter)
