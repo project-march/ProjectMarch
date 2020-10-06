@@ -13,6 +13,8 @@ class InputDeviceController(object):
 
     def __init__(self, node, ping):
         self._node = node
+        self._ping = ping
+
         self._instruction_gait_pub = self._node.create_publisher(GaitInstruction, '/march/input_device/instruction', 10)
         self._instruction_response_pub = self._node.create_subscription(GaitInstructionResponse,
                                                                         '/march/input_device/instruction_response',
@@ -27,7 +29,6 @@ class InputDeviceController(object):
         self.rejected_cb = None
         self.current_gait_cb = None
 
-        self._ping = ping
         self._id = self.ID_FORMAT.format(machine=socket.gethostname(),
                                          user=getpass.getuser())
 
@@ -43,15 +44,13 @@ class InputDeviceController(object):
     def __del__(self):
         self._node.destroy_publisher(self._instruction_gait_pub)
         self._node.destroy_publisher(self._error_pub)
-        if self._ping:
-            self._alive_timer.shutdown()
-            self._alive_timer.join()
-            self._alive_pub.unregister()
+        self._alive_timer.shutdown()
+        self._alive_timer.join()
+        self._alive_pub.unregister()
 
     def _response_callback(self, msg):
         """
         Callback for instruction response messages.
-
         Calls registered callbacks when the gait is accepted, finished or rejected.
 
         :type msg: GaitInstructionResponse
