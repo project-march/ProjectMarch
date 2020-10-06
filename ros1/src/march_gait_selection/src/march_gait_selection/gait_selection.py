@@ -32,7 +32,7 @@ class GaitSelection(object):
 
     @staticmethod
     def get_ros_package_path(package):
-        """Returns the path of where the given (ros) package is located."""
+        """Returns the path of where the given (ros1) package is located."""
         try:
             return rospkg.RosPack().get_path(package)
         except rospkg.common.ResourceNotFound:

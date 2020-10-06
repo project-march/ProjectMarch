@@ -14,7 +14,7 @@ class FileNotFoundError(Exception):
 
 class PackageNotFoundError(Exception):
     def __init__(self, package_name, msg=None):
-        """Class to raise an error when a ros package cannot be found.
+        """Class to raise an error when a ros1 package cannot be found.
 
         :param package_name:
             The package name which is not found by rospkg.RosPack().get_path()
