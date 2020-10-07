@@ -453,7 +453,7 @@ class InputDeviceView(QWidget):
 def get_image_path(img_name):
     """Create an absolute image path to an image."""
     return os.path.join(
-        get_package_share_directory('march_rqt_input_device_ros2'),
+        get_package_share_directory('march_rqt_input_device'),
         'resource',
         'img{0}'.format(img_name))
 

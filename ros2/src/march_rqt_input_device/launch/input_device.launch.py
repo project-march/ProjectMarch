@@ -23,6 +23,6 @@ def generate_launch_description():
             default_value='True',
             description='Whether to use simulation time'),
         Node(
-            package='march_rqt_input_device_ros2', executable='input_device', output='screen',
+            package='march_rqt_input_device', executable='input_device', output='screen',
             name='input_device', arguments=[LaunchConfiguration('ping_safety_node'), LaunchConfiguration('use_sim_time')])
     ])

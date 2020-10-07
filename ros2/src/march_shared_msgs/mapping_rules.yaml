@@ -1,6 +1,3 @@
 -
   ros1_package_name: 'march_shared_resources'
   ros2_package_name: 'march_shared_msgs'
-#  fields_1_to_2:
-#    header: 'header'
-#    header.stamp:

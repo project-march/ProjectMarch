@@ -2,12 +2,12 @@ from setuptools import setup, find_packages
 from glob import glob
 import os
 
-package_name = 'march_rqt_input_device_ros2'
+package_name = 'march_rqt_input_device'
 
 setup(
     name=package_name,
     version='0.0.0',
-    packages=find_packages(package_name),
+    packages=['src'],
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
