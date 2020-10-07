@@ -3,7 +3,11 @@ from launch.actions import DeclareLaunchArgument
 from launch.substitutions import EnvironmentVariable, LaunchConfiguration
 from launch_ros.actions import Node
 
-
+'''
+Launch file to launch rqt input device.
+@argument: use_sim_time, whether the node should use the simulation time as published on the /clock topic.
+@argument: ping_safety_node, whether the node should regularly send an Alive message for the safety node.
+'''
 def generate_launch_description():
     return launch.LaunchDescription([
         DeclareLaunchArgument(

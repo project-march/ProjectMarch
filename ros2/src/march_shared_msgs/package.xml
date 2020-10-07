@@ -3,8 +3,8 @@
 <package format="3">
   <name>march_shared_msgs</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="katjaschmahl@hotmail.com">katja</maintainer>
+  <description>Custom messages and services for the march packages.</description>
+  <maintainer email="software@projectmarch.nl">Project March</maintainer>
   <license>TODO: License declaration</license>
 
   <depend>std_msgs</depend>

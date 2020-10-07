@@ -11,10 +11,12 @@ from .input_device_view import InputDeviceView
 
 
 def main(args=None):
+    """
+    The main function used to start up the rqt input device.
+    """
     rclpy.init(args=args)
 
     try:
-        print(args)
         plugin = 'rqt_input_device'
         main_plugin = Main(filename=plugin)
         sys.exit(main_plugin.main(standalone=plugin, plugin_argument_provider=InputDevicePlugin.add_arguments))
@@ -26,9 +28,11 @@ def main(args=None):
 
 
 class InputDevicePlugin(Plugin):
+    """
+    The plugin used by RQT to start the input device. This gives a context with the node to use.
+    """
     def __init__(self, context):
         super(InputDevicePlugin, self).__init__(context)
-        print(context.argv())
 
         self.setObjectName('InputDevicePlugin')
 
@@ -39,7 +43,6 @@ class InputDevicePlugin(Plugin):
         parser = argparse.ArgumentParser(prog='rqt_plot', add_help=False)
         InputDevicePlugin.add_arguments(parser)
         args = parser.parse_args(context.argv())
-        print(args.use_sim_time)
 
         self._node.set_parameters([Parameter('use_sim_time', value=bool(args.use_sim_time))])
         self._controller = InputDeviceController(self._node, bool(args.ping_safety_node))

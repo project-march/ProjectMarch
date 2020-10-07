@@ -3,6 +3,9 @@ from PyQt5.QtWidgets import QAbstractButton
 
 
 class ImageButton(QAbstractButton):
+    """
+    A class to define the standard button on the input device
+    """
     def __init__(self, image_path):
         super(ImageButton, self).__init__()
         self._pixmap = QPixmap(image_path)

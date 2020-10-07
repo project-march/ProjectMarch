@@ -1,4 +1,7 @@
 import os
+from typing import List, Callable, Tuple
+
+from march_rqt_input_device_ros2.src.input_device_controller import InputDeviceController
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import QSize
 from python_qt_binding.QtWidgets import QGridLayout
@@ -9,7 +12,10 @@ from .image_button import ImageButton
 
 
 class InputDeviceView(QWidget):
-    def __init__(self, ui_file, controller):
+    """
+    The View of the input device, inialized based on a ui file and a controller.
+    """
+    def __init__(self, ui_file, controller: InputDeviceController):
         """
         Initializes the view with a UI file and controller.
 
@@ -40,8 +46,10 @@ class InputDeviceView(QWidget):
         # Request actual possible gaits
         self._update_possible_gaits()
 
-    def _create_buttons(self):
-        # Create buttons here
+    def _create_buttons(self) -> None:
+        """
+        Creates all the buttons, new buttons should be added here.
+        """
         rocker_switch_increment = \
             self.create_button('rocker_switch_up', image_path='/rocker_switch_up.png',
                                callback=lambda: self._controller.publish_increment_step_size(),
@@ -310,29 +318,48 @@ class InputDeviceView(QWidget):
         qt_layout.setSpacing(15)
         self.content.adjustSize()
 
-    def _accepted_cb(self):
+    def _accepted_cb(self) -> None:
+        """
+        Show the GaitInstructionResponse and update possible gaits
+        """
         self.status_label.setText('Gait accepted')
         self._update_possible_gaits()
 
-    def _finished_cb(self):
+    def _finished_cb(self) -> None:
+        """
+        Show the GaitInstructionResponse and update possible gaits
+        """
         self.status_label.setText('Gait finished')
         self.gait_label.setText('')
         self._update_possible_gaits()
 
-    def _rejected_cb(self):
+    def _rejected_cb(self) -> None:
+        """
+        Show the GaitInstructionResponse and update possible gaits
+        """
         self.status_label.setText('Gait rejected')
         self.gait_label.setText('')
         self._update_possible_gaits()
 
-    def _current_gait_cb(self, gait_name):
+    def _current_gait_cb(self, gait_name: str) -> None:
+        """
+        Show the current gait and update possible gaits
+        """
         self.gait_label.setText(gait_name)
 
-    def _update_possible_gaits(self):
+    def _update_possible_gaits(self) -> None:
+        """
+        First requests the controller to update the possible, then create a timer to update the view if the possible
+        gaits changed.
+        """
         self._controller.update_possible_gaits()
         self._update_timer = self._controller.get_node().create_timer(0.5, self._update_possible_gaits_view,
                                                                       clock=self._controller.get_node().get_clock())
 
-    def _update_possible_gaits_view(self):
+    def _update_possible_gaits_view(self) -> None:
+        """
+        Update the buttons if the possible gaits have changed and cancel the timer.
+        """
         new_possible_gaits_future = self._controller.get_possible_gaits()
         if new_possible_gaits_future.done():
             self._update_timer.cancel()
@@ -340,7 +367,11 @@ class InputDeviceView(QWidget):
             if set(self.possible_gaits) != set(new_possible_gaits):
                 self._update_gait_buttons(new_possible_gaits)
 
-    def _update_gait_buttons(self, possible_gaits):
+    def _update_gait_buttons(self, possible_gaits: List[str]) -> None:
+        """
+        Update which buttons are available to the given possible gaits list
+        @param possible_gaits: The gaits that can be executed
+        """
         self.frame.setEnabled(False)
         self.frame.verticalScrollBar().setEnabled(False)
         self.possible_gaits = possible_gaits
@@ -359,8 +390,9 @@ class InputDeviceView(QWidget):
         self.frame.setEnabled(True)
         self.frame.verticalScrollBar().setEnabled(True)
 
-    def create_button(self, name, callback=None, image_path=None, size=(128, 160), always_enabled=False):
-        """Create a push button which the mock input device can register.
+    def create_button(self, name: str, callback: Callable = None, image_path: str = None,
+                      size: Tuple[int, int] = (128, 160), always_enabled: bool = False):
+        """Create a push button which can be pressed to execute a gait instruction.
 
         :param name:
             Name of the button

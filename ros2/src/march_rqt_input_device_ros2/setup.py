@@ -7,7 +7,7 @@ package_name = 'march_rqt_input_device_ros2'
 setup(
     name=package_name,
     version='0.0.0',
-    packages=[package_name],
+    packages=['src'],
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
@@ -22,7 +22,7 @@ setup(
     zip_safe=True,
     maintainer='Project March',
     maintainer_email='katjaschmahl@hotmail.com',
-  description='Developer input device to send commands to the march exoskeleton',
+    description='Developer input device to send commands to the march exoskeleton',
     license='TODO: License declaration',
     tests_require=['pytest'],
     entry_points={
