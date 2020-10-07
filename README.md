@@ -15,7 +15,7 @@ code styling rules. The rules for this format are set in the `.clang-format` and
 Before pushing you should make sure that this is fixed, otherwise the
 GitlabCI pipeline will fail. 
 
-#####How to use
+##### How to use
 First you need to install `clang-format` and `clang-tidy`:
 ```
 sudo apt install clang-format clang-tidy
