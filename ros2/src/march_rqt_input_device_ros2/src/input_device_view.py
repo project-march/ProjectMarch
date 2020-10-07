@@ -353,7 +353,7 @@ class InputDeviceView(QWidget):
         gaits changed.
         """
         self._controller.update_possible_gaits()
-        self._update_timer = self._controller.get_node().create_timer(0.5, self._update_possible_gaits_view,
+        self._update_timer = self._controller.get_node().create_timer(0.1, self._update_possible_gaits_view,
                                                                       clock=self._controller.get_node().get_clock())
 
     def _update_possible_gaits_view(self) -> None:

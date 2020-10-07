@@ -110,7 +110,6 @@ class InputDeviceController(object):
         :rtype: list(str)
         :return: List of possible gaits
         """
-        print(type(self.gait_future))
         return self.gait_future
 
     def get_node(self) -> Node:
