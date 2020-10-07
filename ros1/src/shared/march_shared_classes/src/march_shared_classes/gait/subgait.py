@@ -291,8 +291,6 @@ class Subgait(object):
                                                                          other_setpoints_to_interpolate,
                                                                          parameter))
 
-
-
         # base_setpoint_matrix = np.zeros((num_setpoints, len(base_subgait.joints)))
         # other_setpoint_matrix = np.zeros((num_setpoints, len(other_subgait.joints)))
         #

@@ -1,5 +1,7 @@
 from math import *
 import numpy as np
+from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
+
 
 class Setpoint(object):
     """Base class to define the setpoints of a subgait."""
@@ -98,10 +100,10 @@ def get_foot_pos_from_angles(setpoint_dic):
     r_hfe = setpoint_dic['right_hip_fe']
     r_kfe = setpoint_dic['right_knee']
 
-    bb = 1
-    ll = 1
-    ul = 1
-    ph = 1
+    bb = 1.0
+    ll = 1.0
+    ul = 1.0
+    ph = 1.0
 
     # x is positive in the walking direction, z is in the downward direction, y is directed to the right side
     # the origin in the middle of the hip structure
@@ -131,12 +133,13 @@ def get_angles_from_pos(position, foot):
         pos_y = position[1]
     pos_z = position[2]
 
-    bb = 1
-    ll = 1
-    ul = 1
-    ph = 1
+    bb = 1.0
+    ll = 1.0
+    ul = 1.0
+    ph = 1.0
 
-    # first find the haa angles
+    # first find the haa angle, this can be done by looking at the y-z plane with the knowledge that there must be a
+    # straight line from the foot position tangent to the circle with r = ph around the origin
     if pos_y != 0:
         slope_y_to_or = pos_z / pos_y
         alpha = atan(slope_y_to_or)  # the angle with the y axis of that line
@@ -145,9 +148,76 @@ def get_angles_from_pos(position, foot):
         else:
             haa = - acos(ph / sqrt(pos_z * pos_z + pos_y * pos_y)) + alpha
     else:
-        alpha = pi/2
+        alpha = pi / 2
         haa = acos(ph / sqrt(pos_z * pos_z + pos_y * pos_y)) - alpha
 
-    # the above works, but investigate what are valid angles
+    # once the haa angle is known, use https://www.wolframalpha.com/input/?i=solve+%5Bsin%28x%29+%2B+sin%28x+-+y%29*c%2
+    # C+cos%28x%29+%2B+cos%28x+-+y%29*c%5D+%3D+%5Ba%2C+b%5D to calculate the angles of the hfe and kfe
+    # rescale for easier solving, and check if position is valid
+    rescaled_x = pos_x - bb
+    rescaled_z = (pos_z + sin(haa) * ph) * (pos_z + sin(haa) * ph) + (cos(haa) * ph - pos_y) * (cos(haa) * ph - pos_y)
+    if sqrt(rescaled_x * rescaled_x + rescaled_z * rescaled_z) > ll + ul:
+        raise SubgaitInterpolationError("The desired foot position, ({0}, {1}, {2}), is out of reach".
+                                        format(pos_x, pos_y, pos_z))
+    ll = ll / ul
+    ul = 1.0
+    rescaled_x = rescaled_x / ul
+    rescaled_z = rescaled_z / ul
+
+    # make the calculation more concise
+    big_sqrt_plus = sqrt(-rescaled_x * rescaled_x - rescaled_z * rescaled_z + ll * ll + 1)
+    big_sqrt_min = sqrt(rescaled_x * rescaled_x + rescaled_z * rescaled_z + ll * ll - 1)
+    denom_hip = (rescaled_x * rescaled_x + rescaled_z * rescaled_z + 2 * rescaled_z - ll * ll + 1) * big_sqrt_min
+    numer_op_one = - rescaled_x * rescaled_x * big_sqrt_plus + 2 * rescaled_x * big_sqrt_min - rescaled_z * rescaled_z \
+                   * big_sqrt_plus + ll * ll * big_sqrt_plus - 2 * ll * big_sqrt_plus + big_sqrt_plus
+    numer_op_two = rescaled_x * rescaled_x * big_sqrt_plus + 2 * rescaled_x * big_sqrt_min + rescaled_z * rescaled_z \
+                   * big_sqrt_plus - ll * ll * big_sqrt_plus + 2 * ll * big_sqrt_plus - big_sqrt_plus
+    safety_check_large = ll * (rescaled_x * rescaled_x * rescaled_z * big_sqrt_min + 2 * rescaled_x * rescaled_x
+                               * big_sqrt_min - rescaled_x * rescaled_z * big_sqrt_plus + rescaled_x * ll * ll
+                               * big_sqrt_plus - 2 * rescaled_x * ll * big_sqrt_plus + rescaled_x * big_sqrt_plus +
+                               2 * rescaled_z * rescaled_z * big_sqrt_min - rescaled_z * ll * ll * big_sqrt_min
+                               + rescaled_z * big_sqrt_min + rescaled_z * rescaled_z * rescaled_z * big_sqrt_min
+                               - rescaled_x * rescaled_x * rescaled_x * big_sqrt_plus)
+
+    if rescaled_x * rescaled_x + rescaled_z * rescaled_z - ll * ll + 2 * rescaled_z - 1 == 0 or big_sqrt_min == 0 \
+            or safety_check_large == 0:
+        raise SubgaitInterpolationError("The calculation method cannot find the angles corresponding to the desired"
+                                         "foot position, ({0}, {1}, {2}).".
+                                        format(pos_x, pos_y, pos_z))
+
+    # calculate suitable hfe and kfe angles
+    if denom_hip == 0:
+        if numer_op_one == 0:
+            if rescaled_x < 0:
+                hfe_one = -pi / 2
+            else:
+                hfe_one = pi / 2
+        elif numer_op_one < 0:
+            hfe_one = - pi
+        else:
+            hfe_one = pi
+
+        if numer_op_two == 0:
+            if rescaled_x < 0:
+                hfe_two = -pi / 2
+            else:
+                hfe_two = pi / 2
+        elif numer_op_two < 0:
+            hfe_two = - pi
+        else:
+            hfe_two = pi
+    else:
+        hfe_one = 2 * atan(numer_op_one / denom_hip)
+        hfe_two = 2 * atan(numer_op_two / denom_hip)
+
+    kfe_one = - 2 * atan(big_sqrt_plus / big_sqrt_min)
+    kfe_two = 2 * atan(big_sqrt_plus / big_sqrt_min)
+
+    if kfe_one > 0:
+        kfe = kfe_one
+        hfe = hfe_one
+    else:
+        kfe = kfe_two
+        hfe = hfe_two
 
     return [haa, hfe, kfe]
