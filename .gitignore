@@ -26,6 +26,7 @@ build/
 bin/
 log/
 lib/
+.catkin_workspace
 
 # Binary libraries
 *.so

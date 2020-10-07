@@ -21,7 +21,7 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='Project March',
-    maintainer_email='katjaschmahl@hotmail.com',
+    maintainer_email='software@projectmarch.nl',
     description='Developer input device to send commands to the march exoskeleton',
     license='TODO: License declaration',
     tests_require=['pytest'],

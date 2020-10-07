@@ -38,8 +38,8 @@ class InputDeviceController(object):
                                                             callback=self._current_gait_callback,
                                                             qos_profile=1)
         self._error_pub = self._node.create_publisher(msg_type=Error, topic='/march/error', qos_profile=10)
-        self._possible_gait_client = self._node.create_client(msg_type=PossibleGaits,
-                                                              topic='/march/gait_selection/get_possible_gaits')
+        self._possible_gait_client = self._node.create_client(srv_type=PossibleGaits,
+                                                              srv_name='/march/gait_selection/get_possible_gaits')
 
         self.accepted_cb = None
         self.finished_cb = None
