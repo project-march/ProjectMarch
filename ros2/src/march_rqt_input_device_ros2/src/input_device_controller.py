@@ -63,9 +63,10 @@ class InputDeviceController(object):
     def __del__(self):
         self._node.destroy_publisher(self._instruction_gait_pub)
         self._node.destroy_publisher(self._error_pub)
-        self._alive_timer.shutdown()
-        self._alive_timer.join()
-        self._alive_pub.unregister()
+        if self._ping:
+            self._alive_timer.shutdown()
+            self._alive_timer.join()
+            self._alive_pub.unregister()
 
     def _response_callback(self, msg: GaitInstructionResponse) -> None:
         """
