@@ -20,9 +20,9 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='katja',
+    maintainer='Project March',
     maintainer_email='katjaschmahl@hotmail.com',
-    description='TODO: Package description',
+  description='Developer input device to send commands to the march exoskeleton',
     license='TODO: License declaration',
     tests_require=['pytest'],
     entry_points={
