@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 from glob import glob
 import os
 
@@ -7,7 +7,7 @@ package_name = 'march_rqt_input_device_ros2'
 setup(
     name=package_name,
     version='0.0.0',
-    packages=['src'],
+    packages=find_packages(package_name),
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
@@ -27,7 +27,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'input_device = march_rqt_input_device_ros2.input_device_plugin:main'
+            'input_device = src.input_device_plugin:main'
         ],
     },
 )

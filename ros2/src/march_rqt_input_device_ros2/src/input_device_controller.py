@@ -26,14 +26,20 @@ class InputDeviceController(object):
         self._node = node
         self._ping = ping
 
-        self._instruction_gait_pub = self._node.create_publisher(GaitInstruction, '/march/input_device/instruction', 10)
-        self._instruction_response_pub = self._node.create_subscription(GaitInstructionResponse,
-                                                                        '/march/input_device/instruction_response',
-                                                                        self._response_callback, 10)
-        self._current_gait = self._node.create_subscription(String, '/march/gait/current',
-                                                            self._current_gait_callback, 1)
-        self._error_pub = self._node.create_publisher(Error, '/march/error', 10)
-        self._possible_gait_client = self._node.create_client(PossibleGaits, '/march/gait_selection/get_possible_gaits')
+        self._instruction_gait_pub = self._node.create_publisher(msg_type=GaitInstruction,
+                                                                 topic='/march/input_device/instruction',
+                                                                 qos_profile=10)
+        self._instruction_response_pub = self._node.create_subscription(msg_type=GaitInstructionResponse,
+                                                                        topic='/march/input_device/instruction_response',
+                                                                        callback=self._response_callback,
+                                                                        qos_profile=10)
+        self._current_gait = self._node.create_subscription(msg_type=String,
+                                                            topic='/march/gait/current',
+                                                            callback=self._current_gait_callback,
+                                                            qos_profile=1)
+        self._error_pub = self._node.create_publisher(msg_type=Error, topic='/march/error', qos_profile=10)
+        self._possible_gait_client = self._node.create_client(msg_type=PossibleGaits,
+                                                              topic='/march/gait_selection/get_possible_gaits')
 
         self.accepted_cb = None
         self.finished_cb = None
@@ -44,12 +50,13 @@ class InputDeviceController(object):
                                          user=getpass.getuser())
 
         if self._node.get_parameter('use_sim_time').get_parameter_value():
-            self._timesource = self._node.create_subscription(Clock, '/clock', lambda time: None, 10)
+            self._timesource = self._node.create_subscription(msg_type=Clock, topic='/clock',
+                                                              callback=lambda time: None, qos_profile=10)
 
         if self._ping:
             self._alive_pub = self._node.create_publisher(Alive, '/march/input_device/alive', 10)
-            period = 0.2
-            self._alive_timer = self._node.create_timer(period, self._timer_callback, clock=self._node.get_clock())
+            self._alive_timer = self._node.create_timer(timer_period_sec=0.2, callback=self._timer_callback,
+                                                        clock=self._node.get_clock())
 
         self.gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
 

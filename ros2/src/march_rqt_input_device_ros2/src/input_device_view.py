@@ -1,7 +1,7 @@
 import os
 from typing import List, Callable, Tuple
 
-from march_rqt_input_device_ros2.src.input_device_controller import InputDeviceController
+from .input_device_controller import InputDeviceController
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import QSize
 from python_qt_binding.QtWidgets import QGridLayout
