@@ -1,4 +1,4 @@
-# March
+# Project MARCH
 The main repository of the MARCH exoskeleton.
 
 ![Pipeline Status](https://gitlab.com/project-march/march/badges/main/pipeline.svg)
