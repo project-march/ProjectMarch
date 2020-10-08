@@ -1,5 +1,5 @@
 class PackageNotFoundError(Exception):
-    def __init__(self, package_name, msg=None):
+    def __init__(self, package_name: str, msg: str = None):
         """Class to raise an error when a ros package cannot be found.
 
         :param package_name:
@@ -12,7 +12,7 @@ class PackageNotFoundError(Exception):
 
 
 class MsgTypeError(Exception):
-    def __init__(self, msg=None):
+    def __init__(self, msg: str = None):
         """Class to raise an error when an non msg type is added to a message."""
         if msg is None:
             msg = 'A non msg type (defined in shared resources) was added to a ROS-message'

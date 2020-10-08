@@ -1,7 +1,7 @@
 class GaitError(Exception):
-    def __init__(self, msg=None):
-        """Base class for exceptions in gait modules.
-
+    def __init__(self, msg: str = None):
+        """
+        Initialize a basic gait error exception.
         :param msg:
             The message to display.
         """
@@ -11,7 +11,7 @@ class GaitError(Exception):
 
 
 class GaitNameNotFound(GaitError):
-    def __init__(self, gait_name, msg=None):
+    def __init__(self, gait_name: str, msg: str = None):
         """Class to raise an error when given gait name does not exists .
 
         :param msg:
@@ -24,7 +24,7 @@ class GaitNameNotFound(GaitError):
 
 
 class SubgaitNameNotFound(GaitError):
-    def __init__(self, subgait_name, gait_name, msg=None):
+    def __init__(self, subgait_name: str, gait_name: str, msg: str = None):
         """Class to raise an error when given subgait name does not exists .
 
         :param msg:
@@ -38,7 +38,7 @@ class SubgaitNameNotFound(GaitError):
 
 
 class NonValidGaitContent(GaitError):
-    def __init__(self, gait_name=None, msg=None):
+    def __init__(self, gait_name: str = None, msg: str = None):
         """Class to raise an error when given gait has incorrect content .
 
         :param msg:
@@ -51,12 +51,12 @@ class NonValidGaitContent(GaitError):
 
 
 class SubgaitGraphError(GaitError):
-    def __init__(self, msg):
+    def __init__(self, msg: str):
         super(SubgaitGraphError, self).__init__(msg)
 
 
 class TransitionError(Exception):
-    def __init__(self, msg=None):
+    def __init__(self, msg: str = None):
         """Class to raise an error when transition between two subgaits has an error .
 
         :param msg:
@@ -69,7 +69,7 @@ class TransitionError(Exception):
 
 
 class SubgaitInterpolationError(Exception):
-    def __init__(self, msg=None):
+    def __init__(self, msg: str = None):
         """Class to raise an error when it was not possible to interpolate between subgaits."""
         if msg is None:
             msg = 'An error occurred while trying to merge two subgaits.'

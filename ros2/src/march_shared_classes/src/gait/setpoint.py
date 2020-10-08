@@ -1,11 +1,13 @@
+from rclpy.duration import Duration
+
 
 class Setpoint(object):
     """Base class to define the setpoints of a subgait."""
 
     digits = 4
 
-    def __init__(self, time, position, velocity):
-        self._time = round(time, self.digits)
+    def __init__(self, time: float, position: float, velocity: float):
+        self._time = round(time, self.digits)  # nanoseconds
         self._position = round(position, self.digits)
         self._velocity = round(velocity, self.digits)
 
@@ -14,7 +16,7 @@ class Setpoint(object):
         return self._time
 
     @time.setter
-    def time(self, time):
+    def time(self, time: float):
         self._time = round(time, self.digits)
 
     @property
@@ -22,7 +24,7 @@ class Setpoint(object):
         return self._position
 
     @position.setter
-    def position(self, position):
+    def position(self, position: float):
         self._position = round(position, self.digits)
 
     @property
@@ -30,7 +32,7 @@ class Setpoint(object):
         return self._velocity
 
     @velocity.setter
-    def velocity(self, velocity):
+    def velocity(self, velocity: float):
         self._velocity = round(velocity, self.digits)
 
     def __repr__(self):
@@ -48,7 +50,7 @@ class Setpoint(object):
         return not self.__eq__(other)
 
     @staticmethod
-    def interpolate_setpoints(base_setpoint, other_setpoint, parameter):
+    def interpolate_setpoints(base_setpoint, other_setpoint, parameter: float):
         """Linearly interpolate two setpoints.
 
         :param base_setpoint:

@@ -1,6 +1,7 @@
 import os
 
 import yaml
+from urdf_parser_py import urdf
 
 from march_shared_classes.exceptions.gait_exceptions import GaitNameNotFound, NonValidGaitContent, SubgaitNameNotFound
 from march_shared_classes.exceptions.general_exceptions import FileNotFoundError
@@ -12,7 +13,7 @@ from .subgait_graph import SubgaitGraph
 class Gait(object):
     """base class for a generated gait."""
 
-    def __init__(self, gait_name, subgaits, graph):
+    def __init__(self, gait_name: str, subgaits: dict, graph: SubgaitGraph):
         """Initializes and verifies the gait.
 
         :param str gait_name: Name of the gait
@@ -26,7 +27,7 @@ class Gait(object):
         self._validate_trajectory_transition()
 
     @classmethod
-    def from_file(cls, gait_name, gait_directory, robot, gait_version_map):
+    def from_file(cls, gait_name: str, gait_directory: str, robot: urdf.Robot, gait_version_map: dict):
         """Extract the data from the .gait file.
 
         :param gait_name:
@@ -49,7 +50,7 @@ class Gait(object):
         return cls.from_dict(robot, gait_dictionary, gait_directory, gait_version_map)
 
     @classmethod
-    def from_dict(cls, robot, gait_dictionary, gait_directory, gait_version_map):
+    def from_dict(cls, robot: urdf.Robot, gait_dictionary: dict, gait_directory: str, gait_version_map: dict):
         """Create a new gait object using the .gait and .subgait files.
 
         :param robot:
@@ -74,11 +75,15 @@ class Gait(object):
         return cls(gait_name, subgaits, graph)
 
     @staticmethod
-    def load_subgait(robot, gait_directory, gait_name, subgait_name, gait_version_map):
+    def load_subgait(robot: urdf.Robot, gait_directory: str, gait_name: str, subgait_name: str, gait_version_map: dict) \
+            -> Subgait:
         """Read the .subgait file and extract the data.
-
-        :returns
-            if gait and subgait names are valid return populated Gait object
+        :param robot: the robot corresponding to the given .gait file
+        :param gait_directory: path of the directory where the .gait file is located
+        :param gait_name: the name of the gait where the subgait belongs to
+        :param subgait_name: the name of the subgait to load
+        :param gait_version_map: the parsed yaml file which states the version of the subgaits
+        :return: Gait if gait and subgait names are valid return populated Gait object
         """
         if gait_name not in gait_version_map:
             raise GaitNameNotFound(gait_name)
@@ -103,7 +108,7 @@ class Gait(object):
                                                                       sn=from_subgait.subgait_name,
                                                                       ns=to_subgait.subgait_name))
 
-    def set_subgait_versions(self, robot, gait_directory, version_map):
+    def set_subgait_versions(self, robot: urdf.Robot, gait_directory: str, version_map: dict):
         """Updates the given subgait versions and verifies transitions.
 
         :param robot: URDF matching subgaits
@@ -146,6 +151,6 @@ class Gait(object):
 
         self.subgaits.update(new_subgaits)
 
-    def __getitem__(self, name):
+    def __getitem__(self, name: str):
         """Returns a subgait from the loaded subgaits."""
         return self.subgaits.get(name)

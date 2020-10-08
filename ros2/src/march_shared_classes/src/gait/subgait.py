@@ -1,11 +1,13 @@
 import os
 import re
+from typing import List
 
-import rospy
+from rclpy.duration import Duration
 from trajectory_msgs import msg as trajectory_msg
 import yaml
+from urdf_parser_py import urdf
 
-from march_shared_classes.exceptions.gait_exceptions import NonValidGaitContent, SubgaitInterpolationError
+from march_shared_classes.exceptions.gait_exceptions import NonValidGaitContent, SubgaitInterpolationError, GaitError
 from march_shared_classes.exceptions.general_exceptions import FileNotFoundError
 
 from .joint_trajectory import JointTrajectory
@@ -20,8 +22,9 @@ class Subgait(object):
 
     joint_class = JointTrajectory
 
-    def __init__(self, joints, duration, gait_type='walk_like', gait_name='Walk', subgait_name='right_open',
-                 version='First try', description='Just a simple gait'):
+    def __init__(self, joints: List[JointTrajectory], duration: Duration, gait_type: str = 'walk_like',
+                 gait_name: str = 'Walk', subgait_name: str = 'right_open', version: str = 'First try',
+                 description: str = 'Just a simple gait'):
 
         self.joints = joints
         self.gait_type = gait_type
@@ -34,7 +37,7 @@ class Subgait(object):
 
     # region Create subgait
     @classmethod
-    def from_file(cls, robot, file_name, *args):
+    def from_file(cls, robot: urdf.Robot, file_name: str, *args):
         """Extract sub gait data of the given yaml.
 
         :param robot:
@@ -56,13 +59,13 @@ class Subgait(object):
                 subgait_dict = yaml.load(yaml_file, Loader=yaml.SafeLoader)
 
         except Exception as e:
-            rospy.logerr('Error occurred in subgait: {te}, {er} '.format(te=type(e), er=e))
             return None
 
         return cls.from_dict(robot, subgait_dict, gait_name, subgait_name, version, *args)
 
     @classmethod
-    def from_name_and_version(cls, robot, gait_dir, gait_name, subgait_name, version, *args):
+    def from_name_and_version(cls, robot: urdf.Robot, gait_dir: str, gait_name: str, subgait_name: str, version: str,
+                              *args):
         """Load subgait based from file(s) based on name and version.
 
         :param robot: The robot corresponding to the given subgait file
@@ -83,7 +86,8 @@ class Subgait(object):
             return cls.from_file(robot, subgait_path, *args)
 
     @classmethod
-    def from_files_interpolated(cls, robot, file_name_base, file_name_other, parameter, *args):
+    def from_files_interpolated(cls, robot: urdf.Robot, file_name_base: str, file_name_other: str, parameter: float,
+                                *args):
         """Extract two subgaits from files and interpolate.
 
         :param robot:
@@ -102,7 +106,7 @@ class Subgait(object):
         return cls.interpolate_subgaits(base_subgait, other_subgait, parameter)
 
     @classmethod
-    def from_dict(cls, robot, subgait_dict, gait_name, subgait_name, version, *args):
+    def from_dict(cls, robot: urdf.Robot, subgait_dict: dict, gait_name: str, subgait_name: str, version: str, *args):
         """List parameters from the yaml file in organized lists.
 
         :param robot:
@@ -120,16 +124,15 @@ class Subgait(object):
             A populated Subgait object
         """
         if robot is None:
-            rospy.logerr('Cannot create gait without a loaded robot.')
-            return None
+            raise GaitError('Cannot create gait without a loaded robot.')
 
-        duration = rospy.Duration(subgait_dict['duration']['secs'], subgait_dict['duration']['nsecs']).to_sec()
+        duration = Duration(seconds=subgait_dict['duration']['secs'],
+                            nanoseconds=subgait_dict['duration']['nsecs']).nanoseconds
 
-        joint_list = []
+        joint_list =[]
         for name, points in sorted(subgait_dict['joints'].items(), key=lambda item: item[0]):
             urdf_joint = cls.joint_class.get_joint_from_urdf(robot, name)
             if urdf_joint is None or urdf_joint.type == 'fixed':
-                rospy.logwarn('Joint {0} is not in the robot description. Skipping joint.')
                 continue
             limits = Limits.from_urdf_joint(urdf_joint)
             joint_list.append(cls.joint_class.from_setpoints(name, limits, points, duration, *args))
@@ -154,13 +157,10 @@ class Subgait(object):
         timestamps = self.get_unique_timestamps()
         for timestamp in timestamps:
             joint_trajectory_point = trajectory_msg.JointTrajectoryPoint()
-            joint_trajectory_point.time_from_start = rospy.Duration.from_sec(timestamp)
+            joint_trajectory_point.time_from_start = Duration(seconds=timestamp)
 
             for joint in self.joints:
                 interpolated_setpoint = joint.get_interpolated_setpoint(timestamp)
-                if interpolated_setpoint.time != timestamp:
-                    rospy.logwarn('Time mismatch in joint {jn} at timestamp {ts}, '
-                                  'got time {ti}'.format(jn=joint.name, ts=timestamp, ti=interpolated_setpoint.time))
 
                 joint_trajectory_point.positions.append(interpolated_setpoint.position)
                 joint_trajectory_point.velocities.append(interpolated_setpoint.velocity)
@@ -312,18 +312,18 @@ class Subgait(object):
 
     def to_yaml(self):
         """Returns a YAML string representation of the subgait."""
-        duration = rospy.Duration.from_sec(self.duration)
+        duration = Duration(seconds=self.duration)
         output = {
             'description': self.description,
             'duration': {
-                'nsecs': duration.nsecs,
-                'secs': duration.secs,
+                'nsecs': duration.nanoseconds,
+                'secs': duration.nanoseconds,
             },
             'gait_type': self.gait_type,
             'joints': dict([(joint.name, [{
                 'position': setpoint.position,
                 'time_from_start': {
-                    'nsecs': rospy.Duration.from_sec(setpoint.time).nsecs,
+                    'nsecs': Duration(seconds=setpoint.time).nanoseconds,
                     'secs': int(setpoint.time),
                 },
                 'velocity': setpoint.velocity}
@@ -350,12 +350,10 @@ class Subgait(object):
             other_subgait_path = os.path.join(gait_path, subgait_name, other_version + '.subgait')
             for subgait_path in [base_subgait_path, other_subgait_path]:
                 if not os.path.isfile(subgait_path):
-                    rospy.logwarn('{sp} does not exist'.format(sp=subgait_path))
                     return False
         else:
             subgait_path = os.path.join(gait_path, subgait_name, version + '.subgait')
             if not os.path.isfile(subgait_path):
-                rospy.logwarn('{sp} does not exist'.format(sp=subgait_path))
                 return False
         return True
 

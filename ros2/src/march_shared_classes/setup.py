@@ -5,7 +5,7 @@ package_name = 'march_shared_classes'
 setup(
     name=package_name,
     version='0.0.0',
-    packages=[package_name, 'march_shared_classes.gait', 'march_shared_classes.exceptions'],
+    packages=['src', 'src.gait', 'src.exceptions'],
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
