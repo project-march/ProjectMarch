@@ -3,14 +3,16 @@ sudo apt-get update
 
 sudo apt-get install -y python3-colcon-common-extensions python3-pip
 
-mkdir -p ~/march_ws/src
-cd ~/march_ws || exit
+mkdir -p ~/march_ws
+cd ~/march_ws
 
-wstool init src https://raw.githubusercontent.com/project-march/tutorials/develop/doc/getting_started/.rosinstall
-wstool update -t src
+# Download march repo
+git clone git@gitlab.com:project-march/march.git
 
 # Install dependencies
+cd ~/march_ws/march
 rosdep install -y --from-paths src --ignore-src
 
 colcon build
 source install/setup.bash
+m
