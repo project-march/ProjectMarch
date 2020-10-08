@@ -54,7 +54,11 @@ class InputDevicePlugin(Plugin):
             self._widget.setWindowTitle('{0} ({1})'.format(self._widget.windowTitle(), context.serial_number()))
 
     @staticmethod
-    def add_arguments(parser):
+    def add_arguments(parser: argparse.ArgumentParser) -> None:
+        """
+        Add the available arguments for the input device to the parser
+        :param parser: The argument parser that is used
+        """
         group = parser.add_argument_group('Options for input device')
         group.add_argument('ping_safety_node', nargs=1, help='Whether to ping the safety node')
         group.add_argument('use_sim_time', nargs=1, help='Whether to use simulation time')

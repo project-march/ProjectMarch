@@ -450,7 +450,7 @@ class InputDeviceView(QWidget):
         return qt_button_layout
 
 
-def get_image_path(img_name):
+def get_image_path(img_name: str) -> str:
     """Create an absolute image path to an image."""
     return os.path.join(
         get_package_share_directory('march_rqt_input_device'),
@@ -458,7 +458,7 @@ def get_image_path(img_name):
         'img{0}'.format(img_name))
 
 
-def check_string(text):
+def check_string(text: str) -> str:
     """Split text into new lines on every third word.
 
     :type text: str

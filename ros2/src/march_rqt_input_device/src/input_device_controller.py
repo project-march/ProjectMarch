@@ -1,5 +1,7 @@
 import getpass
 import socket
+
+from rclpy import Future
 from std_msgs.msg import Header, String
 from rosgraph_msgs.msg import Clock
 from march_shared_msgs.msg import Alive, Error, GaitInstruction, GaitInstructionResponse
@@ -29,10 +31,9 @@ class InputDeviceController(object):
         self._instruction_gait_pub = self._node.create_publisher(msg_type=GaitInstruction,
                                                                  topic='/march/input_device/instruction',
                                                                  qos_profile=10)
-        self._instruction_response_pub = self._node.create_subscription(msg_type=GaitInstructionResponse,
-                                                                        topic='/march/input_device/instruction_response',
-                                                                        callback=self._response_callback,
-                                                                        qos_profile=10)
+        self._instruction_response_pub = self._node\
+            .create_subscription(msg_type=GaitInstructionResponse, topic='/march/input_device/instruction_response',
+                                 callback=self._response_callback, qos_profile=10)
         self._current_gait = self._node.create_subscription(msg_type=String,
                                                             topic='/march/gait/current',
                                                             callback=self._current_gait_callback,
@@ -89,8 +90,8 @@ class InputDeviceController(object):
     def _current_gait_callback(self, msg: String) -> None:
         """
         Callback for when the current gait changes, sends the msg through to public current_gait_callback
-        @param msg: The string with the name of the current gait
-        @type msg: String
+        :param msg: The string with the name of the current gait
+        :type msg: String
         """
         if callable(self.current_gait_cb):
             self.current_gait_cb(msg.data)
@@ -111,11 +112,9 @@ class InputDeviceController(object):
         else:
             self._node.get_logger().warn('Failed to contact get_possible_gaits service')
 
-    def get_possible_gaits(self):
+    def get_possible_gaits(self) -> Future:
         """
         Returns the future for the list of names of possible gaits.
-
-        :rtype: list(str)
         :return: List of possible gaits
         """
         return self.gait_future
@@ -123,8 +122,7 @@ class InputDeviceController(object):
     def get_node(self) -> Node:
         """
         Simple get function for the node
-        @return: the node
-        @rtype: Node
+        :return: the node
         """
         return self._node
 
