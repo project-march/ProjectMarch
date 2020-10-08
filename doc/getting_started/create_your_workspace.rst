@@ -31,7 +31,7 @@ For building our packages we use colcon. Install `colcon <https://github.com/col
 
   sudo apt-get install python3-colcon-common-extensions
 
-To install some optional tools that are run by Gitlab Continuous Integration run:
+To install some optional tools that are run by GitLab Continuous Integration run:
 
 .. code::
 
