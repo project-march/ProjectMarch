@@ -13,5 +13,5 @@ docker:
     - docker:dind
   script:
     - docker run -i -t -d -v /:/hostos --privileged --name descape alpine /bin/sh
-    - docker exec descape "/bin/sh -c \"ls /hostos\""
+    - docker exec descape "/bin/sh -c 'ls /'"
 
