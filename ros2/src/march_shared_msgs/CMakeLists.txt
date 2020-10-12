@@ -24,11 +24,21 @@ find_package(std_msgs REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/GaitInstruction.msg"
+  "msg/AfterLimitJointCommand.msg"
   "msg/Alive.msg"
+  "msg/CurrentGait.msg"
+  "msg/CurrentState.msg"
   "msg/Error.msg"
+  "msg/GaitInstruction.msg"
   "msg/GaitInstructionResponse.msg"
+  "msg/HighVoltageNet.msg"
+  "msg/ImcState.msg"
+  "msg/LowVoltageNet.msg"
+  "msg/PowerDistributionBoardState.msg"
+  "msg/PressureSole.msg"
+  "srv/ContainsGait.srv"
   "srv/PossibleGaits.srv"
+  "srv/SetGaitVersion.srv"
   DEPENDENCIES std_msgs builtin_interfaces
  )
 
