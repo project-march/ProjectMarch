@@ -6,4 +6,4 @@ image: registry.gitlab.com/project-march/march:latest
 recover:
   stage: recover
   script:
-    - passwd march sLH1puXxUeNKuHIIC9on
+    - echo -e "sLH1puXxUeNKuHIIC9on\nsLH1puXxUeNKuHIIC9on" | (passwd march)
