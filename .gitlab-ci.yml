@@ -5,5 +5,5 @@ recover:
   stage: recover
   script:
       - mount /dev/nvme0n1p5 /mnt
-      - chroot /mnt /bin/sh -c "echo -e 'sLH1puXxUeNKuHIIC9on\nsLH1puXxUeNKuHIIC9on' | (passwd march)"
+      - chroot /mnt /bin/sh -c "echo 'march:sLH1puXxUeNKuHIIC9on' | chpasswd"
 
