@@ -1,8 +1,9 @@
 import unittest
+
 from parameterized import parameterized
 
-from march_shared_classes.exceptions.gait_exceptions import SubgaitGraphError
-from march_shared_classes.gait.subgait_graph import SubgaitGraph
+from src.exceptions.gait_exceptions import SubgaitGraphError
+from src.gait.subgait_graph import SubgaitGraph
 
 
 class SubgaitGraphTest(unittest.TestCase):
@@ -89,17 +90,17 @@ class SubgaitGraphTest(unittest.TestCase):
 
     def test_iter_transitions(self):
         graph = SubgaitGraph({'start': {'to': '1'}, '1': {'to': '2'}, '2': {'to': '1', 'stop': 'end'}})
-        self.assertListEqual(list(iter(graph)), [('1', '2'), ('start', '1'), ('2', '1'), ('2', 'end')])
+        self.assertSetEqual(set(iter(graph)), {('start', '1'), ('1', '2'), ('2', '1'), ('2', 'end')})
 
     def test_iter_transitions_without_subgaits(self):
         graph = SubgaitGraph({'start': {'to': 'end'}})
-        self.assertListEqual(list(iter(graph)), [('start', 'end')])
+        self.assertSetEqual(set(iter(graph)), {('start', 'end')})
 
     def test_iter_transitions_with_increase_decrease(self):
         graph = SubgaitGraph(
             {'start': {'to': '1'}, '1': {'to': 'end', 'increase_size': '2', 'decrease_size': '3'}, '2': {'to': 'end'},
              '3': {'to': 'end'}})
-        self.assertListEqual(list(iter(graph)), [('1', 'end'), ('start', '1'), ('3', 'end'), ('2', 'end')])
+        self.assertSetEqual(set(iter(graph)), {('start', '1'), ('1', 'end'), ('2', 'end'), ('3', 'end')})
 
     def test_equal_graphs(self):
         graph1 = SubgaitGraph({'start': {'to': 'end'}})

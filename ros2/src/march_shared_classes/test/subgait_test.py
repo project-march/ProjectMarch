@@ -3,11 +3,11 @@ import unittest
 from ament_index_python import get_package_share_directory
 from urdf_parser_py import urdf
 
-from march_shared_classes.exceptions.gait_exceptions import NonValidGaitContent, SubgaitInterpolationError
-from march_shared_classes.gait.joint_trajectory import JointTrajectory
-from march_shared_classes.gait.limits import Limits
-from march_shared_classes.gait.setpoint import Setpoint
-from march_shared_classes.gait.subgait import Subgait
+from src.exceptions.gait_exceptions import NonValidGaitContent, SubgaitInterpolationError
+from src.gait.joint_trajectory import JointTrajectory
+from src.gait.limits import Limits
+from src.gait.setpoint import Setpoint
+from src.gait.subgait import Subgait
 
 
 class SubgaitTest(unittest.TestCase):
@@ -32,11 +32,12 @@ class SubgaitTest(unittest.TestCase):
             Subgait.from_file(self.robot, self.resources_folder + '/MV_walk_leftswing_v2.subgait')
 
     def test_from_file_none_path(self):
-        with self.assertRaises(FileNotFoundError):
+        with self.assertRaises(TypeError):
             Subgait.from_file(self.robot, None)
 
     def test_from_file_no_robot(self):
-        self.assertIsNone(Subgait.from_file(None, self.subgait_path))
+        with self.assertRaises(TypeError):
+            Subgait.from_file(None, self.subgait_path)
 
     # Subgait.from_files_interpolated tests
     def test_from_files_interpolated_correct(self):

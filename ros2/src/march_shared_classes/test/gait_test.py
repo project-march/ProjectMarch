@@ -1,20 +1,21 @@
+import os
 import unittest
-
 from ament_index_python import get_package_share_directory
 from urdf_parser_py import urdf
 import yaml
-from march_shared_classes.exceptions.gait_exceptions import GaitNameNotFound, NonValidGaitContent, SubgaitNameNotFound
-from march_shared_classes.gait.gait import Gait
-from march_shared_classes.gait.subgait import Subgait
+from src.exceptions.gait_exceptions import SubgaitNameNotFound, NonValidGaitContent, GaitNameNotFound
+from src.gait.gait import Gait
+from src.gait.subgait import Subgait
 
 
 class GaitTest(unittest.TestCase):
     def setUp(self):
         self.gait_name = 'walk'
-        self.resources_folder = get_package_share_directory('march_shared_classes') + '/test/resources'
+        self.resources_folder = 'resources'
         self.robot = urdf.Robot.from_xml_file(get_package_share_directory('march_description') + '/urdf/march4.urdf')
+        self.resources_folder = os.path.join(get_package_share_directory('march_shared_classes'), 'test', 'resources')
 
-        self.default_yaml = self.resources_folder + '/default.yaml'
+        self.default_yaml = os.path.join(self.resources_folder, 'default.yaml')
         with open(self.default_yaml, 'r') as default_yaml_file:
             default_config = yaml.load(default_yaml_file, Loader=yaml.SafeLoader)
         self.gait_version_map = default_config['gaits']
@@ -101,3 +102,7 @@ class GaitTest(unittest.TestCase):
         new_version = 'MIV_final'
         with self.assertRaises(NonValidGaitContent):
             self.gait.set_subgait_versions(self.robot, self.resources_folder, {subgait_name: new_version})
+
+
+if __name__ == '__main__':
+    unittest.main()
