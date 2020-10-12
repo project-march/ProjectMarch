@@ -1,6 +1,7 @@
 from collections import deque
+from typing import List
 
-from march_shared_classes.exceptions.gait_exceptions import SubgaitGraphError
+from src.exceptions.gait_exceptions import SubgaitGraphError
 
 
 class SubgaitGraph(object):
@@ -12,12 +13,12 @@ class SubgaitGraph(object):
     DECREASE_SIZE = 'decrease_size'
     TRANSITIONS = [TO, STOP, INCREASE_SIZE, DECREASE_SIZE]
 
-    def __init__(self, graph):
+    def __init__(self, graph: dict):
         self._graph = graph
         self._stoppable = False
         self.validate()
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates the graph and raises an exception when not valid.
 
         This method checks a few things to prove consistency:
@@ -54,7 +55,7 @@ class SubgaitGraph(object):
 
         self._validate_visited(visited)
 
-    def _validate_subgait(self, name):
+    def _validate_subgait(self, name: str) -> None:
         subgait = self._graph.get(name)
         if subgait is None:
             raise SubgaitGraphError('Subgait {n} is not a subgait in the graph'.format(n=name))
@@ -66,7 +67,7 @@ class SubgaitGraph(object):
         if len(set(subgait.values())) != len(subgait):
             raise SubgaitGraphError('Subgait {n} transitions cannot be equal'.format(n=name))
 
-    def _validate_visited(self, visited):
+    def _validate_visited(self, visited) -> None:
         if len(visited[self.START]) != 0:
             raise SubgaitGraphError('Transition to `{s}` is not allowed'.format(s=self.START))
         if self.END not in visited:
@@ -75,15 +76,15 @@ class SubgaitGraph(object):
             not_covered = set(self._graph).difference(visited[self.END])
             raise SubgaitGraphError('`{e}` is not reachable from {s}'.format(e=self.END, s=not_covered))
 
-    def is_stoppable(self):
+    def is_stoppable(self) -> bool:
         """Returns True when the graph contains a stop transition, False otherwise."""
         return self._stoppable
 
-    def start_subgaits(self):
+    def start_subgaits(self) -> List[str]:
         """Returns a list of subgait names that transition from the `start` state."""
-        return self._graph[self.START].values()
+        return list(self._graph[self.START].values())
 
-    def end_subgaits(self):
+    def end_subgaits(self)-> List[str]:
         """Returns a list of subgait names that transition to the `end` state."""
         return [from_subgait
                 for from_subgait, transitions in self._graph.items()

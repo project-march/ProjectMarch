@@ -1,3 +1,4 @@
+import errno
 import os
 import re
 from typing import List
@@ -7,7 +8,7 @@ from trajectory_msgs import msg as trajectory_msg
 import yaml
 from urdf_parser_py import urdf
 
-from march_shared_classes.exceptions.gait_exceptions import NonValidGaitContent, SubgaitInterpolationError, GaitError
+from src.exceptions.gait_exceptions import NonValidGaitContent, SubgaitInterpolationError, GaitError
 
 from .joint_trajectory import JointTrajectory
 from .limits import Limits
@@ -47,18 +48,17 @@ class Subgait(object):
         :returns
             A populated Subgait object
         """
-        if file_name is None or not os.path.isfile(file_name):
-            raise FileNotFoundError(file_path=file_name)
-        try:
-            gait_name = file_name.split('/')[-3]
-            subgait_name = file_name.split('/')[-2]
-            version = file_name.split('/')[-1].replace('.subgait', '')
+        if robot is None:
+            raise TypeError('Robot is None, should be a valid urdf.Robot object')
+        if file_name is None:
+            raise TypeError('Filename is None, should be a string')
 
-            with open(file_name, 'r') as yaml_file:
-                subgait_dict = yaml.load(yaml_file, Loader=yaml.SafeLoader)
+        with open(file_name, 'r') as yaml_file:
+            subgait_dict = yaml.load(yaml_file, Loader=yaml.SafeLoader)
 
-        except Exception as e:
-            return None
+        gait_name = file_name.split('/')[-3]
+        subgait_name = file_name.split('/')[-2]
+        version = file_name.split('/')[-1].replace('.subgait', '')
 
         return cls.from_dict(robot, subgait_dict, gait_name, subgait_name, version, *args)
 
@@ -126,7 +126,7 @@ class Subgait(object):
             raise GaitError('Cannot create gait without a loaded robot.')
 
         duration = Duration(seconds=subgait_dict['duration']['secs'],
-                            nanoseconds=subgait_dict['duration']['nsecs']).nanoseconds
+                            nanoseconds=subgait_dict['duration']['nsecs']).nanoseconds * 1e-9
 
         joint_list =[]
         for name, points in sorted(subgait_dict['joints'].items(), key=lambda item: item[0]):
@@ -180,6 +180,7 @@ class Subgait(object):
         :returns:
             True if trajectory transition correct else False
         """
+        print(f'validating subgait transition {self.get_joint_names()} to {next_subgait.get_joint_names()}')
         from_subgait_joint_names = set(self.get_joint_names())
         to_subgait_joint_names = set(next_subgait.get_joint_names())
 

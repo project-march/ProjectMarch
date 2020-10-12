@@ -5,7 +5,7 @@ from scipy.interpolate import BPoly
 from urdf_parser_py import urdf
 
 from .limits import Limits
-from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
+from src.exceptions.gait_exceptions import SubgaitInterpolationError, NonValidGaitContent
 from .setpoint import Setpoint
 
 
@@ -18,7 +18,7 @@ class JointTrajectory(object):
         self.name = name
         self.limits = limits
         self._setpoints = setpoints
-        self._duration = round(duration, self.setpoint_class.digits)  # nanoseconds
+        self._duration = round(duration, self.setpoint_class.digits)  # seconds
         self.interpolated_position = None
         self.interpolated_velocity = None
         self.interpolate_setpoints()
@@ -35,7 +35,7 @@ class JointTrajectory(object):
         setpoints = [
             cls.setpoint_class(
                 time=Duration(seconds=setpoint['time_from_start']['secs'],
-                              nanoseconds=setpoint['time_from_start']['nsecs']).nanoseconds,
+                              nanoseconds=setpoint['time_from_start']['nsecs']).nanoseconds * 1e-9,
                 position=setpoint['position'], velocity=setpoint['velocity']) for setpoint in setpoints]
         return cls(name, limits, setpoints, duration, *args)
 
@@ -72,7 +72,7 @@ class JointTrajectory(object):
         self._setpoints = setpoints
         self.interpolate_setpoints()
 
-    def get_setpoints_unzipped(self) -> (List[Duration], List[float], List[float]):
+    def get_setpoints_unzipped(self) -> (List[float], List[float], List[float]):
         """Get all the listed attributes of the setpoints."""
         time = []
         position = []
@@ -95,11 +95,13 @@ class JointTrajectory(object):
             True if ending and starting point are identical else False
         """
         if not self._validate_boundary_points():
-            return False
+            raise NonValidGaitContent(self.name, msg=f'Invalid boundary points for begin setpoint {self.setpoints[0]} '
+                                                     f'and end setpoint {self.setpoints[-1]}')
 
         from_setpoint = self.setpoints[-1]
         to_setpoint = joint.setpoints[0]
-
+        print(f'validating velocity {from_setpoint.velocity} to {to_setpoint.velocity}')
+        print(f'validating position {from_setpoint.position} to {to_setpoint.position}')
         if from_setpoint.velocity == to_setpoint.velocity and from_setpoint.position == to_setpoint.position:
             return True
 
@@ -136,7 +138,7 @@ class JointTrajectory(object):
         if time > self.duration:
             return self.setpoint_class(time, self.setpoints[-1].position, 0)
 
-        return self.setpoint_class(time, self.interpolated_position(time), self.interpolated_velocity(time))
+        return self.setpoint_class(time, float(self.interpolated_position(time)), float(self.interpolated_velocity(time)))
 
     def __getitem__(self, index):
         return self.setpoints[index]

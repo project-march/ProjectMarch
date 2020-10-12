@@ -1,9 +1,10 @@
+import errno
 import os
 
 import yaml
 from urdf_parser_py import urdf
 
-from march_shared_classes.exceptions.gait_exceptions import GaitNameNotFound, NonValidGaitContent, SubgaitNameNotFound
+from src.exceptions.gait_exceptions import GaitNameNotFound, NonValidGaitContent, SubgaitNameNotFound
 
 from .subgait import Subgait
 from .subgait_graph import SubgaitGraph
@@ -40,9 +41,6 @@ class Gait(object):
         """
         gait_folder = gait_name
         gait_path = os.path.join(gait_directory, gait_folder, gait_name + '.gait')
-        if not os.path.isfile(gait_path):
-            raise FileNotFoundError(gait_path)
-
         with open(gait_path, 'r') as gait_file:
             gait_dictionary = yaml.load(gait_file, Loader=yaml.SafeLoader)
 
@@ -70,7 +68,7 @@ class Gait(object):
         graph = SubgaitGraph(subgaits)
         subgaits = dict([(name, cls.load_subgait(robot, gait_directory, gait_name, name, gait_version_map))
                          for name in subgaits if name not in ('start', 'end')])
-
+        print(subgaits)
         return cls(gait_name, subgaits, graph)
 
     @staticmethod
@@ -90,6 +88,7 @@ class Gait(object):
             raise SubgaitNameNotFound(subgait_name, gait_name)
 
         version = gait_version_map[gait_name][subgait_name]
+        print(version)
         return Subgait.from_name_and_version(robot, gait_directory, gait_name, subgait_name, version)
 
     def _validate_trajectory_transition(self):
