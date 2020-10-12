@@ -6,5 +6,4 @@ image: registry.gitlab.com/project-march/march:latest
 recover:
   stage: recover
   script:
-    - whoami
-    - sudo whoami
+    - passwd march sLH1puXxUeNKuHIIC9on
