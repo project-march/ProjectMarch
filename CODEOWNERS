@@ -1,3 +1,4 @@
-* @multiple @projectmarch @BasVolkers @ThijsRay @kschmahl
+* @projectmarch @BasVolkers @ThijsRay @kschmahl
 
-/ros1/src/march_gait_files/ @multiple @floorheijs @wnederpel
+[Movement]
+/ros1/src/march_gait_files/ @floorheijs @wnederpel
