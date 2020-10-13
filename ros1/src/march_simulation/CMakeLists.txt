@@ -5,7 +5,7 @@ find_package(catkin REQUIRED)
 
 catkin_package()
 
-catkin_install_python(PROGRAMS scripts/upload_joint_names scripts/to_world_transform scripts/foot_on_ground.py
+catkin_install_python(PROGRAMS scripts/upload_joint_names scripts/to_world_transform scripts/foot_on_ground
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

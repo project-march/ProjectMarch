@@ -13,15 +13,17 @@ class FootOnGround(object):
         self.left_foot_pub = rospy.Publisher('/march/left_foot_on_ground', Bool)
         # self.right_foot_pub = rospy.Publisher('/march/right_foot_on_ground', Bool)
 
-    def update_foot_on_ground(self, msg: LinkStates) -> None:
-        for (index, name) in msg.name:
-            rospy.loginfo(f"{index} --- {name}")
+    def update_foot_on_ground(self, msg):
+        # rospy.logwarn(msg)
+        # rospy.logwarn(msg.name)
+        # rospy.logwarn(msg.pose)
+        for name, position in zip(msg.name, msg.pose):
             if "march::ankle_plate_left" == name:
-                if msg.pose[index]['y'] < EPSILON:
+                rospy.logwarn("{name} --- {position}".format(position=position.position.y, name=name))
+                if position.position.y < EPSILON:
                     self.left_foot_pub.publish(Bool(True))
                 else:
                     self.left_foot_pub.publish(Bool(False))
-
 
 def main():
     node = FootOnGround()
