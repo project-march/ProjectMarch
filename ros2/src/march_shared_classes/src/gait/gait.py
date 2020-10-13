@@ -68,7 +68,6 @@ class Gait(object):
         graph = SubgaitGraph(subgaits)
         subgaits = dict([(name, cls.load_subgait(robot, gait_directory, gait_name, name, gait_version_map))
                          for name in subgaits if name not in ('start', 'end')])
-        print(subgaits)
         return cls(gait_name, subgaits, graph)
 
     @staticmethod
@@ -88,7 +87,6 @@ class Gait(object):
             raise SubgaitNameNotFound(subgait_name, gait_name)
 
         version = gait_version_map[gait_name][subgait_name]
-        print(version)
         return Subgait.from_name_and_version(robot, gait_directory, gait_name, subgait_name, version)
 
     def _validate_trajectory_transition(self):

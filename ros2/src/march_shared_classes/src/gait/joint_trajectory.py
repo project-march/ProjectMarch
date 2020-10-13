@@ -100,8 +100,6 @@ class JointTrajectory(object):
 
         from_setpoint = self.setpoints[-1]
         to_setpoint = joint.setpoints[0]
-        print(f'validating velocity {from_setpoint.velocity} to {to_setpoint.velocity}')
-        print(f'validating position {from_setpoint.position} to {to_setpoint.position}')
         if from_setpoint.velocity == to_setpoint.velocity and from_setpoint.position == to_setpoint.position:
             return True
 

@@ -180,7 +180,6 @@ class Subgait(object):
         :returns:
             True if trajectory transition correct else False
         """
-        print(f'validating subgait transition {self.get_joint_names()} to {next_subgait.get_joint_names()}')
         from_subgait_joint_names = set(self.get_joint_names())
         to_subgait_joint_names = set(next_subgait.get_joint_names())
 
