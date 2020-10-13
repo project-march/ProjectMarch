@@ -11,13 +11,11 @@ function(build_and_install_xacro_files)
             set(path ${CMAKE_MATCH_1})
             # Get the name of the xacro file without directories
             get_filename_component(name ${path} NAME)
-            message(STATUS "${CMAKE_BINARY_DIR}")
 
             xacro_add_files(${path}.xacro
                 TARGET ${name}_xacro
                 OUTPUT ${CMAKE_BINARY_DIR}/${name}.urdf
             )
-            message(STATUS "installing ${CMAKE_BINARY_DIR}/${name}.urdf in share/${PROJECT_NAME}")
             install(FILES ${CMAKE_BINARY_DIR}/${name}.urdf
                 DESTINATION share/${PROJECT_NAME}/urdf
             )

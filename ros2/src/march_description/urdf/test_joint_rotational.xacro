@@ -18,7 +18,7 @@
     <xacro:property name="hover_height" value="0.5"/>
 
     <!-- Import all Gazebo-customization elements, including Gazebo colors -->
-<!--    <xacro:include filename="$(find march_description)/urdf/march.gazebo"/>-->
+    <xacro:include filename="$(find march_description)/urdf/march.gazebo"/>
 
     <!-- Used for fixing robot to Gazebo 'base_link' -->
     <link name="world"/>

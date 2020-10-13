@@ -44,7 +44,7 @@
     <xacro:property name="axel_offset" value="0.05"/> <!-- Space btw top of beam and the each joint -->
 
     <!-- Import all Gazebo-customization elements, including Gazebo colors -->
-<!--    <xacro:include filename="$(find march_description)/urdf/march.gazebo"/>-->
+    <xacro:include filename="$(find march_description)/urdf/march.gazebo"/>
 
 
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
