@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <!-- Revolute-Revolute Manipulator -->
 <robot name="march" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <!-- An argument that makes sure the march.gazebo is loaded only when launching the simulationa and not during build,
+            because during build the march_description package can not be found-->
+    <xacro:arg name="build" default="false"/>
     <!-- Constants for robot dimensions -->
     <xacro:property name="joint_base_mass" value="1"/> <!-- arbitrary value for joint_base_mass -->
     <xacro:property name="joint_base_width" value="0.05"/> <!-- Cube dimensions (width x width x width) of joint base -->
@@ -18,7 +21,9 @@
     <xacro:property name="hover_height" value="0.5"/>
 
     <!-- Import all Gazebo-customization elements, including Gazebo colors -->
-    <xacro:include filename="$(find march_description)/urdf/march.gazebo"/>
+    <xacro:unless value="$(arg build)">
+        <xacro:include filename="$(find march_description)/urdf/march.gazebo"/>
+    </xacro:unless>
 
     <!-- Used for fixing robot to Gazebo 'base_link' -->
     <link name="world"/>

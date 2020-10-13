@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <!-- Revolute-Revolute Manipulator -->
 <robot name="march" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <!-- An argument that makes sure the march.gazebo is loaded only when launching the simulationa and not during build,
+            because during build the march_description package can not be found-->
+    <xacro:arg name="build" default="false"/>
     <!-- Switch between airgaiting or standing on the ground-->
     <!--Value set to: 'world' fixes the robot to the world-->
     <!--Value set to: 'base_link' makes the robot stand on the ground-->
@@ -24,7 +27,9 @@
     <xacro:property name="hover_height" value="0.5"/>
 
     <!-- Import all Gazebo-customization elements, including Gazebo colors -->
-    <xacro:include filename="$(find march_description)/urdf/march.gazebo"/>
+    <xacro:unless value="$(arg build)">
+        <xacro:include filename="$(find march_description)/urdf/march.gazebo"/>
+    </xacro:unless>
 
 
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">

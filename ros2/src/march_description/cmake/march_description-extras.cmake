@@ -14,6 +14,7 @@ function(build_and_install_xacro_files)
 
             xacro_add_files(${path}.xacro
                 TARGET ${name}_xacro
+                REMAP build:=true
                 OUTPUT ${CMAKE_BINARY_DIR}/${name}.urdf
             )
             install(FILES ${CMAKE_BINARY_DIR}/${name}.urdf
