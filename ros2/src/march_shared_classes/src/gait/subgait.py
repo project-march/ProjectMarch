@@ -1,15 +1,11 @@
-import errno
 import os
 import re
 from typing import List
-
 from rclpy.duration import Duration
 from trajectory_msgs import msg as trajectory_msg
 import yaml
 from urdf_parser_py import urdf
-
 from src.exceptions.gait_exceptions import NonValidGaitContent, SubgaitInterpolationError, GaitError
-
 from .joint_trajectory import JointTrajectory
 from .limits import Limits
 from .setpoint import Setpoint
@@ -128,7 +124,7 @@ class Subgait(object):
         duration = Duration(seconds=subgait_dict['duration']['secs'],
                             nanoseconds=subgait_dict['duration']['nsecs']).nanoseconds * 1e-9
 
-        joint_list =[]
+        joint_list = []
         for name, points in sorted(subgait_dict['joints'].items(), key=lambda item: item[0]):
             urdf_joint = cls.joint_class.get_joint_from_urdf(robot, name)
             if urdf_joint is None or urdf_joint.type == 'fixed':

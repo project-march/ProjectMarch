@@ -136,7 +136,8 @@ class JointTrajectory(object):
         if time > self.duration:
             return self.setpoint_class(time, self.setpoints[-1].position, 0)
 
-        return self.setpoint_class(time, float(self.interpolated_position(time)), float(self.interpolated_velocity(time)))
+        return self.setpoint_class(time, float(self.interpolated_position(time)),
+                                   float(self.interpolated_velocity(time)))
 
     def __getitem__(self, index):
         return self.setpoints[index]

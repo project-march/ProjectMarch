@@ -1,6 +1,5 @@
 import os
-from glob import glob, iglob
-
+from glob import iglob
 from setuptools import setup
 
 package_name = 'march_shared_classes'
@@ -26,11 +25,11 @@ setup(
     data_files=data_files(),
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='katja',
-    maintainer_email='katjaschmahl@hotmail.com',
-    description='TODO: Package description',
+    maintainer='Project March',
+    maintainer_email='software@projectmarch.nl',
+    description='Classes that are used by the march packages',
     license='TODO: License declaration',
-    tests_require=['pytest', 'urfdom_py', 'unittest'],
+    tests_require=['pytest', 'urfdom_py', 'unittest', 'parameterized'],
     entry_points={
         'console_scripts': [
         ],

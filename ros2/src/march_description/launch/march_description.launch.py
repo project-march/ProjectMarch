@@ -7,6 +7,7 @@ from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration, Command
 from launch_ros.actions import Node
 
+
 def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
     xacro_path = LaunchConfiguration('xacro_path', default=None)

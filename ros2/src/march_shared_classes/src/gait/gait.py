@@ -1,4 +1,3 @@
-import errno
 import os
 
 import yaml
@@ -71,8 +70,8 @@ class Gait(object):
         return cls(gait_name, subgaits, graph)
 
     @staticmethod
-    def load_subgait(robot: urdf.Robot, gait_directory: str, gait_name: str, subgait_name: str, gait_version_map: dict) \
-            -> Subgait:
+    def load_subgait(robot: urdf.Robot, gait_directory: str, gait_name: str, subgait_name: str,
+                     gait_version_map: dict) -> Subgait:
         """Read the .subgait file and extract the data.
         :param robot: the robot corresponding to the given .gait file
         :param gait_directory: path of the directory where the .gait file is located

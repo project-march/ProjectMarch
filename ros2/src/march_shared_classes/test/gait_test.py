@@ -11,7 +11,6 @@ from src.gait.subgait import Subgait
 class GaitTest(unittest.TestCase):
     def setUp(self):
         self.gait_name = 'walk'
-        self.resources_folder = 'resources'
         self.robot = urdf.Robot.from_xml_file(get_package_share_directory('march_description') + '/urdf/march4.urdf')
         self.resources_folder = os.path.join(get_package_share_directory('march_shared_classes'), 'test', 'resources')
 
