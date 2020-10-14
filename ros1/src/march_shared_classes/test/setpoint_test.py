@@ -1,19 +1,20 @@
 import unittest
+from math import *
+import random
 
 from march_shared_classes.gait.setpoint import Setpoint
 
 
 class SetpointTest(unittest.TestCase):
     def setUp(self):
-        self.setpoint = Setpoint(1.123412541, 0.0343412512, 123.162084)
+        velocity = random.uniform(-1000, 1000)
+        self.setpoint = Setpoint(1.123412541, 0.0343412512, 123.162084)  # 0.0343412512 123.162084
         self.setpoint_dict = {'left_hip_aa': self.setpoint,
                                'left_hip_fe': self.setpoint,
                                'left_knee': self.setpoint,
                                'right_hip_aa': self.setpoint,
                                'right_hip_fe': self.setpoint,
-                               'right_knee': self.setpoint,
-                               'left_ankle': self.setpoint,
-                               'right_ankle': self.setpoint}
+                               'right_knee': self.setpoint}
 
     def test_time_rounding(self):
         self.assertEqual(self.setpoint.time, 1.1234)
@@ -63,9 +64,11 @@ class SetpointTest(unittest.TestCase):
         self.assertEqual([round(angle, 4) for angle in angles], [self.setpoint.position]*6)
 
     def test_inverse_kinematics_velocity(self):
+        for i in self.setpoint_dict: self.setpoint_dict[i].velocity = self.setpoint_dict[i].velocity / 500.0
         foot_vel = Setpoint.get_foot_pos_from_angles(self.setpoint_dict, velocity=True)
         angles = Setpoint.get_angles_from_pos(foot_vel[0], 'left') \
                  + Setpoint.get_angles_from_pos(foot_vel[1], 'right')
+        for i in range(0,len(angles)): angles[i] = angles[i] * 500
         self.assertEqual([round(angle, 4) for angle in angles], [self.setpoint.velocity]*6)
 
 
