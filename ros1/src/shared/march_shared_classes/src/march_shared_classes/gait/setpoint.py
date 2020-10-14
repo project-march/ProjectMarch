@@ -97,12 +97,18 @@ class Setpoint(object):
             r_haa = setpoint_dic['right_hip_aa'].position
             r_hfe = setpoint_dic['right_hip_fe'].position
             r_kfe = setpoint_dic['right_knee'].position
+            if l_haa > pi or l_haa < - pi or r_haa > pi or r_haa < - pi or l_hfe > pi or l_hfe < - pi or l_kfe > pi \
+                    or l_kfe < 0 or r_kfe > pi or r_kfe < 0:
+                raise SubgaitInterpolationError("Angles do not adhere to the hard limits: l_haa = {0}, l_hfe = {1}, "
+                                                "l_kfe = {2}, r_haa = {3}, r_hfe = {4}, r_kfe = {5}".
+                                                format(l_haa, l_hfe, l_kfe, r_haa, r_hfe, r_kfe))
+        # l_haa_circles = round()
 
         bb = 1.0
         ll = 1.0
         ul = 1.0
         ph = 1.0
-        hip = 0.0
+        hip = 1.0
 
         # x is positive in the walking direction, z is in the downward direction, y is directed to the right side
         # the origin in the middle of the hip structure
@@ -129,12 +135,12 @@ class Setpoint(object):
         ll = 1.0
         ul = 1.0
         ph = 1.0
-        hip = 0.0
+        hip = 1.0
 
         pos_x = position[0]
         # so the positive direction is to the outside, easier for calculation, compensate for hip structure
         if foot == 'left':
-            pos_y = - (position[1] + hip / 2.0)
+            pos_y = - position[1] - hip / 2.0
         else:
             pos_y = position[1] - hip / 2.0
         pos_z = position[2]
@@ -156,15 +162,8 @@ class Setpoint(object):
         # *c%2C+cos%28x%29+%2B+cos%28x+-+y%29*c%5D+%3D+%5Ba%2C+b%5D to calculate the angles of the hfe and kfe
         # rescale for easier solving, and check if position is valid
         rescaled_x = pos_x - bb
-        # if haa == pi / 2.0:
-        #     rescaled_z = pos_y
-        # elif haa == - pi / 2.0:
-        #     rescaled_z = - pos_y
-        # else:
-        #     rescaled_z = (pos_z + ph * sin(haa)) / cos(haa)
-        rescaled_z = sqrt((pos_z + sin(haa) * ph) * (pos_z + sin(haa) * ph) \
+        rescaled_z = sqrt((pos_z + sin(haa) * ph) * (pos_z + sin(haa) * ph)
                      + (cos(haa) * ph - pos_y) * (cos(haa) * ph - pos_y))
-
         ll = ll / ul
         ul = 1.0
         rescaled_x = rescaled_x / ul
@@ -175,21 +174,26 @@ class Setpoint(object):
                                             format(pos_x, pos_y, pos_z))
 
         # make the calculation more concise
-        big_sqrt_plus = sqrt(-rescaled_x * rescaled_x - rescaled_z * rescaled_z + ll * ll + 2 * ll + 1)
-        big_sqrt_min = sqrt(rescaled_x * rescaled_x + rescaled_z * rescaled_z - ll * ll + 2 * ll - 1)
-        denom_hip = (rescaled_x * rescaled_x + rescaled_z * rescaled_z + 2 * rescaled_z - ll * ll + 1) * big_sqrt_min
-        numer_op_one = - rescaled_x * rescaled_x * big_sqrt_plus + 2 * rescaled_x * big_sqrt_min - rescaled_z \
-                       * rescaled_z \
-                       * big_sqrt_plus + ll * ll * big_sqrt_plus - 2 * ll * big_sqrt_plus + big_sqrt_plus
-        numer_op_two = rescaled_x * rescaled_x * big_sqrt_plus + 2 * rescaled_x * big_sqrt_min + rescaled_z \
-                       * rescaled_z \
-                       * big_sqrt_plus - ll * ll * big_sqrt_plus + 2 * ll * big_sqrt_plus - big_sqrt_plus
-        safety_check_large = ll * (rescaled_x * rescaled_x * rescaled_z * big_sqrt_min + 2 * rescaled_x * rescaled_x
-                                   * big_sqrt_min - rescaled_x * rescaled_z * big_sqrt_plus + rescaled_x * ll * ll
-                                   * big_sqrt_plus - 2 * rescaled_x * ll * big_sqrt_plus + rescaled_x * big_sqrt_plus +
-                                   2 * rescaled_z * rescaled_z * big_sqrt_min - rescaled_z * ll * ll * big_sqrt_min
-                                   + rescaled_z * big_sqrt_min + rescaled_z * rescaled_z * rescaled_z * big_sqrt_min
-                                   - rescaled_x * rescaled_x * rescaled_x * big_sqrt_plus)
+        try:
+            big_sqrt_plus = sqrt(-rescaled_x * rescaled_x - rescaled_z * rescaled_z + ll * ll + 2 * ll + 1)
+            big_sqrt_min = sqrt(rescaled_x * rescaled_x + rescaled_z * rescaled_z - ll * ll + 2 * ll - 1)
+            denom_hip = (rescaled_x * rescaled_x + rescaled_z * rescaled_z + 2 * rescaled_z - ll * ll + 1) * big_sqrt_min
+            numer_op_one = - rescaled_x * rescaled_x * big_sqrt_plus + 2 * rescaled_x * big_sqrt_min - rescaled_z \
+                           * rescaled_z \
+                           * big_sqrt_plus + ll * ll * big_sqrt_plus - 2 * ll * big_sqrt_plus + big_sqrt_plus
+            numer_op_two = rescaled_x * rescaled_x * big_sqrt_plus + 2 * rescaled_x * big_sqrt_min + rescaled_z \
+                           * rescaled_z \
+                           * big_sqrt_plus - ll * ll * big_sqrt_plus + 2 * ll * big_sqrt_plus - big_sqrt_plus
+            safety_check_large = ll * (rescaled_x * rescaled_x * rescaled_z * big_sqrt_min + 2 * rescaled_x * rescaled_x
+                                       * big_sqrt_min - rescaled_x * rescaled_z * big_sqrt_plus + rescaled_x * ll * ll
+                                       * big_sqrt_plus - 2 * rescaled_x * ll * big_sqrt_plus + rescaled_x * big_sqrt_plus +
+                                       2 * rescaled_z * rescaled_z * big_sqrt_min - rescaled_z * ll * ll * big_sqrt_min
+                                       + rescaled_z * big_sqrt_min + rescaled_z * rescaled_z * rescaled_z * big_sqrt_min
+                                       - rescaled_x * rescaled_x * rescaled_x * big_sqrt_plus)
+        except:
+            raise SubgaitInterpolationError("The calculation method cannot find the angles corresponding to the desired"
+                                        "foot position, ({0}, {1}, {2}).".
+                                        format(pos_x, pos_y, pos_z))
 
         if rescaled_x * rescaled_x + rescaled_z * rescaled_z - ll * ll + 2 * rescaled_z - 1 == 0 or big_sqrt_min == 0 \
                 or safety_check_large == 0:
