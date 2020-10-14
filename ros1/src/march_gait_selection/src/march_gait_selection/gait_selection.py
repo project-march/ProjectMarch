@@ -123,7 +123,6 @@ class GaitSelection(object):
 
         for gait in self._gait_version_map:
             gaits[gait] = SetpointsGait.from_file(gait, self._gait_directory, self._robot, self._gait_version_map)
-
         return gaits
 
     def _load_configuration(self):
