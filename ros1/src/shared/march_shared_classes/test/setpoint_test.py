@@ -6,6 +6,14 @@ from march_shared_classes.gait.setpoint import Setpoint
 class SetpointTest(unittest.TestCase):
     def setUp(self):
         self.setpoint = Setpoint(1.123412541, 0.0343412512, 123.162084)
+        self.setpoint_dict = {'left_hip_aa': self.setpoint,
+                               'left_hip_fe': self.setpoint,
+                               'left_knee': self.setpoint,
+                               'right_hip_aa': self.setpoint,
+                               'right_hip_fe': self.setpoint,
+                               'right_knee': self.setpoint,
+                               'left_ankle': self.setpoint,
+                               'right_ankle': self.setpoint}
 
     def test_time_rounding(self):
         self.assertEqual(self.setpoint.time, 1.1234)
@@ -46,3 +54,21 @@ class SetpointTest(unittest.TestCase):
                                    self.setpoint.position * parameter + (1 - parameter) * 1,
                                    self.setpoint.velocity * parameter + (1 - parameter) * 1)
         self.assertEqual(expected_result, Setpoint.interpolate_setpoints(self.setpoint, other_setpoint, parameter))
+
+
+    def test_inverse_kinematics_position(self):
+        foot_pos = Setpoint.get_foot_pos_from_angles(self.setpoint_dict)
+        angles = Setpoint.get_angles_from_pos(foot_pos[0], 'left')\
+                 + Setpoint.get_angles_from_pos(foot_pos[1], 'right')
+        self.assertEqual([round(angle, 4) for angle in angles], [self.setpoint.position]*6)
+
+    def test_inverse_kinematics_velocity(self):
+        foot_vel = Setpoint.get_foot_pos_from_angles(self.setpoint_dict, velocity=True)
+        angles = Setpoint.get_angles_from_pos(foot_vel[0], 'left') \
+                 + Setpoint.get_angles_from_pos(foot_vel[1], 'right')
+        self.assertEqual([round(angle, 4) for angle in angles], [self.setpoint.velocity]*6)
+
+
+
+
+
