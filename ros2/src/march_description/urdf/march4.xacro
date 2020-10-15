@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- Revolute-Revolute Manipulator -->
 <robot name="march" xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <!-- An argument that makes sure the march.gazebo is loaded only when launching the simulationa and not during build,
+    <!-- An argument that makes sure the march.gazebo is loaded only when launching the simulation and not during build,
             because during build the march_description package can not be found-->
     <xacro:arg name="build" default="false"/>
     <!-- Switch between airgaiting or standing on the ground-->
