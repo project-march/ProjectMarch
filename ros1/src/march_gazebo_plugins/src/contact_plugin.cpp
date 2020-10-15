@@ -1,6 +1,6 @@
 #include <contact/contact_plugin.h>
 
-using namespace gazebo;
+namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(ContactPlugin)
 
 /////////////////////////////////////////////////

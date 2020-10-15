@@ -1,11 +1,11 @@
-#ifndef _GAZEBO_CONTACT_PLUGIN_HH_
-#define _GAZEBO_CONTACT_PLUGIN_HH_
+#ifndef CONTACT_CONTACT_PLUGIN_H
+#define CONTACT_CONTACT_PLUGIN_H
 
-#include <string>
-#include <ros/ros.h>
-#include <std_msgs/Bool.h>
 #include <gazebo/gazebo.hh>
 #include <gazebo/sensors/sensors.hh>
+#include <ros/ros.h>
+#include <std_msgs/Bool.h>
+#include <string>
 
 namespace gazebo
 {
@@ -18,13 +18,13 @@ public:
 
   /// \brief Destructor.
 public:
-  virtual ~ContactPlugin();
+  override ~ContactPlugin();
 
   /// \brief Load the sensor plugin.
   /// \param[in] _sensor Pointer to the sensor that loaded this plugin.
   /// \param[in] _sdf SDF element that describes the plugin.
 public:
-  virtual void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
+  override void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
 
   /// \brief Callback that receives the contact sensor's update signal.
 private:
