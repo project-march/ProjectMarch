@@ -1,13 +1,9 @@
 import rospy
-from genpy import SerializationError
-from rospy.exceptions import ROSSerializationException
 
 from march_shared_resources.srv import GetParamBool, GetParamBoolResponse, GetParamFloat, GetParamFloatResponse, \
     GetParamInt, GetParamIntResponse, GetParamString, GetParamStringList, GetParamStringListResponse, \
     GetParamStringResponse, SetParamBool, SetParamBoolResponse, SetParamFloat, SetParamFloatResponse, SetParamInt, \
     SetParamIntResponse, SetParamString, SetParamStringList, SetParamStringListResponse, SetParamStringResponse
-
-from .parameter_exceptions import InvalidParamName
 
 
 class ParameterServer:
@@ -46,6 +42,10 @@ class ParameterServer:
 
         :param req get request of the client
         :param response_type of request response
+
+        :return Returns a Response of 'response_type'.
+                The success variable of the response is set to true if the parameter could be read from the ROS1
+                parameter server, otherwise it is set to false.
         """
         rospy.loginfo('Retrieving parameter with name: ' + req.name)
 
@@ -61,11 +61,14 @@ class ParameterServer:
 
         :param req set request of the client
         :param response_type of request response
+
+        :return Returns a Response of 'response_type' with the success variable set to true
         """
         rospy.loginfo('Setting parameter with name ' + req.name + ' to value: ' + str(req.value))
 
         rospy.set_param(req.name, req.value)
-        return response_type(rospy.get_param(req.name), True)
+        return response_type(True)
+
 
 def main():
     rospy.init_node('march_parameter_server_node')
