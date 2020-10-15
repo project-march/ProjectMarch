@@ -26,13 +26,21 @@ void ContactPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
     gzerr << "ContactPlugin requires a ContactSensor.\n";
     return;
   }
-
+  this->name = this->parentSensor->Name();
+  ROS_WARN_STREAM(this->name);
   // Create our ROS node.
-  this->ros_node_ = std::make_unique<ros::NodeHandle>("contact_plugin");
+  std::ostringstream node_name;
+  node_name << "contact_plugin_" << this->name;
+  ROS_WARN_STREAM(node_name.str());
+  this->ros_node_ = std::make_unique<ros::NodeHandle>(node_name.str());
 
+
+  std::ostringstream topic_name;
+  topic_name << "/march/contact/" << this->name;
+  ROS_WARN_STREAM(topic_name.str());
   // Create a named topic, and subscribe to it.
   this->ros_pub_ = this->ros_node_->advertise<std_msgs::Bool>(
-      "/march/left_foot_on_ground_plugin", 10);
+      topic_name.str(), 10);
 
   // Connect to the sensor update event.
   this->updateConnection = this->parentSensor->ConnectUpdated(

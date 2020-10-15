@@ -33,6 +33,8 @@ namespace gazebo
     /// updated signal and the OnUpdate callback.
     private: event::ConnectionPtr updateConnection;
 
+
+    std::string name;
     /// \brief A node use for ROS transport
     std::unique_ptr<ros::NodeHandle> ros_node_;
 
