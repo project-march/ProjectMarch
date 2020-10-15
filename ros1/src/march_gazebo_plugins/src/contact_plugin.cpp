@@ -17,8 +17,7 @@ ContactPlugin::~ContactPlugin()
 void ContactPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
 {
   // Get the parent sensor.
-  this->parentSensor =
-    std::dynamic_pointer_cast<sensors::ContactSensor>(_sensor);
+  this->parentSensor = std::dynamic_pointer_cast<sensors::ContactSensor>(_sensor);
 
   // Make sure the parent sensor is valid.
   if (!this->parentSensor)
@@ -27,28 +26,25 @@ void ContactPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
     return;
   }
   this->name = this->parentSensor->Name();
-  ROS_WARN_STREAM(this->name);
+
   // Create our ROS node.
-  std::ostringstream node_name;
-  node_name << "contact_plugin_" << this->name;
-  ROS_WARN_STREAM(node_name.str());
-  this->ros_node_ = std::make_unique<ros::NodeHandle>(node_name.str());
+  this->ros_node_ = std::make_unique<ros::NodeHandle>(this->name);
 
-
+  // Create a named topic, and subscribe to it.
   std::ostringstream topic_name;
   topic_name << "/march/contact/" << this->name;
-  ROS_WARN_STREAM(topic_name.str());
-  // Create a named topic, and subscribe to it.
-  this->ros_pub_ = this->ros_node_->advertise<std_msgs::Bool>(
-      topic_name.str(), 10);
+  this->ros_pub_ = this->ros_node_->advertise<std_msgs::Bool>(topic_name.str(), 10);
 
   // Connect to the sensor update event.
-  this->updateConnection = this->parentSensor->ConnectUpdated(
-      std::bind(&ContactPlugin::OnUpdate, this));
+  this->updateConnection = this->parentSensor->ConnectUpdated(std::bind(&ContactPlugin::OnUpdate, this));
 
   // Make sure the parent sensor is active.
   this->parentSensor->SetActive(true);
-  ROS_INFO("Contact plugin successfully initialized");
+
+  // Log the initialization
+  std::ostringstream initialized;
+  initialized << "Succesfully initialized contact plugin: " << this->name;
+  ROS_INFO_STREAM(initialized.str());
 }
 
 /////////////////////////////////////////////////
@@ -64,5 +60,4 @@ void ContactPlugin::OnUpdate()
     msg.data = true;
   }
   this->ros_pub_.publish(msg);
-
 }

@@ -33,7 +33,6 @@
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
         <node name="upload_joint_names" pkg="march_simulation" type="upload_joint_names"/>
         <node name="world_transformer" pkg="march_simulation" type="to_world_transform" unless="$(arg fixed)"/>
-        <node name="foot_on_ground" pkg="march_simulation" type="foot_on_ground"/>
 
         <include file="$(find march_fake_sensor_data)/launch/march_fake_sensor_data.launch" if="$(arg fake_sensor_data)"/>
     </group>
