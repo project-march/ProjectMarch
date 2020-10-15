@@ -1,4 +1,6 @@
 import rospy
+from genpy import SerializationError
+from rospy.exceptions import ROSSerializationException
 
 from march_shared_resources.srv import GetParamBool, GetParamBoolResponse, GetParamFloat, GetParamFloatResponse, \
     GetParamInt, GetParamIntResponse, GetParamString, GetParamStringList, GetParamStringListResponse, \
@@ -42,30 +44,28 @@ class ParameterServer:
         """
         Look into the ROS1 parameter server and return the value of a parameter.
 
-        :req get request of the client
-        :type response_type of request response
+        :param req get request of the client
+        :param response_type of request response
         """
-        rospy.loginfo('Retrieving param with name: ' + req.name)
+        rospy.loginfo('Retrieving parameter with name: ' + req.name)
 
-        if req.name in rospy.get_param_names():
-            return response_type(rospy.get_param(req.name))
-        raise InvalidParamName(req.name)
+        try:
+            return response_type(rospy.get_param(req.name), True)
+        except KeyError:
+            return response_type(None, False)
 
     @staticmethod
     def set_callback(req, response_type):
         """
         Set a parameter in the ROS1 parameter server.
 
-        :req set request of the client
-        :type response_type of request response
+        :param req set request of the client
+        :param response_type of request response
         """
-        rospy.loginfo('Setting param with name ' + req.name + ' to value: ' + str(req.value))
+        rospy.loginfo('Setting parameter with name ' + req.name + ' to value: ' + str(req.value))
 
-        if req.name in rospy.get_param_names():
-            rospy.set_param(req.name, req.value)
-            return response_type(rospy.get_param(req.name))
-        raise InvalidParamName(req.name)
-
+        rospy.set_param(req.name, req.value)
+        return response_type(rospy.get_param(req.name), True)
 
 def main():
     rospy.init_node('march_parameter_server_node')

@@ -2,3 +2,4 @@ string name
 string value
 ---
 string value
+bool success

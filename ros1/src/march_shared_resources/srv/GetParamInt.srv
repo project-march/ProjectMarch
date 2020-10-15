@@ -1,3 +1,4 @@
 string name
 ---
 int32 value
+bool success
