@@ -63,6 +63,24 @@ class SetpointTest(unittest.TestCase):
                  + Setpoint.get_angles_from_pos(foot_pos[1], 'right')
         self.assertEqual([round(angle, 4) for angle in angles], [self.setpoint.position]*6)
 
+    def test_inverse_kinematics_reversed(self):
+        desired_pos = [[0.0, -1.5, 1.5], [0.0, 1.5, 1.5]]
+        new_angles = Setpoint.get_angles_from_pos(desired_pos[0], 'left')\
+                 + Setpoint.get_angles_from_pos(desired_pos[1], 'right')
+        time = 1.0
+        new_vel = 2.0
+        resulting_angles = {'left_hip_aa':     Setpoint(time, new_angles[0], new_vel),
+                               'left_hip_fe':  Setpoint(time, new_angles[1], new_vel),
+                               'left_knee':    Setpoint(time, new_angles[2], new_vel),
+                               'right_hip_aa': Setpoint(time, new_angles[3], new_vel),
+                               'right_hip_fe': Setpoint(time, new_angles[4], new_vel),
+                               'right_knee':   Setpoint(time, new_angles[5], new_vel)}
+        resulting_pos = Setpoint.get_foot_pos_from_angles(resulting_angles)
+        for i in range(0,len(resulting_pos)):
+            for j in range(0, len(resulting_pos[i])):
+                resulting_pos[i][j] = round(resulting_pos[i][j],1)
+        self.assertEqual(resulting_pos, desired_pos)
+
     def test_inverse_kinematics_velocity(self):
         for i in self.setpoint_dict: self.setpoint_dict[i].velocity = self.setpoint_dict[i].velocity / 500.0
         foot_vel = Setpoint.get_foot_pos_from_angles(self.setpoint_dict, velocity=True)
