@@ -1,6 +1,7 @@
 #include <contact/contact_plugin.h>
 
-namespace gazebo;
+namespace gazebo
+{
 GZ_REGISTER_SENSOR_PLUGIN(ContactPlugin)
 
 /////////////////////////////////////////////////
@@ -61,3 +62,4 @@ void ContactPlugin::OnUpdate()
   }
   this->ros_pub_.publish(msg);
 }
+} // namespace gazebo

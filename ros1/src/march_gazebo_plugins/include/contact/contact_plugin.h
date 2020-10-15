@@ -18,17 +18,17 @@ public:
 
   /// \brief Destructor.
 public:
-  override ~ContactPlugin();
+  ~ContactPlugin() override;
 
   /// \brief Load the sensor plugin.
   /// \param[in] _sensor Pointer to the sensor that loaded this plugin.
   /// \param[in] _sdf SDF element that describes the plugin.
 public:
-  override void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
+  void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf) override;
 
   /// \brief Callback that receives the contact sensor's update signal.
 private:
-  virtual void OnUpdate();
+  void OnUpdate();
 
   /// \brief Pointer to the contact sensor
 private:
