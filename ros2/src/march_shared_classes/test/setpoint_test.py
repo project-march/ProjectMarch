@@ -1,6 +1,6 @@
 import unittest
 
-from src.gait.setpoint import Setpoint
+from march_shared_classes.gait.setpoint import Setpoint
 
 
 class SetpointTest(unittest.TestCase):

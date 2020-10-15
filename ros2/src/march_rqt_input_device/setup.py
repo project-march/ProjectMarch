@@ -7,7 +7,7 @@ package_name = 'march_rqt_input_device'
 setup(
     name=package_name,
     version='0.0.0',
-    packages=['src'],
+    packages=[package_name],
     data_files=[
         ('share/ament_index/resource_index/packages',
             [os.path.join('resource', package_name)]),
@@ -27,7 +27,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'input_device = src.input_device_plugin:main'
+            'input_device = march_rqt_input_device.input_device_plugin:main'
         ],
     },
 )

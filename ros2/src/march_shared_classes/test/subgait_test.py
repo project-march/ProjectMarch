@@ -3,11 +3,11 @@ import unittest
 from ament_index_python import get_package_share_directory
 from urdf_parser_py import urdf
 
-from src.exceptions.gait_exceptions import NonValidGaitContent, SubgaitInterpolationError
-from src.gait.joint_trajectory import JointTrajectory
-from src.gait.limits import Limits
-from src.gait.setpoint import Setpoint
-from src.gait.subgait import Subgait
+from march_shared_classes.exceptions.gait_exceptions import NonValidGaitContent, SubgaitInterpolationError
+from march_shared_classes.gait.joint_trajectory import JointTrajectory
+from march_shared_classes.gait.limits import Limits
+from march_shared_classes.gait.setpoint import Setpoint
+from march_shared_classes.gait.subgait import Subgait
 
 
 class SubgaitTest(unittest.TestCase):

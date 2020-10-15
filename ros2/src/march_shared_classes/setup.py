@@ -1,6 +1,6 @@
 import os
 from glob import iglob
-from setuptools import setup
+from setuptools import setup, find_packages
 
 package_name = 'march_shared_classes'
 
@@ -21,7 +21,7 @@ def data_files():
 setup(
     name=package_name,
     version='0.0.0',
-    packages=['src', 'src.gait', 'src.exceptions'],
+    packages=find_packages(),
     data_files=data_files(),
     install_requires=['setuptools'],
     zip_safe=True,

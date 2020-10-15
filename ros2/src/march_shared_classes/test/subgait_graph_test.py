@@ -2,8 +2,8 @@ import unittest
 
 from parameterized import parameterized
 
-from src.exceptions.gait_exceptions import SubgaitGraphError
-from src.gait.subgait_graph import SubgaitGraph
+from march_shared_classes.exceptions.gait_exceptions import SubgaitGraphError
+from march_shared_classes.gait.subgait_graph import SubgaitGraph
 
 
 class SubgaitGraphTest(unittest.TestCase):

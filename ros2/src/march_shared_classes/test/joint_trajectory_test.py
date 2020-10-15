@@ -1,9 +1,9 @@
 import unittest
 
-from src.exceptions.gait_exceptions import SubgaitInterpolationError
-from src.gait.joint_trajectory import JointTrajectory
-from src.gait.limits import Limits
-from src.gait.setpoint import Setpoint
+from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
+from march_shared_classes.gait.joint_trajectory import JointTrajectory
+from march_shared_classes.gait.limits import Limits
+from march_shared_classes.gait.setpoint import Setpoint
 
 
 class JointTrajectoryTest(unittest.TestCase):

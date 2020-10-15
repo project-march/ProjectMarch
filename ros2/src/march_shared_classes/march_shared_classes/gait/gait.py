@@ -3,7 +3,7 @@ import os
 import yaml
 from urdf_parser_py import urdf
 
-from src.exceptions.gait_exceptions import GaitNameNotFound, NonValidGaitContent, SubgaitNameNotFound
+from march_shared_classes.exceptions.gait_exceptions import GaitNameNotFound, NonValidGaitContent, SubgaitNameNotFound
 
 from .subgait import Subgait
 from .subgait_graph import SubgaitGraph

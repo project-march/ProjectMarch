@@ -3,9 +3,9 @@ import unittest
 from ament_index_python import get_package_share_directory
 from urdf_parser_py import urdf
 import yaml
-from src.exceptions.gait_exceptions import SubgaitNameNotFound, NonValidGaitContent, GaitNameNotFound
-from src.gait.gait import Gait
-from src.gait.subgait import Subgait
+from march_shared_classes.exceptions.gait_exceptions import SubgaitNameNotFound, NonValidGaitContent, GaitNameNotFound
+from march_shared_classes.gait.gait import Gait
+from march_shared_classes.gait.subgait import Subgait
 
 
 class GaitTest(unittest.TestCase):
