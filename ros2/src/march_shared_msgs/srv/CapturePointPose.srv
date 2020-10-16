@@ -1,4 +1,7 @@
-# Service for getting the position of the capture point, after letting the center of mass falling for time duration (this time can be used to make a step)
+# Service for getting the position of the capture point. The parameter duration is used to incorporate the falling the
+# CoM for a specific time. To compensate for all the falling for the rest of the step, this should be equal to the
+# duration of the rest of the step.
+
 float64 duration
 ---
 bool success
