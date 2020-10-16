@@ -17,13 +17,11 @@ public:
   ContactPlugin();
 
   /// \brief Destructor.
-public:
   ~ContactPlugin() override;
 
   /// \brief Load the sensor plugin.
   /// \param[in] _sensor Pointer to the sensor that loaded this plugin.
   /// \param[in] _sdf SDF element that describes the plugin.
-public:
   void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf) override;
 
   /// \brief Callback that receives the contact sensor's update signal.
@@ -31,14 +29,13 @@ private:
   void OnUpdate();
 
   /// \brief Pointer to the contact sensor
-private:
   sensors::ContactSensorPtr parentSensor;
 
   /// \brief Connection that maintains a link between the contact sensor's
   /// updated signal and the OnUpdate callback.
-private:
   event::ConnectionPtr updateConnection;
 
+  /// \brief The name of the contact sensor
   std::string name;
   /// \brief A node use for ROS transport
   std::unique_ptr<ros::NodeHandle> ros_node_;
