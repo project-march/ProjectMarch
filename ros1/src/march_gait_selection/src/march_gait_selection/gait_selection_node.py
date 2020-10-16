@@ -130,13 +130,15 @@ def main():
     gait_directory = rospy.get_param('~gait_directory', DEFAULT_GAIT_DIRECTORY)
     update_rate = rospy.get_param('~update_rate', DEFAULT_UPDATE_RATE)
     robot = urdf.Robot.from_parameter_server('/robot_description')
+    balance_used = rospy.get_param('/balance', False)
 
     gait_selection = GaitSelection(gait_package, gait_directory, robot)
     rospy.loginfo('Gait selection initialized with package {0} of directory {1}'.format(gait_package, gait_directory))
 
-    balance_gait = BalanceGait.create_balance_subgait(gait_selection['balance_walk'])
-    if balance_gait is not None:
-        gait_selection.add_gait(balance_gait)
+    if balance_used:
+        balance_gait = BalanceGait.create_balance_subgait(gait_selection['balance_walk'])
+        if balance_gait is not None:
+            gait_selection.add_gait(balance_gait)
 
     scheduler = TrajectoryScheduler('/march/controller/trajectory/follow_joint_trajectory')
 
