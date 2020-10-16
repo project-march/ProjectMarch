@@ -16,6 +16,7 @@ class ContactPlugin : public SensorPlugin
   /// \brief Load the sensor plugin.
   /// \param[in] _sensor Pointer to the sensor that loaded this plugin.
   /// \param[in] _sdf SDF element that describes the plugin.
+public:
   void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf) override;
 
   /// \brief Callback that receives the contact sensor's update signal.
