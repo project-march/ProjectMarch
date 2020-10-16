@@ -5,7 +5,7 @@
 namespace gazebo
 {
 ObstacleController::ObstacleController(physics::ModelPtr model)
-  : model_(model)
+  : model_(std::move(model))
   , subgait_name_("home_stand")
   , subgait_start_time_(0)
   , subgait_duration_(0)
