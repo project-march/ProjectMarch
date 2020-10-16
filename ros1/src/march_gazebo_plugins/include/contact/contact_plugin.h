@@ -12,12 +12,6 @@ namespace gazebo
 /// \brief An example plugin for a contact sensor.
 class ContactPlugin : public SensorPlugin
 {
-  /// \brief Constructor.
-public:
-  ContactPlugin();
-
-  /// \brief Destructor.
-  ~ContactPlugin() override;
 
   /// \brief Load the sensor plugin.
   /// \param[in] _sensor Pointer to the sensor that loaded this plugin.
