@@ -26,6 +26,7 @@ build/
 bin/
 log/
 lib/
+.catkin_workspace
 
 # Binary libraries
 *.so
@@ -190,6 +191,8 @@ qtcreator-*
 CATKIN_IGNORE
 COLCON_IGNORE
 
+*/install/*
+*/install_isolated/*
 install/*
 
 venv/

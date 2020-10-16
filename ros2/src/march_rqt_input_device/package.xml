@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>march_rqt_input_device</name>
+  <version>0.0.0</version>
+  <description>Developer input device to send commands to the march exoskeleton</description>
+  <maintainer email="software@projectmarch.nl">Project March</maintainer>
+  <license>TODO: License declaration</license>
+
+  <depend>std_msgs</depend>
+  <depend>march_shared_msgs</depend>
+  <depend>builtin_interfaces</depend>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>rqt_gui</exec_depend>
+  <exec_depend>rqt_gui_py</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+    <rqt_gui plugin="${prefix}/plugin.xml"/>
+  </export>
+
+</package>
