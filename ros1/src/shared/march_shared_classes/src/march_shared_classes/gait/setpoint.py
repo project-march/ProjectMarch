@@ -1,8 +1,10 @@
 from math import *
 from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
-
-import rospkg
-from urdf_parser_py import urdf
+# from .joint_trajectory import JointTrajectory
+# from .limits import Limits
+#
+# import rospkg
+# from urdf_parser_py import urdf
 
 class Setpoint(object):
     """Base class to define the setpoints of a subgait."""
@@ -155,8 +157,8 @@ class Setpoint(object):
                 alpha = atan(slope_y_to_or)  # the angle with the y axis of that line
                 haa = acos(ph / sqrt(pos_z * pos_z + pos_y * pos_y)) - alpha
             elif pos_y < 0:
-                alpha = atan(abs(slope_y_to_or))
-                haa = acos(ph / sqrt(pos_z * pos_z + pos_y * pos_y)) - pi + alpha
+                alpha = atan(slope_y_to_or)
+                haa = acos(ph / sqrt(pos_z * pos_z + pos_y * pos_y)) - pi - alpha
         else:
             alpha = pi / 2
             haa = acos(ph / sqrt(pos_z * pos_z + pos_y * pos_y)) - alpha
@@ -176,7 +178,6 @@ class Setpoint(object):
         ul = 1.0
         rescaled_x = rescaled_x / ul
         rescaled_z = rescaled_z / ul
-        print("rescaled_x, rescaled_z = {0}, {1}".format(rescaled_x, rescaled_z))
         if rescaled_x * rescaled_x + rescaled_z * rescaled_z > (ll + ul)*(ll + ul):
             raise SubgaitInterpolationError("The desired foot position, ({0}, {1}, {2}), is out of reach".
                                             format(pos_x, pos_y, pos_z))
@@ -192,11 +193,21 @@ class Setpoint(object):
             numer_op_two = rescaled_x * rescaled_x * big_sqrt_plus + 2 * rescaled_x * big_sqrt_min + rescaled_z \
                            * rescaled_z \
                            * big_sqrt_plus - ll * ll * big_sqrt_plus + 2 * ll * big_sqrt_plus - big_sqrt_plus
-            safety_check_large = ll * (rescaled_x * rescaled_x * rescaled_z * big_sqrt_min + 2 * rescaled_x * rescaled_x
+            safety_check_large_op_one = ll * (rescaled_x * rescaled_x * rescaled_z * big_sqrt_min + 2 * rescaled_x
+                                              * rescaled_x
                                        * big_sqrt_min - rescaled_x * rescaled_z * big_sqrt_plus + rescaled_x * ll * ll
-                                       * big_sqrt_plus - 2 * rescaled_x * ll * big_sqrt_plus + rescaled_x * big_sqrt_plus +
+                                       * big_sqrt_plus - 2 * rescaled_x * ll * big_sqrt_plus + rescaled_x *
+                                              big_sqrt_plus +
                                        2 * rescaled_z * rescaled_z * big_sqrt_min - rescaled_z * ll * ll * big_sqrt_min
                                        + rescaled_z * big_sqrt_min + rescaled_z * rescaled_z * rescaled_z * big_sqrt_min
+                                       - rescaled_x * rescaled_x * rescaled_x * big_sqrt_plus)
+            safety_check_large_op_two = - ll * (rescaled_x * rescaled_x * rescaled_z * big_sqrt_min - 2 * rescaled_x
+                                              * rescaled_x
+                                       * big_sqrt_min - rescaled_x * rescaled_z * big_sqrt_plus + rescaled_x * ll * ll
+                                       * big_sqrt_plus - 2 * rescaled_x * ll * big_sqrt_plus + rescaled_x *
+                                              big_sqrt_plus -
+                                       2 * rescaled_z * rescaled_z * big_sqrt_min + rescaled_z * ll * ll * big_sqrt_min
+                                       - rescaled_z * big_sqrt_min - rescaled_z * rescaled_z * rescaled_z * big_sqrt_min
                                        - rescaled_x * rescaled_x * rescaled_x * big_sqrt_plus)
         except:
             raise SubgaitInterpolationError("The calculation method cannot find the angles corresponding to the desired"
@@ -204,7 +215,7 @@ class Setpoint(object):
                                         format(pos_x, pos_y, pos_z))
 
         if rescaled_x * rescaled_x + rescaled_z * rescaled_z - ll * ll + 2 * rescaled_z - 1 == 0 or big_sqrt_min == 0 \
-                or safety_check_large == 0:
+                or safety_check_large_op_one == 0 or safety_check_large_op_two ==0:
             raise SubgaitInterpolationError("The calculation method cannot find the angles corresponding to the desired"
                                             "foot position, ({0}, {1}, {2}).".
                                             format(pos_x, pos_y, pos_z))
@@ -244,10 +255,8 @@ class Setpoint(object):
             kfe = kfe_two
             hfe = hfe_two
 
-        print("haa, hfe, kfe = {0}, {1}, {2}".format(haa, hfe, kfe))
-
         return [haa, hfe, kfe]
 
-if __name__ == '__main__':
-    a = Setpoint.get_angles_from_pos([1,1,1], 'left')
-    print('hello world!')
+# if __name__ == '__main__':
+#     print('testestetsdfsdfs')
+#     robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
