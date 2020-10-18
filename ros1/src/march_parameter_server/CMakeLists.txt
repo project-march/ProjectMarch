@@ -20,3 +20,8 @@ catkin_install_python(PROGRAMS scripts/${PROJECT_NAME}_node
 install(DIRECTORY launch
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
+
+if(CATKIN_ENABLE_TESTING)
+    find_package(rostest REQUIRED)
+    add_rostest(test/launch/test_parameter_server.test)
+endif()
