@@ -51,7 +51,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/SetParamBool.srv"
   "srv/SetParamInt.srv"
   "srv/SetParamFloat.srv"
-  DEPENDENCIES std_msgs builtin_interfaces
   DEPENDENCIES std_msgs builtin_interfaces geometry_msgs
  )
 
