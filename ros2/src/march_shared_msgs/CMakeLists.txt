@@ -22,6 +22,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(builtin_interfaces REQUIRED)
+find_package(geometry_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/AfterLimitJointCommand.msg"
@@ -36,15 +37,15 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/LowVoltageNet.msg"
   "msg/PowerDistributionBoardState.msg"
   "msg/PressureSole.msg"
+  "srv/CapturePointPose.srv"
   "srv/ContainsGait.srv"
   "srv/PossibleGaits.srv"
   "srv/SetGaitVersion.srv"
-  DEPENDENCIES std_msgs builtin_interfaces
+  DEPENDENCIES std_msgs builtin_interfaces geometry_msgs
  )
 
 install(
   FILES mapping_rules.yaml
   DESTINATION share/${PROJECT_NAME})
-
 
 ament_package()
