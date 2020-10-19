@@ -1,5 +1,4 @@
 stages:
-  - approval
   - docker
   - lint
   - build
@@ -50,18 +49,6 @@ pep8:
       - "**/*.py"
   allow_failure: true
 
-
-gitlab-ci.yml changed:
-  stage: approval
-  image: alpine:latest
-  script:
-    - echo "Approved!"
-  rules:
-    - changes:
-        - ".gitlab-ci.yml"
-      when: manual
-      allow_failure: false
-
 docker:
   stage: docker
   image: docker:latest
@@ -73,13 +60,11 @@ docker:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - docker build -t registry.gitlab.com/project-march/march .
-    - docker push registry.gitlab.com/project-march/march
+    - if [[ $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]; then docker build -t registry.gitlab.com/project-march/march .; fi;
+    - if [[ $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]; then docker push registry.gitlab.com/project-march/march; fi;
   rules:
     - changes:
         - Dockerfile
-      when: manual
-      allow_failure: false
 
 clang tidy:
   needs: ["colcon build"]
