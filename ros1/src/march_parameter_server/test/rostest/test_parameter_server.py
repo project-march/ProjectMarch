@@ -4,7 +4,7 @@ import unittest
 
 import rospy
 
-from march_shared_resources.srv import GetParamString, GetParamStringRequest, \
+from march_shared_resources.srv import GetParamString, GetParamStringRequest, GetParamInt, GetParamIntRequest, \
     SetParamString, SetParamStringRequest
 
 
@@ -32,6 +32,15 @@ class TestParameterServer(unittest.TestCase):
 
         self.assertEqual(rospy.get_param('/test2'), 'test_string2')
         self.assertTrue(response.success)
+
+    def test_get_parameter_not_existing(self):
+        rospy.wait_for_service('/march/parameter_server/get_param_int')
+
+        service = rospy.ServiceProxy('/march/parameter_server/get_param_int', GetParamInt)
+        response = service.call(GetParamIntRequest('/not_existing_param'))
+
+        self.assertEqual(response.value, 0)
+        self.assertFalse(response.success)
 
 
 if __name__ == '__main__':

@@ -12,27 +12,27 @@ class ParameterServer:
     def __init__(self):
         """Construct a get and set service for each parameter type."""
         # Get services
-        rospy.Service('march/parameter_server/get_param_string', GetParamString,
+        rospy.Service('/march/parameter_server/get_param_string', GetParamString,
                       lambda req: self.get_callback(req, GetParamStringResponse))
-        rospy.Service('march/parameter_server/get_param_string_list', GetParamStringList,
+        rospy.Service('/march/parameter_server/get_param_string_list', GetParamStringList,
                       lambda req: self.get_callback(req, GetParamStringListResponse))
-        rospy.Service('march/parameter_server/get_param_bool', GetParamBool,
+        rospy.Service('/march/parameter_server/get_param_bool', GetParamBool,
                       lambda req: self.get_callback(req, GetParamBoolResponse))
-        rospy.Service('march/parameter_server/get_param_float', GetParamFloat,
+        rospy.Service('/march/parameter_server/get_param_float', GetParamFloat,
                       lambda req: self.get_callback(req, GetParamFloatResponse))
-        rospy.Service('march/parameter_server/get_param_int', GetParamInt,
+        rospy.Service('/march/parameter_server/get_param_int', GetParamInt,
                       lambda req: self.get_callback(req, GetParamIntResponse))
 
         # Set services
-        rospy.Service('march/parameter_server/set_param_string', SetParamString,
+        rospy.Service('/march/parameter_server/set_param_string', SetParamString,
                       lambda req: self.set_callback(req, SetParamStringResponse))
-        rospy.Service('march/parameter_server/set_param_string_list', SetParamStringList,
+        rospy.Service('/march/parameter_server/set_param_string_list', SetParamStringList,
                       lambda req: self.set_callback(req, SetParamStringListResponse))
-        rospy.Service('march/parameter_server/set_param_bool', SetParamBool,
+        rospy.Service('/march/parameter_server/set_param_bool', SetParamBool,
                       lambda req: self.set_callback(req, SetParamBoolResponse))
-        rospy.Service('march/parameter_server/set_param_float', SetParamFloat,
+        rospy.Service('/march/parameter_server/set_param_float', SetParamFloat,
                       lambda req: self.set_callback(req, SetParamFloatResponse))
-        rospy.Service('march/parameter_server/set_param_int', SetParamInt,
+        rospy.Service('/march/parameter_server/set_param_int', SetParamInt,
                       lambda req: self.set_callback(req, SetParamIntResponse))
 
     @staticmethod
