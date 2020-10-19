@@ -45,7 +45,8 @@ void ContactPlugin::OnUpdate()
   msgs::Contacts contacts;
   contacts = parentSensor->Contacts();
   std_msgs::Bool msg;
-  msg.data = false;
+  // Set the msg based on contacts, casting to right type
+  msg.data =  static_cast<uint8_t>(false);
   if (contacts.contact_size() > 0)
   {
     msg.data = static_cast<uint8_t>(true);
