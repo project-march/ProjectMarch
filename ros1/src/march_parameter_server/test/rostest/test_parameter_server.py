@@ -4,7 +4,7 @@ import unittest
 
 import rospy
 
-from march_shared_resources.srv import GetParamString, GetParamStringRequest, GetParamInt, GetParamIntRequest, \
+from march_shared_resources.srv import GetParamInt, GetParamIntRequest, GetParamString, GetParamStringRequest, \
     SetParamString, SetParamStringRequest
 
 
