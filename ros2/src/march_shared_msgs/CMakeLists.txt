@@ -46,5 +46,4 @@ install(
   FILES mapping_rules.yaml
   DESTINATION share/${PROJECT_NAME})
 
-
 ament_package()
