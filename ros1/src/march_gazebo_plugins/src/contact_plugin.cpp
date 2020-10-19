@@ -48,7 +48,7 @@ void ContactPlugin::OnUpdate()
   msg.data = false;
   if (contacts.contact_size() > 0)
   {
-    msg.data = true;
+    msg.data = static_cast<uint8_t>(true);
   }
   ros_pub_.publish(msg);
 }
