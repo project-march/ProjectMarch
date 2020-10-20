@@ -32,6 +32,16 @@ add_service_files(
     ContainsGait.srv
     PossibleGaits.srv
     SetGaitVersion.srv
+    GetParamStringList.srv
+    GetParamString.srv
+    GetParamBool.srv
+    GetParamInt.srv
+    GetParamFloat.srv
+    SetParamStringList.srv
+    SetParamString.srv
+    SetParamBool.srv
+    SetParamInt.srv
+    SetParamFloat.srv
 )
 
 generate_messages(
