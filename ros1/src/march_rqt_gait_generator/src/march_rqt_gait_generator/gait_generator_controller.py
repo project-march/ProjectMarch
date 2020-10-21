@@ -242,7 +242,8 @@ class GaitGeneratorController(object):
 
         self.gait_directory = '/'.join(file_name.split('/')[:-3])
         rospy.loginfo('Setting gait directory to %s', str(self.gait_directory))
-        self.view.change_gait_directory_button.setText(self.gait_directory)
+        gait_directory_text = 'gait directory: ' + self.gait_directory.split('/')[-1]
+        self.view.change_gait_directory_button.setText(gait_directory_text)
 
         # Clear undo and redo history
         self.settings_changed_history = RingBuffer(capacity=100, dtype=list)
@@ -314,12 +315,23 @@ class GaitGeneratorController(object):
         return self.gait_directory
 
     def change_gait_directory(self):
+        previous_gait_directory = self.gait_directory
         self.gait_directory = str(self.view.open_directory_dialogue())
-        if self.gait_directory == '':   # If directory dialogue is canceled
-            self.gait_directory = None
-            self.view.change_gait_directory_button.setText('Select a gait directory...')
-        else:
-            self.view.change_gait_directory_button.setText(self.gait_directory)
+        print(self.gait_directory)
+
+        # If directory dialogue is canceled, or an invalid directory is selected, leave gait_directory unchanged
+        if self.gait_directory == '' or self.gait_directory is None:
+            self.gait_directory = previous_gait_directory
+        elif len(self.gait_directory.split('/')) > 2:
+            if self.gait_directory.split('/')[-2] != 'march_gait_files':
+                rospy.logwarn('Invalid gait directory selected, must be a direct child of march_gait_files.'
+                              'Directory selection cancelled')
+                self.gait_directory = previous_gait_directory
+
+        if self.gait_directory is not None:
+            rospy.loginfo('Setting gait directory to %s', str(self.gait_directory))
+            gait_directory_text = 'gait directory: ' + self.gait_directory.split('/')[-1]
+            self.view.change_gait_directory_button.setText(gait_directory_text)
 
     def invert_gait(self):
         for side, controller in self.side_subgait_controller.items():
@@ -338,7 +350,6 @@ class GaitGeneratorController(object):
             return
 
         changed_dict = self.settings_changed_history.pop()
-
         if 'joints' in changed_dict:
             joints = changed_dict['joints']
             for joint in joints:
