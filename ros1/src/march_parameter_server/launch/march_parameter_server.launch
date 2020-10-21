@@ -1,0 +1,3 @@
+<launch>
+    <node name="parameter_server_node" pkg="march_parameter_server" type="march_parameter_server_node" output="screen"></node>
+</launch>
