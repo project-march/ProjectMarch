@@ -317,7 +317,6 @@ class GaitGeneratorController(object):
     def change_gait_directory(self):
         previous_gait_directory = self.gait_directory
         self.gait_directory = str(self.view.open_directory_dialogue())
-        print(self.gait_directory)
 
         # If directory dialogue is canceled, or an invalid directory is selected, leave gait_directory unchanged
         if self.gait_directory == '' or self.gait_directory is None:
