@@ -81,11 +81,11 @@ gaits:
     left_open: MV_TPstraight_leftopen_v1
     right_close: MV_TPstraight_rightclose_v1
   stairs_up:
-    right_open: MVI_stairs_IK
-    left_swing: MVI_stairs_IK
-    right_swing: MVI_stairs_IK
-    left_close: MVI_stairs_IK
-    right_close: MVI_stairs_IK
+    right_open: MVI_stairsup_rightopen_IK_v1
+    left_swing: MVI_stairsup_leftswing_IK_v1
+    right_swing: MVI_stairsup_rightswing_IK_v1
+    left_close: MVI_stairsup_leftclose_IK_v1
+    right_close: MVI_stairsup_rightclose_IK_v1
   stairs_down:
     right_open: MV_stairsdown_rightopen_v2
     left_swing: MV_stairsdown_leftswing_v2
