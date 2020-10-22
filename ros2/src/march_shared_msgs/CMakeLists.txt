@@ -23,6 +23,12 @@ find_package(rosidl_default_generators REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(rosgraph_msgs REQUIRED)
+find_package(trajectory_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(control_msgs REQUIRED)
+find_package(actionlib_msgs REQUIRED)
+
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/AfterLimitJointCommand.msg"
@@ -30,6 +36,10 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/CurrentGait.msg"
   "msg/CurrentState.msg"
   "msg/Error.msg"
+  "msg/FollowJointTrajectoryGoal.msg"
+  "msg/FollowJointTrajectoryActionGoal.msg"
+  "msg/FollowJointTrajectoryResult.msg"
+  "msg/FollowJointTrajectoryActionResult.msg"
   "msg/GaitInstruction.msg"
   "msg/GaitInstructionResponse.msg"
   "msg/HighVoltageNet.msg"
@@ -41,7 +51,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/ContainsGait.srv"
   "srv/PossibleGaits.srv"
   "srv/SetGaitVersion.srv"
-  DEPENDENCIES std_msgs builtin_interfaces geometry_msgs
+  DEPENDENCIES std_msgs builtin_interfaces geometry_msgs rosgraph_msgs trajectory_msgs control_msgs actionlib_msgs
  )
 
 install(
