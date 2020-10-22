@@ -245,8 +245,8 @@ class GaitStateMachine(object):
                 self._input.stop_accepted()
                 self._call_callbacks(self._stop_accepted_callbacks)
             else:
-                self._gait_selection.get_logger.info('Gait `{0}` does not respond to stop'
-                                                     .format(self._current_gait.name))
+                self._gait_selection.get_logger().info('Gait `{0}` does not respond to stop'
+                                                       .format(self._current_gait.name))
                 self._input.stop_rejected()
 
         if self._input.transition_requested():
