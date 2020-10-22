@@ -18,7 +18,7 @@ class Subgait(object):
 
     joint_class = JointTrajectory
 
-    def __init__(self, joints: List[JointTrajectory], duration: Duration, gait_type: str = 'walk_like',
+    def __init__(self, joints: List[JointTrajectory], duration: float, gait_type: str = 'walk_like',
                  gait_name: str = 'Walk', subgait_name: str = 'right_open', version: str = 'First try',
                  description: str = 'Just a simple gait'):
 
