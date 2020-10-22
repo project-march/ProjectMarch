@@ -1,0 +1,5 @@
+#!/usr/bin/env python
+import march_parameter_server.parameter_server_node
+
+if __name__ == '__main__':
+    march_parameter_server.parameter_server_node.main()
