@@ -1,5 +1,6 @@
 from math import *
 from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
+import numpy as np
 
 import rospkg
 from urdf_parser_py import urdf
@@ -38,6 +39,61 @@ class Setpoint(object):
     @velocity.setter
     def velocity(self, velocity):
         self._velocity = round(velocity, self.digits)
+
+    @classmethod
+    def interpolate_setpoints_position(cls, base_setpoints, other_setpoints, parameter):
+        """Linearly interpolate the ankle position.
+
+        :param base_setpoints:
+            A dictionary of setpoints, one for each joint. Return value if parameter is zero
+        :param other_setpoints:
+            A dictionary of setpoints, one for each joint. Return value if parameter is one
+        :param parameter:
+            parameter for the interpolation
+        :return
+            A dictionary of setpoints, who's corresponding foot location is linearly interpolated from the setpoints"""
+
+        base_foot_pos = np.array(Setpoint.get_foot_pos_from_angles(base_setpoints))
+        base_foot_vel = np.array(Setpoint.get_foot_pos_from_angles(base_setpoints), velocity=True)
+        other_foot_pos = np.array(Setpoint.get_foot_pos_from_angles(other_setpoints))
+        other_foot_vel = np.array(Setpoint.get_foot_pos_from_angles(other_setpoints), velocity=True)
+
+        new_foot_pos = base_foot_pos * (1 - parameter) + other_foot_pos * parameter
+        new_foot_vel = base_foot_vel * (1 - parameter) + other_foot_vel * parameter
+
+        # linearly interpolate the ankle angle
+        new_angles = [Setpoint.get_angles_from_pos(new_foot_pos[0], 'left'),
+                      Setpoint.get_angles_from_pos(new_foot_pos[1], 'right')]
+        new_ankle_pos = [base_setpoints['left_ankle'].position * (1 - parameter)
+                         + other_setpoints['left_ankle'].position * parameter,
+                         base_setpoints['right_ankle'].position * (1 - parameter)
+                         + other_setpoints['right_ankle'].position * parameter]
+        new_vel = [Setpoint.get_angles_from_pos(new_foot_vel[0], 'left'),
+                   Setpoint.get_angles_from_pos(new_foot_vel[1], 'right')]
+        new_ankle_vel = [base_setpoints['left_ankle'].velocity * (1 - parameter)
+                         + other_setpoints['left_ankle'].velocity * parameter,
+                         base_setpoints['right_ankle'].velocity * (1 - parameter)
+                         + other_setpoints['right_ankle'].velocity * parameter]
+
+        base_setpoints_time = 0
+        other_setpoints_time = 0
+        for setpoint in base_setpoints:
+            base_setpoints_time += setpoint.time
+        for setpoint in other_setpoints:
+            other_setpoints_time += setpoint.time
+        time = (base_setpoints_time * (1 - parameter) + other_setpoints_time * parameter) / len(base_setpoints)
+
+        resulting_setpoints = {'left_hip_aa': cls(time, new_angles[0][0], new_vel[0][0]),
+                               'left_hip_fe': cls(time, new_angles[0][1], new_vel[0][1]),
+                               'left_knee': cls(time, new_angles[0][2], new_vel[0][2]),
+                               'right_hip_aa': cls(time, new_angles[1][0], new_vel[1][0]),
+                               'right_hip_fe': cls(time, new_angles[1][1], new_vel[1][1]),
+                               'right_knee': cls(time, new_angles[1][2], new_vel[1][2]),
+                               'left_ankle': cls(time, new_ankle_pos[0], new_ankle_vel[0]),
+                               'right_ankle': cls(time, new_ankle_pos[1], new_ankle_vel[1])}
+
+        return resulting_setpoints
+
 
     def __repr__(self):
         return 'Time: %s, Position: %s, Velocity: %s' % (self.time, self.position, self.velocity)
@@ -110,7 +166,6 @@ class Setpoint(object):
 
         # x is positive in the walking direction, z is in the downward direction, y is directed to the right side
         # the origin in the middle of the hip structure
-        print('haa in forward = ', l_haa)
         haa_to_foot_length_left = ul_l * cos(l_hfe) + ll_l * cos(l_hfe - l_kfe)
         left_y = - cos(l_haa) * ph_l - sin(l_haa) * haa_to_foot_length_left - base / 2.0
         left_z = - sin(l_haa) * ph_l + cos(l_haa) * haa_to_foot_length_left
@@ -156,11 +211,10 @@ class Setpoint(object):
         # this assume that pos_z > 0
         if pos_y != 0:
             slope_y_to_or = pos_z / pos_y
+            alpha = atan(slope_y_to_or)
             if pos_y > 0:
-                alpha = atan(slope_y_to_or)  # the angle with the y axis of that line
                 haa = acos(ph / sqrt(pos_z * pos_z + pos_y * pos_y)) - alpha
-            elif pos_y < 0:
-                alpha = atan(slope_y_to_or)
+            else:
                 haa = acos(ph / sqrt(pos_z * pos_z + pos_y * pos_y)) - pi - alpha
         else:
             alpha = pi / 2
@@ -173,15 +227,11 @@ class Setpoint(object):
         # *c%2C+cos%28x%29+%2B+cos%28x+-+y%29*c%5D+%3D+%5Ba%2C+b%5D to calculate the angles of the hfe and kfe
         # rescale for easier solving, and check if position is valid
         rescaled_x = pos_x - bb
-        # rescaled_z = sqrt((pos_z + sin(haa) * ph) * (pos_z + sin(haa) * ph)
-        #              + (cos(haa) * ph - pos_y) * (cos(haa) * ph - pos_y))
         rescaled_z = sqrt(- ph * ph + pos_y * pos_y + pos_z * pos_z)
         ll = ll / ul
         rescaled_x = rescaled_x / ul
         rescaled_z = rescaled_z / ul
         ul = 1.0
-        print('haa = ', haa)
-        print('rescaled_z = ', rescaled_z, 'rescaled_x = ', rescaled_x, 'll = ', ll, 'ul = ', ul)
 
         if rescaled_x * rescaled_x + rescaled_z * rescaled_z > (ll + ul) * (ll + ul):
             raise SubgaitInterpolationError("The desired foot position, ({0}, {1}, {2}), is out of reach".
@@ -268,9 +318,3 @@ class Setpoint(object):
             hfe = hfe_two
 
         return [haa, hfe, kfe]
-
-if __name__ == "__main__":
-    print('hallo')
-    robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
-    hip = robot.link_map['hip_base'].collisions[0].geometry.size[1]
-    print(hip)
