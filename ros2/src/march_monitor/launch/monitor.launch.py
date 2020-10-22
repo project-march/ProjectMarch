@@ -15,9 +15,9 @@ def generate_launch_description():
             name='march_monitor',
             output='screen',
 
-            ## Update perspective file to full_monitor.perspective when done with all packages
-            arguments=[('--perspective-file ', PathJoinSubstitution([get_package_share_directory('march_monitor'),
-                                                                     'config', 'rqt_note_taker.perspective']))]
+            ## Update perspective file to full_monitor.perspective when done with all monitor packages
+            arguments=['--perspective-file', PathJoinSubstitution([get_package_share_directory('march_monitor'),
+                                                                     'config', 'rqt_note_taker.perspective'])]
         ),
         # Uncomment this when march_rqt_robot_monitor is added
         # IncludeLaunchDescription(PythonLaunchDescriptionSource(

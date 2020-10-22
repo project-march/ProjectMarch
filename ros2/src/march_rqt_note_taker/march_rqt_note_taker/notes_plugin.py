@@ -6,12 +6,14 @@ from qt_gui.plugin import Plugin
 
 import rclpy
 from rcl_interfaces.msg import Log
+from rclpy.exceptions import InvalidServiceNameException
 from rclpy.node import Node
 from std_srvs.srv import Trigger
 from rqt_gui.main import Main
 import sys
-from march_shared_resources.msg import CurrentState
+from march_shared_msgs.msg import CurrentState
 
+from rclpy.task import Future
 from .entry import Entry
 from .entry_model import EntryModel
 from .filter_map import FilterMap
@@ -56,7 +58,7 @@ class NotesPlugin(Plugin):
         self._node.create_subscription(CurrentState, '/march/gait_selection/current_state',
                                        self._current_state_cb, qos_profile=10)
 
-        self._get_gait_version_map = self._node.create_client(Trigger, '/march/gait_selection/get_version_map')
+        self._get_gait_version_map_client = self._node.create_client(Trigger, '/march/gait_selection/get_version_map')
 
     def shutdown_plugin(self):
         for subscriber in self._node.subscriptions:
@@ -74,18 +76,25 @@ class NotesPlugin(Plugin):
         :param current_state: Current state being executed
         """
         if current_state.state_type == CurrentState.IDLE:
-            message = 'March is idle in {state}'.format(state=current_state.state)
+            message = f'March is idle in {current_state.state}'
             self._model.insert_row(Entry(message))
         elif current_state.state_type == CurrentState.GAIT:
             try:
-                gait_version_map = ast.literal_eval(self._get_gait_version_map().message)
-
-                message = 'Starting gait {0}: {1}'.format(current_state.state,
-                                                          str(gait_version_map[current_state.state]))
-                self._model.insert_row(Entry(message))
-            except rospy.ServiceException as e:
-                rospy.logwarn('Failed to contact gait selection node for gait versions: {0}'.format(e))
+                future = self._get_gait_version_map_client.call_async(Trigger.Request())
+                future.add_done_callback(lambda future_done: self._get_version_map_callback(future_done, current_state))
+            except InvalidServiceNameException as error:
+                self._node.get_logger().warn(f'Failed to contact gait selection node for gait versions: {error}')
             except KeyError:
                 pass
-            except ValueError as e:
-                rospy.logerr('Failed to parse gait version map: {0}'.format(e))
+            except ValueError as error:
+                self._node.get_logger().error(f'Failed to parse gait version map: {error}')
+
+    def _get_version_map_callback(self, future_done: Future, current_state):
+        self._node.get_logger().info('done with future')
+        result = future_done.result()
+
+        if result.success:
+            gait_version_map = ast.literal_eval(result.message)
+            message = 'Starting gait {0}: {1}'.format(current_state.state,
+                                                      str(gait_version_map[current_state.state]))
+            self._model.insert_row(Entry(message))
