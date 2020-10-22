@@ -1,4 +1,4 @@
-import rclpy
+from rclpy.duration import Duration
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from .gait_interface import GaitInterface
 
@@ -41,6 +41,10 @@ class HomeGait(GaitInterface):
     def final_position(self):
         return self._position
 
+    @property
+    def version(self):
+        return "home_gait_version"
+
     def start(self):
         self._time_since_start = 0.0
         return self._get_trajectory_msg()
@@ -57,8 +61,7 @@ class HomeGait(GaitInterface):
         msg.joint_names = sorted(list(self._position.keys()))
 
         point = JointTrajectoryPoint()
-        # TODO: find good alternative implementation, since there is not yet a python rclpy duration
-        point.time_from_start = rclpy.Duration(seconds=self._duration)
+        point.time_from_start = Duration(seconds=self._duration).to_msg()
         point.positions = [self._position[name] for name in msg.joint_names]
         point.velocities = [0.0] * len(msg.joint_names)
         point.accelerations = [0.0] * len(msg.joint_names)

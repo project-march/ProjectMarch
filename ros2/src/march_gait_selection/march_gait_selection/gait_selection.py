@@ -1,10 +1,17 @@
 import os
+
+import rclpy
+from march_shared_msgs.srv import SetGaitVersion, ContainsGait
+from rcl_interfaces.srv import GetParameters
 from rclpy.node import Node
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python.packages import get_package_share_directory, get_package_prefix
 import yaml
 from march_shared_classes.exceptions.gait_exceptions import GaitError, GaitNameNotFound
-from march_shared_classes.exceptions.general_exceptions import FileNotFoundError, PackageNotFoundError
 from march_shared_classes.gait.subgait import Subgait
+from std_msgs.msg import String
+from std_srvs.srv import Trigger
+from urdf_parser_py import urdf
+
 from .state_machine.setpoints_gait import SetpointsGait
 from .state_machine.state_machine_input import StateMachineInput
 from .state_machine.trajectory_scheduler import TrajectoryScheduler
@@ -12,33 +19,66 @@ from .state_machine.trajectory_scheduler import TrajectoryScheduler
 NODE_NAME = 'gait_selection'
 DEFAULT_GAIT_FILES_PACKAGE = 'march_gait_files'
 DEFAULT_GAIT_DIRECTORY = 'minimal'
-DEFAULT_UPDATE_RATE = 120.0
 
 class GaitSelection(Node):
     """Base class for the gait selection module."""
 
     def __init__(self):
+        super().__init__(NODE_NAME, automatically_declare_parameters_from_overrides=True)
+        self.get_logger().warn("START INIT")
 
-        package = self.get_parameter_or('gait_package', alternative_value=DEFAULT_GAIT_FILES_PACKAGE)
-        directory = self.get_parameter_or('gait_directory', alternative_value=DEFAULT_GAIT_DIRECTORY)
-        update_rate = self.get_parameter_or('update_rate', alternative_value=DEFAULT_UPDATE_RATE)
-        robot = urdf.Robot.from_parameter_server('/robot_description')
+        gait_package = self.get_parameter_or('gait_package', alternative_value=DEFAULT_GAIT_FILES_PACKAGE)\
+            .get_parameter_value().string_value
+        directory = self.get_parameter_or('gait_directory', alternative_value=DEFAULT_GAIT_DIRECTORY)\
+            .get_parameter_value().string_value
 
-        super(GaitSelection, self).__init__(NODE_NAME)
-        package_path = self.get_ros_package_path(package)
+        self._robot = None
+        # Initialize robot description from robot_state_publisher and update based on changes
+        # while not self.cli.wait_for_service(timeout_sec=1.0):
+        #     self.get_logger().info('service not available, waiting again...')
+        #
+        # self.get_logger().debug('Robot description client available')
+        # self.get_logger().debug('Received robot description')
+
+    #     self.robot_future = None
+    #     self.robot_description_timer = self.create_timer(0.5, callback=self.check_robot_future)
+
+        self.robot_description_sub = self.create_subscription(msg_type=String, topic='/robot_description',
+                                                              callback=lambda msg: self.update_robot_description(msg.data),
+                                                              qos_profile=10)
+        self.get_logger().warn(f'{gait_package}')
+        package_path = get_package_share_directory(gait_package)
+        self.get_logger().warn(f'{package_path}')
         self._gait_directory = os.path.join(package_path, directory)
         if not os.path.isdir(self._gait_directory):
-            self.get_logger().err('Gait directory does not exist: {0}'.format(directory))
-            raise FileNotFoundError(file_path=self._gait_directory)
+            self.get_logger().error('Gait directory does not exist: {0}'.format(directory))
 
         self._default_yaml = os.path.join(self._gait_directory, 'default.yaml')
         if not os.path.isfile(self._default_yaml):
-            raise FileNotFoundError(file_path=self._default_yaml)
-
-        self._robot = robot
+            self.get_logger().error('Gait default yaml file does not exist: {0}'.format(directory))
 
         self._gait_version_map, self._positions = self._load_configuration()
-        self._loaded_gaits = self._load_gaits()
+        self.create_services()
+        self._loaded_gaits = {}
+        self.get_logger().debug(f'Version map is {self._gait_version_map}')
+        self.get_logger().warn("END INIT")
+
+    # def check_robot_future(self):
+    #     if self.robot_future is None:
+    #                    else:
+    #             self.get_logger().warn('Waiting for robot state publisher to have service')
+    #     else:
+    #         if self.robot_future.done():
+    #             self.get_logger().info('Robot future done')
+    #             self.update_robot_description(self.robot_future.result().values[0].string_value)
+    #             self.robot_description_timer.cancel()
+    #             self._loaded_gaits = self._load_gaits()
+    #             self.create_services()
+    #             self.get_logger().info('Done loading robot and gaits')
+    #             self.get_logger().info(f'{self._loaded_gaits}')
+    #         else:
+    #             self.get_logger().warn('Robot description is not being published by robot_state_publisher')
+
 
     @staticmethod
     def get_ros_package_path(package):
@@ -59,22 +99,27 @@ class GaitSelection(Node):
         """Returns the named idle positions."""
         return self._positions
 
+    def load_gaits(self):
+        self._loaded_gaits = self._load_gaits()
+
+    def update_robot_description(self, robot_description: String):
+        self._robot = urdf.Robot.from_xml_string(robot_description)
+
     def create_services(self):
         self.create_service(Trigger, '/march/gait_selection/get_version_map',
-                                      lambda msg: [True, str(gait_selection.gait_version_map)])
+                            lambda msg: [True, str(self.gait_version_map)])
 
         self.create_service(SetGaitVersion, '/march/gait_selection/set_gait_version',
-                                      lambda msg: set_gait_versions(msg, gait_selection))
+                            lambda msg: set_gait_versions(msg, self))
 
         self.create_service(Trigger, '/march/gait_selection/get_directory_structure',
-                                      lambda msg: [True, str(gait_selection.scan_directory())])
+                            lambda msg: [True, str(self.scan_directory())])
 
-        self.create_service(Trigger, '/march/gait_selection/update_default_versions',
-                                      lambda msg: gait_selection.update_default_versions())
+        self.create_service(srv_type=Trigger, srv_name='/march/gait_selection/update_default_versions',
+                            callback=lambda msg: self.update_default_versions())
 
-        self.create_service(ContainsGait, '/march/gait_selection/contains_gait',
-                                      lambda msg: contains_gait(msg, gait_selection))
-
+        self.create_service(srv_type=ContainsGait, srv_name='/march/gait_selection/contains_gait',
+                            callback=lambda msg: contains_gait(msg, self))
 
     def set_gait_versions(self, gait_name, version_map):
         """Sets the subgait versions of given gait.
@@ -143,6 +188,7 @@ class GaitSelection(Node):
 
         :returns dict: A dictionary mapping gait name to gait instance
         """
+        self.get_logger().info('Loadings gaits from version map')
         gaits = {}
 
         for gait in self._gait_version_map:
@@ -229,36 +275,3 @@ def contains_gait(request, gait_selection):
             return ContainsGait.Response(False)
 
     return ContainsGait.Response(True)
-
-
-
-def main():
-    gait_selection = GaitSelection()
-
-    # gait_package = rospy.get_param('~gait_package', DEFAULT_GAIT_FILES_PACKAGE)
-    # gait_directory = rospy.get_param('~gait_directory', DEFAULT_GAIT_DIRECTORY)
-    # update_rate = rospy.get_param('~update_rate', DEFAULT_UPDATE_RATE)
-    # robot = urdf.Robot.from_parameter_server('/robot_description')
-
-    # gait_selection = GaitSelection(gait_package, gait_directory, robot)
-    # rospy.loginfo('Gait selection initialized with package {0} of directory {1}'.format(gait_package, gait_directory))
-
-    # balance_gait = BalanceGait.create_balance_subgait(gait_selection['balance_walk'])
-    # if balance_gait is not None:
-    #     gait_selection.add_gait(balance_gait)
-
-    scheduler = TrajectoryScheduler('/march/controller/trajectory/follow_joint_trajectory')
-
-    state_input = StateMachineInput(gait_selection)
-    gait_state_machine = GaitStateMachine(gait_selection, scheduler, state_input, update_rate)
-    # rospy.loginfo('Gait state machine successfully generated')
-
-    rospy.core.add_preshutdown_hook(lambda reason: gait_state_machine.request_shutdown())
-
-    gait_selection.create_services()
-    gait_state_machine.create_services()
-    gait_state_machine.create_publishers
-    create_publishers(gait_state_machine)
-    create_sounds(gait_state_machine)
-
-    gait_state_machine.run()

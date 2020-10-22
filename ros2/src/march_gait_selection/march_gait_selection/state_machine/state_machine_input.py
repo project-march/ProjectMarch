@@ -1,6 +1,5 @@
 from enum import Enum
-from rclpy import Node
-from march_shared_resources.msg import GaitInstruction, GaitInstructionResponse
+from march_shared_msgs.msg import GaitInstruction, GaitInstructionResponse
 
 
 class TransitionRequest(Enum):
@@ -11,7 +10,7 @@ class TransitionRequest(Enum):
 
 class StateMachineInput(object):
 
-    def __init__(self, node: Node):
+    def __init__(self, node):
         self._stopped = False
         self._paused = False
         self._unknown = False
@@ -19,12 +18,13 @@ class StateMachineInput(object):
         self._gait = None
         self._node = node
 
-        self._instruction_subscriber = self._node.create_subscription(GaitInstruction,
-                                                                      '/march/input_device/instruction',
-                                                                      self._callback_input_device_instruction)
-        self._instruction_response_publisher = self._node.create_publisher('/march/input_device/instruction_response',
-                                                                           GaitInstructionResponse,
-                                                                           20)
+        self._instruction_subscriber = node.create_subscription(msg_type=GaitInstruction,
+                                                                topic='/march/input_device/instruction',
+                                                                callback=self._callback_input_device_instruction,
+                                                                qos_profile=10)
+        self._instruction_response_publisher = node.create_publisher(msg_type=GaitInstructionResponse,
+                                                                     topic='/march/input_device/instruction_response',
+                                                                     qos_profile=20)
 
     def get_transition_request(self):
         """Used to return the transition request as an enum.
@@ -96,6 +96,7 @@ class StateMachineInput(object):
         self.reset()
 
     def _callback_input_device_instruction(self, msg):
+        self._node.get_logger().info(f'Callback input device instruction {msg}')
         if msg.type == GaitInstruction.STOP:
             self._stopped = True
         elif msg.type == GaitInstruction.GAIT:
