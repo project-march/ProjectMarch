@@ -1,7 +1,7 @@
 import unittest
 
 from python_qt_binding.QtCore import QDateTime, Qt
-from rosgraph_msgs.msg import Log
+from rcl_interfaces.msg import Log
 
 from march_rqt_note_taker.entry import Entry
 from march_rqt_note_taker.entry_model import EntryModel

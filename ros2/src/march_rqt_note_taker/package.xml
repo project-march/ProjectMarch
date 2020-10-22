@@ -11,13 +11,15 @@
 
   <depend>std_msgs</depend>
   <depend>builtin_interfaces</depend>
-  <depend>march_shared_resources</depend>
+  <depend>march_shared_msgs</depend>
 
   <exec_depend>rclpy</exec_depend>
   <exec_depend>rqt_gui</exec_depend>
   <exec_depend>rqt_gui_py</exec_depend>
 
   <test_depend>rosunit</test_depend>
+  <test_depend>pytest</test_depend>
+  <test_depend>unittest</test_depend>
 
   <export>
     <build_type>ament_python</build_type>

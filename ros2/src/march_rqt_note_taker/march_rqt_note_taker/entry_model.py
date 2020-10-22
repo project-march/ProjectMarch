@@ -2,6 +2,7 @@ from typing import List
 
 from python_qt_binding.QtCore import QAbstractTableModel, QModelIndex, Qt
 from python_qt_binding.QtGui import QBrush
+
 from rcl_interfaces.msg import Log
 
 from .entry import Entry
@@ -12,19 +13,28 @@ class EntryModel(QAbstractTableModel):
     columns = ['time', 'entry']
 
     def __init__(self):
+        """Initialize an empty list of entries."""
+
         super(EntryModel, self).__init__()
         self._entries: List[Entry] = []
 
-    def rowCount(self, parent=None) -> int:
+    def rowCount(self, parent=None) -> int:  # noqa: N802
+        """Get the number of rows.
+
+        :return Returns the number of rows
+        """
         return len(self._entries)
 
-    def columnCount(self, parent=None) -> int:
+    def columnCount(self, parent=None) -> int:  # noqa: N802
+        """Get the number of columns.
+
+        :return Returns the number of columns
+        """
         return len(EntryModel.columns)
 
-    def headerData(self, section: int, orientation, role=None):
-        if orientation == Qt.Horizontal:
-            if role == Qt.DisplayRole:
-                return EntryModel.columns[section].capitalize()
+    def headerData(self, section: int, orientation, role=None):  # noqa: N802
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return EntryModel.columns[section].capitalize()
 
     def data(self, index, role=Qt.DisplayRole):
         column = index.column()
@@ -50,7 +60,6 @@ class EntryModel(QAbstractTableModel):
         """Removes the rows with given indices.
 
         :param positions: positions to remove
-        :returns True when the removal was successful
         """
         for row in sorted(positions, reverse=True):
             if 0 <= row < self.rowCount():
@@ -61,7 +70,6 @@ class EntryModel(QAbstractTableModel):
     def insert_row(self, entry: Entry):
         """Appends an entry.
 
-        :type entry: Entry
         :param entry: Entry to append to rows
         """
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())

@@ -1,6 +1,7 @@
+import sys
 import unittest
 
-from rosgraph_msgs.msg import Log
+from rcl_interfaces.msg import Log
 
 from march_rqt_note_taker.filter_map import FilterMap
 
@@ -40,20 +41,15 @@ class FilterMapTest(unittest.TestCase):
 
     def test_accept_log_level_filter(self):
         level = Log.DEBUG
-        self.log_msg.level = level
-        self.filter_map.add_filter_on_level(lambda _: True, level)
+        self.log_msg.level = int.from_bytes(Log.DEBUG, sys.byteorder)
+        self.filter_map.add_filter_on_level(level)
         self.assertIsNotNone(self.filter_map(self.log_msg))
 
     def test_reject_log_level_filter(self):
         level = Log.INFO
-        self.log_msg.level = Log.DEBUG
-        self.filter_map.add_filter_on_level(lambda _: True, level)
+        self.log_msg.level = int.from_bytes(Log.DEBUG, sys.byteorder)
+        self.filter_map.add_filter_on_level(level)
         self.assertIsNone(self.filter_map(self.log_msg))
-
-    def test_info_level_filter(self):
-        self.log_msg.level = Log.INFO
-        self.filter_map.add_filter_info_level(lambda _: True)
-        self.assertIsNotNone(self.filter_map(self.log_msg))
 
     def test_accept_and_map(self):
         mapped_msg = 'test'
@@ -64,7 +60,7 @@ class FilterMapTest(unittest.TestCase):
     def test_accept_and_map_on_log_level(self):
         mapped_msg = 'test'
         level = Log.DEBUG
-        self.log_msg.level = level
-        self.filter_map.add_filter_on_level(lambda _: True, level, lambda _: mapped_msg)
+        self.log_msg.level = int.from_bytes(level, sys.byteorder)
+        self.filter_map.add_filter_on_level(level, msg_map=lambda _: mapped_msg)
         self.log_msg = self.filter_map(self.log_msg)
         self.assertEqual(self.log_msg.msg, mapped_msg)
