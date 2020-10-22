@@ -1,10 +1,9 @@
 // Copyright 2019 Project March.
-
-#include <gazebo/physics/physics.hh>
-#include <march_shared_resources/CurrentGait.h>
-
 #ifndef MARCH_GAZEBO_PLUGINS_OBSTACLE_CONTROLLER_H
 #define MARCH_GAZEBO_PLUGINS_OBSTACLE_CONTROLLER_H
+
+#include <march_shared_resources/CurrentGait.h>
+#include <gazebo/physics/physics.hh>
 
 namespace gazebo
 {

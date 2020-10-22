@@ -371,6 +371,17 @@
         </collision>
     </link>
 
+    <gazebo reference="ankle_plate_left">
+        <sensor name="ankle_plate_left_contact" type="contact">
+            <plugin name="contact_plugin" filename="libcontact.so"/>
+            <contact>
+                <collision>ankle_plate_left_fixed_joint_lump__foot_left_collision_1</collision>
+            </contact>
+            <update_rate>30</update_rate>
+            <always_on>true</always_on>
+        </sensor>
+    </gazebo>
+
     <!-- Foot Left -->
     <link name="foot_left">
         <inertial>
@@ -523,6 +534,18 @@
             </geometry>
         </collision>
     </link>
+
+
+    <gazebo reference="ankle_plate_right">
+        <sensor name="ankle_plate_right_contact" type="contact">
+            <plugin name="contact_plugin" filename="libcontact.so"/>
+            <contact>
+                <collision>ankle_plate_right_fixed_joint_lump__foot_right_collision_1</collision>
+            </contact>
+            <update_rate>30</update_rate>
+            <always_on>true</always_on>
+        </sensor>
+    </gazebo>
 
     <!-- Foot Right -->
     <link name="foot_right">
