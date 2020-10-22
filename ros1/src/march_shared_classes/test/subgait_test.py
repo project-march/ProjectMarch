@@ -49,7 +49,8 @@ class SubgaitTest(unittest.TestCase):
                                                                                gait=self.gait_name,
                                                                                subgait='left_close',
                                                                                version='MV_walk_leftclose_v2')
-        subgait = Subgait.from_files_interpolated(self.robot, base_subgait_path, other_subgait_path, 0.5)
+        subgait = Subgait.from_files_interpolated(self.robot, base_subgait_path, other_subgait_path, 0.5,
+                                                  foot_pos = True)
         self.assertIsInstance(subgait, Subgait)
 
     # validate_subgait_transition tests
