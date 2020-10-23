@@ -54,9 +54,9 @@ class Setpoint(object):
             A dictionary of setpoints, who's corresponding foot location is linearly interpolated from the setpoints"""
 
         base_foot_pos = np.array(Setpoint.get_foot_pos_from_angles(base_setpoints))
-        base_foot_vel = np.array(Setpoint.get_foot_pos_from_angles(base_setpoints), velocity=True)
+        base_foot_vel = np.array(Setpoint.get_foot_pos_from_angles(base_setpoints, velocity=True))
         other_foot_pos = np.array(Setpoint.get_foot_pos_from_angles(other_setpoints))
-        other_foot_vel = np.array(Setpoint.get_foot_pos_from_angles(other_setpoints), velocity=True)
+        other_foot_vel = np.array(Setpoint.get_foot_pos_from_angles(other_setpoints, velocity=True))
 
         new_foot_pos = base_foot_pos * (1 - parameter) + other_foot_pos * parameter
         new_foot_vel = base_foot_vel * (1 - parameter) + other_foot_vel * parameter
@@ -77,9 +77,9 @@ class Setpoint(object):
 
         base_setpoints_time = 0
         other_setpoints_time = 0
-        for setpoint in base_setpoints:
+        for setpoint in base_setpoints.values():
             base_setpoints_time += setpoint.time
-        for setpoint in other_setpoints:
+        for setpoint in other_setpoints.values():
             other_setpoints_time += setpoint.time
         time = (base_setpoints_time * (1 - parameter) + other_setpoints_time * parameter) / len(base_setpoints)
 

@@ -14,8 +14,13 @@ from march_shared_classes.gait.subgait import Subgait
 class SubgaitTest(unittest.TestCase):
     def setUp(self):
         self.gait_name = 'walk'
+        self.gait_name_ik = 'test'
         self.subgait_name = 'left_swing'
+        self.base_subgait_name = 'base_subgait'
+        self.other_subgait_name = 'other_subgait'
         self.version = 'MV_walk_leftswing_v2'
+        self.base_version = 'foot_position_test'
+        self.other_version = 'foot_position_test'
         self.resources_folder = rospkg.RosPack().get_path('march_shared_classes') + '/test/resources'
         self.robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
         self.subgait_path = '{rsc}/{gait}/{subgait}/{version}.subgait'.format(rsc=self.resources_folder,
@@ -50,7 +55,20 @@ class SubgaitTest(unittest.TestCase):
                                                                                subgait='left_close',
                                                                                version='MV_walk_leftclose_v2')
         subgait = Subgait.from_files_interpolated(self.robot, base_subgait_path, other_subgait_path, 0.5,
-                                                  foot_pos = True)
+                                                  foot_pos = False)
+        self.assertIsInstance(subgait, Subgait)
+
+    def test_from_files_interpolated_correct_ik(self):
+        base_subgait_path = '{rsc}/{gait}/{subgait}/{version}.subgait'.format(rsc=self.resources_folder,
+                                                                              gait=self.gait_name_ik,
+                                                                              subgait=self.base_subgait_name,
+                                                                              version=self.base_version)
+        other_subgait_path = '{rsc}/{gait}/{subgait}/{version}.subgait'.format(rsc=self.resources_folder,
+                                                                               gait=self.gait_name_ik,
+                                                                               subgait=self.other_subgait_name,
+                                                                               version=self.other_version)
+        subgait = Subgait.from_files_interpolated(self.robot, base_subgait_path, other_subgait_path, 0.5,
+                                                  foot_pos=True)
         self.assertIsInstance(subgait, Subgait)
 
     # validate_subgait_transition tests
