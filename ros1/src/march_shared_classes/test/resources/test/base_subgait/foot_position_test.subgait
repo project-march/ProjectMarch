@@ -1,0 +1,86 @@
+description: A gait made to test the parametric gaits based on foot position
+duration: {nsecs: 0, secs: 8}
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: -0.2171
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: -0.0395
+    time_from_start: {nsecs: 28999999, secs: 4}
+    velocity: 0.0
+  - position: -0.1729
+    time_from_start: {nsecs: 0, secs: 8}
+    velocity: 0.0
+  left_hip_aa:
+  - position: -0.0924
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.033
+    time_from_start: {nsecs: 86800000, secs: 4}
+    velocity: 0.0
+  - position: -0.1447
+    time_from_start: {nsecs: 0, secs: 8}
+    velocity: 0.0
+  left_hip_fe:
+  - position: 0.9258
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: -0.0225
+    time_from_start: {nsecs: 874600000, secs: 3}
+    velocity: 0.0
+  - position: 0.795
+    time_from_start: {nsecs: 0, secs: 8}
+    velocity: 0.0
+  left_knee:
+  - position: 0.7791
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.1944
+    time_from_start: {nsecs: 9699999, secs: 4}
+    velocity: 0.0
+  - position: 0.636
+    time_from_start: {nsecs: 0, secs: 8}
+    velocity: 0.0
+  right_ankle:
+  - position: -0.2405
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.0145
+    time_from_start: {nsecs: 57999999, secs: 4}
+    velocity: 0.0
+  - position: -0.1557
+    time_from_start: {nsecs: 0, secs: 8}
+    velocity: 0.0
+  right_hip_aa:
+  - position: -0.0937
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.0129
+    time_from_start: {nsecs: 232000000, secs: 4}
+    velocity: 0.0
+  - position: 0.0938
+    time_from_start: {nsecs: 0, secs: 8}
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.8742
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: -0.0418
+    time_from_start: {nsecs: 19300000, secs: 4}
+    velocity: 0.0
+  - position: 0.9883
+    time_from_start: {nsecs: 0, secs: 8}
+    velocity: 0.0
+  right_knee:
+  - position: 0.9125
+    time_from_start: {nsecs: 0, secs: 0}
+    velocity: 0.0
+  - position: 0.2346
+    time_from_start: {nsecs: 38700000, secs: 4}
+    velocity: 0.0
+  - position: 0.8636
+    time_from_start: {nsecs: 0, secs: 8}
+    velocity: 0.0
+name: base_subgait
+version: foot_position_test

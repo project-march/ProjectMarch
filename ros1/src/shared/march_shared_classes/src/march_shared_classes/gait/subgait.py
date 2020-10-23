@@ -305,8 +305,8 @@ class Subgait(object):
                 other_setpoints_to_interpolate = {}
                 for base_joint in base_subgait.joints:
                     other_joint = other_subgait.get_joint(base_joint.name)
-                    base_joint_setpoints = base_joint.setpoints()
-                    other_joint_setpoints = other_joint.setpoints()
+                    base_joint_setpoints = base_joint._setpoints
+                    other_joint_setpoints = other_joint._setpoints
                     base_setpoints_to_interpolate[base_joint.name] = base_joint_setpoints[current_setpoints_index]
                     other_setpoints_to_interpolate[other_joint.name] = other_joint_setpoints[current_setpoints_index]
                 interpolated_setpoints = Setpoint.interpolate_setpoints_position(base_setpoints_to_interpolate,
