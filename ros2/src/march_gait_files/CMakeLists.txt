@@ -3,8 +3,11 @@ project(march_gait_files)
 
 find_package(ament_cmake REQUIRED)
 
-install(DIRECTORY minimal airgait-v test_versions-v training-v
+# TEMPORARY SOLUTION, WHEN WE TRANSFER COMPLETELY THIS WILL BE REPLACED
+install(DIRECTORY "../../../ros1/src/march_gait_files/"
     DESTINATION share/${PROJECT_NAME}
+    PATTERN "package.xml" EXCLUDE
+    PATTERN "CMakeLists.txt" EXCLUDE
 )
 
 ament_package()
