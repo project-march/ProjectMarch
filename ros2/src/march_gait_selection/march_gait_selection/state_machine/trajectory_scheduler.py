@@ -1,6 +1,5 @@
 from std_msgs.msg import Header
 from actionlib_msgs.msg import GoalID
-from control_msgs.action import FollowJointTrajectory
 from rclpy.action import ActionClient
 from march_shared_msgs.msg import FollowJointTrajectoryGoal, FollowJointTrajectoryActionGoal
 
@@ -17,18 +16,13 @@ class TrajectoryScheduler(object):
 
     def schedule(self, trajectory):
         """Schedules a new trajectory.
-
         :param JointTrajectory trajectory: a trajectory for all joints to follow
         """
         self._failed = False
-        goal = FollowJointTrajectory.Goal()
-        goal.trajectory = trajectory
-        result = self._trajectory_client.send_goal_async(goal)
-        self._node.get_logger().info('hey, i send a goal!')
         ros1_goal = FollowJointTrajectoryGoal(trajectory=trajectory)
         self._trajectory_goal_pub.publish(FollowJointTrajectoryActionGoal(
             header=Header(stamp=self._node.get_clock().now().to_msg()), goal_id=GoalID(), goal=ros1_goal))
-        result.add_done_callback(self._done_cb)
+        self._trajectory_goal_result_sub = self._node.
 
     def failed(self):
         return self._failed

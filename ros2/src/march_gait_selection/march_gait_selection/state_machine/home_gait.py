@@ -2,7 +2,9 @@ from rclpy.duration import Duration
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from .gait_interface import GaitInterface
 
+
 class HomeGait(GaitInterface):
+    """ A standard gait that goes from the unknown state to an idle position. """
     def __init__(self, name, position, gait_type, duration=3.0):
         """Initializes an executable home gait with given positions.
 
@@ -46,10 +48,21 @@ class HomeGait(GaitInterface):
         return "home_gait_version"
 
     def start(self):
+        """
+        This function should be called when the gait is started and creates a trajectory towards the idle position.
+        :return: A JointTrajectory message that can be used to actually schedule the gait.
+        """
         self._time_since_start = 0.0
         return self._get_trajectory_msg()
 
     def update(self, elapsed_time):
+        """
+        A function to update the progress of the gait.
+        :param elapsed_time: The time that has elapsed
+        :return: trajectory, is_finished: a pair of the trajectory that is used and whether or not the gait was finished
+        trajectory is always None in the home gait, since the exact gait is not known
+        is_finished is based on the given duration, not the actual position
+        """
         self._time_since_start += elapsed_time
         if self._time_since_start >= self._duration:
             return None, True

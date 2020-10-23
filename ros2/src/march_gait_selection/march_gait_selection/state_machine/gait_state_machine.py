@@ -1,8 +1,6 @@
-import rclpy
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from rclpy.duration import Duration
 from std_msgs.msg import Header
-from march_gait_selection.sounds import Sounds
 from .gait_state_machine_error import GaitStateMachineError
 from .home_gait import HomeGait
 from march_shared_msgs.msg import CurrentState, CurrentGait, Error
@@ -10,7 +8,9 @@ from march_shared_msgs.srv import PossibleGaits
 
 DEFAULT_TIMER_PERIOD = 0.04
 
+
 class GaitStateMachine(object):
+    """The state machine used to make sure that only valid transitions will be made."""
     UNKNOWN = 'unknown'
 
     def __init__(self, gait_selection, trajectory_scheduler):
@@ -20,8 +20,6 @@ class GaitStateMachine(object):
 
         :param GaitSelection gait_selection: Selection of loaded gaits to build from
         :param TrajectoryScheduler trajectory_scheduler: Scheduler interface for scheduling trajectories
-        :param StateMachineInput state_input: Input interface for controlling the states
-        :param float update_rate: update rate in Hz
         """
         self._gait_selection = gait_selection
         self._trajectory_scheduler = trajectory_scheduler
@@ -29,7 +27,6 @@ class GaitStateMachine(object):
         self._input = StateMachineInput(gait_selection)
         self._timer_period = self._gait_selection.get_parameter_or('timer_period',
                                                                    alternative_value=DEFAULT_TIMER_PERIOD)
-
 
         self._home_gaits = {}
         self._idle_transitions = {}
@@ -54,54 +51,35 @@ class GaitStateMachine(object):
         self.current_gait_pub = self._gait_selection.create_publisher(msg_type=CurrentGait,
                                                                       topic='/march/gait_selection/current_gait',
                                                                       qos_profile=10)
-
-        self._gait_selection.create_subscription(msg_type=Error, topic='/march/error',
-                                                 callback=lambda msg: self.error_cb(msg), qos_profile=10)
+        self.error_sub = self._gait_selection.create_subscription(msg_type=Error, topic='/march/error',
+                                                                  callback=self._error_cb, qos_profile=10)
 
         self._get_possible_gaits_client = self._gait_selection.create_service(
             srv_type=PossibleGaits, srv_name='/march/gait_selection/get_possible_gaits',
             callback=self._possible_gaits_cb)
-        self.add_transition_callback(self.current_state_cb)
-        self.add_gait_callback(self.current_gait_cb)
-        self._gait_selection.get_logger().info('done initializing state machine')
+
+        self.add_transition_callback(self._current_state_cb)
+        self.add_gait_callback(self._current_gait_cb)
+        self._gait_selection.get_logger().info('Successfully initializing state machine')
 
     def _possible_gaits_cb(self, request, response):
-        self._gait_selection.get_logger().info('Possible gaits called')
+        self._gait_selection.get_logger().debug('Possible gaits callback')
         response.gaits = self.get_possible_gaits()
         return response
 
-    def create_sounds(self):
-        if self._gait_selection.get_parameter_or('~sounds', alternative_value=False):
-            sounds = Sounds(['start', 'gait_start', 'gait_end', 'gait_stop'])
-
-            def play_gait_sound(_state, next_is_idle):
-                if next_is_idle:
-                    sounds.play('gait_end')
-                else:
-                    sounds.play('gait_start')
-
-            self.add_transition_callback(play_gait_sound)
-            self.add_stop_accepted_callback(lambda: sounds.play('gait_stop'))
-
-            # Short sleep is necessary to wait for the sound topic to initialize
-            # sleep(0.5)
-            sounds.play('start')
-
-    def current_state_cb(self, state, next_is_idle):
-        self._gait_selection.get_logger().info('Current state updated')
+    def _current_state_cb(self, state, next_is_idle):
         self.current_state_pub.publish(
             CurrentState(
                 header=Header(stamp=self._gait_selection.get_clock().now().to_msg()), state=state,
                 state_type=CurrentState.IDLE if next_is_idle else CurrentState.GAIT))
 
-    def current_gait_cb(self, gait_name, subgait_name, version, duration, gait_type):
-        self._gait_selection.get_logger().info('Current gait updated')
+    def _current_gait_cb(self, gait_name, subgait_name, version, duration, gait_type):
         self.current_gait_pub.publish(
             CurrentGait(header=Header(stamp=self._gait_selection.get_clock().now().to_msg()), gait=gait_name,
                         subgait=subgait_name, version=version, duration=Duration(seconds=duration).to_msg(),
                         gait_type=gait_type))
 
-    def error_cb(self, msg):
+    def _error_cb(self, msg):
         if msg.type == Error.NON_FATAL:
             self.stop()
         elif msg.type == Error.FATAL:
@@ -153,6 +131,10 @@ class GaitStateMachine(object):
         self.last_update_time = self._gait_selection.get_clock().now()
 
     def update(self):
+        """
+        Updates the current state based on the elapsed time, after the state machine is started, this function
+        is called every timer period.
+        """
         if not self._shutdown_requested:
             now = self._gait_selection.get_clock().now()
             elapsed_time = now - self.last_update_time
@@ -174,6 +156,7 @@ class GaitStateMachine(object):
             self._should_stop = True
 
     def _process_idle_state(self):
+        """ If the current state is idle, this function processes input for what to do next. """
         if self._input.gait_requested():
             gait_name = self._input.gait_name()
             self._gait_selection.get_logger().info('Requested gait `{0}`'.format(gait_name))
@@ -209,7 +192,6 @@ class GaitStateMachine(object):
                     subgait=self._current_gait.subgait_name))
                 self._trajectory_scheduler.schedule(trajectory)
             elapsed_time = 0.0
-
 
         if self._trajectory_scheduler.failed():
             self._trajectory_scheduler.reset()

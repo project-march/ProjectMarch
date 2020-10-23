@@ -6,6 +6,8 @@ from march_shared_classes.gait.subgait import Subgait
 
 
 class TransitionSubgait(Subgait):
+    """ The class that defines the subgait used for transitioning between subgaits with not matching
+    begin and end points"""
     def __init__(self, joints, duration,
                  gait_type='walk_like', gait_name='Transition',
                  subgait_name='Transition_subgait', version='Default',

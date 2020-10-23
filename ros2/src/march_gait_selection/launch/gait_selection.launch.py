@@ -5,6 +5,7 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
+    """ Basic launch file to launch the gait selection node """
     return LaunchDescription([
         DeclareLaunchArgument(
             'node_prefix',
@@ -22,14 +23,10 @@ def generate_launch_description():
             'gait_directory',
             default_value='training-v',
             description='The directory where the gait files are located, relatice to the gait_package.'),
-        DeclareLaunchArgument(
-            'sounds',
-            default_value='false',
-            description='Whether to use sounds.'),
+
         Node(
             package='march_gait_selection', executable='march_gait_selection', output='screen',
             name='gait_selection', parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')},
                                                {'gait_package': LaunchConfiguration('gait_package')},
-                                               {'gait_directory': LaunchConfiguration('gait_directory')},
-                                               {'sounds': LaunchConfiguration('sounds')}])
+                                               {'gait_directory': LaunchConfiguration('gait_directory')}])
     ])

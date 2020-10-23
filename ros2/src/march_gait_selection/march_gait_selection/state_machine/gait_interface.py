@@ -1,4 +1,6 @@
 class GaitInterface(object):
+    """The interface that defines the properties and functions that every gait should have."""
+
     @property
     def name(self):
         """Returns the name of the gait."""

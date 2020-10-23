@@ -1,92 +1,67 @@
 import os
-
 import rclpy
 from march_shared_msgs.srv import SetGaitVersion, ContainsGait
 from rcl_interfaces.srv import GetParameters
+from rclpy import Parameter
+from rclpy.exceptions import ParameterNotDeclaredException
 from rclpy.node import Node
-from ament_index_python.packages import get_package_share_directory, get_package_prefix
+from ament_index_python.packages import get_package_share_directory
 import yaml
 from march_shared_classes.exceptions.gait_exceptions import GaitError, GaitNameNotFound
 from march_shared_classes.gait.subgait import Subgait
 from std_msgs.msg import String
 from std_srvs.srv import Trigger
 from urdf_parser_py import urdf
-
 from .state_machine.setpoints_gait import SetpointsGait
-from .state_machine.state_machine_input import StateMachineInput
-from .state_machine.trajectory_scheduler import TrajectoryScheduler
 
 NODE_NAME = 'gait_selection'
-DEFAULT_GAIT_FILES_PACKAGE = 'march_gait_files'
-DEFAULT_GAIT_DIRECTORY = 'minimal'
+
 
 class GaitSelection(Node):
     """Base class for the gait selection module."""
 
     def __init__(self):
         super().__init__(NODE_NAME, automatically_declare_parameters_from_overrides=True)
-        self.get_logger().warn("START INIT")
+        try:
+            gait_package = self.get_parameter('gait_package').get_parameter_value().string_value
+            directory = self.get_parameter('gait_directory').get_parameter_value().string_value
 
-        gait_package = self.get_parameter_or('gait_package', alternative_value=DEFAULT_GAIT_FILES_PACKAGE)\
-            .get_parameter_value().string_value
-        directory = self.get_parameter_or('gait_directory', alternative_value=DEFAULT_GAIT_DIRECTORY)\
-            .get_parameter_value().string_value
+            package_path = get_package_share_directory(gait_package)
+            self._gait_directory = os.path.join(package_path, directory)
+            self._default_yaml = os.path.join(self._gait_directory, 'default.yaml')
 
-        self._robot = None
-        # Initialize robot description from robot_state_publisher and update based on changes
-        # while not self.cli.wait_for_service(timeout_sec=1.0):
-        #     self.get_logger().info('service not available, waiting again...')
-        #
-        # self.get_logger().debug('Robot description client available')
-        # self.get_logger().debug('Received robot description')
-
-    #     self.robot_future = None
-    #     self.robot_description_timer = self.create_timer(0.5, callback=self.check_robot_future)
-
-        self.robot_description_sub = self.create_subscription(msg_type=String, topic='/robot_description',
-                                                              callback=lambda msg: self.update_robot_description(msg.data),
-                                                              qos_profile=10)
-        self.get_logger().warn(f'{gait_package}')
-        package_path = get_package_share_directory(gait_package)
-        self.get_logger().warn(f'{package_path}')
-        self._gait_directory = os.path.join(package_path, directory)
-        if not os.path.isdir(self._gait_directory):
-            self.get_logger().error('Gait directory does not exist: {0}'.format(directory))
-
-        self._default_yaml = os.path.join(self._gait_directory, 'default.yaml')
-        if not os.path.isfile(self._default_yaml):
-            self.get_logger().error('Gait default yaml file does not exist: {0}'.format(directory))
+            if not os.path.isdir(self._gait_directory):
+                self.get_logger().error(f'Gait directory does not exist: {directory}')
+            if not os.path.isfile(self._default_yaml):
+                self.get_logger().error(f'Gait default yaml file does not exist: {directory}/default.yaml')
+        except ParameterNotDeclaredException:
+            self.get_logger().error('Gait selection node started without required parameters gait_package '
+                                    'and gait_directory')
 
         self._gait_version_map, self._positions = self._load_configuration()
+        self._robot = self.init_robot_description()
+        self.robot_description_sub = self.create_subscription(
+            msg_type=String, topic='/robot_description', callback=lambda msg: self.update_robot_description(msg.data),
+            qos_profile=10)
+
         self.create_services()
-        self._loaded_gaits = {}
-        self.get_logger().debug(f'Version map is {self._gait_version_map}')
-        self.get_logger().warn("END INIT")
+        self._loaded_gaits = self._load_gaits()
 
-    # def check_robot_future(self):
-    #     if self.robot_future is None:
-    #                    else:
-    #             self.get_logger().warn('Waiting for robot state publisher to have service')
-    #     else:
-    #         if self.robot_future.done():
-    #             self.get_logger().info('Robot future done')
-    #             self.update_robot_description(self.robot_future.result().values[0].string_value)
-    #             self.robot_description_timer.cancel()
-    #             self._loaded_gaits = self._load_gaits()
-    #             self.create_services()
-    #             self.get_logger().info('Done loading robot and gaits')
-    #             self.get_logger().info(f'{self._loaded_gaits}')
-    #         else:
-    #             self.get_logger().warn('Robot description is not being published by robot_state_publisher')
+    def init_robot_description(self):
+        # Before we can load the gaits and spin the gait selection, we need to get the robot description
+        robot_description_client = self.create_client(srv_type=GetParameters,
+                                                      srv_name='/robot_state_publisher/get_parameters')
+        while not robot_description_client.wait_for_service(timeout_sec=2):
+            self.get_logger().warn("Robot description is not being published, waiting..")
 
+        robot_future = robot_description_client.call_async(request=GetParameters.Request(names=['robot_description']))
+        rclpy.spin_until_future_complete(self, robot_future)
 
-    @staticmethod
-    def get_ros_package_path(package):
-        """Returns the path of where the given (ros) package is located."""
-        return get_package_share_directory(package)
+        return urdf.Robot.from_xml_string(robot_future.result().values[0].string_value)
 
     @property
     def robot(self):
+        """ Return the robot obtained from the robot state publisher."""
         return self._robot
 
     @property
@@ -99,10 +74,10 @@ class GaitSelection(Node):
         """Returns the named idle positions."""
         return self._positions
 
-    def load_gaits(self):
-        self._loaded_gaits = self._load_gaits()
-
-    def update_robot_description(self, robot_description: String):
+    def update_robot_description_cb(self, robot_description: String):
+        """
+        Callback that is used to update the robot description when robot_state_publisher messages about
+        """
         self._robot = urdf.Robot.from_xml_string(robot_description)
 
     def create_services(self):
