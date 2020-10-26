@@ -75,9 +75,13 @@ class Subgait(object):
         """
         if version.startswith(PARAMETRIC_GAITS_PREFIX):
             base_version, other_version, parameter = Subgait.unpack_parametric_version(version)
-            base_path = os.path.join(gait_dir, gait_name, subgait_name, base_version + '.subgait')
-            other_path = os.path.join(gait_dir, gait_name, subgait_name, other_version + '.subgait')
-            return cls.from_files_interpolated(robot, base_path, other_path, parameter, foot_pos=True)
+            if base_version == other_version:
+                subgait_path = os.path.join(gait_dir, gait_name, subgait_name, base_version + '.subgait')
+                return cls.from_file(robot, subgait_path, *args)
+            else:
+                base_path = os.path.join(gait_dir, gait_name, subgait_name, base_version + '.subgait')
+                other_path = os.path.join(gait_dir, gait_name, subgait_name, other_version + '.subgait')
+                return cls.from_files_interpolated(robot, base_path, other_path, parameter, foot_pos=True)
         else:
             subgait_path = os.path.join(gait_dir, gait_name, subgait_name, version + '.subgait')
             return cls.from_file(robot, subgait_path, *args)
