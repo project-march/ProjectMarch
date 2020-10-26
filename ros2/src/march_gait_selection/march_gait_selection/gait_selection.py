@@ -19,30 +19,33 @@ NODE_NAME = 'gait_selection'
 class GaitSelection(Node):
     """Base class for the gait selection module."""
 
-    def __init__(self):
+    def __init__(self, gait_package=None, directory=None, robot=None):
         super().__init__(NODE_NAME, automatically_declare_parameters_from_overrides=True)
         try:
-            gait_package = self.get_parameter('gait_package')\
-                .get_parameter_value().string_value
-            directory = self.get_parameter('gait_directory')\
-                .get_parameter_value().string_value
+            if gait_package is None:
+                gait_package = self.get_parameter('gait_package')\
+                    .get_parameter_value().string_value
+            if directory is None:
+                directory = self.get_parameter('gait_directory')\
+                    .get_parameter_value().string_value
 
-            package_path = get_package_share_directory(gait_package)
-            self._gait_directory = os.path.join(package_path, directory)
-            self._default_yaml = os.path.join(self._gait_directory, 'default.yaml')
-
-            if not os.path.isdir(self._gait_directory):
-                self.get_logger().error(f'Gait directory does not exist: {directory}')
-            if not os.path.isfile(self._default_yaml):
-                self.get_logger().error(
-                    f'Gait default yaml file does not exist: {directory}/default.yaml')
         except ParameterNotDeclaredException:
             self.get_logger().error(
                 'Gait selection node started without required parameters '
                 'gait_package and gait_directory')
 
+        package_path = get_package_share_directory(gait_package)
+        self._gait_directory = os.path.join(package_path, directory)
+        self._default_yaml = os.path.join(self._gait_directory, 'default.yaml')
+
+        if not os.path.isdir(self._gait_directory):
+            self.get_logger().error(f'Gait directory does not exist: {directory}')
+        if not os.path.isfile(self._default_yaml):
+            self.get_logger().error(
+                f'Gait default yaml file does not exist: {directory}/default.yaml')
+
         self._gait_version_map, self._positions = self._load_configuration()
-        self._robot = self._initial_robot_description()
+        self._robot = self._initial_robot_description() if robot is None else robot
         self.robot_description_sub = self.create_subscription(
             msg_type=String, topic='/robot_description',
             callback=self._update_robot_description_cb,
