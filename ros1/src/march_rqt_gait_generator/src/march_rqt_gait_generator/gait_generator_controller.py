@@ -321,8 +321,10 @@ class GaitGeneratorController(object):
         # If directory dialogue is canceled, or an invalid directory is selected, leave gait_directory unchanged
         if self.gait_directory == '' or self.gait_directory is None:
             self.gait_directory = previous_gait_directory
-        elif len(self.gait_directory.split('/')) < 2 or self.gait_directory.split('/')[-2] != 'march_gait_files':
-            rospy.logwarn('Gait directory path invalid. The gait directory must be a direct child of march_gait_files.'
+        elif len(self.gait_directory.split('/')) < 2 or not (self.gait_directory.split('/')[-2] == 'march_gait_files'
+                                                             or self.gait_directory.split('/')[-1] == 'resources'):
+            rospy.logwarn('Gait directory path invalid. The gait directory must be a direct child of march_gait_files'
+                          'or end with resources.'
                           ' Change gait directory cancelled')
             self.gait_directory = previous_gait_directory
 
