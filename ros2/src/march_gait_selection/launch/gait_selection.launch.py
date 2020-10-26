@@ -25,7 +25,6 @@ def generate_launch_description():
             default_value='training-v',
             description='The directory where the gait files are located, '
                         'relative to the gait_package.'),
-
         Node(
             package='march_gait_selection', executable='march_gait_selection',
             output='screen', name='gait_selection',

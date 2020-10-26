@@ -1,7 +1,7 @@
 from std_msgs.msg import Header
 from actionlib_msgs.msg import GoalID
 from march_shared_msgs.msg import FollowJointTrajectoryGoal, \
-    FollowJointTrajectoryActionGoal, FollowJointTrajectoryActionResult
+    FollowJointTrajectoryActionGoal, FollowJointTrajectoryActionResult, FollowJointTrajectoryResult
 
 
 class TrajectoryScheduler(object):
@@ -23,7 +23,8 @@ class TrajectoryScheduler(object):
         self._trajectory_goal_result_sub = self._node.create_subscription(
             msg_type=FollowJointTrajectoryActionResult,
             topic='march/controller/trajectory/follow_joint_trajectory/result',
-            callback=self._done_cb
+            callback=self._done_cb,
+            qos_profile=5
         )
 
     def schedule(self, trajectory):
@@ -42,9 +43,8 @@ class TrajectoryScheduler(object):
     def reset(self):
         self._failed = False
 
-    def _done_cb(self, _state, result):
-        self._node.get_logger().info('Received goal result')
-        if result.error_code != FollowJointTrajectoryActionResult.Result().SUCCESSFUL:
+    def _done_cb(self, result):
+        if result.result.error_code != FollowJointTrajectoryResult.SUCCESSFUL:
             self._node.get_logger().err(
                 'Failed to execute trajectory. {0} ({1})'
                 .format(result.error_string, result.error_code))

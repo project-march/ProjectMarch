@@ -53,6 +53,7 @@ class GaitSelection(Node):
 
         self._create_services()
         self._loaded_gaits = self._load_gaits()
+        self.get_logger().info('Successfully initialized gait selection node.')
 
     def _initial_robot_description(self):
         """
@@ -184,7 +185,6 @@ class GaitSelection(Node):
 
         :returns dict: A dictionary mapping gait name to gait instance
         """
-        self.get_logger().info('Loadings gaits from version map')
         gaits = {}
 
         for gait in self._gait_version_map:

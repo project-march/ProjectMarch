@@ -345,8 +345,6 @@ class GaitStateMachine(object):
 
         self._validate_transitions()
         self._generate_home_gaits(idle_positions)
-        self._gait_selection.get_logger().debug(
-            f'Done generating gait transitions: {self._gait_transitions}')
 
     def _validate_transitions(self):
         """ Validates that every idle position has a transition after the
@@ -365,8 +363,6 @@ class GaitStateMachine(object):
         """
         self._idle_transitions[self.UNKNOWN] = set()
         self._home_gaits = {}
-        self._gait_selection.get_logger().info(
-            f'Generating home gaits with idle positions: {idle_positions}')
         for idle_name, position in idle_positions.items():
             home_gait = HomeGait(idle_name, position['joints'], position['gait_type'])
             home_gait_name = home_gait.name
