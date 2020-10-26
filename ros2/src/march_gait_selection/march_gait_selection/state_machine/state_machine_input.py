@@ -96,11 +96,7 @@ class StateMachineInput(object):
         self.reset()
 
     def _callback_input_device_instruction(self, msg):
-<<<<<<< Updated upstream
-        self._node.get_logger().info(f'Callback input device instruction {msg}')
-=======
         self._node.get_logger().debug(f'Callback input device instruction {msg}')
->>>>>>> Stashed changes
         if msg.type == GaitInstruction.STOP:
             self._stopped = True
         elif msg.type == GaitInstruction.GAIT:
