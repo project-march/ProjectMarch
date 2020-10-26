@@ -51,6 +51,16 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/ContainsGait.srv"
   "srv/PossibleGaits.srv"
   "srv/SetGaitVersion.srv"
+  "srv/GetParamStringList.srv"
+  "srv/GetParamString.srv"
+  "srv/GetParamBool.srv"
+  "srv/GetParamInt.srv"
+  "srv/GetParamFloat.srv"
+  "srv/SetParamStringList.srv"
+  "srv/SetParamString.srv"
+  "srv/SetParamBool.srv"
+  "srv/SetParamInt.srv"
+  "srv/SetParamFloat.srv"
   DEPENDENCIES std_msgs builtin_interfaces geometry_msgs rosgraph_msgs trajectory_msgs control_msgs actionlib_msgs
  )
 

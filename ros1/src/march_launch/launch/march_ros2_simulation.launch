@@ -79,6 +79,8 @@
         </include>
 
         <include if="$(arg balance)" file="$(find march_moveit)/launch/march_moveit.launch" />
+
+        <include file="$(find march_parameter_server)/launch/march_parameter_server.launch" />
     </group>
 
     <!-- Load the URDF into the ROS Parameter Server -->
