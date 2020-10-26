@@ -112,21 +112,21 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left
   // turn (bodge) off plug-in at right time when balance is set to true
   if (balance_ == true && this->subgait_name_ != "home_stand" && this->subgait_name_ != "idle_state")
   {
-    p_pitch_actual = this->p_pitch_off_;
-    p_roll_actual = this->p_roll_off_;
-    p_yaw_actual = this->p_yaw_off_;
-    d_pitch_actual = this->d_pitch_off_;
-    d_roll_actual = this->d_roll_off_;
-    d_yaw_actual = this->d_yaw_off_;
+    p_pitch_actual = p_pitch_off_;
+    p_roll_actual = p_roll_off_;
+    p_yaw_actual = p_yaw_off_;
+    d_pitch_actual = d_pitch_off_;
+    d_roll_actual = d_roll_off_;
+    d_yaw_actual = d_yaw_off_;
   }
   else
   {
-    p_pitch_actual = this->p_pitch_;
-    p_roll_actual = this->p_roll_;
-    p_yaw_actual = this->p_yaw_;
-    d_pitch_actual = this->d_pitch_;
-    d_roll_actual = this->d_roll_;
-    d_yaw_actual = this->d_yaw_;
+    p_pitch_actual = p_pitch_;
+    p_roll_actual = p_roll_;
+    p_yaw_actual = p_yaw_;
+    d_pitch_actual = d_pitch_;
+    d_roll_actual = d_roll_;
+    d_yaw_actual = d_yaw_;
   }
 
 
