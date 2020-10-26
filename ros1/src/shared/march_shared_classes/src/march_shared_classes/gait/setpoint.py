@@ -53,6 +53,9 @@ class Setpoint(object):
         :return
             A dictionary of setpoints, who's corresponding foot location is linearly interpolated from the setpoints"""
 
+        print(base_setpoints)
+        print(other_setpoints)
+
         base_foot_pos = np.array(Setpoint.get_foot_pos_from_angles(base_setpoints))
         base_foot_vel = np.array(Setpoint.get_foot_pos_from_angles(base_setpoints, velocity=True))
         other_foot_pos = np.array(Setpoint.get_foot_pos_from_angles(other_setpoints))
@@ -129,7 +132,7 @@ class Setpoint(object):
 
     @staticmethod
     def get_foot_pos_from_angles(setpoint_dic, velocity=False):
-        """ calculated the position of the foot (ankle, ADFP is not taken into account) from joint angles. The origin of
+        """ calculate the position of the foot (ankle, ADFP is not taken into account) from joint angles. The origin of
         the local coordinate system is in the rotation point of the haa joint of the corresponding foot"""
 
         if velocity:
@@ -226,16 +229,17 @@ class Setpoint(object):
         # once the haa angle is known, use https://www.wolframalpha.com/input/?i=solve+%5Bsin%28x%29+%2B+sin%28x+-+y%29
         # *c%2C+cos%28x%29+%2B+cos%28x+-+y%29*c%5D+%3D+%5Ba%2C+b%5D to calculate the angles of the hfe and kfe
         # rescale for easier solving, and check if position is valid
-        rescaled_x = pos_x - bb
-        rescaled_z = sqrt(- ph * ph + pos_y * pos_y + pos_z * pos_z)
+        rescaled_x = round(pos_x - bb, 10)
+        rescaled_z = round(sqrt(- ph * ph + pos_y * pos_y + pos_z * pos_z), 10)
         ll = ll / ul
         rescaled_x = rescaled_x / ul
         rescaled_z = rescaled_z / ul
         ul = 1.0
 
         if rescaled_x * rescaled_x + rescaled_z * rescaled_z > (ll + ul) * (ll + ul):
+            print('rescaled = (', rescaled_x, rescaled_z, ')')
             raise SubgaitInterpolationError("The desired foot position, ({0}, {1}, {2}), is out of reach".
-                                            format(pos_x, pos_y, pos_z))
+                                            format(position[0], position[1], position[2]))
 
         # make the calculation more concise
         try:
@@ -318,3 +322,17 @@ class Setpoint(object):
             hfe = hfe_two
 
         return [haa, hfe, kfe]
+
+if __name__ == '__main__':
+    angles = {'left_hip_aa': Setpoint(0, 0, 0),
+              'left_hip_fe': Setpoint(0, -0.0873, 0),
+              'left_knee': Setpoint(0, 0, 0),
+               'right_hip_aa': Setpoint(0, 0, 0),
+               'right_hip_fe': Setpoint(0, -0.0873, 0),
+               'right_knee': Setpoint(0, 0, 0)}
+    print(Setpoint.get_foot_pos_from_angles(angles))
+    print(Setpoint.get_angles_from_pos(Setpoint.get_foot_pos_from_angles(angles)[0], 'left'))
+
+    robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
+    bb_l = robot.link_map['hip_aa_frame_left_front'].collisions[0].geometry.size[0]
+    print(bb_l)

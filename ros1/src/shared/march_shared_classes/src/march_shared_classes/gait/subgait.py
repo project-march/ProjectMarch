@@ -77,22 +77,25 @@ class Subgait(object):
             base_version, other_version, parameter = Subgait.unpack_parametric_version(version)
             base_path = os.path.join(gait_dir, gait_name, subgait_name, base_version + '.subgait')
             other_path = os.path.join(gait_dir, gait_name, subgait_name, other_version + '.subgait')
-            return cls.from_files_interpolated(robot, base_path, other_path, parameter)
+            return cls.from_files_interpolated(robot, base_path, other_path, parameter, foot_pos=True)
         else:
             subgait_path = os.path.join(gait_dir, gait_name, subgait_name, version + '.subgait')
             return cls.from_file(robot, subgait_path, *args)
 
     @classmethod
-    def from_files_interpolated(cls, robot, file_name_base, file_name_other, parameter, foot_pos = False, *args):
+    def from_files_interpolated(cls, robot, file_name_base, file_name_other, parameter, foot_pos=False, *args):
         """Extract two subgaits from files and interpolate.
 
         :param robot:
             The robot corresponding to the given subgait file
         :param file_name_base:
-            The .yaml file name of the base subgait
+            The file name of the base subgait
         :param file_name_other:
+            the file name of the oter subgait
         :param parameter:
             The parameter to use for interpolation. Should be 0 <= parameter <= 1
+        :param foot_pos:
+            Determine whether the interpolation should be done on the foot location or on the joint angles
 
         :return:
             A populated Subgait object
@@ -242,6 +245,8 @@ class Subgait(object):
             other subgait, return value if parameter is equal to one
         :param parameter:
             The parameter to use for interpolation. Should be 0 <= parameter <= 1
+        :param foot_pos:
+            Determine whether the interpolation should be done on the foot location or on the joint angles
 
         :return:
             The interpolated subgait
