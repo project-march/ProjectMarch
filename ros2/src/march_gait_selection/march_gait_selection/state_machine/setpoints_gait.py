@@ -58,7 +58,8 @@ class SetpointsGait(GaitInterface, Gait):
 
     def start(self):
         """
-        Start the gait, sets current subgait to the first subgait, resets the time and generates the first trajectory.
+        Start the gait, sets current subgait to the first subgait, resets the
+        time and generates the first trajectory.
         :return: A JointTrajectory message with the trajectory of the first subgait.
         """
         self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
@@ -102,25 +103,12 @@ class SetpointsGait(GaitInterface, Gait):
         self._time_since_start = 0.0 # New subgait is started, so reset the time
         return trajectory, False
 
-    def _stop(self):
-        next_subgait = self.graph[(self._current_subgait.subgait_name, self.graph.STOP)]
-        if next_subgait is None:
-            next_subgait = self.graph[(self._current_subgait.subgait_name, self.graph.TO)]
-        else:
-            self._should_stop = False
-        return next_subgait
-
-    def _transition_subgait(self):
-        old_subgait = self.subgaits[self.graph[(self._current_subgait.subgait_name, self.graph.TO)]]
-        new_subgait = self.subgaits[self.graph[(self._transition_to_subgait.subgait_name, self.graph.TO)]]
-        transition_subgait = TransitionSubgait.from_subgaits(old_subgait, new_subgait, '{s}_transition'.format(
-            s=self._transition_to_subgait.subgait_name))
-        self._current_subgait = transition_subgait
-        self._time_since_start = 0.0
-        self._is_transitioning = True
-        return transition_subgait.to_joint_trajectory_msg(), False
-
     def transition(self, transition_request):
+        """
+        Request
+        :param transition_request:
+        :return:
+        """
         if self._is_transitioning or self._should_stop:
             return False
 
@@ -137,17 +125,49 @@ class SetpointsGait(GaitInterface, Gait):
         return False
 
     def stop(self):
-        if self.graph.is_stoppable() and not self._is_transitioning and self._transition_to_subgait is None:
+        """ Called when the current gait should be stopped. Return a boolean
+        for whether the stopping was succesfull. """
+        if self.graph.is_stoppable() and not self._is_transitioning \
+                and self._transition_to_subgait is None:
             self._should_stop = True
             return True
         else:
             return False
 
     def end(self):
+        """Called when the gait has finished."""
         self._current_subgait = None
 
     def set_subgait_versions(self, robot, gait_directory, version_map):
+        """
+        Change the versions of the subgaits.
+        :param robot: The robot model used.
+        :param gait_directory: The directory where the gaits are located.
+        :param version_map: The map with the new versions to use.
+        """
         if self._current_subgait is None:
-            super(SetpointsGait, self).set_subgait_versions(robot, gait_directory, version_map)
+            super(SetpointsGait, self).set_subgait_versions(robot, gait_directory,
+                                                            version_map)
         else:
             raise GaitError('Cannot change subgait version while gait is being executed')
+
+    def _stop(self):
+        next_subgait = self.graph[(self._current_subgait.subgait_name, self.graph.STOP)]
+        if next_subgait is None:
+            next_subgait = self.graph[(self._current_subgait.subgait_name, self.graph.TO)]
+        else:
+            self._should_stop = False
+        return next_subgait
+
+    def _transition_subgait(self):
+        old_subgait = self.subgaits[self.graph[
+            (self._current_subgait.subgait_name, self.graph.TO)]]
+        new_subgait = self.subgaits[self.graph[
+            (self._transition_to_subgait.subgait_name, self.graph.TO)]]
+        transition_subgait = TransitionSubgait.from_subgaits(
+            old_subgait, new_subgait, '{s}_transition'.format(
+                s=self._transition_to_subgait.subgait_name))
+        self._current_subgait = transition_subgait
+        self._time_since_start = 0.0
+        self._is_transitioning = True
+        return transition_subgait.to_joint_trajectory_msg(), False

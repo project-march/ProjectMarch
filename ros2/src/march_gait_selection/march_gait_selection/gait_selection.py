@@ -2,7 +2,6 @@ import os
 import rclpy
 from march_shared_msgs.srv import SetGaitVersion, ContainsGait
 from rcl_interfaces.srv import GetParameters
-from rclpy import Parameter
 from rclpy.exceptions import ParameterNotDeclaredException
 from rclpy.node import Node
 from ament_index_python.packages import get_package_share_directory
@@ -23,8 +22,10 @@ class GaitSelection(Node):
     def __init__(self):
         super().__init__(NODE_NAME, automatically_declare_parameters_from_overrides=True)
         try:
-            gait_package = self.get_parameter('gait_package').get_parameter_value().string_value
-            directory = self.get_parameter('gait_directory').get_parameter_value().string_value
+            gait_package = self.get_parameter('gait_package')\
+                .get_parameter_value().string_value
+            directory = self.get_parameter('gait_directory')\
+                .get_parameter_value().string_value
 
             package_path = get_package_share_directory(gait_package)
             self._gait_directory = os.path.join(package_path, directory)
@@ -33,31 +34,56 @@ class GaitSelection(Node):
             if not os.path.isdir(self._gait_directory):
                 self.get_logger().error(f'Gait directory does not exist: {directory}')
             if not os.path.isfile(self._default_yaml):
-                self.get_logger().error(f'Gait default yaml file does not exist: {directory}/default.yaml')
+                self.get_logger().error(
+                    f'Gait default yaml file does not exist: {directory}/default.yaml')
         except ParameterNotDeclaredException:
-            self.get_logger().error('Gait selection node started without required parameters gait_package '
-                                    'and gait_directory')
+            self.get_logger().error(
+                'Gait selection node started without required parameters '
+                'gait_package and gait_directory')
 
         self._gait_version_map, self._positions = self._load_configuration()
-        self._robot = self.init_robot_description()
+        self._robot = self._initial_robot_description()
         self.robot_description_sub = self.create_subscription(
-            msg_type=String, topic='/robot_description', callback=lambda msg: self.update_robot_description(msg.data),
+            msg_type=String, topic='/robot_description',
+            callback=self._update_robot_description_cb,
             qos_profile=10)
 
-        self.create_services()
+        self._create_services()
         self._loaded_gaits = self._load_gaits()
 
-    def init_robot_description(self):
-        # Before we can load the gaits and spin the gait selection, we need to get the robot description
-        robot_description_client = self.create_client(srv_type=GetParameters,
-                                                      srv_name='/robot_state_publisher/get_parameters')
+    def _initial_robot_description(self):
+        """
+        Initialize the robot description by getting it from the robot state
+        publisher.
+        """
+        robot_description_client = self.create_client(
+            srv_type=GetParameters, srv_name='/robot_state_publisher/get_parameters')
         while not robot_description_client.wait_for_service(timeout_sec=2):
             self.get_logger().warn("Robot description is not being published, waiting..")
 
-        robot_future = robot_description_client.call_async(request=GetParameters.Request(names=['robot_description']))
+        robot_future = robot_description_client.call_async(
+            request=GetParameters.Request(names=['robot_description']))
         rclpy.spin_until_future_complete(self, robot_future)
 
         return urdf.Robot.from_xml_string(robot_future.result().values[0].string_value)
+
+    def _create_services(self):
+        self.create_service(Trigger, '/march/gait_selection/get_version_map',
+                            lambda msg: [True, str(self.gait_version_map)])
+
+        self.create_service(SetGaitVersion, '/march/gait_selection/set_gait_version',
+                            lambda msg: set_gait_versions(msg, self))
+
+        self.create_service(Trigger, '/march/gait_selection/get_directory_structure',
+                            lambda msg: [True, str(self.scan_directory())])
+
+        self.create_service(srv_type=Trigger,
+                            srv_name='/march/gait_selection/update_default_versions',
+                            callback=lambda msg: self.update_default_versions())
+
+        self.create_service(srv_type=ContainsGait,
+                            srv_name='/march/gait_selection/contains_gait',
+                            callback=lambda msg: contains_gait(msg, self))
 
     @property
     def robot(self):
@@ -74,27 +100,12 @@ class GaitSelection(Node):
         """Returns the named idle positions."""
         return self._positions
 
-    def update_robot_description_cb(self, robot_description: String):
+    def _update_robot_description_cb(self, msg):
         """
-        Callback that is used to update the robot description when robot_state_publisher messages about
+        Callback that is used to update the robot description when
+        robot_state_publisher sends out an update.
         """
-        self._robot = urdf.Robot.from_xml_string(robot_description)
-
-    def create_services(self):
-        self.create_service(Trigger, '/march/gait_selection/get_version_map',
-                            lambda msg: [True, str(self.gait_version_map)])
-
-        self.create_service(SetGaitVersion, '/march/gait_selection/set_gait_version',
-                            lambda msg: set_gait_versions(msg, self))
-
-        self.create_service(Trigger, '/march/gait_selection/get_directory_structure',
-                            lambda msg: [True, str(self.scan_directory())])
-
-        self.create_service(srv_type=Trigger, srv_name='/march/gait_selection/update_default_versions',
-                            callback=lambda msg: self.update_default_versions())
-
-        self.create_service(srv_type=ContainsGait, srv_name='/march/gait_selection/contains_gait',
-                            callback=lambda msg: contains_gait(msg, self))
+        self._robot = urdf.Robot.from_xml_string(msg.data)
 
     def set_gait_versions(self, gait_name, version_map):
         """Sets the subgait versions of given gait.
@@ -108,11 +119,13 @@ class GaitSelection(Node):
         # Only update versions that are different
         version_map = dict([(name, version) for name, version in version_map.items() if
                             version != self._gait_version_map[gait_name][name]])
-        self._loaded_gaits[gait_name].set_subgait_versions(self._robot, self._gait_directory, version_map)
+        self._loaded_gaits[gait_name].set_subgait_versions(
+            self._robot, self._gait_directory, version_map)
         self._gait_version_map[gait_name].update(version_map)
 
     def scan_directory(self):
-        """Scans the gait_directory recursively and create a dictionary of all subgait files.
+        """Scans the gait_directory recursively and create a dictionary of all
+        subgait files.
 
         :returns:
             dictionary of the maps and files within the directory
@@ -128,8 +141,9 @@ class GaitSelection(Node):
                     subgait_path = os.path.join(gait_path, subgait)
 
                     if os.path.isdir(subgait_path):
-                        versions = sorted([v.replace('.subgait', '') for v in os.listdir(os.path.join(subgait_path)) if
-                                           v.endswith('.subgait')])
+                        versions = sorted([v.replace('.subgait', '')
+                                           for v in os.listdir(os.path.join(subgait_path))
+                                           if v.endswith('.subgait')])
                         subgaits[subgait] = versions
 
                 gaits[gait] = subgaits
@@ -137,16 +151,19 @@ class GaitSelection(Node):
 
     def update_default_versions(self):
         """Updates the default.yaml file with the current loaded gait versions."""
-        new_default_dict = {'gaits': self._gait_version_map, 'positions': self._positions}
+        new_default_dict = {'gaits': self._gait_version_map,
+                            'positions': self._positions}
 
         try:
             with open(self._default_yaml, 'w') as default_yaml_content:
                 yaml_content = yaml.dump(new_default_dict, default_flow_style=False)
                 default_yaml_content.write(yaml_content)
-            return [True, 'New default values were written to: {pn}'.format(pn=self._default_yaml)]
+            return [True, 'New default values were written to: {pn}'
+                          .format(pn=self._default_yaml)]
 
         except IOError:
-            return [False, 'Error occurred when writing to file path: {pn}'.format(pn=self._default_yaml)]
+            return [False, 'Error occurred when writing to file path: {pn}'
+                           .format(pn=self._default_yaml)]
 
     def add_gait(self, gait):
         """Adds a gait to the loaded gaits if it does not already exist.
@@ -154,7 +171,8 @@ class GaitSelection(Node):
         The to be added gait should implement `GaitInterface`.
         """
         if gait.name in self._loaded_gaits:
-            self.get_logger().warn('Gait `{gait}` already exists in gait selection'.format(gait=gait.name))
+            self.get_logger().warn('Gait `{gait}` already exists in gait selection'
+                                   .format(gait=gait.name))
         else:
             self._loaded_gaits[gait.name] = gait
 
@@ -167,7 +185,8 @@ class GaitSelection(Node):
         gaits = {}
 
         for gait in self._gait_version_map:
-            gaits[gait] = SetpointsGait.from_file(gait, self._gait_directory, self._robot, self._gait_version_map)
+            gaits[gait] = SetpointsGait.from_file(
+                gait, self._gait_directory, self._robot, self._gait_version_map)
 
         return gaits
 
@@ -182,7 +201,8 @@ class GaitSelection(Node):
             raise TypeError('Gait version map should be of type; dictionary')
 
         if not self._validate_version_map(version_map):
-            raise GaitError(msg='Gait version map: {gm}, is not valid'.format(gm=version_map))
+            raise GaitError(msg='Gait version map: {gm}, is not valid'
+                            .format(gm=version_map))
 
         return version_map, default_config['positions']
 
@@ -201,7 +221,8 @@ class GaitSelection(Node):
             for subgait_name in version_map[gait_name]:
                 version = version_map[gait_name][subgait_name]
                 if not Subgait.validate_version(gait_path, subgait_name, version):
-                    self.get_logger().warn('{0}, {1} does not exist'.format(subgait_name, version))
+                    self.get_logger().warn('{0}, {1} does not exist'
+                                           .format(subgait_name, version))
                     return False
         return True
 
@@ -212,7 +233,6 @@ class GaitSelection(Node):
     def __iter__(self):
         """Returns an iterator over all loaded gaits."""
         return iter(self._loaded_gaits.values())
-
 
 
 def set_gait_versions(msg, gait_selection):

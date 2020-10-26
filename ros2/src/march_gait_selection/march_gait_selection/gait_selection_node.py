@@ -4,9 +4,8 @@ from march_gait_selection.state_machine.gait_state_machine import GaitStateMachi
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryScheduler
 
 
-
-
 def main():
+    """ Starts up the gait selection node with the state machine and scheduler. """
     rclpy.init()
 
     gait_selection = GaitSelection()

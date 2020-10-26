@@ -8,7 +8,8 @@ class HomeGait(GaitInterface):
     def __init__(self, name, position, gait_type, duration=3.0):
         """Initializes an executable home gait with given positions.
 
-        :param str name: Name of the idle position this gait homes to. Will be prefixed with `home_`
+        :param str name: Name of the idle position this gait homes to.
+                         Will be prefixed with `home_`
         :param dict position: Mapping of joint names to positions
         :param str gait_type: Gait type to use for home gait
         :param float duration: Duration of the gait in seconds. Defaults to 3 seconds.
@@ -49,7 +50,8 @@ class HomeGait(GaitInterface):
 
     def start(self):
         """
-        This function should be called when the gait is started and creates a trajectory towards the idle position.
+        Creates a trajectory message to go towards the idle position in the
+        given duration.
         :return: A JointTrajectory message that can be used to actually schedule the gait.
         """
         self._time_since_start = 0.0
@@ -57,10 +59,10 @@ class HomeGait(GaitInterface):
 
     def update(self, elapsed_time):
         """
-        A function to update the progress of the gait.
+        Gives an update on the progress of the gait.
         :param elapsed_time: The time that has elapsed
-        :return: trajectory, is_finished: a pair of the trajectory that is used and whether or not the gait was finished
-        trajectory is always None in the home gait, since the exact gait is not known
+        :return: trajectory, is_finished:
+        trajectory is always None in the home gait, since the exact gait is unknown
         is_finished is based on the given duration, not the actual position
         """
         self._time_since_start += elapsed_time
@@ -70,6 +72,11 @@ class HomeGait(GaitInterface):
             return None, False
 
     def _get_trajectory_msg(self):
+        """
+        Constructs a trajectory message that has only one set point to be
+        standing still in the idle position after the specified duration.
+        :return:
+        """
         msg = JointTrajectory()
         msg.joint_names = sorted(list(self._position.keys()))
 
