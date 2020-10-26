@@ -120,6 +120,8 @@ gaits:
   tilted_path_right_flexed_knee_step:
     left_open: MV_TP_right_flexed_knee_step_leftopen_v1
     right_close: MV_TP_right_flexed_knee_step_rightclose_v1
+  ik_test:
+    swing: forward_swing
 positions:
   stand:
     gait_type: walk_like

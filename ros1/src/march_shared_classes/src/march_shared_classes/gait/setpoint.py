@@ -53,16 +53,13 @@ class Setpoint(object):
         :return
             A dictionary of setpoints, who's corresponding foot location is linearly interpolated from the setpoints"""
 
-        print(base_setpoints)
-        print(other_setpoints)
-
         base_foot_pos = np.array(Setpoint.get_foot_pos_from_angles(base_setpoints))
         base_foot_vel = np.array(Setpoint.get_foot_pos_from_angles(base_setpoints, velocity=True))
         other_foot_pos = np.array(Setpoint.get_foot_pos_from_angles(other_setpoints))
         other_foot_vel = np.array(Setpoint.get_foot_pos_from_angles(other_setpoints, velocity=True))
 
         new_foot_pos = base_foot_pos * (1 - parameter) + other_foot_pos * parameter
-        new_foot_vel = base_foot_vel * (1 - parameter) + other_foot_vel * parameter
+        new_foot_vel = (base_foot_vel * (1 - parameter) + other_foot_vel * parameter)
 
         # linearly interpolate the ankle angle
         new_angles = [Setpoint.get_angles_from_pos(new_foot_pos[0], 'left'),
@@ -203,15 +200,17 @@ class Setpoint(object):
         base = robot.link_map['hip_base'].collisions[0].geometry.size[1]
 
         pos_x = position[0]
-        # so the positive direction is to the outside, easier for calculation, change origin to pivot of haa joint
+        # change y positive direction to go to the foot, easier for calculation, change origin to pivot of haa joint
         if foot == 'left':
             pos_y = - (position[1] + base / 2.0)
         else:
             pos_y = position[1] - base / 2.0
         pos_z = position[2]
 
-        # first calculate the haa angle
-        # this assume that pos_z > 0
+        # first calculate the haa angle. This calculation assumes that pos_z > 0
+        if pos_z <= 0:
+            raise SubgaitInterpolationError("desired z_pos is less then zero, current inverse kinematic calculation is"
+                                            " not capable of this")
         if pos_y != 0:
             slope_y_to_or = pos_z / pos_y
             alpha = atan(slope_y_to_or)
@@ -222,9 +221,7 @@ class Setpoint(object):
         else:
             alpha = pi / 2
             haa = acos(ph / sqrt(pos_z * pos_z + pos_y * pos_y)) - alpha
-        if pos_z < 0:
-            raise SubgaitInterpolationError("desired z_pos is less then zero, inverse kinematic calculation is not"
-                                            " capable of this")
+
 
         # once the haa angle is known, use https://www.wolframalpha.com/input/?i=solve+%5Bsin%28x%29+%2B+sin%28x+-+y%29
         # *c%2C+cos%28x%29+%2B+cos%28x+-+y%29*c%5D+%3D+%5Ba%2C+b%5D to calculate the angles of the hfe and kfe
@@ -237,7 +234,6 @@ class Setpoint(object):
         ul = 1.0
 
         if rescaled_x * rescaled_x + rescaled_z * rescaled_z > (ll + ul) * (ll + ul):
-            print('rescaled = (', rescaled_x, rescaled_z, ')')
             raise SubgaitInterpolationError("The desired foot position, ({0}, {1}, {2}), is out of reach".
                                             format(position[0], position[1], position[2]))
 
@@ -277,7 +273,7 @@ class Setpoint(object):
                                                 - rescaled_x * rescaled_x * rescaled_x * big_sqrt_plus)
         except:
             raise SubgaitInterpolationError("The calculation method cannot find the angles corresponding to the desired"
-                                            "foot position, ({0}, {1}, {2}).".
+                                            " foot position, ({0}, {1}, {2}).".
                                             format(pos_x, pos_y, pos_z))
 
         if rescaled_x * rescaled_x + rescaled_z * rescaled_z - ll * ll + 2 * rescaled_z - 1 == 0 or big_sqrt_min == 0 \
@@ -323,16 +319,3 @@ class Setpoint(object):
 
         return [haa, hfe, kfe]
 
-if __name__ == '__main__':
-    angles = {'left_hip_aa': Setpoint(0, 0, 0),
-              'left_hip_fe': Setpoint(0, -0.0873, 0),
-              'left_knee': Setpoint(0, 0, 0),
-               'right_hip_aa': Setpoint(0, 0, 0),
-               'right_hip_fe': Setpoint(0, -0.0873, 0),
-               'right_knee': Setpoint(0, 0, 0)}
-    print(Setpoint.get_foot_pos_from_angles(angles))
-    print(Setpoint.get_angles_from_pos(Setpoint.get_foot_pos_from_angles(angles)[0], 'left'))
-
-    robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
-    bb_l = robot.link_map['hip_aa_frame_left_front'].collisions[0].geometry.size[0]
-    print(bb_l)
