@@ -7,7 +7,6 @@ from march_shared_classes.gait.setpoint import Setpoint
 
 class SetpointTest(unittest.TestCase):
     def setUp(self):
-        velocity = random.uniform(-1000, 1000)
         self.setpoint = Setpoint(1.123412541, 0.0343412512, 123.162084)  # 0.0343412512 123.162084
         self.setpoint_dict = {'left_hip_aa': self.setpoint,
                                'left_hip_fe': self.setpoint,
@@ -76,20 +75,17 @@ class SetpointTest(unittest.TestCase):
                                'right_hip_fe': Setpoint(time, new_angles[4], new_vel),
                                'right_knee':   Setpoint(time, new_angles[5], new_vel)}
         resulting_pos = Setpoint.get_foot_pos_from_angles(resulting_angles)
-        for i in range(0,len(resulting_pos)):
+        for i in range(0, len(resulting_pos)):
             for j in range(0, len(resulting_pos[i])):
-                resulting_pos[i][j] = round(resulting_pos[i][j],2)
+                resulting_pos[i][j] = round(resulting_pos[i][j], 2)
         self.assertEqual(resulting_pos, desired_pos)
 
     def test_inverse_kinematics_velocity(self):
-        for i in self.setpoint_dict: self.setpoint_dict[i].velocity = self.setpoint_dict[i].velocity / 500.0
+        for i in self.setpoint_dict:
+            self.setpoint_dict[i].velocity = self.setpoint_dict[i].velocity / 500.0
         foot_vel = Setpoint.get_foot_pos_from_angles(self.setpoint_dict, velocity=True)
         angles = Setpoint.get_angles_from_pos(foot_vel[0], 'left') \
                  + Setpoint.get_angles_from_pos(foot_vel[1], 'right')
-        for i in range(0,len(angles)): angles[i] = angles[i] * 500
+        for i in range(0, len(angles)):
+            angles[i] = angles[i] * 500
         self.assertEqual([round(angle, 4) for angle in angles], [self.setpoint.velocity]*6)
-
-
-
-
-
