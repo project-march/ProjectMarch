@@ -131,29 +131,23 @@ class Setpoint(object):
     def get_foot_pos_from_angles(setpoint_dic, velocity=False):
         """ calculate the position of the foot (ankle, ADFP is not taken into account) from joint angles. The origin of
         the local coordinate system is in the rotation point of the haa joint of the corresponding foot"""
-
+        l_haa = setpoint_dic['left_hip_aa'].position
+        l_hfe = setpoint_dic['left_hip_fe'].position
+        l_kfe = setpoint_dic['left_knee'].position
+        r_haa = setpoint_dic['right_hip_aa'].position
+        r_hfe = setpoint_dic['right_hip_fe'].position
+        r_kfe = setpoint_dic['right_knee'].position
         if velocity:
-            l_haa = setpoint_dic['left_hip_aa'].velocity
-            l_hfe = setpoint_dic['left_hip_fe'].velocity
-            l_kfe = setpoint_dic['left_knee'].velocity
-            r_haa = setpoint_dic['right_hip_aa'].velocity
-            r_hfe = setpoint_dic['right_hip_fe'].velocity
-            r_kfe = setpoint_dic['right_knee'].velocity
-        else:
-            l_haa = setpoint_dic['left_hip_aa'].position
-            l_hfe = setpoint_dic['left_hip_fe'].position
-            l_kfe = setpoint_dic['left_knee'].position
-            r_haa = setpoint_dic['right_hip_aa'].position
-            r_hfe = setpoint_dic['right_hip_fe'].position
-            r_kfe = setpoint_dic['right_knee'].position
-            if l_haa > pi or l_haa < - pi or r_haa > pi or r_haa < - pi or l_hfe > pi or l_hfe < - pi or l_kfe > pi \
-                    or l_kfe < 0 or r_kfe > pi or r_kfe < 0:
-                raise SubgaitInterpolationError("Angles do not adhere to the hard limits: l_haa = {0}, l_hfe = {1}, "
-                                                "l_kfe = {2}, r_haa = {3}, r_hfe = {4}, r_kfe = {5}".
-                                                format(l_haa, l_hfe, l_kfe, r_haa, r_hfe, r_kfe))
+            # To calculate the velocity of the foot, find the foot location as it would be one ethercat cycle later.
+            velocity_scale = 250  # The velocities need to be scaled as the position one second later could be invalid.
+            l_haa_next = l_haa + setpoint_dic['left_hip_aa'].velocity / velocity_scale
+            l_hfe_next = l_hfe + setpoint_dic['left_hip_fe'].velocity / velocity_scale
+            l_kfe_next = l_kfe + setpoint_dic['left_knee'].velocity / velocity_scale
+            r_haa_next = r_haa + setpoint_dic['right_hip_aa'].velocity / velocity_scale
+            r_hfe_next = r_hfe + setpoint_dic['right_hip_fe'].velocity / velocity_scale
+            r_kfe_next = r_kfe + setpoint_dic['right_knee'].velocity / velocity_scale
 
         robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
-
         ul_l = robot.link_map['upper_leg_left'].collisions[0].geometry.size[2]
         ll_l = robot.link_map['lower_leg_left'].collisions[0].geometry.size[2]
         bb_l = robot.link_map['hip_aa_frame_left_front'].collisions[0].geometry.size[0]
@@ -176,10 +170,36 @@ class Setpoint(object):
         right_z = - sin(r_haa) * ph_r + cos(r_haa) * haa_to_foot_length_right
         right_x = bb_r + sin(r_hfe) * ul_r + sin(r_hfe - r_kfe) * ll_r
 
-        left_foot_pos = [left_x, left_y, left_z]
-        right_foot_pos = [right_x, right_y, right_z]
+        if velocity:
+            # To calculate the velocity of the foot, find the foot location as it would be one ethercat cycle later.
+            haa_to_foot_length_left_next = ul_l * cos(l_hfe_next) + ll_l * cos(l_hfe_next - l_kfe_next)
+            left_y_next = - cos(l_haa_next) * ph_l - sin(l_haa_next) * haa_to_foot_length_left_next - base / 2.0
+            left_z_next = - sin(l_haa_next) * ph_l + cos(l_haa_next) * haa_to_foot_length_left_next
+            left_x_next = bb_l + sin(l_hfe_next) * ul_l + sin(l_hfe_next - l_kfe_next) * ll_l
 
-        return [left_foot_pos, right_foot_pos]
+            haa_to_foot_length_right_next = ul_r * cos(r_hfe_next) + ll_r * cos(r_hfe_next - r_kfe_next)
+            right_y_next = cos(r_haa_next) * ph_r + sin(r_haa_next) * haa_to_foot_length_right_next + base / 2.0
+            right_z_next = - sin(r_haa_next) * ph_r + cos(r_haa_next) * haa_to_foot_length_right_next
+            right_x_next = bb_r + sin(r_hfe_next) * ul_r + sin(r_hfe_next - r_kfe_next) * ll_r
+
+            # Rescale the velocities back to radians per second.
+            left_y_v = (left_y_next - left_y) * velocity_scale
+            left_z_v = (left_z_next - left_z) * velocity_scale
+            left_x_v = (left_x_next - left_x) * velocity_scale
+
+            right_y_v = (right_y_next - right_y) * velocity_scale
+            right_z_v = (right_z_next - right_z) * velocity_scale
+            right_x_v = (right_x_next - right_x) * velocity_scale
+
+            left_foot_v = [left_x_v, left_y_v, left_z_v]
+            right_foot_v = [right_x_v, right_y_v, right_z_v]
+
+            return [left_foot_v, right_foot_v]
+        else:
+            left_foot_pos = [left_x, left_y, left_z]
+            right_foot_pos = [right_x, right_y, right_z]
+
+            return [left_foot_pos, right_foot_pos]
 
     @staticmethod
     def get_angles_from_pos(position, foot):
@@ -209,7 +229,7 @@ class Setpoint(object):
 
         # first calculate the haa angle. This calculation assumes that pos_z > 0
         if pos_z <= 0:
-            raise SubgaitInterpolationError("desired z_pos is less then zero, current inverse kinematic calculation is"
+            raise SubgaitInterpolationError("desired z_pos is not positive, current inverse kinematic calculation is"
                                             " not capable of this")
         if pos_y != 0:
             slope_y_to_or = pos_z / pos_y
@@ -271,7 +291,7 @@ class Setpoint(object):
                                                 - rescaled_z * big_sqrt_min - rescaled_z * rescaled_z * rescaled_z
                                                 * big_sqrt_min
                                                 - rescaled_x * rescaled_x * rescaled_x * big_sqrt_plus)
-        except:
+        except (ValueError):
             raise SubgaitInterpolationError("The calculation method cannot find the angles corresponding to the desired"
                                             " foot position, ({0}, {1}, {2}).".
                                             format(pos_x, pos_y, pos_z))
