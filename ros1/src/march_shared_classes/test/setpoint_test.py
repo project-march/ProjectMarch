@@ -1,9 +1,9 @@
 import unittest
-from math import *
-import random
+import numpy as np
 
 from march_shared_classes.gait.setpoint import Setpoint
 
+VELOCITY_SCALE = 250
 
 class SetpointTest(unittest.TestCase):
     def setUp(self):
@@ -62,7 +62,7 @@ class SetpointTest(unittest.TestCase):
                  + Setpoint.get_angles_from_pos(foot_pos[1], 'right')
         self.assertEqual([round(angle, 4) for angle in angles], [self.setpoint.position]*6)
 
-    def test_inverse_kinematics_reversed(self):
+    def test_inverse_kinematics_reversed_position(self):
         desired_pos = [[0.0, -0.08, 0.6], [0.0, 0.08, 0.6]]
         new_angles = Setpoint.get_angles_from_pos(desired_pos[0], 'left')\
                  + Setpoint.get_angles_from_pos(desired_pos[1], 'right')
@@ -81,11 +81,17 @@ class SetpointTest(unittest.TestCase):
         self.assertEqual(resulting_pos, desired_pos)
 
     def test_inverse_kinematics_velocity(self):
-        for i in self.setpoint_dict:
-            self.setpoint_dict[i].velocity = self.setpoint_dict[i].velocity / 500.0
-        foot_vel = Setpoint.get_foot_pos_from_angles(self.setpoint_dict, velocity=True)
-        angles = Setpoint.get_angles_from_pos(foot_vel[0], 'left') \
-                 + Setpoint.get_angles_from_pos(foot_vel[1], 'right')
-        for i in range(0, len(angles)):
-            angles[i] = angles[i] * 500
-        self.assertEqual([round(angle, 4) for angle in angles], [self.setpoint.velocity]*6)
+        foot_vel = np.array(Setpoint.get_foot_pos_from_angles(self.setpoint_dict, velocity=True))
+        foot_pos = np.array(Setpoint.get_foot_pos_from_angles(self.setpoint_dict, velocity=False))
+
+        new_angles_pos = [Setpoint.get_angles_from_pos(foot_pos[0], 'left'),
+                          Setpoint.get_angles_from_pos(foot_pos[1], 'right')]
+
+        new_angles_vel = (- np.array(new_angles_pos) +
+                  np.array([Setpoint.get_angles_from_pos(foot_pos[0] + foot_vel[0] / VELOCITY_SCALE, 'left'),
+                   Setpoint.get_angles_from_pos(foot_pos[1] + foot_vel[1] / VELOCITY_SCALE, 'right')])) * VELOCITY_SCALE
+
+        for i in range(0, 2):
+            for j in range(0, 3):
+                new_angles_vel[i, j] = round(new_angles_vel[i, j], 4)
+        self.assertEqual(new_angles_vel.tolist(), [[self.setpoint.velocity]*3, [self.setpoint.velocity]*3])
