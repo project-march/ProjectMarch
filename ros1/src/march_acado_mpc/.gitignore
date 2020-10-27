@@ -1,2 +1,6 @@
 # ignore all todo files
 *.todo
+
+# ignore the ACADO codegen scripts as these are only neccesary for generating the mpc scripts and won't be used when the building the workspace
+# It also requires the ACADO Toolkit and QPoasis which other users propably won't have installed.
+/mpc_gen_src
