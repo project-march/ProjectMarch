@@ -5,6 +5,7 @@ import numpy as np
 import rospkg
 from urdf_parser_py import urdf
 
+VELOCITY_SCALE = 250
 
 class Setpoint(object):
     """Base class to define the setpoints of a subgait."""
@@ -61,15 +62,19 @@ class Setpoint(object):
         new_foot_pos = base_foot_pos * (1 - parameter) + other_foot_pos * parameter
         new_foot_vel = (base_foot_vel * (1 - parameter) + other_foot_vel * parameter)
 
-        # linearly interpolate the ankle angle
-        new_angles = [Setpoint.get_angles_from_pos(new_foot_pos[0], 'left'),
+        new_angles_pos = [Setpoint.get_angles_from_pos(new_foot_pos[0], 'left'),
                       Setpoint.get_angles_from_pos(new_foot_pos[1], 'right')]
+        # Calculate new velocity by finding the foot position one 250th (one ehtercat cycle) of a second later.
+        new_angles_vel = (- np.array(new_angles_pos) +
+                    np.array([Setpoint.get_angles_from_pos(new_foot_pos[0] + new_foot_vel[0] / VELOCITY_SCALE, 'left'),
+                        Setpoint.get_angles_from_pos(new_foot_pos[1] + new_foot_vel[1] / VELOCITY_SCALE, 'right')]))\
+                  * VELOCITY_SCALE
+
+        # linearly interpolate the ankle angle
         new_ankle_pos = [base_setpoints['left_ankle'].position * (1 - parameter)
                          + other_setpoints['left_ankle'].position * parameter,
                          base_setpoints['right_ankle'].position * (1 - parameter)
                          + other_setpoints['right_ankle'].position * parameter]
-        new_vel = [Setpoint.get_angles_from_pos(new_foot_vel[0], 'left'),
-                   Setpoint.get_angles_from_pos(new_foot_vel[1], 'right')]
         new_ankle_vel = [base_setpoints['left_ankle'].velocity * (1 - parameter)
                          + other_setpoints['left_ankle'].velocity * parameter,
                          base_setpoints['right_ankle'].velocity * (1 - parameter)
@@ -83,12 +88,12 @@ class Setpoint(object):
             other_setpoints_time += setpoint.time
         time = (base_setpoints_time * (1 - parameter) + other_setpoints_time * parameter) / len(base_setpoints)
 
-        resulting_setpoints = {'left_hip_aa': cls(time, new_angles[0][0], new_vel[0][0]),
-                               'left_hip_fe': cls(time, new_angles[0][1], new_vel[0][1]),
-                               'left_knee': cls(time, new_angles[0][2], new_vel[0][2]),
-                               'right_hip_aa': cls(time, new_angles[1][0], new_vel[1][0]),
-                               'right_hip_fe': cls(time, new_angles[1][1], new_vel[1][1]),
-                               'right_knee': cls(time, new_angles[1][2], new_vel[1][2]),
+        resulting_setpoints = {'left_hip_aa': cls(time, new_angles_pos[0][0], new_angles_vel[0][0]),
+                               'left_hip_fe': cls(time, new_angles_pos[0][1], new_angles_vel[0][1]),
+                               'left_knee': cls(time, new_angles_pos[0][2], new_angles_vel[0][2]),
+                               'right_hip_aa': cls(time, new_angles_pos[1][0], new_angles_vel[1][0]),
+                               'right_hip_fe': cls(time, new_angles_pos[1][1], new_angles_vel[1][1]),
+                               'right_knee': cls(time, new_angles_pos[1][2], new_angles_vel[1][2]),
                                'left_ankle': cls(time, new_ankle_pos[0], new_ankle_vel[0]),
                                'right_ankle': cls(time, new_ankle_pos[1], new_ankle_vel[1])}
 
@@ -139,13 +144,13 @@ class Setpoint(object):
         r_kfe = setpoint_dic['right_knee'].position
         if velocity:
             # To calculate the velocity of the foot, find the foot location as it would be one ethercat cycle later.
-            velocity_scale = 250  # The velocities need to be scaled as the position one second later could be invalid.
-            l_haa_next = l_haa + setpoint_dic['left_hip_aa'].velocity / velocity_scale
-            l_hfe_next = l_hfe + setpoint_dic['left_hip_fe'].velocity / velocity_scale
-            l_kfe_next = l_kfe + setpoint_dic['left_knee'].velocity / velocity_scale
-            r_haa_next = r_haa + setpoint_dic['right_hip_aa'].velocity / velocity_scale
-            r_hfe_next = r_hfe + setpoint_dic['right_hip_fe'].velocity / velocity_scale
-            r_kfe_next = r_kfe + setpoint_dic['right_knee'].velocity / velocity_scale
+            # The velocities need to be scaled as the position one second later could be invalid.
+            l_haa_next = l_haa + setpoint_dic['left_hip_aa'].velocity / VELOCITY_SCALE
+            l_hfe_next = l_hfe + setpoint_dic['left_hip_fe'].velocity / VELOCITY_SCALE
+            l_kfe_next = l_kfe + setpoint_dic['left_knee'].velocity / VELOCITY_SCALE
+            r_haa_next = r_haa + setpoint_dic['right_hip_aa'].velocity / VELOCITY_SCALE
+            r_hfe_next = r_hfe + setpoint_dic['right_hip_fe'].velocity / VELOCITY_SCALE
+            r_kfe_next = r_kfe + setpoint_dic['right_knee'].velocity / VELOCITY_SCALE
 
         robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
         ul_l = robot.link_map['upper_leg_left'].collisions[0].geometry.size[2]
@@ -183,13 +188,13 @@ class Setpoint(object):
             right_x_next = bb_r + sin(r_hfe_next) * ul_r + sin(r_hfe_next - r_kfe_next) * ll_r
 
             # Rescale the velocities back to radians per second.
-            left_y_v = (left_y_next - left_y) * velocity_scale
-            left_z_v = (left_z_next - left_z) * velocity_scale
-            left_x_v = (left_x_next - left_x) * velocity_scale
+            left_y_v = (left_y_next - left_y) * VELOCITY_SCALE
+            left_z_v = (left_z_next - left_z) * VELOCITY_SCALE
+            left_x_v = (left_x_next - left_x) * VELOCITY_SCALE
 
-            right_y_v = (right_y_next - right_y) * velocity_scale
-            right_z_v = (right_z_next - right_z) * velocity_scale
-            right_x_v = (right_x_next - right_x) * velocity_scale
+            right_y_v = (right_y_next - right_y) * VELOCITY_SCALE
+            right_z_v = (right_z_next - right_z) * VELOCITY_SCALE
+            right_x_v = (right_x_next - right_x) * VELOCITY_SCALE
 
             left_foot_v = [left_x_v, left_y_v, left_z_v]
             right_foot_v = [right_x_v, right_y_v, right_z_v]
