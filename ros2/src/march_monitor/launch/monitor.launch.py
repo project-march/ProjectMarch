@@ -1,14 +1,16 @@
-import os
 import launch
+from ament_index_python.packages import get_package_share_directory
+from launch.actions import DeclareLaunchArgument
 from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
-from launch.actions import IncludeLaunchDescription
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from ament_index_python.packages import get_package_share_directory
 
 
 def generate_launch_description():
     return launch.LaunchDescription([
+        DeclareLaunchArgument(
+            'use_sim_time',
+            default_value='True',
+            description='Whether to use simulation time'),
         Node(
             package='rqt_gui',
             executable='rqt_gui',

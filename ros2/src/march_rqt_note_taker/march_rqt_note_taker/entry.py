@@ -22,17 +22,18 @@ class Entry(QObject):
         self.is_error = is_error
 
     @classmethod
-    def from_ros_msg(cls, log_msg: Log):
+    def from_ros_msg(cls, log_msg: Log, use_current_time: bool):
         """Returns an Entry from a given ROS log message.
 
         :param log_msg: The message to convert
+        :param use_current_time: Whether the current time should be used,
+                                instead of the timestamp of the log
         """
-        # fromSecsSinceEpoch did not give the right time
-        # if log_msg.stamp is None:
-        #     date_time = QDateTime.currentDateTime()
-        # else:
-        #     date_time = QDateTime.fromSecsSinceEpoch(log_msg.stamp.sec)
-        return cls(log_msg.msg, QDateTime.currentDateTime(), log_msg.level >=
+        if use_current_time or log_msg.stamp is None:
+            date_time = QDateTime.currentDateTime()
+        else:
+            date_time = QDateTime.fromSecsSinceEpoch(log_msg.stamp.sec)
+        return cls(log_msg.msg, date_time, log_msg.level >=
                    int.from_bytes(Log.ERROR, sys.byteorder))
 
     def time_string(self) -> str:

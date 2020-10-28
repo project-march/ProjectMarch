@@ -76,12 +76,14 @@ class EntryModel(QAbstractTableModel):
         self._entries.append(entry)
         self.endInsertRows()
 
-    def insert_log_msg(self, log_msg: Log):
+    def insert_log_msg(self, log_msg: Log, use_current_time: bool):
         """Converts a ROS log msg to entry and appends it to the rows.
 
         :param log_msg: Log msg to
+        :param use_current_time: Whether the current time should be used,
+                                 instead of the timestamp of the log
         """
-        self.insert_row(Entry.from_ros_msg(log_msg))
+        self.insert_row(Entry.from_ros_msg(log_msg, use_current_time))
 
     def __str__(self):
         """Returns a string representation of the model."""

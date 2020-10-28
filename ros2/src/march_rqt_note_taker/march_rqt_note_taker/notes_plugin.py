@@ -55,6 +55,9 @@ class NotesPlugin(Plugin):
         self._widget = NotesWidget(self._model, ui_file, self._node)
         context.add_widget(self._widget)
 
+        self._use_current_time = self._node.get_parameter('use_sim_time').get_parameter_value().bool_value
+        self._node.get_logger().info(str(self._use_current_time))
+
         # Log a message when it is an error, or when the content is 'March is fully operational'
         self._filter_map = FilterMap()
         self._filter_map.add_filter_on_minimal_level(Log.ERROR)
@@ -86,10 +89,14 @@ class NotesPlugin(Plugin):
         """
         mapped_msg = self._filter_map(log_msg)
         if mapped_msg:
-            self._model.insert_log_msg(mapped_msg)
+            self._model.insert_log_msg(mapped_msg, self._use_current_time)
 
     def _current_state_cb(self, current_state):
-        """Inserts an entry, which logs the current gait version used.
+        """Callback for when the current state changes.
+
+        After the current state is changed this callback does either
+        1) Log that march is in idle state, or
+        2) Log the gait that is selected, by getting the version_map and creating a new entry.
 
         :param current_state: Current state being executed
         """
@@ -105,18 +112,23 @@ class NotesPlugin(Plugin):
             except InvalidServiceNameException as error:
                 self._node.get_logger().warn(
                     f'Failed to contact gait selection node for gait versions: {error}')
+
+    def _get_version_map_callback(self, future_done: Future, current_state):
+        """Callback for when the version map is retrieved.
+
+        Parses the result of the future and inserts a new entry.
+
+        :param future_done Future that holds the result
+        """
+        result = future_done.result()
+
+        if result.success:
+            try:
+                gait_version_map = ast.literal_eval(result.message)
+                message = f'Starting gait {current_state.state}: {gait_version_map[current_state.state]}'
+                self._model.insert_row(Entry(message))
             except KeyError:
                 pass
             except ValueError as error:
                 self._node.get_logger().error(
                     f'Failed to parse gait version map: {error}')
-
-    def _get_version_map_callback(self, future_done: Future, current_state):
-        self._node.get_logger().info('done with future')
-        result = future_done.result()
-
-        if result.success:
-            gait_version_map = ast.literal_eval(result.message)
-            message = 'Starting gait {0}: {1}'.format(current_state.state,
-                                                      str(gait_version_map[current_state.state]))
-            self._model.insert_row(Entry(message))
