@@ -45,8 +45,8 @@ gaits:
     right_open: MVI_rightopen_haa_v2
     left_swing: MVI_leftswing_haa_v2
     right_swing: MVI_rightswing_haa_v2
-    left_close: MVI_leftclose_haa_v2
-    right_close: MVI_rightclose_haa_v2
+    left_close: MVI_haa
+    right_close: MVI_haa
   walk_small:
     right_open: MV_walksmall_rightopen_v1
     left_swing: MV_walksmall_leftswing_v1
