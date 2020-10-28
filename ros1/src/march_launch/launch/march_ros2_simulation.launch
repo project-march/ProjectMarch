@@ -59,10 +59,10 @@
 
         <node name="sound_play" pkg="sound_play" type="soundplay_node.py" if="$(arg sounds)" output="screen"/>
 
-        <include file="$(find march_gait_selection)/launch/march_gait_selection.launch">
-            <arg name="gait_directory" value="$(arg gait_directory)"/>
-            <arg name="sounds" value="$(arg sounds)"/>
-        </include>
+<!--         <include file="$(find march_gait_selection)/launch/march_gait_selection.launch"> -->
+<!--             <arg name="gait_directory" value="$(arg gait_directory)"/> -->
+<!--             <arg name="sounds" value="$(arg sounds)"/> -->
+<!--         </include> -->
 
         <include file="$(find march_gain_scheduling)/launch/march_gain_scheduling.launch" if="$(arg gain_scheduling)">
             <arg name="configuration" value="$(arg gain_tuning)"/>

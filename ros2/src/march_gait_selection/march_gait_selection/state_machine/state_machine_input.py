@@ -1,8 +1,5 @@
 from enum import Enum
-
-import rospy
-
-from march_shared_resources.msg import GaitInstruction, GaitInstructionResponse
+from march_shared_msgs.msg import GaitInstruction, GaitInstructionResponse
 
 
 class TransitionRequest(Enum):
@@ -13,19 +10,22 @@ class TransitionRequest(Enum):
 
 class StateMachineInput(object):
 
-    def __init__(self):
+    def __init__(self, node):
         self._stopped = False
         self._paused = False
         self._unknown = False
         self._transition_index = 0
         self._gait = None
+        self._node = node
 
-        self._instruction_subscriber = rospy.Subscriber('/march/input_device/instruction',
-                                                        GaitInstruction,
-                                                        self._callback_input_device_instruction)
-        self._instruction_response_publisher = rospy.Publisher('/march/input_device/instruction_response',
-                                                               GaitInstructionResponse,
-                                                               queue_size=20)
+        self._instruction_subscriber = node.create_subscription(msg_type=GaitInstruction,
+                                                                topic='/march/input_device/instruction',
+                                                                callback=self._callback_input_device_instruction,
+                                                                qos_profile=10)
+        self._instruction_response_publisher = node.create_publisher(msg_type=GaitInstructionResponse,
+                                                                     topic='/march/input_device/instruction_response',
+                                                                     qos_profile=20)
+
 
     def get_transition_request(self):
         """Used to return the transition request as an enum.
@@ -97,6 +97,7 @@ class StateMachineInput(object):
         self.reset()
 
     def _callback_input_device_instruction(self, msg):
+        self._node.get_logger().debug(f'Callback input device instruction {msg}')
         if msg.type == GaitInstruction.STOP:
             self._stopped = True
         elif msg.type == GaitInstruction.GAIT:

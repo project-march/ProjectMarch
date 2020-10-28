@@ -1,0 +1,4 @@
+trajectory_msgs/JointTrajectory trajectory
+control_msgs/JointTolerance[] path_tolerance
+control_msgs/JointTolerance[] goal_tolerance
+builtin_interfaces/Duration goal_time_tolerance

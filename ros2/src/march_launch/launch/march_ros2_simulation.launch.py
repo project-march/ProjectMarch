@@ -8,28 +8,80 @@ from launch.substitutions import EnvironmentVariable, LaunchConfiguration
 
 
 def generate_launch_description():
+    # General arguments
+    node_prefix = LaunchConfiguration('node_prefix')
+    use_sim_time = LaunchConfiguration('use_sim_time')
+    # Input device arguments
+    rqt_input = LaunchConfiguration('rqt_input')
+    ping_safety_node = LaunchConfiguration('ping_safety_node')
+    # Robot state publisher arguments
+    robot_state_publisher = LaunchConfiguration('robot_state_publisher')
+    xacro_path = LaunchConfiguration('xacro_path')
+    # Gait selection arguments
+    gait_selection = LaunchConfiguration('gait_selection')
+    gait_package = LaunchConfiguration('gait_package')
+    gait_directory = LaunchConfiguration('gait_directory')
+
     return launch.LaunchDescription([
+        # GENERAL ARGUMENTS
         DeclareLaunchArgument(
             'node_prefix',
             default_value=[EnvironmentVariable('USER'), '_'],
             description='Prefix for node names'),
         DeclareLaunchArgument(
-            'ping_safety_node',
-            default_value='True',
-            description='Whether to ping the safety node'),
-        DeclareLaunchArgument(
             'use_sim_time',
             default_value='True',
             description='Whether to use simulation time'),
-        launch.actions.DeclareLaunchArgument(
+        # RQT INPUT DEVICE ARGUMENTS
+        DeclareLaunchArgument(
             name='rqt_input',
             default_value='True',
             description='Launches the rqt input device.'),
-        # Launch rqt input device if not rqt_input:=false is given as argument
+        DeclareLaunchArgument(
+            'ping_safety_node',
+            default_value='True',
+            description='Whether to ping the safety node'),
+        # ROBOT STATE PUBLISHER ARGUMENTS
+        DeclareLaunchArgument(
+            name='robot_state_publisher',
+            default_value='True',
+            description='Launch the robot state publisher.'),
+        DeclareLaunchArgument(
+            'xacro_path',
+            default_value=os.path.join(get_package_share_directory('march_description'), 'urdf', 'march4.xacro'),
+            description='path to urdf.xacro file to publish'),
+        # GAIT SELECTION ARGUMENTS
+        DeclareLaunchArgument(
+            name='gait_selection',
+            default_value='True',
+            description='Launch the march gait selection node.'),
+        DeclareLaunchArgument(
+            'gait_package',
+            default_value='march_gait_files',
+            description='The package where the gait files are located.'),
+        DeclareLaunchArgument(
+            'gait_directory',
+            default_value='training-v',
+            description='The directory where the gait files are located, '
+                        'relative to the gait_package.'),
+        # Launch rqt input device if not rqt_input:=false
         IncludeLaunchDescription(PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('march_rqt_input_device'), 'launch', 'input_device.launch.py')),
-            launch_arguments=[('node_prefix', LaunchConfiguration('node_prefix')),
-                              ('ping_safety_node', LaunchConfiguration('ping_safety_node')),
-                              ('use_sim_time', LaunchConfiguration('use_sim_time'))],
-            condition=IfCondition(LaunchConfiguration('rqt_input')))
+            launch_arguments=[('node_prefix', node_prefix),
+                              ('ping_safety_node', ping_safety_node),
+                              ('use_sim_time', use_sim_time)],
+            condition=IfCondition(rqt_input)),
+        # Launch robot state publisher (from march_description) if not robot_state_publisher:=false
+        IncludeLaunchDescription(PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('march_description'), 'launch', 'march_description.launch.py')),
+            launch_arguments=[('xacro_path', xacro_path),
+                              ('use_sim_time', use_sim_time)],
+            condition=IfCondition(robot_state_publisher)),
+        # Launch march gait selection if not gait_selection:=false
+        IncludeLaunchDescription(PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('march_gait_selection'), 'launch', 'gait_selection.launch.py')),
+            launch_arguments=[('gait_directory', gait_directory),
+                              ('use_sim_time', use_sim_time),
+                              ('gait_package', gait_package)],
+            condition=IfCondition(gait_selection))
     ])

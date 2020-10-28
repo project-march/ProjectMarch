@@ -1,22 +1,20 @@
 #!/usr/bin/env python
 import os
 import unittest
-
-import rospkg
+from ament_index_python import get_package_share_directory
 from urdf_parser_py import urdf
-
 from march_gait_selection.dynamic_gaits.transition_subgait import TransitionSubgait
 from march_shared_classes.gait.subgait import Subgait
 
 VALID_PACKAGE = 'march_gait_selection'
-VALID_DIRECTORY = 'test/testing_gait_files'
+VALID_DIRECTORY = 'test/resources'
 
 
 class TestTransitionTrajectory(unittest.TestCase):
 
     def setUp(self):
-        self.robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
-        self.resources = os.path.join(rospkg.RosPack().get_path(VALID_PACKAGE), VALID_DIRECTORY)
+        self.robot = urdf.Robot.from_xml_file(get_package_share_directory('march_description') + '/urdf/march4.urdf')
+        self.resources = os.path.join(get_package_share_directory(VALID_PACKAGE), VALID_DIRECTORY)
 
     def test_walk_transition_small_to_medium_right_swing(self):
         #  Test if the TransitionSubgait is created without an error

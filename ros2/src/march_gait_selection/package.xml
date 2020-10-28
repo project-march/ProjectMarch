@@ -4,6 +4,7 @@
   <name>march_gait_selection</name>
   <version>0.0.0</version>
   <description>Obtains the right gait file based on the gait name.</description>
+<<<<<<< HEAD
 
   <maintainer email="software@projectmarch.nl">Project March</maintainer>
   <license>TODO</license>
@@ -27,4 +28,25 @@
 
   <test_depend>rostest</test_depend>
   <test_depend>rosunit</test_depend>
+=======
+  <maintainer email="software@projectmarch.nl">Project March</maintainer>
+  <license>TODO</license>
+
+  <depend>control_msgs</depend>
+  <depend>march_shared_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>march_shared_classes</depend>
+  <exec_depend>urdfdom_py</exec_depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <exec_depend>rclpy</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+>>>>>>> 408-migrate-march_gait_selection-to-ros-2
 </package>

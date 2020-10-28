@@ -18,7 +18,7 @@ class Subgait(object):
 
     joint_class = JointTrajectory
 
-    def __init__(self, joints: List[JointTrajectory], duration: Duration, gait_type: str = 'walk_like',
+    def __init__(self, joints: List[JointTrajectory], duration: float, gait_type: str = 'walk_like',
                  gait_name: str = 'Walk', subgait_name: str = 'right_open', version: str = 'First try',
                  description: str = 'Just a simple gait'):
 
@@ -152,7 +152,7 @@ class Subgait(object):
         timestamps = self.get_unique_timestamps()
         for timestamp in timestamps:
             joint_trajectory_point = trajectory_msg.JointTrajectoryPoint()
-            joint_trajectory_point.time_from_start = Duration(seconds=timestamp)
+            joint_trajectory_point.time_from_start = Duration(seconds=timestamp).to_msg()
 
             for joint in self.joints:
                 interpolated_setpoint = joint.get_interpolated_setpoint(timestamp)

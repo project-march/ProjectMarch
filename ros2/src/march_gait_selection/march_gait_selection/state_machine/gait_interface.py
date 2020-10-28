@@ -1,4 +1,7 @@
 class GaitInterface(object):
+    """The interface that defines the properties and functions that every gait
+    should have."""
+
     @property
     def name(self):
         """Returns the name of the gait."""
@@ -16,7 +19,8 @@ class GaitInterface(object):
 
     @property
     def duration(self):
-        """Returns the duration in seconds of the currently executing trajectory from the start of the gait."""
+        """Returns the duration in seconds of the currently executing trajectory
+         from the start of the gait."""
         return None
 
     @property
@@ -35,7 +39,8 @@ class GaitInterface(object):
         return None
 
     def start(self):
-        """Called when the gait has been selected for execution and returns an optional starting trajectory."""
+        """Called when the gait has been selected for execution and returns an
+        optional starting trajectory."""
         return None
 
     def update(self, elapsed_time):
@@ -51,7 +56,8 @@ class GaitInterface(object):
     def transition(self, transition_request):
         """Requests a special transition.
 
-        :param TransitionRequest transition_request: request on what special transition to perform
+        :param TransitionRequest transition_request: request on what special
+        transition to perform
         :returns True when the request has been accepted, False otherwise.
         """
         return False
