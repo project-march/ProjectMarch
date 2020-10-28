@@ -1,11 +1,11 @@
-from math import atan, cos, acos, sin, sqrt, pi
+from math import acos, atan, cos, pi, sin, sqrt
 
 import numpy as np
 
-from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
-
 import rospkg
 from urdf_parser_py import urdf
+
+from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
 
 VELOCITY_SCALE = 250
 
@@ -57,7 +57,6 @@ class Setpoint(object):
         :return
             A dictionary of setpoints, who's corresponding foot location is linearly interpolated from the setpoints
         """
-
         base_foot_pos = np.array(Setpoint.get_foot_pos_from_angles(base_setpoints))
         base_foot_vel = np.array(Setpoint.get_foot_pos_from_angles(base_setpoints, velocity=True))
         other_foot_pos = np.array(Setpoint.get_foot_pos_from_angles(other_setpoints))
