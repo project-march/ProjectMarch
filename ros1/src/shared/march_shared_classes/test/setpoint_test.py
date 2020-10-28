@@ -1,4 +1,5 @@
 import unittest
+
 import numpy as np
 
 from march_shared_classes.gait.setpoint import Setpoint
@@ -89,8 +90,8 @@ class SetpointTest(unittest.TestCase):
 
         new_angles_vel = (- np.array(new_angles_pos) +
                           + np.array([Setpoint.get_angles_from_pos(foot_pos[0] + foot_vel[0] / VELOCITY_SCALE, 'left'),
-                                      Setpoint.get_angles_from_pos(foot_pos[1] + foot_vel[1] / VELOCITY_SCALE, 'right')
-                                      ])) * VELOCITY_SCALE
+                                      Setpoint.get_angles_from_pos(foot_pos[1] + foot_vel[1] / VELOCITY_SCALE, 'right')]
+                                     )) * VELOCITY_SCALE
 
         for i in range(0, 2):
             for j in range(0, 3):
