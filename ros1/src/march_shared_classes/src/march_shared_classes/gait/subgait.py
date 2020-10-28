@@ -240,8 +240,7 @@ class Subgait(object):
 
     @classmethod
     def interpolate_subgaits(cls, base_subgait, other_subgait, parameter, foot_pos=False):
-        """Linearly interpolate two subgaits with the parameter to get a new subgait. Either based on foot_pos, or on
-        joint angles.
+        """Linearly interpolate two subgaits with the parameter to get a new subgait. based on foot_pos, or on angles.
 
         :param base_subgait:
             base subgait, return value if parameter is equal to zero

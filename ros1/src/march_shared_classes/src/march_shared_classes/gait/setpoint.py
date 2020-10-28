@@ -1,6 +1,7 @@
 from math import *
-from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
 import numpy as np
+
+from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
 
 import rospkg
 from urdf_parser_py import urdf
@@ -53,7 +54,8 @@ class Setpoint(object):
         :param parameter:
             parameter for the interpolation
         :return
-            A dictionary of setpoints, who's corresponding foot location is linearly interpolated from the setpoints"""
+            A dictionary of setpoints, who's corresponding foot location is linearly interpolated from the setpoints
+        """
 
         base_foot_pos = np.array(Setpoint.get_foot_pos_from_angles(base_setpoints))
         base_foot_vel = np.array(Setpoint.get_foot_pos_from_angles(base_setpoints, velocity=True))
@@ -137,7 +139,7 @@ class Setpoint(object):
 
     @staticmethod
     def get_foot_pos_from_angles(setpoint_dic, velocity=False):
-        """ calculate the position of the foot (ankle, ADFP is not taken into account) from joint angles. The origin of
+        """Calculate the position of the foot (ankle, ADFP is not taken into account) from joint angles. The origin of
         the local coordinate system is the middle of the base structure.
 
         :param setpoint_dic:
@@ -146,7 +148,8 @@ class Setpoint(object):
             Boolean which determines whether the foot position or the foot velocity needs to be calculated
 
         :return:
-            the foot location or velocity as a 2x3 list"""
+            the foot location or velocity as a 2x3 list
+        """
         l_haa = setpoint_dic['left_hip_aa'].position
         l_hfe = setpoint_dic['left_hip_fe'].position
         l_kfe = setpoint_dic['left_knee'].position
@@ -228,7 +231,8 @@ class Setpoint(object):
             String that specifies to which foot the coordinates in position belong
 
         :return:
-            Haa, kfe and hfe angles which correspond to the given position"""
+            Haa, kfe and hfe angles which correspond to the given position
+        """
 
         robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
         if foot == 'left':
@@ -254,8 +258,8 @@ class Setpoint(object):
         # first calculate the haa angle. This calculation assumes that pos_z > 0, for details see
         # https://confluence.projectmarch.nl:8443/display/62tech/Inverse+kinematics
         if pos_z <= 0:
-            raise SubgaitInterpolationError("desired z_pos is not positive, current inverse kinematic calculation is"
-                                            " not capable of this")
+            raise SubgaitInterpolationError('desired z_pos is not positive, current inverse kinematic calculation is'
+                                            ' not capable of this')
         if pos_y != 0:
             slope_y_to_or = pos_z / pos_y
             alpha = atan(slope_y_to_or)
@@ -279,7 +283,7 @@ class Setpoint(object):
         ul = 1.0
 
         if rescaled_x * rescaled_x + rescaled_z * rescaled_z > (ll + ul) * (ll + ul):
-            raise SubgaitInterpolationError("The desired foot position, ({0}, {1}, {2}), is out of reach".
+            raise SubgaitInterpolationError('The desired foot position, ({0}, {1}, {2}), is out of reach'.
                                             format(position[0], position[1], position[2]))
 
         # make the calculation more concise
@@ -307,15 +311,15 @@ class Setpoint(object):
                                                 - rescaled_z * big_sqrt_min - rescaled_z * rescaled_z * rescaled_z
                                                 * big_sqrt_min - rescaled_x * rescaled_x * rescaled_x * big_sqrt_plus)
         except ValueError:
-            raise SubgaitInterpolationError("The calculation method cannot find the angles corresponding to the desired"
-                                            " foot position, ({0}, {1}, {2}).".
+            raise SubgaitInterpolationError('The calculation method cannot find the angles corresponding to the desired'
+                                            ' foot position, ({0}, {1}, {2}).'.
                                             format(pos_x, pos_y, pos_z))
 
         # Make sure the desired position adheres to the limits of the calculation given by wolfram alpha
         if rescaled_x * rescaled_x + rescaled_z * rescaled_z - ll * ll + 2 * rescaled_z - 1 == 0 or big_sqrt_min == 0 \
                 or safety_check_large_op_one == 0 or safety_check_large_op_two == 0:
-            raise SubgaitInterpolationError("The calculation method cannot find the angles corresponding to the desired"
-                                            "foot position, ({0}, {1}, {2}).".
+            raise SubgaitInterpolationError('The calculation method cannot find the angles corresponding to the desired'
+                                            'foot position, ({0}, {1}, {2}).'.
                                             format(pos_x, pos_y, pos_z))
 
         # calculate the hfe and kfe angles, since there are two options for these angles, pick the one that with
