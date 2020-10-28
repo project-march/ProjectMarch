@@ -67,11 +67,11 @@ class Setpoint(object):
                           Setpoint.get_angles_from_pos(new_foot_pos[1], 'right')]
         # Calculate new velocity by finding the foot position one 250th (one ehtercat cycle) of a second later.
         new_angles_vel = (- np.array(new_angles_pos) +
-                           np.array([Setpoint.get_angles_from_pos(new_foot_pos[0] + new_foot_vel[0] /
-                                                                  VELOCITY_SCALE, 'left'),
+                          np.array([Setpoint.get_angles_from_pos(new_foot_pos[0] + new_foot_vel[0] /
+                                                                 VELOCITY_SCALE, 'left'),
                                     Setpoint.get_angles_from_pos(new_foot_pos[1] + new_foot_vel[1] /
                                                                  VELOCITY_SCALE, 'right')]))\
-                * VELOCITY_SCALE
+            * VELOCITY_SCALE
 
         # linearly interpolate the ankle angle, as it cannot be calculated from the inverse kinematics
         new_ankle_pos = [base_setpoints['left_ankle'].position * (1 - parameter)
