@@ -43,7 +43,7 @@ class Setpoint(object):
 
     @classmethod
     def interpolate_setpoints_position(cls, base_setpoints, other_setpoints, parameter):
-        """Linearly interpolate the ankle position.
+        """Linearly interpolate between the foot position.
 
         :param base_setpoints:
             A dictionary of setpoints, one for each joint. Return value if parameter is zero
@@ -70,7 +70,7 @@ class Setpoint(object):
                         Setpoint.get_angles_from_pos(new_foot_pos[1] + new_foot_vel[1] / VELOCITY_SCALE, 'right')]))\
                   * VELOCITY_SCALE
 
-        # linearly interpolate the ankle angle
+        # linearly interpolate the ankle angle, as it cannot be calculated from the inverse kinematics
         new_ankle_pos = [base_setpoints['left_ankle'].position * (1 - parameter)
                          + other_setpoints['left_ankle'].position * parameter,
                          base_setpoints['right_ankle'].position * (1 - parameter)
@@ -80,6 +80,7 @@ class Setpoint(object):
                          base_setpoints['right_ankle'].velocity * (1 - parameter)
                          + other_setpoints['right_ankle'].velocity * parameter]
 
+        # Set the time of the new setpoints as the weighted average of the original setpoint times
         base_setpoints_time = 0
         other_setpoints_time = 0
         for setpoint in base_setpoints.values():
@@ -135,7 +136,15 @@ class Setpoint(object):
     @staticmethod
     def get_foot_pos_from_angles(setpoint_dic, velocity=False):
         """ calculate the position of the foot (ankle, ADFP is not taken into account) from joint angles. The origin of
-        the local coordinate system is in the rotation point of the haa joint of the corresponding foot"""
+        the local coordinate system is the middle of the base structure.
+
+        :param setpoint_dic:
+            Dictionary of setpoints from which the foot positions need to be calculated
+        :param velocity:
+            Boolean which determines whether the foot position or the foot velocity needs to be calculated
+
+        :return:
+            the foot location or velocity as a 2x3 list"""
         l_haa = setpoint_dic['left_hip_aa'].position
         l_hfe = setpoint_dic['left_hip_fe'].position
         l_kfe = setpoint_dic['left_knee'].position
@@ -209,7 +218,15 @@ class Setpoint(object):
     @staticmethod
     def get_angles_from_pos(position, foot):
         """Calculates the angles of the joints corresponding to a certain position of the right and left foot
-        w.r.t. the origin in the rotation point of the haa"""
+        w.r.t. the origin in the middle of the hip structure.
+
+        :param position:
+            List that specified the x, y and z position of the foot
+        :param foot:
+            String that specifies to which foot the coordinates in position belong
+
+        :return:
+            Haa, kfe and hfe angles which correspond to the given position"""
 
         robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
         if foot == 'left':
@@ -225,14 +242,15 @@ class Setpoint(object):
         base = robot.link_map['hip_base'].collisions[0].geometry.size[1]
 
         pos_x = position[0]
-        # change y positive direction to go to the foot, easier for calculation, change origin to pivot of haa joint
+        # change y positive direction to the desired foot, easier for calculation, change origin to pivot of haa joint
         if foot == 'left':
             pos_y = - (position[1] + base / 2.0)
         else:
             pos_y = position[1] - base / 2.0
         pos_z = position[2]
 
-        # first calculate the haa angle. This calculation assumes that pos_z > 0
+        # first calculate the haa angle. This calculation assumes that pos_z > 0, for details see
+        # https://confluence.projectmarch.nl:8443/display/62tech/Inverse+kinematics
         if pos_z <= 0:
             raise SubgaitInterpolationError("desired z_pos is not positive, current inverse kinematic calculation is"
                                             " not capable of this")
@@ -250,6 +268,7 @@ class Setpoint(object):
 
         # once the haa angle is known, use https://www.wolframalpha.com/input/?i=solve+%5Bsin%28x%29+%2B+sin%28x+-+y%29
         # *c%2C+cos%28x%29+%2B+cos%28x+-+y%29*c%5D+%3D+%5Ba%2C+b%5D to calculate the angles of the hfe and kfe
+
         # rescale for easier solving, and check if position is valid
         rescaled_x = round(pos_x - bb, 10)
         rescaled_z = round(sqrt(- ph * ph + pos_y * pos_y + pos_z * pos_z), 10)
@@ -296,18 +315,20 @@ class Setpoint(object):
                                                 - rescaled_z * big_sqrt_min - rescaled_z * rescaled_z * rescaled_z
                                                 * big_sqrt_min
                                                 - rescaled_x * rescaled_x * rescaled_x * big_sqrt_plus)
-        except (ValueError):
+        except ValueError:
             raise SubgaitInterpolationError("The calculation method cannot find the angles corresponding to the desired"
                                             " foot position, ({0}, {1}, {2}).".
                                             format(pos_x, pos_y, pos_z))
 
+        # Make sure the desired position adheres to the limits of the calculation given by wolfram alpha
         if rescaled_x * rescaled_x + rescaled_z * rescaled_z - ll * ll + 2 * rescaled_z - 1 == 0 or big_sqrt_min == 0 \
                 or safety_check_large_op_one == 0 or safety_check_large_op_two == 0:
             raise SubgaitInterpolationError("The calculation method cannot find the angles corresponding to the desired"
                                             "foot position, ({0}, {1}, {2}).".
                                             format(pos_x, pos_y, pos_z))
 
-        # calculate suitable hfe and kfe angles
+        # calculate the hfe and kfe angles, since there are two options for these angles, pick the one that with
+        # positive knee flexion.
         if denom_hip == 0:
             if numer_op_one == 0:
                 if rescaled_x < 0:
