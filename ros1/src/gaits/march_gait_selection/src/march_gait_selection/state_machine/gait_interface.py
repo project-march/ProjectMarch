@@ -34,11 +34,16 @@ class GaitInterface(object):
         """Returns the position of all the joints after the gait has ended."""
         return None
 
+    @property
+    def can_freeze(self):
+        """Returns whether the gait has the ability to freeze."""
+        return False
+
     def start(self):
         """Called when the gait has been selected for execution and returns an optional starting trajectory."""
         return None
 
-    def update(self, elapsed_time):
+    def update(self, elapsed_time, logger):
         """Called in a loop with the elapsed time since the last update.
 
         :param float elapsed_time: Elapsed time in seconds since the last update
@@ -61,6 +66,9 @@ class GaitInterface(object):
 
         :returns True when the stop action has been accepted, False otherwise.
         """
+        return False
+
+    def freeze(self):
         return False
 
     def end(self):

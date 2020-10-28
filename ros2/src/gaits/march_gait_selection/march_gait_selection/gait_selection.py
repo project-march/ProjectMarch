@@ -1,5 +1,6 @@
 import os
 import rclpy
+from march_gait_selection.state_machine.semi_dynamic_setpoints_gait import SemiDynamicSetpointsGait
 from march_shared_msgs.srv import SetGaitVersion, ContainsGait
 from rcl_interfaces.srv import GetParameters
 from rclpy.exceptions import ParameterNotDeclaredException
@@ -230,6 +231,10 @@ class GaitSelection(Node):
         for gait in self._gait_version_map:
             gaits[gait] = SetpointsGait.from_file(
                 gait, self._gait_directory, self._robot, self._gait_version_map)
+
+        gaits['dynamic_stairs_up'] = SemiDynamicSetpointsGait.from_file(
+            'stairs_up', self._gait_directory, self._robot,
+            self._gait_version_map)
 
         return gaits
 

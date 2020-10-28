@@ -89,6 +89,10 @@ class InputDeviceView(QWidget):
             self.create_button('balanced_walk',
                                callback=lambda: self._controller.publish_gait('balanced_walk'))
 
+        gait_dynamic_stairs_up = \
+            self.create_button('dynamic_stairs_up',
+                               callback=lambda: self._controller.publish_gait('dynamic_stairs_up'))
+
         gait_single_step_small = \
             self.create_button('single_step_small', image_path='/gait_single_step_small.png',
                                callback=lambda: self._controller.publish_gait('single_step_small'))
@@ -274,7 +278,7 @@ class InputDeviceView(QWidget):
         # The button layout.
         # Position in the array determines position on screen.
         march_button_layout = [
-            [home_sit, home_stand, gait_walk, gait_walk_small, gait_walk_large, gait_balanced_walk, gait_slalom_walk],
+            [home_sit, home_stand, gait_walk, gait_walk_small, gait_walk_large, gait_balanced_walk, gait_dynamic_stairs_up, gait_slalom_walk],
 
             [gait_sit, gait_stand, rocker_switch_increment, rocker_switch_decrement, stop_button, error_button,
              sm_to_unknown_button],

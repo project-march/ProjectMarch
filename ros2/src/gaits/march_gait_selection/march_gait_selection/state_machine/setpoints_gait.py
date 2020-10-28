@@ -1,5 +1,4 @@
 from copy import deepcopy
-
 from march_gait_selection.dynamic_gaits.transition_subgait import TransitionSubgait
 from march_gait_selection.state_machine.home_gait import HomeGait
 from march_shared_classes.exceptions.gait_exceptions import GaitError
@@ -74,7 +73,7 @@ class SetpointsGait(GaitInterface, Gait):
         self._time_since_start = 0.0
         return self._current_subgait.to_joint_trajectory_msg()
 
-    def update(self, elapsed_time):
+    def update(self, elapsed_time, logger):
         """
         Update the progress of the gait, should be called regularly.
         If the current subgait is still running, this does nothing.
@@ -84,11 +83,6 @@ class SetpointsGait(GaitInterface, Gait):
         :return: trjectory, is_finished
         """
         self._time_since_start += elapsed_time
-        if self._should_freeze:
-            trajectory = self._execute_freeze()
-            self._time_since_start = 0.0
-            return trajectory, False
-
         if self._time_since_start < self._current_subgait.duration:
             return None, False
 
@@ -103,12 +97,6 @@ class SetpointsGait(GaitInterface, Gait):
             self._transition_to_subgait = None
             self._is_transitioning = False
 
-        elif self._is_frozen:
-            self._current_subgait = self._subgait_after_freeze
-            trajectory = self._current_subgait.to_joint_trajectory_msg()
-            self._time_since_start = 0.0 # New subgait is started, so reset the time
-            self._is_frozen = False
-            return trajectory, False
         else:
             # If there is no transition subgait that has to be used, go to TO subgait
             next_subgait = self.graph[(self._current_subgait.subgait_name, self.graph.TO)]
@@ -120,28 +108,6 @@ class SetpointsGait(GaitInterface, Gait):
 
         self._time_since_start = 0.0  # New subgait is started, so reset the time
         return trajectory, False
-
-    def _execute_freeze(self):
-        ## Set the rest of current subgait as next subgait
-        if self._time_since_start < self._current_subgait.duration:
-            self._subgait_after_freeze = deepcopy(self._current_subgait)
-            for joint in self._subgait_after_freeze:
-                joint.from_begin_point(self._time_since_start)
-        ## Set a freeze subgait for the freeze duration
-        freeze_subgait = deepcopy(self._current_subgait)
-        freeze_subgait.duration = self._freeze_duration
-        # new_joint_trajectories = []
-        position = self._current_position(self._time_since_start)
-        for joint in freeze_subgait.joints:
-            joint.setpoints = [Setpoint(time=self._freeze_duration,
-                                        position=position[joint.name],
-                                        velocity=0)]
-        self._current_subgait = freeze_subgait
-        self._should_freeze = False
-        self._is_frozen = True
-        return freeze_subgait.to_joint_trajectory_msg()
-
-
 
     def transition(self, transition_request):
         """
@@ -217,13 +183,4 @@ class SetpointsGait(GaitInterface, Gait):
         self._current_subgait = transition_subgait
         self._time_since_start = 0.0
         self._is_transitioning = True
-        return transition_subgait.to_joint_trajectory_msg()
-
-    def freeze(self, duration: float = 10.0):
-        self._should_freeze = True
-        self._freeze_duration = duration
-        return True
-
-    def _current_position(self, elapsed_time):
-        return {joint.name: joint.get_interpolated_setpoint(elapsed_time).position for
-                joint in self._current_subgait}
+        return transition_subgait.to_joint_trajectory_msg(), False

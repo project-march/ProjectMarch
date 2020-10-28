@@ -31,6 +31,7 @@ class TrajectoryScheduler(object):
         """Schedules a new trajectory.
         :param JointTrajectory trajectory: a trajectory for all joints to follow
         """
+        self._node.get_logger().info('Scheduling trajectory')
         self._failed = False
         goal = FollowJointTrajectoryGoal(trajectory=trajectory)
         self._trajectory_goal_pub.publish(FollowJointTrajectoryActionGoal(

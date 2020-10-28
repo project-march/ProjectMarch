@@ -60,10 +60,10 @@ class GaitStateMachine(object):
             msg_type=Error, topic='/march/error', callback=self._error_cb,
             qos_profile=10)
 
-        self._left_foot_on_ground = True
+        self._right_foot_on_ground = True
         self._pressure_sub = self._gait_selection.create_subscription(
-            msg_type=Bool, topic='/march/contact/ankle_plate_left_contact',
-            callback=lambda msg: self._update_foot_on_ground_cb('left', msg),
+            msg_type=Bool, topic='/march/contact/ankle_plate_right_contact',
+            callback=lambda msg: self._update_foot_on_ground_cb(True, msg),
             qos_profile=10)
 
         self._get_possible_gaits_client = self._gait_selection.create_service(
@@ -75,16 +75,13 @@ class GaitStateMachine(object):
         self.add_gait_callback(self._current_gait_cb)
         self._gait_selection.get_logger().debug('Initialized state machine')
 
-    def _update_foot_on_ground_cb(self, right_or_left, msg):
-        # self._gait_selection.get_logger().info('Update foot on ground')
-        if right_or_left == 'left':
-            # self._gait_selection.get_logger().info('Left is on ground')
-            if not self._left_foot_on_ground and msg.data:
-                self._gait_selection.get_logger().info('Left changed to ground')
-                if self._current_gait in self._gait_selection:
-                    self._gait_selection.get_logger().info('Freezing the gait')
+    def _update_foot_on_ground_cb(self, is_right, msg):
+        if is_right:
+            if not self._right_foot_on_ground and msg.data:
+                if self._current_gait is not None and self._current_gait.can_freeze:
+                    self._gait_selection.get_logger().debug('Freezing the gait')
                     self._current_gait.freeze()
-            self._left_foot_on_ground = msg.data
+            self._right_foot_on_ground = msg.data
 
     def _possible_gaits_cb(self, request, response):
         """ Standard callback for the get possible gaits service """
@@ -253,8 +250,8 @@ class GaitStateMachine(object):
             return
 
         self._handle_input()
-
-        trajectory, should_stop = self._current_gait.update(elapsed_time)
+        logger = self._gait_selection.get_logger()
+        trajectory, should_stop = self._current_gait.update(elapsed_time, logger)
         # schedule trajectory if any
         if trajectory is not None:
             self._call_gait_callbacks()
@@ -338,9 +335,14 @@ class GaitStateMachine(object):
         for gait in self._gait_selection:
             gait_name = gait.name
             starting_position = gait.starting_position
+            if 'dynamic' in gait_name:
+                self._gait_selection.get_logger().info(f'{gait_name} from {starting_position}')
             from_idle_name = next(
                 (name for name, position in idle_positions.items()
                  if position['joints'] == starting_position), None)
+            if 'dynamic' in gait_name:
+                self._gait_selection.get_logger().info(f'{gait_name} from {from_idle_name}')
+
             if from_idle_name is None:
                 from_idle_name = 'unknown_idle_{0}'.format(len(idle_positions))
                 self._gait_selection.get_logger().warn(
