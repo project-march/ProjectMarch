@@ -74,7 +74,7 @@ class Setpoint(object):
                                                                    / VELOCITY_SCALE, 'left'),
                                       Setpoint.get_angles_from_pos(new_foot_pos[1] + new_foot_vel[1]
                                                                    / VELOCITY_SCALE, 'right')])) \
-                         * VELOCITY_SCALE
+            * VELOCITY_SCALE
 
         # linearly interpolate the ankle angle, as it cannot be calculated from the inverse kinematics
         new_ankle_pos = [base_setpoints['left_ankle'].position * (1 - parameter)
