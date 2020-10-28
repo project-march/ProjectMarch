@@ -86,7 +86,7 @@ class SetpointsGait(GaitInterface, Gait):
             next_subgait = self._stop()
 
         elif self._transition_to_subgait is not None and not self._is_transitioning:
-            return self._transition_subgait()
+            return self._transition_subgait(), False
 
         elif self._transition_to_subgait is not None and self._is_transitioning:
             next_subgait = self._transition_to_subgait.subgait_name
@@ -162,6 +162,11 @@ class SetpointsGait(GaitInterface, Gait):
         return next_subgait
 
     def _transition_subgait(self):
+        """
+        Creates the transition subgait message from the next subgait to the
+        subgait stored in _transition_to_subgait
+        :return: The trajectory message for the transition step
+        """
         old_subgait = self.subgaits[self.graph[
             (self._current_subgait.subgait_name, self.graph.TO)]]
         new_subgait = self.subgaits[self.graph[
@@ -172,5 +177,5 @@ class SetpointsGait(GaitInterface, Gait):
         self._current_subgait = transition_subgait
         self._time_since_start = 0.0
         self._is_transitioning = True
-        return transition_subgait.to_joint_trajectory_msg(), False
+        return transition_subgait.to_joint_trajectory_msg()
 

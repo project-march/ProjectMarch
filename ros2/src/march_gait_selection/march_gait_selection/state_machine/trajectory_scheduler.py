@@ -45,7 +45,6 @@ class TrajectoryScheduler(object):
 
     def _done_cb(self, result):
         if result.result.error_code != FollowJointTrajectoryResult.SUCCESSFUL:
-            self._node.get_logger().err(
-                'Failed to execute trajectory. {0} ({1})'
-                .format(result.error_string, result.error_code))
+            self._node.get_logger().error(
+                f'Failed to execute trajectory. {result.error_string} ({result.error_code})'
             self._failed = True

@@ -169,7 +169,6 @@ class GaitSelection(Node):
             return [False, 'Error occurred when writing to file path: {pn}'
                            .format(pn=self._default_yaml)]
 
-
     def add_gait(self, gait):
         """Adds a gait to the loaded gaits if it does not already exist.
 
