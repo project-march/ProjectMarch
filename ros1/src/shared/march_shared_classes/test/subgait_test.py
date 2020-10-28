@@ -168,7 +168,7 @@ class SubgaitTest(unittest.TestCase):
 
     # Subgait.interpolate_subgaits tests
     def load_interpolatable_subgaits(self, subgait_name='left_close', base_version='MV_walk_leftclose_v1',
-                                    other_version='MV_walk_leftclose_v2'):
+                                     other_version='MV_walk_leftclose_v2'):
         base_subgait_path = '{rsc}/{gait}/{subgait}/{version}.subgait'.format(rsc=self.resources_folder,
                                                                               gait=self.gait_name,
                                                                               subgait=subgait_name,
