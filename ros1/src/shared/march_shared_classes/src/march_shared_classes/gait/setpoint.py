@@ -1,4 +1,5 @@
-from math import *
+from math import atan, cos, acos, sin, sqrt, pi
+
 import numpy as np
 
 from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
@@ -68,12 +69,12 @@ class Setpoint(object):
         new_angles_pos = [Setpoint.get_angles_from_pos(new_foot_pos[0], 'left'),
                           Setpoint.get_angles_from_pos(new_foot_pos[1], 'right')]
         # Calculate new velocity by finding the foot position one 250th (one ehtercat cycle) of a second later.
-        new_angles_vel = (- np.array(new_angles_pos) +
-                          np.array([Setpoint.get_angles_from_pos(new_foot_pos[0] + new_foot_vel[0] /
-                                                                 VELOCITY_SCALE, 'left'),
-                                    Setpoint.get_angles_from_pos(new_foot_pos[1] + new_foot_vel[1] /
-                                                                 VELOCITY_SCALE, 'right')]))\
-            * VELOCITY_SCALE
+        new_angles_vel = (- np.array(new_angles_pos)
+                          + np.array([Setpoint.get_angles_from_pos(new_foot_pos[0] + new_foot_vel[0]
+                                                                   / VELOCITY_SCALE, 'left'),
+                                      Setpoint.get_angles_from_pos(new_foot_pos[1] + new_foot_vel[1]
+                                                                   / VELOCITY_SCALE, 'right')])) \
+                         * VELOCITY_SCALE
 
         # linearly interpolate the ankle angle, as it cannot be calculated from the inverse kinematics
         new_ankle_pos = [base_setpoints['left_ankle'].position * (1 - parameter)
@@ -139,8 +140,7 @@ class Setpoint(object):
 
     @staticmethod
     def get_foot_pos_from_angles(setpoint_dic, velocity=False):
-        """Calculate the position of the foot (ankle, ADFP is not taken into account) from joint angles. The origin of
-        the local coordinate system is the middle of the base structure.
+        """Calculate the position of the foot (ankle, ADFP, is not taken into account) from joint angles.
 
         :param setpoint_dic:
             Dictionary of setpoints from which the foot positions need to be calculated
@@ -148,7 +148,7 @@ class Setpoint(object):
             Boolean which determines whether the foot position or the foot velocity needs to be calculated
 
         :return:
-            the foot location or velocity as a 2x3 list
+            the foot location or velocity as a 2x3 list. Origin in the hip base, y positive to the right.
         """
         l_haa = setpoint_dic['left_hip_aa'].position
         l_hfe = setpoint_dic['left_hip_fe'].position
@@ -222,18 +222,16 @@ class Setpoint(object):
 
     @staticmethod
     def get_angles_from_pos(position, foot):
-        """Calculates the angles of the joints corresponding to a certain position of the right and left foot
-        w.r.t. the origin in the middle of the hip structure.
+        """Calculates the angles of the joints corresponding to a certain position of the right or left foot.
 
         :param position:
-            List that specified the x, y and z position of the foot
+            List that specified the x, y and z position of the foot. Origin in the hip base, y positive to the right
         :param foot:
             String that specifies to which foot the coordinates in position belong
 
         :return:
             Haa, kfe and hfe angles which correspond to the given position
         """
-
         robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
         if foot == 'left':
             ul = robot.link_map['upper_leg_left'].collisions[0].geometry.size[2]
