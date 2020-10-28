@@ -1,7 +1,6 @@
 from math import acos, atan, cos, pi, sin, sqrt
 
 import numpy as np
-
 import rospkg
 from urdf_parser_py import urdf
 
