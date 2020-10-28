@@ -22,7 +22,7 @@ class Entry(QObject):
         self.is_error = is_error
 
     @classmethod
-    def from_ros_msg(cls, log_msg: Log, use_current_time: bool):
+    def from_ros_msg(cls, log_msg: Log, use_current_time: Optional[bool] = True):
         """Returns an Entry from a given ROS log message.
 
         :param log_msg: The message to convert

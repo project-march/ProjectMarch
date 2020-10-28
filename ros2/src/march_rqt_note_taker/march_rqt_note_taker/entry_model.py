@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from python_qt_binding.QtCore import QAbstractTableModel, QModelIndex, Qt
 from python_qt_binding.QtGui import QBrush
@@ -76,7 +76,7 @@ class EntryModel(QAbstractTableModel):
         self._entries.append(entry)
         self.endInsertRows()
 
-    def insert_log_msg(self, log_msg: Log, use_current_time: bool):
+    def insert_log_msg(self, log_msg: Log, use_current_time: Optional[bool] = True):
         """Converts a ROS log msg to entry and appends it to the rows.
 
         :param log_msg: Log msg to

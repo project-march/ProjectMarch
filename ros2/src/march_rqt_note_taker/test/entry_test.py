@@ -42,14 +42,14 @@ class EntryTest(unittest.TestCase):
         entry = Entry.from_ros_msg(msg)
         self.assertTrue(entry.is_error)
 
-    # def test_create_from_log_msg_with_stamp(self):
-    #     seconds_since_epoch = 100
-    #     msg = Log()
-    #     msg.stamp = Time(sec=seconds_since_epoch, nanosec=0)
-    #     msg.level = int.from_bytes(Log.DEBUG, sys.byteorder)
-    #     entry = Entry.from_ros_msg(msg)
-    #     self.assertEqual(entry.date_time.toSecsSinceEpoch(),
-    #                      seconds_since_epoch)
+    def test_create_from_log_msg_with_stamp(self):
+        seconds_since_epoch = 100
+        msg = Log()
+        msg.stamp = Time(sec=seconds_since_epoch, nanosec=0)
+        msg.level = int.from_bytes(Log.DEBUG, sys.byteorder)
+        entry = Entry.from_ros_msg(msg, use_current_time=False)
+        self.assertEqual(entry.date_time.toSecsSinceEpoch(),
+                         seconds_since_epoch)
 
     def test_to_string(self):
         date_time = QDateTime.fromSecsSinceEpoch(2)
