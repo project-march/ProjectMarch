@@ -29,9 +29,9 @@ class GaitGeneratorView(QWidget):
 
         current_file_path = __file__.split('/')
         path = ''
-        for dir in current_file_path:
-            path += '/' + dir
-            if dir == 'march':
+        for directory in current_file_path:
+            path += '/' + directory
+            if directory == 'march':
                 break
         self.march_path = path
 
