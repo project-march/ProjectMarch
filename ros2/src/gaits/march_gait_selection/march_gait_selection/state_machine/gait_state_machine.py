@@ -1,6 +1,6 @@
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from rclpy.duration import Duration
-from std_msgs.msg import Header
+from std_msgs.msg import Header, Bool
 from .gait_state_machine_error import GaitStateMachineError
 from .home_gait import HomeGait
 from march_shared_msgs.msg import CurrentState, CurrentGait, Error
@@ -60,6 +60,12 @@ class GaitStateMachine(object):
             msg_type=Error, topic='/march/error', callback=self._error_cb,
             qos_profile=10)
 
+        self._left_foot_on_ground = True
+        self._pressure_sub = self._gait_selection.create_subscription(
+            msg_type=Bool, topic='/march/contact/ankle_plate_left_contact',
+            callback=lambda msg: self._update_foot_on_ground_cb('left', msg),
+            qos_profile=10)
+
         self._get_possible_gaits_client = self._gait_selection.create_service(
             srv_type=PossibleGaits,
             srv_name='/march/gait_selection/get_possible_gaits',
@@ -68,6 +74,17 @@ class GaitStateMachine(object):
         self.add_transition_callback(self._current_state_cb)
         self.add_gait_callback(self._current_gait_cb)
         self._gait_selection.get_logger().debug('Initialized state machine')
+
+    def _update_foot_on_ground_cb(self, right_or_left, msg):
+        # self._gait_selection.get_logger().info('Update foot on ground')
+        if right_or_left == 'left':
+            # self._gait_selection.get_logger().info('Left is on ground')
+            if not self._left_foot_on_ground and msg.data:
+                self._gait_selection.get_logger().info('Left changed to ground')
+                if self._current_gait in self._gait_selection:
+                    self._gait_selection.get_logger().info('Freezing the gait')
+                    self._current_gait.freeze()
+            self._left_foot_on_ground = msg.data
 
     def _possible_gaits_cb(self, request, response):
         """ Standard callback for the get possible gaits service """

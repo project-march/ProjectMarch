@@ -22,7 +22,6 @@ class Subgait(object):
     def __init__(self, joints: List[JointTrajectory], duration: float, gait_type: str = 'walk_like',
                  gait_name: str = 'Walk', subgait_name: str = 'right_open', version: str = 'First try',
                  description: str = 'Just a simple gait'):
-
         self.joints = joints
         self.gait_type = gait_type
         self.gait_name = gait_name
@@ -303,6 +302,11 @@ class Subgait(object):
     def final_position(self):
         """Returns a dictionary of joint positions at the end of this subgait."""
         return {joint.name: joint.setpoints[-1].position for joint in self.joints}
+
+    @property
+    def robot(self):
+        """Returns a dictionary of joint positions at the end of this subgait."""
+        return self.robot
 
     # endregion
 

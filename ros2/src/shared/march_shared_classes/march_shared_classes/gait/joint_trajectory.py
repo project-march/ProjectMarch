@@ -63,6 +63,14 @@ class JointTrajectory(object):
         self._duration = round(new_duration, self.setpoint_class.digits)
         self.interpolate_setpoints()
 
+    def from_begin_point(self, begin_time: float) -> None:
+        begin_point = self.get_interpolated_setpoint(begin_time)
+        for setpoint in reversed(self.setpoints):
+            if setpoint.time < begin_time:
+                self.setpoints.remove(setpoint)
+        self.setpoints = [begin_point] + self.setpoints
+        self._duration -= begin_time
+
     @property
     def setpoints(self) -> List[Setpoint]:
         return self._setpoints

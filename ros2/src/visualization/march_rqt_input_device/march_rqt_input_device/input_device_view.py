@@ -37,7 +37,7 @@ class InputDeviceView(QWidget):
         # Extend the widget with all attributes and children from UI file
         loadUi(ui_file, self)
 
-        self.refresh_button.clicked.connect(self._update_possible_gaits)
+        self.refresh_button.clicked.connect(self._controller.update_possible_gaits)
 
         self._create_buttons()
         self._update_possible_gaits()
@@ -367,6 +367,7 @@ class InputDeviceView(QWidget):
         Update which buttons are available to the given possible gaits list
         @param possible_gaits: The gaits that can be executed
         """
+        self._controller.get_node().get_logger().info(f'BUTTONS to {possible_gaits}')
         self.frame.setEnabled(False)
         self.frame.verticalScrollBar().setEnabled(False)
         self.possible_gaits = possible_gaits
