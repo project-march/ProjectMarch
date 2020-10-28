@@ -53,9 +53,15 @@ class InputDeviceView(QWidget):
             self.create_button('home_sit', image_path='/home_sit.png',
                                callback=lambda: self._controller.publish_gait('home_sit'))
 
+<<<<<<< HEAD:ros1/src/visualization/march_rqt_input_device/src/march_rqt_input_device/input_device_view.py
         curb_sdg = \
             self.create_button('curb_sdg',
                                callback=lambda: self._controller.publish_gait('curb_sdg'))
+=======
+        ik_test = \
+            self.create_button('ik_test',
+                               callback=lambda: self._controller.publish_gait('ik_test'))
+>>>>>>> ed7c2ca4... add ik_test to the test folder and to the input device:ros1/src/march_rqt_input_device/src/march_rqt_input_device/input_device_view.py
 
         home_stand = \
             self.create_button('home_stand', image_path='/home_stand.png',
@@ -300,7 +306,11 @@ class InputDeviceView(QWidget):
             [gait_tilted_path_first_start, gait_tilted_path_second_start, gait_tilted_path_first_end,
              gait_tilted_path_second_end],
 
+<<<<<<< HEAD:ros1/src/visualization/march_rqt_input_device/src/march_rqt_input_device/input_device_view.py
             [curb_sdg],
+=======
+            [ik_test],
+>>>>>>> ed7c2ca4... add ik_test to the test folder and to the input device:ros1/src/march_rqt_input_device/src/march_rqt_input_device/input_device_view.py
         ]
 
         # Create the qt_layout from the button layout.
