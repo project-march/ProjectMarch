@@ -175,9 +175,9 @@ class SubgaitTest(unittest.TestCase):
                                                                               version=base_version)
         base_subgait = Subgait.from_file(self.robot, base_subgait_path)
         other_subgait_path = '{rsc}/{gait}/{subgait}/{version}.subgait'.format(rsc=self.resources_folder,
-                                                                              gait=self.gait_name,
-                                                                              subgait=subgait_name,
-                                                                              version=other_version)
+                                                                               gait=self.gait_name,
+                                                                               subgait=subgait_name,
+                                                                               version=other_version)
         other_subgait = Subgait.from_file(self.robot, other_subgait_path)
         return base_subgait, other_subgait
 
@@ -189,9 +189,9 @@ class SubgaitTest(unittest.TestCase):
                                                                               version=base_version)
         base_subgait = Subgait.from_file(self.robot, base_subgait_path)
         other_subgait_path = '{rsc}/{gait}/{subgait}/{version}.subgait'.format(rsc=self.resources_folder,
-                                                                              gait=self.gait_name_ik,
-                                                                              subgait=subgait_name,
-                                                                              version=other_version)
+                                                                               gait=self.gait_name_ik,
+                                                                               subgait=subgait_name,
+                                                                               version=other_version)
         other_subgait = Subgait.from_file(self.robot, other_subgait_path)
         return base_subgait, other_subgait
 
