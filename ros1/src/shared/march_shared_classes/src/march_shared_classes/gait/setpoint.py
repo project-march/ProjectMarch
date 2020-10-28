@@ -67,11 +67,11 @@ class Setpoint(object):
                           Setpoint.get_angles_from_pos(new_foot_pos[1], 'right')]
         # Calculate new velocity by finding the foot position one 250th (one ehtercat cycle) of a second later.
         new_angles_vel = (- np.array(new_angles_pos) +
-                            np.array([Setpoint.get_angles_from_pos(new_foot_pos[0] + new_foot_vel[0] /
-                                                                   VELOCITY_SCALE, 'left'),
-                                     Setpoint.get_angles_from_pos(new_foot_pos[1] + new_foot_vel[1] /
+                           np.array([Setpoint.get_angles_from_pos(new_foot_pos[0] + new_foot_vel[0] /
+                                                                  VELOCITY_SCALE, 'left'),
+                                    Setpoint.get_angles_from_pos(new_foot_pos[1] + new_foot_vel[1] /
                                                                   VELOCITY_SCALE, 'right')]))\
-                  * VELOCITY_SCALE
+                   * VELOCITY_SCALE
 
         # linearly interpolate the ankle angle, as it cannot be calculated from the inverse kinematics
         new_ankle_pos = [base_setpoints['left_ankle'].position * (1 - parameter)
@@ -287,25 +287,25 @@ class Setpoint(object):
             big_sqrt_plus = sqrt(-rescaled_x * rescaled_x - rescaled_z * rescaled_z + ll * ll + 2 * ll + 1)
             big_sqrt_min = sqrt(rescaled_x * rescaled_x + rescaled_z * rescaled_z - ll * ll + 2 * ll - 1)
             denom_hip = (rescaled_x * rescaled_x + rescaled_z * rescaled_z + 2 * rescaled_z - ll * ll + 1) * \
-                        big_sqrt_min
+                big_sqrt_min
             numer_op_one = - rescaled_x * rescaled_x * big_sqrt_plus + 2 * rescaled_x * big_sqrt_min - rescaled_z * \
-                           rescaled_z * big_sqrt_plus + ll * ll * big_sqrt_plus - 2 * ll * big_sqrt_plus + big_sqrt_plus
+                rescaled_z * big_sqrt_plus + ll * ll * big_sqrt_plus - 2 * ll * big_sqrt_plus + big_sqrt_plus
             numer_op_two = rescaled_x * rescaled_x * big_sqrt_plus + 2 * rescaled_x * big_sqrt_min + rescaled_z * \
-                           rescaled_z * big_sqrt_plus - ll * ll * big_sqrt_plus + 2 * ll * big_sqrt_plus - big_sqrt_plus
-            safety_check_large_op_one = ll * (rescaled_x * rescaled_x * rescaled_z * big_sqrt_min + 2 * rescaled_x *
-                                              rescaled_x * big_sqrt_min - rescaled_x * rescaled_z * big_sqrt_plus +
-                                              rescaled_x * ll * ll * big_sqrt_plus - 2 * rescaled_x * ll *
-                                              big_sqrt_plus + rescaled_x * big_sqrt_plus + 2 * rescaled_z * rescaled_z *
-                                              big_sqrt_min - rescaled_z * ll * ll * big_sqrt_min + rescaled_z *
-                                              big_sqrt_min + rescaled_z * rescaled_z * rescaled_z * big_sqrt_min -
-                                              rescaled_x * rescaled_x * rescaled_x * big_sqrt_plus)
-            safety_check_large_op_two = - ll * (rescaled_x * rescaled_x * rescaled_z * big_sqrt_min - 2 * rescaled_x *
-                                                rescaled_x * big_sqrt_min - rescaled_x * rescaled_z * big_sqrt_plus +
-                                                rescaled_x * ll * ll * big_sqrt_plus - 2 * rescaled_x * ll *
-                                                big_sqrt_plus + rescaled_x * big_sqrt_plus - 2 * rescaled_z *
-                                                rescaled_z * big_sqrt_min + rescaled_z * ll * ll * big_sqrt_min -
-                                                rescaled_z * big_sqrt_min - rescaled_z * rescaled_z * rescaled_z *
-                                                big_sqrt_min - rescaled_x * rescaled_x * rescaled_x * big_sqrt_plus)
+                rescaled_z * big_sqrt_plus - ll * ll * big_sqrt_plus + 2 * ll * big_sqrt_plus - big_sqrt_plus
+            safety_check_large_op_one = ll * (rescaled_x * rescaled_x * rescaled_z * big_sqrt_min + 2 * rescaled_x
+                                              * rescaled_x * big_sqrt_min - rescaled_x * rescaled_z * big_sqrt_plus
+                                              + rescaled_x * ll * ll * big_sqrt_plus - 2 * rescaled_x * ll
+                                              * big_sqrt_plus + rescaled_x * big_sqrt_plus + 2 * rescaled_z
+                                              * rescaled_z * big_sqrt_min - rescaled_z * ll * ll * big_sqrt_min
+                                              + rescaled_z * big_sqrt_min + rescaled_z * rescaled_z * rescaled_z
+                                              * big_sqrt_min - rescaled_x * rescaled_x * rescaled_x * big_sqrt_plus)
+            safety_check_large_op_two = - ll * (rescaled_x * rescaled_x * rescaled_z * big_sqrt_min - 2 * rescaled_x
+                                                * rescaled_x * big_sqrt_min - rescaled_x * rescaled_z * big_sqrt_plus
+                                                + rescaled_x * ll * ll * big_sqrt_plus - 2 * rescaled_x * ll
+                                                * big_sqrt_plus + rescaled_x * big_sqrt_plus - 2 * rescaled_z
+                                                * rescaled_z * big_sqrt_min + rescaled_z * ll * ll * big_sqrt_min
+                                                - rescaled_z * big_sqrt_min - rescaled_z * rescaled_z * rescaled_z
+                                                * big_sqrt_min - rescaled_x * rescaled_x * rescaled_x * big_sqrt_plus)
         except ValueError:
             raise SubgaitInterpolationError("The calculation method cannot find the angles corresponding to the desired"
                                             " foot position, ({0}, {1}, {2}).".
