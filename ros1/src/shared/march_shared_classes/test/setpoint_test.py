@@ -61,12 +61,13 @@ class SetpointTest(unittest.TestCase):
         foot_pos = Setpoint.get_foot_pos_from_angles(self.setpoint_dict)
         angles = Setpoint.get_angles_from_pos(foot_pos[0], 'left') + \
             Setpoint.get_angles_from_pos(foot_pos[1], 'right')
-        self.assertEqual([round(angle, 4) for angle in angles], [self.setpoint.position] * 6)
+        for i in range(0, len(angles)):
+            self.assertAlmostEqual(angles[i], self.setpoint.position, places=4)
 
     def test_inverse_kinematics_reversed_position(self):
-        desired_pos = [[0.0, -0.08, 0.6], [0.0, 0.08, 0.6]]
-        new_angles = Setpoint.get_angles_from_pos(desired_pos[0], 'left') + \
-            Setpoint.get_angles_from_pos(desired_pos[1], 'right')
+        desired_position = [[0.0, -0.08, 0.6], [0.0, 0.08, 0.6]]
+        new_angles = Setpoint.get_angles_from_pos(desired_position[0], 'left') + \
+            Setpoint.get_angles_from_pos(desired_position[1], 'right')
         time = 1.0
         new_vel = 2.0
         resulting_angles = {'left_hip_aa': Setpoint(time, new_angles[0], new_vel),
@@ -75,11 +76,10 @@ class SetpointTest(unittest.TestCase):
                             'right_hip_aa': Setpoint(time, new_angles[3], new_vel),
                             'right_hip_fe': Setpoint(time, new_angles[4], new_vel),
                             'right_knee': Setpoint(time, new_angles[5], new_vel)}
-        resulting_pos = Setpoint.get_foot_pos_from_angles(resulting_angles)
-        for i in range(0, len(resulting_pos)):
-            for j in range(0, len(resulting_pos[i])):
-                resulting_pos[i][j] = round(resulting_pos[i][j], 2)
-        self.assertEqual(resulting_pos, desired_pos)
+        resulting_position = Setpoint.get_foot_pos_from_angles(resulting_angles)
+        for i in range(0, len(resulting_position)):
+            for j in range(0, len(resulting_position[i])):
+                self.assertAlmostEqual(resulting_position[i][j], desired_position[i][j], places=4)
 
     def test_inverse_kinematics_velocity(self):
         foot_vel = np.array(Setpoint.get_foot_pos_from_angles(self.setpoint_dict, velocity=True))
