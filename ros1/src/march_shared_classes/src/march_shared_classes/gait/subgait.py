@@ -81,13 +81,13 @@ class Subgait(object):
             else:
                 base_path = os.path.join(gait_dir, gait_name, subgait_name, base_version + '.subgait')
                 other_path = os.path.join(gait_dir, gait_name, subgait_name, other_version + '.subgait')
-                return cls.from_files_interpolated(robot, base_path, other_path, parameter, foot_pos=True)
+                return cls.from_files_interpolated(robot, base_path, other_path, parameter, use_foot_position=True)
         else:
             subgait_path = os.path.join(gait_dir, gait_name, subgait_name, version + '.subgait')
             return cls.from_file(robot, subgait_path, *args)
 
     @classmethod
-    def from_files_interpolated(cls, robot, file_name_base, file_name_other, parameter, foot_pos=False, *args):
+    def from_files_interpolated(cls, robot, file_name_base, file_name_other, parameter, use_foot_position=False, *args):
         """Extract two subgaits from files and interpolate.
 
         :param robot:
@@ -98,7 +98,7 @@ class Subgait(object):
             the file name of the oter subgait
         :param parameter:
             The parameter to use for interpolation. Should be 0 <= parameter <= 1
-        :param foot_pos:
+        :param use_foot_position:
             Determine whether the interpolation should be done on the foot location or on the joint angles
 
         :return:
@@ -106,7 +106,7 @@ class Subgait(object):
         """
         base_subgait = cls.from_file(robot, file_name_base, *args)
         other_subgait = cls.from_file(robot, file_name_other, *args)
-        return cls.interpolate_subgaits(base_subgait, other_subgait, parameter, foot_pos)
+        return cls.interpolate_subgaits(base_subgait, other_subgait, parameter, use_foot_position)
 
     @classmethod
     def from_dict(cls, robot, subgait_dict, gait_name, subgait_name, version, *args):
@@ -239,7 +239,7 @@ class Subgait(object):
             joint.setpoints = new_joint_setpoints
 
     @classmethod
-    def interpolate_subgaits(cls, base_subgait, other_subgait, parameter, foot_pos=False):
+    def interpolate_subgaits(cls, base_subgait, other_subgait, parameter, use_foot_position=False):
         """Linearly interpolate two subgaits with the parameter to get a new subgait. based on foot_pos, or on angles.
 
         :param base_subgait:
@@ -248,7 +248,7 @@ class Subgait(object):
             other subgait, return value if parameter is equal to one
         :param parameter:
             The parameter to use for interpolation. Should be 0 <= parameter <= 1
-        :param foot_pos:
+        :param use_foot_position:
             Determine whether the interpolation should be done on the foot location or on the joint angles
 
         :return:
@@ -270,66 +270,37 @@ class Subgait(object):
 
         joints = []
         num_setpoints = 0
-        try:
-            for base_joint in base_subgait.joints:
-                other_joint = other_subgait.get_joint(base_joint.name)
-                if other_joint is None:
-                    raise SubgaitInterpolationError('Could not find a matching joint for base joint with name {0}.'.
-                                                    format(base_joint.name))
-                if foot_pos:
-                    if num_setpoints == 0:
-                        num_setpoints = len(base_joint._setpoints)
-                        compare_joint_name = base_joint.name
+        for base_joint in base_subgait.joints:
+            other_joint = other_subgait.get_joint(base_joint.name)
+            if other_joint is None:
+                raise SubgaitInterpolationError('Could not find a matching joint for base joint with name {0}.'.
+                                                format(base_joint.name))
+            # check whether each joint has the same number of setpoints for the interpolation using foot position
+            # for the interpolation using joint angles, continue to interpolate_joint_trajectories if joints match
+            if use_foot_position:
+                if num_setpoints == 0:
+                    num_setpoints = len(base_joint.setpoints)
+                    compare_joint_name = base_joint.name
 
-                    if len(base_joint._setpoints) != num_setpoints:
-                        raise SubgaitInterpolationError('Number of setpoints differ in subgait {0} {1} from {0} {2}.'.
-                                                        format(base_subgait.subgait_name, base_joint.name,
-                                                               compare_joint_name))
-                    elif len(other_joint._setpoints) != num_setpoints:
-                        raise SubgaitInterpolationError('Number of setpoint differs in subgait {0} {1} from {2} {3}.'.
-                                                        format(other_subgait.subgait_name, base_joint.name,
-                                                               base_subgait.subgait_name, compare_joint_name))
-                else:
-                    joints.append(cls.joint_class.interpolate_joint_trajectories(base_joint, other_joint, parameter))
+                if len(base_joint.setpoints) != num_setpoints:
+                    raise SubgaitInterpolationError('Number of setpoints differs in subgait {0} {1} from {0} {2}.'.
+                                                    format(base_subgait.subgait_name, base_joint.name,
+                                                           compare_joint_name))
+                elif len(other_joint.setpoints) != num_setpoints:
+                    raise SubgaitInterpolationError('Number of setpoints differs in subgait {0} {1} from {2} {3}.'.
+                                                    format(other_subgait.subgait_name, base_joint.name,
+                                                           base_subgait.subgait_name, compare_joint_name))
+            else:
+                joints.append(cls.joint_class.interpolate_joint_trajectories(base_joint, other_joint, parameter))
 
-        except SubgaitInterpolationError as e:
-            raise e
-
-        duration = base_subgait.duration * parameter + (1 - parameter) * other_subgait.duration
-
-        if foot_pos:
-            new_setpoints = {'left_hip_aa': [],
-                             'left_hip_fe': [],
-                             'left_knee': [],
-                             'right_hip_aa': [],
-                             'right_hip_fe': [],
-                             'right_knee': [],
-                             'left_ankle': [],
-                             'right_ankle': []}
-            # go over each joint to get needed setpoints (all first setpoints, all second setpoints..). These are needed
-            # as calcuating the foot position requires the position of all joints at a certain time.
-            for current_setpoints_index in range(0, num_setpoints):
-                base_setpoints_to_interpolate = {}
-                other_setpoints_to_interpolate = {}
-                for base_joint in base_subgait.joints:
-                    other_joint = other_subgait.get_joint(base_joint.name)
-                    base_joint_setpoints = base_joint.setpoints
-                    other_joint_setpoints = other_joint.setpoints
-                    base_setpoints_to_interpolate[base_joint.name] = base_joint_setpoints[current_setpoints_index]
-                    other_setpoints_to_interpolate[other_joint.name] = other_joint_setpoints[current_setpoints_index]
-                interpolated_setpoints = Setpoint.interpolate_setpoints_position(base_setpoints_to_interpolate,
-                                                                                 other_setpoints_to_interpolate,
-                                                                                 parameter)
-                for base_joint in base_subgait.joints:
-                    new_setpoints[base_joint.name].append(interpolated_setpoints[base_joint.name])
-
-            for base_joint in base_subgait.joints:
-                joints.append(cls.joint_class(base_joint.name, base_joint.limits, new_setpoints[base_joint.name],
-                                              duration))
+        if use_foot_position:
+            joints = cls.joint_class.interpolate_joint_trajectories_foot_position(base_subgait, other_subgait,
+                                                                                  num_setpoints, parameter)
 
         description = 'Interpolation between base version {0}, and other version {1} with parameter{2}'.format(
             base_subgait.version, other_subgait.version, parameter)
 
+        duration = Setpoint.weighted_average(base_subgait.duration, other_subgait.duration, parameter)
         gait_type = base_subgait.gait_type if parameter <= 0.5 else other_subgait.gait_type
         version = '{0}{1}_({2})_({3})'.format(PARAMETRIC_GAITS_PREFIX, parameter, base_subgait.version,
                                               other_subgait.version)

@@ -2,6 +2,7 @@ from math import acos, atan, cos, pi, sin, sqrt
 
 import numpy as np
 import rospkg
+import rospy
 from urdf_parser_py import urdf
 
 from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
@@ -44,7 +45,7 @@ class Setpoint(object):
         self._velocity = round(velocity, self.digits)
 
     @classmethod
-    def interpolate_setpoints_position(cls, base_setpoints, other_setpoints, parameter):
+    def create_position_interpolated_setpoints(cls, base_setpoints, other_setpoints, parameter):
         """Linearly interpolate between the foot position.
 
         :param base_setpoints:
@@ -61,8 +62,8 @@ class Setpoint(object):
         other_foot_pos = np.array(Setpoint.get_foot_pos_from_angles(other_setpoints))
         other_foot_vel = np.array(Setpoint.get_foot_pos_from_angles(other_setpoints, velocity=True))
 
-        new_foot_pos = base_foot_pos * (1 - parameter) + other_foot_pos * parameter
-        new_foot_vel = (base_foot_vel * (1 - parameter) + other_foot_vel * parameter)
+        new_foot_pos = Setpoint.weighted_average(base_foot_pos, other_foot_pos, parameter)
+        new_foot_vel = Setpoint.weighted_average(base_foot_vel, other_foot_vel, parameter)
 
         new_angles_pos = [Setpoint.get_angles_from_pos(new_foot_pos[0], 'left'),
                           Setpoint.get_angles_from_pos(new_foot_pos[1], 'right')]
@@ -75,14 +76,14 @@ class Setpoint(object):
             * VELOCITY_SCALE
 
         # linearly interpolate the ankle angle, as it cannot be calculated from the inverse kinematics
-        new_ankle_pos = [base_setpoints['left_ankle'].position * (1 - parameter)
-                         + other_setpoints['left_ankle'].position * parameter,
-                         base_setpoints['right_ankle'].position * (1 - parameter)
-                         + other_setpoints['right_ankle'].position * parameter]
-        new_ankle_vel = [base_setpoints['left_ankle'].velocity * (1 - parameter)
-                         + other_setpoints['left_ankle'].velocity * parameter,
-                         base_setpoints['right_ankle'].velocity * (1 - parameter)
-                         + other_setpoints['right_ankle'].velocity * parameter]
+        new_ankle_pos = [Setpoint.weighted_average(base_setpoints['left_ankle'].position,
+                                                   other_setpoints['left_ankle'].position, parameter),
+                         Setpoint.weighted_average(base_setpoints['right_ankle'].position,
+                                                   other_setpoints['right_ankle'].position, parameter)]
+        new_ankle_vel = [Setpoint.weighted_average(base_setpoints['left_ankle'].velocity,
+                                                   other_setpoints['left_ankle'].velocity, parameter),
+                         Setpoint.weighted_average(base_setpoints['right_ankle'].velocity,
+                                               other_setpoints['right_ankle'].velocity, parameter)]
 
         # Set the time of the new setpoints as the weighted average of the original setpoint times
         base_setpoints_time = 0
@@ -91,7 +92,7 @@ class Setpoint(object):
             base_setpoints_time += setpoint.time
         for setpoint in other_setpoints.values():
             other_setpoints_time += setpoint.time
-        time = (base_setpoints_time * (1 - parameter) + other_setpoints_time * parameter) / len(base_setpoints)
+        time = Setpoint.weighted_average(base_setpoints_time, other_setpoints_time, parameter) / len(base_setpoints)
 
         resulting_setpoints = {'left_hip_aa': cls(time, new_angles_pos[0][0], new_angles_vel[0][0]),
                                'left_hip_fe': cls(time, new_angles_pos[0][1], new_angles_vel[0][1]),
@@ -131,9 +132,9 @@ class Setpoint(object):
         :return:
             The interpolated setpoint
         """
-        time = parameter * base_setpoint.time + (1 - parameter) * other_setpoint.time
-        position = parameter * base_setpoint.position + (1 - parameter) * other_setpoint.position
-        velocity = parameter * base_setpoint.velocity + (1 - parameter) * other_setpoint.velocity
+        time = Setpoint.weighted_average(base_setpoint.time, other_setpoint.time, parameter)
+        position = Setpoint.weighted_average(base_setpoint.position, other_setpoint.position, parameter)
+        velocity = Setpoint.weighted_average(base_setpoint.velocity, other_setpoint.velocity, parameter)
         return Setpoint(time, position, velocity)
 
     @staticmethod
@@ -155,29 +156,13 @@ class Setpoint(object):
         r_hfe = setpoint_dic['right_hip_fe'].position
         r_kfe = setpoint_dic['right_knee'].position
 
-        robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
-        ul_l = robot.link_map['upper_leg_left'].collisions[0].geometry.size[2]
-        ll_l = robot.link_map['lower_leg_left'].collisions[0].geometry.size[2]
-        bb_l = robot.link_map['hip_aa_frame_left_front'].collisions[0].geometry.size[0]
-        ph_l = robot.link_map['hip_aa_frame_left_side'].collisions[0].geometry.size[1]
-        ul_r = robot.link_map['upper_leg_right'].collisions[0].geometry.size[2]
-        ll_r = robot.link_map['lower_leg_right'].collisions[0].geometry.size[2]
-        bb_r = robot.link_map['hip_aa_frame_right_front'].collisions[0].geometry.size[0]
-        ph_r = robot.link_map['hip_aa_frame_right_side'].collisions[0].geometry.size[1]
-        base = robot.link_map['hip_base'].collisions[0].geometry.size[1]
+        # get lengths from robot model, l_ul = left upper leg etc. see get_lengths_robot().
+        l_ul, l_ll, l_bb, l_ph, r_ul, r_ll, r_bb, r_ph, base = Setpoint.get_lengths_robot()
 
-        # x is positive in the walking direction, z is in the downward direction, y is directed to the right side
-        # the origin in the middle of the hip structure. The calculations are supported by
-        # https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
-        haa_to_foot_length_left = ul_l * cos(l_hfe) + ll_l * cos(l_hfe - l_kfe)
-        left_y = - cos(l_haa) * ph_l - sin(l_haa) * haa_to_foot_length_left - base / 2.0
-        left_z = - sin(l_haa) * ph_l + cos(l_haa) * haa_to_foot_length_left
-        left_x = bb_l + sin(l_hfe) * ul_l + sin(l_hfe - l_kfe) * ll_l
-
-        haa_to_foot_length_right = ul_r * cos(r_hfe) + ll_r * cos(r_hfe - r_kfe)
-        right_y = cos(r_haa) * ph_r + sin(r_haa) * haa_to_foot_length_right + base / 2.0
-        right_z = - sin(r_haa) * ph_r + cos(r_haa) * haa_to_foot_length_right
-        right_x = bb_r + sin(r_hfe) * ul_r + sin(r_hfe - r_kfe) * ll_r
+        left_x, left_y, left_z = Setpoint.calculate_foot_position(l_haa, l_hfe, l_kfe, base, l_ph,
+                                                                  l_bb, l_ul, l_ll, 'left')
+        right_x, right_y, right_z = Setpoint.calculate_foot_position(r_haa, r_hfe, r_kfe, base, r_ph,
+                                                                  r_bb, r_ul, r_ll, 'right')
 
         if velocity:
             # To calculate the velocity of the foot, find the foot location as it would be one ethercat cycle later.
@@ -189,34 +174,50 @@ class Setpoint(object):
             r_hfe_next = r_hfe + setpoint_dic['right_hip_fe'].velocity / VELOCITY_SCALE
             r_kfe_next = r_kfe + setpoint_dic['right_knee'].velocity / VELOCITY_SCALE
 
-            haa_to_foot_length_left_next = ul_l * cos(l_hfe_next) + ll_l * cos(l_hfe_next - l_kfe_next)
-            left_y_next = - cos(l_haa_next) * ph_l - sin(l_haa_next) * haa_to_foot_length_left_next - base / 2.0
-            left_z_next = - sin(l_haa_next) * ph_l + cos(l_haa_next) * haa_to_foot_length_left_next
-            left_x_next = bb_l + sin(l_hfe_next) * ul_l + sin(l_hfe_next - l_kfe_next) * ll_l
-
-            haa_to_foot_length_right_next = ul_r * cos(r_hfe_next) + ll_r * cos(r_hfe_next - r_kfe_next)
-            right_y_next = cos(r_haa_next) * ph_r + sin(r_haa_next) * haa_to_foot_length_right_next + base / 2.0
-            right_z_next = - sin(r_haa_next) * ph_r + cos(r_haa_next) * haa_to_foot_length_right_next
-            right_x_next = bb_r + sin(r_hfe_next) * ul_r + sin(r_hfe_next - r_kfe_next) * ll_r
+            left_x_next, left_y_next, left_z_next = Setpoint.calculate_foot_position(l_haa_next, l_hfe_next,
+                                                                                     l_kfe_next, base, l_ph, l_bb,
+                                                                                     l_ul, l_ll, 'left')
+            right_x_next, right_y_next, right_z_next = Setpoint.calculate_foot_position(r_haa_next, r_hfe_next,
+                                                                                        r_kfe_next, base, r_ph, r_bb,
+                                                                                        r_ul, r_ll, 'right')
 
             # Rescale the velocities back to radians per second.
-            left_y_v = (left_y_next - left_y) * VELOCITY_SCALE
-            left_z_v = (left_z_next - left_z) * VELOCITY_SCALE
-            left_x_v = (left_x_next - left_x) * VELOCITY_SCALE
+            left_y_velocity = (left_y_next - left_y) * VELOCITY_SCALE
+            left_z_velocity = (left_z_next - left_z) * VELOCITY_SCALE
+            left_x_velocity = (left_x_next - left_x) * VELOCITY_SCALE
 
-            right_y_v = (right_y_next - right_y) * VELOCITY_SCALE
-            right_z_v = (right_z_next - right_z) * VELOCITY_SCALE
-            right_x_v = (right_x_next - right_x) * VELOCITY_SCALE
+            right_y_velocity = (right_y_next - right_y) * VELOCITY_SCALE
+            right_z_velocity = (right_z_next - right_z) * VELOCITY_SCALE
+            right_x_velocity = (right_x_next - right_x) * VELOCITY_SCALE
 
-            left_foot_v = [left_x_v, left_y_v, left_z_v]
-            right_foot_v = [right_x_v, right_y_v, right_z_v]
+            left_foot_velocity = [left_x_velocity, left_y_velocity, left_z_velocity]
+            right_foot_velocity = [right_x_velocity, right_y_velocity, right_z_velocity]
 
-            return [left_foot_v, right_foot_v]
+            return [left_foot_velocity, right_foot_velocity]
         else:
-            left_foot_pos = [left_x, left_y, left_z]
-            right_foot_pos = [right_x, right_y, right_z]
+            left_foot_position = [left_x, left_y, left_z]
+            right_foot_position = [right_x, right_y, right_z]
 
-            return [left_foot_pos, right_foot_pos]
+            return [left_foot_position, right_foot_position]
+
+    @staticmethod
+    def calculate_foot_position(haa, hfe, kfe, base, ph, bb, ul, ll, foot):
+        """Calculates the foot position given the relevant angles, lengths and a specification of the foot."""
+
+        # x is positive in the walking direction, z is in the downward direction, y is directed to the right side
+        # the origin in the middle of the hip structure. The calculations are supported by
+        # https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
+        haa_to_foot_length = ul * cos(hfe) + ll * cos(hfe - kfe)
+        z_position = - sin(haa) * ph + cos(haa) * haa_to_foot_length
+        x_position = bb + sin(hfe) * ul + sin(hfe - kfe) * ll
+        if foot == 'left':
+            y_position = - cos(haa) * ph - sin(haa) * haa_to_foot_length - base / 2.0
+        elif foot == 'right':
+            y_position = cos(haa) * ph + sin(haa) * haa_to_foot_length + base / 2.0
+        else:
+            rospy.logwarn('invalid foot specified, {0} was given, does not match "left" or "right"'.format(foot))
+            return
+        return [x_position, y_position, z_position]
 
     @staticmethod
     def get_angles_from_pos(position, foot):
@@ -230,25 +231,17 @@ class Setpoint(object):
         :return:
             Haa, kfe and hfe angles which correspond to the given position
         """
-        robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
-        if foot == 'left':
-            ul = robot.link_map['upper_leg_left'].collisions[0].geometry.size[2]
-            ll = robot.link_map['lower_leg_left'].collisions[0].geometry.size[2]
-            bb = robot.link_map['hip_aa_frame_left_front'].collisions[0].geometry.size[0]
-            ph = robot.link_map['hip_aa_frame_left_side'].collisions[0].geometry.size[1]
-        else:
-            ul = robot.link_map['upper_leg_right'].collisions[0].geometry.size[2]
-            ll = robot.link_map['lower_leg_right'].collisions[0].geometry.size[2]
-            bb = robot.link_map['hip_aa_frame_right_front'].collisions[0].geometry.size[0]
-            ph = robot.link_map['hip_aa_frame_right_side'].collisions[0].geometry.size[1]
-        base = robot.link_map['hip_base'].collisions[0].geometry.size[1]
-
+        # change y positive direction to the desired foot, change origin to pivot of haa joint, for ease of calculation
+        # get lengths from robot model, ul = upper leg etc. see get_lengths_robot().
         pos_x = position[0]
-        # change y positive direction to the desired foot, easier for calculation, change origin to pivot of haa joint
         if foot == 'left':
+            [ul, ll, bb, ph, base] = Setpoint.get_lengths_robot('left')
             pos_y = - (position[1] + base / 2.0)
-        else:
+        elif foot == 'right':
+            [ul, ll, bb, ph, base] = Setpoint.get_lengths_robot('right')
             pos_y = position[1] - base / 2.0
+        else:
+            rospy.logwarn('invalid foot specified, {0} was given, does not match "left" or "right"'.format(foot))
         pos_z = position[2]
 
         # first calculate the haa angle. This calculation assumes that pos_z > 0, for details see
@@ -355,3 +348,31 @@ class Setpoint(object):
             hfe = hfe_two
 
         return [haa, hfe, kfe]
+
+    @staticmethod
+    def weighted_average(base_value, other_value, parameter):
+        """Compute the weighted average of two values with normalised weight parameter."""
+        return base_value * (1 - parameter) + other_value * parameter
+
+    @staticmethod
+    def get_lengths_robot(foot=''):
+        robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
+        l_ul = robot.link_map['upper_leg_left'].collisions[0].geometry.size[2]  # left upper leg length
+        l_ll = robot.link_map['lower_leg_left'].collisions[0].geometry.size[2]  # left lower leg length
+        l_bb = robot.link_map['hip_aa_frame_left_front'].collisions[0].geometry.size[0]  # left haa arm to leg
+        # (billen been)
+        l_ph = robot.link_map['hip_aa_frame_left_side'].collisions[0].geometry.size[1]  # left pelvic hip length
+        r_ul = robot.link_map['upper_leg_right'].collisions[0].geometry.size[2]  # right upper leg length
+        r_ll = robot.link_map['lower_leg_right'].collisions[0].geometry.size[2]  # right lower leg length
+        r_bb = robot.link_map['hip_aa_frame_right_front'].collisions[0].geometry.size[0]  # right haa arm to leg
+        # (billen been)
+        r_ph = robot.link_map['hip_aa_frame_right_side'].collisions[0].geometry.size[1]  # right pelvic hip length
+        base = robot.link_map['hip_base'].collisions[0].geometry.size[1]
+        if foot == 'left':
+            return [l_ul, l_ll, l_bb, l_ph, base]
+        elif foot == 'right':
+            return [r_ul, r_ll, r_bb, r_ph, base]
+        elif foot == '':
+            return [l_ul, l_ll, l_bb, l_ph, r_ul, r_ll, r_bb, r_ph, base]
+        else:
+            rospy.logwarn('invalid foot specified, {0} was given, does not match "left" or "right"'.format(foot))
