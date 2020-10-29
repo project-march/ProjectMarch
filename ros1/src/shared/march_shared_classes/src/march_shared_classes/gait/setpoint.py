@@ -83,7 +83,7 @@ class Setpoint(object):
         new_ankle_vel = [Setpoint.weighted_average(base_setpoints['left_ankle'].velocity,
                                                    other_setpoints['left_ankle'].velocity, parameter),
                          Setpoint.weighted_average(base_setpoints['right_ankle'].velocity,
-                                               other_setpoints['right_ankle'].velocity, parameter)]
+                                                   other_setpoints['right_ankle'].velocity, parameter)]
 
         # Set the time of the new setpoints as the weighted average of the original setpoint times
         base_setpoints_time = 0
@@ -162,7 +162,7 @@ class Setpoint(object):
         left_x, left_y, left_z = Setpoint.calculate_foot_position(l_haa, l_hfe, l_kfe, base, l_ph,
                                                                   l_bb, l_ul, l_ll, 'left')
         right_x, right_y, right_z = Setpoint.calculate_foot_position(r_haa, r_hfe, r_kfe, base, r_ph,
-                                                                  r_bb, r_ul, r_ll, 'right')
+                                                                     r_bb, r_ul, r_ll, 'right')
 
         if velocity:
             # To calculate the velocity of the foot, find the foot location as it would be one ethercat cycle later.
@@ -203,7 +203,6 @@ class Setpoint(object):
     @staticmethod
     def calculate_foot_position(haa, hfe, kfe, base, ph, bb, ul, ll, foot):
         """Calculates the foot position given the relevant angles, lengths and a specification of the foot."""
-
         # x is positive in the walking direction, z is in the downward direction, y is directed to the right side
         # the origin in the middle of the hip structure. The calculations are supported by
         # https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
