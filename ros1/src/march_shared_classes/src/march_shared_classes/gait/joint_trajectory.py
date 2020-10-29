@@ -194,5 +194,5 @@ class JointTrajectory(object):
         duration = Setpoint.weighted_average(base_subgait.duration, other_subgait.duration, parameter)
         for base_joint in base_subgait.joints:
             joints.append(cls(base_joint.name, base_joint.limits, new_setpoints[base_joint.name],
-                                          duration))
+                              duration))
         return joints
