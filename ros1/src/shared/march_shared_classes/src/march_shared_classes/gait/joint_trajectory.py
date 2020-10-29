@@ -167,3 +167,32 @@ class JointTrajectory(object):
             setpoints.append(cls.setpoint_class.interpolate_setpoints(base_setpoint, other_setpoint, parameter))
         duration = parameter * base_trajectory.duration + (1 - parameter) * other_trajectory.duration
         return JointTrajectory(base_trajectory.name, base_trajectory.limits, setpoints, duration)
+
+    @classmethod
+    def interpolate_joint_trajectories_foot_position(cls, base_subgait, other_subgait, num_setpoints, parameter):
+        joints = []
+        new_setpoints = {}
+        # go over each joint to get needed setpoints (all first setpoints, all second setpoints..). These are needed
+        # as calcuating the foot position requires the position of all joints at a certain time.
+        for current_setpoints_index in range(0, num_setpoints):
+            base_setpoints_to_interpolate = {}
+            other_setpoints_to_interpolate = {}
+            for base_joint in base_subgait.joints:
+                other_joint = other_subgait.get_joint(base_joint.name)
+                base_setpoints_to_interpolate[base_joint.name] = base_joint.setpoints[current_setpoints_index]
+                other_setpoints_to_interpolate[other_joint.name] = other_joint.setpoints[current_setpoints_index]
+            interpolated_setpoints = Setpoint.create_position_interpolated_setpoints(base_setpoints_to_interpolate,
+                                                                                     other_setpoints_to_interpolate,
+                                                                                     parameter)
+            # with interpolated setpoints, create a dictionary of joint names with a list of their setpoints
+            for base_joint in base_subgait.joints:
+                try:
+                    new_setpoints[base_joint.name].append(interpolated_setpoints[base_joint.name])
+                except KeyError:
+                    new_setpoints[base_joint.name] = [interpolated_setpoints[base_joint.name]]
+
+        duration = Setpoint.weighted_average(base_subgait.duration, other_subgait.duration, parameter)
+        for base_joint in base_subgait.joints:
+            joints.append(cls(base_joint.name, base_joint.limits, new_setpoints[base_joint.name],
+                                          duration))
+        return joints

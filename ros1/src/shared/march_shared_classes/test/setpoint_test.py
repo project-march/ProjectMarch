@@ -52,9 +52,9 @@ class SetpointTest(unittest.TestCase):
     def test_interpolation_correct(self):
         parameter = 0.3
         other_setpoint = Setpoint(1, 1, 1)
-        expected_result = Setpoint(self.setpoint.time * parameter + (1 - parameter) * 1,
-                                   self.setpoint.position * parameter + (1 - parameter) * 1,
-                                   self.setpoint.velocity * parameter + (1 - parameter) * 1)
+        expected_result = Setpoint(self.setpoint.time * (1 - parameter) + parameter * 1,
+                                   self.setpoint.position * (1 - parameter) + parameter * 1,
+                                   self.setpoint.velocity * (1 - parameter) + parameter * 1)
         self.assertEqual(expected_result, Setpoint.interpolate_setpoints(self.setpoint, other_setpoint, parameter))
 
     def test_inverse_kinematics_position(self):
@@ -95,5 +95,4 @@ class SetpointTest(unittest.TestCase):
 
         for i in range(0, 2):
             for j in range(0, 3):
-                new_angles_vel[i, j] = round(new_angles_vel[i, j], 4)
-        self.assertEqual(new_angles_vel.tolist(), [[self.setpoint.velocity] * 3, [self.setpoint.velocity] * 3])
+                self.assertAlmostEqual(new_angles_vel[i, j], self.setpoint.velocity, places=4)
