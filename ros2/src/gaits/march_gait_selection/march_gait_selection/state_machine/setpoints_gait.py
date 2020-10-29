@@ -73,7 +73,7 @@ class SetpointsGait(GaitInterface, Gait):
         self._time_since_start = 0.0
         return self._current_subgait.to_joint_trajectory_msg()
 
-    def update(self, elapsed_time, logger):
+    def update(self, elapsed_time):
         """
         Update the progress of the gait, should be called regularly.
         If the current subgait is still running, this does nothing.

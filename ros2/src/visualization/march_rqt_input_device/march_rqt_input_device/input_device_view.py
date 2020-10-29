@@ -371,7 +371,6 @@ class InputDeviceView(QWidget):
         Update which buttons are available to the given possible gaits list
         @param possible_gaits: The gaits that can be executed
         """
-        self._controller.get_node().get_logger().info(f'BUTTONS to {possible_gaits}')
         self.frame.setEnabled(False)
         self.frame.verticalScrollBar().setEnabled(False)
         self.possible_gaits = possible_gaits

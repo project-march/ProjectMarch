@@ -1,6 +1,6 @@
 import os
 import rclpy
-from march_gait_selection.state_machine.semi_dynamic_setpoints_gait import SemiDynamicSetpointsGait
+from march_gait_selection.dynamic_gaits.semi_dynamic_setpoints_gait import SemiDynamicSetpointsGait
 from march_shared_msgs.srv import SetGaitVersion, ContainsGait
 from rcl_interfaces.srv import GetParameters
 from rclpy.exceptions import ParameterNotDeclaredException
@@ -232,11 +232,19 @@ class GaitSelection(Node):
             gaits[gait] = SetpointsGait.from_file(
                 gait, self._gait_directory, self._robot, self._gait_version_map)
 
+        self._load_semi_dynamic_gaits(gaits)
+
+        return gaits
+
+    def _load_semi_dynamic_gaits(self, gaits):
+        """
+        Loads the semi dynamic gaits, this is currently only 1 gait.
+        :param gaits: dict to add the semi dynamic gaits to
+        """
         gaits['dynamic_stairs_up'] = SemiDynamicSetpointsGait.from_file(
             'stairs_up', self._gait_directory, self._robot,
             self._gait_version_map)
 
-        return gaits
 
     def _load_configuration(self):
         """Loads and verifies the gaits configuration."""

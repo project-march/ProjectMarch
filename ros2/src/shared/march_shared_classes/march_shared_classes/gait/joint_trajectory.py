@@ -64,11 +64,18 @@ class JointTrajectory(object):
         self.interpolate_setpoints()
 
     def from_begin_point(self, begin_time: float) -> None:
-        begin_point = self.get_interpolated_setpoint(begin_time)
+        """
+        Manipulates the gait to start at given time. Removes all set points
+        after the given begin time. Adds the begin position with 0 velocity at
+        the start.
+        :param begin_time: The time to start
+        """
+        begin_point = self.setpoint_class(
+            begin_time, self.get_interpolated_setpoint(begin_time).position, 0)
         for setpoint in reversed(self.setpoints):
-            if setpoint.time < begin_time:
+            if setpoint.time <= begin_time:
                 self.setpoints.remove(setpoint)
-        self.setpoints = [begin_point] + self.setpoints
+            self.setpoints = [begin_point] + self.setpoints
         self._duration -= begin_time
 
     @property

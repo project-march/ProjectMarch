@@ -251,7 +251,7 @@ class GaitStateMachine(object):
 
         self._handle_input()
         logger = self._gait_selection.get_logger()
-        trajectory, should_stop = self._current_gait.update(elapsed_time, logger)
+        trajectory, should_stop = self._current_gait.update(elapsed_time)
         # schedule trajectory if any
         if trajectory is not None:
             self._call_gait_callbacks()
