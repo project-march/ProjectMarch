@@ -65,17 +65,20 @@ rst_prolog = """
 .. |march| replace:: March exoskeleton
 """
 
+gitlab_root = html_context['gitlab_url'] + html_context['gitlab_user'] + '/'
+ros1_src = 'march/-/blob/main/ros1/src/'
+
 # Links
-extlinks = {'codedir': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/tutorials/tree/' + html_context['gitlab_version'] + '/doc/%s', ''),
-            'rootdir': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/tutorials/tree/' + html_context['gitlab_version'] + '/%s', ''),
-            'hardware-interface': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/march/-/tree/main/src/march_hardware_interface/%s', ''),
-            'input-device': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/input-device/-/tree/main/%s', ''),
-            'march': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/march/-/tree/main/%s', ''),
-            'monitor': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/march/-/tree/main/src/march_monitor/%s', ''),
-            'simulation': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/march/-/tree/main/src/march_simulation/%s', ''),
-            'gait-files': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/march/-/tree/main/src/march_gait_files/%s', ''),
-            'ethercat-slaves': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/ethercat-slaves/-/tree/main/%s', ''),
-            'gait-generation': (html_context['gitlab_url'] + html_context['gitlab_user'] + '/march/-/tree/main/src/march_rqt_gait_generator/%s', ''),
+extlinks = {'codedir': (gitlab_root + 'tutorials/tree/' + html_context['gitlab_version'] + '/doc/%s', ''),
+            'rootdir': (gitlab_root + 'tutorials/tree/' + html_context['gitlab_version'] + '/%s', ''),
+            'hardware-interface': (gitlab_root + ros1_src + 'march_hardware_interface/%s', ''),
+            'input-device': (gitlab_root + 'input-device/-/tree/main/%s', ''),
+            'march': (gitlab_root + ros1_src + '%s', ''),
+            'monitor': (gitlab_root + ros1_src + 'march_monitor/%s', ''),
+            'simulation': (gitlab_root + ros1_src + 'march_simulation/%s', ''),
+            'gait-files': (gitlab_root + ros1_src + 'march_gait_files/%s', ''),
+            'ethercat-slaves': (gitlab_root + 'ethercat-slaves/-/tree/main/%s', ''),
+            'gait-generation': (gitlab_root + ros1_src + 'march_rqt_gait_generator/%s', ''),
             'march_website': ('http://projectmarch.nl', '')}
 
 # Output file base name for HTML help builder.
