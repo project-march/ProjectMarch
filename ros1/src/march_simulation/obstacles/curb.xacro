@@ -8,7 +8,7 @@
     <xacro:property name="step_height" default="0.170"/>
     <xacro:property name="step_depth" default="0.280"/>
     <xacro:property name="step_width" default="1.80"/>
-    <xacro:property name="distance_to_origin" default="0.4"/>
+    <xacro:property name="distance_to_origin" default="0.45"/>
 
     <link name="${parent_name}"/>
 
