@@ -86,6 +86,9 @@ class SetpointsGait(GaitInterface, Gait):
         if self._time_since_start < self._current_subgait.duration:
             return None, False
 
+        return self._update_next_subgait()
+
+    def _update_next_subgait(self):
         if self._should_stop:
             next_subgait = self._stop()
 

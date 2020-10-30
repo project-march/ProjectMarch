@@ -245,7 +245,6 @@ class GaitSelection(Node):
             'stairs_up', self._gait_directory, self._robot,
             self._gait_version_map)
 
-
     def _load_configuration(self):
         """Loads and verifies the gaits configuration."""
         with open(self._default_yaml, 'r') as default_yaml_file:

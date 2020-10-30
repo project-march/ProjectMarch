@@ -51,33 +51,14 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         if self._time_since_start < self._current_subgait.duration:
             return None, False
 
-        if self._should_stop:
-            next_subgait = self._stop()
-
-        elif self._transition_to_subgait is not None and not self._is_transitioning:
-            return self._transition_subgait()
-
-        elif self._transition_to_subgait is not None and self._is_transitioning:
-            next_subgait = self._transition_to_subgait.subgait_name
-            self._transition_to_subgait = None
-            self._is_transitioning = False
-
-        elif self._is_frozen:
+        if self._is_frozen:
             self._current_subgait = self._subgait_after_freeze
             trajectory = self._current_subgait.to_joint_trajectory_msg()
             self._time_since_start = 0.0 # New subgait is started, so reset the time
             self._is_frozen = False
             return trajectory, False
-        else:
-            # If there is transition to do, go to next (TO) subgait
-            next_subgait = self.graph[(self._current_subgait.subgait_name, self.graph.TO)]
 
-        if next_subgait == self.graph.END:
-            return None, True
-        self._current_subgait = self.subgaits[next_subgait]
-        trajectory = self._current_subgait.to_joint_trajectory_msg()
-        self._time_since_start = 0.0  # New subgait is started, so reset the time
-        return trajectory, False
+        return self._update_next_subgait()
 
     def _execute_freeze(self):
         """
