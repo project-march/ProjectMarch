@@ -76,14 +76,18 @@ class Setpoint(object):
             * VELOCITY_SCALE
 
         # linearly interpolate the ankle angle, as it cannot be calculated from the inverse kinematics
-        new_ankle_pos = [Setpoint.weighted_average(base_setpoints['left_ankle'].position,
-                                                   other_setpoints['left_ankle'].position, parameter),
-                         Setpoint.weighted_average(base_setpoints['right_ankle'].position,
-                                                   other_setpoints['right_ankle'].position, parameter)]
-        new_ankle_vel = [Setpoint.weighted_average(base_setpoints['left_ankle'].velocity,
-                                                   other_setpoints['left_ankle'].velocity, parameter),
-                         Setpoint.weighted_average(base_setpoints['right_ankle'].velocity,
-                                                   other_setpoints['right_ankle'].velocity, parameter)]
+        try:
+            new_ankle_pos = [Setpoint.weighted_average(base_setpoints['left_ankle'].position,
+                                                       other_setpoints['left_ankle'].position, parameter),
+                             Setpoint.weighted_average(base_setpoints['right_ankle'].position,
+                                                       other_setpoints['right_ankle'].position, parameter)]
+            new_ankle_vel = [Setpoint.weighted_average(base_setpoints['left_ankle'].velocity,
+                                                       other_setpoints['left_ankle'].velocity, parameter),
+                             Setpoint.weighted_average(base_setpoints['right_ankle'].velocity,
+                                                       other_setpoints['right_ankle'].velocity, parameter)]
+        except KeyError as e:
+            raise KeyError('Expected setpoint dictionaries to contain "{key}", but "{key}" was missing.'.
+                           format(key=e.args[0]))
 
         # Set the time of the new setpoints as the weighted average of the original setpoint times
         base_setpoints_time = 0
@@ -149,12 +153,16 @@ class Setpoint(object):
         :return:
             the foot location or velocity as a 2x3 list. Origin in the hip base, y positive to the right.
         """
-        l_haa = setpoint_dic['left_hip_aa'].position
-        l_hfe = setpoint_dic['left_hip_fe'].position
-        l_kfe = setpoint_dic['left_knee'].position
-        r_haa = setpoint_dic['right_hip_aa'].position
-        r_hfe = setpoint_dic['right_hip_fe'].position
-        r_kfe = setpoint_dic['right_knee'].position
+        try:
+            l_haa = setpoint_dic['left_hip_aa'].position
+            l_hfe = setpoint_dic['left_hip_fe'].position
+            l_kfe = setpoint_dic['left_knee'].position
+            r_haa = setpoint_dic['right_hip_aa'].position
+            r_hfe = setpoint_dic['right_hip_fe'].position
+            r_kfe = setpoint_dic['right_knee'].position
+        except KeyError as e:
+            raise KeyError('Expected setpoint dictionary to contain "{key}", but "{key}" was missing.'.
+                           format(key=e.args[0]))
 
         # get lengths from robot model, l_ul = left upper leg etc. see get_lengths_robot().
         l_ul, l_ll, l_bb, l_ph, r_ul, r_ll, r_bb, r_ph, base = Setpoint.get_lengths_robot()
@@ -355,18 +363,22 @@ class Setpoint(object):
 
     @staticmethod
     def get_lengths_robot(foot=''):
-        robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
-        l_ul = robot.link_map['upper_leg_left'].collisions[0].geometry.size[2]  # left upper leg length
-        l_ll = robot.link_map['lower_leg_left'].collisions[0].geometry.size[2]  # left lower leg length
-        l_bb = robot.link_map['hip_aa_frame_left_front'].collisions[0].geometry.size[0]  # left haa arm to leg
-        # (billen been)
-        l_ph = robot.link_map['hip_aa_frame_left_side'].collisions[0].geometry.size[1]  # left pelvic hip length
-        r_ul = robot.link_map['upper_leg_right'].collisions[0].geometry.size[2]  # right upper leg length
-        r_ll = robot.link_map['lower_leg_right'].collisions[0].geometry.size[2]  # right lower leg length
-        r_bb = robot.link_map['hip_aa_frame_right_front'].collisions[0].geometry.size[0]  # right haa arm to leg
-        # (billen been)
-        r_ph = robot.link_map['hip_aa_frame_right_side'].collisions[0].geometry.size[1]  # right pelvic hip length
-        base = robot.link_map['hip_base'].collisions[0].geometry.size[1]
+        try:
+            robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
+            l_ul = robot.link_map['upper_leg_left'].collisions[0].geometry.size[2]  # left upper leg length
+            l_ll = robot.link_map['lower_leg_left'].collisions[0].geometry.size[2]  # left lower leg length
+            l_bb = robot.link_map['hip_aa_frame_left_front'].collisions[0].geometry.size[0]  # left haa arm to leg
+            # (billen been)
+            l_ph = robot.link_map['hip_aa_frame_left_side'].collisions[0].geometry.size[1]  # left pelvic hip length
+            r_ul = robot.link_map['upper_leg_right'].collisions[0].geometry.size[2]  # right upper leg length
+            r_ll = robot.link_map['lower_leg_right'].collisions[0].geometry.size[2]  # right lower leg length
+            r_bb = robot.link_map['hip_aa_frame_right_front'].collisions[0].geometry.size[0]  # right haa arm to leg
+            # (billen been)
+            r_ph = robot.link_map['hip_aa_frame_right_side'].collisions[0].geometry.size[1]  # right pelvic hip length
+            base = robot.link_map['hip_base'].collisions[0].geometry.size[1]
+        except KeyError as e:
+            raise KeyError('Expected robot.link_map to contain "{key}", but "{key}" was missing.'.
+                           format(key=e.args[0]))
         if foot == 'left':
             return [l_ul, l_ll, l_bb, l_ph, base]
         elif foot == 'right':
