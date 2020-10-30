@@ -83,5 +83,5 @@ class TestGaitSelection(unittest.TestCase):
         self.semi_dynamic_gait.update(2)
         self.semi_dynamic_gait.freeze()
         self.semi_dynamic_gait.update(2)
-        self.assertEquals(self.semi_dynamic_gait._current_subgait.subgait_name,
+        self.assertEqual(self.semi_dynamic_gait._current_subgait.subgait_name,
                           'dynamic_freeze')
