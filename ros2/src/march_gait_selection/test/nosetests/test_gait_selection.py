@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from copy import deepcopy
 import unittest
 import rclpy
 from ament_index_python import get_package_share_directory, PackageNotFoundError

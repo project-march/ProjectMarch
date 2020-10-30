@@ -9,6 +9,7 @@ from march_shared_msgs.srv import PossibleGaits
 DEFAULT_TIMER_PERIOD = 0.04
 NANOSEC_TO_SEC = 1e-9
 
+
 class GaitStateMachine(object):
     """The state machine used to make sure that only valid transitions will
     be made."""

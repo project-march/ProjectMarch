@@ -26,7 +26,6 @@ class StateMachineInput(object):
                                                                      topic='/march/input_device/instruction_response',
                                                                      qos_profile=20)
 
-
     def get_transition_request(self):
         """Used to return the transition request as an enum.
 

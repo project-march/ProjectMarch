@@ -97,10 +97,10 @@ class TransitionSubgait(Subgait):
         new setpoint and transition factor."""
         old_factor = 1.0 - new_factor
 
-        position = (old_setpoint.position * old_factor) + (
-                    new_setpoint.position * new_factor)
-        velocity = (old_setpoint.velocity * old_factor) + (
-                    new_setpoint.velocity * new_factor)
+        position = (old_setpoint.position * old_factor) + \
+                   (new_setpoint.position * new_factor)
+        velocity = (old_setpoint.velocity * old_factor) + \
+                   (new_setpoint.velocity * new_factor)
 
         return Setpoint(new_setpoint.time, position, velocity)
 
@@ -153,4 +153,3 @@ class TransitionSubgait(Subgait):
                             .format(tp=transition_setpoint.position,
                                     op=old_setpoint.position,
                                     np=new_setpoint.position))
-

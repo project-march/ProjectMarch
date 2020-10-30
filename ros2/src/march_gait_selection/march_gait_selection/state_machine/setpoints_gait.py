@@ -101,7 +101,7 @@ class SetpointsGait(GaitInterface, Gait):
         self._current_subgait = self.subgaits[next_subgait]
         trajectory = self._current_subgait.to_joint_trajectory_msg()
 
-        self._time_since_start = 0.0 # New subgait is started, so reset the time
+        self._time_since_start = 0.0  # New subgait is started, so reset the time
         return trajectory, False
 
     def transition(self, transition_request):
@@ -178,4 +178,3 @@ class SetpointsGait(GaitInterface, Gait):
         self._time_since_start = 0.0
         self._is_transitioning = True
         return transition_subgait.to_joint_trajectory_msg()
-
