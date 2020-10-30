@@ -10,6 +10,7 @@ from march_shared_msgs.msg import CurrentState
 from qt_gui.plugin import Plugin
 
 from rcl_interfaces.msg import Log
+from rcl_interfaces.srv import GetParameters
 
 import rclpy
 from rclpy.exceptions import InvalidServiceNameException
@@ -55,14 +56,13 @@ class NotesPlugin(Plugin):
         self._widget = NotesWidget(self._model, ui_file, self._node)
         context.add_widget(self._widget)
 
-        self._use_current_time = self._node.get_parameter('use_sim_time').get_parameter_value().bool_value
-        self._node.get_logger().info(str(self._use_current_time))
+        self._use_current_time = self._should_use_current_time()
 
         # Log a message when it is an error, or when the content is 'March is fully operational'
         self._filter_map = FilterMap()
         self._filter_map.add_filter_on_minimal_level(Log.ERROR)
         self._filter_map.add_filter_on_level(
-            Log.INFO, msg_filter=lambda l: l.msg == 'March is fully operational', )
+            Log.INFO, msg_filter=lambda l: l.msg == 'March is fully operational')
 
         self._node.create_subscription(
             Log, '/rosout_agg', self._rosout_cb, qos_profile=10)
@@ -71,6 +71,29 @@ class NotesPlugin(Plugin):
 
         self._get_gait_version_map_client = self._node.create_client(
             Trigger, '/march/gait_selection/get_version_map')
+
+    def _should_use_current_time(self) -> bool:
+        """ Determine whether the rqt_note_taker should use the current time when creating a new entry
+        or the timestamp of the log msg.
+
+        This is determined based on whether the use_sim_time parameter is True. When this parameter is true, the log msg
+        will not have an useful timestamp, meaning the current time should be used.
+
+        If the node is launched via the launch file, then the parameter can simply be retrieved from the node's
+        parameter server.
+        If the node is launch via rqt_gui, it will not have the parameter correctly set in its own parameter server,
+        therefore the parameter is retrieved from the march_monitor node.
+
+        :return Returns a boolean, indicating whether the current time should be used when creating a new entry.
+        """
+        client = self._node.create_client(GetParameters, '/march_monitor/get_parameters')
+        if client.service_is_ready():
+            future = client.call_async(GetParameters.Request(names=['use_sim_time']))
+            rclpy.spin_until_future_complete(self._node, future)
+            client.destroy()
+            return future.result().values[0].bool_value
+        else:
+            return self._node.get_parameter('use_sim_time').get_parameter_value().bool_value
 
     def shutdown_plugin(self):
         """Close the plugin.
