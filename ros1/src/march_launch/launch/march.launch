@@ -73,10 +73,12 @@
         <include if="$(arg balance)" file="$(find march_moveit)/launch/march_moveit.launch" />
     </group>
 
-    <group if="$(eval configuration == 'exoskeleton')">
-        <include file="$(find march_hardware_interface)/launch/hardware.launch" if="$(arg hardware_interface)">
-            <arg name="robot" value="march4"/>
-        </include>
+    <group if="$(eval gait_directory != 'simulation_only-vi')">
+        <group if="$(eval configuration == 'exoskeleton')">
+            <include file="$(find march_hardware_interface)/launch/hardware.launch" if="$(arg hardware_interface)">
+                <arg name="robot" value="march4"/>
+            </include>
+        </group>
     </group>
 
     <group if="$(eval configuration == 'simulation')">
