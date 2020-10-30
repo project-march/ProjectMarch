@@ -156,13 +156,12 @@ class GaitSelection(Node):
         :param request: service request
         :return: True when the gait and subgait are loaded
         """
-        gait = self[request.gait]
+        gait = self._loaded_gaits.get(request.gait)
         if gait is None:
             return ContainsGait.Response(contains=False)
         for subgait in request.subgaits:
             if gait[subgait] is None:
                 return ContainsGait.Response(contains=False)
-
         return ContainsGait.Response(contains=True)
 
     def scan_directory(self):
