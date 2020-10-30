@@ -7,7 +7,7 @@ from march_shared_msgs.msg import CurrentState, CurrentGait, Error
 from march_shared_msgs.srv import PossibleGaits
 
 DEFAULT_TIMER_PERIOD = 0.04
-
+NANOSEC_TO_SEC = 1e-9
 
 class GaitStateMachine(object):
     """The state machine used to make sure that only valid transitions will
@@ -91,9 +91,10 @@ class GaitStateMachine(object):
 
     def _error_cb(self, msg):
         """ Standard callback for state machine errors, completely stops
-        updating if the error is fatal """
+        updating if the error is fatal. If non fatal, it stops the current
+        gait. """
         if msg.type == Error.NON_FATAL:
-            self.stop()
+            self.stop_gait()
         elif msg.type == Error.FATAL:
             self.request_shutdown()
 
@@ -161,7 +162,7 @@ class GaitStateMachine(object):
             if self._is_idle:
                 self._process_idle_state()
             else:
-                self._process_gait_state(elapsed_time.nanoseconds * 1e-9)
+                self._process_gait_state(elapsed_time.nanoseconds * NANOSEC_TO_SEC)
         else:
             self.update_timer.cancel()
 
@@ -170,7 +171,7 @@ class GaitStateMachine(object):
         possible."""
         self._shutdown_requested = True
 
-    def stop(self):
+    def stop_gait(self):
         """Requests a stop from the current executing gait, but keeps the state
         machine running."""
         if not self._is_idle:
@@ -372,7 +373,8 @@ class GaitStateMachine(object):
             home_gait_name = home_gait.name
             self._home_gaits[home_gait_name] = home_gait
             if home_gait_name in self._gait_transitions:
-                raise GaitStateMachineError('Gaits cannot have the same name as home gait `{0}`'.format(home_gait_name))
+                raise GaitStateMachineError(
+                    f'Gaits cannot have the same name as home gait `{home_gait_name}`')
 
             self._gait_transitions[home_gait_name] = idle_name
             self._idle_transitions[self.UNKNOWN].add(home_gait_name)

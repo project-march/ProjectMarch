@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated />
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="f030c14c-32c5-4173-85b5-3d2eb7cec4a5" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/launch/gait_selection.launch.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/march_gait_selection/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/march_gait_selection/dynamic_gaits/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/march_gait_selection/dynamic_gaits/transition_subgait.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/march_gait_selection/gait_selection.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/march_gait_selection/gait_selection_node.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/march_gait_selection/sounds.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/march_gait_selection/state_machine/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/march_gait_selection/state_machine/gait_interface.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/march_gait_selection/state_machine/gait_state_machine.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/march_gait_selection/state_machine/gait_state_machine_error.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/march_gait_selection/state_machine/home_gait.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/march_gait_selection/state_machine/setpoints_gait.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/march_gait_selection/state_machine/state_machine_input.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/march_gait_selection/state_machine/trajectory_scheduler.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/package.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/resource/march_gait_selection" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/setup.cfg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/setup.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/sounds/gait_end.wav" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/sounds/gait_start.wav" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/sounds/gait_stop.wav" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/sounds/start.wav" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/test/test_copyright.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/test/test_flake8.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ros2/src/march_gait_selection/test/test_pep257.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/march_launch/launch/march_ros2_simulation.launch" beforeDir="false" afterPath="$PROJECT_DIR$/src/march_launch/launch/march_ros2_simulation.launch" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectId" id="1j8cMuMv4MvKAPiarltWWfRAM0v" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="cf.first.check.clang-format" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="f030c14c-32c5-4173-85b5-3d2eb7cec4a5" name="Default Changelist" comment="" />
+      <created>1603189122116</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1603189122116</updated>
+      <workItem from="1603189123399" duration="1746000" />
+      <workItem from="1603194681816" duration="2594000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="449" y="174" key="SettingsEditor" timestamp="1603189602340">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="449" y="174" key="SettingsEditor/1920.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1603189602340" />
+  </component>
+</project>

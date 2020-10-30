@@ -18,13 +18,13 @@ class TransitionSubgait(Subgait):
                                                 version, description)
 
     @classmethod
-    def from_subgaits(cls, old_subgait, new_subgait, new_subgait_name):
+    def from_subgaits(cls, old_subgait, new_subgait, transition_subgait_name):
         """Create a new transition subgait object between two given subgaits.
         :param old_subgait: The old subgait to transition from
         :param new_subgait: The new gait which must be executed after the
                             old gait
-        :param new_subgait_name: Name of the subgait in which the transition
-                                 will occur
+        :param transition_subgait_name: Name to use for the subgait that will be created
+        in which the transition will occur
 
         :return: A populated TransitionSubgait object which holds the data to
                  transition between given gaits
@@ -36,7 +36,7 @@ class TransitionSubgait(Subgait):
         transition_duration = new_subgait_copy.duration
 
         transition_subgait = cls(transition_joints, transition_duration,
-                                 subgait_name=new_subgait_name)
+                                 subgait_name=transition_subgait_name)
 
         cls._validate_transition_gait(old_subgait_copy, transition_subgait,
                                       new_subgait_copy)

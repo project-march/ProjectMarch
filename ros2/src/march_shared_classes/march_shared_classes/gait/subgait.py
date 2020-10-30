@@ -11,6 +11,7 @@ from .limits import Limits
 from .setpoint import Setpoint
 
 PARAMETRIC_GAITS_PREFIX = '_pg_'
+NANOSEC_TO_SEC = 1e-9
 
 
 class Subgait(object):
@@ -122,7 +123,7 @@ class Subgait(object):
             raise GaitError('Cannot create gait without a loaded robot.')
 
         duration = Duration(seconds=subgait_dict['duration']['secs'],
-                            nanoseconds=subgait_dict['duration']['nsecs']).nanoseconds * 1e-9
+                            nanoseconds=subgait_dict['duration']['nsecs']).nanoseconds * NANOSEC_TO_SEC
 
         joint_list = []
         for name, points in sorted(subgait_dict['joints'].items(), key=lambda item: item[0]):
