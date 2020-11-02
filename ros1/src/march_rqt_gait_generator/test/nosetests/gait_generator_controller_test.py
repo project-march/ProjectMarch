@@ -284,12 +284,17 @@ class GaitGeneratorControllerTest(unittest.TestCase):
 
     # change_gait_directory tests
     def test_change_gait_directory(self):
-        self.gait_generator_view.open_directory_dialogue = Mock(return_value='some/test/directory')
+        self.gait_generator_view.open_directory_dialogue = Mock(return_value='some/march_gait_files/directory')
         self.gait_generator_controller.change_gait_directory()
-        self.assertEqual(self.gait_generator_controller.gait_directory, 'some/test/directory')
+        self.assertEqual(self.gait_generator_controller.gait_directory, 'some/march_gait_files/directory')
 
-    def test_change_gait_directory_canceled(self):
-        self.gait_generator_controller.gait_directory = 'some/test/directory'
+    def test_change_gait_directory_canceled_previous(self):
+        self.gait_generator_controller.gait_directory = 'some/march_gait_files/directory'
+        self.gait_generator_view.open_directory_dialogue = Mock(return_value='')
+        self.gait_generator_controller.change_gait_directory()
+        self.assertEqual(self.gait_generator_controller.gait_directory, 'some/march_gait_files/directory')
+
+    def test_change_gait_directory_canceled_none(self):
         self.gait_generator_view.open_directory_dialogue = Mock(return_value='')
         self.gait_generator_controller.change_gait_directory()
         self.assertIsNone(self.gait_generator_controller.gait_directory)
