@@ -18,6 +18,7 @@ class EntryModel(QAbstractTableModel):
         super(EntryModel, self).__init__()
         self._entries: List[Entry] = []
 
+    # Ignore 'N802': function name cannot be snake_case because it overrides a function from QAbstractTableModel
     def rowCount(self, parent=None) -> int:  # noqa: N802
         """Get the number of rows.
 
@@ -25,6 +26,7 @@ class EntryModel(QAbstractTableModel):
         """
         return len(self._entries)
 
+    # Ignore 'N802': function name cannot be snake_case because it overrides a function from QAbstractTableModel
     def columnCount(self, parent=None) -> int:  # noqa: N802
         """Get the number of columns.
 
@@ -32,6 +34,7 @@ class EntryModel(QAbstractTableModel):
         """
         return len(EntryModel.columns)
 
+    # Ignore 'N802': function name cannot be snake_case because it overrides a function from QAbstractTableModel
     def headerData(self, section: int, orientation, role=None):  # noqa: N802
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return EntryModel.columns[section].capitalize()
