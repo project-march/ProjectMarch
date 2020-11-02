@@ -173,9 +173,6 @@ class GaitGeneratorView(QWidget):
                                                       'a subdirectory of march_gait_files or be named resources.',
                                                 self.ros1_path + '/src/march_gait_files')
 
-    def open_directory_dialogue(self):
-        return QFileDialog.getExistingDirectory(None, 'Select a directory to save gaits')
-
     @QtCore.pyqtSlot(int)
     def update_main_time_slider(self, time):
         self.time_slider.setValue(time)
