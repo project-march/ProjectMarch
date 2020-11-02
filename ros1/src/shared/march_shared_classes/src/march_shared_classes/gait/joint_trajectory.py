@@ -170,10 +170,23 @@ class JointTrajectory(object):
 
     @classmethod
     def interpolate_joint_trajectories_foot_position(cls, base_subgait, other_subgait, num_setpoints, parameter):
+        """Linearly interpolate the foot trajectory corresponding to the joint trajectories of two subgaits.
+
+        This function goes over each joint to get needed setpoints (all first setpoints, all second setpoints..).
+        These are needed as calcuating the foot position requires the position of all joints at a certain time.
+
+        :param base_trajectory:
+            base trajectory, return value if parameter is equal to zero
+        :param other_trajectory:
+            other trajectory, return value if parameter is equal to one
+        :param parameter:
+            The parameter to use for interpolation. Should be 0 <= parameter <= 1.
+
+        :return:
+            The interpolated trajectory
+        """
         joints = []
         new_setpoints = {}
-        # go over each joint to get needed setpoints (all first setpoints, all second setpoints..). These are needed
-        # as calcuating the foot position requires the position of all joints at a certain time.
         for current_setpoints_index in range(0, num_setpoints):
             base_setpoints_to_interpolate = {}
             other_setpoints_to_interpolate = {}
