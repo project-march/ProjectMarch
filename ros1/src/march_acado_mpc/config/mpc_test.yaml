@@ -1,0 +1,23 @@
+## Controller Parameters:
+
+# system parameters
+gravity: 9.81     # [m/s^2]
+mass: 3.0         # point mass [kg]
+arm_length: 0.60  # distance from point mass to motor [m]
+
+# constraint values
+angle_min: -0.785   # approximately -45 deg
+angle_max: 0.785    # approximately 45 deg
+torque_min: -50     # Nm
+torque_max: 50      # Nm
+
+# mpc variables
+sampling_time: 0.04 # [s]
+horizon_time: 0.2   # [s]
+
+q_x1: 100   # running cost on x1
+q_x2: 1     # running cost on x2
+r_u: 0.01   # running cost on u
+
+qN_x1: 100   # end cost on x1
+qN_x2: 1     # end cost on x2

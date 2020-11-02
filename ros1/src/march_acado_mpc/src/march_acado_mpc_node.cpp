@@ -1,33 +1,12 @@
-#include "ros/ros.h"
+/* Placeholder script, The code that was here before the "Hello World!" placeholder has been moved to controller.cpp.
+ * This has been done to create a package free of build errors, which will make working on other issues easier.*/
 
+#include <iostream>
 
-int main(int argc, char** argv) {
+using namespace std;
 
-  ros::init(argc, argv, "march_acado_mpc_node")
-  ros::NodeHandle n;
-  ros::Rate rate(10);
+int main( ) {
+    cout << "Hello World!" << endl;
 
-  int count = 0;
-  while (!n.hasParam("/march/joint_names"))
-  {
-    ros::Duration(0.5).sleep();
-    count++;
-    if (count > 10)
-    {
-      ROS_ERROR("Failed to read the joint_names from the parameter server.");
-      throw std::runtime_error("Failed to read the joint_names from the parameter server.");
-    }
-  }
-
-  n.getParam("/march/joint_names", sensor_names);
-
-  while (ros::ok())
-  {
-  	// ...
-    
-    ros::spinOnce();
-    rate.sleep();
-  }
-
-  return 0;
+    return 0;
 }
