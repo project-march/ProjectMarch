@@ -269,7 +269,8 @@ class Subgait(object):
                                                    sorted(other_subgait.get_joint_names())))
 
         joints = []
-        num_setpoints = 0
+        number_of_setpoints = len(base_subgait.joints[0].setpoints)
+        joint_to_compare_to = base_subgait.joints[0].name
         for base_joint in base_subgait.joints:
             other_joint = other_subgait.get_joint(base_joint.name)
             if other_joint is None:
@@ -278,24 +279,25 @@ class Subgait(object):
             # check whether each joint has the same number of setpoints for the interpolation using foot position
             # for the interpolation using joint angles, continue to interpolate_joint_trajectories if joints match
             if use_foot_position:
-                if num_setpoints == 0:
-                    num_setpoints = len(base_joint.setpoints)
-                    compare_joint_name = base_joint.name
-
-                if len(base_joint.setpoints) != num_setpoints:
-                    raise SubgaitInterpolationError('Number of setpoints differs in subgait {0} {1} from {0} {2}.'.
-                                                    format(base_subgait.subgait_name, base_joint.name,
-                                                           compare_joint_name))
-                elif len(other_joint.setpoints) != num_setpoints:
-                    raise SubgaitInterpolationError('Number of setpoints differs in subgait {0} {1} from {2} {3}.'.
-                                                    format(other_subgait.subgait_name, base_joint.name,
-                                                           base_subgait.subgait_name, compare_joint_name))
+                if len(base_joint.setpoints) != number_of_setpoints:
+                    raise SubgaitInterpolationError('Number of setpoints differs in {base_subgait} {joint_1} from '
+                                                    '{base_subgait} {joint_2}.'.
+                                                    format(base_subgait=base_subgait.subgait_name,
+                                                           joint_1=base_joint.name,
+                                                           joint_2=joint_to_compare_to))
+                elif len(other_joint.setpoints) != number_of_setpoints:
+                    raise SubgaitInterpolationError('Number of setpoints differs in {other_subgait} {joint_1} from '
+                                                    '{base_subgait} {joint_2}.'.
+                                                    format(other_subgait=other_subgait.subgait_name,
+                                                           joint_1=base_joint.name,
+                                                           base_subgait=base_subgait.subgait_name,
+                                                           joint_2=joint_to_compare_to))
             else:
                 joints.append(cls.joint_class.interpolate_joint_trajectories(base_joint, other_joint, parameter))
 
         if use_foot_position:
             joints = cls.joint_class.interpolate_joint_trajectories_foot_position(base_subgait, other_subgait,
-                                                                                  num_setpoints, parameter)
+                                                                                  number_of_setpoints, parameter)
 
         description = 'Interpolation between base version {0}, and other version {1} with parameter{2}'.format(
             base_subgait.version, other_subgait.version, parameter)
