@@ -81,14 +81,38 @@
         </group>
     </group>
 
-    <group if="$(eval configuration == 'simulation')">
-        <include file="$(find march_simulation)/launch/march_world.launch">
-            <arg name="gazebo_ui" value="$(eval not headless and gazebo_ui)"/>
-            <arg name="fixed" value="$(arg fixed)"/>
-            <arg name="ground_gait" value="$(arg ground_gait)"/>
-            <arg name="obstacle" value="$(arg obstacle)"/>
-            <arg name="controller" value="$(arg controller)"/>
-        </include>
+    <group if="$(eval gait_directory == 'simulation_only-vi')"><!-- Print a message when starting the exo with the wrong gait_directory -->
+        <group if="$(eval configuration == 'exoskeleton')">
+            <arg name="msg" default="Gait directory simulation_only-vi cannot be ran on the exoskeleton." />
+            <node name="pub_text" pkg="rostopic" type="rostopic"
+               args="pub /msg std_msgs/String '$(arg msg)'"
+               output="screen" />
+            <node name="print_text" pkg="rostopic" type="rostopic"
+               args="echo /msg" output="screen" />
+        </group>
+    </group>
+
+    <group if="$(eval gait_directory != 'simulation_only-vi')">
+        <group if="$(eval configuration == 'simulation')">
+            <include file="$(find march_simulation)/launch/march_world.launch">
+                <arg name="gazebo_ui" value="$(eval not headless and gazebo_ui)"/>
+                <arg name="fixed" value="$(arg fixed)"/>
+                <arg name="ground_gait" value="$(arg ground_gait)"/>
+                <arg name="obstacle" value="$(arg obstacle)"/>
+                <arg name="controller" value="$(arg controller)"/>
+            </include>
+        </group>
+    </group>
+
+    <group if="$(eval gait_directory == 'simulation_only-vi')"><!-- Print a message when starting the exo with the wrong gait_directory -->
+        <group if="$(eval configuration == 'simulation')">
+            <arg name="msg" default="Gait directory simulation_only-vi cannot be ran on the exoskeleton." />
+            <node name="pub_text" pkg="rostopic" type="rostopic"
+               args="pub /msg std_msgs/String '$(arg msg)'"
+               output="screen" />
+            <node name="print_text" pkg="rostopic" type="rostopic"
+               args="echo /msg" output="screen" />
+        </group>
     </group>
 
     <include file="$(dirname)/serial_connection.launch">
