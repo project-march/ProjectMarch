@@ -8,7 +8,8 @@ from rcl_interfaces.msg import Log
 
 class Entry(QObject):
 
-    def __init__(self, content: str, date_time: Optional[QDateTime] = None, is_error: Optional[bool] = False):
+    def __init__(self, content: str, date_time: Optional[QDateTime] = None,
+                 is_error: Optional[bool] = False):
         """Construct an Entry.
 
         :param content Content of the message
@@ -18,11 +19,13 @@ class Entry(QObject):
         super(Entry, self).__init__()
 
         self.content = content
-        self.date_time = QDateTime.currentDateTime() if date_time is None else date_time
+        self.date_time = QDateTime.currentDateTime() if date_time is None \
+            else date_time
         self.is_error = is_error
 
     @classmethod
-    def from_ros_msg(cls, log_msg: Log, use_current_time: Optional[bool] = True):
+    def from_ros_msg(cls, log_msg: Log,
+                     use_current_time: Optional[bool] = True):
         """Returns an Entry from a given ROS log message.
 
         :param log_msg: The message to convert

@@ -14,11 +14,11 @@ class EntryModel(QAbstractTableModel):
 
     def __init__(self):
         """Initialize an empty list of entries."""
-
         super(EntryModel, self).__init__()
         self._entries: List[Entry] = []
 
-    # Ignore 'N802': function name cannot be snake_case because it overrides a function from QAbstractTableModel
+    # Ignore 'N802': function name cannot be snake_case because it
+    # overrides a function from QAbstractTableModel
     def rowCount(self, parent=None) -> int:  # noqa: N802
         """Get the number of rows.
 
@@ -26,7 +26,8 @@ class EntryModel(QAbstractTableModel):
         """
         return len(self._entries)
 
-    # Ignore 'N802': function name cannot be snake_case because it overrides a function from QAbstractTableModel
+    # Ignore 'N802': function name cannot be snake_case because it
+    # overrides a function from QAbstractTableModel
     def columnCount(self, parent=None) -> int:  # noqa: N802
         """Get the number of columns.
 
@@ -34,7 +35,8 @@ class EntryModel(QAbstractTableModel):
         """
         return len(EntryModel.columns)
 
-    # Ignore 'N802': function name cannot be snake_case because it overrides a function from QAbstractTableModel
+    # Ignore 'N802': function name cannot be snake_case because it
+    # overrides a function from QAbstractTableModel
     def headerData(self, section: int, orientation, role=None):  # noqa: N802
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return EntryModel.columns[section].capitalize()
@@ -79,7 +81,8 @@ class EntryModel(QAbstractTableModel):
         self._entries.append(entry)
         self.endInsertRows()
 
-    def insert_log_msg(self, log_msg: Log, use_current_time: Optional[bool] = True):
+    def insert_log_msg(self, log_msg: Log,
+                       use_current_time: Optional[bool] = True):
         """Converts a ROS log msg to entry and appends it to the rows.
 
         :param log_msg: Log msg to
