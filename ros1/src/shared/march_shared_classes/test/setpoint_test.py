@@ -92,6 +92,8 @@ class SetpointTest(unittest.TestCase):
         new_angles_vel_right = Setpoint.calculate_joint_angles_from_foot_position(foot_pos, 'right', foot_vel)
 
         for key in new_angles_vel_right.keys():
-            self.assertAlmostEqual(new_angles_vel_right[key], self.setpoint.velocity, places=4)
+            if key.endswith('_velocity'):
+                self.assertAlmostEqual(new_angles_vel_right[key], self.setpoint.velocity, places=4)
         for key in new_angles_vel_left.keys():
-            self.assertAlmostEqual(new_angles_vel_left[key], self.setpoint.velocity, places=4)
+            if key.endswith('_velocity'):
+                self.assertAlmostEqual(new_angles_vel_left[key], self.setpoint.velocity, places=4)
