@@ -142,8 +142,8 @@ class JointTrajectory(object):
     def __len__(self):
         return len(self.setpoints)
 
-    @classmethod
-    def interpolate_joint_trajectories(cls, base_trajectory, other_trajectory, parameter):
+    @staticmethod
+    def interpolate_joint_trajectories(base_trajectory, other_trajectory, parameter):
         """Linearly interpolate two joint trajectories with the parameter.
 
         :param base_trajectory:
@@ -164,12 +164,12 @@ class JointTrajectory(object):
                                             format(base_trajectory.name))
         setpoints = []
         for base_setpoint, other_setpoint in zip(base_trajectory.setpoints, other_trajectory.setpoints):
-            setpoints.append(cls.setpoint_class.interpolate_setpoints(base_setpoint, other_setpoint, parameter))
+            setpoints.append(JointTrajectory.setpoint_class.interpolate_setpoints(base_setpoint, other_setpoint, parameter))
         duration = parameter * base_trajectory.duration + (1 - parameter) * other_trajectory.duration
         return JointTrajectory(base_trajectory.name, base_trajectory.limits, setpoints, duration)
 
-    @classmethod
-    def interpolate_joint_trajectories_foot_position(cls, base_subgait, other_subgait, num_setpoints, parameter):
+    @staticmethod
+    def interpolate_joint_trajectories_foot_position(base_subgait, other_subgait, parameter):
         """Linearly interpolate the foot trajectory corresponding to the joint trajectories of two subgaits.
 
         This function goes over each joint to get needed setpoints (all first setpoints, all second setpoints..).
@@ -187,11 +187,10 @@ class JointTrajectory(object):
         """
         joints = []
         new_setpoints = {}
-        for current_setpoints_index in range(0, num_setpoints):
+        for current_setpoints_index in range(0, len(base_subgait.joints[0].setpoints)):
             base_setpoints_to_interpolate = {}
             other_setpoints_to_interpolate = {}
-            for base_joint in base_subgait.joints:
-                other_joint = other_subgait.get_joint(base_joint.name)
+            for (base_joint, other_joint) in zip(sorted(base_subgait.joints), sorted(other_subgait.joints)):
                 base_setpoints_to_interpolate[base_joint.name] = base_joint.setpoints[current_setpoints_index]
                 other_setpoints_to_interpolate[other_joint.name] = other_joint.setpoints[current_setpoints_index]
             interpolated_setpoints = Setpoint.create_position_interpolated_setpoints(base_setpoints_to_interpolate,
@@ -206,6 +205,6 @@ class JointTrajectory(object):
 
         duration = Setpoint.weighted_average(base_subgait.duration, other_subgait.duration, parameter)
         for base_joint in base_subgait.joints:
-            joints.append(cls(base_joint.name, base_joint.limits, new_setpoints[base_joint.name],
+            joints.append(JointTrajectory(base_joint.name, base_joint.limits, new_setpoints[base_joint.name],
                               duration))
         return joints

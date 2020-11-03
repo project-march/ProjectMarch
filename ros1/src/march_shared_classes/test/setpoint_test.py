@@ -59,15 +59,15 @@ class SetpointTest(unittest.TestCase):
 
     def test_inverse_kinematics_position(self):
         foot_pos = Setpoint.get_foot_pos_from_angles(self.setpoint_dict)
-        angles = Setpoint.get_angles_from_pos(foot_pos[0], 'left') + \
-            Setpoint.get_angles_from_pos(foot_pos[1], 'right')
+        angles = Setpoint.calculate_joint_angles_from_foot_position(foot_pos[0], 'left') + \
+            Setpoint.calculate_joint_angles_from_foot_position(foot_pos[1], 'right')
         for i in range(0, len(angles)):
             self.assertAlmostEqual(angles[i], self.setpoint.position, places=4)
 
     def test_inverse_kinematics_reversed_position(self):
         desired_position = [[0.0, -0.08, 0.6], [0.0, 0.08, 0.6]]
-        new_angles = Setpoint.get_angles_from_pos(desired_position[0], 'left') + \
-            Setpoint.get_angles_from_pos(desired_position[1], 'right')
+        new_angles = Setpoint.calculate_joint_angles_from_foot_position(desired_position[0], 'left') + \
+            Setpoint.calculate_joint_angles_from_foot_position(desired_position[1], 'right')
         time = 1.0
         new_vel = 2.0
         resulting_angles = {'left_hip_aa': Setpoint(time, new_angles[0], new_vel),
@@ -85,12 +85,12 @@ class SetpointTest(unittest.TestCase):
         foot_vel = np.array(Setpoint.get_foot_pos_from_angles(self.setpoint_dict, velocity=True))
         foot_pos = np.array(Setpoint.get_foot_pos_from_angles(self.setpoint_dict, velocity=False))
 
-        new_angles_pos = [Setpoint.get_angles_from_pos(foot_pos[0], 'left'),
-                          Setpoint.get_angles_from_pos(foot_pos[1], 'right')]
+        new_angles_pos = [Setpoint.calculate_joint_angles_from_foot_position(foot_pos[0], 'left'),
+                          Setpoint.calculate_joint_angles_from_foot_position(foot_pos[1], 'right')]
 
         new_angles_vel = (- np.array(new_angles_pos) +
-                          + np.array([Setpoint.get_angles_from_pos(foot_pos[0] + foot_vel[0] / VELOCITY_SCALE, 'left'),
-                                      Setpoint.get_angles_from_pos(foot_pos[1] + foot_vel[1] / VELOCITY_SCALE, 'right'),
+                          + np.array([Setpoint.calculate_joint_angles_from_foot_position(foot_pos[0] + foot_vel[0] / VELOCITY_SCALE, 'left'),
+                                      Setpoint.calculate_joint_angles_from_foot_position(foot_pos[1] + foot_vel[1] / VELOCITY_SCALE, 'right'),
                                       ])) * VELOCITY_SCALE
 
         for i in range(0, 2):
