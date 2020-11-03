@@ -169,10 +169,8 @@ class Setpoint(object):
         # get lengths from robot model, l_ul = left upper leg etc. see get_lengths_robot().
         l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base = Setpoint.get_lengths_robot()
 
-        left_foot = Setpoint.calculate_foot_position(l_haa, l_hfe, l_kfe, base, l_ph,
-                                                     l_hl, l_ul, l_ll, 'left')
-        right_foot = Setpoint.calculate_foot_position(r_haa, r_hfe, r_kfe, base, r_ph,
-                                                      r_hl, r_ul, r_ll, 'right')
+        left_foot = Setpoint.calculate_foot_position(l_haa, l_hfe, l_kfe, 'left')
+        right_foot = Setpoint.calculate_foot_position(r_haa, r_hfe, r_kfe, 'right')
 
         if velocity:
             # To calculate the velocity of the foot, find the foot location as it would be one ethercat cycle later.
@@ -184,12 +182,8 @@ class Setpoint(object):
             r_hfe_next = r_hfe + setpoint_dic['right_hip_fe'].velocity / VELOCITY_SCALE_FACTOR
             r_kfe_next = r_kfe + setpoint_dic['right_knee'].velocity / VELOCITY_SCALE_FACTOR
 
-            left_foot_next = Setpoint.calculate_foot_position(l_haa_next, l_hfe_next,
-                                                              l_kfe_next, base, l_ph, l_hl,
-                                                              l_ul, l_ll, 'left')
-            right_foot_next = Setpoint.calculate_foot_position(r_haa_next, r_hfe_next,
-                                                               r_kfe_next, base, r_ph, r_hl,
-                                                               r_ul, r_ll, 'right')
+            left_foot_next = Setpoint.calculate_foot_position(l_haa_next, l_hfe_next, l_kfe_next, 'left')
+            right_foot_next = Setpoint.calculate_foot_position(r_haa_next, r_hfe_next, r_kfe_next, 'right')
 
             # Rescale the velocities back to radians per second.
             left_y_velocity = (left_foot_next['y'] - left_foot['y']) * VELOCITY_SCALE_FACTOR
@@ -207,20 +201,21 @@ class Setpoint(object):
                     [right_foot['x'], right_foot['y'], right_foot['z']]]
 
     @staticmethod
-    def calculate_foot_position(haa, hfe, kfe, base, ph, hl, ul, ll, foot):
+    def calculate_foot_position(haa, hfe, kfe, side):
         """Calculates the foot position given the relevant angles, lengths and a specification of the foot."""
         # x is positive in the walking direction, z is in the downward direction, y is directed to the right side
         # the origin in the middle of the hip structure. The calculations are supported by
         # https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
+        ul, ll, hl, ph, base = Setpoint.get_lengths_robot(side)
         haa_to_foot_length = ul * cos(hfe) + ll * cos(hfe - kfe)
         z_position = - sin(haa) * ph + cos(haa) * haa_to_foot_length
         x_position = hl + sin(hfe) * ul + sin(hfe - kfe) * ll
-        if foot == 'left':
+        if side == 'left':
             y_position = - cos(haa) * ph - sin(haa) * haa_to_foot_length - base / 2.0
-        elif foot == 'right':
+        elif side == 'right':
             y_position = cos(haa) * ph + sin(haa) * haa_to_foot_length + base / 2.0
         else:
-            rospy.logwarn('invalid foot specified, {0} was given, does not match "left" or "right"'.format(foot))
+            rospy.logwarn('invalid foot specified, {0} was given, does not match "left" or "right"'.format(side))
             return
         return {'x': x_position, 'y': y_position, 'z': z_position}
 
@@ -353,6 +348,17 @@ class Setpoint(object):
             hfe = hfe_two
 
         return [haa, hfe, kfe]
+
+    @staticmethod
+    def weighted_average_dictionary(base_dictionary, other_dictionary, parameter):
+        resulting_dictionary = {}
+        for key in base_dictionary.keys():
+            try:
+                resulting_dictionary[key] = base_dictionary[key] * (1 - parameter) + other_dictionary[key] * parameter
+            except KeyError as e:
+                raise KeyError('dictionaries must have the same keys for a weighted average. other_dictionary misses '
+                               '{key}'.format(key=e.args[0]))
+        return resulting_dictionary
 
     @staticmethod
     def weighted_average(base_value, other_value, parameter):
