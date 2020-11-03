@@ -46,54 +46,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d627b86e-d86e-4bfd-9cb4-c8c35a7d32b1" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/march_acado_mpc/config/mpc_test.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/march_acado_mpc/src/controller.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/include/march_acado_mpc/mpc.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/march_acado_mpc/include/march_acado_mpc/mpc.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/march_acado_mpc_node.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/march_acado_mpc/src/march_acado_mpc_node.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/acado_auxiliary_functions.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/acado_auxiliary_functions.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/acado_common.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/acado_integrator.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/acado_qpoases_interface.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/acado_qpoases_interface.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/acado_solver.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/EXAMPLES/example1.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/EXAMPLES/example1b.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/INCLUDE/Bounds.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/INCLUDE/Constants.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/INCLUDE/Constraints.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/INCLUDE/CyclingManager.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/INCLUDE/EXTRAS/SolutionAnalysis.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/INCLUDE/Indexlist.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/INCLUDE/MessageHandling.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/INCLUDE/QProblem.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/INCLUDE/QProblemB.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/INCLUDE/SubjectTo.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/INCLUDE/Types.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/INCLUDE/Utils.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/LICENSE.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/README.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/SRC/Bounds.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/SRC/Bounds.ipp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/SRC/Constraints.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/SRC/Constraints.ipp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/SRC/CyclingManager.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/SRC/CyclingManager.ipp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/SRC/EXTRAS/SolutionAnalysis.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/SRC/Indexlist.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/SRC/Indexlist.ipp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/SRC/MessageHandling.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/SRC/MessageHandling.ipp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/SRC/QProblem.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/SRC/QProblem.ipp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/SRC/QProblemB.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/SRC/QProblemB.ipp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/SRC/SubjectTo.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/SRC/SubjectTo.ipp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/SRC/Utils.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/SRC/Utils.ipp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/qpoases/VERSIONS.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_solver.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/src/march_acado_mpc/.gitignore" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -129,13 +83,6 @@
       <recent name="$PROJECT_DIR$/src/march_acado_mpc/src/mpc_codegen/build" />
     </key>
   </component>
-  <component name="RunManager">
-    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -149,7 +96,8 @@
       <workItem from="1603975736882" duration="7222000" />
       <workItem from="1603983394779" duration="592000" />
       <workItem from="1604313837935" duration="1584000" />
-      <workItem from="1604327765916" duration="1939000" />
+      <workItem from="1604327765916" duration="2660000" />
+      <workItem from="1604393472170" duration="5202000" />
     </task>
     <servers />
   </component>
@@ -169,10 +117,10 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="114" y="342" width="722" height="398" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1603899214714">
+    <state x="114" y="342" width="722" height="398" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1604396412489">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="114" y="342" width="722" height="398" key="#com.intellij.fileTypes.FileTypeChooser/1920.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1603899214714" />
+    <state x="114" y="342" width="722" height="398" key="#com.intellij.fileTypes.FileTypeChooser/1920.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1604396412489" />
     <state x="2696" y="311" width="424" height="486" key="FileChooserDialogImpl" timestamp="1603983984609">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
