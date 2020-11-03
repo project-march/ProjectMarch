@@ -1,3 +1,10 @@
+gaits:
+  walk:
+    right_open: MV_walk_rightopen_v3
+    left_swing: MV_walk_leftswing_v2
+    right_swing: MV_walk_rightswing_v2
+    left_close: MV_walk_leftclose_v3
+    right_close: MV_walk_rightclose_v3
 positions:
   stand:
     gait_type: walk_like
