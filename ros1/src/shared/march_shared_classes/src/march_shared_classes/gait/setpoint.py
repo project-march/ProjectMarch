@@ -167,12 +167,12 @@ class Setpoint(object):
                            format(key=e.args[0]))
 
         # get lengths from robot model, l_ul = left upper leg etc. see get_lengths_robot().
-        l_ul, l_ll, l_bb, l_ph, r_ul, r_ll, r_bb, r_ph, base = Setpoint.get_lengths_robot()
+        l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base = Setpoint.get_lengths_robot()
 
         left_foot = Setpoint.calculate_foot_position(l_haa, l_hfe, l_kfe, base, l_ph,
-                                                     l_bb, l_ul, l_ll, 'left')
+                                                     l_hl, l_ul, l_ll, 'left')
         right_foot = Setpoint.calculate_foot_position(r_haa, r_hfe, r_kfe, base, r_ph,
-                                                      r_bb, r_ul, r_ll, 'right')
+                                                      r_hl, r_ul, r_ll, 'right')
 
         if velocity:
             # To calculate the velocity of the foot, find the foot location as it would be one ethercat cycle later.
@@ -185,10 +185,10 @@ class Setpoint(object):
             r_kfe_next = r_kfe + setpoint_dic['right_knee'].velocity / VELOCITY_SCALE_FACTOR
 
             left_foot_next = Setpoint.calculate_foot_position(l_haa_next, l_hfe_next,
-                                                              l_kfe_next, base, l_ph, l_bb,
+                                                              l_kfe_next, base, l_ph, l_hl,
                                                               l_ul, l_ll, 'left')
             right_foot_next = Setpoint.calculate_foot_position(r_haa_next, r_hfe_next,
-                                                               r_kfe_next, base, r_ph, r_bb,
+                                                               r_kfe_next, base, r_ph, r_hl,
                                                                r_ul, r_ll, 'right')
 
             # Rescale the velocities back to radians per second.
@@ -207,14 +207,14 @@ class Setpoint(object):
                     [right_foot['x'], right_foot['y'], right_foot['z']]]
 
     @staticmethod
-    def calculate_foot_position(haa, hfe, kfe, base, ph, bb, ul, ll, foot):
+    def calculate_foot_position(haa, hfe, kfe, base, ph, hl, ul, ll, foot):
         """Calculates the foot position given the relevant angles, lengths and a specification of the foot."""
         # x is positive in the walking direction, z is in the downward direction, y is directed to the right side
         # the origin in the middle of the hip structure. The calculations are supported by
         # https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
         haa_to_foot_length = ul * cos(hfe) + ll * cos(hfe - kfe)
         z_position = - sin(haa) * ph + cos(haa) * haa_to_foot_length
-        x_position = bb + sin(hfe) * ul + sin(hfe - kfe) * ll
+        x_position = hl + sin(hfe) * ul + sin(hfe - kfe) * ll
         if foot == 'left':
             y_position = - cos(haa) * ph - sin(haa) * haa_to_foot_length - base / 2.0
         elif foot == 'right':
@@ -240,10 +240,10 @@ class Setpoint(object):
         # get lengths from robot model, ul = upper leg etc. see get_lengths_robot().
         pos_x = position[0]
         if foot == 'left':
-            [ul, ll, bb, ph, base] = Setpoint.get_lengths_robot('left')
+            [ul, ll, hl, ph, base] = Setpoint.get_lengths_robot('left')
             pos_y = - (position[1] + base / 2.0)
         elif foot == 'right':
-            [ul, ll, bb, ph, base] = Setpoint.get_lengths_robot('right')
+            [ul, ll, hl, ph, base] = Setpoint.get_lengths_robot('right')
             pos_y = position[1] - base / 2.0
         else:
             rospy.logwarn('invalid foot specified, {0} was given, does not match "left" or "right"'.format(foot))
@@ -269,7 +269,7 @@ class Setpoint(object):
         # *c%2C+cos%28x%29+%2B+cos%28x+-+y%29*c%5D+%3D+%5Ba%2C+b%5D to calculate the angles of the hfe and kfe
 
         # rescale for easier solving, and check if position is valid
-        rescaled_x = round(pos_x - bb, 10)
+        rescaled_x = round(pos_x - hl, 10)
         rescaled_z = round(sqrt(- ph * ph + pos_y * pos_y + pos_z * pos_z), 10)
         ll = ll / ul
         rescaled_x = rescaled_x / ul
@@ -360,28 +360,31 @@ class Setpoint(object):
         return base_value * (1 - parameter) + other_value * parameter
 
     @staticmethod
-    def get_lengths_robot(foot=''):
+    def get_lengths_robot(side=''):
+        """"Grabs lengths from the robot which are relevant for the inverse kinematics calculation.
+
+        this function returns the lengths of the specified side, if no side is specified, it returns all relevant
+        lengths.
+        """
         try:
             robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
             l_ul = robot.link_map['upper_leg_left'].collisions[0].geometry.size[2]  # left upper leg length
             l_ll = robot.link_map['lower_leg_left'].collisions[0].geometry.size[2]  # left lower leg length
-            l_bb = robot.link_map['hip_aa_frame_left_front'].collisions[0].geometry.size[0]  # left haa arm to leg
-            # (billen been)
+            l_hl = robot.link_map['hip_aa_frame_left_front'].collisions[0].geometry.size[0]  # left haa arm to leg
             l_ph = robot.link_map['hip_aa_frame_left_side'].collisions[0].geometry.size[1]  # left pelvic hip length
             r_ul = robot.link_map['upper_leg_right'].collisions[0].geometry.size[2]  # right upper leg length
             r_ll = robot.link_map['lower_leg_right'].collisions[0].geometry.size[2]  # right lower leg length
-            r_bb = robot.link_map['hip_aa_frame_right_front'].collisions[0].geometry.size[0]  # right haa arm to leg
-            # (billen been)
+            r_hl = robot.link_map['hip_aa_frame_right_front'].collisions[0].geometry.size[0]  # right haa arm to leg
             r_ph = robot.link_map['hip_aa_frame_right_side'].collisions[0].geometry.size[1]  # right pelvic hip length
-            base = robot.link_map['hip_base'].collisions[0].geometry.size[1]
+            base = robot.link_map['hip_base'].collisions[0].geometry.size[1] # length of the hip base structure
         except KeyError as e:
             raise KeyError('Expected robot.link_map to contain "{key}", but "{key}" was missing.'.
                            format(key=e.args[0]))
-        if foot == 'left':
-            return [l_ul, l_ll, l_bb, l_ph, base]
-        elif foot == 'right':
-            return [r_ul, r_ll, r_bb, r_ph, base]
-        elif foot == '':
-            return [l_ul, l_ll, l_bb, l_ph, r_ul, r_ll, r_bb, r_ph, base]
+        if side == 'left':
+            return [l_ul, l_ll, l_hl, l_ph, base]
+        elif side == 'right':
+            return [r_ul, r_ll, r_hl, r_ph, base]
+        elif side == '':
+            return [l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base]
         else:
             rospy.logwarn('invalid foot specified, {0} was given, does not match "left" or "right"'.format(foot))
