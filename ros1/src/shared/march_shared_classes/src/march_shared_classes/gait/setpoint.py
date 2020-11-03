@@ -1,8 +1,6 @@
 from math import acos, atan, cos, pi, sin, sqrt
 
-import numpy as np
 import rospkg
-import rospy
 from urdf_parser_py import urdf
 
 from march_shared_classes.exceptions.gait_exceptions import SideSpecificationError, SubgaitInterpolationError
@@ -68,9 +66,9 @@ class Setpoint(object):
         new_foot_vel = Setpoint.weighted_average_dictionary(base_foot_velocity, other_foot_velocity, parameter)
 
         new_angles_left = Setpoint.calculate_joint_angles_from_foot_position(new_foot_pos, 'left',
-                                                                                      velocity=new_foot_vel)
+                                                                             velocity=new_foot_vel)
         new_angles_right = Setpoint.calculate_joint_angles_from_foot_position(new_foot_pos, 'right',
-                                                                                       velocity=new_foot_vel)
+                                                                              velocity=new_foot_vel)
 
         # linearly interpolate the ankle angle, as it cannot be calculated from the inverse kinematics
         try:
@@ -381,9 +379,9 @@ class Setpoint(object):
             # scale the found velocity back to radians per second
             next_angles = Setpoint.calculate_joint_angles_from_foot_position(next_positions, foot)
             angle_velocities = {foot + '_hip_aa_velocity': (- haa + next_angles[foot + '_hip_aa'])
-                                                           * VELOCITY_SCALE_FACTOR,
+                                * VELOCITY_SCALE_FACTOR,
                                 foot + '_hip_fe_velocity': (- hfe + next_angles[foot + '_hip_fe'])
-                                                           * VELOCITY_SCALE_FACTOR,
+                                * VELOCITY_SCALE_FACTOR,
                                 foot + '_knee_velocity': (- kfe + next_angles[foot + '_knee']) * VELOCITY_SCALE_FACTOR}
             angle_velocities.update(angle_positions)
             return angle_velocities

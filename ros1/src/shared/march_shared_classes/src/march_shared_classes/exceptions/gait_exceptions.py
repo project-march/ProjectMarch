@@ -76,6 +76,7 @@ class SubgaitInterpolationError(Exception):
 
         super(SubgaitInterpolationError, self).__init__(msg)
 
+
 class SideSpecificationError(Exception):
     def __init__(self, foot, msg=None):
         """Class to raise an error when a foot ('right' or 'left') has be specified but this did not happen."""

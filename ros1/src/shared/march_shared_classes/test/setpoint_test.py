@@ -1,7 +1,5 @@
 import unittest
 
-import numpy as np
-
 from march_shared_classes.gait.setpoint import Setpoint
 
 
