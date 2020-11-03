@@ -7,7 +7,9 @@ from urdf_parser_py import urdf
 
 from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
 
-VELOCITY_SCALE = 250
+# Use this factor when calculating velocities to keep the calculations within the range of motion
+# See IK confluence page https://confluence.projectmarch.nl:8443/display/62tech/Inverse+kinematics
+VELOCITY_SCALE_FACTOR = 250
 
 
 class Setpoint(object):
@@ -44,8 +46,8 @@ class Setpoint(object):
     def velocity(self, velocity):
         self._velocity = round(velocity, self.digits)
 
-    @classmethod
-    def create_position_interpolated_setpoints(cls, base_setpoints, other_setpoints, parameter):
+    @staticmethod
+    def create_position_interpolated_setpoints(base_setpoints, other_setpoints, parameter):
         """Linearly interpolate between the foot position.
 
         :param base_setpoints:
@@ -57,34 +59,40 @@ class Setpoint(object):
         :return
             A dictionary of setpoints, who's corresponding foot location is linearly interpolated from the setpoints
         """
-        base_foot_pos = np.array(Setpoint.get_foot_pos_from_angles(base_setpoints))
-        base_foot_vel = np.array(Setpoint.get_foot_pos_from_angles(base_setpoints, velocity=True))
-        other_foot_pos = np.array(Setpoint.get_foot_pos_from_angles(other_setpoints))
-        other_foot_vel = np.array(Setpoint.get_foot_pos_from_angles(other_setpoints, velocity=True))
+        base_foot_position = np.array(Setpoint.get_foot_pos_from_angles(base_setpoints))
+        base_foot_velocity = np.array(Setpoint.get_foot_pos_from_angles(base_setpoints, velocity=True))
+        other_foot_position = np.array(Setpoint.get_foot_pos_from_angles(other_setpoints))
+        other_foot_velocity = np.array(Setpoint.get_foot_pos_from_angles(other_setpoints, velocity=True))
 
-        new_foot_pos = Setpoint.weighted_average(base_foot_pos, other_foot_pos, parameter)
-        new_foot_vel = Setpoint.weighted_average(base_foot_vel, other_foot_vel, parameter)
+        new_foot_pos = Setpoint.weighted_average(base_foot_position, other_foot_position, parameter)
+        new_foot_vel = Setpoint.weighted_average(base_foot_velocity, other_foot_velocity, parameter)
 
-        new_angles_pos = [Setpoint.get_angles_from_pos(new_foot_pos[0], 'left'),
-                          Setpoint.get_angles_from_pos(new_foot_pos[1], 'right')]
+        new_angles_left = Setpoint.calculate_joint_angles_from_foot_position(new_foot_pos[0], 'left')
+        new_angles_right = Setpoint.calculate_joint_angles_from_foot_position(new_foot_pos[1], 'right')
         # Calculate new velocity by finding the foot position one 250th (one ehtercat cycle) of a second later.
-        new_angles_vel = (- np.array(new_angles_pos)
-                          + np.array([Setpoint.get_angles_from_pos(new_foot_pos[0] + new_foot_vel[0]
-                                                                   / VELOCITY_SCALE, 'left'),
-                                      Setpoint.get_angles_from_pos(new_foot_pos[1] + new_foot_vel[1]
-                                                                   / VELOCITY_SCALE, 'right')])) \
-            * VELOCITY_SCALE
+        new_angles_velocity_left = (- np.array(new_angles_left) +
+                                    np.array(Setpoint.calculate_joint_angles_from_foot_position(new_foot_pos[0] +
+                                                                                                new_foot_vel[0] /
+                                                                                                VELOCITY_SCALE_FACTOR,
+                                                                                                'left'))) * \
+                                   VELOCITY_SCALE_FACTOR
+        new_angles_velocity_right = (- np.array(new_angles_right) +
+                                     np.array(Setpoint.calculate_joint_angles_from_foot_position(new_foot_pos[1] +
+                                                                                                 new_foot_vel[1] /
+                                                                                                 VELOCITY_SCALE_FACTOR,
+                                                                                                 'right'))) * \
+                                    VELOCITY_SCALE_FACTOR
 
         # linearly interpolate the ankle angle, as it cannot be calculated from the inverse kinematics
         try:
-            new_ankle_pos = [Setpoint.weighted_average(base_setpoints['left_ankle'].position,
-                                                       other_setpoints['left_ankle'].position, parameter),
-                             Setpoint.weighted_average(base_setpoints['right_ankle'].position,
-                                                       other_setpoints['right_ankle'].position, parameter)]
-            new_ankle_vel = [Setpoint.weighted_average(base_setpoints['left_ankle'].velocity,
-                                                       other_setpoints['left_ankle'].velocity, parameter),
-                             Setpoint.weighted_average(base_setpoints['right_ankle'].velocity,
-                                                       other_setpoints['right_ankle'].velocity, parameter)]
+            new_ankle_angle_left = Setpoint.weighted_average(base_setpoints['left_ankle'].position,
+                                                               other_setpoints['left_ankle'].position, parameter)
+            new_ankle_angle_right = Setpoint.weighted_average(base_setpoints['right_ankle'].position,
+                                                              other_setpoints['right_ankle'].position, parameter)
+            new_ankle_velocity_left = Setpoint.weighted_average(base_setpoints['left_ankle'].velocity,
+                                                               other_setpoints['left_ankle'].velocity, parameter)
+            new_ankle_velocity_right = Setpoint.weighted_average(base_setpoints['right_ankle'].velocity,
+                                                              other_setpoints['right_ankle'].velocity, parameter)
         except KeyError as e:
             raise KeyError('Expected setpoint dictionaries to contain "{key}", but "{key}" was missing.'.
                            format(key=e.args[0]))
@@ -98,14 +106,14 @@ class Setpoint(object):
             other_setpoints_time += setpoint.time
         time = Setpoint.weighted_average(base_setpoints_time, other_setpoints_time, parameter) / len(base_setpoints)
 
-        resulting_setpoints = {'left_hip_aa': cls(time, new_angles_pos[0][0], new_angles_vel[0][0]),
-                               'left_hip_fe': cls(time, new_angles_pos[0][1], new_angles_vel[0][1]),
-                               'left_knee': cls(time, new_angles_pos[0][2], new_angles_vel[0][2]),
-                               'right_hip_aa': cls(time, new_angles_pos[1][0], new_angles_vel[1][0]),
-                               'right_hip_fe': cls(time, new_angles_pos[1][1], new_angles_vel[1][1]),
-                               'right_knee': cls(time, new_angles_pos[1][2], new_angles_vel[1][2]),
-                               'left_ankle': cls(time, new_ankle_pos[0], new_ankle_vel[0]),
-                               'right_ankle': cls(time, new_ankle_pos[1], new_ankle_vel[1])}
+        resulting_setpoints = {'left_hip_aa': Setpoint(time, new_angles_left[0], new_angles_velocity_left[0]),
+                               'left_hip_fe': Setpoint(time, new_angles_left[1], new_angles_velocity_left[1]),
+                               'left_knee': Setpoint(time, new_angles_left[2], new_angles_velocity_left[2]),
+                               'right_hip_aa': Setpoint(time, new_angles_right[0], new_angles_velocity_right[0]),
+                               'right_hip_fe': Setpoint(time, new_angles_right[1], new_angles_velocity_right[1]),
+                               'right_knee': Setpoint(time, new_angles_right[2], new_angles_velocity_right[2]),
+                               'left_ankle': Setpoint(time, new_ankle_angle_left, new_ankle_velocity_left),
+                               'right_ankle': Setpoint(time, new_ankle_angle_right, new_ankle_velocity_right)}
 
         return resulting_setpoints
 
@@ -167,46 +175,42 @@ class Setpoint(object):
         # get lengths from robot model, l_ul = left upper leg etc. see get_lengths_robot().
         l_ul, l_ll, l_bb, l_ph, r_ul, r_ll, r_bb, r_ph, base = Setpoint.get_lengths_robot()
 
-        left_x, left_y, left_z = Setpoint.calculate_foot_position(l_haa, l_hfe, l_kfe, base, l_ph,
-                                                                  l_bb, l_ul, l_ll, 'left')
-        right_x, right_y, right_z = Setpoint.calculate_foot_position(r_haa, r_hfe, r_kfe, base, r_ph,
-                                                                     r_bb, r_ul, r_ll, 'right')
+        left_foot = Setpoint.calculate_foot_position(l_haa, l_hfe, l_kfe, base, l_ph,
+                                                     l_bb, l_ul, l_ll, 'left')
+        right_foot = Setpoint.calculate_foot_position(r_haa, r_hfe, r_kfe, base, r_ph,
+                                                      r_bb, r_ul, r_ll, 'right')
 
         if velocity:
             # To calculate the velocity of the foot, find the foot location as it would be one ethercat cycle later.
             # The velocities need to be scaled as the position one second later could be invalid.
-            l_haa_next = l_haa + setpoint_dic['left_hip_aa'].velocity / VELOCITY_SCALE
-            l_hfe_next = l_hfe + setpoint_dic['left_hip_fe'].velocity / VELOCITY_SCALE
-            l_kfe_next = l_kfe + setpoint_dic['left_knee'].velocity / VELOCITY_SCALE
-            r_haa_next = r_haa + setpoint_dic['right_hip_aa'].velocity / VELOCITY_SCALE
-            r_hfe_next = r_hfe + setpoint_dic['right_hip_fe'].velocity / VELOCITY_SCALE
-            r_kfe_next = r_kfe + setpoint_dic['right_knee'].velocity / VELOCITY_SCALE
+            l_haa_next = l_haa + setpoint_dic['left_hip_aa'].velocity / VELOCITY_SCALE_FACTOR
+            l_hfe_next = l_hfe + setpoint_dic['left_hip_fe'].velocity / VELOCITY_SCALE_FACTOR
+            l_kfe_next = l_kfe + setpoint_dic['left_knee'].velocity / VELOCITY_SCALE_FACTOR
+            r_haa_next = r_haa + setpoint_dic['right_hip_aa'].velocity / VELOCITY_SCALE_FACTOR
+            r_hfe_next = r_hfe + setpoint_dic['right_hip_fe'].velocity / VELOCITY_SCALE_FACTOR
+            r_kfe_next = r_kfe + setpoint_dic['right_knee'].velocity / VELOCITY_SCALE_FACTOR
 
-            left_x_next, left_y_next, left_z_next = Setpoint.calculate_foot_position(l_haa_next, l_hfe_next,
-                                                                                     l_kfe_next, base, l_ph, l_bb,
-                                                                                     l_ul, l_ll, 'left')
-            right_x_next, right_y_next, right_z_next = Setpoint.calculate_foot_position(r_haa_next, r_hfe_next,
-                                                                                        r_kfe_next, base, r_ph, r_bb,
-                                                                                        r_ul, r_ll, 'right')
+            left_foot_next = Setpoint.calculate_foot_position(l_haa_next, l_hfe_next,
+                                                              l_kfe_next, base, l_ph, l_bb,
+                                                              l_ul, l_ll, 'left')
+            right_foot_next = Setpoint.calculate_foot_position(r_haa_next, r_hfe_next,
+                                                               r_kfe_next, base, r_ph, r_bb,
+                                                               r_ul, r_ll, 'right')
 
             # Rescale the velocities back to radians per second.
-            left_y_velocity = (left_y_next - left_y) * VELOCITY_SCALE
-            left_z_velocity = (left_z_next - left_z) * VELOCITY_SCALE
-            left_x_velocity = (left_x_next - left_x) * VELOCITY_SCALE
+            left_y_velocity = (left_foot_next['y'] - left_foot['y']) * VELOCITY_SCALE_FACTOR
+            left_z_velocity = (left_foot_next['z'] - left_foot['z']) * VELOCITY_SCALE_FACTOR
+            left_x_velocity = (left_foot_next['x'] - left_foot['x']) * VELOCITY_SCALE_FACTOR
 
-            right_y_velocity = (right_y_next - right_y) * VELOCITY_SCALE
-            right_z_velocity = (right_z_next - right_z) * VELOCITY_SCALE
-            right_x_velocity = (right_x_next - right_x) * VELOCITY_SCALE
+            right_y_velocity = (right_foot_next['y'] - right_foot['y']) * VELOCITY_SCALE_FACTOR
+            right_z_velocity = (right_foot_next['z'] - right_foot['z']) * VELOCITY_SCALE_FACTOR
+            right_x_velocity = (right_foot_next['x'] - right_foot['x']) * VELOCITY_SCALE_FACTOR
 
-            left_foot_velocity = [left_x_velocity, left_y_velocity, left_z_velocity]
-            right_foot_velocity = [right_x_velocity, right_y_velocity, right_z_velocity]
-
-            return [left_foot_velocity, right_foot_velocity]
+            return [[left_x_velocity, left_y_velocity, left_z_velocity],
+                    [right_x_velocity, right_y_velocity, right_z_velocity]]
         else:
-            left_foot_position = [left_x, left_y, left_z]
-            right_foot_position = [right_x, right_y, right_z]
-
-            return [left_foot_position, right_foot_position]
+            return [[left_foot['x'], left_foot['y'], left_foot['z']],
+                    [right_foot['x'], right_foot['y'], right_foot['z']]]
 
     @staticmethod
     def calculate_foot_position(haa, hfe, kfe, base, ph, bb, ul, ll, foot):
@@ -224,10 +228,10 @@ class Setpoint(object):
         else:
             rospy.logwarn('invalid foot specified, {0} was given, does not match "left" or "right"'.format(foot))
             return
-        return [x_position, y_position, z_position]
+        return {'x': x_position, 'y': y_position, 'z': z_position}
 
     @staticmethod
-    def get_angles_from_pos(position, foot):
+    def calculate_joint_angles_from_foot_position(position, foot):
         """Calculates the angles of the joints corresponding to a certain position of the right or left foot.
 
         :param position:

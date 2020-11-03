@@ -271,8 +271,7 @@ class Subgait(object):
         joints = []
         number_of_setpoints = len(base_subgait.joints[0].setpoints)
         joint_to_compare_to = base_subgait.joints[0].name
-        for base_joint in base_subgait.joints:
-            other_joint = other_subgait.get_joint(base_joint.name)
+        for (base_joint, other_joint) in zip(sorted(base_subgait.joints), sorted(other_subgait.joints)):
             if other_joint is None:
                 raise SubgaitInterpolationError('Could not find a matching joint for base joint with name {0}.'.
                                                 format(base_joint.name))
@@ -297,7 +296,7 @@ class Subgait(object):
 
         if use_foot_position:
             joints = cls.joint_class.interpolate_joint_trajectories_foot_position(base_subgait, other_subgait,
-                                                                                  number_of_setpoints, parameter)
+                                                                                  parameter)
 
         description = 'Interpolation between base version {0}, and other version {1} with parameter{2}'.format(
             base_subgait.version, other_subgait.version, parameter)
