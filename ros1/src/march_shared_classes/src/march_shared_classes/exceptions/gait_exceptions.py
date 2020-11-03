@@ -75,3 +75,12 @@ class SubgaitInterpolationError(Exception):
             msg = 'An error occurred while trying to merge two subgaits.'
 
         super(SubgaitInterpolationError, self).__init__(msg)
+
+class SideSpecificationError(Exception):
+    def __init__(self, foot, msg=None):
+        """Class to raise an error when a foot ('right' or 'left') has be specified but this did not happen."""
+        if msg is None:
+            msg = "An incorrect side was supplied. Must be either 'left' or 'right', but was '{foot}'.".\
+                format(foot=foot)
+
+        super(SideSpecificationError, self).__init__(msg)
