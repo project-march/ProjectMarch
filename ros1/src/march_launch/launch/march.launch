@@ -85,7 +85,7 @@
         </group>
     </group>
 
-    <group if="$(eval gait_directory != 'simulation_only-vi')">
+    <group if="$(eval gait_directory != 'simulation_only-vi')"><!-- Do not launch the exo with the wrong gait_directory -->
         <group if="$(eval configuration == 'exoskeleton')">
             <include file="$(find march_hardware_interface)/launch/hardware.launch" if="$(arg hardware_interface)">
                 <arg name="robot" value="march4"/>
