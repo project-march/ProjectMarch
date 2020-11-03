@@ -1,4 +1,7 @@
 gaits:
+  curb_sdg:
+    right_open: curb_sdg_test_v1
+    left_close: curb_sdg_test_v1
   ramp_door_slope_up:
     right_open: MV_RD_slopeup_rightopen_v1
     left_open: MV_RD_slopeup_leftopen_v1
