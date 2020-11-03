@@ -23,6 +23,8 @@ add_library(${PROJECT_NAME}
     src/com_controller_plugin.cpp
     src/obstacle_controller.cpp
     src/walk_controller.cpp
+    src/gazebo_ros_realsense.cpp
+    src/RealSensePlugin.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${catkin_INCLUDE_DIRS}/${PROJECT_NAME} ${GAZEBO_INCLUDE_DIRS})
