@@ -30,13 +30,23 @@ protected:
   double subgait_duration_;
 
   bool subgait_changed_;
+  bool balance_;
 
   double p_yaw_;
   double d_yaw_;
+  double p_yaw_off_;
+  double d_yaw_off_;
+
   double p_pitch_;
   double d_pitch_;
+  double p_pitch_off_;
+  double d_pitch_off_;
+
   double p_roll_;
   double d_roll_;
+  double p_roll_off_;
+  double d_roll_off_;
+
   double error_x_last_timestep_;
   double error_y_last_timestep_;
   double error_yaw_last_timestep_;
