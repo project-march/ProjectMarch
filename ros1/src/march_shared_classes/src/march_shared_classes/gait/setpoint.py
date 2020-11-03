@@ -361,7 +361,7 @@ class Setpoint(object):
 
     @staticmethod
     def get_lengths_robot(side=''):
-        """"Grabs lengths from the robot which are relevant for the inverse kinematics calculation.
+        """Grabs lengths from the robot which are relevant for the inverse kinematics calculation.
 
         this function returns the lengths of the specified side, if no side is specified, it returns all relevant
         lengths.
@@ -376,7 +376,7 @@ class Setpoint(object):
             r_ll = robot.link_map['lower_leg_right'].collisions[0].geometry.size[2]  # right lower leg length
             r_hl = robot.link_map['hip_aa_frame_right_front'].collisions[0].geometry.size[0]  # right haa arm to leg
             r_ph = robot.link_map['hip_aa_frame_right_side'].collisions[0].geometry.size[1]  # right pelvic hip length
-            base = robot.link_map['hip_base'].collisions[0].geometry.size[1] # length of the hip base structure
+            base = robot.link_map['hip_base'].collisions[0].geometry.size[1]  # length of the hip base structure
         except KeyError as e:
             raise KeyError('Expected robot.link_map to contain "{key}", but "{key}" was missing.'.
                            format(key=e.args[0]))
@@ -387,4 +387,4 @@ class Setpoint(object):
         elif side == '':
             return [l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base]
         else:
-            rospy.logwarn('invalid foot specified, {0} was given, does not match "left" or "right"'.format(foot))
+            rospy.logwarn('invalid foot specified, {0} was given, does not match "left" or "right"'.format(side))
