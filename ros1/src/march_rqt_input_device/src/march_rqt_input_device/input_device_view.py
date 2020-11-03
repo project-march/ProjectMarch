@@ -56,6 +56,9 @@ class InputDeviceView(QWidget):
         ik_test = \
             self.create_button('ik_test',
                                callback=lambda: self._controller.publish_gait('ik_test'))
+        curb_sdg = \
+            self.create_button('curb_sdg',
+                               callback=lambda: self._controller.publish_gait('curb_sdg'))
 
         home_stand = \
             self.create_button('home_stand', image_path='/home_stand.png',
@@ -300,7 +303,7 @@ class InputDeviceView(QWidget):
             [gait_tilted_path_first_start, gait_tilted_path_second_start, gait_tilted_path_first_end,
              gait_tilted_path_second_end],
 
-            [ik_test],
+            [ik_test, curb_sdg],
         ]
 
         # Create the qt_layout from the button layout.
