@@ -271,7 +271,8 @@ class Subgait(object):
         joints = []
         number_of_setpoints = len(base_subgait.joints[0].setpoints)
         joint_to_compare_to = base_subgait.joints[0].name
-        for (base_joint, other_joint) in zip(sorted(base_subgait.joints), sorted(other_subgait.joints)):
+        for base_joint in base_subgait.joints:
+            other_joint = other_subgait.get_joint(base_joint.name)
             if other_joint is None:
                 raise SubgaitInterpolationError('Could not find a matching joint for base joint with name {0}.'.
                                                 format(base_joint.name))
