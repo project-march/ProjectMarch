@@ -157,14 +157,15 @@ class JointTrajectory(object):
             The interpolated trajectory
         """
         if base_trajectory.limits != other_trajectory.limits:
-            raise SubgaitInterpolationError('Not able to safely interpolate because limits are not equal for joint {0}'.
-                                            format(base_trajectory.name))
+            raise SubgaitInterpolationError('Not able to safely interpolate because limits are not equal for joints '
+                                            '{0} and {1}'.format(base_trajectory.name, other_trajectory.name))
         if len(base_trajectory.setpoints) != len(other_trajectory.setpoints):
             raise SubgaitInterpolationError('The amount of setpoints do not match for joint {0}'.
                                             format(base_trajectory.name))
         setpoints = []
         for base_setpoint, other_setpoint in zip(base_trajectory.setpoints, other_trajectory.setpoints):
-            setpoints.append(JointTrajectory.setpoint_class.interpolate_setpoints(base_setpoint, other_setpoint, parameter))
+            setpoints.append(JointTrajectory.setpoint_class.interpolate_setpoints(base_setpoint, other_setpoint,
+                                                                                  parameter))
         duration = parameter * base_trajectory.duration + (1 - parameter) * other_trajectory.duration
         return JointTrajectory(base_trajectory.name, base_trajectory.limits, setpoints, duration)
 
@@ -190,7 +191,12 @@ class JointTrajectory(object):
         for current_setpoints_index in range(0, len(base_subgait.joints[0].setpoints)):
             base_setpoints_to_interpolate = {}
             other_setpoints_to_interpolate = {}
-            for (base_joint, other_joint) in zip(sorted(base_subgait.joints), sorted(other_subgait.joints)):
+            for base_joint in base_subgait.joints:
+                other_joint = other_subgait.get_joint(base_joint.name)
+                if base_joint.limits != other_joint.limits:
+                    raise SubgaitInterpolationError(
+                        'Not able to safely interpolate because limits are not equal for joints '
+                        '{0} and {1}'.format(base_joint.name, other_joint.name))
                 base_setpoints_to_interpolate[base_joint.name] = base_joint.setpoints[current_setpoints_index]
                 other_setpoints_to_interpolate[other_joint.name] = other_joint.setpoints[current_setpoints_index]
             interpolated_setpoints = Setpoint.create_position_interpolated_setpoints(base_setpoints_to_interpolate,
@@ -206,5 +212,5 @@ class JointTrajectory(object):
         duration = Setpoint.weighted_average(base_subgait.duration, other_subgait.duration, parameter)
         for base_joint in base_subgait.joints:
             joints.append(JointTrajectory(base_joint.name, base_joint.limits, new_setpoints[base_joint.name],
-                              duration))
+                                          duration))
         return joints

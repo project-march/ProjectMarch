@@ -89,8 +89,10 @@ class SetpointTest(unittest.TestCase):
                           Setpoint.calculate_joint_angles_from_foot_position(foot_pos[1], 'right')]
 
         new_angles_vel = (- np.array(new_angles_pos) +
-                          + np.array([Setpoint.calculate_joint_angles_from_foot_position(foot_pos[0] + foot_vel[0] / VELOCITY_SCALE, 'left'),
-                                      Setpoint.calculate_joint_angles_from_foot_position(foot_pos[1] + foot_vel[1] / VELOCITY_SCALE, 'right'),
+                          + np.array([Setpoint.calculate_joint_angles_from_foot_position(foot_pos[0] + foot_vel[0]
+                                                                                         / VELOCITY_SCALE, 'left'),
+                                      Setpoint.calculate_joint_angles_from_foot_position(foot_pos[1] + foot_vel[1]
+                                                                                         / VELOCITY_SCALE, 'right'),
                                       ])) * VELOCITY_SCALE
 
         for i in range(0, 2):

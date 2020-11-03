@@ -70,29 +70,23 @@ class Setpoint(object):
         new_angles_left = Setpoint.calculate_joint_angles_from_foot_position(new_foot_pos[0], 'left')
         new_angles_right = Setpoint.calculate_joint_angles_from_foot_position(new_foot_pos[1], 'right')
         # Calculate new velocity by finding the foot position one 250th (one ehtercat cycle) of a second later.
-        new_angles_velocity_left = (- np.array(new_angles_left) +
-                                    np.array(Setpoint.calculate_joint_angles_from_foot_position(new_foot_pos[0] +
-                                                                                                new_foot_vel[0] /
-                                                                                                VELOCITY_SCALE_FACTOR,
-                                                                                                'left'))) * \
-                                   VELOCITY_SCALE_FACTOR
-        new_angles_velocity_right = (- np.array(new_angles_right) +
-                                     np.array(Setpoint.calculate_joint_angles_from_foot_position(new_foot_pos[1] +
-                                                                                                 new_foot_vel[1] /
-                                                                                                 VELOCITY_SCALE_FACTOR,
-                                                                                                 'right'))) * \
-                                    VELOCITY_SCALE_FACTOR
+        new_angles_velocity_left = \
+            (- np.array(new_angles_left) + np.array(Setpoint.calculate_joint_angles_from_foot_position(
+                new_foot_pos[0] + new_foot_vel[0] / VELOCITY_SCALE_FACTOR, 'left'))) * VELOCITY_SCALE_FACTOR
+        new_angles_velocity_right = \
+            (- np.array(new_angles_right) + np.array(Setpoint.calculate_joint_angles_from_foot_position(
+                new_foot_pos[1] + new_foot_vel[1] / VELOCITY_SCALE_FACTOR, 'right'))) * VELOCITY_SCALE_FACTOR
 
         # linearly interpolate the ankle angle, as it cannot be calculated from the inverse kinematics
         try:
             new_ankle_angle_left = Setpoint.weighted_average(base_setpoints['left_ankle'].position,
-                                                               other_setpoints['left_ankle'].position, parameter)
+                                                             other_setpoints['left_ankle'].position, parameter)
             new_ankle_angle_right = Setpoint.weighted_average(base_setpoints['right_ankle'].position,
                                                               other_setpoints['right_ankle'].position, parameter)
             new_ankle_velocity_left = Setpoint.weighted_average(base_setpoints['left_ankle'].velocity,
-                                                               other_setpoints['left_ankle'].velocity, parameter)
+                                                                other_setpoints['left_ankle'].velocity, parameter)
             new_ankle_velocity_right = Setpoint.weighted_average(base_setpoints['right_ankle'].velocity,
-                                                              other_setpoints['right_ankle'].velocity, parameter)
+                                                                 other_setpoints['right_ankle'].velocity, parameter)
         except KeyError as e:
             raise KeyError('Expected setpoint dictionaries to contain "{key}", but "{key}" was missing.'.
                            format(key=e.args[0]))
