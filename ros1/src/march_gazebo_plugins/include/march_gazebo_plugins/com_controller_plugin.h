@@ -1,11 +1,11 @@
 // Copyright 2019 Project March.
 
+#include <march_gazebo_plugins/walk_controller.h>
+#include <march_shared_resources/CurrentGait.h>
 #include <gazebo/common/common.hh>
 #include <gazebo/physics/physics.hh>
-#include <march_shared_resources/CurrentGait.h>
 #include <ros/callback_queue.h>
 #include <ros/ros.h>
-#include <march_gazebo_plugins/walk_controller.h>
 
 #ifndef MARCH_GAZEBO_PLUGINS_COM_CONTROLLER_PLUGIN_H
 #define MARCH_GAZEBO_PLUGINS_COM_CONTROLLER_PLUGIN_H

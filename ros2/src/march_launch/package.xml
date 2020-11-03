@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+    <name>march_launch</name>
+    <version>0.0.0</version>
+    <description>Launches the related march packages</description>
+
+    <maintainer email="software@projectmarch.nl">Project March</maintainer>
+
+    <license>TODO</license>
+
+    <buildtool_depend>ament_cmake</buildtool_depend>
+
+    <depend>march_rqt_input_device</depend>
+    <exec_depend>march_description</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

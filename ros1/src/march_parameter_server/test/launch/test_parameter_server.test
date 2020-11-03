@@ -1,0 +1,4 @@
+<launch>
+    <node name="param_server" pkg="march_parameter_server" type="march_parameter_server_node" />
+    <test test-name="test_parameter_server" pkg="march_parameter_server" type="test_parameter_server.py"/>
+</launch>

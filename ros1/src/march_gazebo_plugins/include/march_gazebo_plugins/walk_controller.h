@@ -1,9 +1,8 @@
 // Copyright 2019 Project March.
-
-#include <march_gazebo_plugins/obstacle_controller.h>
-
 #ifndef MARCH_GAZEBO_PLUGINS_WALK_CONTROLLER_H
 #define MARCH_GAZEBO_PLUGINS_WALK_CONTROLLER_H
+
+#include <march_gazebo_plugins/obstacle_controller.h>
 
 namespace gazebo
 {
