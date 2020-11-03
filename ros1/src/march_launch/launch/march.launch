@@ -92,6 +92,18 @@
         </group>
     </group>
 
+    <group if="$(eval gait_directory == 'simulation_only-vi')"><!-- Print a message when starting the exo with the wrong gait_directory -->
+        <group if="$(eval configuration == 'simulation')">
+            <node pkg="rostopic" type="rostopic" name="directory_check"
+                  args="pub /march/error march_shared_resources/Error '{header: {seq: 0, stamp: {secs: 0, nsecs: 0},  frame_id: &quot; &quot;},
+                error_message: &quot;Gait directory should never be used for non-simulation purposes.&quot;,
+                type: 0}'"
+                  output="screen"/>
+            <node name="print_text" pkg="rostopic" type="rostopic"
+               args="echo /march/error" output="screen" />
+        </group>
+    </group>
+
     <group if="$(eval gait_directory != 'simulation_only-vi')">
         <group if="$(eval configuration == 'simulation')">
             <include file="$(find march_simulation)/launch/march_world.launch">
@@ -101,17 +113,6 @@
                 <arg name="obstacle" value="$(arg obstacle)"/>
                 <arg name="controller" value="$(arg controller)"/>
             </include>
-        </group>
-    </group>
-
-    <group if="$(eval gait_directory == 'simulation_only-vi')"><!-- Print a message when starting the exo with the wrong gait_directory -->
-        <group if="$(eval configuration == 'simulation')">
-            <arg name="msg" default="Gait directory simulation_only-vi cannot be ran on the exoskeleton." />
-            <node name="pub_text" pkg="rostopic" type="rostopic"
-               args="pub /msg std_msgs/String '$(arg msg)'"
-               output="screen" />
-            <node name="print_text" pkg="rostopic" type="rostopic"
-               args="echo /msg" output="screen" />
         </group>
     </group>
 
