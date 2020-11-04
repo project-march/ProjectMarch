@@ -1,3 +1,5 @@
+from typing import Optional
+
 from march_gait_selection.state_machine.state_machine_input import TransitionRequest
 from march_shared_classes.gait.joint_trajectory import JointTrajectory
 
@@ -9,40 +11,40 @@ class GaitInterface(object):
     @property
     def name(self) -> str:
         """Returns the name of the gait."""
-        return None
+        return ''
 
     @property
     def subgait_name(self) -> str:
         """Returns the name of the currently executing trajectory."""
-        return None
+        return ''
 
     @property
     def version(self) -> str:
         """Returns the version of the currently executing trajectory."""
-        return None
+        return ''
 
     @property
     def duration(self) -> float:
         """Returns the duration in seconds of the currently executing trajectory
          from the start of the gait."""
-        return None
+        return 0.0
 
     @property
     def gait_type(self) -> str:
         """Returns a gait type of the currently executing trajectory."""
-        return None
+        return ''
 
     @property
     def starting_position(self) -> dict:
         """Returns the starting position of all joints."""
-        return None
+        return {}
 
     @property
     def final_position(self) -> dict:
         """Returns the position of all the joints after the gait has ended."""
-        return None
+        return {}
 
-    def start(self) -> JointTrajectory:
+    def start(self) -> Optional[JointTrajectory]:
         """Called when the gait has been selected for execution and returns an
         optional starting trajectory."""
         return None
