@@ -12,7 +12,6 @@ import rospkg
 import rospy
 import rviz
 from sensor_msgs.msg import JointState
-from pathlib import Path
 from tf import (ConnectivityException, ExtrapolationException, LookupException,
                 TransformListener)
 
@@ -28,10 +27,10 @@ class GaitGeneratorView(QWidget):
 
         self.joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=10)
 
-        current_file_path = Path(__file__)
+        current_file_path = __file__.split('/')
         path = ''
-        for directory in current_file_path.parts:
-            path += directory + '/'
+        for directory in current_file_path:
+            path += '/' + directory
             if directory == 'ros1':
                 break
         self.ros1_path = path
@@ -167,13 +166,13 @@ class GaitGeneratorView(QWidget):
     def open_file_dialogue(self):
         return QFileDialog.getOpenFileName(self,
                                            'Select a subgait to import.',
-                                           os.path.join(self.ros1_path, 'src/march_gait_files'),
+                                           self.ros1_path + '/src/march_gait_files',
                                            'March Subgait (*.subgait)')
 
     def open_directory_dialogue(self):
         return QFileDialog.getExistingDirectory(None, 'Select a directory to save gaits. Directory must be '
                                                       'a subdirectory of march_gait_files or be named resources.',
-                                                os.path.join(self.ros1_path, 'src/march_gait_files'))
+                                                self.ros1_path + '/src/march_gait_files')
 
     @QtCore.pyqtSlot(int)
     def update_main_time_slider(self, time):

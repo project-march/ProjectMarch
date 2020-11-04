@@ -1,7 +1,6 @@
 import unittest
 
 from mock import Mock
-from pathlib import Path
 import rospkg
 from urdf_parser_py import urdf
 
@@ -285,43 +284,43 @@ class GaitGeneratorControllerTest(unittest.TestCase):
 
     # change_gait_directory tests
     def test_change_gait_directory(self):
-        self.gait_generator_view.open_directory_dialogue = Mock(return_value=Path('some/march_gait_files/directory'))
+        self.gait_generator_view.open_directory_dialogue = Mock(return_value='some/march_gait_files/directory')
         self.gait_generator_controller.change_gait_directory()
-        self.assertEqual(self.gait_generator_controller.gait_directory, Path('some/march_gait_files/directory'))
+        self.assertEqual(self.gait_generator_controller.gait_directory, 'some/march_gait_files/directory')
 
     def test_change_gait_directory_canceled_previous(self):
-        self.gait_generator_controller.gait_directory = Path('some/march_gait_files/directory')
-        self.gait_generator_view.open_directory_dialogue = Mock(return_value=Path(''))
+        self.gait_generator_controller.gait_directory = 'some/march_gait_files/directory'
+        self.gait_generator_view.open_directory_dialogue = Mock(return_value='')
         self.gait_generator_controller.change_gait_directory()
-        self.assertEqual(self.gait_generator_controller.gait_directory, Path('some/march_gait_files/directory'))
+        self.assertEqual(self.gait_generator_controller.gait_directory, 'some/march_gait_files/directory')
 
     def test_change_gait_directory_canceled_none(self):
-        self.gait_generator_view.open_directory_dialogue = Mock(return_value=Path(''))
+        self.gait_generator_view.open_directory_dialogue = Mock(return_value='')
         self.gait_generator_controller.change_gait_directory()
         self.assertIsNone(self.gait_generator_controller.gait_directory)
 
     def test_change_gait_directory_wrong_folder(self):
-        self.gait_generator_controller.gait_directory = Path('some/march_gait_files/directory')
-        self.gait_generator_view.open_directory_dialogue = Mock(return_value=Path('some/wrong/directory'))
+        self.gait_generator_controller.gait_directory = 'some/march_gait_files/directory'
+        self.gait_generator_view.open_directory_dialogue = Mock(return_value='some/wrong/directory')
         self.gait_generator_controller.change_gait_directory()
-        self.assertEqual(self.gait_generator_controller.gait_directory, Path('some/march_gait_files/directory'))
+        self.assertEqual(self.gait_generator_controller.gait_directory, 'some/march_gait_files/directory')
 
     def test_change_gait_directory_correct_folder_resource(self):
-        self.gait_generator_controller.gait_directory = path('some/march_gait_files/directory')
-        self.gait_generator_view.open_directory_dialogue = Mock(return_value=Path('some/test_direcotory/resources'))
+        self.gait_generator_controller.gait_directory = 'some/march_gait_files/directory'
+        self.gait_generator_view.open_directory_dialogue = Mock(return_value='some/test_direcotory/resources')
         self.gait_generator_controller.change_gait_directory()
-        self.assertEqual(self.gait_generator_controller.gait_directory, Path('some/test_direcotory/resources')
+        self.assertEqual(self.gait_generator_controller.gait_directory, 'some/test_direcotory/resources')
 
     def test_change_gait_directory_short_folder(self):
-        self.gait_generator_controller.gait_directory = Path('some/march_gait_files/directory')
-        self.gait_generator_view.open_directory_dialogue = Mock(return_value=Path('too_short_directory/'))
+        self.gait_generator_controller.gait_directory = 'some/march_gait_files/directory'
+        self.gait_generator_view.open_directory_dialogue = Mock(return_value='too_short_directory/')
         self.gait_generator_controller.change_gait_directory()
-        self.assertEqual(self.gait_generator_controller.gait_directory, Path('some/march_gait_files/directory'))
+        self.assertEqual(self.gait_generator_controller.gait_directory, 'some/march_gait_files/directory')
 
     # get_gait_directory tests
     def test_get_gait_directory(self):
-        self.gait_generator_controller.gait_directory = Path('some/test/directory')
-        self.assertEqual(self.gait_generator_controller.get_gait_directory(), Path('some/test/directory'))
+        self.gait_generator_controller.gait_directory = 'some/test/directory'
+        self.assertEqual(self.gait_generator_controller.get_gait_directory(), 'some/test/directory')
 
     def test_get_gait_directory_none(self):
         self.gait_generator_controller.get_gait_directory()
