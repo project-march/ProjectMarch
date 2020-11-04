@@ -307,9 +307,9 @@ class GaitGeneratorControllerTest(unittest.TestCase):
 
     def test_change_gait_directory_correct_folder_resource(self):
         self.gait_generator_controller.gait_directory = 'some/march_gait_files/directory'
-        self.gait_generator_view.open_directory_dialogue = Mock(return_value='some/test_direcotory/resources')
+        self.gait_generator_view.open_directory_dialogue = Mock(return_value='some/test_directory/resources')
         self.gait_generator_controller.change_gait_directory()
-        self.assertEqual(self.gait_generator_controller.gait_directory, 'some/test_direcotory/resources')
+        self.assertEqual(self.gait_generator_controller.gait_directory, 'some/test_directory/resources')
 
     def test_change_gait_directory_short_folder(self):
         self.gait_generator_controller.gait_directory = 'some/march_gait_files/directory'
