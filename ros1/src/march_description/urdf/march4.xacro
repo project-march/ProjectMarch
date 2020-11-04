@@ -558,7 +558,7 @@
         <sensor name="right_pressure_sole" type="contact">
             <always_on>true</always_on>
             <contact>
-                <collision>ankle_plate_left_fixed_joint_lump__foot_left_collision_1</collision>
+                <collision>ankle_plate_right_fixed_joint_lump__foot_right_collision_1</collision>
             </contact>
             <plugin name="right_foot_pressure_plugin" filename="libgazebo_ros_bumper.so">
                 <bumperTopicName>march/sensor/right_pressure_sole</bumperTopicName>
