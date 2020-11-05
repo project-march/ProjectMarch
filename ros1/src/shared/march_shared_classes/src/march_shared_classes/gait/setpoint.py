@@ -72,10 +72,9 @@ class Setpoint(object):
         new_foot_pos = Setpoint.weighted_average_dictionary(base_foot_position, other_foot_position, parameter)
         new_foot_vel = Setpoint.weighted_average_dictionary(base_foot_velocity, other_foot_velocity, parameter)
 
-        new_angles_left = Setpoint.calculate_joint_angles_from_foot_position(new_foot_pos, 'left',
-                                                                             foot_velocity=new_foot_vel)
-        new_angles_right = Setpoint.calculate_joint_angles_from_foot_position(new_foot_pos, 'right',
-                                                                              foot_velocity=new_foot_vel)
+        new_angles = Setpoint.merge_dictionaries(
+            Setpoint.calculate_joint_angles_from_foot_position(new_foot_pos, 'left', foot_velocity=new_foot_vel),
+            Setpoint.calculate_joint_angles_from_foot_position(new_foot_pos, 'right', foot_velocity=new_foot_vel))
 
         # linearly interpolate the ankle angle, as it cannot be calculated from the inverse kinematics
         try:
@@ -100,20 +99,10 @@ class Setpoint(object):
             other_setpoints_time += setpoint.time
         time = Setpoint.weighted_average(base_setpoints_time, other_setpoints_time, parameter) / len(base_setpoints)
 
-        resulting_setpoints = {'left_hip_aa': Setpoint(time, new_angles_left['left_hip_aa'],
-                                                       new_angles_left['left_hip_aa_velocity']),
-                               'left_hip_fe': Setpoint(time, new_angles_left['left_hip_fe'],
-                                                       new_angles_left['left_hip_fe_velocity']),
-                               'left_knee': Setpoint(time, new_angles_left['left_knee'],
-                                                     new_angles_left['left_knee_velocity']),
-                               'right_hip_aa': Setpoint(time, new_angles_right['right_hip_aa'],
-                                                        new_angles_right['right_hip_aa_velocity']),
-                               'right_hip_fe': Setpoint(time, new_angles_right['right_hip_fe'],
-                                                        new_angles_right['right_hip_fe_velocity']),
-                               'right_knee': Setpoint(time, new_angles_right['right_knee'],
-                                                      new_angles_right['right_knee_velocity']),
-                               'left_ankle': Setpoint(time, new_ankle_angle_left, new_ankle_velocity_left),
+        resulting_setpoints = {'left_ankle': Setpoint(time, new_ankle_angle_left, new_ankle_velocity_left),
                                'right_ankle': Setpoint(time, new_ankle_angle_right, new_ankle_velocity_right)}
+        for joint, velocity in zip(JOINTS_POSITION_NAMES, JOINTS_VELOCITY_NAMES):
+            resulting_setpoints[joint] = Setpoint(time, new_angles[joint], new_angles[velocity])
 
         return resulting_setpoints
 
