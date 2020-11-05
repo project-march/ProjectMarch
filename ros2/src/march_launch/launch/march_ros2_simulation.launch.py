@@ -25,36 +25,40 @@ def generate_launch_description():
     return launch.LaunchDescription([
         # GENERAL ARGUMENTS
         DeclareLaunchArgument(
-            'node_prefix',
-            default_value=[EnvironmentVariable('USER'), '_'],
-            description='Prefix for node names'),
-        DeclareLaunchArgument(
             'use_sim_time',
             default_value='True',
-            description='Whether to use simulation time'),
+            description='Whether to use simulation time as published on the '
+                        '/clock topic by gazebo instead of system time.'),
         # RQT INPUT DEVICE ARGUMENTS
         DeclareLaunchArgument(
             name='rqt_input',
             default_value='True',
-            description='Launches the rqt input device.'),
+            description='If this argument is false, the rqt input device will'
+                        'not be launched.'),
         DeclareLaunchArgument(
             'ping_safety_node',
             default_value='True',
-            description='Whether to ping the safety node'),
+            description='Whether the input device should ping the safety node'
+                        'with an alive message every 0.2 seconds'),
         # ROBOT STATE PUBLISHER ARGUMENTS
         DeclareLaunchArgument(
             name='robot_state_publisher',
             default_value='True',
-            description='Launch the robot state publisher.'),
+            description='Whether or not to launch the robot state publisher,'
+                        'this allows nodes to get the urdf and to subscribe to'
+                        'potential urdf updates. This is necesary for gait selection'
+                        'to be able to launch'),
         DeclareLaunchArgument(
             'xacro_path',
             default_value=os.path.join(get_package_share_directory('march_description'), 'urdf', 'march4.xacro'),
-            description='path to urdf.xacro file to publish'),
+            description='Path to the <robot>.xacro file that should be used to'
+                        'obtain the robot description that is published by the '
+                        'robot state publisher'),
         # GAIT SELECTION ARGUMENTS
         DeclareLaunchArgument(
             name='gait_selection',
             default_value='True',
-            description='Launch the march gait selection node.'),
+            description='Whether to launch the march gait selection node.'),
         DeclareLaunchArgument(
             'gait_package',
             default_value='march_gait_files',
@@ -62,13 +66,12 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'gait_directory',
             default_value='training-v',
-            description='The directory where the gait files are located, '
+            description='The directory in which the gait files to use are located, '
                         'relative to the gait_package.'),
         # Launch rqt input device if not rqt_input:=false
         IncludeLaunchDescription(PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('march_rqt_input_device'), 'launch', 'input_device.launch.py')),
-            launch_arguments=[('node_prefix', node_prefix),
-                              ('ping_safety_node', ping_safety_node),
+            launch_arguments=[('ping_safety_node', ping_safety_node),
                               ('use_sim_time', use_sim_time)],
             condition=IfCondition(rqt_input)),
         # Launch robot state publisher (from march_description) if not robot_state_publisher:=false
