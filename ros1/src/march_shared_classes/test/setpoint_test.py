@@ -80,7 +80,6 @@ class SetpointTest(unittest.TestCase):
                             'right_knee': Setpoint(time, new_angles_right['right_knee'], new_vel)}
         resulting_position = Setpoint.get_foot_pos_from_angles(resulting_angles)
         for key in desired_position.keys():
-            print(key)
             self.assertAlmostEqual(desired_position[key], resulting_position[key], places=4)
 
     def test_inverse_kinematics_velocity(self):
