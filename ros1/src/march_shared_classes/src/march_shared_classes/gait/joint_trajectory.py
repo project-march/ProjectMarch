@@ -204,9 +204,9 @@ class JointTrajectory(object):
                                                                                      parameter)
             # with interpolated setpoints, create a dictionary of joint names with a list of their setpoints
             for base_joint in base_subgait.joints:
-                try:
+                if base_joint.name in new_setpoints:
                     new_setpoints[base_joint.name].append(interpolated_setpoints[base_joint.name])
-                except KeyError:
+                else:
                     new_setpoints[base_joint.name] = [interpolated_setpoints[base_joint.name]]
 
         duration = Setpoint.weighted_average(base_subgait.duration, other_subgait.duration, parameter)

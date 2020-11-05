@@ -66,8 +66,8 @@ class SetpointTest(unittest.TestCase):
             self.assertAlmostEqual(angles_right[key], self.setpoint.position, places=4)
 
     def test_inverse_kinematics_reversed_position(self):
-        desired_position = {'left_foot_x': 0.0, 'left_foot_y': -0.08, 'left_foot_z': 0.6,
-                            'right_foot_x': 0.0, 'right_foot_y': 0.08, 'right_foot_z': 0.6}
+        desired_position = {'left_foot_x': 0.18, 'left_foot_y': -0.08, 'left_foot_z': 0.6,
+                            'right_foot_x': 0.18, 'right_foot_y': 0.08, 'right_foot_z': 0.6}
         new_angles_left = Setpoint.calculate_joint_angles_from_foot_position(desired_position, 'left')
         new_angles_right = Setpoint.calculate_joint_angles_from_foot_position(desired_position, 'right')
         time = 1.0
@@ -80,6 +80,7 @@ class SetpointTest(unittest.TestCase):
                             'right_knee': Setpoint(time, new_angles_right['right_knee'], new_vel)}
         resulting_position = Setpoint.get_foot_pos_from_angles(resulting_angles)
         for key in desired_position.keys():
+            print(key)
             self.assertAlmostEqual(desired_position[key], resulting_position[key], places=4)
 
     def test_inverse_kinematics_velocity(self):
