@@ -2,16 +2,15 @@ from math import acos, atan, cos, pi, sin, sqrt
 
 import rospkg
 from urdf_parser_py import urdf
-import rospy
 
 from march_shared_classes.exceptions.gait_exceptions import SideSpecificationError, SubgaitInterpolationError
 
 # Use this factor when calculating velocities to keep the calculations within the range of motion
 # See IK confluence page https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
 VELOCITY_SCALE_FACTOR = 500
-JOINTS_POSITION_NAMES = ['left_hip_aa', 'left_hip_fe', 'left_knee', 'right_hip_aa', 'right_hip_fe', 'right_knee']
-JOINTS_VELOCITY_NAMES = ['left_hip_aa_velocity', 'left_hip_fe_velocity', 'left_knee_velocity',
-                         'right_hip_aa_velocity', 'right_hip_fe_velocity', 'right_knee_velocity']
+JOINTS_POSITION_NAMES_IK = ['left_hip_aa', 'left_hip_fe', 'left_knee', 'right_hip_aa', 'right_hip_fe', 'right_knee']
+JOINTS_VELOCITY_NAMES_IK = ['left_hip_aa_velocity', 'left_hip_fe_velocity', 'left_knee_velocity',
+                            'right_hip_aa_velocity', 'right_hip_fe_velocity', 'right_knee_velocity']
 FOOT_COORDINATE_NAMES = ['left_foot_x', 'left_foot_y', 'left_foot_z', 'right_foot_x', 'right_foot_y', 'right_foot_z']
 FOOT_VELOCITY_NAMES = ['left_foot_x_velocity', 'left_foot_y_velocity', 'left_foot_z_velocity',
                        'right_foot_x_velocity', 'right_foot_y_velocity', 'right_foot_z_velocity']
@@ -101,7 +100,7 @@ class Setpoint(object):
 
         resulting_setpoints = {'left_ankle': Setpoint(time, new_ankle_angle_left, new_ankle_velocity_left),
                                'right_ankle': Setpoint(time, new_ankle_angle_right, new_ankle_velocity_right)}
-        for joint, velocity in zip(JOINTS_POSITION_NAMES, JOINTS_VELOCITY_NAMES):
+        for joint, velocity in zip(JOINTS_POSITION_NAMES_IK, JOINTS_VELOCITY_NAMES_IK):
             resulting_setpoints[joint] = Setpoint(time, new_angles[joint], new_angles[velocity])
 
         return resulting_setpoints
@@ -150,7 +149,7 @@ class Setpoint(object):
         :return:
             the foot location or velocity as a dictionary. Origin in the hip base, y positive to the right.
         """
-        for joint in JOINTS_POSITION_NAMES:
+        for joint in JOINTS_POSITION_NAMES_IK:
             if joint not in setpoint_dic:
                 raise KeyError('expected setpoint dictionary to contain joint {joint}, but {joint} was missing.'.
                                format(joint=joint))
@@ -192,15 +191,15 @@ class Setpoint(object):
         haa_to_foot_length = ul * cos(hfe) + ll * cos(hfe - kfe)
         z_position = - sin(haa) * ph + cos(haa) * haa_to_foot_length
         x_position = hl + sin(hfe) * ul + sin(hfe - kfe) * ll
+
         if side == 'left':
             y_position = - cos(haa) * ph - sin(haa) * haa_to_foot_length - base / 2.0
-            return {'left_foot_x': x_position, 'left_foot_y': y_position, 'left_foot_z': z_position}
         elif side == 'right':
             y_position = cos(haa) * ph + sin(haa) * haa_to_foot_length + base / 2.0
-            return {'right_foot_x': x_position, 'right_foot_y': y_position, 'right_foot_z': z_position}
         else:
             raise SideSpecificationError(side)
 
+        return {side + '_foot_x': x_position, side + '_foot_y': y_position, side + '_foot_z': z_position}
 
     @staticmethod
     def calculate_joint_angles_from_foot_position(foot_position, foot, foot_velocity=None):
@@ -210,59 +209,64 @@ class Setpoint(object):
         be found at https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics. This function
         assumes that the desired z position of the foot is positive.
 
-        :param position:
+        :param foot_position:
             Dictionary that specifies the x, y and z position of the foot. Origin in the hip base,
             y positive to the right
         :param foot:
             String that specifies to which foot the coordinates in position belong
-        :param velocity:
+        :param foot_velocity:
             Dictionary that specifies the velocity vector of the foot
 
         :return:
             A dictionary with an entry for each joint on the requested side with the correct angle when velocity is not
             requested. When it is the dictionary also has an entry for the velocity of each joint.
         """
+        # Get relevant lengths from robot model, ul = upper leg etc. see get_lengths_robot() and unpack desired position
+        [ul, ll, hl, ph, base] = Setpoint.get_lengths_robot(foot)
+        try:
+            x_position = foot_position[foot + '_foot_x']
+            y_position = foot_position[foot + '_foot_y']
+            z_position = foot_position[foot + '_foot_z']
+        except KeyError as e:
+            raise KeyError('expected foot_position to have key {key}, but {key} was missing.'.format(key=e.args[0]))
+
         # Change y positive direction to the desired foot, change origin to pivot of haa joint, for ease of calculation.
-        # Get relevant lengths from robot model, ul = upper leg etc. see get_lengths_robot().
-        # If a velocity is supplied, also find the position the foot would be in a moment later,
-        # without scaling this could be invalid
         if foot == 'left':
-            pos_x = foot_position['left_foot_x']
-            pos_z = foot_position['left_foot_z']
-            [ul, ll, hl, ph, base] = Setpoint.get_lengths_robot('left')
-            pos_y = - (foot_position['left_foot_y'] + base / 2.0)
+            y_position = - (y_position + base / 2.0)
         elif foot == 'right':
-            pos_x = foot_position['right_foot_x']
-            pos_z = foot_position['right_foot_z']
-            [ul, ll, hl, ph, base] = Setpoint.get_lengths_robot('right')
-            pos_y = foot_position['right_foot_y'] - base / 2.0
+            y_position = y_position - base / 2.0
         else:
             raise SideSpecificationError(foot)
 
         # first calculate the haa angle. This calculation assumes that pos_z > 0
-        haa = Setpoint.calculate_haa_angle(pos_z, pos_y, ph)
+        haa = Setpoint.calculate_haa_angle(z_position, y_position, ph)
 
-        # once the haa angle is known, rescale the desired x and z position to arrive at easier system to calculate the
-        # hfe and kfe angles
-        rescaled_x = round(pos_x - hl, 10)
-        rescaled_z = round(sqrt(- ph * ph + pos_y * pos_y + pos_z * pos_z), 10)
+        # once the haa angle is known, rescale the desired x and z position to arrive at an easier system to calculate
+        # the hfe and kfe angles
+        rescaled_x = round(x_position - hl, 10)
+        rescaled_z = round(sqrt(- ph * ph + y_position * y_position + z_position * z_position), 10)
 
         if rescaled_x * rescaled_x + rescaled_z * rescaled_z > (ll + ul) * (ll + ul):
-            raise SubgaitInterpolationError('The desired foot position, ({0}, {1}, {2}), is out of reach'.
-                                            format(pos_x, pos_y, pos_z))
+            raise SubgaitInterpolationError('The desired {foot} foot position, ({x}, {y}, {z}), is out of reach'.
+                                            format(foot=foot, x=x_position, y=y_position, z=z_position))
 
         hfe, kfe = Setpoint.calculate_hfe_kfe_angles(rescaled_x, rescaled_z, ul, ll)
 
         angle_positions = {foot + '_hip_aa': haa, foot + '_hip_fe': hfe, foot + '_knee': kfe}
 
         if bool(foot_velocity):
-            # find the angles a moment later using the foot position a moment later
-            # scale the found velocity back to radians per second
-            next_position = Setpoint.calculate_next_position_foot(foot_position, foot_velocity)
+            # find the joint angles a moment later using the foot position a moment later
+            # use this together with the current joint angles to calculate the joint velocity
+            next_position = Setpoint.calculate_next_position_foot(foot_position, foot_velocity, foot)
+
             next_angles = Setpoint.calculate_joint_angles_from_foot_position(next_position, foot)
-            angle_velocities = Setpoint.calculate_joint_velocities(next_angles, angle_positions)
+
+            angle_velocities = Setpoint.calculate_joint_velocities(next_angles, angle_positions, foot)
+
             angle_velocities.update(angle_positions)
+
             return angle_velocities
+
         else:
             return angle_positions
 
@@ -271,6 +275,7 @@ class Setpoint(object):
         """Computes the weighted average of the entries of two dictionaries with normalised weight parameter."""
         if len(base_dictionary) != len(other_dictionary):
             raise KeyError('Dictionaries do not have the same number of entries.')
+
         resulting_dictionary = {}
         for key in base_dictionary.keys():
             try:
@@ -279,6 +284,7 @@ class Setpoint(object):
             except KeyError as e:
                 raise KeyError('Dictionaries must have the same keys for a weighted average. other_dictionary misses '
                                '{key}'.format(key=e.args[0]))
+
         return resulting_dictionary
 
     @staticmethod
@@ -307,6 +313,7 @@ class Setpoint(object):
         except KeyError as e:
             raise KeyError('Expected robot.link_map to contain "{key}", but "{key}" was missing.'.
                            format(key=e.args[0]))
+
         if side == 'left':
             return [l_ul, l_ll, l_hl, l_ph, base]
         elif side == 'right':
@@ -318,6 +325,7 @@ class Setpoint(object):
 
     @staticmethod
     def merge_dictionaries(dic_one, dic_two):
+        """Combines the key value pairs of two dicitonaries into a new dicionary."""
         merged_dic = {}
         for key_one in dic_one:
             if key_one not in dic_two or dic_one[key_one] == dic_two[key_one]:
@@ -325,86 +333,108 @@ class Setpoint(object):
             else:
                 raise KeyError('Dictionaries to be merged both contain key {key} with differing values'.
                                format(key=key_one))
+
         for key_two in dic_two:
             if key_two not in dic_one or dic_one[key_two] == dic_two[key_two]:
                 merged_dic[key_two] = dic_two[key_two]
             else:
                 raise KeyError('Dictionaries to be merged both contain key {key} with differing values'.
                                format(key=key_two))
-        return merged_dic
 
+        return merged_dic
 
     @staticmethod
     def calculate_next_positions_joint(setpoint_dic):
-        """Calculates the position of the joints a moment (1 / VELOCITY_SCALE_FACTOR second) later."""
+        """Calculates the position of the joints a moment later given a position and velocity dic."""
         next_positions = {}
-        for joint in JOINTS_POSITION_NAMES:
+        for joint in JOINTS_POSITION_NAMES_IK:
             if joint in setpoint_dic:
                 next_positions[joint] = setpoint_dic[joint].position + setpoint_dic[joint].velocity \
-                                        / VELOCITY_SCALE_FACTOR
+                    / VELOCITY_SCALE_FACTOR
             else:
                 raise KeyError('setpoint_dic is missing joint {joint}'.format(joint=joint))
+
         return next_positions
 
     @staticmethod
-    def calculate_next_position_foot(position_dic, velocity_dic):
-        """Calculates the position of the joints a moment (1 / VELOCITY_SCALE_FACTOR second) later."""
+    def calculate_next_position_foot(position_dic, velocity_dic, foot=None):
+        """Calculates the position of the (left/right/all) joints a moment later given a position and velocity dic."""
         next_position = {}
         for coordinate, velocity in zip(FOOT_COORDINATE_NAMES, FOOT_VELOCITY_NAMES):
+            if bool(foot):
+                if not (coordinate.startswith(foot) and velocity.startswith(foot)):
+                    continue
+
             if coordinate in position_dic and velocity in velocity_dic:
                 next_position[coordinate] = position_dic[coordinate] + velocity_dic[velocity] \
-                                            / VELOCITY_SCALE_FACTOR
+                    / VELOCITY_SCALE_FACTOR
             else:
-                rospy.logwarn('position_dic or velocity_dic is missing key {coord}'.format(coord=coordinate))
+                raise KeyError('position_dic or velocity_dic is missing key {coord}'.format(coord=coordinate))
+
         return next_position
 
     @staticmethod
     def calculate_foot_velocity(next_foot_positions, foot_positions):
+        """Calculates the foot velocity given the current foot location and a next foot location."""
         foot_velocity = {}
         for coordinate, velocity in zip(FOOT_COORDINATE_NAMES, FOOT_VELOCITY_NAMES):
             if coordinate in next_foot_positions and coordinate in foot_positions:
                 foot_velocity[velocity] = (next_foot_positions[coordinate] - foot_positions[coordinate]) \
-                                            * VELOCITY_SCALE_FACTOR
+                    * VELOCITY_SCALE_FACTOR
             else:
                 raise KeyError('next_foot_positions or foot_positions is missing key {coord}'.format(coord=coordinate))
+
         return foot_velocity
 
     @staticmethod
-    def calculate_joint_velocities(next_angle_positions, angle_positions):
+    def calculate_joint_velocities(next_angle_positions, angle_positions, side=None):
+        """Calculates the (left/right/all)joint velocities given a current position and a next position."""
         angle_velocity = {}
-        for coordinate, velocity in zip(JOINTS_POSITION_NAMES, JOINTS_VELOCITY_NAMES):
+        for coordinate, velocity in zip(JOINTS_POSITION_NAMES_IK, JOINTS_VELOCITY_NAMES_IK):
+            if bool(side):
+                if not (coordinate.startswith(side) and velocity.startswith(side)):
+                    continue
+
             if coordinate in next_angle_positions and coordinate in angle_positions:
                 angle_velocity[velocity] = (next_angle_positions[coordinate] - angle_positions[coordinate]) \
-                                            * VELOCITY_SCALE_FACTOR
+                    * VELOCITY_SCALE_FACTOR
             else:
-                rospy.logwarn('next_angle_positions or angle_positions is missing key {coord}'.format(coord=coordinate))
+                raise KeyError('next_angle_positions or angle_positions is missing key {coord}'.
+                               format(coord=coordinate))
+
         return angle_velocity
 
     @staticmethod
-    def calculate_haa_angle(pos_z, pos_y, pelvis_hip_length):
+    def calculate_haa_angle(z_position, y_position, pelvis_hip_length):
         """Calculates the haa angle of the exoskeleton given a desired y and z position of the exoskeleton."""
-        if pos_z <= 0:
-            raise SubgaitInterpolationError('desired z position of the foot is not positive, current haa calculation is '
-                                            'not capable of this')
-        if pos_y != 0:
-            slope_y_to_or = pos_z / pos_y
-            alpha = atan(slope_y_to_or)
-            if pos_y > 0:
-                haa = acos(pelvis_hip_length / sqrt(pos_z * pos_z + pos_y * pos_y)) - alpha
+        if z_position <= 0:
+            raise SubgaitInterpolationError(
+                'desired z position of the foot is not positive, current haa calculation is not capable of this')
+
+        if y_position != 0:
+            slope_foot_to_origin = z_position / y_position
+            angle_foot_to_origin = atan(slope_foot_to_origin)
+            if y_position > 0:
+                haa = acos(pelvis_hip_length / sqrt(z_position * z_position + y_position * y_position)) \
+                    - angle_foot_to_origin
             else:
-                haa = acos(pelvis_hip_length / sqrt(pos_z * pos_z + pos_y * pos_y)) - pi - alpha
+                haa = acos(pelvis_hip_length / sqrt(z_position * z_position + y_position * y_position)) \
+                    - pi - angle_foot_to_origin
         else:
-            alpha = pi / 2
-            haa = acos(pelvis_hip_length / sqrt(pos_z * pos_z + pos_y * pos_y)) - alpha
+            angle_foot_to_origin = pi / 2
+            haa = acos(pelvis_hip_length / sqrt(z_position * z_position + y_position * y_position)) \
+                - angle_foot_to_origin
+
         return haa
 
     @staticmethod
     def calculate_hfe_kfe_angles(rescaled_x, rescaled_z, upper_leg, lower_leg):
+        """Calculates the hfe and kfe given a desired rescaled x and z coordinate using the cosine rule."""
         foot_line_to_leg = acos((upper_leg * upper_leg + rescaled_x * rescaled_x + rescaled_z * rescaled_z
                                  - lower_leg * lower_leg)
                                 / (2 * upper_leg * sqrt(rescaled_x * rescaled_x + rescaled_z * rescaled_z)))
         normal_to_foot_line = atan(rescaled_x / rescaled_z)
         hfe = foot_line_to_leg + normal_to_foot_line
         kfe = acos((rescaled_z - upper_leg * cos(hfe)) / lower_leg) + hfe
-        return hfe, kfe
 
+        return hfe, kfe
