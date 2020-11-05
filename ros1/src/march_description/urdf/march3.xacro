@@ -7,6 +7,10 @@
     <!--Important note: when changing value make sure rviz fixed frame is set to the same value (moveit.rviz)-->
     <xacro:property name="parent_name" value="world"/>
 
+    <!-- An argument that makes sure the march.gazebo is loaded only when launching the simulation and not during build,
+        because during build the march_description package can not be found-->
+    <xacro:arg name="build" default="false"/>
+
     <!-- Constants for robot dimensions -->
     <xacro:property name="PI" value="3.1415926535897931"/>
     <xacro:property name="mass" value="1"/> <!-- arbitrary value for mass -->
