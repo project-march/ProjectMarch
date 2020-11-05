@@ -59,7 +59,8 @@ class InputDeviceController(object):
             self._alive_timer = self._node.create_timer(timer_period_sec=0.2, callback=self._timer_callback,
                                                         clock=self._node.get_clock())
 
-        self.gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
+        self.gait_future = None
+        self.update_possible_gaits()
 
     def __del__(self):
         self._node.destroy_publisher(self._instruction_gait_pub)
@@ -110,7 +111,8 @@ class InputDeviceController(object):
         if self._possible_gait_client.service_is_ready():
             self.gait_future = self._possible_gait_client.call_async(PossibleGaits.Request())
         else:
-            self._node.get_logger().warn('Failed to contact get_possible_gaits service')
+            while not self._possible_gait_client.wait_for_service(timeout_sec=1):
+                self._node.get_logger().warn('Failed to contact possible gaits service')
 
     def get_possible_gaits(self) -> Future:
         """
