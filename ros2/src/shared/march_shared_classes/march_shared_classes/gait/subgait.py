@@ -21,11 +21,11 @@ class Subgait(object):
 
     def __init__(self, joints: List[JointTrajectory], duration: float, gait_type: str = 'walk_like',
                  gait_name: str = 'Walk', subgait_name: str = 'right_open', version: str = 'First try',
-                 description: str = 'Just a simple gait'):
+                 description: str = 'Just a simple gait', robot: urdf.Robot = None):
         self.joints = joints
         self.gait_type = gait_type
         self.gait_name = gait_name
-
+        self.robot = robot
         self.subgait_name = subgait_name
         self.version = version
         self.description = str(description)
@@ -134,7 +134,7 @@ class Subgait(object):
         subgait_type = subgait_dict['gait_type'] if subgait_dict.get('gait_type') else ''
         subgait_description = subgait_dict['description'] if subgait_dict.get('description') else ''
 
-        return cls(joint_list, duration, subgait_type, gait_name, subgait_name, version, subgait_description)
+        return cls(joint_list, duration, subgait_type, gait_name, subgait_name, version, subgait_description, robot)
 
     # endregion
 
@@ -303,21 +303,15 @@ class Subgait(object):
         """Returns a dictionary of joint positions at the end of this subgait."""
         return {joint.name: joint.setpoints[-1].position for joint in self.joints}
 
-    @property
-    def robot(self):
-        """Returns a dictionary of joint positions at the end of this subgait."""
-        return self.robot
-
     # endregion
 
-    def to_yaml(self):
-        """Returns a YAML string representation of the subgait."""
+    def to_dict(self):
         duration = Duration(seconds=self.duration)
-        output = {
+        return {
             'description': self.description,
             'duration': {
                 'nsecs': duration.nanoseconds,
-                'secs': duration.nanoseconds,
+                'secs': math.floor(self.duration),
             },
             'gait_type': self.gait_type,
             'joints': dict([(joint.name, [{
@@ -331,7 +325,10 @@ class Subgait(object):
             'name': self.subgait_name,
             'version': self.version,
         }
-        return yaml.dump(output)
+
+    def to_yaml(self):
+        """Returns a YAML string representation of the subgait."""
+        return yaml.dump(self.to_dict())
 
     # region Class methods
     def __getitem__(self, index):

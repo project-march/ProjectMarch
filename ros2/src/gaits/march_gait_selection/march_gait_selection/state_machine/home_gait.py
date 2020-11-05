@@ -57,7 +57,7 @@ class HomeGait(GaitInterface):
         self._time_since_start = 0.0
         return self._get_trajectory_msg()
 
-    def update(self, elapsed_time):
+    def update(self, elapsed_time, logger):
         """
         Gives an update on the progress of the gait.
         :param elapsed_time: The time that has elapsed
