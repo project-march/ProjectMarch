@@ -202,7 +202,9 @@
     <xacro:property name="axel_offset" value="0.05"/> <!-- Space btw top of beam and the each joint -->
 
     <!-- Import all Gazebo-customization elements, including Gazebo colors -->
-    <xacro:include filename="$(find march_description)/urdf/march.gazebo"/>
+    <xacro:unless value="$(arg build)">
+        <xacro:include filename="$(find march_description)/urdf/march.gazebo"/>
+    </xacro:unless>
 
     <material name="blue">
         <color rgba="0 0 0.6 1"/>

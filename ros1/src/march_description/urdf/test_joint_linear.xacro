@@ -24,8 +24,9 @@
     <xacro:property name="hover_height" value="0.5"/>
 
     <!-- Import all Gazebo-customization elements, including Gazebo colors -->
-    <xacro:include filename="$(find march_description)/urdf/march.gazebo"/>
-
+    <xacro:unless value="$(arg build)">
+        <xacro:include filename="$(find march_description)/urdf/march.gazebo"/>
+    </xacro:unless>
 
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
         <robotNamespace>/march</robotNamespace>
