@@ -1,10 +1,4 @@
-# ignore mpc_code_generator build and executable files
-/src/mpc_code_generator/build
-/src/mpc_code_generator/References
-/src/mpc_code_generator/mpc
-
-# ignore Clion directories
+# ignore Clion specific directories
 /cmake-build-debug
 /.idea
-/../../.idea
 
