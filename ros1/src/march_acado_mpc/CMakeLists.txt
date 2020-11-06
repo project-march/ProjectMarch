@@ -25,8 +25,9 @@ add_executable(march_acado_mpc_node src/march_acado_mpc_node.cpp)
 include_directories(include SYSTEM ${catkin_INCLUDE_DIRS})
 
 add_library(${PROJECT_NAME}
-    include/${PROJECT_NAME}/mpc.h
+    lib/qpoases
     src/march_acado_mpc_node.cpp
+    include/${PROJECT_NAME}/acado_mpc.h
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
