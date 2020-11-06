@@ -1,33 +1,20 @@
-// References
-// [1] https://github.com/uzh-rpg/rpg_mpc/blob/master/model/quadrotor_model_thrustrates.cpp
-// [2] https://github.com/ethz-asl/mav_control_rw
-
 #define _USE_MATH_DEFINES
 
 #include <iostream>
+#include <cmath>
+
 #include <acado_toolkit.hpp>
 #include <acado_code_generation.hpp>
 #include <acado_gnuplot.hpp>
-#include <cmath>
-#include <chrono> 
 
 using namespace std;
-using namespace std::chrono;
 
 USING_NAMESPACE_ACADO
 
 int main( ){
 
-	/*
-  	Switch between code generation and analysis.
-  	If CODE_GEN is true the system is compiled into an optimizaiton problem
-  	for real-time iteration and all code to run it online is generated.
-  	Constraints and reference structure is used but the values will be set on
-  	runtinme.
-  	If CODE_GEN is false, the system is compiled into a standalone optimization
-  	and solved on execution. The reference and constraints must be set in here.
-  	*/
 
+    // Switch between code generation (CODE_GEN = true) and simulation (CODE_GEN = false).
 	const bool CODE_GEN = true;
 
     // INTRODUCE THE VARIABLES:
@@ -42,8 +29,8 @@ int main( ){
     const double t_end = 0.2;                  // Time horizon [s]
 	const double t_sim = 8.0;                  // Simulation time [s]
 	const double dt = 0.04;                    // Discretization time [s]
-	const int N = round(t_end/dt);             // Number of nodes
-	const double g = 9.81;                     // Gravity is everywhere [m/s^2]
+	const int N = round(t_end/dt);          // Number of nodes
+	const double g = 9.81;                     // Gravity [m/s^2]
 	const double m = 3.0;                      // Point mass [kg]
 	const double L = 0.60;                     // Arm length [m]
 
@@ -66,33 +53,39 @@ int main( ){
     f << dot(x2) == -(g/L)*cos(x1) + u/(m*L*L);
 
 
-    // DEFINE LEAST SQUARE FUNCTION:
+    // DEFINE LEAST SQUARE (LSQ) FUNCTION:
     // -----------------------------
+
+    // Running LSQ function
     Function h;
 
     h << x1;
     h << x2;
     h << u;
 
+    // End LSQ function
     Function hN;
 
     hN << x1;
     hN << x2;
 
+    // Running cost matrix
     DMatrix Q(h.getDim(), h.getDim());
     Q.setIdentity();
     Q(0,0) = 100; // x1
     Q(1,1) = 1; // x2
     Q(2,2) = 0.01; // u
 
+    // End cost matrix
     DMatrix QN(hN.getDim(), hN.getDim());
     QN.setIdentity();
     QN(0,0) = Q(0,0); // x1
     QN(1,1) = Q(1,1); // x2
 
+    // Define the reference (for simulation)
     DVector r(h.getDim());
     r.setZero();
-    r(2) = m*L*g;
+//    r(2) = m*L*g;
 
     DVector rN(hN.getDim());
     rN.setZero();
@@ -104,13 +97,13 @@ int main( ){
 
     if(!CODE_GEN) {
 
-    ocp.minimizeLSQ( Q, h, r );
-    ocp.minimizeLSQEndTerm( QN, hN, rN );
+        ocp.minimizeLSQ( Q, h, r );
+        ocp.minimizeLSQEndTerm( QN, hN, rN );
 
     } else {
 
-    ocp.minimizeLSQ( Q, h );
-    ocp.minimizeLSQEndTerm( QN, hN );
+        ocp.minimizeLSQ( Q, h );
+        ocp.minimizeLSQEndTerm( QN, hN );
 
     }
 
@@ -155,8 +148,8 @@ int main( ){
           exit( EXIT_FAILURE );
 
 
-		// ... AND PLOT THE RESULTS
-  	    // ------------------------
+		// PLOT THE RESULTS
+  	    // ----------------
 		VariablesGrid sampledProcessOutput;
 		sim.getSampledProcessOutput( sampledProcessOutput );
 
@@ -169,14 +162,10 @@ int main( ){
 		window.addSubplot( feedbackControl(0),       "Control input [N/m]" );
 		window.plot();
 
-        // sampledProcessOutput(0).print("log_states.txt");
-        // feedbackControl(0).print("log_control.txt");
-
         return EXIT_SUCCESS;
 	} 
     else {
-		// For code generation, we can set some properties.
-        // The main reason for a setting is given as comment.
+		// Code generation properties
         OCPexport mpc(ocp);
 
         mpc.set(HESSIAN_APPROXIMATION,              GAUSS_NEWTON);          // is robust, stable
@@ -196,7 +185,7 @@ int main( ){
         mpc.set( GENERATE_MAKE_FILE,                NO);
 
         // Export everything.
-        if(mpc.exportCode("../src/mpc_codegen") != SUCCESSFUL_RETURN)
+        if(mpc.exportCode("../generated_src") != SUCCESSFUL_RETURN)
             exit( EXIT_FAILURE );
             mpc.printDimensionsQP( );
         }
