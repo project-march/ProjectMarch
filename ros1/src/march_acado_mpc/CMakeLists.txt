@@ -44,9 +44,7 @@ include_directories(include
 #        include/${PROJECT_NAME}/acado_mpc.h)
 
 add_library(${PROJECT_NAME}
-        src/march_acado_mpc_node.cpp
-        lib/qpoases/SRC/
-        generated_src/)
+        src/march_acado_mpc_node.cpp)
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
