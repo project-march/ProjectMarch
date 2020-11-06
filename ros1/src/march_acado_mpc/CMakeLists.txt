@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project(march_acado_mpc)
 
 add_compile_options(-std=c++14 -Wall -Wextra -Werror)
-SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} )
+#SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} )
 
 find_package(catkin REQUIRED COMPONENTS
         march_shared_resources
@@ -18,17 +18,35 @@ catkin_package(
         roscpp)
 
 
-add_executable(march_acado_mpc_node src/march_acado_mpc_node.cpp )
+add_executable(march_acado_mpc_node
+        src/march_acado_mpc_node.cpp)
 
 include_directories(include
         SYSTEM
         ${catkin_INCLUDE_DIRS}
-        ${ACADO_INCLUDE_DIRS})
+        ${ACADO_INCLUDE_DIRS}
+        lib/qpoases/INCLUDE/
+        lib/qpoases/SRC/
+        generated_src/)
+
+#SET (qpOASES_SRCS
+#        lib/qpoases/SRC/Bounds.cpp
+#
+#        lib/qpoases/SRC/Constraints.cpp
+#        lib/qpoases/SRC/CyclingManager.cpp
+#        lib/qpoases/SRC/Indexlist.cpp
+#        lib/qpoases/SRC/MessageHandling.cpp
+#        lib/qpoases/SRC/QProblem.cpp
+#        lib/qpoases/SRC/QProblemB.cpp
+#        lib/qpoases/SRC/SubjectTo.cpp
+#        lib/qpoases/SRC/Utils.cpp
+#
+#        include/${PROJECT_NAME}/acado_mpc.h)
 
 add_library(${PROJECT_NAME}
-        lib/qpoases
         src/march_acado_mpc_node.cpp
-        include/${PROJECT_NAME}/acado_mpc.h)
+        lib/qpoases/SRC/
+        generated_src/)
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
