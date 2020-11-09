@@ -240,9 +240,13 @@ class GaitGeneratorController(object):
         if was_playing:
             self.start_time_slider_thread()
 
-        self.gait_directory = '/'.join(file_name.split('/')[:-3])
+        # The gait directory of the selected gait is always 3 directories behind the .subgait file
+        # (gait_directory/gait/subgait/version.subgait).
+        self.gait_directory = os.path.dirname(os.path.dirname(os.path.dirname(file_name)))
         rospy.loginfo('Setting gait directory to %s', str(self.gait_directory))
-        self.view.change_gait_directory_button.setText(self.gait_directory)
+        # Display only the actual directory under which gaits will be saved for readability
+        gait_directory_text = 'gait directory: ' + os.path.basename(self.gait_directory)
+        self.view.change_gait_directory_button.setText(gait_directory_text)
 
         # Clear undo and redo history
         self.settings_changed_history = RingBuffer(capacity=100, dtype=list)
@@ -314,12 +318,26 @@ class GaitGeneratorController(object):
         return self.gait_directory
 
     def change_gait_directory(self):
+        previous_gait_directory = self.gait_directory
         self.gait_directory = str(self.view.open_directory_dialogue())
-        if self.gait_directory == '':   # If directory dialogue is canceled
-            self.gait_directory = None
-            self.view.change_gait_directory_button.setText('Select a gait directory...')
-        else:
-            self.view.change_gait_directory_button.setText(self.gait_directory)
+        # If directory dialogue is canceled, or an invalid directory is selected, leave gait_directory unchanged
+        if self.gait_directory == '' or self.gait_directory is None:
+            self.gait_directory = previous_gait_directory
+        # Valid gait directories are limited to direct subdirectories of march_gait_files (here march_gait_files must
+        # proceed the final directory in the path) and directories named 'resources' for testing (here resources must be
+        # the final element of the gait directory path). In any other case the directory is invalid. If the path
+        # contains but 1 element it must be invalid.
+        elif os.path.basename(os.path.dirname(self.gait_directory)) != 'march_gait_files' and \
+                os.path.basename(self.gait_directory) != 'resources':
+            rospy.logwarn('Gait directory path invalid. The gait directory must be a direct subdirectory of'
+                          ' march_gait_files or be named resources. Change gait directory cancelled')
+            self.gait_directory = previous_gait_directory
+
+        if self.gait_directory is not None:
+            rospy.loginfo('Setting gait directory to %s', str(self.gait_directory))
+            # Display only the actual directory under which gaits will be saved for readability
+            gait_directory_text = 'gait directory: ' + os.path.basename(self.gait_directory)
+            self.view.change_gait_directory_button.setText(gait_directory_text)
 
     def invert_gait(self):
         for side, controller in self.side_subgait_controller.items():
@@ -338,7 +356,6 @@ class GaitGeneratorController(object):
             return
 
         changed_dict = self.settings_changed_history.pop()
-
         if 'joints' in changed_dict:
             joints = changed_dict['joints']
             for joint in joints:

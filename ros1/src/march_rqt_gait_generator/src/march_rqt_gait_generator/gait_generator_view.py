@@ -27,6 +27,14 @@ class GaitGeneratorView(QWidget):
 
         self.joint_state_pub = rospy.Publisher('joint_states', JointState, queue_size=10)
 
+        current_file_path = __file__.split('/')
+        path = ''
+        for directory in current_file_path:
+            os.path.join(path, directory)
+            if directory == 'ros1':
+                break
+        self.ros1_path = path
+
         self.joint_widgets = {}
         self.tf_listener = TransformListener()
 
@@ -156,13 +164,14 @@ class GaitGeneratorView(QWidget):
         return answer == QMessageBox.Yes
 
     def open_file_dialogue(self):
-        return QFileDialog.getOpenFileName(self,
-                                           'Open Image',
-                                           os.getenv('HOME') + '/march_ws/src/gait-files/march_gait_files',
+        return QFileDialog.getOpenFileName(self, 'Select a subgait to import.',
+                                           os.path.join(self.ros1_path, '/src/march_gait_files'),
                                            'March Subgait (*.subgait)')
 
     def open_directory_dialogue(self):
-        return QFileDialog.getExistingDirectory(None, 'Select a directory to save gaits')
+        return QFileDialog.getExistingDirectory(None, 'Select a directory to save gaits. Directory must be '
+                                                      'a subdirectory of march_gait_files or be named resources.',
+                                                os.path.join(self.ros1_path, '/src/march_gait_files'))
 
     @QtCore.pyqtSlot(int)
     def update_main_time_slider(self, time):
