@@ -117,13 +117,16 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             'joints': dict([(joint.name, [{
                 'position': position[joint.name],
                 'time_from_start': {
-                    'nsecs': Duration(seconds=self._freeze_duration).nanoseconds,
-                    'secs': math.floor(self._freeze_duration),
+                    'nsecs': (duration - math.floor(duration)) * 1e9,
+                    'secs': math.floor(duration),
                 },
-                'velocity': 0}]) for joint in self._current_subgait.joints]),
+                'velocity': 0}
+                for duration in map(lambda x: x/10.0, range(1, round(self._freeze_duration*10)))])
+                            for joint in self._current_subgait.joints]),
             'name': 'dynamic_freeze',
             'version': 'Only version',
         }
+        logger.info(f"{new_dict['joints']}")
         freeze_subgait = Subgait.from_dict(robot=self._current_subgait.robot,
                                            subgait_dict=new_dict,
                                            gait_name=self.gait_name,

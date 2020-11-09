@@ -93,6 +93,10 @@ class InputDeviceView(QWidget):
             self.create_button('dynamic_stairs_up',
                                callback=lambda: self._controller.publish_gait('dynamic_stairs_up'))
 
+        gait_dynamic_curb = \
+            self.create_button('dynamic_curb_sdg',
+                               callback=lambda: self._controller.publish_gait('dynamic_curb_sdg'))
+
         gait_single_step_small = \
             self.create_button('single_step_small', image_path='/gait_single_step_small.png',
                                callback=lambda: self._controller.publish_gait('single_step_small'))
@@ -255,6 +259,10 @@ class InputDeviceView(QWidget):
             self.create_button('tilted_path_second_end',
                                callback=lambda: self._controller.publish_gait('tilted_path_second_end'))
 
+        gait_curb = \
+            self.create_button('curb_sdg',
+                               callback=lambda: self._controller.publish_gait('curb_sdg'))
+
         stop_button = self.create_button('stop', image_path='/stop.png',
                                          callback=lambda: self._controller.publish_stop(),
                                          always_enabled=True)
@@ -278,7 +286,8 @@ class InputDeviceView(QWidget):
         # The button layout.
         # Position in the array determines position on screen.
         march_button_layout = [
-            [home_sit, home_stand, gait_walk, gait_walk_small, gait_walk_large, gait_balanced_walk, gait_dynamic_stairs_up, gait_slalom_walk],
+            [home_sit, home_stand, gait_walk, gait_walk_small, gait_walk_large, gait_balanced_walk,
+             gait_dynamic_stairs_up, gait_dynamic_curb, gait_slalom_walk],
 
             [gait_sit, gait_stand, rocker_switch_increment, rocker_switch_decrement, stop_button, error_button,
              sm_to_unknown_button],
@@ -307,6 +316,8 @@ class InputDeviceView(QWidget):
 
             [gait_tilted_path_first_start, gait_tilted_path_second_start, gait_tilted_path_first_end,
              gait_tilted_path_second_end],
+
+            [gait_curb]
         ]
 
         # Create the qt_layout from the button layout.

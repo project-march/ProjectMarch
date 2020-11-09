@@ -89,15 +89,18 @@ class GaitStateMachine(object):
 
     def _update_foot_on_ground_cb(self, is_right, msg):
         if is_right:
-            if len(msg.states) > 0 and msg.states[0].total_wrench.force.z > 150:
-                self._gait_selection.get_logger(f'{msg.states[0].total_wrench.force.z}')
+            if len(msg.states) > 0 and msg.states[0].total_wrench.force.z > 200:
+                # self._gait_selection.get_logger().info(f'{msg.states[0].total_wrench.force.z}')
+                # self._gait_selection.get_logger().info('Should freeze')
                 if not self._right_foot_on_ground:
+                    self._gait_selection.get_logger().info('Should freeze')
                     self.test_right_pub.publish(Bool(data=True))
                     self._right_foot_on_ground = True
                     if self._current_gait is not None and self._current_gait.can_freeze:
                         self._gait_selection.get_logger().debug('Freezing the gait')
+                        self._trajectory_scheduler.cancel_last()
                         self._current_gait.freeze(self._current_pos)
-            elif len(msg.state) == 0:
+            elif len(msg.states) == 0:
                 self.test_right_pub.publish(Bool(data=False))
                 self._right_foot_on_ground = False
 
@@ -203,6 +206,7 @@ class GaitStateMachine(object):
         """Requests shutdown, which will terminate the state machine as soon as
         possible."""
         self._shutdown_requested = True
+        self._gait_selection.destroy_node()
 
     def stop_gait(self):
         """Requests a stop from the current executing gait, but keeps the state
@@ -269,7 +273,7 @@ class GaitStateMachine(object):
 
         self._handle_input()
         logger = self._gait_selection.get_logger()
-        trajectory, should_stop = self._current_gait.update(elapsed_time, self._gait_selection.get_logger())
+        trajectory, should_stop = self._current_gait.update(elapsed_time, logger)
         # schedule trajectory if any
         if trajectory is not None:
             self._call_gait_callbacks()
@@ -353,13 +357,9 @@ class GaitStateMachine(object):
         for gait in self._gait_selection:
             gait_name = gait.name
             starting_position = gait.starting_position
-            if 'dynamic' in gait_name:
-                self._gait_selection.get_logger().info(f'{gait_name} from {starting_position}')
             from_idle_name = next(
                 (name for name, position in idle_positions.items()
                  if position['joints'] == starting_position), None)
-            if 'dynamic' in gait_name:
-                self._gait_selection.get_logger().info(f'{gait_name} from {from_idle_name}')
 
             if from_idle_name is None:
                 from_idle_name = 'unknown_idle_{0}'.format(len(idle_positions))
@@ -369,6 +369,7 @@ class GaitStateMachine(object):
                 idle_positions[from_idle_name] = \
                     {'gait_type': '', 'joints': starting_position}
             if from_idle_name in self._idle_transitions:
+                # self._gait_selection.get_logger().info(f'Adding {gait_name} to {from_idle_name} in {self._idle_transitions}')
                 self._idle_transitions[from_idle_name].add(gait_name)
             else:
                 self._idle_transitions[from_idle_name] = {gait_name}

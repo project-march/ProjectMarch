@@ -20,9 +20,14 @@ class TrajectoryScheduler(object):
             topic='/march/controller/trajectory/follow_joint_trajectory/goal',
             qos_profile=5)
 
+        self._cancel_pub = self._node.create_publisher(
+            msg_type=GoalID,
+            topic='/march/controller/trajectory/follow_joint_trajectory/cancel',
+            qos_profile=5)
+
         self._trajectory_goal_result_sub = self._node.create_subscription(
             msg_type=FollowJointTrajectoryActionResult,
-            topic='march/controller/trajectory/follow_joint_trajectory/result',
+            topic='/march/controller/trajectory/follow_joint_trajectory/result',
             callback=self._done_cb,
             qos_profile=5
         )
@@ -33,9 +38,13 @@ class TrajectoryScheduler(object):
         """
         self._failed = False
         goal = FollowJointTrajectoryGoal(trajectory=trajectory)
+        self._last_goal = GoalID(stamp=self._node.get_clock().now().to_msg())
         self._trajectory_goal_pub.publish(FollowJointTrajectoryActionGoal(
             header=Header(stamp=self._node.get_clock().now().to_msg()),
-            goal_id=GoalID(), goal=goal))
+            goal_id=self._last_goal, goal=goal))
+
+    def cancel_last(self):
+        self._cancel_pub.publish(GoalID(stamp=self._node.get_clock().now().to_msg()))
 
     def failed(self):
         return self._failed

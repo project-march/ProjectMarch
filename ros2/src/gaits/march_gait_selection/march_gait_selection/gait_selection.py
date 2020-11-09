@@ -244,6 +244,9 @@ class GaitSelection(Node):
         gaits['dynamic_stairs_up'] = SemiDynamicSetpointsGait.from_file(
             'stairs_up', self._gait_directory, self._robot,
             self._gait_version_map)
+        gaits['dynamic_curb_sdg'] = SemiDynamicSetpointsGait.from_file(
+            'curb_sdg', self._gait_directory, self._robot,
+            self._gait_version_map)
 
     def _load_configuration(self):
         """Loads and verifies the gaits configuration."""
