@@ -1,5 +1,9 @@
+from typing import List, Optional
+
 from python_qt_binding.QtCore import QAbstractTableModel, QModelIndex, Qt
 from python_qt_binding.QtGui import QBrush
+
+from rcl_interfaces.msg import Log
 
 from .entry import Entry
 
@@ -9,19 +13,33 @@ class EntryModel(QAbstractTableModel):
     columns = ['time', 'entry']
 
     def __init__(self):
+        """Initialize an empty list of entries."""
         super(EntryModel, self).__init__()
-        self._entries = []
+        self._entries: List[Entry] = []
 
-    def rowCount(self, parent=None):
+    # Ignore 'N802': function name cannot be snake_case because it
+    # overrides a function from QAbstractTableModel
+    def rowCount(self, parent=None) -> int:  # noqa: N802
+        """Get the number of rows.
+
+        :return Returns the number of rows
+        """
         return len(self._entries)
 
-    def columnCount(self, parent=None):
+    # Ignore 'N802': function name cannot be snake_case because it
+    # overrides a function from QAbstractTableModel
+    def columnCount(self, parent=None) -> int:  # noqa: N802
+        """Get the number of columns.
+
+        :return Returns the number of columns
+        """
         return len(EntryModel.columns)
 
-    def headerData(self, section, orientation, role=None):
-        if orientation == Qt.Horizontal:
-            if role == Qt.DisplayRole:
-                return EntryModel.columns[section].capitalize()
+    # Ignore 'N802': function name cannot be snake_case because it
+    # overrides a function from QAbstractTableModel
+    def headerData(self, section: int, orientation, role=None):  # noqa: N802
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return EntryModel.columns[section].capitalize()
 
     def data(self, index, role=Qt.DisplayRole):
         column = index.column()
@@ -43,12 +61,10 @@ class EntryModel(QAbstractTableModel):
 
         return None
 
-    def remove_rows(self, positions):
+    def remove_rows(self, positions: List[int]):
         """Removes the rows with given indices.
 
-        :type positions: List[int]
         :param positions: positions to remove
-        :returns True when the removal was successful
         """
         for row in sorted(positions, reverse=True):
             if 0 <= row < self.rowCount():
@@ -56,23 +72,24 @@ class EntryModel(QAbstractTableModel):
                 del(self._entries[row])
                 self.endRemoveRows()
 
-    def insert_row(self, entry):
+    def insert_row(self, entry: Entry):
         """Appends an entry.
 
-        :type entry: Entry
         :param entry: Entry to append to rows
         """
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         self._entries.append(entry)
         self.endInsertRows()
 
-    def insert_log_msg(self, log_msg):
+    def insert_log_msg(self, log_msg: Log,
+                       use_current_time: Optional[bool] = True):
         """Converts a ROS log msg to entry and appends it to the rows.
 
-        :type log_msg: rosgraph_msgs.msg.Log
         :param log_msg: Log msg to
+        :param use_current_time: Whether the current time should be used,
+                                 instead of the timestamp of the log
         """
-        self.insert_row(Entry.from_ros_msg(log_msg))
+        self.insert_row(Entry.from_ros_msg(log_msg, use_current_time))
 
     def __str__(self):
         """Returns a string representation of the model."""

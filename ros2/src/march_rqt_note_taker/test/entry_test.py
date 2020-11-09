@@ -1,8 +1,9 @@
+import sys
 import unittest
 
 from python_qt_binding.QtCore import QDateTime, QTimeZone
-from rosgraph_msgs.msg import Log
-import rospy
+from rcl_interfaces.msg import Log
+from builtin_interfaces.msg import Time
 
 from march_rqt_note_taker.entry import Entry
 
@@ -21,7 +22,7 @@ class EntryTest(unittest.TestCase):
         content = 'test'
         msg = Log()
         msg.msg = content
-        msg.level = Log.INFO
+        msg.level = int.from_bytes(Log.INFO, sys.byteorder)
         entry = Entry.from_ros_msg(msg)
         self.assertEqual(entry.content, content)
         self.assertFalse(entry.is_error)
@@ -31,22 +32,22 @@ class EntryTest(unittest.TestCase):
 
     def test_create_from_error_log_msg(self):
         msg = Log()
-        msg.level = Log.ERROR
+        msg.level = int.from_bytes(Log.ERROR, sys.byteorder)
         entry = Entry.from_ros_msg(msg)
         self.assertTrue(entry.is_error)
 
     def test_create_from_fatal_log_msg(self):
         msg = Log()
-        msg.level = Log.FATAL
+        msg.level = int.from_bytes(Log.FATAL, sys.byteorder)
         entry = Entry.from_ros_msg(msg)
         self.assertTrue(entry.is_error)
 
     def test_create_from_log_msg_with_stamp(self):
         seconds_since_epoch = 100
         msg = Log()
-        msg.header.stamp = rospy.Time(secs=seconds_since_epoch, nsecs=0)
-        msg.level = Log.DEBUG
-        entry = Entry.from_ros_msg(msg)
+        msg.stamp = Time(sec=seconds_since_epoch, nanosec=0)
+        msg.level = int.from_bytes(Log.DEBUG, sys.byteorder)
+        entry = Entry.from_ros_msg(msg, use_current_time=False)
         self.assertEqual(entry.date_time.toSecsSinceEpoch(),
                          seconds_since_epoch)
 

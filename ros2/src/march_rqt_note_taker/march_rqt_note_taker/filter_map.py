@@ -1,37 +1,71 @@
-from rosgraph_msgs.msg import Log
+import sys
+from typing import Any, Callable, List, Optional, Tuple
+
+from rcl_interfaces.msg import Log
 
 
 class FilterMap:
-    """Filter class that can add custom filters and mappings for accepting `rosgraph_msgs.msg.Log`."""
+    """Filter class that can add filters and mappings for accepting logs"""
 
     def __init__(self):
-        self._filter_maps = []
+        self._filter_maps: List[Tuple[Callable[[
+            Log], bool], Callable[[str], Any]]] = []
 
-    def add_filter(self, msg_filter, msg_map=lambda m: m):
+    def add_filter(self, msg_filter: Callable[[Log], bool],
+                   msg_map: Optional[Callable[[str], Any]] = lambda msg: msg):
         """Adds a filter to accept messages by and map to transform them.
 
-        :type msg_filter: collections.abc.Callable
-        :param msg_filter: Filter method that accepts a `rosgraph_msgs.msg.Log`
+        :param msg_filter: Filter method that accepts a
+                            `rcl_interfaces.msg.Log`
                            and returns True when the message should be accepted
                            and returns False otherwise
-        :type msg_map: collections.abc.Callable
         :param msg_map: Optional map method that accepts a string
         """
         self._filter_maps.append((msg_filter, msg_map))
 
-    def add_filter_on_level(self, msg_filter, level, msg_map=lambda m: m):
-        self._filter_maps.append((
-            lambda l: msg_filter(l) if l.level == level else False,
-            msg_map,
-        ))
+    def add_filter_on_level(self, level: bytes,
+                            msg_filter: Optional[Callable[[Log], bool]] =
+                            lambda msg: True,
+                            msg_map: Optional[Callable[[str], Any]] =
+                            lambda msg: msg):
+        """Add a filter on a specific level.
 
-    def add_filter_info_level(self, msg_filter, msg_map=lambda m: m):
-        self.add_filter_on_level(msg_filter, Log.INFO, msg_map)
+        All messages with log.level == level get accepted.
 
-    def __call__(self, log_msg):
+        :param msg_filter: (Optional)
+                           Additional filter method that accepts a
+                            `rcl_interfaces.msg.Log`
+                           and returns True when the message should be accepted
+                           and returns False otherwise.
+        :param msg_map: Optional map method that accepts a string
+        """
+        self.add_filter(lambda l: msg_filter(l) if l.level ==
+                        self.log_level_to_int(level) else False, msg_map)
+
+    def add_filter_on_minimal_level(self, level: bytes,
+                                    msg_filter: Optional[Callable[[Log], bool]]
+                                    = lambda msg: True,
+                                    msg_map: Optional[Callable[[str], Any]]
+                                    = lambda msg: msg):
+        """Add a filter on a minimal level.
+
+        All messages with log.level >= level get accepted.
+        Hence, When level=Log.DEBUG all messages get accepted, as debug is the
+        minimal logging level.
+
+        :param msg_filter: (Optional)
+                           Additional filter method that accepts a
+                            `rcl_interfaces.msg.Log`
+                           and returns True when the message should be accepted
+                           and returns False otherwise.
+        :param msg_map: Optional map method that accepts a string
+        """
+        self.add_filter(lambda l: msg_filter(l) if l.level >=
+                        self.log_level_to_int(level) else False, msg_map)
+
+    def __call__(self, log_msg: Log):
         """Filters a ROS log msg based on the given filters.
 
-        :type log_msg: rosgraph_msgs.msg.Log
         :param log_msg: Log msg to filter
         :return Mapped message string when the message is accepted by at least
                 one include filter, None otherwise
@@ -42,3 +76,8 @@ class FilterMap:
                 return log_msg
 
         return None
+
+    @staticmethod
+    def log_level_to_int(level: bytes) -> int:
+        """Utility method to convert Log LEVEL (bytes) to an integer."""
+        return int.from_bytes(level, sys.byteorder)
