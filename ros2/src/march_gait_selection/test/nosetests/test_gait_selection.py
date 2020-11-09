@@ -1,37 +1,37 @@
 #!/usr/bin/env python
-from copy import deepcopy
 import unittest
-
-import rospkg
+import rclpy
+from ament_index_python import get_package_share_directory, PackageNotFoundError
+from march_shared_msgs.srv import ContainsGait
 from urdf_parser_py import urdf
-
 from march_gait_selection.gait_selection import GaitSelection
 from march_gait_selection.state_machine.gait_interface import GaitInterface
-from march_shared_classes.exceptions.general_exceptions import FileNotFoundError, PackageNotFoundError
 from march_shared_classes.gait.gait import Gait
 
 VALID_PACKAGE = 'march_gait_selection'
-VALID_DIRECTORY = 'test/testing_gait_files'
+VALID_DIRECTORY = 'test/resources'
 
 
 class TestGaitSelection(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
-        cls._gait_selection = GaitSelection(VALID_PACKAGE, VALID_DIRECTORY, robot)
+        rclpy.init()
+        cls.robot = urdf.Robot.from_xml_file(
+            get_package_share_directory('march_description') + '/urdf/march4.urdf')
 
     def setUp(self):
-        self.gait_selection = deepcopy(self._gait_selection)
+        self.gait_selection = GaitSelection(
+            gait_package=VALID_PACKAGE, directory=VALID_DIRECTORY, robot=self.robot)
 
     # __init__ tests
     def test_init_with_wrong_package(self):
         with self.assertRaises(PackageNotFoundError):
-            GaitSelection('wrong', VALID_DIRECTORY, self.gait_selection.robot)
+            GaitSelection(gait_package='wrong', directory=VALID_DIRECTORY)
 
     def test_init_with_wrong_directory(self):
         with self.assertRaises(FileNotFoundError):
-            GaitSelection(VALID_PACKAGE, 'wrong', self.gait_selection.robot)
+            GaitSelection(gait_package=VALID_PACKAGE, directory='wrong')
 
     # load gaits tests
     def test_types_in_loaded_gaits(self):
@@ -57,3 +57,18 @@ class TestGaitSelection(unittest.TestCase):
 
     def test_get_item_type(self):
         self.assertIsInstance(self.gait_selection['walk'], Gait)
+
+    def test_contains_gait_true(self):
+        request = ContainsGait.Request(gait='walk', subgaits=['right_open'])
+        response = self.gait_selection.contains_gait_cb(request)
+        self.assertTrue(response.contains)
+
+    def test_contains_gait_wrong_subgait(self):
+        request = ContainsGait.Request(gait='walk', subgaits=['non_existing_subgait'])
+        response = self.gait_selection.contains_gait_cb(request)
+        self.assertFalse(response.contains)
+
+    def test_contains_gait_wrong_gait(self):
+        request = ContainsGait.Request(gait='non_existing_gait', subgaits=['right_open'])
+        response = self.gait_selection.contains_gait_cb(request)
+        self.assertFalse(response.contains)
