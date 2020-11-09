@@ -6,14 +6,8 @@ joints:
   - position: 0.0436
     time_from_start: {nsecs: 0, secs: 0}
     velocity: -0.32
-  - position: -0.1047
-    time_from_start: {nsecs: 250000000, secs: 0}
-    velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 600000000, secs: 0}
-    velocity: 0.0
-  - position: 0.0436
-    time_from_start: {nsecs: 900000000, secs: 0}
+    time_from_start: {nsecs: 300000000, secs: 0}
     velocity: 0.0
   - position: 0.0436
     time_from_start: {nsecs: 300000000, secs: 1}
@@ -32,24 +26,15 @@ joints:
     time_from_start: {nsecs: 300000000, secs: 1}
     velocity: -0.0
   left_hip_fe:
-  - position: -0.0785
+  - position: 0.3752
     time_from_start: {nsecs: 0, secs: 0}
-    velocity: 0.0
-  - position: 0.4712
-    time_from_start: {nsecs: 520000000, secs: 0}
-    velocity: 0.1396
-  - position: 0.2618
-    time_from_start: {nsecs: 949400000, secs: 0}
-    velocity: -1.104
+    velocity: -0.32
   - position: -0.0873
     time_from_start: {nsecs: 300000000, secs: 1}
     velocity: 0.0
   left_knee:
   - position: 0.1396
     time_from_start: {nsecs: 0, secs: 0}
-    velocity: 0.0
-  - position: 1.0472
-    time_from_start: {nsecs: 416000000, secs: 0}
     velocity: 0.0
   - position: 0.0
     time_from_start: {nsecs: 300000000, secs: 1}
@@ -58,8 +43,14 @@ joints:
   - position: 0.0436
     time_from_start: {nsecs: 0, secs: 0}
     velocity: -0.32
+  - position: -0.1047
+    time_from_start: {nsecs: 250000000, secs: 0}
+    velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 300000000, secs: 0}
+    time_from_start: {nsecs: 600000000, secs: 0}
+    velocity: 0.0
+  - position: 0.0436
+    time_from_start: {nsecs: 900000000, secs: 0}
     velocity: 0.0
   - position: 0.0436
     time_from_start: {nsecs: 300000000, secs: 1}
@@ -78,9 +69,15 @@ joints:
     time_from_start: {nsecs: 300000000, secs: 1}
     velocity: -0.0
   right_hip_fe:
-  - position: 0.3752
+  - position: -0.0785
     time_from_start: {nsecs: 0, secs: 0}
-    velocity: -0.32
+    velocity: 0.0
+  - position: 0.4712
+    time_from_start: {nsecs: 520000000, secs: 0}
+    velocity: 0.1396
+  - position: 0.2618
+    time_from_start: {nsecs: 949400000, secs: 0}
+    velocity: -1.104
   - position: -0.0873
     time_from_start: {nsecs: 300000000, secs: 1}
     velocity: 0.0
@@ -88,8 +85,11 @@ joints:
   - position: 0.1396
     time_from_start: {nsecs: 0, secs: 0}
     velocity: 0.0
+  - position: 1.0472
+    time_from_start: {nsecs: 416000000, secs: 0}
+    velocity: 0.0
   - position: 0.0
     time_from_start: {nsecs: 300000000, secs: 1}
     velocity: 0.0
-name: left_close
-version: MVI_walk_leftclose_ankle_test_v3
+name: right_close
+version: MVI_walk_rightclose_ankle_v3
