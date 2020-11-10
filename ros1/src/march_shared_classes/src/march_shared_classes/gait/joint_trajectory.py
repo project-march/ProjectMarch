@@ -4,7 +4,7 @@ from scipy.interpolate import BPoly
 from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
 
 from .setpoint import Setpoint
-
+from .utilities import weighted_average
 
 class JointTrajectory(object):
     """Base class for joint trajectory of a gait."""
@@ -187,7 +187,7 @@ class JointTrajectory(object):
             The interpolated trajectory
         """
         joints = []
-        new_setpoints = {}
+        new_setpoints = {joint.name: [] for joint in base_subgait.joints}
         for current_setpoints_index in range(0, len(base_subgait.joints[0].setpoints)):
             base_setpoints_to_interpolate = {}
             other_setpoints_to_interpolate = {}
@@ -204,12 +204,9 @@ class JointTrajectory(object):
                                                                                      parameter)
             # with interpolated setpoints, create a dictionary of joint names with a list of their setpoints
             for base_joint in base_subgait.joints:
-                if base_joint.name in new_setpoints:
-                    new_setpoints[base_joint.name].append(interpolated_setpoints[base_joint.name])
-                else:
-                    new_setpoints[base_joint.name] = [interpolated_setpoints[base_joint.name]]
+                new_setpoints[base_joint.name].append(interpolated_setpoints[base_joint.name])
 
-        duration = Setpoint.weighted_average(base_subgait.duration, other_subgait.duration, parameter)
+        duration = weighted_average(base_subgait.duration, other_subgait.duration, parameter)
         for base_joint in base_subgait.joints:
             joints.append(JointTrajectory(base_joint.name, base_joint.limits, new_setpoints[base_joint.name],
                                           duration))
