@@ -22,7 +22,7 @@ extern "C"
 #include "acado_common.h"
 }
 
-#include "QProblem.hpp"
+#include "INCLUDE/QProblem.hpp"
 
 #if ACADO_COMPUTE_COVARIANCE_MATRIX == 1
 #include "INCLUDE/EXTRAS/SolutionAnalysis.hpp"

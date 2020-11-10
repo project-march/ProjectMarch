@@ -20,11 +20,18 @@ include_directories(
         include/${PROJECT_NAME}
         ${catkin_INCLUDE_DIRS}
         generated_src/
+
+        # "lib/qpoases" is needed for acado_qpoases_interface to correctly build
+        # as this generated file includes "INCLUDE/QProblem.hpp". This path would
+        # only be correct if the qpoases directory was also located in generated_src
+        lib/qpoases
         lib/qpoases/INCLUDE
         lib/qpoases/SRC
 
+
 )
 
+# Create an object that contains all ACADO sources
 #set(ACADO_SRCS
 #        generated_src/acado_auxiliary_functions.c
 #        generated_src/acado_integrator.c
@@ -38,6 +45,7 @@ file(GLOB ACADO_SRCS
         generated_src/*.cpp
         )
 
+# Create an object that contains all qpOASES sources
 #set(QPOASES_SRCS
 #        lib/qpoases/SRC/Bounds.cpp
 #        lib/qpoases/SRC/Constraints.cpp
