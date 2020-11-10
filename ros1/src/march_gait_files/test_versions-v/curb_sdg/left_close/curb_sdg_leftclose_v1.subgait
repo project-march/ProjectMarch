@@ -60,4 +60,4 @@ joints:
     time_from_start: {nsecs: 500000000, secs: 2}
     velocity: 0.0
 name: left_close
-version: curb_sdg_test_v1
+version: curb_sdg_leftclose_v1
