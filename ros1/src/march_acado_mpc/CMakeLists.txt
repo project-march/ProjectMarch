@@ -5,6 +5,12 @@ add_compile_options(-std=c++14 -Wall -Wextra -Werror)
 #SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR} )
 
 find_package(catkin REQUIRED COMPONENTS
+        control_msgs
+        controller_interface
+        controller_manager
+        joint_state_controller
+        joint_trajectory_controller
+        march_hardware
         march_shared_resources
         std_msgs
         roscpp)
@@ -13,13 +19,11 @@ catkin_package(
         INCLUDE_DIRS include
         LIBRARIES $(PROJECT_NAME)
         CATKIN_DEPENDS
-        march_shared_resources
+        control_msgs
+        controller_interface
+#        march_shared_resources
         std_msgs
         roscpp)
-
-
-add_executable(march_acado_mpc_node
-        src/march_acado_mpc_node.cpp)
 
 include_directories(include
         SYSTEM
@@ -27,7 +31,8 @@ include_directories(include
         ${ACADO_INCLUDE_DIRS}
         lib/qpoases/INCLUDE/
         lib/qpoases/SRC/
-        generated_src/)
+        generated_src/
+        include/march_acado_mpc/)
 
 #SET (qpOASES_SRCS
 #        lib/qpoases/SRC/Bounds.cpp
@@ -43,8 +48,20 @@ include_directories(include
 #
 #        include/${PROJECT_NAME}/acado_mpc.h)
 
+SET(march_acado_mpc_node_SRCS
+        src/march_acado_mpc_node.cpp
+        src/acado_mpc.cpp)
+
+add_executable(march_acado_mpc_node ${march_acado_mpc_node_SRCS})
+target_link_libraries(march_acado_mpc_node ${catkin_LIBRARIES})
+
+#add_executable(acado_mpc
+#        src/acado_mpc.cpp)
+#target_link_libraries(acado_mpc ${catkin_LIBRARIES})
+
 add_library(${PROJECT_NAME}
-        src/march_acado_mpc_node.cpp)
+        src/march_acado_mpc_node.cpp
+        src/acado_mpc.cpp)
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 

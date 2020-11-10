@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:feature" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:fix" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:test" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated />
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="60ebf43d-9ecb-4782-bdc7-fb2d6c8b9b82" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/march_acado_mpc/src/acado_mpc.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/march_acado_mpc/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/include/march_acado_mpc/acado_mpc.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/march_acado_mpc/include/march_acado_mpc/acado_mpc.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/package.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/march_acado_mpc/package.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/march_acado_mpc/src/march_acado_mpc_node.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/march_acado_mpc/src/march_acado_mpc_node.cpp" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectId" id="1k0LpPQvj8mC9FW87iX928Bw2ur" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="cf.advertisement.text.has.clang-format" value="true" />
+    <property name="cf.first.check.clang-format" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode" />
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="60ebf43d-9ecb-4782-bdc7-fb2d6c8b9b82" name="Default Changelist" comment="" />
+      <created>1604832744512</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1604832744512</updated>
+      <workItem from="1604832745547" duration="463000" />
+      <workItem from="1604914254455" duration="7101000" />
+      <workItem from="1604926981786" duration="7733000" />
+      <workItem from="1604997025059" duration="5143000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="50" y="198" width="1022" height="732" key="SettingsEditor" timestamp="1604833188647">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="50" y="198" width="1022" height="732" key="SettingsEditor/67.27.1853.1053@67.27.1853.1053" timestamp="1604833188647" />
+    <state x="2543" y="239" width="672" height="678" key="search.everywhere.popup" timestamp="1604920557300">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2543" y="239" width="672" height="678" key="search.everywhere.popup/67.27.1853.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1604920557300" />
+  </component>
+</project>
