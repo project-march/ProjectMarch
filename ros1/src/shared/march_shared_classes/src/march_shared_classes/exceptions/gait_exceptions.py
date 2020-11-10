@@ -85,3 +85,9 @@ class SideSpecificationError(Exception):
                 format(foot=foot)
 
         super(SideSpecificationError, self).__init__(msg)
+
+class IncorrectCoordinateError(Exception):
+    def __init__(self, msg=None):
+        """Class to raise an error when the coordinates of a position are incorrect."""
+        if msg is None:
+            msg = "The keys of a position or velocity dictionary should be ['x', 'y', 'z'], but were different."

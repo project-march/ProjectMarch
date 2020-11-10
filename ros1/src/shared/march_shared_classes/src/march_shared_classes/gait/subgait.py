@@ -7,6 +7,7 @@ import yaml
 
 from march_shared_classes.exceptions.gait_exceptions import NonValidGaitContent, SubgaitInterpolationError
 from march_shared_classes.exceptions.general_exceptions import FileNotFoundError
+from .utilities import weighted_average
 
 from .joint_trajectory import JointTrajectory
 from .limits import Limits
@@ -302,7 +303,7 @@ class Subgait(object):
         description = 'Interpolation between base version {0}, and other version {1} with parameter{2}'.format(
             base_subgait.version, other_subgait.version, parameter)
 
-        duration = Setpoint.weighted_average(base_subgait.duration, other_subgait.duration, parameter)
+        duration = weighted_average(base_subgait.duration, other_subgait.duration, parameter)
         gait_type = base_subgait.gait_type if parameter <= 0.5 else other_subgait.gait_type
         version = '{0}{1}_({2})_({3})'.format(PARAMETRIC_GAITS_PREFIX, parameter, base_subgait.version,
                                               other_subgait.version)
