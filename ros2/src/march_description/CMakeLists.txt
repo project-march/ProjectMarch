@@ -28,7 +28,4 @@ set(XACRO_FILES
 
 ament_package(CONFIG_EXTRAS cmake/${PROJECT_NAME}-extras.cmake)
 
-#build_and_install_xacro_files(${XACRO_FILES})
-
-
-
+build_and_install_xacro_files(${XACRO_FILES})
