@@ -90,8 +90,9 @@ class GaitStateMachine(object):
     def _update_foot_on_ground_cb(self, is_right, msg):
         if is_right:
             if len(msg.states) > 0:
-                force = msg.states[0].total_wrench.force.z
-                if force > 200:
+                force = sum([state.total_wrench.force.z for state in msg.states])
+                if force > 5000:
+                    self._gait_selection.get_logger().info(f'{force}')
                     # self._gait_selection.get_logger().info(f'{len(msg.states)}')
                     self._gait_selection.get_logger().info(f'{self._current_gait}')
                     if not self._right_foot_on_ground:
@@ -362,7 +363,8 @@ class GaitStateMachine(object):
             from_idle_name = next(
                 (name for name, position in idle_positions.items()
                  if position['joints'] == starting_position), None)
-
+            # if 'dynamic' in gait_name:
+            #     self
             if from_idle_name is None:
                 from_idle_name = 'unknown_idle_{0}'.format(len(idle_positions))
                 self._gait_selection.get_logger().warn(
@@ -371,7 +373,7 @@ class GaitStateMachine(object):
                 idle_positions[from_idle_name] = \
                     {'gait_type': '', 'joints': starting_position}
             if from_idle_name in self._idle_transitions:
-                # self._gait_selection.get_logger().info(f'Adding {gait_name} to {from_idle_name} in {self._idle_transitions}')
+                self._gait_selection.get_logger().info(f'Adding {gait_name} to {from_idle_name}')
                 self._idle_transitions[from_idle_name].add(gait_name)
             else:
                 self._idle_transitions[from_idle_name] = {gait_name}

@@ -46,7 +46,9 @@ class GaitSelection(Node):
             self.get_logger().error(
                 f'Gait default yaml file does not exist: {directory}/default.yaml')
 
-        self._gait_version_map, self._positions = self._load_configuration()
+        self._gait_version_map, self._positions, self._semi_dynamic_gait_version_map = \
+            self._load_configuration()
+        self.get_logger().info(f'{self._semi_dynamic_gait_version_map}.')
         self._robot = self._initial_robot_description() if robot is None else robot
 
         self._robot_description_sub = self.create_subscription(
@@ -241,12 +243,10 @@ class GaitSelection(Node):
         Loads the semi dynamic gaits, this is currently only 1 gait.
         :param gaits: dict to add the semi dynamic gaits to
         """
-        gaits['dynamic_stairs_up'] = SemiDynamicSetpointsGait.from_file(
-            'stairs_up', self._gait_directory, self._robot,
-            self._gait_version_map)
-        gaits['dynamic_curb_sdg'] = SemiDynamicSetpointsGait.from_file(
-            'curb_sdg', self._gait_directory, self._robot,
-            self._gait_version_map)
+        for gait in self._semi_dynamic_gait_version_map:
+            gaits[f'dynamic_{gait}'] = SemiDynamicSetpointsGait.from_file(
+                gait, self._gait_directory, self._robot,
+                self._semi_dynamic_gait_version_map)
 
     def _load_configuration(self):
         """Loads and verifies the gaits configuration."""
@@ -254,6 +254,7 @@ class GaitSelection(Node):
             default_config = yaml.load(default_yaml_file, Loader=yaml.SafeLoader)
 
         version_map = default_config['gaits']
+        semi_dynamic_version_map = default_config.get('semi_dynamic_gaits', [])
 
         if not isinstance(version_map, dict):
             raise TypeError('Gait version map should be of type; dictionary')
@@ -261,7 +262,7 @@ class GaitSelection(Node):
         if not self._validate_version_map(version_map):
             raise GaitError(msg='Gait version map: {gm}, is not valid'.format(gm=version_map))
 
-        return version_map, default_config['positions']
+        return version_map, default_config['positions'], semi_dynamic_version_map
 
     def _validate_version_map(self, version_map):
         """Validates if the current versions exist.

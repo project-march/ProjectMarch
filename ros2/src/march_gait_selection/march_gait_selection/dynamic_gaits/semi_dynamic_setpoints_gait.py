@@ -25,14 +25,13 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             return False
         return True
 
-    def freeze(self, position: dict = {}, duration: float = 3.0):
+    def freeze(self, position: dict = {}, duration: float = 10.0):
         """
         If the subgait can freeze it will freeze for the given duration, this
         will later be changed to start the next subgait more dynamically
         after the short freeze
         :param duration: How long to freeze in the current position
         """
-        # if self.can_freeze:
         self._should_freeze = True
         self._freeze_position = position
         self._freeze_duration = duration
@@ -47,9 +46,9 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         :return: trjectory, is_finished
         """
         self._time_since_start += elapsed_time
-        logger.info(f'Should freeze = {self._should_freeze}, is frozen = {self._is_frozen}, time since start = {self._time_since_start}')
+        # logger.info(f'Should freeze = {self._should_freeze}, is frozen = {self._is_frozen}, time since start = {self._time_since_start}')
         if self._should_freeze:
-            logger.info(f'time since start = {self._time_since_start}')
+            logger.info(f'Executing freeze, time since start = {self._time_since_start}')
             trajectory = self._execute_freeze(logger)
             self._time_since_start = 0.0
             return trajectory, False
@@ -81,7 +80,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         self._current_subgait = self._freeze_subgait(logger)
         self._should_freeze = False
         self._is_frozen = True
-        logger.info(f'Frozen, current = {self._current_subgait.subgait_name}, next={self._subgait_after_freeze.subgait_name}, ')
+        logger.info(f'Frozen, current = {self._current_subgait.subgait_name}, next={self._subgait_after_freeze.subgait_name}')
         return self._current_subgait.to_joint_trajectory_msg()
 
     def subgait_after_freeze(self, logger):

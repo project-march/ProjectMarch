@@ -71,8 +71,13 @@ joints:
     time_from_start: {nsecs: 0, secs: 6}
     velocity: 0.0
   - position: 1.0472
+<<<<<<< HEAD:ros1/src/gaits/march_gait_files/test_versions-vi/curb_sdg/right_open/curb_sdg_rightopen_v1.subgait
     time_from_start: {nsecs: 0, secs: 7}
     velocity: -0.1746
+=======
+    time_from_start: {nsecs: 500000000, secs: 6}
+    velocity: -0.3491
+>>>>>>> Change force to use sum instead of 1 point:ros1/src/march_gait_files/test_versions-v/curb_sdg/right_open/curb_sdg_rightopen_v1.subgait
   - position: 0.8552
     time_from_start: {nsecs: 0, secs: 8}
     velocity: 0.0
@@ -87,14 +92,23 @@ joints:
     time_from_start: {nsecs: 0, secs: 4}
     velocity: 0.0
   - position: 1.7977
+<<<<<<< HEAD:ros1/src/gaits/march_gait_files/test_versions-vi/curb_sdg/right_open/curb_sdg_rightopen_v1.subgait
     time_from_start: {nsecs: 0, secs: 5}
+=======
+    time_from_start: {nsecs: 500000000, secs: 4}
+>>>>>>> Change force to use sum instead of 1 point:ros1/src/march_gait_files/test_versions-v/curb_sdg/right_open/curb_sdg_rightopen_v1.subgait
     velocity: 0.0
   - position: 1.4835
     time_from_start: {nsecs: 0, secs: 6}
     velocity: 0.0
   - position: 0.8727
+<<<<<<< HEAD:ros1/src/gaits/march_gait_files/test_versions-vi/curb_sdg/right_open/curb_sdg_rightopen_v1.subgait
     time_from_start: {nsecs: 0, secs: 7}
     velocity: -0.2618
+=======
+    time_from_start: {nsecs: 500000000, secs: 6}
+    velocity: -0.5236
+>>>>>>> Change force to use sum instead of 1 point:ros1/src/march_gait_files/test_versions-v/curb_sdg/right_open/curb_sdg_rightopen_v1.subgait
   - position: 0.576
     time_from_start: {nsecs: 0, secs: 8}
     velocity: 0.0
