@@ -1,5 +1,5 @@
-Documentation (Outdated)
-========================
+Documentation
+=============
 .. inclusion-introduction-start
 
 This tutorial will teach you how to build the documentation locally and contribute to its development.
@@ -10,7 +10,8 @@ Introduction
 ^^^^^^^^^^^^
 These tutorials are written in `rst <http://docutils.sourceforge.net/rst.html>`_, an easy-to-understand plaintext markup language.
 It is then build by `Sphinx <http://www.sphinx-doc.org/en/master/>`_ using the `rosdoc_lite <http://wiki.ros.org/rosdoc_lite>`_ package.
-You can either build the documentation locally when following the tutorials or deploy it to `GitHub pages <https://pages.github.com/>`_ with the help of `Travis <https://travis-ci.org>`_.
+You can either build the documentation locally when following the tutorials or
+deploy it to `Gitlab pages <https://docs.gitlab.com/ee/user/project/pages/>`_ with the help of the GitLab CI.
 
 Building locally
 ^^^^^^^^^^^^^^^^
@@ -18,35 +19,26 @@ Follow these steps to be able to build the documentation locally.
 
 Clone the repository
 --------------------
-Add the following entry to your ``.rosinstall`` file (recommended):
 
-.. code-block:: yaml
+Clone the repository with either ssh or https:
 
-  - git:
-      local-name: march_tutorials
-      uri: https://github.com/project-march/tutorials
+**ssh:**
 
-And use wstool to update your workspace:
+.. code:: bash
 
-.. code::
+    git clone git@gitlab.com:project-march/project-march.gitlab.io.git
 
-  cd ~/march_ws
-  wstool update -t src
+**https:**
 
-Or clone the repository manually in your source directory:
+.. code:: bash
 
-.. code::
-
-  cd ~/march_ws/src
-  git clone https://github.com/project-march/tutorials march_tutorials
-
-.. note:: The local repository should be called ``march_tutorials`` instead of the repository name ``tutorials`` to ensure we can uniquely access the launchfiles.
+    git clone https://gitlab.com/project-march/project-march.gitlab.io.git
 
 Install rosdoc_lite and Sphinx
 ------------------------------
 We use the package rosdoc_lite to generate the documentation with Sphinx
 
-.. code::
+.. code:: bash
 
   sudo apt-get install ros-melodic-rosdoc-lite
 
@@ -82,11 +74,13 @@ You can install both packages from the Ubuntu repositories:
 
 Generate the html
 -----------------
-Simply run the :rootdir:`build_locally <build_locally.sh>` script to generate the docs and automatically open them in your browser.
+First source ROS1 melodic, and then run the :rootdir:`build_locally <build_locally.sh>` script to
+generate the docs and automatically open them in your browser.
 
 .. code::
 
-  cd ~/march_ws/src/march_tutorials
+  source /opt/ros/melodic/setup.bash
+  cd ~/docs.projectmarch.io
   ./build_locally.sh
 
 .. warning::
@@ -151,10 +145,10 @@ Start the auto build:
 When you go to ``localhost:8000`` it should open the documentation and live refresh
 when a file is changed and saved to disk.
 
-Deploy with Travis
-^^^^^^^^^^^^^^^^^^
-We make use of the `Travis deploy <http://docs.travis-ci.com/user/deployment>`_ feature to deploy our generated documentation to GitHub pages.
-Please check the :rootdir:`.travis.yml of this repository <.travis.yml>` for the details.
+Deploy with GitLabCI
+^^^^^^^^^^^^^^^^^^^^
+We make use of the `GitLabCI <https://docs.gitlab.com/ee/ci/>`_  to deploy our generated documentation to GitLab pages.
+Please check the :rootdir:`.gitlab-ci.yml of this repository <.gitlab-ci.yml>` for the details.
 
 Add a new tutorial
 ^^^^^^^^^^^^^^^^^^
