@@ -380,16 +380,6 @@
             <update_rate>30</update_rate>
             <always_on>true</always_on>
         </sensor>
-        <sensor name="left_pressure_sole" type="contact">
-            <always_on>true</always_on>
-            <contact>
-                <collision>ankle_plate_left_fixed_joint_lump__foot_left_collision_1</collision>
-            </contact>
-            <plugin name="left_foot_plugin" filename="libgazebo_ros_bumper.so">
-                <bumperTopicName>march/sensor/left_pressure_sole</bumperTopicName>
-                <frameName>world</frameName>
-            </plugin>
-        </sensor>
     </gazebo>
 
     <!-- Foot Left -->
@@ -412,6 +402,28 @@
             </geometry>
         </collision>
     </link>
+
+    <link name="pressure_sole_left">
+        <collision>
+            <origin xyz="${(-foot_height_forward+foot_height_backward)/2} 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${foot_height_forward+foot_height_backward} ${width} 0.001"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <gazebo reference="pressure_sole_left">
+        <sensor name="left_pressure_sole_2" type="contact">
+            <always_on>true</always_on>
+            <contact>
+                <collision>ankle_plate_left_fixed_joint_lump__pressure_sole_left_collision_2</collision>
+            </contact>
+            <plugin name="left_foot_plugin" filename="libgazebo_ros_bumper.so">
+                <bumperTopicName>march/sensor/left_pressure_sole</bumperTopicName>
+                <frameName>world</frameName>
+            </plugin>
+        </sensor>
+    </gazebo>
 
     <gazebo reference="foot_left">
         <mu1>${foot_mu1}</mu1>
@@ -555,16 +567,6 @@
             <update_rate>30</update_rate>
             <always_on>true</always_on>
         </sensor>
-        <sensor name="right_pressure_sole" type="contact">
-            <always_on>true</always_on>
-            <contact>
-                <collision>ankle_plate_right_fixed_joint_lump__foot_right_collision_1</collision>
-            </contact>
-            <plugin name="right_foot_pressure_plugin" filename="libgazebo_ros_bumper.so">
-                <bumperTopicName>march/sensor/right_pressure_sole</bumperTopicName>
-                <frameName>world</frameName>
-            </plugin>
-        </sensor>
     </gazebo>
 
     <!-- Foot Right -->
@@ -593,6 +595,28 @@
         <mu2>${foot_mu2}</mu2>
         <minDepth>${foot_min_depth}</minDepth>
         <fdir1>1 0 0</fdir1>
+    </gazebo>
+
+    <link name="pressure_sole_right">
+        <collision>
+            <origin xyz="${(-foot_height_forward+foot_height_backward)/2} 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${foot_height_forward+foot_height_backward} ${width} 0.001"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <gazebo reference="pressure_sole_right">
+        <sensor name="right_pressure_sole" type="contact">
+            <always_on>true</always_on>
+            <contact>
+                <collision>ankle_plate_right_fixed_joint_lump__pressure_sole_right_collision_2</collision>
+            </contact>
+            <plugin name="right_foot_plugin" filename="libgazebo_ros_bumper.so">
+                <bumperTopicName>march/sensor/right_pressure_sole</bumperTopicName>
+                <frameName>world</frameName>
+            </plugin>
+        </sensor>
     </gazebo>
 
     <!-- Joints -->
@@ -681,6 +705,18 @@
         <parent link="ankle_plate_left"/>
         <child link="foot_left"/>
         <origin xyz="0 0 ${-ankle_plate_height}" rpy="0 0 0"/>
+    </joint>
+
+    <joint name="left_pressure_sole_joint" type="fixed">
+        <parent link="foot_left"/>
+        <child link="pressure_sole_left"/>
+        <origin xyz="0 0 ${-(width/2)}" rpy="0 0 0"/>
+    </joint>
+
+    <joint name="right_pressure_sole_joint" type="fixed">
+        <parent link="foot_right"/>
+        <child link="pressure_sole_right"/>
+        <origin xyz="0 0 ${-(width/2)}" rpy="0 0 0"/>
     </joint>
 
     <joint name="right_hip_aa" type="revolute">

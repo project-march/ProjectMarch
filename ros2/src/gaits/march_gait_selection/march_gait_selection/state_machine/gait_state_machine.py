@@ -89,17 +89,19 @@ class GaitStateMachine(object):
 
     def _update_foot_on_ground_cb(self, is_right, msg):
         if is_right:
-            if len(msg.states) > 0 and msg.states[0].total_wrench.force.z > 200:
-                # self._gait_selection.get_logger().info(f'{msg.states[0].total_wrench.force.z}')
-                # self._gait_selection.get_logger().info('Should freeze')
-                if not self._right_foot_on_ground:
-                    self._gait_selection.get_logger().info('Should freeze')
-                    self.test_right_pub.publish(Bool(data=True))
-                    self._right_foot_on_ground = True
-                    if self._current_gait is not None and self._current_gait.can_freeze:
-                        self._gait_selection.get_logger().debug('Freezing the gait')
-                        self._trajectory_scheduler.cancel_last()
-                        self._current_gait.freeze(self._current_pos)
+            if len(msg.states) > 0:
+                force = msg.states[0].total_wrench.force.z
+                if force > 200:
+                    # self._gait_selection.get_logger().info(f'{len(msg.states)}')
+                    self._gait_selection.get_logger().info(f'{self._current_gait}')
+                    if not self._right_foot_on_ground:
+                        self._gait_selection.get_logger().info('Should freeze')
+                        self.test_right_pub.publish(Bool(data=True))
+                        self._right_foot_on_ground = True
+                        if self._current_gait is not None and self._current_gait.can_freeze:
+                            self._gait_selection.get_logger().debug('Freezing the gait')
+                            # self._trajectory_scheduler.cancel_last()
+                            self._current_gait.freeze(self._current_pos)
             elif len(msg.states) == 0:
                 self.test_right_pub.publish(Bool(data=False))
                 self._right_foot_on_ground = False

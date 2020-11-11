@@ -32,10 +32,10 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         after the short freeze
         :param duration: How long to freeze in the current position
         """
-        if self.can_freeze:
-            self._should_freeze = True
-            self._freeze_position = position
-            self._freeze_duration = duration
+        # if self.can_freeze:
+        self._should_freeze = True
+        self._freeze_position = position
+        self._freeze_duration = duration
 
     def update(self, elapsed_time, logger):
         """
@@ -47,7 +47,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         :return: trjectory, is_finished
         """
         self._time_since_start += elapsed_time
-        # logger.info(f'Should freeze = {self._should_freeze}, is frozen = {self._is_frozen}, time since start = {self._time_since_start}')
+        logger.info(f'Should freeze = {self._should_freeze}, is frozen = {self._is_frozen}, time since start = {self._time_since_start}')
         if self._should_freeze:
             logger.info(f'time since start = {self._time_since_start}')
             trajectory = self._execute_freeze(logger)
