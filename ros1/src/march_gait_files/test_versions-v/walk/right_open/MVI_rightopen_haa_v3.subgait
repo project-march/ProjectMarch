@@ -123,4 +123,4 @@ joints:
       secs: 1
     velocity: 0.0
 name: right_open
-version: MVI_rightopen_haa_v4
+version: MVI_rightopen_haa_v3
