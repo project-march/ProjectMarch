@@ -8,7 +8,6 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-# find_package(catkin REQUIRED COMPONENTS xacro)
 find_package(xacro REQUIRED)
 
 install(DIRECTORY launch
@@ -16,20 +15,17 @@ install(DIRECTORY launch
 
 include(cmake/${PROJECT_NAME}-extras.cmake)
 
-set(XACRO_FILES
-    urdf/march3.xacro
-    urdf/march4.xacro
-    urdf/test_joint_linear.xacro
-    urdf/test_joint_rotational.xacro
-)
+install(DIRECTORY "../../../ros1/src/march_description/urdf"
+        DESTINATION share/${PROJECT_NAME}
+        )
 
-install(DIRECTORY urdf
-    DESTINATION share/${PROJECT_NAME}
+set(XACRO_FILES
+    "../../../ros1/src/march_description/urdf/march3.xacro"
+    "../../../ros1/src/march_description/urdf/march4.xacro"
+    "../../../ros1/src/march_description/urdf/test_joint_linear.xacro"
+    "../../../ros1/src/march_description/urdf/test_joint_rotational.xacro"
 )
 
 ament_package(CONFIG_EXTRAS cmake/${PROJECT_NAME}-extras.cmake)
 
 build_and_install_xacro_files(${XACRO_FILES})
-
-
-
