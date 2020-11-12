@@ -35,7 +35,7 @@
 
     <arg name="robot_name" default="march4"/>
 
-    <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot_name)"/>
+    <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot_name).xacro"/>
 
     <node
             if="$(arg rosbag)"

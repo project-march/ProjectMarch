@@ -23,7 +23,7 @@
                     ground_gait:=$(arg ground_gait)" />
 
     <!-- Upload the controller configuration -->
-    <rosparam file="$(find march_simulation)/config/$(arg controller)/$(arg robot).yaml" command="load"/>
+    <rosparam file="$(find march_simulation)/config/$(arg controller)/$(arg robot_name).yaml" command="load"/>
 
     <group ns="march">
         <node name="controller_spawner" pkg="controller_manager" type="controller_manager"
