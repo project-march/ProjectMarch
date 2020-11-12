@@ -10,8 +10,10 @@ def data_files():
         (os.path.join('share', 'ament_index', 'resource_index', 'packages'),
          [os.path.join('resource', package_name)]),
         (os.path.join('share', package_name), ['package.xml']),
-        (os.path.join('share', package_name, 'test', 'resources'), [os.path.join('test', 'resources', 'default.yaml')]),
-        (os.path.join('share', package_name, 'test', 'resources', 'walk'), [os.path.join('test', 'resources', 'walk', 'walk.gait')])
+        (os.path.join('share', package_name, 'test', 'resources'),
+         [os.path.join('test', 'resources', 'default.yaml')]),
+        (os.path.join('share', package_name, 'test', 'resources', 'walk'),
+         [os.path.join('test', 'resources', 'walk', 'walk.gait')])
     ]
     for file in iglob(os.path.join('test', 'resources', '**', '*.subgait'), recursive=True):
         data.append((os.path.join('share', package_name, os.path.dirname(file)), [file]))

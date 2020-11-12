@@ -40,11 +40,8 @@ class InputDeviceView(QWidget):
         self.refresh_button.clicked.connect(self._update_possible_gaits)
 
         self._create_buttons()
-        # Start with only 'always available' buttons
-        self.possible_gaits = []
-        self._update_gait_buttons([])
-        # Request actual possible gaits
         self._update_possible_gaits()
+
 
     def _create_buttons(self) -> None:
         """
@@ -353,19 +350,17 @@ class InputDeviceView(QWidget):
         gaits changed.
         """
         self._controller.update_possible_gaits()
-        self._update_timer = self._controller.get_node().create_timer(0.1, self._update_possible_gaits_view,
-                                                                      clock=self._controller.get_node().get_clock())
+        self.possible_gaits = []
+        self._update_gait_buttons([])
+        self._controller.gait_future.add_done_callback(self._update_possible_gaits_view)
 
-    def _update_possible_gaits_view(self) -> None:
+    def _update_possible_gaits_view(self, future) -> None:
         """
-        Update the buttons if the possible gaits have changed and cancel the timer.
+        Update the buttons if the possible gaits have changed.
         """
-        new_possible_gaits_future = self._controller.get_possible_gaits()
-        if new_possible_gaits_future.done():
-            self._update_timer.cancel()
-            new_possible_gaits = new_possible_gaits_future.result().gaits
-            if set(self.possible_gaits) != set(new_possible_gaits):
-                self._update_gait_buttons(new_possible_gaits)
+        new_possible_gaits = future.result().gaits
+        if set(self.possible_gaits) != set(new_possible_gaits):
+            self._update_gait_buttons(new_possible_gaits)
 
     def _update_gait_buttons(self, possible_gaits: List[str]) -> None:
         """

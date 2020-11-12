@@ -11,6 +11,7 @@ from .limits import Limits
 from .setpoint import Setpoint
 
 PARAMETRIC_GAITS_PREFIX = '_pg_'
+NANOSEC_TO_SEC = 1e-9
 
 
 class Subgait(object):
@@ -18,7 +19,7 @@ class Subgait(object):
 
     joint_class = JointTrajectory
 
-    def __init__(self, joints: List[JointTrajectory], duration: Duration, gait_type: str = 'walk_like',
+    def __init__(self, joints: List[JointTrajectory], duration: float, gait_type: str = 'walk_like',
                  gait_name: str = 'Walk', subgait_name: str = 'right_open', version: str = 'First try',
                  description: str = 'Just a simple gait'):
 
@@ -122,7 +123,7 @@ class Subgait(object):
             raise GaitError('Cannot create gait without a loaded robot.')
 
         duration = Duration(seconds=subgait_dict['duration']['secs'],
-                            nanoseconds=subgait_dict['duration']['nsecs']).nanoseconds * 1e-9
+                            nanoseconds=subgait_dict['duration']['nsecs']).nanoseconds * NANOSEC_TO_SEC
 
         joint_list = []
         for name, points in sorted(subgait_dict['joints'].items(), key=lambda item: item[0]):
@@ -152,7 +153,7 @@ class Subgait(object):
         timestamps = self.get_unique_timestamps()
         for timestamp in timestamps:
             joint_trajectory_point = trajectory_msg.JointTrajectoryPoint()
-            joint_trajectory_point.time_from_start = Duration(seconds=timestamp)
+            joint_trajectory_point.time_from_start = Duration(seconds=timestamp).to_msg()
 
             for joint in self.joints:
                 interpolated_setpoint = joint.get_interpolated_setpoint(timestamp)

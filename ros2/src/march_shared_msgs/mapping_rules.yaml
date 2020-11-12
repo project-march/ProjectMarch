@@ -1,3 +1,23 @@
 -
   ros1_package_name: 'march_shared_resources'
   ros2_package_name: 'march_shared_msgs'
+-
+  ros1_package_name: 'control_msgs'
+  ros2_package_name: 'march_shared_msgs'
+  ros1_message_name: 'FollowJointTrajectoryGoal'
+  ros2_message_name: 'FollowJointTrajectoryGoal'
+-
+  ros1_package_name: 'control_msgs'
+  ros2_package_name: 'march_shared_msgs'
+  ros1_message_name: 'FollowJointTrajectoryResult'
+  ros2_message_name: 'FollowJointTrajectoryResult'
+-
+  ros1_package_name: 'control_msgs'
+  ros2_package_name: 'march_shared_msgs'
+  ros1_message_name: 'FollowJointTrajectoryActionGoal'
+  ros2_message_name: 'FollowJointTrajectoryActionGoal'
+-
+  ros1_package_name: 'control_msgs'
+  ros2_package_name: 'march_shared_msgs'
+  ros1_message_name: 'FollowJointTrajectoryActionResult'
+  ros2_message_name: 'FollowJointTrajectoryActionResult'

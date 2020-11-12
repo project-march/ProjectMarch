@@ -73,6 +73,16 @@
         <include if="$(arg balance)" file="$(find march_moveit)/launch/march_moveit.launch" />
     </group>
 
+    <group if="$(eval gait_directory == 'simulation_only-vi')"> <!--Throw when starting the exo with the gait_directory only ment for simulation-->
+        <group if="$(eval configuration == 'exoskeleton')">
+            <node pkg="rostopic" type="rostopic" name="directory_check"
+                  args="pub /march/error march_shared_resources/Error '{header: {seq: 0, stamp: {secs: 0, nsecs: 0},  frame_id: &quot; &quot;},
+                error_message: &quot;Gait directory should never be used for non-simulation purposes.&quot;,
+                type: 0}'"
+                  output="screen"/>
+        </group>
+    </group>
+
     <group if="$(eval configuration == 'exoskeleton')">
         <include file="$(find march_hardware_interface)/launch/hardware.launch" if="$(arg hardware_interface)">
             <arg name="robot" value="march4_with_koen_lengths"/>
