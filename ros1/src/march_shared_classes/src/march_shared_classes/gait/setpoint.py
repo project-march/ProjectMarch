@@ -2,6 +2,7 @@ from math import acos, atan, cos, pi, sin, sqrt
 
 import rospkg
 from urdf_parser_py import urdf
+import os
 
 from .feet_state import FeetState
 from .foot import Foot
@@ -277,6 +278,7 @@ class Setpoint(object):
         try:
             robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
             # size[0], size[1] and size[2] are used to grab the length of the
+            base = robot.link_map['hip_base'].collisions[0].geometry.size[1]  # length of the hip base structure
             l_ul = robot.link_map['upper_leg_left'].collisions[0].geometry.size[2]  # left upper leg length
             l_ll = robot.link_map['lower_leg_left'].collisions[0].geometry.size[2]  # left lower leg length
             l_hl = robot.link_map['hip_aa_frame_left_front'].collisions[0].geometry.size[0]  # left haa arm to leg
@@ -285,7 +287,11 @@ class Setpoint(object):
             r_ll = robot.link_map['lower_leg_right'].collisions[0].geometry.size[2]  # right lower leg length
             r_hl = robot.link_map['hip_aa_frame_right_front'].collisions[0].geometry.size[0]  # right haa arm to leg
             r_ph = robot.link_map['hip_aa_frame_right_side'].collisions[0].geometry.size[1]  # right pelvis hip length
-            base = robot.link_map['hip_base'].collisions[0].geometry.size[1]  # length of the hip base structure
+            off_set = robot.link_map['ankle_plate_right'].visual.origin.xyz[1] + base / 2 + r_hl  # the amount the foot
+            # is more to the inside of the exo than the leg structures. The haa arms need to be shortend by this amount.
+            r_hl = r_hl - off_set
+            l_hl - l_hl - off_set
+
         except KeyError as e:
             raise KeyError('Expected robot.link_map to contain "{key}", but "{key}" was missing.'.
                            format(key=e.args[0]))
