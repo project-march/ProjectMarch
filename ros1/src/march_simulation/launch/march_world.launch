@@ -6,7 +6,7 @@
     <arg name="fixed" default="true" doc="Fixes the exoskeleton in the world"/>
     <arg name="ground_gait" default="false" doc="Exoskeleton will ground gait if true."/>
     <arg name="obstacle" default="none" doc="Obstacle to load in the simulation."/>
-    <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_rotational."/>
+    <arg name="robot" default="march4_with_koen_lengths" doc="The robot to run. Can be: march3, march4, test_joint_rotational."/>
     <arg name="controller" default="effort_control" doc="Changes the controller used by simulation."/>
 
     <!-- Load the URDF into the ROS Parameter Server -->
