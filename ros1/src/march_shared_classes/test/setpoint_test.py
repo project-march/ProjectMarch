@@ -1,6 +1,10 @@
 import unittest
+import rospy
+import rospkg
 
 from march_shared_classes.gait.setpoint import Setpoint
+from march_shared_classes.gait.foot import Foot
+from march_shared_classes.gait.feet_state import FeetState
 
 
 class SetpointTest(unittest.TestCase):
@@ -54,22 +58,25 @@ class SetpointTest(unittest.TestCase):
         self.assertEqual(expected_result, Setpoint.interpolate_setpoints(self.setpoint, other_setpoint, parameter))
 
     def test_inverse_kinematics_position_left(self):
-        foot_pos = Setpoint.get_foot_pos_from_angles(self.setpoint_dict)
-        angles_left = Setpoint.calculate_joint_angles_from_foot_position(foot_pos, 'left')
+        foot_pos = Setpoint.get_feet_state_from_setpoints(self.setpoint_dict)
+        angles_left = Setpoint.get_joint_states_from_foot_state(foot_pos.left_foot)
         for key in angles_left.keys():
-            self.assertAlmostEqual(angles_left[key], self.setpoint.position, places=4)
+            if not key.endswith('_velocity'):
+                self.assertAlmostEqual(angles_left[key], self.setpoint.position, places=4)
 
     def test_inverse_kinematics_position_right(self):
-        foot_pos = Setpoint.get_foot_pos_from_angles(self.setpoint_dict)
-        angles_right = Setpoint.calculate_joint_angles_from_foot_position(foot_pos, 'right')
+        foot_pos = Setpoint.get_feet_state_from_setpoints(self.setpoint_dict)
+        angles_right = Setpoint.get_joint_states_from_foot_state(foot_pos.right_foot)
         for key in angles_right.keys():
-            self.assertAlmostEqual(angles_right[key], self.setpoint.position, places=4)
+            if not key.endswith('_velocity'):
+                self.assertAlmostEqual(angles_right[key], self.setpoint.position, places=4)
 
     def test_inverse_kinematics_reversed_position(self):
-        desired_position = {'left_foot_x': 0.18, 'left_foot_y': -0.08, 'left_foot_z': 0.6,
-                            'right_foot_x': 0.18, 'right_foot_y': 0.08, 'right_foot_z': 0.6}
-        new_angles_left = Setpoint.calculate_joint_angles_from_foot_position(desired_position, 'left')
-        new_angles_right = Setpoint.calculate_joint_angles_from_foot_position(desired_position, 'right')
+        right_foot = Foot('right', {'x': 0.18, 'y': 0.08, 'z': 0.6}, {'x': 0, 'y': 0, 'z': 0})
+        left_foot = Foot('left', {'x': 0.18, 'y': -0.08, 'z': 0.6}, {'x': 0, 'y': 0, 'z': 0})
+        desired_state = FeetState(right_foot, left_foot)
+        new_angles_left = Setpoint.get_joint_states_from_foot_state(desired_state.left_foot)
+        new_angles_right = Setpoint.get_joint_states_from_foot_state(desired_state.right_foot)
         time = 1.0
         new_vel = 2.0
         resulting_angles = {'left_hip_aa': Setpoint(time, new_angles_left['left_hip_aa'], new_vel),
@@ -78,17 +85,27 @@ class SetpointTest(unittest.TestCase):
                             'right_hip_aa': Setpoint(time, new_angles_right['right_hip_aa'], new_vel),
                             'right_hip_fe': Setpoint(time, new_angles_right['right_hip_fe'], new_vel),
                             'right_knee': Setpoint(time, new_angles_right['right_knee'], new_vel)}
-        resulting_position = Setpoint.get_foot_pos_from_angles(resulting_angles)
-        for key in desired_position.keys():
-            self.assertAlmostEqual(desired_position[key], resulting_position[key], places=4)
+        resulting_position = Setpoint.get_feet_state_from_setpoints(resulting_angles)
+        for key in desired_state.left_foot.position.keys():
+            if not key.endswith('_velocity'):
+                self.assertAlmostEqual(desired_state.left_foot.position[key],
+                                       resulting_position.left_foot.position[key], places=4)
+        for key in desired_state.right_foot.position.keys():
+            if not key.endswith('_velocity'):
+                self.assertAlmostEqual(desired_state.right_foot.position[key],
+                                       resulting_position.right_foot.position[key], places=4)
 
     def test_inverse_kinematics_velocity(self):
         feet_state = Setpoint.get_feet_state_from_setpoints(self.setpoint_dict)
 
         new_angle_states_left = Setpoint.get_joint_states_from_foot_state(feet_state.left_foot)
-        new_angle_states_right = Setpoint.get_joint_states_from_foot_state(feet_state.right_foot),
-
-        for key in new_angle_states_right.velocity.keys():
-            self.assertAlmostEqual(new_angle_states_right[key], self.setpoint.velocity, places=4)
-        for key in new_angle_states_left.velocity.keys():
-            self.assertAlmostEqual(new_angle_states_left[key], self.setpoint.velocity, places=4)
+        new_angle_states_right = Setpoint.get_joint_states_from_foot_state(feet_state.right_foot)
+        print(new_angle_states_right)
+        for key in new_angle_states_right.keys():
+            print(key)
+            rospy.logwarn(key)
+            if key.endswith('_velocity'):
+                self.assertAlmostEqual(new_angle_states_right[key], self.setpoint.velocity, places=4)
+        for key in new_angle_states_left.keys():
+            if key.endswith('_velocity'):
+                self.assertAlmostEqual(new_angle_states_left[key], self.setpoint.velocity, places=4)

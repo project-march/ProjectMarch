@@ -287,8 +287,9 @@ class Setpoint(object):
             r_ll = robot.link_map['lower_leg_right'].collisions[0].geometry.size[2]  # right lower leg length
             r_hl = robot.link_map['hip_aa_frame_right_front'].collisions[0].geometry.size[0]  # right haa arm to leg
             r_ph = robot.link_map['hip_aa_frame_right_side'].collisions[0].geometry.size[1]  # right pelvis hip length
-            off_set = robot.link_map['ankle_plate_right'].visual.origin.xyz[1] + base / 2 + r_hl  # the amount the foot
-            # is more to the inside of the exo than the leg structures. The haa arms need to be shortend by this amount.
+            # the foot is a certain amount more to the inside of the exo then the leg structures.
+            # The haa arms need to account for this.
+            off_set = robot.link_map['ankle_plate_right'].visual.origin.xyz[1] + base / 2 + r_hl
             r_hl = r_hl - off_set
             l_hl - l_hl - off_set
 
@@ -303,7 +304,8 @@ class Setpoint(object):
         elif side == 'both':
             return [l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base]
         else:
-            raise SideSpecificationError(side)
+            raise SideSpecificationError(side, "Side should be either 'left', 'right' or 'both', but was {side}".
+                                         format(side=side))
 
     @staticmethod
     def calculate_next_positions_joint(setpoint_dic):
