@@ -1,10 +1,8 @@
 import unittest
-import rospy
-import rospkg
 
-from march_shared_classes.gait.setpoint import Setpoint
-from march_shared_classes.gait.foot import Foot
 from march_shared_classes.gait.feet_state import FeetState
+from march_shared_classes.gait.foot import Foot
+from march_shared_classes.gait.setpoint import Setpoint
 
 
 class SetpointTest(unittest.TestCase):
@@ -100,10 +98,7 @@ class SetpointTest(unittest.TestCase):
 
         new_angle_states_left = Setpoint.get_joint_states_from_foot_state(feet_state.left_foot)
         new_angle_states_right = Setpoint.get_joint_states_from_foot_state(feet_state.right_foot)
-        print(new_angle_states_right)
         for key in new_angle_states_right.keys():
-            print(key)
-            rospy.logwarn(key)
             if key.endswith('_velocity'):
                 self.assertAlmostEqual(new_angle_states_right[key], self.setpoint.velocity, places=4)
         for key in new_angle_states_left.keys():

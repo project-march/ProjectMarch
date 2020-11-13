@@ -7,7 +7,7 @@ def weighted_average_dictionaries(base_dictionary, other_dictionary, parameter):
     for key in base_dictionary.keys():
         try:
             resulting_dictionary[key] = weighted_average(base_dictionary[key],
-                                                                  other_dictionary[key], parameter)
+                                                         other_dictionary[key], parameter)
         except KeyError as e:
             raise KeyError('Dictionaries must have the same keys for a weighted average. other_dictionary misses '
                            '{key}'.format(key=e.args[0]))
@@ -18,6 +18,7 @@ def weighted_average_dictionaries(base_dictionary, other_dictionary, parameter):
 def weighted_average(base_value, other_value, parameter):
     """Compute the weighted average of two values with normalised weight parameter."""
     return base_value * (1 - parameter) + other_value * parameter
+
 
 def merge_dictionaries(dic_one, dic_two):
     """Combines the key value pairs of two dicitonaries into a new dicionary."""
