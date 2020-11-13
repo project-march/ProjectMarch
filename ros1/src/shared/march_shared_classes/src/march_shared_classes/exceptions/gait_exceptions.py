@@ -92,3 +92,14 @@ class IncorrectCoordinateError(Exception):
         """Class to raise an error when the coordinates of a position are incorrect."""
         if msg is None:
             msg = "The keys of a position or velocity dictionary should be ['x', 'y', 'z'], but were different."
+
+        super(IncorrectCoordinateError, self).__init__(msg)
+
+
+class WeightedAverageError(Exception):
+    def __init__(self, msg=None):
+        """Class to raise an error when a weighted average cannot be computed."""
+        if msg is None:
+            msg = 'The calculation of the weighted average cannot be executed safely.'
+
+        super(WeightedAverageError, self).__init__(msg)

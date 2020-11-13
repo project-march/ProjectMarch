@@ -327,7 +327,8 @@ class Setpoint(object):
         """Calculates the position of the joints a moment later given a setpoint dictionary.
 
         :param setpoint_dic: A dictionary of setpoints with positions and velocities
-        :return: A dictionary with the positions of the joints 1 / VELOCITY_SCALE_FACTOR second later"""
+        :return: A dictionary with the positions of the joints 1 / VELOCITY_SCALE_FACTOR second later
+        """
         next_positions = {}
         for joint in JOINTS_POSITION_NAMES_IK:
             if joint in setpoint_dic:
@@ -346,7 +347,8 @@ class Setpoint(object):
         :param angle_positions: A dictionary containing the current positions of the joints
         :param side: Specifies the side of the exo whos joints should be used for the calculation
 
-        ":return: The joint velocities of the joints on the specified side"""
+        ":return: The joint velocities of the joints on the specified side
+        """
         if side != 'left' and side != 'right' and side != 'both':
             raise SideSpecificationError(side, "Side should be either 'left', 'right' or 'both', but was {side}".
                                          format(side=side))
@@ -375,7 +377,8 @@ class Setpoint(object):
         :param y_position: the desired y-position of the foot
         :param pelvis_hip_length: The length from the pelvis to the hip_aa, which is the haa arm
 
-        :return: The hip_aa joint angle needed for the foot to reach the given positions"""
+        :return: The hip_aa joint angle needed for the foot to reach the given positions
+        """
         if z_position <= 0:
             raise SubgaitInterpolationError(
                 'desired z position of the foot is not positive, current haa calculation is not capable of this')
@@ -408,7 +411,8 @@ class Setpoint(object):
         :param upper_leg: The length of the upper leg
         :param lower_leg: The length of the lower leg
 
-        :return: The hip_fe and knee angle needed to reach the desired x and z position"""
+        :return: The hip_fe and knee angle needed to reach the desired x and z position
+        """
         foot_line_to_leg = acos((upper_leg * upper_leg + rescaled_x * rescaled_x + rescaled_z * rescaled_z
                                  - lower_leg * lower_leg)
                                 / (2 * upper_leg * sqrt(rescaled_x * rescaled_x + rescaled_z * rescaled_z)))
