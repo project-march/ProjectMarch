@@ -180,7 +180,7 @@ class Setpoint(object):
         # x is positive in the walking direction, z is in the downward direction, y is directed to the right side
         # the origin in the middle of the hip structure. The calculations are supported by
         # https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
-        ul, ll, hl, ph, base = Setpoint.get_lengths_robot(side)
+        ul, ll, hl, ph, base = Setpoint.get_lengths_robot_for_inverse_kinematics(side)
         haa_to_foot_length = ul * cos(hfe) + ll * cos(hfe - kfe)
         z_position = - sin(haa) * ph + cos(haa) * haa_to_foot_length
         x_position = hl + sin(hfe) * ul + sin(hfe - kfe) * ll
@@ -238,8 +238,9 @@ class Setpoint(object):
         :return:
             A dictionary with an entry for each joint on the requested side with the correct angle.
         """
-        # Get relevant lengths from robot model, ul = upper leg etc. see get_lengths_robot() and unpack desired position
-        [ul, ll, hl, ph, base] = Setpoint.get_lengths_robot(foot_side)
+        # Get relevant lengths from robot model, ul = upper leg etc. see get_lengths_robot_for_inverse_kinematics()
+        # and unpack desired position
+        [ul, ll, hl, ph, base] = Setpoint.get_lengths_robot_for_inverse_kinematics(foot_side)
         x_position = foot_position['x']
         y_position = foot_position['y']
         z_position = foot_position['z']
@@ -270,7 +271,7 @@ class Setpoint(object):
         return angle_positions
 
     @staticmethod
-    def get_lengths_robot(side=None):
+    def get_lengths_robot_for_inverse_kinematics(side=None):
         """Grabs lengths from the robot which are relevant for the inverse kinematics calculation.
 
         this function returns the lengths relevant for the specified foot, if no side is specified,
@@ -279,7 +280,8 @@ class Setpoint(object):
         try:
             robot = urdf.Robot.from_xml_file(os.path.join(rospkg.RosPack().get_path('march_description'), 'urdf',
                                                           'march4.urdf'))
-            # size[0], size[1] and size[2] are used to grab the length of the
+            # size[0], size[1] and size[2] are used to grab relevant length of the link, e.g. the relevant length of the
+            # hip base is in the y direction, that of the upper leg in the z direction.
             base = robot.link_map['hip_base'].collisions[0].geometry.size[1]  # length of the hip base structure
             l_ul = robot.link_map['upper_leg_left'].collisions[0].geometry.size[2]  # left upper leg length
             l_ll = robot.link_map['lower_leg_left'].collisions[0].geometry.size[2]  # left lower leg length
