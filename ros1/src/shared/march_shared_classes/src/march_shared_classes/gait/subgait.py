@@ -74,18 +74,21 @@ class Subgait(object):
         :param args:
         :return: A populated Subgait object.
         """
+        subgait_path = os.path.join(gait_dir, gait_name, subgait_name)
+        subgait_suffix = '.subgait'
         if version.startswith(PARAMETRIC_GAITS_PREFIX):
             base_version, other_version, parameter = Subgait.unpack_parametric_version(version)
             if base_version == other_version:
-                subgait_path = os.path.join(gait_dir, gait_name, subgait_name, base_version + '.subgait')
-                return cls.from_file(robot, subgait_path, *args)
+                subgait_version_path = os.path.join(subgait_path, base_version + subgait_suffix)
+                return cls.from_file(robot, subgait_version_path, *args)
             else:
-                base_path = os.path.join(gait_dir, gait_name, subgait_name, base_version + '.subgait')
-                other_path = os.path.join(gait_dir, gait_name, subgait_name, other_version + '.subgait')
-                return cls.from_files_interpolated(robot, base_path, other_path, parameter, use_foot_position=True)
+                base_version_path = os.path.join(subgait_path, base_version + subgait_suffix)
+                other_version_path = os.path.join(subgait_path, other_version + subgait_suffix)
+                return cls.from_files_interpolated(robot, base_version_path, other_version_path, parameter,
+                                                   use_foot_position=True)
         else:
-            subgait_path = os.path.join(gait_dir, gait_name, subgait_name, version + '.subgait')
-            return cls.from_file(robot, subgait_path, *args)
+            subgait_version_path = os.path.join(subgait_path, version + subgait_suffix)
+            return cls.from_file(robot, subgait_version_path, *args)
 
     @classmethod
     def from_files_interpolated(cls, robot, file_name_base, file_name_other, parameter, use_foot_position=False, *args):
@@ -272,8 +275,8 @@ class Subgait(object):
         joints = []
         number_of_setpoints = len(base_subgait.joints[0].setpoints)
         joint_to_compare_to = base_subgait.joints[0].name
-        for base_joint in base_subgait.joints:
-            other_joint = other_subgait.get_joint(base_joint.name)
+        for base_joint, other_joint in zip(sorted(base_subgait.joints, key=lambda joint: joint.name),
+                                           sorted(other_subgait.joints, key=lambda joint: joint.name)):
             if other_joint is None:
                 raise SubgaitInterpolationError('Could not find a matching joint for base joint with name {0}.'.
                                                 format(base_joint.name))
@@ -284,15 +287,13 @@ class Subgait(object):
                     raise SubgaitInterpolationError('Number of setpoints differs in {base_subgait} {joint_1} from '
                                                     '{base_subgait} {joint_2}.'.
                                                     format(base_subgait=base_subgait.subgait_name,
-                                                           joint_1=base_joint.name,
-                                                           joint_2=joint_to_compare_to))
+                                                           joint_1=base_joint.name, joint_2=joint_to_compare_to))
                 elif len(other_joint.setpoints) != number_of_setpoints:
                     raise SubgaitInterpolationError('Number of setpoints differs in {other_subgait} {joint_1} from '
                                                     '{base_subgait} {joint_2}.'.
                                                     format(other_subgait=other_subgait.subgait_name,
-                                                           joint_1=base_joint.name,
-                                                           base_subgait=base_subgait.subgait_name,
-                                                           joint_2=joint_to_compare_to))
+                                                           joint_1=base_joint.name, joint_2=joint_to_compare_to,
+                                                           base_subgait=base_subgait.subgait_name))
             else:
                 joints.append(cls.joint_class.interpolate_joint_trajectories(base_joint, other_joint, parameter))
 
@@ -375,18 +376,20 @@ class Subgait(object):
     @staticmethod
     def validate_version(gait_path, subgait_name, version):
         """Check whether a gait exists for the gait."""
+        subgait_path = os.path.join(gait_path, subgait_name)
+        subgait_suffix = '.subgait'
         if version.startswith(PARAMETRIC_GAITS_PREFIX):
             base_version, other_version, _ = Subgait.unpack_parametric_version(version)
-            base_subgait_path = os.path.join(gait_path, subgait_name, base_version + '.subgait')
-            other_subgait_path = os.path.join(gait_path, subgait_name, other_version + '.subgait')
-            for subgait_path in [base_subgait_path, other_subgait_path]:
-                if not os.path.isfile(subgait_path):
-                    rospy.logwarn('{sp} does not exist'.format(sp=subgait_path))
+            base_version_path = os.path.join(subgait_path, base_version + subgait_suffix)
+            other_version_path = os.path.join(subgait_path, other_version + subgait_suffix)
+            for version_path in [base_version_path, other_version_path]:
+                if not os.path.isfile(version_path):
+                    rospy.logwarn('{sp} does not exist'.format(sp=version_path))
                     return False
         else:
-            subgait_path = os.path.join(gait_path, subgait_name, version + '.subgait')
-            if not os.path.isfile(subgait_path):
-                rospy.logwarn('{sp} does not exist'.format(sp=subgait_path))
+            version_path = os.path.join(subgait_path, version + subgait_suffix)
+            if not os.path.isfile(version_path):
+                rospy.logwarn('{sp} does not exist'.format(sp=version_path))
                 return False
         return True
 
