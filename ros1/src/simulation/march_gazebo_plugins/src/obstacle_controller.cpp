@@ -205,6 +205,10 @@ void ObstacleController::getGoalPosition(double time_since_start, double& goal_p
     goal_position_x +=
         0.25 * swing_step_size_ - 0.25 * time_since_start * swing_step_size_ / subgait_duration_;
   }
+  else if (subgait_name_.substr(subgait_name_.size() - 6) == "freeze")
+  {
+    goal_position_x = stable_foot_pose.X() + 0.25 * swing_step_size_;
+  }
 }
 
 }  // namespace gazebo

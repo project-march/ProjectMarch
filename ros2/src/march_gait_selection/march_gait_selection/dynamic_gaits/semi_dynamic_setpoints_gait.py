@@ -88,13 +88,13 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         Generates the subgait that should be executed after the freezing.
         :return: The subgait to execute after the freeze
         """
-        # if self._time_since_start < self._current_subgait.duration:
-        #     subgait_after_freeze = deepcopy(self._current_subgait)
-        #     for joint in subgait_after_freeze:
-        #         joint.from_begin_point(self._time_since_start, logger)
-        # else:
-        subgait_after_freeze = self.subgaits[self.graph[
-            (self._previous_subgait, self.graph.TO)]]
+        if self._time_since_start < self._current_subgait.duration:
+            subgait_after_freeze = deepcopy(self._current_subgait)
+            for joint in subgait_after_freeze:
+                joint.from_begin_point(self._time_since_start, logger)
+        else:
+            subgait_after_freeze = self.subgaits[self.graph[
+                (self._previous_subgait, self.graph.TO)]]
         return subgait_after_freeze
 
     def _freeze_subgait(self, logger):
@@ -129,7 +129,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         freeze_subgait = Subgait.from_dict(robot=self._current_subgait.robot,
                                            subgait_dict=new_dict,
                                            gait_name=self.gait_name,
-                                           subgait_name='dynamic_freeze',
+                                           subgait_name='left_dynamic_freeze',
                                            version='Only version, generated from code')
         return freeze_subgait
 
