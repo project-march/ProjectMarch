@@ -1,41 +1,25 @@
-description: Version 2 of ankle gait but than with smoother transition of stance leg
-  from setpoint 2 to 4, and less planter flexion
+description: 'Final giat of MV, with the haa added '
 duration: {nsecs: 199999999, secs: 1}
 gait_type: walk_like
 joints:
   left_ankle:
   - position: 0.0436
     time_from_start: {nsecs: 0, secs: 0}
-    velocity: -0.32
-  - position: -0.0436
-    time_from_start: {nsecs: 240000000, secs: 0}
-    velocity: 0.0
-  - position: 0.0018
-    time_from_start: {nsecs: 448200000, secs: 0}
-    velocity: 0.32
-  - position: 0.1309
-    time_from_start: {nsecs: 960000000, secs: 0}
-    velocity: 0.0
+    velocity: -0.0
   - position: 0.0436
     time_from_start: {nsecs: 199999999, secs: 1}
-    velocity: -0.32
+    velocity: -0.0
   left_hip_aa:
-  - position: 0.0
+  - position: -0.0873
     time_from_start: {nsecs: 0, secs: 0}
-    velocity: 0.0
-  - position: 0.0
-    time_from_start: {nsecs: 450000000, secs: 0}
-    velocity: 0.0
-  - position: 0.0
-    time_from_start: {nsecs: 600000000, secs: 0}
-    velocity: 0.0
-  - position: 0.0
+    velocity: -0.0
+  - position: -0.0873
     time_from_start: {nsecs: 199999999, secs: 1}
     velocity: -0.0
   left_hip_fe:
   - position: 0.288
     time_from_start: {nsecs: 0, secs: 0}
-    velocity: -0.32
+    velocity: -0.3491
   - position: -0.1667
     time_from_start: {nsecs: 199999999, secs: 1}
     velocity: 0.0
@@ -55,30 +39,18 @@ joints:
   right_ankle:
   - position: 0.0436
     time_from_start: {nsecs: 0, secs: 0}
-    velocity: -0.32
-  - position: -0.1363
-    time_from_start: {nsecs: 359700000, secs: 0}
-    velocity: 0.0
-  - position: 0.0873
-    time_from_start: {nsecs: 709100000, secs: 0}
-    velocity: 0.32
-  - position: 0.1222
-    time_from_start: {nsecs: 960000000, secs: 0}
-    velocity: 0.0
+    velocity: -0.0
   - position: 0.0436
     time_from_start: {nsecs: 199999999, secs: 1}
-    velocity: -0.32
+    velocity: -0.0
   right_hip_aa:
-  - position: 0.0
+  - position: -0.0873
     time_from_start: {nsecs: 0, secs: 0}
-    velocity: 0.0
+    velocity: -0.0
   - position: 0.0
-    time_from_start: {nsecs: 450000000, secs: 0}
+    time_from_start: {nsecs: 550000000, secs: 0}
     velocity: 0.0
-  - position: 0.0
-    time_from_start: {nsecs: 600000000, secs: 0}
-    velocity: 0.0
-  - position: 0.0
+  - position: -0.0873
     time_from_start: {nsecs: 199999999, secs: 1}
     velocity: -0.0
   right_hip_fe:
@@ -87,10 +59,10 @@ joints:
     velocity: 0.0
   - position: 0.4887
     time_from_start: {nsecs: 720000000, secs: 0}
-    velocity: 0.128
+    velocity: 0.1396
   - position: 0.288
     time_from_start: {nsecs: 199999999, secs: 1}
-    velocity: -0.32
+    velocity: -0.3491
   right_knee:
   - position: 0.1396
     time_from_start: {nsecs: 0, secs: 0}
@@ -105,4 +77,4 @@ joints:
     time_from_start: {nsecs: 199999999, secs: 1}
     velocity: 0.0
 name: right_swing
-version: MVI_walk_rightswing_ankle_test_V2
+version: HVI_walk_rightswing_haa_v1

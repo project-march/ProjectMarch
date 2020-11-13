@@ -96,4 +96,4 @@ joints:
     time_from_start: {nsecs: 300000000, secs: 1}
     velocity: 0.0
 name: right_open
-version: MVI_walk_rightopen_ankle
+version: MVI_walk_rightopen_ankle_v1
