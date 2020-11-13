@@ -1,10 +1,12 @@
-from .utilities import weighted_average_dictionaries
 from .foot import Foot
+from .utilities import weighted_average_dictionaries
 
 
 class FeetState(object):
+    """Class for encapturing the entire state (position and velocity) of both feet."""
+
     def __init__(self, right_foot, left_foot):
-        """Create a FeetState object, foot_1 and foot_2 are both Foot objects"""
+        """Create a FeetState object, right_foot and left_foot are both Foot objects."""
         self.right_foot = right_foot
         self.left_foot = left_foot
 

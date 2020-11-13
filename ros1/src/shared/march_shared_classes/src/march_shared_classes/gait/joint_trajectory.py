@@ -6,6 +6,7 @@ from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolation
 from .setpoint import Setpoint
 from .utilities import weighted_average
 
+
 class JointTrajectory(object):
     """Base class for joint trajectory of a gait."""
 

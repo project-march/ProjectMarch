@@ -1,13 +1,14 @@
 from math import acos, atan, cos, pi, sin, sqrt
+import os
 
 import rospkg
 from urdf_parser_py import urdf
-import os
+
+from march_shared_classes.exceptions.gait_exceptions import SideSpecificationError, SubgaitInterpolationError
 
 from .feet_state import FeetState
 from .foot import Foot
 from .utilities import merge_dictionaries, weighted_average
-from march_shared_classes.exceptions.gait_exceptions import SideSpecificationError, SubgaitInterpolationError
 
 # Use this factor when calculating velocities to keep the calculations within the range of motion
 # See IK confluence page https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
@@ -76,13 +77,13 @@ class Setpoint(object):
         # linearly interpolate the ankle angle, as it cannot be calculated from the inverse kinematics
         try:
             new_ankle_angle_left = weighted_average(base_setpoints['left_ankle'].position,
-                                                             other_setpoints['left_ankle'].position, parameter)
+                                                    other_setpoints['left_ankle'].position, parameter)
             new_ankle_angle_right = weighted_average(base_setpoints['right_ankle'].position,
-                                                              other_setpoints['right_ankle'].position, parameter)
+                                                     other_setpoints['right_ankle'].position, parameter)
             new_ankle_velocity_left = weighted_average(base_setpoints['left_ankle'].velocity,
-                                                                other_setpoints['left_ankle'].velocity, parameter)
+                                                       other_setpoints['left_ankle'].velocity, parameter)
             new_ankle_velocity_right = weighted_average(base_setpoints['right_ankle'].velocity,
-                                                                 other_setpoints['right_ankle'].velocity, parameter)
+                                                        other_setpoints['right_ankle'].velocity, parameter)
         except KeyError as e:
             raise KeyError('Expected setpoint dictionaries to contain "{key}", but "{key}" was missing.'.
                            format(key=e.args[0]))
@@ -152,20 +153,20 @@ class Setpoint(object):
                                format(joint=joint))
 
         foot_state_left = Setpoint.calculate_foot_position(setpoint_dic['left_hip_aa'].position,
-                                                              setpoint_dic['left_hip_fe'].position,
-                                                              setpoint_dic['left_knee'].position, 'left')
+                                                           setpoint_dic['left_hip_fe'].position,
+                                                           setpoint_dic['left_knee'].position, 'left')
         foot_state_right = Setpoint.calculate_foot_position(setpoint_dic['right_hip_aa'].position,
-                                                               setpoint_dic['right_hip_fe'].position,
-                                                               setpoint_dic['right_knee'].position, 'right')
+                                                            setpoint_dic['right_hip_fe'].position,
+                                                            setpoint_dic['right_knee'].position, 'right')
 
         next_joint_positions = Setpoint.calculate_next_positions_joint(setpoint_dic)
 
         next_foot_state_left = Setpoint.calculate_foot_position(next_joint_positions['left_hip_aa'],
-                                                                   next_joint_positions['left_hip_fe'],
-                                                                   next_joint_positions['left_knee'], 'left')
+                                                                next_joint_positions['left_hip_fe'],
+                                                                next_joint_positions['left_knee'], 'left')
         next_foot_state_right = Setpoint.calculate_foot_position(next_joint_positions['right_hip_aa'],
-                                                                    next_joint_positions['right_hip_fe'],
-                                                                    next_joint_positions['right_knee'], 'right')
+                                                                 next_joint_positions['right_hip_fe'],
+                                                                 next_joint_positions['right_knee'], 'right')
 
         foot_state_left.add_foot_velocity_from_next_state(next_foot_state_left)
         foot_state_right.add_foot_velocity_from_next_state(next_foot_state_right)
@@ -276,7 +277,8 @@ class Setpoint(object):
         it returns all relevant lengths for both feet.
         """
         try:
-            robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
+            robot = urdf.Robot.from_xml_file(os.path.join(rospkg.RosPack().get_path('march_description'), 'urdf',
+                                                          'march4.urdf'))
             # size[0], size[1] and size[2] are used to grab the length of the
             base = robot.link_map['hip_base'].collisions[0].geometry.size[1]  # length of the hip base structure
             l_ul = robot.link_map['upper_leg_left'].collisions[0].geometry.size[2]  # left upper leg length

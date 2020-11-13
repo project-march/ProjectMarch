@@ -1,8 +1,11 @@
-from march_shared_classes.exceptions.gait_exceptions import SideSpecificationError, IncorrectCoordinateError
+from march_shared_classes.exceptions.gait_exceptions import IncorrectCoordinateError, SideSpecificationError
 
 VELOCITY_SCALE_FACTOR = 500
 
+
 class Foot(object):
+    """Class for capturing the state (position and possible velocity) of a foot."""
+
     def __init__(self, foot_side, position, velocity=None):
         """Create a Foot object, position and velocity are both Coordinates."""
         self.position = position

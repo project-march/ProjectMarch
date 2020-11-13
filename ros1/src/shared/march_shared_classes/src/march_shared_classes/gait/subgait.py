@@ -7,11 +7,11 @@ import yaml
 
 from march_shared_classes.exceptions.gait_exceptions import NonValidGaitContent, SubgaitInterpolationError
 from march_shared_classes.exceptions.general_exceptions import FileNotFoundError
-from .utilities import weighted_average
 
 from .joint_trajectory import JointTrajectory
 from .limits import Limits
 from .setpoint import Setpoint
+from .utilities import weighted_average
 
 PARAMETRIC_GAITS_PREFIX = '_pg_'
 
