@@ -176,7 +176,15 @@ class Setpoint(object):
 
     @staticmethod
     def calculate_foot_position(haa, hfe, kfe, side):
-        """Calculates the foot position given the relevant angles, lengths and a specification of the foot."""
+        """Calculates the foot position given the relevant angles, lengths and a specification of the foot.
+
+        :param side: The side of the exoskeleton to which the angles belong
+        :param haa: The angle of the hip_aa joint on the specified side
+        :param hfe: The angle of the hip_fe joint on the specified side
+        :param kfe: The angle of the knee joint on the specified side
+
+        :return: The location of the foot (ankle) of the specified side which corresponds to the given angles
+        """
         # x is positive in the walking direction, z is in the downward direction, y is directed to the right side
         # the origin in the middle of the hip structure. The calculations are supported by
         # https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
@@ -225,7 +233,7 @@ class Setpoint(object):
     def calculate_joint_angles_from_foot_position(foot_position, foot_side):
         """Calculates the angles of the joints corresponding to a certain position of the right or left foot.
 
-        More information on the calculations of the haa, hfe and kfe angles, aswel as on the velocity calculations can
+        More information on the calculations of the haa, hfe and kfe angles, aswell as on the velocity calculations can
         be found at https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics. This function
         assumes that the desired z position of the foot is positive.
 
@@ -276,6 +284,9 @@ class Setpoint(object):
 
         this function returns the lengths relevant for the specified foot, if no side is specified,
         it returns all relevant lengths for both feet.
+
+        :param side: The side of the exoskeleton of which the relevant would like to be known
+        :return: The lengths of the specified side which are relevant for the (inverse) kinematics calculations
         """
         try:
             robot = urdf.Robot.from_xml_file(os.path.join(rospkg.RosPack().get_path('march_description'), 'urdf',
@@ -313,7 +324,10 @@ class Setpoint(object):
 
     @staticmethod
     def calculate_next_positions_joint(setpoint_dic):
-        """Calculates the position of the joints a moment later given a position and velocity dic."""
+        """Calculates the position of the joints a moment later given a setpoint dictionary.
+
+        :param setpoint_dic: A dictionary of setpoints with positions and velocities
+        :return: A dictionary with the positions of the joints 1 / VELOCITY_SCALE_FACTOR second later"""
         next_positions = {}
         for joint in JOINTS_POSITION_NAMES_IK:
             if joint in setpoint_dic:
@@ -325,14 +339,22 @@ class Setpoint(object):
         return next_positions
 
     @staticmethod
-    def calculate_joint_velocities(next_angle_positions, angle_positions, side=None):
-        """Calculates the (left/right/all)joint velocities given a current position and a next position."""
+    def calculate_joint_velocities(next_angle_positions, angle_positions, side='both'):
+        """Calculates the (left/right/all)joint velocities given a current position and a next position.
+
+        :param next_angle_positions: A dictionary containing the positions of the joints a moment later
+        :param angle_positions: A dictionary containing the current positions of the joints
+        :param side: Specifies the side of the exo whos joints should be used for the calculation
+
+        ":return: The joint velocities of the joints on the specified side"""
+        if side != 'left' and side != 'right' and side != 'both':
+            raise SideSpecificationError(side, "Side should be either 'left', 'right' or 'both', but was {side}".
+                                         format(side=side))
         angle_velocity = {}
         for coordinate, velocity in zip(JOINTS_POSITION_NAMES_IK, JOINTS_VELOCITY_NAMES_IK):
-            if bool(side):
+            if side == 'left' or side == 'right':
                 if not (coordinate.startswith(side) and velocity.startswith(side)):
                     continue
-
             if coordinate in next_angle_positions and coordinate in angle_positions:
                 angle_velocity[velocity] = (next_angle_positions[coordinate] - angle_positions[coordinate]) \
                     * VELOCITY_SCALE_FACTOR
@@ -344,7 +366,16 @@ class Setpoint(object):
 
     @staticmethod
     def calculate_haa_angle(z_position, y_position, pelvis_hip_length):
-        """Calculates the haa angle of the exoskeleton given a desired y and z position of the exoskeleton."""
+        """Calculates the haa angle of the exoskeleton given a desired y and z position of the exoskeleton.
+
+        More information on the calculation is found at
+        https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
+
+        :param z_position: the desired z-position of the foot
+        :param y_position: the desired y-position of the foot
+        :param pelvis_hip_length: The length from the pelvis to the hip_aa, which is the haa arm
+
+        :return: The hip_aa joint angle needed for the foot to reach the given positions"""
         if z_position <= 0:
             raise SubgaitInterpolationError(
                 'desired z position of the foot is not positive, current haa calculation is not capable of this')
@@ -367,7 +398,17 @@ class Setpoint(object):
 
     @staticmethod
     def calculate_hfe_kfe_angles(rescaled_x, rescaled_z, upper_leg, lower_leg):
-        """Calculates the hfe and kfe given a desired rescaled x and z coordinate using the cosine rule."""
+        """Calculates the hfe and kfe given a desired rescaled x and z coordinate using the cosine rule.
+
+        The rescaled x and z position are described and explained in
+        https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
+
+        :param rescaled_x: The desired x_position of the foot, rescaled to make the calculation easier
+        :param rescaled_z: The desired z_position of the foot, rescaled to make the calculation easier
+        :param upper_leg: The length of the upper leg
+        :param lower_leg: The length of the lower leg
+
+        :return: The hip_fe and knee angle needed to reach the desired x and z position"""
         foot_line_to_leg = acos((upper_leg * upper_leg + rescaled_x * rescaled_x + rescaled_z * rescaled_z
                                  - lower_leg * lower_leg)
                                 / (2 * upper_leg * sqrt(rescaled_x * rescaled_x + rescaled_z * rescaled_z)))
