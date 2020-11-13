@@ -83,15 +83,12 @@ class SetpointTest(unittest.TestCase):
             self.assertAlmostEqual(desired_position[key], resulting_position[key], places=4)
 
     def test_inverse_kinematics_velocity(self):
-        foot_vel = Setpoint.get_foot_pos_from_angles(self.setpoint_dict, velocity=True)
-        foot_pos = Setpoint.get_foot_pos_from_angles(self.setpoint_dict, velocity=False)
+        feet_state = Setpoint.get_feet_state_from_setpoints(self.setpoint_dict)
 
-        new_angles_vel_left = Setpoint.calculate_joint_angles_from_foot_position(foot_pos, 'left', foot_vel)
-        new_angles_vel_right = Setpoint.calculate_joint_angles_from_foot_position(foot_pos, 'right', foot_vel)
+        new_angle_states_left = Setpoint.get_joint_states_from_foot_state(feet_state.left_foot)
+        new_angle_states_right = Setpoint.get_joint_states_from_foot_state(feet_state.right_foot),
 
-        for key in new_angles_vel_right.keys():
-            if key.endswith('_velocity'):
-                self.assertAlmostEqual(new_angles_vel_right[key], self.setpoint.velocity, places=4)
-        for key in new_angles_vel_left.keys():
-            if key.endswith('_velocity'):
-                self.assertAlmostEqual(new_angles_vel_left[key], self.setpoint.velocity, places=4)
+        for key in new_angle_states_right.velocity.keys():
+            self.assertAlmostEqual(new_angle_states_right[key], self.setpoint.velocity, places=4)
+        for key in new_angle_states_left.velocity.keys():
+            self.assertAlmostEqual(new_angle_states_left[key], self.setpoint.velocity, places=4)
