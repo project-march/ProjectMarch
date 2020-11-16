@@ -189,22 +189,3 @@ The output should be exactly:
     cd ~/ros2_foxy/
     # skip ros1_bridge package since that has to configured later
     colcon build --symlink-install --packages-skip ros1_bridge
-
-.. _automated-scripts-label:
-
-Automated scripts
-^^^^^^^^^^^^^^^^^
-You can run the following scripts or download them:
-
-* :codedir:`ROS1 Melodic <getting_started/install_ros_melodic.sh>`.
-* :codedir:`ROS2 Foxy <getting_started/install_ros_foxy.sh>`.
-
-**ROS1 Melodic**
-
-.. literalinclude:: install_ros_melodic.sh
-   :language: bash
-
-**ROS2 Foxy**
-
-.. literalinclude:: install_ros_foxy.sh
-   :language: bash
