@@ -80,7 +80,7 @@ generate the docs and automatically open them in your browser.
 .. code::
 
   source /opt/ros/melodic/setup.bash
-  cd ~/docs.projectmarch.io
+  cd ~/project-march.gitlab.io
   ./build_locally.sh
 
 .. warning::

@@ -6,6 +6,7 @@ Setup your workspace
 .. inclusion-introduction-start
 
 This tutorial will help you set up a ROS1 Melodic and ROS2 Foxy workspace with all packages needed to run the |march|.
+You should have followed :ref: `install_ros_and_tools-label` before you can setup your workspace.
 
 .. inclusion-introduction-end
 
@@ -44,6 +45,8 @@ The following will install any ROS1 Melodic package dependencies not already in 
 
 .. code:: bash
 
+  sudo apt update
+  source /opt/ros/melodic/setup.bash
   cd ~/march/ros1/
   rosdep install -y --from-paths src --ignore-src
 
@@ -55,14 +58,14 @@ Note that you should only build the bridge after the ROS1 and ROS2 MARCH package
 Building ROS1
 ^^^^^^^^^^^^^
 
-To build the MARCH ROS1 packages, you have to source your ROS1 Melodic installation and then invoke catkin:
+To build the MARCH ROS1 packages, you have to source your ROS1 Melodic installation and then invoke colcon:
 
 
 .. code:: bash
 
     source /opt/ros/melodic/setup.bash
     cd ~/march/ros1
-    catkin_make_isolated --install
+    colcon build
 
 Building ROS2
 ^^^^^^^^^^^^^
@@ -78,6 +81,8 @@ To build the MARCH ROS2 packages, you have to source your ROS2 Foxy installation
 Building the bridge
 ^^^^^^^^^^^^^^^^^^^
 
+Building the bridge usually only needs to be done once.
+Rebuilding the bridge is only necessary when new messages are added in both ROS1 and ROS2 which need to be bridged.
 To build to bridge, you have to source *all* your ROS files,
 and then use colcon to build the 'ros1_bridge' package:
 
@@ -85,10 +90,10 @@ and then use colcon to build the 'ros1_bridge' package:
 
     source /opt/ros/melodic/setup.bash
     source ~/ros2_foxy/install/setup.bash
-    source ~/march/ros1/install_isolated/setup.bash
+    source ~/march/ros1/install/setup.bash
     source ~/march/ros2/install/local_setup.bash
     cd ~/ros2_foxy
-    colcon build --packages-select ros1_bridge --cmake-force-configure;
+    colcon build --packages-select ros1_bridge --cmake-force-configure
 
 If you want to see the messages that are mapped and verify the bridge was built correctly run:
 
@@ -113,8 +118,8 @@ In order to run ROS1, you have to source both ROS1 Melodic and the ROS1 MARCH pa
 
 .. code:: bash
 
-    source /opt/ros/melodic/setup.bash;
-    source ~/march/ros1/install_isolated/setup.bash;
+    source /opt/ros/melodic/setup.bash
+    source ~/march/ros1/install/setup.bash
     roslaunch march_launch march_ros2_simulation.launch
 
 Run the bridge
@@ -148,12 +153,12 @@ These aliases provide shortcuts to easily build and run the code. It is recommen
 
 .. code:: bash
 
-    alias march_build_ros1='source /opt/ros/melodic/setup.bash;cd ~/march/ros1;catkin_make_isolated --install'
-    alias march_run_ros1='source /opt/ros/melodic/setup.bash;source ~/march/ros1/install_isolated/setup.bash;roslaunch march_launch march_ros2_simulation.launch gait_directory:=test_versions-v'
+    alias march_build_ros1='source /opt/ros/melodic/setup.bash && cd ~/march/ros1 && colcon build'
+    alias march_run_ros1='source /opt/ros/melodic/setup.bash && source ~/march/ros1/install/setup.bash && roslaunch march_launch march_ros2_simulation.launch gait_directory:=test_versions-v'
 
-    alias march_build_ros2='source ~/ros2_foxy/install/setup.bash;cd ~/march/ros2;colcon build'
-    alias march_run_ros2='source ~/ros2_foxy/install/setup.bash;source ~/march/ros2/install/setup.bash;ros2 launch march_launch march_ros2_simulation.launch.py'
+    alias march_build_ros2='source ~/ros2_foxy/install/setup.bash && cd ~/march/ros2 && colcon build'
+    alias march_run_ros2='source ~/ros2_foxy/install/setup.bash && source ~/march/ros2/install/setup.bash && ros2 launch march_launch march_ros2_simulation.launch.py'
 
-    alias march_build_bridge='source /opt/ros/melodic/setup.bash;source ~/ros2_foxy/install/setup.bash;source ~/march/ros1/install_isolated/setup.bash;source ~/march/ros2/install/local_setup.bash;cd ~/ros2_foxy;colcon build --packages-select ros1_bridge --cmake-force-configure;ros2 run ros1_bridge dynamic_bridge --print-pairs'
-    alias march_run_bridge='source /opt/ros/melodic/setup.bash;source ~/ros2_foxy/install/setup.bash;export ROS_MASTER_URI=http://localhost:11311;ros2 run ros1_bridge dynamic_bridge --bridge-all-topics'
+    alias march_build_bridge='source /opt/ros/melodic/setup.bash && source ~/ros2_foxy/install/setup.bash && source ~/march/ros1/install/setup.bash && source ~/march/ros2/install/local_setup.bash && cd ~/ros2_foxy && colcon build --packages-select ros1_bridge --cmake-force-configure && ros2 run ros1_bridge dynamic_bridge --print-pairs'
+    alias march_run_bridge='source /opt/ros/melodic/setup.bash && source ~/ros2_foxy/install/setup.bash && export ROS_MASTER_URI=http://localhost:11311 && ros2 run ros1_bridge dynamic_bridge --bridge-all-topics'
 

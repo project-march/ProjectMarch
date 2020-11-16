@@ -9,14 +9,19 @@ This tutorial will help you install ROS1 Melodic, ROS2 Foxy and the required bui
 
 .. inclusion-introduction-end
 
-.. note:: If you already have experience with installing Ros Melodic and ROS2 Foxy, you can skip to the :ref:`automated-scripts-label` below.
-  We strongly recommend following the manual guide at least once to familiarize yourself with the commands.
-
 Install ROS1 Melodic
 ^^^^^^^^^^^^^^^^^^^^
 This tutorial is mostly copied from `Install ROS1 Melodic <https://wiki.ros.org/melodic/Installation/Ubuntu>`_.
 
-1) The first step is to setup your sources.list:
+1) First, install some tools:
+
+..  code:: bash
+
+    sudo apt install lsb-release gnupg2 python-rosdep
+    sudo rosdep init
+
+
+1) The next step is to setup your sources.list:
 
 .. code:: bash
 
@@ -42,8 +47,8 @@ This tutorial is mostly copied from `Install ROS1 Melodic <https://wiki.ros.org/
 .. code:: bash
 
   rosdep update  # No sudo
-  sudo apt-get update
-  sudo apt-get dist-upgrade
+  sudo apt update
+  sudo apt full-upgrade
 
 5) Finally , for building our packages we use colcon. Install `colcon <https://github.com/colcon>`_:
 
@@ -71,9 +76,22 @@ This tutorial is a slightly updated version of `Install ROS2 Foxy <https://index
 
     cd ~/
     sudo apt update && sudo apt install -y build-essential libssl-dev wget
-    wget https://github.com/Kitware/CMake/archive/v3.18.4.tar.gz && tar -zxvf v3.18.4.tar.gz && rm v3.18.4.tar.gz && cd CMake-3.18.4 && ./bootstrap && make
-    sudo make install && cd .. && rm -rf CMake-3.18.4
+    wget https://github.com/Kitware/CMake/archive/v3.18.4.tar.gz && tar -zxvf v3.18.4.tar.gz && rm v3.18.4.tar.gz && cd CMake-3.18.4 && ./bootstrap && make && cd .. && mv CMake-3.18.4 .CMake-3.18.4
+    cd .CMake-3.18.4 && sudo ln -s $(pwd) /usr/local/share/cmake-3.18 && sudo ln $(pwd)/bin/* /usr/local/bin
+
+Verify CMake is correctly updated by running:
+
+.. code:: bash
+
     cmake --version
+
+The output should be exactly:
+
+.. code::
+
+    cmake version 3.18.4
+
+    CMake suite maintained and supported by Kitware (kitware.com/cmake).
 
 2) Then we have to make sure the right locale is set:
 
@@ -148,14 +166,21 @@ This tutorial is a slightly updated version of `Install ROS2 Foxy <https://index
     wget https://raw.githubusercontent.com/ros2/ros2/foxy/ros2.repos
     vcs import src < ros2.repos
 
-7) Some additional dependencies have to be manually added:
+7) Install dependencies using rosdep:
+
+.. code:: bash
+
+    rosdep update
+    rosdep install --from-paths src --ignore-src --rosdistro foxy -y --skip-keys "console_bridge fastcdr fastrtps rti-connext-dds-5.3.1 urdfdom_headers"
+
+8) Some additional dependencies have to be manually added:
 
 .. code:: bash
 
     cd ~/ros2_foxy/src/ros2/
-    git clone https://github.com/ros/xacro/tree/dashing-devel
-    git clone https://github.com/ros/urdf_parser_py/tree/ros2
-    git clone https://github.com/ros-controls/control_msgs
+    git clone https://github.com/ros/xacro.git -b dashing-devel
+    git clone https://github.com/ros/urdf_parser_py.git -b ros2
+    git clone https://github.com/ros-controls/control_msgs.git -b foxy-devel
 
 8) The final step is to build the ROS2 code. This may take a long time (> 1h):
 
