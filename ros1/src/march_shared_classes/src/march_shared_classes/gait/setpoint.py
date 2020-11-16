@@ -9,6 +9,7 @@ from march_shared_classes.exceptions.gait_exceptions import SideSpecificationErr
 from .feet_state import FeetState
 from .foot import Foot
 from .utilities import merge_dictionaries, weighted_average
+from .vector_3d import Vector3d
 
 # Use this factor when calculating velocities to keep the calculations within the range of motion
 # See IK confluence page https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
@@ -200,7 +201,7 @@ class Setpoint(object):
         else:
             raise SideSpecificationError(side)
 
-        return Foot(side, {'x': x_position, 'y': y_position, 'z': z_position})
+        return Foot(side, Vector3d(x_position, y_position, z_position))
 
     @staticmethod
     def get_joint_states_from_foot_state(foot_state):
@@ -238,7 +239,7 @@ class Setpoint(object):
         assumes that the desired z position of the foot is positive.
 
         :param foot_position:
-            A dictionary which specifies the desired position of the foot.
+            A Vecor3d object which specifies the desired position of the foot.
         :param foot_side:
             A string which specifies to which side the foot_position belongs and thus which joint angles should be
             computed.
@@ -249,9 +250,9 @@ class Setpoint(object):
         # Get relevant lengths from robot model, ul = upper leg etc. see get_lengths_robot_for_inverse_kinematics()
         # and unpack desired position
         [ul, ll, hl, ph, base] = Setpoint.get_lengths_robot_for_inverse_kinematics(foot_side)
-        x_position = foot_position['x']
-        y_position = foot_position['y']
-        z_position = foot_position['z']
+        x_position = foot_position.x
+        y_position = foot_position.y
+        z_position = foot_position.z
 
         # Change y positive direction to the desired foot, change origin to pivot of haa joint, for ease of calculation.
         if foot_side == 'left':

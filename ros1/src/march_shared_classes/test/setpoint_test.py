@@ -3,6 +3,7 @@ import unittest
 from march_shared_classes.gait.feet_state import FeetState
 from march_shared_classes.gait.foot import Foot
 from march_shared_classes.gait.setpoint import Setpoint
+from march_shared_classes.gait.vector_3d import Vector3d
 
 
 class SetpointTest(unittest.TestCase):
@@ -70,8 +71,8 @@ class SetpointTest(unittest.TestCase):
                 self.assertAlmostEqual(angles_right[key], self.setpoint.position, places=4)
 
     def test_inverse_kinematics_reversed_position(self):
-        right_foot = Foot('right', {'x': 0.18, 'y': 0.08, 'z': 0.6}, {'x': 0, 'y': 0, 'z': 0})
-        left_foot = Foot('left', {'x': 0.18, 'y': -0.08, 'z': 0.6}, {'x': 0, 'y': 0, 'z': 0})
+        right_foot = Foot('right', Vector3d(0.18, 0.08, 0.6), Vector3d(0, 0, 0))
+        left_foot = Foot('left', Vector3d(0.18, -0.08, 0.6), Vector3d(0, 0, 0))
         desired_state = FeetState(right_foot, left_foot)
         new_angles_left = Setpoint.get_joint_states_from_foot_state(desired_state.left_foot)
         new_angles_right = Setpoint.get_joint_states_from_foot_state(desired_state.right_foot)
@@ -84,14 +85,12 @@ class SetpointTest(unittest.TestCase):
                             'right_hip_fe': Setpoint(time, new_angles_right['right_hip_fe'], new_vel),
                             'right_knee': Setpoint(time, new_angles_right['right_knee'], new_vel)}
         resulting_position = Setpoint.get_feet_state_from_setpoints(resulting_angles)
-        for key in desired_state.left_foot.position.keys():
-            if not key.endswith('_velocity'):
-                self.assertAlmostEqual(desired_state.left_foot.position[key],
-                                       resulting_position.left_foot.position[key], places=4)
-        for key in desired_state.right_foot.position.keys():
-            if not key.endswith('_velocity'):
-                self.assertAlmostEqual(desired_state.right_foot.position[key],
-                                       resulting_position.right_foot.position[key], places=4)
+
+        for key in ['x', 'y', 'z']:
+            self.assertAlmostEqual(desired_state.left_foot.position[key],
+                                   resulting_position.left_foot.position[key], places=4)
+            self.assertAlmostEqual(desired_state.right_foot.position[key],
+                                   resulting_position.right_foot.position[key], places=4)
 
     def test_inverse_kinematics_velocity(self):
         feet_state = Setpoint.get_feet_state_from_setpoints(self.setpoint_dict)

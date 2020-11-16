@@ -1,7 +1,7 @@
 from march_shared_classes.exceptions.gait_exceptions import WeightedAverageError
 
 from .foot import Foot
-from .utilities import weighted_average_dictionaries
+from .utilities import weighted_average
 
 
 class FeetState(object):
@@ -33,13 +33,13 @@ class FeetState(object):
             raise WeightedAverageError('Not all Foot objects of the FeetState object contain velocities, '
                                        'calculation cannot proceed')
 
-        resulting_right_foot = Foot('right', weighted_average_dictionaries(base_state.right_foot.position,
-                                                                           other_state.right_foot.position, parameter),
-                                    weighted_average_dictionaries(base_state.right_foot.velocity,
-                                                                  other_state.right_foot.velocity, parameter))
-        resulting_left_foot = Foot('left', weighted_average_dictionaries(base_state.left_foot.position,
-                                                                         other_state.left_foot.position, parameter),
-                                   weighted_average_dictionaries(base_state.left_foot.velocity,
-                                                                 other_state.left_foot.velocity, parameter))
+        resulting_right_foot = Foot('right', weighted_average(base_state.right_foot.position,
+                                                              other_state.right_foot.position, parameter),
+                                    weighted_average(base_state.right_foot.velocity,
+                                                     other_state.right_foot.velocity, parameter))
+        resulting_left_foot = Foot('left', weighted_average(base_state.left_foot.position,
+                                                            other_state.left_foot.position, parameter),
+                                   weighted_average(base_state.left_foot.velocity,
+                                                    other_state.left_foot.velocity, parameter))
 
         return cls(resulting_right_foot, resulting_left_foot)
