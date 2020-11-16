@@ -23,8 +23,13 @@
                     max_effort_rotary:=200.0 max_effort_linear:=200.0
                     ground_gait:=$(arg ground_gait)" />
 
-    <!-- Upload the controller configuration -->
-    <rosparam file="$(find march_simulation)/config/$(arg controller)/$(arg robot).yaml" command="load"/>
+    <!-- Upload the controller configuration, march4_with_koen_lengths uses the march4 controller -->
+    <group if="$(eval robot != 'march4_with_koen_lengths')" >
+        <rosparam file="$(find march_simulation)/config/$(arg controller)/$(arg robot).yaml" command="load"/>
+    </group>
+    <group if="$(eval robot == 'march4_with_koen_lengths')" >
+        <rosparam file="$(find march_simulation)/config/$(arg controller)/march4.yaml" command ="load"/>
+    </group>
 
     <group ns="march">
         <node name="controller_spawner" pkg="controller_manager" type="controller_manager"
