@@ -165,13 +165,13 @@ class GaitGeneratorView(QWidget):
 
     def open_file_dialogue(self):
         return QFileDialog.getOpenFileName(self, 'Select a subgait to import.',
-                                           os.path.join(self.ros1_path, 'src', 'march_gait_files'),
+                                           os.path.join(self.ros1_path, 'src', 'gaits', 'march_gait_files'),
                                            'March Subgait (*.subgait)')
 
     def open_directory_dialogue(self):
         return QFileDialog.getExistingDirectory(None, 'Select a directory to save gaits. Directory must be '
                                                       'a subdirectory of march_gait_files or be named resources.',
-                                                os.path.join(self.ros1_path, 'src', 'march_gait_files'))
+                                                os.path.join(self.ros1_path, 'src', 'gaits', 'march_gait_files'))
 
     @QtCore.pyqtSlot(int)
     def update_main_time_slider(self, time):
