@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include "acado_auxiliary_functions.h"
 
 using namespace std;
 
@@ -11,8 +12,9 @@ class ModelPredictiveController {
 
 private:
     vector<string> _joint_list;
-    vector<double> _last_update_times;
+
 public:
+
     /**
      * \brief Constructor function
      */
@@ -27,6 +29,16 @@ public:
      * \brief Set the initial state
      */
     void setInitState(vector<double> x0);
+
+    /**
+     * \brief
+     */
+//    vector<float> getState();
+
+    /**
+     * \brief
+     */
+//    vector<float> getControl( );
 
     /**
      * \brief Run a single feedback iteration given the initial state
