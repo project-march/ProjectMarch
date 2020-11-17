@@ -17,24 +17,23 @@ This tutorial is mostly copied from `Install ROS1 Melodic <https://wiki.ros.org/
 
 ..  code:: bash
 
-    sudo apt install lsb-release gnupg2 python-rosdep
-    sudo rosdep init
+    sudo apt install lsb-release gnupg2
 
 
-1) The next step is to setup your sources.list:
+2) The next step is to setup your sources.list:
 
 .. code:: bash
 
     sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 
 
-2) Then, setup your keys:
+3) Then, setup your keys:
 
 .. code:: bash
 
     sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 
-3) If these steps went well, you should be able to install ROS Melodic:
+4) If these steps went well, you should be able to install ROS Melodic:
 
 .. code:: bash
 
@@ -42,15 +41,16 @@ This tutorial is mostly copied from `Install ROS1 Melodic <https://wiki.ros.org/
     sudo apt install ros-melodic-desktop-full
 
 
-4) Once you have ROS installed, make sure you have the most up to date packages:
+5) Once you have ROS installed, make sure you have the most up to date packages:
 
 .. code:: bash
 
+  sudo rosdep init
   rosdep update  # No sudo
   sudo apt update
   sudo apt full-upgrade
 
-5) Finally , for building our packages we use colcon. Install `colcon <https://github.com/colcon>`_:
+6) Finally , for building our packages we use colcon. Install `colcon <https://github.com/colcon>`_:
 
 .. code:: bash
 
