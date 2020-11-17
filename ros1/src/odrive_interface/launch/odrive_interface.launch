@@ -1,3 +1,0 @@
-<launch>
-    <node name="odrive_interface_node" pkg="odrive_interface" type="odrive_interface_node" output="screen"/>
-</launch>
