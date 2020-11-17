@@ -92,10 +92,11 @@ class GaitStateMachine(object):
         self._current_pos = {name: pos for (name, pos) in zip(msg.name, msg.position)}
 
     def _freeze_cb(self, msg):
+        self._gait_selection.get_logger().info('Freeze callback')
         if self._current_gait is not None and self._current_gait.can_freeze:
             self._gait_selection.get_logger().debug('Freezing the gait')
             # self._trajectory_scheduler.cancel_last()
-            self._current_gait.freeze(self._current_pos)
+            self._current_gait.freeze(self._current_pos, self)
 
     def _update_foot_on_ground_cb(self, is_right, msg):
         if is_right:
@@ -104,15 +105,15 @@ class GaitStateMachine(object):
                 if force > 8000:
                     # self._gait_selection.get_logger().info(f'{force}')
                     # self._gait_selection.get_logger().info(f'{len(msg.states)}')
-                    # self._gait_selection.get_logger().info(f'{self._current_gait}')
                     if not self._right_foot_on_ground:
                         self._gait_selection.get_logger().info('Should freeze')
+                        self._gait_selection.get_logger().info(f'{self._current_gait}')
                         self.test_right_pub.publish(Bool(data=True))
                         self._right_foot_on_ground = True
                         if self._current_gait is not None and self._current_gait.can_freeze:
                             self._gait_selection.get_logger().debug('Freezing the gait')
                             # self._trajectory_scheduler.cancel_last()
-                            self._current_gait.freeze(self._current_pos)
+                            self._current_gait.freeze(self._current_pos, self)
             elif len(msg.states) == 0:
                 self.test_right_pub.publish(Bool(data=False))
                 self._right_foot_on_ground = False
