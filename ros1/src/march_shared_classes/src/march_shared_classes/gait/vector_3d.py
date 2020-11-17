@@ -49,7 +49,8 @@ class Vector3d(object):
     def as_dictionary(self):
         return{'x': self.x, 'y': self.y, 'z': self.z}
 
-    def size(self):
+    @staticmethod
+    def size():
         return 3
 
     @staticmethod
