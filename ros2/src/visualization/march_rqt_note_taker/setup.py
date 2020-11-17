@@ -7,7 +7,7 @@ import os
 
 package_name = 'march_rqt_note_taker'
 
-ros1_source = os.path.join('..', '..', '..', 'ros1', 'src', 'march_rqt_note_taker')
+ros1_source = os.path.join('..', '..', '..', 'ros1', 'src', 'visualization', 'march_rqt_note_taker')
 
 setup(
     name=package_name,

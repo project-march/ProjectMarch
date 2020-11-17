@@ -15,15 +15,15 @@ install(DIRECTORY launch
 
 include(cmake/${PROJECT_NAME}-extras.cmake)
 
-install(DIRECTORY "../../../ros1/src/march_description/urdf"
+install(DIRECTORY "../../../ros1/src/shared/march_description/urdf"
         DESTINATION share/${PROJECT_NAME}
         )
 
 set(XACRO_FILES
-    "../../../ros1/src/march_description/urdf/march3.xacro"
-    "../../../ros1/src/march_description/urdf/march4.xacro"
-    "../../../ros1/src/march_description/urdf/test_joint_linear.xacro"
-    "../../../ros1/src/march_description/urdf/test_joint_rotational.xacro"
+    "../../../ros1/src/shared/march_description/urdf/march3.xacro"
+    "../../../ros1/src/shared/march_description/urdf/march4.xacro"
+    "../../../ros1/src/shared/march_description/urdf/test_joint_linear.xacro"
+    "../../../ros1/src/shared/march_description/urdf/test_joint_rotational.xacro"
 )
 
 ament_package(CONFIG_EXTRAS cmake/${PROJECT_NAME}-extras.cmake)
