@@ -1,5 +1,4 @@
-
-cmake_minimum_required(VERSION 3.11.0)
+cmake_minimum_required(VERSION 3.10)
 PROJECT(march_acado_mpc)
 
 
@@ -15,21 +14,6 @@ catkin_package(
         std_msgs
         roscpp
 )
-
-include(FetchContent)
-FetchContent_Declare(
-        qpoases
-        GIT_REPOSITORY https://github.com/coin-or/qpOASES.git
-        GIT_TAG stable/3.2
-)
-
-FetchContent_MakeAvailable(qpoases)
-
-#include(ExternalProject)
-#ExternalProject_Add(qpoases
-#        GIT_REPOSITORY https://github.com/coin-or/qpOASES.git
-#        GIT_TAG stable/3.2
-#        )
 
 include_directories(
         include/${PROJECT_NAME}
