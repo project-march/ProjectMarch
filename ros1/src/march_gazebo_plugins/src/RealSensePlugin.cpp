@@ -146,7 +146,6 @@ void RealSensePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
                        smanager->GetSensor(prefix + COLOR_CAMERA_NAME))
                        ->Camera();
 
-  // Check if camera renderers have been found successfuly
   if (!this->depthCam) {
     std::cerr << "RealSensePlugin: Depth Camera has not been found"
               << std::endl;
@@ -210,6 +209,7 @@ void RealSensePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   // Listen to the update event
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&RealSensePlugin::OnUpdate, this));
+
 }
 
 /////////////////////////////////////////////////
