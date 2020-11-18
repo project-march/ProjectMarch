@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project(march_description)
 
 find_package(catkin REQUIRED COMPONENTS xacro)
+find_package(realsense2_description REQUIRED)
 
 catkin_package(CFG_EXTRAS ${PROJECT_NAME}-extras.cmake)
 

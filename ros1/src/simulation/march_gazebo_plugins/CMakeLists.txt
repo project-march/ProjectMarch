@@ -4,18 +4,24 @@ project(march_gazebo_plugins LANGUAGES CXX)
 find_package(catkin REQUIRED COMPONENTS
     gazebo_ros
     march_shared_msgs
+    image_transport
+    camera_info_manager
     roscpp
 )
 find_package(gazebo REQUIRED)
 
 include_directories(
+    SYSTEM
     ${catkin_INCLUDE_DIRS}
+    ${GAZEBO_INCLUDE_DIRS}
     include
 )
 
+find_package(realsense2_camera REQUIRED)
+
 catkin_package(
     INCLUDE_DIRS include
-    LIBRARIES ${PROJECT_NAME} contact
+    LIBRARIES ${PROJECT_NAME} contact realsense_gazebo_plugin
     CATKIN_DEPENDS march_shared_msgs roscpp
 )
 
@@ -23,8 +29,6 @@ add_library(${PROJECT_NAME}
     src/com_controller_plugin.cpp
     src/obstacle_controller.cpp
     src/walk_controller.cpp
-    src/gazebo_ros_realsense.cpp
-    src/RealSensePlugin.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${catkin_INCLUDE_DIRS}/${PROJECT_NAME} ${GAZEBO_INCLUDE_DIRS})
@@ -61,3 +65,26 @@ install(TARGETS contact
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
+
+#####
+# Add realsense plugin
+#####
+#add_library(
+#   realsense_gazebo_plugin
+#   src/RealSensePlugin.cpp
+#   src/gazebo_ros_realsense.cpp
+#)
+#
+#target_include_directories(realsense_gazebo_plugin PRIVATE ${catkin_INCLUDE_DIRS}/realsense_gazebo_plugin ${GAZEBO_INCLUDE_DIRS})
+#target_link_directories(realsense_gazebo_plugin PRIVATE ${GAZEBO_LIBRARY_DIRS})
+#target_link_libraries(realsense_gazebo_plugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
+#add_dependencies(realsense_gazebo_plugin ${catkin_EXPORTED_TARGETS})
+#
+#install(DIRECTORY include/realsense_gazebo_plugin/
+#        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}/realsense_gazebo_plugin
+#        )
+#install(
+#        TARGETS realsense_gazebo_plugin
+#        DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+#        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#)

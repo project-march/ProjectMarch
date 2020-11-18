@@ -743,8 +743,14 @@
         <origin xyz="0 0 ${-ankle_plate_height}" rpy="0 0 0"/>
     </joint>
 
+<!--    <gazebo>-->
+<!--        <plugin name="realsense_plugin" filename="librealsense_gazebo_plugin.so"/>-->
+<!--    </gazebo>-->
 
-
+    <xacro:include filename="$(find realsense2_description)/urdf/_d435.urdf.xacro" />
+    <xacro:sensor_d435 parent="upper_leg_left">
+        <origin xyz="0 0 0" rpy="0 0 3.1416"/>
+    </xacro:sensor_d435>
     <!-- ROS Control plugin for Gazebo -->
     <transmission name="left_hip_aa">
         <type>transmission_interface/SimpleTransmission</type>
