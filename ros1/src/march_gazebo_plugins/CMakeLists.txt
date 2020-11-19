@@ -3,15 +3,12 @@ project(march_gazebo_plugins LANGUAGES CXX)
 
 find_package(catkin REQUIRED COMPONENTS
     gazebo_ros
-    image_transport
-    camera_info_manager
     march_shared_resources
     roscpp
 )
 find_package(gazebo REQUIRED)
 
 include_directories(
-    SYSTEM
     ${catkin_INCLUDE_DIRS}
     ${GAZEBO_INCLUDE_DIRS}
     include
