@@ -21,7 +21,7 @@ find_package(realsense2_camera REQUIRED)
 
 catkin_package(
     INCLUDE_DIRS include
-    LIBRARIES ${PROJECT_NAME} contact realsense_gazebo_plugin
+    LIBRARIES ${PROJECT_NAME} contact
     CATKIN_DEPENDS march_shared_msgs roscpp
 )
 
@@ -47,8 +47,8 @@ install(TARGETS ${PROJECT_NAME}
 #####
 # Add contact plugin
 #####
-# include_directories(${GAZEBO_INCLUDE_DIRS})
-# link_directories(${GAZEBO_LIBRARY_DIRS})
+include_directories(${GAZEBO_INCLUDE_DIRS})
+link_directories(${GAZEBO_LIBRARY_DIRS})
 add_library(contact
     src/contact_plugin.cpp
 )
@@ -65,26 +65,3 @@ install(TARGETS contact
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
-
-#####
-# Add realsense plugin
-#####
-#add_library(
-#   realsense_gazebo_plugin
-#   src/RealSensePlugin.cpp
-#   src/gazebo_ros_realsense.cpp
-#)
-#
-#target_include_directories(realsense_gazebo_plugin PRIVATE ${catkin_INCLUDE_DIRS}/realsense_gazebo_plugin ${GAZEBO_INCLUDE_DIRS})
-#target_link_directories(realsense_gazebo_plugin PRIVATE ${GAZEBO_LIBRARY_DIRS})
-#target_link_libraries(realsense_gazebo_plugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
-#add_dependencies(realsense_gazebo_plugin ${catkin_EXPORTED_TARGETS})
-#
-#install(DIRECTORY include/realsense_gazebo_plugin/
-#        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}/realsense_gazebo_plugin
-#        )
-#install(
-#        TARGETS realsense_gazebo_plugin
-#        DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-#        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#)
