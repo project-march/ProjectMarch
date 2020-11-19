@@ -1,0 +1,19 @@
+#! /usr/bin/env python
+import rospy
+from march_shared_resources.srv import ChangeObstacleSizeResponse, ChangeObstacleSize
+from gazebo_msgs.srv import GetModelState, GetModelStateRequest, GetWorldProperties, GetWorldPropertiesRequest
+
+rospy.init_node('change_obstacle_dimensions', anonymous=True)
+RESIZABLE_OBSTACLES = ['bench']
+
+# Default dimension (same as in bench.xacro)
+default_length = 0.5
+default_width = 1
+default_height = 0.4
+
+def change_size_callback(msg):
+    if msg.obstacle_name not in RESIZABLE_OBSTACLES:
+        return ChangeObstacleSizeResponse(success=False)
+
+
+change_obstacle_size = rospy.Subscriber('/march/change_obstacle_sizes', ChangeObstacleSize, change_size_callback)

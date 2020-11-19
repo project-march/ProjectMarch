@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<robot  xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="bench" params="bench_length bench_width bench_height">
+        <gazebo>
+            <static>true</static>
+        </gazebo>
+
+        <xacro:property name="distance_to_origin" default="0.4"/>
+        <xacro:property name="parent_name" value="world"/>
+        <xacro:property name="mu1" value="1.0"/>
+        <xacro:property name="mu2" value="1.0"/>
+        <!-- Minimum allowable depth before contact correction impulse is applied. -->
+        <xacro:property name="min_depth" value="0.0005"/>
+
+        <!-- Used for fixing robot to Gazebo 'base_link' -->
+        <link name="${parent_name}"/>
+
+
+        <!-- Links -->
+        <link name="bench">
+            <collision>
+                <geometry>
+                    <box size="${bench_length} ${bench_width} ${bench_height}" />
+                </geometry>
+            </collision>
+
+            <visual name='visual'>
+                <geometry>
+                    <box size="${bench_length} ${bench_width} ${bench_height}" />
+                </geometry>
+            </visual>
+            <inertial>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <mass value="1"/>
+                <inertia
+                        ixx="1"
+                        ixy="1"
+                        ixz="1"
+                        iyy="1"
+                        iyz="1"
+                        izz="1" />
+            </inertial>
+        </link>
+
+        <gazebo reference="bench">
+            <mu1>${mu1}</mu1>
+            <mu2>${mu2}</mu2>
+            <minDepth>${min_depth}</minDepth>
+        </gazebo>
+
+        <!-- Joints -->
+        <joint name="joint_0" type="fixed">
+            <parent link="${parent_name}"/>
+            <child link="bench"/>
+            <origin xyz="${bench_length / 2} 0 ${bench_height / 2}" rpy="0 0 0"/>
+        </joint>
+    </xacro:macro>
+</robot>

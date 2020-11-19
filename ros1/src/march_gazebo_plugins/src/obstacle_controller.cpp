@@ -32,7 +32,7 @@ ObstacleController::ObstacleController(physics::ModelPtr model)
   foot_right_ = model_->GetLink("ankle_plate_right");
   ros::param::get("balance", balance_);
 
-  subgait_name_ = "home_stand";
+  default_subgait_name_ = "home_stand";
   subgait_changed_ = true;
 
   mass = 0.0;
@@ -56,7 +56,7 @@ void ObstacleController::newSubgait(const march_shared_resources::CurrentGaitCon
   {
     ROS_WARN("Gait starts with left. CoM controller plugin might not work properly.");
   }
-  subgait_name_ = msg->subgait.empty() ? "home_stand" : msg->subgait;
+  subgait_name_ = msg->subgait.empty() ? default_subgait_name_ : msg->subgait;
   subgait_duration_ = msg->duration.toSec();
   subgait_start_time_ = model_->GetWorld()->SimTime().Double();
   subgait_changed_ = true;
@@ -82,7 +82,7 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left
   double time_since_start = model_->GetWorld()->SimTime().Double() - subgait_start_time_;
   if (time_since_start > 1.05 * subgait_duration_)
   {
-    subgait_name_ = "home_stand";
+    subgait_name_ = default_subgait_name_;
     subgait_changed_ = true;
   }
 
@@ -153,6 +153,8 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left
 
 void ObstacleController::getGoalPosition(double time_since_start, double& goal_position_x, double& goal_position_y)
 {
+
+
   // Left foot is stable unless subgait name starts with left
   auto stable_foot_pose = foot_left_->WorldCoGPose().Pos();
   auto swing_foot_pose = foot_right_->WorldCoGPose().Pos();
@@ -165,6 +167,14 @@ void ObstacleController::getGoalPosition(double time_since_start, double& goal_p
   // Goal position is determined from the location of the stable foot
   goal_position_x = stable_foot_pose.X();
   goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
+
+  if (subgait_name_ == "sit") {
+    default_subgait_name_ = "sit";
+    goal_position_x = stable_foot_pose.X() + 0.25;
+  }
+  else if (subgait_name_ == "stand_up") {
+    default_subgait_name_ = "home_stand";
+  }
 
   // Start goal position a quarter step size behind the stable foot
   // Move the goal position forward with v = 0.5 * swing_step_size/subgait_duration

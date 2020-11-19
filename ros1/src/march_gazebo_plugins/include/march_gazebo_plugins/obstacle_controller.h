@@ -24,6 +24,7 @@ protected:
   physics::LinkPtr foot_right_;
   double mass;
 
+  std::string default_subgait_name_;
   std::string subgait_name_;
   double subgait_start_time_;
   double swing_step_size_;
