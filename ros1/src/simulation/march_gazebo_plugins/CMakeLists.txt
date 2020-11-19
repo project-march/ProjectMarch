@@ -45,8 +45,6 @@ install(TARGETS ${PROJECT_NAME}
 #####
 # Add contact plugin
 #####
-include_directories(${GAZEBO_INCLUDE_DIRS})
-link_directories(${GAZEBO_LIBRARY_DIRS})
 add_library(contact
     src/contact_plugin.cpp
 )
