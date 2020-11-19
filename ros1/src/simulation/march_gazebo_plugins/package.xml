@@ -14,8 +14,8 @@
 
   <depend>roscpp</depend>
   <depend>gazebo_ros</depend>
-  <depend>march_shared_msgs</depend>
-  <depend>realsense2_camera</depend>
+
+  <depend>march_shared_resources</depend>
 
   <export>
     <gazebo_ros plugin_path="${prefix}/lib" gazebo_media_path="${prefix}" />

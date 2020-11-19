@@ -11,5 +11,4 @@
 
     <build_depend>xacro</build_depend>
     <build_depend>realsense2_description</build_depend>
-    <build_depend>realsense2_camera</build_depend>
 </package>

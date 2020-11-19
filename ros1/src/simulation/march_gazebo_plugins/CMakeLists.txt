@@ -17,8 +17,6 @@ include_directories(
     include
 )
 
-find_package(realsense2_camera REQUIRED)
-
 catkin_package(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME} contact
