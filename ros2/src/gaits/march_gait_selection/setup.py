@@ -8,7 +8,7 @@ package_name = 'march_gait_selection'
 def data_files():
     """ Generates the list of data files necessary for gait selection, the gait and subgait files
     required for testing are taken from the ros1 directory to decrease duplication. """
-    ros1_source = '../../../ros1/src/gaits/march_gait_selection/test/testing_gait_files'
+    ros1_source = '../../../../ros1/src/gaits/march_gait_selection/test/testing_gait_files'
     data = [
         (os.path.join('share', 'ament_index', 'resource_index', 'packages'),
          [os.path.join('resource', package_name)]),
