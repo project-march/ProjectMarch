@@ -6,7 +6,7 @@
 
     <xacro:property name="parent_name" value="world"/>
     <xacro:property name="step_height" default="0.170"/>
-    <xacro:property name="step_depth" default="0.280"/>
+    <xacro:property name="step_depth" default="7"/>
     <xacro:property name="step_width" default="1.80"/>
     <xacro:property name="distance_to_origin" default="0.45"/>
 
