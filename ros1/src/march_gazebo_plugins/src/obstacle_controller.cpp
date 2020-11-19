@@ -153,8 +153,6 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left
 
 void ObstacleController::getGoalPosition(double time_since_start, double& goal_position_x, double& goal_position_y)
 {
-
-
   // Left foot is stable unless subgait name starts with left
   auto stable_foot_pose = foot_left_->WorldCoGPose().Pos();
   auto swing_foot_pose = foot_right_->WorldCoGPose().Pos();
@@ -168,14 +166,15 @@ void ObstacleController::getGoalPosition(double time_since_start, double& goal_p
   goal_position_x = stable_foot_pose.X();
   goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
 
-  if (subgait_name_ == "sit") {
-    default_subgait_name_ = "sit";
-    goal_position_x = stable_foot_pose.X() + 0.25;
+  if (subgait_name_ == "sit_home") {
+    goal_position_x = stable_foot_pose.X() + 0.25 * swing_step_size_;
   }
-  else if (subgait_name_ == "stand_up") {
+  else if (subgait_name_.find("sit") != std::string::npos) {
+    default_subgait_name_ = "sit_home";
+  }
+  else if (subgait_name_.find("stand") != std::string::npos) {
     default_subgait_name_ = "home_stand";
   }
-
   // Start goal position a quarter step size behind the stable foot
   // Move the goal position forward with v = 0.5 * swing_step_size/subgait_duration
   if (subgait_name_.substr(subgait_name_.size() - 4) == "open")

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot  xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <xacro:macro name="bench" params="bench_length bench_width bench_height">
+    <xacro:macro name="bench" params="length:=0.5 width:=1 height:=0.4">
         <gazebo>
             <static>true</static>
         </gazebo>
@@ -20,13 +20,13 @@
         <link name="bench">
             <collision>
                 <geometry>
-                    <box size="${bench_length} ${bench_width} ${bench_height}" />
+                    <box size="${length} ${width} ${height}" />
                 </geometry>
             </collision>
 
             <visual name='visual'>
                 <geometry>
-                    <box size="${bench_length} ${bench_width} ${bench_height}" />
+                    <box size="${length} ${width} ${height}" />
                 </geometry>
             </visual>
             <inertial>
@@ -52,7 +52,7 @@
         <joint name="joint_0" type="fixed">
             <parent link="${parent_name}"/>
             <child link="bench"/>
-            <origin xyz="${bench_length / 2} 0 ${bench_height / 2}" rpy="0 0 0"/>
+            <origin xyz="${length / 2} 0 ${height / 2}" rpy="0 0 0"/>
         </joint>
     </xacro:macro>
 </robot>

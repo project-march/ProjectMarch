@@ -2,6 +2,6 @@ string obstacle_name
 
 int64 new_height    # 0 (default value) means default size will be used
 int64 new_width     # 0 (default value) means default size will be used
-int64 new_depth     # 0 (default value) means default size will be used
+int64 new_length     # 0 (default value) means default size will be used
 ---
 bool success
