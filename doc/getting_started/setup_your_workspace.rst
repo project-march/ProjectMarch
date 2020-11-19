@@ -1,12 +1,12 @@
 
 .. _setup-your-workspace-label:
 
-Setup your workspace
-=====================
+Building your workspace
+=======================
 .. inclusion-introduction-start
 
-This tutorial will help you set up a ROS1 Melodic and ROS2 Foxy workspace with all packages needed to run the |march|.
-You should have followed :ref: `install_ros_and_tools-label` before you can setup your workspace.
+This tutorial will help you build the  ROS1 Melodic and ROS2 Foxy workspace with all packages needed to run the |march|.
+You should have followed :ref: `install_ros_and_march-label` before you can build your workspace.
 
 .. inclusion-introduction-end
 
@@ -23,36 +23,10 @@ This tutorial will walk you through how to setup your workspace such that you ca
 .. note:: You will have to perform most steps multiple times throughout the development process.
     In the sections :ref:`march_aliases-label` you can find some convenient aliases.
 
-Download the MARCH source code
-------------------------------
-To download the source code, you can either use ssh (recommended):
-
-.. code:: bash
-
- cd ~/
- git clone git@gitlab.com:project-march/march.git
-
-Or use https:
-
-.. code:: bash
-
- cd ~/
- git clone https://gitlab.com/project-march/march.git
-
-Install ROS1 dependencies
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The following will install any ROS1 Melodic package dependencies not already in your workspace:
-
-.. code:: bash
-
-  sudo apt update
-  source /opt/ros/melodic/setup.bash
-  cd ~/march/ros1/
-  rosdep install -y --from-paths src --ignore-src
 
 Building the code
 -----------------
-ROS1 MARCH packages, ROS2 MARCH packages, and the bridge should all be built in a **separate terminal**.
+The ROS1 MARCH packages, ROS2 MARCH packages, and the bridge should all be built in a **separate terminal**.
 Note that you should only build the bridge after the ROS1 and ROS2 MARCH packages have been built
 
 Building ROS1

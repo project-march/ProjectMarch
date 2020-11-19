@@ -24,7 +24,7 @@ How to use the tutorials
 The tutorials are designed to provide hands-on experience with ROS and the |march|.
 Here is an overview of the different types of tutorials.
 
-Install ROS and Tools
+Install ROS and March
 ^^^^^^^^^^^^^^^^^^^^^
 .. include:: doc/getting_started/install_ros_and_tools.rst
   :start-after: inclusion-introduction-start

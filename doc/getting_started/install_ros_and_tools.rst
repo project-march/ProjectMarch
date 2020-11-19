@@ -1,39 +1,55 @@
 
-.. _install_ros_and_tools-label:
+.. install_ros_and_march-label:
 
-Install ROS and tools
+Install ROS and March
 =====================
 .. inclusion-introduction-start
 
-This tutorial will help you install ROS1 Melodic, ROS2 Foxy and the required buildtools and dependencies.
+This tutorial will help you install ROS1 Melodic, ROS2 Foxy, the MARCH repository, the required buildtools and dependencies.
 
 .. inclusion-introduction-end
+
+Download the MARCH source code
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The first step is to download the source code, you can either use ssh (recommended):
+
+.. code:: bash
+
+ cd ~/
+ git clone git@gitlab.com:project-march/march.git
+
+Or use https:
+
+.. code:: bash
+
+ cd ~/
+ git clone https://gitlab.com/project-march/march.git
 
 Install ROS1 Melodic
 ^^^^^^^^^^^^^^^^^^^^
 This tutorial is mostly copied from `Install ROS1 Melodic <https://wiki.ros.org/melodic/Installation/Ubuntu>`_.
 
-1) First, install some tools:
+1. First, install some tools:
 
 ..  code:: bash
 
-    sudo apt install lsb-release gnupg2
+    sudo apt install lsb-release gnupg2 python3-colcon-common-extensions
 
 
-2) The next step is to setup your sources.list:
+2. The next step is to setup your sources.list:
 
 .. code:: bash
 
     sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 
 
-3) Then, setup your keys:
+3. Then, setup your keys:
 
 .. code:: bash
 
     sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 
-4) If these steps went well, you should be able to install ROS Melodic:
+4. If these steps went well, you should be able to install ROS Melodic:
 
 .. code:: bash
 
@@ -41,7 +57,7 @@ This tutorial is mostly copied from `Install ROS1 Melodic <https://wiki.ros.org/
     sudo apt install ros-melodic-desktop-full
 
 
-5) Once you have ROS installed, make sure you have the most up to date packages:
+5. Once you have ROS installed, make sure you have the most up to date packages:
 
 .. code:: bash
 
@@ -50,27 +66,21 @@ This tutorial is mostly copied from `Install ROS1 Melodic <https://wiki.ros.org/
   sudo apt update
   sudo apt full-upgrade
 
-6) Finally , for building our packages we use colcon. Install `colcon <https://github.com/colcon>`_:
+6. Finally, the following will install any ROS1 Melodic package dependencies not already in your workspace:
 
 .. code:: bash
 
-  sudo apt-get install python3-colcon-common-extensions
-
-..
-    comment for now because this doesnt actually seem relevant on this page
-    To install some optional tools that are run by GitLab Continuous Integration run:
-    .. code:: bash
-
-      pip install --user catkin_lint
-      python2 -m pip install --user flake8 pep8-naming flake8-blind-except flake8-string-format flake8-builtins flake8-commas flake8-quotes flake8-print flake8-docstrings flake8-import-order
-      sudo apt install clang-format
+  sudo apt update
+  source /opt/ros/melodic/setup.bash
+  cd ~/march/ros1/
+  rosdep install -y --from-paths src --ignore-src
 
 Install ROS2 Foxy
 ^^^^^^^^^^^^^^^^^
 Installing ROS2 Foxy requires some more effort than installing ROS1 Melodic.
 This tutorial is a slightly updated version of `Install ROS2 Foxy <https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Development-Setup/>`_.
 
-1) The first step is to update the CMake version, as the default Ubuntu 18.04 doesn't comply with some ROS2 packages (This may take some time):
+1. The first step is to update the CMake version, as the default Ubuntu 18.04 doesn't comply with some ROS2 packages (This may take some time):
 
 .. code:: bash
 
@@ -93,7 +103,7 @@ The output should be exactly:
 
     CMake suite maintained and supported by Kitware (kitware.com/cmake).
 
-2) Then we have to make sure the right locale is set:
+2. Then we have to make sure the right locale is set:
 
 .. code:: bash
 
@@ -106,20 +116,20 @@ The output should be exactly:
 
     locale  # verify settings
 
-3) Now we can add the ROS2 apt repository:
+3. Now we can add the ROS2 apt repository:
 
 .. code:: bash
 
     sudo apt update && sudo apt install curl gnupg2 lsb-release
     curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
 
-4) And add the repository to the sources list
+4. And add the repository to the sources list
 
 .. code:: bash
 
     sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
 
-5) The next step is to install the necessary development and ROS tools:
+5. The next step is to install the necessary development and ROS tools:
 
 .. code:: bash
 
@@ -157,7 +167,7 @@ The output should be exactly:
     sudo apt install --no-install-recommends -y \
       libcunit1-dev
 
-6) Now we can create a ROS2 Foxy workspace and retrieve the code:
+6. Now we can create a ROS2 Foxy workspace and retrieve the code:
 
 .. code:: bash
 
@@ -166,26 +176,34 @@ The output should be exactly:
     wget https://raw.githubusercontent.com/ros2/ros2/foxy/ros2.repos
     vcs import src < ros2.repos
 
-7) Install dependencies using rosdep:
+7. Install dependencies using rosdep:
 
 .. code:: bash
 
     rosdep update
     rosdep install --from-paths src --ignore-src --rosdistro foxy -y --skip-keys "console_bridge fastcdr fastrtps rti-connext-dds-5.3.1 urdfdom_headers"
 
-8) Some additional dependencies have to be manually added:
+8. Some additional dependencies have to be manually added using the .repos file from the main march repository. Run the following:
 
 .. code:: bash
 
-    cd ~/ros2_foxy/src/ros2/
-    git clone https://github.com/ros/xacro.git -b dashing-devel
-    git clone https://github.com/ros/urdf_parser_py.git -b ros2
-    git clone https://github.com/ros-controls/control_msgs.git -b foxy-devel
+    cd ~/ros2_foxy/
+    wget https://gitlab.com/project-march/march/-/raw/main/ros2_dependencies.repos
+    vcs import src < ros2_dependencies.repos
 
-8) The final step is to build the ROS2 code. This may take a long time (> 1h):
+9. The final step is to build the ROS2 code. This may take a long time (> 1h):
 
 .. code:: bash
 
     cd ~/ros2_foxy/
     # skip ros1_bridge package since that has to configured later
     colcon build --symlink-install --packages-skip ros1_bridge
+
+Install Python dependencies
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Some additional python dependencies have to be installed using pip:
+
+.. code:: bash
+
+  python -m pip install -r ~/march/requirements.txt
+

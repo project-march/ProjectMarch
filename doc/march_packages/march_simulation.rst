@@ -27,8 +27,7 @@ so that the exoskeleton can move relative to the world. The launch command becom
 
 One can add an obstacle in simulation by adding the "obstacle:=<<obstacle_name>>" to the command. The possible
 obstacles can be found in the obstacles folder of the march_simulation package. The current obstacles were created
-after four of the `obstacles <https://ethz.ch/content/dam/ethz/special-interest/conference-websites-dam/cybathlon-dam/documents/CYBATHLON_Races_and_Rules.pdf/>`_
-in the Cybathlon 2020. Creating a new xacro file in the obstacles folder is all that is needed to create a new obstacle
+after four of the obstacles in the Cybathlon 2020. Creating a new xacro file in the obstacles folder is all that is needed to create a new obstacle
 for the simulation.
 
 Code structure
