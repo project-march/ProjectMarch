@@ -68,4 +68,4 @@ joints:
     time_from_start: {nsecs: 550000000, secs: 1}
     velocity: 0.0
 name: right_close
-version: MVI_haa
+version: MVI_walk_rigthclose_haa_v1
