@@ -96,8 +96,8 @@ This tutorial is a slightly updated version of `Install ROS2 Foxy <https://index
 
     cd ~/
     sudo apt update && sudo apt install -y build-essential libssl-dev wget
-    wget https://github.com/Kitware/CMake/archive/v3.18.4.tar.gz && tar -zxvf v3.18.4.tar.gz && rm v3.18.4.tar.gz && cd CMake-3.18.4 && ./bootstrap && make && cd .. && mv CMake-3.18.4 .CMake-3.18.4
-    cd .CMake-3.18.4 && sudo ln -s $(pwd) /usr/local/share/cmake-3.18 && sudo ln $(pwd)/bin/* /usr/local/bin
+    wget https://github.com/Kitware/CMake/archive/v3.19.0.tar.gz && tar -zxvf v3.19.0.tar.gz && rm v3.19.0.tar.gz && cd CMake-3.19.0 && ./bootstrap && make && cd .. && mv CMake-3.19.0 .CMake-3.19.0
+    cd .CMake-3.19.0 && sudo ln -s $(pwd) /usr/local/share/cmake-3.19 && sudo ln $(pwd)/bin/* /usr/local/bin
 
 Verify CMake is correctly updated by running:
 
@@ -109,7 +109,7 @@ The output should be exactly:
 
 .. code::
 
-    cmake version 3.18.4
+    cmake version 3.19.0
 
     CMake suite maintained and supported by Kitware (kitware.com/cmake).
 
