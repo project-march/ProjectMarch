@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot  xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <xacro:macro name="bench" params="length:=0.5 width:=1 height:=0.4">
+    <xacro:macro name="bench" params="length:=0.5 width:=1 height:=0.5">
         <gazebo>
             <static>true</static>
         </gazebo>

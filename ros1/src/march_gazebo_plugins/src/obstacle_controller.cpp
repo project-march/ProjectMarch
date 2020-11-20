@@ -31,8 +31,8 @@ ObstacleController::ObstacleController(physics::ModelPtr model)
   foot_left_ = model_->GetLink("ankle_plate_left");
   foot_right_ = model_->GetLink("ankle_plate_right");
   ros::param::get("balance", balance_);
-
-  default_subgait_name_ = "home_stand";
+  // As long as no sitting gait is executed, the default to use when no subgait is idle_stand
+  default_subgait_name_ = "idle_stand";
   subgait_changed_ = true;
 
   mass = 0.0;
@@ -166,14 +166,22 @@ void ObstacleController::getGoalPosition(double time_since_start, double& goal_p
   goal_position_x = stable_foot_pose.X();
   goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
 
-  if (subgait_name_ == "sit_home") {
+  // If the exoskeleton is in an idle sit position, put the CoM a bit behind the stable foot
+  if (subgait_name_ == "idle_sit") {
     goal_position_x = stable_foot_pose.X() + 0.25 * swing_step_size_;
-  }
+  } // If the exoskeleton is in an idle stand position, put the CoM on the stable foot
+  if (subgait_name_ == "idle_stand") {
+    goal_position_x = stable_foot_pose.X();
+  }// Change the default that is used without a subgait to idle_sit after sitting
+    // During the sitting down the CoM will be controlled between the stable foot and the final sit
   else if (subgait_name_.find("sit") != std::string::npos) {
-    default_subgait_name_ = "sit_home";
-  }
+    default_subgait_name_ = "idle_sit";
+    goal_position_x = stable_foot_pose.X() + 0.1 * swing_step_size_;
+  } // Change the default that is used without a subgait to idle_stand after standing up
+    // During the standing the CoM will be controlled between the stable foot and the final sit
   else if (subgait_name_.find("stand") != std::string::npos) {
-    default_subgait_name_ = "home_stand";
+    default_subgait_name_ = "idle_stand";
+    goal_position_x = stable_foot_pose.X() + 0.1 * swing_step_size_;
   }
   // Start goal position a quarter step size behind the stable foot
   // Move the goal position forward with v = 0.5 * swing_step_size/subgait_duration
