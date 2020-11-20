@@ -82,8 +82,11 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left
   double time_since_start = model_->GetWorld()->SimTime().Double() - subgait_start_time_;
   if (time_since_start > 1.05 * subgait_duration_)
   {
+    if (subgait_name_ != default_subgait_name_ and subgait_name_ != "home_stand" and subgait_name_ != "sit_home")
+    {
+        subgait_changed_ = true;
+    }
     subgait_name_ = default_subgait_name_;
-    subgait_changed_ = true;
   }
 
   auto model_com = GetCom();
@@ -168,9 +171,9 @@ void ObstacleController::getGoalPosition(double time_since_start, double& goal_p
 
   // If the exoskeleton is in an idle sit position, put the CoM a bit behind the stable foot
   if (subgait_name_ == "idle_sit") {
-    goal_position_x = stable_foot_pose.X() + 0.25 * swing_step_size_;
+    goal_position_x = stable_foot_pose.X() + 0.2 * swing_step_size_;
   } // If the exoskeleton is in an idle stand position, put the CoM on the stable foot
-  if (subgait_name_ == "idle_stand") {
+  else if (subgait_name_ == "idle_stand") {
     goal_position_x = stable_foot_pose.X();
   }// Change the default that is used without a subgait to idle_sit after sitting
     // During the sitting down the CoM will be controlled between the stable foot and the final sit
