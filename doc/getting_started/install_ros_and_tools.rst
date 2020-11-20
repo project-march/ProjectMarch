@@ -11,11 +11,19 @@ This tutorial will help you install ROS1 Melodic, ROS2 Foxy, the MARCH repositor
 
 Download the MARCH source code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The first step is to download the source code, you can either use ssh (recommended):
+First, make sure both git and git lfs are installed:
+
+.. code:: bash
+
+    sudo apt install git
+    curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+
+The next step is to download the source code, you can either use ssh (recommended):
 
 .. code:: bash
 
  cd ~/
+ git lfs install
  git clone git@gitlab.com:project-march/march.git
 
 Or use https:
@@ -23,6 +31,7 @@ Or use https:
 .. code:: bash
 
  cd ~/
+ git lfs install
  git clone https://gitlab.com/project-march/march.git
 
 Install ROS1 Melodic
@@ -61,6 +70,7 @@ This tutorial is mostly copied from `Install ROS1 Melodic <https://wiki.ros.org/
 
 .. code:: bash
 
+  sudo apt install python-rosdep
   sudo rosdep init
   rosdep update  # No sudo
   sudo apt update

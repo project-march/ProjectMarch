@@ -57,7 +57,7 @@ Building the bridge
 
 Building the bridge usually only needs to be done once.
 Rebuilding the bridge is only necessary when new messages are added in both ROS1 and ROS2 which need to be bridged.
-To build to bridge, you have to source *all* your ROS files,
+To build the bridge, you have to source *all* your ROS files,
 and then use colcon to build the 'ros1_bridge' package:
 
 .. code:: bash
