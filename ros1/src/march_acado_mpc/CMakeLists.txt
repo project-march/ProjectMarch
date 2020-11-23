@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 
-project(march_acado_mpc DESCRIPTION "Project to perform model predictive control with the help of ACADO"
-                        LANGUAGES CXX)
+project(march_acado_mpc DESCRIPTION "Model predictive control with the help of ACADO"
+    LANGUAGES CXX C)
 
 # Define which packages this package depends on
 find_package(catkin REQUIRED 
@@ -13,8 +13,9 @@ find_package(catkin REQUIRED
 catkin_package(
         INCLUDE_DIRS include
         LIBRARIES ${PROJECT_NAME}
-        # Define the catkin projects that this project depends on. If another project does
-        # "find_package(march_acado_mpc)" these packages will be seen as transitive dependencies.
+        # Define the catkin projects that this project depends on. If another project
+        # does "find_package(march_acado_mpc)" these packages will be seen as
+        # transitive dependencies.
         CATKIN_DEPENDS march_shared_resources roscpp std_msgs
 )
 
@@ -33,13 +34,9 @@ FetchContent_MakeAvailable(acado-solver)
 # Define a variable that points to the location of the ACADO. This
 # location is chosen by FetchContent_Declare.
 set(ACADO_DIR "${PROJECT_BINARY_DIR}/_deps/acado-solver-src")
-
-file(GLOB_RECURSE ACADO_SRCS 
-    RELATIVE "${ACADO_DIR}"
-    CONFIGURE_DEPENDS
-    *.c   
-    *.cpp
-)
+# Create a list of all source files in the ACADO directory and store it
+# in ACADO_SRCS.
+aux_source_directory("${ACADO_DIR}" ACADO_SRCS)
 
 ##################################################
 # ACADO LIBRARY WITH BOTH THE SOLVER AND QPOASES #
@@ -57,10 +54,7 @@ include_directories(
         lib/qpoases/SRC
 )
 
-# A recursive way of including all files above
-file(GLOB_RECURSE QPOASES_SRCS
-        lib/qpoases/SRC/*.cpp
-        )
+aux_source_directory(lib/qpoases/SRC QPOASES_SRCS)
 
 add_library(${PROJECT_NAME}
         src/acado_mpc.cpp
