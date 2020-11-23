@@ -76,7 +76,7 @@ class GaitSelection(Node):
     def _create_services(self):
         self.create_service(srv_type=Trigger,
                             srv_name='/march/gait_selection/get_version_map',
-                            callback=lambda msg: [True, str(self.gait_version_map)])
+                            callback=lambda req, res: Trigger.Response(success=True, message=str(self.gait_version_map)))
 
         self.create_service(srv_type=SetGaitVersion,
                             srv_name='/march/gait_selection/set_gait_version',
@@ -84,11 +84,11 @@ class GaitSelection(Node):
 
         self.create_service(srv_type=Trigger,
                             srv_name='/march/gait_selection/get_directory_structure',
-                            callback=lambda msg: [True, str(self.scan_directory())])
+                            callback=lambda req, res: Trigger.Response(success=True, message=str(self.scan_directory())))
 
         self.create_service(srv_type=Trigger,
                             srv_name='/march/gait_selection/update_default_versions',
-                            callback=lambda msg: self.update_default_versions())
+                            callback=self.update_default_versions_cb)
 
         self.create_service(srv_type=ContainsGait,
                             srv_name='/march/gait_selection/contains_gait',
@@ -132,23 +132,27 @@ class GaitSelection(Node):
             self._robot, self._gait_directory, version_map)
         self._gait_version_map[gait_name].update(version_map)
 
-    def set_gait_versions_cb(self, msg):
+    def set_gait_versions_cb(self, request, response):
         """Sets a new gait version to the gait selection instance.
 
         :type msg: march_shared_resources.srv.SetGaitVersionRequest
         :rtype march_shared_resources.srv.SetGaitVersionResponse
         """
-        if len(msg.subgaits) != len(msg.versions):
+        if len(request.subgaits) != len(request.versions):
             return [False, '`subgaits` and `versions` array are not of equal length']
 
-        version_map = dict(zip(msg.subgaits, msg.versions))
+        version_map = dict(zip(request.subgaits, request.versions))
         try:
-            self.set_gait_versions(msg.gait, version_map)
-            return [True, '']
+            self.set_gait_versions(request.gait, version_map)
+            response.success = True
+            response.message = ''
+            return response
         except Exception as e:
-            return [False, str(e)]
+            response.success = False
+            response.message = str(e)
+            return response
 
-    def contains_gait_cb(self, request):
+    def contains_gait_cb(self, request, response):
         """
         Checks whether a gait and subgait are loaded.
 
@@ -157,12 +161,13 @@ class GaitSelection(Node):
         :return: True when the gait and subgait are loaded
         """
         gait = self._loaded_gaits.get(request.gait)
+        response.contains = True
         if gait is None:
-            return ContainsGait.Response(contains=False)
+            response.contains = False
         for subgait in request.subgaits:
             if gait[subgait] is None:
-                return ContainsGait.Response(contains=False)
-        return ContainsGait.Response(contains=True)
+                response.contains = False
+        return response
 
     def scan_directory(self):
         """Scans the gait_directory recursively and create a dictionary of all
@@ -190,7 +195,7 @@ class GaitSelection(Node):
                 gaits[gait] = subgaits
         return gaits
 
-    def update_default_versions(self):
+    def update_default_versions_cb(self, request, response):
         """Updates the default.yaml file with the current loaded gait versions."""
         new_default_dict = {'gaits': self._gait_version_map, 'positions': self._positions}
 
@@ -199,12 +204,12 @@ class GaitSelection(Node):
                 yaml_content = yaml.dump(new_default_dict, default_flow_style=False)
                 default_yaml_content.write(yaml_content)
 
-            return [True, 'New default values were written to: {pn}'
-                          .format(pn=self._default_yaml)]
+            return Trigger.Response(success=True, message='New default values were written to: {pn}'
+                                    .format(pn=self._default_yaml))
 
         except IOError:
-            return [False, 'Error occurred when writing to file path: {pn}'
-                           .format(pn=self._default_yaml)]
+            return Trigger.Response(success=False, message='Error occurred when writing to file path: {pn}'
+                                    .format(pn=self._default_yaml))
 
     def add_gait(self, gait):
         """Adds a gait to the loaded gaits if it does not already exist.

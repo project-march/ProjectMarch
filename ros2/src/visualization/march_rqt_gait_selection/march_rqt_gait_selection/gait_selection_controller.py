@@ -22,6 +22,9 @@ class GaitSelectionController(object):
     def get_version_map(self):
         """Get the gait version map used in the gait selection node."""
         try:
+            while not self._get_version_map.wait_for_service(timeout_sec=2):
+                self._node.get_logger().warn(
+                    "Waiting for get_version_map service to be available, is gait selection running?")
             return dict(ast.literal_eval(self._get_version_map.call(Trigger.Request()).message))
         except ValueError:
             raise InvalidResponseError
@@ -31,6 +34,9 @@ class GaitSelectionController(object):
     def get_directory_structure(self):
         """Get the gait directory of the selected gait_directory in the gait selection node."""
         try:
+            while not self._get_version_map.wait_for_service(timeout_sec=2):
+                self._node.get_logger().warn(
+                    "Waiting for get_directory_structure service to be available, is gait selection running?")
             return dict(ast.literal_eval(self._get_directory_structure.call(Trigger.Request()).message))
         except ValueError:
             raise InvalidResponseError
@@ -45,6 +51,8 @@ class GaitSelectionController(object):
         :param list(str) versions: Names of the versions
         """
         # try:
+        while not self._get_version_map.wait_for_service(timeout_sec=2):
+            self._node.get_logger().warn("Waiting for set_gait_version service to be available, is gait selection running?")
         result = self._set_gait_version.call(
             SetGaitVersion.Request(gait=gait_name, subgait=subgait_names, versions=versions))
         return result.success, result.message
@@ -54,6 +62,8 @@ class GaitSelectionController(object):
     def set_default_versions(self):
         """Save the current gait version map in the gait selection node as a default."""
         # try:
+        while not self._get_version_map.wait_for_service(timeout_sec=2):
+            self._node.get_logger().warn("Waiting for set_default_versions service to be available, is gait selection running?")
         result = self._set_default_versions.call(Trigger.Request())
         return result.success, result.message
         # except rospy.ServiceException:
