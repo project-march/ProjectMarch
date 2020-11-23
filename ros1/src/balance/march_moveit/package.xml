@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>march_moveit</name>
+  <version>0.3.0</version>
+  <description>
+     An automatically generated package with all the configuration and launch files for using the march with the MoveIt! Motion Planning Framework
+  </description>
+  <author email="software@projectmarch.nl">Project MARCH</author>
+  <maintainer email="software@projectmarch.nl">Project MARCH</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://moveit.ros.org/</url>
+  <url type="bugtracker">https://github.com/ros-planning/moveit/issues</url>
+  <url type="repository">https://github.com/ros-planning/moveit</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>controller_manager</exec_depend>
+  <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>joint_state_publisher</exec_depend>
+  <exec_depend>joy</exec_depend>
+  <exec_depend>march_description</exec_depend>
+  <exec_depend>moveit_fake_controller_manager</exec_depend>
+  <exec_depend>moveit_kinematics</exec_depend>
+  <exec_depend>moveit_planners_ompl</exec_depend>
+  <exec_depend>moveit_ros_benchmarks</exec_depend>
+  <exec_depend>moveit_ros_move_group</exec_depend>
+  <exec_depend>moveit_ros_visualization</exec_depend>
+  <exec_depend>moveit_ros_warehouse</exec_depend>
+  <exec_depend>moveit_setup_assistant</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>rviz</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>warehouse_ros_mongo</exec_depend>
+  <exec_depend>xacro</exec_depend>
+</package>
