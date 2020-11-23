@@ -21,5 +21,4 @@
   <exec_depend>rospy</exec_depend>
   <exec_depend>tf2_ros</exec_depend>
   <exec_depend>tf</exec_depend>
-  <exec_depend>march_launch</exec_depend>
 </package>
