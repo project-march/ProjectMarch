@@ -11,23 +11,9 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <depend>control_msgs</depend>
-  <depend>controller_manager</depend>
-  <depend>controller_interface</depend>
-  <depend>joint_state_controller</depend>
-  <depend>joint_trajectory_controller</depend>
-  <depend>march_hardware</depend>
   <depend>march_shared_resources</depend>
   <depend>roscpp</depend>
   <depend>std_msgs</depend>
-
-<!--  <build_export_depend>march_shared_resources</build_export_depend>-->
-<!--  <build_export_depend>roscpp</build_export_depend>-->
-<!--  <build_export_depend>std_msgs</build_export_depend>-->
-
-<!--  <exec_depend>march_shared_resources</exec_depend>-->
-<!--  <exec_depend>roscpp</exec_depend>-->
-<!--  <exec_depend>std_msgs</exec_depend>-->
 
   <test_depend>rosunit</test_depend>
 </package>

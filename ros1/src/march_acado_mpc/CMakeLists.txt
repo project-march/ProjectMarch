@@ -27,13 +27,13 @@ catkin_package(
 ################
 # Fetch the latest version of the acado solver from the Project MARCH GitLab. This
 # is downloaded in the _deps/acado-solver-src folder in the build directory.
-FetchContent_Declare(acado-solver
+fetchcontent_declare(acado-solver
     GIT_REPOSITORY "https://gitlab.com/project-march/libraries/acado-solver.git"
     GIT_TAG "main"
     GIT_SHALLOW true
 )
 if(NOT acado-solver_POPULATED)
-    FetchContent_Populate(acado-solver)
+    fetchcontent_populate(acado-solver)
 endif()
 
 # Define a variable that points to the location of the ACADO. This
@@ -49,13 +49,13 @@ aux_source_directory("${ACADO_DIR}" ACADO_SRCS)
 ###########
 # qpOASES has a version on GitHub, but it is not the version that is needed. We
 # need qpOASES that is included with acado.
-FetchContent_Declare(acado
+fetchcontent_declare(acado
     GIT_REPOSITORY "https://github.com/acado/acado.git"
     GIT_TAG "stable"
     GIT_SHALLOW true
 )
 if(NOT acado_POPULATED)
-    FetchContent_Populate(acado)
+    fetchcontent_populate(acado)
 endif()
 
 # Define a variable that points to the location of the qpOASES. This
