@@ -126,6 +126,3 @@
 
 
 </robot>
-
-<!--         <origin xyz="${-1 * sin(radians(45) - ramp_up_slope) * (ramp_up_length / sqrt(2)) - platform_length / 2} 0
-        ${cos(radians(45) - ramp_up_slope) * (ramp_up_length / sqrt(2)) - platform_height / 2}" rpy="0 ${-1 * ramp_up_slope} 0"/> -->
