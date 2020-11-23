@@ -1,8 +1,11 @@
-cmake_minimum_required(VERSION 3.10)
-PROJECT(march_acado_mpc)
+cmake_minimum_required(VERSION 3.18)
 
+project(march_acado_mpc DESCRIPTION "Project to perform model predictive control with the help of ACADO"
+                        LANGUAGES CXX)
 
-find_package(catkin REQUIRED COMPONENTS
+# Define which packages this package depends on
+find_package(catkin REQUIRED 
+        COMPONENTS
         march_shared_resources
         roscpp
         std_msgs)
@@ -10,15 +13,41 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
         INCLUDE_DIRS include
         LIBRARIES ${PROJECT_NAME}
-        CATKIN_DEPENDS
-        std_msgs
-        roscpp
+        # Define the catkin projects that this project depends on. If another project does
+        # "find_package(march_acado_mpc)" these packages will be seen as transitive dependencies.
+        CATKIN_DEPENDS march_shared_resources roscpp std_msgs
 )
 
+################
+# ACADO SOLVER #
+################
+# Fetch the latest version of the acado solver from the Project MARCH GitLab. This
+# is downloaded in the _deps/acado-solver-src folder in the build directory.
+include(FetchContent)
+FetchContent_Declare(acado-solver
+    GIT_REPOSITORY "https://gitlab.com/project-march/libraries/acado-solver.git"
+    GIT_TAG "main"
+)
+FetchContent_MakeAvailable(acado-solver)
+
+# Define a variable that points to the location of the ACADO. This
+# location is chosen by FetchContent_Declare.
+set(ACADO_DIR "${PROJECT_BINARY_DIR}/_deps/acado-solver-src")
+
+file(GLOB_RECURSE ACADO_SRCS 
+    RELATIVE "${ACADO_DIR}"
+    CONFIGURE_DEPENDS
+    *.c   
+    *.cpp
+)
+
+##################################################
+# ACADO LIBRARY WITH BOTH THE SOLVER AND QPOASES #
+##################################################
 include_directories(
-        include/${PROJECT_NAME}
-        ${catkin_INCLUDE_DIRS}
-        generated_src/
+        "include/${PROJECT_NAME}"
+        "${catkin_INCLUDE_DIRS}"
+        "${ACADO_DIR}"
 
         # "lib/qpoases" is needed for acado_qpoases_interface to correctly build
         # as this generated file includes "INCLUDE/QProblem.hpp". This path would
@@ -26,46 +55,7 @@ include_directories(
         lib/qpoases
         lib/qpoases/INCLUDE
         lib/qpoases/SRC
-
-
 )
-
-# Create an object that contains all ACADO sources
-#set(ACADO_SRCS
-#        generated_src/acado_auxiliary_functions.c
-#        generated_src/acado_integrator.c
-#        generated_src/acado_qpoases_interface.cpp
-#        generated_src/acado_solver.c
-#        )
-
-# A recursive way of including all files above
-file(GLOB ACADO_SRCS
-        generated_src/*.c
-        generated_src/*.cpp
-        )
-
-# Create an object that contains all qpOASES sources
-#set(QPOASES_SRCS
-#        lib/qpoases/SRC/Bounds.cpp
-#        lib/qpoases/SRC/Constraints.cpp
-#        lib/qpoases/SRC/CyclingManager.cpp
-#        lib/qpoases/SRC/Indexlist.cpp
-#        lib/qpoases/SRC/MessageHandling.cpp
-#        lib/qpoases/SRC/QProblem.cpp
-#        lib/qpoases/SRC/QProblemB.cpp
-#        lib/qpoases/SRC/SubjectTo.cpp
-#        lib/qpoases/SRC/Utils.cpp
-#
-#        lib/qpoases/SRC/Bounds.ipp
-#        lib/qpoases/SRC/Constraints.ipp
-#        lib/qpoases/SRC/CyclingManager.ipp
-#        lib/qpoases/SRC/Indexlist.ipp
-#        lib/qpoases/SRC/MessageHandling.ipp
-#        lib/qpoases/SRC/QProblem.ipp
-#        lib/qpoases/SRC/QProblemB.ipp
-#        lib/qpoases/SRC/SubjectTo.ipp
-#        lib/qpoases/SRC/Utils.ipp
-#        )
 
 # A recursive way of including all files above
 file(GLOB_RECURSE QPOASES_SRCS
@@ -74,13 +64,15 @@ file(GLOB_RECURSE QPOASES_SRCS
 
 add_library(${PROJECT_NAME}
         src/acado_mpc.cpp
-        ${ACADO_SRCS}
-        ${QPOASES_SRCS}
-        )
-
+        "${QPOASES_SRCS}"
+        "${ACADO_SRCS}"
+)
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
+############
+# ROS NODE #
+############
 add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node)
 add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
