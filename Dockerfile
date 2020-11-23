@@ -16,8 +16,8 @@ RUN rosdep install -y --from-paths ros1/src --ignore-src && pip install numpy_ri
 # Remove project files from container
 RUN rm -rf /projects
 
-# Update CMake to version 3.19
+# Update CMake to version 3.18
 WORKDIR /root
-RUN wget https://github.com/Kitware/CMake/archive/v3.19.0.tar.gz && tar -zxvf v3.19.0.tar.gz && rm v3.19.0.tar.gz && cd CMake-3.19.0 && ./bootstrap && make && cd .. && mv CMake-3.19.0 .CMake-3.19.0 && cd .CMake-3.19.0 && ln -s $(pwd) /usr/local/share/cmake-3.19 && ln $(pwd)/bin/* /usr/local/bin
+RUN wget https://github.com/Kitware/CMake/archive/v3.18.5.tar.gz && tar -zxvf v3.18.5.tar.gz && rm v3.18.5.tar.gz && cd CMake-3.18.5 && ./bootstrap && make && cd .. && mv CMake-3.18.5 .CMake-3.18.5 && cd .CMake-3.18.5 && ln -s $(pwd) /usr/local/share/cmake-3.18 && ln $(pwd)/bin/* /usr/local/bin
 
 RUN rm -rf /var/lib/apt/lists/* && rm -rf /var/cache/apt/archives && apt-get clean
