@@ -1,4 +1,5 @@
 # ignore Clion specific directories
 /cmake-build-debug
 /.idea
+/../../.idea
 
