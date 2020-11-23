@@ -23,7 +23,6 @@ class GaitSelectionView(QWidget):
         super(GaitSelectionView, self).__init__(flags=Qt.Window)
 
         self._controller = controller
-
         # Extend the widget with all attributes and children from UI file
         loadUi(ui_file, self)
 
