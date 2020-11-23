@@ -5,6 +5,6 @@ find_package(catkin REQUIRED)
 
 catkin_package()
 
-install(DIRECTORY minimal airgait-v test_versions-vi training-v simulation_only-vi
+install(DIRECTORY airgait-v minimal simulation_only-vi test_versions-vi training-v
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
