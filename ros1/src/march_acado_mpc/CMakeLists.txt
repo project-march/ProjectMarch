@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.18)
 project(march_acado_mpc DESCRIPTION "Model predictive control with the help of ACADO"
     LANGUAGES CXX C)
 
+# Enable the FetchContent CMake module.
+include(FetchContent)
+
 # Define which packages this package depends on
 find_package(catkin REQUIRED 
         COMPONENTS
@@ -24,19 +27,44 @@ catkin_package(
 ################
 # Fetch the latest version of the acado solver from the Project MARCH GitLab. This
 # is downloaded in the _deps/acado-solver-src folder in the build directory.
-include(FetchContent)
 FetchContent_Declare(acado-solver
     GIT_REPOSITORY "https://gitlab.com/project-march/libraries/acado-solver.git"
     GIT_TAG "main"
+    GIT_SHALLOW true
 )
-FetchContent_MakeAvailable(acado-solver)
+if(NOT acado-solver_POPULATED)
+    FetchContent_Populate(acado-solver)
+endif()
 
 # Define a variable that points to the location of the ACADO. This
 # location is chosen by FetchContent_Declare.
 set(ACADO_DIR "${PROJECT_BINARY_DIR}/_deps/acado-solver-src")
+
 # Create a list of all source files in the ACADO directory and store it
 # in ACADO_SRCS.
 aux_source_directory("${ACADO_DIR}" ACADO_SRCS)
+
+###########
+# QPOASES #
+###########
+# qpOASES has a version on GitHub, but it is not the version that is needed. We
+# need qpOASES that is included with acado.
+FetchContent_Declare(acado
+    GIT_REPOSITORY "https://github.com/acado/acado.git"
+    GIT_TAG "stable"
+    GIT_SHALLOW true
+)
+if(NOT acado_POPULATED)
+    FetchContent_Populate(acado)
+endif()
+
+# Define a variable that points to the location of the qpOASES. This
+# location is chosen by FetchContent_Declare.
+set(QPOASES_DIR "${PROJECT_BINARY_DIR}/_deps/acado-src/external_packages/qpoases")
+
+# Create a list of all source files in the qpOASES source folder and store it
+# in QPOASES_SRCS.
+aux_source_directory("${QPOASES_DIR}/SRC" QPOASES_SRCS)
 
 ##################################################
 # ACADO LIBRARY WITH BOTH THE SOLVER AND QPOASES #
@@ -47,14 +75,11 @@ include_directories(
         "${ACADO_DIR}"
 
         # "lib/qpoases" is needed for acado_qpoases_interface to correctly build
-        # as this generated file includes "INCLUDE/QProblem.hpp". This path would
-        # only be correct if the qpoases directory was also located in generated_src
-        lib/qpoases
-        lib/qpoases/INCLUDE
-        lib/qpoases/SRC
+        # as this generated file includes "INCLUDE/QProblem.hpp".
+        ${QPOASES_DIR}
+        ${QPOASES_DIR}/INCLUDE
+        ${QPOASES_DIR}/SRC
 )
-
-aux_source_directory(lib/qpoases/SRC QPOASES_SRCS)
 
 add_library(${PROJECT_NAME}
         src/acado_mpc.cpp
