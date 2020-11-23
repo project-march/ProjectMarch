@@ -14,12 +14,12 @@ find_package(catkin REQUIRED
         std_msgs)
 
 catkin_package(
-        INCLUDE_DIRS include
-        LIBRARIES ${PROJECT_NAME}
-        # Define the catkin projects that this project depends on. If another project
-        # does "find_package(march_acado_mpc)" these packages will be seen as
-        # transitive dependencies.
-        CATKIN_DEPENDS march_shared_resources roscpp std_msgs
+    INCLUDE_DIRS include
+    LIBRARIES ${PROJECT_NAME}
+    # Define the catkin projects that this project depends on. If another project
+    # does "find_package(march_acado_mpc)" these packages will be seen as
+    # transitive dependencies.
+    CATKIN_DEPENDS march_shared_resources roscpp std_msgs
 )
 
 ################
@@ -70,7 +70,7 @@ aux_source_directory("${QPOASES_DIR}/SRC" QPOASES_SRCS)
 # ACADO LIBRARY WITH BOTH THE SOLVER AND QPOASES #
 ##################################################
 include_directories(
-        "include/${PROJECT_NAME}"
+        include
         "${catkin_INCLUDE_DIRS}"
         "${ACADO_DIR}"
 
@@ -96,7 +96,7 @@ add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node)
 add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 
-install(DIRECTORY include/${PROJECT_NAME}
+install(DIRECTORY include
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
         )
 install(TARGETS ${PROJECT_NAME}
