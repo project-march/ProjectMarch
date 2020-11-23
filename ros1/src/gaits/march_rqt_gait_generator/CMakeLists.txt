@@ -7,7 +7,8 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 catkin_python_setup()
-catkin_package()
+catkin_package(CATKIN_DEPENDS march_shared_resources)
+
 
 install(FILES plugin.xml
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
