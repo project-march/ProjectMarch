@@ -27,12 +27,14 @@ UniformDistribution::UniformDistribution(const int start, const int end):
  * @brief Set the range of an existing distribution to a new range.
  * @param start The lower bound (inclusive)
  * @param end The upper bound (inclusive)
- * @throws BadUniformDistribution If the end is smaller than the start.
  */
-void UniformDistribution::set_range(const int start, const int end)
+void UniformDistribution::set_range(int start, int end)
 {
-    // Invariant: check that the end is larger than the start.
-    if (end < start) throw BadUniformDistribution {};
+    // If the end is smaller than the start, swap them and treat the
+    // end as the start.
+    if (end < start) {
+        std::swap(start, end);
+    }
 
     std::uniform_int_distribution<int> new_distribution(start, end);
     distribution = new_distribution;

@@ -11,9 +11,6 @@ class UniformDistribution {
         std::uniform_int_distribution<int> distribution;
 
     public:
-        // Exception class in case the invariants do not hold.
-        class BadUniformDistribution {};
-
         UniformDistribution(const int start, const int end);
 
         // Assume the start to be 0 if only the end is specified.
