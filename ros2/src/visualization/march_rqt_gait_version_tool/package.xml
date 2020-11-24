@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>march_rqt_gait_selection</name>
+  <name>march_rqt_gait_version_tool</name>
   <version>0.0.0</version>
   <description>RQT plugin to switch the used version of gaits at runtime.</description>
 

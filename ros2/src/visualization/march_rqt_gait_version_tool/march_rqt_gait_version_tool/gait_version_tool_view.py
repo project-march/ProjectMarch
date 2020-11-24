@@ -2,8 +2,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QComboBox, QLabel, QWidget
 from python_qt_binding import loadUi
 
-from .gait_selection_errors import GaitSelectionError
-from .gait_selection_pop_up import PopUpWindow
+from .gait_version_tool_errors import GaitSelectionError
+from .gait_version_tool_pop_up import PopUpWindow
 from .parametric_pop_up import ParametricPopUpWindow
 
 

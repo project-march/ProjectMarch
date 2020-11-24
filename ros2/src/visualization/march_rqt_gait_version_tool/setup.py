@@ -5,9 +5,9 @@ from setuptools import setup
 from glob import glob
 import os
 
-package_name = 'march_rqt_gait_selection'
+package_name = 'march_rqt_gait_version_tool'
 
-ros1_source = os.path.join('..', '..', '..', '..', 'ros1', 'src', 'visualization', package_name)
+ros1_source = os.path.join('..', '..', '..', '..', 'ros1', 'src', 'visualization', 'march_rqt_gait_selection')
 
 setup(
     name=package_name,
@@ -33,7 +33,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'rqt_gait_selection = march_rqt_gait_selection.gait_selection_plugin:main'
+            'gait_version_tool = march_rqt_gait_version_tool.gait_version_tool_plugin:main'
         ],
     },
 )

@@ -3,7 +3,7 @@ import os
 import yaml
 from std_srvs.srv import Trigger
 from march_shared_msgs.srv import SetGaitVersion
-from .gait_selection_errors import InvalidResponseError
+from .gait_version_tool_errors import InvalidResponseError
 
 
 class GaitSelectionController(object):

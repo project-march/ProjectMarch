@@ -4,8 +4,8 @@ import sys
 from qt_gui.plugin import Plugin
 import rclpy
 from rclpy.node import Node
-from .gait_selection_controller import GaitSelectionController
-from .gait_selection_view import GaitSelectionView
+from .gait_version_tool_controller import GaitSelectionController
+from .gait_version_tool_view import GaitSelectionView
 from rqt_gui.main import Main
 from ament_index_python import get_package_share_directory
 

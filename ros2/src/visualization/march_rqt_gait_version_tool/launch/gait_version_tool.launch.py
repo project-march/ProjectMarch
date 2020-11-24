@@ -15,10 +15,10 @@ def generate_launch_description() -> launch.LaunchDescription:
             default_value='True',
             description='Whether to use simulation time'),
         Node(
-            package='march_rqt_gait_selection',
-            executable='rqt_gait_selection',
+            package='march_rqt_gait_version_tool',
+            executable='gait_version_tool',
             output='screen',
-            name='rqt_gait_selection',
+            name='gait_version_tool',
             parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}],
             # Give the source directory as argument to find the march_gait_files
             arguments=[EnvironmentVariable('PWD')]
