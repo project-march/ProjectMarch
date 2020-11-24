@@ -99,9 +99,14 @@ class GaitSelectionView(QWidget):
             try:
                 length = len(version)
                 version_number = ''.join(char for char in version[length - 2: length] if char.isdigit())
-                return int(version_number)
+                if version_number != '':
+                    return int(version_number)
+                else:
+                    return 998
             except ValueError:
                 return version
+            except:
+                return 9999
 
         self._is_update_active = True
         if self._is_refresh_active:
@@ -124,8 +129,9 @@ class GaitSelectionView(QWidget):
 
             subgait_menu.show()
             subgait_label.show()
-
+            self._log(f'{versions}')
             versions = sorted(versions, key=version_sorter)
+            self._log(f'Sorted: {versions}')
 
             subgait_label.setText(subgait_name)
             subgait_menu.addItems(versions)
@@ -191,7 +197,6 @@ class GaitSelectionView(QWidget):
         try:
             self.available_gaits = self._controller.get_directory_structure()
             self.version_map = self._controller.get_version_map()
-
             self._gait_menu.addItems(sorted(self.available_gaits.keys()))
 
             self._log('Directory data refreshed', 'success')
@@ -199,6 +204,7 @@ class GaitSelectionView(QWidget):
             self._log(str(e), 'error')
         finally:
             self._is_refresh_active = False
+            self.update_version_menus()
 
     # logger
     def _log(self, msg, color_tag='info'):

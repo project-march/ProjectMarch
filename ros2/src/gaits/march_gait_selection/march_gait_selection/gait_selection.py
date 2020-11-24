@@ -143,6 +143,7 @@ class GaitSelection(Node):
 
         version_map = dict(zip(request.subgaits, request.versions))
         try:
+            self.get_logger().info(f'Setting gait versions from {request}')
             self.set_gait_versions(request.gait, version_map)
             response.success = True
             response.message = ''

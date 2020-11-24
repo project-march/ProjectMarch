@@ -37,6 +37,9 @@ class GaitSelectionController(object):
             while not self._get_version_map.wait_for_service(timeout_sec=2):
                 self._node.get_logger().warn(
                     "Waiting for get_directory_structure service to be available, is gait selection running?")
+            self._node.get_logger().info(f"Get directory service")
+            result = dict(ast.literal_eval(self._get_directory_structure.call(Trigger.Request()).message))
+            self._node.get_logger().info(f"{result}")
             return dict(ast.literal_eval(self._get_directory_structure.call(Trigger.Request()).message))
         except ValueError:
             raise InvalidResponseError
@@ -53,8 +56,11 @@ class GaitSelectionController(object):
         # try:
         while not self._get_version_map.wait_for_service(timeout_sec=2):
             self._node.get_logger().warn("Waiting for set_gait_version service to be available, is gait selection running?")
+        self._node.get_logger().info(f"Set_gait_version service: {gait_name}")
+        self._node.get_logger().info(f"Set_gait_version service: {subgait_names}")
+        self._node.get_logger().info(f"Set_gait_version service: {versions}")
         result = self._set_gait_version.call(
-            SetGaitVersion.Request(gait=gait_name, subgait=subgait_names, versions=versions))
+            SetGaitVersion.Request(gait=gait_name, subgaits=subgait_names, versions=versions))
         return result.success, result.message
         # except rospy.ServiceException:
         #     raise GaitServiceError
@@ -64,6 +70,7 @@ class GaitSelectionController(object):
         # try:
         while not self._get_version_map.wait_for_service(timeout_sec=2):
             self._node.get_logger().warn("Waiting for set_default_versions service to be available, is gait selection running?")
+        self._node.get_logger().info(f"Set default service")
         result = self._set_default_versions.call(Trigger.Request())
         return result.success, result.message
         # except rospy.ServiceException:
