@@ -15,31 +15,37 @@
  * @details Apply an autoregression filter to the latest 7 randomly generated
  * temperatures to make the temperature less jittery.
  */
+UniformDistribution::UniformDistribution(const int start, const int end):
+    generator(random_device())
+{
+    set_range(start, end);
+}
 
-//int min_temperature;
-//int max_temperature;
-//std::vector<std::string> sensor_names;
-//std::vector<ros::Publisher> temperature_publishers;
-//
-//// Store the 7 most recent generated temperatures so we can take the weighted
-//// average of them when we publish.
-//std::vector<int> latest_temperatures;
-//
-//// The weights of the autoregression, the most recent temperature has the
-//// highest weight.
-//std::vector<float> ar_values;
-//
-//// Calculate the weighted average of the latest_temperatures
-//double calculateArTemperature(std::vector<int> temperatures, std::vector<float> ar_values)
-//{
-//  double res = 0;
-//  for (unsigned int i = 0; i < temperatures.size(); i++)
-//  {
-//    res += temperatures.at(i) * ar_values.at(i);
-//  }
-//  return res;
-//}
-//
+void UniformDistribution::set_range(const int start, const int end) 
+{
+    // Invariant: check that the end is larger than the start.
+    if (end < start) throw BadUniformDistribution {};
+
+    std::uniform_int_distribution<int> new_distribution(start, end);
+    distribution = new_distribution;
+}
+
+int UniformDistribution::get_random_number() 
+{
+    return distribution(generator);
+}
+
+// Calculate the weighted average of the latest_temperatures
+double calculateArTemperature(std::vector<int> temperatures, std::vector<float> ar_values)
+{
+  double res = 0;
+  for (unsigned int i = 0; i < temperatures.size(); i++)
+  {
+    res += temperatures.at(i) * ar_values.at(i);
+  }
+  return res;
+}
+
 ///**
 // * This callback is called when parameters from the config file are changed
 // * during run-time. This method updates the local values which depend on these
@@ -65,13 +71,13 @@
 // * @param end Highest number
 // * @return The Random number
 // */
-//int randBetween(int start, int end)
-//{
-//  std::random_device rd;
-//  std::mt19937 gen(rd());
-//  std::uniform_int_distribution<> dis(start, end);
-//  return dis(gen);
-//}
+int randBetween(int start, int end)
+{
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<> dis(start, end);
+  return dis(gen);
+}
 //
 ///**
 // * Publish a random temperature within the boundaries of the min and max
@@ -115,10 +121,6 @@
 //  }
 //  return full_topic;
 //}
-
-class FakeTemperatureDataNode : public rclcpp::Node {
-    
-};
 
 int main(int argc, char** argv)
 {
