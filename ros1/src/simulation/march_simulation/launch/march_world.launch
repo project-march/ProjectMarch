@@ -34,7 +34,7 @@
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
         <node name="upload_joint_names" pkg="march_simulation" type="upload_joint_names"/>
         <node name="world_transformer" pkg="march_simulation" type="to_world_transform" unless="$(arg fixed)"/>
-        <node name="change_obstacle_node" pkg="march_simulation" type="change_obstacle_dimensions"/>
+        <node name="set_obstacle_node" pkg="march_simulation" type="set_obstacle_dimensions"/>
 
         <include file="$(find march_fake_sensor_data)/launch/march_fake_sensor_data.launch" if="$(arg fake_sensor_data)"/>
     </group>

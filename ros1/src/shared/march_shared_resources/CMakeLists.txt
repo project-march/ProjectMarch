@@ -30,7 +30,6 @@ add_service_files(
     FILES
     CapturePointPose.srv
     ContainsGait.srv
-    ChangeObstacleSize.srv
     PossibleGaits.srv
     SetGaitVersion.srv
     GetParamStringList.srv
@@ -38,6 +37,7 @@ add_service_files(
     GetParamBool.srv
     GetParamInt.srv
     GetParamFloat.srv
+    SetObstacleSize.srv
     SetParamStringList.srv
     SetParamString.srv
     SetParamBool.srv
