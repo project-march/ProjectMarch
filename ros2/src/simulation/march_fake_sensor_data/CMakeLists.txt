@@ -18,16 +18,10 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(dynamic_reconfigure REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
-# Generate TemperaturesConfig.h from Temperatures.cfg file
-generate_dynamic_reconfigure_options(
-    config/Temperatures.cfg
-)
-
 add_executable(march_fake_sensor_data_node src/FakeTemperatureData.cpp)
-ament_target_dependencies(march_fake_sensor_data_node rclcpp dynamic_reconfigure sensor_msgs)
+ament_target_dependencies(march_fake_sensor_data_node rclcpp sensor_msgs)
 target_include_directories(march_fake_sensor_data_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
