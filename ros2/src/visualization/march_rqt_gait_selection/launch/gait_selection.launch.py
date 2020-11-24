@@ -1,6 +1,6 @@
 import launch
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, EnvironmentVariable
 from launch_ros.actions import Node
 
 
@@ -19,6 +19,8 @@ def generate_launch_description() -> launch.LaunchDescription:
             executable='rqt_gait_selection',
             output='screen',
             name='rqt_gait_selection',
-            parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}]
+            parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}],
+            # Give the source directory as argument to find the march_gait_files src
+            arguments=[EnvironmentVariable('PWD')]
         )
     ])
