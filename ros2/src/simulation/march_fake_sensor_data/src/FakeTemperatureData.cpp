@@ -1,13 +1,10 @@
-// Copyright 2018 Project March.
+// Copyright 2020 Project March.
 
-#include "ros/ros.h"
+#include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/Temperature.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <dynamic_reconfigure/server.h>
 #include <random>
-
-#include <march_fake_sensor_data/TemperaturesConfig.h>
 
 /**
  * @file FakeTemperatureData.cpp
