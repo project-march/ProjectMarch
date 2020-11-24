@@ -25,7 +25,7 @@ add_executable(${PROJECT_NAME}_node
     src/UniformDistribution.cpp
 )
 ament_target_dependencies(${PROJECT_NAME}_node rclcpp sensor_msgs)
-target_include_directories(${PROJECT_NAME}_node PRIVATE
+target_include_directories(${PROJECT_NAME}_node PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>)
 
@@ -33,8 +33,14 @@ install(TARGETS march_fake_sensor_data_node
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  ament_lint_auto_find_test_dependencies()
+    find_package(ament_lint_auto REQUIRED)
+    find_package(ament_cmake_gtest REQUIRED)
+    ament_lint_auto_find_test_dependencies()
+
+    # Add a gtest executables
+    ament_add_gtest(${PROJECT_NAME}-test
+        test/UniformDistributionTest.cpp
+    )
 endif()
 
 ament_package()
