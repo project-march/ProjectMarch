@@ -5,7 +5,6 @@
 //#include "sensor_msgs/msg/temperature.hpp"
 //#include <boost/algorithm/string.hpp>
 //#include <boost/algorithm/string/split.hpp>
-//#include <random>
 #include "march_fake_sensor_data/FakeTemperatureData.hpp"
 
 /**
@@ -15,25 +14,6 @@
  * @details Apply an autoregression filter to the latest 7 randomly generated
  * temperatures to make the temperature less jittery.
  */
-UniformDistribution::UniformDistribution(const int start, const int end):
-    generator(random_device())
-{
-    set_range(start, end);
-}
-
-void UniformDistribution::set_range(const int start, const int end) 
-{
-    // Invariant: check that the end is larger than the start.
-    if (end < start) throw BadUniformDistribution {};
-
-    std::uniform_int_distribution<int> new_distribution(start, end);
-    distribution = new_distribution;
-}
-
-int UniformDistribution::get_random_number() 
-{
-    return distribution(generator);
-}
 
 // Calculate the weighted average of the latest_temperatures
 double calculateArTemperature(std::vector<int> temperatures, std::vector<float> ar_values)
@@ -65,19 +45,6 @@ double calculateArTemperature(std::vector<int> temperatures, std::vector<float> 
 //  max_temperature = config.max_temperature;
 //}
 //
-///**
-// * @brief Generate number between start and end
-// * @param start Lowest number
-// * @param end Highest number
-// * @return The Random number
-// */
-int randBetween(int start, int end)
-{
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<> dis(start, end);
-  return dis(gen);
-}
 //
 ///**
 // * Publish a random temperature within the boundaries of the min and max

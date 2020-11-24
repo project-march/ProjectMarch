@@ -20,7 +20,10 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
-add_executable(${PROJECT_NAME}_node src/FakeTemperatureData.cpp)
+add_executable(${PROJECT_NAME}_node 
+    src/FakeTemperatureData.cpp
+    src/UniformDistribution.cpp
+)
 ament_target_dependencies(${PROJECT_NAME}_node rclcpp sensor_msgs)
 target_include_directories(${PROJECT_NAME}_node PRIVATE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

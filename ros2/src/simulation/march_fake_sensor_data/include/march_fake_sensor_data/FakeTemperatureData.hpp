@@ -3,6 +3,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/node.hpp"
 #include "rclcpp/publisher.hpp"
+#include "sensor_msgs/msg/temperature.hpp"
 #include <random>
 
 class FakeTemperatureDataNode final : public rclcpp::Node {
@@ -22,7 +23,7 @@ class FakeTemperatureDataNode final : public rclcpp::Node {
 
         // All the publishers that need to know a temperature. Every iteration, the
         // temperature will be published to these publishers
-        std::vector<rclcpp::Publisher> temperature_publishers;
+        std::vector<rclcpp::Publisher<sensor_msgs::msg::Temperature>> temperature_publishers;
 
         // Calculate the weighted average based on the latest temperatures to
         // reduce the jitter in the produced random temperatures.
@@ -30,38 +31,14 @@ class FakeTemperatureDataNode final : public rclcpp::Node {
 
     public:
         // Constructor that moves the predefined auto regression values into itself.
-        FakeTemperatureDataNode(const std::vector<float>&& autoregression_values) explicit;
+        explicit FakeTemperatureDataNode(const std::vector<float>&& autoregression_values);
 
-        void add_temperature_publisher(const std::string&& sensor_name) explicit;
+        void add_temperature_publisher(const std::string&& sensor_name);
 
-        // Publish the fake temperature data to the appropriate topic.
-        double publish_temperature(const& rclcpp::Publisher publisher);
+        // Publish all the fake temperature data to the appropriate topics.
+        void publish_temperatures();
 
         // The temperature should be dynamically adjustable.
         void set_minimum_temperature(int new_temperature);
         void set_maximum_temperature(int new_temperature);
-};
-
-class UniformDistribution {
-    private:
-        // Variables that are required for random number generation.
-        std::random_device random_device;
-        std::mt19937 generator;
-        std::uniform_int_distribution<int> distribution;
-
-    public:
-        UniformDistribution(const int start, const int end);
-
-        // Assume the start to be 0 if only the end is specified.
-        UniformDistribution(const int end) explicit;
-
-        // While the constructor does also create the random device and the random
-        // generator, there should also be a possibility to change the range of the
-        // generator without replacing it fully. In order to ensure that the pseudo 
-        // random numbers have random characteristics, it is necessary that the
-        // random device and generator are kept the same.
-        void set_range(const int start, const int end);
-
-        // Get a uniformly distributed pseudo random number in the specified range.
-        int get_random_number() const;
 };
