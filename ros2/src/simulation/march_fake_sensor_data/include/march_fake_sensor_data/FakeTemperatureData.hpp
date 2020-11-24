@@ -4,26 +4,25 @@
 #include "rclcpp/node.hpp"
 #include "rclcpp/publisher.hpp"
 #include "sensor_msgs/msg/temperature.hpp"
-#include <random>
+#include "march_fake_sensor_data/UniformDistribution.hpp"
 
 class FakeTemperatureDataNode final : public rclcpp::Node {
     private:
-        // The range of minimum and maximum temperatures that this node will generate
-        // fake temperatures in.
-        int minimum_temperature;
-        int maximum_temperature;
-
         // Keeps a history of the 7 most recent generated temperatures so it becomes
         // possible to take the weighted average before publishing. This makes the
         // data less jittery, but it is a tradeoff against randomness.
         std::vector<int> latest_temperatures;
 
         // The weights for the autoregression.
-        std::vector<float> autoregression_values;
+        std::vector<float> autoregression_weights;
 
         // All the publishers that need to know a temperature. Every iteration, the
         // temperature will be published to these publishers
         std::vector<rclcpp::Publisher<sensor_msgs::msg::Temperature>> temperature_publishers;
+
+        // The distribution and the associated generator that will be used to create
+        // the random temperatures.
+        UniformDistribution distribution;
 
         // Calculate the weighted average based on the latest temperatures to
         // reduce the jitter in the produced random temperatures.
@@ -31,7 +30,10 @@ class FakeTemperatureDataNode final : public rclcpp::Node {
 
     public:
         // Constructor that moves the predefined auto regression values into itself.
-        explicit FakeTemperatureDataNode(const std::vector<float>&& autoregression_values);
+        FakeTemperatureDataNode(
+                const std::string& node_name,
+                const std::vector<float>&& autoregression_weights
+        );
 
         void add_temperature_publisher(const std::string&& sensor_name);
 
@@ -39,6 +41,5 @@ class FakeTemperatureDataNode final : public rclcpp::Node {
         void publish_temperatures();
 
         // The temperature should be dynamically adjustable.
-        void set_minimum_temperature(int new_temperature);
-        void set_maximum_temperature(int new_temperature);
+        void set_range(int minimum_temperature, int maximum_temperature);
 };

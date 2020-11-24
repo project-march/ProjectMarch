@@ -6,6 +6,7 @@
 //#include <boost/algorithm/string.hpp>
 //#include <boost/algorithm/string/split.hpp>
 #include "march_fake_sensor_data/FakeTemperatureData.hpp"
+#include "march_fake_sensor_data/UniformDistribution.hpp"
 
 /**
  * @file FakeTemperatureData.cpp
@@ -15,15 +16,44 @@
  * temperatures to make the temperature less jittery.
  */
 
-// Calculate the weighted average of the latest_temperatures
-double calculateArTemperature(std::vector<int> temperatures, std::vector<float> ar_values)
+/**
+ * @param node_name The name that this node will take in ROS.
+ * @param autoregression_weights A list of weights that will determine which previous
+ * temperature values weigh the most in the calculation of new temperatures.
+ */
+FakeTemperatureDataNode::FakeTemperatureDataNode(const std::string& node_name, const std::vector<float>&& autoregression_weights):
+    Node(node_name),
+    latest_temperatures { std::vector<int>(autoregression_weights.size()) },
+    autoregression_weights { std::move(autoregression_weights) },
+    distribution {0, 0}
 {
-  double res = 0;
-  for (unsigned int i = 0; i < temperatures.size(); i++)
+    // Each value in autoregression_values refers to the weight of
+    // the temperatures in latest_temperatures. Therefore, their lengths should
+    // match.
+    assert(latest_temperatures.size() == autoregression_weights.size());
+}
+
+/**
+ * @brief Calculate the weighted average of the last random temperatures
+ * to avoid jitter.
+ * @return A temperature based on the weighted average.
+ */
+double FakeTemperatureDataNode::calculate_autoregression_temperature() const {
+  double result {0};
+  for (unsigned int i {0}; i < latest_temperatures.size(); ++i)
   {
-    res += temperatures.at(i) * ar_values.at(i);
+    result += latest_temperatures.at(i) * autoregression_weights.at(i);
   }
-  return res;
+  return result;
+}
+
+/**
+ * @brief The range in which new random temperature will be generated.
+ * @param minimum_temperature The minimum value (inclusive)
+ * @param maximum_temperature The maximum value (inclusive)
+ */
+void FakeTemperatureDataNode::set_range(int minimum_temperature, int maximum_temperature) {
+    distribution.set_range(minimum_temperature, maximum_temperature);
 }
 
 ///**
