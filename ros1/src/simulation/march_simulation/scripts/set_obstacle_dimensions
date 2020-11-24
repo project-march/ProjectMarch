@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 import rospy
-from march_shared_resources.srv import ChangeObstacleSizeResponse, ChangeObstacleSize
+from march_shared_resources.srv import SetObstacleSizeResponse, SetObstacleSize
 from gazebo_msgs.srv import SpawnModelRequest, SpawnModel, DeleteModel, DeleteModelRequest
 import xacro
 
@@ -10,7 +10,7 @@ import xacro
 RESIZABLE_OBSTACLES = ['bench']
 
 try:
-    rospy.init_node('change_obstacle_dimensions', anonymous=True)
+    rospy.init_node('set_obstacle_dimensions', anonymous=True)
 
     spawn_publisher = rospy.ServiceProxy('/gazebo/spawn_urdf_model', SpawnModel)
     delete_publisher = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
