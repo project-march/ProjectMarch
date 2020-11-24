@@ -92,7 +92,9 @@ class GaitSelectionView(QWidget):
     def update_version_menus(self):
         """When a gait is selected set the subgait labels and populate the subgait menus with the available versions."""
         def version_sorter(version):
-            """Used in the sort function to sort numbers which are 9<.
+            """Used in the sort function to sort numbers which are 9<. If
+            there is no version number, 0 is returned to have it at the top of
+            the list
 
             :param version: str of the version
             """
@@ -102,11 +104,9 @@ class GaitSelectionView(QWidget):
                 if version_number != '':
                     return int(version_number)
                 else:
-                    return 998
+                    return 0
             except ValueError:
-                return version
-            except:
-                return 9999
+                return 0
 
         self._is_update_active = True
         if self._is_refresh_active:
@@ -129,9 +129,7 @@ class GaitSelectionView(QWidget):
 
             subgait_menu.show()
             subgait_label.show()
-            self._log(f'{versions}')
             versions = sorted(versions, key=version_sorter)
-            self._log(f'Sorted: {versions}')
 
             subgait_label.setText(subgait_name)
             subgait_menu.addItems(versions)

@@ -17,7 +17,9 @@ def main(args=None):
     try:
         plugin = 'march_rqt_gait_selection'
         main_plugin = Main(filename=plugin)
-        sys.exit(main_plugin.main(standalone=plugin, plugin_argument_provider=GaitSelectionPlugin.add_arguments))
+        sys.exit(main_plugin.main(
+            standalone=plugin,
+            plugin_argument_provider=GaitSelectionPlugin.add_arguments))
 
     except KeyboardInterrupt:
         pass
@@ -36,14 +38,16 @@ class GaitSelectionPlugin(Plugin):
         GaitSelectionPlugin.add_arguments(parser)
         args = parser.parse_args(context.argv())
 
-        ui_file = os.path.join(get_package_share_directory('march_rqt_gait_selection'), 'gait_selection.ui')
+        ui_file = os.path.join(
+            get_package_share_directory('march_rqt_gait_selection'), 'gait_selection.ui')
 
         self._controller = GaitSelectionController(self._node, source_dir=str(args.source_dir[0]))
         self._widget = GaitSelectionView(ui_file, self._controller)
         context.add_widget(self._widget)
 
         if context.serial_number() > 1:
-            self._widget.setWindowTitle('{0} ({1})'.format(self._widget.windowTitle(), context.serial_number()))
+            self._widget.setWindowTitle('{0} ({1})'.format(
+                self._widget.windowTitle(), context.serial_number()))
 
     @staticmethod
     def add_arguments(parser: argparse.ArgumentParser) -> None:
@@ -52,4 +56,5 @@ class GaitSelectionPlugin(Plugin):
         :param parser: The argument parser that is used
         """
         group = parser.add_argument_group('Options for RQT version tool')
-        group.add_argument('source_dir', nargs=1, help='The source home to find the march gait files')
+        group.add_argument('source_dir', nargs=1,
+                           help='The source home to find the march gait files')

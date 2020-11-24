@@ -35,6 +35,7 @@ class GaitSelection(Node):
                 'gait_package and gait_directory')
 
         package_path = get_package_share_directory(gait_package)
+        self._directory_name = directory
         self._gait_directory = os.path.join(package_path, directory)
         self._default_yaml = os.path.join(self._gait_directory, 'default.yaml')
 
@@ -77,6 +78,10 @@ class GaitSelection(Node):
         self.create_service(srv_type=Trigger,
                             srv_name='/march/gait_selection/get_version_map',
                             callback=lambda req, res: Trigger.Response(success=True, message=str(self.gait_version_map)))
+
+        self.create_service(srv_type=Trigger,
+                            srv_name='/march/gait_selection/get_gait_directory',
+                            callback=lambda req, res: Trigger.Response(success=True, message=self._directory_name))
 
         self.create_service(srv_type=Trigger,
                             srv_name='/march/gait_selection/get_default_dict',

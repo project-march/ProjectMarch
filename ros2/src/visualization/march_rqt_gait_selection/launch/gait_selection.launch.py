@@ -20,7 +20,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             output='screen',
             name='rqt_gait_selection',
             parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}],
-            # Give the source directory as argument to find the march_gait_files src
+            # Give the source directory as argument to find the march_gait_files
             arguments=[EnvironmentVariable('PWD')]
         )
     ])
