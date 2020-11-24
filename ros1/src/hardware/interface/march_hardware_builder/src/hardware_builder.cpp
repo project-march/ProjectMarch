@@ -139,7 +139,7 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
   int slave_index = imc_config["slaveIndex"].as<int>();
 
   std::ifstream imc_setup_data;
-  imc_setup_data.open(ros::package::getPath("march_ems_projects").append("/sw_files/" + urdf_joint->name + ".sw"));
+  imc_setup_data.open(ros::package::getPath("march_hardware").append("/config/sw_files/" + urdf_joint->name + ".sw"));
   std::string setup = convertSWFileToString(imc_setup_data);
   return std::make_unique<march::IMotionCube>(
       march::Slave(slave_index, pdo_interface, sdo_interface),
