@@ -30,19 +30,19 @@ add_service_files(
     FILES
     CapturePointPose.srv
     ContainsGait.srv
+    GetParamBool.srv
+    GetParamFloat.srv
+    GetParamInt.srv
+    GetParamString.srv
+    GetParamStringList.srv
     PossibleGaits.srv
     SetGaitVersion.srv
-    GetParamStringList.srv
-    GetParamString.srv
-    GetParamBool.srv
-    GetParamInt.srv
-    GetParamFloat.srv
     SetObstacleSize.srv
-    SetParamStringList.srv
-    SetParamString.srv
     SetParamBool.srv
-    SetParamInt.srv
     SetParamFloat.srv
+    SetParamInt.srv
+    SetParamString.srv
+    SetParamStringList.srv
 )
 
 generate_messages(

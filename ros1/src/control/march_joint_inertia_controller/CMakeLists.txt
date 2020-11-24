@@ -24,9 +24,11 @@ catkin_package(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
     CATKIN_DEPENDS
+    actionlib
     actionlib_msgs
     control_msgs
     controller_interface
+    march_shared_resources
     pluginlib
     roscpp
     std_msgs
