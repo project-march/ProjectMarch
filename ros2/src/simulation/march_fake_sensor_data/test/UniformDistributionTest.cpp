@@ -1,39 +1,22 @@
 // Copyright 2020 Project MARCH
 
 #include <gtest/gtest.h>
-//#include "march_imu_manager/wireless_master.h"
-//
-TEST(UniformDistributionTest, equal)
+#include "march_fake_sensor_data/UniformDistribution.hpp"
+
+TEST(UniformDistributionTest, generate_within_bounds)
 {
-    ASSERT_EQ(0, 0);
+    int lower_bound = -5;
+    int upper_bound = 5; 
+    UniformDistribution distribution { lower_bound, upper_bound };
+    for (int i {0}; i < 100; ++i) {
+        auto number = distribution.get_random_number();
+        ASSERT_LE(lower_bound, number);
+        ASSERT_GE(upper_bound, number);
+    }
 }
-//
-//TEST(WirelessMasterTest, oneRate)
-//{
-//      const int supportedRate = 60;
-//        XsIntArray rates(1, &supportedRate);
-//          const int rate = WirelessMaster::findClosestUpdateRate(rates, 0);
-//            ASSERT_EQ(rate, supportedRate);
-//}
-//
-//TEST(WirelessMasterTest, matchingRate)
-//{
-//      const int supportedRates[3] = { 60, 80, 100 };
-//        XsIntArray rates(3, supportedRates);
-//          const int rate = WirelessMaster::findClosestUpdateRate(rates, supportedRates[1]);
-//            ASSERT_EQ(rate, supportedRates[1]);
-//}
-//
-//TEST(WirelessMasterTest, twoClosestRates)
-//{
-//      const int supportedRates[2] = { 10, 20 };
-//        XsIntArray rates(2, supportedRates);
-//          const int rate = WirelessMaster::findClosestUpdateRate(rates, 15);
-//            ASSERT_EQ(rate, supportedRates[0]);
-//}
-//
+
 int main(int argc, char* argv[])
 {
-      testing::InitGoogleTest(&argc, argv);
-        return RUN_ALL_TESTS();
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

@@ -2,11 +2,13 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/node.hpp"
-//#include "sensor_msgs/msg/temperature.hpp"
-//#include <boost/algorithm/string.hpp>
-//#include <boost/algorithm/string/split.hpp>
+// #include "sensor_msgs/msg/temperature.hpp"
+// #include <boost/algorithm/string.hpp>
+// #include <boost/algorithm/string/split.hpp>
 #include "march_fake_sensor_data/FakeTemperatureData.hpp"
 #include "march_fake_sensor_data/UniformDistribution.hpp"
+#include <vector>
+#include <string>
 
 /**
  * @file FakeTemperatureData.cpp
