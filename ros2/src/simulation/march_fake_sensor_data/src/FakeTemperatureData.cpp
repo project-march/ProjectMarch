@@ -1,10 +1,12 @@
 // Copyright 2020 Project March.
 
 #include "rclcpp/rclcpp.hpp"
-#include "sensor_msgs/msg/temperature.hpp"
-#include <boost/algorithm/string.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <random>
+#include "rclcpp/node.hpp"
+//#include "sensor_msgs/msg/temperature.hpp"
+//#include <boost/algorithm/string.hpp>
+//#include <boost/algorithm/string/split.hpp>
+//#include <random>
+#include "march_fake_sensor_data/FakeTemperatureData.hpp"
 
 /**
  * @file FakeTemperatureData.cpp
@@ -14,109 +16,113 @@
  * temperatures to make the temperature less jittery.
  */
 
-int min_temperature;
-int max_temperature;
-std::vector<std::string> sensor_names;
-std::vector<ros::Publisher> temperature_publishers;
+//int min_temperature;
+//int max_temperature;
+//std::vector<std::string> sensor_names;
+//std::vector<ros::Publisher> temperature_publishers;
+//
+//// Store the 7 most recent generated temperatures so we can take the weighted
+//// average of them when we publish.
+//std::vector<int> latest_temperatures;
+//
+//// The weights of the autoregression, the most recent temperature has the
+//// highest weight.
+//std::vector<float> ar_values;
+//
+//// Calculate the weighted average of the latest_temperatures
+//double calculateArTemperature(std::vector<int> temperatures, std::vector<float> ar_values)
+//{
+//  double res = 0;
+//  for (unsigned int i = 0; i < temperatures.size(); i++)
+//  {
+//    res += temperatures.at(i) * ar_values.at(i);
+//  }
+//  return res;
+//}
+//
+///**
+// * This callback is called when parameters from the config file are changed
+// * during run-time. This method updates the local values which depend on these
+// * parameters to make ensure the values are not out-of-date.
+// * @param config the config file with all the parameters
+// * @param level A bitmask
+// */
+//void temperatureConfigCallback(march_fake_sensor_data::TemperaturesConfig& config, uint32_t /* level */)
+//{
+//  // Make sure there is always a possible interval between min and max
+//  // temperature.
+//  if (config.min_temperature >= config.max_temperature)
+//  {
+//    config.max_temperature = config.min_temperature + 1;
+//  }
+//  min_temperature = config.min_temperature;
+//  max_temperature = config.max_temperature;
+//}
+//
+///**
+// * @brief Generate number between start and end
+// * @param start Lowest number
+// * @param end Highest number
+// * @return The Random number
+// */
+//int randBetween(int start, int end)
+//{
+//  std::random_device rd;
+//  std::mt19937 gen(rd());
+//  std::uniform_int_distribution<> dis(start, end);
+//  return dis(gen);
+//}
+//
+///**
+// * Publish a random temperature within the boundaries of the min and max
+// * parameters
+// * @param temperature_pub publish the temperature message with this publisher
+// */
+//void publishTemperature(const ros::Publisher& temperature_pub)
+//{
+//  int random_temperature = randBetween(min_temperature, max_temperature);
+//
+//  // Update the vector with the latest temperatures by removing the first entry
+//  // and adding a new one.
+//  latest_temperatures.erase(latest_temperatures.begin());
+//  latest_temperatures.push_back(random_temperature);
+//
+//  double current_temperature = calculateArTemperature(latest_temperatures, ar_values);
+//  sensor_msgs::Temperature msg;
+//  msg.temperature = current_temperature;
+//  msg.header.stamp = ros::Time::now();
+//  temperature_pub.publish(msg);
+//}
+//
+///**
+// * @brief Combine the base topic name with sensor name.
+// * @param base Leading part of the topic
+// * @param name Name of the sensor
+// * @return Full topic name
+// */
+//std::string createTopicName(const char* base, const char* name)
+//{
+//  char slash[] = "/";
+//  // The buffer needs more space then the final string length.
+//  int extra_buffer_size = 100;
+//  const int kArraySize = static_cast<const int>(strlen(base) + strlen(slash) + strlen(name) + extra_buffer_size);
+//  // Create a char array of the combined size of all three parts
+//  char full_topic[kArraySize];
+//  int error_code = snprintf(full_topic, kArraySize, "%s%s%s", base, slash, name);
+//  if (error_code < 0 || error_code > kArraySize)
+//  {
+//    ROS_ERROR("Error creating topic %s (error code %d)", full_topic, error_code);
+//  }
+//  return full_topic;
+//}
 
-// Store the 7 most recent generated temperatures so we can take the weighted
-// average of them when we publish.
-std::vector<int> latest_temperatures;
-
-// The weights of the autoregression, the most recent temperature has the
-// highest weight.
-std::vector<float> ar_values;
-
-// Calculate the weighted average of the latest_temperatures
-double calculateArTemperature(std::vector<int> temperatures, std::vector<float> ar_values)
-{
-  double res = 0;
-  for (unsigned int i = 0; i < temperatures.size(); i++)
-  {
-    res += temperatures.at(i) * ar_values.at(i);
-  }
-  return res;
-}
-
-/**
- * This callback is called when parameters from the config file are changed
- * during run-time. This method updates the local values which depend on these
- * parameters to make ensure the values are not out-of-date.
- * @param config the config file with all the parameters
- * @param level A bitmask
- */
-void temperatureConfigCallback(march_fake_sensor_data::TemperaturesConfig& config, uint32_t /* level */)
-{
-  // Make sure there is always a possible interval between min and max
-  // temperature.
-  if (config.min_temperature >= config.max_temperature)
-  {
-    config.max_temperature = config.min_temperature + 1;
-  }
-  min_temperature = config.min_temperature;
-  max_temperature = config.max_temperature;
-}
-
-/**
- * @brief Generate number between start and end
- * @param start Lowest number
- * @param end Highest number
- * @return The Random number
- */
-int randBetween(int start, int end)
-{
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<> dis(start, end);
-  return dis(gen);
-}
-
-/**
- * Publish a random temperature within the boundaries of the min and max
- * parameters
- * @param temperature_pub publish the temperature message with this publisher
- */
-void publishTemperature(const ros::Publisher& temperature_pub)
-{
-  int random_temperature = randBetween(min_temperature, max_temperature);
-
-  // Update the vector with the latest temperatures by removing the first entry
-  // and adding a new one.
-  latest_temperatures.erase(latest_temperatures.begin());
-  latest_temperatures.push_back(random_temperature);
-
-  double current_temperature = calculateArTemperature(latest_temperatures, ar_values);
-  sensor_msgs::Temperature msg;
-  msg.temperature = current_temperature;
-  msg.header.stamp = ros::Time::now();
-  temperature_pub.publish(msg);
-}
-
-/**
- * @brief Combine the base topic name with sensor name.
- * @param base Leading part of the topic
- * @param name Name of the sensor
- * @return Full topic name
- */
-std::string createTopicName(const char* base, const char* name)
-{
-  char slash[] = "/";
-  // The buffer needs more space then the final string length.
-  int extra_buffer_size = 100;
-  const int kArraySize = static_cast<const int>(strlen(base) + strlen(slash) + strlen(name) + extra_buffer_size);
-  // Create a char array of the combined size of all three parts
-  char full_topic[kArraySize];
-  int error_code = snprintf(full_topic, kArraySize, "%s%s%s", base, slash, name);
-  if (error_code < 0 || error_code > kArraySize)
-  {
-    ROS_ERROR("Error creating topic %s (error code %d)", full_topic, error_code);
-  }
-  return full_topic;
-}
+class FakeTemperatureDataNode : public rclcpp::Node {
+    
+};
 
 int main(int argc, char** argv)
 {
-  
+      /*
   ros::init(argc, argv, "march_fake_sensor_data");
   ros::NodeHandle n;
   ros::Rate rate(10);
@@ -166,6 +172,6 @@ int main(int argc, char** argv)
     rate.sleep();
     ros::spinOnce();
   }
-
+*/
   return 0;
 }
