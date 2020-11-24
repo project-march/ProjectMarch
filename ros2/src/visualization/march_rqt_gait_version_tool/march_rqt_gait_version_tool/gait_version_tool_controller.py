@@ -6,7 +6,7 @@ from march_shared_msgs.srv import SetGaitVersion
 from .gait_version_tool_errors import InvalidResponseError
 
 
-class GaitSelectionController(object):
+class GaitVersionToolController(object):
     def __init__(self, node, source_dir):
         """Base class to communicate with the gait selection node."""
         self._node = node
