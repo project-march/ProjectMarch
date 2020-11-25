@@ -24,6 +24,9 @@ protected:
   physics::LinkPtr foot_right_;
   double mass;
 
+  std::string HOME_STAND;
+  std::string STAND_IDLE;
+  std::string SIT_IDLE;
   std::string default_subgait_name_;
   std::string subgait_name_;
   double subgait_start_time_;
