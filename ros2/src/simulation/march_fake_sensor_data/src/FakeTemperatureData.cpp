@@ -2,12 +2,15 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/node.hpp"
+#include "rclcpp/publisher.hpp"
+#include "rclcpp/qos.hpp"
 // #include "sensor_msgs/msg/temperature.hpp"
 // #include <boost/algorithm/string.hpp>
 // #include <boost/algorithm/string/split.hpp>
 #include "march_fake_sensor_data/FakeTemperatureData.hpp"
 #include "march_fake_sensor_data/UniformDistribution.hpp"
 #include <vector>
+#include <stdexcept>
 #include <string>
 
 /**
@@ -40,7 +43,8 @@ FakeTemperatureDataNode::FakeTemperatureDataNode(const std::string& node_name, c
  * to avoid jitter.
  * @return A temperature based on the weighted average.
  */
-double FakeTemperatureDataNode::calculate_autoregression_temperature() const {
+double FakeTemperatureDataNode::calculate_autoregression_temperature() const
+{
   double result {0};
   for (unsigned int i {0}; i < latest_temperatures.size(); ++i)
   {
@@ -54,8 +58,43 @@ double FakeTemperatureDataNode::calculate_autoregression_temperature() const {
  * @param minimum_temperature The minimum value (inclusive)
  * @param maximum_temperature The maximum value (inclusive)
  */
-void FakeTemperatureDataNode::set_range(int minimum_temperature, int maximum_temperature) {
+void FakeTemperatureDataNode::set_range(int minimum_temperature, int maximum_temperature)
+{
     distribution.set_range(minimum_temperature, maximum_temperature);
+}
+
+void FakeTemperatureDataNode::add_temperature_publisher(const std::string& sensor_name)
+{
+    if(sensor_name.empty()) {
+        throw std::invalid_argument("Sensor name cannot be empty");
+    }
+    std::string topic_name = std::string("/march/temperature/") + sensor_name;
+    // This is not an important topic, therefore it has lenient QoS settings:
+    // - keep only the last sample
+    // - attempt to deliver samples, but may lose them if the network is not robust
+    //   (best effort)
+    // - no attempt is made to persist samples (volatile)
+    auto qos = rclcpp::QoS(1).best_effort().durability_volatile();
+    auto publisher = this->create_publisher<sensor_msgs::msg::Temperature>(topic_name, qos);
+    temperature_publishers.push_back(publisher);
+}
+
+void FakeTemperatureDataNode::publish_temperature()
+{
+    distribution.get_random_number();
+    latest_temperatures
+//  int random_temperature = randBetween(min_temperature, max_temperature);
+//
+//  // Update the vector with the latest temperatures by removing the first entry
+//  // and adding a new one.
+//  latest_temperatures.erase(latest_temperatures.begin());
+//  latest_temperatures.push_back(random_temperature);
+//
+//  double current_temperature = calculateArTemperature(latest_temperatures, ar_values);
+//  sensor_msgs::Temperature msg;
+//  msg.temperature = current_temperature;
+//  msg.header.stamp = ros::Time::now();
+//  temperature_pub.publish(msg);
 }
 
 ///**
@@ -99,27 +138,6 @@ void FakeTemperatureDataNode::set_range(int minimum_temperature, int maximum_tem
 //  temperature_pub.publish(msg);
 //}
 //
-///**
-// * @brief Combine the base topic name with sensor name.
-// * @param base Leading part of the topic
-// * @param name Name of the sensor
-// * @return Full topic name
-// */
-//std::string createTopicName(const char* base, const char* name)
-//{
-//  char slash[] = "/";
-//  // The buffer needs more space then the final string length.
-//  int extra_buffer_size = 100;
-//  const int kArraySize = static_cast<const int>(strlen(base) + strlen(slash) + strlen(name) + extra_buffer_size);
-//  // Create a char array of the combined size of all three parts
-//  char full_topic[kArraySize];
-//  int error_code = snprintf(full_topic, kArraySize, "%s%s%s", base, slash, name);
-//  if (error_code < 0 || error_code > kArraySize)
-//  {
-//    ROS_ERROR("Error creating topic %s (error code %d)", full_topic, error_code);
-//  }
-//  return full_topic;
-//}
 
 int main(int argc, char** argv)
 {

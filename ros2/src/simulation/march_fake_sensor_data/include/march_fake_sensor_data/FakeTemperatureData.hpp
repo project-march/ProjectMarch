@@ -19,7 +19,7 @@ class FakeTemperatureDataNode final : public rclcpp::Node {
 
         // All the publishers that need to know a temperature. Every iteration, the
         // temperature will be published to these publishers
-        std::vector<rclcpp::Publisher<sensor_msgs::msg::Temperature>> temperature_publishers;
+        std::vector<std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::Temperature>>> temperature_publishers;
 
         // The distribution and the associated generator that will be used to create
         // the random temperatures.
@@ -36,7 +36,7 @@ class FakeTemperatureDataNode final : public rclcpp::Node {
                 const std::vector<float>&& autoregression_weights
         );
 
-        void add_temperature_publisher(const std::string&& sensor_name);
+        void add_temperature_publisher(const std::string& sensor_name);
 
         // Publish all the fake temperature data to the appropriate topics.
         void publish_temperatures();
