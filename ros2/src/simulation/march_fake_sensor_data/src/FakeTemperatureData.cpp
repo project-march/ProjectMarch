@@ -9,6 +9,7 @@
 // #include <boost/algorithm/string/split.hpp>
 #include "march_fake_sensor_data/FakeTemperatureData.hpp"
 #include "march_fake_sensor_data/UniformDistribution.hpp"
+#include <deque>
 #include <vector>
 #include <stdexcept>
 #include <string>
@@ -28,7 +29,7 @@
  */
 FakeTemperatureDataNode::FakeTemperatureDataNode(const std::string& node_name, const std::vector<float>&& autoregression_weights):
     Node(node_name),
-    latest_temperatures { std::vector<int>(autoregression_weights.size()) },
+    latest_temperatures { std::deque<int>(autoregression_weights.size()) },
     autoregression_weights { std::move(autoregression_weights) },
     distribution {0, 0}
 {
@@ -45,11 +46,12 @@ FakeTemperatureDataNode::FakeTemperatureDataNode(const std::string& node_name, c
  */
 double FakeTemperatureDataNode::calculate_autoregression_temperature() const
 {
-  double result {0};
-  for (unsigned int i {0}; i < latest_temperatures.size(); ++i)
-  {
-    result += latest_temperatures.at(i) * autoregression_weights.at(i);
-  }
+    double result {0};
+    int index {0};
+    for (auto temperature : latest_temperatures) {
+        result += temperature * autoregression_weights.at(index);
+        index += 1;
+    }
   return result;
 }
 

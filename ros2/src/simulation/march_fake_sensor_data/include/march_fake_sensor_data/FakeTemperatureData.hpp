@@ -6,13 +6,16 @@
 #include "rclcpp/publisher.hpp"
 #include "sensor_msgs/msg/temperature.hpp"
 #include "march_fake_sensor_data/UniformDistribution.hpp"
+#include <deque>
+#include <vector>
+#include <string>
 
 class FakeTemperatureDataNode final : public rclcpp::Node {
     private:
         // Keeps a history of the 7 most recent generated temperatures so it becomes
         // possible to take the weighted average before publishing. This makes the
         // data less jittery, but it is a tradeoff against randomness.
-        std::vector<int> latest_temperatures;
+        std::deque<int> latest_temperatures;
 
         // The weights for the autoregression.
         std::vector<float> autoregression_weights;
