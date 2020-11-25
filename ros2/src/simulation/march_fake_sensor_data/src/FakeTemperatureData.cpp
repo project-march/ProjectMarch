@@ -4,7 +4,6 @@
 #include "rclcpp/node.hpp"
 #include "rclcpp/publisher.hpp"
 #include "rclcpp/qos.hpp"
-// #include "sensor_msgs/msg/temperature.hpp"
 // #include <boost/algorithm/string.hpp>
 // #include <boost/algorithm/string/split.hpp>
 #include "march_fake_sensor_data/FakeTemperatureData.hpp"
@@ -77,7 +76,7 @@ void FakeTemperatureDataNode::add_temperature_publisher(const std::string& senso
     //   (best effort)
     // - no attempt is made to persist samples (volatile)
     auto qos = rclcpp::QoS(1).best_effort().durability_volatile();
-    auto publisher = this->create_publisher<sensor_msgs::msg::Temperature>(topic_name, qos);
+    auto publisher = this->create_publisher<MessageType>(topic_name, qos);
     temperature_publishers.push_back(publisher);
 }
 

@@ -11,6 +11,7 @@
 #include <string>
 
 class FakeTemperatureDataNode final : public rclcpp::Node {
+    using MessageType = sensor_msgs::msg::Temperature;
     private:
         // Keeps a history of the 7 most recent generated temperatures so it becomes
         // possible to take the weighted average before publishing. This makes the
@@ -22,7 +23,7 @@ class FakeTemperatureDataNode final : public rclcpp::Node {
 
         // All the publishers that need to know a temperature. Every iteration, the
         // temperature will be published to these publishers
-        std::vector<std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::Temperature>>> temperature_publishers;
+        std::vector<std::shared_ptr<rclcpp::Publisher<MessageType>>> temperature_publishers;
 
         // The distribution and the associated generator that will be used to create
         // the random temperatures.
