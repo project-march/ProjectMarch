@@ -82,7 +82,6 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME}
-        src/acado_mpc.cpp
         "${QPOASES_SRCS}"
         "${ACADO_SRCS}"
 )
