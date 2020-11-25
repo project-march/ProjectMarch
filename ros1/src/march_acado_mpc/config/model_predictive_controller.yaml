@@ -1,0 +1,9 @@
+march:
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50
+
+  controller:
+    trajectory:
+      type: model_predictive_trajectory_controller/JointTrajectoryController
+      joint: rotational_joint

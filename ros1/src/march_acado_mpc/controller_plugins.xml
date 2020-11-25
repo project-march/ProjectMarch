@@ -1,0 +1,5 @@
+<library path="lib/libmarch_acado_mpc">
+    <class name="model_predictive_trajectory_controller/JointTrajectoryController"
+           type="model_predictive_trajectory_controller::JointTrajectoryController"
+           base_class_type="controller_interface::ControllerBase" />
+</library>

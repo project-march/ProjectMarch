@@ -1,0 +1,12 @@
+<!--<launch>-->
+<!--	<node name="acado_mpc_node" pkg="march_acado_mpc" type="march_acado_mpc_node" output="screen"></node>-->
+<!--</launch>-->
+
+<?xml version="1.0" ?>
+<launch>
+    <include file="${find march_simulation}/launch/march_world.launch"/>
+    <rosparam file="${find march_acado_mpc}/config/model_predictive_controller.yaml"
+              command="load"/>
+    <node name="model_predictive_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+    output="screen" args="rotational_joint_mpc"/>
+</launch>
