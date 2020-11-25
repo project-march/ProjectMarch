@@ -10,43 +10,43 @@ import xacro
 # which accepts the parameters length, width and height with default values
 RESIZABLE_OBSTACLES = ['bench']
 
-try:
-    rospy.init_node('set_obstacle_dimensions', anonymous=True)
+rospy.init_node('set_obstacle_dimensions', anonymous=True)
 
-    spawn_publisher = rospy.ServiceProxy('/gazebo/spawn_urdf_model', SpawnModel)
-    delete_publisher = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
-    get_world_properties = rospy.ServiceProxy('/gazebo/get_world_properties', GetWorldProperties)
+spawn_publisher = rospy.ServiceProxy('/gazebo/spawn_urdf_model', SpawnModel)
+delete_publisher = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
+get_world_properties = rospy.ServiceProxy('/gazebo/get_world_properties', GetWorldProperties)
 
-    def set_size(name, length=0, width=0, height=0):
-        length = 'length="{length}"'.format(length=length) if length != 0 else ''
-        width = 'width="{width}"'.format(name=width) if width != 0 else ''
-        height = 'height="{name}"'.format(name=height) if height != 0 else ''
 
-        doc = xacro.parse('''<?xml version="1.0"?>
-                <robot name="{name}" xmlns:xacro="http://www.ros.org/wiki/xacro">
-                    <xacro:include filename="$(find march_simulation)/obstacles/{name}_macro.xacro"/>
-                    <xacro:{name} {length} {width} {height}/>
-                </robot>
-                '''.format(name=name, length=length, width=width, height=height), None)
-        xacro.process_doc(doc)
-        new_obstacle = doc.toprettyxml(indent='  ')
-        models = get_world_properties.call(GetWorldPropertiesRequest()).model_names
-        if name in models:
-            delete_publisher.call(DeleteModelRequest(model_name=name))
+def set_size(name, length=0, width=0, height=0):
+    length = 'length="{length}"'.format(length=length) if length != 0 else ''
+    width = 'width="{width}"'.format(width=width) if width != 0 else ''
+    height = 'height="{height}"'.format(height=height) if height != 0 else ''
 
-        spawn_publisher.call(SpawnModelRequest(
-            model_name=name, model_xml=new_obstacle))
+    doc = xacro.parse('''<?xml version="1.0"?>
+            <robot name="{name}" xmlns:xacro="http://www.ros.org/wiki/xacro">
+                <xacro:include filename="$(find march_simulation)/obstacles/{name}_macro.xacro"/>
+                <xacro:{name} {length} {width} {height}/>
+            </robot>
+            '''.format(name=name, length=length, width=width, height=height), None)
+    xacro.process_doc(doc)
+    new_obstacle = doc.toprettyxml(indent='  ')
+    models = get_world_properties.call(GetWorldPropertiesRequest()).model_names
+    if name in models:
+        delete_publisher.call(DeleteModelRequest(model_name=name))
 
-    def set_size_callback(msg):
-        if msg.obstacle_name not in RESIZABLE_OBSTACLES:
-            return SetObstacleSizeResponse(success=False)
+    spawn_publisher.call(SpawnModelRequest(
+        model_name=name, model_xml=new_obstacle))
 
-        else:
-            set_size(name=msg.obstacle_name, length=msg.new_length, width=msg.new_width, height=msg.new_height)
-            return SetObstacleSizeResponse(success=True)
 
-    change_obstacle_size = rospy.Service('/march/set_obstacle_size',
-                                         SetObstacleSize, set_size_callback)
-    rospy.spin()
-except rospy.ROSInterruptException:
-    pass
+def set_size_callback(msg):
+    if msg.obstacle_name not in RESIZABLE_OBSTACLES:
+        return SetObstacleSizeResponse(success=False)
+
+    else:
+        set_size(name=msg.obstacle_name, length=msg.new_length, width=msg.new_width, height=msg.new_height)
+        return SetObstacleSizeResponse(success=True)
+
+
+change_obstacle_size = rospy.Service('/march/set_obstacle_size',
+                                     SetObstacleSize, set_size_callback)
+rospy.spin()
