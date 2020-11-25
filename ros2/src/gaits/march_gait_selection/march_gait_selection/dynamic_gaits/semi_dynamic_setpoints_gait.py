@@ -25,15 +25,15 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             return False
         return True
 
-    def freeze(self, position: dict = {}, sm = None, duration: float = 5.0):
+    def freeze(self, position: dict = {}, duration: float = 10.0):
         """
         If the subgait can freeze it will freeze for the given duration, this
         will later be changed to start the next subgait more dynamically
         after the short freeze
+        :param position: The position to freeze in
         :param duration: How long to freeze in the current position
         """
         self._should_freeze = True
-        self.sm = sm
         self._freeze_position = position
         self._freeze_duration = duration
 
@@ -112,7 +112,6 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         position = self._position_after_time(self._time_since_start)
         logger.info(f'Position theory is: {position}')
         logger.info(f'Position reality is: {self._freeze_position}')
-        logger.info(f'Position reality new is: {self.sm._current_pos}')
         position = self._freeze_position
         new_dict = {
             'description': 'A subgait that stays in the same position',

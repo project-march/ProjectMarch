@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/katja/march_ws/march/ros1/src/simulation/march_gazebo_plugins/cmake-build-debug/devel/setup.sh

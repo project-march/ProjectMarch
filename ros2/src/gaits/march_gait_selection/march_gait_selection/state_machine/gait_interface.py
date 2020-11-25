@@ -14,6 +14,11 @@ class GaitInterface(object):
         return ''
 
     @property
+    def can_freeze(self) -> bool:
+        """Returns whether the gait has a freeze functionality."""
+        return False
+
+    @property
     def subgait_name(self) -> str:
         """Returns the name of the currently executing trajectory."""
         return ''
