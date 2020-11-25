@@ -3,7 +3,7 @@
 <package format="3">
   <name>march_parameter_server</name>
   <version>0.0.0</version>
-  <description>Node to interact with ROS1 parameter server</description>
+  <description>Interact with ROS1 parameter server for ROS 2</description>
 
   <maintainer email="software@projectmarch.nl">Project March</maintainer>
   <license>TODO</license>
