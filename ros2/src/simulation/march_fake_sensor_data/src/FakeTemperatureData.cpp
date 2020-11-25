@@ -64,6 +64,11 @@ void FakeTemperatureDataNode::set_range(int minimum_temperature, int maximum_tem
     distribution.set_range(minimum_temperature, maximum_temperature);
 }
 
+/**
+ * @brief Add a sensor whose fake temperature will be published on the
+ * "/march/temperature/<sensor_name>" topic.
+ * @param sensor_name The name of the sensor.
+ */
 void FakeTemperatureDataNode::add_temperature_publisher(const std::string& sensor_name)
 {
     if(sensor_name.empty()) {
@@ -80,22 +85,22 @@ void FakeTemperatureDataNode::add_temperature_publisher(const std::string& senso
     temperature_publishers.push_back(publisher);
 }
 
-void FakeTemperatureDataNode::publish_temperature()
+/**
+ * @brief Publish a fake temperature to all the registered temperature publishers.
+ */
+void FakeTemperatureDataNode::publish_temperatures()
 {
-    distribution.get_random_number();
-    latest_temperatures
-//  int random_temperature = randBetween(min_temperature, max_temperature);
-//
-//  // Update the vector with the latest temperatures by removing the first entry
-//  // and adding a new one.
-//  latest_temperatures.erase(latest_temperatures.begin());
-//  latest_temperatures.push_back(random_temperature);
-//
-//  double current_temperature = calculateArTemperature(latest_temperatures, ar_values);
-//  sensor_msgs::Temperature msg;
-//  msg.temperature = current_temperature;
-//  msg.header.stamp = ros::Time::now();
-//  temperature_pub.publish(msg);
+    for (auto publisher : temperature_publishers) {
+        // "Cycle" through the previous randomly generated temperatures by removing the
+        // oldest in the queue and adding a new random number to back of the queue.
+        latest_temperatures.pop_front();
+        latest_temperatures.push_back(distribution.get_random_number());
+
+        MessageType message;
+        message.temperature = calculate_autoregression_temperature();
+        message.header.stamp = this->now();
+        publisher->publish(message);
+    }
 }
 
 ///**
@@ -115,28 +120,6 @@ void FakeTemperatureDataNode::publish_temperature()
 //  }
 //  min_temperature = config.min_temperature;
 //  max_temperature = config.max_temperature;
-//}
-//
-//
-///**
-// * Publish a random temperature within the boundaries of the min and max
-// * parameters
-// * @param temperature_pub publish the temperature message with this publisher
-// */
-//void publishTemperature(const ros::Publisher& temperature_pub)
-//{
-//  int random_temperature = randBetween(min_temperature, max_temperature);
-//
-//  // Update the vector with the latest temperatures by removing the first entry
-//  // and adding a new one.
-//  latest_temperatures.erase(latest_temperatures.begin());
-//  latest_temperatures.push_back(random_temperature);
-//
-//  double current_temperature = calculateArTemperature(latest_temperatures, ar_values);
-//  sensor_msgs::Temperature msg;
-//  msg.temperature = current_temperature;
-//  msg.header.stamp = ros::Time::now();
-//  temperature_pub.publish(msg);
 //}
 //
 
