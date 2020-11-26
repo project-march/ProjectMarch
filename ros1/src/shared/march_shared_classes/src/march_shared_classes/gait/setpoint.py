@@ -2,10 +2,10 @@ from math import cos, sin
 
 from march_shared_classes.exceptions.gait_exceptions import SideSpecificationError, SubgaitInterpolationError
 
-from .feet_state import FeetState
-from .foot import Foot
-from .utilities import merge_dictionaries, weighted_average, get_lengths_robot_for_inverse_kinematics
-from .vector_3d import Vector3d
+from march_shared_classes.foot_classes.feet_state import FeetState
+from march_shared_classes.foot_classes.foot import Foot
+from march_shared_classes.utilities.utility_functions import merge_dictionaries, weighted_average, get_lengths_robot_for_inverse_kinematics
+from march_shared_classes.utilities.vector_3d import Vector3d
 
 # Use this factor when calculating velocities to keep the calculations within the range of motion
 # See IK confluence page https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics

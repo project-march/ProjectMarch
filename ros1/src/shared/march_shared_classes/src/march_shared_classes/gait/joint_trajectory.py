@@ -4,7 +4,7 @@ from scipy.interpolate import BPoly
 from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
 
 from .setpoint import Setpoint
-from .utilities import weighted_average
+from march_shared_classes.utilities.utility_functions import weighted_average
 
 
 class JointTrajectory(object):

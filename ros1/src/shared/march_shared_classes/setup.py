@@ -3,7 +3,8 @@ from catkin_pkg.python_setup import generate_distutils_setup
 from setuptools import setup
 
 setup_args = generate_distutils_setup(
-    packages=['march_shared_classes', 'march_shared_classes.gait', 'march_shared_classes.exceptions'],
+    packages=['march_shared_classes', 'march_shared_classes.gait', 'march_shared_classes.exceptions',
+              'march_shared_classes.foot_classes', 'march_shared_classes.utilities'],
     package_dir={'': 'src'},
 )
 

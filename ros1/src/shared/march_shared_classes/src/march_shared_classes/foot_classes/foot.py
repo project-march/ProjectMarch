@@ -1,11 +1,8 @@
 from math import acos, atan, cos, pi, sqrt
 
+from march_shared_classes.exceptions.gait_exceptions import SideSpecificationError, SubgaitInterpolationError
 
-from march_shared_classes.exceptions.gait_exceptions import SideSpecificationError
-
-
-from .setpoint import Setpoint
-from .utilities import merge_dictionaries, get_lengths_robot_for_inverse_kinematics
+from march_shared_classes.utilities.utility_functions import merge_dictionaries, get_lengths_robot_for_inverse_kinematics
 
 
 VELOCITY_SCALE_FACTOR = 500
@@ -56,15 +53,15 @@ class Foot(object):
         """
         # find the joint angles a moment later using the foot position a moment later
         # use this together with the current joint angles to calculate the joint velocity
-        angle_positions = Setpoint.calculate_joint_angles_from_foot_position(foot_state.position,
+        angle_positions = Foot.calculate_joint_angles_from_foot_position(foot_state.position,
                                                                              foot_state.foot_side)
 
         next_position = Foot.calculate_next_foot_position(foot_state)
 
-        next_angles = Setpoint.calculate_joint_angles_from_foot_position(next_position.position,
+        next_angles = Foot.calculate_joint_angles_from_foot_position(next_position.position,
                                                                          next_position.foot_side)
 
-        angle_velocities = Setpoint.calculate_joint_velocities(next_angles, angle_positions, foot_state.foot_side)
+        angle_velocities = Foot.calculate_joint_velocities(next_angles, angle_positions, foot_state.foot_side)
 
         angle_states = merge_dictionaries(angle_velocities, angle_positions)
 
@@ -103,7 +100,7 @@ class Foot(object):
             raise SideSpecificationError(foot_side)
 
         # first calculate the haa angle. This calculation assumes that pos_z > 0
-        haa = Setpoint.calculate_haa_angle(z_position, y_position, ph)
+        haa = Foot.calculate_haa_angle(z_position, y_position, ph)
 
         # once the haa angle is known, rescale the desired x and z position to arrive at an easier system to calculate
         # the hfe and kfe angles
@@ -114,7 +111,7 @@ class Foot(object):
             raise SubgaitInterpolationError('The desired {foot} foot position, ({x}, {y}, {z}), is out of reach'.
                                             format(foot=foot_side, x=x_position, y=y_position, z=z_position))
 
-        hfe, kfe = Setpoint.calculate_hfe_kfe_angles(rescaled_x, rescaled_z, ul, ll)
+        hfe, kfe = Foot.calculate_hfe_kfe_angles(rescaled_x, rescaled_z, ul, ll)
 
         angle_positions = {foot_side + '_hip_aa': haa, foot_side + '_hip_fe': hfe, foot_side + '_knee': kfe}
         return angle_positions
