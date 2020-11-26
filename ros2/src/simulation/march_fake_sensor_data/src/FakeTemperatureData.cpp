@@ -89,14 +89,23 @@ void FakeTemperatureDataNode::add_temperature_publisher(const std::string& senso
 void FakeTemperatureDataNode::publish_temperatures()
 {
     for (auto publisher : temperature_publishers) {
-        // "Cycle" through the previous randomly generated temperatures by removing the
-        // oldest in the queue and adding a new random number to back of the queue.
-        latest_temperatures.pop_front();
-        latest_temperatures.push_back(distribution.get_random_number());
+        generate_new_temperature();
 
         MessageType message;
         message.temperature = calculate_autoregression_temperature();
         message.header.stamp = this->now();
         publisher->publish(message);
     }
+}
+
+/**
+ * @brief Generate a new pseudo random temperature and add it to the list of latest
+ * temperatures.
+ */
+void FakeTemperatureDataNode::generate_new_temperature()
+{
+    // "Cycle" through the previous randomly generated temperatures by removing the
+    // oldest in the queue and adding a new random number to back of the queue.
+    latest_temperatures.pop_front();
+    latest_temperatures.push_back(distribution.get_random_number());
 }

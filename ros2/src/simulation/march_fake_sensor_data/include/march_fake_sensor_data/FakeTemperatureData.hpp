@@ -42,6 +42,8 @@ class FakeTemperatureDataNode final : public rclcpp::Node {
 
         void add_temperature_publisher(const std::string& sensor_name);
 
+        void generate_new_temperature();
+
         // Publish all the fake temperature data to the appropriate topics.
         void publish_temperatures();
 
