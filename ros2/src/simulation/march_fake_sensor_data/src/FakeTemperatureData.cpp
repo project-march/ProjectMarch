@@ -32,10 +32,8 @@ FakeTemperatureDataNode::FakeTemperatureDataNode(const std::string& node_name, c
     autoregression_weights { std::move(autoregression_weights) },
     distribution {0, 0}
 {
-    // Each value in autoregression_values refers to the weight of
-    // the temperatures in latest_temperatures. Therefore, their lengths should
-    // match.
-    assert(latest_temperatures.size() == autoregression_weights.size());
+
+
 }
 
 /**
@@ -101,60 +99,4 @@ void FakeTemperatureDataNode::publish_temperatures()
         message.header.stamp = this->now();
         publisher->publish(message);
     }
-}
-
-int main(int argc, char** argv)
-{
-      /*
-  ros::init(argc, argv, "march_fake_sensor_data");
-  ros::NodeHandle n;
-  ros::Rate rate(10);
-
-  ros::param::get("~min_temperature", min_temperature);
-  ros::param::get("~max_temperature", max_temperature);
-
-  int count = 0;
-  while (!n.hasParam("/march/joint_names"))
-  {
-    ros::Duration(0.5).sleep();
-    count++;
-    if (count > 10)
-    {
-      ROS_ERROR("Failed to read the joint_names from the parameter server.");
-      throw std::runtime_error("Failed to read the joint_names from the parameter server.");
-    }
-  }
-
-  n.getParam("/march/joint_names", sensor_names);
-
-  // Initialise autoregression variables.
-  latest_temperatures = { 0, 0, 0, 0, 0, 0, 0 };
-  ar_values = { 0.1, 0.1, 0.1, 0.15, 0.15, 0.2, 0.2 };
-
-  // Create a publisher for each sensor
-  for (std::string sensor_name : sensor_names)
-  {
-    ros::Publisher temperature_pub =
-        n.advertise<sensor_msgs::Temperature>(createTopicName("/march/temperature", sensor_name.c_str()), 1000);
-    temperature_publishers.push_back(temperature_pub);
-  }
-
-  // Make the temperature values dynamic reconfigurable
-  dynamic_reconfigure::Server<march_fake_sensor_data::TemperaturesConfig> server;
-  dynamic_reconfigure::Server<march_fake_sensor_data::TemperaturesConfig>::CallbackType f;
-  server.setCallback(boost::bind(&temperatureConfigCallback, _1, _2));
-
-  while (ros::ok())
-  {
-    // Loop through all publishers
-    for (ros::Publisher temperature_pub : temperature_publishers)
-    {
-      publishTemperature(temperature_pub);
-    }
-
-    rate.sleep();
-    ros::spinOnce();
-  }
-*/
-  return 0;
 }
