@@ -1,4 +1,4 @@
-description: MVI ankle gait version 1 with HAA version 1 movement included
+description: MVI ankle gait version 1 with HAA version 2 movement included
 duration:
   nsecs: 300000000
   secs: 1
@@ -21,15 +21,15 @@ joints:
       secs: 1
     velocity: -0.0
   left_hip_aa:
-  - position: -0.0873
+  - position: 0.0
     time_from_start:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: 0.0
+  - position: -0.0611
     time_from_start:
-      nsecs: 0
-      secs: 1
+      nsecs: 300000000
+      secs: 0
     velocity: 0.0
   - position: 0.0
     time_from_start:
@@ -85,15 +85,15 @@ joints:
       secs: 1
     velocity: -0.0
   right_hip_aa:
-  - position: -0.0873
+  - position: 0.0
     time_from_start:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: 0.0
+  - position: 0.0636
     time_from_start:
-      nsecs: 0
-      secs: 1
+      nsecs: 606000000
+      secs: 0
     velocity: 0.0
   - position: 0.0
     time_from_start:
@@ -138,4 +138,4 @@ joints:
       secs: 1
     velocity: 0.0
 name: right_close
-version: MVI_walk_rightclose_haa_adpf_v1
+version: MVI_walk_rightclose_haa_adpf_v2

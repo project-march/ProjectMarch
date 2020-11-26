@@ -1,4 +1,4 @@
-description: MVI ankle gait version 3 with HAA movement included
+description: MVI ankle gait version 1 with HAA version 1 movement included
 duration:
   nsecs: 300000000
   secs: 1
@@ -26,17 +26,12 @@ joints:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: -0.0875
+  - position: -0.0873
     time_from_start:
-      nsecs: 457200000
+      nsecs: 600000000
       secs: 0
     velocity: 0.0
   - position: -0.0873
-    time_from_start:
-      nsecs: 0
-      secs: 1
-    velocity: 0.0
-  - position: 0.0
     time_from_start:
       nsecs: 300000000
       secs: 1
@@ -100,12 +95,12 @@ joints:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: 0.1047
+  - position: 0.0611
     time_from_start:
-      nsecs: 650000000
+      nsecs: 400000000
       secs: 0
     velocity: 0.0
-  - position: 0.0
+  - position: -0.0873
     time_from_start:
       nsecs: 300000000
       secs: 1
