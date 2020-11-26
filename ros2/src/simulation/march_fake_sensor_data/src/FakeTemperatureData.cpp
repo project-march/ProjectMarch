@@ -32,8 +32,12 @@ FakeTemperatureDataNode::FakeTemperatureDataNode(const std::string& node_name, c
     autoregression_weights { std::move(autoregression_weights) },
     distribution {0, 0}
 {
-
-
+    // Create a timer that fires 10 times a second
+    // Define parameters for minimum temperature and maximum temperature
+    // Retrieve the names of the joints
+    // Create fake temperature sensors for all joints
+    // Create a callback for the temperature parameters changing
+    // Publish the temperatures every 0.1 second in a loop
 }
 
 /**
