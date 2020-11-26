@@ -1,9 +1,9 @@
 import unittest
 
-from march_shared_classes.gait.feet_state import FeetState
-from march_shared_classes.gait.foot import Foot
+from march_shared_classes.foot_classes.feet_state import FeetState
+from march_shared_classes.foot_classes.foot import Foot
 from march_shared_classes.gait.setpoint import Setpoint
-from march_shared_classes.gait.vector_3d import Vector3d
+from march_shared_classes.utilities.vector_3d import Vector3d
 
 
 class SetpointTest(unittest.TestCase):

@@ -2,10 +2,11 @@ from math import acos, atan, cos, pi, sqrt
 
 from march_shared_classes.exceptions.gait_exceptions import SideSpecificationError, SubgaitInterpolationError
 
-from march_shared_classes.utilities.utility_functions import merge_dictionaries, get_lengths_robot_for_inverse_kinematics
+from march_shared_classes.utilities.utility_functions import get_lengths_robot_for_inverse_kinematics
 
 
 VELOCITY_SCALE_FACTOR = 500
+JOINT_NAMES_IK = ['left_hip_aa', 'left_hip_fe', 'left_knee', 'right_hip_aa', 'right_hip_fe', 'right_knee']
 
 
 class Foot(object):
@@ -13,9 +14,9 @@ class Foot(object):
 
     def __init__(self, foot_side, position, velocity=None):
         """Create a Foot object, position and velocity are both Vector3d objects."""
+        self.foot_side = foot_side
         self.position = position
         self.velocity = velocity
-        self.foot_side = foot_side
         if foot_side != 'left' and foot_side != 'right':
             raise SideSpecificationError(foot_side)
 
@@ -35,54 +36,48 @@ class Foot(object):
 
         :param current_state: A Foot object with a velocity
 
-        :return A Foot object with the position of the foot 1 / VELOCITY_SCALE_FACTOR second later
+        :return: A Foot object with the position of the foot 1 / VELOCITY_SCALE_FACTOR second later
         """
         next_position = current_state.position + current_state.velocity / VELOCITY_SCALE_FACTOR
         return cls(current_state.foot_side, next_position)
 
     @staticmethod
-    def get_joint_states_from_foot_state(foot_state):
-        """Computes the state (position & velocity) of the joints needed to reach a desired state of the foot.
+    def get_joint_states_from_foot_state(foot_state, time):
+        """Translates between feet_state and a list of setpoints, which correspond with the feet_state.
 
-        :param foot_state:
-            A Foot object which specifies the desired position and velocity of the foot, also specifies which foot.
+        :param foot_state: A fully populated Foot object.
+        :param time: The time of the Foot state and resulting setpoints.
 
-        :return:
-            A dictionary with an entry for each joint on the requested side with the correct joint angles and joint
-            velocities.
+        :return: A dictionary of setpoints, the foot location and velocity of which corresponds with the feet_state.
         """
+        joint_states = Foot.calculate_joint_angles_from_foot_position(foot_state.position, foot_state.foot_side, time)
+
         # find the joint angles a moment later using the foot position a moment later
         # use this together with the current joint angles to calculate the joint velocity
-        angle_positions = Foot.calculate_joint_angles_from_foot_position(foot_state.position,
-                                                                             foot_state.foot_side)
-
         next_position = Foot.calculate_next_foot_position(foot_state)
+        next_joint_positions = Foot.calculate_joint_angles_from_foot_position(next_position.position,
+                                                                              next_position.foot_side, time)
+        for joint in JOINT_NAMES_IK:
+            if joint in joint_states and joint in next_joint_positions:
+                joint_states[joint].add_joint_velocity_from_next_angle(next_joint_positions[joint])
 
-        next_angles = Foot.calculate_joint_angles_from_foot_position(next_position.position,
-                                                                         next_position.foot_side)
-
-        angle_velocities = Foot.calculate_joint_velocities(next_angles, angle_positions, foot_state.foot_side)
-
-        angle_states = merge_dictionaries(angle_velocities, angle_positions)
-
-        return angle_states
+        return joint_states
 
     @staticmethod
-    def calculate_joint_angles_from_foot_position(foot_position, foot_side):
+    def calculate_joint_angles_from_foot_position(foot_position, foot_side, time):
         """Calculates the angles of the joints corresponding to a certain position of the right or left foot.
 
         More information on the calculations of the haa, hfe and kfe angles, aswell as on the velocity calculations can
         be found at https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics. This function
         assumes that the desired z position of the foot is positive.
 
-        :param foot_position:
-            A Vecor3d object which specifies the desired position of the foot.
-        :param foot_side:
-            A string which specifies to which side the foot_position belongs and thus which joint angles should be
-            computed.
+        :param foot_position: A Vecor3d object which specifies the desired position of the foot.
+        :param foot_side: A string which specifies to which side the foot_position belongs and thus which joint angles
+            should be computed.
+        :param time: The time of the foot_position and the resulting setpoints.
 
         :return:
-            A dictionary with an entry for each joint on the requested side with the correct angle.
+            A dictionary of Setpoints for each joint on the requested side with the correct angle at the provided time.
         """
         # Get relevant lengths from robot model, ul = upper leg etc. see get_lengths_robot_for_inverse_kinematics()
         # and unpack desired position
@@ -113,7 +108,8 @@ class Foot(object):
 
         hfe, kfe = Foot.calculate_hfe_kfe_angles(rescaled_x, rescaled_z, ul, ll)
 
-        angle_positions = {foot_side + '_hip_aa': haa, foot_side + '_hip_fe': hfe, foot_side + '_knee': kfe}
+        angle_positions = {foot_side + '_hip_aa': Setpoint(time, haa), foot_side + '_hip_fe': Setpoint(time, hfe),
+                           foot_side + '_knee': Setpoint(time, kfe)}
         return angle_positions
 
 

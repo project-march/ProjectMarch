@@ -10,9 +10,7 @@ from march_shared_classes.utilities.vector_3d import Vector3d
 # Use this factor when calculating velocities to keep the calculations within the range of motion
 # See IK confluence page https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
 VELOCITY_SCALE_FACTOR = 500
-JOINTS_POSITION_NAMES_IK = ['left_hip_aa', 'left_hip_fe', 'left_knee', 'right_hip_aa', 'right_hip_fe', 'right_knee']
-JOINTS_VELOCITY_NAMES_IK = ['left_hip_aa_velocity', 'left_hip_fe_velocity', 'left_knee_velocity',
-                            'right_hip_aa_velocity', 'right_hip_fe_velocity', 'right_knee_velocity']
+JOINT_NAMES_IK = ['left_hip_aa', 'left_hip_fe', 'left_knee', 'right_hip_aa', 'right_hip_fe', 'right_knee']
 
 
 class Setpoint(object):
@@ -20,7 +18,7 @@ class Setpoint(object):
 
     digits = 4
 
-    def __init__(self, time, position, velocity):
+    def __init__(self, time, position, velocity=None):
         self._time = round(time, self.digits)
         self._position = round(position, self.digits)
         self._velocity = round(velocity, self.digits)
@@ -49,6 +47,16 @@ class Setpoint(object):
     def velocity(self, velocity):
         self._velocity = round(velocity, self.digits)
 
+    def add_joint_velocity_from_next_angle(self, next_state):
+        """Calculates the (left/right/all)joint velocities given a current position and a next position.
+
+        :param this: A Setpoint object with no velocity
+        :param next_state: A Setpoint with the positions a moment later
+
+        ":return: The joint velocities of the joints on the specified side
+        """
+        self.velocity = (next_state.position - self.position) * VELOCITY_SCALE_FACTOR
+
     @staticmethod
     def create_position_interpolated_setpoints(base_setpoints, other_setpoints, parameter):
         """Linearly interpolate between the foot position.
@@ -62,14 +70,12 @@ class Setpoint(object):
         :return
             A dictionary of setpoints, who's corresponding foot location is linearly interpolated from the setpoints
         """
-        base_foot_state = Setpoint.get_feet_state_from_setpoints(base_setpoints)
-        other_foot_state = Setpoint.get_feet_state_from_setpoints(other_setpoints)
+        base_feet_state = Setpoint.get_feet_state_from_setpoints(base_setpoints)
+        other_feet_state = Setpoint.get_feet_state_from_setpoints(other_setpoints)
 
-        new_feet_state = FeetState.weighted_average_states(base_foot_state, other_foot_state, parameter)
+        new_feet_state = FeetState.weighted_average_states(base_feet_state, other_feet_state, parameter)
 
-        new_joint_states = merge_dictionaries(
-            Setpoint.get_joint_states_from_foot_state(new_feet_state.left_foot),
-            Setpoint.get_joint_states_from_foot_state(new_feet_state.right_foot))
+        inverse_kinematic_setpoints = FeetState.feet_state_to_setpoint(new_feet_state)
 
         # linearly interpolate the ankle angle, as it cannot be calculated from the inverse kinematics
         try:
@@ -94,10 +100,9 @@ class Setpoint(object):
             other_setpoints_time += setpoint.time
         time = weighted_average(base_setpoints_time, other_setpoints_time, parameter) / len(base_setpoints)
 
-        resulting_setpoints = {'left_ankle': Setpoint(time, new_ankle_angle_left, new_ankle_velocity_left),
+        ankle_setpoints = {'left_ankle': Setpoint(time, new_ankle_angle_left, new_ankle_velocity_left),
                                'right_ankle': Setpoint(time, new_ankle_angle_right, new_ankle_velocity_right)}
-        for joint, velocity in zip(JOINTS_POSITION_NAMES_IK, JOINTS_VELOCITY_NAMES_IK):
-            resulting_setpoints[joint] = Setpoint(time, new_joint_states[joint], new_joint_states[velocity])
+        resulting_setpoints = merge_dictionaries(inverse_kinematic_setpoints, ankle_setpoints)
 
         return resulting_setpoints
 
@@ -144,7 +149,7 @@ class Setpoint(object):
             A FeetState object with a left and right foot which each have a position and velocity corresponding to the
             setpoint dictionary
         """
-        for joint in JOINTS_POSITION_NAMES_IK:
+        for joint in JOINT_NAMES_IK:
             if joint not in setpoint_dic:
                 raise KeyError('expected setpoint dictionary to contain joint {joint}, but {joint} was missing.'.
                                format(joint=joint))
@@ -168,7 +173,14 @@ class Setpoint(object):
         foot_state_left.add_foot_velocity_from_next_state(next_foot_state_left)
         foot_state_right.add_foot_velocity_from_next_state(next_foot_state_right)
 
-        feet_state = FeetState(foot_state_right, foot_state_left)
+        # Set the time of the new setpoints as the weighted average of the original setpoint times
+        feet_state_time = 0
+        for setpoint in setpoint_dic.values():
+            feet_state_time += setpoint.time
+        feet_state_time = feet_state_time / len(setpoint_dic)
+
+        feet_state = FeetState(foot_state_right, foot_state_left, feet_state_time)
+
         return feet_state
 
     @staticmethod
@@ -207,7 +219,7 @@ class Setpoint(object):
         :return: A dictionary with the positions of the joints 1 / VELOCITY_SCALE_FACTOR second later
         """
         next_positions = {}
-        for joint in JOINTS_POSITION_NAMES_IK:
+        for joint in JOINT_NAMES_IK:
             if joint in setpoint_dic:
                 next_positions[joint] = setpoint_dic[joint].position + setpoint_dic[joint].velocity \
                     / VELOCITY_SCALE_FACTOR
@@ -216,29 +228,3 @@ class Setpoint(object):
 
         return next_positions
 
-    @staticmethod
-    def calculate_joint_velocities(next_angle_positions, angle_positions, side='both'):
-        """Calculates the (left/right/all)joint velocities given a current position and a next position.
-
-        :param next_angle_positions: A dictionary containing the positions of the joints a moment later
-        :param angle_positions: A dictionary containing the current positions of the joints
-        :param side: Specifies the side of the exo whos joints should be used for the calculation
-
-        ":return: The joint velocities of the joints on the specified side
-        """
-        if side != 'left' and side != 'right' and side != 'both':
-            raise SideSpecificationError(side, "Side should be either 'left', 'right' or 'both', but was {side}".
-                                         format(side=side))
-        angle_velocity = {}
-        for coordinate, velocity in zip(JOINTS_POSITION_NAMES_IK, JOINTS_VELOCITY_NAMES_IK):
-            if side == 'left' or side == 'right':
-                if not (coordinate.startswith(side) and velocity.startswith(side)):
-                    continue
-            if coordinate in next_angle_positions and coordinate in angle_positions:
-                angle_velocity[velocity] = (next_angle_positions[coordinate] - angle_positions[coordinate]) \
-                    * VELOCITY_SCALE_FACTOR
-            else:
-                raise KeyError('next_angle_positions or angle_positions is missing key {coord}'.
-                               format(coord=coordinate))
-
-        return angle_velocity
