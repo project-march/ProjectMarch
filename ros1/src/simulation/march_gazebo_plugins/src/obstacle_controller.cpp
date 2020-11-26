@@ -169,7 +169,6 @@ void ObstacleController::getGoalPosition(double time_since_start)
   // Goal position is determined from the location of the stable foot
   if (subgait_name_.substr(0, 7) != "dynamic")
   {
-    ROS_INFO_STREAM(subgait_name_.substr(0, 7) << "is not dynamic.");
     goal_position_x = stable_foot_pose.X();
   }
   goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
