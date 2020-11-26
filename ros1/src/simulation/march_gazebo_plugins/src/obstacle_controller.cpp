@@ -28,6 +28,8 @@ ObstacleController::ObstacleController(physics::ModelPtr model)
   , error_x_last_timestep_(0)
   , error_y_last_timestep_(0)
   , error_yaw_last_timestep_(0)
+  , goal_position_x(0)
+  , goal_position_y(0)
 
 {
   foot_left_ = model_->GetLink("ankle_plate_left");
@@ -94,10 +96,7 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left
 
   auto model_com = GetCom();
 
-  double goal_position_x;
-  double goal_position_y;
-
-  getGoalPosition(time_since_start, goal_position_x, goal_position_y);
+  getGoalPosition(time_since_start);
   double error_x = model_com.X() - goal_position_x;
   double error_y = model_com.Y() - goal_position_y;
   double error_yaw = foot_left_->WorldPose().Rot().Z();
@@ -157,7 +156,7 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left
 
 }
 
-void ObstacleController::getGoalPosition(double time_since_start, double& goal_position_x, double& goal_position_y)
+void ObstacleController::getGoalPosition(double time_since_start)
 {
   // Left foot is stable unless subgait name starts with left
   auto stable_foot_pose = foot_left_->WorldCoGPose().Pos();
@@ -170,6 +169,7 @@ void ObstacleController::getGoalPosition(double time_since_start, double& goal_p
   // Goal position is determined from the location of the stable foot
   if (subgait_name_.substr(0, 7) != "dynamic")
   {
+    ROS_INFO_STREAM(subgait_name_.substr(0, 7) << "is not dynamic.");
     goal_position_x = stable_foot_pose.X();
   }
   goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();

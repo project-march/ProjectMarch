@@ -37,7 +37,7 @@ class TrajectoryScheduler(object):
         :param JointTrajectory trajectory: a trajectory for all joints to follow
         """
         self._failed = False
-        goal = FollowJointTrajectoryGoal(trajectory=trajectory)
+        goal = FollowJointTrajectoryGoal(trajectory=trajectory, goal_tolerance=[0.1]*len(trajectory.joint_names), goal_time_tolerance=0.2)
         self._last_goal = GoalID(stamp=self._node.get_clock().now().to_msg())
         self._trajectory_goal_pub.publish(FollowJointTrajectoryActionGoal(
             header=Header(stamp=self._node.get_clock().now().to_msg()),

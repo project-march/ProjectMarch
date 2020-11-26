@@ -15,7 +15,7 @@ public:
   void newSubgait(const march_shared_resources::CurrentGaitConstPtr& msg);
   ignition::math::v4::Vector3<double> GetCom();
   void update(ignition::math::v4::Vector3<double>& torque_all, ignition::math::v4::Vector3<double>& torque_stable);
-  void getGoalPosition(double time_since_start, double& goal_position_x, double& goal_position_y);
+  void getGoalPosition(double time_since_start);
 
 protected:
   physics::ModelPtr model_;
@@ -54,6 +54,9 @@ protected:
   double error_x_last_timestep_;
   double error_y_last_timestep_;
   double error_yaw_last_timestep_;
+
+  double goal_position_x;
+  double goal_position_y;
 };
 }  // namespace gazebo
 
