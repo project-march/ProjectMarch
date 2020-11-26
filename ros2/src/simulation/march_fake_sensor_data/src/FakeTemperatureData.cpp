@@ -103,26 +103,6 @@ void FakeTemperatureDataNode::publish_temperatures()
     }
 }
 
-///**
-// * This callback is called when parameters from the config file are changed
-// * during run-time. This method updates the local values which depend on these
-// * parameters to make ensure the values are not out-of-date.
-// * @param config the config file with all the parameters
-// * @param level A bitmask
-// */
-//void temperatureConfigCallback(march_fake_sensor_data::TemperaturesConfig& config, uint32_t /* level */)
-//{
-//  // Make sure there is always a possible interval between min and max
-//  // temperature.
-//  if (config.min_temperature >= config.max_temperature)
-//  {
-//    config.max_temperature = config.min_temperature + 1;
-//  }
-//  min_temperature = config.min_temperature;
-//  max_temperature = config.max_temperature;
-//}
-//
-
 int main(int argc, char** argv)
 {
       /*
