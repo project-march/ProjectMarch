@@ -29,10 +29,6 @@ class FakeTemperatureDataNode final : public rclcpp::Node {
         // the random temperatures.
         UniformDistribution distribution;
 
-        // Calculate the weighted average based on the latest temperatures to
-        // reduce the jitter in the produced random temperatures.
-        double calculate_autoregression_temperature() const;
-
     public:
         // Constructor that moves the predefined auto regression values into itself.
         FakeTemperatureDataNode(
@@ -49,4 +45,8 @@ class FakeTemperatureDataNode final : public rclcpp::Node {
 
         // The temperature should be dynamically adjustable.
         void set_range(int minimum_temperature, int maximum_temperature);
+
+        // Calculate the weighted average based on the latest temperatures to
+        // reduce the jitter in the produced random temperatures.
+        double calculate_autoregression_temperature() const;
 };

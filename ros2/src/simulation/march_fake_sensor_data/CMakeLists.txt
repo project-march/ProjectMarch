@@ -47,16 +47,20 @@ install(TARGETS march_fake_sensor_data_node
 if(BUILD_TESTING)
     find_package(ament_lint_auto REQUIRED)
     find_package(ament_cmake_gtest REQUIRED)
+    find_package(launch_testing_ament_cmake REQUIRED)
     ament_lint_auto_find_test_dependencies()
 
     # Add a gtest executables
-    ament_add_gtest(${PROJECT_NAME}-test
+    ament_add_gtest(${PROJECT_NAME}-uniform-distribution-test
         test/UniformDistributionTest.cpp
     )
-
-    target_link_libraries(${PROJECT_NAME}-test
-        ${PROJECT_NAME}
+    target_link_libraries(${PROJECT_NAME}-uniform-distribution-test ${PROJECT_NAME})
+    ament_add_gtest(${PROJECT_NAME}-fake-temperature-data-test
+        test/FakeTemperatureDataTest.cpp
     )
+    target_link_libraries(${PROJECT_NAME}-fake-temperature-data-test ${PROJECT_NAME})
+
+#add_launch_test(test/name_of_test.test.py)
 endif()
 
 ament_package()

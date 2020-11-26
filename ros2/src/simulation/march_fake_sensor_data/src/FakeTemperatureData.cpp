@@ -49,7 +49,7 @@ double FakeTemperatureDataNode::calculate_autoregression_temperature() const
         result += temperature * autoregression_weights.at(index);
         index += 1;
     }
-  return result;
+    return result;
 }
 
 /**
