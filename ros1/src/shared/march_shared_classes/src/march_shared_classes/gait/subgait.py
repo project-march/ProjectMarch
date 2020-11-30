@@ -11,6 +11,7 @@ from march_shared_classes.exceptions.general_exceptions import FileNotFoundError
 from .joint_trajectory import JointTrajectory
 from .limits import Limits
 from .setpoint import Setpoint
+from march_shared_classes.foot_classes.feet_state import FeetState
 from march_shared_classes.utilities.utility_functions import weighted_average
 
 PARAMETRIC_GAITS_PREFIX = '_pg_'
@@ -298,11 +299,17 @@ class Subgait(object):
                 joints.append(cls.joint_class.interpolate_joint_trajectories(base_joint, other_joint, parameter))
 
         if use_foot_position:
-            joints = cls.joint_class.interpolate_joint_trajectories_foot_position(base_subgait, other_subgait,
-                                                                                  parameter)
+            base_setpoints_to_interpolate, other_setpoints_to_interpolate = \
+                cls.joint_class.change_order_of_joints_and_setpoints(base_subgait, other_subgait)
+            base_foot_states = []
+            other_foot_states = []
+            for setpoint_index in range(0, number_of_setpoints):
+                base_foot_states.append(FeetState.from_setpoints(base_setpoints_to_interpolate[setpoint_index]))
+                other_foot_states.append(FeetState.from_setpoints(other_setpoints_to_interpolate[setpoint_index]))
 
-        description = 'Interpolation between base version {0}, and other version {1} with parameter{2}'.format(
-            base_subgait.version, other_subgait.version, parameter)
+        description = 'Interpolation between base version {0}, and other version {1} with parameter{2}. ' \
+                      'Based on foot position: {3}'.format(base_subgait.version, other_subgait.version, parameter,
+                                                           use_foot_position)
 
         duration = weighted_average(base_subgait.duration, other_subgait.duration, parameter)
         gait_type = base_subgait.gait_type if parameter <= 0.5 else other_subgait.gait_type
@@ -402,3 +409,52 @@ class Subgait(object):
         base_version = versions[0][1:-1]
         other_version = versions[1][1:-1]
         return base_version, other_version, parameter
+
+    @staticmethod
+    def create_position_interpolated_setpoints(base_setpoints, other_setpoints, parameter):
+        """Linearly interpolate between the foot position.
+
+        :param base_setpoints:
+            A dictionary of setpoints, one for each joint. Return value if parameter is zero
+        :param other_setpoints:
+            A dictionary of setpoints, one for each joint. Return value if parameter is one
+        :param parameter:
+            parameter for the interpolation
+        :return
+            A dictionary of setpoints, who's corresponding foot location is linearly interpolated from the setpoints
+        """
+        base_feet_state = Setpoint.get_feet_state_from_setpoints(base_setpoints)
+        other_feet_state = Setpoint.get_feet_state_from_setpoints(other_setpoints)
+
+        new_feet_state = FeetState.weighted_average_states(base_feet_state, other_feet_state, parameter)
+
+        inverse_kinematic_setpoints = FeetState.feet_state_to_setpoint(new_feet_state)
+
+        # linearly interpolate the ankle angle, as it cannot be calculated from the inverse kinematics
+        try:
+            new_ankle_angle_left = weighted_average(base_setpoints['left_ankle'].position,
+                                                    other_setpoints['left_ankle'].position, parameter)
+            new_ankle_angle_right = weighted_average(base_setpoints['right_ankle'].position,
+                                                     other_setpoints['right_ankle'].position, parameter)
+            new_ankle_velocity_left = weighted_average(base_setpoints['left_ankle'].velocity,
+                                                       other_setpoints['left_ankle'].velocity, parameter)
+            new_ankle_velocity_right = weighted_average(base_setpoints['right_ankle'].velocity,
+                                                        other_setpoints['right_ankle'].velocity, parameter)
+        except KeyError as e:
+            raise KeyError('Expected setpoint dictionaries to contain "{key}", but "{key}" was missing.'.
+                           format(key=e.args[0]))
+
+        # Set the time of the new setpoints as the weighted average of the original setpoint times
+        base_setpoints_time = 0
+        other_setpoints_time = 0
+        for setpoint in base_setpoints.values():
+            base_setpoints_time += setpoint.time
+        for setpoint in other_setpoints.values():
+            other_setpoints_time += setpoint.time
+        time = weighted_average(base_setpoints_time, other_setpoints_time, parameter) / len(base_setpoints)
+
+        ankle_setpoints = {'left_ankle': Setpoint(time, new_ankle_angle_left, new_ankle_velocity_left),
+                               'right_ankle': Setpoint(time, new_ankle_angle_right, new_ankle_velocity_right)}
+        resulting_setpoints = merge_dictionaries(inverse_kinematic_setpoints, ankle_setpoints)
+
+        return resulting_setpoints

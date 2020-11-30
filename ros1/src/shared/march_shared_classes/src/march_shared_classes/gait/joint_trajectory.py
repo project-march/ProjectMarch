@@ -171,44 +171,33 @@ class JointTrajectory(object):
         return JointTrajectory(base_trajectory.name, base_trajectory.limits, setpoints, duration)
 
     @staticmethod
-    def interpolate_joint_trajectories_foot_position(base_subgait, other_subgait, parameter):
-        """Linearly interpolate the foot trajectory corresponding to the joint trajectories of two subgaits.
+    def change_order_of_joints_and_setpoints(base_subgait, other_subgait):
+        """Change structure from joints which have a list of setpoints to a list of 'ith' setpoints with for each joint.
 
         This function goes over each joint to get needed setpoints (all first setpoints, all second setpoints..).
-        These are needed as calcuating the foot position requires the position of all joints at a certain time.
+        These are placed in list with the correct index, where each entry contains a dictionary with joint name setpoint
+        pairs.
 
-        :param base_trajectory:
-            base trajectory, return value if parameter is equal to zero
-        :param other_trajectory:
-            other trajectory, return value if parameter is equal to one
+        :param base_subgait:
+            base base_subgait, return value if parameter is equal to zero
+        :param other_subgait:
+            other other_subgait, return value if parameter is equal to one
         :param parameter:
             The parameter to use for interpolation. Should be 0 <= parameter <= 1.
 
         :return:
             The interpolated trajectory
         """
-        joints = []
-        new_setpoints = {joint.name: [] for joint in base_subgait.joints}
-        for current_setpoints_index in range(0, len(base_subgait.joints[0].setpoints)):
-            base_setpoints_to_interpolate = {}
-            other_setpoints_to_interpolate = {}
+        number_of_setpoints = len(base_subgait.joints[0].setpoints)
+        base_setpoints_to_interpolate = [{} for _ in range(number_of_setpoints)]
+        other_setpoints_to_interpolate = [{} for _ in range(number_of_setpoints)]
+        for setpoint_index in range(number_of_setpoints):
             for base_joint, other_joint in zip(sorted(base_subgait.joints, key=lambda joint: joint.name),
                                                sorted(other_subgait.joints, key=lambda joint: joint.name)):
                 if base_joint.limits != other_joint.limits:
                     raise SubgaitInterpolationError(
                         'Not able to safely interpolate because limits are not equal for joints '
                         '{0} and {1}'.format(base_joint.name, other_joint.name))
-                base_setpoints_to_interpolate[base_joint.name] = base_joint.setpoints[current_setpoints_index]
-                other_setpoints_to_interpolate[other_joint.name] = other_joint.setpoints[current_setpoints_index]
-            interpolated_setpoints = Setpoint.create_position_interpolated_setpoints(base_setpoints_to_interpolate,
-                                                                                     other_setpoints_to_interpolate,
-                                                                                     parameter)
-            # with interpolated setpoints, create a dictionary of joint names with a list of their setpoints
-            for base_joint in base_subgait.joints:
-                new_setpoints[base_joint.name].append(interpolated_setpoints[base_joint.name])
-
-        duration = weighted_average(base_subgait.duration, other_subgait.duration, parameter)
-        for base_joint in base_subgait.joints:
-            joints.append(JointTrajectory(base_joint.name, base_joint.limits, new_setpoints[base_joint.name],
-                                          duration))
-        return joints
+                base_setpoints_to_interpolate[setpoint_index][base_joint.name] = base_joint.setpoints[setpoint_index]
+                other_setpoints_to_interpolate[setpoint_index][other_joint.name] = other_joint.setpoints[setpoint_index]
+        return base_setpoints_to_interpolate, other_setpoints_to_interpolate

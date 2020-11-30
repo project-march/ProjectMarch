@@ -1,17 +1,65 @@
-from march_shared_classes.exceptions.gait_exceptions import WeightedAverageError
+from march_shared_classes.exceptions.gait_exceptions import WeightedAverageError, SideSpecificationError
 
+from march_shared_classes.gait.setpoint import Setpoint
 from .foot import Foot
-from march_shared_classes.utilities.utility_functions import merge_dictionaries, weighted_average
+from march_shared_classes.utilities.utility_functions import merge_dictionaries, weighted_average, get_lengths_robot_for_inverse_kinematics
 
+JOINT_NAMES_IK = ['left_hip_aa', 'left_hip_fe', 'left_knee', 'right_hip_aa', 'right_hip_fe', 'right_knee']
+VELOCITY_SCALE_FACTOR = 500
 
 class FeetState(object):
-    """Class for encapturing the entire state (position and velocity) of both feet."""
+    """Class for encapturing the entire state (position and velocity at a certain time) of both feet."""
 
     def __init__(self, right_foot, left_foot, time=None):
         """Create a FeetState object, right_foot and left_foot are both Foot objects."""
         self.right_foot = right_foot
         self.left_foot = left_foot
         self.time = time
+
+    @classmethod
+    def from_setpoints(cls, setpoint_dic):
+        """Calculate the position and velocity of the foot (or rather ankle) from joint angles.
+
+        :param setpoint_dic:
+            Dictionary of setpoints from which the feet positions and velocities need to be calculated
+
+        :return:
+            A FeetState object with a left and right foot which each have a position and velocity corresponding to the
+            setpoint dictionary
+        """
+        for joint in JOINT_NAMES_IK:
+            if joint not in setpoint_dic:
+                raise KeyError('expected setpoint dictionary to contain joint {joint}, but {joint} was missing.'.
+                               format(joint=joint))
+
+        foot_state_left = Foot.calculate_foot_position(setpoint_dic['left_hip_aa'].position,
+                                                           setpoint_dic['left_hip_fe'].position,
+                                                           setpoint_dic['left_knee'].position, 'left')
+        foot_state_right = Foot.calculate_foot_position(setpoint_dic['right_hip_aa'].position,
+                                                            setpoint_dic['right_hip_fe'].position,
+                                                            setpoint_dic['right_knee'].position, 'right')
+
+        next_joint_positions = Setpoint.calculate_next_positions_joint(setpoint_dic)
+
+        next_foot_state_left = Foot.calculate_foot_position(next_joint_positions['left_hip_aa'],
+                                                                next_joint_positions['left_hip_fe'],
+                                                                next_joint_positions['left_knee'], 'left')
+        next_foot_state_right = Foot.calculate_foot_position(next_joint_positions['right_hip_aa'],
+                                                                 next_joint_positions['right_hip_fe'],
+                                                                 next_joint_positions['right_knee'], 'right')
+
+        foot_state_left.add_foot_velocity_from_next_state(next_foot_state_left)
+        foot_state_right.add_foot_velocity_from_next_state(next_foot_state_right)
+
+        # Set the time of the new setpoints as the weighted average of the original setpoint times
+        feet_state_time = 0
+        for setpoint in setpoint_dic.values():
+            feet_state_time += setpoint.time
+        feet_state_time = feet_state_time / len(setpoint_dic)
+
+        feet_state = cls(foot_state_right, foot_state_left, feet_state_time)
+
+        return feet_state
 
     @classmethod
     def weighted_average_states(cls, base_state, other_state, parameter):

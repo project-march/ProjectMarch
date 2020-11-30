@@ -1,8 +1,10 @@
-from math import acos, atan, cos, pi, sqrt
+from math import acos, atan, cos, pi, sin, sqrt
 
 from march_shared_classes.exceptions.gait_exceptions import SideSpecificationError, SubgaitInterpolationError
 
+from march_shared_classes.gait.setpoint import Setpoint
 from march_shared_classes.utilities.utility_functions import get_lengths_robot_for_inverse_kinematics
+from march_shared_classes.utilities.vector_3d import Vector3d
 
 
 VELOCITY_SCALE_FACTOR = 500
@@ -168,3 +170,31 @@ class Foot(object):
         kfe = acos((rescaled_z - upper_leg * cos(hfe)) / lower_leg) + hfe
 
         return hfe, kfe
+
+    @staticmethod
+    def calculate_foot_position(haa, hfe, kfe, side):
+        """Calculates the foot position given the relevant angles, lengths and a specification of the foot.
+
+        :param side: The side of the exoskeleton to which the angles belong
+        :param haa: The angle of the hip_aa joint on the specified side
+        :param hfe: The angle of the hip_fe joint on the specified side
+        :param kfe: The angle of the knee joint on the specified side
+
+        :return: The location of the foot (ankle) of the specified side which corresponds to the given angles
+        """
+        # x is positive in the walking direction, z is in the downward direction, y is directed to the right side
+        # the origin in the middle of the hip structure. The calculations are supported by
+        # https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
+        ul, ll, hl, ph, base = get_lengths_robot_for_inverse_kinematics(side)
+        haa_to_foot_length = ul * cos(hfe) + ll * cos(hfe - kfe)
+        z_position = - sin(haa) * ph + cos(haa) * haa_to_foot_length
+        x_position = hl + sin(hfe) * ul + sin(hfe - kfe) * ll
+
+        if side == 'left':
+            y_position = - cos(haa) * ph - sin(haa) * haa_to_foot_length - base / 2.0
+        elif side == 'right':
+            y_position = cos(haa) * ph + sin(haa) * haa_to_foot_length + base / 2.0
+        else:
+            raise SideSpecificationError(side)
+
+        return Foot(side, Vector3d(x_position, y_position, z_position))
