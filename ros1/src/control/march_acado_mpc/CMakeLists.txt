@@ -84,6 +84,7 @@ include_directories(
 add_library(${PROJECT_NAME}
         "${QPOASES_SRCS}"
         "${ACADO_SRCS}"
+        src/joint_trajectory_mpc.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
@@ -91,19 +92,20 @@ target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 ############
 # ROS NODE #
 ############
-add_executable(joint_trajectory_mpc src/joint_trajectory_mpc)
-add_dependencies(joint_trajectory_mpc ${catkin_EXPORTED_TARGETS})
-target_link_libraries(joint_trajectory_mpc ${PROJECT_NAME})
+#add_executable(joint_trajectory_mpc src/joint_trajectory_mpc)
+#add_dependencies(joint_trajectory_mpc ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(joint_trajectory_mpc ${PROJECT_NAME})
 
 install(DIRECTORY include
-        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-        )
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
+
 install(TARGETS ${PROJECT_NAME}
-        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-        )
-install(TARGETS joint_trajectory_mpc
-        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-        )
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
+
+install(FILES controller_plugins.xml
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+
 install(DIRECTORY launch
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
         )
