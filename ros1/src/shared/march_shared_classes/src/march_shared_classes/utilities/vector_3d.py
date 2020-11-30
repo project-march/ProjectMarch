@@ -1,5 +1,6 @@
 from march_shared_classes.exceptions.gait_exceptions import IncorrectCoordinateError
 
+from math import sqrt
 
 class Vector3d(object):
     """A 3d vector class."""
@@ -46,8 +47,14 @@ class Vector3d(object):
         else:
             return False
 
+    def __repr__(self):
+        return 'x: {x}, y: {y}, z: {z}'.format(x=self.x, y=self.y, z=self.z)
+
     def as_dictionary(self):
         return{'x': self.x, 'y': self.y, 'z': self.z}
+
+    def norm(self):
+        return sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
 
     @staticmethod
     def size():

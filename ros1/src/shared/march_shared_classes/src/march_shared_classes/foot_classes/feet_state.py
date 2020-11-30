@@ -5,7 +5,6 @@ from .foot import Foot
 from march_shared_classes.utilities.utility_functions import merge_dictionaries, weighted_average, get_lengths_robot_for_inverse_kinematics
 
 JOINT_NAMES_IK = ['left_hip_aa', 'left_hip_fe', 'left_knee', 'right_hip_aa', 'right_hip_fe', 'right_knee']
-VELOCITY_SCALE_FACTOR = 500
 
 class FeetState(object):
     """Class for encapturing the entire state (position and velocity at a certain time) of both feet."""
@@ -21,7 +20,8 @@ class FeetState(object):
         """Calculate the position and velocity of the foot (or rather ankle) from joint angles.
 
         :param setpoint_dic:
-            Dictionary of setpoints from which the feet positions and velocities need to be calculated
+            Dictionary of setpoints from which the feet positions and velocities need to be calculated, should all
+            be around the same time
 
         :return:
             A FeetState object with a left and right foot which each have a position and velocity corresponding to the
@@ -41,12 +41,13 @@ class FeetState(object):
 
         next_joint_positions = Setpoint.calculate_next_positions_joint(setpoint_dic)
 
-        next_foot_state_left = Foot.calculate_foot_position(next_joint_positions['left_hip_aa'],
-                                                                next_joint_positions['left_hip_fe'],
-                                                                next_joint_positions['left_knee'], 'left')
-        next_foot_state_right = Foot.calculate_foot_position(next_joint_positions['right_hip_aa'],
-                                                                 next_joint_positions['right_hip_fe'],
-                                                                 next_joint_positions['right_knee'], 'right')
+        next_foot_state_left = Foot.calculate_foot_position(next_joint_positions['left_hip_aa'].position,
+                                                                next_joint_positions['left_hip_fe'].position,
+                                                                next_joint_positions['left_knee'].position, 'left')
+        next_foot_state_right = Foot.calculate_foot_position(next_joint_positions['right_hip_aa'].position,
+                                                                 next_joint_positions['right_hip_fe'].position,
+                                                                 next_joint_positions['right_knee'].position, 'right')
+
 
         foot_state_left.add_foot_velocity_from_next_state(next_foot_state_left)
         foot_state_right.add_foot_velocity_from_next_state(next_foot_state_right)

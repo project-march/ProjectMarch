@@ -2,18 +2,23 @@ from march_shared_classes.utilities.utility_functions import merge_dictionaries,
 
 # Use this factor when calculating velocities to keep the calculations within the range of motion
 # See IK confluence page https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
-VELOCITY_SCALE_FACTOR = 500
+VELOCITY_SCALE_FACTOR = 0.001
+JOINT_NAMES_IK = ['left_hip_aa', 'left_hip_fe', 'left_knee', 'right_hip_aa', 'right_hip_fe', 'right_knee']
+
 
 
 class Setpoint(object):
     """Base class to define the setpoints of a subgait."""
 
-    digits = 4
+    digits = 8
 
     def __init__(self, time, position, velocity=None):
         self._time = round(time, self.digits)
         self._position = round(position, self.digits)
-        self._velocity = round(velocity, self.digits)
+        if velocity is not None:
+            self._velocity = round(velocity, self.digits)
+        else:
+            self._velocity = None
 
     @property
     def time(self):
@@ -39,20 +44,11 @@ class Setpoint(object):
     def velocity(self, velocity):
         self._velocity = round(velocity, self.digits)
 
-    def add_joint_velocity_from_next_angle(self, next_state):
-        """Calculates the (left/right/all)joint velocities given a current position and a next position.
-
-        Approximates using next_position = position + current_velocity * time_difference
-
-        :param this: A Setpoint object with no velocity
-        :param next_state: A Setpoint with the positions a moment later
-
-        ":return: The joint velocities of the joints on the specified side
-        """
-        self.velocity = (next_state.position - self.position) * VELOCITY_SCALE_FACTOR
-
     def __repr__(self):
-        return 'Time: %s, Position: %s, Velocity: %s' % (self.time, self.position, self.velocity)
+        if self.velocity is not None:
+            return 'Time: %s, Position: %s, Velocity: %s' % (self.time, self.position, self.velocity)
+        else:
+            return 'Time: %s, Position: %s, Velocity: Not specified' % (self.time, self.position)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -65,9 +61,11 @@ class Setpoint(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    @staticmethod
-    def calculate_next_positions_joint(setpoint_dic):
+    @classmethod
+    def calculate_next_positions_joint(cls, setpoint_dic):
         """Calculates the position of the joints a moment later given a setpoint dictionary.
+
+        Calculates using the approximation next_position = position + current_velocity * time_difference
 
         :param setpoint_dic: A dictionary of setpoints with positions and velocities
         :return: A dictionary with the positions of the joints 1 / VELOCITY_SCALE_FACTOR second later
@@ -75,12 +73,25 @@ class Setpoint(object):
         next_positions = {}
         for joint in JOINT_NAMES_IK:
             if joint in setpoint_dic:
-                next_positions[joint] = setpoint_dic[joint].position + setpoint_dic[joint].velocity \
-                    / VELOCITY_SCALE_FACTOR
+                next_positions[joint] = cls(setpoint_dic[joint].time + VELOCITY_SCALE_FACTOR,
+                                                 setpoint_dic[joint].position + setpoint_dic[joint].velocity
+                                                 * VELOCITY_SCALE_FACTOR)
             else:
                 raise KeyError('setpoint_dic is missing joint {joint}'.format(joint=joint))
 
         return next_positions
+
+    def add_joint_velocity_from_next_angle(self, next_state):
+        """Calculates the (left/right/all)joint velocities given a current position and a next position.
+
+        Calculates using the approximation next_position = position + current_velocity * time_difference
+
+        :param self: A Setpoint object with no velocity
+        :param next_state: A Setpoint with the positions a moment later
+
+        ":return: The joint velocities of the joints on the specified side
+        """
+        self.velocity = (next_state.position - self.position) / (next_state.time - self.time)
 
     @staticmethod
     def interpolate_setpoints(base_setpoint, other_setpoint, parameter):

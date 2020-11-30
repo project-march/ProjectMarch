@@ -7,7 +7,7 @@ from march_shared_classes.utilities.utility_functions import get_lengths_robot_f
 from march_shared_classes.utilities.vector_3d import Vector3d
 
 
-VELOCITY_SCALE_FACTOR = 500
+VELOCITY_SCALE_FACTOR = 0.001
 JOINT_NAMES_IK = ['left_hip_aa', 'left_hip_fe', 'left_knee', 'right_hip_aa', 'right_hip_fe', 'right_knee']
 
 
@@ -29,7 +29,7 @@ class Foot(object):
 
         :return: The object with a velocity which is calculated based on the next state
         """
-        velocity = (next_state.position - self.position) * VELOCITY_SCALE_FACTOR
+        velocity = (next_state.position - self.position) / VELOCITY_SCALE_FACTOR
         self.velocity = velocity
 
     @classmethod
@@ -40,7 +40,7 @@ class Foot(object):
 
         :return: A Foot object with the position of the foot 1 / VELOCITY_SCALE_FACTOR second later
         """
-        next_position = current_state.position + current_state.velocity / VELOCITY_SCALE_FACTOR
+        next_position = current_state.position + current_state.velocity * VELOCITY_SCALE_FACTOR
         return cls(current_state.foot_side, next_position)
 
     @staticmethod
@@ -58,7 +58,9 @@ class Foot(object):
         # use this together with the current joint angles to calculate the joint velocity
         next_position = Foot.calculate_next_foot_position(foot_state)
         next_joint_positions = Foot.calculate_joint_angles_from_foot_position(next_position.position,
-                                                                              next_position.foot_side, time)
+                                                                              next_position.foot_side,
+                                                                              time + VELOCITY_SCALE_FACTOR)
+
         for joint in JOINT_NAMES_IK:
             if joint in joint_states and joint in next_joint_positions:
                 joint_states[joint].add_joint_velocity_from_next_angle(next_joint_positions[joint])
@@ -167,7 +169,9 @@ class Foot(object):
                                 / (2 * upper_leg * sqrt(rescaled_x * rescaled_x + rescaled_z * rescaled_z)))
         normal_to_foot_line = atan(rescaled_x / rescaled_z)
         hfe = foot_line_to_leg + normal_to_foot_line
-        kfe = acos((rescaled_z - upper_leg * cos(hfe)) / lower_leg) + hfe
+
+        cos_normal_lower_leg_angle = round((rescaled_z - upper_leg * cos(hfe)) / lower_leg, 10)
+        kfe = acos(cos_normal_lower_leg_angle) + hfe
 
         return hfe, kfe
 
