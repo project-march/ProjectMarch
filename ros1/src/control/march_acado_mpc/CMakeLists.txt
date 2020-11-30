@@ -91,9 +91,9 @@ target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 ############
 # ROS NODE #
 ############
-add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node)
-add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
+add_executable(joint_trajectory_mpc src/joint_trajectory_mpc)
+add_dependencies(joint_trajectory_mpc ${catkin_EXPORTED_TARGETS})
+target_link_libraries(joint_trajectory_mpc ${PROJECT_NAME})
 
 install(DIRECTORY include
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
@@ -101,7 +101,7 @@ install(DIRECTORY include
 install(TARGETS ${PROJECT_NAME}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         )
-install(TARGETS ${PROJECT_NAME}_node
+install(TARGETS joint_trajectory_mpc
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
         )
 install(DIRECTORY launch

@@ -1,3 +1,0 @@
-<launch>
-	<node name="acado_mpc_node" pkg="march_acado_mpc" type="march_acado_mpc_node" output="screen"></node>
-</launch>
