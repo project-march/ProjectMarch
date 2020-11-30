@@ -8,6 +8,6 @@ hardware_interface::EffortJointInterface>
 
     JointTrajectoryController;
 
-}  // namespace inertia_trajectory_controller
+}  // model_predictive_trajectory_controller
 
 PLUGINLIB_EXPORT_CLASS(model_predictive_trajectory_controller::JointTrajectoryController, controller_interface::ControllerBase);
