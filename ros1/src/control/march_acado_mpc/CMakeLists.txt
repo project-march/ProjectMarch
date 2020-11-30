@@ -9,9 +9,17 @@ include(FetchContent)
 # Define which packages this package depends on
 find_package(catkin REQUIRED 
         COMPONENTS
+        control_msgs
+        controller_interface
+        controller_manager
+        joint_state_controller
+        joint_trajectory_controller
+        march_hardware
         march_shared_resources
+        pluginlib
         roscpp
-        std_msgs)
+        std_msgs
+)
 
 catkin_package(
     INCLUDE_DIRS include
@@ -19,7 +27,13 @@ catkin_package(
     # Define the catkin projects that this project depends on. If another project
     # does "find_package(march_acado_mpc)" these packages will be seen as
     # transitive dependencies.
-    CATKIN_DEPENDS march_shared_resources roscpp std_msgs
+    CATKIN_DEPENDS
+    control_msgs
+    controller_interface
+    march_shared_resources
+    pluginlib
+    roscpp
+    std_msgs
 )
 
 ################
