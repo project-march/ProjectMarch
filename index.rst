@@ -24,9 +24,15 @@ How to use the tutorials
 The tutorials are designed to provide hands-on experience with ROS and the |march|.
 Here is an overview of the different types of tutorials.
 
+Install ROS and March
+^^^^^^^^^^^^^^^^^^^^^
+.. include:: doc/getting_started/install_ros_and_tools.rst
+  :start-after: inclusion-introduction-start
+  :end-before: inclusion-introduction-end
+
 Create your workspace
 ^^^^^^^^^^^^^^^^^^^^^
-.. include:: doc/getting_started/create_your_workspace.rst
+.. include:: doc/getting_started/setup_your_workspace.rst
   :start-after: inclusion-introduction-start
   :end-before: inclusion-introduction-end
 
@@ -58,7 +64,8 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    :maxdepth: 2
    :hidden:
 
-   doc/getting_started/create_your_workspace
+   doc/getting_started/install_ros_and_tools
+   doc/getting_started/setup_your_workspace
 
 .. toctree::
    :caption: Useful tools

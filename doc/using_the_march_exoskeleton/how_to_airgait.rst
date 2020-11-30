@@ -55,4 +55,4 @@ Start up
    to start the input device.
 
 
-.. note:: For this part we assume that on the pc you are running everything is installed described in  :ref:`create-your-workspace-label`
+.. note:: For this part we assume that on the pc you are running everything is installed described in  :ref:`setup-your-workspace-label`

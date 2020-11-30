@@ -7,7 +7,7 @@ the march packages.
 Prerequisites
 -------------
 In order to run the tests you must already have a workspace setup.
-See :ref:`create-your-workspace-label`.
+See :ref:`setup-your-workspace-label`.
 
 
 Running the tests locally
