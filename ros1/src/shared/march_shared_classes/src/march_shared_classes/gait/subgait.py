@@ -432,21 +432,23 @@ class Subgait(object):
             base_feet_state = FeetState.from_setpoints(base_setpoints_to_interpolate[setpoint_index])
             other_feet_state = FeetState.from_setpoints(other_setpoints_to_interpolate[setpoint_index])
             new_feet_state = FeetState.weighted_average_states(base_feet_state, other_feet_state, parameter)
+            setpoints_to_add = FeetState.feet_state_to_setpoint(new_feet_state)
             for joint_name in JOINT_NAMES_IK:
-                new_setpoints[joint_name].append(FeetState.feet_state_to_setpoint(new_feet_state)[joint_name])
+                new_setpoints[joint_name].append(setpoints_to_add[joint_name])
 
         # fill the ankle joint using the angle based linear interpolation
         for ankle_joint in ['left_ankle', 'right_ankle']:
             for base_setpoint, other_setpoint in zip(base_subgait.get_joint(ankle_joint).setpoints,
                                                      other_subgait.get_joint(ankle_joint).setpoints):
-                new_setpoints[ankle_joint].append(Setpoint.interpolate_setpoints(base_setpoint, other_setpoint,
-                                                                                 parameter))
+                new_ankle_setpoint_to_add = Setpoint.interpolate_setpoints(base_setpoint, other_setpoint, parameter)
+                new_setpoints[ankle_joint].append(new_ankle_setpoint_to_add)
 
         duration = weighted_average(base_subgait.duration, other_subgait.duration, parameter)
 
         for joint in base_subgait.joints:
-            interpolated_joint_trajectories.append(JointTrajectory(joint.name, joint.limits, new_setpoints[joint.name],
-                                                                   duration))
+            interpolated_joint_trajectory_to_add = JointTrajectory(joint.name, joint.limits, new_setpoints[joint.name],
+                                                                   duration)
+            interpolated_joint_trajectories.append(interpolated_joint_trajectory_to_add)
 
         return interpolated_joint_trajectories
 
@@ -466,8 +468,9 @@ class Subgait(object):
                 raise SubgaitInterpolationError('The subgaits to interpolate do not have the same joints, base'
                                                 ' subgait has {0}, while other subgait has {1}'.
                                                 format(base_joint.name, other_joint.name))
-            interpolated_joint_trajectories.append(JointTrajectory.interpolate_joint_trajectories(base_joint,
+            interpolated_joint_trajectory_to_add = JointTrajectory.interpolate_joint_trajectories(base_joint,
                                                                                                   other_joint,
-                                                                                                  parameter))
+                                                                                                  parameter)
+            interpolated_joint_trajectories.append(interpolated_joint_trajectory_to_add)
 
         return interpolated_joint_trajectories
