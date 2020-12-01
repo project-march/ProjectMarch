@@ -22,6 +22,9 @@ All code is built on top of the Robot Operating System (ROS). More information a
 ## Documentation
 All documentation can be found at https://docs.projectmarch.nl
 
+## Contributing
+At the moment, it is not possible to contribute to the code base without explicit permission from Project MARCH. We hope to change this as soon as possible.
+
 ## License
 At the moment, Project MARCH has no explicit license. We are working on an open source
 license for the code base. You can keep track of the current state of this proces [here](https://gitlab.com/groups/project-march/-/epics/3).
