@@ -1,2 +1,6 @@
 [march_data_collector]
 launch_depend=ignore
+
+[march_acado_mpc]
+missing_directory = ignore
+missing_file = ignore

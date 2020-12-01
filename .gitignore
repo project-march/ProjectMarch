@@ -176,7 +176,7 @@ srv/_*.py
 qtcreator-*
 *.user
 
-.idea/*
+**/.idea/**
 */cmake-build-debug/*
 /planning/cfg
 /planning/docs
