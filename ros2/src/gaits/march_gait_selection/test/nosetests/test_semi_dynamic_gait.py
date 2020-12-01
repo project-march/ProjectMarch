@@ -69,8 +69,6 @@ class TestSemiDynamicGaitSelection(unittest.TestCase):
 
     def test_position_after_time_begin(self):
         self.semi_dynamic_gait.update(1)
-        # print(self.semi_dynamic_gait._position_after_time(0))
-        # print('should equal:')
         print(self.gait_selection.positions['stand']['joints'])
         self.assertEqual(self.semi_dynamic_gait._position_after_time(0),
                          self.gait_selection.positions['stand']['joints'])
