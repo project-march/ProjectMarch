@@ -384,6 +384,7 @@ class Subgait(object):
 
     @staticmethod
     def check_foot_position_interpolation_is_safe(base_subgait, other_subgait):
+        """Checks whether two subgaits are safe to be interpolated based on foot location"""
         number_of_setpoints = len(base_subgait.joints[0].setpoints)
         joint_to_compare_to = base_subgait.joints[0].name
         for base_joint, other_joint in zip(sorted(base_subgait.joints, key=lambda joint: joint.name),
