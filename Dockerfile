@@ -1,3 +1,4 @@
+# Use ROS melodic as base image
 FROM ros:melodic-ros-core
 
 # Install build tools
