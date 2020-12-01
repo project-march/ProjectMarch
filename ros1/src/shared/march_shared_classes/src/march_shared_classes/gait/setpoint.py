@@ -1,9 +1,9 @@
-from march_shared_classes.utilities.utility_functions import weighted_average
+from march_shared_classes.utilities.utility_functions import get_joint_names_for_inverse_kinematics, weighted_average
 
 # Use this factor when calculating velocities to keep the calculations within the range of motion
 # See IK confluence page https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
 VELOCITY_SCALE_FACTOR = 0.001
-JOINT_NAMES_IK = ['left_hip_aa', 'left_hip_fe', 'left_knee', 'right_hip_aa', 'right_hip_fe', 'right_knee']
+JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
 
 
 class Setpoint(object):

@@ -8,14 +8,14 @@ import yaml
 from march_shared_classes.exceptions.gait_exceptions import NonValidGaitContent, SubgaitInterpolationError
 from march_shared_classes.exceptions.general_exceptions import FileNotFoundError
 from march_shared_classes.foot_classes.feet_state import FeetState
-from march_shared_classes.utilities.utility_functions import weighted_average
+from march_shared_classes.utilities.utility_functions import get_joint_names_for_inverse_kinematics, weighted_average
 
 from .joint_trajectory import JointTrajectory
 from .limits import Limits
 from .setpoint import Setpoint
 
 PARAMETRIC_GAITS_PREFIX = '_pg_'
-JOINT_NAMES_IK = ['left_hip_aa', 'left_hip_fe', 'left_knee', 'right_hip_aa', 'right_hip_fe', 'right_knee']
+JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
 
 
 class Subgait(object):

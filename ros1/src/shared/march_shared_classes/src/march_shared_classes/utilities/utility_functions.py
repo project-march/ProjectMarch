@@ -88,3 +88,16 @@ def get_lengths_robot_for_inverse_kinematics(side=None):
     else:
         raise SideSpecificationError(side, "Side should be either 'left', 'right' or 'both', but was {side}".
                                      format(side=side))
+
+
+def get_joint_names_for_inverse_kinematics():
+    robot = urdf.Robot.from_xml_file(os.path.join(rospkg.RosPack().get_path('march_description'), 'urdf',
+                                                  'march4.urdf'))
+    robot_joint_names = robot.joint_map.keys()
+    joint_name_list = ['left_hip_aa', 'left_hip_fe', 'left_knee', 'right_hip_aa', 'right_hip_fe', 'right_knee']
+    for joint_name in joint_name_list:
+        if joint_name not in robot_joint_names:
+            raise KeyError('Inverse kinematics calculation expected the robot with name {robot_name} to have joint '
+                           '{joint_name}, but {joint_name} was not found '.
+                           format(robot_name=robot.name, joint_name=joint_name))
+    return joint_name_list

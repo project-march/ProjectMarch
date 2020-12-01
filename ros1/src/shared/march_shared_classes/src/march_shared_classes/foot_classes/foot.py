@@ -6,11 +6,12 @@ from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolation
 from march_shared_classes.exceptions.general_exceptions import SideSpecificationError
 from march_shared_classes.gait.setpoint import Setpoint
 from march_shared_classes.utilities.side import Side
+from march_shared_classes.utilities.utility_functions import get_joint_names_for_inverse_kinematics
 from march_shared_classes.utilities.utility_functions import get_lengths_robot_for_inverse_kinematics, weighted_average
 from march_shared_classes.utilities.vector_3d import Vector3d
 
 VELOCITY_SCALE_FACTOR = 0.001
-JOINT_NAMES_IK = ['left_hip_aa', 'left_hip_fe', 'left_knee', 'right_hip_aa', 'right_hip_fe', 'right_knee']
+JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
 
 
 class Foot(object):
