@@ -28,3 +28,6 @@ At the moment, it is not possible to contribute to the code base without explici
 ## License
 At the moment, Project MARCH has no explicit license. We are working on an open source
 license for the code base. You can keep track of the current state of this proces [here](https://gitlab.com/groups/project-march/-/epics/3).
+
+## Contact
+If you have any questions about our project, don't hesitate to contact us at software@projectmarch.nl.
