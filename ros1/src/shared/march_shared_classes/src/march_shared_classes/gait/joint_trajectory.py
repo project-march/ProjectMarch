@@ -176,7 +176,7 @@ class JointTrajectory(object):
 
         This function goes over each joint to get needed setpoints (all first setpoints, all second setpoints..).
         These are placed in list with the correct index, where each entry contains a dictionary with joint name setpoint
-        pairs.
+        pairs. Also checks whether the joint trajectories are safe to interpolate.
 
         :param base_subgait:
             base base_subgait, return value if parameter is equal to zero
@@ -194,10 +194,6 @@ class JointTrajectory(object):
         for setpoint_index in range(number_of_setpoints):
             for base_joint, other_joint in zip(sorted(base_subgait.joints, key=lambda joint: joint.name),
                                                sorted(other_subgait.joints, key=lambda joint: joint.name)):
-                if base_joint.limits != other_joint.limits:
-                    raise SubgaitInterpolationError(
-                        'Not able to safely interpolate because limits are not equal for joints '
-                        '{0} and {1}'.format(base_joint.name, other_joint.name))
                 base_setpoints_to_interpolate[setpoint_index][base_joint.name] = base_joint.setpoints[setpoint_index]
                 other_setpoints_to_interpolate[setpoint_index][other_joint.name] = other_joint.setpoints[setpoint_index]
         return base_setpoints_to_interpolate, other_setpoints_to_interpolate
