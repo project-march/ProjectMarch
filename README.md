@@ -1,6 +1,24 @@
-# Project MARCH
-![Pipeline Status](https://gitlab.com/project-march/march/badges/main/pipeline.svg)
+<div align="center">
+  <p>
+    <h1>
+      <a href="https://gitlab.com/project-march/march">
+        <img src=".gitlab/readme/logo.png" alt="Project MARCH" width=50%/>
+      </a>
+    </h1>
+    <h4>Exoskeleton technology</h4>
+  </p>
+  <p>
+    <a href="https://gitlab.com/project-march/march/-/pipelines">
+      <img src=""https://gitlab.com/project-march/march/badges/main/pipeline.svg alt="Pipeline Status" />
+    </a>
+    <br>
+  </p>
+</div>
 
+
+
+
+## About
 Project MARCH is a student team of the TU Delft that is involved in the development of
 a user-friendly and versatile exoskeleton, a motorized robotic suit, that can be used
 to get people with a spinal cord injury to stand up and walk again. This repository
