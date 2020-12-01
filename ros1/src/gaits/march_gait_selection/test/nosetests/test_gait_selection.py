@@ -4,6 +4,7 @@ import unittest
 
 import rospkg
 from urdf_parser_py import urdf
+
 from march_gait_selection.gait_selection import GaitSelection
 from march_gait_selection.state_machine.gait_interface import GaitInterface
 from march_shared_classes.exceptions.general_exceptions import FileNotFoundError, PackageNotFoundError
