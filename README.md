@@ -12,8 +12,10 @@ contains the code to make this happen.
 <img src=".gitlab/readme/simulation.jpeg" alt="View of the backsize of a simulated exoskeleton." width="49%">
 <img src=".gitlab/readme/stairs.jpeg" alt="A simulated exoskeleton walking up a ramp with a small inclination." width="49%">
 
-## Documentation
+## Framework
+All code is built on top of the Robot Operating System (ROS). More information about ROS can be found on https://www.ros.org/about-ros/.
 
+## Documentation
 All documentation can be found at https://docs.projectmarch.nl
 
 ## C++ code style
