@@ -2,15 +2,8 @@
 from copy import deepcopy
 import unittest
 
-<<<<<<< HEAD:ros1/src/gaits/march_gait_selection/test/nosetests/test_gait_selection.py
 import rospkg
-=======
-import rclpy
-from ament_index_python import get_package_share_directory, PackageNotFoundError
-from march_gait_selection.dynamic_gaits.semi_dynamic_setpoints_gait import SemiDynamicSetpointsGait
->>>>>>> Add failing test for semi dynamic gaits:ros2/src/march_gait_selection/test/nosetests/test_gait_selection.py
 from urdf_parser_py import urdf
-
 from march_gait_selection.gait_selection import GaitSelection
 from march_gait_selection.state_machine.gait_interface import GaitInterface
 from march_shared_classes.exceptions.general_exceptions import FileNotFoundError, PackageNotFoundError
@@ -63,7 +56,3 @@ class TestGaitSelection(unittest.TestCase):
 
     def test_get_item_type(self):
         self.assertIsInstance(self.gait_selection['walk'], Gait)
-
-    def test_dynamic_gait_loaded(self):
-        self.assertIsInstance(self.gait_selection['dynamic_stairs_up'],
-                              SemiDynamicSetpointsGait)
