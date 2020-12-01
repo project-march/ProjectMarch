@@ -92,9 +92,9 @@ class GaitVersionToolView(QWidget):
     def update_version_menus(self):
         """When a gait is selected set the subgait labels and populate the subgait menus with the available versions."""
         def version_sorter(version):
-            """Used in the sort function to sort numbers which are 9<. If
-            there is no version number, 0 is returned to have it at the top of
-            the list
+            """Used in the sort function to sort based on the last 2 digits of the
+            version name. If there is no version number, 0 is returned to have
+            it at the top of the list.
 
             :param version: str of the version
             """
