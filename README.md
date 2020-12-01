@@ -15,6 +15,10 @@ contains the code to make this happen.
 ## Framework
 All code is built on top of the Robot Operating System (ROS). More information about ROS can be found on https://www.ros.org/about-ros/.
 
+## Installation
+- To install required ROS enviroment, please follow the [Install ROS and tools](https://docs.projectmarch.nl/doc/getting_started/install_ros_and_tools.html) instructions.
+- To build and run the code, please follow the [Setup your workspace](https://docs.projectmarch.nl/doc/getting_started/setup_your_workspace.html) instructions.
+
 ## Documentation
 All documentation can be found at https://docs.projectmarch.nl
 
