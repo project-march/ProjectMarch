@@ -39,17 +39,11 @@ class TrajectoryScheduler(object):
         :param JointTrajectory trajectory: a trajectory for all joints to follow
         """
         self._failed = False
-        goal = FollowJointTrajectoryGoal(
-            trajectory=trajectory, goal_tolerance=[JointTolerance(
-                name=joint_name, position=0.1, velocity=0.1) for joint_name in trajectory.joint_names],
-            goal_time_tolerance=Duration(sec=0, nanosec=500000))
-        self._last_goal = GoalID(stamp=self._node.get_clock().now().to_msg())
+        stamp = self._node.get_clock().now().to_msg()
+        goal = FollowJointTrajectoryGoal(trajectory=trajectory)
         self._trajectory_goal_pub.publish(FollowJointTrajectoryActionGoal(
-            header=Header(stamp=self._node.get_clock().now().to_msg()),
-            goal_id=self._last_goal, goal=goal))
-
-    def cancel_last(self):
-        self._cancel_pub.publish(GoalID(stamp=self._node.get_clock().now().to_msg()))
+            header=Header(stamp=stamp),
+            goal_id=GoalID(stamp=stamp), goal=goal))
 
     def failed(self):
         return self._failed

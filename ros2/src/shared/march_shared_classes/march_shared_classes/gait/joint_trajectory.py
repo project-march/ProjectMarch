@@ -63,12 +63,13 @@ class JointTrajectory(object):
         self._duration = round(new_duration, self.setpoint_class.digits)
         self.interpolate_setpoints()
 
-    def from_begin_point(self, begin_time: float, position, logger) -> None:
+    def from_begin_point(self, begin_time: float, position) -> None:
         """
         Manipulates the gait to start at given time. Removes all set points
         after the given begin time. Adds the begin position with 0 velocity at
         the start.
         :param begin_time: The time to start
+        :param position: The position to start from
         """
         begin_time -= 1
         for setpoint in reversed(self.setpoints):
@@ -77,7 +78,6 @@ class JointTrajectory(object):
             else:
                 setpoint.time -= begin_time
         self.setpoints = [Setpoint(time=0, position=position, velocity=0)] + self.setpoints
-        logger.info(f"{self.setpoints}")
         self._duration = self._duration - begin_time
 
     @property

@@ -1,7 +1,6 @@
 from gazebo_msgs.msg import ContactsState
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from rclpy.duration import Duration
-from sensor_msgs.msg import JointState
 from std_msgs.msg import Header, Bool
 from .gait_state_machine_error import GaitStateMachineError
 from .home_gait import HomeGait
@@ -63,22 +62,19 @@ class GaitStateMachine(object):
             qos_profile=10)
 
         self._right_foot_on_ground = True
-        self._pressure_sub = self._gait_selection.create_subscription(
+        self._left_foot_on_ground = True
+        self._right_pressure_sub = self._gait_selection.create_subscription(
             msg_type=ContactsState, topic='/march/sensor/right_pressure_sole',
             callback=lambda msg: self._update_foot_on_ground_cb(True, msg),
             qos_profile=10)
-        self._current_position_sub = self._gait_selection.create_subscription(
-            msg_type=JointState, topic='/march/joint_states',
-            callback=self._update_current_pos,
-            qos_profile=1)
+        self._left_pressure_sub = self._gait_selection.create_subscription(
+            msg_type=ContactsState, topic='/march/sensor/left_pressure_sole',
+            callback=lambda msg: self._update_foot_on_ground_cb(False, msg),
+            qos_profile=10)
         self._freeze_sub = self._gait_selection.create_subscription(
             msg_type=Bool, topic='/freeze',
-            callback=self._freeze_cb,
+            callback=lambda msg: self._freeze(),
             qos_profile=1)
-        self._current_pos = {}
-        self.test_right_pub = self._gait_selection.create_publisher(
-            msg_type=Bool, topic='/test_right',
-            qos_profile=10)
         self._get_possible_gaits_client = self._gait_selection.create_service(
             srv_type=PossibleGaits,
             srv_name='/march/gait_selection/get_possible_gaits',
@@ -91,30 +87,31 @@ class GaitStateMachine(object):
     def _update_current_pos(self, msg):
         self._current_pos = {name: pos for (name, pos) in zip(msg.name, msg.position)}
 
-    def _freeze_cb(self, msg):
-        self._gait_selection.get_logger().info('Freeze callback')
+    def _freeze(self):
         if self._current_gait is not None and self._current_gait.can_freeze:
             self._gait_selection.get_logger().debug('Freezing the gait')
-            # self._trajectory_scheduler.cancel_last()
-            self._current_gait.freeze(self._current_pos)
+            self._current_gait.freeze()
 
     def _update_foot_on_ground_cb(self, is_right, msg):
-        if is_right:
-            if len(msg.states) > 0:
-                force = sum([state.total_wrench.force.z for state in msg.states])
-                if force > 8000:
-                    if not self._right_foot_on_ground:
-                        self._gait_selection.get_logger().info('Should freeze')
-                        self._gait_selection.get_logger().info(f'{self._current_gait}')
-                        self.test_right_pub.publish(Bool(data=True))
-                        self._right_foot_on_ground = True
-                        if self._current_gait is not None and self._current_gait.can_freeze:
-                            self._gait_selection.get_logger().debug('Freezing the gait')
-                            # self._trajectory_scheduler.cancel_last()
-                            self._current_gait.freeze(self._current_pos)
-            elif len(msg.states) == 0:
-                self.test_right_pub.publish(Bool(data=False))
+        """ Update the status of the feet on ground based on pressure sole data,
+        this is currently decided based on the force in simulation, but the numbers
+        for this will be updated when range of real pressure soles is known.
+        If the foot was not on the ground before and is now, the gait will freeze """
+        if len(msg.states) > 0:
+            force = sum([state.total_wrench.force.z for state in msg.states])
+            if force > 8000:
+                if not self._right_foot_on_ground and is_right:
+                    self._right_foot_on_ground = True
+                    self._freeze()
+                elif not self._left_foot_on_ground and not is_right:
+                    self._left_foot_on_ground = True
+                    self._freeze()
+        # If there are no contacts, change foot on ground to False
+        elif len(msg.states) == 0:
+            if is_right:
                 self._right_foot_on_ground = False
+            else:
+                self._left_foot_on_ground = False
 
     def _possible_gaits_cb(self, request, response):
         """ Standard callback for the get possible gaits service """
@@ -285,7 +282,7 @@ class GaitStateMachine(object):
 
         self._handle_input()
         logger = self._gait_selection.get_logger()
-        trajectory, should_stop = self._current_gait.update(elapsed_time, logger)
+        trajectory, should_stop = self._current_gait.update(elapsed_time)
         # schedule trajectory if any
         if trajectory is not None:
             self._call_gait_callbacks()
@@ -382,7 +379,6 @@ class GaitStateMachine(object):
                 idle_positions[from_idle_name] = \
                     {'gait_type': '', 'joints': starting_position}
             if from_idle_name in self._idle_transitions:
-                self._gait_selection.get_logger().info(f'Adding {gait_name} to {from_idle_name}')
                 self._idle_transitions[from_idle_name].add(gait_name)
             else:
                 self._idle_transitions[from_idle_name] = {gait_name}

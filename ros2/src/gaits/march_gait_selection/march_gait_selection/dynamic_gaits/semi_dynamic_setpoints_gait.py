@@ -1,19 +1,19 @@
 import math
 from copy import deepcopy
-from march_gait_selection.state_machine.home_gait import HomeGait
 from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
-from march_shared_classes.gait.setpoint import Setpoint
 from march_shared_classes.gait.subgait import Subgait
 from rclpy.duration import Duration
 
 
 class SemiDynamicSetpointsGait(SetpointsGait):
+    """ A semi-dynamic version of the setpoints gait, implements a freeze functionality """
 
     def __init__(self, gait_name, subgaits, graph):
         super(SemiDynamicSetpointsGait, self).__init__(f'dynamic_{gait_name}', subgaits, graph)
         self._should_freeze = False
         self._is_frozen = False
         self._freeze_duration = 0
+        self._freeze_position = None
 
     @property
     def can_freeze(self) -> bool:
@@ -25,19 +25,17 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             return False
         return True
 
-    def freeze(self, position: dict = {}, duration: float = 10.0):
+    def freeze(self, duration: float = 3.0):
         """
         If the subgait can freeze it will freeze for the given duration, this
         will later be changed to start the next subgait more dynamically
         after the short freeze
-        :param position: The position to freeze in
         :param duration: How long to freeze in the current position
         """
         self._should_freeze = True
-        self._freeze_position = position
         self._freeze_duration = duration
 
-    def update(self, elapsed_time, logger):
+    def update(self, elapsed_time):
         """
         Update the progress of the gait, should be called regularly.
         If the current subgait is still running, this does nothing.
@@ -47,18 +45,15 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         :return: trjectory, is_finished
         """
         self._time_since_start += elapsed_time
-        # logger.info(f'Should freeze = {self._should_freeze}, is frozen = {self._is_frozen}, time since start = {self._time_since_start}')
         if self._should_freeze:
-            logger.info(f'Executing freeze, time since start = {self._time_since_start}')
-            trajectory = self._execute_freeze(logger)
-            self._time_since_start = 0.0
+            trajectory = self._execute_freeze()
+            self._time_since_start = 0.0  # New subgait is started, so reset the time
             return trajectory, False
 
         if self._time_since_start < self._current_subgait.duration:
             return None, False
 
         if self._is_frozen:
-            logger.info(f'After freeze')
             self._current_subgait = self._subgait_after_freeze
             trajectory = self._current_subgait.to_joint_trajectory_msg()
             self._time_since_start = 0.0  # New subgait is started, so reset the time
@@ -67,7 +62,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
 
         return self._update_next_subgait()
 
-    def _execute_freeze(self, logger):
+    def _execute_freeze(self):
         """
         Freezes the subgait, currently this means that there is a new subgait
         started of the given freeze duration which ends at the current position.
@@ -76,43 +71,41 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         :return:
         """
         self._previous_subgait = self._current_subgait.subgait_name
-        logger.info(f'Previous is {self._current_subgait.subgait_name}')
-        self._subgait_after_freeze = self.subgait_after_freeze(logger)
-        self._current_subgait = self._freeze_subgait(logger)
+        self._subgait_after_freeze = self.subgait_after_freeze()
+        self._current_subgait = self._freeze_subgait()
         self._should_freeze = False
         self._is_frozen = True
-        logger.info(f'Frozen, current = {self._current_subgait.subgait_name}, next={self._subgait_after_freeze.subgait_name}')
         return self._current_subgait.to_joint_trajectory_msg()
 
-    def subgait_after_freeze(self, logger):
+    def subgait_after_freeze(self):
         """
         Generates the subgait that should be executed after the freezing.
         :return: The subgait to execute after the freeze
         """
         if self._time_since_start < self._current_subgait.duration:
+            # The subgait after freeze is a copy of the current gait from
+            # the current time point
             subgait_after_freeze = deepcopy(self._current_subgait)
             for joint in subgait_after_freeze:
-                joint.from_begin_point(self._time_since_start, self._freeze_position[joint.name], logger)
+                joint.from_begin_point(self._time_since_start, self._freeze_position)
             subgait_after_freeze.duration -= self._time_since_start
-            subgait_after_freeze.subgait_name = 'dynamic_' + self._current_subgait.subgait_name
-            self.graph._graph[subgait_after_freeze.subgait_name] = {'to':
-                self.graph[(self._previous_subgait, self.graph.TO)]}
-            logger.info(f"Current subgait after: duration={self._current_subgait.duration} {[self._current_subgait.get_joint(joint.name).setpoints for joint in self._current_subgait.joints]}")
-            logger.info(f"After freeze:  duration={subgait_after_freeze.duration}  {[subgait_after_freeze.get_joint(joint.name).setpoints for joint in self._current_subgait.joints]}")
+            subgait_after_freeze.subgait_name = 'freeze_subgait_after'
+            # Add the subgait after the freeze to the subgait graph
+            self.graph.graph[subgait_after_freeze.subgait_name] = \
+                {'to': self.graph[(self._previous_subgait, self.graph.TO)]}
         else:
+            # If the current subgait was already done,
+            # go to the next subgait after freeze
             subgait_after_freeze = self.subgaits[self.graph[
                 (self._previous_subgait, self.graph.TO)]]
         return subgait_after_freeze
 
-    def _freeze_subgait(self, logger):
+    def _freeze_subgait(self):
         """
         Generates a subgait of the freeze duration based on the current position.
         :return: A subgait to freeze in current position
         """
-        position = self._position_after_time(self._time_since_start)
-        logger.info(f'Position theory is: {position}')
-        logger.info(f'Position reality is: {self._freeze_position}')
-        position = self._freeze_position
+        self._freeze_position = self._position_after_time(self._time_since_start)
         new_dict = {
             'description': 'A subgait that stays in the same position',
             'duration': {
@@ -121,7 +114,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             },
             'gait_type': 'walk_like',
             'joints': dict([(joint.name, [{
-                'position': position[joint.name],
+                'position': self._freeze_position[joint.name],
                 'time_from_start': {
                     'nsecs': (duration - math.floor(duration)) * 1e9,
                     'secs': math.floor(duration),
@@ -129,14 +122,13 @@ class SemiDynamicSetpointsGait(SetpointsGait):
                 'velocity': 0}
                 for duration in [self._freeze_duration]])
                             for joint in self._current_subgait.joints]),
-            'name': 'dynamic_freeze',
+            'name': 'freeze',
             'version': 'Only version',
         }
-        logger.info(f"{[new_dict['joints'][joint.name][0] for joint in self._current_subgait.joints]}")
         freeze_subgait = Subgait.from_dict(robot=self._current_subgait.robot,
                                            subgait_dict=new_dict,
                                            gait_name=self.gait_name,
-                                           subgait_name='dynamic_freeze',
+                                           subgait_name='freeze',
                                            version='Only version, generated from code')
         return freeze_subgait
 

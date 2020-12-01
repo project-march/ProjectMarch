@@ -52,7 +52,7 @@ class GaitSelection(Node):
         self._robot = self._initial_robot_description() if robot is None else robot
 
         self._robot_description_sub = self.create_subscription(
-           msg_type=String, topic='/robot_description',
+            msg_type=String, topic='/robot_description',
             callback=self._update_robot_description_cb,
             qos_profile=10)
 
