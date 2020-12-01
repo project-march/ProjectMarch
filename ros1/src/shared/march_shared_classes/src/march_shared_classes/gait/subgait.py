@@ -268,15 +268,8 @@ class Subgait(object):
             raise ValueError('Parameter for interpolation should be in the interval [0, 1], but is {0}'
                              .format(parameter))
 
-        if sorted(base_subgait.get_joint_names()) != sorted(other_subgait.get_joint_names()):
-            raise SubgaitInterpolationError('The subgaits to interpolate do not have the same joints, base'
-                                            ' subgait has {0}, while other subgait has {1}'.
-                                            format(sorted(base_subgait.get_joint_names()),
-                                                   sorted(other_subgait.get_joint_names())))
-
         if use_foot_position:
             joints = Subgait.get_foot_position_interpolated_joint_trajectories(base_subgait, other_subgait, parameter)
-
         else:
             joints = Subgait.get_joint_angle_interpolated_joint_trajectories(base_subgait, other_subgait, parameter)
 
@@ -390,8 +383,12 @@ class Subgait(object):
         joint_to_compare_to = base_subgait.joints[0].name
         for base_joint, other_joint in zip(sorted(base_subgait.joints, key=lambda joint: joint.name),
                                            sorted(other_subgait.joints, key=lambda joint: joint.name)):
+            if base_joint.name != other_joint.name:
+                raise SubgaitInterpolationError('The subgaits to interpolate do not have the same joints, base'
+                                                ' subgait has {0}, while other subgait has {1}'.
+                                                format(base_joint.name, other_joint.name))
+
             # check whether each joint has the same number of setpoints for the interpolation using foot position
-            # for the interpolation using joint angles, continue to interpolate_joint_trajectories if joints match
             if len(base_joint.setpoints) != number_of_setpoints:
                 raise SubgaitInterpolationError('Number of setpoints differs in {base_subgait} {joint_1} from '
                                                 '{base_subgait} {joint_2}.'.
@@ -465,6 +462,10 @@ class Subgait(object):
         interpolated_joint_trajectories = []
         for base_joint, other_joint in zip(sorted(base_subgait.joints, key=lambda joint: joint.name),
                                            sorted(other_subgait.joints, key=lambda joint: joint.name)):
+            if base_joint.name != other_joint.name:
+                raise SubgaitInterpolationError('The subgaits to interpolate do not have the same joints, base'
+                                                ' subgait has {0}, while other subgait has {1}'.
+                                                format(base_joint.name, other_joint.name))
             interpolated_joint_trajectories.append(JointTrajectory.interpolate_joint_trajectories(base_joint,
                                                                                                   other_joint,
                                                                                                   parameter))
