@@ -1,158 +1,86 @@
-Documentation
-=============
+Adding dependencies
+===================
 .. inclusion-introduction-start
 
-This tutorial will teach you how to build the documentation locally and contribute to its development.
+This page will explain the steps that have to be followed when you want to add a new dependency to the
+code base of Project MARCH.
 
 .. inclusion-introduction-end
 
-Introduction
-^^^^^^^^^^^^
-These tutorials are written in `rst <http://docutils.sourceforge.net/rst.html>`_, an easy-to-understand plaintext markup language.
-It is then build by `Sphinx <http://www.sphinx-doc.org/en/master/>`_ using the `rosdoc_lite <http://wiki.ros.org/rosdoc_lite>`_ package.
-You can either build the documentation locally when following the tutorials or
-deploy it to `Gitlab pages <https://docs.gitlab.com/ee/user/project/pages/>`_ with the help of the GitLab CI.
-
-Building locally
+Before you start
 ^^^^^^^^^^^^^^^^
-Follow these steps to be able to build the documentation locally.
+Before you include a new dependency, it is important to look at the license of the dependency. Some
+of the libraries or dependencies you might want to include, have certain restrictions that are not
+compatible with the license of Project MARCH. Right now, this is quite a complex story because the
+code base does not yet have an open source license. Therefore, it is recommended to contact the
+software department or the maintainers of the Project MARCH repositories on GitLab.
 
-Clone the repository
---------------------
+Different types
+^^^^^^^^^^^^^^^
+The different dependencies are split in three different categories:
 
-Clone the repository with either ssh or https:
+* ROS specific libraries
+* Non-ROS libraries
+* Generated files that are expensive to generate
 
-**ssh:**
+Each category has their own list of steps that have to be followed if you want to add a dependency.
 
-.. code:: bash
+ROS specific libraries
+----------------------
+These libraries are specificly designed to work with ROS. These packages are listed in the
+`ROS distro list`_. However, not all packages are 100% compatible with our version of ROS
+and therefore adding ROS specific libraries requires some care.
+The following steps should be followed, in order, until a step matches the situation:
 
-    git clone git@gitlab.com:project-march/project-march.gitlab.io.git
-
-**https:**
-
-.. code:: bash
-
-    git clone https://gitlab.com/project-march/project-march.gitlab.io.git
-
-Install rosdoc_lite and Sphinx
-------------------------------
-We use the package rosdoc_lite to generate the documentation with Sphinx
-
-.. code:: bash
-
-  sudo apt-get install ros-melodic-rosdoc-lite
-
-
-Install Gem and html-proofer
-----------------------------
-Gem is a package manager for Ruby, we will use it to install `html-proofer <https://github.com/gjtorikian/html-proofer>`_.
-html-proofer is a tool that can validate your generated html for mistakes like broken links or missing images.
-
-.. code::
-
-  sudo apt-get update
-  sudo apt install ruby-full
-
-  # Check if ruby and gem got installed correctly
-  ruby --version
-  gem --version
-
-  sudo gem update --system
-  sudo gem install html-proofer
-
-Install Additional dependencies
--------------------------------
-Pygit is used so we can tell Sphinx what branch we are on. That way links to GitHub files can be verified against the proper branch.
-This prevents html-proofer from not being able to find newly added files on develop, as it checks against the current branch.
-Furthermore, we use the sphinx-rtd-theme for the theme of the pages.
-You can install both packages from the Ubuntu repositories:
-
-.. code::
-
-  sudo apt install python-pygit2 python-sphinx-rtd-theme
+1) In case it is a library that is available via rosdep for the latest version, use rosdep.
+2) In case it is a library that *not* is available via rosdep for the latest version AND you
+   do *not* want to change the source code, add a link to the source of the package in the
+   ``ros2_dependencies.repo`` file.
+3) In case you want to change the source code, fork the library to the `Libraries and forks group`_
+   on GitLab and add it to the ``ros2_dependencies.repo`` file.
 
 
-Generate the html
+.. _ROS distro list: https://github.com/ros/rosdistro/
+.. _Libraries and forks group: https://gitlab.com/project-march/libraries
+
+
+Non-ROS libraries
 -----------------
-First source ROS1 melodic, and then run the :rootdir:`build_locally <build_locally.sh>` script to
-generate the docs and automatically open them in your browser.
+These libraries are not necessarily designed to work with ROS. Libraries such as scipy, numpy
+or Boost fall in this category. The following steps should be followed, in order, until a step matches
+the situation:
 
-.. code::
+1) In case it is a library that is available via pip, add it to ``requirements.pip``.
+   This allows the package to be installed with ``pip install -r requirements.pip``.
+2) In case it is a library that is available via apt, ensure that the package is in
+   the main, restricted, universe or multiverse sources and add it to the ``requirements.apt`` file.
+   This allos the package to be installed with ``apt install < requirements.apt``.
+3) In case it is only available as source and you *don't* want to make any changes to the library,
+   add it to the package in the CMakeLists.txt file with the CMakes FetchContent_Declare command.
+4) In case you want to change the source code, fork the library to the `Libraries and forks group`_
+   on GitLab and add the fork location to the CMakeLists.txt file with CMakes FetchContent_Declare command.
 
-  source /opt/ros/melodic/setup.bash
-  cd ~/project-march.gitlab.io
-  ./build_locally.sh
+Avoid binary files in your fork. In case the fork contains binaries, add these binaries to the repository
+with `Git LFS`_. Check if CMake fetches these Git LFS files as well!
 
-.. warning::
-  If you already have sphinx installed, you might get the following error:
+.. _Git LFS: https://git-lfs.github.com/
 
-  .. code::
 
-    Traceback (most recent call last):
-      File "/home/march/.local/bin/sphinx-build", line 7, in <module>
-        from sphinx.cmd.build import main
-      File "/home/march/.local/lib/python2.7/site-packages/sphinx/cmd/build.py", line 39
-        file=stderr)
-            ^
-    SyntaxError: invalid syntax
-    stdout:
+Generated files that are expensive to generate
+----------------------------------------------
+Sometime, it is necessary to add a dependency in the form of generated files that are expensive to
+generate. An example of this are the files that are generated for model predictive control.
 
-  Fix it by uninstalling sphinx
+These files should be in their own repository in the  `Libraries and forks group`_ on GitLab
+and the repository can be included with CMake with the FetchContent_Declare command.
 
-  .. code::
+Avoid binary files in your fork. In case the fork contains binaries, add these binaries to the repository
+with `Git LFS`_. Check if CMake fetches these Git LFS files as well!
 
-    pip uninstall sphinx
 
-.. warning::
-  You might get the following error if sphinx is installed using pip3:
+Example of CMake FetchContect_Declare
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+An example implementation of CMake's FetchContent can be found in the `march_acado_mpc/CMakeLists.txt`_ file
+on GitLab.
 
-  .. code::
-
-    Exception occurred:
-      File "<frozen importlib._bootstrap>", line 222, in _call_with_frames_removed
-      File "/home/olav/march_ws/src/march_tutorials/_scripts/tutorialformatter.py", line 121
-        print 'tutorialformatter.py error: sub-tutorial %s not found.' % sub_name
-                                                                     ^
-    SyntaxError: Missing parentheses in call to 'print'
-
-  You can fix this by uninstalling python3 sphinx:
-
-  .. code::
-
-    pip3 uninstall sphinx
-
-.. note::
-  If you have added new files but not pushed to GitHub yet, html-proofer will probably complain about invalid links.
-  Push your files and build locally again to solve this problem.
-
-sphinx-autobuild
------------------------
-`sphinx-autobuild <https://pypi.org/project/sphinx-autobuild/>`_ is a tool that
-watches your doc files and live updates your changes.
-
-You can install it with pip:
-
-.. code::
-
-  pip install --user sphinx-autobuild
-
-Start the auto build:
-
-.. code::
-
-  sphinx-autobuild . build/html
-
-When you go to ``localhost:8000`` it should open the documentation and live refresh
-when a file is changed and saved to disk.
-
-Deploy with GitLabCI
-^^^^^^^^^^^^^^^^^^^^
-We make use of the `GitLabCI <https://docs.gitlab.com/ee/ci/>`_  to deploy our generated documentation to GitLab pages.
-Please check the :rootdir:`.gitlab-ci.yml of this repository <.gitlab-ci.yml>` for the details.
-
-Add a new tutorial
-^^^^^^^^^^^^^^^^^^
-Adding a new tutorial is as simple as creating a new ``.rst`` file.
-To make sure it shows up in the Table of Contents, add it to the :rootdir:`index.rst <index.rst>` under a ``.. toctree::`` directive
-
-.. tip:: If you are creating a new package description, make sure to base it off the :codedir:`package template <march_packages/template.rst>`
+.. _march_acado_mpc/CMakeLists.txt: https://gitlab.com/project-march/march/-/blob/main/ros1/src/control/march_acado_mpc/CMakeLists.txt
