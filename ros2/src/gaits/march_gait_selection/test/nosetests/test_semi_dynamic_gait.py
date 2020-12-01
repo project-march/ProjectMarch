@@ -11,17 +11,17 @@ VALID_PACKAGE = 'march_gait_selection'
 VALID_DIRECTORY = 'test/resources'
 
 
-class TestGaitSelection(unittest.TestCase):
+class TestSemiDynamicGaitSelection(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
         cls.robot = urdf.Robot.from_xml_file(
             get_package_share_directory('march_description') + '/urdf/march4.urdf')
         cls.gait_directory = os.path.join(get_package_share_directory(VALID_PACKAGE), VALID_DIRECTORY)
+        cls.gait_selection = GaitSelection(
+            gait_package=VALID_PACKAGE, directory=VALID_DIRECTORY, robot=cls.robot)
 
     def setUp(self):
-        self.gait_selection = GaitSelection(
-            gait_package=VALID_PACKAGE, directory=VALID_DIRECTORY, robot=self.robot)
         self.semi_dynamic_gait = SemiDynamicSetpointsGait.from_file(
             'stairs_up', self.gait_directory, self.robot,
             self.gait_selection.gait_version_map)
@@ -45,7 +45,7 @@ class TestGaitSelection(unittest.TestCase):
 
     def test_subgait_starts_from_0_after_freeze(self):
         self.semi_dynamic_gait.update(2)
-        self.semi_dynamic_gait.freeze()
+        self.semi_dynamic_gait.freeze(2)
         self.semi_dynamic_gait.update(0.5)
         self.assertEqual(self.semi_dynamic_gait._time_since_start, 0)
 
@@ -54,19 +54,26 @@ class TestGaitSelection(unittest.TestCase):
         self.semi_dynamic_gait.freeze(10)
         self.semi_dynamic_gait.update(1)
         self.semi_dynamic_gait.update(9.5)
-        self.assertEqual(self.semi_dynamic_gait._time_since_start, 8.5)
+        self.assertEqual(self.semi_dynamic_gait._time_since_start, 9.5)
 
     def test_freeze_duration_done(self):
         self.semi_dynamic_gait.update(2)
+        print(self.semi_dynamic_gait._time_since_start)
         self.semi_dynamic_gait.freeze(10)
+        print(self.semi_dynamic_gait._time_since_start)
         self.semi_dynamic_gait.update(1)
-        self.semi_dynamic_gait.update(10.5)
+        print(self.semi_dynamic_gait._time_since_start)
+        self.semi_dynamic_gait.update(11)
+        print(self.semi_dynamic_gait._time_since_start)
         self.assertEqual(self.semi_dynamic_gait._time_since_start, 0)
 
     def test_position_after_time_begin(self):
-        self.semi_dynamic_gait.update(2)
+        self.semi_dynamic_gait.update(1)
+        # print(self.semi_dynamic_gait._position_after_time(0))
+        # print('should equal:')
+        print(self.gait_selection.positions['stand']['joints'])
         self.assertEqual(self.semi_dynamic_gait._position_after_time(0),
-                         self.gait_selection.positions['stand'])
+                         self.gait_selection.positions['stand']['joints'])
 
     def test_position_after_time_end(self):
         self.semi_dynamic_gait.update(2)
@@ -77,6 +84,7 @@ class TestGaitSelection(unittest.TestCase):
                           'left_knee': 0.3491,
                           'right_ankle': 0.0436,
                           'right_hip_aa': 0.0,
+                          'right_hip_fe': 0.3491,
                           'right_knee': 0.4363})
 
     def test_execute_freeze(self):
@@ -84,4 +92,4 @@ class TestGaitSelection(unittest.TestCase):
         self.semi_dynamic_gait.freeze()
         self.semi_dynamic_gait.update(2)
         self.assertEqual(self.semi_dynamic_gait._current_subgait.subgait_name,
-                          'dynamic_freeze')
+                          'freeze')

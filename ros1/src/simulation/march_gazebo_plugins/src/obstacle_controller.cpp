@@ -167,12 +167,9 @@ void ObstacleController::getGoalPosition(double time_since_start)
     swing_foot_pose = foot_left_->WorldCoGPose().Pos();
   }
   // Goal position is determined from the location of the stable foot
-  if (subgait_name_.substr(0, 7) != "dynamic")
-  {
-    goal_position_x = stable_foot_pose.X();
-  }
   goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
 
+<<<<<<< HEAD
   // If the exoskeleton is in an idle sit position, put the CoM a bit behind the stable foot
   if (subgait_name_ == SIT_IDLE) {
     goal_position_x = stable_foot_pose.X() + 0.2 * swing_step_size_;
@@ -190,8 +187,10 @@ void ObstacleController::getGoalPosition(double time_since_start)
     default_subgait_name_ = STAND_IDLE;
     goal_position_x = stable_foot_pose.X() + 0.1 * swing_step_size_;
   }
-  if (subgait_name_.substr(0, 7) != "dynamic")
+
+  if (subgait_name_.substr(0, 6) != "freeze")
   {
+    goal_position_x = stable_foot_pose.X();
     // Start goal position a quarter step size behind the stable foot
     // Move the goal position forward with v = 0.5 * swing_step_size/subgait_duration
     if (subgait_name_.substr(subgait_name_.size() - 4) == "open")

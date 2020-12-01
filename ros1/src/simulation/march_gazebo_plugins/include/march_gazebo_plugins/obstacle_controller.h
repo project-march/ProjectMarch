@@ -60,4 +60,4 @@ protected:
 };
 }  // namespace gazebo
 
-#endif  // MARCH_RQT_GAIT_GENERATOR_OBSTACLECONTROLLER_H
+#endif  // MARCH_GAZEBO_PLUGINS_OBSTACLE_CONTROLLER_H

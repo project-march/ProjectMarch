@@ -2,8 +2,8 @@ import math
 from copy import deepcopy
 from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
 from march_shared_classes.gait.subgait import Subgait
-from rclpy.duration import Duration
 
+SECS_TO_NANOSECS = 1e9
 
 class SemiDynamicSetpointsGait(SetpointsGait):
     """ A semi-dynamic version of the setpoints gait, implements a freeze functionality """
@@ -32,8 +32,9 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         after the short freeze
         :param duration: How long to freeze in the current position
         """
-        self._should_freeze = True
-        self._freeze_duration = duration
+        if self.can_freeze:
+            self._should_freeze = True
+            self._freeze_duration = duration
 
     def update(self, elapsed_time):
         """
@@ -70,6 +71,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         original subgait after the freeze.
         :return:
         """
+        self._freeze_position = self._position_after_time(self._time_since_start)
         self._previous_subgait = self._current_subgait.subgait_name
         self._subgait_after_freeze = self.subgait_after_freeze()
         self._current_subgait = self._freeze_subgait()
@@ -87,7 +89,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             # the current time point
             subgait_after_freeze = deepcopy(self._current_subgait)
             for joint in subgait_after_freeze:
-                joint.from_begin_point(self._time_since_start, self._freeze_position)
+                joint.from_begin_point(self._time_since_start, self._freeze_position[joint.name])
             subgait_after_freeze.duration -= self._time_since_start
             subgait_after_freeze.subgait_name = 'freeze_subgait_after'
             # Add the subgait after the freeze to the subgait graph
@@ -105,25 +107,25 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         Generates a subgait of the freeze duration based on the current position.
         :return: A subgait to freeze in current position
         """
-        self._freeze_position = self._position_after_time(self._time_since_start)
+        duration_secs = math.floor(self._freeze_duration)
+        duration_nsecs = (self._freeze_duration - duration_secs) * SECS_TO_NANOSECS
         new_dict = {
             'description': 'A subgait that stays in the same position',
             'duration': {
-                'nsecs': Duration(seconds=self._freeze_duration).nanoseconds,
-                'secs': math.floor(self._freeze_duration),
+                'nsecs': duration_nsecs,
+                'secs': duration_secs,
             },
             'gait_type': 'walk_like',
             'joints': dict([(joint.name, [{
                 'position': self._freeze_position[joint.name],
                 'time_from_start': {
-                    'nsecs': (duration - math.floor(duration)) * 1e9,
-                    'secs': math.floor(duration),
+                    'nsecs': duration_nsecs,
+                    'secs': duration_secs,
                 },
-                'velocity': 0}
-                for duration in [self._freeze_duration]])
+                'velocity': 0}])
                             for joint in self._current_subgait.joints]),
             'name': 'freeze',
-            'version': 'Only version',
+            'version': 'Only version, generated from code',
         }
         freeze_subgait = Subgait.from_dict(robot=self._current_subgait.robot,
                                            subgait_dict=new_dict,
