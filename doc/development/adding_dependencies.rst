@@ -54,7 +54,7 @@ the situation:
    This allows the package to be installed with ``pip install -r requirements.pip``.
 2) In case it is a library that is available via apt, ensure that the package is in
    the main, restricted, universe or multiverse sources and add it to the ``requirements.apt`` file.
-   This allos the package to be installed with ``apt install < requirements.apt``.
+   This allows the package to be installed with ``apt install < requirements.apt``.
 3) In case it is only available as source and you *don't* want to make any changes to the library,
    add it to the package in the CMakeLists.txt file with the CMakes FetchContent_Declare command.
 4) In case you want to change the source code, fork the library to the `Libraries and forks group`_
