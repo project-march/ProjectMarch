@@ -1,0 +1,158 @@
+Documentation
+=============
+.. inclusion-introduction-start
+
+This tutorial will teach you how to build the documentation locally and contribute to its development.
+
+.. inclusion-introduction-end
+
+Introduction
+^^^^^^^^^^^^
+These tutorials are written in `rst <http://docutils.sourceforge.net/rst.html>`_, an easy-to-understand plaintext markup language.
+It is then build by `Sphinx <http://www.sphinx-doc.org/en/master/>`_ using the `rosdoc_lite <http://wiki.ros.org/rosdoc_lite>`_ package.
+You can either build the documentation locally when following the tutorials or
+deploy it to `Gitlab pages <https://docs.gitlab.com/ee/user/project/pages/>`_ with the help of the GitLab CI.
+
+Building locally
+^^^^^^^^^^^^^^^^
+Follow these steps to be able to build the documentation locally.
+
+Clone the repository
+--------------------
+
+Clone the repository with either ssh or https:
+
+**ssh:**
+
+.. code:: bash
+
+    git clone git@gitlab.com:project-march/project-march.gitlab.io.git
+
+**https:**
+
+.. code:: bash
+
+    git clone https://gitlab.com/project-march/project-march.gitlab.io.git
+
+Install rosdoc_lite and Sphinx
+------------------------------
+We use the package rosdoc_lite to generate the documentation with Sphinx
+
+.. code:: bash
+
+  sudo apt-get install ros-melodic-rosdoc-lite
+
+
+Install Gem and html-proofer
+----------------------------
+Gem is a package manager for Ruby, we will use it to install `html-proofer <https://github.com/gjtorikian/html-proofer>`_.
+html-proofer is a tool that can validate your generated html for mistakes like broken links or missing images.
+
+.. code::
+
+  sudo apt-get update
+  sudo apt install ruby-full
+
+  # Check if ruby and gem got installed correctly
+  ruby --version
+  gem --version
+
+  sudo gem update --system
+  sudo gem install html-proofer
+
+Install Additional dependencies
+-------------------------------
+Pygit is used so we can tell Sphinx what branch we are on. That way links to GitHub files can be verified against the proper branch.
+This prevents html-proofer from not being able to find newly added files on develop, as it checks against the current branch.
+Furthermore, we use the sphinx-rtd-theme for the theme of the pages.
+You can install both packages from the Ubuntu repositories:
+
+.. code::
+
+  sudo apt install python-pygit2 python-sphinx-rtd-theme
+
+
+Generate the html
+-----------------
+First source ROS1 melodic, and then run the :rootdir:`build_locally <build_locally.sh>` script to
+generate the docs and automatically open them in your browser.
+
+.. code::
+
+  source /opt/ros/melodic/setup.bash
+  cd ~/project-march.gitlab.io
+  ./build_locally.sh
+
+.. warning::
+  If you already have sphinx installed, you might get the following error:
+
+  .. code::
+
+    Traceback (most recent call last):
+      File "/home/march/.local/bin/sphinx-build", line 7, in <module>
+        from sphinx.cmd.build import main
+      File "/home/march/.local/lib/python2.7/site-packages/sphinx/cmd/build.py", line 39
+        file=stderr)
+            ^
+    SyntaxError: invalid syntax
+    stdout:
+
+  Fix it by uninstalling sphinx
+
+  .. code::
+
+    pip uninstall sphinx
+
+.. warning::
+  You might get the following error if sphinx is installed using pip3:
+
+  .. code::
+
+    Exception occurred:
+      File "<frozen importlib._bootstrap>", line 222, in _call_with_frames_removed
+      File "/home/olav/march_ws/src/march_tutorials/_scripts/tutorialformatter.py", line 121
+        print 'tutorialformatter.py error: sub-tutorial %s not found.' % sub_name
+                                                                     ^
+    SyntaxError: Missing parentheses in call to 'print'
+
+  You can fix this by uninstalling python3 sphinx:
+
+  .. code::
+
+    pip3 uninstall sphinx
+
+.. note::
+  If you have added new files but not pushed to GitHub yet, html-proofer will probably complain about invalid links.
+  Push your files and build locally again to solve this problem.
+
+sphinx-autobuild
+-----------------------
+`sphinx-autobuild <https://pypi.org/project/sphinx-autobuild/>`_ is a tool that
+watches your doc files and live updates your changes.
+
+You can install it with pip:
+
+.. code::
+
+  pip install --user sphinx-autobuild
+
+Start the auto build:
+
+.. code::
+
+  sphinx-autobuild . build/html
+
+When you go to ``localhost:8000`` it should open the documentation and live refresh
+when a file is changed and saved to disk.
+
+Deploy with GitLabCI
+^^^^^^^^^^^^^^^^^^^^
+We make use of the `GitLabCI <https://docs.gitlab.com/ee/ci/>`_  to deploy our generated documentation to GitLab pages.
+Please check the :rootdir:`.gitlab-ci.yml of this repository <.gitlab-ci.yml>` for the details.
+
+Add a new tutorial
+^^^^^^^^^^^^^^^^^^
+Adding a new tutorial is as simple as creating a new ``.rst`` file.
+To make sure it shows up in the Table of Contents, add it to the :rootdir:`index.rst <index.rst>` under a ``.. toctree::`` directive
+
+.. tip:: If you are creating a new package description, make sure to base it off the :codedir:`package template <march_packages/template.rst>`
