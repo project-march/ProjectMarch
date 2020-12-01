@@ -1,7 +1,16 @@
 # Project MARCH
-The main repository of the MARCH exoskeleton.
-
 ![Pipeline Status](https://gitlab.com/project-march/march/badges/main/pipeline.svg)
+
+Project MARCH is a student team of the TU Delft that is involved in the development of
+a user-friendly and versatile exoskeleton, a motorized robotic suit, that can be used
+to get people with a spinal cord injury to stand up and walk again. This repository
+contains the code to make this happen.
+
+## Pictures
+<img src=".gitlab/readme/ivi.jpeg" alt="The exoskeleton sitting on a wooden box on a field track." width="49%">
+<img src=".gitlab/readme/exo.jpeg" alt="The pilot wearing the exoskeleton and standing straight on a field track." width="49%">
+<img src=".gitlab/readme/simulation.jpeg" alt="View of the backsize of a simulated exoskeleton." width="49%">
+<img src=".gitlab/readme/stairs.jpeg" alt="A simulated exoskeleton walking up a ramp with a small inclination." width="49%">
 
 ## Documentation
 
