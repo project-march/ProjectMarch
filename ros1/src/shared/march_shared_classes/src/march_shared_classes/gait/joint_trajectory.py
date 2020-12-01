@@ -4,7 +4,6 @@ from scipy.interpolate import BPoly
 from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
 
 from .setpoint import Setpoint
-from march_shared_classes.utilities.utility_functions import weighted_average
 
 
 class JointTrajectory(object):
@@ -178,15 +177,9 @@ class JointTrajectory(object):
         These are placed in list with the correct index, where each entry contains a dictionary with joint name setpoint
         pairs. Also checks whether the joint trajectories are safe to interpolate.
 
-        :param base_subgait:
-            base base_subgait, return value if parameter is equal to zero
-        :param other_subgait:
-            other other_subgait, return value if parameter is equal to one
-        :param parameter:
-            The parameter to use for interpolation. Should be 0 <= parameter <= 1.
-
-        :return:
-            The interpolated trajectory
+        :param base_subgait: one of the subgaits to reorder
+        :param other_subgait: the other subgait to reorder
+        :return: The interpolated trajectory
         """
         number_of_setpoints = len(base_subgait.joints[0].setpoints)
         base_setpoints_to_interpolate = [{} for _ in range(number_of_setpoints)]

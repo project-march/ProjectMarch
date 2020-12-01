@@ -1,11 +1,13 @@
 from math import acos, atan, cos, pi, sin, sqrt
 
-from march_shared_classes.exceptions.gait_exceptions import SideSpecificationError, SubgaitInterpolationError
+import rospy
 
+from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
+from march_shared_classes.exceptions.general_exceptions import SideSpecificationError
 from march_shared_classes.gait.setpoint import Setpoint
-from march_shared_classes.utilities.utility_functions import get_lengths_robot_for_inverse_kinematics
+from march_shared_classes.utilities.side import Side
+from march_shared_classes.utilities.utility_functions import get_lengths_robot_for_inverse_kinematics, weighted_average
 from march_shared_classes.utilities.vector_3d import Vector3d
-
 
 VELOCITY_SCALE_FACTOR = 0.001
 JOINT_NAMES_IK = ['left_hip_aa', 'left_hip_fe', 'left_knee', 'right_hip_aa', 'right_hip_fe', 'right_knee']
@@ -16,11 +18,11 @@ class Foot(object):
 
     def __init__(self, foot_side, position, velocity=None):
         """Create a Foot object, position and velocity are both Vector3d objects."""
-        self.foot_side = foot_side
         self.position = position
         self.velocity = velocity
-        if foot_side != 'left' and foot_side != 'right':
+        if foot_side != Side.left and foot_side != Side.right:
             raise SideSpecificationError(foot_side)
+        self.foot_side = Side(foot_side)
 
     def add_foot_velocity_from_next_state(self, next_state):
         """Adds the foot velocity to the state given a next state for the foot to be in.
@@ -91,9 +93,9 @@ class Foot(object):
         z_position = foot_position.z
 
         # Change y positive direction to the desired foot, change origin to pivot of haa joint, for ease of calculation.
-        if foot_side == 'left':
+        if foot_side == Side.left:
             y_position = - (y_position + base / 2.0)
-        elif foot_side == 'right':
+        elif foot_side == Side.right:
             y_position = y_position - base / 2.0
         else:
             raise SideSpecificationError(foot_side)
@@ -112,10 +114,10 @@ class Foot(object):
 
         hfe, kfe = Foot.calculate_hfe_kfe_angles(rescaled_x, rescaled_z, ul, ll)
 
-        angle_positions = {foot_side + '_hip_aa': Setpoint(time, haa), foot_side + '_hip_fe': Setpoint(time, hfe),
-                           foot_side + '_knee': Setpoint(time, kfe)}
+        angle_positions = {foot_side.value + '_hip_aa': Setpoint(time, haa),
+                           foot_side.value + '_hip_fe': Setpoint(time, hfe),
+                           foot_side.value + '_knee': Setpoint(time, kfe)}
         return angle_positions
-
 
     @staticmethod
     def calculate_haa_angle(z_position, y_position, pelvis_hip_length):
@@ -194,11 +196,27 @@ class Foot(object):
         z_position = - sin(haa) * ph + cos(haa) * haa_to_foot_length
         x_position = hl + sin(hfe) * ul + sin(hfe - kfe) * ll
 
-        if side == 'left':
+        if side == side.left:
             y_position = - cos(haa) * ph - sin(haa) * haa_to_foot_length - base / 2.0
-        elif side == 'right':
+        elif side == side.right:
             y_position = cos(haa) * ph + sin(haa) * haa_to_foot_length + base / 2.0
         else:
             raise SideSpecificationError(side)
 
         return Foot(side, Vector3d(x_position, y_position, z_position))
+
+    @staticmethod
+    def weighted_average_foot(base_foot, other_foot, parameter):
+        """Computes the weighted average of two Foot objects, result has a velocity of None if it cannot be computed."""
+        if base_foot.foot_side != other_foot.foot_side:
+            raise SideSpecificationError('expected sides of both base and other foot to be equal but were {base} and '
+                                         '{other}.'.format(base=base_foot.foot_side, other=other_foot.foot_side))
+        resulting_position = weighted_average(base_foot.position, other_foot.position, parameter)
+        if base_foot.velocity is not None and other_foot.velocity is not None:
+            resulting_velocity = weighted_average(base_foot.velocity, other_foot.velocity, parameter)
+        else:
+            rospy.logwarn('one or both of the provided feet does not have a velocity specified, '
+                          'setting the resulting velocity to None')
+            resulting_velocity = None
+
+        return Foot(base_foot.foot_side, resulting_position, resulting_velocity)

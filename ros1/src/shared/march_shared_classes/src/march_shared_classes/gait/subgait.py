@@ -7,15 +7,16 @@ import yaml
 
 from march_shared_classes.exceptions.gait_exceptions import NonValidGaitContent, SubgaitInterpolationError
 from march_shared_classes.exceptions.general_exceptions import FileNotFoundError
+from march_shared_classes.foot_classes.feet_state import FeetState
+from march_shared_classes.utilities.utility_functions import weighted_average
 
 from .joint_trajectory import JointTrajectory
 from .limits import Limits
 from .setpoint import Setpoint
-from march_shared_classes.foot_classes.feet_state import FeetState
-from march_shared_classes.utilities.utility_functions import weighted_average
 
 PARAMETRIC_GAITS_PREFIX = '_pg_'
 JOINT_NAMES_IK = ['left_hip_aa', 'left_hip_fe', 'left_knee', 'right_hip_aa', 'right_hip_fe', 'right_knee']
+
 
 class Subgait(object):
     """Base class for usage of the defined subgaits."""
@@ -384,7 +385,7 @@ class Subgait(object):
 
     @staticmethod
     def check_foot_position_interpolation_is_safe(base_subgait, other_subgait):
-        """Checks whether two subgaits are safe to be interpolated based on foot location"""
+        """Checks whether two subgaits are safe to be interpolated based on foot location."""
         number_of_setpoints = len(base_subgait.joints[0].setpoints)
         joint_to_compare_to = base_subgait.joints[0].name
         for base_joint, other_joint in zip(sorted(base_subgait.joints, key=lambda joint: joint.name),
@@ -410,7 +411,7 @@ class Subgait(object):
 
     @staticmethod
     def get_foot_position_interpolated_joint_trajectories(base_subgait, other_subgait, parameter):
-        """Creates a list of joint trajectories with linearly interpolated corresponding foot location
+        """Creates a list of joint trajectories with linearly interpolated corresponding foot location.
 
         The foot location corresponding to the resulting trajectories is equal to the weighted average (with the
         parameter) of the foor locations corresponding to the base and other subgait.
@@ -454,7 +455,7 @@ class Subgait(object):
 
     @staticmethod
     def get_joint_angle_interpolated_joint_trajectories(base_subgait, other_subgait, parameter):
-        """Calls the interpolate_joint_trajectories method for each joint trajectory in two subgaits
+        """Calls the interpolate_joint_trajectories method for each joint trajectory in two subgaits.
 
         :param base_subgait: base subgait, return value if parameter is equal to zero
         :param other_subgiat: other subgait, return value if parameter is equal to one

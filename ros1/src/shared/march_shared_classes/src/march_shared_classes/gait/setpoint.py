@@ -1,10 +1,9 @@
-from march_shared_classes.utilities.utility_functions import merge_dictionaries, weighted_average
+from march_shared_classes.utilities.utility_functions import weighted_average
 
 # Use this factor when calculating velocities to keep the calculations within the range of motion
 # See IK confluence page https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
 VELOCITY_SCALE_FACTOR = 0.001
 JOINT_NAMES_IK = ['left_hip_aa', 'left_hip_fe', 'left_knee', 'right_hip_aa', 'right_hip_fe', 'right_knee']
-
 
 
 class Setpoint(object):
@@ -74,8 +73,8 @@ class Setpoint(object):
         for joint in JOINT_NAMES_IK:
             if joint in setpoint_dic:
                 next_positions[joint] = cls(setpoint_dic[joint].time + VELOCITY_SCALE_FACTOR,
-                                                 setpoint_dic[joint].position + setpoint_dic[joint].velocity
-                                                 * VELOCITY_SCALE_FACTOR)
+                                            setpoint_dic[joint].position + setpoint_dic[joint].velocity
+                                            * VELOCITY_SCALE_FACTOR)
             else:
                 raise KeyError('setpoint_dic is missing joint {joint}'.format(joint=joint))
 

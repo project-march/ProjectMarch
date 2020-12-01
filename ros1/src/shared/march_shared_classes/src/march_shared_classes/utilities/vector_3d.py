@@ -1,6 +1,7 @@
-from march_shared_classes.exceptions.gait_exceptions import IncorrectCoordinateError
-
 from math import sqrt
+
+from march_shared_classes.exceptions.general_exceptions import IncorrectCoordinateError
+
 
 class Vector3d(object):
     """A 3d vector class."""
@@ -50,6 +51,13 @@ class Vector3d(object):
     def __repr__(self):
         return 'x: {x}, y: {y}, z: {z}'.format(x=self.x, y=self.y, z=self.z)
 
+    @classmethod
+    def from_dictionary(cls, dic):
+        """Creates a Vector3d object from a dictionary with keys 'x', 'y' and 'z'."""
+        if {'x', 'y', 'z'} != set(dic.keys()):
+            raise IncorrectCoordinateError()
+        return cls(dic['x'], dic['y'], dic['z'])
+
     def as_dictionary(self):
         return{'x': self.x, 'y': self.y, 'z': self.z}
 
@@ -59,9 +67,3 @@ class Vector3d(object):
     @staticmethod
     def size():
         return 3
-
-    @staticmethod
-    def from_dictionary(dic):
-        if {'x', 'y', 'z'} != set(dic.keys()):
-            raise IncorrectCoordinateError()
-        return Vector3d(dic['x'], dic['y'], dic['z'])

@@ -55,7 +55,7 @@ class SubgaitGraphError(GaitError):
         super(SubgaitGraphError, self).__init__(msg)
 
 
-class TransitionError(Exception):
+class TransitionError(GaitError):
     def __init__(self, msg=None):
         """Class to raise an error when transition between two subgaits has an error .
 
@@ -68,38 +68,10 @@ class TransitionError(Exception):
         super(TransitionError, self).__init__(msg)
 
 
-class SubgaitInterpolationError(Exception):
+class SubgaitInterpolationError(GaitError):
     def __init__(self, msg=None):
         """Class to raise an error when it was not possible to interpolate between subgaits."""
         if msg is None:
             msg = 'An error occurred while trying to merge two subgaits.'
 
         super(SubgaitInterpolationError, self).__init__(msg)
-
-
-class SideSpecificationError(Exception):
-    def __init__(self, foot, msg=None):
-        """Class to raise an error when a foot ('right' or 'left') has to be specified but this did not happen."""
-        if msg is None:
-            msg = "An incorrect side was supplied. Must be either 'left' or 'right', but was '{foot}'.".\
-                format(foot=foot)
-
-        super(SideSpecificationError, self).__init__(msg)
-
-
-class IncorrectCoordinateError(Exception):
-    def __init__(self, msg=None):
-        """Class to raise an error when the coordinates of a position are incorrect."""
-        if msg is None:
-            msg = "The keys of a position or velocity dictionary should be ['x', 'y', 'z'], but were different."
-
-        super(IncorrectCoordinateError, self).__init__(msg)
-
-
-class WeightedAverageError(Exception):
-    def __init__(self, msg=None):
-        """Class to raise an error when a weighted average cannot be computed."""
-        if msg is None:
-            msg = 'The calculation of the weighted average cannot be executed safely.'
-
-        super(WeightedAverageError, self).__init__(msg)

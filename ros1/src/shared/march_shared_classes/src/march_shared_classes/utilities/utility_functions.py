@@ -3,6 +3,11 @@ import os
 import rospkg
 from urdf_parser_py import urdf
 
+from march_shared_classes.exceptions.general_exceptions import SideSpecificationError
+
+from .side import Side
+
+
 def weighted_average(base_value, other_value, parameter):
     """Compute the weighted average of two values with normalised weight parameter.
 
@@ -40,6 +45,7 @@ def merge_dictionaries(dic_one, dic_two):
                            format(key=key_two))
     return merged_dic
 
+
 def get_lengths_robot_for_inverse_kinematics(side=None):
     """Grabs lengths from the robot which are relevant for the inverse kinematics calculation.
 
@@ -73,11 +79,11 @@ def get_lengths_robot_for_inverse_kinematics(side=None):
         raise KeyError('Expected robot.link_map to contain "{key}", but "{key}" was missing.'.
                        format(key=e.args[0]))
 
-    if side == 'left':
+    if side == Side.left:
         return [l_ul, l_ll, l_hl, l_ph, base]
-    elif side == 'right':
+    elif side == Side.right:
         return [r_ul, r_ll, r_hl, r_ph, base]
-    elif side == 'both':
+    elif side == Side.both:
         return [l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base]
     else:
         raise SideSpecificationError(side, "Side should be either 'left', 'right' or 'both', but was {side}".

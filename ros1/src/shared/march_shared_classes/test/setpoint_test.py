@@ -3,6 +3,7 @@ import unittest
 from march_shared_classes.foot_classes.feet_state import FeetState
 from march_shared_classes.foot_classes.foot import Foot
 from march_shared_classes.gait.setpoint import Setpoint
+from march_shared_classes.utilities.side import Side
 from march_shared_classes.utilities.vector_3d import Vector3d
 
 
@@ -66,9 +67,6 @@ class SetpointTest(unittest.TestCase):
     def test_inverse_kinematics_velocity(self):
         feet_state = FeetState.from_setpoints(self.setpoint_dict)
         new_setpoints = FeetState.feet_state_to_setpoint(feet_state)
-        print(new_setpoints)
-        print(feet_state.left_foot.position)
-        print(feet_state.left_foot.velocity)
         for key in new_setpoints.keys():
             self.assertAlmostEqual(new_setpoints[key].velocity, self.setpoint_dict[key].velocity, places=4)
 
@@ -79,8 +77,8 @@ class SetpointTest(unittest.TestCase):
             self.assertAlmostEqual(new_setpoints[key].time, self.setpoint_dict[key].time, places=4)
 
     def test_inverse_kinematics_reversed_position(self):
-        right_foot = Foot('right', Vector3d(0.18, 0.08, 0.6), Vector3d(0, 0, 0))
-        left_foot = Foot('left', Vector3d(0.18, -0.08, 0.6), Vector3d(0, 0, 0))
+        right_foot = Foot(Side.right, Vector3d(0.18, 0.08, 0.6), Vector3d(0, 0, 0))
+        left_foot = Foot(Side.left, Vector3d(0.18, -0.08, 0.6), Vector3d(0, 0, 0))
         desired_state = FeetState(right_foot, left_foot, 0.1)
         new_setpoints = FeetState.feet_state_to_setpoint(desired_state)
         resulting_position = FeetState.from_setpoints(new_setpoints)
@@ -89,5 +87,3 @@ class SetpointTest(unittest.TestCase):
         dif_right = desired_state.right_foot.position - resulting_position.right_foot.position
         self.assertTrue((dif_left.norm() < 0.00001))
         self.assertTrue((dif_right.norm() < 1 / 0.00001))
-
-

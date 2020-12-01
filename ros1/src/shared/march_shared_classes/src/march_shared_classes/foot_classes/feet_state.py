@@ -1,10 +1,11 @@
-from march_shared_classes.exceptions.gait_exceptions import WeightedAverageError, SideSpecificationError
-
 from march_shared_classes.gait.setpoint import Setpoint
+from march_shared_classes.utilities.side import Side
+from march_shared_classes.utilities.utility_functions import merge_dictionaries, weighted_average
+
 from .foot import Foot
-from march_shared_classes.utilities.utility_functions import merge_dictionaries, weighted_average, get_lengths_robot_for_inverse_kinematics
 
 JOINT_NAMES_IK = ['left_hip_aa', 'left_hip_fe', 'left_knee', 'right_hip_aa', 'right_hip_fe', 'right_knee']
+
 
 class FeetState(object):
     """Class for encapturing the entire state (position and velocity at a certain time) of both feet."""
@@ -33,21 +34,20 @@ class FeetState(object):
                                format(joint=joint))
 
         foot_state_left = Foot.calculate_foot_position(setpoint_dic['left_hip_aa'].position,
-                                                           setpoint_dic['left_hip_fe'].position,
-                                                           setpoint_dic['left_knee'].position, 'left')
+                                                       setpoint_dic['left_hip_fe'].position,
+                                                       setpoint_dic['left_knee'].position, Side.left)
         foot_state_right = Foot.calculate_foot_position(setpoint_dic['right_hip_aa'].position,
-                                                            setpoint_dic['right_hip_fe'].position,
-                                                            setpoint_dic['right_knee'].position, 'right')
+                                                        setpoint_dic['right_hip_fe'].position,
+                                                        setpoint_dic['right_knee'].position, Side.right)
 
         next_joint_positions = Setpoint.calculate_next_positions_joint(setpoint_dic)
 
         next_foot_state_left = Foot.calculate_foot_position(next_joint_positions['left_hip_aa'].position,
-                                                                next_joint_positions['left_hip_fe'].position,
-                                                                next_joint_positions['left_knee'].position, 'left')
+                                                            next_joint_positions['left_hip_fe'].position,
+                                                            next_joint_positions['left_knee'].position, Side.left)
         next_foot_state_right = Foot.calculate_foot_position(next_joint_positions['right_hip_aa'].position,
-                                                                 next_joint_positions['right_hip_fe'].position,
-                                                                 next_joint_positions['right_knee'].position, 'right')
-
+                                                             next_joint_positions['right_hip_fe'].position,
+                                                             next_joint_positions['right_knee'].position, Side.right)
 
         foot_state_left.add_foot_velocity_from_next_state(next_foot_state_left)
         foot_state_right.add_foot_velocity_from_next_state(next_foot_state_right)
@@ -78,20 +78,8 @@ class FeetState(object):
         elif parameter == 1:
             return other_state
 
-        if not(bool(base_state.right_foot.velocity) and bool(base_state.left_foot.velocity)
-               and bool(other_state.right_foot.velocity) and bool(other_state.left_foot.velocity)):
-            raise WeightedAverageError('Not all Foot objects of the FeetState object contain velocities, '
-                                       'calculation cannot proceed')
-
-        resulting_right_foot = Foot('right', weighted_average(base_state.right_foot.position,
-                                                              other_state.right_foot.position, parameter),
-                                    weighted_average(base_state.right_foot.velocity,
-                                                     other_state.right_foot.velocity, parameter))
-        resulting_left_foot = Foot('left', weighted_average(base_state.left_foot.position,
-                                                            other_state.left_foot.position, parameter),
-                                   weighted_average(base_state.left_foot.velocity,
-                                                    other_state.left_foot.velocity, parameter))
-
+        resulting_right_foot = Foot.weighted_average_foot(base_state.right_foot, other_state.right_foot, parameter)
+        resulting_left_foot = Foot.weighted_average_foot(base_state.left_foot, other_state.left_foot, parameter)
         resulting_time = weighted_average(base_state.time, other_state.time, parameter)
 
         return cls(resulting_right_foot, resulting_left_foot, resulting_time)
