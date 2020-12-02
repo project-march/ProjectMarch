@@ -68,7 +68,7 @@ with `Git LFS`_. Check if CMake fetches these Git LFS files as well!
 
 Generated files that are expensive to generate
 ----------------------------------------------
-Sometime, it is necessary to add a dependency in the form of generated files that are expensive to
+Sometimes, it is necessary to add a dependency in the form of generated files that are expensive to
 generate. An example of this are the files that are generated for model predictive control.
 
 These files should be in their own repository in the  `Libraries and forks group`_ on GitLab
