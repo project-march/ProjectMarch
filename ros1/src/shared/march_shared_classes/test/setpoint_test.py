@@ -1,5 +1,5 @@
-import unittest
 from math import pi
+import unittest
 
 from march_shared_classes.foot_classes.feet_state import FeetState
 from march_shared_classes.foot_classes.foot import Foot
@@ -72,12 +72,6 @@ class SetpointTest(unittest.TestCase):
         for key in new_setpoints.keys():
             self.assertAlmostEqual(new_setpoints[key].velocity, self.setpoint_dict[key].velocity, places=4)
 
-    def test_inverse_kinematics_position(self):
-        feet_state = FeetState.from_setpoints(self.setpoint_dict)
-        new_setpoints = FeetState.feet_state_to_setpoints(feet_state)
-        for key in new_setpoints.keys():
-            self.assertAlmostEqual(new_setpoints[key].position, self.setpoint_dict[key].position, places=4)
-
     def test_inverse_kinematics_reversed_position(self):
         right_foot = Foot(Side.right, Vector3d(0.18, 0.08, 0.6), Vector3d(0, 0, 0))
         left_foot = Foot(Side.left, Vector3d(0.18, -0.08, 0.6), Vector3d(0, 0, 0))
@@ -110,10 +104,10 @@ class SetpointTest(unittest.TestCase):
 
     def test_find_known_position_forward(self):
         setpoint_dict = {'left_hip_aa': Setpoint(0, 0, 0),
-                         'left_hip_fe': Setpoint(0, pi/2, 0),
-                         'left_knee': Setpoint(0, 0,0),
+                         'left_hip_fe': Setpoint(0, pi / 2, 0),
+                         'left_knee': Setpoint(0, 0, 0),
                          'right_hip_aa': Setpoint(0, 0, 0),
-                         'right_hip_fe': Setpoint(0, pi/2, 0),
+                         'right_hip_fe': Setpoint(0, pi / 2, 0),
                          'right_knee': Setpoint(0, 0, 0)}
         [l_ul, l_ll, _, _, r_ul, r_ll, _, _, _] = get_lengths_robot_for_inverse_kinematics(Side.both)
         resulting_state = FeetState.from_setpoints(setpoint_dict)
@@ -144,11 +138,11 @@ class SetpointTest(unittest.TestCase):
 
     def test_find_known_position_sit(self):
         setpoint_dict = {'left_hip_aa': Setpoint(0, 0, 0),
-                         'left_hip_fe': Setpoint(0, pi/2, 0),
-                         'left_knee': Setpoint(0, pi/2, 0),
+                         'left_hip_fe': Setpoint(0, pi / 2, 0),
+                         'left_knee': Setpoint(0, pi / 2, 0),
                          'right_hip_aa': Setpoint(0, 0, 0),
-                         'right_hip_fe': Setpoint(0, pi/2, 0),
-                         'right_knee': Setpoint(0, pi/2, 0)}
+                         'right_hip_fe': Setpoint(0, pi / 2, 0),
+                         'right_knee': Setpoint(0, pi / 2, 0)}
         [l_ul, l_ll, _, _, r_ul, r_ll, _, _, _] = get_lengths_robot_for_inverse_kinematics(Side.both)
         resulting_state = FeetState.from_setpoints(setpoint_dict)
         expected_right_foot = Foot(Side.right, Vector3d(r_ul + 0.1395, 0.1705, r_ll), Vector3d(0, 0, 0))
@@ -169,10 +163,10 @@ class SetpointTest(unittest.TestCase):
                               'right_hip_fe': Setpoint(0, 0, 0),
                               'right_knee': Setpoint(0, 0, 0)}
         other_setpoint_dict = {'left_hip_aa': Setpoint(0, 0, 0),
-                               'left_hip_fe': Setpoint(0, pi/2, 0),
-                               'left_knee': Setpoint(0, 0,0),
+                               'left_hip_fe': Setpoint(0, pi / 2, 0),
+                               'left_knee': Setpoint(0, 0, 0),
                                'right_hip_aa': Setpoint(0, 0, 0),
-                               'right_hip_fe': Setpoint(0, pi/2, 0),
+                               'right_hip_fe': Setpoint(0, pi / 2, 0),
                                'right_knee': Setpoint(0, 0, 0)}
 
         base_state = FeetState.from_setpoints(base_setpoint_dict)

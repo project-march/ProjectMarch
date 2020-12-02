@@ -74,10 +74,3 @@ class Vector3d(object):
     @staticmethod
     def size():
         return 3
-
-if __name__ == "__main__":
-    vec = Vector3d(1,2,3)
-    print(vec*3)
-    print(vec*3.5)
-    print(4 * vec)
-    print(abs(vec))

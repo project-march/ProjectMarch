@@ -101,6 +101,5 @@ class GaitTest(unittest.TestCase):
         self.gait.subgaits['left_close'].joints[0].setpoints[-1].position = 124
         subgait_name = 'left_close'
         new_version = 'MIV_final'
-        print(self.gait.subgaits['left_close'].joints[0].setpoints)
         with self.assertRaises(NonValidGaitContent):
             self.gait.set_subgait_versions(self.robot, self.resources_folder, {subgait_name: new_version})

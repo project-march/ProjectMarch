@@ -176,11 +176,6 @@ class Foot(object):
 
         sin_normal_lower_leg_angle = round((rescaled_x - upper_leg * sin(hfe)) / lower_leg, 10)
         kfe = hfe - asin(sin_normal_lower_leg_angle)
-        print("beta = ", normal_to_foot_line)
-        print("alpha = ", foot_line_to_leg)
-        print("cos_normal_lower_leg_angle = ", sin_normal_lower_leg_angle)
-        print("acos(boven) = ", kfe - hfe)
-        print(kfe)
 
         return hfe, kfe
 
