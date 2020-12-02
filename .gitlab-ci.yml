@@ -20,9 +20,11 @@ docker:
     - docker build -t registry.gitlab.com/project-march/project-march.gitlab.io .
     - docker push registry.gitlab.com/project-march/project-march.gitlab.io
   rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
     - changes:
         - Dockerfile
-      when: manual
+      when: always
       allow_failure: false
 
 sphinx-test:
