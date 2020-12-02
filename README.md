@@ -24,6 +24,8 @@ a user-friendly and versatile exoskeleton, a motorized robotic suit, that can be
 to get people with a spinal cord injury to stand up and walk again. This repository
 contains the code to make this happen.
 
+More information about our project can be found on [projectmarch.nl](https://www.projectmarch.nl/en/project-march).
+
 ## Pictures
 <img src=".gitlab/readme/ivi.jpeg" alt="The exoskeleton sitting on a wooden box on a field track." width="49%">
 <img src=".gitlab/readme/exo.jpeg" alt="The pilot wearing the exoskeleton and standing straight on a field track." width="49%">
