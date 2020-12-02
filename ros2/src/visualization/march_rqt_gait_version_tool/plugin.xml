@@ -1,0 +1,17 @@
+<library path="src">
+    <class name="GaitVersionToolPlugin" type="march_rqt_gait_version_tool.gait_version_tool_plugin.GaitVersionToolPlugin" base_class_type="rqt_gui_py::Plugin">
+        <description>
+            RQT plugin to configure which version of gaits will be performed at runtime.
+        </description>
+        <qtgui>
+            <group>
+                <label>March</label>
+                <icon>resource/img/march-walking.png</icon>
+                <statustip>Plugins related to the March exoskeleton.</statustip>
+            </group>
+            <label>March Gait Version Tool</label>
+            <icon>resource/img/march-walking.png</icon>
+            <statustip>GUI to select gait versions for the March exoskeleton.</statustip>
+        </qtgui>
+    </class>
+</library>
