@@ -72,8 +72,8 @@ def get_lengths_robot_for_inverse_kinematics(side=None):
         # the foot is a certain amount more to the inside of the exo then the leg structures.
         # The haa arms need to account for this.
         off_set = robot.link_map['ankle_plate_right'].visual.origin.xyz[1] + base / 2 + r_hl
-        r_hl = r_hl - off_set
-        l_hl - l_hl - off_set
+        r_ph = r_ph - off_set
+        l_ph = l_ph - off_set
 
     except KeyError as e:
         raise KeyError('Expected robot.link_map to contain "{key}", but "{key}" was missing.'.

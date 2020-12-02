@@ -1,10 +1,11 @@
 import unittest
+from math import pi
 
 from march_shared_classes.foot_classes.feet_state import FeetState
 from march_shared_classes.foot_classes.foot import Foot
 from march_shared_classes.gait.setpoint import Setpoint
 from march_shared_classes.utilities.side import Side
-from march_shared_classes.utilities.utility_functions import weighted_average
+from march_shared_classes.utilities.utility_functions import get_lengths_robot_for_inverse_kinematics
 from march_shared_classes.utilities.vector_3d import Vector3d
 
 
@@ -61,19 +62,19 @@ class SetpointTest(unittest.TestCase):
 
     def test_inverse_kinematics_position(self):
         feet_state = FeetState.from_setpoints(self.setpoint_dict)
-        new_setpoints = FeetState.feet_state_to_setpoint(feet_state)
+        new_setpoints = FeetState.feet_state_to_setpoints(feet_state)
         for key in new_setpoints.keys():
             self.assertAlmostEqual(new_setpoints[key].position, self.setpoint_dict[key].position, places=4)
 
     def test_inverse_kinematics_velocity(self):
         feet_state = FeetState.from_setpoints(self.setpoint_dict)
-        new_setpoints = FeetState.feet_state_to_setpoint(feet_state)
+        new_setpoints = FeetState.feet_state_to_setpoints(feet_state)
         for key in new_setpoints.keys():
             self.assertAlmostEqual(new_setpoints[key].velocity, self.setpoint_dict[key].velocity, places=4)
 
     def test_inverse_kinematics_position(self):
         feet_state = FeetState.from_setpoints(self.setpoint_dict)
-        new_setpoints = FeetState.feet_state_to_setpoint(feet_state)
+        new_setpoints = FeetState.feet_state_to_setpoints(feet_state)
         for key in new_setpoints.keys():
             self.assertAlmostEqual(new_setpoints[key].position, self.setpoint_dict[key].position, places=4)
 
@@ -81,7 +82,7 @@ class SetpointTest(unittest.TestCase):
         right_foot = Foot(Side.right, Vector3d(0.18, 0.08, 0.6), Vector3d(0, 0, 0))
         left_foot = Foot(Side.left, Vector3d(0.18, -0.08, 0.6), Vector3d(0, 0, 0))
         desired_state = FeetState(right_foot, left_foot, 0.1)
-        new_setpoints = FeetState.feet_state_to_setpoint(desired_state)
+        new_setpoints = FeetState.feet_state_to_setpoints(desired_state)
         resulting_position = FeetState.from_setpoints(new_setpoints)
 
         dif_left = desired_state.left_foot.position - resulting_position.left_foot.position
@@ -92,25 +93,102 @@ class SetpointTest(unittest.TestCase):
     def test_weighted_average_states(self):
         parameter = 0.8
 
-        base_right_foot = Foot(Side.right, Vector3d(0.18, 0.08, 0.6), Vector3d(125, 4.152532, 0))
-        base_left_foot = Foot(Side.left, Vector3d(0.18, -0.08, 0.6), Vector3d(7, 0.1232, 0))
+        base_right_foot = Foot(Side.right, Vector3d(0, 0, 0), Vector3d(0, 0, 0))
+        base_left_foot = Foot(Side.left, Vector3d(0, 0, 0), Vector3d(0, 0, 0))
         base_state = FeetState(base_right_foot, base_left_foot, 0.1)
 
-        other_right_foot = Foot(Side.right, Vector3d(0.18, 0.08, 0.6), Vector3d(1.12315, 2.2, 0))
-        other_left_foot = Foot(Side.left, Vector3d(0.18, -0.08, 0.6), Vector3d(32, -0.1232, 3.1415))
+        other_right_foot = Foot(Side.right, Vector3d(1, 1, 1), Vector3d(1, 1, 1))
+        other_left_foot = Foot(Side.left, Vector3d(1, 1, 1), Vector3d(1, 1, 1))
         other_state = FeetState(other_right_foot, other_left_foot, 0.1)
 
         resulting_state = FeetState.weighted_average_states(base_state, other_state, parameter)
-        expected_result_right = Foot(Side.right,
-                                     weighted_average(Vector3d(0.18, 0.08, 0.6), Vector3d(0.18, 0.08, 0.6), parameter),
-                                     weighted_average(Vector3d(125, 4.152532, 0), Vector3d(1.12315, 2.2, 0), parameter))
-        expected_result_left = Foot(Side.left,
-                                    weighted_average(Vector3d(0.18, -0.08, 0.6), Vector3d(0.18, -0.08, 0.6), parameter),
-                                    weighted_average(Vector3d(7, 0.1232, 0), Vector3d(32, -0.1232, 3.1415), parameter))
-        expected_state = FeetState(expected_result_right, expected_result_left, 0.1)
 
-        self.assertEqual(expected_state.left_foot.position, resulting_state.left_foot.position)
-        self.assertEqual(expected_state.left_foot.velocity, resulting_state.left_foot.velocity)
-        self.assertEqual(expected_state.right_foot.position, resulting_state.right_foot.position)
-        self.assertEqual(expected_state.right_foot.velocity, resulting_state.right_foot.velocity)
+        self.assertEqual(Vector3d(0.8, 0.8, 0.8), resulting_state.left_foot.position)
+        self.assertEqual(Vector3d(0.8, 0.8, 0.8), resulting_state.left_foot.velocity)
+        self.assertEqual(Vector3d(0.8, 0.8, 0.8), resulting_state.right_foot.position)
+        self.assertEqual(Vector3d(0.8, 0.8, 0.8), resulting_state.right_foot.velocity)
 
+    def test_find_known_position_forward(self):
+        setpoint_dict = {'left_hip_aa': Setpoint(0, 0, 0),
+                         'left_hip_fe': Setpoint(0, pi/2, 0),
+                         'left_knee': Setpoint(0, 0,0),
+                         'right_hip_aa': Setpoint(0, 0, 0),
+                         'right_hip_fe': Setpoint(0, pi/2, 0),
+                         'right_knee': Setpoint(0, 0, 0)}
+        [l_ul, l_ll, _, _, r_ul, r_ll, _, _, _] = get_lengths_robot_for_inverse_kinematics(Side.both)
+        resulting_state = FeetState.from_setpoints(setpoint_dict)
+        expected_right_foot = Foot(Side.right, Vector3d(r_ul + r_ll + 0.1395, 0.1705, 0), Vector3d(0, 0, 0))
+        expected_left_foot = Foot(Side.right, Vector3d(l_ul + l_ll + 0.1395, -0.1705, 0), Vector3d(0, 0, 0))
+        expected_state = FeetState(expected_right_foot, expected_left_foot, 0)
+        self.assertTrue(Vector3d.is_close_enough(expected_state.left_foot.position,
+                                                 resulting_state.left_foot.position))
+        self.assertTrue(Vector3d.is_close_enough(expected_state.right_foot.position,
+                                                 resulting_state.right_foot.position))
+
+    def test_find_known_position_down(self):
+        setpoint_dict = {'left_hip_aa': Setpoint(0, 0, 0),
+                         'left_hip_fe': Setpoint(0, 0, 0),
+                         'left_knee': Setpoint(0, 0, 0),
+                         'right_hip_aa': Setpoint(0, 0, 0),
+                         'right_hip_fe': Setpoint(0, 0, 0),
+                         'right_knee': Setpoint(0, 0, 0)}
+        [l_ul, l_ll, _, _, r_ul, r_ll, _, _, _] = get_lengths_robot_for_inverse_kinematics(Side.both)
+        resulting_state = FeetState.from_setpoints(setpoint_dict)
+        expected_right_foot = Foot(Side.right, Vector3d(0.1395, 0.1705, r_ul + r_ll), Vector3d(0, 0, 0))
+        expected_left_foot = Foot(Side.right, Vector3d(0.1395, -0.1705, l_ul + l_ll), Vector3d(0, 0, 0))
+        expected_state = FeetState(expected_right_foot, expected_left_foot, 0)
+        self.assertTrue(Vector3d.is_close_enough(expected_state.left_foot.position,
+                                                 resulting_state.left_foot.position))
+        self.assertTrue(Vector3d.is_close_enough(expected_state.right_foot.position,
+                                                 resulting_state.right_foot.position))
+
+    def test_find_known_position_sit(self):
+        setpoint_dict = {'left_hip_aa': Setpoint(0, 0, 0),
+                         'left_hip_fe': Setpoint(0, pi/2, 0),
+                         'left_knee': Setpoint(0, pi/2, 0),
+                         'right_hip_aa': Setpoint(0, 0, 0),
+                         'right_hip_fe': Setpoint(0, pi/2, 0),
+                         'right_knee': Setpoint(0, pi/2, 0)}
+        [l_ul, l_ll, _, _, r_ul, r_ll, _, _, _] = get_lengths_robot_for_inverse_kinematics(Side.both)
+        resulting_state = FeetState.from_setpoints(setpoint_dict)
+        expected_right_foot = Foot(Side.right, Vector3d(r_ul + 0.1395, 0.1705, r_ll), Vector3d(0, 0, 0))
+        expected_left_foot = Foot(Side.right, Vector3d(l_ul + 0.1395, -0.1705, l_ll), Vector3d(0, 0, 0))
+        expected_state = FeetState(expected_right_foot, expected_left_foot, 0)
+        self.assertTrue(Vector3d.is_close_enough(expected_state.left_foot.position,
+                                                 resulting_state.left_foot.position))
+        self.assertTrue(Vector3d.is_close_enough(expected_state.right_foot.position,
+                                                 resulting_state.right_foot.position))
+
+    def test_set_forward_backward_swing_inverse_kinematics(self):
+        [l_ul, l_ll, _, _, r_ul, r_ll, _, _, _] = get_lengths_robot_for_inverse_kinematics(Side.both)
+        parameter = 0.99
+        base_setpoint_dict = {'left_hip_aa': Setpoint(0, 0, 0),
+                              'left_hip_fe': Setpoint(0, 0, 0),
+                              'left_knee': Setpoint(0, 0, 0),
+                              'right_hip_aa': Setpoint(0, 0, 0),
+                              'right_hip_fe': Setpoint(0, 0, 0),
+                              'right_knee': Setpoint(0, 0, 0)}
+        other_setpoint_dict = {'left_hip_aa': Setpoint(0, 0, 0),
+                               'left_hip_fe': Setpoint(0, pi/2, 0),
+                               'left_knee': Setpoint(0, 0,0),
+                               'right_hip_aa': Setpoint(0, 0, 0),
+                               'right_hip_fe': Setpoint(0, pi/2, 0),
+                               'right_knee': Setpoint(0, 0, 0)}
+
+        base_state = FeetState.from_setpoints(base_setpoint_dict)
+        other_state = FeetState.from_setpoints(other_setpoint_dict)
+        resulting_state = FeetState.weighted_average_states(base_state, other_state, parameter)
+
+        base_expected_right_foot = Foot(Side.right, Vector3d(0.1395, 0.1705, r_ul + r_ll), Vector3d(0, 0, 0))
+        base_expected_left_foot = Foot(Side.right, Vector3d(0.1395, -0.1705, l_ul + l_ll), Vector3d(0, 0, 0))
+        base_expected_state = FeetState(base_expected_right_foot, base_expected_left_foot, 0)
+
+        other_expected_right_foot = Foot(Side.right, Vector3d(r_ul + r_ll + 0.1395, 0.1705, 0), Vector3d(0, 0, 0))
+        other_expected_left_foot = Foot(Side.right, Vector3d(l_ul + l_ll + 0.1395, -0.1705, 0), Vector3d(0, 0, 0))
+        other_expected_state = FeetState(other_expected_right_foot, other_expected_left_foot, 0)
+
+        expected_state = FeetState.weighted_average_states(base_expected_state, other_expected_state, parameter)
+        self.assertTrue(Vector3d.is_close_enough(expected_state.left_foot.position,
+                                                 resulting_state.left_foot.position))
+        self.assertTrue(Vector3d.is_close_enough(expected_state.right_foot.position,
+                                                 resulting_state.right_foot.position))

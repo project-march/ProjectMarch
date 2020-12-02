@@ -61,7 +61,7 @@ class GaitTest(unittest.TestCase):
         self.gait.set_subgait_versions(self.robot, self.resources_folder, {})
 
     def test_set_one_new_subgait_version(self):
-        subgait_name = 'left_close'
+        subgait_name = 'right_open'
         new_version = 'MIV_final'
         self.gait.set_subgait_versions(self.robot, self.resources_folder, {subgait_name: new_version})
         self.assertEqual(new_version, self.gait.subgaits[subgait_name].version)

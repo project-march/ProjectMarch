@@ -1,4 +1,4 @@
-from math import acos, atan, cos, pi, sin, sqrt
+from math import acos, asin, atan, cos, pi, sin, sqrt
 
 import rospy
 
@@ -118,6 +118,7 @@ class Foot(object):
         angle_positions = {foot_side.value + '_hip_aa': Setpoint(time, haa),
                            foot_side.value + '_hip_fe': Setpoint(time, hfe),
                            foot_side.value + '_knee': Setpoint(time, kfe)}
+
         return angle_positions
 
     @staticmethod
@@ -173,8 +174,13 @@ class Foot(object):
         normal_to_foot_line = atan(rescaled_x / rescaled_z)
         hfe = foot_line_to_leg + normal_to_foot_line
 
-        cos_normal_lower_leg_angle = round((rescaled_z - upper_leg * cos(hfe)) / lower_leg, 10)
-        kfe = acos(cos_normal_lower_leg_angle) + hfe
+        sin_normal_lower_leg_angle = round((rescaled_x - upper_leg * sin(hfe)) / lower_leg, 10)
+        kfe = hfe - asin(sin_normal_lower_leg_angle)
+        print("beta = ", normal_to_foot_line)
+        print("alpha = ", foot_line_to_leg)
+        print("cos_normal_lower_leg_angle = ", sin_normal_lower_leg_angle)
+        print("acos(boven) = ", kfe - hfe)
+        print(kfe)
 
         return hfe, kfe
 

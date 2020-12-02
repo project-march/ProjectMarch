@@ -96,7 +96,7 @@ class JointTrajectory(object):
         from_setpoint = self.setpoints[-1]
         to_setpoint = joint.setpoints[0]
 
-        allowed_error = 0.0001
+        allowed_error = 0.001
 
         if abs(from_setpoint.velocity - to_setpoint.velocity) <= allowed_error \
                 and abs(from_setpoint.position - to_setpoint.position) <= allowed_error:

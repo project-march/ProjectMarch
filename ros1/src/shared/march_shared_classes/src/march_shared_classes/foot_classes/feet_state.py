@@ -86,7 +86,7 @@ class FeetState(object):
         return cls(resulting_right_foot, resulting_left_foot, resulting_time)
 
     @staticmethod
-    def feet_state_to_setpoint(feet_state):
+    def feet_state_to_setpoints(feet_state):
         """Translates between feet_state and a list of setpoints, which correspond with the feet_state.
 
         :param feet_state: A fully populated FeetState object, with two fully populated Foot objects.

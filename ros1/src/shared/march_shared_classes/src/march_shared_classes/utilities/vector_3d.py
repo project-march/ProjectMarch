@@ -68,6 +68,10 @@ class Vector3d(object):
         return sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
 
     @staticmethod
+    def is_close_enough(vector1, vector2, tolerance=0.0001):
+        return (vector1 - vector2).norm() <= tolerance
+
+    @staticmethod
     def size():
         return 3
 
@@ -76,3 +80,4 @@ if __name__ == "__main__":
     print(vec*3)
     print(vec*3.5)
     print(4 * vec)
+    print(abs(vec))

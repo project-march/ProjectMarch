@@ -8,6 +8,7 @@ from march_shared_classes.exceptions.general_exceptions import FileNotFoundError
 from .subgait import Subgait
 from .subgait_graph import SubgaitGraph
 
+ALLOWED_ERROR_ENDPOINTS = 0.0001
 
 class Gait(object):
     """base class for a generated gait."""
@@ -123,10 +124,11 @@ class Gait(object):
                     old_subgait = self.subgaits[to_subgait_name]
                     new_subgait = new_subgaits[to_subgait_name]
 
-                    allowed_error = 0.0001
+                    old_starting_positions = old_subgait.starting_position
+                    new_starting_positions = new_subgait.starting_position
                     for joint in old_subgait.joints:
-                        if (abs(old_subgait.starting_position[joint.name] -
-                                new_subgait.starting_position[joint.name]) >= allowed_error):
+                        if (abs(old_starting_positions[joint.name] -
+                                new_starting_positions[joint.name]) >= ALLOWED_ERROR_ENDPOINTS):
                             raise NonValidGaitContent(
                                 msg='The starting position of new version {gait} {subgait} does not match'.format(
                                     gait=self.gait_name, subgait=to_subgait_name))
@@ -134,10 +136,11 @@ class Gait(object):
                     old_subgait = self.subgaits[from_subgait_name]
                     new_subgait = new_subgaits[from_subgait_name]
 
-                    allowed_error = 0.0001
+                    old_final_positions = old_subgait.final_position
+                    new_final_positions = new_subgait.final_position
                     for joint in old_subgait.joints:
-                        if (abs(old_subgait.final_position[joint.name] -
-                                new_subgait.final_position[joint.name]) >= allowed_error):
+                        if (abs(old_final_positions[joint.name] -
+                                new_final_positions[joint.name]) >= ALLOWED_ERROR_ENDPOINTS):
                             raise NonValidGaitContent(
                                 msg='The final position of new version {gait} {subgait} does not match'.format(
                                     gait=self.gait_name, subgait=from_subgait_name))

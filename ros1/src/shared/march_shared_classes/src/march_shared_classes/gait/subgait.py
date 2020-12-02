@@ -432,7 +432,7 @@ class Subgait(object):
             base_feet_state = FeetState.from_setpoints(base_setpoints_to_interpolate[setpoint_index])
             other_feet_state = FeetState.from_setpoints(other_setpoints_to_interpolate[setpoint_index])
             new_feet_state = FeetState.weighted_average_states(base_feet_state, other_feet_state, parameter)
-            setpoints_to_add = FeetState.feet_state_to_setpoint(new_feet_state)
+            setpoints_to_add = FeetState.feet_state_to_setpoints(new_feet_state)
             for joint_name in JOINT_NAMES_IK:
                 new_setpoints[joint_name].append(setpoints_to_add[joint_name])
 
