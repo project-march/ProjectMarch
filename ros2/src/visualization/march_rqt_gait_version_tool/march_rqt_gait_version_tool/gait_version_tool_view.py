@@ -2,8 +2,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QComboBox, QLabel, QWidget
 from python_qt_binding import loadUi
 
-from .gait_selection_errors import GaitSelectionError
-from .gait_selection_pop_up import PopUpWindow
+from .gait_version_tool_errors import GaitVersionToolError
+from .gait_version_tool_pop_up import PopUpWindow
 from .parametric_pop_up import ParametricPopUpWindow
 
 
@@ -11,7 +11,7 @@ DEFAULT_AMOUNT_OF_AVAILABLE_SUBGAITS = 3
 PARAMETRIC_GAIT_PREFIX = '_pg_'
 
 
-class GaitSelectionView(QWidget):
+class GaitVersionToolView(QWidget):
     def __init__(self, ui_file, controller):
         """Base class to load and use the gait_selection.ui.
 
@@ -20,10 +20,9 @@ class GaitSelectionView(QWidget):
         :param controller:
             A reference to the controller corresponding to the rqt gait selection functionality
         """
-        super(GaitSelectionView, self).__init__(flags=Qt.Window)
+        super(GaitVersionToolView, self).__init__(flags=Qt.Window)
 
         self._controller = controller
-
         # Extend the widget with all attributes and children from UI file
         loadUi(ui_file, self)
 
@@ -93,16 +92,21 @@ class GaitSelectionView(QWidget):
     def update_version_menus(self):
         """When a gait is selected set the subgait labels and populate the subgait menus with the available versions."""
         def version_sorter(version):
-            """Used in the sort function to sort numbers which are 9<.
+            """Used in the sort function to sort based on the last 2 digits of the
+            version name. If there is no version number, 0 is returned to have
+            it at the top of the list.
 
             :param version: str of the version
             """
             try:
                 length = len(version)
                 version_number = ''.join(char for char in version[length - 2: length] if char.isdigit())
-                return int(version_number)
+                if version_number != '':
+                    return int(version_number)
+                else:
+                    return 0
             except ValueError:
-                return version
+                return 0
 
         self._is_update_active = True
         if self._is_refresh_active:
@@ -125,7 +129,6 @@ class GaitSelectionView(QWidget):
 
             subgait_menu.show()
             subgait_label.show()
-
             versions = sorted(versions, key=version_sorter)
 
             subgait_label.setText(subgait_name)
@@ -192,14 +195,14 @@ class GaitSelectionView(QWidget):
         try:
             self.available_gaits = self._controller.get_directory_structure()
             self.version_map = self._controller.get_version_map()
-
             self._gait_menu.addItems(sorted(self.available_gaits.keys()))
 
             self._log('Directory data refreshed', 'success')
-        except GaitSelectionError as e:
+        except GaitVersionToolError as e:
             self._log(str(e), 'error')
         finally:
             self._is_refresh_active = False
+            self.update_version_menus()
 
     # logger
     def _log(self, msg, color_tag='info'):
@@ -244,7 +247,7 @@ class GaitSelectionView(QWidget):
                 self._log(msg if msg else 'Set new default versions', 'success')
             else:
                 self._log(msg if msg else 'Failed to set default versions', 'error')
-        except GaitSelectionError as e:
+        except GaitVersionToolError as e:
             self._log(str(e), 'error')
 
     def _apply(self):
@@ -264,14 +267,14 @@ class GaitSelectionView(QWidget):
                 self._log(msg if msg else 'Version change applied', 'success')
             else:
                 self._log(msg if msg else 'Version change applied failed', 'failed')
-        except GaitSelectionError as e:
+        except GaitVersionToolError as e:
             self._log(str(e), 'error')
 
     def _show_version_map_pop_up(self):
         """Use a pop up window to display all the gait, subgaits and currently used versions."""
         try:
             version_map = self._controller.get_version_map()
-        except GaitSelectionError as e:
+        except GaitVersionToolError as e:
             self._log(str(e), 'error')
             return
 
@@ -285,7 +288,8 @@ class GaitSelectionView(QWidget):
         self._version_map_pop_up.show_message(version_map_string)
 
     def _show_parametric_pop_up(self, versions):
-        """Use a pop up window to get the base version, other version and parameter for a parametric subgait."""
+        """Use a pop up window to get the base version, other version and
+        parameter for a parametric subgait."""
         return self._parametric_pop_up.show_pop_up(versions)
 
     def get_parametric_version(self):
