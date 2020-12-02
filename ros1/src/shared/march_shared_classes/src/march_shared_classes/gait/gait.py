@@ -123,18 +123,24 @@ class Gait(object):
                     old_subgait = self.subgaits[to_subgait_name]
                     new_subgait = new_subgaits[to_subgait_name]
 
-                    if old_subgait.starting_position != new_subgait.starting_position:
-                        raise NonValidGaitContent(
-                            msg='The starting position of new version {gait} {subgait} does not match'.format(
-                                gait=self.gait_name, subgait=to_subgait_name))
+                    allowed_error = 0.0001
+                    for joint in old_subgait.joints:
+                        if (abs(old_subgait.starting_position[joint.name] -
+                                new_subgait.starting_position[joint.name]) >= allowed_error):
+                            raise NonValidGaitContent(
+                                msg='The starting position of new version {gait} {subgait} does not match'.format(
+                                    gait=self.gait_name, subgait=to_subgait_name))
                 elif to_subgait_name == self.graph.END:
                     old_subgait = self.subgaits[from_subgait_name]
                     new_subgait = new_subgaits[from_subgait_name]
 
-                    if old_subgait.final_position != new_subgait.final_position:
-                        raise NonValidGaitContent(
-                            msg='The final position of new version {gait} {subgait} does not match'.format(
-                                gait=self.gait_name, subgait=from_subgait_name))
+                    allowed_error = 0.0001
+                    for joint in old_subgait.joints:
+                        if (abs(old_subgait.final_position[joint.name] -
+                                new_subgait.final_position[joint.name]) >= allowed_error):
+                            raise NonValidGaitContent(
+                                msg='The final position of new version {gait} {subgait} does not match'.format(
+                                    gait=self.gait_name, subgait=from_subgait_name))
                 else:
                     from_subgait = new_subgaits.get(from_subgait_name, self.subgaits[from_subgait_name])
                     to_subgait = new_subgaits.get(to_subgait_name, self.subgaits[to_subgait_name])

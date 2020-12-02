@@ -35,6 +35,9 @@ class Vector3d(object):
         z = self.z * factor
         return Vector3d(x, y, z)
 
+    def __rmul__(self, factor):
+        return self * factor
+
     def __getitem__(self, direction):
         return self.as_dictionary()[direction]
 
@@ -67,3 +70,9 @@ class Vector3d(object):
     @staticmethod
     def size():
         return 3
+
+if __name__ == "__main__":
+    vec = Vector3d(1,2,3)
+    print(vec*3)
+    print(vec*3.5)
+    print(4 * vec)
