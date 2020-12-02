@@ -9,7 +9,7 @@
   </p>
   <p>
     <a href="https://gitlab.com/project-march/march/-/pipelines">
-      <img src=""https://gitlab.com/project-march/march/badges/main/pipeline.svg alt="Pipeline Status" />
+      <img src="https://gitlab.com/project-march/march/badges/main/pipeline.svg" alt="Pipeline Status" />
     </a>
     <br>
   </p>
