@@ -114,10 +114,10 @@ class InputDeviceController(object):
             while not self._possible_gait_client.wait_for_service(timeout_sec=1):
                 self._node.get_logger().warn('Failed to contact possible gaits service')
 
-    def get_possible_gaits(self):
+    def get_possible_gaits(self) -> Future:
         """
-        Returns the future for the list of names of possible gaits.
-        :return: List of possible gaits
+        Returns the future for the names of possible gaits.
+        :return: Future for the possible gaits
         """
         return self.gait_future
 

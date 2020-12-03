@@ -4,6 +4,8 @@ from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
 from march_shared_classes.gait.subgait import Subgait
 
 SECS_TO_NANOSECS = 1e9
+SHOULD_NOT_FREEZE_FIRST_SECS = 0.3  #secs
+
 
 class SemiDynamicSetpointsGait(SetpointsGait):
     """ A semi-dynamic version of the setpoints gait, implements a freeze functionality """
@@ -21,7 +23,8 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         for noticing the step height and ending the subgait earlier. This is
         therefore not possible during the first second of the subgait, to
         prevent accidental freezing."""
-        if self._time_since_start < 1 or self._should_freeze or self._is_frozen:
+        if self._time_since_start < SHOULD_NOT_FREEZE_FIRST_SECS \
+                or self._should_freeze or self._is_frozen:
             return False
         return True
 
@@ -51,9 +54,11 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             self._time_since_start = 0.0  # New subgait is started, so reset the time
             return trajectory, False
 
+        # If the current subgait is not finished, no new trajectory is necessary
         if self._time_since_start < self._current_subgait.duration:
             return None, False
 
+        # If the subgait is finished and it was frozen, execute the subgait after freeze
         if self._is_frozen:
             self._current_subgait = self._subgait_after_freeze
             trajectory = self._current_subgait.to_joint_trajectory_msg()
@@ -115,7 +120,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
                 'nsecs': duration_nsecs,
                 'secs': duration_secs,
             },
-            'gait_type': 'walk_like',
+            'gait_type': self._current_subgait.gait_type,
             'joints': dict([(joint.name, [{
                 'position': self._freeze_position[joint.name],
                 'time_from_start': {

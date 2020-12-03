@@ -413,7 +413,7 @@
     </link>
 
     <gazebo reference="pressure_sole_left">
-        <sensor name="left_pressure_sole_2" type="contact">
+        <sensor name="left_pressure_sole" type="contact">
             <always_on>true</always_on>
             <contact>
                 <collision>ankle_plate_left_fixed_joint_lump__pressure_sole_left_collision_2</collision>

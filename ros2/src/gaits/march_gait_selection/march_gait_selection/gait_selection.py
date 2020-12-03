@@ -48,7 +48,6 @@ class GaitSelection(Node):
 
         self._gait_version_map, self._positions, self._semi_dynamic_gait_version_map = \
             self._load_configuration()
-        self.get_logger().info(f'{self._semi_dynamic_gait_version_map}.')
         self._robot = self._initial_robot_description() if robot is None else robot
 
         self._robot_description_sub = self.create_subscription(

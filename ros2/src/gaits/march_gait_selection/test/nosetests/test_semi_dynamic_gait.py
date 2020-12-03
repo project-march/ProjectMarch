@@ -58,13 +58,9 @@ class TestSemiDynamicGaitSelection(unittest.TestCase):
 
     def test_freeze_duration_done(self):
         self.semi_dynamic_gait.update(2)
-        print(self.semi_dynamic_gait._time_since_start)
         self.semi_dynamic_gait.freeze(10)
-        print(self.semi_dynamic_gait._time_since_start)
         self.semi_dynamic_gait.update(1)
-        print(self.semi_dynamic_gait._time_since_start)
         self.semi_dynamic_gait.update(11)
-        print(self.semi_dynamic_gait._time_since_start)
         self.assertEqual(self.semi_dynamic_gait._time_since_start, 0)
 
     def test_position_after_time_begin(self):
