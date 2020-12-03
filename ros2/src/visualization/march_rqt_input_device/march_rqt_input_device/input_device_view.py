@@ -11,6 +11,7 @@ from ament_index_python.packages import get_package_share_directory
 from .image_button import ImageButton
 
 
+
 class InputDeviceView(QWidget):
     """
     The View of the input device, inialized based on a ui file and a controller.
@@ -88,10 +89,6 @@ class InputDeviceView(QWidget):
         gait_balanced_walk = \
             self.create_button('balanced_walk',
                                callback=lambda: self._controller.publish_gait('balanced_walk'))
-
-        gait_dynamic_stairs_up = \
-            self.create_button('dynamic_stairs_up',
-                               callback=lambda: self._controller.publish_gait('dynamic_stairs_up'))
 
         gait_dynamic_curb = \
             self.create_button('dynamic_curb_sdg',
@@ -287,7 +284,7 @@ class InputDeviceView(QWidget):
         # Position in the array determines position on screen.
         march_button_layout = [
             [home_sit, home_stand, gait_walk, gait_walk_small, gait_walk_large, gait_balanced_walk,
-             gait_dynamic_stairs_up, gait_dynamic_curb, gait_slalom_walk],
+             gait_dynamic_curb, gait_slalom_walk],
 
             [gait_sit, gait_stand, rocker_switch_increment, rocker_switch_decrement, stop_button, error_button,
              sm_to_unknown_button],

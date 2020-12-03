@@ -117,10 +117,8 @@ class GaitStateMachine(object):
         # If there are no contacts, change foot on ground to False
         elif len(msg.states) == 0:
             if is_right:
-                if self._right_foot_on_ground:
                 self._right_foot_on_ground = False
             else:
-                if self._left_foot_on_ground:
                 self._left_foot_on_ground = False
 
     def _possible_gaits_cb(self, request, response):
