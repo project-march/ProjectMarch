@@ -36,8 +36,6 @@ public:
     joint_handles_ptr_ = &joint_handles;
     num_joints_ = joint_handles_ptr_->size();
 
-    std::cout << num_joints_ << std::endl;
-
     return true;
   }
 
