@@ -167,8 +167,10 @@ class JointTrajectory(object):
                                             format(base_trajectory.name))
         setpoints = []
         for base_setpoint, other_setpoint in zip(base_trajectory.setpoints, other_trajectory.setpoints):
-            setpoints.append(JointTrajectory.setpoint_class.interpolate_setpoints(base_setpoint, other_setpoint,
-                                                                                  parameter))
+            interpolated_setpoint_to_add = \
+                JointTrajectory.setpoint_class.interpolate_setpoints(base_setpoint, other_setpoint, parameter)
+            setpoints.append(interpolated_setpoint_to_add)
+
         duration = parameter * base_trajectory.duration + (1 - parameter) * other_trajectory.duration
         return JointTrajectory(base_trajectory.name, base_trajectory.limits, setpoints, duration)
 
