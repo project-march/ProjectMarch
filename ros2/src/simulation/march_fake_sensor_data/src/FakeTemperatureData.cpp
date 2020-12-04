@@ -4,14 +4,23 @@
 #include "rclcpp/node.hpp"
 #include "rclcpp/publisher.hpp"
 #include "rclcpp/qos.hpp"
+#include "rclcpp/timer.hpp"
 // #include <boost/algorithm/string.hpp>
 // #include <boost/algorithm/string/split.hpp>
 #include "march_fake_sensor_data/FakeTemperatureData.hpp"
 #include "march_fake_sensor_data/UniformDistribution.hpp"
+#include <chrono>
 #include <deque>
 #include <vector>
 #include <stdexcept>
 #include <string>
+
+using namespace std::chrono_literals;
+
+const int DEFAULT_MINIMUM_TEMPERATURE { 10 };
+const int DEFAULT_MAXIMUM_TEMPERATURE { 30 };
+const std::string MINIMUM_TEMPERATURE_PARAMETER_NAME { "minimum_temperature" };
+const std::string MAXIMUM_TEMPERATURE_PARAMETER_NAME { "maximum_temperature" };
 
 /**
  * @file FakeTemperatureData.cpp
@@ -30,14 +39,48 @@ FakeTemperatureDataNode::FakeTemperatureDataNode(const std::string& node_name, c
     Node(node_name),
     latest_temperatures { std::deque<int>(autoregression_weights.size()) },
     autoregression_weights { std::move(autoregression_weights) },
-    distribution {0, 0}
+    minimum_temperature { DEFAULT_MINIMUM_TEMPERATURE },
+    maximum_temperature { DEFAULT_MAXIMUM_TEMPERATURE },
+    distribution { minimum_temperature, maximum_temperature }
 {
-    // Create a timer that fires 10 times a second
-    // Define parameters for minimum temperature and maximum temperature
-    // Retrieve the names of the joints
-    // Create fake temperature sensors for all joints
-    // Create a callback for the temperature parameters changing
+    // Declare the existance of these parameters
+    this->declare_parameter<int>(MINIMUM_TEMPERATURE_PARAMETER_NAME, minimum_temperature);
+    this->declare_parameter<int>(MAXIMUM_TEMPERATURE_PARAMETER_NAME, maximum_temperature);
+
+    // Register a callback that will be called whenever the parameters of this Node
+    // are updated.
+    parameter_callback = this->add_on_set_parameters_callback(std::bind(&FakeTemperatureDataNode::update_parameters, this, std::placeholders::_1));
+
+    // TODO: Retrieve the names of the joints
+    // TODO: Create fake temperature sensors for all joints
+
+    timer = this->create_wall_timer(100ms, std::bind(&FakeTemperatureDataNode::timer_callback, this));
+}
+
+// In ROS 1, this was done with "dynamic_reconfigure". Because ROS 2 has native support
+// for dynamically reconfiguring parameters, this is done like this.
+rcl_interfaces::msg::SetParametersResult
+FakeTemperatureDataNode::update_parameters(const std::vector<rclcpp::Parameter> & parameters)
+{
+    rcl_interfaces::msg::SetParametersResult result;
+    result.successful = true;
+    for (const auto & parameter : parameters) {
+        if (parameter.get_name() == MINIMUM_TEMPERATURE_PARAMETER_NAME) {
+            minimum_temperature = parameter.get_value<int>();
+            set_range(minimum_temperature, maximum_temperature);
+        }
+        if (parameter.get_name() == MAXIMUM_TEMPERATURE_PARAMETER_NAME) {
+            maximum_temperature = parameter.get_value<int>();
+            set_range(minimum_temperature, maximum_temperature);
+        }
+    }
+    return result;
+}
+
+void FakeTemperatureDataNode::timer_callback()
+{
     // Publish the temperatures every 0.1 second in a loop
+    // TODO
 }
 
 /**

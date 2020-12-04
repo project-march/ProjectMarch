@@ -4,6 +4,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/node.hpp"
 #include "rclcpp/publisher.hpp"
+#include "rclcpp/timer.hpp"
 #include "sensor_msgs/msg/temperature.hpp"
 #include "march_fake_sensor_data/UniformDistribution.hpp"
 #include <deque>
@@ -24,10 +25,24 @@ class FakeTemperatureDataNode final : public rclcpp::Node {
         // All the publishers that need to know a temperature. Every iteration, the
         // temperature will be published to these publishers
         std::vector<std::shared_ptr<rclcpp::Publisher<MessageType>>> temperature_publishers;
+        // Values to store the temperature generation bounds
+        int minimum_temperature;
+        int maximum_temperature;
 
         // The distribution and the associated generator that will be used to create
         // the random temperatures.
         UniformDistribution distribution;
+
+        // A timer that will fire a few times a second and publish the
+        // new temperatures of the relevant topics.
+        rclcpp::TimerBase::SharedPtr timer;
+
+        // Callback function that will be called by the timer.
+        void timer_callback();
+
+        // Callback function that is called whenever the parameters are changed
+        rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr parameter_callback;
+        rcl_interfaces::msg::SetParametersResult update_parameters(const std::vector<rclcpp::Parameter> & parameters);
 
     public:
         // Constructor that moves the predefined auto regression values into itself.
