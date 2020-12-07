@@ -93,6 +93,9 @@ def get_lengths_robot_for_inverse_kinematics(side=None):
 
 def get_joint_names_for_inverse_kinematics():
     robot_joint_names = rospy.get_param('/march/joint_names')
+    # robot = urdf.Robot.from_xml_file(os.path.join(rospkg.RosPack().get_path('march_description'), 'urdf',
+    #                                               'march4.urdf'))
+    # robot_joint_names = robot.joint_map.keys()
     joint_name_list = ['left_hip_aa', 'left_hip_fe', 'left_knee', 'right_hip_aa', 'right_hip_fe', 'right_knee']
     for joint_name in joint_name_list:
         if joint_name not in robot_joint_names:

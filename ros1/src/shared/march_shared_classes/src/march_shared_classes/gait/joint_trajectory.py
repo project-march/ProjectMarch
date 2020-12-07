@@ -5,6 +5,8 @@ from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolation
 
 from .setpoint import Setpoint
 
+ALLOWED_ERROR = 0.001
+
 
 class JointTrajectory(object):
     """Base class for joint trajectory of a gait."""
@@ -96,10 +98,8 @@ class JointTrajectory(object):
         from_setpoint = self.setpoints[-1]
         to_setpoint = joint.setpoints[0]
 
-        allowed_error = 0.001
-
-        if abs(from_setpoint.velocity - to_setpoint.velocity) <= allowed_error \
-                and abs(from_setpoint.position - to_setpoint.position) <= allowed_error:
+        if abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR \
+                and abs(from_setpoint.position - to_setpoint.position) <= ALLOWED_ERROR:
             return True
 
         return False

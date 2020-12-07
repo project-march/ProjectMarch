@@ -36,22 +36,22 @@ class FeetState(object):
 
         foot_state_left = Foot.calculate_foot_position(setpoint_dic['left_hip_aa'].position,
                                                        setpoint_dic['left_hip_fe'].position,
-                                                       setpoint_dic['left_knee'].position, 
+                                                       setpoint_dic['left_knee'].position,
                                                        Side.left)
         foot_state_right = Foot.calculate_foot_position(setpoint_dic['right_hip_aa'].position,
                                                         setpoint_dic['right_hip_fe'].position,
-                                                        setpoint_dic['right_knee'].position, 
+                                                        setpoint_dic['right_knee'].position,
                                                         Side.right)
 
         next_joint_positions = Setpoint.calculate_next_positions_joint(setpoint_dic)
 
         next_foot_state_left = Foot.calculate_foot_position(next_joint_positions['left_hip_aa'].position,
                                                             next_joint_positions['left_hip_fe'].position,
-                                                            next_joint_positions['left_knee'].position, 
+                                                            next_joint_positions['left_knee'].position,
                                                             Side.left)
         next_foot_state_right = Foot.calculate_foot_position(next_joint_positions['right_hip_aa'].position,
                                                              next_joint_positions['right_hip_fe'].position,
-                                                             next_joint_positions['right_knee'].position, 
+                                                             next_joint_positions['right_knee'].position,
                                                              Side.right)
 
         foot_state_left.add_foot_velocity_from_next_state(next_foot_state_left)
