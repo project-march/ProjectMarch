@@ -100,10 +100,5 @@ def get_joint_names_for_inverse_kinematics():
         if joint_name not in robot_joint_names:
             raise KeyError('Inverse kinematics calculation expected the robot to have joint '
                            '{joint_name}, but {joint_name} was not found.'.format(joint_name=joint_name))
-    for robot_joint_name in robot_joint_names:
-        if robot_joint_name not in joint_name_list:
-            if robot_joint_name != 'ankle_left' and robot_joint_name != 'ankle_right':
-                raise KeyError('Robot has joint name {robot_joint_name}, but the inverse kinematics calculation does '
-                               'not account for this joint.'.format(robot_joint_name=robot_joint_name))
 
     return joint_name_list
