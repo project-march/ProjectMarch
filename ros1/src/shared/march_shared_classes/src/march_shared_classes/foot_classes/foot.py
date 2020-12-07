@@ -104,16 +104,16 @@ class Foot(object):
         # first calculate the haa angle. This calculation assumes that pos_z > 0
         haa = Foot.calculate_haa_angle(z_position, y_position, ph)
 
-        # once the haa angle is known, rescale the desired x and z position to arrive at an easier system to calculate
+        # once the haa angle is known, transform the desired x and z position to arrive at an easier system to calculate
         # the hfe and kfe angles
-        rescaled_x = round(x_position - hl, 10)
-        rescaled_z = round(sqrt(- ph * ph + y_position * y_position + z_position * z_position), 10)
+        transformed_x = round(x_position - hl, 10)
+        transformed_z = round(sqrt(- ph * ph + y_position * y_position + z_position * z_position), 10)
 
-        if rescaled_x * rescaled_x + rescaled_z * rescaled_z > (ll + ul) * (ll + ul):
+        if transformed_x * transformed_x + transformed_z * transformed_z > (ll + ul) * (ll + ul):
             raise SubgaitInterpolationError('The desired {foot} foot position, ({x}, {y}, {z}), is out of reach'.
                                             format(foot=foot_side, x=x_position, y=y_position, z=z_position))
 
-        hfe, kfe = Foot.calculate_hfe_kfe_angles(rescaled_x, rescaled_z, ul, ll)
+        hfe, kfe = Foot.calculate_hfe_kfe_angles(transformed_x, transformed_z, ul, ll)
 
         angle_positions = {foot_side.value + '_hip_aa': Setpoint(time, haa),
                            foot_side.value + '_hip_fe': Setpoint(time, hfe),
@@ -155,26 +155,26 @@ class Foot(object):
         return haa
 
     @staticmethod
-    def calculate_hfe_kfe_angles(rescaled_x, rescaled_z, upper_leg, lower_leg):
-        """Calculates the hfe and kfe given a desired rescaled x and z coordinate using the cosine rule.
+    def calculate_hfe_kfe_angles(transformed_x, transformed_z, upper_leg, lower_leg):
+        """Calculates the hfe and kfe given a desired transformed x and z coordinate using the cosine rule.
 
-        The rescaled x and z position are described and explained in
+        The transformed x and z position are described and explained in
         https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
 
-        :param rescaled_x: The desired x_position of the foot, rescaled to make the calculation easier
-        :param rescaled_z: The desired z_position of the foot, rescaled to make the calculation easier
+        :param transformed_x: The desired x_position of the foot, transformed to make the calculation easier
+        :param transformed_z: The desired z_position of the foot, transformed to make the calculation easier
         :param upper_leg: The length of the upper leg
         :param lower_leg: The length of the lower leg
 
         :return: The hip_fe and knee angle needed to reach the desired x and z position
         """
-        foot_line_to_leg = acos((upper_leg * upper_leg + rescaled_x * rescaled_x + rescaled_z * rescaled_z
+        foot_line_to_leg = acos((upper_leg * upper_leg + transformed_x * transformed_x + transformed_z * transformed_z
                                  - lower_leg * lower_leg)
-                                / (2 * upper_leg * sqrt(rescaled_x * rescaled_x + rescaled_z * rescaled_z)))
-        normal_to_foot_line = atan(rescaled_x / rescaled_z)
+                                / (2 * upper_leg * sqrt(transformed_x * transformed_x + transformed_z * transformed_z)))
+        normal_to_foot_line = atan(transformed_x / transformed_z)
         hfe = foot_line_to_leg + normal_to_foot_line
 
-        sin_normal_lower_leg_angle = round((rescaled_x - upper_leg * sin(hfe)) / lower_leg, 10)
+        sin_normal_lower_leg_angle = round((transformed_x - upper_leg * sin(hfe)) / lower_leg, 10)
         kfe = hfe - asin(sin_normal_lower_leg_angle)
 
         return hfe, kfe
