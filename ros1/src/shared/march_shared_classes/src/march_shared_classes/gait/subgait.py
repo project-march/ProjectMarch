@@ -15,6 +15,7 @@ from .limits import Limits
 from .setpoint import Setpoint
 
 PARAMETRIC_GAITS_PREFIX = '_pg_'
+SUBGAIT_SUFFIX = '.subgait'
 JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
 
 
@@ -53,7 +54,7 @@ class Subgait(object):
         try:
             gait_name = file_name.split('/')[-3]
             subgait_name = file_name.split('/')[-2]
-            version = file_name.split('/')[-1].replace('.subgait', '')
+            version = file_name.split('/')[-1].replace(SUBGAIT_SUFFIX, '')
 
             with open(file_name, 'r') as yaml_file:
                 subgait_dict = yaml.load(yaml_file, Loader=yaml.SafeLoader)
@@ -77,19 +78,18 @@ class Subgait(object):
         :return: A populated Subgait object.
         """
         subgait_path = os.path.join(gait_dir, gait_name, subgait_name)
-        subgait_suffix = '.subgait'
         if version.startswith(PARAMETRIC_GAITS_PREFIX):
             base_version, other_version, parameter = Subgait.unpack_parametric_version(version)
             if base_version == other_version:
-                subgait_version_path = os.path.join(subgait_path, base_version + subgait_suffix)
+                subgait_version_path = os.path.join(subgait_path, base_version + SUBGAIT_SUFFIX)
                 return cls.from_file(robot, subgait_version_path, *args)
             else:
-                base_version_path = os.path.join(subgait_path, base_version + subgait_suffix)
-                other_version_path = os.path.join(subgait_path, other_version + subgait_suffix)
+                base_version_path = os.path.join(subgait_path, base_version + SUBGAIT_SUFFIX)
+                other_version_path = os.path.join(subgait_path, other_version + SUBGAIT_SUFFIX)
                 return cls.from_files_interpolated(robot, base_version_path, other_version_path, parameter,
                                                    use_foot_position=True)
         else:
-            subgait_version_path = os.path.join(subgait_path, version + subgait_suffix)
+            subgait_version_path = os.path.join(subgait_path, version + SUBGAIT_SUFFIX)
             return cls.from_file(robot, subgait_version_path, *args)
 
     @classmethod
@@ -350,17 +350,16 @@ class Subgait(object):
     def validate_version(gait_path, subgait_name, version):
         """Check whether a gait exists for the gait."""
         subgait_path = os.path.join(gait_path, subgait_name)
-        subgait_suffix = '.subgait'
         if version.startswith(PARAMETRIC_GAITS_PREFIX):
             base_version, other_version, _ = Subgait.unpack_parametric_version(version)
-            base_version_path = os.path.join(subgait_path, base_version + subgait_suffix)
-            other_version_path = os.path.join(subgait_path, other_version + subgait_suffix)
+            base_version_path = os.path.join(subgait_path, base_version + SUBGAIT_SUFFIX)
+            other_version_path = os.path.join(subgait_path, other_version + SUBGAIT_SUFFIX)
             for version_path in [base_version_path, other_version_path]:
                 if not os.path.isfile(version_path):
                     rospy.logwarn('{sp} does not exist'.format(sp=version_path))
                     return False
         else:
-            version_path = os.path.join(subgait_path, version + subgait_suffix)
+            version_path = os.path.join(subgait_path, version + SUBGAIT_SUFFIX)
             if not os.path.isfile(version_path):
                 rospy.logwarn('{sp} does not exist'.format(sp=version_path))
                 return False
