@@ -1,6 +1,7 @@
 import os
 
 import rospkg
+import rospy
 from urdf_parser_py import urdf
 
 from march_shared_classes.exceptions.general_exceptions import SideSpecificationError
@@ -91,13 +92,16 @@ def get_lengths_robot_for_inverse_kinematics(side=None):
 
 
 def get_joint_names_for_inverse_kinematics():
-    robot = urdf.Robot.from_xml_file(os.path.join(rospkg.RosPack().get_path('march_description'), 'urdf',
-                                                  'march4.urdf'))
-    robot_joint_names = robot.joint_map.keys()
+    robot_joint_names = rospy.get_param('/march/joint_names')
     joint_name_list = ['left_hip_aa', 'left_hip_fe', 'left_knee', 'right_hip_aa', 'right_hip_fe', 'right_knee']
     for joint_name in joint_name_list:
         if joint_name not in robot_joint_names:
-            raise KeyError('Inverse kinematics calculation expected the robot with name {robot_name} to have joint '
-                           '{joint_name}, but {joint_name} was not found '.
-                           format(robot_name=robot.name, joint_name=joint_name))
+            raise KeyError('Inverse kinematics calculation expected the robot to have joint '
+                           '{joint_name}, but {joint_name} was not found.'.format(joint_name=joint_name))
+    for robot_joint_name in robot_joint_names:
+        if robot_joint_name not in joint_name_list:
+            if robot_joint_name != 'ankle_left' and robot_joint_name != 'ankle_right':
+                raise KeyError('Robot has joint name {robot_joint_name}, but the inverse kinematics calculation does '
+                               'not account for this joint.'.format(robot_joint_name=robot_joint_name))
+
     return joint_name_list
