@@ -136,7 +136,7 @@ class Foot(object):
         """
         if z_position <= 0:
             raise SubgaitInterpolationError(
-                'desired z position of the foot is not positive, current haa calculation is not capable of this')
+                'desired z position of the foot is not positive, current haa calculation is not capable to deal with this')
 
         if y_position != 0:
             slope_foot_to_origin = z_position / y_position

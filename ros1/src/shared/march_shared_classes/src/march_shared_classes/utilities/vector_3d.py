@@ -46,10 +46,7 @@ class Vector3d(object):
             yield element
 
     def __eq__(self, other):
-        if self.x == other.x and self.y == other.y and self.z == other.z:
-            return True
-        else:
-            return False
+        return (self.x == other.x and self.y == other.y and self.z == other.z)
 
     def __repr__(self):
         return 'x: {x}, y: {y}, z: {z}'.format(x=self.x, y=self.y, z=self.z)

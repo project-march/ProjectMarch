@@ -76,7 +76,7 @@ class Setpoint(object):
                                             setpoint_dic[joint].position + setpoint_dic[joint].velocity
                                             * VELOCITY_SCALE_FACTOR)
             else:
-                raise KeyError('setpoint_dic is missing joint {joint}'.format(joint=joint))
+                raise KeyError('Setpoint_dic is missing joint {joint}'.format(joint=joint))
 
         return next_positions
 
@@ -88,7 +88,7 @@ class Setpoint(object):
         :param self: A Setpoint object with no velocity
         :param next_state: A Setpoint with the positions a moment later
 
-        ":return: The joint velocities of the joints on the specified side
+        :return: The joint velocities of the joints on the specified side
         """
         self.velocity = (next_state.position - self.position) / (next_state.time - self.time)
 
