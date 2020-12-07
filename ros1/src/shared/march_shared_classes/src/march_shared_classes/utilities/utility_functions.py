@@ -1,7 +1,6 @@
 import os
 
 import rospkg
-import rospy
 from urdf_parser_py import urdf
 
 from march_shared_classes.exceptions.general_exceptions import SideSpecificationError
