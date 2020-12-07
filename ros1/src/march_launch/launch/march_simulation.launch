@@ -20,7 +20,10 @@
 
     <arg name="rosbag" default="false" doc="Enables rosbag record node."/>
 
-    <arg name="controller" default="effort_control" doc="Changes the controller used by simulation."/>
+    <arg name="robot" default="march4" doc="Robot to use."/>
+    <arg name="robot_description" default="$(arg robot)" doc="URDF file to use"/>
+    <arg name="controller_type" default="effort_control" doc="Changes the controller used by simulation."/>
+    <arg name="controller_name" default="$(arg robot)" doc="Name of the controller"/>
 
     <param name="balance" value="$(arg balance)"/>
 
