@@ -67,7 +67,8 @@ class JointTrajectory(object):
         """
         Manipulates the gait to start at given time. Removes all set points
         after the given begin time. Adds the begin position with 0 velocity at
-        the start.
+        the start. It also adds 1 second at the beginning to allow speeding up
+        to the required speed again.
         :param begin_time: The time to start
         :param position: The position to start from
         """

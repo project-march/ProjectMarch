@@ -9,6 +9,7 @@ from .home_gait import HomeGait
 from march_shared_msgs.msg import CurrentState, CurrentGait, Error
 from march_shared_msgs.srv import PossibleGaits
 
+PRESSURE_SOLE_STANDING_FORCE = 8000
 DEFAULT_TIMER_PERIOD = 0.04
 NANOSEC_TO_SEC = 1e-9
 
@@ -107,7 +108,7 @@ class GaitStateMachine(object):
         If the foot was not on the ground before and is now, the gait will freeze """
         if len(msg.states) > 0:
             force = sum([state.total_wrench.force.z for state in msg.states])
-            if force > 8000:
+            if force > PRESSURE_SOLE_STANDING_FORCE:
                 if not self._right_foot_on_ground and is_right:
                     self._right_foot_on_ground = True
                     self._freeze()
@@ -377,8 +378,7 @@ class GaitStateMachine(object):
             from_idle_name = next(
                 (name for name, position in idle_positions.items()
                  if position['joints'] == starting_position), None)
-            # if 'dynamic' in gait_name:
-            #     self
+
             if from_idle_name is None:
                 from_idle_name = 'unknown_idle_{0}'.format(len(idle_positions))
                 self._gait_selection.get_logger().warn(

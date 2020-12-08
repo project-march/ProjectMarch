@@ -80,7 +80,7 @@ class SetpointsGait(GaitInterface, Gait):
         If the gait should be stopped, this will be done
         If the current subgait is done, it will start the next subgait
         :param elapsed_time:
-        :return: trjectory, is_finished
+        :return: trajectory, is_finished
         """
         self._time_since_start += elapsed_time
         if self._time_since_start < self._current_subgait.duration:
