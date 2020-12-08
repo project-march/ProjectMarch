@@ -18,10 +18,6 @@ def generate_launch_description():
     # Robot state publisher arguments
     robot_state_publisher = LaunchConfiguration('robot_state_publisher')
     robot_description = LaunchConfiguration('robot_description')
-    xacro_path = [PathJoinSubstitution([
-        get_package_share_directory('march_description'),
-        'urdf',
-        robot_description]), '.xacro']
     # Gait selection arguments
     gait_selection = LaunchConfiguration('gait_selection')
     gait_package = LaunchConfiguration('gait_package')
@@ -61,7 +57,8 @@ def generate_launch_description():
         DeclareLaunchArgument(
             name='robot_description',
             default_value=robot,
-            description="URDF file to use."
+            description="Which <robot_description>.xacro file to use. "
+                        "This file must be available in the march_desrciption/urdf/ folder"
         ),
         # GAIT SELECTION ARGUMENTS
         DeclareLaunchArgument(
@@ -86,7 +83,7 @@ def generate_launch_description():
         # Launch robot state publisher (from march_description) if not robot_state_publisher:=false
         IncludeLaunchDescription(PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('march_description'), 'launch', 'march_description.launch.py')),
-            launch_arguments=[('xacro_path', xacro_path),
+            launch_arguments=[('robot_description', robot_description),
                               ('use_sim_time', use_sim_time)],
             condition=IfCondition(robot_state_publisher)),
         # Launch march gait selection if not gait_selection:=false
