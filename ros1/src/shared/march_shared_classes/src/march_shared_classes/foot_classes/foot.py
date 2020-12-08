@@ -12,6 +12,7 @@ from march_shared_classes.utilities.vector_3d import Vector3d
 
 VELOCITY_SCALE_FACTOR = 0.001
 JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
+MID_CALCULATION_PRECISION_DIGITS = 10
 
 
 class Foot(object):
@@ -106,8 +107,9 @@ class Foot(object):
 
         # once the haa angle is known, transform the desired x and z position to arrive at an easier system to calculate
         # the hfe and kfe angles
-        transformed_x = round(x_position - hl, 10)
-        transformed_z = round(sqrt(- ph * ph + y_position * y_position + z_position * z_position), 10)
+        transformed_x = round(x_position - hl, MID_CALCULATION_PRECISION_DIGITS)
+        transformed_z = round(sqrt(- ph * ph + y_position * y_position + z_position * z_position),
+                              MID_CALCULATION_PRECISION_DIGITS)
 
         if transformed_x * transformed_x + transformed_z * transformed_z > (ll + ul) * (ll + ul):
             raise SubgaitInterpolationError('The desired {foot} foot position, ({x}, {y}, {z}), is out of reach'.
@@ -175,7 +177,8 @@ class Foot(object):
         normal_to_foot_line = atan(transformed_x / transformed_z)
         hfe = foot_line_to_leg + normal_to_foot_line
 
-        sin_normal_lower_leg_angle = round((transformed_x - upper_leg * sin(hfe)) / lower_leg, 10)
+        sin_normal_lower_leg_angle = round((transformed_x - upper_leg * sin(hfe)) / lower_leg,
+                                           MID_CALCULATION_PRECISION_DIGITS)
         kfe = hfe - asin(sin_normal_lower_leg_angle)
 
         return hfe, kfe
