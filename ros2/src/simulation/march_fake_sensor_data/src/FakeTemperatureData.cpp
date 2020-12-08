@@ -5,10 +5,9 @@
 #include "rclcpp/publisher.hpp"
 #include "rclcpp/qos.hpp"
 #include "rclcpp/timer.hpp"
-// #include <boost/algorithm/string.hpp>
-// #include <boost/algorithm/string/split.hpp>
 #include "march_fake_sensor_data/FakeTemperatureData.hpp"
 #include "march_fake_sensor_data/UniformDistribution.hpp"
+#include "march_shared_msgs/srv/get_param_string_list.hpp"
 #include <chrono>
 #include <deque>
 #include <vector>
@@ -43,22 +42,65 @@ FakeTemperatureDataNode::FakeTemperatureDataNode(const std::string& node_name, c
     maximum_temperature { DEFAULT_MAXIMUM_TEMPERATURE },
     distribution { minimum_temperature, maximum_temperature }
 {
-    // Declare the existance of these parameters
+    // Declare the existance of these parameters. This is necessary in ROS 2.
     this->declare_parameter<int>(MINIMUM_TEMPERATURE_PARAMETER_NAME, minimum_temperature);
     this->declare_parameter<int>(MAXIMUM_TEMPERATURE_PARAMETER_NAME, maximum_temperature);
 
     // Register a callback that will be called whenever the parameters of this Node
-    // are updated.
+    // are updated. The callback changes the internal state to reflect the new
+    // values of the parameters.
     parameter_callback = this->add_on_set_parameters_callback(std::bind(&FakeTemperatureDataNode::update_parameters, this, std::placeholders::_1));
 
-    // TODO: Retrieve the names of the joints
-    // TODO: Create fake temperature sensors for all joints
+    // Create a temperature publisher for all the different joints.
+    for (auto sensor : get_joint_names()) {
+        add_temperature_publisher(sensor);
+    }
 
+    // Ensure that new fake temperatures are published every 100 ms.
     timer = this->create_wall_timer(100ms, std::bind(&FakeTemperatureDataNode::timer_callback, this));
 }
 
-// In ROS 1, this was done with "dynamic_reconfigure". Because ROS 2 has native support
-// for dynamically reconfiguring parameters, this is done like this.
+std::vector<std::string> FakeTemperatureDataNode::get_joint_names()
+{
+    std::vector<std::string> names;
+
+    // This is a temporary solution until a joint names service is
+    // available in ROS 2.
+    // TODO: rewrite this function to use a ROS 2 service for the joint names
+    auto client = this->create_client<march_shared_msgs::srv::GetParamStringList>("/march/parameter_server/get_param_string_list");
+    auto request = std::make_shared<march_shared_msgs::srv::GetParamStringList::Request>();
+    request->name = std::string("joint_names");
+
+    // Wait until the service is available. Sending a request to an unavailable service
+    // will always fail.
+    while (!client->wait_for_service(1s)) {
+        if (!rclcpp::ok()) {
+            RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for parameter_server service. Exiting.");
+            return names;
+        }
+        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "parameter_server service service not available, waiting again...");
+    }
+
+    // Send the request and push the received names to the names vector.
+    auto result = client->async_send_request(request);
+    if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), result) == rclcpp::FutureReturnCode::SUCCESS) {
+        for (auto joint_name : result.get()->value) {
+            names.push_back(joint_name);
+        }
+    } else {
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call parameter_server get joint names service");
+    }
+
+    return names;
+}
+
+/*
+ * @brief Whenever a parameter is changed, the interal state should also change
+ * @param parameters Specify the new state of the parameters.
+ * @details In ROS 1, this was done with "dynamic_reconfigure". Because ROS 2
+ *          has native support for dynamically reconfiguring parameters, this
+ *          is done like this.
+ */
 rcl_interfaces::msg::SetParametersResult
 FakeTemperatureDataNode::update_parameters(const std::vector<rclcpp::Parameter> & parameters)
 {
@@ -77,10 +119,12 @@ FakeTemperatureDataNode::update_parameters(const std::vector<rclcpp::Parameter> 
     return result;
 }
 
+/**
+ * @brief Called whenever the main timer goes off.
+ */
 void FakeTemperatureDataNode::timer_callback()
 {
-    // Publish the temperatures every 0.1 second in a loop
-    // TODO
+    publish_temperatures();
 }
 
 /**

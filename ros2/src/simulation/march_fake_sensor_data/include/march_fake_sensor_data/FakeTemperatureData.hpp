@@ -13,6 +13,8 @@
 
 class FakeTemperatureDataNode final : public rclcpp::Node {
     using MessageType = sensor_msgs::msg::Temperature;
+    using Publisher = rclcpp::Publisher<MessageType>::SharedPtr;
+    using JointNames = std::vector<std::string>;
     private:
         // Keeps a history of the 7 most recent generated temperatures so it becomes
         // possible to take the weighted average before publishing. This makes the
@@ -24,7 +26,8 @@ class FakeTemperatureDataNode final : public rclcpp::Node {
 
         // All the publishers that need to know a temperature. Every iteration, the
         // temperature will be published to these publishers
-        std::vector<std::shared_ptr<rclcpp::Publisher<MessageType>>> temperature_publishers;
+        std::vector<Publisher> temperature_publishers;
+
         // Values to store the temperature generation bounds
         int minimum_temperature;
         int maximum_temperature;
@@ -39,6 +42,9 @@ class FakeTemperatureDataNode final : public rclcpp::Node {
 
         // Callback function that will be called by the timer.
         void timer_callback();
+
+        // Retrieve the joint names from the published robot description.
+        JointNames get_joint_names();
 
         // Callback function that is called whenever the parameters are changed
         rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr parameter_callback;
