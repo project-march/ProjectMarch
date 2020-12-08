@@ -99,6 +99,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
    :hidden:
 
    doc/development/documentation
+   doc/development/adding_dependencies
    doc/continuous_integration/continuous_integration
    doc/development/testing
    doc/development/style_guide
