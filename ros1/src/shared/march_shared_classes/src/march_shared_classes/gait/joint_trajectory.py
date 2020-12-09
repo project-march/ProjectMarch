@@ -5,6 +5,8 @@ from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolation
 
 from .setpoint import Setpoint
 
+ALLOWED_ERROR = 0.001
+
 
 class JointTrajectory(object):
     """Base class for joint trajectory of a gait."""
@@ -96,7 +98,8 @@ class JointTrajectory(object):
         from_setpoint = self.setpoints[-1]
         to_setpoint = joint.setpoints[0]
 
-        if from_setpoint.velocity == to_setpoint.velocity and from_setpoint.position == to_setpoint.position:
+        if abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR \
+                and abs(from_setpoint.position - to_setpoint.position) <= ALLOWED_ERROR:
             return True
 
         return False
@@ -142,8 +145,8 @@ class JointTrajectory(object):
     def __len__(self):
         return len(self.setpoints)
 
-    @classmethod
-    def interpolate_joint_trajectories(cls, base_trajectory, other_trajectory, parameter):
+    @staticmethod
+    def interpolate_joint_trajectories(base_trajectory, other_trajectory, parameter):
         """Linearly interpolate two joint trajectories with the parameter.
 
         :param base_trajectory:
@@ -157,13 +160,38 @@ class JointTrajectory(object):
             The interpolated trajectory
         """
         if base_trajectory.limits != other_trajectory.limits:
-            raise SubgaitInterpolationError('Not able to safely interpolate because limits are not equal for joint {0}'.
-                                            format(base_trajectory.name))
+            raise SubgaitInterpolationError('Not able to safely interpolate because limits are not equal for joints '
+                                            '{0} and {1}'.format(base_trajectory.name, other_trajectory.name))
         if len(base_trajectory.setpoints) != len(other_trajectory.setpoints):
             raise SubgaitInterpolationError('The amount of setpoints do not match for joint {0}'.
                                             format(base_trajectory.name))
         setpoints = []
         for base_setpoint, other_setpoint in zip(base_trajectory.setpoints, other_trajectory.setpoints):
-            setpoints.append(cls.setpoint_class.interpolate_setpoints(base_setpoint, other_setpoint, parameter))
+            interpolated_setpoint_to_add = \
+                JointTrajectory.setpoint_class.interpolate_setpoints(base_setpoint, other_setpoint, parameter)
+            setpoints.append(interpolated_setpoint_to_add)
+
         duration = parameter * base_trajectory.duration + (1 - parameter) * other_trajectory.duration
         return JointTrajectory(base_trajectory.name, base_trajectory.limits, setpoints, duration)
+
+    @staticmethod
+    def change_order_of_joints_and_setpoints(base_subgait, other_subgait):
+        """Change structure from joints which have a list of setpoints to a list of 'ith' setpoints with for each joint.
+
+        This function goes over each joint to get needed setpoints (all first setpoints, all second setpoints..).
+        These are placed in list with the correct index, where each entry contains a dictionary with joint name setpoint
+        pairs. Also checks whether the joint trajectories are safe to interpolate.
+
+        :param base_subgait: one of the subgaits to reorder
+        :param other_subgait: the other subgait to reorder
+        :return: The interpolated trajectory
+        """
+        number_of_setpoints = len(base_subgait.joints[0].setpoints)
+        base_setpoints_to_interpolate = [{} for _ in range(number_of_setpoints)]
+        other_setpoints_to_interpolate = [{} for _ in range(number_of_setpoints)]
+        for setpoint_index in range(number_of_setpoints):
+            for base_joint, other_joint in zip(sorted(base_subgait.joints, key=lambda joint: joint.name),
+                                               sorted(other_subgait.joints, key=lambda joint: joint.name)):
+                base_setpoints_to_interpolate[setpoint_index][base_joint.name] = base_joint.setpoints[setpoint_index]
+                other_setpoints_to_interpolate[setpoint_index][other_joint.name] = other_joint.setpoints[setpoint_index]
+        return base_setpoints_to_interpolate, other_setpoints_to_interpolate

@@ -5,6 +5,8 @@ gaits:
     right_swing: MV_walk_rightswing_v2
     left_close: MV_walk_leftclose_v3
     right_close: MV_walk_rightclose_v3
+  ik_test:
+    swing: forward_swing
 positions:
   stand:
     gait_type: walk_like
