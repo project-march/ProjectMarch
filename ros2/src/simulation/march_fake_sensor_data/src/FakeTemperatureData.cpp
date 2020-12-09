@@ -20,6 +20,7 @@ const int DEFAULT_MINIMUM_TEMPERATURE { 10 };
 const int DEFAULT_MAXIMUM_TEMPERATURE { 30 };
 const std::string MINIMUM_TEMPERATURE_PARAMETER_NAME { "minimum_temperature" };
 const std::string MAXIMUM_TEMPERATURE_PARAMETER_NAME { "maximum_temperature" };
+const std::string LOGGER_NAME { "fake_temperature" };
 
 /**
  * @file FakeTemperatureData.cpp
@@ -75,10 +76,10 @@ std::vector<std::string> FakeTemperatureDataNode::get_joint_names()
     // will always fail.
     while (!client->wait_for_service(5s)) {
         if (!rclcpp::ok()) {
-            RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for parameter_server service. Exiting.");
+            RCLCPP_ERROR(rclcpp::get_logger(LOGGER_NAME), "Interrupted while waiting for parameter_server service. Exiting.");
             return names;
         }
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "The ROS 1 to ROS 2 parameter_server service is not available, waiting again...");
+        RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "The ROS 1 to ROS 2 parameter_server service is not available, waiting again...");
     }
 
     // Send the request and push the received names to the names vector.
@@ -88,7 +89,7 @@ std::vector<std::string> FakeTemperatureDataNode::get_joint_names()
             names.push_back(joint_name);
         }
     } else {
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call ROS 1 to ROS 2 parameter_server get joint names service");
+        RCLCPP_ERROR(rclcpp::get_logger(LOGGER_NAME), "Failed to call ROS 1 to ROS 2 parameter_server get joint names service");
     }
 
     return names;
