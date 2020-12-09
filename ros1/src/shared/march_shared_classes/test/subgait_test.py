@@ -14,8 +14,13 @@ from march_shared_classes.gait.subgait import Subgait
 class SubgaitTest(unittest.TestCase):
     def setUp(self):
         self.gait_name = 'walk'
+        self.gait_name_ik = 'ik_test'
         self.subgait_name = 'left_swing'
+        self.base_subgait_name = 'swing'
+        self.other_subgait_name = 'swing'
         self.version = 'MV_walk_leftswing_v2'
+        self.base_version = 'forward_swing'
+        self.other_version = 'backward_swing'
         self.resources_folder = rospkg.RosPack().get_path('march_shared_classes') + '/test/resources'
         self.robot = urdf.Robot.from_xml_file(rospkg.RosPack().get_path('march_description') + '/urdf/march4.urdf')
         self.subgait_path = '{rsc}/{gait}/{subgait}/{version}.subgait'.format(rsc=self.resources_folder,
@@ -49,7 +54,21 @@ class SubgaitTest(unittest.TestCase):
                                                                                gait=self.gait_name,
                                                                                subgait='left_close',
                                                                                version='MV_walk_leftclose_v2')
-        subgait = Subgait.from_files_interpolated(self.robot, base_subgait_path, other_subgait_path, 0.5)
+        subgait = Subgait.from_files_interpolated(self.robot, base_subgait_path, other_subgait_path, 0.5,
+                                                  use_foot_position=False)
+        self.assertIsInstance(subgait, Subgait)
+
+    def test_from_files_interpolated_correct_ik(self):
+        base_subgait_path = '{rsc}/{gait}/{subgait}/{version}.subgait'.format(rsc=self.resources_folder,
+                                                                              gait=self.gait_name_ik,
+                                                                              subgait=self.base_subgait_name,
+                                                                              version=self.base_version)
+        other_subgait_path = '{rsc}/{gait}/{subgait}/{version}.subgait'.format(rsc=self.resources_folder,
+                                                                               gait=self.gait_name_ik,
+                                                                               subgait=self.other_subgait_name,
+                                                                               version=self.other_version)
+        subgait = Subgait.from_files_interpolated(self.robot, base_subgait_path, other_subgait_path, 0.5,
+                                                  use_foot_position=True)
         self.assertIsInstance(subgait, Subgait)
 
     # validate_subgait_transition tests
@@ -162,36 +181,50 @@ class SubgaitTest(unittest.TestCase):
         other_subgait = Subgait.from_file(self.robot, other_subgait_path)
         return base_subgait, other_subgait
 
+    def load_interpolatable_subgaits_ik(self, subgait_name='swing', base_version='forward_swing',
+                                        other_version='backward_swing'):
+        base_subgait_path = '{rsc}/{gait}/{subgait}/{version}.subgait'.format(rsc=self.resources_folder,
+                                                                              gait=self.gait_name_ik,
+                                                                              subgait=subgait_name,
+                                                                              version=base_version)
+        base_subgait = Subgait.from_file(self.robot, base_subgait_path)
+        other_subgait_path = '{rsc}/{gait}/{subgait}/{version}.subgait'.format(rsc=self.resources_folder,
+                                                                               gait=self.gait_name_ik,
+                                                                               subgait=subgait_name,
+                                                                               version=other_version)
+        other_subgait = Subgait.from_file(self.robot, other_subgait_path)
+        return base_subgait, other_subgait
+
     def test_interpolate_subgaits_wrong_parameter(self):
         # should be 0 <= parameter <= 1
-        base_subgait, other_subgait = self.load_interpolatable_subgaits()
+        base_subgait, other_subgait = self.load_interpolatable_subgaits_ik()
         with self.assertRaises(ValueError):
-            Subgait.interpolate_subgaits(base_subgait, other_subgait, 2)
+            Subgait.interpolate_subgaits(base_subgait, other_subgait, 2, use_foot_position=True)
 
     def test_interpolate_subgaits_parameter_zero(self):
-        base_subgait, other_subgait = self.load_interpolatable_subgaits()
-        new_subgait = Subgait.interpolate_subgaits(base_subgait, other_subgait, 0)
+        base_subgait, other_subgait = self.load_interpolatable_subgaits_ik()
+        new_subgait = Subgait.interpolate_subgaits(base_subgait, other_subgait, 0, use_foot_position=True)
         self.assertEqual(base_subgait, new_subgait)
 
     def test_interpolate_subgaits_parameter_one(self):
-        base_subgait, other_subgait = self.load_interpolatable_subgaits()
-        new_subgait = Subgait.interpolate_subgaits(base_subgait, other_subgait, 1)
+        base_subgait, other_subgait = self.load_interpolatable_subgaits_ik()
+        new_subgait = Subgait.interpolate_subgaits(base_subgait, other_subgait, 1, use_foot_position=True)
         self.assertEqual(other_subgait, new_subgait)
 
     def test_interpolate_subgaits_interpolated(self):
         # test whether each setpoint is correctly interpolated
         parameter = 0.4
         base_subgait, other_subgait = self.load_interpolatable_subgaits()
-        new_subgait = Subgait.interpolate_subgaits(base_subgait, other_subgait, parameter)
+        new_subgait = Subgait.interpolate_subgaits(base_subgait, other_subgait, parameter, use_foot_position=False)
         for i, joint in enumerate(new_subgait.joints):
             for j, setpoint in enumerate(joint.setpoints):
                 base_setpoint = base_subgait.joints[i].setpoints[j]
                 other_setpoint = other_subgait.joints[i].setpoints[j]
-                self.assertAlmostEqual(base_setpoint.time * parameter + (1 - parameter) * other_setpoint.time,
+                self.assertAlmostEqual(base_setpoint.time * (1 - parameter) + parameter * other_setpoint.time,
                                        setpoint.time, places=4)
-                self.assertAlmostEqual(base_setpoint.position * parameter + (1 - parameter) * other_setpoint.position,
+                self.assertAlmostEqual(base_setpoint.position * (1 - parameter) + parameter * other_setpoint.position,
                                        setpoint.position, places=4)
-                self.assertAlmostEqual(base_setpoint.velocity * parameter + (1 - parameter) * other_setpoint.velocity,
+                self.assertAlmostEqual(base_setpoint.velocity * (1 - parameter) + parameter * other_setpoint.velocity,
                                        setpoint.velocity, places=4)
 
     def test_interpolate_subgaits_wrong_amount_of_joints(self):
@@ -210,5 +243,12 @@ class SubgaitTest(unittest.TestCase):
         base_subgait, other_subgait = self.load_interpolatable_subgaits()
         parameter = 0.2
         new_subgait = Subgait.interpolate_subgaits(base_subgait, other_subgait, parameter)
+        new_duration = (1 - parameter) * base_subgait.duration + parameter * other_subgait.duration
+        self.assertEqual(new_duration, new_subgait.duration)
+
+    def test_interpolate_subgaits_duration_ik(self):
+        base_subgait, other_subgait = self.load_interpolatable_subgaits_ik()
+        parameter = 0.2
+        new_subgait = Subgait.interpolate_subgaits(base_subgait, other_subgait, parameter, use_foot_position=True)
         new_duration = parameter * base_subgait.duration + (1 - parameter) * other_subgait.duration
         self.assertEqual(new_duration, new_subgait.duration)

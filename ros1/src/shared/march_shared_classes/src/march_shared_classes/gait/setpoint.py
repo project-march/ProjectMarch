@@ -1,13 +1,23 @@
+from march_shared_classes.utilities.utility_functions import get_joint_names_for_inverse_kinematics, weighted_average
+
+# Use this factor when calculating velocities to keep the calculations within the range of motion
+# See IK confluence page https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
+VELOCITY_SCALE_FACTOR = 0.001
+JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
+
 
 class Setpoint(object):
     """Base class to define the setpoints of a subgait."""
 
-    digits = 4
+    digits = 8
 
-    def __init__(self, time, position, velocity):
+    def __init__(self, time, position, velocity=None):
         self._time = round(time, self.digits)
         self._position = round(position, self.digits)
-        self._velocity = round(velocity, self.digits)
+        if velocity is not None:
+            self._velocity = round(velocity, self.digits)
+        else:
+            self._velocity = None
 
     @property
     def time(self):
@@ -34,7 +44,10 @@ class Setpoint(object):
         self._velocity = round(velocity, self.digits)
 
     def __repr__(self):
-        return 'Time: %s, Position: %s, Velocity: %s' % (self.time, self.position, self.velocity)
+        if self.velocity is not None:
+            return 'Time: %s, Position: %s, Velocity: %s' % (self.time, self.position, self.velocity)
+        else:
+            return 'Time: %s, Position: %s, Velocity: Not specified' % (self.time, self.position)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -46,6 +59,38 @@ class Setpoint(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    @classmethod
+    def calculate_next_positions_joint(cls, setpoint_dic):
+        """Calculates the position of the joints a moment later given a setpoint dictionary.
+
+        Calculates using the approximation next_position = position + current_velocity * time_difference
+
+        :param setpoint_dic: A dictionary of setpoints with positions and velocities
+        :return: A dictionary with the positions of the joints 1 / VELOCITY_SCALE_FACTOR second later
+        """
+        next_positions = {}
+        for joint in JOINT_NAMES_IK:
+            if joint in setpoint_dic:
+                next_positions[joint] = cls(setpoint_dic[joint].time + VELOCITY_SCALE_FACTOR,
+                                            setpoint_dic[joint].position + setpoint_dic[joint].velocity
+                                            * VELOCITY_SCALE_FACTOR)
+            else:
+                raise KeyError('Setpoint_dic is missing joint {joint}'.format(joint=joint))
+
+        return next_positions
+
+    def add_joint_velocity_from_next_angle(self, next_state):
+        """Calculates the (left/right/all)joint velocities given a current position and a next position.
+
+        Calculates using the approximation next_position = position + current_velocity * time_difference
+
+        :param self: A Setpoint object with no velocity
+        :param next_state: A Setpoint with the positions a moment later
+
+        :return: The joint velocities of the joints on the specified side
+        """
+        self.velocity = (next_state.position - self.position) / (next_state.time - self.time)
 
     @staticmethod
     def interpolate_setpoints(base_setpoint, other_setpoint, parameter):
@@ -60,7 +105,7 @@ class Setpoint(object):
         :return:
             The interpolated setpoint
         """
-        time = parameter * base_setpoint.time + (1 - parameter) * other_setpoint.time
-        position = parameter * base_setpoint.position + (1 - parameter) * other_setpoint.position
-        velocity = parameter * base_setpoint.velocity + (1 - parameter) * other_setpoint.velocity
+        time = weighted_average(base_setpoint.time, other_setpoint.time, parameter)
+        position = weighted_average(base_setpoint.position, other_setpoint.position, parameter)
+        velocity = weighted_average(base_setpoint.velocity, other_setpoint.velocity, parameter)
         return Setpoint(time, position, velocity)

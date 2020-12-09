@@ -55,7 +55,7 @@ class SubgaitGraphError(GaitError):
         super(SubgaitGraphError, self).__init__(msg)
 
 
-class TransitionError(Exception):
+class TransitionError(GaitError):
     def __init__(self, msg=None):
         """Class to raise an error when transition between two subgaits has an error .
 
@@ -68,7 +68,7 @@ class TransitionError(Exception):
         super(TransitionError, self).__init__(msg)
 
 
-class SubgaitInterpolationError(Exception):
+class SubgaitInterpolationError(GaitError):
     def __init__(self, msg=None):
         """Class to raise an error when it was not possible to interpolate between subgaits."""
         if msg is None:
