@@ -40,10 +40,12 @@ target_include_directories(${PROJECT_NAME}_node PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>)
 
-install(TARGETS march_fake_sensor_data
+install(TARGETS ${PROJECT_NAME}
     LIBRARY DESTINATION lib/${PROJECT_NAME})
-install(TARGETS march_fake_sensor_data_node
-    RUNTIME DESTINATION lib/${PROJECT_NAME}_node)
+install(TARGETS ${PROJECT_NAME}_node
+    RUNTIME DESTINATION lib/${PROJECT_NAME})
+install(DIRECTORY launch
+    DESTINATION share/${PROJECT_NAME}/)
 
 if(BUILD_TESTING)
     find_package(ament_lint_auto REQUIRED)
