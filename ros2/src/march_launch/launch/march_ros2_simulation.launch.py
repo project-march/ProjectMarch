@@ -92,5 +92,24 @@ def generate_launch_description():
             launch_arguments=[('gait_directory', gait_directory),
                               ('use_sim_time', use_sim_time),
                               ('gait_package', gait_package)],
-            condition=IfCondition(gait_selection))
+            condition=IfCondition(gait_selection)),
+
+        # Fake sensor data
+        DeclareLaunchArgument(
+            name='fake_sensor_data',
+            default_value='True',
+            description='Whether to launch the fake sensor data node.'),
+        DeclareLaunchArgument(
+            'minimum_fake_temperature',
+            default_value='10',
+            description='Lower bound to generate fake temperatures from'),
+        DeclareLaunchArgument(
+            'maximum_fake_temperature',
+            default_value='30',
+            description='Upper bound to generate fake temperatures from'),
+        IncludeLaunchDescription(PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('march_fake_sensor_data'), 'launch', 'march_fake_sensor_data.launch.py')),
+            launch_arguments=[('minimum_temperature', LaunchConfiguration('minimum_fake_temperature')),
+                              ('maximum_temperature', LaunchConfiguration('maximum_fake_temperature'))],
+            condition=IfCondition(LaunchConfiguration('fake_sensor_data')))
     ])
