@@ -168,8 +168,7 @@ void ObstacleController::getGoalPosition(double time_since_start)
   }
   // Goal position is determined from the location of the stable foot
   goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
-
-<<<<<<< HEAD
+  
   // If the exoskeleton is in an idle sit position, put the CoM a bit behind the stable foot
   if (subgait_name_ == SIT_IDLE) {
     goal_position_x = stable_foot_pose.X() + 0.2 * swing_step_size_;
