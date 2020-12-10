@@ -62,8 +62,6 @@ if(BUILD_TESTING)
         test/FakeTemperatureDataTest.cpp
     )
     target_link_libraries(${PROJECT_NAME}-fake-temperature-data-test ${PROJECT_NAME})
-
-#add_launch_test(test/name_of_test.test.py)
 endif()
 
 ament_package()

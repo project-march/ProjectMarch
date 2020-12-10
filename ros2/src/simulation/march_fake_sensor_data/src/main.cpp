@@ -13,6 +13,8 @@ int main(int argc, char** argv)
         "march_fake_temperature_data",
         std::move(autoregression_weights)
     );
+    // Start the timer and create the publishers
+    (*temperature).initialize();
 
     // Execute the temperature node with a single-threaded executor.
     rclcpp::spin(temperature);

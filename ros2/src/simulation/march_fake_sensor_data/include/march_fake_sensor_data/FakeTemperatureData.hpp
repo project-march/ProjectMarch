@@ -70,4 +70,7 @@ class FakeTemperatureDataNode final : public rclcpp::Node {
         // Calculate the weighted average based on the latest temperatures to
         // reduce the jitter in the produced random temperatures.
         double calculate_autoregression_temperature() const;
+
+        // Initialize the connection with other nodes
+        void initialize();
 };

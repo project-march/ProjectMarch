@@ -51,7 +51,10 @@ FakeTemperatureDataNode::FakeTemperatureDataNode(const std::string& node_name, c
     // are updated. The callback changes the internal state to reflect the new
     // values of the parameters.
     parameter_callback = this->add_on_set_parameters_callback(std::bind(&FakeTemperatureDataNode::update_parameters, this, std::placeholders::_1));
+}
 
+void FakeTemperatureDataNode::initialize()
+{
     // Create a temperature publisher for all the different joints.
     for (auto sensor : get_joint_names()) {
         add_temperature_publisher(sensor);
