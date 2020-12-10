@@ -1,9 +1,9 @@
 #include "joint_trajectory_mpc.hpp"
 #include <pluginlib/class_list_macros.hpp>
 
-typedef HardwareInterfaceAdapter<hardware_interface::EffortJointInterface, joint_trajectory_controller::State> HWIA;
+typedef HardwareInterfaceAdapter<hardware_interface::EffortJointInterface, joint_trajectory_controller::State> ModelPredictiveControllerInterface;
 
-bool HWIA::init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
+bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
 {
   joint_handles_ptr_ = &joint_handles;
   num_joints_ = joint_handles_ptr_->size();
@@ -11,7 +11,7 @@ bool HWIA::init(std::vector<hardware_interface::JointHandle>& joint_handles, ros
   return true;
 }
 
-void HWIA::starting(const ros::Time& /*time*/)
+void ModelPredictiveControllerInterface::starting(const ros::Time& /*time*/)
 {
   if (!joint_handles_ptr_) {return;}
 
@@ -22,7 +22,7 @@ void HWIA::starting(const ros::Time& /*time*/)
   }
 }
 
-void HWIA::updateCommand(const ros::Time& /*time*/, const ros::Duration& period,
+void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/, const ros::Duration& period,
                    const joint_trajectory_controller::State& /*desired state*/,
                    const joint_trajectory_controller::State& state_error)
 {
@@ -46,7 +46,7 @@ void HWIA::updateCommand(const ros::Time& /*time*/, const ros::Duration& period,
 
 }
 
-void HWIA::stopping(const ros::Time& /*time*/)
+void ModelPredictiveControllerInterface::stopping(const ros::Time& /*time*/)
 {
 
 }
