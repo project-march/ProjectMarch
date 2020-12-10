@@ -38,6 +38,11 @@ TEST_F(FakeTemperatureDataNodeTest, test_change_range)
     }
 
     (*node).set_range(-2, 2);
+    // "flush" the previous values
+    for (int i {0}; i < 10; ++i) {
+        (*node).generate_new_temperature();
+    }
+
     for (int i {0}; i < 10; ++i) {
         (*node).generate_new_temperature();
         ASSERT_LE((*node).calculate_autoregression_temperature(), 2);

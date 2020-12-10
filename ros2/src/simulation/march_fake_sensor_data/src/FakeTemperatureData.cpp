@@ -16,8 +16,8 @@
 
 using namespace std::chrono_literals;
 
-const int DEFAULT_MINIMUM_TEMPERATURE { 10 };
-const int DEFAULT_MAXIMUM_TEMPERATURE { 30 };
+const int DEFAULT_MINIMUM_TEMPERATURE { 0 };
+const int DEFAULT_MAXIMUM_TEMPERATURE { 0 };
 const std::string MINIMUM_TEMPERATURE_PARAMETER_NAME { "minimum_temperature" };
 const std::string MAXIMUM_TEMPERATURE_PARAMETER_NAME { "maximum_temperature" };
 const std::string LOGGER_NAME { "fake_temperature" };
