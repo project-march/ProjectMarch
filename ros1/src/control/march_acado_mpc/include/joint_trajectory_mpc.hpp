@@ -60,4 +60,7 @@ private:
 
 };
 
+// Assign an alias to the class definition
+typedef HardwareInterfaceAdapter<hardware_interface::EffortJointInterface, joint_trajectory_controller::State> ModelPredictiveControllerInterface;
+
 #endif  // MARCH_HARDWARE_TRAJECTORY_MPC_H

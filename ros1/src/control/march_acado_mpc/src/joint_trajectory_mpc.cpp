@@ -1,7 +1,6 @@
 #include "joint_trajectory_mpc.hpp"
 #include <pluginlib/class_list_macros.hpp>
 
-typedef HardwareInterfaceAdapter<hardware_interface::EffortJointInterface, joint_trajectory_controller::State> ModelPredictiveControllerInterface;
 
 bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
 {
