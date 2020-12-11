@@ -19,6 +19,12 @@ public:
    */
   void setInitialState(std::vector<double> x0);
 
+  /**
+   * \brief Run a single feedback iteration given the initial state
+   * @param x0 - initial state
+   */
+  void controller(std::vector<double> x0);
+
 
 private:
 
