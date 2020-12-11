@@ -98,6 +98,7 @@ add_library(${PROJECT_NAME}
 #        "${QPOASES_SRCS}"
 #        "${ACADO_SRCS}"
         src/joint_trajectory_mpc.cpp
+        src/model_predictive_controller.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
