@@ -98,6 +98,12 @@ def generate_launch_description():
                               ('gait_package', gait_package)],
             condition=IfCondition(gait_selection)),
 
+        # Safety
+        IncludeLaunchDescription(PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('march_safety'), 'launch', 'march_safety.launch.py')),
+            launch_arguments=[('use_sim_time', use_sim_time)]
+        ),
+
         # Fake sensor data
         DeclareLaunchArgument(
             name='fake_sensor_data',
@@ -116,4 +122,5 @@ def generate_launch_description():
             launch_arguments=[('minimum_fake_temperature', minimum_fake_temperature),
                               ('maximum_fake_temperature', maximum_fake_temperature)],
             condition=IfCondition(fake_sensor_data))
+
     ])
