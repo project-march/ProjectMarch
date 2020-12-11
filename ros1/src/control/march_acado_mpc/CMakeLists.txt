@@ -42,7 +42,7 @@ catkin_package(
 # is downloaded in the _deps/acado-solver-src folder in the build directory.
 fetchcontent_declare(acado-solver
     GIT_REPOSITORY "https://gitlab.com/project-march/libraries/acado-solver.git"
-    GIT_TAG "main"
+    GIT_TAG "4-add-a-mpc_export-test-file"
     GIT_SHALLOW true
 )
 if(NOT acado-solver_POPULATED)
@@ -95,8 +95,8 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME}
-#        "${QPOASES_SRCS}"
-#        "${ACADO_SRCS}"
+        "${QPOASES_SRCS}"
+        "${ACADO_SRCS}"
         src/joint_trajectory_mpc.cpp
         src/model_predictive_controller.cpp
 )
