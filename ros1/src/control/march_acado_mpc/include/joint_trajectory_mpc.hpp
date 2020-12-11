@@ -57,7 +57,6 @@ private:
 
   unsigned int num_joints_;
 
-
 };
 
 // Assign an alias to the class definition

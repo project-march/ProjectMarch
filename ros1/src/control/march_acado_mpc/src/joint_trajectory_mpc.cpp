@@ -1,4 +1,5 @@
 #include "joint_trajectory_mpc.hpp"
+#include "model_predictive_controller.hpp"
 #include <pluginlib/class_list_macros.hpp>
 
 
