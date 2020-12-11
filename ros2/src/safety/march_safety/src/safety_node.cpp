@@ -15,7 +15,7 @@
 
 #include <chrono>
 
-const float UPDATE_RATE {20.0};
+const double UPDATE_RATE {20.0};
 
 using namespace std::chrono_literals;
 
@@ -26,14 +26,16 @@ int main(int argc, char** argv)
   rclcpp::NodeOptions options;
   options.automatically_declare_parameters_from_overrides(true);
 
-  auto safety = std::make_shared<SafetyNode> ("march_safety", options);
+  auto safety = std::make_shared<SafetyNode>("march_safety", options);
+
+  safety->start(UPDATE_RATE);
 
   rclcpp::shutdown();
   return 0;
 }
 
 SafetyNode::SafetyNode(const std::string& node_name, const rclcpp::NodeOptions& options):
-  Node(node_name , options)
+  Node(node_name, options)
 {
   std::vector<std::string> joint_names = get_joint_names();
 
@@ -45,12 +47,14 @@ SafetyNode::SafetyNode(const std::string& node_name, const rclcpp::NodeOptions& 
 
   // Create the input and temperature safety handler
   auto safety_handler = std::make_shared<SafetyHandler>(this, error_publisher, gait_instruction_publisher);
-  std::vector<std::unique_ptr<SafetyType>> safety_list;
   safety_list.push_back(std::make_unique<TemperatureSafety>(this, safety_handler, joint_names));
   safety_list.push_back(std::make_unique<InputDeviceSafety>(this, safety_handler));
+}
 
+void SafetyNode::start(const double update_rate)
+{
   // Update the safety handlers every 1/20 s (= 50ms)
-  rclcpp::Rate rate(UPDATE_RATE);
+  rclcpp::Rate rate(update_rate);
   while (rclcpp::ok())
   {
     rate.sleep();

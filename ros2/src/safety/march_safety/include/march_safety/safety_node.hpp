@@ -6,11 +6,13 @@
 #include "rclcpp/node.hpp"
 #include "rclcpp/rate.hpp"
 
+#include "march_safety/safety_type.hpp"
+
 #include <vector>
 #include <string>
 
 
-class SafetyNode final : public rclcpp::Node {
+class SafetyNode : public rclcpp::Node {
   using JointNames = std::vector<std::string>;
   public:
     SafetyNode(
@@ -18,9 +20,13 @@ class SafetyNode final : public rclcpp::Node {
         const rclcpp::NodeOptions& options
     );
 
+    void start(const double update_rate);
+
   private:
     // Retrieve the joint names from the published robot description.
     JointNames get_joint_names();
+
+    std::vector<std::unique_ptr<SafetyType>> safety_list;
 };
 
 #endif  // MARCH_SAFETY_SAFETY_NODE_H
