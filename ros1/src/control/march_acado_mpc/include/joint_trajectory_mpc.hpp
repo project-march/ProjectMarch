@@ -7,10 +7,12 @@
 #include <hardware_interface/joint_state_interface.h>
 #include <joint_trajectory_controller/joint_trajectory_controller.h>
 #include <trajectory_interface/quintic_spline_segment.h>
+#include "model_predictive_controller.hpp"
 
 // Other includes
 #include <ros/ros.h>
 #include <pluginlib/class_list_macros.h>
+#include <vector>
 
 
 // Create a State alias
@@ -56,6 +58,8 @@ private:
   std::vector<hardware_interface::JointHandle>* joint_handles_ptr_;
 
   unsigned int num_joints_;
+
+  std::vector<ModelPredictiveController> model_predictive_controllers_;
 
 };
 
