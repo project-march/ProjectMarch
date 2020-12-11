@@ -1,57 +1,98 @@
-// Copyright 2018 Project March.
-#include <string>
-#include <vector>
+// Copyrihgt 2018 Project March
+#include "rclcpp/rclcpp.hpp"
+#include "rclcpp/node.hpp"
+#include "rclcpp/publisher.hpp"
 
-#include <ros/ros.h>
-#include <sound_play/sound_play.h>
+#include "march_safety/safety_node.hpp"
+#include "march_safety/safety_handler.hpp"
+#include "march_safety/safety_type.hpp"
+#include "march_safety/input_device_safety.hpp"
+#include "march_safety/temperature_safety.hpp"
 
-#include "march_shared_resources/Error.h"
-#include "march_shared_resources/GaitInstruction.h"
+#include "march_shared_msgs/srv/get_param_string_list.hpp"
+#include "march_shared_msgs/msg/error.hpp"
+#include "march_shared_msgs/msg/gait_instruction.hpp"
 
-#include "march_safety/input_device_safety.h"
-#include "march_safety/safety_handler.h"
-#include "march_safety/temperature_safety.h"
+#include <chrono>
+
+const float UPDATE_RATE {20.0};
+
+using namespace std::chrono_literals;
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "march_safety_node");
-  ros::NodeHandle n;
-  ros::Rate rate(20);
+  rclcpp::init(argc, argv);
 
-  ROS_DEBUG("Trying to get parameter /march/joint_names");
-  while (ros::ok() && !n.hasParam("/march/joint_names"))
-  {
-    ros::Duration(0.5).sleep();
-    ROS_DEBUG("Waiting on /march/joint_names to be available");
-  }
+  rclcpp::NodeOptions options;
+  options.automatically_declare_parameters_from_overrides(true);
 
-  std::vector<std::string> joint_names;
-  n.getParam("/march/joint_names", joint_names);
-  ROS_DEBUG("Got joint names");
+  auto safety = std::make_shared<SafetyNode> ("march_safety", options);
+
+  rclcpp::shutdown();
+  return 0;
+}
+
+SafetyNode::SafetyNode(const std::string& node_name, const rclcpp::NodeOptions& options):
+  Node(node_name , options)
+{
+  std::vector<std::string> joint_names = get_joint_names();
+
+  RCLCPP_DEBUG(this->get_logger(), "Got joint names.");
 
   // Create an error publisher to notify the system (state machine) if something is wrong
-  ros::Publisher error_publisher = n.advertise<march_shared_resources::Error>("/march/error", 1000);
-  ros::Publisher gait_instruction_publisher =
-      n.advertise<march_shared_resources::GaitInstruction>("/march/input_device/instruction", 1000);
-  sound_play::SoundClient sound_client(n, "robotsound");
+  auto error_publisher = this->create_publisher<march_shared_msgs::msg::Error>("/march/error", 1000);
+  auto gait_instruction_publisher = this->create_publisher<march_shared_msgs::msg::GaitInstruction>("/march/input_device/instruction", 1000);
 
-  SafetyHandler safety_handler = SafetyHandler(&n, &error_publisher, &gait_instruction_publisher, sound_client);
-
+  // Create the input and temperature safety handler
+  auto safety_handler = std::make_shared<SafetyHandler>(this, error_publisher, gait_instruction_publisher);
   std::vector<std::unique_ptr<SafetyType>> safety_list;
-  safety_list.push_back(std::make_unique<TemperatureSafety>(&n, &safety_handler, joint_names));
-  safety_list.push_back(std::make_unique<InputDeviceSafety>(&n, &safety_handler));
+  safety_list.push_back(std::make_unique<TemperatureSafety>(this, safety_handler, joint_names));
+  safety_list.push_back(std::make_unique<InputDeviceSafety>(this, safety_handler));
 
-  while (ros::ok())
+  // Update the safety handlers every 1/20 s (= 50ms)
+  rclcpp::Rate rate(UPDATE_RATE);
+  while (rclcpp::ok())
   {
     rate.sleep();
-    ros::spinOnce();
+    rclcpp::spin_some(this->get_node_base_interface());
 
-    const ros::Time now = ros::Time::now();
     for (auto& i : safety_list)
     {
-      i->update(now);
+      i->update();
     }
   }
+}
 
-  return 0;
+std::vector<std::string> SafetyNode::get_joint_names()
+{
+  std::vector<std::string> names;
+
+  // This is a temporary solution until a joint names service is
+  // available in ROS 2.
+  // TODO: rewrite this function to use a ROS 2 service for the joint names
+  auto client = this->create_client<march_shared_msgs::srv::GetParamStringList>("/march/parameter_server/get_param_string_list");
+  auto request = std::make_shared<march_shared_msgs::srv::GetParamStringList::Request>();
+  request->name = std::string("joint_names");
+
+  // Wait until the service is available. Sending a request to an unavailable service
+  // will always fail.
+  while (!client->wait_for_service(5s)) {
+    if (!rclcpp::ok()) {
+      RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for parameter_server service. Exiting.");
+      return names;
+    }
+    RCLCPP_INFO(this->get_logger(), "The ROS 1 to ROS 2 parameter_server service is not available, waiting again...");
+  }
+
+  // Send the request and push the received names to the names vector.
+  auto result = client->async_send_request(request);
+  if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), result) == rclcpp::FutureReturnCode::SUCCESS) {
+    for (auto joint_name : result.get()->value) {
+      names.push_back(joint_name);
+    }
+  } else {
+    RCLCPP_ERROR(this->get_logger(), "Failed to call ROS 1 to ROS 2 parameter_server get joint names service");
+  }
+
+  return names;
 }

@@ -86,5 +86,10 @@ def generate_launch_description():
             launch_arguments=[('gait_directory', gait_directory),
                               ('use_sim_time', use_sim_time),
                               ('gait_package', gait_package)],
-            condition=IfCondition(gait_selection))
+            condition=IfCondition(gait_selection)),
+        # Safety
+        IncludeLaunchDescription(PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('march_safety'), 'launch', 'march_safety.launch.py')),
+            launch_arguments=[('use_sim_time', use_sim_time)]
+        )
     ])
