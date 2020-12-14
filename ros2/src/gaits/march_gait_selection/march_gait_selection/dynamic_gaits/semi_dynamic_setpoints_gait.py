@@ -128,9 +128,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
                     'secs': duration_secs,
                 },
                 'velocity': 0}])
-                            for joint in self._current_subgait.joints]),
-            'name': 'freeze',
-            'version': 'Only version, generated from code',
+                            for joint in self._current_subgait.joints])
         }
         freeze_subgait = Subgait.from_dict(robot=self._current_subgait.robot,
                                            subgait_dict=new_dict,
