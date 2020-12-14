@@ -1,6 +1,11 @@
 #! /usr/bin/env python
 import rospy
+<<<<<<< HEAD
 from march_shared_msgs.srv import SetObstacleSizeResponse, SetObstacleSize
+=======
+from march_shared_resources.srv import SetObstacleSizeRampLikeResponse, SetObstacleSizeRampLike, \
+    SetObstacleSizeStairsLikeResponse, SetObstacleSizeStairsLike
+>>>>>>> Add _macro.xacro file and introduce new service
 from gazebo_msgs.srv import SpawnModelRequest, SpawnModel, DeleteModel, \
     DeleteModelRequest, GetWorldProperties, GetWorldPropertiesRequest
 import xacro
@@ -8,7 +13,7 @@ import xacro
 # All obstacles that have a macro file which allows for changing the dimension
 # this means there must be an <name>_macro.xacro in the obstacles directory
 # which accepts the parameters length, width and height with default values
-RESIZABLE_OBSTACLES = ['bench']
+RESIZABLE_OBSTACLES = ['bench', 'ramp_and_door']
 
 rospy.init_node('set_obstacle_dimensions', anonymous=True)
 
@@ -16,8 +21,7 @@ spawn_publisher = rospy.ServiceProxy('/gazebo/spawn_urdf_model', SpawnModel)
 delete_publisher = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
 get_world_properties = rospy.ServiceProxy('/gazebo/get_world_properties', GetWorldProperties)
 
-
-def set_size(name, length=0, width=0, height=0):
+def set_new_stairs_like_obstacle(name, length=0, width=0, height=0):
     length = 'length="{length}"'.format(length=length) if length != 0 else ''
     width = 'width="{width}"'.format(width=width) if width != 0 else ''
     height = 'height="{height}"'.format(height=height) if height != 0 else ''
@@ -28,6 +32,22 @@ def set_size(name, length=0, width=0, height=0):
                 <xacro:{name} {length} {width} {height}/>
             </robot>
             '''.format(name=name, length=length, width=width, height=height), None)
+    set_size(name, doc)
+
+def set_new_ramp_like_obstacle(name, slope_up=0, slope_down=0, length_up=0):
+    slope_up = 'slope_up="{slope_up}"'.format(slope_up=slope_up) if slope_up != 0 else ''
+    slope_down = 'slope_down="{slope_down}"'.format(slope_down=slope_down) if slope_down != 0 else ''
+    length_up = 'length_up="{length_up}"'.format(length_up=length_up) if length_up != 0 else ''
+
+    doc = xacro.parse('''<?xml version="1.0"?>
+                <robot name="{name}" xmlns:xacro="http://www.ros.org/wiki/xacro">
+                    <xacro:include filename="$(find march_simulation)/obstacles/{name}_macro.xacro"/>
+                    <xacro:{name} {slope_up} {slope_down} {length_up}/>
+                </robot>
+                '''.format(name=name, slope_up=slope_up, slope_down=slope_down, length_up=length_up), None)
+    set_size(name, doc)
+
+def set_size(name, doc):
     xacro.process_doc(doc)
     new_obstacle = doc.toprettyxml(indent='  ')
     models = get_world_properties.call(GetWorldPropertiesRequest()).model_names
@@ -37,16 +57,27 @@ def set_size(name, length=0, width=0, height=0):
     spawn_publisher.call(SpawnModelRequest(
         model_name=name, model_xml=new_obstacle))
 
-
-def set_size_callback(msg):
+def set_size_stairs_like_callback(msg):
     if msg.obstacle_name not in RESIZABLE_OBSTACLES:
-        return SetObstacleSizeResponse(success=False)
+        return SetObstacleSizeStairsLikeResponse(success=False)
 
     else:
-        set_size(name=msg.obstacle_name, length=msg.new_length, width=msg.new_width, height=msg.new_height)
-        return SetObstacleSizeResponse(success=True)
+        set_new_stairs_like_obstacle(name=msg.obstacle_name, length=msg.new_length, width=msg.new_width,
+                                     height=msg.new_height)
+        return SetObstacleSizeStairsLikeResponse(success=True)
+
+def set_size_ramp_like_callback(msg):
+    if msg.obstacle_name not in RESIZABLE_OBSTACLES:
+        return SetObstacleSizeRampLikeResponse(success=False)
+
+    else:
+        set_new_ramp_like_obstacle(name=msg.obstacle_name, slope_up=msg.new_slope_up, slope_down=msg.new_slope_down,
+                                   length_up=msg.new_length_up)
+        return SetObstacleSizeStairsLikeResponse(success=True)
 
 
-change_obstacle_size = rospy.Service('/march/set_obstacle_size',
-                                     SetObstacleSize, set_size_callback)
+change_stairs_like_obstacle_size = rospy.Service('/march/set_obstacle_size_stairs_like',
+                                                 SetObstacleSizeStairsLike, set_size_stairs_like_callback)
+change_ramp_like_obstacle_size = rospy.Service('/march/set_obstacle_size_stairs_like',
+                                               SetObstacleSizeRampLike, set_size_ramp_like_callback)
 rospy.spin()
