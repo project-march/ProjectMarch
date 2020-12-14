@@ -8,6 +8,7 @@ from .gait_state_machine_error import GaitStateMachineError
 from .home_gait import HomeGait
 from march_shared_msgs.msg import CurrentState, CurrentGait, Error
 from march_shared_msgs.srv import PossibleGaits
+from march_shared_classes.utilities.side import Side
 
 PRESSURE_SOLE_STANDING_FORCE = 8000
 DEFAULT_TIMER_PERIOD = 0.04
@@ -68,11 +69,11 @@ class GaitStateMachine(object):
         self._left_foot_on_ground = True
         self._right_pressure_sub = self._gait_selection.create_subscription(
             msg_type=ContactsState, topic='/march/sensor/right_pressure_sole',
-            callback=lambda msg: self._update_foot_on_ground_cb(True, msg),
+            callback=lambda msg: self._update_foot_on_ground_cb(Side.right, msg),
             qos_profile=10)
         self._left_pressure_sub = self._gait_selection.create_subscription(
             msg_type=ContactsState, topic='/march/sensor/left_pressure_sole',
-            callback=lambda msg: self._update_foot_on_ground_cb(False, msg),
+            callback=lambda msg: self._update_foot_on_ground_cb(Side.left, msg),
             qos_profile=10)
         self._freeze_sub = self._gait_selection.create_service(
             srv_type=Trigger, srv_name='/freeze',
@@ -101,7 +102,7 @@ class GaitStateMachine(object):
         else:
             return False
 
-    def _update_foot_on_ground_cb(self, is_right, msg):
+    def _update_foot_on_ground_cb(self, side, msg):
         """ Update the status of the feet on ground based on pressure sole data,
         this is currently decided based on the force in simulation, but the numbers
         for this will be updated when range of real pressure soles is known.
@@ -109,15 +110,15 @@ class GaitStateMachine(object):
         if len(msg.states) > 0:
             force = sum([state.total_wrench.force.z for state in msg.states])
             if force > PRESSURE_SOLE_STANDING_FORCE:
-                if not self._right_foot_on_ground and is_right:
+                if not self._right_foot_on_ground and side is Side.right:
                     self._right_foot_on_ground = True
                     self._freeze()
-                elif not self._left_foot_on_ground and not is_right:
+                elif not self._left_foot_on_ground and side is Side.left:
                     self._left_foot_on_ground = True
                     self._freeze()
         # If there are no contacts, change foot on ground to False
         elif len(msg.states) == 0:
-            if is_right:
+            if side is Side.right:
                 self._right_foot_on_ground = False
             else:
                 self._left_foot_on_ground = False
