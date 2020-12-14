@@ -6,16 +6,19 @@
     <arg name="fixed" default="true" doc="Fixes the exoskeleton in the world"/>
     <arg name="ground_gait" default="false" doc="Exoskeleton will ground gait if true."/>
     <arg name="obstacle" default="none" doc="Obstacle to load in the simulation."/>
-    <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_rotational,
-    march4_with_koen_lengths."/>
-    <arg name="controller" default="effort_control" doc="Changes the controller used by simulation."/>
+
+    <arg name="robot" default="march4" doc="Robot to use."/>
+    <arg name="robot_description" default="$(arg robot)" doc="URDF file to use"/>
+    <arg name="controller_type" default="effort_control" doc="Changes the controller used by simulation."/>
+    <arg name="controller_name" default="$(arg robot)" doc="Name of the controller"/>
+
 
     <!-- Load the URDF into the ROS Parameter Server -->
     <!-- Override effort values as Gazebo uses different units than the actual IMC. -->
     <!-- In theory, if the controller is properly tuned, these values can be arbitrarily large. -->
     <!-- However, to limit the safety controller, we need to limit them. -->
     <param name="robot_description"
-           command="$(find xacro)/xacro '$(find march_description)/urdf/$(arg robot).xacro'
+           command="$(find xacro)/xacro '$(find march_description)/urdf/$(arg robot_description).xacro'
                     k_velocity_value_hfe:=60.0 k_velocity_value_kfe:=60.0
                     k_velocity_value_haa:=60.0 k_velocity_value_adpf:=15.0
                     k_position_value_hfe:=5000.0 k_position_value_kfe:=5000.0
@@ -24,7 +27,7 @@
                     ground_gait:=$(arg ground_gait)" />
 
     <!-- Upload the controller configuration -->
-    <rosparam file="$(find march_simulation)/config/$(arg controller)/$(arg robot).yaml" command="load"/>
+    <rosparam file="$(find march_simulation)/config/$(arg controller_type)/$(arg controller_name).yaml" command="load"/>
 
     <group ns="march">
         <node name="controller_spawner" pkg="controller_manager" type="controller_manager"

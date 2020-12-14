@@ -1,10 +1,12 @@
 <launch>
     <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_linear, test_joint_rotational."/>
+    <arg name="robot_description" default="$(arg robot)" doc="URDF file to use"/>
+    <arg name="controller_name" default="$(arg robot)" doc="Name of the controller file"/>
     <arg name="reset_imc" default="false" doc="Reset the IMC if this argument is set to true"/>
 
-    <rosparam file="$(find march_hardware_interface)/config/$(arg robot)/controllers.yaml" command="load"/>
+    <rosparam file="$(find march_hardware_interface)/config/$(arg controller_name)/controllers.yaml" command="load"/>
 
-    <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot).urdf"/>
+    <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot_description).urdf"/>
 
     <group ns="march">
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>

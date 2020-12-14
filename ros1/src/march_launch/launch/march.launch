@@ -31,9 +31,11 @@
 
     <arg name="balance" default="false" doc="Uses the dynamic balance gaits instead of the predefined gaits."/>
 
-    <arg name="controller" default="effort_control" doc="Changes the controller used by simulation."/>
+    <arg name="robot" default="march4" doc="Robot to use."/>
+    <arg name="robot_description" default="$(arg robot)" doc="URDF file to use"/>
+    <arg name="controller_type" default="effort_control" doc="Changes the controller used by simulation."/>
+    <arg name="controller_name" default="$(arg robot)" doc="Name of the controller"/>
 
-    <arg name="robot" default="march4"/>
 
     <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot).xacro"/>
 
@@ -88,6 +90,8 @@
     <group if="$(eval configuration == 'exoskeleton')">
         <include file="$(find march_hardware_interface)/launch/hardware.launch" if="$(arg hardware_interface)">
             <arg name="robot" value="$(arg robot)"/>
+            <arg name="robot_description" value="$(arg robot_description)"/>
+            <arg name="controller_name" value="$(arg controller_name)"/>
         </include>
     </group>
 
@@ -97,8 +101,10 @@
             <arg name="fixed" value="$(arg fixed)"/>
             <arg name="ground_gait" value="$(arg ground_gait)"/>
             <arg name="obstacle" value="$(arg obstacle)"/>
-            <arg name="controller" value="$(arg controller)"/>
             <arg name="robot" value="$(arg robot)"/>
+            <arg name="robot_description" value="$(arg robot_description)"/>
+            <arg name="controller_name" value="$(arg controller_name)"/>
+            <arg name="controller_type" value="$(arg controller_type)"/>
         </include>
     </group>
 
