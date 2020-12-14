@@ -9,9 +9,17 @@ include(FetchContent)
 # Define which packages this package depends on
 find_package(catkin REQUIRED 
         COMPONENTS
+        control_msgs
+        controller_interface
+        controller_manager
+        joint_state_controller
+        joint_trajectory_controller
+        march_hardware
         march_shared_resources
+        pluginlib
         roscpp
-        std_msgs)
+        std_msgs
+)
 
 catkin_package(
     INCLUDE_DIRS include
@@ -19,7 +27,13 @@ catkin_package(
     # Define the catkin projects that this project depends on. If another project
     # does "find_package(march_acado_mpc)" these packages will be seen as
     # transitive dependencies.
-    CATKIN_DEPENDS march_shared_resources roscpp std_msgs
+    CATKIN_DEPENDS
+    control_msgs
+    controller_interface
+    march_shared_resources
+    pluginlib
+    roscpp
+    std_msgs
 )
 
 ################
@@ -82,28 +96,24 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME}
-        "${QPOASES_SRCS}"
-        "${ACADO_SRCS}"
+#        "${QPOASES_SRCS}"
+#        "${ACADO_SRCS}"
+        src/joint_trajectory_mpc.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
-############
-# ROS NODE #
-############
-add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node)
-add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 
 install(DIRECTORY include
-        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-        )
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
+
 install(TARGETS ${PROJECT_NAME}
-        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-        )
-install(TARGETS ${PROJECT_NAME}_node
-        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-        )
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
+
+install(FILES controller_plugins.xml
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+
 install(DIRECTORY launch
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
         )
