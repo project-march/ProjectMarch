@@ -90,6 +90,10 @@ class SubgaitGraph(object):
                 for from_subgait, transitions in self._graph.items()
                 if self.END in transitions.values()]
 
+    @property
+    def graph(self):
+        return self._graph
+
     def __contains__(self, subgait_name):
         """Checks if the given subgait name is contained in the graph."""
         return subgait_name in self._graph

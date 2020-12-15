@@ -46,7 +46,7 @@ class InputDeviceController(object):
         self.finished_cb = None
         self.rejected_cb = None
         self.current_gait_cb = None
-
+        self._possible_gaits = []
         self._id = self.ID_FORMAT.format(machine=socket.gethostname(),
                                          user=getpass.getuser())
 
@@ -116,8 +116,8 @@ class InputDeviceController(object):
 
     def get_possible_gaits(self) -> Future:
         """
-        Returns the future for the list of names of possible gaits.
-        :return: List of possible gaits
+        Returns the future for the names of possible gaits.
+        :return: Future for the possible gaits
         """
         return self.gait_future
 

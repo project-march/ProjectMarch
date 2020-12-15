@@ -11,6 +11,7 @@ from ament_index_python.packages import get_package_share_directory
 from .image_button import ImageButton
 
 
+
 class InputDeviceView(QWidget):
     """
     The View of the input device, inialized based on a ui file and a controller.
@@ -37,7 +38,7 @@ class InputDeviceView(QWidget):
         # Extend the widget with all attributes and children from UI file
         loadUi(ui_file, self)
 
-        self.refresh_button.clicked.connect(self._update_possible_gaits)
+        self.refresh_button.clicked.connect(self._controller.update_possible_gaits)
 
         self._create_buttons()
         self._update_possible_gaits()
@@ -88,6 +89,10 @@ class InputDeviceView(QWidget):
         gait_balanced_walk = \
             self.create_button('balanced_walk',
                                callback=lambda: self._controller.publish_gait('balanced_walk'))
+
+        gait_dynamic_curb = \
+            self.create_button('dynamic_curb_sdg',
+                               callback=lambda: self._controller.publish_gait('dynamic_curb_sdg'))
 
         gait_single_step_small = \
             self.create_button('single_step_small', image_path='/gait_single_step_small.png',
@@ -251,6 +256,10 @@ class InputDeviceView(QWidget):
             self.create_button('tilted_path_second_end',
                                callback=lambda: self._controller.publish_gait('tilted_path_second_end'))
 
+        gait_curb = \
+            self.create_button('curb_sdg',
+                               callback=lambda: self._controller.publish_gait('curb_sdg'))
+
         stop_button = self.create_button('stop', image_path='/stop.png',
                                          callback=lambda: self._controller.publish_stop(),
                                          always_enabled=True)
@@ -274,7 +283,8 @@ class InputDeviceView(QWidget):
         # The button layout.
         # Position in the array determines position on screen.
         march_button_layout = [
-            [home_sit, home_stand, gait_walk, gait_walk_small, gait_walk_large, gait_balanced_walk, gait_slalom_walk],
+            [home_sit, home_stand, gait_walk, gait_walk_small, gait_walk_large, gait_balanced_walk,
+             gait_dynamic_curb, gait_slalom_walk],
 
             [gait_sit, gait_stand, rocker_switch_increment, rocker_switch_decrement, stop_button, error_button,
              sm_to_unknown_button],
@@ -303,6 +313,8 @@ class InputDeviceView(QWidget):
 
             [gait_tilted_path_first_start, gait_tilted_path_second_start, gait_tilted_path_first_end,
              gait_tilted_path_second_end],
+
+            [gait_curb]
         ]
 
         # Create the qt_layout from the button layout.

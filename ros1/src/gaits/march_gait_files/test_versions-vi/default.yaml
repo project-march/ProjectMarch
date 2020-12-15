@@ -256,3 +256,7 @@ positions:
       right_hip_aa: 0.0
       right_hip_fe: -0.0873
       right_knee: 0.0
+semi_dynamic_gaits:
+  curb_sdg:
+    right_open: curb_sdg_rightopen_v1
+    left_close: curb_sdg_leftclose_v1

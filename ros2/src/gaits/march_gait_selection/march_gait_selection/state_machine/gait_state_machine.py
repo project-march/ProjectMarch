@@ -1,11 +1,16 @@
+from gazebo_msgs.msg import ContactsState
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from rclpy.duration import Duration
-from std_msgs.msg import Header
+from std_msgs.msg import Header, Bool
+from std_srvs.srv import Trigger
+
 from .gait_state_machine_error import GaitStateMachineError
 from .home_gait import HomeGait
 from march_shared_msgs.msg import CurrentState, CurrentGait, Error
 from march_shared_msgs.srv import PossibleGaits
+from march_shared_classes.utilities.side import Side
 
+PRESSURE_SOLE_STANDING_FORCE = 8000
 DEFAULT_TIMER_PERIOD = 0.04
 NANOSEC_TO_SEC = 1e-9
 
@@ -60,6 +65,19 @@ class GaitStateMachine(object):
             msg_type=Error, topic='/march/error', callback=self._error_cb,
             qos_profile=10)
 
+        self._right_foot_on_ground = True
+        self._left_foot_on_ground = True
+        self._right_pressure_sub = self._gait_selection.create_subscription(
+            msg_type=ContactsState, topic='/march/sensor/right_pressure_sole',
+            callback=lambda msg: self._update_foot_on_ground_cb(Side.right, msg),
+            qos_profile=10)
+        self._left_pressure_sub = self._gait_selection.create_subscription(
+            msg_type=ContactsState, topic='/march/sensor/left_pressure_sole',
+            callback=lambda msg: self._update_foot_on_ground_cb(Side.left, msg),
+            qos_profile=10)
+        self._freeze_sub = self._gait_selection.create_service(
+            srv_type=Trigger, srv_name='/freeze',
+            callback=self._freeze_cb)
         self._get_possible_gaits_client = self._gait_selection.create_service(
             srv_type=PossibleGaits,
             srv_name='/march/gait_selection/get_possible_gaits',
@@ -68,6 +86,42 @@ class GaitStateMachine(object):
         self.add_transition_callback(self._current_state_cb)
         self.add_gait_callback(self._current_gait_cb)
         self._gait_selection.get_logger().debug('Initialized state machine')
+
+    def _freeze_cb(self, request, response):
+        if self._freeze():
+            response.success = True
+        else:
+            response.success = False
+        return response
+
+    def _freeze(self):
+        if self._current_gait is not None and self._current_gait.can_freeze:
+            self._gait_selection.get_logger().debug('Freezing the gait')
+            self._current_gait.freeze()
+            return True
+        else:
+            return False
+
+    def _update_foot_on_ground_cb(self, side, msg):
+        """ Update the status of the feet on ground based on pressure sole data,
+        this is currently decided based on the force in simulation, but the numbers
+        for this will be updated when range of real pressure soles is known.
+        If the foot was not on the ground before and is now, the gait will freeze """
+        if len(msg.states) > 0:
+            force = sum([state.total_wrench.force.z for state in msg.states])
+            if force > PRESSURE_SOLE_STANDING_FORCE:
+                if not self._right_foot_on_ground and side is Side.right:
+                    self._right_foot_on_ground = True
+                    self._freeze()
+                elif not self._left_foot_on_ground and side is Side.left:
+                    self._left_foot_on_ground = True
+                    self._freeze()
+        # If there are no contacts, change foot on ground to False
+        elif len(msg.states) == 0:
+            if side is Side.right:
+                self._right_foot_on_ground = False
+            else:
+                self._left_foot_on_ground = False
 
     def _possible_gaits_cb(self, request, response):
         """ Standard callback for the get possible gaits service """
@@ -171,6 +225,7 @@ class GaitStateMachine(object):
         """Requests shutdown, which will terminate the state machine as soon as
         possible."""
         self._shutdown_requested = True
+        self._gait_selection.destroy_node()
 
     def stop_gait(self):
         """Requests a stop from the current executing gait, but keeps the state
@@ -236,7 +291,7 @@ class GaitStateMachine(object):
             return
 
         self._handle_input()
-
+        logger = self._gait_selection.get_logger()
         trajectory, should_stop = self._current_gait.update(elapsed_time)
         # schedule trajectory if any
         if trajectory is not None:
@@ -324,6 +379,7 @@ class GaitStateMachine(object):
             from_idle_name = next(
                 (name for name, position in idle_positions.items()
                  if position['joints'] == starting_position), None)
+
             if from_idle_name is None:
                 from_idle_name = 'unknown_idle_{0}'.format(len(idle_positions))
                 self._gait_selection.get_logger().warn(

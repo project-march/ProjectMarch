@@ -1,6 +1,10 @@
+from copy import deepcopy
 from march_gait_selection.dynamic_gaits.transition_subgait import TransitionSubgait
+from march_gait_selection.state_machine.home_gait import HomeGait
 from march_shared_classes.exceptions.gait_exceptions import GaitError
 from march_shared_classes.gait.gait import Gait
+from march_shared_classes.gait.setpoint import Setpoint
+from march_shared_classes.gait.subgait import Subgait
 
 from .gait_interface import GaitInterface
 from .state_machine_input import TransitionRequest
@@ -71,17 +75,20 @@ class SetpointsGait(GaitInterface, Gait):
 
     def update(self, elapsed_time):
         """
-        Update the theoretical progress of the gait, should be called regularly.
+        Update the progress of the gait, should be called regularly.
         If the current subgait is still running, this does nothing.
         If the gait should be stopped, this will be done
         If the current subgait is done, it will start the next subgait
         :param elapsed_time:
-        :return:
+        :return: trajectory, is_finished
         """
         self._time_since_start += elapsed_time
         if self._time_since_start < self._current_subgait.duration:
             return None, False
 
+        return self._update_next_subgait()
+
+    def _update_next_subgait(self):
         if self._should_stop:
             next_subgait = self._stop()
 
@@ -92,6 +99,7 @@ class SetpointsGait(GaitInterface, Gait):
             next_subgait = self._transition_to_subgait.subgait_name
             self._transition_to_subgait = None
             self._is_transitioning = False
+
         else:
             # If there is no transition subgait that has to be used, go to TO subgait
             next_subgait = self.graph[(self._current_subgait.subgait_name, self.graph.TO)]
@@ -106,7 +114,8 @@ class SetpointsGait(GaitInterface, Gait):
 
     def transition(self, transition_request):
         """
-        Request a transition (decrease or increase)
+        Request to transition between two subgaits with increasing or decreasing
+        size of the step.
         :param transition_request:
         :return: whether the transition can be executed
         """
@@ -177,4 +186,4 @@ class SetpointsGait(GaitInterface, Gait):
         self._current_subgait = transition_subgait
         self._time_since_start = 0.0
         self._is_transitioning = True
-        return transition_subgait.to_joint_trajectory_msg()
+        return transition_subgait.to_joint_trajectory_msg(), False

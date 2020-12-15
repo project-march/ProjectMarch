@@ -1,5 +1,6 @@
 import os
 import rclpy
+from march_gait_selection.dynamic_gaits.semi_dynamic_setpoints_gait import SemiDynamicSetpointsGait
 from march_shared_msgs.srv import SetGaitVersion, ContainsGait
 from rcl_interfaces.srv import GetParameters
 from rclpy.exceptions import ParameterNotDeclaredException
@@ -45,11 +46,11 @@ class GaitSelection(Node):
             self.get_logger().error(
                 f'Gait default yaml file does not exist: {directory}/default.yaml')
 
-        self._gait_version_map, self._positions = self._load_configuration()
+        self._gait_version_map, self._positions, self._semi_dynamic_gait_version_map = \
+            self._load_configuration()
         self._robot = self._initial_robot_description() if robot is None else robot
-        # Subsribe to the robot description channel to be kept up to date of
-        # changes in the robot description
-        self.robot_description_sub = self.create_subscription(
+
+        self._robot_description_sub = self.create_subscription(
             msg_type=String, topic='/robot_description',
             callback=self._update_robot_description_cb,
             qos_profile=10)
@@ -232,7 +233,19 @@ class GaitSelection(Node):
             gaits[gait] = SetpointsGait.from_file(
                 gait, self._gait_directory, self._robot, self._gait_version_map)
 
+        self._load_semi_dynamic_gaits(gaits)
+
         return gaits
+
+    def _load_semi_dynamic_gaits(self, gaits):
+        """
+        Loads the semi dynamic gaits, this is currently only 1 gait.
+        :param gaits: dict to add the semi dynamic gaits to
+        """
+        for gait in self._semi_dynamic_gait_version_map:
+            gaits[f'dynamic_{gait}'] = SemiDynamicSetpointsGait.from_file(
+                gait, self._gait_directory, self._robot,
+                self._semi_dynamic_gait_version_map)
 
     def _load_configuration(self):
         """Loads and verifies the gaits configuration."""
@@ -240,6 +253,7 @@ class GaitSelection(Node):
             default_config = yaml.load(default_yaml_file, Loader=yaml.SafeLoader)
 
         version_map = default_config['gaits']
+        semi_dynamic_version_map = default_config.get('semi_dynamic_gaits', [])
 
         if not isinstance(version_map, dict):
             raise TypeError('Gait version map should be of type; dictionary')
@@ -247,7 +261,7 @@ class GaitSelection(Node):
         if not self._validate_version_map(version_map):
             raise GaitError(msg='Gait version map: {gm}, is not valid'.format(gm=version_map))
 
-        return version_map, default_config['positions']
+        return version_map, default_config['positions'], semi_dynamic_version_map
 
     def _validate_version_map(self, version_map):
         """Validates if the current versions exist.

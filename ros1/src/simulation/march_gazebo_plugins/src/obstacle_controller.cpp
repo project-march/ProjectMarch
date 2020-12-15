@@ -28,6 +28,8 @@ ObstacleController::ObstacleController(physics::ModelPtr model)
   , error_x_last_timestep_(0)
   , error_y_last_timestep_(0)
   , error_yaw_last_timestep_(0)
+  , goal_position_x(0)
+  , goal_position_y(0)
 
 {
   foot_left_ = model_->GetLink("ankle_plate_left");
@@ -94,10 +96,7 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left
 
   auto model_com = GetCom();
 
-  double goal_position_x;
-  double goal_position_y;
-
-  getGoalPosition(time_since_start, goal_position_x, goal_position_y);
+  getGoalPosition(time_since_start);
   double error_x = model_com.X() - goal_position_x;
   double error_y = model_com.Y() - goal_position_y;
   double error_yaw = foot_left_->WorldPose().Rot().Z();
@@ -157,7 +156,7 @@ void ObstacleController::update(ignition::math::v4::Vector3<double>& torque_left
 
 }
 
-void ObstacleController::getGoalPosition(double time_since_start, double& goal_position_x, double& goal_position_y)
+void ObstacleController::getGoalPosition(double time_since_start)
 {
   // Left foot is stable unless subgait name starts with left
   auto stable_foot_pose = foot_left_->WorldCoGPose().Pos();
@@ -167,11 +166,9 @@ void ObstacleController::getGoalPosition(double time_since_start, double& goal_p
     stable_foot_pose = foot_right_->WorldCoGPose().Pos();
     swing_foot_pose = foot_left_->WorldCoGPose().Pos();
   }
-
   // Goal position is determined from the location of the stable foot
-  goal_position_x = stable_foot_pose.X();
   goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
-
+  
   // If the exoskeleton is in an idle sit position, put the CoM a bit behind the stable foot
   if (subgait_name_ == SIT_IDLE) {
     goal_position_x = stable_foot_pose.X() + 0.2 * swing_step_size_;
@@ -189,21 +186,24 @@ void ObstacleController::getGoalPosition(double time_since_start, double& goal_p
     default_subgait_name_ = STAND_IDLE;
     goal_position_x = stable_foot_pose.X() + 0.1 * swing_step_size_;
   }
-  // Start goal position a quarter step size behind the stable foot
-  // Move the goal position forward with v = 0.5 * swing_step_size/subgait_duration
-  if (subgait_name_.substr(subgait_name_.size() - 4) == "open")
+
+  if (subgait_name_.substr(0, 6) != "freeze")
   {
-    goal_position_x += -0.25 * time_since_start * swing_step_size_ / subgait_duration_;
-  }
-  else if (subgait_name_.substr(subgait_name_.size() - 5) == "swing")
-  {
-    goal_position_x +=
-        0.25 * swing_step_size_ - 0.5 * time_since_start * swing_step_size_ / subgait_duration_;
-  }
-  else if (subgait_name_.substr(subgait_name_.size() - 5) == "close")
-  {
-    goal_position_x +=
-        0.25 * swing_step_size_ - 0.25 * time_since_start * swing_step_size_ / subgait_duration_;
+    goal_position_x = stable_foot_pose.X();
+    // Start goal position a quarter step size behind the stable foot
+    // Move the goal position forward with v = 0.5 * swing_step_size/subgait_duration
+    if (subgait_name_.substr(subgait_name_.size() - 4) == "open")
+    {
+      goal_position_x += -0.25 * time_since_start * swing_step_size_ / subgait_duration_;
+    }
+    else if (subgait_name_.substr(subgait_name_.size() - 5) == "swing")
+    {
+      goal_position_x += 0.25 * swing_step_size_ - 0.5 * time_since_start * swing_step_size_ / subgait_duration_;
+    }
+    else if (subgait_name_.substr(subgait_name_.size() - 5) == "close")
+    {
+      goal_position_x += 0.25 * swing_step_size_ - 0.25 * time_since_start * swing_step_size_ / subgait_duration_;
+    }
   }
 }
 
