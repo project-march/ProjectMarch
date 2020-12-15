@@ -9,7 +9,8 @@ import xacro
 # All obstacles that have a macro file which allows for changing the dimension
 # this means there must be an <name>_macro.xacro in the obstacles directory
 # which accepts the parameters length, width and height with default values
-RESIZABLE_OBSTACLES = ['bench', 'ramp_and_door']
+RESIZABLE_OBSTACLES_RAMP_LIKE = ['ramp_and_door']
+RESIZABLE_OBSTACLES_STAIRS_LIKE = ['bench']
 
 rospy.init_node('set_obstacle_dimensions', anonymous=True)
 
@@ -54,7 +55,7 @@ def set_size(name, doc):
         model_name=name, model_xml=new_obstacle))
 
 def set_size_stairs_like_callback(msg):
-    if msg.obstacle_name not in RESIZABLE_OBSTACLES:
+    if msg.obstacle_name not in RESIZABLE_OBSTACLES_STAIRS_LIKE:
         return SetObstacleSizeStairsLikeResponse(success=False)
 
     else:
@@ -63,7 +64,7 @@ def set_size_stairs_like_callback(msg):
         return SetObstacleSizeStairsLikeResponse(success=True)
 
 def set_size_ramp_like_callback(msg):
-    if msg.obstacle_name not in RESIZABLE_OBSTACLES:
+    if msg.obstacle_name not in RESIZABLE_OBSTACLES_RAMP_LIKE:
         return SetObstacleSizeRampLikeResponse(success=False)
 
     else:
