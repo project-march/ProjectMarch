@@ -1,0 +1,17 @@
+name: walk
+subgaits:
+  left_close:
+    to: end
+  left_swing:
+    stop: right_close
+    to: right_swing
+  right_close:
+    to: end
+  right_open:
+    stop: left_swing
+    to: left_swing
+  right_swing:
+    to: left_close
+  start:
+    stop: right_open
+    to: right_open
