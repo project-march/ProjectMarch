@@ -1,0 +1,8 @@
+name: stairs_up_single_step
+subgaits:
+  left_close:
+    to: end
+  right_open:
+    to: left_close
+  start:
+    to: right_open
