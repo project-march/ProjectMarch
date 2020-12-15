@@ -109,7 +109,7 @@ def generate_launch_description():
             description='Upper bound to generate fake temperatures from'),
         IncludeLaunchDescription(PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('march_fake_sensor_data'), 'launch', 'march_fake_sensor_data.launch.py')),
-            launch_arguments=[('minimum_temperature', LaunchConfiguration('minimum_fake_temperature')),
-                              ('maximum_temperature', LaunchConfiguration('maximum_fake_temperature'))],
+            launch_arguments=[('minimum_fake_temperature', LaunchConfiguration('minimum_fake_temperature')),
+                              ('maximum_fake_temperature', LaunchConfiguration('maximum_fake_temperature'))],
             condition=IfCondition(LaunchConfiguration('fake_sensor_data')))
     ])

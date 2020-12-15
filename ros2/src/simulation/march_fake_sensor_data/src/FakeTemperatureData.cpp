@@ -36,17 +36,19 @@ const std::string LOGGER_NAME { "fake_temperature" };
  * temperature values weigh the most in the calculation of new temperatures.
  */
 FakeTemperatureDataNode::FakeTemperatureDataNode(const std::string& node_name, const std::vector<float>&& autoregression_weights):
-    Node(node_name),
+    Node(node_name, rclcpp::NodeOptions()
+                      .automatically_declare_parameters_from_overrides(true)),
     latest_temperatures { std::deque<int>(autoregression_weights.size()) },
     autoregression_weights { std::move(autoregression_weights) },
     minimum_temperature { DEFAULT_MINIMUM_TEMPERATURE },
     maximum_temperature { DEFAULT_MAXIMUM_TEMPERATURE },
     distribution { minimum_temperature, maximum_temperature }
 {
-    // Declare the existance of these parameters. This is necessary in ROS 2.
-    this->declare_parameter<int>(MINIMUM_TEMPERATURE_PARAMETER_NAME, minimum_temperature);
-    this->declare_parameter<int>(MAXIMUM_TEMPERATURE_PARAMETER_NAME, maximum_temperature);
-
+    this->get_parameter(
+      MINIMUM_TEMPERATURE_PARAMETER_NAME, minimum_temperature);
+    this->get_parameter(
+      MAXIMUM_TEMPERATURE_PARAMETER_NAME, maximum_temperature);
+    set_range(minimum_temperature, maximum_temperature);
     // Register a callback that will be called whenever the parameters of this Node
     // are updated. The callback changes the internal state to reflect the new
     // values of the parameters.
