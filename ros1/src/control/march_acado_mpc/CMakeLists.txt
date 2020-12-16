@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.16)
 
 project(march_acado_mpc DESCRIPTION "Model predictive control with the help of ACADO"
     LANGUAGES CXX C)
@@ -14,7 +14,6 @@ find_package(catkin REQUIRED
         controller_manager
         joint_state_controller
         joint_trajectory_controller
-        march_hardware
         march_shared_msgs
         pluginlib
         roscpp
