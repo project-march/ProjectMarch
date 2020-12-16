@@ -1,7 +1,7 @@
 from diagnostic_msgs.msg import DiagnosticStatus
 import rospy
 
-from march_shared_resources.msg import ImcState
+from march_shared_msgs.msg import ImcState
 
 
 class CheckImcStatus:

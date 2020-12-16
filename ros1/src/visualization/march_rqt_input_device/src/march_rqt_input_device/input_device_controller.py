@@ -4,8 +4,8 @@ import socket
 import rospy
 from std_msgs.msg import Header
 
-from march_shared_resources.msg import Alive, CurrentState, Error, GaitInstruction, GaitInstructionResponse
-from march_shared_resources.srv import PossibleGaits
+from march_shared_msgs.msg import Alive, CurrentState, Error, GaitInstruction, GaitInstructionResponse
+from march_shared_msgs.srv import PossibleGaits
 
 
 class InputDeviceController(object):

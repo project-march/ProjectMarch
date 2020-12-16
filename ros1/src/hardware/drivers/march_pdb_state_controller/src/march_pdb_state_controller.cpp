@@ -12,9 +12,9 @@
 #include <march_hardware/power/high_voltage.h>
 #include <march_hardware/power/low_voltage.h>
 #include <march_hardware_interface/march_pdb_state_interface.h>
-#include <march_shared_resources/HighVoltageNet.h>
-#include <march_shared_resources/LowVoltageNet.h>
-#include <march_shared_resources/PowerDistributionBoardState.h>
+#include <march_shared_msgs/HighVoltageNet.h>
+#include <march_shared_msgs/LowVoltageNet.h>
+#include <march_shared_msgs/PowerDistributionBoardState.h>
 
 namespace march_pdb_state_controller
 {
@@ -40,7 +40,7 @@ bool MarchPdbStateController::init(MarchPdbStateInterface* hw, ros::NodeHandle& 
     this->pdb_state_ = (hw->getHandle(pdb_state_names[0]));
     // realtime publisher
     this->rt_pub_ =
-        std::make_unique<realtime_tools::RealtimePublisher<march_shared_resources::PowerDistributionBoardState>>(
+        std::make_unique<realtime_tools::RealtimePublisher<march_shared_msgs::PowerDistributionBoardState>>(
             root_nh, "/march/pdb/" + pdb_state_names[0], 4);
   }
 
@@ -53,13 +53,13 @@ void MarchPdbStateController::starting(const ros::Time& time)
   this->last_publish_times_ = time;
 }
 
-std::vector<march_shared_resources::HighVoltageNet>
+std::vector<march_shared_msgs::HighVoltageNet>
 MarchPdbStateController::createHighVoltageNetsMessage(march::HighVoltage high_voltage)
 {
-  std::vector<march_shared_resources::HighVoltageNet> high_voltage_net_msgs;
+  std::vector<march_shared_msgs::HighVoltageNet> high_voltage_net_msgs;
   for (size_t i = 1; i < 9; i++)
   {
-    march_shared_resources::HighVoltageNet msg;
+    march_shared_msgs::HighVoltageNet msg;
     msg.name = std::to_string(i);
     msg.operational = high_voltage.getNetOperational(i);
     msg.overcurrent_triggered = high_voltage.getOvercurrentTrigger(i);
@@ -68,13 +68,13 @@ MarchPdbStateController::createHighVoltageNetsMessage(march::HighVoltage high_vo
   return high_voltage_net_msgs;
 }
 
-std::vector<march_shared_resources::LowVoltageNet>
+std::vector<march_shared_msgs::LowVoltageNet>
 MarchPdbStateController::createLowVoltageNetsMessage(march::LowVoltage low_voltage)
 {
-  std::vector<march_shared_resources::LowVoltageNet> low_voltage_net_msgs;
+  std::vector<march_shared_msgs::LowVoltageNet> low_voltage_net_msgs;
   for (size_t i = 1; i < 3; i++)
   {
-    march_shared_resources::LowVoltageNet msg;
+    march_shared_msgs::LowVoltageNet msg;
     msg.name = std::to_string(i);
     msg.operational = low_voltage.getNetOperational(i);
     msg.current = low_voltage.getNetCurrent(i);

@@ -6,8 +6,8 @@
 #include <ros/ros.h>
 #include <sound_play/sound_play.h>
 
-#include <march_shared_resources/Error.h>
-#include <march_shared_resources/GaitInstruction.h>
+#include <march_shared_msgs/Error.h>
+#include <march_shared_msgs/GaitInstruction.h>
 
 class SafetyHandler
 {

@@ -12,7 +12,7 @@
 
   <depend>control_msgs</depend>
   <depend>geometry_msgs</depend>
-  <depend>march_shared_resources</depend>
+  <depend>march_shared_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>std_msgs</depend>
   <depend>tf2_geometry_msgs</depend>

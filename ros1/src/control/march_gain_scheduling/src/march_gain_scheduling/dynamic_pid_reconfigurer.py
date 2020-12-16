@@ -1,7 +1,7 @@
 from dynamic_reconfigure.client import Client
 import rospy
 
-from march_shared_resources.msg import CurrentGait
+from march_shared_msgs.msg import CurrentGait
 
 from .one_step_linear_interpolation import interpolate
 

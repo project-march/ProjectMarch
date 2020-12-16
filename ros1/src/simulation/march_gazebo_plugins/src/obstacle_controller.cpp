@@ -47,7 +47,7 @@ ObstacleController::ObstacleController(physics::ModelPtr model)
   }
 }
 
-void ObstacleController::newSubgait(const march_shared_resources::CurrentGaitConstPtr& msg)
+void ObstacleController::newSubgait(const march_shared_msgs::CurrentGaitConstPtr& msg)
 {
   if (subgait_name_ == "right_open" or subgait_name_ == "right_swing" or
       subgait_name_ == "left_swing")

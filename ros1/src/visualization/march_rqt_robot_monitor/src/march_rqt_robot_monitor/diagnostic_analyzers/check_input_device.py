@@ -16,7 +16,7 @@ class CheckInputDevice(object):
         """
         Update the frequency diagnostics for given input device.
 
-        :type msg: march_shared_resources.msg.Alive
+        :type msg: march_shared_msgs.msg.Alive
         :param msg: Alive message
         """
         if msg.id in self._diagnostics:
