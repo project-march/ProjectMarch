@@ -10,8 +10,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include <march_shared_resources/Alive.h>
-#include <march_shared_resources/Error.h>
+#include <march_shared_msgs/Alive.h>
+#include <march_shared_msgs/Error.h>
 
 class InputDeviceSafety : public SafetyType
 {
@@ -21,7 +21,7 @@ public:
   void update(const ros::Time& now) override;
 
 private:
-  void inputDeviceAliveCallback(const march_shared_resources::AliveConstPtr& msg);
+  void inputDeviceAliveCallback(const march_shared_msgs::AliveConstPtr& msg);
 
   SafetyHandler* safety_handler_;
 

@@ -3,7 +3,7 @@ import ast
 import rospy
 from std_srvs.srv import Trigger
 
-from march_shared_resources.srv import SetGaitVersion
+from march_shared_msgs.srv import SetGaitVersion
 
 from .gait_selection_errors import GaitServiceError, InvalidResponseError
 

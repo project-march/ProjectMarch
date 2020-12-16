@@ -7,7 +7,7 @@ import rospy
 import tf2_ros
 from visualization_msgs.msg import Marker
 
-from march_shared_resources.srv import CapturePointPose
+from march_shared_msgs.srv import CapturePointPose
 
 FRACTION_FALLING_TIME = 0.5
 

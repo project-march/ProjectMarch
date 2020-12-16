@@ -36,7 +36,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>absolute_velocity/0</field>
@@ -49,7 +49,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -87,7 +87,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>absolute_velocity/1</field>
@@ -100,7 +100,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -138,7 +138,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>absolute_velocity/2</field>
@@ -151,7 +151,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -189,7 +189,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>absolute_velocity/3</field>
@@ -202,7 +202,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -240,7 +240,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>absolute_velocity/4</field>
@@ -253,7 +253,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -291,7 +291,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>absolute_velocity/4</field>
@@ -304,7 +304,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -342,7 +342,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>absolute_velocity/6</field>
@@ -355,7 +355,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -393,7 +393,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>absolute_velocity/7</field>
@@ -406,7 +406,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -469,7 +469,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>incremental_velocity/0</field>
@@ -482,7 +482,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -520,7 +520,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>incremental_velocity/1</field>
@@ -533,7 +533,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -571,7 +571,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>incremental_velocity/2</field>
@@ -584,7 +584,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -622,7 +622,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>incremental_velocity/3</field>
@@ -635,7 +635,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -673,7 +673,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>incremental_velocity/4</field>
@@ -686,7 +686,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -724,7 +724,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>incremental_velocity/6</field>
@@ -737,7 +737,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -775,7 +775,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>incremental_velocity/6</field>
@@ -788,7 +788,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -826,7 +826,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>incremental_velocity/7</field>
@@ -839,7 +839,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/imc_states</topic>
-                                    <type>march_shared_resources/ImcState</type>
+                                    <type>march_shared_msgs/ImcState</type>
                                 </y_axis>
                             </axes>
                             <color>

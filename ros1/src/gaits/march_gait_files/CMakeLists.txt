@@ -5,6 +5,9 @@ find_package(catkin REQUIRED)
 
 catkin_package()
 
-install(DIRECTORY airgait-v minimal simulation_only-vi test_versions-vi training-v
+# TEMPORARY SOLUTION, WHEN WE TRANSFER COMPLETELY THIS WILL BE REPLACED
+install(DIRECTORY "../../../../ros2/src/gaits/march_gait_files/"
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+    PATTERN "package.xml" EXCLUDE
+    PATTERN "CMakeLists.txt" EXCLUDE
 )

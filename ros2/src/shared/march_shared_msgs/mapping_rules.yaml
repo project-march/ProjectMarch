@@ -1,5 +1,5 @@
 -
-  ros1_package_name: 'march_shared_resources'
+  ros1_package_name: 'march_shared_msgs'
   ros2_package_name: 'march_shared_msgs'
 -
   ros1_package_name: 'control_msgs'

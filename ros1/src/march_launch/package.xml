@@ -12,18 +12,21 @@
     <buildtool_depend>catkin</buildtool_depend>
 
     <exec_depend>controller_manager</exec_depend>
-    <exec_depend>march_data_collector</exec_depend>
+    <exec_depend>gazebo_ros</exec_depend>
+
     <exec_depend>march_description</exec_depend>
+    <exec_depend>march_simulation</exec_depend>
+    
+    <exec_depend>march_data_collector</exec_depend>
     <exec_depend>march_fake_sensor_data</exec_depend>
     <exec_depend>march_gain_scheduling</exec_depend>
     <exec_depend>march_gait_selection</exec_depend>
-    <exec_depend>gazebo_ros</exec_depend>
     <exec_depend>march_hardware_interface</exec_depend>
     <exec_depend>march_moveit</exec_depend>
     <exec_depend>march_parameter_server</exec_depend>
     <exec_depend>march_rqt_input_device</exec_depend>
     <exec_depend>march_safety</exec_depend>
-    <exec_depend>march_simulation</exec_depend>
+
     <exec_depend>robot_state_publisher</exec_depend>
     <exec_depend>rosserial_python</exec_depend>
     <exec_depend>rviz</exec_depend>

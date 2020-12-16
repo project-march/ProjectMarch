@@ -4,3 +4,9 @@ launch_depend=ignore
 [march_acado_mpc]
 missing_directory = ignore
 missing_file = ignore
+
+[march_gait_files]
+external_directory = ignore
+
+[march_description]
+external_directory = ignore

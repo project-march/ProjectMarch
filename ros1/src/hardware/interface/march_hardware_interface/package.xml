@@ -18,7 +18,7 @@
   <depend>march_description</depend>
   <depend>march_hardware</depend>
   <depend>march_hardware_builder</depend>
-  <depend>march_shared_resources</depend>
+  <depend>march_shared_msgs</depend>
   <depend>realtime_tools</depend>
   <depend>roscpp</depend>
   <depend>std_msgs</depend>
