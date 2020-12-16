@@ -59,7 +59,7 @@
     <node name="rviz" pkg="rviz" type="rviz" if="$(eval not headless and rviz)"/>
 
     <group ns="march">
-        <!--<include file="$(find march_safety)/launch/march_safety.launch"/>-->
+        <include file="$(find march_safety)/launch/march_safety.launch"/>
 
         <node name="sound_play" pkg="sound_play" type="soundplay_node.py" if="$(arg sounds)" output="screen"/>
 
