@@ -36,7 +36,7 @@ catkin_lint:
   stage: lint
   script:
     - cd ros1/
-    - catkin_lint -W1 --strict --config ../.catkin_lint src
+    - catkin_lint -W1 --strict --config ../.catkin_lint src --ignore external_directory
 
 pep8:
   stage: lint
