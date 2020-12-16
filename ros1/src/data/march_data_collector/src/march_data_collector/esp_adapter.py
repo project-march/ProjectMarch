@@ -15,7 +15,7 @@ from sensor_msgs.msg import Imu, Temperature
 from tf.transformations import euler_from_quaternion
 from visualization_msgs.msg import Marker
 
-from march_shared_resources.msg import (AfterLimitJointCommand, CurrentGait, CurrentState, ImcState, JointValues,
+from march_shared_msgs.msg import (AfterLimitJointCommand, CurrentGait, CurrentState, ImcState, JointValues,
                                         PressureSole)
 
 try:
@@ -209,7 +209,7 @@ class ESPAdapter:
     def joint_values_callback(self, data, sources):
         """Callback for trajectory_state data. Converts ROS message to csv string to send to the source window.
 
-        :param data: ROS march_shared_resources.msgs.JointValues
+        :param data: ROS march_shared_msgs.msgs.JointValues
         :param sources: list of source windows in the ESP engine
         """
         actual_positions_str = list_to_str(data.controller_output.actual.positions)
@@ -263,7 +263,7 @@ class ESPAdapter:
     def imc_state_callback(self, data, sources):
         """Callback for IMotionCube data. Converts ROS message to csv string to send to the source window.
 
-        :param data: ROS march_shared_resources.msgs.ImcErrorState message
+        :param data: ROS march_shared_msgs.msgs.ImcErrorState message
         :param sources: list of source windows in the ESP engine
         """
         time_str = get_time_str(data.header.stamp)
@@ -307,7 +307,7 @@ class ESPAdapter:
     def pressure_sole_callback(self, data, sources):
         """Callback for pressure sole data. Converts ROS message to csv string to send to the source window.
 
-        :param data: ROS march_shared_resources.PressureSole message
+        :param data: ROS march_shared_msgs.PressureSole message
         :param sources: list of source windows in the ESP engine
         """
         pressure_left = list_to_str(data.pressure_left)

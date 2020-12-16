@@ -9,7 +9,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <depend>march_shared_resources</depend>
+  <depend>march_shared_msgs</depend>
   <depend>march_shared_classes</depend>
 
   <exec_depend>rospy</exec_depend>

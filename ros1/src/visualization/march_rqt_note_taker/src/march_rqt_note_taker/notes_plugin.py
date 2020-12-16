@@ -7,7 +7,7 @@ import rospkg
 import rospy
 from std_srvs.srv import Trigger
 
-from march_shared_resources.msg import CurrentState
+from march_shared_msgs.msg import CurrentState
 
 from .entry import Entry
 from .entry_model import EntryModel

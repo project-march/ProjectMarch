@@ -2,7 +2,7 @@ import diagnostic_updater
 import rospy
 from sensor_msgs.msg import JointState
 
-from march_shared_resources.msg import Alive
+from march_shared_msgs.msg import Alive
 
 from .diagnostic_analyzers.check_input_device import CheckInputDevice
 from .diagnostic_analyzers.control import CheckJointValues

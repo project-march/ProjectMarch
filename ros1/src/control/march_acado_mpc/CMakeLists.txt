@@ -15,7 +15,7 @@ find_package(catkin REQUIRED
         joint_state_controller
         joint_trajectory_controller
         march_hardware
-        march_shared_resources
+        march_shared_msgs
         pluginlib
         roscpp
         std_msgs
@@ -30,7 +30,7 @@ catkin_package(
     CATKIN_DEPENDS
     control_msgs
     controller_interface
-    march_shared_resources
+    march_shared_msgs
     pluginlib
     roscpp
     std_msgs

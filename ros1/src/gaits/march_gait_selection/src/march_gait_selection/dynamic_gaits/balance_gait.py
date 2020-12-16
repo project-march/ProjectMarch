@@ -8,7 +8,7 @@ from sensor_msgs.msg import JointState
 from std_msgs.msg import Header
 
 from march_gait_selection.state_machine.gait_interface import GaitInterface
-from march_shared_resources.srv import CapturePointPose
+from march_shared_msgs.srv import CapturePointPose
 
 
 class BalanceGait(GaitInterface):

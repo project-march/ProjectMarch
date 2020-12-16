@@ -4,7 +4,7 @@ project(march_safety)
 add_compile_options(-std=c++14 -Wall -Wextra -Werror)
 
 find_package(catkin REQUIRED COMPONENTS
-    march_shared_resources
+    march_shared_msgs
     roscpp
     sensor_msgs
     sound_play
@@ -16,7 +16,7 @@ catkin_package(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
     CATKIN_DEPENDS
-    march_shared_resources
+    march_shared_msgs
     roscpp
     sensor_msgs
     sound_play
