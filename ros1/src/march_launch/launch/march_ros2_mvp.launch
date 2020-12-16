@@ -63,9 +63,9 @@
 
         <node name="sound_play" pkg="sound_play" type="soundplay_node.py" if="$(arg sounds)" output="screen"/>
 
-        <!--<include file="$(find march_gain_scheduling)/launch/march_gain_scheduling.launch" if="$(arg gain_scheduling)">
+        <include file="$(find march_gain_scheduling)/launch/march_gain_scheduling.launch" if="$(arg gain_scheduling)">
             <arg name="configuration" value="$(arg gain_tuning)"/>
-        </include>-->
+        </include>
 
         <!--<include file="$(find march_data_collector)/launch/march_data_collector.launch" if="$(eval data_collector or esp or balance)">
             <arg name="esp" value="$(arg esp)"/>
