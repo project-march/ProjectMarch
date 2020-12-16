@@ -3,7 +3,7 @@ project(march_gazebo_plugins LANGUAGES CXX)
 
 find_package(catkin REQUIRED COMPONENTS
     gazebo_ros
-    march_shared_resources
+    march_shared_msgs
     roscpp
 )
 find_package(gazebo REQUIRED)
@@ -16,7 +16,7 @@ include_directories(
 catkin_package(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME} contact
-    CATKIN_DEPENDS march_shared_resources roscpp
+    CATKIN_DEPENDS march_shared_msgs roscpp
 )
 
 add_library(${PROJECT_NAME}

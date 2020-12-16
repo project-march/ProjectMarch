@@ -4,7 +4,7 @@ project(march_data_collector)
 find_package(catkin REQUIRED COMPONENTS
     control_msgs
     geometry_msgs
-    march_shared_resources
+    march_shared_msgs
     sensor_msgs
     std_msgs
     tf2_geometry_msgs
@@ -17,7 +17,7 @@ catkin_package(
     CATKIN_DEPENDS
     control_msgs
     geometry_msgs
-    march_shared_resources
+    march_shared_msgs
     sensor_msgs
     std_msgs
     tf2_geometry_msgs

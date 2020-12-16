@@ -237,7 +237,7 @@
                                         <type>2</type>
                                     </scale>
                                     <topic>/march/controller/after_limit_joint_command</topic>
-                                    <type>march_shared_resources/AfterLimitJointCommand</type>
+                                    <type>march_shared_msgs/AfterLimitJointCommand</type>
                                 </x_axis>
                                 <y_axis>
                                     <field>effort_command/3</field>
@@ -250,7 +250,7 @@
                                         <type>0</type>
                                     </scale>
                                     <topic>/march/controller/after_limit_joint_command</topic>
-                                    <type>march_shared_resources/AfterLimitJointCommand</type>
+                                    <type>march_shared_msgs/AfterLimitJointCommand</type>
                                 </y_axis>
                             </axes>
                             <color>

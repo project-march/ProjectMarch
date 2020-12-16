@@ -13,7 +13,7 @@ import tf2_ros
 from urdf_parser_py.urdf import URDF
 from visualization_msgs.msg import Marker
 
-from march_shared_resources.msg import JointValues, PressureSole
+from march_shared_msgs.msg import JointValues, PressureSole
 
 
 from .com_calculator import CoMCalculator

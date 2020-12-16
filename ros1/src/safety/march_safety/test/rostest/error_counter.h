@@ -1,5 +1,5 @@
 // Copyright 2019 Project March.
-#include <march_shared_resources/Error.h>
+#include <march_shared_msgs/Error.h>
 
 struct ErrorCounter
 {
@@ -7,7 +7,7 @@ struct ErrorCounter
   {
   }
 
-  void cb(const march_shared_resources::Error&)
+  void cb(const march_shared_msgs::Error&)
   {
     ++count;
   }
