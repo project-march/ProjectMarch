@@ -97,7 +97,7 @@ def generate_launch_description():
         # Fake sensor data
         DeclareLaunchArgument(
             name='fake_sensor_data',
-            default_value='True',
+            default_value='False',
             description='Whether to launch the fake sensor data node.'),
         DeclareLaunchArgument(
             'minimum_fake_temperature',
