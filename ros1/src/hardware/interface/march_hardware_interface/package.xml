@@ -24,7 +24,6 @@
   <depend>std_msgs</depend>
   <depend>urdf</depend>
 
-  <exec_depend>ethercat_grant</exec_depend>
   <exec_depend>robot_state_publisher</exec_depend>
   <exec_depend>xacro</exec_depend>
 
