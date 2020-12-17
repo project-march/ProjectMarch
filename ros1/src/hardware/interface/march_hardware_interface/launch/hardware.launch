@@ -17,7 +17,7 @@
         />
 
         <node
-                launch-prefix="sudo -S"
+                launch-prefix="sudo -S -E"
                 name="hardware_interface"
                 pkg="march_hardware_interface"
                 type="march_hardware_interface_node"
