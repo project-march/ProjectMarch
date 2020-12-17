@@ -1,5 +1,6 @@
 <launch>
     <arg name="gain_scheduling" default="false" doc="Whether to use gain scheduling, which changes PID values based on executed gait."/>
+    <arg name="gait_selection" default="false" doc="Whether to use gait selection in ros1."/>
     <arg name="gain_tuning" default="groundgait" doc="The configuration to use for gain scheduling. Only used when 'gain_scheduling' is true."/>
     <arg name="sounds" default="false" doc="Whether to use sounds."/>
 
@@ -73,7 +74,13 @@
             <arg name="moticon_ip" value="$(arg moticon_ip)"/>
         </include>-->
 
-        <!--<include if="$(arg balance)" file="$(find march_moveit)/launch/march_moveit.launch" />-->
+        <include if="$(arg balance)" file="$(find march_moveit)/launch/march_moveit.launch" />
+
+        <include if="$(arg gait_selection)" file="$(find march_gait_selection)/launch/march_gait_selection.launch">
+            <arg name="gait_directory" value="$(arg gait_directory)"/>
+            <arg name="sounds" value="$(arg sounds)"/>
+        </include>
+
 
         <!--<include file="$(find march_parameter_server)/launch/march_parameter_server.launch" />-->
     </group>
