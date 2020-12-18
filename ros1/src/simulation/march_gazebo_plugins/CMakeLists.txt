@@ -27,7 +27,7 @@ add_library(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${catkin_INCLUDE_DIRS}/${PROJECT_NAME} ${GAZEBO_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${catkin_LIBRARIES})
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_14)
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror)
 
 install(DIRECTORY include/${PROJECT_NAME}/
@@ -49,7 +49,7 @@ add_library(contact
 
 target_include_directories(contact PRIVATE ${catkin_INCLUDE_DIRS}/contact ${GAZEBO_INCLUDE_DIRS})
 target_link_libraries(contact PRIVATE ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES})
-target_compile_features(contact PRIVATE cxx_std_14)
+target_compile_features(contact PRIVATE cxx_std_17)
 target_compile_options(contact PRIVATE -Wall -Wextra -Werror)
 
 install(DIRECTORY include/contact/
