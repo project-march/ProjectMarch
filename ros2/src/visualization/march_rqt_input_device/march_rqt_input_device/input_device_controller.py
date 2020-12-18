@@ -24,9 +24,9 @@ class InputDeviceController(object):
     # Format of the identifier for the alive message
     ID_FORMAT = 'rqt@{machine}@{user}ros2'
 
-    def __init__(self, node, ping):
+    def __init__(self, node):
         self._node = node
-        self._ping = ping
+        self._ping = node.get_parameter('ping_safety_node').get_parameter_value().bool_value
 
         self._instruction_gait_pub = self._node.create_publisher(msg_type=GaitInstruction,
                                                                  topic='/march/input_device/instruction',
