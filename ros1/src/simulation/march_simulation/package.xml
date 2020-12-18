@@ -18,6 +18,7 @@
     <exec_depend>march_description</exec_depend>
     <!--Keeping this a comment for when this package is completely migrated to ROS2-->
     <!--<exec_depend>march_fake_sensor_data</exec_depend>-->
+    <exec_depend>march_gazebo_plugins</exec_depend>
     <exec_depend>robot_state_publisher</exec_depend>
     <exec_depend>rospy</exec_depend>
     <exec_depend>tf2_ros</exec_depend>
