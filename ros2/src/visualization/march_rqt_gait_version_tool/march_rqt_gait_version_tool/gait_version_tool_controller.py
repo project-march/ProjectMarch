@@ -15,7 +15,6 @@ class GaitVersionToolController(object):
         """Base class to communicate with the gait selection node."""
         self._node = node
         self._source_dir = GAIT_SOURCE_DIR
-        node.get_logger().info(str(GAIT_SOURCE_DIR))
         self._get_version_map = node.create_client(
             srv_type=Trigger, srv_name='/march/gait_selection/get_version_map')
         self._get_directory_structure = node.create_client(
