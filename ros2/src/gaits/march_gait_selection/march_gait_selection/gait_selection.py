@@ -51,7 +51,7 @@ class GaitSelection(Node):
         self._robot = self._initial_robot_description() if robot is None else robot
 
         self._robot_description_sub = self.create_subscription(
-            msg_type=String, topic='/robot_description',
+            msg_type=String, topic='/march/robot_description',
             callback=self._update_robot_description_cb,
             qos_profile=10)
 
@@ -65,7 +65,7 @@ class GaitSelection(Node):
         publisher.
         """
         robot_description_client = self.create_client(
-            srv_type=GetParameters, srv_name='/robot_state_publisher/get_parameters')
+            srv_type=GetParameters, srv_name='/march/robot_state_publisher/get_parameters')
         while not robot_description_client.wait_for_service(timeout_sec=2):
             self.get_logger().warn("Robot description is not being published, waiting..")
 
