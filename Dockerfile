@@ -1,4 +1,4 @@
-From ros::foxy-ros1-bridge-focal
+From ros:foxy-ros1-bridge-focal
 
 # Add project to Docker container
 ADD . /projects
