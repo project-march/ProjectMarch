@@ -1,9 +1,5 @@
 From ros:foxy-ros1-bridge-focal
 
-# Add project to Docker container
-ADD . /projects
-WORKDIR /projects
-
 # Install ROS Noetic and Foxy base packages
 RUN apt update && apt install -y ros-noetic-ros-base ros-foxy-ros-base
 
@@ -12,6 +8,10 @@ RUN apt update && apt upgrade -y && apt install -y python3-rosdep python3-rosins
 
 # Install Python linters
 RUN python3 -m pip install pep8-naming flake8-blind-except flake8-string-format flake8-builtins flake8-commas flake8-quotes flake8-print flake8-docstrings flake8-import-order mock autopep8 pydocstyle argcomplete flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings pytest-repeat pytest-rerunfailures pytest
+
+# Add project to Docker container
+ADD . /projects
+WORKDIR /projects
 
 # Install ROS 1 rosdep dependencies
 RUN source /opt/ros/noetic/local_setup.sh && rosdep install -y --from-paths ros1/src --rosdistro noetic --ignore-src && pip install -r requirements.pip
