@@ -10,7 +10,7 @@ from python_qt_binding.QtWidgets import (QFileDialog, QFrame, QHeaderView,
                                          QMessageBox, QShortcut, QWidget)
 import rospkg
 import rospy
-import rviz
+from rviz import bindings as rviz
 from sensor_msgs.msg import JointState
 from tf import (ConnectivityException, ExtrapolationException, LookupException,
                 TransformListener)
