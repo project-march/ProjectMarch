@@ -1,0 +1,4 @@
+scipy==0.19.1
+pyqtgraph==0.11.0
+numpy_ringbuffer==0.2.1
+parameterized==0.7.4
