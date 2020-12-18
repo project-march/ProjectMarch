@@ -13,8 +13,8 @@ public:
   explicit ObstacleController(physics::ModelPtr model);
 
   void newSubgait(const march_shared_msgs::CurrentGaitConstPtr& msg);
-  ignition::math::v4::Vector3<double> GetCom();
-  void update(ignition::math::v4::Vector3<double>& torque_all, ignition::math::v4::Vector3<double>& torque_stable);
+  ignition::math::v6::Vector3<double> GetCom();
+  void update(ignition::math::v6::Vector3<double>& torque_all, ignition::math::v6::Vector3<double>& torque_stable);
   void getGoalPosition(double time_since_start);
 
 protected:

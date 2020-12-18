@@ -48,8 +48,8 @@ void ComControllerPlugin::onRosMsg(const march_shared_msgs::CurrentGaitConstPtr&
 // Called by the world update start event
 void ComControllerPlugin::onUpdate()
 {
-  ignition::math::v4::Vector3<double> torque_left;
-  ignition::math::v4::Vector3<double> torque_right;
+  ignition::math::v6::Vector3<double> torque_left;
+  ignition::math::v6::Vector3<double> torque_right;
 
   controller_->update(torque_left, torque_right);
 
