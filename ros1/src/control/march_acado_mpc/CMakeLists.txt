@@ -52,7 +52,7 @@ endif()
 
 # Define a variable that points to the location of the ACADO. This
 # location is chosen by FetchContent_Declare.
-set(ACADO_DIR "${PROJECT_BINARY_DIR}/_deps/acado-solver-src")
+set(ACADO_DIR "${PROJECT_BINARY_DIR}/_deps/acado-solver-src/mpc_export")
 
 # Create a list of all source files in the ACADO directory and store it
 # in ACADO_SRCS.
