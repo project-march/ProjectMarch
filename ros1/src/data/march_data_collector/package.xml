@@ -3,8 +3,8 @@
 <package format="3">
   <name>march_data_collector</name>
   <version>0.0.0</version>
-  <description>Collecting data for further processing including sending to an Events Stream Processing engine</description>
-  <maintainer email="software@projectmarch.nl">rutger</maintainer>
+  <description>Collecting data for further processing including calculating the CoM and the Capture point</description>
+  <maintainer email="software@projectmarch.nl">Project March</maintainer>
   <license>TODO</license>
 
   <buildtool_depend>catkin</buildtool_depend>
