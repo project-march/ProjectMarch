@@ -1,13 +1,26 @@
-// Copyright 2018 Project March.
+// Copyright 2020 Project March.
 
-#include "ros/ros.h"
-#include "sensor_msgs/Temperature.h"
-#include <boost/algorithm/string.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <dynamic_reconfigure/server.h>
-#include <random>
+#include "rclcpp/rclcpp.hpp"
+#include "rclcpp/node.hpp"
+#include "rclcpp/publisher.hpp"
+#include "rclcpp/qos.hpp"
+#include "rclcpp/timer.hpp"
+#include "march_fake_sensor_data/FakeTemperatureData.hpp"
+#include "march_fake_sensor_data/UniformDistribution.hpp"
+#include "march_shared_msgs/srv/get_param_string_list.hpp"
+#include <chrono>
+#include <deque>
+#include <vector>
+#include <stdexcept>
+#include <string>
 
-#include <march_fake_sensor_data/TemperaturesConfig.h>
+using namespace std::chrono_literals;
+
+const int DEFAULT_MINIMUM_TEMPERATURE { 0 };
+const int DEFAULT_MAXIMUM_TEMPERATURE { 0 };
+const std::string MINIMUM_TEMPERATURE_PARAMETER_NAME { "minimum_temperature" };
+const std::string MAXIMUM_TEMPERATURE_PARAMETER_NAME { "maximum_temperature" };
+const std::string LOGGER_NAME { "fake_temperature" };
 
 /**
  * @file FakeTemperatureData.cpp
@@ -17,157 +30,179 @@
  * temperatures to make the temperature less jittery.
  */
 
-int min_temperature;
-int max_temperature;
-std::vector<std::string> sensor_names;
-std::vector<ros::Publisher> temperature_publishers;
-
-// Store the 7 most recent generated temperatures so we can take the weighted
-// average of them when we publish.
-std::vector<int> latest_temperatures;
-
-// The weights of the autoregression, the most recent temperature has the
-// highest weight.
-std::vector<float> ar_values;
-
-// Calculate the weighted average of the latest_temperatures
-double calculateArTemperature(std::vector<int> temperatures, std::vector<float> ar_values)
-{
-  double res = 0;
-  for (unsigned int i = 0; i < temperatures.size(); i++)
-  {
-    res += temperatures.at(i) * ar_values.at(i);
-  }
-  return res;
-}
-
 /**
- * This callback is called when parameters from the config file are changed
- * during run-time. This method updates the local values which depend on these
- * parameters to make ensure the values are not out-of-date.
- * @param config the config file with all the parameters
- * @param level A bitmask
+ * @param node_name The name that this node will take in ROS.
+ * @param autoregression_weights A list of weights that will determine which previous
+ * temperature values weigh the most in the calculation of new temperatures.
  */
-void temperatureConfigCallback(march_fake_sensor_data::TemperaturesConfig& config, uint32_t /* level */)
+FakeTemperatureDataNode::FakeTemperatureDataNode(const std::string& node_name, const std::vector<float>&& autoregression_weights):
+    Node(node_name, rclcpp::NodeOptions()
+                      .automatically_declare_parameters_from_overrides(true)),
+    latest_temperatures { std::deque<int>(autoregression_weights.size()) },
+    autoregression_weights { std::move(autoregression_weights) },
+    minimum_temperature { DEFAULT_MINIMUM_TEMPERATURE },
+    maximum_temperature { DEFAULT_MAXIMUM_TEMPERATURE },
+    distribution { minimum_temperature, maximum_temperature }
 {
-  // Make sure there is always a possible interval between min and max
-  // temperature.
-  if (config.min_temperature >= config.max_temperature)
-  {
-    config.max_temperature = config.min_temperature + 1;
-  }
-  min_temperature = config.min_temperature;
-  max_temperature = config.max_temperature;
+    this->get_parameter(
+      MINIMUM_TEMPERATURE_PARAMETER_NAME, minimum_temperature);
+    this->get_parameter(
+      MAXIMUM_TEMPERATURE_PARAMETER_NAME, maximum_temperature);
+    set_range(minimum_temperature, maximum_temperature);
+    // Register a callback that will be called whenever the parameters of this Node
+    // are updated. The callback changes the internal state to reflect the new
+    // values of the parameters.
+    parameter_callback = this->add_on_set_parameters_callback(std::bind(&FakeTemperatureDataNode::update_parameters, this, std::placeholders::_1));
 }
 
-/**
- * @brief Generate number between start and end
- * @param start Lowest number
- * @param end Highest number
- * @return The Random number
- */
-int randBetween(int start, int end)
+void FakeTemperatureDataNode::initialize()
 {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<> dis(start, end);
-  return dis(gen);
-}
-
-/**
- * Publish a random temperature within the boundaries of the min and max
- * parameters
- * @param temperature_pub publish the temperature message with this publisher
- */
-void publishTemperature(const ros::Publisher& temperature_pub)
-{
-  int random_temperature = randBetween(min_temperature, max_temperature);
-
-  // Update the vector with the latest temperatures by removing the first entry
-  // and adding a new one.
-  latest_temperatures.erase(latest_temperatures.begin());
-  latest_temperatures.push_back(random_temperature);
-
-  double current_temperature = calculateArTemperature(latest_temperatures, ar_values);
-  sensor_msgs::Temperature msg;
-  msg.temperature = current_temperature;
-  msg.header.stamp = ros::Time::now();
-  temperature_pub.publish(msg);
-}
-
-/**
- * @brief Combine the base topic name with sensor name.
- * @param base Leading part of the topic
- * @param name Name of the sensor
- * @return Full topic name
- */
-std::string createTopicName(const char* base, const char* name)
-{
-  char slash[] = "/";
-  // The buffer needs more space then the final string length.
-  int extra_buffer_size = 100;
-  const int kArraySize = static_cast<const int>(strlen(base) + strlen(slash) + strlen(name) + extra_buffer_size);
-  // Create a char array of the combined size of all three parts
-  char full_topic[kArraySize];
-  int error_code = snprintf(full_topic, kArraySize, "%s%s%s", base, slash, name);
-  if (error_code < 0 || error_code > kArraySize)
-  {
-    ROS_ERROR("Error creating topic %s (error code %d)", full_topic, error_code);
-  }
-  return full_topic;
-}
-
-int main(int argc, char** argv)
-{
-  ros::init(argc, argv, "march_fake_sensor_data");
-  ros::NodeHandle n;
-  ros::Rate rate(10);
-
-  ros::param::get("~min_temperature", min_temperature);
-  ros::param::get("~max_temperature", max_temperature);
-
-  int count = 0;
-  while (!n.hasParam("/march/joint_names"))
-  {
-    ros::Duration(0.5).sleep();
-    count++;
-    if (count > 10)
-    {
-      ROS_ERROR("Failed to read the joint_names from the parameter server.");
-      throw std::runtime_error("Failed to read the joint_names from the parameter server.");
-    }
-  }
-
-  n.getParam("/march/joint_names", sensor_names);
-
-  // Initialise autoregression variables.
-  latest_temperatures = { 0, 0, 0, 0, 0, 0, 0 };
-  ar_values = { 0.1, 0.1, 0.1, 0.15, 0.15, 0.2, 0.2 };
-
-  // Create a publisher for each sensor
-  for (std::string sensor_name : sensor_names)
-  {
-    ros::Publisher temperature_pub =
-        n.advertise<sensor_msgs::Temperature>(createTopicName("/march/temperature", sensor_name.c_str()), 1000);
-    temperature_publishers.push_back(temperature_pub);
-  }
-
-  // Make the temperature values dynamic reconfigurable
-  dynamic_reconfigure::Server<march_fake_sensor_data::TemperaturesConfig> server;
-  dynamic_reconfigure::Server<march_fake_sensor_data::TemperaturesConfig>::CallbackType f;
-  server.setCallback(boost::bind(&temperatureConfigCallback, _1, _2));
-
-  while (ros::ok())
-  {
-    // Loop through all publishers
-    for (ros::Publisher temperature_pub : temperature_publishers)
-    {
-      publishTemperature(temperature_pub);
+    // Create a temperature publisher for all the different joints.
+    for (auto sensor : get_joint_names()) {
+        add_temperature_publisher(sensor);
     }
 
-    rate.sleep();
-    ros::spinOnce();
-  }
+    // Ensure that new fake temperatures are published every 100 ms.
+    timer = this->create_wall_timer(100ms, std::bind(&FakeTemperatureDataNode::timer_callback, this));
+}
 
-  return 0;
+std::vector<std::string> FakeTemperatureDataNode::get_joint_names()
+{
+    std::vector<std::string> names;
+
+    // This is a temporary solution until a joint names service is
+    // available in ROS 2.
+    // TODO: rewrite this function to use a ROS 2 service for the joint names
+    auto client = this->create_client<march_shared_msgs::srv::GetParamStringList>("/march/parameter_server/get_param_string_list");
+    auto request = std::make_shared<march_shared_msgs::srv::GetParamStringList::Request>();
+    request->name = std::string("joint_names");
+
+    // Wait until the service is available. Sending a request to an unavailable service
+    // will always fail.
+    while (!client->wait_for_service(5s)) {
+        if (!rclcpp::ok()) {
+            RCLCPP_ERROR(rclcpp::get_logger(LOGGER_NAME), "Interrupted while waiting for parameter_server service. Exiting.");
+            return names;
+        }
+        RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "The ROS 1 to ROS 2 parameter_server service is not available, waiting again...");
+    }
+
+    // Send the request and push the received names to the names vector.
+    auto result = client->async_send_request(request);
+    if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), result) == rclcpp::FutureReturnCode::SUCCESS) {
+        for (auto joint_name : result.get()->value) {
+            names.push_back(joint_name);
+        }
+    } else {
+        RCLCPP_ERROR(rclcpp::get_logger(LOGGER_NAME), "Failed to call ROS 1 to ROS 2 parameter_server get joint names service");
+    }
+
+    return names;
+}
+
+/*
+ * @brief Whenever a parameter is changed, the interal state should also change
+ * @param parameters Specify the new state of the parameters.
+ * @details In ROS 1, this was done with "dynamic_reconfigure". Because ROS 2
+ *          has native support for dynamically reconfiguring parameters, this
+ *          is done like this.
+ */
+rcl_interfaces::msg::SetParametersResult
+FakeTemperatureDataNode::update_parameters(const std::vector<rclcpp::Parameter> & parameters)
+{
+    rcl_interfaces::msg::SetParametersResult result;
+    result.successful = true;
+    for (const auto & parameter : parameters) {
+        if (parameter.get_name() == MINIMUM_TEMPERATURE_PARAMETER_NAME) {
+            minimum_temperature = parameter.get_value<int>();
+            set_range(minimum_temperature, maximum_temperature);
+        }
+        if (parameter.get_name() == MAXIMUM_TEMPERATURE_PARAMETER_NAME) {
+            maximum_temperature = parameter.get_value<int>();
+            set_range(minimum_temperature, maximum_temperature);
+        }
+    }
+    return result;
+}
+
+/**
+ * @brief Called whenever the main timer goes off.
+ */
+void FakeTemperatureDataNode::timer_callback()
+{
+    publish_temperatures();
+}
+
+/**
+ * @brief Calculate the weighted average of the last random temperatures
+ * to avoid jitter.
+ * @return A temperature based on the weighted average.
+ */
+double FakeTemperatureDataNode::calculate_autoregression_temperature() const
+{
+    double result {0};
+    int index {0};
+    for (auto temperature : latest_temperatures) {
+        result += temperature * autoregression_weights.at(index);
+        index += 1;
+    }
+    return result;
+}
+
+/**
+ * @brief The range in which new random temperature will be generated.
+ * @param minimum_temperature The minimum value (inclusive)
+ * @param maximum_temperature The maximum value (inclusive)
+ */
+void FakeTemperatureDataNode::set_range(int minimum_temperature, int maximum_temperature)
+{
+    distribution.set_range(minimum_temperature, maximum_temperature);
+}
+
+/**
+ * @brief Add a sensor whose fake temperature will be published on the
+ * "/march/temperature/<sensor_name>" topic.
+ * @param sensor_name The name of the sensor.
+ */
+void FakeTemperatureDataNode::add_temperature_publisher(const std::string& sensor_name)
+{
+    if(sensor_name.empty()) {
+        throw std::invalid_argument("Sensor name cannot be empty");
+    }
+    std::string topic_name = std::string("/march/temperature/") + sensor_name;
+    // This is not an important topic, therefore it has lenient QoS settings:
+    // - keep only the last sample
+    // - attempt to deliver samples, but may lose them if the network is not robust
+    //   (best effort)
+    // - no attempt is made to persist samples (volatile)
+    auto qos = rclcpp::QoS(1).best_effort().durability_volatile();
+    auto publisher = this->create_publisher<MessageType>(topic_name, qos);
+    temperature_publishers.push_back(publisher);
+}
+
+/**
+ * @brief Publish a fake temperature to all the registered temperature publishers.
+ */
+void FakeTemperatureDataNode::publish_temperatures()
+{
+    for (auto publisher : temperature_publishers) {
+        generate_new_temperature();
+
+        MessageType message;
+        message.temperature = calculate_autoregression_temperature();
+        message.header.stamp = this->now();
+        publisher->publish(message);
+    }
+}
+
+/**
+ * @brief Generate a new pseudo random temperature and add it to the list of latest
+ * temperatures.
+ */
+void FakeTemperatureDataNode::generate_new_temperature()
+{
+    // "Cycle" through the previous randomly generated temperatures by removing the
+    // oldest in the queue and adding a new random number to back of the queue.
+    latest_temperatures.pop_front();
+    latest_temperatures.push_back(distribution.get_random_number());
 }
