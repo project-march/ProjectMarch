@@ -5,12 +5,16 @@ from std_srvs.srv import Trigger
 from march_shared_msgs.srv import SetGaitVersion
 from .gait_version_tool_errors import InvalidResponseError
 
+# Go directories up until you reach the ros2/ folder, then navigate to the
+# march_gait_files package source
+GAIT_SOURCE_DIR = os.path.join(os.path.dirname(__file__), '..', '..', '..',
+                               '..', '..', '..', 'src', 'gaits', 'march_gait_files')
 
 class GaitVersionToolController(object):
-    def __init__(self, node, source_dir):
+    def __init__(self, node):
         """Base class to communicate with the gait selection node."""
         self._node = node
-        self._source_dir = source_dir
+        self._source_dir = GAIT_SOURCE_DIR
         self._get_version_map = node.create_client(
             srv_type=Trigger, srv_name='/march/gait_selection/get_version_map')
         self._get_directory_structure = node.create_client(
@@ -73,11 +77,7 @@ class GaitVersionToolController(object):
         """Save the current gait version map in the gait selection node as a default."""
         self.wait_for_service(self._get_default_dict)
 
-        # Temporary solution to find the march_gait_files source to change the
-        # default versions, this should be changed when march_gait_files is migrated
-        file_path = os.path.join(os.path.dirname(self._source_dir), 'ros1',
-                                 'src', 'gaits', 'march_gait_files',
-                                 self._gait_directory, 'default.yaml')
+        file_path = os.path.join(GAIT_SOURCE_DIR, self._gait_directory, 'default.yaml')
         new_default_dict = dict(ast.literal_eval(
             self._get_default_dict.call(Trigger.Request()).message))
 
