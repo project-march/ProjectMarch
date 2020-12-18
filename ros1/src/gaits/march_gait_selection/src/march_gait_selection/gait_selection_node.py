@@ -5,7 +5,7 @@ from urdf_parser_py import urdf
 
 from march_shared_msgs.msg import CurrentGait, CurrentState, Error
 from march_shared_msgs.srv import (ContainsGait, ContainsGaitResponse, PossibleGaits, PossibleGaitsResponse,
-                                        SetGaitVersion)
+                                   SetGaitVersion)
 
 from .dynamic_gaits.balance_gait import BalanceGait
 from .gait_selection import GaitSelection
