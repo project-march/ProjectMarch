@@ -9,18 +9,21 @@ RUN apt update && apt upgrade -y && apt install -y python3-rosdep python3-rosins
 # Install Python linters
 RUN python3 -m pip install pep8-naming flake8-blind-except flake8-string-format flake8-builtins flake8-commas flake8-quotes flake8-print flake8-docstrings flake8-import-order mock autopep8 pydocstyle argcomplete flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings pytest-repeat pytest-rerunfailures pytest
 
+# Update rosdep
+RUN rosdep update
+
 # Add project to Docker container
 ADD . /projects
 WORKDIR /projects
 
 # Install ROS 1 rosdep dependencies
-RUN source /opt/ros/noetic/local_setup.sh && rosdep install -y --from-paths ros1/src --rosdistro noetic --ignore-src && pip install -r requirements.pip
+RUN bash -c "source /opt/ros/noetic/local_setup.bash && rosdep install -y --from-paths ros1/src --rosdistro noetic --ignore-src" && pip install -r requirements.pip
 
 # Install additional dependencies that are not available the standard way
-RUN mkdir /ros2_foxy && mkdir /ros2_foxy/src && cd /ros2_foxy && vcs import src < ros2_dependencies.repos && source /opt/ros/foxy/local_setup.sh && colcon build
+RUN mkdir /ros2_foxy && mkdir /ros2_foxy/src && cd /ros2_foxy && vcs import src < ros2_dependencies.repos && bash -c "source /opt/ros/foxy/local_setup.bash && colcon build"
 
 # Install ROS 2 rosdep dependencies
-RUN source /opt/ros/foxy/local_setup.sh && source /ros2_foxy/install/local_setup.sh && rosdep install -y --from-paths ros2/src --rosdistro foxy --ignore-src && pip install -r requirements.pip
+RUN bash -c "source /opt/ros/foxy/local_setup.bash && source /ros2_foxy/install/local_setup.bash && rosdep install -y --from-paths ros2/src --rosdistro foxy --ignore-src" && pip install -r requirements.pip
 
 # Remove project files from container
 RUN rm -rf /projects
