@@ -39,7 +39,7 @@
 
 <!-- ROS1 Gait selection        -->
     <arg name="sounds" default="true" doc="Whether to use sounds."/>
-    <arg name="gait_selection" default="false" docs="Whether to start the ros1 gait selection"/>
+    <arg name="gait_selection" default="false" doc="Whether to start the ros1 gait selection"/>
     <arg name="gait_directory" default="training-v" doc="Gait files directory to use"/>
 
 <!-- Check arguments-->
@@ -85,14 +85,14 @@
             <arg name="moticon_ip" value="$(arg moticon_ip)"/>
         </include>
 
+
 <!-- Bridge -->
         <include file="$(find march_parameter_server)/launch/march_parameter_server.launch" />
 
 
 <!-- ROS1 Gait selection    -->
         <node name="sound_play" pkg="sound_play" type="soundplay_node.py" if="$(eval sounds and gait_selection)" output="screen"/>
-
-        <include file="$(find march_gait_selection)/launch/march_gait_selection.launch" if="$(arg gait_selection)>
+        <include file="$(find march_gait_selection)/launch/march_gait_selection.launch" if="$(arg gait_selection)">
             <arg name="gait_directory" value="$(arg gait_directory)"/>
             <arg name="sounds" value="$(arg sounds)"/>
         </include>

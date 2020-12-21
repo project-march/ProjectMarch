@@ -9,7 +9,7 @@
     <arg name="gain_tuning" default="groundgait" doc="The configuration to use for gain scheduling. Only used when 'gain_scheduling' is true."/>
 
 <!-- Simulation only            -->
-    <arg name="rviz" default="false" doc="Launches RViz."/>
+    <arg name="rviz" default="true" doc="Launches RViz."/>
     <arg name="gazebo_ui" default="false" doc="Launches the Gazebo UI."/>
 
     <arg name="balance" default="false" doc="Uses the dynamic balance gaits instead of the predefined gaits."/>
@@ -29,7 +29,7 @@
 
 <!-- ROS1 Gait selection        -->
     <arg name="sounds" default="true" doc="Whether to use sounds."/>
-    <arg name="gait_selection" default="false" docs="Whether to start the ros1 gait selection"/>
+    <arg name="gait_selection" default="false" doc="Whether to start the ros1 gait selection"/>
     <arg name="gait_directory" default="minimal" doc="Gait files directory to use"/>
 
 <!-- Pass everything to march.launch -->
