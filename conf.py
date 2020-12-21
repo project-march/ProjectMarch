@@ -25,9 +25,9 @@ copyright = '2020, Project March'
 # built documents.
 #
 # The short X.Y version.
-version = 'Melodic'
+version = 'Noetic'
 # The full version, including alpha/beta/rc tags.
-release = 'Melodic'
+release = 'Noetic'
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'default'
