@@ -1,0 +1,18 @@
+knee:
+  lower_limit:
+  upper_limit:
+  lower_soft_buffer:
+  upper_soft_buffer:
+  k_position:
+  k_velocity:
+  max_effort:
+  max_velocity:
+hfe:
+  lower_limit:
+  upper_limit:
+  lower_soft_buffer:
+  upper_soft_buffer:
+  k_position:
+  k_velocity:
+  max_effort:
+  max_velocity:
