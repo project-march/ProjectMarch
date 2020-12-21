@@ -12,6 +12,7 @@
   <depend>control_msgs</depend>
   <depend>std_msgs</depend>
   <depend>march_shared_msgs</depend>
+  <depend>gazebo_msgs</depend>
 
   <exec_depend>actionlib_msgs</exec_depend>
   <exec_depend>march_description</exec_depend>
