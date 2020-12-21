@@ -1,32 +1,38 @@
 <launch>
-    <arg name="gain_scheduling" default="false" doc="Whether to use gain scheduling, which changes PID values based on executed gait."/>
-    <arg name="gain_tuning" default="groundgait" doc="The configuration to use for gain scheduling. Only used when 'gain_scheduling' is true."/>
-    <arg name="sounds" default="false" doc="Whether to use sounds."/>
-
-    <arg name="rviz" default="true" doc="Launches RViz."/>
-    <arg name="rqt_input" default="true" doc="Launches the rqt input device."/>
-    <arg name="gazebo_ui" default="false" doc="Launches the Gazebo UI."/>
-
-    <arg name="balance" default="false" doc="Uses the dynamic balance gaits instead of the predefined gaits."/>
-    <arg name="data_collector" default="false" doc="Launches the data collector when true."/>
-
-    <arg name="ground_gait" default="$(arg balance)" doc="Exoskeleton will ground gait in gazebo_ui if true."/>
-    <arg name="fixed" default="$(eval not ground_gait)" doc="Fixes the exoskeleton in the world in rviz"/>
-    <arg name="obstacle" default="none" doc="Obstacle to load in the simulation."/>
-
-    <arg name="gait_directory" default="minimal" doc="Gait files directory to use"/>
-
-    <arg name="input_device" default="false" doc="Launches ros serial node to connect with input device."/>
-
-    <arg name="rosbag" default="false" doc="Enables rosbag record node."/>
-
+<!-- General                    -->
     <arg name="robot" default="march4" doc="Robot to use."/>
     <arg name="robot_description" default="$(arg robot)" doc="URDF file to use"/>
     <arg name="controller_type" default="effort_control" doc="Changes the controller used by simulation."/>
     <arg name="controller_name" default="$(arg robot)" doc="Name of the controller"/>
 
-    <param name="balance" value="$(arg balance)"/>
+    <arg name="gain_scheduling" default="true" doc="Whether to use gain scheduling, which changes PID values based on executed gait."/>
+    <arg name="gain_tuning" default="groundgait" doc="The configuration to use for gain scheduling. Only used when 'gain_scheduling' is true."/>
 
+<!-- Simulation only            -->
+    <arg name="rviz" default="false" doc="Launches RViz."/>
+    <arg name="gazebo_ui" default="false" doc="Launches the Gazebo UI."/>
+
+    <arg name="balance" default="false" doc="Uses the dynamic balance gaits instead of the predefined gaits."/>
+    <arg name="ground_gait" default="$(arg balance)" doc="Exoskeleton will ground gait in gazebo_ui if true."/>
+    <arg name="obstacle" default="none" doc="Obstacle to load in the simulation."/>
+    <arg name="fixed" default="$(eval not balance)" doc="Fixes the exoskeleton in the world in rviz"/>
+
+
+<!-- Hardware                   -->
+    <arg name="input_device" default="false" doc="Launches ros serial node to connect with input device."/>
+
+<!-- Data                       -->
+    <arg name="rosbag" default="false" doc="Enables rosbag record node."/>
+    <arg name="bag_prefix" default="log" doc="Prefix of the bag file. Only used if rosbag is true."/>
+
+    <arg name="data_collector" default="false" doc="Launches the data collector when true."/>
+
+<!-- ROS1 Gait selection        -->
+    <arg name="sounds" default="true" doc="Whether to use sounds."/>
+    <arg name="gait_selection" default="false" docs="Whether to start the ros1 gait selection"/>
+    <arg name="gait_directory" default="minimal" doc="Gait files directory to use"/>
+
+<!-- Pass everything to march.launch -->
     <include file="$(dirname)/march.launch" pass_all_args="true">
         <arg name="configuration" value="simulation"/>
     </include>
