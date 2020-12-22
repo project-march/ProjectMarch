@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<robot  xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="frame_part"
+                 params="name side length width direction collision_origin visual_origin:=0 mesh:=0 com:=0 mass:=0 inertia:=0">
+        <xacro:if value="${direction == 'x'}">
+            <xacro:property name="size" value="${length} ${width} ${width}"/>
+            <xacro:property name="rpy" value="0 0 0"/>
+        </xacro:if>
+        <xacro:if value="${direction == 'y'}">
+            <xacro:property name="size" value="${width} ${length} ${width}"/>
+            <xacro:property name="rpy" value="0 0 ${pi}"/>
+        </xacro:if>
+        <xacro:if value="${direction == 'z'}">
+            <xacro:property name="size" value="${width} ${width} ${length}"/>
+            <xacro:property name="rpy" value="0 0 ${pi}"/>
+        </xacro:if>
+
+        <link name="${name}">
+            <xacro:unless value="${visual_origin == 0}">
+                <visual>
+                    <origin xyz="${visual_origin}" rpy="${rpy}"/>
+                    <geometry>
+                        <mesh filename="package://march_description/urdf/stl-files/${mesh}" scale="1 1 1"/>
+                    </geometry>
+                    <material name="blue"/>
+                </visual>
+            </xacro:unless>
+
+            <xacro:unless value="${inertia == 0}">
+                <inertial>
+                    <origin xyz="${com}" rpy="0 0 0"/>
+                    <mass value="${mass}"/>
+                    <xacro:if value="${side == 'right'}">
+                        <inertia
+                                ixx="${inertia['xx']}"
+                                ixy="${inertia['xy']}"
+                                ixz="${inertia['xz']}"
+                                iyy="${inertia['yy']}"
+                                iyz="${inertia['yz']}"
+                                izz="${inertia['zz']}" />
+                    </xacro:if>
+
+                    <xacro:if value="${side == 'left'}">
+                        <inertia
+                                ixx="${inertia['xx']}"
+                                ixy="${-inertia['xy']}"
+                                ixz="${inertia['xz']}"
+                                iyy="${inertia['yy']}"
+                                iyz="${-inertia['yz']}"
+                                izz="${inertia['zz']}" />
+                    </xacro:if>
+                </inertial>
+            </xacro:unless>
+
+            <collision>
+                <origin xyz="${collision_origin}" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${size}"/>
+                </geometry>
+            </collision>
+        </link>
+    </xacro:macro>
+</robot>
+

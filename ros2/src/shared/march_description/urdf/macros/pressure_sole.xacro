@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<robot  xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="pressure_sole"
+                 params="side parent">
+        <gazebo reference="${parent}">
+            <sensor name="${parent}_contact" type="contact">
+                <plugin name="contact_plugin" filename="libcontact.so"/>
+                <contact>
+                    <collision name="ankle_plate_left_fixed_joint_lump__foot_left_collision_1"/>
+                </contact>
+                <update_rate>30</update_rate>
+                <always_on>true</always_on>
+            </sensor>
+            <sensor name="left_pressure_sole" type="contact">
+                <always_on>true</always_on>
+                <contact>
+                    <collision>ankle_plate_left_fixed_joint_lump__foot_left_collision_1</collision>
+                </contact>
+                <plugin name="left_foot_plugin" filename="libgazebo_ros_bumper.so">
+                    <bumperTopicName>march/sensor/left_pressure_sole</bumperTopicName>
+                    <frameName>world</frameName>
+                </plugin>
+            </sensor>
+        </gazebo>
+    </xacro:macro>
+</robot>
