@@ -1,26 +1,32 @@
 <?xml version="1.0"?>
 <robot  xmlns:xacro="http://www.ros.org/wiki/xacro">
     <xacro:macro name="pressure_sole"
-                 params="side parent">
-        <gazebo reference="${parent}">
-            <sensor name="${parent}_contact" type="contact">
-                <plugin name="contact_plugin" filename="libcontact.so"/>
-                <contact>
-                    <collision name="ankle_plate_left_fixed_joint_lump__foot_left_collision_1"/>
-                </contact>
-                <update_rate>30</update_rate>
+                 params="side foot_name">
+
+        <link name="pressure_sole_${side}">
+            <collision>
+                <origin xyz="${(-foot_height_forward+foot_height_backward)/2} 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${foot_height_forward+foot_height_backward} ${width} 0.001"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <gazebo reference="pressure_sole_${side}">
+            <sensor name="pressure_sole_${side}" type="contact">
                 <always_on>true</always_on>
-            </sensor>
-            <sensor name="left_pressure_sole" type="contact">
-                <always_on>true</always_on>
-                <contact>
-                    <collision>ankle_plate_left_fixed_joint_lump__foot_left_collision_1</collision>
-                </contact>
-                <plugin name="left_foot_plugin" filename="libgazebo_ros_bumper.so">
-                    <bumperTopicName>march/sensor/left_pressure_sole</bumperTopicName>
+                <contact collision="ankle_plate_${side}_fixed_joint_lump__pressure_sole_${side}_collision_2"/>
+                <plugin name="pressure_sole_plugin_${side}" filename="libgazebo_ros_bumper.so">
+                    <bumperTopicName>/march/sensor/right_pressure_sole</bumperTopicName>
                     <frameName>world</frameName>
                 </plugin>
             </sensor>
-        </gazebo>
+        </gazebo>`
+
+        <joint name="pressure_sole_${side}_joint" type="fixed">
+            <parent link="${foot_name}"/>
+            <child link="pressure_sole_${side}"/>
+            <origin xyz="0 0 ${-(width/2)}" rpy="0 0 0"/>
+        </joint>
     </xacro:macro>
 </robot>
