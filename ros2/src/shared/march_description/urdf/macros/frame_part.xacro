@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot  xmlns:xacro="http://www.ros.org/wiki/xacro">
     <xacro:macro name="frame_part"
-                 params="name side length width direction collision_origin visual_origin:=0 mesh:=0 com:=0 mass:=0 inertia:=0">
+                 params="name side length direction collision_origin visual_origin:=0 mesh:=0 com:=0 mass:=0 inertia:=0 scale:='1 1 1'">
         <xacro:if value="${direction == 'x'}">
             <xacro:property name="size" value="${length} ${width} ${width}"/>
             <xacro:property name="rpy" value="0 0 0"/>
@@ -20,7 +20,7 @@
                 <visual>
                     <origin xyz="${visual_origin}" rpy="${rpy}"/>
                     <geometry>
-                        <mesh filename="package://march_description/urdf/stl-files/${mesh}" scale="1 1 1"/>
+                        <mesh filename="package://march_description/urdf/stl-files/${mesh}" scale="${scale}"/>
                     </geometry>
                     <material name="blue"/>
                 </visual>
