@@ -1,17 +1,20 @@
 <?xml version="1.0"?>
 <robot  xmlns:xacro="http://www.ros.org/wiki/xacro">
     <xacro:macro name="frame_part"
-                 params="name side length direction collision_origin visual_origin:=0 mesh:=0 com:=0 mass:=0 inertia:=0 scale:='1 1 1'">
+                 params="name reflect length direction collision_origin visual_origin:=0 mesh:=0 com:=0 mass:=0 inertia:=0 scale:='1 1 1'">
         <xacro:if value="${direction == 'x'}">
             <xacro:property name="size" value="${length} ${width} ${width}"/>
+<!--            <xacro:property name="collision_origin" value="${-length/2} ${width} ${width}"/>-->
             <xacro:property name="rpy" value="0 0 0"/>
         </xacro:if>
         <xacro:if value="${direction == 'y'}">
             <xacro:property name="size" value="${width} ${length} ${width}"/>
+<!--            <xacro:property name="collision_origin" value="${-length/2} ${width} ${width}"/>-->
             <xacro:property name="rpy" value="0 0 ${pi}"/>
         </xacro:if>
         <xacro:if value="${direction == 'z'}">
             <xacro:property name="size" value="${width} ${width} ${length}"/>
+<!--            <xacro:property name="collision_origin" value="${-length/2} ${width} ${width}"/>-->
             <xacro:property name="rpy" value="0 0 ${pi}"/>
         </xacro:if>
 
@@ -30,25 +33,13 @@
                 <inertial>
                     <origin xyz="${com}" rpy="0 0 0"/>
                     <mass value="${mass}"/>
-                    <xacro:if value="${side == 'right'}">
-                        <inertia
-                                ixx="${inertia['xx']}"
-                                ixy="${inertia['xy']}"
-                                ixz="${inertia['xz']}"
-                                iyy="${inertia['yy']}"
-                                iyz="${inertia['yz']}"
-                                izz="${inertia['zz']}" />
-                    </xacro:if>
-
-                    <xacro:if value="${side == 'left'}">
-                        <inertia
-                                ixx="${inertia['xx']}"
-                                ixy="${-inertia['xy']}"
-                                ixz="${inertia['xz']}"
-                                iyy="${inertia['yy']}"
-                                iyz="${-inertia['yz']}"
-                                izz="${inertia['zz']}" />
-                    </xacro:if>
+                    <inertia
+                            ixx="${inertia['xx']}"
+                            ixy="${inertia['xy'] * reflect}"
+                            ixz="${inertia['xz']}"
+                            iyy="${inertia['yy']}"
+                            iyz="${inertia['yz'] * reflect}"
+                            izz="${inertia['zz']}" />
                 </inertial>
             </xacro:unless>
 
