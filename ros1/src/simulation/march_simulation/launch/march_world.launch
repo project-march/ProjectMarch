@@ -25,7 +25,8 @@
                     k_position_value_haa:=5000.0 k_position_value_adpf:=5000.0
                     max_effort_rotary:=200.0 max_effort_linear:=200.0
                     ground_gait:=$(arg ground_gait)
-                    realsense_simulation:=$(arg realsense_simulation)" />
+                    realsense_simulation:=$(arg realsense_simulation)
+                    configuration:='simulation'" />
 
     <!-- Upload the controller configuration -->
     <rosparam file="$(find march_simulation)/config/airgait/$(arg controller_type)/$(arg controller_name).yaml"

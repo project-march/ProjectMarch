@@ -81,6 +81,7 @@
         <arg name="wireless" value="$(arg wireless)"/>
     </include>
 
+
 <!-- Data-->
     <node
             if="$(arg rosbag)"
@@ -135,7 +136,7 @@
                     k_position_value_hfe:=5000.0 k_position_value_kfe:=5000.0
                     k_position_value_haa:=5000.0 k_position_value_adpf:=5000.0
                     max_effort_rotary:=200.0 max_effort_linear:=200.0
-                    ground_gait:=$(arg ground_gait)" />
+                    ground_gait:=$(arg ground_gait) configuration:=$(arg configuration)"/>
         <include if="$(arg balance)" file="$(find march_moveit)/launch/march_moveit.launch" />
         <include if="$(arg balance)"
                  file="$(find march_moveit_interface)/launch/moveit_interface.launch" />
