@@ -1,0 +1,28 @@
+knee:
+  lower_soft_buffer: 3.5    # degrees
+  upper_soft_buffer: 3.0      # degrees
+  k_position: 14.88
+  k_velocity: 20000.0
+  max_effort: 18000.0
+  max_velocity: 2.5
+hfe:
+  lower_soft_buffer: 3.0
+  upper_soft_buffer: 3.0
+  k_position: 14.88
+  k_velocity: 20000.0
+  max_effort: 18000.0
+  max_velocity: 2.0
+ankle:
+  lower_soft_buffer: 5.0
+  upper_soft_buffer: 3.0
+  k_position: 5.0
+  k_velocity: 20000.0
+  max_effort: 22932.0
+  max_velocity: 1.0
+haa:
+  lower_soft_buffer: 3.5
+  upper_soft_buffer: 3.5
+  k_position: 4.0
+  k_velocity: 20000.0
+  max_effort: 22932.0
+  max_velocity: 1.0
