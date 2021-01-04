@@ -118,7 +118,7 @@ In order to run ROS2, you have to source both ROS2 Foxy and the ROS2 MARCH packa
 
     source /opt/ros/foxy/setup.bash
     source ~/march/ros2/install/local_setup.bash
-    ros2 launch march_launch march_simulation.launch.py
+    ros2 launch march_launch march_ros2_simulation.launch.py
 
 .. _march_aliases-label:
 
@@ -135,7 +135,7 @@ These aliases provide shortcuts to easily build and run the code. It is recommen
     alias sros2='source ~/march_ws/march/ros2/install/local_setup.bash'
 
     alias march_build_ros1='snoe && cd ~/march_ws/march/ros1 && colcon build'
-    alias march_run_ros1='snoe && sros1 && roslaunch march_launch march_ros2_simulation.launch gait_directory:=test_versions-vi'
+    alias march_run_ros1='snoe && sros1 && roslaunch march_launch march_simulation.launch gait_directory:=test_versions-vi'
 
     alias march_build_ros2='sfox && cd ~/march_ws/march/ros2 && colcon build'
     alias march_run_ros2='sfox && sros2 && ros2 launch march_launch march_ros2_simulation.launch.py'
