@@ -88,7 +88,7 @@ This tutorial is mostly copied from `Install ROS1 Noetic <https://wiki.ros.org/n
 
 Install ROS2 Foxy
 ^^^^^^^^^^^^^^^^^
-Installing ROS2 Foxy requires some more effort than installing ROS1 Melodic.
+Installing ROS2 Foxy requires some more effort than installing ROS1 Noetic.
 This tutorial is a slightly updated version of `Install ROS2 Foxy <https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Development-Setup/>`_.
 
 1. The first step is to make sure the right locale is set:
@@ -138,16 +138,6 @@ This tutorial is a slightly updated version of `Install ROS2 Foxy <https://index
     cd ~/march/ros2
     rosdep update
     rosdep install --from-paths src --ignore-src --rosdistro foxy -y
-
-8. Some additional dependencies have to be manually added using the .repos file from the main march repository. Run the following:
-
-.. code:: bash
-
-    cd ~/ros2_dependencies
-    wget https://gitlab.com/project-march/march/-/raw/main/ros2_dependencies.repos
-    vcs import src < ros2_dependencies.repos
-    source /opt/ros/foxy/setup.bash
-    colcon build --symlink-install
 
 Install ROS1/ROS2 bridge
 ^^^^^^^^^^^^^^^^^^^^^^^^
