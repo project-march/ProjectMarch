@@ -31,7 +31,7 @@ container:tag:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - if [[ docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH != 0 ]]; then docker pull $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH && docker tag $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH && docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH; fi;
+    - if ! docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH; then docker pull $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH && docker tag $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH && docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH; fi;
 
 container:build:
   stage: Build container
