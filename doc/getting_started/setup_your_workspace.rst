@@ -36,7 +36,7 @@ To build the MARCH ROS1 packages, you have to source your ROS1 Noetic installati
 
 .. code:: bash
 
-    source /opt/ros/noetic/setup.bash
+    source /opt/ros/noetic/local_setup.bash
     cd ~/march/ros1
     colcon build
 
@@ -47,7 +47,7 @@ To build the MARCH ROS2 packages, you have to source your ROS2 Foxy installation
 
 .. code:: bash
 
-    source /opt/ros/foxy/setup.bash
+    source /opt/ros/foxy/local_setup.bash
     cd ~/march/ros2
     colcon build
 
@@ -61,9 +61,9 @@ and then use colcon to build the 'ros1_bridge' package:
 
 .. code:: bash
 
-    source /opt/ros/noetic/setup.bash
-    source /opt/ros/foxy/setup.bash
-    source ~/march/ros1/install/setup.bash
+    source /opt/ros/noetic/local_setup.bash
+    source /opt/ros/foxy/local_setup.bash
+    source ~/march/ros1/install/local_setup.bash
     source ~/march/ros2/install/local_setup.bash
     cd ~/ros1_bridge
     colcon build --packages-select ros1_bridge --cmake-force-configure
@@ -91,8 +91,8 @@ In order to run ROS1, you have to source both ROS1 Noetic and the ROS1 MARCH pac
 
 .. code:: bash
 
-    source /opt/ros/noetic/setup.bash
-    source ~/march/ros1/install/setup.bash
+    source /opt/ros/noetic/local_setup.bash
+    source ~/march/ros1/install/local_setup.bash
     roslaunch march_launch march_simulation.launch
 
 Run the bridge
@@ -102,10 +102,10 @@ In order to run the bridge, you have to source ROS1 and ROS2.
 
 .. code:: bash
 
-    source /opt/ros/noetic/setup.bash
-    source /opt/ros/foxy/setup.bash
+    source /opt/ros/noetic/local_setup.bash
+    source /opt/ros/foxy/local_setup.bash
     cd ~/ros1_bridge
-    source install/setup.bash
+    source install/local_setup.bash
     export ROS_MASTER_URI=http://localhost:11311
     ros2 run ros1_bridge dynamic_bridge --bridge-all-topics
 
@@ -116,7 +116,7 @@ In order to run ROS2, you have to source both ROS2 Foxy and the ROS2 MARCH packa
 
 .. code:: bash
 
-    source /opt/ros/foxy/setup.bash
+    source /opt/ros/foxy/local_setup.bash
     source ~/march/ros2/install/local_setup.bash
     ros2 launch march_launch march_ros2_simulation.launch.py
 
@@ -128,10 +128,10 @@ These aliases provide shortcuts to easily build and run the code. It is recommen
 
 .. code:: bash
 
-    alias snoe='source /opt/ros/noetic/setup.bash'
-    alias sfox='source /opt/ros/foxy/setup.bash'
+    alias snoe='source /opt/ros/noetic/local_setup.bash'
+    alias sfox='source /opt/ros/foxy/local_setup.bash'
 
-    alias sros1='source ~/march_ws/march/ros1/install/setup.bash'
+    alias sros1='source ~/march_ws/march/ros1/install/local_setup.bash'
     alias sros2='source ~/march_ws/march/ros2/install/local_setup.bash'
 
     alias march_build_ros1='snoe && cd ~/march_ws/march/ros1 && colcon build'
@@ -140,5 +140,5 @@ These aliases provide shortcuts to easily build and run the code. It is recommen
     alias march_build_ros2='sfox && cd ~/march_ws/march/ros2 && colcon build'
     alias march_run_ros2='sfox && sros2 && ros2 launch march_launch march_ros2_simulation.launch.py'
 
-    alias march_build_bridge='snoe && sfox && sros1 && sros2 && cd ~/ros1_bridge && colcon build --packages-select ros1_bridge --cmake-force-configure && source install/setup.bash && ros2 run ros1_bridge dynamic_bridge --print-pairs'
-    alias march_run_bridge='snoe && sfox && cd ~/ros1_bridge && source install/setup.bash && export ROS_MASTER_URI=http://localhost:11311 && ros2 run ros1_bridge dynamic_bridge --bridge-all-topics'
+    alias march_build_bridge='snoe && sfox && sros1 && sros2 && cd ~/ros1_bridge && colcon build --packages-select ros1_bridge --cmake-force-configure && source install/local_setup.bash && ros2 run ros1_bridge dynamic_bridge --print-pairs'
+    alias march_run_bridge='snoe && sfox && cd ~/ros1_bridge && source install/local_setup.bash && export ROS_MASTER_URI=http://localhost:11311 && ros2 run ros1_bridge dynamic_bridge --bridge-all-topics'
