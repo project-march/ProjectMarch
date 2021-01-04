@@ -58,7 +58,7 @@ This tutorial is mostly copied from `Install ROS1 Noetic <https://wiki.ros.org/n
 
     sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 
-4. If these steps went well, you should be able to install ROS Melodic:
+4. If these steps went well, you should be able to install ROS Noetic:
 
 .. code:: bash
 

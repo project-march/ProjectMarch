@@ -131,13 +131,13 @@ These aliases provide shortcuts to easily build and run the code. It is recommen
     alias snoe='source /opt/ros/noetic/local_setup.bash'
     alias sfox='source /opt/ros/foxy/local_setup.bash'
 
-    alias sros1='source ~/march_ws/march/ros1/install/local_setup.bash'
-    alias sros2='source ~/march_ws/march/ros2/install/local_setup.bash'
+    alias sros1='source ~/march/ros1/install/local_setup.bash'
+    alias sros2='source ~/march/ros2/install/local_setup.bash'
 
-    alias march_build_ros1='snoe && cd ~/march_ws/march/ros1 && colcon build'
+    alias march_build_ros1='snoe && cd ~/march/ros1 && colcon build'
     alias march_run_ros1='snoe && sros1 && roslaunch march_launch march_simulation.launch gait_directory:=test_versions-vi'
 
-    alias march_build_ros2='sfox && cd ~/march_ws/march/ros2 && colcon build'
+    alias march_build_ros2='sfox && cd ~/march/ros2 && colcon build'
     alias march_run_ros2='sfox && sros2 && ros2 launch march_launch march_ros2_simulation.launch.py'
 
     alias march_build_bridge='snoe && sfox && sros1 && sros2 && cd ~/ros1_bridge && colcon build --packages-select ros1_bridge --cmake-force-configure && source install/local_setup.bash && ros2 run ros1_bridge dynamic_bridge --print-pairs'
