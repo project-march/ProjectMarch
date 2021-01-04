@@ -20,7 +20,7 @@ WORKDIR /projects
 RUN bash -c "source /opt/ros/noetic/local_setup.bash && rosdep install -y --from-paths ros1/src --rosdistro noetic --ignore-src" && python3 -m pip install -r requirements.pip
 
 # Install additional dependencies that are not available the standard way
-RUN mkdir /ros2_foxy && mkdir /ros2_foxy/src && cd /ros2_foxy && vcs import src < ros2_dependencies.repos && bash -c "source /opt/ros/foxy/local_setup.bash && colcon build"
+RUN mkdir /ros2_foxy && mkdir /ros2_foxy/src && cd /ros2_foxy && vcs import src < /projects/ros2_dependencies.repos && bash -c "source /opt/ros/foxy/local_setup.bash && colcon build"
 
 # Install ROS 2 rosdep dependencies
 RUN bash -c "source /opt/ros/foxy/local_setup.bash && source /ros2_foxy/install/local_setup.bash && rosdep install -y --from-paths ros2/src --rosdistro foxy --ignore-src" && python3 -m pip install -r requirements.pip
