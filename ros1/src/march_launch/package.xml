@@ -18,7 +18,6 @@
     <exec_depend>march_simulation</exec_depend>
     
     <exec_depend>march_data_collector</exec_depend>
-    <exec_depend>march_fake_sensor_data</exec_depend>
     <exec_depend>march_gain_scheduling</exec_depend>
     <exec_depend>march_gait_selection</exec_depend>
     <exec_depend>march_hardware_interface</exec_depend>
