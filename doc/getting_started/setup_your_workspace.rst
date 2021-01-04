@@ -125,6 +125,10 @@ In order to run ROS2, you have to source both ROS2 Foxy and the ROS2 MARCH packa
 Convenient aliases
 ^^^^^^^^^^^^^^^^^^
 These aliases provide shortcuts to easily build and run the code. It is recommended you add them to your ~/.bashrc file.
+The 'bash -i -c' makes sure that the sourcing happens only within the command. This allows you to use ros1 and ros2
+aliases in the same terminal without problems. However, if you use one of the first 4 aliases, this will make the
+terminal usable for only ROS1 or only ROS2. For most cases, it is advised to have three separate terminals, one used
+for all ROS1 building and running, one for the bridge and one for all ROS2 code
 
 .. code:: bash
 
