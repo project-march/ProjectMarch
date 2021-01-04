@@ -9,7 +9,7 @@ Requirements
 ------------
 In order to follow the tutorials, we expect you to have at least some knowledge of the following tools:
 
-- `Ubuntu 18.04 <http://releases.ubuntu.com/18.04/>`_
+- `Ubuntu 20.04 <http://releases.ubuntu.com/20.04/>`_
 - Linux command line
 - `Git <https://git-scm.com/>`_
 
