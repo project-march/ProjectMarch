@@ -11,5 +11,4 @@
         <param name="moticon_ip" value="$(arg moticon_ip)" />
         <param name="pressure_soles" value="$(arg pressure_soles)" />
     </node>
-
 </launch>

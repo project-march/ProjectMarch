@@ -5,7 +5,7 @@
     <arg name="controller_type" default="effort_control" doc="Changes the controller used by simulation."/>
     <arg name="controller_name" default="$(arg robot)" doc="Name of the controller"/>
 
-    <arg name="gain_scheduling" default="true" doc="Whether to use gain scheduling, which changes PID values based on executed gait."/>
+    <arg name="gain_scheduling" default="false" doc="Whether to use gain scheduling, which changes PID values based on executed gait."/>
     <arg name="gain_tuning" default="groundgait" doc="The configuration to use for gain scheduling. Only used when 'gain_scheduling' is true."/>
 
 <!-- Simulation only            -->
