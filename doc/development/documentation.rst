@@ -40,7 +40,7 @@ We use the package rosdoc_lite to generate the documentation with Sphinx
 
 .. code:: bash
 
-  sudo apt-get install ros-melodic-rosdoc-lite
+  sudo apt install ros-noetic-rosdoc-lite
 
 
 Install Gem and html-proofer
@@ -50,7 +50,7 @@ html-proofer is a tool that can validate your generated html for mistakes like b
 
 .. code::
 
-  sudo apt-get update
+  sudo apt update
   sudo apt install ruby-full
 
   # Check if ruby and gem got installed correctly
@@ -69,39 +69,19 @@ You can install both packages from the Ubuntu repositories:
 
 .. code::
 
-  sudo apt install python-pygit2 python-sphinx-rtd-theme
+  sudo apt install python3-pygit2 python3-sphinx-rtd-theme
 
 
 Generate the html
 -----------------
-First source ROS1 melodic, and then run the :rootdir:`build_locally <build_locally.sh>` script to
+First source ROS1 Noetic, and then run the :rootdir:`build_locally <build_locally.sh>` script to
 generate the docs and automatically open them in your browser.
 
 .. code::
 
-  source /opt/ros/melodic/setup.bash
+  source /opt/ros/noetic/local_setup.bash
   cd ~/project-march.gitlab.io
   ./build_locally.sh
-
-.. warning::
-  If you already have sphinx installed, you might get the following error:
-
-  .. code::
-
-    Traceback (most recent call last):
-      File "/home/march/.local/bin/sphinx-build", line 7, in <module>
-        from sphinx.cmd.build import main
-      File "/home/march/.local/lib/python2.7/site-packages/sphinx/cmd/build.py", line 39
-        file=stderr)
-            ^
-    SyntaxError: invalid syntax
-    stdout:
-
-  Fix it by uninstalling sphinx
-
-  .. code::
-
-    pip uninstall sphinx
 
 .. warning::
   You might get the following error if sphinx is installed using pip3:
@@ -134,7 +114,7 @@ You can install it with pip:
 
 .. code::
 
-  pip install --user sphinx-autobuild
+  pip3 install --user sphinx-autobuild
 
 Start the auto build:
 
