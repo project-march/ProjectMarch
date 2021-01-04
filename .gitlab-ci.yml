@@ -1,56 +1,27 @@
 stages:
-  - docker
-  - lint
-  - build
-  - test
-  - static_analysis
-
-image: registry.gitlab.com/project-march/march:latest
+  - Tag container
+  - Build container
+  - Lint code
+  - Build code
+  - Test code
+  - Static analysis on code
 
 cache:
   key: "${CI_JOB_NAME}"
   paths:
     - ccache
 
-colcon build:
-  stage: build
-  artifacts:
-    paths:
-      - ros1/build/
-      - ros1/install/
-      - ros1/log/
-  script:
-    - cd ros1/
-    - colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
+image: registry.gitlab.com/project-march/march:$CI_COMMIT_BRANCH
 
-colcon test:
-  stage: test
-  dependencies:
-    - colcon build
-  script:
-    - cd ros1/
-    - source install/setup.bash && colcon test --event-handlers console_direct+
-    - colcon test-result --verbose
-
-catkin_lint:
-  stage: lint
-  script:
-    - cd ros1/
-    - catkin_lint -W1 --strict --config ../.catkin_lint src
-
-pep8:
-  stage: lint
-  script:
-    - cd ros1/
-    - python -m autopep8 --diff -r --aggressive --aggressive --exit-code src
-    - python -m flake8
-  only:
-    changes:
-      - "**/*.py"
-  allow_failure: true
-
-docker:
-  stage: docker
+# Allow each branch to run their own container. This allows a branch to add
+# dependencies to their package.xml and use them as expected. This process works as
+# follows:
+# 1. The image for this branch is pulled. If it does not exist, copy the default
+#   image and tag it as an image for this branch.
+# 2. If there are changes to the Dockerfile or to a package.xml file, rebuild the
+#   container.
+container:tag:
+  stage: Tag container
   image: docker:latest
   variables:
     DOCKER_HOST: tcp://docker:2376
@@ -60,20 +31,112 @@ docker:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - if [[ $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]; then docker build -t registry.gitlab.com/project-march/march .; fi;
-    - if [[ $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]; then docker push registry.gitlab.com/project-march/march; fi;
+    - if [[ docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH != 0 ]]; then docker pull $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH && docker tag $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH && docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH; fi;
+
+container:build:
+  stage: Build container
+  image: docker:latest
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH
+    - if [[ $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]; then docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH $CI_REGISTRY_IMAGE:latest && docker push $CI_REGISTRY_IMAGE:latest; fi;
   rules:
     - changes:
         - Dockerfile
         - "**/package.xml"
 
-clang tidy:
-  needs: ["colcon build"]
-  stage: static_analysis
+# Runs a linter on the code to see if the code style is consistent
+noetic:pep8:
+  stage: Lint code
+  script:
+    - cd ros1/
+    - python -m autopep8 --diff -r --aggressive --aggressive --exit-code src
+    - python -m flake8
+  only:
+    changes:
+      - "ros1/**/*.py"
+
+foxy:pep8:
+  stage: Lint code
+  script:
+    - cd ros2/
+    - python -m autopep8 --diff -r --aggressive --aggressive --exit-code src
+    - python -m flake8
+  only:
+    changes:
+      - "ros2/**/*.py"
+
+noetic:build:
+  stage: Build code
+  artifacts:
+    paths:
+      - ros1/build/
+      - ros1/install/
+      - ros1/log/
+  script:
+    - cd ros1/
+    - source /opt/ros/noetic/local_setup.bash && colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
+
+foxy:build:
+  stage: Build code
+  artifacts:
+    paths:
+      - ros2/build/
+      - ros2/install/
+      - ros2/log/
+  script:
+    - cd ros2/
+    - source /opt/ros/foxy/local_setup.bash && colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
+
+noetic:test:
+  stage: Test code
+  dependencies:
+    - noetic:build
+  needs: ["noetic:build"]
+  script:
+    - cd ros1/
+    - source /opt/ros/noetic/local_setup.bash && source install/local_setup.bash && colcon test --event-handlers console_direct+
+    - colcon test-result --verbose
+
+foxy:test:
+  stage: Test code
+  dependencies:
+    - foxy:build
+  needs: ["foxy:build"]
+  script:
+    - cd ros2/
+    - source /opt/ros/foxy/local_setup.bash && source install/local_setup.bash && colcon test --event-handlers console_direct+
+    - colcon test-result --verbose
+
+noetic:clang_tidy:
+  stage: Static analysis on code
+  dependencies:
+    - noetic:build
+  needs: ["noetic:build"]
   script:
     - cd ros1/
     - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
   only:
     changes:
-      - "**/*.{hpp,h,cpp}"
+      - "ros1/**/*.{hpp,h,cpp}"
+  allow_failure: true
+
+foxy:clang_tidy:
+  stage: Static analysis on code
+  dependencies:
+    - foxy:build
+  needs: ["foxy:build"]
+  script:
+    - cd ros2/
+    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
+  only:
+    changes:
+      - "ros2/**/*.{hpp,h,cpp}"
   allow_failure: true
