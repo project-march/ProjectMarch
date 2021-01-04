@@ -7,8 +7,6 @@ import os
 
 package_name = 'march_rqt_note_taker'
 
-ros1_source = os.path.join('..', '..', '..', '..', 'ros1', 'src', 'visualization', 'march_rqt_note_taker')
-
 setup(
     name=package_name,
     version='0.0.0',
@@ -19,9 +17,9 @@ setup(
         (os.path.join('share', package_name), ['package.xml']),
         (os.path.join('share', package_name, 'launch'), glob('launch/*.launch')),
         (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
-        (os.path.join('share', package_name), [os.path.join(ros1_source, 'plugin.xml')]),
-        (os.path.join('share', package_name), [os.path.join(ros1_source, 'resource', 'note_taker.ui')]),
-        (os.path.join('share', package_name, 'resource', 'img'), glob(ros1_source + '/resource/img/*.png'))
+        (os.path.join('share', package_name), [os.path.join('plugin.xml')]),
+        (os.path.join('share', package_name), [os.path.join('resource', 'note_taker.ui')]),
+        (os.path.join('share', package_name, 'resource', 'img'), glob('resource/img/*.png'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,
