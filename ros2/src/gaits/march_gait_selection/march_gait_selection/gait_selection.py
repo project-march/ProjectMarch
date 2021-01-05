@@ -172,9 +172,11 @@ class GaitSelection(Node):
         :return: True when the gait and subgait are loaded
         """
         gait = self._loaded_gaits.get(request.gait)
-        response.contains = True
         if gait is None:
             response.contains = False
+            return response
+
+        response.contains = True
         for subgait in request.subgaits:
             if gait[subgait] is None:
                 response.contains = False
