@@ -23,16 +23,20 @@ The next step is to download the source code, you can either use ssh (recommende
 .. code:: bash
 
     cd ~/
-    git lfs install
     git clone git@gitlab.com:project-march/march.git
+    cd march/
+    git lfs install
+
 
 Or use https:
 
 .. code:: bash
 
     cd ~/
-    git lfs install
     git clone https://gitlab.com/project-march/march.git
+    cd march/
+    git lfs install
+
 
 Install ROS1 Noetic
 ^^^^^^^^^^^^^^^^^^^
@@ -43,7 +47,7 @@ This tutorial is mostly copied from `Install ROS1 Noetic <https://wiki.ros.org/n
 
 ..  code:: bash
 
-    sudo apt install lsb-release gnupg2 python3-colcon-common-extensions
+    sudo apt install lsb-release gnupg2
 
 
 2. The next step is to setup your sources.list:
@@ -58,11 +62,12 @@ This tutorial is mostly copied from `Install ROS1 Noetic <https://wiki.ros.org/n
 
     sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 
-4. If these steps went well, you should be able to install ROS Noetic:
+4. If these steps went well, you should be able to install colcon and ROS Noetic:
 
 .. code:: bash
 
     sudo apt update
+    sudo apt install python3-colcon-common-extensions
     sudo apt install ros-noetic-desktop-full
 
 
