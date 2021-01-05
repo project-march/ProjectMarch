@@ -63,6 +63,7 @@ noetic:pep8:
   only:
     changes:
       - "ros1/**/*.py"
+  allow_failure: true
 
 foxy:pep8:
   stage: Lint code
@@ -73,6 +74,7 @@ foxy:pep8:
   only:
     changes:
       - "ros2/**/*.py"
+  allow_failure: true
 
 noetic:build:
   stage: Build code
