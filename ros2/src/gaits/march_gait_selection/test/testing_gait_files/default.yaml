@@ -27,3 +27,6 @@ positions:
       right_hip_aa: 0.0
       right_hip_fe: -0.0873
       right_knee: 0.0
+semi_dynamic_gaits:
+  stairs_up: {right_open: MIV_final, left_swing: MIV_final, right_swing: MIV_final,
+              left_close: MIV_final, right_close: MIV_final}
