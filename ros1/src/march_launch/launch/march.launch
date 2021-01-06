@@ -1,44 +1,75 @@
 <launch>
+<!-- General                    -->
     <arg name="configuration" default="exoskeleton" doc="Configuration on launching the 'simulation' or 'exoskeleton'."/>
     <arg name="headless" default="false" doc="Launches no GUI when true."/>
-    <arg name="hardware_interface" default="true" doc="Launches the hardware interface when config is 'exoskeleton."/>
-    <arg name="gain_scheduling" default="true" doc="Whether to use gain scheduling, which changes PID values based on executed gait."/>
-    <arg name="gain_tuning" default="groundgait" doc="The configuration to use for gain scheduling. Only used when 'gain_scheduling' is true."/>
-    <arg name="sounds" default="true" doc="Whether to use sounds."/>
-
-    <arg name="rviz" default="false" doc="Launches RViz."/>
-    <arg name="rqt_input" default="true" doc="Launches the march rqt input device."/>
-    <arg name="gazebo_ui" default="false" doc="Launches the Gazebo UI."/>
-
-    <arg name="ground_gait" default="false" doc="Exoskeleton will ground gait in gazebo_ui if true."/>
-    <arg name="obstacle" default="none" doc="Obstacle to load in the simulation."/>
-    <arg name="fixed" default="true" doc="Fixes the exoskeleton in the world in rviz"/>
-
-    <arg name="arduino_master" default="false" doc="Launches ros serial node to connect with arduino on master."/>
-    <arg name="input_device" default="false" doc="Launches ros serial node to connect with input device."/>
-    <arg name="wireless" default="false" doc="Enables wireless connection to the input device."/>
-
-    <arg name="gait_directory" default="training-v" doc="Gait files directory to use"/>
-
-    <arg name="rosbag" default="true" doc="Enables rosbag record node."/>
-    <arg name="bag_prefix" default="log" doc="Prefix of the bag file. Only used if rosbag is true."/>
-
-    <arg name="esp" default="false" doc="Whether a connection to an ESP server should be established."/>
-    <arg name="data_collector" default="false" doc="Launches the data collector when true."/>
-    <arg name="pressure_soles" default="false" doc="Whether a connection with pressure_soles should be established." />
-    <arg name="moticon_ip" default="192.168.8.105" doc="The ip-adress with Moticon software running on it, defaults to
-            EMS switch laptop on standard router"/>
-
-    <arg name="balance" default="false" doc="Uses the dynamic balance gaits instead of the predefined gaits."/>
 
     <arg name="robot" default="march4" doc="Robot to use."/>
     <arg name="robot_description" default="$(arg robot)" doc="URDF file to use"/>
     <arg name="controller_type" default="effort_control" doc="Changes the controller used by simulation."/>
     <arg name="controller_name" default="$(arg robot)" doc="Name of the controller"/>
 
+    <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot_description).xacro"/>
 
-    <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot).xacro"/>
+    <arg name="gain_scheduling" default="true" doc="Whether to use gain scheduling, which changes PID values based on executed gait."/>
+    <arg name="gain_tuning" default="groundgait" doc="The configuration to use for gain scheduling. Only used when 'gain_scheduling' is true."/>
 
+<!-- Simulation only            -->
+    <arg name="rviz" default="false" doc="Launches RViz."/>
+    <arg name="gazebo_ui" default="false" doc="Launches the Gazebo UI."/>
+
+    <arg name="ground_gait" default="false" doc="Exoskeleton will ground gait in gazebo_ui if true."/>
+    <arg name="obstacle" default="none" doc="Obstacle to load in the simulation."/>
+    <arg name="fixed" default="true" doc="Fixes the exoskeleton in the world in rviz"/>
+    <arg name="balance" default="false" doc="Uses the dynamic balance gaits instead of the predefined gaits."/>
+
+<!-- Hardware                   -->
+    <arg name="arduino_master" default="false" doc="Launches ros serial node to connect with arduino on master."/>
+    <arg name="input_device" default="false" doc="Launches ros serial node to connect with input device."/>
+    <arg name="wireless" default="false" doc="Enables wireless connection to the input device."/>
+    <arg name="hardware_interface" default="true" doc="Launches the hardware interface when config is 'exoskeleton."/>
+
+<!-- Data                       -->
+    <arg name="rosbag" default="true" doc="Enables rosbag record node."/>
+    <arg name="bag_prefix" default="log" doc="Prefix of the bag file. Only used if rosbag is true."/>
+
+    <arg name="data_collector" default="false" doc="Launches the data collector when true."/>
+    <arg name="pressure_soles" default="false" doc="Whether a connection with pressure_soles should be established." />
+    <arg name="moticon_ip" default="192.168.8.105" doc="The ip-adress with Moticon software running on it, defaults to
+            EMS switch laptop on standard router"/>
+
+<!-- ROS1 Gait selection        -->
+    <arg name="sounds" default="true" doc="Whether to use sounds."/>
+    <arg name="gait_selection" default="false" doc="Whether to start the ros1 gait selection"/>
+    <arg name="gait_directory" default="training-v" doc="Gait files directory to use"/>
+
+<!-- Check arguments-->
+     <!-- Throw error when starting the exo with the gait_directory only meant for simulation -->
+    <group if="$(eval gait_directory == 'simulation_only-vi')">
+        <group if="$(eval configuration == 'exoskeleton')">
+            <node pkg="rostopic" type="rostopic" name="directory_check"
+                  args="pub /march/error march_shared_msgs/Error '{header: {seq: 0, stamp: {secs: 0, nsecs: 0},  frame_id: &quot; &quot;},
+                error_message: &quot;Gait directory should never be used for non-simulation purposes.&quot;,
+                type: 0}'"
+                  output="screen"/>
+        </group>
+    </group>
+
+<!-- Hardware               -->
+    <group if="$(eval configuration == 'exoskeleton')">
+        <include file="$(find march_hardware_interface)/launch/hardware.launch" if="$(arg hardware_interface)">
+            <arg name="robot" value="$(arg robot)"/>
+            <arg name="robot_description" value="$(arg robot_description)"/>
+            <arg name="controller_name" value="$(arg controller_name)"/>
+        </include>
+    </group>
+
+    <include file="$(dirname)/serial_connection.launch">
+        <arg name="arduino_master" value="$(arg arduino_master)"/>
+        <arg name="input_device" value="$(arg input_device)"/>
+        <arg name="wireless" value="$(arg wireless)"/>
+    </include>
+
+<!-- Data-->
     <node
             if="$(arg rosbag)"
             pkg="rosbag"
@@ -48,53 +79,36 @@
             args="-a -q -o $(arg bag_prefix)"
     />
 
-    <node name="rviz" pkg="rviz" type="rviz" if="$(eval not headless and rviz)"/>
-
     <group ns="march">
-        <include file="$(find march_safety)/launch/march_safety.launch"/>
-
-        <node name="sound_play" pkg="sound_play" type="soundplay_node.py" if="$(arg sounds)" output="screen"/>
-
-        <include file="$(find march_gait_selection)/launch/march_gait_selection.launch">
-            <arg name="gait_directory" value="$(arg gait_directory)"/>
-            <arg name="sounds" value="$(arg sounds)"/>
-        </include>
-
-        <include file="$(find march_gain_scheduling)/launch/march_gain_scheduling.launch" if="$(arg gain_scheduling)">
-            <arg name="configuration" value="$(arg gain_tuning)"/>
-        </include>
-
-        <include file="$(find march_rqt_input_device)/launch/march_rqt_input_device.launch" if="$(eval not headless and rqt_input)">
-            <arg name="ping_safety_node" value="true"/>
-        </include>
-
-        <include file="$(find march_data_collector)/launch/march_data_collector.launch" if="$(eval data_collector or esp or balance)">
-            <arg name="esp" value="$(arg esp)"/>
+        <include file="$(find march_data_collector)/launch/march_data_collector.launch" if="$(eval data_collector or balance)">
             <arg name="pressure_soles" value="$(arg pressure_soles)"/>
             <arg name="moticon_ip" value="$(arg moticon_ip)"/>
         </include>
 
-        <include if="$(arg balance)" file="$(find march_moveit)/launch/march_moveit.launch" />
-    </group>
 
-    <group if="$(eval gait_directory == 'simulation_only-vi')"> <!--Throw when starting the exo with the gait_directory only ment for simulation-->
-        <group if="$(eval configuration == 'exoskeleton')">
-            <node pkg="rostopic" type="rostopic" name="directory_check"
-                  args="pub /march/error march_shared_resources/Error '{header: {seq: 0, stamp: {secs: 0, nsecs: 0},  frame_id: &quot; &quot;},
-                error_message: &quot;Gait directory should never be used for non-simulation purposes.&quot;,
-                type: 0}'"
-                  output="screen"/>
-        </group>
-    </group>
+<!-- Bridge -->
+        <include file="$(find march_parameter_server)/launch/march_parameter_server.launch" />
 
-    <group if="$(eval configuration == 'exoskeleton')">
-        <include file="$(find march_hardware_interface)/launch/hardware.launch" if="$(arg hardware_interface)">
-            <arg name="robot" value="$(arg robot)"/>
-            <arg name="robot_description" value="$(arg robot_description)"/>
-            <arg name="controller_name" value="$(arg controller_name)"/>
+
+<!-- ROS1 Gait selection    -->
+        <node name="sound_play" pkg="sound_play" type="soundplay_node.py" if="$(eval sounds and gait_selection)" output="screen"/>
+        <include file="$(find march_gait_selection)/launch/march_gait_selection.launch" if="$(arg gait_selection)">
+            <arg name="gait_directory" value="$(arg gait_directory)"/>
+            <arg name="sounds" value="$(arg sounds)"/>
         </include>
+
+        <include file="$(find march_safety)/launch/march_safety.launch"/>
+        <include file="$(find march_gain_scheduling)/launch/march_gain_scheduling.launch" if="$(arg gain_scheduling)">
+            <arg name="configuration" value="$(arg gain_tuning)"/>
+        </include>
+
+<!-- Simulation            -->
+        <include if="$(arg balance)" file="$(find march_moveit)/launch/march_moveit.launch" />
+        <param name="balance" value="$(arg balance)"/>
     </group>
 
+
+    <node name="rviz" pkg="rviz" type="rviz" if="$(eval not headless and rviz)"/>
     <group if="$(eval configuration == 'simulation')">
         <include file="$(find march_simulation)/launch/march_world.launch">
             <arg name="gazebo_ui" value="$(eval not headless and gazebo_ui)"/>
@@ -108,9 +122,4 @@
         </include>
     </group>
 
-    <include file="$(dirname)/serial_connection.launch">
-        <arg name="arduino_master" value="$(arg arduino_master)"/>
-        <arg name="input_device" value="$(arg input_device)"/>
-        <arg name="wireless" value="$(arg wireless)"/>
-    </include>
 </launch>

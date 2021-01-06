@@ -19,7 +19,7 @@ def main(args=None):
     try:
         plugin = 'rqt_input_device'
         main_plugin = Main(filename=plugin)
-        sys.exit(main_plugin.main(standalone=plugin, plugin_argument_provider=InputDevicePlugin.add_arguments))
+        sys.exit(main_plugin.main(standalone=plugin))
 
     except KeyboardInterrupt:
         pass
@@ -40,25 +40,11 @@ class InputDevicePlugin(Plugin):
 
         self._node = context.node
 
-        parser = argparse.ArgumentParser(prog='rqt_plot', add_help=False)
-        InputDevicePlugin.add_arguments(parser)
-        args = parser.parse_args(context.argv())
-
-        self._node.set_parameters([Parameter('use_sim_time', value=bool(args.use_sim_time))])
-        self._controller = InputDeviceController(self._node, bool(args.ping_safety_node))
+        self._node.declare_parameter('ping_safety_node')
+        self._controller = InputDeviceController(self._node)
         self._widget = InputDeviceView(ui_file, self._controller)
         context.add_widget(self._widget)
 
         # Show _widget.windowTitle on left-top of each plugin (when it's set in _widget). (useful for multiple windows)
         if context.serial_number() > 1:
             self._widget.setWindowTitle('{0} ({1})'.format(self._widget.windowTitle(), context.serial_number()))
-
-    @staticmethod
-    def add_arguments(parser: argparse.ArgumentParser) -> None:
-        """
-        Add the available arguments for the input device to the parser
-        :param parser: The argument parser that is used
-        """
-        group = parser.add_argument_group('Options for input device')
-        group.add_argument('ping_safety_node', nargs=1, help='Whether to ping the safety node')
-        group.add_argument('use_sim_time', nargs=1, help='Whether to use simulation time')

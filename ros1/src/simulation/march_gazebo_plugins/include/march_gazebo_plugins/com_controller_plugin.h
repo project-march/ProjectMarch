@@ -1,7 +1,7 @@
 // Copyright 2019 Project March.
 
 #include <march_gazebo_plugins/walk_controller.h>
-#include <march_shared_resources/CurrentGait.h>
+#include <march_shared_msgs/CurrentGait.h>
 #include <gazebo/common/common.hh>
 #include <gazebo/physics/physics.hh>
 #include <ros/callback_queue.h>
@@ -16,7 +16,7 @@ class ComControllerPlugin : public ModelPlugin
 {
 public:
   void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/) override;
-  void onRosMsg(const march_shared_resources::CurrentGaitConstPtr& msg);
+  void onRosMsg(const march_shared_msgs::CurrentGaitConstPtr& msg);
 
   // Called by the world update start event
   void onUpdate();

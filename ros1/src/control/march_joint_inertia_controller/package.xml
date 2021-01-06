@@ -18,8 +18,7 @@
   <depend>controller_interface</depend>
   <depend>joint_state_controller</depend>
   <depend>joint_trajectory_controller</depend>
-  <depend>march_hardware</depend>
-  <depend>march_shared_resources</depend>
+  <depend>march_shared_msgs</depend>
   <depend>pluginlib</depend>
   <depend>realtime_tools</depend>
   <depend>roscpp</depend>

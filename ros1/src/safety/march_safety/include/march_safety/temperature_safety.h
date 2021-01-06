@@ -9,7 +9,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/Temperature.h>
 
-#include <march_shared_resources/Error.h>
+#include <march_shared_msgs/Error.h>
 
 #include "march_safety/safety_type.h"
 #include "march_safety/safety_handler.h"

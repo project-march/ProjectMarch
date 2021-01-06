@@ -10,11 +10,11 @@
   <buildtool_depend>catkin</buildtool_depend>
   <buildtool_depend>python3-setuptools</buildtool_depend>
 
-  <depend>march_shared_resources</depend>
+  <depend>march_shared_msgs</depend>
 
   <exec_depend>march_description</exec_depend>
-  <exec_depend>python-scipy</exec_depend>
+  <exec_depend>python3-scipy</exec_depend>
   <exec_depend>rospy</exec_depend>
 
-  <test_depend>python-parameterized</test_depend>
+  <test_depend>python3-parameterized</test_depend>
 </package>

@@ -11,8 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
     controller_manager
     joint_state_controller
     joint_trajectory_controller
-    march_hardware
-    march_shared_resources
+    march_shared_msgs
     pluginlib
     realtime_tools
     roscpp
@@ -28,7 +27,7 @@ catkin_package(
     actionlib_msgs
     control_msgs
     controller_interface
-    march_shared_resources
+    march_shared_msgs
     pluginlib
     roscpp
     std_msgs

@@ -7,8 +7,6 @@ import os
 
 package_name = 'march_rqt_gait_version_tool'
 
-ros1_source = os.path.join('..', '..', '..', '..', 'ros1', 'src', 'visualization', 'march_rqt_gait_selection')
-
 setup(
     name=package_name,
     version='0.0.0',
@@ -22,10 +20,10 @@ setup(
         (os.path.join('share', package_name, 'launch'),
          glob(os.path.join('launch', '*.launch.py'))),
         (os.path.join('share', package_name), ['plugin.xml']),
-        (os.path.join('share', package_name), [os.path.join(ros1_source, 'resource', 'gait_selection.ui')]),
-        (os.path.join('share', package_name), [os.path.join(ros1_source, 'resource', 'parametric_pop_up.ui')]),
+        (os.path.join('share', package_name), [os.path.join('resource', 'gait_selection.ui')]),
+        (os.path.join('share', package_name), [os.path.join('resource', 'parametric_pop_up.ui')]),
         (os.path.join('share', package_name, 'resource', 'img'),
-         glob(os.path.join(ros1_source, 'resource', 'img', '*.png')))
+         glob(os.path.join('resource', 'img', '*.png')))
     ],
     install_requires=['setuptools'],
     zip_safe=True,

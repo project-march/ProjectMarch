@@ -31,7 +31,7 @@ void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf
   ros_node_ = std::make_unique<ros::NodeHandle>("com_controller_plugin");
 
   // Create a named topic, and subscribe to it.
-  ros::SubscribeOptions so = ros::SubscribeOptions::create<march_shared_resources::CurrentGait>(
+  ros::SubscribeOptions so = ros::SubscribeOptions::create<march_shared_msgs::CurrentGait>(
       "/march/gait_selection/current_gait", 1, boost::bind(&ComControllerPlugin::onRosMsg, this, _1), ros::VoidPtr(),
       &ros_queue_);
   ros_sub_ = ros_node_->subscribe(so);
@@ -40,7 +40,7 @@ void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf
   ros_queue_thread_ = std::thread(std::bind(&ComControllerPlugin::queueThread, this));
 }
 
-void ComControllerPlugin::onRosMsg(const march_shared_resources::CurrentGaitConstPtr& msg)
+void ComControllerPlugin::onRosMsg(const march_shared_msgs::CurrentGaitConstPtr& msg)
 {
   controller_->newSubgait(msg);
 }
@@ -48,8 +48,8 @@ void ComControllerPlugin::onRosMsg(const march_shared_resources::CurrentGaitCons
 // Called by the world update start event
 void ComControllerPlugin::onUpdate()
 {
-  ignition::math::v4::Vector3<double> torque_left;
-  ignition::math::v4::Vector3<double> torque_right;
+  ignition::math::v6::Vector3<double> torque_left;
+  ignition::math::v6::Vector3<double> torque_right;
 
   controller_->update(torque_left, torque_right);
 

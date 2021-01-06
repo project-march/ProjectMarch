@@ -6,7 +6,7 @@
 #include <std_msgs/Time.h>
 
 #include <march_safety/temperature_safety.h>
-#include <march_shared_resources/Alive.h>
+#include <march_shared_msgs/Alive.h>
 #include "error_counter.h"
 
 TEST(TestConnectionNotLost, connectionNotLost)
@@ -15,7 +15,7 @@ TEST(TestConnectionNotLost, connectionNotLost)
   ros::NodeHandle nh;
   double send_errors_interval;
   nh.getParam("/march_safety_node/send_errors_interval", send_errors_interval);
-  ros::Publisher pub_alive = nh.advertise<march_shared_resources::Alive>("march/input_device/alive", 0);
+  ros::Publisher pub_alive = nh.advertise<march_shared_msgs::Alive>("march/input_device/alive", 0);
   ErrorCounter errorCounter;
   ros::Subscriber sub = nh.subscribe("march/error", 0, &ErrorCounter::cb, &errorCounter);
 
@@ -26,7 +26,7 @@ TEST(TestConnectionNotLost, connectionNotLost)
   EXPECT_EQ(1u, pub_alive.getNumSubscribers());
   EXPECT_EQ(1u, sub.getNumPublishers());
 
-  march_shared_resources::Alive msg;
+  march_shared_msgs::Alive msg;
   msg.stamp = ros::Time::now();
   msg.id = "test";
   pub_alive.publish(msg);
