@@ -1,7 +1,10 @@
-#!/usr/bin/env python
-from setuptools import setup
+from distutils.core import setup
 
-from catkin_pkg.python_setup import generate_distutils_setup
+from setuptools import setup
+from glob import glob
+import os
+
+package_name = 'march_rqt_robot_monitor'
 
 d = generate_distutils_setup(
     packages=[
@@ -11,5 +14,3 @@ d = generate_distutils_setup(
     package_dir={"": "src"},
     scripts=["scripts/march_rqt_robot_monitor_node"],
 )
-
-setup(**d)
