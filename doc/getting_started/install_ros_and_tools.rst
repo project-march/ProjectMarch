@@ -140,6 +140,7 @@ This tutorial is a slightly updated version of `Install ROS2 Foxy <https://index
 
 .. code:: bash
 
+    source /opt/ros/foxy/setup.bash
     cd ~/march/ros2
     rosdep update
     rosdep install --from-paths src --ignore-src --rosdistro foxy -y
