@@ -44,7 +44,7 @@ container:build:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH .
+    - docker build --cache-from $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH -t $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH .
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH
     - if [[ $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]; then docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH $CI_REGISTRY_IMAGE:latest && docker push $CI_REGISTRY_IMAGE:latest; fi;
   rules:
