@@ -33,7 +33,6 @@
               respawn="false" output="screen"
               args="spawn controller/trajectory joint_state_controller"/>
 
-        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
         <node name="upload_joint_names" pkg="march_simulation" type="upload_joint_names"/>
         <node name="world_transformer" pkg="march_simulation" type="to_world_transform" unless="$(arg fixed)"/>
         <node name="set_obstacle_node" pkg="march_simulation" type="set_obstacle_dimensions"/>
