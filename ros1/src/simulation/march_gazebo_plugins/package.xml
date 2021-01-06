@@ -13,6 +13,8 @@
   <build_depend>gazebo</build_depend>
 
   <depend>roscpp</depend>
+  <depend>roslib</depend>
+  <depend>std_srvs</depend>
   <depend>gazebo_ros</depend>
   <depend>march_shared_msgs</depend>
 

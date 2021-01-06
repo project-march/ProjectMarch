@@ -42,18 +42,18 @@ protected:
 
   double p_yaw_;
   double d_yaw_;
-  double p_yaw_off_;
-  double d_yaw_off_;
+  double p_yaw_balance_;
+  double d_yaw_balance_;
 
   double p_pitch_;
   double d_pitch_;
-  double p_pitch_off_;
-  double d_pitch_off_;
+  double p_pitch_balance_;
+  double d_pitch_balance_;
 
   double p_roll_;
   double d_roll_;
-  double p_roll_off_;
-  double d_roll_off_;
+  double p_roll_balance_;
+  double d_roll_balance_;
 
   double error_x_last_timestep_;
   double error_y_last_timestep_;

@@ -2,6 +2,8 @@
 
 #include <march_gazebo_plugins/com_controller_plugin.h>
 #include <typeinfo>
+#include "std_srvs/Trigger.h"
+
 
 namespace gazebo
 {
@@ -36,9 +38,24 @@ void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf
       &ros_queue_);
   ros_sub_ = ros_node_->subscribe(so);
 
+  // Create a service for changing balance com strength
+//  bool balance;
+//  if (ros_node_->getParam("/march/balance", balance)) {
+//    ROS_WARN_STREAM("Balance param " << "was found.");
+//  }
+//  if (balance) {
+//  ROS_WARN_STREAM("Balance param " << "was true.");
+//  ros::ServiceServer ros_service_ = ros_node_->advertiseService("/march/balance/change_com_level", &ComControllerPlugin::onChangeComLevel, this);
+//  }
   // Spin up the queue helper thread.
   ros_queue_thread_ = std::thread(std::bind(&ComControllerPlugin::queueThread, this));
 }
+
+//bool ComControllerPlugin::onChangeComLevel(std_srvs::Trigger::Request &req,
+//             std_srvs::Trigger::Response &res) {
+//    ROS_WARN_STREAM("Requested to change ComLevel. " << "Go go go.");
+//    return false;
+//}
 
 void ComControllerPlugin::onRosMsg(const march_shared_msgs::CurrentGaitConstPtr& msg)
 {

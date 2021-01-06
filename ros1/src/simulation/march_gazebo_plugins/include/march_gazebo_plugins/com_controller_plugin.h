@@ -6,6 +6,7 @@
 #include <gazebo/physics/physics.hh>
 #include <ros/callback_queue.h>
 #include <ros/ros.h>
+//#include "std_srvs/Trigger.h"
 
 #ifndef MARCH_GAZEBO_PLUGINS_COM_CONTROLLER_PLUGIN_H
 #define MARCH_GAZEBO_PLUGINS_COM_CONTROLLER_PLUGIN_H
@@ -16,6 +17,7 @@ class ComControllerPlugin : public ModelPlugin
 {
 public:
   void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/) override;
+//  bool onChangeComLevel(std_srvs::Trigger::Request& req, std_srvs::Trigger::Response& res);
   void onRosMsg(const march_shared_msgs::CurrentGaitConstPtr& msg);
 
   // Called by the world update start event
@@ -36,6 +38,8 @@ private:
 
   /// \brief A ROS subscriber
   ros::Subscriber ros_sub_;
+
+//  ros::ServiceServer ros_service_;
 
   /// \brief A ROS callbackqueue that helps process messages
   ros::CallbackQueue ros_queue_;
