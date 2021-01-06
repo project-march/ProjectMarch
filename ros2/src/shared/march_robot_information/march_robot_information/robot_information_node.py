@@ -3,7 +3,6 @@ from typing import List
 import rclpy
 from rcl_interfaces.msg import ParameterValue
 from rcl_interfaces.srv import GetParameters
-from rclpy.parameter import Parameter
 from rclpy.node import Node
 from urdf_parser_py import urdf
 
@@ -24,8 +23,7 @@ class RobotInformation(Node):
     about the march robot in its parameters."""
     def __init__(self):
         super().__init__(NODE_NAME,
-                         automatically_declare_parameters_from_overrides=True,
-                         namespace='march')
+                         automatically_declare_parameters_from_overrides=True)
         self.get_parameter_clients = {}
         self.add_joint_names()
 
@@ -58,7 +56,7 @@ class RobotInformation(Node):
         :return: Returns the values that are retrieved from the service call.
         """
         srv_name = f'{node}/get_parameters'
-        if not srv_name in self.get_parameter_clients:
+        if srv_name not in self.get_parameter_clients:
             client = self.create_client(GetParameters, srv_name)
             self.get_parameter_clients[srv_name] = client
         else:

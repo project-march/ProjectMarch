@@ -14,7 +14,9 @@ setup(
          [os.path.join('resource', package_name)]),
         (os.path.join('share', package_name), ['package.xml']),
         (os.path.join('share', package_name, 'launch'),
-         glob('launch/*.launch.py'))
+         glob('launch/*.launch.py')),
+        (os.path.join('share', package_name, 'test'),
+         glob('test/*.py'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -26,7 +28,8 @@ setup(
     license='TODO: License declaration',
     entry_points={
         'console_scripts': [
-            f'{package_name} = {package_name}.robot_information_node:main'
+            f'{package_name} = {package_name}.robot_information_node:main',
         ],
     },
+    tests_require=['pytest']
 )

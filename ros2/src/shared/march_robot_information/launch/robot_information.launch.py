@@ -17,5 +17,6 @@ def generate_launch_description():
             executable='march_robot_information',
             output='screen',
             name='robot_information',
+            namespace='march',
             parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}])
     ])
