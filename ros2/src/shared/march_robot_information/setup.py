@@ -1,22 +1,24 @@
 import os
 from glob import glob
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 package_name = 'march_robot_information'
 
 setup(
     name=package_name,
     version='0.0.0',
-    packages=[package_name],
+    packages=find_packages(),
     data_files=[
         (os.path.join('share', 'ament_index', 'resource_index', 'packages'),
          [os.path.join('resource', package_name)]),
         (os.path.join('share', package_name), ['package.xml']),
         (os.path.join('share', package_name, 'launch'),
          glob('launch/*.launch.py')),
-        (os.path.join('share', package_name, 'test'),
-         glob('test/*.py'))
+        (os.path.join('share', package_name, 'test', 'launch_test'),
+         glob('test/launch_test/*.py')),
+        (os.path.join('share', package_name, 'test', 'unittest'),
+         glob('test/unittest/*.py'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,

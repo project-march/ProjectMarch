@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import rclpy
 from rcl_interfaces.msg import ParameterValue
@@ -22,11 +22,16 @@ def main():
 class RobotInformation(Node):
     """The RobotInformation is a simple node that holds additional information
     about the march robot in its parameters."""
-    def __init__(self):
+    def __init__(self, joint_names: Optional[List[str]] = None):
         super().__init__(NODE_NAME,
                          automatically_declare_parameters_from_overrides=True)
         self.get_parameter_clients = {}
-        self.joint_names = self.get_joint_names()
+
+        if joint_names is not None:
+            self.joint_names = joint_names
+        else:
+            self.joint_names = self.get_joint_names()
+
         self.create_service(GetJointNames, 'robot_information/get_joint_names',
                             self.get_joint_names_cb)
 
@@ -75,6 +80,7 @@ class RobotInformation(Node):
 
         return future.result().values
 
-    def get_joint_names_cb(self, request, response):
+    def get_joint_names_cb(self, _, response):
+        """Return the joint names."""
         response.joint_names = self.joint_names
         return response

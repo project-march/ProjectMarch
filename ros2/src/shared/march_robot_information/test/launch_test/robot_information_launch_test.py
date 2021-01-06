@@ -11,9 +11,6 @@ from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_testing.actions import ReadyToTest
-from rcl_interfaces.msg import ParameterType
-from rcl_interfaces.srv import GetParameters
-
 from march_shared_msgs.srv import GetJointNames
 
 
