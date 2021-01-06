@@ -145,4 +145,4 @@ for all ROS1 building and running, one for the bridge and one for all ROS2 code
     alias march_run_ros2='bash -i -c "sfox && sros2 && ros2 launch march_launch march_ros2_simulation.launch.py"'
 
     alias march_build_bridge='bash -i -c "snoe && sfox && sros1 && sros2 && cd ~/ros1_bridge && colcon build --packages-select ros1_bridge --cmake-force-configure && source install/local_setup.bash && ros2 run ros1_bridge dynamic_bridge --print-pairs"'
-    alias march_run_bridge='bash -i -c "snoe && sfox && cd ~/ros1_bridge && source install/local_setup.bash && export ROS_MASTER_URI=http://localhost:11311 && ros2 run ros1_bridge dynamic_bridge --bridge-all-topics"'
+    alias march_run_bridge='bash -i -c "snoe && sfox && sros1 && sros2 && cd ~/ros1_bridge && source install/local_setup.bash && export ROS_MASTER_URI=http://localhost:11311 && ros2 run ros1_bridge dynamic_bridge --bridge-all-topics"'

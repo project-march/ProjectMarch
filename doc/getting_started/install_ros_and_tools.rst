@@ -86,7 +86,7 @@ This tutorial is mostly copied from `Install ROS1 Noetic <https://wiki.ros.org/n
 .. code:: bash
 
   sudo apt update
-  source /opt/ros/noetic/setup.bash
+  source /opt/ros/noetic/local_setup.bash
   cd ~/march/ros1/
   rosdep install --rosdistro noetic -y --from-paths src --ignore-src
 
@@ -140,6 +140,7 @@ This tutorial is a slightly updated version of `Install ROS2 Foxy <https://index
 
 .. code:: bash
 
+    source /opt/ros/foxy/local_setup.bash
     cd ~/march/ros2
     rosdep update
     rosdep install --from-paths src --ignore-src --rosdistro foxy -y
