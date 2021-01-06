@@ -48,7 +48,8 @@ container:build:
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH
     - if [[ $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]; then docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH $CI_REGISTRY_IMAGE:latest && docker push $CI_REGISTRY_IMAGE:latest; fi;
   rules:
-    - if: '$CI_MERGE_REQUEST_EVENT_TYPE != "detached"'
+    # If this variable is empty, then the image tag cannot be created. It is empty in merge request pipelines or tag pipelines.
+    - if: '$CI_COMMIT_BRANCH != ""'
       changes:
         - Dockerfile
         - "**/package.xml"
