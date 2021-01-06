@@ -14,6 +14,8 @@ from launch_testing.actions import ReadyToTest
 from rcl_interfaces.msg import ParameterType
 from rcl_interfaces.srv import GetParameters
 
+from march_shared_msgs.srv import GetJointNames
+
 
 @pytest.mark.launch_test
 def generate_test_description():
@@ -61,24 +63,16 @@ class TestRobotInformation(unittest.TestCase):
     def test_get_joint_names(self):
         """Test that all joint names that are set on the robot information
         node parameters are equal to the expected eight joints."""
-        client = self.node.create_client(GetParameters,
+        client = self.node.create_client(GetJointNames,
                                          '/march/robot_information/'
-                                         'get_parameters')
-
+                                         'get_joint_names')
         client.wait_for_service()
 
-        while True:
-            future = client.call_async(
-                GetParameters.Request(names=['joint_names']))
+        future = client.call_async(GetJointNames.Request())
+        rclpy.spin_until_future_complete(self.node, future)
+        joint_names = future.result().joint_names
 
-            rclpy.spin_until_future_complete(self.node, future)
-            joint_names = future.result().values[0]
-
-            # Only break the loop if the parameter type is set
-            if joint_names.type != ParameterType.PARAMETER_NOT_SET:
-                break
-
-        self.assertEqual(joint_names.string_array_value,
+        self.assertEqual(joint_names,
                          ['left_hip_aa', 'left_hip_fe', 'left_knee',
                           'left_ankle', 'right_hip_aa', 'right_hip_fe',
                           'right_knee', 'right_ankle'])

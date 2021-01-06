@@ -3,6 +3,7 @@ from typing import List
 import rclpy
 from rcl_interfaces.msg import ParameterValue
 from rcl_interfaces.srv import GetParameters
+from march_shared_msgs.srv import GetJointNames
 from rclpy.node import Node
 from urdf_parser_py import urdf
 
@@ -25,9 +26,11 @@ class RobotInformation(Node):
         super().__init__(NODE_NAME,
                          automatically_declare_parameters_from_overrides=True)
         self.get_parameter_clients = {}
-        self.add_joint_names()
+        self.joint_names = self.get_joint_names()
+        self.create_service(GetJointNames, 'robot_information/get_joint_names',
+                            self.get_joint_names_cb)
 
-    def add_joint_names(self):
+    def get_joint_names(self) -> List[str]:
         """
         Add the list of joint names to the parameters of this node.
 
@@ -46,6 +49,7 @@ class RobotInformation(Node):
                 joint_names.append(joint.name)
 
         self.declare_parameter(name='joint_names', value=joint_names)
+        return joint_names
 
     def make_get_parameters_request(self, node: str, names: List[str]) \
             -> List[ParameterValue]:
@@ -70,3 +74,7 @@ class RobotInformation(Node):
         rclpy.spin_until_future_complete(self, future)
 
         return future.result().values
+
+    def get_joint_names_cb(self, request, response):
+        response.joint_names = self.joint_names
+        return response
