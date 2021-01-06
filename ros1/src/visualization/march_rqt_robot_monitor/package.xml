@@ -12,7 +12,7 @@
   <depend>std_msgs</depend>
   <depend>diagnostic_aggregator</depend>
   <depend>diagnostic_updater</depend>
-  <depend>march_shared_resources</depend>
+  <depend>march_shared_msgs</depend>
 
   <exec_depend>roscpp</exec_depend>
   <exec_depend>rospy</exec_depend>

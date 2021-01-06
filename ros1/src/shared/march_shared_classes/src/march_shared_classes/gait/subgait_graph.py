@@ -81,7 +81,7 @@ class SubgaitGraph(object):
 
     def start_subgaits(self):
         """Returns a list of subgait names that transition from the `start` state."""
-        return self._graph[self.START].values()
+        return list(self._graph[self.START].values())
 
     def end_subgaits(self):
         """Returns a list of subgait names that transition to the `end` state."""

@@ -19,8 +19,8 @@ def generate_launch_description() -> launch.LaunchDescription:
             executable='gait_version_tool',
             output='screen',
             name='gait_version_tool',
-            parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}],
-            # Give the source directory as argument to find the march_gait_files
-            arguments=[EnvironmentVariable('PWD')]
+            parameters=[
+                {'use_sim_time': LaunchConfiguration('use_sim_time')}
+            ]
         )
     ])

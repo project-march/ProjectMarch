@@ -1,17 +1,17 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(march_rqt_robot_monitor)
 
 find_package(catkin REQUIRED COMPONENTS
     diagnostic_aggregator
     diagnostic_updater
-    march_shared_resources
+    march_shared_msgs
     std_msgs
 )
 
 catkin_package(CATKIN_DEPENDS
     diagnostic_aggregator
     diagnostic_updater
-    march_shared_resources
+    march_shared_msgs
     std_msgs
 )
 

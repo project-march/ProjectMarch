@@ -3,9 +3,9 @@ from std_msgs.msg import Header
 from std_srvs.srv import Trigger
 from urdf_parser_py import urdf
 
-from march_shared_resources.msg import CurrentGait, CurrentState, Error
-from march_shared_resources.srv import (ContainsGait, ContainsGaitResponse, PossibleGaits, PossibleGaitsResponse,
-                                        SetGaitVersion)
+from march_shared_msgs.msg import CurrentGait, CurrentState, Error
+from march_shared_msgs.srv import (ContainsGait, ContainsGaitResponse, PossibleGaits, PossibleGaitsResponse,
+                                   SetGaitVersion)
 
 from .dynamic_gaits.balance_gait import BalanceGait
 from .gait_selection import GaitSelection
@@ -23,9 +23,9 @@ DEFAULT_UPDATE_RATE = 120.0
 def set_gait_versions(msg, gait_selection):
     """Sets a new gait version to the gait selection instance.
 
-    :type msg: march_shared_resources.srv.SetGaitVersionRequest
+    :type msg: march_shared_msgs.srv.SetGaitVersionRequest
     :type gait_selection: GaitSelection
-    :rtype march_shared_resources.srv.SetGaitVersionResponse
+    :rtype march_shared_msgs.srv.SetGaitVersionResponse
     """
     if len(msg.subgaits) != len(msg.versions):
         return [False, '`subgaits` and `versions` array are not of equal length']

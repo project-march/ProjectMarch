@@ -7,8 +7,6 @@
   <maintainer email="software@projectmarch.nl">Project March</maintainer>
   <license>TODO</license>
 
-  <buildtool_depend>ament_python</buildtool_depend>
-
   <exec_depend>rclpy</exec_depend>
   <exec_depend>rqt_gui</exec_depend>
   <exec_depend>rqt_gui_py</exec_depend>

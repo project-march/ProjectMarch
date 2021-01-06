@@ -1,0 +1,106 @@
+{
+  "keys": {},
+  "groups": {
+    "mainwindow": {
+      "keys": {
+        "geometry": {
+          "repr(QByteArray.hex)": "QtCore.QByteArray(b'01d9d0cb0002000000000000000000000000077f00000437000000000000001c0000077f0000043700000001000000000780')",
+          "type": "repr(QByteArray.hex)",
+          "pretty-print": "           7       7     "
+        },
+        "state": {
+          "repr(QByteArray.hex)": "QtCore.QByteArray(b'000000ff00000000fd000000010000000300000780000003f0fc0100000001fc0000000000000780000002b100fffffffc0200000002fc0000001600000275000000c300080014fc0100000002fb00000072006d0061007200630068005f007200710074005f0069006e007000750074005f006400650076006900630065005f005f0049006e0070007500740044006500760069006300650050006c007500670069006e005f005f0031005f005f006d00610069006e005f00770069006400670065007401000000000000037a000000f70007fffffb00000064006d0061007200630068005f007200710074005f006e006f00740065005f00740061006b00650072005f005f004e006f0074006500730050006c007500670069006e005f005f0031005f005f006e006f007400650073005f007700690064006700650074010000038000000400000001b400fffffffb00000088006d0061007200630068005f007200710074005f0067006100690074005f00760065007200730069006f006e005f0074006f006f006c005f005f004700610069007400560065007200730069006f006e0054006f006f006c0050006c007500670069006e005f005f0031005f005f004700610069007400530065006c0065006300740069006f006e0100000291000001750000008100ffffff000007800000000000000004000000040000000800000008fc00000001000000030000000100000036004d0069006e0069006d0069007a006500640044006f0063006b00570069006400670065007400730054006f006f006c0062006100720000000000ffffffff0000000000000000')",
+          "type": "repr(QByteArray.hex)",
+          "pretty-print": "                                        rmarch_rqt_input_device__InputDevicePlugin__1__main_widget          dmarch_rqt_note_taker__NotesPlugin__1__notes_widget           march_rqt_gait_version_tool__GaitVersionToolPlugin__1__GaitSelection                            6MinimizedDockWidgetsToolbar        "
+        }
+      },
+      "groups": {
+        "toolbar_areas": {
+          "keys": {
+            "MinimizedDockWidgetsToolbar": {
+              "repr": "8",
+              "type": "repr"
+            }
+          },
+          "groups": {}
+        }
+      }
+    },
+    "pluginmanager": {
+      "keys": {
+        "running-plugins": {
+          "repr": "{'march_rqt_gait_version_tool/GaitVersionToolPlugin': [1], 'march_rqt_input_device/InputDevicePlugin': [1], 'march_rqt_note_taker/NotesPlugin': [1]}",
+          "type": "repr"
+        }
+      },
+      "groups": {
+        "plugin__march_rqt_gait_version_tool__GaitVersionToolPlugin__1": {
+          "keys": {},
+          "groups": {
+            "dock_widget__GaitSelection": {
+              "keys": {
+                "dock_widget_title": {
+                  "repr": "'March Gait Selection'",
+                  "type": "repr"
+                },
+                "dockable": {
+                  "repr": "True",
+                  "type": "repr"
+                },
+                "parent": {
+                  "repr": "None",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            }
+          }
+        },
+        "plugin__march_rqt_input_device__InputDevicePlugin__1": {
+          "keys": {},
+          "groups": {
+            "dock_widget__main_widget": {
+              "keys": {
+                "dock_widget_title": {
+                  "repr": "'March Input Device'",
+                  "type": "repr"
+                },
+                "dockable": {
+                  "repr": "True",
+                  "type": "repr"
+                },
+                "parent": {
+                  "repr": "None",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            }
+          }
+        },
+        "plugin__march_rqt_note_taker__NotesPlugin__1": {
+          "keys": {},
+          "groups": {
+            "dock_widget__notes_widget": {
+              "keys": {
+                "dock_widget_title": {
+                  "repr": "'Note taker'",
+                  "type": "repr"
+                },
+                "dockable": {
+                  "repr": "True",
+                  "type": "repr"
+                },
+                "parent": {
+                  "repr": "None",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            }
+          }
+        }
+      }
+    }
+  }
+}

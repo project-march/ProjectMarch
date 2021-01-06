@@ -13,19 +13,25 @@ def generate_launch_description() -> launch.LaunchDescription:
 
     return launch.LaunchDescription([
         DeclareLaunchArgument(
-            'node_prefix',
+            name='node_prefix',
             default_value=[EnvironmentVariable('USER'), '_'],
             description='Prefix for node names'),
         DeclareLaunchArgument(
-            'ping_safety_node',
+            name='ping_safety_node',
             default_value='True',
             description='Whether to ping the safety node'),
         DeclareLaunchArgument(
-            'use_sim_time',
+            name='use_sim_time',
             default_value='True',
             description='Whether to use simulation time'),
         Node(
-            package='march_rqt_input_device', executable='input_device', output='screen',
-            name='input_device', arguments=[LaunchConfiguration('ping_safety_node'),
-                                            LaunchConfiguration('use_sim_time')])
+            package='march_rqt_input_device',
+            executable='input_device',
+            output='screen',
+            name='input_device',
+            parameters=[
+                {'use_sim_time': LaunchConfiguration('use_sim_time')},
+                {'ping_safety_node': LaunchConfiguration('ping_safety_node')}
+            ]
+        )
     ])

@@ -1,6 +1,5 @@
 <launch>
     <arg name="use_sim_time" default="true" doc="Uses simulated time and publishes on /clock."/>
-    <arg name="fake_sensor_data" default="false" doc="Publishes fake sensor data."/>
     <arg name="gazebo_ui" default="true" doc="Launches the Gazebo UI."/>
     <arg name="debug" default="false" doc="Starts gazebo debugging with gdb."/>
     <arg name="fixed" default="true" doc="Fixes the exoskeleton in the world"/>
@@ -34,12 +33,10 @@
               respawn="false" output="screen"
               args="spawn controller/trajectory joint_state_controller"/>
 
-        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
         <node name="upload_joint_names" pkg="march_simulation" type="upload_joint_names"/>
         <node name="world_transformer" pkg="march_simulation" type="to_world_transform" unless="$(arg fixed)"/>
         <node name="set_obstacle_node" pkg="march_simulation" type="set_obstacle_dimensions"/>
 
-        <include file="$(find march_fake_sensor_data)/launch/march_fake_sensor_data.launch" if="$(arg fake_sensor_data)"/>
     </group>
 
     <group>

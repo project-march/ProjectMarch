@@ -5,7 +5,7 @@ import unittest
 from parameterized import parameterized
 import rospy
 
-from march_shared_resources.srv import GetParamBool, GetParamBoolRequest, GetParamFloat, GetParamFloatRequest, \
+from march_shared_msgs.srv import GetParamBool, GetParamBoolRequest, GetParamFloat, GetParamFloatRequest, \
     GetParamInt, GetParamIntRequest, GetParamString, GetParamStringList, GetParamStringListRequest, \
     GetParamStringRequest, SetParamBool, SetParamBoolRequest, SetParamFloat, SetParamFloatRequest, SetParamInt, \
     SetParamIntRequest, SetParamString, SetParamStringList, SetParamStringListRequest, SetParamStringRequest

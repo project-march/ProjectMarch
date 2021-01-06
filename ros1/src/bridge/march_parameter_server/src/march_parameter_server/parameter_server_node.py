@@ -1,6 +1,6 @@
 import rospy
 
-from march_shared_resources.srv import GetParamBool, GetParamBoolResponse, GetParamFloat, GetParamFloatResponse, \
+from march_shared_msgs.srv import GetParamBool, GetParamBoolResponse, GetParamFloat, GetParamFloatResponse, \
     GetParamInt, GetParamIntResponse, GetParamString, GetParamStringList, GetParamStringListResponse, \
     GetParamStringResponse, SetParamBool, SetParamBoolResponse, SetParamFloat, SetParamFloatResponse, SetParamInt, \
     SetParamIntResponse, SetParamString, SetParamStringList, SetParamStringListResponse, SetParamStringResponse

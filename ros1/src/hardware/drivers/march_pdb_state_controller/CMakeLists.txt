@@ -8,7 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
     hardware_interface
     march_hardware
     march_hardware_interface
-    march_shared_resources
+    march_shared_msgs
     pluginlib
     realtime_tools
     roscpp
@@ -23,7 +23,7 @@ catkin_package(
     hardware_interface
     march_hardware
     march_hardware_interface
-    march_shared_resources
+    march_shared_msgs
     pluginlib
     realtime_tools
     roscpp

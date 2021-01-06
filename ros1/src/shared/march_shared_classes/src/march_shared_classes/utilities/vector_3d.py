@@ -23,7 +23,13 @@ class Vector3d(object):
         z = self.z - other.z
         return Vector3d(x, y, z)
 
-    def __div__(self, factor):
+    def __floordiv__(self, factor):
+        x = self.x / factor
+        y = self.y / factor
+        z = self.z / factor
+        return Vector3d(x, y, z)
+
+    def __truediv__(self, factor):
         x = self.x / factor
         y = self.y / factor
         z = self.z / factor

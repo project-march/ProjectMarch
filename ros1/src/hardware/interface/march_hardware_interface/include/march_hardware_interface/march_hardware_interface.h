@@ -20,8 +20,8 @@
 
 #include <march_hardware/march_robot.h>
 #include <march_hardware_builder/hardware_builder.h>
-#include <march_shared_resources/AfterLimitJointCommand.h>
-#include <march_shared_resources/ImcState.h>
+#include <march_shared_msgs/AfterLimitJointCommand.h>
+#include <march_shared_msgs/ImcState.h>
 
 template <typename T>
 using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;
@@ -135,8 +135,8 @@ private:
   bool has_actuated_ = false;
 
   /* Real time safe publishers */
-  RtPublisherPtr<march_shared_resources::AfterLimitJointCommand> after_limit_joint_command_pub_;
-  RtPublisherPtr<march_shared_resources::ImcState> imc_state_pub_;
+  RtPublisherPtr<march_shared_msgs::AfterLimitJointCommand> after_limit_joint_command_pub_;
+  RtPublisherPtr<march_shared_msgs::ImcState> imc_state_pub_;
 };
 
 #endif  // MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_H

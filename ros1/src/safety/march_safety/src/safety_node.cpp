@@ -5,8 +5,8 @@
 #include <ros/ros.h>
 #include <sound_play/sound_play.h>
 
-#include "march_shared_resources/Error.h"
-#include "march_shared_resources/GaitInstruction.h"
+#include "march_shared_msgs/Error.h"
+#include "march_shared_msgs/GaitInstruction.h"
 
 #include "march_safety/input_device_safety.h"
 #include "march_safety/safety_handler.h"
@@ -30,9 +30,9 @@ int main(int argc, char** argv)
   ROS_DEBUG("Got joint names");
 
   // Create an error publisher to notify the system (state machine) if something is wrong
-  ros::Publisher error_publisher = n.advertise<march_shared_resources::Error>("/march/error", 1000);
+  ros::Publisher error_publisher = n.advertise<march_shared_msgs::Error>("/march/error", 1000);
   ros::Publisher gait_instruction_publisher =
-      n.advertise<march_shared_resources::GaitInstruction>("/march/input_device/instruction", 1000);
+      n.advertise<march_shared_msgs::GaitInstruction>("/march/input_device/instruction", 1000);
   sound_play::SoundClient sound_client(n, "robotsound");
 
   SafetyHandler safety_handler = SafetyHandler(&n, &error_publisher, &gait_instruction_publisher, sound_client);

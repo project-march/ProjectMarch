@@ -11,15 +11,20 @@ def generate_launch_description() -> launch.LaunchDescription:
             'use_sim_time',
             default_value='True',
             description='Whether to use simulation time'),
+        DeclareLaunchArgument(
+            name='perspective',
+            default_value='full_monitor',
+            description='Which perspective file to use.'
+        ),
         Node(
             package='rqt_gui',
             executable='rqt_gui',
             name='march_monitor',
             output='screen',
-
-            ## Update perspective file to full_monitor.perspective when done with all monitor packages
-            arguments=['--perspective-file', PathJoinSubstitution([get_package_share_directory('march_monitor'),
-                                                                     'config', 'rqt_note_taker.perspective'])],
+            arguments=['--perspective-file', [PathJoinSubstitution([get_package_share_directory('march_monitor'),
+                                                                   'config',
+                                                                   LaunchConfiguration('perspective')]),
+                                                                   '.perspective']],
             parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}]
         ),
         # Uncomment this when march_rqt_robot_monitor is added

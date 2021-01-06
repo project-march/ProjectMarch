@@ -9,11 +9,11 @@ InputDeviceSafety::InputDeviceSafety(ros::NodeHandle* n, SafetyHandler* safety_h
   int milliseconds;
   ros::param::get("~input_device_connection_timeout", milliseconds);
   this->connection_timeout_ = ros::Duration(milliseconds / 1000.0);
-  this->subscriber_input_device_alive_ = n->subscribe<march_shared_resources::Alive>(
+  this->subscriber_input_device_alive_ = n->subscribe<march_shared_msgs::Alive>(
       "/march/input_device/alive", 10, &InputDeviceSafety::inputDeviceAliveCallback, this);
 }
 
-void InputDeviceSafety::inputDeviceAliveCallback(const march_shared_resources::AliveConstPtr& msg)
+void InputDeviceSafety::inputDeviceAliveCallback(const march_shared_msgs::AliveConstPtr& msg)
 {
   this->last_alive_stamps_[msg->id] = msg->stamp;
 }

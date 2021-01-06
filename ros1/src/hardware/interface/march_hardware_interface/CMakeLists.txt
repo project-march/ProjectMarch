@@ -11,7 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
     march_description
     march_hardware
     march_hardware_builder
-    march_shared_resources
+    march_shared_msgs
     realtime_tools
     roscpp
     std_msgs
@@ -26,7 +26,7 @@ catkin_package(
     march_description
     march_hardware
     march_hardware_builder
-    march_shared_resources
+    march_shared_msgs
     realtime_tools
     roscpp
     std_msgs

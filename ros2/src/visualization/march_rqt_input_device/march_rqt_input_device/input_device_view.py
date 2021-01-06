@@ -260,6 +260,10 @@ class InputDeviceView(QWidget):
             self.create_button('curb_sdg',
                                callback=lambda: self._controller.publish_gait('curb_sdg'))
 
+        ik_test = \
+            self.create_button('ik_test',
+                               callback=lambda: self._controller.publish_gait('ik_test'))
+
         stop_button = self.create_button('stop', image_path='/stop.png',
                                          callback=lambda: self._controller.publish_stop(),
                                          always_enabled=True)
@@ -314,7 +318,7 @@ class InputDeviceView(QWidget):
             [gait_tilted_path_first_start, gait_tilted_path_second_start, gait_tilted_path_first_end,
              gait_tilted_path_second_end],
 
-            [gait_curb]
+            [ik_test, gait_curb]
         ]
 
         # Create the qt_layout from the button layout.

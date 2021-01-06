@@ -2,7 +2,7 @@ from enum import Enum
 
 import rospy
 
-from march_shared_resources.msg import GaitInstruction, GaitInstructionResponse
+from march_shared_msgs.msg import GaitInstruction, GaitInstructionResponse
 
 
 class TransitionRequest(Enum):

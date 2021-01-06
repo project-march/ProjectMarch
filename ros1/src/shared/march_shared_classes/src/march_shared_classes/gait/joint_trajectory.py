@@ -137,7 +137,9 @@ class JointTrajectory(object):
             rospy.logerr('Could not interpolate setpoint at time {0}'.format(time))
             return self.setpoint_class(time, self.setpoints[-1].position, 0)
 
-        return self.setpoint_class(time, self.interpolated_position(time), self.interpolated_velocity(time))
+        return self.setpoint_class(
+            time, float(self.interpolated_position(time)),
+            float(self.interpolated_velocity(time)))
 
     def __getitem__(self, index):
         return self.setpoints[index]

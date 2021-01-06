@@ -40,7 +40,7 @@ void PDOmap::addObject(IMCObjectName object_name)
 
   if (this->PDO_objects.count(object_name) != 0)
   {
-    ROS_WARN("IMC object %i is already added to PDO map", object_name);
+    ROS_WARN("IMC object %i is already added to PDO map", static_cast<int>(object_name));
     return;
   }
 

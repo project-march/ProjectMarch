@@ -15,7 +15,7 @@ SafetyHandler::SafetyHandler(ros::NodeHandle* n, ros::Publisher* error_publisher
 
 void SafetyHandler::publishErrorMessage(const std::string& message, int8_t error_type) const
 {
-  march_shared_resources::Error error_msg;
+  march_shared_msgs::Error error_msg;
   std::ostringstream message_stream;
   error_msg.header.stamp = ros::Time::now();
   error_msg.error_message = message;
@@ -25,9 +25,9 @@ void SafetyHandler::publishErrorMessage(const std::string& message, int8_t error
 
 void SafetyHandler::publishStopMessage() const
 {
-  march_shared_resources::GaitInstruction gait_instruction_msg;
+  march_shared_msgs::GaitInstruction gait_instruction_msg;
   gait_instruction_msg.header.stamp = ros::Time::now();
-  gait_instruction_msg.type = march_shared_resources::GaitInstruction::STOP;
+  gait_instruction_msg.type = march_shared_msgs::GaitInstruction::STOP;
   this->gait_instruction_publisher_->publish(gait_instruction_msg);
 }
 
@@ -35,7 +35,7 @@ void SafetyHandler::publishFatal(const std::string& message)
 {
   ROS_ERROR("%s", message.c_str());
 
-  this->publishErrorMessage(message, march_shared_resources::Error::FATAL);
+  this->publishErrorMessage(message, march_shared_msgs::Error::FATAL);
   this->fatal_sound_.play();
 }
 
@@ -44,6 +44,6 @@ void SafetyHandler::publishNonFatal(const std::string& message)
   ROS_ERROR("%s", message.c_str());
 
   this->publishStopMessage();
-  this->publishErrorMessage(message, march_shared_resources::Error::NON_FATAL);
+  this->publishErrorMessage(message, march_shared_msgs::Error::NON_FATAL);
   this->non_fatal_sound_.play();
 }
