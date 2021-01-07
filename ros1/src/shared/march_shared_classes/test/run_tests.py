@@ -8,12 +8,12 @@ from .setpoint_test import SetpointTest
 from .subgait_graph_test import SubgaitGraphTest
 from .subgait_test import SubgaitTest
 
-PKG = 'march_shared_classes'
+PKG = "march_shared_classes"
 
-if __name__ == '__main__':
-    rosunit.unitrun(PKG, 'limits_test', LimitsTest)
-    rosunit.unitrun(PKG, 'setpoint_test', SetpointTest)
-    rosunit.unitrun(PKG, 'joint_trajectory_test', JointTrajectoryTest)
-    rosunit.unitrun(PKG, 'subgait_graph_test', SubgaitGraphTest)
-    rosunit.unitrun(PKG, 'subgait_test', SubgaitTest)
-    rosunit.unitrun(PKG, 'gait_test', GaitTest)
+if __name__ == "__main__":
+    rosunit.unitrun(PKG, "limits_test", LimitsTest)
+    rosunit.unitrun(PKG, "setpoint_test", SetpointTest)
+    rosunit.unitrun(PKG, "joint_trajectory_test", JointTrajectoryTest)
+    rosunit.unitrun(PKG, "subgait_graph_test", SubgaitGraphTest)
+    rosunit.unitrun(PKG, "subgait_test", SubgaitTest)
+    rosunit.unitrun(PKG, "gait_test", GaitTest)

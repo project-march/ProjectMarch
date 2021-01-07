@@ -13,7 +13,7 @@ class HomeGait(GaitInterface):
         :param str gait_type: Gait type to use for home gait
         :param float duration: Duration of the gait in seconds. Defaults to 3 seconds.
         """
-        self._name = 'home_{name}'.format(name=name)
+        self._name = "home_{name}".format(name=name)
         self._position = position
         self._gait_type = gait_type
         self._duration = duration

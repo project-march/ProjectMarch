@@ -4,10 +4,13 @@ import unittest
 
 import rosunit
 
-from march_gain_scheduling.interpolation_errors import NegativeValueError, UnequalLengthError
+from march_gain_scheduling.interpolation_errors import (
+    NegativeValueError,
+    UnequalLengthError,
+)
 from march_gain_scheduling.one_step_linear_interpolation import interpolate
 
-PKG = 'march_gain_scheduling'
+PKG = "march_gain_scheduling"
 
 
 class OneStepLinearInterpolationTest(unittest.TestCase):
@@ -55,5 +58,5 @@ class OneStepLinearInterpolationTest(unittest.TestCase):
         self.assertEqual(result, [])
 
 
-if __name__ == '__main__':
-    rosunit.unitrun(PKG, 'test_multiply', OneStepLinearInterpolationTest)
+if __name__ == "__main__":
+    rosunit.unitrun(PKG, "test_multiply", OneStepLinearInterpolationTest)
