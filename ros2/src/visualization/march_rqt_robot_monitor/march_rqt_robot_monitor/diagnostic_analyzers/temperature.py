@@ -1,5 +1,5 @@
 from diagnostic_msgs.msg import DiagnosticStatus
-import rospy
+from rclpy.node import Node
 
 LOWER_THRESHOLD_VALID_TEMPERATURE_VALUE = 0
 UPPER_THRESHOLD_VALID_TEMPERATURE_VALUE = 100

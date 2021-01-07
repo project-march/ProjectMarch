@@ -1,5 +1,5 @@
 from diagnostic_msgs.msg import DiagnosticStatus
-import rospy
+from rclpy.node import Node
 from urdf_parser_py import urdf
 
 
@@ -9,8 +9,8 @@ WARN_PERCENTAGE = 5
 class CheckJointValues(object):
     """Base class to diagnose the joint movement values."""
 
-    def __init__(self, topic, msg_type):
-        rospy.Subscriber(topic, msg_type, self.cb)
+    def __init__(self, node: Node, topic: str, msg_type: type):
+        node.create_subscription(msg_type, topic, self.cb, qos_profile=10)
 
         # callback variables
         self._timestamp = None

@@ -19,7 +19,7 @@ def generate_launch_description():
             default_value='true',
             description='Set to launch the rqt robot monitor.'),
         Node(
-            package='march_rqt_robot_monitor_node',
+            package='march_rqt_robot_monitor',
             executable='march_rqt_robot_monitor',
             output='screen',
             name='march_rqt_robot_monitor'),

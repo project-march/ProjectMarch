@@ -1,11 +1,12 @@
 from diagnostic_msgs.msg import DiagnosticStatus
-import rospy
+from diagnostic_updater import Updater
+from rclpy.node import Node
 
 from march_shared_msgs.msg import CurrentGait
 
 
 class CheckGaitStatus(object):
-    def __init__(self, updater):
+    def __init__(self, node: Node, updater: Updater):
         """Initializes an gait diagnostic which analyzes gait and subgait states.
 
         :type updater: diagnostic_updater.Updater

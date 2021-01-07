@@ -11,6 +11,7 @@
   <depend>std_msgs</depend>
   <depend>diagnostic_aggregator</depend>
   <depend>diagnostic_updater</depend>
+  <depend>rqt_robot_monitor</depend>
   <depend>march_shared_msgs</depend>
 
   <export>

@@ -1,5 +1,6 @@
-from diagnostic_updater import FrequencyStatusParam, HeaderlessTopicDiagnostic
-import rospy
+from diagnostic_updater import FrequencyStatusParam, HeaderlessTopicDiagnostic, \
+    Updater
+from rclpy.node import Node
 
 
 class CheckInputDevice(object):
@@ -10,7 +11,7 @@ class CheckInputDevice(object):
         self._updater = updater
         self._diagnostics = {}
 
-        rospy.Subscriber(topic, message_type, self._cb)
+        node.create_subscription(message_type, topic, self._cb, qos_profile=10)
 
     def _cb(self, msg):
         """
