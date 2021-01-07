@@ -243,6 +243,25 @@ void ObstacleController::getWalkGoalPositionX(double time_since_start, double st
   else if (subgait_name_.substr(subgait_name_.size() - 5) == "close")
   {
     goal_position_x += 0.25 * swing_step_size_ - 0.25 * time_since_start * swing_step_size_ / subgait_duration_;
+
+bool ObstacleController::changeComLevel(std::string level_name)
+{
+  if (not std::count(com_levels.begin(), com_levels.end(), level_name))
+  {
+    ROS_WARN_STREAM("The requested CoM level was not found");
+    return false;
+  }
+  else
+  {
+    p_pitch_balance_ = com_levels_tree[level_name]["pitch"]["p"].as<double>();
+    d_pitch_balance_ = com_levels_tree[level_name]["pitch"]["d"].as<double>();
+
+    p_roll_balance_ = com_levels_tree[level_name]["roll"]["p"].as<double>();
+    d_roll_balance_ = com_levels_tree[level_name]["roll"]["d"].as<double>();
+
+    p_yaw_balance_ = com_levels_tree[level_name]["yaw"]["p"].as<double>();
+    d_yaw_balance_ = com_levels_tree[level_name]["yaw"]["d"].as<double>();
+    return true;
   }
 }
 

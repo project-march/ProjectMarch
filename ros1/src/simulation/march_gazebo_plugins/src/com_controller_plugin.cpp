@@ -2,8 +2,9 @@
 
 #include <march_gazebo_plugins/com_controller_plugin.h>
 #include <typeinfo>
-#include "std_srvs/Trigger.h"
-
+#include "march_shared_msgs/GetPossibleComLevels.h"
+#include "march_shared_msgs/ChangeComLevel.h"
+#include <boost/bind.hpp>
 
 namespace gazebo
 {
@@ -38,24 +39,46 @@ void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf
       &ros_queue_);
   ros_sub_ = ros_node_->subscribe(so);
 
-  // Create a service for changing balance com strength
-//  bool balance;
-//  if (ros_node_->getParam("/march/balance", balance)) {
-//    ROS_WARN_STREAM("Balance param " << "was found.");
-//  }
-//  if (balance) {
-//  ROS_WARN_STREAM("Balance param " << "was true.");
-//  ros::ServiceServer ros_service_ = ros_node_->advertiseService("/march/balance/change_com_level", &ComControllerPlugin::onChangeComLevel, this);
-//  }
+  bool balance;
+  if (ros_node_->param("/march/balance", balance, false))
+  {
+    //     Create change_com_level service
+    ros::AdvertiseServiceOptions aso_change_com;
+    boost::function<bool(march_shared_msgs::ChangeComLevel::Request&,
+                         march_shared_msgs::ChangeComLevel::Response&)> change_com_cb =
+        boost::bind(&ComControllerPlugin::onChangeComLevel, this, _1, _2);
+    aso_change_com.init("/march/balance/change_com_level", change_com_cb);
+    aso_change_com.callback_queue = &ros_queue_;
+    change_com_level_service_ = this->ros_node_->advertiseService(aso_change_com);
+
+    // Create get_possible_com_levels
+    ros::AdvertiseServiceOptions aso_get_com;
+    boost::function<bool(march_shared_msgs::GetPossibleComLevels::Request&,
+                         march_shared_msgs::GetPossibleComLevels::Response&)>
+        get_com_cb = boost::bind(&ComControllerPlugin::onGetPossibleComLevels, this, _1, _2);
+    aso_get_com.init("/march/balance/get_possible_com_levels", get_com_cb);
+    aso_get_com.callback_queue = &ros_queue_;
+    get_possible_com_levels_service_ = this->ros_node_->advertiseService(aso_get_com);
+  }
+
   // Spin up the queue helper thread.
   ros_queue_thread_ = std::thread(std::bind(&ComControllerPlugin::queueThread, this));
 }
 
-//bool ComControllerPlugin::onChangeComLevel(std_srvs::Trigger::Request &req,
-//             std_srvs::Trigger::Response &res) {
-//    ROS_WARN_STREAM("Requested to change ComLevel. " << "Go go go.");
-//    return false;
-//}
+bool ComControllerPlugin::onChangeComLevel(march_shared_msgs::ChangeComLevel::Request &req,
+                                           march_shared_msgs::ChangeComLevel::Response &res) {
+  ROS_WARN_STREAM("Requested to change CoM level.");
+  res.success = controller_->changeComLevel(req.level_name);
+  return true;
+}
+
+bool ComControllerPlugin::onGetPossibleComLevels(march_shared_msgs::GetPossibleComLevels::Request &req,
+                                                 march_shared_msgs::GetPossibleComLevels::Response &res)
+{
+//  ROS_WARN_STREAM("Requested to get ComLevel. " << controller_->com_levels);
+  res.com_levels = controller_->com_levels;
+  return true;
+}
 
 void ComControllerPlugin::onRosMsg(const march_shared_msgs::CurrentGaitConstPtr& msg)
 {

@@ -1,0 +1,4 @@
+# Service for changing the com level for balance
+string level_name
+---
+bool success

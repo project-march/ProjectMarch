@@ -6,7 +6,8 @@
 #include <gazebo/physics/physics.hh>
 #include <ros/callback_queue.h>
 #include <ros/ros.h>
-//#include "std_srvs/Trigger.h"
+#include "march_shared_msgs/GetPossibleComLevels.h"
+#include "march_shared_msgs/ChangeComLevel.h"
 
 #ifndef MARCH_GAZEBO_PLUGINS_COM_CONTROLLER_PLUGIN_H
 #define MARCH_GAZEBO_PLUGINS_COM_CONTROLLER_PLUGIN_H
@@ -17,7 +18,10 @@ class ComControllerPlugin : public ModelPlugin
 {
 public:
   void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/) override;
-//  bool onChangeComLevel(std_srvs::Trigger::Request& req, std_srvs::Trigger::Response& res);
+  bool onChangeComLevel(march_shared_msgs::ChangeComLevel::Request& req,
+                        march_shared_msgs::ChangeComLevel::Response& res);
+  bool onGetPossibleComLevels(march_shared_msgs::GetPossibleComLevels::Request& req,
+                              march_shared_msgs::GetPossibleComLevels::Response& res);
   void onRosMsg(const march_shared_msgs::CurrentGaitConstPtr& msg);
 
   // Called by the world update start event
@@ -36,10 +40,13 @@ private:
   /// \brief A node use for ROS transport
   std::unique_ptr<ros::NodeHandle> ros_node_;
 
+  /// \brief A service used for sharing the available com_levels
+  ros::ServiceServer get_possible_com_levels_service_;
+  ros::ServiceServer change_com_level_service_;
+
   /// \brief A ROS subscriber
   ros::Subscriber ros_sub_;
 
-//  ros::ServiceServer ros_service_;
 
   /// \brief A ROS callbackqueue that helps process messages
   ros::CallbackQueue ros_queue_;
