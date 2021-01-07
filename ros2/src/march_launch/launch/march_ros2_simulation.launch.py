@@ -123,4 +123,5 @@ def generate_launch_description():
                               ('maximum_fake_temperature', maximum_fake_temperature)],
             condition=IfCondition(fake_sensor_data))
 
+        )
     ])
