@@ -59,8 +59,7 @@ container:build:
 noetic:pep8:
   stage: Lint code
   script:
-    - cd ros1/
-    - python3 -m flake8
+    - python3 -m flake8 ros1
   only:
     changes:
       - "ros1/**/*.py"
@@ -69,8 +68,7 @@ noetic:pep8:
 foxy:pep8:
   stage: Lint code
   script:
-    - cd ros2/
-    - python3 -m flake8
+    - python3 -m flake8 ros2
   only:
     changes:
       - "ros2/**/*.py"
