@@ -19,7 +19,7 @@ image: registry.gitlab.com/project-march/march:$CI_COMMIT_BRANCH
 # 1. The image for this branch is pulled. If it does not exist, copy the default
 #   image and tag it as an image for this branch.
 # 2. If there are changes to the Dockerfile or to a package.xml file, rebuild the
-#   container.
+#   con tainer.
 container:tag:
   stage: Tag container
   image: docker:latest
@@ -55,24 +55,23 @@ container:build:
         - Dockerfile
         - "**/package.xml"
 
-# Runs a linter on the code to see if the code style is consistent
-noetic:pep8:
+# Runs a linter on the code to see if the code style is consistent and to avoid common
+# mistakes
+noetic:flake8:
   stage: Lint code
   script:
     - python3 -m flake8 ros1
   only:
     changes:
       - "ros1/**/*.py"
-  allow_failure: true
 
-foxy:pep8:
+foxy:flake8:
   stage: Lint code
   script:
     - python3 -m flake8 ros2
   only:
     changes:
       - "ros2/**/*.py"
-  allow_failure: true
 
 noetic:build:
   stage: Build code
