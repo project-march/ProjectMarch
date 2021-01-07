@@ -1,7 +1,7 @@
 [flake8]
 show-source = true
-max-line-length = 120
-exclude = .git, __init__.py, build, install, log
+max-line-length = 88
+exclude = .git, __init__.py, build, install, log, venv
 application-package-names =
     march_description,
     march_gain_scheduling,
@@ -23,7 +23,6 @@ application-package-names =
     march_shared_resources,
     march_rqt_gait_generator,
     odrive_interface
-import-order-style = appnexus
 ignore =
     # D100: Missing docstring in public module
     D100,

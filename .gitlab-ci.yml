@@ -60,7 +60,6 @@ noetic:pep8:
   stage: Lint code
   script:
     - cd ros1/
-    - python3 -m autopep8 --diff -r --aggressive --aggressive --exit-code src
     - python3 -m flake8
   only:
     changes:
@@ -71,7 +70,6 @@ foxy:pep8:
   stage: Lint code
   script:
     - cd ros2/
-    - python3 -m autopep8 --diff -r --aggressive --aggressive --exit-code src
     - python3 -m flake8
   only:
     changes:
