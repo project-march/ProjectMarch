@@ -17,8 +17,8 @@ def generate_launch_description():
             default_value='None',
             description='Names of the joints. If an empty list (None) is given'
                         'as argument the robot_information node uses the '
-                        'robot_description parameter of the robot_state_publisher '
-                        'to determine the joint names.'
+                        'robot_description parameter of the '
+                        'robot_state_publisher to determine the joint names.'
         ),
         Node(
             package='march_robot_information',

@@ -28,6 +28,9 @@ def generate_test_description():
 
 
 class TestRobotInformation(unittest.TestCase):
+    """This class provides a launch test for the
+    march_robot_information node."""
+
     @classmethod
     def setUpClass(cls):
         """Initialize the ROS context for the test node."""
@@ -40,7 +43,7 @@ class TestRobotInformation(unittest.TestCase):
 
     def setUp(self):
         """Create a ROS node for tests."""
-        self.node = rclpy.create_node('test_talker_listener_link')
+        self.node = rclpy.create_node('test_robot_information')
 
     def tearDown(self):
         """Destroy the ROS node."""

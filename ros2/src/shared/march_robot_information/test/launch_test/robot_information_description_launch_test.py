@@ -23,9 +23,10 @@ def generate_test_description():
                 'launch', 'march_description.launch.py')),
         launch_arguments=[('robot_description', 'march4')]
     )
-    robot_information_node = IncludeLaunchDescription(PythonLaunchDescriptionSource(
-        os.path.join(get_package_share_directory('march_robot_information'),
-                     'launch', 'robot_information.launch.py')))
+    robot_information_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(os.path.join(
+            get_package_share_directory('march_robot_information'),
+            'launch', 'robot_information.launch.py')))
 
     # The second return value of this tuple can be used to indicate
     # names of the processes such that the stdout of a certain
@@ -39,7 +40,10 @@ def generate_test_description():
     ]), {})
 
 
-class TestRobotInformation(unittest.TestCase):
+class TestRobotInformationDescription(unittest.TestCase):
+    """This class provides an integration test between the march_description
+    package and the march_robot_information node."""
+
     @classmethod
     def setUpClass(cls):
         """Initialize the ROS context for the test node."""
@@ -52,7 +56,7 @@ class TestRobotInformation(unittest.TestCase):
 
     def setUp(self):
         """Create a ROS node for tests."""
-        self.node = rclpy.create_node('test_talker_listener_link')
+        self.node = rclpy.create_node('test_robot_information_description')
 
     def tearDown(self):
         """Destroy the ROS node."""

@@ -38,7 +38,6 @@ class RobotInformation(Node):
         else:
             joint_names = self.get_parameter(
                 'joint_names').get_parameter_value().string_array_value
-            self.get_logger().info(str(self.get_parameter('joint_names').get_parameter_value()))
             if len(joint_names) > 0:
                 self.joint_names = joint_names
             else:
