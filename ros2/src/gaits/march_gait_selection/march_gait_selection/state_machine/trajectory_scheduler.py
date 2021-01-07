@@ -1,6 +1,4 @@
-from control_msgs.msg import JointTolerance
 from std_msgs.msg import Header
-from builtin_interfaces.msg import Duration
 from actionlib_msgs.msg import GoalID
 from march_shared_msgs.msg import (
     FollowJointTrajectoryGoal,

@@ -1,7 +1,7 @@
 from gazebo_msgs.msg import ContactsState
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from rclpy.duration import Duration
-from std_msgs.msg import Header, Bool
+from std_msgs.msg import Header
 from std_srvs.srv import Trigger
 
 from .gait_state_machine_error import GaitStateMachineError
@@ -323,7 +323,6 @@ class GaitStateMachine(object):
             return
 
         self._handle_input()
-        logger = self._gait_selection.get_logger()
         trajectory, should_stop = self._current_gait.update(elapsed_time)
         # schedule trajectory if any
         if trajectory is not None:

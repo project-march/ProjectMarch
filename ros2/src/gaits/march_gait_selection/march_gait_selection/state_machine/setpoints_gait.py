@@ -1,10 +1,6 @@
-from copy import deepcopy
 from march_gait_selection.dynamic_gaits.transition_subgait import TransitionSubgait
-from march_gait_selection.state_machine.home_gait import HomeGait
 from march_shared_classes.exceptions.gait_exceptions import GaitError
 from march_shared_classes.gait.gait import Gait
-from march_shared_classes.gait.setpoint import Setpoint
-from march_shared_classes.gait.subgait import Subgait
 
 from .gait_interface import GaitInterface
 from .state_machine_input import TransitionRequest

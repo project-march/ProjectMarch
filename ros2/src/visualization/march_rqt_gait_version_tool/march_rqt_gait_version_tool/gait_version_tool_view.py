@@ -86,7 +86,7 @@ class GaitVersionToolView(QWidget):
 
         :param amount_of_new_subgait_menus: the amount of new subgait labels and menu's
         """
-        for new_subgait in range(amount_of_new_subgait_menus):
+        for _ in range(amount_of_new_subgait_menus):
 
             new_subgait_label = QLabel(self)
             new_subgait_label.setFont(self._subgait_labels[0].font())

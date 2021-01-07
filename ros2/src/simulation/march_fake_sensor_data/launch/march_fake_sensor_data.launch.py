@@ -1,6 +1,3 @@
-import os
-import sys
-
 from launch.actions import DeclareLaunchArgument
 from launch import LaunchDescription
 from launch.substitutions import LaunchConfiguration

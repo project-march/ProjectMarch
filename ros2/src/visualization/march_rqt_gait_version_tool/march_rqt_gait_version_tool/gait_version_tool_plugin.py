@@ -1,4 +1,3 @@
-import argparse
 import os
 import sys
 from qt_gui.plugin import Plugin

@@ -1,5 +1,6 @@
 import os
 import re
+import math
 from typing import List
 from rclpy.duration import Duration
 from trajectory_msgs import msg as trajectory_msg

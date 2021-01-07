@@ -175,7 +175,7 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
             new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
             self.joint_trajectory.add_setpoint(new_setpoint)
 
-        for i in range(110):
+        for _ in range(110):
             self.joint_trajectory.undo()
         self.assertEqual(self.joint_trajectory.setpoints, setpoints_copy)
 
@@ -186,7 +186,7 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
             new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
             self.joint_trajectory.add_setpoint(new_setpoint)
 
-        for i in range(110):
+        for _ in range(110):
             self.joint_trajectory.undo()
         self.assertEqual(len(self.joint_trajectory.setpoints_redo_list), 100)
 
@@ -195,7 +195,7 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
             new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
             self.joint_trajectory.add_setpoint(new_setpoint)
 
-        for i in range(80):
+        for _ in range(80):
             self.joint_trajectory.undo()
         self.assertEqual(len(self.joint_trajectory.setpoints_history), 20)
 
@@ -204,7 +204,7 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
             new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
             self.joint_trajectory.add_setpoint(new_setpoint)
 
-        for i in range(80):
+        for _ in range(80):
             self.joint_trajectory.undo()
         self.assertEqual(len(self.joint_trajectory.setpoints_redo_list), 80)
 
@@ -244,10 +244,10 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
             new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
             self.joint_trajectory.add_setpoint(new_setpoint)
 
-        for i in range(80):
+        for _ in range(80):
             self.joint_trajectory.undo()
 
-        for i in range(50):
+        for _ in range(50):
             self.joint_trajectory.redo()
         self.assertEqual(len(self.joint_trajectory.setpoints_history), 70)
 
@@ -256,9 +256,9 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
             new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
             self.joint_trajectory.add_setpoint(new_setpoint)
 
-        for i in range(80):
+        for _ in range(80):
             self.joint_trajectory.undo()
 
-        for i in range(50):
+        for _ in range(50):
             self.joint_trajectory.redo()
         self.assertEqual(len(self.joint_trajectory.setpoints_redo_list), 30)

@@ -1,6 +1,5 @@
 import os
 import unittest
-import rclpy
 from ament_index_python import get_package_share_directory
 from march_gait_selection.dynamic_gaits.semi_dynamic_setpoints_gait import (
     SemiDynamicSetpointsGait,

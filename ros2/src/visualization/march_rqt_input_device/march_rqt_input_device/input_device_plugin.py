@@ -1,11 +1,9 @@
-import argparse
 import os
 from qt_gui.plugin import Plugin
 from ament_index_python.packages import get_package_share_directory
 from rqt_gui.main import Main
 import sys
 import rclpy
-from rclpy.parameter import Parameter
 from .input_device_controller import InputDeviceController
 from .input_device_view import InputDeviceView
 
