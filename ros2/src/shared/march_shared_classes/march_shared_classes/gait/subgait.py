@@ -422,20 +422,27 @@ class Subgait(object):
                 "secs": math.floor(self.duration),
             },
             "gait_type": self.gait_type,
-            "joints": {
-                joint.name: [
-                    {
-                        "position": setpoint.position,
-                        "time_from_start": {
-                            "nsecs": Duration(seconds=setpoint.time).nanoseconds,
-                            "secs": int(setpoint.time),
-                        },
-                        "velocity": setpoint.velocity,
-                    }
-                    for setpoint in joint.setpoints
+            "joints": dict(
+                [
+                    (
+                        joint.name,
+                        [
+                            {
+                                "position": setpoint.position,
+                                "time_from_start": {
+                                    "nsecs": Duration(
+                                        seconds=setpoint.time
+                                    ).nanoseconds,
+                                    "secs": int(setpoint.time),
+                                },
+                                "velocity": setpoint.velocity,
+                            }
+                            for setpoint in joint.setpoints
+                        ],
+                    )
+                    for joint in self.joints
                 ]
-                for joint in self.joints
-            },
+            ),
             "name": self.subgait_name,
             "version": self.version,
         }

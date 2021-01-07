@@ -4,11 +4,16 @@ from ament_index_python import get_package_share_directory
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import (
+    EnvironmentVariable,
+    LaunchConfiguration,
+    PathJoinSubstitution,
+)
 
 
 def generate_launch_description():
     # General arguments
+    node_prefix = LaunchConfiguration("node_prefix")
     use_sim_time = LaunchConfiguration("use_sim_time")
     robot = LaunchConfiguration("robot")
     # Input device arguments
@@ -128,16 +133,6 @@ def generate_launch_description():
                     ("gait_package", gait_package),
                 ],
                 condition=IfCondition(gait_selection),
-            ),
-            # March robot information
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                    os.path.join(
-                        get_package_share_directory("march_robot_information"),
-                        "launch",
-                        "robot_information.launch.py",
-                    )
-                )
             ),
             # Fake sensor data
             DeclareLaunchArgument(
