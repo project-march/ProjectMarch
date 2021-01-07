@@ -17,7 +17,7 @@ def main(args=None):
     rclpy.init(args=args)
 
     try:
-        plugin = 'rqt_input_device'
+        plugin = "rqt_input_device"
         main_plugin = Main(filename=plugin)
         sys.exit(main_plugin.main(standalone=plugin))
 
@@ -31,20 +31,25 @@ class InputDevicePlugin(Plugin):
     """
     The plugin used by RQT to start the input device. This gives a context with the node to use.
     """
+
     def __init__(self, context):
         super(InputDevicePlugin, self).__init__(context)
 
-        self.setObjectName('InputDevicePlugin')
+        self.setObjectName("InputDevicePlugin")
 
-        ui_file = os.path.join(get_package_share_directory('march_rqt_input_device'), 'input_device.ui')
+        ui_file = os.path.join(
+            get_package_share_directory("march_rqt_input_device"), "input_device.ui"
+        )
 
         self._node = context.node
 
-        self._node.declare_parameter('ping_safety_node')
+        self._node.declare_parameter("ping_safety_node")
         self._controller = InputDeviceController(self._node)
         self._widget = InputDeviceView(ui_file, self._controller)
         context.add_widget(self._widget)
 
         # Show _widget.windowTitle on left-top of each plugin (when it's set in _widget). (useful for multiple windows)
         if context.serial_number() > 1:
-            self._widget.setWindowTitle('{0} ({1})'.format(self._widget.windowTitle(), context.serial_number()))
+            self._widget.setWindowTitle(
+                "{0} ({1})".format(self._widget.windowTitle(), context.serial_number())
+            )

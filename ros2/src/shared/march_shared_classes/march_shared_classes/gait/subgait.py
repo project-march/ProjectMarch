@@ -5,12 +5,16 @@ from rclpy.duration import Duration
 from trajectory_msgs import msg as trajectory_msg
 import yaml
 from urdf_parser_py import urdf
-from march_shared_classes.exceptions.gait_exceptions import NonValidGaitContent, SubgaitInterpolationError, GaitError
+from march_shared_classes.exceptions.gait_exceptions import (
+    NonValidGaitContent,
+    SubgaitInterpolationError,
+    GaitError,
+)
 from .joint_trajectory import JointTrajectory
 from .limits import Limits
 from .setpoint import Setpoint
 
-PARAMETRIC_GAITS_PREFIX = '_pg_'
+PARAMETRIC_GAITS_PREFIX = "_pg_"
 NANOSEC_TO_SEC = 1e-9
 
 
@@ -19,9 +23,17 @@ class Subgait(object):
 
     joint_class = JointTrajectory
 
-    def __init__(self, joints: List[JointTrajectory], duration: float, gait_type: str = 'walk_like',
-                 gait_name: str = 'Walk', subgait_name: str = 'right_open', version: str = 'First try',
-                 description: str = 'Just a simple gait', robot: urdf.Robot = None):
+    def __init__(
+        self,
+        joints: List[JointTrajectory],
+        duration: float,
+        gait_type: str = "walk_like",
+        gait_name: str = "Walk",
+        subgait_name: str = "right_open",
+        version: str = "First try",
+        description: str = "Just a simple gait",
+        robot: urdf.Robot = None,
+    ):
         self.joints = joints
         self.gait_type = gait_type
         self.gait_name = gait_name
@@ -45,22 +57,31 @@ class Subgait(object):
             A populated Subgait object
         """
         if robot is None:
-            raise TypeError('Robot is None, should be a valid urdf.Robot object')
+            raise TypeError("Robot is None, should be a valid urdf.Robot object")
         if file_name is None:
-            raise TypeError('Filename is None, should be a string')
+            raise TypeError("Filename is None, should be a string")
 
-        with open(file_name, 'r') as yaml_file:
+        with open(file_name, "r") as yaml_file:
             subgait_dict = yaml.load(yaml_file, Loader=yaml.SafeLoader)
 
-        gait_name = file_name.split('/')[-3]
-        subgait_name = file_name.split('/')[-2]
-        version = file_name.split('/')[-1].replace('.subgait', '')
+        gait_name = file_name.split("/")[-3]
+        subgait_name = file_name.split("/")[-2]
+        version = file_name.split("/")[-1].replace(".subgait", "")
 
-        return cls.from_dict(robot, subgait_dict, gait_name, subgait_name, version, *args)
+        return cls.from_dict(
+            robot, subgait_dict, gait_name, subgait_name, version, *args
+        )
 
     @classmethod
-    def from_name_and_version(cls, robot: urdf.Robot, gait_dir: str, gait_name: str, subgait_name: str, version: str,
-                              *args):
+    def from_name_and_version(
+        cls,
+        robot: urdf.Robot,
+        gait_dir: str,
+        gait_name: str,
+        subgait_name: str,
+        version: str,
+        *args
+    ):
         """Load subgait based from file(s) based on name and version.
 
         :param robot: The robot corresponding to the given subgait file
@@ -72,17 +93,31 @@ class Subgait(object):
         :return: A populated Subgait object.
         """
         if version.startswith(PARAMETRIC_GAITS_PREFIX):
-            base_version, other_version, parameter = Subgait.unpack_parametric_version(version)
-            base_path = os.path.join(gait_dir, gait_name, subgait_name, base_version + '.subgait')
-            other_path = os.path.join(gait_dir, gait_name, subgait_name, other_version + '.subgait')
+            base_version, other_version, parameter = Subgait.unpack_parametric_version(
+                version
+            )
+            base_path = os.path.join(
+                gait_dir, gait_name, subgait_name, base_version + ".subgait"
+            )
+            other_path = os.path.join(
+                gait_dir, gait_name, subgait_name, other_version + ".subgait"
+            )
             return cls.from_files_interpolated(robot, base_path, other_path, parameter)
         else:
-            subgait_path = os.path.join(gait_dir, gait_name, subgait_name, version + '.subgait')
+            subgait_path = os.path.join(
+                gait_dir, gait_name, subgait_name, version + ".subgait"
+            )
             return cls.from_file(robot, subgait_path, *args)
 
     @classmethod
-    def from_files_interpolated(cls, robot: urdf.Robot, file_name_base: str, file_name_other: str, parameter: float,
-                                *args):
+    def from_files_interpolated(
+        cls,
+        robot: urdf.Robot,
+        file_name_base: str,
+        file_name_other: str,
+        parameter: float,
+        *args
+    ):
         """Extract two subgaits from files and interpolate.
 
         :param robot:
@@ -101,7 +136,15 @@ class Subgait(object):
         return cls.interpolate_subgaits(base_subgait, other_subgait, parameter)
 
     @classmethod
-    def from_dict(cls, robot: urdf.Robot, subgait_dict: dict, gait_name: str, subgait_name: str, version: str, *args):
+    def from_dict(
+        cls,
+        robot: urdf.Robot,
+        subgait_dict: dict,
+        gait_name: str,
+        subgait_name: str,
+        version: str,
+        *args
+    ):
         """List parameters from the yaml file in organized lists.
 
         :param robot:
@@ -119,22 +162,44 @@ class Subgait(object):
             A populated Subgait object
         """
         if robot is None:
-            raise GaitError('Cannot create gait without a loaded robot.')
+            raise GaitError("Cannot create gait without a loaded robot.")
 
-        duration = Duration(seconds=subgait_dict['duration']['secs'],
-                            nanoseconds=subgait_dict['duration']['nsecs']).nanoseconds * NANOSEC_TO_SEC
+        duration = (
+            Duration(
+                seconds=subgait_dict["duration"]["secs"],
+                nanoseconds=subgait_dict["duration"]["nsecs"],
+            ).nanoseconds
+            * NANOSEC_TO_SEC
+        )
 
         joint_list = []
-        for name, points in sorted(subgait_dict['joints'].items(), key=lambda item: item[0]):
+        for name, points in sorted(
+            subgait_dict["joints"].items(), key=lambda item: item[0]
+        ):
             urdf_joint = cls.joint_class.get_joint_from_urdf(robot, name)
-            if urdf_joint is None or urdf_joint.type == 'fixed':
+            if urdf_joint is None or urdf_joint.type == "fixed":
                 continue
             limits = Limits.from_urdf_joint(urdf_joint)
-            joint_list.append(cls.joint_class.from_setpoints(name, limits, points, duration, *args))
-        subgait_type = subgait_dict['gait_type'] if subgait_dict.get('gait_type') else ''
-        subgait_description = subgait_dict['description'] if subgait_dict.get('description') else ''
+            joint_list.append(
+                cls.joint_class.from_setpoints(name, limits, points, duration, *args)
+            )
+        subgait_type = (
+            subgait_dict["gait_type"] if subgait_dict.get("gait_type") else ""
+        )
+        subgait_description = (
+            subgait_dict["description"] if subgait_dict.get("description") else ""
+        )
 
-        return cls(joint_list, duration, subgait_type, gait_name, subgait_name, version, subgait_description, robot)
+        return cls(
+            joint_list,
+            duration,
+            subgait_type,
+            gait_name,
+            subgait_name,
+            version,
+            subgait_description,
+            robot,
+        )
 
     # endregion
 
@@ -152,7 +217,9 @@ class Subgait(object):
         timestamps = self.get_unique_timestamps()
         for timestamp in timestamps:
             joint_trajectory_point = trajectory_msg.JointTrajectoryPoint()
-            joint_trajectory_point.time_from_start = Duration(seconds=timestamp).to_msg()
+            joint_trajectory_point.time_from_start = Duration(
+                seconds=timestamp
+            ).to_msg()
 
             for joint in self.joints:
                 interpolated_setpoint = joint.get_interpolated_setpoint(timestamp)
@@ -180,10 +247,14 @@ class Subgait(object):
         to_subgait_joint_names = set(next_subgait.get_joint_names())
 
         if from_subgait_joint_names != to_subgait_joint_names:
-            raise NonValidGaitContent(msg='Gait {gait}, structure of joints does not match between '
-                                          'subgait {fn} and subgait {tn}'.format(gait=self.gait_name,
-                                                                                 fn=self.subgait_name,
-                                                                                 tn=next_subgait.subgait_name))
+            raise NonValidGaitContent(
+                msg="Gait {gait}, structure of joints does not match between "
+                "subgait {fn} and subgait {tn}".format(
+                    gait=self.gait_name,
+                    fn=self.subgait_name,
+                    tn=next_subgait.subgait_name,
+                )
+            )
 
         for joint_name in to_subgait_joint_names:
             from_joint = self.get_joint(joint_name)
@@ -219,8 +290,12 @@ class Subgait(object):
             new_joint_setpoints = []
             for timestamp in timestamps:
                 if timestamp > self.duration:
-                    raise IndexError('Gait {gait}, subgait {subgait} could not extrapolate timestamp outside max '
-                                     'duration'.format(gait=self.gait_name, subgait=self.subgait_name))
+                    raise IndexError(
+                        "Gait {gait}, subgait {subgait} could not extrapolate timestamp outside max "
+                        "duration".format(
+                            gait=self.gait_name, subgait=self.subgait_name
+                        )
+                    )
 
                 new_joint_setpoints.append(joint.get_interpolated_setpoint(timestamp))
 
@@ -245,34 +320,66 @@ class Subgait(object):
         if parameter == 0:
             return base_subgait
         if not (0 < parameter < 1):
-            raise ValueError('Parameter for interpolation should be in the interval [0, 1], but is {0}'
-                             .format(parameter))
+            raise ValueError(
+                "Parameter for interpolation should be in the interval [0, 1], but is {0}".format(
+                    parameter
+                )
+            )
 
-        if sorted(base_subgait.get_joint_names()) != sorted(other_subgait.get_joint_names()):
-            raise SubgaitInterpolationError('The subgaits to interpolate do not have the same joints, base'
-                                            ' subgait has {0}, while other subgait has {1}'.
-                                            format(sorted(base_subgait.get_joint_names()),
-                                                   sorted(other_subgait.get_joint_names())))
+        if sorted(base_subgait.get_joint_names()) != sorted(
+            other_subgait.get_joint_names()
+        ):
+            raise SubgaitInterpolationError(
+                "The subgaits to interpolate do not have the same joints, base"
+                " subgait has {0}, while other subgait has {1}".format(
+                    sorted(base_subgait.get_joint_names()),
+                    sorted(other_subgait.get_joint_names()),
+                )
+            )
         joints = []
         try:
             for base_joint in base_subgait.joints:
                 other_joint = other_subgait.get_joint(base_joint.name)
                 if other_joint is None:
-                    raise SubgaitInterpolationError('Could not find a matching joint for base joint with name {0}.'.
-                                                    format(base_joint.name))
-                joints.append(cls.joint_class.interpolate_joint_trajectories(base_joint, other_joint, parameter))
+                    raise SubgaitInterpolationError(
+                        "Could not find a matching joint for base joint with name {0}.".format(
+                            base_joint.name
+                        )
+                    )
+                joints.append(
+                    cls.joint_class.interpolate_joint_trajectories(
+                        base_joint, other_joint, parameter
+                    )
+                )
         except SubgaitInterpolationError as e:
             raise e
 
-        description = 'Interpolation between base version {0}, and other version {1} with parameter{2}'.format(
-            base_subgait.version, other_subgait.version, parameter)
+        description = "Interpolation between base version {0}, and other version {1} with parameter{2}".format(
+            base_subgait.version, other_subgait.version, parameter
+        )
 
-        duration = base_subgait.duration * parameter + (1 - parameter) * other_subgait.duration
-        gait_type = base_subgait.gait_type if parameter <= 0.5 else other_subgait.gait_type
-        version = '{0}{1}_({2})_({3})'.format(PARAMETRIC_GAITS_PREFIX, parameter, base_subgait.version,
-                                              other_subgait.version)
-        return Subgait(joints, duration, gait_type, base_subgait.gait_name, base_subgait.subgait_name, version,
-                       description)
+        duration = (
+            base_subgait.duration * parameter + (1 - parameter) * other_subgait.duration
+        )
+        gait_type = (
+            base_subgait.gait_type if parameter <= 0.5 else other_subgait.gait_type
+        )
+        version = "{0}{1}_({2})_({3})".format(
+            PARAMETRIC_GAITS_PREFIX,
+            parameter,
+            base_subgait.version,
+            other_subgait.version,
+        )
+        return Subgait(
+            joints,
+            duration,
+            gait_type,
+            base_subgait.gait_name,
+            base_subgait.subgait_name,
+            version,
+            description,
+        )
+
     # endregion
 
     # region Get functions
@@ -308,22 +415,35 @@ class Subgait(object):
     def to_dict(self):
         duration = Duration(seconds=self.duration)
         return {
-            'description': self.description,
-            'duration': {
-                'nsecs': duration.nanoseconds,
-                'secs': math.floor(self.duration),
+            "description": self.description,
+            "duration": {
+                "nsecs": duration.nanoseconds,
+                "secs": math.floor(self.duration),
             },
-            'gait_type': self.gait_type,
-            'joints': dict([(joint.name, [{
-                'position': setpoint.position,
-                'time_from_start': {
-                    'nsecs': Duration(seconds=setpoint.time).nanoseconds,
-                    'secs': int(setpoint.time),
-                },
-                'velocity': setpoint.velocity}
-                for setpoint in joint.setpoints]) for joint in self.joints]),
-            'name': self.subgait_name,
-            'version': self.version,
+            "gait_type": self.gait_type,
+            "joints": dict(
+                [
+                    (
+                        joint.name,
+                        [
+                            {
+                                "position": setpoint.position,
+                                "time_from_start": {
+                                    "nsecs": Duration(
+                                        seconds=setpoint.time
+                                    ).nanoseconds,
+                                    "secs": int(setpoint.time),
+                                },
+                                "velocity": setpoint.velocity,
+                            }
+                            for setpoint in joint.setpoints
+                        ],
+                    )
+                    for joint in self.joints
+                ]
+            ),
+            "name": self.subgait_name,
+            "version": self.version,
         }
 
     def to_yaml(self):
@@ -336,6 +456,7 @@ class Subgait(object):
 
     def __len__(self):
         return len(self.joints)
+
     # endregion
 
     @staticmethod
@@ -343,13 +464,17 @@ class Subgait(object):
         """Check whether a gait exists for the gait."""
         if version.startswith(PARAMETRIC_GAITS_PREFIX):
             base_version, other_version, _ = Subgait.unpack_parametric_version(version)
-            base_subgait_path = os.path.join(gait_path, subgait_name, base_version + '.subgait')
-            other_subgait_path = os.path.join(gait_path, subgait_name, other_version + '.subgait')
+            base_subgait_path = os.path.join(
+                gait_path, subgait_name, base_version + ".subgait"
+            )
+            other_subgait_path = os.path.join(
+                gait_path, subgait_name, other_version + ".subgait"
+            )
             for subgait_path in [base_subgait_path, other_subgait_path]:
                 if not os.path.isfile(subgait_path):
                     return False
         else:
-            subgait_path = os.path.join(gait_path, subgait_name, version + '.subgait')
+            subgait_path = os.path.join(gait_path, subgait_name, version + ".subgait")
             if not os.path.isfile(subgait_path):
                 return False
         return True
@@ -357,9 +482,11 @@ class Subgait(object):
     @staticmethod
     def unpack_parametric_version(version):
         """Unpack a version to base version, other version and parameter."""
-        parameter_str = re.search(r'^{0}(\d+\.\d+)_'.format(PARAMETRIC_GAITS_PREFIX), version).group(1)
+        parameter_str = re.search(
+            r"^{0}(\d+\.\d+)_".format(PARAMETRIC_GAITS_PREFIX), version
+        ).group(1)
         parameter = float(parameter_str)
-        versions = re.findall(r'\([^\)]*\)', version)
+        versions = re.findall(r"\([^\)]*\)", version)
         base_version = versions[0][1:-1]
         other_version = versions[1][1:-1]
         return base_version, other_version, parameter

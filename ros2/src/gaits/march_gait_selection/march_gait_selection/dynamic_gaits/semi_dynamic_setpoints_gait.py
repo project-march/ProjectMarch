@@ -4,14 +4,16 @@ from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
 from march_shared_classes.gait.subgait import Subgait
 
 SECS_TO_NANOSECS = 1e9
-SHOULD_NOT_FREEZE_FIRST_SECS = 0.3  #secs
+SHOULD_NOT_FREEZE_FIRST_SECS = 0.3  # secs
 
 
 class SemiDynamicSetpointsGait(SetpointsGait):
     """ A semi-dynamic version of the setpoints gait, implements a freeze functionality """
 
     def __init__(self, gait_name, subgaits, graph):
-        super(SemiDynamicSetpointsGait, self).__init__(f'dynamic_{gait_name}', subgaits, graph)
+        super(SemiDynamicSetpointsGait, self).__init__(
+            f"dynamic_{gait_name}", subgaits, graph
+        )
         self._should_freeze = False
         self._is_frozen = False
         self._freeze_duration = 0
@@ -23,8 +25,11 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         for noticing the step height and ending the subgait earlier. This is
         therefore not possible during the first second of the subgait, to
         prevent accidental freezing."""
-        if self._time_since_start < SHOULD_NOT_FREEZE_FIRST_SECS \
-                or self._should_freeze or self._is_frozen:
+        if (
+            self._time_since_start < SHOULD_NOT_FREEZE_FIRST_SECS
+            or self._should_freeze
+            or self._is_frozen
+        ):
             return False
         return True
 
@@ -94,17 +99,21 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             # the current time point
             subgait_after_freeze = deepcopy(self._current_subgait)
             for joint in subgait_after_freeze:
-                joint.from_begin_point(self._time_since_start, self._freeze_position[joint.name])
+                joint.from_begin_point(
+                    self._time_since_start, self._freeze_position[joint.name]
+                )
             subgait_after_freeze.duration -= self._time_since_start
-            subgait_after_freeze.subgait_name = 'freeze_subgait_after'
+            subgait_after_freeze.subgait_name = "freeze_subgait_after"
             # Add the subgait after the freeze to the subgait graph
-            self.graph.graph[subgait_after_freeze.subgait_name] = \
-                {'to': self.graph[(self._previous_subgait, self.graph.TO)]}
+            self.graph.graph[subgait_after_freeze.subgait_name] = {
+                "to": self.graph[(self._previous_subgait, self.graph.TO)]
+            }
         else:
             # If the current subgait was already done,
             # go to the next subgait after freeze
-            subgait_after_freeze = self.subgaits[self.graph[
-                (self._previous_subgait, self.graph.TO)]]
+            subgait_after_freeze = self.subgaits[
+                self.graph[(self._previous_subgait, self.graph.TO)]
+            ]
         return subgait_after_freeze
 
     def _freeze_subgait(self):
@@ -115,26 +124,38 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         duration_secs = math.floor(self._freeze_duration)
         duration_nsecs = (self._freeze_duration - duration_secs) * SECS_TO_NANOSECS
         new_dict = {
-            'description': 'A subgait that stays in the same position',
-            'duration': {
-                'nsecs': duration_nsecs,
-                'secs': duration_secs,
+            "description": "A subgait that stays in the same position",
+            "duration": {
+                "nsecs": duration_nsecs,
+                "secs": duration_secs,
             },
-            'gait_type': self._current_subgait.gait_type,
-            'joints': dict([(joint.name, [{
-                'position': self._freeze_position[joint.name],
-                'time_from_start': {
-                    'nsecs': duration_nsecs,
-                    'secs': duration_secs,
-                },
-                'velocity': 0}])
-                            for joint in self._current_subgait.joints])
+            "gait_type": self._current_subgait.gait_type,
+            "joints": dict(
+                [
+                    (
+                        joint.name,
+                        [
+                            {
+                                "position": self._freeze_position[joint.name],
+                                "time_from_start": {
+                                    "nsecs": duration_nsecs,
+                                    "secs": duration_secs,
+                                },
+                                "velocity": 0,
+                            }
+                        ],
+                    )
+                    for joint in self._current_subgait.joints
+                ]
+            ),
         }
-        freeze_subgait = Subgait.from_dict(robot=self._current_subgait.robot,
-                                           subgait_dict=new_dict,
-                                           gait_name=self.gait_name,
-                                           subgait_name='freeze',
-                                           version='Only version, generated from code')
+        freeze_subgait = Subgait.from_dict(
+            robot=self._current_subgait.robot,
+            subgait_dict=new_dict,
+            gait_name=self.gait_name,
+            subgait_name="freeze",
+            version="Only version, generated from code",
+        )
         return freeze_subgait
 
     def _position_after_time(self, elapsed_time):
@@ -144,5 +165,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         :param elapsed_time: The time since the start of the subgait in secs.
         :return: dict with joints and joint positions
         """
-        return {joint.name: joint.get_interpolated_setpoint(elapsed_time).position for
-                joint in self._current_subgait}
+        return {
+            joint.name: joint.get_interpolated_setpoint(elapsed_time).position
+            for joint in self._current_subgait
+        }
