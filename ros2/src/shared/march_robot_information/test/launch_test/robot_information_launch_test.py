@@ -1,38 +1,27 @@
-# This file has been created with the help from the following example:
-# https://github.com/ros2/launch_ros/blob/master/launch_testing_ros/test/examples/talker_listener_launch_test.py
-
-import os
 import unittest
 
 import pytest
 import rclpy
-from ament_index_python import get_package_share_directory
+
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
-from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch_ros.actions import Node
 from launch_testing.actions import ReadyToTest
 from march_shared_msgs.srv import GetJointNames
+
+JOINT_NAMES = ['joint_1', 'joint_2']
 
 
 @pytest.mark.launch_test
 def generate_test_description():
-    description_node = IncludeLaunchDescription(PythonLaunchDescriptionSource(
-        os.path.join(get_package_share_directory('march_robot_information'),
-                     'launch', 'robot_information.launch.py')))
-    robot_information_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory('march_description'),
-                'launch', 'march_description.launch.py')),
-        launch_arguments=[('robot_description', 'march4')]
-    )
-    # The second return value of this tuple can be used to indicate
-    # names of the processes such that the stdout of a certain
-    # process can be verified.
-    # Since we don't need to verify output of processes but just query node
-    # parameters this is left as an empty dictionary
+    robot_information_node = Node(
+        package='march_robot_information',
+        executable='march_robot_information',
+        output='screen',
+        name='robot_information',
+        namespace='march',
+        parameters=[{'joint_names': JOINT_NAMES}])
+
     return (LaunchDescription([
-        description_node,
         robot_information_node,
         ReadyToTest(),
     ]), {})
@@ -58,8 +47,7 @@ class TestRobotInformation(unittest.TestCase):
         self.node.destroy_node()
 
     def test_get_joint_names(self):
-        """Test that all joint names that are set on the robot information
-        node parameters are equal to the expected eight joints."""
+        """Test that the get_joint_names service return the correct joints."""
         client = self.node.create_client(GetJointNames,
                                          '/march/robot_information/'
                                          'get_joint_names')
@@ -69,7 +57,4 @@ class TestRobotInformation(unittest.TestCase):
         rclpy.spin_until_future_complete(self.node, future)
         joint_names = future.result().joint_names
 
-        self.assertEqual(joint_names,
-                         ['left_hip_aa', 'left_hip_fe', 'left_knee',
-                          'left_ankle', 'right_hip_aa', 'right_hip_fe',
-                          'right_knee', 'right_ankle'])
+        self.assertEqual(joint_names, JOINT_NAMES)
