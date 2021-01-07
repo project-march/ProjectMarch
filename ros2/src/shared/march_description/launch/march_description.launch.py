@@ -11,10 +11,7 @@ from launch_ros.actions import Node
 def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
     robot_description = LaunchConfiguration('robot_description')
-    xacro_path = PathJoinSubstitution([
-        get_package_share_directory('march_description'),
-        'urdf',
-        robot_description])
+    xacro_path = LaunchConfiguration('xacro_path')
 
     return LaunchDescription([
         DeclareLaunchArgument(
@@ -25,7 +22,17 @@ def generate_launch_description():
             name='robot_description',
             default_value='march4',
             description="Which <robot_description>.xacro file to use. "
-                        "This file must be available in the march_desrciption/urdf/ folder"
+                        "This file must be available in the "
+                        "march_desrciption/urdf/ folder"
+        ),
+        DeclareLaunchArgument(
+            name='xacro_path',
+            default_value=[PathJoinSubstitution([
+                get_package_share_directory('march_description'),
+            'urdf', robot_description]), '.xacro'],
+            description="Path to the xacro file to read. "
+                        "If no path is supplied the robot_description argument"
+                        "is used to determine the path."
         ),
         Node(
             package='robot_state_publisher',
@@ -35,6 +42,6 @@ def generate_launch_description():
             output='screen',
             parameters=[{
                 'use_sim_time': use_sim_time,
-                'robot_description': Command(['xacro', ' ', xacro_path, '.xacro'])
+                'robot_description': Command(['xacro', ' ', xacro_path])
             }]),
     ])
