@@ -122,6 +122,4 @@ def generate_launch_description():
             launch_arguments=[('minimum_fake_temperature', minimum_fake_temperature),
                               ('maximum_fake_temperature', maximum_fake_temperature)],
             condition=IfCondition(fake_sensor_data))
-
-        )
     ])
