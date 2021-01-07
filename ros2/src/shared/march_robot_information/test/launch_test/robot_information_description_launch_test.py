@@ -16,12 +16,15 @@ from march_shared_msgs.srv import GetJointNames
 
 @pytest.mark.launch_test
 def generate_test_description():
+    xacro_path = os.path.join(
+        get_package_share_directory('march_robot_information'), 'test',
+        'resource', 'march4.xacro')
     description_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 get_package_share_directory('march_description'),
                 'launch', 'march_description.launch.py')),
-        launch_arguments=[('robot_description', 'march4')]
+        launch_arguments=[('xacro_path', xacro_path)]
     )
     robot_information_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(

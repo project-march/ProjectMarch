@@ -18,7 +18,9 @@ setup(
         (os.path.join('share', package_name, 'test', 'launch_test'),
          glob('test/launch_test/*.py')),
         (os.path.join('share', package_name, 'test', 'unittest'),
-         glob('test/unittest/*.py'))
+         glob('test/unittest/*.py')),
+        (os.path.join('share', package_name, 'test', 'resource'),
+         glob('test/resource/*.*'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,
