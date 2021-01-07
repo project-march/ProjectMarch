@@ -20,7 +20,8 @@
   <depend>urdf</depend>
 
 <!--  <test_depend>code_coverage</test_depend>-->
-<!--  <test_depend>rostest</test_depend>-->
+  <test_depend>ros2test</test_depend>
+  <test_depend>ros_testing</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

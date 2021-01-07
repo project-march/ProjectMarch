@@ -22,20 +22,21 @@ find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(urdf REQUIRED)
+find_package(ros_testing REQUIRED)
 
 add_library(${PROJECT_NAME}
         src/input_device_safety.cpp
         src/safety_handler.cpp
         src/temperature_safety.cpp
 )
-ament_target_dependencies(${PROJECT_NAME} march_shared_msgs rclcpp sensor_msgs std_msgs urdf)
+ament_target_dependencies(${PROJECT_NAME} march_shared_msgs rclcpp sensor_msgs std_msgs urdf ros_testing)
 target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
 
 # the executable that is run in ROS and links with the library defined above
 add_executable(${PROJECT_NAME}_node src/safety_node.cpp)
-ament_target_dependencies(${PROJECT_NAME}_node march_shared_msgs rclcpp sensor_msgs std_msgs urdf)
+ament_target_dependencies(${PROJECT_NAME}_node march_shared_msgs rclcpp sensor_msgs std_msgs urdf ros_testing)
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME}_node PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -50,6 +51,7 @@ install(TARGETS ${PROJECT_NAME}_node
 install(DIRECTORY launch config
         DESTINATION share/${PROJECT_NAME}/)
 
+add_ros_test(test/launch/march_safety_connection_lost.launch.py)
 # Add gtest based cpp test target and link libraries
 #if(CATKIN_ENABLE_TESTING)
 #    find_package(rostest REQUIRED)

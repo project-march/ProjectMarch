@@ -18,6 +18,7 @@ def generate_launch_description():
             package='march_safety',
             executable='march_safety_node',
             name='safety_node',
+            namespace='march',
             output='screen',
             parameters=[
                 PathJoinSubstitution([get_package_share_directory('march_safety'),
