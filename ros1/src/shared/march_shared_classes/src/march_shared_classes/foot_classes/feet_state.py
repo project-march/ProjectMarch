@@ -87,12 +87,15 @@ class FeetState(object):
     def weighted_average_states(cls, base_state, other_state, parameter):
         """Computes the weighted average of two feet states.
 
-        :param base_state: One of the states for the weighted average, return this is parameter is 0
-        :param other_state: One of the states for the weighted average, return this if parameter is 1
-        :param parameter: The normalised weight parameter, the parameter that determines the weight of the other_state
+        :param base_state: One of the states for the weighted average, return this if
+                           parameter is 0
+        :param other_state: One of the states for the weighted average, return this if
+                            parameter is 1
+        :param parameter: The normalised weight parameter, the parameter that determines
+                          the weight of the other_state
 
-        :return: A FeetState Object of which the positions and velocities of both the feet are the weighted average of
-        those of the base and other states.
+        :return: A FeetState Object of which the positions and velocities of both the
+                 feet are the weighted average of those of the base and other states.
         """
         if parameter == 0:
             return base_state

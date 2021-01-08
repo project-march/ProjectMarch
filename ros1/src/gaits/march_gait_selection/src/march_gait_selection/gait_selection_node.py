@@ -30,6 +30,7 @@ def set_gait_versions(msg, gait_selection):
 
     :type msg: march_shared_msgs.srv.SetGaitVersionRequest
     :type gait_selection: GaitSelection
+
     :rtype march_shared_msgs.srv.SetGaitVersionResponse
     """
     if len(msg.subgaits) != len(msg.versions):

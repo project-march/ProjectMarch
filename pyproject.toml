@@ -8,7 +8,6 @@ max_line_length = 80
 # show line of source code in output
 show_source = true
 
-
 # list of plugins and rules for them
 [tool.flakehell.plugins]
 flake8-2020 = ["+*"]
@@ -16,6 +15,7 @@ flake8-black = ["+*"]
 flake8-blind-except = ["+*"]
 flake8-bugbear = ["+*", "+B950"]
 flake8-builtins = ["+*"]
+flake8-rst-docstrings = ["+*"]
 flake8-string-format = ["+*"]
 flake8-todos = ["+*"]
 mccabe = ["+*"]

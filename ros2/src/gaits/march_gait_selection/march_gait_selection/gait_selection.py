@@ -189,10 +189,10 @@ class GaitSelection(Node):
         )
 
     def set_gait_versions_cb(self, request, response):
-
         """Sets a new gait version to the gait selection instance.
 
         :type msg: march_shared_resources.srv.SetGaitVersionRequest
+
         :rtype march_shared_resources.srv.SetGaitVersionResponse
         """
 

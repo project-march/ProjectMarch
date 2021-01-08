@@ -18,7 +18,7 @@ class FilterMap:
         """Adds a filter to accept messages by and map to transform them.
 
         :param msg_filter: Filter method that accepts a
-                            `rcl_interfaces.msg.Log`
+                           `rcl_interfaces.msg.Log`
                            and returns True when the message should be accepted
                            and returns False otherwise
         :param msg_map: Optional map method that accepts a string
@@ -37,7 +37,7 @@ class FilterMap:
 
         :param msg_filter: (Optional)
                            Additional filter method that accepts a
-                            `rcl_interfaces.msg.Log`
+                           `rcl_interfaces.msg.Log`
                            and returns True when the message should be accepted
                            and returns False otherwise.
         :param msg_map: Optional map method that accepts a string
@@ -63,7 +63,7 @@ class FilterMap:
 
         :param msg_filter: (Optional)
                            Additional filter method that accepts a
-                            `rcl_interfaces.msg.Log`
+                           `rcl_interfaces.msg.Log`
                            and returns True when the message should be accepted
                            and returns False otherwise.
         :param msg_map: Optional map method that accepts a string
@@ -79,6 +79,7 @@ class FilterMap:
         """Filters a ROS log msg based on the given filters.
 
         :param log_msg: Log msg to filter
+
         :return Mapped message string when the message is accepted by at least
                 one include filter, None otherwise
         """

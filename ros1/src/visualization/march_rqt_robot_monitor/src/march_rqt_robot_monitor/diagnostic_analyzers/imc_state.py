@@ -33,8 +33,9 @@ class CheckImcStatus:
 
         :type index: int
         :param index: index of the joint
+
         :return Curried diagnostic function that updates the diagnostic status
-                according to the given index
+                according to the given index.
         """
 
         def d(stat):
