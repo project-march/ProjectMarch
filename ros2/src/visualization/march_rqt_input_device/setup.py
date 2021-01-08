@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from setuptools import setup
 from glob import glob
 import os
