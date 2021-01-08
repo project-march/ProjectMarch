@@ -17,8 +17,7 @@ ADD . /projects
 WORKDIR /projects
 
 # Install Python linter plugins & dependencies
-RUN python3 -m pip install -r requirements.pip && python3 -m pip install -r <(python3 -m flakehell missed)
-
+RUN python3 -m pip install -r requirements.pip && bash -c "python3 -m pip install -r <(python3 -m flakehell missed)"
 
 # Install ROS 1 rosdep dependencies
 RUN bash -c "source /opt/ros/noetic/local_setup.bash && rosdep install -y --from-paths ros1/src --rosdistro noetic --ignore-src"
