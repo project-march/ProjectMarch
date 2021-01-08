@@ -38,11 +38,7 @@ def generate_launch_description() -> launch.LaunchDescription:
                 ],
                 parameters=[{"use_sim_time": LaunchConfiguration("use_sim_time")}],
             ),
-            # Uncomment this when march_rqt_robot_monitor is added
-            # IncludeLaunchDescription(PythonLaunchDescriptionSource(
-            #         os.path.join(get_package_share_directory('march_rqt_robot_monitor'), 'launch',
-            #                      'march_rqt_robot_monitor.launch.py')),
-            #     launch_arguments=[('rqt', 'false')]
-            # )
+            # TODO: Uncomment this when march_rqt_robot_monitor is added
+            # TODO: IncludeLaunchDescription(PythonLaunchDescriptionSource(os.path.join(get_package_share_directory('march_rqt_robot_monitor'), 'launch', 'march_rqt_robot_monitor.launch.py')), launch_arguments=[('rqt', 'false')])
         ]
     )

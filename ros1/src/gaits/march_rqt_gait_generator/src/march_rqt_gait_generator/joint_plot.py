@@ -247,7 +247,6 @@ class JointPlot(pg.PlotItem):
             # We are already one step into the drag.
             # Find the point(s) at the mouse cursor when the button was first
             # pressed:
-            # pos = ev.buttonDownPos()
             pos = ev.buttonDownScenePos()
             # Switch position into local coords using viewbox
             local_pos = self.vb.mapSceneToView(pos)

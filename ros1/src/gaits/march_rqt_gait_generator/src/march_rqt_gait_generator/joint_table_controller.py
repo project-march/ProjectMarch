@@ -39,7 +39,6 @@ class JointTableController(object):
                 joint.duration,
             )
         )
-        # self.table_widget.resizeRowsToContents()
         self.table_widget.resizeColumnsToContents()
 
     def to_setpoints(self):
