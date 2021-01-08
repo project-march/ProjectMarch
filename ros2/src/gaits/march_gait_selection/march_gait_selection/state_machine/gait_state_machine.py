@@ -258,6 +258,17 @@ class GaitStateMachine(object):
         if not self._is_idle:
             self._should_stop = True
 
+    def check_foot_pressure(self):
+        """Check if the pressure is placed on the right foot when starting a gait from idle.
+         If not, issue a warning"""
+
+        pressure_right = True
+
+        if "right" in self._current_gait.subgait_name and pressure_right:
+            self._gait_selection.get_logger().warn("Pressure is placed on the wrong foot")
+        elif "left" in self._current_gait.subgait_name and pressure_right:
+            self._gait_selection.get_logger().warn("Pressure is placed on the wrong foot")
+
     def _process_idle_state(self):
         """If the current state is idle, this function processes input for
         what to do next."""
@@ -292,7 +303,7 @@ class GaitStateMachine(object):
     def _process_gait_state(self, elapsed_time):
         """Processes the current state when there is a gait happening.
         Schedules the next subgait if there is no trajectory happening or
-        finishes the gait if it is doen."""
+        finishes the gait if it is done. """
         if self._current_gait is None:
             if self._current_state in self._home_gaits:
                 self._current_gait = self._home_gaits[self._current_state]
@@ -305,6 +316,7 @@ class GaitStateMachine(object):
             trajectory = self._current_gait.start()
             if trajectory is not None:
                 self._call_gait_callbacks()
+                self.check_foot_pressure()
                 self._gait_selection.get_logger().info(
                     "Scheduling {subgait}".format(
                         subgait=self._current_gait.subgait_name
