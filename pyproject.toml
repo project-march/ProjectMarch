@@ -14,6 +14,7 @@ show_source = true
 flake8-2020 = ["+*"]
 flake8-black = ["+*"]
 flake8-bugbear = ["+*", "+B950"]
+mccabe = ["+*"]
 pep8-naming = ["+*"]
 pycodestyle = ["+*", "-E501", "-W503", "-E203"]
 pyflakes = ["+*"]
