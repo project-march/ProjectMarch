@@ -1,4 +1,4 @@
-class FileNotFoundError(Exception):
+class FileNotFoundError(Exception):  # noqa: A001
     def __init__(self, file_path, msg=None):
         """Class to raise an error when a file cannot be found.
 
