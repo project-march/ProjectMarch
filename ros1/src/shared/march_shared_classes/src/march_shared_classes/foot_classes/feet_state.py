@@ -79,9 +79,8 @@ class FeetState(object):
             feet_state_time += setpoint.time
         feet_state_time = feet_state_time / len(setpoint_dic)
 
-        feet_state = cls(foot_state_right, foot_state_left, feet_state_time)
-
-        return feet_state
+        # feet state
+        return cls(foot_state_right, foot_state_left, feet_state_time)
 
     @classmethod
     def weighted_average_states(cls, base_state, other_state, parameter):
@@ -127,5 +126,5 @@ class FeetState(object):
             feet_state.right_foot, feet_state.time
         )
 
-        setpoints = merge_dictionaries(left_joint_states, right_joint_states)
-        return setpoints
+        # setpoints
+        return merge_dictionaries(left_joint_states, right_joint_states)

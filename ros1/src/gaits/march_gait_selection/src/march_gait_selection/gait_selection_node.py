@@ -40,7 +40,7 @@ def set_gait_versions(msg, gait_selection):
     try:
         gait_selection.set_gait_versions(msg.gait, version_map)
         return [True, ""]
-    except Exception as e:
+    except Exception as e:  # noqa: PIE786
         return [False, str(e)]
 
 
