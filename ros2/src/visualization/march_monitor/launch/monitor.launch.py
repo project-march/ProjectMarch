@@ -1,7 +1,9 @@
 import launch
+import os
 from ament_index_python.packages import get_package_share_directory
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.substitutions import PathJoinSubstitution, LaunchConfiguration
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 
 
@@ -38,11 +40,15 @@ def generate_launch_description() -> launch.LaunchDescription:
                 ],
                 parameters=[{"use_sim_time": LaunchConfiguration("use_sim_time")}],
             ),
-            # Uncomment this when march_rqt_robot_monitor is added
-            # IncludeLaunchDescription(PythonLaunchDescriptionSource(
-            #         os.path.join(get_package_share_directory('march_rqt_robot_monitor'), 'launch',
-            #                      'march_rqt_robot_monitor.launch.py')),
-            #     launch_arguments=[('rqt', 'false')]
-            # )
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    os.path.join(
+                        get_package_share_directory("march_rqt_robot_monitor"),
+                        "launch",
+                        "march_rqt_robot_monitor.launch.py",
+                    )
+                ),
+                launch_arguments=[("rqt", "false")],
+            ),
         ]
     )
