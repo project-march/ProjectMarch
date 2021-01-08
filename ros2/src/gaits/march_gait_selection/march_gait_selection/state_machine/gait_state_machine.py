@@ -346,6 +346,7 @@ class GaitStateMachine(object):
                         f"left={self._force_left_foot}, right={self._force_right_foot}"
                     )
                 self._call_gait_callbacks()
+                self.check_foot_pressure()
                 self._gait_selection.get_logger().info(
                     "Scheduling {subgait}".format(
                         subgait=self._current_gait.subgait_name
