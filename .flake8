@@ -1,6 +1,0 @@
-[flake8]
-show-source = true
-max-line-length = 80
-exclude = .git, __init__.py, build, install, log, venv
-select = C,E,F,W,B,B950
-extend-ignore = E203, E501, C812, C815, C816, CNL100
