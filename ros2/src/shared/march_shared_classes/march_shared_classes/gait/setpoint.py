@@ -33,11 +33,7 @@ class Setpoint(object):
         self._velocity = round(velocity, self.digits)
 
     def __repr__(self):
-        return "Time: %s, Position: %s, Velocity: %s" % (
-            self.time,
-            self.position,
-            self.velocity,
-        )
+        return f"Time: {self.time!s}, Position: {self.position!s}, Velocity: {self.velocity!s}"
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):

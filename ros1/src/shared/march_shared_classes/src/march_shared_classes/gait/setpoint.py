@@ -48,16 +48,9 @@ class Setpoint(object):
 
     def __repr__(self):
         if self.velocity is not None:
-            return "Time: %s, Position: %s, Velocity: %s" % (
-                self.time,
-                self.position,
-                self.velocity,
-            )
+            return f"Time: {self.time!s}, Position: {self.position!s}, Velocity: {self.velocity!s}"
         else:
-            return "Time: %s, Position: %s, Velocity: Not specified" % (
-                self.time,
-                self.position,
-            )
+            return f"Time: {self.time!s}, Position: {self.position!s}, Velocity: Not specified"
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
