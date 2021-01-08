@@ -8,12 +8,13 @@ max_line_length = 80
 # show line of source code in output
 show_source = true
 
+
 # list of plugins and rules for them
 [tool.flakehell.plugins]
 flake8-2020 = ["+*"]
 flake8-black = ["+*"]
 flake8-bugbear = ["+*", "+B950"]
-#pep8-naming = ["+*"]
+pep8-naming = ["+*"]
 pycodestyle = ["+*", "-E501", "-W503", "-E203"]
 pyflakes = ["+*"]
 pylint = ["+*"]
