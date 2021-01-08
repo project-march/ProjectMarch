@@ -57,21 +57,17 @@ container:build:
 
 # Runs a linter on the code to see if the code style is consistent and to avoid common
 # mistakes
-noetic:flake8:
+flake8:
   stage: Lint code
   script:
-    - python3 -m flake8 ros1
+    - python3 -m flakehell lint --format=gitlab --output-file flakehell.json
   only:
     changes:
       - "ros1/**/*.py"
-
-foxy:flake8:
-  stage: Lint code
-  script:
-    - python3 -m flake8 ros2
-  only:
-    changes:
       - "ros2/**/*.py"
+  artifacts:
+    reports:
+      codequality: flakehell.json
 
 noetic:build:
   stage: Build code
