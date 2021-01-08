@@ -56,7 +56,7 @@ class HomeGait(GaitInterface):
 
     def _get_trajectory_msg(self):
         msg = JointTrajectory()
-        msg.joint_names = sorted(list(self._position.keys()))
+        msg.joint_names = sorted(self._position.keys())
 
         point = JointTrajectoryPoint()
         point.time_from_start = rospy.Duration.from_sec(self._duration)

@@ -79,7 +79,7 @@ class HomeGait(GaitInterface):
         :return:
         """
         msg = JointTrajectory()
-        msg.joint_names = sorted(list(self._position.keys()))
+        msg.joint_names = sorted(self._position.keys())
 
         point = JointTrajectoryPoint()
         point.time_from_start = Duration(seconds=self._duration).to_msg()

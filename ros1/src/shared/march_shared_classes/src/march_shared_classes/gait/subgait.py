@@ -425,27 +425,20 @@ class Subgait(object):
                 "secs": duration.secs,
             },
             "gait_type": self.gait_type,
-            "joints": dict(
-                [
-                    (
-                        joint.name,
-                        [
-                            {
-                                "position": setpoint.position,
-                                "time_from_start": {
-                                    "nsecs": rospy.Duration.from_sec(
-                                        setpoint.time
-                                    ).nsecs,
-                                    "secs": int(setpoint.time),
-                                },
-                                "velocity": setpoint.velocity,
-                            }
-                            for setpoint in joint.setpoints
-                        ],
-                    )
-                    for joint in self.joints
+            "joints": {
+                joint.name: [
+                    {
+                        "position": setpoint.position,
+                        "time_from_start": {
+                            "nsecs": rospy.Duration.from_sec(setpoint.time).nsecs,
+                            "secs": int(setpoint.time),
+                        },
+                        "velocity": setpoint.velocity,
+                    }
+                    for setpoint in joint.setpoints
                 ]
-            ),
+                for joint in self.joints
+            },
             "name": self.subgait_name,
             "version": self.version,
         }

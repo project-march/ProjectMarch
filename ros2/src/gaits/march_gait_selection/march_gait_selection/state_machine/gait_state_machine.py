@@ -122,7 +122,7 @@ class GaitStateMachine(object):
         for this will be updated when range of real pressure soles is known.
         If the foot was not on the ground before and is now, the gait will freeze"""
         if len(msg.states) > 0:
-            force = sum([state.total_wrench.force.z for state in msg.states])
+            force = sum(state.total_wrench.force.z for state in msg.states)
             if force > PRESSURE_SOLE_STANDING_FORCE:
                 if not self._right_foot_on_ground and side is Side.right:
                     self._right_foot_on_ground = True
