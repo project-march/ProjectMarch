@@ -11,6 +11,7 @@ show_source = true
 # list of plugins and rules for them
 [tool.flakehell.plugins]
 flake8-2020 = ["+*"]
+flake8-assertive = ["+*"]
 flake8-black = ["+*"]
 flake8-blind-except = ["+*"]
 flake8-bugbear = ["+*", "+B950"]
