@@ -1,24 +1,13 @@
 gaits:
-  walk:
-    right_open: MV_walk_rightopen_v3
-    left_swing: MV_walk_leftswing_v2
-    right_swing: MV_walk_rightswing_v2
-    left_close: MV_walk_leftclose_v3
-    right_close: MV_walk_rightclose_v3
   ik_test:
     swing: forward_swing
+  walk:
+    left_close: MV_walk_leftclose_v3
+    left_swing: MV_walk_leftswing_v2
+    right_close: MV_walk_rightclose_v3
+    right_open: MV_walk_rightopen_v3
+    right_swing: MV_walk_rightswing_v2
 positions:
-  stand:
-    gait_type: walk_like
-    joints:
-      left_ankle: 0.0436
-      left_hip_aa: 0.0
-      left_hip_fe: -0.0873
-      left_knee: 0.0
-      right_ankle: 0.0436
-      right_hip_aa: 0.0
-      right_hip_fe: -0.0873
-      right_knee: 0.0
   idle_1:
     gait_type: walk_like
     joints:
@@ -30,6 +19,28 @@ positions:
       right_hip_aa: -0.0524
       right_hip_fe: 0.5236
       right_knee: 0.8203
+  idle_10:
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.0436
+      left_hip_aa: 0.0
+      left_hip_fe: -0.0873
+      left_knee: 0.0
+      right_ankle: 0.0436
+      right_hip_aa: 0.0
+      right_hip_fe: 0.4014
+      right_knee: 0.6981
+  idle_11:
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.0436
+      left_hip_aa: 0.0
+      left_hip_fe: 0.4014
+      left_knee: 0.6981
+      right_ankle: 0.0436
+      right_hip_aa: 0.0
+      right_hip_fe: -0.0873
+      right_knee: 0.0
   idle_2:
     gait_type: walk_like
     joints:
@@ -63,17 +74,6 @@ positions:
       right_hip_aa: 0.0
       right_hip_fe: -0.0873
       right_knee: 0.0
-  sit:
-    gait_type: walk_like
-    joints:
-      left_ankle: 0.0436
-      left_hip_aa: 0.0
-      left_hip_fe: 1.2217
-      left_knee: 1.5708
-      right_ankle: 0.0436
-      right_hip_aa: 0.0
-      right_hip_fe: 1.2217
-      right_knee: 1.5708
   idle_6:
     gait_type: walk_like
     joints:
@@ -118,24 +118,24 @@ positions:
       right_hip_aa: 0.1222
       right_hip_fe: -0.0873
       right_knee: 0.0
-  idle_10:
+  sit:
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.0436
+      left_hip_aa: 0.0
+      left_hip_fe: 1.2217
+      left_knee: 1.5708
+      right_ankle: 0.0436
+      right_hip_aa: 0.0
+      right_hip_fe: 1.2217
+      right_knee: 1.5708
+  stand:
     gait_type: walk_like
     joints:
       left_ankle: 0.0436
       left_hip_aa: 0.0
       left_hip_fe: -0.0873
       left_knee: 0.0
-      right_ankle: 0.0436
-      right_hip_aa: 0.0
-      right_hip_fe: 0.4014
-      right_knee: 0.6981
-  idle_11:
-    gait_type: walk_like
-    joints:
-      left_ankle: 0.0436
-      left_hip_aa: 0.0
-      left_hip_fe: 0.4014
-      left_knee: 0.6981
       right_ankle: 0.0436
       right_hip_aa: 0.0
       right_hip_fe: -0.0873

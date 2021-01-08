@@ -12,6 +12,8 @@ from march_shared_classes.exceptions.gait_exceptions import (
 from .subgait import Subgait
 from .subgait_graph import SubgaitGraph
 
+ALLOWED_ERROR_ENDPOINTS = 0.0001
+
 
 class Gait(object):
     """base class for a generated gait."""
@@ -169,22 +171,41 @@ class Gait(object):
                     old_subgait = self.subgaits[to_subgait_name]
                     new_subgait = new_subgaits[to_subgait_name]
 
-                    if old_subgait.starting_position != new_subgait.starting_position:
-                        raise NonValidGaitContent(
-                            msg="The starting position of new version {gait} {subgait} does not match".format(
-                                gait=self.gait_name, subgait=to_subgait_name
+                    old_starting_positions = old_subgait.starting_position
+                    new_starting_positions = new_subgait.starting_position
+                    for joint in old_subgait.joints:
+                        if (
+                            abs(
+                                old_starting_positions[joint.name]
+                                - new_starting_positions[joint.name]
                             )
-                        )
+                            >= ALLOWED_ERROR_ENDPOINTS
+                        ):
+                            raise NonValidGaitContent(
+                                msg="The starting position of new version {gait} {subgait} does not match".format(
+                                    gait=self.gait_name, subgait=to_subgait_name
+                                )
+                            )
                 elif to_subgait_name == self.graph.END:
                     old_subgait = self.subgaits[from_subgait_name]
                     new_subgait = new_subgaits[from_subgait_name]
 
-                    if old_subgait.final_position != new_subgait.final_position:
-                        raise NonValidGaitContent(
-                            msg="The final position of new version {gait} {subgait} does not match".format(
-                                gait=self.gait_name, subgait=from_subgait_name
+                    old_final_positions = old_subgait.final_position
+                    new_final_positions = new_subgait.final_position
+                    for joint in old_subgait.joints:
+                        if (
+                            abs(
+                                old_final_positions[joint.name]
+                                - new_final_positions[joint.name]
                             )
-                        )
+                            >= ALLOWED_ERROR_ENDPOINTS
+                        ):
+                            raise NonValidGaitContent(
+                                msg="The final position of new version {gait} {subgait} does not match".format(
+                                    gait=self.gait_name, subgait=from_subgait_name
+                                )
+                            )
+
                 else:
                     from_subgait = new_subgaits.get(
                         from_subgait_name, self.subgaits[from_subgait_name]
