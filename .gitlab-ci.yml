@@ -19,7 +19,7 @@ image: registry.gitlab.com/project-march/march:$CI_COMMIT_BRANCH
 # 1. The image for this branch is pulled. If it does not exist, copy the default
 #   image and tag it as an image for this branch.
 # 2. If there are changes to the Dockerfile or to a package.xml file, rebuild the
-#   con tainer.
+#   container.
 container:tag:
   stage: Tag container
   image: docker:latest
