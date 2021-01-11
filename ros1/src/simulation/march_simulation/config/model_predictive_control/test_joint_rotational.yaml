@@ -1,0 +1,20 @@
+# this file represents the controller being used
+march:
+  # Publish all joint states -----------------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50
+
+  controller:
+    trajectory:
+      type: model_predictive_trajectory_controller/JointTrajectoryController
+      joints:
+        - rotational_joint
+
+
+      gains: # Required because we're controlling an effort interface
+        rotational_joint: {p: 0,  d: 0, i: 0, i_clamp: 0}
+
+      state_publish_rate:  25            # Override default
+      action_monitor_rate: 30            # Override default
+      stop_trajectory_duration: 0        # Override default
