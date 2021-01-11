@@ -1,4 +1,3 @@
-
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog
 from python_qt_binding import loadUi
@@ -29,16 +28,18 @@ class ParametricPopUpWindow(QDialog):
         self.otherVersionComboBox.clear()
         self.otherVersionComboBox.addItems(versions)
         self.parameterSlider.setValue(50)
-        self.parameterLabel.setText('parameter = 0.50')
+        self.parameterLabel.setText("parameter = 0.50")
 
-        self.base_version = ''
-        self.other_version = ''
+        self.base_version = ""
+        self.other_version = ""
         self.parameter = 0.0
         return super(ParametricPopUpWindow, self).exec_()
 
     def value_changed(self):
         """Puts the new slider value in the label next to it."""
-        self.parameterLabel.setText('parameter = {val:.2f}'.format(val=self.parameterSlider.value() / 100.0))
+        self.parameterLabel.setText(
+            "parameter = {val:.2f}".format(val=self.parameterSlider.value() / 100.0)
+        )
 
     def cancel(self):
         """Close without applying the values."""

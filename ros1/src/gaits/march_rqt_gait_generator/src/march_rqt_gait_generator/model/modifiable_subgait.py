@@ -27,18 +27,18 @@ class ModifiableSubgait(Subgait):
             True if the replacement is possible and no errors occurred
         """
         if not key_1 or not key_2:
-            rospy.loginfo('Keys are invalid')
+            rospy.loginfo("Keys are invalid")
             return False
 
         # XNOR, only one key can and must exist in the subgait name
         if (key_1 in self.subgait_name) == (key_2 in self.subgait_name):
-            rospy.loginfo('Multiple or no keys exist in subgait %s', self.subgait_name)
+            rospy.loginfo("Multiple or no keys exist in subgait %s", self.subgait_name)
             return False
 
         # If a joint name has both keys, we wouldn't know how to replace them.
         for joint in self.joints:
             if key_1 in joint.name and key_2 in joint.name:
-                rospy.loginfo('Both keys exist in joint %s', joint.name)
+                rospy.loginfo("Both keys exist in joint %s", joint.name)
                 return False
 
             if key_1 in joint.name:
@@ -46,7 +46,7 @@ class ModifiableSubgait(Subgait):
                 joint_2_name = joint.name.replace(key_1, key_2)
 
                 if joint_2_name not in self.get_joint_names():
-                    rospy.loginfo('joint %s does not exist', joint_2_name)
+                    rospy.loginfo("joint %s does not exist", joint_2_name)
                     return False
 
                 joint_2 = self.get_joint(joint_2_name)
@@ -56,7 +56,7 @@ class ModifiableSubgait(Subgait):
                 joint_1_name = joint.name.replace(key_2, key_1)
 
                 if joint_1_name not in self.get_joint_names():
-                    rospy.loginfo('joint %s does not exist', joint_1_name)
+                    rospy.loginfo("joint %s does not exist", joint_1_name)
                     return False
 
                 joint_1 = self.get_joint(joint_1_name)
@@ -79,7 +79,7 @@ class ModifiableSubgait(Subgait):
             The mirrored subgait as subgait object
         """
         if not self.can_mirror(key_1, key_2):
-            rospy.logwarn('Cannot mirror gait %s', self.gait_name)
+            rospy.logwarn("Cannot mirror gait %s", self.gait_name)
             return False
 
         if key_1 in self.subgait_name:
@@ -87,7 +87,7 @@ class ModifiableSubgait(Subgait):
         elif key_2 in self.subgait_name:
             mirrored_subgait_name = str(self.subgait_name.replace(key_2, key_1))
         else:
-            rospy.logerr('This case should have been caught by can_mirror()')
+            rospy.logerr("This case should have been caught by can_mirror()")
             return False
 
         if key_1 in self.version:
@@ -106,28 +106,47 @@ class ModifiableSubgait(Subgait):
             else:
                 continue
 
-            mirrored_joint = ModifiableJointTrajectory(mirrored_name, joint.limits, joint.setpoints, joint.duration)
+            mirrored_joint = ModifiableJointTrajectory(
+                mirrored_name, joint.limits, joint.setpoints, joint.duration
+            )
             mirrored_joints.append(mirrored_joint)
 
-        return ModifiableSubgait(mirrored_joints, self.duration, self.gait_type, self.gait_name, mirrored_subgait_name,
-                                 mirrored_version, self.description)
+        return ModifiableSubgait(
+            mirrored_joints,
+            self.duration,
+            self.gait_type,
+            self.gait_name,
+            mirrored_subgait_name,
+            mirrored_version,
+            self.description,
+        )
 
     @staticmethod
     def verify_mirrored_joint(joint_1, joint_2):
         """Verify if joint_1 and joint_2 are mirrored versions of each other."""
         if joint_1 is None or joint_2 is None:
-            rospy.logwarn('Joints %s and %s are not valid.', str(joint_1), str(joint_2))
+            rospy.logwarn("Joints %s and %s are not valid.", str(joint_1), str(joint_2))
             return False
 
-        if joint_1.setpoints[0].position != joint_2.setpoints[-1].position \
-                or joint_1.setpoints[0].velocity != joint_2.setpoints[-1].velocity:
-            rospy.loginfo('First setpoint of %s != last setpoint of %s. These subgaits will not be able to loop.',
-                          joint_1.name, joint_2.name)
+        if (
+            joint_1.setpoints[0].position != joint_2.setpoints[-1].position
+            or joint_1.setpoints[0].velocity != joint_2.setpoints[-1].velocity
+        ):
+            rospy.loginfo(
+                "First setpoint of %s != last setpoint of %s. These subgaits will not be able to loop.",
+                joint_1.name,
+                joint_2.name,
+            )
 
-        if joint_1.setpoints[-1].position != joint_2.setpoints[0].position \
-                or joint_1.setpoints[-1].velocity != joint_2.setpoints[0].velocity:
-            rospy.loginfo('Last setpoint of %s != first setpoint of %s. These subgaits will not be able to loop.',
-                          joint_1.name, joint_2.name)
+        if (
+            joint_1.setpoints[-1].position != joint_2.setpoints[0].position
+            or joint_1.setpoints[-1].velocity != joint_2.setpoints[0].velocity
+        ):
+            rospy.loginfo(
+                "Last setpoint of %s != first setpoint of %s. These subgaits will not be able to loop.",
+                joint_1.name,
+                joint_2.name,
+            )
 
         return True
 

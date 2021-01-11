@@ -12,7 +12,7 @@ class TestGaitSelection(unittest.TestCase):
         rclpy.init()
 
     def test_create_with_predefined_joint_names(self):
-        joint_names = ['one', 'two']
+        joint_names = ["one", "two"]
         node = RobotInformation(joint_names=joint_names)
         request = GetJointNames.Request()
         response = GetJointNames.Response(joint_names=[])

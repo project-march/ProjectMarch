@@ -69,16 +69,27 @@ class SetpointsGait(GaitInterface, Gait):
             return None, False
 
         if self._should_stop:
-            next_subgait = self.graph[(self._current_subgait.subgait_name, self.graph.STOP)]
+            next_subgait = self.graph[
+                (self._current_subgait.subgait_name, self.graph.STOP)
+            ]
             if next_subgait is None:
-                next_subgait = self.graph[(self._current_subgait.subgait_name, self.graph.TO)]
+                next_subgait = self.graph[
+                    (self._current_subgait.subgait_name, self.graph.TO)
+                ]
             else:
                 self._should_stop = False
         elif self._transition_to_subgait is not None and not self._is_transitioning:
-            old_subgait = self.subgaits[self.graph[(self._current_subgait.subgait_name, self.graph.TO)]]
-            new_subgait = self.subgaits[self.graph[(self._transition_to_subgait.subgait_name, self.graph.TO)]]
-            transition_subgait = TransitionSubgait.from_subgaits(old_subgait, new_subgait, '{s}_transition'.format(
-                s=self._transition_to_subgait.subgait_name))
+            old_subgait = self.subgaits[
+                self.graph[(self._current_subgait.subgait_name, self.graph.TO)]
+            ]
+            new_subgait = self.subgaits[
+                self.graph[(self._transition_to_subgait.subgait_name, self.graph.TO)]
+            ]
+            transition_subgait = TransitionSubgait.from_subgaits(
+                old_subgait,
+                new_subgait,
+                "{s}_transition".format(s=self._transition_to_subgait.subgait_name),
+            )
             self._current_subgait = transition_subgait
             self._time_since_start = 0.0
             self._is_transitioning = True
@@ -88,7 +99,9 @@ class SetpointsGait(GaitInterface, Gait):
             self._transition_to_subgait = None
             self._is_transitioning = False
         else:
-            next_subgait = self.graph[(self._current_subgait.subgait_name, self.graph.TO)]
+            next_subgait = self.graph[
+                (self._current_subgait.subgait_name, self.graph.TO)
+            ]
 
         if next_subgait == self.graph.END:
             return None, True
@@ -102,9 +115,13 @@ class SetpointsGait(GaitInterface, Gait):
             return False
 
         if transition_request == TransitionRequest.DECREASE_SIZE:
-            name = self.graph[(self._current_subgait.subgait_name, self.graph.DECREASE_SIZE)]
+            name = self.graph[
+                (self._current_subgait.subgait_name, self.graph.DECREASE_SIZE)
+            ]
         elif transition_request == TransitionRequest.INCREASE_SIZE:
-            name = self.graph[(self._current_subgait.subgait_name, self.graph.INCREASE_SIZE)]
+            name = self.graph[
+                (self._current_subgait.subgait_name, self.graph.INCREASE_SIZE)
+            ]
         else:
             return False
 
@@ -114,7 +131,11 @@ class SetpointsGait(GaitInterface, Gait):
         return False
 
     def stop(self):
-        if self.graph.is_stoppable() and not self._is_transitioning and self._transition_to_subgait is None:
+        if (
+            self.graph.is_stoppable()
+            and not self._is_transitioning
+            and self._transition_to_subgait is None
+        ):
             self._should_stop = True
             return True
         else:
@@ -125,6 +146,10 @@ class SetpointsGait(GaitInterface, Gait):
 
     def set_subgait_versions(self, robot, gait_directory, version_map):
         if self._current_subgait is None:
-            super(SetpointsGait, self).set_subgait_versions(robot, gait_directory, version_map)
+            super(SetpointsGait, self).set_subgait_versions(
+                robot, gait_directory, version_map
+            )
         else:
-            raise GaitError('Cannot change subgait version while gait is being executed')
+            raise GaitError(
+                "Cannot change subgait version while gait is being executed"
+            )

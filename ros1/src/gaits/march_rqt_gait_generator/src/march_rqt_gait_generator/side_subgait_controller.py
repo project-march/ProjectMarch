@@ -2,7 +2,9 @@ from numpy_ringbuffer import RingBuffer
 
 
 class SideSubgaitController(object):
-    def __init__(self, default, view, lock_checked=False, default_checked=False, subgait=None):
+    def __init__(
+        self, default, view, lock_checked=False, default_checked=False, subgait=None
+    ):
         self._lock_checked = lock_checked
         self._default_checked = default_checked
         self._subgait = subgait
@@ -13,25 +15,35 @@ class SideSubgaitController(object):
         self.settings_redo_list = RingBuffer(capacity=100, dtype=list)
 
     def undo(self):
-        self.settings_redo_list.append({'lock_checked': self._lock_checked, 'default_checked': self._default_checked,
-                                        'subgait': self._subgait})
+        self.settings_redo_list.append(
+            {
+                "lock_checked": self._lock_checked,
+                "default_checked": self._default_checked,
+                "subgait": self._subgait,
+            }
+        )
         settings = self.settings_history.pop()
-        self._lock_checked = settings['lock_checked']
-        self._default_checked = settings['default_checked']
-        self._subgait = settings['subgait']
+        self._lock_checked = settings["lock_checked"]
+        self._default_checked = settings["default_checked"]
+        self._subgait = settings["subgait"]
         self.view.update_widget(self)
 
     def redo(self):
         self.save_changed_settings()
         settings = self.settings_redo_list.pop()
-        self._lock_checked = settings['lock_checked']
-        self._default_checked = settings['default_checked']
-        self._subgait = settings['subgait']
+        self._lock_checked = settings["lock_checked"]
+        self._default_checked = settings["default_checked"]
+        self._subgait = settings["subgait"]
         self.view.update_widget(self)
 
     def save_changed_settings(self):
-        self.settings_history.append({'lock_checked': self._lock_checked, 'default_checked': self._default_checked,
-                                      'subgait': self._subgait})
+        self.settings_history.append(
+            {
+                "lock_checked": self._lock_checked,
+                "default_checked": self._default_checked,
+                "subgait": self._subgait,
+            }
+        )
 
     @property
     def lock_checked(self):
@@ -71,4 +83,4 @@ class SideSubgaitController(object):
         if self._subgait:
             return self._subgait.version
         else:
-            return 'Import'
+            return "Import"

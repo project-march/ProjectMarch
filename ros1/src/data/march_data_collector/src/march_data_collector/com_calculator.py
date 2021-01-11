@@ -25,15 +25,16 @@ from visualization_msgs.msg import Marker
 
 
 class CoMCalculator(object):
-
     def __init__(self, robot, tf_buffer):
         self.tf_buffer = tf_buffer
 
-        self.links = dict(filter(lambda __l: __l[1].inertial is not None, robot.link_map.items()))
+        self.links = dict(
+            filter(lambda __l: __l[1].inertial is not None, robot.link_map.items())
+        )
         self.mass = sum(l.inertial.mass for (_, l) in self.links.items())
 
         self.marker = Marker()
-        self.marker.header.frame_id = 'world'
+        self.marker.header.frame_id = "world"
         self.marker.type = self.marker.SPHERE
         self.marker.action = self.marker.ADD
         self.marker.pose.orientation.w = 1.0
@@ -49,7 +50,7 @@ class CoMCalculator(object):
         z = 0
         for link in self.links:
             try:
-                trans = self.tf_buffer.lookup_transform('world', link, rospy.Time())
+                trans = self.tf_buffer.lookup_transform("world", link, rospy.Time())
 
                 to_transform = geometry_msgs.msg.PointStamped()
                 to_transform.point.x = self.links[link].inertial.origin.xyz[0]
@@ -64,7 +65,11 @@ class CoMCalculator(object):
                 y += self.links[link].inertial.mass * transformed.point.y
                 z += self.links[link].inertial.mass * transformed.point.z
             except tf2_ros.TransformException as err:
-                rospy.logdebug('TF Error in trying to lookup transform for center of mass: {error}'.format(error=err))
+                rospy.logdebug(
+                    "TF Error in trying to lookup transform for center of mass: {error}".format(
+                        error=err
+                    )
+                )
 
         x = x / self.mass
         y = y / self.mass
@@ -75,6 +80,6 @@ class CoMCalculator(object):
         self.marker.pose.position.x = x
         self.marker.pose.position.y = y
         self.marker.pose.position.z = z
-        rospy.logdebug('center of mass is at ' + str(self.marker.pose.position))
+        rospy.logdebug("center of mass is at " + str(self.marker.pose.position))
 
         return self.marker

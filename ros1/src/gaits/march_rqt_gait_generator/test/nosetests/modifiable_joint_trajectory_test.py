@@ -3,7 +3,9 @@ import unittest
 
 from mock import Mock
 
-from march_rqt_gait_generator.model.modifiable_joint_trajectory import ModifiableJointTrajectory
+from march_rqt_gait_generator.model.modifiable_joint_trajectory import (
+    ModifiableJointTrajectory,
+)
 from march_rqt_gait_generator.model.modifiable_setpoint import ModifiableSetpoint
 from march_shared_classes.gait.limits import Limits
 
@@ -11,13 +13,18 @@ from march_shared_classes.gait.limits import Limits
 class ModifiableJointTrajectoryTest(unittest.TestCase):
     def setUp(self):
         self.gait_generator = Mock()
-        self.joint_name = 'test_joint'
+        self.joint_name = "test_joint"
         self.limits = Limits(-1, 1, 2)
         self.duration = 2.0
         self.times = [0, self.duration / 2.0, self.duration]
         self.setpoints = [ModifiableSetpoint(t, 0.5 * t, t) for t in self.times]
-        self.joint_trajectory = ModifiableJointTrajectory(self.joint_name, self.limits, copy.deepcopy(self.setpoints),
-                                                          self.duration, self.gait_generator)
+        self.joint_trajectory = ModifiableJointTrajectory(
+            self.joint_name,
+            self.limits,
+            copy.deepcopy(self.setpoints),
+            self.duration,
+            self.gait_generator,
+        )
 
     # enforce_limits tests
     def test_enforce_limits_nonzero_start(self):
@@ -33,7 +40,9 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
     def test_enforce_limits_max_position(self):
         self.joint_trajectory.setpoints[-1].position = self.limits.upper + 1
         self.joint_trajectory.enforce_limits()
-        self.assertEqual(self.joint_trajectory.setpoints[-1].position, self.limits.upper)
+        self.assertEqual(
+            self.joint_trajectory.setpoints[-1].position, self.limits.upper
+        )
 
     def test_enforce_limits_min_position(self):
         self.joint_trajectory.setpoints[1].position = self.limits.lower - 1
@@ -43,12 +52,16 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
     def test_enforce_limits_max_velocity(self):
         self.joint_trajectory.setpoints[0].velocity = self.limits.velocity + 1
         self.joint_trajectory.enforce_limits()
-        self.assertEqual(self.joint_trajectory.setpoints[0].velocity, self.limits.velocity)
+        self.assertEqual(
+            self.joint_trajectory.setpoints[0].velocity, self.limits.velocity
+        )
 
     def test_enforce_limits_min_velocity(self):
         self.joint_trajectory.setpoints[-1].velocity = -self.limits.velocity - 1
         self.joint_trajectory.enforce_limits()
-        self.assertEqual(self.joint_trajectory.setpoints[-1].velocity, -self.limits.velocity)
+        self.assertEqual(
+            self.joint_trajectory.setpoints[-1].velocity, -self.limits.velocity
+        )
 
     # set_setpoints test
     def test_set_setpoints(self):
@@ -56,7 +69,9 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
         self.joint_trajectory.set_setpoints(new_setpoints)
         # The last setpoint should be at self.duration due to self.enforce_limits().
         # x and v should also be self.duration due to definition above.
-        last_setpoint = ModifiableSetpoint(self.duration, 0.5 * self.duration, self.duration)
+        last_setpoint = ModifiableSetpoint(
+            self.duration, 0.5 * self.duration, self.duration
+        )
         self.assertEqual(self.joint_trajectory.setpoints[-1], last_setpoint)
 
     # add_setpoint tests
@@ -74,7 +89,9 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
     def test_add_setpoint_save_changed_joints_call(self):
         new_setpoint = ModifiableSetpoint(0.5, 0, 0)
         self.joint_trajectory.add_setpoint(new_setpoint)
-        self.gait_generator.save_changed_settings.assert_called_once_with({'joints': [self.joint_trajectory]})
+        self.gait_generator.save_changed_settings.assert_called_once_with(
+            {"joints": [self.joint_trajectory]}
+        )
 
     # remove_setpoint tests
     def test_remove_setpoint_removal_correct_setpoint(self):
@@ -88,17 +105,21 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
 
     def test_remove_setpoint_save_changed_joints_call(self):
         self.joint_trajectory.remove_setpoint(2)
-        self.gait_generator.save_changed_settings.assert_called_once_with({'joints': [self.joint_trajectory]})
+        self.gait_generator.save_changed_settings.assert_called_once_with(
+            {"joints": [self.joint_trajectory]}
+        )
 
     # save_setpoints test
     def test_save_setpoints_content(self):
         self.joint_trajectory.save_setpoints()
-        old_setpoints = self.joint_trajectory.setpoints_history[0]['setpoints']
+        old_setpoints = self.joint_trajectory.setpoints_history[0]["setpoints"]
         self.assertEqual(old_setpoints, self.setpoints)
 
     def test_save_setpoints_save_changed_joints_call(self):
         self.joint_trajectory.save_setpoints()
-        self.gait_generator.save_changed_settings.assert_called_once_with({'joints': [self.joint_trajectory]})
+        self.gait_generator.save_changed_settings.assert_called_once_with(
+            {"joints": [self.joint_trajectory]}
+        )
 
     def test_save_setpoints_no_save_changed_joints_call(self):
         self.joint_trajectory.save_setpoints(single_joint_change=False)
@@ -109,13 +130,15 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
         self.joint_trajectory.invert()
         self.setpoints.reverse()
         for setpoint in self.setpoints:
-            setpoint.velocity = - setpoint.velocity
+            setpoint.velocity = -setpoint.velocity
             setpoint.time = self.duration - setpoint.time
         self.assertEqual(self.joint_trajectory.setpoints, self.setpoints)
 
     def test_invert_test_setpoints_saved(self):
         self.joint_trajectory.invert()
-        self.assertEqual(self.joint_trajectory.setpoints_history[0]['setpoints'], self.setpoints)
+        self.assertEqual(
+            self.joint_trajectory.setpoints_history[0]["setpoints"], self.setpoints
+        )
         self.gait_generator.save_changed_settings.assert_not_called()
 
     # undo tests
@@ -152,7 +175,7 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
             new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
             self.joint_trajectory.add_setpoint(new_setpoint)
 
-        for i in range(110):
+        for _ in range(110):
             self.joint_trajectory.undo()
         self.assertEqual(self.joint_trajectory.setpoints, setpoints_copy)
 
@@ -163,7 +186,7 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
             new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
             self.joint_trajectory.add_setpoint(new_setpoint)
 
-        for i in range(110):
+        for _ in range(110):
             self.joint_trajectory.undo()
         self.assertEqual(len(self.joint_trajectory.setpoints_redo_list), 100)
 
@@ -172,7 +195,7 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
             new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
             self.joint_trajectory.add_setpoint(new_setpoint)
 
-        for i in range(80):
+        for _ in range(80):
             self.joint_trajectory.undo()
         self.assertEqual(len(self.joint_trajectory.setpoints_history), 20)
 
@@ -181,7 +204,7 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
             new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
             self.joint_trajectory.add_setpoint(new_setpoint)
 
-        for i in range(80):
+        for _ in range(80):
             self.joint_trajectory.undo()
         self.assertEqual(len(self.joint_trajectory.setpoints_redo_list), 80)
 
@@ -221,10 +244,10 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
             new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
             self.joint_trajectory.add_setpoint(new_setpoint)
 
-        for i in range(80):
+        for _ in range(80):
             self.joint_trajectory.undo()
 
-        for i in range(50):
+        for _ in range(50):
             self.joint_trajectory.redo()
         self.assertEqual(len(self.joint_trajectory.setpoints_history), 70)
 
@@ -233,9 +256,9 @@ class ModifiableJointTrajectoryTest(unittest.TestCase):
             new_setpoint = ModifiableSetpoint((i + 1) / 101.0, 0, 0)
             self.joint_trajectory.add_setpoint(new_setpoint)
 
-        for i in range(80):
+        for _ in range(80):
             self.joint_trajectory.undo()
 
-        for i in range(50):
+        for _ in range(50):
             self.joint_trajectory.redo()
         self.assertEqual(len(self.joint_trajectory.setpoints_redo_list), 30)

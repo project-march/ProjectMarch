@@ -19,7 +19,10 @@ class TimeSliderThread(QtCore.QThread):
         r = rospy.Rate(calculations_per_second)
         while self.allowed_to_run:
             index += 1
-            value = (self.current + float(index) / calculations_per_second * self.playback_speed) % self.max
+            value = (
+                self.current
+                + float(index) / calculations_per_second * self.playback_speed
+            ) % self.max
             self.update_signal.emit(value)
             r.sleep()
 

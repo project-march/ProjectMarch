@@ -1,4 +1,7 @@
-from march_shared_classes.utilities.utility_functions import get_joint_names_for_inverse_kinematics, weighted_average
+from march_shared_classes.utilities.utility_functions import (
+    get_joint_names_for_inverse_kinematics,
+    weighted_average,
+)
 
 # Use this factor when calculating velocities to keep the calculations within the range of motion
 # See IK confluence page https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
@@ -45,15 +48,24 @@ class Setpoint(object):
 
     def __repr__(self):
         if self.velocity is not None:
-            return 'Time: %s, Position: %s, Velocity: %s' % (self.time, self.position, self.velocity)
+            return "Time: %s, Position: %s, Velocity: %s" % (
+                self.time,
+                self.position,
+                self.velocity,
+            )
         else:
-            return 'Time: %s, Position: %s, Velocity: Not specified' % (self.time, self.position)
+            return "Time: %s, Position: %s, Velocity: Not specified" % (
+                self.time,
+                self.position,
+            )
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return (self.time == other.time
-                    and self.position == other.position
-                    and self.velocity == other.velocity)
+            return (
+                self.time == other.time
+                and self.position == other.position
+                and self.velocity == other.velocity
+            )
         else:
             return False
 
@@ -72,11 +84,15 @@ class Setpoint(object):
         next_positions = {}
         for joint in JOINT_NAMES_IK:
             if joint in setpoint_dic:
-                next_positions[joint] = cls(setpoint_dic[joint].time + VELOCITY_SCALE_FACTOR,
-                                            setpoint_dic[joint].position + setpoint_dic[joint].velocity
-                                            * VELOCITY_SCALE_FACTOR)
+                next_positions[joint] = cls(
+                    setpoint_dic[joint].time + VELOCITY_SCALE_FACTOR,
+                    setpoint_dic[joint].position
+                    + setpoint_dic[joint].velocity * VELOCITY_SCALE_FACTOR,
+                )
             else:
-                raise KeyError('Setpoint_dic is missing joint {joint}'.format(joint=joint))
+                raise KeyError(
+                    "Setpoint_dic is missing joint {joint}".format(joint=joint)
+                )
 
         return next_positions
 
@@ -90,7 +106,9 @@ class Setpoint(object):
 
         :return: The joint velocities of the joints on the specified side
         """
-        self.velocity = (next_state.position - self.position) / (next_state.time - self.time)
+        self.velocity = (next_state.position - self.position) / (
+            next_state.time - self.time
+        )
 
     @staticmethod
     def interpolate_setpoints(base_setpoint, other_setpoint, parameter):
@@ -106,6 +124,10 @@ class Setpoint(object):
             The interpolated setpoint
         """
         time = weighted_average(base_setpoint.time, other_setpoint.time, parameter)
-        position = weighted_average(base_setpoint.position, other_setpoint.position, parameter)
-        velocity = weighted_average(base_setpoint.velocity, other_setpoint.velocity, parameter)
+        position = weighted_average(
+            base_setpoint.position, other_setpoint.position, parameter
+        )
+        velocity = weighted_average(
+            base_setpoint.velocity, other_setpoint.velocity, parameter
+        )
         return Setpoint(time, position, velocity)

@@ -5,13 +5,17 @@ from march_shared_classes.gait.setpoint import Setpoint
 
 class SetpointTest(unittest.TestCase):
     def setUp(self):
-        self.setpoint = Setpoint(1.123412541, 0.0343412512, 123.162084)  # 0.0343412512 123.162084
-        self.setpoint_dict = {'left_hip_aa': self.setpoint,
-                              'left_hip_fe': self.setpoint,
-                              'left_knee': self.setpoint,
-                              'right_hip_aa': self.setpoint,
-                              'right_hip_fe': self.setpoint,
-                              'right_knee': self.setpoint}
+        self.setpoint = Setpoint(
+            1.123412541, 0.0343412512, 123.162084
+        )  # 0.0343412512 123.162084
+        self.setpoint_dict = {
+            "left_hip_aa": self.setpoint,
+            "left_hip_fe": self.setpoint,
+            "left_knee": self.setpoint,
+            "right_hip_aa": self.setpoint,
+            "right_hip_fe": self.setpoint,
+            "right_knee": self.setpoint,
+        }
 
     def test_time_rounding(self):
         self.assertEqual(self.setpoint.time, 1.1234)
@@ -23,7 +27,10 @@ class SetpointTest(unittest.TestCase):
         self.assertEqual(self.setpoint.velocity, 123.1621)
 
     def test_string_output(self):
-        self.assertEqual(str(self.setpoint), 'Time: %s, Position: %s, Velocity: %s' % (1.1234, 0.0343, 123.1621))
+        self.assertEqual(
+            str(self.setpoint),
+            "Time: %s, Position: %s, Velocity: %s" % (1.1234, 0.0343, 123.1621),
+        )
 
     def test_equal(self):
         other_setpoint = Setpoint(1.123410541132, 0.03433998, 123.1621)
@@ -48,7 +55,14 @@ class SetpointTest(unittest.TestCase):
     def test_interpolation_correct(self):
         parameter = 0.3
         other_setpoint = Setpoint(1, 1, 1)
-        expected_result = Setpoint(self.setpoint.time * parameter + (1 - parameter) * other_setpoint.time,
-                                   self.setpoint.position * parameter + (1 - parameter) * other_setpoint.position,
-                                   self.setpoint.velocity * parameter + (1 - parameter) * other_setpoint.velocity)
-        self.assertEqual(expected_result, Setpoint.interpolate_setpoints(self.setpoint, other_setpoint, parameter))
+        expected_result = Setpoint(
+            self.setpoint.time * parameter + (1 - parameter) * other_setpoint.time,
+            self.setpoint.position * parameter
+            + (1 - parameter) * other_setpoint.position,
+            self.setpoint.velocity * parameter
+            + (1 - parameter) * other_setpoint.velocity,
+        )
+        self.assertEqual(
+            expected_result,
+            Setpoint.interpolate_setpoints(self.setpoint, other_setpoint, parameter),
+        )

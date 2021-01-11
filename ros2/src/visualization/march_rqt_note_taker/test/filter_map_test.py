@@ -23,9 +23,9 @@ class FilterMapTest(unittest.TestCase):
         self.assertIsNone(self.filter_map(self.log_msg))
 
     def test_reject_one_filter_with_map(self):
-        msg = 'test'
+        msg = "test"
         self.log_msg.msg = msg
-        self.filter_map.add_filter(lambda m: False, lambda _: '')
+        self.filter_map.add_filter(lambda m: False, lambda _: "")
         self.assertIsNone(self.filter_map(self.log_msg))
         self.assertEqual(self.log_msg.msg, msg)
 
@@ -52,13 +52,13 @@ class FilterMapTest(unittest.TestCase):
         self.assertIsNone(self.filter_map(self.log_msg))
 
     def test_accept_and_map(self):
-        mapped_msg = 'test'
+        mapped_msg = "test"
         self.filter_map.add_filter(lambda _: True, lambda _: mapped_msg)
         self.log_msg = self.filter_map(self.log_msg)
         self.assertEqual(self.log_msg.msg, mapped_msg)
 
     def test_accept_and_map_on_log_level(self):
-        mapped_msg = 'test'
+        mapped_msg = "test"
         level = Log.DEBUG
         self.log_msg.level = int.from_bytes(level, sys.byteorder)
         self.filter_map.add_filter_on_level(level, msg_map=lambda _: mapped_msg)

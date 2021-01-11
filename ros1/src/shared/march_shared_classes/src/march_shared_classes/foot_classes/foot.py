@@ -6,8 +6,13 @@ from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolation
 from march_shared_classes.exceptions.general_exceptions import SideSpecificationError
 from march_shared_classes.gait.setpoint import Setpoint
 from march_shared_classes.utilities.side import Side
-from march_shared_classes.utilities.utility_functions import get_joint_names_for_inverse_kinematics
-from march_shared_classes.utilities.utility_functions import get_lengths_robot_for_inverse_kinematics, weighted_average
+from march_shared_classes.utilities.utility_functions import (
+    get_joint_names_for_inverse_kinematics,
+)
+from march_shared_classes.utilities.utility_functions import (
+    get_lengths_robot_for_inverse_kinematics,
+    weighted_average,
+)
 from march_shared_classes.utilities.vector_3d import Vector3d
 
 VELOCITY_SCALE_FACTOR = 0.001
@@ -44,7 +49,9 @@ class Foot(object):
 
         :return: A Foot object with the position of the foot 1 / VELOCITY_SCALE_FACTOR second later
         """
-        next_position = current_state.position + current_state.velocity * VELOCITY_SCALE_FACTOR
+        next_position = (
+            current_state.position + current_state.velocity * VELOCITY_SCALE_FACTOR
+        )
         return cls(current_state.foot_side, next_position)
 
     @staticmethod
@@ -56,18 +63,24 @@ class Foot(object):
 
         :return: A dictionary of setpoints, the foot location and velocity of which corresponds with the feet_state.
         """
-        joint_states = Foot.calculate_joint_angles_from_foot_position(foot_state.position, foot_state.foot_side, time)
+        joint_states = Foot.calculate_joint_angles_from_foot_position(
+            foot_state.position, foot_state.foot_side, time
+        )
 
         # find the joint angles a moment later using the foot position a moment later
         # use this together with the current joint angles to calculate the joint velocity
         next_position = Foot.calculate_next_foot_position(foot_state)
-        next_joint_positions = Foot.calculate_joint_angles_from_foot_position(next_position.position,
-                                                                              next_position.foot_side,
-                                                                              time + VELOCITY_SCALE_FACTOR)
+        next_joint_positions = Foot.calculate_joint_angles_from_foot_position(
+            next_position.position,
+            next_position.foot_side,
+            time + VELOCITY_SCALE_FACTOR,
+        )
 
         for joint in JOINT_NAMES_IK:
             if joint in joint_states and joint in next_joint_positions:
-                joint_states[joint].add_joint_velocity_from_next_angle(next_joint_positions[joint])
+                joint_states[joint].add_joint_velocity_from_next_angle(
+                    next_joint_positions[joint]
+                )
 
         return joint_states
 
@@ -96,7 +109,7 @@ class Foot(object):
 
         # Change y positive direction to the desired foot, change origin to pivot of haa joint, for ease of calculation.
         if foot_side == Side.left:
-            y_position = - (y_position + base / 2.0)
+            y_position = -(y_position + base / 2.0)
         elif foot_side == Side.right:
             y_position = y_position - base / 2.0
         else:
@@ -108,18 +121,27 @@ class Foot(object):
         # once the haa angle is known, transform the desired x and z position to arrive at an easier system to calculate
         # the hfe and kfe angles
         transformed_x = round(x_position - hl, MID_CALCULATION_PRECISION_DIGITS)
-        transformed_z = round(sqrt(- ph * ph + y_position * y_position + z_position * z_position),
-                              MID_CALCULATION_PRECISION_DIGITS)
+        transformed_z = round(
+            sqrt(-ph * ph + y_position * y_position + z_position * z_position),
+            MID_CALCULATION_PRECISION_DIGITS,
+        )
 
-        if transformed_x * transformed_x + transformed_z * transformed_z > (ll + ul) * (ll + ul):
-            raise SubgaitInterpolationError('The desired {foot} foot position, ({x}, {y}, {z}), is out of reach'.
-                                            format(foot=foot_side, x=x_position, y=y_position, z=z_position))
+        if transformed_x * transformed_x + transformed_z * transformed_z > (ll + ul) * (
+            ll + ul
+        ):
+            raise SubgaitInterpolationError(
+                "The desired {foot} foot position, ({x}, {y}, {z}), is out of reach".format(
+                    foot=foot_side, x=x_position, y=y_position, z=z_position
+                )
+            )
 
         hfe, kfe = Foot.calculate_hfe_kfe_angles(transformed_x, transformed_z, ul, ll)
 
-        angle_positions = {foot_side.value + '_hip_aa': Setpoint(time, haa),
-                           foot_side.value + '_hip_fe': Setpoint(time, hfe),
-                           foot_side.value + '_knee': Setpoint(time, kfe)}
+        angle_positions = {
+            foot_side.value + "_hip_aa": Setpoint(time, haa),
+            foot_side.value + "_hip_fe": Setpoint(time, hfe),
+            foot_side.value + "_knee": Setpoint(time, kfe),
+        }
 
         return angle_positions
 
@@ -138,22 +160,39 @@ class Foot(object):
         """
         if z_position <= 0:
             raise SubgaitInterpolationError(
-                'desired z position of the foot is not positive, '
-                'current haa calculation is not capable to deal with this')
+                "desired z position of the foot is not positive, "
+                "current haa calculation is not capable to deal with this"
+            )
 
         if y_position != 0:
             slope_foot_to_origin = z_position / y_position
             angle_foot_to_origin = atan(slope_foot_to_origin)
             if y_position > 0:
-                haa = acos(pelvis_hip_length / sqrt(z_position * z_position + y_position * y_position)) \
+                haa = (
+                    acos(
+                        pelvis_hip_length
+                        / sqrt(z_position * z_position + y_position * y_position)
+                    )
                     - angle_foot_to_origin
+                )
             else:
-                haa = acos(pelvis_hip_length / sqrt(z_position * z_position + y_position * y_position)) \
-                    - pi - angle_foot_to_origin
+                haa = (
+                    acos(
+                        pelvis_hip_length
+                        / sqrt(z_position * z_position + y_position * y_position)
+                    )
+                    - pi
+                    - angle_foot_to_origin
+                )
         else:
             angle_foot_to_origin = pi / 2
-            haa = acos(pelvis_hip_length / sqrt(z_position * z_position + y_position * y_position)) \
+            haa = (
+                acos(
+                    pelvis_hip_length
+                    / sqrt(z_position * z_position + y_position * y_position)
+                )
                 - angle_foot_to_origin
+            )
 
         return haa
 
@@ -171,14 +210,26 @@ class Foot(object):
 
         :return: The hip_fe and knee angle needed to reach the desired x and z position
         """
-        foot_line_to_leg = acos((upper_leg * upper_leg + transformed_x * transformed_x + transformed_z * transformed_z
-                                 - lower_leg * lower_leg)
-                                / (2 * upper_leg * sqrt(transformed_x * transformed_x + transformed_z * transformed_z)))
+        foot_line_to_leg = acos(
+            (
+                upper_leg * upper_leg
+                + transformed_x * transformed_x
+                + transformed_z * transformed_z
+                - lower_leg * lower_leg
+            )
+            / (
+                2
+                * upper_leg
+                * sqrt(transformed_x * transformed_x + transformed_z * transformed_z)
+            )
+        )
         normal_to_foot_line = atan(transformed_x / transformed_z)
         hfe = foot_line_to_leg + normal_to_foot_line
 
-        sin_normal_lower_leg_angle = round((transformed_x - upper_leg * sin(hfe)) / lower_leg,
-                                           MID_CALCULATION_PRECISION_DIGITS)
+        sin_normal_lower_leg_angle = round(
+            (transformed_x - upper_leg * sin(hfe)) / lower_leg,
+            MID_CALCULATION_PRECISION_DIGITS,
+        )
         kfe = hfe - asin(sin_normal_lower_leg_angle)
 
         return hfe, kfe
@@ -199,11 +250,11 @@ class Foot(object):
         # https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
         ul, ll, hl, ph, base = get_lengths_robot_for_inverse_kinematics(side)
         haa_to_foot_length = ul * cos(hfe) + ll * cos(hfe - kfe)
-        z_position = - sin(haa) * ph + cos(haa) * haa_to_foot_length
+        z_position = -sin(haa) * ph + cos(haa) * haa_to_foot_length
         x_position = hl + sin(hfe) * ul + sin(hfe - kfe) * ll
 
         if side == side.left:
-            y_position = - cos(haa) * ph - sin(haa) * haa_to_foot_length - base / 2.0
+            y_position = -cos(haa) * ph - sin(haa) * haa_to_foot_length - base / 2.0
         elif side == side.right:
             y_position = cos(haa) * ph + sin(haa) * haa_to_foot_length + base / 2.0
         else:
@@ -215,14 +266,22 @@ class Foot(object):
     def weighted_average_foot(base_foot, other_foot, parameter):
         """Computes the weighted average of two Foot objects, result has a velocity of None if it cannot be computed."""
         if base_foot.foot_side != other_foot.foot_side:
-            raise SideSpecificationError('expected sides of both base and other foot to be equal but were {base} and '
-                                         '{other}.'.format(base=base_foot.foot_side, other=other_foot.foot_side))
-        resulting_position = weighted_average(base_foot.position, other_foot.position, parameter)
+            raise SideSpecificationError(
+                "expected sides of both base and other foot to be equal but were {base} and "
+                "{other}.".format(base=base_foot.foot_side, other=other_foot.foot_side)
+            )
+        resulting_position = weighted_average(
+            base_foot.position, other_foot.position, parameter
+        )
         if base_foot.velocity is not None and other_foot.velocity is not None:
-            resulting_velocity = weighted_average(base_foot.velocity, other_foot.velocity, parameter)
+            resulting_velocity = weighted_average(
+                base_foot.velocity, other_foot.velocity, parameter
+            )
         else:
-            rospy.logwarn('one or both of the provided feet does not have a velocity specified, '
-                          'setting the resulting velocity to None')
+            rospy.logwarn(
+                "one or both of the provided feet does not have a velocity specified, "
+                "setting the resulting velocity to None"
+            )
             resulting_velocity = None
 
         return Foot(base_foot.foot_side, resulting_position, resulting_velocity)

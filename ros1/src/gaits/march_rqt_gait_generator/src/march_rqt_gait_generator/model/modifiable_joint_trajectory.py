@@ -12,7 +12,9 @@ class ModifiableJointTrajectory(JointTrajectory):
     setpoint_class = ModifiableSetpoint
 
     def __init__(self, name, limits, setpoints, duration, gait_generator=None):
-        super(ModifiableJointTrajectory, self).__init__(name, limits, setpoints, duration)
+        super(ModifiableJointTrajectory, self).__init__(
+            name, limits, setpoints, duration
+        )
 
         self.setpoints_history = RingBuffer(capacity=100, dtype=list)
         self.setpoints_redo_list = RingBuffer(capacity=100, dtype=list)
@@ -22,11 +24,15 @@ class ModifiableJointTrajectory(JointTrajectory):
         self._end_point = None
 
         if self.setpoints[0].time != 0:
-            rospy.logwarn('First setpoint of {0} has been set '
-                          'from {1} to 0'.format(name, self.setpoints[0].time))
+            rospy.logwarn(
+                "First setpoint of {0} has been set "
+                "from {1} to 0".format(name, self.setpoints[0].time)
+            )
         if self.setpoints[-1].time != duration:
-            rospy.logwarn('Last setpoint of {0} has been set '
-                          'from {1} to {2}'.format(name, self.setpoints[0].time, duration))
+            rospy.logwarn(
+                "Last setpoint of {0} has been set "
+                "from {1} to {2}".format(name, self.setpoints[0].time, duration)
+            )
 
     def set_setpoints(self, setpoints):
         self.setpoints = setpoints
@@ -53,12 +59,12 @@ class ModifiableJointTrajectory(JointTrajectory):
         self.setpoints[-1].time = self.duration
 
         for setpoint in self.setpoints:
-            setpoint.position = min(max(setpoint.position,
-                                        self.limits.lower),
-                                    self.limits.upper)
-            setpoint.velocity = min(max(setpoint.velocity,
-                                        -self.limits.velocity),
-                                    self.limits.velocity)
+            setpoint.position = min(
+                max(setpoint.position, self.limits.lower), self.limits.upper
+            )
+            setpoint.velocity = min(
+                max(setpoint.velocity, -self.limits.velocity), self.limits.velocity
+            )
 
     def add_interpolated_setpoint(self, time):
         self.add_setpoint(self.get_interpolated_setpoint(time))
@@ -83,10 +89,15 @@ class ModifiableJointTrajectory(JointTrajectory):
         self.interpolate_setpoints()
 
     def save_setpoints(self, single_joint_change=True):
-        self.setpoints_history.append({'setpoints': copy.deepcopy(self.setpoints), 'start_point': self.start_point,
-                                       'end_point': self.end_point})
+        self.setpoints_history.append(
+            {
+                "setpoints": copy.deepcopy(self.setpoints),
+                "start_point": self.start_point,
+                "end_point": self.end_point,
+            }
+        )
         if single_joint_change:
-            self.gait_generator.save_changed_settings({'joints': [self]})
+            self.gait_generator.save_changed_settings({"joints": [self]})
 
     def invert(self):
         self.save_setpoints(single_joint_change=False)
@@ -99,12 +110,17 @@ class ModifiableJointTrajectory(JointTrajectory):
         if not self.setpoints_history:
             return
 
-        self.setpoints_redo_list.append({'setpoints': copy.deepcopy(self.setpoints), 'start_point': self.start_point,
-                                         'end_point': self.end_point})
+        self.setpoints_redo_list.append(
+            {
+                "setpoints": copy.deepcopy(self.setpoints),
+                "start_point": self.start_point,
+                "end_point": self.end_point,
+            }
+        )
         setpoints = self.setpoints_history.pop()
-        self._setpoints = setpoints['setpoints']
-        self._start_point = setpoints['start_point']
-        self._end_point = setpoints['end_point']
+        self._setpoints = setpoints["setpoints"]
+        self._start_point = setpoints["start_point"]
+        self._end_point = setpoints["end_point"]
         self._duration = self.setpoints[-1].time
         self.enforce_limits()
         self.interpolate_setpoints()
@@ -113,12 +129,17 @@ class ModifiableJointTrajectory(JointTrajectory):
         if not self.setpoints_redo_list:
             return
 
-        self.setpoints_history.append({'setpoints': copy.deepcopy(self.setpoints), 'start_point': self.start_point,
-                                       'end_point': self.end_point})
+        self.setpoints_history.append(
+            {
+                "setpoints": copy.deepcopy(self.setpoints),
+                "start_point": self.start_point,
+                "end_point": self.end_point,
+            }
+        )
         setpoints = self.setpoints_redo_list.pop()
-        self._setpoints = setpoints['setpoints']
-        self._start_point = setpoints['start_point']
-        self._end_point = setpoints['end_point']
+        self._setpoints = setpoints["setpoints"]
+        self._start_point = setpoints["start_point"]
+        self._end_point = setpoints["end_point"]
         self._duration = self.setpoints[-1].time
         self.enforce_limits()
         self.interpolate_setpoints()

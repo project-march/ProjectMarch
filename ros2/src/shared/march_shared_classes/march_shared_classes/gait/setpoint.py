@@ -33,13 +33,19 @@ class Setpoint(object):
         self._velocity = round(velocity, self.digits)
 
     def __repr__(self):
-        return 'Time: %s, Position: %s, Velocity: %s' % (self.time, self.position, self.velocity)
+        return "Time: %s, Position: %s, Velocity: %s" % (
+            self.time,
+            self.position,
+            self.velocity,
+        )
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return (self.time == other.time
-                    and self.position == other.position
-                    and self.velocity == other.velocity)
+            return (
+                self.time == other.time
+                and self.position == other.position
+                and self.velocity == other.velocity
+            )
         else:
             return False
 
@@ -60,6 +66,12 @@ class Setpoint(object):
             The interpolated setpoint
         """
         time = parameter * base_setpoint.time + (1 - parameter) * other_setpoint.time
-        position = parameter * base_setpoint.position + (1 - parameter) * other_setpoint.position
-        velocity = parameter * base_setpoint.velocity + (1 - parameter) * other_setpoint.velocity
+        position = (
+            parameter * base_setpoint.position
+            + (1 - parameter) * other_setpoint.position
+        )
+        velocity = (
+            parameter * base_setpoint.velocity
+            + (1 - parameter) * other_setpoint.velocity
+        )
         return Setpoint(time, position, velocity)

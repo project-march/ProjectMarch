@@ -32,7 +32,7 @@ def main(args=None):
     rclpy.init(args=args)
 
     try:
-        plugin = 'march_rqt_note_taker'
+        plugin = "march_rqt_note_taker"
         main_plugin = Main(filename=plugin)
         sys.exit(main_plugin.main(standalone=plugin))
 
@@ -43,14 +43,13 @@ def main(args=None):
 
 
 class NotesPlugin(Plugin):
-
     def __init__(self, context):
         """Initialize the NotesPLugin."""
         super(NotesPlugin, self).__init__(context)
 
         ui_file = os.path.join(
-            get_package_share_directory('march_rqt_note_taker'),
-            'note_taker.ui')
+            get_package_share_directory("march_rqt_note_taker"), "note_taker.ui"
+        )
 
         self._node: Node = context.node
 
@@ -65,20 +64,25 @@ class NotesPlugin(Plugin):
         self._filter_map = FilterMap()
         self._filter_map.add_filter_on_minimal_level(Log.ERROR)
         self._filter_map.add_filter_on_level(
-            level=Log.INFO,
-            msg_filter=lambda l: l.msg == 'March is fully operational')
+            level=Log.INFO, msg_filter=lambda l: l.msg == "March is fully operational"
+        )
 
         self._node.create_subscription(
-            Log, '/rosout_agg', self._rosout_cb, qos_profile=10)
-        self._node.create_subscription(CurrentState,
-                                       '/march/gait_selection/current_state',
-                                       self._current_state_cb, qos_profile=10)
+            Log, "/rosout_agg", self._rosout_cb, qos_profile=10
+        )
+        self._node.create_subscription(
+            CurrentState,
+            "/march/gait_selection/current_state",
+            self._current_state_cb,
+            qos_profile=10,
+        )
 
         self._get_gait_version_map_client = self._node.create_client(
-            Trigger, '/march/gait_selection/get_version_map')
+            Trigger, "/march/gait_selection/get_version_map"
+        )
 
     def _should_use_current_time(self) -> bool:
-        """ Determine whether the rqt_note_taker should use the current time
+        """Determine whether the rqt_note_taker should use the current time
         when creating a new entry or the timestamp of the log msg.
 
         This is determined based on whether the use_sim_time parameter is True.
@@ -94,17 +98,20 @@ class NotesPlugin(Plugin):
         :return Returns a boolean, indicating whether the current time should
         be used when creating a new entry.
         """
-        client = self._node.create_client(GetParameters,
-                                          '/march_monitor/get_parameters')
+        client = self._node.create_client(
+            GetParameters, "/march_monitor/get_parameters"
+        )
         if client.service_is_ready():
-            future = client.call_async(GetParameters.Request(
-                names=['use_sim_time']))
+            future = client.call_async(GetParameters.Request(names=["use_sim_time"]))
             rclpy.spin_until_future_complete(self._node, future)
             client.destroy()
             return future.result().values[0].bool_value
         else:
-            return self._node.get_parameter('use_sim_time').\
-                get_parameter_value().bool_value
+            return (
+                self._node.get_parameter("use_sim_time")
+                .get_parameter_value()
+                .bool_value
+            )
 
     def shutdown_plugin(self):
         """Close the plugin.
@@ -137,19 +144,21 @@ class NotesPlugin(Plugin):
         :param current_state: Current state being executed
         """
         if current_state.state_type == CurrentState.IDLE:
-            message = f'March is idle in {current_state.state}'
+            message = f"March is idle in {current_state.state}"
             self._model.insert_row(Entry(message))
         elif current_state.state_type == CurrentState.GAIT:
             try:
-                future = self._get_gait_version_map_client.call_async(
-                    Trigger.Request())
+                future = self._get_gait_version_map_client.call_async(Trigger.Request())
                 future.add_done_callback(
                     lambda future_done: self._get_version_map_callback(
-                        future_done, current_state))
+                        future_done, current_state
+                    )
+                )
             except InvalidServiceNameException as error:
                 self._node.get_logger().warn(
-                    f'Failed to contact gait selection node '
-                    f'for gait versions: {error}')
+                    f"Failed to contact gait selection node "
+                    f"for gait versions: {error}"
+                )
 
     def _get_version_map_callback(self, future_done: Future, current_state):
         """Callback for when the version map is retrieved.
@@ -163,11 +172,14 @@ class NotesPlugin(Plugin):
         if result.success:
             try:
                 gait_version_map = ast.literal_eval(result.message)
-                message = f'Starting gait {current_state.state}: ' \
-                          f'{gait_version_map[current_state.state]}'
+                message = (
+                    f"Starting gait {current_state.state}: "
+                    f"{gait_version_map[current_state.state]}"
+                )
                 self._model.insert_row(Entry(message))
             except KeyError:
                 pass
             except ValueError as error:
                 self._node.get_logger().error(
-                    f'Failed to parse gait version map: {error}')
+                    f"Failed to parse gait version map: {error}"
+                )
