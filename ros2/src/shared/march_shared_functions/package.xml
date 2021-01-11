@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>march_shared_functions</name>
+  <version>0.0.0</version>
+  <description>Additional utility functions for the march packages.</description>
+  <maintainer email="software@projectmarch.nl">Project March</maintainer>
+  <license>TODO: License declaration</license>
+
+  <depend>march_shared_msgs</depend>
+  <depend>rclcpp</depend>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

@@ -13,6 +13,8 @@
 #include "march_shared_msgs/msg/error.hpp"
 #include "march_shared_msgs/msg/gait_instruction.hpp"
 
+#include "march_shared_functions/march_util.hpp"
+
 #include <chrono>
 
 const double UPDATE_RATE {20.0};
@@ -37,7 +39,7 @@ int main(int argc, char** argv)
 SafetyNode::SafetyNode(const std::string& node_name, const rclcpp::NodeOptions& options):
   Node(node_name, options)
 {
-  std::vector<std::string> joint_names = get_joint_names();
+  std::vector<std::string> joint_names = march_util::get_joint_names(*this);
 
   RCLCPP_DEBUG(this->get_logger(), "Got joint names.");
 
@@ -65,38 +67,4 @@ void SafetyNode::start(const double update_rate)
       i->update();
     }
   }
-}
-
-std::vector<std::string> SafetyNode::get_joint_names()
-{
-  std::vector<std::string> names;
-
-  // This is a temporary solution until a joint names service is
-  // available in ROS 2.
-  // TODO: rewrite this function to use a ROS 2 service for the joint names
-  auto client = this->create_client<march_shared_msgs::srv::GetParamStringList>("/march/parameter_server/get_param_string_list");
-  auto request = std::make_shared<march_shared_msgs::srv::GetParamStringList::Request>();
-  request->name = std::string("joint_names");
-
-  // Wait until the service is available. Sending a request to an unavailable service
-  // will always fail.
-  while (!client->wait_for_service(5s)) {
-    if (!rclcpp::ok()) {
-      RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for parameter_server service. Exiting.");
-      return names;
-    }
-    RCLCPP_INFO(this->get_logger(), "The ROS 1 to ROS 2 parameter_server service is not available, waiting again...");
-  }
-
-  // Send the request and push the received names to the names vector.
-  auto result = client->async_send_request(request);
-  if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), result) == rclcpp::FutureReturnCode::SUCCESS) {
-    for (auto joint_name : result.get()->value) {
-      names.push_back(joint_name);
-    }
-  } else {
-    RCLCPP_ERROR(this->get_logger(), "Failed to call ROS 1 to ROS 2 parameter_server get joint names service");
-  }
-
-  return names;
 }

@@ -23,9 +23,6 @@ class SafetyNode : public rclcpp::Node {
     void start(const double update_rate);
 
   private:
-    // Retrieve the joint names from the published robot description.
-    JointNames get_joint_names();
-
     std::vector<std::unique_ptr<SafetyType>> safety_list;
 };
 
