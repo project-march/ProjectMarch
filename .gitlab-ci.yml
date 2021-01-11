@@ -60,7 +60,6 @@ container:build:
 flake8:
   stage: Lint code
   image: registry.gitlab.com/project-march/march:$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-  needs: ["container:tag"]
   script:
     - echo "Target SHA is $CI_MERGE_REQUEST_TARGET_BRANCH_SHA"
     - git diff $CI_MERGE_REQUEST_TARGET_BRANCH_SHA
@@ -70,6 +69,9 @@ flake8:
   artifacts:
     reports:
       codequality: flakehell.json
+  retry:
+    max: 3
+    when: runner_system_failure
 
 noetic:build:
   stage: Build code
