@@ -8,11 +8,13 @@ class FilterMap:
     """Filter class that can add filters and mappings for accepting logs"""
 
     def __init__(self):
-        self._filter_maps: List[Tuple[Callable[[
-            Log], bool], Callable[[str], Any]]] = []
+        self._filter_maps: List[Tuple[Callable[[Log], bool], Callable[[str], Any]]] = []
 
-    def add_filter(self, msg_filter: Callable[[Log], bool],
-                   msg_map: Optional[Callable[[str], Any]] = lambda msg: msg):
+    def add_filter(
+        self,
+        msg_filter: Callable[[Log], bool],
+        msg_map: Optional[Callable[[str], Any]] = lambda msg: msg,
+    ):
         """Adds a filter to accept messages by and map to transform them.
 
         :param msg_filter: Filter method that accepts a
@@ -23,11 +25,12 @@ class FilterMap:
         """
         self._filter_maps.append((msg_filter, msg_map))
 
-    def add_filter_on_level(self, level: bytes,
-                            msg_filter: Optional[Callable[[Log], bool]] =
-                            lambda msg: True,
-                            msg_map: Optional[Callable[[str], Any]] =
-                            lambda msg: msg):
+    def add_filter_on_level(
+        self,
+        level: bytes,
+        msg_filter: Optional[Callable[[Log], bool]] = lambda msg: True,
+        msg_map: Optional[Callable[[str], Any]] = lambda msg: msg,
+    ):
         """Add a filter on a specific level.
 
         All messages with log.level == level get accepted.
@@ -39,14 +42,19 @@ class FilterMap:
                            and returns False otherwise.
         :param msg_map: Optional map method that accepts a string
         """
-        self.add_filter(lambda l: msg_filter(l) if l.level ==
-                        self.log_level_to_int(level) else False, msg_map)
+        self.add_filter(
+            lambda l: msg_filter(l)
+            if l.level == self.log_level_to_int(level)
+            else False,
+            msg_map,
+        )
 
-    def add_filter_on_minimal_level(self, level: bytes,
-                                    msg_filter: Optional[Callable[[Log], bool]]
-                                    = lambda msg: True,
-                                    msg_map: Optional[Callable[[str], Any]]
-                                    = lambda msg: msg):
+    def add_filter_on_minimal_level(
+        self,
+        level: bytes,
+        msg_filter: Optional[Callable[[Log], bool]] = lambda msg: True,
+        msg_map: Optional[Callable[[str], Any]] = lambda msg: msg,
+    ):
         """Add a filter on a minimal level.
 
         All messages with log.level >= level get accepted.
@@ -60,8 +68,12 @@ class FilterMap:
                            and returns False otherwise.
         :param msg_map: Optional map method that accepts a string
         """
-        self.add_filter(lambda l: msg_filter(l) if l.level >=
-                        self.log_level_to_int(level) else False, msg_map)
+        self.add_filter(
+            lambda l: msg_filter(l)
+            if l.level >= self.log_level_to_int(level)
+            else False,
+            msg_map,
+        )
 
     def __call__(self, log_msg: Log):
         """Filters a ROS log msg based on the given filters.

@@ -33,8 +33,15 @@ class JointTrajectory(object):
         """
         setpoints = [
             cls.setpoint_class(
-                rospy.Duration(setpoint['time_from_start']['secs'], setpoint['time_from_start']['nsecs']).to_sec(),
-                setpoint['position'], setpoint['velocity']) for setpoint in setpoints]
+                rospy.Duration(
+                    setpoint["time_from_start"]["secs"],
+                    setpoint["time_from_start"]["nsecs"],
+                ).to_sec(),
+                setpoint["position"],
+                setpoint["velocity"],
+            )
+            for setpoint in setpoints
+        ]
         return cls(name, limits, setpoints, duration, *args)
 
     @staticmethod
@@ -98,8 +105,10 @@ class JointTrajectory(object):
         from_setpoint = self.setpoints[-1]
         to_setpoint = joint.setpoints[0]
 
-        if abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR \
-                and abs(from_setpoint.position - to_setpoint.position) <= ALLOWED_ERROR:
+        if (
+            abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR
+            and abs(from_setpoint.position - to_setpoint.position) <= ALLOWED_ERROR
+        ):
             return True
 
         return False
@@ -110,8 +119,10 @@ class JointTrajectory(object):
         :returns:
             False if the starting/ending point is (not at 0/duration) and (has nonzero speed), True otherwise
         """
-        return (self.setpoints[0].time == 0 or self.setpoints[0].velocity == 0) and \
-               (self.setpoints[-1].time == round(self.duration, Setpoint.digits) or self.setpoints[-1].velocity == 0)
+        return (self.setpoints[0].time == 0 or self.setpoints[0].velocity == 0) and (
+            self.setpoints[-1].time == round(self.duration, Setpoint.digits)
+            or self.setpoints[-1].velocity == 0
+        )
 
     def interpolate_setpoints(self):
         if len(self.setpoints) == 1:
@@ -131,15 +142,17 @@ class JointTrajectory(object):
 
     def get_interpolated_setpoint(self, time):
         if time < 0:
-            rospy.logerr('Could not interpolate setpoint at time {0}'.format(time))
+            rospy.logerr("Could not interpolate setpoint at time {0}".format(time))
             return self.setpoint_class(time, self.setpoints[0].position, 0)
         if time > self.duration:
-            rospy.logerr('Could not interpolate setpoint at time {0}'.format(time))
+            rospy.logerr("Could not interpolate setpoint at time {0}".format(time))
             return self.setpoint_class(time, self.setpoints[-1].position, 0)
 
         return self.setpoint_class(
-            time, float(self.interpolated_position(time)),
-            float(self.interpolated_velocity(time)))
+            time,
+            float(self.interpolated_position(time)),
+            float(self.interpolated_velocity(time)),
+        )
 
     def __getitem__(self, index):
         return self.setpoints[index]
@@ -162,19 +175,34 @@ class JointTrajectory(object):
             The interpolated trajectory
         """
         if base_trajectory.limits != other_trajectory.limits:
-            raise SubgaitInterpolationError('Not able to safely interpolate because limits are not equal for joints '
-                                            '{0} and {1}'.format(base_trajectory.name, other_trajectory.name))
+            raise SubgaitInterpolationError(
+                "Not able to safely interpolate because limits are not equal for joints "
+                "{0} and {1}".format(base_trajectory.name, other_trajectory.name)
+            )
         if len(base_trajectory.setpoints) != len(other_trajectory.setpoints):
-            raise SubgaitInterpolationError('The amount of setpoints do not match for joint {0}'.
-                                            format(base_trajectory.name))
+            raise SubgaitInterpolationError(
+                "The amount of setpoints do not match for joint {0}".format(
+                    base_trajectory.name
+                )
+            )
         setpoints = []
-        for base_setpoint, other_setpoint in zip(base_trajectory.setpoints, other_trajectory.setpoints):
-            interpolated_setpoint_to_add = \
-                JointTrajectory.setpoint_class.interpolate_setpoints(base_setpoint, other_setpoint, parameter)
+        for base_setpoint, other_setpoint in zip(
+            base_trajectory.setpoints, other_trajectory.setpoints
+        ):
+            interpolated_setpoint_to_add = (
+                JointTrajectory.setpoint_class.interpolate_setpoints(
+                    base_setpoint, other_setpoint, parameter
+                )
+            )
             setpoints.append(interpolated_setpoint_to_add)
 
-        duration = parameter * base_trajectory.duration + (1 - parameter) * other_trajectory.duration
-        return JointTrajectory(base_trajectory.name, base_trajectory.limits, setpoints, duration)
+        duration = (
+            parameter * base_trajectory.duration
+            + (1 - parameter) * other_trajectory.duration
+        )
+        return JointTrajectory(
+            base_trajectory.name, base_trajectory.limits, setpoints, duration
+        )
 
     @staticmethod
     def change_order_of_joints_and_setpoints(base_subgait, other_subgait):
@@ -192,8 +220,14 @@ class JointTrajectory(object):
         base_setpoints_to_interpolate = [{} for _ in range(number_of_setpoints)]
         other_setpoints_to_interpolate = [{} for _ in range(number_of_setpoints)]
         for setpoint_index in range(number_of_setpoints):
-            for base_joint, other_joint in zip(sorted(base_subgait.joints, key=lambda joint: joint.name),
-                                               sorted(other_subgait.joints, key=lambda joint: joint.name)):
-                base_setpoints_to_interpolate[setpoint_index][base_joint.name] = base_joint.setpoints[setpoint_index]
-                other_setpoints_to_interpolate[setpoint_index][other_joint.name] = other_joint.setpoints[setpoint_index]
+            for base_joint, other_joint in zip(
+                sorted(base_subgait.joints, key=lambda joint: joint.name),
+                sorted(other_subgait.joints, key=lambda joint: joint.name),
+            ):
+                base_setpoints_to_interpolate[setpoint_index][
+                    base_joint.name
+                ] = base_joint.setpoints[setpoint_index]
+                other_setpoints_to_interpolate[setpoint_index][
+                    other_joint.name
+                ] = other_joint.setpoints[setpoint_index]
         return base_setpoints_to_interpolate, other_setpoints_to_interpolate

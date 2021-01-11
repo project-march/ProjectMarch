@@ -1,14 +1,17 @@
-from control_msgs.msg import JointTolerance
 from std_msgs.msg import Header
-from builtin_interfaces.msg import Duration
 from actionlib_msgs.msg import GoalID
-from march_shared_msgs.msg import FollowJointTrajectoryGoal, \
-    FollowJointTrajectoryActionGoal, FollowJointTrajectoryActionResult, FollowJointTrajectoryResult
+from march_shared_msgs.msg import (
+    FollowJointTrajectoryGoal,
+    FollowJointTrajectoryActionGoal,
+    FollowJointTrajectoryActionResult,
+    FollowJointTrajectoryResult,
+)
 
 
 class TrajectoryScheduler(object):
-    """ Scheduler that sends sends the wanted trajectories to the topic listened
-    to by the exoskeleton/simulation. """
+    """Scheduler that sends sends the wanted trajectories to the topic listened
+    to by the exoskeleton/simulation."""
+
     def __init__(self, node):
         self._failed = False
         self._node = node
@@ -19,19 +22,21 @@ class TrajectoryScheduler(object):
         # migrated to ros2
         self._trajectory_goal_pub = self._node.create_publisher(
             msg_type=FollowJointTrajectoryActionGoal,
-            topic='/march/controller/trajectory/follow_joint_trajectory/goal',
-            qos_profile=5)
+            topic="/march/controller/trajectory/follow_joint_trajectory/goal",
+            qos_profile=5,
+        )
 
         self._cancel_pub = self._node.create_publisher(
             msg_type=GoalID,
-            topic='/march/controller/trajectory/follow_joint_trajectory/cancel',
-            qos_profile=5)
+            topic="/march/controller/trajectory/follow_joint_trajectory/cancel",
+            qos_profile=5,
+        )
 
         self._trajectory_goal_result_sub = self._node.create_subscription(
             msg_type=FollowJointTrajectoryActionResult,
-            topic='/march/controller/trajectory/follow_joint_trajectory/result',
+            topic="/march/controller/trajectory/follow_joint_trajectory/result",
             callback=self._done_cb,
-            qos_profile=5
+            qos_profile=5,
         )
 
     def schedule(self, trajectory):
@@ -41,9 +46,11 @@ class TrajectoryScheduler(object):
         self._failed = False
         stamp = self._node.get_clock().now().to_msg()
         goal = FollowJointTrajectoryGoal(trajectory=trajectory)
-        self._trajectory_goal_pub.publish(FollowJointTrajectoryActionGoal(
-            header=Header(stamp=stamp),
-            goal_id=GoalID(stamp=stamp), goal=goal))
+        self._trajectory_goal_pub.publish(
+            FollowJointTrajectoryActionGoal(
+                header=Header(stamp=stamp), goal_id=GoalID(stamp=stamp), goal=goal
+            )
+        )
 
     def failed(self):
         return self._failed
@@ -54,5 +61,6 @@ class TrajectoryScheduler(object):
     def _done_cb(self, result):
         if result.result.error_code != FollowJointTrajectoryResult.SUCCESSFUL:
             self._node.get_logger().error(
-                f'Failed to execute trajectory. {result.result.error_string} ({result.result.error_code})')
+                f"Failed to execute trajectory. {result.result.error_string} ({result.result.error_code})"
+            )
             self._failed = True

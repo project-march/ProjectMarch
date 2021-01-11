@@ -6,7 +6,7 @@ class CheckInputDevice(object):
     """Base class to diagnose whether the input devices are connected properly."""
 
     def __init__(self, topic, message_type, updater, frequency):
-        self._frequency_params = FrequencyStatusParam({'min': frequency}, 0.1)
+        self._frequency_params = FrequencyStatusParam({"min": frequency}, 0.1)
         self._updater = updater
         self._diagnostics = {}
 
@@ -22,5 +22,6 @@ class CheckInputDevice(object):
         if msg.id in self._diagnostics:
             self._diagnostics[msg.id].tick()
         else:
-            self._diagnostics[msg.id] = HeaderlessTopicDiagnostic('input_device {0}'.format(msg.id),
-                                                                  self._updater, self._frequency_params)
+            self._diagnostics[msg.id] = HeaderlessTopicDiagnostic(
+                "input_device {0}".format(msg.id), self._updater, self._frequency_params
+            )

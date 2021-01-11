@@ -55,28 +55,23 @@ container:build:
         - Dockerfile
         - "**/package.xml"
 
-# Runs a linter on the code to see if the code style is consistent
-noetic:pep8:
+# Runs a linter on the code to see if the code style is consistent and to avoid common
+# mistakes
+noetic:flake8:
   stage: Lint code
   script:
-    - cd ros1/
-    - python3 -m autopep8 --diff -r --aggressive --aggressive --exit-code src
-    - python3 -m flake8
+    - python3 -m flake8 ros1
   only:
     changes:
       - "ros1/**/*.py"
-  allow_failure: true
 
-foxy:pep8:
+foxy:flake8:
   stage: Lint code
   script:
-    - cd ros2/
-    - python3 -m autopep8 --diff -r --aggressive --aggressive --exit-code src
-    - python3 -m flake8
+    - python3 -m flake8 ros2
   only:
     changes:
       - "ros2/**/*.py"
-  allow_failure: true
 
 noetic:build:
   stage: Build code
