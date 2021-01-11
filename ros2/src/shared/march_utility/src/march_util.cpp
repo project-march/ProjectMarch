@@ -4,7 +4,7 @@
 #include <chrono>
 #include "rclcpp/rclcpp.hpp"
 #include "march_shared_msgs/srv/get_joint_names.hpp"
-#include "march_shared_functions/march_util.hpp"
+#include "march_utility/march_util.hpp"
 
 using namespace std::chrono_literals;
 
