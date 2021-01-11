@@ -60,14 +60,14 @@ container:build:
 flake8:
   stage: Lint code
   script:
-    - python3 -m flakehell lint --format=gitlab --output-file flakehell.json --baseline .flake-baseline
-  only:
-    changes:
-      - "ros1/src/**/*.py"
-      - "ros2/src/**/*.py"
-  artifacts:
-    reports:
-      codequality: flakehell.json
+    - python3 -m flakehell lint --format=stat --baseline .flake-baseline
+      #  only:
+      #    changes:
+      #      - "ros1/src/**/*.py"
+      #      - "ros2/src/**/*.py"
+        #artifacts:
+        #  reports:
+        #    codequality: flakehell.json
 
 noetic:build:
   stage: Build code
