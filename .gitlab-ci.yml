@@ -63,11 +63,7 @@ flake8:
     - python3 -m flakehell plugins
     - git diff $CI_MERGE_REQUEST_TARGET_BRANCH_SHA | python3 -m flakehell lint --diff --format=gitlab --output-file flakehell.json
   rules:
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_SHA
-      #only:
-      #  changes:
-      #    - "ros1/src/**/*.py"
-      #    - "ros2/src/**/*.py"
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_SHA != ""'
   artifacts:
     reports:
       codequality: flakehell.json
