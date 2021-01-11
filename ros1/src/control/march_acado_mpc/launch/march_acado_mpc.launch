@@ -1,3 +1,0 @@
-<launch>
-	<node name="joint_trajectory_mpc" pkg="march_acado_mpc" type="joint_trajectory_mpc" output="screen"></node>
-</launch>
