@@ -28,9 +28,12 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
 
+ament_export_targets(${PROJECT_NAME} HAS_LIBRARY_TARGET)
+
 install(DIRECTORY include/${PROJECT_NAME}
-        DESTINATION include/)
+        DESTINATION include)
 install(TARGETS ${PROJECT_NAME}
+        EXPORT ${PROJECT_NAME}
         LIBRARY DESTINATION lib/${PROJECT_NAME})
 
 
