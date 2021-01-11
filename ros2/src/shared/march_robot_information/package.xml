@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>march_robot_information</name>
+  <version>0.0.0</version>
+  <description>
+    This node contains information about the march robot such as the joint names in its node parameters and makes
+    this information public to other nodes.
+  </description>
+  <maintainer email="software@projectmarch.nl">Project March</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>python3-setuptools</buildtool_depend>
+
+  <depend>march_shared_msgs</depend>
+
+  <test_depend>ros2test</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

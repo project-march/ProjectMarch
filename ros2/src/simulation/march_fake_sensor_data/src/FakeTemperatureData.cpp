@@ -7,7 +7,7 @@
 #include "rclcpp/timer.hpp"
 #include "march_fake_sensor_data/FakeTemperatureData.hpp"
 #include "march_fake_sensor_data/UniformDistribution.hpp"
-#include "march_shared_msgs/srv/get_param_string_list.hpp"
+#include "march_shared_msgs/srv/get_joint_names.hpp"
 #include <chrono>
 #include <deque>
 #include <vector>
@@ -70,12 +70,8 @@ std::vector<std::string> FakeTemperatureDataNode::get_joint_names()
 {
     std::vector<std::string> names;
 
-    // This is a temporary solution until a joint names service is
-    // available in ROS 2.
-    // TODO: rewrite this function to use a ROS 2 service for the joint names
-    auto client = this->create_client<march_shared_msgs::srv::GetParamStringList>("/march/parameter_server/get_param_string_list");
-    auto request = std::make_shared<march_shared_msgs::srv::GetParamStringList::Request>();
-    request->name = std::string("joint_names");
+    auto client = this->create_client<march_shared_msgs::srv::GetJointNames>("/march/robot_information/get_joint_names");
+    auto request = std::make_shared<march_shared_msgs::srv::GetJointNames::Request>();
 
     // Wait until the service is available. Sending a request to an unavailable service
     // will always fail.
@@ -84,13 +80,13 @@ std::vector<std::string> FakeTemperatureDataNode::get_joint_names()
             RCLCPP_ERROR(rclcpp::get_logger(LOGGER_NAME), "Interrupted while waiting for parameter_server service. Exiting.");
             return names;
         }
-        RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "The ROS 1 to ROS 2 parameter_server service is not available, waiting again...");
+        RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "The get_joint_names service was unavailable, waiting again...");
     }
 
     // Send the request and push the received names to the names vector.
     auto result = client->async_send_request(request);
     if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), result) == rclcpp::FutureReturnCode::SUCCESS) {
-        for (auto joint_name : result.get()->value) {
+        for (auto joint_name : result.get()->joint_names) {
             names.push_back(joint_name);
         }
     } else {
