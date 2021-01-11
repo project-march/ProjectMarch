@@ -5,6 +5,7 @@ exclude = [".git", "__init__.py", "build", "install", "log", "venv"]
 # make output nice
 format = "grouped"
 max_line_length = 80
+baseline = ".flake-baseline"
 # show line of source code in output
 show_source = true
 
