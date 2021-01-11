@@ -8,7 +8,7 @@ using namespace std;
 class ModelPredictiveController {
 public:
     // Public variables
-    vector<double> x0;  // Current state
+    vector<double> x0{0,0};  // Current state
     double u;           // Calculated control input
 
     /**

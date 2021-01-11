@@ -50,9 +50,17 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
   {
     // Set current joint state
     state = {(*joint_handles_ptr_)[i].getPosition(), (*joint_handles_ptr_)[i].getVelocity()};
-    std::cout << state[0] << ", " << state[1] << std::endl;
-    // simple P controller to test setCommand() and the trajectory controller
-    const double command = state_error.position[i]*1000;
+    model_predictive_controllers_[i].x0 = state;
+
+    // Calculate mpc control signal
+    model_predictive_controllers_[i].controller();
+
+    // Set command variable
+//    command = state_error.position[i]*1000;
+
+    command = model_predictive_controllers_[i].u;
+
+    // Apply command variable
     (*joint_handles_ptr_)[i].setCommand(command);
   }
 
