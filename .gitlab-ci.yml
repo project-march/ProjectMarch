@@ -59,6 +59,8 @@ container:build:
 # mistakes
 flake8:
   stage: Lint code
+  image: registry.gitlab.com/project-march/march:$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+  needs: ["container:tag"]
   script:
     - echo "Target SHA is $CI_MERGE_REQUEST_TARGET_BRANCH_SHA"
     - git diff $CI_MERGE_REQUEST_TARGET_BRANCH_SHA
