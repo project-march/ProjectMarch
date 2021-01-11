@@ -1,11 +1,16 @@
 #! /usr/bin/env python
 import rospy
 <<<<<<< HEAD
+<<<<<<< HEAD
 from march_shared_msgs.srv import SetObstacleSizeResponse, SetObstacleSize
 =======
 from march_shared_resources.srv import SetObstacleSizeRampLikeResponse, SetObstacleSizeRampLike, \
     SetObstacleSizeStairsLikeResponse, SetObstacleSizeStairsLike
 >>>>>>> Add _macro.xacro file and introduce new service
+=======
+from march_shared_resources.srv import SetObstacleSizeRampLikeResponse, SetObstacleSizeRampLike, \
+    SetObstacleSizeStairsLikeResponse, SetObstacleSizeStairsLike
+>>>>>>> 80ac29e11b917a99e4bfb67f1d6ab9ca52a99c3b
 from gazebo_msgs.srv import SpawnModelRequest, SpawnModel, DeleteModel, \
     DeleteModelRequest, GetWorldProperties, GetWorldPropertiesRequest
 import xacro
