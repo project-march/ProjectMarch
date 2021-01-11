@@ -7,8 +7,8 @@ from rclpy.exceptions import ParameterNotDeclaredException
 from rclpy.node import Node
 from ament_index_python.packages import get_package_share_directory
 import yaml
-from march_shared_classes.exceptions.gait_exceptions import GaitError, GaitNameNotFound
-from march_shared_classes.gait.subgait import Subgait
+from march_utility.exceptions.gait_exceptions import GaitError, GaitNameNotFound
+from march_utility.gait.subgait import Subgait
 from std_msgs.msg import String
 from std_srvs.srv import Trigger
 from urdf_parser_py import urdf

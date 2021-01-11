@@ -5,7 +5,7 @@ from rclpy.duration import Duration
 from trajectory_msgs import msg as trajectory_msg
 import yaml
 from urdf_parser_py import urdf
-from march_shared_classes.exceptions.gait_exceptions import NonValidGaitContent, SubgaitInterpolationError, GaitError
+from march_utility.exceptions.gait_exceptions import NonValidGaitContent, SubgaitInterpolationError, GaitError
 from .joint_trajectory import JointTrajectory
 from .limits import Limits
 from .setpoint import Setpoint

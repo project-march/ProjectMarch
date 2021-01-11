@@ -1,6 +1,6 @@
 import unittest
 
-from march_shared_classes.gait.limits import Limits
+from march_utility.gait.limits import Limits
 
 
 class LimitsTest(unittest.TestCase):

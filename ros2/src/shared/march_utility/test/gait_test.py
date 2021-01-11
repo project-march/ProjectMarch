@@ -3,16 +3,16 @@ import unittest
 from ament_index_python import get_package_share_directory
 from urdf_parser_py import urdf
 import yaml
-from march_shared_classes.exceptions.gait_exceptions import SubgaitNameNotFound, NonValidGaitContent, GaitNameNotFound
-from march_shared_classes.gait.gait import Gait
-from march_shared_classes.gait.subgait import Subgait
+from march_utility.exceptions.gait_exceptions import SubgaitNameNotFound, NonValidGaitContent, GaitNameNotFound
+from march_utility.gait.gait import Gait
+from march_utility.gait.subgait import Subgait
 
 
 class GaitTest(unittest.TestCase):
     def setUp(self):
         self.gait_name = 'walk'
         self.robot = urdf.Robot.from_xml_file(get_package_share_directory('march_description') + '/urdf/march4.urdf')
-        self.resources_folder = os.path.join(get_package_share_directory('march_shared_classes'), 'test', 'resources')
+        self.resources_folder = os.path.join(get_package_share_directory('march_utility'), 'test', 'resources')
 
         self.default_yaml = os.path.join(self.resources_folder, 'default.yaml')
         with open(self.default_yaml, 'r') as default_yaml_file:

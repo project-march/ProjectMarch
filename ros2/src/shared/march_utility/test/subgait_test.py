@@ -3,11 +3,11 @@ import unittest
 from ament_index_python import get_package_share_directory
 from urdf_parser_py import urdf
 
-from march_shared_classes.exceptions.gait_exceptions import NonValidGaitContent, SubgaitInterpolationError
-from march_shared_classes.gait.joint_trajectory import JointTrajectory
-from march_shared_classes.gait.limits import Limits
-from march_shared_classes.gait.setpoint import Setpoint
-from march_shared_classes.gait.subgait import Subgait
+from march_utility.exceptions.gait_exceptions import NonValidGaitContent, SubgaitInterpolationError
+from march_utility.gait.joint_trajectory import JointTrajectory
+from march_utility.gait.limits import Limits
+from march_utility.gait.setpoint import Setpoint
+from march_utility.gait.subgait import Subgait
 
 
 class SubgaitTest(unittest.TestCase):
@@ -15,7 +15,7 @@ class SubgaitTest(unittest.TestCase):
         self.gait_name = 'walk'
         self.subgait_name = 'left_swing'
         self.version = 'MV_walk_leftswing_v2'
-        self.resources_folder = get_package_share_directory('march_shared_classes') + '/test/resources'
+        self.resources_folder = get_package_share_directory('march_utility') + '/test/resources'
         self.robot = urdf.Robot.from_xml_file(get_package_share_directory('march_description') + '/urdf/march4.urdf')
         self.subgait_path = '{rsc}/{gait}/{subgait}/{version}.subgait'.format(rsc=self.resources_folder,
                                                                               gait=self.gait_name,

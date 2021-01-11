@@ -13,6 +13,8 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>march_shared_msgs</depend>
+  <depend>march_utility</depend>
+
   <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>
 <!--  <depend>sound_play</depend>-->

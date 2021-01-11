@@ -1,7 +1,7 @@
 from typing import Optional
 
 from march_gait_selection.state_machine.state_machine_input import TransitionRequest
-from march_shared_classes.gait.joint_trajectory import JointTrajectory
+from march_utility.gait.joint_trajectory import JointTrajectory
 
 
 class GaitInterface(object):
