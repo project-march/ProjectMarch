@@ -60,8 +60,9 @@ container:build:
 flake8:
   stage: Lint code
   script:
-    - python3 -m flakehell plugins
-    - git diff $CI_MERGE_REQUEST_TARGET_BRANCH_SHA | python3 -m flakehell lint --diff --format=gitlab --output-file flakehell.json
+    - echo "Target SHA is $CI_MERGE_REQUEST_TARGET_BRANCH_SHA"
+    - git diff $CI_MERGE_REQUEST_TARGET_BRANCH_SHA
+    - git diff $CI_MERGE_REQUEST_TARGET_BRANCH_SHA | python3 -m flakehell lint --diff --tee --format=gitlab --output-file flakehell.json
   rules:
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_SHA != ""'
   artifacts:
