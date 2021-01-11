@@ -13,7 +13,7 @@
 #include "march_shared_msgs/msg/error.hpp"
 #include "march_shared_msgs/msg/gait_instruction.hpp"
 
-#include "march_shared_functions/march_util.hpp"
+#include "march_utility/march_util.hpp"
 
 #include <chrono>
 
