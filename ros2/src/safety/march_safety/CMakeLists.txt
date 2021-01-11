@@ -51,39 +51,8 @@ install(TARGETS ${PROJECT_NAME}_node
 install(DIRECTORY launch config
         DESTINATION share/${PROJECT_NAME}/)
 
-add_ros_test(test/launch/march_safety_connection_lost.launch.py)
-# Add gtest based cpp test target and link libraries
-#if(CATKIN_ENABLE_TESTING)
-#    find_package(rostest REQUIRED)
-#
-#    add_rostest_gtest(${PROJECT_NAME}_connection_lost_test
-#        test/launch/${PROJECT_NAME}_connection_lost.test
-#        test/rostest/connection_lost_test.cpp
-#    )
-#
-#    add_rostest_gtest(${PROJECT_NAME}_connection_never_started_test
-#        test/launch/${PROJECT_NAME}_connection_never_started.test
-#        test/rostest/connection_never_started_test.cpp
-#    )
-#
-#    add_rostest_gtest(${PROJECT_NAME}_connection_not_lost_test
-#        test/launch/${PROJECT_NAME}_connection_not_lost.test
-#        test/rostest/connection_not_lost_test.cpp
-#    )
-#    target_link_libraries(${PROJECT_NAME}_connection_lost_test ${catkin_LIBRARIES})
-#    target_link_libraries(${PROJECT_NAME}_connection_never_started_test ${catkin_LIBRARIES})
-#    target_link_libraries(${PROJECT_NAME}_connection_not_lost_test ${catkin_LIBRARIES})
-#
-#    if(ENABLE_COVERAGE_TESTING)
-#        set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/test*")
-#        add_code_coverage(
-#            NAME coverage_report
-#            DEPENDENCIES
-#            ${PROJECT_NAME}_connection_lost_test
-#            ${PROJECT_NAME}_connection_never_started_test
-#            ${PROJECT_NAME}_connection_not_lost_test
-#        )
-#    endif()
-#endif()
+if(BUILD_TESTING)
+    add_ros_test(test/launch/march_safety_connection_lost.launch.py)
+endif()
 
 ament_package()
