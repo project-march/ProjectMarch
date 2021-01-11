@@ -58,6 +58,7 @@ private:
   std::vector<hardware_interface::JointHandle>* joint_handles_ptr_;
 
   unsigned int num_joints_;
+  double command;
 
   std::vector<ModelPredictiveController> model_predictive_controllers_;
   vector<double> state;

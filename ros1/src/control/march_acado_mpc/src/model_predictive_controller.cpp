@@ -54,7 +54,7 @@ void ModelPredictiveController::setInitialState(vector<double> x0) {
 void ModelPredictiveController::controller() {
 
   // Set initial speed
-  ModelPredictiveController::setInitialState(x0);
+  setInitialState(x0);
 
   // preparation step
   acado_preparationStep();
