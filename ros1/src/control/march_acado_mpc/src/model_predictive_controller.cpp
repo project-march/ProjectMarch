@@ -1,4 +1,5 @@
 #include "model_predictive_controller.hpp"
+#include "acado_common.h"
 
 #include <iostream>
 #include <vector>
@@ -45,7 +46,7 @@ void ModelPredictiveController::init() {
 }
 
 void ModelPredictiveController::setInitialState(vector<double> x0) {
-  for (int i = 0; i < NX; ++i) {
+  for (int i = 0; i < ACADO_NX; ++i) {
     acadoVariables.x0[i] = x0[i];
   }
 }

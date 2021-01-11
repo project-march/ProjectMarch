@@ -60,6 +60,7 @@ private:
   unsigned int num_joints_;
 
   std::vector<ModelPredictiveController> model_predictive_controllers_;
+  vector<double> state;
 
 };
 
