@@ -61,8 +61,10 @@ flake8:
   stage: Lint code
   script:
     - echo "Target SHA is $CI_MERGE_REQUEST_TARGET_BRANCH_SHA"
+    - echo "Target branch is $CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
     - git diff $CI_MERGE_REQUEST_TARGET_BRANCH_SHA
-    - git diff $CI_MERGE_REQUEST_TARGET_BRANCH_SHA | python3 -m flakehell lint --diff --tee --format=gitlab --output-file flakehell.json
+    - git diff $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    - git diff $CI_MERGE_REQUEST_TARGET_BRANCH_NAME | python3 -m flakehell lint --diff --tee --format=gitlab --output-file flakehell.json
   rules:
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_SHA != ""'
   artifacts:
