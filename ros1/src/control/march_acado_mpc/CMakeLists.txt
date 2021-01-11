@@ -42,7 +42,7 @@ catkin_package(
 # is downloaded in the _deps/acado-solver-src folder in the build directory.
 fetchcontent_declare(acado-solver
     GIT_REPOSITORY "https://gitlab.com/project-march/libraries/acado-solver.git"
-    GIT_TAG "4-add-a-mpc_export-test-file"
+    GIT_TAG "Gazebo-simulation-model"
     GIT_SHALLOW true
 )
 if(NOT acado-solver_POPULATED)
