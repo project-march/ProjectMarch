@@ -60,6 +60,7 @@ container:build:
 flake8:
   stage: Lint code
   script:
+    - python3 -m flakehell plugins
     - python3 -m flakehell lint --format=stat --baseline .flake-baseline
       #  only:
       #    changes:
