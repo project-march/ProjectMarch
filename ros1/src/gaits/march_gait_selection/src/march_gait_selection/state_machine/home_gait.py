@@ -13,7 +13,7 @@ class HomeGait(GaitInterface):
         :param str gait_type: Gait type to use for home gait
         :param float duration: Duration of the gait in seconds. Defaults to 3 seconds.
         """
-        self._name = 'home_{name}'.format(name=name)
+        self._name = "home_{name}".format(name=name)
         self._position = position
         self._gait_type = gait_type
         self._duration = duration
@@ -56,7 +56,7 @@ class HomeGait(GaitInterface):
 
     def _get_trajectory_msg(self):
         msg = JointTrajectory()
-        msg.joint_names = sorted(list(self._position.keys()))
+        msg.joint_names = sorted(self._position.keys())
 
         point = JointTrajectoryPoint()
         point.time_from_start = rospy.Duration.from_sec(self._duration)

@@ -63,6 +63,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/SetParamBool.srv"
   "srv/SetParamInt.srv"
   "srv/SetParamFloat.srv"
+  "srv/GetJointNames.srv"
   DEPENDENCIES std_msgs builtin_interfaces geometry_msgs rosgraph_msgs trajectory_msgs control_msgs actionlib_msgs
  )
 

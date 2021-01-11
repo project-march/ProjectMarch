@@ -52,20 +52,20 @@ class Vector3d(object):
             yield element
 
     def __eq__(self, other):
-        return (self.x == other.x and self.y == other.y and self.z == other.z)
+        return self.x == other.x and self.y == other.y and self.z == other.z
 
     def __repr__(self):
-        return 'x: {x}, y: {y}, z: {z}'.format(x=self.x, y=self.y, z=self.z)
+        return "x: {x}, y: {y}, z: {z}".format(x=self.x, y=self.y, z=self.z)
 
     @classmethod
     def from_dictionary(cls, dic):
         """Creates a Vector3d object from a dictionary with keys 'x', 'y' and 'z'."""
-        if {'x', 'y', 'z'} != set(dic.keys()):
+        if {"x", "y", "z"} != set(dic.keys()):
             raise IncorrectCoordinateError()
-        return cls(dic['x'], dic['y'], dic['z'])
+        return cls(dic["x"], dic["y"], dic["z"])
 
     def as_dictionary(self):
-        return{'x': self.x, 'y': self.y, 'z': self.z}
+        return {"x": self.x, "y": self.y, "z": self.z}
 
     def norm(self):
         return sqrt(self.x * self.x + self.y * self.y + self.z * self.z)

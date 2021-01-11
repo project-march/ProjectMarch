@@ -5,7 +5,10 @@ from scipy.interpolate import BPoly
 from urdf_parser_py import urdf
 
 from .limits import Limits
-from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError, NonValidGaitContent
+from march_shared_classes.exceptions.gait_exceptions import (
+    SubgaitInterpolationError,
+    NonValidGaitContent,
+)
 from .setpoint import Setpoint
 
 
@@ -14,7 +17,14 @@ class JointTrajectory(object):
 
     setpoint_class = Setpoint
 
-    def __init__(self, name: str, limits: Limits, setpoints: List[Setpoint], duration: float, *args):
+    def __init__(
+        self,
+        name: str,
+        limits: Limits,
+        setpoints: List[Setpoint],
+        duration: float,
+        *args,
+    ):
         self.name = name
         self.limits = limits
         self._setpoints = setpoints
@@ -24,7 +34,9 @@ class JointTrajectory(object):
         self.interpolate_setpoints()
 
     @classmethod
-    def from_setpoints(cls, name: str, limits: Limits, setpoints: List[dict], duration: float, *args):
+    def from_setpoints(
+        cls, name: str, limits: Limits, setpoints: List[dict], duration: float, *args
+    ):
         """Creates a list of joint trajectories.
 
         :param str name: Name of the joint
@@ -34,9 +46,16 @@ class JointTrajectory(object):
         """
         setpoints = [
             cls.setpoint_class(
-                time=Duration(seconds=setpoint['time_from_start']['secs'],
-                              nanoseconds=setpoint['time_from_start']['nsecs']).nanoseconds * 1e-9,
-                position=setpoint['position'], velocity=setpoint['velocity']) for setpoint in setpoints]
+                time=Duration(
+                    seconds=setpoint["time_from_start"]["secs"],
+                    nanoseconds=setpoint["time_from_start"]["nsecs"],
+                ).nanoseconds
+                * 1e-9,
+                position=setpoint["position"],
+                velocity=setpoint["velocity"],
+            )
+            for setpoint in setpoints
+        ]
         return cls(name, limits, setpoints, duration, *args)
 
     @staticmethod
@@ -78,7 +97,9 @@ class JointTrajectory(object):
                 self.setpoints.remove(setpoint)
             else:
                 setpoint.time -= begin_time
-        self.setpoints = [Setpoint(time=0, position=position, velocity=0)] + self.setpoints
+        self.setpoints = [
+            Setpoint(time=0, position=position, velocity=0)
+        ] + self.setpoints
         self._duration = self._duration - begin_time
 
     @property
@@ -113,12 +134,18 @@ class JointTrajectory(object):
             True if ending and starting point are identical else False
         """
         if not self._validate_boundary_points():
-            raise NonValidGaitContent(self.name, msg=f'Invalid boundary points for begin setpoint {self.setpoints[0]} '
-                                                     f'and end setpoint {self.setpoints[-1]}')
+            raise NonValidGaitContent(
+                self.name,
+                msg=f"Invalid boundary points for begin setpoint {self.setpoints[0]} "
+                f"and end setpoint {self.setpoints[-1]}",
+            )
 
         from_setpoint = self.setpoints[-1]
         to_setpoint = joint.setpoints[0]
-        if from_setpoint.velocity == to_setpoint.velocity and from_setpoint.position == to_setpoint.position:
+        if (
+            from_setpoint.velocity == to_setpoint.velocity
+            and from_setpoint.position == to_setpoint.position
+        ):
             return True
 
         return False
@@ -129,8 +156,10 @@ class JointTrajectory(object):
         :returns:
             False if the starting/ending point is (not at 0/duration) and (has nonzero speed), True otherwise
         """
-        return (self.setpoints[0].time == 0 or self.setpoints[0].velocity == 0) and \
-               (self.setpoints[-1].time == round(self.duration, Setpoint.digits) or self.setpoints[-1].velocity == 0)
+        return (self.setpoints[0].time == 0 or self.setpoints[0].velocity == 0) and (
+            self.setpoints[-1].time == round(self.duration, Setpoint.digits)
+            or self.setpoints[-1].velocity == 0
+        )
 
     def interpolate_setpoints(self) -> None:
         if len(self.setpoints) == 1:
@@ -154,8 +183,11 @@ class JointTrajectory(object):
         if time > self.duration:
             return self.setpoint_class(time, self.setpoints[-1].position, 0)
 
-        return self.setpoint_class(time, float(self.interpolated_position(time)),
-                                   float(self.interpolated_velocity(time)))
+        return self.setpoint_class(
+            time,
+            float(self.interpolated_position(time)),
+            float(self.interpolated_velocity(time)),
+        )
 
     def __getitem__(self, index):
         return self.setpoints[index]
@@ -164,7 +196,9 @@ class JointTrajectory(object):
         return len(self.setpoints)
 
     @classmethod
-    def interpolate_joint_trajectories(cls, base_trajectory, other_trajectory, parameter: float):
+    def interpolate_joint_trajectories(
+        cls, base_trajectory, other_trajectory, parameter: float
+    ):
         """Linearly interpolate two joint trajectories with the parameter.
 
         :param base_trajectory:
@@ -178,13 +212,30 @@ class JointTrajectory(object):
             The interpolated trajectory
         """
         if base_trajectory.limits != other_trajectory.limits:
-            raise SubgaitInterpolationError('Not able to safely interpolate because limits are not equal for joint {0}'.
-                                            format(base_trajectory.name))
+            raise SubgaitInterpolationError(
+                "Not able to safely interpolate because limits are not equal for joint {0}".format(
+                    base_trajectory.name
+                )
+            )
         if len(base_trajectory.setpoints) != len(other_trajectory.setpoints):
-            raise SubgaitInterpolationError('The amount of setpoints do not match for joint {0}'.
-                                            format(base_trajectory.name))
+            raise SubgaitInterpolationError(
+                "The amount of setpoints do not match for joint {0}".format(
+                    base_trajectory.name
+                )
+            )
         setpoints = []
-        for base_setpoint, other_setpoint in zip(base_trajectory.setpoints, other_trajectory.setpoints):
-            setpoints.append(cls.setpoint_class.interpolate_setpoints(base_setpoint, other_setpoint, parameter))
-        duration = parameter * base_trajectory.duration + (1 - parameter) * other_trajectory.duration
-        return JointTrajectory(base_trajectory.name, base_trajectory.limits, setpoints, duration)
+        for base_setpoint, other_setpoint in zip(
+            base_trajectory.setpoints, other_trajectory.setpoints
+        ):
+            setpoints.append(
+                cls.setpoint_class.interpolate_setpoints(
+                    base_setpoint, other_setpoint, parameter
+                )
+            )
+        duration = (
+            parameter * base_trajectory.duration
+            + (1 - parameter) * other_trajectory.duration
+        )
+        return JointTrajectory(
+            base_trajectory.name, base_trajectory.limits, setpoints, duration
+        )

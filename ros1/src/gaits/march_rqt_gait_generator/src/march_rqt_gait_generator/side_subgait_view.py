@@ -1,4 +1,4 @@
-from python_qt_binding.QtWidgets import (QCheckBox, QPushButton)
+from python_qt_binding.QtWidgets import QCheckBox, QPushButton
 
 
 class SideSubgaitView(object):

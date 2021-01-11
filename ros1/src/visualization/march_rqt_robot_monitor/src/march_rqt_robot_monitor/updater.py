@@ -11,19 +11,25 @@ from .diagnostic_analyzers.imc_state import CheckImcStatus
 
 
 def main():
-    rospy.init_node('Diagnostic_updater')
+    rospy.init_node("Diagnostic_updater")
 
     updater = diagnostic_updater.Updater()
-    updater.setHardwareID('MARCH IVc')
+    updater.setHardwareID("MARCH IVc")
 
     # Frequency checks
-    CheckInputDevice('/march/input_device/alive', Alive, updater, 5)
+    CheckInputDevice("/march/input_device/alive", Alive, updater, 5)
 
     # control checks
-    check_current_movement_values = CheckJointValues('march/joint_states', JointState)
-    updater.add('Control position values', check_current_movement_values.position_diagnostics)
-    updater.add('Control velocity values', check_current_movement_values.velocity_diagnostics)
-    updater.add('Control effort values', check_current_movement_values.effort_diagnostics)
+    check_current_movement_values = CheckJointValues("march/joint_states", JointState)
+    updater.add(
+        "Control position values", check_current_movement_values.position_diagnostics
+    )
+    updater.add(
+        "Control velocity values", check_current_movement_values.velocity_diagnostics
+    )
+    updater.add(
+        "Control effort values", check_current_movement_values.effort_diagnostics
+    )
 
     # IMC state check
     CheckImcStatus(updater)
