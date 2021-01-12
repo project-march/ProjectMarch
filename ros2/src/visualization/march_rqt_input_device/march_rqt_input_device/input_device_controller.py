@@ -50,7 +50,7 @@ class InputDeviceController(object):
         self._id = self.ID_FORMAT.format(machine=socket.gethostname(),
                                          user=getpass.getuser())
 
-        if self._node.get_parameter('use_sim_time').get_parameter_value():
+        if self._node.get_parameter('use_sim_time').get_parameter_value().bool_value:
             self._timesource = self._node.create_subscription(msg_type=Clock, topic='/clock',
                                                               callback=lambda time: None, qos_profile=10)
 

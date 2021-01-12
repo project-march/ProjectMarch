@@ -17,7 +17,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             name='use_sim_time',
-            default_value='True',
+            default_value='true',
             description='Whether to use simulation time'),
         Node(
             package='march_safety',

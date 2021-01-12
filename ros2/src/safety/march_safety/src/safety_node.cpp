@@ -17,27 +17,23 @@
 
 #include <chrono>
 
-const double UPDATE_RATE {20.0};
-
 using namespace std::chrono_literals;
 
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
 
-  rclcpp::NodeOptions options;
-  options.automatically_declare_parameters_from_overrides(true);
+  auto safety_node = std::make_shared<SafetyNode>("safety_node", "march");
 
-  auto safety = std::make_shared<SafetyNode>("march_safety", options);
+  safety_node->start();
 
-  safety->start(UPDATE_RATE);
-
+  rclcpp::spin(safety_node);
   rclcpp::shutdown();
   return 0;
 }
 
-SafetyNode::SafetyNode(const std::string& node_name, const rclcpp::NodeOptions& options):
-  Node(node_name, options)
+SafetyNode::SafetyNode(const std::string& node_name, const std::string& node_namespace):
+  Node(node_name, node_namespace, rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true))
 {
   std::vector<std::string> joint_names = march_util::get_joint_names(*this);
 
@@ -53,18 +49,16 @@ SafetyNode::SafetyNode(const std::string& node_name, const rclcpp::NodeOptions& 
   safety_list.push_back(std::make_unique<InputDeviceSafety>(this, safety_handler));
 }
 
-void SafetyNode::start(const double update_rate)
+void SafetyNode::start()
 {
-  // Update the safety handlers every 1/20 s (= 50ms)
-  rclcpp::Rate rate(update_rate);
-  while (rclcpp::ok())
-  {
-    rate.sleep();
-    rclcpp::spin_some(this->get_node_base_interface());
+  // Ensure that the safety node is updated every 50 ms
+  timer = this->create_wall_timer(50ms, std::bind(&SafetyNode::update, this));
+}
 
-    for (auto& i : safety_list)
-    {
-      i->update();
-    }
+void SafetyNode::update()
+{
+  for (auto& i : safety_list)
+  {
+    i->update();
   }
 }

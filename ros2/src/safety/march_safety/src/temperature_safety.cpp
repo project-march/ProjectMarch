@@ -45,7 +45,6 @@ void TemperatureSafety::setTemperatureThresholds(std::string& type)
     auto parameter = "temperature_thresholds_" + type + "." + joint;
     node_->get_parameter_or(parameter, threshold_value, default_temperature_threshold_);
     temperature_thresholds_map.insert({joint, threshold_value});
-    RCLCPP_INFO_STREAM(node_->get_logger(), "Parameter: " << parameter << " ,Value: " << threshold_value  << ";\n");
   }
 }
 

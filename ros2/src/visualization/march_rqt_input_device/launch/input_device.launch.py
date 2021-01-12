@@ -29,6 +29,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             executable='input_device',
             output='screen',
             name='input_device',
+            namespace='march',
             parameters=[
                 {'use_sim_time': LaunchConfiguration('use_sim_time')},
                 {'ping_safety_node': LaunchConfiguration('ping_safety_node')}

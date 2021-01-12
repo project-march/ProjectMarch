@@ -24,8 +24,10 @@ def set_input_device_safety_parameters(node: Node, send_errors_interval: int,
 
 
 class ErrorCounter:
-    def __init__(self):
+    def __init__(self, node):
         self.count = 0
+        self.node = node
 
     def cb(self, _):
+        self.node.get_logger().info("Recieved message!")
         self.count += 1

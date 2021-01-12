@@ -23,6 +23,7 @@
 
   <test_depend>ros2test</test_depend>
   <test_depend>ros_testing</test_depend>
+  <test_depend>march_robot_information</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

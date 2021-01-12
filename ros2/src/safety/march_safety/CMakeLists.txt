@@ -53,6 +53,7 @@ install(DIRECTORY launch config
         DESTINATION share/${PROJECT_NAME}/)
 
 if(BUILD_TESTING)
+    ament_python_install_package(test)
     add_ros_test(test/launch/march_safety_connection_lost.launch.py)
 endif()
 

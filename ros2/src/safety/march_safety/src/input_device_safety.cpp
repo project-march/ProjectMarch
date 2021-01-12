@@ -8,7 +8,7 @@
 
 #include <chrono>
 
-const int DURATION_MS {5000};
+const float DURATION_MS {5000.0};
 
 using namespace std::chrono_literals;
 
@@ -19,6 +19,9 @@ InputDeviceSafety::InputDeviceSafety(SafetyNode* node, std::shared_ptr<SafetyHan
 {
   int milliseconds;
   node->get_parameter("input_device_connection_timeout", milliseconds);
+
+  RCLCPP_INFO_STREAM(node_->get_logger(), "Ipd timeout: " << milliseconds);
+
   connection_timeout_ = rclcpp::Duration(std::chrono::milliseconds(milliseconds));
   subscriber_input_device_alive_ = node_->create_subscription<AliveMsg>(
       "/march/input_device/alive", 10, std::bind(&InputDeviceSafety::inputDeviceAliveCallback, this, std::placeholders::_1));
@@ -26,16 +29,17 @@ InputDeviceSafety::InputDeviceSafety(SafetyNode* node, std::shared_ptr<SafetyHan
 
 void InputDeviceSafety::inputDeviceAliveCallback(const march_shared_msgs::msg::Alive::SharedPtr msg)
 {
-  this->last_alive_stamps_[msg->id] = msg->stamp;
+  RCLCPP_INFO_STREAM(node_->get_logger(), "Alive: sec: " << msg->stamp.sec << " nsec:" << msg->stamp.nanosec);
+  last_alive_stamps_[msg->id] = msg->stamp;
 }
 
 void InputDeviceSafety::update()
 {
-  auto clock = node_->get_clock();
-  auto now = clock->now();
-  if (this->last_alive_stamps_.empty())
+  auto clock = *node_->get_clock();
+  auto now = clock.now();
+  if (last_alive_stamps_.empty())
   {
-    RCLCPP_INFO_THROTTLE(node_->get_logger(), *clock, DURATION_MS, "No input device connected yet");
+    RCLCPP_INFO_THROTTLE(node_->get_logger(), clock, DURATION_MS, "No input device connected yet");
     return;
   }
 
@@ -45,7 +49,8 @@ void InputDeviceSafety::update()
   {
     const std::string& id = last_alive_stamp.first;
     const rclcpp::Time& last_alive = last_alive_stamp.second;
-    const bool timed_out = now > (last_alive + this->connection_timeout_);
+
+    const bool timed_out = now > (last_alive + connection_timeout_);
     const bool is_connected = this->connected_devices_.find(id) != this->connected_devices_.end();
 
     if (is_connected && timed_out)
@@ -74,7 +79,7 @@ void InputDeviceSafety::update()
     if (now + rclcpp::Duration(0.5s) < last_alive)
     {
       // Duration is in ms here
-      RCLCPP_WARN_STREAM_THROTTLE(node_->get_logger(), *clock, DURATION_MS, "Input device `" << id << "` alive message is from the future. Current time is "
+      RCLCPP_WARN_STREAM_THROTTLE(node_->get_logger(), clock, DURATION_MS, "Input device `" << id << "` alive message is from the future. Current time is "
                                                      << now.seconds() << " and last alive message was "
                                                      << last_alive.seconds());
     }
@@ -83,11 +88,12 @@ void InputDeviceSafety::update()
   const bool has_connections = !this->connected_devices_.empty();
   if (had_connections && !has_connections)
   {
+    RCLCPP_INFO_STREAM(node_->get_logger(), "Publishing non-fatal");
     this->safety_handler_->publishNonFatal("All input devices are lost", now);
   }
 
   if (!has_connections)
   {
-    RCLCPP_INFO_SKIPFIRST_THROTTLE(node_->get_logger(), *clock, DURATION_MS, "No input device connected");
+    RCLCPP_INFO_SKIPFIRST_THROTTLE(node_->get_logger(), clock, DURATION_MS, "No input device connected");
   }
 }
