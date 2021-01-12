@@ -8,7 +8,7 @@ from march_shared_msgs.srv import ContainsGait
 from urdf_parser_py import urdf
 from march_gait_selection.gait_selection import GaitSelection
 from march_gait_selection.state_machine.gait_interface import GaitInterface
-from march_shared_classes.gait.gait import Gait
+from march_utility.gait.gait import Gait
 
 VALID_PACKAGE = "march_gait_selection"
 VALID_DIRECTORY = "test/resources"

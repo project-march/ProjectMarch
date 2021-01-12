@@ -18,7 +18,7 @@ class GaitTest(unittest.TestCase):
     def setUp(self):
         self.gait_name = "walk"
         self.resources_folder = (
-            rospkg.RosPack().get_path("march_shared_classes") + "/test/resources"
+            rospkg.RosPack().get_path("march_utility") + "/test/resources"
         )
         self.robot = urdf.Robot.from_xml_file(
             rospkg.RosPack().get_path("march_description") + "/urdf/march4.urdf"

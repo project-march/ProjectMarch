@@ -25,7 +25,7 @@ class SubgaitTest(unittest.TestCase):
         self.base_version = "forward_swing"
         self.other_version = "backward_swing"
         self.resources_folder = (
-            rospkg.RosPack().get_path("march_shared_classes") + "/test/resources"
+            rospkg.RosPack().get_path("march_utility") + "/test/resources"
         )
         self.robot = urdf.Robot.from_xml_file(
             rospkg.RosPack().get_path("march_description") + "/urdf/march4.urdf"

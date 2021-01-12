@@ -1,8 +1,8 @@
 from copy import deepcopy
-from march_shared_classes.exceptions.gait_exceptions import TransitionError
-from march_shared_classes.gait.joint_trajectory import JointTrajectory
-from march_shared_classes.gait.setpoint import Setpoint
-from march_shared_classes.gait.subgait import Subgait
+from march_utility.exceptions.gait_exceptions import TransitionError
+from march_utility.gait.joint_trajectory import JointTrajectory
+from march_utility.gait.setpoint import Setpoint
+from march_utility.gait.subgait import Subgait
 
 
 class TransitionSubgait(Subgait):

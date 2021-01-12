@@ -8,7 +8,7 @@ from .setpoint_test import SetpointTest
 from .subgait_graph_test import SubgaitGraphTest
 from .subgait_test import SubgaitTest
 
-PKG = "march_shared_classes"
+PKG = "march_utility"
 
 if __name__ == "__main__":
     rosunit.unitrun(PKG, "limits_test", LimitsTest)

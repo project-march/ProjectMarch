@@ -4,11 +4,11 @@ from setuptools import setup
 
 setup_args = generate_distutils_setup(
     packages=[
-        "march_shared_classes",
-        "march_shared_classes.gait",
-        "march_shared_classes.exceptions",
-        "march_shared_classes.foot_classes",
-        "march_shared_classes.utilities",
+        "march_utility",
+        "march_utility.gait",
+        "march_utility.exceptions",
+        "march_utility.foot_classes",
+        "march_utility.utilities",
     ],
     package_dir={"": "src"},
 )

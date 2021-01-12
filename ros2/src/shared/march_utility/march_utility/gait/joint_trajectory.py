@@ -5,7 +5,7 @@ from scipy.interpolate import BPoly
 from urdf_parser_py import urdf
 
 from .limits import Limits
-from march_shared_classes.exceptions.gait_exceptions import (
+from march_utility.exceptions.gait_exceptions import (
     SubgaitInterpolationError,
     NonValidGaitContent,
 )

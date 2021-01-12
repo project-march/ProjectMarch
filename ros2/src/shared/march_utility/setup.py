@@ -2,7 +2,7 @@ import os
 from glob import iglob
 from setuptools import setup, find_packages
 
-package_name = "march_shared_classes"
+package_name = "march_utility"
 
 
 def data_files():
@@ -39,7 +39,7 @@ setup(
     zip_safe=True,
     maintainer="Project March",
     maintainer_email="software@projectmarch.nl",
-    description="Classes that are used by the march packages",
+    description="Python and Cpp libraries used by other March packages",
     license="TODO: License declaration",
     tests_require=["pytest", "urfdom_py", "unittest", "parameterized"],
     entry_points={
