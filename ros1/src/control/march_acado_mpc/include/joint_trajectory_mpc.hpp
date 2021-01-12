@@ -14,6 +14,12 @@
 #include <pluginlib/class_list_macros.h>
 #include <vector>
 
+#include <ros/node_handle.h>
+#include <ros/time.h>
+#include "std_msgs/Float64.h"
+
+#include <cassert>
+#include <memory>
 
 // Create a State alias
 namespace joint_trajectory_controller

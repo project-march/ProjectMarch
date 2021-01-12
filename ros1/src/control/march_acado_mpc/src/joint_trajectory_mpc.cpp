@@ -57,9 +57,9 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
 
     // Set command variable
 //    command = state_error.position[i]*1000;
-
+//    command = -100.0;
     command = model_predictive_controllers_[i].u;
-
+    std::cout << command << std::endl;
     // Apply command variable
     (*joint_handles_ptr_)[i].setCommand(command);
   }
