@@ -1,13 +1,12 @@
 // Copyright 2019 Project March.
 
 #include "march_safety/temperature_safety.hpp"
-
 #include "rclcpp/rclcpp.hpp"
 
+#include <chrono>
 #include <map>
 #include <string>
 #include <vector>
-#include <chrono>
 
 const double DEFAULT_TEMPERATURE_THRESHOLD {40.0};
 
