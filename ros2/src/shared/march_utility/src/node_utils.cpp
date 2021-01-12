@@ -1,10 +1,11 @@
 // Copyright 2020 Project March.
-#include <string>
-#include <vector>
-#include <chrono>
 #include "rclcpp/rclcpp.hpp"
 #include "march_shared_msgs/srv/get_joint_names.hpp"
 #include "march_utility/node_utils.hpp"
+
+#include <chrono>
+#include <string>
+#include <vector>
 
 using namespace std::chrono_literals;
 
@@ -15,7 +16,7 @@ namespace node_utils
      * @param node Node to create client for and use logger of.
      * @return Returns the list of joint names.
      */
-      std::vector<std::string> get_joint_names(rclcpp::Node& node)
+      auto get_joint_names(const rclcpp::Node& node)
       {
         std::vector<std::string> names;
 
@@ -50,5 +51,6 @@ namespace node_utils
 
         return names;
       }
-}
+} // namespace node_utils
+
 
