@@ -75,6 +75,6 @@ def set_size_ramp_like_callback(msg):
 
 change_stairs_like_obstacle_size = rospy.Service('/march/set_obstacle_size_stairs_like',
                                                  SetObstacleSizeStairsLike, set_size_stairs_like_callback)
-change_ramp_like_obstacle_size = rospy.Service('/march/set_obstacle_size_stairs_like',
+change_ramp_like_obstacle_size = rospy.Service('/march/set_obstacle_size_ramp_like',
                                                SetObstacleSizeRampLike, set_size_ramp_like_callback)
 rospy.spin()
