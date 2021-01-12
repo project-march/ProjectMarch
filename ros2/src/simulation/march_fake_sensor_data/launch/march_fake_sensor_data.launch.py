@@ -5,7 +5,7 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    ld = LaunchDescription(
+    return LaunchDescription(
         [
             DeclareLaunchArgument(
                 "minimum_fake_temperature",
@@ -37,7 +37,6 @@ def generate_launch_description():
             ),
         ]
     )
-    return ld
 
 
 if __name__ == "__main__":

@@ -114,6 +114,7 @@ class SubgaitGraph(object):
         """Returns the subgait the given subgait transitions to.
 
         :param (str, str) transition: Tuple of subgait name and type of transition, can be either 'to' or 'stop'
+
         :rtype str
         :returns Name of subgait that the given transition transitions to
         """

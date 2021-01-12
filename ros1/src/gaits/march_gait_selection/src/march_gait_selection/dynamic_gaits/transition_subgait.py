@@ -120,7 +120,7 @@ class TransitionSubgait(Subgait):
                 transition_subgait
             ) or not transition_subgait.validate_subgait_transition(new_subgait):
                 raise TransitionError("Transition subgaits do not match")
-        except Exception as error:
+        except Exception as error:  # noqa: PIE786
             TransitionError("Error when creating transition: {er}".format(er=error))
 
     @staticmethod

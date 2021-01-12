@@ -173,11 +173,13 @@ class GaitSelection(Node):
             raise GaitNameNotFound(gait_name)
 
         # Only update versions that are different
-        version_map = {
-            name: version
-            for name, version in version_map.items()
-            if version != self._gait_version_map[gait_name][name]
-        }
+        version_map = dict(
+            [
+                (name, version)
+                for name, version in version_map.items()
+                if version != self._gait_version_map[gait_name][name]
+            ]
+        )
         self._loaded_gaits[gait_name].set_subgait_versions(
             self._robot, self._gait_directory, version_map
         )
@@ -187,10 +189,10 @@ class GaitSelection(Node):
         )
 
     def set_gait_versions_cb(self, request, response):
-
         """Sets a new gait version to the gait selection instance.
 
         :type msg: march_shared_resources.srv.SetGaitVersionRequest
+
         :rtype march_shared_resources.srv.SetGaitVersionResponse
         """
 
@@ -204,7 +206,7 @@ class GaitSelection(Node):
             response.success = True
             response.message = ""
             return response
-        except Exception as e:
+        except Exception as e:  # noqa: PIE786
             response.success = False
             response.message = str(e)
             return response
@@ -247,9 +249,11 @@ class GaitSelection(Node):
 
                     if os.path.isdir(subgait_path):
                         versions = sorted(
-                            v.replace(".subgait", "")
-                            for v in os.listdir(os.path.join(subgait_path))
-                            if v.endswith(".subgait")
+                            [
+                                v.replace(".subgait", "")
+                                for v in os.listdir(os.path.join(subgait_path))
+                                if v.endswith(".subgait")
+                            ]
                         )
                         subgaits[subgait] = versions
 

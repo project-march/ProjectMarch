@@ -113,7 +113,7 @@ class NotesWidget(QWidget):
                 for index in selection_model.selectedIndexes()
                 if not index.column()
             ]
-            if indices and all(index.isValid() for index in indices):
+            if indices and all([index.isValid() for index in indices]):
                 self._model.remove_rows([index.row() for index in indices])
 
     def _set_saved(self, saved):

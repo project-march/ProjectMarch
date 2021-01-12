@@ -2,8 +2,7 @@ class GaitError(Exception):
     def __init__(self, msg: str = None):
         """
         Initialize a basic gait error exception.
-        :param msg:
-            The message to display.
+        :param msg: The message to display.
         """
         if msg is None:
             msg = "An error occurred with a gait module."

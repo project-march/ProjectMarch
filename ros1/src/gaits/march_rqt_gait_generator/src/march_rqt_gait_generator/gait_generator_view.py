@@ -195,10 +195,10 @@ class GaitGeneratorView(QWidget):
         except (LookupException, ConnectivityException, ExtrapolationException):
             return
 
-        self.height_left_line_edit.setText("%.3f" % trans_left[2])
-        self.height_right_line_edit.setText("%.3f" % trans_right[2])
+        self.height_left_line_edit.setText(f"{trans_left[2]:.3f}")
+        self.height_right_line_edit.setText(f"{trans_right[2]:.3f}")
         self.heel_distance_line_edit.setText(
-            "%.3f" % math.sqrt(trans_left[0] ** 2 + trans_left[2] ** 2)
+            f"{math.sqrt(trans_left[0] ** 2 + trans_left[2] ** 2)}:.3f"
         )
 
     def message(self, title=None, msg=None):

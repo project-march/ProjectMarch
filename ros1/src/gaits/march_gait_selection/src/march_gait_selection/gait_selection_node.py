@@ -30,6 +30,7 @@ def set_gait_versions(msg, gait_selection):
 
     :type msg: march_shared_msgs.srv.SetGaitVersionRequest
     :type gait_selection: GaitSelection
+
     :rtype march_shared_msgs.srv.SetGaitVersionResponse
     """
     if len(msg.subgaits) != len(msg.versions):
@@ -39,7 +40,7 @@ def set_gait_versions(msg, gait_selection):
     try:
         gait_selection.set_gait_versions(msg.gait, version_map)
         return [True, ""]
-    except Exception as e:
+    except Exception as e:  # noqa: PIE786
         return [False, str(e)]
 
 

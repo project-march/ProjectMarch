@@ -109,11 +109,11 @@ class SubgaitGraphTest(unittest.TestCase):
     def test_contained_subgait(self):
         subgait = "test"
         graph = SubgaitGraph({"start": {"to": subgait}, subgait: {"to": "end"}})
-        self.assertTrue(subgait in graph)
+        self.assertIn(subgait, graph)
 
     def test_not_contained_subgait(self):
         graph = SubgaitGraph({"start": {"to": "1"}, "1": {"to": "end"}})
-        self.assertFalse("test" in graph)
+        self.assertNotIn("test", graph)
 
     def test_get_correct_to_transition(self):
         subgait = "test"
@@ -169,9 +169,9 @@ class SubgaitGraphTest(unittest.TestCase):
     def test_equal_graphs(self):
         graph1 = SubgaitGraph({"start": {"to": "end"}})
         graph2 = SubgaitGraph({"start": {"to": "end"}})
-        self.assertTrue(graph1 == graph2)
+        self.assertEqual(graph1, graph2)
 
     def test_not_equal_graphs(self):
         graph1 = SubgaitGraph({"start": {"to": "1"}, "1": {"to": "end"}})
         graph2 = SubgaitGraph({"start": {"to": "end"}})
-        self.assertFalse(graph1 == graph2)
+        self.assertNotEqual(graph1, graph2)

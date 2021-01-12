@@ -130,28 +130,34 @@ class SemiDynamicSetpointsGait(SetpointsGait):
                 "secs": duration_secs,
             },
             "gait_type": self._current_subgait.gait_type,
-            "joints": {
-                joint.name: [
-                    {
-                        "position": self._freeze_position[joint.name],
-                        "time_from_start": {
-                            "nsecs": duration_nsecs,
-                            "secs": duration_secs,
-                        },
-                        "velocity": 0,
-                    }
+            "joints": dict(
+                [
+                    (
+                        joint.name,
+                        [
+                            {
+                                "position": self._freeze_position[joint.name],
+                                "time_from_start": {
+                                    "nsecs": duration_nsecs,
+                                    "secs": duration_secs,
+                                },
+                                "velocity": 0,
+                            }
+                        ],
+                    )
+                    for joint in self._current_subgait.joints
                 ]
-                for joint in self._current_subgait.joints
-            },
+            ),
         }
-        freeze_subgait = Subgait.from_dict(
+
+        # freeze subgait
+        return Subgait.from_dict(
             robot=self._current_subgait.robot,
             subgait_dict=new_dict,
             gait_name=self.gait_name,
             subgait_name="freeze",
             version="Only version, generated from code",
         )
-        return freeze_subgait
 
     def _position_after_time(self, elapsed_time):
         """

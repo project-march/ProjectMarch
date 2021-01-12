@@ -28,8 +28,8 @@ class GaitStateMachine(object):
         In order to start the state machine see `run`.
 
         :param GaitSelection gait_selection: Loaded gaits to build graph from
-        :param TrajectoryScheduler trajectory_scheduler:
-        Scheduler interface for scheduling trajectories
+        :param TrajectoryScheduler trajectory_scheduler: Scheduler interface for
+                                                         scheduling trajectories
         """
         self._gait_selection = gait_selection
         self._trajectory_scheduler = trajectory_scheduler

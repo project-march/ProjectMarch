@@ -65,7 +65,7 @@ class SubgaitGraph(object):
             raise SubgaitGraphError(
                 "Subgait {n} has no `{t}` transition".format(n=name, t=self.TO)
             )
-        if not all(transition in self.TRANSITIONS for transition in subgait):
+        if not all([transition in self.TRANSITIONS for transition in subgait]):
             raise SubgaitGraphError(
                 "Subgait {n} has unknown transitions. Available transitions {t}".format(
                     n=name, t=self.TRANSITIONS
@@ -119,6 +119,7 @@ class SubgaitGraph(object):
         """Returns the subgait the given subgait transitions to.
 
         :param (str, str) transition: Tuple of subgait name and type of transition, can be either 'to' or 'stop'
+
         :rtype str
         :returns Name of subgait that the given transition transitions to
         """
