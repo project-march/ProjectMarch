@@ -35,11 +35,11 @@ container:build:
     DOCKER_HOST: tcp://docker:2376
     DOCKER_TLS_CERTDIR: "/certs"
   services:
-    - docker:dind
+    - docker:dind-rootless
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - docker build --cache-from $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH -t $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH .
+    - DOCKER_BUILDKIT=1 docker build --cache-from $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH -t $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH --build-arg BUILDKIT_INLINE_CACHE=1 .
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH
     - if [[ $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]; then docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH $CI_REGISTRY_IMAGE:latest && docker push $CI_REGISTRY_IMAGE:latest; fi;
   rules:
