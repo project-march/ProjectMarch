@@ -1,3 +1,6 @@
+from march_shared_classes.foot_classes.foot import Foot
+
+
 class PackageNotFoundError(Exception):
     def __init__(self, package_name: str, msg: str = None):
         """Class to raise an error when a ros package cannot be found.
@@ -21,7 +24,7 @@ class MsgTypeError(Exception):
 
 
 class SideSpecificationError(Exception):
-    def __init__(self, foot, msg=None):
+    def __init__(self, foot: Foot, msg: str = None):
         """Class to raise an error when a foot ('right' or 'left') has to be specified but this did not happen."""
         if msg is None:
             msg = "An incorrect side was supplied. Must be a either Side.left or Side.right, but was {foot}.".format(
@@ -32,7 +35,7 @@ class SideSpecificationError(Exception):
 
 
 class IncorrectCoordinateError(Exception):
-    def __init__(self, msg=None):
+    def __init__(self, msg: str = None):
         """Class to raise an error when the coordinates of a position are incorrect."""
         if msg is None:
             msg = "The keys of a position or velocity dictionary should be ['x', 'y', 'z'], but were different."
@@ -41,7 +44,7 @@ class IncorrectCoordinateError(Exception):
 
 
 class WeightedAverageError(Exception):
-    def __init__(self, msg=None):
+    def __init__(self, msg: str = None):
         """Class to raise an error when a weighted average cannot be computed."""
         if msg is None:
             msg = "The calculation of the weighted average cannot be executed safely."
