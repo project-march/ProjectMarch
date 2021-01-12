@@ -19,11 +19,11 @@ RUN rosdep update
 
 # Install ROS 1 rosdep dependencies
 COPY ros1 /projects/
-RUN bash -c "source /opt/ros/noetic/local_setup.bash && rosdep update && rosdep install -y --from-paths /projects/ros1/src --rosdistro noetic --ignore-src && rm -rf /projects && rm -rf /var/lib/apt/lists/* && rm -rf /var/cache/apt/archives && apt-get clean"
+RUN bash -c "source /opt/ros/noetic/local_setup.bash && rosdep update && rosdep install -y --from-paths /projects/src --rosdistro noetic --ignore-src && rm -rf /projects && rm -rf /var/lib/apt/lists/* && rm -rf /var/cache/apt/archives && apt-get clean"
 
 # Install ROS 2 rosdep dependencies
 COPY ros2 /projects/
-RUN bash -c "source /opt/ros/foxy/local_setup.bash && rosdep update && rosdep install -y --from-paths /projects/ros2/src --rosdistro foxy --ignore-src && rm -rf /projects && rm -rf /var/lib/apt/lists/* && rm -rf /var/cache/apt/archives && apt-get clean"
+RUN bash -c "source /opt/ros/foxy/local_setup.bash && rosdep update && rosdep install -y --from-paths /projects/src --rosdistro foxy --ignore-src && rm -rf /projects && rm -rf /var/lib/apt/lists/* && rm -rf /var/cache/apt/archives && apt-get clean"
 
 # Set working directory
 WORKDIR /root
