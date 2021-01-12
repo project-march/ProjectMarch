@@ -10,7 +10,7 @@ import xacro
 # this means there must be an <name>_macro.xacro in the obstacles directory
 # which accepts the parameters length, width and height with default values
 RESIZABLE_OBSTACLES_RAMP_LIKE = ['ramp_and_door']
-RESIZABLE_OBSTACLES_STAIRS_LIKE = ['bench']
+RESIZABLE_OBSTACLES_STAIRS_LIKE = ['bench', 'stairs']
 
 rospy.init_node('set_obstacle_dimensions', anonymous=True)
 
@@ -31,17 +31,18 @@ def set_new_stairs_like_obstacle(name, length=0, width=0, height=0):
             '''.format(name=name, length=length, width=width, height=height), None)
     set_size(name, doc)
 
-def set_new_ramp_like_obstacle(name, slope_up=0, slope_down=0, length_up=0):
+def set_new_ramp_like_obstacle(name, slope_up=0, slope_down=0, ramp_up_length=0):
     slope_up = 'slope_up="{slope_up}"'.format(slope_up=slope_up) if slope_up != 0 else ''
     slope_down = 'slope_down="{slope_down}"'.format(slope_down=slope_down) if slope_down != 0 else ''
-    length_up = 'length_up="{length_up}"'.format(length_up=length_up) if length_up != 0 else ''
+    ramp_up_length = 'ramp_up_length="{ramp_up_length}"'.format(ramp_up_length=ramp_up_length) \
+        if ramp_up_length != 0 else ''
 
     doc = xacro.parse('''<?xml version="1.0"?>
                 <robot name="{name}" xmlns:xacro="http://www.ros.org/wiki/xacro">
                     <xacro:include filename="$(find march_simulation)/obstacles/{name}_macro.xacro"/>
-                    <xacro:{name} {slope_up} {slope_down} {length_up}/>
+                    <xacro:{name} {slope_up} {slope_down} {ramp_up_length}/>
                 </robot>
-                '''.format(name=name, slope_up=slope_up, slope_down=slope_down, length_up=length_up), None)
+                '''.format(name=name, slope_up=slope_up, slope_down=slope_down, ramp_up_length=ramp_up_length), None)
     set_size(name, doc)
 
 def set_size(name, doc):
@@ -69,8 +70,8 @@ def set_size_ramp_like_callback(msg):
 
     else:
         set_new_ramp_like_obstacle(name=msg.obstacle_name, slope_up=msg.new_slope_up, slope_down=msg.new_slope_down,
-                                   length_up=msg.new_length_up)
-        return SetObstacleSizeStairsLikeResponse(success=True)
+                                   ramp_up_length=msg.new_length_up)
+        return SetObstacleSizeRampLikeResponse(success=True)
 
 
 change_stairs_like_obstacle_size = rospy.Service('/march/set_obstacle_size_stairs_like',

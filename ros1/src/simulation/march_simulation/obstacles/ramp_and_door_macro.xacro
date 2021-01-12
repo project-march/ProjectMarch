@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <xacro:macro name="bench" params="up_degrees:=15 down_degrees:=15 ramp_up_length:=3">
+    <xacro:macro name="ramp_and_door" params="slope_up:=15 slope_down:=15 ramp_up_length:=3">
         <gazebo>
             <static>true</static>
         </gazebo>
@@ -10,8 +10,8 @@
         <xacro:property name="platform_length" default="2.920"/>
         <xacro:property name="platform_width" default="1.4"/>
         <xacro:property name="distance_to_origin" default="0.4"/>
-        <xacro:property name="ramp_up_slope" default="${radians(up_degrees)}"/>
-        <xacro:property name="ramp_down_slope" value="${radians(down_degrees)}"/>
+        <xacro:property name="ramp_up_slope" default="${radians(slope_up)}"/>
+        <xacro:property name="ramp_down_slope" value="${radians(slope_down)}"/>
         <xacro:property name="ramp_down_length" default="${sin(ramp_up_slope) * ramp_up_length / sin(ramp_down_slope)}"/>
 
         <xacro:property name="parent_name" value="world"/>
