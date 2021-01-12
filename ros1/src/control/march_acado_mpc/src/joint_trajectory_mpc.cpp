@@ -1,4 +1,5 @@
 #include "joint_trajectory_mpc.hpp"
+#include "model_predictive_controller.hpp"
 #include <pluginlib/class_list_macros.hpp>
 
 
@@ -6,6 +7,13 @@ bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::Jo
 {
   joint_handles_ptr_ = &joint_handles;
   num_joints_ = joint_handles_ptr_->size();
+
+  //initialize the model predictive controllers
+  model_predictive_controllers_.resize(num_joints_);
+  for (unsigned int i = 0; i < num_joints_; ++i)
+  {
+    model_predictive_controllers_[i].initSolver();
+  }
 
   return true;
 }
