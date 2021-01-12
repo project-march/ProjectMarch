@@ -7,7 +7,7 @@ RUN apt update && apt upgrade -y && apt install -y apt-utils && apt install -y r
 WORKDIR /projects
 
 # Install flakehell linter dependencies
-COPY pyproject.toml /projects/
+COPY pyproject.toml .flake-baseline /projects/
 RUN bash -c "python3 -m pip install -r <(python3 -m flakehell missed) && rm -f /projects/pyproject.toml"
 
 # Install Python required runtime dependencies and test dependencies
