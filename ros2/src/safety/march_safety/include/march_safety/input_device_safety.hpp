@@ -23,20 +23,32 @@ class InputDeviceSafety : public SafetyType
 public:
   InputDeviceSafety(SafetyNode* node, std::shared_ptr<SafetyHandler> safety_handler);
 
+  // Update the input device safety checker.
   void update() override;
 
 private:
+  // Callback for when the input device publishes on the /march/input_device/alive topic
   void inputDeviceAliveCallback(const AliveMsg::SharedPtr msg);
 
+  // Check the last alive stamp of an input device.
+  void check_last_alive_stamp(const std::string& id, const rclcpp::Time& last_alive);
+
+  // Node to use for logging and getting time
   SafetyNode* node_;
 
+  // Safety handlers to use when logging errors
   std::shared_ptr<SafetyHandler> safety_handler_;
 
+  // Subscription for the /march/input_device/alive topic
   AliveSubscription subscriber_input_device_alive_;
 
+  // Time to wait before a connection is considered timed out
   rclcpp::Duration connection_timeout_;
 
+  // Map containing for each input device the last time they published to the /march/input_device/alive topic
   std::unordered_map<std::string, rclcpp::Time> last_alive_stamps_;
+
+  // Set of connected devices
   std::unordered_set<std::string> connected_devices_;
 };
 
