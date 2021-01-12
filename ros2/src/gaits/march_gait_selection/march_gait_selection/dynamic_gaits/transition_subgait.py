@@ -27,11 +27,11 @@ class TransitionSubgait(Subgait):
     @classmethod
     def from_subgaits(cls, old_subgait, new_subgait, transition_subgait_name):
         """Create a new transition subgait object between two given subgaits.
+
         :param old_subgait: The old subgait to transition from
-        :param new_subgait: The new gait which must be executed after the
-                            old gait
+        :param new_subgait: The new gait which must be executed after the old gait
         :param transition_subgait_name: Name to use for the subgait that will be created
-        in which the transition will occur
+                                        in which the transition will occur
 
         :return: A populated TransitionSubgait object which holds the data to
                  transition between given gaits
@@ -126,7 +126,7 @@ class TransitionSubgait(Subgait):
                 transition_subgait
             ) or not transition_subgait.validate_subgait_transition(new_subgait):
                 raise TransitionError("Transition subgaits do not match")
-        except Exception as error:
+        except Exception as error:  # noqa: PIE786
             TransitionError("Error when creating transition: {er}".format(er=error))
 
     @staticmethod

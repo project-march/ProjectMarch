@@ -137,13 +137,12 @@ class Foot(object):
 
         hfe, kfe = Foot.calculate_hfe_kfe_angles(transformed_x, transformed_z, ul, ll)
 
-        angle_positions = {
+        # angle positions
+        return {
             foot_side.value + "_hip_aa": Setpoint(time, haa),
             foot_side.value + "_hip_fe": Setpoint(time, hfe),
             foot_side.value + "_knee": Setpoint(time, kfe),
         }
-
-        return angle_positions
 
     @staticmethod
     def calculate_haa_angle(z_position, y_position, pelvis_hip_length):

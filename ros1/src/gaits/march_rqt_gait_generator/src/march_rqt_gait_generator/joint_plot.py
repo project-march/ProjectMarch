@@ -197,7 +197,7 @@ class JointPlot(pg.PlotItem):
             + plot_range * (parameter - min_parameter) / parameter_range
         )
 
-    def mouseClickEvent(self, event):
+    def mouseClickEvent(self, event):  # noqa: N802
 
         scene_position = event.scenePos()
 
@@ -236,7 +236,7 @@ class JointPlot(pg.PlotItem):
         self.add_setpoint.emit(time, math.radians(position), event.modifiers())
         event.accept()
 
-    def mouseDragEvent(self, ev):
+    def mouseDragEvent(self, ev):  # noqa: N802
         # Check to make sure the button is the left mouse button. If not, ignore it.
         # Would have to change this if porting to Mac I assume.
         if ev.button() != QtCore.Qt.LeftButton:
