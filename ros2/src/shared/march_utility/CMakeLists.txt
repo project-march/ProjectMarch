@@ -34,6 +34,13 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 # Install python modules
 ament_python_install_package(${PROJECT_NAME})
 
+if(BUILD_TESTING)
+    find_package(ament_cmake_pytest REQUIRED)
+    ament_add_pytest_test(general_test test)
+
+    install(DIRECTORY test/resources
+        DESTINATION share/${PROJECT_NAME}/test)
+endif()
 
 ament_export_targets(${PROJECT_NAME} HAS_LIBRARY_TARGET)
 install(DIRECTORY include/${PROJECT_NAME}
