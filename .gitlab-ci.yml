@@ -48,7 +48,6 @@ container:build:
     - if: '$CI_MERGE_REQUEST_EVENT_TYPE !~ /detached|merged_result|merge_train/'
       changes:
         - Dockerfile
-        - "**/package.xml"
 
 # Runs a linter on the code to see if the code style is consistent and to avoid common
 # mistakes
