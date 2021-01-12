@@ -7,13 +7,15 @@
   <maintainer email="software@projectmarch.nl">Project March</maintainer>
   <license>TODO: License declaration</license>
 
-  <depend>march_shared_msgs</depend>
-  <depend>urdfdom_py</depend>
-  <depend>march_description</depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
 
-  <test_depend>python3-pytest</test_depend>
+  <depend>rclcpp</depend>
+  <depend>rclpy</depend>
+
+  <depend>march_shared_msgs</depend>
 
   <export>
-    <build_type>ament_python</build_type>
+    <build_type>ament_cmake</build_type>
   </export>
 </package>
