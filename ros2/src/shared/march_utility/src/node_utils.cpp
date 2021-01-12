@@ -16,7 +16,7 @@ namespace node_utils
      * @param node Node to create client for and use logger of.
      * @return Returns the list of joint names.
      */
-      auto get_joint_names(const rclcpp::Node& node)
+      std::vector<std::string> get_joint_names(rclcpp::Node& node)
       {
         std::vector<std::string> names;
 
