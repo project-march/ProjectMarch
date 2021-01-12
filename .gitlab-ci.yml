@@ -30,25 +30,18 @@ container:tag:
 
 container:build:
   stage: Build container
-  image: docker:latest
-  variables:
-    DOCKER_HOST: tcp://docker:2376
-    DOCKER_TLS_CERTDIR: "/certs"
-  services:
-    - docker:dind-rootless
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
   script:
-    - DOCKER_BUILDKIT=1 docker build --cache-from $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH -t $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH --build-arg BUILDKIT_INLINE_CACHE=1 .
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH
-    - if [[ $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]; then docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH $CI_REGISTRY_IMAGE:latest && docker push $CI_REGISTRY_IMAGE:latest; fi;
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --cache true --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH
   rules:
-    # Ensure that the merge request type is not detached, not from a merged_result, and not a merge_train because
-    # this means that $CI_COMMIT_BRANCH would be empty (See https://docs.gitlab.com/ee/ci/variables/predefined_variables.html)
-    - if: '$CI_MERGE_REQUEST_EVENT_TYPE !~ /detached|merged_result|merge_train/'
-      changes:
-        - Dockerfile
-        - "**/package.xml"
+    - if: '$CI_COMMIT_BRANCH'
+      #      changes:
+      #        - Dockerfile
+      #        - "**/package.xml"
 
 # Runs a linter on the code to see if the code style is consistent and to avoid common
 # mistakes
