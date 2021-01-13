@@ -29,7 +29,7 @@ namespace node_utils
         {
           if (!rclcpp::ok())
           {
-            RCLCPP_ERROR(node.get_logger(), "Interrupted while waiting for parameter_server service. Exiting.");
+            RCLCPP_ERROR(node.get_logger(), "Interrupted while waiting for get_joint_names service. Exiting.");
             return names;
           }
           RCLCPP_INFO(node.get_logger(), "The get_joint_names service was unavailable, waiting again...");
