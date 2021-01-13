@@ -1,4 +1,5 @@
 import os
+from typing import List
 
 from ament_index_python.packages import get_package_share_directory
 from urdf_parser_py import urdf
@@ -8,27 +9,32 @@ from march_shared_classes.exceptions.general_exceptions import SideSpecification
 from .side import Side
 
 
-def weighted_average(base_value, other_value, parameter):
+def weighted_average(base_value: float, other_value: float, parameter: float) -> float:
     """Compute the weighted average of two values with normalised weight parameter.
 
-    :param base_value: The first value for the weighted average, return this if parameter is 0
-    :param other_value: The second value for the weighted average, return this if parameter is 1
-    :param: parameter: The normalised weight parameter, the parameter that deterines the weight of the second value
+    :param base_value: The first value for the weighted average,
+        return this if parameter is 0
+    :param other_value: The second value for the weighted average,
+        return this if parameter is 1
+    :param parameter: The normalised weight parameter, the parameter that
+        determines the weight of the second value
 
     :return: A value which is the weighted average of the given values
     """
     return base_value * (1 - parameter) + other_value * parameter
 
 
-def merge_dictionaries(dic_one, dic_two):
-    """Combines the key value pairs of two dicitonaries into a new dicionary.
+def merge_dictionaries(dic_one: dict, dic_two: dict) -> dict:
+    """Combines the key value pairs of two dicitonaries into a new dictionary.
 
-    Throws an error when both dictionaries contain the same key and the corresponding values are not equal.
+    Throws an error when both dictionaries contain the same key and the
+    corresponding values are not equal.
 
     :param dic_one: One of the dictionaries which is to be merged
     :param dic_two: One of the dictionaries which is to be merged
 
-    :return: The merged dictionary, has the same key value pairs as the pairs in the given dictionaries combined
+    :return: The merged dictionary, has the same key value pairs as the pairs in
+    the given dictionaries combined
     """
     merged_dic = {}
     for key_one in dic_one:
@@ -36,30 +42,30 @@ def merge_dictionaries(dic_one, dic_two):
             merged_dic[key_one] = dic_one[key_one]
         else:
             raise KeyError(
-                "Dictionaries to be merged both contain key {key} with differing values".format(
-                    key=key_one
-                )
+                f"Dictionaries to be merged both contain key {key_one} with differing "
+                f"values"
             )
     for key_two in dic_two:
         if key_two not in dic_one or dic_one[key_two] == dic_two[key_two]:
             merged_dic[key_two] = dic_two[key_two]
         else:
             raise KeyError(
-                "Dictionaries to be merged both contain key {key} with differing values".format(
-                    key=key_two
-                )
+                f"Dictionaries to be merged both contain key {key_two} with differing "
+                f"values"
             )
     return merged_dic
 
 
-def get_lengths_robot_for_inverse_kinematics(side=None):
-    """Grabs lengths from the robot which are relevant for the inverse kinematics calculation.
+def get_lengths_robot_for_inverse_kinematics(side: Side = Side.both) -> List[float]:
+    """Grabs lengths from the robot which are relevant for the inverse kinematics
+    calculation.
 
-    this function returns the lengths relevant for the specified foot, if no side is specified,
-    it returns all relevant lengths for both feet.
+    this function returns the lengths relevant for the specified foot, if no
+    side is specified,it returns all relevant lengths for both feet.
 
-    :param side: The side of the exoskeleton of which the relevant would like to be known
-    :return: The lengths of the specified side which are relevant for the (inverse) kinematics calculations
+    :param side: The side of the exoskeleton of which the lengths would like to be known
+    :return: The lengths of the specified side which are relevant for
+        the (inverse) kinematics calculations
     """
     try:
         robot = urdf.Robot.from_xml_file(
@@ -67,8 +73,9 @@ def get_lengths_robot_for_inverse_kinematics(side=None):
                 get_package_share_directory("march_description"), "urdf", "march4.urdf"
             )
         )
-        # size[0], size[1] and size[2] are used to grab relevant length of the link, e.g. the relevant length of the
-        # hip base is in the y direction, that of the upper leg in the z direction.
+        # size[0], size[1] and size[2] are used to grab relevant length of the link,
+        # e.g. the relevant length of the hip base is in the y direction, that of the
+        # upper leg in the z direction.
         base = (
             robot.link_map["hip_base"].collisions[0].geometry.size[1]
         )  # length of the hip base structure
@@ -96,8 +103,8 @@ def get_lengths_robot_for_inverse_kinematics(side=None):
         r_ph = (
             robot.link_map["hip_aa_frame_right_side"].collisions[0].geometry.size[1]
         )  # right pelvis hip length
-        # the foot is a certain amount more to the inside of the exo then the leg structures.
-        # The haa arms need to account for this.
+        # The foot is a certain amount more to the inside of the exo then the
+        # leg structures. The haa arms need to account for this.
         off_set = (
             robot.link_map["ankle_plate_right"].visual.origin.xyz[1] + base / 2 + r_hl
         )
@@ -106,9 +113,7 @@ def get_lengths_robot_for_inverse_kinematics(side=None):
 
     except KeyError as e:
         raise KeyError(
-            'Expected robot.link_map to contain "{key}", but "{key}" was missing.'.format(
-                key=e.args[0]
-            )
+            f"Expected robot.link_map to contain {e.args[0]}, but it was missing."
         )
 
     if side == Side.left:
@@ -119,14 +124,11 @@ def get_lengths_robot_for_inverse_kinematics(side=None):
         return [l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base]
     else:
         raise SideSpecificationError(
-            side,
-            "Side should be either 'left', 'right' or 'both', but was {side}".format(
-                side=side
-            ),
+            side, f"Side should be either 'left', 'right' or 'both', but was {side}"
         )
 
 
-def get_joint_names_for_inverse_kinematics():
+def get_joint_names_for_inverse_kinematics() -> List[str]:
     robot = urdf.Robot.from_xml_file(
         os.path.join(
             get_package_share_directory("march_description"), "urdf", "march4.urdf"
@@ -144,10 +146,8 @@ def get_joint_names_for_inverse_kinematics():
     for joint_name in joint_name_list:
         if joint_name not in robot_joint_names:
             raise KeyError(
-                "Inverse kinematics calculation expected the robot to have joint "
-                "{joint_name}, but {joint_name} was not found.".format(
-                    joint_name=joint_name
-                )
+                f"Inverse kinematics calculation expected the robot to have joint "
+                f"{joint_name}, but {joint_name} was not found."
             )
 
     return joint_name_list
