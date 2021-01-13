@@ -1,3 +1,4 @@
+from __future__ import annotations
 from march_shared_classes.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
     weighted_average,
@@ -72,13 +73,16 @@ class Setpoint(object):
         return not self.__eq__(other)
 
     @classmethod
-    def calculate_next_positions_joint(cls, setpoint_dic):
-        """Calculates the position of the joints a moment later given a setpoint dictionary.
+    def calculate_next_positions_joint(cls, setpoint_dic: dict) -> dict:
+        """Calculates the position of the joints a moment later given a
+        setpoint dictionary.
 
-        Calculates using the approximation next_position = position + current_velocity * time_difference
+        Calculates using the approximation:
+         next_position = position + current_velocity * time_difference
 
         :param setpoint_dic: A dictionary of setpoints with positions and velocities
-        :return: A dictionary with the positions of the joints 1 / VELOCITY_SCALE_FACTOR second later
+        :return: A dictionary with the positions of the joints
+        1 / VELOCITY_SCALE_FACTOR second later
         """
         next_positions = {}
         for joint in JOINT_NAMES_IK:
@@ -95,10 +99,12 @@ class Setpoint(object):
 
         return next_positions
 
-    def add_joint_velocity_from_next_angle(self, next_state):
-        """Calculates the (left/right/all)joint velocities given a current position and a next position.
+    def add_joint_velocity_from_next_angle(self, next_state: Setpoint):
+        """Calculates the (left/right/all)joint velocities given a current position
+        and a next position.
 
-        Calculates using the approximation next_position = position + current_velocity * time_difference
+        Calculates using the approximation:
+         next_position = position + current_velocity * time_difference
 
         :param self: A Setpoint object with no velocity
         :param next_state: A Setpoint with the positions a moment later
@@ -110,7 +116,9 @@ class Setpoint(object):
         )
 
     @staticmethod
-    def interpolate_setpoints(base_setpoint, other_setpoint, parameter: float):
+    def interpolate_setpoints(
+        base_setpoint: Setpoint, other_setpoint: Setpoint, parameter: float
+    ) -> Setpoint:
         """Linearly interpolate two setpoints.
 
         :param base_setpoint:

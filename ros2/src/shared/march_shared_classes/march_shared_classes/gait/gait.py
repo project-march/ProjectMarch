@@ -110,7 +110,8 @@ class Gait(object):
         :param gait_directory: path of the directory where the .gait file is located
         :param gait_name: the name of the gait where the subgait belongs to
         :param subgait_name: the name of the subgait to load
-        :param gait_version_map: the parsed yaml file which states the version of the subgaits
+        :param gait_version_map: the parsed yaml file which states the version of
+        the subgaits
         :return: Gait if gait and subgait names are valid return populated Gait object
         """
         if gait_name not in gait_version_map:
@@ -182,9 +183,8 @@ class Gait(object):
                             >= ALLOWED_ERROR_ENDPOINTS
                         ):
                             raise NonValidGaitContent(
-                                msg="The starting position of new version {gait} {subgait} does not match".format(
-                                    gait=self.gait_name, subgait=to_subgait_name
-                                )
+                                msg=f"The starting position of new version "
+                                f"{self.gait_name} {to_subgait_name} does not match"
                             )
                 elif to_subgait_name == self.graph.END:
                     old_subgait = self.subgaits[from_subgait_name]
@@ -201,9 +201,9 @@ class Gait(object):
                             >= ALLOWED_ERROR_ENDPOINTS
                         ):
                             raise NonValidGaitContent(
-                                msg="The final position of new version {gait} {subgait} does not match".format(
-                                    gait=self.gait_name, subgait=from_subgait_name
-                                )
+                                msg=f"The final position of new version "
+                                f"{self.gait_name} {from_subgait_name} does not "
+                                f"match"
                             )
 
                 else:
@@ -216,11 +216,9 @@ class Gait(object):
 
                     if not from_subgait.validate_subgait_transition(to_subgait):
                         raise NonValidGaitContent(
-                            msg="Gait {gait} with end setpoint of subgait {sn} to subgait {ns} does not match".format(
-                                gait=self.gait_name,
-                                sn=from_subgait.subgait_name,
-                                ns=to_subgait.subgait_name,
-                            )
+                            msg=f"Gait {self.gait_name} with end setpoint of subgait "
+                            f"{from_subgait_name.subgait_name} to "
+                            f"subgait {to_subgait.subgait_name} does not match"
                         )
 
         self.subgaits.update(new_subgaits)

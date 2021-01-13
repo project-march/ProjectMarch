@@ -1,5 +1,7 @@
+from __future__ import annotations
 from typing import List
 
+from march_shared_classes.gait.subgait import Subgait
 from rclpy.duration import Duration
 from scipy.interpolate import BPoly
 from urdf_parser_py import urdf
@@ -62,7 +64,8 @@ class JointTrajectory(object):
 
     @staticmethod
     def get_joint_from_urdf(robot: urdf.Robot, joint_name: str):
-        """Get the name of the robot joint corresponding with the joint in the subgait."""
+        """Get the name of the robot joint corresponding with the joint
+        in the subgait."""
         for urdf_joint in robot.joints:
             if urdf_joint.name == joint_name:
                 return urdf_joint
@@ -84,7 +87,7 @@ class JointTrajectory(object):
         self._duration = round(new_duration, self.setpoint_class.digits)
         self.interpolate_setpoints()
 
-    def from_begin_point(self, begin_time: float, position) -> None:
+    def from_begin_point(self, begin_time: float, position: float) -> None:
         """
         Manipulates the gait to start at given time. Removes all set points
         after the given begin time. Adds the begin position with 0 velocity at
@@ -126,7 +129,7 @@ class JointTrajectory(object):
 
         return time, position, velocity
 
-    def validate_joint_transition(self, joint) -> bool:
+    def validate_joint_transition(self, joint: JointTrajectory) -> bool:
         """Validate the ending and starting of this joint to a given joint.
 
         :param joint:
@@ -154,10 +157,12 @@ class JointTrajectory(object):
         return False
 
     def _validate_boundary_points(self) -> bool:
-        """Validate the starting and ending of this joint are at t = 0 and t = duration, or that their speed is zero.
+        """Validate the starting and ending of this joint are at t = 0 and
+        t = duration, or that their speed is zero.
 
         :returns:
-            False if the starting/ending point is (not at 0/duration) and (has nonzero speed), True otherwise
+            False if the starting/ending point is (not at 0/duration) and
+            (has nonzero speed), True otherwise
         """
         return (self.setpoints[0].time == 0 or self.setpoints[0].velocity == 0) and (
             self.setpoints[-1].time == round(self.duration, Setpoint.digits)
@@ -175,12 +180,12 @@ class JointTrajectory(object):
         for i in range(0, len(time)):
             yi.append([position[i], velocity[i]])
 
-        # We do a cubic spline here, just like the ros joint_trajectory_action_controller,
-        # see https://wiki.ros.org/robot_mechanism_controllers/JointTrajectoryActionController
+        # We do a cubic spline here, like the ros joint_trajectory_action_controller,
+        # https://wiki.ros.org/robot_mechanism_controllers/JointTrajectoryActionController
         self.interpolated_position = BPoly.from_derivatives(time, yi)
         self.interpolated_velocity = self.interpolated_position.derivative()
 
-    def get_interpolated_setpoint(self, time) -> Setpoint:
+    def get_interpolated_setpoint(self, time: float) -> Setpoint:
         if time < 0:
             return self.setpoint_class(time, self.setpoints[0].position, 0)
         if time > self.duration:
@@ -200,7 +205,9 @@ class JointTrajectory(object):
 
     @staticmethod
     def interpolate_joint_trajectories(
-        base_trajectory, other_trajectory, parameter: float
+        base_trajectory: JointTrajectory,
+        other_trajectory: JointTrajectory,
+        parameter: float,
     ):
         """Linearly interpolate two joint trajectories with the parameter.
 
@@ -248,12 +255,17 @@ class JointTrajectory(object):
         )
 
     @staticmethod
-    def change_order_of_joints_and_setpoints(base_subgait, other_subgait):
-        """Change structure from joints which have a list of setpoints to a list of 'ith' setpoints with for each joint.
+    def change_order_of_joints_and_setpoints(
+        base_subgait: Subgait, other_subgait: Subgait
+    ) -> (dict, dict):
+        """Change structure from joints which have a list of setpoints to a
+        list of 'ith' setpoints with for each joint.
 
-        This function goes over each joint to get needed setpoints (all first setpoints, all second setpoints..).
-        These are placed in list with the correct index, where each entry contains a dictionary with joint name setpoint
-        pairs. Also checks whether the joint trajectories are safe to interpolate.
+        This function goes over each joint to get needed setpoints
+        (all first setpoints, all second setpoints..).
+        These are placed in list with the correct index, where each entry contains a
+        dictionary with joint name setpoint pairs. Also checks whether the joint
+        trajectories are safe to interpolate.
 
         :param base_subgait: one of the subgaits to reorder
         :param other_subgait: the other subgait to reorder

@@ -20,7 +20,7 @@ class FeetState(object):
 
     def __init__(self, right_foot: Foot, left_foot: Foot, time: float = None):
         """Create a FeetState object, right_foot and left_foot are both Foot
-        objects. """
+        objects."""
         self.right_foot = right_foot
         self.left_foot = left_foot
         self.time = time
@@ -88,9 +88,9 @@ class FeetState(object):
         return feet_state
 
     @classmethod
-    def weighted_average_states(cls, base_state: FeetState,
-                                other_state: FeetState,
-                                parameter: float) -> FeetState:
+    def weighted_average_states(
+        cls, base_state: FeetState, other_state: FeetState, parameter: float
+    ) -> FeetState:
         """Computes the weighted average of two feet states.
 
         :param base_state: One of the states for the weighted average,
@@ -114,8 +114,7 @@ class FeetState(object):
         resulting_left_foot = Foot.weighted_average_foot(
             base_state.left_foot, other_state.left_foot, parameter
         )
-        resulting_time = weighted_average(base_state.time, other_state.time,
-                                          parameter)
+        resulting_time = weighted_average(base_state.time, other_state.time, parameter)
 
         return cls(resulting_right_foot, resulting_left_foot, resulting_time)
 

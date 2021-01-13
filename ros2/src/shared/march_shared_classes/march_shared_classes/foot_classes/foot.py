@@ -1,5 +1,6 @@
-from math import acos, asin, atan, cos, pi, sin, sqrt
 from __future__ import annotations
+
+from math import acos, asin, atan, cos, pi, sin, sqrt
 from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
 from march_shared_classes.exceptions.general_exceptions import SideSpecificationError
 from march_shared_classes.gait.setpoint import Setpoint
@@ -21,8 +22,7 @@ MID_CALCULATION_PRECISION_DIGITS = 10
 class Foot(object):
     """Class for capturing the state (position and possible velocity) of a foot."""
 
-    def __init__(self, foot_side: Side, position: Vector3d,
-                 velocity: float = None):
+    def __init__(self, foot_side: Side, position: Vector3d, velocity: float = None):
         """Create a Foot object, position and velocity are both Vector3d objects."""
         self.position = position
         self.velocity = velocity
@@ -72,8 +72,9 @@ class Foot(object):
             foot_state.position, foot_state.foot_side, time
         )
 
-        # find the joint angles a moment later using the foot position a moment later
-        # use this together with the current joint angles to calculate the joint velocity
+        # find the joint angles a moment later using the foot position a
+        # moment later use this together with the current joint angles to
+        # calculate the joint velocity
         next_position = Foot.calculate_next_foot_position(foot_state)
         next_joint_positions = Foot.calculate_joint_angles_from_foot_position(
             next_position.position,
@@ -90,9 +91,9 @@ class Foot(object):
         return joint_states
 
     @staticmethod
-    def calculate_joint_angles_from_foot_position(foot_position: Vector3d,
-                                                  foot_side: Side,
-                                                  time: float) -> dict:
+    def calculate_joint_angles_from_foot_position(
+        foot_position: Vector3d, foot_side: Side, time: float
+    ) -> dict:
         """Calculates the angles of the joints corresponding to a certain
         position of the right or left foot.
 
@@ -158,8 +159,9 @@ class Foot(object):
         return angle_positions
 
     @staticmethod
-    def calculate_haa_angle(z_position: float, y_position: float,
-                            pelvis_hip_length: float):
+    def calculate_haa_angle(
+        z_position: float, y_position: float, pelvis_hip_length: float
+    ):
         """Calculates the haa angle of the exoskeleton given a desired y and z
         position of the exoskeleton.
 
@@ -212,8 +214,9 @@ class Foot(object):
         return haa
 
     @staticmethod
-    def calculate_hfe_kfe_angles(transformed_x: float, transformed_z: float,
-                                 upper_leg: float, lower_leg: float):
+    def calculate_hfe_kfe_angles(
+        transformed_x: float, transformed_z: float, upper_leg: float, lower_leg: float
+    ):
         """Calculates the hfe and kfe given a desired transformed x and z
         coordinate using the cosine rule.
 
@@ -255,8 +258,7 @@ class Foot(object):
         return hfe, kfe
 
     @staticmethod
-    def calculate_foot_position(haa: float, hfe: float, kfe: float,
-                                side: Side) -> Foot:
+    def calculate_foot_position(haa: float, hfe: float, kfe: float, side: Side) -> Foot:
         """Calculates the foot position given the relevant angles, lengths
         and a specification of the foot.
 
@@ -287,8 +289,7 @@ class Foot(object):
         return Foot(side, Vector3d(x_position, y_position, z_position))
 
     @staticmethod
-    def weighted_average_foot(base_foot: Foot, other_foot: Foot,
-                              parameter: float):
+    def weighted_average_foot(base_foot: Foot, other_foot: Foot, parameter: float):
         """Computes the weighted average of two Foot objects, result has a
         velocity of None if it cannot be computed."""
         if base_foot.foot_side != other_foot.foot_side:
