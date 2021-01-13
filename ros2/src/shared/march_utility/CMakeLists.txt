@@ -21,12 +21,13 @@ find_package(ament_cmake_python REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclpy REQUIRED)
 find_package(march_shared_msgs REQUIRED)
+find_package(march_description REQUIRED)
 
 # Install cpp libraries
 add_library(${PROJECT_NAME}
         src/node_utils.cpp
         )
-ament_target_dependencies(${PROJECT_NAME} march_shared_msgs rclcpp)
+ament_target_dependencies(${PROJECT_NAME} march_shared_msgs march_description rclcpp)
 target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
