@@ -26,7 +26,7 @@ void SafetyHandler::publishErrorMessage(const std::string& message, const rclcpp
   error_msg.error_message = message;
   error_msg.type = error_type;
 
-  RCLCPP_INFO_STREAM(this->node_->get_logger(),"publishing error, num subs: " << node_->count_subscribers("/march/error"));
+  RCLCPP_INFO(this->node_->get_logger(),"publishing error");
 
   this->error_publisher_->publish(error_msg);
 }

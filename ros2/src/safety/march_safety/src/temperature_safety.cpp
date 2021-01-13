@@ -10,6 +10,7 @@
 #include <vector>
 
 const double DEFAULT_TEMPERATURE_THRESHOLD {40.0};
+const int DEFAULT_SEND_ERRORS_INTERVAL {1000};
 
 // TODO(@Tim) Throw an exception when no temperatures are published.
 TemperatureSafety::TemperatureSafety(SafetyNode* node,
@@ -17,15 +18,19 @@ TemperatureSafety::TemperatureSafety(SafetyNode* node,
                                      std::vector<std::string> joint_names)
   : node_(node),
   safety_handler_(safety_handler),
+  send_errors_interval_(0),
   joint_names_(std::move(joint_names))
 {
   node_->get_parameter_or("default_temperature_threshold", default_temperature_threshold_, DEFAULT_TEMPERATURE_THRESHOLD);
   setAllTemperatureThresholds();
 
-  node_->get_parameter("send_errors_interval", send_errors_interval_);
-  this->time_last_send_error_ = rclcpp::Time(0);
+  int send_errors_interval_ms;
+  node_->get_parameter_or("send_errors_interval", send_errors_interval_ms, DEFAULT_SEND_ERRORS_INTERVAL);
+  send_errors_interval_ = rclcpp::Duration(std::chrono::milliseconds(send_errors_interval_ms));
 
-  this->createSubscribers();
+  time_last_send_error_ = node_->get_clock()->now() - send_errors_interval_;
+
+  createSubscribers();
 }
 
 void TemperatureSafety::setAllTemperatureThresholds()
@@ -38,15 +43,13 @@ void TemperatureSafety::setAllTemperatureThresholds()
 
 void TemperatureSafety::setTemperatureThresholds(std::string& type)
 {
-  auto temperature_thresholds_map = getThresholdsMap(type);
-
   for (std::string joint : joint_names_)
   {
     double threshold_value;
     std::string parameter_name = "temperature_thresholds_" + type + "." + joint;
 
     bool parameter_is_set = node_->get_parameter_or(parameter_name, threshold_value, default_temperature_threshold_);
-    temperature_thresholds_map.insert({joint, threshold_value});
+    setThreshold(type, joint, threshold_value);
 
     RCLCPP_INFO_STREAM(node_->get_logger(), "Name: " << parameter_name << ", value: " << threshold_value << ", Set:" << parameter_is_set);
 
@@ -56,21 +59,31 @@ void TemperatureSafety::setTemperatureThresholds(std::string& type)
   }
 }
 
-TemperatureSafety::ThresholdHoldsMap TemperatureSafety::getThresholdsMap(std::string& type)
+void TemperatureSafety::setThreshold(std::string& type, std::string joint, double threshold_value)
 {
   // Is there a better way to do this ?
-    if (type.compare("fatal") == 0)
-        return fatal_temperature_thresholds_map_;
-    else if (type.compare("non_fatal") == 0)
-        return non_fatal_temperature_thresholds_map_;
+    if (type == "fatal")
+    {
+      fatal_temperature_thresholds_map_.insert({ joint, threshold_value });
+    }
+    else if (type == "non_fatal")
+    {
+      non_fatal_temperature_thresholds_map_.insert({ joint, threshold_value });
+    }
+    else if (type == "warning")
+    {
+       warning_temperature_thresholds_map_.insert({ joint, threshold_value });
+    }
     else
-        return warning_temperature_thresholds_map_;
+    {
+        RCLCPP_WARN_STREAM(node_->get_logger(), "Unknown temperature threshold type: " << type);
+    }
 }
 
 void TemperatureSafety::temperatureCallback(const TemperatureMsg::SharedPtr msg, const std::string& sensor_name)
 {
   // send at most an error every second
-  if (node_->get_clock()->now() <= (time_last_send_error_ + rclcpp::Duration(std::chrono::milliseconds(send_errors_interval_))))
+  if (node_->get_clock()->now() <= (time_last_send_error_ + send_errors_interval_))
   {
     return;
   }

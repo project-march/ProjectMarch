@@ -51,12 +51,12 @@ private:
 
   void setAllTemperatureThresholds();
   void setTemperatureThresholds(std::string& type);
-  ThresholdHoldsMap getThresholdsMap(std::string& type);
+  void setThreshold(std::string& type, std::string joint, double threshold_value);
 
   SafetyNode* node_;
   std::shared_ptr<SafetyHandler> safety_handler_;
   double default_temperature_threshold_;
-  long send_errors_interval_;
+  rclcpp::Duration send_errors_interval_;
   rclcpp::Time time_last_send_error_;
 
   ThresholdHoldsMap fatal_temperature_thresholds_map_;
