@@ -1,5 +1,4 @@
 import os
-import time
 import unittest
 
 import pytest
@@ -11,7 +10,6 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 from launch_testing.actions import ReadyToTest
 from march_shared_msgs.msg import Alive, Error
-from rclpy.executors import MultiThreadedExecutor
 from test.util import ErrorCounter
 
 INPUT_DEVICE_CONNECTION_TIMEOUT = 500
@@ -60,16 +58,15 @@ class TestMarchSafetyConnectionLost(unittest.TestCase):
 
         self.input_device_connection_timeout = INPUT_DEVICE_CONNECTION_TIMEOUT
         self.error_topic = "/march/error"
-        self.input_alive_topic = "/march/input_device/alive"
-
-        self.alive_publisher = self.node.create_publisher(msg_type=Alive,
-                                                          topic=self.input_alive_topic,
-                                                          qos_profile=0)
-
         self.node.create_subscription(msg_type=Error,
                                       topic=self.error_topic,
                                       callback=self.error_counter.cb,
                                       qos_profile=1)
+
+        self.input_alive_topic = "/march/input_device/alive"
+        self.alive_publisher = self.node.create_publisher(msg_type=Alive,
+                                                          topic=self.input_alive_topic,
+                                                          qos_profile=0)
 
     def tearDown(self):
         """Destroy the ROS node."""

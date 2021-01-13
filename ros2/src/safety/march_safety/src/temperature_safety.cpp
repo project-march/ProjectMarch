@@ -2,6 +2,7 @@
 
 #include "march_safety/temperature_safety.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "rclcpp/parameter.hpp"
 
 #include <chrono>
 #include <map>
@@ -42,9 +43,16 @@ void TemperatureSafety::setTemperatureThresholds(std::string& type)
   for (std::string joint : joint_names_)
   {
     double threshold_value;
-    auto parameter = "temperature_thresholds_" + type + "." + joint;
-    node_->get_parameter_or(parameter, threshold_value, default_temperature_threshold_);
+    std::string parameter_name = "temperature_thresholds_" + type + "." + joint;
+
+    bool parameter_is_set = node_->get_parameter_or(parameter_name, threshold_value, default_temperature_threshold_);
     temperature_thresholds_map.insert({joint, threshold_value});
+
+    RCLCPP_INFO_STREAM(node_->get_logger(), "Name: " << parameter_name << ", value: " << threshold_value << ", Set:" << parameter_is_set);
+
+    if (!parameter_is_set) {
+        node_->declare_parameter(parameter_name, default_temperature_threshold_);
+    }
   }
 }
 
