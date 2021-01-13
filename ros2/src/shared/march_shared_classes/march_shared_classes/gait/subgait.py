@@ -54,7 +54,7 @@ class Subgait(object):
 
     # region Create subgait
     @classmethod
-    def from_file(cls, robot: urdf.Robot, file_name: str, *args):
+    def from_file(cls, robot: urdf.Robot, file_name: str):
         """Extract sub gait data of the given yaml.
 
         :param robot:
@@ -78,7 +78,7 @@ class Subgait(object):
         version = file_name.split("/")[-1].replace(SUBGAIT_SUFFIX, "")
 
         return cls.from_dict(
-            robot, subgait_dict, gait_name, subgait_name, version, *args
+            robot, subgait_dict, gait_name, subgait_name, version
         )
 
     @classmethod
@@ -89,7 +89,6 @@ class Subgait(object):
         gait_name: str,
         subgait_name: str,
         version: str,
-        *args,
     ):
         """Load subgait based from file(s) based on name and version.
 
@@ -98,7 +97,6 @@ class Subgait(object):
         :param gait_name: The name of the corresponding gait
         :param subgait_name: The name of the subgait to load
         :param version: The version to use, this can be parametric
-        :param args:
         :return: A populated Subgait object.
         """
         subgait_path = os.path.join(gait_dir, gait_name, subgait_name)
@@ -110,7 +108,7 @@ class Subgait(object):
                 subgait_version_path = os.path.join(
                     subgait_path, base_version + SUBGAIT_SUFFIX
                 )
-                return cls.from_file(robot, subgait_version_path, *args)
+                return cls.from_file(robot, subgait_version_path)
             else:
                 base_version_path = os.path.join(
                     subgait_path, base_version + SUBGAIT_SUFFIX
@@ -128,7 +126,7 @@ class Subgait(object):
 
         else:
             subgait_version_path = os.path.join(subgait_path, version + SUBGAIT_SUFFIX)
-            return cls.from_file(robot, subgait_version_path, *args)
+            return cls.from_file(robot, subgait_version_path)
 
     @classmethod
     def from_files_interpolated(
@@ -137,9 +135,8 @@ class Subgait(object):
         file_name_base: str,
         file_name_other: str,
         parameter: float,
-        use_foot_position=False,
-        *args,
-    ):
+        use_foot_position: bool = False,
+    ) -> Subgait:
         """Extract two subgaits from files and interpolate.
 
         :param robot:
@@ -155,8 +152,8 @@ class Subgait(object):
         :return:
             A populated Subgait object
         """
-        base_subgait = cls.from_file(robot, file_name_base, *args)
-        other_subgait = cls.from_file(robot, file_name_other, *args)
+        base_subgait = cls.from_file(robot, file_name_base)
+        other_subgait = cls.from_file(robot, file_name_other)
         return cls.interpolate_subgaits(
             base_subgait, other_subgait, parameter, use_foot_position
         )
@@ -169,7 +166,6 @@ class Subgait(object):
         gait_name: str,
         subgait_name: str,
         version: str,
-        *args,
     ):
         """List parameters from the yaml file in organized lists.
 
@@ -207,7 +203,7 @@ class Subgait(object):
                 continue
             limits = Limits.from_urdf_joint(urdf_joint)
             joint_list.append(
-                cls.joint_class.from_setpoints(name, limits, points, duration, *args)
+                cls.joint_class.from_setpoints(name, limits, points, duration)
             )
         subgait_type = (
             subgait_dict["gait_type"] if subgait_dict.get("gait_type") else ""
@@ -293,7 +289,8 @@ class Subgait(object):
     # endregion
 
     # region Manipulate subgait
-    def scale_timestamps_subgait(self, new_duration: float, rescale: bool = True):
+    def scale_timestamps_subgait(self, new_duration: float, rescale: bool = True) -> \
+            None:
         """Scale or cut off all the setpoint to match the duration in both subgaits.
 
         :param new_duration: the new duration to scale the setpoints with
@@ -479,21 +476,39 @@ class Subgait(object):
 
     @staticmethod
     def validate_version(gait_path: str, subgait_name: str, version: str) -> bool:
-        """Check whether a gait exists for the gait."""
+        """ Check whether a gait exists for the gait.
+
+        :param gait_path: The path to the gait
+        :param subgait_name: The name of the subgait
+        :param version: The version of the subgait
+        :return: Whether the gait is valid
+        """
         subgait_path = os.path.join(gait_path, subgait_name)
         if version.startswith(PARAMETRIC_GAITS_PREFIX):
-            base_version, other_version, _ = Subgait.unpack_parametric_version(version)
-            base_version_path = os.path.join(
-                subgait_path, base_version + SUBGAIT_SUFFIX
-            )
-            other_version_path = os.path.join(
-                subgait_path, other_version + SUBGAIT_SUFFIX
-            )
-            for version_path in [base_version_path, other_version_path]:
-                if not os.path.isfile(version_path):
-                    return False
+            Subgait.validate_parametric_version(subgait_path, version)
         else:
             version_path = os.path.join(subgait_path, version + SUBGAIT_SUFFIX)
+            if not os.path.isfile(version_path):
+                return False
+        return True
+
+    @staticmethod
+    def validate_parametric_version(subgait_path: str, version: str)\
+            -> bool:
+        """ Check whether a parametric gait is valid.
+
+        :param subgait_path: The path to the subgait file
+        :param version: The version of the parametric gait
+        :return: True if the subgait is parametrized between two existing subgaits
+        """
+        base_version, other_version, _ = Subgait.unpack_parametric_version(version)
+        base_version_path = os.path.join(
+            subgait_path, base_version + SUBGAIT_SUFFIX
+        )
+        other_version_path = os.path.join(
+            subgait_path, other_version + SUBGAIT_SUFFIX
+        )
+        for version_path in [base_version_path, other_version_path]:
             if not os.path.isfile(version_path):
                 return False
         return True
@@ -513,7 +528,7 @@ class Subgait(object):
     @staticmethod
     def check_foot_position_interpolation_is_safe(
         base_subgait: Subgait, other_subgait: Subgait
-    ):
+    ) -> None:
         """Checks whether two subgaits are safe to be interpolated based on
         foot location."""
         number_of_setpoints = len(base_subgait.joints[0].setpoints)
@@ -522,6 +537,7 @@ class Subgait(object):
             sorted(base_subgait.joints, key=lambda joint: joint.name),
             sorted(other_subgait.joints, key=lambda joint: joint.name),
         ):
+            JointTrajectory.check_joint_interpolation_is_safe(base_joi)
             if base_joint.name != other_joint.name:
                 raise SubgaitInterpolationError(
                     "The subgaits to interpolate do not have the same joints, base"

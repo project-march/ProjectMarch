@@ -27,7 +27,6 @@ class JointTrajectory(object):
         limits: Limits,
         setpoints: List[Setpoint],
         duration: float,
-        *args,
     ):
         self.name = name
         self.limits = limits
@@ -39,7 +38,7 @@ class JointTrajectory(object):
 
     @classmethod
     def from_setpoints(
-        cls, name: str, limits: Limits, setpoints: List[dict], duration: float, *args
+        cls, name: str, limits: Limits, setpoints: List[dict], duration: float
     ):
         """Creates a list of joint trajectories.
 
@@ -60,12 +59,16 @@ class JointTrajectory(object):
             )
             for setpoint in setpoints
         ]
-        return cls(name, limits, setpoints, duration, *args)
+        return cls(name, limits, setpoints, duration)
 
     @staticmethod
-    def get_joint_from_urdf(robot: urdf.Robot, joint_name: str):
-        """Get the name of the robot joint corresponding with the joint
-        in the subgait."""
+    def get_joint_from_urdf(robot: urdf.Robot, joint_name: str) -> str:
+        """ Get the name of the robot joint corresponding with the joint
+        in the subgait.
+
+        :param robot: The urdf robot to use
+        :param joint_name: The name to look for
+        """
         for urdf_joint in robot.joints:
             if urdf_joint.name == joint_name:
                 return urdf_joint
@@ -76,6 +79,12 @@ class JointTrajectory(object):
         return self._duration
 
     def set_duration(self, new_duration: float, rescale: bool = True) -> None:
+        """ Change the duration of the joint trajectory.
+
+        :param new_duration: The new duration to change to.
+        :param rescale:
+        :return:
+        """
         for setpoint in reversed(self.setpoints):
             if rescale:
                 setpoint.time = setpoint.time * new_duration / self.duration
@@ -89,10 +98,11 @@ class JointTrajectory(object):
 
     def from_begin_point(self, begin_time: float, position: float) -> None:
         """
-        Manipulates the gait to start at given time. Removes all set points
+        Manipulate the gait to start at given time. Removes all set points
         after the given begin time. Adds the begin position with 0 velocity at
         the start. It also adds 1 second at the beginning to allow speeding up
         to the required speed again.
+
         :param begin_time: The time to start
         :param position: The position to start from
         """
@@ -157,7 +167,7 @@ class JointTrajectory(object):
         return False
 
     def _validate_boundary_points(self) -> bool:
-        """Validate the starting and ending of this joint are at t = 0 and
+        """ Validate the starting and ending of this joint are at t = 0 and
         t = duration, or that their speed is zero.
 
         :returns:
@@ -186,6 +196,8 @@ class JointTrajectory(object):
         self.interpolated_velocity = self.interpolated_position.derivative()
 
     def get_interpolated_setpoint(self, time: float) -> Setpoint:
+        """ Get a setpoint on a certain time. If there is no setpoint
+         at this time point, it will interpolate between the setpoints. """
         if time < 0:
             return self.setpoint_class(time, self.setpoints[0].position, 0)
         if time > self.duration:
@@ -208,7 +220,7 @@ class JointTrajectory(object):
         base_trajectory: JointTrajectory,
         other_trajectory: JointTrajectory,
         parameter: float,
-    ):
+    ) -> JointTrajectory:
         """Linearly interpolate two joint trajectories with the parameter.
 
         :param base_trajectory:
@@ -258,7 +270,7 @@ class JointTrajectory(object):
     def change_order_of_joints_and_setpoints(
         base_subgait: Subgait, other_subgait: Subgait
     ) -> (dict, dict):
-        """Change structure from joints which have a list of setpoints to a
+        """ Change structure from joints which have a list of setpoints to a
         list of 'ith' setpoints with for each joint.
 
         This function goes over each joint to get needed setpoints

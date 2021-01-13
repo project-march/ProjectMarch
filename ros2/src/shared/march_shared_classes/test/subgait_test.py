@@ -76,6 +76,7 @@ class SubgaitTest(unittest.TestCase):
             0.5,
             use_foot_position=False,
         )
+        self.assertIsInstance(subgait, Subgait)
 
     def test_from_files_interpolated_correct_ik(self):
         base_subgait_path = "{rsc}/{gait}/{subgait}/{version}.subgait".format(
@@ -253,9 +254,9 @@ class SubgaitTest(unittest.TestCase):
 
     def load_interpolatable_subgaits_ik(
         self,
-        subgait_name="swing",
-        base_version="forward_swing",
-        other_version="backward_swing",
+        subgait_name: str = "swing",
+        base_version: str = "forward_swing",
+        other_version: str = "backward_swing",
     ):
         base_subgait_path = "{rsc}/{gait}/{subgait}/{version}.subgait".format(
             rsc=self.resources_folder,
