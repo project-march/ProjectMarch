@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import os
 import time
 import unittest
+from threading import Event
 
 import pytest
 import rclpy
@@ -16,6 +17,7 @@ from march_shared_msgs.msg import Error
 from rcl_interfaces.srv import GetParameters, ListParameters
 from sensor_msgs.msg import Temperature
 from test.util import ErrorCounter
+from parameterized import parameterized
 
 TIMEOUT_DURATION = 3
 JOINT_NAMES = ['test_joint1', 'test_joint2', 'test_joint3']
@@ -49,7 +51,7 @@ def generate_test_description():
     ]), {})
 
 
-class TestMarchSafetyConnectionLost(unittest.TestCase):
+class TestMarchSafetyTemperature(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Initialize the ROS context for the test node."""
@@ -63,7 +65,8 @@ class TestMarchSafetyConnectionLost(unittest.TestCase):
     def setUp(self):
         """Create a ROS node for tests."""
         self.node = rclpy.create_node('test_march_safety_temperature')
-        self.error_counter = ErrorCounter(self.node)
+        self.event = Event()
+        self.error_counter = ErrorCounter(self.node, self.event)
 
         self.error_topic = "/march/error"
         self.node.create_subscription(msg_type=Error,
@@ -98,63 +101,36 @@ class TestMarchSafetyConnectionLost(unittest.TestCase):
                          for value in future.result().values]
         self.assertEqual(expected_values, actual_values)
 
-    def test_below_specific_threshold(self):
-        joint_name = 'test_joint1'
+    @parameterized.expand([
+        ["below_default_threshold", 'default_temperature_threshold', -1, 1, 0, 'test_joint3'],
+        ['below_warning_threshold', 'temperature_thresholds_warning', -1, 1, 0, "test_joint1"],
+        ['between_warning_and_non_fatal_threshold', 'temperature_thresholds_warning', 1, 1, 0, "test_joint1"],
+        ['between_non_fatal_and_fatal_threshold', 'temperature_thresholds_non_fatal', 1, 1, 1, "test_joint1"],
+        ['exceed_fatal_threshold', 'temperature_thresholds_fatal', 1, 1, 1, "test_joint1"],
+        ['exceed_fatal_threshold_multiple_times', 'temperature_thresholds_fatal', 1, 3, 3, "test_joint1"],
+        ['exceed_default_threshold', 'default_temperature_threshold', 1, 1, 1, "test_joint3"],
+        ['exceed_default_threshold_multiple_times', 'default_temperature_threshold', 1, 3, 3, "test_joint3"]
+    ])
+    def test_parameterized(self, test_name, threshold_type, temperature_difference,
+                           times, expected_error_count, joint_name):
         publisher = self.create_joint_publisher(joint_name)
         self.wait_for_node_startup(joint_name)
-
-        self.publish_temperature(publisher,
-                                 self.get_threshold('temperature_thresholds_non_fatal',
-                                                    joint_name) - 1)
-
-        # Wait for some time to let node handle published temperature
-        rclpy.spin_once(self.node, timeout_sec=TIMEOUT_DURATION)
-
-        self.assertEqual(self.error_counter.count, 0)
-
-    def test_below_default_threshold(self):
-        joint_name = 'test_joint3'
-        publisher = self.create_joint_publisher(joint_name)
-        self.wait_for_node_startup(joint_name)
-
-        self.publish_temperature(publisher,
-                                 self.thresholds['default_temperature_threshold'] - 1)
-
-        # Wait for some time to let node handle published temperature
-        rclpy.spin_once(self.node, timeout_sec=TIMEOUT_DURATION)
-
-        self.assertEqual(self.error_counter.count, 0)
-
-    def test_exceed_default_threshold(self):
-        joint_name = 'test_joint3'
-        publisher = self.create_joint_publisher(joint_name)
-        self.wait_for_node_startup(joint_name)
-
-        self.publish_temperature(publisher,
-                                 self.thresholds['default_temperature_threshold'] + 1)
-
-        # Wait for some time to let node handle published temperature
-        rclpy.spin_once(self.node, timeout_sec=TIMEOUT_DURATION)
-
-        self.assertEqual(self.error_counter.count, 1)
-
-    def test_exceed_default_threshold_multiple_times(self):
-        joint_name = 'test_joint3'
-        publisher = self.create_joint_publisher(joint_name)
-        self.wait_for_node_startup(joint_name)
-
-        times = 3
 
         for _ in range(times):
             self.publish_temperature(publisher,
-                                     self.thresholds['default_temperature_threshold'] + 1)
-            # Wait for some time to let node handle published temperature
+                                     self.get_threshold(threshold_type, joint_name) + temperature_difference)
+
+            # Execute publish temperature callback
             rclpy.spin_once(self.node, timeout_sec=TIMEOUT_DURATION)
 
             # Sleep some extra time to let send_errors_interval pass
             time.sleep(self.thresholds['send_errors_interval'] / 1000)
 
-        self.assertEqual(self.error_counter.count, times)
+            # Execute (possible) publish error callback
+            rclpy.spin_once(self.node, timeout_sec=TIMEOUT_DURATION)
+
+        self.assertEqual(self.error_counter.count, expected_error_count,
+                         msg=f"Test name: {test_name}")
 
     def wait_for_parameter_availability(self, parameter_names: set, timeout=TIMEOUT_DURATION) -> bool:
         client = self.node.create_client(srv_type=ListParameters,
@@ -184,7 +160,8 @@ class TestMarchSafetyConnectionLost(unittest.TestCase):
                                           qos_profile=0)
 
     def get_threshold(self, threshold_type, joint_name):
-        if joint_name in self.thresholds[threshold_type]:
+        if not threshold_type == 'default_temperature_threshold' and \
+                joint_name in self.thresholds[threshold_type]:
             return self.thresholds[threshold_type][joint_name]
         else:
             return self.thresholds['default_temperature_threshold']

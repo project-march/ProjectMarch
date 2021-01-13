@@ -40,7 +40,7 @@ def generate_test_description():
     ]), {})
 
 
-class TestMarchSafetyConnectionLost(unittest.TestCase):
+class TestMarchSafetyConnection(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Initialize the ROS context for the test node."""
