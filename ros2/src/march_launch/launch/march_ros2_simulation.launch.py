@@ -129,6 +129,16 @@ def generate_launch_description():
                 ],
                 condition=IfCondition(gait_selection),
             ),
+            # March robot information
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    os.path.join(
+                        get_package_share_directory("march_robot_information"),
+                        "launch",
+                        "robot_information.launch.py",
+                    )
+                )
+            ),
             # Fake sensor data
             DeclareLaunchArgument(
                 name="fake_sensor_data",
