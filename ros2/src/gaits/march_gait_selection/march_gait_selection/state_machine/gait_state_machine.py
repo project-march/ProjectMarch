@@ -261,7 +261,18 @@ class GaitStateMachine(object):
     def check_foot_pressure(self, gait_name):
         """Check if the pressure is placed on the right foot when starting a gait from idle."""
 
-        return 0
+        # Get subgait name from current gait
+        subgait_name = "right_open"
+
+        # Check if the pressure is placed on the correct foot
+        # Pressure always has to be placed on the foot opposite to the starting foot
+        pressure_right_foot = False
+        if "right" in subgait_name and pressure_right_foot:
+            return 0
+        elif "left" in subgait_name and not pressure_right_foot:
+            return 0
+        else:
+            return 1
 
     def _process_idle_state(self):
         """If the current state is idle, this function processes input for
