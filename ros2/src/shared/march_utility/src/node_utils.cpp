@@ -39,10 +39,7 @@ namespace node_utils
         auto result = client->async_send_request(request);
         if (rclcpp::spin_until_future_complete(node.get_node_base_interface(), result) == rclcpp::FutureReturnCode::SUCCESS)
         {
-          for (auto joint_name : result.get()->joint_names)
-          {
-            names.push_back(joint_name);
-          }
+          names = result.get()->joint_names;
         }
         else
         {
