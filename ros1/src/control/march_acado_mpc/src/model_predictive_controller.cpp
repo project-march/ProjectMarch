@@ -27,7 +27,7 @@ void ModelPredictiveController::init() {
     acadoVariables.x[i * ACADO_NX + 1] = 0; // dtheta
   }
 
-  double theta_ref = 60*(M_PI/180)
+  double theta_ref = 60*(M_PI/180);
 
   // Prepare references (step reference)
   for (int i = 0; i < ACADO_N; ++i) {
