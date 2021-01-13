@@ -639,6 +639,7 @@ def check_string(text: str) -> str:
 
     :type text: str
     :param text: The text to split
+
     :return New string which contains newlines
     """
     words = text.replace("_", " ").split(" ")

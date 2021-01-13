@@ -37,8 +37,9 @@ class SetpointTest(unittest.TestCase):
     def test_string_output(self):
         self.assertEqual(
             str(self.setpoint),
-            "Time: %s, Position: %s, Velocity: %s"
-            % (1.12341254, 0.03434126, 123.16208455),
+            "Time: {t}, Position: {p}, Velocity: {v}".format(
+                t=1.12341254, p=0.03434126, v=123.16208455
+            ),
         )
 
     def test_equal(self):
@@ -103,8 +104,8 @@ class SetpointTest(unittest.TestCase):
         dif_right = (
             desired_state.right_foot.position - resulting_position.right_foot.position
         )
-        self.assertTrue((dif_left.norm() < 0.00001))
-        self.assertTrue((dif_right.norm() < 1 / 0.00001))
+        self.assertLess(dif_left.norm(), 0.00001)
+        self.assertLess(dif_right.norm(), 1 / 0.00001)
 
     def test_weighted_average_states(self):
         parameter = 0.8

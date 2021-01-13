@@ -1,4 +1,6 @@
-class FileNotFoundError(Exception):
+# TODO(Thijs): Update this to the Python 3 builtin FileNotFoundError. Python 2 did not have this
+# https://gitlab.com/project-march/march/-/issues/663
+class FileNotFoundError(Exception):  # noqa: A001
     def __init__(self, file_path, msg=None):
         """Class to raise an error when a file cannot be found.
 

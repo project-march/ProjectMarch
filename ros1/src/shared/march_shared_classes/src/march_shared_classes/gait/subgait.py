@@ -73,7 +73,7 @@ class Subgait(object):
             with open(file_name, "r") as yaml_file:
                 subgait_dict = yaml.load(yaml_file, Loader=yaml.SafeLoader)
 
-        except Exception as e:
+        except Exception as e:  # noqa: PIE786
             rospy.logerr(
                 "Error occurred in subgait: {te}, {er} ".format(te=type(e), er=e)
             )

@@ -29,7 +29,9 @@ class SetpointTest(unittest.TestCase):
     def test_string_output(self):
         self.assertEqual(
             str(self.setpoint),
-            "Time: %s, Position: %s, Velocity: %s" % (1.1234, 0.0343, 123.1621),
+            "Time: {t}, Position: {p}, Velocity: {v}".format(
+                t=1.1234, p=0.0343, v=123.1621
+            ),
         )
 
     def test_equal(self):

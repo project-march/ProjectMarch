@@ -18,8 +18,7 @@ class JointSettingSpinBoxDelegate(QtGui.QItemDelegate):
         self.duration = duration
         self.digits = digits
 
-    def createEditor(self, parent, option, index):
-
+    def createEditor(self, parent, option, index):  # noqa: N802
         time_offset = 1 / math.pow(10, self.digits)
 
         row = index.row()
@@ -66,16 +65,14 @@ class JointSettingSpinBoxDelegate(QtGui.QItemDelegate):
 
         return editor
 
-    def setEditorData(self, spin_box, index):
+    def setEditorData(self, spin_box, index):  # noqa: N802
         value = float(index.model().data(index, QtCore.Qt.EditRole))
-
         spin_box.setValue(value)
 
-    def setModelData(self, spin_box, model, index):
+    def setModelData(self, spin_box, model, index):  # noqa: N802
         spin_box.interpretText()
         value = round(spin_box.value(), self.digits)
-
         model.setData(index, str(value), QtCore.Qt.EditRole)
 
-    def updateEditorGeometry(self, editor, option, index):
+    def updateEditorGeometry(self, editor, option, index):  # noqa: N802
         editor.setGeometry(option.rect)

@@ -47,6 +47,7 @@ class GaitInterface(object):
         """Called in a loop with the elapsed time since the last update.
 
         :param float elapsed_time: Elapsed time in seconds since the last update
+
         :returns A pair of a trajectory and a flag. The trajectory that will be
                  set as the new goal for the controller, can be None. The flag
                  indicates whether the gait has finished.
@@ -57,6 +58,7 @@ class GaitInterface(object):
         """Requests a special transition.
 
         :param TransitionRequest transition_request: request on what special transition to perform
+
         :returns True when the request has been accepted, False otherwise.
         """
         return False
