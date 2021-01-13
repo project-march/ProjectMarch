@@ -50,7 +50,7 @@ class Setpoint(object):
     def __repr__(self):
         if self.velocity is not None:
             return (
-                f"Time: {self.time!s}, Position: {self.position!s}, Velocity:" 
+                f"Time: {self.time!s}, Position: {self.position!s}, Velocity:"
                 f" {self.velocity!s}"
             )
         else:
