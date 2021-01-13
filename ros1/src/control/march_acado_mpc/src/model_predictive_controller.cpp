@@ -1,8 +1,11 @@
+#define _USE_MATH_DEFINES
+
 #include "model_predictive_controller.hpp"
 #include "acado_common.h"
 
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 using namespace std;
 
@@ -24,16 +27,18 @@ void ModelPredictiveController::init() {
     acadoVariables.x[i * ACADO_NX + 1] = 0; // dtheta
   }
 
+  double theta_ref = 60*(M_PI/180)
+
   // Prepare references (step reference)
   for (int i = 0; i < ACADO_N; ++i) {
-    acadoVariables.y[i * ACADO_NY + 0] = -0.3; // theta
-    acadoVariables.y[i * ACADO_NY + 1] = 0; // dtheta
-    acadoVariables.y[i * ACADO_NY + 2] = 0; // T
+    acadoVariables.y[i * ACADO_NY + 0] = theta_ref; // theta
+    acadoVariables.y[i * ACADO_NY + 1] = 0;         // dtheta
+    acadoVariables.y[i * ACADO_NY + 2] = 0;         // T
   }
 
-  acadoVariables.yN[0] = -0.3; // theta
-  acadoVariables.yN[1] = 0; // dtheta
-  acadoVariables.yN[2] = 0; // T
+  acadoVariables.yN[0] = theta_ref; // theta
+  acadoVariables.yN[1] = 0;         // dtheta
+  acadoVariables.yN[2] = 0;         // T
 
   //TODO: Check if setting the current state feedback here is necessary
 
