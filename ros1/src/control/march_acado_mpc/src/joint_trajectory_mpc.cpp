@@ -48,19 +48,15 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
   // Update effort command
   for (unsigned int i = 0; i < num_joints_; ++i)
   {
-    // Set current joint state
+    // Get current joint state
     state = {(*joint_handles_ptr_)[i].getPosition(), (*joint_handles_ptr_)[i].getVelocity()};
     model_predictive_controllers_[i].x0 = state;
 
     // Calculate mpc control signal
     model_predictive_controllers_[i].controller();
-
-    // Set command variable
-//    command = state_error.position[i]*1000;
-//    command = -100.0;
     command = model_predictive_controllers_[i].u;
-    std::cout << command << std::endl;
-    // Apply command variable
+
+    // Apply command
     (*joint_handles_ptr_)[i].setCommand(command);
   }
 

@@ -27,7 +27,7 @@ void ModelPredictiveController::init() {
     acadoVariables.x[i * ACADO_NX + 1] = 0; // dtheta
   }
 
-  double theta_ref = 60*(M_PI/180);
+  double theta_ref = 25*(M_PI/180);
 
   // Prepare references (step reference)
   for (int i = 0; i < ACADO_N; ++i) {
@@ -39,8 +39,6 @@ void ModelPredictiveController::init() {
   acadoVariables.yN[0] = theta_ref; // theta
   acadoVariables.yN[1] = 0;         // dtheta
   acadoVariables.yN[2] = 0;         // T
-
-  //TODO: Check if setting the current state feedback here is necessary
 
   // Current state feedback
   ModelPredictiveController::setInitialState(x0);
