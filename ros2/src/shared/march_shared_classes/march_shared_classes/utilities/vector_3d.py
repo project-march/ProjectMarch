@@ -49,18 +49,6 @@ class Vector3d(object):
         z = self.z - other.z
         return Vector3d(x, y, z)
 
-    def __floordiv__(self, factor: float) -> Vector3d:
-        """
-        Divide vector with a certain factor.
-
-        :param factor: The factor to use.
-        :return: The new vector.
-        """
-        x = self.x / factor
-        y = self.y / factor
-        z = self.z / factor
-        return Vector3d(x, y, z)
-
     def __truediv__(self, factor: float) -> Vector3d:
         """
         Divide vector with a certain factor.
