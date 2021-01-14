@@ -20,6 +20,10 @@ def data_files():
             os.path.join("share", package_name, "test", "resources", "walk"),
             [os.path.join("test", "resources", "walk", "walk.gait")],
         ),
+        (
+            os.path.join("share", package_name, "test", "resources", "ik_test"),
+            [os.path.join("test", "resources", "ik_test", "ik_test.gait")],
+        ),
     ]
     for file in iglob(
         os.path.join("test", "resources", "**", "*.subgait"), recursive=True
