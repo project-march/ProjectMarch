@@ -1,3 +1,5 @@
+"""This module contains the Setpoint class used for defining gaits."""
+
 from __future__ import annotations
 from march_shared_classes.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
@@ -15,7 +17,14 @@ class Setpoint(object):
 
     digits = 8
 
-    def __init__(self, time: float, position: float, velocity: float = None):
+    def __init__(self, time: float, position: float, velocity: float = None) -> None:
+        """
+        Initialize a setpoint.
+
+        :param time: The time within the subgait.
+        :param position: The position (angle) of the joint.
+        :param velocity: The velocity of the joint.
+        """
         self._time = round(time, self.digits)  # nanoseconds
         self._position = round(position, self.digits)
         if velocity is not None:
@@ -74,37 +83,33 @@ class Setpoint(object):
 
     @classmethod
     def calculate_next_positions_joint(cls, setpoint_dic: dict) -> dict:
-        """Calculates the position of the joints a moment later given a
-        setpoint dictionary.
+        """
+        Calculate the position of the joints a moment later.
 
         Calculates using the approximation:
-         next_position = position + current_velocity * time_difference
-
+        next_position = position + current_velocity * time_difference
         :param setpoint_dic: A dictionary of setpoints with positions and velocities
-        :return: A dictionary with the positions of the joints
-        1 / VELOCITY_SCALE_FACTOR second later
+        :return: A dictionary with the positions of the joints 1 / VELOCITY_SCALE_FACTOR
+        seconds later
         """
         next_positions = {}
         for joint in JOINT_NAMES_IK:
-            if joint in setpoint_dic:
+            if joint not in setpoint_dic:
+                raise KeyError(f"Setpoint_dic is missing joint {joint}")
+            else:
                 next_positions[joint] = cls(
                     setpoint_dic[joint].time + VELOCITY_SCALE_FACTOR,
                     setpoint_dic[joint].position
                     + setpoint_dic[joint].velocity * VELOCITY_SCALE_FACTOR,
                 )
-            else:
-                raise KeyError(
-                    "Setpoint_dic is missing joint {joint}".format(joint=joint)
-                )
 
         return next_positions
 
-    def add_joint_velocity_from_next_angle(self, next_state: Setpoint):
-        """Calculates the (left/right/all)joint velocities given a current position
-        and a next position.
+    def add_joint_velocity_from_next_angle(self, next_state: Setpoint) -> None:
+        """Calculate the joint velocities given a current position and a next position.
 
         Calculates using the approximation:
-         next_position = position + current_velocity * time_difference
+        next_position = position + current_velocity * time_difference
 
         :param self: A Setpoint object with no velocity
         :param next_state: A Setpoint with the positions a moment later

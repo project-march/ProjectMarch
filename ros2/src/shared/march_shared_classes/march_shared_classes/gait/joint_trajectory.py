@@ -1,5 +1,12 @@
+"""
+This module contain the JointTrajectory class.
+
+This is used for for creating the positions that should be followed by the joints,
+and to check the safety limits.
+"""
+
 from __future__ import annotations
-from typing import List
+from typing import List, Optional
 
 from march_shared_classes.gait.subgait import Subgait
 from rclpy.duration import Duration
@@ -27,7 +34,8 @@ class JointTrajectory(object):
         limits: Limits,
         setpoints: List[Setpoint],
         duration: float,
-    ):
+    ) -> None:
+        """Initialize a joint trajectory."""
         self.name = name
         self.limits = limits
         self._setpoints = setpoints
@@ -39,7 +47,7 @@ class JointTrajectory(object):
     @classmethod
     def from_setpoints(
         cls, name: str, limits: Limits, setpoints: List[dict], duration: float
-    ):
+    ) -> JointTrajectory:
         """Creates a list of joint trajectories.
 
         :param str name: Name of the joint
@@ -62,12 +70,11 @@ class JointTrajectory(object):
         return cls(name, limits, setpoints, duration)
 
     @staticmethod
-    def get_joint_from_urdf(robot: urdf.Robot, joint_name: str) -> str:
-        """ Get the name of the robot joint corresponding with the joint
-        in the subgait.
+    def get_joint_from_urdf(robot: urdf.Robot, joint_name: str) -> Optional[str]:
+        """Get the joint from the urdf robot with the given joint name.
 
-        :param robot: The urdf robot to use
-        :param joint_name: The name to look for
+        :param robot: The urdf robot to use.
+        :param joint_name: The name to look for.
         """
         for urdf_joint in robot.joints:
             if urdf_joint.name == joint_name:
@@ -76,14 +83,15 @@ class JointTrajectory(object):
 
     @property
     def duration(self) -> float:
+        """Get the duration of the joint trajectory."""
         return self._duration
 
     def set_duration(self, new_duration: float, rescale: bool = True) -> None:
-        """ Change the duration of the joint trajectory.
+        """Change the duration of the joint trajectory.
 
         :param new_duration: The new duration to change to.
-        :param rescale:
-        :return:
+        :param rescale: If true, the trajectory will be shortened/lengthed by rescaling.
+            Else, the setpoints outside of the duration will be removed.
         """
         for setpoint in reversed(self.setpoints):
             if rescale:
@@ -98,11 +106,11 @@ class JointTrajectory(object):
 
     def from_begin_point(self, begin_time: float, position: float) -> None:
         """
-        Manipulate the gait to start at given time. Removes all set points
-        after the given begin time. Adds the begin position with 0 velocity at
-        the start. It also adds 1 second at the beginning to allow speeding up
-        to the required speed again.
+        Manipulate the gait to start at given time.
 
+        Removes all set points after the given begin time. Adds the begin position
+        with 0 velocity at the start. It also adds 1 second at the beginning
+        to allow speeding up to the required speed again.
         :param begin_time: The time to start
         :param position: The position to start from
         """
@@ -167,8 +175,7 @@ class JointTrajectory(object):
         return False
 
     def _validate_boundary_points(self) -> bool:
-        """ Validate the starting and ending of this joint are at t = 0 and
-        t = duration, or that their speed is zero.
+        """Validate the starting and ending of this joint.
 
         :returns:
             False if the starting/ending point is (not at 0/duration) and
@@ -180,6 +187,7 @@ class JointTrajectory(object):
         )
 
     def interpolate_setpoints(self) -> None:
+        """Interpolate the setpoints from the joint trajectory."""
         if len(self.setpoints) == 1:
             self.interpolated_position = lambda time: self.setpoints[0].position
             self.interpolated_velocity = lambda time: self.setpoints[0].velocity
@@ -196,8 +204,11 @@ class JointTrajectory(object):
         self.interpolated_velocity = self.interpolated_position.derivative()
 
     def get_interpolated_setpoint(self, time: float) -> Setpoint:
-        """ Get a setpoint on a certain time. If there is no setpoint
-         at this time point, it will interpolate between the setpoints. """
+        """Get a setpoint on a certain time.
+
+        If there is no setpoint at this time point, it will interpolate
+        between the setpoints.
+        """
         if time < 0:
             return self.setpoint_class(time, self.setpoints[0].position, 0)
         if time > self.duration:
@@ -270,8 +281,7 @@ class JointTrajectory(object):
     def change_order_of_joints_and_setpoints(
         base_subgait: Subgait, other_subgait: Subgait
     ) -> (dict, dict):
-        """ Change structure from joints which have a list of setpoints to a
-        list of 'ith' setpoints with for each joint.
+        """Change structure of joint trajectories to see positions per time point.
 
         This function goes over each joint to get needed setpoints
         (all first setpoints, all second setpoints..).
@@ -298,3 +308,42 @@ class JointTrajectory(object):
                     other_joint.name
                 ] = other_joint.setpoints[setpoint_index]
         return base_setpoints_to_interpolate, other_setpoints_to_interpolate
+
+    @staticmethod
+    def check_joint_interpolation_is_safe(
+        base_joint: JointTrajectory,
+        other_joint: JointTrajectory,
+        number_of_setpoints: int,
+    ) -> None:
+        """Check whether it is possible to interpolate between the two joint trajectories.
+
+        :param base_joint: The first joint trajectory to interpolate.
+        :param other_joint: The second joint trajectory to interpolate.
+        :param number_of_setpoints: The number of setpoints the joint trajectories
+            should have.
+        """
+        if base_joint.name != other_joint.name:
+            raise SubgaitInterpolationError(
+                f"The subgaits to interpolate do not have the same joints, base"
+                f" subgait has {base_joint.name}, while other subgait has "
+                f"{other_joint.name}"
+            )
+
+            # check whether each joint has the same number of setpoints for
+            # the interpolation using foot position
+        if len(base_joint.setpoints) != number_of_setpoints:
+            raise SubgaitInterpolationError(
+                f"Number of setpoints differs in {base_joint.name} from  "
+                f"{number_of_setpoints}."
+            )
+        elif len(other_joint.setpoints) != number_of_setpoints:
+            raise SubgaitInterpolationError(
+                f"Number of setpoints differs in {base_joint.name} from "
+                f"{number_of_setpoints}"
+            )
+            # check whether each base joint as its corresponding other joint
+        if base_joint.limits != other_joint.limits:
+            raise SubgaitInterpolationError(
+                f"Not able to safely interpolate because limits are not equal for "
+                f"joints {base_joint.name} and {other_joint.name}"
+            )

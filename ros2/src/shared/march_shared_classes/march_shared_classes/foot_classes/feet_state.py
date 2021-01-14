@@ -1,3 +1,8 @@
+"""
+This module contains the FeetState class.
+
+This class is  used to create gaits based on the state of both feet.
+"""
 from __future__ import annotations
 
 from march_shared_classes.gait.setpoint import Setpoint
@@ -15,25 +20,26 @@ JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
 
 
 class FeetState(object):
-    """Class for encapturing the entire state (position and velocity at a
-    certain time) of both feet."""
+    """Class for encapturing the state of both feet."""
 
-    def __init__(self, right_foot: Foot, left_foot: Foot, time: float = None):
-        """Create a FeetState object, right_foot and left_foot are both Foot
-        objects."""
+    def __init__(self, right_foot: Foot, left_foot: Foot, time: float = None) -> None:
+        """Create a FeetState object.
+
+        :param right_foot: The state of the right foot.
+        :param left_foot: The state of the left foot.
+        :param time: Optional, the time at which this state occurs (within a subgait).
+        """
         self.right_foot = right_foot
         self.left_foot = left_foot
         self.time = time
 
     @classmethod
     def from_setpoints(cls, setpoint_dic: dict) -> FeetState:
-        """Calculate the position and velocity of the foot (or rather ankle)
-        from joint angles.
+        """Calculate the position and velocity of the foot from joint angles.
 
         :param setpoint_dic:
             Dictionary of setpoints from which the feet positions and velocities
             need to be calculated, should all be around the same time
-
         :return:
             A FeetState object with a left and right foot which each have a
             position and velocity corresponding to the setpoint dictionary
@@ -83,25 +89,22 @@ class FeetState(object):
             feet_state_time += setpoint.time
         feet_state_time = feet_state_time / len(setpoint_dic)
 
-        feet_state = cls(foot_state_right, foot_state_left, feet_state_time)
-
-        return feet_state
+        return cls(foot_state_right, foot_state_left, feet_state_time)
 
     @classmethod
     def weighted_average_states(
         cls, base_state: FeetState, other_state: FeetState, parameter: float
     ) -> FeetState:
-        """Computes the weighted average of two feet states.
+        """Compute the weighted average of two feet states.
 
-        :param base_state: One of the states for the weighted average,
-                           return this is parameter is 0
+        :param base_state: One of the states for the weighted average, return
+            this if parameter is 0.
         :param other_state: One of the states for the weighted average,
-                            return this if parameter is 1
+            return this if parameter is 1.
         :param parameter: The normalised weight parameter, the parameter
-                          that determines the weight of the other_state
-
+            that determines the weight of the other_state.
         :return: A FeetState Object of which the positions and velocities of both
-        the feet are the weighted average of those of the base and other states.
+            the feet are the weighted average of those of the base and other states.
         """
         if parameter == 0:
             return base_state
@@ -120,14 +123,12 @@ class FeetState(object):
 
     @staticmethod
     def feet_state_to_setpoints(feet_state: FeetState) -> dict:
-        """Translates between feet_state and a list of setpoints, which
-        correspond with the feet_state.
+        """Translate between feet_state and a list of corresponding setpoints.
 
         :param feet_state: A fully populated FeetState object, with two
-                           fully populated Foot objects.
-
+            fully populated Foot objects.
         :return: A dictionary of setpoints, the foot location and velocity
-                 of which corresponds with the feet_state
+            of which corresponds with the feet_state.
         """
         left_joint_states = Foot.get_joint_states_from_foot_state(
             feet_state.left_foot, feet_state.time
@@ -136,5 +137,4 @@ class FeetState(object):
             feet_state.right_foot, feet_state.time
         )
 
-        setpoints = merge_dictionaries(left_joint_states, right_joint_states)
-        return setpoints
+        return merge_dictionaries(left_joint_states, right_joint_states)

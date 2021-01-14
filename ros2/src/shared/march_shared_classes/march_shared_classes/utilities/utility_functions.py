@@ -1,3 +1,9 @@
+"""This module contains general helper functions.
+
+These functions are not a part of any specific part of the code, but will be useful
+for general use cases.
+"""
+
 import os
 from typing import List
 
@@ -10,7 +16,8 @@ from .side import Side
 
 
 def weighted_average(base_value: float, other_value: float, parameter: float) -> float:
-    """Compute the weighted average of two values with normalised weight parameter.
+    """
+    Compute the weighted average of two values with normalised weight parameter.
 
     :param base_value: The first value for the weighted average,
         return this if parameter is 0
@@ -25,48 +32,55 @@ def weighted_average(base_value: float, other_value: float, parameter: float) ->
 
 
 def merge_dictionaries(dic_one: dict, dic_two: dict) -> dict:
-    """Combines the key value pairs of two dicitonaries into a new dictionary.
+    """Combine the key value pairs of two dicitonaries into a new dictionary.
 
     Throws an error when both dictionaries contain the same key and the
     corresponding values are not equal.
-
     :param dic_one: One of the dictionaries which is to be merged
     :param dic_two: One of the dictionaries which is to be merged
-
     :return: The merged dictionary, has the same key value pairs as the pairs in
     the given dictionaries combined
     """
     merged_dic = {}
     for key_one in dic_one:
-        if key_one not in dic_two or dic_one[key_one] == dic_two[key_one]:
+        if check_key(dic_one, dic_two, key_one):
             merged_dic[key_one] = dic_one[key_one]
-        else:
-            raise KeyError(
-                f"Dictionaries to be merged both contain key {key_one} with differing "
-                f"values"
-            )
     for key_two in dic_two:
-        if key_two not in dic_one or dic_one[key_two] == dic_two[key_two]:
+        if check_key(dic_one, dic_two, key_two):
             merged_dic[key_two] = dic_two[key_two]
-        else:
-            raise KeyError(
-                f"Dictionaries to be merged both contain key {key_two} with differing "
-                f"values"
-            )
+
     return merged_dic
 
 
-def get_lengths_robot_for_inverse_kinematics(side: Side = Side.both) -> List[float]:
-    """Grabs lengths from the robot which are relevant for the inverse kinematics
-    calculation.
+def check_key(dic_one: dict, dic_two: dict, key: str) -> bool:
+    """Check whether this key can be merged between two dictionaries."""
+    if key not in dic_one or key not in dic_two:
+        return True
+    else:
+        if dic_one[key] != dic_two[key]:
+            raise KeyError(
+                f"Dictionaries to be merged both contain key {key} with differing "
+                f"values"
+            )
+        return True
 
-    this function returns the lengths relevant for the specified foot, if no
+
+def get_lengths_robot_for_inverse_kinematics(  # noqa: CCR001
+    side: Side = Side.both,
+) -> List[float]:
+    """Grab lengths which are relevant for the inverse kinematics calculation.
+
+    This function returns the lengths relevant for the specified foot, if no
     side is specified,it returns all relevant lengths for both feet.
 
     :param side: The side of the exoskeleton of which the lengths would like to be known
     :return: The lengths of the specified side which are relevant for
         the (inverse) kinematics calculations
     """
+    if not isinstance(side, Side):
+        raise SideSpecificationError(
+            side, f"Side should be either 'left', 'right' or 'both', but was {side}"
+        )
     try:
         robot = urdf.Robot.from_xml_file(
             os.path.join(
@@ -76,36 +90,53 @@ def get_lengths_robot_for_inverse_kinematics(side: Side = Side.both) -> List[flo
         # size[0], size[1] and size[2] are used to grab relevant length of the link,
         # e.g. the relevant length of the hip base is in the y direction, that of the
         # upper leg in the z direction.
-        base = (
-            robot.link_map["hip_base"].collisions[0].geometry.size[1]
-        )  # length of the hip base structure
-        l_ul = (
+        # length of the hip base structure
+        base = robot.link_map["hip_base"].collisions[0].geometry.size[1]  # noqa: ECE001
+
+        # left upper leg length
+        l_ul = (  # noqa: ECE001
             robot.link_map["upper_leg_left"].collisions[0].geometry.size[2]
-        )  # left upper leg length
-        l_ll = (
+        )
+
+        # left lower leg length
+        l_ll = (  # noqa: ECE001
             robot.link_map["lower_leg_left"].collisions[0].geometry.size[2]
-        )  # left lower leg length
-        l_hl = (
+        )
+
+        # left haa arm to leg
+        l_hl = (  # noqa: ECE001
             robot.link_map["hip_aa_frame_left_front"].collisions[0].geometry.size[0]
-        )  # left haa arm to leg
-        l_ph = (
+        )
+
+        # left pelvis to hip length
+        l_ph = (  # noqa ECE001
             robot.link_map["hip_aa_frame_left_side"].collisions[0].geometry.size[1]
-        )  # left pelvis to hip length
-        r_ul = (
+        )
+
+        # right upper leg length
+        r_ul = (  # noqa: ECE001
             robot.link_map["upper_leg_right"].collisions[0].geometry.size[2]
-        )  # right upper leg length
-        r_ll = (
+        )
+
+        # right lower leg length
+        r_ll = (  # noqa: ECE001
             robot.link_map["lower_leg_right"].collisions[0].geometry.size[2]
-        )  # right lower leg length
-        r_hl = (
+        )
+
+        # right haa arm to leg
+        r_hl = (  # noqa: ECE001
             robot.link_map["hip_aa_frame_right_front"].collisions[0].geometry.size[0]
-        )  # right haa arm to leg
-        r_ph = (
-            robot.link_map["hip_aa_frame_right_side"].collisions[0].geometry.size[1]
-        )  # right pelvis hip length
+        )
+
+        # right pelvis hip length
+        r_ph = (  # noqa: ECE001
+            robot.link_map["hip_aa_frame_right_side"]
+            .collisions[0]
+            .geometry.size[1]  # noqa ECE001
+        )
         # The foot is a certain amount more to the inside of the exo then the
         # leg structures. The haa arms need to account for this.
-        off_set = (
+        off_set = (  # noqa: ECE001
             robot.link_map["ankle_plate_right"].visual.origin.xyz[1] + base / 2 + r_hl
         )
         r_ph = r_ph - off_set
@@ -122,13 +153,15 @@ def get_lengths_robot_for_inverse_kinematics(side: Side = Side.both) -> List[flo
         return [r_ul, r_ll, r_hl, r_ph, base]
     elif side == Side.both:
         return [l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base]
-    else:
-        raise SideSpecificationError(
-            side, f"Side should be either 'left', 'right' or 'both', but was {side}"
-        )
 
 
 def get_joint_names_for_inverse_kinematics() -> List[str]:
+    """
+    Get a list of the joint names that can be used for the inverse kinematics.
+
+    This also checks whether robot description contains the required joints.
+    :return: A list of joint names.
+    """
     robot = urdf.Robot.from_xml_file(
         os.path.join(
             get_package_share_directory("march_description"), "urdf", "march4.urdf"

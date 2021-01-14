@@ -1,3 +1,10 @@
+"""
+This module contains the foot class.
+
+This class captures the state of a foot at a specific time. This is used for
+creating gaits based on foot positions.
+"""
+
 from __future__ import annotations
 
 from math import acos, asin, atan, cos, pi, sin, sqrt
@@ -22,7 +29,9 @@ MID_CALCULATION_PRECISION_DIGITS = 10
 class Foot(object):
     """Class for capturing the state (position and possible velocity) of a foot."""
 
-    def __init__(self, foot_side: Side, position: Vector3d, velocity: float = None):
+    def __init__(
+        self, foot_side: Side, position: Vector3d, velocity: float = None
+    ) -> None:
         """Create a Foot object, position and velocity are both Vector3d objects."""
         self.position = position
         self.velocity = velocity
@@ -30,27 +39,31 @@ class Foot(object):
             raise SideSpecificationError(foot_side)
         self.foot_side = Side(foot_side)
 
-    def add_foot_velocity_from_next_state(self, next_state: Foot):
-        """Adds the foot velocity to the state given a next state for the
-        foot to be in.
+    def add_foot_velocity_from_next_state(self, next_state: Foot) -> None:
+        """Add the foot velocity to the foot state.
 
-        :param: next_state: A Foot object that specifies the foot location
-        1 / VELOCITY_SCALE_FACTOR second later
+        This is done based on a given next state for the foot to be in.
 
-        :return: The object with a velocity which is calculated based on the
-        next state
+        :param: next_state:
+            A Foot object that specifies the foot location 1 / VELOCITY_SCALE_FACTOR
+            seconds later.
+
+        :return:
+            The object with a velocity which is calculated based on the next state.
         """
         velocity = (next_state.position - self.position) / VELOCITY_SCALE_FACTOR
         self.velocity = velocity
 
     @classmethod
     def calculate_next_foot_position(cls, current_state: Foot) -> Foot:
-        """Calculates the foot position a moment later given the current state.
+        """Calculate the foot position a moment later given the current state.
 
-        :param current_state: A Foot object with a velocity
+        :param current_state:
+            A Foot object with a velocity.
 
-        :return: A Foot object with the position of the foot
-        1 / VELOCITY_SCALE_FACTOR second later
+        :return:
+            A Foot object with the position of the foot 1 / VELOCITY_SCALE_FACTOR
+            seconds later.
         """
         next_position = (
             current_state.position + current_state.velocity * VELOCITY_SCALE_FACTOR
@@ -59,14 +72,16 @@ class Foot(object):
 
     @staticmethod
     def get_joint_states_from_foot_state(foot_state: Foot, time: float) -> dict:
-        """Translates between feet_state and a list of setpoints, which
-        correspond with the feet_state.
+        """Translate between feet_state and a list of setpoints.
 
-        :param foot_state: A fully populated Foot object.
-        :param time: The time of the Foot state and resulting setpoints.
+        :param foot_state:
+            A fully populated Foot object.
+        :param time:
+            The time of the Foot state and resulting setpoints.
 
-        :return: A dictionary of setpoints, the foot location and velocity of
-        which corresponds with the feet_state.
+        :return:
+            A dictionary of setpoints, the foot location and velocity of
+            which corresponds with the feet_state.
         """
         joint_states = Foot.calculate_joint_angles_from_foot_position(
             foot_state.position, foot_state.foot_side, time
@@ -94,25 +109,29 @@ class Foot(object):
     def calculate_joint_angles_from_foot_position(
         foot_position: Vector3d, foot_side: Side, time: float
     ) -> dict:
-        """Calculates the angles of the joints corresponding to a certain
-        position of the right or left foot.
+        """Calculate the angles of the joints corresponding to a certain foot position.
 
         More information on the calculations of the haa, hfe and kfe angles,
         as well as on the velocity calculations can be found at
         https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics.
-        This function assumes that the desired z position of the foot is
-        positive.
+        This function assumes that the desired z position of the foot is positive.
 
-        :param foot_position: A Vecor3d object which specifies the desired
-        position of the foot.
+        :param foot_position:
+            A Vecor3d object which specifies the desired position of the foot.
         :param foot_side: A string which specifies to which side the
-        foot_position belongs and thus which joint angles should be computed.
-        :param time: The time of the foot_position and the resulting setpoints.
+            foot_position belongs and thus which joint angles should be computed.
+        :param time:
+            The time of the foot_position and the resulting setpoints.
 
         :return:
             A dictionary of Setpoints for each joint on the requested side with
             the correct angle at the provided time.
         """
+        if foot_side != Side.left and foot_side != Side.right:
+            raise SideSpecificationError(
+                foot_side,
+                f"Side should be either 'left' or 'right', but was " f"{foot_side}",
+            )
         # Get relevant lengths from robot model, ul = upper leg etc.
         # see get_lengths_robot_for_inverse_kinematics() and unpack desired position
         [ul, ll, hl, ph, base] = get_lengths_robot_for_inverse_kinematics(foot_side)
@@ -124,10 +143,8 @@ class Foot(object):
         # pivot of haa joint, for ease of calculation.
         if foot_side == Side.left:
             y_position = -(y_position + base / 2.0)
-        elif foot_side == Side.right:
-            y_position = y_position - base / 2.0
         else:
-            raise SideSpecificationError(foot_side)
+            y_position = y_position - base / 2.0
 
         # first calculate the haa angle. This calculation assumes that pos_z > 0
         haa = Foot.calculate_haa_angle(z_position, y_position, ph)
@@ -150,30 +167,31 @@ class Foot(object):
 
         hfe, kfe = Foot.calculate_hfe_kfe_angles(transformed_x, transformed_z, ul, ll)
 
-        angle_positions = {
+        return {
             foot_side.value + "_hip_aa": Setpoint(time, haa),
             foot_side.value + "_hip_fe": Setpoint(time, hfe),
             foot_side.value + "_knee": Setpoint(time, kfe),
         }
 
-        return angle_positions
-
     @staticmethod
     def calculate_haa_angle(
         z_position: float, y_position: float, pelvis_hip_length: float
-    ):
-        """Calculates the haa angle of the exoskeleton given a desired y and z
-        position of the exoskeleton.
+    ) -> float:
+        """Calculate the haa angle of the exoskeleton.
 
+        This is done based on a given desired y and z position of the exoskeleton.
         More information on the calculation is found at
         https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
 
-        :param z_position: the desired z-position of the foot
-        :param y_position: the desired y-position of the foot
-        :param pelvis_hip_length: The length from the pelvis to the hip_aa,
-        which is the haa arm
+        :param z_position:
+            The desired z-position of the foot
+        :param y_position:
+            The desired y-position of the foot
+        :param pelvis_hip_length:
+            The length from the pelvis to the hip_aa, which is the haa arm
 
-        :return: The hip_aa joint angle needed for the foot to reach the given position
+        :return:
+            The hip_aa joint angle needed for the foot to reach the given position
         """
         if z_position <= 0:
             raise SubgaitInterpolationError(
@@ -216,22 +234,26 @@ class Foot(object):
     @staticmethod
     def calculate_hfe_kfe_angles(
         transformed_x: float, transformed_z: float, upper_leg: float, lower_leg: float
-    ):
-        """Calculates the hfe and kfe given a desired transformed x and z
-        coordinate using the cosine rule.
+    ) -> (float, float):
+        """Calculate the hfe and kfe angles.
 
-        The transformed x and z position are described and explained in
-        https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
+        This is done given a desired transformed x and z coordinate using the cosine
+        rule. The transformed x and z position are described and explained in
+        https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics.
 
-        :param transformed_x: The desired x_position of the foot, transformed
-        to make the calculation easier
-        :param transformed_z: The desired z_position of the foot, transformed
-        to make the calculation easier
-        :param upper_leg: The length of the upper leg
-        :param lower_leg: The length of the lower leg
+        :param transformed_x:
+            The desired x_position of the foot, transformed to make the calculation
+            easier
+        :param transformed_z:
+            The desired z_position of the foot, transformed to make the calculation
+            easier
+        :param upper_leg:
+            The length of the upper leg
+        :param lower_leg:
+            The length of the lower leg
 
-        :return: The hip_fe and knee angle needed to reach the desired x and z
-        position
+        :return:
+            The hip_fe and knee angle needed to reach the desired x and z position
         """
         foot_line_to_leg = acos(
             (
@@ -259,17 +281,23 @@ class Foot(object):
 
     @staticmethod
     def calculate_foot_position(haa: float, hfe: float, kfe: float, side: Side) -> Foot:
-        """Calculates the foot position given the relevant angles, lengths
-        and a specification of the foot.
+        """Calculate the foot position given the relevant angles and lengths.
 
-        :param side: The side of the exoskeleton to which the angles belong
-        :param haa: The angle of the hip_aa joint on the specified side
-        :param hfe: The angle of the hip_fe joint on the specified side
-        :param kfe: The angle of the knee joint on the specified side
+        :param side:
+            The side of the exoskeleton to which the angles belong
+        :param haa:
+            The angle of the hip_aa joint on the specified side
+        :param hfe:
+            The angle of the hip_fe joint on the specified side
+        :param kfe:
+            The angle of the knee joint on the specified side
 
-        :return: The location of the foot (ankle) of the specified side
-        which corresponds to the given angles
+        :return:
+            The location of the foot (ankle) of the specified side
+            which corresponds to the given angles
         """
+        if side != Side.right and side != Side.left:
+            raise SideSpecificationError(side)
         # x is positive in the walking direction, z is in the downward direction,
         # y is directed to the right side, the origin in the middle of the hip
         # structure. The calculations are supported by
@@ -281,20 +309,30 @@ class Foot(object):
 
         if side == side.left:
             y_position = -cos(haa) * ph - sin(haa) * haa_to_foot_length - base / 2.0
-        elif side == side.right:
-            y_position = cos(haa) * ph + sin(haa) * haa_to_foot_length + base / 2.0
         else:
-            raise SideSpecificationError(side)
+            y_position = cos(haa) * ph + sin(haa) * haa_to_foot_length + base / 2.0
 
         return Foot(side, Vector3d(x_position, y_position, z_position))
 
     @staticmethod
-    def weighted_average_foot(base_foot: Foot, other_foot: Foot, parameter: float):
-        """Computes the weighted average of two Foot objects, result has a
-        velocity of None if it cannot be computed."""
+    def weighted_average_foot(
+        base_foot: Foot, other_foot: Foot, parameter: float
+    ) -> Foot:
+        """Compute the weighted average of two Foot objects.
+
+        :param base_foot:
+            The first foot for averaging.
+        :param other_foot:
+            The second foot for averaging.
+        :param parameter:
+            The parameter that determines the weight for the feet.
+
+        :return
+            The average foot, has a velocity of None if it cannot be computed.
+        """
         if base_foot.foot_side != other_foot.foot_side:
             raise SideSpecificationError(
-                f"expected sides of both base and other foot to be equal but "
+                f"Expected sides of both base and other foot to be equal but "
                 f"were {base_foot.foot_side} and {other_foot.foot_side}."
             )
         resulting_position = weighted_average(
