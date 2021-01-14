@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 import rospy
 
-from march_shared_msg.srv import SetObstacleSizeRampLikeResponse, SetObstacleSizeRampLike, \
+from march_shared_msgs.srv import SetObstacleSizeRampLikeResponse, SetObstacleSizeRampLike, \
     SetObstacleSizeStairsLikeResponse, SetObstacleSizeStairsLike
 from gazebo_msgs.srv import SpawnModelRequest, SpawnModel, DeleteModel, \
     DeleteModelRequest, GetWorldProperties, GetWorldPropertiesRequest
