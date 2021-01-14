@@ -206,5 +206,5 @@ venv/
 .idea/*
 */cmake-build-debug/**
 .vscode/settings.json
-ros1/src/control/606-branch-log.txt
+*/ros1/src/control/606-branch-log.txt
 
