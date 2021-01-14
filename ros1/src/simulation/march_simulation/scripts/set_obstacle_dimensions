@@ -1,8 +1,11 @@
 #! /usr/bin/env python
 import rospy
-
+<<<<<<< HEAD
+from march_shared_msgs.srv import SetObstacleSizeResponse, SetObstacleSize
+=======
 from march_shared_resources.srv import SetObstacleSizeRampLikeResponse, SetObstacleSizeRampLike, \
     SetObstacleSizeStairsLikeResponse, SetObstacleSizeStairsLike
+>>>>>>> Add _macro.xacro file and introduce new service
 from gazebo_msgs.srv import SpawnModelRequest, SpawnModel, DeleteModel, \
     DeleteModelRequest, GetWorldProperties, GetWorldPropertiesRequest
 import xacro
@@ -27,7 +30,6 @@ def set_new_stairs_like_obstacle(name, length=0, width=0, height=0):
     doc = make_xacro_file(name, length, width, height)
     set_size(name, doc)
 
-
 def set_new_ramp_like_obstacle(name, slope_up=0, slope_down=0, ramp_up_length=0):
     slope_up = make_set_size_string('slope_up', slope_up)
     slope_down = make_set_size_string('slope_down', slope_down)
@@ -39,7 +41,7 @@ def set_new_ramp_like_obstacle(name, slope_up=0, slope_down=0, ramp_up_length=0)
 def make_set_size_string(dimension, size):
     if size == 0:
         return ''
-    return '{dimension}="{size}"'.format(dimension=dimension, size=size)
+    return f'{dimension}="{size}"'
 
 def make_xacro_file(name, parameter_1, parameter_2, parameter_3):
     doc = xacro.parse('''<?xml version="1.0"?>
