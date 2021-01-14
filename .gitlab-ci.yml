@@ -14,7 +14,7 @@ image: registry.gitlab.com/project-march/march:$CI_COMMIT_BRANCH
 # 1. The image for this branch is pulled. If it does not exist, copy the default
 #   image and tag it as an image for this branch.
 # 2. If there are changes to the Dockerfile or to a package.xml file, rebuild the
-#   container.
+#   container. This will use remote caches from GitLab to speed up the process.
 container:tag:
   stage: Tag container
   image: docker:latest
@@ -36,7 +36,7 @@ container:build:
   script:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --cache=true --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH
+    - /kaniko/executor --cache=true --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH --cleanup
   rules:
     - if: '$CI_COMMIT_BRANCH'
       #      changes:
