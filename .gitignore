@@ -187,6 +187,8 @@ qtcreator-*
 # Emacs
 .#*
 
+606-branch-log.txt
+
 # Catkin custom files
 CATKIN_IGNORE
 COLCON_IGNORE
