@@ -568,9 +568,7 @@ class Subgait(object):
         (
             base_setpoints_to_interpolate,
             other_setpoints_to_interpolate,
-        ) = Subgait.change_order_of_joints_and_setpoints(
-            base_subgait, other_subgait
-        )
+        ) = Subgait.change_order_of_joints_and_setpoints(base_subgait, other_subgait)
         new_setpoints = {joint.name: [] for joint in base_subgait.joints}
         # fill all joints in new_setpoints except the ankle joints using
         # the inverse kinematics
