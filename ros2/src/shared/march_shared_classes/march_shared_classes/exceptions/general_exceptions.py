@@ -1,6 +1,6 @@
 """This module contains some errors that are specific to the Project March code."""
 from __future__ import annotations
-from march_shared_classes.foot_classes.foot import Foot
+from march_shared_classes.utilities.side import Side
 
 
 class PackageNotFoundError(Exception):
@@ -37,7 +37,7 @@ class MsgTypeError(Exception):
 class SideSpecificationError(Exception):
     """Class to raise an error when wrong side ('right' or 'left') was specified."""
 
-    def __init__(self, foot: Foot, msg: str = None) -> None:
+    def __init__(self, foot: Side, msg: str = None) -> None:
         """
         Initialize side specification error.
 

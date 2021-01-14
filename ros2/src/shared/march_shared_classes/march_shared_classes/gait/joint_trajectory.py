@@ -8,7 +8,6 @@ and to check the safety limits.
 from __future__ import annotations
 from typing import List, Optional
 
-from march_shared_classes.gait.subgait import Subgait
 from rclpy.duration import Duration
 from scipy.interpolate import BPoly
 from urdf_parser_py import urdf
@@ -276,38 +275,6 @@ class JointTrajectory(object):
         return JointTrajectory(
             base_trajectory.name, base_trajectory.limits, setpoints, duration
         )
-
-    @staticmethod
-    def change_order_of_joints_and_setpoints(
-        base_subgait: Subgait, other_subgait: Subgait
-    ) -> (dict, dict):
-        """Change structure of joint trajectories to see positions per time point.
-
-        This function goes over each joint to get needed setpoints
-        (all first setpoints, all second setpoints..).
-        These are placed in list with the correct index, where each entry contains a
-        dictionary with joint name setpoint pairs. Also checks whether the joint
-        trajectories are safe to interpolate.
-
-        :param base_subgait: one of the subgaits to reorder
-        :param other_subgait: the other subgait to reorder
-        :return: The interpolated trajectory
-        """
-        number_of_setpoints = len(base_subgait.joints[0].setpoints)
-        base_setpoints_to_interpolate = [{} for _ in range(number_of_setpoints)]
-        other_setpoints_to_interpolate = [{} for _ in range(number_of_setpoints)]
-        for setpoint_index in range(number_of_setpoints):
-            for base_joint, other_joint in zip(
-                sorted(base_subgait.joints, key=lambda joint: joint.name),
-                sorted(other_subgait.joints, key=lambda joint: joint.name),
-            ):
-                base_setpoints_to_interpolate[setpoint_index][
-                    base_joint.name
-                ] = base_joint.setpoints[setpoint_index]
-                other_setpoints_to_interpolate[setpoint_index][
-                    other_joint.name
-                ] = other_joint.setpoints[setpoint_index]
-        return base_setpoints_to_interpolate, other_setpoints_to_interpolate
 
     @staticmethod
     def check_joint_interpolation_is_safe(

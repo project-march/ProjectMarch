@@ -217,7 +217,7 @@ class Gait(object):
                     if not from_subgait.validate_subgait_transition(to_subgait):
                         raise NonValidGaitContent(
                             msg=f"Gait {self.gait_name} with end setpoint of subgait "
-                            f"{from_subgait_name.subgait_name} to "
+                            f"{from_subgait.subgait_name} to "
                             f"subgait {to_subgait.subgait_name} does not match"
                         )
 

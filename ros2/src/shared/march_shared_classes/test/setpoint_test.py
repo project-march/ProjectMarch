@@ -38,7 +38,7 @@ class SetpointTest(unittest.TestCase):
         self.assertEqual(
             str(self.setpoint),
             "Time: {t}, Position: {p}, Velocity: {v}".format(
-                t=1.1234, p=0.0343, v=123.1621
+                t=1.12341254, p=0.03434126, v=123.16208455
             ),
         )
 
