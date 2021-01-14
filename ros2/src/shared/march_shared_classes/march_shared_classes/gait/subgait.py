@@ -105,15 +105,12 @@ class Subgait(object):
             base_version, other_version, parameter = Subgait.unpack_parametric_version(
                 version
             )
+            base_version_path = os.path.join(
+                subgait_path, base_version + SUBGAIT_SUFFIX
+            )
             if base_version == other_version:
-                subgait_version_path = os.path.join(
-                    subgait_path, base_version + SUBGAIT_SUFFIX
-                )
-                return cls.from_file(robot, subgait_version_path)
+                return cls.from_file(robot, base_version_path)
             else:
-                base_version_path = os.path.join(
-                    subgait_path, base_version + SUBGAIT_SUFFIX
-                )
                 other_version_path = os.path.join(
                     subgait_path, other_version + SUBGAIT_SUFFIX
                 )
