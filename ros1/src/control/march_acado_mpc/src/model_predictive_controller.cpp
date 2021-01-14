@@ -53,7 +53,50 @@ void ModelPredictiveController::setReference(vector<vector<double>> reference) {
     }
 }
 
+bool ModelPredictiveController::readReferenceFromFile(const char* filename, vector<vector<double>>& data) {
+    ifstream file(filename);
+    string line;
+
+    if (file.is_open()) {
+        while (getline(file,line))
+        {
+            stringstream linestream(line);
+            vector<double> linedata;
+            double number;
+
+            while (linestream >> number)
+            {
+                linedata.push_back(number);
+            }
+            data.push_back(linedata);
+        }
+        file.close();
+    }
+    else
+        return false;
+
+    return true;
+}
+
+void ModelPredictiveController::setReference(vector<vector<double>>& reference, int iter) {
+    for (int i = 0; i < ACADO_N; ++i) {
+        acadoVariables.y[i * ACADO_NY + 0] = reference[iter + i][0]; // theta
+        acadoVariables.y[i * ACADO_NY + 1] = reference[iter + i][1]; // dtheta
+        acadoVariables.y[i * ACADO_NY + 2] = reference[iter + i][2]; // T
+    }
+
+    acadoVariables.yN[0] = reference[iter + ACADO_N][0]; // theta
+    acadoVariables.yN[1] = reference[iter + ACADO_N][1]; // dtheta
+    acadoVariables.yN[2] = reference[iter + ACADO_N][2]; // T
+}
+
+
 void ModelPredictiveController::init() {
+
+  // Read reference data
+  if (ModelPredictiveController::readReferenceFromFile("../references/sin.txt", reference) == false) {
+      cout << "Cannot read reference" << endl;
+  }
 
   // Initialize the solver
   acado_initializeSolver();
