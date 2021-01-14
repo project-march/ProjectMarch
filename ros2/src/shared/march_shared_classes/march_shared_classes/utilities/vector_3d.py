@@ -93,7 +93,7 @@ class Vector3d(object):
         :param other: The vector to compare to.
         :return: Whether the vectors are equal.
         """
-        if not isinstance(object, Vector3d):
+        if not isinstance(other, Vector3d):
             return False
         return self.x == other.x and self.y == other.y and self.z == other.z
 
