@@ -13,6 +13,8 @@ public:
     // Public variables
     vector<double> x0{0,0}; // Current state
     double u;               // Calculated control input
+    int iter = 0;           // Current iteration of the control loop
+    vector<vector<double>> reference; // reference vector
 
     /**
      * \brief Initialise the model predictive controller
