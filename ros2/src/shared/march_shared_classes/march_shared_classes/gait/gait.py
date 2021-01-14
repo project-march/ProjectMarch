@@ -16,7 +16,7 @@ ALLOWED_ERROR_ENDPOINTS = 0.0001
 
 
 class Gait(object):
-    """base class for a generated gait."""
+    """Base class for a generated gait."""
 
     def __init__(self, gait_name: str, subgaits: dict, graph: SubgaitGraph):
         """Initializes and verifies the gait.

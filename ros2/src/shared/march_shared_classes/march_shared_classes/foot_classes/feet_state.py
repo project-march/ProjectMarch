@@ -108,7 +108,7 @@ class FeetState(object):
         """
         if parameter == 0:
             return base_state
-        elif parameter == 1:
+        if parameter == 1:
             return other_state
 
         resulting_right_foot = Foot.weighted_average_foot(

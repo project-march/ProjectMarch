@@ -87,7 +87,7 @@ class Foot(object):
             foot_state.position, foot_state.foot_side, time
         )
 
-        # find the joint angles a moment later using the foot position a
+        # Find the joint angles a moment later using the foot position a
         # moment later use this together with the current joint angles to
         # calculate the joint velocity
         next_position = Foot.calculate_next_foot_position(foot_state)
@@ -146,10 +146,10 @@ class Foot(object):
         else:
             y_position = y_position - base / 2.0
 
-        # first calculate the haa angle. This calculation assumes that pos_z > 0
+        # First calculate the haa angle. This calculation assumes that pos_z > 0
         haa = Foot.calculate_haa_angle(z_position, y_position, ph)
 
-        # once the haa angle is known, transform the desired x and z position to
+        # Once the haa angle is known, transform the desired x and z position to
         # arrive at an easier system to calculate the hfe and kfe angles
         transformed_x = round(x_position - hl, MID_CALCULATION_PRECISION_DIGITS)
         transformed_z = round(
@@ -195,7 +195,7 @@ class Foot(object):
         """
         if z_position <= 0:
             raise SubgaitInterpolationError(
-                "desired z position of the foot is not positive, "
+                "Desired z position of the foot is not positive, "
                 "current haa calculation is not capable to deal with this"
             )
 
