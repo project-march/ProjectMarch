@@ -187,7 +187,7 @@ qtcreator-*
 # Emacs
 .#*
 
-606-branch-log.txt
+ros1/src/control/606-branch-log.txt
 
 # Catkin custom files
 CATKIN_IGNORE
