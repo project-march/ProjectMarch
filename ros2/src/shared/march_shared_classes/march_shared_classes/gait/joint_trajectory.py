@@ -6,7 +6,7 @@ and to check the safety limits.
 """
 
 from __future__ import annotations
-from typing import List, Optional
+from typing import List, Tuple, Any
 
 from rclpy.duration import Duration
 from scipy.interpolate import BPoly
@@ -39,13 +39,13 @@ class JointTrajectory(object):
         self.limits = limits
         self._setpoints = setpoints
         self._duration = round(duration, self.setpoint_class.digits)  # seconds
-        self.interpolated_position = None
-        self.interpolated_velocity = None
+        self.interpolated_position: Any = None
+        self.interpolated_velocity: Any = None
         self.interpolate_setpoints()
 
     @classmethod
     def from_setpoints(
-        cls, name: str, limits: Limits, setpoints: List[dict], duration: float
+        cls, name: str, limits: Limits, setpoint_dict: List[dict], duration: float
     ) -> JointTrajectory:
         """Creates a list of joint trajectories.
 
@@ -55,7 +55,7 @@ class JointTrajectory(object):
         :param duration: The total duration of the trajectory
         """
         setpoints = [
-            cls.setpoint_class(
+            Setpoint(
                 time=Duration(
                     seconds=setpoint["time_from_start"]["secs"],
                     nanoseconds=setpoint["time_from_start"]["nsecs"],
@@ -64,12 +64,12 @@ class JointTrajectory(object):
                 position=setpoint["position"],
                 velocity=setpoint["velocity"],
             )
-            for setpoint in setpoints
+            for setpoint in setpoint_dict
         ]
         return cls(name, limits, setpoints, duration)
 
     @staticmethod
-    def get_joint_from_urdf(robot: urdf.Robot, joint_name: str) -> Optional[str]:
+    def get_joint_from_urdf(robot: urdf.Robot, joint_name: str) -> urdf.Joint:
         """Get the joint from the urdf robot with the given joint name.
 
         :param robot: The urdf robot to use.
@@ -133,7 +133,7 @@ class JointTrajectory(object):
         self._setpoints = setpoints
         self.interpolate_setpoints()
 
-    def get_setpoints_unzipped(self) -> (List[float], List[float], List[float]):
+    def get_setpoints_unzipped(self) -> Tuple[List[float], List[float], List[float]]:
         """Get all the listed attributes of the setpoints."""
         time = []
         position = []
@@ -165,8 +165,10 @@ class JointTrajectory(object):
         from_setpoint = self.setpoints[-1]
         to_setpoint = joint.setpoints[0]
 
-        return abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR \
+        return (
+            abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR
             and abs(from_setpoint.position - to_setpoint.position) <= ALLOWED_ERROR
+        )
 
     def _validate_boundary_points(self) -> bool:
         """Validate the starting and ending of this joint.

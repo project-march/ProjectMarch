@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import re
 import math
-from typing import List
+from typing import List, Tuple
 from rclpy.duration import Duration
 from trajectory_msgs import msg as trajectory_msg
 import yaml
@@ -16,7 +16,7 @@ from march_shared_classes.exceptions.gait_exceptions import (
 from march_shared_classes.foot_classes.feet_state import FeetState
 from march_shared_classes.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
-    weighted_average,
+    weighted_average_floats,
 )
 from .joint_trajectory import JointTrajectory
 from .limits import Limits
@@ -381,7 +381,7 @@ class Subgait(object):
             f"Based on foot position: {use_foot_position}"
         )
 
-        duration = weighted_average(
+        duration = weighted_average_floats(
             base_subgait.duration, other_subgait.duration, parameter
         )
 
@@ -519,12 +519,16 @@ class Subgait(object):
         )
 
     @staticmethod
-    def unpack_parametric_version(version: str) -> (str, str, float):
+    def unpack_parametric_version(version: str) -> Tuple[str, str, float]:
         """Unpack a version to base version, other version and parameter."""
-        parameter_str = re.search(
+        parameter_search = re.search(
             r"^{0}(\d+\.\d+)_".format(PARAMETRIC_GAITS_PREFIX), version
-        ).group(1)
-        parameter = float(parameter_str)
+        )
+        if parameter_search is None:
+            raise SubgaitInterpolationError(
+                "Parametric version was stored in wrong " "format."
+            )
+        parameter = float(parameter_search.group(1))
         versions = re.findall(r"\([^\)]*\)", version)
         base_version = versions[0][1:-1]
         other_version = versions[1][1:-1]
@@ -569,7 +573,7 @@ class Subgait(object):
             base_setpoints_to_interpolate,
             other_setpoints_to_interpolate,
         ) = Subgait.change_order_of_joints_and_setpoints(base_subgait, other_subgait)
-        new_setpoints = {joint.name: [] for joint in base_subgait.joints}
+        new_setpoints: dict = {joint.name: [] for joint in base_subgait.joints}
         # fill all joints in new_setpoints except the ankle joints using
         # the inverse kinematics
         for setpoint_index in range(0, number_of_setpoints):
@@ -597,7 +601,7 @@ class Subgait(object):
                 )
                 new_setpoints[ankle_joint].append(new_ankle_setpoint_to_add)
 
-        duration = weighted_average(
+        duration = weighted_average_floats(
             base_subgait.duration, other_subgait.duration, parameter
         )
 
@@ -644,7 +648,7 @@ class Subgait(object):
     @staticmethod
     def change_order_of_joints_and_setpoints(
         base_subgait: Subgait, other_subgait: Subgait
-    ) -> (dict, dict):
+    ) -> Tuple[List[dict], List[dict]]:
         """Change structure of joint trajectories to see positions per time point.
 
         This function goes over each joint to get needed setpoints
@@ -658,8 +662,12 @@ class Subgait(object):
         :return: The interpolated trajectory
         """
         number_of_setpoints = len(base_subgait.joints[0].setpoints)
-        base_setpoints_to_interpolate = [{} for _ in range(number_of_setpoints)]
-        other_setpoints_to_interpolate = [{} for _ in range(number_of_setpoints)]
+        base_setpoints_to_interpolate: List[dict] = [
+            {} for _ in range(number_of_setpoints)
+        ]
+        other_setpoints_to_interpolate: List[dict] = [
+            {} for _ in range(number_of_setpoints)
+        ]
         for setpoint_index in range(number_of_setpoints):
             for base_joint, other_joint in zip(
                 sorted(base_subgait.joints, key=lambda joint: joint.name),

@@ -98,13 +98,15 @@ class Vector3d(object):
         """Get vector as iterator."""
         yield from [self.x, self.y, self.z]
 
-    def __eq__(self, other: Vector3d) -> bool:
+    def __eq__(self, other: object) -> bool:
         """
         Check if two vectors are equal.
 
         :param other: The vector to compare to.
         :return: Whether the vectors are equal.
         """
+        if not isinstance(object, Vector3d):
+            return False
         return self.x == other.x and self.y == other.y and self.z == other.z
 
     def __repr__(self) -> str:

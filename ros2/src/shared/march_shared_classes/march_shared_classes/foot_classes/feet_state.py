@@ -9,10 +9,12 @@ from march_shared_classes.gait.setpoint import Setpoint
 from march_shared_classes.utilities.side import Side
 from march_shared_classes.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
-)
-from march_shared_classes.utilities.utility_functions import (
     merge_dictionaries,
-    weighted_average,
+    weighted_average_floats,
+)
+
+from march_shared_classes.exceptions.gait_exceptions import (
+    SubgaitInterpolationError,
 )
 from .foot import Foot
 
@@ -84,10 +86,10 @@ class FeetState(object):
 
         # Set the time of the new setpoints as the weighted
         # average of the original setpoint times
-        feet_state_time = 0
+        feet_state_time = 0.0
         for setpoint in setpoint_dic.values():
             feet_state_time += setpoint.time
-        feet_state_time = feet_state_time / len(setpoint_dic)
+        feet_state_time = feet_state_time / float(len(setpoint_dic))
 
         return cls(foot_state_right, foot_state_left, feet_state_time)
 
@@ -106,6 +108,11 @@ class FeetState(object):
         :return: A FeetState Object of which the positions and velocities of both
             the feet are the weighted average of those of the base and other states.
         """
+        if base_state.time is None or other_state.time is None:
+            raise SubgaitInterpolationError(
+                "Feet state requires a time to compute " "the weighted average."
+            )
+
         if parameter == 0:
             return base_state
         if parameter == 1:
@@ -117,7 +124,9 @@ class FeetState(object):
         resulting_left_foot = Foot.weighted_average_foot(
             base_state.left_foot, other_state.left_foot, parameter
         )
-        resulting_time = weighted_average(base_state.time, other_state.time, parameter)
+        resulting_time = weighted_average_floats(
+            base_state.time, other_state.time, parameter
+        )
 
         return cls(resulting_right_foot, resulting_left_foot, resulting_time)
 
@@ -130,6 +139,13 @@ class FeetState(object):
         :return: A dictionary of setpoints, the foot location and velocity
             of which corresponds with the feet_state.
         """
+        if feet_state.time is None:
+            raise SubgaitInterpolationError(
+                msg="Feet state needs a time to "
+                "interpolate to setpoint, but time "
+                "was None."
+            )
+
         left_joint_states = Foot.get_joint_states_from_foot_state(
             feet_state.left_foot, feet_state.time
         )

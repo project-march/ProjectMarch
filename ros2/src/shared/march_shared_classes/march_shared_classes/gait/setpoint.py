@@ -1,9 +1,12 @@
 """This module contains the Setpoint class used for defining gaits."""
 
 from __future__ import annotations
+
+from typing import Optional
+
 from march_shared_classes.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
-    weighted_average,
+    weighted_average_floats,
 )
 
 # Use this factor when calculating velocities to keep the calculations within the range of motion
@@ -17,7 +20,9 @@ class Setpoint(object):
 
     digits = 8
 
-    def __init__(self, time: float, position: float, velocity: float = None) -> None:
+    def __init__(
+        self, time: float, position: float, velocity: Optional[float] = None
+    ) -> None:
         """
         Initialize a setpoint.
 
@@ -28,7 +33,7 @@ class Setpoint(object):
         self._time = round(time, self.digits)  # nanoseconds
         self._position = round(position, self.digits)
         if velocity is not None:
-            self._velocity = round(velocity, self.digits)
+            self._velocity: Optional[float] = round(velocity, self.digits)
         else:
             self._velocity = None
 
@@ -135,11 +140,13 @@ class Setpoint(object):
         :return:
             The interpolated setpoint
         """
-        time = weighted_average(base_setpoint.time, other_setpoint.time, parameter)
-        position = weighted_average(
+        time = weighted_average_floats(
+            base_setpoint.time, other_setpoint.time, parameter
+        )
+        position = weighted_average_floats(
             base_setpoint.position, other_setpoint.position, parameter
         )
-        velocity = weighted_average(
+        velocity = weighted_average_floats(
             base_setpoint.velocity, other_setpoint.velocity, parameter
         )
         return Setpoint(time, position, velocity)

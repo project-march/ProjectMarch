@@ -11,13 +11,15 @@ from ament_index_python.packages import get_package_share_directory
 from urdf_parser_py import urdf
 
 from march_shared_classes.exceptions.general_exceptions import SideSpecificationError
-
+from march_shared_classes.utilities.vector_3d import Vector3d
 from .side import Side
 
 
-def weighted_average(base_value: float, other_value: float, parameter: float) -> float:
+def weighted_average_floats(
+    base_value: float, other_value: float, parameter: float
+) -> float:
     """
-    Compute the weighted average of two values with normalised weight parameter.
+    Compute the weighted average of two element with normalised weight parameter.
 
     :param base_value: The first value for the weighted average,
         return this if parameter is 0
@@ -26,9 +28,27 @@ def weighted_average(base_value: float, other_value: float, parameter: float) ->
     :param parameter: The normalised weight parameter, the parameter that
         determines the weight of the second value
 
-    :return: A value which is the weighted average of the given values
+    :return: A vector which is the weighted average of the given values
     """
     return base_value * (1 - parameter) + other_value * parameter
+
+
+def weighted_average_vectors(
+    base_vector: Vector3d, other_vector: Vector3d, parameter: float
+) -> Vector3d:
+    """
+    Compute the weighted average of two element with normalised weight parameter.
+
+    :param base_vector: The first vector for the weighted average,
+        return this if parameter is 0
+    :param other_vector: The second vector for the weighted average,
+        return this if parameter is 1
+    :param parameter: The normalised weight parameter, the parameter that
+        determines the weight of the second vector
+
+    :return: A vector which is the weighted average of the given vectors
+    """
+    return base_vector * (1 - parameter) + other_vector * parameter
 
 
 def merge_dictionaries(dic_one: dict, dic_two: dict) -> dict:
@@ -151,7 +171,7 @@ def get_lengths_robot_for_inverse_kinematics(  # noqa: CCR001
         return [l_ul, l_ll, l_hl, l_ph, base]
     elif side == Side.right:
         return [r_ul, r_ll, r_hl, r_ph, base]
-    elif side == Side.both:
+    else:
         return [l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base]
 
 

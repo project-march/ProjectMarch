@@ -8,6 +8,8 @@ creating gaits based on foot positions.
 from __future__ import annotations
 
 from math import acos, asin, atan, cos, pi, sin, sqrt
+from typing import Tuple
+
 from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
 from march_shared_classes.exceptions.general_exceptions import SideSpecificationError
 from march_shared_classes.gait.setpoint import Setpoint
@@ -17,7 +19,7 @@ from march_shared_classes.utilities.utility_functions import (
 )
 from march_shared_classes.utilities.utility_functions import (
     get_lengths_robot_for_inverse_kinematics,
-    weighted_average,
+    weighted_average_vectors,
 )
 from march_shared_classes.utilities.vector_3d import Vector3d
 
@@ -29,12 +31,10 @@ MID_CALCULATION_PRECISION_DIGITS = 10
 class Foot(object):
     """Class for capturing the state (position and possible velocity) of a foot."""
 
-    def __init__(
-        self, foot_side: Side, position: Vector3d, velocity: float = None
-    ) -> None:
+    def __init__(self, foot_side: Side, position: Vector3d, velocity: Vector3d) -> None:
         """Create a Foot object, position and velocity are both Vector3d objects."""
-        self.position = position
-        self.velocity = velocity
+        self.position: Vector3d = position
+        self.velocity: Vector3d = velocity
         if foot_side != Side.left and foot_side != Side.right:
             raise SideSpecificationError(foot_side)
         self.foot_side = Side(foot_side)
@@ -65,10 +65,10 @@ class Foot(object):
             A Foot object with the position of the foot 1 / VELOCITY_SCALE_FACTOR
             seconds later.
         """
-        next_position = (
-            current_state.position + current_state.velocity * VELOCITY_SCALE_FACTOR
+        next_position = current_state.position + (
+            current_state.velocity * VELOCITY_SCALE_FACTOR
         )
-        return cls(current_state.foot_side, next_position)
+        return cls(current_state.foot_side, next_position, current_state.velocity)
 
     @staticmethod
     def get_joint_states_from_foot_state(foot_state: Foot, time: float) -> dict:
@@ -231,7 +231,7 @@ class Foot(object):
     @staticmethod
     def calculate_hfe_kfe_angles(
         transformed_x: float, transformed_z: float, upper_leg: float, lower_leg: float
-    ) -> (float, float):
+    ) -> Tuple[float, float]:
         """Calculate the hfe and kfe angles.
 
         This is done given a desired transformed x and z coordinate using the cosine
@@ -309,7 +309,9 @@ class Foot(object):
         else:
             y_position = cos(haa) * ph + sin(haa) * haa_to_foot_length + base / 2.0
 
-        return Foot(side, Vector3d(x_position, y_position, z_position))
+        return Foot(
+            side, Vector3d(x_position, y_position, z_position), Vector3d(0.0, 0.0, 0.0)
+        )
 
     @staticmethod
     def weighted_average_foot(
@@ -329,17 +331,14 @@ class Foot(object):
         """
         if base_foot.foot_side != other_foot.foot_side:
             raise SideSpecificationError(
+                other_foot.foot_side,
                 f"Expected sides of both base and other foot to be equal but "
-                f"were {base_foot.foot_side} and {other_foot.foot_side}."
+                f"were {base_foot.foot_side} and {other_foot.foot_side}.",
             )
-        resulting_position = weighted_average(
+        resulting_position = weighted_average_vectors(
             base_foot.position, other_foot.position, parameter
         )
-        if base_foot.velocity is not None and other_foot.velocity is not None:
-            resulting_velocity = weighted_average(
-                base_foot.velocity, other_foot.velocity, parameter
-            )
-        else:
-            resulting_velocity = None
-
+        resulting_velocity = weighted_average_vectors(
+            base_foot.velocity, other_foot.velocity, parameter
+        )
         return Foot(base_foot.foot_side, resulting_position, resulting_velocity)
