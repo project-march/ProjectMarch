@@ -165,13 +165,8 @@ class JointTrajectory(object):
         from_setpoint = self.setpoints[-1]
         to_setpoint = joint.setpoints[0]
 
-        if (
-            abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR
+        return abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR \
             and abs(from_setpoint.position - to_setpoint.position) <= ALLOWED_ERROR
-        ):
-            return True
-
-        return False
 
     def _validate_boundary_points(self) -> bool:
         """Validate the starting and ending of this joint.
@@ -281,7 +276,7 @@ class JointTrajectory(object):
         base_joint: JointTrajectory,
         other_joint: JointTrajectory,
         number_of_setpoints: int,
-    ) -> None:
+    ) -> bool:
         """Check whether it is possible to interpolate between the two joint trajectories.
 
         :param base_joint: The first joint trajectory to interpolate.
@@ -314,3 +309,4 @@ class JointTrajectory(object):
                 f"Not able to safely interpolate because limits are not equal for "
                 f"joints {base_joint.name} and {other_joint.name}"
             )
+        return True

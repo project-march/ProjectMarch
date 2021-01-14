@@ -408,7 +408,7 @@ class Subgait(object):
 
     # region Get functions
     def get_unique_timestamps(self) -> List[float]:
-        """Get the timestamp that is unique to a setpoint."""
+        """Get the timestamps that are unique to a setpoint."""
         timestamps = []
         for joint in self.joints:
             for setpoint in joint.setpoints:

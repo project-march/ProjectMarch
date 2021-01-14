@@ -128,10 +128,7 @@ class Foot(object):
             the correct angle at the provided time.
         """
         if foot_side != Side.left and foot_side != Side.right:
-            raise SideSpecificationError(
-                foot_side,
-                f"Side should be either 'left' or 'right', but was " f"{foot_side}",
-            )
+            raise SideSpecificationError(foot_side)
         # Get relevant lengths from robot model, ul = upper leg etc.
         # see get_lengths_robot_for_inverse_kinematics() and unpack desired position
         [ul, ll, hl, ph, base] = get_lengths_robot_for_inverse_kinematics(foot_side)
