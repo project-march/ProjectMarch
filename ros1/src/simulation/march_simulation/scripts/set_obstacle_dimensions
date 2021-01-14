@@ -23,31 +23,34 @@ delete_publisher = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
 get_world_properties = rospy.ServiceProxy('/gazebo/get_world_properties', GetWorldProperties)
 
 def set_new_stairs_like_obstacle(name, length=0, width=0, height=0):
-    length = 'length="{length}"'.format(length=length) if length != 0 else ''
-    width = 'width="{width}"'.format(width=width) if width != 0 else ''
-    height = 'height="{height}"'.format(height=height) if height != 0 else ''
+    length = make_set_size_string('length', length)
+    width = make_set_size_string('width', width)
+    height = make_set_size_string('height', height)
 
-    doc = xacro.parse('''<?xml version="1.0"?>
-            <robot name="{name}" xmlns:xacro="http://www.ros.org/wiki/xacro">
-                <xacro:include filename="$(find march_simulation)/obstacles/{name}_macro.xacro"/>
-                <xacro:{name} {length} {width} {height}/>
-            </robot>
-            '''.format(name=name, length=length, width=width, height=height), None)
+    doc = make_xacro_file(name, length, width, height)
     set_size(name, doc)
 
 def set_new_ramp_like_obstacle(name, slope_up=0, slope_down=0, ramp_up_length=0):
-    slope_up = 'slope_up="{slope_up}"'.format(slope_up=slope_up) if slope_up != 0 else ''
-    slope_down = 'slope_down="{slope_down}"'.format(slope_down=slope_down) if slope_down != 0 else ''
-    ramp_up_length = 'ramp_up_length="{ramp_up_length}"'.format(ramp_up_length=ramp_up_length) \
-        if ramp_up_length != 0 else ''
+    slope_up = make_set_size_string('slope_up', slope_up)
+    slope_down = make_set_size_string('slope_down', slope_down)
+    ramp_up_length = make_set_size_string('ramp_up_length', ramp_up_length)
 
+    doc = make_xacro_file(name, slope_up, slope_down, ramp_up_length)
+    set_size(name, doc)
+
+def make_set_size_string(dimension, size):
+    if size == 0:
+        return ''
+    return f'{dimension}="{size}"'
+
+def make_xacro_file(name, parameter_1, parameter_2, parameter_3):
     doc = xacro.parse('''<?xml version="1.0"?>
                 <robot name="{name}" xmlns:xacro="http://www.ros.org/wiki/xacro">
                     <xacro:include filename="$(find march_simulation)/obstacles/{name}_macro.xacro"/>
-                    <xacro:{name} {slope_up} {slope_down} {ramp_up_length}/>
+                    <xacro:{name} {parameter_1} {parameter_2} {parameter_3}/>
                 </robot>
-                '''.format(name=name, slope_up=slope_up, slope_down=slope_down, ramp_up_length=ramp_up_length), None)
-    set_size(name, doc)
+                '''.format(name=name, parameter_1=parameter_1, parameter_2=parameter_2, parameter_3=parameter_3), None)
+    return doc
 
 def set_size(name, doc):
     xacro.process_doc(doc)
