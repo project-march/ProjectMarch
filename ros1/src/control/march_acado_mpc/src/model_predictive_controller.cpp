@@ -27,7 +27,7 @@ void ModelPredictiveController::init() {
     acadoVariables.x[i * ACADO_NX + 1] = 0; // dtheta
   }
 
-  double theta_ref = 25*(M_PI/180);
+  double theta_ref = 90*(M_PI/180);
 
   // Prepare references (step reference)
   for (int i = 0; i < ACADO_N; ++i) {
@@ -41,7 +41,7 @@ void ModelPredictiveController::init() {
   acadoVariables.yN[2] = 0;         // T
 
   // Current state feedback
-  ModelPredictiveController::setInitialState(x0);
+  setInitialState(x0);
 
   // Warm-up the solver
   acado_preparationStep();
