@@ -12,9 +12,11 @@ from march_utility.exceptions.gait_exceptions import (
 from .subgait import Subgait
 from .subgait_graph import SubgaitGraph
 
+ALLOWED_ERROR_ENDPOINTS = 0.0001
+
 
 class Gait(object):
-    """base class for a generated gait."""
+    """Base class for a generated gait."""
 
     def __init__(self, gait_name: str, subgaits: dict, graph: SubgaitGraph):
         """Initializes and verifies the gait.
@@ -108,7 +110,8 @@ class Gait(object):
         :param gait_directory: path of the directory where the .gait file is located
         :param gait_name: the name of the gait where the subgait belongs to
         :param subgait_name: the name of the subgait to load
-        :param gait_version_map: the parsed yaml file which states the version of the subgaits
+        :param gait_version_map: the parsed yaml file which states the version of
+        the subgaits
         :return: Gait if gait and subgait names are valid return populated Gait object
         """
         if gait_name not in gait_version_map:
@@ -169,22 +172,40 @@ class Gait(object):
                     old_subgait = self.subgaits[to_subgait_name]
                     new_subgait = new_subgaits[to_subgait_name]
 
-                    if old_subgait.starting_position != new_subgait.starting_position:
-                        raise NonValidGaitContent(
-                            msg="The starting position of new version {gait} {subgait} does not match".format(
-                                gait=self.gait_name, subgait=to_subgait_name
+                    old_starting_positions = old_subgait.starting_position
+                    new_starting_positions = new_subgait.starting_position
+                    for joint in old_subgait.joints:
+                        if (
+                            abs(
+                                old_starting_positions[joint.name]
+                                - new_starting_positions[joint.name]
                             )
-                        )
+                            >= ALLOWED_ERROR_ENDPOINTS
+                        ):
+                            raise NonValidGaitContent(
+                                msg=f"The starting position of new version "
+                                f"{self.gait_name} {to_subgait_name} does not match"
+                            )
                 elif to_subgait_name == self.graph.END:
                     old_subgait = self.subgaits[from_subgait_name]
                     new_subgait = new_subgaits[from_subgait_name]
 
-                    if old_subgait.final_position != new_subgait.final_position:
-                        raise NonValidGaitContent(
-                            msg="The final position of new version {gait} {subgait} does not match".format(
-                                gait=self.gait_name, subgait=from_subgait_name
+                    old_final_positions = old_subgait.final_position
+                    new_final_positions = new_subgait.final_position
+                    for joint in old_subgait.joints:
+                        if (
+                            abs(
+                                old_final_positions[joint.name]
+                                - new_final_positions[joint.name]
                             )
-                        )
+                            >= ALLOWED_ERROR_ENDPOINTS
+                        ):
+                            raise NonValidGaitContent(
+                                msg=f"The final position of new version "
+                                f"{self.gait_name} {from_subgait_name} does not "
+                                f"match"
+                            )
+
                 else:
                     from_subgait = new_subgaits.get(
                         from_subgait_name, self.subgaits[from_subgait_name]
@@ -195,11 +216,9 @@ class Gait(object):
 
                     if not from_subgait.validate_subgait_transition(to_subgait):
                         raise NonValidGaitContent(
-                            msg="Gait {gait} with end setpoint of subgait {sn} to subgait {ns} does not match".format(
-                                gait=self.gait_name,
-                                sn=from_subgait.subgait_name,
-                                ns=to_subgait.subgait_name,
-                            )
+                            msg=f"Gait {self.gait_name} with end setpoint of subgait "
+                            f"{from_subgait.subgait_name} to "
+                            f"subgait {to_subgait.subgait_name} does not match"
                         )
 
         self.subgaits.update(new_subgaits)

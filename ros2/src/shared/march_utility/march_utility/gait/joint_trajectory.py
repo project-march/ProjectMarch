@@ -1,4 +1,12 @@
-from typing import List
+"""
+This module contain the JointTrajectory class.
+
+This is used for for creating the positions that should be followed by the joints,
+and to check the safety limits.
+"""
+
+from __future__ import annotations
+from typing import List, Tuple, Any
 
 from rclpy.duration import Duration
 from scipy.interpolate import BPoly
@@ -10,6 +18,8 @@ from march_utility.exceptions.gait_exceptions import (
     NonValidGaitContent,
 )
 from .setpoint import Setpoint
+
+ALLOWED_ERROR = 0.001
 
 
 class JointTrajectory(object):
@@ -23,20 +33,20 @@ class JointTrajectory(object):
         limits: Limits,
         setpoints: List[Setpoint],
         duration: float,
-        *args,
-    ):
+    ) -> None:
+        """Initialize a joint trajectory."""
         self.name = name
         self.limits = limits
         self._setpoints = setpoints
         self._duration = round(duration, self.setpoint_class.digits)  # seconds
-        self.interpolated_position = None
-        self.interpolated_velocity = None
+        self.interpolated_position: Any = None
+        self.interpolated_velocity: Any = None
         self.interpolate_setpoints()
 
     @classmethod
     def from_setpoints(
-        cls, name: str, limits: Limits, setpoints: List[dict], duration: float, *args
-    ):
+        cls, name: str, limits: Limits, setpoint_dict: List[dict], duration: float
+    ) -> JointTrajectory:
         """Creates a list of joint trajectories.
 
         :param str name: Name of the joint
@@ -45,7 +55,7 @@ class JointTrajectory(object):
         :param duration: The total duration of the trajectory
         """
         setpoints = [
-            cls.setpoint_class(
+            Setpoint(
                 time=Duration(
                     seconds=setpoint["time_from_start"]["secs"],
                     nanoseconds=setpoint["time_from_start"]["nsecs"],
@@ -54,13 +64,17 @@ class JointTrajectory(object):
                 position=setpoint["position"],
                 velocity=setpoint["velocity"],
             )
-            for setpoint in setpoints
+            for setpoint in setpoint_dict
         ]
-        return cls(name, limits, setpoints, duration, *args)
+        return cls(name, limits, setpoints, duration)
 
     @staticmethod
-    def get_joint_from_urdf(robot: urdf.Robot, joint_name: str):
-        """Get the name of the robot joint corresponding with the joint in the subgait."""
+    def get_joint_from_urdf(robot: urdf.Robot, joint_name: str) -> urdf.Joint:
+        """Get the joint from the urdf robot with the given joint name.
+
+        :param robot: The urdf robot to use.
+        :param joint_name: The name to look for.
+        """
         for urdf_joint in robot.joints:
             if urdf_joint.name == joint_name:
                 return urdf_joint
@@ -68,9 +82,16 @@ class JointTrajectory(object):
 
     @property
     def duration(self) -> float:
+        """Get the duration of the joint trajectory."""
         return self._duration
 
     def set_duration(self, new_duration: float, rescale: bool = True) -> None:
+        """Change the duration of the joint trajectory.
+
+        :param new_duration: The new duration to change to.
+        :param rescale: If true, the trajectory will be shortened/lengthed by rescaling.
+            Else, the setpoints outside of the duration will be removed.
+        """
         for setpoint in reversed(self.setpoints):
             if rescale:
                 setpoint.time = setpoint.time * new_duration / self.duration
@@ -82,12 +103,13 @@ class JointTrajectory(object):
         self._duration = round(new_duration, self.setpoint_class.digits)
         self.interpolate_setpoints()
 
-    def from_begin_point(self, begin_time: float, position) -> None:
+    def from_begin_point(self, begin_time: float, position: float) -> None:
         """
-        Manipulates the gait to start at given time. Removes all set points
-        after the given begin time. Adds the begin position with 0 velocity at
-        the start. It also adds 1 second at the beginning to allow speeding up
-        to the required speed again.
+        Manipulate the gait to start at given time.
+
+        Removes all set points after the given begin time. Adds the begin position
+        with 0 velocity at the start. It also adds 1 second at the beginning
+        to allow speeding up to the required speed again.
         :param begin_time: The time to start
         :param position: The position to start from
         """
@@ -111,7 +133,7 @@ class JointTrajectory(object):
         self._setpoints = setpoints
         self.interpolate_setpoints()
 
-    def get_setpoints_unzipped(self) -> (List[float], List[float], List[float]):
+    def get_setpoints_unzipped(self) -> Tuple[List[float], List[float], List[float]]:
         """Get all the listed attributes of the setpoints."""
         time = []
         position = []
@@ -124,7 +146,7 @@ class JointTrajectory(object):
 
         return time, position, velocity
 
-    def validate_joint_transition(self, joint) -> bool:
+    def validate_joint_transition(self, joint: JointTrajectory) -> bool:
         """Validate the ending and starting of this joint to a given joint.
 
         :param joint:
@@ -142,19 +164,18 @@ class JointTrajectory(object):
 
         from_setpoint = self.setpoints[-1]
         to_setpoint = joint.setpoints[0]
-        if (
-            from_setpoint.velocity == to_setpoint.velocity
-            and from_setpoint.position == to_setpoint.position
-        ):
-            return True
 
-        return False
+        return (
+            abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR
+            and abs(from_setpoint.position - to_setpoint.position) <= ALLOWED_ERROR
+        )
 
     def _validate_boundary_points(self) -> bool:
-        """Validate the starting and ending of this joint are at t = 0 and t = duration, or that their speed is zero.
+        """Validate the starting and ending of this joint.
 
         :returns:
-            False if the starting/ending point is (not at 0/duration) and (has nonzero speed), True otherwise
+            False if the starting/ending point is (not at 0/duration) and
+            (has nonzero speed), True otherwise
         """
         return (self.setpoints[0].time == 0 or self.setpoints[0].velocity == 0) and (
             self.setpoints[-1].time == round(self.duration, Setpoint.digits)
@@ -162,6 +183,7 @@ class JointTrajectory(object):
         )
 
     def interpolate_setpoints(self) -> None:
+        """Interpolate the setpoints from the joint trajectory."""
         if len(self.setpoints) == 1:
             self.interpolated_position = lambda time: self.setpoints[0].position
             self.interpolated_velocity = lambda time: self.setpoints[0].velocity
@@ -172,12 +194,17 @@ class JointTrajectory(object):
         for i in range(0, len(time)):
             yi.append([position[i], velocity[i]])
 
-        # We do a cubic spline here, just like the ros joint_trajectory_action_controller,
-        # see https://wiki.ros.org/robot_mechanism_controllers/JointTrajectoryActionController
+        # We do a cubic spline here, like the ros joint_trajectory_action_controller,
+        # https://wiki.ros.org/robot_mechanism_controllers/JointTrajectoryActionController
         self.interpolated_position = BPoly.from_derivatives(time, yi)
         self.interpolated_velocity = self.interpolated_position.derivative()
 
-    def get_interpolated_setpoint(self, time) -> Setpoint:
+    def get_interpolated_setpoint(self, time: float) -> Setpoint:
+        """Get a setpoint on a certain time.
+
+        If there is no setpoint at this time point, it will interpolate
+        between the setpoints.
+        """
         if time < 0:
             return self.setpoint_class(time, self.setpoints[0].position, 0)
         if time > self.duration:
@@ -195,10 +222,12 @@ class JointTrajectory(object):
     def __len__(self):
         return len(self.setpoints)
 
-    @classmethod
+    @staticmethod
     def interpolate_joint_trajectories(
-        cls, base_trajectory, other_trajectory, parameter: float
-    ):
+        base_trajectory: JointTrajectory,
+        other_trajectory: JointTrajectory,
+        parameter: float,
+    ) -> JointTrajectory:
         """Linearly interpolate two joint trajectories with the parameter.
 
         :param base_trajectory:
@@ -213,10 +242,11 @@ class JointTrajectory(object):
         """
         if base_trajectory.limits != other_trajectory.limits:
             raise SubgaitInterpolationError(
-                "Not able to safely interpolate because limits are not equal for joint {0}".format(
-                    base_trajectory.name
-                )
+                f"Not able to safely interpolate because limits "
+                f"are not equal for joints {base_trajectory.name} "
+                f"and {other_trajectory.name}"
             )
+
         if len(base_trajectory.setpoints) != len(other_trajectory.setpoints):
             raise SubgaitInterpolationError(
                 "The amount of setpoints do not match for joint {0}".format(
@@ -224,14 +254,17 @@ class JointTrajectory(object):
                 )
             )
         setpoints = []
+
         for base_setpoint, other_setpoint in zip(
             base_trajectory.setpoints, other_trajectory.setpoints
         ):
-            setpoints.append(
-                cls.setpoint_class.interpolate_setpoints(
+            interpolated_setpoint_to_add = (
+                JointTrajectory.setpoint_class.interpolate_setpoints(
                     base_setpoint, other_setpoint, parameter
                 )
             )
+            setpoints.append(interpolated_setpoint_to_add)
+
         duration = (
             parameter * base_trajectory.duration
             + (1 - parameter) * other_trajectory.duration
@@ -239,3 +272,43 @@ class JointTrajectory(object):
         return JointTrajectory(
             base_trajectory.name, base_trajectory.limits, setpoints, duration
         )
+
+    @staticmethod
+    def check_joint_interpolation_is_safe(
+        base_joint: JointTrajectory,
+        other_joint: JointTrajectory,
+        number_of_setpoints: int,
+    ) -> bool:
+        """Check whether it is possible to interpolate between the two joint trajectories.
+
+        :param base_joint: The first joint trajectory to interpolate.
+        :param other_joint: The second joint trajectory to interpolate.
+        :param number_of_setpoints: The number of setpoints the joint trajectories
+            should have.
+        """
+        if base_joint.name != other_joint.name:
+            raise SubgaitInterpolationError(
+                f"The subgaits to interpolate do not have the same joints, base"
+                f" subgait has {base_joint.name}, while other subgait has "
+                f"{other_joint.name}"
+            )
+
+            # check whether each joint has the same number of setpoints for
+            # the interpolation using foot position
+        if len(base_joint.setpoints) != number_of_setpoints:
+            raise SubgaitInterpolationError(
+                f"Number of setpoints differs in {base_joint.name} from  "
+                f"{number_of_setpoints}."
+            )
+        elif len(other_joint.setpoints) != number_of_setpoints:
+            raise SubgaitInterpolationError(
+                f"Number of setpoints differs in {base_joint.name} from "
+                f"{number_of_setpoints}"
+            )
+            # check whether each base joint as its corresponding other joint
+        if base_joint.limits != other_joint.limits:
+            raise SubgaitInterpolationError(
+                f"Not able to safely interpolate because limits are not equal for "
+                f"joints {base_joint.name} and {other_joint.name}"
+            )
+        return True
