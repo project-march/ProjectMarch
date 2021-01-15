@@ -35,8 +35,11 @@ container:build:
     entrypoint: [""]
   script:
     - mkdir -p /kaniko/.docker
+    # Equivalent to `docker login` but without installing docker"
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --cache=true --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH --cleanup
+    # The kaniko executor from https://github.com/GoogleContainerTools/kaniko
+    # Information about all the parameters can be found there.
+    - /kaniko/executor --cache=true --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH --cleanup --snapshotMode=redo --use-new-run
   rules:
     - if: '$CI_COMMIT_BRANCH'
       #      changes:
