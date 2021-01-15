@@ -42,9 +42,8 @@ container:build:
     - /kaniko/executor --cache=true --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH --cleanup --snapshotMode=redo --use-new-run
   rules:
     - if: '$CI_COMMIT_BRANCH'
-      #      changes:
-      #        - Dockerfile
-      #        - "**/package.xml"
+      changes:
+        - Dockerfile
 
 # Runs a linter on the code to see if the code style is consistent and to avoid common
 # mistakes
