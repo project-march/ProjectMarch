@@ -59,6 +59,7 @@ flake8:
   artifacts:
     reports:
       codequality: flakehell.json
+  allow_failure: true
 
 noetic:build:
   stage: Build code
