@@ -8,8 +8,6 @@ format = "grouped"
 max_line_length = 80
 # show line of source code in output
 show_source = true
-# Baseline to use as reference
-baseline = ".flake-baseline"
 
 # list of plugins and rules for them
 [tool.flakehell.plugins]
