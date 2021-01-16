@@ -2,6 +2,8 @@ import math
 import os
 import subprocess
 
+from .inverse_kinematics_setpoints_view import InverseKinematicsSetpointsView
+
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore
 from python_qt_binding import loadUi
@@ -225,6 +227,9 @@ class GaitGeneratorView(QWidget):
             "a subdirectory of march_gait_files or be named resources.",
             os.path.join(self.ros2_path, "src", "gaits", "march_gait_files"),
         )
+
+    def open_inverse_kinematics_setpoints_dialogue(self):
+        InverseKinematicsSetpointsView.show(self)
 
     @QtCore.pyqtSlot(int)
     def update_main_time_slider(self, time):
