@@ -395,6 +395,7 @@ class GaitGeneratorController(object):
 
     def open_inverse_kinematics_setpoints_window(self):
         rospy.loginfo("hey you pressed the button, nice ouwe")
+        self.view.open_inverse_kinematics_setpoints_dialogue()
 
     def invert_gait(self):
         for side, controller in self.side_subgait_controller.items():
