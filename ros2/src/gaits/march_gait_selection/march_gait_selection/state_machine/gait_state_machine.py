@@ -128,11 +128,9 @@ class GaitStateMachine(object):
             if force > PRESSURE_SOLE_STANDING_FORCE:
                 if not self._right_foot_on_ground and side is Side.right:
                     self._right_foot_on_ground = True
-                    # self._force_right_foot = force
                     self._freeze()
                 elif not self._left_foot_on_ground and side is Side.left:
                     self._left_foot_on_ground = True
-                    # self._force_left_foot = force
                     self._freeze()
 
             # Assign force to specific foot
