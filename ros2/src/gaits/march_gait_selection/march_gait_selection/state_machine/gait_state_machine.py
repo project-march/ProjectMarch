@@ -269,18 +269,29 @@ class GaitStateMachine(object):
         """Check if the pressure is placed on the right foot when starting a gait from idle."""
 
         self._gait_selection.get_logger().debug(
-            'Force right: {0}, Left: {1}'.format(self._force_right_foot, self._force_left_foot))
+            "Force right: {0}, Left: {1}".format(
+                self._force_right_foot, self._force_left_foot
+            )
+        )
 
         # Check if the pressure is placed on the correct foot
         # Pressure always has to be placed on the foot opposite to the starting foot
 
-        if "right" in self._current_gait.subgait_name and self._force_right_foot > self._force_left_foot:
+        if (
+            "right" in self._current_gait.subgait_name
+            and self._force_right_foot > self._force_left_foot
+        ):
             self._gait_selection.get_logger().warn(
-                'Incorrect foot pressure, place pressure on left foot')
+                "Incorrect foot pressure, place pressure on left foot"
+            )
             return 0
-        elif "left" in self._current_gait.subgait_name and self._force_left_foot > self._force_right_foot:
+        elif (
+            "left" in self._current_gait.subgait_name
+            and self._force_left_foot > self._force_right_foot
+        ):
             self._gait_selection.get_logger().warn(
-                'Incorrect foot pressure, place pressure on right foot')
+                "Incorrect foot pressure, place pressure on right foot"
+            )
             return 0
 
         return 1
@@ -319,7 +330,7 @@ class GaitStateMachine(object):
     def _process_gait_state(self, elapsed_time):
         """Processes the current state when there is a gait happening.
         Schedules the next subgait if there is no trajectory happening or
-        finishes the gait if it is done. """
+        finishes the gait if it is done."""
         if self._current_gait is None:
             if self._current_state in self._home_gaits:
                 self._current_gait = self._home_gaits[self._current_state]
