@@ -128,9 +128,11 @@ class GaitStateMachine(object):
             if force > PRESSURE_SOLE_STANDING_FORCE:
                 if not self._right_foot_on_ground and side is Side.right:
                     self._right_foot_on_ground = True
+                    # self._force_right_foot = force
                     self._freeze()
                 elif not self._left_foot_on_ground and side is Side.left:
                     self._left_foot_on_ground = True
+                    # self._force_left_foot = force
                     self._freeze()
 
             # Assign force to specific foot
@@ -367,7 +369,6 @@ class GaitStateMachine(object):
         trajectory, should_stop = self._current_gait.update(elapsed_time)
         # schedule trajectory if any
         if trajectory is not None:
-            self.check_foot_pressure()
             self._call_gait_callbacks()
             self._gait_selection.get_logger().info(
                 "Scheduling {subgait}".format(subgait=self._current_gait.subgait_name)
