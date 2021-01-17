@@ -128,11 +128,9 @@ class GaitStateMachine(object):
             if force > PRESSURE_SOLE_STANDING_FORCE:
                 if not self._right_foot_on_ground and side is Side.right:
                     self._right_foot_on_ground = True
-                    # self._force_right_foot = force
                     self._freeze()
                 elif not self._left_foot_on_ground and side is Side.left:
                     self._left_foot_on_ground = True
-                    # self._force_left_foot = force
                     self._freeze()
 
             # Assign force to specific foot
@@ -271,10 +269,11 @@ class GaitStateMachine(object):
         if not self._is_idle:
             self._should_stop = True
 
-    def correct_foot_pressure(self):
-        """Check if the pressure is placed on the foot opposite to the subgait starting foot.
-        If not, issue a warning. This will only be checked when transitioning from idle to gait state"""
-
+    def correct_foot_pressure(self) -> bool:
+        """
+        Check if the pressure is placed on the foot opposite to the subgait starting foot.
+        If not, issue a warning. This will only be checked when transitioning from idle to gait state
+        """
         if (
             "right" in self._current_gait.subgait_name
             and self._force_right_foot > self._force_left_foot
@@ -342,9 +341,8 @@ class GaitStateMachine(object):
             if trajectory is not None:
                 if not self.correct_foot_pressure():
                     self._gait_selection.get_logger().debug(
-                        "Foot forces when incorrect pressure warning was issued: left={0}, right={1}".format(
-                            self._force_left_foot, self._force_right_foot
-                        )
+                        f"Foot forces when incorrect pressure warning was issued: "
+                        f"left={self._force_left_foot}, right={self._force_right_foot}"
                     )
                 self._call_gait_callbacks()
                 self._gait_selection.get_logger().info(
