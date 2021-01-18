@@ -67,6 +67,7 @@ public:
     int alpha_filter_size[2];
     std::vector<std::vector<double>> vibration_boundaries{ { 0.0, 0.0 }, { 0.0, 0.0 } };
     std::vector<double> default_vibration = { 0.0, 1.0 };
+
     ros::NodeHandle rotary_estimator_nh(nh, std::string("inertia_estimator/rotary"));
     rotary_estimator_nh.param("std_samples", samples_, 100);
     rotary_estimator_nh.param("lambda", lambda[0], 1.0);
