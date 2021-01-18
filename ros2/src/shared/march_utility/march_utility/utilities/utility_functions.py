@@ -10,8 +10,8 @@ from typing import List
 from ament_index_python.packages import get_package_share_directory
 from urdf_parser_py import urdf
 
-from march_shared_classes.exceptions.general_exceptions import SideSpecificationError
-from march_shared_classes.utilities.vector_3d import Vector3d
+from march_utility.exceptions.general_exceptions import SideSpecificationError
+from march_utility.utilities.vector_3d import Vector3d
 from .side import Side
 
 

@@ -5,15 +5,15 @@ This class is  used to create gaits based on the state of both feet.
 """
 from __future__ import annotations
 
-from march_shared_classes.gait.setpoint import Setpoint
-from march_shared_classes.utilities.side import Side
-from march_shared_classes.utilities.utility_functions import (
+from march_utility.gait.setpoint import Setpoint
+from march_utility.utilities.side import Side
+from march_utility.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
     merge_dictionaries,
     weighted_average_floats,
 )
 
-from march_shared_classes.exceptions.gait_exceptions import (
+from march_utility.exceptions.gait_exceptions import (
     SubgaitInterpolationError,
 )
 from .foot import Foot

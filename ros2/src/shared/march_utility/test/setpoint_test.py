@@ -1,14 +1,15 @@
 from math import pi
 import unittest
 
-from march_shared_classes.foot_classes.feet_state import FeetState
-from march_shared_classes.foot_classes.foot import Foot
-from march_shared_classes.gait.setpoint import Setpoint
-from march_shared_classes.utilities.side import Side
-from march_shared_classes.utilities.utility_functions import (
+
+from march_utility.foot_classes.feet_state import FeetState
+from march_utility.foot_classes.foot import Foot
+from march_utility.gait.setpoint import Setpoint
+from march_utility.utilities.side import Side
+from march_utility.utilities.utility_functions import (
     get_lengths_robot_for_inverse_kinematics,
 )
-from march_shared_classes.utilities.vector_3d import Vector3d
+from march_utility.utilities.vector_3d import Vector3d
 
 
 class SetpointTest(unittest.TestCase):

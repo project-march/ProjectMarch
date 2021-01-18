@@ -7,7 +7,7 @@
 #include "rclcpp/timer.hpp"
 #include "march_fake_sensor_data/FakeTemperatureData.hpp"
 #include "march_fake_sensor_data/UniformDistribution.hpp"
-#include "march_shared_msgs/srv/get_joint_names.hpp"
+#include "march_utility/node_utils.hpp"
 #include <chrono>
 #include <deque>
 #include <vector>
@@ -58,42 +58,12 @@ FakeTemperatureDataNode::FakeTemperatureDataNode(const std::string& node_name, c
 void FakeTemperatureDataNode::initialize()
 {
     // Create a temperature publisher for all the different joints.
-    for (auto sensor : get_joint_names()) {
+    for (auto sensor : node_utils::get_joint_names(*this)) {
         add_temperature_publisher(sensor);
     }
 
     // Ensure that new fake temperatures are published every 100 ms.
     timer = this->create_wall_timer(100ms, std::bind(&FakeTemperatureDataNode::timer_callback, this));
-}
-
-std::vector<std::string> FakeTemperatureDataNode::get_joint_names()
-{
-    std::vector<std::string> names;
-
-    auto client = this->create_client<march_shared_msgs::srv::GetJointNames>("/march/robot_information/get_joint_names");
-    auto request = std::make_shared<march_shared_msgs::srv::GetJointNames::Request>();
-
-    // Wait until the service is available. Sending a request to an unavailable service
-    // will always fail.
-    while (!client->wait_for_service(5s)) {
-        if (!rclcpp::ok()) {
-            RCLCPP_ERROR(rclcpp::get_logger(LOGGER_NAME), "Interrupted while waiting for parameter_server service. Exiting.");
-            return names;
-        }
-        RCLCPP_INFO(rclcpp::get_logger(LOGGER_NAME), "The get_joint_names service was unavailable, waiting again...");
-    }
-
-    // Send the request and push the received names to the names vector.
-    auto result = client->async_send_request(request);
-    if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), result) == rclcpp::FutureReturnCode::SUCCESS) {
-        for (auto joint_name : result.get()->joint_names) {
-            names.push_back(joint_name);
-        }
-    } else {
-        RCLCPP_ERROR(rclcpp::get_logger(LOGGER_NAME), "Failed to call ROS 1 to ROS 2 parameter_server get joint names service");
-    }
-
-    return names;
 }
 
 /*

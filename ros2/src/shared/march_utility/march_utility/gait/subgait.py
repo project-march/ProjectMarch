@@ -8,13 +8,13 @@ from rclpy.duration import Duration
 from trajectory_msgs import msg as trajectory_msg
 import yaml
 from urdf_parser_py import urdf
-from march_shared_classes.exceptions.gait_exceptions import (
+from march_utility.exceptions.gait_exceptions import (
     NonValidGaitContent,
     SubgaitInterpolationError,
     GaitError,
 )
-from march_shared_classes.foot_classes.feet_state import FeetState
-from march_shared_classes.utilities.utility_functions import (
+from march_utility.foot_classes.feet_state import FeetState
+from march_utility.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
     weighted_average_floats,
 )
