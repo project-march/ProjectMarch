@@ -1,14 +1,17 @@
 import math
 import os
 import subprocess
+import sys
 
-from .inverse_kinematics_setpoints_view import InverseKinematicsSetpointsView
+from .inverse_kinematics_setpoints_input import Ui_inverse_kinematics_setpoints_input_dialogue
 
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore
 from python_qt_binding import loadUi
 from python_qt_binding.QtGui import QKeySequence
 from python_qt_binding.QtWidgets import (
+    QApplication,
+    QDialog,
     QFileDialog,
     QFrame,
     QHeaderView,
@@ -229,7 +232,15 @@ class GaitGeneratorView(QWidget):
         )
 
     def open_inverse_kinematics_setpoints_dialogue(self):
-        InverseKinematicsSetpointsView.show(self)
+        rospy.loginfo("you made it to the gg_view file")
+        app = QApplication(sys.argv)
+        window = QDialog()
+        ui = Ui_inverse_kinematics_setpoints_input_dialogue()
+        ui.setupUi(window)
+        rospy.loginfo("the ui was even setup, thats crazy")
+        window.exec_()
+        rospy.loginfo("window.show() has been ran, only sys.exit(app.exec_()) is now left")
+        # sys.exit(app.exec_())
 
     @QtCore.pyqtSlot(int)
     def update_main_time_slider(self, time):
