@@ -45,5 +45,5 @@ pyflakes = ["+*"]
 pylint = ["+*"]
 
 [tool.flakehell.exceptions."**/*_test.py"]
-flake8-annotations = ["-ANN2*"]
+flake8-annotations = ["-ANN*"]
 flake8-docstrings = ["-*"]

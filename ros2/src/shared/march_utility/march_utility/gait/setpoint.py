@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from march_shared_classes.utilities.utility_functions import (
+from march_utility.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
     weighted_average_floats,
 )

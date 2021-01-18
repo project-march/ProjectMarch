@@ -43,9 +43,6 @@ class FakeTemperatureDataNode final : public rclcpp::Node {
         // Callback function that will be called by the timer.
         void timer_callback();
 
-        // Retrieve the joint names from the published robot description.
-        JointNames get_joint_names();
-
         // Callback function that is called whenever the parameters are changed
         rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr parameter_callback;
         rcl_interfaces::msg::SetParametersResult update_parameters(const std::vector<rclcpp::Parameter> & parameters);

@@ -1,6 +1,6 @@
 """This module contains some errors that are specific to the Project March code."""
 from __future__ import annotations
-from march_shared_classes.utilities.side import Side
+from march_utility.utilities.side import Side
 
 
 class PackageNotFoundError(Exception):

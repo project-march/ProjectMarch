@@ -12,6 +12,7 @@
   <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>
   <depend>march_shared_msgs</depend>
+  <depend>march_utility</depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
 

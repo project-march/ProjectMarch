@@ -13,6 +13,7 @@
   <buildtool_depend>python3-setuptools</buildtool_depend>
 
   <depend>march_shared_msgs</depend>
+  <depend>march_description</depend>
 
   <test_depend>ros2test</test_depend>
 

@@ -21,20 +21,21 @@ find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(march_shared_msgs REQUIRED)
+find_package(march_utility REQUIRED)
 
 # the library that contains the logic
 add_library(${PROJECT_NAME}
     src/FakeTemperatureData.cpp
     src/UniformDistribution.cpp
 )
-ament_target_dependencies(${PROJECT_NAME} rclcpp sensor_msgs std_msgs march_shared_msgs)
+ament_target_dependencies(${PROJECT_NAME} rclcpp sensor_msgs std_msgs march_shared_msgs march_utility)
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>)
 
 # the executable that is run in ROS and links with the library defined above
 add_executable(${PROJECT_NAME}_node src/main.cpp    )
-ament_target_dependencies(${PROJECT_NAME}_node rclcpp sensor_msgs std_msgs march_shared_msgs)
+ament_target_dependencies(${PROJECT_NAME}_node rclcpp sensor_msgs std_msgs march_shared_msgs march_utility)
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME}_node PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

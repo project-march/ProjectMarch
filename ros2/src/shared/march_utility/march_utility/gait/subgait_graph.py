@@ -1,7 +1,7 @@
 from collections import deque
 from typing import List
 
-from march_shared_classes.exceptions.gait_exceptions import SubgaitGraphError
+from march_utility.exceptions.gait_exceptions import SubgaitGraphError
 
 
 class SubgaitGraph(object):

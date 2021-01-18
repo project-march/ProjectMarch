@@ -1,7 +1,7 @@
 import math
 from copy import deepcopy
 from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
-from march_shared_classes.gait.subgait import Subgait
+from march_utility.gait.subgait import Subgait
 
 SECS_TO_NANOSECS = 1e9
 SHOULD_NOT_FREEZE_FIRST_SECS = 0.3  # secs

@@ -3,7 +3,7 @@ import os
 import yaml
 from urdf_parser_py import urdf
 
-from march_shared_classes.exceptions.gait_exceptions import (
+from march_utility.exceptions.gait_exceptions import (
     GaitNameNotFound,
     NonValidGaitContent,
     SubgaitNameNotFound,

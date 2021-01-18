@@ -7,7 +7,7 @@ from __future__ import annotations
 from math import sqrt
 from typing import Iterator
 
-from march_shared_classes.exceptions.general_exceptions import IncorrectCoordinateError
+from march_utility.exceptions.general_exceptions import IncorrectCoordinateError
 
 
 class Vector3d(object):

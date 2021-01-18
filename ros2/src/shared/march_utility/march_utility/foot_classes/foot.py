@@ -10,18 +10,18 @@ from __future__ import annotations
 from math import acos, asin, atan, cos, pi, sin, sqrt
 from typing import Tuple
 
-from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
-from march_shared_classes.exceptions.general_exceptions import SideSpecificationError
-from march_shared_classes.gait.setpoint import Setpoint
-from march_shared_classes.utilities.side import Side
-from march_shared_classes.utilities.utility_functions import (
+from march_utility.exceptions.gait_exceptions import SubgaitInterpolationError
+from march_utility.exceptions.general_exceptions import SideSpecificationError
+from march_utility.gait.setpoint import Setpoint
+from march_utility.utilities.side import Side
+from march_utility.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
 )
-from march_shared_classes.utilities.utility_functions import (
+from march_utility.utilities.utility_functions import (
     get_lengths_robot_for_inverse_kinematics,
     weighted_average_vectors,
 )
-from march_shared_classes.utilities.vector_3d import Vector3d
+from march_utility.utilities.vector_3d import Vector3d
 
 VELOCITY_SCALE_FACTOR = 0.001
 JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
