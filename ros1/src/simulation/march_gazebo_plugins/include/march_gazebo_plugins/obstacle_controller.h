@@ -22,6 +22,7 @@ protected:
 
   physics::LinkPtr foot_left_;
   physics::LinkPtr foot_right_;
+  physics::LinkPtr hip_base_;
   double mass;
 
   std::string HOME_STAND;
