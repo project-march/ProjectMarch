@@ -797,7 +797,7 @@
         <origin xyz="0 0 ${-ankle_plate_height}" rpy="0 0 0"/>
     </joint>
 
-    <xa
+
     <xacro:include filename="camera/_d435.urdf.xacro" />
     <xacro:sensor_d435 parent="upper_leg_left">
         <origin xyz="0 0 0" rpy="0 0 3.1416"/>
