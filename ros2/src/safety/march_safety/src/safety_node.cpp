@@ -49,12 +49,19 @@ SafetyNode::SafetyNode(const std::string& node_name, const std::string& node_nam
   safety_list.push_back(std::make_unique<InputDeviceSafety>(this, safety_handler));
 }
 
+/**
+ * @brief Start the safety node
+ * @details Starts a wall timer that calls the update function every 50ms.
+ */
 void SafetyNode::start()
 {
   // Ensure that the safety node is updated every 50 ms
   timer = this->create_wall_timer(50ms, std::bind(&SafetyNode::update, this));
 }
 
+/**
+ * @brief Update the safety listeners
+ */
 void SafetyNode::update()
 {
   for (auto& i : safety_list)

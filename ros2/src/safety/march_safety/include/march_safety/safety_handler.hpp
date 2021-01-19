@@ -22,13 +22,17 @@ public:
                 ErrorPublisher error_publisher,
                 GaitInstructionPublisher gait_instruction_publisher);
 
-  void publishFatal(const std::string& message, const rclcpp::Time& now);
+  // Publish a fatal error message to the /march/error topic
+  void publishFatal(const std::string& message);
 
-  void publishNonFatal(const std::string& message, const rclcpp::Time& now);
+  // Publish a fatal error message to the /march/error topic
+  void publishNonFatal(const std::string& message);
 
-  void publishErrorMessage(const std::string& message, const rclcpp::Time& now, int8_t error_type) const;
+  // Publish an error message to the /march/error topic
+  void publishErrorMessage(const std::string& message, int8_t error_type) const;
 
-  void publishStopMessage(const rclcpp::Time& now) const;
+  // Publish a GaitInstruction stop message to the /march/input_device/instruction topic
+  void publishStopMessage() const;
 
 private:
   SafetyNode* node_;

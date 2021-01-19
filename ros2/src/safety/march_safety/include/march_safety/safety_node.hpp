@@ -21,7 +21,10 @@ class SafetyNode : public rclcpp::Node {
         const std::string& node_namespace
     );
 
+    // Start the safety node
     void start();
+
+    // Update the safety listeners
     void update();
 
   private:

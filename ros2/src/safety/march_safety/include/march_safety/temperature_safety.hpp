@@ -27,38 +27,35 @@ public:
   void update() override { };
 
 private:
-  /**
-   * This callback checks if the temperature values do not exceed the defined threshold
-   * @param msg the temperature message
-   * @param sensor_name the name of the sender
-   */
+  // Callback for when a temperature is published.
   void temperatureCallback(const TemperatureMsg::SharedPtr msg, const std::string& sensor_name);
 
-  /**
-   * Create a subscriber for every sensor that publishes temperatures
-   */
+  // Create a subscriber for each joint on the /march/temperature/<joint> topic
   void createSubscribers();
 
+  // Create an error string for when a temperature is too high.
   std::string getErrorMessage(double temperature, const std::string& sensor_name);
 
-  /**
-   * Find the specific defined threshold for this sensor
-   * If there is none, fall back to the default
-   * @param sensor_name
-   * @return the threshold
-   */
+  // Get the threshold of a joint in a thresholdsmap. If there is none, fall back to the default.
   double getThreshold(const std::string& sensor_name, ThresholdHoldsMap temperature_thresholds_map);
 
+  // Set all temperature thresholds.
   void setAllTemperatureThresholds();
+
+  // Set all temperature thresholds for a specific type.
   void setTemperatureThresholds(std::string& type);
+
+  // Set a temperature threshold for a specific type and joint.
   void setThreshold(std::string& type, std::string joint, double threshold_value);
 
   SafetyNode* node_;
   std::shared_ptr<SafetyHandler> safety_handler_;
   double default_temperature_threshold_;
+
   rclcpp::Duration send_errors_interval_;
   rclcpp::Time time_last_send_error_;
 
+  // ThresholdHoldsMap to store threshold values for each joint
   ThresholdHoldsMap fatal_temperature_thresholds_map_;
   ThresholdHoldsMap non_fatal_temperature_thresholds_map_;
   ThresholdHoldsMap warning_temperature_thresholds_map_;

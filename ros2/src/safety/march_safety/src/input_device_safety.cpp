@@ -70,7 +70,7 @@ void InputDeviceSafety::update()
   const bool has_connections = !connected_devices_.empty();
   if (had_connections && !has_connections)
   {
-    safety_handler_->publishNonFatal("All input devices are lost", node_->get_clock()->now());
+    safety_handler_->publishNonFatal("All input devices are lost");
   }
 
   if (!has_connections)
@@ -101,7 +101,7 @@ void InputDeviceSafety::check_last_alive_stamp(const std::string& id, const rclc
     connected_devices_.erase(id);
     if (id == "crutch" && !connected_devices_.empty())
     {
-      safety_handler_->publishNonFatal("Crutch input device lost", now);
+      safety_handler_->publishNonFatal("Crutch input device lost");
       RCLCPP_ERROR_STREAM(node_->get_logger(), "Input device `" << id << "` lost");
     }
     else

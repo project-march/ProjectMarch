@@ -18,38 +18,51 @@ SafetyHandler::SafetyHandler(SafetyNode* node,
 {
 }
 
-void SafetyHandler::publishErrorMessage(const std::string& message, const rclcpp::Time& now, int8_t error_type) const
+/**
+ * @brief Publish an error message to the /march/error topic
+ * @param message Error message
+ * @param error_type Type of the error
+ */
+void SafetyHandler::publishErrorMessage(const std::string& message, int8_t error_type) const
 {
   ErrorMsg error_msg;
   std::ostringstream message_stream;
-  error_msg.header.stamp = now;
+  error_msg.header.stamp = node_->get_clock()->now();
   error_msg.error_message = message;
   error_msg.type = error_type;
-
-  RCLCPP_INFO(this->node_->get_logger(),"publishing error");
-
-  this->error_publisher_->publish(error_msg);
+  error_publisher_->publish(error_msg);
 }
 
-void SafetyHandler::publishStopMessage(const rclcpp::Time& now) const
+/**
+ * @brief Publish a GaitInstruction stop message to the /march/input_device/instruction topic
+ */
+void SafetyHandler::publishStopMessage() const
 {
   GaitInstruction gait_instruction_msg;
-  gait_instruction_msg.header.stamp = now;
+  gait_instruction_msg.header.stamp = node_->get_clock()->now();;
   gait_instruction_msg.type = GaitInstruction::STOP;
-  this->gait_instruction_publisher_->publish(gait_instruction_msg);
+  gait_instruction_publisher_->publish(gait_instruction_msg);
 }
 
-void SafetyHandler::publishFatal(const std::string& message, const rclcpp::Time& now)
+/**
+ * @brief Publish a fatal error message to the /march/error topic
+ * @param message Error message
+ */
+void SafetyHandler::publishFatal(const std::string& message)
 {
-  RCLCPP_ERROR(this->node_->get_logger(),"%s", message.c_str());
+  RCLCPP_ERROR(node_->get_logger(),"%s", message.c_str());
 
-  this->publishErrorMessage(message, now, ErrorMsg::FATAL);
+  publishErrorMessage(message, ErrorMsg::FATAL);
 }
 
-void SafetyHandler::publishNonFatal(const std::string& message, const rclcpp::Time& now)
+/**
+ * @brief Publish a non-fatal error message to the /march/error topic
+ * @param message Error message
+ */
+void SafetyHandler::publishNonFatal(const std::string& message)
 {
-  RCLCPP_ERROR(this->node_->get_logger(),"%s", message.c_str());
+  RCLCPP_ERROR(node_->get_logger(),"%s", message.c_str());
 
-  this->publishStopMessage(now);
-  this->publishErrorMessage(message, now, ErrorMsg::NON_FATAL);
+  publishStopMessage();
+  publishErrorMessage(message, ErrorMsg::NON_FATAL);
 }
