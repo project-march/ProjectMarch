@@ -64,7 +64,7 @@ class TestMarchSafetyConnection(unittest.TestCase):
     def setUp(self):
         """Create a ROS node for tests."""
         self.node = rclpy.create_node("test_march_safety_connection")
-        self.error_counter = ErrorCounter(self.node)
+        self.error_counter = ErrorCounter()
 
         self.input_device_connection_timeout = INPUT_DEVICE_CONNECTION_TIMEOUT
         self.error_topic = "/march/error"
