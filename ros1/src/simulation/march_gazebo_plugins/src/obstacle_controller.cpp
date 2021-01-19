@@ -115,7 +115,7 @@ void ObstacleController::update(ignition::math::v6::Vector3<double>& torque_left
   // roll, pitch and yaw are defined in
   // https://docs.projectmarch.nl/doc/march_packages/march_simulation.html#torque-application
   // turn (bodge) off plug-in at right time when balance is set to true
-  if (balance_ == true && subgait_name_ != HOME_STAND && subgait_name_ != "idle_state")
+  if (balance_ == true && subgait_name_ != HOME_STAND && subgait_name_ != STAND_IDLE)
   {
     p_pitch_actual = p_pitch_off_;
     p_roll_actual = p_roll_off_;
@@ -168,23 +168,26 @@ void ObstacleController::getGoalPosition(double time_since_start)
   }
   // Goal position is determined from the location of the stable foot
   goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
-  
-  // If the exoskeleton is in an idle sit position, put the CoM a bit behind the stable foot
-  if (subgait_name_ == SIT_IDLE) {
-    goal_position_x = stable_foot_pose.X() + 0.2 * swing_step_size_;
-  } // If the exoskeleton is in an idle stand position, put the CoM on the stable foot
+
+  // If the exoskeleton is busy sitting down, move the CoM behind the stable foot
+  // Set 'sitting' as the new default state
+  if (subgait_name_ == 'sit_down') {
+      default_subgait_name_ = SIT_IDLE;
+      goal_position_x = stable_foot_pose.X() + 0.1 * swing_step_size_;
+  }
+  // If the exoskeleton has sat down or is changing while sitting, keep the CoM behind the stable foot
+  else if (subgait_name_ == SIT_IDLE || subgait_name_ == 'sit_home' || subgait_name_ == 'prepare_stand_up') {
+      goal_position_x = stable_foot_pose.X() + 0.2 * swing_step_size_;
+  }
+  // If the exoskeleton is busy standing up, move the CoM forward again (relative when sitting down)
+  // Set 'Standing' as the new defualt state
+  else if (subgait_name_ == 'stand_up') {
+      default_subgait_name_ = STAND_IDLE;
+      goal_position_x = stable_foot_pose.X() + 0.1 * swing_step_size_;
+  }
+  // If the exoskeleton has stood up, keep the CoM on the stable foot
   else if (subgait_name_ == STAND_IDLE) {
     goal_position_x = stable_foot_pose.X();
-  }// Change the default that is used without a subgait to idle_sit after sitting
-    // During the sitting down the CoM will be controlled between the stable foot and the final sit
-  else if (subgait_name_.find("sit") != std::string::npos) {
-    default_subgait_name_ = SIT_IDLE;
-    goal_position_x = stable_foot_pose.X() + 0.1 * swing_step_size_;
-  } // Change the default that is used without a subgait to idle_stand after standing up
-    // During the standing the CoM will be controlled between the stable foot and the final sit
-  else if (subgait_name_.find("stand") != std::string::npos) {
-    default_subgait_name_ = STAND_IDLE;
-    goal_position_x = stable_foot_pose.X() + 0.1 * swing_step_size_;
   }
 
   if (subgait_name_.substr(0, 6) != "freeze")
