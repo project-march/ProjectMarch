@@ -38,7 +38,7 @@ add_service_files(
     PossibleGaits.srv
     SetGaitVersion.srv
     SetObstacleSizeRampLike.srv
-    SetObstacleSizeStairsLike.srv
+    SetObstacleSizeBlockLike.srv
     SetParamBool.srv
     SetParamFloat.srv
     SetParamInt.srv

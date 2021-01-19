@@ -2,7 +2,7 @@
 import rospy
 
 from march_shared_msgs.srv import SetObstacleSizeRampLikeResponse, SetObstacleSizeRampLike, \
-    SetObstacleSizeStairsLikeResponse, SetObstacleSizeStairsLike
+    SetObstacleSizeBlockLikeResponse, SetObstacleSizeBlockLike
 from gazebo_msgs.srv import SpawnModelRequest, SpawnModel, DeleteModel, \
     DeleteModelRequest, GetWorldProperties, GetWorldPropertiesRequest
 import xacro
@@ -10,7 +10,7 @@ import xacro
 # All obstacles that have a macro file which allows for changing the dimension
 # this means there must be an <name>_macro.xacro in the obstacles directory
 RESIZABLE_OBSTACLES_RAMP_LIKE = ['ramp_and_door'] # for files which accept slope_up, slope_down and length_ramp_up
-RESIZABLE_OBSTACLES_STAIRS_LIKE = ['bench', 'stairs'] # for files which accept height, width and length
+RESIZABLE_OBSTACLES_BLOCK_LIKE = ['bench', 'stairs'] # for files which accept height, width and length
 
 rospy.init_node('set_obstacle_dimensions', anonymous=True)
 
@@ -18,7 +18,7 @@ spawn_publisher = rospy.ServiceProxy('/gazebo/spawn_urdf_model', SpawnModel)
 delete_publisher = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
 get_world_properties = rospy.ServiceProxy('/gazebo/get_world_properties', GetWorldProperties)
 
-def set_new_stairs_like_obstacle(name, length=0, width=0, height=0):
+def set_new_block_like_obstacle(name, length=0, width=0, height=0):
     length_string = make_set_size_string('length', length)
     width_string = make_set_size_string('width', width)
     height_string = make_set_size_string('height', height)
@@ -59,14 +59,14 @@ def set_size(name, doc):
     spawn_publisher.call(SpawnModelRequest(
         model_name=name, model_xml=new_obstacle))
 
-def set_size_stairs_like_callback(msg):
-    if msg.obstacle_name not in RESIZABLE_OBSTACLES_STAIRS_LIKE:
-        return SetObstacleSizeStairsLikeResponse(success=False)
+def set_size_block_like_callback(msg):
+    if msg.obstacle_name not in RESIZABLE_OBSTACLES_BLOCK_LIKE:
+        return SetObstacleSizeBlockLikeResponse(success=False)
 
     else:
-        set_new_stairs_like_obstacle(name=msg.obstacle_name, length=msg.new_length, width=msg.new_width,
+        set_new_block_like_obstacle(name=msg.obstacle_name, length=msg.new_length, width=msg.new_width,
                                      height=msg.new_height)
-        return SetObstacleSizeStairsLikeResponse(success=True)
+        return SetObstacleSizeBlockLikeResponse(success=True)
 
 def set_size_ramp_like_callback(msg):
     if msg.obstacle_name not in RESIZABLE_OBSTACLES_RAMP_LIKE:
@@ -78,8 +78,8 @@ def set_size_ramp_like_callback(msg):
         return SetObstacleSizeRampLikeResponse(success=True)
 
 
-change_stairs_like_obstacle_size = rospy.Service('/march/set_obstacle_size/stairs_like',
-                                                 SetObstacleSizeStairsLike, set_size_stairs_like_callback)
+change_block_like_obstacle_size = rospy.Service('/march/set_obstacle_size/block_like',
+                                                 SetObstacleSizeBlockLike, set_size_block_like_callback)
 change_ramp_like_obstacle_size = rospy.Service('/march/set_obstacle_size/ramp_like',
                                                SetObstacleSizeRampLike, set_size_ramp_like_callback)
 rospy.spin()

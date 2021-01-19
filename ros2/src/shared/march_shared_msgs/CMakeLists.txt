@@ -52,7 +52,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/PossibleGaits.srv"
   "srv/SetGaitVersion.srv"
   "srv/SetObstacleSizeRampLike.srv"
-  "srv/SetObstacleSizeStairsLike.srv"
+  "srv/SetObstacleSizeBlockLike.srv"
   "srv/GetParamStringList.srv"
   "srv/GetParamString.srv"
   "srv/GetParamBool.srv"
