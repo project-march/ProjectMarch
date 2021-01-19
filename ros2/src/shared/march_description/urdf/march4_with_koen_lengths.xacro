@@ -744,9 +744,13 @@
     </joint>
 
     <xacro:include filename="camera/_d435.urdf.xacro" />
-    <xacro:sensor_d435 parent="upper_leg_left">
-        <origin xyz="0 0 0" rpy="0 0 3.1416"/>
+    <xacro:sensor_d435 parent="hip_base">
+        <!--    Attached to the hip_base, since this is most comparable to the backpack -->
+        <!--    in amount of movement-->
+        <origin xyz="-0.15 0.18 0.18" rpy="${0.5 * pi} ${0.25 * pi} ${pi}"/>
+        <!-- Rotate to be vertical and pointing down 45 degrees -->
     </xacro:sensor_d435>
+
 
     <!-- ROS Control plugin for Gazebo -->
     <transmission name="left_hip_aa">
