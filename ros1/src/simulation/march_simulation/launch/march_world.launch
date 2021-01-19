@@ -48,14 +48,13 @@
     <!-- Override effort values as Gazebo uses different units than the actual IMC. -->
     <!-- In theory, if the controller is properly tuned, these values can be arbitrarily large. -->
     <!-- However, to limit the safety controller, we need to limit them. -->
-    <arg name="test" default="5000.0"/>
     <param name="robot_description"
            command="$(find xacro)/xacro '$(find march_description)/urdf/$(arg robot_description).xacro'
                     k_velocity_value_hfe:=60.0 k_velocity_value_kfe:=60.0
                     k_velocity_value_haa:=60.0 k_velocity_value_adpf:=15.0
                     k_position_value_hfe:=5000.0 k_position_value_kfe:=5000.0
                     k_position_value_haa:=5000.0 k_position_value_adpf:=5000.0
-                    max_effort_rotary:=200.0 max_effort_linear:=$(arg test)
+                    max_effort_rotary:=200.0 max_effort_linear:=200.0
                     ground_gait:=$(arg ground_gait)" />
 
     <!-- Upload the controller configuration -->

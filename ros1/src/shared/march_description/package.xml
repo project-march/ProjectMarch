@@ -9,6 +9,5 @@
 
     <buildtool_depend>catkin</buildtool_depend>
 
-    <depend>march_shared_msgs</depend>
     <build_depend>xacro</build_depend>
 </package>

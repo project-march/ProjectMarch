@@ -177,7 +177,6 @@ qtcreator-*
 *.user
 
 **/.idea/**
-
 */cmake-build-debug/*
 /planning/cfg
 /planning/docs

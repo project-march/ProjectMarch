@@ -1,6 +1,3 @@
 [submodule "ros1/src/realsense_gazebo_plugin"]
 	path = ros1/src/realsense_gazebo_plugin
 	url = git@gitlab.com:project-march/libraries/realsense_gazebo_plugin.git
-[submodule "ros1/src/realsense"]
-	path = ros1/src/realsense
-	url = https://github.com/pal-robotics-forks/realsense.git
