@@ -52,11 +52,11 @@ class JointPlot(pg.PlotItem):
         self.setYRange(self.lower_limit - 0.1, self.upper_limit + 0.1, padding=0)
         middle_y = (self.upper_limit + self.lower_limit) / 2
         self.zero_line = self.addLine(y=middle_y)
-        limit_pen = pg.mkPen(color='r', style=QtCore.Qt.DotLine)
+        limit_pen = pg.mkPen(color="r", style=QtCore.Qt.DotLine)
         self.addLine(y=self.lower_limit, pen=limit_pen)
         self.addLine(y=self.upper_limit, pen=limit_pen)
 
-        time_pen = pg.mkPen(color='y', style=QtCore.Qt.DotLine)
+        time_pen = pg.mkPen(color="y", style=QtCore.Qt.DotLine)
         self.time_line = self.addLine(0, pen=time_pen, bounds=(0, self.duration))
 
         self.setMouseEnabled(False, False)
@@ -73,7 +73,7 @@ class JointPlot(pg.PlotItem):
 
         marker_length = self.duration / 10.0
         if display:
-            velocity_pen = pg.mkPen(color='g', size=3)
+            velocity_pen = pg.mkPen(color="g", size=3)
         else:
             velocity_pen = None
 
@@ -84,23 +84,27 @@ class JointPlot(pg.PlotItem):
             x_start = setpoint.time - dx
             x_end = setpoint.time + dx
 
-            dy = math.degrees(0.5 * marker_length * math.sin(math.atan(setpoint.velocity)))
+            dy = math.degrees(
+                0.5 * marker_length * math.sin(math.atan(setpoint.velocity))
+            )
             y_start = math.degrees(setpoint.position) - dy
             y_end = math.degrees(setpoint.position) + dy
 
-            self.velocity_markers.append(self.plot([x_start, x_end], [y_start, y_end], pen=velocity_pen))
+            self.velocity_markers.append(
+                self.plot([x_start, x_end], [y_start, y_end], pen=velocity_pen)
+            )
             self.velocities.append(setpoint.velocity)
 
     def update_time_slider(self, time):
         self.time_line.setValue(time)
 
     def create_plots(self, joint):
-        self.plot_item = self.plot(pen=None, symbolBrush=(255, 0, 0), symbolPen='w')
+        self.plot_item = self.plot(pen=None, symbolBrush=(255, 0, 0), symbolPen="w")
         self.showGrid(True, True, 1)
         self.plot_position_interpolation = self.plot()
-        self.plot_velocity_interpolation = self.plot(pen=pg.mkPen(color='g'))
-        self.plot_min_effort = self.plot(pen=pg.mkPen(color='r'))
-        self.plot_max_effort = self.plot(pen=pg.mkPen(color='r'))
+        self.plot_velocity_interpolation = self.plot(pen=pg.mkPen(color="g"))
+        self.plot_min_effort = self.plot(pen=pg.mkPen(color="r"))
+        self.plot_max_effort = self.plot(pen=pg.mkPen(color="r"))
 
     def to_setpoints(self):
         plot_data = self.plot_item.getData()
@@ -129,12 +133,20 @@ class JointPlot(pg.PlotItem):
         indices = np.linspace(0, self.duration, self.duration * 100)
         position_data = joint.interpolated_position(indices)
         velocity_data = joint.interpolated_velocity(indices)
-        min_effort_data, max_effort_data = self.calculate_min_max_effort(position_data, velocity_data)
+        min_effort_data, max_effort_data = self.calculate_min_max_effort(
+            position_data, velocity_data
+        )
         for i in range(0, len(position_data)):
             position_data[i] = math.degrees(position_data[i])
-            velocity_data[i] = self.scale_parameter(velocity_data[i], self.limits.velocity)
-            min_effort_data[i] = self.scale_parameter(min_effort_data[i], self.limits.effort)
-            max_effort_data[i] = self.scale_parameter(max_effort_data[i], self.limits.effort)
+            velocity_data[i] = self.scale_parameter(
+                velocity_data[i], self.limits.velocity
+            )
+            min_effort_data[i] = self.scale_parameter(
+                min_effort_data[i], self.limits.effort
+            )
+            max_effort_data[i] = self.scale_parameter(
+                max_effort_data[i], self.limits.effort
+            )
 
         self.plot_position_interpolation.setData(indices, position_data)
         self.zero_line.setPen(None)
@@ -157,10 +169,22 @@ class JointPlot(pg.PlotItem):
         max_effort = [0] * len(position)
         min_effort = [0] * len(position)
         for i in range(len(position)):
-            max_velocity[i] = min(-self.limits.k_position * (position[i] - self.limits.upper), self.limits.velocity)
-            min_velocity[i] = max(-self.limits.k_position * (position[i] - self.limits.lower), -self.limits.velocity)
-            max_effort[i] = min(-self.limits.k_velocity * (velocity[i] - max_velocity[i]), self.limits.effort)
-            min_effort[i] = max(-self.limits.k_velocity * (velocity[i] - min_velocity[i]), -self.limits.effort)
+            max_velocity[i] = min(
+                -self.limits.k_position * (position[i] - self.limits.upper),
+                self.limits.velocity,
+            )
+            min_velocity[i] = max(
+                -self.limits.k_position * (position[i] - self.limits.lower),
+                -self.limits.velocity,
+            )
+            max_effort[i] = min(
+                -self.limits.k_velocity * (velocity[i] - max_velocity[i]),
+                self.limits.effort,
+            )
+            min_effort[i] = max(
+                -self.limits.k_velocity * (velocity[i] - min_velocity[i]),
+                -self.limits.effort,
+            )
         return min_effort, max_effort
 
     def scale_parameter(self, parameter, max_paramter, min_parameter=None):
@@ -168,9 +192,12 @@ class JointPlot(pg.PlotItem):
             min_parameter = -max_paramter
         plot_range = self.upper_limit - self.lower_limit
         parameter_range = max_paramter - min_parameter
-        return self.lower_limit + plot_range * (parameter - min_parameter) / parameter_range
+        return (
+            self.lower_limit
+            + plot_range * (parameter - min_parameter) / parameter_range
+        )
 
-    def mouseClickEvent(self, event):
+    def mouseClickEvent(self, event):  # noqa: N802
 
         scene_position = event.scenePos()
 
@@ -209,7 +236,7 @@ class JointPlot(pg.PlotItem):
         self.add_setpoint.emit(time, math.radians(position), event.modifiers())
         event.accept()
 
-    def mouseDragEvent(self, ev):
+    def mouseDragEvent(self, ev):  # noqa: N802
         # Check to make sure the button is the left mouse button. If not, ignore it.
         # Would have to change this if porting to Mac I assume.
         if ev.button() != QtCore.Qt.LeftButton:
@@ -220,7 +247,6 @@ class JointPlot(pg.PlotItem):
             # We are already one step into the drag.
             # Find the point(s) at the mouse cursor when the button was first
             # pressed:
-            # pos = ev.buttonDownPos()
             pos = ev.buttonDownScenePos()
             # Switch position into local coords using viewbox
             local_pos = self.vb.mapSceneToView(pos)
@@ -265,8 +291,13 @@ class JointPlot(pg.PlotItem):
                     x_min = x[self.dragIndex - 1] + 0.01
                 if self.dragIndex < len(x) - 1:
                     x_max = x[self.dragIndex + 1] - 0.01
-                x[self.dragIndex] = min(max(local_pos.x() + self.dragOffset.x(), x_min), x_max)
-                y[self.dragIndex] = min(max(local_pos.y() + self.dragOffset.y(), self.lower_limit), self.upper_limit)
+                x[self.dragIndex] = min(
+                    max(local_pos.x() + self.dragOffset.x(), x_min), x_max
+                )
+                y[self.dragIndex] = min(
+                    max(local_pos.y() + self.dragOffset.y(), self.lower_limit),
+                    self.upper_limit,
+                )
 
                 # Update the PlotDataItem (this will automatically update the graphics when a change is detected)
                 self.plot_item.setData(x, y)

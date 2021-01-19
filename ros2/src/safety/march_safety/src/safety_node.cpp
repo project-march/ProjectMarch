@@ -13,7 +13,7 @@
 #include "march_shared_msgs/msg/error.hpp"
 #include "march_shared_msgs/msg/gait_instruction.hpp"
 
-#include "march_utility/march_util.hpp"
+#include "march_utility/node_utils.hpp"
 
 #include <chrono>
 
@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 SafetyNode::SafetyNode(const std::string& node_name, const std::string& node_namespace):
   Node(node_name, node_namespace, rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true))
 {
-  std::vector<std::string> joint_names = march_util::get_joint_names(*this);
+  std::vector<std::string> joint_names = node_utils::get_joint_names(*this);
 
   RCLCPP_DEBUG(this->get_logger(), "Got joint names.");
 

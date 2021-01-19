@@ -5,7 +5,10 @@ import rospy
 import yaml
 
 from march_shared_classes.exceptions.gait_exceptions import GaitError, GaitNameNotFound
-from march_shared_classes.exceptions.general_exceptions import FileNotFoundError, PackageNotFoundError
+from march_shared_classes.exceptions.general_exceptions import (
+    FileNotFoundError,
+    PackageNotFoundError,
+)
 from march_shared_classes.gait.subgait import Subgait
 
 from .state_machine.setpoints_gait import SetpointsGait
@@ -18,10 +21,10 @@ class GaitSelection(object):
         package_path = self.get_ros_package_path(package)
         self._gait_directory = os.path.join(package_path, directory)
         if not os.path.isdir(self._gait_directory):
-            rospy.logerr('Gait directory does not exist: {0}'.format(directory))
+            rospy.logerr("Gait directory does not exist: {0}".format(directory))
             raise FileNotFoundError(file_path=self._gait_directory)
 
-        self._default_yaml = os.path.join(self._gait_directory, 'default.yaml')
+        self._default_yaml = os.path.join(self._gait_directory, "default.yaml")
         if not os.path.isfile(self._default_yaml):
             raise FileNotFoundError(file_path=self._default_yaml)
 
@@ -62,9 +65,14 @@ class GaitSelection(object):
             raise GaitNameNotFound(gait_name)
 
         # Only update versions that are different
-        version_map = dict([(name, version) for name, version in version_map.items() if
-                            version != self._gait_version_map[gait_name][name]])
-        self._loaded_gaits[gait_name].set_subgait_versions(self._robot, self._gait_directory, version_map)
+        version_map = {
+            name: version
+            for name, version in version_map.items()
+            if version != self._gait_version_map[gait_name][name]
+        }
+        self._loaded_gaits[gait_name].set_subgait_versions(
+            self._robot, self._gait_directory, version_map
+        )
         self._gait_version_map[gait_name].update(version_map)
 
     def scan_directory(self):
@@ -84,8 +92,11 @@ class GaitSelection(object):
                     subgait_path = os.path.join(gait_path, subgait)
 
                     if os.path.isdir(subgait_path):
-                        versions = sorted([v.replace('.subgait', '') for v in os.listdir(os.path.join(subgait_path)) if
-                                           v.endswith('.subgait')])
+                        versions = sorted(
+                            v.replace(".subgait", "")
+                            for v in os.listdir(os.path.join(subgait_path))
+                            if v.endswith(".subgait")
+                        )
                         subgaits[subgait] = versions
 
                 gaits[gait] = subgaits
@@ -93,16 +104,29 @@ class GaitSelection(object):
 
     def update_default_versions(self):
         """Updates the default.yaml file with the current loaded gait versions."""
-        new_default_dict = {'gaits': self._gait_version_map, 'positions': self._positions}
+        new_default_dict = {
+            "gaits": self._gait_version_map,
+            "positions": self._positions,
+        }
 
         try:
-            with open(self._default_yaml, 'w') as default_yaml_content:
+            with open(self._default_yaml, "w") as default_yaml_content:
                 yaml_content = yaml.dump(new_default_dict, default_flow_style=False)
                 default_yaml_content.write(yaml_content)
-            return [True, 'New default values were written to: {pn}'.format(pn=self._default_yaml)]
+            return [
+                True,
+                "New default values were written to: {pn}".format(
+                    pn=self._default_yaml
+                ),
+            ]
 
         except IOError:
-            return [False, 'Error occurred when writing to file path: {pn}'.format(pn=self._default_yaml)]
+            return [
+                False,
+                "Error occurred when writing to file path: {pn}".format(
+                    pn=self._default_yaml
+                ),
+            ]
 
     def add_gait(self, gait):
         """Adds a gait to the loaded gaits if it does not already exist.
@@ -110,7 +134,9 @@ class GaitSelection(object):
         The to be added gait should implement `GaitInterface`.
         """
         if gait.name in self._loaded_gaits:
-            rospy.logwarn('Gait `{gait}` already exists in gait selection'.format(gait=gait.name))
+            rospy.logwarn(
+                "Gait `{gait}` already exists in gait selection".format(gait=gait.name)
+            )
         else:
             self._loaded_gaits[gait.name] = gait
 
@@ -122,23 +148,27 @@ class GaitSelection(object):
         gaits = {}
 
         for gait in self._gait_version_map:
-            gaits[gait] = SetpointsGait.from_file(gait, self._gait_directory, self._robot, self._gait_version_map)
+            gaits[gait] = SetpointsGait.from_file(
+                gait, self._gait_directory, self._robot, self._gait_version_map
+            )
         return gaits
 
     def _load_configuration(self):
         """Loads and verifies the gaits configuration."""
-        with open(self._default_yaml, 'r') as default_yaml_file:
+        with open(self._default_yaml, "r") as default_yaml_file:
             default_config = yaml.load(default_yaml_file, Loader=yaml.SafeLoader)
 
-        version_map = default_config['gaits']
+        version_map = default_config["gaits"]
 
         if not isinstance(version_map, dict):
-            raise TypeError('Gait version map should be of type; dictionary')
+            raise TypeError("Gait version map should be of type; dictionary")
 
         if not self._validate_version_map(version_map):
-            raise GaitError(msg='Gait version map: {gm}, is not valid'.format(gm=version_map))
+            raise GaitError(
+                msg="Gait version map: {gm}, is not valid".format(gm=version_map)
+            )
 
-        return version_map, default_config['positions']
+        return version_map, default_config["positions"]
 
     def _validate_version_map(self, version_map):
         """Validates if the current versions exist.
@@ -148,14 +178,16 @@ class GaitSelection(object):
         """
         for gait_name in version_map:
             gait_path = os.path.join(self._gait_directory, gait_name)
-            if not os.path.isfile(os.path.join(gait_path, gait_name + '.gait')):
-                rospy.logwarn('gait {gn} does not exist'.format(gn=gait_name))
+            if not os.path.isfile(os.path.join(gait_path, gait_name + ".gait")):
+                rospy.logwarn("gait {gn} does not exist".format(gn=gait_name))
                 return False
 
             for subgait_name in version_map[gait_name]:
                 version = version_map[gait_name][subgait_name]
                 if not Subgait.validate_version(gait_path, subgait_name, version):
-                    rospy.logwarn('{0}, {1} does not exist'.format(subgait_name, version))
+                    rospy.logwarn(
+                        "{0}, {1} does not exist".format(subgait_name, version)
+                    )
                     return False
         return True
 

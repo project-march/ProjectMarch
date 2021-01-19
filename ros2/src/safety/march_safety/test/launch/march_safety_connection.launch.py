@@ -17,27 +17,37 @@ INPUT_DEVICE_CONNECTION_TIMEOUT = 500
 
 @pytest.mark.launch_test
 def generate_test_description():
-    robot_information_node = IncludeLaunchDescription(PythonLaunchDescriptionSource(
-        os.path.join(get_package_share_directory('march_robot_information'),
-                     'launch', 'robot_information.launch.py')),
-        launch_arguments=[('joint_names', '[test_joint1, test_joint2, test_joint3]')]
+    robot_information_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("march_robot_information"),
+                "launch",
+                "robot_information.launch.py",
+            )
+        ),
+        launch_arguments=[("joint_names", "[test_joint1, test_joint2, test_joint3]")],
     )
     safety_node = Node(
-        package='march_safety',
-        executable='march_safety_node',
-        name='safety_node',
-        namespace='march',
-        output='screen',
+        package="march_safety",
+        executable="march_safety_node",
+        name="safety_node",
+        namespace="march",
+        output="screen",
         parameters=[
-            {'input_device_connection_timeout': INPUT_DEVICE_CONNECTION_TIMEOUT},
-            {'use_sim_time': False}
+            {"input_device_connection_timeout": INPUT_DEVICE_CONNECTION_TIMEOUT},
+            {"use_sim_time": False},
         ],
     )
-    return (LaunchDescription([
-        robot_information_node,
-        safety_node,
-        ReadyToTest(),
-    ]), {})
+    return (
+        LaunchDescription(
+            [
+                robot_information_node,
+                safety_node,
+                ReadyToTest(),
+            ]
+        ),
+        {},
+    )
 
 
 class TestMarchSafetyConnection(unittest.TestCase):
@@ -53,20 +63,22 @@ class TestMarchSafetyConnection(unittest.TestCase):
 
     def setUp(self):
         """Create a ROS node for tests."""
-        self.node = rclpy.create_node('test_march_safety_connection')
+        self.node = rclpy.create_node("test_march_safety_connection")
         self.error_counter = ErrorCounter(self.node)
 
         self.input_device_connection_timeout = INPUT_DEVICE_CONNECTION_TIMEOUT
         self.error_topic = "/march/error"
-        self.node.create_subscription(msg_type=Error,
-                                      topic=self.error_topic,
-                                      callback=self.error_counter.cb,
-                                      qos_profile=1)
+        self.node.create_subscription(
+            msg_type=Error,
+            topic=self.error_topic,
+            callback=self.error_counter.cb,
+            qos_profile=1,
+        )
 
         self.input_alive_topic = "/march/input_device/alive"
-        self.alive_publisher = self.node.create_publisher(msg_type=Alive,
-                                                          topic=self.input_alive_topic,
-                                                          qos_profile=0)
+        self.alive_publisher = self.node.create_publisher(
+            msg_type=Alive, topic=self.input_alive_topic, qos_profile=0
+        )
 
     def tearDown(self):
         """Destroy the ROS node."""
@@ -77,8 +89,9 @@ class TestMarchSafetyConnection(unittest.TestCase):
         self.publish_alive()
 
         # Wait for some time to let error counter increment
-        rclpy.spin_once(self.node,
-                        timeout_sec=(self.input_device_connection_timeout * 3) / 1000)
+        rclpy.spin_once(
+            self.node, timeout_sec=(self.input_device_connection_timeout * 3) / 1000
+        )
 
         self.assertEqual(self.error_counter.count, 1)
 
@@ -87,8 +100,9 @@ class TestMarchSafetyConnection(unittest.TestCase):
         self.publish_alive()
 
         # Wait for some time but not enough time to be timed out
-        rclpy.spin_once(self.node,
-                        timeout_sec=(self.input_device_connection_timeout / 2) / 1000)
+        rclpy.spin_once(
+            self.node, timeout_sec=(self.input_device_connection_timeout / 2) / 1000
+        )
 
         self.assertEqual(self.error_counter.count, 0)
 
@@ -96,14 +110,17 @@ class TestMarchSafetyConnection(unittest.TestCase):
         self.wait_for_node_startup()
 
         # Wait some time to let input device connection timeout pass
-        rclpy.spin_once(self.node,
-                        timeout_sec=(self.input_device_connection_timeout * 3) / 1000)
+        rclpy.spin_once(
+            self.node, timeout_sec=(self.input_device_connection_timeout * 3) / 1000
+        )
 
         self.assertEqual(self.error_counter.count, 0)
 
     def wait_for_node_startup(self):
-        while self.node.count_subscribers(self.input_alive_topic) == 0 or \
-                self.node.count_publishers(self.error_topic) == 0:
+        while (
+            self.node.count_subscribers(self.input_alive_topic) == 0
+            or self.node.count_publishers(self.error_topic) == 0
+        ):
             rclpy.spin_once(self.node, timeout_sec=0.1)
 
         self.assertEqual(self.node.count_subscribers(self.input_alive_topic), 1)
@@ -111,4 +128,5 @@ class TestMarchSafetyConnection(unittest.TestCase):
 
     def publish_alive(self):
         self.alive_publisher.publish(
-            Alive(id="test", stamp=self.node.get_clock().now().to_msg()))
+            Alive(id="test", stamp=self.node.get_clock().now().to_msg())
+        )

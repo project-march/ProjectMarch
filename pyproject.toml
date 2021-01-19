@@ -1,0 +1,49 @@
+[tool.flakehell]
+# specify any flake8 options.
+# dont run plugins on these files and folders
+exclude = [".git", "__init__.py", "build", "install", "log", "venv"]
+# make output nice
+format = "grouped"
+# set max line length to 80 (becomes 88 with B950)
+max_line_length = 80
+# show line of source code in output
+show_source = true
+
+# list of plugins and rules for them
+[tool.flakehell.plugins]
+flake8-2020 = ["+*"]
+flake8-aaa = ["+*"]
+flake8-annotations = ["+*", "-ANN101", "-ANN102"]
+flake8-annotations-complexity = ["+*"]
+flake8-assertive = ["+*"]
+flake8-bandit = ["+*"]
+flake8-black = ["+*"]
+flake8-blind-except = ["+*"]
+flake8-bugbear = ["+*", "+B950"]
+flake8-builtins = ["+*"]
+flake8-cognitive-complexity = ["+*"]
+flake8-commas = ["+*", "-C812", "-C815", "-C816"]
+flake8-comprehensions = ["+*"]
+flake8-deprecated = ["+*"]
+flake8-docstrings = ["+*"]
+flake8-eradicate = ["+*"]
+flake8-executable = ["+*"]
+flake8-expression-complexity = ["+*"]
+flake8-functions = ["+*"]
+flake8-pie = ["+*"]
+flake8-print = ["+*"]
+flake8-printf-formatting = ["+*"]
+flake8-rst-docstrings = ["+*"]
+flake8-simplify = ["+*"]
+flake8-string-format = ["+*"]
+flake8-todos = ["+*"]
+flake8-use-fstring = ["+*"]
+mccabe = ["+*"]
+pep8-naming = ["+*"]
+pycodestyle = ["+*", "-E501", "-W503", "-E203"]
+pyflakes = ["+*"]
+pylint = ["+*"]
+
+[tool.flakehell.exceptions."**/*_test.py"]
+flake8-annotations = ["-ANN*"]
+flake8-docstrings = ["-*"]

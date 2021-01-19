@@ -5,7 +5,7 @@ from .home_gait import HomeGait
 
 
 class GaitStateMachine(object):
-    UNKNOWN = 'unknown'
+    UNKNOWN = "unknown"
 
     def __init__(self, gait_selection, trajectory_scheduler, state_input, update_rate):
         """Generates a state machine from given gaits and resets it to UNKNOWN state.
@@ -106,17 +106,21 @@ class GaitStateMachine(object):
     def _process_idle_state(self):
         if self._input.gait_requested():
             gait_name = self._input.gait_name()
-            rospy.loginfo('Requested gait `{0}`'.format(gait_name))
+            rospy.loginfo("Requested gait `{0}`".format(gait_name))
             if gait_name in self._idle_transitions[self._current_state]:
                 self._current_state = gait_name
                 self._is_idle = False
                 self._should_stop = False
                 self._input.gait_accepted()
                 self._call_transition_callbacks()
-                rospy.loginfo('Accepted gait `{0}`'.format(gait_name))
+                rospy.loginfo("Accepted gait `{0}`".format(gait_name))
             else:
                 self._input.gait_rejected()
-                rospy.loginfo('Cannot execute gait `{0}` from idle state `{1}`'.format(gait_name, self._current_state))
+                rospy.loginfo(
+                    "Cannot execute gait `{0}` from idle state `{1}`".format(
+                        gait_name, self._current_state
+                    )
+                )
         elif self._input.unknown_requested():
             self._input.gait_accepted()
             self._transition_to_unknown()
@@ -129,11 +133,15 @@ class GaitStateMachine(object):
                 self._current_gait = self._home_gaits[self._current_state]
             else:
                 self._current_gait = self._gait_selection[self._current_state]
-            rospy.loginfo('Executing gait `{0}`'.format(self._current_gait.name))
+            rospy.loginfo("Executing gait `{0}`".format(self._current_gait.name))
             trajectory = self._current_gait.start()
             if trajectory is not None:
                 self._call_gait_callbacks()
-                rospy.loginfo('Scheduling {subgait}'.format(subgait=self._current_gait.subgait_name))
+                rospy.loginfo(
+                    "Scheduling {subgait}".format(
+                        subgait=self._current_gait.subgait_name
+                    )
+                )
                 self._trajectory_scheduler.schedule(trajectory)
             elapsed_time = 0.0
 
@@ -151,7 +159,9 @@ class GaitStateMachine(object):
         # schedule trajectory if any
         if trajectory is not None:
             self._call_gait_callbacks()
-            rospy.loginfo('Scheduling {subgait}'.format(subgait=self._current_gait.subgait_name))
+            rospy.loginfo(
+                "Scheduling {subgait}".format(subgait=self._current_gait.subgait_name)
+            )
             self._trajectory_scheduler.schedule(trajectory)
 
         if should_stop:
@@ -160,42 +170,62 @@ class GaitStateMachine(object):
             self._current_gait.end()
             self._input.gait_finished()
             self._call_transition_callbacks()
-            rospy.loginfo('Finished gait `{0}`'.format(self._current_gait.name))
+            rospy.loginfo("Finished gait `{0}`".format(self._current_gait.name))
             self._current_gait = None
 
     def _handle_input(self):
         if self._input.stop_requested() or self._should_stop:
             self._should_stop = False
             if self._current_gait.stop():
-                rospy.loginfo('Gait `{0}` responded to stop'.format(self._current_gait.name))
+                rospy.loginfo(
+                    "Gait `{0}` responded to stop".format(self._current_gait.name)
+                )
                 self._input.stop_accepted()
                 self._call_callbacks(self._stop_accepted_callbacks)
             else:
-                rospy.loginfo('Gait `{0}` does not respond to stop'.format(self._current_gait.name))
+                rospy.loginfo(
+                    "Gait `{0}` does not respond to stop".format(
+                        self._current_gait.name
+                    )
+                )
                 self._input.stop_rejected()
 
         if self._input.transition_requested():
             request = self._input.get_transition_request()
             self._input.reset()
             if self._current_gait.transition(request):
-                rospy.loginfo('Gait `{0}` responded to transition request `{1}`'.format(self._current_gait.name,
-                                                                                        request.name))
+                rospy.loginfo(
+                    "Gait `{0}` responded to transition request `{1}`".format(
+                        self._current_gait.name, request.name
+                    )
+                )
             else:
-                rospy.loginfo('Gait `{0}` does not respond to transition request `{1}`'.format(self._current_gait.name,
-                                                                                               request.name))
+                rospy.loginfo(
+                    "Gait `{0}` does not respond to transition request `{1}`".format(
+                        self._current_gait.name, request.name
+                    )
+                )
 
     def _call_transition_callbacks(self):
-        self._call_callbacks(self._transition_callbacks, self._current_state, self._is_idle)
+        self._call_callbacks(
+            self._transition_callbacks, self._current_state, self._is_idle
+        )
 
     def _call_gait_callbacks(self):
         if self._current_gait is not None:
-            self._call_callbacks(self._gait_callbacks, self._current_gait.name, self._current_gait.subgait_name,
-                                 self._current_gait.version, self._current_gait.duration, self._current_gait.gait_type)
+            self._call_callbacks(
+                self._gait_callbacks,
+                self._current_gait.name,
+                self._current_gait.subgait_name,
+                self._current_gait.version,
+                self._current_gait.duration,
+                self._current_gait.gait_type,
+            )
 
     def _transition_to_unknown(self):
         self._current_state = self.UNKNOWN
         self._is_idle = True
-        rospy.loginfo('Transitioned to `{0}`'.format(self.UNKNOWN))
+        rospy.loginfo("Transitioned to `{0}`".format(self.UNKNOWN))
 
     def _generate_graph(self):
         self._idle_transitions = {}
@@ -205,12 +235,24 @@ class GaitStateMachine(object):
             gait_name = gait.name
             starting_position = gait.starting_position
             from_idle_name = next(
-                (name for name, position in idle_positions.items() if position['joints'] == starting_position), None)
+                (
+                    name
+                    for name, position in idle_positions.items()
+                    if position["joints"] == starting_position
+                ),
+                None,
+            )
             if from_idle_name is None:
-                from_idle_name = 'unknown_idle_{0}'.format(len(idle_positions))
-                rospy.logwarn('No named position given for starting position of gait `{gn}`, creating `{n}`'
-                              .format(gn=gait_name, n=from_idle_name))
-                idle_positions[from_idle_name] = {'gait_type': '', 'joints': starting_position}
+                from_idle_name = "unknown_idle_{0}".format(len(idle_positions))
+                rospy.logwarn(
+                    "No named position given for starting position of gait `{gn}`, creating `{n}`".format(
+                        gn=gait_name, n=from_idle_name
+                    )
+                )
+                idle_positions[from_idle_name] = {
+                    "gait_type": "",
+                    "joints": starting_position,
+                }
             if from_idle_name in self._idle_transitions:
                 self._idle_transitions[from_idle_name].add(gait_name)
             else:
@@ -218,12 +260,24 @@ class GaitStateMachine(object):
 
             final_position = gait.final_position
             to_idle_name = next(
-                (name for name, position in idle_positions.items() if position['joints'] == final_position), None)
+                (
+                    name
+                    for name, position in idle_positions.items()
+                    if position["joints"] == final_position
+                ),
+                None,
+            )
             if to_idle_name is None:
-                to_idle_name = 'unknown_idle_{0}'.format(len(idle_positions))
-                rospy.logwarn('No named position given for final position of gait `{gn}`, creating `{n}`'
-                              .format(gn=gait_name, n=to_idle_name))
-                idle_positions[to_idle_name] = {'gait_type': '', 'joints': final_position}
+                to_idle_name = "unknown_idle_{0}".format(len(idle_positions))
+                rospy.logwarn(
+                    "No named position given for final position of gait `{gn}`, creating `{n}`".format(
+                        gn=gait_name, n=to_idle_name
+                    )
+                )
+                idle_positions[to_idle_name] = {
+                    "gait_type": "",
+                    "joints": final_position,
+                }
             self._gait_transitions[gait_name] = to_idle_name
 
         self._validate_transitions()
@@ -233,17 +287,21 @@ class GaitStateMachine(object):
     def _validate_transitions(self):
         for idle in self._gait_transitions.values():
             if idle not in self._idle_transitions:
-                rospy.logwarn('{0} does not have transitions'.format(idle))
+                rospy.logwarn("{0} does not have transitions".format(idle))
 
     def _generate_home_gaits(self, idle_positions):
         self._idle_transitions[self.UNKNOWN] = set()
         self._home_gaits = {}
         for idle_name, position in idle_positions.items():
-            home_gait = HomeGait(idle_name, position['joints'], position['gait_type'])
+            home_gait = HomeGait(idle_name, position["joints"], position["gait_type"])
             home_gait_name = home_gait.name
             self._home_gaits[home_gait_name] = home_gait
             if home_gait_name in self._gait_transitions:
-                raise GaitStateMachineError('Gaits cannot have the same name as home gait `{0}`'.format(home_gait_name))
+                raise GaitStateMachineError(
+                    "Gaits cannot have the same name as home gait `{0}`".format(
+                        home_gait_name
+                    )
+                )
             self._gait_transitions[home_gait_name] = idle_name
             self._idle_transitions[self.UNKNOWN].add(home_gait_name)
 

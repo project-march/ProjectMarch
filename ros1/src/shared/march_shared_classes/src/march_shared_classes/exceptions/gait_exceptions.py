@@ -6,7 +6,7 @@ class GaitError(Exception):
             The message to display.
         """
         if msg is None:
-            msg = 'An error occurred with a gait module.'
+            msg = "An error occurred with a gait module."
         super(GaitError, self).__init__(msg)
 
 
@@ -18,7 +18,7 @@ class GaitNameNotFound(GaitError):
             The message to display.
         """
         if msg is None:
-            msg = 'Could not find gait name: {gait} in map.'.format(gait=gait_name)
+            msg = "Could not find gait name: {gait} in map.".format(gait=gait_name)
 
         super(GaitNameNotFound, self).__init__(msg)
 
@@ -31,8 +31,9 @@ class SubgaitNameNotFound(GaitError):
             The message to display.
         """
         if msg is None:
-            msg = 'Could not find subgait name {subgait} of gait {gait} in map.'.format(subgait=subgait_name,
-                                                                                        gait=gait_name)
+            msg = "Could not find subgait name {subgait} of gait {gait} in map.".format(
+                subgait=subgait_name, gait=gait_name
+            )
 
         super(SubgaitNameNotFound, self).__init__(msg)
 
@@ -45,7 +46,7 @@ class NonValidGaitContent(GaitError):
             The message to display.
         """
         if msg is None:
-            msg = 'The given gait: {gn} has incorrect information'.format(gn=gait_name)
+            msg = "The given gait: {gn} has incorrect information".format(gn=gait_name)
 
         super(NonValidGaitContent, self).__init__(msg)
 
@@ -63,7 +64,7 @@ class TransitionError(GaitError):
             The message to display.
         """
         if msg is None:
-            msg = 'Subgaits can not transition'
+            msg = "Subgaits can not transition"
 
         super(TransitionError, self).__init__(msg)
 
@@ -72,6 +73,6 @@ class SubgaitInterpolationError(GaitError):
     def __init__(self, msg=None):
         """Class to raise an error when it was not possible to interpolate between subgaits."""
         if msg is None:
-            msg = 'An error occurred while trying to merge two subgaits.'
+            msg = "An error occurred while trying to merge two subgaits."
 
         super(SubgaitInterpolationError, self).__init__(msg)

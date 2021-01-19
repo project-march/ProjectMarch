@@ -10,7 +10,7 @@ from .entry import Entry
 
 class EntryModel(QAbstractTableModel):
 
-    columns = ['time', 'entry']
+    columns = ["time", "entry"]
 
     def __init__(self):
         """Initialize an empty list of entries."""
@@ -50,13 +50,13 @@ class EntryModel(QAbstractTableModel):
             entry = self._entries[row]
 
             if role == Qt.DisplayRole:
-                if column == 'time':
+                if column == "time":
                     return entry.time_string()
-                elif column == 'entry':
+                elif column == "entry":
                     return entry.content
 
             if role == Qt.ForegroundRole:
-                if column == 'entry' and entry.is_error:
+                if column == "entry" and entry.is_error:
                     return QBrush(Qt.darkRed)
 
         return None
@@ -69,7 +69,7 @@ class EntryModel(QAbstractTableModel):
         for row in sorted(positions, reverse=True):
             if 0 <= row < self.rowCount():
                 self.beginRemoveRows(QModelIndex(), row, row)
-                del(self._entries[row])
+                del self._entries[row]
                 self.endRemoveRows()
 
     def insert_row(self, entry: Entry):
@@ -81,8 +81,7 @@ class EntryModel(QAbstractTableModel):
         self._entries.append(entry)
         self.endInsertRows()
 
-    def insert_log_msg(self, log_msg: Log,
-                       use_current_time: Optional[bool] = True):
+    def insert_log_msg(self, log_msg: Log, use_current_time: Optional[bool] = True):
         """Converts a ROS log msg to entry and appends it to the rows.
 
         :param log_msg: Log msg to
@@ -93,7 +92,7 @@ class EntryModel(QAbstractTableModel):
 
     def __str__(self):
         """Returns a string representation of the model."""
-        return '\n'.join(str(x) for x in self._entries)
+        return "\n".join(str(x) for x in self._entries)
 
     def __len__(self):
         return len(self._entries)

@@ -1,10 +1,6 @@
-from copy import deepcopy
 from march_gait_selection.dynamic_gaits.transition_subgait import TransitionSubgait
-from march_gait_selection.state_machine.home_gait import HomeGait
 from march_utility.exceptions.gait_exceptions import GaitError
 from march_utility.gait.gait import Gait
-from march_utility.gait.setpoint import Setpoint
-from march_utility.gait.subgait import Subgait
 
 from .gait_interface import GaitInterface
 from .state_machine_input import TransitionRequest
@@ -12,6 +8,7 @@ from .state_machine_input import TransitionRequest
 
 class SetpointsGait(GaitInterface, Gait):
     """ The standard gait built up from setpoints """
+
     def __init__(self, gait_name, subgaits, graph):
         super(SetpointsGait, self).__init__(gait_name, subgaits, graph)
         self._current_subgait = None
@@ -102,7 +99,9 @@ class SetpointsGait(GaitInterface, Gait):
 
         else:
             # If there is no transition subgait that has to be used, go to TO subgait
-            next_subgait = self.graph[(self._current_subgait.subgait_name, self.graph.TO)]
+            next_subgait = self.graph[
+                (self._current_subgait.subgait_name, self.graph.TO)
+            ]
 
         if next_subgait == self.graph.END:
             return None, True
@@ -124,9 +123,13 @@ class SetpointsGait(GaitInterface, Gait):
             return False
 
         if transition_request == TransitionRequest.DECREASE_SIZE:
-            name = self.graph[(self._current_subgait.subgait_name, self.graph.DECREASE_SIZE)]
+            name = self.graph[
+                (self._current_subgait.subgait_name, self.graph.DECREASE_SIZE)
+            ]
         elif transition_request == TransitionRequest.INCREASE_SIZE:
-            name = self.graph[(self._current_subgait.subgait_name, self.graph.INCREASE_SIZE)]
+            name = self.graph[
+                (self._current_subgait.subgait_name, self.graph.INCREASE_SIZE)
+            ]
         else:
             return False
 
@@ -136,10 +139,13 @@ class SetpointsGait(GaitInterface, Gait):
         return False
 
     def stop(self):
-        """ Called when the current gait should be stopped. Return a boolean
-        for whether the stopping was succesfull. """
-        if self.graph.is_stoppable() and not self._is_transitioning \
-                and self._transition_to_subgait is None:
+        """Called when the current gait should be stopped. Return a boolean
+        for whether the stopping was succesfull."""
+        if (
+            self.graph.is_stoppable()
+            and not self._is_transitioning
+            and self._transition_to_subgait is None
+        ):
             self._should_stop = True
             return True
         else:
@@ -157,15 +163,20 @@ class SetpointsGait(GaitInterface, Gait):
         :param version_map: The map with the new versions to use.
         """
         if self._current_subgait is None:
-            super(SetpointsGait, self).set_subgait_versions(robot, gait_directory,
-                                                            version_map)
+            super(SetpointsGait, self).set_subgait_versions(
+                robot, gait_directory, version_map
+            )
         else:
-            raise GaitError('Cannot change subgait version while gait is being executed')
+            raise GaitError(
+                "Cannot change subgait version while gait is being executed"
+            )
 
     def _stop(self):
         next_subgait = self.graph[(self._current_subgait.subgait_name, self.graph.STOP)]
         if next_subgait is None:
-            next_subgait = self.graph[(self._current_subgait.subgait_name, self.graph.TO)]
+            next_subgait = self.graph[
+                (self._current_subgait.subgait_name, self.graph.TO)
+            ]
         else:
             self._should_stop = False
         return next_subgait
@@ -176,13 +187,17 @@ class SetpointsGait(GaitInterface, Gait):
         subgait stored in _transition_to_subgait
         :return: The trajectory message for the transition step
         """
-        old_subgait = self.subgaits[self.graph[
-            (self._current_subgait.subgait_name, self.graph.TO)]]
-        new_subgait = self.subgaits[self.graph[
-            (self._transition_to_subgait.subgait_name, self.graph.TO)]]
+        old_subgait = self.subgaits[
+            self.graph[(self._current_subgait.subgait_name, self.graph.TO)]
+        ]
+        new_subgait = self.subgaits[
+            self.graph[(self._transition_to_subgait.subgait_name, self.graph.TO)]
+        ]
         transition_subgait = TransitionSubgait.from_subgaits(
-            old_subgait, new_subgait, '{s}_transition'.format(
-                s=self._transition_to_subgait.subgait_name))
+            old_subgait,
+            new_subgait,
+            "{s}_transition".format(s=self._transition_to_subgait.subgait_name),
+        )
         self._current_subgait = transition_subgait
         self._time_since_start = 0.0
         self._is_transitioning = True

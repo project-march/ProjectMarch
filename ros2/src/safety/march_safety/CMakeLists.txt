@@ -56,7 +56,7 @@ if(BUILD_TESTING)
     install(DIRECTORY test
             DESTINATION share/${PROJECT_NAME}/)
     ament_python_install_package(test)
-#    add_ros_test(test/launch/march_safety_connection.launch.py)
+    add_ros_test(test/launch/march_safety_connection.launch.py)
     add_ros_test(test/launch/march_safety_temperature.launch.py)
 endif()
 

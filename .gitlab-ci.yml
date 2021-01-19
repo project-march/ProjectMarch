@@ -6,11 +6,6 @@ stages:
   - Test code
   - Static analysis on code
 
-cache:
-  key: "${CI_JOB_NAME}"
-  paths:
-    - ccache
-
 image: registry.gitlab.com/project-march/march:$CI_COMMIT_BRANCH
 
 # Allow each branch to run their own container. This allows a branch to add
@@ -55,27 +50,15 @@ container:build:
         - Dockerfile
         - "**/package.xml"
 
-# Runs a linter on the code to see if the code style is consistent
-noetic:pep8:
+# Runs a linter on the code to see if the code style is consistent and to avoid common
+# mistakes
+flake8:
   stage: Lint code
   script:
-    - cd ros1/
-    - python3 -m autopep8 --diff -r --aggressive --aggressive --exit-code src
-    - python3 -m flake8
-  only:
-    changes:
-      - "ros1/**/*.py"
-  allow_failure: true
-
-foxy:pep8:
-  stage: Lint code
-  script:
-    - cd ros2/
-    - python3 -m autopep8 --diff -r --aggressive --aggressive --exit-code src
-    - python3 -m flake8
-  only:
-    changes:
-      - "ros2/**/*.py"
+    - python3 -m flakehell lint --format=gitlab --output-file flakehell.json
+  artifacts:
+    reports:
+      codequality: flakehell.json
   allow_failure: true
 
 noetic:build:

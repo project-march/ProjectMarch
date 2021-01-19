@@ -1,12 +1,18 @@
 import actionlib
-from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal, FollowJointTrajectoryResult
+from control_msgs.msg import (
+    FollowJointTrajectoryAction,
+    FollowJointTrajectoryGoal,
+    FollowJointTrajectoryResult,
+)
 import rospy
 
 
 class TrajectoryScheduler(object):
     def __init__(self, topic):
         self._failed = False
-        self._trajectory_client = actionlib.SimpleActionClient(topic, FollowJointTrajectoryAction)
+        self._trajectory_client = actionlib.SimpleActionClient(
+            topic, FollowJointTrajectoryAction
+        )
 
     def schedule(self, trajectory):
         """Schedules a new trajectory.
@@ -26,5 +32,9 @@ class TrajectoryScheduler(object):
 
     def _done_cb(self, _state, result):
         if result.error_code != FollowJointTrajectoryResult.SUCCESSFUL:
-            rospy.logerr('Failed to execute trajectory. {0} ({1})'.format(result.error_string, result.error_code))
+            rospy.logerr(
+                "Failed to execute trajectory. {0} ({1})".format(
+                    result.error_string, result.error_code
+                )
+            )
             self._failed = True

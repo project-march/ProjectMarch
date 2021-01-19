@@ -12,7 +12,6 @@ class TransitionRequest(Enum):
 
 
 class StateMachineInput(object):
-
     def __init__(self):
         self._stopped = False
         self._paused = False
@@ -20,12 +19,16 @@ class StateMachineInput(object):
         self._transition_index = 0
         self._gait = None
 
-        self._instruction_subscriber = rospy.Subscriber('/march/input_device/instruction',
-                                                        GaitInstruction,
-                                                        self._callback_input_device_instruction)
-        self._instruction_response_publisher = rospy.Publisher('/march/input_device/instruction_response',
-                                                               GaitInstructionResponse,
-                                                               queue_size=20)
+        self._instruction_subscriber = rospy.Subscriber(
+            "/march/input_device/instruction",
+            GaitInstruction,
+            self._callback_input_device_instruction,
+        )
+        self._instruction_response_publisher = rospy.Publisher(
+            "/march/input_device/instruction_response",
+            GaitInstructionResponse,
+            queue_size=20,
+        )
 
     def get_transition_request(self):
         """Used to return the transition request as an enum.

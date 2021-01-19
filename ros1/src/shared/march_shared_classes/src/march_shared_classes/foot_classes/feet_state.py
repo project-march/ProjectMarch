@@ -1,7 +1,12 @@
 from march_shared_classes.gait.setpoint import Setpoint
 from march_shared_classes.utilities.side import Side
-from march_shared_classes.utilities.utility_functions import get_joint_names_for_inverse_kinematics
-from march_shared_classes.utilities.utility_functions import merge_dictionaries, weighted_average
+from march_shared_classes.utilities.utility_functions import (
+    get_joint_names_for_inverse_kinematics,
+)
+from march_shared_classes.utilities.utility_functions import (
+    merge_dictionaries,
+    weighted_average,
+)
 
 from .foot import Foot
 
@@ -31,28 +36,39 @@ class FeetState(object):
         """
         for joint in JOINT_NAMES_IK:
             if joint not in setpoint_dic:
-                raise KeyError('expected setpoint dictionary to contain joint {joint}, but {joint} was missing.'.
-                               format(joint=joint))
+                raise KeyError(
+                    "expected setpoint dictionary to contain joint {joint}, but {joint} was missing.".format(
+                        joint=joint
+                    )
+                )
 
-        foot_state_left = Foot.calculate_foot_position(setpoint_dic['left_hip_aa'].position,
-                                                       setpoint_dic['left_hip_fe'].position,
-                                                       setpoint_dic['left_knee'].position,
-                                                       Side.left)
-        foot_state_right = Foot.calculate_foot_position(setpoint_dic['right_hip_aa'].position,
-                                                        setpoint_dic['right_hip_fe'].position,
-                                                        setpoint_dic['right_knee'].position,
-                                                        Side.right)
+        foot_state_left = Foot.calculate_foot_position(
+            setpoint_dic["left_hip_aa"].position,
+            setpoint_dic["left_hip_fe"].position,
+            setpoint_dic["left_knee"].position,
+            Side.left,
+        )
+        foot_state_right = Foot.calculate_foot_position(
+            setpoint_dic["right_hip_aa"].position,
+            setpoint_dic["right_hip_fe"].position,
+            setpoint_dic["right_knee"].position,
+            Side.right,
+        )
 
         next_joint_positions = Setpoint.calculate_next_positions_joint(setpoint_dic)
 
-        next_foot_state_left = Foot.calculate_foot_position(next_joint_positions['left_hip_aa'].position,
-                                                            next_joint_positions['left_hip_fe'].position,
-                                                            next_joint_positions['left_knee'].position,
-                                                            Side.left)
-        next_foot_state_right = Foot.calculate_foot_position(next_joint_positions['right_hip_aa'].position,
-                                                             next_joint_positions['right_hip_fe'].position,
-                                                             next_joint_positions['right_knee'].position,
-                                                             Side.right)
+        next_foot_state_left = Foot.calculate_foot_position(
+            next_joint_positions["left_hip_aa"].position,
+            next_joint_positions["left_hip_fe"].position,
+            next_joint_positions["left_knee"].position,
+            Side.left,
+        )
+        next_foot_state_right = Foot.calculate_foot_position(
+            next_joint_positions["right_hip_aa"].position,
+            next_joint_positions["right_hip_fe"].position,
+            next_joint_positions["right_knee"].position,
+            Side.right,
+        )
 
         foot_state_left.add_foot_velocity_from_next_state(next_foot_state_left)
         foot_state_right.add_foot_velocity_from_next_state(next_foot_state_right)
@@ -63,28 +79,34 @@ class FeetState(object):
             feet_state_time += setpoint.time
         feet_state_time = feet_state_time / len(setpoint_dic)
 
-        feet_state = cls(foot_state_right, foot_state_left, feet_state_time)
-
-        return feet_state
+        # feet state
+        return cls(foot_state_right, foot_state_left, feet_state_time)
 
     @classmethod
     def weighted_average_states(cls, base_state, other_state, parameter):
         """Computes the weighted average of two feet states.
 
-        :param base_state: One of the states for the weighted average, return this is parameter is 0
-        :param other_state: One of the states for the weighted average, return this if parameter is 1
-        :param parameter: The normalised weight parameter, the parameter that determines the weight of the other_state
+        :param base_state: One of the states for the weighted average, return this if
+                           parameter is 0
+        :param other_state: One of the states for the weighted average, return this if
+                            parameter is 1
+        :param parameter: The normalised weight parameter, the parameter that determines
+                          the weight of the other_state
 
-        :return: A FeetState Object of which the positions and velocities of both the feet are the weighted average of
-        those of the base and other states.
+        :return: A FeetState Object of which the positions and velocities of both the
+                 feet are the weighted average of those of the base and other states.
         """
         if parameter == 0:
             return base_state
         elif parameter == 1:
             return other_state
 
-        resulting_right_foot = Foot.weighted_average_foot(base_state.right_foot, other_state.right_foot, parameter)
-        resulting_left_foot = Foot.weighted_average_foot(base_state.left_foot, other_state.left_foot, parameter)
+        resulting_right_foot = Foot.weighted_average_foot(
+            base_state.right_foot, other_state.right_foot, parameter
+        )
+        resulting_left_foot = Foot.weighted_average_foot(
+            base_state.left_foot, other_state.left_foot, parameter
+        )
         resulting_time = weighted_average(base_state.time, other_state.time, parameter)
 
         return cls(resulting_right_foot, resulting_left_foot, resulting_time)
@@ -97,8 +119,12 @@ class FeetState(object):
 
         :return: A dictionary of setpoints, the foot location and velocity of which corresponds with the feet_state
         """
-        left_joint_states = Foot.get_joint_states_from_foot_state(feet_state.left_foot, feet_state.time)
-        right_joint_states = Foot.get_joint_states_from_foot_state(feet_state.right_foot, feet_state.time)
+        left_joint_states = Foot.get_joint_states_from_foot_state(
+            feet_state.left_foot, feet_state.time
+        )
+        right_joint_states = Foot.get_joint_states_from_foot_state(
+            feet_state.right_foot, feet_state.time
+        )
 
-        setpoints = merge_dictionaries(left_joint_states, right_joint_states)
-        return setpoints
+        # setpoints
+        return merge_dictionaries(left_joint_states, right_joint_states)

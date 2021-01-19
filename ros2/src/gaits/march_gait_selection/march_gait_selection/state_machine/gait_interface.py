@@ -11,7 +11,7 @@ class GaitInterface(object):
     @property
     def name(self) -> str:
         """Returns the name of the gait."""
-        return ''
+        return ""
 
     @property
     def can_freeze(self) -> bool:
@@ -21,23 +21,23 @@ class GaitInterface(object):
     @property
     def subgait_name(self) -> str:
         """Returns the name of the currently executing trajectory."""
-        return ''
+        return ""
 
     @property
     def version(self) -> str:
         """Returns the version of the currently executing trajectory."""
-        return ''
+        return ""
 
     @property
     def duration(self) -> float:
         """Returns the duration in seconds of the currently executing trajectory
-         from the start of the gait."""
+        from the start of the gait."""
         return 0.0
 
     @property
     def gait_type(self) -> str:
         """Returns a gait type of the currently executing trajectory."""
-        return ''
+        return ""
 
     @property
     def starting_position(self) -> dict:
@@ -58,6 +58,7 @@ class GaitInterface(object):
         """Called in a loop with the elapsed time since the last update.
 
         :param float elapsed_time: Elapsed time in seconds since the last update
+
         :returns A pair of a trajectory and a flag. The trajectory that will be
                  set as the new goal for the controller, can be None. The flag
                  indicates whether the gait has finished.
@@ -68,7 +69,8 @@ class GaitInterface(object):
         """Requests a special transition.
 
         :param TransitionRequest transition_request: request on what special
-        transition to perform
+               transition to perform
+
         :returns True when the request has been accepted, False otherwise.
         """
         return False

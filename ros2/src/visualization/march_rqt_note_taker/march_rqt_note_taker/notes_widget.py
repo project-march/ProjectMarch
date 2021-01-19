@@ -34,19 +34,24 @@ class NotesWidget(QWidget):
         loadUi(ui_file, self)
 
         self._model.rowsInserted.connect(
-            lambda parent, first, last: [self.update_status(),
-                                         self._set_saved(False),
-                                         self._autosave(first, last,
-                                                        self.INSERT)])
+            lambda parent, first, last: [
+                self.update_status(),
+                self._set_saved(False),
+                self._autosave(first, last, self.INSERT),
+            ]
+        )
         self._model.rowsRemoved.connect(
-            lambda parent, first, last: [self.update_status(),
-                                         self._set_saved(False),
-                                         self._autosave(first, last,
-                                                        self.REMOVE)])
+            lambda parent, first, last: [
+                self.update_status(),
+                self._set_saved(False),
+                self._autosave(first, last, self.REMOVE),
+            ]
+        )
 
         self.table_view.setModel(self._model)
         self.table_view.verticalScrollBar().rangeChanged.connect(
-            self._handle_change_scroll)
+            self._handle_change_scroll
+        )
         self._last_scroll_max = self.table_view.verticalScrollBar().maximum()
 
         self.input_field.returnPressed.connect(self._handle_insert_entry)
@@ -59,13 +64,13 @@ class NotesWidget(QWidget):
         self.autosave_check_box.setChecked(self._has_autosave)
         self.autosave_check_box.setEnabled(False)
 
-        self._delete_shortcut = QShortcut(QKeySequence('Delete'), self)
+        self._delete_shortcut = QShortcut(QKeySequence("Delete"), self)
         self._delete_shortcut.activated.connect(self._delete_selected)
 
-        self._load_shortcut = QShortcut(QKeySequence('Ctrl+O'), self)
+        self._load_shortcut = QShortcut(QKeySequence("Ctrl+O"), self)
         self._load_shortcut.activated.connect(self._handle_load)
 
-        self._save_shortcut = QShortcut(QKeySequence('Ctrl+S'), self)
+        self._save_shortcut = QShortcut(QKeySequence("Ctrl+S"), self)
         self._save_shortcut.activated.connect(self._handle_save)
 
     def _handle_insert_entry(self):
@@ -74,28 +79,25 @@ class NotesWidget(QWidget):
         if entry:
             self._model.insert_row(Entry(entry))
         self.input_field.clear()
-        self.table_view.verticalScrollBar().setSliderPosition(
-            self._last_scroll_max)
+        self.table_view.verticalScrollBar().setSliderPosition(self._last_scroll_max)
 
     def update_status(self):
         """Update status when a row is added or removed.
 
         The status display tells the user the total amount of messages is updated.
         """
-        self.messages_label.setText(f'Displaying {len(self._model)} messages')
+        self.messages_label.setText(f"Displaying {len(self._model)} messages")
 
     def _handle_start_take(self):
         """Callback for when the 'Start take' button is pressed."""
         take = self.camera_spin_box.value()
-        self._model.insert_row(Entry(f'Started camera take {take}'))
+        self._model.insert_row(Entry(f"Started camera take {take}"))
         self.camera_spin_box.setValue(take + 1)
-        self.table_view.verticalScrollBar().setSliderPosition(
-            self._last_scroll_max)
+        self.table_view.verticalScrollBar().setSliderPosition(self._last_scroll_max)
 
     def _handle_change_scroll(self, scroll_min, scroll_max):
         """Callback for when the mouse is scrolled."""
-        if self.table_view.verticalScrollBar().value() == \
-                self._last_scroll_max:
+        if self.table_view.verticalScrollBar().value() == self._last_scroll_max:
             self.table_view.verticalScrollBar().setSliderPosition(scroll_max)
             self._last_scroll_max = scroll_max
 
@@ -106,8 +108,11 @@ class NotesWidget(QWidget):
         """
         selection_model = self.table_view.selectionModel()
         if self.table_view.hasFocus() and selection_model.hasSelection():
-            indices = [index for index in selection_model.selectedIndexes()
-                       if not index.column()]
+            indices = [
+                index
+                for index in selection_model.selectedIndexes()
+                if not index.column()
+            ]
             if indices and all([index.isValid() for index in indices]):
                 self._model.remove_rows([index.row() for index in indices])
 
@@ -120,13 +125,13 @@ class NotesWidget(QWidget):
 
         Not yet implemented.
         """
-        self._node.get_logger().warn(
-            'Loading notes from a file is not yet implemented')
+        self._node.get_logger().warn("Loading notes from a file is not yet implemented")
 
     def _handle_save(self):
         """Callback for when the save button is pressed."""
         result = QFileDialog.getSaveFileName(
-            self, 'Save File', '.', 'Minute files (*.txt)')
+            self, "Save File", ".", "Minute files (*.txt)"
+        )
         file_name = result[0]
         if file_name:
             self._save(file_name)
@@ -150,33 +155,34 @@ class NotesWidget(QWidget):
         if self._has_autosave and self._last_save_file is not None:
             if self._autosave_file is None or self._autosave_file.closed:
                 try:
-                    self._autosave_file = open(self._last_save_file, 'r+')
+                    self._autosave_file = open(self._last_save_file, "r+")
                     self._autosave_file.seek(0, os.SEEK_END)
                 except IOError as err:
                     self._node.get_logger().error(
-                        f'Failed to open file {self._last_save_fil} '
-                        f'for autosaving: {err}')
+                        f"Failed to open file {self._last_save_fil} "
+                        f"for autosaving: {err}"
+                    )
                     return
             try:
                 if action == self.INSERT:
                     if first != 0:
-                        self._autosave_file.write('\n')
+                        self._autosave_file.write("\n")
                     self._autosave_file.write(
-                        '\n'.join(str(entry)
-                                  for entry in self._model[first:last + 1]))
+                        "\n".join(str(entry) for entry in self._model[first : last + 1])
+                    )
                 elif action == self.REMOVE:
                     self._autosave_file.seek(0, os.SEEK_SET)
                     self._autosave_file.write(str(self._model))
                     self._autosave_file.truncate()
                 else:
-                    self._node.get_logger().warn(
-                        f'Unknown autosave action: {action}')
+                    self._node.get_logger().warn(f"Unknown autosave action: {action}")
                     return
                 self._autosave_file.flush()
             except IOError as err:
                 self._node.get_logger().error(
-                    f'Failed to write to file {self._last_save_fil} '
-                    f'for autosaving: {err}')
+                    f"Failed to write to file {self._last_save_fil} "
+                    f"for autosaving: {err}"
+                )
             else:
                 self._set_saved(True)
 
@@ -185,13 +191,13 @@ class NotesWidget(QWidget):
 
         :param file_name Name of the file
         """
-        if file_name[-4:] != '.txt':
-            file_name += '.txt'
+        if file_name[-4:] != ".txt":
+            file_name += ".txt"
         try:
-            with open(file_name, 'w') as f:
+            with open(file_name, "w") as f:
                 f.write(str(self._model))
         except IOError as err:
-            self._node.get_logger().error(f'Failed to open file: {err}')
+            self._node.get_logger().error(f"Failed to open file: {err}")
         else:
             self._set_saved(True)
             self._last_save_file = file_name

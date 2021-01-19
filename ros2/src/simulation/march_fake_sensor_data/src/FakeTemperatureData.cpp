@@ -7,8 +7,7 @@
 #include "rclcpp/timer.hpp"
 #include "march_fake_sensor_data/FakeTemperatureData.hpp"
 #include "march_fake_sensor_data/UniformDistribution.hpp"
-#include "march_shared_msgs/srv/get_joint_names.hpp"
-#include "march_utility/march_util.hpp"
+#include "march_utility/node_utils.hpp"
 #include <chrono>
 #include <deque>
 #include <vector>
@@ -59,7 +58,7 @@ FakeTemperatureDataNode::FakeTemperatureDataNode(const std::string& node_name, c
 void FakeTemperatureDataNode::initialize()
 {
     // Create a temperature publisher for all the different joints.
-    for (auto sensor : march_util::get_joint_names(*this)) {
+    for (auto sensor : node_utils::get_joint_names(*this)) {
         add_temperature_publisher(sensor);
     }
 

@@ -9,12 +9,12 @@ class ModifiableSetpointTest(unittest.TestCase):
 
     def test_invert_time(self):
         self.setpoint.invert(2)
-        self.assertEqual(self.setpoint.time, round(2 - 1.123412541, 8))
+        self.assertAlmostEqual(self.setpoint.time, 2 - 1.123412541, 8)
 
     def test_invert_position(self):
         self.setpoint.invert(2)
-        self.assertEqual(self.setpoint.position, round(0.034341255, 8))
+        self.assertAlmostEqual(self.setpoint.position, 0.034341255, 8)
 
     def test_invert_velocity(self):
         self.setpoint.invert(2)
-        self.assertEqual(self.setpoint.velocity, round(-123.162084549, 8))
+        self.assertAlmostEqual(self.setpoint.velocity, -123.162084549, 8)
