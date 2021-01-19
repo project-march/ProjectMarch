@@ -1,8 +1,6 @@
-from datetime import datetime, timedelta
 import os
-import time
 import unittest
-from threading import Event
+from datetime import datetime, timedelta
 
 import pytest
 import rclpy
@@ -14,10 +12,10 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 from launch_testing.actions import ReadyToTest
 from march_shared_msgs.msg import Error
+from parameterized import parameterized
 from rcl_interfaces.srv import GetParameters, ListParameters
 from sensor_msgs.msg import Temperature
 from test.util import ErrorCounter
-from parameterized import parameterized
 
 TIMEOUT_DURATION = 2
 JOINT_NAMES = ["test_joint1", "test_joint2", "test_joint3"]
@@ -224,7 +222,6 @@ class TestMarchSafetyTemperature(unittest.TestCase):
         #
         # # Spin an extra time to make sure the error counter is updated
         # rclpy.spin_once(self.node, timeout_sec=TIMEOUT_DURATION)
-
 
         self.assertEqual(
             self.error_counter.count,
