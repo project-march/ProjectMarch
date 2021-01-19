@@ -34,7 +34,12 @@ ObstacleController::ObstacleController(physics::ModelPtr model)
 {
   foot_left_ = model_->GetLink("ankle_plate_left");
   foot_right_ = model_->GetLink("ankle_plate_right");
-  hip_base_ = model_->GetLink("hip_base");
+  // Grab upper leg length from right leg as both legs are identical, use size[2] as the length is in the z-direction
+//  unsigned int index = 0;
+//  std::vector<double> upper_leg_dimensions = model_->GetLink("upper_leg_right")->GetCollisions();
+//            std::cout << upper_leg_dimensions << std::endl;
+  upper_leg_length_ = 0.4; // roughly the length of the upper leg
+
   ros::param::get("balance", balance_);
   // As long as no sitting gait is executed, the default to use when no subgait is idle_stand
   subgait_name_ = HOME_STAND;
@@ -54,7 +59,7 @@ void ObstacleController::newSubgait(const march_shared_msgs::CurrentGaitConstPtr
       subgait_name_ == "left_swing")
   {
     // Exponential smoothing with alpha = 0.2
-    swing_step_size_ = 0.8 * swing_step_size_ + 0.4 * std::abs(foot_right_->WorldPose().Pos().X() -
+    swing_step_size_ = 0.8 * swing_step_size_ + 0.2 * std::abs(foot_right_->WorldPose().Pos().X() -
                                                                            foot_left_->WorldPose().Pos().X());
   }
 
@@ -162,35 +167,39 @@ void ObstacleController::getGoalPosition(double time_since_start)
   // Left foot is stable unless subgait name starts with left
   auto stable_foot_pose = foot_left_->WorldCoGPose().Pos();
   auto swing_foot_pose = foot_right_->WorldCoGPose().Pos();
-  auto hip_base_pose = hip_base_->WorldCoGPose().Pos();
 
   if (subgait_name_.substr(0, 4) == "left")
   {
     stable_foot_pose = foot_right_->WorldCoGPose().Pos();
     swing_foot_pose = foot_left_->WorldCoGPose().Pos();
   }
+
   // Goal position is determined from the location of the stable foot
   goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
 
   // If the exoskeleton is busy sitting down, move the CoM behind the stable foot
   // Set 'sitting' as the new default state
-  if (subgait_name_ == "sit_down") {
-      default_subgait_name_ = SIT_IDLE;
-      goal_position_x = stable_foot_pose.X() + hip_base_pose.X() * time_since_start / subgait_duration_;
+  if (subgait_name_ == "sit_down")
+  {
+    default_subgait_name_ = SIT_IDLE;
+    goal_position_x = stable_foot_pose.X() + upper_leg_length_ * time_since_start / subgait_duration_;
   }
   // If the exoskeleton has sat down or is changing while sitting, keep the CoM behind the stable foot
-  else if (subgait_name_ == SIT_IDLE || subgait_name_ == "sit_home" || subgait_name_ == "prepare_stand_up") {
-      goal_position_x = stable_foot_pose.X() + hip_base_pose.X();
+  else if (subgait_name_ == SIT_IDLE || subgait_name_ == "sit_home" || subgait_name_ == "prepare_stand_up")
+  {
+    goal_position_x = stable_foot_pose.X() + upper_leg_length_; // and try using the hip position.
   }
   // If the exoskeleton is busy standing up, move the CoM forward again (relative when sitting down)
   // Set 'Standing' as the new defualt state
-  else if (subgait_name_ == "stand_up") {
-      default_subgait_name_ = STAND_IDLE;
-      goal_position_x = stable_foot_pose.X() + hip_base_pose.X() * (1 - time_since_start / subgait_duration_);
+  else if (subgait_name_ == "stand_up")
+  {
+    default_subgait_name_ = STAND_IDLE;
+    goal_position_x = stable_foot_pose.X() + upper_leg_length_ * (1 - time_since_start / subgait_duration_);
   }
   // If the exoskeleton has stood up, keep the CoM on the stable foot
-  else if (subgait_name_ == STAND_IDLE) {
-    goal_position_x = stable_foot_pose.X();
+  else if (subgait_name_ == STAND_IDLE)
+  {
+    goal_position_x = upper_leg_length_;
   }
 
   if (subgait_name_.substr(0, 6) != "freeze")
