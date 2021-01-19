@@ -37,7 +37,7 @@ def set_new_ramp_like_obstacle(name, slope_up=0, slope_down=0, ramp_up_length=0)
 def make_set_size_string(dimension, size):
     if size == 0:
         return ''
-    return '{dimension}="{size}"'.format(dimension=dimension, size=size)
+    return f'{dimension}="{size}"'
 
 def make_xacro_file(name, parameter_1, parameter_2, parameter_3):
     doc = xacro.parse('''<?xml version="1.0"?>
