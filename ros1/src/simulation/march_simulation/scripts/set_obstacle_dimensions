@@ -52,12 +52,8 @@ def make_xacro_file(name, parameter_1, parameter_2, parameter_3):
 def set_size(name, doc):
     xacro.process_doc(doc)
     new_obstacle = doc.toprettyxml(indent='  ')
-    models = get_world_properties.call(GetWorldPropertiesRequest()).model_names
-    if name in models:
-        delete_publisher.call(DeleteModelRequest(model_name=name))
-
-    spawn_publisher.call(SpawnModelRequest(
-        model_name=name, model_xml=new_obstacle))
+    delete_publisher(model_name=name)
+    spawn_publisher(model_name=name, model_xml=new_obstacle)
 
 def set_size_block_like_callback(msg):
     if msg.obstacle_name not in RESIZABLE_OBSTACLES_BLOCK_LIKE:
