@@ -36,7 +36,7 @@ ObstacleController::ObstacleController(physics::ModelPtr model)
   foot_right_ = model_->GetLink("ankle_plate_right");
   // roughly the half the length of the upper leg, this is bodged for now as I cannot seem to get the length of the link
   // from the urdf in here
-  upper_leg_length_ = 0.20;
+  upper_leg_length_ = 0.40;
 
   ros::param::get("balance", balance_);
   // As long as no sitting gait is executed, the default to use when no subgait is idle_stand
@@ -165,6 +165,7 @@ void ObstacleController::getGoalPosition(double time_since_start)
   // Left foot is stable unless subgait name starts with left
   auto stable_foot_pose = foot_left_->WorldCoGPose().Pos();
   auto swing_foot_pose = foot_right_->WorldCoGPose().Pos();
+  double halved_upper_leg_length_ = upper_leg_length_ / 2;
 
   if (subgait_name_.substr(0, 4) == "left")
   {
@@ -184,19 +185,19 @@ void ObstacleController::getGoalPosition(double time_since_start)
     if (subgait_name_ == "sit_down")
     {
       default_subgait_name_ = SIT_IDLE;
-      goal_position_x += upper_leg_length_ * time_since_start / subgait_duration_;
+      goal_position_x += halved_upper_leg_length_ * time_since_start / subgait_duration_;
     }
     // If the exoskeleton has sat down or is changing while sitting, keep the CoM behind the stable foot
     else if (subgait_name_ == SIT_IDLE || subgait_name_ == "sit_home" || subgait_name_ == "prepare_stand_up")
     {
-      goal_position_x += upper_leg_length_; // and try using the hip position.
+      goal_position_x += halved_upper_leg_length_; // and try using the hip position.
     }
     // If the exoskeleton is busy standing up, move the CoM forward again (relative when sitting down)
     // Set 'Standing' as the new defualt state
     else if (subgait_name_ == "stand_up")
     {
       default_subgait_name_ = STAND_IDLE;
-      goal_position_x += upper_leg_length_ * (1 - time_since_start / subgait_duration_);
+      goal_position_x += halved_upper_leg_length_ * (1 - time_since_start / subgait_duration_);
     }
     // If the exoskeleton is executing an open gait (generally right_open),
     // move the CoM from the stable foot to a quarter step size in front.
