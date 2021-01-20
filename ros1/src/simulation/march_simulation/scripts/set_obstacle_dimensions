@@ -1,14 +1,16 @@
 #! /usr/bin/env python
 import rospy
-from march_shared_msgs.srv import SetObstacleSizeResponse, SetObstacleSize
+
+from march_shared_msgs.srv import SetObstacleSizeRampLikeResponse, SetObstacleSizeRampLike, \
+    SetObstacleSizeBlockLikeResponse, SetObstacleSizeBlockLike
 from gazebo_msgs.srv import SpawnModelRequest, SpawnModel, DeleteModel, \
     DeleteModelRequest, GetWorldProperties, GetWorldPropertiesRequest
 import xacro
 
 # All obstacles that have a macro file which allows for changing the dimension
 # this means there must be an <name>_macro.xacro in the obstacles directory
-# which accepts the parameters length, width and height with default values
-RESIZABLE_OBSTACLES = ['bench']
+RESIZABLE_OBSTACLES_RAMP_LIKE = ['ramp_and_door'] # for files which accept slope_up, slope_down and length_ramp_up
+RESIZABLE_OBSTACLES_BLOCK_LIKE = ['bench', 'stairs'] # for files which accept height, width and length
 
 rospy.init_node('set_obstacle_dimensions', anonymous=True)
 
@@ -16,37 +18,63 @@ spawn_publisher = rospy.ServiceProxy('/gazebo/spawn_urdf_model', SpawnModel)
 delete_publisher = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
 get_world_properties = rospy.ServiceProxy('/gazebo/get_world_properties', GetWorldProperties)
 
+def set_new_block_like_obstacle(name, length=0, width=0, height=0):
+    length_string = make_set_size_string('length', length)
+    width_string = make_set_size_string('width', width)
+    height_string = make_set_size_string('height', height)
 
-def set_size(name, length=0, width=0, height=0):
-    length = 'length="{length}"'.format(length=length) if length != 0 else ''
-    width = 'width="{width}"'.format(width=width) if width != 0 else ''
-    height = 'height="{height}"'.format(height=height) if height != 0 else ''
+    doc = make_xacro_file(name, length_string, width_string, height_string)
+    set_size(name, doc)
 
-    doc = xacro.parse('''<?xml version="1.0"?>
-            <robot name="{name}" xmlns:xacro="http://www.ros.org/wiki/xacro">
-                <xacro:include filename="$(find march_simulation)/obstacles/{name}_macro.xacro"/>
-                <xacro:{name} {length} {width} {height}/>
-            </robot>
-            '''.format(name=name, length=length, width=width, height=height), None)
+def set_new_ramp_like_obstacle(name, slope_up=0, slope_down=0, ramp_up_length=0):
+    slope_up_string = make_set_size_string('slope_up', slope_up)
+    slope_down_string = make_set_size_string('slope_down', slope_down)
+    ramp_up_length_string = make_set_size_string('ramp_up_length', ramp_up_length)
+
+    doc = make_xacro_file(name, slope_up_string, slope_down_string, ramp_up_length_string)
+    set_size(name, doc)
+
+def make_set_size_string(dimension, size):
+    if size == 0:
+        return ''
+    return f'{dimension}="{size}"'
+
+def make_xacro_file(name, parameter_1, parameter_2, parameter_3):
+    doc = xacro.parse(f'''<?xml version="1.0"?>
+                      <robot name="{name}" xmlns:xacro="http://www.ros.org/wiki/xacro">
+                         <xacro:include filename="$(find march_simulation)/obstacles/{name}_macro.xacro"/>
+                         <xacro:{name} {parameter_1} {parameter_2} {parameter_3}/>
+                      </robot>
+                      ''')
+    return doc
+
+def set_size(name, doc):
     xacro.process_doc(doc)
     new_obstacle = doc.toprettyxml(indent='  ')
-    models = get_world_properties.call(GetWorldPropertiesRequest()).model_names
-    if name in models:
-        delete_publisher.call(DeleteModelRequest(model_name=name))
+    delete_publisher(model_name=name)
+    spawn_publisher(model_name=name, model_xml=new_obstacle)
 
-    spawn_publisher.call(SpawnModelRequest(
-        model_name=name, model_xml=new_obstacle))
-
-
-def set_size_callback(msg):
-    if msg.obstacle_name not in RESIZABLE_OBSTACLES:
-        return SetObstacleSizeResponse(success=False)
+def set_size_block_like_callback(msg):
+    if msg.obstacle_name not in RESIZABLE_OBSTACLES_BLOCK_LIKE:
+        return SetObstacleSizeBlockLikeResponse(success=False)
 
     else:
-        set_size(name=msg.obstacle_name, length=msg.new_length, width=msg.new_width, height=msg.new_height)
-        return SetObstacleSizeResponse(success=True)
+        set_new_block_like_obstacle(name=msg.obstacle_name, length=msg.new_length, width=msg.new_width,
+                                     height=msg.new_height)
+        return SetObstacleSizeBlockLikeResponse(success=True)
+
+def set_size_ramp_like_callback(msg):
+    if msg.obstacle_name not in RESIZABLE_OBSTACLES_RAMP_LIKE:
+        return SetObstacleSizeRampLikeResponse(success=False)
+
+    else:
+        set_new_ramp_like_obstacle(name=msg.obstacle_name, slope_up=msg.new_slope_up, slope_down=msg.new_slope_down,
+                                   ramp_up_length=msg.new_ramp_up_length)
+        return SetObstacleSizeRampLikeResponse(success=True)
 
 
-change_obstacle_size = rospy.Service('/march/set_obstacle_size',
-                                     SetObstacleSize, set_size_callback)
+change_block_like_obstacle_size = rospy.Service('/march/set_obstacle_size/block_like',
+                                                 SetObstacleSizeBlockLike, set_size_block_like_callback)
+change_ramp_like_obstacle_size = rospy.Service('/march/set_obstacle_size/ramp_like',
+                                               SetObstacleSizeRampLike, set_size_ramp_like_callback)
 rospy.spin()
