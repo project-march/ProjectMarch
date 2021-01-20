@@ -6,7 +6,8 @@ from rclpy.node import Node
 class CheckInputDevice(object):
     """Base class to diagnose whether the input devices are connected properly."""
 
-    def __init__(self, topic, message_type, updater, frequency):
+    def __init__(self, node: Node, topic: str, message_type, updater: Updater,
+                 frequency: float):
         self._frequency_params = FrequencyStatusParam({"min": frequency}, 0.1)
         self._updater = updater
         self._diagnostics = {}

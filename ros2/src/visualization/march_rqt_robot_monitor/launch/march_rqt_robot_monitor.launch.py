@@ -15,7 +15,7 @@ def generate_launch_description():
         'config', 'analyzers.yaml')
     return LaunchDescription([
         DeclareLaunchArgument(
-            'rqt',
+            name='rqt',
             default_value='true',
             description='Set to launch the rqt robot monitor.'),
         Node(

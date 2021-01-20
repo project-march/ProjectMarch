@@ -14,6 +14,8 @@ from march_utility.gait.subgait import Subgait
 from std_msgs.msg import String
 from std_srvs.srv import Trigger
 from urdf_parser_py import urdf
+
+from march_utility.utilities.node_utils import get_robot_urdf
 from .state_machine.setpoints_gait import SetpointsGait
 
 NODE_NAME = "gait_selection"
@@ -63,7 +65,7 @@ class GaitSelection(Node):
             self._positions,
             self._semi_dynamic_gait_version_map,
         ) = self._load_configuration()
-        self._robot = self._initial_robot_description() if robot is None else robot
+        self._robot = get_robot_urdf(self) if robot is None else robot
 
         self._robot_description_sub = self.create_subscription(
             msg_type=String,
@@ -75,27 +77,6 @@ class GaitSelection(Node):
         self._create_services()
         self._loaded_gaits = self._load_gaits()
         self.get_logger().info("Successfully initialized gait selection node.")
-
-    def _initial_robot_description(self):
-        """
-        Initialize the robot description by getting it from the robot state
-        publisher.
-        """
-        robot_description_client = self.create_client(
-            srv_type=GetParameters,
-            srv_name="/march/robot_state_publisher/get_parameters",
-        )
-        while not robot_description_client.wait_for_service(timeout_sec=2):
-            self.get_logger().warn(
-                "Robot description is not being published, waiting.."
-            )
-
-        robot_future = robot_description_client.call_async(
-            request=GetParameters.Request(names=["robot_description"])
-        )
-        rclpy.spin_until_future_complete(self, robot_future)
-
-        return urdf.Robot.from_xml_string(robot_future.result().values[0].string_value)
 
     def _create_services(self):
         self.create_service(

@@ -8,18 +8,18 @@ diag_agg:
         path: Inputs
         contains: 'input_device'
         remove_prefix: 'march_rqt_robot_monitor_node: input_device '
-      control:
-        type: diagnostic_aggregator/GenericAnalyzer
-        path: Control
-        contains: 'Control'
-        remove_prefix: 'march_rqt_robot_monitor_node: '
-      imotioncubes:
-        type: diagnostic_aggregator/GenericAnalyzer
-        path: iMotioncubes
-        contains: 'IMC'
-        remove_prefix: 'march_rqt_robot_monitor_node: IMC '
-      gait:
-        type: diagnostic_aggregator/GenericAnalyzer
-        path: Gait
-        contains: 'Gait'
-        remove_prefix: 'march_rqt_robot_monitor_node: '
+#      control:
+#        type: diagnostic_aggregator/GenericAnalyzer
+#        path: Control
+#        contains: 'Control'
+#        remove_prefix: 'march_rqt_robot_monitor_node: '
+#      imotioncubes:
+#        type: diagnostic_aggregator/GenericAnalyzer
+#        path: iMotioncubes
+#        contains: 'IMC'
+#        remove_prefix: 'march_rqt_robot_monitor_node: IMC '
+#      gait:
+#        type: diagnostic_aggregator/GenericAnalyzer
+#        path: Gait
+#        contains: 'Gait'
+#        remove_prefix: 'march_rqt_robot_monitor_node: '

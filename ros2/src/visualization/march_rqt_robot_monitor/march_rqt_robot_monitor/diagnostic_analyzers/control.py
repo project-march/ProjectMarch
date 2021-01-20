@@ -1,7 +1,7 @@
 from diagnostic_msgs.msg import DiagnosticStatus
 from rclpy.node import Node
-from urdf_parser_py import urdf
 
+from march_utility.utilities.node_utils import get_robot_urdf
 
 WARN_PERCENTAGE = 5
 
@@ -25,7 +25,7 @@ class CheckJointValues(object):
         self._velocity_limits = {}
         self._effort_limits = {}
 
-        self._robot = urdf.Robot.from_parameter_server("/robot_description")
+        self._robot = get_robot_urdf(node)
         for joint in self._robot.joints:
             try:
                 self._lower_soft_limits[

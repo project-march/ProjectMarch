@@ -12,7 +12,10 @@ class CheckImcStatus:
         :type updater: diagnostic_updater.Updater
         """
         self._updater = updater
-        self._sub = rospy.Subscriber("/march/imc_states", ImcState, self._cb)
+        self._sub = node.create_subscription(msg_type=ImcState,
+                                             topic="/march/imc_states",
+                                             callback=self._cb,
+                                             qos_profile=10)
         self._imc_state = None
 
         self._diagnostics = set()
