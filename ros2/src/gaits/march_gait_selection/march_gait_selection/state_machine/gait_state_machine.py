@@ -281,7 +281,7 @@ class GaitStateMachine(object):
             self._gait_selection.get_logger().warn(
                 "Incorrect pressure placement, place pressure on left foot"
             )
-            return 0
+            return False
         elif (
             "left" in self._current_gait.subgait_name
             and self._force_left_foot > self._force_right_foot
