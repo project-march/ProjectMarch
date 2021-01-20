@@ -289,7 +289,7 @@ class GaitStateMachine(object):
             self._gait_selection.get_logger().warn(
                 "Incorrect pressure placement, place pressure on right foot"
             )
-            return 0
+            return False
 
         return 1
 
