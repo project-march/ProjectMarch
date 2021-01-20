@@ -272,6 +272,7 @@ class GaitStateMachine(object):
     def correct_foot_pressure(self) -> bool:
         """
         Check if the pressure is placed on the foot opposite to the subgait starting foot.
+
         If not, issue a warning. This will only be checked when transitioning from idle to gait state
         """
         if (
