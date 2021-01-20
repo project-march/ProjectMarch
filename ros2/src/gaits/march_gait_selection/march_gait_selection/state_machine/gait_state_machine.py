@@ -269,7 +269,7 @@ class GaitStateMachine(object):
         if not self._is_idle:
             self._should_stop = True
 
-    def correct_foot_pressure(self) -> bool:
+    def check_correct_foot_pressure(self) -> bool:
         """
         Check if the pressure is placed on the foot opposite to the subgait starting foot.
         If not, issue a warning. This will only be checked when transitioning from idle to gait state
@@ -291,7 +291,7 @@ class GaitStateMachine(object):
             )
             return False
 
-        return 1
+        return True
 
     def _process_idle_state(self):
         """If the current state is idle, this function processes input for
@@ -339,7 +339,7 @@ class GaitStateMachine(object):
             )
             trajectory = self._current_gait.start()
             if trajectory is not None:
-                if not self.correct_foot_pressure():
+                if not self.check_correct_foot_pressure():
                     self._gait_selection.get_logger().debug(
                         f"Foot forces when incorrect pressure warning was issued: "
                         f"left={self._force_left_foot}, right={self._force_right_foot}"
