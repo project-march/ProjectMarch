@@ -34,11 +34,9 @@ ObstacleController::ObstacleController(physics::ModelPtr model)
 {
   foot_left_ = model_->GetLink("ankle_plate_left");
   foot_right_ = model_->GetLink("ankle_plate_right");
-  // Grab upper leg length from right leg as both legs are identical, use size[2] as the length is in the z-direction
-//  unsigned int index = 0;
-//  std::vector<double> upper_leg_dimensions = model_->GetLink("upper_leg_right")->GetCollisions();
-//            std::cout << upper_leg_dimensions << std::endl;
-  upper_leg_length_ = 0.4; // roughly the length of the upper leg
+  // roughly the half the length of the upper leg, this is bodged for now as I cannot seem to get the length of the link
+  // from the urdf in here
+  upper_leg_length_ = 0.20;
 
   ros::param::get("balance", balance_);
   // As long as no sitting gait is executed, the default to use when no subgait is idle_stand
@@ -177,47 +175,42 @@ void ObstacleController::getGoalPosition(double time_since_start)
   // Goal position is determined from the location of the stable foot
   goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
 
-  // If the exoskeleton is busy sitting down, move the CoM behind the stable foot
-  // Set 'sitting' as the new default state
-  if (subgait_name_ == "sit_down")
-  {
-    default_subgait_name_ = SIT_IDLE;
-    goal_position_x = stable_foot_pose.X() + upper_leg_length_ * time_since_start / subgait_duration_;
-  }
-  // If the exoskeleton has sat down or is changing while sitting, keep the CoM behind the stable foot
-  else if (subgait_name_ == SIT_IDLE || subgait_name_ == "sit_home" || subgait_name_ == "prepare_stand_up")
-  {
-    goal_position_x = stable_foot_pose.X() + upper_leg_length_; // and try using the hip position.
-  }
-  // If the exoskeleton is busy standing up, move the CoM forward again (relative when sitting down)
-  // Set 'Standing' as the new defualt state
-  else if (subgait_name_ == "stand_up")
-  {
-    default_subgait_name_ = STAND_IDLE;
-    goal_position_x = stable_foot_pose.X() + upper_leg_length_ * (1 - time_since_start / subgait_duration_);
-  }
-  // If the exoskeleton has stood up, keep the CoM on the stable foot
-  else if (subgait_name_ == STAND_IDLE)
-  {
-    goal_position_x = upper_leg_length_;
-  }
-
-  if (subgait_name_.substr(0, 6) != "freeze")
+  // if the exo skeleton is frozen, do not send a new goal_position_x, keep it at previous value
+  if (subgait_name_.substr(0, 6) != "freeze" )
   {
     goal_position_x = stable_foot_pose.X();
+    // If the exoskeleton is busy sitting down, move the CoM behind the stable foot
+    // Set 'sitting' as the new default state
+    if (subgait_name_ == "sit_down")
+    {
+      default_subgait_name_ = SIT_IDLE;
+      goal_position_x += upper_leg_length_ * time_since_start / subgait_duration_;
+    }
+    // If the exoskeleton has sat down or is changing while sitting, keep the CoM behind the stable foot
+    else if (subgait_name_ == SIT_IDLE || subgait_name_ == "sit_home" || subgait_name_ == "prepare_stand_up")
+    {
+      goal_position_x += upper_leg_length_; // and try using the hip position.
+    }
+    // If the exoskeleton is busy standing up, move the CoM forward again (relative when sitting down)
+    // Set 'Standing' as the new defualt state
+    else if (subgait_name_ == "stand_up")
+    {
+      default_subgait_name_ = STAND_IDLE;
+      goal_position_x += upper_leg_length_ * (1 - time_since_start / subgait_duration_);
+    }
     // Start goal position a quarter step size behind the stable foot
     // Move the goal position forward with v = 0.5 * swing_step_size/subgait_duration
-    if (subgait_name_.substr(subgait_name_.size() - 4) == "open")
+    else if (subgait_name_.substr(subgait_name_.size() - 4) == "open")
     {
-      goal_position_x += -0.25 * time_since_start * swing_step_size_ / subgait_duration_;
+      goal_position_x = stable_foot_pose.X() - 0.25 * time_since_start * swing_step_size_ / subgait_duration_;
     }
     else if (subgait_name_.substr(subgait_name_.size() - 5) == "swing")
     {
-      goal_position_x += 0.25 * swing_step_size_ - 0.5 * time_since_start * swing_step_size_ / subgait_duration_;
+      goal_position_x = stable_foot_pose.X() + 0.25 * swing_step_size_ - 0.5 * time_since_start * swing_step_size_ / subgait_duration_;
     }
     else if (subgait_name_.substr(subgait_name_.size() - 5) == "close")
     {
-      goal_position_x += 0.25 * swing_step_size_ - 0.25 * time_since_start * swing_step_size_ / subgait_duration_;
+      goal_position_x = stable_foot_pose.X() + 0.25 * swing_step_size_ - 0.25 * time_since_start * swing_step_size_ / subgait_duration_;
     }
   }
 }
