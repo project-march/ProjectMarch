@@ -37,6 +37,7 @@ ObstacleController::ObstacleController(physics::ModelPtr model)
   // roughly the length of the upper leg, this is bodged for now as I cannot seem to get the length of the link
   // from the urdf in here. This is used for the goal position calculation when siting & standing up
   upper_leg_length_ = 0.40;
+  double halved_upper_leg_length_ = upper_leg_length_ / 2.0;
 
   ros::param::get("balance", balance_);
   // As long as no sitting gait is executed, the default to use when no subgait is idle_stand
@@ -165,7 +166,6 @@ void ObstacleController::getGoalPosition(double time_since_start)
   // Left foot is stable unless subgait name starts with left
   auto stable_foot_pose = foot_left_->WorldCoGPose().Pos();
   auto swing_foot_pose = foot_right_->WorldCoGPose().Pos();
-  double halved_upper_leg_length_ = upper_leg_length_ / 2;
 
   if (subgait_name_.substr(0, 4) == "left")
   {
