@@ -61,7 +61,7 @@ void ObstacleController::newSubgait(const march_shared_msgs::CurrentGaitConstPtr
   {
     // Exponential smoothing with alpha = 0.8
     double alpha = 0.8;
-    swing_step_size_ = alpha * swing_step_size_ + (1 - alpha) * std::abs(foot_right_->WorldPose().Pos().X() -
+    swing_step_size_ = alpha * swing_step_size_ + (1 - alpha) * 2 * std::abs(foot_right_->WorldPose().Pos().X() -
                                                                          foot_left_->WorldPose().Pos().X());
   }
 
@@ -179,15 +179,15 @@ void ObstacleController::getGoalPosition(double time_since_start)
   // Y coordinate of the goal position is determined from the location of the stable foot
   // X coordinate of the goal position is determined from the current subgait the exoskeleton in executing
   // if the exo skeleton is frozen, do not send a new goal_position_x, keep it at previous value
-  if (subgait_name_.find("freeze") != std::string::npos)
+  if (subgait_name_.find("freeze") == std::string::npos)
   {
     if (subgait_name_.find("sit") != std::string::npos || subgait_name_ == "prepare_stand_up") {
       getSitGoalPositionX(time_since_start, stable_foot_pose.X());
-      goal_position_y = 0.5 * stable_foot_pose.Y() + 0.5 * swing_foot_pose.Y();
+      goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
     }
     else if (subgait_name_.find("stand") != std::string::npos) {
       getStandGoalPositionX(time_since_start, stable_foot_pose.X());
-      goal_position_y = 0.5 * stable_foot_pose.Y() + 0.5 * swing_foot_pose.Y();
+      goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
     }
     else if (subgait_name_.find("right") != std::string::npos || subgait_name_.find("left") != std::string::npos) {
       getWalkGoalPositionX(time_since_start, stable_foot_pose.X());
