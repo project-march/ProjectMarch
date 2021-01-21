@@ -1,5 +1,6 @@
 import diagnostic_updater
 import rclpy
+from march_utility.utilities.node_utils import get_joint_names
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 
@@ -16,6 +17,7 @@ HARDWARE_ID = 'MARCH VI'
 FREQUENCY = 10
 PERIOD = 1 / FREQUENCY
 
+
 class DiagnosticUpdater(Node):
     def __init__(self):
         super().__init__(NODE_NAME)
@@ -23,33 +25,41 @@ class DiagnosticUpdater(Node):
         self.updater = diagnostic_updater.Updater(node=self, period=PERIOD)
         self.updater.setHardwareID(HARDWARE_ID)
 
+        joint_names = get_joint_names(self)
+
         # Frequency checks
-        # CheckInputDevice(self, '/march/input_device/alive', Alive, self.updater, 5)
-        #
+        CheckInputDevice(self, '/march/input_device/alive', Alive, self.updater, 5)
+
         # Control checks
-        check_current_movement_values = CheckJointValues(self,
-                                                         'march/joint_states',
-                                                         JointState)
-        self.updater.add('Control position values',
-                         check_current_movement_values.position_diagnostics)
+        # check_joint_states = CheckJointValues(self,
+        #                                                  '/march/joint_states',
+        #                                                  JointState)
+        # self.updater.add('Control position values',
+        #                  check_joint_states.position_diagnostics)
         # self.updater.add('Control velocity values',
-        #                  check_current_movement_values.velocity_diagnostics)
+        #                  check_joint_states.velocity_diagnostics)
         # self.updater.add('Control effort values',
-        #                  check_current_movement_values.effort_diagnostics)
-        #
-        # # IMC state check
-        # CheckImcStatus(self, self.updater)
-        #
-        # # Gait information
-        # CheckGaitStatus(self, self.updater)
+        #                  check_joint_states.effort_diagnostics)
+
+        # IMC state check
+        CheckImcStatus(self, self.updater, joint_names)
+
+        # Gait information
+        CheckGaitStatus(self, self.updater)
 
         # self.updater.force_update()
 
-    def start(self):
-        update_rate = self.create_rate(FREQUENCY)
-        while rclpy.ok():
-            update_rate.sleep()
+    def update(self):
+
+
+        if len(self.updater.tasks) == 0:
+            self.get_logger().warn("No tasks found!")
+        else:
+            # self.get_logger().info(f'Names: {[task.name for task in self.updater.tasks]}')
             self.updater.update()
+
+    def start(self):
+        self.create_timer(PERIOD, self.update)
 
 
 def main():
@@ -58,3 +68,5 @@ def main():
     node = DiagnosticUpdater()
 
     node.start()
+
+    rclpy.spin(node)

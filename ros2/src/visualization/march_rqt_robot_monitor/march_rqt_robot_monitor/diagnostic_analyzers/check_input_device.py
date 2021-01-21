@@ -8,7 +8,7 @@ class CheckInputDevice(object):
 
     def __init__(self, node: Node, topic: str, message_type, updater: Updater,
                  frequency: float):
-        self._frequency_params = FrequencyStatusParam({"min": frequency}, 0.1)
+        self._frequency_params = FrequencyStatusParam({"min": frequency})
         self._updater = updater
         self._diagnostics = {}
 
@@ -25,5 +25,5 @@ class CheckInputDevice(object):
             self._diagnostics[msg.id].tick()
         else:
             self._diagnostics[msg.id] = HeaderlessTopicDiagnostic(
-                "input_device {0}".format(msg.id), self._updater, self._frequency_params
+                f"input_device {msg.id}", self._updater, self._frequency_params
             )

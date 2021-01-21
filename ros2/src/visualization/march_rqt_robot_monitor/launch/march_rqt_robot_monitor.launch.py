@@ -15,24 +15,28 @@ def generate_launch_description():
         'config', 'analyzers.yaml')
     return LaunchDescription([
         DeclareLaunchArgument(
+            name='use_sim_time',
+            default_value='true',
+            description='Whether to use simulation time.'),
+        DeclareLaunchArgument(
             name='rqt',
             default_value='true',
             description='Set to launch the rqt robot monitor.'),
         Node(
-            package='march_rqt_robot_monitor',
-            executable='march_rqt_robot_monitor',
+            package='rqt_robot_monitor',
+            executable='rqt_robot_monitor',
             output='screen',
-            name='march_rqt_robot_monitor'),
+            namespace='rqt_robot_monitor',
+            condition=IfCondition(LaunchConfiguration('rqt'))),
         Node(
             package='diagnostic_aggregator',
             executable='aggregator_node',
             output='screen',
-            name='diag_agg',
             parameters=[parameter_file]),
         Node(
-            package='rqt_robot_monitor',
-            executable='rqt_robot_monitor',
+            package='march_rqt_robot_monitor',
+            executable='march_rqt_robot_monitor_node',
             output='screen',
-            name='rqt_robot_monitor',
-            condition=IfCondition(LaunchConfiguration('rqt')))
+            name='march_rqt_robot_monitor_node',
+            parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}]),
     ])

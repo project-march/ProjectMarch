@@ -1,4 +1,5 @@
 import rclpy
+from march_shared_msgs.srv import GetJointNames
 from rcl_interfaces.srv import GetParameters
 from rclpy.node import Node
 from rclpy.client import Client
@@ -39,5 +40,20 @@ def wait_for_service(node: Node, client: Client, timeout=SERVICE_TIMEOUT):
     :param client: Client of the service.
     :param timeout: Optional timeout to wait before logging again
     """
-    while client.wait_for_service(timeout_sec=timeout):
+    while not client.wait_for_service(timeout_sec=timeout):
         node.get_logger().info(f'Waiting for {client.srv_name} to become available')
+
+
+def get_joint_names(node: Node):
+    joint_names_client = node.create_client(
+        srv_type=GetJointNames,
+        srv_name="/march/robot_information/get_joint_names",
+    )
+    wait_for_service(node, joint_names_client)
+
+    future = joint_names_client.call_async(
+        request=GetJointNames.Request()
+    )
+    rclpy.spin_until_future_complete(node, future)
+
+    return future.result().joint_names

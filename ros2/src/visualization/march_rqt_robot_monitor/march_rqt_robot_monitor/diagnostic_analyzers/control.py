@@ -1,7 +1,11 @@
+from typing import Optional, List
+
 from diagnostic_msgs.msg import DiagnosticStatus
 from rclpy.node import Node
 
 from march_utility.utilities.node_utils import get_robot_urdf
+from rclpy.time import Time
+from sensor_msgs.msg import JointState
 
 WARN_PERCENTAGE = 5
 
@@ -13,11 +17,11 @@ class CheckJointValues(object):
         node.create_subscription(msg_type, topic, self.cb, qos_profile=10)
 
         # callback variables
-        self._timestamp = None
-        self._joint_names = None
-        self._position = None
-        self._velocity = None
-        self._effort = None
+        self._timestamp: Optional[Time] = None
+        self._joint_names: Optional[List[str]] = None
+        self._position: Optional[List[float]] = None
+        self._velocity: Optional[List[float]] = None
+        self._effort: Optional[List[float]] = None
 
         # robot properties
         self._lower_soft_limits = {}
@@ -39,9 +43,9 @@ class CheckJointValues(object):
             except AttributeError:
                 pass
 
-    def cb(self, msg):
+    def cb(self, msg: JointState):
         """Save the latest published movement values with corresponding timestamp."""
-        self._timestamp = msg.header.stamp
+        self._timestamp = Time.from_msg(msg.header.stamp)
         self._joint_names = msg.name
         self._position = msg.position
         self._velocity = msg.velocity
@@ -54,7 +58,7 @@ class CheckJointValues(object):
             stat.summary(DiagnosticStatus.STALE, "No position recorded")
             return stat
 
-        stat.add("Timestamp", self._timestamp)
+        stat.add("Timestamp", str(self._timestamp))
 
         joint_outside_soft_limits = []
         joint_in_warning_zone_soft_limits = []
@@ -80,14 +84,12 @@ class CheckJointValues(object):
         if joint_outside_soft_limits:
             stat.summary(
                 DiagnosticStatus.ERROR,
-                "Outside soft limits: {ls}".format(ls=str(joint_outside_soft_limits)),
+                f"Outside soft limits: {joint_outside_soft_limits}",
             )
         elif joint_in_warning_zone_soft_limits:
             stat.summary(
                 DiagnosticStatus.WARN,
-                "Close to soft limits: {ls}".format(
-                    ls=str(joint_in_warning_zone_soft_limits)
-                ),
+                f"Close to soft limits: {joint_in_warning_zone_soft_limits}"
             )
         else:
             stat.summary(DiagnosticStatus.OK, "OK")

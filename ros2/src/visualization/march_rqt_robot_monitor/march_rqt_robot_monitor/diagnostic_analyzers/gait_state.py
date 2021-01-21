@@ -11,13 +11,13 @@ class CheckGaitStatus(object):
 
         :type updater: diagnostic_updater.Updater
         """
-        self._goal_sub = rospy.Subscriber(
-            "/march/gait_selection/current_gait", CurrentGait, self._cb_goal
-        )
+        self._goal_sub = node.create_subscription(
+            topic="/march/gait_selection/current_gait",
+            msg_type=CurrentGait, callback=self._cb_goal, qos_profile=10
+            )
         self._gait_msg = None
 
-        self._updater = updater
-        self._updater.add("Gait", self._diagnostics)
+        updater.add("Gait", self._diagnostics)
 
     def _cb_goal(self, msg):
         """Callback for the gait scheduler goal.
@@ -40,9 +40,6 @@ class CheckGaitStatus(object):
 
         stat.summary(
             DiagnosticStatus.OK,
-            "Gait: {gait}, {subgait}".format(
-                gait=str(self._gait_msg.gait), subgait=str(self._gait_msg.subgait)
-            ),
-        )
+            f"Gait: {self._gait_msg.gait}, {self._gait_msg.subgait}")
 
         return stat

@@ -1,3 +1,5 @@
+from typing import List
+
 from diagnostic_msgs.msg import DiagnosticStatus
 from diagnostic_updater import Updater
 from rclpy.node import Node
@@ -6,31 +8,27 @@ from march_shared_msgs.msg import ImcState
 
 
 class CheckImcStatus:
-    def __init__(self, node: Node, updater: Updater):
+    def __init__(self, node: Node,  updater: Updater, joint_names: List[str]):
         """Initializes an IMC diagnostic which analyzes IMC states.
 
         :type updater: diagnostic_updater.Updater
         """
-        self._updater = updater
+        self.node = node
         self._sub = node.create_subscription(msg_type=ImcState,
                                              topic="/march/imc_states",
                                              callback=self._cb,
                                              qos_profile=10)
         self._imc_state = None
 
-        self._diagnostics = set()
+        for i, joint_name in enumerate(joint_names):
+           updater.add(f"IMC {joint_name}", self._diagnostic(i))
 
-    def _cb(self, msg):
+    def _cb(self, msg: ImcState):
         """Callback for imc_states.
 
         :type msg: ImcState
         """
         self._imc_state = msg
-        for i in range(len(msg.joint_names)):
-            joint_name = msg.joint_names[i]
-            if joint_name not in self._diagnostics:
-                self._diagnostics.add(joint_name)
-                self._updater.add("IMC {0}".format(joint_name), self._diagnostic(i))
 
     def _diagnostic(self, index):
         """Creates a diagnostic function for an IMC.
@@ -41,9 +39,8 @@ class CheckImcStatus:
         :return Curried diagnostic function that updates the diagnostic status
                 according to the given index.
         """
-
         def d(stat):
-            if self._imc_state.joint_names[index] is None:
+            if self._imc_state is None:
                 stat.summary(DiagnosticStatus.STALE, "No more events recorded")
                 return stat
             detailed_error = int(self._imc_state.detailed_error[index])

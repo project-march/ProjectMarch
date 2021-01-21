@@ -27,6 +27,6 @@ setup(
     license="TODO: License declaration",
     tests_require=["pytest"],
     entry_points={
-        "console_scripts": [f"{package_name} = {package_name}.updater:main"],
+        "console_scripts": [f"{package_name}_node = {package_name}.updater:main"],
     },
 )
