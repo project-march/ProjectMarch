@@ -18,6 +18,7 @@ from python_qt_binding.QtWidgets import (
     QMessageBox,
     QShortcut,
     QWidget,
+    QInputDialog,
 )
 import rospkg
 import rospy
@@ -233,14 +234,30 @@ class GaitGeneratorView(QWidget):
 
     def open_inverse_kinematics_setpoints_dialogue(self):
         rospy.loginfo("you made it to the gg_view file")
-        app = QApplication(sys.argv)
-        window = QDialog()
-        ui = Ui_inverse_kinematics_setpoints_input_dialogue()
-        ui.setupUi(window)
-        rospy.loginfo("the ui was even setup, thats crazy")
-        window.exec_()
-        rospy.loginfo("window.show() has been ran, only sys.exit(app.exec_()) is now left")
-        # sys.exit(app.exec_())
+        input, cancelled  = self.get_inverse_kinematics_setpoints_input()
+
+    def get_inverse_kinematics_setpoints_input(self):
+        """Asks the user the needed inputs, returns these plus a flag indicating cancellation of any input."""
+        inputs = {}
+        cancelled = False
+        z_axis, ok = QInputDialog.getItem(self, "IK input dialog", "z axis choice",
+                                          ["from hip downwards", "from ground upwards"], 0, False)
+        if ok:
+            inputs['z_axis'] = z_axis
+        else:
+            cancelled = True
+
+        num1, ok2 = QInputDialog.getDouble(self, "IK input dialog", "pick a number, any number")
+        num2, ok3 = QInputDialog.getDouble(self, "IK input dialog", "pick another number, any number")
+
+        return inputs, cancelled
+
+    def get_inverse_kinematics_setpoints_double_input(self, title, input_question, input_dic, cancelled):
+        """General input grabber for doubles for the filling of the inverse kinematics setpoints input"""
+        num, ok = QInputDialog.getDouble(self, title, input_question)
+        if ok:
+            input_dic[input_question] = num
+            return input_dic, cancelled
 
     @QtCore.pyqtSlot(int)
     def update_main_time_slider(self, time):
