@@ -2,6 +2,8 @@
 
 #include <march_gazebo_plugins/obstacle_controller.h>
 #include <ros/ros.h>
+#include <typeinfo>
+
 namespace gazebo
 {
 ObstacleController::ObstacleController(physics::ModelPtr model)
@@ -58,7 +60,7 @@ void ObstacleController::newSubgait(const march_shared_msgs::CurrentGaitConstPtr
       subgait_name_ == "left_swing")
   {
     // Exponential smoothing with alpha = 0.8
-    double alpha = 0.8
+    double alpha = 0.8;
     swing_step_size_ = alpha * swing_step_size_ + (1 - alpha) * std::abs(foot_right_->WorldPose().Pos().X() -
                                                                          foot_left_->WorldPose().Pos().X());
   }
@@ -168,7 +170,7 @@ void ObstacleController::getGoalPosition(double time_since_start)
   auto stable_foot_pose = foot_left_->WorldCoGPose().Pos();
   auto swing_foot_pose = foot_right_->WorldCoGPose().Pos();
 
-  if (subgait_name.find("left") != std::string::npos))
+  if (subgait_name_.find("left") != std::string::npos)
   {
     stable_foot_pose = foot_right_->WorldCoGPose().Pos();
     swing_foot_pose = foot_left_->WorldCoGPose().Pos();
@@ -177,26 +179,26 @@ void ObstacleController::getGoalPosition(double time_since_start)
   // Y coordinate of the goal position is determined from the location of the stable foot
   // X coordinate of the goal position is determined from the current subgait the exoskeleton in executing
   // if the exo skeleton is frozen, do not send a new goal_position_x, keep it at previous value
-  if (subgait_name.find("freeze") != std::string::npos))
+  if (subgait_name_.find("freeze") != std::string::npos)
   {
     if (subgait_name_.find("sit") != std::string::npos || subgait_name_ == "prepare_stand_up") {
-      getSitGoalPosition(time_since_start, stable_foot_pose, swing_foot_pose);
+      getSitGoalPositionX(time_since_start, stable_foot_pose.X());
       goal_position_y = 0.5 * stable_foot_pose.Y() + 0.5 * swing_foot_pose.Y();
     }
     else if (subgait_name_.find("stand") != std::string::npos) {
-      getStandGoalPosition(time_since_start, stable_foot_pose, swing_foot_pose);
+      getStandGoalPositionX(time_since_start, stable_foot_pose.X());
       goal_position_y = 0.5 * stable_foot_pose.Y() + 0.5 * swing_foot_pose.Y();
     }
-    else if (subgait_name.find("right") != std::string::npos || subgait_name.find("left") != std::string::npos) {
-      getWalkGoalPosition(time_since_start, stable_foot_pose, swing_foot_pose);
+    else if (subgait_name_.find("right") != std::string::npos || subgait_name_.find("left") != std::string::npos) {
+      getWalkGoalPositionX(time_since_start, stable_foot_pose.X());
       goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
     }
   }
 }
 
-void ObstacleController::getSitGoalPosition(double time_since_start, auto stable_foot_pose, auto swing_foot_pose)
+void ObstacleController::getSitGoalPositionX(double time_since_start, double stable_foot_pose_x)
 {
-  goal_position_x = stable_foot_pose.X();
+  goal_position_x = stable_foot_pose_x;
   // If the exoskeleton is busy sitting down, move the CoM behind the stable foot
   // Set 'sitting' as the new default state
   if (subgait_name_.substr(subgait_name_.size() - 8) == "sit_down") {
@@ -210,9 +212,9 @@ void ObstacleController::getSitGoalPosition(double time_since_start, auto stable
   }
 }
 
-void ObstacleController::getStandGoalPosition(double time_since_start, auto stable_foot_pose, auto swing_foot_pose)
+void ObstacleController::getStandGoalPositionX(double time_since_start, double stable_foot_pose_x)
 {
-  goal_position_x = stable_foot_pose.X();
+  goal_position_x = stable_foot_pose_x;
   // If the exoskeleton is busy standing up, move the CoM forward again (relative when sitting down)
   // Set 'Standing' as the new default state
   if (subgait_name_.substr(subgait_name_.size() - 8) == "stand_up") {
@@ -221,13 +223,13 @@ void ObstacleController::getStandGoalPosition(double time_since_start, auto stab
   }
 }
 
-void ObstacleController::getWalkGoalPosition(double time_since_start, auto stable_foot_pose, auto swing_foot_pose)
+void ObstacleController::getWalkGoalPositionX(double time_since_start, double stable_foot_pose_x)
 {
-  goal_position_x = stable_foot_pose.X();
+  goal_position_x = stable_foot_pose_x;
   // If the exoskeleton is executing an open gait (generally right_open),
   // move the CoM from the stable foot to a quarter step size in front.
   // quarter step sizes are used during the walk to avoid sending the CoM too far from the stable foot
-  else if (subgait_name_.substr(subgait_name_.size() - 4) == "open")
+  if (subgait_name_.substr(subgait_name_.size() - 4) == "open")
   {
     goal_position_x += - 0.25 * time_since_start * swing_step_size_ / subgait_duration_;
   }
