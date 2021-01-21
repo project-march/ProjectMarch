@@ -5,11 +5,11 @@ duration:
 gait_type: walk_like
 joints:
   left_ankle:
-  - position: 0.0436
+  - position: 0.04360007
     time_from_start:
       nsecs: 0
       secs: 0
-    velocity: -0.32
+    velocity: 0.0
   - position: 0.0436
     time_from_start:
       nsecs: 300000000
@@ -25,7 +25,7 @@ joints:
     time_from_start:
       nsecs: 0
       secs: 0
-    velocity: 0.0
+    velocity: -0.0
   - position: -0.0611
     time_from_start:
       nsecs: 300000000
@@ -59,11 +59,11 @@ joints:
       secs: 1
     velocity: 0.0
   right_ankle:
-  - position: 0.0436
+  - position: 0.04360007
     time_from_start:
       nsecs: 0
       secs: 0
-    velocity: -0.32
+    velocity: 0.0
   - position: -0.1047
     time_from_start:
       nsecs: 250000000
@@ -89,7 +89,7 @@ joints:
     time_from_start:
       nsecs: 0
       secs: 0
-    velocity: 0.0
+    velocity: -0.0
   - position: 0.0636
     time_from_start:
       nsecs: 606000000
