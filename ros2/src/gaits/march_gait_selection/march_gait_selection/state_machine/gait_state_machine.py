@@ -76,6 +76,8 @@ class GaitStateMachine(object):
 
         self._right_foot_on_ground = True
         self._left_foot_on_ground = True
+        self._force_right_foot = 0
+        self._force_left_foot = 0
         self._right_pressure_sub = self._gait_selection.create_subscription(
             msg_type=ContactsState,
             topic="/march/sensor/right_pressure_sole",
@@ -130,12 +132,21 @@ class GaitStateMachine(object):
                 elif not self._left_foot_on_ground and side is Side.left:
                     self._left_foot_on_ground = True
                     self._freeze()
+
+            # Assign force to specific foot
+            if side is Side.right:
+                self._force_right_foot = force
+            else:
+                self._force_left_foot = force
+
         # If there are no contacts, change foot on ground to False
         elif len(msg.states) == 0:
             if side is Side.right:
                 self._right_foot_on_ground = False
+                self._force_right_foot = 0
             else:
                 self._left_foot_on_ground = False
+                self._force_left_foot = 0
 
     def _possible_gaits_cb(self, request, response):
         """ Standard callback for the get possible gaits service """
@@ -258,6 +269,31 @@ class GaitStateMachine(object):
         if not self._is_idle:
             self._should_stop = True
 
+    def check_correct_foot_pressure(self) -> bool:
+        """
+        Check if the pressure is placed on the foot opposite to the subgait starting foot.
+
+        If not, issue a warning. This will only be checked when transitioning from idle to gait state
+        """
+        if (
+            "right" in self._current_gait.subgait_name
+            and self._force_right_foot > self._force_left_foot
+        ):
+            self._gait_selection.get_logger().warn(
+                "Incorrect pressure placement, place pressure on left foot"
+            )
+            return False
+        if (
+            "left" in self._current_gait.subgait_name
+            and self._force_left_foot > self._force_right_foot
+        ):
+            self._gait_selection.get_logger().warn(
+                "Incorrect pressure placement, place pressure on right foot"
+            )
+            return False
+
+        return True
+
     def _process_idle_state(self):
         """If the current state is idle, this function processes input for
         what to do next."""
@@ -292,7 +328,7 @@ class GaitStateMachine(object):
     def _process_gait_state(self, elapsed_time):
         """Processes the current state when there is a gait happening.
         Schedules the next subgait if there is no trajectory happening or
-        finishes the gait if it is doen."""
+        finishes the gait if it is done."""
         if self._current_gait is None:
             if self._current_state in self._home_gaits:
                 self._current_gait = self._home_gaits[self._current_state]
@@ -304,6 +340,11 @@ class GaitStateMachine(object):
             )
             trajectory = self._current_gait.start()
             if trajectory is not None:
+                if not self.check_correct_foot_pressure():
+                    self._gait_selection.get_logger().debug(
+                        f"Foot forces when incorrect pressure warning was issued: "
+                        f"left={self._force_left_foot}, right={self._force_right_foot}"
+                    )
                 self._call_gait_callbacks()
                 self._gait_selection.get_logger().info(
                     "Scheduling {subgait}".format(
