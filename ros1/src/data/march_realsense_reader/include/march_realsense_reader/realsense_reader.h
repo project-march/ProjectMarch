@@ -6,6 +6,7 @@
 #include <pcl_ros/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <std_srvs/Trigger.h>
 
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
 
@@ -14,10 +15,14 @@ class RealSenseReader
 public:
     RealSenseReader(ros::NodeHandle* n);
     void pointcloud_callback(const PointCloud::ConstPtr& msg);
+    bool read_pointcloud_callback(std_srvs::Trigger::Request &req,
+                                  std_srvs::Trigger::Response &res);
 
 private:
     ros::NodeHandle* n_;
     ros::Subscriber pointcloud_subscriber_;
+    ros::ServiceServer read_pointcloud_service_;
+    bool reading_;
 };
 
 #endif //MARCH_REALSENSE_READER_HPP

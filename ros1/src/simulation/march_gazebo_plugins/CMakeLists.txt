@@ -10,7 +10,6 @@ find_package(gazebo REQUIRED)
 
 include_directories(
     ${catkin_INCLUDE_DIRS}
-    ${GAZEBO_INCLUDE_DIRS}
     include
 )
 

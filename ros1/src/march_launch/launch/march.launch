@@ -32,6 +32,7 @@
     <arg name="rosbag" default="true" doc="Enables rosbag record node."/>
     <arg name="bag_prefix" default="log" doc="Prefix of the bag file. Only used if rosbag is true."/>
 
+    <arg name="realsense" default="false" doc="Launches the realsense reader node when true."/>
     <arg name="data_collector" default="false" doc="Launches the data collector when true."/>
     <arg name="pressure_soles" default="false" doc="Whether a connection with pressure_soles should be established." />
     <arg name="moticon_ip" default="192.168.8.105" doc="The ip-adress with Moticon software running on it, defaults to
@@ -80,6 +81,9 @@
     />
 
     <group ns="march">
+        <include file="$(find march_realsense_reader)/launch/realsense_reader.launch"
+                 if="$(arg realsense)"/>
+
         <include file="$(find march_data_collector)/launch/march_data_collector.launch" if="$(eval data_collector or balance)">
             <arg name="pressure_soles" value="$(arg pressure_soles)"/>
             <arg name="moticon_ip" value="$(arg moticon_ip)"/>
