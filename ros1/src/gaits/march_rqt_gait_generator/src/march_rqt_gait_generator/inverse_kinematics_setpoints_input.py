@@ -6,6 +6,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
+import rospy
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -219,23 +220,31 @@ class Ui_inverse_kinematics_setpoints_input_dialogue(object):
         self.retranslateUi(inverse_kinematics_setpoints_input_dialogue)
         QtCore.QMetaObject.connectSlotsByName(inverse_kinematics_setpoints_input_dialogue)
 
+        # own code added to the gerated file
+        self.z_axis_combo_box.addItems(["from hip downwards", "from ground upwards"])
+        self.create_inverse_kinematics_setpoints_button.clicked.connect(self.create_inverse_kinematics_setpoints)
+
+    def create_inverse_kinematics_setpoints(self):
+        rospy.loginfo("you pressed the button in the dialogue :000000")
+
+
     def retranslateUi(self, inverse_kinematics_setpoints_input_dialogue):
-        _translate = QtCore.QCoreApplication.translate
-        inverse_kinematics_setpoints_input_dialogue.setWindowTitle(_translate("inverse_kinematics_setpoints_input_dialogue", "Dialog"))
-        self.AxisLabelLeftX.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "x"))
-        self.AxisLabelLeftY.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "y"))
-        self.desired_left_x_input.setToolTip(_translate("inverse_kinematics_setpoints_input_dialogue", "<html><head/><body><p><br/></p></body></html>"))
-        self.AxisLabelLeftZ.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "z"))
-        self.LeftFootLabel.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "left foot"))
-        self.AxisLabelRightZ.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "z"))
-        self.desired_right_x_input.setToolTip(_translate("inverse_kinematics_setpoints_input_dialogue", "<html><head/><body><p><br/></p></body></html>"))
-        self.AxisLabelRightX.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "x"))
-        self.foot_label_right.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "right foot"))
-        self.AxisLabelRightY.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "y"))
-        self.AxislabelT.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "t"))
-        self.time_input.setToolTip(_translate("inverse_kinematics_setpoints_input_dialogue", "<html><head/><body><p><br/></p></body></html>"))
-        self.label.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "<html><head/><body><p><span style=\" font-size:20pt; font-weight:600;\">axes</span></p></body></html>"))
-        self.YAxisExplanationLabel.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "y axis is to the right"))
-        self.XAxisExplanationLabel.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "x axis is forward"))
-        self.ZAxisExplanationLabel.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "z axis: "))
-        self.create_inverse_kinematics_setpoints_button.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "Put setpoints in"))
+            _translate = QtCore.QCoreApplication.translate
+            inverse_kinematics_setpoints_input_dialogue.setWindowTitle(_translate("inverse_kinematics_setpoints_input_dialogue", "Dialog"))
+            self.AxisLabelLeftX.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "x"))
+            self.AxisLabelLeftY.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "y"))
+            self.desired_left_x_input.setToolTip(_translate("inverse_kinematics_setpoints_input_dialogue", "<html><head/><body><p><br/></p></body></html>"))
+            self.AxisLabelLeftZ.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "z"))
+            self.LeftFootLabel.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "left foot"))
+            self.AxisLabelRightZ.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "z"))
+            self.desired_right_x_input.setToolTip(_translate("inverse_kinematics_setpoints_input_dialogue", "<html><head/><body><p><br/></p></body></html>"))
+            self.AxisLabelRightX.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "x"))
+            self.foot_label_right.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "right foot"))
+            self.AxisLabelRightY.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "y"))
+            self.AxislabelT.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "t"))
+            self.time_input.setToolTip(_translate("inverse_kinematics_setpoints_input_dialogue", "<html><head/><body><p><br/></p></body></html>"))
+            self.label.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "<html><head/><body><p><span style=\" font-size:20pt; font-weight:600;\">axes</span></p></body></html>"))
+            self.YAxisExplanationLabel.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "y axis is to the right"))
+            self.XAxisExplanationLabel.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "x axis is forward"))
+            self.ZAxisExplanationLabel.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "z axis: "))
+            self.create_inverse_kinematics_setpoints_button.setText(_translate("inverse_kinematics_setpoints_input_dialogue", "Put setpoints in"))
