@@ -55,7 +55,7 @@ container:build:
 flake8:
   stage: Lint code
   script:
-    - python3 -m flakehell lint --supress-none-returning --format=gitlab --output-file
+    - python3 -m flakehell lint --suppress-none-returning --format=gitlab --output-file
     - flakehell.json
   artifacts:
     reports:
