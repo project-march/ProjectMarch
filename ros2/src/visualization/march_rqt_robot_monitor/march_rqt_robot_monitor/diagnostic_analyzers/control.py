@@ -1,3 +1,5 @@
+"""The module control.py contains the CheckJointValues Class."""
+
 from typing import Optional, List
 
 from diagnostic_msgs.msg import DiagnosticStatus
@@ -6,6 +8,7 @@ from rclpy.node import Node
 from march_utility.utilities.node_utils import get_robot_urdf
 from rclpy.time import Time
 from sensor_msgs.msg import JointState
+from urdf_parser_py import urdf
 
 WARN_PERCENTAGE = 5
 
@@ -29,19 +32,26 @@ class CheckJointValues(object):
         self._velocity_limits = {}
         self._effort_limits = {}
 
-        self._robot = get_robot_urdf(node)
-        for joint in self._robot.joints:
-            try:
-                self._lower_soft_limits[
-                    joint.name
-                ] = joint.safety_controller.soft_lower_limit
-                self._upper_soft_limits[
-                    joint.name
-                ] = joint.safety_controller.soft_upper_limit
-                self._velocity_limits[joint.name] = joint.limit.velocity
-                self._effort_limits[joint.name] = joint.limit.effort
-            except AttributeError:
-                pass
+        robot = get_robot_urdf(node)
+        for joint in robot.joints:
+            self.set_joint_limits(joint)
+
+    def set_joint_limits(self, joint: urdf.Joint):
+        """Set the joint limits for a joint.
+
+        :param joint Joint urdf to get limits from.
+        """
+        try:
+            self._lower_soft_limits[
+                joint.name
+            ] = joint.safety_controller.soft_lower_limit
+            self._upper_soft_limits[
+                joint.name
+            ] = joint.safety_controller.soft_upper_limit
+            self._velocity_limits[joint.name] = joint.limit.velocity
+            self._effort_limits[joint.name] = joint.limit.effort
+        except AttributeError:
+            pass
 
     def cb(self, msg: JointState):
         """Save the latest published movement values with corresponding timestamp."""
@@ -89,7 +99,7 @@ class CheckJointValues(object):
         elif joint_in_warning_zone_soft_limits:
             stat.summary(
                 DiagnosticStatus.WARN,
-                f"Close to soft limits: {joint_in_warning_zone_soft_limits}"
+                f"Close to soft limits: {joint_in_warning_zone_soft_limits}",
             )
         else:
             stat.summary(DiagnosticStatus.OK, "OK")

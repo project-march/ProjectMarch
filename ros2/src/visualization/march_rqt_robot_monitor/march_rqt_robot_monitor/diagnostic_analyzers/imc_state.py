@@ -1,37 +1,43 @@
-from typing import List
+"""The module imc_state.py contains the CheckImcStatus Class."""
+
+from typing import List, Callable
 
 from diagnostic_msgs.msg import DiagnosticStatus
-from diagnostic_updater import Updater
+from diagnostic_updater import Updater, DiagnosticStatusWrapper
 from rclpy.node import Node
 
 from march_shared_msgs.msg import ImcState
 
 
 class CheckImcStatus:
-    def __init__(self, node: Node,  updater: Updater, joint_names: List[str]):
-        """Initializes an IMC diagnostic which analyzes IMC states.
+    """Base class to diagnose the imc statuses."""
+
+    def __init__(self, node: Node, updater: Updater, joint_names: List[str]):
+        """Initialize an IMC diagnostic which analyzes IMC states.
 
         :type updater: diagnostic_updater.Updater
         """
         self.node = node
-        self._sub = node.create_subscription(msg_type=ImcState,
-                                             topic="/march/imc_states",
-                                             callback=self._cb,
-                                             qos_profile=10)
+        self._sub = node.create_subscription(
+            msg_type=ImcState,
+            topic="/march/imc_states",
+            callback=self._cb,
+            qos_profile=10,
+        )
         self._imc_state = None
 
         for i, joint_name in enumerate(joint_names):
-           updater.add(f"IMC {joint_name}", self._diagnostic(i))
+            updater.add(f"IMC {joint_name}", self._diagnostic(i))
 
     def _cb(self, msg: ImcState):
-        """Callback for imc_states.
+        """Set the imc_states.
 
         :type msg: ImcState
         """
         self._imc_state = msg
 
-    def _diagnostic(self, index):
-        """Creates a diagnostic function for an IMC.
+    def _diagnostic(self, index: int) -> Callable:  # noqa: D202
+        """Create a diagnostic function for an IMC.
 
         :type index: int
         :param index: index of the joint
@@ -39,7 +45,8 @@ class CheckImcStatus:
         :return Curried diagnostic function that updates the diagnostic status
                 according to the given index.
         """
-        def d(stat):
+
+        def d(stat: DiagnosticStatusWrapper) -> DiagnosticStatusWrapper:
             if self._imc_state is None:
                 stat.summary(DiagnosticStatus.STALE, "No more events recorded")
                 return stat

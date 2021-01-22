@@ -78,7 +78,7 @@ class GaitSelection(Node):
         self._loaded_gaits = self._load_gaits()
         self.get_logger().info("Successfully initialized gait selection node.")
 
-    def _create_services(self):
+    def _create_services(self) -> None:
         self.create_service(
             srv_type=Trigger,
             srv_name="/march/gait_selection/get_version_map",

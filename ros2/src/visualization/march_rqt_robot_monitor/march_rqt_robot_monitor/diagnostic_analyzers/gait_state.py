@@ -1,3 +1,5 @@
+"""The module gait_state.py contains the CheckGaitStatus Class."""
+
 from diagnostic_msgs.msg import DiagnosticStatus
 from diagnostic_updater import Updater
 from rclpy.node import Node
@@ -6,6 +8,8 @@ from march_shared_msgs.msg import CurrentGait
 
 
 class CheckGaitStatus(object):
+    """Base class to diagnose the gait status."""
+
     def __init__(self, node: Node, updater: Updater):
         """Initializes an gait diagnostic which analyzes gait and subgait states.
 
@@ -13,16 +17,18 @@ class CheckGaitStatus(object):
         """
         self._goal_sub = node.create_subscription(
             topic="/march/gait_selection/current_gait",
-            msg_type=CurrentGait, callback=self._cb_goal, qos_profile=10
-            )
+            msg_type=CurrentGait,
+            callback=self._cb_goal,
+            qos_profile=10,
+        )
         self._gait_msg = None
 
         updater.add("Gait", self._diagnostics)
 
-    def _cb_goal(self, msg):
-        """Callback for the gait scheduler goal.
+    def _cb_goal(self, msg: CurrentGait):
+        """Set the current_gait.
 
-        :param msg: GaitGoal
+        Callback for the gait scheduler goal.
         """
         self._gait_msg = msg
 
@@ -40,6 +46,7 @@ class CheckGaitStatus(object):
 
         stat.summary(
             DiagnosticStatus.OK,
-            f"Gait: {self._gait_msg.gait}, {self._gait_msg.subgait}")
+            f"Gait: {self._gait_msg.gait}, {self._gait_msg.subgait}",
+        )
 
         return stat

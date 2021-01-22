@@ -1,28 +1,36 @@
+"""The module temperature.py contains the CheckJointTemperature Class."""
+
 from typing import List
 
 import rclpy
 from diagnostic_msgs.msg import DiagnosticStatus
+from diagnostic_updater import DiagnosticStatusWrapper
 from march_utility.utilities.node_utils import wait_for_service
 from rcl_interfaces.srv import GetParameters
 from rclpy.node import Node
+from sensor_msgs.msg import Temperature
 
 LOWER_THRESHOLD_VALID_TEMPERATURE_VALUE = 0
 UPPER_THRESHOLD_VALID_TEMPERATURE_VALUE = 100
 
-THRESHOLD_TYPES = ['warning', 'non_fatal', 'fatal']
+THRESHOLD_TYPES = ["warning", "non_fatal", "fatal"]
 
 
-class CheckJointTemperature(object):
+class CheckJointTemperature:
     """Base class to diagnose the joint temperatures."""
 
-    def __init__(self, node: Node, joint_name, topic, msg_type):
+    def __init__(self, node: Node, joint_name: str, topic: str, msg_type: type):
         self.node = node
         self.joint_name = joint_name
 
         node.create_subscription(msg_type, topic, self._cb, qos_profile=10)
 
-        self._default_threshold, self._thresholds_warning, self._thresholds_non_fatal, \
-            self._thresholds_fatal = self._get_temperature_thresholds()
+        (
+            self._default_threshold,
+            self._thresholds_warning,
+            self._thresholds_non_fatal,
+            self._thresholds_fatal,
+        ) = self._get_temperature_thresholds()
 
         self._timestamp = None
         self._temperature = None
@@ -32,24 +40,26 @@ class CheckJointTemperature(object):
 
         :return Returns a tuple containing all temperature thresholds
         """
-        names = ['/march/safety_node/default_temperature_threshold'] + \
-            [f'march/safety_node/temperature_thresholds_{threshold_type}/{self.joint_name}'
-             for threshold_type in THRESHOLD_TYPES]
-        client = self.node.create_client(srv_type=GetParameters,
-                                         srv_name='/march/safety_node/get_parameters')
+        names = ["/march/safety_node/default_temperature_threshold"] + [
+            f"march/safety_node/temperature_thresholds_{threshold_type}/{self.joint_name}"
+            for threshold_type in THRESHOLD_TYPES
+        ]
+        client = self.node.create_client(
+            srv_type=GetParameters, srv_name="/march/safety_node/get_parameters"
+        )
         wait_for_service(self.node, client)
         future = client.call_async(GetParameters.Request(names=names))
         rclpy.spin_until_future_complete(self.node, future)
 
         return [value.double_value for value in future.result().value]
 
-    def _cb(self, msg):
+    def _cb(self, msg: Temperature):
         """Save the latest published temperature with corresponding timestamp."""
         self._temperature = float(msg.temperature)
         self._timestamp = msg.header.stamp
 
-    def diagnostics(self, stat):
-        """The diagnostic message to display in the standard stat format."""
+    def diagnostics(self, stat: DiagnosticStatusWrapper) -> DiagnosticStatusWrapper:
+        """Create a diagnostic message to display in the standard stat format."""
         if self._timestamp is None:
             stat.add("Topic error", "No events recorded")
             stat.summary(DiagnosticStatus.STALE, "No temperature recorded")
