@@ -31,7 +31,7 @@ void ModelPredictiveController::init() {
 
   // Prepare references (step reference)
   for (int i = 0; i < ACADO_N; ++i) {
-    acadoVariables.y[i * ACADO_NY + 0] = theta_ref; // theta
+    acadoVariables.y[i * ACADO_NY] = theta_ref; // theta
     acadoVariables.y[i * ACADO_NY + 1] = 0;         // dtheta
     acadoVariables.y[i * ACADO_NY + 2] = 0;         // T
   }
