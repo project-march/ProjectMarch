@@ -54,7 +54,7 @@ void ModelPredictiveController::setInitialState(vector<double> x0) {
   }
 }
 
-void ModelPredictiveController::controller() {
+void ModelPredictiveController::calculateControlInput() {
 
   // Set initial speed
   setInitialState(x0);

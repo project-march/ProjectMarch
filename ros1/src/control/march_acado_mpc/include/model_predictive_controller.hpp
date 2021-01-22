@@ -6,10 +6,11 @@
 using namespace std;
 
 class ModelPredictiveController {
+
 public:
     // Public variables
-    vector<double> x0{0,0};  // Current state
-    double u;           // Calculated control input
+    vector<double> x0{0,0}; // Current state
+    double u;               // Calculated control input
 
     /**
      * \brief Initialise the model predictive controller
@@ -27,11 +28,7 @@ public:
      * @param x0 - initial state
      * @return u - control input
      */
-    void controller();
-
-private:
-
-
+    void calculateControlInput();
 
 };
 
