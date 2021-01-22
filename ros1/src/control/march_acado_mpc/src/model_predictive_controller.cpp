@@ -63,7 +63,7 @@ void ModelPredictiveController::calculateControlInput() {
   acado_preparationStep();
 
   // feedback step
-  acado_feedbackStep( );
+  acado_feedbackStep();
   u = acadoVariables.u[0];
 
   // Shift states and control and prepare for the next iteration
