@@ -1,9 +1,7 @@
+
 import math
 import os
 import subprocess
-import sys
-
-from .inverse_kinematics_setpoints_input import Ui_inverse_kinematics_setpoints_input_dialogue
 
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore
@@ -234,30 +232,72 @@ class GaitGeneratorView(QWidget):
 
     def open_inverse_kinematics_setpoints_dialogue(self):
         rospy.loginfo("you made it to the gg_view file")
-        input, cancelled  = self.get_inverse_kinematics_setpoints_input()
+        input_dictionary, cancelled  = self.get_inverse_kinematics_setpoints_input()
+        rospy.loginfo('you entered: ')
+        rospy.loginfo(f'dictionary {input_dictionary}, cancelled: {cancelled}')
 
     def get_inverse_kinematics_setpoints_input(self):
         """Asks the user the needed inputs, returns these plus a flag indicating cancellation of any input."""
-        inputs = {}
-        cancelled = False
-        z_axis, ok = QInputDialog.getItem(self, "IK input dialog", "z axis choice",
-                                          ["from hip downwards", "from ground upwards"], 0, False)
+        input_dialogue = QInputDialog(self)
+        input_dialogue.setDoubleDecimals(4)
+        input_dialogue.setDoubleRange(-100.0, 100.0)
+        input_dialogue.resize(300,100)
+        input_dictionary = {}
+
+        ## grab general settings for calculation
+        input_name = 'foot_side'
+        resulting_variable, ok = input_dialogue.getItem(self, "enter foot side choice", input_name,
+                                                        ["right", "left"], 0, False)
         if ok:
-            inputs['z_axis'] = z_axis
+            input_dictionary[input_name] = resulting_variable
         else:
-            cancelled = True
+            return input_dictionary, True
 
-        num1, ok2 = QInputDialog.getDouble(self, "IK input dialog", "pick a number, any number")
-        num2, ok3 = QInputDialog.getDouble(self, "IK input dialog", "pick another number, any number")
-
-        return inputs, cancelled
-
-    def get_inverse_kinematics_setpoints_double_input(self, title, input_question, input_dic, cancelled):
-        """General input grabber for doubles for the filling of the inverse kinematics setpoints input"""
-        num, ok = QInputDialog.getDouble(self, title, input_question)
+        input_name = 'z_axis'
+        output_item, ok = input_dialogue.getItem(self, "enter z axis choice", input_name,
+                                                 [ "from ground upwards", "from hip downwards"], 0, False)
         if ok:
-            input_dic[input_question] = num
-            return input_dic, cancelled
+            input_dictionary[input_name] = resulting_variable
+        else:
+            return input_dictionary, True
+
+        input_name = 'set_y'
+        output_item, ok = input_dialogue.getItem(self, "Do you want to specify y", input_name,
+                                                 ["no", "yes"], 0, False)
+        if ok:
+            if output_item == 'no':
+                input_dictionary[input_name] = False
+            else:
+                input_dictionary[input_name] = True
+        else:
+            return input_dictionary, True
+
+        ## grab the desired foot coordinates
+        input_dialogue.setInputMode(QInputDialog.DoubleInput)
+        double_variable_names = ['x_coordinate_cm', 'y_coordinate_cm', 'z_coordinate_cm', 'time_s']
+        for double_variable_name in double_variable_names:
+            if not input_dictionary['set_y'] and double_variable_name == 'y_coordinate_cm':
+                continue
+            input_dictionary, cancelled = \
+                self.get_inverse_kinematics_setpoints_double_input(input_dialogue,
+                                                                   f'Enter desired {double_variable_name}',
+                                                                   double_variable_name, input_dictionary)
+            if cancelled:
+                return input_dictionary, cancelled
+
+        return input_dictionary, False
+
+    def get_inverse_kinematics_setpoints_double_input(self, input_dialogue, input_text, asked_variable_name,
+                                                      input_dictionary):
+        """General input grabber for doubles for the filling of the inverse kinematics setpoints input"""
+        input_dialogue.setLabelText(input_text)
+        ok = input_dialogue.exec_()
+        resulting_number = input_dialogue.doubleValue()
+        if ok:
+            input_dictionary[asked_variable_name] = resulting_number
+            return input_dictionary, False
+        else:
+            return input_dictionary, True
 
     @QtCore.pyqtSlot(int)
     def update_main_time_slider(self, time):
