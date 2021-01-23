@@ -231,10 +231,7 @@ class GaitGeneratorView(QWidget):
         )
 
     def open_inverse_kinematics_setpoints_dialogue(self):
-        rospy.loginfo("you made it to the gg_view file")
         input_dictionary, cancelled  = self.get_inverse_kinematics_setpoints_input()
-        rospy.loginfo('you entered: ')
-        rospy.loginfo(f'dictionary {input_dictionary}, cancelled: {cancelled}')
 
     def get_inverse_kinematics_setpoints_input(self):
         """Asks the user the needed inputs, returns these plus a flag indicating cancellation of any input."""
