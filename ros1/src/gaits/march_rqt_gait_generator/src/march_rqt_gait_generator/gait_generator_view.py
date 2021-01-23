@@ -235,15 +235,19 @@ class GaitGeneratorView(QWidget):
 
     def get_inverse_kinematics_setpoints_input(self):
         """Asks the user the needed inputs, returns these plus a flag indicating cancellation of any input."""
-        input_dialogue = QInputDialog(self)
-        input_dialogue.setDoubleDecimals(4)
-        input_dialogue.setDoubleRange(-100.0, 100.0)
-        input_dialogue.resize(300,100)
         input_dictionary = {}
+        input_dictionary, cancelled = self.get_inverse_kinematics_setpoints_input_settings(input_dictionary)
 
-        ## grab general settings for calculation
+        if cancelled:
+            return input_dictionary, cancelled
+
+        input_dictionary, cancelled = self.get_inverse_kinematics_setpoints_foot_coordinates(input_dictionary)
+
+        return input_dictionary, cancelled
+
+    def get_inverse_kinematics_setpoints_input_settings(self, input_dictionary):
         input_name = 'foot_side'
-        resulting_variable, ok = input_dialogue.getItem(self, "enter foot side choice", input_name,
+        resulting_variable, ok = QInputDialog.getItem(self, "enter foot side choice", input_name,
                                                         ["right", "left"], 0, False)
         if ok:
             input_dictionary[input_name] = resulting_variable
@@ -251,7 +255,7 @@ class GaitGeneratorView(QWidget):
             return input_dictionary, True
 
         input_name = 'z_axis'
-        output_item, ok = input_dialogue.getItem(self, "enter z axis choice", input_name,
+        output_item, ok = QInputDialog.getItem(self, "enter z axis choice", input_name,
                                                  [ "from ground upwards", "from hip downwards"], 0, False)
         if ok:
             input_dictionary[input_name] = resulting_variable
@@ -259,7 +263,7 @@ class GaitGeneratorView(QWidget):
             return input_dictionary, True
 
         input_name = 'set_y'
-        output_item, ok = input_dialogue.getItem(self, "Do you want to specify y", input_name,
+        output_item, ok = QInputDialog.getItem(self, "Do you want to specify y", input_name,
                                                  ["no", "yes"], 0, False)
         if ok:
             if output_item == 'no':
@@ -269,7 +273,14 @@ class GaitGeneratorView(QWidget):
         else:
             return input_dictionary, True
 
-        ## grab the desired foot coordinates
+        return input_dictionary, False
+
+    def get_inverse_kinematics_setpoints_foot_coordinates(self, input_dictionary):
+        input_dialogue = QInputDialog(self)
+        input_dialogue.setDoubleDecimals(4)
+        input_dialogue.setDoubleRange(-100.0, 100.0)
+        input_dialogue.resize(300,100)
+
         input_dialogue.setInputMode(QInputDialog.DoubleInput)
         double_variable_names = ['x_coordinate_cm', 'y_coordinate_cm', 'z_coordinate_cm', 'time_s']
         for double_variable_name in double_variable_names:
