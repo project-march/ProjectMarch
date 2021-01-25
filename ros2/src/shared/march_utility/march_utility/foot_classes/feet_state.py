@@ -37,7 +37,7 @@ class FeetState(object):
         self.time = time
 
     @classmethod
-    def from_setpoints(cls, setpoint_dic: dict) -> FeetState:
+    def from_setpoint_dict(cls, setpoint_dic: dict) -> FeetState:
         """Calculate the position and velocity of the foot from joint angles.
 
         :param setpoint_dic:

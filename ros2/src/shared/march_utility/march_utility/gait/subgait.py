@@ -4,6 +4,8 @@ import os
 import re
 import math
 from typing import List, Tuple
+
+from march_utility.utilities.duration import CustomDuration
 from rclpy.duration import Duration
 from trajectory_msgs import msg as trajectory_msg
 import yaml
@@ -36,7 +38,7 @@ class Subgait(object):
     def __init__(
         self,
         joints: List[JointTrajectory],
-        duration: Duration,
+        duration: CustomDuration,
         gait_type: str = "walk_like",
         gait_name: str = "Walk",
         subgait_name: str = "right_open",
@@ -187,7 +189,7 @@ class Subgait(object):
         if robot is None:
             raise GaitError("Cannot create gait without a loaded robot.")
 
-        duration = Duration(nanoseconds=subgait_dict["duration"])
+        duration = CustomDuration(nanoseconds=subgait_dict["duration"])
         joint_list = []
         for name, points in sorted(
             subgait_dict["joints"].items(), key=lambda item: item[0]
@@ -197,7 +199,7 @@ class Subgait(object):
                 continue
             limits = Limits.from_urdf_joint(urdf_joint)
             joint_list.append(
-                cls.joint_class.from_setpoints(name, limits, points, duration)
+                cls.joint_class.from_setpoint_dict(name, limits, points, duration)
             )
         subgait_type = (
             subgait_dict["gait_type"] if subgait_dict.get("gait_type") else ""
@@ -286,7 +288,7 @@ class Subgait(object):
 
     # region Manipulate subgait
     def scale_timestamps_subgait(
-        self, new_duration: float, rescale: bool = True
+        self, new_duration: CustomDuration, rescale: bool = True
     ) -> None:
         """Scale or cut off all the setpoint to match the duration in both subgaits.
 
@@ -302,7 +304,7 @@ class Subgait(object):
             joint.set_duration(new_duration, rescale)
         self.duration = new_duration
 
-    def create_interpolated_setpoints(self, timestamps: List[float]) -> None:
+    def create_interpolated_setpoints(self, timestamps: List[CustomDuration]) -> None:
         """Equalize the setpoints of the subgait match the given timestamps.
 
         :param timestamps: the new timestamps to use when creating the setpoints
@@ -371,9 +373,7 @@ class Subgait(object):
             f"Based on foot position: {use_foot_position}"
         )
 
-        duration = weighted_average_floats(
-            base_subgait.duration, other_subgait.duration, parameter
-        )
+        duration = base_subgait.duration.weighted_average(other_subgait.duration, parameter)
 
         gait_type = (
             base_subgait.gait_type if parameter <= 0.5 else other_subgait.gait_type
@@ -397,7 +397,7 @@ class Subgait(object):
     # endregion
 
     # region Get functions
-    def get_unique_timestamps(self) -> List[float]:
+    def get_unique_timestamps(self) -> List[CustomDuration]:
         """Get the timestamps that are unique to a setpoint."""
         timestamps = []
         for joint in self.joints:
@@ -431,10 +431,7 @@ class Subgait(object):
         duration = Duration(seconds=self.duration)
         return {
             "description": self.description,
-            "duration": {
-                "nsecs": duration.nanoseconds,
-                "secs": math.floor(self.duration),
-            },
+            "duration": duration.nanoseconds,
             "gait_type": self.gait_type,
             "joints": dict(
                 [
@@ -567,10 +564,10 @@ class Subgait(object):
         # fill all joints in new_setpoints except the ankle joints using
         # the inverse kinematics
         for setpoint_index in range(0, number_of_setpoints):
-            base_feet_state = FeetState.from_setpoints(
+            base_feet_state = FeetState.from_setpoint_dict(
                 base_setpoints_to_interpolate[setpoint_index]
             )
-            other_feet_state = FeetState.from_setpoints(
+            other_feet_state = FeetState.from_setpoint_dict(
                 other_setpoints_to_interpolate[setpoint_index]
             )
             new_feet_state = FeetState.weighted_average_states(
@@ -591,9 +588,7 @@ class Subgait(object):
                 )
                 new_setpoints[ankle_joint].append(new_ankle_setpoint_to_add)
 
-        duration = weighted_average_floats(
-            base_subgait.duration, other_subgait.duration, parameter
-        )
+        duration = base_subgait.duration.weighted_average(other_subgait.duration, parameter)
 
         for joint in base_subgait.joints:
             interpolated_joint_trajectory_to_add = JointTrajectory(

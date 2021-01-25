@@ -51,3 +51,6 @@ class CustomDuration(Duration):
         if not (isinstance(other, int) or isinstance(other, float)):
             raise TypeError(f"Expected numerical value, bot got type: {type(other)}")
         return other / self.seconds
+
+    def __hash__(self):
+        return hash(self.nanoseconds)
