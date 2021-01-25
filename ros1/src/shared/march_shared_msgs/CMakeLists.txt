@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
     message_generation
     std_msgs
     trajectory_msgs
+    sensor_msgs
 )
 
 add_message_files(
@@ -30,6 +31,7 @@ add_service_files(
     FILES
     CapturePointPose.srv
     ContainsGait.srv
+    GetMoveItTrajectory.srv
     GetParamBool.srv
     GetParamFloat.srv
     GetParamInt.srv
@@ -51,6 +53,7 @@ generate_messages(
     control_msgs
     std_msgs
     trajectory_msgs
+    sensor_msgs
 )
 
 catkin_package(
@@ -60,4 +63,5 @@ catkin_package(
     message_runtime
     std_msgs
     trajectory_msgs
+    sensor_msgs
 )

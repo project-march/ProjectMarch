@@ -1,0 +1,5 @@
+#!/usr/bin/env python3
+from march_moveit_interface import moveit_interface_node
+
+if __name__ == '__main__':
+    moveit_interface_node.main()
