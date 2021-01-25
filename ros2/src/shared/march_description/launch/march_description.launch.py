@@ -9,6 +9,7 @@ from launch.substitutions import (
     PathJoinSubstitution,
     TextSubstitution,
 )
+from launch.conditions import UnlessCondition
 from launch_ros.actions import Node
 
 
@@ -25,6 +26,7 @@ def generate_launch_description():
 
     use_imu_data = LaunchConfiguration("use_imu_data")
     to_world_transform = LaunchConfiguration("to_world_transform")
+    balance = LaunchConfiguration("balance")
 
     return LaunchDescription(
         [
@@ -69,6 +71,11 @@ def generate_launch_description():
                 description="Whether the simulation should be simulating "
                 "ground_gaiting instead of airgaiting.",
             ),
+            DeclareLaunchArgument(
+                "balance",
+                default_value="False",
+                description="Whether balance is being used.",
+            ),
             Node(
                 package="march_robot_state_publisher",
                 executable="march_robot_state_publisher_node",
@@ -93,6 +100,7 @@ def generate_launch_description():
                         "to_world_transform": to_world_transform,
                     }
                 ],
+                # condition=UnlessCondition(balance)
             ),
         ]
     )

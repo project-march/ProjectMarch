@@ -3,6 +3,9 @@
   <!-- By default, we are not in debug mode -->
   <arg name="debug" default="false" />
 
+
+  <param name="/march/robot_description_semantic"
+         textfile="$(find march_moveit)/config/march.srdf" />
   <!--
   By default, hide joint_state_publisher's GUI
 
