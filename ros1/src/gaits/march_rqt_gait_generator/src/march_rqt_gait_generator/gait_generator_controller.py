@@ -409,7 +409,7 @@ class GaitGeneratorController(object):
         if cancelled:
             rospy.loginfo("The inputs for the inverse kinematics were cancelled.")
             return
-        elif 0 <= self.inverse_kinematics_input_dictionary['time_s'] <= self.subgait.duration:
+        elif not 0 <= self.inverse_kinematics_input_dictionary['time_s'] <= self.subgait.duration:
             rospy.loginfo(f"The specified time is invalid. Should be between 0 and the subgait duration. "
                           f"{self.inverse_kinematics_input_dictionary['time_s']} was given.")
             return
@@ -499,8 +499,13 @@ class GaitGeneratorController(object):
             position = setpoint_dictionary[joint_name].position
             velocity = setpoint_dictionary[joint_name].velocity
             joint = self.subgait.get_joint(joint_name)
+            # If the current subgait already has a setpoint at the specified time, remove it before adding the new one
+            for index, setpoint in enumerate(joint.setpoints):
+                if setpoint.time == time:
+                    joint.remove_setpoint(index)
             joint.add_setpoint(ModifiableSetpoint(time, position, velocity))
             self.view.update_joint_widget(joint)
+            self.view.publish_preview(self.subgait, self.current_time),
 
     def invert_gait(self):
         for side, controller in self.side_subgait_controller.items():
