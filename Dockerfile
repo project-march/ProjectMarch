@@ -3,6 +3,7 @@
 # If you have added a new dependency, running .scripts/generate_dockerfile.sh from
 # the root of the repository should be enough.
 FROM ros:foxy-ros1-bridge-focal
+ARG DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt upgrade -y && apt install -y apt-utils && apt install -y ros-noetic-ros-base ros-foxy-ros-base
 RUN apt update && apt install -y python3-rosdep python3-rosinstall python3-rosinstall-generator build-essential python3-colcon-common-extensions python3-pip python3-pip python3-catkin-pkg python3-catkin-lint clang-tidy clang libssl-dev wget cmake git git-lfs libbullet-dev python3-flake8 python3-pytest-cov python3-setuptools python3-vcstool && apt install -y --no-install-recommends libasio-dev libtinyxml2-dev libcunit1-dev
 RUN python3 -m pip install mock argcomplete pytest-repeat pytest-rerunfailures pytest flakehell pyqtgraph==0.11.0 numpy_ringbuffer==0.2.1 flake8-2020 flake8-aaa flake8-annotations flake8-annotations-complexity flake8-assertive flake8-bandit flake8-black flake8-bugbear flake8-cognitive-complexity flake8-commas flake8-eradicate flake8-executable flake8-expression-complexity flake8-functions flake8-pie flake8-print flake8-printf-formatting flake8-rst-docstrings flake8-simplify flake8-string-format flake8-todos flake8-use-fstring pep8-naming 
