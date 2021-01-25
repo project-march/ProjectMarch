@@ -5,19 +5,17 @@ project(march_realsense_reader)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-#    pcl_conversions
-#    pcl_ros
+    pcl_conversions
+    pcl_ros
     roscpp
     sensor_msgs
 )
 
-find_package(PCL 1.8 REQUIRED)
-
 catkin_package(
     INCLUDE_DIRS include
     CATKIN_DEPENDS
-#    pcl_conversions
-#    pcl_ros
+    pcl_conversions
+    pcl_ros
     roscpp
     sensor_msgs
 )
