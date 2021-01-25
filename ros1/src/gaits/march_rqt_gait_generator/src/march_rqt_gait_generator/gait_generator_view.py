@@ -336,15 +336,7 @@ class GaitGeneratorView(QWidget):
                 continue
 
             # Form a string explaining the variable to the user from the variable name
-            if double_variable_name == "time_s":
-                input_text = "Enter the desired time of the desired foot position"
-            elif double_variable_name.find("coordinate") != -1:
-                input_text = (
-                    f"Enter the desired deviation from default foot "
-                    f"position in the {double_variable_name[0]} direction in cm"
-                )
-            else:
-                input_text = f"Enter the desired velocity of foot in the {double_variable_name[0]} direction in cm / s"
+            input_text = self.get_input_text_for_foot_state_input_variable(double_variable_name)
 
             (input_dictionary, cancelled) = self.get_double_input(
                 input_dialogue, input_text, double_variable_name, input_dictionary
@@ -353,6 +345,18 @@ class GaitGeneratorView(QWidget):
                 return input_dictionary, cancelled
 
         return input_dictionary, False
+
+    def get_input_text_for_foot_state_input_variable(self, double_variable_name):
+        if double_variable_name == "time_s":
+            input_text = "Enter the desired time of the desired foot position"
+        elif double_variable_name.find("coordinate") != -1:
+            input_text = (
+                f"Enter the desired deviation from default foot "
+                f"position in the {double_variable_name[0]} direction in cm"
+            )
+        else:
+            input_text = f"Enter the desired velocity of foot in the {double_variable_name[0]} direction in cm / s"
+        return input_text
 
     def get_double_input(
         self, input_dialogue, input_text, asked_variable_name, input_dictionary
