@@ -17,7 +17,7 @@ from march_shared_msgs.msg import JointValues, PressureSole
 
 
 from .com_calculator import CoMCalculator
-from .cp_calculator import CPCalculator
+from march_data_collector.cp_calculator import CPCalculator
 
 
 class DataCollectorNode(object):
