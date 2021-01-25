@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import xacro
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
@@ -22,9 +21,9 @@ def generate_launch_description():
     xacro_path = PathJoinSubstitution(
         [get_package_share_directory("march_description"), "urdf", robot_description]
     )
-
     use_imu_data = LaunchConfiguration("use_imu_data")
     to_world_transform = LaunchConfiguration("to_world_transform")
+    balance = LaunchConfiguration("balance")
 
     return LaunchDescription(
         [
@@ -68,6 +67,11 @@ def generate_launch_description():
                 default_value="False",
                 description="Whether the simulation should be simulating "
                 "ground_gaiting instead of airgaiting.",
+            ),
+            DeclareLaunchArgument(
+                "balance",
+                default_value="False",
+                description="Whether balance is being used.",
             ),
             Node(
                 package="march_robot_state_publisher",
