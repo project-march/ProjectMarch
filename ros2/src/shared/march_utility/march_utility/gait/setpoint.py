@@ -11,26 +11,29 @@ from march_utility.utilities.utility_functions import (
 
 # Use this factor when calculating velocities to keep the calculations within the range of motion
 # See IK confluence page https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
+from march_utility.utilities.duration import CustomDuration
+from rclpy.duration import Duration
+
 VELOCITY_SCALE_FACTOR = 0.001
 JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
 
 
-class Setpoint(object):
+class Setpoint:
     """Base class to define the setpoints of a subgait."""
 
     digits = 8
 
     def __init__(
-        self, time: float, position: float, velocity: Optional[float] = None
+        self, time: CustomDuration, position: float, velocity: Optional[float] = None
     ) -> None:
         """
         Initialize a setpoint.
 
-        :param time: The time within the subgait.
+        :param time: The time within the subgait, in nanoseconds.
         :param position: The position (angle) of the joint.
         :param velocity: The velocity of the joint.
         """
-        self._time = round(time, self.digits)  # nanoseconds
+        self._time = round(time, self.digits) # https://github.com/python/mypy/issues/8213
         self._position = round(position, self.digits)
         if velocity is not None:
             self._velocity: Optional[float] = round(velocity, self.digits)
@@ -64,7 +67,7 @@ class Setpoint(object):
     def __repr__(self):
         if self.velocity is not None:
             return (
-                f"Time: {self.time!s}, Position: {self.position!s}, Velocity:"
+                f"Time: {self.time.nanoseconds!s}, Position: {self.position!s}, Velocity:"
                 f" {self.velocity!s}"
             )
         else:
@@ -103,7 +106,7 @@ class Setpoint(object):
                 raise KeyError(f"Setpoint_dic is missing joint {joint}")
             else:
                 next_positions[joint] = cls(
-                    setpoint_dic[joint].time + VELOCITY_SCALE_FACTOR,
+                    setpoint_dic[joint].time + CustomDuration(seconds=VELOCITY_SCALE_FACTOR),
                     setpoint_dic[joint].position
                     + setpoint_dic[joint].velocity * VELOCITY_SCALE_FACTOR,
                 )
@@ -140,9 +143,7 @@ class Setpoint(object):
         :return:
             The interpolated setpoint
         """
-        time = weighted_average_floats(
-            base_setpoint.time, other_setpoint.time, parameter
-        )
+        time = base_setpoint.time.weighted_average(other_setpoint.time, parameter)
         position = weighted_average_floats(
             base_setpoint.position, other_setpoint.position, parameter
         )

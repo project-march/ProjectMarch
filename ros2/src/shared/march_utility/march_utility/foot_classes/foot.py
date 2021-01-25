@@ -13,6 +13,7 @@ from typing import Tuple
 from march_utility.exceptions.gait_exceptions import SubgaitInterpolationError
 from march_utility.exceptions.general_exceptions import SideSpecificationError
 from march_utility.gait.setpoint import Setpoint
+from march_utility.utilities.duration import CustomDuration
 from march_utility.utilities.side import Side
 from march_utility.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
@@ -94,7 +95,7 @@ class Foot(object):
         next_joint_positions = Foot.calculate_joint_angles_from_foot_position(
             next_position.position,
             next_position.foot_side,
-            time + VELOCITY_SCALE_FACTOR,
+            time + CustomDuration(seconds=VELOCITY_SCALE_FACTOR),
         )
 
         for joint in JOINT_NAMES_IK:
@@ -107,7 +108,7 @@ class Foot(object):
 
     @staticmethod
     def calculate_joint_angles_from_foot_position(
-        foot_position: Vector3d, foot_side: Side, time: float
+        foot_position: Vector3d, foot_side: Side, time: CustomDuration
     ) -> dict:
         """Calculate the angles of the joints corresponding to a certain foot position.
 

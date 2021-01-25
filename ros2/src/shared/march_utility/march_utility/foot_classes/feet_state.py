@@ -6,6 +6,7 @@ This class is  used to create gaits based on the state of both feet.
 from __future__ import annotations
 
 from march_utility.gait.setpoint import Setpoint
+from march_utility.utilities.duration import CustomDuration
 from march_utility.utilities.side import Side
 from march_utility.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
@@ -24,7 +25,7 @@ JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
 class FeetState(object):
     """Class for encapturing the state of both feet."""
 
-    def __init__(self, right_foot: Foot, left_foot: Foot, time: float = None) -> None:
+    def __init__(self, right_foot: Foot, left_foot: Foot, time: CustomDuration = None) -> None:
         """Create a FeetState object.
 
         :param right_foot: The state of the right foot.
@@ -86,10 +87,10 @@ class FeetState(object):
 
         # Set the time of the new setpoints as the weighted
         # average of the original setpoint times
-        feet_state_time = 0.0
+        feet_state_time = CustomDuration()
         for setpoint in setpoint_dic.values():
             feet_state_time += setpoint.time
-        feet_state_time = feet_state_time / float(len(setpoint_dic))
+        feet_state_time = feet_state_time / len(setpoint_dic)
 
         return cls(foot_state_right, foot_state_left, feet_state_time)
 
@@ -124,9 +125,7 @@ class FeetState(object):
         resulting_left_foot = Foot.weighted_average_foot(
             base_state.left_foot, other_state.left_foot, parameter
         )
-        resulting_time = weighted_average_floats(
-            base_state.time, other_state.time, parameter
-        )
+        resulting_time = base_state.time.weighted_average(other_state.time, parameter)
 
         return cls(resulting_right_foot, resulting_left_foot, resulting_time)
 

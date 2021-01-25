@@ -36,7 +36,7 @@ class Subgait(object):
     def __init__(
         self,
         joints: List[JointTrajectory],
-        duration: float,
+        duration: Duration,
         gait_type: str = "walk_like",
         gait_name: str = "Walk",
         subgait_name: str = "right_open",
@@ -187,14 +187,7 @@ class Subgait(object):
         if robot is None:
             raise GaitError("Cannot create gait without a loaded robot.")
 
-        duration = (
-            Duration(
-                seconds=subgait_dict["duration"]["secs"],
-                nanoseconds=subgait_dict["duration"]["nsecs"],
-            ).nanoseconds
-            * NANOSEC_TO_SEC
-        )
-
+        duration = Duration(nanoseconds=subgait_dict["duration"])
         joint_list = []
         for name, points in sorted(
             subgait_dict["joints"].items(), key=lambda item: item[0]
