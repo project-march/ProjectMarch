@@ -5,6 +5,12 @@ import rospkg
 import rospy
 
 from march_shared_classes.gait.subgait import Subgait
+from march_shared_classes.foot_classes.foot import Foot
+from march_shared_classes.utilities.side import Side
+from march_shared_classes.utilities.vector_3d import Vector3d
+from march_shared_classes.utilities.utility_functions import (
+    get_lengths_robot_for_inverse_kinematics,
+)
 
 from .model.modifiable_setpoint import ModifiableSetpoint
 from .model.modifiable_subgait import ModifiableSubgait
@@ -22,6 +28,7 @@ class GaitGeneratorController(object):
         self.time_slider_thread = None
         self.current_time = 0
         self.robot = robot
+        self.inverse_kinematics_input_dictionary = {}
 
         empty_subgait_file = os.path.join(
             rospkg.RosPack().get_path("march_rqt_gait_generator"),
@@ -54,7 +61,7 @@ class GaitGeneratorController(object):
             self.change_gait_directory
         )
         self.view.add_inverse_kinematic_setpoints_button.clicked.connect(
-            self.open_inverse_kinematics_setpoints_window
+            self.add_inverse_kinematics_setpoints
         )
         self.view.import_gait_button.clicked.connect(self.import_gait)
         self.view.export_gait_button.clicked.connect(self.export_gait)
@@ -393,8 +400,68 @@ class GaitGeneratorController(object):
             )
             self.view.change_gait_directory_button.setText(gait_directory_text)
 
-    def open_inverse_kinematics_setpoints_window(self):
-        self.view.open_inverse_kinematics_setpoints_dialogue()
+    def add_inverse_kinematics_setpoints(self):
+        """Adds setpoints to the gait based on a user specified desired foot location."""
+        self.inverse_kinematics_input_dictionary, cancelled  = self.view.get_inverse_kinematics_setpoints_input()
+        if cancelled:
+            rospy.loginfo("The inputs for the inverse kinematics were cancelled.")
+            return
+
+        # Transform the input from relative to the default position to relative to the exoskeleton
+        self.transform_inverse_kinematics_setpoints_inputs()
+
+        # Calculate the setpoints from the desired foot coordinates and add them to the gait
+        setpoint_dictionary = self.get_setpoints_from_inverse_kinematics_input()
+        self.add_setpoints_from_dictionary(setpoint_dictionary)
+
+    def transform_inverse_kinematics_setpoints_inputs(self):
+        foot_side = self.inverse_kinematics_input_dictionary['foot_side']
+        [upper_leg_length, lower_leg_length, haa_to_leg_length, haa_arm, base] = \
+            get_lengths_robot_for_inverse_kinematics(foot_side)
+        self.transform_inverse_kinematics_setpoints_x_coordinate(haa_to_leg_length)
+        self.transform_inverse_kinematics_setpoints_y_coordiante(haa_arm, base, foot_side)
+        self.transform_inverse_kinematics_setpoints_z_coordinate(upper_leg_length, lower_leg_length)
+
+    def transform_inverse_kinematics_setpoints_x_coordinate(self, haa_to_leg_length):
+        """Add the default x coordinate to the desired x coordinate to transform to exoskeleton coordinate system."""
+        default_x_position_cm = haa_to_leg_length * 100
+        self.inverse_kinematics_input_dictionary['x_coordiante_cm'] += default_x_position_cm
+
+    def transform_inverse_kinematics_setpoints_y_coordinate(self, haa_arm, base, foot_side):
+        """Add the default y coordinate to the desired y coordinate to transform to exoskeleton coordinate system."""
+        if foot_side == Side.right:
+            default_y_position_cm = (base / 2 + haa_arm) * 100
+        else:
+            default_y_position_cm = (- base / 2 - haa_arm) * 100
+        self.inverse_kinematics_input_dictionary['y_coordinate_cm'] += default_y_position_cm
+
+    def transform_inverse_kinematics_setpoints_z_coordinate(self, upper_leg_length, lower_leg_length):
+        """Transform the z coordinate of the input to the coordinate system of the exoskeleton."""
+        if self.inverse_kinematics_input_dictionary['z_axis'] == "from ground upwards":
+            ground_z_coordinate_cm = (upper_leg_length + lower_leg_length) * 100
+            self.inverse_kinematics_input_dictionary['z_coordinate_cm'] = \
+                ground_z_coordinate_cm - self.inverse_kinematics_input_dictionary['z_coordinate_cm']
+
+    def get_setpoints_from_inverse_kinematics_input(self):
+        """Use the inverse kinematics function to translate the desired foot coordinates to setpoints."""
+        input_dictionary = self.inverse_kinematics_input_dictionary
+        desired_position = Vector3d(self.inverse_kinematics_input_dictionary['x_coordinate_cm'] / 100,
+                                    self.inverse_kinematics_input_dictionary['y_coordinate_cm'] / 100,
+                                    self.inverse_kinematics_input_dictionary['z_coordinate_cm'] / 100)
+
+        desired_foot_state = Foot(self.inverse_kinematics_input_dictionary['foot_side'],
+                                  desired_position, Vector3d(0, 0, 0))
+        setpoints = Foot.get_joint_states_from_foot_state(desired_foot_state, input_dictionary['time_s'])
+        return setpoints
+
+    def add_setpoints_from_dictionary(self, setpoint_dictionary):
+        """Add setpoints from a dictionary with joints as keys to the gait."""
+        for joint in setpoint_dictionary:
+            time = setpoint_dictionary[joint].time
+            position = setpoint_dictionary[joint].position
+            velocity = setpoint_dictionary[joint].velocity
+            joint.add_setpoint(ModifiableSetpoint(time, position, velocity))
+
 
     def invert_gait(self):
         for side, controller in self.side_subgait_controller.items():
