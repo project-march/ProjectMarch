@@ -243,9 +243,10 @@ class GaitGeneratorView(QWidget):
         if cancelled:
             return input_dictionary, cancelled
 
-        input_dictionary, cancelled = self.get_inverse_kinematics_setpoints_foot_state(
-            input_dictionary
-        )
+        (
+            input_dictionary,
+            cancelled,
+        ) = self.get_inverse_kinematics_setpoints_input_foot_state(input_dictionary)
 
         return input_dictionary, cancelled
 
@@ -308,7 +309,7 @@ class GaitGeneratorView(QWidget):
         else:
             return input_dictionary, True
 
-    def get_inverse_kinematics_setpoints_foot_state(self, input_dictionary):
+    def get_inverse_kinematics_setpoints_input_foot_state(self, input_dictionary):
         """Asks the inputs for the foot coordinate needed for the inverse kinematics setpoints."""
         input_dialogue = QInputDialog(self)
         input_dialogue.setDoubleDecimals(2)
