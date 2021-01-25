@@ -401,7 +401,7 @@ class GaitGeneratorController(object):
             self.view.change_gait_directory_button.setText(gait_directory_text)
 
     def add_inverse_kinematics_setpoints(self):
-        """Adds setpoints to the gait based on a user specified desired foot location."""
+        """Add setpoints to the gait based on a user specified desired foot location."""
         (
             self.inverse_kinematics_input_dictionary,
             cancelled,
@@ -430,6 +430,7 @@ class GaitGeneratorController(object):
         self.add_setpoints_from_dictionary(setpoint_dictionary)
 
     def transform_inverse_kinematics_setpoints_inputs(self):
+        """Transform the input coordinates (relative to a default foot location) to coordinates relative to the exo."""
         foot_side = self.inverse_kinematics_input_dictionary["foot_side"]
         [
             upper_leg_length,
@@ -495,13 +496,13 @@ class GaitGeneratorController(object):
         desired_foot_state = Foot(
             input_dictionary["foot_side"], desired_position, desired_velocity
         )
-        setpoints = Foot.get_joint_states_from_foot_state(
+
+        return Foot.get_joint_states_from_foot_state(
             desired_foot_state, input_dictionary["time_s"]
         )
-        return setpoints
 
     def add_setpoints_from_dictionary(self, setpoint_dictionary):
-        """Add setpoints from a dictionary with joints as keys to the gait."""
+        """Add setpoints from a dictionary with joints as keys to the current subgait."""
         for joint_name in setpoint_dictionary:
             time = setpoint_dictionary[joint_name].time
             position = setpoint_dictionary[joint_name].position
@@ -513,7 +514,7 @@ class GaitGeneratorController(object):
                     joint.remove_setpoint(index)
             joint.add_setpoint(ModifiableSetpoint(time, position, velocity))
             self.view.update_joint_widget(joint)
-            self.view.publish_preview(self.subgait, self.current_time),
+            self.view.publish_preview(self.subgait, self.current_time)
 
     def invert_gait(self):
         for side, controller in self.side_subgait_controller.items():
