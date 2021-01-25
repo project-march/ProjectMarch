@@ -1,4 +1,3 @@
-
 import math
 import os
 import subprocess
@@ -236,17 +235,26 @@ class GaitGeneratorView(QWidget):
         """Asks the user the needed inputs, returns these plus a flag indicating cancellation of any input."""
         input_dictionary = {}
 
-        input_dictionary, cancelled = self.get_inverse_kinematics_setpoints_input_settings(input_dictionary)
+        (
+            input_dictionary,
+            cancelled,
+        ) = self.get_inverse_kinematics_setpoints_input_settings(input_dictionary)
 
-        input_dictionary, cancelled = self.get_inverse_kinematics_setpoints_foot_coordinate(input_dictionary)
+        if cancelled:
+            return input_dictionary, cancelled
+
+        input_dictionary, cancelled = self.get_inverse_kinematics_setpoints_foot_state(
+            input_dictionary
+        )
 
         return input_dictionary, cancelled
 
     def get_inverse_kinematics_setpoints_input_settings(self, input_dictionary):
         """Asks the user to specify certain settings needed for the inverse kinematics setpoints."""
         input_name = "foot_side"
-        output_item, ok = QInputDialog.getItem(self, "enter foot side choice", input_name,
-                                                        ["right", "left"], 0, False)
+        output_item, ok = QInputDialog.getItem(
+            self, "enter foot side choice", input_name, ["right", "left"], 0, False
+        )
         if ok:
             if output_item == "right":
                 input_dictionary[input_name] = Side.right
@@ -255,51 +263,112 @@ class GaitGeneratorView(QWidget):
         else:
             return input_dictionary, True
 
-        input_name = 'z_axis'
-        output_item, ok = QInputDialog.getItem(self, "enter z axis choice", input_name,
-                                                 ["from ground upwards", "from hip downwards"], 0, False)
+        input_name = "z_axis"
+        output_item, ok = QInputDialog.getItem(
+            self,
+            "enter z axis choice",
+            input_name,
+            ["from ground upwards", "from hip downwards"],
+            0,
+            False,
+        )
         if ok:
             input_dictionary[input_name] = output_item
         else:
             return input_dictionary, True
 
-        input_name = 'set_y'
-        output_item, ok = QInputDialog.getItem(self, "Do you want to specify y", input_name,
-                                                 ["no", "yes"], 0, False)
+        (
+            input_dictionary,
+            cancelled,
+        ) = self.get_inverse_kinematics_setpoints_input_yes_no(
+            "Do you want to specify a desired foot velocity?",
+            "set_velocity",
+            input_dictionary,
+        )
+
+        if cancelled:
+            return input_dictionary, cancelled
+
+        (
+            input_dictionary,
+            cancelled,
+        ) = self.get_inverse_kinematics_setpoints_input_yes_no(
+            "Do you want to specify the y coordinate of the foot?",
+            "set_y_coordinate",
+            input_dictionary,
+        )
+
+        return input_dictionary, cancelled
+
+    def get_inverse_kinematics_setpoints_input_yes_no(
+        self, input_text, asked_variable_name, input_dictionary
+    ):
+
+        output_item, ok = QInputDialog.getItem(
+            self, input_text, asked_variable_name, ["no", "yes"], 0, False
+        )
         if ok:
-            if output_item == 'no':
-                input_dictionary[input_name] = False
+            if output_item == "no":
+                input_dictionary[asked_variable_name] = False
             else:
-                input_dictionary[input_name] = True
+                input_dictionary[asked_variable_name] = True
+            return input_dictionary, False
         else:
             return input_dictionary, True
 
-        return input_dictionary, False
-
-    def get_inverse_kinematics_setpoints_foot_coordinate(self, input_dictionary):
+    def get_inverse_kinematics_setpoints_foot_state(self, input_dictionary):
         """Asks the inputs for the foot coordinate needed for the inverse kinematics setpoints."""
         input_dialogue = QInputDialog(self)
         input_dialogue.setDoubleDecimals(2)
         input_dialogue.setDoubleRange(-100.0, 100.0)
-        input_dialogue.resize(300,100)
+        input_dialogue.resize(300, 100)
 
         input_dialogue.setInputMode(QInputDialog.DoubleInput)
-        double_variable_names = ['x_coordinate_cm', 'y_coordinate_cm', 'z_coordinate_cm', 'time_s']
+        double_variable_names = [
+            "x_coordinate_cm",
+            "y_coordinate_cm",
+            "z_coordinate_cm",
+            "time_s",
+        ]
+
+        if input_dictionary["set_velocity"]:
+            double_variable_names.extend(
+                ["x_velocity_cm_per_s", "y_velocity_cm_per_s", "z_velocity_cm_per_s"]
+            )
+
         for double_variable_name in double_variable_names:
-            if not input_dictionary['set_y'] and double_variable_name == 'y_coordinate_cm':
-                input_dictionary['y_coordinate_cm'] = 0
+            if (
+                not input_dictionary["set_y_coordinate"]
+                and double_variable_name == "y_coordinate_cm"
+            ):
+                input_dictionary["y_coordinate_cm"] = 0
                 continue
-            input_dictionary, cancelled = \
-                self.get_inverse_kinematics_setpoints_double_input(input_dialogue,
-                                                                   f'Enter desired {double_variable_name} from default',
-                                                                   double_variable_name, input_dictionary)
+
+            # Form a string explaining the variable to the user from the variable name
+            if double_variable_name == "time_s":
+                input_text = f"Enter desired {double_variable_name} of foot position"
+            elif double_variable_name.find("coordinate") != -1:
+                input_text = (
+                    f"Enter desired deviation from default foot "
+                    f"position in {double_variable_name[0]} direction"
+                )
+            else:
+                input_text = f"Enter desired velocity of foot in {double_variable_name[0]} direction"
+
+            (
+                input_dictionary,
+                cancelled,
+            ) = self.get_inverse_kinematics_setpoints_double_input(
+                input_dialogue, input_text, double_variable_name, input_dictionary
+            )
             if cancelled:
                 return input_dictionary, cancelled
 
         return input_dictionary, False
 
-    def get_inverse_kinematics_setpoints_double_input(self, input_dialogue, input_text, asked_variable_name,
-                                                      input_dictionary):
+    def get_inverse_kinematics_setpoints_double_input(
+        self, input_dialogue, input_text, asked_variable_name, input_dictionary
+    ):
         """General input grabber for doubles for the filling of the inverse kinematics setpoints input."""
         input_dialogue.setLabelText(input_text)
         ok = input_dialogue.exec_()
