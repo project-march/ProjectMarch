@@ -1,0 +1,6 @@
+string swing_leg
+sensor_msgs/JointState swing_leg_target
+sensor_msgs/JointState stance_leg_target
+---
+bool success
+trajectory_msgs/JointTrajectory trajectory
