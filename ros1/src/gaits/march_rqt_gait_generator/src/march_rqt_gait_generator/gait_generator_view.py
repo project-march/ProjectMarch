@@ -277,10 +277,7 @@ class GaitGeneratorView(QWidget):
         else:
             return input_dictionary, True
 
-        (
-            input_dictionary,
-            cancelled,
-        ) = self.get_inverse_kinematics_setpoints_input_yes_no(
+        (input_dictionary, cancelled,) = self.get_yes_no_input(
             "Do you want to specify a desired foot velocity?",
             "set_velocity",
             input_dictionary,
@@ -289,10 +286,7 @@ class GaitGeneratorView(QWidget):
         if cancelled:
             return input_dictionary, cancelled
 
-        (
-            input_dictionary,
-            cancelled,
-        ) = self.get_inverse_kinematics_setpoints_input_yes_no(
+        (input_dictionary, cancelled,) = self.get_yes_no_input(
             "Do you want to specify the y coordinate of the foot?",
             "set_y_coordinate",
             input_dictionary,
@@ -300,10 +294,8 @@ class GaitGeneratorView(QWidget):
 
         return input_dictionary, cancelled
 
-    def get_inverse_kinematics_setpoints_input_yes_no(
-        self, input_text, asked_variable_name, input_dictionary
-    ):
-
+    def get_yes_no_input(self, input_text, asked_variable_name, input_dictionary):
+        """General input grabber for yes no questions."""
         output_item, ok = QInputDialog.getItem(
             self, input_text, asked_variable_name, ["no", "yes"], 0, False
         )
@@ -355,10 +347,7 @@ class GaitGeneratorView(QWidget):
             else:
                 input_text = f"Enter desired velocity of foot in {double_variable_name[0]} direction"
 
-            (
-                input_dictionary,
-                cancelled,
-            ) = self.get_inverse_kinematics_setpoints_double_input(
+            (input_dictionary, cancelled,) = self.get_double_input(
                 input_dialogue, input_text, double_variable_name, input_dictionary
             )
             if cancelled:
@@ -366,7 +355,7 @@ class GaitGeneratorView(QWidget):
 
         return input_dictionary, False
 
-    def get_inverse_kinematics_setpoints_double_input(
+    def get_double_input(
         self, input_dialogue, input_text, asked_variable_name, input_dictionary
     ):
         """General input grabber for doubles for the filling of the inverse kinematics setpoints input."""
