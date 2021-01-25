@@ -245,10 +245,10 @@ class GaitGeneratorView(QWidget):
     def get_inverse_kinematics_setpoints_input_settings(self, input_dictionary):
         """Asks the user to specify certain settings needed for the inverse kinematics setpoints."""
         input_name = "foot_side"
-        resulting_variable, ok = QInputDialog.getItem(self, "enter foot side choice", input_name,
+        output_item, ok = QInputDialog.getItem(self, "enter foot side choice", input_name,
                                                         ["right", "left"], 0, False)
         if ok:
-            if resulting_variable == "right":
+            if output_item == "right":
                 input_dictionary[input_name] = Side.right
             else:
                 input_dictionary[input_name] = Side.left
@@ -259,7 +259,7 @@ class GaitGeneratorView(QWidget):
         output_item, ok = QInputDialog.getItem(self, "enter z axis choice", input_name,
                                                  ["from ground upwards", "from hip downwards"], 0, False)
         if ok:
-            input_dictionary[input_name] = resulting_variable
+            input_dictionary[input_name] = output_item
         else:
             return input_dictionary, True
 
@@ -305,7 +305,7 @@ class GaitGeneratorView(QWidget):
         ok = input_dialogue.exec_()
         resulting_number = input_dialogue.doubleValue()
         if ok:
-            input_dictionary[asked_variable_name] += resulting_number
+            input_dictionary[asked_variable_name] = resulting_number
             return input_dictionary, False
         else:
             return input_dictionary, True
