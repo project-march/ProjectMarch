@@ -9,8 +9,6 @@ from pyqtgraph.Qt import QtCore
 from python_qt_binding import loadUi
 from python_qt_binding.QtGui import QKeySequence
 from python_qt_binding.QtWidgets import (
-    QApplication,
-    QDialog,
     QFileDialog,
     QFrame,
     QHeaderView,
@@ -246,7 +244,7 @@ class GaitGeneratorView(QWidget):
         (
             input_dictionary,
             cancelled,
-        ) = self.get_inverse_kinematics_setpoints_input_foot_state(input_dictionary)
+        ) = self.get_foot_state_input(input_dictionary)
 
         return input_dictionary, cancelled
 
@@ -278,7 +276,7 @@ class GaitGeneratorView(QWidget):
         else:
             return input_dictionary, True
 
-        (input_dictionary, cancelled,) = self.get_yes_no_input(
+        (input_dictionary, cancelled) = self.get_yes_no_input(
             "Do you want to specify a desired foot velocity?",
             "set_velocity",
             input_dictionary,
@@ -287,7 +285,7 @@ class GaitGeneratorView(QWidget):
         if cancelled:
             return input_dictionary, cancelled
 
-        (input_dictionary, cancelled,) = self.get_yes_no_input(
+        (input_dictionary, cancelled) = self.get_yes_no_input(
             "Do you want to specify the y coordinate of the foot?",
             "set_y_coordinate",
             input_dictionary,
@@ -309,7 +307,7 @@ class GaitGeneratorView(QWidget):
         else:
             return input_dictionary, True
 
-    def get_inverse_kinematics_setpoints_input_foot_state(self, input_dictionary):
+    def get_foot_state_input(self, input_dictionary):
         """Asks the inputs for the foot coordinate needed for the inverse kinematics setpoints."""
         input_dialogue = QInputDialog(self)
         input_dialogue.setDoubleDecimals(2)
@@ -348,7 +346,7 @@ class GaitGeneratorView(QWidget):
             else:
                 input_text = f"Enter the desired velocity of foot in the {double_variable_name[0]} direction in cm / s"
 
-            (input_dictionary, cancelled,) = self.get_double_input(
+            (input_dictionary, cancelled) = self.get_double_input(
                 input_dialogue, input_text, double_variable_name, input_dictionary
             )
             if cancelled:
