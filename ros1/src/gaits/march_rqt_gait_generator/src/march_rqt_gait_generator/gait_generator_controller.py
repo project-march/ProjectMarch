@@ -406,12 +406,20 @@ class GaitGeneratorController(object):
             self.inverse_kinematics_input_dictionary,
             cancelled,
         ) = self.view.get_inverse_kinematics_setpoints_input()
+
+        # Check whether the input is valid
         if cancelled:
             rospy.loginfo("The inputs for the inverse kinematics were cancelled.")
             return
-        elif not 0 <= self.inverse_kinematics_input_dictionary['time_s'] <= self.subgait.duration:
-            rospy.loginfo(f"The specified time is invalid. Should be between 0 and the subgait duration. "
-                          f"{self.inverse_kinematics_input_dictionary['time_s']} was given.")
+        elif (
+            not 0
+            <= self.inverse_kinematics_input_dictionary["time_s"]
+            <= self.subgait.duration
+        ):
+            rospy.loginfo(
+                f"The specified time is invalid. Should be between 0 and the subgait duration. "
+                f"{self.inverse_kinematics_input_dictionary['time_s']} was given."
+            )
             return
 
         # Transform the input from relative to the default position to relative to the exoskeleton
