@@ -29,15 +29,19 @@ InputDeviceSafety::InputDeviceSafety(std::shared_ptr<SafetyNode> node, std::shar
   node_->get_parameter("input_device_connection_timeout", milliseconds);
 
   connection_timeout_ = rclcpp::Duration(std::chrono::milliseconds(milliseconds));
+
+  auto callback = [this](const AliveMsg::SharedPtr msg) {
+    inputDeviceAliveCallback(msg);
+  };
   subscriber_input_device_alive_ = node_->create_subscription<AliveMsg>(
-      "/march/input_device/alive", 10, std::bind(&InputDeviceSafety::inputDeviceAliveCallback, this, std::placeholders::_1));
+      "/march/input_device/alive", 10, callback);
 }
 
 /**
  * @brief Callback for when the input device publishes on the /march/input_device/alive topic
  * @param msg Alive msg
  */
-void InputDeviceSafety::inputDeviceAliveCallback(const march_shared_msgs::msg::Alive::SharedPtr msg)
+void InputDeviceSafety::inputDeviceAliveCallback(const AliveMsg::SharedPtr msg)
 {
   last_alive_stamps_[msg->id] = msg->stamp;
 }
