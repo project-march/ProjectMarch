@@ -19,15 +19,14 @@ const float THROTTLE_DURATION_MS {5000.0};
 
 /**
  * @param node Reference to the safety node
- * @param safety_handler Safety handler that can be used to publish errors
  */
-InputDeviceSafety::InputDeviceSafety(SafetyNode* node, std::shared_ptr<SafetyHandler> safety_handler):
+InputDeviceSafety::InputDeviceSafety(std::shared_ptr<SafetyNode> node, std::shared_ptr<SafetyHandler> safety_handler):
   node_(node),
   safety_handler_(safety_handler),
   connection_timeout_(0)
 {
   int milliseconds;
-  node->get_parameter("input_device_connection_timeout", milliseconds);
+  node_->get_parameter("input_device_connection_timeout", milliseconds);
 
   connection_timeout_ = rclcpp::Duration(std::chrono::milliseconds(milliseconds));
   subscriber_input_device_alive_ = node_->create_subscription<AliveMsg>(

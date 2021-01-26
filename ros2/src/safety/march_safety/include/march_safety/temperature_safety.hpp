@@ -13,8 +13,14 @@
 
 #include "march_safety/safety_type.hpp"
 #include "march_safety/safety_handler.hpp"
+#include "march_safety/safety_node.hpp"
 
-const std::string THRESHOLD_TYPES[] = {"fatal", "non_fatal", "warning"};
+enum ThresholdType
+{
+  FATAL,
+  NON_FATAL,
+  WARNING
+};
 
 class TemperatureSafety : public SafetyType
 {
@@ -22,7 +28,7 @@ class TemperatureSafety : public SafetyType
   using TemperatureSubscription = rclcpp::Subscription<TemperatureMsg>::SharedPtr;
   using ThresholdHoldsMap = std::map<std::string, double>;
 public:
-  TemperatureSafety(SafetyNode* node, std::shared_ptr<SafetyHandler> safety_handler, std::vector<std::string> joint_names);
+  TemperatureSafety(std::shared_ptr<SafetyNode> node, std::shared_ptr<SafetyHandler> safety_handler);
 
   void update() override { };
 
@@ -40,28 +46,23 @@ private:
   double getThreshold(const std::string& sensor_name, ThresholdHoldsMap temperature_thresholds_map);
 
   // Set all temperature thresholds.
-  void setAllTemperatureThresholds();
+  void setTemperatureThresholds();
 
-  // Set all temperature thresholds for a specific type.
-  void setTemperatureThresholds(std::string& type);
+  // Node to use for logging and getting time
+  std::shared_ptr<SafetyNode> node_;
 
-  // Set a temperature threshold for a specific type and joint.
-  void setThreshold(std::string& type, std::string joint, double threshold_value);
-
-  SafetyNode* node_;
+  // Safety handlers to use when logging errors
   std::shared_ptr<SafetyHandler> safety_handler_;
+
   double default_temperature_threshold_;
 
   rclcpp::Duration send_errors_interval_;
   rclcpp::Time time_last_send_error_;
 
-  // ThresholdHoldsMap to store threshold values for each joint
-  ThresholdHoldsMap fatal_temperature_thresholds_map_;
-  ThresholdHoldsMap non_fatal_temperature_thresholds_map_;
-  ThresholdHoldsMap warning_temperature_thresholds_map_;
+  // Map of ThresholdHoldsMaps to store threshold values for each joint
+  std::map<ThresholdType, ThresholdHoldsMap> thresholds_maps_;
 
   std::vector<TemperatureSubscription> temperature_subscribers_ = {};
-  std::vector<std::string> joint_names_;
 };
 
 #endif  // MARCH_SAFETY_TEMPERATURE_SAFETY_H

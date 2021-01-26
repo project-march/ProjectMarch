@@ -9,12 +9,8 @@
 #include <string>
 
 
-SafetyHandler::SafetyHandler(SafetyNode* node,
-                             ErrorPublisher error_publisher,
-                             GaitInstructionPublisher gait_instruction_publisher)
+SafetyHandler::SafetyHandler(std::shared_ptr<SafetyNode> node)
   : node_(node)
-  , error_publisher_(error_publisher)
-  , gait_instruction_publisher_(gait_instruction_publisher)
 {
 }
 
@@ -30,7 +26,7 @@ void SafetyHandler::publishErrorMessage(const std::string& message, int8_t error
   error_msg.header.stamp = node_->get_clock()->now();
   error_msg.error_message = message;
   error_msg.type = error_type;
-  error_publisher_->publish(error_msg);
+  node_->error_publisher->publish(error_msg);
 }
 
 /**
@@ -41,7 +37,7 @@ void SafetyHandler::publishStopMessage() const
   GaitInstruction gait_instruction_msg;
   gait_instruction_msg.header.stamp = node_->get_clock()->now();;
   gait_instruction_msg.type = GaitInstruction::STOP;
-  gait_instruction_publisher_->publish(gait_instruction_msg);
+  node_->gait_instruction_publisher->publish(gait_instruction_msg);
 }
 
 /**

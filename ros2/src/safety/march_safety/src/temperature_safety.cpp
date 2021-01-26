@@ -12,26 +12,26 @@
 const double DEFAULT_TEMPERATURE_THRESHOLD {40.0};
 const int DEFAULT_SEND_ERRORS_INTERVAL {1000};
 
+const std::map<ThresholdType, std::string> THRESHOLD_NAMES = {
+    { FATAL, "fatal"},
+    { NON_FATAL, "non_fatal"},
+    { WARNING, "warning"}
+};
+
 // TODO(@Tim) Throw an exception when no temperatures are published.
 /**
  * @brief Construct the TemperatureSafety class
  * @param node Node to use for logging
- * @param safety_handler Safety handler to use for publishing errors
- * @param joint_names List of joint names
  * @details Get the required parameters.
  *          Set all temperature thresholds.
  *          Create temperature subscribers.
  */
-TemperatureSafety::TemperatureSafety(SafetyNode* node,
-                                     std::shared_ptr<SafetyHandler> safety_handler,
-                                     std::vector<std::string> joint_names)
+TemperatureSafety::TemperatureSafety(std::shared_ptr<SafetyNode> node, std::shared_ptr<SafetyHandler> safety_handler)
   : node_(node),
   safety_handler_(safety_handler),
-  send_errors_interval_(0),
-  joint_names_(std::move(joint_names))
+  send_errors_interval_(0)
 {
   node_->get_parameter_or("default_temperature_threshold", default_temperature_threshold_, DEFAULT_TEMPERATURE_THRESHOLD);
-  setAllTemperatureThresholds();
 
   int send_errors_interval_ms;
   node_->get_parameter_or("send_errors_interval", send_errors_interval_ms, DEFAULT_SEND_ERRORS_INTERVAL);
@@ -39,65 +39,32 @@ TemperatureSafety::TemperatureSafety(SafetyNode* node,
 
   time_last_send_error_ = node_->get_clock()->now() - send_errors_interval_;
 
+  setTemperatureThresholds();
   createSubscribers();
 }
 
 /**
  * @brief Set all temperature thresholds.
  */
-void TemperatureSafety::setAllTemperatureThresholds()
+void TemperatureSafety::setTemperatureThresholds()
 {
-  for (auto type : THRESHOLD_TYPES)
+  for (auto type : THRESHOLD_NAMES)
   {
-    setTemperatureThresholds(type);
-  }
-}
+    ThresholdHoldsMap thresholds_map;
+    for (std::string joint : node_->joint_names)
+    {
+      double threshold_value;
+      std::string parameter_name = "temperature_thresholds_" + type.second + "." + joint;
 
-/**
- * @brief Set all temperature thresholds for a specific type.
- * @param type Type to set thresholds for.
- */
-void TemperatureSafety::setTemperatureThresholds(std::string& type)
-{
-  for (std::string joint : joint_names_)
-  {
-    double threshold_value;
-    std::string parameter_name = "temperature_thresholds_" + type + "." + joint;
+      bool parameter_is_set = node_->get_parameter_or(parameter_name, threshold_value, default_temperature_threshold_);
+      thresholds_map.insert({ joint, threshold_value });
 
-    bool parameter_is_set = node_->get_parameter_or(parameter_name, threshold_value, default_temperature_threshold_);
-    setThreshold(type, joint, threshold_value);
-
-    if (!parameter_is_set) {
+      if (!parameter_is_set) {
         node_->declare_parameter(parameter_name, default_temperature_threshold_);
+      }
     }
+    thresholds_maps_.insert({type.first, thresholds_map});
   }
-}
-
-/**
- * @brief Set a temperature threshold for a specific type and joint.
- * @param type Type to set thresholds for.
- * @param joint Joint to set thresholds for.
- * @param threshold_value Threshold value to set.
- */
-void TemperatureSafety::setThreshold(std::string& type, std::string joint, double threshold_value)
-{
-  // Is there a better way to do this ?
-    if (type == "fatal")
-    {
-      fatal_temperature_thresholds_map_.insert({ joint, threshold_value });
-    }
-    else if (type == "non_fatal")
-    {
-      non_fatal_temperature_thresholds_map_.insert({ joint, threshold_value });
-    }
-    else if (type == "warning")
-    {
-       warning_temperature_thresholds_map_.insert({ joint, threshold_value });
-    }
-    else
-    {
-        RCLCPP_WARN_STREAM(node_->get_logger(), "Unknown temperature threshold type: " << type);
-    }
 }
 
 /**
@@ -115,7 +82,7 @@ void TemperatureSafety::temperatureCallback(const TemperatureMsg::SharedPtr msg,
   }
 
   double temperature = msg->temperature;
-  if (temperature <= getThreshold(sensor_name, warning_temperature_thresholds_map_))
+  if (temperature <= getThreshold(sensor_name, thresholds_maps_.at(WARNING)))
   {
     return;
   }
@@ -131,15 +98,15 @@ void TemperatureSafety::temperatureCallback(const TemperatureMsg::SharedPtr msg,
   }
 
   // If the threshold is exceeded raise an error
-  if (temperature > getThreshold(sensor_name, fatal_temperature_thresholds_map_))
+  if (temperature > getThreshold(sensor_name, thresholds_maps_.at(FATAL)))
   {
     safety_handler_->publishFatal(error_message);
   }
-  else if (temperature > getThreshold(sensor_name, non_fatal_temperature_thresholds_map_))
+  else if (temperature > getThreshold(sensor_name, thresholds_maps_.at(NON_FATAL)))
   {
     safety_handler_->publishNonFatal(error_message);
   }
-  else if (temperature > getThreshold(sensor_name, warning_temperature_thresholds_map_))
+  else if (temperature > getThreshold(sensor_name, thresholds_maps_.at(WARNING)))
   {
     RCLCPP_WARN(node_->get_logger(), "%s", error_message.c_str());
   }
@@ -183,7 +150,7 @@ double TemperatureSafety::getThreshold(const std::string& sensor_name, Threshold
  */
 void TemperatureSafety::createSubscribers()
 {
-  for (const std::string& joint_name : joint_names_)
+  for (const std::string& joint_name : node_->joint_names)
   {
     // Construct callback instead of using std::bind
     // https://github.com/ros2/rclcpp/issues/583#issuecomment-442146657

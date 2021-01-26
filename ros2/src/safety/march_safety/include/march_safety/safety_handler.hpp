@@ -2,6 +2,7 @@
 #ifndef MARCH_SAFETY_SAFETY_HANDLER_H
 #define MARCH_SAFETY_SAFETY_HANDLER_H
 
+#include <memory>
 #include <string>
 
 #include "rclcpp/rclcpp.hpp"
@@ -15,12 +16,8 @@ class SafetyHandler
 {
   using ErrorMsg = march_shared_msgs::msg::Error;
   using GaitInstruction = march_shared_msgs::msg::GaitInstruction;
-  using ErrorPublisher = rclcpp::Publisher<ErrorMsg>::SharedPtr;
-  using GaitInstructionPublisher = rclcpp::Publisher<GaitInstruction>::SharedPtr;
 public:
-  SafetyHandler(SafetyNode* node,
-                ErrorPublisher error_publisher,
-                GaitInstructionPublisher gait_instruction_publisher);
+  SafetyHandler(std::shared_ptr<SafetyNode> node);
 
   // Publish a fatal error message to the /march/error topic
   void publishFatal(const std::string& message);
@@ -35,9 +32,7 @@ public:
   void publishStopMessage() const;
 
 private:
-  SafetyNode* node_;
-  ErrorPublisher error_publisher_;
-  GaitInstructionPublisher gait_instruction_publisher_;
+  std::shared_ptr<SafetyNode> node_;
 };
 
 #endif  // MARCH_SAFETY_SAFETY_HANDLER_H

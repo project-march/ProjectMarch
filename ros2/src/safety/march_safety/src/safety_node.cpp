@@ -23,7 +23,12 @@ int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
 
-  auto safety_node = std::make_shared<SafetyNode>("safety_node", "march");
+  auto safety_node = std::make_shared<SafetyNode>();
+
+  // Add the input device and temperature safety handlers
+  auto safety_handler = std::make_shared<SafetyHandler>(safety_node);
+  safety_node->safety_list.push_back(std::make_unique<InputDeviceSafety>(safety_node, safety_handler));
+  safety_node->safety_list.push_back(std::make_unique<TemperatureSafety>(safety_node, safety_handler));
 
   safety_node->start();
 
@@ -32,21 +37,17 @@ int main(int argc, char** argv)
   return 0;
 }
 
-SafetyNode::SafetyNode(const std::string& node_name, const std::string& node_namespace):
-  Node(node_name, node_namespace, rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true))
+SafetyNode::SafetyNode():
+  Node("safety_node", "march", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true))
 {
-  std::vector<std::string> joint_names = node_utils::get_joint_names(*this);
-
+  joint_names = node_utils::get_joint_names(*this);
   RCLCPP_DEBUG(this->get_logger(), "Got joint names.");
 
   // Create an error publisher to notify the system (state machine) if something is wrong
-  auto error_publisher = this->create_publisher<march_shared_msgs::msg::Error>("/march/error", 1000);
-  auto gait_instruction_publisher = this->create_publisher<march_shared_msgs::msg::GaitInstruction>("/march/input_device/instruction", 1000);
+  error_publisher = this->create_publisher<march_shared_msgs::msg::Error>("/march/error", 1000);
 
-  // Create the input and temperature safety handler
-  auto safety_handler = std::make_shared<SafetyHandler>(this, error_publisher, gait_instruction_publisher);
-  safety_list.push_back(std::make_unique<TemperatureSafety>(this, safety_handler, joint_names));
-  safety_list.push_back(std::make_unique<InputDeviceSafety>(this, safety_handler));
+  // Create an instruction publisher to publish when a gait has to stop
+  gait_instruction_publisher = this->create_publisher<march_shared_msgs::msg::GaitInstruction>("/march/input_device/instruction", 1000);
 }
 
 /**
