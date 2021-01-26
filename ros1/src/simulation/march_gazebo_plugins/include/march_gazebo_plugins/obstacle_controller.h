@@ -25,7 +25,6 @@ protected:
 
   physics::LinkPtr foot_left_;
   physics::LinkPtr foot_right_;
-  double upper_leg_length_;
   double halved_upper_leg_length_;
   double mass;
 

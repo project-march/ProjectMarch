@@ -38,7 +38,7 @@ ObstacleController::ObstacleController(physics::ModelPtr model)
   foot_right_ = model_->GetLink("ankle_plate_right");
   // Roughly the length of the upper leg, this is bodged for now as I cannot seem to get the length of the link
   // from the urdf in here. This is used for the goal position calculation when siting & standing up
-  upper_leg_length_ = 0.40;
+  double upper_leg_length_ = 0.40;
   halved_upper_leg_length_ = upper_leg_length_ / 2.0;
 
   ros::param::get("balance", balance_);
