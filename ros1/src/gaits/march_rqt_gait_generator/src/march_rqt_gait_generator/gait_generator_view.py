@@ -1,6 +1,7 @@
 import math
 import os
 import subprocess
+from typing import Dict, Tuple
 
 from march_shared_classes.utilities.side import Side
 
@@ -229,7 +230,7 @@ class GaitGeneratorView(QWidget):
             os.path.join(self.ros2_path, "src", "gaits", "march_gait_files"),
         )
 
-    def get_inverse_kinematics_setpoints_input(self):
+    def get_inverse_kinematics_setpoints_input(self) -> Tuple[Dict[str, any], bool]:
         """Asks the user the needed inputs, returns these plus a flag indicating cancellation of any input."""
         input_dictionary = {}
 
@@ -248,19 +249,20 @@ class GaitGeneratorView(QWidget):
 
         return input_dictionary, cancelled
 
-    def get_inverse_kinematics_setpoints_input_settings(self, input_dictionary):
+    def get_inverse_kinematics_setpoints_input_settings(
+        self, input_dictionary: Dict[str, any]
+    ) -> Tuple[Dict[str, any], bool]:
         """Asks the user to specify certain settings needed for the inverse kinematics setpoints."""
         input_name = "foot_side"
         output_item, ok = QInputDialog.getItem(
             self, "enter foot side choice", input_name, ["right", "left"], 0, False
         )
-        if ok:
-            if output_item == "right":
-                input_dictionary[input_name] = Side.right
-            else:
-                input_dictionary[input_name] = Side.left
-        else:
+        if not ok:
             return input_dictionary, True
+        if output_item == "right":
+            input_dictionary[input_name] = Side.right
+        else:
+            input_dictionary[input_name] = Side.left
 
         input_name = "z_axis"
         output_item, ok = QInputDialog.getItem(
@@ -271,10 +273,9 @@ class GaitGeneratorView(QWidget):
             0,
             False,
         )
-        if ok:
-            input_dictionary[input_name] = output_item
-        else:
+        if not ok:
             return input_dictionary, True
+        input_dictionary[input_name] = output_item
 
         (input_dictionary, cancelled) = self.get_yes_no_input(
             "Do you want to specify a desired foot velocity?",
@@ -293,7 +294,12 @@ class GaitGeneratorView(QWidget):
 
         return input_dictionary, cancelled
 
-    def get_yes_no_input(self, input_text, asked_variable_name, input_dictionary):
+    def get_yes_no_input(
+        self,
+        input_text: str,
+        asked_variable_name: str,
+        input_dictionary: Dict[str, any],
+    ) -> Tuple[Dict[str, any], bool]:
         """General input grabber for yes no questions."""
         output_item, ok = QInputDialog.getItem(
             self, input_text, asked_variable_name, ["no", "yes"], 0, False
@@ -307,7 +313,9 @@ class GaitGeneratorView(QWidget):
         else:
             return input_dictionary, True
 
-    def get_foot_state_input(self, input_dictionary):
+    def get_foot_state_input(
+        self, input_dictionary: Dict[str, any]
+    ) -> Tuple[Dict[str, any], bool]:
         """Asks the inputs for the foot coordinate needed for the inverse kinematics setpoints."""
         input_dialogue = QInputDialog(self)
         input_dialogue.setDoubleDecimals(2)
@@ -336,7 +344,9 @@ class GaitGeneratorView(QWidget):
                 continue
 
             # Form a string explaining the variable to the user from the variable name
-            input_text = self.get_input_text_for_foot_state_input_variable(double_variable_name)
+            input_text = self.get_input_text_for_foot_state_input_variable(
+                double_variable_name
+            )
 
             (input_dictionary, cancelled) = self.get_double_input(
                 input_dialogue, input_text, double_variable_name, input_dictionary
@@ -346,7 +356,10 @@ class GaitGeneratorView(QWidget):
 
         return input_dictionary, False
 
-    def get_input_text_for_foot_state_input_variable(self, double_variable_name):
+    def get_input_text_for_foot_state_input_variable(
+        self, double_variable_name: str
+    ) -> str:
+        """Form a string explaining the variable to the user from the variable name."""
         if double_variable_name == "time_s":
             input_text = "Enter the desired time of the desired foot position"
         elif double_variable_name.find("coordinate") != -1:
@@ -359,8 +372,12 @@ class GaitGeneratorView(QWidget):
         return input_text
 
     def get_double_input(
-        self, input_dialogue, input_text, asked_variable_name, input_dictionary
-    ):
+        self,
+        input_dialogue: QInputDialog,
+        input_text: str,
+        asked_variable_name: str,
+        input_dictionary: Dict[str, any],
+    ) -> Tuple[Dict[str, any], bool]:
         """General input grabber for doubles for the filling of the inverse kinematics setpoints input."""
         input_dialogue.setLabelText(input_text)
         ok = input_dialogue.exec_()
@@ -372,7 +389,7 @@ class GaitGeneratorView(QWidget):
             return input_dictionary, True
 
     @QtCore.pyqtSlot(int)
-    def update_main_time_slider(self, time):
+    def update_main_time_slider(self, time: float) -> None:
         self.time_slider.setValue(time)
 
     def update_joint_widgets(self, joints):

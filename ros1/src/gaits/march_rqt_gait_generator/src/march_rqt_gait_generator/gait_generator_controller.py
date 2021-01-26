@@ -3,6 +3,7 @@ import os
 from numpy_ringbuffer import RingBuffer
 import rospkg
 import rospy
+from typing import Dict
 
 from march_shared_classes.gait.subgait import Subgait
 from march_shared_classes.foot_classes.foot import Foot
@@ -400,7 +401,7 @@ class GaitGeneratorController(object):
             )
             self.view.change_gait_directory_button.setText(gait_directory_text)
 
-    def add_inverse_kinematics_setpoints(self):
+    def add_inverse_kinematics_setpoints(self) -> None:
         """Add setpoints to the gait based on a user specified desired foot location."""
         (
             self.inverse_kinematics_input_dictionary,
@@ -429,7 +430,7 @@ class GaitGeneratorController(object):
         setpoint_dictionary = self.get_setpoints_from_inverse_kinematics_input()
         self.add_setpoints_from_dictionary(setpoint_dictionary)
 
-    def transform_inverse_kinematics_setpoints_inputs(self):
+    def transform_inverse_kinematics_setpoints_inputs(self) -> None:
         """Transform the input coordinates (relative to a default foot location) to coordinates relative to the exo."""
         foot_side = self.inverse_kinematics_input_dictionary["foot_side"]
         [
@@ -447,7 +448,9 @@ class GaitGeneratorController(object):
             upper_leg_length, lower_leg_length
         )
 
-    def transform_inverse_kinematics_setpoints_x_coordinate(self, haa_to_leg_length):
+    def transform_inverse_kinematics_setpoints_x_coordinate(
+        self, haa_to_leg_length: float
+    ) -> None:
         """Add the default x coordinate to the desired x coordinate to transform to exoskeleton coordinate system."""
         default_x_position_cm = haa_to_leg_length * 100
         self.inverse_kinematics_input_dictionary[
@@ -455,8 +458,8 @@ class GaitGeneratorController(object):
         ] += default_x_position_cm
 
     def transform_inverse_kinematics_setpoints_y_coordinate(
-        self, haa_arm, base, foot_side
-    ):
+        self, haa_arm: float, base: float, foot_side: float
+    ) -> None:
         """Add the default y coordinate to the desired y coordinate to transform to exoskeleton coordinate system."""
         if foot_side == Side.right:
             default_y_position_cm = (base / 2 + haa_arm) * 100
@@ -467,8 +470,8 @@ class GaitGeneratorController(object):
         ] += default_y_position_cm
 
     def transform_inverse_kinematics_setpoints_z_coordinate(
-        self, upper_leg_length, lower_leg_length
-    ):
+        self, upper_leg_length: float, lower_leg_length: float
+    ) -> None:
         """Transform the z coordinate of the input to the coordinate system of the exoskeleton."""
         if self.inverse_kinematics_input_dictionary["z_axis"] == "from ground upwards":
             ground_z_coordinate_cm = (upper_leg_length + lower_leg_length) * 100
@@ -477,7 +480,7 @@ class GaitGeneratorController(object):
                 - self.inverse_kinematics_input_dictionary["z_coordinate_cm"]
             )
 
-    def get_setpoints_from_inverse_kinematics_input(self):
+    def get_setpoints_from_inverse_kinematics_input(self) -> None:
         """Use the inverse kinematics function to translate the desired foot coordinates to setpoints."""
         input_dictionary = self.inverse_kinematics_input_dictionary
         desired_position = Vector3d(
@@ -501,7 +504,9 @@ class GaitGeneratorController(object):
             desired_foot_state, input_dictionary["time_s"]
         )
 
-    def add_setpoints_from_dictionary(self, setpoint_dictionary):
+    def add_setpoints_from_dictionary(
+        self, setpoint_dictionary: Dict[str, any]
+    ) -> None:
         """Add setpoints from a dictionary with joints as keys to the current subgait."""
         for joint_name in setpoint_dictionary:
             time = setpoint_dictionary[joint_name].time
@@ -516,7 +521,7 @@ class GaitGeneratorController(object):
             self.view.update_joint_widget(joint)
             self.view.publish_preview(self.subgait, self.current_time)
 
-    def invert_gait(self):
+    def invert_gait(self) -> None:
         for side, controller in self.side_subgait_controller.items():
             controller.lock_checked = False
             self.handle_sidepoint_lock(side)
