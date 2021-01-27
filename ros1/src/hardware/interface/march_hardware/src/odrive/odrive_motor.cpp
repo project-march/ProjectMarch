@@ -228,14 +228,14 @@ bool OdriveMotor::getIncrementalMorePrecise() const
 
 int OdriveMotor::getAngleCountsIncremental()
 {
-//  ROS_INFO("Angle counts: %f ", this->angle_counts_incremental);
+  // ROS_INFO("Angle counts: %f ", this->angle_counts_incremental);
   return this->angle_counts_incremental;
 }
 
 double OdriveMotor::getAngleRadIncremental()
 {
-  double angle_rad = this->getAngleCountsIncremental() * PI_2 /  GEAR_RATIO;
-//  ROS_INFO("Angle rad: %f ", angle_rad);
+  double angle_rad = ((double)(this->getAngleCountsIncremental()) / 4096) * PI_2 /  (double)GEAR_RATIO;
+  ROS_INFO("Angle rad: %f ", angle_rad);
   return angle_rad;
 }
 
