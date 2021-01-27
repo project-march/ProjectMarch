@@ -5,6 +5,7 @@ import rospkg
 import rospy
 from typing import Dict
 
+from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
 from march_shared_classes.gait.subgait import Subgait
 from march_shared_classes.foot_classes.foot import Foot
 from march_shared_classes.utilities.side import Side
@@ -417,18 +418,26 @@ class GaitGeneratorController(object):
             <= self.inverse_kinematics_input_dictionary["time_s"]
             <= self.subgait.duration
         ):
+            warning_message = f"The specified time is invalid. " \
+                              f"Should be between 0 and the subgait duration {self.subgait.duration}. " \
+                              f"{self.inverse_kinematics_input_dictionary['time_s']} was given."
             rospy.loginfo(
-                f"The specified time is invalid. Should be between 0 and the subgait duration. "
-                f"{self.inverse_kinematics_input_dictionary['time_s']} was given."
+                warning_message
             )
+            self.view.message("The inverse kinematics setpoints feature has failed.", warning_message)
             return
 
         # Transform the input from relative to the default position to relative to the exoskeleton
         self.transform_inverse_kinematics_setpoints_inputs()
 
         # Calculate the setpoints from the desired foot coordinates and add them to the gait
-        setpoint_dictionary = self.get_setpoints_from_inverse_kinematics_input()
-        self.add_setpoints_from_dictionary(setpoint_dictionary)
+        try:
+            setpoint_dictionary = self.get_setpoints_from_inverse_kinematics_input()
+            self.add_setpoints_from_dictionary(setpoint_dictionary)
+        except SubgaitInterpolationError as e:
+            self.view.message("The inverse kinematics setpoints feature as failed.",
+                              "A subgait interpolation error occured, see the terminal for more information.")
+
 
     def transform_inverse_kinematics_setpoints_inputs(self) -> None:
         """Transform the input coordinates (relative to a default foot location) to coordinates relative to the exo."""
@@ -452,7 +461,7 @@ class GaitGeneratorController(object):
         self, haa_to_leg_length: float
     ) -> None:
         """Add the default x coordinate to the desired x coordinate to transform to exoskeleton coordinate system."""
-        default_x_position_cm = haa_to_leg_length * 100
+        default_x_position_cm = haa_to_leg_length * 100  # multiply by 100 as the lengths are m and the input cm
         self.inverse_kinematics_input_dictionary[
             "x_coordinate_cm"
         ] += default_x_position_cm
@@ -461,10 +470,11 @@ class GaitGeneratorController(object):
         self, haa_arm: float, base: float, foot_side: float
     ) -> None:
         """Add the default y coordinate to the desired y coordinate to transform to exoskeleton coordinate system."""
+        hip_to_foot_length_cm = (base / 2 + haa_arm) * 100  # multiply by 100 as the lengths are m and the input cm
         if foot_side == Side.right:
-            default_y_position_cm = (base / 2 + haa_arm) * 100
+            default_y_position_cm = hip_to_foot_length_cm
         else:
-            default_y_position_cm = (-base / 2 - haa_arm) * 100
+            default_y_position_cm = - hip_to_foot_length_cm
         self.inverse_kinematics_input_dictionary[
             "y_coordinate_cm"
         ] += default_y_position_cm
@@ -474,6 +484,7 @@ class GaitGeneratorController(object):
     ) -> None:
         """Transform the z coordinate of the input to the coordinate system of the exoskeleton."""
         if self.inverse_kinematics_input_dictionary["z_axis"] == "from ground upwards":
+            # multiply exoskeleton lengths by 100 as the lengths are m and the input cm
             ground_z_coordinate_cm = (upper_leg_length + lower_leg_length) * 100
             self.inverse_kinematics_input_dictionary["z_coordinate_cm"] = (
                 ground_z_coordinate_cm
@@ -484,12 +495,13 @@ class GaitGeneratorController(object):
         """Use the inverse kinematics function to translate the desired foot coordinates to setpoints."""
         input_dictionary = self.inverse_kinematics_input_dictionary
         desired_position = Vector3d(
-            input_dictionary["x_coordinate_cm"] / 100,
+            input_dictionary["x_coordinate_cm"] / 100,  # for inverse kinematics we need the input in meters
             input_dictionary["y_coordinate_cm"] / 100,
             input_dictionary["z_coordinate_cm"] / 100,
         )
         if input_dictionary["set_velocity"]:
             desired_velocity = Vector3d(
+                # for inverse kinematics we need the input in meters per second
                 input_dictionary["x_velocity_cm_per_s"] / 100,
                 input_dictionary["y_velocity_cm_per_s"] / 100,
                 input_dictionary["z_velocity_cm_per_s"] / 100,
