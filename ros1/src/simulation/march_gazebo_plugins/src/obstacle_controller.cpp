@@ -177,21 +177,20 @@ void ObstacleController::getGoalPosition(double time_since_start)
   }
 
   // Y coordinate of the goal position is determined from the location of the stable foot
+  goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
+
   // X coordinate of the goal position is determined from the current subgait the exoskeleton in executing
   // if the exo skeleton is frozen, do not send a new goal_position_x, keep it at previous value
   if (subgait_name_.find("freeze") == std::string::npos)
   {
     if (subgait_name_.find("sit") != std::string::npos || subgait_name_ == "prepare_stand_up") {
       getSitGoalPositionX(time_since_start, stable_foot_pose.X());
-      goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
     }
     else if (subgait_name_.find("stand") != std::string::npos) {
       getStandGoalPositionX(time_since_start, stable_foot_pose.X());
-      goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
     }
     else if (subgait_name_.find("right") != std::string::npos || subgait_name_.find("left") != std::string::npos) {
       getWalkGoalPositionX(time_since_start, stable_foot_pose.X());
-      goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
     }
   }
 }
