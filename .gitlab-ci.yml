@@ -43,7 +43,6 @@ container:build:
   rules:
     - if: '$CI_COMMIT_BRANCH'
       changes:
-        - .gitlab-ci.yml
         - Dockerfile
 
 # Runs a linter on the code to see if the code style is consistent and to avoid common
