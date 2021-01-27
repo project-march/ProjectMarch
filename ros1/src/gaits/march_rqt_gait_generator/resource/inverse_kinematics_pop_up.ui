@@ -235,7 +235,11 @@ to the default foot position.</string>
      </widget>
     </item>
     <item row="11" column="1">
-     <widget class="QDoubleSpinBox" name="xVelocitySpinBox"/>
+     <widget class="QDoubleSpinBox" name="xVelocitySpinBox">
+      <property name="minimum">
+       <double>-99.989999999999995</double>
+      </property>
+     </widget>
     </item>
     <item row="12" column="0">
      <widget class="QLabel" name="yVelocityLabel">
@@ -245,7 +249,11 @@ to the default foot position.</string>
      </widget>
     </item>
     <item row="12" column="1">
-     <widget class="QDoubleSpinBox" name="yVelocitySpinBox"/>
+     <widget class="QDoubleSpinBox" name="yVelocitySpinBox">
+      <property name="minimum">
+       <double>-99.989999999999995</double>
+      </property>
+     </widget>
     </item>
     <item row="13" column="0">
      <widget class="QLabel" name="zVelocityLabel">
@@ -258,7 +266,11 @@ to the default foot position.</string>
      </widget>
     </item>
     <item row="13" column="1">
-     <widget class="QDoubleSpinBox" name="zVelocitySpinBox"/>
+     <widget class="QDoubleSpinBox" name="zVelocitySpinBox">
+      <property name="minimum">
+       <double>-99.989999999999995</double>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
