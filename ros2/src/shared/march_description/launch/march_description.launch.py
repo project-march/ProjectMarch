@@ -47,7 +47,6 @@ def generate_launch_description():
                         ),
                     }
                 ],
-                # condition=UnlessCondition(balance)
             ),
         ]
     )
