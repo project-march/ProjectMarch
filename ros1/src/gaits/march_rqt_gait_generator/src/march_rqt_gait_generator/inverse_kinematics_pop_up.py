@@ -7,7 +7,7 @@ from march_shared_classes.utilities.side import Side
 
 class InverseKinematicsPopUpWindow(QDialog):
     """A pop up window for retrieving the inputs for the inverse kinematics setpoints feature."""
-    
+
     def __init__(self, parent, ui_file: str):
         """Connects the ok and cancel buttons."""
         super(InverseKinematicsPopUpWindow, self).__init__(
@@ -42,7 +42,7 @@ class InverseKinematicsPopUpWindow(QDialog):
             self.foot_side = Side.left
 
         self.z_axis = self.zAxisComboBox.currentText()
-        self.use_default_y_position = self.useDefaultYComboBox.currentText() == "yes"
+        self.use_default_y_position = self.useDefaultYComboBox.currentText() == "Yes"
         self.position_input = (
             Vector3d(
                 self.xCoordinateSpinBox.value(),
