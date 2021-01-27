@@ -100,7 +100,6 @@ def generate_launch_description():
                         "to_world_transform": to_world_transform,
                     }
                 ],
-                # condition=UnlessCondition(balance)
             ),
         ]
     )

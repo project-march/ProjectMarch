@@ -30,8 +30,9 @@ class MoveItInterface:
 
         moveit_commander.PlanningSceneInterface()
 
-        self.trajectory_publisher = rospy.Publisher("/traj", JointTrajectory, 10)
-        self.log_publisher = rospy.Publisher('/log_test', String, 10)
+        self.trajectory_publisher = rospy.Publisher("/traj", JointTrajectory,
+                                                    queue_size=10)
+        self.log_publisher = rospy.Publisher('/log_test', String, queue_size=10)
 
         try:
             self.move_group = {
