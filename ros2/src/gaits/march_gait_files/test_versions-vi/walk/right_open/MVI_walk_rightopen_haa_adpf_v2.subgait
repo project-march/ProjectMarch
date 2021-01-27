@@ -10,16 +10,11 @@ joints:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: 0.1426
-    time_from_start:
-      nsecs: 961800000
-      secs: 0
-    velocity: 0.0
-  - position: 0.0436
+  - position: 0.04360007
     time_from_start:
       nsecs: 300000000
       secs: 1
-    velocity: -0.32
+    velocity: 0.0
   left_hip_aa:
   - position: 0.0
     time_from_start:
@@ -69,31 +64,26 @@ joints:
       secs: 1
     velocity: 0.0
   right_ankle:
-  - position: 0.0436
+  - position: 0.04360007
     time_from_start:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: -0.1047
+  - position: -0.06632251
     time_from_start:
       nsecs: 250000000
       secs: 0
-    velocity: 0.0
-  - position: 0.0785
+    velocity: 0.34906585
+  - position: 0.04363323
     time_from_start:
-      nsecs: 700100000
+      nsecs: 622000000
       secs: 0
-    velocity: 0.3491
-  - position: 0.1222
-    time_from_start:
-      nsecs: 0
-      secs: 1
     velocity: 0.0
-  - position: 0.0436
+  - position: 0.04360007
     time_from_start:
       nsecs: 300000000
       secs: 1
-    velocity: -0.32
+    velocity: 0.0
   right_hip_aa:
   - position: 0.0
     time_from_start:
@@ -116,11 +106,11 @@ joints:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: 0.6109
+  - position: 0.61090014
     time_from_start:
       nsecs: 780000000
       secs: 0
-    velocity: 0.1396
+    velocity: 0.13960016
   - position: 0.3752
     time_from_start:
       nsecs: 300000000
@@ -132,12 +122,12 @@ joints:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: 1.0472
+  - position: 1.20427718
     time_from_start:
       nsecs: 546000000
       secs: 0
     velocity: 0.0
-  - position: 0.0969
+  - position: 0.09690068
     time_from_start:
       nsecs: 169999999
       secs: 1
