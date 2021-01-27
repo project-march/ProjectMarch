@@ -14,5 +14,4 @@ def main():
                   GetMoveItTrajectory,
                   moveit_interface.get_joint_trajectory)
 
-
     rospy.spin()

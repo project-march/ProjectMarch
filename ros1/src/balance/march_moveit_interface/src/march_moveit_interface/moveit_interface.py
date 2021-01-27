@@ -5,6 +5,7 @@ from typing import Optional
 
 import moveit_commander
 import rospy
+from geometry_msgs.msg import Pose
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Header, String
 from march_shared_msgs.srv import CapturePointPose, GetMoveItTrajectoryRequest, \
@@ -30,10 +31,6 @@ class MoveItInterface:
 
         moveit_commander.PlanningSceneInterface()
 
-        self.trajectory_publisher = rospy.Publisher("/traj", JointTrajectory,
-                                                    queue_size=10)
-        self.log_publisher = rospy.Publisher('/log_test', String, queue_size=10)
-
         try:
             self.move_group = {
                 "all_legs": moveit_commander.MoveGroupCommander("all_legs"),
@@ -50,14 +47,14 @@ class MoveItInterface:
                 "moveit interface node"
             )
 
-    def set_swing_leg_target(self, leg_name, joint_state):
+    def set_swing_leg_target(self, leg_name: str, target_pose: Pose):
         """Set the swing leg target to capture point.
 
         :param leg_name: The name of the used move group
         :param subgait_name: the normal subgait name
         """
         self.move_group[leg_name].set_joint_value_target(
-            joint_state, self._end_effectors[leg_name], True
+            target_pose, self._end_effectors[leg_name], True
         )
 
     def set_stance_leg_target(self, leg_name, joint_state):
@@ -70,7 +67,7 @@ class MoveItInterface:
         """
         self.move_group[leg_name].set_joint_value_target(joint_state)
 
-    def construct_trajectory(self, swing_leg: str, swing_leg_target: JointState,
+    def construct_trajectory(self, swing_leg: str, swing_leg_target: Pose,
                              stance_leg_target: JointState) -> Optional[
         JointTrajectory]:
         """Constructs a balance trajectory for all joints.
@@ -80,10 +77,15 @@ class MoveItInterface:
 
         :return: the balance trajectory
         """
+        rospy.loginfo("Constructing trajectory")
         stance_leg = "right_leg" if swing_leg == "left_leg" else "left_leg"
 
         self.set_swing_leg_target(swing_leg, swing_leg_target)
+        rospy.loginfo("Done setting swing leg target")
         self.set_stance_leg_target(stance_leg, stance_leg_target)
+        rospy.loginfo("Done setting stance leg target")
+
+        self._joint_state_target = JointState()
 
         targets = (
             self.move_group["left_leg"].get_joint_value_target()
@@ -93,42 +95,31 @@ class MoveItInterface:
         self._joint_state_target.header.stamp = rospy.Time.now()
         self._joint_state_target.position = targets
 
-        balance_subgait = self.move_group["all_legs"].plan(self._joint_state_target)
-        balance_trajectory = balance_subgait.joint_trajectory
+        rospy.loginfo("Planning")
+        plan = self.move_group["all_legs"].plan(
+            self._joint_state_target)
+        rospy.loginfo("Done planning")
 
-        if not balance_trajectory:
+        if not plan[0]:
             rospy.logwarn(
-                "No valid balance trajectory for {ln} received from capture point leg, "
-                "returning default subgait".format(ln=swing_leg)
+                f"No valid balance trajectory for {swing_leg} received from capture "
+                f"point leg, returning default subgait"
             )
             return None
 
-        if not balance_trajectory.points:
-            rospy.logwarn(
-                "Empty trajectory in {ln} received from capture point topic, "
-                "returning default subgait".format(ln=swing_leg)
-            )
-            return None
+        return plan[1]
 
-        self.trajectory_publisher.publish(balance_trajectory)
-
-        return balance_trajectory
-
-    def get_joint_trajectory(self, req: GetMoveItTrajectoryRequest,
-                                 res: GetMoveItTrajectoryResponse) -> None:
+    def get_joint_trajectory(self, req: GetMoveItTrajectoryRequest) -> GetMoveItTrajectoryResponse:
         """Returns the trajectory of a subgait name that could use moveit.
 
         :param name: the name of the subgait
         """
-
-        self.log_publisher.publish('Request received')
-        trajectory = self.construct_trajectory(req.swing_leg, req.swing_leg_target,
+        res = GetMoveItTrajectoryResponse()
+        trajectory = self.construct_trajectory(req.swing_leg, req.swing_leg_target_pose,
                                                    req.stance_leg_target)
-        self.log_publisher.publish('Trajectory constructed')
-        self.trajectory_publisher.publish(trajectory)
         if trajectory is not None:
-            res.succes = True
+            res.success = True
             res.trajectory = trajectory
         else:
-            res.succes = False
-        return
+            res.success = False
+        return res
