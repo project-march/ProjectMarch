@@ -418,13 +418,15 @@ class GaitGeneratorController(object):
             <= self.inverse_kinematics_input_dictionary["time_s"]
             <= self.subgait.duration
         ):
-            warning_message = f"The specified time is invalid. " \
-                              f"Should be between 0 and the subgait duration {self.subgait.duration}. " \
-                              f"{self.inverse_kinematics_input_dictionary['time_s']} was given."
-            rospy.loginfo(
-                warning_message
+            warning_message = (
+                f"The specified time is invalid. "
+                f"Should be between 0 and the subgait duration {self.subgait.duration}. "
+                f"{self.inverse_kinematics_input_dictionary['time_s']} was given."
             )
-            self.view.message("The inverse kinematics setpoints feature has failed.", warning_message)
+            rospy.loginfo(warning_message)
+            self.view.message(
+                "The inverse kinematics setpoints feature has failed.", warning_message
+            )
             return
 
         # Transform the input from relative to the default position to relative to the exoskeleton
@@ -435,9 +437,10 @@ class GaitGeneratorController(object):
             setpoint_dictionary = self.get_setpoints_from_inverse_kinematics_input()
             self.add_setpoints_from_dictionary(setpoint_dictionary)
         except SubgaitInterpolationError as e:
-            self.view.message("The inverse kinematics setpoints feature as failed.",
-                              "A subgait interpolation error occured, see the terminal for more information.")
-
+            self.view.message(
+                "The inverse kinematics setpoints feature as failed.",
+                "A subgait interpolation error occured, see the terminal for more information.",
+            )
 
     def transform_inverse_kinematics_setpoints_inputs(self) -> None:
         """Transform the input coordinates (relative to a default foot location) to coordinates relative to the exo."""
@@ -461,7 +464,9 @@ class GaitGeneratorController(object):
         self, haa_to_leg_length: float
     ) -> None:
         """Add the default x coordinate to the desired x coordinate to transform to exoskeleton coordinate system."""
-        default_x_position_cm = haa_to_leg_length * 100  # multiply by 100 as the lengths are m and the input cm
+        default_x_position_cm = (
+            haa_to_leg_length * 100
+        )  # multiply by 100 as the lengths are m and the input cm
         self.inverse_kinematics_input_dictionary[
             "x_coordinate_cm"
         ] += default_x_position_cm
@@ -470,11 +475,13 @@ class GaitGeneratorController(object):
         self, haa_arm: float, base: float, foot_side: float
     ) -> None:
         """Add the default y coordinate to the desired y coordinate to transform to exoskeleton coordinate system."""
-        hip_to_foot_length_cm = (base / 2 + haa_arm) * 100  # multiply by 100 as the lengths are m and the input cm
+        hip_to_foot_length_cm = (
+            base / 2 + haa_arm
+        ) * 100  # multiply by 100 as the lengths are m and the input cm
         if foot_side == Side.right:
             default_y_position_cm = hip_to_foot_length_cm
         else:
-            default_y_position_cm = - hip_to_foot_length_cm
+            default_y_position_cm = -hip_to_foot_length_cm
         self.inverse_kinematics_input_dictionary[
             "y_coordinate_cm"
         ] += default_y_position_cm
@@ -495,7 +502,8 @@ class GaitGeneratorController(object):
         """Use the inverse kinematics function to translate the desired foot coordinates to setpoints."""
         input_dictionary = self.inverse_kinematics_input_dictionary
         desired_position = Vector3d(
-            input_dictionary["x_coordinate_cm"] / 100,  # for inverse kinematics we need the input in meters
+            input_dictionary["x_coordinate_cm"]
+            / 100,  # for inverse kinematics we need the input in meters
             input_dictionary["y_coordinate_cm"] / 100,
             input_dictionary["z_coordinate_cm"] / 100,
         )
