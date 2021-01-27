@@ -37,9 +37,11 @@ public:
      * @param data
      * @return
      */
-    bool readReferenceFromFile(const char* filename, vector<vector<double>>& data);
+    bool readReferenceFromFile(const char* fileName, vector<vector<double>>& reference);
 
-    void setReference(vector<vector<double>>& data, int iter);
+    void setReference(vector<vector<double>> reference);
+
+    void scrollReference(vector<vector<double>>& reference);
 
 private:
 

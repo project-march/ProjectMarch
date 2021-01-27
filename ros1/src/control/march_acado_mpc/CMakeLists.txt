@@ -117,3 +117,7 @@ install(FILES controller_plugins.xml
 install(DIRECTORY launch
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
         )
+
+install(DIRECTORY references
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+        )
