@@ -255,11 +255,11 @@ class GaitGeneratorView(QWidget):
         """Asks the user to specify certain settings needed for the inverse kinematics setpoints."""
         input_name = "foot_side"
         output_item, ok = QInputDialog.getItem(
-            self, "enter foot side choice", input_name, ["right", "left"], 0, False
+            self, "enter foot side choice", input_name, ["Right", "Left"], 0, False
         )
         if not ok:
             return input_dictionary, True
-        if output_item == "right":
+        if output_item == "Right":
             input_dictionary[input_name] = Side.right
         else:
             input_dictionary[input_name] = Side.left
