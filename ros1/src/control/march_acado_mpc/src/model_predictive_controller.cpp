@@ -26,32 +26,19 @@ void ModelPredictiveController::init()
   // Initialize the solver
   acado_initializeSolver();
 
-  // Initialise the states vector
-  for (int i = 0; i < ACADO_N + 1; ++i) {
-    acadoVariables.x[i * ACADO_NX] = 0; // theta
+  // Prepare a consistent initial guess
+  for (int i = 0; i < ACADO_N + 1; i++) {
+    acadoVariables.x[i * ACADO_NX + 0] = 0; // theta
     acadoVariables.x[i * ACADO_NX + 1] = 0; // dtheta
   }
 
-  // Initialise the control input vector
   for (int i = 0; i < ACADO_N; i++) {
-    acadoVariables.u[i * ACADO_NU] = 0; // T
+      acadoVariables.u[i * ACADO_NU] = 0; // T
   }
 
-  // Set angle step reference value
-  double theta_ref = 90*(M_PI/180);
-
-  // Prepare references (step reference)
-//  ModelPredictiveController::setReference(reference, iter);
-
-//  for (int i = 0; i < ACADO_N; ++i) {
-//    acadoVariables.y[i * ACADO_NY + 0] = theta_ref; // theta
-//    acadoVariables.y[i * ACADO_NY + 1] = 0;         // dtheta
-//    acadoVariables.y[i * ACADO_NY + 2] = 0;         // T
-//  }
-//
-//  acadoVariables.yN[0] = theta_ref; // theta
-//  acadoVariables.yN[1] = 0;         // dtheta
-//  acadoVariables.yN[2] = 0;         // T
+  // Set reference and scroll one step up
+  ModelPredictiveController::setReference(reference);
+  ModelPredictiveController::scrollReference(reference);
 
   // Set the current initial state
   setInitialState(x0);
@@ -108,7 +95,8 @@ void ModelPredictiveController::calculateControlInput() {
   setInitialState(x0);
 
   // Set reference
-  ModelPredictiveController::setReference(reference, iter);
+  ModelPredictiveController::setReference(reference);
+  ModelPredictiveController::scrollReference(reference);
 
   // preparation step
   acado_preparationStep();
@@ -120,8 +108,6 @@ void ModelPredictiveController::calculateControlInput() {
   // Shift states and control and prepare for the next iteration
   acado_shiftStates(2, 0, 0);
   acado_shiftControls(0);
-
-  iter++;
 
 }
 
