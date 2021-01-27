@@ -408,7 +408,7 @@ class GaitGeneratorController(object):
         if self.view.inverse_kinematics_pop_up.cancelled:
             rospy.loginfo("The inputs for the inverse kinematics were cancelled.")
             return
-        elif not 0 <= self.view.inverse_kinematics_pop_up.time <= self.subgait.duration:
+        if not 0 <= self.view.inverse_kinematics_pop_up.time <= self.subgait.duration:
             warning_message = (
                 "The inverse kinematics setpoints feature has failed."
                 f"The specified time is invalid. "
