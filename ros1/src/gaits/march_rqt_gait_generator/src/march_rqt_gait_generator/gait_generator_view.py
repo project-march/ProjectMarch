@@ -45,9 +45,9 @@ class GaitGeneratorView(QWidget):
         path = "/"
         for directory in current_file_path:
             path = os.path.join(path, directory)
-            if directory == "ros2":
+            if directory == "march":
                 break
-        self.ros2_path = path
+        self.march_path = path
 
         self.joint_widgets = {}
         self.tf_listener = TransformListener()
@@ -220,7 +220,7 @@ class GaitGeneratorView(QWidget):
         return QFileDialog.getOpenFileName(
             self,
             "Select a subgait to import.",
-            os.path.join(self.ros2_path, "src", "gaits", "march_gait_files"),
+            os.path.join(self.march_path, "ros2", "src", "gaits", "march_gait_files"),
             "March Subgait (*.subgait)",
         )
 
@@ -229,7 +229,7 @@ class GaitGeneratorView(QWidget):
             None,
             "Select a directory to save gaits. Directory must be "
             "a subdirectory of march_gait_files or be named resources.",
-            os.path.join(self.ros2_path, "src", "gaits", "march_gait_files"),
+            os.path.join(self.march_path, "ros2", "src", "gaits", "march_gait_files"),
         )
 
     # def get_inverse_kinematics_setpoints_input(self) -> Tuple[Dict[str, any], bool]:
