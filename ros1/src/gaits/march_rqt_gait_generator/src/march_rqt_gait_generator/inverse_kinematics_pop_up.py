@@ -1,14 +1,16 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog
 from python_qt_binding import loadUi
+from python_qt_binding.QtWidgets import QWidget
+
 from march_shared_classes.utilities.vector_3d import Vector3d
 from march_shared_classes.utilities.side import Side
 
 
 class InverseKinematicsPopUpWindow(QDialog):
-    """A pop up window for retrieving the inputs for the inverse kinematics setpoints feature."""
+    """Retrieves the inputs for the inverse kinematics setpoints feature with a pop up."""
 
-    def __init__(self, parent, ui_file: str):
+    def __init__(self, parent: QWidget, ui_file: str) -> None:
         """Connects the ok and cancel buttons."""
         super(InverseKinematicsPopUpWindow, self).__init__(
             parent=parent, flags=Qt.Window
@@ -18,7 +20,7 @@ class InverseKinematicsPopUpWindow(QDialog):
         self.buttonBox.accepted.connect(self.save)
         self.buttonBox.rejected.connect(self.cancel)
 
-    def show_pop_up(self):
+    def show_pop_up(self) -> any:
         """Show pop up."""
         self.foot_side = ""
         self.z_axis = ""
@@ -29,12 +31,12 @@ class InverseKinematicsPopUpWindow(QDialog):
         self.cancelled = False
         return super(InverseKinematicsPopUpWindow, self).exec_()
 
-    def cancel(self):
+    def cancel(self) -> None:
         """Close without applying the values."""
         self.cancelled = True
         self.reject()
 
-    def save(self):
+    def save(self) -> None:
         """Check and save value while closing, close if successful."""
         if self.footSideComboBox.currentText() == "Right":
             self.foot_side = Side.right
