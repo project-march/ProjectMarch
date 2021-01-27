@@ -70,16 +70,13 @@ class BalanceGait(GaitInterface):
             f"{self._capture_point_service[leg_name]}")
 
         self.capture_point_event.clear()
-        # self._node.get_logger().info(f'Event {self.capture_point_event}')
 
         future = self._capture_point_service[
                 leg_name].call_async(
                 CapturePointPose.Request(duration=subgait_duration))
 
-        rclpy.spin_until_future_complete(self._node, future)
-        # self.capture_point_future.add_done_callback(self.capture_point_cb)
-        # self.capture_point_event.wait(timeout=self.CAPTURE_POINT_SERVICE_TIMEOUT)
-        self._node.get_logger().info(f"{future.done()}")
+        future.add_done_callback(self.capture_point_cb)
+        return self.capture_point_event.wait(timeout=self.CAPTURE_POINT_SERVICE_TIMEOUT)
 
     def capture_point_cb(self, future: Future):
         self._node.get_logger().info("Capture point callback")
@@ -127,26 +124,29 @@ class BalanceGait(GaitInterface):
         stance_leg = "right_leg" if swing_leg == "left_leg" else "left_leg"
         self._node.get_logger().info('Constructing trajectory')
         capture_point_success = self.compute_swing_leg_target(swing_leg, subgait_name)
-        # if not capture_point_success:
-        #     self._node.get_logger().warn("Capture point call took too long, "
-        #                                  "using default gait.")
-        #     self._node.get_logger().warn(f"Status is "
-        #                                  f"{self.capture_point_event.is_set()} - "
-        #                                  f"{self.capture_point_future.done()} - "
-        #                                  f"{self.capture_point_future.result()}")
-        #     return self.default_walk[subgait_name].to_joint_trajectory_msg()
+        if not capture_point_success:
+            self._node.get_logger().warn("Capture point call took too long, "
+                                         "using default gait.")
+            return self.default_walk[subgait_name].to_joint_trajectory_msg()
         stance_leg_target = self.compute_stance_leg_target(stance_leg, subgait_name)
 
         self.moveit_event.clear()
         self._node.get_logger().info('Time for moveit interface call')
+        self._node.get_logger().info(f"Capture point: "
+                                     f"{self.capture_point_result.capture_point}")
+        self._node.get_logger().info(f"Swing leg: "
+                                     f"{swing_leg}, "
+                                     f"stance leg target"
+                                     f"{stance_leg_target}")
         trajectory_future = \
             self._moveit_trajectory_service.call_async(GetMoveItTrajectory.Request(
                 swing_leg=swing_leg,
-                swing_leg_target=self.capture_point_result.capture_point,
+                swing_leg_target_pose=self.capture_point_result.capture_point,
                 stance_leg_target=stance_leg_target))
 
         trajectory_future.add_done_callback(self.moveit_event_cb)
         if self.moveit_event.wait(self.MOVEIT_INTERFACE_SERVICE_TIMEOUT):
+            self._node.get_logger().info("Done with moveit call, returning:")
             return self.moveit_trajectory_result.trajectory
         else:
             self._node.get_logger().warn("Moveit interface call took too long, "
