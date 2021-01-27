@@ -243,7 +243,8 @@ class GaitStateMachine(object):
     def run(self):
         """Runs the state machine until shutdown is requested."""
         self.update_timer = self._gait_selection.create_timer(
-            timer_period_sec=self._timer_period, callback=self.update
+            timer_period_sec=self._timer_period, callback=self.update,
+            callback_group=ReentrantCallbackGroup()
         )
         self.last_update_time = self._gait_selection.get_clock().now()
 
@@ -253,7 +254,6 @@ class GaitStateMachine(object):
         machine is started, this function is called every timer period.
         """
         if not self._shutdown_requested:
-            self._gait_selection.get_logger().info("Update")
             now = self._gait_selection.get_clock().now()
             elapsed_time = Duration.from_ros_duration(now - self.last_update_time)
             self.last_update_time = now
@@ -342,7 +342,7 @@ class GaitStateMachine(object):
                 self._current_gait = self._gait_selection[self._current_state]
 
             self._gait_selection.get_logger().info(
-                "Executing gait `{0}`".format(self._current_gait.name)
+                f"Executing gait `{self._current_gait.name}`"
             )
             trajectory = self._current_gait.start()
             if trajectory is not None:
@@ -353,27 +353,31 @@ class GaitStateMachine(object):
                     )
                 self._call_gait_callbacks()
                 self._gait_selection.get_logger().info(
-                    "Scheduling {subgait}".format(
-                        subgait=self._current_gait.subgait_name
-                    )
+                    f"Scheduling {self._current_gait.subgait_name}"
                 )
 
                 self._trajectory_scheduler.schedule(trajectory)
             elapsed_time = Duration(0)
 
-        if self._trajectory_scheduler.failed():
-            self._trajectory_scheduler.reset()
-            self._current_gait.end()
-            self._current_gait = None
-            self._transition_to_unknown()
-            self._input.gait_finished()
-            return
+        # if self._trajectory_scheduler.failed():
+        #     self._trajectory_scheduler.reset()
+        #     self._current_gait.end()
+        #     self._current_gait = None
+        #     self._transition_to_unknown()
+        #     self._input.gait_finished()
+        #     return
 
         self._handle_input()
         trajectory, should_stop = self._current_gait.update(elapsed_time)
+        self._gait_selection.get_logger().info(
+            f"Gait update done: `{trajectory}`, {should_stop}"
+        )
         # schedule trajectory if any
         if trajectory is not None:
             self._call_gait_callbacks()
+            self._gait_selection.get_logger().info(
+                f"Scheduling"
+            )
             self._gait_selection.get_logger().info(
                 f"Scheduling {self._current_gait.subgait_name}"
             )
