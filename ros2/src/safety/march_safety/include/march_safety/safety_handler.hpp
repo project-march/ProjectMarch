@@ -26,10 +26,10 @@ public:
   void publishNonFatal(const std::string& message);
 
   // Publish an error message to the /march/error topic
-  void publishErrorMessage(const std::string& message, int8_t error_type) const;
+  void publishErrorMessage(const std::string& message, int8_t error_type);
 
   // Publish a GaitInstruction stop message to the /march/input_device/instruction topic
-  void publishStopMessage() const;
+  void publishStopMessage();
 
 private:
   std::shared_ptr<SafetyNode> node_;
