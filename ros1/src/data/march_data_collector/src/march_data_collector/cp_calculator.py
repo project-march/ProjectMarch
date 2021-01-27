@@ -7,7 +7,7 @@ import rospy
 import tf2_ros
 from visualization_msgs.msg import Marker
 
-from march_shared_msgs.srv import CapturePointPose
+from march_shared_msgs.srv import CapturePointPose, CapturePointPoseResponse
 
 FRACTION_FALLING_TIME = 0.5
 
@@ -147,10 +147,8 @@ class CPCalculator(object):
 
     def get_capture_point(self, capture_point_request_msg):
         """Service call function to return the capture point pose positions."""
-        rospy.logdebug(
-            "Request capture point in {duration}".format(
-                duration=capture_point_request_msg.duration
-            )
+        rospy.loginfo(
+            f"Request capture point in {capture_point_request_msg.duration}"
         )
 
         duration = capture_point_request_msg.duration
@@ -158,4 +156,8 @@ class CPCalculator(object):
         if capture_point_duration < 0:
             return [False, 0.0, capture_point]
 
-        return [True, capture_point_duration, capture_point]
+        rospy.loginfo(
+            f"Returning capture point in {capture_point_request_msg.duration}"
+        )
+        return CapturePointPoseResponse(success=True, duration=capture_point_duration,
+                                         capture_point=capture_point)

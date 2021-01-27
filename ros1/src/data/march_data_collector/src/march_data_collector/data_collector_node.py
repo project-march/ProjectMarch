@@ -36,10 +36,22 @@ class DataCollectorNode(object):
             "/march/joint_values", JointValues, queue_size=1
         )
 
-        self._imu_broadcaster = tf2_ros.TransformBroadcaster()
         self._com_marker_publisher = rospy.Publisher(
             "/march/com_marker", Marker, queue_size=1
         )
+
+        self._simulation = rospy.get_param("~simulation")
+        if not self._simulation:
+            self._imu_broadcaster = tf2_ros.TransformBroadcaster()
+
+            self._imu_subscriber = rospy.Subscriber("/march/imu", Imu, self.imu_callback)
+
+            self.transform_imu = TransformStamped()
+
+            self.transform_imu.header.frame_id = "world"
+            self.transform_imu.child_frame_id = "imu_link"
+            self.transform_imu.transform.translation.x = 0.0
+            self.transform_imu.transform.translation.y = 0.0
 
         self._trajectory_state_subscriber = rospy.Subscriber(
             "/march/controller/trajectory/state",
@@ -47,16 +59,7 @@ class DataCollectorNode(object):
             self.trajectory_state_callback,
         )
 
-        self._imu_subscriber = rospy.Subscriber("/march/imu", Imu, self.imu_callback)
-
         self.pressure_soles_on = rospy.get_param("~pressure_soles")
-
-        self.transform_imu = TransformStamped()
-
-        self.transform_imu.header.frame_id = "world"
-        self.transform_imu.child_frame_id = "imu_link"
-        self.transform_imu.transform.translation.x = 0.0
-        self.transform_imu.transform.translation.y = 0.0
 
         if self.pressure_soles_on:
             rospy.logdebug("will run with pressure soles")
