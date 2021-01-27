@@ -107,6 +107,7 @@
         <include file="$(find march_data_collector)/launch/march_data_collector.launch" if="$(eval data_collector or balance)">
             <arg name="pressure_soles" value="$(arg pressure_soles)"/>
             <arg name="moticon_ip" value="$(arg moticon_ip)"/>
+            <arg name="simulation" value="$(eval configuration == 'simulation')"/>
         </include>
 
 
@@ -134,14 +135,11 @@
                     k_position_value_haa:=5000.0 k_position_value_adpf:=5000.0
                     max_effort_rotary:=200.0 max_effort_linear:=200.0
                     ground_gait:=$(arg ground_gait)" />
-<!--        <node if="$(arg balance)" name="robot_state_publisher"-->
-<!--              pkg="robot_state_publisher" type="robot_state_publisher" />-->
         <include if="$(arg balance)" file="$(find march_moveit)/launch/march_moveit.launch" />
         <include if="$(arg balance)"
                  file="$(find march_moveit_interface)/launch/moveit_interface.launch" />
-        <param name="balance" value="$(arg balance)"/>
-
     </group>
+    <param name="balance" value="$(arg balance)"/>
 
 
     <node name="rviz" pkg="rviz" type="rviz" if="$(eval not headless and rviz)"/>
