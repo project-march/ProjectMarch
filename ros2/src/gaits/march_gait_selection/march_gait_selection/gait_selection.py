@@ -6,6 +6,7 @@ from march_gait_selection.dynamic_gaits.semi_dynamic_setpoints_gait import (
 )
 from march_shared_msgs.srv import SetGaitVersion, ContainsGait
 from rcl_interfaces.srv import GetParameters
+from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.exceptions import ParameterNotDeclaredException
 from rclpy.node import Node
 from ament_index_python.packages import get_package_share_directory

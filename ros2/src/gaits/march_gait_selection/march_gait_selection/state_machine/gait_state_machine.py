@@ -1,6 +1,8 @@
 from gazebo_msgs.msg import ContactsState
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from march_utility.utilities.duration import Duration
+from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.duration import Duration
 from std_msgs.msg import Header
 from std_srvs.srv import Trigger
 
@@ -81,12 +83,14 @@ class GaitStateMachine(object):
             msg_type=ContactsState,
             topic="/march/sensor/right_pressure_sole",
             callback=lambda msg: self._update_foot_on_ground_cb(Side.right, msg),
+            callback_group=ReentrantCallbackGroup(),
             qos_profile=10,
         )
         self._left_pressure_sub = self._gait_selection.create_subscription(
             msg_type=ContactsState,
             topic="/march/sensor/left_pressure_sole",
             callback=lambda msg: self._update_foot_on_ground_cb(Side.left, msg),
+            callback_group=ReentrantCallbackGroup(),
             qos_profile=10,
         )
         self._freeze_sub = self._gait_selection.create_service(
@@ -96,6 +100,7 @@ class GaitStateMachine(object):
             srv_type=PossibleGaits,
             srv_name="/march/gait_selection/get_possible_gaits",
             callback=self._possible_gaits_cb,
+            callback_group=ReentrantCallbackGroup(),
         )
 
         self.add_transition_callback(self._current_state_cb)
@@ -248,6 +253,7 @@ class GaitStateMachine(object):
         machine is started, this function is called every timer period.
         """
         if not self._shutdown_requested:
+            self._gait_selection.get_logger().info("Update")
             now = self._gait_selection.get_clock().now()
             elapsed_time = Duration.from_ros_duration(now - self.last_update_time)
             self.last_update_time = now
@@ -301,7 +307,7 @@ class GaitStateMachine(object):
         if self._input.gait_requested():
             gait_name = self._input.gait_name()
             self._gait_selection.get_logger().info(
-                "Requested gait `{0}`".format(gait_name)
+                f"Requested gait `{gait_name}`"
             )
             if gait_name in self._idle_transitions[self._current_state]:
                 self._current_state = gait_name
@@ -310,14 +316,13 @@ class GaitStateMachine(object):
                 self._input.gait_accepted()
                 self._call_transition_callbacks()
                 self._gait_selection.get_logger().info(
-                    "Accepted gait `{0}`".format(gait_name)
+                    f"Accepted gait `{gait_name}`"
                 )
             else:
                 self._input.gait_rejected()
                 self._gait_selection.get_logger().info(
-                    "Cannot execute gait `{0}` from idle state `{1}`".format(
-                        gait_name, self._current_state
-                    )
+                    f"Cannot execute gait `{gait_name}` from idle state `"
+                    f"{self._current_state}`"
                 )
 
         elif self._input.unknown_requested():
@@ -370,7 +375,7 @@ class GaitStateMachine(object):
         if trajectory is not None:
             self._call_gait_callbacks()
             self._gait_selection.get_logger().info(
-                "Scheduling {subgait}".format(subgait=self._current_gait.subgait_name)
+                f"Scheduling {self._current_gait.subgait_name}"
             )
             self._trajectory_scheduler.schedule(trajectory)
 
@@ -381,7 +386,7 @@ class GaitStateMachine(object):
             self._input.gait_finished()
             self._call_transition_callbacks()
             self._gait_selection.get_logger().info(
-                "Finished gait `{0}`".format(self._current_gait.name)
+                f"Finished gait `{self._current_gait.name}`"
             )
             self._current_gait = None
 
@@ -392,15 +397,13 @@ class GaitStateMachine(object):
             self._should_stop = False
             if self._current_gait.stop():
                 self._gait_selection.get_logger().info(
-                    "Gait `{0}` responded to stop".format(self._current_gait.name)
+                    f"Gait {self._current_gait.name} responded to stop"
                 )
                 self._input.stop_accepted()
                 self._call_callbacks(self._stop_accepted_callbacks)
             else:
                 self._gait_selection.get_logger().info(
-                    "Gait `{0}` does not respond to stop".format(
-                        self._current_gait.name
-                    )
+                    f"Gait {self._current_gait.name} does not respond to stop"
                 )
                 self._input.stop_rejected()
 
@@ -409,15 +412,13 @@ class GaitStateMachine(object):
             self._input.reset()
             if self._current_gait.transition(request):
                 self._gait_selection.get_logger().info(
-                    "Gait `{0}` responded to transition request `{1}`".format(
-                        self._current_gait.name, request.name
-                    )
+                    f"Gait {self._current_gait.name} responded to transition request "
+                    f"{request.name}"
                 )
             else:
                 self._gait_selection.get_logger().info(
-                    "Gait `{0}` does not respond to transition request `{1}`".format(
-                        self._current_gait.name, request.name
-                    )
+                    f"Gait {self._current_gait.name} does not respond to transition "
+                    f"request {request.name}"
                 )
 
     def _call_transition_callbacks(self):
@@ -472,9 +473,8 @@ class GaitStateMachine(object):
             if from_idle_name is None:
                 from_idle_name = "unknown_idle_{0}".format(len(idle_positions))
                 self._gait_selection.get_logger().warn(
-                    "No named position given for starting position of gait `{gn}`, creating `{n}`".format(
-                        gn=gait_name, n=from_idle_name
-                    )
+                    f"No named position given for starting position of gait `"
+                    f"{gait_name} creating {from_idle_name}"
                 )
                 idle_positions[from_idle_name] = {
                     "gait_type": "",
@@ -497,9 +497,8 @@ class GaitStateMachine(object):
             if to_idle_name is None:
                 to_idle_name = "unknown_idle_{0}".format(len(idle_positions))
                 self._gait_selection.get_logger().warn(
-                    "No named position given for final position of gait `{gn}`, creating `{n}`".format(
-                        gn=gait_name, n=to_idle_name
-                    )
+                    f"No named position given for final position of gait "
+                    f"{gait_name}`, creating {to_idle_name}"
                 )
                 idle_positions[to_idle_name] = {
                     "gait_type": "",
@@ -517,7 +516,7 @@ class GaitStateMachine(object):
         for idle in self._gait_transitions.values():
             if idle not in self._idle_transitions:
                 self._gait_selection.get_logger().warn(
-                    "{0} does not have transitions".format(idle)
+                    f"{idle} does not have transitions"
                 )
 
     def _generate_home_gaits(self, idle_positions):

@@ -1,3 +1,4 @@
+from control_msgs.msg import JointTolerance
 from std_msgs.msg import Header
 from actionlib_msgs.msg import GoalID
 from march_shared_msgs.msg import (
@@ -45,7 +46,10 @@ class TrajectoryScheduler(object):
         """
         self._failed = False
         stamp = self._node.get_clock().now().to_msg()
-        goal = FollowJointTrajectoryGoal(trajectory=trajectory)
+        goal = FollowJointTrajectoryGoal(trajectory=trajectory, goal_tolerance=[
+            JointTolerance(position=10.0, velocity=10.0, acceleration=10.0) for i in 
+            range(
+                0, 8)])
         self._trajectory_goal_pub.publish(
             FollowJointTrajectoryActionGoal(
                 header=Header(stamp=stamp), goal_id=GoalID(stamp=stamp), goal=goal

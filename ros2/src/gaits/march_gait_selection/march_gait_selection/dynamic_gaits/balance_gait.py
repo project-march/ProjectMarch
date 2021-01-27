@@ -1,11 +1,8 @@
 from copy import deepcopy
-import os
-import sys
 from threading import Event
-from typing import Optional
 
+import rclpy
 from rclpy import Future
-from rclpy.callback_groups import ReentrantCallbackGroup
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Header
 
@@ -16,8 +13,9 @@ from march_shared_msgs.srv import CapturePointPose, GetMoveItTrajectory
 class BalanceGait(GaitInterface):
     """Base class to create a gait using the moveit motion planning."""
 
-    CAPTURE_POINT_SERVICE_TIMEOUT = 1
-    NANOSEC_TO_SEC = 10e-9
+    CAPTURE_POINT_SERVICE_TIMEOUT = 20.0
+    MOVEIT_INTERFACE_SERVICE_TIMEOUT = 20.0
+    NANOSEC_TO_SEC = 1e-9
 
     def __init__(self, node, gait_name="balanced_walk", default_walk=None):
         self.gait_name = gait_name
@@ -25,6 +23,8 @@ class BalanceGait(GaitInterface):
         self._default_walk = default_walk
 
         self.moveit_event = Event()
+        self.capture_point_event = Event()
+        self.capture_point_result = None
 
         self._capture_point_service = {
             "left_leg": node.create_client(
@@ -57,26 +57,34 @@ class BalanceGait(GaitInterface):
         """
         self._default_walk = new_default_walk
 
-    def compute_swing_leg_target(self, leg_name: str, subgait_name: str) -> \
-            Optional[JointState]:
+    def compute_swing_leg_target(self, leg_name: str, subgait_name: str) -> bool:
         """Set the swing leg target to capture point.
 
         :param leg_name: The name of the used move group
         :param subgait_name: the normal subgait name
         """
-        self._node.get_logger().info('Computing swing leg target')
+        self._node.get_logger().info(f'Computing swing leg target for {leg_name}')
         subgait_duration = self.default_walk[subgait_name].duration
-        return_msg = self._capture_point_service[leg_name](
-            duration=subgait_duration)
+        if not self._capture_point_service[leg_name].wait_for_service(timeout_sec=3):
+            self._node.get_logger().warn(f"Capture point service not found: "
+            f"{self._capture_point_service[leg_name]}")
 
-        if not return_msg.success:
-            self._node.get_logger().warn("No messages received from the capture "
-                                           "point service.")
-            return None
+        self.capture_point_event.clear()
+        # self._node.get_logger().info(f'Event {self.capture_point_event}')
 
-        self._node.get_logger().info(
-            f"Done comuputing swing leg target, duration is {return_msg.duration}")
-        return return_msg.duration
+        future = self._capture_point_service[
+                leg_name].call_async(
+                CapturePointPose.Request(duration=subgait_duration))
+
+        rclpy.spin_until_future_complete(self._node, future)
+        # self.capture_point_future.add_done_callback(self.capture_point_cb)
+        # self.capture_point_event.wait(timeout=self.CAPTURE_POINT_SERVICE_TIMEOUT)
+        self._node.get_logger().info(f"{future.done()}")
+
+    def capture_point_cb(self, future: Future):
+        self._node.get_logger().info("Capture point callback")
+        self.capture_point_result = future.result()
+        self.capture_point_event.set()
 
     def compute_stance_leg_target(self, leg_name: str, subgait_name: str) -> JointState:
         """Set the target of the stance leg to the end of the gait file.
@@ -97,7 +105,7 @@ class BalanceGait(GaitInterface):
 
         joint_state = JointState()
         joint_state.header = Header()
-        joint_state.header.stamp = self._node.get_clock().now()
+        joint_state.header.stamp = self._node.get_clock().now().to_msg()
         joint_state.name = [joint.name for joint in non_capture_point_joints]
         joint_state.position = [
             joint.setpoints[-1].position for joint in non_capture_point_joints
@@ -117,27 +125,37 @@ class BalanceGait(GaitInterface):
         :return: the balance trajectory
         """
         stance_leg = "right_leg" if swing_leg == "left_leg" else "left_leg"
-        self._node.get_logger().info('Constructing trajectory')    
-        swing_leg_target = self.compute_swing_leg_target(swing_leg, subgait_name)
+        self._node.get_logger().info('Constructing trajectory')
+        capture_point_success = self.compute_swing_leg_target(swing_leg, subgait_name)
+        # if not capture_point_success:
+        #     self._node.get_logger().warn("Capture point call took too long, "
+        #                                  "using default gait.")
+        #     self._node.get_logger().warn(f"Status is "
+        #                                  f"{self.capture_point_event.is_set()} - "
+        #                                  f"{self.capture_point_future.done()} - "
+        #                                  f"{self.capture_point_future.result()}")
+        #     return self.default_walk[subgait_name].to_joint_trajectory_msg()
         stance_leg_target = self.compute_stance_leg_target(stance_leg, subgait_name)
 
         self.moveit_event.clear()
-        self._node.get_logger().info('Time for moveit interface call') 
+        self._node.get_logger().info('Time for moveit interface call')
         trajectory_future = \
             self._moveit_trajectory_service.call_async(GetMoveItTrajectory.Request(
-                swing_leg=swing_leg, swing_leg_target=swing_leg_target,
+                swing_leg=swing_leg,
+                swing_leg_target=self.capture_point_result.capture_point,
                 stance_leg_target=stance_leg_target))
 
         trajectory_future.add_done_callback(self.moveit_event_cb)
-        self.moveit_event.wait()
-
-        return self.moveit_trajectory_result.trajectory if self.moveit_trajectory_result.success else \
-            self.default_walk[
-            subgait_name].to_joint_trajectory_msg()
+        if self.moveit_event.wait(self.MOVEIT_INTERFACE_SERVICE_TIMEOUT):
+            return self.moveit_trajectory_result.trajectory
+        else:
+            self._node.get_logger().warn("Moveit interface call took too long, "
+                                         "using default gait.")
+            return self.default_walk[
+                subgait_name].to_joint_trajectory_msg()
 
     def moveit_event_cb(self, future: Future):
-        result = future.result()
-        self.moveit_trajectory_result = result
+        self.moveit_trajectory_result = future.result()
         self.moveit_event.set()
 
     def get_joint_trajectory_msg(self, name):
@@ -186,10 +204,11 @@ class BalanceGait(GaitInterface):
         self._time_since_start = 0.0
         trajectory = self.get_joint_trajectory_msg(self._current_subgait)
         time_from_start = trajectory.points[-1].time_from_start
-        self._current_subgait_duration = float(time_from_start.sec)  + \
-                                         (time_from_start.nanosec *
-                                         self.NANOSEC_TO_SEC)
+        self._current_subgait_duration = self.duration_to_sec(time_from_start)
         return trajectory
+
+    def duration_to_sec(self, duration) -> float:
+        return float(duration.sec) + (duration.nanosec * self.NANOSEC_TO_SEC)
 
     def update(self, elapsed_time):
         self._time_since_start += elapsed_time
@@ -203,13 +222,10 @@ class BalanceGait(GaitInterface):
             if next_subgait == self._default_walk.graph.END:
                 return None, True
 
-            self._node.get_logger().info(next_subgait)
-
             trajectory = self.get_joint_trajectory_msg(next_subgait)
             self._current_subgait = next_subgait
-            self._current_subgait_duration = trajectory.points[
-                -1
-            ].time_from_start.to_sec()
+            time_from_start = trajectory.points[-1].time_from_start
+            self._current_subgait_duration = self.duration_to_sec(time_from_start)
             self._time_since_start = 0.0
             return trajectory, False
 
