@@ -112,19 +112,19 @@
        <bool>false</bool>
       </property>
       <property name="currentText">
-       <string>yes</string>
+       <string>Yes</string>
       </property>
       <property name="insertPolicy">
        <enum>QComboBox::InsertAtBottom</enum>
       </property>
       <item>
        <property name="text">
-        <string>yes</string>
+        <string>Yes</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>no</string>
+        <string>No</string>
        </property>
       </item>
      </widget>
@@ -145,7 +145,7 @@
     <item row="4" column="0">
      <widget class="QLabel" name="timeLabel">
       <property name="text">
-       <string>time in seconds</string>
+       <string>Time in seconds</string>
       </property>
      </widget>
     </item>
