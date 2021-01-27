@@ -33,6 +33,7 @@ container:build:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
+  parallel: 5
   script:
     - mkdir -p /kaniko/.docker
     # Equivalent to `docker login` but without installing docker"
