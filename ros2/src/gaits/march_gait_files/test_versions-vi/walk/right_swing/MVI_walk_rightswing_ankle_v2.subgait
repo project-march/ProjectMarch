@@ -1,6 +1,6 @@
 description: MVI walk gait with no HAA movements
 duration:
-  nsecs: 300000000
+  nsecs: 199999999
   secs: 1
 gait_type: walk_like
 joints:
@@ -10,19 +10,9 @@ joints:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: -0.10470056
+  - position: 0.04360007
     time_from_start:
-      nsecs: 250000000
-      secs: 0
-    velocity: 0.0
-  - position: 0.0
-    time_from_start:
-      nsecs: 600000000
-      secs: 0
-    velocity: 0.0
-  - position: 0.0436
-    time_from_start:
-      nsecs: 300000000
+      nsecs: 199999999
       secs: 1
     velocity: 0.0
   left_hip_aa:
@@ -33,54 +23,54 @@ joints:
     velocity: 0.0
   - position: 0.0
     time_from_start:
-      nsecs: 487500000
+      nsecs: 450000000
       secs: 0
     velocity: 0.0
   - position: 0.0
     time_from_start:
-      nsecs: 650000000
+      nsecs: 600000000
       secs: 0
     velocity: 0.0
   - position: 0.0
     time_from_start:
-      nsecs: 300000000
+      nsecs: 199999999
       secs: 1
     velocity: 0.0
   left_hip_fe:
-  - position: -0.26179939
+  - position: 0.3752
     time_from_start:
       nsecs: 0
       secs: 0
-    velocity: 0.31415927
-  - position: 0.4712
+    velocity: -0.32
+  - position: 0.3386
     time_from_start:
-      nsecs: 520000000
+      nsecs: 471300000
       secs: 0
-    velocity: 0.1396
-  - position: 0.2618
+    velocity: -0.5076
+  - position: -0.26179939
     time_from_start:
-      nsecs: 949400000
-      secs: 0
-    velocity: -1.104
-  - position: -0.0873
-    time_from_start:
-      nsecs: 300000000
+      nsecs: 199999999
       secs: 1
-    velocity: 0.0
+    velocity: 0.31415927
   left_knee:
   - position: 0.1396
     time_from_start:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: 1.0472
+  - position: 0.2094
     time_from_start:
-      nsecs: 416000000
+      nsecs: 240000000
       secs: 0
     velocity: 0.0
-  - position: 0.0
+  - position: 0.1396
     time_from_start:
-      nsecs: 300000000
+      nsecs: 816000000
+      secs: 0
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start:
+      nsecs: 199999999
       secs: 1
     velocity: 0.0
   right_ankle:
@@ -89,9 +79,19 @@ joints:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: 0.0436
+  - position: -0.17453293
     time_from_start:
-      nsecs: 300000000
+      nsecs: 272700000
+      secs: 0
+    velocity: 0.0
+  - position: 0.04360007
+    time_from_start:
+      nsecs: 709100000
+      secs: 0
+    velocity: 0.0
+  - position: 0.04360007
+    time_from_start:
+      nsecs: 199999999
       secs: 1
     velocity: 0.0
   right_hip_aa:
@@ -102,40 +102,65 @@ joints:
     velocity: 0.0
   - position: 0.0
     time_from_start:
-      nsecs: 487500000
+      nsecs: 450000000
       secs: 0
     velocity: 0.0
   - position: 0.0
     time_from_start:
-      nsecs: 650000000
+      nsecs: 600000000
       secs: 0
     velocity: 0.0
   - position: 0.0
     time_from_start:
-      nsecs: 300000000
+      nsecs: 199999999
       secs: 1
     velocity: 0.0
   right_hip_fe:
-  - position: 0.3752
+  - position: -0.17453293
     time_from_start:
       nsecs: 0
       secs: 0
-    velocity: -0.32
-  - position: -0.0873
-    time_from_start:
-      nsecs: 300000000
-      secs: 1
     velocity: 0.0
+  - position: 0.6981317
+    time_from_start:
+      nsecs: 470700000
+      secs: 0
+    velocity: 1.23309955
+  - position: 0.78539816
+    time_from_start:
+      nsecs: 720000000
+      secs: 0
+    velocity: 0.1280007
+  - position: 0.3752
+    time_from_start:
+      nsecs: 199999999
+      secs: 1
+    velocity: -0.32
   right_knee:
   - position: 0.1396
     time_from_start:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: 0.0
+  - position: 1.13446401
     time_from_start:
-      nsecs: 300000000
+      nsecs: 504000000
+      secs: 0
+    velocity: 0.0
+  - position: 0.87269953
+    time_from_start:
+      nsecs: 769300000
+      secs: 0
+    velocity: -2.45929982
+  - position: 0.09690068
+    time_from_start:
+      nsecs: 80000000
       secs: 1
     velocity: 0.0
-name: left_close
-version: MVI_walk_leftclose_ankle_v1
+  - position: 0.1396
+    time_from_start:
+      nsecs: 199999999
+      secs: 1
+    velocity: 0.0
+name: right_swing
+version: MVI_walk_rightswing_ankle_v2
