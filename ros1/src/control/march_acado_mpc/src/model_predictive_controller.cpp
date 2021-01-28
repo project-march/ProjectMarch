@@ -53,38 +53,6 @@ void ModelPredictiveController::setReference(vector<vector<double>> reference) {
     }
 }
 
-bool ModelPredictiveController::readReferenceFromFile(const char* fileName, vector<vector<double>>& reference) {
-    // open file
-    fstream file;
-    file.open(fileName,ios::in);
-
-    vector<double> lineData;
-    string line;
-    double value;
-
-    if(file.is_open()) {
-        // Skip the first (header) line
-        getline(file, line);
-
-        // Get all reference values
-        while (getline(file, line)) {
-
-            lineData.clear();
-
-            stringstream ss(line);
-
-            while (ss >> value) {
-                lineData.push_back(value);
-            }
-            reference.push_back(lineData);
-        }
-        file.close();
-    } else {
-        return false;
-    }
-    return true;
-}
-
 void ModelPredictiveController::setReference(vector<vector<double>> reference) {
     for(int i = 0; i < ACADO_N; i++) {
         for(int j = 0; j < ACADO_NY; j++) {
