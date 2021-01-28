@@ -99,6 +99,8 @@ class MoveItInterface:
         plan = self.move_group["all_legs"].plan(
             self._joint_state_target)
         rospy.loginfo("Done planning")
+        rospy.loginfo(f"Type is {type(plan[1])}")
+        # rospy.loginfo(f"Trajecotry is {plan[1]}")
 
         if not plan[0]:
             rospy.logwarn(
@@ -107,7 +109,7 @@ class MoveItInterface:
             )
             return None
 
-        return plan[1]
+        return plan[1].joint_trajectory
 
     def get_joint_trajectory(self, req: GetMoveItTrajectoryRequest) -> GetMoveItTrajectoryResponse:
         """Returns the trajectory of a subgait name that could use moveit.
@@ -116,7 +118,7 @@ class MoveItInterface:
         """
         res = GetMoveItTrajectoryResponse()
         trajectory = self.construct_trajectory(req.swing_leg, req.swing_leg_target_pose,
-                                                   req.stance_leg_target)
+                                               req.stance_leg_target)
         if trajectory is not None:
             res.success = True
             res.trajectory = trajectory

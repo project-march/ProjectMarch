@@ -23,8 +23,11 @@ class BalanceGait(GaitInterface):
         self._default_walk = default_walk
 
         self.moveit_event = Event()
+        self.moveit_trajectory_result = None
         self.capture_point_event = Event()
         self.capture_point_result = None
+
+        self._constructing = False
 
         self._capture_point_service = {
             "left_leg": node.create_client(
@@ -138,11 +141,14 @@ class BalanceGait(GaitInterface):
                                      f"{swing_leg}, "
                                      f"stance leg target"
                                      f"{stance_leg_target}")
+        self._node.get_logger().info(f"{self._moveit_trajectory_service.service_is_ready()}")
+        request = GetMoveItTrajectory.Request(
+            swing_leg=swing_leg,
+            swing_leg_target_pose=self.capture_point_result.capture_point,
+            stance_leg_target=stance_leg_target)
+        self._node.get_logger().info(f"{request}")
         trajectory_future = \
-            self._moveit_trajectory_service.call_async(GetMoveItTrajectory.Request(
-                swing_leg=swing_leg,
-                swing_leg_target_pose=self.capture_point_result.capture_point,
-                stance_leg_target=stance_leg_target))
+            self._moveit_trajectory_service.call_async(request)
 
         trajectory_future.add_done_callback(self.moveit_event_cb)
         if self.moveit_event.wait(self.MOVEIT_INTERFACE_SERVICE_TIMEOUT):
@@ -215,18 +221,21 @@ class BalanceGait(GaitInterface):
         if self._time_since_start < self._current_subgait_duration:
             return None, False
         else:
+            if self._constructing:
+                return None, False
             next_subgait = self._default_walk.graph[
                 (self._current_subgait, self._default_walk.graph.TO)
             ]
 
             if next_subgait == self._default_walk.graph.END:
                 return None, True
-
+            self._constructing = True
             trajectory = self.get_joint_trajectory_msg(next_subgait)
             self._current_subgait = next_subgait
             time_from_start = trajectory.points[-1].time_from_start
             self._current_subgait_duration = self.duration_to_sec(time_from_start)
             self._time_since_start = 0.0
+            self._constructing = False
             return trajectory, False
 
     def end(self):
