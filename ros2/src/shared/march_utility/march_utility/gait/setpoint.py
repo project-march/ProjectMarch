@@ -6,7 +6,7 @@ from typing import Optional
 
 # Use this factor when calculating velocities to keep the calculations within the range of motion
 # See IK confluence page https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
-from march_utility.utilities.duration import CustomDuration
+from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
     weighted_average_floats,
@@ -22,7 +22,7 @@ class Setpoint:
     digits = 8
 
     def __init__(
-        self, time: CustomDuration, position: float, velocity: Optional[float] = None
+        self, time: Duration, position: float, velocity: Optional[float] = None
     ) -> None:
         """
         Initialize a setpoint.
@@ -104,7 +104,7 @@ class Setpoint:
                 raise KeyError(f"Setpoint_dic is missing joint {joint}")
             else:
                 next_positions[joint] = cls(
-                    setpoint_dic[joint].time + CustomDuration(seconds=VELOCITY_SCALE_FACTOR),
+                    setpoint_dic[joint].time + Duration(seconds=VELOCITY_SCALE_FACTOR),
                     setpoint_dic[joint].position
                     + setpoint_dic[joint].velocity * VELOCITY_SCALE_FACTOR,
                 )

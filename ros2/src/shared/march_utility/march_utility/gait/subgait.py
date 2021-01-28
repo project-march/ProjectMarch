@@ -12,7 +12,7 @@ from march_utility.exceptions.gait_exceptions import (
     GaitError,
 )
 from march_utility.foot_classes.feet_state import FeetState
-from march_utility.utilities.duration import CustomDuration
+from march_utility.utilities.duration import Duration
 from march_utility.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
 )
@@ -37,7 +37,7 @@ class Subgait(object):
     def __init__(
         self,
         joints: List[JointTrajectory],
-        duration: CustomDuration,
+        duration: Duration,
         gait_type: str = "walk_like",
         gait_name: str = "Walk",
         subgait_name: str = "right_open",
@@ -188,7 +188,7 @@ class Subgait(object):
         if robot is None:
             raise GaitError("Cannot create gait without a loaded robot.")
 
-        duration = CustomDuration(nanoseconds=subgait_dict["duration"])
+        duration = Duration(nanoseconds=subgait_dict["duration"])
         joint_list = []
         for name, points in sorted(
             subgait_dict["joints"].items(), key=lambda item: item[0]
@@ -285,7 +285,7 @@ class Subgait(object):
 
     # region Manipulate subgait
     def scale_timestamps_subgait(
-        self, new_duration: CustomDuration, rescale: bool = True
+        self, new_duration: Duration, rescale: bool = True
     ) -> None:
         """Scale or cut off all the setpoint to match the duration in both subgaits.
 
@@ -301,7 +301,7 @@ class Subgait(object):
             joint.set_duration(new_duration, rescale)
         self.duration = new_duration
 
-    def create_interpolated_setpoints(self, timestamps: List[CustomDuration]) -> None:
+    def create_interpolated_setpoints(self, timestamps: List[Duration]) -> None:
         """Equalize the setpoints of the subgait match the given timestamps.
 
         :param timestamps: the new timestamps to use when creating the setpoints
@@ -394,7 +394,7 @@ class Subgait(object):
     # endregion
 
     # region Get functions
-    def get_unique_timestamps(self) -> List[CustomDuration]:
+    def get_unique_timestamps(self) -> List[Duration]:
         """Get the timestamps that are unique to a setpoint."""
         timestamps = []
         for joint in self.joints:

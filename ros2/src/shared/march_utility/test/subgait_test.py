@@ -1,7 +1,7 @@
 import unittest
 
 from ament_index_python import get_package_share_directory
-from march_utility.utilities.duration import CustomDuration
+from march_utility.utilities.duration import Duration
 from urdf_parser_py import urdf
 
 from march_utility.exceptions.gait_exceptions import (
@@ -158,13 +158,13 @@ class SubgaitTest(unittest.TestCase):
                     "test",
                     Limits(0.0, 0.0, 0.0),
                     [
-                        Setpoint(CustomDuration(seconds=0.0), position, 0.0),
-                        Setpoint(CustomDuration(seconds=0.5), 1.0, 0.0),
+                        Setpoint(Duration(seconds=0.0), position, 0.0),
+                        Setpoint(Duration(seconds=0.5), 1.0, 0.0),
                     ],
-                    CustomDuration(seconds=1.0),
+                    Duration(seconds=1.0),
                 )
             ],
-            CustomDuration(seconds=1.0),
+            Duration(seconds=1.0),
         )
         self.assertDictEqual(subgait.starting_position, {"test": position})
 
@@ -176,33 +176,33 @@ class SubgaitTest(unittest.TestCase):
                     "test",
                     Limits(0.0, 0.0, 0.0),
                     [
-                        Setpoint(CustomDuration(seconds=0.0), 0.0, 0.0),
-                        Setpoint(CustomDuration(seconds=0.5), position, 0.0),
+                        Setpoint(Duration(seconds=0.0), 0.0, 0.0),
+                        Setpoint(Duration(seconds=0.5), position, 0.0),
                     ],
-                    CustomDuration(seconds=1.0),
+                    Duration(seconds=1.0),
                 )
             ],
-            CustomDuration(seconds=1.0),
+            Duration(seconds=1.0),
         )
         self.assertDictEqual(subgait.final_position, {"test": position})
 
     def test_set_duration_with_scaling_smaller_duration(self):
-        self.subgait.scale_timestamps_subgait(CustomDuration(seconds=0.8))
-        self.assertEqual(self.subgait.duration, CustomDuration(seconds=0.8))
+        self.subgait.scale_timestamps_subgait(Duration(seconds=0.8))
+        self.assertEqual(self.subgait.duration, Duration(seconds=0.8))
 
     def test_set_duration_with_scaling_larger_duration(self):
-        self.subgait.scale_timestamps_subgait(CustomDuration(seconds=1.8))
-        self.assertEqual(self.subgait.duration, CustomDuration(seconds=1.8))
+        self.subgait.scale_timestamps_subgait(Duration(seconds=1.8))
+        self.assertEqual(self.subgait.duration, Duration(seconds=1.8))
 
     def test_set_duration_with_cut_off_instead_of_scaling(self):
-        self.subgait.scale_timestamps_subgait(CustomDuration(seconds=0.8), rescale=False)
+        self.subgait.scale_timestamps_subgait(Duration(seconds=0.8), rescale=False)
         self.assertEqual(len(self.subgait.get_joint("left_knee")), 2)
 
     def test_equalize_amount_of_setpoints_with_higher_duration_new_gait(self):
-        self.subgait.scale_timestamps_subgait(CustomDuration(seconds=1.5))
+        self.subgait.scale_timestamps_subgait(Duration(seconds=1.5))
 
-        timestamps = sorted(set(self.subgait.get_unique_timestamps() + [CustomDuration(t) for t in [1.1, 1.2, 1.3]]))
-        self.subgait.create_interpolated_setpoints([CustomDuration(t) for t in [1.1, 1.2, 1.3]])
+        timestamps = sorted(set(self.subgait.get_unique_timestamps() + [Duration(t) for t in [1.1, 1.2, 1.3]]))
+        self.subgait.create_interpolated_setpoints([Duration(t) for t in [1.1, 1.2, 1.3]])
 
         self.assertEqual(
             timestamps,
@@ -214,12 +214,12 @@ class SubgaitTest(unittest.TestCase):
         )
 
     def test_equalize_amount_of_setpoints_with_lower_duration_new_gait(self):
-        self.subgait.scale_timestamps_subgait(CustomDuration(0.8))
+        self.subgait.scale_timestamps_subgait(Duration(0.8))
 
         timestamps = sorted(
-            set(self.subgait.get_unique_timestamps() + [CustomDuration(t) for t in [0.6, 0.7, 0.75]])
+            set(self.subgait.get_unique_timestamps() + [Duration(t) for t in [0.6, 0.7, 0.75]])
         )
-        self.subgait.create_interpolated_setpoints([CustomDuration(t) for t in [0.6, 0.7, 0.75]])
+        self.subgait.create_interpolated_setpoints([Duration(t) for t in [0.6, 0.7, 0.75]])
 
         self.assertEqual(
             timestamps,

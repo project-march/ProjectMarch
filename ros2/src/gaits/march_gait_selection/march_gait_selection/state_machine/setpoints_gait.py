@@ -1,7 +1,7 @@
 from march_gait_selection.dynamic_gaits.transition_subgait import TransitionSubgait
 from march_utility.exceptions.gait_exceptions import GaitError
 from march_utility.gait.gait import Gait
-from march_utility.utilities.duration import CustomDuration
+from march_utility.utilities.duration import Duration
 
 from .gait_interface import GaitInterface
 from .state_machine_input import TransitionRequest
@@ -16,7 +16,7 @@ class SetpointsGait(GaitInterface, Gait):
         self._should_stop = False
         self._transition_to_subgait = None
         self._is_transitioning = False
-        self._time_since_start = CustomDuration(0)
+        self._time_since_start = Duration(0)
 
     @property
     def name(self):
@@ -68,10 +68,10 @@ class SetpointsGait(GaitInterface, Gait):
         self._should_stop = False
         self._transition_to_subgait = None
         self._is_transitioning = False
-        self._time_since_start = CustomDuration(0)
+        self._time_since_start = Duration(0)
         return self._current_subgait.to_joint_trajectory_msg()
 
-    def update(self, elapsed_time: CustomDuration):
+    def update(self, elapsed_time: Duration):
         """
         Update the progress of the gait, should be called regularly.
         If the current subgait is still running, this does nothing.
@@ -109,7 +109,7 @@ class SetpointsGait(GaitInterface, Gait):
         self._current_subgait = self.subgaits[next_subgait]
         trajectory = self._current_subgait.to_joint_trajectory_msg()
 
-        self._time_since_start = CustomDuration(0)  # New subgait is started, so reset the time
+        self._time_since_start = Duration(0)  # New subgait is started, so reset the time
         return trajectory, False
 
     def transition(self, transition_request):
@@ -200,6 +200,6 @@ class SetpointsGait(GaitInterface, Gait):
             "{s}_transition".format(s=self._transition_to_subgait.subgait_name),
         )
         self._current_subgait = transition_subgait
-        self._time_since_start = CustomDuration(0)
+        self._time_since_start = Duration(0)
         self._is_transitioning = True
         return transition_subgait.to_joint_trajectory_msg(), False

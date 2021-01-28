@@ -4,15 +4,15 @@ from march_utility.exceptions.gait_exceptions import SubgaitInterpolationError
 from march_utility.gait.joint_trajectory import JointTrajectory
 from march_utility.gait.limits import Limits
 from march_utility.gait.setpoint import Setpoint
-from march_utility.utilities.duration import CustomDuration
+from march_utility.utilities.duration import Duration
 
 
 class JointTrajectoryTest(unittest.TestCase):
     def setUp(self):
         self.joint_name = "test_joint"
         self.limits = Limits(-1, 1, 2)
-        self.duration = CustomDuration(seconds=2.0)
-        self.times = [CustomDuration(), self.duration / 2.0, self.duration]
+        self.duration = Duration(seconds=2.0)
+        self.times = [Duration(), self.duration / 2.0, self.duration]
         self.setpoints = [Setpoint(t, 2 * t.seconds, t.seconds / 2.0) for t in self.times]
         self.joint_trajectory = JointTrajectory(
             self.joint_name, self.limits, self.setpoints, self.duration
@@ -79,7 +79,7 @@ class JointTrajectoryTest(unittest.TestCase):
     def test_valid_boundary_points_nonzero_start_end_zero_speed(self):
         # First setpoint at t = 0.5 and last setpoint at t = 1.5 =/= duration have zero speed.
         setpoints = [
-            Setpoint(t * 0.5 + CustomDuration(seconds=0.5),
+            Setpoint(t * 0.5 + Duration(seconds=0.5),
                      (self.duration - t).seconds,
                      t.seconds * 2 - t.seconds ** 2)
             for t in self.times
@@ -92,7 +92,7 @@ class JointTrajectoryTest(unittest.TestCase):
     def test_invalid_boundary_points_nonzero_start_nonzero_speed(self):
         # First setpoint at t = 1 has nonzero speed.
         setpoints = [
-            Setpoint(t * 0.5 + CustomDuration(seconds=1),
+            Setpoint(t * 0.5 + Duration(seconds=1),
                      (self.duration - t).seconds,
                      (self.duration - t).seconds * 2)
             for t in self.times
@@ -116,7 +116,7 @@ class JointTrajectoryTest(unittest.TestCase):
 
     # interpolate_setpoints tests
     def test_interpolation_start_point(self):
-        interpolated_setpoint = self.joint_trajectory.get_interpolated_setpoint(CustomDuration(seconds=0))
+        interpolated_setpoint = self.joint_trajectory.get_interpolated_setpoint(Duration(seconds=0))
         self.assertEqual(interpolated_setpoint, self.setpoints[0])
 
     def test_interpolation_end_point(self):
@@ -132,19 +132,19 @@ class JointTrajectoryTest(unittest.TestCase):
         self.assertEqual(interpolated_setpoint, self.setpoints[1])
 
     def test_get_interpolated_setpoints_invalid_time_too_high(self):
-        setpoint = self.joint_trajectory.get_interpolated_setpoint(self.duration + CustomDuration(seconds=1))
+        setpoint = self.joint_trajectory.get_interpolated_setpoint(self.duration + Duration(seconds=1))
         self.assertEqual(
-            setpoint, Setpoint(self.duration + CustomDuration(seconds=1), self.setpoints[-1].position, 0)
+            setpoint, Setpoint(self.duration + Duration(seconds=1), self.setpoints[-1].position, 0)
         )
 
     def test_get_interpolated_setpoints_invalid_time_too_low(self):
-        setpoint = self.joint_trajectory.get_interpolated_setpoint(CustomDuration(seconds=-1))
-        self.assertEqual(setpoint, Setpoint(CustomDuration(seconds=-1), self.setpoints[0].position, 0))
+        setpoint = self.joint_trajectory.get_interpolated_setpoint(Duration(seconds=-1))
+        self.assertEqual(setpoint, Setpoint(Duration(seconds=-1), self.setpoints[0].position, 0))
 
     def test_get_interpolated_setpoints_home_subgait(self):
-        self.joint_trajectory.setpoints = [Setpoint(CustomDuration(seconds=3), 1, 1)]
-        setpoint = self.joint_trajectory.get_interpolated_setpoint(CustomDuration(seconds=1))
-        self.assertEqual(setpoint, Setpoint(CustomDuration(seconds=1), 1, 1))
+        self.joint_trajectory.setpoints = [Setpoint(Duration(seconds=3), 1, 1)]
+        setpoint = self.joint_trajectory.get_interpolated_setpoint(Duration(seconds=1))
+        self.assertEqual(setpoint, Setpoint(Duration(seconds=1), 1, 1))
 
     def test_interpolate_trajectories_unequal_limits(self):
         different_limits = Limits(-2, 3, 2)
@@ -170,8 +170,8 @@ class JointTrajectoryTest(unittest.TestCase):
 
     def test_interpolate_trajectories_correct_duration(self):
         parameter = 0.5
-        other_duration = self.duration + CustomDuration(seconds=1)
-        other_times = [CustomDuration(), other_duration / 2.0, other_duration]
+        other_duration = self.duration + Duration(seconds=1)
+        other_times = [Duration(), other_duration / 2.0, other_duration]
         other_setpoints = [Setpoint(t, 2 * t.seconds, t.seconds / 2.0) for t in other_times]
         other_trajectory = JointTrajectory(
             self.joint_name, self.limits, other_setpoints, other_duration

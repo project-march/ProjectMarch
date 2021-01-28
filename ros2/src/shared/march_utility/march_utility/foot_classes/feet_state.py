@@ -6,7 +6,7 @@ This class is  used to create gaits based on the state of both feet.
 from __future__ import annotations
 
 from march_utility.gait.setpoint import Setpoint
-from march_utility.utilities.duration import CustomDuration
+from march_utility.utilities.duration import Duration
 from march_utility.utilities.side import Side
 from march_utility.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
@@ -25,7 +25,7 @@ JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
 class FeetState(object):
     """Class for encapturing the state of both feet."""
 
-    def __init__(self, right_foot: Foot, left_foot: Foot, time: CustomDuration = None) -> None:
+    def __init__(self, right_foot: Foot, left_foot: Foot, time: Duration = None) -> None:
         """Create a FeetState object.
 
         :param right_foot: The state of the right foot.
@@ -87,7 +87,7 @@ class FeetState(object):
 
         # Set the time of the new setpoints as the weighted
         # average of the original setpoint times
-        feet_state_time = CustomDuration()
+        feet_state_time = Duration()
         for setpoint in setpoint_dic.values():
             feet_state_time += setpoint.time
         feet_state_time = feet_state_time / len(setpoint_dic)
