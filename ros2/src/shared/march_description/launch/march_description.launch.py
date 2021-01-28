@@ -14,7 +14,7 @@ def generate_launch_description():
         [get_package_share_directory("march_description"), "urdf", robot_description]
     )
     balance = LaunchConfiguration("balance")
-    
+
     return LaunchDescription(
         [
             DeclareLaunchArgument(
