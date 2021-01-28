@@ -5,6 +5,7 @@ from march_gait_selection.dynamic_gaits.semi_dynamic_setpoints_gait import (
     SemiDynamicSetpointsGait,
 )
 from march_shared_msgs.srv import SetGaitVersion, ContainsGait
+from rclpy.parameter import Parameter
 from rcl_interfaces.srv import GetParameters
 from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.exceptions import ParameterNotDeclaredException
@@ -30,6 +31,7 @@ class GaitSelection(Node):
         super().__init__(
             NODE_NAME, automatically_declare_parameters_from_overrides=True
         )
+        self._balance_used = False
         try:
             if gait_package is None:
                 gait_package = (
@@ -44,15 +46,15 @@ class GaitSelection(Node):
                     .string_value
                 )
 
+            self._balance_used = (
+                self.get_parameter("balance").get_parameter_value().bool_value
+            )
+
         except ParameterNotDeclaredException:
             self.get_logger().error(
                 "Gait selection node started without required parameters "
                 "gait_package, gait_directory and balance"
             )
-
-        self._balance_used = (
-            self.get_parameter_or("balance", False).get_parameter_value().bool_value
-        )
 
         package_path = get_package_share_directory(gait_package)
         self._directory_name = directory
