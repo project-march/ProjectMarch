@@ -21,8 +21,23 @@ ModelPredictiveController::ModelPredictiveController(std::vector<std::vector<flo
 {
 }
 
-void ModelPredictiveController::init()
-{
+void ModelPredictiveController::setReference(vector<vector<double>> reference) {
+    for(int i = 0; i < ACADO_N; i++) {
+        for(int j = 0; j < ACADO_NY; j++) {
+            acadoVariables.y[i*ACADO_NY+j] = reference[i][j];
+        }
+    }
+    for(int j = 0; j < ACADO_NYN; j++) {
+        acadoVariables.yN[j] = reference[ACADO_N][j];
+    }
+}
+
+void ModelPredictiveController::scrollReference(vector<vector<double>>& reference) {
+    reference.erase(reference.begin());
+    reference.push_back(reference[0]);
+}
+
+void ModelPredictiveController::init() {
   // Initialize the solver
   acado_initializeSolver();
 
