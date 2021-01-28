@@ -44,9 +44,7 @@ class GaitSelection(Node):
                     .string_value
                 )
             self._balance_used = (
-                self.get_parameter("balance")
-                    .get_parameter_value()
-                    .bool_value
+                self.get_parameter("balance").get_parameter_value().bool_value
             )
 
         except ParameterNotDeclaredException:
@@ -278,11 +276,11 @@ class GaitSelection(Node):
 
         self._load_semi_dynamic_gaits(gaits)
 
-        if self._balance_used and 'balance_walk' in gaits.keys():
-            balance_gait = BalanceGait(node=self, default_walk=gaits['balance_walk'])
+        if self._balance_used and "balance_walk" in gaits.keys():
+            balance_gait = BalanceGait(node=self, default_walk=gaits["balance_walk"])
             if balance_gait is not None:
                 self.get_logger().info("Successfully created a balance gait")
-                gaits['balanced_walk'] = balance_gait
+                gaits["balanced_walk"] = balance_gait
 
         return gaits
 
