@@ -235,9 +235,7 @@ class Subgait(object):
         timestamps = self.get_unique_timestamps()
         for timestamp in timestamps:
             joint_trajectory_point = trajectory_msg.JointTrajectoryPoint()
-            joint_trajectory_point.time_from_start = CustomDuration(
-                seconds=timestamp
-            ).to_msg()
+            joint_trajectory_point.time_from_start = timestamp.to_msg()
 
             for joint in self.joints:
                 interpolated_setpoint = joint.get_interpolated_setpoint(timestamp)

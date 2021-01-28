@@ -3,6 +3,7 @@ from march_utility.exceptions.gait_exceptions import TransitionError
 from march_utility.gait.joint_trajectory import JointTrajectory
 from march_utility.gait.setpoint import Setpoint
 from march_utility.gait.subgait import Subgait
+from march_utility.utilities.duration import CustomDuration
 
 
 class TransitionSubgait(Subgait):
@@ -12,7 +13,7 @@ class TransitionSubgait(Subgait):
     def __init__(
         self,
         joints,
-        duration,
+        duration: CustomDuration,
         gait_type="walk_like",
         gait_name="Transition",
         subgait_name="Transition_subgait",

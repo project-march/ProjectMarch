@@ -2,9 +2,10 @@ import math
 from copy import deepcopy
 from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
 from march_utility.gait.subgait import Subgait
+from march_utility.utilities.duration import CustomDuration
 
 SECS_TO_NANOSECS = 1e9
-SHOULD_NOT_FREEZE_FIRST_SECS = 0.3  # secs
+SHOULD_NOT_FREEZE_FIRST_SECS = CustomDuration(seconds=0.3)
 
 
 class SemiDynamicSetpointsGait(SetpointsGait):
@@ -16,7 +17,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         )
         self._should_freeze = False
         self._is_frozen = False
-        self._freeze_duration = 0
+        self._freeze_duration = CustomDuration(0)
         self._freeze_position = None
 
     @property
@@ -33,7 +34,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             return False
         return True
 
-    def freeze(self, duration: float = 3.0):
+    def freeze(self, duration: CustomDuration = CustomDuration(seconds=3)):
         """
         If the subgait can freeze it will freeze for the given duration, this
         will later be changed to start the next subgait more dynamically
@@ -44,7 +45,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             self._should_freeze = True
             self._freeze_duration = duration
 
-    def update(self, elapsed_time):
+    def update(self, elapsed_time: CustomDuration):
         """
         Update the progress of the gait, should be called regularly.
         If the current subgait is still running, this does nothing.
@@ -56,7 +57,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         self._time_since_start += elapsed_time
         if self._should_freeze:
             trajectory = self._execute_freeze()
-            self._time_since_start = 0.0  # New subgait is started, so reset the time
+            self._time_since_start = CustomDuration(0)  # New subgait is started, so reset the time
             return trajectory, False
 
         # If the current subgait is not finished, no new trajectory is necessary
@@ -67,7 +68,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         if self._is_frozen:
             self._current_subgait = self._subgait_after_freeze
             trajectory = self._current_subgait.to_joint_trajectory_msg()
-            self._time_since_start = 0.0  # New subgait is started, so reset the time
+            self._time_since_start = CustomDuration(0) # New subgait is started, so reset the time
             self._is_frozen = False
             return trajectory, False
 
@@ -121,14 +122,9 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         Generates a subgait of the freeze duration based on the current position.
         :return: A subgait to freeze in current position
         """
-        duration_secs = math.floor(self._freeze_duration)
-        duration_nsecs = (self._freeze_duration - duration_secs) * SECS_TO_NANOSECS
         new_dict = {
             "description": "A subgait that stays in the same position",
-            "duration": {
-                "nsecs": duration_nsecs,
-                "secs": duration_secs,
-            },
+            "duration": self._freeze_duration.nanoseconds,
             "gait_type": self._current_subgait.gait_type,
             "joints": dict(
                 [
@@ -137,10 +133,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
                         [
                             {
                                 "position": self._freeze_position[joint.name],
-                                "time_from_start": {
-                                    "nsecs": duration_nsecs,
-                                    "secs": duration_secs,
-                                },
+                                "time_from_start": self._freeze_duration.nanoseconds,
                                 "velocity": 0,
                             }
                         ],
@@ -159,7 +152,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             version="Only version, generated from code",
         )
 
-    def _position_after_time(self, elapsed_time):
+    def _position_after_time(self, elapsed_time: CustomDuration):
         """
         The position that the exoskeleton should be in after a certain elapsed
         time of the current subgait.

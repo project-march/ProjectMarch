@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from copy import deepcopy
 
 from march_utility.utilities.utility_functions import weighted_average_floats
 from rclpy.duration import Duration as ROSDuration
@@ -27,6 +28,10 @@ class CustomDuration(ROSDuration):
             raise TypeError(f"Weighted average expectes other to be a CustomDuration, but got a {type(other)}")
         return CustomDuration(nanoseconds=weighted_average_floats(self.nanoseconds, other.nanoseconds, parameter))
 
+    @classmethod
+    def from_ros_duration(cls, duration: ROSDuration):
+        return cls(nanoseconds=duration.nanoseconds)
+
     def __add__(self, other):
         return CustomDuration(nanoseconds=self.nanoseconds + other.nanoseconds)
 
@@ -46,11 +51,8 @@ class CustomDuration(ROSDuration):
             return self.nanoseconds / other.nanoseconds
         raise TypeError(f"Expected numerical value or CustomDuration, bot got type: {type(other)}")
 
-
-    def __rtruediv__(self, other):
-        if not (isinstance(other, int) or isinstance(other, float)):
-            raise TypeError(f"Expected numerical value, bot got type: {type(other)}")
-        return other / self.seconds
-
     def __hash__(self):
         return hash(self.nanoseconds)
+
+    def __deepcopy__(self, memo):
+        return CustomDuration(nanoseconds=self.nanoseconds)

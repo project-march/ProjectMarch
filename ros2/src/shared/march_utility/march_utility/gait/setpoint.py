@@ -124,7 +124,7 @@ class Setpoint:
         """
         self.velocity = (next_state.position - self.position) / (
             next_state.time - self.time
-        )
+        ).seconds
 
     @staticmethod
     def interpolate_setpoints(

@@ -2,7 +2,7 @@ from pathlib import Path
 import re
 
 if __name__ == '__main__':
-    for path in Path('ik_test').rglob('*.subgait'):
+    for path in Path('/home/bas/march/ros2/src/gaits/march_gait_selection/test/testing_gait_files').rglob('*.subgait'):
         file = open(path, "r")
         content = file.read()
         replacements = []
