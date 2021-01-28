@@ -2,6 +2,8 @@
 
 #include <march_gazebo_plugins/obstacle_controller.h>
 #include <ros/ros.h>
+#include <typeinfo>
+
 namespace gazebo
 {
 ObstacleController::ObstacleController(physics::ModelPtr model)
@@ -34,6 +36,11 @@ ObstacleController::ObstacleController(physics::ModelPtr model)
 {
   foot_left_ = model_->GetLink("ankle_plate_left");
   foot_right_ = model_->GetLink("ankle_plate_right");
+  // Roughly the length of the upper leg, this is bodged for now as I cannot seem to get the length of the link
+  // from the urdf in here. This is used for the goal position calculation when siting & standing up
+  double upper_leg_length_ = 0.40;
+  halved_upper_leg_length_ = upper_leg_length_ / 2.0;
+
   ros::param::get("balance", balance_);
   // As long as no sitting gait is executed, the default to use when no subgait is idle_stand
   subgait_name_ = HOME_STAND;
@@ -52,9 +59,10 @@ void ObstacleController::newSubgait(const march_shared_msgs::CurrentGaitConstPtr
   if (subgait_name_ == "right_open" or subgait_name_ == "right_swing" or
       subgait_name_ == "left_swing")
   {
-    // Exponential smoothing with alpha = 0.2
-    swing_step_size_ = 0.8 * swing_step_size_ + 0.4 * std::abs(foot_right_->WorldPose().Pos().X() -
-                                                                           foot_left_->WorldPose().Pos().X());
+    // Exponential smoothing with alpha = 0.8
+    double alpha = 0.8;
+    swing_step_size_ = alpha * swing_step_size_ + (1 - alpha) * 2 * std::abs(foot_right_->WorldPose().Pos().X() -
+                                                                         foot_left_->WorldPose().Pos().X());
   }
 
   if (subgait_name_ == HOME_STAND and msg->subgait.substr(0, 4) == "left")
@@ -115,7 +123,7 @@ void ObstacleController::update(ignition::math::v6::Vector3<double>& torque_left
   // roll, pitch and yaw are defined in
   // https://docs.projectmarch.nl/doc/march_packages/march_simulation.html#torque-application
   // turn (bodge) off plug-in at right time when balance is set to true
-  if (balance_ == true && subgait_name_ != HOME_STAND && subgait_name_ != "idle_state")
+  if (balance_ == true && subgait_name_ != HOME_STAND && subgait_name_ != STAND_IDLE)
   {
     p_pitch_actual = p_pitch_off_;
     p_roll_actual = p_roll_off_;
@@ -161,49 +169,80 @@ void ObstacleController::getGoalPosition(double time_since_start)
   // Left foot is stable unless subgait name starts with left
   auto stable_foot_pose = foot_left_->WorldCoGPose().Pos();
   auto swing_foot_pose = foot_right_->WorldCoGPose().Pos();
-  if (subgait_name_.substr(0, 4) == "left")
+
+  if (subgait_name_.find("left") != std::string::npos)
   {
     stable_foot_pose = foot_right_->WorldCoGPose().Pos();
     swing_foot_pose = foot_left_->WorldCoGPose().Pos();
   }
-  // Goal position is determined from the location of the stable foot
-  goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
-  
-  // If the exoskeleton is in an idle sit position, put the CoM a bit behind the stable foot
-  if (subgait_name_ == SIT_IDLE) {
-    goal_position_x = stable_foot_pose.X() + 0.2 * swing_step_size_;
-  } // If the exoskeleton is in an idle stand position, put the CoM on the stable foot
-  else if (subgait_name_ == STAND_IDLE) {
-    goal_position_x = stable_foot_pose.X();
-  }// Change the default that is used without a subgait to idle_sit after sitting
-    // During the sitting down the CoM will be controlled between the stable foot and the final sit
-  else if (subgait_name_.find("sit") != std::string::npos) {
-    default_subgait_name_ = SIT_IDLE;
-    goal_position_x = stable_foot_pose.X() + 0.1 * swing_step_size_;
-  } // Change the default that is used without a subgait to idle_stand after standing up
-    // During the standing the CoM will be controlled between the stable foot and the final sit
-  else if (subgait_name_.find("stand") != std::string::npos) {
-    default_subgait_name_ = STAND_IDLE;
-    goal_position_x = stable_foot_pose.X() + 0.1 * swing_step_size_;
-  }
 
-  if (subgait_name_.substr(0, 6) != "freeze")
+  // Y coordinate of the goal position is determined from the location of the stable foot
+  goal_position_y = 0.75 * stable_foot_pose.Y() + 0.25 * swing_foot_pose.Y();
+
+  // X coordinate of the goal position is determined from the current subgait the exoskeleton in executing
+  // if the exo skeleton is frozen, do not send a new goal_position_x, keep it at previous value
+  if (subgait_name_.find("freeze") == std::string::npos)
   {
-    goal_position_x = stable_foot_pose.X();
-    // Start goal position a quarter step size behind the stable foot
-    // Move the goal position forward with v = 0.5 * swing_step_size/subgait_duration
-    if (subgait_name_.substr(subgait_name_.size() - 4) == "open")
-    {
-      goal_position_x += -0.25 * time_since_start * swing_step_size_ / subgait_duration_;
+    if (subgait_name_.find("sit") != std::string::npos || subgait_name_ == "prepare_stand_up") {
+      getSitGoalPositionX(time_since_start, stable_foot_pose.X());
     }
-    else if (subgait_name_.substr(subgait_name_.size() - 5) == "swing")
-    {
-      goal_position_x += 0.25 * swing_step_size_ - 0.5 * time_since_start * swing_step_size_ / subgait_duration_;
+    else if (subgait_name_.find("stand") != std::string::npos) {
+      getStandGoalPositionX(time_since_start, stable_foot_pose.X());
     }
-    else if (subgait_name_.substr(subgait_name_.size() - 5) == "close")
-    {
-      goal_position_x += 0.25 * swing_step_size_ - 0.25 * time_since_start * swing_step_size_ / subgait_duration_;
+    else if (subgait_name_.find("right") != std::string::npos || subgait_name_.find("left") != std::string::npos) {
+      getWalkGoalPositionX(time_since_start, stable_foot_pose.X());
     }
+  }
+}
+
+void ObstacleController::getSitGoalPositionX(double time_since_start, double stable_foot_pose_x)
+{
+  goal_position_x = stable_foot_pose_x;
+  // If the exoskeleton is busy sitting down, move the CoM behind the stable foot
+  // Set 'sitting' as the new default state
+  if (subgait_name_.substr(subgait_name_.size() - 8) == "sit_down") {
+    default_subgait_name_ = SIT_IDLE;
+    goal_position_x += halved_upper_leg_length_ * time_since_start / subgait_duration_;
+  }
+    // If the exoskeleton has sat down or is moving while sitting, keep the CoM behind the stable foot
+  else if (subgait_name_ == SIT_IDLE || subgait_name_.substr(subgait_name_.size() - 8) == "sit_home" ||
+           subgait_name_.substr(subgait_name_.size() - 16) == "prepare_stand_up") {
+    goal_position_x += halved_upper_leg_length_; // and try using the hip position.
+  }
+}
+
+void ObstacleController::getStandGoalPositionX(double time_since_start, double stable_foot_pose_x)
+{
+  goal_position_x = stable_foot_pose_x;
+  // If the exoskeleton is busy standing up, move the CoM forward again (relative when sitting down)
+  // Set 'Standing' as the new default state
+  if (subgait_name_.substr(subgait_name_.size() - 8) == "stand_up") {
+    default_subgait_name_ = STAND_IDLE;
+    goal_position_x += halved_upper_leg_length_ * (1 - time_since_start / subgait_duration_);
+  }
+}
+
+void ObstacleController::getWalkGoalPositionX(double time_since_start, double stable_foot_pose_x)
+{
+  goal_position_x = stable_foot_pose_x;
+  // If the exoskeleton is executing an open gait (generally right_open),
+  // move the CoM from the stable foot to a quarter step size in front.
+  // quarter step sizes are used during the walk to avoid sending the CoM too far from the stable foot
+  if (subgait_name_.substr(subgait_name_.size() - 4) == "open")
+  {
+    goal_position_x += - 0.25 * time_since_start * swing_step_size_ / subgait_duration_;
+  }
+  // During the swing phase, move the CoM from a quarter step size behind the stable foot, to a quarter step size
+  // in front of the stable foot
+  else if (subgait_name_.substr(subgait_name_.size() - 5) == "swing")
+  {
+    goal_position_x += 0.25 * swing_step_size_ - 0.5 * time_since_start * swing_step_size_ / subgait_duration_;
+  }
+  // If the exosekelton in executing a close gait, move the CoM from a quarter step size behind the stable foot,
+  // to the stable foot
+  else if (subgait_name_.substr(subgait_name_.size() - 5) == "close")
+  {
+    goal_position_x += 0.25 * swing_step_size_ - 0.25 * time_since_start * swing_step_size_ / subgait_duration_;
   }
 }
 
