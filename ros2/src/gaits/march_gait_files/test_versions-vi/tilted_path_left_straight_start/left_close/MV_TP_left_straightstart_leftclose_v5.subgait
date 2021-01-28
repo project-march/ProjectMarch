@@ -1,83 +1,83 @@
 description: Straight start corresponding to version 5.
-duration: {nsecs: 500000000, secs: 2}
+duration: 2500000000
 gait_type: stairs_like
 joints:
   left_ankle:
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: -0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 666700000, secs: 1}
+    time_from_start: 1666700000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: -0.0
   left_hip_fe:
   - position: -0.2269
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1537
-    time_from_start: {nsecs: 573200000, secs: 0}
+    time_from_start: 573200000
     velocity: 1.3963
   - position: 0.9002
-    time_from_start: {nsecs: 237500000, secs: 1}
+    time_from_start: 1237500000
     velocity: -0.1745
   - position: 0.6109
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   left_knee:
   - position: 0.3491
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.309
-    time_from_start: {nsecs: 648100000, secs: 0}
+    time_from_start: 648100000
     velocity: 0.8727
   - position: 1.4399
-    time_from_start: {nsecs: 157399999, secs: 1}
+    time_from_start: 1157399999
     velocity: 0.0
   - position: 0.9076
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   right_ankle:
   - position: 0.1047
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: -0.0
   right_hip_aa:
   - position: 0.1222
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1222
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: -0.0
   right_hip_fe:
   - position: 0.6109
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.6109
-    time_from_start: {nsecs: 463000000, secs: 0}
+    time_from_start: 463000000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   right_knee:
   - position: 0.6632
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.6632
-    time_from_start: {nsecs: 463000000, secs: 0}
+    time_from_start: 463000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
 name: left_close
 version: MV_TP_left_straightstart_leftclose_v5

@@ -1,79 +1,79 @@
 description: The setpoints of this walking gait are the same as the setpoints of the
   MIII walking gait, except for the fact that the timing of the setpoints in different.
   Besides that, the maximal hip flexion is extended till 50% of the gait cycle.
-duration: {nsecs: 250000000, secs: 1}
+duration: 1250000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 31300000, secs: 0}
+    time_from_start: 31300000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: -0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 31300000, secs: 0}
+    time_from_start: 31300000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: -0.0
   left_hip_fe:
   - position: 0.4887
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -0.3491
   - position: -0.1667
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: 0.0
   left_knee:
   - position: 0.1396
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.3491
   - position: 0.2094
-    time_from_start: {nsecs: 250000000, secs: 0}
+    time_from_start: 250000000
     velocity: 0.0
   - position: 0.1396
-    time_from_start: {nsecs: 850000000, secs: 0}
+    time_from_start: 850000000
     velocity: 0.0
   - position: 0.1396
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: 0.0
   right_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 31300000, secs: 0}
+    time_from_start: 31300000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: -0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 31300000, secs: 0}
+    time_from_start: 31300000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: -0.0
   right_hip_fe:
   - position: -0.1667
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.4887
-    time_from_start: {nsecs: 750000000, secs: 0}
+    time_from_start: 750000000
     velocity: 0.1396
   - position: 0.4887
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: -0.3491
   right_knee:
   - position: 0.1396
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.8727
-    time_from_start: {nsecs: 525000000, secs: 0}
+    time_from_start: 525000000
     velocity: 0.0
   - position: 0.0969
-    time_from_start: {nsecs: 125000000, secs: 1}
+    time_from_start: 1125000000
     velocity: 0.0
   - position: 0.1396
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: 0.3491
 name: right_swing
 version: MIII_tweaked_longer_hip_flexion

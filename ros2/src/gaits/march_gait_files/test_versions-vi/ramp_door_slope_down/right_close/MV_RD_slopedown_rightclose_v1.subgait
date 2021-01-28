@@ -1,86 +1,86 @@
 description: One of the two options for the closing step on the ramp.
-duration: {nsecs: 0, secs: 3}
+duration: 3000000000
 gait_type: stairs_like
 joints:
   left_ankle:
   - position: -0.2618
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -0.0
   - position: -0.2618
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: -0.0
   - position: -0.2618
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: -0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -0.0
   - position: 0.0
-    time_from_start: {nsecs: 627500000, secs: 2}
+    time_from_start: 2627500000
     velocity: -0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: -0.0
   left_hip_fe:
   - position: 0.4583
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: -0.0
   left_knee:
   - position: 0.2065
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.5251
-    time_from_start: {nsecs: 750000000, secs: 0}
+    time_from_start: 750000000
     velocity: -0.0
   - position: 0.0
-    time_from_start: {nsecs: 950000000, secs: 1}
+    time_from_start: 1950000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   right_ankle:
   - position: -0.2618
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -0.0
   - position: -0.2618
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: 0.0
   - position: -0.2618
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: -0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -0.0
   - position: 0.0
-    time_from_start: {nsecs: 464900000, secs: 2}
+    time_from_start: 2464900000
     velocity: -0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: -0.0
   right_hip_fe:
   - position: 0.1745
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -0.0
   - position: 0.5558
-    time_from_start: {nsecs: 50000000, secs: 1}
+    time_from_start: 1050000000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: -0.0
   right_knee:
   - position: 0.6981
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.8668
-    time_from_start: {nsecs: 199999999, secs: 1}
+    time_from_start: 1199999999
     velocity: -0.3491
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: -0.0
 name: right_close
 version: MV_RD_slopedown_rightclose_v1

@@ -1,92 +1,92 @@
 description: The left close gait for the high step of the Rough Terrain.
-duration: {nsecs: 700000000, secs: 1}
+duration: 1700000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1222
-    time_from_start: {nsecs: 576000000, secs: 0}
+    time_from_start: 576000000
     velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: -0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 637400000, secs: 0}
+    time_from_start: 637400000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 850000000, secs: 0}
+    time_from_start: 850000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: -0.0
   left_hip_fe:
   - position: -0.2269
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.0472
-    time_from_start: {nsecs: 615600000, secs: 0}
+    time_from_start: 615600000
     velocity: 0.1396
   - position: 0.4008
-    time_from_start: {nsecs: 147200000, secs: 1}
+    time_from_start: 1147200000
     velocity: -1.2252
   - position: -0.0873
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: 0.0
   left_knee:
   - position: 0.1396
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.6581
-    time_from_start: {nsecs: 360800000, secs: 0}
+    time_from_start: 360800000
     velocity: 0.0
   - position: 0.9692
-    time_from_start: {nsecs: 835800000, secs: 0}
+    time_from_start: 835800000
     velocity: -1.5708
   - position: 0.0
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: 0.0
   right_ankle:
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: -0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 637400000, secs: 0}
+    time_from_start: 637400000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 850000000, secs: 0}
+    time_from_start: 850000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: -0.0
   right_hip_fe:
   - position: 0.3491
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -0.3491
   - position: -0.0873
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: 0.0
   right_knee:
   - position: 0.1396
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1396
-    time_from_start: {nsecs: 550000000, secs: 0}
+    time_from_start: 550000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: 0.0
 name: left_close
 version: MV_RT_highstep_leftclose_v1

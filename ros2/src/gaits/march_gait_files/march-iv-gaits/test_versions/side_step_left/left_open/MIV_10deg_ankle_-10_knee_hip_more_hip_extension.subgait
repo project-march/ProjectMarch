@@ -1,74 +1,74 @@
 description: Left open step for a step to the side, ankle 2.5, HAA 10 deg.
-duration: {nsecs: 0, secs: 2}
+duration: 2000000000
 gait_type: ''
 joints:
   left_ankle:
   - position: -0.1745
-    time_from_start: {nsecs: 50100000, secs: 0}
+    time_from_start: 50100000
     velocity: 0.0
   - position: -0.1745
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1745
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: 0.0
   left_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.3491
-    time_from_start: {nsecs: 0, secs: 1}
+    time_from_start: 1000000000
     velocity: 0.0
   - position: -0.1745
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: 0.0
   left_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.5236
-    time_from_start: {nsecs: 0, secs: 1}
+    time_from_start: 1000000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: 0.0
   right_ankle:
   - position: -0.1745
-    time_from_start: {nsecs: 50100000, secs: 0}
+    time_from_start: 50100000
     velocity: 0.0
   - position: -0.1745
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: -0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0524
-    time_from_start: {nsecs: 400000000, secs: 0}
+    time_from_start: 400000000
     velocity: 0.0
   - position: 0.1745
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: 0.0
   right_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 409900000, secs: 0}
+    time_from_start: 409900000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: 0.0
   right_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: 0.0
 name: left_open
 version: MIV_10deg_ankle_-10_knee_hip_more_hip_extension
