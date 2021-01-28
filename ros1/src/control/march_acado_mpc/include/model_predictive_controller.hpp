@@ -42,6 +42,10 @@ public:
 
     void scrollReference(vector<vector<double>>& reference);
 
+//    void stepRef(vector<vector<double>>& ref, double amp, int N, double dt);
+
+//    void sinRef(vector<vector<double>>& ref, double freq, double amp, int N, double dt);
+
 private:
 
 
