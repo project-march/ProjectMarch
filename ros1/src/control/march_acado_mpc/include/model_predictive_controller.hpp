@@ -44,6 +44,10 @@ public:
      */
     void assignWeightingMatrix(std::vector<std::vector<float>> Q);
 
+//    void stepRef(vector<vector<double>>& ref, double amp, int N, double dt);
+
+//    void sinRef(vector<vector<double>>& ref, double freq, double amp, int N, double dt);
+
 private:
   std::vector<std::vector<float>> Q_;
 };
