@@ -43,15 +43,16 @@ class GaitSelection(Node):
                     .get_parameter_value()
                     .string_value
                 )
-            self._balance_used = (
-                self.get_parameter("balance").get_parameter_value().bool_value
-            )
 
         except ParameterNotDeclaredException:
             self.get_logger().error(
                 "Gait selection node started without required parameters "
                 "gait_package, gait_directory and balance"
             )
+
+        self._balance_used = (
+            self.get_parameter_or("balance", False).get_parameter_value().bool_value
+        )
 
         package_path = get_package_share_directory(gait_package)
         self._directory_name = directory

@@ -1,9 +1,10 @@
 from copy import deepcopy
 from threading import Event
-from typing import Tuple
+from typing import Tuple, Optional
 
 from march_utility.gait.gait import Gait
-from rclpy import Future, Node
+from rclpy import Future
+from rclpy.node import Node
 from rclpy.duration import Duration
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Header
@@ -211,7 +212,7 @@ class BalanceGait(GaitInterface):
     def duration_to_sec(self, duration: Duration) -> float:
         return float(duration.sec) + (duration.nanosec * self.NANOSEC_TO_SEC)
 
-    def update(self, elapsed_time: float) -> Tuple[JointTrajectory, bool]:
+    def update(self, elapsed_time: float) -> Tuple[Optional[JointTrajectory], bool]:
         self._time_since_start += elapsed_time
         if self._time_since_start < self._current_subgait_duration:
             return None, False
