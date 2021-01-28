@@ -31,7 +31,9 @@ class Setpoint:
         :param position: The position (angle) of the joint.
         :param velocity: The velocity of the joint.
         """
-        self._time = round(time, self.digits) # https://github.com/python/mypy/issues/8213
+        self._time = round(
+            time, self.digits
+        )  # https://github.com/python/mypy/issues/8213
         self._position = round(position, self.digits)
         if velocity is not None:
             self._velocity: Optional[float] = round(velocity, self.digits)

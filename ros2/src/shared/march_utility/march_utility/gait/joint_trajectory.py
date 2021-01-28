@@ -177,7 +177,9 @@ class JointTrajectory(object):
             False if the starting/ending point is (not at 0/duration) and
             (has nonzero speed), True otherwise
         """
-        return (self.setpoints[0].time.nanoseconds == 0 or self.setpoints[0].velocity == 0) and (
+        return (
+            self.setpoints[0].time.nanoseconds == 0 or self.setpoints[0].velocity == 0
+        ) and (
             self.setpoints[-1].time == round(self.duration, Setpoint.digits)
             or self.setpoints[-1].velocity == 0
         )
@@ -265,7 +267,9 @@ class JointTrajectory(object):
             )
             setpoints.append(interpolated_setpoint_to_add)
 
-        duration = base_trajectory.duration.weighted_average(other_trajectory.duration, parameter)
+        duration = base_trajectory.duration.weighted_average(
+            other_trajectory.duration, parameter
+        )
         return JointTrajectory(
             base_trajectory.name, base_trajectory.limits, setpoints, duration
         )

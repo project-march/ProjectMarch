@@ -57,7 +57,9 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         self._time_since_start += elapsed_time
         if self._should_freeze:
             trajectory = self._execute_freeze()
-            self._time_since_start = Duration(0)  # New subgait is started, so reset the time
+            self._time_since_start = Duration(
+                0
+            )  # New subgait is started, so reset the time
             return trajectory, False
 
         # If the current subgait is not finished, no new trajectory is necessary
@@ -68,7 +70,9 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         if self._is_frozen:
             self._current_subgait = self._subgait_after_freeze
             trajectory = self._current_subgait.to_joint_trajectory_msg()
-            self._time_since_start = Duration(0) # New subgait is started, so reset the time
+            self._time_since_start = Duration(
+                0
+            )  # New subgait is started, so reset the time
             self._is_frozen = False
             return trajectory, False
 

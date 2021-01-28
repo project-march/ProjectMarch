@@ -165,7 +165,9 @@ class GaitStateMachine(object):
             )
         )
 
-    def _current_gait_cb(self, gait_name, subgait_name, version, duration: Duration, gait_type):
+    def _current_gait_cb(
+        self, gait_name, subgait_name, version, duration: Duration, gait_type
+    ):
         """Standard callback when gait changes, publishes the current gait
         More callbacke can be added using add_gait_callback"""
         self.current_gait_pub.publish(

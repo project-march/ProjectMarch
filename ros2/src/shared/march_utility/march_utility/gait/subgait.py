@@ -370,7 +370,9 @@ class Subgait(object):
             f"Based on foot position: {use_foot_position}"
         )
 
-        duration = base_subgait.duration.weighted_average(other_subgait.duration, parameter)
+        duration = base_subgait.duration.weighted_average(
+            other_subgait.duration, parameter
+        )
 
         gait_type = (
             base_subgait.gait_type if parameter <= 0.5 else other_subgait.gait_type
@@ -579,7 +581,9 @@ class Subgait(object):
                 )
                 new_setpoints[ankle_joint].append(new_ankle_setpoint_to_add)
 
-        duration = base_subgait.duration.weighted_average(other_subgait.duration, parameter)
+        duration = base_subgait.duration.weighted_average(
+            other_subgait.duration, parameter
+        )
 
         for joint in base_subgait.joints:
             interpolated_joint_trajectory_to_add = JointTrajectory(

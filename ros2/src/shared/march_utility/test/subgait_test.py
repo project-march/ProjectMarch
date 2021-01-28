@@ -201,8 +201,15 @@ class SubgaitTest(unittest.TestCase):
     def test_equalize_amount_of_setpoints_with_higher_duration_new_gait(self):
         self.subgait.scale_timestamps_subgait(Duration(seconds=1.5))
 
-        timestamps = sorted(set(self.subgait.get_unique_timestamps() + [Duration(t) for t in [1.1, 1.2, 1.3]]))
-        self.subgait.create_interpolated_setpoints([Duration(t) for t in [1.1, 1.2, 1.3]])
+        timestamps = sorted(
+            set(
+                self.subgait.get_unique_timestamps()
+                + [Duration(t) for t in [1.1, 1.2, 1.3]]
+            )
+        )
+        self.subgait.create_interpolated_setpoints(
+            [Duration(t) for t in [1.1, 1.2, 1.3]]
+        )
 
         self.assertEqual(
             timestamps,
@@ -217,9 +224,14 @@ class SubgaitTest(unittest.TestCase):
         self.subgait.scale_timestamps_subgait(Duration(0.8))
 
         timestamps = sorted(
-            set(self.subgait.get_unique_timestamps() + [Duration(t) for t in [0.6, 0.7, 0.75]])
+            set(
+                self.subgait.get_unique_timestamps()
+                + [Duration(t) for t in [0.6, 0.7, 0.75]]
+            )
         )
-        self.subgait.create_interpolated_setpoints([Duration(t) for t in [0.6, 0.7, 0.75]])
+        self.subgait.create_interpolated_setpoints(
+            [Duration(t) for t in [0.6, 0.7, 0.75]]
+        )
 
         self.assertEqual(
             timestamps,
@@ -348,7 +360,9 @@ class SubgaitTest(unittest.TestCase):
         new_subgait = Subgait.interpolate_subgaits(
             base_subgait, other_subgait, parameter
         )
-        new_duration = base_subgait.duration.weighted_average(other_subgait.duration, parameter)
+        new_duration = base_subgait.duration.weighted_average(
+            other_subgait.duration, parameter
+        )
         self.assertEqual(new_duration, new_subgait.duration)
 
     def test_interpolate_subgaits_duration_ik(self):
@@ -357,5 +371,7 @@ class SubgaitTest(unittest.TestCase):
         new_subgait = Subgait.interpolate_subgaits(
             base_subgait, other_subgait, parameter, use_foot_position=True
         )
-        new_duration = base_subgait.duration.weighted_average(other_subgait.duration, parameter)
+        new_duration = base_subgait.duration.weighted_average(
+            other_subgait.duration, parameter
+        )
         self.assertEqual(new_duration, new_subgait.duration)

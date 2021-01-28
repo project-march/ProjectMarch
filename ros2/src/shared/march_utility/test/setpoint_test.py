@@ -45,7 +45,9 @@ class SetpointTest(unittest.TestCase):
         )
 
     def test_equal(self):
-        other_setpoint = Setpoint(Duration(seconds=1.1234125445313287), 0.034341264534, 123.16208455453)
+        other_setpoint = Setpoint(
+            Duration(seconds=1.1234125445313287), 0.034341264534, 123.16208455453
+        )
         self.assertEqual(self.setpoint, other_setpoint)
 
     def test_different_classes(self):
@@ -53,11 +55,15 @@ class SetpointTest(unittest.TestCase):
         self.assertNotEqual(self.setpoint, other_setpoint)
 
     def test_unequal_time(self):
-        other_setpoint = Setpoint(Duration(seconds=1.123491381), 0.03434126, 123.16208455)
+        other_setpoint = Setpoint(
+            Duration(seconds=1.123491381), 0.03434126, 123.16208455
+        )
         self.assertNotEqual(self.setpoint, other_setpoint)
 
     def test_unequal_position(self):
-        other_setpoint = Setpoint(Duration(seconds=1.12341254), -0.03434126, 123.16208455)
+        other_setpoint = Setpoint(
+            Duration(seconds=1.12341254), -0.03434126, 123.16208455
+        )
         self.assertNotEqual(self.setpoint, other_setpoint)
 
     def test_unequal_velocity(self):
@@ -69,7 +75,9 @@ class SetpointTest(unittest.TestCase):
         parameter = 0.3
         other_setpoint = Setpoint(Duration(seconds=time), position, velocity)
         expected_result = Setpoint(
-            Duration(seconds=self.setpoint.time.seconds * (1 - parameter) + parameter * time),
+            Duration(
+                seconds=self.setpoint.time.seconds * (1 - parameter) + parameter * time
+            ),
             self.setpoint.position * (1 - parameter) + parameter * position,
             self.setpoint.velocity * (1 - parameter) + parameter * velocity,
         )
@@ -119,7 +127,9 @@ class SetpointTest(unittest.TestCase):
 
         other_right_foot = Foot(Side.right, Vector3d(1, 1, 1), Vector3d(1, 1, 1))
         other_left_foot = Foot(Side.left, Vector3d(1, 1, 1), Vector3d(1, 1, 1))
-        other_state = FeetState(other_right_foot, other_left_foot, Duration(seconds=0.1))
+        other_state = FeetState(
+            other_right_foot, other_left_foot, Duration(seconds=0.1)
+        )
 
         resulting_state = FeetState.weighted_average_states(
             base_state, other_state, parameter

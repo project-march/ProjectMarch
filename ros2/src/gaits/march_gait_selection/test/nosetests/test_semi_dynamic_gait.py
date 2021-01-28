@@ -61,7 +61,9 @@ class TestSemiDynamicGaitSelection(unittest.TestCase):
         self.semi_dynamic_gait.freeze(Duration(seconds=10))
         self.semi_dynamic_gait.update(Duration(seconds=1))
         self.semi_dynamic_gait.update(Duration(seconds=9.5))
-        self.assertEqual(self.semi_dynamic_gait._time_since_start, Duration(seconds=9.5))
+        self.assertEqual(
+            self.semi_dynamic_gait._time_since_start, Duration(seconds=9.5)
+        )
 
     def test_freeze_duration_done(self):
         self.semi_dynamic_gait.update(Duration(seconds=2))

@@ -6,7 +6,9 @@ from .gait_interface import GaitInterface
 class HomeGait(GaitInterface):
     """ A standard gait that goes from the unknown state to an idle position. """
 
-    def __init__(self, name, position, gait_type, duration: Duration = Duration(seconds=3)):
+    def __init__(
+        self, name, position, gait_type, duration: Duration = Duration(seconds=3)
+    ):
         """Initializes an executable home gait with given positions.
 
         :param str name: Name of the idle position this gait homes to.

@@ -18,8 +18,8 @@ class TestTransitionTrajectory(unittest.TestCase):
         self.assertAlmostEqual(duration.seconds, 1)
 
     def test_get_seconds(self):
-        duration = Duration(seconds=1)
-        self.assertAlmostEqual(duration.seconds, 1)
+        duration = Duration(seconds=1.5)
+        self.assertAlmostEqual(duration.seconds, 1.5)
 
     def test_add(self):
         duration_1 = Duration(seconds=1)
@@ -47,7 +47,9 @@ class TestTransitionTrajectory(unittest.TestCase):
     def test_weighted_average(self):
         duration_1 = Duration(seconds=4)
         duration_2 = Duration(seconds=8)
-        self.assertEqual(duration_1.weighted_average(duration_2, 0.75).nanoseconds, 7000000000)
+        self.assertEqual(
+            duration_1.weighted_average(duration_2, 0.75).nanoseconds, 7000000000
+        )
 
     def test_round(self):
         duration = Duration(seconds=4.56)

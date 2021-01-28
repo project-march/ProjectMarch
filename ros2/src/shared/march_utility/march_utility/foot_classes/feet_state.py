@@ -25,7 +25,9 @@ JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
 class FeetState(object):
     """Class for encapturing the state of both feet."""
 
-    def __init__(self, right_foot: Foot, left_foot: Foot, time: Duration = None) -> None:
+    def __init__(
+        self, right_foot: Foot, left_foot: Foot, time: Duration = None
+    ) -> None:
         """Create a FeetState object.
 
         :param right_foot: The state of the right foot.
