@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import math
-from typing import Union
+from typing import Union, Any
 
 from march_utility.utilities.utility_functions import weighted_average_floats
 from rclpy.duration import Duration as ROSDuration
@@ -18,10 +18,24 @@ class Duration(ROSDuration):
         super().__init__(seconds=seconds, nanoseconds=nanoseconds)
 
     @property
-    def seconds(self):
+    def seconds(self) -> float:
+        """Convert the nanoseconds to seconds."""
         return self.nanoseconds / NSEC_IN_SEC
 
-    def __round__(self, n=None) -> Duration:
+    def __round__(self, n: int = None) -> Duration:
+        """Round the nanoseconds as if it were seconds.
+
+        This round works as followings:
+        Say self.seconds = 1.25 and you want to round to 1 digit (n=1)
+        Then self.nanoseconds = 1250000000
+        Since n=1, n_pow becomes 10^8.
+        Then self.nanoseconds / n_pow becomes 12.5 and (12.5) = 13.
+        After multiplying again by n_pow we get 1.3 * 10^9 nanoseconds, which is equal
+        to 1,3 seconds.
+
+        :param n Number of decimals to round to
+        :return Returns a new duration, with the rounded amount of seconds.
+        """
         n_pow = math.pow(10, NSEC_DIGITS - n)
         rounded_nanoseconds = round(self.nanoseconds / n_pow) * n_pow
         return Duration(nanoseconds=rounded_nanoseconds)
@@ -31,9 +45,9 @@ class Duration(ROSDuration):
 
         :param other: Other duration
         :param parameter: parameter to use in taking weighted average
+
         :return: Returns the weighted duration
         """
-
         if not isinstance(other, Duration):
             raise TypeError(
                 f"Weighted average expectes other to be a Duration, but got a {type(other)}"
@@ -56,6 +70,7 @@ class Duration(ROSDuration):
         """Add a duration.
 
         :param other: Duration to add
+
         :return Returns the result of the addition
         """
         return Duration(nanoseconds=self.nanoseconds + other.nanoseconds)
@@ -64,6 +79,7 @@ class Duration(ROSDuration):
         """Subtract a duration.
 
         :param other: Duration to subtract
+
         :return Returns the result of the subtraction
         """
         return Duration(nanoseconds=self.nanoseconds - other.nanoseconds)
@@ -72,9 +88,10 @@ class Duration(ROSDuration):
         """Multiply the duration by a numeric value.
 
         :param other: Value to multiply by
+
         :return Returns the result of the multiplication
         """
-        if isinstance(other, int) or isinstance(other, float):
+        if isinstance(other, (int, float)):
             return Duration(nanoseconds=self.nanoseconds * other)
         raise TypeError(f"Expected numerical value, bot got type: {type(other)}")
 
@@ -87,9 +104,10 @@ class Duration(ROSDuration):
         If this value is another Duration, a numeric value is returned.
 
         :param other: What to divide by
+
         :return Returns the result of the division
         """
-        if isinstance(other, int) or isinstance(other, float):
+        if isinstance(other, (int, float)):
             return Duration(nanoseconds=self.nanoseconds / other)
         if isinstance(other, Duration):
             return self.nanoseconds / other.nanoseconds
@@ -101,6 +119,6 @@ class Duration(ROSDuration):
         """Return a hash based on the nanoseconds attribute."""
         return hash(self.nanoseconds)
 
-    def __deepcopy__(self, _) -> Duration:
+    def __deepcopy__(self, _: Any) -> Duration:
         """Create a deepcopy of the Duration."""
         return Duration(nanoseconds=self.nanoseconds)
