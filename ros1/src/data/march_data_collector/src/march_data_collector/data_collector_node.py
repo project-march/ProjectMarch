@@ -2,6 +2,7 @@ import errno
 from math import pi
 import socket
 import sys
+from typing import List
 
 from control_msgs.msg import JointTrajectoryControllerState
 from geometry_msgs.msg import TransformStamped
@@ -15,13 +16,17 @@ from visualization_msgs.msg import Marker
 
 from march_shared_msgs.msg import JointValues, PressureSole
 
-
 from .com_calculator import CoMCalculator
 from march_data_collector.cp_calculator import CPCalculator
 
 
 class DataCollectorNode(object):
-    def __init__(self, com_calculator, cp_calculators, tf_buffer, feet):
+    """A node """
+
+    def __init__(self, com_calculator: CoMCalculator, cp_calculators: List[
+        CPCalculator],
+                 tf_buffer: tf2_ros.Buffer,
+                 feet: dict):
         self.differentiation_order = 2
         self._com_calculator = com_calculator
         self._cp_calculators = cp_calculators
@@ -44,7 +49,9 @@ class DataCollectorNode(object):
         if not self._simulation:
             self._imu_broadcaster = tf2_ros.TransformBroadcaster()
 
-            self._imu_subscriber = rospy.Subscriber("/march/imu", Imu, self.imu_callback)
+            self._imu_subscriber = rospy.Subscriber(
+                "/march/imu", Imu, self.imu_callback
+            )
 
             self.transform_imu = TransformStamped()
 

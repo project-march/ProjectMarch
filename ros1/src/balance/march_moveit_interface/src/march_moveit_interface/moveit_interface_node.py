@@ -1,8 +1,9 @@
+"""Executable to start the moveit interface node."""
 import rospy
-from march_shared_msgs.srv import GetMoveItTrajectory, GetMoveItTrajectoryRequest, \
-    GetMoveItTrajectoryResponse
+from march_shared_msgs.srv import (
+    GetMoveItTrajectory,
+)
 from march_moveit_interface.moveit_interface import MoveItInterface
-from std_srvs.srv import Trigger
 
 
 def main():
@@ -10,8 +11,10 @@ def main():
 
     moveit_interface = MoveItInterface()
 
-    rospy.Service("/march/moveit/get_trajectory",
-                  GetMoveItTrajectory,
-                  moveit_interface.get_joint_trajectory)
+    rospy.Service(
+        "/march/moveit/get_trajectory",
+        GetMoveItTrajectory,
+        moveit_interface.get_joint_trajectory,
+    )
 
     rospy.spin()
