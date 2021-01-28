@@ -1,49 +1,64 @@
-// Copyright 2019 Project March.
-#include "march_safety/safety_handler.h"
+//// Copyright 2019 Project March.
+#include "rclcpp/rclcpp.hpp"
+
+#include "march_safety/safety_handler.hpp"
+#include "march_safety/safety_node.hpp"
+#include <march_shared_msgs/msg/error.hpp>
+#include <march_shared_msgs/msg/gait_instruction.hpp>
 
 #include <string>
 
-SafetyHandler::SafetyHandler(ros::NodeHandle* n, ros::Publisher* error_publisher,
-                             ros::Publisher* gait_instruction_publisher, sound_play::SoundClient& sound_client)
-  : n_(n)
-  , error_publisher_(error_publisher)
-  , gait_instruction_publisher_(gait_instruction_publisher)
-  , fatal_sound_(sound_client.waveSoundFromPkg("march_safety", "sound/fatal.wav"))
-  , non_fatal_sound_(sound_client.waveSoundFromPkg("march_safety", "sound/non_fatal.wav"))
+
+SafetyHandler::SafetyHandler(std::shared_ptr<SafetyNode> node)
+  : node_(node)
 {
 }
 
-void SafetyHandler::publishErrorMessage(const std::string& message, int8_t error_type) const
+/**
+ * @brief Publish an error message to the /march/error topic
+ * @param message Error message
+ * @param error_type Type of the error
+ */
+void SafetyHandler::publishErrorMessage(const std::string& message, int8_t error_type)
 {
-  march_shared_resources::Error error_msg;
+  ErrorMsg error_msg;
   std::ostringstream message_stream;
-  error_msg.header.stamp = ros::Time::now();
+  error_msg.header.stamp = node_->get_clock()->now();
   error_msg.error_message = message;
   error_msg.type = error_type;
-  this->error_publisher_->publish(error_msg);
+  node_->error_publisher->publish(error_msg);
 }
 
-void SafetyHandler::publishStopMessage() const
+/**
+ * @brief Publish a GaitInstruction stop message to the /march/input_device/instruction topic
+ */
+void SafetyHandler::publishStopMessage()
 {
-  march_shared_resources::GaitInstruction gait_instruction_msg;
-  gait_instruction_msg.header.stamp = ros::Time::now();
-  gait_instruction_msg.type = march_shared_resources::GaitInstruction::STOP;
-  this->gait_instruction_publisher_->publish(gait_instruction_msg);
+  GaitInstruction gait_instruction_msg;
+  gait_instruction_msg.header.stamp = node_->get_clock()->now();;
+  gait_instruction_msg.type = GaitInstruction::STOP;
+  node_->gait_instruction_publisher->publish(gait_instruction_msg);
 }
 
+/**
+ * @brief Publish a fatal error message to the /march/error topic
+ * @param message Error message
+ */
 void SafetyHandler::publishFatal(const std::string& message)
 {
-  ROS_ERROR("%s", message.c_str());
+  RCLCPP_ERROR(node_->get_logger(),"%s", message.c_str());
 
-  this->publishErrorMessage(message, march_shared_resources::Error::FATAL);
-  this->fatal_sound_.play();
+  publishErrorMessage(message, ErrorMsg::FATAL);
 }
 
+/**
+ * @brief Publish a non-fatal error message to the /march/error topic
+ * @param message Error message
+ */
 void SafetyHandler::publishNonFatal(const std::string& message)
 {
-  ROS_ERROR("%s", message.c_str());
+  RCLCPP_ERROR(node_->get_logger(),"%s", message.c_str());
 
-  this->publishStopMessage();
-  this->publishErrorMessage(message, march_shared_resources::Error::NON_FATAL);
-  this->non_fatal_sound_.play();
+  publishStopMessage();
+  publishErrorMessage(message, ErrorMsg::NON_FATAL);
 }
