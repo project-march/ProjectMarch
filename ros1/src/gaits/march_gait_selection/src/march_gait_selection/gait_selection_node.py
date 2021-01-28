@@ -12,9 +12,7 @@ from march_shared_msgs.srv import (
     SetGaitVersion,
 )
 
-from ros1.src.balance.march_moveit_interface.src.march_moveit_interface.moveit_interface import (
-    BalanceGait,
-)
+from .dynamic_gaits.balance_gait import BalanceGait
 from .gait_selection import GaitSelection
 from .sounds import Sounds
 from .state_machine.gait_state_machine import GaitStateMachine
