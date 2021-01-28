@@ -1,25 +1,24 @@
 """Defines a base class for subgaits that can be executed by the exoskeleton."""
 from __future__ import annotations
+
 import os
 import re
-import math
 from typing import List, Tuple
 
-from march_utility.utilities.duration import CustomDuration
-from rclpy.duration import Duration
-from trajectory_msgs import msg as trajectory_msg
 import yaml
-from urdf_parser_py import urdf
 from march_utility.exceptions.gait_exceptions import (
     NonValidGaitContent,
     SubgaitInterpolationError,
     GaitError,
 )
 from march_utility.foot_classes.feet_state import FeetState
+from march_utility.utilities.duration import CustomDuration
 from march_utility.utilities.utility_functions import (
     get_joint_names_for_inverse_kinematics,
-    weighted_average_floats,
 )
+from trajectory_msgs import msg as trajectory_msg
+from urdf_parser_py import urdf
+
 from .joint_trajectory import JointTrajectory
 from .limits import Limits
 from .setpoint import Setpoint
@@ -236,7 +235,7 @@ class Subgait(object):
         timestamps = self.get_unique_timestamps()
         for timestamp in timestamps:
             joint_trajectory_point = trajectory_msg.JointTrajectoryPoint()
-            joint_trajectory_point.time_from_start = Duration(
+            joint_trajectory_point.time_from_start = CustomDuration(
                 seconds=timestamp
             ).to_msg()
 
@@ -428,10 +427,9 @@ class Subgait(object):
 
     def to_dict(self) -> dict:
         """Get the subgait represented as a dictionary."""
-        duration = Duration(seconds=self.duration)
         return {
             "description": self.description,
-            "duration": duration.nanoseconds,
+            "duration": self.duration.nanoseconds,
             "gait_type": self.gait_type,
             "joints": dict(
                 [
@@ -440,12 +438,7 @@ class Subgait(object):
                         [
                             {
                                 "position": setpoint.position,
-                                "time_from_start": {
-                                    "nsecs": Duration(
-                                        seconds=setpoint.time
-                                    ).nanoseconds,
-                                    "secs": int(setpoint.time),
-                                },
+                                "time_from_start": setpoint.time.nanoseconds,
                                 "velocity": setpoint.velocity,
                             }
                             for setpoint in joint.setpoints

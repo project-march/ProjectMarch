@@ -3,13 +3,13 @@ from __future__ import annotations
 import math
 
 from march_utility.utilities.utility_functions import weighted_average_floats
-from rclpy.duration import Duration
+from rclpy.duration import Duration as ROSDuration
 
 NSEC_DIGITS = 9
 NSEC_TO_SEC = math.pow(10, -NSEC_DIGITS)
 
 
-class CustomDuration(Duration):
+class CustomDuration(ROSDuration):
     def __init__(self, seconds: float = 0.0, nanoseconds: float = 0.0):
         super().__init__(seconds=seconds, nanoseconds=nanoseconds)
 

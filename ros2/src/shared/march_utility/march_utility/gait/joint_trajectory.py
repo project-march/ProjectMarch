@@ -6,18 +6,18 @@ and to check the safety limits.
 """
 
 from __future__ import annotations
+
 from typing import List, Tuple, Any
 
-from march_utility.utilities.duration import CustomDuration
-from rclpy.duration import Duration
-from scipy.interpolate import BPoly
-from urdf_parser_py import urdf
-
-from .limits import Limits
 from march_utility.exceptions.gait_exceptions import (
     SubgaitInterpolationError,
     NonValidGaitContent,
 )
+from march_utility.utilities.duration import CustomDuration
+from scipy.interpolate import BPoly
+from urdf_parser_py import urdf
+
+from .limits import Limits
 from .setpoint import Setpoint
 
 ALLOWED_ERROR = 0.001
