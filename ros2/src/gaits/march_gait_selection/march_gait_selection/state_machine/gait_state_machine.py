@@ -243,8 +243,9 @@ class GaitStateMachine(object):
     def run(self):
         """Runs the state machine until shutdown is requested."""
         self.update_timer = self._gait_selection.create_timer(
-            timer_period_sec=self._timer_period, callback=self.update,
-            callback_group=ReentrantCallbackGroup()
+            timer_period_sec=self._timer_period,
+            callback=self.update,
+            callback_group=ReentrantCallbackGroup(),
         )
         self.last_update_time = self._gait_selection.get_clock().now()
 
@@ -306,18 +307,14 @@ class GaitStateMachine(object):
         what to do next."""
         if self._input.gait_requested():
             gait_name = self._input.gait_name()
-            self._gait_selection.get_logger().info(
-                f"Requested gait `{gait_name}`"
-            )
+            self._gait_selection.get_logger().info(f"Requested gait `{gait_name}`")
             if gait_name in self._idle_transitions[self._current_state]:
                 self._current_state = gait_name
                 self._is_idle = False
                 self._should_stop = False
                 self._input.gait_accepted()
                 self._call_transition_callbacks()
-                self._gait_selection.get_logger().info(
-                    f"Accepted gait `{gait_name}`"
-                )
+                self._gait_selection.get_logger().info(f"Accepted gait `{gait_name}`")
             else:
                 self._input.gait_rejected()
                 self._gait_selection.get_logger().info(
@@ -359,25 +356,20 @@ class GaitStateMachine(object):
                 self._trajectory_scheduler.schedule(trajectory)
             elapsed_time = Duration(0)
 
-        # if self._trajectory_scheduler.failed():
-        #     self._trajectory_scheduler.reset()
-        #     self._current_gait.end()
-        #     self._current_gait = None
-        #     self._transition_to_unknown()
-        #     self._input.gait_finished()
-        #     return
+        if self._trajectory_scheduler.failed():
+            self._trajectory_scheduler.reset()
+            self._current_gait.end()
+            self._current_gait = None
+            self._transition_to_unknown()
+            self._input.gait_finished()
+            return
 
         self._handle_input()
         trajectory, should_stop = self._current_gait.update(elapsed_time)
-        self._gait_selection.get_logger().info(
-            f"Gait update done: `{trajectory}`, {should_stop}"
-        )
+
         # schedule trajectory if any
         if trajectory is not None:
             self._call_gait_callbacks()
-            self._gait_selection.get_logger().info(
-                f"Scheduling"
-            )
             self._gait_selection.get_logger().info(
                 f"Scheduling {self._current_gait.subgait_name}"
             )

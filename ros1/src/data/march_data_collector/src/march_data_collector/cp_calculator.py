@@ -1,24 +1,32 @@
+"""Module to calculate the capture point."""
 from copy import deepcopy
 from math import sqrt
+from typing import Tuple
 
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import Point, Pose
 from march_data_collector.inverted_pendulum import InvertedPendulum
 import rospy
 import tf2_ros
 from visualization_msgs.msg import Marker
 
-from march_shared_msgs.srv import CapturePointPose, CapturePointPoseResponse
+from march_shared_msgs.srv import (
+    CapturePointPose,
+    CapturePointPoseResponse,
+    CapturePointPoseRequest,
+)
 
 FRACTION_FALLING_TIME = 0.5
 
 
 class CPCalculator(object):
-    def __init__(self, tf_buffer, static_foot_link, swing_foot_link):
-        """Base class to calculate capture point for the exoskeleton.
+    """Base class to calculate capture point for the exoskeleton.
 
-        The capture point calculator is coupled to a static foot and swing foot. The static foot is used as the base of
-        the inverted pendulum.
-        """
+    The capture point calculator is coupled to a static foot and swing foot. The static foot is used as the base of
+    the inverted pendulum.
+    """
+    def __init__(
+        self, tf_buffer: tf2_ros.Buffer, static_foot_link: str, swing_foot_link: str
+    ):
         self._tf_buffer = tf_buffer
         self._static_foot_link = static_foot_link
         self.cp_service = rospy.Service(
@@ -54,12 +62,12 @@ class CPCalculator(object):
         self._capture_point_marker.scale.z = 0.03
 
     @property
-    def center_of_mass(self):
+    def center_of_mass(self) -> Point:
         """Center of mass property getter."""
         return self._center_of_mass
 
     @center_of_mass.setter
-    def center_of_mass(self, updated_center_of_mass):
+    def center_of_mass(self, updated_center_of_mass: Marker):
         """Center of mass property setter."""
         if not isinstance(updated_center_of_mass, Marker):
             raise TypeError("Given center of mass is not of type: Marker")
@@ -80,7 +88,7 @@ class CPCalculator(object):
         self._center_of_mass = deepcopy(updated_center_of_mass.pose.position)
         self._prev_t = current_time
 
-    def _calculate_capture_point(self, duration):
+    def _calculate_capture_point(self, duration: float) -> Tuple[float, Pose]:
         """Calculate a future capture point pose using the inverted pendulum and center of mass.
 
         :param duration:
@@ -145,19 +153,15 @@ class CPCalculator(object):
 
         return capture_point_duration, self._capture_point_marker.pose
 
-    def get_capture_point(self, capture_point_request_msg):
+    def get_capture_point(
+        self, capture_point_request_msg: CapturePointPoseRequest
+    ) -> CapturePointPoseResponse:
         """Service call function to return the capture point pose positions."""
-        rospy.loginfo(
-            f"Request capture point in {capture_point_request_msg.duration}"
-        )
-
         duration = capture_point_request_msg.duration
         capture_point_duration, capture_point = self._calculate_capture_point(duration)
         if capture_point_duration < 0:
             return [False, 0.0, capture_point]
 
-        rospy.loginfo(
-            f"Returning capture point in {capture_point_request_msg.duration}"
+        return CapturePointPoseResponse(
+            success=True, duration=capture_point_duration, capture_point=capture_point
         )
-        return CapturePointPoseResponse(success=True, duration=capture_point_duration,
-                                         capture_point=capture_point)
