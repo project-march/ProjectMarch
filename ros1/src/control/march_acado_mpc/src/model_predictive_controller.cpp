@@ -30,14 +30,19 @@ void ModelPredictiveController::setReference(vector<vector<double>> reference) {
     for(int j = 0; j < ACADO_NYN; j++) {
         acadoVariables.yN[j] = reference[ACADO_N][j];
     }
+    // [Temporary] Has the function been executed?
+    std::cout << "\033[4;32m" << __FUNCTION__ << "()\033[0m" << " has executed\n";
 }
 
 void ModelPredictiveController::scrollReference(vector<vector<double>>& reference) {
     reference.erase(reference.begin());
     reference.push_back(reference[0]);
+    // [Temporary] Has the function been executed?
+    std::cout << "\033[4;32m" << __FUNCTION__ << "()\033[0m" << " has executed\n";
 }
 
 void ModelPredictiveController::init() {
+
   // Initialize the solver
   acado_initializeSolver();
 
@@ -51,9 +56,27 @@ void ModelPredictiveController::init() {
       acadoVariables.u[i * ACADO_NU] = 0; // T
   }
 
-  // Set reference and scroll one step up
-  ModelPredictiveController::setReference(reference);
-  ModelPredictiveController::scrollReference(reference);
+  // Setup and fill a reference vector
+//  vector<vector<double>> reference;
+//  ModelPredictiveController::sinRef(reference, 0.5, 1.0, ACADO_N, 0.04);
+//  bool repeat_reference = true;
+
+//  // Set reference and scroll one step up
+//  ModelPredictiveController::setReference(reference);
+//  if (repeat_reference) {
+//    ModelPredictiveController::scrollReference(reference);
+//  }
+
+    // Prepare references (step reference)
+    for (int i = 0; i < ACADO_N; ++i) {
+        acadoVariables.y[i * ACADO_NY] = 1.0; // theta
+        acadoVariables.y[i * ACADO_NY + 1] = 0;         // dtheta
+        acadoVariables.y[i * ACADO_NY + 2] = 0;         // T
+    }
+
+    acadoVariables.yN[0] = 1.0; // theta
+    acadoVariables.yN[1] = 0;         // dtheta
+    acadoVariables.yN[2] = 0;         // T
 
   // Set the current initial state
   setInitialState(x0);
@@ -64,6 +87,8 @@ void ModelPredictiveController::init() {
   // Warm-up the solver
   acado_preparationStep();
 
+    // [Temporary] Has the function been executed?
+    std::cout << "\033[4;32m" << __FUNCTION__ << "()\033[0m" << " has executed\n";
 }
 
 void ModelPredictiveController::setInitialState(vector<double> x0) {
@@ -111,7 +136,7 @@ void ModelPredictiveController::calculateControlInput() {
 
   // Set reference
   ModelPredictiveController::setReference(reference);
-  ModelPredictiveController::scrollReference(reference);
+//  ModelPredictiveController::scrollReference(reference);
 
   // preparation step
   acado_preparationStep();
