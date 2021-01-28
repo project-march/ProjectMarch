@@ -37,7 +37,6 @@ public:
      * @param data
      * @return
      */
-    bool readReferenceFromFile(const char* fileName, vector<vector<double>>& reference);
 
     void setReference(vector<vector<double>> reference);
 
