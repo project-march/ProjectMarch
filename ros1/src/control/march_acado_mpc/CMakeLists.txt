@@ -42,7 +42,7 @@ catkin_package(
 # is downloaded in the _deps/acado-solver-src folder in the build directory.
 fetchcontent_declare(acado-solver
     GIT_REPOSITORY "https://gitlab.com/project-march/libraries/acado-solver.git"
-    GIT_TAG "main"
+    GIT_TAG "7-update-the-test_joint_rotational-model-files-to-the-ones-in-the-gazebo-simulation-model-branch"
     GIT_SHALLOW true
 )
 if(NOT acado-solver_POPULATED)

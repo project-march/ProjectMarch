@@ -29,6 +29,9 @@ void ModelPredictiveControllerInterface::starting(const ros::Time& /*time*/)
   {
     (*joint_handles_ptr_)[i].setCommand(0.0);
   }
+
+  std::cout << "MPC!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+
 }
 
 void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/, const ros::Duration& period,
@@ -58,6 +61,8 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
 
     // Apply command
     (*joint_handles_ptr_)[i].setCommand(command);
+
+    std::cout << "MPC command: " << command << std::endl;
   }
 
 }

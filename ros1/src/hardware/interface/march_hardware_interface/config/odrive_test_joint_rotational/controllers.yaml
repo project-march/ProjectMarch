@@ -10,7 +10,7 @@ march:
       type: march_pdb_state_controller/MarchPdbStateController
       publish_rate: 50
     trajectory:
-      type: effort_controllers/JointTrajectoryController
+      type: model_predictive_trajectory_controller/JointTrajectoryController
       joints:
         - rotational_joint
       constraints:
@@ -18,5 +18,5 @@ march:
           margin_soft_limit_error: 0.5
           trajectory: 01 #0.305
           goal: 01 #0.305
-      gains: # Required because we're controlling an effort interface
-        rotational_joint: {p: 500, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
+#      gains: # Required because we're controlling an effort interface
+#        rotational_joint: {p: 500, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
