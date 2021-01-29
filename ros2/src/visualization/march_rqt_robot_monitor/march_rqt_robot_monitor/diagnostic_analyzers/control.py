@@ -75,7 +75,7 @@ class CheckJointValues(object):
 
         for index in range(len(self._joint_names)):
             joint_name = self._joint_names[index]
-            stat.add(self._joint_names[index], self._position[index])
+            stat.add(self._joint_names[index], str(self._position[index]))
 
             if self._position[index] >= self._upper_soft_limits[joint_name]:
                 joint_outside_soft_limits.append(self._joint_names[index])
@@ -113,14 +113,14 @@ class CheckJointValues(object):
             stat.summary(DiagnosticStatus.STALE, "No velocity recorded")
             return stat
 
-        stat.add("Timestamp", self._timestamp)
+        stat.add("Timestamp", str(self._timestamp))
 
         joints_at_velocity_limit = []
         joint_in_warning_zone_velocity_limit = []
 
         for index in range(len(self._joint_names)):
             joint_name = self._joint_names[index]
-            stat.add(self._joint_names[index], self._velocity[index])
+            stat.add(self._joint_names[index], str(self._velocity[index]))
 
             if self._velocity[index] >= self._velocity_limits[joint_name]:
                 joints_at_velocity_limit.append(self._joint_names[index])
@@ -153,14 +153,14 @@ class CheckJointValues(object):
             stat.summary(DiagnosticStatus.STALE, "No effort recorded")
             return stat
 
-        stat.add("Timestamp", self._timestamp)
+        stat.add("Timestamp", str(self._timestamp))
 
         joints_at_effort_limit = []
         joints_in_warning_zone_effort_limits = []
 
         for index in range(len(self._joint_names)):
             joint_name = self._joint_names[index]
-            stat.add(self._joint_names[index], self._position[index])
+            stat.add(self._joint_names[index], str(self._position[index]))
 
             if self._effort[index] >= self._effort_limits[joint_name]:
                 joints_at_effort_limit.append(self._joint_names[index])

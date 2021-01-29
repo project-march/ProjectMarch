@@ -3,7 +3,7 @@
 from diagnostic_updater import FrequencyStatusParam, HeaderlessTopicDiagnostic, Updater
 from rclpy.node import Node
 
-from march_shared_msgs import Alive
+from march_shared_msgs.msg import Alive
 
 
 class CheckInputDevice(object):
