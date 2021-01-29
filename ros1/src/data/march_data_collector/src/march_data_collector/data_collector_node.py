@@ -23,10 +23,13 @@ from march_data_collector.cp_calculator import CPCalculator
 class DataCollectorNode(object):
     """A node """
 
-    def __init__(self, com_calculator: CoMCalculator, cp_calculators: List[
-        CPCalculator],
-                 tf_buffer: tf2_ros.Buffer,
-                 feet: dict):
+    def __init__(
+        self,
+        com_calculator: CoMCalculator,
+        cp_calculators: List[CPCalculator],
+        tf_buffer: tf2_ros.Buffer,
+        feet: dict,
+    ):
         self.differentiation_order = 2
         self._com_calculator = com_calculator
         self._cp_calculators = cp_calculators
