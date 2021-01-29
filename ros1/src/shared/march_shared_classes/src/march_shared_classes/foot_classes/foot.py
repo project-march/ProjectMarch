@@ -115,10 +115,17 @@ class Foot(object):
         else:
             raise SideSpecificationError(foot_side)
 
-        # first calculate the haa angle. This calculation assumes that pos_z > 0
+        # Check if the HAA can be calculated (if the desired position is not too close to the origin)
+        if ph / sqrt(z_position * z_position + y_position * y_position) > 1:
+            raise SubgaitInterpolationError(
+                "The desired {foot} foot position, ({x}, {y}, {z}), is out of reach".format(
+                    foot=foot_side, x=x_position, y=y_position, z=z_position
+                )
+            )
+        # Then calculate the haa angle. This calculation assumes that pos_z > 0
         haa = Foot.calculate_haa_angle(z_position, y_position, ph)
 
-        # once the haa angle is known, transform the desired x and z position to arrive at an easier system to calculate
+        # Transform the desired x and z position to arrive at an easier system to calculate
         # the hfe and kfe angles
         transformed_x = round(x_position - hl, MID_CALCULATION_PRECISION_DIGITS)
         transformed_z = round(
@@ -128,7 +135,7 @@ class Foot(object):
 
         if transformed_x * transformed_x + transformed_z * transformed_z > (ll + ul) * (
             ll + ul
-        ) or ph / sqrt(z_position * z_position + y_position * y_position):
+        ):
             raise SubgaitInterpolationError(
                 "The desired {foot} foot position, ({x}, {y}, {z}), is out of reach".format(
                     foot=foot_side, x=x_position, y=y_position, z=z_position
