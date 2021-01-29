@@ -6,7 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   moveit_commander
   rospy
   sensor_msgs
-  std_msgs
+  geometry_msgs
 )
 
 catkin_python_setup()
@@ -17,7 +17,7 @@ catkin_package(
     moveit_commander
     rospy
     sensor_msgs
-    std_msgs
+    geometry_msgs
 )
 
 catkin_install_python(PROGRAMS scripts/${PROJECT_NAME}

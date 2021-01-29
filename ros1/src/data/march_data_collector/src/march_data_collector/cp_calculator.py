@@ -24,6 +24,7 @@ class CPCalculator(object):
     The capture point calculator is coupled to a static foot and swing foot. The static foot is used as the base of
     the inverted pendulum.
     """
+
     def __init__(
         self, tf_buffer: tf2_ros.Buffer, static_foot_link: str, swing_foot_link: str
     ):
