@@ -10,13 +10,10 @@
 using namespace std;
 
 // Global variables used by the solver
-ACADOvariables acadoVariables;
-ACADOworkspace acadoWorkspace;
+ACADOvariables acadoVariables = {};
+ACADOworkspace acadoWorkspace = {};
 
 void ModelPredictiveController::init() {
-  // Reset all solver memory
-  memset(&acadoWorkspace, 0, sizeof(acadoWorkspace));
-  memset(&acadoVariables, 0, sizeof(acadoVariables));
 
   // Initialize the solver
   acado_initializeSolver();
