@@ -3,9 +3,6 @@
   <!-- By default, we are not in debug mode -->
   <arg name="debug" default="false" />
 
-
-  <param name="/march/robot_description_semantic"
-         textfile="$(find march_moveit)/config/march.srdf" />
   <!--
   By default, hide joint_state_publisher's GUI
 
@@ -19,6 +16,7 @@
   <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
   <include file="$(find march_moveit)/launch/planning_context.launch">
     <arg name="load_robot_description" value="false"/>
+    <arg name="robot_description" value="march/robot_description"/>
   </include>
 
   <!-- If needed, broadcast static tf for robot root -->
