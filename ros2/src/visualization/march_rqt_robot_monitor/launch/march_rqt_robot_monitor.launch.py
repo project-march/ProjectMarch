@@ -39,6 +39,7 @@ def generate_launch_description() -> LaunchDescription:
                 package="diagnostic_aggregator",
                 executable="aggregator_node",
                 output="screen",
+                name="diag_agg",
                 parameters=[parameter_file],
             ),
             Node(
