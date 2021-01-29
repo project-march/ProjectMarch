@@ -128,7 +128,7 @@ class Foot(object):
 
         if transformed_x * transformed_x + transformed_z * transformed_z > (ll + ul) * (
             ll + ul
-        ):
+        ) or ph / sqrt(z_position * z_position + y_position * y_position):
             raise SubgaitInterpolationError(
                 "The desired {foot} foot position, ({x}, {y}, {z}), is out of reach".format(
                     foot=foot_side, x=x_position, y=y_position, z=z_position
@@ -162,36 +162,20 @@ class Foot(object):
                 "desired z position of the foot is not positive, "
                 "current haa calculation is not capable to deal with this"
             )
+        haa_arm_to_z_y_distance_ration = pelvis_hip_length / sqrt(
+            z_position * z_position + y_position * y_position
+        )
 
         if y_position != 0:
             slope_foot_to_origin = z_position / y_position
             angle_foot_to_origin = atan(slope_foot_to_origin)
             if y_position > 0:
-                haa = (
-                    acos(
-                        pelvis_hip_length
-                        / sqrt(z_position * z_position + y_position * y_position)
-                    )
-                    - angle_foot_to_origin
-                )
+                haa = acos(haa_arm_to_z_y_distance_ration) - angle_foot_to_origin
             else:
-                haa = (
-                    acos(
-                        pelvis_hip_length
-                        / sqrt(z_position * z_position + y_position * y_position)
-                    )
-                    - pi
-                    - angle_foot_to_origin
-                )
+                haa = acos(haa_arm_to_z_y_distance_ration) - pi - angle_foot_to_origin
         else:
             angle_foot_to_origin = pi / 2
-            haa = (
-                acos(
-                    pelvis_hip_length
-                    / sqrt(z_position * z_position + y_position * y_position)
-                )
-                - angle_foot_to_origin
-            )
+            haa = acos(haa_arm_to_z_y_distance_ration) - angle_foot_to_origin
 
         return haa
 
