@@ -18,12 +18,18 @@ void ModelPredictiveController::init() {
   // Initialize the solver
   acado_initializeSolver();
 
-  // Prepare a consistent initial guess
+  // Initialise the states vector
   for (int i = 0; i < ACADO_N + 1; ++i) {
     acadoVariables.x[i * ACADO_NX] = 0; // theta
     acadoVariables.x[i * ACADO_NX + 1] = 0; // dtheta
   }
 
+  // Initialise the control input vector
+  for (int i = 0; i < ACADO_N; i++) {
+    acadoVariables.u[i * ACADO_NU] = 0; // T
+  }
+
+  // Set angle step reference value
   double theta_ref = 90*(M_PI/180);
 
   // Prepare references (step reference)
