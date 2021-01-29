@@ -24,7 +24,6 @@ class InverseKinematicsPopUpWindow(QDialog):
         """Show pop up."""
         self.foot_side = ""
         self.z_axis = ""
-        self.use_default_y_position = True
         self.position_input = Vector3d(0, 0, 0)
         self.velocity_input = Vector3d(0, 0, 0)
         self.time = 0
@@ -44,14 +43,13 @@ class InverseKinematicsPopUpWindow(QDialog):
             self.foot_side = Side.left
 
         self.z_axis = self.zAxisComboBox.currentText()
-        self.use_default_y_position = self.useDefaultYComboBox.currentText() == "Yes"
         self.position_input = (
             Vector3d(
                 self.xCoordinateSpinBox.value(),
                 self.yCoordinateSpinBox.value(),
                 self.zCoordinateSpinBox.value(),
             )
-            / 100
+            / 100  # Convert the input in cm to meters for calculation
         )
         self.velocity_input = (
             Vector3d(
@@ -59,7 +57,7 @@ class InverseKinematicsPopUpWindow(QDialog):
                 self.yVelocitySpinBox.value(),
                 self.zVelocitySpinBox.value(),
             )
-            / 100
+            / 100  # Convert the input in cm / s to meters / s for calculation
         )
         self.time = self.timeSpinBox.value()
         self.accept()

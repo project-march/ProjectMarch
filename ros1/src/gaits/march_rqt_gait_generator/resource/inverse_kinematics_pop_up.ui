@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>566</width>
-    <height>582</height>
+    <height>546</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>290</x>
-     <y>530</y>
+     <y>500</y>
      <width>221</width>
      <height>41</height>
     </rect>
@@ -35,7 +35,7 @@
      <x>10</x>
      <y>10</y>
      <width>543</width>
-     <height>521</height>
+     <height>481</height>
     </rect>
    </property>
    <layout class="QFormLayout" name="formLayout">
@@ -99,37 +99,7 @@
       </item>
      </widget>
     </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="useDefaultYLabel">
-      <property name="text">
-       <string>Use default y position</string>
-      </property>
-     </widget>
-    </item>
     <item row="2" column="1">
-     <widget class="QComboBox" name="useDefaultYComboBox">
-      <property name="editable">
-       <bool>false</bool>
-      </property>
-      <property name="currentText">
-       <string>Yes</string>
-      </property>
-      <property name="insertPolicy">
-       <enum>QComboBox::InsertAtBottom</enum>
-      </property>
-      <item>
-       <property name="text">
-        <string>Yes</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>No</string>
-       </property>
-      </item>
-     </widget>
-    </item>
-    <item row="3" column="1">
      <spacer name="verticalSpacer">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
@@ -142,17 +112,17 @@
       </property>
      </spacer>
     </item>
-    <item row="4" column="0">
+    <item row="3" column="0">
      <widget class="QLabel" name="timeLabel">
       <property name="text">
        <string>Time in seconds</string>
       </property>
      </widget>
     </item>
-    <item row="4" column="1">
+    <item row="3" column="1">
      <widget class="QDoubleSpinBox" name="timeSpinBox"/>
     </item>
-    <item row="5" column="1">
+    <item row="4" column="1">
      <spacer name="verticalSpacer_3">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
@@ -165,7 +135,7 @@
       </property>
      </spacer>
     </item>
-    <item row="6" column="0">
+    <item row="5" column="0">
      <widget class="QLabel" name="coordinateExplanationLabel">
       <property name="text">
        <string>Coordinates are relative 
@@ -176,45 +146,45 @@ to the default foot position.</string>
       </property>
      </widget>
     </item>
-    <item row="7" column="0">
+    <item row="6" column="0">
      <widget class="QLabel" name="xCoordinateLabel">
       <property name="text">
        <string>x coordinate in cm</string>
       </property>
      </widget>
     </item>
-    <item row="7" column="1">
+    <item row="6" column="1">
      <widget class="QDoubleSpinBox" name="xCoordinateSpinBox">
       <property name="minimum">
        <double>-99.989999999999995</double>
       </property>
      </widget>
     </item>
-    <item row="8" column="0">
+    <item row="7" column="0">
      <widget class="QLabel" name="yCoordinateLabel">
       <property name="text">
        <string>y coordinate in cm</string>
       </property>
      </widget>
     </item>
-    <item row="8" column="1">
+    <item row="7" column="1">
      <widget class="QDoubleSpinBox" name="yCoordinateSpinBox">
       <property name="minimum">
        <double>-99.989999999999995</double>
       </property>
      </widget>
     </item>
-    <item row="9" column="0">
+    <item row="8" column="0">
      <widget class="QLabel" name="zCoordinateLabel">
       <property name="text">
        <string>z coordinate in cm</string>
       </property>
      </widget>
     </item>
-    <item row="9" column="1">
+    <item row="8" column="1">
      <widget class="QDoubleSpinBox" name="zCoordinateSpinBox"/>
     </item>
-    <item row="10" column="1">
+    <item row="9" column="1">
      <spacer name="verticalSpacer_2">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
@@ -227,35 +197,35 @@ to the default foot position.</string>
       </property>
      </spacer>
     </item>
-    <item row="11" column="0">
+    <item row="10" column="0">
      <widget class="QLabel" name="xVelocityLabel">
       <property name="text">
        <string>x velocity in cm per s</string>
       </property>
      </widget>
     </item>
-    <item row="11" column="1">
+    <item row="10" column="1">
      <widget class="QDoubleSpinBox" name="xVelocitySpinBox">
       <property name="minimum">
        <double>-99.989999999999995</double>
       </property>
      </widget>
     </item>
-    <item row="12" column="0">
+    <item row="11" column="0">
      <widget class="QLabel" name="yVelocityLabel">
       <property name="text">
        <string>y velocity in cm per s</string>
       </property>
      </widget>
     </item>
-    <item row="12" column="1">
+    <item row="11" column="1">
      <widget class="QDoubleSpinBox" name="yVelocitySpinBox">
       <property name="minimum">
        <double>-99.989999999999995</double>
       </property>
      </widget>
     </item>
-    <item row="13" column="0">
+    <item row="12" column="0">
      <widget class="QLabel" name="zVelocityLabel">
       <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
@@ -265,7 +235,7 @@ to the default foot position.</string>
       </property>
      </widget>
     </item>
-    <item row="13" column="1">
+    <item row="12" column="1">
      <widget class="QDoubleSpinBox" name="zVelocitySpinBox">
       <property name="minimum">
        <double>-99.989999999999995</double>
