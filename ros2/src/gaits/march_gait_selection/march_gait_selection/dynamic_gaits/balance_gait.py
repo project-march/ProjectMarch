@@ -145,7 +145,6 @@ class BalanceGait(GaitInterface):
             swing_leg_target_pose=self.capture_point_result.capture_point,
             stance_leg_target=stance_leg_target,
         )
-        self._node.get_logger().info(f"{request}")
         trajectory_future = self._moveit_trajectory_service.call_async(request)
 
         trajectory_future.add_done_callback(self.moveit_event_cb)
@@ -168,7 +167,6 @@ class BalanceGait(GaitInterface):
         :param name: the name of the subgait
         """
         if name == "right_open_2":
-            self._node.get_logger().info("RIGHT OPEN 2")
             return self.construct_trajectory("right_leg", name)
         elif name == "left_swing_2":
             return self.construct_trajectory("left_leg", name)
