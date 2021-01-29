@@ -21,8 +21,9 @@ class BalanceGait(GaitInterface):
     MOVEIT_INTERFACE_SERVICE_TIMEOUT = 1.0
     NANOSEC_TO_SEC = 1e-9
 
-    def __init__(self, node: Node, gait_name: str = "balanced_walk",
-                 default_walk: Gait = None):
+    def __init__(
+        self, node: Node, gait_name: str = "balanced_walk", default_walk: Gait = None
+    ):
         self.gait_name = gait_name
         self._node = node
         self._default_walk = default_walk
