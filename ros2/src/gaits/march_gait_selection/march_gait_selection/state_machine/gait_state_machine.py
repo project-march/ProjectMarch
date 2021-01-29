@@ -12,7 +12,6 @@ from march_utility.utilities.side import Side
 
 PRESSURE_SOLE_STANDING_FORCE = 8000
 DEFAULT_TIMER_PERIOD = 0.04
-NANOSEC_TO_SEC = 1e-9
 
 
 class GaitStateMachine(object):

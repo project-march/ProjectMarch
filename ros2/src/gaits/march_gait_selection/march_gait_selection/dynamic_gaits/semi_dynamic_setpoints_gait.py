@@ -4,7 +4,6 @@ from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
 from march_utility.gait.subgait import Subgait
 from march_utility.utilities.duration import Duration
 
-SECS_TO_NANOSECS = 1e9
 SHOULD_NOT_FREEZE_FIRST_SECS = Duration(seconds=0.3)
 
 
