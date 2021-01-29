@@ -20,6 +20,7 @@
 
 #include <cassert>
 #include <memory>
+#include <time.h>
 
 // Create a State alias
 namespace joint_trajectory_controller
@@ -68,6 +69,9 @@ private:
 
   std::vector<ModelPredictiveController> model_predictive_controllers_;
   vector<double> state;
+
+  clock_t t_new;
+  clock_t t_last;
 
 };
 

@@ -11,6 +11,7 @@ public:
     // Public variables
     vector<double> x0{0,0}; // Current state
     double u;               // Calculated control input
+    vector<vector<double>> reference; // Current reference
 
     /**
      * \brief Initialise the model predictive controller
@@ -30,6 +31,13 @@ public:
      */
     void calculateControlInput();
 
+    void sinRef(vector<vector<double>>& ref, double freq, double amp, int N, double dt);
+
+    void stepRef(vector<vector<double>>& ref, double amp, int N, double dt);
+
+    void scrollReference(vector<vector<double>>& reference);
+
+    void setReference(vector<vector<double>> reference);
 };
 
 #endif
