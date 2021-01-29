@@ -222,27 +222,27 @@ void ObstacleController::getStandGoalPositionX(double time_since_start, double s
   }
 }
 
-void ObstacleController::getWalkGoalPositionX(double time_since_start, double stable_foot_pose_x)
-{
+void ObstacleController::getWalkGoalPositionX(double time_since_start, double stable_foot_pose_x) {
   goal_position_x = stable_foot_pose_x;
   // If the exoskeleton is executing an open gait (generally right_open),
   // move the CoM from the stable foot to a quarter step size in front.
   // quarter step sizes are used during the walk to avoid sending the CoM too far from the stable foot
-  if (subgait_name_.substr(subgait_name_.size() - 4) == "open")
-  {
-    goal_position_x += - 0.25 * time_since_start * swing_step_size_ / subgait_duration_;
+  if (subgait_name_.substr(subgait_name_.size() - 4) == "open") {
+    goal_position_x += -0.25 * time_since_start * swing_step_size_ / subgait_duration_;
   }
-  // During the swing phase, move the CoM from a quarter step size behind the stable foot, to a quarter step size
-  // in front of the stable foot
-  else if (subgait_name_.substr(subgait_name_.size() - 5) == "swing")
-  {
-    goal_position_x += 0.25 * swing_step_size_ - 0.5 * time_since_start * swing_step_size_ / subgait_duration_;
+    // During the swing phase, move the CoM from a quarter step size behind the stable foot, to a quarter step size
+    // in front of the stable foot
+  else if (subgait_name_.substr(subgait_name_.size() - 5) == "swing") {
+    goal_position_x += 0.25 * swing_step_size_ -
+                       0.5 * time_since_start * swing_step_size_ / subgait_duration_;
   }
-  // If the exosekelton in executing a close gait, move the CoM from a quarter step size behind the stable foot,
-  // to the stable foot
-  else if (subgait_name_.substr(subgait_name_.size() - 5) == "close")
-  {
-    goal_position_x += 0.25 * swing_step_size_ - 0.25 * time_since_start * swing_step_size_ / subgait_duration_;
+    // If the exosekelton in executing a close gait, move the CoM from a quarter step size behind the stable foot,
+    // to the stable foot
+  else if (subgait_name_.substr(subgait_name_.size() - 5) == "close") {
+    goal_position_x += 0.25 * swing_step_size_ -
+                       0.25 * time_since_start * swing_step_size_ / subgait_duration_;
+  }
+}
 
 bool ObstacleController::changeComLevel(std::string level_name)
 {

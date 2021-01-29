@@ -40,7 +40,7 @@ void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf
   ros_sub_ = ros_node_->subscribe(so);
 
   bool balance;
-  if (ros_node_->param("/march/balance", balance, false))
+  if (ros_node_->param("/balance", balance, false))
   {
     //     Create change_com_level service
     ros::AdvertiseServiceOptions aso_change_com;
