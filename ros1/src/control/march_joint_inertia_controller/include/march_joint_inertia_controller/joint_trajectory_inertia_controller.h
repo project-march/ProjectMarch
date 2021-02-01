@@ -67,13 +67,13 @@ public:
     int alpha_filter_size[2];
     std::vector<std::vector<double>> vibration_boundaries{ { 0.0, 0.0 }, { 0.0, 0.0 } };
     std::vector<double> default_vibration = { 0.0, 1.0 };
-    ros::NodeHandle rotary_estimator_nh(nh, std::string("inertia_estimator/rotary"));
+    // ros::NodeHandle rotary_estimator_nh(nh, std::string("inertia_estimator/rotary"));
     rotary_estimator_nh.param("std_samples", samples_, 100);
     rotary_estimator_nh.param("lambda", lambda[0], 1.0);
     rotary_estimator_nh.param("alpha_filter_size", alpha_filter_size[0], 12);
     rotary_estimator_nh.param("vibration_boundaries", vibration_boundaries[0], default_vibration);
 
-    ros::NodeHandle linear_estimator_nh(nh, std::string("inertia_estimator/linear"));
+    // ros::NodeHandle linear_estimator_nh(nh, std::string("inertia_estimator/linear"));
     linear_estimator_nh.param("lambda", lambda[1], 1.0);
     linear_estimator_nh.param("alpha_filter_size", alpha_filter_size[1], 12);
     linear_estimator_nh.param("vibration_boundaries", vibration_boundaries[1], default_vibration);
