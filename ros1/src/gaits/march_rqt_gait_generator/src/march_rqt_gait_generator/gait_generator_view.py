@@ -2,6 +2,8 @@ import math
 import os
 import subprocess
 
+from .inverse_kinematics_pop_up import InverseKinematicsPopUpWindow
+
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore
 from python_qt_binding import loadUi
@@ -43,9 +45,9 @@ class GaitGeneratorView(QWidget):
         path = "/"
         for directory in current_file_path:
             path = os.path.join(path, directory)
-            if directory == "ros2":
+            if directory == "march":
                 break
-        self.ros2_path = path
+        self.march_path = path
 
         self.joint_widgets = {}
         self.tf_listener = TransformListener()
@@ -70,6 +72,10 @@ class GaitGeneratorView(QWidget):
         }
 
         self.initialize_shortcuts()
+
+        self.inverse_kinematics_pop_up = InverseKinematicsPopUpWindow(
+            self, ui_file.replace("gait_generator.ui", "inverse_kinematics_pop_up.ui")
+        )
 
     def initialize_shortcuts(self):
         self.ctrl_z = QShortcut(QKeySequence(self.tr("Ctrl+Z")), self)
@@ -198,10 +204,10 @@ class GaitGeneratorView(QWidget):
         self.height_left_line_edit.setText(f"{trans_left[2]:.3f}")
         self.height_right_line_edit.setText(f"{trans_right[2]:.3f}")
         self.heel_distance_line_edit.setText(
-            f"{math.sqrt(trans_left[0] ** 2 + trans_left[2] ** 2)}:.3f"
+            f"{math.sqrt(trans_left[0] ** 2 + trans_left[2] ** 2):.3f}"
         )
 
-    def message(self, title=None, msg=None):
+    def message(self, title=None, msg=None) -> None:
         QMessageBox.question(self, title, msg, QMessageBox.Ok)
 
     def yes_no_question(self, title=None, msg=None):
@@ -214,7 +220,7 @@ class GaitGeneratorView(QWidget):
         return QFileDialog.getOpenFileName(
             self,
             "Select a subgait to import.",
-            os.path.join(self.ros2_path, "src", "gaits", "march_gait_files"),
+            os.path.join(self.march_path, "ros2", "src", "gaits", "march_gait_files"),
             "March Subgait (*.subgait)",
         )
 
@@ -223,11 +229,16 @@ class GaitGeneratorView(QWidget):
             None,
             "Select a directory to save gaits. Directory must be "
             "a subdirectory of march_gait_files or be named resources.",
-            os.path.join(self.ros2_path, "src", "gaits", "march_gait_files"),
+            os.path.join(self.march_path, "ros2", "src", "gaits", "march_gait_files"),
         )
 
+    # def get_inverse_kinematics_setpoints_input(self) -> Tuple[Dict[str, any], bool]:
+    def get_inverse_kinematics_setpoints_input(self) -> None:
+        """Asks the user the needed inputs, returns these plus a flag indicating cancellation of any input."""
+        self.inverse_kinematics_pop_up.show_pop_up()
+
     @QtCore.pyqtSlot(int)
-    def update_main_time_slider(self, time):
+    def update_main_time_slider(self, time: float) -> None:
         self.time_slider.setValue(time)
 
     def update_joint_widgets(self, joints):

@@ -3,8 +3,15 @@ import os
 from numpy_ringbuffer import RingBuffer
 import rospkg
 import rospy
+from typing import Dict
 
+from march_shared_classes.exceptions.gait_exceptions import SubgaitInterpolationError
 from march_shared_classes.gait.subgait import Subgait
+from march_shared_classes.foot_classes.foot import Foot
+from march_shared_classes.utilities.side import Side
+from march_shared_classes.utilities.utility_functions import (
+    get_lengths_robot_for_inverse_kinematics,
+)
 
 from .model.modifiable_setpoint import ModifiableSetpoint
 from .model.modifiable_subgait import ModifiableSubgait
@@ -52,6 +59,9 @@ class GaitGeneratorController(object):
     def connect_buttons(self):
         self.view.change_gait_directory_button.clicked.connect(
             self.change_gait_directory
+        )
+        self.view.add_inverse_kinematic_setpoints_button.clicked.connect(
+            self.add_inverse_kinematics_setpoints
         )
         self.view.import_gait_button.clicked.connect(self.import_gait)
         self.view.export_gait_button.clicked.connect(self.export_gait)
@@ -390,7 +400,121 @@ class GaitGeneratorController(object):
             )
             self.view.change_gait_directory_button.setText(gait_directory_text)
 
-    def invert_gait(self):
+    def add_inverse_kinematics_setpoints(self) -> None:
+        """Add setpoints to the gait based on a user specified desired foot location."""
+        self.view.get_inverse_kinematics_setpoints_input()
+
+        # Check whether the input is valid
+        if self.view.inverse_kinematics_pop_up.cancelled:
+            rospy.loginfo("The inputs for the inverse kinematics were cancelled.")
+            return
+        if not 0 <= self.view.inverse_kinematics_pop_up.time <= self.subgait.duration:
+            warning_message = (
+                "The inverse kinematics setpoints feature has failed."
+                f"The specified time is invalid. "
+                f"Should be between 0 and the subgait duration {self.subgait.duration}. "
+                f"{self.view.inverse_kinematics_pop_up.time} was given."
+            )
+            rospy.loginfo(warning_message)
+            self.view.message(
+                "The inverse kinematics setpoints feature has failed.", warning_message
+            )
+            return
+
+        # Transform the input from relative to the default position to relative to the exoskeleton
+        self.transform_inverse_kinematics_setpoints_inputs()
+
+        # Calculate the setpoints from the desired foot coordinates and add them to the gait
+        try:
+            setpoint_dictionary = self.get_setpoints_from_inverse_kinematics_input()
+            self.add_setpoints_from_dictionary(setpoint_dictionary)
+        except SubgaitInterpolationError as e:
+            self.view.message(
+                "The inverse kinematics setpoints feature as failed.",
+                "A subgait interpolation error occured, see the terminal for more information.",
+            )
+            rospy.loginfo(e)
+
+    def transform_inverse_kinematics_setpoints_inputs(self) -> None:
+        """Transform the input coordinates (relative to a default foot location) to coordinates relative to the exo."""
+        foot_side = self.view.inverse_kinematics_pop_up.foot_side
+
+        [
+            upper_leg_length,
+            lower_leg_length,
+            haa_to_leg_length,
+            haa_arm,
+            base,
+        ] = get_lengths_robot_for_inverse_kinematics(foot_side)
+
+        self.transform_inverse_kinematics_setpoints_x_coordinate(haa_to_leg_length)
+        self.transform_inverse_kinematics_setpoints_y_coordinate(
+            haa_arm, base, foot_side
+        )
+        self.transform_inverse_kinematics_setpoints_z_coordinate(
+            upper_leg_length, lower_leg_length
+        )
+
+    def transform_inverse_kinematics_setpoints_x_coordinate(
+        self, haa_to_leg_length: float
+    ) -> None:
+        """Add the default x coordinate to the desired x coordinate to transform to exoskeleton coordinate system."""
+        default_x_position = haa_to_leg_length
+
+        self.view.inverse_kinematics_pop_up.position_input.x += default_x_position
+
+    def transform_inverse_kinematics_setpoints_y_coordinate(
+        self, haa_arm: float, base: float, foot_side: float
+    ) -> None:
+        """Add the default y coordinate to the desired y coordinate to transform to exoskeleton coordinate system."""
+        hip_to_foot_length_cm = base / 2 + haa_arm
+        if foot_side == Side.right:
+            default_y_position = hip_to_foot_length_cm
+        else:
+            default_y_position = -hip_to_foot_length_cm
+        self.view.inverse_kinematics_pop_up.position_input.y += default_y_position
+
+    def transform_inverse_kinematics_setpoints_z_coordinate(
+        self, upper_leg_length: float, lower_leg_length: float
+    ) -> None:
+        """Transform the z coordinate of the input to the coordinate system of the exoskeleton."""
+        if self.view.inverse_kinematics_pop_up.z_axis == "From ground upwards":
+            ground_z_coordinate_cm = upper_leg_length + lower_leg_length
+            self.view.inverse_kinematics_pop_up.position_input.z = (
+                ground_z_coordinate_cm
+                - self.view.inverse_kinematics_pop_up.position_input.z
+            )
+
+    def get_setpoints_from_inverse_kinematics_input(self) -> None:
+        """Use the inverse kinematics function to translate the desired foot coordinates to setpoints."""
+        desired_foot_state = Foot(
+            self.view.inverse_kinematics_pop_up.foot_side,
+            self.view.inverse_kinematics_pop_up.position_input,
+            self.view.inverse_kinematics_pop_up.velocity_input,
+        )
+
+        return Foot.get_joint_states_from_foot_state(
+            desired_foot_state, self.view.inverse_kinematics_pop_up.time
+        )
+
+    def add_setpoints_from_dictionary(
+        self, setpoint_dictionary: Dict[str, any]
+    ) -> None:
+        """Add setpoints from a dictionary with joints as keys to the current subgait."""
+        for joint_name in setpoint_dictionary:
+            time = setpoint_dictionary[joint_name].time
+            position = setpoint_dictionary[joint_name].position
+            velocity = setpoint_dictionary[joint_name].velocity
+            joint = self.subgait.get_joint(joint_name)
+            # If the current subgait already has a setpoint at the specified time, remove it before adding the new one
+            for index, setpoint in enumerate(joint.setpoints):
+                if setpoint.time == time:
+                    joint.remove_setpoint(index)
+            joint.add_setpoint(ModifiableSetpoint(time, position, velocity))
+            self.view.update_joint_widget(joint)
+            self.view.publish_preview(self.subgait, self.current_time)
+
+    def invert_gait(self) -> None:
         for side, controller in self.side_subgait_controller.items():
             controller.lock_checked = False
             self.handle_sidepoint_lock(side)
