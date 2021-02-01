@@ -118,7 +118,7 @@ void OdriveMotor::actuateTorque(double target_torque_ampere)
   std::string command_name_ = this->create_command(O_PM_INPUT_TORQUE);
   if (this->write(command_name_, target_torque_ampere_float) == 1)
   {
-    ROS_ERROR("Could net set target torque; %f to the axis", target_torque_ampere);
+    ROS_ERROR("Could not set target torque; %f to the axis", target_torque_ampere);
   }
 
   this->readValues();
