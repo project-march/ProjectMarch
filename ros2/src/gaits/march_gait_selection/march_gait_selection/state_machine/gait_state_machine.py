@@ -1,6 +1,6 @@
 from gazebo_msgs.msg import ContactsState
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
-from rclpy.duration import Duration
+from march_utility.utilities.duration import Duration
 from std_msgs.msg import Header
 from std_srvs.srv import Trigger
 
@@ -12,7 +12,6 @@ from march_utility.utilities.side import Side
 
 PRESSURE_SOLE_STANDING_FORCE = 8000
 DEFAULT_TIMER_PERIOD = 0.04
-NANOSEC_TO_SEC = 1e-9
 
 
 class GaitStateMachine(object):
@@ -165,7 +164,9 @@ class GaitStateMachine(object):
             )
         )
 
-    def _current_gait_cb(self, gait_name, subgait_name, version, duration, gait_type):
+    def _current_gait_cb(
+        self, gait_name, subgait_name, version, duration: Duration, gait_type
+    ):
         """Standard callback when gait changes, publishes the current gait
         More callbacke can be added using add_gait_callback"""
         self.current_gait_pub.publish(
@@ -174,7 +175,7 @@ class GaitStateMachine(object):
                 gait=gait_name,
                 subgait=subgait_name,
                 version=version,
-                duration=Duration(seconds=duration).to_msg(),
+                duration=duration.to_msg(),
                 gait_type=gait_type,
             )
         )
@@ -248,12 +249,12 @@ class GaitStateMachine(object):
         """
         if not self._shutdown_requested:
             now = self._gait_selection.get_clock().now()
-            elapsed_time = now - self.last_update_time
+            elapsed_time = Duration.from_ros_duration(now - self.last_update_time)
             self.last_update_time = now
             if self._is_idle:
                 self._process_idle_state()
             else:
-                self._process_gait_state(elapsed_time.nanoseconds * NANOSEC_TO_SEC)
+                self._process_gait_state(elapsed_time)
         else:
             self.update_timer.cancel()
 
@@ -325,7 +326,7 @@ class GaitStateMachine(object):
             self._input.gait_finished()
             self._call_transition_callbacks()
 
-    def _process_gait_state(self, elapsed_time):
+    def _process_gait_state(self, elapsed_time: Duration):
         """Processes the current state when there is a gait happening.
         Schedules the next subgait if there is no trajectory happening or
         finishes the gait if it is done."""
@@ -353,7 +354,7 @@ class GaitStateMachine(object):
                 )
 
                 self._trajectory_scheduler.schedule(trajectory)
-            elapsed_time = 0.0
+            elapsed_time = Duration(0)
 
         if self._trajectory_scheduler.failed():
             self._trajectory_scheduler.reset()
