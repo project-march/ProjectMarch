@@ -518,14 +518,12 @@ class Subgait(object):
         base_subgait: Subgait, other_subgait: Subgait
     ) -> None:
         """Check whether two subgaits are safe to be interpolated on foot location."""
-        number_of_setpoints = len(base_subgait.joints[0].setpoints)
         for base_joint, other_joint in zip(
             sorted(base_subgait.joints, key=lambda joint: joint.name),
             sorted(other_subgait.joints, key=lambda joint: joint.name),
         ):
             JointTrajectory.check_joint_interpolation_is_safe(
-                base_joint, other_joint, number_of_setpoints
-            )
+                base_joint, other_joint)
 
     @staticmethod
     def get_foot_position_interpolated_joint_trajectories(
@@ -543,15 +541,15 @@ class Subgait(object):
         :return: A list of interpolated joint trajectories
         """
         interpolated_joint_trajectories = []
-        # for inverse kinematics it is required that all joints have the same
-        # number of setpoints as to calculate the foot position at a certain time.
-        # The inverse kinematics also needs acces to the 'ith' setpoints of all joints
+        # The inverse kinematics needs acces to the 'ith' setpoints of all joints
         Subgait.check_foot_position_interpolation_is_safe(base_subgait, other_subgait)
-        number_of_setpoints = len(base_subgait.joints[0].setpoints)
+
         (
             base_setpoints_to_interpolate,
             other_setpoints_to_interpolate,
-        ) = Subgait.change_order_of_joints_and_setpoints(base_subgait, other_subgait)
+        ) = Subgait.prepare_subgaits_for_inverse_kinematics(base_subgait, other_subgait)
+
+        number_of_setpoints = len(base_subgait.joints[0].setpoints)
         new_setpoints: dict = {joint.name: [] for joint in base_subgait.joints}
         # fill all joints in new_setpoints except the ankle joints using
         # the inverse kinematics
@@ -591,6 +589,13 @@ class Subgait(object):
             interpolated_joint_trajectories.append(interpolated_joint_trajectory_to_add)
 
         return interpolated_joint_trajectories
+
+    @staticmethod
+    def propare_subgaits_for_inverse_kinematics(
+            base_subgait: Subgait, other_subgait: Subgait
+    ) -> Tuple[List[dict], List[dict]]:
+        
+
 
     @staticmethod
     def get_joint_angle_interpolated_joint_trajectories(
