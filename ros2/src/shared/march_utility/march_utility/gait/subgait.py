@@ -548,6 +548,7 @@ class Subgait(object):
         ) = Subgait.prepare_subgaits_for_inverse_kinematics(base_subgait, other_subgait)
 
         number_of_setpoints = len(base_setpoints_to_interpolate)
+
         new_setpoints: dict = {joint.name: [] for joint in base_subgait.joints}
         # fill all joints in new_setpoints except the ankle joints using
         # the inverse kinematics
