@@ -14,7 +14,6 @@
 
   <depend>march_shared_msgs</depend>
   <depend>march_utility</depend>
-  <depend>ros_testing</depend>
 
   <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>
@@ -22,6 +21,7 @@
   <depend>urdf</depend>
 
   <test_depend>ros2test</test_depend>
+  <test_depend>ros_testing</test_depend>
   <test_depend>march_robot_information</test_depend>
 
   <export>
