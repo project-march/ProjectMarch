@@ -1,4 +1,5 @@
 import os
+import traceback
 
 from numpy_ringbuffer import RingBuffer
 import rospkg
@@ -433,12 +434,11 @@ class GaitGeneratorController(object):
                 "The inverse kinematics setpoints feature as failed.",
                 "A subgait interpolation error occured, see the terminal for more information.",
             )
-            rospy.loginfo(e)
+            traceback.print_exc()
         except ValueError as e:
             self.view.message("The inverse kinematics setpoints feature has failed.",
                               "A ValueError occured, see the terminal for more information")
-            rospy.loginfo(e)
-
+            traceback.print_exc()
     def transform_inverse_kinematics_setpoints_inputs(self) -> None:
         """Transform the input coordinates (relative to a default foot location) to coordinates relative to the exo."""
         foot_side = self.view.inverse_kinematics_pop_up.foot_side
