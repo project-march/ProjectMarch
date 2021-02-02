@@ -10,24 +10,24 @@ off:
     d: 0
 weak:
   pitch:
-    p: 1000
+    p: 100
     d: 0
   roll:
-    p: 1000
+    p: 100
     d: 0
   yaw:
-    p: 0
-    d: 0
+    p: 100
+    d: 1000
 medium:
   pitch:
-    p: 3000
+    p: 150
     d: 0
   roll:
-    p: 3000
+    p: 150
     d: 0
   yaw:
-    p: 0
-    d: 0
+    p: 500
+    d: 3000
 default:
   pitch:
     p: 220
