@@ -434,6 +434,10 @@ class GaitGeneratorController(object):
                 "A subgait interpolation error occured, see the terminal for more information.",
             )
             rospy.loginfo(e)
+        except ValueError as e:
+            self.view.message("The inverse kinematics setpoints feature has failed.",
+                              "A ValueError occured, see the terminal for more information")
+            rospy.loginfo(e)
 
     def transform_inverse_kinematics_setpoints_inputs(self) -> None:
         """Transform the input coordinates (relative to a default foot location) to coordinates relative to the exo."""
