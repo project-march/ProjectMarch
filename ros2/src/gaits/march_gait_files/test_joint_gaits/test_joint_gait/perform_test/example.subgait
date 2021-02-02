@@ -2,7 +2,7 @@ description: Subgait generated using TestJointGaitGenerator, with a duration of 
   and 2 setpoints.
 duration:
   nsecs: 0
-  secs: 6
+  secs: 8
 gait_type: ''
 joints:
   rotational_joint:
@@ -16,15 +16,20 @@ joints:
       nsecs: 0
       secs: 2
     velocity: 0.0
-  - position: 0.2
+  - position: 0.0
     time_from_start:
       nsecs: 0
       secs: 4
     velocity: 0.0
-  - position: 0.0
+  - position: 0.2
     time_from_start:
       nsecs: 0
       secs: 6
+    velocity: 0.0
+  - position: 0.0
+    time_from_start:
+      nsecs: 0
+      secs: 8
     velocity: 0.0
 name: perform_test
 version: example

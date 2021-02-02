@@ -35,7 +35,7 @@ march:
       inertia_estimator:
         rotary:
           std_samples: 100 # number of samples used to calculate the standard deviation
-          lambda: 0.96 # Usually chosen between 0.9 and 1.0, but not bigger than one or less than zero
+          lambda: 0.1 # Usually chosen between 0.9 and 1.0, but not bigger than one or less than zero
           alpha_filter_size: 12 # Determines the filter size in the alpha calculation, recommended between 8 and 32
           vibration_boundaries:
             - 1.4

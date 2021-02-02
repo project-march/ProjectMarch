@@ -10,7 +10,7 @@ march:
       type: march_pdb_state_controller/MarchPdbStateController
       publish_rate: 50
     trajectory:
-      type: effort_controllers/JointTrajectoryController
+      type: inertia_trajectory_controller/JointTrajectoryController
       joints:
         - rotational_joint
       constraints:

@@ -1,0 +1,1105 @@
+description: Subgait generated using TestJointGaitGenerator, with a duration of 6.0s
+  and 2 setpoints.
+duration:
+  nsecs: 0
+  secs: 600
+gait_type: ''
+joints:
+  rotational_joint:
+  - position: 0
+    time_from_start:
+      nsecs: 0
+      secs: 0
+    velocity: 0.0
+  - position: 0.06
+    time_from_start:
+      nsecs: 0
+      secs: 3
+    velocity: 0.0
+  - position: -0.22
+    time_from_start:
+      nsecs: 0
+      secs: 6
+    velocity: 0.0
+  - position: -0.27
+    time_from_start:
+      nsecs: 0
+      secs: 10
+    velocity: 0.0
+  - position: 0.12
+    time_from_start:
+      nsecs: 0
+      secs: 13
+    velocity: 0.0
+  - position: -0.25
+    time_from_start:
+      nsecs: 0
+      secs: 14
+    velocity: 0.0
+  - position: 0.1
+    time_from_start:
+      nsecs: 0
+      secs: 18
+    velocity: 0.0
+  - position: -0.15
+    time_from_start:
+      nsecs: 0
+      secs: 20
+    velocity: 0.0
+  - position: 0.25
+    time_from_start:
+      nsecs: 0
+      secs: 25
+    velocity: 0.0
+  - position: -0.24
+    time_from_start:
+      nsecs: 0
+      secs: 28
+    velocity: 0.0
+  - position: -0.02
+    time_from_start:
+      nsecs: 0
+      secs: 29
+    velocity: 0.0
+  - position: 0.03
+    time_from_start:
+      nsecs: 0
+      secs: 32
+    velocity: 0.0
+  - position: -0.1
+    time_from_start:
+      nsecs: 0
+      secs: 34
+    velocity: 0.0
+  - position: -0.03
+    time_from_start:
+      nsecs: 0
+      secs: 38
+    velocity: 0.0
+  - position: 0.05
+    time_from_start:
+      nsecs: 0
+      secs: 42
+    velocity: 0.0
+  - position: 0.29
+    time_from_start:
+      nsecs: 0
+      secs: 44
+    velocity: 0.0
+  - position: -0.2
+    time_from_start:
+      nsecs: 0
+      secs: 46
+    velocity: 0.0
+  - position: 0.25
+    time_from_start:
+      nsecs: 0
+      secs: 48
+    velocity: 0.0
+  - position: -0.13
+    time_from_start:
+      nsecs: 0
+      secs: 51
+    velocity: 0.0
+  - position: 0.24
+    time_from_start:
+      nsecs: 0
+      secs: 55
+    velocity: 0.0
+  - position: -0.29
+    time_from_start:
+      nsecs: 0
+      secs: 57
+    velocity: 0.0
+  - position: 0.13
+    time_from_start:
+      nsecs: 0
+      secs: 59
+    velocity: 0.0
+  - position: -0.03
+    time_from_start:
+      nsecs: 0
+      secs: 61
+    velocity: 0.0
+  - position: -0.28
+    time_from_start:
+      nsecs: 0
+      secs: 66
+    velocity: 0.0
+  - position: 0.18
+    time_from_start:
+      nsecs: 0
+      secs: 70
+    velocity: 0.0
+  - position: 0.24
+    time_from_start:
+      nsecs: 0
+      secs: 72
+    velocity: 0.0
+  - position: -0.02
+    time_from_start:
+      nsecs: 0
+      secs: 74
+    velocity: 0.0
+  - position: -0.07
+    time_from_start:
+      nsecs: 0
+      secs: 77
+    velocity: 0.0
+  - position: 0.07
+    time_from_start:
+      nsecs: 0
+      secs: 81
+    velocity: 0.0
+  - position: 0.02
+    time_from_start:
+      nsecs: 0
+      secs: 84
+    velocity: 0.0
+  - position: -0.14
+    time_from_start:
+      nsecs: 0
+      secs: 85
+    velocity: 0.0
+  - position: -0.15
+    time_from_start:
+      nsecs: 0
+      secs: 89
+    velocity: 0.0
+  - position: 0.1
+    time_from_start:
+      nsecs: 0
+      secs: 91
+    velocity: 0.0
+  - position: 0.05
+    time_from_start:
+      nsecs: 0
+      secs: 94
+    velocity: 0.0
+  - position: -0.11
+    time_from_start:
+      nsecs: 0
+      secs: 99
+    velocity: 0.0
+  - position: -0.28
+    time_from_start:
+      nsecs: 0
+      secs: 100
+    velocity: 0.0
+  - position: 0.26
+    time_from_start:
+      nsecs: 0
+      secs: 105
+    velocity: 0.0
+  - position: 0.19
+    time_from_start:
+      nsecs: 0
+      secs: 107
+    velocity: 0.0
+  - position: 0.17
+    time_from_start:
+      nsecs: 0
+      secs: 110
+    velocity: 0.0
+  - position: 0.08
+    time_from_start:
+      nsecs: 0
+      secs: 115
+    velocity: 0.0
+  - position: -0.23
+    time_from_start:
+      nsecs: 0
+      secs: 116
+    velocity: 0.0
+  - position: 0.02
+    time_from_start:
+      nsecs: 0
+      secs: 120
+    velocity: 0.0
+  - position: -0.05
+    time_from_start:
+      nsecs: 0
+      secs: 121
+    velocity: 0.0
+  - position: 0.08
+    time_from_start:
+      nsecs: 0
+      secs: 122
+    velocity: 0.0
+  - position: -0.26
+    time_from_start:
+      nsecs: 0
+      secs: 127
+    velocity: 0.0
+  - position: 0.06
+    time_from_start:
+      nsecs: 0
+      secs: 132
+    velocity: 0.0
+  - position: -0.21
+    time_from_start:
+      nsecs: 0
+      secs: 137
+    velocity: 0.0
+  - position: -0.26
+    time_from_start:
+      nsecs: 0
+      secs: 139
+    velocity: 0.0
+  - position: 0.06
+    time_from_start:
+      nsecs: 0
+      secs: 140
+    velocity: 0.0
+  - position: -0.22
+    time_from_start:
+      nsecs: 0
+      secs: 141
+    velocity: 0.0
+  - position: -0.27
+    time_from_start:
+      nsecs: 0
+      secs: 143
+    velocity: 0.0
+  - position: 0.29
+    time_from_start:
+      nsecs: 0
+      secs: 147
+    velocity: 0.0
+  - position: -0.19
+    time_from_start:
+      nsecs: 0
+      secs: 152
+    velocity: 0.0
+  - position: 0.3
+    time_from_start:
+      nsecs: 0
+      secs: 156
+    velocity: 0.0
+  - position: 0.13
+    time_from_start:
+      nsecs: 0
+      secs: 159
+    velocity: 0.0
+  - position: -0.29
+    time_from_start:
+      nsecs: 0
+      secs: 160
+    velocity: 0.0
+  - position: -0.28
+    time_from_start:
+      nsecs: 0
+      secs: 164
+    velocity: 0.0
+  - position: 0.1
+    time_from_start:
+      nsecs: 0
+      secs: 168
+    velocity: 0.0
+  - position: -0.06
+    time_from_start:
+      nsecs: 0
+      secs: 171
+    velocity: 0.0
+  - position: -0.28
+    time_from_start:
+      nsecs: 0
+      secs: 174
+    velocity: 0.0
+  - position: -0.15
+    time_from_start:
+      nsecs: 0
+      secs: 175
+    velocity: 0.0
+  - position: -0.17
+    time_from_start:
+      nsecs: 0
+      secs: 180
+    velocity: 0.0
+  - position: -0.05
+    time_from_start:
+      nsecs: 0
+      secs: 181
+    velocity: 0.0
+  - position: -0.2
+    time_from_start:
+      nsecs: 0
+      secs: 182
+    velocity: 0.0
+  - position: 0.27
+    time_from_start:
+      nsecs: 0
+      secs: 184
+    velocity: 0.0
+  - position: -0.14
+    time_from_start:
+      nsecs: 0
+      secs: 187
+    velocity: 0.0
+  - position: -0.19
+    time_from_start:
+      nsecs: 0
+      secs: 190
+    velocity: 0.0
+  - position: 0.25
+    time_from_start:
+      nsecs: 0
+      secs: 192
+    velocity: 0.0
+  - position: -0.21
+    time_from_start:
+      nsecs: 0
+      secs: 194
+    velocity: 0.0
+  - position: 0.19
+    time_from_start:
+      nsecs: 0
+      secs: 198
+    velocity: 0.0
+  - position: -0.05
+    time_from_start:
+      nsecs: 0
+      secs: 202
+    velocity: 0.0
+  - position: -0.23
+    time_from_start:
+      nsecs: 0
+      secs: 206
+    velocity: 0.0
+  - position: -0.11
+    time_from_start:
+      nsecs: 0
+      secs: 210
+    velocity: 0.0
+  - position: -0.07
+    time_from_start:
+      nsecs: 0
+      secs: 213
+    velocity: 0.0
+  - position: -0.11
+    time_from_start:
+      nsecs: 0
+      secs: 216
+    velocity: 0.0
+  - position: 0.14
+    time_from_start:
+      nsecs: 0
+      secs: 217
+    velocity: 0.0
+  - position: 0.27
+    time_from_start:
+      nsecs: 0
+      secs: 218
+    velocity: 0.0
+  - position: 0.03
+    time_from_start:
+      nsecs: 0
+      secs: 221
+    velocity: 0.0
+  - position: -0.01
+    time_from_start:
+      nsecs: 0
+      secs: 225
+    velocity: 0.0
+  - position: 0.28
+    time_from_start:
+      nsecs: 0
+      secs: 226
+    velocity: 0.0
+  - position: 0.28
+    time_from_start:
+      nsecs: 0
+      secs: 229
+    velocity: 0.0
+  - position: 0.01
+    time_from_start:
+      nsecs: 0
+      secs: 234
+    velocity: 0.0
+  - position: 0.12
+    time_from_start:
+      nsecs: 0
+      secs: 235
+    velocity: 0.0
+  - position: 0.0
+    time_from_start:
+      nsecs: 0
+      secs: 237
+    velocity: 0.0
+  - position: 0.07
+    time_from_start:
+      nsecs: 0
+      secs: 242
+    velocity: 0.0
+  - position: -0.04
+    time_from_start:
+      nsecs: 0
+      secs: 247
+    velocity: 0.0
+  - position: -0.28
+    time_from_start:
+      nsecs: 0
+      secs: 250
+    velocity: 0.0
+  - position: -0.22
+    time_from_start:
+      nsecs: 0
+      secs: 255
+    velocity: 0.0
+  - position: -0.1
+    time_from_start:
+      nsecs: 0
+      secs: 258
+    velocity: 0.0
+  - position: -0.15
+    time_from_start:
+      nsecs: 0
+      secs: 259
+    velocity: 0.0
+  - position: -0.24
+    time_from_start:
+      nsecs: 0
+      secs: 260
+    velocity: 0.0
+  - position: 0.14
+    time_from_start:
+      nsecs: 0
+      secs: 262
+    velocity: 0.0
+  - position: -0.28
+    time_from_start:
+      nsecs: 0
+      secs: 267
+    velocity: 0.0
+  - position: -0.04
+    time_from_start:
+      nsecs: 0
+      secs: 270
+    velocity: 0.0
+  - position: 0.08
+    time_from_start:
+      nsecs: 0
+      secs: 272
+    velocity: 0.0
+  - position: 0.13
+    time_from_start:
+      nsecs: 0
+      secs: 277
+    velocity: 0.0
+  - position: 0.02
+    time_from_start:
+      nsecs: 0
+      secs: 280
+    velocity: 0.0
+  - position: -0.13
+    time_from_start:
+      nsecs: 0
+      secs: 281
+    velocity: 0.0
+  - position: -0.22
+    time_from_start:
+      nsecs: 0
+      secs: 284
+    velocity: 0.0
+  - position: -0.03
+    time_from_start:
+      nsecs: 0
+      secs: 289
+    velocity: 0.0
+  - position: -0.07
+    time_from_start:
+      nsecs: 0
+      secs: 291
+    velocity: 0.0
+  - position: 0.1
+    time_from_start:
+      nsecs: 0
+      secs: 292
+    velocity: 0.0
+  - position: -0.21
+    time_from_start:
+      nsecs: 0
+      secs: 294
+    velocity: 0.0
+  - position: 0.23
+    time_from_start:
+      nsecs: 0
+      secs: 298
+    velocity: 0.0
+  - position: -0.08
+    time_from_start:
+      nsecs: 0
+      secs: 302
+    velocity: 0.0
+  - position: 0.22
+    time_from_start:
+      nsecs: 0
+      secs: 307
+    velocity: 0.0
+  - position: 0.12
+    time_from_start:
+      nsecs: 0
+      secs: 310
+    velocity: 0.0
+  - position: 0.18
+    time_from_start:
+      nsecs: 0
+      secs: 312
+    velocity: 0.0
+  - position: -0.07
+    time_from_start:
+      nsecs: 0
+      secs: 313
+    velocity: 0.0
+  - position: 0.19
+    time_from_start:
+      nsecs: 0
+      secs: 314
+    velocity: 0.0
+  - position: -0.09
+    time_from_start:
+      nsecs: 0
+      secs: 317
+    velocity: 0.0
+  - position: 0.26
+    time_from_start:
+      nsecs: 0
+      secs: 318
+    velocity: 0.0
+  - position: -0.21
+    time_from_start:
+      nsecs: 0
+      secs: 319
+    velocity: 0.0
+  - position: 0.23
+    time_from_start:
+      nsecs: 0
+      secs: 321
+    velocity: 0.0
+  - position: -0.29
+    time_from_start:
+      nsecs: 0
+      secs: 324
+    velocity: 0.0
+  - position: 0.08
+    time_from_start:
+      nsecs: 0
+      secs: 326
+    velocity: 0.0
+  - position: 0.26
+    time_from_start:
+      nsecs: 0
+      secs: 328
+    velocity: 0.0
+  - position: -0.07
+    time_from_start:
+      nsecs: 0
+      secs: 329
+    velocity: 0.0
+  - position: 0.25
+    time_from_start:
+      nsecs: 0
+      secs: 330
+    velocity: 0.0
+  - position: -0.04
+    time_from_start:
+      nsecs: 0
+      secs: 333
+    velocity: 0.0
+  - position: 0.07
+    time_from_start:
+      nsecs: 0
+      secs: 337
+    velocity: 0.0
+  - position: 0.26
+    time_from_start:
+      nsecs: 0
+      secs: 339
+    velocity: 0.0
+  - position: 0.27
+    time_from_start:
+      nsecs: 0
+      secs: 343
+    velocity: 0.0
+  - position: 0.01
+    time_from_start:
+      nsecs: 0
+      secs: 346
+    velocity: 0.0
+  - position: 0.21
+    time_from_start:
+      nsecs: 0
+      secs: 347
+    velocity: 0.0
+  - position: -0.22
+    time_from_start:
+      nsecs: 0
+      secs: 349
+    velocity: 0.0
+  - position: -0.15
+    time_from_start:
+      nsecs: 0
+      secs: 350
+    velocity: 0.0
+  - position: 0.05
+    time_from_start:
+      nsecs: 0
+      secs: 351
+    velocity: 0.0
+  - position: 0.16
+    time_from_start:
+      nsecs: 0
+      secs: 353
+    velocity: 0.0
+  - position: 0.22
+    time_from_start:
+      nsecs: 0
+      secs: 357
+    velocity: 0.0
+  - position: 0.1
+    time_from_start:
+      nsecs: 0
+      secs: 361
+    velocity: 0.0
+  - position: -0.12
+    time_from_start:
+      nsecs: 0
+      secs: 363
+    velocity: 0.0
+  - position: -0.1
+    time_from_start:
+      nsecs: 0
+      secs: 367
+    velocity: 0.0
+  - position: 0.01
+    time_from_start:
+      nsecs: 0
+      secs: 369
+    velocity: 0.0
+  - position: 0.01
+    time_from_start:
+      nsecs: 0
+      secs: 371
+    velocity: 0.0
+  - position: -0.08
+    time_from_start:
+      nsecs: 0
+      secs: 373
+    velocity: 0.0
+  - position: -0.18
+    time_from_start:
+      nsecs: 0
+      secs: 377
+    velocity: 0.0
+  - position: 0.03
+    time_from_start:
+      nsecs: 0
+      secs: 379
+    velocity: 0.0
+  - position: 0.24
+    time_from_start:
+      nsecs: 0
+      secs: 384
+    velocity: 0.0
+  - position: 0.23
+    time_from_start:
+      nsecs: 0
+      secs: 387
+    velocity: 0.0
+  - position: 0.18
+    time_from_start:
+      nsecs: 0
+      secs: 392
+    velocity: 0.0
+  - position: -0.1
+    time_from_start:
+      nsecs: 0
+      secs: 395
+    velocity: 0.0
+  - position: 0.18
+    time_from_start:
+      nsecs: 0
+      secs: 396
+    velocity: 0.0
+  - position: 0.17
+    time_from_start:
+      nsecs: 0
+      secs: 401
+    velocity: 0.0
+  - position: -0.14
+    time_from_start:
+      nsecs: 0
+      secs: 403
+    velocity: 0.0
+  - position: -0.08
+    time_from_start:
+      nsecs: 0
+      secs: 404
+    velocity: 0.0
+  - position: 0.08
+    time_from_start:
+      nsecs: 0
+      secs: 408
+    velocity: 0.0
+  - position: 0.26
+    time_from_start:
+      nsecs: 0
+      secs: 410
+    velocity: 0.0
+  - position: 0.28
+    time_from_start:
+      nsecs: 0
+      secs: 414
+    velocity: 0.0
+  - position: -0.13
+    time_from_start:
+      nsecs: 0
+      secs: 419
+    velocity: 0.0
+  - position: -0.23
+    time_from_start:
+      nsecs: 0
+      secs: 421
+    velocity: 0.0
+  - position: 0.12
+    time_from_start:
+      nsecs: 0
+      secs: 426
+    velocity: 0.0
+  - position: -0.11
+    time_from_start:
+      nsecs: 0
+      secs: 431
+    velocity: 0.0
+  - position: 0.18
+    time_from_start:
+      nsecs: 0
+      secs: 433
+    velocity: 0.0
+  - position: 0.18
+    time_from_start:
+      nsecs: 0
+      secs: 434
+    velocity: 0.0
+  - position: -0.15
+    time_from_start:
+      nsecs: 0
+      secs: 437
+    velocity: 0.0
+  - position: -0.02
+    time_from_start:
+      nsecs: 0
+      secs: 438
+    velocity: 0.0
+  - position: -0.3
+    time_from_start:
+      nsecs: 0
+      secs: 442
+    velocity: 0.0
+  - position: -0.1
+    time_from_start:
+      nsecs: 0
+      secs: 446
+    velocity: 0.0
+  - position: 0.27
+    time_from_start:
+      nsecs: 0
+      secs: 447
+    velocity: 0.0
+  - position: -0.02
+    time_from_start:
+      nsecs: 0
+      secs: 449
+    velocity: 0.0
+  - position: -0.29
+    time_from_start:
+      nsecs: 0
+      secs: 451
+    velocity: 0.0
+  - position: 0.01
+    time_from_start:
+      nsecs: 0
+      secs: 453
+    velocity: 0.0
+  - position: 0.22
+    time_from_start:
+      nsecs: 0
+      secs: 454
+    velocity: 0.0
+  - position: -0.21
+    time_from_start:
+      nsecs: 0
+      secs: 459
+    velocity: 0.0
+  - position: 0.02
+    time_from_start:
+      nsecs: 0
+      secs: 464
+    velocity: 0.0
+  - position: -0.16
+    time_from_start:
+      nsecs: 0
+      secs: 466
+    velocity: 0.0
+  - position: 0.25
+    time_from_start:
+      nsecs: 0
+      secs: 467
+    velocity: 0.0
+  - position: 0.24
+    time_from_start:
+      nsecs: 0
+      secs: 470
+    velocity: 0.0
+  - position: 0.05
+    time_from_start:
+      nsecs: 0
+      secs: 471
+    velocity: 0.0
+  - position: -0.07
+    time_from_start:
+      nsecs: 0
+      secs: 474
+    velocity: 0.0
+  - position: -0.04
+    time_from_start:
+      nsecs: 0
+      secs: 475
+    velocity: 0.0
+  - position: 0.28
+    time_from_start:
+      nsecs: 0
+      secs: 478
+    velocity: 0.0
+  - position: -0.06
+    time_from_start:
+      nsecs: 0
+      secs: 481
+    velocity: 0.0
+  - position: -0.14
+    time_from_start:
+      nsecs: 0
+      secs: 483
+    velocity: 0.0
+  - position: -0.18
+    time_from_start:
+      nsecs: 0
+      secs: 484
+    velocity: 0.0
+  - position: 0.17
+    time_from_start:
+      nsecs: 0
+      secs: 488
+    velocity: 0.0
+  - position: 0.3
+    time_from_start:
+      nsecs: 0
+      secs: 489
+    velocity: 0.0
+  - position: 0.04
+    time_from_start:
+      nsecs: 0
+      secs: 491
+    velocity: 0.0
+  - position: 0.24
+    time_from_start:
+      nsecs: 0
+      secs: 494
+    velocity: 0.0
+  - position: 0.23
+    time_from_start:
+      nsecs: 0
+      secs: 497
+    velocity: 0.0
+  - position: -0.08
+    time_from_start:
+      nsecs: 0
+      secs: 499
+    velocity: 0.0
+  - position: -0.21
+    time_from_start:
+      nsecs: 0
+      secs: 503
+    velocity: 0.0
+  - position: -0.18
+    time_from_start:
+      nsecs: 0
+      secs: 508
+    velocity: 0.0
+  - position: 0.02
+    time_from_start:
+      nsecs: 0
+      secs: 510
+    velocity: 0.0
+  - position: 0.29
+    time_from_start:
+      nsecs: 0
+      secs: 513
+    velocity: 0.0
+  - position: 0.19
+    time_from_start:
+      nsecs: 0
+      secs: 514
+    velocity: 0.0
+  - position: 0.04
+    time_from_start:
+      nsecs: 0
+      secs: 516
+    velocity: 0.0
+  - position: -0.24
+    time_from_start:
+      nsecs: 0
+      secs: 518
+    velocity: 0.0
+  - position: 0.15
+    time_from_start:
+      nsecs: 0
+      secs: 522
+    velocity: 0.0
+  - position: -0.07
+    time_from_start:
+      nsecs: 0
+      secs: 523
+    velocity: 0.0
+  - position: 0.03
+    time_from_start:
+      nsecs: 0
+      secs: 524
+    velocity: 0.0
+  - position: -0.15
+    time_from_start:
+      nsecs: 0
+      secs: 528
+    velocity: 0.0
+  - position: -0.24
+    time_from_start:
+      nsecs: 0
+      secs: 530
+    velocity: 0.0
+  - position: 0.17
+    time_from_start:
+      nsecs: 0
+      secs: 535
+    velocity: 0.0
+  - position: 0.01
+    time_from_start:
+      nsecs: 0
+      secs: 536
+    velocity: 0.0
+  - position: -0.03
+    time_from_start:
+      nsecs: 0
+      secs: 540
+    velocity: 0.0
+  - position: -0.27
+    time_from_start:
+      nsecs: 0
+      secs: 544
+    velocity: 0.0
+  - position: 0.07
+    time_from_start:
+      nsecs: 0
+      secs: 545
+    velocity: 0.0
+  - position: -0.13
+    time_from_start:
+      nsecs: 0
+      secs: 548
+    velocity: 0.0
+  - position: -0.26
+    time_from_start:
+      nsecs: 0
+      secs: 552
+    velocity: 0.0
+  - position: -0.16
+    time_from_start:
+      nsecs: 0
+      secs: 555
+    velocity: 0.0
+  - position: 0.19
+    time_from_start:
+      nsecs: 0
+      secs: 560
+    velocity: 0.0
+  - position: -0.17
+    time_from_start:
+      nsecs: 0
+      secs: 561
+    velocity: 0.0
+  - position: 0.14
+    time_from_start:
+      nsecs: 0
+      secs: 566
+    velocity: 0.0
+  - position: 0.06
+    time_from_start:
+      nsecs: 0
+      secs: 569
+    velocity: 0.0
+  - position: 0.18
+    time_from_start:
+      nsecs: 0
+      secs: 570
+    velocity: 0.0
+  - position: 0.0
+    time_from_start:
+      nsecs: 0
+      secs: 571
+    velocity: 0.0
+  - position: 0.18
+    time_from_start:
+      nsecs: 0
+      secs: 573
+    velocity: 0.0
+  - position: 0.24
+    time_from_start:
+      nsecs: 0
+      secs: 575
+    velocity: 0.0
+  - position: 0.11
+    time_from_start:
+      nsecs: 0
+      secs: 580
+    velocity: 0.0
+  - position: -0.25
+    time_from_start:
+      nsecs: 0
+      secs: 583
+    velocity: 0.0
+  - position: 0.04
+    time_from_start:
+      nsecs: 0
+      secs: 585
+    velocity: 0.0
+  - position: 0.15
+    time_from_start:
+      nsecs: 0
+      secs: 586
+    velocity: 0.0
+  - position: -0.11
+    time_from_start:
+      nsecs: 0
+      secs: 587
+    velocity: 0.0
+  - position: 0.14
+    time_from_start:
+      nsecs: 0
+      secs: 590
+    velocity: 0.0
+  - position: 0.3
+    time_from_start:
+      nsecs: 0
+      secs: 593
+    velocity: 0.0
+  - position: 0.15
+    time_from_start:
+      nsecs: 0
+      secs: 594
+    velocity: 0.0
+  - position: 0.0
+    time_from_start:
+      nsecs: 0
+      secs: 600
+    velocity: 0.0
+name: perform_test
+version: sysID

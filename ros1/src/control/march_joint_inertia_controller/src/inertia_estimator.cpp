@@ -1,4 +1,5 @@
 // Copyright 2020 Project March.
+#include <iostream>
 #include <algorithm>
 #include <cmath>
 #include <hardware_interface/joint_command_interface.h>
@@ -138,12 +139,19 @@ void InertiaEstimator::inertiaEstimate()
 
   correlationCalculation();
   K_i_ = gainCalculation();
-  K_a_ = alphaCalculation();
+//  K_a_ = alphaCalculation();
+  K_a_ = 1.0;
+//  std::cout << "K_i_: " << K_i_ << std::endl;
+//  std::cout << "K_a_: " << K_a_ << std::endl;
   auto ita = filtered_acceleration_array_.begin();
   auto itt = filtered_joint_torque_.begin();
   const double torque_e = *itt - *(++itt);
   const double acc_e = *ita - *(++ita);
+//  std::cout << "joint inertia 1: " << joint_inertia_ << std::endl;
   joint_inertia_ = (torque_e - (acc_e * joint_inertia_)) * K_i_ * K_a_ + joint_inertia_;
+//  std::cout << "acc_e " << acc_e << std::endl;
+//  std::cout << "torque_e: " << torque_e << std::endl;
+  std::cout << "joint inertia: " << joint_inertia_ << std::endl;
 }
 
 // Calculate the alpha coefficient for the inertia estimate
