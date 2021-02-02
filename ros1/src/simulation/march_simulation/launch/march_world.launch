@@ -10,6 +10,8 @@
     <arg name="robot_description" default="$(arg robot)" doc="URDF file to use"/>
     <arg name="controller_type" default="effort_control" doc="Changes the controller used by simulation."/>
     <arg name="controller_name" default="$(arg robot)" doc="Name of the controller"/>
+    <arg name="realsense_simulation" default="true"
+         doc="Whether the simulation camera or the physical camera should be used"/>
 
     <!-- Disable all plugins that are not used by the physical realsense camera. -->
     <!-- The compressedDepth plugin has to be turned off to prevent errors when -->
@@ -55,7 +57,8 @@
                     k_position_value_hfe:=5000.0 k_position_value_kfe:=5000.0
                     k_position_value_haa:=5000.0 k_position_value_adpf:=5000.0
                     max_effort_rotary:=200.0 max_effort_linear:=200.0
-                    ground_gait:=$(arg ground_gait)" />
+                    ground_gait:=$(arg ground_gait)
+                    realsense_simulation:=$(arg realsense_simulation)" />
 
     <!-- Upload the controller configuration -->
     <rosparam file="$(find march_simulation)/config/$(arg controller_type)/$(arg controller_name).yaml" command="load"/>
