@@ -540,8 +540,7 @@ class Subgait(object):
             sorted(base_subgait.joints, key=lambda joint: joint.name),
             sorted(other_subgait.joints, key=lambda joint: joint.name),
         ):
-            JointTrajectory.check_joint_interpolation_is_safe(
-                base_joint, other_joint)
+            JointTrajectory.check_joint_interpolation_is_safe(base_joint, other_joint)
 
     @staticmethod
     def get_foot_position_interpolated_joint_trajectories(
@@ -609,10 +608,36 @@ class Subgait(object):
         return interpolated_joint_trajectories
 
     @staticmethod
-    def propare_subgaits_for_inverse_kinematics(
-            base_subgait: Subgait, other_subgait: Subgait
+    def prepare_subgaits_for_inverse_kinematics(
+        base_subgait: Subgait, other_subgait: Subgait
     ) -> Tuple[List[dict], List[dict]]:
-        
+
+        max_duration = (
+            base_subgait.duration
+            if base_subgait.duration > other_subgait.duration
+            else other_subgait.duration
+        )
+        # The resulting setpoint lists will have a setpoint every 0.1s plus one at the start
+        number_of_setpoints = max_duration * 10 + 1
+
+        base_setpoints_to_interpolate = prepare_subgait_for_inverse_kinematics(
+            base_subgait, number_of_setpoints
+        )
+        other_setpoints_to_interpolate = prepare_subgait_for_inverse_kinematics(
+            other_subgait, number_of_setpoints
+        )
+
+        return base_setpoints_to_interpolate, other_setpoints_to_interpolate
+
+    @staticmethod
+    def prepare_subgait_for_inverse_kinematics(
+        subgait: Subgait, number_of_setpoints: int
+    ) -> List[Dict]:
+
+        setpoints_to_interpolate: List[dict] = [{} for _ in range(number_of_setpoints)]
+        for joint in subgait:
+            for setpoint_index in range(number_of_setpoints):
+                setpoint_to_add_time = setpoint_index / (number_of_setpoints - 1) * subgait.duration
 
 
     @staticmethod
