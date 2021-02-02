@@ -22,7 +22,6 @@ find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(urdf REQUIRED)
-find_package(ros_testing REQUIRED)
 find_package(march_utility REQUIRED)
 
 add_library(${PROJECT_NAME}
@@ -30,14 +29,14 @@ add_library(${PROJECT_NAME}
         src/safety_handler.cpp
         src/temperature_safety.cpp
 )
-ament_target_dependencies(${PROJECT_NAME} march_shared_msgs rclcpp sensor_msgs std_msgs urdf ros_testing march_utility)
+ament_target_dependencies(${PROJECT_NAME} march_shared_msgs rclcpp sensor_msgs std_msgs urdf march_utility)
 target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>)
 
 # the executable that is run in ROS and links with the library defined above
 add_executable(${PROJECT_NAME}_node src/safety_node.cpp)
-ament_target_dependencies(${PROJECT_NAME}_node march_shared_msgs rclcpp sensor_msgs std_msgs urdf ros_testing march_utility)
+ament_target_dependencies(${PROJECT_NAME}_node march_shared_msgs rclcpp sensor_msgs std_msgs urdf march_utility)
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME}_node PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -53,6 +52,7 @@ install(DIRECTORY launch config
         DESTINATION share/${PROJECT_NAME}/)
 
 if(BUILD_TESTING)
+    find_package(ros_testing REQUIRED)
     install(DIRECTORY test
             DESTINATION share/${PROJECT_NAME}/)
     ament_python_install_package(test)
