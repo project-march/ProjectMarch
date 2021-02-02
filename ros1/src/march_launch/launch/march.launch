@@ -103,7 +103,6 @@
             <arg name="sounds" value="$(arg sounds)"/>
         </include>
 
-        <include file="$(find march_safety)/launch/march_safety.launch"/>
         <include file="$(find march_gain_scheduling)/launch/march_gain_scheduling.launch" if="$(arg gain_scheduling)">
             <arg name="configuration" value="$(arg gain_tuning)"/>
         </include>

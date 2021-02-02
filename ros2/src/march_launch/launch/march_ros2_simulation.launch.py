@@ -129,6 +129,17 @@ def generate_launch_description():
                 ],
                 condition=IfCondition(gait_selection),
             ),
+            # Safety
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    os.path.join(
+                        get_package_share_directory("march_safety"),
+                        "launch",
+                        "march_safety.launch.py",
+                    )
+                ),
+                launch_arguments=[("use_sim_time", use_sim_time)],
+            ),
             # March robot information
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(

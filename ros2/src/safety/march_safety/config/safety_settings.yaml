@@ -1,0 +1,31 @@
+march/safety_node:
+  ros__parameters:
+    default_temperature_threshold: 40.0
+    input_device_connection_timeout: 1000 # Milliseconds
+    send_errors_interval: 1000 # Milliseconds
+    temperature_thresholds_warning:
+      left_hip_aa: 45.0
+      left_hip_fe: 40.0
+      left_knee: 45.0
+      left_ankle: 45.0
+      right_hip_aa: 45.0
+      right_hip_fe: 40.0
+      right_knee: 40.0
+      right_ankle: 40.0
+    temperature_thresholds_non_fatal:
+      left_hip_aa: 50.0
+      left_hip_fe: 45.0
+      left_knee: 45.0
+      left_ankle: 50.0
+      right_hip_aa: 50.0
+      right_hip_fe: 45.0
+      right_knee: 45.0
+      right_ankle: 50.0
+    temperature_thresholds_fatal:
+      left_hip_aa: 55.0
+      left_hip_fe: 50.0
+      left_knee: 50.0
+      left_ankle: 55.0
+      right_hip_aa: 55.0
+      right_hip_fe: 50.0
+      right_knee: 50.0

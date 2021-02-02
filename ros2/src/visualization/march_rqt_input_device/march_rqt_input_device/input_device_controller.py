@@ -60,6 +60,7 @@ class InputDeviceController(object):
         self.rejected_cb = None
         self.current_gait_cb = None
         self._possible_gaits = []
+
         self._id = self.ID_FORMAT.format(
             machine=socket.gethostname(), user=getpass.getuser()
         )
