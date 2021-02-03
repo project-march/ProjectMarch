@@ -619,17 +619,9 @@ class Subgait(object):
 
         for joint in subgait:
             for setpoint_index in range(number_of_setpoints):
-<<<<<<< HEAD
                 # Create new setpoints at equidistant time stamps using the interpolated position and velocity
                 time = setpoint_index / (number_of_setpoints - 1) * subgait.duration
                 setpoint_to_add = subgait.get_joint(joint.name).get_interpolated_setpoint(time)
-=======
-                # Create new setpoints at time intervals using the interpolated position and velocity
-                time = setpoint_index / (number_of_setpoints - 1) * subgait.duration
-                position = subgait.get_joint[joint.name].interpolated_position(time)
-                velocity = subgait.get_joint[joint.name].interpolated_velocity(time)
-                setpoint_to_add = Setpoint(time, position, velocity)
->>>>>>> c5b27908... Finalize function for preparing subgaits for interpolation.
 
                 setpoints_to_interpolate[setpoint_index][joint.name] = setpoint_to_add
 
@@ -666,6 +658,7 @@ class Subgait(object):
             interpolated_joint_trajectories.append(interpolated_joint_trajectory_to_add)
 
         return interpolated_joint_trajectories
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 
@@ -705,3 +698,5 @@ class Subgait(object):
     #             ] = other_joint.setpoints[setpoint_index]
     #     return base_setpoints_to_interpolate, other_setpoints_to_interpolate
 >>>>>>> c5b27908... Finalize function for preparing subgaits for interpolation.
+=======
+>>>>>>> be25b16b... Clean up code.
