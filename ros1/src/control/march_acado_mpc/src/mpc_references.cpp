@@ -10,7 +10,7 @@ void scrollReference(vector<vector<double>>& reference) {
     reference.push_back(reference[0]);
 }
 
-void sinRef(vector<vector<double>>& reference, double freq, double amp, int N, double dt) {
+void sinRef(vector<vector<double>>& reference, double freq, double amplitude, int N, double dt) {
 
     // calculate the amount of time steps required for one period
     double T_N = ceil(1/(freq*dt));
@@ -24,8 +24,8 @@ void sinRef(vector<vector<double>>& reference, double freq, double amp, int N, d
         line.clear();
 
         // fill the line vector with the three required references values
-        line.push_back(amp*sin((freq*2*M_PI)*(j*dt))); // THETA
-        line.push_back(amp*cos((freq*2*M_PI)*(j*dt))); // DTHETA
+        line.push_back(amplitude*sin((freq*2*M_PI)*(j*dt))); // THETA
+        line.push_back(amplitude*cos((freq*2*M_PI)*(j*dt))); // DTHETA
         line.push_back(0.0); // T
 
         // add the temp vector to the reference
@@ -34,7 +34,7 @@ void sinRef(vector<vector<double>>& reference, double freq, double amp, int N, d
 
 }
 
-void stepRef(vector<vector<double>>& ref, double amplitude, int N) {
+void stepRef(vector<vector<double>>& reference, double amplitude, int N) {
 
     vector<double> line;
     for (int j = 0; j < N+1; j++) {
@@ -47,7 +47,7 @@ void stepRef(vector<vector<double>>& ref, double amplitude, int N) {
         line.push_back(0.0);        // T
 
         // add the temp vector to the reference
-        ref.push_back(line);
+        reference.push_back(line);
     }
 
 }

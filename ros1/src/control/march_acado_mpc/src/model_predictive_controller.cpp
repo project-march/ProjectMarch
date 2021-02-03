@@ -64,11 +64,9 @@ void ModelPredictiveController::init() {
     acadoVariables.x[i * ACADO_NX + 1] = 0; // dtheta
   }
 
-  // Fill reference vector (by chaining reference functions)
-  sinRef(reference, 0.01, 0.785, ACADO_N, 0.04);
-  stepRef(reference, 0.0, 50*ACADO_N+1);
-  sinRef(reference, 0.01, -0.785, ACADO_N, 0.04);
-  stepRef(reference, 0.0, 50*ACADO_N+1);
+  // Fill reference vector with sinus and or step signals
+//  sinRef(reference, 0.2, 0.785, ACADO_N, 0.001);
+  stepRef(reference, 0.785, ACADO_N);
 
   // Set the reference
   setReference(reference);
@@ -120,7 +118,6 @@ void ModelPredictiveController::assignWeightingMatrix(std::vector<std::vector<fl
                 acadoVariables.WN[i*(n_cols-ACADO_NU) + j] = Q[i][j];
             }
         }
-
     }
 }
 
