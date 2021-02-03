@@ -11,9 +11,10 @@ public:
     ModelPredictiveController(std::vector<std::vector<float>> Q);
 
     // Public variables
-    vector<double> x0{0,0}; // Current state
-    double u;               // Calculated control input
-    vector<vector<double>> reference; // Current reference
+    vector<double> x0{0,0};             // Current state
+    double u;                           // Calculated control input
+    vector<vector<double>> reference;   // Current reference
+    bool repeat_reference = true;      // Periodically Repeat the reference
 
     /**
      * \brief Initialise the model predictive controller
