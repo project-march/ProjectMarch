@@ -17,6 +17,17 @@ using namespace std;
 ACADOvariables acadoVariables = {};
 ACADOworkspace acadoWorkspace = {};
 
+void ModelPredictiveController::setReference(vector<vector<double>> reference) {
+    for(int i = 0; i < ACADO_N; i++) {
+        for(int j = 0; j < ACADO_NY; j++) {
+            acadoVariables.y[i * ACADO_NY + j] = reference[i][j];
+        }
+    }
+    for(int j = 0; j < ACADO_NYN; j++) {
+        acadoVariables.yN[j] = reference[ACADO_N][j];
+    }
+}
+
 void ModelPredictiveController::init() {
 
   // Initialize the solver
