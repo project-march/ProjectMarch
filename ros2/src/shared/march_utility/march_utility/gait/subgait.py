@@ -582,6 +582,8 @@ class Subgait(object):
             setpoints_to_add = FeetState.feet_state_to_setpoints(new_feet_state)
             for joint_name in JOINT_NAMES_IK:
                 new_setpoints[joint_name].append(setpoints_to_add[joint_name])
+                print(f"setpoints = {setpoints_to_add[joint_name]}")
+
         # fill the ankle joint using the angle based linear interpolation
         for ankle_joint in ["left_ankle", "right_ankle"]:
             for base_setpoint, other_setpoint in zip(
@@ -619,7 +621,7 @@ class Subgait(object):
         )
         # The resulting setpoint lists will have a setpoint roughly every 0.1s plus one at the start
         number_of_setpoints = round(max_duration * 10 + 1)
-        
+
         base_setpoints_to_interpolate = Subgait.prepare_subgait_for_inverse_kinematics(
             base_subgait, number_of_setpoints
         )
