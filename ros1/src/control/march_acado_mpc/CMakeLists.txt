@@ -42,7 +42,7 @@ catkin_package(
 # is downloaded in the _deps/acado-solver-src folder in the build directory.
 fetchcontent_declare(acado-solver
     GIT_REPOSITORY "https://gitlab.com/project-march/libraries/acado-solver.git"
-    GIT_TAG "Gazebo-simulation-model"
+    GIT_TAG "main"
     GIT_SHALLOW true
 )
 if(NOT acado-solver_POPULATED)
@@ -99,6 +99,7 @@ add_library(${PROJECT_NAME}
         "${ACADO_SRCS}"
         src/joint_trajectory_mpc.cpp
         src/model_predictive_controller.cpp
+        src/mpc_references.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})

@@ -3,7 +3,7 @@
 #include <pluginlib/class_list_macros.hpp>
 
 #include <iostream>
-
+//#include <chrono>
 
 bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
 {
@@ -53,7 +53,7 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
     model_predictive_controllers_[i].x0 = state;
 
     // Calculate mpc control signal
-    model_predictive_controllers_[i].controller();
+    model_predictive_controllers_[i].calculateControlInput();
     command = model_predictive_controllers_[i].u;
 
     // Apply command
