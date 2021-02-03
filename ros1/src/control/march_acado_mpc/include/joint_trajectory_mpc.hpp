@@ -70,9 +70,6 @@ private:
   std::vector<ModelPredictiveController> model_predictive_controllers_;
   vector<double> state;
 
-  clock_t t_new;
-  clock_t t_last;
-
 };
 
 // Assign an alias to the class definition

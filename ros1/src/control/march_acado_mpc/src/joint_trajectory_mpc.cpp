@@ -3,7 +3,7 @@
 #include <pluginlib/class_list_macros.hpp>
 
 #include <iostream>
-#include <chrono>
+//#include <chrono>
 
 bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
 {
@@ -58,10 +58,6 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
     // Apply command
     (*joint_handles_ptr_)[i].setCommand(command);
   }
-
-    t_new = clock();
-    t_last = t_new;
-    cout << "[" << t_new - t_last << "] dt, updateCommand() " << endl;
 
 }
 
