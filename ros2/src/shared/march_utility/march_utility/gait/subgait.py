@@ -601,7 +601,6 @@ class Subgait(object):
         )
         # The resulting setpoint lists will have a setpoint roughly every 0.1s plus one at the start
         number_of_setpoints = round(max_duration * 10 + 1)
-
         base_setpoints_to_interpolate = Subgait.prepare_subgait_for_inverse_kinematics(
             base_subgait, number_of_setpoints
         )
