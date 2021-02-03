@@ -26,13 +26,16 @@ public:
     void setInitialState(vector<double> x0);
 
     /**
+     * \brief Set the reference
+     * @param reference
+     */
+    void setReference(vector<vector<double>> reference);
+
+    /**
      * \brief Calculate the control input
-     * @param x0 - initial state
-     * @return u - control input
      */
     void calculateControlInput();
 
-    void setReference(vector<vector<double>> reference);
 };
 
 #endif
