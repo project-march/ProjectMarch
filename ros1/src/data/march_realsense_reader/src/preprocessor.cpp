@@ -7,7 +7,6 @@ using Normals = pcl::PointCloud<pcl::Normal>;
 
 Preprocessor::Preprocessor(YAML::Node config_tree,
                            PointCloud::Ptr pointcloud,
-                           Normals::Ptr normal_pointcloud):
                            config_tree_{config_tree},
                            pointcloud_{pointcloud},
                            normal_pointcloud_{normal_pointcloud}
@@ -31,4 +30,5 @@ void SimplePreprocessor::preprocess()
 {
   ROS_INFO_STREAM("Preprocessing, test_parameter is " <<
   config_tree_["test_parameter"]);
+
 }
