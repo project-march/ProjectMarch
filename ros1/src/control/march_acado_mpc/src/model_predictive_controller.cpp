@@ -155,8 +155,6 @@ void ModelPredictiveController::init() {
   // Warm-up the solver
   acado_preparationStep();
 
-    // [Temporary] Has the function been executed?
-    std::cout << "\033[4;32m" << __FUNCTION__ << "()\033[0m" << " has executed\n";
 }
 
 void ModelPredictiveController::setInitialState(vector<double> x0) {
