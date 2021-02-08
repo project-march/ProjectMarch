@@ -36,7 +36,6 @@ public:
      */
     void calculateControlInput();
 
-    void setReference(vector<vector<double>> reference);
 };
 
 #endif
