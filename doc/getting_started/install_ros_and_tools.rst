@@ -162,3 +162,8 @@ Some additional python dependencies have to be installed using pip:
 
     python3 -m pip install -r ~/march/requirements.pip
 
+Install RealSense dependencies
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+If you are planning to also use the Intel Realsense camera, you should also install the necessary packages for this:
+https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md#installing-the-packages.
+
