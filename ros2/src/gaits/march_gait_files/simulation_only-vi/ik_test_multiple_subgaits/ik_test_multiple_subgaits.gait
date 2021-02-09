@@ -1,4 +1,4 @@
-name: ik_test
+name: ik_test_multiple_subgaits
 subgaits:
   swing_up:
     to: swing_down
