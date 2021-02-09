@@ -23,7 +23,7 @@ The next step is to download the source code, you can either use ssh (recommende
 .. code:: bash
 
     cd ~/
-    git clone git@gitlab.com:project-march/march.git
+    git clone git@gitlab.com:project-march/march.git --recurse-submodules
     cd march/
     git lfs install
 
@@ -33,7 +33,7 @@ Or use https:
 .. code:: bash
 
     cd ~/
-    git clone https://gitlab.com/project-march/march.git
+    git clone https://gitlab.com/project-march/march.git --recurse-submodules
     cd march/
     git lfs install
 
