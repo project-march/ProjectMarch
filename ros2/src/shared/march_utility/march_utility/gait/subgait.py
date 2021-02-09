@@ -593,7 +593,6 @@ class Subgait(object):
                 )
                 new_setpoints[ankle_joint].append(new_ankle_setpoint_to_add)
 
-
         duration = weighted_average_floats(
             base_subgait.duration, other_subgait.duration, parameter
         )
@@ -619,7 +618,7 @@ class Subgait(object):
         )
         # The resulting setpoint lists will have a setpoint roughly every 0.1s plus one at the start
         number_of_setpoints = round(max_duration * 10 + 1)
-        
+
         base_setpoints_to_interpolate = Subgait.prepare_subgait_for_inverse_kinematics(
             base_subgait, number_of_setpoints
         )
@@ -640,7 +639,9 @@ class Subgait(object):
             for setpoint_index in range(number_of_setpoints):
                 # Create new setpoints at equidistant time stamps using the interpolated position and velocity
                 time = setpoint_index / (number_of_setpoints - 1) * subgait.duration
-                setpoint_to_add = subgait.get_joint(joint.name).get_interpolated_setpoint(time)
+                setpoint_to_add = subgait.get_joint(
+                    joint.name
+                ).get_interpolated_setpoint(time)
 
                 setpoints_to_interpolate[setpoint_index][joint.name] = setpoint_to_add
 

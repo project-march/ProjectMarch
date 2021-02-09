@@ -366,7 +366,8 @@ class InputDeviceView(QWidget):
         )
 
         ik_test_multiple_subgaits = self.create_button(
-            "ik_test_multiple_subgaits", callback=lambda: self._controller.publish_gait("ik_test_multiple_subgaits")
+            "ik_test_multiple_subgaits",
+            callback=lambda: self._controller.publish_gait("ik_test_multiple_subgaits"),
         )
 
         stop_button = self.create_button(
@@ -480,8 +481,11 @@ class InputDeviceView(QWidget):
                 gait_tilted_path_first_end,
                 gait_tilted_path_second_end,
             ],
-            [ik_test, gait_curb,
-             ik_test_multiple_subgaits,],
+            [
+                ik_test,
+                gait_curb,
+                ik_test_multiple_subgaits,
+            ],
         ]
 
         # Create the qt_layout from the button layout.
