@@ -1,86 +1,86 @@
 description: Closing step for stairs up, same version as MIII used.
-duration: {nsecs: 0, secs: 4}
+duration: 4000000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 100000, secs: 3}
+    time_from_start: 3000100000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 4}
+    time_from_start: 4000000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 100000, secs: 3}
+    time_from_start: 3000100000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 4}
+    time_from_start: 4000000000
     velocity: 0.0
   left_hip_fe:
   - position: 0.3491
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -0.9425
   - position: 0.0
-    time_from_start: {nsecs: 80000000, secs: 2}
+    time_from_start: 2080000000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 4}
+    time_from_start: 4000000000
     velocity: 0.0
   left_knee:
   - position: 0.4363
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -0.9425
   - position: 0.0
-    time_from_start: {nsecs: 80000000, secs: 2}
+    time_from_start: 2080000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 4}
+    time_from_start: 4000000000
     velocity: 0.0
   right_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 100000, secs: 3}
+    time_from_start: 3000100000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 4}
+    time_from_start: 4000000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 100000, secs: 3}
+    time_from_start: 3000100000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 4}
+    time_from_start: 4000000000
     velocity: 0.0
   right_hip_fe:
   - position: -0.1396
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.6981
-    time_from_start: {nsecs: 600000000, secs: 1}
+    time_from_start: 1600000000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 4}
+    time_from_start: 4000000000
     velocity: 0.0
   right_knee:
   - position: 0.3491
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 1.228
   - position: 1.0472
-    time_from_start: {nsecs: 360000000, secs: 1}
+    time_from_start: 1360000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 4}
+    time_from_start: 4000000000
     velocity: 0.0
 name: right_close
 version: MIV_earlier_knee_flexion_slow

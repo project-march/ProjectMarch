@@ -1,63 +1,63 @@
 description: 'Prepare stand up: perform hip flexion before the actual standing up
   from the sofa.'
-duration: {nsecs: 0, secs: 1}
+duration: 1000000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0436
-    time_from_start: {nsecs: 25000000, secs: 0}
+    time_from_start: 25000000
     velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 1}
+    time_from_start: 1000000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 1}
+    time_from_start: 1000000000
     velocity: 0.0
   left_hip_fe:
   - position: 1.5708
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.6581
-    time_from_start: {nsecs: 0, secs: 1}
+    time_from_start: 1000000000
     velocity: 0.0
   left_knee:
   - position: 1.7453
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.7453
-    time_from_start: {nsecs: 0, secs: 1}
+    time_from_start: 1000000000
     velocity: 0.0
   right_ankle:
   - position: 0.0436
-    time_from_start: {nsecs: 25000000, secs: 0}
+    time_from_start: 25000000
     velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 1}
+    time_from_start: 1000000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 25000000, secs: 0}
+    time_from_start: 25000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 1}
+    time_from_start: 1000000000
     velocity: 0.0
   right_hip_fe:
   - position: 1.5708
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.6581
-    time_from_start: {nsecs: 0, secs: 1}
+    time_from_start: 1000000000
     velocity: 0.0
   right_knee:
   - position: 1.7453
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.7453
-    time_from_start: {nsecs: 0, secs: 1}
+    time_from_start: 1000000000
     velocity: 0.0
 name: prepare_stand_up
 version: MIV_less_knee_flexion_ankle_2.5

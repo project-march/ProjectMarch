@@ -1,64 +1,64 @@
 description: 'Prepare stand up: perform hip flexion before the actual standing up.
   This is the same version as MIII used, except for the fact that more hip extension
   is added at the sitting position.'
-duration: {nsecs: 0, secs: 1}
+duration: 1000000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0873
-    time_from_start: {nsecs: 25000000, secs: 0}
+    time_from_start: 25000000
     velocity: 0.0
   - position: 0.0873
-    time_from_start: {nsecs: 0, secs: 1}
+    time_from_start: 1000000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 1}
+    time_from_start: 1000000000
     velocity: 0.0
   left_hip_fe:
   - position: 1.2217
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.5708
-    time_from_start: {nsecs: 0, secs: 1}
+    time_from_start: 1000000000
     velocity: 0.0
   left_knee:
   - position: 1.5708
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.5708
-    time_from_start: {nsecs: 0, secs: 1}
+    time_from_start: 1000000000
     velocity: 0.0
   right_ankle:
   - position: 0.0873
-    time_from_start: {nsecs: 25000000, secs: 0}
+    time_from_start: 25000000
     velocity: 0.0
   - position: 0.0873
-    time_from_start: {nsecs: 0, secs: 1}
+    time_from_start: 1000000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 25000000, secs: 0}
+    time_from_start: 25000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 1}
+    time_from_start: 1000000000
     velocity: 0.0
   right_hip_fe:
   - position: 1.2217
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.5708
-    time_from_start: {nsecs: 0, secs: 1}
+    time_from_start: 1000000000
     velocity: 0.0
   right_knee:
   - position: 1.5708
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.5708
-    time_from_start: {nsecs: 0, secs: 1}
+    time_from_start: 1000000000
     velocity: 0.0
 name: prepare_stand_up
 version: MIV_ankle_5

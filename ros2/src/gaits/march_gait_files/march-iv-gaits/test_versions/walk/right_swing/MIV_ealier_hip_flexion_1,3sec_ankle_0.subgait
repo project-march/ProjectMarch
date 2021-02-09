@@ -1,96 +1,96 @@
 description: The setpoints of this walking gait are the same as the setpoints of the
   MIV walking gait, but the hip and knee flexion is earlier in the gait cycle.
-duration: {nsecs: 300000000, secs: 1}
+duration: 1300000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 32500000, secs: 0}
+    time_from_start: 32500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 300000000, secs: 1}
+    time_from_start: 1300000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 32500000, secs: 0}
+    time_from_start: 32500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 487500000, secs: 0}
+    time_from_start: 487500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 650000000, secs: 0}
+    time_from_start: 650000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 300000000, secs: 1}
+    time_from_start: 1300000000
     velocity: 0.0
   left_hip_fe:
   - position: 0.3142
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -0.3491
   - position: -0.1667
-    time_from_start: {nsecs: 174199999, secs: 1}
+    time_from_start: 1174199999
     velocity: 0.0
   - position: -0.1047
-    time_from_start: {nsecs: 300000000, secs: 1}
+    time_from_start: 1300000000
     velocity: 0.3491
   left_knee:
   - position: 0.1396
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.2094
-    time_from_start: {nsecs: 260000000, secs: 0}
+    time_from_start: 260000000
     velocity: 0.0
   - position: 0.1396
-    time_from_start: {nsecs: 884000000, secs: 0}
+    time_from_start: 884000000
     velocity: 0.0
   - position: 0.1396
-    time_from_start: {nsecs: 174199999, secs: 1}
+    time_from_start: 1174199999
     velocity: 0.0
   - position: 0.2094
-    time_from_start: {nsecs: 300000000, secs: 1}
+    time_from_start: 1300000000
     velocity: 0.6981
   right_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 32500000, secs: 0}
+    time_from_start: 32500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 300000000, secs: 1}
+    time_from_start: 1300000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 32500000, secs: 0}
+    time_from_start: 32500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 487500000, secs: 0}
+    time_from_start: 487500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 650000000, secs: 0}
+    time_from_start: 650000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 300000000, secs: 1}
+    time_from_start: 1300000000
     velocity: 0.0
   right_hip_fe:
   - position: -0.1047
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.3491
   - position: 0.5585
-    time_from_start: {nsecs: 780000000, secs: 0}
+    time_from_start: 780000000
     velocity: 0.1396
   - position: 0.3142
-    time_from_start: {nsecs: 300000000, secs: 1}
+    time_from_start: 1300000000
     velocity: -0.3491
   right_knee:
   - position: 0.2094
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.6981
   - position: 0.8727
-    time_from_start: {nsecs: 546000000, secs: 0}
+    time_from_start: 546000000
     velocity: 0.0
   - position: 0.0969
-    time_from_start: {nsecs: 169999999, secs: 1}
+    time_from_start: 1169999999
     velocity: 0.0
   - position: 0.1396
-    time_from_start: {nsecs: 300000000, secs: 1}
+    time_from_start: 1300000000
     velocity: 0.0
 name: right_swing
 version: MIV_ealier_hip_flexion_1,3sec_ankle_0
