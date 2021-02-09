@@ -1,8 +1,0 @@
-name: ik_test
-subgaits:
-  swing_up:
-    to: swing_down
-  swing_down:
-    to: end
-  start:
-    to: swing_up
