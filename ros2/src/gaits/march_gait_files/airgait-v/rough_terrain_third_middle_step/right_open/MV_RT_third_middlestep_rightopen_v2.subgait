@@ -1,83 +1,83 @@
 description: This version has 5 degrees more hip flexion compared to v1
-duration: {nsecs: 200000000, secs: 2}
+duration: 2200000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 200000000, secs: 2}
+    time_from_start: 2200000000
     velocity: -0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 824900000, secs: 0}
+    time_from_start: 824900000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 200000000, secs: 2}
+    time_from_start: 2200000000
     velocity: 0.0
   left_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: -0.2269
-    time_from_start: {nsecs: 200000000, secs: 2}
+    time_from_start: 2200000000
     velocity: 0.0
   left_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1396
-    time_from_start: {nsecs: 496000000, secs: 1}
+    time_from_start: 1496000000
     velocity: 0.0
   - position: 0.2618
-    time_from_start: {nsecs: 200000000, secs: 2}
+    time_from_start: 2200000000
     velocity: 0.0
   right_ankle:
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 200000000, secs: 2}
+    time_from_start: 2200000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 824900000, secs: 0}
+    time_from_start: 824900000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 200000000, secs: 2}
+    time_from_start: 2200000000
     velocity: 0.0
   right_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1537
-    time_from_start: {nsecs: 504499999, secs: 0}
+    time_from_start: 504499999
     velocity: 1.3963
   - position: 0.8378
-    time_from_start: {nsecs: 320000000, secs: 1}
+    time_from_start: 1320000000
     velocity: -0.1745
   - position: 0.1571
-    time_from_start: {nsecs: 200000000, secs: 2}
+    time_from_start: 2200000000
     velocity: 0.0
   right_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.2217
-    time_from_start: {nsecs: 958700000, secs: 0}
+    time_from_start: 958700000
     velocity: 0.0
   - position: 0.6338
-    time_from_start: {nsecs: 529600000, secs: 1}
+    time_from_start: 1529600000
     velocity: -1.4198
   - position: 0.1396
-    time_from_start: {nsecs: 200000000, secs: 2}
+    time_from_start: 2200000000
     velocity: 0.0
 name: right_open
 version: MV_RT_third_middlestep_rightopen_v2

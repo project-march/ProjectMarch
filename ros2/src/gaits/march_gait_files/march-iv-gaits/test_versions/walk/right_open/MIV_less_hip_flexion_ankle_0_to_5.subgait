@@ -1,86 +1,86 @@
 description: The right open gait for the MIV walking gait with less hip flexion
-duration: {nsecs: 700000000, secs: 1}
+duration: 1700000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0873
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: -0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 42600000, secs: 0}
+    time_from_start: 42600000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 637400000, secs: 0}
+    time_from_start: 637400000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 850000000, secs: 0}
+    time_from_start: 850000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: -0.0
   left_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: -0.1667
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: 0.0
   left_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1396
-    time_from_start: {nsecs: 155999999, secs: 1}
+    time_from_start: 1155999999
     velocity: 0.0
   - position: 0.1396
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: 0.0
   right_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0873
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: -0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 42600000, secs: 0}
+    time_from_start: 42600000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 637400000, secs: 0}
+    time_from_start: 637400000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 850000000, secs: 0}
+    time_from_start: 850000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: -0.0
   right_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.4014
-    time_from_start: {nsecs: 765000000, secs: 0}
+    time_from_start: 765000000
     velocity: 0.1396
   - position: 0.2618
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: -0.3491
   right_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.8727
-    time_from_start: {nsecs: 540000000, secs: 0}
+    time_from_start: 540000000
     velocity: 0.0
   - position: 0.0969
-    time_from_start: {nsecs: 530000000, secs: 1}
+    time_from_start: 1530000000
     velocity: 0.0
   - position: 0.1396
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: 0.0
 name: right_open
 version: MIV_less_hip_flexion_ankle_0_to_5

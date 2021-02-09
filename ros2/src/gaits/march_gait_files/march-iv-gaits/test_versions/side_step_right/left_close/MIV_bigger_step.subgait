@@ -1,68 +1,68 @@
 description: Closing step for a side step to the right.
-duration: {nsecs: 0, secs: 2}
+duration: 2000000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 50100000, secs: 0}
+    time_from_start: 50100000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.1396
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1396
-    time_from_start: {nsecs: 400000000, secs: 0}
+    time_from_start: 400000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: 0.0
   left_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: 0.0
   left_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: 0.0
   right_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 50100000, secs: 0}
+    time_from_start: 50100000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.1396
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1745
-    time_from_start: {nsecs: 500000000, secs: 0}
+    time_from_start: 500000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: 0.0
   right_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: 0.0
   right_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: 0.0
 name: left_close
 version: MIV_bigger_step
