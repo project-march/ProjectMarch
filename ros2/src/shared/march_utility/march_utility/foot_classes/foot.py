@@ -159,8 +159,9 @@ class Foot(object):
             ll + ul
         ):
             raise SubgaitInterpolationError(
-                f"The desired {foot_side} foot position, ({x_position}, "
-                f"{y_position}, {z_position}), is out of reach"
+                f"The desired {foot_side} foot position, (x, y, z) = ({x_position}, "
+                f"{y_position}, {z_position}), is out of reach. Transformed coordinates "
+                f"are (x', z') = ({transformed_x}, {transformed_z}) with haa angle {haa}."
             )
 
         hfe, kfe = Foot.calculate_hfe_kfe_angles(transformed_x, transformed_z, ul, ll)
