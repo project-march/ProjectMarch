@@ -6,6 +6,7 @@ import sys
 from control_msgs.msg import JointTrajectoryControllerState
 from geometry_msgs.msg import TransformStamped
 import numpy
+from rclpy import Node
 from sensor_msgs.msg import Imu
 from tf.transformations import quaternion_from_euler, quaternion_multiply
 import tf2_ros
@@ -20,10 +21,16 @@ from .cp_calculator import CPCalculator
 
 
 class DataCollector(Node):
-    def __init__(self, com_calculator, cp_calculators, tf_buffer, feet):
+    def __init__(self, tf_buffer):
+        # key is the swing foot and item is the static foot
+        feet = {"foot_left": "foot_right", "foot_right": "foot_left"}
+        robot = self._initial_robot_description()
         self.differentiation_order = 2
-        self._com_calculator = com_calculator
-        self._cp_calculators = cp_calculators
+        self._com_calculator = CoMCalculator(self, robot, tf_buffer)
+        self._cp_calculators = [
+            CPCalculator(self, tf_buffer, swing_foot, static_foot)
+            for swing_foot, static_foot in feet.items()
+        ]
         self.tf_buffer = tf_buffer
         self.feet = feet
 
@@ -82,6 +89,29 @@ class DataCollector(Node):
             )
         else:
             rospy.logdebug("running without pressure soles")
+
+
+    def _initial_robot_description(self):
+        """
+        Initialize the robot description by getting it from the robot state
+        publisher.
+        """
+        robot_description_client = self.create_client(
+            srv_type=GetParameters,
+            srv_name="/march/robot_state_publisher/get_parameters",
+        )
+        while not robot_description_client.wait_for_service(timeout_sec=2):
+            self.get_logger().warn(
+                "Robot description is not being published, waiting.."
+            )
+
+        robot_future = robot_description_client.call_async(
+            request=GetParameters.Request(names=["robot_description"])
+        )
+        rclpy.spin_until_future_complete(self, robot_future)
+
+        return urdf.Robot.from_xml_string(robot_future.result().values[0].string_value)
+
 
     def trajectory_state_callback(self, data):
         com = self._com_calculator.calculate_com()
@@ -197,33 +227,3 @@ class DataCollector(Node):
     def close_sockets(self):
         self.output_sock.close()
         self.input_sock.close()
-
-    def run(self):
-        if self.pressure_soles_on:
-            while not rospy.is_shutdown() and self.pressure_soles_on:
-                self.receive_udp()
-        else:
-            rospy.spin()
-
-
-def main():
-    rospy.init_node("data_collector", anonymous=True)
-    try:
-        robot = URDF.from_parameter_server("/robot_description")
-    except KeyError:
-        rospy.logerr("Cannot retrieve URDF from parameter server.")
-        sys.exit()
-    tf_buffer = tf2_ros.Buffer()
-    tf2_ros.TransformListener(tf_buffer)
-    center_of_mass_calculator = CoMCalculator(robot, tf_buffer)
-    # key is the swing foot and item is the static foot
-    feet = {"foot_left": "foot_right", "foot_right": "foot_left"}
-    cp_calculators = [
-        CPCalculator(tf_buffer, swing_foot, static_foot)
-        for swing_foot, static_foot in feet.items()
-    ]
-
-    data_collector_node = DataCollectorNode(
-        center_of_mass_calculator, cp_calculators, tf_buffer, feet.keys()
-    )
-    data_collector_node.run()

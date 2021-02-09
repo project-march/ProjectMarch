@@ -18,14 +18,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import geometry_msgs.msg
-import rospy
+import rclpy
 import tf2_geometry_msgs as tf_geo
 import tf2_ros
 from visualization_msgs.msg import Marker
 
 
 class CoMCalculator(object):
-    def __init__(self, robot, tf_buffer):
+    def __init__(self, node, robot, tf_buffer):
+        self._node = node
         self.tf_buffer = tf_buffer
 
         self.links = dict(
@@ -50,14 +51,15 @@ class CoMCalculator(object):
         z = 0
         for link in self.links:
             try:
-                trans = self.tf_buffer.lookup_transform("world", link, rospy.Time())
+                trans = self.tf_buffer.lookup_transform("world", link,
+                                                        self._node.get_clock().now())
 
                 to_transform = geometry_msgs.msg.PointStamped()
                 to_transform.point.x = self.links[link].inertial.origin.xyz[0]
                 to_transform.point.y = self.links[link].inertial.origin.xyz[1]
                 to_transform.point.z = self.links[link].inertial.origin.xyz[2]
                 to_transform.header.frame_id = link
-                to_transform.header.stamp = rospy.get_rostime()
+                to_transform.header.stamp = self._node.get_clock().now()
                 transformed = tf_geo.do_transform_point(to_transform, trans)
 
                 # calculate part of CoM equation depending on link
@@ -65,7 +67,7 @@ class CoMCalculator(object):
                 y += self.links[link].inertial.mass * transformed.point.y
                 z += self.links[link].inertial.mass * transformed.point.z
             except tf2_ros.TransformException as err:
-                rospy.logdebug(
+                self._node.get_logger().debug(
                     "TF Error in trying to lookup transform for center of mass: {error}".format(
                         error=err
                     )
@@ -76,10 +78,11 @@ class CoMCalculator(object):
         z = z / self.mass
 
         # send CoM position to RViZ
-        self.marker.header.stamp = rospy.get_rostime()
+        self.marker.header.stamp = self._node.get_clock().now()
         self.marker.pose.position.x = x
         self.marker.pose.position.y = y
         self.marker.pose.position.z = z
-        rospy.logdebug("center of mass is at " + str(self.marker.pose.position))
+        self._node.get_logger().debug("center of mass is at " + str(
+            self.marker.pose.position))
 
         return self.marker
