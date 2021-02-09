@@ -357,11 +357,7 @@ Text-align: right
       <item row="4" column="3">
        <widget class="QPushButton" name="add_inverse_kinematic_setpoints_button">
         <property name="text">
-<<<<<<< HEAD
-         <string>add IK setpoints</string>
-=======
          <string>Add IK setpoints</string>
->>>>>>> fc5bd864c0e32c1e6df0483551170fd35ada878e
         </property>
        </widget>
       </item>
