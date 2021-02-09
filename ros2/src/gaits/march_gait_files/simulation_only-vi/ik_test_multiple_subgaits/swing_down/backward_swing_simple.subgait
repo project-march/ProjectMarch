@@ -10,7 +10,7 @@ joints:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: 0.04360007
+  - position: 0.0436
     time_from_start:
       nsecs: 0
       secs: 8
@@ -32,7 +32,7 @@ joints:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: -0.08729962
+  - position: -0.0873
     time_from_start:
       nsecs: 0
       secs: 8
@@ -54,7 +54,7 @@ joints:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: 0.04360007
+  - position: 0.0436
     time_from_start:
       nsecs: 0
       secs: 8
@@ -76,7 +76,7 @@ joints:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: -0.08729962
+  - position: -0.0873
     time_from_start:
       nsecs: 0
       secs: 8
