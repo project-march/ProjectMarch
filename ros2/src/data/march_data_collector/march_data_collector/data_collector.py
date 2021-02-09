@@ -1,15 +1,18 @@
 import errno
 from math import pi
 import socket
-import sys
 
+import rclpy
 from control_msgs.msg import JointTrajectoryControllerState
 from geometry_msgs.msg import TransformStamped
 import numpy
+from rcl_interfaces.srv import GetParameters
 from rclpy import Node
+from rclpy.time import Time
 from sensor_msgs.msg import Imu
 from tf.transformations import quaternion_from_euler, quaternion_multiply
 import tf2_ros
+from urdf_parser_py import urdf
 from urdf_parser_py.urdf import URDF
 from visualization_msgs.msg import Marker
 
@@ -21,41 +24,52 @@ from .cp_calculator import CPCalculator
 
 
 class DataCollector(Node):
-    def __init__(self, tf_buffer):
+    def __init__(self, node_name: str):
         # key is the swing foot and item is the static foot
+        super().__init__(node_name)
         feet = {"foot_left": "foot_right", "foot_right": "foot_left"}
         robot = self._initial_robot_description()
         self.differentiation_order = 2
-        self._com_calculator = CoMCalculator(self, robot, tf_buffer)
+        self.tf_buffer = tf2_ros.Buffer()
+        tf2_ros.TransformListener(self.tf_buffer, self)
+        self.feet = feet
+
+        self._com_calculator = CoMCalculator(self, robot, self.tf_buffer)
         self._cp_calculators = [
-            CPCalculator(self, tf_buffer, swing_foot, static_foot)
+            CPCalculator(self, self.tf_buffer, swing_foot, static_foot)
             for swing_foot, static_foot in feet.items()
         ]
-        self.tf_buffer = tf_buffer
-        self.feet = feet
 
         self.position_memory = []
         self.time_memory = []
         self.joint_values = JointValues()
 
-        self.joint_values_publisher = rospy.Publisher(
-            "/march/joint_values", JointValues, queue_size=1
+        self.joint_values_publisher = self.create_publisher(
+            topic="/march/joint_values", msg_type=JointValues,
+            qos_profile=10
         )
 
-        self._imu_broadcaster = tf2_ros.TransformBroadcaster()
-        self._com_marker_publisher = rospy.Publisher(
-            "/march/com_marker", Marker, queue_size=1
+        self._imu_broadcaster = tf2_ros.TransformBroadcaster(self)
+        self._com_marker_publisher = self.create_publisher(
+            topic="/march/com_marker", msg_type=Marker, qos_profile=10
         )
 
-        self._trajectory_state_subscriber = rospy.Subscriber(
-            "/march/controller/trajectory/state",
-            JointTrajectoryControllerState,
-            self.trajectory_state_callback,
+        self._trajectory_state_subscriber = self.create_subscription(
+            topic="/march/controller/trajectory/state",
+            msg_type=JointTrajectoryControllerState,
+            callback=self.trajectory_state_callback,
+            qos_profile=10
         )
 
-        self._imu_subscriber = rospy.Subscriber("/march/imu", Imu, self.imu_callback)
+        self._imu_subscriber = self.create_subscription(
+            topic="/march/imu",
+            msg_type=Imu,
+            callback=self.imu_callback,
+            qos_profile=10
+        )
 
-        self.pressure_soles_on = rospy.get_param("~pressure_soles")
+        self.pressure_soles_on = self.get_parameter(
+            "~pressure_soles").get_parameter_value().bool_value
 
         self.transform_imu = TransformStamped()
 
@@ -65,8 +79,8 @@ class DataCollector(Node):
         self.transform_imu.transform.translation.y = 0.0
 
         if self.pressure_soles_on:
-            rospy.logdebug("will run with pressure soles")
-            self.output_host = rospy.get_param("~moticon_ip")
+            self.get_logger().debug("Connecting to pressure soles")
+            self.output_host = self.get_parameter("~moticon_ip").get_parameter_value().string_value
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.connect(("8.8.8.8", 53))
             self.input_host = sock.getsockname()[0]
@@ -78,17 +92,17 @@ class DataCollector(Node):
             try:
                 self.input_sock.bind((self.input_host, 9999))
             except socket.error:
-                rospy.logwarn(
+                self.get_logger().warn(
                     "Cannot connect to host, is the adress correct? \nrunning without pressure soles"
                 )
                 self.pressure_soles_on = False
                 self.close_sockets()
 
-            self._pressure_sole_publisher = rospy.Publisher(
-                "/march/pressure_soles", PressureSole, queue_size=1
+            self._pressure_sole_publisher = self.create_publisher(
+                topic="/march/pressure_soles", msg_type=PressureSole, qos_profile=1
             )
         else:
-            rospy.logdebug("running without pressure soles")
+            self.get_logger().debug("running without pressure soles")
 
 
     def _initial_robot_description(self):
@@ -161,13 +175,14 @@ class DataCollector(Node):
             z_diff = float("-inf")
             try:
                 old_z = self.tf_buffer.lookup_transform(
-                    "world", "imu_link", rospy.Time()
+                    "world", "imu_link", self.get_clock().now()
                 ).transform.translation.z
                 for foot in self.feet:
-                    trans = self.tf_buffer.lookup_transform("world", foot, rospy.Time())
+                    trans = self.tf_buffer.lookup_transform("world", foot,
+                                                            self.get_clock().now())
                     z_diff = max(z_diff, old_z - trans.transform.translation.z)
 
-                self.transform_imu.header.stamp = rospy.Time.now()
+                self.transform_imu.header.stamp = self.get_clock().now()
                 self.transform_imu.transform.translation.z = z_diff
 
                 imu_rotation = quaternion_multiply(
@@ -186,10 +201,9 @@ class DataCollector(Node):
 
                 self._imu_broadcaster.sendTransform(self.transform_imu)
             except tf2_ros.TransformException as e:
-                rospy.logdebug(
-                    "Cannot calculate imu transform, because tf frames are not available, {0}".format(
-                        e
-                    )
+                self.get_logger().debug(
+                    f"Cannot calculate imu transform, because tf frames are not "
+                    f"available, {e}"
                 )
 
     def send_udp(self, data):
@@ -204,8 +218,8 @@ class DataCollector(Node):
             datachannels = data.split()
             values = [float(x) for x in datachannels]
             pressure_sole_msg = PressureSole()
-            pressure_sole_msg.header.stamp = rospy.Time.now()
-            pressure_sole_msg.pressure_soles_time = rospy.Time(values[0])
+            pressure_sole_msg.header.stamp = self.get_clock().now()
+            pressure_sole_msg.pressure_soles_time = Time(seconds=values[0])
             pressure_sole_msg.cop_left = values[1:3]
             pressure_sole_msg.pressure_left = values[3:19]
             pressure_sole_msg.total_force_left = values[19]
@@ -214,7 +228,7 @@ class DataCollector(Node):
             pressure_sole_msg.total_force_right = values[38]
             self._pressure_sole_publisher.publish(pressure_sole_msg)
         except socket.timeout:
-            rospy.loginfo(
+            self.get_logger().info(
                 "Has not received pressure sole data in a while, are they on?"
             )
         except socket.error as error:

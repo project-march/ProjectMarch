@@ -25,6 +25,12 @@ def generate_launch_description():
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
     minimum_fake_temperature = LaunchConfiguration("minimum_fake_temperature")
     maximum_fake_temperature = LaunchConfiguration("maximum_fake_temperature")
+    # Data collector
+    data_collector = LaunchConfiguration("data_collector")
+    moticon_ip = LaunchConfiguration("moticon_ip")
+    pressure_soles = LaunchConfiguration("pressure_soles")
+    logfile = LaunchConfiguration("logfile")
+
 
     return launch.LaunchDescription(
         [
@@ -82,6 +88,28 @@ def generate_launch_description():
                 default_value="training-v",
                 description="The directory in which the gait files to use are located, "
                 "relative to the gait_package.",
+            ),
+            # DATA COLLECTOR ARGUMENTS
+            DeclareLaunchArgument(
+                "data_collector",
+                default_value="false",
+                description="Whether the data collector should be launched"
+            ),
+            DeclareLaunchArgument(
+                "moticon_ip",
+                default_value="192.168.8.105",
+                description="The ip-adress with Moticon software running on it, "
+                            "defaults to EMS switch laptop on standard router",
+            ),
+            DeclareLaunchArgument(
+                "pressure_soles",
+                default_value="false",
+                description="Whether the pressure soles will be connected"
+            ),
+            DeclareLaunchArgument(
+                "logfile",
+                default_value="false",
+                description="Whether the data input is from a log file."
             ),
             # Launch rqt input device if not rqt_input:=false
             IncludeLaunchDescription(
@@ -149,6 +177,23 @@ def generate_launch_description():
                         "robot_information.launch.py",
                     )
                 )
+            ),
+            # Data collector
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    os.path.join(
+                        get_package_share_directory("march_data_collector"),
+                        "launch",
+                        "data_collector.launch.py",
+                    )
+                ),
+                launch_arguments=[
+                    ("use_sim_time", use_sim_time),
+                    ("moticon_ip", moticon_ip),
+                    ("pressure_soles", pressure_soles),
+                    ("logfile", logfile),
+                ],
+                condition=IfCondition(data_collector),
             ),
             # Fake sensor data
             DeclareLaunchArgument(

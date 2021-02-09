@@ -3,7 +3,6 @@ from math import sqrt
 
 from geometry_msgs.msg import Point
 from march_data_collector.inverted_pendulum import InvertedPendulum
-import rospy
 import tf2_ros
 from visualization_msgs.msg import Marker
 
@@ -13,26 +12,27 @@ FRACTION_FALLING_TIME = 0.5
 
 
 class CPCalculator(object):
-    def __init__(self, tf_buffer, static_foot_link, swing_foot_link):
+    def __init__(self, node, tf_buffer, static_foot_link, swing_foot_link):
         """Base class to calculate capture point for the exoskeleton.
 
-        The capture point calculator is coupled to a static foot and swing foot. The static foot is used as the base of
-        the inverted pendulum.
+        The capture point calculator is coupled to a static foot and swing foot.
+        The static foot is used as the base of the inverted pendulum.
         """
+        self._node = node
         self._tf_buffer = tf_buffer
         self._static_foot_link = static_foot_link
-        self.cp_service = rospy.Service(
-            "/march/capture_point/" + swing_foot_link,
-            CapturePointPose,
-            self.get_capture_point,
+        self.cp_service = self._node.create_service(
+            srv_name="/march/capture_point/" + swing_foot_link,
+            srv_type=CapturePointPose,
+            callback=self.get_capture_point,
         )
 
-        self.cp_publisher = rospy.Publisher(
+        self.cp_publisher = self._node.create_publisher(
             "/march/cp_marker/" + swing_foot_link, Marker, queue_size=1
         )
 
         self._gravity_constant = 9.81
-        self._prev_t = rospy.Time.now()
+        self._prev_t = self._node.get_clock().now()
         self._delta_t = 0
 
         self.com_vx = 0
@@ -81,14 +81,16 @@ class CPCalculator(object):
         self._prev_t = current_time
 
     def _calculate_capture_point(self, duration):
-        """Calculate a future capture point pose using the inverted pendulum and center of mass.
+        """Calculate a future capture point pose using the inverted pendulum and
+         center of mass.
 
         :param duration:
-            the amount of seconds away from the current time the capture point should be calculated
+            the amount of seconds away from the current time the capture point should
+            be calculated
         """
         try:
             static_foot_transform = self._tf_buffer.lookup_transform(
-                "world", self._static_foot_link, rospy.Time()
+                "world", self._static_foot_link, self._node.get_clock().now()
             )
             static_foot_position = static_foot_transform.transform.translation
             falling_time = InvertedPendulum.calculate_falling_time(
@@ -111,7 +113,7 @@ class CPCalculator(object):
             )
 
             if new_center_of_mass["z"] <= 0:
-                rospy.loginfo_throttle(
+                self._node.get_logger().info_throttle(
                     1, "Cannot calculate capture point; z of new center of mass <= 0"
                 )
                 return -1, self._capture_point_marker.pose
@@ -129,17 +131,16 @@ class CPCalculator(object):
                 + new_center_of_mass["vy"] * capture_point_multiplier
             )
 
-            self._capture_point_marker.header.stamp = rospy.get_rostime()
+            self._capture_point_marker.header.stamp = self._node.get_clock().now(
+            ).to_msg()
             self._capture_point_marker.pose.position.x = x_cp + static_foot_position.x
             self._capture_point_marker.pose.position.y = y_cp + static_foot_position.y
             self._capture_point_marker.pose.position.z = 0
 
             self.cp_publisher.publish(self._capture_point_marker)
         except tf2_ros.TransformException as e:
-            rospy.loginfo(
-                "Error in trying to lookup transform for capture point: {error}".format(
-                    error=e
-                )
+            self._node.get_logger().info(
+                f"Error in trying to lookup transform for capture point: {e}"
             )
             capture_point_duration = -1
 
@@ -147,10 +148,8 @@ class CPCalculator(object):
 
     def get_capture_point(self, capture_point_request_msg):
         """Service call function to return the capture point pose positions."""
-        rospy.logdebug(
-            "Request capture point in {duration}".format(
-                duration=capture_point_request_msg.duration
-            )
+        self._node.get_logger().debug(
+            f"Request capture point in {capture_point_request_msg.duration}"
         )
 
         duration = capture_point_request_msg.duration

@@ -86,12 +86,6 @@
         <include file="$(find march_realsense_reader)/launch/realsense_reader.launch"
                  if="$(arg realsense)"/>
 
-        <include file="$(find march_data_collector)/launch/march_data_collector.launch" if="$(eval data_collector or balance)">
-            <arg name="pressure_soles" value="$(arg pressure_soles)"/>
-            <arg name="moticon_ip" value="$(arg moticon_ip)"/>
-        </include>
-
-
 <!-- Bridge -->
         <include file="$(find march_parameter_server)/launch/march_parameter_server.launch" />
 
