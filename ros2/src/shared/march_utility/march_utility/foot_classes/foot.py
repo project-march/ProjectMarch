@@ -153,41 +153,41 @@ class Foot(object):
             sqrt(-ph * ph + y_position * y_position + z_position * z_position),
             MID_CALCULATION_PRECISION_DIGITS,
         )
-        transformed_distance_to_origin = (
+        transformed_distance_to_origin = sqrt(
             transformed_x * transformed_x + transformed_z * transformed_z
         )
 
-        # If (due to rounding errors) there is a slight overshoot over what the exo can possibly reach,
-        # this happens regularly with a straightend leg, scale the transformed variables so that the foot
-        # location is reacable again
-        allowable_overshoot = 0.002
-        if (
-            (ll + ul) * (ll * ul)
-            <= transformed_distance_to_origin
-            <= (ll + ul) * (ll * ul) + allowable_overshoot
-        ):
-            scale_factor = transformed_distance_to_origin / (
-                (ll + ul) * (ll * ul) + allowable_overshoot
-            )
-            transformed_x *= scale_factor
-            transformed_z *= scale_factor
-        elif (
-            transformed_x * transformed_x + transformed_z * transformed_z
-            > (ll + ul) * (ll + ul) + allowable_overshoot
-        ):
+        allowable_overshoot = 0.001
+        # If the desired foot location is too far out, trow an error
+        if transformed_distance_to_origin > ll + ul + allowable_overshoot:
             raise SubgaitInterpolationError(
                 f"The desired {foot_side} foot position, (x, y, z) = ({x_position}, "
                 f"{y_position}, {z_position}), is out of reach. Transformed coordinates "
                 f"are (x', z') = ({transformed_x}, {transformed_z}) with haa angle {haa}."
+                f"Distance to origin {transformed_distance_to_origin}."
             )
-
-        hfe, kfe = Foot.calculate_hfe_kfe_angles(transformed_x, transformed_z, ul, ll)
+        # If the desired foot location is close to what is reachable,
+        # do a different calculation which assumes the leg is stretched
+        elif ll + ul - allowable_overshoot <= transformed_distance_to_origin <= ll + ul + allowable_overshoot:
+            hfe = Foot.calculate_hfe_angle_straight_leg(transformed_x, transformed_z)
+            kfe = 0
+        # If neither is the case, do the normal hfe kfe calculation
+        else:
+            hfe, kfe = Foot.calculate_hfe_kfe_angles(transformed_x, transformed_z, ul, ll)
 
         return {
             foot_side.value + "_hip_aa": Setpoint(time, haa),
             foot_side.value + "_hip_fe": Setpoint(time, hfe),
             foot_side.value + "_knee": Setpoint(time, kfe),
         }
+
+    @staticmethod
+    def calculate_hfe_angle_straight_leg(transformed_x: float, transformed_z: float) -> float:
+        if transformed_x > 0:
+            hfe = atan(abs(transformed_x / transformed_z))
+        else:
+            hfe = - atan(abs(transformed_x / transformed_z))
+        return hfe
 
     @staticmethod
     def calculate_haa_angle(
