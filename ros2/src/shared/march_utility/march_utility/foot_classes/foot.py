@@ -153,9 +153,27 @@ class Foot(object):
             sqrt(-ph * ph + y_position * y_position + z_position * z_position),
             MID_CALCULATION_PRECISION_DIGITS,
         )
+        transformed_distance_to_origin = (
+            transformed_x * transformed_x + transformed_z * transformed_z
+        )
 
-        if transformed_x * transformed_x + transformed_z * transformed_z > (ll + ul) * (
-            ll + ul
+        # If (due to rounding errors) there is a slight overshoot over what the exo can possibly reach,
+        # this happens regularly with a straightend leg, scale the transformed variables so that the foot
+        # location is reacable again
+        allowable_overshoot = 0.002
+        if (
+            (ll + ul) * (ll * ul)
+            <= transformed_distance_to_origin
+            <= (ll + ul) * (ll * ul) + allowable_overshoot
+        ):
+            scale_factor = transformed_distance_to_origin / (
+                (ll + ul) * (ll * ul) + allowable_overshoot
+            )
+            transformed_x *= scale_factor
+            transformed_z *= scale_factor
+        elif (
+            transformed_x * transformed_x + transformed_z * transformed_z
+            > (ll + ul) * (ll + ul) + allowable_overshoot
         ):
             raise SubgaitInterpolationError(
                 f"The desired {foot_side} foot position, (x, y, z) = ({x_position}, "
