@@ -47,16 +47,18 @@ add_library(${PROJECT_NAME}
     include/${PROJECT_NAME}/error/error_type.h
     include/${PROJECT_NAME}/error/hardware_exception.h
     include/${PROJECT_NAME}/error/motion_error.h
-    include/${PROJECT_NAME}/ethercat/ethercat_master.h
-    include/${PROJECT_NAME}/ethercat/pdo_interface.h
-    include/${PROJECT_NAME}/ethercat/pdo_map.h
-    include/${PROJECT_NAME}/ethercat/pdo_types.h
-    include/${PROJECT_NAME}/ethercat/sdo_interface.h
-    include/${PROJECT_NAME}/ethercat/slave.h
-    include/${PROJECT_NAME}/imotioncube/actuation_mode.h
-    include/${PROJECT_NAME}/imotioncube/imotioncube.h
-    include/${PROJECT_NAME}/imotioncube/imotioncube_state.h
-    include/${PROJECT_NAME}/imotioncube/imotioncube_target_state.h
+    include/${PROJECT_NAME}/communication/ethercat/ethercat_master.h
+    include/${PROJECT_NAME}/communication/ethercat/pdo_interface.h
+    include/${PROJECT_NAME}/communication/ethercat/pdo_map.h
+    include/${PROJECT_NAME}/communication/ethercat/pdo_types.h
+    include/${PROJECT_NAME}/communication/ethercat/sdo_interface.h
+    include/${PROJECT_NAME}/communication/ethercat/slave.h
+    include/${PROJECT_NAME}/communication/endpoint/endpoint.h
+    include/${PROJECT_NAME}/communication/endpoint/ethercat_endpoint.h
+    include/${PROJECT_NAME}/motor_controller/imotioncube/actuation_mode.h
+    include/${PROJECT_NAME}/motor_controller/imotioncube/imotioncube.h
+    include/${PROJECT_NAME}/motor_controller/imotioncube/imotioncube_state.h
+    include/${PROJECT_NAME}/motor_controller/imotioncube/imotioncube_target_state.h
     include/${PROJECT_NAME}/joint.h
     include/${PROJECT_NAME}/march_robot.h
     include/${PROJECT_NAME}/power/boot_shutdown_offsets.h
@@ -72,12 +74,14 @@ add_library(${PROJECT_NAME}
     src/encoder/incremental_encoder.cpp
     src/error/error_type.cpp
     src/error/motion_error.cpp
-    src/ethercat/ethercat_master.cpp
-    src/ethercat/pdo_interface.cpp
-    src/ethercat/pdo_map.cpp
-    src/ethercat/sdo_interface.cpp
-    src/imotioncube/imotioncube.cpp
-    src/imotioncube/imotioncube_target_state.cpp
+    src/communication/ethercat/ethercat_master.cpp
+    src/communication/ethercat/pdo_interface.cpp
+    src/communication/ethercat/pdo_map.cpp
+    src/communication/ethercat/sdo_interface.cpp
+    src/communication/endpoint/endpoint.cpp
+    src/communication/endpoint/ethercat_endpoint.cpp
+    src/motor_controller/imotioncube/imotioncube.cpp
+    src/motor_controller/imotioncube/imotioncube_target_state.cpp
     src/joint.cpp
     src/march_robot.cpp
     src/power/high_voltage.cpp

@@ -2,7 +2,7 @@
 
 #ifndef MARCH_HARDWARE_MARCH_ROBOT_H
 #define MARCH_HARDWARE_MARCH_ROBOT_H
-#include "march_hardware/ethercat/ethercat_master.h"
+#include "march_hardware/communication/ethercat/ethercat_master.h"
 #include "march_hardware/joint.h"
 #include "march_hardware/power/power_distribution_board.h"
 

@@ -1,5 +1,5 @@
 // Copyright 2019 Project March.
-#include "march_hardware/ethercat/pdo_types.h"
+#include "march_hardware/communication/ethercat/pdo_types.h"
 #include "march_hardware/temperature/temperature_ges.h"
 
 namespace march

@@ -2,7 +2,7 @@
 
 #ifndef MARCH_HARDWARE_ENCODER_H
 #define MARCH_HARDWARE_ENCODER_H
-#include "march_hardware/ethercat/pdo_interface.h"
+#include "march_hardware/communication/ethercat/pdo_interface.h"
 
 #include <cmath>
 #include <cstddef>

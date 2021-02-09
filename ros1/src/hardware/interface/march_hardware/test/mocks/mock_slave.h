@@ -2,7 +2,7 @@
 #include "mock_pdo_interface.h"
 #include "mock_sdo_interface.h"
 
-#include "march_hardware/ethercat/slave.h"
+#include "march_hardware/communication/ethercat/slave.h"
 
 #include <memory>
 

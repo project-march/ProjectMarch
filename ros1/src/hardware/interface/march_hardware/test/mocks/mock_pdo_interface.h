@@ -1,6 +1,6 @@
 #pragma once
-#include "march_hardware/ethercat/pdo_interface.h"
-#include "march_hardware/ethercat/pdo_types.h"
+#include "march_hardware/communication/ethercat/pdo_interface.h"
+#include "march_hardware/communication/ethercat/pdo_types.h"
 
 #include <memory>
 

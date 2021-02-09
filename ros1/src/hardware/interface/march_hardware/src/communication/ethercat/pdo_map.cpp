@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
-#include "march_hardware/ethercat/pdo_map.h"
-#include "march_hardware/ethercat/sdo_interface.h"
+#include "march_hardware/communication/ethercat/pdo_map.h"
+#include "march_hardware/communication/ethercat/sdo_interface.h"
 #include "march_hardware/error/hardware_exception.h"
 
 #include <cstdint>

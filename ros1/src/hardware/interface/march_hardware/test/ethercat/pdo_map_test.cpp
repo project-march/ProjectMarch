@@ -1,6 +1,6 @@
 // Copyright 2018 Project March.
 #include "../mocks/mock_sdo_interface.h"
-#include "march_hardware/ethercat/pdo_map.h"
+#include "march_hardware/communication/ethercat/pdo_map.h"
 
 #include <gtest/gtest.h>
 

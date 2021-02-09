@@ -1,5 +1,5 @@
 // Copyright 2019 Project March.
-#include "march_hardware/ethercat/ethercat_master.h"
+#include "march_hardware/communication/ethercat/ethercat_master.h"
 #include "march_hardware/error/hardware_exception.h"
 
 #include <chrono>

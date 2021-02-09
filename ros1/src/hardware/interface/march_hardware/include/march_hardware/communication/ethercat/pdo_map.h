@@ -1,7 +1,7 @@
 // Copyright 2019 Project March.
 #ifndef MARCH_HARDWARE_PDOMAP_H
 #define MARCH_HARDWARE_PDOMAP_H
-#include "march_hardware/ethercat/sdo_interface.h"
+#include "march_hardware/communication/ethercat/sdo_interface.h"
 
 #include <string>
 #include <utility>

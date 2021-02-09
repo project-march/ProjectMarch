@@ -1,7 +1,7 @@
 // Copyright 2020 Project March.
 #include "../mocks/mock_pdo_interface.h"
 #include "../mocks/mock_sdo_interface.h"
-#include "march_hardware/ethercat/slave.h"
+#include "march_hardware/communication/ethercat/slave.h"
 #include "march_hardware/error/hardware_exception.h"
 
 #include <stdexcept>

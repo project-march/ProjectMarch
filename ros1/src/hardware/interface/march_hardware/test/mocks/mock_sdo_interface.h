@@ -1,5 +1,5 @@
 #pragma once
-#include "march_hardware/ethercat/sdo_interface.h"
+#include "march_hardware/communication/ethercat/sdo_interface.h"
 
 #include <memory>
 

@@ -3,10 +3,10 @@
 #ifndef MARCH_HARDWARE_IMOTIONCUBE_H
 #define MARCH_HARDWARE_IMOTIONCUBE_H
 #include "actuation_mode.h"
-#include "march_hardware/ethercat/pdo_map.h"
-#include "march_hardware/ethercat/pdo_types.h"
-#include "march_hardware/ethercat/sdo_interface.h"
-#include "march_hardware/ethercat/slave.h"
+#include "march_hardware/communication/ethercat/pdo_map.h"
+#include "march_hardware/communication/ethercat/pdo_types.h"
+#include "march_hardware/communication/ethercat/sdo_interface.h"
+#include "march_hardware/communication/ethercat/slave.h"
 #include "imotioncube_state.h"
 #include "imotioncube_target_state.h"
 #include "march_hardware/encoder/absolute_encoder.h"
