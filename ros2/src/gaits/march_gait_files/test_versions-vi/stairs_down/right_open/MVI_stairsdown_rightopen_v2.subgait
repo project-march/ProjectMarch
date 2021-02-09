@@ -20,7 +20,7 @@ joints:
       nsecs: 339999999
       secs: 2
     velocity: 0.0
-  - position: -0.30539946
+  - position: -0.26179939
     time_from_start:
       nsecs: 0
       secs: 4
@@ -37,15 +37,15 @@ joints:
       secs: 4
     velocity: 0.0
   left_hip_fe:
-  - position: -0.08729962
+  - position: -0.0873
     time_from_start:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: 0.26179939
+  - position: 0.3491
     time_from_start:
-      nsecs: 9100000
-      secs: 1
+      nsecs: 0
+      secs: 2
     velocity: 0.0
   - position: 0.6283
     time_from_start:
@@ -58,16 +58,16 @@ joints:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: 0.0
+  - position: 0.5411
     time_from_start:
-      nsecs: 0
+      nsecs: 500000000
       secs: 1
-    velocity: 0.0
-  - position: 0.52360052
+    velocity: -0.1745
+  - position: 0.5236
     time_from_start:
       nsecs: 0
       secs: 2
-    velocity: 0.08729962
+    velocity: 0.0873
   - position: 1.4486
     time_from_start:
       nsecs: 0
@@ -101,15 +101,10 @@ joints:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: 0.26179939
-    time_from_start:
-      nsecs: 9100000
-      secs: 1
-    velocity: 0.52359878
   - position: 0.6981317
     time_from_start:
-      nsecs: 310900000
-      secs: 2
+      nsecs: 429999999
+      secs: 1
     velocity: 0.0
   - position: 0.5061001
     time_from_start:
@@ -122,30 +117,15 @@ joints:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: 0.0
-    time_from_start:
-      nsecs: 0
-      secs: 1
-    velocity: 0.0
-  - position: 0.87266463
+  - position: 1.22173048
     time_from_start:
       nsecs: 500000000
       secs: 1
-    velocity: 1.3962634
-  - position: 1.41973808
-    time_from_start:
-      nsecs: 0
-      secs: 2
-    velocity: 0.34906585
-  - position: 0.335372
-    time_from_start:
-      nsecs: 874299999
-      secs: 2
-    velocity: 0.0
-  - position: 0.3316
+    velocity: -0.26179939
+  - position: 0.33160034
     time_from_start:
       nsecs: 0
       secs: 4
     velocity: 0.0
 name: right_open
-version: MVI_stairsdown_rightopen_v1
+version: MVI_stairsdown_rightopen_v2

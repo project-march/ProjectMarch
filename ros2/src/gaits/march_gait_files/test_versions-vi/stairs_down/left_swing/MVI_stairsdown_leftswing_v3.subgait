@@ -1,0 +1,141 @@
+description: Stairsdown backwards
+duration:
+  nsecs: 750000000
+  secs: 2
+gait_type: stairs_like
+joints:
+  left_ankle:
+  - position: 0.04363323
+    time_from_start:
+      nsecs: 0
+      secs: 0
+    velocity: -0.0
+  - position: 0.04363323
+    time_from_start:
+      nsecs: 590000000
+      secs: 0
+    velocity: -0.0
+  - position: -0.26179939
+    time_from_start:
+      nsecs: 250000000
+      secs: 2
+    velocity: -0.0
+  - position: -0.15707963
+    time_from_start:
+      nsecs: 750000000
+      secs: 2
+    velocity: -0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start:
+      nsecs: 0
+      secs: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start:
+      nsecs: 750000000
+      secs: 2
+    velocity: -0.0
+  left_hip_fe:
+  - position: 1.22173048
+    time_from_start:
+      nsecs: 0
+      secs: 0
+    velocity: 0.08726646
+  - position: 1.36135682
+    time_from_start:
+      nsecs: 600300000
+      secs: 0
+    velocity: 0.34906585
+  - position: 0.08726646
+    time_from_start:
+      nsecs: 750000000
+      secs: 2
+    velocity: -0.17449976
+  left_knee:
+  - position: 1.0472
+    time_from_start:
+      nsecs: 0
+      secs: 0
+    velocity: -0.0
+  - position: 1.6755
+    time_from_start:
+      nsecs: 0
+      secs: 1
+    velocity: -0.0
+  - position: 0.24430072
+    time_from_start:
+      nsecs: 750000000
+      secs: 2
+    velocity: -0.69810028
+  right_ankle:
+  - position: -0.15707963
+    time_from_start:
+      nsecs: 0
+      secs: 0
+    velocity: -0.0
+  - position: 0.04363323
+    time_from_start:
+      nsecs: 750000000
+      secs: 0
+    velocity: -0.0
+  - position: 0.04360007
+    time_from_start:
+      nsecs: 750000000
+      secs: 2
+    velocity: -0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start:
+      nsecs: 0
+      secs: 0
+    velocity: -0.0
+  - position: -0.06108652
+    time_from_start:
+      nsecs: 533500000
+      secs: 0
+    velocity: -0.12217305
+  - position: -0.08726646
+    time_from_start:
+      nsecs: 174600000
+      secs: 1
+    velocity: -0.01100256
+  - position: -0.06108652
+    time_from_start:
+      nsecs: 942700000
+      secs: 1
+    velocity: 0.12217305
+  - position: 0.0
+    time_from_start:
+      nsecs: 750000000
+      secs: 2
+    velocity: -0.0
+  right_hip_fe:
+  - position: 0.08726646
+    time_from_start:
+      nsecs: 0
+      secs: 0
+    velocity: -0.17449976
+  - position: 1.22173048
+    time_from_start:
+      nsecs: 750000000
+      secs: 2
+    velocity: -0.0
+  right_knee:
+  - position: 0.2443
+    time_from_start:
+      nsecs: 0
+      secs: 0
+    velocity: -0.6981
+  - position: 0.1396
+    time_from_start:
+      nsecs: 467500000
+      secs: 0
+    velocity: -0.0
+  - position: 1.0471993
+    time_from_start:
+      nsecs: 750000000
+      secs: 2
+    velocity: -0.0
+name: left_swing
+version: MVI_stairsdown_leftswing_v3
