@@ -640,9 +640,6 @@ class Subgait(object):
     def convert_points_dict(points: dict):
         """Convert the new point dictionary structure to the old structure"""
         for point in points:
-            nanoseconds = point['time_from_start']
+            nanoseconds = point["time_from_start"]
             duration = Duration(nsecs=nanoseconds)
-            point['time_from_start'] = {
-                'secs': duration.secs,
-                'nsecs': duration.nsecs
-            }
+            point["time_from_start"] = {"secs": duration.secs, "nsecs": duration.nsecs}

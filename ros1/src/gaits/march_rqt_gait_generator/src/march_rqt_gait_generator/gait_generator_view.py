@@ -208,10 +208,10 @@ class GaitGeneratorView(QWidget):
             f"{math.sqrt(trans_left[0] ** 2 + trans_left[2] ** 2):.3f}"
         )
 
-    def message(self, title=None, msg=None) -> None:
+    def message(self, title: str = None, msg: str = None) -> None:
         QMessageBox.question(self, title, msg, QMessageBox.Ok)
 
-    def yes_no_question(self, title=None, msg=None):
+    def yes_no_question(self, title: str = None, msg: str = None) -> bool:
         answer = QMessageBox.question(
             self, title, msg, QMessageBox.Yes | QMessageBox.No
         )

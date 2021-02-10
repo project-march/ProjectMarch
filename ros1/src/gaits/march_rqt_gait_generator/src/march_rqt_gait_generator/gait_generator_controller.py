@@ -429,16 +429,19 @@ class GaitGeneratorController(object):
         try:
             setpoint_dictionary = self.get_setpoints_from_inverse_kinematics_input()
             self.add_setpoints_from_dictionary(setpoint_dictionary)
-        except SubgaitInterpolationError as e:
+        except SubgaitInterpolationError:
             self.view.message(
                 "The inverse kinematics setpoints feature as failed.",
                 "A subgait interpolation error occured, see the terminal for more information.",
             )
             traceback.print_exc()
-        except ValueError as e:
-            self.view.message("The inverse kinematics setpoints feature has failed.",
-                              "A ValueError occured, see the terminal for more information")
+        except ValueError:
+            self.view.message(
+                "The inverse kinematics setpoints feature has failed.",
+                "A ValueError occured, see the terminal for more information",
+            )
             traceback.print_exc()
+
     def transform_inverse_kinematics_setpoints_inputs(self) -> None:
         """Transform the input coordinates (relative to a default foot location) to coordinates relative to the exo."""
         foot_side = self.view.inverse_kinematics_pop_up.foot_side
