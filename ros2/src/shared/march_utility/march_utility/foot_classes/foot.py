@@ -169,7 +169,7 @@ class Foot(object):
             )
         # If the desired foot location is close to what is reachable,
         # do a different calculation which assumes the leg is stretched
-        elif ll + ul - allowable_overshoot <= transformed_distance_to_origin <= ll + ul + allowable_overshoot:
+        elif ll + ul <= transformed_distance_to_origin <= ll + ul + allowable_overshoot:
             hfe = Foot.calculate_hfe_angle_straight_leg(transformed_x, transformed_z)
             kfe = 0
         # If neither is the case, do the normal hfe kfe calculation
