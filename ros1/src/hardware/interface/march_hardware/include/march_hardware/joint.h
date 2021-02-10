@@ -7,10 +7,10 @@
 #include <utility>
 #include <vector>
 
-#include <march_hardware/imotioncube/imotioncube.h>
+#include <march_hardware/motor_controller/imotioncube/imotioncube.h>
 #include <march_hardware/power/power_distribution_board.h>
 #include <march_hardware/temperature/temperature_ges.h>
-#include <march_hardware/imotioncube/imotioncube_state.h>
+#include <march_hardware/motor_controller/imotioncube/imotioncube_state.h>
 
 namespace march
 {
