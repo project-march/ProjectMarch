@@ -75,7 +75,7 @@ class GaitGeneratorView(QWidget):
         self.initialize_shortcuts()
 
         self.inverse_kinematics_pop_up = InverseKinematicsPopUpWindow(
-            self, ui_file.replace("gait_generator.ui", "inverse_kinematics_pop_up.ui")
+            self, ui_file.replace("gait_generator.ui", "inverse_kinematics_setpoints_input.ui")
         )
 
     def initialize_shortcuts(self):
