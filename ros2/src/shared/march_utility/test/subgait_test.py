@@ -265,45 +265,23 @@ class SubgaitTest(unittest.TestCase):
         other_subgait = Subgait.from_file(self.robot, other_subgait_path)
         return base_subgait, other_subgait
 
-    def load_interpolatable_subgaits_ik(
-        self,
-        subgait_name: str = "swing",
-        base_version: str = "forward_swing",
-        other_version: str = "backward_swing",
-    ):
-        base_subgait_path = "{rsc}/{gait}/{subgait}/{version}.subgait".format(
-            rsc=self.resources_folder,
-            gait=self.gait_name_ik,
-            subgait=subgait_name,
-            version=base_version,
-        )
-        base_subgait = Subgait.from_file(self.robot, base_subgait_path)
-        other_subgait_path = "{rsc}/{gait}/{subgait}/{version}.subgait".format(
-            rsc=self.resources_folder,
-            gait=self.gait_name_ik,
-            subgait=subgait_name,
-            version=other_version,
-        )
-        other_subgait = Subgait.from_file(self.robot, other_subgait_path)
-        return base_subgait, other_subgait
-
     def test_interpolate_subgaits_wrong_parameter(self):
         # should be 0 <= parameter <= 1
-        base_subgait, other_subgait = self.load_interpolatable_subgaits_ik()
+        base_subgait, other_subgait = self.load_interpolatable_subgaits()
         with self.assertRaises(ValueError):
             Subgait.interpolate_subgaits(
                 base_subgait, other_subgait, 2, use_foot_position=True
             )
 
     def test_interpolate_subgaits_parameter_zero(self):
-        base_subgait, other_subgait = self.load_interpolatable_subgaits_ik()
+        base_subgait, other_subgait = self.load_interpolatable_subgaits()
         new_subgait = Subgait.interpolate_subgaits(
             base_subgait, other_subgait, 0, use_foot_position=True
         )
         self.assertEqual(base_subgait, new_subgait)
 
     def test_interpolate_subgaits_parameter_one(self):
-        base_subgait, other_subgait = self.load_interpolatable_subgaits_ik()
+        base_subgait, other_subgait = self.load_interpolatable_subgaits()
         new_subgait = Subgait.interpolate_subgaits(
             base_subgait, other_subgait, 1, use_foot_position=True
         )
@@ -366,7 +344,7 @@ class SubgaitTest(unittest.TestCase):
         self.assertEqual(new_duration, new_subgait.duration)
 
     def test_interpolate_subgaits_duration_ik(self):
-        base_subgait, other_subgait = self.load_interpolatable_subgaits_ik()
+        base_subgait, other_subgait = self.load_interpolatable_subgaits()
         parameter = 0.2
         new_subgait = Subgait.interpolate_subgaits(
             base_subgait, other_subgait, parameter, use_foot_position=True
@@ -375,3 +353,5 @@ class SubgaitTest(unittest.TestCase):
             other_subgait.duration, parameter
         )
         self.assertEqual(new_duration, new_subgait.duration)
+
+
