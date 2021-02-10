@@ -1,134 +1,134 @@
 description: Test the ROM of both ankle joints in a standing position
-duration: {nsecs: 0, secs: 25}
+duration: 25000000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1745
-    time_from_start: {nsecs: 0, secs: 5}
+    time_from_start: 5000000000
     velocity: 0.0
   - position: -0.3491
-    time_from_start: {nsecs: 0, secs: 15}
+    time_from_start: 15000000000
     velocity: 0.0
   - position: 0.0873
-    time_from_start: {nsecs: 0, secs: 25}
+    time_from_start: 25000000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 375000000, secs: 9}
+    time_from_start: 9375000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 12}
+    time_from_start: 12500000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 25}
+    time_from_start: 25000000000
     velocity: 0.0
   left_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 5}
+    time_from_start: 5000000000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 21}
+    time_from_start: 21000000000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 23}
+    time_from_start: 23000000000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 25}
+    time_from_start: 25000000000
     velocity: 0.0
   left_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 5}
+    time_from_start: 5000000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 15}
+    time_from_start: 15000000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 21}
+    time_from_start: 21000000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 25}
+    time_from_start: 25000000000
     velocity: 0.0
   right_ankle:
   - position: 0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1745
-    time_from_start: {nsecs: 0, secs: 5}
+    time_from_start: 5000000000
     velocity: 0.0
   - position: -0.3491
-    time_from_start: {nsecs: 0, secs: 15}
+    time_from_start: 15000000000
     velocity: 0.0
   - position: 0.0873
-    time_from_start: {nsecs: 0, secs: 25}
+    time_from_start: 25000000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 375000000, secs: 9}
+    time_from_start: 9375000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 12}
+    time_from_start: 12500000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 25}
+    time_from_start: 25000000000
     velocity: 0.0
   right_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 5}
+    time_from_start: 5000000000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 21}
+    time_from_start: 21000000000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 23}
+    time_from_start: 23000000000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 25}
+    time_from_start: 25000000000
     velocity: 0.0
   right_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 5}
+    time_from_start: 5000000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 15}
+    time_from_start: 15000000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 21}
+    time_from_start: 21000000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 25}
+    time_from_start: 25000000000
     velocity: 0.0
 name: ankle_test_stand
 version: ankle_test_stand

@@ -1,38 +1,38 @@
 description: 'Home stand gait: go to the standing position.'
-duration: {nsecs: 0, secs: 3}
+duration: 3000000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0873
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   left_hip_fe:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   left_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   right_ankle:
   - position: 0.0873
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   right_hip_fe:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   right_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
 name: home_stand
 version: home_stand_3sec_less_hip_extension

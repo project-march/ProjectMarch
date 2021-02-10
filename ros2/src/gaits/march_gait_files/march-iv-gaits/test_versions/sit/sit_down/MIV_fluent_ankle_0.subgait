@@ -1,100 +1,100 @@
 description: Sit down gait for the sitting block. This is the same version as MIV
   except for the fact that the velocities and the beginning and the end are decreased
   to get a smoother gait.
-duration: {nsecs: 500000000, secs: 2}
+duration: 2500000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 62500000, secs: 0}
+    time_from_start: 62500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 62500000, secs: 0}
+    time_from_start: 62500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 937500000, secs: 0}
+    time_from_start: 937500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   left_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1745
-    time_from_start: {nsecs: 500000000, secs: 0}
+    time_from_start: 500000000
     velocity: 0.7994
   - position: 1.3963
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: 0.7994
   - position: 1.6057
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   left_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1745
-    time_from_start: {nsecs: 500000000, secs: 0}
+    time_from_start: 500000000
     velocity: 0.7994
   - position: 1.3963
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: 0.7994
   - position: 1.5708
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   right_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 62500000, secs: 0}
+    time_from_start: 62500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 62500000, secs: 0}
+    time_from_start: 62500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 937500000, secs: 0}
+    time_from_start: 937500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   right_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1745
-    time_from_start: {nsecs: 500000000, secs: 0}
+    time_from_start: 500000000
     velocity: 0.7994
   - position: 1.3963
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: 0.7994
   - position: 1.6057
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   right_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1745
-    time_from_start: {nsecs: 500000000, secs: 0}
+    time_from_start: 500000000
     velocity: 0.7994
   - position: 1.3963
-    time_from_start: {nsecs: 0, secs: 2}
+    time_from_start: 2000000000
     velocity: 0.7994
   - position: 1.5708
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
 name: sit_down
 version: MIV_fluent_ankle_0
