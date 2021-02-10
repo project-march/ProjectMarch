@@ -2,7 +2,7 @@
 #include "march_hardware_interface/march_hardware_interface.h"
 #include "march_hardware_interface/power_net_on_off_command.h"
 
-#include <march_hardware/imotioncube/actuation_mode.h>
+#include <march_hardware/motor_controller/imotioncube/actuation_mode.h>
 #include <march_hardware/joint.h>
 
 #include <algorithm>

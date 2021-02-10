@@ -1,5 +1,5 @@
 // Copyright 2018 Project March.
-#include "march_hardware/imotioncube/imotioncube.h"
+#include "march_hardware/motor_controller/imotioncube/imotioncube.h"
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/error/motion_error.h"
 #include "march_hardware/ethercat/pdo_types.h"
