@@ -617,8 +617,8 @@ class Subgait(object):
 
         setpoints_to_interpolate: List[dict] = [{} for _ in range(number_of_setpoints)]
 
-        for joint in subgait:
-            for setpoint_index in range(number_of_setpoints):
+        for setpoint_index in range(number_of_setpoints):
+            for joint in subgait.joints:
                 # Create new setpoints at equidistant time stamps using the interpolated position and velocity
                 time = Duration(seconds=setpoint_index / (number_of_setpoints - 1) * subgait.duration.seconds)
                 setpoint_to_add = subgait.get_joint(
