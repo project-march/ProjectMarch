@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import os
 import re
-from typing import List, Tuple
+from typing import List, Tuple, Set
 
 import yaml
 from march_utility.exceptions.gait_exceptions import (
@@ -404,6 +404,15 @@ class Subgait(object):
 
         return sorted(set(timestamps))
 
+    def get_unique_timestamps_unsorted(self) -> Set[Duration]:
+        """Get the timestamps that are unique to a setpoint, but leave the set unsorted."""
+        timestamps = []
+        for joint in self.joints:
+            for setpoint in joint.setpoints:
+                timestamps.append(setpoint.time)
+
+        return set(timestamps)
+
     def get_joint(self, name: str) -> JointTrajectory:
         """Get joint object with given name or index."""
         return next(joint for joint in self.joints if joint.name == name)
@@ -593,39 +602,57 @@ class Subgait(object):
         base_subgait: Subgait, other_subgait: Subgait
     ) -> Tuple[List[dict], List[dict]]:
 
-        max_duration = (
-            base_subgait.duration
-            if base_subgait.duration > other_subgait.duration
-            else other_subgait.duration
-        )
-        # The resulting setpoint lists will have a setpoint roughly every 0.1s plus one at the start
-        number_of_setpoints = round(max_duration.seconds * 10 + 1)
+        # max_duration = (
+        #     base_subgait.duration
+        #     if base_subgait.duration > other_subgait.duration
+        #     else other_subgait.duration
+        # )
+        # # The resulting setpoint lists will have a setpoint roughly every 0.1s plus one at the start
+        # number_of_setpoints = round(max_duration.seconds * 10 + 1)
+
+        base_to_other_duration_ratio = base_subgait.duration / other_subgait.duration
+        base_time_stamps = base_subgait.get_unique_timestamps_unsorted()
+        other_time_stamps = other_subgait.get_unique_timestamps_unsorted()
+
+        for base_time in base_time_stamps:
+            other_time_stamps.add(base_time * base_to_other_duration_ratio)
+
+        for other_time in other_time_stamps:
+            base_time_stamps.add(other_time / base_to_other_duration_ratio)
+
+        base_time_stamps = sorted(base_time_stamps)
+        other_time_stamps = sorted(other_time_stamps)
 
         base_setpoints_to_interpolate = Subgait.prepare_subgait_for_inverse_kinematics(
-            base_subgait, number_of_setpoints
+            base_subgait, base_time_stamps
         )
         other_setpoints_to_interpolate = Subgait.prepare_subgait_for_inverse_kinematics(
-            other_subgait, number_of_setpoints
+            other_subgait, other_time_stamps
         )
 
         return base_setpoints_to_interpolate, other_setpoints_to_interpolate
 
     @staticmethod
     def prepare_subgait_for_inverse_kinematics(
-        subgait: Subgait, number_of_setpoints: int
+        subgait: Subgait, time_stamps: Set[Duration]
     ) -> List[dict]:
 
-        setpoints_to_interpolate: List[dict] = [{} for _ in range(number_of_setpoints)]
+        setpoints_to_interpolate: List[dict] = [{} for _ in time_stamps]
 
-        for setpoint_index in range(number_of_setpoints):
+        for setpoint_index, time in enumerate(time_stamps):
             for joint in subgait.joints:
-                # Create new setpoints at equidistant time stamps using the interpolated position and velocity
-                time = Duration(seconds=setpoint_index / (number_of_setpoints - 1) * subgait.duration.seconds)
-                setpoint_to_add = subgait.get_joint(
-                    joint.name
-                ).get_interpolated_setpoint(time)
-
+                setpoint_to_add = subgait.get_joint(joint.name).get_interpolated_setpoint(time)
                 setpoints_to_interpolate[setpoint_index][joint.name] = setpoint_to_add
+        #
+        # for setpoint_index in range(number_of_setpoints):
+        #     for joint in subgait.joints:
+        #         # Create new setpoints at equidistant time stamps using the interpolated position and velocity
+        #         time = Duration(seconds=setpoint_index / (number_of_setpoints - 1) * subgait.duration.seconds)
+        #         setpoint_to_add = subgait.get_joint(
+        #             joint.name
+        #         ).get_interpolated_setpoint(time)
+        #
+        #         setpoints_to_interpolate[setpoint_index][joint.name] = setpoint_to_add
 
         return setpoints_to_interpolate
 
