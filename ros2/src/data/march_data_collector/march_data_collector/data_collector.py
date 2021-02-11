@@ -44,8 +44,7 @@ class DataCollector(Node):
         self.joint_values = JointValues()
 
         self.joint_values_publisher = self.create_publisher(
-            topic="/march/joint_values", msg_type=JointValues,
-            qos_profile=10
+            topic="/march/joint_values", msg_type=JointValues, qos_profile=10
         )
 
         self._imu_broadcaster = tf2_ros.TransformBroadcaster(self)
@@ -57,18 +56,16 @@ class DataCollector(Node):
             topic="/march/controller/trajectory/state",
             msg_type=JointTrajectoryControllerState,
             callback=self.trajectory_state_callback,
-            qos_profile=10
+            qos_profile=10,
         )
 
         self._imu_subscriber = self.create_subscription(
-            topic="/march/imu",
-            msg_type=Imu,
-            callback=self.imu_callback,
-            qos_profile=10
+            topic="/march/imu", msg_type=Imu, callback=self.imu_callback, qos_profile=10
         )
 
-        self.pressure_soles_on = self.get_parameter(
-            "~pressure_soles").get_parameter_value().bool_value
+        self.pressure_soles_on = (
+            self.get_parameter("~pressure_soles").get_parameter_value().bool_value
+        )
 
         self.transform_imu = TransformStamped()
 
@@ -79,7 +76,9 @@ class DataCollector(Node):
 
         if self.pressure_soles_on:
             self.get_logger().debug("Connecting to pressure soles")
-            self.output_host = self.get_parameter("~moticon_ip").get_parameter_value().string_value
+            self.output_host = (
+                self.get_parameter("~moticon_ip").get_parameter_value().string_value
+            )
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.connect(("8.8.8.8", 53))
             self.input_host = sock.getsockname()[0]
@@ -103,7 +102,6 @@ class DataCollector(Node):
         else:
             self.get_logger().debug("running without pressure soles")
 
-
     def _initial_robot_description(self):
         """
         Initialize the robot description by getting it from the robot state
@@ -124,7 +122,6 @@ class DataCollector(Node):
         rclpy.spin_until_future_complete(self, robot_future)
 
         return urdf.Robot.from_xml_string(robot_future.result().values[0].string_value)
-
 
     def trajectory_state_callback(self, data):
         com = self._com_calculator.calculate_com()
@@ -177,8 +174,9 @@ class DataCollector(Node):
                     "world", "imu_link", self.get_clock().now()
                 ).transform.translation.z
                 for foot in self.feet:
-                    trans = self.tf_buffer.lookup_transform("world", foot,
-                                                            self.get_clock().now())
+                    trans = self.tf_buffer.lookup_transform(
+                        "world", foot, self.get_clock().now()
+                    )
                     z_diff = max(z_diff, old_z - trans.transform.translation.z)
 
                 self.transform_imu.header.stamp = self.get_clock().now()

@@ -2,6 +2,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+
 # <arg name="moticon_ip" default="192.168.8.105" doc="The ip-adress with Moticon software running on it, defaults to
 # EMS switch laptop on standard router"/>
 # <arg name="pressure_soles" default="false" doc="Whether pressure soles will be connected"/>
@@ -17,23 +18,23 @@ def generate_launch_description():
                 "use_sim_time",
                 default_value="true",
                 description="Whether to use simulation time as published on the "
-                            "/clock topic by gazebo instead of system time.",
+                "/clock topic by gazebo instead of system time.",
             ),
             DeclareLaunchArgument(
                 "moticon_ip",
                 default_value="192.168.8.105",
                 description="The ip-adress with Moticon software running on it, "
-                            "defaults to EMS switch laptop on standard router",
+                "defaults to EMS switch laptop on standard router",
             ),
             DeclareLaunchArgument(
                 "pressure_soles",
                 default_value="false",
-                description="Whether the pressure soles will be connected"
+                description="Whether the pressure soles will be connected",
             ),
             DeclareLaunchArgument(
                 "logfile",
                 default_value="false",
-                description="Whether the data input is from a log file."
+                description="Whether the data input is from a log file.",
             ),
             Node(
                 package="march_data_collector",

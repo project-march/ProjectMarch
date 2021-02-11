@@ -131,8 +131,9 @@ class CPCalculator(object):
                 + new_center_of_mass["vy"] * capture_point_multiplier
             )
 
-            self._capture_point_marker.header.stamp = self._node.get_clock().now(
-            ).to_msg()
+            self._capture_point_marker.header.stamp = (
+                self._node.get_clock().now().to_msg()
+            )
             self._capture_point_marker.pose.position.x = x_cp + static_foot_position.x
             self._capture_point_marker.pose.position.y = y_cp + static_foot_position.y
             self._capture_point_marker.pose.position.z = 0

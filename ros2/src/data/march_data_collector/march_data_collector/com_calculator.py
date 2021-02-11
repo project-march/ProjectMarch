@@ -18,9 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import geometry_msgs.msg
-import rclpy
-import tf2_geometry_msgs as tf_geo
 import tf2_ros
+from .tf2_geometry_msgs import do_transform_point
 from visualization_msgs.msg import Marker
 
 
@@ -51,8 +50,9 @@ class CoMCalculator(object):
         z = 0
         for link in self.links:
             try:
-                trans = self.tf_buffer.lookup_transform("world", link,
-                                                        self._node.get_clock().now())
+                trans = self.tf_buffer.lookup_transform(
+                    "world", link, self._node.get_clock().now()
+                )
 
                 to_transform = geometry_msgs.msg.PointStamped()
                 to_transform.point.x = self.links[link].inertial.origin.xyz[0]
@@ -60,7 +60,7 @@ class CoMCalculator(object):
                 to_transform.point.z = self.links[link].inertial.origin.xyz[2]
                 to_transform.header.frame_id = link
                 to_transform.header.stamp = self._node.get_clock().now()
-                transformed = tf_geo.do_transform_point(to_transform, trans)
+                transformed = do_transform_point(to_transform, trans)
 
                 # calculate part of CoM equation depending on link
                 x += self.links[link].inertial.mass * transformed.point.x
@@ -82,7 +82,8 @@ class CoMCalculator(object):
         self.marker.pose.position.x = x
         self.marker.pose.position.y = y
         self.marker.pose.position.z = z
-        self._node.get_logger().debug("center of mass is at " + str(
-            self.marker.pose.position))
+        self._node.get_logger().debug(
+            "center of mass is at " + str(self.marker.pose.position)
+        )
 
         return self.marker

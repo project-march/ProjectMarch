@@ -31,7 +31,6 @@ def generate_launch_description():
     pressure_soles = LaunchConfiguration("pressure_soles")
     logfile = LaunchConfiguration("logfile")
 
-
     return launch.LaunchDescription(
         [
             # GENERAL ARGUMENTS
@@ -93,23 +92,23 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 "data_collector",
                 default_value="false",
-                description="Whether the data collector should be launched"
+                description="Whether the data collector should be launched",
             ),
             DeclareLaunchArgument(
                 "moticon_ip",
                 default_value="192.168.8.105",
                 description="The ip-adress with Moticon software running on it, "
-                            "defaults to EMS switch laptop on standard router",
+                "defaults to EMS switch laptop on standard router",
             ),
             DeclareLaunchArgument(
                 "pressure_soles",
                 default_value="false",
-                description="Whether the pressure soles will be connected"
+                description="Whether the pressure soles will be connected",
             ),
             DeclareLaunchArgument(
                 "logfile",
                 default_value="false",
-                description="Whether the data input is from a log file."
+                description="Whether the data input is from a log file.",
             ),
             # Launch rqt input device if not rqt_input:=false
             IncludeLaunchDescription(
