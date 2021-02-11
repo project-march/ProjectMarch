@@ -3,21 +3,53 @@
 #include <pluginlib/class_list_macros.hpp>
 
 #include <iostream>
-
+#include <string>
+#include <vector>
 
 bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
 {
   joint_handles_ptr_ = &joint_handles;
   num_joints_ = joint_handles.size();
 
-  //initialize the model predictive controllers
-  model_predictive_controllers_.resize(num_joints_);
+  std::vector<std::string> joint_names;
+  ros::param::get("/march/joint_names", joint_names);
+
+  // Initialize the model predictive controllers
   for (unsigned int i = 0; i < num_joints_; ++i)
   {
+    model_predictive_controllers_.push_back(ModelPredictiveController(getQMatrix(joint_names[i])));
     model_predictive_controllers_[i].init();
   }
 
   return true;
+}
+
+// Retrieve the Q matrix from the parameter server for a joint.
+std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(std::string joint_name)
+{
+  int n_rows, n_cols;
+  ros::param::get("/march/controller/trajectory/q_matrices/"  + joint_name + "/n_rows", n_rows);
+  ros::param::get("/march/controller/trajectory/q_matrices/"  + joint_name + "/n_cols", n_cols);
+
+  std::vector<float> Q_flat;
+  ros::param::get("/march/controller/trajectory/q_matrices/"  + joint_name + "/Q", Q_flat);
+
+  std::vector<std::vector<float>> Q(n_rows, std::vector<float>(n_cols));
+  if (Q_flat.size() != n_rows * n_cols)
+  {
+    ROS_WARN("Q_matrix does not have specified matrix dimensions.");
+  }
+  else
+  {
+    for (int y = 0; y < Q_flat.size() / n_rows; y++)
+    {
+      for (int x = 0; x < Q_flat.size() / n_cols; x++)
+      {
+        Q[y][x] = Q_flat[y * n_rows + x];
+      }
+    }
+  }
+  return Q;
 }
 
 void ModelPredictiveControllerInterface::starting(const ros::Time& /*time*/)
