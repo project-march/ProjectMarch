@@ -1,4 +1,3 @@
-import math
 from copy import deepcopy
 from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
 from march_utility.gait.subgait import Subgait
