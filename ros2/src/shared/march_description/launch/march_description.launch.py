@@ -18,21 +18,6 @@ def generate_launch_description():
     xacro_path = PathJoinSubstitution(
         [get_package_share_directory("march_description"), "urdf", robot_description]
     )
-    # mappings = {
-    #     'ground_gait': ground_gait,
-    #     'realsense_simulation': realsense_simulation
-    # }
-    # if simulation:
-    #     mappings.update({'k_velocity_value_hfe': '60.0', 'k_velocity_value_kfe': '60.0',
-    #     'k_velocity_value_haa': '60.0', 'k_velocity_value_adpf': '15.0',
-    #     'k_position_value_hfe': '5000.0', 'k_position_value_kfe': '5000.0',
-    #     'k_position_value_haa': '5000.0', 'k_position_value_adpf': '5000.0',
-    #     'max_effort_rotary': '200.0', 'max_effort_linear': '200.0'})
-    #
-    # print(mappings)
-
-    # doc = xacro.process_file(xacro_path, mappings=mappings)
-    # description_urdf = doc.toprettyxml(indent='  ')
 
     use_imu_data = LaunchConfiguration("use_imu_data")
     to_world_transform = LaunchConfiguration("to_world_transform")
@@ -90,10 +75,10 @@ def generate_launch_description():
                     {
                         "use_sim_time": use_sim_time,
                         "robot_description": Command(
-                            ["xacro",
-                            xacro_path,
-                            [" ground_gait:=", ground_gait,
-                             " realsense_simulation:=", realsense_simulation]]
+                            ["xacro ",
+                            xacro_path, ".xacro",
+                            " ground_gait:=", ground_gait,
+                            " realsense_simulation:=", realsense_simulation]
                         ),
                         "use_imu_data": use_imu_data,
                         "to_world_transform": to_world_transform,
