@@ -573,12 +573,10 @@ class Subgait(object):
             setpoints_to_add = FeetState.feet_state_to_setpoints(new_feet_state)
             for joint_name in JOINT_NAMES_IK:
                 new_setpoints[joint_name].append(setpoints_to_add[joint_name])
-        # fill the ankle joint using the angle based linear interpolation
-        for ankle_joint in ["left_ankle", "right_ankle"]:
-            for base_setpoint, other_setpoint in zip(
-                base_subgait.get_joint(ankle_joint).setpoints,
-                other_subgait.get_joint(ankle_joint).setpoints,
-            ):
+            # fill the ankle joint using the angle based linear interpolation
+            for ankle_joint in ["left_ankle", "right_ankle"]:
+                base_setpoint = base_setpoints_to_interpolate[setpoint_index][ankle_joint]
+                other_setpoint = other_setpoints_to_interpolate[setpoint_index][ankle_joint]
                 new_ankle_setpoint_to_add = Setpoint.interpolate_setpoints(
                     base_setpoint, other_setpoint, parameter
                 )
@@ -601,15 +599,6 @@ class Subgait(object):
     def prepare_subgaits_for_inverse_kinematics(
         base_subgait: Subgait, other_subgait: Subgait
     ) -> Tuple[List[dict], List[dict]]:
-
-        # max_duration = (
-        #     base_subgait.duration
-        #     if base_subgait.duration > other_subgait.duration
-        #     else other_subgait.duration
-        # )
-        # # The resulting setpoint lists will have a setpoint roughly every 0.1s plus one at the start
-        # number_of_setpoints = round(max_duration.seconds * 10 + 1)
-
         base_to_other_duration_ratio = base_subgait.duration / other_subgait.duration
         base_time_stamps = base_subgait.get_unique_timestamps_unsorted()
         other_time_stamps = other_subgait.get_unique_timestamps_unsorted()
@@ -638,22 +627,13 @@ class Subgait(object):
     ) -> List[dict]:
 
         setpoints_to_interpolate: List[dict] = [{} for _ in time_stamps]
-
+        print(time_stamps)
         for setpoint_index, time in enumerate(time_stamps):
             for joint in subgait.joints:
                 setpoint_to_add = subgait.get_joint(joint.name).get_interpolated_setpoint(time)
                 setpoints_to_interpolate[setpoint_index][joint.name] = setpoint_to_add
-        #
-        # for setpoint_index in range(number_of_setpoints):
-        #     for joint in subgait.joints:
-        #         # Create new setpoints at equidistant time stamps using the interpolated position and velocity
-        #         time = Duration(seconds=setpoint_index / (number_of_setpoints - 1) * subgait.duration.seconds)
-        #         setpoint_to_add = subgait.get_joint(
-        #             joint.name
-        #         ).get_interpolated_setpoint(time)
-        #
-        #         setpoints_to_interpolate[setpoint_index][joint.name] = setpoint_to_add
 
+        print(setpoints_to_interpolate)
         return setpoints_to_interpolate
 
     @staticmethod
