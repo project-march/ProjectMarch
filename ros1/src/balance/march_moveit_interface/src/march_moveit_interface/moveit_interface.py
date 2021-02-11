@@ -53,6 +53,9 @@ class MoveItInterface:
         :param leg_name: The name of the used move group.
         :param target_pose: The capture point pose that the swing leg should go to.
         """
+        # The move group sets a target for moveit, the end effector should be
+        # specified, since otherwise the default is used, the boolean (True)
+        # specifies that the pose is an approximate.
         self.move_group[leg_name].set_joint_value_target(
             target_pose, self._end_effectors[leg_name], True
         )
@@ -110,6 +113,11 @@ class MoveItInterface:
         :param req: The request for the moveit trajectory.
         """
         res = GetMoveItTrajectoryResponse()
+        if req.swing_leg not in ["right_leg", "left_leg"]:
+            res.success = False
+            rospy.logwarn(f"Incorrect swing leg {req.swing_leg} was given, no moveit "
+                          f"trajectory can be constructed.")
+            return res
         trajectory = self.construct_trajectory(
             req.swing_leg, req.swing_leg_target_pose, req.stance_leg_target
         )

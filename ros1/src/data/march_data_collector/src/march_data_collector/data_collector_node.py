@@ -34,6 +34,7 @@ class DataCollectorNode(object):
         self._com_calculator = com_calculator
         self._cp_calculators = cp_calculators
         self.tf_buffer = tf_buffer
+        # key is the swing foot and item is the static foot
         self.feet = feet
 
         self.position_memory = []
