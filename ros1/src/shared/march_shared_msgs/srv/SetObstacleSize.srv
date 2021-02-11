@@ -1,7 +1,0 @@
-string obstacle_name
-
-float64 new_height    # 0 (default value) means default size will be used, this value is defined in the <obstacle>_macro.xacro file
-float64 new_width     # 0 (default value)
-float64 new_length     # 0 (default value)
----
-bool success

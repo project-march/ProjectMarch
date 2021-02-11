@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>march_safety</name>
+  <version>0.0.0</version>
+  <description>
+    Observes and checks (sensor) data during run-time. If there is something
+    wrong a warning/error message should be published.
+  </description>
+  <maintainer email="software@projectmarch.nl">Project March</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>march_shared_msgs</depend>
+  <depend>march_utility</depend>
+
+  <depend>rclcpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>urdf</depend>
+
+  <test_depend>ros2test</test_depend>
+  <test_depend>ros_testing</test_depend>
+  <test_depend>march_robot_information</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

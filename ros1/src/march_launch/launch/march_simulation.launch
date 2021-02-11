@@ -25,6 +25,8 @@
     <arg name="rosbag" default="false" doc="Enables rosbag record node."/>
     <arg name="bag_prefix" default="log" doc="Prefix of the bag file. Only used if rosbag is true."/>
 
+    <arg name="realsense" default="false"
+         doc="Launches the realsense reader node when true."/>
     <arg name="data_collector" default="false" doc="Launches the data collector when true."/>
 
 <!-- ROS1 Gait selection        -->

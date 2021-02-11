@@ -3,12 +3,12 @@
 #include <pluginlib/class_list_macros.hpp>
 
 #include <iostream>
-
+//#include <chrono>
 
 bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
 {
   joint_handles_ptr_ = &joint_handles;
-  num_joints_ = joint_handles_ptr_->size();
+  num_joints_ = joint_handles.size();
 
   //initialize the model predictive controllers
   model_predictive_controllers_.resize(num_joints_);
@@ -38,7 +38,6 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
                    const joint_trajectory_controller::State& desired_state,
                    const joint_trajectory_controller::State& state_error)
 {
-  num_joints_ = joint_handles_ptr_->size();
 
   // Preconditions
   if (!joint_handles_ptr_)

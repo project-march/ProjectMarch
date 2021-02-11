@@ -20,6 +20,7 @@
 
 #include <cassert>
 #include <memory>
+#include <time.h>
 
 // Create a State alias
 namespace joint_trajectory_controller

@@ -2,43 +2,38 @@
 
 #include "model_predictive_controller.hpp"
 #include "acado_common.h"
+#include "mpc_references.h"
 
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 using namespace std;
 
 // Global variables used by the solver
-ACADOvariables acadoVariables;
-ACADOworkspace acadoWorkspace;
+ACADOvariables acadoVariables = {};
+ACADOworkspace acadoWorkspace = {};
 
 void ModelPredictiveController::init() {
-  // Reset all solver memory
-  memset(&acadoWorkspace, 0, sizeof(acadoWorkspace));
-  memset(&acadoVariables, 0, sizeof(acadoVariables));
 
   // Initialize the solver
   acado_initializeSolver();
 
   // Prepare a consistent initial guess
-  for (int i = 0; i < ACADO_N + 1; ++i) {
-    acadoVariables.x[i * ACADO_NX] = 0; // theta
+  for (int i = 0; i < ACADO_N + 1; i++) {
+    acadoVariables.x[i * ACADO_NX + 0] = 0; // theta
     acadoVariables.x[i * ACADO_NX + 1] = 0; // dtheta
   }
 
-  double theta_ref = 0.2;
+  // Fill reference vector with sinus and or step signals
+  sinRef(reference, 0.2, 0.5, ACADO_N, 0.001);
+//  stepRef(reference, 0.785, ACADO_N);
 
-  // Prepare references (step reference)
-  for (int i = 0; i < ACADO_N; ++i) {
-    acadoVariables.y[i * ACADO_NY] = theta_ref; // theta
-    acadoVariables.y[i * ACADO_NY + 1] = 0;         // dtheta
-    acadoVariables.y[i * ACADO_NY + 2] = 0;         // T
-  }
-
-  acadoVariables.yN[0] = theta_ref; // theta
-  acadoVariables.yN[1] = 0;         // dtheta
-  acadoVariables.yN[2] = 0;         // T
+  // Set the reference
+  setReference(reference);
 
   // Current state feedback
   setInitialState(x0);
@@ -54,12 +49,28 @@ void ModelPredictiveController::setInitialState(vector<double> x0) {
   }
 }
 
+void ModelPredictiveController::setReference(vector<vector<double>> reference) {
+    for(int i = 0; i < ACADO_N; i++) {
+        for(int j = 0; j < ACADO_NY; j++) {
+            acadoVariables.y[i * ACADO_NY + j] = reference[i][j];
+        }
+    }
+    for(int j = 0; j < ACADO_NYN; j++) {
+        acadoVariables.yN[j] = reference[ACADO_N][j];
+    }
+}
+
 void ModelPredictiveController::calculateControlInput() {
 
-  // Set initial speed
+  // Set initial state
   setInitialState(x0);
 
+  // Set reference
+  ModelPredictiveController::setReference(reference);
+//  ModelPredictiveController::scrollReference(reference);
+
   // preparation step
+  setReference(reference);
   acado_preparationStep();
 
   // feedback step
@@ -70,5 +81,9 @@ void ModelPredictiveController::calculateControlInput() {
   acado_shiftStates(2, 0, 0);
   acado_shiftControls(0);
 
-}
+  // Scroll the reference vector
+  if(repeat_reference) {
+      scrollReference(reference);
+  }
 
+}

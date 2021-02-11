@@ -9,8 +9,10 @@ class ModelPredictiveController {
 
 public:
     // Public variables
-    vector<double> x0{0,0}; // Current state
-    double u;               // Calculated control input
+    vector<double> x0{0,0};             // Current state
+    double u;                           // Calculated control input
+    vector<vector<double>> reference;   // Current reference
+    bool repeat_reference = true;      // Periodically Repeat the reference
 
     /**
      * \brief Initialise the model predictive controller
@@ -24,9 +26,13 @@ public:
     void setInitialState(vector<double> x0);
 
     /**
+     * \brief Set the reference
+     * @param reference
+     */
+    void setReference(vector<vector<double>> reference);
+
+    /**
      * \brief Calculate the control input
-     * @param x0 - initial state
-     * @return u - control input
      */
     void calculateControlInput();
 
