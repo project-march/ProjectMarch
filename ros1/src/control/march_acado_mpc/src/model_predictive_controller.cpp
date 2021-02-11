@@ -29,8 +29,8 @@ void ModelPredictiveController::init() {
   }
 
   // Fill reference vector with sinus and or step signals
-  sinRef(reference, 0.2, 0.5, ACADO_N, 0.001);
-//  stepRef(reference, 0.785, ACADO_N);
+  sinRef(reference, 0.25, 0.5, ACADO_N, 0.02);
+//  stepRef(reference, 0.0, 2*ACADO_N);
 
   // Set the reference
   setReference(reference);
