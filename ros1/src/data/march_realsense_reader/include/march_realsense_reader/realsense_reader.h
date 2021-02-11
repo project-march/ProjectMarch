@@ -8,7 +8,7 @@
 #include <pcl_conversions/pcl_conversions.h>
 #include <std_srvs/Trigger.h>
 
-typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
+using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
 class RealSenseReader
 {

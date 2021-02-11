@@ -13,17 +13,17 @@ using Normals = pcl::PointCloud<pcl::Normal>;
 class Preprocessor {
   public:
     Preprocessor(YAML::Node config_tree,
-                 std::shared_ptr<PointCloud> pointcloud,
-                 std::shared_ptr<Normals> normal_pointcloud);
+                 PointCloud::Ptr pointcloud,
+                 Normals::Ptr normal_pointcloud);
     Preprocessor(std::string file_name,
-                 std::shared_ptr<PointCloud> pointcloud,
-                 std::shared_ptr<Normals> normal_pointcloud);
+                 PointCloud::Ptr pointcloud,
+                 Normals::Ptr normal_pointcloud);
     virtual void preprocess()=0; // This function is required to be implemented by
     // any preprocessor
     virtual ~Preprocessor() {};
 
-    std::shared_ptr<PointCloud> pointcloud_;
-    std::shared_ptr<Normals> normal_pointcloud_;
+    PointCloud::Ptr pointcloud_;
+    Normals::Ptr normal_pointcloud_;
     YAML::Node config_tree_;
 };
 
