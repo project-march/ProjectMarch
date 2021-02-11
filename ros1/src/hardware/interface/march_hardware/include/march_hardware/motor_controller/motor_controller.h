@@ -53,7 +53,7 @@ public:
    * @return A MotorControllerState object containing all data read from the motor controller at every communication
    * cycle.
    */
-  MotorControllerState& getState();
+  std::unique_ptr<MotorControllerState> getState();
 private:
   std::unique_ptr<AbsoluteEncoder> absolute_encoder_;
   std::unique_ptr<IncrementalEncoder> incremental_encoder_;
