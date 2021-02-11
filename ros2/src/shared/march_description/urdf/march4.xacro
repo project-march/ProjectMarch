@@ -6,6 +6,7 @@
     <!-- Value set to: 'base_link' makes the robot stand on the ground also set launch parameter fixed to false and set
     the hover_height to 0.0. Set ground_gait to true to ground gait in simulation.-->
     <xacro:arg name="ground_gait" default="false"/>
+    <xacro:property name="ground_gait" value="$(arg ground_gait)"/>
 
 <!--    Switch between using the physical camera and the simulation camera -->
 <!--    If set to 'true', no physical camera is needed -->
