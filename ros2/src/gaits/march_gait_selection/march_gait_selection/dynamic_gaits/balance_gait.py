@@ -1,11 +1,10 @@
 from copy import deepcopy
 from threading import Event
 from typing import Tuple, Optional
-
 from march_utility.gait.gait import Gait
 from rclpy import Future
 from rclpy.node import Node
-from rclpy.duration import Duration
+from march_utility.utilities import Duration
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Header
 
@@ -30,8 +29,8 @@ class BalanceGait(GaitInterface):
         self._constructing = False
 
         self._current_subgait = None
-        self._current_subgait_duration = 0.0
-        self._time_since_start = 0.0
+        self._current_subgait_duration = Duration(0)
+        self._time_since_start = Duration(0)
 
         self.capture_point_event = Event()
         self.capture_point_result = None
@@ -82,7 +81,6 @@ class BalanceGait(GaitInterface):
         future = self._capture_point_service[leg_name].call_async(
             CapturePointPose.Request(duration=subgait_duration)
         )
-
         future.add_done_callback(self.capture_point_cb)
         return self.capture_point_event.wait(timeout=self.CAPTURE_POINT_SERVICE_TIMEOUT)
 
@@ -205,11 +203,8 @@ class BalanceGait(GaitInterface):
         self._time_since_start = 0.0
         trajectory = self.get_joint_trajectory_msg(self._current_subgait)
         time_from_start = trajectory.points[-1].time_from_start
-        self._current_subgait_duration = self.duration_to_sec(time_from_start)
+        self._current_subgait_duration = Duration.from_ros_duration(time_from_start)
         return trajectory
-
-    def duration_to_sec(self, duration: Duration) -> float:
-        return float(duration.sec) + (duration.nanosec * self.NANOSEC_TO_SEC)
 
     def update(self, elapsed_time: float) -> Tuple[Optional[JointTrajectory], bool]:
         self._time_since_start += elapsed_time
@@ -228,11 +223,11 @@ class BalanceGait(GaitInterface):
             trajectory = self.get_joint_trajectory_msg(next_subgait)
             self._current_subgait = next_subgait
             time_from_start = trajectory.points[-1].time_from_start
-            self._current_subgait_duration = self.duration_to_sec(time_from_start)
+            self._current_subgait_duration = Duration.from_ros_duration(time_from_start)
             self._time_since_start = 0.0
             self._constructing = False
             return trajectory, False
 
     def end(self):
         self._current_subgait = None
-        self._current_subgait_duration = 0.0
+        self._current_subgait_duration = Duration(0)
