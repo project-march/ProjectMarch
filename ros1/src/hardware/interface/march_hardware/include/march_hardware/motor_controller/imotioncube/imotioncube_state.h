@@ -7,7 +7,7 @@
 
 namespace march
 {
-class IMCStateOfOperation : public MotorControllerStateOfOperation
+class IMCStateOfOperation
 {
 public:
   enum Value
@@ -78,7 +78,7 @@ public:
     }
   }
 
-  std::string toString() override
+  std::string toString()
   {
     switch (this->value_)
     {
@@ -105,20 +105,6 @@ public:
     }
   }
 
-  bool operator==(Value v) const
-  {
-    return this->value_ == v;
-  }
-  bool operator==(IMCStateOfOperation a) const
-  {
-    return this->value_ == a.value_;
-  }
-  bool operator!=(IMCStateOfOperation a) const
-  {
-    return this->value_ != a.value_;
-  }
-
-private:
   Value value_;
 };
 class IMotionCubeState : public MotorControllerState
@@ -135,7 +121,8 @@ public:
                    std::string motion_error_description, std::string second_detailed_error_description)
       : MotorControllerState(motor_current, motor_voltage, absolute_angle_iu, incremental_angle_iu,
                              absolute_velocity_iu, incremental_velocity_iu, absolute_angle_rad, incremental_angle_rad,
-                             absolute_velocity_rad, incremental_velocity_rad, IMCStateOfOperation(status_word))
+                             absolute_velocity_rad, incremental_velocity_rad)
+      , state_of_operation_(IMCStateOfOperation(status_word))
       , motion_error_(motion_error)
       , detailed_error_(detailed_error)
       , second_detailed_error_(second_detailed_error)
@@ -144,9 +131,9 @@ public:
       , second_detailed_error_description_(second_detailed_error_description)
   {}
 
-  bool checkState() override
+  bool isOk() override
   {
-    return !(this->state_of_operation_ == march::IMCStateOfOperation::FAULT);
+    return state_of_operation_.value_ != march::IMCStateOfOperation::FAULT;
   }
 
   std::string getErrorStatus() override
@@ -161,6 +148,12 @@ public:
     return error_stream.str();
   }
 
+  std::string getOperationalState() override
+  {
+    return state_of_operation_.toString();
+  }
+
+  IMCStateOfOperation state_of_operation_;
   std::string motion_error_;
   std::string detailed_error_;
   std::string second_detailed_error_;
