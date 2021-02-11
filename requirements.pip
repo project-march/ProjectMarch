@@ -1,2 +1,3 @@
 pyqtgraph==0.11.0
 numpy_ringbuffer==0.2.1
+traceback==3.9.1
