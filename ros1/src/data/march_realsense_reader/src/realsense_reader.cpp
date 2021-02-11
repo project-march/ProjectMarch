@@ -6,7 +6,7 @@
 #include <std_srvs/Trigger.h>
 #include <pointcloud_processor/preprocessor.h>
 
-typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
+using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n):
@@ -30,8 +30,8 @@ void RealSenseReader::pointcloud_callback(const PointCloud::ConstPtr& msg)
     // All logic to execute with a pointcloud will be executed here.
     ROS_INFO_STREAM("Processing point cloud at time " << msg->header.stamp);
     reading_ = false;
-    std::shared_ptr<PointCloud> pointcloud = std::make_shared<PointCloud>(*msg);
-    std::shared_ptr<Normals> normals = std::make_shared<Normals>();
+    PointCloud::Ptr pointcloud = boost::make_shared<PointCloud>(*msg);
+    Normals::Ptr normals = boost::make_shared<Normals>();
     std::unique_ptr<SimplePreprocessor> preprocessor =
         std::make_unique<SimplePreprocessor>(config_file_, pointcloud, normals);
     preprocessor->preprocess();
