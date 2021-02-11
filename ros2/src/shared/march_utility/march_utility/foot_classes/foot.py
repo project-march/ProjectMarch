@@ -168,8 +168,8 @@ class Foot(object):
                 f"Distance to origin {transformed_distance_to_origin}."
             )
         # If the desired foot location is close to what is reachable,
-        # do a different calculation which assumes the leg is stretched
-        elif ll + ul <= transformed_distance_to_origin <= ll + ul + allowable_overshoot:
+        # do a calculation which assumes the leg is stretched
+        if ll + ul <= transformed_distance_to_origin <= ll + ul + allowable_overshoot:
             hfe = Foot.calculate_hfe_angle_straight_leg(transformed_x, transformed_z)
             kfe = 0
         # If neither is the case, do the normal hfe kfe calculation
@@ -188,7 +188,7 @@ class Foot(object):
     def calculate_hfe_angle_straight_leg(
         transformed_x: float, transformed_z: float
     ) -> float:
-        """Calculate the hfe angle assuming the leg is straight, makes no further assumptions about the leg length."""
+        """Calculate the hfe angle of a straight leg."""
         if transformed_x > 0:
             hfe = atan(abs(transformed_x / transformed_z))
         else:

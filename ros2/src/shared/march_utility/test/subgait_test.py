@@ -355,6 +355,7 @@ class SubgaitTest(unittest.TestCase):
         self.assertEqual(new_duration, new_subgait.duration)
 
     def test_prepare_subgaits_number_of_setpoints(self):
+        """The prepare subgaits method should give the same number of setpoints for all subgaits."""
         base_subgait, other_subgait = self.load_interpolatable_subgaits(
             "left_close",
             "MV_walk_leftclose_v1",
