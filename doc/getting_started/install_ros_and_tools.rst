@@ -23,7 +23,7 @@ The next step is to download the source code, you can either use ssh (recommende
 .. code:: bash
 
     cd ~/
-    git clone git@gitlab.com:project-march/march.git
+    git clone git@gitlab.com:project-march/march.git --recurse-submodules
     cd march/
     git lfs install
 
@@ -33,7 +33,7 @@ Or use https:
 .. code:: bash
 
     cd ~/
-    git clone https://gitlab.com/project-march/march.git
+    git clone https://gitlab.com/project-march/march.git --recurse-submodules
     cd march/
     git lfs install
 
@@ -161,4 +161,9 @@ Some additional python dependencies have to be installed using pip:
 .. code:: bash
 
     python3 -m pip install -r ~/march/requirements.pip
+
+Install RealSense dependencies
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+If you are planning to also use the Intel Realsense camera, you should also install the necessary packages for this:
+https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md#installing-the-packages.
 

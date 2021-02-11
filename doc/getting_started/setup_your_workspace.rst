@@ -104,6 +104,8 @@ In order to run the bridge, you have to source ROS1 and ROS2.
 
     source /opt/ros/noetic/local_setup.bash
     source /opt/ros/foxy/local_setup.bash
+    source ~/march/ros1/install/local_setup.bash
+    source ~/march/ros2/install/local_setup.bash
     cd ~/ros1_bridge
     source install/local_setup.bash
     export ROS_MASTER_URI=http://localhost:11311
