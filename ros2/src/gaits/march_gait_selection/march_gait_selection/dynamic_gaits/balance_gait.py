@@ -4,7 +4,7 @@ from typing import Tuple, Optional
 from march_utility.gait.gait import Gait
 from rclpy import Future
 from rclpy.node import Node
-from march_utility.utilities import Duration
+from march_utility.utilities.duration import Duration
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Header
 
@@ -18,7 +18,6 @@ class BalanceGait(GaitInterface):
 
     CAPTURE_POINT_SERVICE_TIMEOUT = 1.0
     MOVEIT_INTERFACE_SERVICE_TIMEOUT = 1.0
-    NANOSEC_TO_SEC = 1e-9
 
     def __init__(
         self, node: Node, gait_name: str = "balanced_walk", default_walk: Gait = None
@@ -127,6 +126,11 @@ class BalanceGait(GaitInterface):
 
         :return: the balance trajectory
         """
+        if swing_leg not in ["right_leg", "left_leg"]:
+            self._node.get_logger().warn(f"Swing leg was not one of the possible legs "
+                                         f"(left_leg or right_leg), but {swing_leg}, "
+                                         f"using default walk instead")
+            return self.default_walk[subgait_name].to_joint_trajectory_msg()
         stance_leg = "right_leg" if swing_leg == "left_leg" else "left_leg"
         capture_point_success = self.compute_swing_leg_target(swing_leg, subgait_name)
         if not capture_point_success:
@@ -200,13 +204,13 @@ class BalanceGait(GaitInterface):
 
     def start(self) -> JointTrajectory:
         self._current_subgait = self._default_walk.graph.start_subgaits()[0]
-        self._time_since_start = 0.0
+        self._time_since_start = Duration(0)
         trajectory = self.get_joint_trajectory_msg(self._current_subgait)
         time_from_start = trajectory.points[-1].time_from_start
         self._current_subgait_duration = Duration.from_ros_duration(time_from_start)
         return trajectory
 
-    def update(self, elapsed_time: float) -> Tuple[Optional[JointTrajectory], bool]:
+    def update(self, elapsed_time: Duration) -> Tuple[Optional[JointTrajectory], bool]:
         self._time_since_start += elapsed_time
         if self._time_since_start < self._current_subgait_duration:
             return None, False
@@ -224,7 +228,7 @@ class BalanceGait(GaitInterface):
             self._current_subgait = next_subgait
             time_from_start = trajectory.points[-1].time_from_start
             self._current_subgait_duration = Duration.from_ros_duration(time_from_start)
-            self._time_since_start = 0.0
+            self._time_since_start = Duration(0)
             self._constructing = False
             return trajectory, False
 

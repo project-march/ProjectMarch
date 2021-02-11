@@ -1,4 +1,3 @@
-from control_msgs.msg import JointTolerance
 from std_msgs.msg import Header
 from actionlib_msgs.msg import GoalID
 from march_shared_msgs.msg import (

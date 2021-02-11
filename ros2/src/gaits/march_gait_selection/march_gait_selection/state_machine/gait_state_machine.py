@@ -2,7 +2,6 @@ from gazebo_msgs.msg import ContactsState
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
 from march_utility.utilities.duration import Duration
 from rclpy.callback_groups import ReentrantCallbackGroup
-from rclpy.duration import Duration
 from std_msgs.msg import Header
 from std_srvs.srv import Trigger
 
