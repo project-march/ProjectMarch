@@ -52,7 +52,7 @@ public:
    * that information on a topic
    */
   void updateCommand(const ros::Time& /*time*/, const ros::Duration& period,
-                     const joint_trajectory_controller::State& /*desired state*/,
+                     const joint_trajectory_controller::State& desired_state,
                      const joint_trajectory_controller::State& state_error);
 
   /**

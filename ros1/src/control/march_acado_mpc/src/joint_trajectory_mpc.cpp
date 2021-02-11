@@ -35,7 +35,7 @@ void ModelPredictiveControllerInterface::starting(const ros::Time& /*time*/)
 }
 
 void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/, const ros::Duration& period,
-                   const joint_trajectory_controller::State& /*desired state*/,
+                   const joint_trajectory_controller::State& desired_state,
                    const joint_trajectory_controller::State& state_error)
 {
   num_joints_ = joint_handles_ptr_->size();
@@ -63,6 +63,8 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
     (*joint_handles_ptr_)[i].setCommand(command);
 
     std::cout << "MPC command: " << command << std::endl;
+    std::cout << "desired state:" << desired_state.position[i] << std::endl;
+    std::cout << "period:" << period << std::endl;
   }
 
 }
