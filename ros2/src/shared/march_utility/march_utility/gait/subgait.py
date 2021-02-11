@@ -603,6 +603,7 @@ class Subgait(object):
     def prepare_subgaits_for_inverse_kinematics(
         base_subgait: Subgait, other_subgait: Subgait
     ) -> Tuple[List[dict], List[dict]]:
+        """Create two lists of setpoints to interpolate where the time stamps of the lists are the same."""
         base_to_other_duration_ratio = base_subgait.duration / other_subgait.duration
         base_time_stamps = base_subgait.get_unique_timestamps_unsorted()
         other_time_stamps = other_subgait.get_unique_timestamps_unsorted()
@@ -629,9 +630,9 @@ class Subgait(object):
     def prepare_subgait_for_inverse_kinematics(
         subgait: Subgait, time_stamps: Set[Duration]
     ) -> List[dict]:
-
+        """Create a list of setpoints from a subgait where the timestamps of the setpoints are given by time_stamps."""
         setpoints_to_interpolate: List[dict] = [{} for _ in time_stamps]
-        print(time_stamps)
+
         for setpoint_index, time in enumerate(time_stamps):
             for joint in subgait.joints:
                 setpoint_to_add = subgait.get_joint(
@@ -639,7 +640,6 @@ class Subgait(object):
                 ).get_interpolated_setpoint(time)
                 setpoints_to_interpolate[setpoint_index][joint.name] = setpoint_to_add
 
-        print(setpoints_to_interpolate)
         return setpoints_to_interpolate
 
     @staticmethod

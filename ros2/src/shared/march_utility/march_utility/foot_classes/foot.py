@@ -188,6 +188,7 @@ class Foot(object):
     def calculate_hfe_angle_straight_leg(
         transformed_x: float, transformed_z: float
     ) -> float:
+        """Calculate the hfe angle assuming the leg is straight, makes no further assumptions about the leg length."""
         if transformed_x > 0:
             hfe = atan(abs(transformed_x / transformed_z))
         else:
