@@ -603,7 +603,7 @@ class Subgait(object):
     def prepare_subgaits_for_inverse_kinematics(
         base_subgait: Subgait, other_subgait: Subgait
     ) -> Tuple[List[dict], List[dict]]:
-        """Create two lists of setpoints with equal time stamps"""
+        """Create two lists of setpoints with equal time stamps."""
         base_to_other_duration_ratio = base_subgait.duration / other_subgait.duration
         base_time_stamps = base_subgait.get_unique_timestamps_unsorted()
         other_time_stamps = other_subgait.get_unique_timestamps_unsorted()
