@@ -1,0 +1,14 @@
+Header header
+string[] joint_names
+string[] error_status
+string[] operational_state
+float32[] motor_current
+float32[] motor_voltage
+float32[] absolute_angle_iu
+float32[] incremental_angle_iu
+float32[] absolute_velocity_iu
+float32[] incremental_velocity_iu
+float32[] absolute_angle_rad
+float32[] incremental_angle_rad
+float32[] absolute_velocity_rad
+float32[] incremental_velocity_rad

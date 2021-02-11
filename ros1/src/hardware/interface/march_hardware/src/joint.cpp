@@ -3,6 +3,7 @@
 #include "march_hardware/joint.h"
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/error/motion_error.h"
+#include <march_hardware/motor_controller/motor_controller_state.h>
 
 #include <ros/ros.h>
 
@@ -223,9 +224,9 @@ float Joint::getTemperature()
   return this->temperature_ges_->getTemperature();
 }
 
-IMotionCubeState Joint::getIMotionCubeState()
+std::unique_ptr<MotorControllerState> Joint::getMotorControllerState()
 {
-  return this->imc_->getState();
+  return std::move(imc_->getState());
 }
 
 void Joint::setAllowActuation(bool allow_actuation)

@@ -10,7 +10,7 @@
 #include <march_hardware/motor_controller/imotioncube/imotioncube.h>
 #include <march_hardware/power/power_distribution_board.h>
 #include <march_hardware/temperature/temperature_ges.h>
-#include <march_hardware/motor_controller/imotioncube/imotioncube_state.h>
+#include <march_hardware/motor_controller/motor_controller_state.h>
 
 namespace march
 {
@@ -64,7 +64,7 @@ public:
   double getVelocityIUAbsolute();
   double getVelocityIUIncremental();
   float getTemperature();
-  IMotionCubeState getIMotionCubeState();
+  std::unique_ptr<MotorControllerState> getMotorControllerState();
 
   std::string getName() const;
   int getTemperatureGESSlaveIndex() const;

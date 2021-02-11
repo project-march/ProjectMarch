@@ -1,6 +1,7 @@
 // Copyright 2018 Project March.
 #include "march_hardware/motor_controller/imotioncube/imotioncube.h"
 #include "march_hardware/motor_controller/imotioncube/imotioncube_state.h"
+#include <march_hardware/motor_controller/motor_controller_state.h>
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/error/motion_error.h"
 #include "march_hardware/ethercat/pdo_types.h"
@@ -503,33 +504,33 @@ ActuationMode IMotionCube::getActuationMode() const
   return this->actuation_mode_;
 }
 
-IMotionCubeState IMotionCube::getState()
+std::unique_ptr<MotorControllerState> IMotionCube::getState()
 {
-  IMotionCubeState state;
+  auto state = std::make_unique<IMotionCubeState>();
 
   std::bitset<16> motionErrorBits = this->getMotionError();
-  state.motion_error_ = motionErrorBits.to_string();
+  state->motion_error_ = motionErrorBits.to_string();
   std::bitset<16> detailedErrorBits = this->getDetailedError();
-  state.detailed_error_ = detailedErrorBits.to_string();
+  state->detailed_error_ = detailedErrorBits.to_string();
   std::bitset<16> secondDetailedErrorBits = this->getSecondDetailedError();
-  state.second_detailed_error_ = secondDetailedErrorBits.to_string();
+  state->second_detailed_error_ = secondDetailedErrorBits.to_string();
 
-  state.state_of_operation_ = IMCStateOfOperation(this->getStatusWord());
+  state->state_of_operation_ = IMCStateOfOperation(this->getStatusWord());
 
-  state.motion_error_description_ = error::parseError(this->getMotionError(), error::ErrorRegisters::MOTION_ERROR);
-  state.detailed_error_description_ =
+  state->motion_error_description_ = error::parseError(this->getMotionError(), error::ErrorRegisters::MOTION_ERROR);
+  state->detailed_error_description_ =
       error::parseError(this->getDetailedError(), error::ErrorRegisters::DETAILED_ERROR);
-  state.second_detailed_error_description_ =
+  state->second_detailed_error_description_ =
       error::parseError(this->getSecondDetailedError(), error::ErrorRegisters::SECOND_DETAILED_ERROR);
 
-  state.motor_current_ = this->getMotorCurrent();
-//  state.IMCVoltage_ = this->getIMCVoltage();
-  state.motor_voltage_ = this->getMotorVoltage();
+  state->motor_current_ = this->getMotorCurrent();
+//  state->IMCVoltage_ = this->getIMCVoltage();
+  state->motor_voltage_ = this->getMotorVoltage();
 
-//  state.absolute_encoderValue = this->getAngleIUAbsolute();
-//  state.incremental_encoderValue = this->getAngleIUIncremental();
-//  state.absoluteVelocity = this->getVelocityIUAbsolute();
-//  state.incrementalVelocity = this->getVelocityIUIncremental();
+//  state->absolute_encoderValue = this->getAngleIUAbsolute();
+//  state->incremental_encoderValue = this->getAngleIUIncremental();
+//  state->absoluteVelocity = this->getVelocityIUAbsolute();
+//  state->incrementalVelocity = this->getVelocityIUIncremental();
 
   return state;
 }
