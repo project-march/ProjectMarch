@@ -225,35 +225,7 @@ float Joint::getTemperature()
 
 IMotionCubeState Joint::getIMotionCubeState()
 {
-  IMotionCubeState states;
-
-  std::bitset<16> statusWordBits = this->imc_->getStatusWord();
-  states.statusWord = statusWordBits.to_string();
-  std::bitset<16> motionErrorBits = this->imc_->getMotionError();
-  states.motionError = motionErrorBits.to_string();
-  std::bitset<16> detailedErrorBits = this->imc_->getDetailedError();
-  states.detailedError = detailedErrorBits.to_string();
-  std::bitset<16> secondDetailedErrorBits = this->imc_->getSecondDetailedError();
-  states.secondDetailedError = secondDetailedErrorBits.to_string();
-
-  states.state = IMCState(this->imc_->getStatusWord());
-
-  states.motionErrorDescription = error::parseError(this->imc_->getMotionError(), error::ErrorRegisters::MOTION_ERROR);
-  states.detailedErrorDescription =
-      error::parseError(this->imc_->getDetailedError(), error::ErrorRegisters::DETAILED_ERROR);
-  states.secondDetailedErrorDescription =
-      error::parseError(this->imc_->getSecondDetailedError(), error::ErrorRegisters::SECOND_DETAILED_ERROR);
-
-  states.motorCurrent = this->imc_->getMotorCurrent();
-  states.IMCVoltage = this->imc_->getIMCVoltage();
-  states.motorVoltage = this->imc_->getMotorVoltage();
-
-  states.absoluteEncoderValue = this->imc_->getAngleIUAbsolute();
-  states.incrementalEncoderValue = this->imc_->getAngleIUIncremental();
-  states.absoluteVelocity = this->imc_->getVelocityIUAbsolute();
-  states.incrementalVelocity = this->imc_->getVelocityIUIncremental();
-
-  return states;
+  return this->imc_->getState();
 }
 
 void Joint::setAllowActuation(bool allow_actuation)

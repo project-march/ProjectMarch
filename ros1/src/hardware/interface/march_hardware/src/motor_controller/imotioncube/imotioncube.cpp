@@ -1,5 +1,6 @@
 // Copyright 2018 Project March.
 #include "march_hardware/motor_controller/imotioncube/imotioncube.h"
+#include "march_hardware/motor_controller/imotioncube/imotioncube_state.h"
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/error/motion_error.h"
 #include "march_hardware/ethercat/pdo_types.h"
@@ -328,7 +329,7 @@ void IMotionCube::goToTargetState(IMotionCubeTargetState target_state)
     ROS_INFO_DELAYED_THROTTLE(5, "\tWaiting for '%s': %s", target_state.getDescription().c_str(),
                               std::bitset<16>(this->getStatusWord()).to_string().c_str());
     if (target_state.getState() == IMotionCubeTargetState::OPERATION_ENABLED.getState() &&
-        IMCState(this->getStatusWord()) == IMCState::FAULT)
+        IMCStateOfOperation(this->getStatusWord()) == IMCStateOfOperation::FAULT)
     {
       ROS_FATAL("IMotionCube went to fault state while attempting to go to '%s'. Shutting down.",
                 target_state.getDescription().c_str());
@@ -500,5 +501,36 @@ void IMotionCube::downloadSetupToDrive(SdoSlaveInterface& sdo)
 ActuationMode IMotionCube::getActuationMode() const
 {
   return this->actuation_mode_;
+}
+
+IMotionCubeState IMotionCube::getState()
+{
+  IMotionCubeState state;
+
+  std::bitset<16> motionErrorBits = this->getMotionError();
+  state.motion_error_ = motionErrorBits.to_string();
+  std::bitset<16> detailedErrorBits = this->getDetailedError();
+  state.detailed_error_ = detailedErrorBits.to_string();
+  std::bitset<16> secondDetailedErrorBits = this->getSecondDetailedError();
+  state.second_detailed_error_ = secondDetailedErrorBits.to_string();
+
+  state.state_of_operation_ = IMCStateOfOperation(this->getStatusWord());
+
+  state.motion_error_description_ = error::parseError(this->getMotionError(), error::ErrorRegisters::MOTION_ERROR);
+  state.detailed_error_description_ =
+      error::parseError(this->getDetailedError(), error::ErrorRegisters::DETAILED_ERROR);
+  state.second_detailed_error_description_ =
+      error::parseError(this->getSecondDetailedError(), error::ErrorRegisters::SECOND_DETAILED_ERROR);
+
+  state.motor_current_ = this->getMotorCurrent();
+//  state.IMCVoltage_ = this->getIMCVoltage();
+  state.motor_voltage_ = this->getMotorVoltage();
+
+//  state.absolute_encoderValue = this->getAngleIUAbsolute();
+//  state.incremental_encoderValue = this->getAngleIUIncremental();
+//  state.absoluteVelocity = this->getVelocityIUAbsolute();
+//  state.incrementalVelocity = this->getVelocityIUIncremental();
+
+  return state;
 }
 }  // namespace march

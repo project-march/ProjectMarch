@@ -2,7 +2,7 @@
 
 #ifndef MARCH_HARDWARE_IMOTIONCUBE_H
 #define MARCH_HARDWARE_IMOTIONCUBE_H
-#include "actuation_mode.h"
+#include "march_hardware/motor_controller/actuation_mode.h"
 #include "march_hardware/ethercat/pdo_map.h"
 #include "march_hardware/ethercat/pdo_types.h"
 #include "march_hardware/ethercat/sdo_interface.h"
@@ -66,6 +66,8 @@ public:
   virtual float getMotorVoltage();
 
   void setControlWord(uint16_t control_word);
+
+  IMotionCubeState getState();
 
   virtual void actuateRad(double target_rad);
   virtual void actuateTorque(int16_t target_torque);
