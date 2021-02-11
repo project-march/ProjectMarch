@@ -23,6 +23,7 @@ private:
     ros::Subscriber pointcloud_subscriber_;
     ros::ServiceServer read_pointcloud_service_;
     bool reading_;
+    std::string config_file_;
 };
 
 #endif //MARCH_REALSENSE_READER_HPP

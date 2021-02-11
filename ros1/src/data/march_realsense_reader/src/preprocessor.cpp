@@ -1,5 +1,6 @@
 #include <pointcloud_processor/preprocessor.h>
 #include "yaml-cpp/yaml.h"
+#include <ros/ros.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -23,10 +24,11 @@ Preprocessor::Preprocessor(
 {
   std::string path = ros::package::getPath("march_realsense_reader") +
       "/config/" + file_name;
-  config_tree_ = YAML::LoadFile(path);
+  config_tree_ = YAML::LoadFile(path)["preprocessor"];
 }
 
 void SimplePreprocessor::preprocess()
 {
-
+  ROS_INFO_STREAM("Preprocessing, test_parameter is " <<
+  config_tree_["test_parameter"]);
 }

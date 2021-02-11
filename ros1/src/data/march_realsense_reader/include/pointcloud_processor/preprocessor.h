@@ -22,14 +22,14 @@ class Preprocessor {
     // any preprocessor
     virtual ~Preprocessor() {};
 
-  private:
     std::shared_ptr<PointCloud> pointcloud_;
     std::shared_ptr<Normals> normal_pointcloud_;
     YAML::Node config_tree_;
 };
 
 class SimplePreprocessor : Preprocessor {
-public:
+  public:
+    using Preprocessor::Preprocessor; //Use the constructors defined in the super class
     void preprocess();
 };
 
