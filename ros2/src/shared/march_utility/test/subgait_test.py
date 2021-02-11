@@ -355,10 +355,13 @@ class SubgaitTest(unittest.TestCase):
         self.assertEqual(new_duration, new_subgait.duration)
 
     def test_prepare_subgaits_number_of_setpoints(self):
-        base_subgait, other_subgait = self.load_interpolatable_subgaits("left_close",
-                                                                        "MV_walk_leftclose_v1",
-                                                                        "MV_walk_leftclose_inverse_kinematics_v2")
-        base_setpoints, other_setpoints = Subgait.prepare_subgaits_for_inverse_kinematics(base_subgait, other_subgait)
+        base_subgait, other_subgait = self.load_interpolatable_subgaits(
+            "left_close",
+            "MV_walk_leftclose_v1",
+            "MV_walk_leftclose_inverse_kinematics_v2",
+        )
+        (
+            base_setpoints,
+            other_setpoints,
+        ) = Subgait.prepare_subgaits_for_inverse_kinematics(base_subgait, other_subgait)
         self.assertEqual(len(base_setpoints), len(other_setpoints))
-
-

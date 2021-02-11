@@ -575,8 +575,12 @@ class Subgait(object):
                 new_setpoints[joint_name].append(setpoints_to_add[joint_name])
             # fill the ankle joint using the angle based linear interpolation
             for ankle_joint in ["left_ankle", "right_ankle"]:
-                base_setpoint = base_setpoints_to_interpolate[setpoint_index][ankle_joint]
-                other_setpoint = other_setpoints_to_interpolate[setpoint_index][ankle_joint]
+                base_setpoint = base_setpoints_to_interpolate[setpoint_index][
+                    ankle_joint
+                ]
+                other_setpoint = other_setpoints_to_interpolate[setpoint_index][
+                    ankle_joint
+                ]
                 new_ankle_setpoint_to_add = Setpoint.interpolate_setpoints(
                     base_setpoint, other_setpoint, parameter
                 )
@@ -630,7 +634,9 @@ class Subgait(object):
         print(time_stamps)
         for setpoint_index, time in enumerate(time_stamps):
             for joint in subgait.joints:
-                setpoint_to_add = subgait.get_joint(joint.name).get_interpolated_setpoint(time)
+                setpoint_to_add = subgait.get_joint(
+                    joint.name
+                ).get_interpolated_setpoint(time)
                 setpoints_to_interpolate[setpoint_index][joint.name] = setpoint_to_add
 
         print(setpoints_to_interpolate)

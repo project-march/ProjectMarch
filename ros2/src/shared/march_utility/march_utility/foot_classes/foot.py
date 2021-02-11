@@ -174,7 +174,9 @@ class Foot(object):
             kfe = 0
         # If neither is the case, do the normal hfe kfe calculation
         else:
-            hfe, kfe = Foot.calculate_hfe_kfe_angles(transformed_x, transformed_z, ul, ll)
+            hfe, kfe = Foot.calculate_hfe_kfe_angles(
+                transformed_x, transformed_z, ul, ll
+            )
 
         return {
             foot_side.value + "_hip_aa": Setpoint(time, haa),
@@ -183,11 +185,13 @@ class Foot(object):
         }
 
     @staticmethod
-    def calculate_hfe_angle_straight_leg(transformed_x: float, transformed_z: float) -> float:
+    def calculate_hfe_angle_straight_leg(
+        transformed_x: float, transformed_z: float
+    ) -> float:
         if transformed_x > 0:
             hfe = atan(abs(transformed_x / transformed_z))
         else:
-            hfe = - atan(abs(transformed_x / transformed_z))
+            hfe = -atan(abs(transformed_x / transformed_z))
         return hfe
 
     @staticmethod
