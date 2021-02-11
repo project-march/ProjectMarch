@@ -11,6 +11,7 @@
 #include "imotioncube_target_state.h"
 #include "march_hardware/encoder/absolute_encoder.h"
 #include "march_hardware/encoder/incremental_encoder.h"
+#include <march_hardware/motor_controller/motor_controller_state.h>
 
 #include <memory>
 #include <unordered_map>
@@ -67,7 +68,7 @@ public:
 
   void setControlWord(uint16_t control_word);
 
-  IMotionCubeState getState();
+  std::unique_ptr<MotorControllerState> getState();
 
   virtual void actuateRad(double target_rad);
   virtual void actuateTorque(int16_t target_torque);

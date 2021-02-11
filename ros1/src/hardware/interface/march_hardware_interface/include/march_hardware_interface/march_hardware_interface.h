@@ -88,7 +88,7 @@ private:
   void updateIMotionCubeState();
   void updatePressureSoleData();
   void outsideLimitsCheck(size_t joint_index);
-  bool iMotionCubeStateCheck(size_t joint_index);
+  bool MotorControllerStateCheck(size_t joint_index);
   static void getSoftJointLimitsError(const std::string& name, const urdf::JointConstSharedPtr& urdf_joint,
                                       joint_limits_interface::SoftJointLimits& error_soft_limits);
 
