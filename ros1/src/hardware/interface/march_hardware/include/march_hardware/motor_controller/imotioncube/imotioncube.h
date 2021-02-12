@@ -54,13 +54,13 @@ public:
   double getVelocityIUIncremental();
   virtual double getVelocityRadAbsolute();
   virtual double getVelocityRadIncremental();
-
   uint16_t getStatusWord();
   uint16_t getMotionError();
   uint16_t getDetailedError();
   uint16_t getSecondDetailedError();
 
   ActuationMode getActuationMode() const;
+  unsigned int getActuationModeNumber() const;
 
   virtual float getMotorCurrent();
   virtual float getIMCVoltage();

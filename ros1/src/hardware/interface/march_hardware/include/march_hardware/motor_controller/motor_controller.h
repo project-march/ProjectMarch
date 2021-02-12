@@ -22,13 +22,13 @@ public:
   double getVelocity();
   virtual double getTorque() = 0;
 
-  virtual ActuationMode getActuationMode() const = 0;
+  ActuationMode getActuationMode() const;
 
-  /**
-   * Getter for the slave index.
-   * @return slave index if the motor controller is an ethercat slave, else -1
+  /*
+   * Transform the ActuationMode to a number that is understood by the MotorController
+   * @return the mode number that belong to the ActuationMode
    */
-  virtual int getSlaveIndex() const = 0;
+  virtual unsigned int getActuationModeNumber() const = 0;
 
   virtual float getMotorCurrent() = 0;
 //  virtual float getMotorControllerVoltage() = 0;
