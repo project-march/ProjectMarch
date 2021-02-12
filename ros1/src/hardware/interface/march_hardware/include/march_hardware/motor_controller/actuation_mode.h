@@ -45,20 +45,6 @@ public:
       this->value_ = ActuationMode::unknown;
     }
   }
-
-  uint8_t toModeNumber()
-  {
-    switch (this->value_)
-    {
-      case position:
-        return 8;
-      case torque:
-        return 10;
-      default:
-        return 0;
-    }
-  }
-
   int getValue() const
   {
     return this->value_;

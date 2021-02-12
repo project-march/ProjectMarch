@@ -8,7 +8,8 @@
 namespace march
 {
 MotorController::MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                                 std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode)
+                                 std::unique_ptr<IncrementalEncoder> incremental_encoder,
+                                 ActuationMode actuation_mode)
   : Slave(slave)
   , absolute_encoder_(std::move(absolute_encoder))
   , incremental_encoder_(std::move(incremental_encoder))
@@ -19,5 +20,10 @@ MotorController::MotorController(const Slave& slave, std::unique_ptr<AbsoluteEnc
 bool MotorController::isIncrementalEncoderMorePrecise() const
 {
   return incremental_encoder_->getRadPerBit() < absolute_encoder_->getRadPerBit();
+}
+
+ActuationMode MotorController::getActuationMode() const
+{
+  return actuation_mode_;
 }
 }

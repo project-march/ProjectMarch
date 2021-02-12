@@ -6,6 +6,8 @@
 #include "march_hardware/error/motion_error.h"
 #include "march_hardware/ethercat/pdo_types.h"
 
+#include "march_hardware/motor_controller/actuation_mode.h"
+
 #include <bitset>
 #include <memory>
 #include <stdexcept>
@@ -111,7 +113,7 @@ bool IMotionCube::writeInitialSettings(SdoSlaveInterface& sdo, int cycle_time)
   }
 
   // mode of operation
-  int mode_of_op = sdo.write(0x6060, 0, this->actuation_mode_.toModeNumber());
+  int mode_of_op = sdo.write(0x6060, 0, getActuationModeNumber());
 
   // position limit -- min position
   int min_pos_lim = sdo.write(0x607D, 1, this->absolute_encoder_->getLowerSoftLimitIU());
@@ -504,6 +506,19 @@ ActuationMode IMotionCube::getActuationMode() const
   return this->actuation_mode_;
 }
 
+unsigned int IMotionCube::getActuationModeNumber() const
+{
+  switch(this->actuation_mode_.getValue())
+  {
+    case ActuationMode::position:
+      return 8;
+     case ActuationMode::torque:
+       return 10;
+     default:
+       return 0;
+  }
+}
+
 std::unique_ptr<MotorControllerState> IMotionCube::getState()
 {
   auto state = std::make_unique<IMotionCubeState>();
@@ -527,10 +542,15 @@ std::unique_ptr<MotorControllerState> IMotionCube::getState()
 //  state->IMCVoltage_ = this->getIMCVoltage();
   state->motor_voltage_ = this->getMotorVoltage();
 
-//  state->absolute_encoderValue = this->getAngleIUAbsolute();
-//  state->incremental_encoderValue = this->getAngleIUIncremental();
-//  state->absoluteVelocity = this->getVelocityIUAbsolute();
-//  state->incrementalVelocity = this->getVelocityIUIncremental();
+  state->absolute_angle_iu_ = this->getAngleIUAbsolute();
+  state->incremental_angle_iu_ = this->getAngleIUIncremental();
+  state->absolute_velocity_iu_ = this->getVelocityIUAbsolute();
+  state->incremental_velocity_iu_ = this->getVelocityIUIncremental();
+
+  state->absolute_angle_rad_ = getAngleRadAbsolute();
+  state->incremental_angle_rad_ = getAngleRadIncremental();
+  state->absolute_velocity_rad_ = getVelocityRadAbsolute();
+  state->incremental_velocity_rad_ = getVelocityRadIncremental();
 
   return state;
 }
