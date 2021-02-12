@@ -10,7 +10,7 @@
 #include <urdf/model.h>
 #include <yaml-cpp/yaml.h>
 
-#include <march_hardware/motor_controller/imotioncube/actuation_mode.h>
+#include <march_hardware/motor_controller/actuation_mode.h>
 #include <march_hardware/encoder/absolute_encoder.h>
 #include <march_hardware/encoder/incremental_encoder.h>
 #include <march_hardware/ethercat/pdo_interface.h>

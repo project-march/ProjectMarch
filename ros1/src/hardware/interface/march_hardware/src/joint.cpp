@@ -311,7 +311,7 @@ bool Joint::receivedDataUpdate()
 
 ActuationMode Joint::getActuationMode() const
 {
-  return this->imc_->getActuationMode();
+  return imc_->getActuationMode();
 }
 
 }  // namespace march
