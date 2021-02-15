@@ -13,8 +13,13 @@ using namespace std;
 ACADOvariables acadoVariables = {};
 ACADOworkspace acadoWorkspace = {};
 
-void ModelPredictiveController::init() {
+ModelPredictiveController::ModelPredictiveController(std::vector<std::vector<float>> Q)
+    : Q_(Q)
+{
+}
 
+void ModelPredictiveController::init()
+{
   // Initialize the solver
   acado_initializeSolver();
 

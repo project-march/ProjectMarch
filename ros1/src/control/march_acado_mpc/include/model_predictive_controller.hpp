@@ -8,6 +8,8 @@ using namespace std;
 class ModelPredictiveController {
 
 public:
+    ModelPredictiveController(std::vector<std::vector<float>> Q);
+
     // Public variables
     vector<double> x0{0,0}; // Current state
     double u;               // Calculated control input
@@ -30,6 +32,8 @@ public:
      */
     void calculateControlInput();
 
+private:
+  std::vector<std::vector<float>> Q_;
 };
 
 #endif

@@ -61,6 +61,13 @@ public:
   void stopping(const ros::Time& /*time*/);
 
 private:
+  /**
+   * @brief Retrieve the Q matrix from the parameter server for a joint.
+   * @param joint_name Joint to retrieve Q Matrix for
+   * @return Returns a 2d vector: The Q Matrix.
+   */
+  std::vector<std::vector<float>> getQMatrix(std::string joint_name);
+
   std::vector<hardware_interface::JointHandle>* joint_handles_ptr_;
 
   unsigned int num_joints_;
