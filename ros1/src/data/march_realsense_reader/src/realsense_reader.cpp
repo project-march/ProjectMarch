@@ -23,7 +23,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
   config_file_ = "pointcloud_parameters.yaml";
 }
 
-void RealSenseReader::pointcloud_callback(const PointCloud::ConstPtr& msg)
+void RealSenseReader::pointcloud_callback(const PointCloud::ConstPtr& input_cloud)
 {
   if (reading_)
   {
