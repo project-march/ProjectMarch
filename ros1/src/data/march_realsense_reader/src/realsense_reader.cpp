@@ -28,9 +28,9 @@ void RealSenseReader::pointcloud_callback(const PointCloud::ConstPtr& input_clou
   if (reading_)
   {
     // All logic to execute with a pointcloud will be executed here.
-    ROS_INFO_STREAM("Processing point cloud at time " << msg->header.stamp);
+    ROS_INFO_STREAM("Processing point cloud at time " << input_cloud->header.stamp);
     reading_ = false;
-    PointCloud::Ptr pointcloud = boost::make_shared<PointCloud>(*msg);
+    PointCloud::Ptr pointcloud = boost::make_shared<PointCloud>(*input_cloud);
     Normals::Ptr normals = boost::make_shared<Normals>();
     std::unique_ptr<SimplePreprocessor> preprocessor =
         std::make_unique<SimplePreprocessor>(config_file_, pointcloud, normals);
