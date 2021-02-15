@@ -14,7 +14,7 @@ class RealSenseReader
 {
 public:
     RealSenseReader(ros::NodeHandle* n);
-    void pointcloud_callback(const PointCloud::ConstPtr& msg);
+    void pointcloud_callback(const PointCloud::ConstPtr& input_cloud);
     bool read_pointcloud_callback(std_srvs::Trigger::Request &req,
                                   std_srvs::Trigger::Response &res);
 
