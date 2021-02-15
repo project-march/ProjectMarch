@@ -21,6 +21,9 @@ bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::Jo
     model_predictive_controllers_[i].init();
   }
 
+  pub_->init(nh, "/march/mpc/command", 4);
+  command_msg_.data.resize(num_joints_);
+
   return true;
 }
 
