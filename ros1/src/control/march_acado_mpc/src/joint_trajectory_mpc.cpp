@@ -22,10 +22,9 @@ bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::Jo
   }
 
   // Initialize the place where the MPC command will be published
-  pub_->init(nh, "/march/mpc/command", 4);
-  command_msg_.data.resize(num_joints_);
-  std::cout << "Got to pub" << std::endl;
 
+  command_pub_ = std::make_unique<realtime_tools::RealtimePublisher<std_msgs::Float64MultiArray>>(nh, "/march/mpc/command", 10);
+  command_pub_->msg_.data.resize(num_joints_);
   return true;
 }
 
@@ -94,9 +93,17 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
 
     // Apply command
     (*joint_handles_ptr_)[i].setCommand(command);
+
+    // Publish command
+    if (!command_pub_->trylock())
+    {
+        return;
+    }
+    command_pub_->msg_.data[i] = command;
   }
 
-}
+  command_pub_->unlockAndPublish();
+  }
 
 void ModelPredictiveControllerInterface::stopping(const ros::Time& /*time*/)
 {

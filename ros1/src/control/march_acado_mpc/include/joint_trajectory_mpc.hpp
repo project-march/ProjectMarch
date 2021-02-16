@@ -78,10 +78,7 @@ private:
   std::vector<ModelPredictiveController> model_predictive_controllers_;
   vector<double> state;
 
-  std_msgs::Float64MultiArray command_msg_;
-  std::unique_ptr<realtime_tools::RealtimePublisher<std_msgs::Float64MultiArray>> pub_;
-//  realtime_tools::RealtimeP
-
+  std::unique_ptr<realtime_tools::RealtimePublisher<std_msgs::Float64MultiArray>> command_pub_;
 };
 
 // Assign an alias to the class definition
