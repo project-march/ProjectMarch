@@ -33,8 +33,8 @@ void RealSenseReader::pointcloud_callback(const PointCloud::ConstPtr& input_clou
     PointCloud::Ptr pointcloud = boost::make_shared<PointCloud>(*input_cloud);
     Normals::Ptr normals = boost::make_shared<Normals>();
 
-    std::unique_ptr<NormalPreprocessor> preprocessor =
-        std::make_unique<NormalPreprocessor>(config_file_, pointcloud, normals);
+    std::unique_ptr<SimplePreprocessor> preprocessor =
+        std::make_unique<SimplePreprocessor>(config_file_, pointcloud, normals);
     preprocessor->preprocess();
   }
 }

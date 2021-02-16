@@ -33,4 +33,10 @@ class SimplePreprocessor : Preprocessor {
     void preprocess();
 };
 
+class NormalPreprocessor : Preprocessor {
+public:
+  using Preprocessor::Preprocessor; //Use the constructors defined in the super class
+  void preprocess();
+};
+
 #endif //MARCH_PREPROCESSOR_H
