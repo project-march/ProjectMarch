@@ -18,9 +18,11 @@ public:
   MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
                   std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
 
-  double getAngle();
+  double getPosition();
   double getVelocity();
-  virtual double getTorque() = 0;
+  double getPosition(bool absolute);
+  double getVelocity(bool absolute);
+  virtual int16_t getTorque() = 0;
 
   ActuationMode getActuationMode() const;
 
@@ -30,22 +32,24 @@ public:
    */
   virtual unsigned int getActuationModeNumber() const = 0;
 
-  virtual float getMotorCurrent() = 0;
-//  virtual float getMotorControllerVoltage() = 0;
-  virtual float getMotorVoltage() = 0;
-
-  virtual void actuateRad(double target_rad) = 0;
-  virtual void actuateTorque(double target_torque_ampere) = 0;
-
-  virtual void prepareActuation() = 0;
-  virtual bool initialize(int cycle_time) = 0;
-  virtual void reset() = 0;
+//  virtual float getMotorCurrent() = 0;
+////  virtual float getMotorControllerVoltage() = 0;
+//  virtual float getMotorVoltage() = 0;
+//
+//  virtual void actuateRad(double target_rad) = 0;
+//  virtual void actuateTorque(double target_torque_ampere) = 0;
+//
+//  virtual void prepareActuation() = 0;
+  bool initialize(int cycle_time);
 
   /**
- * Get whether the incremental encoder is more precise than the absolute encoder
- * @return true if the incremental encoder has a higher resolution than the absolute encoder, false otherwise
- */
+   * Get whether the incremental encoder is more precise than the absolute encoder
+   * @return true if the incremental encoder has a higher resolution than the absolute encoder, false otherwise
+   */
   bool isIncrementalEncoderMorePrecise() const;
+
+  bool hasAbsoluteEncoder() const;
+  bool hasIncrementalEncoder() const;
 
   /**
    * Get the most recent states of the motor controller, i.e. all data that is read from the controller at every
@@ -53,10 +57,17 @@ public:
    * @return A MotorControllerState object containing all data read from the motor controller at every communication
    * cycle.
    */
-  std::unique_ptr<MotorControllerState> getState();
-private:
-  std::unique_ptr<AbsoluteEncoder> absolute_encoder_;
-  std::unique_ptr<IncrementalEncoder> incremental_encoder_;
+  virtual std::unique_ptr<MotorControllerState> getState() = 0;
+
+protected:
+  virtual double getAbsolutePosition() = 0;
+  virtual double getIncrementalPosition() = 0;
+
+  virtual double getAbsoluteVelocity() = 0;
+  virtual double getIncrementalVelocity() = 0;
+
+  std::unique_ptr<AbsoluteEncoder> absolute_encoder_ = nullptr;
+  std::unique_ptr<IncrementalEncoder> incremental_encoder_ = nullptr;
   ActuationMode actuation_mode_;
 };
 

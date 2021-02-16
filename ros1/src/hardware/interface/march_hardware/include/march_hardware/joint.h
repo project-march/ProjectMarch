@@ -21,18 +21,18 @@ public:
    * Initializes a Joint without motor controller and temperature slave.
    * Actuation will be disabled.
    */
-  Joint(std::string name, int net_number);
+//  Joint(std::string name, int net_number);
 
   /**
    * Initializes a Joint with motor controller and without temperature slave.
    */
-  Joint(std::string name, int net_number, bool allow_actuation, std::unique_ptr<IMotionCube> imc);
+  Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<IMotionCube> motor_controller);
 
   /**
    * Initializes a Joint with motor controller and temperature slave.
    */
-  Joint(std::string name, int net_number, bool allow_actuation, std::unique_ptr<IMotionCube> imc,
-        std::unique_ptr<TemperatureGES> temperature_ges);
+  Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<IMotionCube> motor_controller,
+        std::shared_ptr<TemperatureGES> temperature_ges);
 
   virtual ~Joint() noexcept = default;
 
@@ -40,12 +40,11 @@ public:
   Joint(const Joint&) = delete;
   Joint& operator=(const Joint&) = delete;
 
-  void resetIMotionCube();
-
   /* Delete move assignment since string cannot be move assigned */
   Joint(Joint&&) = default;
   Joint& operator=(Joint&&) = delete;
 
+  // Initialize the components of the joint
   bool initialize(int cycle_time);
   void prepareActuation();
 
@@ -55,26 +54,16 @@ public:
 
   double getPosition() const;
   double getVelocity() const;
-  double getVoltageVelocity() const;
-  double getIncrementalPosition() const;
-  double getAbsolutePosition() const;
-  int16_t getTorque();
-  int32_t getAngleIUAbsolute();
-  int32_t getAngleIUIncremental();
-  double getVelocityIUAbsolute();
-  double getVelocityIUIncremental();
-  float getTemperature();
-  std::unique_ptr<MotorControllerState> getMotorControllerState();
 
   std::string getName() const;
-  int getTemperatureGESSlaveIndex() const;
-  int getIMotionCubeSlaveIndex() const;
   int getNetNumber() const;
 
+  std::shared_ptr<MotorController> getMotorController();
   ActuationMode getActuationMode() const;
 
-  bool hasIMotionCube() const;
   bool hasTemperatureGES() const;
+  std::shared_ptr<TemperatureGES> getTemperatureGES();
+
   bool canActuate() const;
   bool receivedDataUpdate();
   void setAllowActuation(bool allow_actuation);
@@ -82,7 +71,9 @@ public:
   /** @brief Override comparison operator */
   friend bool operator==(const Joint& lhs, const Joint& rhs)
   {
-    return lhs.name_ == rhs.name_ && ((lhs.imc_ && rhs.imc_ && *lhs.imc_ == *rhs.imc_) || (!lhs.imc_ && !rhs.imc_)) &&
+    return lhs.name_ == rhs.name_ &&
+           ((lhs.motor_controller_ && rhs.motor_controller_ && *lhs.motor_controller_ == *rhs.motor_controller_) ||
+            (!lhs.motor_controller_ && !rhs.motor_controller_)) &&
            ((lhs.temperature_ges_ && rhs.temperature_ges_ && *lhs.temperature_ges_ == *rhs.temperature_ges_) ||
             (!lhs.temperature_ges_ && !rhs.temperature_ges_)) &&
            lhs.allow_actuation_ == rhs.allow_actuation_ &&
@@ -100,9 +91,9 @@ public:
        << "ActuationMode: " << joint.getActuationMode().toString() << ", "
        << "allowActuation: " << joint.allow_actuation_ << ", "
        << "imotioncube: ";
-    if (joint.imc_)
+    if (joint.motor_controller_)
     {
-      os << *joint.imc_;
+      os << *joint.motor_controller_;
     }
     else
     {
@@ -126,21 +117,15 @@ private:
   const std::string name_;
   const int net_number_;
   bool allow_actuation_ = false;
-  float previous_imc_volt_ = 0.0;
-  float previous_motor_current_ = 0.0;
-  float previous_motor_volt_ = 0.0;
-  double previous_absolute_position_ = 0.0;
-  double previous_incremental_position_ = 0.0;
-  double previous_absolute_velocity_ = 0.0;
-  double previous_incremental_velocity_ = 0.0;
 
+  std::unique_ptr<MotorControllerState> previous_state_ = nullptr;
+
+  double previous_incremental_position_ = 0.0;
   double position_ = 0.0;
-  double incremental_position_ = 0.0;
-  double absolute_position_ = 0.0;
   double velocity_ = 0.0;
 
-  std::unique_ptr<IMotionCube> imc_ = nullptr;
-  std::unique_ptr<TemperatureGES> temperature_ges_ = nullptr;
+  std::shared_ptr<IMotionCube> motor_controller_;
+  std::shared_ptr<TemperatureGES> temperature_ges_ = nullptr;
 };
 
 }  // namespace march
