@@ -38,6 +38,15 @@ public:
   double absolute_velocity_rad_;
   double incremental_velocity_rad_;
 
+  friend bool operator==(const MotorControllerState& lhs, const MotorControllerState& rhs)
+  {
+    return lhs.motor_current_ == rhs.motor_current_ && lhs.motor_voltage_ == rhs.motor_voltage_ &&
+    lhs.absolute_angle_iu_ == rhs.absolute_angle_iu_ && lhs.incremental_angle_iu_ == rhs.incremental_angle_iu_ &&
+    lhs.absolute_velocity_iu_ == rhs.absolute_velocity_iu_ && lhs.incremental_velocity_iu_ == rhs.incremental_velocity_iu_ &&
+    lhs.absolute_angle_rad_ == rhs.absolute_angle_rad_ && lhs.incremental_angle_rad_ == rhs.incremental_angle_rad_ &&
+    lhs.absolute_velocity_rad_ == rhs.absolute_velocity_rad_ && lhs.incremental_velocity_rad_ == rhs.incremental_velocity_rad_;
+  }
+
   /**
    * Check whether the motor controller is in an error state
    * @return false if the motor controller is in error state, otherwise true

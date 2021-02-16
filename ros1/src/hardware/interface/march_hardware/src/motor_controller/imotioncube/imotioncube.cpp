@@ -2,6 +2,7 @@
 #include "march_hardware/motor_controller/imotioncube/imotioncube.h"
 #include "march_hardware/motor_controller/imotioncube/imotioncube_state.h"
 #include <march_hardware/motor_controller/motor_controller_state.h>
+#include "march_hardware/motor_controller/motor_controller.h"
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/error/motion_error.h"
 #include "march_hardware/ethercat/pdo_types.h"
@@ -21,11 +22,8 @@ namespace march
 {
 IMotionCube::IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
                          std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode)
-  : Slave(slave)
-  , absolute_encoder_(std::move(absolute_encoder))
-  , incremental_encoder_(std::move(incremental_encoder))
+  : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode)
   , sw_string_("empty")
-  , actuation_mode_(actuation_mode)
 {
   if (!this->absolute_encoder_ || !this->incremental_encoder_)
   {
@@ -501,11 +499,6 @@ void IMotionCube::downloadSetupToDrive(SdoSlaveInterface& sdo)
   }
 }
 
-ActuationMode IMotionCube::getActuationMode() const
-{
-  return this->actuation_mode_;
-}
-
 unsigned int IMotionCube::getActuationModeNumber() const
 {
   switch(this->actuation_mode_.getValue())
@@ -554,4 +547,26 @@ std::unique_ptr<MotorControllerState> IMotionCube::getState()
 
   return state;
 }
+
+
+double IMotionCube::getAbsolutePosition()
+{
+  return getAngleRadAbsolute();
+}
+
+double IMotionCube::getIncrementalPosition()
+{
+  return getAngleRadIncremental();
+}
+
+double IMotionCube::getAbsoluteVelocity()
+{
+  return getVelocityRadAbsolute();
+}
+
+double IMotionCube::getIncrementalVelocity()
+{
+  return getVelocityRadIncremental();
+}
+
 }  // namespace march

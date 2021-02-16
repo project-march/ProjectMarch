@@ -95,10 +95,7 @@ bool EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
 
   for (Joint& joint : joints)
   {
-    if (joint.hasIMotionCube())
-    {
-      ec_slave[joint.getIMotionCubeSlaveIndex()].PO2SOconfig = setSlaveWatchdogTimer;
-    }
+    ec_slave[joint.getMotorController()->getSlaveIndex()].PO2SOconfig = setSlaveWatchdogTimer;
     reset |= joint.initialize(this->cycle_time_ms_);
   }
 
