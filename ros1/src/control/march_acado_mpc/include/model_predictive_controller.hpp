@@ -32,6 +32,12 @@ public:
      */
     void calculateControlInput();
 
+    /**
+     * \brief Assign the weighting matrix values
+     * @param Q - weighting matrix
+     */
+    void assignWeightingMatrix(std::vector<std::vector<float>> Q);
+
 private:
   std::vector<std::vector<float>> Q_;
 };

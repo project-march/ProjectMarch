@@ -54,12 +54,22 @@ void ModelPredictiveController::init()
   // Warm-up the solver
   acado_preparationStep();
 
+  assignWeightingMatrix(Q_);
+
 }
 
 void ModelPredictiveController::setInitialState(vector<double> x0) {
   for (int i = 0; i < ACADO_NX; ++i) {
     acadoVariables.x0[i] = x0[i];
   }
+}
+
+void ModelPredictiveController::assignWeightingMatrix(std::vector<std::vector<float>> Q) {
+
+
+
+  // [Temporary] Has the function been executed?
+  std::cout << "\033[4;32m" << __FUNCTION__ << "()\033[0m" << " has executed\n";
 }
 
 void ModelPredictiveController::calculateControlInput() {
