@@ -12,6 +12,8 @@
 
 #include <ros/ros.h>
 
+#include "march_hardware/motor_controller/imotioncube/imotioncube.h"
+
 namespace march
 {
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf, ::std::string ifName, int ecatCycleTime,
@@ -54,7 +56,7 @@ void MarchRobot::startEtherCAT(bool reset_imc)
   {
     ROS_DEBUG("Resetting all IMotionCubes due to either: reset arg: %d or downloading of .sw fie: %d", reset_imc,
               sw_reset);
-    resetIMotionCubes();
+    resetMotorControllers();
 
     ROS_INFO("Restarting the EtherCAT Master");
     ethercatMaster.stop();
@@ -73,11 +75,11 @@ void MarchRobot::stopEtherCAT()
   ethercatMaster.stop();
 }
 
-void MarchRobot::resetIMotionCubes()
+void MarchRobot::resetMotorControllers()
 {
   for (auto& joint : jointList)
   {
-    joint.resetIMotionCube();
+    joint.getMotorController()->Slave::reset();
   }
 }
 
@@ -87,14 +89,15 @@ int MarchRobot::getMaxSlaveIndex()
 
   for (Joint& joint : jointList)
   {
-    int temperatureSlaveIndex = joint.getTemperatureGESSlaveIndex();
-    if (temperatureSlaveIndex > maxSlaveIndex)
+    if (joint.hasTemperatureGES())
     {
-      maxSlaveIndex = temperatureSlaveIndex;
+      int temperatureSlaveIndex = joint.getTemperatureGES()->getSlaveIndex();
+      if (temperatureSlaveIndex > maxSlaveIndex) {
+        maxSlaveIndex = temperatureSlaveIndex;
+      }
     }
 
-    int iMotionCubeSlaveIndex = joint.getIMotionCubeSlaveIndex();
-
+    int iMotionCubeSlaveIndex = joint.getMotorController()->getSlaveIndex();
     if (iMotionCubeSlaveIndex > maxSlaveIndex)
     {
       maxSlaveIndex = iMotionCubeSlaveIndex;
@@ -112,15 +115,12 @@ bool MarchRobot::hasValidSlaves()
   {
     if (joint.hasTemperatureGES())
     {
-      int temperatureSlaveIndex = joint.getTemperatureGESSlaveIndex();
+      int temperatureSlaveIndex = joint.getTemperatureGES()->getSlaveIndex();
       temperatureSlaveIndices.push_back(temperatureSlaveIndex);
     }
 
-    if (joint.hasIMotionCube())
-    {
-      int iMotionCubeSlaveIndex = joint.getIMotionCubeSlaveIndex();
-      iMotionCubeIndices.push_back(iMotionCubeSlaveIndex);
-    }
+    int iMotionCubeSlaveIndex = joint.getMotorController()->getSlaveIndex();
+    iMotionCubeIndices.push_back(iMotionCubeSlaveIndex);
   }
   // Multiple temperature sensors may be connected to the same slave.
   // Remove duplicate temperatureSlaveIndices so they don't trigger as

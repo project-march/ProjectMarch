@@ -3,6 +3,7 @@
 #ifndef MARCH_HARDWARE_IMOTIONCUBE_H
 #define MARCH_HARDWARE_IMOTIONCUBE_H
 #include "march_hardware/motor_controller/actuation_mode.h"
+#include "march_hardware/motor_controller/motor_controller.h"
 #include "march_hardware/ethercat/pdo_map.h"
 #include "march_hardware/ethercat/pdo_types.h"
 #include "march_hardware/ethercat/sdo_interface.h"
@@ -19,7 +20,7 @@
 
 namespace march
 {
-class IMotionCube : public Slave
+class IMotionCube : public MotorController
 {
 public:
   /**
@@ -47,7 +48,7 @@ public:
   virtual double getAngleRadIncremental();
   double getAbsoluteRadPerBit() const;
   double getIncrementalRadPerBit() const;
-  int16_t getTorque();
+  int16_t getTorque() override;
   int32_t getAngleIUAbsolute();
   int32_t getAngleIUIncremental();
   double getVelocityIUAbsolute();
@@ -59,8 +60,7 @@ public:
   uint16_t getDetailedError();
   uint16_t getSecondDetailedError();
 
-  ActuationMode getActuationMode() const;
-  unsigned int getActuationModeNumber() const;
+  unsigned int getActuationModeNumber() const override;
 
   virtual float getMotorCurrent();
   virtual float getIMCVoltage();
@@ -68,7 +68,7 @@ public:
 
   void setControlWord(uint16_t control_word);
 
-  std::unique_ptr<MotorControllerState> getState();
+  std::unique_ptr<MotorControllerState> getState() override;
 
   virtual void actuateRad(double target_rad);
   virtual void actuateTorque(int16_t target_torque);
@@ -104,6 +104,12 @@ protected:
   bool initSdo(SdoSlaveInterface& sdo, int cycle_time) override;
 
   void reset(SdoSlaveInterface& sdo) override;
+
+  double getAbsolutePosition() override;
+  double getIncrementalPosition() override;
+
+  double getAbsoluteVelocity() override;
+  double getIncrementalVelocity() override;
 
 private:
   void actuateIU(int32_t target_iu);
@@ -143,10 +149,7 @@ private:
   // possible and thus allow for mocking the encoders. A unique pointer is
   // chosen since the IMotionCube should be the owner and the encoders
   // do not need to be passed around.
-  std::unique_ptr<AbsoluteEncoder> absolute_encoder_;
-  std::unique_ptr<IncrementalEncoder> incremental_encoder_;
   std::string sw_string_;
-  ActuationMode actuation_mode_;
 
   std::unordered_map<IMCObjectName, uint8_t> miso_byte_offsets_;
   std::unordered_map<IMCObjectName, uint8_t> mosi_byte_offsets_;
