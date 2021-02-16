@@ -1,86 +1,86 @@
 description: 'First step of the MIII walking gait. '
-duration: {nsecs: 600000000, secs: 1}
+duration: 1600000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 40100000, secs: 0}
+    time_from_start: 40100000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 600000000, secs: 1}
+    time_from_start: 1600000000
     velocity: -0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 40100000, secs: 0}
+    time_from_start: 40100000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 599900000, secs: 0}
+    time_from_start: 599900000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 800000000, secs: 0}
+    time_from_start: 800000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 600000000, secs: 1}
+    time_from_start: 1600000000
     velocity: -0.0
   left_hip_fe:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: -0.1667
-    time_from_start: {nsecs: 600000000, secs: 1}
+    time_from_start: 1600000000
     velocity: 0.0
   left_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0969
-    time_from_start: {nsecs: 254000000, secs: 0}
+    time_from_start: 254000000
     velocity: -0.2793
   - position: 0.0
-    time_from_start: {nsecs: 88000000, secs: 1}
+    time_from_start: 1088000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 600000000, secs: 1}
+    time_from_start: 1600000000
     velocity: 0.0
   right_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 40100000, secs: 0}
+    time_from_start: 40100000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 600000000, secs: 1}
+    time_from_start: 1600000000
     velocity: -0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 40100000, secs: 0}
+    time_from_start: 40100000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 599900000, secs: 0}
+    time_from_start: 599900000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 800000000, secs: 0}
+    time_from_start: 800000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 600000000, secs: 1}
+    time_from_start: 1600000000
     velocity: -0.0
   right_hip_fe:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.5585
-    time_from_start: {nsecs: 880600000, secs: 0}
+    time_from_start: 880600000
     velocity: 0.1396
   - position: 0.3491
-    time_from_start: {nsecs: 600000000, secs: 1}
+    time_from_start: 1600000000
     velocity: -0.6981
   right_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.8727
-    time_from_start: {nsecs: 704000000, secs: 0}
+    time_from_start: 704000000
     velocity: 0.0
   - position: 0.3491
-    time_from_start: {nsecs: 600000000, secs: 1}
+    time_from_start: 1600000000
     velocity: -0.6981
 name: right_open
 version: MIII_ankle_0

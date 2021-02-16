@@ -1,96 +1,96 @@
 description: Right swing step for stairs down, same version as MIII used for the continuous
   version. Corrected version.
-duration: {nsecs: 0, secs: 3}
+duration: 3000000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 535000000, secs: 0}
+    time_from_start: 535000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   left_hip_fe:
   - position: 0.4583
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -1.5289
   - position: 0.0
-    time_from_start: {nsecs: 480000000, secs: 0}
+    time_from_start: 480000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 199999999, secs: 1}
+    time_from_start: 1199999999
     velocity: 0.0
   - position: 0.3491
-    time_from_start: {nsecs: 919999999, secs: 1}
+    time_from_start: 1919999999
     velocity: 0.0
   - position: 0.3491
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   left_knee:
   - position: 0.2878
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -0.5236
   - position: 0.0873
-    time_from_start: {nsecs: 199999999, secs: 1}
+    time_from_start: 1199999999
     velocity: 0.0
   - position: 0.0873
-    time_from_start: {nsecs: 100000000, secs: 2}
+    time_from_start: 2100000000
     velocity: 0.0
   - position: 0.7086
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 1.2566
   right_ankle:
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 372400000, secs: 0}
+    time_from_start: 372400000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   right_hip_fe:
   - position: 0.3491
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.3491
-    time_from_start: {nsecs: 20000000, secs: 1}
+    time_from_start: 1020000000
     velocity: 0.0
   - position: 1.309
-    time_from_start: {nsecs: 220000000, secs: 2}
+    time_from_start: 2220000000
     velocity: 0.1449
   - position: 0.4583
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: -1.5289
   right_knee:
   - position: 0.7086
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 1.2566
   - position: 1.7453
-    time_from_start: {nsecs: 139999999, secs: 1}
+    time_from_start: 1139999999
     velocity: 0.0
   - position: 1.7453
-    time_from_start: {nsecs: 919999999, secs: 1}
+    time_from_start: 1919999999
     velocity: 0.0
   - position: 0.2878
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: -0.5236
 name: right_swing
 version: MIV_less_knee_extension_ankle_2.5
