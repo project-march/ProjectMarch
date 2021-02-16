@@ -22,6 +22,9 @@
 
 #include <march_shared_msgs/MotorControllerState.h>
 
+#include "march_hardware/motor_controller/motor_controller.h"
+#include "march_hardware/motor_controller/imotioncube/imotioncube.h"
+
 using hardware_interface::JointHandle;
 using hardware_interface::JointStateHandle;
 using hardware_interface::PositionJointInterface;
@@ -222,9 +225,9 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
 
     if (joint.hasTemperatureGES())
     {
-      joint_temperature_[i] = joint.getTemperature();
+      joint_temperature_[i] = joint.getTemperatureGES()->getTemperature();
     }
-    joint_effort_[i] = joint.getTorque();
+    joint_effort_[i] = joint.getMotorController()->getTorque();
   }
 
   this->updateIMotionCubeState();
@@ -454,7 +457,7 @@ void MarchHardwareInterface::updateMotorControllerState()
   for (size_t i = 0; i < num_joints_; i++)
   {
     march::Joint& joint = march_robot_->getJoint(i);
-    auto motor_controller_state = joint.getMotorControllerState();
+    auto motor_controller_state = joint.getMotorController()->getState();
     motor_controller_state_pub_->msg_.header.stamp = ros::Time::now();
     motor_controller_state_pub_->msg_.joint_names[i] = joint.getName();
     motor_controller_state_pub_->msg_.operational_state[i] = motor_controller_state->getOperationalState();
@@ -480,7 +483,7 @@ void MarchHardwareInterface::updateMotorControllerState()
 bool MarchHardwareInterface::MotorControllerStateCheck(size_t joint_index)
 {
   march::Joint& joint = march_robot_->getJoint(joint_index);
-  auto motor_controller_state = joint.getMotorControllerState();
+  auto motor_controller_state = joint.getMotorController()->getState();
   if (!motor_controller_state->isOk())
   {
     ROS_ERROR("MotorController of joint %s is in fault state %s.\n Error Status: \n%s",

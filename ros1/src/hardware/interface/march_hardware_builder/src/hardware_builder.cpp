@@ -124,7 +124,7 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const 
   return { joint_name, net_number, allow_actuation, std::move(imc), std::move(ges) };
 }
 
-std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAML::Node& imc_config,
+std::shared_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAML::Node& imc_config,
                                                                        march::ActuationMode mode,
                                                                        const urdf::JointConstSharedPtr& urdf_joint,
                                                                        march::PdoInterfacePtr pdo_interface,
@@ -144,7 +144,7 @@ std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
   std::ifstream imc_setup_data;
   imc_setup_data.open(ros::package::getPath("march_hardware").append("/config/sw_files/" + urdf_joint->name + ".sw"));
   std::string setup = convertSWFileToString(imc_setup_data);
-  return std::make_unique<march::IMotionCube>(
+  return std::make_shared<march::IMotionCube>(
       march::Slave(slave_index, pdo_interface, sdo_interface),
       HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, urdf_joint),
       HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), setup, mode);
@@ -199,7 +199,7 @@ HardwareBuilder::createIncrementalEncoder(const YAML::Node& incremental_encoder_
   return std::make_unique<march::IncrementalEncoder>(resolution, transmission);
 }
 
-std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(const YAML::Node& temperature_ges_config,
+std::shared_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(const YAML::Node& temperature_ges_config,
                                                                              march::PdoInterfacePtr pdo_interface,
                                                                              march::SdoInterfacePtr sdo_interface)
 {
@@ -213,7 +213,7 @@ std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(con
 
   const auto slave_index = temperature_ges_config["slaveIndex"].as<int>();
   const auto byte_offset = temperature_ges_config["byteOffset"].as<int>();
-  return std::make_unique<march::TemperatureGES>(march::Slave(slave_index, pdo_interface, sdo_interface), byte_offset);
+  return std::make_shared<march::TemperatureGES>(march::Slave(slave_index, pdo_interface, sdo_interface), byte_offset);
 }
 
 std::unique_ptr<march::PowerDistributionBoard> HardwareBuilder::createPowerDistributionBoard(
