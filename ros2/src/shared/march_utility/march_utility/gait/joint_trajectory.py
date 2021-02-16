@@ -6,17 +6,18 @@ and to check the safety limits.
 """
 
 from __future__ import annotations
+
 from typing import List, Tuple, Any
 
-from rclpy.duration import Duration
-from scipy.interpolate import BPoly
-from urdf_parser_py import urdf
-
-from .limits import Limits
 from march_utility.exceptions.gait_exceptions import (
     SubgaitInterpolationError,
     NonValidGaitContent,
 )
+from march_utility.utilities.duration import Duration
+from scipy.interpolate import BPoly
+from urdf_parser_py import urdf
+
+from .limits import Limits
 from .setpoint import Setpoint
 
 ALLOWED_ERROR = 0.001
@@ -32,20 +33,20 @@ class JointTrajectory(object):
         name: str,
         limits: Limits,
         setpoints: List[Setpoint],
-        duration: float,
+        duration: Duration,
     ) -> None:
         """Initialize a joint trajectory."""
         self.name = name
         self.limits = limits
         self._setpoints = setpoints
-        self._duration = round(duration, self.setpoint_class.digits)  # seconds
+        self._duration = round(duration, self.setpoint_class.digits)
         self.interpolated_position: Any = None
         self.interpolated_velocity: Any = None
         self.interpolate_setpoints()
 
     @classmethod
-    def from_setpoints(
-        cls, name: str, limits: Limits, setpoint_dict: List[dict], duration: float
+    def from_setpoint_dict(
+        cls, name: str, limits: Limits, setpoint_dict: List[dict], duration: Duration
     ) -> JointTrajectory:
         """Creates a list of joint trajectories.
 
@@ -56,11 +57,7 @@ class JointTrajectory(object):
         """
         setpoints = [
             Setpoint(
-                time=Duration(
-                    seconds=setpoint["time_from_start"]["secs"],
-                    nanoseconds=setpoint["time_from_start"]["nsecs"],
-                ).nanoseconds
-                * 1e-9,
+                time=Duration(nanoseconds=setpoint["time_from_start"]),
                 position=setpoint["position"],
                 velocity=setpoint["velocity"],
             )
@@ -81,11 +78,11 @@ class JointTrajectory(object):
         return None
 
     @property
-    def duration(self) -> float:
+    def duration(self) -> Duration:
         """Get the duration of the joint trajectory."""
         return self._duration
 
-    def set_duration(self, new_duration: float, rescale: bool = True) -> None:
+    def set_duration(self, new_duration: Duration, rescale: bool = True) -> None:
         """Change the duration of the joint trajectory.
 
         :param new_duration: The new duration to change to.
@@ -94,8 +91,8 @@ class JointTrajectory(object):
         """
         for setpoint in reversed(self.setpoints):
             if rescale:
-                setpoint.time = setpoint.time * new_duration / self.duration
-                setpoint.velocity = setpoint.velocity * self.duration / new_duration
+                setpoint.time = setpoint.time * (new_duration / self.duration)
+                setpoint.velocity = setpoint.velocity * (self.duration / new_duration)
             else:
                 if setpoint.time > new_duration:
                     self.setpoints.remove(setpoint)
@@ -103,7 +100,7 @@ class JointTrajectory(object):
         self._duration = round(new_duration, self.setpoint_class.digits)
         self.interpolate_setpoints()
 
-    def from_begin_point(self, begin_time: float, position: float) -> None:
+    def from_begin_point(self, begin_time: Duration, position: float) -> None:
         """
         Manipulate the gait to start at given time.
 
@@ -113,14 +110,14 @@ class JointTrajectory(object):
         :param begin_time: The time to start
         :param position: The position to start from
         """
-        begin_time -= 1
+        begin_time -= Duration(seconds=1)
         for setpoint in reversed(self.setpoints):
             if setpoint.time <= begin_time:
                 self.setpoints.remove(setpoint)
             else:
                 setpoint.time -= begin_time
         self.setpoints = [
-            Setpoint(time=0, position=position, velocity=0)
+            Setpoint(time=Duration(), position=position, velocity=0)
         ] + self.setpoints
         self._duration = self._duration - begin_time
 
@@ -134,13 +131,16 @@ class JointTrajectory(object):
         self.interpolate_setpoints()
 
     def get_setpoints_unzipped(self) -> Tuple[List[float], List[float], List[float]]:
-        """Get all the listed attributes of the setpoints."""
+        """Get all the listed attributes of the setpoints.
+
+        Converts the setpoints time to seconds.
+        """
         time = []
         position = []
         velocity = []
 
         for setpoint in self.setpoints:
-            time.append(setpoint.time)
+            time.append(setpoint.time.seconds)
             position.append(setpoint.position)
             velocity.append(setpoint.velocity)
 
@@ -177,7 +177,9 @@ class JointTrajectory(object):
             False if the starting/ending point is (not at 0/duration) and
             (has nonzero speed), True otherwise
         """
-        return (self.setpoints[0].time == 0 or self.setpoints[0].velocity == 0) and (
+        return (
+            self.setpoints[0].time.nanoseconds == 0 or self.setpoints[0].velocity == 0
+        ) and (
             self.setpoints[-1].time == round(self.duration, Setpoint.digits)
             or self.setpoints[-1].velocity == 0
         )
@@ -199,21 +201,21 @@ class JointTrajectory(object):
         self.interpolated_position = BPoly.from_derivatives(time, yi)
         self.interpolated_velocity = self.interpolated_position.derivative()
 
-    def get_interpolated_setpoint(self, time: float) -> Setpoint:
+    def get_interpolated_setpoint(self, time: Duration) -> Setpoint:
         """Get a setpoint on a certain time.
 
         If there is no setpoint at this time point, it will interpolate
         between the setpoints.
         """
-        if time < 0:
+        if time < Duration(seconds=0):
             return self.setpoint_class(time, self.setpoints[0].position, 0)
         if time > self.duration:
             return self.setpoint_class(time, self.setpoints[-1].position, 0)
 
         return self.setpoint_class(
             time,
-            float(self.interpolated_position(time)),
-            float(self.interpolated_velocity(time)),
+            float(self.interpolated_position(time.seconds)),
+            float(self.interpolated_velocity(time.seconds)),
         )
 
     def __getitem__(self, index):
@@ -265,9 +267,8 @@ class JointTrajectory(object):
             )
             setpoints.append(interpolated_setpoint_to_add)
 
-        duration = (
-            parameter * base_trajectory.duration
-            + (1 - parameter) * other_trajectory.duration
+        duration = base_trajectory.duration.weighted_average(
+            other_trajectory.duration, parameter
         )
         return JointTrajectory(
             base_trajectory.name, base_trajectory.limits, setpoints, duration

@@ -2,6 +2,7 @@ import os
 import re
 
 import rospy
+from rospy import Duration
 from trajectory_msgs import msg as trajectory_msg
 import yaml
 
@@ -23,6 +24,8 @@ from .setpoint import Setpoint
 PARAMETRIC_GAITS_PREFIX = "_pg_"
 SUBGAIT_SUFFIX = ".subgait"
 JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
+
+SEC_TO_NSEC = 1e9
 
 
 class Subgait(object):
@@ -179,9 +182,7 @@ class Subgait(object):
             rospy.logerr("Cannot create gait without a loaded robot.")
             return None
 
-        duration = rospy.Duration(
-            subgait_dict["duration"]["secs"], subgait_dict["duration"]["nsecs"]
-        ).to_sec()
+        duration = cls.nsec_to_sec(subgait_dict["duration"])
 
         joint_list = []
         for name, points in sorted(
@@ -194,6 +195,8 @@ class Subgait(object):
                 )
                 continue
             limits = Limits.from_urdf_joint(urdf_joint)
+            # Make compatible with new subgait time structure
+            cls.convert_points_dict(points)
             joint_list.append(
                 cls.joint_class.from_setpoints(name, limits, points, duration, *args)
             )
@@ -417,22 +420,15 @@ class Subgait(object):
 
     def to_yaml(self):
         """Returns a YAML string representation of the subgait."""
-        duration = rospy.Duration.from_sec(self.duration)
         output = {
             "description": self.description,
-            "duration": {
-                "nsecs": duration.nsecs,
-                "secs": duration.secs,
-            },
+            "duration": self.sec_to_nsec(self.duration),
             "gait_type": self.gait_type,
             "joints": {
                 joint.name: [
                     {
                         "position": setpoint.position,
-                        "time_from_start": {
-                            "nsecs": rospy.Duration.from_sec(setpoint.time).nsecs,
-                            "secs": int(setpoint.time),
-                        },
+                        "time_from_start": self.sec_to_nsec(setpoint.time),
                         "velocity": setpoint.velocity,
                     }
                     for setpoint in joint.setpoints
@@ -628,3 +624,22 @@ class Subgait(object):
             interpolated_joint_trajectories.append(interpolated_joint_trajectory_to_add)
 
         return interpolated_joint_trajectories
+
+    # Compatability with new subgait file structure
+    @staticmethod
+    def sec_to_nsec(seconds: float) -> int:
+        """Convert seconds to nanoseconds."""
+        return int(seconds * SEC_TO_NSEC)
+
+    @staticmethod
+    def nsec_to_sec(nanoseconds: int) -> float:
+        """Convert nanoseconds to seconds."""
+        return float(nanoseconds) / SEC_TO_NSEC
+
+    @staticmethod
+    def convert_points_dict(points: dict):
+        """Convert the new point dictionary structure to the old structure"""
+        for point in points:
+            nanoseconds = point["time_from_start"]
+            duration = Duration(nsecs=nanoseconds)
+            point["time_from_start"] = {"secs": duration.secs, "nsecs": duration.nsecs}

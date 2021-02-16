@@ -2,6 +2,7 @@ from typing import Optional
 
 from march_gait_selection.state_machine.state_machine_input import TransitionRequest
 from march_utility.gait.joint_trajectory import JointTrajectory
+from march_utility.utilities.duration import Duration
 
 
 class GaitInterface(object):
@@ -54,7 +55,7 @@ class GaitInterface(object):
         optional starting trajectory."""
         return None
 
-    def update(self, elapsed_time: float) -> (JointTrajectory, bool):
+    def update(self, elapsed_time: Duration) -> (JointTrajectory, bool):
         """Called in a loop with the elapsed time since the last update.
 
         :param float elapsed_time: Elapsed time in seconds since the last update
