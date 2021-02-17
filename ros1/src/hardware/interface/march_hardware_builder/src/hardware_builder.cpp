@@ -98,7 +98,7 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const 
     ROS_WARN("Joint %s does not have a netNumber", joint_name.c_str());
   }
 
-  const auto allow_actuation = joint_config["allowActuation"].as<bool>();
+//  const auto allow_actuation = joint_config["allowActuation"].as<bool>();
 
   march::ActuationMode mode;
   if (joint_config["actuationMode"])
@@ -118,7 +118,7 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const 
   {
     ROS_WARN("Joint %s does not have a configuration for a TemperatureGes", joint_name.c_str());
   }
-  return { joint_name, net_number, allow_actuation, std::move(imc), std::move(ges) };
+  return { joint_name, net_number, std::move(imc), std::move(ges) };
 }
 
 std::shared_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAML::Node& imc_config,

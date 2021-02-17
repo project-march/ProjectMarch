@@ -15,20 +15,15 @@
 
 namespace march
 {
-//Joint::Joint(std::string name, int net_number) : name_(std::move(name)), net_number_(net_number)
-//{
-//}
-
-Joint::Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<IMotionCube> motor_controller)
-  : name_(std::move(name)), net_number_(net_number), allow_actuation_(allow_actuation), motor_controller_(std::move(motor_controller))
+Joint::Joint(std::string name, int net_number, std::shared_ptr<IMotionCube> motor_controller)
+  : name_(std::move(name)), net_number_(net_number), motor_controller_(std::move(motor_controller))
 {
 }
 
-Joint::Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<IMotionCube> motor_controller,
+Joint::Joint(std::string name, int net_number, std::shared_ptr<IMotionCube> motor_controller,
              std::shared_ptr<TemperatureGES> temperature_ges)
   : name_(std::move(name))
   , net_number_(net_number)
-  , allow_actuation_(allow_actuation)
   , motor_controller_(std::move(motor_controller))
   , temperature_ges_(std::move(temperature_ges))
 {
@@ -94,25 +89,6 @@ double Joint::getVelocity() const
 {
   return this->velocity_;
 }
-
-void Joint::actuate(double target)
-{
-  if (!this->canActuate())
-  {
-    throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE, "Joint %s is not allowed to actuate",
-                                   this->name_.c_str());
-  }
-  auto actuation_mode = motor_controller_->getActuationMode();
-  if (actuation_mode == march::ActuationMode::position)
-  {
-    motor_controller_->actuateRadians(target);
-  }
-  else if (actuation_mode == march::ActuationMode::torque)
-  {
-    motor_controller_->actuateTorque(target);
-  }
-}
-
 
 void Joint::setAllowActuation(bool allow_actuation)
 {
