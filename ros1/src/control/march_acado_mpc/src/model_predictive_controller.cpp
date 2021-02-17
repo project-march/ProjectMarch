@@ -41,7 +41,7 @@ void ModelPredictiveController::init()
   //  setReference(reference);
 
   // Set angle step reference value
-  double theta_ref = 90*(M_PI/180);
+  double theta_ref = 30*(M_PI/180);
 
   // Prepare references (step reference)
   for (int i = 0; i < ACADO_N; ++i) {
@@ -57,10 +57,10 @@ void ModelPredictiveController::init()
   // Current state feedback
   setInitialState(x0);
 
+  assignWeightingMatrix(Q_);
+
   // Warm-up the solver
   acado_preparationStep();
-
-  assignWeightingMatrix(Q_);
 
 }
 
