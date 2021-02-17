@@ -34,10 +34,10 @@ Joint::Joint(std::string name, int net_number, bool allow_actuation, std::shared
 {
 }
 
-bool Joint::initialize(int cycle_time)
+bool Joint::initSdo(int cycle_time)
 {
   bool reset = false;
-  reset |= this->motor_controller_->initialize(cycle_time);
+  reset |= this->motor_controller_->Slave::initSdo(cycle_time);
   if (this->hasTemperatureGES())
   {
     reset |= this->temperature_ges_->initSdo(cycle_time);
@@ -53,7 +53,7 @@ void Joint::prepareActuation()
                                    this->name_.c_str());
   }
   ROS_INFO("[%s] Preparing for actuation", this->name_.c_str());
-  this->motor_controller_->goToOperationEnabled();
+  motor_controller_->prepareActuation();
   ROS_INFO("[%s] Successfully prepared for actuation", this->name_.c_str());
 
   this->previous_incremental_position_ = motor_controller_->getPosition(false);

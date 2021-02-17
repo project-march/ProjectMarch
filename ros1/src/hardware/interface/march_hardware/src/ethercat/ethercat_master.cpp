@@ -96,7 +96,7 @@ bool EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
   for (Joint& joint : joints)
   {
     ec_slave[joint.getMotorController()->getSlaveIndex()].PO2SOconfig = setSlaveWatchdogTimer;
-    reset |= joint.initialize(this->cycle_time_ms_);
+    reset |= joint.initSdo(this->cycle_time_ms_);
   }
 
   ec_config_map(&this->io_map_);

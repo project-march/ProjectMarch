@@ -22,7 +22,6 @@ public:
   double getVelocity();
   double getPosition(bool absolute);
   double getVelocity(bool absolute);
-  virtual int16_t getTorque() = 0;
 
   ActuationMode getActuationMode() const;
 
@@ -32,14 +31,15 @@ public:
    */
   virtual unsigned int getActuationModeNumber() const = 0;
 
-//  virtual float getMotorCurrent() = 0;
-////  virtual float getMotorControllerVoltage() = 0;
-//  virtual float getMotorVoltage() = 0;
-//
+  virtual double getTorque() = 0;
+  virtual float getMotorCurrent() = 0;
+  virtual float getMotorControllerVoltage() = 0;
+  virtual float getMotorVoltage() = 0;
+
   virtual void actuateRadians(double target_position) = 0;
   virtual void actuateTorque(double target_effort) = 0;
-//
-//  virtual void prepareActuation() = 0;
+
+  virtual void prepareActuation() = 0;
   bool initialize(int cycle_time);
 
   /**
@@ -61,6 +61,22 @@ public:
    * cycle.
    */
   virtual std::unique_ptr<MotorControllerState> getState() = 0;
+
+  /** @brief Override comparison operator */
+  friend bool operator==(const MotorController& lhs, const MotorController& rhs)
+  {
+    return lhs.getSlaveIndex() == rhs.getSlaveIndex() && *lhs.absolute_encoder_ == *rhs.absolute_encoder_ &&
+           *lhs.incremental_encoder_ == *rhs.incremental_encoder_ &&
+           lhs.actuation_mode_.getValue() == rhs.actuation_mode_.getValue();
+  }
+  /** @brief Override stream operator for clean printing */
+  friend std::ostream& operator<<(std::ostream& os, const MotorController& motor_controller)
+  {
+    return os << "slaveIndex: " << motor_controller.getSlaveIndex() << ", "
+              << "incrementalEncoder: " << *motor_controller.incremental_encoder_ << ", "
+              << "absoluteEncoder: " << *motor_controller.absolute_encoder_
+              << "actuationMode" << motor_controller.actuation_mode_.toString();
+  }
 
 protected:
   virtual double getAbsolutePosition() = 0;

@@ -45,7 +45,7 @@ public:
   Joint& operator=(Joint&&) = delete;
 
   // Initialize the components of the joint
-  bool initialize(int cycle_time);
+  bool initSdo(int cycle_time);
   void prepareActuation();
 
   void actuate(double target);
@@ -120,7 +120,7 @@ private:
   double position_ = 0.0;
   double velocity_ = 0.0;
 
-  std::shared_ptr<IMotionCube> motor_controller_;
+  std::shared_ptr<MotorController> motor_controller_;
   std::shared_ptr<TemperatureGES> temperature_ges_ = nullptr;
 };
 

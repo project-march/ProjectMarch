@@ -30,7 +30,7 @@ protected:
 //TEST_F(JointTest, InitializeWithoutMotorControllerAndGes)
 //{
 //  march::Joint joint("test", 0);
-//  ASSERT_NO_THROW(joint.initialize(1));
+//  ASSERT_NO_THROW(joint.initSdo(1));
 //}
 
 TEST_F(JointTest, InitializeWithoutTemperatureGes)
@@ -39,7 +39,7 @@ TEST_F(JointTest, InitializeWithoutTemperatureGes)
   EXPECT_CALL(*this->imc, initSdo(_, Eq(expected_cycle))).Times(1);
 
   march::Joint joint("test", 0, false, std::move(this->imc));
-  ASSERT_NO_THROW(joint.initialize(expected_cycle));
+  ASSERT_NO_THROW(joint.initSdo(expected_cycle));
 }
 
 TEST_F(JointTest, InitializeWithoutMotorController)
@@ -48,7 +48,7 @@ TEST_F(JointTest, InitializeWithoutMotorController)
   EXPECT_CALL(*this->temperature_ges, initSdo(_, Eq(expected_cycle))).Times(1);
 
   march::Joint joint("test", 0, false, nullptr, std::move(this->temperature_ges));
-  ASSERT_NO_THROW(joint.initialize(expected_cycle));
+  ASSERT_NO_THROW(joint.initSdo(expected_cycle));
 }
 
 TEST_F(JointTest, AllowActuation)
