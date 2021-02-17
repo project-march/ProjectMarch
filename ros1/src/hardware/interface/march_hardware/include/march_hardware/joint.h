@@ -48,8 +48,7 @@ public:
   bool initialize(int cycle_time);
   void prepareActuation();
 
-  void actuateRad(double target_position);
-  void actuateTorque(int16_t target_torque);
+  void actuate(double target);
   void readEncoders(const ros::Duration& elapsed_time);
 
   double getPosition() const;
@@ -59,7 +58,6 @@ public:
   int getNetNumber() const;
 
   std::shared_ptr<MotorController> getMotorController();
-  ActuationMode getActuationMode() const;
 
   bool hasTemperatureGES() const;
   std::shared_ptr<TemperatureGES> getTemperatureGES();
@@ -76,8 +74,7 @@ public:
             (!lhs.motor_controller_ && !rhs.motor_controller_)) &&
            ((lhs.temperature_ges_ && rhs.temperature_ges_ && *lhs.temperature_ges_ == *rhs.temperature_ges_) ||
             (!lhs.temperature_ges_ && !rhs.temperature_ges_)) &&
-           lhs.allow_actuation_ == rhs.allow_actuation_ &&
-           lhs.getActuationMode().getValue() == rhs.getActuationMode().getValue();
+           lhs.allow_actuation_ == rhs.allow_actuation_;
   }
 
   friend bool operator!=(const Joint& lhs, const Joint& rhs)
@@ -88,7 +85,6 @@ public:
   friend ::std::ostream& operator<<(std::ostream& os, const Joint& joint)
   {
     os << "name: " << joint.name_ << ", "
-       << "ActuationMode: " << joint.getActuationMode().toString() << ", "
        << "allowActuation: " << joint.allow_actuation_ << ", "
        << "imotioncube: ";
     if (joint.motor_controller_)

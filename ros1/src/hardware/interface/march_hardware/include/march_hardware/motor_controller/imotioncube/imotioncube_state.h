@@ -111,25 +111,6 @@ class IMotionCubeState : public MotorControllerState
 {
 public:
   IMotionCubeState() = default;
-  IMotionCubeState(float motor_current, float motor_voltage,
-                   double absolute_angle_iu, double incremental_angle_iu,
-                   double absolute_velocity_iu, double incremental_velocity_iu,
-                   double absolute_angle_rad, double incremental_angle_rad,
-                   double absolute_velocity_rad, double incremental_velocity_rad,
-                   uint16_t status_word, std::string motion_error, std::string detailed_error,
-                   std::string second_detailed_error, std::string detailed_error_description,
-                   std::string motion_error_description, std::string second_detailed_error_description)
-      : MotorControllerState(motor_current, motor_voltage, absolute_angle_iu, incremental_angle_iu,
-                             absolute_velocity_iu, incremental_velocity_iu, absolute_angle_rad, incremental_angle_rad,
-                             absolute_velocity_rad, incremental_velocity_rad)
-      , state_of_operation_(IMCStateOfOperation(status_word))
-      , motion_error_(motion_error)
-      , detailed_error_(detailed_error)
-      , second_detailed_error_(second_detailed_error)
-      , detailed_error_description_(detailed_error_description)
-      , motion_error_description_(motion_error_description)
-      , second_detailed_error_description_(second_detailed_error_description)
-  {}
 
   bool isOk() override
   {

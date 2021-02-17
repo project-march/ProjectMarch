@@ -70,9 +70,9 @@ public:
   static march::Joint createJoint(const YAML::Node& joint_config, const std::string& joint_name,
                                   const urdf::JointConstSharedPtr& urdf_joint, march::PdoInterfacePtr pdo_interface,
                                   march::SdoInterfacePtr sdo_interface);
-  static std::unique_ptr<march::AbsoluteEncoder> createAbsoluteEncoder(const YAML::Node& absolute_encoder_config,
+  static std::shared_ptr<march::AbsoluteEncoder> createAbsoluteEncoder(const YAML::Node& absolute_encoder_config,
                                                                        const urdf::JointConstSharedPtr& urdf_joint);
-  static std::unique_ptr<march::IncrementalEncoder>
+  static std::shared_ptr<march::IncrementalEncoder>
   createIncrementalEncoder(const YAML::Node& incremental_encoder_config);
   static std::shared_ptr<march::IMotionCube> createIMotionCube(const YAML::Node& imc_config, march::ActuationMode mode,
                                                                const urdf::JointConstSharedPtr& urdf_joint,

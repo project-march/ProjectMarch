@@ -150,7 +150,7 @@ std::shared_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
       HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), setup, mode);
 }
 
-std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
+std::shared_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
     const YAML::Node& absolute_encoder_config, const urdf::JointConstSharedPtr& urdf_joint)
 {
   if (!absolute_encoder_config || !urdf_joint)
@@ -183,7 +183,7 @@ std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
                                                   urdf_joint->limits->upper, soft_lower_limit, soft_upper_limit);
 }
 
-std::unique_ptr<march::IncrementalEncoder>
+std::shared_ptr<march::IncrementalEncoder>
 HardwareBuilder::createIncrementalEncoder(const YAML::Node& incremental_encoder_config)
 {
   if (!incremental_encoder_config)

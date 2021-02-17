@@ -10,25 +10,10 @@ class MotorControllerState
 {
 public:
   MotorControllerState() = default;
-  MotorControllerState(float motor_current, float motor_voltage,
-                       double absolute_angle_iu, double incremental_angle_iu,
-                       double absolute_velocity_iu, double incremental_velocity_iu,
-                       double absolute_angle_rad, double incremental_angle_rad,
-                       double absolute_velocity_rad, double incremental_velocity_rad)
-    : motor_current_(motor_current)
-    , motor_voltage_(motor_voltage)
-    , absolute_angle_iu_(absolute_angle_iu)
-    , incremental_angle_iu_(incremental_angle_iu)
-    , absolute_velocity_iu_(absolute_velocity_iu)
-    , incremental_velocity_iu_(incremental_velocity_iu)
-    , absolute_angle_rad_(absolute_angle_rad)
-    , incremental_angle_rad_(incremental_angle_rad)
-    , absolute_velocity_rad_(absolute_velocity_rad)
-    , incremental_velocity_rad_(incremental_velocity_rad)
-  {}
 
   float motor_current_;
   float motor_voltage_;
+  float motor_controller_voltage_;
   double absolute_angle_iu_;
   double incremental_angle_iu_;
   double absolute_velocity_iu_;

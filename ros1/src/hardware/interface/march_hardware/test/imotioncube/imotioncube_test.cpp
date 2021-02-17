@@ -53,16 +53,16 @@ TEST_F(IMotionCubeTest, NoActuationMode)
 {
   march::IMotionCube imc(mock_slave, std::move(this->mock_absolute_encoder), std::move(this->mock_incremental_encoder),
                          march::ActuationMode::unknown);
-  ASSERT_THROW(imc.actuateRad(1), march::error::HardwareException);
+  ASSERT_THROW(imc.actuateRadians(1), march::error::HardwareException);
 }
 
-TEST_F(IMotionCubeTest, ActuationModeTorqueActuateRad)
+TEST_F(IMotionCubeTest, ActuationModeTorqueActuateRadians)
 {
   march::IMotionCube imc(mock_slave, std::move(this->mock_absolute_encoder), std::move(this->mock_incremental_encoder),
                          march::ActuationMode::torque);
 
   ASSERT_EQ(march::ActuationMode::torque, imc.getActuationMode().getValue());
-  ASSERT_THROW(imc.actuateRad(1), march::error::HardwareException);
+  ASSERT_THROW(imc.actuateRadians(1), march::error::HardwareException);
 }
 
 TEST_F(IMotionCubeTest, ActuationModePositionActuateTorque)
