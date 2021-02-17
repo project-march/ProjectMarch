@@ -64,7 +64,7 @@ void NormalsPreprocessor::downsample()
   auto parameters = config_tree_["downsampling"];
   double leaf_size = parameters["leaf_size"].as<double>();
 
-  pcl::VoxelGrid<pcl::PoinXYZ> voxel_grid;
+  pcl::VoxelGrid<pcl::PointXYZ> voxel_grid;
   voxel_grid.setInputCloud(pointcloud_);
   voxel_grid.setLeafSize(leaf_size, leaf_size, leaf_size);
   voxel_grid.filter(*pointcloud_);
