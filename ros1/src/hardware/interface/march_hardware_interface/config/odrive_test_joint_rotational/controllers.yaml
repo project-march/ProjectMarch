@@ -13,6 +13,15 @@ march:
       type: model_predictive_trajectory_controller/JointTrajectoryController
       joints:
         - rotational_joint
+
+      q_matrices:
+        rotational_joint:
+          n_rows: 3
+          n_cols: 3
+          Q: [ 100.0, 0, 0,
+               0, 1.0, 0,
+               0, 0, 0.01 ]
+
       constraints:
         rotational_joint:
           margin_soft_limit_error: 0.5
