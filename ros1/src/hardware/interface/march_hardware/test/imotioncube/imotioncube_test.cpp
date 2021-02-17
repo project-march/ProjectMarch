@@ -77,5 +77,5 @@ TEST_F(IMotionCubeTest, OperationEnabledWithoutActuationMode)
 {
   march::IMotionCube imc(mock_slave, std::move(this->mock_absolute_encoder), std::move(this->mock_incremental_encoder),
                          march::ActuationMode::unknown);
-  ASSERT_THROW(imc.goToOperationEnabled(), march::error::HardwareException);
+  ASSERT_THROW(imc.prepareActuation(), march::error::HardwareException);
 }
