@@ -66,7 +66,7 @@ private:
    * @param joint_name Joint to retrieve Q Matrix for
    * @return Returns a 2d vector: The Q Matrix.
    */
-  std::vector<std::vector<float>> getQMatrix(std::string joint_name);
+  std::vector<float> getQMatrix(std::string joint_name);
 
   std::vector<hardware_interface::JointHandle>* joint_handles_ptr_;
 

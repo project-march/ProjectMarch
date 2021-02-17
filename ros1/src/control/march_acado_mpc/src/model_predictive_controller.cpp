@@ -64,9 +64,37 @@ void ModelPredictiveController::setInitialState(vector<double> x0) {
   }
 }
 
-void ModelPredictiveController::assignWeightingMatrix(std::vector<std::vector<float>> Q) {
+void ModelPredictiveController::assignWeightingMatrix(std::vector<float> Q) {
 
+    double ACADO_NW = sizeof(acadoVariables.W)/sizeof(acadoVariables.W[0]);
+    double ACADO_NWN = sizeof(acadoVariables.WN)/sizeof(acadoVariables.WN[0]);
 
+    std::cout << ACADO_NW << ", " << ACADO_NWN << std::endl;
+
+    int nrows = Q.size();
+    int ncols = Q[0].size();
+
+    // set W matrix with Q matrix
+    for(int i=0; i < nrows; i++) {
+        for(int j=0; j < ncols; j++) {
+            acadoVariables.W[i*ncols+j] = Q[i][j];
+        }
+    }
+
+    // Set WN matrix with Q matrix
+    for(int i=0; i < (nrows-1); i++) {
+        for(int j=0; j < 2; j++) {
+            acadoVariables.WN[i*(ncols-1) + j] = Q[i][j];
+        }
+    }
+
+    for(int i=0; i < ACADO_NW; i++) {
+        std::cout << acadoVariables.W[i] << std::endl;
+    }
+
+    for(int i=0; i < ACADO_NWN; i++) {
+        std::cout << acadoVariables.WN[i] << std::endl;
+    }
 
   // [Temporary] Has the function been executed?
   std::cout << "\033[4;32m" << __FUNCTION__ << "()\033[0m" << " has executed\n";
