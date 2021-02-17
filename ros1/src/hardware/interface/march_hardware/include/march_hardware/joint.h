@@ -17,39 +17,33 @@ namespace march
 class Joint
 {
 public:
-  /**
-   * Initializes a Joint without motor controller and temperature slave.
-   * Actuation will be disabled.
-   */
-//  Joint(std::string name, int net_number);
+  // Initialize a Joint with motor controller and without temperature slave.
+  Joint(std::string name, int net_number, std::shared_ptr<IMotionCube> motor_controller);
 
-  /**
-   * Initializes a Joint with motor controller and without temperature slave.
-   */
-  Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<IMotionCube> motor_controller);
-
-  /**
-   * Initializes a Joint with motor controller and temperature slave.
-   */
-  Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<IMotionCube> motor_controller,
+  // Initialize a Joint with motor controller and temperature slave.
+  Joint(std::string name, int net_number, std::shared_ptr<IMotionCube> motor_controller,
         std::shared_ptr<TemperatureGES> temperature_ges);
 
   virtual ~Joint() noexcept = default;
 
-  /* Delete copy constructor/assignment since the unique_ptr cannot be copied */
+  // Delete copy constructor/assignment since the unique_ptr cannot be copied
   Joint(const Joint&) = delete;
   Joint& operator=(const Joint&) = delete;
 
-  /* Delete move assignment since string cannot be move assigned */
+  // Delete move assignment since string cannot be move assigned
   Joint(Joint&&) = default;
   Joint& operator=(Joint&&) = delete;
 
-  // Initialize the components of the joint
+  // Call the initSdo functions of the components of the joint
   bool initSdo(int cycle_time);
-  void prepareActuation();
 
-  void actuate(double target);
+  // Read the encoder data and store the position and velocity values in the Joint
   void readEncoders(const ros::Duration& elapsed_time);
+
+  // Prepare the joint for actuation
+  // First calls the prepareActuation() method of the MotorController
+  // Then sets some initial values
+  void prepareActuation();
 
   double getPosition() const;
   double getVelocity() const;

@@ -18,58 +18,55 @@ public:
   MotorController(const Slave& slave, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
                   std::shared_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
 
+  // Get the most precise position or velocity
   double getPosition();
   double getVelocity();
+
+  // Get the position, either absolute or incremental
   double getPosition(bool absolute);
   double getVelocity(bool absolute);
 
+  // A MotorController should support both actuating by position (radians) or by torque
+  virtual void actuateRadians(double target_position) = 0;
+  virtual void actuateTorque(double target_effort) = 0;
   ActuationMode getActuationMode() const;
 
-  /*
-   * Transform the ActuationMode to a number that is understood by the MotorController
-   * @return the mode number that belong to the ActuationMode
-   */
+  // Actuate based on the actuation mode of the motor controller
+  void actuate(double target);
+
+  // Prepare the MotorController for actuation, move it into its 'ready' state
+  virtual void prepareActuation() = 0;
+
+  // Transform the ActuationMode to a number that is understood by the MotorController
   virtual unsigned int getActuationModeNumber() const = 0;
 
+  // Get whether the incremental encoder is more precise than the absolute encoder
+  bool isIncrementalEncoderMorePrecise() const;
+
+  // A MotorController doesn't necessarily have an AbsoluteEncoder and an IncrementalEncoder, but will have
+  // at least one of the two
+  bool hasAbsoluteEncoder() const;
+  std::shared_ptr<AbsoluteEncoder> getAbsoluteEncoder();
+  bool hasIncrementalEncoder() const;
+  std::shared_ptr<IncrementalEncoder> getIncrementalEncoder();
+
+  // Getters for specific information about the state of the motor and its controller
   virtual double getTorque() = 0;
   virtual float getMotorCurrent() = 0;
   virtual float getMotorControllerVoltage() = 0;
   virtual float getMotorVoltage() = 0;
 
-  virtual void actuateRadians(double target_position) = 0;
-  virtual void actuateTorque(double target_effort) = 0;
-
-  virtual void prepareActuation() = 0;
-  bool initialize(int cycle_time);
-
-  /**
-   * Get whether the incremental encoder is more precise than the absolute encoder
-   * @return true if the incremental encoder has a higher resolution than the absolute encoder, false otherwise
-   */
-  bool isIncrementalEncoderMorePrecise() const;
-
-  bool hasAbsoluteEncoder() const;
-  std::shared_ptr<AbsoluteEncoder> getAbsoluteEncoder();
-
-  bool hasIncrementalEncoder() const;
-  std::shared_ptr<IncrementalEncoder> getIncrementalEncoder();
-
-  /**
-   * Get the most recent states of the motor controller, i.e. all data that is read from the controller at every
-   * communication cycle.
-   * @return A MotorControllerState object containing all data read from the motor controller at every communication
-   * cycle.
-   */
+  // Get a full description of the state of the MotorController
   virtual std::unique_ptr<MotorControllerState> getState() = 0;
 
-  /** @brief Override comparison operator */
+  // Override comparison operator
   friend bool operator==(const MotorController& lhs, const MotorController& rhs)
   {
     return lhs.getSlaveIndex() == rhs.getSlaveIndex() && *lhs.absolute_encoder_ == *rhs.absolute_encoder_ &&
            *lhs.incremental_encoder_ == *rhs.incremental_encoder_ &&
            lhs.actuation_mode_.getValue() == rhs.actuation_mode_.getValue();
   }
-  /** @brief Override stream operator for clean printing */
+  // Override stream operator for clean printing
   friend std::ostream& operator<<(std::ostream& os, const MotorController& motor_controller)
   {
     return os << "slaveIndex: " << motor_controller.getSlaveIndex() << ", "
@@ -79,9 +76,10 @@ public:
   }
 
 protected:
+  // Getters for absolute and incremental position and velocity.
+  // These will throw an error where the encoder is not available.
   virtual double getAbsolutePosition() = 0;
   virtual double getIncrementalPosition() = 0;
-
   virtual double getAbsoluteVelocity() = 0;
   virtual double getIncrementalVelocity() = 0;
 

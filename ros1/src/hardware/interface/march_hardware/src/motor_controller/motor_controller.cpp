@@ -26,11 +26,6 @@ MotorController::MotorController(const Slave& slave, std::shared_ptr<AbsoluteEnc
   }
 }
 
-bool MotorController::initialize(int cycle_time)
-{
-  return this->initSdo(cycle_time);
-}
-
 bool MotorController::isIncrementalEncoderMorePrecise() const
 {
   if (!hasIncrementalEncoder())
@@ -127,4 +122,15 @@ std::shared_ptr<IncrementalEncoder> MotorController::getIncrementalEncoder()
   return incremental_encoder_;
 }
 
+void MotorController::actuate(double target)
+{
+  if (actuation_mode_ == march::ActuationMode::position)
+  {
+    actuateRadians(target);
+  }
+  else if (actuation_mode_ == march::ActuationMode::torque)
+  {
+    actuateTorque(target);
+  }
+}
 }
