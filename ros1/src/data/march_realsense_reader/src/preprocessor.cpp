@@ -49,15 +49,11 @@ void NormalsPreprocessor::preprocess()
 
   transformPointCloud();
 
-
   filterOnDistanceFromOrigin();
-
 
   removeStatisticalOutliers();
 
-
   fillNormalCloud();
-
 
   filterOnNormalOrientation();
 }
@@ -137,7 +133,7 @@ void NormalsPreprocessor::filterOnDistanceFromOrigin()
 
 void NormalsPreprocessor::fillNormalCloud()
 {
-  // Remove all the points who's normal is not in the 'interesting' region.
+  // Fill the pointcloud_normals_ object with estimated normals from the current pointcloud_ object 
   auto parameters = config_tree_["normal_estimation"];
   bool use_tree_search_method = parameters["use_tree_search_method"].as<bool>();
   int number_of_neighbours = parameters["number_of_neighbours"].as<int>();
@@ -160,6 +156,8 @@ void NormalsPreprocessor::fillNormalCloud()
 
 void NormalsPreprocessor::filterOnNormalOrientation()
 {
+  // Filter points based on the x y or z component of the normal vector of the point.
+  // This can work because the normals are of unit length.
   auto parameters = config_tree_["normal_filter"];
   double allowed_length_x = parameters["allowed_length_x"].as<double>();
   double allowed_length_y = parameters["allowed_length_y"].as<double>();
@@ -171,11 +169,11 @@ void NormalsPreprocessor::filterOnNormalOrientation()
     {
       // remove point if its normal is too far from what is desired
       if (pointcloud_normals_->points[p].normal_x * pointcloud_normals_->points[p].normal_x >
-          allowed_length_x ||
+          allowed_length_x * allowed_length_x ||
           pointcloud_normals_->points[p].normal_y * pointcloud_normals_->points[p].normal_y >
-          allowed_length_y ||
+          allowed_length_y * allowed_length_y ||
           pointcloud_normals_->points[p].normal_z * pointcloud_normals_->points[p].normal_z >
-          allowed_length_z )
+          allowed_length_z * allowed_length_z )
       {
         pointcloud_->points[p] = pointcloud_->points[pointcloud_->points.size() - 1];
         pointcloud_->points.resize(pointcloud_->points.size() - 1);
