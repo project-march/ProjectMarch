@@ -1,77 +1,77 @@
 description: This version has 5 degrees more knee flexion.
-duration: {nsecs: 500000000, secs: 2}
+duration: 2500000000
 gait_type: stairs_like
 joints:
   left_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   left_hip_fe:
   - position: -0.1396
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.8378
-    time_from_start: {nsecs: 785600000, secs: 1}
+    time_from_start: 1785600000
     velocity: -0.3491
   - position: 0.7278
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   left_knee:
   - position: 0.1396
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.309
-    time_from_start: {nsecs: 300000000, secs: 1}
+    time_from_start: 1300000000
     velocity: -0.3491
   - position: 0.9031
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   right_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   right_hip_fe:
   - position: 0.7278
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: -0.1396
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   right_knee:
   - position: 0.9031
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1396
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
 name: left_swing
 version: MV_RD_slopeup_leftswing_v3

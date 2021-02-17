@@ -1,123 +1,123 @@
 description: Right open step for stairs up, same version as MIII used. The first MIII
   version was probably not the right one, so this version has to be better.
-duration: {nsecs: 0, secs: 3}
+duration: 3000000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 244000000, secs: 0}
+    time_from_start: 244000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 237500000, secs: 1}
+    time_from_start: 1237500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 649999999, secs: 1}
+    time_from_start: 1649999999
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 267500000, secs: 0}
+    time_from_start: 267500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 237500000, secs: 1}
+    time_from_start: 1237500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 649999999, secs: 1}
+    time_from_start: 1649999999
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   left_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 399999999, secs: 2}
+    time_from_start: 2399999999
     velocity: 0.0
   - position: -0.1396
-    time_from_start: {nsecs: 811300000, secs: 2}
+    time_from_start: 2811300000
     velocity: 0.0
   - position: -0.1396
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   left_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 956900000, secs: 0}
+    time_from_start: 956900000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 390899999, secs: 2}
+    time_from_start: 2390899999
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 691100000, secs: 2}
+    time_from_start: 2691100000
     velocity: 0.0
   - position: 0.1847
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 1.228
   right_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 154900000, secs: 0}
+    time_from_start: 154900000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 237500000, secs: 1}
+    time_from_start: 1237500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 649999999, secs: 1}
+    time_from_start: 1649999999
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 186200000, secs: 0}
+    time_from_start: 186200000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 237500000, secs: 1}
+    time_from_start: 1237500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   right_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.2741
-    time_from_start: {nsecs: 496899999, secs: 1}
+    time_from_start: 1496899999
     velocity: 0.0
   - position: 1.2741
-    time_from_start: {nsecs: 857100000, secs: 1}
+    time_from_start: 1857100000
     velocity: 0.0
   - position: 0.3491
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: -0.9425
   right_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.7453
-    time_from_start: {nsecs: 197100000, secs: 1}
+    time_from_start: 1197100000
     velocity: 0.0
   - position: 1.5708
-    time_from_start: {nsecs: 734499999, secs: 1}
+    time_from_start: 1734499999
     velocity: -0.3142
   - position: 0.4363
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: -0.9425
 name: right_open
 version: MIV_slow_sjaan

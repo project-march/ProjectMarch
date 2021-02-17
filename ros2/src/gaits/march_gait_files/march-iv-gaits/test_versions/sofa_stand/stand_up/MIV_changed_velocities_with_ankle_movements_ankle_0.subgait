@@ -1,93 +1,93 @@
 description: 'Stand up gait: from the sofa to the standing position. In this gait
   the velocities are increased. Furthermore, movement of the ankles is added.'
-duration: {nsecs: 700000000, secs: 1}
+duration: 1700000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1745
-    time_from_start: {nsecs: 300000000, secs: 0}
+    time_from_start: 300000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: 0.0
   left_hip_fe:
   - position: 1.6581
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.5708
-    time_from_start: {nsecs: 100000000, secs: 0}
+    time_from_start: 100000000
     velocity: -1.0123
   - position: 0.0
-    time_from_start: {nsecs: 600000000, secs: 1}
+    time_from_start: 1600000000
     velocity: -1.0123
   - position: -0.0873
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: 0.0
   left_knee:
   - position: 1.9024
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.7977
-    time_from_start: {nsecs: 100000000, secs: 0}
+    time_from_start: 100000000
     velocity: -1.0123
   - position: 0.0873
-    time_from_start: {nsecs: 600000000, secs: 1}
+    time_from_start: 1600000000
     velocity: -1.0123
   - position: 0.0
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: 0.0
   right_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1745
-    time_from_start: {nsecs: 300000000, secs: 0}
+    time_from_start: 300000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: 0.0
   right_hip_fe:
   - position: 1.6581
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.5708
-    time_from_start: {nsecs: 100000000, secs: 0}
+    time_from_start: 100000000
     velocity: -1.0123
   - position: 0.0
-    time_from_start: {nsecs: 600000000, secs: 1}
+    time_from_start: 1600000000
     velocity: -1.0123
   - position: -0.0873
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: 0.0
   right_knee:
   - position: 1.9024
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.7977
-    time_from_start: {nsecs: 100000000, secs: 0}
+    time_from_start: 100000000
     velocity: -1.0123
   - position: 0.0873
-    time_from_start: {nsecs: 600000000, secs: 1}
+    time_from_start: 1600000000
     velocity: -1.0123
   - position: 0.0
-    time_from_start: {nsecs: 700000000, secs: 1}
+    time_from_start: 1700000000
     velocity: 0.0
 name: stand_up
 version: MIV_changed_velocities_with_ankle_movements_ankle_0

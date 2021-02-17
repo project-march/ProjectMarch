@@ -1,84 +1,84 @@
 description: Right close for stepping straight onto the Tilted Path, starting with
   the left foot.
-duration: {nsecs: 700000000, secs: 2}
+duration: 2700000000
 gait_type: stairs_like
 joints:
   left_ankle:
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 700000000, secs: 2}
+    time_from_start: 2700000000
     velocity: -0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 12299999, secs: 1}
+    time_from_start: 1012299999
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 350000000, secs: 1}
+    time_from_start: 1350000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 700000000, secs: 2}
+    time_from_start: 2700000000
     velocity: -0.0
   left_hip_fe:
   - position: 0.384
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 700000000, secs: 2}
+    time_from_start: 2700000000
     velocity: 0.0
   left_knee:
   - position: 0.3491
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 700000000, secs: 2}
+    time_from_start: 2700000000
     velocity: 0.0
   right_ankle:
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 700000000, secs: 2}
+    time_from_start: 2700000000
     velocity: -0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 12299999, secs: 1}
+    time_from_start: 1012299999
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 350000000, secs: 1}
+    time_from_start: 1350000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 700000000, secs: 2}
+    time_from_start: 2700000000
     velocity: -0.0
   right_hip_fe:
   - position: -0.2269
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.5585
-    time_from_start: {nsecs: 111299999, secs: 1}
+    time_from_start: 1111299999
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 700000000, secs: 2}
+    time_from_start: 2700000000
     velocity: -0.0
   right_knee:
   - position: 0.1396
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 1.2217
-    time_from_start: {nsecs: 900000000, secs: 0}
+    time_from_start: 900000000
     velocity: 0.0
   - position: 0.3196
-    time_from_start: {nsecs: 920600000, secs: 1}
+    time_from_start: 1920600000
     velocity: -0.9993
   - position: 0.0
-    time_from_start: {nsecs: 700000000, secs: 2}
+    time_from_start: 2700000000
     velocity: 0.0
 name: right_close
 version: MV_TPstraight_rightclose_v1

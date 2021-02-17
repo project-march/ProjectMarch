@@ -1,71 +1,71 @@
 description: Stairs up with higher steps.
-duration: {nsecs: 0, secs: 3}
+duration: 3000000000
 gait_type: stairs_like
 joints:
   left_ankle:
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   left_hip_fe:
   - position: 0.2269
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.1745
   - position: 0.9599
-    time_from_start: {nsecs: 527300000, secs: 1}
+    time_from_start: 1527300000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   left_knee:
   - position: 0.2443
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.6981
   - position: 1.4835
-    time_from_start: {nsecs: 527300000, secs: 1}
+    time_from_start: 1527300000
     velocity: 0.0
   - position: 1.2008
-    time_from_start: {nsecs: 59600000, secs: 2}
+    time_from_start: 2059600000
     velocity: -1.3331
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   right_ankle:
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   right_hip_fe:
   - position: 1.1694
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   right_knee:
   - position: 1.1345
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
 name: left_close
 version: MV_stairsup_leftclose_v5
