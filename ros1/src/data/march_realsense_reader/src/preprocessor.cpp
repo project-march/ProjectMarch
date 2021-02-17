@@ -8,6 +8,7 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/common/transforms.h>
 #include <pcl/filters/statistical_outlier_removal.h>
+//#include <pcl/visualization/pcl_visualizer.h>
 
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -44,6 +45,15 @@ void SimplePreprocessor::preprocess()
 void NormalsPreprocessor::preprocess()
 {
   ROS_INFO_STREAM("Preprocessing with normal filtering.");
+  ROS_INFO_STREAM("Pointcloud_ size BEFORE proprocessing " << pointcloud_->points.size());
+
+//  pcl::visualization::PCLVisualizer::Ptr viewer_1 (new pcl::visualization::PCLVisualizer ("input Viewer"));
+//  viewer_1->setBackgroundColor (0, 0, 0);
+//  viewer_1->addPointCloud<pcl::PointXYZ> (pointcloud_, "input cloud");
+//  viewer_1->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "input cloud");
+//  viewer_1->addCoordinateSystem (1.0);
+//  viewer_1->initCameraParameters ();
+//  viewer_1->spin();
 
   clock_t start = clock();
 
@@ -91,6 +101,17 @@ void NormalsPreprocessor::preprocess()
 
   double time_normal_filter = double(end - normal_fill) / double(CLOCKS_PER_SEC);
   ROS_INFO_STREAM("Time taken by normal_filter in total is : " << std::fixed << time_normal_filter << std::setprecision(5) << " sec ");
+
+  ROS_INFO_STREAM("Pointcloud_ size AFTER preprocessing " << pointcloud_->points.size());
+
+//  pcl::visualization::PCLVisualizer::Ptr viewer_2 (new pcl::visualization::PCLVisualizer ("processed Viewer"));
+//  viewer_2->setBackgroundColor (0, 0, 0);
+//  viewer_2->addPointCloud<pcl::PointXYZ> (pointcloud_, "resulting cloud");
+//  viewer_2->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "resulting cloud");
+//  viewer_2->addPointCloudNormals<pcl::PointXYZ, pcl::Normal> (pointcloud_, pointcloud_normals_, 10, 0.05, "normals");
+//  viewer_2->addCoordinateSystem (1.0);
+//  viewer_2->initCameraParameters ();
+//  viewer_2->spin();
 }
 
 void NormalsPreprocessor::downsample()
@@ -100,9 +121,9 @@ void NormalsPreprocessor::downsample()
   double leaf_size = parameters["leaf_size"].as<double>();
 
   pcl::VoxelGrid<pcl::PointXYZ> voxel_grid;
-  voxel_grid.setInputCloud (pointcloud_);
-  voxel_grid.setLeafSize (leaf_size, leaf_size, leaf_size);
-  voxel_grid.filter (*pointcloud_);
+  voxel_grid.setInputCloud(pointcloud_);
+  voxel_grid.setLeafSize(leaf_size, leaf_size, leaf_size);
+  voxel_grid.filter(*pointcloud_);
 }
 
 void NormalsPreprocessor::removeStatisticalOutliers()
@@ -113,10 +134,10 @@ void NormalsPreprocessor::removeStatisticalOutliers()
   double sd_factor = parameters["sd_factor"].as<double>();
 
   pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
-  sor.setInputCloud (pointcloud_);
-  sor.setMeanK (number_of_neighbours);
-  sor.setStddevMulThresh (sd_factor);
-  sor.filter (*pointcloud_);
+  sor.setInputCloud(pointcloud_);
+  sor.setMeanK(number_of_neighbours);
+  sor.setStddevMulThresh(sd_factor);
+  sor.filter(*pointcloud_);
 }
 
 void NormalsPreprocessor::transformPointCloud()
@@ -202,11 +223,11 @@ void NormalsPreprocessor::filterOnNormalOrientation()
     {
       // remove point if its normal is too far from what is desired
       if (pointcloud_normals_->points[p].normal_x * pointcloud_normals_->points[p].normal_x >
-          allowed_length_x ||
+          allowed_length_x * allowed_length_x ||
           pointcloud_normals_->points[p].normal_y * pointcloud_normals_->points[p].normal_y >
-          allowed_length_y ||
+          allowed_length_y * allowed_length_y ||
           pointcloud_normals_->points[p].normal_z * pointcloud_normals_->points[p].normal_z >
-          allowed_length_z )
+          allowed_length_z * allowed_length_z )
       {
         pointcloud_->points[p] = pointcloud_->points[pointcloud_->points.size() - 1];
         pointcloud_->points.resize(pointcloud_->points.size() - 1);
