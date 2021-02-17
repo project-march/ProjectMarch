@@ -44,46 +44,19 @@ public:
   IMotionCube(const IMotionCube&) = delete;
   IMotionCube& operator=(const IMotionCube&) = delete;
 
-  int16_t getTorque() override;
-  int32_t getAngleIUAbsolute();
-  int32_t getAngleIUIncremental();
-  double getVelocityIUAbsolute();
-  double getVelocityIUIncremental();
-  uint16_t getStatusWord();
-  uint16_t getMotionError();
-  uint16_t getDetailedError();
-  uint16_t getSecondDetailedError();
-
   unsigned int getActuationModeNumber() const override;
 
-  virtual float getMotorCurrent();
-  virtual float getMotorControllerVoltage();
-  virtual float getMotorVoltage();
-
-  void setControlWord(uint16_t control_word);
+  double getTorque() override;
+  float getMotorCurrent() override;
+  float getMotorControllerVoltage() override;
+  float getMotorVoltage() override;
 
   std::unique_ptr<MotorControllerState> getState() override;
 
-  void actuateRadians(double target_rad) override;
+  void actuateRadians(double target_position) override;
   void actuateTorque(double target_torque) override;
 
-  void goToTargetState(IMotionCubeTargetState target_state);
-  virtual void goToOperationEnabled();
-
-  /** @brief Override comparison operator */
-  friend bool operator==(const IMotionCube& lhs, const IMotionCube& rhs)
-  {
-    return lhs.getSlaveIndex() == rhs.getSlaveIndex() && *lhs.absolute_encoder_ == *rhs.absolute_encoder_ &&
-           *lhs.incremental_encoder_ == *rhs.incremental_encoder_;
-  }
-  /** @brief Override stream operator for clean printing */
-  friend std::ostream& operator<<(std::ostream& os, const IMotionCube& imc)
-  {
-    return os << "slaveIndex: " << imc.getSlaveIndex() << ", "
-              << "incrementalEncoder: " << *imc.incremental_encoder_ << ", "
-              << "absoluteEncoder: " << *imc.absolute_encoder_
-              << "actuationMode" << imc.actuation_mode_.toString();
-  }
+  void prepareActuation() override;
 
   constexpr static double MAX_TARGET_DIFFERENCE = 0.393;
   constexpr static double IPEAK = 40;
@@ -100,7 +73,6 @@ public:
 
 protected:
   bool initSdo(SdoSlaveInterface& sdo, int cycle_time) override;
-
   void reset(SdoSlaveInterface& sdo) override;
 
   double getAbsolutePosition() override;
@@ -111,8 +83,20 @@ protected:
 
 private:
   int16_t ampereToTorqueIU(double ampere);
-
   void actuateIU(int32_t target_iu);
+
+  void goToTargetState(IMotionCubeTargetState target_state);
+
+  int32_t getAngleIUAbsolute();
+  int32_t getAngleIUIncremental();
+  double getVelocityIUAbsolute();
+  double getVelocityIUIncremental();
+  uint16_t getStatusWord();
+  uint16_t getMotionError();
+  uint16_t getDetailedError();
+  uint16_t getSecondDetailedError();
+
+  void setControlWord(uint16_t control_word);
 
   void mapMisoPDOs(SdoSlaveInterface& sdo);
   void mapMosiPDOs(SdoSlaveInterface& sdo);
