@@ -64,10 +64,10 @@ void NormalsPreprocessor::downsample()
   auto parameters = config_tree_["downsampling"];
   double leaf_size = parameters["leaf_size"].as<double>();
 
-  pcl::VoxelGrid<pcl::PointXYZ> voxel_grid;
-  voxel_grid.setInputCloud (pointcloud_);
-  voxel_grid.setLeafSize (leaf_size, leaf_size, leaf_size);
-  voxel_grid.filter (*pointcloud_);
+  pcl::VoxelGrid<pcl::PoinXYZ> voxel_grid;
+  voxel_grid.setInputCloud(pointcloud_);
+  voxel_grid.setLeafSize(leaf_size, leaf_size, leaf_size);
+  voxel_grid.filter(*pointcloud_);
 }
 
 void NormalsPreprocessor::removeStatisticalOutliers()
@@ -78,10 +78,10 @@ void NormalsPreprocessor::removeStatisticalOutliers()
   double sd_factor = parameters["sd_factor"].as<double>();
 
   pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
-  sor.setInputCloud (pointcloud_);
-  sor.setMeanK (number_of_neighbours);
-  sor.setStddevMulThresh (sd_factor);
-  sor.filter (*pointcloud_);
+  sor.setInputCloud(pointcloud_);
+  sor.setMeanK(number_of_neighbours);
+  sor.setStddevMulThresh(sd_factor);
+  sor.filter(*pointcloud_);
 }
 
 void NormalsPreprocessor::transformPointCloud()
