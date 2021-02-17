@@ -95,7 +95,7 @@ TEST_F(JointTest, ActuatePositionDisableActuation)
 {
   march::Joint joint("actuate_false", 0, false, std::move(this->imc));
   EXPECT_FALSE(joint.canActuate());
-  ASSERT_THROW(joint.actuateRad(0.3), march::error::HardwareException);
+  ASSERT_THROW(joint.actuate(0.3), march::error::HardwareException);
 }
 
 TEST_F(JointTest, ActuatePosition)
@@ -104,14 +104,14 @@ TEST_F(JointTest, ActuatePosition)
   EXPECT_CALL(*this->imc, actuateRad(Eq(expected_rad))).Times(1);
 
   march::Joint joint("actuate_false", 0, true, std::move(this->imc));
-  ASSERT_NO_THROW(joint.actuateRad(expected_rad));
+  ASSERT_NO_THROW(joint.actuate(expected_rad));
 }
 
 TEST_F(JointTest, ActuateTorqueDisableActuation)
 {
   march::Joint joint("actuate_false", 0, false, std::move(this->imc));
   EXPECT_FALSE(joint.canActuate());
-  ASSERT_THROW(joint.actuateTorque(3), march::error::HardwareException);
+  ASSERT_THROW(joint.actuate(3), march::error::HardwareException);
 }
 
 TEST_F(JointTest, ActuateTorque)
@@ -120,7 +120,7 @@ TEST_F(JointTest, ActuateTorque)
   EXPECT_CALL(*this->imc, actuateTorque(Eq(expected_torque))).Times(1);
 
   march::Joint joint("actuate_false", 0, true, std::move(this->imc));
-  ASSERT_NO_THROW(joint.actuateTorque(expected_torque));
+  ASSERT_NO_THROW(joint.actuate(expected_torque));
 }
 
 TEST_F(JointTest, PrepareForActuationNotAllowed)
@@ -177,14 +177,14 @@ TEST_F(JointTest, TestPrepareActuation)
 
 TEST_F(JointTest, TestReceivedDataUpdateFirstTimeTrue)
 {
-  EXPECT_CALL(*this->imc, getIMCVoltage()).WillOnce(Return(48));
+  EXPECT_CALL(*this->imc, getMotorControllerVoltage()).WillOnce(Return(48));
   march::Joint joint("actuate_true", 0, true, std::move(this->imc));
   ASSERT_TRUE(joint.receivedDataUpdate());
 }
 
 TEST_F(JointTest, TestReceivedDataUpdateTrue)
 {
-  EXPECT_CALL(*this->imc, getIMCVoltage()).WillOnce(Return(48)).WillOnce(Return(48.001));
+  EXPECT_CALL(*this->imc, getMotorControllerVoltage()).WillOnce(Return(48)).WillOnce(Return(48.001));
   march::Joint joint("actuate_true", 0, true, std::move(this->imc));
   joint.receivedDataUpdate();
   ASSERT_TRUE(joint.receivedDataUpdate());
@@ -192,7 +192,7 @@ TEST_F(JointTest, TestReceivedDataUpdateTrue)
 
 TEST_F(JointTest, TestReceivedDataUpdateFalse)
 {
-  EXPECT_CALL(*this->imc, getIMCVoltage()).WillRepeatedly(Return(48));
+  EXPECT_CALL(*this->imc, getMotorControllerVoltage()).WillRepeatedly(Return(48));
   march::Joint joint("actuate_true", 0, true, std::move(this->imc));
   joint.receivedDataUpdate();
   ASSERT_FALSE(joint.receivedDataUpdate());
@@ -202,7 +202,7 @@ TEST_F(JointTest, TestReadEncodersOnce)
 {
   ros::Duration elapsed_time(0.2);
   double velocity = 0.5;
-  double velocity_with_noise = velocity - 2 * this->imc->getAbsoluteRadPerBit() / elapsed_time.toSec();
+  double velocity_with_noise = velocity - 2 * this->imc->getAbsoluteEncoder()->getRadPerBit() / elapsed_time.toSec();
 
   double initial_incremental_position = 5;
   double initial_absolute_position = 3;
@@ -210,7 +210,7 @@ TEST_F(JointTest, TestReadEncodersOnce)
   double new_incremental_position = initial_incremental_position + velocity * elapsed_time.toSec();
   double new_absolute_position = initial_absolute_position + velocity_with_noise * elapsed_time.toSec();
 
-  EXPECT_CALL(*this->imc, getIMCVoltage()).WillOnce(Return(48));
+  EXPECT_CALL(*this->imc, getMotorControllerVoltage()).WillOnce(Return(48));
   EXPECT_CALL(*this->imc, getMotorCurrent()).WillOnce(Return(5));
   EXPECT_CALL(*this->imc, getAngleRadIncremental())
       .WillOnce(Return(initial_incremental_position))
@@ -240,7 +240,7 @@ TEST_F(JointTest, TestReadEncodersTwice)
   double first_velocity = 0.5;
   double second_velocity = 0.8;
 
-  double absolute_noise = -this->imc->getAbsoluteRadPerBit();
+  double absolute_noise = -this->imc->getAbsoluteEncoder()->getRadPerBit();
   double first_velocity_with_noise = first_velocity + absolute_noise / elapsed_time.toSec();
   double second_velocity_with_noise = second_velocity + absolute_noise / elapsed_time.toSec();
 
@@ -251,7 +251,7 @@ TEST_F(JointTest, TestReadEncodersTwice)
   double third_incremental_position = second_incremental_position + second_velocity * elapsed_time.toSec();
   double third_absolute_position = second_absolute_position + second_velocity_with_noise * elapsed_time.toSec();
 
-  EXPECT_CALL(*this->imc, getIMCVoltage()).WillOnce(Return(48)).WillOnce(Return(48.01));
+  EXPECT_CALL(*this->imc, getMotorControllerVoltage()).WillOnce(Return(48)).WillOnce(Return(48.01));
   EXPECT_CALL(*this->imc, getAngleRadIncremental())
       .WillOnce(Return(initial_incremental_position))
       .WillOnce(Return(second_incremental_position))
@@ -291,14 +291,14 @@ TEST_F(JointTest, TestReadEncodersNoUpdate)
 
   double velocity = 0.5;
 
-  double absolute_noise = -this->imc->getAbsoluteRadPerBit();
+  double absolute_noise = -this->imc->getAbsoluteEncoder()->getRadPerBit();
 
   double initial_incremental_position = 5;
   double initial_absolute_position = 3;
   double second_incremental_position = initial_incremental_position + velocity * elapsed_time.toSec();
   double second_absolute_position = initial_absolute_position + velocity * elapsed_time.toSec() + absolute_noise;
 
-  EXPECT_CALL(*this->imc, getIMCVoltage()).WillRepeatedly(Return(48));
+  EXPECT_CALL(*this->imc, getMotorControllerVoltage()).WillRepeatedly(Return(48));
   EXPECT_CALL(*this->imc, getAngleRadIncremental())
       .WillOnce(Return(initial_incremental_position))
       .WillRepeatedly(Return(second_incremental_position));

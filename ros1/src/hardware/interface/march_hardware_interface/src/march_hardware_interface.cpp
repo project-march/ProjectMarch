@@ -121,7 +121,8 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
     JointLimits limits;
     getJointLimits(this->march_robot_->getUrdf().getJoint(joint.getName()), limits);
 
-    if (joint.getActuationMode() == march::ActuationMode::position)
+    auto actuation_mode = joint.getMotorController()->getActuationMode();
+    if (actuation_mode == march::ActuationMode::position)
     {
       // Create position joint interface
       JointHandle joint_position_handle(joint_state_handle, &joint_position_command_[i]);
@@ -131,7 +132,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
       PositionJointSoftLimitsHandle joint_limits_handle(joint_position_handle, limits, soft_limits_[i]);
       position_joint_soft_limits_interface_.registerHandle(joint_limits_handle);
     }
-    else if (joint.getActuationMode() == march::ActuationMode::torque)
+    else if (actuation_mode == march::ActuationMode::torque)
     {
       // Create effort joint interface
       JointHandle joint_effort_handle_(joint_state_handle, &joint_effort_command_[i]);
@@ -161,11 +162,11 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
       joint_velocity_[i] = joint.getVelocity();
       joint_effort_[i] = 0;
 
-      if (joint.getActuationMode() == march::ActuationMode::position)
+      if (actuation_mode == march::ActuationMode::position)
       {
         joint_position_command_[i] = joint_position_[i];
       }
-      else if (joint.getActuationMode() == march::ActuationMode::torque)
+      else if (actuation_mode == march::ActuationMode::torque)
       {
         joint_effort_command_[i] = 0;
       }
@@ -283,13 +284,14 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
     {
       joint_last_effort_command_[i] = joint_effort_command_[i];
 
-      if (joint.getActuationMode() == march::ActuationMode::position)
+      auto actuation_mode = joint.getMotorController()->getActuationMode();
+      if (actuation_mode == march::ActuationMode::position)
       {
-        joint.actuateRad(joint_position_command_[i]);
+        joint.actuate(joint_position_command_[i]);
       }
-      else if (joint.getActuationMode() == march::ActuationMode::torque)
+      else if (actuation_mode == march::ActuationMode::torque)
       {
-        joint.actuateTorque(std::round(joint_effort_command_[i]));
+        joint.actuate(joint_effort_command_[i]);
       }
     }
   }
