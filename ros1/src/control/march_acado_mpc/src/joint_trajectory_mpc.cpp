@@ -5,7 +5,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
->>>>>>> 654-create-mpc-tuning-and-parameter-config-files
 
 bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
 {

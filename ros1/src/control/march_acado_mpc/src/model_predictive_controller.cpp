@@ -35,10 +35,24 @@ void ModelPredictiveController::init()
 
   // Fill reference vector with sinus and or step signals
 //  sinRef(reference, 0.25, 0.5, ACADO_N, 0.02);
-  stepRef(reference, 0.0, 2*ACADO_N);
+//  stepRef(reference, 0.0, 2*ACADO_N);
 
   // Set the reference
-  setReference(reference);
+  //  setReference(reference);
+
+  // Set angle step reference value
+  double theta_ref = 90*(M_PI/180);
+
+  // Prepare references (step reference)
+  for (int i = 0; i < ACADO_N; ++i) {
+    acadoVariables.y[i * ACADO_NY] = theta_ref; // theta
+    acadoVariables.y[i * ACADO_NY + 1] = 0;         // dtheta
+    acadoVariables.y[i * ACADO_NY + 2] = 0;         // T
+  }
+
+  acadoVariables.yN[0] = theta_ref; // theta
+  acadoVariables.yN[1] = 0;         // dtheta
+  acadoVariables.yN[2] = 0;         // T
 
   // Current state feedback
   setInitialState(x0);
@@ -57,21 +71,22 @@ void ModelPredictiveController::setInitialState(vector<double> x0) {
 }
 
 void ModelPredictiveController::setReference(vector<vector<double>> reference) {
-    for(int i = 0; i < ACADO_N; i++) {
-        for(int j = 0; j < ACADO_NY; j++) {
+    for (int i = 0; i < ACADO_N; i++) {
+        for (int j = 0; j < ACADO_NY; j++) {
             acadoVariables.y[i * ACADO_NY + j] = reference[i][j];
         }
     }
-    for(int j = 0; j < ACADO_NYN; j++) {
+    for (int j = 0; j < ACADO_NYN; j++) {
         acadoVariables.yN[j] = reference[ACADO_N][j];
     }
+}
 
 void ModelPredictiveController::assignWeightingMatrix(std::vector<std::vector<float>> Q) {
 
     double ACADO_NW = sizeof(acadoVariables.W)/sizeof(acadoVariables.W[0]);
     double ACADO_NWN = sizeof(acadoVariables.WN)/sizeof(acadoVariables.WN[0]);
 
-//    std::cout << ACADO_NW << ", " << ACADO_NWN << std::endl;
+    std::cout << ACADO_NW << ", " << ACADO_NWN << std::endl;
 
     int nrows = Q.size();
     int ncols = Q[0].size();
@@ -90,16 +105,16 @@ void ModelPredictiveController::assignWeightingMatrix(std::vector<std::vector<fl
         }
     }
 
-//    for(int i=0; i < ACADO_NW; i++) {
-//        std::cout << acadoVariables.W[i] << std::endl;
-//    }
-//
-//    for(int i=0; i < ACADO_NWN; i++) {
-//        std::cout << acadoVariables.WN[i] << std::endl;
-//    }
-//
-//  // [Temporary] Has the function been executed?
-//  std::cout << "\033[4;32m" << __FUNCTION__ << "()\033[0m" << " has executed\n";
+    for(int i=0; i < ACADO_NW; i++) {
+        std::cout << acadoVariables.W[i] << std::endl;
+    }
+
+    for(int i=0; i < ACADO_NWN; i++) {
+        std::cout << acadoVariables.WN[i] << std::endl;
+    }
+
+  // [Temporary] Has the function been executed?
+  std::cout << "\033[4;32m" << __FUNCTION__ << "()\033[0m" << " has executed\n";
 }
 
 void ModelPredictiveController::calculateControlInput() {
@@ -108,11 +123,11 @@ void ModelPredictiveController::calculateControlInput() {
   setInitialState(x0);
 
   // Set reference
-  ModelPredictiveController::setReference(reference);
+//  ModelPredictiveController::setReference(reference);
 //  ModelPredictiveController::scrollReference(reference);
 
   // preparation step
-  setReference(reference);
+//  setReference(reference);
   acado_preparationStep();
 
   // feedback step
@@ -123,9 +138,9 @@ void ModelPredictiveController::calculateControlInput() {
   acado_shiftStates(2, 0, 0);
   acado_shiftControls(0);
 
-  // Scroll the reference vector
-  if(repeat_reference) {
-      scrollReference(reference);
-  }
+//  // Scroll the reference vector
+//  if(repeat_reference) {
+//      scrollReference(reference);
+//  }
 
 }
