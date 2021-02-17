@@ -209,7 +209,7 @@ int16_t IMotionCube::ampereToTorqueIU(double ampere)
   return AMPERE_TO_IU_FACTOR * ampere / (2 * IPEAK);
 }
 
-int16_t IMotionCube::getTorque()
+double IMotionCube::getTorque()
 {
   bit16 return_byte = this->read16(this->miso_byte_offsets_.at(IMCObjectName::ActualTorque));
   return return_byte.i;
@@ -315,7 +315,7 @@ void IMotionCube::goToTargetState(IMotionCubeTargetState target_state)
   ROS_DEBUG("\tReached '%s'!", target_state.getDescription().c_str());
 }
 
-void IMotionCube::goToOperationEnabled()
+void IMotionCube::prepareActuation()
 {
   if (this->actuation_mode_ == ActuationMode::unknown)
   {
