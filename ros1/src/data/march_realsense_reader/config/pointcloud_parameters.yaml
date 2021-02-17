@@ -2,20 +2,25 @@ preprocessor:
   test_parameter: 100
   downsampling:
     leaf_size: 0.05
+
   statistical_outlier_filter:
     sd_factor: 2.0
     number_of_neighbours: 10
+
   transformation:
     rotation_y: -0.7854 # - pi / 4
     translation_x: 0.1
     translation_y: 0.0
     translation_z: 0.4 # an estimation of where the foot could be
+
   normal_estimation:
     use_tree_search_method: true
     number_of_neighbours: 10
     search_radius: 0.03
+
   distance_filter:
     distance_threshold: 3.0
+
   normal_filter:
     # We only interested in points who's normal is mainly in the z direction
     allowed_length_x: 0.4

@@ -45,52 +45,21 @@ void NormalsPreprocessor::preprocess()
 {
   ROS_INFO_STREAM("Preprocessing with normal filtering.");
 
-  clock_t start = clock();
-
   downsample();
-
-  clock_t downsample = clock();
 
   transformPointCloud();
 
-  clock_t transform = clock();
 
   filterOnDistanceFromOrigin();
 
-  clock_t distance = clock();
 
   removeStatisticalOutliers();
 
-  clock_t sor = clock();
 
   fillNormalCloud();
 
-  clock_t normal_fill = clock();
 
   filterOnNormalOrientation();
-
-  clock_t end = clock();
-
-  double time_taken = double(end - start) / double(CLOCKS_PER_SEC);
-  ROS_INFO_STREAM("Time taken by preprocessing in total is : " << std::fixed << time_taken << std::setprecision(5) << " sec ");
-
-  double time_downsample = double(downsample - start) / double(CLOCKS_PER_SEC);
-  ROS_INFO_STREAM("Time taken by downsample in total is : " << std::fixed << time_downsample << std::setprecision(5) << " sec ");
-
-  double time_sor = double(sor - distance) / double(CLOCKS_PER_SEC);
-  ROS_INFO_STREAM("Time taken by sor in total is : " << std::fixed << time_sor << std::setprecision(5) << " sec ");
-
-  double time_transform = double(transform - downsample) / double(CLOCKS_PER_SEC);
-  ROS_INFO_STREAM("Time taken by transform in total is : " << std::fixed << time_transform << std::setprecision(5) << " sec ");
-
-  double time_distance = double(distance - transform) / double(CLOCKS_PER_SEC);
-  ROS_INFO_STREAM("Time taken by distance in total is : " << std::fixed << time_distance << std::setprecision(5) << " sec ");
-
-  double time_normal_fill = double(normal_fill - distance) / double(CLOCKS_PER_SEC);
-  ROS_INFO_STREAM("Time taken by normal filling in total is : " << std::fixed << time_normal_fill << std::setprecision(5) << " sec ");
-
-  double time_normal_filter = double(end - normal_fill) / double(CLOCKS_PER_SEC);
-  ROS_INFO_STREAM("Time taken by normal_filter in total is : " << std::fixed << time_normal_filter << std::setprecision(5) << " sec ");
 }
 
 void NormalsPreprocessor::downsample()
