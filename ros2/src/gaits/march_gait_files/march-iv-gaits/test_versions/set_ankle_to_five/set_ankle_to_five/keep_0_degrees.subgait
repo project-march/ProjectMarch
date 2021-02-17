@@ -1,62 +1,62 @@
 description: Set the ankle angle from zero to five degrees
-duration: {nsecs: 500000000, secs: 0}
+duration: 500000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 0}
+    time_from_start: 500000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 75000000, secs: 0}
+    time_from_start: 75000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 0}
+    time_from_start: 500000000
     velocity: 0.0
   left_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 75000000, secs: 0}
+    time_from_start: 75000000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 500000000, secs: 0}
+    time_from_start: 500000000
     velocity: 0.0
   left_knee:
   - position: 0.0
-    time_from_start: {nsecs: 75000000, secs: 0}
+    time_from_start: 75000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 0}
+    time_from_start: 500000000
     velocity: 0.0
   right_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 0}
+    time_from_start: 500000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 75000000, secs: 0}
+    time_from_start: 75000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 0}
+    time_from_start: 500000000
     velocity: 0.0
   right_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 75000000, secs: 0}
+    time_from_start: 75000000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 500000000, secs: 0}
+    time_from_start: 500000000
     velocity: 0.0
   right_knee:
   - position: 0.0
-    time_from_start: {nsecs: 75000000, secs: 0}
+    time_from_start: 75000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 0}
+    time_from_start: 500000000
     velocity: 0.0
 name: set_ankle_to_five
 version: keep_0_degrees

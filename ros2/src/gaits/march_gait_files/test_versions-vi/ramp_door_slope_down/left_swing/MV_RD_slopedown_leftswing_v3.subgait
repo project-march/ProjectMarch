@@ -1,86 +1,86 @@
 description: The right swing step for the ramp down, with ankle -5.
-duration: {nsecs: 0, secs: 3}
+duration: 3000000000
 gait_type: stairs_like
 joints:
   left_ankle:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 372500000, secs: 0}
+    time_from_start: 372500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   left_hip_fe:
   - position: 0.1745
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.355
-    time_from_start: {nsecs: 907600000, secs: 0}
+    time_from_start: 907600000
     velocity: 0.0
   - position: 0.4583
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: -0.0
   left_knee:
   - position: 0.6981
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -0.0
   - position: 0.9059
-    time_from_start: {nsecs: 742900000, secs: 0}
+    time_from_start: 742900000
     velocity: -0.0
   - position: 0.1998
-    time_from_start: {nsecs: 59099999, secs: 2}
+    time_from_start: 2059099999
     velocity: 0.0
   - position: 0.2065
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: -0.0
   right_ankle:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: -0.0
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 535100000, secs: 0}
+    time_from_start: 535100000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   right_hip_fe:
   - position: 0.4583
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1745
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: 0.0
   right_knee:
   - position: 0.2065
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.5089
-    time_from_start: {nsecs: 498799999, secs: 1}
+    time_from_start: 1498799999
     velocity: 0.3491
   - position: 0.6981
-    time_from_start: {nsecs: 0, secs: 3}
+    time_from_start: 3000000000
     velocity: -0.0
 name: left_swing
 version: MV_RD_slopedown_leftswing_v3

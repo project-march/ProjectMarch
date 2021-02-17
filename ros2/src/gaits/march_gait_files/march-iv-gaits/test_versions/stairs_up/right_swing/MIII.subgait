@@ -1,110 +1,110 @@
 description: Swing step for stairs up, same version as MIII used.
-duration: {nsecs: 750000000, secs: 2}
+duration: 2750000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 62600000, secs: 2}
+    time_from_start: 2062600000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 750000000, secs: 2}
+    time_from_start: 2750000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 62600000, secs: 2}
+    time_from_start: 2062600000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 750000000, secs: 2}
+    time_from_start: 2750000000
     velocity: 0.0
   left_hip_fe:
   - position: 1.0472
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -0.5236
   - position: 0.3491
-    time_from_start: {nsecs: 550000000, secs: 0}
+    time_from_start: 550000000
     velocity: -0.9599
   - position: 0.0
-    time_from_start: {nsecs: 429999999, secs: 1}
+    time_from_start: 1429999999
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 475000000, secs: 2}
+    time_from_start: 2475000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 750000000, secs: 2}
+    time_from_start: 2750000000
     velocity: 0.0
   left_knee:
   - position: 1.1345
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -0.5236
   - position: 0.4363
-    time_from_start: {nsecs: 550000000, secs: 0}
+    time_from_start: 550000000
     velocity: -0.9599
   - position: 0.0
-    time_from_start: {nsecs: 429999999, secs: 1}
+    time_from_start: 1429999999
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 750000000, secs: 2}
+    time_from_start: 2750000000
     velocity: 0.0
   right_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 62600000, secs: 2}
+    time_from_start: 2062600000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 750000000, secs: 2}
+    time_from_start: 2750000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 62600000, secs: 2}
+    time_from_start: 2062600000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 750000000, secs: 2}
+    time_from_start: 2750000000
     velocity: 0.0
   right_hip_fe:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: -0.1396
-    time_from_start: {nsecs: 385000000, secs: 0}
+    time_from_start: 385000000
     velocity: 0.0
   - position: -0.1396
-    time_from_start: {nsecs: 550000000, secs: 0}
+    time_from_start: 550000000
     velocity: 0.0
   - position: 1.2741
-    time_from_start: {nsecs: 925000000, secs: 1}
+    time_from_start: 1925000000
     velocity: 0.0
   - position: 1.2741
-    time_from_start: {nsecs: 254999999, secs: 2}
+    time_from_start: 2254999999
     velocity: 0.0
   - position: 1.0472
-    time_from_start: {nsecs: 750000000, secs: 2}
+    time_from_start: 2750000000
     velocity: -0.5236
   right_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 275000000, secs: 0}
+    time_from_start: 275000000
     velocity: 0.0
   - position: 1.7453
-    time_from_start: {nsecs: 649999999, secs: 1}
+    time_from_start: 1649999999
     velocity: 0.0
   - position: 1.5708
-    time_from_start: {nsecs: 145000000, secs: 2}
+    time_from_start: 2145000000
     velocity: -0.3142
   - position: 1.1345
-    time_from_start: {nsecs: 750000000, secs: 2}
+    time_from_start: 2750000000
     velocity: -0.5236
 name: right_swing
 version: MIII
