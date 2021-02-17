@@ -15,8 +15,8 @@ namespace march
 class MotorController : public Slave
 {
 public:
-  MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                  std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
+  MotorController(const Slave& slave, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
+                  std::shared_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
 
   double getPosition();
   double getVelocity();
@@ -36,8 +36,8 @@ public:
 ////  virtual float getMotorControllerVoltage() = 0;
 //  virtual float getMotorVoltage() = 0;
 //
-//  virtual void actuateRad(double target_rad) = 0;
-//  virtual void actuateTorque(double target_torque_ampere) = 0;
+  virtual void actuateRadians(double target_position) = 0;
+  virtual void actuateTorque(double target_effort) = 0;
 //
 //  virtual void prepareActuation() = 0;
   bool initialize(int cycle_time);
@@ -49,7 +49,10 @@ public:
   bool isIncrementalEncoderMorePrecise() const;
 
   bool hasAbsoluteEncoder() const;
+  std::shared_ptr<AbsoluteEncoder> getAbsoluteEncoder();
+
   bool hasIncrementalEncoder() const;
+  std::shared_ptr<IncrementalEncoder> getIncrementalEncoder();
 
   /**
    * Get the most recent states of the motor controller, i.e. all data that is read from the controller at every
@@ -66,8 +69,8 @@ protected:
   virtual double getAbsoluteVelocity() = 0;
   virtual double getIncrementalVelocity() = 0;
 
-  std::unique_ptr<AbsoluteEncoder> absolute_encoder_ = nullptr;
-  std::unique_ptr<IncrementalEncoder> incremental_encoder_ = nullptr;
+  std::shared_ptr<AbsoluteEncoder> absolute_encoder_ = nullptr;
+  std::shared_ptr<IncrementalEncoder> incremental_encoder_ = nullptr;
   ActuationMode actuation_mode_;
 };
 

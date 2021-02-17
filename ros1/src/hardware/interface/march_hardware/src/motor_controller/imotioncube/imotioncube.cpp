@@ -20,8 +20,8 @@
 
 namespace march
 {
-IMotionCube::IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                         std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode)
+IMotionCube::IMotionCube(const Slave& slave, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
+                         std::shared_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode)
   : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode)
   , sw_string_("empty")
 {
@@ -31,8 +31,8 @@ IMotionCube::IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> ab
   }
 }
 
-IMotionCube::IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::string& sw_stream,
+IMotionCube::IMotionCube(const Slave& slave, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
+                         std::shared_ptr<IncrementalEncoder> incremental_encoder, std::string& sw_stream,
                          ActuationMode actuation_mode)
   : IMotionCube(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode)
 {
@@ -145,7 +145,7 @@ bool IMotionCube::writeInitialSettings(SdoSlaveInterface& sdo, int cycle_time)
   return false;
 }
 
-void IMotionCube::actuateRad(double target_rad)
+void IMotionCube::actuateRadians(double target_position)
 {
   if (this->actuation_mode_ != ActuationMode::position)
   {
@@ -154,13 +154,13 @@ void IMotionCube::actuateRad(double target_rad)
                                    this->actuation_mode_.toString().c_str());
   }
 
-  if (std::abs(target_rad - this->getAngleRadAbsolute()) > MAX_TARGET_DIFFERENCE)
+  if (std::abs(target_position - this->getAbsolutePosition()) > MAX_TARGET_DIFFERENCE)
   {
     throw error::HardwareException(error::ErrorType::TARGET_EXCEEDS_MAX_DIFFERENCE,
-                                   "Target %f exceeds max difference of %f from current %f for slave %d", target_rad,
-                                   MAX_TARGET_DIFFERENCE, this->getAngleRadAbsolute(), this->getSlaveIndex());
+                                   "Target %f exceeds max difference of %f from current %f for slave %d", target_position,
+                                   MAX_TARGET_DIFFERENCE, this->getAbsolutePosition(), this->getSlaveIndex());
   }
-  this->actuateIU(this->absolute_encoder_->fromRad(target_rad));
+  this->actuateIU(this->absolute_encoder_->fromRad(target_position));
 }
 
 void IMotionCube::actuateIU(int32_t target_iu)
@@ -180,8 +180,15 @@ void IMotionCube::actuateIU(int32_t target_iu)
   this->write32(target_position_location, target_position);
 }
 
-void IMotionCube::actuateTorque(int16_t target_torque)
+void IMotionCube::actuateTorque(double target_torque)
 {
+  if (target_torque >= IPEAK)
+  {
+    throw error::HardwareException(error::ErrorType::TARGET_TORQUE_EXCEEDS_MAX_TORQUE,
+                                   "Target torque of %dA exceeds max torque of %dA", target_torque, IPEAK);
+  }
+  int16_t target_torque_iu = ampereToTorqueIU(target_torque);
+
   if (this->actuation_mode_ != ActuationMode::torque)
   {
     throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
@@ -189,47 +196,17 @@ void IMotionCube::actuateTorque(int16_t target_torque)
                                    this->actuation_mode_.toString().c_str());
   }
 
-  if (target_torque >= MAX_TARGET_TORQUE)
-  {
-    throw error::HardwareException(error::ErrorType::TARGET_TORQUE_EXCEEDS_MAX_TORQUE,
-                                   "Target torque of %d exceeds max torque of %d", target_torque, MAX_TARGET_TORQUE);
-  }
-
-  bit16 target_torque_struct = { .i = target_torque };
+  bit16 target_torque_struct = { .i = target_torque_iu };
 
   uint8_t target_torque_location = this->mosi_byte_offsets_.at(IMCObjectName::TargetTorque);
 
   this->write16(target_torque_location, target_torque_struct);
 }
 
-double IMotionCube::getAngleRadAbsolute()
+int16_t IMotionCube::ampereToTorqueIU(double ampere)
 {
-  if (!IMotionCubeTargetState::SWITCHED_ON.isReached(this->getStatusWord()) &&
-      !IMotionCubeTargetState::OPERATION_ENABLED.isReached(this->getStatusWord()))
-  {
-    ROS_WARN_THROTTLE(10, "Invalid use of encoders, you're not in the correct state.");
-  }
-  return this->absolute_encoder_->getAngleRad(*this, this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
-}
-
-double IMotionCube::getAngleRadIncremental()
-{
-  if (!IMotionCubeTargetState::SWITCHED_ON.isReached(this->getStatusWord()) &&
-      !IMotionCubeTargetState::OPERATION_ENABLED.isReached(this->getStatusWord()))
-  {
-    ROS_WARN_THROTTLE(10, "Invalid use of encoders, you're not in the correct state.");
-  }
-  return this->incremental_encoder_->getAngleRad(*this, this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
-}
-
-double IMotionCube::getAbsoluteRadPerBit() const
-{
-  return this->absolute_encoder_->getRadPerBit();
-}
-
-double IMotionCube::getIncrementalRadPerBit() const
-{
-  return this->incremental_encoder_->getRadPerBit();
+  // See CoE manual page 222
+  return AMPERE_TO_IU_FACTOR * ampere / (2 * IPEAK);
 }
 
 int16_t IMotionCube::getTorque()
@@ -256,16 +233,6 @@ double IMotionCube::getVelocityIUAbsolute()
 double IMotionCube::getVelocityIUIncremental()
 {
   return this->incremental_encoder_->getVelocityIU(*this, this->miso_byte_offsets_.at(IMCObjectName::MotorVelocity));
-}
-
-double IMotionCube::getVelocityRadAbsolute()
-{
-  return this->absolute_encoder_->getVelocityRad(*this, this->miso_byte_offsets_.at(IMCObjectName::ActualVelocity));
-}
-
-double IMotionCube::getVelocityRadIncremental()
-{
-  return this->incremental_encoder_->getVelocityRad(*this, this->miso_byte_offsets_.at(IMCObjectName::MotorVelocity));
 }
 
 uint16_t IMotionCube::getStatusWord()
@@ -298,7 +265,7 @@ float IMotionCube::getMotorCurrent()
          static_cast<float>(motor_current_iu);  // Conversion to Amp, see Technosoft CoE programming manual
 }
 
-float IMotionCube::getIMCVoltage()
+float IMotionCube::getMotorControllerVoltage()
 {
   // maximum measurable DC voltage found in EMS Setup/Drive info button
   const float V_DC_MAX_MEASURABLE = 102.3;
@@ -532,7 +499,7 @@ std::unique_ptr<MotorControllerState> IMotionCube::getState()
       error::parseError(this->getSecondDetailedError(), error::ErrorRegisters::SECOND_DETAILED_ERROR);
 
   state->motor_current_ = this->getMotorCurrent();
-//  state->IMCVoltage_ = this->getIMCVoltage();
+  state->motor_controller_voltage_ = this->getMotorControllerVoltage();
   state->motor_voltage_ = this->getMotorVoltage();
 
   state->absolute_angle_iu_ = this->getAngleIUAbsolute();
@@ -540,10 +507,10 @@ std::unique_ptr<MotorControllerState> IMotionCube::getState()
   state->absolute_velocity_iu_ = this->getVelocityIUAbsolute();
   state->incremental_velocity_iu_ = this->getVelocityIUIncremental();
 
-  state->absolute_angle_rad_ = getAngleRadAbsolute();
-  state->incremental_angle_rad_ = getAngleRadIncremental();
-  state->absolute_velocity_rad_ = getVelocityRadAbsolute();
-  state->incremental_velocity_rad_ = getVelocityRadIncremental();
+  state->absolute_angle_rad_ = getAbsolutePosition();
+  state->incremental_angle_rad_ = getIncrementalPosition();
+  state->absolute_velocity_rad_ = getAbsoluteVelocity();
+  state->incremental_velocity_rad_ = getIncrementalVelocity();
 
   return state;
 }
@@ -551,22 +518,32 @@ std::unique_ptr<MotorControllerState> IMotionCube::getState()
 
 double IMotionCube::getAbsolutePosition()
 {
-  return getAngleRadAbsolute();
+  if (!IMotionCubeTargetState::SWITCHED_ON.isReached(this->getStatusWord()) &&
+      !IMotionCubeTargetState::OPERATION_ENABLED.isReached(this->getStatusWord()))
+  {
+    ROS_WARN_THROTTLE(10, "Invalid use of encoders, you're not in the correct state.");
+  }
+  return this->absolute_encoder_->getAngleRad(*this, this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
 }
 
 double IMotionCube::getIncrementalPosition()
 {
-  return getAngleRadIncremental();
+  if (!IMotionCubeTargetState::SWITCHED_ON.isReached(this->getStatusWord()) &&
+      !IMotionCubeTargetState::OPERATION_ENABLED.isReached(this->getStatusWord()))
+  {
+    ROS_WARN_THROTTLE(10, "Invalid use of encoders, you're not in the correct state.");
+  }
+  return this->incremental_encoder_->getAngleRad(*this, this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
 }
 
 double IMotionCube::getAbsoluteVelocity()
 {
-  return getVelocityRadAbsolute();
+  return this->absolute_encoder_->getVelocityRad(*this, this->miso_byte_offsets_.at(IMCObjectName::ActualVelocity));
 }
 
 double IMotionCube::getIncrementalVelocity()
 {
-  return getVelocityRadIncremental();
+  return this->incremental_encoder_->getVelocityRad(*this, this->miso_byte_offsets_.at(IMCObjectName::MotorVelocity));
 }
 
 }  // namespace march
