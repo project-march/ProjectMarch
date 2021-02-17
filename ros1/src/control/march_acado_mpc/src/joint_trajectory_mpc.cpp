@@ -29,7 +29,7 @@ bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::Jo
 }
 
 // Retrieve the Q matrix from the parameter server for a joint.
-std::vector<float> ModelPredictiveControllerInterface::getQMatrix(std::string joint_name)
+std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(std::string joint_name)
 {
   int n_rows, n_cols;
   ros::param::get("/march/controller/trajectory/q_matrices/"  + joint_name + "/n_rows", n_rows);
@@ -53,7 +53,7 @@ std::vector<float> ModelPredictiveControllerInterface::getQMatrix(std::string jo
       }
     }
   }
-  return Q_flat;
+  return Q;
 }
 
 void ModelPredictiveControllerInterface::starting(const ros::Time& /*time*/)
