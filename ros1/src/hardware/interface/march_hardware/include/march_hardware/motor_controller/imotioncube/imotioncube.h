@@ -32,10 +32,10 @@ public:
    * @param actuation_mode actuation mode in which the IMotionCube must operate
    * @throws std::invalid_argument When an absolute or incremental encoder is nullptr.
    */
-  IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-              std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
-  IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-              std::unique_ptr<IncrementalEncoder> incremental_encoder, std::string& sw_stream,
+  IMotionCube(const Slave& slave, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
+              std::shared_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
+  IMotionCube(const Slave& slave, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
+              std::shared_ptr<IncrementalEncoder> incremental_encoder, std::string& sw_stream,
               ActuationMode actuation_mode);
 
   ~IMotionCube() noexcept override = default;
@@ -44,17 +44,11 @@ public:
   IMotionCube(const IMotionCube&) = delete;
   IMotionCube& operator=(const IMotionCube&) = delete;
 
-  virtual double getAngleRadAbsolute();
-  virtual double getAngleRadIncremental();
-  double getAbsoluteRadPerBit() const;
-  double getIncrementalRadPerBit() const;
   int16_t getTorque() override;
   int32_t getAngleIUAbsolute();
   int32_t getAngleIUIncremental();
   double getVelocityIUAbsolute();
   double getVelocityIUIncremental();
-  virtual double getVelocityRadAbsolute();
-  virtual double getVelocityRadIncremental();
   uint16_t getStatusWord();
   uint16_t getMotionError();
   uint16_t getDetailedError();
@@ -63,15 +57,15 @@ public:
   unsigned int getActuationModeNumber() const override;
 
   virtual float getMotorCurrent();
-  virtual float getIMCVoltage();
+  virtual float getMotorControllerVoltage();
   virtual float getMotorVoltage();
 
   void setControlWord(uint16_t control_word);
 
   std::unique_ptr<MotorControllerState> getState() override;
 
-  virtual void actuateRad(double target_rad);
-  virtual void actuateTorque(int16_t target_torque);
+  void actuateRadians(double target_rad) override;
+  void actuateTorque(double target_torque) override;
 
   void goToTargetState(IMotionCubeTargetState target_state);
   virtual void goToOperationEnabled();
@@ -87,10 +81,14 @@ public:
   {
     return os << "slaveIndex: " << imc.getSlaveIndex() << ", "
               << "incrementalEncoder: " << *imc.incremental_encoder_ << ", "
-              << "absoluteEncoder: " << *imc.absolute_encoder_;
+              << "absoluteEncoder: " << *imc.absolute_encoder_
+              << "actuationMode" << imc.actuation_mode_.toString();
   }
 
   constexpr static double MAX_TARGET_DIFFERENCE = 0.393;
+  constexpr static double IPEAK = 40;
+  // See CoE manual page 222
+  constexpr static double AMPERE_TO_IU_FACTOR = 65520;
   // This value is slightly larger than the current limit of the
   // linear joints defined in the URDF.
   const static int16_t MAX_TARGET_TORQUE = 23500;
@@ -112,6 +110,8 @@ protected:
   double getIncrementalVelocity() override;
 
 private:
+  int16_t ampereToTorqueIU(double ampere);
+
   void actuateIU(int32_t target_iu);
 
   void mapMisoPDOs(SdoSlaveInterface& sdo);

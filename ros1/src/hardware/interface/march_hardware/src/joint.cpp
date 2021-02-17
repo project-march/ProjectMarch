@@ -61,16 +61,6 @@ void Joint::prepareActuation()
   this->velocity_ = 0;
 }
 
-void Joint::actuateRad(double target_position)
-{
-  if (!this->canActuate())
-  {
-    throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE, "Joint %s is not allowed to actuate",
-                                   this->name_.c_str());
-  }
-  this->motor_controller_->actuateRad(target_position);
-}
-
 void Joint::readEncoders(const ros::Duration& elapsed_time)
 {
   if (this->receivedDataUpdate())
@@ -105,15 +95,24 @@ double Joint::getVelocity() const
   return this->velocity_;
 }
 
-void Joint::actuateTorque(int16_t target_torque)
+void Joint::actuate(double target)
 {
   if (!this->canActuate())
   {
     throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE, "Joint %s is not allowed to actuate",
                                    this->name_.c_str());
   }
-  this->motor_controller_->actuateTorque(target_torque);
+  auto actuation_mode = motor_controller_->getActuationMode();
+  if (actuation_mode == march::ActuationMode::position)
+  {
+    motor_controller_->actuateRadians(target);
+  }
+  else if (actuation_mode == march::ActuationMode::torque)
+  {
+    motor_controller_->actuateTorque(target);
+  }
 }
+
 
 void Joint::setAllowActuation(bool allow_actuation)
 {
@@ -155,11 +154,6 @@ bool Joint::receivedDataUpdate()
   }
   previous_state_ = std::move(new_state);
   return data_updated;
-}
-
-ActuationMode Joint::getActuationMode() const
-{
-  return motor_controller_->getActuationMode();
 }
 
 std::shared_ptr<MotorController> Joint::getMotorController()
