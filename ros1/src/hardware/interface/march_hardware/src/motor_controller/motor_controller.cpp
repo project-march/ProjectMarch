@@ -124,7 +124,6 @@ std::shared_ptr<IncrementalEncoder> MotorController::getIncrementalEncoder()
 
 void MotorController::actuate(double target)
 {
-  ROS_INFO_STREAM("Actuation target: " << target);
   if (actuation_mode_ == march::ActuationMode::position)
   {
     actuateRadians(target);

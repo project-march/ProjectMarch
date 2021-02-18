@@ -147,8 +147,6 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
                                                            &joint_temperature_variance_[i]);
     march_temperature_interface_.registerHandle(temperature_sensor_handle);
 
-    ROS_INFO_STREAM("Joint: " << joint.getName() << ", Can actuate:" << joint.canActuate());
-
     // Enable high voltage on the IMC
     if (joint.canActuate())
     {
@@ -218,6 +216,9 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
 
     // Update position with he most accurate velocity
     joint.readEncoders(elapsed_time);
+
+    ROS_INFO_STREAM("Joint: " << joint.getName() << ", Pos: " << joint.getPosition() << ", Vel: " << joint.getVelocity());
+
     joint_position_[i] = joint.getPosition();
     joint_velocity_[i] = joint.getVelocity();
 
@@ -275,6 +276,8 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
     if (joint.canActuate())
     {
       joint_last_effort_command_[i] = joint_effort_command_[i];
+
+      ROS_INFO_STREAM("Joint: " << joint.getName() << ", Target: " << joint_effort_command_[i]);
 
       auto actuation_mode = joint.getMotorController()->getActuationMode();
       if (actuation_mode == march::ActuationMode::position)
