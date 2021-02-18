@@ -354,19 +354,15 @@ class SubgaitTest(unittest.TestCase):
         )
         self.assertEqual(new_duration, new_subgait.duration)
 
-    def test_prepare_subgait_timestamps(self):
-        number_of_setpoints = 10
-        setpoint_list = Subgait.prepare_subgait_for_inverse_kinematics(self.subgait, number_of_setpoints)
-        duration = self.subgait.duration
-        for i, dict in enumerate(setpoint_list):
-            for joint, setpoint in dict.items():
-                self.assertAlmostEqual(setpoint.time.seconds, duration.seconds * i / (number_of_setpoints - 1))
-
     def test_prepare_subgaits_number_of_setpoints(self):
-        base_subgait, other_subgait = self.load_interpolatable_subgaits("left_close",
-                                                                        "MV_walk_leftclose_v1",
-                                                                        "MV_walk_leftclose_inverse_kinematics_v2")
-        base_setpoints, other_setpoints = Subgait.prepare_subgaits_for_inverse_kinematics(base_subgait, other_subgait)
+        """The prepare subgaits method should give the same number of setpoints for all subgaits."""
+        base_subgait, other_subgait = self.load_interpolatable_subgaits(
+            "left_close",
+            "MV_walk_leftclose_v1",
+            "MV_walk_leftclose_inverse_kinematics_v2",
+        )
+        (
+            base_setpoints,
+            other_setpoints,
+        ) = Subgait.prepare_subgaits_for_inverse_kinematics(base_subgait, other_subgait)
         self.assertEqual(len(base_setpoints), len(other_setpoints))
-
-

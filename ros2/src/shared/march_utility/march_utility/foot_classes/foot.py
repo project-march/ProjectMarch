@@ -167,14 +167,16 @@ class Foot(object):
                 f"are (x', z') = ({transformed_x}, {transformed_z}) with haa angle {haa}."
                 f"Distance to origin {transformed_distance_to_origin}."
             )
-        # If the desired foot location is close to what is reachable,
-        # do a different calculation which assumes the leg is stretched
-        elif ll + ul - allowable_overshoot <= transformed_distance_to_origin <= ll + ul + allowable_overshoot:
+        # If the desired foot location is just beyond what is reachable, (due to rounding errors perhaps),
+        # do a calculation which assumes the leg is stretched
+        if ll + ul <= transformed_distance_to_origin <= ll + ul + allowable_overshoot:
             hfe = Foot.calculate_hfe_angle_straight_leg(transformed_x, transformed_z)
             kfe = 0
         # If neither is the case, do the normal hfe kfe calculation
         else:
-            hfe, kfe = Foot.calculate_hfe_kfe_angles(transformed_x, transformed_z, ul, ll)
+            hfe, kfe = Foot.calculate_hfe_kfe_angles(
+                transformed_x, transformed_z, ul, ll
+            )
 
         return {
             foot_side.value + "_hip_aa": Setpoint(time, haa),
@@ -183,11 +185,14 @@ class Foot(object):
         }
 
     @staticmethod
-    def calculate_hfe_angle_straight_leg(transformed_x: float, transformed_z: float) -> float:
+    def calculate_hfe_angle_straight_leg(
+        transformed_x: float, transformed_z: float
+    ) -> float:
+        """Calculate the hfe angle of a straight leg."""
         if transformed_x > 0:
             hfe = atan(abs(transformed_x / transformed_z))
         else:
-            hfe = - atan(abs(transformed_x / transformed_z))
+            hfe = -atan(abs(transformed_x / transformed_z))
         return hfe
 
     @staticmethod
