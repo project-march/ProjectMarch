@@ -209,6 +209,9 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
 
     // Update position with he most accurate velocity
     joint.readEncoders(elapsed_time);
+
+    ROS_INFO_STREAM("Joint: " << joint.getName() << ", Pos: " << joint.getPosition() << ", Vel: " << joint.getVelocity());
+
     joint_position_[i] = joint.getPosition();
     joint_velocity_[i] = joint.getVelocity();
 
@@ -266,6 +269,8 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
     if (joint.canActuate())
     {
       joint_last_effort_command_[i] = joint_effort_command_[i];
+
+      ROS_INFO_STREAM("Joint: " << joint.getName() << ", Target: " << joint_effort_command_[i]);
 
       if (joint.getActuationMode() == march::ActuationMode::position)
       {
