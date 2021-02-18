@@ -35,6 +35,11 @@ std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(s
   ros::param::get("/march/controller/trajectory/q_matrices/"  + joint_name + "/n_rows", n_rows);
   ros::param::get("/march/controller/trajectory/q_matrices/"  + joint_name + "/n_cols", n_cols);
 
+  if (n_rows != n_cols)
+  {
+    ROS_WARN("Q_matrix is not square");
+  }
+
   std::vector<float> Q_flat;
   ros::param::get("/march/controller/trajectory/q_matrices/"  + joint_name + "/Q", Q_flat);
 
