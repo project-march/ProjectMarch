@@ -286,7 +286,7 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
       }
       else if (actuation_mode == march::ActuationMode::torque)
       {
-        joint.getMotorController()->actuate(joint_effort_command_[i]);
+        joint.getMotorController()->actuate(std::round(joint_effort_command_[i]));
       }
     }
   }

@@ -182,12 +182,13 @@ void IMotionCube::actuateIU(int32_t target_iu)
 
 void IMotionCube::actuateTorque(double target_torque)
 {
-  if (target_torque >= IPEAK)
+  int16_t target_torque_iu = (int16_t) target_torque;
+  if (target_torque_iu >= MAX_TARGET_TORQUE)
   {
     throw error::HardwareException(error::ErrorType::TARGET_TORQUE_EXCEEDS_MAX_TORQUE,
-                                   "Target torque of %fA exceeds max torque of %fA", target_torque, IPEAK);
+                                   "Target torque of %fA exceeds max torque of %fA", target_torque_iu, IPEAK);
   }
-  int16_t target_torque_iu = ampereToTorqueIU(target_torque);
+  //ampereToTorqueIU(target_torque);
 
   if (this->actuation_mode_ != ActuationMode::torque)
   {
