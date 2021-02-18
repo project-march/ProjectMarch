@@ -18,7 +18,7 @@ march:
         rotational_joint:
           n_rows: 3
           n_cols: 3
-          Q: [ 100.0, 0, 0,
+          Q: [ 1000.0, 0, 0,
                0, 1.0, 0,
                0, 0, 0.01 ]
 

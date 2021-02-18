@@ -34,25 +34,25 @@ void ModelPredictiveController::init()
   }
 
   // Fill reference vector with sinus and or step signals
-//  sinRef(reference, 0.25, 0.5, ACADO_N, 0.02);
-//  stepRef(reference, 0.0, 2*ACADO_N);
+  sinRef(reference, 0.35, 0.349, ACADO_N, 0.02);
+//  stepRef(reference, 1.0, 2*ACADO_N);
 
   // Set the reference
-  //  setReference(reference);
+  setReference(reference);
 
-  // Set angle step reference value
-  double theta_ref = 30*(M_PI/180);
-
-  // Prepare references (step reference)
-  for (int i = 0; i < ACADO_N; ++i) {
-    acadoVariables.y[i * ACADO_NY] = theta_ref; // theta
-    acadoVariables.y[i * ACADO_NY + 1] = 0;         // dtheta
-    acadoVariables.y[i * ACADO_NY + 2] = 0;         // T
-  }
-
-  acadoVariables.yN[0] = theta_ref; // theta
-  acadoVariables.yN[1] = 0;         // dtheta
-  acadoVariables.yN[2] = 0;         // T
+//  // Set angle step reference value
+//  double theta_ref = 30*(M_PI/180);
+//
+//  // Prepare references (step reference)
+//  for (int i = 0; i < ACADO_N; ++i) {
+//    acadoVariables.y[i * ACADO_NY] = theta_ref; // theta
+//    acadoVariables.y[i * ACADO_NY + 1] = 0;         // dtheta
+//    acadoVariables.y[i * ACADO_NY + 2] = 0;         // T
+//  }
+//
+//  acadoVariables.yN[0] = theta_ref; // theta
+//  acadoVariables.yN[1] = 0;         // dtheta
+//  acadoVariables.yN[2] = 0;         // T
 
   // Current state feedback
   setInitialState(x0);
@@ -121,13 +121,10 @@ void ModelPredictiveController::calculateControlInput() {
 
   // Set initial state
   setInitialState(x0);
-
-  // Set reference
-//  ModelPredictiveController::setReference(reference);
-//  ModelPredictiveController::scrollReference(reference);
+  pos_ref = acadoVariables.y[0];
 
   // preparation step
-//  setReference(reference);
+  setReference(reference);
   acado_preparationStep();
 
   // feedback step
@@ -138,9 +135,9 @@ void ModelPredictiveController::calculateControlInput() {
   acado_shiftStates(2, 0, 0);
   acado_shiftControls(0);
 
-//  // Scroll the reference vector
-//  if(repeat_reference) {
-//      scrollReference(reference);
-//  }
+  // Scroll the reference vector
+  if(repeat_reference) {
+      scrollReference(reference);
+  }
 
 }

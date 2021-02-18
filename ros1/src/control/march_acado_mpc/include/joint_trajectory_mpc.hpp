@@ -80,6 +80,7 @@ private:
   vector<double> state;
 
   std::unique_ptr<realtime_tools::RealtimePublisher<std_msgs::Float64MultiArray>> command_pub_;
+    std::unique_ptr<realtime_tools::RealtimePublisher<std_msgs::Float64>> ref_pub_;
 };
 
 // Assign an alias to the class definition
