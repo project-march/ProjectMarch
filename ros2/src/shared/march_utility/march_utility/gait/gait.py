@@ -12,6 +12,10 @@ from march_utility.exceptions.gait_exceptions import (
 from .subgait import Subgait
 from .subgait_graph import SubgaitGraph
 
+import time
+import rclpy
+from rclpy.node import Node
+
 ALLOWED_ERROR_ENDPOINTS = 0.001
 
 
@@ -158,13 +162,23 @@ class Gait(object):
         :param str gait_directory: path to the gait directory
         :param dict version_map: Mapping subgait names to versions
         """
+
         new_subgaits = {}
+        timeStart = time.time()
+        BLUE = '\033[0;34m'
+        GREEN = '\033[0;32m'
+        node = Node("march_rqt_input_device")
         for subgait_name, version in version_map.items():
             if subgait_name not in self.subgaits:
                 raise SubgaitNameNotFound(subgait_name, self.gait_name)
+            timeStartLoop = time.time()
             new_subgaits[subgait_name] = Subgait.from_name_and_version(
                 robot, gait_directory, self.gait_name, subgait_name, version
             )
+            node.get_logger().info(f'{GREEN}gait.py loop ExexTime: {time.time() - timeStartLoop}')
+
+        node.get_logger().info(f'{BLUE}gait.py ExexTime: {time.time() - timeStart}')
+        node.get_logger().info('\033[39m')
 
         for from_subgait_name, to_subgait_name in self.graph:
             if from_subgait_name in new_subgaits or to_subgait_name in new_subgaits:
@@ -222,6 +236,7 @@ class Gait(object):
                         )
 
         self.subgaits.update(new_subgaits)
+
 
     def __getitem__(self, name: str):
         """Returns a subgait from the loaded subgaits."""

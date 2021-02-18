@@ -16,6 +16,10 @@ from std_srvs.srv import Trigger
 from urdf_parser_py import urdf
 from .state_machine.setpoints_gait import SetpointsGait
 
+import colorama
+colorama.init(autoreset=True)
+
+import time
 NODE_NAME = "gait_selection"
 
 
@@ -168,6 +172,7 @@ class GaitSelection(Node):
         :param str gait_name: Name of the gait to change versions
         :param dict version_map: Mapping subgait names to versions
         """
+
         self.get_logger().info(f"Setting gait versions, should be {version_map}")
         if gait_name not in self._loaded_gaits:
             raise GaitNameNotFound(gait_name)
@@ -180,9 +185,13 @@ class GaitSelection(Node):
                 if version != self._gait_version_map[gait_name][name]
             ]
         )
+        timeStart = time.time()
         self._loaded_gaits[gait_name].set_subgait_versions(
-            self._robot, self._gait_directory, version_map
+            self._robot, self._gait_directory, version_map ########################################################
         )
+        RED = '\033[0;31m'
+        self.get_logger().info(f'{RED}gait_selection.py ExexTime: {time.time() - timeStart}')
+        self.get_logger().info('\033[39m')
         self._gait_version_map[gait_name].update(version_map)
         self.get_logger().info(
             f"Setting gait versions, is {self._gait_version_map[gait_name]}"

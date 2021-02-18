@@ -23,6 +23,11 @@ from .joint_trajectory import JointTrajectory
 from .limits import Limits
 from .setpoint import Setpoint
 
+import time
+import rclpy
+from rclpy.node import Node
+
+
 PARAMETRIC_GAITS_PREFIX = "_pg_"
 SUBGAIT_SUFFIX = ".subgait"
 JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
@@ -152,8 +157,13 @@ class Subgait(object):
         :return:
             A populated Subgait object
         """
+        timeStart = time.time()
+        YELLOW = '\033[1;33m'
+        node = Node("march_rqt_input_device")
         base_subgait = cls.from_file(robot, file_name_base)
         other_subgait = cls.from_file(robot, file_name_other)
+        node.get_logger().info(f'{YELLOW}subgait.py ExecTime: {time.time() - timeStart}')
+        node.get_logger().info('\033[39m')
         return cls.interpolate_subgaits(
             base_subgait, other_subgait, parameter, use_foot_position
         )
@@ -527,11 +537,17 @@ class Subgait(object):
         base_subgait: Subgait, other_subgait: Subgait
     ) -> None:
         """Check whether two subgaits are safe to be interpolated on foot location."""
+        timeStart = time.time()
+        PURPLE = '\033[1;35m'
+        node = Node("march_rqt_input_device")
         for base_joint, other_joint in zip(
             sorted(base_subgait.joints, key=lambda joint: joint.name),
             sorted(other_subgait.joints, key=lambda joint: joint.name),
         ):
             JointTrajectory.check_joint_interpolation_is_safe(base_joint, other_joint)
+        node.get_logger().info(f'{PURPLE}subgait.py check_safe ExecTime: {time.time() - timeStart}')
+        node.get_logger().info('\033[39m')
+
 
     @staticmethod
     def get_foot_position_interpolated_joint_trajectories(
@@ -604,6 +620,9 @@ class Subgait(object):
         base_subgait: Subgait, other_subgait: Subgait
     ) -> Tuple[List[dict], List[dict]]:
         """Create two lists of setpoints with equal time stamps."""
+        timeStart = time.time()
+        ORANGE = '\033[0;33m'
+        node = Node("march_rqt_input_device")
         base_to_other_duration_ratio = base_subgait.duration / other_subgait.duration
         base_time_stamps = base_subgait.get_unique_timestamps_unsorted()
         other_time_stamps = other_subgait.get_unique_timestamps_unsorted()
@@ -623,7 +642,8 @@ class Subgait(object):
         other_setpoints_to_interpolate = Subgait.prepare_subgait_for_inverse_kinematics(
             other_subgait, other_time_stamps
         )
-
+        node.get_logger().info(f'{ORANGE}subgait.py prepare_for_inverse_kinematics ExecTime: {time.time() - timeStart}')
+        node.get_logger().info('\033[39m')
         return base_setpoints_to_interpolate, other_setpoints_to_interpolate
 
     @staticmethod

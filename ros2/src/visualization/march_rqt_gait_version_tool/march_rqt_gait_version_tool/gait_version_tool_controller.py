@@ -4,6 +4,12 @@ import yaml
 from std_srvs.srv import Trigger
 from march_shared_msgs.srv import SetGaitVersion
 from .gait_version_tool_errors import InvalidResponseError
+##############
+import rclpy
+from rclpy.node import Node
+import time
+##########
+
 
 # Go directories up until you reach the ros2/ folder, then navigate to the
 # march_gait_files package source
@@ -88,12 +94,15 @@ class GaitVersionToolController(object):
         :param list(str) subgait_names: Names of subgaits of which to change the version
         :param list(str) versions: Names of the versions
         """
+        timeStart = time.time()
         self.wait_for_service(self._set_gait_version)
         result = self._set_gait_version.call(
             SetGaitVersion.Request(
                 gait=gait_name, subgaits=subgait_names, versions=versions
             )
         )
+        # node = Node("march_rqt_input_device")
+        self._node.get_logger().info(f'gait_version_tool_controller.py ExexTime: {time.time()-timeStart}')
         return result.success, result.message
 
     def set_default_versions(self):
