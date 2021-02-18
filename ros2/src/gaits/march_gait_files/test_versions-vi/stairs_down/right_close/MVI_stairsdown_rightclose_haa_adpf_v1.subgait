@@ -10,7 +10,7 @@ joints:
     time_from_start: 1381699999
     velocity: -0.0
   - position: 0.04363323
-    time_from_start: 2000000000
+    time_from_start: 2080000000
     velocity: -0.0
   - position: 0.04360007
     time_from_start: 2750000000
@@ -36,7 +36,7 @@ joints:
     time_from_start: 747200000
     velocity: -0.02349213
   - position: 0.08726646
-    time_from_start: 2000000000
+    time_from_start: 2500000000
     velocity: -0.0
   - position: -0.08729962
     time_from_start: 2750000000
@@ -76,8 +76,8 @@ joints:
     time_from_start: 733900000
     velocity: 0.17453293
   - position: 0.08726646
-    time_from_start: 2000000000
-    velocity: 0.0
+    time_from_start: 2500000000
+    velocity: -1.04719755
   - position: -0.08729962
     time_from_start: 2750000000
     velocity: -0.0
@@ -89,10 +89,10 @@ joints:
     time_from_start: 1107900000
     velocity: 0.87266463
   - position: 0.0
-    time_from_start: 2000000000
+    time_from_start: 2500000000
     velocity: -0.0
   - position: 0.0
     time_from_start: 2750000000
     velocity: -0.0
 name: right_close
-version: MVI_stairsdown_rightclose_v3
+version: MVI_stairsdown_rightclose_haa_adpf_v1

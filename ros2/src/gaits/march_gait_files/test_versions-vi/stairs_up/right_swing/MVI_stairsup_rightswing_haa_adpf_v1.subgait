@@ -86,4 +86,4 @@ joints:
     time_from_start: 2750000000
     velocity: 0.0
 name: right_swing
-version: MVI_stairsup_rightswing_v1
+version: MVI_stairsup_rightswing_haa_adpf_v1

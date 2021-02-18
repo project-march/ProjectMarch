@@ -95,4 +95,4 @@ joints:
     time_from_start: 3750000000
     velocity: -0.6981
 name: right_open
-version: MVI_stairsdown_rightopen_v3
+version: MVI_stairsdown_rightopen_haa_adpf_v3

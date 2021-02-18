@@ -1,4 +1,4 @@
-description: Extra hip flexion of 10 degrees for the whole gait
+description: ''
 duration: 2750000000
 gait_type: stairs_like
 joints:
@@ -23,13 +23,13 @@ joints:
     time_from_start: 2750000000
     velocity: 0.0
   left_hip_fe:
-  - position: 0.08726646
+  - position: -0.08726646
     time_from_start: 0
     velocity: 0.17449976
-  - position: 1.36135682
+  - position: 1.2005893
     time_from_start: 2149700000
     velocity: -0.34906585
-  - position: 1.22173048
+  - position: 1.0471993
     time_from_start: 2750000000
     velocity: -0.08726646
   left_knee:
@@ -69,12 +69,12 @@ joints:
     time_from_start: 2750000000
     velocity: 0.0
   right_hip_fe:
-  - position: 1.22173048
+  - position: 1.0471993
     time_from_start: 0
     velocity: 0.0
-  - position: 0.08726646
+  - position: -0.0873
     time_from_start: 2750000000
-    velocity: 0.17449976
+    velocity: 0.1745
   right_knee:
   - position: 1.0471993
     time_from_start: 0
@@ -86,4 +86,4 @@ joints:
     time_from_start: 2750000000
     velocity: 0.6981
 name: left_swing
-version: MVI_stairsup_leftswing_v2
+version: MVI_stairsup_leftswing_haa_adpf_v1

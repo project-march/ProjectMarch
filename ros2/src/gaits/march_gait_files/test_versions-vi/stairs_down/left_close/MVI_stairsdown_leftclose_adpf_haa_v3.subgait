@@ -95,4 +95,4 @@ joints:
     time_from_start: 2750000000
     velocity: -0.0
 name: left_close
-version: MVI_stairsdown_leftclose_v3
+version: MVI_stairsdown_leftclose_haa_adpf_v3
