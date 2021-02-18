@@ -185,7 +185,7 @@ void IMotionCube::actuateTorque(double target_torque)
   if (target_torque >= IPEAK)
   {
     throw error::HardwareException(error::ErrorType::TARGET_TORQUE_EXCEEDS_MAX_TORQUE,
-                                   "Target torque of %dA exceeds max torque of %dA", target_torque, IPEAK);
+                                   "Target torque of %fA exceeds max torque of %fA", target_torque, IPEAK);
   }
   int16_t target_torque_iu = ampereToTorqueIU(target_torque);
 
@@ -199,6 +199,8 @@ void IMotionCube::actuateTorque(double target_torque)
   bit16 target_torque_struct = { .i = target_torque_iu };
 
   uint8_t target_torque_location = this->mosi_byte_offsets_.at(IMCObjectName::TargetTorque);
+
+  ROS_INFO_STREAM("Target torque iu:" target_torque_iu);
 
   this->write16(target_torque_location, target_torque_struct);
 }
