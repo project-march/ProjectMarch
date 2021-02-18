@@ -57,10 +57,6 @@ void ModelPredictiveController::init()
   // Warm-up the solver
   acado_preparationStep();
 
-    for (int i = 0; i < 9; ++i) {
-        std::cout << acadoVariables.W[i] << std::endl;
-    }
-
 }
 
 void ModelPredictiveController::setInitialState(vector<double> x0) {
