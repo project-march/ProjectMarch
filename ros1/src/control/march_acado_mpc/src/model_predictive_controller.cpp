@@ -57,6 +57,10 @@ void ModelPredictiveController::init()
   // Warm-up the solver
   acado_preparationStep();
 
+    for (int i = 0; i < 9; ++i) {
+        std::cout << acadoVariables.W[i] << std::endl;
+    }
+
 }
 
 void ModelPredictiveController::setInitialState(vector<double> x0) {
@@ -75,19 +79,19 @@ void ModelPredictiveController::assignWeightingMatrix(std::vector<std::vector<fl
     int n_rows = Q.size();
     int n_cols = Q[0].size();
 
-    // Check if the given weighting matrix is the correct size
+    // Check if the given weighting matrix is the correct size.
     // If so, assign the weighting matrices
     if (ACADO_NW == (n_rows*n_cols) && ACADO_NWN == (n_rows-ACADO_NU)*(n_cols-ACADO_NU))
     {
 
-        // set W matrix with Q matrix
+        // set W matrix with Q matrix (state and input weights)
         for(int i=0; i < n_rows; i++) {
             for(int j=0; j < n_cols; j++) {
                 acadoVariables.W[i*n_cols+j] = Q[i][j];
             }
         }
 
-        // Set WN matrix with Q matrix
+        // Set WN matrix with a subset of the Q matrix (only state weights)
         for(int i=0; i < (n_rows-ACADO_NU); i++) {
             for(int j=0; j < 2; j++) {
                 acadoVariables.WN[i*(n_cols-ACADO_NU) + j] = Q[i][j];
