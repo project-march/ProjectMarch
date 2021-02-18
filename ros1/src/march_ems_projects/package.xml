@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>march_ems_projects</name>
+    <version>0.0.0</version>
+    <description>The projects used by the iMotionCubes</description>
+    <maintainer email="software@projectmarch.nl">Project March</maintainer>
+    <license>TODO</license>
+
+    <buildtool_depend>catkin</buildtool_depend>
+</package>

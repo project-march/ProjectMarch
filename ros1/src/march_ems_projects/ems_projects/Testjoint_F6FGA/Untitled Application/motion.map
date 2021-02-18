@@ -1,0 +1,31 @@
+**********************************************
+Technosoft Motion Language Linker	Version 2.0
+**********************************************
+Thu Mar 12 10:44:22 2020
+
+
+OUTPUT FILE NAME:	<C:\Program Files (x86)\Technosoft\ESM\Projects\March 5 current tuning\Testjoint_F6FGA\Untitled Application\motion.out>
+ENTRY POINT SYMBOL:	"_PROG_INI" address: 4000
+
+MEMORY CONFIGURATION
+
+          name      origin    length    
+          ----      ------    ------    
+PAGE  0:  MLPS      4000      35AF
+
+PAGE  1:  USER      03B0      0050
+
+
+GLOBAL SYMBOLS
+
+address   name                          address   name                          
+-------   ----                          -------   ----                          
+403C      _PROG_END_ADDR                4000      _PROG_LOAD_ADDR               
+4000      _PROG_INI                     4000      _PROG_INI                     
+4000      _PROG_LOAD_ADDR               4000      _PROG_RUN_ADDR                
+4000      _PROG_RUN_ADDR                4009      CONTINUEWITHENDINIT           
+4009      CONTINUEWITHENDINIT           400D      WAIT_VDC                      
+4011      MAINSTARTADDRESS              4011      MAINSTARTADDRESS              
+400D      WAIT_VDC                      403C      _PROG_END_ADDR                
+
+[7 global symbols]

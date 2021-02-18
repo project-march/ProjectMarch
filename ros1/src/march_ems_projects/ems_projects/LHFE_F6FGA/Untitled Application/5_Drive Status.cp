@@ -1,0 +1,172 @@
+17 71 1386 499
+TEXT 1 881 442 1102 456  "" "Courier New" 9 400 0 0 0 49 0 1 14212834
+TEXT 1 895 411 1076 434  "" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 895 411 1096 434  "" "Courier New" 9 400 0 0 0 49 0 1 14212834
+TEXT 1 895 388 1076 412  " 0 - BiSS CRC error" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 895 366 1076 389  " 1 - BiSS data warning" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 895 343 1076 367  " 2 - BiSS data error" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 895 320 1076 344  " 3 - BiSS sensor missing" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 895 182 1076 206  " 9 - Reserved" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 895 297 1076 321  " 4 - AEI interface error" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 895 274 1076 298  " 5 - Hall sensor missing" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 895 251 1076 275  " 6 - Position wraparound" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 895 228 1076 252  " 7 - Reserved" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 895 205 1076 229  " 8 - Reserved" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 895 159 1076 183  "10 - Reserved" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 895 136 1076 160  "11 - Reserved" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 895 113 1076 137  "12 - Reserved" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 895 90 1076 114  "13 - Reserved" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 895 67 1076 91  "14 - Reserved" "Arial" 10 700 0 0 0 34 0 1 14212834
+BIT 1 1068 387 1104 419  0 "DER2" "DER2[bit 0]" 0 0 0 255
+BIT 1 1068 364 1104 396  0 "DER2" "DER2[bit 1]" 1 0 0 255
+BIT 1 1068 342 1104 374  0 "DER2" "DER2[bit 2]" 2 0 0 255
+BIT 1 1068 319 1104 351  0 "DER2" "DER2[bit 3]" 3 0 0 255
+BIT 1 1068 296 1104 328  0 "DER2" "DER2[bit 4]" 4 0 0 255
+BIT 1 1068 273 1104 305  0 "DER2" "DER2[bit 5]" 5 0 0 255
+BIT 1 1068 250 1104 282  0 "DER2" "DER2[bit 6]" 6 0 0 255
+BIT 1 1068 227 1104 259  0 "DER2" "DER2[bit 7]" 7 0 0 255
+BIT 1 1068 204 1104 236  0 "DER2" "DER2[bit 8]" 8 0 0 255
+BIT 1 1068 181 1104 213  0 "DER2" "DER2[bit 0]" 9 0 0 255
+BIT 1 1068 158 1104 190  0 "DER2" "DER2[bit 10]" 10 0 0 255
+BIT 1 1068 135 1104 167  0 "DER2" "DER2[bit 11]" 11 0 0 255
+BIT 1 1068 112 1104 144  0 "DER2" "DER2[bit 12]" 12 0 0 255
+BIT 1 1068 89 1104 121  0 "DER2" "DER2[bit 13]" 13 0 0 255
+TEXT 1 895 44 1076 68  "15 - Output frequency" "Arial" 10 700 0 0 0 34 0 1 14212834
+BIT 1 1068 67 1104 99  0 "DER2" "DER2[bit 14]" 14 0 0 255
+BIT 1 1068 44 1104 76  0 "DER2" "DER2[bit 15]" 15 0 0 255
+TEXT 1 895 11 1096 35  " DER2 - Detail Error Reg. 2" "Arial" 11 700 0 0 0 34 0 1 8421631
+TEXT 1 881 0 1102 456  "" "Courier New" 9 400 0 0 0 49 0 1 14212834
+TEXT 1 661 442 882 456  "" "Courier New" 9 400 0 0 0 49 0 1 14212834
+TEXT 1 441 442 662 456  "" "Courier New" 9 400 0 0 0 49 0 1 14212834
+TEXT 1 -2 442 217 456  "" "Courier New" 9 400 0 0 0 49 0 1 14212834
+TEXT 1 184 422 211 448  " [V]" "Arial" 10 700 255 0 0 34 0 1 14212834
+TEXT 1 6 422 121 447  "Supply voltage" "Arial" 10 700 255 0 0 34 0 1 14212834
+SHOWVAR 1 52 422 189 454  0 "DC_Supply_Motor" "V " 0.000000000e+000 1.000000000e+003 0 0 %3 "DC_Supp" 0
+TEXT 1 -2 401 217 456  "" "Courier New" 9 400 0 0 0 49 0 1 14212834
+TEXT 1 216 442 442 456  "" "Courier New" 9 400 0 0 0 49 0 1 14212834
+TEXT 1 405 422 434 448  "[°C]" "Arial" 10 700 255 0 0 34 0 1 14212834
+TEXT 1 223 422 338 447  "Drive temperature" "Arial" 10 700 255 0 0 34 0 1 14212834
+SHOWVAR 1 269 422 406 454  0 "AD7" "°C" 0.000000000e+000 1.000000000e+003 0 0 %3 "AD7[°C]" 0
+TEXT 1 216 221 442 456  " IMPORTANT! Check SRH.0 ! \r\n Supply voltage and some status\r\n or error bits are set ONLY after \r\n ENDINIT is executed. \r\n If SRH.0 = 0 and you use \r\n EasySetUp, download a setup, \r\n reset the drive and press the \r\n nearby button to send an ENDINIT\r\n command. If you are using \r\n EasyMotion Studio, run a TML \r\n program. This includes execution\r\n of ENDINIT.    " "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 5 379 190 404  " 0 - ENDINIT executed" "Arial" 10 700 0 0 0 34 0 1 14212834
+BIT 1 183 379 219 411  0 "SRH" "SRH[bit 0]" 0 0 0 0
+TEXT 1 675 411 856 434  "" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 675 411 876 434  "" "Courier New" 9 400 0 0 0 49 0 1 14212834
+TEXT 1 675 388 856 412  " 0 - TML stack overflow" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 675 366 856 389  " 1 - TML stack underflow" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 675 343 856 367  " 2 - Homing not available" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 675 320 856 344  " 3 - Function not available" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 675 182 856 206  " 9 - UPD ignored for S-curve" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 675 297 856 321  " 4 - UPD ignored" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 675 274 856 298  " 5 - Cancelable call ignored" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 675 251 856 275  " 6 - Software LSP active" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 675 228 856 252  " 7 - Software LSN active" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 675 205 856 229  " 8 - Invalid S-curve profile" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 675 159 856 183  "10 - Encoder broken wire" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 675 136 856 160  "11 - Start mode failed" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 675 113 856 137  "12 - Reserved" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 675 90 856 114  "13 - Self check error" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 675 67 856 91  "14 - STO hardware error" "Arial" 10 700 0 0 0 34 0 1 14212834
+BIT 1 848 387 884 419  0 "DER" "DER[bit 0]" 0 0 0 255
+BIT 1 848 364 884 396  0 "DER" "DER[bit 1]" 1 0 0 255
+BIT 1 848 342 884 374  0 "DER" "DER[bit 2]" 2 0 0 255
+BIT 1 848 319 884 351  0 "DER" "DER[bit 3]" 3 0 0 255
+BIT 1 848 296 884 328  0 "DER" "DER[bit 4]" 4 0 0 255
+BIT 1 848 273 884 305  0 "DER" "DER[bit 5]" 5 0 0 255
+BIT 1 848 250 884 282  0 "DER" "DER[bit 6]" 6 0 0 255
+BIT 1 848 227 884 259  0 "DER" "DER[bit 7]" 7 0 0 255
+BIT 1 848 204 884 236  0 "DER" "DER[bit 8]" 8 0 0 255
+BIT 1 848 181 884 213  0 "DER" "DER[bit 0]" 9 0 0 255
+BIT 1 848 158 884 190  0 "DER" "DER[bit 10]" 10 0 0 255
+BIT 1 848 135 884 167  0 "DER" "DER[bit 11]" 11 0 0 255
+BIT 1 848 112 884 144  0 "DER" "DER[bit 12]" 12 0 0 255
+BIT 1 848 89 884 121  0 "DER" "DER[bit 13]" 13 0 0 255
+TEXT 1 675 44 856 68  "15 - EEPROM Locked" "Arial" 10 700 0 0 0 34 0 1 14212834
+BIT 1 848 67 884 99  0 "DER" "DER[bit 14]" 14 0 0 255
+BIT 1 848 44 884 76  0 "DER" "DER[bit 15]" 15 0 0 255
+TEXT 1 675 11 876 35  " DER - Detail Error Register" "Arial" 11 700 0 0 0 34 0 1 8421631
+TEXT 1 661 0 882 456  "" "Courier New" 9 400 0 0 0 49 0 1 14212834
+TEXT 1 455 411 656 434  "" "Courier New" 9 400 0 0 0 49 0 1 14212834
+CODE 0 366 159 438 219  "\r\nENDINIT"
+TEXT 1 5 357 190 381  " 1 - Over position trigger 1" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 5 334 190 359  " 2 - Over position trigger 2" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 5 312 190 336  " 3 - Over position trigger 3" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 5 289 190 314  " 4 - Over position trigger 4" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 5 268 190 292  " 5 - Autorun enabled" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 5 246 190 270  " 6 - LSP event/interrupt" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 5 225 190 249  " 7 - LSN event/interrupt" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 5 203 190 227  " 8 - Capture event/interrupt" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 5 181 190 205  " 9 - Target reached" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 5 158 190 183  "10 - I2t warning - Motor" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 5 135 190 160  "11 - I2t warning - Drive" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 5 112 190 137  "12 - In Gear" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 5 89 190 114  "13 - In freeze control" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 5 66 190 91  "14 - In Cam" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 5 44 190 68  "15 - Fault" "Arial" 10 700 0 0 0 34 0 1 14212834
+BIT 1 183 356 219 388  0 "SRH" "SRH[bit 1]" 1 0 0 0
+BIT 1 183 334 219 366  0 "SRH" "SRH[bit 2]" 2 0 0 0
+BIT 1 183 311 219 343  0 "SRH" "SRH[bit 3]" 3 0 0 0
+BIT 1 183 289 219 321  0 "SRH" "SRH[bit 4]" 4 0 0 0
+BIT 1 183 268 219 300  0 "SRH" "SRH[bit 5]" 5 0 0 0
+BIT 1 183 246 219 278  0 "SRH" "SRH[bit 6]" 6 0 0 0
+BIT 1 183 225 219 257  0 "SRH" "SRH[bit 7]" 7 0 0 0
+BIT 1 183 203 219 235  0 "SRH" "SRH[bit 8]" 8 0 0 0
+BIT 1 183 181 219 213  0 "SRH" "SRH[bit 9]" 9 0 0 0
+BIT 1 183 158 219 190  0 "SRH" "SRH[bit 10]" 10 0 0 0
+BIT 1 183 135 219 167  0 "SRH" "SRH[bit 11]" 11 0 0 0
+BIT 1 183 112 219 144  0 "SRH" "SRH[bit 12]" 12 0 0 0
+BIT 1 183 89 219 121  0 "SRH" "SRH[bit 13]" 13 0 0 0
+BIT 1 183 66 219 98  0 "SRH" "SRH[bit 14]" 14 0 0 0
+BIT 1 183 44 219 76  0 "SRH" "SRH[bit 15]" 15 0 0 255
+TEXT 1 455 388 636 412  " 0 - EtherCAT comm. error" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 455 366 636 389  " 1 - Short-circuit" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 455 343 636 367  " 2 - Invalid setup data" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 455 320 636 344  " 3 - Control error" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 455 182 636 206  " 9 - I2t" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 455 297 636 321  " 4 - Serial comm. error" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 455 274 636 298  " 5 - Feedback error " "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 455 251 636 275  " 6 - LSP (limit +) active" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 455 228 636 252  " 7 - LSN (limit -) active" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 455 205 636 229  " 8 - Over current" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 455 159 636 183  "10 - Over temp. - Motor" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 455 136 636 160  "11 - Over temp. - Drive" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 455 113 636 137  "12 - Over voltage" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 455 90 636 114  "13 - Under voltage" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 455 67 636 91  "14 - Command error" "Arial" 10 700 0 0 0 34 0 1 14212834
+BIT 1 628 387 664 419  0 "MER" "MER[bit 0]" 0 0 0 255
+BIT 1 628 364 664 396  0 "MER" "MER[bit 1]" 1 0 0 255
+BIT 1 628 342 664 374  0 "MER" "MER[bit 2]" 2 0 0 255
+BIT 1 628 319 664 351  0 "MER" "MER[bit 3]" 3 0 0 255
+BIT 1 628 296 664 328  0 "MER" "MER[bit 4]" 4 0 0 255
+BIT 1 628 273 664 305  0 "MER" "MER[bit 5]" 5 0 0 0
+BIT 1 628 250 664 282  0 "MER" "MER[bit 6]" 6 0 0 255
+BIT 1 628 227 664 259  0 "MER" "MER[bit 7]" 7 0 0 255
+BIT 1 628 204 664 236  0 "MER" "MER[bit 8]" 8 0 0 255
+BIT 1 628 181 664 213  0 "MER" "MER[bit 9]" 9 0 0 255
+BIT 1 628 158 664 190  0 "MER" "MER[bit 10]" 10 0 0 255
+BIT 1 628 135 664 167  0 "MER" "MER[bit 11]" 11 0 0 255
+BIT 1 628 112 664 144  0 "MER" "MER[bit 12]" 12 0 0 255
+BIT 1 628 89 664 121  0 "MER" "MER[bit 13]" 13 0 0 255
+TEXT 1 229 135 414 159  " 7 - Homing/CALLS warning" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 229 112 414 136  " 8 - Homing/CALLS active" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 229 89 414 114  "10 - Motion is completed" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 229 66 414 90  "14 - Event set has occured" "Arial" 10 700 0 0 0 34 0 1 14212834
+BIT 1 407 135 443 167  0 "SRL" "SRL[bit 7]" 7 0 0 0
+BIT 1 407 112 443 144  0 "SRL" "SRL[bit 8]" 8 0 0 0
+BIT 1 407 89 443 121  0 "SRL" "SRL[bit 10]" 10 0 0 0
+TEXT 1 229 43 414 68  "15 - Axis is ON" "Arial" 10 700 0 0 0 34 0 1 14212834
+BIT 1 407 66 443 98  0 "SRL" "SRL[bit 14]" 14 0 0 0
+TEXT 1 229 158 366 219  " Registers legend:\r\n       1 - Yes / True\r\n       0 - No / False" "Arial" 10 700 255 0 0 34 0 1 14212834
+TEXT 1 456 11 657 35  "    MER - Error Register" "Arial" 11 700 0 0 0 34 0 1 8421631
+TEXT 1 455 44 636 68  "15 - STO 1 or 2 is inactive" "Arial" 10 700 0 0 0 34 0 1 14212834
+TEXT 1 229 11 432 35  " SRL - Status Register Low" "Arial" 11 700 0 0 0 34 0 1 16776960
+BIT 1 407 43 443 75  0 "SRL" "SRL[bit15]" 15 0 0 0
+TEXT 1 5 11 210 35  " SRH - Status Register High" "Arial" 11 700 0 0 0 34 0 1 16776960
+TEXT 1 216 0 442 223  "" "Courier New" 9 400 0 0 0 49 0 1 14212834
+BIT 1 628 67 664 99  0 "MER" "MER[bit 14]" 14 0 0 255
+BIT 1 628 44 664 76  0 "MER" "MER[bit 15]" 15 0 0 255
+TEXT 1 441 0 662 456  "" "Courier New" 9 400 0 0 0 49 0 1 14212834
+TEXT 1 -2 0 217 418  "" "Courier New" 9 400 0 0 0 49 0 1 14212834
+SHOWVAR 1 1111 44 1317 76  1 "Load_Position" "rot" 0.000000000e+000 1.000000000e+003 0 0 %3 "{1}Load_Position[rot]" 0
+SHOWVAR 1 1150 107 1317 139  0 "Load_Position" "\\rot" 0.000000000e+000 1.000000000e+003 0 0 %3 "Load_Position" 0
+SHOWVAR 1 1115 156 1282 188  0 "Load_Position" "deg" 0.000000000e+000 1.000000000e+003 0 0 %3 "Load_Position[deg]" 0
