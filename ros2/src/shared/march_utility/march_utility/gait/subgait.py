@@ -206,6 +206,7 @@ class Subgait(object):
             subgait_dict["description"] if subgait_dict.get("description") else ""
         )
 
+
         return cls(
             joint_list,
             duration,
@@ -549,7 +550,6 @@ class Subgait(object):
         :return: A list of interpolated joint trajectories
         """
         Subgait.check_foot_position_interpolation_is_safe(base_subgait, other_subgait)
-
         # The inverse kinematics needs access to the 'ith' setpoints of all joints
         (
             base_setpoints_to_interpolate,
@@ -586,7 +586,6 @@ class Subgait(object):
                     base_setpoint, other_setpoint, parameter
                 )
                 new_setpoints[ankle_joint].append(new_ankle_setpoint_to_add)
-
         duration = base_subgait.duration.weighted_average(
             other_subgait.duration, parameter
         )
@@ -605,15 +604,15 @@ class Subgait(object):
         base_subgait: Subgait, other_subgait: Subgait
     ) -> Tuple[List[dict], List[dict]]:
         """Create two lists of setpoints with equal time stamps."""
-        base_to_other_duration_ratio = base_subgait.duration / other_subgait.duration
+        base_to_other_duration_ratio = other_subgait.duration / base_subgait.duration
         base_time_stamps = base_subgait.get_unique_timestamps_unsorted()
         other_time_stamps = other_subgait.get_unique_timestamps_unsorted()
 
         for base_time in base_time_stamps:
-            other_time_stamps.add(base_time * base_to_other_duration_ratio)
+            other_time_stamps.add(round((base_time * base_to_other_duration_ratio), 4))
 
         for other_time in other_time_stamps:
-            base_time_stamps.add(other_time / base_to_other_duration_ratio)
+            base_time_stamps.add(round((other_time / base_to_other_duration_ratio), 4))
 
         base_time_stamps = sorted(base_time_stamps)
         other_time_stamps = sorted(other_time_stamps)
