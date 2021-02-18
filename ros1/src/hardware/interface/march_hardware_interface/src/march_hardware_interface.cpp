@@ -217,8 +217,6 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
     // Update position with he most accurate velocity
     joint.readEncoders(elapsed_time);
 
-    ROS_INFO_STREAM("Joint: " << joint.getName() << ", Pos: " << joint.getPosition() << ", Vel: " << joint.getVelocity());
-
     joint_position_[i] = joint.getPosition();
     joint_velocity_[i] = joint.getVelocity();
 
@@ -227,6 +225,8 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
       joint_temperature_[i] = joint.getTemperatureGES()->getTemperature();
     }
     joint_effort_[i] = joint.getMotorController()->getTorque();
+
+    ROS_INFO_STREAM("Joint: " << joint.getName() << ", Pos: " << joint_position_[i] << ", Vel: " << joint_velocity_[i] << ", Torque:" << joint_effort_[i]);
   }
 
   this->updateMotorControllerState();
