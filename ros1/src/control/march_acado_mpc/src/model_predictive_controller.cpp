@@ -35,7 +35,7 @@ void ModelPredictiveController::init()
   }
 
   // Set angle step reference value
-  double theta_ref = 30*(M_PI/180);
+  double theta_ref = 90*(M_PI/180);
 
   // Prepare references (step reference)
   for (int i = 0; i < ACADO_N; ++i) {
