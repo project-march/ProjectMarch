@@ -106,7 +106,7 @@ public:
 private:
   const std::string name_;
   const int net_number_;
-  bool allow_actuation_ = false;
+  bool allow_actuation_ = true;
 
   std::unique_ptr<MotorControllerState> previous_state_ = nullptr;
 

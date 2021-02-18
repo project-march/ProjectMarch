@@ -147,6 +147,8 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
                                                            &joint_temperature_variance_[i]);
     march_temperature_interface_.registerHandle(temperature_sensor_handle);
 
+    ROS_INFO_STREAM("Joint: " << joint.getName() << ", Can actuate:" << joint.canActuate());
+
     // Enable high voltage on the IMC
     if (joint.canActuate())
     {
