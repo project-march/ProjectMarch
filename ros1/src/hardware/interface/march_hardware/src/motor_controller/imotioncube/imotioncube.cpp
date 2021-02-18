@@ -200,7 +200,7 @@ void IMotionCube::actuateTorque(double target_torque)
 
   uint8_t target_torque_location = this->mosi_byte_offsets_.at(IMCObjectName::TargetTorque);
 
-  ROS_INFO_STREAM("Target torque iu:" target_torque_iu);
+  ROS_INFO_STREAM("Target torque iu: " << target_torque_struct.i);
 
   this->write16(target_torque_location, target_torque_struct);
 }
