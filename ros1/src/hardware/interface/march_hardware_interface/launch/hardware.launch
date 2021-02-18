@@ -18,6 +18,7 @@
         />
 
         <node
+                launch-prefix="ethercat_grant"
                 name="hardware_interface"
                 pkg="march_hardware_interface"
                 type="march_hardware_interface_node"
