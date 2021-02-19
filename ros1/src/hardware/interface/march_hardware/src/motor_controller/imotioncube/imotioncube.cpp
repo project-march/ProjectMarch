@@ -166,7 +166,7 @@ void IMotionCube::actuateRadians(double target_position)
 
 void IMotionCube::actuateIU(int32_t target_iu)
 {
-  if (!this->absolute_encoder_->isValidTargetIU(this->getAngleIUAbsolute(), target_iu))
+  if (!this->absolute_encoder_->isValidTargetIU(this->getAbsolutePositionIU(), target_iu))
   {
     throw error::HardwareException(error::ErrorType::INVALID_ACTUATE_POSITION,
                                    "Position %d is invalid for slave %d. (%d, %d)", target_iu, this->getSlaveIndex(),
@@ -209,22 +209,22 @@ float IMotionCube::getTorque()
   return return_byte.i;
 }
 
-int32_t IMotionCube::getAngleIUAbsolute()
+int32_t IMotionCube::getAbsolutePositionIU()
 {
   return this->absolute_encoder_->getAngleIU(*this, this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
 }
 
-int IMotionCube::getAngleIUIncremental()
+int IMotionCube::getIncrementalPositionIU()
 {
   return this->incremental_encoder_->getAngleIU(*this, this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
 }
 
-double IMotionCube::getVelocityIUAbsolute()
+double IMotionCube::getAbsoluteVelocityIU()
 {
   return this->absolute_encoder_->getVelocityIU(*this, this->miso_byte_offsets_.at(IMCObjectName::ActualVelocity));
 }
 
-double IMotionCube::getVelocityIUIncremental()
+double IMotionCube::getIncrementalVelocityIU()
 {
   return this->incremental_encoder_->getVelocityIU(*this, this->miso_byte_offsets_.at(IMCObjectName::MotorVelocity));
 }
@@ -322,7 +322,7 @@ void IMotionCube::prepareActuation()
   this->goToTargetState(IMotionCubeTargetState::READY_TO_SWITCH_ON);
   this->goToTargetState(IMotionCubeTargetState::SWITCHED_ON);
 
-  const int32_t angle = this->getAngleIUAbsolute();
+  const int32_t angle = this->getAbsolutePositionIU();
   //  If the encoder is functioning correctly and the joint is not outside hardlimits, move the joint to its current
   //  position. Otherwise shutdown
   if (abs(angle) <= 2)
@@ -496,15 +496,15 @@ std::shared_ptr<MotorControllerState> IMotionCube::getState()
   state->motor_controller_voltage_ = getMotorControllerVoltage();
   state->motor_voltage_ = getMotorVoltage();
 
-  state->absolute_angle_iu_ = getAngleIUAbsolute();
-  state->incremental_angle_iu_ = getAngleIUIncremental();
-  state->absolute_velocity_iu_ = getVelocityIUAbsolute();
-  state->incremental_velocity_iu_ = getVelocityIUIncremental();
+  state->absolute_position_iu_ = getAbsolutePositionIU();
+  state->incremental_position_iu_ = getIncrementalPositionIU();
+  state->absolute_velocity_iu_ = getAbsoluteVelocityIU();
+  state->incremental_velocity_iu_ = getIncrementalVelocityIU();
 
-  state->absolute_angle_rad_ = getAbsolutePosition();
-  state->incremental_angle_rad_ = getIncrementalPosition();
-  state->absolute_velocity_rad_ = getAbsoluteVelocity();
-  state->incremental_velocity_rad_ = getIncrementalVelocity();
+  state->absolute_position_ = getAbsolutePosition();
+  state->incremental_position_ = getIncrementalPosition();
+  state->absolute_velocity_ = getAbsoluteVelocity();
+  state->incremental_velocity_ = getIncrementalVelocity();
 
   return state;
 }

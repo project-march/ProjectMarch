@@ -345,15 +345,15 @@ void MarchHardwareInterface::reserveMemory()
   motor_controller_state_pub_->msg_.motor_current.resize(num_joints_);
   motor_controller_state_pub_->msg_.motor_voltage.resize(num_joints_);
 
-  motor_controller_state_pub_->msg_.absolute_angle_iu.resize(num_joints_);
-  motor_controller_state_pub_->msg_.incremental_angle_iu.resize(num_joints_);
+  motor_controller_state_pub_->msg_.absolute_position_iu.resize(num_joints_);
+  motor_controller_state_pub_->msg_.incremental_position_iu.resize(num_joints_);
   motor_controller_state_pub_->msg_.absolute_velocity_iu.resize(num_joints_);
   motor_controller_state_pub_->msg_.incremental_velocity_iu.resize(num_joints_);
 
-  motor_controller_state_pub_->msg_.absolute_angle_rad.resize(num_joints_);
-  motor_controller_state_pub_->msg_.incremental_angle_rad.resize(num_joints_);
-  motor_controller_state_pub_->msg_.absolute_velocity_rad.resize(num_joints_);
-  motor_controller_state_pub_->msg_.incremental_velocity_rad.resize(num_joints_);
+  motor_controller_state_pub_->msg_.absolute_position.resize(num_joints_);
+  motor_controller_state_pub_->msg_.incremental_position.resize(num_joints_);
+  motor_controller_state_pub_->msg_.absolute_velocity.resize(num_joints_);
+  motor_controller_state_pub_->msg_.incremental_velocity.resize(num_joints_);
 }
 
 void MarchHardwareInterface::updatePowerDistributionBoard()
@@ -468,15 +468,15 @@ void MarchHardwareInterface::updateMotorControllerState()
     motor_controller_state_pub_->msg_.motor_current[i] = motor_controller_state->motor_current_;
     motor_controller_state_pub_->msg_.motor_voltage[i] = motor_controller_state->motor_voltage_;
 
-    motor_controller_state_pub_->msg_.absolute_angle_iu[i] = motor_controller_state->absolute_angle_iu_;
-    motor_controller_state_pub_->msg_.incremental_angle_iu[i] = motor_controller_state->incremental_angle_iu_;
+    motor_controller_state_pub_->msg_.absolute_position_iu[i] = motor_controller_state->absolute_position_iu_;
+    motor_controller_state_pub_->msg_.incremental_position_iu[i] = motor_controller_state->incremental_position_iu_;
     motor_controller_state_pub_->msg_.absolute_velocity_iu[i] = motor_controller_state->absolute_velocity_iu_;
     motor_controller_state_pub_->msg_.incremental_velocity_iu[i] = motor_controller_state->incremental_velocity_iu_;
 
-    motor_controller_state_pub_->msg_.absolute_angle_rad[i] = motor_controller_state->absolute_angle_rad_;
-    motor_controller_state_pub_->msg_.incremental_angle_rad[i] = motor_controller_state->incremental_angle_rad_;
-    motor_controller_state_pub_->msg_.absolute_velocity_rad[i] = motor_controller_state->absolute_velocity_rad_;
-    motor_controller_state_pub_->msg_.incremental_velocity_rad[i] = motor_controller_state->incremental_velocity_rad_;
+    motor_controller_state_pub_->msg_.absolute_position[i] = motor_controller_state->absolute_position_;
+    motor_controller_state_pub_->msg_.incremental_position[i] = motor_controller_state->incremental_position_;
+    motor_controller_state_pub_->msg_.absolute_velocity[i] = motor_controller_state->absolute_velocity_;
+    motor_controller_state_pub_->msg_.incremental_velocity[i] = motor_controller_state->incremental_velocity_;
   }
 
   motor_controller_state_pub_->unlockAndPublish();
