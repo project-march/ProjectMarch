@@ -102,6 +102,11 @@ ActuationMode MotorController::getActuationMode() const
   return actuation_mode_;
 }
 
+void MotorController::setActuationMode(ActuationMode actuation_mode)
+{
+  actuation_mode_ = actuation_mode;
+};
+
 bool MotorController::hasAbsoluteEncoder() const
 {
   return absolute_encoder_ != nullptr;
@@ -131,6 +136,12 @@ void MotorController::actuate(double target)
   else if (actuation_mode_ == march::ActuationMode::torque)
   {
     actuateTorque(target);
+  }
+  else
+  {
+    throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
+                                   "Actuation mode %s is not supported",
+                                   actuation_mode_.toString().c_str());
   }
 }
 }
