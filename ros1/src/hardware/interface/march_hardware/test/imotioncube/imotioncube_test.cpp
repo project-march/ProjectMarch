@@ -32,14 +32,14 @@ TEST_F(IMotionCubeTest, NoAbsoluteEncoder)
 {
   ASSERT_THROW(
       march::IMotionCube(mock_slave, nullptr, std::move(this->mock_incremental_encoder), march::ActuationMode::unknown),
-      std::invalid_argument);
+      march::error::HardwareException);
 }
 
 TEST_F(IMotionCubeTest, NoIncrementalEncoder)
 {
   ASSERT_THROW(
       march::IMotionCube(mock_slave, std::move(this->mock_absolute_encoder), nullptr, march::ActuationMode::unknown),
-      std::invalid_argument);
+      march::error::HardwareException);
 }
 
 TEST_F(IMotionCubeTest, SlaveIndexOne)

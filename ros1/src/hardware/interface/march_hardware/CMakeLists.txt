@@ -130,7 +130,7 @@ if(CATKIN_ENABLE_TESTING)
         test/mocks/mock_encoder.h
         test/mocks/mock_imotioncube.h
         test/mocks/mock_incremental_encoder.h
-        test/mocks/mock_joint.h
+        test/mocks/mock_motorcontroller_state.h
         test/mocks/mock_pdo_interface.h
         test/mocks/mock_sdo_interface.h
         test/mocks/mock_slave.h

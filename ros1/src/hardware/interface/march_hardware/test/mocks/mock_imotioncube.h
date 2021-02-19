@@ -4,6 +4,7 @@
 #include "mock_slave.h"
 
 #include "march_hardware/motor_controller/imotioncube/imotioncube.h"
+#include "march_hardware/motor_controller/imotioncube/imotioncube_state.h"
 #include "march_hardware/ethercat/sdo_interface.h"
 
 #include <memory>
@@ -19,20 +20,23 @@ public:
   {
   }
 
-  MOCK_METHOD0(goToOperationEnabled, void());
+  MOCK_METHOD0(getState, std::shared_ptr<march::MotorControllerState>());
 
-  MOCK_METHOD0(getAngleRadIncremental, double());
-  MOCK_METHOD0(getAngleRadAbsolute, double());
+  MOCK_METHOD0(prepareActuation, void());
 
-  MOCK_METHOD0(getVelocityRadIncremental, double());
-  MOCK_METHOD0(getVelocityRadAbsolute, double());
+  MOCK_METHOD0(isIncrementalEncoderMorePrecise, bool());
+
+  MOCK_METHOD0(getIncrementalPosition, double());
+  MOCK_METHOD0(getAbsolutePosition, double());
+  MOCK_METHOD0(getIncrementalVelocity, double());
+  MOCK_METHOD0(getAbsoluteVelocity, double());
 
   MOCK_METHOD0(getMotorControllerVoltage, float());
   MOCK_METHOD0(getMotorVoltage, float());
   MOCK_METHOD0(getMotorCurrent, float());
 
-  MOCK_METHOD1(actuateRad, void(double));
-  MOCK_METHOD1(actuateTorque, void(int16_t));
+  MOCK_METHOD1(actuateRadians, void(double));
+  MOCK_METHOD1(actuateTorque, void(double));
 
   MOCK_METHOD2(initSdo, bool(march::SdoSlaveInterface& sdo, int cycle_time));
   MOCK_METHOD1(reset, void(march::SdoSlaveInterface&));

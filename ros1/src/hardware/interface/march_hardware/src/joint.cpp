@@ -76,13 +76,13 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
   {
     if (motor_controller_->isIncrementalEncoderMorePrecise())
     {
-      double new_incremental_position = motor_controller_->getPosition();
+      double new_incremental_position = motor_controller_->getPosition(false);
       position_ += (new_incremental_position - previous_incremental_position_);
       previous_incremental_position_ = new_incremental_position;
     }
     else
     {
-      position_ = motor_controller_->getPosition();
+      position_ = motor_controller_->getPosition(true);
     }
     velocity_ = motor_controller_->getVelocity();
   }
