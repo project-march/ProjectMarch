@@ -18,17 +18,13 @@ class Joint
 {
 public:
   // Initialize a Joint with motor controller and without temperature slave.
-  Joint(std::string name, int net_number, std::shared_ptr<IMotionCube> motor_controller);
+  Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<IMotionCube> motor_controller);
 
   // Initialize a Joint with motor controller and temperature slave.
-  Joint(std::string name, int net_number, std::shared_ptr<IMotionCube> motor_controller,
+  Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<IMotionCube> motor_controller,
         std::shared_ptr<TemperatureGES> temperature_ges);
 
   virtual ~Joint() noexcept = default;
-
-  // Delete copy constructor/assignment since the unique_ptr cannot be copied
-  Joint(const Joint&) = delete;
-  Joint& operator=(const Joint&) = delete;
 
   // Delete move assignment since string cannot be move assigned
   Joint(Joint&&) = default;
@@ -40,25 +36,33 @@ public:
   // Read the encoder data and store the position and velocity values in the Joint
   void readEncoders(const ros::Duration& elapsed_time);
 
+  // Check whether the state of the MotorController has changed
+  bool receivedDataUpdate();
+
   // Prepare the joint for actuation
   // First calls the prepareActuation() method of the MotorController
   // Then sets some initial values
   void prepareActuation();
 
+  // Actuate the joint if it is allowed to do so
+  void actuate(double target);
+
+  // Get the position and velocity of the joint
   double getPosition() const;
   double getVelocity() const;
 
+  // Getters and setters for properties of the joint
   std::string getName() const;
   int getNetNumber() const;
+  bool canActuate() const;
+  void setAllowActuation(bool allow_actuation);
 
+  // A joint must have a MotorController
   std::shared_ptr<MotorController> getMotorController();
 
+  // A joint may have a temperature GES
   bool hasTemperatureGES() const;
   std::shared_ptr<TemperatureGES> getTemperatureGES();
-
-  bool canActuate() const;
-  bool receivedDataUpdate();
-  void setAllowActuation(bool allow_actuation);
 
   /** @brief Override comparison operator */
   friend bool operator==(const Joint& lhs, const Joint& rhs)
@@ -80,7 +84,7 @@ public:
   {
     os << "name: " << joint.name_ << ", "
        << "allowActuation: " << joint.allow_actuation_ << ", "
-       << "imotioncube: ";
+       << "MotorController: ";
     if (joint.motor_controller_)
     {
       os << *joint.motor_controller_;
@@ -108,12 +112,15 @@ private:
   const int net_number_;
   bool allow_actuation_ = false;
 
-  std::unique_ptr<MotorControllerState> previous_state_ = nullptr;
-
+  // Keep track of the position and velocity of the joint, updated by readEncoders()
   double previous_incremental_position_ = 0.0;
   double position_ = 0.0;
   double velocity_ = 0.0;
 
+  // Keep track of the state of the MotorController
+  std::unique_ptr<MotorControllerState> previous_state_ = nullptr;
+
+  // A joint must have a MotorController but may have a TemperatureGES
   std::shared_ptr<MotorController> motor_controller_;
   std::shared_ptr<TemperatureGES> temperature_ges_ = nullptr;
 };

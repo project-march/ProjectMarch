@@ -15,15 +15,19 @@
 
 namespace march
 {
-Joint::Joint(std::string name, int net_number, std::shared_ptr<IMotionCube> motor_controller)
-  : name_(std::move(name)), net_number_(net_number), motor_controller_(std::move(motor_controller))
+Joint::Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<IMotionCube> motor_controller)
+  : name_(std::move(name))
+  , net_number_(net_number)
+  , allow_actuation_(allow_actuation)
+  , motor_controller_(std::move(motor_controller))
 {
 }
 
-Joint::Joint(std::string name, int net_number, std::shared_ptr<IMotionCube> motor_controller,
+Joint::Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<IMotionCube> motor_controller,
              std::shared_ptr<TemperatureGES> temperature_ges)
   : name_(std::move(name))
   , net_number_(net_number)
+  , allow_actuation_(allow_actuation)
   , motor_controller_(std::move(motor_controller))
   , temperature_ges_(std::move(temperature_ges))
 {
@@ -54,6 +58,16 @@ void Joint::prepareActuation()
   this->previous_incremental_position_ = motor_controller_->getPosition(false);
   this->position_ = motor_controller_->getPosition(true);
   this->velocity_ = 0;
+}
+
+void Joint::actuate(double target)
+{
+  if (!this->canActuate())
+  {
+    throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE, "Joint %s is not allowed to actuate",
+                                   this->name_.c_str());
+  }
+  motor_controller_->actuate(target);
 }
 
 void Joint::readEncoders(const ros::Duration& elapsed_time)

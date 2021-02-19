@@ -287,11 +287,11 @@ void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Durat
       auto actuation_mode = joint.getMotorController()->getActuationMode();
       if (actuation_mode == march::ActuationMode::position)
       {
-        joint.getMotorController()->actuate(joint_position_command_[i]);
+        joint.actuate(joint_position_command_[i]);
       }
       else if (actuation_mode == march::ActuationMode::torque)
       {
-        joint.getMotorController()->actuate(joint_effort_command_[i]);
+        joint.actuate(joint_effort_command_[i]);
       }
     }
   }

@@ -51,7 +51,7 @@ public:
   std::shared_ptr<IncrementalEncoder> getIncrementalEncoder();
 
   // Getters for specific information about the state of the motor and its controller
-  virtual double getTorque() = 0;
+  virtual float getTorque() = 0;
   virtual float getMotorCurrent() = 0;
   virtual float getMotorControllerVoltage() = 0;
   virtual float getMotorVoltage() = 0;
@@ -83,6 +83,8 @@ protected:
   virtual double getAbsoluteVelocity() = 0;
   virtual double getIncrementalVelocity() = 0;
 
+  // A MotorController doesn't necessarily have an AbsoluteEncoder and an IncrementalEncoder, but will have
+  // at least one of the two
   std::shared_ptr<AbsoluteEncoder> absolute_encoder_ = nullptr;
   std::shared_ptr<IncrementalEncoder> incremental_encoder_ = nullptr;
   ActuationMode actuation_mode_;
