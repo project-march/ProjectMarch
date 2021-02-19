@@ -49,7 +49,7 @@ void NormalsPreprocessor::preprocess()
 
   downsample();
 
-  transformPointCloud();
+  transformPointCloudFromUrdf();
 
   filterOnDistanceFromOrigin();
 
