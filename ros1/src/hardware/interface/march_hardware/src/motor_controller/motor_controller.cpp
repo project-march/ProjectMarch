@@ -36,7 +36,7 @@ bool MotorController::isIncrementalEncoderMorePrecise() const
   {
     return true;
   }
-  return incremental_encoder_->getRadPerBit() < absolute_encoder_->getRadPerBit();
+  return incremental_encoder_->getRadiansPerBit() < absolute_encoder_->getRadiansPerBit();
 }
 
 double MotorController::getPosition()
