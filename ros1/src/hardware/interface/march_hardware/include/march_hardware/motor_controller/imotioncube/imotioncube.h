@@ -40,28 +40,24 @@ public:
 
   ~IMotionCube() noexcept override = default;
 
-  /* Delete copy constructor/assignment since the unique_ptrs cannot be copied */
-  IMotionCube(const IMotionCube&) = delete;
-  IMotionCube& operator=(const IMotionCube&) = delete;
+  // Override functions for actuating the IMotionCube
+  void prepareActuation() override;
+  void actuateRadians(double target_position) override;
+  void actuateTorque(double target_torque) override;
 
+  // Transform the ActuationMode to a number that is understood by the IMotionCube
   unsigned int getActuationModeNumber() const override;
 
-  double getTorque() override;
+  // Get a full description of the state of the IMotionCube
+  std::unique_ptr<MotorControllerState> getState() override;
+
+  // Getters for specific information about the state of the motor and the IMotionCube
+  float getTorque() override;
   float getMotorCurrent() override;
   float getMotorControllerVoltage() override;
   float getMotorVoltage() override;
 
-  std::unique_ptr<MotorControllerState> getState() override;
-
-  void actuateRadians(double target_position) override;
-  void actuateTorque(double target_torque) override;
-
-  void prepareActuation() override;
-
   constexpr static double MAX_TARGET_DIFFERENCE = 0.393;
-  constexpr static double IPEAK = 40;
-  // See CoE manual page 222
-  constexpr static double AMPERE_TO_IU_FACTOR = 65520;
   // This value is slightly larger than the current limit of the
   // linear joints defined in the URDF.
   const static int16_t MAX_TARGET_TORQUE = 23500;
@@ -72,21 +68,25 @@ public:
   static const uint16_t WATCHDOG_TIME = 500;
 
 protected:
+  // Override protected functions from Slave class
   bool initSdo(SdoSlaveInterface& sdo, int cycle_time) override;
   void reset(SdoSlaveInterface& sdo) override;
 
+  // Override protected functions from MotorController class
   double getAbsolutePosition() override;
   double getIncrementalPosition() override;
-
   double getAbsoluteVelocity() override;
   double getIncrementalVelocity() override;
 
 private:
-  int16_t ampereToTorqueIU(double ampere);
+  // Actuate position in Internal Units
   void actuateIU(int32_t target_iu);
 
+  // Set the IMotionCube in a certain state
   void goToTargetState(IMotionCubeTargetState target_state);
+  void setControlWord(uint16_t control_word);
 
+  // Getters for information about the state of the IMotionCube
   int32_t getAngleIUAbsolute();
   int32_t getAngleIUIncremental();
   double getVelocityIUAbsolute();
@@ -95,8 +95,6 @@ private:
   uint16_t getMotionError();
   uint16_t getDetailedError();
   uint16_t getSecondDetailedError();
-
-  void setControlWord(uint16_t control_word);
 
   void mapMisoPDOs(SdoSlaveInterface& sdo);
   void mapMosiPDOs(SdoSlaveInterface& sdo);

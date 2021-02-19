@@ -182,18 +182,17 @@ void IMotionCube::actuateIU(int32_t target_iu)
 
 void IMotionCube::actuateTorque(double target_torque)
 {
-  if (target_torque >= IPEAK)
-  {
-    throw error::HardwareException(error::ErrorType::TARGET_TORQUE_EXCEEDS_MAX_TORQUE,
-                                   "Target torque of %dA exceeds max torque of %dA", target_torque, IPEAK);
-  }
-  int16_t target_torque_iu = ampereToTorqueIU(target_torque);
-
+  int16_t target_torque_iu = (int16_t) std::round(target_torque);
   if (this->actuation_mode_ != ActuationMode::torque)
   {
     throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
                                    "trying to actuate torque, while actuation mode is %s",
                                    this->actuation_mode_.toString().c_str());
+  }
+  if (target_torque >= MAX_TARGET_TORQUE)
+  {
+    throw error::HardwareException(error::ErrorType::TARGET_TORQUE_EXCEEDS_MAX_TORQUE,
+                                   "Target torque of %dA exceeds max torque of %dA", target_torque, MAX_TARGET_TORQUE);
   }
 
   bit16 target_torque_struct = { .i = target_torque_iu };
@@ -203,13 +202,7 @@ void IMotionCube::actuateTorque(double target_torque)
   this->write16(target_torque_location, target_torque_struct);
 }
 
-int16_t IMotionCube::ampereToTorqueIU(double ampere)
-{
-  // See CoE manual page 222
-  return AMPERE_TO_IU_FACTOR * ampere / (2 * IPEAK);
-}
-
-double IMotionCube::getTorque()
+float IMotionCube::getTorque()
 {
   bit16 return_byte = this->read16(this->miso_byte_offsets_.at(IMCObjectName::ActualTorque));
   return return_byte.i;
