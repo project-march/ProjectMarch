@@ -25,9 +25,10 @@ IMotionCube::IMotionCube(const Slave& slave, std::shared_ptr<AbsoluteEncoder> ab
   : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode)
   , sw_string_("empty")
 {
-  if (!this->absolute_encoder_ || !this->incremental_encoder_)
+  if (this->absolute_encoder_ == nullptr || this->incremental_encoder_ == nullptr)
   {
-    throw std::invalid_argument("Incremental or absolute encoder cannot be nullptr");
+    throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
+                                   "An IMotionCube needs both an incremental and an absolute encoder");
   }
 }
 
@@ -472,9 +473,9 @@ unsigned int IMotionCube::getActuationModeNumber() const
   }
 }
 
-std::unique_ptr<MotorControllerState> IMotionCube::getState()
+std::shared_ptr<MotorControllerState> IMotionCube::getState()
 {
-  auto state = std::make_unique<IMotionCubeState>();
+  auto state = std::make_shared<IMotionCubeState>();
 
   std::bitset<16> motionErrorBits = this->getMotionError();
   state->motion_error_ = motionErrorBits.to_string();
@@ -491,14 +492,14 @@ std::unique_ptr<MotorControllerState> IMotionCube::getState()
   state->second_detailed_error_description_ =
       error::parseError(this->getSecondDetailedError(), error::ErrorRegisters::SECOND_DETAILED_ERROR);
 
-  state->motor_current_ = this->getMotorCurrent();
-  state->motor_controller_voltage_ = this->getMotorControllerVoltage();
-  state->motor_voltage_ = this->getMotorVoltage();
+  state->motor_current_ = getMotorCurrent();
+  state->motor_controller_voltage_ = getMotorControllerVoltage();
+  state->motor_voltage_ = getMotorVoltage();
 
-  state->absolute_angle_iu_ = this->getAngleIUAbsolute();
-  state->incremental_angle_iu_ = this->getAngleIUIncremental();
-  state->absolute_velocity_iu_ = this->getVelocityIUAbsolute();
-  state->incremental_velocity_iu_ = this->getVelocityIUIncremental();
+  state->absolute_angle_iu_ = getAngleIUAbsolute();
+  state->incremental_angle_iu_ = getAngleIUIncremental();
+  state->absolute_velocity_iu_ = getVelocityIUAbsolute();
+  state->incremental_velocity_iu_ = getVelocityIUIncremental();
 
   state->absolute_angle_rad_ = getAbsolutePosition();
   state->incremental_angle_rad_ = getIncrementalPosition();

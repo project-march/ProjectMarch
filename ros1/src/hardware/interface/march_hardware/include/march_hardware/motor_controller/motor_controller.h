@@ -29,7 +29,10 @@ public:
   // A MotorController should support both actuating by position (radians) or by torque
   virtual void actuateRadians(double target_position) = 0;
   virtual void actuateTorque(double target_effort) = 0;
+
+  // Getter and setter for the ActuationMode
   ActuationMode getActuationMode() const;
+  void setActuationMode(ActuationMode actuation_mode);
 
   // Actuate based on the actuation mode of the motor controller
   void actuate(double target);
@@ -57,7 +60,7 @@ public:
   virtual float getMotorVoltage() = 0;
 
   // Get a full description of the state of the MotorController
-  virtual std::unique_ptr<MotorControllerState> getState() = 0;
+  virtual std::shared_ptr<MotorControllerState> getState() = 0;
 
   // Override comparison operator
   friend bool operator==(const MotorController& lhs, const MotorController& rhs)
