@@ -161,7 +161,7 @@ void IMotionCube::actuateRadians(double target_position)
                                    "Target %f exceeds max difference of %f from current %f for slave %d", target_position,
                                    MAX_TARGET_DIFFERENCE, this->getAbsolutePosition(), this->getSlaveIndex());
   }
-  this->actuateIU(this->absolute_encoder_->fromRad(target_position));
+  this->actuateIU(this->absolute_encoder_->toIU(target_position, true));
 }
 
 void IMotionCube::actuateIU(int32_t target_iu)
@@ -211,22 +211,36 @@ float IMotionCube::getTorque()
 
 int32_t IMotionCube::getAbsolutePositionIU()
 {
-  return this->absolute_encoder_->getAngleIU(*this, this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
+  if (!IMotionCubeTargetState::SWITCHED_ON.isReached(this->getStatusWord()) &&
+      !IMotionCubeTargetState::OPERATION_ENABLED.isReached(this->getStatusWord()))
+  {
+    ROS_WARN_THROTTLE(10, "Invalid use of encoders, you're not in the correct state.");
+  }
+  bit32 return_byte = this->read32(this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
+  return return_byte.i;
 }
 
 int IMotionCube::getIncrementalPositionIU()
 {
-  return this->incremental_encoder_->getAngleIU(*this, this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
+  if (!IMotionCubeTargetState::SWITCHED_ON.isReached(this->getStatusWord()) &&
+      !IMotionCubeTargetState::OPERATION_ENABLED.isReached(this->getStatusWord()))
+  {
+    ROS_WARN_THROTTLE(10, "Invalid use of encoders, you're not in the correct state.");
+  }
+  bit32 return_byte = this->read32(this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
+  return return_byte.i;
 }
 
 double IMotionCube::getAbsoluteVelocityIU()
 {
-  return this->absolute_encoder_->getVelocityIU(*this, this->miso_byte_offsets_.at(IMCObjectName::ActualVelocity));
+  bit32 return_byte = this->read32(this->miso_byte_offsets_.at(IMCObjectName::ActualVelocity));
+  return return_byte.i / (TIME_PER_VELOCITY_SAMPLE * FIXED_POINT_TO_FLOAT_CONVERSION);
 }
 
 double IMotionCube::getIncrementalVelocityIU()
 {
-  return this->incremental_encoder_->getVelocityIU(*this, this->miso_byte_offsets_.at(IMCObjectName::MotorVelocity));
+  bit32 return_byte = this->read32(this->miso_byte_offsets_.at(IMCObjectName::MotorVelocity));
+  return return_byte.i / (TIME_PER_VELOCITY_SAMPLE * FIXED_POINT_TO_FLOAT_CONVERSION);
 }
 
 uint16_t IMotionCube::getStatusWord()
@@ -512,32 +526,22 @@ std::shared_ptr<MotorControllerState> IMotionCube::getState()
 
 double IMotionCube::getAbsolutePosition()
 {
-  if (!IMotionCubeTargetState::SWITCHED_ON.isReached(this->getStatusWord()) &&
-      !IMotionCubeTargetState::OPERATION_ENABLED.isReached(this->getStatusWord()))
-  {
-    ROS_WARN_THROTTLE(10, "Invalid use of encoders, you're not in the correct state.");
-  }
-  return this->absolute_encoder_->getAngleRad(*this, this->miso_byte_offsets_.at(IMCObjectName::ActualPosition));
+  return absolute_encoder_->toRadians(getAbsolutePositionIU(), true);
 }
 
 double IMotionCube::getIncrementalPosition()
 {
-  if (!IMotionCubeTargetState::SWITCHED_ON.isReached(this->getStatusWord()) &&
-      !IMotionCubeTargetState::OPERATION_ENABLED.isReached(this->getStatusWord()))
-  {
-    ROS_WARN_THROTTLE(10, "Invalid use of encoders, you're not in the correct state.");
-  }
-  return this->incremental_encoder_->getAngleRad(*this, this->miso_byte_offsets_.at(IMCObjectName::MotorPosition));
+  return incremental_encoder_->toRadians(getIncrementalPositionIU(), true);
 }
 
 double IMotionCube::getAbsoluteVelocity()
 {
-  return this->absolute_encoder_->getVelocityRad(*this, this->miso_byte_offsets_.at(IMCObjectName::ActualVelocity));
+  return absolute_encoder_->toRadians(getAbsoluteVelocityIU(), false);
 }
 
 double IMotionCube::getIncrementalVelocity()
 {
-  return this->incremental_encoder_->getVelocityRad(*this, this->miso_byte_offsets_.at(IMCObjectName::MotorVelocity));
+  return incremental_encoder_->toRadians(getIncrementalVelocityIU(), false);
 }
 
 }  // namespace march
