@@ -49,7 +49,7 @@ public:
   unsigned int getActuationModeNumber() const override;
 
   // Get a full description of the state of the IMotionCube
-  std::unique_ptr<MotorControllerState> getState() override;
+  std::shared_ptr<MotorControllerState> getState() override;
 
   // Getters for specific information about the state of the motor and the IMotionCube
   float getTorque() override;

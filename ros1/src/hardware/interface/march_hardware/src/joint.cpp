@@ -131,7 +131,7 @@ bool Joint::canActuate() const
 
 bool Joint::receivedDataUpdate()
 {
-  std::unique_ptr<MotorControllerState> new_state = motor_controller_->getState();
+  auto new_state = motor_controller_->getState();
 
   bool data_updated;
   if (previous_state_ == nullptr)

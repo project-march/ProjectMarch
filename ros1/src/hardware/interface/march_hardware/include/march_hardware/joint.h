@@ -118,7 +118,7 @@ private:
   double velocity_ = 0.0;
 
   // Keep track of the state of the MotorController
-  std::unique_ptr<MotorControllerState> previous_state_ = nullptr;
+  std::shared_ptr<MotorControllerState> previous_state_ = nullptr;
 
   // A joint must have a MotorController but may have a TemperatureGES
   std::shared_ptr<MotorController> motor_controller_;
