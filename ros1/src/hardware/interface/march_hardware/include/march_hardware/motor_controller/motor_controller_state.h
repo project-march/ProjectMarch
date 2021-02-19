@@ -14,22 +14,22 @@ public:
   float motor_current_;
   float motor_voltage_;
   float motor_controller_voltage_;
-  double absolute_angle_iu_;
-  double incremental_angle_iu_;
+  double absolute_position_iu_;
+  double incremental_position_iu_;
   double absolute_velocity_iu_;
   double incremental_velocity_iu_;
-  double absolute_angle_rad_;
-  double incremental_angle_rad_;
-  double absolute_velocity_rad_;
-  double incremental_velocity_rad_;
+  double absolute_position_;
+  double incremental_position_;
+  double absolute_velocity_;
+  double incremental_velocity_;
 
   friend bool operator==(const MotorControllerState& lhs, const MotorControllerState& rhs)
   {
     return lhs.motor_current_ == rhs.motor_current_ && lhs.motor_voltage_ == rhs.motor_voltage_ &&
-    lhs.absolute_angle_iu_ == rhs.absolute_angle_iu_ && lhs.incremental_angle_iu_ == rhs.incremental_angle_iu_ &&
+    lhs.absolute_position_iu_ == rhs.absolute_position_iu_ && lhs.incremental_position_iu_ == rhs.incremental_position_iu_ &&
     lhs.absolute_velocity_iu_ == rhs.absolute_velocity_iu_ && lhs.incremental_velocity_iu_ == rhs.incremental_velocity_iu_ &&
-    lhs.absolute_angle_rad_ == rhs.absolute_angle_rad_ && lhs.incremental_angle_rad_ == rhs.incremental_angle_rad_ &&
-    lhs.absolute_velocity_rad_ == rhs.absolute_velocity_rad_ && lhs.incremental_velocity_rad_ == rhs.incremental_velocity_rad_;
+    lhs.absolute_position_ == rhs.absolute_position_ && lhs.incremental_position_ == rhs.incremental_position_ &&
+    lhs.absolute_velocity_ == rhs.absolute_velocity_ && lhs.incremental_velocity_ == rhs.incremental_velocity_;
   }
 
   /**

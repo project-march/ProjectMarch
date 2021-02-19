@@ -1,4 +1,4 @@
-Header header
+std_msgs/Header header
 string[] joint_names
 string[] error_status
 string[] operational_state

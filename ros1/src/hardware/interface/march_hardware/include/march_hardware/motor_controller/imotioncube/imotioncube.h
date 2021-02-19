@@ -87,10 +87,10 @@ private:
   void setControlWord(uint16_t control_word);
 
   // Getters for information about the state of the IMotionCube
-  int32_t getAngleIUAbsolute();
-  int32_t getAngleIUIncremental();
-  double getVelocityIUAbsolute();
-  double getVelocityIUIncremental();
+  int32_t getAbsolutePositionIU();
+  int32_t getIncrementalPositionIU();
+  double getAbsoluteVelocityIU();
+  double getIncrementalVelocityIU();
   uint16_t getStatusWord();
   uint16_t getMotionError();
   uint16_t getDetailedError();
