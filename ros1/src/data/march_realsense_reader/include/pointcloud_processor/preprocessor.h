@@ -39,6 +39,7 @@ public:
   void preprocess();
   void downsample();
   void removeStatisticalOutliers();
+  void transformPointCloudFromUrdf();
   void transformPointCloud();
   void fillNormalCloud();
   void filterOnDistanceFromOrigin();

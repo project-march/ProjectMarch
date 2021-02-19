@@ -8,6 +8,8 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/common/transforms.h>
 #include <pcl/filters/statistical_outlier_removal.h>
+#include <pcl_ros/transforms.h>
+#include <geometry_msgs/TransformStamped.h>
 
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -82,6 +84,25 @@ void NormalsPreprocessor::removeStatisticalOutliers()
   sor.setMeanK(number_of_neighbours);
   sor.setStddevMulThresh(sd_factor);
   sor.filter(*pointcloud_);
+}
+
+void NormalsPreprocessor::transformPointCloudFromUrdf()
+{
+  tf2_ros::Buffer tfBuffer;
+  tf2_ros::TransformListener tfListener(tfBuffer);
+
+  geometry_msgs::TransformStamped transformStamped;
+  try
+  {
+//    transformStamped = tfBuffer.lookupTransform("camera_link", , ros::Time(0));
+    pcl_ros::transformPointCloud("foot_right", *pointcloud_, *pointcloud_, tfBuffer);
+//    pcl::transformPointCloud(*pointcloud_, *pointcloud_, transformStamped); // Actually transform
+  }
+  catch (tf2::TransformException &ex)
+  {
+    ROS_WARN("%s", ex.what());
+    return;
+  }
 }
 
 void NormalsPreprocessor::transformPointCloud()

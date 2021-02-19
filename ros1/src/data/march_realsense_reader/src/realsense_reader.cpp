@@ -20,6 +20,9 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
       ("/camera/read_pointcloud",
       &RealSenseReader::read_pointcloud_callback,
       this);
+  pointcloud_publisher_ = n_->advertise<PointCloud>
+      ("/camera/preprocessed_cloud", 1);
+
   config_file_ = "pointcloud_parameters.yaml";
 }
 
@@ -36,6 +39,9 @@ void RealSenseReader::pointcloud_callback(const PointCloud::ConstPtr& input_clou
     std::unique_ptr<NormalsPreprocessor> preprocessor =
         std::make_unique<NormalsPreprocessor>(config_file_, pointcloud, normals);
     preprocessor->preprocess();
+
+    pointcloud_publisher_.publish(pointcloud);
+
   }
 }
 
