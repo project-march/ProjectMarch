@@ -12,8 +12,8 @@ AbsoluteEncoder::AbsoluteEncoder(size_t number_of_bits, int32_t lower_limit_iu, 
   : Encoder(number_of_bits), lower_limit_iu_(lower_limit_iu), upper_limit_iu_(upper_limit_iu)
 {
   this->zero_position_iu_ = this->lower_limit_iu_ - lower_limit_rad * this->getTotalPositions() / PI_2;
-  this->lower_soft_limit_iu_ = this->fromRad(lower_soft_limit_rad);
-  this->upper_soft_limit_iu_ = this->fromRad(upper_soft_limit_rad);
+  this->lower_soft_limit_iu_ = this->toIU(lower_soft_limit_rad, true);
+  this->upper_soft_limit_iu_ = this->toIU(upper_soft_limit_rad, true);
 
   if (this->lower_limit_iu_ >= this->upper_limit_iu_ || this->lower_soft_limit_iu_ >= this->upper_soft_limit_iu_ ||
       this->lower_soft_limit_iu_ < this->lower_limit_iu_ || this->upper_soft_limit_iu_ > this->upper_limit_iu_)
@@ -26,7 +26,7 @@ AbsoluteEncoder::AbsoluteEncoder(size_t number_of_bits, int32_t lower_limit_iu, 
   }
 
   const double range_of_motion = upper_limit_rad - lower_limit_rad;
-  const double encoder_range_of_motion = this->toRad(this->upper_limit_iu_) - this->toRad(this->lower_limit_iu_);
+  const double encoder_range_of_motion = this->toRadians(this->upper_limit_iu_, true) - this->toRadians(this->lower_limit_iu_, true);
   const double difference = std::abs(encoder_range_of_motion - range_of_motion) / encoder_range_of_motion;
   if (difference > AbsoluteEncoder::MAX_RANGE_DIFFERENCE)
   {
@@ -37,19 +37,33 @@ AbsoluteEncoder::AbsoluteEncoder(size_t number_of_bits, int32_t lower_limit_iu, 
   }
 }
 
-double AbsoluteEncoder::toRad(int32_t iu) const
+double AbsoluteEncoder::getRadiansPerBit() const
 {
-  return (iu - this->zero_position_iu_) * this->getRadPerBit();
+  return PI_2 / getTotalPositions();
 }
 
-double AbsoluteEncoder::getRadPerBit() const
+double AbsoluteEncoder::toRadians(double iu, bool is_position) const
 {
-  return PI_2 / this->getTotalPositions();
+  if (is_position)
+  {
+    return (iu - zero_position_iu_) * getRadiansPerBit();
+  }
+  else
+  {
+    return iu * getRadiansPerBit();
+  }
 }
 
-int32_t AbsoluteEncoder::fromRad(double rad) const
+double AbsoluteEncoder::toIU(double radians, bool is_position) const
 {
-  return (rad * this->getTotalPositions() / PI_2) + this->zero_position_iu_;
+  if (is_position)
+  {
+    return (radians / getRadiansPerBit()) + zero_position_iu_;
+  }
+  else
+  {
+    return radians / getRadiansPerBit();
+  }
 }
 
 bool AbsoluteEncoder::isWithinHardLimitsIU(int32_t iu) const

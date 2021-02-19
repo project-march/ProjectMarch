@@ -34,21 +34,6 @@ TEST_F(EncoderTest, ResolutionAboveRange)
   ASSERT_THROW(MockEncoder(50), march::error::HardwareException);
 }
 
-TEST_F(EncoderTest, GetAngleIU)
-{
-  MockEncoder encoder(this->resolution);
-  const int32_t expected = 101;
-  const uint8_t expected_offset = 4;
-  march::bit32 result;
-  result.i = expected;
-  MockPdoInterfacePtr mock_pdo = std::make_shared<MockPdoInterface>();
-  march::PdoSlaveInterface pdo(this->slave_index, mock_pdo);
-
-  EXPECT_CALL(*mock_pdo, read32(this->slave_index, Eq(expected_offset))).WillOnce(Return(result));
-
-  ASSERT_EQ(expected, encoder.getAngleIU(pdo, expected_offset));
-}
-
 TEST_F(EncoderTest, CorrectTotalPositions)
 {
   MockEncoder encoder(this->resolution);

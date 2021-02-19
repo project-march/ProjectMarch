@@ -8,14 +8,19 @@ IncrementalEncoder::IncrementalEncoder(size_t number_of_bits, double transmissio
 {
 }
 
-double IncrementalEncoder::toRad(int32_t iu) const
+double IncrementalEncoder::getRadiansPerBit() const
 {
-  return iu * this->getRadPerBit();
+  return PI_2 / (getTotalPositions() * this->transmission_);
 }
 
-double IncrementalEncoder::getRadPerBit() const
+double IncrementalEncoder::toIU(double radians, bool /*is_position*/) const
 {
-  return PI_2 / (this->getTotalPositions() * this->transmission_);
+  return radians / getRadiansPerBit();
+}
+
+double IncrementalEncoder::toRadians(double iu, bool /*is_position*/) const
+{
+  return iu * getRadiansPerBit();
 }
 
 double IncrementalEncoder::getTransmission() const

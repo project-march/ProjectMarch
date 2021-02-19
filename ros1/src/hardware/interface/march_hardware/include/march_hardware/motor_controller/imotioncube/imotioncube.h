@@ -67,6 +67,12 @@ public:
   // 500 * 100us = 50 ms = watchdog timer
   static const uint16_t WATCHDOG_TIME = 500;
 
+  // Constant used for converting a fixed point 16.16 bit number to a double, which is done by dividing by 2^16
+  static constexpr double FIXED_POINT_TO_FLOAT_CONVERSION = 1 << 16;
+
+  // iMOTIONCUBE setting (slow loop sample period)
+  static constexpr double TIME_PER_VELOCITY_SAMPLE = 0.004;
+
 protected:
   // Override protected functions from Slave class
   bool initSdo(SdoSlaveInterface& sdo, int cycle_time) override;
