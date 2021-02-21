@@ -50,11 +50,11 @@ std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(s
   }
   else
   {
-    for (int y = 0; y < Q_flat.size() / n_rows; y++)
+    for (int y = 0; y < n_rows; y++)
     {
-      for (int x = 0; x < Q_flat.size() / n_cols; x++)
+      for (int x = 0; x < n_cols; x++)
       {
-        Q[y][x] = Q_flat[y * n_rows + x];
+        Q[y][x] = Q_flat[y * n_cols + x];
       }
     }
   }
