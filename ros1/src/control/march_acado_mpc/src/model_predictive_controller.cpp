@@ -34,8 +34,8 @@ void ModelPredictiveController::init()
   }
 
   // Fill reference vector with sinus and or step signals
-  sinRef(reference, 0.35, 0.349, ACADO_N, 0.02);
-//  stepRef(reference, 1.0, 2*ACADO_N);
+  sinRef(reference, 0.1, 0.349, ACADO_N, 0.02); //freq, amp, horizon, sampling time
+//  stepRef(reference, 0.3, 2*ACADO_N);
 
   // Set the reference
   setReference(reference);
@@ -112,9 +112,6 @@ void ModelPredictiveController::assignWeightingMatrix(std::vector<std::vector<fl
     for(int i=0; i < ACADO_NWN; i++) {
         std::cout << acadoVariables.WN[i] << std::endl;
     }
-
-  // [Temporary] Has the function been executed?
-  std::cout << "\033[4;32m" << __FUNCTION__ << "()\033[0m" << " has executed\n";
 }
 
 void ModelPredictiveController::calculateControlInput() {
@@ -128,10 +125,14 @@ void ModelPredictiveController::calculateControlInput() {
   acado_preparationStep();
 
   // feedback step
-  acado_feedbackStep();
+  if (acado_feedbackStep()){
+      std::cout << "\033[4;32m" << "Feedback step failed" << "()\033[0m" << std::endl;
+  }
   u = acadoVariables.u[0];
+  std::cout << "MPC COMMAND: " << u << std::endl;
+    std::cout << "MPC Cost: " << acado_getObjective() << std::endl;
 
-  // Shift states and control and prepare for the next iteration
+    // Shift states and control and prepare for the next iteration
   acado_shiftStates(2, 0, 0);
   acado_shiftControls(0);
 

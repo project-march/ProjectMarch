@@ -113,8 +113,8 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
 
   command_pub_->unlockAndPublish();
   ref_pub_->unlockAndPublish();
-  std::cout << ref_pub_->msg_.data << std::endl;
-  std::cout << "test" << std::endl;
+//  std::cout << ref_pub_->msg_.data << std::endl;
+//  std::cout << "test" << std::endl;
   }
 
 void ModelPredictiveControllerInterface::stopping(const ros::Time& /*time*/)
