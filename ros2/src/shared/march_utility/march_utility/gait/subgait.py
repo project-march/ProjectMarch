@@ -576,17 +576,30 @@ class Subgait(object):
         new_setpoints: dict = {joint.name: [] for joint in base_subgait.joints}
         # fill all joints in new_setpoints except the ankle joints using
         # the inverse kinematics
+
+        PINK = '\033[0;35m'
+        CYAN = '\033[0;36m'
+        node = Node("march_rqt_input_device")
+        timer_base_feet = 0
+        timer_setpoints_add = 0
         for setpoint_index in range(0, number_of_setpoints):
+            timeStart_base_feet = time.time()
             base_feet_state = FeetState.from_setpoint_dict(
                 base_setpoints_to_interpolate[setpoint_index]
             )
             other_feet_state = FeetState.from_setpoint_dict(
                 other_setpoints_to_interpolate[setpoint_index]
             )
+            timer_base_feet = timer_base_feet + time.time() - timeStart_base_feet
+
             new_feet_state = FeetState.weighted_average_states(
                 base_feet_state, other_feet_state, parameter
             )
+
+            timeStart_setpoints_add = time.time()
             setpoints_to_add = FeetState.feet_state_to_setpoints(new_feet_state)
+            timer_setpoints_add = timer_setpoints_add + time.time() - timeStart_setpoints_add
+
             for joint_name in JOINT_NAMES_IK:
                 new_setpoints[joint_name].append(setpoints_to_add[joint_name])
             # fill the ankle joint using the angle based linear interpolation
@@ -605,6 +618,10 @@ class Subgait(object):
         duration = base_subgait.duration.weighted_average(
             other_subgait.duration, parameter
         )
+
+        node.get_logger().info(f'{PINK}subgait.py base_feet_state: {timer_base_feet}')
+        node.get_logger().info(f'{CYAN}subgait.py set_points_to_add: {timer_setpoints_add}')
+        node.get_logger().info('\033[39m')
 
         interpolated_joint_trajectories = []
         for joint in base_subgait.joints:
