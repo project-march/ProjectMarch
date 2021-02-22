@@ -4,3 +4,6 @@
 [submodule "ros2/src/libraries/robot-state-publisher"]
 	path = ros2/src/libraries/robot-state-publisher
 	url = git@gitlab.com:project-march/libraries/robot-state-publisher.git
+[submodule "ros2/src/libraries/diagnostic_updater"]
+	path = ros2/src/libraries/diagnostic_updater
+	url = git@gitlab.com:project-march/libraries/diagnostic-updater.git
