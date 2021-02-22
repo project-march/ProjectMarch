@@ -7,6 +7,9 @@ gaits:
     right_close: MV_walk_rightclose_v3
   ik_test:
     swing: forward_swing
+  ik_test_multiple_subgaits:
+    swing_up: forward_swing_simple
+    swing_down: forward_swing_simple
 positions:
   stand:
     gait_type: walk_like

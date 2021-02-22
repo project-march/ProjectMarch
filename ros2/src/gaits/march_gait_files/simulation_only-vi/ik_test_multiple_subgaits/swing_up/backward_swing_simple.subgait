@@ -1,0 +1,62 @@
+description: swinging up &backwards with both legs simple
+duration: 8000000000
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: 0.0436
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.04360007
+    time_from_start: 8000000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 8000000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: -0.0873
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.31493265
+    time_from_start: 8000000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 8000000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.0436
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.04360007
+    time_from_start: 8000000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 8000000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: -0.0873
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.30079126
+    time_from_start: 8000000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 8000000000
+    velocity: 0.0
+name: swing_up
+version: backward_swing_simple
