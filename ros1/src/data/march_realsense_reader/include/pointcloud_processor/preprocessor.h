@@ -14,7 +14,7 @@ class Preprocessor {
   public:
     Preprocessor(YAML::Node config_tree,
                  PointCloud::Ptr pointcloud,
-                 Normals::Ptr normal_pointcloud);
+                 Normals::Ptr pointcloud_normals);
     Preprocessor(std::string file_name,
                  PointCloud::Ptr pointcloud,
                  Normals::Ptr normal_pointcloud);
@@ -23,7 +23,7 @@ class Preprocessor {
     virtual ~Preprocessor() {};
 
     PointCloud::Ptr pointcloud_;
-    Normals::Ptr normal_pointcloud_;
+    Normals::Ptr pointcloud_normals_;
     YAML::Node config_tree_;
 };
 
@@ -34,10 +34,18 @@ class SimplePreprocessor : Preprocessor {
     void preprocess();
 };
 
-class NormalPreprocessor : Preprocessor {
+class NormalsPreprocessor : Preprocessor {
 public:
   using Preprocessor::Preprocessor; //Use the constructors defined in the super class
   void preprocess();
+  void downsample();
+  void removeStatisticalOutliers();
+  void transformPointCloudFromUrdf();
+  void transformPointCloud();
+  void fillNormalCloud();
+  void filterOnDistanceFromOrigin();
+  void filterOnNormalOrientation();
+>>>>>>> 2c7b21f6c3708e5db56c386402b8e92a95e93bed
 };
 
 #endif //MARCH_PREPROCESSOR_H
