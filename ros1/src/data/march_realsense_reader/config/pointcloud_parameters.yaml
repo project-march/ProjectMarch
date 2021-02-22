@@ -1,8 +1,5 @@
 preprocessor:
   test_parameter: 100
-<<<<<<< HEAD
-  leaf_size: 0.02
-=======
 
   downsampling:
     leaf_size: 0.05
@@ -30,4 +27,3 @@ preprocessor:
     allowed_length_x: 0.65
     allowed_length_y: 0.5
     allowed_length_z: 1.0 # 1.0 is max length of a normal vector
->>>>>>> 2c7b21f6c3708e5db56c386402b8e92a95e93bed

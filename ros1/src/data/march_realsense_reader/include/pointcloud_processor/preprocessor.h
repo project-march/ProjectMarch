@@ -45,7 +45,6 @@ public:
   void fillNormalCloud();
   void filterOnDistanceFromOrigin();
   void filterOnNormalOrientation();
->>>>>>> 2c7b21f6c3708e5db56c386402b8e92a95e93bed
 };
 
 #endif //MARCH_PREPROCESSOR_H
