@@ -40,8 +40,10 @@ void RealSenseReader::pointcloud_callback(const PointCloud::ConstPtr& input_clou
         std::make_unique<NormalsPreprocessor>(config_file_, pointcloud, normals);
     preprocessor->preprocess();
 
+    ROS_INFO_STREAM("Done preprocessing, lets publish: " << pointcloud);
     pointcloud_publisher_.publish(pointcloud);
 
+    ROS_INFO_STREAM("Pointcloud published");
   }
 }
 

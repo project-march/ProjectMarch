@@ -9,6 +9,8 @@ find_package(catkin REQUIRED COMPONENTS
     pcl_ros
     roscpp
     sensor_msgs
+    tf2_ros
+    geometry_msgs
 )
 
 find_package(yaml-cpp)
@@ -20,6 +22,8 @@ catkin_package(
     pcl_ros
     roscpp
     sensor_msgs
+    tf2_ros
+    geometry_msgs
 )
 
 include_directories(

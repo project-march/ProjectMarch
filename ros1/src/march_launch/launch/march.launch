@@ -50,6 +50,8 @@
             <arg name="color_fps" value="$(arg color_fps)"/>
             <arg name="infra_fps" value="$(arg infra_fps)"/>
             <arg name="enable_pointcloud" value="true"/>
+            <arg name="output" value="log"/>
+<!--            <arg name="initial_reset" value="true"/>-->
         </include>
     </group>
 

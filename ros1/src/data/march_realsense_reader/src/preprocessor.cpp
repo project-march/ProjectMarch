@@ -56,13 +56,15 @@ void NormalsPreprocessor::preprocess()
 
   transformPointCloudFromUrdf();
 
-  filterOnDistanceFromOrigin();
+//  filterOnDistanceFromOrigin();
+//
+//  removeStatisticalOutliers();
+//
+//  fillNormalCloud();
+//
+//  filterOnNormalOrientation();
 
-  removeStatisticalOutliers();
-
-  fillNormalCloud();
-
-  filterOnNormalOrientation();
+  ROS_INFO_STREAM("Done preprocessing.");
 }
 
 void NormalsPreprocessor::downsample()
@@ -99,9 +101,10 @@ void NormalsPreprocessor::transformPointCloudFromUrdf()
   geometry_msgs::TransformStamped transformStamped;
   try
   {
-//    transformStamped = tfBuffer.lookupTransform("camera_link", , ros::Time(0));
-    pcl_ros::transformPointCloud("foot_right", *pointcloud_, *pointcloud_, tfBuffer);
-//    pcl::transformPointCloud(*pointcloud_, *pointcloud_, transformStamped); // Actually transform
+    transformStamped = tfBuffer.lookupTransform("camera_link", "foot_left", ros::Time
+    (0));
+    pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_,
+                                 transformStamped.transform);
   }
   catch (tf2::TransformException &ex)
   {
