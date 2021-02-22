@@ -24,6 +24,7 @@ add_message_files(
     LowVoltageNet.msg
     PowerDistributionBoardState.msg
     PressureSole.msg
+    PressureSoleData.msg
 )
 
 add_service_files(

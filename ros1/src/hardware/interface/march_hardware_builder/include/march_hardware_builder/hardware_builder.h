@@ -20,6 +20,7 @@
 #include <march_hardware/march_robot.h>
 #include <march_hardware/power/power_distribution_board.h>
 #include <march_hardware/temperature/temperature_ges.h>
+#include <march_hardware/pressure_sole/pressure_sole.h>
 
 /**
  * @brief Creates a MarchRobot from a robot yaml and URDF.
@@ -84,12 +85,21 @@ public:
   createPowerDistributionBoard(const YAML::Node& power_distribution_board_config, march::PdoInterfacePtr pdo_interface,
                                march::SdoInterfacePtr sdo_interface);
 
+  static std::vector<march::PressureSole> createPressureSoles(const YAML::Node& pressure_soles_config,
+                                                              march::PdoInterfacePtr pdo_interface,
+                                                              march::SdoInterfacePtr sdo_interface);
+  static march::PressureSole createPressureSole(const YAML::Node& pressure_sole_config,
+                                                march::PdoInterfacePtr pdo_interface,
+                                                march::SdoInterfacePtr sdo_interface);
+
   static const std::vector<std::string> INCREMENTAL_ENCODER_REQUIRED_KEYS;
   static const std::vector<std::string> ABSOLUTE_ENCODER_REQUIRED_KEYS;
   static const std::vector<std::string> IMOTIONCUBE_REQUIRED_KEYS;
   static const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS;
   static const std::vector<std::string> POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS;
   static const std::vector<std::string> JOINT_REQUIRED_KEYS;
+  static const std::vector<std::string> PRESSURE_SOLE_REQUIRED_KEYS;
+
 
 private:
   /**

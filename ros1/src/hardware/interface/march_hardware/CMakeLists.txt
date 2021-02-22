@@ -67,6 +67,7 @@ add_library(${PROJECT_NAME}
     include/${PROJECT_NAME}/power/power_distribution_board.h
     include/${PROJECT_NAME}/temperature/temperature_ges.h
     include/${PROJECT_NAME}/temperature/temperature_sensor.h
+    include/${PROJECT_NAME}/pressure_sole/pressure_sole.h
     src/encoder/absolute_encoder.cpp
     src/encoder/encoder.cpp
     src/encoder/incremental_encoder.cpp
@@ -84,6 +85,7 @@ add_library(${PROJECT_NAME}
     src/power/low_voltage.cpp
     src/power/power_distribution_board.cpp
     src/temperature/temperature_ges.cpp
+    src/pressure_sole/pressure_sole.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} pthread)

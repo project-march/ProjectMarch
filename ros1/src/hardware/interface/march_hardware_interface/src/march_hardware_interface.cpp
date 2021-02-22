@@ -4,6 +4,7 @@
 
 #include <march_hardware/imotioncube/actuation_mode.h>
 #include <march_hardware/joint.h>
+#include <march_shared_msgs/PressureSoleData.h>
 
 #include <algorithm>
 #include <cmath>
@@ -35,6 +36,9 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
   // Initialize realtime publisher for the IMotionCube states
   this->imc_state_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_msgs::ImcState>>(
       nh, "/march/imc_states/", 4);
+
+  pressure_sole_data_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_msgs::PressureSoleData>>(
+      nh, "/march/pressure_sole_data/", 4);
 
   this->after_limit_joint_command_pub_ =
       std::make_unique<realtime_tools::RealtimePublisher<march_shared_msgs::AfterLimitJointCommand>>(
@@ -220,6 +224,11 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
   }
 
   this->updateIMotionCubeState();
+
+  if (march_robot_->hasPressureSoles())
+  {
+    updatePressureSoleData();
+  }
 }
 
 void MarchHardwareInterface::write(const ros::Time& /* time */, const ros::Duration& elapsed_time)
@@ -537,4 +546,30 @@ void MarchHardwareInterface::getSoftJointLimitsError(const std::string& name,
       urdf_joint->limits->lower + ((urdf_joint->safety->soft_lower_limit - urdf_joint->limits->lower) * margin);
   error_soft_limits.max_position =
       urdf_joint->limits->upper - ((urdf_joint->limits->upper - urdf_joint->safety->soft_upper_limit) * margin);
+}
+
+void MarchHardwareInterface::updatePressureSoleData()
+{
+  if (!pressure_sole_data_pub_->trylock())
+  {
+    return;
+  }
+
+  pressure_sole_data_pub_->msg_.header.stamp = ros::Time::now();
+  auto pressure_soles = march_robot_->getPressureSoles();
+  for (size_t i = 0; i < pressure_soles.size(); i++)
+  {
+    auto data = pressure_soles[i].read();
+    pressure_sole_data_pub_->msg_.side[i] = pressure_soles[i].getSide();
+    pressure_sole_data_pub_->msg_.heel_right[i] = data.heel_right;
+    pressure_sole_data_pub_->msg_.heel_left[i] = data.heel_left;
+    pressure_sole_data_pub_->msg_.met1[i] = data.met1;
+    pressure_sole_data_pub_->msg_.hallux[i] = data.hallux;
+    pressure_sole_data_pub_->msg_.met3[i] = data.met3;
+    pressure_sole_data_pub_->msg_.toes[i] = data.toes;
+    pressure_sole_data_pub_->msg_.met5[i] = data.met5;
+    pressure_sole_data_pub_->msg_.arch[i] = data.arch;
+  }
+
+  pressure_sole_data_pub_->unlockAndPublish();
 }
