@@ -324,7 +324,8 @@ std::vector<march::PressureSole> HardwareBuilder::createPressureSoles(const YAML
   for (const YAML::Node& pressure_sole_config : pressure_soles_config)
   {
     pressure_soles.push_back(
-        HardwareBuilder::createPressureSole(pressure_sole_config, pdo_interface, sdo_interface));
+        HardwareBuilder::createPressureSole(pressure_sole_config[pressure_sole_config.begin()->first.as<std::string>()],
+                                            pdo_interface, sdo_interface));
   }
   return pressure_soles;
 }
