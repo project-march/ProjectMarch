@@ -343,6 +343,17 @@ void MarchHardwareInterface::reserveMemory()
   imc_state_pub_->msg_.incremental_encoder_value.resize(num_joints_);
   imc_state_pub_->msg_.absolute_velocity.resize(num_joints_);
   imc_state_pub_->msg_.incremental_velocity.resize(num_joints_);
+
+  auto num_pressure_soles = march_robot_->getPressureSoles().size();
+  pressure_sole_data_pub_->msg_.side.resize(num_pressure_soles);
+  pressure_sole_data_pub_->msg_.heel_right.resize(num_pressure_soles);
+  pressure_sole_data_pub_->msg_.heel_left.resize(num_pressure_soles);
+  pressure_sole_data_pub_->msg_.met1.resize(num_pressure_soles);
+  pressure_sole_data_pub_->msg_.hallux.resize(num_pressure_soles);
+  pressure_sole_data_pub_->msg_.met3.resize(num_pressure_soles);
+  pressure_sole_data_pub_->msg_.toes.resize(num_pressure_soles);
+  pressure_sole_data_pub_->msg_.met5.resize(num_pressure_soles);
+  pressure_sole_data_pub_->msg_.arch.resize(num_pressure_soles);
 }
 
 void MarchHardwareInterface::updatePowerDistributionBoard()

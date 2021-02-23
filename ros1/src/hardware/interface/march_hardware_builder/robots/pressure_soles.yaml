@@ -3,11 +3,7 @@ pressure_soles:
   ecatCycleTime: 4
   ecatSlaveTimeout: 50
   pressure_soles:
-    - right_side:
+    - left_side:
         slaveIndex: 1
         byteOffset: 8
-        side: right
-    - left_side:
-        slaveIndex: 2
-        byteOffset: 8
-        side: left
+        side: 'left'
