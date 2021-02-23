@@ -401,7 +401,7 @@ class Subgait(object):
         for joint in self.joints:
             for setpoint in joint.setpoints:
                 timestamps.append(setpoint.time)
-        if sorted:
+        if sorted_timestamps:
             return sorted(set(timestamps))
         else:
             return set(timestamps)
