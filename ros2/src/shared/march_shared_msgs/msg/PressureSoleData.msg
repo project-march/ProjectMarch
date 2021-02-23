@@ -1,4 +1,4 @@
-Header header
+std_msgs/Header  header
 string[] side
 float32[] heel_right
 float32[] heel_left
