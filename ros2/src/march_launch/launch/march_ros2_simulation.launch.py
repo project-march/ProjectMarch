@@ -74,25 +74,25 @@ def generate_launch_description():
                 name="simulation",
                 default_value="False",
                 description="Whether the exoskeleton is ran physically or in "
-                            "simulation.",
+                "simulation.",
             ),
             DeclareLaunchArgument(
                 name="realsense_simulation",
                 default_value="False",
-                description="Whether the simulation camera or the physical camera should be used"
+                description="Whether the simulation camera or the physical camera should be used",
             ),
             DeclareLaunchArgument(
                 name="ground_gait",
                 default_value="False",
                 description="Whether the simulation should be simulating "
-                            "ground_gaiting instead of airgaiting.",
+                "ground_gaiting instead of airgaiting.",
             ),
             DeclareLaunchArgument(
                 name="to_world_transform",
                 default_value="False",
                 description="Whether a transform from the world to base_link is "
-                            "necessary, this is the case when you are "
-                            "groundgaiting in rviz.",
+                "necessary, this is the case when you are "
+                "groundgaiting in rviz.",
             ),
             # GAIT SELECTION ARGUMENTS
             DeclareLaunchArgument(
@@ -141,7 +141,7 @@ def generate_launch_description():
                     ("simulation", simulation),
                     ("realsense_simulation", realsense_simulation),
                     ("ground_gait", ground_gait),
-                    ("to_world_transform", to_world_transform)
+                    ("to_world_transform", to_world_transform),
                 ],
                 condition=IfCondition(robot_state_publisher),
             ),

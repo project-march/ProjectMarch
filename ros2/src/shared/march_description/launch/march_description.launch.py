@@ -3,8 +3,12 @@ import xacro
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration, Command, PathJoinSubstitution, \
-    TextSubstitution
+from launch.substitutions import (
+    LaunchConfiguration,
+    Command,
+    PathJoinSubstitution,
+    TextSubstitution,
+)
 from launch_ros.actions import Node
 
 
@@ -57,17 +61,17 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 name="realsense_simulation",
                 default_value="False",
-                description="Whether the simulation camera or the physical camera should be used"
+                description="Whether the simulation camera or the physical camera should be used",
             ),
             DeclareLaunchArgument(
                 name="ground_gait",
                 default_value="False",
                 description="Whether the simulation should be simulating "
-                            "ground_gaiting instead of airgaiting.",
+                "ground_gaiting instead of airgaiting.",
             ),
             Node(
-                package="robot_state_publisher",
-                executable="march_robot_state_publisher",
+                package="march_robot_state_publisher",
+                executable="march_robot_state_publisher_node",
                 name="robot_state_publisher",
                 namespace="march",
                 output="screen",
@@ -75,10 +79,15 @@ def generate_launch_description():
                     {
                         "use_sim_time": use_sim_time,
                         "robot_description": Command(
-                            ["xacro ",
-                            xacro_path, ".xacro",
-                            " ground_gait:=", ground_gait,
-                            " realsense_simulation:=", realsense_simulation]
+                            [
+                                "xacro ",
+                                xacro_path,
+                                ".xacro",
+                                " ground_gait:=",
+                                ground_gait,
+                                " realsense_simulation:=",
+                                realsense_simulation,
+                            ]
                         ),
                         "use_imu_data": use_imu_data,
                         "to_world_transform": to_world_transform,
