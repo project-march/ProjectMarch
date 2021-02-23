@@ -31,21 +31,18 @@ def generate_launch_description() -> LaunchDescription:
             Node(
                 package="rqt_robot_monitor",
                 executable="rqt_robot_monitor",
-                output="screen",
                 namespace="rqt_robot_monitor",
                 condition=IfCondition(LaunchConfiguration("rqt")),
             ),
             Node(
                 package="diagnostic_aggregator",
                 executable="aggregator_node",
-                output="screen",
                 name="diag_agg",
                 parameters=[parameter_file],
             ),
             Node(
                 package="march_rqt_robot_monitor",
                 executable="march_rqt_robot_monitor_node",
-                output="screen",
                 name="march_rqt_robot_monitor_node",
                 parameters=[{"use_sim_time": LaunchConfiguration("use_sim_time")}],
             ),

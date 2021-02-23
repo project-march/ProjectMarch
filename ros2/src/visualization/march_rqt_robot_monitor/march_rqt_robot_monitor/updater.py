@@ -31,7 +31,7 @@ class DiagnosticUpdater(Node):
         joint_names = get_joint_names(self)
 
         # Frequency checks
-        CheckInputDevice(self, "/march/input_device/alive", Alive, self.updater, 5)
+        CheckInputDevice(self, "/march/input_device/alive", Alive, self.updater, 4)
 
         # Control checks
         check_joint_states = CheckJointValues(self, "/march/joint_states", JointState)
