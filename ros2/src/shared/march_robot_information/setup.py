@@ -16,10 +16,10 @@ setup(
         ),
         (os.path.join("share", package_name), ["package.xml"]),
         (os.path.join("share", package_name, "launch"), glob("launch/*.launch.py")),
-        (
-            os.path.join("share", package_name, "test", "launch_test"),
-            glob("test/launch_test/*.py"),
-        ),
+        # (
+        #     os.path.join("share", package_name, "test", "launch_test"),
+        #     glob("test/launch_test/*.py"),
+        # ),
         (
             os.path.join("share", package_name, "test", "unittest"),
             glob("test/unittest/*.py"),
