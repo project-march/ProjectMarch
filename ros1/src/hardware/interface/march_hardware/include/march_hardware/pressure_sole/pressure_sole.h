@@ -16,6 +16,13 @@ struct PressureSoleData
   float toes;
   float met5;
   float arch;
+
+  bool operator==(const PressureSoleData& rhs) const
+  {
+    return heel_right == rhs.heel_right && heel_left == rhs.heel_left && met1 == rhs.met1 && hallux == rhs.hallux &&
+           met3 == rhs.met3 && toes == rhs.toes && met5 == rhs.met5 && arch == rhs.arch;
+
+  }
 };
 
 class PressureSole : public Slave

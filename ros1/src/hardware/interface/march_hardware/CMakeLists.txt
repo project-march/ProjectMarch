@@ -139,6 +139,7 @@ if(CATKIN_ENABLE_TESTING)
         test/power/net_monitor_offsets_test.cpp
         test/power/power_distribution_board_test.cpp
         test/temperature/temperature_ges_test.cpp
+        test/pressure_sole/pressure_sole_test.cpp
         test/test_runner.cpp
     )
     target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME})
