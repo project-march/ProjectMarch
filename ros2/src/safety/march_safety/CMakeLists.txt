@@ -51,13 +51,13 @@ install(TARGETS ${PROJECT_NAME}_node
 install(DIRECTORY launch config
         DESTINATION share/${PROJECT_NAME}/)
 
-if(BUILD_TESTING)
-    find_package(ros_testing REQUIRED)
-    install(DIRECTORY test
-            DESTINATION share/${PROJECT_NAME}/)
-    ament_python_install_package(test)
-    add_ros_test(test/launch/march_safety_connection.launch.py)
-    add_ros_test(test/launch/march_safety_temperature.launch.py)
-endif()
+#if(BUILD_TESTING)
+#    find_package(ros_testing REQUIRED)
+#    install(DIRECTORY test
+#            DESTINATION share/${PROJECT_NAME}/)
+#    ament_python_install_package(test)
+#    add_ros_test(test/launch/march_safety_connection.launch.py)
+#    add_ros_test(test/launch/march_safety_temperature.launch.py)
+#endif()
 
 ament_package()
