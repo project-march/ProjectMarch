@@ -206,7 +206,6 @@ class Subgait(object):
             subgait_dict["description"] if subgait_dict.get("description") else ""
         )
 
-
         return cls(
             joint_list,
             duration,
@@ -396,23 +395,16 @@ class Subgait(object):
     # endregion
 
     # region Get functions
-    def get_unique_timestamps(self) -> List[Duration]:
+    def get_unique_timestamps(self, sorted_timestamps: bool = True) -> List[Duration]:
         """Get the timestamps that are unique to a setpoint."""
         timestamps = []
         for joint in self.joints:
             for setpoint in joint.setpoints:
                 timestamps.append(setpoint.time)
-
-        return sorted(set(timestamps))
-
-    def get_unique_timestamps_unsorted(self) -> Set[Duration]:
-        """Get the timestamps that are unique to a setpoint, but leave the set unsorted."""
-        timestamps = []
-        for joint in self.joints:
-            for setpoint in joint.setpoints:
-                timestamps.append(setpoint.time)
-
-        return set(timestamps)
+        if sorted:
+            return sorted(set(timestamps))
+        else:
+            return set(timestamps)
 
     def get_joint(self, name: str) -> JointTrajectory:
         """Get joint object with given name or index."""
@@ -605,8 +597,8 @@ class Subgait(object):
     ) -> Tuple[List[dict], List[dict]]:
         """Create two lists of setpoints with equal time stamps."""
         base_to_other_duration_ratio = other_subgait.duration / base_subgait.duration
-        base_time_stamps = base_subgait.get_unique_timestamps_unsorted()
-        other_time_stamps = other_subgait.get_unique_timestamps_unsorted()
+        base_time_stamps = base_subgait.get_unique_timestamps(sorted_timestamps=False)
+        other_time_stamps = other_subgait.get_unique_timestamps(sorted_timestamps=False)
 
         for base_time in base_time_stamps:
             other_time_stamps.add(round((base_time * base_to_other_duration_ratio), 4))
