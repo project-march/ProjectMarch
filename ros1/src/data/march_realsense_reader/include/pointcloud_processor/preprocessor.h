@@ -39,8 +39,6 @@ public:
   using Preprocessor::Preprocessor; //Use the constructors defined in the super class
   void preprocess();
   void downsample();
-  void removeStatisticalOutliers();
-  void transformPointCloudFromUrdf();
   void transformPointCloud();
   void fillNormalCloud();
   void filterOnDistanceFromOrigin();

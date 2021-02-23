@@ -14,14 +14,14 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
     reading_(false)
 {
   pointcloud_subscriber_ = n_->subscribe<PointCloud>
-    ("/camera/depth/color/points", 1,
+    ("/camera/depth/color/points", 50,
      &RealSenseReader::pointcloud_callback, this);
   read_pointcloud_service_ = n_->advertiseService
       ("/camera/read_pointcloud",
       &RealSenseReader::read_pointcloud_callback,
       this);
   pointcloud_publisher_ = n_->advertise<PointCloud>
-      ("/camera/preprocessed_cloud", 1);
+      ("/camera/preprocessed_cloud", 50);
 
   config_file_ = "pointcloud_parameters.yaml";
 }
@@ -40,8 +40,10 @@ void RealSenseReader::pointcloud_callback(const PointCloud::ConstPtr& input_clou
         std::make_unique<NormalsPreprocessor>(config_file_, pointcloud, normals);
     preprocessor->preprocess();
 
+    ROS_INFO_STREAM("Done preprocessing, lets publish: " << pointcloud << " with size: " << pointcloud->points.size());
+    PointCloud::constPtr =
     pointcloud_publisher_.publish(pointcloud);
-
+    ROS_INFO_STREAM("Pointcloud published");
   }
 }
 

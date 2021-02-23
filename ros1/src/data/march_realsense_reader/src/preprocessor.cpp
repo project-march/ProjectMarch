@@ -50,19 +50,21 @@ void SimplePreprocessor::preprocess()
 
 void NormalsPreprocessor::preprocess()
 {
-  ROS_INFO_STREAM("Preprocessing with normal filtering.");
+  ROS_INFO_STREAM("Preprocessing with normal filtering. Number of points in pointcloud is " << pointcloud_->points.size());
 
   downsample();
 
-  transformPointCloudFromUrdf();
+  transformPointCloud();
 
   filterOnDistanceFromOrigin();
 
-  removeStatisticalOutliers();
+//  removeStatisticalOutliers();
 
   fillNormalCloud();
 
   filterOnNormalOrientation();
+
+  ROS_INFO_STREAM("Finished preprocessing. Number of points in pointcloud is " << pointcloud_->points.size());
 }
 
 void NormalsPreprocessor::downsample()
@@ -77,37 +79,19 @@ void NormalsPreprocessor::downsample()
   voxel_grid.filter(*pointcloud_);
 }
 
-void NormalsPreprocessor::removeStatisticalOutliers()
-{
-  // Remove statistical outliers from the pointcloud to reduce noise
-  auto parameters = config_tree_["statistical_outlier_filter"];
-  int number_of_neighbours = parameters["number_of_neighbours"].as<int>();
-  double sd_factor = parameters["sd_factor"].as<double>();
-
-  pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
-  sor.setInputCloud(pointcloud_);
-  sor.setMeanK(number_of_neighbours);
-  sor.setStddevMulThresh(sd_factor);
-  sor.filter(*pointcloud_);
-}
-
-void NormalsPreprocessor::transformPointCloudFromUrdf()
-{
-  tf2_ros::Buffer tfBuffer;
-  tf2_ros::TransformListener tfListener(tfBuffer);
-
-  geometry_msgs::TransformStamped transformStamped;
-  try
-  {
-    transformStamped = tfBuffer.lookupTransform("camera_link", "foot_left", ros::Time(4));
-    pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_, transformStamped.transform);
-  }
-  catch (tf2::TransformException &ex)
-  {
-    ROS_WARN("%s", ex.what());
-    return;
-  }
-}
+//void NormalsPreprocessor::removeStatisticalOutliers()
+//{
+//  // Remove statistical outliers from the pointcloud to reduce noise
+//  auto parameters = config_tree_["statistical_outlier_filter"];
+//  int number_of_neighbours = parameters["number_of_neighbours"].as<int>();
+//  double sd_factor = parameters["sd_factor"].as<double>();
+//
+//  pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
+//  sor.setInputCloud(pointcloud_);
+//  sor.setMeanK(number_of_neighbours);
+//  sor.setStddevMulThresh(sd_factor);
+//  sor.filter(*pointcloud_);
+//}
 
 void NormalsPreprocessor::transformPointCloud()
 {
@@ -119,8 +103,8 @@ void NormalsPreprocessor::transformPointCloud()
   double translation_z = parameters["translation_z"].as<double>();
   double rotation_y = parameters["rotation_y"].as<double>();
 
-  // make a 4 by 4 transformation Transform = [Rotation translation; 0 1]
-  Eigen::Affine3f transform = Eigen::Affine3f::Identity(); // Eigen should be a dependency of pcl, is this fine?
+  // make a 4 by 4 transformation Transform = [Rotation (3x3) translation (3x1); 0 (1x3) 1 (1x1)]
+  Eigen::Affine3f transform = Eigen::Affine3f::Identity();
 
   // Add the desired translation to the transformation matrix
   transform.translation() << translation_x, translation_y, translation_z;
@@ -128,7 +112,8 @@ void NormalsPreprocessor::transformPointCloud()
   // Add the desired rotation (currently just around the Y axis) to the transformation matrix
   transform.rotate(Eigen::AngleAxisf(rotation_y, Eigen::Vector3f::UnitY()));
 
-  pcl::transformPointCloud(*pointcloud_, *pointcloud_, transform); // Actually transform
+  // Actually transform
+  pcl::transformPointCloud(*pointcloud_, *pointcloud_, transform);
 }
 
 void NormalsPreprocessor::filterOnDistanceFromOrigin()
