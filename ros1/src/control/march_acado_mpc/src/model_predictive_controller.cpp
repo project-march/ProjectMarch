@@ -135,7 +135,7 @@ void ModelPredictiveController::init() {
 
   // Prepare a consistent initial guess
   for (int i = 0; i < ACADO_N + 1; i++) {
-    acadoVariables.x[i * ACADO_NX + 0] = 0; // theta
+    acadoVariables.x[i * ACADO_NX    ] = 0;     // theta
     acadoVariables.x[i * ACADO_NX + 1] = 0; // dtheta
   }
 
