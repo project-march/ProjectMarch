@@ -22,7 +22,7 @@
 #include <march_hardware_builder/hardware_builder.h>
 #include <march_shared_msgs/AfterLimitJointCommand.h>
 #include <march_shared_msgs/ImcState.h>
-#include <march_shared_msgs/PressureSoleData.h>
+#include <march_shared_msgs/PressureSolesData.h>
 
 template <typename T>
 using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;
@@ -139,7 +139,7 @@ private:
   /* Real time safe publishers */
   RtPublisherPtr<march_shared_msgs::AfterLimitJointCommand> after_limit_joint_command_pub_;
   RtPublisherPtr<march_shared_msgs::ImcState> imc_state_pub_;
-  RtPublisherPtr<march_shared_msgs::PressureSoleData> pressure_sole_data_pub_;
+  RtPublisherPtr<march_shared_msgs::PressureSolesData> pressure_sole_data_pub_;
 };
 
 #endif  // MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_H

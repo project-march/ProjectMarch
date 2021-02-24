@@ -5,6 +5,7 @@
 #include <march_hardware/imotioncube/actuation_mode.h>
 #include <march_hardware/joint.h>
 #include <march_shared_msgs/PressureSoleData.h>
+#include <march_shared_msgs/PressureSolesData.h>
 
 #include <algorithm>
 #include <cmath>
@@ -37,7 +38,7 @@ bool MarchHardwareInterface::init(ros::NodeHandle& nh, ros::NodeHandle& /* robot
   this->imc_state_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_msgs::ImcState>>(
       nh, "/march/imc_states/", 4);
 
-  pressure_sole_data_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_msgs::PressureSoleData>>(
+  pressure_sole_data_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_msgs::PressureSolesData>>(
       nh, "/march/pressure_sole_data/", 4);
 
   this->after_limit_joint_command_pub_ =
@@ -343,17 +344,6 @@ void MarchHardwareInterface::reserveMemory()
   imc_state_pub_->msg_.incremental_encoder_value.resize(num_joints_);
   imc_state_pub_->msg_.absolute_velocity.resize(num_joints_);
   imc_state_pub_->msg_.incremental_velocity.resize(num_joints_);
-
-  auto num_pressure_soles = march_robot_->getPressureSoles().size();
-  pressure_sole_data_pub_->msg_.side.resize(num_pressure_soles);
-  pressure_sole_data_pub_->msg_.heel_right.resize(num_pressure_soles);
-  pressure_sole_data_pub_->msg_.heel_left.resize(num_pressure_soles);
-  pressure_sole_data_pub_->msg_.met1.resize(num_pressure_soles);
-  pressure_sole_data_pub_->msg_.hallux.resize(num_pressure_soles);
-  pressure_sole_data_pub_->msg_.met3.resize(num_pressure_soles);
-  pressure_sole_data_pub_->msg_.toes.resize(num_pressure_soles);
-  pressure_sole_data_pub_->msg_.met5.resize(num_pressure_soles);
-  pressure_sole_data_pub_->msg_.arch.resize(num_pressure_soles);
 }
 
 void MarchHardwareInterface::updatePowerDistributionBoard()
@@ -565,22 +555,30 @@ void MarchHardwareInterface::updatePressureSoleData()
   {
     return;
   }
-
   pressure_sole_data_pub_->msg_.header.stamp = ros::Time::now();
   auto pressure_soles = march_robot_->getPressureSoles();
   for (size_t i = 0; i < pressure_soles.size(); i++)
   {
+    march_shared_msgs::PressureSoleData pressure_sole_data_msg;
     auto data = pressure_soles[i].read();
-    pressure_sole_data_pub_->msg_.side[i] = pressure_soles[i].getSide();
-    pressure_sole_data_pub_->msg_.heel_right[i] = data.heel_right;
-    pressure_sole_data_pub_->msg_.heel_left[i] = data.heel_left;
-    pressure_sole_data_pub_->msg_.met1[i] = data.met1;
-    pressure_sole_data_pub_->msg_.hallux[i] = data.hallux;
-    pressure_sole_data_pub_->msg_.met3[i] = data.met3;
-    pressure_sole_data_pub_->msg_.toes[i] = data.toes;
-    pressure_sole_data_pub_->msg_.met5[i] = data.met5;
-    pressure_sole_data_pub_->msg_.arch[i] = data.arch;
-  }
+    pressure_sole_data_msg.side = pressure_soles[i].getSide();
+    pressure_sole_data_msg.heel_right = data.heel_right;
+    pressure_sole_data_msg.heel_left = data.heel_left;
+    pressure_sole_data_msg.met1 = data.met1;
+    pressure_sole_data_msg.hallux = data.hallux;
+    pressure_sole_data_msg.met3 = data.met3;
+    pressure_sole_data_msg.toes = data.toes;
+    pressure_sole_data_msg.met5 = data.met5;
+    pressure_sole_data_msg.arch = data.arch;
 
+    if (pressure_sole_data_msg.side == "left")
+    {
+      pressure_sole_data_pub_->msg_.left_foot = pressure_sole_data_msg;
+    }
+    else
+    {
+      pressure_sole_data_pub_->msg_.right_foot = pressure_sole_data_msg;
+    }
+  }
   pressure_sole_data_pub_->unlockAndPublish();
 }

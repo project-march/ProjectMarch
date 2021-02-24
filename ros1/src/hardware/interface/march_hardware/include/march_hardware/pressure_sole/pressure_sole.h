@@ -28,10 +28,6 @@ struct PressureSoleData
 class PressureSole : public Slave
 {
 public:
-  enum Side {
-    LEFT,
-    RIGHT
-  };
   PressureSole(const Slave& slave, uint8_t byte_offset, std::string side);
 
   // Read the data in from ethercat

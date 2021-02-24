@@ -25,6 +25,7 @@ add_message_files(
     PowerDistributionBoardState.msg
     PressureSole.msg
     PressureSoleData.msg
+    PressureSolesData.msg
 )
 
 add_service_files(
