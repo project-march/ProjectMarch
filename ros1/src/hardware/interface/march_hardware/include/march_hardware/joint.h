@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-#include <march_hardware/motor_controller/imotioncube/imotioncube.h>
+#include <march_hardware/motor_controller/motor_controller.h>
 #include <march_hardware/power/power_distribution_board.h>
 #include <march_hardware/temperature/temperature_ges.h>
 #include <march_hardware/motor_controller/motor_controller_state.h>
@@ -18,10 +18,10 @@ class Joint
 {
 public:
   // Initialize a Joint with motor controller and without temperature slave.
-  Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<IMotionCube> motor_controller);
+  Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<MotorController> motor_controller);
 
   // Initialize a Joint with motor controller and temperature slave.
-  Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<IMotionCube> motor_controller,
+  Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<MotorController> motor_controller,
         std::shared_ptr<TemperatureGES> temperature_ges);
 
   virtual ~Joint() noexcept = default;
