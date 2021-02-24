@@ -41,7 +41,6 @@ void RealSenseReader::pointcloud_callback(const PointCloud::ConstPtr& input_clou
     preprocessor->preprocess();
 
     ROS_INFO_STREAM("Done preprocessing, lets publish: " << pointcloud << " with size: " << pointcloud->points.size());
-    PointCloud::constPtr =
     pointcloud_publisher_.publish(pointcloud);
     ROS_INFO_STREAM("Pointcloud published");
   }
