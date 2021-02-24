@@ -110,10 +110,10 @@ int MarchRobot::getMaxSlaveIndex()
       }
     }
 
-    int iMotionCubeSlaveIndex = joint.getMotorController()->getSlaveIndex();
-    if (iMotionCubeSlaveIndex > maxSlaveIndex)
+    int motorControllerSlaveIndex = joint.getMotorController()->getSlaveIndex();
+    if (motorControllerSlaveIndex > maxSlaveIndex)
     {
-      maxSlaveIndex = iMotionCubeSlaveIndex;
+      maxSlaveIndex = motorControllerSlaveIndex;
     }
   }
   return maxSlaveIndex;
@@ -121,7 +121,7 @@ int MarchRobot::getMaxSlaveIndex()
 
 bool MarchRobot::hasValidSlaves()
 {
-  ::std::vector<int> iMotionCubeIndices;
+  ::std::vector<int> motorControllerIndices;
   ::std::vector<int> temperatureSlaveIndices;
 
   for (auto& joint : jointList)
@@ -132,8 +132,8 @@ bool MarchRobot::hasValidSlaves()
       temperatureSlaveIndices.push_back(temperatureSlaveIndex);
     }
 
-    int iMotionCubeSlaveIndex = joint.getMotorController()->getSlaveIndex();
-    iMotionCubeIndices.push_back(iMotionCubeSlaveIndex);
+    int motorControllerSlaveIndex = joint.getMotorController()->getSlaveIndex();
+    motorControllerIndices.push_back(motorControllerSlaveIndex);
   }
   // Multiple temperature sensors may be connected to the same slave.
   // Remove duplicate temperatureSlaveIndices so they don't trigger as
@@ -145,8 +145,8 @@ bool MarchRobot::hasValidSlaves()
   // Merge the slave indices
   ::std::vector<int> slaveIndices;
 
-  slaveIndices.reserve(iMotionCubeIndices.size() + temperatureSlaveIndices.size());
-  slaveIndices.insert(slaveIndices.end(), iMotionCubeIndices.begin(), iMotionCubeIndices.end());
+  slaveIndices.reserve(motorControllerIndices.size() + temperatureSlaveIndices.size());
+  slaveIndices.insert(slaveIndices.end(), motorControllerIndices.begin(), motorControllerIndices.end());
   slaveIndices.insert(slaveIndices.end(), temperatureSlaveIndices.begin(), temperatureSlaveIndices.end());
 
   if (slaveIndices.size() == 1)

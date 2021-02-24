@@ -15,7 +15,7 @@
 
 namespace march
 {
-Joint::Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<IMotionCube> motor_controller)
+Joint::Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<MotorController> motor_controller)
   : name_(std::move(name))
   , net_number_(net_number)
   , allow_actuation_(allow_actuation)
@@ -23,7 +23,7 @@ Joint::Joint(std::string name, int net_number, bool allow_actuation, std::shared
 {
 }
 
-Joint::Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<IMotionCube> motor_controller,
+Joint::Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<MotorController> motor_controller,
              std::shared_ptr<TemperatureGES> temperature_ges)
   : name_(std::move(name))
   , net_number_(net_number)
