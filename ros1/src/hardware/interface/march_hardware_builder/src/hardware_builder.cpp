@@ -15,6 +15,7 @@
 #include <march_hardware/ethercat/pdo_interface.h>
 #include <march_hardware/ethercat/sdo_interface.h>
 #include <march_hardware/error/hardware_exception.h>
+#include <march_hardware/pressure_sole/pressure_sole.h>
 
 // clang-format off
 const std::vector<std::string> HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS =
@@ -32,6 +33,7 @@ const std::vector<std::string> HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRE
         "slaveIndex", "bootShutdownOffsets", "netMonitorByteOffsets", "netDriverByteOffsets"
     };
 const std::vector<std::string> HardwareBuilder::JOINT_REQUIRED_KEYS = { "allowActuation" };
+const std::vector<std::string> HardwareBuilder::PRESSURE_SOLE_REQUIRED_KEYS = { "slaveIndex", "byteOffset", "side" };
 // clang-format on
 
 HardwareBuilder::HardwareBuilder(AllowedRobot robot) : HardwareBuilder(robot.getFilePath())
@@ -72,8 +74,9 @@ std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
   ROS_INFO_STREAM("Robot config:\n" << config);
   YAML::Node pdb_config = config["powerDistributionBoard"];
   auto pdb = HardwareBuilder::createPowerDistributionBoard(pdb_config, pdo_interface, sdo_interface);
-  return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_, std::move(pdb), if_name, cycle_time,
-                                             slave_timeout);
+  auto pressure_soles = createPressureSoles(config["pressure_soles"], pdo_interface, sdo_interface);
+  return std::make_unique<march::MarchRobot>(std::move(joints), this->urdf_, std::move(pdb), std::move(pressure_soles),
+                                             if_name, cycle_time, slave_timeout);
 }
 
 march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const std::string& joint_name,
@@ -308,6 +311,38 @@ std::vector<march::Joint> HardwareBuilder::createJoints(const YAML::Node& joints
   joints.shrink_to_fit();
   return joints;
 }
+
+std::vector<march::PressureSole> HardwareBuilder::createPressureSoles(const YAML::Node& pressure_soles_config,
+                                                                      march::PdoInterfacePtr pdo_interface,
+                                                                      march::SdoInterfacePtr sdo_interface)
+{
+  std::vector<march::PressureSole> pressure_soles;
+  if (!pressure_soles_config)
+  {
+    return pressure_soles;
+  }
+  for (const YAML::Node& pressure_sole_config : pressure_soles_config)
+  {
+    pressure_soles.push_back(
+        HardwareBuilder::createPressureSole(pressure_sole_config[pressure_sole_config.begin()->first.as<std::string>()],
+                                            pdo_interface, sdo_interface));
+  }
+  return pressure_soles;
+}
+
+march::PressureSole HardwareBuilder::createPressureSole(const YAML::Node& pressure_sole_config,
+                                                         march::PdoInterfacePtr pdo_interface,
+                                                         march::SdoInterfacePtr sdo_interface)
+{
+  HardwareBuilder::validateRequiredKeysExist(pressure_sole_config, HardwareBuilder::PRESSURE_SOLE_REQUIRED_KEYS,
+                                             "pressure_sole");
+
+  const auto slave_index = pressure_sole_config["slaveIndex"].as<int>();
+  const auto byte_offset = pressure_sole_config["byteOffset"].as<int>();
+  const auto side = pressure_sole_config["side"].as<std::string>();
+  return march::PressureSole(march::Slave(slave_index, pdo_interface, sdo_interface), byte_offset, side);
+}
+
 
 std::string convertSWFileToString(std::ifstream& sw_file)
 {
