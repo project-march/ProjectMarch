@@ -32,8 +32,9 @@ bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::Jo
 std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(std::string joint_name)
 {
   int n_rows, n_cols;
-  ros::param::get("/march/controller/trajectory/q_matrices/"  + joint_name + "/n_rows", n_rows);
-  ros::param::get("/march/controller/trajectory/q_matrices/"  + joint_name + "/n_cols", n_cols);
+  std::string parameter_path = "/march/controller/trajectory";
+  ros::param::get(parameter_path + "/q_matrices/"  + joint_name + "/n_rows", n_rows);
+  ros::param::get(parameter_path + "/q_matrices/"  + joint_name + "/n_cols", n_cols);
 
   if (n_rows != n_cols)
   {
@@ -41,7 +42,7 @@ std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(s
   }
 
   std::vector<float> Q_flat;
-  ros::param::get("/march/controller/trajectory/q_matrices/"  + joint_name + "/Q", Q_flat);
+  ros::param::get(parameter_path + "/q_matrices/"  + joint_name + "/Q", Q_flat);
 
   std::vector<std::vector<float>> Q(n_rows, std::vector<float>(n_cols));
   if (Q_flat.size() != n_rows * n_cols)
