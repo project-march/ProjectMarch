@@ -1,0 +1,9 @@
+pressure_soles:
+  ifName: enp2s0
+  ecatCycleTime: 4
+  ecatSlaveTimeout: 50
+  pressure_soles:
+    - left_side:
+        slaveIndex: 1
+        byteOffset: 8
+        side: 'left'

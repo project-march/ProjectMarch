@@ -22,6 +22,7 @@
 #include <march_hardware_builder/hardware_builder.h>
 #include <march_shared_msgs/AfterLimitJointCommand.h>
 #include <march_shared_msgs/ImcState.h>
+#include <march_shared_msgs/PressureSolesData.h>
 
 template <typename T>
 using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;
@@ -85,6 +86,7 @@ private:
   void updatePowerDistributionBoard();
   void updateAfterLimitJointCommand();
   void updateIMotionCubeState();
+  void updatePressureSoleData();
   void outsideLimitsCheck(size_t joint_index);
   bool iMotionCubeStateCheck(size_t joint_index);
   static void getSoftJointLimitsError(const std::string& name, const urdf::JointConstSharedPtr& urdf_joint,
@@ -137,6 +139,7 @@ private:
   /* Real time safe publishers */
   RtPublisherPtr<march_shared_msgs::AfterLimitJointCommand> after_limit_joint_command_pub_;
   RtPublisherPtr<march_shared_msgs::ImcState> imc_state_pub_;
+  RtPublisherPtr<march_shared_msgs::PressureSolesData> pressure_sole_data_pub_;
 };
 
 #endif  // MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_H

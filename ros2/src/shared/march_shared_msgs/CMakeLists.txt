@@ -47,6 +47,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/LowVoltageNet.msg"
   "msg/PowerDistributionBoardState.msg"
   "msg/PressureSole.msg"
+  "msg/PressureSoleData.msg"
+  "msg/PressureSolesData.msg"
   "srv/CapturePointPose.srv"
   "srv/ContainsGait.srv"
   "srv/PossibleGaits.srv"
