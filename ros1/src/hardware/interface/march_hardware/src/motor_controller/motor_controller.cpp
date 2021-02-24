@@ -54,7 +54,8 @@ double MotorController::getPosition(bool absolute)
   {
     if (!hasAbsoluteEncoder())
     {
-      throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "Cannot get absolute position");
+      throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "Cannot get absolute position,"
+                                                                        "the motor controller has no absolute encoder");
     }
     return getAbsolutePosition();
   }
@@ -62,7 +63,8 @@ double MotorController::getPosition(bool absolute)
   {
     if (!hasIncrementalEncoder())
     {
-      throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "Cannot get incremental position");
+      throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "Cannot get incremental position, "
+                                                                        "the motor controller has no incremental encoder");
     }
     return getIncrementalPosition();
   }
@@ -83,7 +85,8 @@ double MotorController::getVelocity(bool absolute)
   {
     if (!hasAbsoluteEncoder())
     {
-      throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "Cannot get absolute velocity");
+      throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "Cannot get absolute velocity,"
+                                                                        "the motor controller has no absolute encoder");
     }
     return getAbsoluteVelocity();
   }
@@ -91,7 +94,8 @@ double MotorController::getVelocity(bool absolute)
   {
     if (!hasIncrementalEncoder())
     {
-      throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "Cannot get incremental velocity");
+      throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "Cannot get incremental velocity,"
+                                                                        "the motor controller has no incremental encoder");
     }
     return getIncrementalVelocity();
   }
