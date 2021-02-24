@@ -1,4 +1,4 @@
-description: ''
+description: March VI strairs-up gait with HAA, ADPF, HFE and KFE movements.
 duration: 2750000000
 gait_type: stairs_like
 joints:
@@ -34,10 +34,10 @@ joints:
     time_from_start: 0
     velocity: 0.69810028
   - position: 1.3963
-    time_from_start: 1399999999
+    time_from_start: 1400000000
     velocity: 0.0
   - position: 1.2008
-    time_from_start: 1887999999
+    time_from_start: 1888000000
     velocity: -1.3331
   - position: 0.0
     time_from_start: 2750000000
