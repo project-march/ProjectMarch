@@ -16,7 +16,9 @@
 
 #include <ros/node_handle.h>
 #include <ros/time.h>
+#include "std_msgs/Float64MultiArray.h"
 #include "std_msgs/Float64.h"
+#include <realtime_tools/realtime_publisher.h>
 
 #include <cassert>
 #include <memory>
@@ -61,6 +63,13 @@ public:
   void stopping(const ros::Time& /*time*/);
 
 private:
+  /**
+   * @brief Retrieve the Q matrix from the parameter server for a joint.
+   * @param joint_name Joint to retrieve Q Matrix for
+   * @return Returns a 2d vector: The Q Matrix.
+   */
+  std::vector<std::vector<float>> getQMatrix(std::string joint_name);
+
   std::vector<hardware_interface::JointHandle>* joint_handles_ptr_;
 
   unsigned int num_joints_;
@@ -69,6 +78,7 @@ private:
   std::vector<ModelPredictiveController> model_predictive_controllers_;
   vector<double> state;
 
+  std::unique_ptr<realtime_tools::RealtimePublisher<std_msgs::Float64MultiArray>> command_pub_;
 };
 
 // Assign an alias to the class definition

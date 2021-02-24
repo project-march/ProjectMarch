@@ -11,6 +11,14 @@ march:
       joints:
         - rotational_joint
 
+      q_matrices:
+        rotational_joint:
+          n_rows: 3
+          n_cols: 3
+          Q: [100.0, 0.0,  0.0,
+              0.0,   1.0,  0.0,
+              0.0,   0.0, 0.01]
+
       state_publish_rate:  25            # Override default
       action_monitor_rate: 30            # Override default
       stop_trajectory_duration: 0        # Override default
