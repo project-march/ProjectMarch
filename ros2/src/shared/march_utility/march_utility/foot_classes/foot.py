@@ -7,7 +7,7 @@ creating gaits based on foot positions.
 
 from __future__ import annotations
 
-from math import acos, asin, atan, cos, pi, sin, sqrt
+from math import acos, asin, atan, atan2, cos, pi, sin, sqrt
 from typing import Tuple
 
 from march_utility.exceptions.gait_exceptions import SubgaitInterpolationError
@@ -220,7 +220,7 @@ class Foot(object):
         transformed_x: float, transformed_z: float
     ) -> float:
         """Calculate the hfe angle of a straight leg."""
-        return atan(transformed_x / transformed_z)
+        return atan2(transformed_x / transformed_z)
 
     @staticmethod
     def calculate_haa_angle(
