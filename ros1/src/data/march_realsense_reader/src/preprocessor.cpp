@@ -61,6 +61,7 @@ void NormalsPreprocessor::preprocess()
 //  removeStatisticalOutliers();
 
   fillNormalCloud();
+//  time.sleep(10);
 
   filterOnNormalOrientation();
 

@@ -12,7 +12,9 @@ int main(int argc, char **argv)
 
   RealSenseReader reader = RealSenseReader(&n);
 
-  ros::spin();
-  ros::shutdown();
+  ros::AsyncSpinner spinner(2);  // Use n
+  // threads
+  spinner.start();
+  ros::waitForShutdown();
   return 0;
 }
