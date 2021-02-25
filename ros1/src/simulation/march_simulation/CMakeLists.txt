@@ -5,7 +5,7 @@ find_package(catkin REQUIRED)
 
 catkin_package()
 
-catkin_install_python(PROGRAMS scripts/upload_joint_names scripts/to_world_transform scripts/set_obstacle_dimensions
+catkin_install_python(PROGRAMS scripts/upload_joint_names scripts/set_obstacle_dimensions
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
