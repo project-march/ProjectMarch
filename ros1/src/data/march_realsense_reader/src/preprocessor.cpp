@@ -149,8 +149,15 @@ void NormalsPreprocessor::fillNormalCloud()
   int number_of_neighbours = parameters["number_of_neighbours"].as<int>();
   double search_radius = parameters["search_radius"].as<double>();
 
+  auto transformation_parameters = config_tre_["normal_estimation"];
+  double translation_x = transformation_parameters["translation_x"].as<double>();
+  double translation_y = transformation_parameters["translation_y"].as<double>();
+  double translation_z = transformation_parameters["translation_z"].as<double>() ;
+
   pcl::NormalEstimation <pcl::PointXYZ, pcl::Normal> normal_estimator;
   normal_estimator.setInputCloud(pointcloud_);
+  normal_estimator.setViewPoint(translation_x, translation_y, translation_z);
+
   if (use_tree_search_method)
   {
     pcl::search::Search<pcl::PointXYZ>::Ptr search_method (new pcl::search::KdTree <pcl::PointXYZ>);
