@@ -149,7 +149,7 @@ void NormalsPreprocessor::fillNormalCloud()
   int number_of_neighbours = parameters["number_of_neighbours"].as<int>();
   double search_radius = parameters["search_radius"].as<double>();
 
-  auto transformation_parameters = config_tree_["normal_estimation"];
+  auto transformation_parameters = config_tree_["transformation"];
   double translation_x = transformation_parameters["translation_x"].as<double>();
   double translation_y = transformation_parameters["translation_y"].as<double>();
   double translation_z = transformation_parameters["translation_z"].as<double>();
