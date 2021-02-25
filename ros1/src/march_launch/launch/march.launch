@@ -46,7 +46,7 @@
          doc="The frame rate to use for the infra red module of the camera"/>
 
     <group if="$(eval (not realsense_simulation) and realsense)">
-        <include file="$(find realsense2_camera)/launch/rs_camera.launch)">
+        <include file="$(find realsense2_camera)/launch/rs_camera.launch">
             <arg name="depth_fps" value="$(arg depth_fps)"/>
             <arg name="color_fps" value="$(arg color_fps)"/>
             <arg name="infra_fps" value="$(arg infra_fps)"/>
