@@ -23,7 +23,7 @@ def generate_launch_description() -> launch.LaunchDescription:
             Node(
                 package="rqt_gui",
                 executable="rqt_gui",
-                name="march_monitor",
+                namespace="march/monitor",
                 output="screen",
                 arguments=[
                     "--perspective-file",
