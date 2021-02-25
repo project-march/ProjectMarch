@@ -22,6 +22,7 @@ private:
     ros::NodeHandle* n_;
     ros::Subscriber pointcloud_subscriber_;
     ros::ServiceServer read_pointcloud_service_;
+    ros::Publisher preprocessed_pointcloud_publisher_;
     bool reading_;
     std::string config_file_;
 };
