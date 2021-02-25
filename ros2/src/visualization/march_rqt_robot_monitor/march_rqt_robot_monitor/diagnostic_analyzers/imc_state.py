@@ -1,35 +1,43 @@
+"""The module imc_state.py contains the CheckImcStatus Class."""
+
+from typing import List, Callable
+
 from diagnostic_msgs.msg import DiagnosticStatus
-import rospy
+from diagnostic_updater import Updater, DiagnosticStatusWrapper
+from rclpy.node import Node
 
 from march_shared_msgs.msg import ImcState
 
 
 class CheckImcStatus:
-    def __init__(self, updater):
-        """Initializes an IMC diagnostic which analyzes IMC states.
+    """Base class to diagnose the imc statuses."""
+
+    def __init__(self, node: Node, updater: Updater, joint_names: List[str]):
+        """Initialize an IMC diagnostic which analyzes IMC states.
 
         :type updater: diagnostic_updater.Updater
         """
-        self._updater = updater
-        self._sub = rospy.Subscriber("/march/imc_states", ImcState, self._cb)
+        self.node = node
+        self._sub = node.create_subscription(
+            msg_type=ImcState,
+            topic="/march/imc_states",
+            callback=self._cb,
+            qos_profile=10,
+        )
         self._imc_state = None
 
-        self._diagnostics = set()
+        for i, joint_name in enumerate(joint_names):
+            updater.add(f"IMC {joint_name}", self._diagnostic(i))
 
-    def _cb(self, msg):
-        """Callback for imc_states.
+    def _cb(self, msg: ImcState):
+        """Set the imc_states.
 
         :type msg: ImcState
         """
         self._imc_state = msg
-        for i in range(len(msg.joint_names)):
-            joint_name = msg.joint_names[i]
-            if joint_name not in self._diagnostics:
-                self._diagnostics.add(joint_name)
-                self._updater.add("IMC {0}".format(joint_name), self._diagnostic(i))
 
-    def _diagnostic(self, index):
-        """Creates a diagnostic function for an IMC.
+    def _diagnostic(self, index: int) -> Callable:  # noqa: D202
+        """Create a diagnostic function for an IMC.
 
         :type index: int
         :param index: index of the joint
@@ -38,8 +46,8 @@ class CheckImcStatus:
                 according to the given index.
         """
 
-        def d(stat):
-            if self._imc_state.joint_names[index] is None:
+        def d(stat: DiagnosticStatusWrapper) -> DiagnosticStatusWrapper:
+            if self._imc_state is None:
                 stat.summary(DiagnosticStatus.STALE, "No more events recorded")
                 return stat
             detailed_error = int(self._imc_state.detailed_error[index])
