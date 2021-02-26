@@ -13,15 +13,14 @@ using RegionsVector = std::vector<pcl::PointIndices>;
 
 class RegionCreator {
   public:
-    RegionCreator(YAML::Node config_tree,
-                 PointCloud::Ptr pointcloud,
-                 Normals::Ptr normal_pointcloud,
-                 boost::shared_ptr<RegionsVector> regions_vector);
+    RegionCreator(YAML::Node config_tree);
     // This function is required to be implemented by any region creator
-    virtual void create_regions()=0;
+    virtual void create_regions(PointCloud::Ptr pointcloud,
+                                Normals::Ptr normal_pointcloud,
+                                boost::shared_ptr<RegionsVector> regions_vector)=0;
     virtual ~RegionCreator() {};
 
-  private:
+  protected:
     PointCloud::Ptr pointcloud_;
     Normals::Ptr normal_pointcloud_;
     boost::shared_ptr<RegionsVector> regions_vector_;
@@ -32,7 +31,9 @@ class SimpleRegionCreator : RegionCreator {
   public:
     //Use the constructors defined in the super class
     using RegionCreator::RegionCreator;
-    void create_regions();
+    void create_regions(PointCloud::Ptr pointcloud,
+                        Normals::Ptr normal_pointcloud,
+                        boost::shared_ptr<RegionsVector> regions_vector);
 };
 
 #endif //MARCH_PREPROCESSOR_H

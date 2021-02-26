@@ -8,6 +8,8 @@
 #include <pcl_conversions/pcl_conversions.h>
 #include <std_srvs/Trigger.h>
 #include "yaml-cpp/yaml.h"
+#include <pointcloud_processor/preprocessor.h>
+#include <pointcloud_processor/region_creator.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
@@ -26,6 +28,8 @@ private:
     ros::Subscriber pointcloud_subscriber_;
     ros::ServiceServer read_pointcloud_service_;
     ros::Publisher preprocessed_pointcloud_publisher_;
+    std::unique_ptr<SimplePreprocessor> preprocessor_;
+    std::unique_ptr<SimpleRegionCreator> region_creator_;
     bool reading_;
     bool debugging_;
     YAML::Node config_tree_;

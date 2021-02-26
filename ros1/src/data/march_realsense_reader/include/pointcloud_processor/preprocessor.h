@@ -13,12 +13,11 @@ using Normals = pcl::PointCloud<pcl::Normal>;
 
 class Preprocessor {
   public:
-    Preprocessor(YAML::Node config_tree,
-                 PointCloud::Ptr pointcloud,
-                 Normals::Ptr normal_pointcloud);
+    Preprocessor(YAML::Node config_tree);
 
     // This function is required to be implemented by any preprocessor
-    virtual void preprocess()=0;
+    virtual void preprocess(PointCloud::Ptr pointcloud,
+                            Normals::Ptr normal_pointcloud)=0;
     virtual ~Preprocessor() {};
 
     PointCloud::Ptr pointcloud_;
@@ -28,13 +27,14 @@ class Preprocessor {
 
 class SimplePreprocessor : Preprocessor {
   public:
-    SimplePreprocessor(YAML::Node config_tree,
-                       PointCloud::Ptr pointcloud,
-                       Normals::Ptr normal_pointcloud);
-    void preprocess();
+    SimplePreprocessor(YAML::Node config_tree);
+    void preprocess(PointCloud::Ptr pointcloud,
+                    Normals::Ptr normal_pointcloud);
 
   protected:
     void transformPointCloudFromUrdf();
+    std::unique_ptr<tf2_ros::Buffer> tfBuffer;
+    std::unique_ptr<tf2_ros::TransformListener> tfListener;
 };
 
 #endif //MARCH_PREPROCESSOR_H
