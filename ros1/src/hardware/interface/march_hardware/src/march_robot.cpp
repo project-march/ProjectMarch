@@ -33,6 +33,19 @@ MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
 {
 }
 
+MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
+                       std::unique_ptr<PowerDistributionBoard> powerDistributionBoard,
+                       std::vector<PressureSole> pressureSoles,
+                       ::std::string ifName, int ecatCycleTime,
+                        int ecatSlaveTimeout)
+  : jointList(std::move(jointList))
+  , urdf_(std::move(urdf))
+  , ethercatMaster(ifName, this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout)
+  , pdb_(std::move(powerDistributionBoard))
+  , pressureSoles(std::move(pressureSoles))
+{
+}
+
 void MarchRobot::startEtherCAT(bool reset_imc)
 {
   if (!hasValidSlaves())
@@ -228,6 +241,16 @@ bool MarchRobot::hasPowerDistributionboard() const
 PowerDistributionBoard* MarchRobot::getPowerDistributionBoard() const
 {
   return this->pdb_.get();
+}
+
+bool MarchRobot::hasPressureSoles() const
+{
+  return pressureSoles.size() > 0;
+}
+
+std::vector<PressureSole> MarchRobot::getPressureSoles() const
+{
+  return pressureSoles;
 }
 
 MarchRobot::~MarchRobot()

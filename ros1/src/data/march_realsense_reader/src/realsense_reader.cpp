@@ -4,8 +4,10 @@
 #include <ros/ros.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <std_srvs/Trigger.h>
+#include <pointcloud_processor/preprocessor.h>
 
-typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
+using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
+using Normals = pcl::PointCloud<pcl::Normal>;
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n):
     n_(n),
@@ -18,15 +20,23 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
       ("/camera/read_pointcloud",
       &RealSenseReader::read_pointcloud_callback,
       this);
+  config_file_ = "pointcloud_parameters.yaml";
+  preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>
+      ("/camera/preprocessed_cloud", 1);
 }
 
-void RealSenseReader::pointcloud_callback(const PointCloud::ConstPtr& msg)
+void RealSenseReader::pointcloud_callback(const PointCloud::ConstPtr& input_cloud)
 {
   if (reading_)
   {
     // All logic to execute with a pointcloud will be executed here.
-    ROS_INFO_STREAM("Processing point cloud at time " << msg->header.stamp);
     reading_ = false;
+    PointCloud::Ptr pointcloud = boost::make_shared<PointCloud>(*input_cloud);
+    Normals::Ptr normals = boost::make_shared<Normals>();
+    std::unique_ptr<SimplePreprocessor> preprocessor =
+        std::make_unique<SimplePreprocessor>(config_file_, pointcloud, normals);
+    preprocessor->preprocess();
+    preprocessed_pointcloud_publisher_.publish(pointcloud);
   }
 }
 

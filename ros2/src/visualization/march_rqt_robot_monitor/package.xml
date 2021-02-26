@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>march_rqt_robot_monitor</name>
+  <version>0.0.0</version>
+  <description>rqt automated software tool to analyze the March exoskeleton during runtime</description>
+
+  <maintainer email="software@projectmarch.nl">Project March</maintainer>
+  <license>TODO</license>
+
+  <depend>std_msgs</depend>
+  <depend>diagnostic_aggregator</depend>
+  <depend>diagnostic_updater</depend>
+  <depend>rqt_robot_monitor</depend>
+  <depend>march_shared_msgs</depend>
+  <depend>march_utility</depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
