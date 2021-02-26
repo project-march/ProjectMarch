@@ -41,6 +41,27 @@ Preprocessor::Preprocessor(
   config_tree_ = YAML::LoadFile(path)["preprocessor"];
 }
 
+void Preprocessor::removePointByIndex(int index, PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals)
+{
+  // Removes a point from a pointcloud (and optionaly the corresponding pointcloud_normals as well) from a given index
+  if (index < pointcloud->points.size() && index > 0) {
+    if (pointcloud_normals != nullptr) {
+      if (index < pointcloud_normals->points.size() && index > 0) {
+        pointcloud_normals->points[index] = pointcloud_normals->points[pointcloud_normals->points.size() - 1];
+        pointcloud_normals->points.resize(pointcloud_normals->points.size() - 1);
+      } else {
+        ROS_WARN("Index to be removed is not valid for pointcloud_normals");
+      }
+    }
+    pointcloud->points[index] = pointcloud->points[pointcloud->points.size() - 1];
+    pointcloud->points.resize(pointcloud->points.size() - 1);
+  }
+  else
+  {
+    ROS_WARN("Index to be removed is not valid for pointcloud");
+  }
+}
+
 void SimplePreprocessor::preprocess()
 {
   ROS_INFO_STREAM("Preprocessing, test_parameter is " <<
@@ -65,27 +86,6 @@ void NormalsPreprocessor::preprocess()
   //  removeStatisticalOutliers();
 
   ROS_INFO_STREAM("Finished preprocessing. Number of points in pointcloud is " << pointcloud_->points.size());
-}
-
-void removePointByIndex(int index, PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals = nullptr)
-{
-  // Removes a point from a pointcloud (and optionaly the corresponding pointcloud_normals as well) from a given index
-  if (index < pointcloud->points.size() && index > 0) {
-    if (pointcloud_normals != nullptr) {
-      if (index < pointcloud_normals->points.size() && index > 0) {
-        pointcloud_normals->points[index] = pointcloud_normals->points[pointcloud_normals->points.size() - 1];
-        pointcloud_normals->points.resize(pointcloud_normals->points.size() - 1);
-      } else {
-        ROS_WARN("Index to be removed is not valid for pointcloud_normals");
-      }
-    }
-    pointcloud->points[index] = pointcloud->points[pointcloud->points.size() - 1];
-    pointcloud->points.resize(pointcloud->points.size() - 1);
-  }
-  else
-  {
-    ROS_WARN("Index to be removed is not valid for pointcloud");
-  }
 }
 
 void NormalsPreprocessor::downsample()

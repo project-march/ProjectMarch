@@ -22,6 +22,8 @@ class Preprocessor {
     virtual void preprocess()=0;
     virtual ~Preprocessor() {};
 
+    void removePointByIndex(int index, PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals = nullptr);
+
     PointCloud::Ptr pointcloud_;
     Normals::Ptr pointcloud_normals_;
     YAML::Node config_tree_;
