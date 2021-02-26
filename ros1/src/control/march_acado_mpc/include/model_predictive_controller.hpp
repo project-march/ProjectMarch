@@ -34,19 +34,15 @@ public:
     void setReference(vector<vector<double>> reference);
 
     /**
-     * \brief Calculate the control input
-     */
-    void calculateControlInput();
-
-    /**
      * \brief Assign the weighting matrix values
      * @param Q - weighting matrix
      */
     void assignWeightingMatrix(std::vector<std::vector<float>> Q);
 
-//    void stepRef(vector<vector<double>>& ref, double amp, int N, double dt);
-
-//    void sinRef(vector<vector<double>>& ref, double freq, double amp, int N, double dt);
+    /**
+     * \brief Calculate the control input
+     */
+    void calculateControlInput();
 
 private:
   std::vector<std::vector<float>> Q_;
