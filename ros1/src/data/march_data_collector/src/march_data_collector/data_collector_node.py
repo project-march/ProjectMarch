@@ -2,6 +2,7 @@ import errno
 from math import pi
 import socket
 import sys
+from typing import List
 
 from control_msgs.msg import JointTrajectoryControllerState
 from geometry_msgs.msg import TransformStamped
@@ -15,17 +16,25 @@ from visualization_msgs.msg import Marker
 
 from march_shared_msgs.msg import JointValues, PressureSole
 
-
 from .com_calculator import CoMCalculator
-from .cp_calculator import CPCalculator
+from march_data_collector.cp_calculator import CPCalculator
 
 
 class DataCollectorNode(object):
-    def __init__(self, com_calculator, cp_calculators, tf_buffer, feet):
+    """A node """
+
+    def __init__(
+        self,
+        com_calculator: CoMCalculator,
+        cp_calculators: List[CPCalculator],
+        tf_buffer: tf2_ros.Buffer,
+        feet: dict,
+    ):
         self.differentiation_order = 2
         self._com_calculator = com_calculator
         self._cp_calculators = cp_calculators
         self.tf_buffer = tf_buffer
+        # key is the swing foot and item is the static foot
         self.feet = feet
 
         self.position_memory = []
@@ -36,10 +45,24 @@ class DataCollectorNode(object):
             "/march/joint_values", JointValues, queue_size=1
         )
 
-        self._imu_broadcaster = tf2_ros.TransformBroadcaster()
         self._com_marker_publisher = rospy.Publisher(
             "/march/com_marker", Marker, queue_size=1
         )
+
+        self._simulation = rospy.get_param("~simulation")
+        if not self._simulation:
+            self._imu_broadcaster = tf2_ros.TransformBroadcaster()
+
+            self._imu_subscriber = rospy.Subscriber(
+                "/march/imu", Imu, self.imu_callback
+            )
+
+            self.transform_imu = TransformStamped()
+
+            self.transform_imu.header.frame_id = "world"
+            self.transform_imu.child_frame_id = "imu_link"
+            self.transform_imu.transform.translation.x = 0.0
+            self.transform_imu.transform.translation.y = 0.0
 
         self._trajectory_state_subscriber = rospy.Subscriber(
             "/march/controller/trajectory/state",
@@ -47,16 +70,7 @@ class DataCollectorNode(object):
             self.trajectory_state_callback,
         )
 
-        self._imu_subscriber = rospy.Subscriber("/march/imu", Imu, self.imu_callback)
-
         self.pressure_soles_on = rospy.get_param("~pressure_soles")
-
-        self.transform_imu = TransformStamped()
-
-        self.transform_imu.header.frame_id = "world"
-        self.transform_imu.child_frame_id = "imu_link"
-        self.transform_imu.transform.translation.x = 0.0
-        self.transform_imu.transform.translation.y = 0.0
 
         if self.pressure_soles_on:
             rospy.logdebug("will run with pressure soles")

@@ -30,10 +30,10 @@ class GaitInterface(object):
         return ""
 
     @property
-    def duration(self) -> float:
+    def duration(self) -> Duration:
         """Returns the duration in seconds of the currently executing trajectory
         from the start of the gait."""
-        return 0.0
+        return Duration(0)
 
     @property
     def gait_type(self) -> str:
