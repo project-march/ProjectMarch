@@ -4,3 +4,6 @@
 [submodule "ros2/src/libraries/diagnostic_updater"]
 	path = ros2/src/libraries/diagnostic_updater
 	url = git@gitlab.com:project-march/libraries/diagnostic-updater.git
+[submodule "ros1/src/libraries/ros_control"]
+	path = ros1/src/libraries/ros_control
+	url = git@gitlab.com:project-march/libraries/ros-control.git
