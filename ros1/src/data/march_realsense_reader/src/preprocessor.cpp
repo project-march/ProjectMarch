@@ -58,11 +58,11 @@ void NormalsPreprocessor::preprocess()
 
   filterOnDistanceFromOrigin();
 
-//  removeStatisticalOutliers();
-
   fillNormalCloud();
 
   filterOnNormalOrientation();
+
+  //  removeStatisticalOutliers();
 
   ROS_INFO_STREAM("Finished preprocessing. Number of points in pointcloud is " << pointcloud_->points.size());
 }
@@ -79,19 +79,19 @@ void NormalsPreprocessor::downsample()
   voxel_grid.filter(*pointcloud_);
 }
 
-void NormalsPreprocessor::removeStatisticalOutliers()
-{
-  // Remove statistical outliers from the pointcloud to reduce noise
-  auto parameters = config_tree_["statistical_outlier_filter"];
-  int number_of_neighbours = parameters["number_of_neighbours"].as<int>();
-  double sd_factor = parameters["sd_factor"].as<double>();
-
-  pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
-  sor.setInputCloud(pointcloud_);
-  sor.setMeanK(number_of_neighbours);
-  sor.setStddevMulThresh(sd_factor);
-  sor.filter(*pointcloud_);
-}
+//void NormalsPreprocessor::removeStatisticalOutliers()
+//{
+//  // Remove statistical outliers from the pointcloud to reduce noise
+//  auto parameters = config_tree_["statistical_outlier_filter"];
+//  int number_of_neighbours = parameters["number_of_neighbours"].as<int>();
+//  double sd_factor = parameters["sd_factor"].as<double>();
+//
+//  pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
+//  sor.setInputCloud(pointcloud_);
+//  sor.setMeanK(number_of_neighbours);
+//  sor.setStddevMulThresh(sd_factor);
+//  sor.filter(*pointcloud_);
+//}
 
 void NormalsPreprocessor::transformPointCloud()
 {
