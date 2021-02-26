@@ -7,8 +7,14 @@
     <arg name="robot" default="march4" doc="The robot to run. Can be: march3, march4, test_joint_linear, test_joint_rotational."/>
     <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot).urdf"/>>
 
+    <arg name="simulation" default="false"
+         doc="Whether the simulation or the physical exoskeleton is being used,
+              if the simulation is being used, the imus should not be used to
+              publish the transformation."/>
+
     <node name="march_data_collector" pkg="march_data_collector" type="march_data_collector" output="screen">
         <param name="moticon_ip" value="$(arg moticon_ip)" />
         <param name="pressure_soles" value="$(arg pressure_soles)" />
+        <param name="simulation" value="$(arg simulation)"/>
     </node>
 </launch>
