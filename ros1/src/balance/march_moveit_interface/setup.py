@@ -3,13 +3,9 @@ from catkin_pkg.python_setup import generate_distutils_setup
 from setuptools import setup
 
 setup_args = generate_distutils_setup(
-    packages=[
-        "march_gait_selection",
-        "march_gait_selection.dynamic_gaits",
-        "march_gait_selection.state_machine",
-    ],
+    packages=["march_moveit_interface"],
     package_dir={"": "src"},
-    scripts=["scripts/march_gait_selection_node"],
+    scripts=["scripts/march_moveit_interface"],
 )
 
 setup(**setup_args)

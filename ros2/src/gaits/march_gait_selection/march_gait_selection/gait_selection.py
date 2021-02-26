@@ -1,10 +1,13 @@
 import os
 import rclpy
+from march_gait_selection.dynamic_gaits.balance_gait import BalanceGait
 from march_gait_selection.dynamic_gaits.semi_dynamic_setpoints_gait import (
     SemiDynamicSetpointsGait,
 )
 from march_shared_msgs.srv import SetGaitVersion, ContainsGait
+from rclpy.parameter import Parameter
 from rcl_interfaces.srv import GetParameters
+from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.exceptions import ParameterNotDeclaredException
 from rclpy.node import Node
 from ament_index_python.packages import get_package_share_directory
@@ -28,6 +31,7 @@ class GaitSelection(Node):
         super().__init__(
             NODE_NAME, automatically_declare_parameters_from_overrides=True
         )
+        self._balance_used = False
         try:
             if gait_package is None:
                 gait_package = (
@@ -42,10 +46,14 @@ class GaitSelection(Node):
                     .string_value
                 )
 
+            self._balance_used = (
+                self.get_parameter("balance").get_parameter_value().bool_value
+            )
+
         except ParameterNotDeclaredException:
             self.get_logger().error(
                 "Gait selection node started without required parameters "
-                "gait_package and gait_directory"
+                "gait_package, gait_directory and balance"
             )
 
         package_path = get_package_share_directory(gait_package)
@@ -242,7 +250,6 @@ class GaitSelection(Node):
         return gaits
 
     def get_default_dict_cb(self, req, res):
-        self.get_logger().info("default dict callback")
         defaults = {"gaits": self._gait_version_map, "positions": self._positions}
         return Trigger.Response(success=True, message=str(defaults))
 
@@ -271,6 +278,12 @@ class GaitSelection(Node):
             )
 
         self._load_semi_dynamic_gaits(gaits)
+
+        if self._balance_used and "balance_walk" in gaits.keys():
+            balance_gait = BalanceGait(node=self, default_walk=gaits["balance_walk"])
+            if balance_gait is not None:
+                self.get_logger().info("Successfully created a balance gait")
+                gaits["balanced_walk"] = balance_gait
 
         return gaits
 

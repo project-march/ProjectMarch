@@ -45,7 +45,9 @@ class TrajectoryScheduler(object):
         """
         self._failed = False
         stamp = self._node.get_clock().now().to_msg()
-        goal = FollowJointTrajectoryGoal(trajectory=trajectory)
+        goal = FollowJointTrajectoryGoal(
+            trajectory=trajectory
+        )
         self._trajectory_goal_pub.publish(
             FollowJointTrajectoryActionGoal(
                 header=Header(stamp=stamp), goal_id=GoalID(stamp=stamp), goal=goal
