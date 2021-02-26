@@ -67,6 +67,27 @@ void NormalsPreprocessor::preprocess()
   ROS_INFO_STREAM("Finished preprocessing. Number of points in pointcloud is " << pointcloud_->points.size());
 }
 
+void removePointByIndex(int index, PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals = nullptr)
+{
+  // Removes a point from a pointcloud (and optionaly the corresponding pointcloud_normals as well) from a given index
+  if (index < pointcloud->points.size() && index > 0) {
+    if (pointcloud_normals != nullptr) {
+      if (index < pointcloud_normals->points.size() && index > 0) {
+        pointcloud_normals->points[index] = pointcloud_normals->points[pointcloud_normals->points.size() - 1];
+        pointcloud_normals->points.resize(pointcloud_normals->points.size() - 1);
+      } else {
+        ROS_WARN("Index to be removed is not valid for pointcloud_normals");
+      }
+    }
+    pointcloud->points[index] = pointcloud->points[pointcloud->points.size() - 1];
+    pointcloud->points.resize(pointcloud->points.size() - 1);
+  }
+  else
+  {
+    ROS_WARN("Index to be removed is not valid for pointcloud");
+  }
+}
+
 void NormalsPreprocessor::downsample()
 {
   // Downsample the number of points in the pointcloud to have a more workable number of points
@@ -133,9 +154,7 @@ void NormalsPreprocessor::filterOnDistanceFromOrigin()
     // remove point if it's outside the threshold distance
     if (point_distance_squared > distance_threshold_squared)
     {
-      pointcloud_->points[p] = pointcloud_->points[pointcloud_->points.size() - 1];
-      pointcloud_->points.resize(pointcloud_->points.size() - 1);
-
+      removePointByIndex(p, pointcloud_);
       p--;
     }
   }
@@ -192,12 +211,7 @@ void NormalsPreprocessor::filterOnNormalOrientation()
           pointcloud_normals_->points[p].normal_z * pointcloud_normals_->points[p].normal_z >
           allowed_length_z )
       {
-        pointcloud_->points[p] = pointcloud_->points[pointcloud_->points.size() - 1];
-        pointcloud_->points.resize(pointcloud_->points.size() - 1);
-
-        pointcloud_normals_->points[p] = pointcloud_normals_->points[pointcloud_normals_->points.size() - 1];
-        pointcloud_normals_->points.resize(pointcloud_normals_->points.size() - 1);
-
+        removePointByIndex(p, pointcloud_, pointcloud_normals_);
         p--;
       }
     }
