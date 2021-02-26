@@ -49,7 +49,8 @@ void SimplePreprocessor::transformPointCloudFromUrdf() {
   }
   catch (tf2::TransformException &ex)
   {
-    ROS_WARN("%s", ex.what());
+    ROS_WARN_STREAM("Something went wrong when transforming the poincloud: "
+    << ex.what());
     return;
   }
 }
