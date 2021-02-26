@@ -206,8 +206,7 @@ void NormalsPreprocessor::filterOnNormalOrientation()
           pointcloud_normals_->points[p].normal_y * pointcloud_normals_->points[p].normal_y >
           allowed_length_y ||
           pointcloud_normals_->points[p].normal_z * pointcloud_normals_->points[p].normal_z >
-          allowed_length_z )
-      {
+          allowed_length_z) {
         removePointByIndex(p, pointcloud_, pointcloud_normals_);
         p--;
       }
@@ -216,8 +215,11 @@ void NormalsPreprocessor::filterOnNormalOrientation()
   else
   {
     ROS_WARN("The size of the pointcloud and the normal pointcloud are not the same. Cannot filter on normals.");
+  }
+}
 
-    void SimplePreprocessor::transformPointCloudFromUrdf() {
+void SimplePreprocessor::transformPointCloudFromUrdf()
+{
   tf2_ros::Buffer tfBuffer;
   tf2_ros::TransformListener tfListener(tfBuffer);
 
