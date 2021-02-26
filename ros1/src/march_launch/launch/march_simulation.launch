@@ -15,7 +15,7 @@
     <arg name="balance" default="false" doc="Uses the dynamic balance gaits instead of the predefined gaits."/>
     <arg name="ground_gait" default="$(arg balance)" doc="Exoskeleton will ground gait in gazebo_ui if true."/>
     <arg name="obstacle" default="none" doc="Obstacle to load in the simulation."/>
-    <arg name="fixed" default="$(eval not balance)" doc="Fixes the exoskeleton in the world in rviz"/>
+    <arg name="fixed" default="$(eval not ground_gait)" doc="Fixes the exoskeleton in the world in rviz"/>
 
 
 <!-- Hardware                   -->

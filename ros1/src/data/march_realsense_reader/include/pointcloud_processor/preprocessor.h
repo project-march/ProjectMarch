@@ -32,6 +32,9 @@ class SimplePreprocessor : Preprocessor {
     //Use the constructors defined in the super class
     using Preprocessor::Preprocessor;
     void preprocess();
+
+  private:
+    void transformPointCloudFromUrdf();
 };
 
 #endif //MARCH_PREPROCESSOR_H

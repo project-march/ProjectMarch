@@ -1,7 +1,14 @@
-from diagnostic_msgs.msg import DiagnosticStatus
-import rospy
-from urdf_parser_py import urdf
+"""The module control.py contains the CheckJointValues Class."""
 
+from typing import Optional, List
+
+from diagnostic_msgs.msg import DiagnosticStatus
+from rclpy.node import Node
+
+from march_utility.utilities.node_utils import get_robot_urdf
+from rclpy.time import Time
+from sensor_msgs.msg import JointState
+from urdf_parser_py import urdf
 
 WARN_PERCENTAGE = 5
 
@@ -9,15 +16,15 @@ WARN_PERCENTAGE = 5
 class CheckJointValues(object):
     """Base class to diagnose the joint movement values."""
 
-    def __init__(self, topic, msg_type):
-        rospy.Subscriber(topic, msg_type, self.cb)
+    def __init__(self, node: Node, topic: str, msg_type: type):
+        node.create_subscription(msg_type, topic, self.cb, qos_profile=10)
 
         # callback variables
-        self._timestamp = None
-        self._joint_names = None
-        self._position = None
-        self._velocity = None
-        self._effort = None
+        self._timestamp: Optional[Time] = None
+        self._joint_names: Optional[List[str]] = None
+        self._position: Optional[List[float]] = None
+        self._velocity: Optional[List[float]] = None
+        self._effort: Optional[List[float]] = None
 
         # robot properties
         self._lower_soft_limits = {}
@@ -25,23 +32,30 @@ class CheckJointValues(object):
         self._velocity_limits = {}
         self._effort_limits = {}
 
-        self._robot = urdf.Robot.from_parameter_server("/robot_description")
-        for joint in self._robot.joints:
-            try:
-                self._lower_soft_limits[
-                    joint.name
-                ] = joint.safety_controller.soft_lower_limit
-                self._upper_soft_limits[
-                    joint.name
-                ] = joint.safety_controller.soft_upper_limit
-                self._velocity_limits[joint.name] = joint.limit.velocity
-                self._effort_limits[joint.name] = joint.limit.effort
-            except AttributeError:
-                pass
+        robot = get_robot_urdf(node)
+        for joint in robot.joints:
+            self.set_joint_limits(joint)
 
-    def cb(self, msg):
+    def set_joint_limits(self, joint: urdf.Joint):
+        """Set the joint limits for a joint.
+
+        :param joint Joint urdf to get limits from.
+        """
+        try:
+            self._lower_soft_limits[
+                joint.name
+            ] = joint.safety_controller.soft_lower_limit
+            self._upper_soft_limits[
+                joint.name
+            ] = joint.safety_controller.soft_upper_limit
+            self._velocity_limits[joint.name] = joint.limit.velocity
+            self._effort_limits[joint.name] = joint.limit.effort
+        except AttributeError:
+            pass
+
+    def cb(self, msg: JointState):
         """Save the latest published movement values with corresponding timestamp."""
-        self._timestamp = msg.header.stamp
+        self._timestamp = Time.from_msg(msg.header.stamp)
         self._joint_names = msg.name
         self._position = msg.position
         self._velocity = msg.velocity
@@ -54,14 +68,14 @@ class CheckJointValues(object):
             stat.summary(DiagnosticStatus.STALE, "No position recorded")
             return stat
 
-        stat.add("Timestamp", self._timestamp)
+        stat.add("Timestamp", str(self._timestamp))
 
         joint_outside_soft_limits = []
         joint_in_warning_zone_soft_limits = []
 
         for index in range(len(self._joint_names)):
             joint_name = self._joint_names[index]
-            stat.add(self._joint_names[index], self._position[index])
+            stat.add(self._joint_names[index], str(self._position[index]))
 
             if self._position[index] >= self._upper_soft_limits[joint_name]:
                 joint_outside_soft_limits.append(self._joint_names[index])
@@ -80,14 +94,12 @@ class CheckJointValues(object):
         if joint_outside_soft_limits:
             stat.summary(
                 DiagnosticStatus.ERROR,
-                "Outside soft limits: {ls}".format(ls=str(joint_outside_soft_limits)),
+                f"Outside soft limits: {joint_outside_soft_limits}",
             )
         elif joint_in_warning_zone_soft_limits:
             stat.summary(
                 DiagnosticStatus.WARN,
-                "Close to soft limits: {ls}".format(
-                    ls=str(joint_in_warning_zone_soft_limits)
-                ),
+                f"Close to soft limits: {joint_in_warning_zone_soft_limits}",
             )
         else:
             stat.summary(DiagnosticStatus.OK, "OK")
@@ -101,14 +113,14 @@ class CheckJointValues(object):
             stat.summary(DiagnosticStatus.STALE, "No velocity recorded")
             return stat
 
-        stat.add("Timestamp", self._timestamp)
+        stat.add("Timestamp", str(self._timestamp))
 
         joints_at_velocity_limit = []
         joint_in_warning_zone_velocity_limit = []
 
         for index in range(len(self._joint_names)):
             joint_name = self._joint_names[index]
-            stat.add(self._joint_names[index], self._velocity[index])
+            stat.add(self._joint_names[index], str(self._velocity[index]))
 
             if self._velocity[index] >= self._velocity_limits[joint_name]:
                 joints_at_velocity_limit.append(self._joint_names[index])
@@ -141,14 +153,14 @@ class CheckJointValues(object):
             stat.summary(DiagnosticStatus.STALE, "No effort recorded")
             return stat
 
-        stat.add("Timestamp", self._timestamp)
+        stat.add("Timestamp", str(self._timestamp))
 
         joints_at_effort_limit = []
         joints_in_warning_zone_effort_limits = []
 
         for index in range(len(self._joint_names)):
             joint_name = self._joint_names[index]
-            stat.add(self._joint_names[index], self._position[index])
+            stat.add(self._joint_names[index], str(self._position[index]))
 
             if self._effort[index] >= self._effort_limits[joint_name]:
                 joints_at_effort_limit.append(self._joint_names[index])

@@ -1,3 +1,10 @@
-[submodule "ros1/src/simulation/realsense_gazebo_plugin"]
-	path = ros1/src/simulation/realsense_gazebo_plugin
+[submodule "ros1/src/libraries/realsense_gazebo_plugin"]
+	path = ros1/src/libraries/realsense_gazebo_plugin
 	url = git@gitlab.com:project-march/libraries/realsense_gazebo_plugin.git
+[submodule "ros2/src/libraries/diagnostic_updater"]
+	path = ros2/src/libraries/diagnostic_updater
+	url = git@gitlab.com:project-march/libraries/diagnostic-updater.git
+[submodule "ros2/src/libraries/march_robot_state_publisher"]
+	path = ros2/src/libraries/march_robot_state_publisher
+	url = https://gitlab.com/project-march/libraries/robot-state-publisher.git
+	branch = 2-rename-to-march_robot_state_publisher-and-fix-tests
