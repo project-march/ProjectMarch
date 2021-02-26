@@ -9,16 +9,9 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/common/transforms.h>
 #include <pcl/filters/statistical_outlier_removal.h>
+
 #include <pcl_ros/transforms.h>
-#include <geometry_msgs/TransformStamped.h>
-
-
-#include <pcl/filters/voxel_grid.h>
-
-=======
 #include <tf2_ros/transform_listener.h>
-#include <pcl_ros/transforms.h>
->>>>>>> main
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -223,8 +216,8 @@ void NormalsPreprocessor::filterOnNormalOrientation()
   else
   {
     ROS_WARN("The size of the pointcloud and the normal pointcloud are not the same. Cannot filter on normals.");
-=======
-void SimplePreprocessor::transformPointCloudFromUrdf() {
+
+    void SimplePreprocessor::transformPointCloudFromUrdf() {
   tf2_ros::Buffer tfBuffer;
   tf2_ros::TransformListener tfListener(tfBuffer);
 
@@ -241,6 +234,5 @@ void SimplePreprocessor::transformPointCloudFromUrdf() {
     ROS_WARN_STREAM("Something went wrong when transforming the poincloud: "
     << ex.what());
     return;
->>>>>>> main
   }
 }
