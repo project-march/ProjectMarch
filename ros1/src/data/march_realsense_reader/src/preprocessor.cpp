@@ -17,22 +17,19 @@ Preprocessor::Preprocessor(YAML::Node config_tree,
 
 }
 
-Preprocessor::Preprocessor(
-    std::string file_name,
-    PointCloud::Ptr pointcloud,
-    Normals::Ptr normal_pointcloud):
-    pointcloud_{pointcloud},
-    normal_pointcloud_{normal_pointcloud}
+SimplePreprocessor::SimplePreprocessor(YAML::Node config_tree,
+                                       PointCloud::Ptr pointcloud,
+                                       Normals::Ptr normal_pointcloud):
+    Preprocessor::Preprocessor(config_tree, pointcloud, normal_pointcloud)
 {
-  std::string path = ros::package::getPath("march_realsense_reader") +
-      "/config/" + file_name;
-  config_tree_ = YAML::LoadFile(path)["preprocessor"];
+
 }
 
 void SimplePreprocessor::preprocess() {
   ROS_INFO_STREAM("Preprocessing, test_parameter is " <<
   config_tree_["test_parameter"]);
 
+  transformPointCloudFromUrdf();
 }
 
 void SimplePreprocessor::transformPointCloudFromUrdf() {
@@ -50,7 +47,7 @@ void SimplePreprocessor::transformPointCloudFromUrdf() {
   catch (tf2::TransformException &ex)
   {
     ROS_WARN_STREAM("Something went wrong when transforming the pointcloud: "
-    << ex.what());
+                        << ex.what());
     return;
   }
 }

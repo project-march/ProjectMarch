@@ -7,6 +7,7 @@
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <std_srvs/Trigger.h>
+#include "yaml-cpp/yaml.h"
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
@@ -17,6 +18,8 @@ public:
     void pointcloud_callback(const PointCloud::ConstPtr& input_cloud);
     bool read_pointcloud_callback(std_srvs::Trigger::Request &req,
                                   std_srvs::Trigger::Response &res);
+    YAML::Node readConfig(std::string config_file);
+    YAML::Node getConfigIfPresent(std::string key);
 
 private:
     ros::NodeHandle* n_;
@@ -24,7 +27,8 @@ private:
     ros::ServiceServer read_pointcloud_service_;
     ros::Publisher preprocessed_pointcloud_publisher_;
     bool reading_;
-    std::string config_file_;
+    bool debugging_;
+    YAML::Node config_tree_;
 };
 
 #endif //MARCH_REALSENSE_READER_HPP

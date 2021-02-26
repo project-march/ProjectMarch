@@ -6,6 +6,7 @@
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
 #include "yaml-cpp/yaml.h"
+#include <tf2_ros/transform_listener.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -15,9 +16,7 @@ class Preprocessor {
     Preprocessor(YAML::Node config_tree,
                  PointCloud::Ptr pointcloud,
                  Normals::Ptr normal_pointcloud);
-    Preprocessor(std::string file_name,
-                 PointCloud::Ptr pointcloud,
-                 Normals::Ptr normal_pointcloud);
+
     // This function is required to be implemented by any preprocessor
     virtual void preprocess()=0;
     virtual ~Preprocessor() {};
@@ -29,11 +28,12 @@ class Preprocessor {
 
 class SimplePreprocessor : Preprocessor {
   public:
-    //Use the constructors defined in the super class
-    using Preprocessor::Preprocessor;
+    SimplePreprocessor(YAML::Node config_tree,
+                       PointCloud::Ptr pointcloud,
+                       Normals::Ptr normal_pointcloud);
     void preprocess();
 
-  private:
+  protected:
     void transformPointCloudFromUrdf();
 };
 
