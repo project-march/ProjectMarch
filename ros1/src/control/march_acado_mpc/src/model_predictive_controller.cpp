@@ -105,7 +105,7 @@ void ModelPredictiveController::calculateControlInput() {
   setInitialState(x0);
 
   // Set reference
-  ModelPredictiveController::setReference(reference);
+  setReference(reference);
 
   // preparation step
   setReference(reference);
