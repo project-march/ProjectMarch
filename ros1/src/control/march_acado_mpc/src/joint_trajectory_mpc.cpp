@@ -109,6 +109,8 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
 //          return;
       }
       ref_pub_->msg_.data = model_predictive_controllers_[0].pos_ref;
+
+    std::cout << "\033[4;32m" << "Period:" << period << "\033[0m" << std::endl;
   }
 
   command_pub_->unlockAndPublish();
