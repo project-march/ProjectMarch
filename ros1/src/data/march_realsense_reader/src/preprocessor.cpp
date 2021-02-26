@@ -15,6 +15,10 @@
 
 #include <pcl/filters/voxel_grid.h>
 
+=======
+#include <tf2_ros/transform_listener.h>
+#include <pcl_ros/transforms.h>
+>>>>>>> main
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -219,5 +223,24 @@ void NormalsPreprocessor::filterOnNormalOrientation()
   else
   {
     ROS_WARN("The size of the pointcloud and the normal pointcloud are not the same. Cannot filter on normals.");
+=======
+void SimplePreprocessor::transformPointCloudFromUrdf() {
+  tf2_ros::Buffer tfBuffer;
+  tf2_ros::TransformListener tfListener(tfBuffer);
+
+  geometry_msgs::TransformStamped transformStamped;
+  try
+  {
+    transformStamped = tfBuffer.lookupTransform("camera_link", "foot_left",
+                                                ros::Time::now(), ros::Duration(0.5));
+    pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_,
+                                 transformStamped.transform);
+  }
+  catch (tf2::TransformException &ex)
+  {
+    ROS_WARN_STREAM("Something went wrong when transforming the poincloud: "
+    << ex.what());
+    return;
+>>>>>>> main
   }
 }

@@ -25,6 +25,7 @@ private:
     ros::Subscriber pointcloud_subscriber_;
     PointCloud last_pointcloud_;
     ros::ServiceServer read_pointcloud_service_;
+    ros::Publisher preprocessed_pointcloud_publisher_;
     bool reading_;
     std::string config_file_;
     ros::Publisher pointcloud_publisher_;

@@ -17,10 +17,15 @@ def generate_launch_description():
     # Robot state publisher arguments
     robot_state_publisher = LaunchConfiguration("robot_state_publisher")
     robot_description = LaunchConfiguration("robot_description")
+    ground_gait = LaunchConfiguration("ground_gait")
+    realsense_simulation = LaunchConfiguration("realsense_simulation")
+    simulation = LaunchConfiguration("simulation")
+    to_world_transform = LaunchConfiguration("to_world_transform")
     # Gait selection arguments
     gait_selection = LaunchConfiguration("gait_selection")
     gait_package = LaunchConfiguration("gait_package")
     gait_directory = LaunchConfiguration("gait_directory")
+    balance = LaunchConfiguration("balance")
     # Fake sensor data
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
     minimum_fake_temperature = LaunchConfiguration("minimum_fake_temperature")
@@ -66,6 +71,30 @@ def generate_launch_description():
                 description="Which <robot_description>.xacro file to use. "
                 "This file must be available in the march_desrciption/urdf/ folder",
             ),
+            DeclareLaunchArgument(
+                name="simulation",
+                default_value="False",
+                description="Whether the exoskeleton is ran physically or in "
+                "simulation.",
+            ),
+            DeclareLaunchArgument(
+                name="realsense_simulation",
+                default_value="False",
+                description="Whether the simulation camera or the physical camera should be used",
+            ),
+            DeclareLaunchArgument(
+                name="ground_gait",
+                default_value="False",
+                description="Whether the simulation should be simulating "
+                "ground_gaiting instead of airgaiting.",
+            ),
+            DeclareLaunchArgument(
+                name="to_world_transform",
+                default_value="False",
+                description="Whether a transform from the world to base_link is "
+                "necessary, this is the case when you are "
+                "groundgaiting in rviz.",
+            ),
             # GAIT SELECTION ARGUMENTS
             DeclareLaunchArgument(
                 name="gait_selection",
@@ -82,6 +111,11 @@ def generate_launch_description():
                 default_value="training-v",
                 description="The directory in which the gait files to use are located, "
                 "relative to the gait_package.",
+            ),
+            DeclareLaunchArgument(
+                "balance",
+                default_value="False",
+                description="Whether balance is being used.",
             ),
             # Launch rqt input device if not rqt_input:=false
             IncludeLaunchDescription(
@@ -110,6 +144,11 @@ def generate_launch_description():
                 launch_arguments=[
                     ("robot_description", robot_description),
                     ("use_sim_time", use_sim_time),
+                    ("simulation", simulation),
+                    ("realsense_simulation", realsense_simulation),
+                    ("ground_gait", ground_gait),
+                    ("to_world_transform", to_world_transform),
+                    ("balance", balance),
                 ],
                 condition=IfCondition(robot_state_publisher),
             ),
@@ -126,6 +165,7 @@ def generate_launch_description():
                     ("gait_directory", gait_directory),
                     ("use_sim_time", use_sim_time),
                     ("gait_package", gait_package),
+                    ("balance", balance),
                 ],
                 condition=IfCondition(gait_selection),
             ),
