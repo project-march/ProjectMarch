@@ -24,7 +24,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
 
   config_file_ = "pointcloud_parameters.yaml";
   preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>
-      ("/camera/preprocessed_cloud", 1);
+      ("/camera/preprocessed_cloud", 50);
 }
 
 void RealSenseReader::pointcloud_callback(const sensor_msgs::PointCloud2 input_cloud)
@@ -41,12 +41,24 @@ void RealSenseReader::pointcloud_callback(const sensor_msgs::PointCloud2 input_c
     PointCloud::Ptr pointcloud = boost::make_shared<PointCloud>(converted_cloud);
     Normals::Ptr normals = boost::make_shared<Normals>();
 
+    pointcloud->width  = 1;
+    pointcloud->height = pointcloud->points.size();
+
     std::unique_ptr<NormalsPreprocessor> preprocessor =
         std::make_unique<NormalsPreprocessor>(config_file_, pointcloud, normals);
     preprocessor->preprocess();
 
-    preprocessed_pointcloud_publisher_.publish(pointcloud);
-  }
+    ROS_INFO_STREAM("Done preprocessing, lets publish: " << pointcloud << " with size: " << pointcloud->points.size());
+
+    pointcloud->width  = 1;
+    pointcloud->height = pointcloud->points.size();
+
+    sensor_msgs::PointCloud2 msg;
+    pcl::toROSMsg(*pointcloud, msg);
+
+    preprocessed_pointcloud_publisher_.publish(msg);
+    
+    ROS_INFO_STREAM("Pointcloud published");  }
 }
 
 bool RealSenseReader::read_pointcloud_callback(std_srvs::Trigger::Request &req,
