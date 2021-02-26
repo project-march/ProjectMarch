@@ -61,7 +61,6 @@ void NormalsPreprocessor::preprocess()
 //  removeStatisticalOutliers();
 
   fillNormalCloud();
-//  time.sleep(10);
 
   filterOnNormalOrientation();
 
@@ -80,19 +79,19 @@ void NormalsPreprocessor::downsample()
   voxel_grid.filter(*pointcloud_);
 }
 
-//void NormalsPreprocessor::removeStatisticalOutliers()
-//{
-//  // Remove statistical outliers from the pointcloud to reduce noise
-//  auto parameters = config_tree_["statistical_outlier_filter"];
-//  int number_of_neighbours = parameters["number_of_neighbours"].as<int>();
-//  double sd_factor = parameters["sd_factor"].as<double>();
-//
-//  pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
-//  sor.setInputCloud(pointcloud_);
-//  sor.setMeanK(number_of_neighbours);
-//  sor.setStddevMulThresh(sd_factor);
-//  sor.filter(*pointcloud_);
-//}
+void NormalsPreprocessor::removeStatisticalOutliers()
+{
+  // Remove statistical outliers from the pointcloud to reduce noise
+  auto parameters = config_tree_["statistical_outlier_filter"];
+  int number_of_neighbours = parameters["number_of_neighbours"].as<int>();
+  double sd_factor = parameters["sd_factor"].as<double>();
+
+  pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
+  sor.setInputCloud(pointcloud_);
+  sor.setMeanK(number_of_neighbours);
+  sor.setStddevMulThresh(sd_factor);
+  sor.filter(*pointcloud_);
+}
 
 void NormalsPreprocessor::transformPointCloud()
 {
@@ -187,11 +186,11 @@ void NormalsPreprocessor::filterOnNormalOrientation()
     {
       // remove point if its normal is too far from what is desired
       if (pointcloud_normals_->points[p].normal_x * pointcloud_normals_->points[p].normal_x >
-          allowed_length_x * allowed_length_x ||
+          allowed_length_x ||
           pointcloud_normals_->points[p].normal_y * pointcloud_normals_->points[p].normal_y >
-          allowed_length_y * allowed_length_y ||
+          allowed_length_y ||
           pointcloud_normals_->points[p].normal_z * pointcloud_normals_->points[p].normal_z >
-          allowed_length_z * allowed_length_z )
+          allowed_length_z )
       {
         pointcloud_->points[p] = pointcloud_->points[pointcloud_->points.size() - 1];
         pointcloud_->points.resize(pointcloud_->points.size() - 1);

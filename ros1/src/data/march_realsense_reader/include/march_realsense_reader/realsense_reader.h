@@ -18,6 +18,7 @@ public:
     void pointcloud_callback(const sensor_msgs::PointCloud2 input_cloud);
     bool read_pointcloud_callback(std_srvs::Trigger::Request &req,
                                   std_srvs::Trigger::Response &res);
+    void publishPointCloud(PointCloud::Ptr pointcloud);
 
 private:
     ros::NodeHandle* n_;

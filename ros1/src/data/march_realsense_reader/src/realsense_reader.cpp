@@ -28,7 +28,6 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
 
 void RealSenseReader::pointcloud_callback(const sensor_msgs::PointCloud2 input_cloud)
 {
-//  last_pointcloud_ = input_cloud;
   if (reading_) {
     // All logic to execute with a pointcloud will be executed here.
     ROS_INFO_STREAM("Processing point cloud at time " << input_cloud.header
@@ -43,14 +42,7 @@ void RealSenseReader::pointcloud_callback(const sensor_msgs::PointCloud2 input_c
         std::make_unique<NormalsPreprocessor>(config_file_, pointcloud, normals);
     preprocessor->preprocess();
 
-    pointcloud->width  = 1;
-    pointcloud->height = pointcloud->points.size();
-
-    ROS_INFO_STREAM("Done preprocessing, lets publish: " << pointcloud << " with size: " << pointcloud->points.size());
-    sensor_msgs::PointCloud2 msg;
-    pcl::toROSMsg(*pointcloud, msg);
-    pointcloud_publisher_.publish(msg);
-    ROS_INFO_STREAM("Pointcloud published");
+    publishPointCloud(pointcloud);
   }
 }
 
@@ -60,4 +52,16 @@ bool RealSenseReader::read_pointcloud_callback(std_srvs::Trigger::Request &req,
   reading_ = true;
   res.success = true;
   return true;
+}
+
+void RealSenseReader::publishPointCloud(PointCloud::Ptr pointcloud)
+{
+  pointcloud->width  = 1;
+  pointcloud->height = pointcloud->points.size();
+
+  ROS_INFO_STREAM("Done preprocessing, lets publish: " << pointcloud << " with size: " << pointcloud->points.size());
+  sensor_msgs::PointCloud2 msg;
+  pcl::toROSMsg(*pointcloud, msg);
+  pointcloud_publisher_.publish(msg);
+  ROS_INFO_STREAM("Pointcloud published");
 }
