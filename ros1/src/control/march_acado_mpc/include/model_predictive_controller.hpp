@@ -11,8 +11,10 @@ public:
     ModelPredictiveController(std::vector<std::vector<float>> Q);
 
     // Public variables
-    vector<double> x0{0,0}; // Current state
-    double u;               // Calculated control input
+    vector<double> x0{0,0};             // Current state
+    double u;                           // Calculated control input
+    vector<vector<double>> reference;   // Current reference
+    bool repeat_reference = true;      // Periodically Repeat the reference
 
     /**
      * \brief Initialise the model predictive controller
@@ -26,17 +28,21 @@ public:
     void setInitialState(vector<double> x0);
 
     /**
-     * \brief Calculate the control input
-     * @param x0 - initial state
-     * @return u - control input
+     * \brief Set the reference
+     * @param reference
      */
-    void calculateControlInput();
+    void setReference(vector<vector<double>> reference);
 
     /**
      * \brief Assign the weighting matrix values
      * @param Q - weighting matrix
      */
     void assignWeightingMatrix(std::vector<std::vector<float>> Q);
+
+    /**
+     * \brief Calculate the control input
+     */
+    void calculateControlInput();
 
 private:
   std::vector<std::vector<float>> Q_;

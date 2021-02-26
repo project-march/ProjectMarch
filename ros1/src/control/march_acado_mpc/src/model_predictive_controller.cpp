@@ -2,10 +2,14 @@
 
 #include "model_predictive_controller.hpp"
 #include "acado_common.h"
+#include "mpc_references.h"
 
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 using namespace std;
 
@@ -18,37 +22,25 @@ ModelPredictiveController::ModelPredictiveController(std::vector<std::vector<flo
 {
 }
 
-void ModelPredictiveController::init()
-{
+void ModelPredictiveController::init() {
+
   // Initialize the solver
   acado_initializeSolver();
 
-  // Initialise the states vector
-  for (int i = 0; i < ACADO_N + 1; ++i) {
-    acadoVariables.x[i * ACADO_NX] = 0; // theta
+  // Prepare a consistent initial guess
+  for (int i = 0; i < ACADO_N + 1; i++) {
+    acadoVariables.x[i * ACADO_NX    ] = 0;     // theta
     acadoVariables.x[i * ACADO_NX + 1] = 0; // dtheta
   }
 
-  // Initialise the control input vector
-  for (int i = 0; i < ACADO_N; i++) {
-    acadoVariables.u[i * ACADO_NU] = 0; // T
-  }
+  // Fill reference vector with sinus and or step signals
+//  sinRef(reference, 0.2, 0.785, ACADO_N, 0.001);
+  stepRef(reference, 0.261, ACADO_N);
 
-  // Set angle step reference value
-  double theta_ref = 90*(M_PI/180);
+  // Set the reference
+  setReference(reference);
 
-  // Prepare references (step reference)
-  for (int i = 0; i < ACADO_N; ++i) {
-    acadoVariables.y[i * ACADO_NY] = theta_ref; // theta
-    acadoVariables.y[i * ACADO_NY + 1] = 0;         // dtheta
-    acadoVariables.y[i * ACADO_NY + 2] = 0;         // T
-  }
-
-  acadoVariables.yN[0] = theta_ref; // theta
-  acadoVariables.yN[1] = 0;         // dtheta
-  acadoVariables.yN[2] = 0;         // T
-
-  // Set the current initial state
+  // Current state feedback
   setInitialState(x0);
 
   // Assign the weighting matrix
@@ -63,6 +55,17 @@ void ModelPredictiveController::setInitialState(vector<double> x0) {
   for (int i = 0; i < ACADO_NX; ++i) {
     acadoVariables.x0[i] = x0[i];
   }
+}
+
+void ModelPredictiveController::setReference(vector<vector<double>> reference) {
+    for(int i = 0; i < ACADO_N; i++) {
+        for(int j = 0; j < ACADO_NY; j++) {
+            acadoVariables.y[i * ACADO_NY + j] = reference[i][j];
+        }
+    }
+    for(int j = 0; j < ACADO_NYN; j++) {
+        acadoVariables.yN[j] = reference[ACADO_N][j];
+    }
 }
 
 void ModelPredictiveController::assignWeightingMatrix(std::vector<std::vector<float>> Q) {
@@ -93,16 +96,19 @@ void ModelPredictiveController::assignWeightingMatrix(std::vector<std::vector<fl
                 acadoVariables.WN[i*(n_cols-ACADO_NU) + j] = Q[i][j];
             }
         }
-
     }
 }
 
 void ModelPredictiveController::calculateControlInput() {
 
-  // Set initial speed
+  // Set initial state
   setInitialState(x0);
 
+  // Set reference
+  setReference(reference);
+
   // preparation step
+  setReference(reference);
   acado_preparationStep();
 
   // feedback step
@@ -113,5 +119,9 @@ void ModelPredictiveController::calculateControlInput() {
   acado_shiftStates(2, 0, 0);
   acado_shiftControls(0);
 
-}
+  // Scroll the reference vector
+  if(repeat_reference) {
+      scrollReference(reference);
+  }
 
+}

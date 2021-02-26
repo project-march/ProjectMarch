@@ -109,7 +109,7 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
   }
 
   command_pub_->unlockAndPublish();
-  }
+}
 
 void ModelPredictiveControllerInterface::stopping(const ros::Time& /*time*/)
 {
