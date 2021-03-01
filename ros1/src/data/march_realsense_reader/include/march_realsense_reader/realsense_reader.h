@@ -15,10 +15,17 @@ class RealSenseReader
 {
 public:
     RealSenseReader(ros::NodeHandle* n);
+
+    // When `reading_` is true, this method executes the logic to process a pointcloud
+    // on the next pointcloud the camera publishes. When `reading_` is false, this does nothing.
     void pointcloud_callback(const sensor_msgs::PointCloud2 input_cloud);
+
+    // Sets the `reading_` variable to true so pointcloud_callback executes its logic
     bool read_pointcloud_callback(std_srvs::Trigger::Request &req,
                                   std_srvs::Trigger::Response &res);
-    void publishPointCloud(PointCloud::Ptr pointcloud);
+
+    // Publishes the pointcloud on a topic for visualisation in rviz or furter use
+    void publishPreprocessedPointCloud(PointCloud::Ptr pointcloud);
 
 private:
     ros::NodeHandle* n_;

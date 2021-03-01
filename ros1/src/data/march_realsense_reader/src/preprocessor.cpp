@@ -38,15 +38,20 @@ Preprocessor::Preprocessor(
   config_tree_ = YAML::LoadFile(path)["preprocessor"];
 }
 
+// Removes a point from a pointcloud (and optionally the corresponding pointcloud_normals as well) at a given index
 void Preprocessor::removePointByIndex(int index, PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals)
 {
-  // Removes a point from a pointcloud (and optionaly the corresponding pointcloud_normals as well) from a given index
-  if (index < pointcloud->points.size() && index > 0) {
-    if (pointcloud_normals != nullptr) {
-      if (index < pointcloud_normals->points.size() && index > 0) {
+  if (index < pointcloud->points.size() && index > 0)
+  {
+    if (pointcloud_normals != nullptr)
+    {
+      if (index < pointcloud_normals->points.size() && index > 0)
+      {
         pointcloud_normals->points[index] = pointcloud_normals->points[pointcloud_normals->points.size() - 1];
         pointcloud_normals->points.resize(pointcloud_normals->points.size() - 1);
-      } else {
+      }
+      else
+      {
         ROS_WARN("Index to be removed is not valid for pointcloud_normals");
       }
     }
@@ -63,7 +68,6 @@ void SimplePreprocessor::preprocess()
 {
   ROS_INFO_STREAM("Preprocessing, test_parameter is " <<
   config_tree_["test_parameter"]);
-
 }
 
 void NormalsPreprocessor::preprocess()
@@ -85,9 +89,9 @@ void NormalsPreprocessor::preprocess()
   ROS_INFO_STREAM("Finished preprocessing. Number of points in pointcloud is " << pointcloud_->points.size());
 }
 
+// Downsample the number of points in the pointcloud to have a more workable number of points
 void NormalsPreprocessor::downsample()
 {
-  // Downsample the number of points in the pointcloud to have a more workable number of points
   auto parameters = config_tree_["downsampling"];
   double leaf_size = parameters["leaf_size"].as<double>();
 
@@ -111,10 +115,11 @@ void NormalsPreprocessor::downsample()
 //  sor.filter(*pointcloud_);
 //}
 
+
+// Translate and rotate the pointcloud so that the origin is at the foot
+// Currently uses a very rough and static estimation of where the foot should be
 void NormalsPreprocessor::transformPointCloud()
 {
-  // Translate and rotate the pointcloud so that the origin is at the foot
-  // Currently uses a very rough and static estimation of where the foot should be
   auto parameters = config_tree_["transformation"];
   double translation_x = parameters["translation_x"].as<double>();
   double translation_y = parameters["translation_y"].as<double>();
@@ -134,9 +139,9 @@ void NormalsPreprocessor::transformPointCloud()
   pcl::transformPointCloud(*pointcloud_, *pointcloud_, transform);
 }
 
+// Remove all the points which are far away from the origin in 3d euclidean distance
 void NormalsPreprocessor::filterOnDistanceFromOrigin()
 {
-  // Remove all the points which are far away from the origin in 3d euclidean distance
   auto parameters = config_tree_["distance_filter"];
   double distance_threshold_squared = parameters["distance_threshold"].as<double>() *
                                       parameters["distance_threshold"].as<double>();
@@ -157,13 +162,10 @@ void NormalsPreprocessor::filterOnDistanceFromOrigin()
   }
 }
 
+// Fill the pointcloud_normals_ object with estimated normals from the current pointcloud_ object
 void NormalsPreprocessor::fillNormalCloud()
 {
-  // Fill the pointcloud_normals_ object with estimated normals from the current pointcloud_ object 
   auto parameters = config_tree_["normal_estimation"];
-  bool use_tree_search_method = parameters["use_tree_search_method"].as<bool>();
-  int number_of_neighbours = parameters["number_of_neighbours"].as<int>();
-  double search_radius = parameters["search_radius"].as<double>();
 
   auto transformation_parameters = config_tree_["transformation"];
   double translation_x = transformation_parameters["translation_x"].as<double>();
@@ -176,21 +178,24 @@ void NormalsPreprocessor::fillNormalCloud()
 
   if (use_tree_search_method)
   {
+    bool use_tree_search_method = parameters["use_tree_search_method"].as<bool>();
+    int number_of_neighbours = parameters["number_of_neighbours"].as<int>();
     pcl::search::Search<pcl::PointXYZ>::Ptr search_method (new pcl::search::KdTree <pcl::PointXYZ>);
     normal_estimator.setSearchMethod(search_method);
     normal_estimator.setKSearch(number_of_neighbours);
   }
   else
   {
+    double search_radius = parameters["search_radius"].as<double>();
     normal_estimator.setRadiusSearch(search_radius);
   }
   normal_estimator.compute(*pointcloud_normals_);
 }
 
+// Filter points based on the x y or z component of the normal vector of the point.
+// This can work because the normals are of unit length.
 void NormalsPreprocessor::filterOnNormalOrientation()
 {
-  // Filter points based on the x y or z component of the normal vector of the point.
-  // This can work because the normals are of unit length.
   auto parameters = config_tree_["normal_filter"];
   double allowed_length_x = parameters["allowed_length_x"].as<double>();
   double allowed_length_y = parameters["allowed_length_y"].as<double>();
@@ -206,7 +211,8 @@ void NormalsPreprocessor::filterOnNormalOrientation()
           pointcloud_normals_->points[p].normal_y * pointcloud_normals_->points[p].normal_y >
           allowed_length_y ||
           pointcloud_normals_->points[p].normal_z * pointcloud_normals_->points[p].normal_z >
-          allowed_length_z) {
+          allowed_length_z)
+      {
         removePointByIndex(p, pointcloud_, pointcloud_normals_);
         p--;
       }
@@ -214,10 +220,11 @@ void NormalsPreprocessor::filterOnNormalOrientation()
   }
   else
   {
-    ROS_WARN("The size of the pointcloud and the normal pointcloud are not the same. Cannot filter on normals.");
+    ROS_ERROR("The size of the pointcloud and the normal pointcloud are not the same. Cannot filter on normals.");
   }
 }
 
+// Transforms the pointcloud so that the location and orientation of the origin match that of the foot.
 void SimplePreprocessor::transformPointCloudFromUrdf()
 {
   tf2_ros::Buffer tfBuffer;
