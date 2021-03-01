@@ -10,7 +10,7 @@
 #include <urdf/model.h>
 #include <yaml-cpp/yaml.h>
 
-#include <march_hardware/motor_controller/imotioncube/actuation_mode.h>
+#include <march_hardware/motor_controller/actuation_mode.h>
 #include <march_hardware/encoder/absolute_encoder.h>
 #include <march_hardware/encoder/incremental_encoder.h>
 #include <march_hardware/ethercat/pdo_interface.h>
@@ -70,15 +70,15 @@ public:
   static march::Joint createJoint(const YAML::Node& joint_config, const std::string& joint_name,
                                   const urdf::JointConstSharedPtr& urdf_joint, march::PdoInterfacePtr pdo_interface,
                                   march::SdoInterfacePtr sdo_interface);
-  static std::unique_ptr<march::AbsoluteEncoder> createAbsoluteEncoder(const YAML::Node& absolute_encoder_config,
+  static std::shared_ptr<march::AbsoluteEncoder> createAbsoluteEncoder(const YAML::Node& absolute_encoder_config,
                                                                        const urdf::JointConstSharedPtr& urdf_joint);
-  static std::unique_ptr<march::IncrementalEncoder>
+  static std::shared_ptr<march::IncrementalEncoder>
   createIncrementalEncoder(const YAML::Node& incremental_encoder_config);
-  static std::unique_ptr<march::IMotionCube> createIMotionCube(const YAML::Node& imc_config, march::ActuationMode mode,
+  static std::shared_ptr<march::IMotionCube> createIMotionCube(const YAML::Node& imc_config, march::ActuationMode mode,
                                                                const urdf::JointConstSharedPtr& urdf_joint,
                                                                march::PdoInterfacePtr pdo_interface,
                                                                march::SdoInterfacePtr sdo_interface);
-  static std::unique_ptr<march::TemperatureGES> createTemperatureGES(const YAML::Node& temperature_ges_config,
+  static std::shared_ptr<march::TemperatureGES> createTemperatureGES(const YAML::Node& temperature_ges_config,
                                                                      march::PdoInterfacePtr pdo_interface,
                                                                      march::SdoInterfacePtr sdo_interface);
   static std::unique_ptr<march::PowerDistributionBoard>

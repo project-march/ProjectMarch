@@ -3,10 +3,11 @@
 #define MARCH_HARDWARE_IMOTIONCUBE_STATE_H
 
 #include <string>
+#include "march_hardware/motor_controller/motor_controller_state.h"
 
 namespace march
 {
-class IMCState
+class IMCStateOfOperation
 {
 public:
   enum Value
@@ -22,11 +23,11 @@ public:
     UNKNOWN,
   };
 
-  IMCState() : value_(UNKNOWN)
+  IMCStateOfOperation() : value_(UNKNOWN)
   {
   }
 
-  explicit IMCState(uint16_t status) : value_(UNKNOWN)
+  explicit IMCStateOfOperation(uint16_t status) : value_(UNKNOWN)
   {
     const uint16_t five_bit_mask = 0b0000000001001111;
     const uint16_t six_bit_mask = 0b0000000001101111;
@@ -45,39 +46,39 @@ public:
 
     if (five_bit_masked == not_ready_switch_on)
     {
-      this->value_ = IMCState::NOT_READY_TO_SWITCH_ON;
+      this->value_ = IMCStateOfOperation::NOT_READY_TO_SWITCH_ON;
     }
     else if (five_bit_masked == switch_on_disabled)
     {
-      this->value_ = IMCState::SWITCH_ON_DISABLED;
+      this->value_ = IMCStateOfOperation::SWITCH_ON_DISABLED;
     }
     else if (six_bit_masked == ready_to_switch_on)
     {
-      this->value_ = IMCState::READY_TO_SWITCH_ON;
+      this->value_ = IMCStateOfOperation::READY_TO_SWITCH_ON;
     }
     else if (six_bit_masked == switched_on)
     {
-      this->value_ = IMCState::SWITCHED_ON;
+      this->value_ = IMCStateOfOperation::SWITCHED_ON;
     }
     else if (six_bit_masked == operation_enabled)
     {
-      this->value_ = IMCState::OPERATION_ENABLED;
+      this->value_ = IMCStateOfOperation::OPERATION_ENABLED;
     }
     else if (six_bit_masked == quick_stop_active)
     {
-      this->value_ = IMCState::QUICK_STOP_ACTIVE;
+      this->value_ = IMCStateOfOperation::QUICK_STOP_ACTIVE;
     }
     else if (five_bit_masked == fault_reaction_active)
     {
-      this->value_ = IMCState::FAULT_REACTION_ACTIVE;
+      this->value_ = IMCStateOfOperation::FAULT_REACTION_ACTIVE;
     }
     else if (five_bit_masked == fault)
     {
-      this->value_ = IMCState::FAULT;
+      this->value_ = IMCStateOfOperation::FAULT;
     }
   }
 
-  std::string getString()
+  std::string toString()
   {
     switch (this->value_)
     {
@@ -99,49 +100,61 @@ public:
         return "Fault";
       case UNKNOWN:
         return "Not in a recognized IMC state";
+      default:
+        return "Not in a recognized IMC state";
     }
   }
 
   bool operator==(Value v) const
   {
-    return this->value_ == v;
+    return value_ == v;
   }
-  bool operator==(IMCState a) const
+  bool operator==(IMCStateOfOperation a) const
   {
-    return this->value_ == a.value_;
+    return value_ == a.value_;
   }
-  bool operator!=(IMCState a) const
+  bool operator!=(IMCStateOfOperation a) const
   {
-    return this->value_ != a.value_;
+    return value_ != a.value_;
   }
 
-private:
   Value value_;
 };
-
-struct IMotionCubeState
+class IMotionCubeState : public MotorControllerState
 {
 public:
   IMotionCubeState() = default;
 
-  std::string statusWord;
-  std::string motionError;
-  std::string detailedError;
-  std::string secondDetailedError;
-  IMCState state;
-  std::string detailedErrorDescription;
-  std::string motionErrorDescription;
-  std::string secondDetailedErrorDescription;
+  bool isOk() override
+  {
+    return state_of_operation_.value_ != march::IMCStateOfOperation::FAULT;
+  }
 
-  float motorCurrent;
-  float IMCVoltage;
-  float motorVoltage;
-  int absoluteEncoderValue;
-  int incrementalEncoderValue;
-  double absoluteVelocity;
-  double incrementalVelocity;
+  std::string getErrorStatus() override
+  {
+    std::ostringstream error_stream;
+    std::string state = this->state_of_operation_.toString().c_str();
+
+    error_stream << "State: " << state << "\nMotion Error: " << this->motion_error_description_ << " ("
+                 << this->motion_error_ << ")\nDetailed Error: " << this->detailed_error_description_ << " ("
+                 << this->detailed_error_ << ")\nSecond Detailed Error: " << this->second_detailed_error_description_ << " ("
+                 << this->second_detailed_error_ << ")";
+    return error_stream.str();
+  }
+
+  std::string getOperationalState() override
+  {
+    return state_of_operation_.toString();
+  }
+
+  IMCStateOfOperation state_of_operation_;
+  std::string motion_error_;
+  std::string detailed_error_;
+  std::string second_detailed_error_;
+  std::string detailed_error_description_;
+  std::string motion_error_description_;
+  std::string second_detailed_error_description_;
 };
-
 }  // namespace march
 
-#endif  // MARCH_HARDWARE_IMOTIONCUBE_STATE_H
+#endif  // MARCH_HARDWARE_IMOTIONCUBE_STATE_OF_OPERATION_H
