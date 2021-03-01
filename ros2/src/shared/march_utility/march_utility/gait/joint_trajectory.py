@@ -278,33 +278,17 @@ class JointTrajectory(object):
     def check_joint_interpolation_is_safe(
         base_joint: JointTrajectory,
         other_joint: JointTrajectory,
-        number_of_setpoints: int,
     ) -> bool:
         """Check whether it is possible to interpolate between the two joint trajectories.
 
         :param base_joint: The first joint trajectory to interpolate.
         :param other_joint: The second joint trajectory to interpolate.
-        :param number_of_setpoints: The number of setpoints the joint trajectories
-            should have.
         """
         if base_joint.name != other_joint.name:
             raise SubgaitInterpolationError(
                 f"The subgaits to interpolate do not have the same joints, base"
                 f" subgait has {base_joint.name}, while other subgait has "
                 f"{other_joint.name}"
-            )
-
-            # check whether each joint has the same number of setpoints for
-            # the interpolation using foot position
-        if len(base_joint.setpoints) != number_of_setpoints:
-            raise SubgaitInterpolationError(
-                f"Number of setpoints differs in {base_joint.name} from  "
-                f"{number_of_setpoints}."
-            )
-        elif len(other_joint.setpoints) != number_of_setpoints:
-            raise SubgaitInterpolationError(
-                f"Number of setpoints differs in {base_joint.name} from "
-                f"{number_of_setpoints}"
             )
             # check whether each base joint as its corresponding other joint
         if base_joint.limits != other_joint.limits:
