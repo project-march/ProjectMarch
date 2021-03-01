@@ -152,7 +152,7 @@ void NormalsPreprocessor::transformPointCloud()
   double translation_y;
   double translation_z;
   double rotation_y;
-  if (YAML:Node transformation_parameters = config_tree_["transformation"])
+  if (YAML::Node transformation_parameters = config_tree_["transformation"])
   {
     grabParameter(transformation_parameters, "translation_x", translation_x);
     grabParameter(transformation_parameters, "translation_y", translation_y);
