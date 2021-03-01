@@ -39,20 +39,20 @@ Preprocessor::Preprocessor(
 }
 
 // Removes a point from a pointcloud (and optionally the corresponding pointcloud_normals as well) at a given index
-void Preprocessor::removePointByIndex(int index, PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals)
+void Preprocessor::removePointByIndex(int const index, PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals)
 {
-  if (index < pointcloud->points.size() && index > 0)
+  if (index < pointcloud->points.size() && index >= 0)
   {
     if (pointcloud_normals != nullptr)
     {
-      if (index < pointcloud_normals->points.size() && index > 0)
+      if (index < pointcloud_normals->points.size() && index >= 0)
       {
         pointcloud_normals->points[index] = pointcloud_normals->points[pointcloud_normals->points.size() - 1];
         pointcloud_normals->points.resize(pointcloud_normals->points.size() - 1);
       }
       else
       {
-        ROS_WARN("Index to be removed is not valid for pointcloud_normals");
+        ROS_WARN_STREAM("Index " << index << " to be removed is not valid for pointcloud_normals");
       }
     }
     pointcloud->points[index] = pointcloud->points[pointcloud->points.size() - 1];
@@ -60,14 +60,30 @@ void Preprocessor::removePointByIndex(int index, PointCloud::Ptr pointcloud, Nor
   }
   else
   {
-    ROS_WARN("Index to be removed is not valid for pointcloud");
+    ROS_WARN_STREAM("Index " << index << " to be removed is not valid for pointcloud");
+  }
+}
+
+// Grabs a parameter from a YAML::Node and throws a clear warning if the requested parameter does not exist
+template <class T>
+void Preprocessor::grabParameter(YAML::Node const yaml_node, std::string parameter_name, T& parameter)
+{
+  if (YAML::Node raw_parameter = yaml_node[parameter_name])
+  {
+    parameter = raw_parameter.as<T>();
+  }
+  else
+  {
+    ROS_ERROR_STREAM("parameter not found in the given YAML::node. Parameter name is " << parameter_name);
   }
 }
 
 void SimplePreprocessor::preprocess()
 {
-  ROS_INFO_STREAM("Preprocessing, test_parameter is " <<
-  config_tree_["test_parameter"]);
+  int test_parameter;
+  grabParameter(config_tree_, "test_parameter", test_parameter);
+
+  ROS_INFO_STREAM("Preprocessing, test_parameter is " << config_tree_["test_parameter"]);
 }
 
 void NormalsPreprocessor::preprocess()
@@ -92,8 +108,15 @@ void NormalsPreprocessor::preprocess()
 // Downsample the number of points in the pointcloud to have a more workable number of points
 void NormalsPreprocessor::downsample()
 {
-  auto parameters = config_tree_["downsampling"];
-  double leaf_size = parameters["leaf_size"].as<double>();
+  double leaf_size;
+  if (YAML::Node downsampling_parameters = config_tree_["downsampling"])
+  {
+    grabParameter(downsampling_parameters, "leaf_size", leaf_size);
+  }
+  else
+  {
+    ROS_ERROR("Downsample parameters not found in parameter file");
+  }
 
   pcl::VoxelGrid<pcl::PointXYZ> voxel_grid;
   voxel_grid.setInputCloud(pointcloud_);
@@ -101,12 +124,16 @@ void NormalsPreprocessor::downsample()
   voxel_grid.filter(*pointcloud_);
 }
 
+//Remove statistical outliers from the pointcloud to reduce noise
 //void NormalsPreprocessor::removeStatisticalOutliers()
 //{
-//  // Remove statistical outliers from the pointcloud to reduce noise
-//  auto parameters = config_tree_["statistical_outlier_filter"];
-//  int number_of_neighbours = parameters["number_of_neighbours"].as<int>();
-//  double sd_factor = parameters["sd_factor"].as<double>();
+//  int number_of_neighbours;
+//  double sd_factor;
+//  if (YAML::Node statistical_outlier_removal_parameters = config_tree_["statistical_outlier_removal"])
+//  {
+//    grabParameter(statistical_outlier_removal_parameters, "number_of_neighbours", number_of_neighbours);
+//    grabParameter(statistical_outlier_removal_parameters, "sd_factor", sd_factor);
+//  }
 //
 //  pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
 //  sor.setInputCloud(pointcloud_);
@@ -120,11 +147,22 @@ void NormalsPreprocessor::downsample()
 // Currently uses a very rough and static estimation of where the foot should be
 void NormalsPreprocessor::transformPointCloud()
 {
-  auto parameters = config_tree_["transformation"];
-  double translation_x = parameters["translation_x"].as<double>();
-  double translation_y = parameters["translation_y"].as<double>();
-  double translation_z = parameters["translation_z"].as<double>();
-  double rotation_y = parameters["rotation_y"].as<double>();
+
+  double translation_x;
+  double translation_y;
+  double translation_z;
+  double rotation_y;
+  if (YAML:Node transformation_parameters = config_tree_["transformation"])
+  {
+    grabParameter(transformation_parameters, "translation_x", translation_x);
+    grabParameter(transformation_parameters, "translation_y", translation_y);
+    grabParameter(transformation_parameters, "translation_z", translation_z);
+    grabParameter(transformation_parameters, "rotation_y", rotation_y);
+  }
+  else
+  {
+    ROS_ERROR("Transformation parameters not found in parameter file");
+  }
 
   // make a 4 by 4 transformation Transform = [Rotation (3x3) translation (3x1); 0 (1x3) 1 (1x1)]
   Eigen::Affine3f transform = Eigen::Affine3f::Identity();
@@ -142,13 +180,20 @@ void NormalsPreprocessor::transformPointCloud()
 // Remove all the points which are far away from the origin in 3d euclidean distance
 void NormalsPreprocessor::filterOnDistanceFromOrigin()
 {
-  auto parameters = config_tree_["distance_filter"];
-  double distance_threshold_squared = parameters["distance_threshold"].as<double>() *
-                                      parameters["distance_threshold"].as<double>();
+  double distance_threshold;
+  if (YAML::Node parameters = config_tree_["distance_filter"])
+  {
+    grabParameter(parameters, "distance_threshold", distance_threshold);
+  }
+  else
+  {
+    ROS_ERROR("distance filter parameters not found in parameter file");
+  }
+  double distance_threshold_squared = distance_threshold * distance_threshold;
 
   for (int p = 0; p<pointcloud_->points.size(); p++)
   {
-    // find the squared distance from the origin.
+    // find the squared distance from the origin
     float point_distance_squared = (pointcloud_->points[p].x * pointcloud_->points[p].x) +
                                    (pointcloud_->points[p].y * pointcloud_->points[p].y) +
                                    (pointcloud_->points[p].z * pointcloud_->points[p].z);
@@ -165,13 +210,29 @@ void NormalsPreprocessor::filterOnDistanceFromOrigin()
 // Fill the pointcloud_normals_ object with estimated normals from the current pointcloud_ object
 void NormalsPreprocessor::fillNormalCloud()
 {
-  auto parameters = config_tree_["normal_estimation"];
-  bool use_tree_search_method = parameters["use_tree_search_method"].as<bool>();
+  double translation_x;
+  double translation_y;
+  double translation_z;
+  if (YAML::Node transformation_parameters = config_tree_["transformation"])
+  {
+    grabParameter(transformation_parameters, "translation_x", translation_x);
+    grabParameter(transformation_parameters, "translation_y", translation_y);
+    grabParameter(transformation_parameters, "translation_z", translation_z);
+  }
+  else
+  {
+    ROS_ERROR("transformation parameters not found in parameter file");
+  }
 
-  auto transformation_parameters = config_tree_["transformation"];
-  double translation_x = transformation_parameters["translation_x"].as<double>();
-  double translation_y = transformation_parameters["translation_y"].as<double>();
-  double translation_z = transformation_parameters["translation_z"].as<double>();
+  bool use_tree_search_method;
+  if (YAML::Node normal_estimation_parameters = config_tree_["normal_estimation"])
+  {
+    grabParameter(normal_estimation_parameters, "use_tree_search_method", use_tree_search_method);
+  }
+  else
+  {
+    ROS_ERROR("normal estimation parameters not found in parameter file");
+  }
 
   pcl::NormalEstimation <pcl::PointXYZ, pcl::Normal> normal_estimator;
   normal_estimator.setInputCloud(pointcloud_);
@@ -179,14 +240,18 @@ void NormalsPreprocessor::fillNormalCloud()
 
   if (use_tree_search_method)
   {
-    int number_of_neighbours = parameters["number_of_neighbours"].as<int>();
+    int number_of_neighbours;
+    grabParameter(normal_estimation_parameters, "number_of_neighbours", number_of_neighbours);
+
     pcl::search::Search<pcl::PointXYZ>::Ptr search_method (new pcl::search::KdTree <pcl::PointXYZ>);
     normal_estimator.setSearchMethod(search_method);
     normal_estimator.setKSearch(number_of_neighbours);
   }
   else
   {
-    double search_radius = parameters["search_radius"].as<double>();
+    double search_radius;
+    grabParameter(normal_estimation_parameters, "search_radius", search_radius);
+
     normal_estimator.setRadiusSearch(search_radius);
   }
   normal_estimator.compute(*pointcloud_normals_);
@@ -196,10 +261,16 @@ void NormalsPreprocessor::fillNormalCloud()
 // This can work because the normals are of unit length.
 void NormalsPreprocessor::filterOnNormalOrientation()
 {
-  auto parameters = config_tree_["normal_filter"];
-  double allowed_length_x = parameters["allowed_length_x"].as<double>();
-  double allowed_length_y = parameters["allowed_length_y"].as<double>();
-  double allowed_length_z = parameters["allowed_length_z"].as<double>();
+  double allowed_length_x;
+  double allowed_length_y;
+  double allowed_length_z;
+  if (YAML::Node normal_filter_parameters = config_tree_["normal_filter"])
+  {
+    grabParameter(normal_filter_parameters, "allowed_length_x", allowed_length_x);
+    grabParameter(normal_filter_parameters, "allowed_length_y", allowed_length_y);
+    grabParameter(normal_filter_parameters, "allowed_length_z", allowed_length_z);
+  }
+
 
   if (pointcloud_->points.size() == pointcloud_normals_->points.size())
   {
