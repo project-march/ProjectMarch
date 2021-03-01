@@ -15,8 +15,12 @@ public:
 
   ~IncrementalEncoder() noexcept override = default;
 
-  double toRad(int32_t iu) const override;
-  double getRadPerBit() const override;
+  // Inherited methods
+  double getRadiansPerBit() const override;
+  double toRadians(double iu, bool is_position) const override;
+  double toIU(double radians, bool is_position) const override;
+
+
   double getTransmission() const;
 
   /** @brief Override comparison operator */

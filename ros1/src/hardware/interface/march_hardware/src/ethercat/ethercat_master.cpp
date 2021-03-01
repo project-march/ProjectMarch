@@ -81,9 +81,9 @@ void EthercatMaster::ethercatMasterInitiation()
 int setSlaveWatchdogTimer(uint16 slave)
 {
   uint16 configadr = ec_slave[slave].configadr;
-  ec_FPWRw(configadr, 0x0400, IMotionCube::WATCHDOG_DIVIDER, EC_TIMEOUTRET);  // Set the divider register of the WD
-  ec_FPWRw(configadr, 0x0410, IMotionCube::WATCHDOG_TIME, EC_TIMEOUTRET);     // Set the PDI watchdog = WD
-  ec_FPWRw(configadr, 0x0420, IMotionCube::WATCHDOG_TIME, EC_TIMEOUTRET);     // Set the SM watchdog = WD
+  ec_FPWRw(configadr, 0x0400, MotorController::WATCHDOG_DIVIDER, EC_TIMEOUTRET);  // Set the divider register of the WD
+  ec_FPWRw(configadr, 0x0410, MotorController::WATCHDOG_TIME, EC_TIMEOUTRET);     // Set the PDI watchdog = WD
+  ec_FPWRw(configadr, 0x0420, MotorController::WATCHDOG_TIME, EC_TIMEOUTRET);     // Set the SM watchdog = WD
   return 1;
 }
 
@@ -95,11 +95,8 @@ bool EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
 
   for (Joint& joint : joints)
   {
-    if (joint.hasIMotionCube())
-    {
-      ec_slave[joint.getIMotionCubeSlaveIndex()].PO2SOconfig = setSlaveWatchdogTimer;
-    }
-    reset |= joint.initialize(this->cycle_time_ms_);
+    ec_slave[joint.getMotorController()->getSlaveIndex()].PO2SOconfig = setSlaveWatchdogTimer;
+    reset |= joint.initSdo(this->cycle_time_ms_);
   }
 
   ec_config_map(&this->io_map_);

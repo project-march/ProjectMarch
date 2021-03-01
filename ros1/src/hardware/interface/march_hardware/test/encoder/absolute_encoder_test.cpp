@@ -85,26 +85,26 @@ TEST_F(AbsoluteEncoderTest, UpperSoftLimitHigherThanUpperHardLimit)
 
 TEST_F(AbsoluteEncoderTest, ZeroPositionRadToZeroPosition)
 {
-  ASSERT_EQ(this->encoder.fromRad(0.0), this->zero_position);
+  ASSERT_EQ(this->encoder.toIU(0.0, true), this->zero_position);
 }
 
 TEST_F(AbsoluteEncoderTest, CorrectFromRad)
 {
   const double radians = 1.0;
   const int32_t expected = (radians * this->total_positions / (2 * M_PI)) + this->zero_position;
-  ASSERT_EQ(this->encoder.fromRad(radians), expected);
+  ASSERT_EQ((int32_t) this->encoder.toIU(radians, true), expected);
 }
 
 TEST_F(AbsoluteEncoderTest, ZeroPositionToZeroRadians)
 {
-  ASSERT_DOUBLE_EQ(this->encoder.toRad(this->zero_position), 0.0);
+  ASSERT_DOUBLE_EQ(this->encoder.toRadians(this->zero_position, true), 0.0);
 }
 
 TEST_F(AbsoluteEncoderTest, CorrectToRad)
 {
   const int32_t iu = 1.0;
   const double expected = (iu - this->zero_position) * 2 * M_PI / this->total_positions;
-  ASSERT_EQ(this->encoder.toRad(iu), expected);
+  ASSERT_EQ(this->encoder.toRadians(iu, true), expected);
 }
 
 INSTANTIATE_TEST_CASE_P(ParameterizedLimits, TestEncoderParameterizedLimits,
