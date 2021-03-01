@@ -13,7 +13,8 @@ using RegionsVector = std::vector<pcl::PointIndices>;
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n):
     n_(n),
-    reading_(false) {
+    reading_(false)
+{
   pointcloud_subscriber_ = n_->subscribe<PointCloud>
       ("/camera/depth/color/points", 1,
        &RealSenseReader::pointcloud_callback, this);
@@ -28,13 +29,16 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
   region_creator_ = std::make_unique<SimpleRegionCreator>(
       getConfigIfPresent("region_creator"));
 
-  if (config_tree_["debug"]) {
+  if (config_tree_["debug"])
+  {
     debugging_ = config_tree_["debug"].as<bool>();
-  } else {
+  } else
+  {
     debugging_ = false;
   }
 
-  if (debugging_) {
+  if (debugging_)
+  {
     preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>
         ("/camera/preprocessed_cloud", 1);
   }
@@ -44,19 +48,24 @@ YAML::Node RealSenseReader::readConfig(std::string config_file) {
   YAML::Node config_tree;
   std::string path = ros::package::getPath("march_realsense_reader") +
                      "/config/" + config_file;
-  try {
+  try
+  {
     config_tree = YAML::LoadFile(path);
-  } catch (YAML::Exception e) {
+  } catch (YAML::Exception e)
+  {
     ROS_WARN_STREAM("YAML file with path " << path << " could not be loaded, using "
                                                       "empty config instead");
   }
   return config_tree;
 }
 
-YAML::Node RealSenseReader::getConfigIfPresent(std::string key) {
-  if (config_tree_[key]) {
+YAML::Node RealSenseReader::getConfigIfPresent(std::string key)
+{
+  if (config_tree_[key])
+  {
     return config_tree_[key];
-  } else {
+  } else
+  {
     ROS_WARN_STREAM("Key " << key << " was not found in the config file, empty config "
                                      "will be used");
     return YAML::Node();
@@ -74,7 +83,8 @@ void RealSenseReader::pointcloud_callback(const PointCloud::ConstPtr& input_clou
 
     // Preprocess
     preprocessor_->preprocess(pointcloud, normals);
-    if (debugging_) {
+    if (debugging_)
+    {
       preprocessed_pointcloud_publisher_.publish(pointcloud);
     }
 

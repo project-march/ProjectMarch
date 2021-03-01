@@ -25,14 +25,24 @@ class Preprocessor {
     YAML::Node config_tree_;
 };
 
+/** The SimplePreprocessor is mostly for debug purposes, it does only the most vital
+ * step of transforming the pointcloud based on the /tf topic. More complex
+ * preoprocessors will be made for normal usecases **/
 class SimplePreprocessor : Preprocessor {
   public:
+    /** Basic constructor for simple preprocessor, this will also create a tf_listener
+    that is required for transforming the pointcloud **/
     SimplePreprocessor(YAML::Node config_tree);
+
+    // Preprocess the given pointcloud, based on parameters in the config tree
     void preprocess(PointCloud::Ptr pointcloud,
-                    Normals::Ptr normal_pointcloud);
+                    Normals::Ptr normal_pointcloud) override;
 
   protected:
+    /** Calls the tf listener, to know transform at current time and transforms the
+     pointcloud **/
     void transformPointCloudFromUrdf();
+
     std::unique_ptr<tf2_ros::Buffer> tfBuffer;
     std::unique_ptr<tf2_ros::TransformListener> tfListener;
 };
