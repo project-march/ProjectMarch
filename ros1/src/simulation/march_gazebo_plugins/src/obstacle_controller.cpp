@@ -17,16 +17,16 @@ ObstacleController::ObstacleController(physics::ModelPtr model)
   , balance_(false)
   , p_yaw_(0)
   , d_yaw_(0)
-  , p_yaw_off_(0)
-  , d_yaw_off_(0)
+  , p_yaw_balance_(0)
+  , d_yaw_balance_(0)
   , p_pitch_(0)
   , d_pitch_(0)
-  , p_pitch_off_(0)
-  , d_pitch_off_(0)
+  , p_pitch_balance_(0)
+  , d_pitch_balance_(0)
   , p_roll_(0)
   , d_roll_(0)
-  , p_roll_off_(0)
-  , d_roll_off_(0)
+  , p_roll_balance_(0)
+  , d_roll_balance_(0)
   , error_x_last_timestep_(0)
   , error_y_last_timestep_(0)
   , error_yaw_last_timestep_(0)
@@ -125,12 +125,12 @@ void ObstacleController::update(ignition::math::v6::Vector3<double>& torque_left
   // turn (bodge) off plug-in at right time when balance is set to true
   if (balance_ == true && subgait_name_ != HOME_STAND && subgait_name_ != STAND_IDLE)
   {
-    p_pitch_actual = p_pitch_off_;
-    p_roll_actual = p_roll_off_;
-    p_yaw_actual = p_yaw_off_;
-    d_pitch_actual = d_pitch_off_;
-    d_roll_actual = d_roll_off_;
-    d_yaw_actual = d_yaw_off_;
+    p_pitch_actual = p_pitch_balance_;
+    p_roll_actual = p_roll_balance_;
+    p_yaw_actual = p_yaw_balance_;
+    d_pitch_actual = d_pitch_balance_;
+    d_roll_actual = d_roll_balance_;
+    d_yaw_actual = d_yaw_balance_;
   }
   else
   {
@@ -245,5 +245,25 @@ void ObstacleController::getWalkGoalPositionX(double time_since_start, double st
     goal_position_x += 0.25 * swing_step_size_ - 0.25 * time_since_start * swing_step_size_ / subgait_duration_;
   }
 }
+
+bool ObstacleController::changeComLevel(std::string level_name)
+{
+  if (not std::count(com_levels.begin(), com_levels.end(), level_name)) {
+    ROS_WARN_STREAM("The requested CoM level was not found");
+    return false;
+  } else {
+    p_pitch_balance_ = com_levels_tree[level_name]["pitch"]["p"].as<double>();
+    d_pitch_balance_ = com_levels_tree[level_name]["pitch"]["d"].as<double>();
+
+    p_roll_balance_ = com_levels_tree[level_name]["roll"]["p"].as<double>();
+    d_roll_balance_ = com_levels_tree[level_name]["roll"]["d"].as<double>();
+
+    p_yaw_balance_ = com_levels_tree[level_name]["yaw"]["p"].as<double>();
+    d_yaw_balance_ = com_levels_tree[level_name]["yaw"]["d"].as<double>();
+    return true;
+  }
+}
+
+
 
 }  // namespace gazebo
