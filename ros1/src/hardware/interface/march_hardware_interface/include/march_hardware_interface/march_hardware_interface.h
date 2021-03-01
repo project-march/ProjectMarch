@@ -21,7 +21,7 @@
 #include <march_hardware/march_robot.h>
 #include <march_hardware_builder/hardware_builder.h>
 #include <march_shared_msgs/AfterLimitJointCommand.h>
-#include <march_shared_msgs/ImcState.h>
+#include <march_shared_msgs/MotorControllerState.h>
 #include <march_shared_msgs/PressureSolesData.h>
 
 template <typename T>
@@ -85,7 +85,7 @@ private:
   void updateHighVoltageEnable();
   void updatePowerDistributionBoard();
   void updateAfterLimitJointCommand();
-  void updateIMotionCubeState();
+  void updateMotorControllerState();
   void updatePressureSoleData();
   void outsideLimitsCheck(size_t joint_index);
   bool MotorControllerStateCheck(size_t joint_index);
@@ -138,7 +138,7 @@ private:
 
   /* Real time safe publishers */
   RtPublisherPtr<march_shared_msgs::AfterLimitJointCommand> after_limit_joint_command_pub_;
-  RtPublisherPtr<march_shared_msgs::ImcState> imc_state_pub_;
+  RtPublisherPtr<march_shared_msgs::MotorControllerState> motor_controller_state_pub_;
   RtPublisherPtr<march_shared_msgs::PressureSolesData> pressure_sole_data_pub_;
 };
 

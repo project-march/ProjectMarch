@@ -231,7 +231,7 @@ void MarchHardwareInterface::read(const ros::Time& /* time */, const ros::Durati
     joint_effort_[i] = joint.getMotorController()->getTorque();
   }
 
-  this->updateIMotionCubeState();
+  this->updateMotorControllerState();
 
   if (march_robot_->hasPressureSoles())
   {
