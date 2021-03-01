@@ -27,7 +27,7 @@ class Preprocessor {
 
     // Grabs a parameter from a YAML::Node and throws a clear warning if the requested parameter does not exist
     template<class T>
-    void grabParameter(YAML::Node const yaml_node, std::string parameter_name, T& parameter);
+    void grabParameter(YAML::Node const yaml_node, std::string const parameter_name, T& parameter);
 
     PointCloud::Ptr pointcloud_;
     Normals::Ptr pointcloud_normals_;

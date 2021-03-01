@@ -66,7 +66,7 @@ void Preprocessor::removePointByIndex(int const index, PointCloud::Ptr pointclou
 
 // Grabs a parameter from a YAML::Node and throws a clear warning if the requested parameter does not exist
 template <class T>
-void Preprocessor::grabParameter(YAML::Node const yaml_node, std::string parameter_name, T& parameter)
+void Preprocessor::grabParameter(YAML::Node const yaml_node, std::string const parameter_name, T& parameter)
 {
   if (YAML::Node raw_parameter = yaml_node[parameter_name])
   {
