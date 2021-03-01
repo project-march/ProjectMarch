@@ -105,6 +105,19 @@ public:
     }
   }
 
+  bool operator==(Value v) const
+  {
+    return value_ == v;
+  }
+  bool operator==(IMCStateOfOperation a) const
+  {
+    return value_ == a.value_;
+  }
+  bool operator!=(IMCStateOfOperation a) const
+  {
+    return value_ != a.value_;
+  }
+
   Value value_;
 };
 class IMotionCubeState : public MotorControllerState

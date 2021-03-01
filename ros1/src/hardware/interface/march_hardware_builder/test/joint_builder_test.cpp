@@ -95,15 +95,6 @@ TEST_F(JointBuilderTest, NoActuate)
                MissingKeyException);
 }
 
-//TEST_F(JointBuilderTest, NoIMotionCube)
-//{
-//  YAML::Node config = this->loadTestYaml("/joint_no_imotioncube.yaml");
-//  march::Joint joint = HardwareBuilder::createJoint(config, "test_joint_no_imotioncube", this->joint,
-//                                                    this->pdo_interface, this->sdo_interface);
-//
-//  ASSERT_FALSE(joint.hasMotorController());
-//}
-
 TEST_F(JointBuilderTest, NoTemperatureGES)
 {
   YAML::Node config = this->loadTestYaml("/joint_no_temperature_ges.yaml");

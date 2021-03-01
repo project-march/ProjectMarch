@@ -78,6 +78,11 @@ public:
               << "actuationMode" << motor_controller.actuation_mode_.toString();
   }
 
+  // Watchdog base time = 1 / 25 MHz * (2498 + 2) = 0.0001 seconds=100 µs
+  static const uint16_t WATCHDOG_DIVIDER = 2498;
+  // 500 * 100us = 50 ms = watchdog timer
+  static const uint16_t WATCHDOG_TIME = 500;
+
 protected:
   // Getters for absolute and incremental position and velocity.
   // These will throw an error where the encoder is not available.
