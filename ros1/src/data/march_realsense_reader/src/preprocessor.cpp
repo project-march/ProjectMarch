@@ -225,9 +225,19 @@ void NormalsPreprocessor::fillNormalCloud()
   }
 
   bool use_tree_search_method;
+  int number_of_neighbours;
+  double search_radius;
   if (YAML::Node normal_estimation_parameters = config_tree_["normal_estimation"])
   {
     grabParameter(normal_estimation_parameters, "use_tree_search_method", use_tree_search_method);
+    if (use_tree_search_method)
+    {
+      grabParameter(normal_estimation_parameters, "number_of_neighbours", number_of_neighbours);
+    }
+    else
+    {
+      grabParameter(normal_estimation_parameters, "search_radius", search_radius);
+    }
   }
   else
   {
@@ -240,18 +250,12 @@ void NormalsPreprocessor::fillNormalCloud()
 
   if (use_tree_search_method)
   {
-    int number_of_neighbours;
-    grabParameter(normal_estimation_parameters, "number_of_neighbours", number_of_neighbours);
-
     pcl::search::Search<pcl::PointXYZ>::Ptr search_method (new pcl::search::KdTree <pcl::PointXYZ>);
     normal_estimator.setSearchMethod(search_method);
     normal_estimator.setKSearch(number_of_neighbours);
   }
   else
   {
-    double search_radius;
-    grabParameter(normal_estimation_parameters, "search_radius", search_radius);
-
     normal_estimator.setRadiusSearch(search_radius);
   }
   normal_estimator.compute(*pointcloud_normals_);
