@@ -61,7 +61,7 @@ bool RealSenseReader::read_pointcloud_callback(std_srvs::Trigger::Request &req,
 }
 
 // Publishes the pointcloud on a topic for visualisation in rviz or furter use
-void publishPreprocessedPointCloud(PointCloud::Ptr pointcloud)
+void RealSenseReader::publishPreprocessedPointCloud(PointCloud::Ptr pointcloud)
 {
   ROS_INFO_STREAM("Publishing a preprocessed cloud with size: " << pointcloud->points.size());
 
