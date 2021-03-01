@@ -78,7 +78,6 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
                    const joint_trajectory_controller::State& state_error)
 {
 
-  this->future_states
   // Preconditions
   if (!joint_handles_ptr_)
   {
