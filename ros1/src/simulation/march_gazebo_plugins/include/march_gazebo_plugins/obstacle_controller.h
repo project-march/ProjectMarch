@@ -4,6 +4,7 @@
 
 #include <march_shared_msgs/CurrentGait.h>
 #include <gazebo/physics/physics.hh>
+#include "yaml-cpp/yaml.h"
 
 namespace gazebo
 {
@@ -19,6 +20,9 @@ public:
   void getSitGoalPositionX(double time_since_start, double stable_foot_pose_x);
   void getStandGoalPositionX(double time_since_start, double stable_foot_pose_x);
   void getWalkGoalPositionX(double time_since_start, double stable_foot_pose_x);
+  bool changeComLevel(std::string);
+
+  std::vector<std::string> com_levels;
 
 protected:
   physics::ModelPtr model_;
@@ -42,18 +46,18 @@ protected:
 
   double p_yaw_;
   double d_yaw_;
-  double p_yaw_off_;
-  double d_yaw_off_;
+  double p_yaw_balance_;
+  double d_yaw_balance_;
 
   double p_pitch_;
   double d_pitch_;
-  double p_pitch_off_;
-  double d_pitch_off_;
+  double p_pitch_balance_;
+  double d_pitch_balance_;
 
   double p_roll_;
   double d_roll_;
-  double p_roll_off_;
-  double d_roll_off_;
+  double p_roll_balance_;
+  double d_roll_balance_;
 
   double error_x_last_timestep_;
   double error_y_last_timestep_;
@@ -61,6 +65,8 @@ protected:
 
   double goal_position_x;
   double goal_position_y;
+
+  YAML::Node com_levels_tree;
 };
 }  // namespace gazebo
 

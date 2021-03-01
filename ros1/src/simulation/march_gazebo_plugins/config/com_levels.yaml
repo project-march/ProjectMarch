@@ -1,0 +1,40 @@
+off:
+  pitch:
+    p: 0
+    d: 0
+  roll:
+    p: 0
+    d: 0
+  yaw:
+    p: 0
+    d: 0
+weak:
+  pitch:
+    p: 100
+    d: 0
+  roll:
+    p: 100
+    d: 0
+  yaw:
+    p: 100
+    d: 1000
+medium:
+  pitch:
+    p: 150
+    d: 0
+  roll:
+    p: 150
+    d: 0
+  yaw:
+    p: 500
+    d: 3000
+default:
+  pitch:
+    p: 220
+    d: 70000
+  roll:
+    p: 250
+    d: 70000
+  yaw:
+    p: 1500
+    d: 70000
