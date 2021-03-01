@@ -32,6 +32,7 @@ add_message_files(
 add_service_files(
     FILES
     CapturePointPose.srv
+    ChangeComLevel.srv
     ContainsGait.srv
     GetMoveItTrajectory.srv
     GetParamBool.srv
@@ -39,6 +40,7 @@ add_service_files(
     GetParamInt.srv
     GetParamString.srv
     GetParamStringList.srv
+    GetPossibleComLevels.srv
     PossibleGaits.srv
     SetGaitVersion.srv
     SetObstacleSizeRampLike.srv

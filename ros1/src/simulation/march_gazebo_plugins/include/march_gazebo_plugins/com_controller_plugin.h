@@ -6,6 +6,8 @@
 #include <gazebo/physics/physics.hh>
 #include <ros/callback_queue.h>
 #include <ros/ros.h>
+#include "march_shared_msgs/GetPossibleComLevels.h"
+#include "march_shared_msgs/ChangeComLevel.h"
 
 #ifndef MARCH_GAZEBO_PLUGINS_COM_CONTROLLER_PLUGIN_H
 #define MARCH_GAZEBO_PLUGINS_COM_CONTROLLER_PLUGIN_H
@@ -17,8 +19,13 @@ class ComControllerPlugin : public ModelPlugin
 public:
   void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/) override;
   void onRosMsg(const march_shared_msgs::CurrentGaitConstPtr& msg);
+  bool onChangeComLevel(march_shared_msgs::ChangeComLevel::Request& req,
+                        march_shared_msgs::ChangeComLevel::Response& res);
+  bool onGetPossibleComLevels(march_shared_msgs::GetPossibleComLevels::Request& req,
+                              march_shared_msgs::GetPossibleComLevels::Response& res);
 
-  // Called by the world update start event
+
+    // Called by the world update start event
   void onUpdate();
 
 private:
@@ -42,6 +49,10 @@ private:
 
   /// \brief A thread the keeps running the ros_queue
   std::thread ros_queue_thread_;
+
+  /// \brief A service used for sharing the available com_levels
+  ros::ServiceServer get_possible_com_levels_service_;
+  ros::ServiceServer change_com_level_service_;
 };
 
 // Register this plugin with the simulator
