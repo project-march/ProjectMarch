@@ -166,6 +166,7 @@ void NormalsPreprocessor::filterOnDistanceFromOrigin()
 void NormalsPreprocessor::fillNormalCloud()
 {
   auto parameters = config_tree_["normal_estimation"];
+  bool use_tree_search_method = parameters["use_tree_search_method"].as<bool>();
 
   auto transformation_parameters = config_tree_["transformation"];
   double translation_x = transformation_parameters["translation_x"].as<double>();
@@ -178,7 +179,6 @@ void NormalsPreprocessor::fillNormalCloud()
 
   if (use_tree_search_method)
   {
-    bool use_tree_search_method = parameters["use_tree_search_method"].as<bool>();
     int number_of_neighbours = parameters["number_of_neighbours"].as<int>();
     pcl::search::Search<pcl::PointXYZ>::Ptr search_method (new pcl::search::KdTree <pcl::PointXYZ>);
     normal_estimator.setSearchMethod(search_method);
