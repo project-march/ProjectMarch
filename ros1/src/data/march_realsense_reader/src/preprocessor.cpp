@@ -67,10 +67,10 @@ void Preprocessor::removePointByIndex(int const index, PointCloud::Ptr pointclou
 
 void NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals)
 {
-  ROS_INFO_STREAM("Preprocessing with normal filtering. Pointcloud size: " << pointcloud_->points.size());
+  *pointcloud_ = *pointcloud;
+  *pointcloud_normals_ = *pointcloud_normals;
 
-  pointcloud_ = pointcloud;
-  pointcloud_normals_ = pointcloud_normals;
+  ROS_INFO_STREAM("Preprocessing with normal filtering. Pointcloud size: " << pointcloud_->points.size());
 
   bool do_statistical_outlier_removal;
   if (YAML::Node statistical_outlier_filter_parameters = config_tree_["statistical_outlier_filter"])
