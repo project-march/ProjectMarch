@@ -17,15 +17,16 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 
 // Base constructor for preprocessors
-Preprocessor::Preprocessor(YAML::Node config_tree):
-                           config_tree_{config_tree}
+Preprocessor::Preprocessor(YAML::Node config_tree, bool debugging):
+                           config_tree_{config_tree},
+                           debugging_{debugging}
 {
 
 }
 
 // Create a simple preprocessor with the ability to look up transforms
-SimplePreprocessor::SimplePreprocessor(YAML::Node config_tree):
-    Preprocessor(config_tree)
+SimplePreprocessor::SimplePreprocessor(YAML::Node config_tree, bool debugging):
+    Preprocessor(config_tree, debugging)
 {
   tfBuffer = std::make_unique<tf2_ros::Buffer>();
   tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
@@ -64,7 +65,8 @@ void Preprocessor::removePointByIndex(int const index, PointCloud::Ptr pointclou
   }
 }
 
-void NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals)
+bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud, Normals::Ptr
+pointcloud_normals)
 {
   pointcloud_ = pointcloud;
   pointcloud_normals_ = pointcloud_normals;
@@ -94,6 +96,7 @@ void NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud, Normals::Ptr po
   }
 
   ROS_INFO_STREAM("Finished preprocessing. Pointcloud size: " << pointcloud_->points.size());
+  return true;
 }
 
 // Downsample the number of points in the pointcloud to have a more workable number of points
@@ -291,8 +294,8 @@ void NormalsPreprocessor::filterOnNormalOrientation()
 }
 
 // Preprocess the pointcloud, this means only transforming for the simple preprocessor
-void SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud,
-                                    Normals::Ptr pointcloud_normals)
+bool SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud,
+                                    Normals::Ptr normal_pointcloud)
 {
   pointcloud_ = pointcloud;
   pointcloud_normals_ = pointcloud_normals;
@@ -303,6 +306,7 @@ void SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud,
   ROS_INFO_STREAM("Preprocessing with simple preprocessor. Test parameter is " << test_parameter);
 
   transformPointCloudFromUrdf();
+  return true;
 }
 
 // Transform the pointcloud based on the data found on the /tf topic, this is

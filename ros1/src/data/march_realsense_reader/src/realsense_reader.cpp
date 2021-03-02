@@ -3,32 +3,32 @@
 #include <pcl/point_types.h>
 #include <ros/ros.h>
 #include <pcl_conversions/pcl_conversions.h>
-#include <std_srvs/Trigger.h>
+#include <march_shared_msgs/GetGaitParameters.h>
 #include <pointcloud_processor/preprocessor.h>
 #include <pointcloud_processor/region_creator.h>
+#include <pointcloud_processor/parameter_determiner.h>
+#include <pointcloud_processor/plane_finder.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using RegionsVector = std::vector<pcl::PointIndices>;
+using PlaneParameters = std::vector<pcl::ModelCoefficients::Ptr>;
+using HullsVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
+
+std::string POINTCLOUD_TOPIC = "/camera/depth/color/points";
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n):
-    n_(n),
-    reading_(false)
+    n_(n)
 {
   pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>
-      ("/camera/depth/color/points", 1,
+      (POINTCLOUD_TOPIC, 1,
        &RealSenseReader::pointcloud_callback, this);
   read_pointcloud_service_ = n_->advertiseService
-      ("/camera/read_pointcloud",
-       &RealSenseReader::read_pointcloud_callback,
+      ("/camera/process_pointcloud",
+       &RealSenseReader::process_pointcloud_callback,
        this);
 
   config_tree_ = readConfig("pointcloud_parameters.yaml");
-
-  preprocessor_ = std::make_unique<NormalsPreprocessor>(
-      getConfigIfPresent("preprocessor"));
-  region_creator_ = std::make_unique<SimpleRegionCreator>(
-      getConfigIfPresent("region_creator"));
 
   if (config_tree_["debug"])
   {
@@ -39,8 +39,21 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
     debugging_ = false;
   }
 
+  preprocessor_ = std::make_unique<NormalsPreprocessor>(
+      getConfigIfPresent("preprocessor"), debugging_);
+  region_creator_ = std::make_unique<SimpleRegionCreator>(
+      getConfigIfPresent("region_creator"), debugging_);
+  plane_finder_ = std::make_unique<SimplePlaneFinder>(
+      getConfigIfPresent("plane_finder"), debugging_);
+  parameter_determiner_ = std::make_unique<SimpleParameterDeterminer>(
+      getConfigIfPresent("parameter_determiner"), debugging_);
+
+
   if (debugging_)
   {
+    ROS_INFO("Realsense reader started with debugging, all intermediate result "
+             "steps will be published and more information given in console, but"
+             " this might slow the process, this can be turned off in the yaml.");
     preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>
         ("/camera/preprocessed_cloud", 1);
   }
@@ -76,49 +89,54 @@ YAML::Node RealSenseReader::getConfigIfPresent(std::string key)
   }
 }
 
-
-// When `reading_` is true, this method executes the logic to process a pointcloud
-// on the next pointcloud the camera publishes. When `reading_` is false, this does nothing.
-void RealSenseReader::pointcloud_callback(const sensor_msgs::PointCloud2 input_cloud)
+// This method executes the logic to process a pointcloud
+bool RealSenseReader::process_pointcloud(
+    PointCloud::Ptr pointcloud,
+    int selected_gait, march_shared_msgs::GetGaitParameters::Response &res)
 {
-  if (reading_)
+  Normals::Ptr normals = boost::make_shared<Normals>();
+
+  // Preprocess
+  bool preprocessing_was_successful = preprocessor_->preprocess(pointcloud, normals);
+  if (not preprocessing_was_successful)
   {
-    // All logic to execute with a pointcloud will be executed here.
-    ROS_INFO_STREAM("Processing point cloud at time " << input_cloud.header.stamp);
-
-    reading_ = false;
-
-    PointCloud converted_cloud;
-    pcl::fromROSMsg(input_cloud, converted_cloud);
-    PointCloud::Ptr pointcloud = boost::make_shared<PointCloud>(converted_cloud);
-    Normals::Ptr normals = boost::make_shared<Normals>();
-
-    // Preprocess
-    preprocessor_->preprocess(pointcloud, normals);
-
-    if (debugging_)
-    {
-      publishPreprocessedPointCloud(pointcloud);
-    }
-
-    // Create regions
-    boost::shared_ptr<RegionsVector> regions_vector =
-        boost::make_shared<RegionsVector>();
-    region_creator_->create_regions(pointcloud, normals, regions_vector);
-
+    res.error_message = "Preprocessing was unsuccessful, see debug output "
+                        "for more information";
+    return false;
   }
-}
+  if (debugging_)
+  {
+    ROS_INFO("Done preprocessing, see /camera/preprocessed_cloud for results");
+    publishPreprocessedPointCloud(pointcloud);
+  }
 
-// Sets the `reading_` variable to true so pointcloud_callback executes its logic
-bool RealSenseReader::read_pointcloud_callback(std_srvs::Trigger::Request &req,
-                                               std_srvs::Trigger::Response &res)
-{
-  reading_ = true;
+  // Create regions
+  boost::shared_ptr<RegionsVector> regions_vector =
+      boost::make_shared<RegionsVector>();
+  bool region_creating_was_successful =
+      region_creator_->create_regions(pointcloud, normals, regions_vector);
+  if (not region_creating_was_successful)
+  {
+    res.error_message = "Region creating was unsuccessful, see debug output "
+                        "for more information";
+    return false;
+  }
+  if (debugging_)
+  {
+    ROS_INFO("Done creating regions");
+    //TODO: Add publisher to visualize created regions
+  }
+
+  // Find planes
+  boost::shared_ptr<PlaneParameters> plane_parameters =
+      boost::make_shared<PlaneParameters>();
+  boost::shared_ptr<HullsVector> hulls = boost::make_shared<HullsVector>();
+
   res.success = true;
   return true;
 }
 
-// Publishes the pointcloud on a topic for visualisation in rviz or furter use
+// Publishes the pointcloud on a topic for visualisation in rviz or further use
 void RealSenseReader::publishPreprocessedPointCloud(PointCloud::Ptr pointcloud)
 {
   ROS_INFO_STREAM("Publishing a preprocessed cloud with size: " << pointcloud->points.size());
@@ -132,3 +150,26 @@ void RealSenseReader::publishPreprocessedPointCloud(PointCloud::Ptr pointcloud)
   preprocessed_pointcloud_publisher_.publish(msg);
 }
 
+// The callback for the service that was starts processing the point cloud and gives
+// back parameters for a gait
+bool RealSenseReader::process_pointcloud_callback(
+    march_shared_msgs::GetGaitParameters::Request &req,
+    march_shared_msgs::GetGaitParameters::Response &res)
+{
+  boost::shared_ptr<const sensor_msgs::PointCloud2> input_cloud =
+      ros::topic::waitForMessage<sensor_msgs::PointCloud2>
+      (POINTCLOUD_TOPIC, *n_, ros::Duration(1.0));
+
+  if (input_cloud == nullptr)
+  {
+    res.error_message = "No pointcloud published within 1 second, so "
+                        "no processing could be done";
+    return false;
+  }
+
+  PointCloud converted_cloud;
+  pcl::fromROSMsg(*input_cloud, converted_cloud);
+  PointCloud::Ptr point_cloud = boost::make_shared<PointCloud>(converted_cloud);
+
+  return process_pointcloud(point_cloud, req.selected_gait, res);
+}

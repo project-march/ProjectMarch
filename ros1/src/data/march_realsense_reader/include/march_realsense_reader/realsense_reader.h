@@ -6,28 +6,47 @@
 #include <pcl_ros/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
-#include <std_srvs/Trigger.h>
-
 #include <sensor_msgs/PointCloud2.h>
+#include <march_shared_msgs/GetGaitParameters.h>
 #include "yaml-cpp/yaml.h"
 #include <pointcloud_processor/preprocessor.h>
 #include <pointcloud_processor/region_creator.h>
+#include <pointcloud_processor/plane_finder.h>
+#include <pointcloud_processor/parameter_determiner.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
 class RealSenseReader
 {
 public:
+    // Setup realsense reader with given node handle.
     RealSenseReader(ros::NodeHandle* n);
 
-    // When `reading_` is true, this method executes the logic to process a pointcloud
-    // on the next pointcloud the camera publishes. When `reading_` is false, this does nothing.
-    void pointcloud_callback(const sensor_msgs::PointCloud2 input_cloud);
+    /** Takes the pointcloud and transform that into
+     * gait parameters, these parameters are put into the response,
+     * returns whether the processing was successful.
+     */
+    bool process_pointcloud(PointCloud::Ptr input_cloud,
+                            int selected_gait,
+                            march_shared_msgs::GetGaitParameters::Response &res);
 
-    // Sets the `reading_` variable to true so pointcloud_callback executes its logic
-    bool read_pointcloud_callback(std_srvs::Trigger::Request &req,
-                                  std_srvs::Trigger::Response &res);
+    /** A callback that starts the entire pointcloud processing when the
+     * /camera/read_pointcloud service is called.
+     */
+    bool process_pointcloud_callback(march_shared_msgs::GetGaitParameters::Request &req,
+                                  march_shared_msgs::GetGaitParameters::Response &res);
+
+    /** Pointcloud callback, empty since we are not processing all pointclouds, this
+     * gives a speedup when you need a single pointcloud.
+     */
+    void pointcloud_callback(const sensor_msgs::PointCloud2 pointCloud2) {};
+
+    /** Read in the config file, the string is the name of the file, which should be
+     * in the config directory. Returns a YAML::Node with the configurations.
+     */
     YAML::Node readConfig(std::string config_file);
+
+    // Get a config key from the root of the file, returns empty if key is missing.
     YAML::Node getConfigIfPresent(std::string key);
 
     // Publishes the pointcloud on a topic for visualisation in rviz or furter use
@@ -41,7 +60,8 @@ private:
     ros::Publisher preprocessed_pointcloud_publisher_;
     std::unique_ptr<NormalsPreprocessor> preprocessor_;
     std::unique_ptr<SimpleRegionCreator> region_creator_;
-    bool reading_;
+    std::unique_ptr<SimplePlaneFinder> plane_finder_;
+    std::unique_ptr<SimpleParameterDeterminer> parameter_determiner_;
     bool debugging_;
     std::string config_file_;
     ros::Publisher pointcloud_publisher_;

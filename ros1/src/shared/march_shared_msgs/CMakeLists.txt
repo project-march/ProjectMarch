@@ -34,6 +34,7 @@ add_service_files(
     CapturePointPose.srv
     ChangeComLevel.srv
     ContainsGait.srv
+    GetGaitParameters.srv
     GetMoveItTrajectory.srv
     GetParamBool.srv
     GetParamFloat.srv

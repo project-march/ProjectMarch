@@ -14,9 +14,9 @@ using RegionsVector = std::vector<pcl::PointIndices>;
 class RegionCreator
 {
   public:
-    RegionCreator(YAML::Node config_tree);
+    RegionCreator(YAML::Node config_tree, bool debugging);
     // This function is required to be implemented by any region creator
-    virtual void create_regions(PointCloud::Ptr pointcloud,
+    virtual bool create_regions(PointCloud::Ptr pointcloud,
                                 Normals::Ptr normal_pointcloud,
                                 boost::shared_ptr<RegionsVector> regions_vector)=0;
     virtual ~RegionCreator() {};
@@ -26,6 +26,7 @@ class RegionCreator
     Normals::Ptr normal_pointcloud_;
     boost::shared_ptr<RegionsVector> regions_vector_;
     YAML::Node config_tree_;
+    bool debugging_;
 };
 
 class SimpleRegionCreator : RegionCreator
@@ -35,7 +36,7 @@ class SimpleRegionCreator : RegionCreator
     using RegionCreator::RegionCreator;
     /** This function should take in a pointcloud with matching normals and cluster them
     in regions, based on the parameters in the YAML node given at construction. **/
-    void create_regions(PointCloud::Ptr pointcloud,
+    bool create_regions(PointCloud::Ptr pointcloud,
                         Normals::Ptr normal_pointcloud,
                         boost::shared_ptr<RegionsVector> regions_vector) override;
 };
