@@ -60,6 +60,7 @@ public:
   void preprocess(PointCloud::Ptr pointcloud,
                   Normals::Ptr pointcloud_normals) override;
 
+protected:
   // Removes points from the pointcloud such that there is only one point left in a certain area
   // (specified in the parameter file)
   void downsample();

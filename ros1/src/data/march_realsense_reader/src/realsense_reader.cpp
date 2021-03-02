@@ -41,7 +41,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
 
   if (debugging_)
   {
-    preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>
+    preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud2>
         ("/camera/preprocessed_cloud", 1);
   }
 }

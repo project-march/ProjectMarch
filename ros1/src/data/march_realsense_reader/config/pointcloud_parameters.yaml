@@ -30,3 +30,4 @@ preprocessor:
     allowed_length_z: 1.0 # 1.0 is max length of a normal vector
 
 debug: true
+
