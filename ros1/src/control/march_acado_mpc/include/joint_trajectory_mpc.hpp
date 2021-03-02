@@ -24,6 +24,9 @@
 #include <memory>
 #include <time.h>
 
+#include <chrono>
+#include <ctime>
+
 // Create a State alias
 namespace joint_trajectory_controller
 {
@@ -80,7 +83,11 @@ private:
   vector<double> state;
 
   std::unique_ptr<realtime_tools::RealtimePublisher<std_msgs::Float64MultiArray>> command_pub_;
-    std::unique_ptr<realtime_tools::RealtimePublisher<std_msgs::Float64>> ref_pub_;
+  std::unique_ptr<realtime_tools::RealtimePublisher<std_msgs::Float64>> ref_pub_;
+
+  clock_t previous_time = clock();
+  clock_t current_time = clock();
+  double elapsed_seconds;
 };
 
 // Assign an alias to the class definition

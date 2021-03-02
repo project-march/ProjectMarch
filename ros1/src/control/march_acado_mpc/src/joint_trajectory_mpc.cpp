@@ -6,6 +6,9 @@
 #include <string>
 #include <vector>
 
+#include <chrono>
+#include <ctime>
+
 bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
 {
   joint_handles_ptr_ = &joint_handles;
@@ -110,7 +113,13 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
       }
       ref_pub_->msg_.data = model_predictive_controllers_[0].pos_ref;
 
-    std::cout << "Update time (s):" << period << std::endl;
+    current_time = clock();
+    elapsed_seconds = double(current_time-previous_time) / double(CLOCKS_PER_SEC);
+
+    std::cout << "Update time (s):" << elapsed_seconds << setprecision(5) << std::endl;
+
+    previous_time = current_time;
+
   }
 
   command_pub_->unlockAndPublish();
