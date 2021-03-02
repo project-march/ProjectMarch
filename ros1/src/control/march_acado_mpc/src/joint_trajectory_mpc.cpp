@@ -115,10 +115,13 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
 
     current_time = clock();
     elapsed_seconds = double(current_time-previous_time) / double(CLOCKS_PER_SEC);
-
-    std::cout << "Update time (s):" << elapsed_seconds << setprecision(5) << std::endl;
-
+    total_seconds = total_seconds + elapsed_seconds;
+    mean_seconds = total_seconds/iter;
+    std::cout << "Update time (s): " << elapsed_seconds << setprecision(5) << std::endl;
+    std::cout << "Mean time (s): " << mean_seconds << setprecision(5) << std::endl;
     previous_time = current_time;
+
+    iter = iter + 1.0;
 
   }
 

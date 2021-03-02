@@ -27,17 +27,17 @@ void ModelPredictiveController::init()
   acado_initializeSolver();
 
   // Prepare a consistent initial guess
-  for (int i = 0; i < ACADO_N + 1; i++)
+  for (int i = 0; i <= ACADO_N + 1; i++)
   {
     acadoVariables.x[i * ACADO_NX + 0] = 0;  // theta
     acadoVariables.x[i * ACADO_NX + 1] = 0;  // dtheta
   }
 
   // Fill reference vector with sinus and or step signals
-  sinRef(reference, 0.1, 0.261791667, ACADO_N, 0.02);  // freq, amp, horizon, sampling time   [10s]
-  sinRef(reference, 0.125, 0.261791667, ACADO_N, 0.02);  // freq, amp, horizon, sampling time [08s]
-  sinRef(reference, 0.16, 0.261791667, ACADO_N, 0.02);  // freq, amp, horizon, sampling time  [06s]
-  //  stepRef(reference, 0.3, 2*ACADO_N);
+//  sinRef(reference, 0.1, 0.261791667, ACADO_N, 0.02);  // freq, amp, horizon, sampling time   [10s]
+//  sinRef(reference, 0.125, 0.261791667, ACADO_N, 0.02);  // freq, amp, horizon, sampling time [08s]
+//  sinRef(reference, 0.16, 0.261791667, ACADO_N, 0.02);  // freq, amp, horizon, sampling time  [06s]
+    stepRef(reference, 0.0, 2*ACADO_N);
 
   // hold last N reference values
 //  repeat_reference = false;

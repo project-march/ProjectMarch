@@ -88,6 +88,9 @@ private:
   clock_t previous_time = clock();
   clock_t current_time = clock();
   double elapsed_seconds;
+  double total_seconds = 0.0;
+  double mean_seconds = 0.0;
+  double iter = 1.0;
 };
 
 // Assign an alias to the class definition
