@@ -23,10 +23,6 @@ class Preprocessor {
     // Removes a point from a pointcloud (and optionally the corresponding pointcloud_normals as well) at a given index
     void removePointByIndex(int const index, PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals = nullptr);
 
-    // Grabs a parameter from a YAML::Node and throws a clear warning if the requested parameter does not exist
-    template<class T>
-    void grabParameter(YAML::Node const yaml_node, std::string const parameter_name, T& parameter);
-
     PointCloud::Ptr pointcloud_;
     Normals::Ptr pointcloud_normals_;
     YAML::Node config_tree_;
@@ -79,6 +75,9 @@ public:
 
   // Removes all points which do not roughly have a normal in a certain direction (specified in the parameter file)
   void filterOnNormalOrientation();
+
+  // Remove statistical outliers from the pointcloud to reduce noise
+  void removeStatisticalOutliers();
 };
 
 #endif //MARCH_PREPROCESSOR_H

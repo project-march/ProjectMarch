@@ -5,6 +5,7 @@ preprocessor:
     leaf_size: 0.05
 
   statistical_outlier_filter:
+    do_statistical_outlier_removal: false
     sd_factor: 2.0
     number_of_neighbours: 10
 

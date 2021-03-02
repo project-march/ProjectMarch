@@ -1,4 +1,5 @@
 #include <pointcloud_processor/preprocessor.h>
+#include <yaml_utilities.h>
 
 #include "yaml-cpp/yaml.h"
 #include <ros/ros.h>
@@ -64,20 +65,6 @@ void Preprocessor::removePointByIndex(int const index, PointCloud::Ptr pointclou
   }
 }
 
-// Grabs a parameter from a YAML::Node and throws a clear warning if the requested parameter does not exist
-template <class T>
-void Preprocessor::grabParameter(YAML::Node const yaml_node, std::string const parameter_name, T& parameter)
-{
-  if (YAML::Node raw_parameter = yaml_node[parameter_name])
-  {
-    parameter = raw_parameter.as<T>();
-  }
-  else
-  {
-    ROS_ERROR_STREAM("parameter not found in the given YAML::node. Parameter name is " << parameter_name);
-  }
-}
-
 void NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals)
 {
   ROS_INFO_STREAM("Preprocessing with normal filtering. Pointcloud size: " << pointcloud_->points.size());
@@ -88,7 +75,7 @@ void NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud, Normals::Ptr po
   bool do_statistical_outlier_removal;
   if (YAML::Node statistical_outlier_filter_parameters = config_tree_["statistical_outlier_filter"])
   {
-    grabParameter(config_t, statistical_outlier_filter_parameters,
+    grabParameter(statistical_outlier_filter_parameters, "do_statistical_outlier_removal",
                   do_statistical_outlier_removal);
   }
 
@@ -129,23 +116,23 @@ void NormalsPreprocessor::downsample()
   voxel_grid.filter(*pointcloud_);
 }
 
-//Remove statistical outliers from the pointcloud to reduce noise
-//void NormalsPreprocessor::removeStatisticalOutliers()
-//{
-//  int number_of_neighbours;
-//  double sd_factor;
-//  if (YAML::Node statistical_outlier_removal_parameters = config_tree_["statistical_outlier_removal"])
-//  {
-//    grabParameter(statistical_outlier_removal_parameters, "number_of_neighbours", number_of_neighbours);
-//    grabParameter(statistical_outlier_removal_parameters, "sd_factor", sd_factor);
-//  }
-//
-//  pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
-//  sor.setInputCloud(pointcloud_);
-//  sor.setMeanK(number_of_neighbours);
-//  sor.setStddevMulThresh(sd_factor);
-//  sor.filter(*pointcloud_);
-//}
+// Remove statistical outliers from the pointcloud to reduce noise
+void NormalsPreprocessor::removeStatisticalOutliers()
+{
+  int number_of_neighbours;
+  double sd_factor;
+  if (YAML::Node statistical_outlier_removal_parameters = config_tree_["statistical_outlier_removal"])
+  {
+    grabParameter(statistical_outlier_removal_parameters, "number_of_neighbours", number_of_neighbours);
+    grabParameter(statistical_outlier_removal_parameters, "sd_factor", sd_factor);
+  }
+
+  pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
+  sor.setInputCloud(pointcloud_);
+  sor.setMeanK(number_of_neighbours);
+  sor.setStddevMulThresh(sd_factor);
+  sor.filter(*pointcloud_);
+}
 
 
 // Translate and rotate the pointcloud so that the origin is at the foot
