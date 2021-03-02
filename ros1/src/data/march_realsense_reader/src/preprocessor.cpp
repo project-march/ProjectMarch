@@ -7,50 +7,48 @@
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 
-Preprocessor::Preprocessor(YAML::Node config_tree,
-                           PointCloud::Ptr pointcloud,
-                           Normals::Ptr normal_pointcloud):
-                           config_tree_{config_tree},
-                           pointcloud_{pointcloud},
-                           normal_pointcloud_{normal_pointcloud}
+// Base constructor for preprocessors
+Preprocessor::Preprocessor(YAML::Node config_tree):
+                           config_tree_{config_tree}
 {
 
 }
 
-Preprocessor::Preprocessor(
-    std::string file_name,
-    PointCloud::Ptr pointcloud,
-    Normals::Ptr normal_pointcloud):
-    pointcloud_{pointcloud},
-    normal_pointcloud_{normal_pointcloud}
+// Create a simple preprocessor with the ability to look up transforms
+SimplePreprocessor::SimplePreprocessor(YAML::Node config_tree):
+    Preprocessor(config_tree)
 {
-  std::string path = ros::package::getPath("march_realsense_reader") +
-      "/config/" + file_name;
-  config_tree_ = YAML::LoadFile(path)["preprocessor"];
+  tfBuffer = std::make_unique<tf2_ros::Buffer>();
+  tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
 }
 
-void SimplePreprocessor::preprocess() {
-  ROS_INFO_STREAM("Preprocessing, test_parameter is " <<
-  config_tree_["test_parameter"]);
+// Preprocess the pointcloud, this means only transforming for the simple preprocessor
+void SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud,
+                                    Normals::Ptr normal_pointcloud)
+{
+  pointcloud_ = pointcloud;
+  normal_pointcloud_ = normal_pointcloud;
+  ROS_INFO_STREAM("Preprocessing with simple preprocessor");
 
+  transformPointCloudFromUrdf();
 }
 
-void SimplePreprocessor::transformPointCloudFromUrdf() {
-  tf2_ros::Buffer tfBuffer;
-  tf2_ros::TransformListener tfListener(tfBuffer);
-
+// Transform the pointcloud based on the data found on the /tf topic, this is
+// necessary to know the height and distance to the wanted step from the foot.
+void SimplePreprocessor::transformPointCloudFromUrdf()
+{
   geometry_msgs::TransformStamped transformStamped;
   try
   {
-    transformStamped = tfBuffer.lookupTransform("camera_link", "foot_left",
+    transformStamped = tfBuffer->lookupTransform("camera_link", "foot_left",
                                                 ros::Time::now(), ros::Duration(0.5));
     pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_,
                                  transformStamped.transform);
   }
   catch (tf2::TransformException &ex)
   {
-    ROS_WARN_STREAM("Something went wrong when transforming the poincloud: "
-    << ex.what());
+    ROS_WARN_STREAM("Something went wrong when transforming the pointcloud: "
+                        << ex.what());
     return;
   }
 }
