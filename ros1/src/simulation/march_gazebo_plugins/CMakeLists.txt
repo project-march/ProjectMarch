@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
     roscpp
 )
 find_package(gazebo REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 include_directories(
     ${catkin_INCLUDE_DIRS}
@@ -27,7 +28,7 @@ add_library(${PROJECT_NAME}
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${catkin_INCLUDE_DIRS}/${PROJECT_NAME} ${GAZEBO_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${catkin_LIBRARIES} yaml-cpp)
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror)
 
@@ -54,6 +55,11 @@ target_compile_options(contact PRIVATE -Wall -Wextra -Werror)
 install(DIRECTORY include/contact/
     DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}/contact
 )
+
+install(DIRECTORY config
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+
 install(TARGETS contact
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

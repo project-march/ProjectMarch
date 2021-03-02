@@ -1,0 +1,89 @@
+description: Stairsdown backwards
+duration: 2750000000
+gait_type: stairs_like
+joints:
+  left_ankle:
+  - position: 0.04363323
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.04363323
+    time_from_start: 590000000
+    velocity: -0.0
+  - position: -0.26179939
+    time_from_start: 2250000000
+    velocity: -0.0
+  - position: -0.15707963
+    time_from_start: 2750000000
+    velocity: -0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 2750000000
+    velocity: -0.0
+  left_hip_fe:
+  - position: 1.22173048
+    time_from_start: 0
+    velocity: 0.08726646
+  - position: 1.36135682
+    time_from_start: 600300000
+    velocity: 0.34906585
+  - position: 0.08726646
+    time_from_start: 2750000000
+    velocity: -0.17449976
+  left_knee:
+  - position: 1.0472
+    time_from_start: 0
+    velocity: -0.0
+  - position: 1.6755
+    time_from_start: 1000000000
+    velocity: -0.0
+  - position: 0.24430072
+    time_from_start: 2750000000
+    velocity: -0.69810028
+  right_ankle:
+  - position: -0.15707963
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.04363323
+    time_from_start: 750000000
+    velocity: -0.0
+  - position: 0.04360007
+    time_from_start: 2750000000
+    velocity: -0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.06108652
+    time_from_start: 533500000
+    velocity: -0.12217305
+  - position: -0.08726646
+    time_from_start: 1174600000
+    velocity: -0.01100256
+  - position: -0.06108652
+    time_from_start: 1942700000
+    velocity: 0.12217305
+  - position: 0.0
+    time_from_start: 2750000000
+    velocity: -0.0
+  right_hip_fe:
+  - position: 0.08726646
+    time_from_start: 0
+    velocity: -0.17449976
+  - position: 1.22173048
+    time_from_start: 2750000000
+    velocity: -0.0
+  right_knee:
+  - position: 0.2443
+    time_from_start: 0
+    velocity: -0.6981
+  - position: 0.1396
+    time_from_start: 467500000
+    velocity: -0.0
+  - position: 1.0471993
+    time_from_start: 2750000000
+    velocity: -0.0
+name: left_swing
+version: MVI_stairsdown_leftswing_haa_adpf_v3

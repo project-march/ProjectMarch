@@ -27,3 +27,5 @@ preprocessor:
     allowed_length_x: 0.7
     allowed_length_y: 0.8
     allowed_length_z: 1.0 # 1.0 is max length of a normal vector
+
+debug: true

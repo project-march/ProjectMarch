@@ -3,6 +3,7 @@
 #define MARCH_GAZEBO_PLUGINS_WALK_CONTROLLER_H
 
 #include <march_gazebo_plugins/obstacle_controller.h>
+#include <ros/ros.h>
 
 namespace gazebo
 {

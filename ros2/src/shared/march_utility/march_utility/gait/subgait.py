@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import os
 import re
-from typing import List, Tuple
+from typing import List, Tuple, Set
 
 import yaml
 from march_utility.exceptions.gait_exceptions import (
@@ -395,14 +395,16 @@ class Subgait(object):
     # endregion
 
     # region Get functions
-    def get_unique_timestamps(self) -> List[Duration]:
+    def get_unique_timestamps(self, sorted_timestamps: bool = True) -> List[Duration]:
         """Get the timestamps that are unique to a setpoint."""
         timestamps = []
         for joint in self.joints:
             for setpoint in joint.setpoints:
                 timestamps.append(setpoint.time)
-
-        return sorted(set(timestamps))
+        if sorted_timestamps:
+            return sorted(set(timestamps))
+        else:
+            return set(timestamps)
 
     def get_joint(self, name: str) -> JointTrajectory:
         """Get joint object with given name or index."""
@@ -518,14 +520,11 @@ class Subgait(object):
         base_subgait: Subgait, other_subgait: Subgait
     ) -> None:
         """Check whether two subgaits are safe to be interpolated on foot location."""
-        number_of_setpoints = len(base_subgait.joints[0].setpoints)
         for base_joint, other_joint in zip(
             sorted(base_subgait.joints, key=lambda joint: joint.name),
             sorted(other_subgait.joints, key=lambda joint: joint.name),
         ):
-            JointTrajectory.check_joint_interpolation_is_safe(
-                base_joint, other_joint, number_of_setpoints
-            )
+            JointTrajectory.check_joint_interpolation_is_safe(base_joint, other_joint)
 
     @staticmethod
     def get_foot_position_interpolated_joint_trajectories(
@@ -542,16 +541,15 @@ class Subgait(object):
         :param parameter: Parameter for interpolation, between 0 and 1
         :return: A list of interpolated joint trajectories
         """
-        interpolated_joint_trajectories = []
-        # for inverse kinematics it is required that all joints have the same
-        # number of setpoints as to calculate the foot position at a certain time.
-        # The inverse kinematics also needs acces to the 'ith' setpoints of all joints
         Subgait.check_foot_position_interpolation_is_safe(base_subgait, other_subgait)
-        number_of_setpoints = len(base_subgait.joints[0].setpoints)
+        # The inverse kinematics needs access to the 'ith' setpoints of all joints
         (
             base_setpoints_to_interpolate,
             other_setpoints_to_interpolate,
-        ) = Subgait.change_order_of_joints_and_setpoints(base_subgait, other_subgait)
+        ) = Subgait.prepare_subgaits_for_inverse_kinematics(base_subgait, other_subgait)
+
+        number_of_setpoints = len(base_setpoints_to_interpolate)
+
         new_setpoints: dict = {joint.name: [] for joint in base_subgait.joints}
         # fill all joints in new_setpoints except the ankle joints using
         # the inverse kinematics
@@ -568,22 +566,23 @@ class Subgait(object):
             setpoints_to_add = FeetState.feet_state_to_setpoints(new_feet_state)
             for joint_name in JOINT_NAMES_IK:
                 new_setpoints[joint_name].append(setpoints_to_add[joint_name])
-
-        # fill the ankle joint using the angle based linear interpolation
-        for ankle_joint in ["left_ankle", "right_ankle"]:
-            for base_setpoint, other_setpoint in zip(
-                base_subgait.get_joint(ankle_joint).setpoints,
-                other_subgait.get_joint(ankle_joint).setpoints,
-            ):
+            # fill the ankle joint using the angle based linear interpolation
+            for ankle_joint in ["left_ankle", "right_ankle"]:
+                base_setpoint = base_setpoints_to_interpolate[setpoint_index][
+                    ankle_joint
+                ]
+                other_setpoint = other_setpoints_to_interpolate[setpoint_index][
+                    ankle_joint
+                ]
                 new_ankle_setpoint_to_add = Setpoint.interpolate_setpoints(
                     base_setpoint, other_setpoint, parameter
                 )
                 new_setpoints[ankle_joint].append(new_ankle_setpoint_to_add)
-
         duration = base_subgait.duration.weighted_average(
             other_subgait.duration, parameter
         )
 
+        interpolated_joint_trajectories = []
         for joint in base_subgait.joints:
             interpolated_joint_trajectory_to_add = JointTrajectory(
                 joint.name, joint.limits, new_setpoints[joint.name], duration
@@ -591,6 +590,49 @@ class Subgait(object):
             interpolated_joint_trajectories.append(interpolated_joint_trajectory_to_add)
 
         return interpolated_joint_trajectories
+
+    @staticmethod
+    def prepare_subgaits_for_inverse_kinematics(
+        base_subgait: Subgait, other_subgait: Subgait
+    ) -> Tuple[List[dict], List[dict]]:
+        """Create two lists of setpoints with equal time stamps."""
+        base_to_other_duration_ratio = other_subgait.duration / base_subgait.duration
+        base_time_stamps = base_subgait.get_unique_timestamps(sorted_timestamps=False)
+        other_time_stamps = other_subgait.get_unique_timestamps(sorted_timestamps=False)
+
+        for base_time in base_time_stamps:
+            other_time_stamps.add(round((base_time * base_to_other_duration_ratio), 4))
+
+        for other_time in other_time_stamps:
+            base_time_stamps.add(round((other_time / base_to_other_duration_ratio), 4))
+
+        base_time_stamps = sorted(base_time_stamps)
+        other_time_stamps = sorted(other_time_stamps)
+
+        base_setpoints_to_interpolate = Subgait.prepare_subgait_for_inverse_kinematics(
+            base_subgait, base_time_stamps
+        )
+        other_setpoints_to_interpolate = Subgait.prepare_subgait_for_inverse_kinematics(
+            other_subgait, other_time_stamps
+        )
+
+        return base_setpoints_to_interpolate, other_setpoints_to_interpolate
+
+    @staticmethod
+    def prepare_subgait_for_inverse_kinematics(
+        subgait: Subgait, time_stamps: Set[Duration]
+    ) -> List[dict]:
+        """Create a list of setpoints from a subgait with timestamps given by time_stamps."""
+        setpoints_to_interpolate: List[dict] = [{} for _ in time_stamps]
+
+        for setpoint_index, time in enumerate(time_stamps):
+            for joint in subgait.joints:
+                setpoint_to_add = subgait.get_joint(
+                    joint.name
+                ).get_interpolated_setpoint(time)
+                setpoints_to_interpolate[setpoint_index][joint.name] = setpoint_to_add
+
+        return setpoints_to_interpolate
 
     @staticmethod
     def get_joint_angle_interpolated_joint_trajectories(
@@ -623,39 +665,3 @@ class Subgait(object):
             interpolated_joint_trajectories.append(interpolated_joint_trajectory_to_add)
 
         return interpolated_joint_trajectories
-
-    @staticmethod
-    def change_order_of_joints_and_setpoints(
-        base_subgait: Subgait, other_subgait: Subgait
-    ) -> Tuple[List[dict], List[dict]]:
-        """Change structure of joint trajectories to see positions per time point.
-
-        This function goes over each joint to get needed setpoints
-        (all first setpoints, all second setpoints..).
-        These are placed in list with the correct index, where each entry contains a
-        dictionary with joint name setpoint pairs. Also checks whether the joint
-        trajectories are safe to interpolate.
-
-        :param base_subgait: one of the subgaits to reorder
-        :param other_subgait: the other subgait to reorder
-        :return: The interpolated trajectory
-        """
-        number_of_setpoints = len(base_subgait.joints[0].setpoints)
-        base_setpoints_to_interpolate: List[dict] = [
-            {} for _ in range(number_of_setpoints)
-        ]
-        other_setpoints_to_interpolate: List[dict] = [
-            {} for _ in range(number_of_setpoints)
-        ]
-        for setpoint_index in range(number_of_setpoints):
-            for base_joint, other_joint in zip(
-                sorted(base_subgait.joints, key=lambda joint: joint.name),
-                sorted(other_subgait.joints, key=lambda joint: joint.name),
-            ):
-                base_setpoints_to_interpolate[setpoint_index][
-                    base_joint.name
-                ] = base_joint.setpoints[setpoint_index]
-                other_setpoints_to_interpolate[setpoint_index][
-                    other_joint.name
-                ] = other_joint.setpoints[setpoint_index]
-        return base_setpoints_to_interpolate, other_setpoints_to_interpolate

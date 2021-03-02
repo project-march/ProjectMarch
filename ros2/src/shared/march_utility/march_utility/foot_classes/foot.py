@@ -7,7 +7,7 @@ creating gaits based on foot positions.
 
 from __future__ import annotations
 
-from math import acos, asin, atan, cos, pi, sin, sqrt
+from math import acos, asin, atan, atan2, cos, pi, sin, sqrt
 from typing import Tuple
 
 from march_utility.exceptions.gait_exceptions import SubgaitInterpolationError
@@ -27,6 +27,7 @@ from march_utility.utilities.vector_3d import Vector3d
 VELOCITY_SCALE_FACTOR = 0.001
 JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
 MID_CALCULATION_PRECISION_DIGITS = 10
+ALLOWABLE_OVERSHOOT_FOOT_POSITION = 0.001
 
 
 class Foot(object):
@@ -149,27 +150,77 @@ class Foot(object):
 
         # Once the haa angle is known, transform the desired x and z position to
         # arrive at an easier system to calculate the hfe and kfe angles
-        transformed_x = round(x_position - hl, MID_CALCULATION_PRECISION_DIGITS)
-        transformed_z = round(
-            sqrt(-ph * ph + y_position * y_position + z_position * z_position),
-            MID_CALCULATION_PRECISION_DIGITS,
-        )
+        (
+            transformed_x,
+            transformed_z,
+            transformed_distance_to_origin,
+        ) = Foot.transform_desired_position(x_position, z_position, y_position, ph, hl)
 
-        if transformed_x * transformed_x + transformed_z * transformed_z > (ll + ul) * (
-            ll + ul
-        ):
+        # If the desired foot location is too far out, trow an error
+        if transformed_distance_to_origin > ll + ul + ALLOWABLE_OVERSHOOT_FOOT_POSITION:
             raise SubgaitInterpolationError(
-                f"The desired {foot_side} foot position, ({x_position}, "
-                f"{y_position}, {z_position}), is out of reach"
+                f"The desired {foot_side} foot position, (x, y, z) = ({x_position}, "
+                f"{y_position}, {z_position}), is out of reach. Transformed coordinates "
+                f"are (x', z') = ({transformed_x}, {transformed_z}) with haa angle {haa}."
+                f"Distance to origin {transformed_distance_to_origin}."
             )
 
-        hfe, kfe = Foot.calculate_hfe_kfe_angles(transformed_x, transformed_z, ul, ll)
+        hfe, kfe = Foot.calculate_hfe_kfe_angles(
+            transformed_x, transformed_z, ul, ll, transformed_distance_to_origin
+        )
 
         return {
             foot_side.value + "_hip_aa": Setpoint(time, haa),
             foot_side.value + "_hip_fe": Setpoint(time, hfe),
             foot_side.value + "_knee": Setpoint(time, kfe),
         }
+
+    @staticmethod
+    def transform_desired_position(
+        x_position: float, z_position: float, y_position: float, ph: float, hl: float
+    ) -> Tuple[float, float, float]:
+        """Transform the desired position to an easier coordinate system for the hfe kfe calculation."""
+        transformed_x = round(x_position - hl, MID_CALCULATION_PRECISION_DIGITS)
+        transformed_z = round(
+            sqrt(-ph * ph + y_position * y_position + z_position * z_position),
+            MID_CALCULATION_PRECISION_DIGITS,
+        )
+        transformed_distance_to_origin = sqrt(
+            transformed_x * transformed_x + transformed_z * transformed_z
+        )
+        return transformed_x, transformed_z, transformed_distance_to_origin
+
+    @staticmethod
+    def calculate_hfe_kfe_angles(
+        transformed_x: float,
+        transformed_z: float,
+        ul: float,
+        ll: float,
+        transformed_distance_to_origin: float,
+    ) -> Tuple[float, float]:
+        """Figure out how to calculate the hfe and kfe angles and do the calculations."""
+        # If the desired foot location is just beyond what is reachable, (due to rounding errors perhaps),
+        # do a calculation which assumes the leg is stretched
+        if (
+            ll + ul
+            <= transformed_distance_to_origin
+            <= ll + ul + ALLOWABLE_OVERSHOOT_FOOT_POSITION
+        ):
+            hfe = Foot.calculate_hfe_angle_straight_leg(transformed_x, transformed_z)
+            kfe = 0
+        # If neither is the case, do the normal hfe kfe calculation
+        else:
+            hfe, kfe = Foot.calculate_hfe_kfe_angles_default_situation(
+                transformed_x, transformed_z, ul, ll
+            )
+        return hfe, kfe
+
+    @staticmethod
+    def calculate_hfe_angle_straight_leg(
+        transformed_x: float, transformed_z: float
+    ) -> float:
+        """Calculate the hfe angle of a straight leg."""
+        return atan2(transformed_x / transformed_z)
 
     @staticmethod
     def calculate_haa_angle(
@@ -230,7 +281,7 @@ class Foot(object):
         return haa
 
     @staticmethod
-    def calculate_hfe_kfe_angles(
+    def calculate_hfe_kfe_angles_default_situation(
         transformed_x: float, transformed_z: float, upper_leg: float, lower_leg: float
     ) -> Tuple[float, float]:
         """Calculate the hfe and kfe angles.

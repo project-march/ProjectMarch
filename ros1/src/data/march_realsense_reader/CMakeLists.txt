@@ -34,6 +34,7 @@ include_directories(
 add_library(${PROJECT_NAME}
     src/realsense_reader.cpp
     src/preprocessor.cpp
+    src/region_creator.cpp
 )
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} yaml-cpp)
 

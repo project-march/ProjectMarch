@@ -2,6 +2,10 @@
 
 #include <march_gazebo_plugins/com_controller_plugin.h>
 #include <typeinfo>
+#include "march_shared_msgs/GetPossibleComLevels.h"
+#include "march_shared_msgs/ChangeComLevel.h"
+#include <boost/bind.hpp>
+
 
 namespace gazebo
 {
@@ -35,6 +39,28 @@ void ComControllerPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf
       "/march/gait_selection/current_gait", 1, boost::bind(&ComControllerPlugin::onRosMsg, this, _1), ros::VoidPtr(),
       &ros_queue_);
   ros_sub_ = ros_node_->subscribe(so);
+
+  bool balance;
+  if (ros_node_->param("/balance", balance, false))
+  {
+    //     Create change_com_level service
+    ros::AdvertiseServiceOptions aso_change_com;
+    boost::function<bool(march_shared_msgs::ChangeComLevel::Request&,
+                         march_shared_msgs::ChangeComLevel::Response&)> change_com_cb =
+        boost::bind(&ComControllerPlugin::onChangeComLevel, this, _1, _2);
+    aso_change_com.init("/march/balance/change_com_level", change_com_cb);
+    aso_change_com.callback_queue = &ros_queue_;
+    change_com_level_service_ = this->ros_node_->advertiseService(aso_change_com);
+
+    // Create get_possible_com_levels
+    ros::AdvertiseServiceOptions aso_get_com;
+    boost::function<bool(march_shared_msgs::GetPossibleComLevels::Request&,
+                         march_shared_msgs::GetPossibleComLevels::Response&)>
+        get_com_cb = boost::bind(&ComControllerPlugin::onGetPossibleComLevels, this, _1, _2);
+    aso_get_com.init("/march/balance/get_possible_com_levels", get_com_cb);
+    aso_get_com.callback_queue = &ros_queue_;
+    get_possible_com_levels_service_ = this->ros_node_->advertiseService(aso_get_com);
+  }
 
   // Spin up the queue helper thread.
   ros_queue_thread_ = std::thread(std::bind(&ComControllerPlugin::queueThread, this));
@@ -73,6 +99,20 @@ void ComControllerPlugin::queueThread()
   {
     ros_queue_.callAvailable(ros::WallDuration(timeout));
   }
+}
+
+bool ComControllerPlugin::onChangeComLevel(march_shared_msgs::ChangeComLevel::Request &req,
+                                           march_shared_msgs::ChangeComLevel::Response &res) {
+  ROS_INFO_STREAM("Requested to change CoM level.");
+  res.success = controller_->changeComLevel(req.level_name);
+  return true;
+}
+
+bool ComControllerPlugin::onGetPossibleComLevels(march_shared_msgs::GetPossibleComLevels::Request &req,
+                                                 march_shared_msgs::GetPossibleComLevels::Response &res)
+{
+  res.com_levels = controller_->com_levels;
+  return true;
 }
 
 }  // namespace gazebo
