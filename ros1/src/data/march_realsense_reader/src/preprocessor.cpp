@@ -75,7 +75,7 @@ void NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud, Normals::Ptr po
   bool do_statistical_outlier_removal;
   if (YAML::Node statistical_outlier_filter_parameters = config_tree_["statistical_outlier_filter"])
   {
-    grabParameter(statistical_outlier_filter_parameters, "do_statistical_outlier_removal",
+    grabParameter<bool>(statistical_outlier_filter_parameters, "do_statistical_outlier_removal",
                   do_statistical_outlier_removal);
   }
 
@@ -103,7 +103,7 @@ void NormalsPreprocessor::downsample()
   double leaf_size;
   if (YAML::Node downsampling_parameters = config_tree_["downsampling"])
   {
-    grabParameter(downsampling_parameters, "leaf_size", leaf_size);
+    grabParameter<double>(downsampling_parameters, "leaf_size", leaf_size);
   }
   else
   {
@@ -123,8 +123,8 @@ void NormalsPreprocessor::removeStatisticalOutliers()
   double sd_factor;
   if (YAML::Node statistical_outlier_removal_parameters = config_tree_["statistical_outlier_removal"])
   {
-    grabParameter(statistical_outlier_removal_parameters, "number_of_neighbours", number_of_neighbours);
-    grabParameter(statistical_outlier_removal_parameters, "sd_factor", sd_factor);
+    grabParameter<int>(statistical_outlier_removal_parameters, "number_of_neighbours", number_of_neighbours);
+    grabParameter<double>(statistical_outlier_removal_parameters, "sd_factor", sd_factor);
   }
 
   pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
@@ -146,10 +146,10 @@ void NormalsPreprocessor::transformPointCloud()
   double rotation_y;
   if (YAML::Node transformation_parameters = config_tree_["transformation"])
   {
-    grabParameter(transformation_parameters, "translation_x", translation_x);
-    grabParameter(transformation_parameters, "translation_y", translation_y);
-    grabParameter(transformation_parameters, "translation_z", translation_z);
-    grabParameter(transformation_parameters, "rotation_y", rotation_y);
+    grabParameter<double>(transformation_parameters, "translation_x", translation_x);
+    grabParameter<double>(transformation_parameters, "translation_y", translation_y);
+    grabParameter<double>(transformation_parameters, "translation_z", translation_z);
+    grabParameter<double>(transformation_parameters, "rotation_y", rotation_y);
   }
   else
   {
@@ -175,7 +175,7 @@ void NormalsPreprocessor::filterOnDistanceFromOrigin()
   double distance_threshold;
   if (YAML::Node parameters = config_tree_["distance_filter"])
   {
-    grabParameter(parameters, "distance_threshold", distance_threshold);
+    grabParameter<double>(parameters, "distance_threshold", distance_threshold);
   }
   else
   {
@@ -207,9 +207,9 @@ void NormalsPreprocessor::fillNormalCloud()
   double translation_z;
   if (YAML::Node transformation_parameters = config_tree_["transformation"])
   {
-    grabParameter(transformation_parameters, "translation_x", translation_x);
-    grabParameter(transformation_parameters, "translation_y", translation_y);
-    grabParameter(transformation_parameters, "translation_z", translation_z);
+    grabParameter<double>(transformation_parameters, "translation_x", translation_x);
+    grabParameter<double>(transformation_parameters, "translation_y", translation_y);
+    grabParameter<double>(transformation_parameters, "translation_z", translation_z);
   }
   else
   {
@@ -221,14 +221,14 @@ void NormalsPreprocessor::fillNormalCloud()
   double search_radius;
   if (YAML::Node normal_estimation_parameters = config_tree_["normal_estimation"])
   {
-    grabParameter(normal_estimation_parameters, "use_tree_search_method", use_tree_search_method);
+    grabParameter<bool>(normal_estimation_parameters, "use_tree_search_method", use_tree_search_method);
     if (use_tree_search_method)
     {
-      grabParameter(normal_estimation_parameters, "number_of_neighbours", number_of_neighbours);
+      grabParameter<int>(normal_estimation_parameters, "number_of_neighbours", number_of_neighbours);
     }
     else
     {
-      grabParameter(normal_estimation_parameters, "search_radius", search_radius);
+      grabParameter<double>(normal_estimation_parameters, "search_radius", search_radius);
     }
   }
   else
@@ -262,9 +262,9 @@ void NormalsPreprocessor::filterOnNormalOrientation()
   double allowed_length_z;
   if (YAML::Node normal_filter_parameters = config_tree_["normal_filter"])
   {
-    grabParameter(normal_filter_parameters, "allowed_length_x", allowed_length_x);
-    grabParameter(normal_filter_parameters, "allowed_length_y", allowed_length_y);
-    grabParameter(normal_filter_parameters, "allowed_length_z", allowed_length_z);
+    grabParameter<double>(normal_filter_parameters, "allowed_length_x", allowed_length_x);
+    grabParameter<double>(normal_filter_parameters, "allowed_length_y", allowed_length_y);
+    grabParameter<double>(normal_filter_parameters, "allowed_length_z", allowed_length_z);
   }
 
 
@@ -299,7 +299,7 @@ void SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud,
   pointcloud_normals_ = pointcloud_normals;
 
   int test_parameter;
-  grabParameter(config_tree_, "test_parameter", test_parameter);
+  grabParameter<int>(config_tree_, "test_parameter", test_parameter);
 
   ROS_INFO_STREAM("Preprocessing with simple preprocessor. Test parameter is " << test_parameter);
 
