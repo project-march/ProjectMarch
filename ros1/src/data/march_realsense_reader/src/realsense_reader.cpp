@@ -87,8 +87,9 @@ void RealSenseReader::pointcloud_callback(const sensor_msgs::PointCloud2 input_c
 
     reading_ = false;
 
-    PointCloud::Ptr pointcloud;
-    pcl::fromROSMsg(input_cloud, *pointcloud);
+    PointCloud converted_cloud;
+    pcl::fromROSMsg(input_cloud, converted_cloud);
+    PointCloud::Ptr pointcloud = boost::make_shared<PointCloud>(converted_cloud);
     Normals::Ptr normals = boost::make_shared<Normals>();
 
     // Preprocess
