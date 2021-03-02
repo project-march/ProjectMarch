@@ -31,6 +31,13 @@ SimplePreprocessor::SimplePreprocessor(YAML::Node config_tree):
   tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
 }
 
+// Create a preprocessor with the ability to estimate normals and filter based on them
+NormalsPreprocessor::NormalsPreprocessor(YAML::Node config_tree):
+        Preprocessor(config_tree)
+{
+
+}
+
 // Removes a point from a pointcloud (and optionally the corresponding pointcloud_normals as well) at a given index
 void Preprocessor::removePointByIndex(int const index, PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals)
 {
@@ -71,17 +78,19 @@ void Preprocessor::grabParameter(YAML::Node const yaml_node, std::string const p
   }
 }
 
-void SimplePreprocessor::preprocess()
+void NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals)
 {
-  int test_parameter;
-  grabParameter(config_tree_, "test_parameter", test_parameter);
+  ROS_INFO_STREAM("Preprocessing with normal filtering. Pointcloud size: " << pointcloud_->points.size());
 
-  ROS_INFO_STREAM("Preprocessing, test_parameter is " << config_tree_["test_parameter"]);
-}
+  pointcloud_ = pointcloud;
+  pointcloud_normals_ = pointcloud_normals;
 
-void NormalsPreprocessor::preprocess()
-{
-  ROS_INFO_STREAM("Preprocessing with normal filtering. Number of points in pointcloud is " << pointcloud_->points.size());
+  bool do_statistical_outlier_removal;
+  if (YAML::Node statistical_outlier_filter_parameters = config_tree_["statistical_outlier_filter"])
+  {
+    grabParameter(config_t, statistical_outlier_filter_parameters,
+                  do_statistical_outlier_removal);
+  }
 
   downsample();
 
@@ -93,9 +102,12 @@ void NormalsPreprocessor::preprocess()
 
   filterOnNormalOrientation();
 
-  //  removeStatisticalOutliers();
+  if (do_statistical_outlier_removal)
+  {
+    removeStatisticalOutliers();
+  }
 
-  ROS_INFO_STREAM("Finished preprocessing. Number of points in pointcloud is " << pointcloud_->points.size());
+  ROS_INFO_STREAM("Finished preprocessing. Pointcloud size: " << pointcloud_->points.size());
 }
 
 // Downsample the number of points in the pointcloud to have a more workable number of points
@@ -292,19 +304,17 @@ void NormalsPreprocessor::filterOnNormalOrientation()
   }
 }
 
-// Transforms the pointcloud so that the location and orientation of the origin match that of the foot.
-void SimplePreprocessor::transformPointCloudFromUrdf()
-{
-  tf2_ros::Buffer tfBuffer;
-  tf2_ros::TransformListener tfListener(tfBuffer);
-
 // Preprocess the pointcloud, this means only transforming for the simple preprocessor
 void SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud,
-                                    Normals::Ptr normal_pointcloud)
+                                    Normals::Ptr pointcloud_normals)
 {
   pointcloud_ = pointcloud;
-  normal_pointcloud_ = normal_pointcloud;
-  ROS_INFO_STREAM("Preprocessing with simple preprocessor");
+  pointcloud_normals_ = pointcloud_normals;
+
+  int test_parameter;
+  grabParameter(config_tree_, "test_parameter", test_parameter);
+
+  ROS_INFO_STREAM("Preprocessing with simple preprocessor. Test parameter is " << test_parameter);
 
   transformPointCloudFromUrdf();
 }

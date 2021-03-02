@@ -15,7 +15,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
     n_(n),
     reading_(false)
 {
-  pointcloud_subscriber_ = n_->subscribe<PointCloud>
+  pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>
       ("/camera/depth/color/points", 1,
        &RealSenseReader::pointcloud_callback, this);
   read_pointcloud_service_ = n_->advertiseService

@@ -17,7 +17,7 @@ class Preprocessor {
 
     // This function is required to be implemented by any preprocessor
     virtual void preprocess(PointCloud::Ptr pointcloud,
-                            Normals::Ptr normal_pointcloud)=0;
+                            Normals::Ptr pointcloud_normals)=0;
     virtual ~Preprocessor() {};
 
     // Removes a point from a pointcloud (and optionally the corresponding pointcloud_normals as well) at a given index
@@ -43,7 +43,7 @@ class SimplePreprocessor : Preprocessor {
 
   // Preprocess the given pointcloud, based on parameters in the config tree
   void preprocess(PointCloud::Ptr pointcloud,
-                  Normals::Ptr normal_pointcloud) override;
+                  Normals::Ptr pointcloud_normals) override;
 
 protected:
   /** Calls the tf listener, to know transform at current time and transforms the
@@ -56,11 +56,13 @@ protected:
 
 class NormalsPreprocessor : Preprocessor {
 public:
-  // Use the constructors defined in the super class
-  using Preprocessor::Preprocessor;
+  /** Basic constructor for simple preprocessor, this will also create a tf_listener
+  that is required for transforming the pointcloud **/
+  NormalsPreprocessor(YAML::Node config_tree);
 
   // Calls all subsequent methods to preprocess a pointlcoud using normal vectors
-  void preprocess();
+  void preprocess(PointCloud::Ptr pointcloud,
+                  Normals::Ptr pointcloud_normals) override;
 
   // Removes points from the pointcloud such that there is only one point left in a certain area
   // (specified in the parameter file)
