@@ -91,7 +91,7 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
   for (unsigned int i = 0; i < num_joints_; ++i)
   {
     // Get current joint state
-    state = {(*joint_handles_ptr_)[i].getPosition(), (*joint_handles_ptr_)[i].getVelocity()};
+    state = {(*joint_handles_ptr_)[i].getPosition(), (*joint_handles_ptr_)[i].getVelocity(), model_predictive_controllers_[i].u};
     model_predictive_controllers_[i].x0 = state;
 
     // Calculate mpc control signal
@@ -119,6 +119,7 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
     mean_seconds = total_seconds/iter;
     std::cout << "Update time (s): " << elapsed_seconds << setprecision(5) << std::endl;
     std::cout << "Mean time (s): " << mean_seconds << setprecision(5) << std::endl;
+    std::cout << "---" << std::endl;
     previous_time = current_time;
 
     iter = iter + 1.0;

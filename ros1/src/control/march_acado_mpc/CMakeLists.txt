@@ -42,7 +42,7 @@ catkin_package(
 # is downloaded in the _deps/acado-solver-src folder in the build directory.
 fetchcontent_declare(acado-solver
     GIT_REPOSITORY "https://gitlab.com/project-march/libraries/acado-solver.git"
-    GIT_TAG "Model-with-friction-curve"
+    GIT_TAG "Discrete-MPC-model"
     GIT_SHALLOW true
 )
 if(NOT acado-solver_POPULATED)

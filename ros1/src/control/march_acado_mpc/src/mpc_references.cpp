@@ -27,6 +27,7 @@ void sinRef(vector<vector<double>>& reference, double freq, double amplitude, in
         line.push_back(amplitude*sin((freq*2*M_PI)*(j*dt))); // THETA
         line.push_back(amplitude*cos((freq*2*M_PI)*(j*dt))); // DTHETA
         line.push_back(0.0); // T
+        line.push_back(0.0); // dT
 
         // add the temp vector to the reference
         reference.push_back(line);
@@ -45,6 +46,7 @@ void stepRef(vector<vector<double>>& reference, double amplitude, int N) {
         line.push_back(amplitude);  // THETA
         line.push_back(0.0);        // DTHETA
         line.push_back(0.0);        // T
+        line.push_back(0.0);        // dT
 
         // add the temp vector to the reference
         reference.push_back(line);

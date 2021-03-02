@@ -31,16 +31,22 @@ void ModelPredictiveController::init()
   {
     acadoVariables.x[i * ACADO_NX + 0] = 0;  // theta
     acadoVariables.x[i * ACADO_NX + 1] = 0;  // dtheta
+    acadoVariables.x[i * ACADO_NX + 2] = 0;  // T
+  }
+
+  for (int i = 0; i <= ACADO_N; ++i)
+  {
+    acadoVariables.u[i] = 0;  // dT
   }
 
   // Fill reference vector with sinus and or step signals
-//  sinRef(reference, 0.1, 0.261791667, ACADO_N, 0.02);  // freq, amp, horizon, sampling time   [10s]
-//  sinRef(reference, 0.125, 0.261791667, ACADO_N, 0.02);  // freq, amp, horizon, sampling time [08s]
-//  sinRef(reference, 0.16, 0.261791667, ACADO_N, 0.02);  // freq, amp, horizon, sampling time  [06s]
-    stepRef(reference, 0.0, 2*ACADO_N);
+  //  sinRef(reference, 0.1, 0.261791667, ACADO_N, 0.02);  // freq, amp, horizon, sampling time   [10s]
+  //  sinRef(reference, 0.125, 0.261791667, ACADO_N, 0.02);  // freq, amp, horizon, sampling time [08s]
+  //  sinRef(reference, 0.16, 0.261791667, ACADO_N, 0.02);  // freq, amp, horizon, sampling time  [06s]
+  stepRef(reference, 0.0, 2 * ACADO_N);
 
   // hold last N reference values
-//  repeat_reference = false;
+  //  repeat_reference = false;
 
   // Set the reference
   setReference(reference);
@@ -147,10 +153,10 @@ void ModelPredictiveController::calculateControlInput()
               << "Feedback step failed"
               << "()\033[0m" << std::endl;
   }
-  u = acadoVariables.u[0];
+//  u = acadoVariables.u[0];
 
   // only for discrete time model with integrator
-  //  u = u + acadoVariables.u[0];
+    u = u + acadoVariables.u[0];
 
   std::cout << "MPC COMMAND: " << u << std::endl;
   std::cout << "MPC Cost: " << acado_getObjective() << std::endl;
