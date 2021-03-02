@@ -147,11 +147,13 @@ void ModelPredictiveController::calculateControlInput()
   acado_preparationStep();
 
   // feedback step
-  if (acado_feedbackStep())
+  status = acado_feedbackStep();
+  if (status)
   {
     std::cout << "\033[4;32m"
-              << "Feedback step failed"
-              << "()\033[0m" << std::endl;
+              << "Feedback step failed ("
+              << status << ")"
+              << "\033[0m" << std::endl;
   }
 //  u = acadoVariables.u[0];
 

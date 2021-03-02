@@ -16,6 +16,7 @@ public:
     vector<vector<double>> reference;   // Current reference
     bool repeat_reference = true;      // Periodically Repeat the reference
     double pos_ref;
+    int status;
 
     /**
      * \brief Initialise the model predictive controller
