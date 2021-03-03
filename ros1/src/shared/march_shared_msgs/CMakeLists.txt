@@ -29,6 +29,17 @@ add_message_files(
     PressureSoleData.msg
     PressureSolesData.msg
 )
+add_message_files(
+    DIRECTORY
+    msg/mpc_msgs
+    FILES
+    MpcState.msg
+    MpcEstimation.msg
+    MpcTuning.msg
+    MpcDiagnostics.msg
+    MpcJoint.msg
+    MpcMsg.msg
+)
 
 add_service_files(
     FILES
@@ -60,7 +71,7 @@ generate_messages(
     std_msgs
     trajectory_msgs
     sensor_msgs
-)
+    )
 
 catkin_package(
     CATKIN_DEPENDS

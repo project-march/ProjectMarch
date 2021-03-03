@@ -18,6 +18,9 @@
 #include <ros/time.h>
 #include "std_msgs/Float64MultiArray.h"
 #include "std_msgs/Float64.h"
+
+#include <march_shared_msgs/MpcMsg.h>
+
 #include <realtime_tools/realtime_publisher.h>
 
 #include <cassert>
@@ -79,7 +82,7 @@ private:
   std::vector<ModelPredictiveController> model_predictive_controllers_;
   vector<double> state;
 
-  std::unique_ptr<realtime_tools::RealtimePublisher<std_msgs::Float64MultiArray>> command_pub_;
+  std::unique_ptr<realtime_tools::RealtimePublisher<march_shared_msgs::MpcMsg>> command_pub_;
 };
 
 // Assign an alias to the class definition

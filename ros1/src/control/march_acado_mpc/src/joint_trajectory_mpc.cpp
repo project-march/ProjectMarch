@@ -1,6 +1,7 @@
 #include "joint_trajectory_mpc.hpp"
 #include "model_predictive_controller.hpp"
 #include <pluginlib/class_list_macros.hpp>
+#include "acado_common.h"
 
 #include <iostream>
 #include <string>
@@ -23,9 +24,19 @@ bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::Jo
   }
 
   // Initialize the place where the MPC command will be published
+  command_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_msgs::MpcMsg>>(nh, "/march/mpc/command", 10);
 
-  command_pub_ = std::make_unique<realtime_tools::RealtimePublisher<std_msgs::Float64MultiArray>>(nh, "/march/mpc/command", 10);
-  command_pub_->msg_.data.resize(num_joints_);
+  // Initialise Mpc messages
+  int prediction_horizon = ACADO_N; /* From acado_common.h */
+  command_pub_->msg_.joint.resize(num_joints_);
+
+  for (unsigned int i=0; i < num_joints_; i++) {
+      command_pub_->msg_.joint[i].tuning.horizon = prediction_horizon;
+      command_pub_->msg_.joint[i].estimation.position.resize(prediction_horizon);
+      command_pub_->msg_.joint[i].estimation.velocity.resize(prediction_horizon);
+      command_pub_->msg_.joint[i].estimation.control.resize(prediction_horizon);
+      command_pub_->msg_.joint[i].state.reference.resize(prediction_horizon);
+  }
   return true;
 }
 
@@ -105,7 +116,7 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
     {
         return;
     }
-    command_pub_->msg_.data[i] = command;
+    command_pub_->msg_.joint[i].state.command = command;
   }
 
   command_pub_->unlockAndPublish();
