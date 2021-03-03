@@ -115,8 +115,10 @@ class MoveItInterface:
         res = GetMoveItTrajectoryResponse()
         if req.swing_leg not in ["right_leg", "left_leg"]:
             res.success = False
-            rospy.logwarn(f"Incorrect swing leg {req.swing_leg} was given, no moveit "
-                          f"trajectory can be constructed.")
+            rospy.logwarn(
+                f"Incorrect swing leg {req.swing_leg} was given, no moveit "
+                f"trajectory can be constructed."
+            )
             return res
         trajectory = self.construct_trajectory(
             req.swing_leg, req.swing_leg_target_pose, req.stance_leg_target

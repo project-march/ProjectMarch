@@ -156,4 +156,3 @@ class FeetState(object):
         )
 
         return merge_dictionaries(left_joint_states, right_joint_states)
-
