@@ -9,7 +9,7 @@ from typing import List
 
 from ament_index_python.packages import get_package_share_directory
 from urdf_parser_py import urdf
-from node import Node
+from rclpy.node import Node
 
 from march_utility.exceptions.general_exceptions import SideSpecificationError
 from march_utility.utilities.vector_3d import Vector3d
@@ -84,6 +84,18 @@ def check_key(dic_one: dict, dic_two: dict, key: str) -> bool:
                 f"values"
             )
         return True
+
+
+def select_lengths_for_inverse_kinematics(lengths: List[float], side: Side = Side.both) -> List[float]:
+    if len(lengths) != 9:
+        Node("march_utility").get_logger().error("The lengths given did not have size 9. Cannot unpack the lengths.")
+
+    l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base = lengths
+    if side == Side.left:
+        return [l_ul, l_ll, l_hl, l_ph, base]
+    elif side == Side.right:
+        return [r_ul, r_ll, r_hl, r_ph, base]
+    return lengths
 
 
 def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
@@ -168,23 +180,16 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
             f"Expected robot.link_map to contain {e.args[0]}, but it was missing."
         )
 
-    return get_lengths_robot_for_inverse_kinematics([l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base], side)
+    return select_lengths_for_inverse_kinematics([l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base], side)
 
 
 LENGTHS_BOTH_SIDES = get_lengths_robot_from_urdf_for_inverse_kinematics()
 
 
-def get_lengths_robot_for_inverse_kinematics(lengths: List[float] = LENGTHS_BOTH_SIDES, side: Side = Side.both) -> List[float]:
+def get_lengths_robot_for_inverse_kinematics(side: Side = Side.both) -> List[float]:
     """Grab lengths which are relevant for the inverse kinematics calculations from a list."""
-    if len(lengths != 9):
-        Node("march_utility").get_logger().error("The lengths given did not have size 9. Cannot unpack the lengths.")
+    return select_lengths_for_inverse_kinematics(LENGTHS_BOTH_SIDES, side)
 
-    l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base = lengths
-    if side == Side.left:
-        return [l_ul, l_ll, l_hl, l_ph, base]
-    elif side == Side.right:
-        return [r_ul, r_ll, r_hl, r_ph, base]
-    return lengths
 
 
 def get_joint_names_for_inverse_kinematics() -> List[str]:
