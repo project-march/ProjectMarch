@@ -46,8 +46,12 @@ All documentation can be found at https://docs.projectmarch.nl
 At the moment, it is not possible to contribute to the code base without explicit permission from Project MARCH. We hope to change this as soon as possible.
 
 ## License
-At the moment, Project MARCH has no explicit license. We are working on an open source
-license for the code base. You can keep track of the current state of this process [here](https://gitlab.com/groups/project-march/-/epics/3).
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License version 3,
+WITH additional terms per section 7.
+A copy of the GNU General Public License, version 3 can be found
+in [LICENSE.md](LICENSE.md) or on https://www.gnu.org/licenses/.
+The additional terms can be found in [LICENSE-ADDITIONAL-TERMS.md](LICENSE-ADDITIONAL-TERMS.md).
 
 ## Contact
 If you have any questions about our project, don't hesitate to contact us at software@projectmarch.nl.
