@@ -3,8 +3,6 @@
 
 #include "yaml-cpp/yaml.h"
 #include <ros/ros.h>
-#include <time.h>
-#include <typeinfo>
 
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/search/kdtree.h>

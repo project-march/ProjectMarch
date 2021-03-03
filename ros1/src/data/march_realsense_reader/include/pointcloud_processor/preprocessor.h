@@ -1,7 +1,6 @@
 #ifndef MARCH_PREPROCESSOR_H
 #define MARCH_PREPROCESSOR_H
 
-#include <string>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
