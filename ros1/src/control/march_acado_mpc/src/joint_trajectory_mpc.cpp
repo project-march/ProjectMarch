@@ -7,37 +7,38 @@
 #include <string>
 #include <vector>
 
-bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
-{
-  joint_handles_ptr_ = &joint_handles;
-  num_joints_ = joint_handles.size();
+bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh) {
+    joint_handles_ptr_ = &joint_handles;
+    num_joints_ = joint_handles.size();
 
-  std::vector<std::string> joint_names;
-  ros::param::get("/march/joint_names", joint_names);
+    std::vector <std::string> joint_names;
+    ros::param::get("/march/joint_names", joint_names);
 
-  // Initialize the model predictive controllers
-  for (unsigned int i = 0; i < num_joints_; ++i)
-  {
-    model_predictive_controllers_.push_back(ModelPredictiveController(getQMatrix(joint_names[i])));
-    model_predictive_controllers_[i].joint_name = joint_names[i];
-    model_predictive_controllers_[i].init();
-  }
+    // Initialize the model predictive controllers
+    for (unsigned int i = 0; i < num_joints_; ++i) {
+        model_predictive_controllers_.push_back(ModelPredictiveController(getQMatrix(joint_names[i])));
+        model_predictive_controllers_[i].joint_name = joint_names[i];
+        model_predictive_controllers_[i].init();
+    }
 
-  // Initialize the place where the MPC command will be published
-  command_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_msgs::MpcMsg>>(nh, "/march/mpc/", 10);
+    // Initialize the place where the MPC command will be published
+    mpc_pub_ =
+            std::make_unique < realtime_tools::RealtimePublisher < march_shared_msgs::MpcMsg >> (nh, "/march/mpc/", 10);
 
-  // Initialise Mpc messages
-  int prediction_horizon = ACADO_N; /* From acado_common.h */
-  command_pub_->msg_.joint.resize(num_joints_);
+    // Initialise Mpc messages
+    int prediction_horizon = ACADO_N; /* From acado_common.h */
+    mpc_pub_->msg_.joint.resize(num_joints_);
 
-  for (unsigned int i=0; i < num_joints_; i++) {
-      command_pub_->msg_.joint[i].tuning.horizon = prediction_horizon;
-      command_pub_->msg_.joint[i].estimation.position.resize(prediction_horizon);
-      command_pub_->msg_.joint[i].estimation.velocity.resize(prediction_horizon);
-      command_pub_->msg_.joint[i].estimation.control.resize(prediction_horizon);
-      command_pub_->msg_.joint[i].state.reference.resize(prediction_horizon);
-  }
-  return true;
+    for (unsigned int i = 0; i < num_joints_; i++) {
+        mpc_pub_->msg_.joint[i].tuning.horizon = prediction_horizon;
+        mpc_pub_->msg_.joint[i].estimation.position.resize(prediction_horizon);
+        mpc_pub_->msg_.joint[i].estimation.velocity.resize(prediction_horizon);
+        mpc_pub_->msg_.joint[i].estimation.control.resize(prediction_horizon);
+        for (unsigned int j = 0; i < ACADO_NY; j++) {
+            mpc_pub_->msg_.joint[i].state.reference_trajectory[j].array.resize(prediction_horizon);
+        }
+    }
+    return true;
 }
 
 // Retrieve the Q matrix from the parameter server for a joint.
@@ -85,6 +86,36 @@ void ModelPredictiveControllerInterface::starting(const ros::Time& /*time*/)
   }
 }
 
+void ModelPredictiveControllerInterface::setMpcMsg() {
+    if (!mpc_pub_->trylock())
+    {
+        return;
+    }
+    // Loop trough all joints
+    for (int i = 0; i < num_joints_; i++)
+    {
+        mpc_pub_->msg_.joint[i].state.command = command;
+        // Loop through the 'measurements' (y_i == 0 -> angle, y_i == 1 -> d/dt*angle)
+        for(int y_i = 0; y_i < ACADO_N; y_i++) {
+            //
+            for (int n_i = 0; n_i < ACADO_NY; n_i++) {
+                mpc_pub_->msg_.joint[i].state.reference_trajectory[y_i].array[n_i] = acadoVariables.y[y_i + n_i * ACADO_N];
+            }
+        }
+    }
+    mpc_pub_->unlockAndPublish();
+}
+//    for(int i = 0; i < ACADO_N; i++) {
+//        for(int j = 0; j < ACADO_NY; j++) {
+////            acadoVariables.y[i * ACADO_NY + j] = reference[i][j];
+//            mpc_pub_
+//        }
+//    }
+//    for(int j = 0; j < ACADO_NYN; j++) {
+//        acadoVariables.yN[j] = reference[ACADO_N][j];
+//    }
+
+
 void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/, const ros::Duration& period,
                                                        const std::vector<joint_trajectory_controller::State>&  /*desired_states*/,
                                                        const joint_trajectory_controller::State& state_error)
@@ -98,28 +129,22 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
   assert(num_joints_ == state_error.velocity.size());
 
   // Update effort command
-  for (unsigned int i = 0; i < num_joints_; ++i)
-  {
-    // Get current joint state
-    state = {(*joint_handles_ptr_)[i].getPosition(), (*joint_handles_ptr_)[i].getVelocity()};
-    model_predictive_controllers_[i].x0 = state;
+  for (unsigned int i = 0; i < num_joints_; ++i) {
+      // Get current joint state
+      state = {(*joint_handles_ptr_)[i].getPosition(), (*joint_handles_ptr_)[i].getVelocity()};
+      model_predictive_controllers_[i].x0 = state;
 
-    // Calculate mpc control signal
-    model_predictive_controllers_[i].calculateControlInput();
-    command = model_predictive_controllers_[i].u;
+      // Calculate mpc control signal
+      model_predictive_controllers_[i].calculateControlInput();
+      command = model_predictive_controllers_[i].u;
 
-    // Apply command
-    (*joint_handles_ptr_)[i].setCommand(command);
+      // Apply command
+      (*joint_handles_ptr_)[i].setCommand(command);
 
-    // Publish command
-    if (!command_pub_->trylock())
-    {
-        return;
-    }
-    command_pub_->msg_.joint[i].state.command = command;
+      // Publish command
+      setMpcMsg();
+
   }
-
-  command_pub_->unlockAndPublish();
 }
 
 void ModelPredictiveControllerInterface::stopping(const ros::Time& /*time*/)

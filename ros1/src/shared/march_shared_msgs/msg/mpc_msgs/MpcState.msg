@@ -1,3 +1,4 @@
 float32 command
-float32[] reference
+MpcArray[] reference_trajectory
+float32[] reference_input
 float32 cost

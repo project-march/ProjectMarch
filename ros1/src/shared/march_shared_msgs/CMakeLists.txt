@@ -33,6 +33,7 @@ add_message_files(
     DIRECTORY
     msg/mpc_msgs
     FILES
+    MpcArray.msg
     MpcState.msg
     MpcEstimation.msg
     MpcTuning.msg

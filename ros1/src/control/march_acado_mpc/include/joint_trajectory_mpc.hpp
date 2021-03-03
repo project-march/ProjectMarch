@@ -65,6 +65,10 @@ public:
    * \brief Procedure, if required, for stopping the controller
    */
   void stopping(const ros::Time& /*time*/);
+  /**
+   * \brief Set and publish the message with MPC outputs, and MPC configuration
+   */
+  void setMpcMsg();
 
 private:
   /**
@@ -82,7 +86,7 @@ private:
   std::vector<ModelPredictiveController> model_predictive_controllers_;
   vector<double> state;
 
-  std::unique_ptr<realtime_tools::RealtimePublisher<march_shared_msgs::MpcMsg>> command_pub_;
+  std::unique_ptr<realtime_tools::RealtimePublisher<march_shared_msgs::MpcMsg>> mpc_pub_;
 };
 
 // Assign an alias to the class definition
