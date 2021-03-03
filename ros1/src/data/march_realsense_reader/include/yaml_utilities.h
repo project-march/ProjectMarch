@@ -19,7 +19,7 @@ namespace yaml_utilities
     }
     else
     {
-      ROS_ERROR_STREAM("parameter not found in the given YAML::node. Parameter name is " << parameter_name);
+      ROS_ERROR_STREAM("Parameter not found in the given YAML::node. Parameter name is " << parameter_name);
       return parameter;
     }
   }

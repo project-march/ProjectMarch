@@ -155,9 +155,6 @@ void NormalsPreprocessor::transformPointCloud()
     ROS_ERROR("Transformation parameters not found in parameter file");
   }
 
-  ROS_INFO_STREAM("translation_x value: " << translation_x);
-  ROS_INFO_STREAM("translation_x type: " << typeid(translation_x).name());
-
   // make a 4 by 4 transformation Transform = [Rotation (3x3) translation (3x1); 0 (1x3) 1 (1x1)]
   Eigen::Affine3f transform = Eigen::Affine3f::Identity();
 
@@ -181,7 +178,7 @@ void NormalsPreprocessor::filterOnDistanceFromOrigin()
   }
   else
   {
-    ROS_ERROR("distance filter parameters not found in parameter file");
+    ROS_ERROR("Distance filter parameters not found in parameter file");
   }
   double distance_threshold_squared = distance_threshold * distance_threshold;
 
@@ -215,7 +212,7 @@ void NormalsPreprocessor::fillNormalCloud()
   }
   else
   {
-    ROS_ERROR("transformation parameters not found in parameter file");
+    ROS_ERROR("Transformation parameters not found in parameter file");
   }
 
   bool use_tree_search_method;
@@ -235,7 +232,7 @@ void NormalsPreprocessor::fillNormalCloud()
   }
   else
   {
-    ROS_ERROR("normal estimation parameters not found in parameter file");
+    ROS_ERROR("Normal estimation parameters not found in parameter file");
   }
 
   pcl::NormalEstimation <pcl::PointXYZ, pcl::Normal> normal_estimator;
