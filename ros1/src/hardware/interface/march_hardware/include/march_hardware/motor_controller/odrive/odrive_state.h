@@ -7,6 +7,38 @@
 
 namespace march
 {
+
+template<class Value>
+Value getNextValue(Value current)
+{
+  return static_cast<Value>(static_cast<uint32_t>(current) << 1);
+}
+
+
+template<class ErrorType, class ErrorValue>
+std::string errorsToString(uint32_t error_status, std::string error_type, ErrorValue begin, ErrorValue end)
+{
+  std::ostringstream ss;
+  ss << error_type << " errors: ";
+  if (error_status == 0)
+  {
+    ss << "None";
+  }
+  else
+  {
+    ss << "[";
+    for(auto possible_error = begin; possible_error <= end; possible_error = getNextValue(possible_error))
+    {
+      if ((error_status & possible_error) > 0)
+      {
+        ss << ErrorType::toString(possible_error) << ", ";
+      }
+    }
+    ss << "]";
+  }
+  return ss.str();
+}
+
 class ODriveAxisState
 {
 public:
@@ -107,10 +139,6 @@ public:
     ERROR = 1,
   };
 
-  static constexpr Value AllAxisErrors[]{
-      ERROR
-  };
-
   ODriveAxisError() : value_(0)
   {
   }
@@ -134,26 +162,7 @@ public:
 
   std::string toString()
   {
-    std::stringstream ss;
-    ss << "Axis errors: ";
-    if (value_ == 0)
-    {
-      ss << "None";
-    }
-    else
-    {
-      ss << "[";
-      for (unsigned int i = 0; i < sizeof(AllAxisErrors) / sizeof(uint32_t); ++i)
-      {
-        auto current_error = AllAxisErrors[i];
-        if ((value_ & current_error) > 0)
-        {
-          ss << toString(current_error) << ", ";
-        }
-      }
-      ss << "]";
-    }
-    return ss.str();
+    return errorsToString<ODriveAxisError, Value>(value_, "Axis", ERROR, ERROR);
   }
 
   bool operator==(uint32_t v) const
@@ -181,10 +190,6 @@ public:
     ERROR = 1,
   };
 
-  static constexpr Value AllMotorErrors[]{
-      ERROR
-  };
-
   ODriveMotorError() : value_(0)
   {
   }
@@ -208,26 +213,7 @@ public:
 
   std::string toString()
   {
-    std::stringstream ss;
-    ss << "Motor errors: ";
-    if (value_ == 0)
-    {
-      ss << "None";
-    }
-    else
-    {
-      ss << "[";
-      for (unsigned int i = 0; i < sizeof(AllMotorErrors) / sizeof(uint32_t); ++i)
-      {
-        auto current_error = AllMotorErrors[i];
-        if ((value_ & current_error) > 0)
-        {
-          ss << toString(current_error) << ", ";
-        }
-      }
-      ss << "]";
-    }
-    return ss.str();
+    return errorsToString<ODriveMotorError, Value>(value_, "Motor", ERROR, ERROR);
   }
 
   bool operator==(uint16_t v) const
@@ -255,10 +241,6 @@ public:
     ERROR = 1
   };
 
-  static constexpr Value AllEncoderManagerErrors[]{
-    ERROR
-  };
-
   ODriveEncoderManagerError() : value_(0)
   {
   }
@@ -282,37 +264,120 @@ public:
 
   std::string toString()
   {
-    std::stringstream ss;
-    ss << "Encoder manager errors: ";
-    if (value_ == 0)
-    {
-      ss << "None";
-    }
-    else
-    {
-      ss << "[";
-      for (unsigned int i = 0; i < sizeof(AllEncoderManagerErrors) / sizeof(uint32_t); ++i)
-      {
-        auto current_error = AllEncoderManagerErrors[i];
-        if ((value_ & current_error) > 0)
-        {
-          ss << toString(current_error) << ", ";
-        }
-      }
-      ss << "]";
-    }
-    return ss.str();
+    return errorsToString<ODriveEncoderManagerError, Value>(value_, "Encoder Manager", ERROR, ERROR);
   }
 
   bool operator==(uint16_t v) const
   {
     return value_ == v;
   }
-  bool operator==(ODriveMotorError a) const
+  bool operator==(ODriveEncoderManagerError a) const
   {
     return value_ == a.value_;
   }
-  bool operator!=(ODriveMotorError a) const
+  bool operator!=(ODriveEncoderManagerError a) const
+  {
+    return value_ != a.value_;
+  }
+
+  uint32_t value_;
+};
+
+class ODriveEncoderError
+{
+public:
+  enum Value: uint32_t
+  {
+    NONE = 0,
+    ERROR = 1
+  };
+
+  ODriveEncoderError() : value_(0)
+  {
+  }
+
+  ODriveEncoderError(uint32_t value) : value_(value)
+  {
+  }
+
+  static std::string toString(Value value)
+  {
+    switch (value)
+    {
+      case NONE:
+        return "None";
+      case ERROR:
+        return "Error";
+      default:
+        return "Unknown encoder error";
+    }
+  }
+
+  std::string toString()
+  {
+    return errorsToString<ODriveEncoderError, Value>(value_, "Encoder", ERROR, ERROR);
+  }
+
+  bool operator==(uint16_t v) const
+  {
+    return value_ == v;
+  }
+  bool operator==(ODriveEncoderError a) const
+  {
+    return value_ == a.value_;
+  }
+  bool operator!=(ODriveEncoderError a) const
+  {
+    return value_ != a.value_;
+  }
+
+  uint32_t value_;
+};
+
+class ODriveControllerError
+{
+public:
+  enum Value: uint32_t
+  {
+    NONE = 0,
+    ERROR = 1
+  };
+
+  ODriveControllerError() : value_(0)
+  {
+  }
+
+  ODriveControllerError(uint32_t value) : value_(value)
+  {
+  }
+
+  static std::string toString(Value value)
+  {
+    switch (value)
+    {
+      case Value::NONE:
+        return "None";
+      case Value::ERROR:
+        return "Error";
+      default:
+        return "Unknown controller error";
+    }
+  }
+
+  std::string toString()
+  {
+    return errorsToString<ODriveControllerError, Value>(value_, "Controller", ERROR, ERROR);
+  }
+
+  bool operator==(uint16_t v) const
+  {
+    return value_ == v;
+  }
+  bool operator==(ODriveControllerError a) const
+  {
+    return value_ == a.value_;
+  }
+  bool operator!=(ODriveControllerError a) const
   {
     return value_ != a.value_;
   }
@@ -332,8 +397,13 @@ public:
 
   std::string getErrorStatus() override
   {
-    //TODO: implement
-    return "";
+    std::ostringstream error_stream;
+    std::string state = this->axis_state_.toString().c_str();
+
+    error_stream << "State: " << state << ", " << axis_error_.toString() << ", " << motor_error_.toString()
+                 << ", " << encoder_manager_error_.toString() << ", " << encoder_error_.toString() << ", "
+                 << controller_error_.toString();
+    return error_stream.str();
   }
 
   std::string getOperationalState() override
@@ -345,8 +415,8 @@ public:
   ODriveAxisError axis_error_;
   ODriveMotorError motor_error_;
   ODriveEncoderManagerError encoder_manager_error_;
-  uint16_t encoder_error_;
-  uint8_t controller_error_;
+  ODriveEncoderError encoder_error_;
+  ODriveControllerError controller_error_;
 
 };
 }  // namespace march

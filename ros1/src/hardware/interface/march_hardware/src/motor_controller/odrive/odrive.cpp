@@ -6,6 +6,7 @@
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/error/motion_error.h"
 #include "march_hardware/ethercat/pdo_types.h"
+#include "march_hardware/ethercat/pdo_map.h"
 
 #include "march_hardware/motor_controller/actuation_mode.h"
 
@@ -20,9 +21,11 @@
 
 namespace march
 {
-ODrive::ODrive(const Slave& slave, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
+ODrive::ODrive(const Slave& slave, int axis_number, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
                std::shared_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode)
-  : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode){};
+  : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode)
+  , axis_number_(axis_number)
+{};
 
 void ODrive::prepareActuation()
 {
@@ -104,5 +107,10 @@ double ODrive::getIncrementalVelocity()
 {
   //TODO: implement
   return -1;
+}
+
+ODriveAxisError ODrive::getAxisError()
+{
+  return ODriveAxisError(this->read32(ODrivePDOmap::read_objects.at(ODriveObjectName::Axis0Error).offset).ui);
 }
 }
