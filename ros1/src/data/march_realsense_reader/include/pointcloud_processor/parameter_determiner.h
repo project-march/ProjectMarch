@@ -10,7 +10,7 @@
 
 using PlaneParameters = std::vector<pcl::ModelCoefficients::Ptr>;
 using HullsVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
-using GaitParameters = march_shared_msgs::GetGaitParameters::Response;
+using GaitParameters = march_shared_msgs::GaitParameters;
 
 class ParameterDeterminer
 {
@@ -21,13 +21,15 @@ public:
         boost::shared_ptr<PlaneParameters> plane_parameters,
         boost::shared_ptr<HullsVector> hulls,
         SelectedGait selected_obstacle,
-        GaitParameters gait_parameters)=0;
+        boost::shared_ptr<GaitParameters> gait_parameters)=0;
 
     virtual ~ParameterDeterminer() {};
 
 protected:
     boost::shared_ptr<PlaneParameters> plane_parameters_;
     boost::shared_ptr<HullsVector> hulls_;
+    SelectedGait selected_obstacle_;
+    boost::shared_ptr<GaitParameters> gait_parameters_;
     YAML::Node config_tree_;
     bool debugging_;
 };
@@ -46,7 +48,7 @@ public:
         boost::shared_ptr<PlaneParameters> plane_parameters,
         boost::shared_ptr<HullsVector> hulls,
         SelectedGait selected_obstacle,
-        GaitParameters gait_parameters) override;
+        boost::shared_ptr<GaitParameters> gait_parameters) override;
 };
 
 #endif //MARCH_PARAMETER_DETERMINER_H

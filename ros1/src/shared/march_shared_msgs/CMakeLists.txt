@@ -19,6 +19,7 @@ add_message_files(
     Error.msg
     GaitInstruction.msg
     GaitInstructionResponse.msg
+    GaitParameters.msg
     HighVoltageNet.msg
     ImcState.msg
     JointValues.msg

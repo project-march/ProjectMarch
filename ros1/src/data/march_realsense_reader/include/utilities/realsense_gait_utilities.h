@@ -44,6 +44,6 @@
  * made with the RealSense camera.
  */
 
-enum SelectedGait{stairs_up, stairs_down, ramp_up, ramp_down};
+enum SelectedGait{stairs_up=0, stairs_down=1, ramp_up=2, ramp_down=3};
 
 #endif //MARCH_REALSENSE_GAIT_UTILITIES_H

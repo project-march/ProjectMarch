@@ -300,11 +300,7 @@ bool SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud,
   pointcloud_ = pointcloud;
   pointcloud_normals_ = pointcloud_normals;
 
-  int test_parameter;
-  test_parameter = yaml_utilities::grabParameter<int>(config_tree_, "test_parameter");
-
-  ROS_INFO_STREAM("Preprocessing with simple preprocessor. Test parameter is " << test_parameter);
-
+  ROS_INFO_STREAM("Preprocessing with SimplePreprocessor");
   transformPointCloudFromUrdf();
   return true;
 }

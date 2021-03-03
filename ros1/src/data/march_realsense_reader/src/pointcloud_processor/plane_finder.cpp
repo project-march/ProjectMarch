@@ -30,6 +30,11 @@ bool SimplePlaneFinder::find_planes(
   plane_parameters_ = plane_parameters;
   hulls_ = hulls;
 
+  if (debugging_)
+  {
+    ROS_INFO("Finding planes with SimplePlaneFinder");
+  }
+
   // TODO: Basic algorithm to find the planes should be implemented here
 
   return true;

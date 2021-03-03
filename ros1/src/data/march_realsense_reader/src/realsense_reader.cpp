@@ -92,7 +92,8 @@ YAML::Node RealSenseReader::getConfigIfPresent(std::string key)
 // This method executes the logic to process a pointcloud
 bool RealSenseReader::process_pointcloud(
     PointCloud::Ptr pointcloud,
-    int selected_gait, march_shared_msgs::GetGaitParameters::Response &res)
+    int selected_gait,
+    march_shared_msgs::GetGaitParameters::Response &res)
 {
   Normals::Ptr normals = boost::make_shared<Normals>();
 
@@ -131,9 +132,46 @@ bool RealSenseReader::process_pointcloud(
   boost::shared_ptr<PlaneParameters> plane_parameters =
       boost::make_shared<PlaneParameters>();
   boost::shared_ptr<HullsVector> hulls = boost::make_shared<HullsVector>();
+  bool plane_finding_was_successful =
+      plane_finder_->find_planes(pointcloud, normals, regions_vector,
+                                 plane_parameters, hulls);
+  if (not plane_finding_was_successful)
+  {
+    res.error_message = "Plane finding was unsuccessful, see debug output "
+                        "for more information";
+    return false;
+  }
+  if (debugging_)
+  {
+    ROS_INFO("Done finding planes");
+    //TODO: Add publisher to visualize found planes
+  }
+
+  // Determine parameters
+  SelectedGait selected_obstacle = (SelectedGait) selected_gait;
+  boost::shared_ptr<march_shared_msgs::GaitParameters> gait_parameters =
+      boost::make_shared<march_shared_msgs::GaitParameters>();
+  bool parameter_determining_was_successful =
+      parameter_determiner_->determine_parameters(
+          plane_parameters, hulls, selected_obstacle, gait_parameters);
+  if (not parameter_determining_was_successful)
+  {
+    res.error_message = "Parameter determining was unsuccessful, see debug output "
+                        "for more information";
+    return false;
+  }
+  res.gait_parameters = *gait_parameters;
+
+  if (debugging_)
+  {
+    ROS_INFO("Done determining parameters");
+    //TODO: Add publisher to visualize found planes
+  }
 
   res.success = true;
   return true;
+
+
 }
 
 // Publishes the pointcloud on a topic for visualisation in rviz or further use
