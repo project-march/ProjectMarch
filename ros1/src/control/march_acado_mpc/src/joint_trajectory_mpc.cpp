@@ -24,7 +24,7 @@ bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::Jo
   }
 
   // Initialize the place where the MPC command will be published
-  command_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_msgs::MpcMsg>>(nh, "/march/mpc/command", 10);
+  command_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_msgs::MpcMsg>>(nh, "/march/mpc/", 10);
 
   // Initialise Mpc messages
   int prediction_horizon = ACADO_N; /* From acado_common.h */
