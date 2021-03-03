@@ -85,7 +85,7 @@ def check_key(dic_one: dict, dic_two: dict, key: str) -> bool:
         return True
 
 
-def get_lengths_robot_for_inverse_kinematics(  # noqa: CCR001
+def get_lengths_robot_from_urdf(  # noqa: CCR001
     side: Side = Side.both,
 ) -> List[float]:
     """Grab lengths which are relevant for the inverse kinematics calculation.
@@ -174,6 +174,15 @@ def get_lengths_robot_for_inverse_kinematics(  # noqa: CCR001
     else:
         return [l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base]
 
+LENGTHS_BOTH_SIDES = get_lengths_robot_from_urdf()
+def get_lengths_robot_for_inverse_kinematics(side: Side = Side.both) -> List[float]:
+    l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base = LENGTHS_BOTH_SIDES
+    if side == Side.left:
+        return [l_ul, l_ll, l_hl, l_ph, base]
+    elif side == Side.right:
+        return [r_ul, r_ll, r_hl, r_ph, base]
+    else:
+        return [l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base]
 
 def get_joint_names_for_inverse_kinematics() -> List[str]:
     """
