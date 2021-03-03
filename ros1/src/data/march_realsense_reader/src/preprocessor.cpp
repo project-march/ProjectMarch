@@ -71,7 +71,7 @@ void NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud, Normals::Ptr po
 
   ROS_INFO_STREAM("Preprocessing with normal filtering. Pointcloud size: " << pointcloud_->points.size());
 
-  bool do_statistical_outlier_removal;
+  bool do_statistical_outlier_removal = false;
   if (YAML::Node statistical_outlier_filter_parameters = config_tree_["statistical_outlier_filter"])
   {
     do_statistical_outlier_removal = yaml_utilities::grabParameter<bool>(statistical_outlier_filter_parameters,
