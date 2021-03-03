@@ -39,7 +39,7 @@ enum class DataDirection
   MOSI,
 };
 
-/** All the available IMC object names divided over the PDO maps. make sure to also add it to PDOmap constructor.*/
+/** All the available IMC object names divided over the PDO maps. make sure to also add it to IMCPDOmap constructor.*/
 enum class IMCObjectName
 {
   StatusWord,
@@ -62,7 +62,7 @@ enum class IMCObjectName
   MotorVoltage
 };
 
-class PDOmap
+class IMCPDOmap
 {
 public:
   /**
@@ -94,6 +94,49 @@ private:
   const int nr_of_regs = 4;                   // Amount of registers available.
   const int object_sizes[3] = { 32, 16, 8 };  // Available sizes.
 };
-}  // namespace march
+
+struct ODriveObject
+{
+  uint8_t offset;
+  uint8_t length;
+
+  ODriveObject(uint8_t offset, uint8_t length) : offset(offset), length(length){};
+};
+
+enum class ODriveObjectName
+{
+  // Read objects
+  Axis0ActualPosition,
+  Axis0ActualTorque,
+  Axis0MotorVelocity,
+  Axis0Error,
+  Axis0MotorError,
+  Axis0EMError,
+  Axis0EncoderError,
+  Axis0ControllerError,
+  Axis1ActualPosition,
+  Axis1ActualTorque,
+  Axis1MotorVelocity,
+  Axis1Error,
+  Axis1MotorError,
+  Axis1EMError,
+  Axis1EncoderError,
+  Axis1ControllerError,
+  // Write objects
+  Axis0TargetTorque,
+  Axis1TargetTorque
+};
+
+class ODrivePDOmap
+{
+public:
+  /* Compared to the IMCPdoMap, the ODrivePDOmap is much simpler.
+   * All byte offsets can be stored directly and no additional mapping is required.
+   */
+  static std::unordered_map<ODriveObjectName, ODriveObject> write_objects;
+  static std::unordered_map<ODriveObjectName, ODriveObject> read_objects;
+};
+
+}// namespace march
 
 #endif  // MARCH_HARDWARE_PDOMAP_H

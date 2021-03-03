@@ -58,7 +58,7 @@ bool IMotionCube::initSdo(SdoSlaveInterface& sdo, int cycle_time)
 // Master In, Slave Out
 void IMotionCube::mapMisoPDOs(SdoSlaveInterface& sdo)
 {
-  PDOmap map_miso;
+  IMCPDOmap map_miso;
   map_miso.addObject(IMCObjectName::StatusWord);      // Compulsory!
   map_miso.addObject(IMCObjectName::ActualPosition);  // Compulsory!
   map_miso.addObject(IMCObjectName::ActualTorque);    // Compulsory!
@@ -77,7 +77,7 @@ void IMotionCube::mapMisoPDOs(SdoSlaveInterface& sdo)
 // Master Out, Slave In
 void IMotionCube::mapMosiPDOs(SdoSlaveInterface& sdo)
 {
-  PDOmap map_mosi;
+  IMCPDOmap map_mosi;
   map_mosi.addObject(IMCObjectName::ControlWord);  // Compulsory!
   map_mosi.addObject(IMCObjectName::TargetPosition);
   map_mosi.addObject(IMCObjectName::TargetTorque);

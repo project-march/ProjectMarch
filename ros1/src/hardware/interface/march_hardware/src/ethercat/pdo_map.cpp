@@ -9,7 +9,7 @@
 
 namespace march
 {
-std::unordered_map<IMCObjectName, IMCObject> PDOmap::all_objects = {
+std::unordered_map<IMCObjectName, IMCObject> IMCPDOmap::all_objects = {
   { IMCObjectName::StatusWord, IMCObject(0x6041, 0, 16) },
   { IMCObjectName::ActualPosition, IMCObject(0x6064, 0, 32) },
   { IMCObjectName::ActualVelocity, IMCObject(0x6069, 0, 32) },
@@ -30,10 +30,34 @@ std::unordered_map<IMCObjectName, IMCObject> PDOmap::all_objects = {
   { IMCObjectName::MotorVoltage, IMCObject(0x2108, 3, 16) }
 };
 
-void PDOmap::addObject(IMCObjectName object_name)
+std::unordered_map<ODriveObjectName, ODriveObject> ODrivePDOmap::read_objects = {
+    { ODriveObjectName::Axis0ActualPosition, ODriveObject(0, 32) },
+    { ODriveObjectName::Axis0ActualTorque, ODriveObject(4, 32) },
+    { ODriveObjectName::Axis0MotorVelocity, ODriveObject( 8, 32) },
+    { ODriveObjectName::Axis0Error, ODriveObject(12, 32) },
+    { ODriveObjectName::Axis0MotorError, ODriveObject(16, 16) },
+    { ODriveObjectName::Axis0EMError, ODriveObject(20, 32) },
+    { ODriveObjectName::Axis0EncoderError, ODriveObject(24, 16) },
+    { ODriveObjectName::Axis0ControllerError, ODriveObject(28, 8) },
+    { ODriveObjectName::Axis1ActualPosition, ODriveObject(32, 32) },
+    { ODriveObjectName::Axis1ActualTorque, ODriveObject(36, 32) },
+    { ODriveObjectName::Axis1MotorVelocity, ODriveObject(40, 32) },
+    { ODriveObjectName::Axis1Error, ODriveObject(44, 32) },
+    { ODriveObjectName::Axis1MotorError, ODriveObject(48, 16) },
+    { ODriveObjectName::Axis1EMError, ODriveObject(52, 32) },
+    { ODriveObjectName::Axis1EncoderError, ODriveObject(56, 16) },
+    { ODriveObjectName::Axis1ControllerError, ODriveObject(60, 8) },
+};
+
+std::unordered_map<ODriveObjectName, ODriveObject> ODrivePDOmap::write_objects = {
+    { ODriveObjectName::Axis0TargetTorque, ODriveObject(0, 32) },
+    { ODriveObjectName::Axis1TargetTorque, ODriveObject(4, 32) },
+};
+
+void IMCPDOmap::addObject(IMCObjectName object_name)
 {
-  auto it = PDOmap::all_objects.find(object_name);
-  if (it == PDOmap::all_objects.end())
+  auto it = IMCPDOmap::all_objects.find(object_name);
+  if (it == IMCPDOmap::all_objects.end())
   {
     throw error::HardwareException(error::ErrorType::PDO_OBJECT_NOT_DEFINED);
   }
@@ -55,7 +79,7 @@ void PDOmap::addObject(IMCObjectName object_name)
   }
 }
 
-std::unordered_map<IMCObjectName, uint8_t> PDOmap::map(SdoSlaveInterface& sdo, DataDirection direction)
+std::unordered_map<IMCObjectName, uint8_t> IMCPDOmap::map(SdoSlaveInterface& sdo, DataDirection direction)
 {
   switch (direction)
   {
@@ -69,7 +93,7 @@ std::unordered_map<IMCObjectName, uint8_t> PDOmap::map(SdoSlaveInterface& sdo, D
   }
 }
 
-std::unordered_map<IMCObjectName, uint8_t> PDOmap::configurePDO(SdoSlaveInterface& sdo, int base_register,
+std::unordered_map<IMCObjectName, uint8_t> IMCPDOmap::configurePDO(SdoSlaveInterface& sdo, int base_register,
                                                                 uint16_t base_sync_manager)
 {
   int counter = 1;
@@ -139,7 +163,7 @@ std::unordered_map<IMCObjectName, uint8_t> PDOmap::configurePDO(SdoSlaveInterfac
   return byte_offsets;
 }
 
-std::vector<std::pair<IMCObjectName, IMCObject>> PDOmap::sortPDOObjects()
+std::vector<std::pair<IMCObjectName, IMCObject>> IMCPDOmap::sortPDOObjects()
 {
   std::vector<std::pair<IMCObjectName, IMCObject>> sorted_PDO_objects;
 
