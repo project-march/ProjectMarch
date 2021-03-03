@@ -85,10 +85,10 @@ def check_key(dic_one: dict, dic_two: dict, key: str) -> bool:
         return True
 
 
-def get_lengths_robot_from_urdf(  # noqa: CCR001
+def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
     side: Side = Side.both,
 ) -> List[float]:
-    """Grab lengths which are relevant for the inverse kinematics calculation.
+    """Grab lengths which are relevant for the inverse kinematics calculation from the urdf file.
 
     This function returns the lengths relevant for the specified foot, if no
     side is specified,it returns all relevant lengths for both feet.
@@ -155,7 +155,7 @@ def get_lengths_robot_from_urdf(  # noqa: CCR001
             .geometry.size[1]  # noqa ECE001
         )
         # The foot is a certain amount more to the inside of the exo then the
-        # leg structures. The haa arms need to account for this.
+        # leg structures. The haa arms (pelic to hip lengths) need to account for this.
         off_set = (  # noqa: ECE001
             robot.link_map["ankle_plate_right"].visual.origin.xyz[1] + base / 2 + r_hl
         )
@@ -174,9 +174,14 @@ def get_lengths_robot_from_urdf(  # noqa: CCR001
     else:
         return [l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base]
 
-LENGTHS_BOTH_SIDES = get_lengths_robot_from_urdf()
+
+LENGTHS_BOTH_SIDES = get_lengths_robot_from_urdf_for_inverse_kinematics()
+
+
 def get_lengths_robot_for_inverse_kinematics(side: Side = Side.both) -> List[float]:
+    """Grab lengths which are relevant for the inverse kinematics calculations from a list."""
     l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base = LENGTHS_BOTH_SIDES
+
     if side == Side.left:
         return [l_ul, l_ll, l_hl, l_ph, base]
     elif side == Side.right:
@@ -184,9 +189,9 @@ def get_lengths_robot_for_inverse_kinematics(side: Side = Side.both) -> List[flo
     else:
         return [l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base]
 
+
 def get_joint_names_for_inverse_kinematics() -> List[str]:
-    """
-    Get a list of the joint names that can be used for the inverse kinematics.
+    """Get a list of the joint names that can be used for the inverse kinematics.
 
     This also checks whether robot description contains the required joints.
     :return: A list of joint names.
