@@ -15,16 +15,17 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
     n_(n),
     reading_(false)
 {
-  pointcloud_subscriber_ = n_->subscribe<PointCloud>
+  pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>
       ("/camera/depth/color/points", 1,
        &RealSenseReader::pointcloud_callback, this);
   read_pointcloud_service_ = n_->advertiseService
       ("/camera/read_pointcloud",
        &RealSenseReader::read_pointcloud_callback,
        this);
+
   config_tree_ = readConfig("pointcloud_parameters.yaml");
 
-  preprocessor_ = std::make_unique<SimplePreprocessor>(
+  preprocessor_ = std::make_unique<NormalsPreprocessor>(
       getConfigIfPresent("preprocessor"));
   region_creator_ = std::make_unique<SimpleRegionCreator>(
       getConfigIfPresent("region_creator"));
@@ -32,7 +33,8 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
   if (config_tree_["debug"])
   {
     debugging_ = config_tree_["debug"].as<bool>();
-  } else
+  }
+  else
   {
     debugging_ = false;
   }
@@ -51,7 +53,8 @@ YAML::Node RealSenseReader::readConfig(std::string config_file) {
   try
   {
     config_tree = YAML::LoadFile(path);
-  } catch (YAML::Exception e)
+  }
+  catch (YAML::Exception e)
   {
     ROS_WARN_STREAM("YAML file with path " << path << " could not be loaded, using "
                                                       "empty config instead");
@@ -64,7 +67,8 @@ YAML::Node RealSenseReader::getConfigIfPresent(std::string key)
   if (config_tree_[key])
   {
     return config_tree_[key];
-  } else
+  }
+  else
   {
     ROS_WARN_STREAM("Key " << key << " was not found in the config file, empty config "
                                      "will be used");
@@ -72,29 +76,40 @@ YAML::Node RealSenseReader::getConfigIfPresent(std::string key)
   }
 }
 
-void RealSenseReader::pointcloud_callback(const PointCloud::ConstPtr& input_cloud)
+
+// When `reading_` is true, this method executes the logic to process a pointcloud
+// on the next pointcloud the camera publishes. When `reading_` is false, this does nothing.
+void RealSenseReader::pointcloud_callback(const sensor_msgs::PointCloud2 input_cloud)
 {
   if (reading_)
   {
     // All logic to execute with a pointcloud will be executed here.
+    ROS_INFO_STREAM("Processing point cloud at time " << input_cloud.header.stamp);
+
     reading_ = false;
-    PointCloud::Ptr pointcloud = boost::make_shared<PointCloud>(*input_cloud);
+
+    PointCloud converted_cloud;
+    pcl::fromROSMsg(input_cloud, converted_cloud);
+    PointCloud::Ptr pointcloud = boost::make_shared<PointCloud>(converted_cloud);
     Normals::Ptr normals = boost::make_shared<Normals>();
 
     // Preprocess
     preprocessor_->preprocess(pointcloud, normals);
+
     if (debugging_)
     {
-      preprocessed_pointcloud_publisher_.publish(pointcloud);
+      publishPreprocessedPointCloud(pointcloud);
     }
 
     // Create regions
     boost::shared_ptr<RegionsVector> regions_vector =
         boost::make_shared<RegionsVector>();
     region_creator_->create_regions(pointcloud, normals, regions_vector);
+
   }
 }
 
+// Sets the `reading_` variable to true so pointcloud_callback executes its logic
 bool RealSenseReader::read_pointcloud_callback(std_srvs::Trigger::Request &req,
                                                std_srvs::Trigger::Response &res)
 {
@@ -102,3 +117,18 @@ bool RealSenseReader::read_pointcloud_callback(std_srvs::Trigger::Request &req,
   res.success = true;
   return true;
 }
+
+// Publishes the pointcloud on a topic for visualisation in rviz or furter use
+void RealSenseReader::publishPreprocessedPointCloud(PointCloud::Ptr pointcloud)
+{
+  ROS_INFO_STREAM("Publishing a preprocessed cloud with size: " << pointcloud->points.size());
+
+  pointcloud->width  = 1;
+  pointcloud->height = pointcloud->points.size();
+
+  sensor_msgs::PointCloud2 msg;
+  pcl::toROSMsg(*pointcloud, msg);
+
+  preprocessed_pointcloud_publisher_.publish(msg);
+}
+
