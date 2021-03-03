@@ -60,6 +60,7 @@ add_library(${PROJECT_NAME}
     include/${PROJECT_NAME}/motor_controller/motor_controller.h
     include/${PROJECT_NAME}/motor_controller/motor_controller_state.h
     include/${PROJECT_NAME}/motor_controller/odrive/odrive.h
+    include/${PROJECT_NAME}/motor_controller/odrive/odrive_state.h
     include/${PROJECT_NAME}/joint.h
     include/${PROJECT_NAME}/march_robot.h
     include/${PROJECT_NAME}/power/boot_shutdown_offsets.h

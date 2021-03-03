@@ -1,6 +1,6 @@
 // Copyright 2018 Project March.
 #include "march_hardware/motor_controller/odrive/odrive.h"
-#include "march_hardware/motor_controller/imotioncube/imotioncube_state.h"
+#include "march_hardware/motor_controller/odrive/odrive_state.h"
 #include <march_hardware/motor_controller/motor_controller_state.h>
 #include "march_hardware/motor_controller/motor_controller.h"
 #include "march_hardware/error/hardware_exception.h"
@@ -47,7 +47,7 @@ unsigned int ODrive::getActuationModeNumber() const
 
 std::shared_ptr<MotorControllerState> ODrive::getState()
 {
-  auto imc_state = std::make_shared<IMotionCubeState>();
+  auto imc_state = std::make_shared<ODriveState>();
   return imc_state;
 }
 
