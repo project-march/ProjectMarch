@@ -9,11 +9,11 @@
 #include <pointcloud_processor/parameter_determiner.h>
 #include <pointcloud_processor/plane_finder.h>
 
-using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
-using Normals = pcl::PointCloud<pcl::Normal>;
-using RegionsVector = std::vector<pcl::PointIndices>;
-using PlaneParameters = std::vector<pcl::ModelCoefficients::Ptr>;
-using HullsVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
+//using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
+//using Normals = pcl::PointCloud<pcl::Normal>;
+//using RegionsVector = std::vector<pcl::PointIndices>;
+//using PlaneParameters = std::vector<pcl::ModelCoefficients::Ptr>;
+//using HullsVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
 
 std::string POINTCLOUD_TOPIC = "/camera/depth/color/points";
 

@@ -40,26 +40,27 @@ class SimplePreprocessor : Preprocessor {
 
     // Preprocess the given pointcloud, based on parameters in the config tree
     bool preprocess(PointCloud::Ptr pointcloud,
-                    Normals::Ptr normal_pointcloud) override;
+                    Normals::Ptr pointcloud_normals) override;
 
-  // Removes all points which do not roughly have a normal in a certain direction (specified in the parameter file)
-  void filterOnNormalOrientation();
+  protected:
+    /** Calls the tf listener, to know transform at current time and transforms the
+     pointcloud **/
+    void transformPointCloudFromUrdf();
 
-  // Remove statistical outliers from the pointcloud to reduce noise
-  void removeStatisticalOutliers();
+    std::unique_ptr<tf2_ros::Buffer> tfBuffer;
+    std::unique_ptr<tf2_ros::TransformListener> tfListener;
 };
 
 class NormalsPreprocessor : Preprocessor {
-public:
-    /** Basic constructor for simple preprocessor, this will also create a tf_listener
-    that is required for transforming the pointcloud **/
-    NormalsPreprocessor(YAML::Node config_tree);
+  public:
+    // Use constructor from super class
+    using Preprocessor::Preprocessor;
 
     // Calls all subsequent methods to preprocess a pointlcoud using normal vectors
     bool preprocess(PointCloud::Ptr pointcloud,
                     Normals::Ptr pointcloud_normals) override;
 
-protected:
+  protected:
     // Removes points from the pointcloud such that there is only one point left in a certain area
     // (specified in the parameter file)
     void downsample();
@@ -72,5 +73,12 @@ protected:
 
     // Removes all points which are futher away then a certain distance from the origin (specified in the parameter file)
     void filterOnDistanceFromOrigin();
+
+    // Removes all points which do not roughly have a normal in a certain direction (specified in the parameter file)
+    void filterOnNormalOrientation();
+
+    // Remove statistical outliers from the pointcloud to reduce noise
+    void removeStatisticalOutliers();
+};
 
 #endif //MARCH_PREPROCESSOR_H

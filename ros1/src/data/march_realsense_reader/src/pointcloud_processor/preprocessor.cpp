@@ -32,13 +32,6 @@ SimplePreprocessor::SimplePreprocessor(YAML::Node config_tree, bool debugging):
   tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
 }
 
-// Create a preprocessor with the ability to estimate normals and filter based on them
-NormalsPreprocessor::NormalsPreprocessor(YAML::Node config_tree):
-        Preprocessor(config_tree)
-{
-
-}
-
 // Removes a point from a pointcloud (and optionally the corresponding pointcloud_normals as well) at a given index
 void Preprocessor::removePointByIndex(int const index, PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals)
 {
@@ -65,8 +58,8 @@ void Preprocessor::removePointByIndex(int const index, PointCloud::Ptr pointclou
   }
 }
 
-bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud, Normals::Ptr
-pointcloud_normals)
+bool NormalsPreprocessor::preprocess(
+    PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals)
 {
   pointcloud_ = pointcloud;
   pointcloud_normals_ = pointcloud_normals;
@@ -295,7 +288,7 @@ void NormalsPreprocessor::filterOnNormalOrientation()
 
 // Preprocess the pointcloud, this means only transforming for the simple preprocessor
 bool SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud,
-                                    Normals::Ptr normal_pointcloud)
+                                    Normals::Ptr pointcloud_normals)
 {
   pointcloud_ = pointcloud;
   pointcloud_normals_ = pointcloud_normals;
