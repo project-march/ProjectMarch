@@ -1,5 +1,5 @@
 #include <pointcloud_processor/preprocessor.h>
-#include <yaml_utilities.h>
+#include <utilities/yaml_utilities.h>
 
 #include "yaml-cpp/yaml.h"
 #include <ros/ros.h>
