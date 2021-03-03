@@ -81,7 +81,8 @@ YAML::Node RealSenseReader::getConfigIfPresent(std::string key)
 // on the next pointcloud the camera publishes. When `reading_` is false, this does nothing.
 void RealSenseReader::pointcloud_callback(const sensor_msgs::PointCloud2 input_cloud)
 {
-  if (reading_) {
+  if (reading_)
+  {
     // All logic to execute with a pointcloud will be executed here.
     ROS_INFO_STREAM("Processing point cloud at time " << input_cloud.header.stamp);
 
