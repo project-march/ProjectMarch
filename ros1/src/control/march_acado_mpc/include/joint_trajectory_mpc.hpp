@@ -66,6 +66,10 @@ public:
    */
   void stopping(const ros::Time& /*time*/);
   /**
+   * \brief Start MPC topic and resize vectors in the MPC msg.
+   */
+  void initMpcMsg();
+  /**
    * \brief Set and publish the message with MPC outputs, and MPC configuration
    */
   void setMpcMsg();
