@@ -4,6 +4,7 @@
 #include "acado_common.h"
 #include <acado_auxiliary_functions.h>
 #include "mpc_references.h"
+#include <ros/console.h>
 
 #include <iostream>
 #include <vector>
@@ -100,6 +101,34 @@ void ModelPredictiveController::assignWeightingMatrix(std::vector<std::vector<fl
     }
 }
 
+void ModelPredictiveController::controllerDiagnosis() {
+    // Check acado_preparationStep() status code
+    ROS_WARN_STREAM_COND(preparationStepStatus > 0, joint_name << ", Error in preparation step");
+
+    // Check acado_feedbackStep() status code
+    // Only checks codes that indicate an error
+    switch (feedbackStepStatus) {
+        case 1:
+            ROS_WARN_STREAM(joint_name << ", QP could not be solved within the given number of iterations");
+            break;
+
+        case -1:
+            ROS_WARN_STREAM(joint_name << ", QP could not be solved due to an internal error");
+            break;
+
+        case -2:
+            ROS_WARN_STREAM(joint_name << ", QP is infeasible and thus could not be solved");
+            break;
+
+        case -3:
+            ROS_WARN_STREAM(joint_name << ", QP is unbounded and thus could not be solved");
+            break;
+    }
+
+    // Check soft bound on controller update time
+    ROS_WARN_STREAM_COND(t_preparation+t_feedback > controllerUpdateSoftBound, joint_name << ", controller update time exceeded soft bound");
+}
+
 void ModelPredictiveController::calculateControlInput() {
 
   // Set initial state
@@ -111,12 +140,12 @@ void ModelPredictiveController::calculateControlInput() {
   // Preparation step (timed)
   acado_tic(&t);
   preparationStepStatus = acado_preparationStep();
-  t_preparation = acado_toc(&t) * 1e6;
+  t_preparation = acado_toc(&t);
 
   // Feedback step (timed)
   acado_tic(&t);
   feedbackStepStatus = acado_feedbackStep();
-  t_feedback = acado_toc(&t) * 1e6;
+  t_feedback = acado_toc(&t);
   
   // Set mpc command 
   u = acadoVariables.u[0];
@@ -129,5 +158,8 @@ void ModelPredictiveController::calculateControlInput() {
   if(repeat_reference) {
       scrollReference(reference);
   }
+
+  // Perform a diagnosis on the controller
+  controllerDiagnosis();
 
 }

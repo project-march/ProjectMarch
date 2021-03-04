@@ -18,6 +18,7 @@ bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::Jo
   for (unsigned int i = 0; i < num_joints_; ++i)
   {
     model_predictive_controllers_.push_back(ModelPredictiveController(getQMatrix(joint_names[i])));
+    model_predictive_controllers_[i].joint_name = joint_names[i];
     model_predictive_controllers_[i].init();
   }
 
