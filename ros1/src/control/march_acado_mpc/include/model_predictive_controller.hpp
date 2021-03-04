@@ -2,6 +2,7 @@
 #define MARCH_MODEL_PREDICTIVE_CONTROLLER_H
 
 #include <vector>
+#include <acado_auxiliary_functions.h>
 
 using namespace std;
 
@@ -15,6 +16,14 @@ public:
     double u;                           // Calculated control input
     vector<vector<double>> reference;   // Current reference
     bool repeat_reference = true;      // Periodically Repeat the reference
+
+    // Timing variables
+    acado_timer t;
+    double t_preparation, t_feedback;
+
+    // status variables
+    int preparationStepStatus;
+    int feedbackStepStatus;
 
     /**
      * \brief Initialise the model predictive controller

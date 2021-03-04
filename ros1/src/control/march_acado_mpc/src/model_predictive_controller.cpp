@@ -2,6 +2,7 @@
 
 #include "model_predictive_controller.hpp"
 #include "acado_common.h"
+#include <acado_auxiliary_functions.h>
 #include "mpc_references.h"
 
 #include <iostream>
@@ -107,12 +108,17 @@ void ModelPredictiveController::calculateControlInput() {
   // Set reference
   setReference(reference);
 
-  // preparation step
-  setReference(reference);
-  acado_preparationStep();
+  // Preparation step (timed)
+  acado_tic(&t);
+  preparationStepStatus = acado_preparationStep();
+  t_preparation = acado_toc(&t) * 1e6;
 
-  // feedback step
-  acado_feedbackStep();
+  // Feedback step (timed)
+  acado_tic(&t);
+  feedbackStepStatus = acado_feedbackStep();
+  t_feedback = acado_toc(&t) * 1e6;
+  
+  // Set mpc command 
   u = acadoVariables.u[0];
 
   // Shift states and control and prepare for the next iteration
