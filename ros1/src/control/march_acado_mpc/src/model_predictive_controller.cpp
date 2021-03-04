@@ -36,8 +36,8 @@ void ModelPredictiveController::init() {
   }
 
   // Fill reference vector with sinus and or step signals
-//  sinRef(reference, 0.2, 0.785, ACADO_N, 0.001);
-  stepRef(reference, 0.261, ACADO_N);
+  sinRef(reference, 0.2, 0.785, ACADO_N, 0.001);
+//  stepRef(reference, 0.261, ACADO_N);
 
   // Set the reference
   setReference(reference);
@@ -68,6 +68,12 @@ void ModelPredictiveController::setReference(vector<vector<double>> reference) {
     for(int j = 0; j < ACADO_NYN; j++) {
         acadoVariables.yN[j] = reference[ACADO_N][j];
     }
+}
+
+void ModelPredictiveController::shiftStatesAndControl(){
+    // Shift states and control and prepare for the next iteration
+    acado_shiftStates(2, 0, 0);
+    acado_shiftControls(0);
 }
 
 void ModelPredictiveController::assignWeightingMatrix(std::vector<std::vector<float>> Q) {
@@ -147,10 +153,6 @@ void ModelPredictiveController::calculateControlInput() {
   
   // Set mpc command 
   u = acadoVariables.u[0];
-
-  // Shift states and control and prepare for the next iteration
-  acado_shiftStates(2, 0, 0);
-  acado_shiftControls(0);
 
   // Scroll the reference vector
   if(repeat_reference) {

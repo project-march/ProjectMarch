@@ -73,6 +73,10 @@ public:
      * \brief Calculate the control input
      */
     void calculateControlInput();
+    /**
+     * \biref Shifts the state and control acadoVariables
+     */
+    void shiftStatesAndControl();
 
 private:
   std::vector<std::vector<float>> Q_;

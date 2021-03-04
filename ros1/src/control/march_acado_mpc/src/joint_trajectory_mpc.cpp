@@ -75,6 +75,7 @@ void ModelPredictiveControllerInterface::initMpcMsg() {
     // Initialise Mpc messages
     int prediction_horizon = ACADO_N;
     mpc_pub_->msg_.joint.resize(num_joints_);
+
     for (unsigned int i = 0; i < num_joints_; i++) {
         mpc_pub_->msg_.joint[i].tuning.horizon = prediction_horizon;
         mpc_pub_->msg_.joint[i].estimation.position.resize(prediction_horizon + 1);
@@ -82,10 +83,12 @@ void ModelPredictiveControllerInterface::initMpcMsg() {
         mpc_pub_->msg_.joint[i].estimation.control.resize(prediction_horizon + 1);
         mpc_pub_->msg_.joint[i].state.reference_trajectory.resize(ACADO_NYN);
         mpc_pub_->msg_.joint[i].state.reference_input.resize(ACADO_NU);
+
         // Loop trough all the outputs
         for (unsigned int j = 0; j < ACADO_NYN; j++) {
             mpc_pub_->msg_.joint[i].state.reference_trajectory[j].array.resize(prediction_horizon + 1);
         }
+
         // Loop trough all the inputs
         for (unsigned int j = 0; j < ACADO_NU; j++) {
             // The optimal control is one value shorter than the output,
@@ -105,44 +108,33 @@ void ModelPredictiveControllerInterface::setMpcMsg()
     for (int i = 0; i < num_joints_; i++)
     {
         mpc_pub_->msg_.joint[i].state.command = command;
-//        dest.insert(dest.begin(), std::begin(src), std::end(src));
-//        mpc_pub_->msg_.joint[i].estimation.control.clear();
         mpc_pub_->msg_.joint[i].estimation.control.assign(std::begin(acadoVariables.u), std::end(acadoVariables.u));
         // Loop through the 'measurements' (y_i == 0 -> angle, y_i == 1 -> d/dt*angle)
         for(int n_i = 0; n_i < ACADO_N + 1; n_i++)
         {
-//            // Loop through outputs
+            // Loop through outputs
             for (int y_i = 0; y_i < ACADO_NYN; y_i++)
             {
                 mpc_pub_->msg_.joint[i].state.reference_trajectory[y_i].array[n_i] =
                         acadoVariables.y[y_i + n_i * ACADO_NY];
             }
-//            // Loop trough inputs
-//            for (int u_i = 0; u_i < ACADO_NU; u_i++)
-//            {
-//                mpc_pub_->msg_.joint[i].state.reference_trajectory[ACADO_NY + u_i].array[n_i] =
-//                        acadoVariables.y[ACADO_NY + u_i + n_i * ACADO_NY];
-//            }
-//            for (int x_i = 0; x_i < ACADO_NX; x_i++)
-//            {
-//                mpc_pub_->msg_.joint[i].estimation.position[x_i] = acadoVariables.x[x_i];
-//                mpc_pub_->msg_.joint[i].estimation.velocity[x_i] = acadoVariables.x[x_i + 1];
-//            }
+
+            // Loop trough inputs
+            for (int u_i = 0; u_i < ACADO_NU; u_i++)
+            {
+                mpc_pub_->msg_.joint[i].state.reference_input[u_i].array[n_i] =
+                        acadoVariables.y[ACADO_NYN + u_i + n_i * ACADO_NY];
+            }
+
+            // Estimated states
+            mpc_pub_->msg_.joint[i].estimation.position[n_i] = acadoVariables.x[ACADO_NX * n_i];
+            mpc_pub_->msg_.joint[i].estimation.velocity[n_i] = acadoVariables.x[ACADO_NX * n_i + 1];
+
         }
 
     }
     mpc_pub_->unlockAndPublish();
 }
-//    for(int i = 0; i < ACADO_N; i++) {
-//        for(int j = 0; j < ACADO_NY; j++) {
-////            acadoVariables.y[i * ACADO_NY + j] = reference[i][j];
-//            mpc_pub_
-//        }
-//    }
-//    for(int j = 0; j < ACADO_NYN; j++) {
-//        acadoVariables.yN[j] = reference[ACADO_N][j];
-//    }
-
 
 void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/, const ros::Duration& period,
                                                        const std::vector<joint_trajectory_controller::State>&  /*desired_states*/,
@@ -172,6 +164,7 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
       // Publish command
       setMpcMsg();
 
+      model_predictive_controllers_[i].shiftStatesAndControl();
   }
 }
 
