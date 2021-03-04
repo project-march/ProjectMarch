@@ -55,3 +55,4 @@ The additional terms can be found in [LICENSE-ADDITIONAL-TERMS.md](LICENSE-ADDIT
 
 ## Contact
 If you have any questions about our project, don't hesitate to contact us at software@projectmarch.nl.
+If you would like to reach us through paper mail, our address can be found on [www.projectmarch.nl](www.projectmarch.nl).
