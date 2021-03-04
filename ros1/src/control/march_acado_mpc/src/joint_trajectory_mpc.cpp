@@ -94,9 +94,31 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
     state = {(*joint_handles_ptr_)[i].getPosition(), (*joint_handles_ptr_)[i].getVelocity()};
     model_predictive_controllers_[i].x0 = state;
 
-    // Calculate mpc control signal
+    std::cout << "Pos: " << state[0] << std::endl;
+
+//    // Integrator
+//    ki = 20.0;
+//    clamp_i = 5.0;
+//    integrated_error = integrated_error + (model_predictive_controllers_[i].reference[0][0]-state[0])*period.toSec();
+//    integrator_command = ki*integrated_error;
+//
+//    // Integrator Clamp
+//    if(integrator_command >= clamp_i) {
+//        integrator_command = clamp_i;
+//    }
+//    else if (integrator_command <= -clamp_i) {
+//        integrator_command = -clamp_i;
+//    }
+//
+//    std::cout << "error_sum: " << integrated_error << std::endl;
+//    std::cout << "i_command: " << integrator_command << std::endl;
+
+    // Calculate mpc control signal + integrator
     model_predictive_controllers_[i].calculateControlInput();
+//    command = model_predictive_controllers_[i].u + integrator_command;
     command = model_predictive_controllers_[i].u;
+//    command = command - 0.01;
+    std::cout << "command: " << command << std::endl;
 
     // Apply command
     (*joint_handles_ptr_)[i].setCommand(command);
@@ -113,15 +135,15 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
       }
       ref_pub_->msg_.data = model_predictive_controllers_[0].pos_ref;
 
-    current_time = clock();
-    elapsed_seconds = double(current_time-previous_time) / double(CLOCKS_PER_SEC);
-    total_seconds = total_seconds + elapsed_seconds;
-    mean_seconds = total_seconds/iter;
-    std::cout << "Update time (s): " << elapsed_seconds << setprecision(5) << std::endl;
-    std::cout << "Mean time (s): " << mean_seconds << setprecision(5) << std::endl;
-    previous_time = current_time;
-
-    iter = iter + 1.0;
+//    current_time = clock();
+//    elapsed_seconds = double(current_time-previous_time) / double(CLOCKS_PER_SEC);
+//    total_seconds = total_seconds + elapsed_seconds;
+//    mean_seconds = total_seconds/iter;
+//    std::cout << "Update time (s): " << elapsed_seconds << setprecision(5) << std::endl;
+//    std::cout << "Mean time (s): " << mean_seconds << setprecision(5) << std::endl;
+//    previous_time = current_time;
+//
+//    iter = iter + 1.0;
 
   }
 

@@ -77,7 +77,7 @@ private:
   std::vector<hardware_interface::JointHandle>* joint_handles_ptr_;
 
   unsigned int num_joints_;
-  double command;
+  double command = 0.0;
 
   std::vector<ModelPredictiveController> model_predictive_controllers_;
   vector<double> state;
@@ -85,12 +85,18 @@ private:
   std::unique_ptr<realtime_tools::RealtimePublisher<std_msgs::Float64MultiArray>> command_pub_;
   std::unique_ptr<realtime_tools::RealtimePublisher<std_msgs::Float64>> ref_pub_;
 
-  clock_t previous_time = clock();
-  clock_t current_time = clock();
-  double elapsed_seconds;
-  double total_seconds = 0.0;
-  double mean_seconds = 0.0;
-  double iter = 1.0;
+//  clock_t previous_time = clock();
+//  clock_t current_time = clock();
+//  double elapsed_seconds = 0.025;
+//  double total_seconds = 0.0;
+//  double mean_seconds = 0.0;
+//  double iter = 1.0;
+
+  // integrator
+  double ki;
+  double clamp_i;
+  double integrated_error = 0.0;
+  double integrator_command = 0.0;
 };
 
 // Assign an alias to the class definition

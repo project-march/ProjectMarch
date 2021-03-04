@@ -34,13 +34,22 @@ void ModelPredictiveController::init()
   }
 
   // Fill reference vector with sinus and or step signals
-//  sinRef(reference, 0.1, 0.261791667, ACADO_N, 0.02);  // freq, amp, horizon, sampling time   [10s]
-//  sinRef(reference, 0.125, 0.261791667, ACADO_N, 0.02);  // freq, amp, horizon, sampling time [08s]
-//  sinRef(reference, 0.16, 0.261791667, ACADO_N, 0.02);  // freq, amp, horizon, sampling time  [06s]
-    stepRef(reference, 0.0, 2*ACADO_N);
+  sinRef(reference, 0.100, 0.4, ACADO_N, 0.02);       // freq, amp, horizon, sampling time   [10s]
+  sinRef(reference, 0.111, 0.4, ACADO_N, 0.02);   // freq, amp, horizon, sampling time   [10s]
+  sinRef(reference, 0.125, 0.4, ACADO_N, 0.02);   // freq, amp, horizon, sampling time   [10s]
+  sinRef(reference, 0.143, 0.4, ACADO_N, 0.02);   // freq, amp, horizon, sampling time   [10s]
+  sinRef(reference, 0.160, 0.4, ACADO_N, 0.02);   // freq, amp, horizon, sampling time   [10s]
+  sinRef(reference, 0.200, 0.4, ACADO_N, 0.02);   // freq, amp, horizon, sampling time   [10s]
+  sinRef(reference, 0.250, 0.4, ACADO_N, 0.02);   // freq, amp, horizon, sampling time   [10s]
+  sinRef(reference, 0.333, 0.4, ACADO_N, 0.02);   // freq, amp, horizon, sampling time   [10s]
+  sinRef(reference, 0.400, 0.4, ACADO_N, 0.02);   // freq, amp, horizon, sampling time   [10s]
+  sinRef(reference, 0.500, 0.4, ACADO_N, 0.02);   // freq, amp, horizon, sampling time   [10s]
+  sinRef(reference, 0.667, 0.4, ACADO_N, 0.02);   // freq, amp, horizon, sampling time   [10s]
+  sinRef(reference, 1.000, 0.4, ACADO_N, 0.02);  // freq, amp, horizon, sampling time   [10s]
+  stepRef(reference, 0.0, 20*ACADO_N);
 
   // hold last N reference values
-//  repeat_reference = false;
+//    repeat_reference = false;
 
   // Set the reference
   setReference(reference);
@@ -132,6 +141,8 @@ void ModelPredictiveController::assignWeightingMatrix(std::vector<std::vector<fl
 
 void ModelPredictiveController::calculateControlInput()
 {
+  std::cout << "\n---\n" << std::endl;
+
   // Set initial state
   setInitialState(x0);
   pos_ref = acadoVariables.y[0];
