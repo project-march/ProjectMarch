@@ -71,6 +71,19 @@ protected:
   std::string description_;
 };
 
+class NotImplemented : public std::logic_error
+{
+public:
+  NotImplemented(std::string function_name) : std::logic_error("Function " + function_name + " is not implemented")
+  {
+  };
+
+  NotImplemented(std::string function_name, std::string context)
+    : std::logic_error("Function " + function_name + " is not implemented for " + context)
+  {
+  };
+};
+
 }  // namespace error
 }  // namespace march
 

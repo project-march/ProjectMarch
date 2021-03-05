@@ -26,10 +26,10 @@ ODrive::ODrive(const Slave& slave, int axis_number, std::shared_ptr<AbsoluteEnco
   : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode)
   , axis_number_(axis_number)
 {
-  if (this->absolute_encoder_ == nullptr || this->incremental_encoder_ == nullptr)
+  if (this->absolute_encoder_ == nullptr)
   {
     throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
-                                   "An ODrive needs either an incremental or an absolute encoder");
+                                   "An ODrive needs an absolute encoder");
   }
 };
 
@@ -41,11 +41,6 @@ ODrive::ODrive(const Slave& slave, int axis_number, std::shared_ptr<AbsoluteEnco
 void ODrive::prepareActuation()
 {
   // No action is needed as the DieBoSlave make sure actuation is ready when etherCAT connection is made
-}
-
-void ODrive::actuateRadians(double /*target_position*/)
-{
-  throw std::logic_error("actuateRadians is not implemented for ODrive");
 }
 
 void ODrive::actuateTorque(double target_torque)
@@ -69,25 +64,28 @@ unsigned int ODrive::getActuationModeNumber() const
 
 std::shared_ptr<MotorControllerState> ODrive::getState()
 {
-  auto imc_state = std::make_shared<ODriveState>();
-  return imc_state;
+  auto state = std::make_shared<ODriveState>();
+
+  //Set general attributes
+  state->absolute_position_iu_ = getAbsolutePositionIU();
+  state->absolute_velocity_iu_ = getAbsoluteVelocityIU();
+
+  state->absolute_position_ = getAbsolutePosition();
+  state->absolute_velocity_ = getAbsoluteVelocity();
+
+  // Set ODrive specific attributes
+//  state->axis_state_ = getAxisState(); // TODO: implement
+  state->axis_error_ = getAxisError();
+  state->motor_error_ = getMotorError();
+  state->encoder_manager_error_ = getEncoderManagerError();
+  state->encoder_error_ = getEncoderError();
+  state->controller_error_ = getControllerError();
+  return state;
 }
 
 float ODrive::getTorque()
 {
   return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ActualTorque, axis_number_)).f;
-}
-float ODrive::getMotorCurrent()
-{
-  throw std::logic_error("getMotorCurrent is not implemented for ODrive");
-}
-float ODrive::getMotorControllerVoltage()
-{
-  throw std::logic_error("getMotorControllerVoltage is not implemented for ODrive");
-}
-float ODrive::getMotorVoltage()
-{
-  throw std::logic_error("getMotorVoltage is not implemented for ODrive");
 }
 
 bool ODrive::initSdo(SdoSlaveInterface& /*sdo*/, int /*cycle_time*/)
@@ -98,27 +96,27 @@ bool ODrive::initSdo(SdoSlaveInterface& /*sdo*/, int /*cycle_time*/)
 
 void ODrive::reset(SdoSlaveInterface& /*sdo*/)
 {
-  throw std::logic_error("reset is not implemented for ODrive");
+  //TODO: implement
 }
 
-double ODrive::getAbsolutePosition()
+float ODrive::getAbsolutePositionIU()
 {
   return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ActualPosition, axis_number_)).f;
 }
 
-double ODrive::getIncrementalPosition()
-{
-  throw std::logic_error("getIncrementalPosition is not implemented for ODrive");
-}
-
-double ODrive::getAbsoluteVelocity()
+float ODrive::getAbsoluteVelocityIU()
 {
   return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ActualVelocity, axis_number_)).f;
 }
 
-double ODrive::getIncrementalVelocity()
+double ODrive::getAbsolutePosition()
 {
-  throw std::logic_error("getIncrementalVelocity is not implemented for ODrive");
+  return absolute_encoder_->toRadians(getAbsolutePositionIU(), true);
+}
+
+double ODrive::getAbsoluteVelocity()
+{
+  return absolute_encoder_->toRadians(getAbsoluteVelocityIU(), false);
 }
 
 ODriveAxisError ODrive::getAxisError()

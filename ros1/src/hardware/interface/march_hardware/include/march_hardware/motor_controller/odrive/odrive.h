@@ -41,7 +41,6 @@ public:
 
   // Override functions for actuating the ODrive
   void prepareActuation() override;
-  void actuateRadians(double target_position) override;
   void actuateTorque(double target_torque) override;
 
   // Transform the ActuationMode to a number that is understood by the ODrive
@@ -52,9 +51,6 @@ public:
 
   // Getters for specific information about the state of the motor and the ODrive
   float getTorque() override;
-  float getMotorCurrent() override;
-  float getMotorControllerVoltage() override;
-  float getMotorVoltage() override;
 
 protected:
   // Override protected functions from Slave class
@@ -63,9 +59,7 @@ protected:
 
   // Override protected functions from MotorController class
   double getAbsolutePosition() override;
-  double getIncrementalPosition() override;
   double getAbsoluteVelocity() override;
-  double getIncrementalVelocity() override;
 
 private:
   // Set the ODrive in a certain axis state
@@ -73,6 +67,9 @@ private:
 
 //  TODO: Look at getAxisState()
 //  ODriveAxisState getAxisState();
+
+  float getAbsolutePositionIU();
+  float getAbsoluteVelocityIU();
 
   ODriveAxisError getAxisError();
   ODriveMotorError getMotorError();

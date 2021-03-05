@@ -9,15 +9,12 @@
 namespace march
 {
 MotorController::MotorController(const Slave& slave, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
-                                 std::shared_ptr<IncrementalEncoder> incremental_encoder,
-                                 ActuationMode actuation_mode)
-  : Slave(slave)
-  , actuation_mode_(actuation_mode)
+                                 std::shared_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode)
+  : Slave(slave), actuation_mode_(actuation_mode)
 {
   if (incremental_encoder == nullptr && absolute_encoder_ == nullptr)
   {
-    throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
-                                   "A MotorController needs at least an incremental or an absolute encoder");
+    throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "A MotorController needs at least an incremental or an absolute encoder");
   }
   else
   {
@@ -143,9 +140,40 @@ void MotorController::actuate(double target)
   }
   else
   {
-    throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
-                                   "Actuation mode %s is not supported",
+    throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE, "Actuation mode %s is not supported",
                                    actuation_mode_.toString().c_str());
   }
 }
+
+
+// Throw NotImplemented error by default for functions not part of the Minimum Viable Product
+
+void MotorController::actuateRadians(double /*target_position*/)
+{
+  throw error::NotImplemented("actuateRadians", "current MotorController");
+}
+
+float MotorController::getMotorCurrent()
+{
+  throw error::NotImplemented("getMotorCurrent", "current MotorController");
+}
+float MotorController::getMotorControllerVoltage()
+{
+  throw error::NotImplemented("getMotorControllerVoltage", "current MotorController");
+}
+float MotorController::getMotorVoltage()
+{
+  throw error::NotImplemented("getMotorVoltage", "current MotorController");
+}
+
+double MotorController::getIncrementalPosition()
+{
+  throw error::NotImplemented("getIncrementalPosition", "current MotorController");
+}
+
+double MotorController::getIncrementalVelocity()
+{
+  throw error::NotImplemented("getIncrementalVelocity", "current MotorController");
+}
+
 }
