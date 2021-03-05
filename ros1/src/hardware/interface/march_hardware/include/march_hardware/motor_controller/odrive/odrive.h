@@ -11,7 +11,6 @@
 #include "march_hardware/ethercat/slave.h"
 #include "march_hardware/encoder/absolute_encoder.h"
 #include "march_hardware/encoder/incremental_encoder.h"
-#include <march_hardware/motor_controller/motor_controller_state.h>
 #include "march_hardware/motor_controller/odrive/odrive_state.h"
 
 #include <memory>
@@ -42,6 +41,7 @@ public:
   // Override functions for actuating the ODrive
   void prepareActuation() override;
   void actuateTorque(double target_torque) override;
+  void actuateRadians(double target_position) override;
 
   // Transform the ActuationMode to a number that is understood by the ODrive
   unsigned int getActuationModeNumber() const override;
@@ -51,6 +51,9 @@ public:
 
   // Getters for specific information about the state of the motor and the ODrive
   float getTorque() override;
+  float getMotorCurrent() override;
+  float getMotorControllerVoltage() override;
+  float getMotorVoltage() override;
 
 protected:
   // Override protected functions from Slave class
@@ -59,7 +62,9 @@ protected:
 
   // Override protected functions from MotorController class
   double getAbsolutePosition() override;
+  double getIncrementalPosition() override;
   double getAbsoluteVelocity() override;
+  double getIncrementalVelocity() override;
 
 private:
   // Set the ODrive in a certain axis state

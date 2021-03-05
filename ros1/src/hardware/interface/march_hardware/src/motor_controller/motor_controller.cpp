@@ -144,36 +144,4 @@ void MotorController::actuate(double target)
                                    actuation_mode_.toString().c_str());
   }
 }
-
-
-// Throw NotImplemented error by default for functions not part of the Minimum Viable Product
-
-void MotorController::actuateRadians(double /*target_position*/)
-{
-  throw error::NotImplemented("actuateRadians", "current MotorController");
-}
-
-float MotorController::getMotorCurrent()
-{
-  throw error::NotImplemented("getMotorCurrent", "current MotorController");
-}
-float MotorController::getMotorControllerVoltage()
-{
-  throw error::NotImplemented("getMotorControllerVoltage", "current MotorController");
-}
-float MotorController::getMotorVoltage()
-{
-  throw error::NotImplemented("getMotorVoltage", "current MotorController");
-}
-
-double MotorController::getIncrementalPosition()
-{
-  throw error::NotImplemented("getIncrementalPosition", "current MotorController");
-}
-
-double MotorController::getIncrementalVelocity()
-{
-  throw error::NotImplemented("getIncrementalVelocity", "current MotorController");
-}
-
 }

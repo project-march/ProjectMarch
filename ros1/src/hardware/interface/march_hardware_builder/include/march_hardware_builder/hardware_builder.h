@@ -16,6 +16,7 @@
 #include <march_hardware/ethercat/pdo_interface.h>
 #include <march_hardware/ethercat/sdo_interface.h>
 #include <march_hardware/motor_controller/imotioncube/imotioncube.h>
+#include <march_hardware/motor_controller/odrive/odrive.h>
 #include <march_hardware/joint.h>
 #include <march_hardware/march_robot.h>
 #include <march_hardware/power/power_distribution_board.h>
@@ -78,6 +79,11 @@ public:
                                                                const urdf::JointConstSharedPtr& urdf_joint,
                                                                march::PdoInterfacePtr pdo_interface,
                                                                march::SdoInterfacePtr sdo_interface);
+  static std::shared_ptr<march::ODrive> createODrive(const YAML::Node& odrive_config,
+                                                     march::ActuationMode mode,
+                                                     const urdf::JointConstSharedPtr& urdf_joint,
+                                                     march::PdoInterfacePtr pdo_interface,
+                                                     march::SdoInterfacePtr sdo_interface);
   static std::shared_ptr<march::TemperatureGES> createTemperatureGES(const YAML::Node& temperature_ges_config,
                                                                      march::PdoInterfacePtr pdo_interface,
                                                                      march::SdoInterfacePtr sdo_interface);
@@ -95,6 +101,7 @@ public:
   static const std::vector<std::string> INCREMENTAL_ENCODER_REQUIRED_KEYS;
   static const std::vector<std::string> ABSOLUTE_ENCODER_REQUIRED_KEYS;
   static const std::vector<std::string> IMOTIONCUBE_REQUIRED_KEYS;
+  static const std::vector<std::string> ODRIVE_REQUIRED_KEYS;
   static const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS;
   static const std::vector<std::string> POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS;
   static const std::vector<std::string> JOINT_REQUIRED_KEYS;

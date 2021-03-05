@@ -27,6 +27,10 @@ const std::vector<std::string> HardwareBuilder::IMOTIONCUBE_REQUIRED_KEYS =
     {
         "slaveIndex", "incrementalEncoder", "absoluteEncoder"
     };
+const std::vector<std::string> HardwareBuilder::ODRIVE_REQUIRED_KEYS =
+    {
+        "slaveIndex", "axis", "absoluteEncoder"
+    };
 const std::vector<std::string> HardwareBuilder::TEMPERATUREGES_REQUIRED_KEYS = { "slaveIndex", "byteOffset" };
 const std::vector<std::string> HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS =
     {
@@ -109,11 +113,18 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const 
     mode = march::ActuationMode(joint_config["actuationMode"].as<std::string>());
   }
 
-  auto imc =
-      HardwareBuilder::createIMotionCube(joint_config["imotioncube"], mode, urdf_joint, pdo_interface, sdo_interface);
-  if (!imc)
+  std::shared_ptr<march::MotorController> motor_controller;
+  if (joint_config["imotioncube"])
   {
-    ROS_WARN("Joint %s does not have a configuration for an IMotionCube", joint_name.c_str());
+    motor_controller = HardwareBuilder::createIMotionCube(joint_config["imotioncube"], mode, urdf_joint, pdo_interface, sdo_interface);
+  }
+  else if (joint_config["odrive"])
+  {
+    motor_controller = HardwareBuilder::createODrive(joint_config["odrive"], mode, urdf_joint, pdo_interface, sdo_interface);
+  }
+  if (!motor_controller)
+  {
+    throw MissingKeyException("imotioncube or odrive", "joint");
   }
 
   auto ges = HardwareBuilder::createTemperatureGES(joint_config["temperatureges"], pdo_interface, sdo_interface);
@@ -121,7 +132,7 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const 
   {
     ROS_WARN("Joint %s does not have a configuration for a TemperatureGes", joint_name.c_str());
   }
-  return { joint_name, net_number, allow_actuation, std::move(imc), std::move(ges) };
+  return { joint_name, net_number, allow_actuation, std::move(motor_controller), std::move(ges) };
 }
 
 std::shared_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAML::Node& imc_config,
@@ -148,6 +159,28 @@ std::shared_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
       march::Slave(slave_index, pdo_interface, sdo_interface),
       HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, urdf_joint),
       HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), setup, mode);
+}
+
+std::shared_ptr<march::ODrive> HardwareBuilder::createODrive(const YAML::Node& odrive_config,
+                                                             march::ActuationMode mode,
+                                                             const urdf::JointConstSharedPtr& urdf_joint,
+                                                             march::PdoInterfacePtr pdo_interface,
+                                                             march::SdoInterfacePtr sdo_interface)
+{
+  if (!odrive_config || !urdf_joint)
+  {
+    return nullptr;
+  }
+
+  HardwareBuilder::validateRequiredKeysExist(odrive_config, HardwareBuilder::ODRIVE_REQUIRED_KEYS, "odrive");
+
+  YAML::Node absolute_encoder_config = odrive_config["absoluteEncoder"];
+  int slave_index = odrive_config["slaveIndex"].as<int>();
+  int axis_number = odrive_config["axis"].as<int>();
+
+  return std::make_shared<march::ODrive>(
+      march::Slave(slave_index, pdo_interface, sdo_interface), axis_number,
+      HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, urdf_joint), mode);
 }
 
 std::shared_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(

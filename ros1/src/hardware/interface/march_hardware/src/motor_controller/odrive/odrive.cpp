@@ -143,4 +143,35 @@ ODriveControllerError ODrive::getControllerError()
 {
   return ODriveControllerError(this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ControllerError, axis_number_)).ui);
 }
+
+// Throw NotImplemented error by default for functions not part of the Minimum Viable Product
+void ODrive::actuateRadians(double /*target_position*/)
+{
+  throw error::NotImplemented("actuateRadians", "ODrive");
+}
+
+float ODrive::getMotorCurrent()
+{
+  throw error::NotImplemented("getMotorCurrent", "ODrive");
+}
+
+float ODrive::getMotorControllerVoltage()
+{
+  throw error::NotImplemented("getMotorControllerVoltage", "ODrive");
+}
+
+float ODrive::getMotorVoltage()
+{
+  throw error::NotImplemented("getMotorVoltage", "ODrive");
+}
+
+double ODrive::getIncrementalPosition()
+{
+  throw error::NotImplemented("getIncrementalPosition", "ODrive");
+}
+
+double ODrive::getIncrementalVelocity()
+{
+  throw error::NotImplemented("getIncrementalVelocity", "ODrive");
+}
 }

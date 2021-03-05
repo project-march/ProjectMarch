@@ -1,6 +1,6 @@
 // Copyright 2019 Project March.
-#ifndef MARCH_HARDWARE_IMOTIONCUBE_STATE_H
-#define MARCH_HARDWARE_IMOTIONCUBE_STATE_H
+#ifndef MARCH_HARDWARE_ODRIVE_STATE_H
+#define MARCH_HARDWARE_ODRIVE_STATE_H
 
 #include <string>
 #include "march_hardware/motor_controller/motor_controller_state.h"
@@ -392,7 +392,7 @@ public:
 
   bool isOk() override
   {
-    return axis_state_.value_ == march::ODriveAxisState::CLOSED_LOOP_CONTROL;
+    return axis_state_.value_ == ODriveAxisState::CLOSED_LOOP_CONTROL;
   }
 
   std::string getErrorStatus() override
@@ -421,4 +421,4 @@ public:
 };
 }  // namespace march
 
-#endif  // MARCH_HARDWARE_IMOTIONCUBE_STATE_OF_OPERATION_H
+#endif  // MARCH_HARDWARE_ODRIVE_STATE_OF_OPERATION_H
