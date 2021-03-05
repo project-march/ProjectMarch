@@ -30,28 +30,34 @@ std::unordered_map<IMCObjectName, IMCObject> IMCPDOmap::all_objects = {
   { IMCObjectName::MotorVoltage, IMCObject(0x2108, 3, 16) }
 };
 
-std::unordered_map<ODriveObjectName, ODriveObject> ODrivePDOmap::read_objects = {
-    { ODriveObjectName::Axis0ActualPosition, ODriveObject(0, 32) },
-    { ODriveObjectName::Axis0ActualTorque, ODriveObject(4, 32) },
-    { ODriveObjectName::Axis0MotorVelocity, ODriveObject( 8, 32) },
-    { ODriveObjectName::Axis0Error, ODriveObject(12, 32) },
-    { ODriveObjectName::Axis0MotorError, ODriveObject(16, 16) },
-    { ODriveObjectName::Axis0EMError, ODriveObject(20, 32) },
-    { ODriveObjectName::Axis0EncoderError, ODriveObject(24, 16) },
-    { ODriveObjectName::Axis0ControllerError, ODriveObject(28, 8) },
-    { ODriveObjectName::Axis1ActualPosition, ODriveObject(32, 32) },
-    { ODriveObjectName::Axis1ActualTorque, ODriveObject(36, 32) },
-    { ODriveObjectName::Axis1MotorVelocity, ODriveObject(40, 32) },
-    { ODriveObjectName::Axis1Error, ODriveObject(44, 32) },
-    { ODriveObjectName::Axis1MotorError, ODriveObject(48, 16) },
-    { ODriveObjectName::Axis1EMError, ODriveObject(52, 32) },
-    { ODriveObjectName::Axis1EncoderError, ODriveObject(56, 16) },
-    { ODriveObjectName::Axis1ControllerError, ODriveObject(60, 8) },
+ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_0 = {
+  { ODriveObjectName::ActualPosition, ODriveObject(0, 32) },
+  { ODriveObjectName::ActualTorque, ODriveObject(4, 32) },
+  { ODriveObjectName::ActualVelocity, ODriveObject(8, 32) },
+  { ODriveObjectName::AxisError, ODriveObject(12, 32) },
+  { ODriveObjectName::MotorError, ODriveObject(16, 16) },
+  { ODriveObjectName::EncoderManagerError, ODriveObject(20, 32) },
+  { ODriveObjectName::EncoderError, ODriveObject(24, 16) },
+  { ODriveObjectName::ControllerError, ODriveObject(28, 8) },
 };
 
-std::unordered_map<ODriveObjectName, ODriveObject> ODrivePDOmap::write_objects = {
-    { ODriveObjectName::Axis0TargetTorque, ODriveObject(0, 32) },
-    { ODriveObjectName::Axis1TargetTorque, ODriveObject(4, 32) },
+ODrivePDOmap::ObjectMap ODrivePDOmap::miso_objects_axis_1 = {
+  { ODriveObjectName::ActualPosition, ODriveObject(32, 32) },
+  { ODriveObjectName::ActualTorque, ODriveObject(36, 32) },
+  { ODriveObjectName::ActualVelocity, ODriveObject(40, 32) },
+  { ODriveObjectName::AxisError, ODriveObject(44, 32) },
+  { ODriveObjectName::MotorError, ODriveObject(48, 16) },
+  { ODriveObjectName::EncoderManagerError, ODriveObject(52, 32) },
+  { ODriveObjectName::EncoderError, ODriveObject(56, 16) },
+  { ODriveObjectName::ControllerError, ODriveObject(60, 8) }
+};
+
+ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_0 = {
+  { ODriveObjectName::TargetTorque, ODriveObject(0, 32) },
+};
+
+ODrivePDOmap::ObjectMap ODrivePDOmap::mosi_objects_axis_1 = {
+    { ODriveObjectName::TargetTorque, ODriveObject(0, 32) },
 };
 
 void IMCPDOmap::addObject(IMCObjectName object_name)
@@ -94,7 +100,7 @@ std::unordered_map<IMCObjectName, uint8_t> IMCPDOmap::map(SdoSlaveInterface& sdo
 }
 
 std::unordered_map<IMCObjectName, uint8_t> IMCPDOmap::configurePDO(SdoSlaveInterface& sdo, int base_register,
-                                                                uint16_t base_sync_manager)
+                                                                   uint16_t base_sync_manager)
 {
   int counter = 1;
   int current_register = base_register;
@@ -179,4 +185,44 @@ std::vector<std::pair<IMCObjectName, IMCObject>> IMCPDOmap::sortPDOObjects()
   }
   return sorted_PDO_objects;
 }
-}  // namespace march
+
+
+int8_t ODrivePDOmap::getMISOByteOffset(ODriveObjectName object_name, int axis_number)
+{
+  // TODO: Add contains key check
+  if(axis_number == 0)
+  {
+    return miso_objects_axis_0.at(object_name).offset;
+  }
+  else if(axis_number == 1)
+  {
+    return miso_objects_axis_1.at(object_name).offset;
+  }
+  else
+  {
+    // TODO: throw HardwareException
+    return -1;
+  }
+}
+
+int8_t ODrivePDOmap::getMOSIByteOffset(ODriveObjectName object_name, int axis_number)
+{
+  // TODO: Add contains key check
+  if(axis_number == 0)
+  {
+    return mosi_objects_axis_0.at(object_name).offset;
+  }
+  else if(axis_number == 1)
+  {
+    return mosi_objects_axis_1.at(object_name).offset;
+  }
+  else
+  {
+    // TODO: throw HardwareException
+    return -1;
+  }
+}
+
+
+
+}// namespace march

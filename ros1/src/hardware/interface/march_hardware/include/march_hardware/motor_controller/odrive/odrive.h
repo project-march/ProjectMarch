@@ -34,6 +34,8 @@ public:
    */
   ODrive(const Slave& slave, int axis_number, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
          std::shared_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
+  ODrive(const Slave& slave, int axis_number, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
+         ActuationMode actuation_mode);
 
   ~ODrive() noexcept override = default;
 
@@ -69,7 +71,9 @@ private:
   // Set the ODrive in a certain axis state
 //  void goToAxisState(ODriveAxisState target_state);
 
-  ODriveAxisState getAxisState();
+//  TODO: Look at getAxisState()
+//  ODriveAxisState getAxisState();
+
   ODriveAxisError getAxisError();
   ODriveMotorError getMotorError();
   ODriveEncoderManagerError getEncoderManagerError();

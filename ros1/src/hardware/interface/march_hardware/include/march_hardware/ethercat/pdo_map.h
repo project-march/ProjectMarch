@@ -106,35 +106,36 @@ struct ODriveObject
 enum class ODriveObjectName
 {
   // Read objects
-  Axis0ActualPosition,
-  Axis0ActualTorque,
-  Axis0MotorVelocity,
-  Axis0Error,
-  Axis0MotorError,
-  Axis0EMError,
-  Axis0EncoderError,
-  Axis0ControllerError,
-  Axis1ActualPosition,
-  Axis1ActualTorque,
-  Axis1MotorVelocity,
-  Axis1Error,
-  Axis1MotorError,
-  Axis1EMError,
-  Axis1EncoderError,
-  Axis1ControllerError,
+  ActualPosition,
+  ActualTorque,
+  ActualVelocity,
+  AxisError,
+  MotorError,
+  EncoderManagerError,
+  EncoderError,
+  ControllerError,
   // Write objects
-  Axis0TargetTorque,
-  Axis1TargetTorque
+  TargetTorque,
 };
 
 class ODrivePDOmap
 {
 public:
   /* Compared to the IMCPdoMap, the ODrivePDOmap is much simpler.
-   * All byte offsets can be stored directly and no additional mapping is required.
+   * All byte offsets can be stored directly and no additional logic is required.
    */
-  static std::unordered_map<ODriveObjectName, ODriveObject> write_objects;
-  static std::unordered_map<ODriveObjectName, ODriveObject> read_objects;
+
+  // Map ODriveObjectsNames to ODriveObjects, which contain the byte offset of the object
+  using ObjectMap = std::unordered_map<ODriveObjectName, ODriveObject>;
+
+  static ObjectMap miso_objects_axis_0;
+  static ObjectMap mosi_objects_axis_0;
+  static ObjectMap miso_objects_axis_1;
+  static ObjectMap mosi_objects_axis_1;
+
+  // Get the byte offset for an ODriveObject of an axis
+  static int8_t getMISOByteOffset(ODriveObjectName object_name, int axis_number);
+  static int8_t getMOSIByteOffset(ODriveObjectName object_name, int axis_number);
 };
 
 }// namespace march
