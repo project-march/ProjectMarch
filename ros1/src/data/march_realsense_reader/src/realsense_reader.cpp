@@ -112,9 +112,10 @@ bool RealSenseReader::process_pointcloud(
     publishPreprocessedPointCloud(pointcloud);
   }
 
-  // Create regions
+  // Setup data structures for region creating
   boost::shared_ptr<RegionVector> region_vector =
       boost::make_shared<RegionVector>();
+  // Create regions
   bool region_creating_was_successful =
       region_creator_->create_regions(pointcloud, normals, region_vector);
   if (not region_creating_was_successful)
@@ -129,11 +130,12 @@ bool RealSenseReader::process_pointcloud(
     //TODO: Add publisher to visualize created regions
   }
 
-  // Find hulls
+  // Setup data structures for hull finding
   boost::shared_ptr<PlaneParameterVector> plane_parameter_vector =
       boost::make_shared<PlaneParameterVector>();
   boost::shared_ptr<HullVector> hull_vector = boost::make_shared<HullVector>();
   boost::shared_ptr<PolygonVector> polygon_vector = boost::make_shared<PolygonVector>();
+  // Find hulls
   bool hull_finding_was_successful =
       hull_finder_->find_hulls(pointcloud, normals, region_vector,
                                  plane_parameter_vector, hull_vector, polygon_vector);
@@ -149,10 +151,11 @@ bool RealSenseReader::process_pointcloud(
     //TODO: Add publisher to visualize found planes
   }
 
-  // Determine parameters
+  // Setup data structures for parameter determining
   SelectedGait selected_obstacle = (SelectedGait) selected_gait;
   boost::shared_ptr<march_shared_msgs::GaitParameters> gait_parameters =
       boost::make_shared<march_shared_msgs::GaitParameters>();
+  // Determine parameters
   bool parameter_determining_was_successful =
       parameter_determiner_->determine_parameters(
           plane_parameter_vector, hull_vector, polygon_vector, selected_obstacle,
