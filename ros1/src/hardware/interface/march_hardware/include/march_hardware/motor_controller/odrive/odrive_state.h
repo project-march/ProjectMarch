@@ -205,7 +205,7 @@ public:
 class ODriveMotorError
 {
 public:
-  enum Value: uint32_t
+  enum Value: uint64_t
   {
     NONE                            = 0x00000000,
     PHASE_RESISTANCE_OUT_OF_RANGE   = 0x00000001,
@@ -240,7 +240,7 @@ public:
   {
   }
 
-  ODriveMotorError(uint32_t value) : value_(value)
+  ODriveMotorError(uint64_t value) : value_(value)
   {
   }
 
@@ -312,7 +312,7 @@ public:
     return errorsToString<ODriveMotorError, Value>(value_, "Motor", PHASE_RESISTANCE_OUT_OF_RANGE, CONTROLLER_INITIALIZING);
   }
 
-  bool operator==(uint16_t v) const
+  bool operator==(uint64_t v) const
   {
     return value_ == v;
   }
@@ -325,7 +325,7 @@ public:
     return value_ != a.value_;
   }
 
-  uint32_t value_;
+  uint64_t value_;
 };
 
 class ODriveEncoderManagerError
@@ -363,7 +363,7 @@ public:
     return errorsToString<ODriveEncoderManagerError, Value>(value_, "Encoder Manager", ERROR, ERROR);
   }
 
-  bool operator==(uint16_t v) const
+  bool operator==(uint32_t v) const
   {
     return value_ == v;
   }
@@ -444,7 +444,7 @@ public:
     return errorsToString<ODriveEncoderError, Value>(value_, "Encoder", UNSTABLE_GAIN, INFEASIBLE_IO_NUM);
   }
 
-  bool operator==(uint16_t v) const
+  bool operator==(uint32_t v) const
   {
     return value_ == v;
   }
@@ -510,7 +510,7 @@ public:
     return errorsToString<ODriveControllerError, Value>(value_, "Controller", OVERSPEED, INVALID_ESTIMATE);
   }
 
-  bool operator==(uint16_t v) const
+  bool operator==(uint32_t v) const
   {
     return value_ == v;
   }
