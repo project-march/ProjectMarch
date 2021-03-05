@@ -7,13 +7,14 @@
 #include <pointcloud_processor/preprocessor.h>
 #include <pointcloud_processor/region_creator.h>
 #include <pointcloud_processor/parameter_determiner.h>
-#include <pointcloud_processor/plane_finder.h>
+#include <pointcloud_processor/hull_finder.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
-using RegionsVector = std::vector<pcl::PointIndices>;
-using PlaneParameters = std::vector<pcl::ModelCoefficients::Ptr>;
-using HullsVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
+using RegionVector = std::vector<pcl::PointIndices>;
+using PlaneParameterVector = std::vector<pcl::ModelCoefficients::Ptr>;
+using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
+using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
 
 std::string POINTCLOUD_TOPIC = "/camera/depth/color/points";
 
@@ -43,8 +44,8 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
       getConfigIfPresent("preprocessor"), debugging_);
   region_creator_ = std::make_unique<SimpleRegionCreator>(
       getConfigIfPresent("region_creator"), debugging_);
-  plane_finder_ = std::make_unique<SimplePlaneFinder>(
-      getConfigIfPresent("plane_finder"), debugging_);
+  hull_finder_ = std::make_unique<SimpleHullFinder>(
+      getConfigIfPresent("hull_finder"), debugging_);
   parameter_determiner_ = std::make_unique<SimpleParameterDeterminer>(
       getConfigIfPresent("parameter_determiner"), debugging_);
 
@@ -112,10 +113,10 @@ bool RealSenseReader::process_pointcloud(
   }
 
   // Create regions
-  boost::shared_ptr<RegionsVector> regions_vector =
-      boost::make_shared<RegionsVector>();
+  boost::shared_ptr<RegionVector> region_vector =
+      boost::make_shared<RegionVector>();
   bool region_creating_was_successful =
-      region_creator_->create_regions(pointcloud, normals, regions_vector);
+      region_creator_->create_regions(pointcloud, normals, region_vector);
   if (not region_creating_was_successful)
   {
     res.error_message = "Region creating was unsuccessful, see debug output "
@@ -128,22 +129,23 @@ bool RealSenseReader::process_pointcloud(
     //TODO: Add publisher to visualize created regions
   }
 
-  // Find planes
-  boost::shared_ptr<PlaneParameters> plane_parameters =
-      boost::make_shared<PlaneParameters>();
-  boost::shared_ptr<HullsVector> hulls = boost::make_shared<HullsVector>();
-  bool plane_finding_was_successful =
-      plane_finder_->find_planes(pointcloud, normals, regions_vector,
-                                 plane_parameters, hulls);
-  if (not plane_finding_was_successful)
+  // Find hulls
+  boost::shared_ptr<PlaneParameterVector> plane_parameter_vector =
+      boost::make_shared<PlaneParameterVector>();
+  boost::shared_ptr<HullVector> hull_vector = boost::make_shared<HullVector>();
+  boost::shared_ptr<PolygonVector> polygon_vector = boost::make_shared<PolygonVector>();
+  bool hull_finding_was_successful =
+      hull_finder_->find_hulls(pointcloud, normals, region_vector,
+                                 plane_parameter_vector, hull_vector, polygon_vector);
+  if (not hull_finding_was_successful)
   {
-    res.error_message = "Plane finding was unsuccessful, see debug output "
+    res.error_message = "Hull finding was unsuccessful, see debug output "
                         "for more information";
     return false;
   }
   if (debugging_)
   {
-    ROS_INFO("Done finding planes");
+    ROS_INFO("Done finding hulls");
     //TODO: Add publisher to visualize found planes
   }
 
@@ -153,7 +155,8 @@ bool RealSenseReader::process_pointcloud(
       boost::make_shared<march_shared_msgs::GaitParameters>();
   bool parameter_determining_was_successful =
       parameter_determiner_->determine_parameters(
-          plane_parameters, hulls, selected_obstacle, gait_parameters);
+          plane_parameter_vector, hull_vector, polygon_vector, selected_obstacle,
+          gait_parameters);
   if (not parameter_determining_was_successful)
   {
     res.error_message = "Parameter determining was unsuccessful, see debug output "
@@ -165,7 +168,7 @@ bool RealSenseReader::process_pointcloud(
   if (debugging_)
   {
     ROS_INFO("Done determining parameters");
-    //TODO: Add publisher to visualize found planes
+    //TODO: Add publisher to visualize found hulls
   }
 
   res.success = true;

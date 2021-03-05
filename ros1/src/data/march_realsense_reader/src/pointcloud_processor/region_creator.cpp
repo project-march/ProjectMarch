@@ -4,7 +4,7 @@
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
-using RegionsVector = std::vector<pcl::PointIndices>;
+using RegionVector = std::vector<pcl::PointIndices>;
 
 // Construct a basic RegionCreator class
 RegionCreator::RegionCreator(YAML::Node config_tree, bool debugging):
@@ -18,12 +18,12 @@ RegionCreator::RegionCreator(YAML::Node config_tree, bool debugging):
  in regions, based on the parameters in the YAML node given at construction **/
 bool SimpleRegionCreator::create_regions(PointCloud::Ptr pointcloud,
                                          Normals::Ptr normal_pointcloud,
-                                         boost::shared_ptr<RegionsVector>
-                                             regions_vector)
+                                         boost::shared_ptr<RegionVector>
+                                             region_vector)
 {
   pointcloud_ = pointcloud;
   normal_pointcloud_ = normal_pointcloud;
-  regions_vector_ = regions_vector;
+  region_vector_ = region_vector;
   ROS_INFO_STREAM("Creating regions with SimpleRegionCreator");
 
   return true;

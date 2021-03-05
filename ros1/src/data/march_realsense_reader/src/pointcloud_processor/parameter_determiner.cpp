@@ -7,9 +7,11 @@
 #include "pointcloud_processor/parameter_determiner.h"
 #include "march_shared_msgs/GaitParameters.h"
 
-using PlaneParameters = std::vector<pcl::ModelCoefficients::Ptr>;
-using HullsVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
+using PlaneParameterVector = std::vector<pcl::ModelCoefficients::Ptr>;
+using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
 using GaitParameters = march_shared_msgs::GaitParameters;
+using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
+
 
 ParameterDeterminer::ParameterDeterminer(YAML::Node config_tree, bool debugging):
   debugging_{debugging},
@@ -19,8 +21,9 @@ ParameterDeterminer::ParameterDeterminer(YAML::Node config_tree, bool debugging)
 }
 
 bool SimpleParameterDeterminer::determine_parameters(
-        boost::shared_ptr<PlaneParameters> plane_parameters,
-        boost::shared_ptr<HullsVector> hulls,
+        boost::shared_ptr<PlaneParameterVector> plane_parameter_vector,
+        boost::shared_ptr<HullVector> hull_vector,
+        boost::shared_ptr<PolygonVector> polygon_vector,
         SelectedGait selected_obstacle,
         boost::shared_ptr<GaitParameters> gait_parameters)
 {
@@ -28,10 +31,11 @@ bool SimpleParameterDeterminer::determine_parameters(
   {
     ROS_INFO("Determining parameters with simple parameter determiner");
   }
-  hulls_ = hulls;
+  hull_vector_ = hull_vector;
   selected_obstacle_ = selected_obstacle;
   gait_parameters_ = gait_parameters;
-  plane_parameters_ = plane_parameters;
+  plane_parameter_vector_ = plane_parameter_vector;
+  polygon_vector_ = polygon_vector;
 
   // Return a standard step parameter, which works for medium stairs and medium ramp
   gait_parameters_->step_height_parameter = 0.5;

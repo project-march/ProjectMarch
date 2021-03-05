@@ -8,9 +8,10 @@
 #include "utilities/realsense_gait_utilities.h"
 #include "march_shared_msgs/GetGaitParameters.h"
 
-using PlaneParameters = std::vector<pcl::ModelCoefficients::Ptr>;
-using HullsVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
+using PlaneParameterVector = std::vector<pcl::ModelCoefficients::Ptr>;
+using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
 using GaitParameters = march_shared_msgs::GaitParameters;
+using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
 
 class ParameterDeterminer
 {
@@ -18,16 +19,18 @@ public:
     ParameterDeterminer(YAML::Node config_tree, bool debugging);
     // This function is required to be implemented by any plane finder
     virtual bool determine_parameters(
-        boost::shared_ptr<PlaneParameters> plane_parameters,
-        boost::shared_ptr<HullsVector> hulls,
+        boost::shared_ptr<PlaneParameterVector> plane_parameter_vector,
+        boost::shared_ptr<HullVector> hull_vector,
+        boost::shared_ptr<PolygonVector> polygon_vector,
         SelectedGait selected_obstacle,
         boost::shared_ptr<GaitParameters> gait_parameters)=0;
 
     virtual ~ParameterDeterminer() {};
 
 protected:
-    boost::shared_ptr<PlaneParameters> plane_parameters_;
-    boost::shared_ptr<HullsVector> hulls_;
+    boost::shared_ptr<PlaneParameterVector> plane_parameter_vector_;
+    boost::shared_ptr<HullVector> hull_vector_;
+    boost::shared_ptr<PolygonVector> polygon_vector_;
     SelectedGait selected_obstacle_;
     boost::shared_ptr<GaitParameters> gait_parameters_;
     YAML::Node config_tree_;
@@ -45,8 +48,9 @@ public:
     /** This function should take in a pointcloud with matching normals and
      * regions, and turn this into chulls where the foot can be located. **/
     bool determine_parameters(
-        boost::shared_ptr<PlaneParameters> plane_parameters,
-        boost::shared_ptr<HullsVector> hulls,
+        boost::shared_ptr<PlaneParameterVector> plane_parameter_vector,
+        boost::shared_ptr<HullVector> hull_vector,
+        boost::shared_ptr<PolygonVector> polygon_vector,
         SelectedGait selected_obstacle,
         boost::shared_ptr<GaitParameters> gait_parameters) override;
 };

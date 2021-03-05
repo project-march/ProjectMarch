@@ -11,7 +11,7 @@
 #include "yaml-cpp/yaml.h"
 #include <pointcloud_processor/preprocessor.h>
 #include <pointcloud_processor/region_creator.h>
-#include <pointcloud_processor/plane_finder.h>
+#include <pointcloud_processor/hull_finder.h>
 #include <pointcloud_processor/parameter_determiner.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -31,7 +31,7 @@ public:
                             march_shared_msgs::GetGaitParameters::Response &res);
 
     /** A callback that starts the entire pointcloud processing when the
-     * /camera/read_pointcloud service is called.
+     * /camera/process_pointcloud service is called.
      */
     bool process_pointcloud_callback(march_shared_msgs::GetGaitParameters::Request &req,
                                   march_shared_msgs::GetGaitParameters::Response &res);
@@ -60,7 +60,7 @@ private:
     ros::Publisher preprocessed_pointcloud_publisher_;
     std::unique_ptr<NormalsPreprocessor> preprocessor_;
     std::unique_ptr<SimpleRegionCreator> region_creator_;
-    std::unique_ptr<SimplePlaneFinder> plane_finder_;
+    std::unique_ptr<SimpleHullFinder> hull_finder_;
     std::unique_ptr<SimpleParameterDeterminer> parameter_determiner_;
     bool debugging_;
     std::string config_file_;
