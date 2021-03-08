@@ -102,6 +102,9 @@
             args="-a -q -o $(arg bag_prefix)"
     />
 
+    <rosparam file="$(find march_bridge_parameters)/config/topics_services_to_bridge.yaml"
+              command="load"/>
+
     <group ns="march">
         <include file="$(find march_realsense_reader)/launch/realsense_reader.launch"
                  if="$(arg realsense)"/>
