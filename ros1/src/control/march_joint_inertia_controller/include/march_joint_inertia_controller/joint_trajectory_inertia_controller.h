@@ -17,7 +17,7 @@
 #include <ros/node_handle.h>
 #include <ros/time.h>
 #include "std_msgs/Float64.h"
-#include <trajectory_interface/quintic_spline_segment.h>
+#include <joint_trajectory_controller/trajectory_interface/quintic_spline_segment.h>
 
 template <typename T>
 using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;

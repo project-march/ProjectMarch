@@ -6,7 +6,7 @@
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
 #include <joint_trajectory_controller/joint_trajectory_controller.h>
-#include <trajectory_interface/quintic_spline_segment.h>
+#include <joint_trajectory_controller/trajectory_interface/quintic_spline_segment.h>
 #include "model_predictive_controller.hpp"
 
 // Other includes
