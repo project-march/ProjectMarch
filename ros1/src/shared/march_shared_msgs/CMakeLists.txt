@@ -19,6 +19,7 @@ add_message_files(
     Error.msg
     GaitInstruction.msg
     GaitInstructionResponse.msg
+    GaitParameters.msg
     HighVoltageNet.msg
     ImcState.msg
     JointValues.msg
@@ -34,6 +35,7 @@ add_service_files(
     CapturePointPose.srv
     ChangeComLevel.srv
     ContainsGait.srv
+    GetGaitParameters.srv
     GetMoveItTrajectory.srv
     GetParamBool.srv
     GetParamFloat.srv

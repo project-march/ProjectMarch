@@ -51,6 +51,7 @@
             <arg name="color_fps" value="$(arg color_fps)"/>
             <arg name="infra_fps" value="$(arg infra_fps)"/>
             <arg name="enable_pointcloud" value="true"/>
+            <arg name="enable_gyro" value="true"/>
             <arg name="initial_reset" value="$(arg initial_reset)"/>
         </include>
     </group>
