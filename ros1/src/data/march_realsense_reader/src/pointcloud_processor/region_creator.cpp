@@ -24,7 +24,7 @@ bool SimpleRegionCreator::create_regions(PointCloud::Ptr pointcloud,
   pointcloud_ = pointcloud;
   normal_pointcloud_ = normal_pointcloud;
   region_vector_ = region_vector;
-  ROS_INFO_STREAM("Creating regions 0with SimpleRegionCreator");
+  ROS_INFO_STREAM("Creating regions with SimpleRegionCreator");
 
   //TODO: Implement simple region creating algorithm
   return true;

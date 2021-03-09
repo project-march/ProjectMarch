@@ -38,7 +38,7 @@ bool SimpleHullFinder::find_hulls(
     ROS_INFO("Finding hulls with SimpleHullFinder");
   }
 
-  // TODO: Basic algorithm to find the planes should be implemented here
+  // TODO: Basic algorithm to find the hulls should be implemented here
 
   return true;
 }

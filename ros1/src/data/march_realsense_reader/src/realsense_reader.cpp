@@ -17,6 +17,7 @@ using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
 using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
 
 std::string POINTCLOUD_TOPIC = "/camera/depth/color/points";
+ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(1.0); // secs
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n):
     n_(n)
@@ -176,8 +177,6 @@ bool RealSenseReader::process_pointcloud(
 
   res.success = true;
   return true;
-
-
 }
 
 // Publishes the pointcloud on a topic for visualisation in rviz or further use
@@ -202,12 +201,12 @@ bool RealSenseReader::process_pointcloud_callback(
 {
   boost::shared_ptr<const sensor_msgs::PointCloud2> input_cloud =
       ros::topic::waitForMessage<sensor_msgs::PointCloud2>
-      (POINTCLOUD_TOPIC, *n_, ros::Duration(1.0));
+      (POINTCLOUD_TOPIC, *n_, POINTCLOUD_TIMEOUT);
 
   if (input_cloud == nullptr)
   {
-    res.error_message = "No pointcloud published within 1 second, so "
-                        "no processing could be done";
+    res.error_message = "No pointcloud published within timeout, so "
+                        "no processing could be done.";
     return false;
   }
 
