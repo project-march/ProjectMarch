@@ -64,7 +64,8 @@ bool NormalsPreprocessor::preprocess(
   pointcloud_ = pointcloud;
   pointcloud_normals_ = pointcloud_normals;
 
-  ROS_INFO_STREAM("Preprocessing with normal filtering. Pointcloud size: " << pointcloud_->points.size());
+  ROS_DEBUG_STREAM("Preprocessing with normal filtering. Pointcloud size: " <<
+  pointcloud_->points.size());
 
   bool do_statistical_outlier_removal = false;
   if (YAML::Node statistical_outlier_filter_parameters = config_tree_["statistical_outlier_filter"])
@@ -293,7 +294,7 @@ bool SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud,
   pointcloud_ = pointcloud;
   pointcloud_normals_ = pointcloud_normals;
 
-  ROS_INFO_STREAM("Preprocessing with SimplePreprocessor");
+  ROS_DEBUG("Preprocessing with SimplePreprocessor");
   transformPointCloudFromUrdf();
   return true;
 }

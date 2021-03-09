@@ -51,9 +51,8 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
       getConfigIfPresent("parameter_determiner"), debugging_);
 
 
-  if (debugging_)
-  {
-    ROS_INFO("Realsense reader started with debugging, all intermediate result "
+  if (debugging_) {
+    ROS_DEBUG("Realsense reader started with debugging, all intermediate result "
              "steps will be published and more information given in console, but"
              " this might slow the process, this can be turned off in the yaml.");
     preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>
@@ -107,9 +106,10 @@ bool RealSenseReader::process_pointcloud(
                         "for more information";
     return false;
   }
+
   if (debugging_)
   {
-    ROS_INFO("Done preprocessing, see /camera/preprocessed_cloud for results");
+    ROS_DEBUG("Done preprocessing, see /camera/preprocessed_cloud for results");
     publishPreprocessedPointCloud(pointcloud);
   }
 
@@ -125,11 +125,9 @@ bool RealSenseReader::process_pointcloud(
                         "for more information";
     return false;
   }
-  if (debugging_)
-  {
-    ROS_INFO("Done creating regions");
-    //TODO: Add publisher to visualize created regions
-  }
+
+  ROS_DEBUG("Done creating regions");
+  //TODO: Add publisher to visualize created regions
 
   // Setup data structures for hull finding
   boost::shared_ptr<PlaneParameterVector> plane_parameter_vector =
@@ -146,11 +144,9 @@ bool RealSenseReader::process_pointcloud(
                         "for more information";
     return false;
   }
-  if (debugging_)
-  {
-    ROS_INFO("Done finding hulls");
-    //TODO: Add publisher to visualize found planes
-  }
+
+  ROS_DEBUG("Done finding hulls");
+  //TODO: Add publisher to visualize found planes
 
   // Setup data structures for parameter determining
   SelectedGait selected_obstacle = (SelectedGait) selected_gait;
@@ -169,11 +165,8 @@ bool RealSenseReader::process_pointcloud(
   }
   res.gait_parameters = *gait_parameters;
 
-  if (debugging_)
-  {
-    ROS_INFO("Done determining parameters");
-    //TODO: Add publisher to visualize found hulls
-  }
+  ROS_DEBUG("Done determining parameters");
+  //TODO: Add publisher to visualize found hulls
 
   res.success = true;
   return true;

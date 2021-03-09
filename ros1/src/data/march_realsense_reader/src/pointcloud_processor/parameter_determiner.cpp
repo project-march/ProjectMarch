@@ -27,10 +27,7 @@ bool SimpleParameterDeterminer::determine_parameters(
         SelectedGait selected_obstacle,
         boost::shared_ptr<GaitParameters> gait_parameters)
 {
-  if (debugging_)
-  {
-    ROS_INFO("Determining parameters with simple parameter determiner");
-  }
+  ROS_DEBUG("Determining parameters with simple parameter determiner");
   hull_vector_ = hull_vector;
   selected_obstacle_ = selected_obstacle;
   gait_parameters_ = gait_parameters;

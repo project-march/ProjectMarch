@@ -33,10 +33,7 @@ bool SimpleHullFinder::find_hulls(
   hull_vector_ = hull_vector;
   polygon_vector_ = polygon_vector;
 
-  if (debugging_)
-  {
-    ROS_INFO("Finding hulls with SimpleHullFinder");
-  }
+  ROS_DEBUG("Finding hulls with SimpleHullFinder");
 
   // TODO: Basic algorithm to find the hulls should be implemented here
 
