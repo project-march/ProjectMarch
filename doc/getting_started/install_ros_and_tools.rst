@@ -1,5 +1,5 @@
 
-.. install_ros_and_march-label:
+.. _install_ros_and_march-label:
 
 Install ROS and March
 =====================

@@ -86,6 +86,7 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
 
    doc/using_the_march_exoskeleton/high_level_overview
    doc/using_the_march_exoskeleton/connecting_to_the_exoskeleton
+   doc/using_the_march_exoskeleton/connecting_to_the_exoskeleton_ethercat
    doc/using_the_march_exoskeleton/how_to_airgait
    doc/using_the_march_exoskeleton/how_to_view_live_data
    doc/using_the_march_exoskeleton/log_files
