@@ -89,6 +89,7 @@ def check_key(dic_one: dict, dic_two: dict, key: str) -> bool:
 def select_lengths_for_inverse_kinematics(
     lengths: List[float], side: Side = Side.both
 ) -> List[float]:
+    """Return only the lengths in the list on the requested side."""
     if len(lengths) != 9:
         Node("march_utility").get_logger().error(
             "The lengths given did not have size 9. Cannot unpack the lengths."
