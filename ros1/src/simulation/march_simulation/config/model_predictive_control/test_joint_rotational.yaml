@@ -10,7 +10,7 @@ march:
       type: model_predictive_trajectory_controller/JointTrajectoryController
       joints:
         - rotational_joint
-
+      N: 2
       q_matrices:
         rotational_joint:
           n_rows: 3

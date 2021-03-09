@@ -74,10 +74,9 @@ void ModelPredictiveControllerInterface::starting(const ros::Time& /*time*/)
 }
 
 void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/, const ros::Duration& period,
-                   const joint_trajectory_controller::State& /*desired state*/,
-                   const joint_trajectory_controller::State& state_error)
+                                                       const std::vector<joint_trajectory_controller::State>&  /*desired_states*/,
+                                                       const joint_trajectory_controller::State& state_error)
 {
-
   // Preconditions
   if (!joint_handles_ptr_)
   {

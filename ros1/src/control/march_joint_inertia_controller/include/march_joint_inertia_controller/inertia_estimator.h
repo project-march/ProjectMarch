@@ -6,7 +6,7 @@
 #include <hardware_interface/joint_command_interface.h>
 #include <list>
 #include <ros/ros.h>
-#include <trajectory_interface/quintic_spline_segment.h>
+#include <joint_trajectory_controller/trajectory_interface/quintic_spline_segment.h>
 #include <urdf/model.h>
 
 /**
