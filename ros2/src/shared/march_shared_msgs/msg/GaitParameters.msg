@@ -19,9 +19,9 @@ float64 step_size_parameter
 # Ramp: Min gradient is 5 degrees, max is  20 degrees
 float64 step_height_parameter
 
-# Parameter that determines the amount of HAA that should be used for
-# the chosen step, between 0 and 1, where 0 is regular angle and 1 is
-# maximal sideways step for this obstacle. Currently, we have not implemented
+# Parameter that influences the amount the step should go sideways (using HAA mostly)
+# for the step chosen by the realsense, between 0 and 1, where 0 is regular angle and 1
+# is maximal sideways step for this obstacle. Currently, we have not implemented
 # this in the gaits yet.
 #
 # Stairs: Not used yet, should always be 0
