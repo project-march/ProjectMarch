@@ -1,13 +1,13 @@
 #include <pointcloud_processor/preprocessor.h>
 #include <yaml_utilities.h>
-
 #include "yaml-cpp/yaml.h"
 #include <ros/ros.h>
-
+#include <ctime>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/search/kdtree.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/common/transforms.h>
+#include <pcl/filters/random_sample.h>
 #include <pcl/filters/statistical_outlier_removal.h>
 
 #include <pcl_ros/transforms.h>
@@ -77,23 +77,59 @@ void NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud, Normals::Ptr po
     do_statistical_outlier_removal = yaml_utilities::grabParameter<bool>(statistical_outlier_filter_parameters,
                                                                          "do_statistical_outlier_removal");
   }
+  clock_t start = clock();
 
   downsample();
+  clock_t downsample = clock();
 
-  transformPointCloud();
-
-  filterOnDistanceFromOrigin();
-
-  fillNormalCloud();
-
-  filterOnNormalOrientation();
-
-  if (do_statistical_outlier_removal)
-  {
-    removeStatisticalOutliers();
-  }
+//  transformPointCloud();
+//  clock_t transformPointCloud = clock();
+//
+//  filterOnDistanceFromOrigin();
+//  clock_t filterOnDistanceFromOrigin = clock();
+//
+//  fillNormalCloud();
+//  clock_t fillNormalCloud = clock();
+//
+//  filterOnNormalOrientation();
+//  clock_t filterOnNormalOrientation = clock();
+//
+//  if (do_statistical_outlier_removal)
+//  {
+//    removeStatisticalOutliers();
+//  }
+  clock_t removeStatisticalOutliers = clock();
 
   ROS_INFO_STREAM("Finished preprocessing. Pointcloud size: " << pointcloud_->points.size());
+  double time_taken = double(downsample - start) / double(CLOCKS_PER_SEC);
+  std::cout << "Time taken by downsample is : " << std::fixed
+            << time_taken << std::setprecision(5);
+  std::cout << " sec " << std::endl;
+//  time_taken = double(transformPointCloud - downsample) / double(CLOCKS_PER_SEC);
+//  std::cout << "Time taken by transformPointCloud is : " << std::fixed
+//            << time_taken << std::setprecision(5);
+//  std::cout << " sec " << std::endl;
+//  time_taken = double(filterOnDistanceFromOrigin - transformPointCloud) / double(CLOCKS_PER_SEC);
+//  std::cout << "Time taken by filterOnDistanceFromOrigin is : " << std::fixed
+//            << time_taken << std::setprecision(5);
+//  std::cout << " sec " << std::endl;
+//  time_taken = double(fillNormalCloud - filterOnDistanceFromOrigin) / double(CLOCKS_PER_SEC);
+//  std::cout << "Time taken by fillNormalCloud is : " << std::fixed
+//            << time_taken << std::setprecision(5);
+//  std::cout << " sec " << std::endl;
+//  time_taken = double(filterOnNormalOrientation - fillNormalCloud) / double(CLOCKS_PER_SEC);
+//  std::cout << "Time taken by filterOnNormalOrientation is : " << std::fixed
+//            << time_taken << std::setprecision(5);
+//  std::cout << " sec " << std::endl;
+//  time_taken = double(removeStatisticalOutliers - filterOnNormalOrientation) / double(CLOCKS_PER_SEC);
+//  std::cout << "Time taken by removeStatisticalOutliers is : " << std::fixed
+//       << time_taken << std::setprecision(5);
+//  std::cout << " sec " << std::endl;
+
+  time_taken = double(removeStatisticalOutliers - start) / double(CLOCKS_PER_SEC);
+  std::cout << "Time taken by program is : " << std::fixed
+            << time_taken << std::setprecision(5);
+  std::cout << " sec " << std::endl;
 }
 
 // Downsample the number of points in the pointcloud to have a more workable number of points
@@ -109,10 +145,18 @@ void NormalsPreprocessor::downsample()
     ROS_ERROR("Downsample parameters not found in parameter file");
   }
 
-  pcl::VoxelGrid<pcl::PointXYZ> voxel_grid;
-  voxel_grid.setInputCloud(pointcloud_);
-  voxel_grid.setLeafSize(leaf_size, leaf_size, leaf_size);
-  voxel_grid.filter(*pointcloud_);
+//  pcl::VoxelGrid<pcl::PointXYZ> voxel_grid;
+//  voxel_grid.setInputCloud(pointcloud_);
+//  voxel_grid.setLeafSize(leaf_size, leaf_size, leaf_size);
+//  voxel_grid.setFilterLimits(-3.0, 3.0);
+//  voxel_grid.filter(*pointcloud_);
+  float decimate_percent = 1.0/100.0;
+  pcl::RandomSample<pcl::PointXYZ> random_sampler;
+  random_sampler.setInputCloud(pointcloud_);
+  int num_output_points = (int) (decimate_percent * pointcloud_->points.size());
+  random_sampler.setSample(num_output_points);
+  random_sampler.filter(*pointcloud_);
+
 }
 
 // Remove statistical outliers from the pointcloud to reduce noise

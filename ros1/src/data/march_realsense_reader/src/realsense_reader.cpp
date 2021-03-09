@@ -6,6 +6,7 @@
 #include <std_srvs/Trigger.h>
 #include <pointcloud_processor/preprocessor.h>
 #include <pointcloud_processor/region_creator.h>
+#include <ctime>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -83,29 +84,49 @@ void RealSenseReader::pointcloud_callback(const sensor_msgs::PointCloud2 input_c
 {
   if (reading_)
   {
+    clock_t start = clock();
+
     // All logic to execute with a pointcloud will be executed here.
     ROS_INFO_STREAM("Processing point cloud at time " << input_cloud.header.stamp);
 
     reading_ = false;
 
+    clock_t start_convert = clock();
     PointCloud converted_cloud;
     pcl::fromROSMsg(input_cloud, converted_cloud);
     PointCloud::Ptr pointcloud = boost::make_shared<PointCloud>(converted_cloud);
     Normals::Ptr normals = boost::make_shared<Normals>();
+    clock_t end_convert = clock();
 
     // Preprocess
     preprocessor_->preprocess(pointcloud, normals);
-
+    clock_t start_debug;
+    clock_t end_debug;
     if (debugging_)
     {
+      start_debug = clock();
       publishPreprocessedPointCloud(pointcloud);
+      end_debug = clock();
     }
-
     // Create regions
     boost::shared_ptr<RegionsVector> regions_vector =
         boost::make_shared<RegionsVector>();
     region_creator_->create_regions(pointcloud, normals, regions_vector);
 
+    clock_t end = clock();
+
+    double time_taken = double(end - start) / double(CLOCKS_PER_SEC);
+    std::cout << "Time taken by pointcloud_callback is : " << std::fixed
+              << time_taken << std::setprecision(5);
+    std::cout << " sec " << std::endl;
+    time_taken = double(end_debug - start_debug) / double(CLOCKS_PER_SEC);
+    std::cout << "Of which: " << std::fixed
+              << time_taken << std::setprecision(5);
+    std::cout << " sec is taken up by publising" << std::endl;
+    time_taken = double(end_convert - start_convert) / double(CLOCKS_PER_SEC);
+    std::cout << "And of which: " << std::fixed
+              << time_taken << std::setprecision(5);
+    std::cout << " sec is taken up by converting" << std::endl;
   }
 }
 
