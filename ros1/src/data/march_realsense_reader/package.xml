@@ -29,5 +29,6 @@
   <exec_depend>march_shared_msgs</exec_depend>
   <exec_depend>pcl_ros</exec_depend>
   <exec_depend>tf2_ros</exec_depend>
+  <depend>imu_filter_madgwick</depend>
 
 </package>

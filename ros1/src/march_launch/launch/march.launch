@@ -53,6 +53,14 @@
             <arg name="enable_pointcloud" value="true"/>
             <arg name="enable_gyro" value="true"/>
             <arg name="initial_reset" value="$(arg initial_reset)"/>
+            <arg name="filters"                   value="pointcloud"/>
+            <arg name="clip_distance"             value="-2"/>
+            <arg name="linear_accel_cov"          value="0.01"/>
+            <arg name="unite_imu_method"          value="linear_interpolation"/>
+            <arg name="topic_odom_in"             value="odom_in"/>
+            <arg name="calib_odom_file"           value=""/>
+            <arg name="publish_odom_tf"           value="true"/>
+            <arg name="allow_no_texture_points"   value="false"/>
         </include>
     </group>
 
