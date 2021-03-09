@@ -49,6 +49,7 @@ class FeetState(object):
             A FeetState object with a left and right foot which each have a
             position and velocity corresponding to the setpoint dictionary
         """
+
         for joint in JOINT_NAMES_IK:
             if joint not in setpoint_dic:
                 raise KeyError(

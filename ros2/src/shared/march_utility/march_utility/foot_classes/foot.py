@@ -220,7 +220,7 @@ class Foot(object):
         transformed_x: float, transformed_z: float
     ) -> float:
         """Calculate the hfe angle of a straight leg."""
-        return atan2(transformed_x / transformed_z)
+        return atan2(transformed_x, transformed_z)
 
     @staticmethod
     def calculate_haa_angle(
@@ -351,7 +351,9 @@ class Foot(object):
         # y is directed to the right side, the origin in the middle of the hip
         # structure. The calculations are supported by
         # https://confluence.projectmarch.nl:8443/display/62tech/%28Inverse%29+kinematics
+
         ul, ll, hl, ph, base = get_lengths_robot_for_inverse_kinematics(side)
+
         haa_to_foot_length = ul * cos(hfe) + ll * cos(hfe - kfe)
         z_position = -sin(haa) * ph + cos(haa) * haa_to_foot_length
         x_position = hl + sin(hfe) * ul + sin(hfe - kfe) * ll
