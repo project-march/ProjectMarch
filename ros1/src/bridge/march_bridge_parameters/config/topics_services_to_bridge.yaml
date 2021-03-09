@@ -44,7 +44,7 @@ topics:
   - { topic: 'tf', type: 'tf2_msgs/msg/TFMessage' }
   - { topic: 'tf_static', type: 'tf2_msgs/msg/TFMessage' }
 services_1_to_2:
-  - { service: '/camera/read_pointcloud',
+  - { service: '/camera/process_pointcloud',
       type: 'std_srvs/srv/Trigger' }
   - { service: '/gazebo/get_world_properties',
       type: 'gazebo_msgs/srv/GetWorldProperties' }
