@@ -1,0 +1,47 @@
+[
+  {
+    "name":"axis0.motor.config.current_lim",
+    "type":"float",
+    "value":10.0
+  },
+  {
+    "name":"axis0.encoder.config.cpr",
+    "type":"int32",
+    "value":131072
+  },
+  {
+    "name":"axis0.encoder.config.use_index",
+    "type":"bool",
+    "value":1
+  },
+  {
+    "name":"config.brake_resistance",
+    "type":"float",
+    "value":2.0
+  },
+  {
+    "name":"axis0.motor.config.pole_pairs",
+    "type":"int32",
+    "value":14
+  },
+  {
+    "name":"axis0.controller.config.control_mode",
+    "type":"int32",
+    "value":1
+  },
+  {
+    "name":"axis0.controller.config.input_mode",
+    "type":"int32",
+    "value":1
+  },
+  {
+    "name": "axis0.motor.config.torque_constant",
+    "type": "float",
+    "value": 0.02329577465
+  },
+  {
+    "name": "axis0.controller.config.vel_limit",
+    "type": "float",
+    "value": 4.0
+  }
+]
