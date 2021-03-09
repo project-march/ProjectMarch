@@ -86,9 +86,13 @@ def check_key(dic_one: dict, dic_two: dict, key: str) -> bool:
         return True
 
 
-def select_lengths_for_inverse_kinematics(lengths: List[float], side: Side = Side.both) -> List[float]:
+def select_lengths_for_inverse_kinematics(
+    lengths: List[float], side: Side = Side.both
+) -> List[float]:
     if len(lengths) != 9:
-        Node("march_utility").get_logger().error("The lengths given did not have size 9. Cannot unpack the lengths.")
+        Node("march_utility").get_logger().error(
+            "The lengths given did not have size 9. Cannot unpack the lengths."
+        )
 
     l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base = lengths
     if side == Side.left:
@@ -180,7 +184,9 @@ def get_lengths_robot_from_urdf_for_inverse_kinematics(  # noqa: CCR001
             f"Expected robot.link_map to contain {e.args[0]}, but it was missing."
         )
 
-    return select_lengths_for_inverse_kinematics([l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base], side)
+    return select_lengths_for_inverse_kinematics(
+        [l_ul, l_ll, l_hl, l_ph, r_ul, r_ll, r_hl, r_ph, base], side
+    )
 
 
 LENGTHS_BOTH_SIDES = get_lengths_robot_from_urdf_for_inverse_kinematics()
@@ -189,7 +195,6 @@ LENGTHS_BOTH_SIDES = get_lengths_robot_from_urdf_for_inverse_kinematics()
 def get_lengths_robot_for_inverse_kinematics(side: Side = Side.both) -> List[float]:
     """Grab lengths which are relevant for the inverse kinematics calculations from a list."""
     return select_lengths_for_inverse_kinematics(LENGTHS_BOTH_SIDES, side)
-
 
 
 def get_joint_names_for_inverse_kinematics() -> List[str]:
