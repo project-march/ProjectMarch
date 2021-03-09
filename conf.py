@@ -69,8 +69,8 @@ gitlab_root = html_context['gitlab_url'] + html_context['gitlab_user'] + '/'
 ros1_src = 'march/-/blob/main/ros1/src/'
 
 # Links
-extlinks = {'codedir': (gitlab_root + 'tutorials/tree/' + html_context['gitlab_version'] + '/doc/%s', ''),
-            'rootdir': (gitlab_root + 'tutorials/tree/' + html_context['gitlab_version'] + '/%s', ''),
+extlinks = {'codedir': (gitlab_root + 'project-march.gitlab.io/tree/' + html_context['gitlab_version'] + '/doc/%s', ''),
+            'rootdir': (gitlab_root + 'project-march.gitlab.io/tree/' + html_context['gitlab_version'] + '/%s', ''),
             'hardware-interface': (gitlab_root + ros1_src + 'march_hardware_interface/%s', ''),
             'input-device': (gitlab_root + 'input-device/-/tree/main/%s', ''),
             'march': (gitlab_root + ros1_src + '%s', ''),

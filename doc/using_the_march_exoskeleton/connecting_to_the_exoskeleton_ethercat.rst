@@ -23,7 +23,7 @@ Until this package is released you will have to run a small install script manua
 Setting up ethercat_grant
 --------------------------------------------------
 We have written a small script that build the ethercat_grant package and sets up an executable at :code:`/usr/local/bin/`.
-You can find the script here: :codedir:`.setup_ethercat_grant.sh <using_the_march_exoskeleton/setup_ethercat_grant.sh>`
+You can find the script here: :codedir:`setup_ethercat_grant.sh <using_the_march_exoskeleton/setup_ethercat_grant.sh>`
 
 Run the script with:
 
