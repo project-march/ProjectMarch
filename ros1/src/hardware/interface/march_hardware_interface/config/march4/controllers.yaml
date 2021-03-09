@@ -32,6 +32,8 @@ march:
         right_knee: {p: 0, i: 0, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
 
       constraints:
+        stopped_velocity_tolerance: 0.2
+        goal_time: 0.1
         left_ankle:
           margin_soft_limit_error: 0.5
           trajectory: 0.305
