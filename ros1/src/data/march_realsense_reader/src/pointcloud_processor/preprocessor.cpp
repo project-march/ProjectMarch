@@ -152,15 +152,9 @@ bool NormalsPreprocessor::downsample()
 bool NormalsPreprocessor::transformPointCloud()
 {
   //  Grab relevant parameters
-  double translation_x;
-  double translation_y;
-  double translation_z;
   double rotation_y;
   if (YAML::Node transformation_parameters = config_tree_["transformation"])
   {
-    translation_x = yaml_utilities::grabParameter<double>(transformation_parameters, "translation_x");
-    translation_y = yaml_utilities::grabParameter<double>(transformation_parameters, "translation_y");
-    translation_z = yaml_utilities::grabParameter<double>(transformation_parameters, "translation_z");
     rotation_y = yaml_utilities::grabParameter<double>(transformation_parameters, "rotation_y");
   }
   else
@@ -171,9 +165,6 @@ bool NormalsPreprocessor::transformPointCloud()
 
   // make a 4 by 4 transformation Transform = [Rotation (3x3) translation (3x1); 0 (1x3) 1 (1x1)]
   Eigen::Affine3f transform = Eigen::Affine3f::Identity();
-
-  // Add the desired translation to the transformation matrix
-  transform.translation() << translation_x, translation_y, translation_z;
 
   // Add the desired rotation (currently just around the Y axis) to the transformation matrix
   transform.rotate(Eigen::AngleAxisf(rotation_y, Eigen::Vector3f::UnitY()));
