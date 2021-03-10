@@ -9,7 +9,7 @@ diag_agg:
     control:
       type: diagnostic_aggregator/GenericAnalyzer
       path: Control
-      contains: ['Control']
+      contains: ['values']
       remove_prefix: ['march_rqt_robot_monitor_node: ']
     motor_controller:
       type: diagnostic_aggregator/GenericAnalyzer
