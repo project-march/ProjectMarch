@@ -11,11 +11,11 @@ diag_agg:
       path: Control
       contains: ['Control']
       remove_prefix: ['march_rqt_robot_monitor_node: ']
-    imc:
+    motor_controller:
       type: diagnostic_aggregator/GenericAnalyzer
-      path: IMC
-      contains: ['IMC']
-      remove_prefix: ['march_rqt_robot_monitor_node: IMC ']
+      path: MotorController
+      contains: ['MotorController']
+      remove_prefix: ['march_rqt_robot_monitor_node: MotorController ']
     gait:
       type: diagnostic_aggregator/GenericAnalyzer
       path: Gait
