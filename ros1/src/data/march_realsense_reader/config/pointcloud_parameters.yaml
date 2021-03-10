@@ -7,14 +7,11 @@ preprocessor:
 
   transformation:
     rotation_y: -0.75 # - pi / 4
-    translation_x: 0.0
-    translation_y: 0.0
-    translation_z: 0.0 # an estimation of where the foot could be
 
   normal_estimation:
     use_tree_search_method: true
     number_of_neighbours: 10
-    search_radius: 0.03
+    # search_radius: 0.03
 
   distance_filter:
     distance_threshold: 3.0

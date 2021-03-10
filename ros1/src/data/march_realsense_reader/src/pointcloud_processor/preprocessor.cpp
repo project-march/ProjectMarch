@@ -222,21 +222,6 @@ bool NormalsPreprocessor::filterOnDistanceFromOrigin()
 bool NormalsPreprocessor::fillNormalCloud()
 {
   //  Grab relevant parameters
-  double translation_x;
-  double translation_y;
-  double translation_z;
-  if (YAML::Node transformation_parameters = config_tree_["transformation"])
-  {
-    translation_x = yaml_utilities::grabParameter<double>(transformation_parameters, "translation_x");
-    translation_y = yaml_utilities::grabParameter<double>(transformation_parameters, "translation_y");
-    translation_z = yaml_utilities::grabParameter<double>(transformation_parameters, "translation_z");
-  }
-  else
-  {
-    ROS_ERROR("Transformation parameters not found in parameter file");
-    return false;
-  }
-
   bool use_tree_search_method;
   int number_of_neighbours;
   double search_radius;
@@ -261,7 +246,6 @@ bool NormalsPreprocessor::fillNormalCloud()
   //  Fill the normal estimation object and estimate the normals
   pcl::NormalEstimation <pcl::PointXYZ, pcl::Normal> normal_estimator;
   normal_estimator.setInputCloud(pointcloud_);
-  normal_estimator.setViewPoint(translation_x, translation_y, translation_z);
 
   if (use_tree_search_method)
   {

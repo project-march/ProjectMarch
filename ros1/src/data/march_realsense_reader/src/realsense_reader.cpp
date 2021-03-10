@@ -220,8 +220,9 @@ bool RealSenseReader::process_pointcloud_callback(
   bool succes = process_pointcloud(point_cloud, req.selected_gait, res);
 
   time_t end_callback = clock();
+  double time_taken = double(end_callback - start_callback) / double(CLOCKS_PER_SEC);
   ROS_DEBUG_STREAM("Time taken by process point cloud callback method: " << std::fixed <<
                    time_taken << std::setprecision(5) << " sec " << std::endl);
-    
-  return succes
+
+  return succes;
 }
