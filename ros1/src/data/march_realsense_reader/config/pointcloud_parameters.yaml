@@ -2,7 +2,10 @@ preprocessor:
   test_parameter: 100
 
   downsampling:
+    voxel_grid_filter: false
     leaf_size: 0.05
+    random_filter: true # default when voxel grid is false
+    remaining_points: 10000
 
   statistical_outlier_filter:
     do_statistical_outlier_removal: false
