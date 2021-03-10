@@ -125,8 +125,6 @@ void ModelPredictiveController::controllerDiagnosis() {
             break;
     }
 
-    // Check soft bound on controller update time
-    ROS_WARN_STREAM_COND(t_preparation+t_feedback > controllerUpdateSoftBound, joint_name << ", controller update time exceeded soft bound");
 }
 
 void ModelPredictiveController::calculateControlInput() {
