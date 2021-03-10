@@ -85,8 +85,6 @@ services_2_to_1:
       type: 'std_srvs/Trigger' }
   - { service: '/march/gait_selection/get_gait_directory',
       type: 'std_srvs/Trigger' }
-  - { service: '/march/gait_selection/get_possible_gaits',
-      type: 'march_shared_msgs/PossibleGaits' }
   - { service: '/march/gait_selection/get_version_map',
       type: 'std_srvs/Trigger' }
   - { service: '/march/gait_selection/set_gait_version',
