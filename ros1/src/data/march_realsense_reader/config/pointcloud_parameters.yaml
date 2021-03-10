@@ -4,13 +4,8 @@ preprocessor:
   downsampling:
     voxel_grid_filter: false
     leaf_size: 0.05
-    random_filter: true # default true when voxel grid is false
+    random_filter: true
     remaining_points: 5000
-
-  statistical_outlier_filter:
-    do_statistical_outlier_removal: false
-    sd_factor: 2.0
-    number_of_neighbours: 10
 
   transformation:
     rotation_y: -0.75 # - pi / 4

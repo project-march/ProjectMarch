@@ -75,9 +75,6 @@ protected:
 
   // Removes all points which do not roughly have a normal in a certain direction (specified in the parameter file)
   void filterOnNormalOrientation();
-
-  // Remove statistical outliers from the pointcloud to reduce noise
-  void removeStatisticalOutliers();
 };
 
 #endif //MARCH_PREPROCESSOR_H

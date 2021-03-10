@@ -77,30 +77,19 @@ void NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud, Normals::Ptr po
     do_statistical_outlier_removal = yaml_utilities::grabParameter<bool>(statistical_outlier_filter_parameters,
                                                                          "do_statistical_outlier_removal");
   }
-  clock_t start = clock();
+  clock_t start_preprocess = clock();
 
   downsample();
-  clock_t downsample = clock();
 
   transformPointCloud();
-  clock_t transformPointCloud = clock();
 
   filterOnDistanceFromOrigin();
-  clock_t filterOnDistanceFromOrigin = clock();
 
   fillNormalCloud();
-  clock_t fillNormalCloud = clock();
 
   filterOnNormalOrientation();
 
-  int points_before = pointcloud_->points.size();
-  clock_t filterOnNormalOrientation = clock();
-  if (do_statistical_outlier_removal)
-  {
-    removeStatisticalOutliers();
-  }
-  clock_t removeStatisticalOutliers = clock();
-  int points_after = pointcloud_->points.size();
+  clock_t end_preprocess = clock();
 
   if (pointcloud_->points.size() != pointcloud_normals_->points.size())
   {
@@ -109,38 +98,8 @@ void NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud, Normals::Ptr po
                     << "Points in pointcloud_normals: " << pointcloud_normals_->points.size());
   }
 
-
-  ROS_INFO_STREAM("Finished preprocessing. Pointcloud size: " << pointcloud_->points.size());
-  double time_taken = double(downsample - start) / double(CLOCKS_PER_SEC);
-  std::cout << "Time taken by downsample is : " << std::fixed
-            << time_taken << std::setprecision(5);
-  std::cout << " sec " << std::endl;
-  time_taken = double(transformPointCloud - downsample) / double(CLOCKS_PER_SEC);
-  std::cout << "Time taken by transformPointCloud is : " << std::fixed
-            << time_taken << std::setprecision(5);
-  std::cout << " sec " << std::endl;
-  time_taken = double(filterOnDistanceFromOrigin - transformPointCloud) / double(CLOCKS_PER_SEC);
-  std::cout << "Time taken by filterOnDistanceFromOrigin is : " << std::fixed
-            << time_taken << std::setprecision(5);
-  std::cout << " sec " << std::endl;
-  time_taken = double(fillNormalCloud - filterOnDistanceFromOrigin) / double(CLOCKS_PER_SEC);
-  std::cout << "Time taken by fillNormalCloud is : " << std::fixed
-            << time_taken << std::setprecision(5);
-  std::cout << " sec " << std::endl;
-  time_taken = double(filterOnNormalOrientation - fillNormalCloud) / double(CLOCKS_PER_SEC);
-  std::cout << "Time taken by filterOnNormalOrientation is : " << std::fixed
-            << time_taken << std::setprecision(5);
-  std::cout << " sec " << std::endl;
-  time_taken = double(removeStatisticalOutliers - filterOnNormalOrientation) / double(CLOCKS_PER_SEC);
-  std::cout << "Time taken by removeStatisticalOutliers is : " << std::fixed
-       << time_taken << std::setprecision(5);
-  std::cout << " sec " << std::endl;
-
-  double removed_SOR = double(points_after - points_before);
-  std::cout << "Points removed by SOR: " << removed_SOR << std::endl;
-
-  time_taken = double(removeStatisticalOutliers - start) / double(CLOCKS_PER_SEC);
-  std::cout << "Time taken by program is : " << std::fixed
+  time_taken = double(end_preprocess - start_preprocess) / double(CLOCKS_PER_SEC);
+  std::cout << "Time taken by preprocessor is : " << std::fixed
             << time_taken << std::setprecision(5);
   std::cout << " sec " << std::endl;
 }
@@ -352,27 +311,6 @@ void NormalsPreprocessor::filterOnNormalOrientation()
   {
     ROS_ERROR("The size of the pointcloud and the normal pointcloud are not the same. Cannot filter on normals.");
   }
-}
-
-// Remove statistical outliers from the pointcloud to reduce noise
-void NormalsPreprocessor::removeStatisticalOutliers()
-{
-  //  Grab relevant parameters
-  int number_of_neighbours;
-  double sd_factor;
-  if (YAML::Node statistical_outlier_removal_parameters = config_tree_["statistical_outlier_removal"])
-  {
-    number_of_neighbours = yaml_utilities::grabParameter<int>(statistical_outlier_removal_parameters,
-                                                              "number_of_neighbours");
-    sd_factor = yaml_utilities::grabParameter<double>(statistical_outlier_removal_parameters, "sd_factor");
-  }
-
-  // Fill the SOR object and execute the filter
-  pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
-  sor.setInputCloud(pointcloud_);
-  sor.setMeanK(number_of_neighbours);
-  sor.setStddevMulThresh(sd_factor);
-  sor.filter(*pointcloud_);
 }
 
 // Preprocess the pointcloud, this means only transforming for the simple preprocessor
