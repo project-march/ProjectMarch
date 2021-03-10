@@ -35,7 +35,7 @@ public:
     // Timing variables
     acado_timer t;
     double t_preparation, t_feedback;
-    double controllerUpdateSoftBound = 1e-3; // 1 ms
+    double controllerUpdateSoftBound = 1e-2; // 1 ms
 
     // status variables
     int preparationStepStatus;
