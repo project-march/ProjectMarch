@@ -26,7 +26,6 @@ def generate_launch_description():
     to_world_transform = LaunchConfiguration("to_world_transform")
 
     # Gait selection arguments
-    gait_selection = LaunchConfiguration("gait_selection")
     gait_package = LaunchConfiguration("gait_package")
     gait_directory = LaunchConfiguration("gait_directory")
     balance = LaunchConfiguration("balance")
@@ -96,11 +95,6 @@ def generate_launch_description():
             ),
             # GAIT SELECTION ARGUMENTS
             DeclareLaunchArgument(
-                name="gait_selection",
-                default_value="True",
-                description="Whether to launch the march gait selection node.",
-            ),
-            DeclareLaunchArgument(
                 name="gait_package",
                 default_value="march_gait_files",
                 description="The package where the gait files are located.",
@@ -166,7 +160,7 @@ def generate_launch_description():
                 ],
                 condition=IfCondition(robot_state_publisher),
             ),
-            # Launch march gait selection if not gait_selection:=false
+            # March gait selection
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
                     os.path.join(
@@ -181,7 +175,6 @@ def generate_launch_description():
                     ("gait_package", gait_package),
                     ("balance", balance),
                 ],
-                condition=IfCondition(gait_selection),
             ),
             # Safety
             IncludeLaunchDescription(

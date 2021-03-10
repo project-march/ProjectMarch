@@ -26,7 +26,6 @@ def generate_launch_description():
     to_world_transform = LaunchConfiguration("to_world_transform")
 
     # Gait selection arguments
-    gait_selection = LaunchConfiguration("gait_selection")
     gait_package = LaunchConfiguration("gait_package")
     gait_directory = LaunchConfiguration("gait_directory")
     balance = LaunchConfiguration("balance")
@@ -98,11 +97,6 @@ def generate_launch_description():
             ),
             # GAIT SELECTION ARGUMENTS
             DeclareLaunchArgument(
-                name="gait_selection",
-                default_value="True",
-                description="Whether to launch the march gait selection node.",
-            ),
-            DeclareLaunchArgument(
                 name="gait_package",
                 default_value="march_gait_files",
                 description="The package where the gait files are located.",
@@ -153,7 +147,6 @@ def generate_launch_description():
                     ("ground_gait", ground_gait),
                     ("realsense_simulation", realsense_simulation),
                     ("to_world_transform", to_world_transform),
-                    ("gait_selection", gait_selection),
                     ("gait_package", gait_package),
                     ("gait_directory", gait_directory),
                     ("balance", balance),
