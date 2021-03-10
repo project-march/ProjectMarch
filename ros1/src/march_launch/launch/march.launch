@@ -44,10 +44,6 @@
          doc="The frame rate to use for the color module of the camera"/>
     <arg name="infra_fps" default="$(arg camera_fps)"
          doc="The frame rate to use for the infra red module of the camera"/>
-    <arg name="enable_infra" default="false"
-         doc="Enables the infra 1 and 2 topics. Disable for less noice send to ROS"/>
-    <arg name="enable_color" default="false"
-         doc="Enables the color topics. Disable for less noice send to ROS"/>
 
     <group if="$(eval (not realsense_simulation) and realsense)">
         <include file="$(find realsense2_camera)/launch/rs_camera.launch">
@@ -57,8 +53,6 @@
             <arg name="enable_pointcloud" value="true"/>
             <arg name="enable_gyro" value="true"/>
             <arg name="initial_reset" value="$(arg initial_reset)"/>
-            <arg name="enable_infra" value="$(arg enable_infra)"/>
-            <arg name="enable_color" value="$(arg enable_color)"/>
         </include>
     </group>
 
