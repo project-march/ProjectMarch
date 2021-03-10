@@ -19,6 +19,19 @@ public:
     bool repeat_reference = true;      // Periodically Repeat the reference
     std::string joint_name;
 
+    // Error enums
+    enum Error {
+
+        // acado_preparationStep() errors
+        PREP_INTERNAL_ERROR = 1,
+
+        // acado_feedbackStep() errors
+        QP_ITERATION_LIMIT_REACHED = 1,
+        QP_INTERNAL_ERROR = -1,
+        QP_INFEASIBLE = -2,
+        QP_UNBOUNDED = -3
+    };
+
     // Timing variables
     acado_timer t;
     double t_preparation, t_feedback;
