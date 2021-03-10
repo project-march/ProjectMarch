@@ -127,9 +127,11 @@ class BalanceGait(GaitInterface):
         :return: the balance trajectory
         """
         if swing_leg not in ["right_leg", "left_leg"]:
-            self._node.get_logger().warn(f"Swing leg was not one of the possible legs "
-                                         f"(left_leg or right_leg), but {swing_leg}, "
-                                         f"using default walk instead")
+            self._node.get_logger().warn(
+                f"Swing leg was not one of the possible legs "
+                f"(left_leg or right_leg), but {swing_leg}, "
+                f"using default walk instead"
+            )
             return self.default_walk[subgait_name].to_joint_trajectory_msg()
         stance_leg = "right_leg" if swing_leg == "left_leg" else "left_leg"
         capture_point_success = self.compute_swing_leg_target(swing_leg, subgait_name)

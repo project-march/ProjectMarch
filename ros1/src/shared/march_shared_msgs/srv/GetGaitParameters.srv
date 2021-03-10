@@ -1,0 +1,16 @@
+# This enum is used for specifying the obstacle that should be dynamically
+# made with the RealSense camera. All supported obstacles should be
+# specified here
+uint8 STAIRS_UP=0
+uint8 STAIRS_DOWN=1
+uint8 RAMP_UP=2
+uint8 RAMP_DOWN=3
+uint8 selected_gait
+---
+# Whether a valid place to set the foot was found using the camera.
+bool success
+
+# If success is false, this string should provide more information as to what went wrong
+string error_message
+
+GaitParameters gait_parameters

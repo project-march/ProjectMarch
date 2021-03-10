@@ -55,6 +55,7 @@
             <arg name="color_fps" value="$(arg color_fps)"/>
             <arg name="infra_fps" value="$(arg infra_fps)"/>
             <arg name="enable_pointcloud" value="true"/>
+            <arg name="enable_gyro" value="true"/>
             <arg name="initial_reset" value="$(arg initial_reset)"/>
             <arg name="enable_infra" value="$(arg enable_infra)"/>
             <arg name="enable_color" value="$(arg enable_color)"/>
@@ -107,6 +108,9 @@
             output="log"
             args="-a -q -o $(arg bag_prefix)"
     />
+
+    <rosparam file="$(find march_bridge_parameters)/config/topics_services_to_bridge.yaml"
+              command="load"/>
 
     <group ns="march">
         <include file="$(find march_realsense_reader)/launch/realsense_reader.launch"

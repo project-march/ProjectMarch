@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
     roscpp
     sensor_msgs
     tf2_ros
+    march_shared_msgs
 )
 
 find_package(yaml-cpp)
@@ -22,6 +23,7 @@ catkin_package(
     roscpp
     sensor_msgs
     tf2_ros
+    march_shared_msgs
 )
 
 include_directories(
@@ -33,8 +35,10 @@ include_directories(
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
     src/realsense_reader.cpp
-    src/preprocessor.cpp
-    src/region_creator.cpp
+    src/pointcloud_processor/preprocessor.cpp
+    src/pointcloud_processor/region_creator.cpp
+    src/pointcloud_processor/hull_finder.cpp
+    src/pointcloud_processor/parameter_determiner.cpp
 )
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} yaml-cpp)
 
@@ -63,6 +67,7 @@ install(TARGETS ${PROJECT_NAME}
 
 # Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}/ include/pointcloud_processor/
+        include/utilities/
     DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
     FILES_MATCHING PATTERN "*.h"
 )

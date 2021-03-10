@@ -1,5 +1,10 @@
 #include <pointcloud_processor/preprocessor.h>
+<<<<<<< HEAD:ros1/src/data/march_realsense_reader/src/preprocessor.cpp
 #include <yaml_utilities.h>
+=======
+#include <utilities/yaml_utilities.h>
+
+>>>>>>> main:ros1/src/data/march_realsense_reader/src/pointcloud_processor/preprocessor.cpp
 #include "yaml-cpp/yaml.h"
 #include <ros/ros.h>
 #include <ctime>
@@ -17,25 +22,19 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 
 // Base constructor for preprocessors
-Preprocessor::Preprocessor(YAML::Node config_tree):
-                           config_tree_{config_tree}
+Preprocessor::Preprocessor(YAML::Node config_tree, bool debugging):
+                           config_tree_{config_tree},
+                           debugging_{debugging}
 {
 
 }
 
 // Create a simple preprocessor with the ability to look up transforms
-SimplePreprocessor::SimplePreprocessor(YAML::Node config_tree):
-    Preprocessor(config_tree)
+SimplePreprocessor::SimplePreprocessor(YAML::Node config_tree, bool debugging):
+    Preprocessor(config_tree, debugging)
 {
   tfBuffer = std::make_unique<tf2_ros::Buffer>();
   tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
-}
-
-// Create a preprocessor with the ability to estimate normals and filter based on them
-NormalsPreprocessor::NormalsPreprocessor(YAML::Node config_tree):
-        Preprocessor(config_tree)
-{
-
 }
 
 // Removes a point from a pointcloud (and optionally the corresponding pointcloud_normals as well) at a given index
@@ -64,12 +63,14 @@ void Preprocessor::removePointByIndex(int const index, PointCloud::Ptr pointclou
   }
 }
 
-void NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals)
+bool NormalsPreprocessor::preprocess(
+    PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals)
 {
   pointcloud_ = pointcloud;
   pointcloud_normals_ = pointcloud_normals;
 
-  ROS_INFO_STREAM("Preprocessing with normal filtering. Pointcloud size: " << pointcloud_->points.size());
+  ROS_DEBUG_STREAM("Preprocessing with normal filtering. Pointcloud size: " <<
+  pointcloud_->points.size());
 
   bool do_statistical_outlier_removal = false;
   if (YAML::Node statistical_outlier_filter_parameters = config_tree_["statistical_outlier_filter"])
@@ -102,6 +103,9 @@ void NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud, Normals::Ptr po
   std::cout << "Time taken by preprocessor is : " << std::fixed
             << time_taken << std::setprecision(5);
   std::cout << " sec " << std::endl;
+  
+  ROS_INFO_STREAM("Finished preprocessing. Pointcloud size: " << pointcloud_->points.size());
+  return true;
 }
 
 // Downsample the number of points in the pointcloud to have a more workable number of points
@@ -314,18 +318,15 @@ void NormalsPreprocessor::filterOnNormalOrientation()
 }
 
 // Preprocess the pointcloud, this means only transforming for the simple preprocessor
-void SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud,
+bool SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud,
                                     Normals::Ptr pointcloud_normals)
 {
   pointcloud_ = pointcloud;
   pointcloud_normals_ = pointcloud_normals;
 
-  int test_parameter;
-  test_parameter = yaml_utilities::grabParameter<int>(config_tree_, "test_parameter");
-
-  ROS_INFO_STREAM("Preprocessing with simple preprocessor. Test parameter is " << test_parameter);
-
+  ROS_DEBUG("Preprocessing with SimplePreprocessor");
   transformPointCloudFromUrdf();
+  return true;
 }
 
 // Transform the pointcloud based on the data found on the /tf topic, this is
