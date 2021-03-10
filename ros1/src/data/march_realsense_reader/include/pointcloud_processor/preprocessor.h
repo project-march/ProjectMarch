@@ -63,19 +63,19 @@ class NormalsPreprocessor : Preprocessor {
   protected:
     // Removes points from the pointcloud such that there is only one point left in a certain area
     // (specified in the parameter file)
-    void downsample();
+    bool downsample();
 
     // Rotate and translates the pointcloud by some certain amounts (specified in the parameter file)
-    void transformPointCloud();
+    bool transformPointCloud();
 
     // Estimates the normals of the pointcloud and fills the pointcloud_normals_ cloud with those
-    void fillNormalCloud();
+    bool fillNormalCloud();
 
     // Removes all points which are futher away then a certain distance from the origin (specified in the parameter file)
-    void filterOnDistanceFromOrigin();
+    bool filterOnDistanceFromOrigin();
 
     // Removes all points which do not roughly have a normal in a certain direction (specified in the parameter file)
-    void filterOnNormalOrientation();
+    bool filterOnNormalOrientation();
 };
 
 #endif //MARCH_PREPROCESSOR_H

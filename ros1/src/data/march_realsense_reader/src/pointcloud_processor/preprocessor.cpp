@@ -1,10 +1,5 @@
 #include <pointcloud_processor/preprocessor.h>
-<<<<<<< HEAD:ros1/src/data/march_realsense_reader/src/preprocessor.cpp
-#include <yaml_utilities.h>
-=======
 #include <utilities/yaml_utilities.h>
-
->>>>>>> main:ros1/src/data/march_realsense_reader/src/pointcloud_processor/preprocessor.cpp
 #include "yaml-cpp/yaml.h"
 #include <ros/ros.h>
 #include <ctime>
@@ -69,26 +64,21 @@ bool NormalsPreprocessor::preprocess(
   pointcloud_ = pointcloud;
   pointcloud_normals_ = pointcloud_normals;
 
-  ROS_DEBUG_STREAM("Preprocessing with normal filtering. Pointcloud size: " <<
-  pointcloud_->points.size());
+  ROS_DEBUG_STREAM("Preprocessing with normal filtering. Pointcloud size: " << pointcloud_->points.size());
 
-  bool do_statistical_outlier_removal = false;
-  if (YAML::Node statistical_outlier_filter_parameters = config_tree_["statistical_outlier_filter"])
-  {
-    do_statistical_outlier_removal = yaml_utilities::grabParameter<bool>(statistical_outlier_filter_parameters,
-                                                                         "do_statistical_outlier_removal");
-  }
   clock_t start_preprocess = clock();
 
-  downsample();
+  bool succes = true;
 
-  transformPointCloud();
+  succes &= downsample();
 
-  filterOnDistanceFromOrigin();
+  succes &= transformPointCloud();
 
-  fillNormalCloud();
+  succes &= filterOnDistanceFromOrigin();
 
-  filterOnNormalOrientation();
+  succes &= fillNormalCloud();
+
+  succes &= filterOnNormalOrientation();
 
   clock_t end_preprocess = clock();
 
@@ -99,17 +89,16 @@ bool NormalsPreprocessor::preprocess(
                     << "Points in pointcloud_normals: " << pointcloud_normals_->points.size());
   }
 
-  time_taken = double(end_preprocess - start_preprocess) / double(CLOCKS_PER_SEC);
-  std::cout << "Time taken by preprocessor is : " << std::fixed
-            << time_taken << std::setprecision(5);
-  std::cout << " sec " << std::endl;
-  
-  ROS_INFO_STREAM("Finished preprocessing. Pointcloud size: " << pointcloud_->points.size());
-  return true;
+  double time_taken = double(end_preprocess - start_preprocess) / double(CLOCKS_PER_SEC);
+  ROS_DEBUG_STREAM("Time taken by pointcloud pre-processor is : " << std::fixed <<
+                   time_taken << std::setprecision(5) << " sec " << std::endl);
+
+  ROS_DEBUG_STREAM("Finished preprocessing. Pointcloud size: " << pointcloud_->points.size());
+  return succes;
 }
 
 // Downsample the number of points in the pointcloud to have a more workable number of points
-void NormalsPreprocessor::downsample()
+bool NormalsPreprocessor::downsample()
 {
   //  Grab relevant parameters
   bool voxel_grid_filter = false;
@@ -136,6 +125,7 @@ void NormalsPreprocessor::downsample()
   else
   {
     ROS_ERROR("Downsample parameters not found in parameter file");
+    return false;
   }
 
   // Fill in the chosen downsampling object and do the downsampling
@@ -154,11 +144,12 @@ void NormalsPreprocessor::downsample()
     random_sampler.setSample(remaining_points);
     random_sampler.filter(*pointcloud_);
   }
+  return true;
 }
 
 // Translate and rotate the pointcloud so that the origin is at the foot
 // Currently uses a very rough and static estimation of where the foot should be
-void NormalsPreprocessor::transformPointCloud()
+bool NormalsPreprocessor::transformPointCloud()
 {
   //  Grab relevant parameters
   double translation_x;
@@ -175,6 +166,7 @@ void NormalsPreprocessor::transformPointCloud()
   else
   {
     ROS_ERROR("Transformation parameters not found in parameter file");
+    return false;
   }
 
   // make a 4 by 4 transformation Transform = [Rotation (3x3) translation (3x1); 0 (1x3) 1 (1x1)]
@@ -188,10 +180,12 @@ void NormalsPreprocessor::transformPointCloud()
 
   // Actually transform
   pcl::transformPointCloud(*pointcloud_, *pointcloud_, transform);
+
+  return true;
 }
 
 // Remove all the points which are far away from the origin in 3d euclidean distance
-void NormalsPreprocessor::filterOnDistanceFromOrigin()
+bool NormalsPreprocessor::filterOnDistanceFromOrigin()
 {
   //  Grab relevant parameters
   double distance_threshold;
@@ -202,6 +196,7 @@ void NormalsPreprocessor::filterOnDistanceFromOrigin()
   else
   {
     ROS_ERROR("Distance filter parameters not found in parameter file");
+    return false;
   }
   double distance_threshold_squared = distance_threshold * distance_threshold;
 
@@ -220,10 +215,11 @@ void NormalsPreprocessor::filterOnDistanceFromOrigin()
       p--;
     }
   }
+  return true;
 }
 
 // Fill the pointcloud_normals_ object with estimated normals from the current pointcloud_ object
-void NormalsPreprocessor::fillNormalCloud()
+bool NormalsPreprocessor::fillNormalCloud()
 {
   //  Grab relevant parameters
   double translation_x;
@@ -238,6 +234,7 @@ void NormalsPreprocessor::fillNormalCloud()
   else
   {
     ROS_ERROR("Transformation parameters not found in parameter file");
+    return false;
   }
 
   bool use_tree_search_method;
@@ -258,6 +255,7 @@ void NormalsPreprocessor::fillNormalCloud()
   else
   {
     ROS_ERROR("Normal estimation parameters not found in parameter file");
+    return false;
   }
 
   //  Fill the normal estimation object and estimate the normals
@@ -276,11 +274,13 @@ void NormalsPreprocessor::fillNormalCloud()
     normal_estimator.setRadiusSearch(search_radius);
   }
   normal_estimator.compute(*pointcloud_normals_);
+
+  return true;
 }
 
 // Filter points based on the x y or z component of the normal vector of the point.
 // This can work because the normals are of unit length.
-void NormalsPreprocessor::filterOnNormalOrientation()
+bool NormalsPreprocessor::filterOnNormalOrientation()
 {
   //  Grab relevant parameters
   double allowed_length_x;
@@ -291,6 +291,11 @@ void NormalsPreprocessor::filterOnNormalOrientation()
     allowed_length_x = yaml_utilities::grabParameter<double>(normal_filter_parameters, "allowed_length_x");
     allowed_length_y = yaml_utilities::grabParameter<double>(normal_filter_parameters, "allowed_length_y");
     allowed_length_z = yaml_utilities::grabParameter<double>(normal_filter_parameters, "allowed_length_z");
+  }
+  else
+  {
+    ROS_ERROR("Normal filter parameters not found in parameter file");
+    return false;
   }
 
   // Remove any point who's normal does not fall into the desired region
@@ -314,7 +319,10 @@ void NormalsPreprocessor::filterOnNormalOrientation()
   else
   {
     ROS_ERROR("The size of the pointcloud and the normal pointcloud are not the same. Cannot filter on normals.");
+    return false;
   }
+
+  return true;
 }
 
 // Preprocess the pointcloud, this means only transforming for the simple preprocessor
