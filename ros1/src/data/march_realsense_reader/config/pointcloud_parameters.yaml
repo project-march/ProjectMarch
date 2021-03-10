@@ -7,9 +7,6 @@ preprocessor:
 
   transformation:
     rotation_y: -0.75 # - pi / 4
-    translation_x: 0
-    translation_y: 0
-    translation_z: 0
 
   normal_estimation:
     use_tree_search_method: true
