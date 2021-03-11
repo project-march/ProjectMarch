@@ -7,7 +7,7 @@
   {
     "name":"axis0.encoder.config.cpr",
     "type":"int32",
-    "value":131072
+    "value":8192
   },
   {
     "name":"axis0.encoder.config.use_index",
@@ -22,7 +22,7 @@
   {
     "name":"axis0.motor.config.pole_pairs",
     "type":"int32",
-    "value":14
+    "value":7
   },
   {
     "name":"axis0.controller.config.control_mode",
@@ -42,6 +42,6 @@
   {
     "name": "axis0.controller.config.vel_limit",
     "type": "float",
-    "value": 4.0
+    "value": 50.0
   }
 ]

@@ -14,8 +14,9 @@ march:
       # When you switch to effort actuationmode, 'position_controllers' must be substituted with 'effort_controllers' and the gains must be added
       joints:
         - linear_joint
-            gains: # Required because we're controlling an effort interface
-              test_joint: {p: 50, i: 0, d: 10, i_clamp: 10, publish_state: true, antiwindup: true}
+
+      gains: # Required because we're controlling an effort interface
+        linear_joint: {p: 50, i: 0, d: 10, i_clamp: 10, publish_state: true, antiwindup: true}
       # Note: these gains are tuned for the KFE joints in the exoskeleton
 
       constraints:

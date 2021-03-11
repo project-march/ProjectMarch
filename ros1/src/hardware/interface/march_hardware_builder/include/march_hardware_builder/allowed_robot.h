@@ -16,6 +16,7 @@ public:
     march3,
     test_joint_rotational,
     odrive_test_joint_rotational,
+    odrive_test_joint_linear,
     test_joint_linear,
     pdb,
     two_odrive_joints,
@@ -39,6 +40,10 @@ public:
     else if (robot_name == "odrive_test_joint_rotational")
     {
       this->value = odrive_test_joint_rotational;
+    }
+    else if (robot_name == "odrive_test_joint_linear")
+    {
+      this->value = odrive_test_joint_linear;
     }
     else if (robot_name == "two_odrive_joints")
     {
@@ -81,6 +86,10 @@ public:
     else if (this->value == AllowedRobot::odrive_test_joint_rotational)
     {
       return base_path.append("/robots/odrive_test_joint_rotational.yaml");
+    }
+    else if (this->value == AllowedRobot::odrive_test_joint_linear)
+    {
+      return base_path.append("/robots/odrive_test_joint_linear.yaml");
     }
     else if (this->value == AllowedRobot::test_joint_linear)
     {
@@ -126,6 +135,9 @@ public:
       case odrive_test_joint_rotational:
         out << "odrive_test_joint_rotational";
         break;
+      case odrive_test_joint_linear:
+        out << "odrive_test_joint_linear";
+            break;
       case two_odrive_joints:
         out << "two_odrive_joints";
         break;

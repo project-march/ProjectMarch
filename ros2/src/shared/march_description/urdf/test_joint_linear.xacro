@@ -16,10 +16,10 @@
     <xacro:property name="bar_width" value="0.05"/>
 
     <xacro:property name="joint_buffer" value="${3*pi/180}"/> <!-- rad -->
-    <xacro:property name="joint_lower_limit" value="${-8.5*pi/180}"/> <!-- rad -->
-    <xacro:property name="joint_upper_limit" value="${8.5*pi/180}"/> <!-- rad -->
+    <xacro:property name="joint_lower_limit" value="${-223*pi/360}"/> <!-- rad -->
+    <xacro:property name="joint_upper_limit" value="${223*pi/360}"/> <!-- rad -->
     <xacro:property name="joint_effort_limit" value="10927.0"/>
-    <xacro:property name="joint_velocity_limit" value="1.0"/> <!-- rad/s -->
+    <xacro:property name="joint_velocity_limit" value="10.0"/> <!-- rad/s -->
 
     <xacro:property name="hover_height" value="0.5"/>
 
@@ -100,7 +100,7 @@
         </joint>
         <actuator name="linear_joint_motor">
             <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-            <mechanicalReduction>1</mechanicalReduction>
+            <mechanicalReduction>223</mechanicalReduction>
         </actuator>
     </transmission>
 

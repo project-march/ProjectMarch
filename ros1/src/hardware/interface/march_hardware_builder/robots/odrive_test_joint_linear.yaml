@@ -12,6 +12,6 @@ testsetup:
             resolution: 12
             minPositionIU: 240
             maxPositionIU: 445
-            incrementalEncoder:
-              resolution: 13
-              transmission: 200
+          incrementalEncoder:
+            resolution: 13
+            transmission: 200
