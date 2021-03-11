@@ -12,6 +12,7 @@ import rospy
 from geometry_msgs.msg import Pose
 from sensor_msgs.msg import JointState
 from march_shared_msgs.srv import (
+    GetMoveItTrajectory,
     GetMoveItTrajectoryRequest,
     GetMoveItTrajectoryResponse,
 )
@@ -30,6 +31,13 @@ class MoveItInterface:
         moveit_commander.RobotCommander()
 
         moveit_commander.PlanningSceneInterface()
+
+        moveit_interface = MoveItInterface()
+        rospy.Service(
+            "/march/moveit/get_trajectory",
+            GetMoveItTrajectory,
+            moveit_interface.get_joint_trajectory,
+        )
 
         try:
             self.move_group = {
