@@ -35,7 +35,8 @@ void ModelPredictiveController::init() {
 
   // Fill reference vector with sinus and or step signals
 //  sinRef(reference, 0.2, 0.785, ACADO_N, 0.001);
-  stepRef(reference, 0.261, ACADO_N);
+//  stepRef(reference, 0.261, ACADO_N);
+  reference.assign(ACADO_N, {0.0, 0.0, 0.0});
 
   // Set the reference
   setReference(reference);
@@ -119,9 +120,9 @@ void ModelPredictiveController::calculateControlInput() {
   acado_shiftStates(2, 0, 0);
   acado_shiftControls(0);
 
-  // Scroll the reference vector
-  if(repeat_reference) {
-      scrollReference(reference);
-  }
+//  // Scroll the reference vector
+//  if(repeat_reference) {
+//      scrollReference(reference);
+//  }
 
 }

@@ -6,6 +6,9 @@
 #include <string>
 #include <vector>
 
+#include <ros/ros.h>
+//#include <ros/console.h>
+
 bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
 {
   joint_handles_ptr_ = &joint_handles;
@@ -19,6 +22,7 @@ bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::Jo
   {
     model_predictive_controllers_.push_back(ModelPredictiveController(getQMatrix(joint_names[i])));
     model_predictive_controllers_[i].init();
+
   }
 
   // Initialize the place where the MPC command will be published
@@ -74,7 +78,7 @@ void ModelPredictiveControllerInterface::starting(const ros::Time& /*time*/)
 }
 
 void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/, const ros::Duration& period,
-                                                       const std::vector<joint_trajectory_controller::State>&  /*desired_states*/,
+                                                       const std::vector<joint_trajectory_controller::State>&  desired_states,
                                                        const joint_trajectory_controller::State& state_error)
 {
   // Preconditions
@@ -86,11 +90,16 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
   assert(num_joints_ == state_error.velocity.size());
 
   // Update effort command
-  for (unsigned int i = 0; i < num_joints_; ++i)
+  for (unsigned int i = 0; i < num_joints_; i++)
   {
     // Get current joint state
     state = {(*joint_handles_ptr_)[i].getPosition(), (*joint_handles_ptr_)[i].getVelocity()};
     model_predictive_controllers_[i].x0 = state;
+
+    // Set the reference
+      for (unsigned int j = 0; j < desired_states.size(); j++) {
+          model_predictive_controllers_[i].reference[j] = {desired_states[j].position[i], desired_states[j].velocity[i], 0.0};
+      }
 
     // Calculate mpc control signal
     model_predictive_controllers_[i].calculateControlInput();
