@@ -134,7 +134,6 @@ bool NormalsPreprocessor::downsample()
     pcl::VoxelGrid<pcl::PointXYZ> voxel_grid;
     voxel_grid.setInputCloud(pointcloud_);
     voxel_grid.setLeafSize(leaf_size, leaf_size, leaf_size);
-    voxel_grid.setFilterLimits(-3.0, 3.0);
     voxel_grid.filter(*pointcloud_);
   }
   else if (random_filter)
