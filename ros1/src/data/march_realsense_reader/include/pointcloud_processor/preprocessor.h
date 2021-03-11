@@ -76,6 +76,36 @@ class NormalsPreprocessor : Preprocessor {
 
     // Removes all points which do not roughly have a normal in a certain direction (specified in the parameter file)
     bool filterOnNormalOrientation();
+
+    // Reads all the relevant parameters from the yaml file
+    bool readYaml();
+
+    // Downsampling parameters
+    bool getDownsamplingParameters();
+    bool voxel_grid_filter;
+    double leaf_size;
+    bool random_filter;
+    int remaining_points;
+
+    // Transform parameters
+    bool getTransformParameters();
+    double rotation_y;
+
+    // Distance filter parameters
+    bool getDistanceFilterParameters();
+    double distance_threshold;
+
+    // Normal estimation parameters
+    bool getNormalEstimationParameters();
+    bool use_tree_search_method;
+    int number_of_neighbours;
+    double search_radius;
+
+    // Normal filter parameters
+    bool getNormalFilterParameters();
+    double allowed_length_x;
+    double allowed_length_y;
+    double allowed_length_z;
 };
 
 #endif //MARCH_PREPROCESSOR_H
