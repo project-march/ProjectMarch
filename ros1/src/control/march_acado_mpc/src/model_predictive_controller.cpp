@@ -2,7 +2,9 @@
 
 #include "model_predictive_controller.hpp"
 #include "acado_common.h"
+#include <acado_auxiliary_functions.h>
 #include "mpc_references.h"
+#include <ros/console.h>
 
 #include <iostream>
 #include <vector>
@@ -99,6 +101,32 @@ void ModelPredictiveController::assignWeightingMatrix(std::vector<std::vector<fl
     }
 }
 
+void ModelPredictiveController::controllerDiagnosis() {
+    // Check acado_preparationStep() status code
+    ROS_WARN_STREAM_COND(preparationStepStatus >= PREP_INTERNAL_ERROR, joint_name << ", Error in preparation step");
+
+    // Check acado_feedbackStep() status code
+    // Only checks codes that indicate an error
+    switch (feedbackStepStatus) {
+        case QP_ITERATION_LIMIT_REACHED:
+            ROS_WARN_STREAM(joint_name << ", QP could not be solved within the given number of iterations");
+            break;
+
+        case QP_INTERNAL_ERROR:
+            ROS_WARN_STREAM(joint_name << ", QP could not be solved due to an internal error");
+            break;
+
+        case QP_INFEASIBLE:
+            ROS_WARN_STREAM(joint_name << ", QP is infeasible and thus could not be solved");
+            break;
+
+        case QP_UNBOUNDED:
+            ROS_WARN_STREAM(joint_name << ", QP is unbounded and thus could not be solved");
+            break;
+    }
+
+}
+
 void ModelPredictiveController::calculateControlInput() {
 
   // Set initial state
@@ -107,12 +135,17 @@ void ModelPredictiveController::calculateControlInput() {
   // Set reference
   setReference(reference);
 
-  // preparation step
-  setReference(reference);
-  acado_preparationStep();
+  // Preparation step (timed)
+  acado_tic(&t);
+  preparationStepStatus = acado_preparationStep();
+  t_preparation = acado_toc(&t);
 
-  // feedback step
-  acado_feedbackStep();
+  // Feedback step (timed)
+  acado_tic(&t);
+  feedbackStepStatus = acado_feedbackStep();
+  t_feedback = acado_toc(&t);
+  
+  // Set mpc command 
   u = acadoVariables.u[0];
 
   // Shift states and control and prepare for the next iteration
@@ -123,5 +156,8 @@ void ModelPredictiveController::calculateControlInput() {
   if(repeat_reference) {
       scrollReference(reference);
   }
+
+  // Perform a diagnosis on the controller
+  controllerDiagnosis();
 
 }

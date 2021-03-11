@@ -1,7 +1,9 @@
 #ifndef MARCH_MODEL_PREDICTIVE_CONTROLLER_H
 #define MARCH_MODEL_PREDICTIVE_CONTROLLER_H
 
+#include <iostream>
 #include <vector>
+#include <acado_auxiliary_functions.h>
 
 using namespace std;
 
@@ -15,6 +17,28 @@ public:
     double u;                           // Calculated control input
     vector<vector<double>> reference;   // Current reference
     bool repeat_reference = true;      // Periodically Repeat the reference
+    std::string joint_name;
+
+    // Error enums
+    enum Error {
+
+        // acado_preparationStep() errors
+        PREP_INTERNAL_ERROR = 1,
+
+        // acado_feedbackStep() errors
+        QP_ITERATION_LIMIT_REACHED = 1,
+        QP_INTERNAL_ERROR = -1,
+        QP_INFEASIBLE = -2,
+        QP_UNBOUNDED = -3
+    };
+
+    // Timing variables
+    acado_timer t;
+    double t_preparation, t_feedback;
+
+    // status variables
+    int preparationStepStatus;
+    int feedbackStepStatus;
 
     /**
      * \brief Initialise the model predictive controller
@@ -38,6 +62,12 @@ public:
      * @param Q - weighting matrix
      */
     void assignWeightingMatrix(std::vector<std::vector<float>> Q);
+
+    /**
+     * \brief Check status codes and other
+     * diagnostic data and issue helpful ROS Messages
+     */
+    void controllerDiagnosis();
 
     /**
      * \brief Calculate the control input
