@@ -1,7 +1,9 @@
+#include <ctime>
 #include <march_realsense_reader/realsense_reader.h>
 #include <pcl_ros/point_cloud.h>
 #include <pcl/point_types.h>
 #include <ros/ros.h>
+#include <ros/console.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <march_shared_msgs/GetGaitParameters.h>
 #include <pointcloud_processor/preprocessor.h>
@@ -55,6 +57,9 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
     ROS_DEBUG("Realsense reader started with debugging, all intermediate result "
              "steps will be published and more information given in console, but"
              " this might slow the process, this can be turned off in the yaml.");
+    if( ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) ) {
+      ros::console::notifyLoggerLevelsChanged();
+    }
     preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>
         ("/camera/preprocessed_cloud", 1);
   }
@@ -96,6 +101,7 @@ bool RealSenseReader::process_pointcloud(
     int selected_gait,
     march_shared_msgs::GetGaitParameters::Response &res)
 {
+  clock_t start_of_processing_time = clock();
   Normals::Ptr normals = boost::make_shared<Normals>();
 
   // Preprocess
@@ -168,6 +174,12 @@ bool RealSenseReader::process_pointcloud(
   ROS_DEBUG("Done determining parameters");
   //TODO: Add publisher to visualize found hulls
 
+  clock_t end_of_processing_time = clock();
+
+  double time_taken = double(end_of_processing_time - start_of_processing_time) / double(CLOCKS_PER_SEC);
+  ROS_DEBUG_STREAM("Time taken by point cloud processor is : " << std::fixed <<
+                   time_taken << std::setprecision(5) << " sec " << std::endl);
+
   res.success = true;
   return true;
 }
@@ -182,6 +194,7 @@ void RealSenseReader::publishPreprocessedPointCloud(PointCloud::Ptr pointcloud)
 
   sensor_msgs::PointCloud2 msg;
   pcl::toROSMsg(*pointcloud, msg);
+  msg.header.frame_id = "foot_left";
 
   preprocessed_pointcloud_publisher_.publish(msg);
 }
@@ -192,6 +205,8 @@ bool RealSenseReader::process_pointcloud_callback(
     march_shared_msgs::GetGaitParameters::Request &req,
     march_shared_msgs::GetGaitParameters::Response &res)
 {
+  time_t start_callback = clock();
+
   boost::shared_ptr<const sensor_msgs::PointCloud2> input_cloud =
       ros::topic::waitForMessage<sensor_msgs::PointCloud2>
       (POINTCLOUD_TOPIC, *n_, POINTCLOUD_TIMEOUT);
@@ -207,5 +222,12 @@ bool RealSenseReader::process_pointcloud_callback(
   pcl::fromROSMsg(*input_cloud, converted_cloud);
   PointCloud::Ptr point_cloud = boost::make_shared<PointCloud>(converted_cloud);
 
-  return process_pointcloud(point_cloud, req.selected_gait, res);
+  bool success = process_pointcloud(point_cloud, req.selected_gait, res);
+
+  time_t end_callback = clock();
+  double time_taken = double(end_callback - start_callback) / double(CLOCKS_PER_SEC);
+  ROS_DEBUG_STREAM("Time taken by process point cloud callback method: " << std::fixed <<
+                   time_taken << std::setprecision(5) << " sec " << std::endl);
+
+  return success;
 }
