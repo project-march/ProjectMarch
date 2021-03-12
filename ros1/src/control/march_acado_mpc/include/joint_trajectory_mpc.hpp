@@ -77,7 +77,7 @@ private:
   double command;
 
   std::vector<ModelPredictiveController> model_predictive_controllers_;
-  vector<double> state;
+  vector<double> current_state;
 
   std::unique_ptr<realtime_tools::RealtimePublisher<std_msgs::Float64MultiArray>> command_pub_;
 };
