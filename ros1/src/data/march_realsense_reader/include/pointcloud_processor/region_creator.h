@@ -22,6 +22,7 @@ class RegionCreator
                                 Normals::Ptr pointcloud_normals,
                                 boost::shared_ptr<RegionVector> regions_vector)=0;
     virtual ~RegionCreator() {};
+    virtual pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation()=0;
 
   protected:
     PointCloud::Ptr pointcloud_;
@@ -36,24 +37,38 @@ class regionGrower : RegionCreator
   public:
     //Use the constructors defined in the super class
     using RegionCreator::RegionCreator;
-    /** This function should take in a pointcloud with matching normals and cluster them
-    in regions, based on the parameters in the YAML node given at construction. **/
+    /** Create cluster using the region growing algorithm, takes algorithm configuration from the YAML, and fills
+     * parameter regions_vector with clusters. **/
     bool create_regions(PointCloud::Ptr pointcloud,
                         Normals::Ptr pointcloud_normals,
                         boost::shared_ptr<RegionVector> regions_vector) override;
-    void debug_visualisation(pcl::PointCloud<pcl::PointXYZRGB>::Ptr coloured_cloud);
 
-  private:
-    void setup_region_grower();
+    /**
+     * @return A pointer to a single pointcloud, with unique colours for every cluster
+     */
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation() override;
+
+private:
+    /**
+    * Read out YAML
+    * @return true if succesful
+    */
     bool read_yaml();
+
+    /**
+     * configure region growing algorithm
+     */
+    void setup_region_grower();
+
+    /**
+     * Extract clusters from region_grower object
+     * @return true if succesful
+     */
     bool extract_regions();
 
   private:
     // Region Growing Object
     pcl::RegionGrowing <pcl::PointXYZ, pcl::Normal> region_grower;
-
-//    // Debug coloured cloud
-//    pcl::PointCloud<pcl::PointXYZRGB>::Ptr coloured_cloud;
 
     // Region Growing configuration parameters
     int number_of_neighbours;

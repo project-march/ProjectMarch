@@ -19,8 +19,6 @@ RegionCreator::RegionCreator(YAML::Node config_tree, bool debugging):
 
 }
 
-/** This function should take in a pointcloud with matching normals and cluster them
- in regions, based on the parameters in the YAML node given at construction **/
 bool regionGrower::create_regions(PointCloud::Ptr pointcloud,
                                          Normals::Ptr pointcloud_normals,
                                          boost::shared_ptr<RegionVector>
@@ -29,7 +27,7 @@ bool regionGrower::create_regions(PointCloud::Ptr pointcloud,
   pointcloud_ = pointcloud;
   pointcloud_normals_ = pointcloud_normals;
   regions_vector_ = regions_vector;
-  ROS_INFO_STREAM("Creating regions with region growing");
+  ROS_DEBUG_STREAM("Creating regions with region growing");
 
   read_yaml();
   setup_region_grower();
@@ -52,11 +50,10 @@ bool regionGrower::read_yaml()
     ROS_ERROR("'region_growing' parameters not found in parameter file");
     return false;
   }
-
 }
+
 void regionGrower::setup_region_grower()
 {
-
   pcl::search::Search<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
   region_grower.setMinClusterSize(min_cluster_size);
   region_grower.setMaxClusterSize(max_cluster_size);
@@ -64,19 +61,28 @@ void regionGrower::setup_region_grower()
   region_grower.setNumberOfNeighbours(number_of_neighbours);
   region_grower.setInputCloud(pointcloud_);
   region_grower.setInputNormals(pointcloud_normals_);
+  region_grower.setSmoothnessThreshold(smoothness_threshold);
   region_grower.setCurvatureThreshold(curvature_threshold);
 }
+
 bool regionGrower::extract_regions()
 {
   region_grower.extract(*regions_vector_);
+  ROS_DEBUG("Total number of clusters found: %lu", regions_vector_->size());
   if (debugging_)
   {
-    ROS_INFO("Total number of clusters found: %lu", regions_vector_->size());
+    int i = 0;
+    for (auto region: *regions_vector_)
+    {
+      ROS_DEBUG("Total number of points in cluster %i: %lu", i, region.indices.size());
+      i++;
+    }
   }
   return true;
 }
 
-void regionGrower::debug_visualisation(pcl::PointCloud<pcl::PointXYZRGB>::Ptr coloured_cloud)
+pcl::PointCloud<pcl::PointXYZRGB>::Ptr regionGrower::debug_visualisation()
 {
-  coloured_cloud = region_grower.getColoredCloud();
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr coloured_cloud = region_grower.getColoredCloud();
+  return coloured_cloud;
 }
