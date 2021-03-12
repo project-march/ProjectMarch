@@ -67,16 +67,16 @@ class NormalsPreprocessor : Preprocessor {
     bool downsample();
 
     // Transform the pointcloud based on the data found on the /tf topic,
-    bool transformPointCloudFromUrdf();
+    bool transformPointCloudFromUrdf(geometry_msgs::TransformStamped & transform_stamped);
 
     // Rotate and translates the pointcloud by some certain amounts (specified in the parameter file)
     bool transformPointCloud();
 
-    // Estimates the normals of the pointcloud and fills the pointcloud_normals_ cloud with those
-    bool fillNormalCloud();
-
     // Removes all points which are futher away then a certain distance from the origin (specified in the parameter file)
     bool filterOnDistanceFromOrigin();
+
+    // Estimates the normals of the pointcloud and fills the pointcloud_normals_ cloud with those
+    bool fillNormalCloud(geometry_msgs::TransformStamped transform_stamped);
 
     // Removes all points which do not roughly have a normal in a certain direction (specified in the parameter file)
     bool filterOnNormalOrientation();
@@ -114,6 +114,7 @@ class NormalsPreprocessor : Preprocessor {
     // Objects needed for transformation based on URDF
     std::unique_ptr<tf2_ros::Buffer> tfBuffer;
     std::unique_ptr<tf2_ros::TransformListener> tfListener;
+    std::string pointcloud_frame_id;
 };
 
 #endif //MARCH_PREPROCESSOR_H

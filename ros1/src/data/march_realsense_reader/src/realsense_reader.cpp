@@ -42,7 +42,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
     debugging_ = false;
   }
 
-  preprocessor_ = std::make_unique<SimplePreprocessor>(
+  preprocessor_ = std::make_unique<NormalsPreprocessor>(
       getConfigIfPresent("preprocessor"), debugging_);
   region_creator_ = std::make_unique<SimpleRegionCreator>(
       getConfigIfPresent("region_creator"), debugging_);
