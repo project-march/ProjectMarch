@@ -4,7 +4,7 @@ from ament_index_python import get_package_share_directory
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PythonExpression
 
 
 def generate_launch_description():
@@ -19,11 +19,14 @@ def generate_launch_description():
     # Robot state publisher arguments
     robot_state_publisher = LaunchConfiguration("robot_state_publisher")
     robot_description = LaunchConfiguration("robot_description")
+    use_imu_data = LaunchConfiguration("use_imu_data")
+    imu_topic = LaunchConfiguration("imu_topic")
 
     # Simulation arguments
     ground_gait = LaunchConfiguration("ground_gait")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
     to_world_transform = LaunchConfiguration("to_world_transform")
+
 
     # Gait selection arguments
     gait_package = LaunchConfiguration("gait_package")
@@ -88,10 +91,21 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="to_world_transform",
-                default_value="False",
+                default_value=ground_gait,
                 description="Whether a transform from the world to base_link is "
                 "necessary, this is the case when you are "
-                "groundgaiting in rviz.",
+                "groundgaiting.",
+            ),
+            DeclareLaunchArgument(
+                name="use_imu_data",
+                default_value=False,
+                description="Whether to use the camera imu to know the real "
+                            "orientation of the exoskeleton"
+            ),
+            DeclareLaunchArgument(
+                name="imu_topic",
+                default_value="/camera_front/imu/data",
+                description="The topic that should be used to determine the orientation"
             ),
             # GAIT SELECTION ARGUMENTS
             DeclareLaunchArgument(
@@ -157,6 +171,8 @@ def generate_launch_description():
                     ("ground_gait", ground_gait),
                     ("to_world_transform", to_world_transform),
                     ("balance", balance),
+                    ("use_imu_data", use_imu_data),
+                    ("imu_topic", imu_topic)
                 ],
                 condition=IfCondition(robot_state_publisher),
             ),

@@ -4,7 +4,7 @@ from ament_index_python import get_package_share_directory
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PythonExpression
 
 
 def generate_launch_description():
@@ -20,8 +20,11 @@ def generate_launch_description():
     robot_state_publisher = LaunchConfiguration("robot_state_publisher")
     robot_description = LaunchConfiguration("robot_description")
     ground_gait = LaunchConfiguration("ground_gait")
+    use_imu_data = LaunchConfiguration("use_imu_data")
+    imu_topic = LaunchConfiguration("imu_topic")
 
     # Simulation arguments
+    realsense = LaunchConfiguration("realsense")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
     to_world_transform = LaunchConfiguration("to_world_transform")
 
@@ -94,6 +97,17 @@ def generate_launch_description():
                 description="Whether a transform from the world to base_link is "
                 "necessary, this is the case when you are "
                 "groundgaiting in rviz.",
+            ),
+            DeclareLaunchArgument(
+                name="use_imu_data",
+                default_value=False,
+                description="Whether to use the camera imu to know the real "
+                            "orientation of the exoskeleton"
+            ),
+            DeclareLaunchArgument(
+                name="imu_topic",
+                default_value="/camera_front/imu/data",
+                description="The topic that should be used to determine the orientation"
             ),
             # GAIT SELECTION ARGUMENTS
             DeclareLaunchArgument(

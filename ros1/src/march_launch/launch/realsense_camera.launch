@@ -18,27 +18,27 @@
     <arg name="infra_fps" default="$(arg camera_fps)"
          doc="The frame rate to use for the infra red module of the camera"/>
 
-    <arg name="enable_fisheye"      default="false"/>
-    <arg name="depth_width"         default="640"/>
-    <arg name="depth_height"        default="480"/>
-    <arg name="enable_depth"        default="true"/>
+    <arg name="enable_fisheye"          default="false"/>
+    <arg name="depth_width"             default="640"/>
+    <arg name="depth_height"            default="480"/>
+    <arg name="enable_depth"            default="true"/>
 
-    <arg name="infra_width"        default="640"/>
-    <arg name="infra_height"       default="480"/>
-    <arg name="enable_infra"       default="false"/>
-    <arg name="enable_infra1"       default="$(arg enable_infra)"/>
-    <arg name="enable_infra2"       default="$(arg enable_infra)"/>
+    <arg name="infra_width"             default="640"/>
+    <arg name="infra_height"            default="480"/>
+    <arg name="enable_infra"            default="false"/>
+    <arg name="enable_infra1"           default="$(arg enable_infra)"/>
+    <arg name="enable_infra2"           default="$(arg enable_infra)"/>
 
-    <arg name="color_width"         default="640"/>
-    <arg name="color_height"        default="480"/>
-    <arg name="enable_color"        default="false"/>
+    <arg name="color_width"             default="640"/>
+    <arg name="color_height"            default="480"/>
+    <arg name="enable_color"            default="false"/>
 
-    <arg name="gyro_fps"            default="400"/>
-    <arg name="accel_fps"           default="250"/>
-    <arg name="enable_gyro"         default="true"/>
-    <arg name="enable_gyro_back"         default="false"/>
-    <arg name="enable_accel"        default="true"/>
-    <arg name="enable_accel_back"        default="false"/>
+    <arg name="gyro_fps"                default="400"/>
+    <arg name="accel_fps"               default="250"/>
+    <arg name="enable_gyro"             default="true"/>
+    <arg name="enable_accel"            default="true"/>
+    <arg name="enable_gyro_camera_back" default="false"/>
+    <arg name="enable_accel_back"       default="false"/>
 
     <arg name="enable_pointcloud"         default="true"/>
     <arg name="pointcloud_texture_stream" default="RS2_STREAM_COLOR"/>
@@ -74,7 +74,7 @@
 
             <arg name="enable_pointcloud"        value="$(arg enable_pointcloud)"/>
             <arg name="pointcloud_texture_stream" value="$(arg pointcloud_texture_stream)"/>
-            <arg name="pointcloud_texture_index"  value="$(arg pointcloud_texture_index)"/>
+            <arg name="pointcloud_texture_index" value="$(arg pointcloud_texture_index)"/>
             <arg name="enable_sync"              value="$(arg enable_sync)"/>
             <arg name="align_depth"              value="$(arg align_depth)"/>
             <arg name="enable_fisheye"           value="$(arg enable_fisheye)"/>
@@ -112,6 +112,13 @@
             <arg name="allow_no_texture_points"  value="$(arg allow_no_texture_points)"/>
 
         </include>
+
+        <node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter">
+            <param name="use_mag" type="bool" value="false" />
+            <param name="publish_tf" type="bool" value="false" />
+            <param name="_world_frame" type="string" value="nwu" />
+            <remap from="imu/data_raw" to="imu"/>
+        </node>
     </group>
 
     <group ns="$(arg camera_back_name)" if="$(arg use_camera_back)">
@@ -146,8 +153,8 @@
 
             <arg name="gyro_fps"                 value="$(arg gyro_fps)"/>
             <arg name="accel_fps"                value="$(arg accel_fps)"/>
-            <arg name="enable_gyro"              value="$(arg enable_gyro)"/>
-            <arg name="enable_accel"             value="$(arg enable_accel)"/>
+            <arg name="enable_gyro"              value="$(arg enable_gyro_camera_back)"/>
+            <arg name="enable_accel"             value="$(arg enable_accel_camera_back)"/>
 
             <arg name="publish_tf"               value="$(arg publish_tf)"/>
             <arg name="tf_publish_rate"          value="$(arg tf_publish_rate)"/>
