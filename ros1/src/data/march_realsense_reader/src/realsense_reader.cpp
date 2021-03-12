@@ -97,7 +97,7 @@ bool RealSenseReader::process_pointcloud(
     int selected_gait,
     march_shared_msgs::GetGaitParameters::Response &res)
 {
-  clock_t start_processing = clock();
+  clock_t start_of_processing_time = clock();
   Normals::Ptr normals = boost::make_shared<Normals>();
 
   // Preprocess
@@ -170,9 +170,9 @@ bool RealSenseReader::process_pointcloud(
   ROS_DEBUG("Done determining parameters");
   //TODO: Add publisher to visualize found hulls
 
-  clock_t end_processing = clock();
+  clock_t end_of_processing_time = clock();
 
-  double time_taken = double(end_processing - start_processing) / double(CLOCKS_PER_SEC);
+  double time_taken = double(end_of_processing_time - start_of_processing_time) / double(CLOCKS_PER_SEC);
   ROS_DEBUG_STREAM("Time taken by point cloud processor is : " << std::fixed <<
                    time_taken << std::setprecision(5) << " sec " << std::endl);
 
