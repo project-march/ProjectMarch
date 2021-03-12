@@ -143,7 +143,6 @@ bool RealSenseReader::process_pointcloud(
   }
 
   ROS_DEBUG("Done creating regions");
-  //TODO: Add publisher to visualize created regions
 
   // Setup data structures for hull finding
   boost::shared_ptr<PlaneParameterVector> plane_parameter_vector =
@@ -212,11 +211,17 @@ void RealSenseReader::publishPreprocessedPointCloud(PointCloud::Ptr pointcloud)
 void RealSenseReader::publishRegionCreatorPointCloud()
 {
   ROS_INFO_STREAM("Publishing a cloud with different regions");
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr coloured_cloud (new pcl::PointCloud<pcl::PointXYZRGB>);
-  ROS_INFO_STREAM("1");
-  region_creator_->debug_visualisation(coloured_cloud);
-  ROS_INFO_STREAM("2");
-  region_pointcloud_publisher_.publish(*coloured_cloud);
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr coloured_cloud = region_creator_->debug_visualisation();
+
+  coloured_cloud->width  = 1;
+  coloured_cloud->height = coloured_cloud->points.size();
+
+  sensor_msgs::PointCloud2 msg;
+  pcl::toROSMsg(*coloured_cloud, msg);
+
+  // Header part of the msg is overwritten in pcl::toROSMsg.
+  msg.header.frame_id = "foot_left";
+  region_pointcloud_publisher_.publish(msg);
 }
 
 // The callback for the service that was starts processing the point cloud and gives
