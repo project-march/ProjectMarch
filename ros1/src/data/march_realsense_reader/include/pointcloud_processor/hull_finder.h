@@ -37,7 +37,7 @@ protected:
     PointCloud::Ptr pointcloud_;
     Normals::Ptr normal_pointcloud_;
     boost::shared_ptr<RegionVector> region_vector_;
-    boost::shared_ptr<PlaneParameterVector> plane_parameter_vector_;
+    boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;
     boost::shared_ptr<HullVector> hull_vector_;
     boost::shared_ptr<PolygonVector> polygon_vector_;
     YAML::Node config_tree_;
@@ -54,12 +54,12 @@ public:
     bool find_hulls(PointCloud::Ptr pointcloud,
                      Normals::Ptr normal_pointcloud,
                      boost::shared_ptr<RegionVector> region_vector,
-                     boost::shared_ptr<PlaneParameterVector> plane_parameter_vector,
+                     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,
                      boost::shared_ptr<HullVector> hull_vector,
                      boost::shared_ptr<PolygonVector> polygon_vector) override;
 
 protected:
-    // Converts a region into a convex or concave hull
+    // Convert a region into a convex or concave hull
     bool getCHullFromRegion();
 
     // Get the plane coefficients of the region using average point and normal
@@ -74,8 +74,11 @@ protected:
     // Add the hull to a vector together with its plane coefficients and polygons
     bool addCHullToVector();
 
-    // Reads all the relevant parameters from the yaml file
+    // Read all the relevant parameters from the yaml file
     bool readYaml();
+
+    // Calculate the average normal and point of a region
+    bool getAverageNormalAndPoint(std::vector<double> average_point, std::vector<double> average_normal);
 
     // Plane coefficients given as [0]*x + [1]*y + [2]*z + [3] = 0
     pcl::ModelCoefficients::Ptr  plane_coefficients;
