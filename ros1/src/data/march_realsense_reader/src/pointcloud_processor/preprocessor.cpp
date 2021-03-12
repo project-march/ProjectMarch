@@ -76,20 +76,20 @@ bool NormalsPreprocessor::preprocess(
 
   clock_t start_preprocess = clock();
 
-  bool succes = true;
+  bool success = true;
 
-  succes &= readYaml();
+  success &= readYaml();
 
-  succes &= downsample();
+  success &= downsample();
 
   geometry_msgs::TransformStamped transform_stamped;
-  succes &= transformPointCloudFromUrdf(transform_stamped);
+  success &= transformPointCloudFromUrdf(transform_stamped);
 
-  succes &= filterOnDistanceFromOrigin();
+  success &= filterOnDistanceFromOrigin();
 
-  succes &= fillNormalCloud(transform_stamped);
+  success &= fillNormalCloud(transform_stamped);
 
-  succes &= filterOnNormalOrientation();
+  success &= filterOnNormalOrientation();
 
   clock_t end_preprocess = clock();
 
@@ -110,17 +110,17 @@ bool NormalsPreprocessor::preprocess(
 
 bool NormalsPreprocessor::readYaml()
 {
-  bool succes = true;
+  bool success = true;
 
-  succes &= getDownsamplingParameters();
+  success &= getDownsamplingParameters();
 
-  succes &= getDistanceFilterParameters();
+  success &= getDistanceFilterParameters();
 
-  succes &= getNormalEstimationParameters();
+  success &= getNormalEstimationParameters();
 
-  succes &= getNormalFilterParameters();
+  success &= getNormalFilterParameters();
 
-  return succes;
+  return success;
 }
 
 bool NormalsPreprocessor::getDownsamplingParameters()
