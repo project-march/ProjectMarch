@@ -363,7 +363,7 @@ void SimplePreprocessor::transformPointCloudFromUrdf()
   try
   {
     pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
-    transform_stamped = tfBuffer->lookupTransform("foot_left", pointcloud_frame_id,
+    transformStamped = tfBuffer->lookupTransform("foot_left", pointcloud_frame_id,
                                                   ros::Time::now(), ros::Duration(0.5));
     pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_,
                                  transformStamped.transform);
