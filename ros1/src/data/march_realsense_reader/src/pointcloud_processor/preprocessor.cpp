@@ -76,20 +76,20 @@ bool NormalsPreprocessor::preprocess(
 
   clock_t start_preprocess = clock();
 
-  bool succes = true;
+  bool success = true;
 
-  succes &= readYaml();
+  success &= readYaml();
 
-  succes &= downsample();
+  success &= downsample();
 
   geometry_msgs::TransformStamped transform_stamped;
-  succes &= transformPointCloudFromUrdf(transform_stamped);
+  success &= transformPointCloudFromUrdf(transform_stamped);
 
-  succes &= filterOnDistanceFromOrigin();
+  success &= filterOnDistanceFromOrigin();
 
-  succes &= fillNormalCloud(transform_stamped);
+  success &= fillNormalCloud(transform_stamped);
 
-  succes &= filterOnNormalOrientation();
+  success &= filterOnNormalOrientation();
 
   clock_t end_preprocess = clock();
 
@@ -105,22 +105,23 @@ bool NormalsPreprocessor::preprocess(
                    time_taken << std::setprecision(5) << " sec " << std::endl);
 
   ROS_DEBUG_STREAM("Finished preprocessing. Pointcloud size: " << pointcloud_->points.size());
-  return succes;
+
+  return success;
 }
 
 bool NormalsPreprocessor::readYaml()
 {
-  bool succes = true;
+  bool success = true;
 
-  succes &= getDownsamplingParameters();
+  success &= getDownsamplingParameters();
 
-  succes &= getDistanceFilterParameters();
+  success &= getDistanceFilterParameters();
 
-  succes &= getNormalEstimationParameters();
+  success &= getNormalEstimationParameters();
 
-  succes &= getNormalFilterParameters();
+  success &= getNormalFilterParameters();
 
-  return succes;
+  return success;
 }
 
 bool NormalsPreprocessor::getDownsamplingParameters()
@@ -234,7 +235,7 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(geometry_msgs::TransformSt
   try
   {
     pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
-    transform_stamped = tfBuffer->lookupTransform("foot_left", pointcloud_frame_id,
+    transform_stamped = tfBuffer->lookupTransform(link_to_transform_to, pointcloud_frame_id,
                                                  ros::Time::now(), ros::Duration(0.5));
     pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_,
                                  transform_stamped.transform);
@@ -362,8 +363,9 @@ void SimplePreprocessor::transformPointCloudFromUrdf()
   geometry_msgs::TransformStamped transformStamped;
   try
   {
-    transformStamped = tfBuffer->lookupTransform("foot_left", "camera_depth_optical_frame",
-                                                ros::Time::now(), ros::Duration(0.5));
+    pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
+    transformStamped = tfBuffer->lookupTransform(link_to_transform_to, pointcloud_frame_id,
+                                                  ros::Time::now(), ros::Duration(0.5));
     pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_,
                                  transformStamped.transform);
   }

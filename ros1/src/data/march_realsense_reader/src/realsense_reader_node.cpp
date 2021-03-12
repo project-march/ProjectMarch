@@ -1,6 +1,5 @@
 #include <string>
 #include <vector>
-
 #include <ros/ros.h>
 #include <march_realsense_reader/realsense_reader.h>
 

@@ -47,8 +47,11 @@ class SimplePreprocessor : Preprocessor {
      pointcloud **/
     void transformPointCloudFromUrdf();
 
+    // Objects needed for transformation based on URDF
     std::unique_ptr<tf2_ros::Buffer> tfBuffer;
     std::unique_ptr<tf2_ros::TransformListener> tfListener;
+    std::string pointcloud_frame_id;
+    std::string link_to_transform_to = "foot_left";
 };
 
 class NormalsPreprocessor : Preprocessor {
@@ -115,6 +118,7 @@ class NormalsPreprocessor : Preprocessor {
     std::unique_ptr<tf2_ros::Buffer> tfBuffer;
     std::unique_ptr<tf2_ros::TransformListener> tfListener;
     std::string pointcloud_frame_id;
+    std::string link_to_transform_to = "foot_left";
 };
 
 #endif //MARCH_PREPROCESSOR_H
