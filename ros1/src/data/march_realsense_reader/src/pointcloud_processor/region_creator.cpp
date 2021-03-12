@@ -22,11 +22,11 @@ RegionCreator::RegionCreator(YAML::Node config_tree, bool debugging):
 bool regionGrower::create_regions(PointCloud::Ptr pointcloud,
                                          Normals::Ptr pointcloud_normals,
                                          boost::shared_ptr<RegionVector>
-                                         regions_vector)
+                                         region_vector)
 {
   pointcloud_ = pointcloud;
   pointcloud_normals_ = pointcloud_normals;
-  regions_vector_ = regions_vector;
+  region_vector_ = region_vector;
   ROS_DEBUG_STREAM("Creating regions with region growing");
 
   success = true;
@@ -70,12 +70,12 @@ bool regionGrower::extract_regions()
 {
   try
   {
-    region_grower.extract(*regions_vector_);
-    ROS_DEBUG("Total number of clusters found: %lu", regions_vector_->size());
+    region_grower.extract(*region_vector_);
+    ROS_DEBUG("Total number of clusters found: %lu", region_vector_->size());
     if (debugging_)
     {
       int i = 0;
-      for (auto region: *regions_vector_)
+      for (auto region: *region_vector_)
       {
         ROS_DEBUG("Total number of points in cluster %i: %lu", i, region.indices.size());
         i++;
