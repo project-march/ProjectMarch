@@ -45,12 +45,10 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
 
   preprocessor_ = std::make_unique<NormalsPreprocessor>(
       getConfigIfPresent("preprocessor"), debugging_);
-  hull_finder_ = std::make_unique<SimpleHullFinder>(
-      getConfigIfPresent("hull_finder"), debugging_);
   region_creator_ = std::make_unique<regionGrower>(
           getConfigIfPresent("region_creator"), debugging_);
-//  plane_finder_ = std::make_unique<SimplePlaneFinder>(
-//      getConfigIfPresent("plane_finder"), debugging_);
+  hull_finder_ = std::make_unique<SimpleHullFinder>(
+      getConfigIfPresent("hull_finder"), debugging_);
   parameter_determiner_ = std::make_unique<SimpleParameterDeterminer>(
       getConfigIfPresent("parameter_determiner"), debugging_);
 
