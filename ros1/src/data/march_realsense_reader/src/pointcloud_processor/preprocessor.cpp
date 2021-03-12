@@ -32,6 +32,14 @@ SimplePreprocessor::SimplePreprocessor(YAML::Node config_tree, bool debugging):
   tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
 }
 
+// Create a normals preprocessor with the ability to transform based on normal orientation
+NormalsPreprocessor::NormalsPreprocessor(YAML::Node config_tree, bool debugging):
+        Preprocessor(config_tree, debugging)
+{
+  tfBuffer = std::make_unique<tf2_ros::Buffer>();
+  tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
+}
+
 // Removes a point from a pointcloud (and optionally the corresponding pointcloud_normals as well) at a given index
 void Preprocessor::removePointByIndex(int const index, PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals)
 {
@@ -99,7 +107,7 @@ bool NormalsPreprocessor::preprocess(
   return succes;
 }
 
-bool NormalsPreprocessor::  readYaml()
+bool NormalsPreprocessor::readYaml()
 {
   bool succes = true;
 
@@ -235,6 +243,27 @@ bool NormalsPreprocessor::downsample()
   return true;
 }
 
+// Transform the pointcloud based on the data found on the /tf topic, this is
+// necessary to know the height and distance to the wanted step from the foot.
+bool NormalsPreprocessor::transformPointCloudFromUrdf()
+{
+  geometry_msgs::TransformStamped transformStamped;
+  try
+  {
+    transformStamped = tfBuffer->lookupTransform("camera_link", "ankle_plate_left",
+                                                 ros::Time::now(), ros::Duration(0.5));
+    pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_,
+                                 transformStamped.transform);
+  }
+  catch (tf2::TransformException &ex)
+  {
+    ROS_WARN_STREAM("Something went wrong when transforming the pointcloud: "
+                            << ex.what());
+    return false;
+  }
+  return true;
+}
+
 // Translate and rotate the pointcloud so that the origin is at the foot
 // Currently uses a very rough and static estimation of where the foot should be
 bool NormalsPreprocessor::transformPointCloud()
@@ -346,7 +375,7 @@ void SimplePreprocessor::transformPointCloudFromUrdf()
   geometry_msgs::TransformStamped transformStamped;
   try
   {
-    transformStamped = tfBuffer->lookupTransform("camera_link", "foot_left",
+    transformStamped = tfBuffer->lookupTransform("camera_link", "ankle_plate_left",
                                                 ros::Time::now(), ros::Duration(0.5));
     pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_,
                                  transformStamped.transform);

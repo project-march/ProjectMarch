@@ -58,7 +58,7 @@ private:
     PointCloud last_pointcloud_;
     ros::ServiceServer read_pointcloud_service_;
     ros::Publisher preprocessed_pointcloud_publisher_;
-    std::unique_ptr<NormalsPreprocessor> preprocessor_;
+    std::unique_ptr<SimplePreprocessor> preprocessor_;
     std::unique_ptr<SimpleRegionCreator> region_creator_;
     std::unique_ptr<SimpleHullFinder> hull_finder_;
     std::unique_ptr<SimpleParameterDeterminer> parameter_determiner_;

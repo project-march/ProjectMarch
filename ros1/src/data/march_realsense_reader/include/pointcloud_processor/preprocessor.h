@@ -53,8 +53,9 @@ class SimplePreprocessor : Preprocessor {
 
 class NormalsPreprocessor : Preprocessor {
   public:
-    // Use constructor from super class
-    using Preprocessor::Preprocessor;
+    /** Basic constructor for normals preprocessor, this will also create a tf_listener
+    that is required for transforming the pointcloud **/
+    NormalsPreprocessor(YAML::Node config_tree, bool debugging);
 
     // Calls all subsequent methods to preprocess a pointlcoud using normal vectors
     bool preprocess(PointCloud::Ptr pointcloud,
@@ -64,6 +65,9 @@ class NormalsPreprocessor : Preprocessor {
     // Removes points from the pointcloud such that there is only one point left in a certain area
     // (specified in the parameter file)
     bool downsample();
+
+    // Transform the pointcloud based on the data found on the /tf topic,
+    bool transformPointCloudFromUrdf();
 
     // Rotate and translates the pointcloud by some certain amounts (specified in the parameter file)
     bool transformPointCloud();
@@ -106,6 +110,10 @@ class NormalsPreprocessor : Preprocessor {
     double allowed_length_x;
     double allowed_length_y;
     double allowed_length_z;
+
+    // Objects needed for transformation based on URDF
+    std::unique_ptr<tf2_ros::Buffer> tfBuffer;
+    std::unique_ptr<tf2_ros::TransformListener> tfListener;
 };
 
 #endif //MARCH_PREPROCESSOR_H
