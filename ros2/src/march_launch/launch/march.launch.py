@@ -4,7 +4,7 @@ from ament_index_python import get_package_share_directory
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, PythonExpression
+from launch.substitutions import LaunchConfiguration
 
 
 def generate_launch_description():
@@ -98,7 +98,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="use_imu_data",
-                default_value=False,
+                default_value="False",
                 description="Whether to use the camera imu to know the real "
                             "orientation of the exoskeleton"
             ),
