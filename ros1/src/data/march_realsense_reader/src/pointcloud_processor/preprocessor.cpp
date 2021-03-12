@@ -250,7 +250,7 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf()
   geometry_msgs::TransformStamped transformStamped;
   try
   {
-    transformStamped = tfBuffer->lookupTransform("camera_link", "ankle_plate_left",
+    transformStamped = tfBuffer->lookupTransform("foot_left", "camera_depth_optical_frame",
                                                  ros::Time::now(), ros::Duration(0.5));
     pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_,
                                  transformStamped.transform);
@@ -375,7 +375,7 @@ void SimplePreprocessor::transformPointCloudFromUrdf()
   geometry_msgs::TransformStamped transformStamped;
   try
   {
-    transformStamped = tfBuffer->lookupTransform("camera_link", "ankle_plate_left",
+    transformStamped = tfBuffer->lookupTransform("foot_left", "camera_depth_optical_frame",
                                                 ros::Time::now(), ros::Duration(0.5));
     pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_,
                                  transformStamped.transform);
