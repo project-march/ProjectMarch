@@ -5,9 +5,6 @@ preprocessor:
     random_filter: true
     remaining_points: 5000
 
-  transformation:
-    rotation_y: -0.75 # - pi / 4
-
   normal_estimation:
     use_tree_search_method: true
     number_of_neighbours: 10
