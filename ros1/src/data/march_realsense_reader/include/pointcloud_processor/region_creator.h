@@ -67,6 +67,8 @@ private:
     bool extract_regions();
 
   private:
+    bool success;
+
     // Region Growing Object
     pcl::RegionGrowing <pcl::PointXYZ, pcl::Normal> region_grower;
 
