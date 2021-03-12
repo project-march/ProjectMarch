@@ -105,7 +105,7 @@ bool NormalsPreprocessor::preprocess(
                    time_taken << std::setprecision(5) << " sec " << std::endl);
 
   ROS_DEBUG_STREAM("Finished preprocessing. Pointcloud size: " << pointcloud_->points.size());
-  
+
   return success;
 }
 
@@ -235,7 +235,7 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(geometry_msgs::TransformSt
   try
   {
     pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
-    transform_stamped = tfBuffer->lookupTransform("foot_left", pointcloud_frame_id,
+    transform_stamped = tfBuffer->lookupTransform(link_to_transform_to, pointcloud_frame_id,
                                                  ros::Time::now(), ros::Duration(0.5));
     pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_,
                                  transform_stamped.transform);
@@ -364,7 +364,7 @@ void SimplePreprocessor::transformPointCloudFromUrdf()
   try
   {
     pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
-    transformStamped = tfBuffer->lookupTransform("foot_left", pointcloud_frame_id,
+    transformStamped = tfBuffer->lookupTransform(link_to_transform_to, pointcloud_frame_id,
                                                   ros::Time::now(), ros::Duration(0.5));
     pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_,
                                  transformStamped.transform);
