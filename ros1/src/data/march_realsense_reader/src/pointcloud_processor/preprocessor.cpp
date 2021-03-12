@@ -105,7 +105,8 @@ bool NormalsPreprocessor::preprocess(
                    time_taken << std::setprecision(5) << " sec " << std::endl);
 
   ROS_DEBUG_STREAM("Finished preprocessing. Pointcloud size: " << pointcloud_->points.size());
-  return succes;
+  
+  return success;
 }
 
 bool NormalsPreprocessor::readYaml()

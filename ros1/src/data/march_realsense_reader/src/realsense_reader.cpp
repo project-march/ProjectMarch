@@ -3,6 +3,7 @@
 #include <pcl_ros/point_cloud.h>
 #include <pcl/point_types.h>
 #include <ros/ros.h>
+#include <ros/console.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <march_shared_msgs/GetGaitParameters.h>
 #include <pointcloud_processor/preprocessor.h>
@@ -56,6 +57,9 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
     ROS_DEBUG("Realsense reader started with debugging, all intermediate result "
              "steps will be published and more information given in console, but"
              " this might slow the process, this can be turned off in the yaml.");
+    if( ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) ) {
+      ros::console::notifyLoggerLevelsChanged();
+    }
     preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>
         ("/camera/preprocessed_cloud", 1);
   }
