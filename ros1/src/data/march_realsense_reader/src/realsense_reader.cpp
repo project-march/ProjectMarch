@@ -67,6 +67,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
     region_pointcloud_publisher_ = n_->advertise<pcl::PointCloud<pcl::PointXYZRGB>>("/camera/region_cloud", 1);
     preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>
         ("/camera/preprocessed_cloud", 1);
+    region_pointcloud_publisher_ = n_->advertise<pcl::PointCloud<pcl::PointXYZRGB>>("/camera/region_cloud", 1);
   }
 }
 
