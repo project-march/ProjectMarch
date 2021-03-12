@@ -362,8 +362,9 @@ void SimplePreprocessor::transformPointCloudFromUrdf()
   geometry_msgs::TransformStamped transformStamped;
   try
   {
-    transformStamped = tfBuffer->lookupTransform("foot_left", "camera_depth_optical_frame",
-                                                ros::Time::now(), ros::Duration(0.5));
+    pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
+    transform_stamped = tfBuffer->lookupTransform("foot_left", pointcloud_frame_id,
+                                                  ros::Time::now(), ros::Duration(0.5));
     pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_,
                                  transformStamped.transform);
   }
