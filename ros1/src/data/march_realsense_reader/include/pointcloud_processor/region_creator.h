@@ -20,14 +20,14 @@ class RegionCreator
     // This function is required to be implemented by any region creator
     virtual bool create_regions(PointCloud::Ptr pointcloud,
                                 Normals::Ptr pointcloud_normals,
-                                boost::shared_ptr<RegionVector> regions_vector)=0;
+                                boost::shared_ptr<RegionVector> region_vector)=0;
     virtual ~RegionCreator() {};
     virtual pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation()=0;
 
   protected:
     PointCloud::Ptr pointcloud_;
     Normals::Ptr pointcloud_normals_;
-    boost::shared_ptr<RegionVector> regions_vector_;
+    boost::shared_ptr<RegionVector> region_vector_;
     YAML::Node config_tree_;
     bool debugging_;
 };
@@ -38,10 +38,10 @@ class regionGrower : RegionCreator
     //Use the constructors defined in the super class
     using RegionCreator::RegionCreator;
     /** Create cluster using the region growing algorithm, takes algorithm configuration from the YAML, and fills
-     * parameter regions_vector with clusters. **/
+     * parameter region_vector with clusters. **/
     bool create_regions(PointCloud::Ptr pointcloud,
                         Normals::Ptr pointcloud_normals,
-                        boost::shared_ptr<RegionVector> regions_vector) override;
+                        boost::shared_ptr<RegionVector> region_vector) override;
 
     /**
      * @return A pointer to a single pointcloud, with unique colours for every cluster
