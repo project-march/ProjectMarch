@@ -10,11 +10,11 @@
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using Region = pcl::PointIndices;
-using PlaneCoefficients = pcl::ModelCoefficients::Ptr;
+using PlaneCoefficients = pcl::ModelCoefficients;
 using Hull = pcl::PointCloud<pcl::PointXYZ>::Ptr;
 using Polygon = std::vector<pcl::Vertices>;
 using RegionVector = std::vector<Region>;
-using PlaneCoefficientsVector = std::vector<PlaneCoefficients>;
+using PlaneCoefficientsVector = std::vector<PlaneCoefficients::Ptr>;
 using HullVector = std::vector<Hull>;
 using PolygonVector = std::vector<Polygon>;
 
@@ -26,8 +26,8 @@ public:
     virtual bool find_hulls(PointCloud::Ptr pointcloud,
                              Normals::Ptr normal_pointcloud,
                              boost::shared_ptr<RegionVector> region_vector,
-                             boost::shared_ptr<PlaneParameterVector>
-                                 plane_parameter_vector,
+                             boost::shared_ptr<PlaneCoefficientsVector>
+                                 plane_coefficients_vector,
                              boost::shared_ptr<HullVector> hull_vector,
                              boost::shared_ptr<PolygonVector> polygon_vector)=0;
 
@@ -81,18 +81,16 @@ protected:
     bool readYaml();
     bool convex;
     double alpha;
-
-    // Plane coefficients given as [0]*x + [1]*y + [2]*z + [3] = 0
-    pcl::ModelCoefficients::Ptr  plane_coefficients;
+    int hull_dimension;
 
     int region_index_;
     int region_vector_length_;
     PointCloud::Ptr region_points_;
     PonitCloud::Ptr region_normals_;
     PointCloud::Ptr region_points_projected_;
-
-
-
+    PlaneCoefficients::Ptr  plane_coefficients_;
+    Hull hull_;
+    Polygon polygon_;
 };
 
 #endif //MARCH_HULL_FINDER_H
