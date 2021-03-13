@@ -62,10 +62,7 @@ private:
     ros::Publisher region_pointcloud_publisher_;
     std::unique_ptr<NormalsPreprocessor> preprocessor_;
     std::unique_ptr<regionGrower> region_creator_;
-    std::unique_ptr<SimpleHullFinder> hull_finder_;
-//    std::unique_ptr<SimpleRegionCreator> region_creator_;
-    std::unique_ptr<regionGrower> region_creator_;
-//    std::unique_ptr<SimplePlaneFinder> plane_finder_;
+    std::unique_ptr<CHullFinder> hull_finder_;
     std::unique_ptr<SimpleParameterDeterminer> parameter_determiner_;
     bool debugging_;
     std::string config_file_;

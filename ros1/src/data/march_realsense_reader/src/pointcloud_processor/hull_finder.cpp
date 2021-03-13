@@ -4,11 +4,16 @@
 #include <utilities/output_utilities.h>
 #include <cmath>
 
+#include <pcl/surface/convex_hull.h>
+#include <pcl/filters/project_inliers.h>
+#include <pcl/surface/concave_hull.h>
+#include <pcl/filters/crop_hull.h>
+
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using Region = pcl::PointIndices;
 using PlaneCoefficients = pcl::ModelCoefficients;
-using Hull = pcl::PointCloud<pcl::PointXYZ>;
+using Hull = pcl::PointCloud<pcl::PointXYZ>::Ptr;
 using Polygon = std::vector<pcl::Vertices>;
 using RegionVector = std::vector<Region>;
 using PlaneCoefficientsVector = std::vector<PlaneCoefficients::Ptr>;
@@ -25,14 +30,14 @@ HullFinder::HullFinder(YAML::Node config_tree, bool debugging):
 
 bool CHullFinder::find_hulls(
      PointCloud::Ptr pointcloud,
-     Normals::Ptr normal_pointcloud,
+     Normals::Ptr pointcloud_normals,
      boost::shared_ptr<RegionVector> region_vector,
      boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,
      boost::shared_ptr<HullVector> hull_vector,
      boost::shared_ptr<PolygonVector> polygon_vector)
 {
   pointcloud_ = pointcloud;
-  normal_pointcloud_ = normal_pointcloud;
+  pointcloud_normals_ = pointcloud_normals;
   region_vector_ = region_vector;
   plane_coefficients_vector_ = plane_coefficients_vector;
   hull_vector_ = hull_vector;
@@ -42,13 +47,14 @@ bool CHullFinder::find_hulls(
 
   bool success = true;
 
-  succes &= readYaml();
+  success &= readYaml();
 
-  succes &= initializeOutputVariables();
+  // Resize the output variables to the right lengths
+  success &= prepareOutputVariables();
 
-  for (region_index_ = 0; region_index_ < region_vector_length_; region_index++)
+  for (region_index_ = 0; region_index_ < region_vector_length_; region_index_++)
   {
-    succes &= getCHullFromRegion();
+    success &= getCHullFromRegion();
   }
 
   return true;
@@ -58,29 +64,18 @@ bool CHullFinder::find_hulls(
 bool CHullFinder::readYaml()
 {
 
+  return true;
 }
 
-bool CHullFinder::initializeOutputVariables()
+// Resizes the output variables to the right lengths
+bool CHullFinder::prepareOutputVariables()
 {
-  region_vector_length_ = region_vector->size();
+  region_vector_length_ = region_vector_->size();
 
-  plane_coefficients_vector->resize(region_vector_length_);
+  plane_coefficients_vector_->resize(region_vector_length_);
   hull_vector_->resize(region_vector_length_);
   polygon_vector_->resize(region_vector_length_);
-//  for (int index = 0; index < region_vector_length_; index++){
-//    // Plane coefficients given as [0]*x + [1]*y + [2]*z + [3] = 0
-//    PlaneCoefficients::Ptr plane_coefficients (new PlaneCoefficients);
-//    plane_coefficients->values.resize(4);
-//
-//    Hull hull;
-//
-//    Polygon polygon;
-//
-//    plane_coefficients_vector_[index] = plane_coefficients;
-//    hull_vector_[index] = hull;
-//    polygon_vector_[index] = polygon;
-//
-//  }
+  return true;
 }
 
 // Converts a region into a convex or concave hull
@@ -89,22 +84,22 @@ bool CHullFinder::getCHullFromRegion()
   bool success = true;
 
   // Select the region from the cloud
-  pcl::copyPointCloud(*pointcloud_, clusters_indices[region_index_], *region_points_);
-  pcl::copyPointCloud(*pointcloud_norals_, clusters_indices[region_index_], *region_normals_);
+  pcl::copyPointCloud(*pointcloud_, region_vector_[region_index_], *region_points_);
+  pcl::copyPointCloud(*pointcloud_normals_, region_vector_[region_index_], *region_normals_);
 
   // Get the plane coefficients of the region
   success &= getPlaneCoefficientsRegion();
 
   // Project the region to its plane so a convex or concave hull can be created
-  succes &= projectRegionToPlane();
+  success &= projectRegionToPlane();
 
   // Create the hull
-  succes &= getCHullFromProjectedPlane();
+  success &= getCHullFromProjectedPlane();
 
   // Add the hull to a vector together with its plane coefficients and polygons
-  succes &= addCHullToVector();
+  success &= addCHullToVector();
 
-  return success
+  return success;
 }
 
 // Get the plane coefficients of the region using average point and normal
@@ -129,7 +124,7 @@ bool CHullFinder::getPlaneCoefficientsRegion()
       average_point[2] * average_normal[2]);
 
   ROS_DEBUG_STREAM("Region " << region_index_ << " has plane coefficients: " <<
-                   output_utilities::vectorToString(plane_coefficients->values));
+                   output_utilities::vectorToString(plane_coefficients_->values));
 
   return success;
 }
@@ -154,7 +149,7 @@ bool CHullFinder::getCHullFromProjectedPlane()
     pcl::ConvexHull<pcl::PointXYZ> convex_hull;
     convex_hull.setInputCloud (region_points_projected_);
     convex_hull.setDimension(hull_dimension);
-    convex_hull.reconstruct(hull_, polygon_);
+    convex_hull.reconstruct(*hull_, polygon_);
   }
   else
   {
@@ -162,7 +157,7 @@ bool CHullFinder::getCHullFromProjectedPlane()
     concave_hull.setAlpha(alpha);
     concave_hull.setInputCloud (region_points_projected_);
     concave_hull.setDimension(hull_dimension);
-    convex_hull.reconstruct(hull_, polygon_);
+    concave_hull.reconstruct(*hull_, polygon_);
   }
   return true;
 }
@@ -170,9 +165,9 @@ bool CHullFinder::getCHullFromProjectedPlane()
 // Add the hull to a vector together with its plane coefficients and polygons
 bool CHullFinder::addCHullToVector()
 {
-  hull_vector_[i] = hull_;
-  polygon_vector_[i] = polygon_;
-  plane_coefficients_vector_[i] = plane_coefficients_;
+  *(hull_vector_)[region_index_] = hull_;
+  *(polygon_vector_)[region_index_] = polygon_;
+  *(plane_coefficients_vector_)[region_index_] = plane_coefficients_;
   return true;
 }
 
@@ -184,25 +179,25 @@ bool CHullFinder::getAveragePointAndNormal(std::vector<double> average_point,
   std::fill(average_normal.begin(), average_normal.end(), 0);
 
   int number_of_points = region_points_->points.size();
-  int number_of_normals = region_normals_->poitns.size();
+  int number_of_normals = region_normals_->points.size();
   if (number_of_points == number_of_normals)
   {
     for (int p = 0; p < number_of_points; p++)
     {
-      current_normal = region_normals_->points[p];
-      current_point = region_points_->point[p];
+      pcl::Normal current_normal = region_normals_->points[p];
+      pcl::PointXYZ current_point = region_points_->points[p];
 
-      average_normals[0] += current_normal.normal_x;
-      average_normals[1] += current_normal.normal_y;
-      average_normals[2] += current_normal.normal_z;
-      average_point[0] += current_poitns_.x;
-      average_point[1] += current_poitns_.y;
-      average_point[2] += current_poitns_.z;
+      average_normal[0] += current_normal.normal_x;
+      average_normal[1] += current_normal.normal_y;
+      average_normal[2] += current_normal.normal_z;
+      average_point[0] += current_point.x;
+      average_point[1] += current_point.y;
+      average_point[2] += current_point.z;
     }
 
-    average_normals[0] /= number_of_normals;
-    average_normals[1] /= number_of_normals;
-    average_normals[2] /= number_of_normals;
+    average_normal[0] /= number_of_normals;
+    average_normal[1] /= number_of_normals;
+    average_normal[2] /= number_of_normals;
 
     average_point[0] /= number_of_points;
     average_point[1] /= number_of_points;
@@ -213,9 +208,9 @@ bool CHullFinder::getAveragePointAndNormal(std::vector<double> average_point,
     // The norm is generally close to 1, but this need not be the case
     // e.g. if the orientation of the normals is not consistent.
     float minimum_norm_allowed = 0.05;
-    if (average_normals[0] * average_normals[0] +
-        average_normals[1] * average_normals[1] +
-        average_normals[2] * average_normals[2] > minimum_norm_allowed)
+    if (average_normal[0] * average_normal[0] +
+        average_normal[1] * average_normal[1] +
+        average_normal[2] * average_normal[2] > minimum_norm_allowed)
     {
       return false;
     }

@@ -35,7 +35,7 @@ public:
 
 protected:
     PointCloud::Ptr pointcloud_;
-    Normals::Ptr normal_pointcloud_;
+    Normals::Ptr pointcloud_normals_;
     boost::shared_ptr<RegionVector> region_vector_;
     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;
     boost::shared_ptr<HullVector> hull_vector_;
@@ -59,6 +59,9 @@ public:
                      boost::shared_ptr<PolygonVector> polygon_vector) override;
 
 protected:
+    // Resize the output variables to the right lengths
+    bool prepareOutputVariables();
+
     // Convert a region into a convex or concave hull
     bool getCHullFromRegion();
 
@@ -75,7 +78,7 @@ protected:
     bool addCHullToVector();
 
     // Calculate the average normal and point of a region
-    bool getAverageNormalAndPoint(std::vector<double> average_point, std::vector<double> average_normal);
+    bool getAveragePointAndNormal(std::vector<double> average_point, std::vector<double> average_normal);
 
     // Read all the relevant parameters from the yaml file
     bool readYaml();
@@ -86,7 +89,7 @@ protected:
     int region_index_;
     int region_vector_length_;
     PointCloud::Ptr region_points_;
-    PonitCloud::Ptr region_normals_;
+    Normals::Ptr region_normals_;
     PointCloud::Ptr region_points_projected_;
     PlaneCoefficients::Ptr  plane_coefficients_;
     Hull hull_;
