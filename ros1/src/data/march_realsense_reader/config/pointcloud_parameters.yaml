@@ -27,5 +27,10 @@ region_creator:
     smoothness_threshold: 0.0698 # 4 / 180 * pi
     curvature_threshold: 0.5
 
+hull_finder:
+  c_hull_finder:
+    convex: true # If set to false, use concave
+    alpha: 0.5
+
 debug: true
 

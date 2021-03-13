@@ -2,6 +2,7 @@
 #include "yaml-cpp/yaml.h"
 #include <ros/ros.h>
 #include <utilities/output_utilities.h>
+#include <cmath>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -43,9 +44,9 @@ bool CHullFinder::find_hulls(
 
   succes &= getYaml();
 
-  succes &= initializeVariables();
+  succes &= initializeOutputVariables();
 
-  for (region_index = 0; region_index < region_vector_length; region_index++)
+  for (region_index_ = 0; region_index_ < region_vector_length_; region_index++)
   {
     succes &= getCHullFromRegion();
   }
@@ -58,14 +59,15 @@ bool CHullFinder::getYaml()
 
 }
 
-bool CHullFinder::initializeVariables()
+bool CHullFinder::initializeOutputVariables()
 {
-  region_vector_length = region_vector.size();
-  plane_parameter_vector.resize(region_vector_length);
-  hull_vector_.resize(region_vector_length);
-  polygon_vector_.resize(region_vector_length);
+  region_vector_length_ = region_vector->size();
 
-  for (int index = 0; index < region_vector_length; index++){
+  plane_parameter_vector->resize(region_vector_length_);
+  hull_vector_->resize(region_vector_length_);
+  polygon_vector_->resize(region_vector_length_);
+
+  for (int index = 0; index < region_vector_length_; index++){
     // Plane parameters given as [0]*x + [1]*y + [2]*z + [3] = 0
     PlaneCoefficients::Ptr plane_coefficients (new PlaneCoefficients);
     plane_coefficients->values.resize(4);
@@ -78,8 +80,8 @@ bool CHullFinder::getCHullFromRegion()
 {
   bool success = true;
   // Select the region from the cloud
-  pcl::copyPointCloud(*pointcloud_, clusters_indices[region_index], *region_points_);
-  pcl::copyPointCloud(*pointcloud_norals_, clusters_indices[region_index], *region_normals_);
+  pcl::copyPointCloud(*pointcloud_, clusters_indices[region_index_], *region_points_);
+  pcl::copyPointCloud(*pointcloud_norals_, clusters_indices[region_index_], *region_normals_);
 
   // Get the plane coefficients of the region
   success &= getPlaneCoefficientsRegion();
@@ -117,7 +119,7 @@ bool CHullFinder::getPlaneCoefficientsRegion()
       average_point[1] * average_normal[1] +
       average_point[2] * average_normal[2]);
 
-  ROS_DEBUG_STREAM("Region " << region_index << " has plane coefficients: " <<
+  ROS_DEBUG_STREAM("Region " << region_index_ << " has plane coefficients: " <<
                    output_utilities::vectorToString(plane_coefficients->values));
 
   return success;
@@ -126,17 +128,32 @@ bool CHullFinder::getPlaneCoefficientsRegion()
 // project the region to its plane so a convex or concave hull can be created
 bool CHullFinder::projectRegionToPlane()
 {
-  bool success = true;
-
-  return success;
+  // Create the projection object
+  pcl::ProjectInliers<pcl::PointXYZ> proj;
+  proj.setModelType (pcl::SACMODEL_PLANE);
+  proj.setInputCloud (region_points_);
+  proj.setModelCoefficients (plane_coefficients);
+  proj.filter (*region_points_projected_);
+  return true;
 }
 
 // Create the convex or concave hull from a projected region and its corresponding polygons
 bool CHullFinder::getCHullFromProjectedPlane()
 {
-  bool success = true;
-
-  return success;
+  if (convex) {
+    pcl::ConvexHull<pcl::PointXYZ> chull;
+    chull.setInputCloud (region_points_projected_);
+    chull.setDimension(2);
+    chull.reconstruct (*region_hulls, polygons);
+  }
+  else {
+    pcl::ConcaveHull<pcl::PointXYZ> chull;
+    chull.setAlpha(alpha);
+    chull.setInputCloud (region_points_projected_);
+    chull.setDimension(2);
+    chull.reconstruct (*region_hulls, polygons);
+  }
+  return true;
 }
 
 // Add the hull to a vector together with its plane coefficients and polygons
@@ -178,10 +195,22 @@ bool CHullFinder::getAveragePointAndNormal(std::vector<double> average_point,
     average_point[0] /= number_of_points;
     average_point[1] /= number_of_points;
     average_point[2] /= number_of_points;
+
+    // If the normal is zero (<=> it has a norm of zero) it is invalid
+    // and it then cannot be used to calculate plane coefficients.
+    // The norm is generally close to 1, but this need not be the case
+    // e.g. if the orientation of the normals is not consistent.
+    float minimum_norm_allowed = 0.05;
+    if (average_normals[0] * average_normals[0] +
+        average_normals[1] * average_normals[1] +
+        average_normals[2] * average_normals[2] > minimum_norm_allowed)
+    {
+      return false;
+    }
   }
   else
   {
-    ROS_ERROR_STREAM("Region with index " << region_index << " does not have the same number of points and normals, "
+    ROS_ERROR_STREAM("Region with index " << region_index_ << " does not have the same number of points and normals, "
                      " unable to calculate average point and normal. "
                      "Number of points: " << number_of_points << ". Number of normals: " << number_of_normals);
     return false;

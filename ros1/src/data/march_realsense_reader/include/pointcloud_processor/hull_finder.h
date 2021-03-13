@@ -74,19 +74,24 @@ protected:
     // Add the hull to a vector together with its plane coefficients and polygons
     bool addCHullToVector();
 
-    // Read all the relevant parameters from the yaml file
-    bool readYaml();
-
     // Calculate the average normal and point of a region
     bool getAverageNormalAndPoint(std::vector<double> average_point, std::vector<double> average_normal);
+
+    // Read all the relevant parameters from the yaml file
+    bool readYaml();
+    bool convex;
+    double alpha;
 
     // Plane coefficients given as [0]*x + [1]*y + [2]*z + [3] = 0
     pcl::ModelCoefficients::Ptr  plane_coefficients;
 
-    int region_index;
-    int region_vector_length;
+    int region_index_;
+    int region_vector_length_;
     PointCloud::Ptr region_points_;
     PonitCloud::Ptr region_normals_;
+    PointCloud::Ptr region_points_projected_;
+
+
 
 };
 
