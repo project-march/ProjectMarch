@@ -95,45 +95,55 @@ void ModelPredictiveControllerInterface::initMpcMsg() {
             // since there is no control on the terminal state
             mpc_pub_->msg_.joint[i].state.reference_input[j].array.resize(prediction_horizon);
         }
-
     }
 }
-void ModelPredictiveControllerInterface::setMpcMsg()
-{
-    if (!mpc_pub_->trylock())
-    {
-        return;
+void ModelPredictiveControllerInterface::setMpcMsg(int joint_number) {
+  // For readability
+  int i = joint_number;
+
+  if (!mpc_pub_->trylock()) {
+    return;
+  }
+
+  // Only set time once
+  if (joint_number == 0)
+  {
+    mpc_pub_->msg_.time = ros::Time::now();
+  }
+
+  mpc_pub_->msg_.joint[i].state.command = command;
+  mpc_pub_->msg_.joint[i].state.cost = model_predictive_controllers_[i].cost;
+  mpc_pub_->msg_.joint[i].estimation.control.assign(std::begin(acadoVariables.u), std::end(acadoVariables.u));
+
+  // Loop through the 'measurements' (y_i == 0 -> angle, y_i == 1 -> d/dt*angle)
+  for (int n_i = 0; n_i < ACADO_N + 1; n_i++) {
+    // Loop through outputs
+    for (int y_i = 0; y_i < ACADO_NYN; y_i++) {
+      mpc_pub_->msg_.joint[i].state.reference_trajectory[y_i].array[n_i] =
+              acadoVariables.y[y_i + n_i * ACADO_NY];
     }
-    // Loop trough all joints
-    for (int i = 0; i < num_joints_; i++)
-    {
-        mpc_pub_->msg_.joint[i].state.command = command;
-        mpc_pub_->msg_.joint[i].estimation.control.assign(std::begin(acadoVariables.u), std::end(acadoVariables.u));
-        // Loop through the 'measurements' (y_i == 0 -> angle, y_i == 1 -> d/dt*angle)
-        for(int n_i = 0; n_i < ACADO_N + 1; n_i++)
-        {
-            // Loop through outputs
-            for (int y_i = 0; y_i < ACADO_NYN; y_i++)
-            {
-                mpc_pub_->msg_.joint[i].state.reference_trajectory[y_i].array[n_i] =
-                        acadoVariables.y[y_i + n_i * ACADO_NY];
-            }
 
-            // Loop trough inputs
-            for (int u_i = 0; u_i < ACADO_NU; u_i++)
-            {
-                mpc_pub_->msg_.joint[i].state.reference_input[u_i].array[n_i] =
-                        acadoVariables.y[ACADO_NYN + u_i + n_i * ACADO_NY];
-            }
-
-            // Estimated states
-            mpc_pub_->msg_.joint[i].estimation.position[n_i] = acadoVariables.x[ACADO_NX * n_i];
-            mpc_pub_->msg_.joint[i].estimation.velocity[n_i] = acadoVariables.x[ACADO_NX * n_i + 1];
-
-        }
-
+    // Loop trough inputs
+    for (int u_i = 0; u_i < ACADO_NU; u_i++) {
+      mpc_pub_->msg_.joint[i].state.reference_input[u_i].array[n_i] =
+              acadoVariables.y[ACADO_NYN + u_i + n_i * ACADO_NY];
     }
-    mpc_pub_->unlockAndPublish();
+
+    // Estimated states
+    mpc_pub_->msg_.joint[i].estimation.position[n_i] = acadoVariables.x[ACADO_NX * n_i];
+    mpc_pub_->msg_.joint[i].estimation.velocity[n_i] = acadoVariables.x[ACADO_NX * n_i + 1];
+
+  }
+
+  // Acado solver time diagnostics
+  mpc_pub_->msg_.joint[i].diagnostics.preparation_time = model_predictive_controllers_[i].t_preparation;
+  mpc_pub_->msg_.joint[i].diagnostics.feedback_time = model_predictive_controllers_[i].t_feedback;
+  mpc_pub_->msg_.joint[i].diagnostics.total_time = model_predictive_controllers_[i].t_preparation +
+                                                   model_predictive_controllers_[i].t_feedback;
+
+  // Acado & QPoasis error diagnostics
+  mpc_pub_->msg_.joint[i].diagnostics.preparation_status = model_predictive_controllers_[i].preparationStepStatus;
+  mpc_pub_->msg_.joint[i].diagnostics.feedback_status = model_predictive_controllers_[i].feedbackStepStatus;
 }
 
 void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/, const ros::Duration& period,
@@ -162,10 +172,14 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
       (*joint_handles_ptr_)[i].setCommand(command);
 
       // Publish command
-      setMpcMsg();
+      setMpcMsg(i);
 
+      // Shift the solver for next time step
       model_predictive_controllers_[i].shiftStatesAndControl();
   }
+
+  // Publish msgs after all inputs are calculated and set
+  mpc_pub_->unlockAndPublish();
 }
 
 void ModelPredictiveControllerInterface::stopping(const ros::Time& /*time*/)

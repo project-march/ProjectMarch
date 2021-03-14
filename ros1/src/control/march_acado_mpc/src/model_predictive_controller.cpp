@@ -36,8 +36,8 @@ void ModelPredictiveController::init() {
   }
 
   // Fill reference vector with sinus and or step signals
-  sinRef(reference, 0.2, 0.785, ACADO_N, 0.001);
-//  stepRef(reference, 0.261, ACADO_N);
+//  sinRef(reference, 0.2, 0.785, ACADO_N, 0.001);
+  stepRef(reference, 0.261, ACADO_N);
 
   // Set the reference
   setReference(reference);
@@ -150,6 +150,9 @@ void ModelPredictiveController::calculateControlInput() {
   acado_tic(&t);
   feedbackStepStatus = acado_feedbackStep();
   t_feedback = acado_toc(&t);
+
+  // Objective cost for diagnosis
+  cost = acado_getObjective();
   
   // Set mpc command 
   u = acadoVariables.u[0];
@@ -161,5 +164,4 @@ void ModelPredictiveController::calculateControlInput() {
 
   // Perform a diagnosis on the controller
   controllerDiagnosis();
-
 }
