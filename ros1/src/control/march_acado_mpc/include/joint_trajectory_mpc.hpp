@@ -14,13 +14,10 @@
 #include <pluginlib/class_list_macros.h>
 #include <vector>
 
+// Publishing and msgs
 #include <ros/node_handle.h>
 #include <ros/time.h>
-#include "std_msgs/Float64MultiArray.h"
-#include "std_msgs/Float64.h"
-
 #include <march_shared_msgs/MpcMsg.h>
-
 #include <realtime_tools/realtime_publisher.h>
 
 #include <cassert>

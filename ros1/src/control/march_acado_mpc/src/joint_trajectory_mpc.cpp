@@ -24,6 +24,7 @@ bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::Jo
     // Initialize the place where the MPC command will be published
     mpc_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_msgs::MpcMsg>>(nh, "/march/mpc/", 10);
     initMpcMsg();
+
     return true;
 }
 
@@ -159,23 +160,24 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
   assert(num_joints_ == state_error.velocity.size());
 
   // Update effort command
-  for (unsigned int i = 0; i < num_joints_; ++i) {
-      // Get current joint state
-      state = {(*joint_handles_ptr_)[i].getPosition(), (*joint_handles_ptr_)[i].getVelocity()};
-      model_predictive_controllers_[i].x0 = state;
+  for (unsigned int i = 0; i < num_joints_; ++i)
+  {
+    // Get current joint state
+    state = {(*joint_handles_ptr_)[i].getPosition(), (*joint_handles_ptr_)[i].getVelocity()};
+    model_predictive_controllers_[i].x0 = state;
 
-      // Calculate mpc control signal
-      model_predictive_controllers_[i].calculateControlInput();
-      command = model_predictive_controllers_[i].u;
+    // Calculate mpc control signal
+    model_predictive_controllers_[i].calculateControlInput();
+    command = model_predictive_controllers_[i].u;
 
-      // Apply command
-      (*joint_handles_ptr_)[i].setCommand(command);
+    // Apply command
+    (*joint_handles_ptr_)[i].setCommand(command);
 
-      // Publish command
-      setMpcMsg(i);
+    // Publish command
+    setMpcMsg(i);
 
-      // Shift the solver for next time step
-      model_predictive_controllers_[i].shiftStatesAndControl();
+    // Shift the solver for next time step
+    model_predictive_controllers_[i].shiftStatesAndControl();
   }
 
   // Publish msgs after all inputs are calculated and set

@@ -72,7 +72,7 @@ generate_messages(
     std_msgs
     trajectory_msgs
     sensor_msgs
-    )
+)
 
 catkin_package(
     CATKIN_DEPENDS
