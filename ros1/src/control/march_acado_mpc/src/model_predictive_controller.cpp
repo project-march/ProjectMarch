@@ -24,8 +24,8 @@ ModelPredictiveController::ModelPredictiveController(std::vector<std::vector<flo
 {
 }
 
-void ModelPredictiveController::init() {
-
+void ModelPredictiveController::init()
+{
   // Initialize the solver
   acado_initializeSolver();
 
@@ -50,16 +50,17 @@ void ModelPredictiveController::init() {
 
   // Warm-up the solver
   acado_preparationStep();
-
 }
 
-void ModelPredictiveController::setInitialState(vector<double> x0) {
+void ModelPredictiveController::setInitialState(vector<double> x0)
+{
   for (int i = 0; i < ACADO_NX; ++i) {
     acadoVariables.x0[i] = x0[i];
   }
 }
 
-void ModelPredictiveController::setReference(vector<vector<double>> reference) {
+void ModelPredictiveController::setReference(vector<vector<double>> reference)
+{
     for(int i = 0; i < ACADO_N; i++) {
         for(int j = 0; j < ACADO_NY; j++) {
             acadoVariables.y[i * ACADO_NY + j] = reference[i][j];
@@ -70,14 +71,15 @@ void ModelPredictiveController::setReference(vector<vector<double>> reference) {
     }
 }
 
-void ModelPredictiveController::shiftStatesAndControl(){
+void ModelPredictiveController::shiftStatesAndControl()
+{
     // Shift states and control and prepare for the next iteration
     acado_shiftStates(2, 0, 0);
     acado_shiftControls(0);
 }
 
-void ModelPredictiveController::assignWeightingMatrix(std::vector<std::vector<float>> Q) {
-
+void ModelPredictiveController::assignWeightingMatrix(std::vector<std::vector<float>> Q)
+{
     // Get size of weighting array
     double ACADO_NW = sizeof(acadoVariables.W)/sizeof(acadoVariables.W[0]);
     double ACADO_NWN = sizeof(acadoVariables.WN)/sizeof(acadoVariables.WN[0]);
@@ -90,7 +92,6 @@ void ModelPredictiveController::assignWeightingMatrix(std::vector<std::vector<fl
     // If so, assign the weighting matrices
     if (ACADO_NW == (n_rows*n_cols) && ACADO_NWN == (n_rows-ACADO_NU)*(n_cols-ACADO_NU))
     {
-
         // set W matrix with Q matrix (state and input weights)
         for(int i=0; i < n_rows; i++) {
             for(int j=0; j < n_cols; j++) {
@@ -107,7 +108,8 @@ void ModelPredictiveController::assignWeightingMatrix(std::vector<std::vector<fl
     }
 }
 
-void ModelPredictiveController::controllerDiagnosis() {
+void ModelPredictiveController::controllerDiagnosis()
+{
     // Check acado_preparationStep() status code
     ROS_WARN_STREAM_COND(preparationStepStatus >= PREP_INTERNAL_ERROR, joint_name << ", Error in preparation step");
 
@@ -130,11 +132,10 @@ void ModelPredictiveController::controllerDiagnosis() {
             ROS_WARN_STREAM(joint_name << ", QP is unbounded and thus could not be solved");
             break;
     }
-
 }
 
-void ModelPredictiveController::calculateControlInput() {
-
+void ModelPredictiveController::calculateControlInput()
+{
   // Set initial state
   setInitialState(x0);
 
