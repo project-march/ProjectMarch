@@ -75,7 +75,7 @@ public:
      */
     void calculateControlInput();
     /**
-     * \biref Shifts the state and control acadoVariables
+     * \brief Shift the state and control acadoVariables
      */
     void shiftStatesAndControl();
 
