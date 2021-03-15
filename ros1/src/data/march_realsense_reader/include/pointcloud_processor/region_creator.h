@@ -58,7 +58,7 @@ private:
     /**
      * configure region growing algorithm
      */
-    void setup_region_grower();
+    bool setup_region_grower();
 
     /**
      * Extract clusters from region_grower object
@@ -67,8 +67,6 @@ private:
     bool extract_regions();
 
   private:
-    bool success;
-
     // Region Growing Object
     pcl::RegionGrowing <pcl::PointXYZ, pcl::Normal> region_grower;
 
