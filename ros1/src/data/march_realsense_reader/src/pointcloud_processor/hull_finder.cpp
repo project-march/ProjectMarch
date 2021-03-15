@@ -49,12 +49,18 @@ bool CHullFinder::find_hulls(
   ROS_DEBUG("Finding hulls with CHullFinder, C for convex or concave");
 
   bool success = true;
+  ROS_DEBUG("Finding hulls with CHullFinder, C for convex or concave");
 
   success &= readYaml();
+  ROS_DEBUG("YAML is read");
 
   region_index_ = 0;
-  for (auto region_: *region_vector_)
+  for (auto region: *region_vector_)
   {
+    region_ = region;
+    ROS_DEBUG("Finding hulls with CHullFinder, C for convex or concave");
+    ROS_DEBUG_STREAM("size of region_ " << region_.indices.size());
+
     success &= getCHullFromRegion();
     region_index_++;
   }
@@ -67,9 +73,12 @@ bool CHullFinder::readYaml()
 {
   if (YAML::Node c_hull_finder_parameters = config_tree_["c_hull_finder"])
   {
+    ROS_DEBUG_STREAM("Successfully found the ,c_hull_finder_parameters ");
+
     convex = yaml_utilities::grabParameter<bool>(c_hull_finder_parameters, "convex");
     alpha = yaml_utilities::grabParameter<double>(c_hull_finder_parameters, "alpha");
     hull_dimension = yaml_utilities::grabParameter<int>(c_hull_finder_parameters, "hull_dimension");
+    ROS_DEBUG_STREAM("Successfully grabbed params, hull_dimension = " << hull_dimension);
   }
   else
   {
@@ -84,21 +93,39 @@ bool CHullFinder::getCHullFromRegion()
 {
   bool success = true;
 
-  // Select the region from the cloud
-  pcl::copyPointCloud(*pointcloud_, region_, *region_points_);
-  pcl::copyPointCloud(*pointcloud_normals_, region_, *region_normals_);
+  ROS_DEBUG_STREAM("start of loop method" << hull_dimension);
+  ROS_DEBUG_STREAM("region indices size " << region_.indices.size());
+
+//   Select the region from the cloud
+  pcl::ExtractIndices<pcl::PointXYZ> extract;
+  extract.setInputCloud (pointcloud_);
+  extract.setIndices ( boost::make_shared<std::vector<int>>(region_.indices));
+  extract.setNegative (false);
+  ROS_DEBUG_STREAM("set the thinkgs");
+
+  extract.filter (region_points_); // de referencing goes wrong
+  ROS_DEBUG_STREAM("copied one cloud");
+
+  pcl::copyPointCloud(*pointcloud_normals_, region_.indices, *region_normals_);
+
+  ROS_DEBUG_STREAM("copied the clouds");
 
   // Get the plane coefficients of the region
   success &= getPlaneCoefficientsRegion();
+  ROS_DEBUG_STREAM("got the coeffs");
 
   // Project the region to its plane so a convex or concave hull can be created
   success &= projectRegionToPlane();
+  ROS_DEBUG_STREAM("got the projection");
 
   // Create the hull
   success &= getCHullFromProjectedPlane();
+  ROS_DEBUG_STREAM("got the chull");
 
   // Add the hull to a vector together with its plane coefficients and polygons
   success &= addCHullToVector();
+  ROS_DEBUG_STREAM("added to vectors");
+
 
   return success;
 }
