@@ -1,10 +1,13 @@
-description: Stairs up with height of 13 cm and depth of 35 cm
+description: Stairs up height 12 cm and depth 20
 duration: 2750000000
 gait_type: stairs_like
 joints:
   left_ankle:
   - position: 0.04360007
     time_from_start: 0
+    velocity: 0.0
+  - position: 0.04363323
+    time_from_start: 670000000
     velocity: 0.0
   - position: 0.04360007
     time_from_start: 2750000000
@@ -32,24 +35,27 @@ joints:
   - position: 0.08726646
     time_from_start: 2002800000
     velocity: 0.02349213
-  - position: -0.08726646
+  - position: 0.0
     time_from_start: 2750000000
     velocity: 0.17449976
   left_knee:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
+  - position: 0.0
+    time_from_start: 600000000
+    velocity: 0.0
   - position: 0.13960016
     time_from_start: 2000000000
     velocity: 0.08726646
   - position: 0.24430072
     time_from_start: 2750000000
-    velocity: 0.76790996
+    velocity: 0.69810028
   right_ankle:
   - position: 0.04360007
     time_from_start: 0
     velocity: 0.0
-  - position: -0.08726646
+  - position: 0.04360007
     time_from_start: 2750000000
     velocity: 0.0
   right_hip_aa:
@@ -69,10 +75,10 @@ joints:
   - position: 0.08726646
     time_from_start: 613600000
     velocity: 0.0
-  - position: 1.1693706
-    time_from_start: 2016099999
+  - position: 1.04719755
+    time_from_start: 2001999999
     velocity: -0.17453293
-  - position: 0.82641166
+  - position: 0.78662688
     time_from_start: 2750000000
     velocity: 0.0
   right_knee:
@@ -80,16 +86,13 @@ joints:
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: 250000000
+    time_from_start: 600000000
     velocity: 0.0
-  - position: 0.00677719
-    time_from_start: 606964290
-    velocity: 0
-  - position: 1.35401867
-    time_from_start: 1628785710
-    velocity: 0
-  - position: 0.65194304
+  - position: 1.6231562
+    time_from_start: 1621300000
+    velocity: -0.87266463
+  - position: 0.97625515
     time_from_start: 2750000000
     velocity: 0.0
 name: right_open
-version: MVI_stairsup_rightopen_haa_adpf_hD
+version: MVI_stairsup_rightopen_haa_adpf_hd
