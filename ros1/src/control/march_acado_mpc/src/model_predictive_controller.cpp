@@ -73,7 +73,6 @@ void ModelPredictiveController::setReference(vector<vector<double>> reference)
 
 void ModelPredictiveController::shiftStatesAndControl()
 {
-    // Shift states and control and prepare for the next iteration
     acado_shiftStates(2, 0, 0);
     acado_shiftControls(0);
 }
