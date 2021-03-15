@@ -87,13 +87,13 @@ protected:
     int hull_dimension;
 
     int region_index_;
-    int region_vector_length_;
     PointCloud::Ptr region_points_;
     Normals::Ptr region_normals_;
     PointCloud::Ptr region_points_projected_;
     PlaneCoefficients::Ptr  plane_coefficients_;
     Hull hull_;
     Polygon polygon_;
+    Region region_;
 };
 
 #endif //MARCH_HULL_FINDER_H

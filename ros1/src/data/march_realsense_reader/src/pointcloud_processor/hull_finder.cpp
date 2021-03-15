@@ -2,12 +2,15 @@
 #include "yaml-cpp/yaml.h"
 #include <ros/ros.h>
 #include <utilities/output_utilities.h>
+#include <utilities/yaml_utilities.h>
 #include <cmath>
 
 #include <pcl/surface/convex_hull.h>
 #include <pcl/filters/project_inliers.h>
 #include <pcl/surface/concave_hull.h>
 #include <pcl/filters/crop_hull.h>
+#include <pcl/filters/extract_indices.h>
+
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -49,12 +52,11 @@ bool CHullFinder::find_hulls(
 
   success &= readYaml();
 
-  // Resize the output variables to the right lengths
-  success &= prepareOutputVariables();
-
-  for (region_index_ = 0; region_index_ < region_vector_length_; region_index_++)
+  region_index_ = 0;
+  for (auto region_: *region_vector_)
   {
     success &= getCHullFromRegion();
+    region_index_++;
   }
 
   return true;
@@ -63,18 +65,17 @@ bool CHullFinder::find_hulls(
 // Read all relevant parameters from the parameter yaml file
 bool CHullFinder::readYaml()
 {
-
-  return true;
-}
-
-// Resizes the output variables to the right lengths
-bool CHullFinder::prepareOutputVariables()
-{
-  region_vector_length_ = region_vector_->size();
-
-  plane_coefficients_vector_->resize(region_vector_length_);
-  hull_vector_->resize(region_vector_length_);
-  polygon_vector_->resize(region_vector_length_);
+  if (YAML::Node c_hull_finder_parameters = config_tree_["c_hull_finder"])
+  {
+    convex = yaml_utilities::grabParameter<bool>(c_hull_finder_parameters, "convex");
+    alpha = yaml_utilities::grabParameter<double>(c_hull_finder_parameters, "alpha");
+    hull_dimension = yaml_utilities::grabParameter<int>(c_hull_finder_parameters, "hull_dimension");
+  }
+  else
+  {
+    ROS_ERROR("'c_hull_finder' parameters not found in parameter file");
+    return false;
+  }
   return true;
 }
 
@@ -84,8 +85,8 @@ bool CHullFinder::getCHullFromRegion()
   bool success = true;
 
   // Select the region from the cloud
-  pcl::copyPointCloud(*pointcloud_, region_vector_[region_index_], *region_points_);
-  pcl::copyPointCloud(*pointcloud_normals_, region_vector_[region_index_], *region_normals_);
+  pcl::copyPointCloud(*pointcloud_, region_, *region_points_);
+  pcl::copyPointCloud(*pointcloud_normals_, region_, *region_normals_);
 
   // Get the plane coefficients of the region
   success &= getPlaneCoefficientsRegion();
@@ -165,9 +166,10 @@ bool CHullFinder::getCHullFromProjectedPlane()
 // Add the hull to a vector together with its plane coefficients and polygons
 bool CHullFinder::addCHullToVector()
 {
-  *(hull_vector_)[region_index_] = hull_;
-  *(polygon_vector_)[region_index_] = polygon_;
-  *(plane_coefficients_vector_)[region_index_] = plane_coefficients_;
+  hull_vector_->push_back(hull_);
+  polygon_vector_->push_back(polygon_);
+  plane_coefficients_vector_->push_back(plane_coefficients_);
+
   return true;
 }
 
