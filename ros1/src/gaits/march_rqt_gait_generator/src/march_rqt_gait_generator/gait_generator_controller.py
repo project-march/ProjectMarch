@@ -44,7 +44,8 @@ class GaitGeneratorController(object):
             view=self.view.side_subgait_view["previous"], default=standing
         )
         next_subgait_controller = SideSubgaitController(
-            view=self.view.side_subgait_view["next"], default=standing
+            view=self.view.side_subgait_view["next"],
+            default=standing,
         )
         self.side_subgait_controller = {
             "previous": previous_subgait_controller,
