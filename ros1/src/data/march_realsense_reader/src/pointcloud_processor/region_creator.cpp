@@ -85,33 +85,27 @@ bool RegionGrower::setup_region_grower()
 
 bool RegionGrower::extract_regions()
 {
-  try
+  region_grower.extract(*region_vector_);
+  if (debugging_)
   {
-    region_grower.extract(*region_vector_);
-    if (debugging_)
+    ROS_DEBUG("Total number of clusters found: %lu", region_vector_->size());
+    int i = 0;
+    for (auto region: *region_vector_)
     {
-      ROS_DEBUG("Total number of clusters found: %lu", region_vector_->size());
-      int i = 0;
-      for (auto region: *region_vector_)
-      {
-        ROS_DEBUG("Total number of points in cluster %i: %lu", i, region.indices.size());
-        i++;
-      }
+      ROS_DEBUG("Total number of points in cluster %i: %lu", i, region.indices.size());
+      i++;
     }
 
-    if (region_vectore_->size() == 0)
-    {
-      ROS_WARN("Region growing algorithm found no clusters");
-      return false;
-    }
-    return true;
-  }
-  catch(...)
+  if (region_vector_->size() == 0)
   {
-    ROS_ERROR("Something went wrong during extracting the regions from the region grower.");
+    ROS_WARN("Region growing algorithm found no clusters");
     return false;
   }
+  return true;
+}
 
+  ROS_ERROR("Something went wrong during extracting the regions from the region grower.");
+  return false;
 }
 
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr RegionGrower::debug_visualisation()
