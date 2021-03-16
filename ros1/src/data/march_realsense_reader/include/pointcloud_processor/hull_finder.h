@@ -25,7 +25,7 @@ public:
     // This function is required to be implemented by any plane finder
     virtual bool find_hulls(PointCloud::Ptr pointcloud,
                              Normals::Ptr normal_pointcloud,
-                             boost::shared_ptr<RegionVector> region_vector,
+                             RegionVector region_vector,
                              boost::shared_ptr<PlaneCoefficientsVector>
                                  plane_coefficients_vector,
                              boost::shared_ptr<HullVector> hull_vector,
@@ -36,7 +36,7 @@ public:
 protected:
     PointCloud::Ptr pointcloud_;
     Normals::Ptr pointcloud_normals_;
-    boost::shared_ptr<RegionVector> region_vector_;
+    RegionVector region_vector_;
     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;
     boost::shared_ptr<HullVector> hull_vector_;
     boost::shared_ptr<PolygonVector> polygon_vector_;
@@ -53,7 +53,7 @@ public:
      * regions, and turn this into chulls where the foot can be located. **/
     bool find_hulls(PointCloud::Ptr pointcloud,
                      Normals::Ptr normal_pointcloud,
-                     boost::shared_ptr<RegionVector> region_vector,
+                     RegionVector region_vector,
                      boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,
                      boost::shared_ptr<HullVector> hull_vector,
                      boost::shared_ptr<PolygonVector> polygon_vector) override;

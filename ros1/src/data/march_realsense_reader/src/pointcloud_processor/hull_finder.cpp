@@ -34,7 +34,7 @@ HullFinder::HullFinder(YAML::Node config_tree, bool debugging):
 bool CHullFinder::find_hulls(
      PointCloud::Ptr pointcloud,
      Normals::Ptr pointcloud_normals,
-     boost::shared_ptr<RegionVector> region_vector,
+     RegionVector region_vector,
      boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,
      boost::shared_ptr<HullVector> hull_vector,
      boost::shared_ptr<PolygonVector> polygon_vector)
@@ -55,9 +55,9 @@ bool CHullFinder::find_hulls(
   ROS_DEBUG("YAML is read");
 
   region_index_ = 0;
-  for (auto region: *region_vector_)
+  for (region_index_ = 0; region_index_ < region_vector_.size(); region_index_++)
   {
-    region_ = region;
+    region_ = region_vector_[region_index_];
     ROS_DEBUG("Finding hulls with CHullFinder, C for convex or concave");
     ROS_DEBUG_STREAM("size of region_ " << region_.indices.size());
 
@@ -96,17 +96,20 @@ bool CHullFinder::getCHullFromRegion()
   ROS_DEBUG_STREAM("start of loop method" << hull_dimension);
   ROS_DEBUG_STREAM("region indices size " << region_.indices.size());
 
-//   Select the region from the cloud
-  pcl::ExtractIndices<pcl::PointXYZ> extract;
-  extract.setInputCloud (pointcloud_);
-  extract.setIndices ( boost::make_shared<std::vector<int>>(region_.indices));
-  extract.setNegative (false);
-  ROS_DEBUG_STREAM("set the thinkgs");
+//  Select the region from the cloud
+//  pcl::ExtractIndices<pcl::PointXYZ> extract;
+//  extract.setInputCloud (pointcloud_);
+//  extract.setIndices (region_.indices);
+//  extract.setNegative (false);
+//  ROS_DEBUG_STREAM("set the thinkgs");
+//
+//  extract.filter (region_points_); // de referencing goes wrong
 
-  extract.filter (region_points_); // de referencing goes wrong
+  pcl::copyPointCloud(*pointcloud_, region_, *region_points_);
+
   ROS_DEBUG_STREAM("copied one cloud");
 
-  pcl::copyPointCloud(*pointcloud_normals_, region_.indices, *region_normals_);
+  pcl::copyPointCloud(*pointcloud_normals_, region_, *region_normals_);
 
   ROS_DEBUG_STREAM("copied the clouds");
 

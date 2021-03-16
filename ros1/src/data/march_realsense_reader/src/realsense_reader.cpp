@@ -153,7 +153,7 @@ bool RealSenseReader::process_pointcloud(
   boost::shared_ptr<PolygonVector> polygon_vector = boost::make_shared<PolygonVector>();
   // Find hulls
   bool hull_finding_was_successful =
-      hull_finder_->find_hulls(pointcloud, normals, region_vector,
+      hull_finder_->find_hulls(pointcloud, normals, *region_vector,
                                  plane_parameter_vector, hull_vector, polygon_vector);
   if (not hull_finding_was_successful)
   {
