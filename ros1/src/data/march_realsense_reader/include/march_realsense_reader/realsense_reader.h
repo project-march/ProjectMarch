@@ -50,8 +50,10 @@ public:
     YAML::Node getConfigIfPresent(std::string key);
 
     // Publishes the pointcloud on a topic for visualisation in rviz or furter use
-    void publishPreprocessedPointCloud(PointCloud::Ptr pointcloud);
-    void publishRegionCreatorPointCloud();
+//    void publishPreprocessedPointCloud(PointCloud::Ptr pointcloud);
+//    void publishRegionCreatorPointCloud();
+    template <typename T>
+    void publishCloud(ros::Publisher publisher, T cloud);
 
 private:
     ros::NodeHandle* n_;

@@ -65,9 +65,6 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
 
     preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>("/camera/preprocessed_cloud", 1);
     region_pointcloud_publisher_ = n_->advertise<pcl::PointCloud<pcl::PointXYZRGB>>("/camera/region_cloud", 1);
-    preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>
-        ("/camera/preprocessed_cloud", 1);
-    region_pointcloud_publisher_ = n_->advertise<pcl::PointCloud<pcl::PointXYZRGB>>("/camera/region_cloud", 1);
   }
 }
 
@@ -140,11 +137,9 @@ bool RealSenseReader::process_pointcloud(
 
   if (debugging_)
   {
-    ROS_INFO("Done creating regions");
+    ROS_DEBUG("Done creating regions");
     publishRegionCreatorPointCloud();
   }
-
-  ROS_DEBUG("Done creating regions");
 
   // Setup data structures for hull finding
   boost::shared_ptr<PlaneParameterVector> plane_parameter_vector =
@@ -157,6 +152,8 @@ bool RealSenseReader::process_pointcloud(
                                  plane_parameter_vector, hull_vector, polygon_vector);
   if (not hull_finding_was_successful)
   {
+    ROS_ERROR_STREAM("Hull finding was unsuccessful, see debug output "
+                     "for more information");
     res.error_message = "Hull finding was unsuccessful, see debug output "
                         "for more information";
     return false;
@@ -195,10 +192,23 @@ bool RealSenseReader::process_pointcloud(
   return true;
 }
 
+template <typename T>
+void RealSenseReader::publishCloud(ros::Publisher publisher, T cloud)
+{
+  pointcloud->width  = 1;
+  pointcloud->height = cloud->points.size();
+
+  sensor_msgs::PointCloud2 msg;
+  pcl::toROSMsg(*cloud, msg);
+  msg.header.frame_id = "foot_left";
+
+  publisher.publish(msg);
+}
+
 // Publishes the pointcloud on a topic for visualisation in rviz or further use
 void RealSenseReader::publishPreprocessedPointCloud(PointCloud::Ptr pointcloud)
 {
-  ROS_INFO_STREAM("Publishing a preprocessed cloud with size: " << pointcloud->points.size());
+  ROS_DEBUG_STREAM("Publishing a preprocessed cloud with size: " << pointcloud->points.size());
 
   pointcloud->width  = 1;
   pointcloud->height = pointcloud->points.size();
@@ -212,7 +222,23 @@ void RealSenseReader::publishPreprocessedPointCloud(PointCloud::Ptr pointcloud)
 
 void RealSenseReader::publishRegionCreatorPointCloud()
 {
-  ROS_INFO_STREAM("Publishing a cloud with different regions");
+  ROS_DEBUG_STREAM("Publishing a cloud with different regions");
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr coloured_cloud = region_creator_->debug_visualisation();
+
+  coloured_cloud->width  = 1;
+  coloured_cloud->height = coloured_cloud->points.size();
+
+  sensor_msgs::PointCloud2 msg;
+  pcl::toROSMsg(*coloured_cloud, msg);
+
+  // Header part of the msg is overwritten in pcl::toROSMsg.
+  msg.header.frame_id = "foot_left";
+  region_pointcloud_publisher_.publish(msg);
+}
+
+void RealSenseReader::publishHulls()
+{
+  ROS_DEBUG_STREAM("Publishing a cloud with different regions");
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr coloured_cloud = region_creator_->debug_visualisation();
 
   coloured_cloud->width  = 1;

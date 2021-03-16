@@ -11,11 +11,11 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using Region = pcl::PointIndices;
 using PlaneCoefficients = pcl::ModelCoefficients;
-using Hull = pcl::PointCloud<pcl::PointXYZ>::Ptr;
+using Hull = pcl::PointCloud<pcl::PointXYZ>;
 using Polygon = std::vector<pcl::Vertices>;
 using RegionVector = std::vector<Region>;
 using PlaneCoefficientsVector = std::vector<PlaneCoefficients::Ptr>;
-using HullVector = std::vector<Hull>;
+using HullVector = std::vector<Hull::Ptr>;
 using PolygonVector = std::vector<Polygon>;
 
 class HullFinder
@@ -78,7 +78,7 @@ protected:
     bool addCHullToVector();
 
     // Calculate the average normal and point of a region
-    bool getAveragePointAndNormal(std::vector<double> average_point, std::vector<double> average_normal);
+    bool getAveragePointAndNormal(std::vector<double> & average_point, std::vector<double> & average_normal);
 
     // Read all the relevant parameters from the yaml file
     bool readYaml();
@@ -87,11 +87,11 @@ protected:
     int hull_dimension;
 
     int region_index_;
-    PointCloud::Ptr region_points_;
-    Normals::Ptr region_normals_;
-    PointCloud::Ptr region_points_projected_;
-    PlaneCoefficients::Ptr  plane_coefficients_;
-    Hull hull_;
+    PointCloud::Ptr region_points_ = boost::make_shared<PointCloud>();
+    Normals::Ptr region_normals_ = boost::make_shared<Normals>();
+    PointCloud::Ptr region_points_projected_ = boost::make_shared<PointCloud>();
+    PlaneCoefficients::Ptr plane_coefficients_ = boost::make_shared<PlaneCoefficients>();
+    Hull::Ptr hull_ = boost::make_shared<Hull>();
     Polygon polygon_;
     Region region_;
 };

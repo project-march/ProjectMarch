@@ -9,7 +9,7 @@ namespace output_utilities
   {
     std::string string = "";
     for(int i = 0; i < vector.size(); i++) {
-      string += std::to_string(vector[i]) + "\t";
+      string += std::to_string(vector[i]) + ",   ";
     }
     return string;
   }

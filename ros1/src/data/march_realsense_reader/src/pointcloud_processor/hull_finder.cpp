@@ -16,11 +16,11 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using Region = pcl::PointIndices;
 using PlaneCoefficients = pcl::ModelCoefficients;
-using Hull = pcl::PointCloud<pcl::PointXYZ>::Ptr;
+using Hull = pcl::PointCloud<pcl::PointXYZ>;
 using Polygon = std::vector<pcl::Vertices>;
 using RegionVector = std::vector<Region>;
 using PlaneCoefficientsVector = std::vector<PlaneCoefficients::Ptr>;
-using HullVector = std::vector<Hull>;
+using HullVector = std::vector<Hull::Ptr>;
 using PolygonVector = std::vector<Polygon>;
 
 // Construct a basic HullFinder class
@@ -39,6 +39,8 @@ bool CHullFinder::find_hulls(
      boost::shared_ptr<HullVector> hull_vector,
      boost::shared_ptr<PolygonVector> polygon_vector)
 {
+  time_t start_find_hulls = clock();
+
   pointcloud_ = pointcloud;
   pointcloud_normals_ = pointcloud_normals;
   region_vector_ = region_vector;
@@ -49,23 +51,25 @@ bool CHullFinder::find_hulls(
   ROS_DEBUG("Finding hulls with CHullFinder, C for convex or concave");
 
   bool success = true;
-  ROS_DEBUG("Finding hulls with CHullFinder, C for convex or concave");
 
   success &= readYaml();
-  ROS_DEBUG("YAML is read");
 
   region_index_ = 0;
   for (region_index_ = 0; region_index_ < region_vector_.size(); region_index_++)
   {
     region_ = region_vector_[region_index_];
-    ROS_DEBUG("Finding hulls with CHullFinder, C for convex or concave");
-    ROS_DEBUG_STREAM("size of region_ " << region_.indices.size());
 
     success &= getCHullFromRegion();
+
     region_index_++;
   }
 
-  return true;
+  time_t end_find_hulls = clock();
+  double time_taken = double(end_find_hulls - start_find_hulls) / double(CLOCKS_PER_SEC);
+  ROS_DEBUG_STREAM("Time taken by the pointcloud HullFinder CHullFinder  is : "
+                   << std::fixed << time_taken << std::setprecision(5) << " sec " << std::endl);
+
+  return success;
 }
 
 // Read all relevant parameters from the parameter yaml file
@@ -73,12 +77,9 @@ bool CHullFinder::readYaml()
 {
   if (YAML::Node c_hull_finder_parameters = config_tree_["c_hull_finder"])
   {
-    ROS_DEBUG_STREAM("Successfully found the ,c_hull_finder_parameters ");
-
     convex = yaml_utilities::grabParameter<bool>(c_hull_finder_parameters, "convex");
     alpha = yaml_utilities::grabParameter<double>(c_hull_finder_parameters, "alpha");
     hull_dimension = yaml_utilities::grabParameter<int>(c_hull_finder_parameters, "hull_dimension");
-    ROS_DEBUG_STREAM("Successfully grabbed params, hull_dimension = " << hull_dimension);
   }
   else
   {
@@ -93,42 +94,20 @@ bool CHullFinder::getCHullFromRegion()
 {
   bool success = true;
 
-  ROS_DEBUG_STREAM("start of loop method" << hull_dimension);
-  ROS_DEBUG_STREAM("region indices size " << region_.indices.size());
-
-//  Select the region from the cloud
-//  pcl::ExtractIndices<pcl::PointXYZ> extract;
-//  extract.setInputCloud (pointcloud_);
-//  extract.setIndices (region_.indices);
-//  extract.setNegative (false);
-//  ROS_DEBUG_STREAM("set the thinkgs");
-//
-//  extract.filter (region_points_); // de referencing goes wrong
-
   pcl::copyPointCloud(*pointcloud_, region_, *region_points_);
-
-  ROS_DEBUG_STREAM("copied one cloud");
-
   pcl::copyPointCloud(*pointcloud_normals_, region_, *region_normals_);
-
-  ROS_DEBUG_STREAM("copied the clouds");
 
   // Get the plane coefficients of the region
   success &= getPlaneCoefficientsRegion();
-  ROS_DEBUG_STREAM("got the coeffs");
 
   // Project the region to its plane so a convex or concave hull can be created
   success &= projectRegionToPlane();
-  ROS_DEBUG_STREAM("got the projection");
 
   // Create the hull
   success &= getCHullFromProjectedPlane();
-  ROS_DEBUG_STREAM("got the chull");
 
   // Add the hull to a vector together with its plane coefficients and polygons
   success &= addCHullToVector();
-  ROS_DEBUG_STREAM("added to vectors");
-
 
   return success;
 }
@@ -145,6 +124,7 @@ bool CHullFinder::getPlaneCoefficientsRegion()
   // Plane coefficients given as [0]*x + [1]*y + [2]*z + [3] = 0
   // The first three coefficients are the normal vector of the plane as
   // all the vectors in the plane are perpendicular to the normal
+  plane_coefficients_->values.resize(4);
   plane_coefficients_->values[0] = average_normal[0];
   plane_coefficients_->values[1] = average_normal[1];
   plane_coefficients_->values[2] = average_normal[2];
@@ -204,8 +184,8 @@ bool CHullFinder::addCHullToVector()
 }
 
 // Calculate the average normal and point of a region
-bool CHullFinder::getAveragePointAndNormal(std::vector<double> average_point,
-                                           std::vector<double> average_normal)
+bool CHullFinder::getAveragePointAndNormal(std::vector<double> & average_point,
+                                           std::vector<double> & average_normal)
 {
   std::fill(average_point.begin(), average_point.end(), 0);
   std::fill(average_normal.begin(), average_normal.end(), 0);
@@ -242,8 +222,11 @@ bool CHullFinder::getAveragePointAndNormal(std::vector<double> average_point,
     float minimum_norm_allowed = 0.05;
     if (average_normal[0] * average_normal[0] +
         average_normal[1] * average_normal[1] +
-        average_normal[2] * average_normal[2] > minimum_norm_allowed)
+        average_normal[2] * average_normal[2] < minimum_norm_allowed)
     {
+      ROS_ERROR_STREAM("Computed average normal of region is too close to zero. Plane parameters will be inaccurate."
+                       "Average normal of region " << region_index_ <<
+                       " is " << output_utilities::vectorToString(average_normal));
       return false;
     }
   }
