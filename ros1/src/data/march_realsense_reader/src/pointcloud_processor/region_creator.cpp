@@ -78,7 +78,7 @@ bool regionGrower::setup_region_grower()
   }
   else
   {
-    ROS_ERROR("pointlcoud_ is of size: %lu, while pointcloud_normals_ is of size: %lu", pointcloud_->size(), pointcloud_normals_->size());
+    ROS_ERROR("pointcloud_ is of size: %lu, while pointcloud_normals_ is of size: %lu", pointcloud_->size(), pointcloud_normals_->size());
     return false;
   }
 }
@@ -110,6 +110,5 @@ bool regionGrower::extract_regions()
 
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr regionGrower::debug_visualisation()
 {
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr coloured_cloud = region_grower.getColoredCloud();
-  return coloured_cloud;
+  return region_grower.getColoredCloud();
 }

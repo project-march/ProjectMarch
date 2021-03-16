@@ -32,7 +32,7 @@ class RegionCreator
     bool debugging_;
 };
 
-class regionGrower : RegionCreator
+class RegionGrower : RegionCreator
 {
   public:
     //Use the constructors defined in the super class
@@ -56,7 +56,7 @@ private:
     bool read_yaml();
 
     /**
-     * configure region growing algorithm
+     * Configure region growing algorithm
      */
     bool setup_region_grower();
 
