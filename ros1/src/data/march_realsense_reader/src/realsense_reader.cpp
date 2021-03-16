@@ -4,6 +4,7 @@
 #include <pcl/point_types.h>
 #include <ros/ros.h>
 #include <ros/console.h>
+#include <visualization_msgs/MarkerArray.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <march_shared_msgs/GetGaitParameters.h>
 #include <pointcloud_processor/preprocessor.h>
@@ -65,6 +66,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
 
     preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>("/camera/preprocessed_cloud", 1);
     region_pointcloud_publisher_ = n_->advertise<pcl::PointCloud<pcl::PointXYZRGB>>("/camera/region_cloud", 1);
+    hull_marker_array_publisher_ = n_->advertise<visualization_msgs::MarkerArray>("/camera/hull_marker_array", 1);
   }
 }
 
@@ -119,7 +121,7 @@ bool RealSenseReader::process_pointcloud(
   if (debugging_)
   {
     ROS_DEBUG("Done preprocessing, see /camera/preprocessed_cloud for results");
-    publishPreprocessedPointCloud(pointcloud);
+    publishCloud<pcl::PointXYZ>(preprocessed_pointcloud_publisher_, *pointcloud);
   }
 
   // Setup data structures for region creating
@@ -137,11 +139,12 @@ bool RealSenseReader::process_pointcloud(
 
   if (debugging_)
   {
-    ROS_DEBUG("Done creating regions");
-    publishRegionCreatorPointCloud();
+    ROS_DEBUG("Done creating regions, now publishing to /camera/region_cloud");
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr coloured_cloud = region_creator_->debug_visualisation();
+    publishCloud<pcl::PointXYZRGB>(region_pointcloud_publisher_, *coloured_cloud);
   }
 
-  // Setup data structures for hull finding
+  // Setup data structures for finding
   boost::shared_ptr<PlaneParameterVector> plane_parameter_vector =
       boost::make_shared<PlaneParameterVector>();
   boost::shared_ptr<HullVector> hull_vector = boost::make_shared<HullVector>();
@@ -152,11 +155,15 @@ bool RealSenseReader::process_pointcloud(
                                  plane_parameter_vector, hull_vector, polygon_vector);
   if (not hull_finding_was_successful)
   {
-    ROS_ERROR_STREAM("Hull finding was unsuccessful, see debug output "
-                     "for more information");
     res.error_message = "Hull finding was unsuccessful, see debug output "
                         "for more information";
     return false;
+  }
+
+  if (debugging_)
+  {
+    ROS_DEBUG("Done creating hulls, now publishing to /camera/hull_marker_array");
+    publishHullMarkerArray(hull_vector);
   }
 
   ROS_DEBUG("Done finding hulls");
@@ -192,64 +199,46 @@ bool RealSenseReader::process_pointcloud(
   return true;
 }
 
+// Publishes a pointcloud of any point type on a publisher
 template <typename T>
-void RealSenseReader::publishCloud(ros::Publisher publisher, T cloud)
+void RealSenseReader::publishCloud(ros::Publisher publisher,
+                                   pcl::PointCloud<T> cloud)
 {
-  pointcloud->width  = 1;
-  pointcloud->height = cloud->points.size();
+  cloud.width  = 1;
+  cloud.height = cloud.points.size();
 
   sensor_msgs::PointCloud2 msg;
-  pcl::toROSMsg(*cloud, msg);
+  pcl::toROSMsg(cloud, msg);
   msg.header.frame_id = "foot_left";
 
   publisher.publish(msg);
 }
 
-// Publishes the pointcloud on a topic for visualisation in rviz or further use
-void RealSenseReader::publishPreprocessedPointCloud(PointCloud::Ptr pointcloud)
+void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_vector)
 {
-  ROS_DEBUG_STREAM("Publishing a preprocessed cloud with size: " << pointcloud->points.size());
+  visualization_msgs::MarkerArray marker_array;
+  for (pcl::PointCloud<pcl::PointXYZ>::Ptr hull: *hull_vector)
+  {
+    // Color the hull with a random color (r, g and b in [1, 0])
+    double r = (rand() % 500) / 500.0;
+    double g = (rand() % 500) / 500.0;
+    double b = (rand() % 500) / 500.0;
+    for (pcl::PointXYZ point : *hull)
+    {
+      visualization_msgs::Marker marker;
+      marker.header.frame_id = "foot_left";
+      marker.pose.position.x = point.x;
+      marker.pose.position.y = point.y;
+      marker.pose.position.z = point.z;
+      marker.color.r = r;
+      marker.color.g = g;
+      marker.color.b = b;
+      marker.color.a = 1.0;
+      marker_array.markers.push_back(marker);
+    }
+  }
 
-  pointcloud->width  = 1;
-  pointcloud->height = pointcloud->points.size();
-
-  sensor_msgs::PointCloud2 msg;
-  pcl::toROSMsg(*pointcloud, msg);
-  msg.header.frame_id = "foot_left";
-
-  preprocessed_pointcloud_publisher_.publish(msg);
-}
-
-void RealSenseReader::publishRegionCreatorPointCloud()
-{
-  ROS_DEBUG_STREAM("Publishing a cloud with different regions");
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr coloured_cloud = region_creator_->debug_visualisation();
-
-  coloured_cloud->width  = 1;
-  coloured_cloud->height = coloured_cloud->points.size();
-
-  sensor_msgs::PointCloud2 msg;
-  pcl::toROSMsg(*coloured_cloud, msg);
-
-  // Header part of the msg is overwritten in pcl::toROSMsg.
-  msg.header.frame_id = "foot_left";
-  region_pointcloud_publisher_.publish(msg);
-}
-
-void RealSenseReader::publishHulls()
-{
-  ROS_DEBUG_STREAM("Publishing a cloud with different regions");
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr coloured_cloud = region_creator_->debug_visualisation();
-
-  coloured_cloud->width  = 1;
-  coloured_cloud->height = coloured_cloud->points.size();
-
-  sensor_msgs::PointCloud2 msg;
-  pcl::toROSMsg(*coloured_cloud, msg);
-
-  // Header part of the msg is overwritten in pcl::toROSMsg.
-  msg.header.frame_id = "foot_left";
-  region_pointcloud_publisher_.publish(msg);
+  hull_marker_array_publisher_.publish(marker_array);
 }
 
 // The callback for the service that was starts processing the point cloud and gives
