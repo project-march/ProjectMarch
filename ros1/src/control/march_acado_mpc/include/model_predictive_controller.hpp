@@ -80,7 +80,7 @@ public:
     void shiftStatesAndControl();
 
 private:
-  std::vector<std::vector<float>> Q_;
+    std::vector<std::vector<float>> Q_;
 };
 
 #endif

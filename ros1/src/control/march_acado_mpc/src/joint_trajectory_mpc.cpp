@@ -15,16 +15,18 @@ bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::Jo
   std::vector <std::string> joint_names;
   ros::param::get("/march/joint_names", joint_names);
 
+  // Initialize the place where the MPC command will be published
+  mpc_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_msgs::MpcMsg>>(nh, "/march/mpc/", 10);
+  initMpcMsg();
+
   // Initialize the model predictive controllers
-  for (unsigned int i = 0; i < num_joints_; ++i) {
+  for (unsigned int i = 0; i < num_joints_; ++i)
+  {
       model_predictive_controllers_.push_back(ModelPredictiveController(getQMatrix(joint_names[i])));
       model_predictive_controllers_[i].joint_name = joint_names[i];
       model_predictive_controllers_[i].init();
   }
 
-  // Initialize the place where the MPC command will be published
-  mpc_pub_ = std::make_unique<realtime_tools::RealtimePublisher<march_shared_msgs::MpcMsg>>(nh, "/march/mpc/", 10);
-  initMpcMsg();
 
   return true;
 }
@@ -45,6 +47,12 @@ std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(s
   std::vector<float> Q_flat;
   ros::param::get(parameter_path + "/q_matrices/"  + joint_name + "/Q", Q_flat);
 
+  // Set QMatrix for the mpc msg
+  for (int i =0; i < num_joints_; ++i)
+  {
+    mpc_pub_->msg_.joint[i].tuning.q_matrix.assign(Q_flat.begin(), Q_flat.end());
+  }
+
   std::vector<std::vector<float>> Q(n_rows, std::vector<float>(n_cols));
   if (Q_flat.size() != n_rows * n_cols)
   {
@@ -60,6 +68,7 @@ std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(s
       }
     }
   }
+
   return Q;
 }
 
@@ -111,7 +120,7 @@ void ModelPredictiveControllerInterface::setMpcMsg(int joint_number)
   // Only set time once
   if (joint_number == 0)
   {
-    mpc_pub_->msg_.time = ros::Time::now();
+    mpc_pub_->msg_.header.stamp = ros::Time::now();
   }
 
   mpc_pub_->msg_.joint[i].state.command = model_predictive_controllers_[i].u;
