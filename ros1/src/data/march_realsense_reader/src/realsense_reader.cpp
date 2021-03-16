@@ -217,6 +217,7 @@ void RealSenseReader::publishCloud(ros::Publisher publisher,
 void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_vector)
 {
   visualization_msgs::MarkerArray marker_array;
+  int id = 0;
   for (pcl::PointCloud<pcl::PointXYZ>::Ptr hull: *hull_vector)
   {
     // Color the hull with a random color (r, g and b in [1, 0])
@@ -226,6 +227,8 @@ void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_
     for (pcl::PointXYZ point : *hull)
     {
       visualization_msgs::Marker marker;
+      marker.action = marker.ADD;
+      marker.id = id;
       marker.header.frame_id = "foot_left";
       marker.pose.position.x = point.x;
       marker.pose.position.y = point.y;
@@ -234,7 +237,16 @@ void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_
       marker.color.g = g;
       marker.color.b = b;
       marker.color.a = 1.0;
+      marker.scale.x = 0.1;
+      marker.scale.y = 0.1;
+      marker.scale.z = 0.1;
+      marker.pose.orientation.x = 0.0;
+      marker.pose.orientation.y = 0.0;
+      marker.pose.orientation.z = 0.0;
+      marker.pose.orientation.w = 1.0;
+      marker.type = visualization_msgs::Marker::CUBE;
       marker_array.markers.push_back(marker);
+      id++;
     }
   }
 
