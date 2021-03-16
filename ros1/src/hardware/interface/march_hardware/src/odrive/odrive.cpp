@@ -394,6 +394,19 @@ int Odrive::setConfigurations(const std::string& configuration_json_path)
       continue;
     }
   }
+
+  int32_t control_mode;
+  std::string command_name_ = this->create_command(".controller.config.control_mode");
+  if (this->read(command_name_, control_mode) == 1)
+  {
+    ROS_ERROR("Could not read control mode");
+    return ODRIVE_ERROR;
+  }
+  else
+  {
+    ROS_INFO_STREAM("Control mode: " << control_mode);
+  }
+
   return ODRIVE_OK
 }
 
@@ -501,7 +514,7 @@ double Odrive::readVelocityRadAbsolute()
 
 int Odrive::readAngleCountsIncremental()
 {
-  float iu_position;
+  int iu_position;
   std::string command_name_ = this->create_command(O_PM_ENCODER_POSITION_UI);
   if (this->read(command_name_, iu_position) == 1)
   {

@@ -2,16 +2,16 @@ testsetup:
   cycleTime: 4
   slaveTimeout: 50
   joints:
-    - rotational_joint:
+    - linear_joint:
         actuationMode: torque
         allowActuation: true
         odrive:
           serial_number: "0x20803873304E"
           axis: "axis0"
           absoluteEncoder:
-            resolution: 17
-            minPositionIU: 97242
-            maxPositionIU: 119617
-          incrementalEncoder:
             resolution: 12
-            transmission: 101
+            minPositionIU: 240
+            maxPositionIU: 445
+          incrementalEncoder:
+            resolution: 13
+            transmission: 200

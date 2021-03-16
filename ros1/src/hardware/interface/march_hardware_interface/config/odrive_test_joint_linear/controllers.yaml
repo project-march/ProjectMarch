@@ -11,12 +11,16 @@ march:
       publish_rate: 50
     trajectory:
       type: effort_controllers/JointTrajectoryController
+      # When you switch to effort actuationmode, 'position_controllers' must be substituted with 'effort_controllers' and the gains must be added
       joints:
-        - rotational_joint
-      constraints:
-        rotational_joint:
-          margin_soft_limit_error: 0.5
-          trajectory: 01 #0.305
-          goal: 01 #0.305
+        - linear_joint
+
       gains: # Required because we're controlling an effort interface
-        rotational_joint: {p: 130, i: 10, d: 0, i_clamp: 100, publish_state: true, antiwindup: true}
+        linear_joint: {p: 50, i: 0, d: 10, i_clamp: 10, publish_state: true, antiwindup: true}
+      # Note: these gains are tuned for the KFE joints in the exoskeleton
+
+      constraints:
+        linear_joint:
+          margin_soft_limit_error: 0.5
+          trajectory: 0.305
+          goal: 0.305

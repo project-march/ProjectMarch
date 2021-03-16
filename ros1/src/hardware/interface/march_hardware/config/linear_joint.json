@@ -2,12 +2,12 @@
   {
     "name":"axis0.motor.config.current_lim",
     "type":"float",
-    "value":30.0
+    "value":10.0
   },
   {
     "name":"axis0.encoder.config.cpr",
     "type":"int32",
-    "value":4096
+    "value":8192
   },
   {
     "name":"axis0.encoder.config.use_index",
@@ -22,7 +22,7 @@
   {
     "name":"axis0.motor.config.pole_pairs",
     "type":"int32",
-    "value":21
+    "value":7
   },
   {
     "name":"axis0.controller.config.control_mode",
@@ -37,11 +37,11 @@
   {
     "name": "axis0.motor.config.torque_constant",
     "type": "float",
-    "value": 0.05513333333
+    "value": 0.02329577465
   },
   {
     "name": "axis0.controller.config.vel_limit",
     "type": "float",
-    "value": 4.0
+    "value": 50.0
   }
 ]

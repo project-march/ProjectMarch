@@ -1,0 +1,14 @@
+<launch>
+    <arg name="gain_scheduling" default="false" doc="Whether to use gain scheduling, which changes PID values based on executed gait."/>
+    <arg name="sounds" default="false" doc="Whether to use sounds."/>
+
+    <arg name="robot" default="odrive_test_joint_linear" doc="The robot to run"/>
+    <arg name="robot_description" default="test_joint_linear" doc="Robot urdf file to use"/>
+
+    <arg name="gait_directory" default="test_joint_gaits" doc="Gait files directory to use"/>
+
+    <arg name="rosbag" default="true" doc="Enables rosbag record node."/>
+    <arg name="bag_prefix" default="motoco_test"/>
+
+    <include file="$(dirname)/march.launch" pass_all_args="true"/>
+</launch>

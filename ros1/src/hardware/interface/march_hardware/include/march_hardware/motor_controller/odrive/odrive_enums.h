@@ -4,7 +4,7 @@
 // axis command names
 #define O_PM_REQUEST_STATE ".requested_state"
 #define O_PM_CURRENT_STATE ".current_state"
-#define O_PM_ENCODER_POSITION_UI ".encoder.pos_estimate"
+#define O_PM_ENCODER_POSITION_UI ".encoder.shadow_count"
 #define O_PM_ENCODER_VELOCITY_UI ".encoder.vel_estimate"
 #define O_PM_ODRIVE_INPUT_VOLTAGE "vbus_voltage"
 #define O_PM_INPUT_TORQUE ".controller.input_torque"
