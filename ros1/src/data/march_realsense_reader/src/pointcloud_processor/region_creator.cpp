@@ -19,7 +19,7 @@ RegionCreator::RegionCreator(YAML::Node config_tree, bool debugging):
 
 }
 
-bool regionGrower::create_regions(PointCloud::Ptr pointcloud,
+bool RegionGrower::create_regions(PointCloud::Ptr pointcloud,
                                          Normals::Ptr pointcloud_normals,
                                          boost::shared_ptr<RegionVector>
                                          region_vector)
@@ -29,21 +29,21 @@ bool regionGrower::create_regions(PointCloud::Ptr pointcloud,
   region_vector_ = region_vector;
   ROS_DEBUG_STREAM("Creating regions with region growing");
 
-  clock_t start_preprocess = clock();
+  clock_t start_region_grow = clock();
 
   bool success = true;
   success &= read_yaml();
   success &= setup_region_grower();
   success &= extract_regions();
 
-  clock_t end_preprocess = clock();
-  double time_taken = double(end_preprocess - start_preprocess) / double(CLOCKS_PER_SEC);
-  ROS_DEBUG_STREAM("Time taken by pointcloud regionGrower is : " << std::fixed <<
+  clock_t end_region_grow = clock();
+  double time_taken = double(end_region_grow - start_region_grow) / double(CLOCKS_PER_SEC);
+  ROS_DEBUG_STREAM("Time taken by pointcloud RegionGrower is : " << std::fixed <<
                     time_taken << std::setprecision(5) << " sec " << std::endl);
 
   return success;
 }
-bool regionGrower::read_yaml()
+bool RegionGrower::read_yaml()
 {
   if (YAML::Node region_growing_parameters = config_tree_["region_growing"])
   {
@@ -61,7 +61,7 @@ bool regionGrower::read_yaml()
   }
 }
 
-bool regionGrower::setup_region_grower()
+bool RegionGrower::setup_region_grower()
 {
   if (pointcloud_->size() == pointcloud_normals_->size())
   {
@@ -83,7 +83,7 @@ bool regionGrower::setup_region_grower()
   }
 }
 
-bool regionGrower::extract_regions()
+bool RegionGrower::extract_regions()
 {
   try
   {
@@ -98,6 +98,12 @@ bool regionGrower::extract_regions()
         i++;
       }
     }
+
+    if (region_vectore_->size() == 0)
+    {
+      ROS_WARN("Region growing algorithm found no clusters");
+      return false;
+    }
     return true;
   }
   catch(...)
@@ -108,7 +114,7 @@ bool regionGrower::extract_regions()
 
 }
 
-pcl::PointCloud<pcl::PointXYZRGB>::Ptr regionGrower::debug_visualisation()
+pcl::PointCloud<pcl::PointXYZRGB>::Ptr RegionGrower::debug_visualisation()
 {
   return region_grower.getColoredCloud();
 }

@@ -45,7 +45,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
 
   preprocessor_ = std::make_unique<NormalsPreprocessor>(
       getConfigIfPresent("preprocessor"), debugging_);
-  region_creator_ = std::make_unique<regionGrower>(
+  region_creator_ = std::make_unique<RegionGrower>(
           getConfigIfPresent("region_creator"), debugging_);
   hull_finder_ = std::make_unique<SimpleHullFinder>(
       getConfigIfPresent("hull_finder"), debugging_);
