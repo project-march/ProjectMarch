@@ -818,7 +818,7 @@
     <xacro:sensor_d435 name="camera_back" parent="hip_base"
                        plugin="$(arg realsense_simulation)">
 
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <origin xyz="0 22 0" rpy="0 0 ${0.5 * pi}"/>
     </xacro:sensor_d435>
 
 
