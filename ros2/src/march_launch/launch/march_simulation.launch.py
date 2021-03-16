@@ -100,7 +100,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 name="use_imu_data",
-                default_value=False,
+                default_value="False",
                 description="Whether to use the camera imu to know the real "
                             "orientation of the exoskeleton"
             ),
@@ -157,6 +157,8 @@ def generate_launch_description():
                     ("ping_safety_node", ping_safety_node),
                     ("robot", robot),
                     ("robot_state_publisher", robot_state_publisher),
+                    ("use_imu_data", use_imu_data),
+                    ("imu_topic", imu_topic),
                     ("robot_description", robot_description),
                     ("ground_gait", ground_gait),
                     ("realsense_simulation", realsense_simulation),
