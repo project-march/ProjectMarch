@@ -38,7 +38,7 @@
     <arg name="enable_gyro"             default="true"/>
     <arg name="enable_accel"            default="true"/>
     <arg name="enable_gyro_camera_back" default="false"/>
-    <arg name="enable_accel_back"       default="false"/>
+    <arg name="enable_accel_camera_back" efault="false"/>
 
     <arg name="enable_pointcloud"         default="true"/>
     <arg name="pointcloud_texture_stream" default="RS2_STREAM_COLOR"/>
