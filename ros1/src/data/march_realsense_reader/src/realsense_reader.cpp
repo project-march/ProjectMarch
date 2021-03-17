@@ -15,7 +15,7 @@
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using RegionVector = std::vector<pcl::PointIndices>;
-using PlaneParameterVector = std::vector<pcl::ModelCoefficients::Ptr>;
+using PlaneCoefficientsVector = std::vector<pcl::ModelCoefficients::Ptr>;
 using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
 using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
 
@@ -145,14 +145,14 @@ bool RealSenseReader::process_pointcloud(
   }
 
   // Setup data structures for finding
-  boost::shared_ptr<PlaneParameterVector> plane_parameter_vector =
-      boost::make_shared<PlaneParameterVector>();
+  boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector =
+      boost::make_shared<PlaneCoefficientsVector>();
   boost::shared_ptr<HullVector> hull_vector = boost::make_shared<HullVector>();
   boost::shared_ptr<PolygonVector> polygon_vector = boost::make_shared<PolygonVector>();
   // Find hulls
   bool hull_finding_was_successful =
       hull_finder_->find_hulls(pointcloud, normals, region_vector,
-                                 plane_parameter_vector, hull_vector, polygon_vector);
+                               plane_coefficients_vector, hull_vector, polygon_vector);
   if (not hull_finding_was_successful)
   {
     res.error_message = "Hull finding was unsuccessful, see debug output "
@@ -176,8 +176,8 @@ bool RealSenseReader::process_pointcloud(
   // Determine parameters
   bool parameter_determining_was_successful =
       parameter_determiner_->determine_parameters(
-          plane_parameter_vector, hull_vector, polygon_vector, selected_obstacle,
-          gait_parameters);
+              plane_coefficients_vector, hull_vector, polygon_vector, selected_obstacle,
+              gait_parameters);
   if (not parameter_determining_was_successful)
   {
     res.error_message = "Parameter determining was unsuccessful, see debug output "
