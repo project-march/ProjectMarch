@@ -32,7 +32,8 @@ def generate_launch_description():
     gait_package = LaunchConfiguration("gait_package")
     gait_directory = LaunchConfiguration("gait_directory")
     balance = LaunchConfiguration("balance")
-    
+
+
     # Fake sensor data
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
     minimum_fake_temperature = LaunchConfiguration("minimum_fake_temperature")
