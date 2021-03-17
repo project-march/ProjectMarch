@@ -8,10 +8,18 @@
 #include "utilities/realsense_gait_utilities.h"
 #include "march_shared_msgs/GetGaitParameters.h"
 
-using PlaneParameterVector = std::vector<pcl::ModelCoefficients::Ptr>;
-using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
+using PointCloud2D = pcl::PontCloud<pcl::PointXY>:
+using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
+using Normals = pcl::PointCloud<pcl::Normal>;
+using Region = pcl::PointIndices;
+using PlaneCoefficients = pcl::ModelCoefficients;
+using Hull = pcl::PointCloud<pcl::PointXYZ>;
+using Polygon = std::vector<pcl::Vertices>;
+using RegionVector = std::vector<Region>;
+using PlaneCoefficientsVector = std::vector<PlaneCoefficients::Ptr>;
+using HullVector = std::vector<Hull::Ptr>;
+using PolygonVector = std::vector<Polygon>;
 using GaitParameters = march_shared_msgs::GaitParameters;
-using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
 
 class ParameterDeterminer
 {
@@ -19,10 +27,10 @@ public:
     ParameterDeterminer(YAML::Node config_tree, bool debugging);
     // This function is required to be implemented by any plane finder
     virtual bool determine_parameters(
-        boost::shared_ptr<PlaneParameterVector> plane_parameter_vector,
-        boost::shared_ptr<HullVector> hull_vector,
-        boost::shared_ptr<PolygonVector> polygon_vector,
-        SelectedGait selected_obstacle,
+        boost::shared_ptr<PlaneParameterVector> const plane_parameter_vector,
+        boost::shared_ptr<HullVector> const hull_vector,
+        boost::shared_ptr<PolygonVector> const polygon_vector,
+        SelectedGait const selected_obstacle,
         boost::shared_ptr<GaitParameters> gait_parameters)=0;
 
     virtual ~ParameterDeterminer() {};
@@ -37,23 +45,31 @@ protected:
     bool debugging_;
 };
 
-/** The simple parameter determiner
+/** The hull parameter determiner
  *
  */
-class SimpleParameterDeterminer : ParameterDeterminer
+class HullParameterDeterminer : ParameterDeterminer
 {
 public:
     //Use the constructors defined in the super class
     using ParameterDeterminer::ParameterDeterminer;
     /** This function should take in a pointcloud with matching normals and
-     * regions, and turn this into a location where the foot can be placed,
-     * from this location, gaits parameters should be made. **/
+    * hulls, and turn this into a location where the foot can be placed,
+    * from this location, gaits parameters should be made. **/
     bool determine_parameters(
-        boost::shared_ptr<PlaneParameterVector> plane_parameter_vector,
-        boost::shared_ptr<HullVector> hull_vector,
-        boost::shared_ptr<PolygonVector> polygon_vector,
-        SelectedGait selected_obstacle,
+        boost::shared_ptr<PlaneParameterVector> const plane_parameter_vector,
+        boost::shared_ptr<HullVector> const hull_vector,
+        boost::shared_ptr<PolygonVector> const polygon_vector,
+        SelectedGait const selected_obstacle,
         boost::shared_ptr<GaitParameters> gait_parameters) override;
+
+protected:
+    /** Takes a 2D point cloud of potential foot locations and returns
+     * the valid foot locations with associated height and normal vector.
+     * Result indicates whether every original point ends up being valid.**/
+    bool cropCloudToHullVector(PointCloud2D::Ptr const input_cloud,
+                               Normals::Ptr output_cloud,
+                               bool result);
 };
 
 /** The simple parameter determiner
@@ -64,18 +80,13 @@ class SimpleParameterDeterminer : ParameterDeterminer
 public:
   //Use the constructors defined in the super class
   using ParameterDeterminer::ParameterDeterminer;
-  /** This function should take in a pointcloud with matching normals and
-   * regions, and turn this into a location where the foot can be placed,
-   * from this location, gaits parameters should be made. **/
+  /** A Simple implementation which return parameters of 0.5 **/
   bool determine_parameters(
-          boost::shared_ptr<PlaneParameterVector> plane_parameter_vector,
-          boost::shared_ptr<HullVector> hull_vector,
-          boost::shared_ptr<PolygonVector> polygon_vector,
-          SelectedGait selected_obstacle,
+          boost::shared_ptr<PlaneParameterVector> const plane_parameter_vector,
+          boost::shared_ptr<HullVector> const hull_vector,
+          boost::shared_ptr<PolygonVector> const polygon_vector,
+          SelectedGait const selected_obstacle,
           boost::shared_ptr<GaitParameters> gait_parameters) override;
-
-protected:
-  
 };
 
 #endif //MARCH_PARAMETER_DETERMINER_H

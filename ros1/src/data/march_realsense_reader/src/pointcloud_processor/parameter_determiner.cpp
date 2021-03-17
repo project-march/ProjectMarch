@@ -7,11 +7,18 @@
 #include "pointcloud_processor/parameter_determiner.h"
 #include "march_shared_msgs/GaitParameters.h"
 
-using PlaneParameterVector = std::vector<pcl::ModelCoefficients::Ptr>;
-using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
+using PointCloud2D = pcl::PontCloud<pcl::PointXY>:
+using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
+using Normals = pcl::PointCloud<pcl::Normal>;
+using Region = pcl::PointIndices;
+using PlaneCoefficients = pcl::ModelCoefficients;
+using Hull = pcl::PointCloud<pcl::PointXYZ>;
+using Polygon = std::vector<pcl::Vertices>;
+using RegionVector = std::vector<Region>;
+using PlaneCoefficientsVector = std::vector<PlaneCoefficients::Ptr>;
+using HullVector = std::vector<Hull::Ptr>;
+using PolygonVector = std::vector<Polygon>;
 using GaitParameters = march_shared_msgs::GaitParameters;
-using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
-
 
 ParameterDeterminer::ParameterDeterminer(YAML::Node config_tree, bool debugging):
   debugging_{debugging},
@@ -21,10 +28,41 @@ ParameterDeterminer::ParameterDeterminer(YAML::Node config_tree, bool debugging)
 }
 
 bool SimpleParameterDeterminer::determine_parameters(
-        boost::shared_ptr<PlaneParameterVector> plane_parameter_vector,
-        boost::shared_ptr<HullVector> hull_vector,
-        boost::shared_ptr<PolygonVector> polygon_vector,
-        SelectedGait selected_obstacle,
+        boost::shared_ptr<PlaneParameterVector> const plane_parameter_vector,
+        boost::shared_ptr<HullVector> const hull_vector,
+        boost::shared_ptr<PolygonVector> const polygon_vector,
+        SelectedGait const selected_obstacle,
+        boost::shared_ptr<GaitParameters> gait_parameters)
+{
+  ROS_DEBUG("Determining parameters with simple parameter determiner");
+  hull_vector_ = hull_vector;
+  selected_obstacle_ = selected_obstacle;
+  gait_parameters_ = gait_parameters;
+  plane_coefficients_vector_ = plane_coefficients_vector;
+  polygon_vector_ = polygon_vector;
+
+};
+
+/** For each hull, the input cloud's z coordinate is set so that it
+* lies on the corresponding plane, then the input cloud is cropped, the points inside the hull (the cropped cloud)
+* are moved to the output cloud with the normal of the plane
+* This process is repeated for each hull. If each point in the input_cloud has been moved to the output cloud,
+* result is set to true, it is set to false otherwise **/
+bool HullParameterDeterminer::cropCloudToHullVector(PointCloud2D::Ptr const input_cloud,
+                                                    Normals::Ptr output_cloud,
+                                                    bool result)
+{
+  for (Hull hull : *hull_vector_){
+    PointCloud::Ptr elevated_cloud (new PointCloud);
+    addZCoordinateToCloudFromPlaneCoefficients(input_cloud, )
+  }
+}
+
+bool SimpleParameterDeterminer::determine_parameters(
+        boost::shared_ptr<PlaneParameterVector> const plane_parameter_vector,
+        boost::shared_ptr<HullVector> const hull_vector,
+        boost::shared_ptr<PolygonVector> const polygon_vector,
+        SelectedGait const selected_obstacle,
         boost::shared_ptr<GaitParameters> gait_parameters)
 {
   ROS_DEBUG("Determining parameters with simple parameter determiner");
@@ -39,4 +77,3 @@ bool SimpleParameterDeterminer::determine_parameters(
   gait_parameters_->step_size_parameter = 0.5;
   return true;
 };
-

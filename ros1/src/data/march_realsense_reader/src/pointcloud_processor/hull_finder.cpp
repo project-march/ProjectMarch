@@ -11,7 +11,6 @@
 #include <pcl/filters/crop_hull.h>
 #include <pcl/filters/extract_indices.h>
 
-
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using Region = pcl::PointIndices;
