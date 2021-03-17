@@ -45,8 +45,8 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
 
   preprocessor_ = std::make_unique<NormalsPreprocessor>(
       getConfigIfPresent("preprocessor"), debugging_);
-  region_creator_ = std::make_unique<SimpleRegionCreator>(
-      getConfigIfPresent("region_creator"), debugging_);
+  region_creator_ = std::make_unique<RegionGrower>(
+          getConfigIfPresent("region_creator"), debugging_);
   hull_finder_ = std::make_unique<SimpleHullFinder>(
       getConfigIfPresent("hull_finder"), debugging_);
   parameter_determiner_ = std::make_unique<SimpleParameterDeterminer>(
@@ -57,11 +57,13 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
     ROS_DEBUG("Realsense reader started with debugging, all intermediate result "
              "steps will be published and more information given in console, but"
              " this might slow the process, this can be turned off in the yaml.");
+
     if( ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) ) {
       ros::console::notifyLoggerLevelsChanged();
     }
     preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>
         ("/camera/preprocessed_cloud", 1);
+    region_pointcloud_publisher_ = n_->advertise<pcl::PointCloud<pcl::PointXYZRGB>>("/camera/region_cloud", 1);
   }
 }
 
@@ -132,8 +134,13 @@ bool RealSenseReader::process_pointcloud(
     return false;
   }
 
+  if (debugging_)
+  {
+    ROS_INFO("Done creating regions");
+    publishRegionCreatorPointCloud();
+  }
+
   ROS_DEBUG("Done creating regions");
-  //TODO: Add publisher to visualize created regions
 
   // Setup data structures for hull finding
   boost::shared_ptr<PlaneParameterVector> plane_parameter_vector =
@@ -197,6 +204,22 @@ void RealSenseReader::publishPreprocessedPointCloud(PointCloud::Ptr pointcloud)
   msg.header.frame_id = "foot_left";
 
   preprocessed_pointcloud_publisher_.publish(msg);
+}
+
+void RealSenseReader::publishRegionCreatorPointCloud()
+{
+  ROS_INFO_STREAM("Publishing a cloud with different regions");
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr coloured_cloud = region_creator_->debug_visualisation();
+
+  coloured_cloud->width  = 1;
+  coloured_cloud->height = coloured_cloud->points.size();
+
+  sensor_msgs::PointCloud2 msg;
+  pcl::toROSMsg(*coloured_cloud, msg);
+
+  // Header part of the msg is overwritten in pcl::toROSMsg.
+  msg.header.frame_id = "foot_left";
+  region_pointcloud_publisher_.publish(msg);
 }
 
 // The callback for the service that was starts processing the point cloud and gives
