@@ -59,9 +59,6 @@ public:
                      boost::shared_ptr<PolygonVector> polygon_vector) override;
 
 protected:
-    // Resize the output variables to the right lengths
-    bool prepareOutputVariables();
-
     // Convert a region into a convex or concave hull
     bool getCHullFromRegion();
 
