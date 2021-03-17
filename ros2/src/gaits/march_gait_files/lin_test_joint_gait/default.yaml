@@ -1,0 +1,11 @@
+gaits:
+  lin_test_joint_gait:
+    lin_test: lin_test
+positions:
+  setup:
+    gait_type: ''
+    joints:
+      linear_joint: 0.0
+
+      
+      

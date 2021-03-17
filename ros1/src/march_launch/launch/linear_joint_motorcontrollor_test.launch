@@ -5,7 +5,7 @@
     <arg name="robot" default="odrive_test_joint_linear" doc="The robot to run"/>
     <arg name="robot_description" default="test_joint_linear" doc="Robot urdf file to use"/>
 
-    <arg name="gait_directory" default="test_joint_gaits" doc="Gait files directory to use"/>
+    <arg name="gait_directory" default="lin_test_joint_gait" doc="Gait files directory to use"/>
 
     <arg name="rosbag" default="true" doc="Enables rosbag record node."/>
     <arg name="bag_prefix" default="motoco_test"/>

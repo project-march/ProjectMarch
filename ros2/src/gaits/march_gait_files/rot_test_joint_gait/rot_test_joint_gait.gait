@@ -1,0 +1,6 @@
+name: rot_test_joint_gait
+subgaits:
+  rot_test:
+    to: end
+  start:
+    to: rot_test

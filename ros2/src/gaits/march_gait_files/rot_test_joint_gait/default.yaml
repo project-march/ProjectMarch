@@ -1,8 +1,11 @@
 gaits:
-  test_joint_gait:
-    perform_test: example
+  rot_test_joint_gait:
+    rot_test: rot_test
 positions:
   setup:
     gait_type: ''
     joints:
       rotational_joint: 0.0
+
+      
+      

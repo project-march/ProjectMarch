@@ -100,7 +100,7 @@
         </joint>
         <actuator name="linear_joint_motor">
             <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-            <mechanicalReduction>223</mechanicalReduction>
+            <mechanicalReduction>3.14159265</mechanicalReduction>
         </actuator>
     </transmission>
 
