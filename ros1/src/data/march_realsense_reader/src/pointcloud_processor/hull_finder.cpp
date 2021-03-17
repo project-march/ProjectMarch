@@ -54,14 +54,11 @@ bool CHullFinder::find_hulls(
 
   success &= readYaml();
 
-  region_index_ = 0;
-  for (Region region : *region_vector_)
+  for (region_index_ = 0; region_index_ < region_vector_->size(); region_index_++)
   {
-    region_ = region;
+    region_ = region_vector_->at(region_index_);
 
     success &= getCHullFromRegion();
-
-    region_index_++;
   }
 
   time_t end_find_hulls = clock();
