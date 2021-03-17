@@ -52,11 +52,16 @@ bool HullParameterDeterminer::cropCloudToHullVector(PointCloud2D::Ptr const inpu
                                                     Normals::Ptr output_cloud,
                                                     bool result)
 {
-  for (Hull hull : *hull_vector_){
+  bool success = true;
+  for (int hull_index = 0; hull_index < hull_vector_->size(); hull_index++){
     PointCloud::Ptr elevated_cloud (new PointCloud);
-    addZCoordinateToCloudFromPlaneCoefficients(input_cloud, )
+    addZCoordinateToCloudFromPlaneCoefficients(input_cloud,
+                                               plane_coefficients_vector_->at(hull_index),
+                                               elevated_cloud)
   }
 }
+
+bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients()
 
 bool SimpleParameterDeterminer::determine_parameters(
         boost::shared_ptr<PlaneParameterVector> const plane_parameter_vector,
