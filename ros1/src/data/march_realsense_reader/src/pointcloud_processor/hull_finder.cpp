@@ -101,10 +101,16 @@ bool CHullFinder::getCHullFromRegion()
   success &= projectRegionToPlane();
 
   // Create the hull
-  success &= getCHullFromProjectedPlane();
+  success &= getCHullFromProjectedRegion();
 
   // Add the hull to a vector together with its plane coefficients and polygons
   success &= addCHullToVector();
+
+  if (hull_->points.size() == 0)
+  {
+    ROS_WARN_STEAM("Hull of region " << region_index_ << " Consists of zero points")
+    return false;
+  }
 
   return success;
 }
@@ -150,7 +156,7 @@ bool CHullFinder::projectRegionToPlane()
 }
 
 // Create the convex or concave hull from a projected region and its corresponding polygons
-bool CHullFinder::getCHullFromProjectedPlane()
+bool CHullFinder::getCHullFromProjectedRegion()
 {
   if (convex)
   {
@@ -184,6 +190,7 @@ bool CHullFinder::addCHullToVector()
 bool CHullFinder::getAveragePointAndNormal(std::vector<double> & average_point,
                                            std::vector<double> & average_normal)
 {
+  // Initialize the average point and normal to zero
   std::fill(average_point.begin(), average_point.end(), 0);
   std::fill(average_normal.begin(), average_normal.end(), 0);
 

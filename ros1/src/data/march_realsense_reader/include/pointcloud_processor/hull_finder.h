@@ -69,7 +69,7 @@ protected:
     bool projectRegionToPlane();
 
     // Create the convex or concave hull from a projected region
-    bool getCHullFromProjectedPlane();
+    bool getCHullFromProjectedRegion();
 
     // Add the hull to a vector together with its plane coefficients and polygons
     bool addCHullToVector();
