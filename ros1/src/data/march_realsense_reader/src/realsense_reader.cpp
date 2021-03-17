@@ -166,9 +166,6 @@ bool RealSenseReader::process_pointcloud(
     publishHullMarkerArray(hull_vector);
   }
 
-  ROS_DEBUG("Done finding hulls");
-  //TODO: Add publisher to visualize found planes
-
   // Setup data structures for parameter determining
   SelectedGait selected_obstacle = (SelectedGait) selected_gait;
   boost::shared_ptr<march_shared_msgs::GaitParameters> gait_parameters =

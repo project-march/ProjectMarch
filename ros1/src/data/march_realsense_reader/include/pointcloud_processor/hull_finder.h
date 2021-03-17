@@ -91,6 +91,7 @@ protected:
     Hull::Ptr hull_ = boost::make_shared<Hull>();
     Polygon polygon_;
     Region region_;
+    ros::Publisher is_convex_publisher_;
 };
 
 #endif //MARCH_HULL_FINDER_H

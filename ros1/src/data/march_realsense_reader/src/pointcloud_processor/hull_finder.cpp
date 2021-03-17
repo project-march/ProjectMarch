@@ -108,7 +108,7 @@ bool CHullFinder::getCHullFromRegion()
 
   if (hull_->points.size() == 0)
   {
-    ROS_WARN_STEAM("Hull of region " << region_index_ << " Consists of zero points")
+    ROS_WARN_STREAM("Hull of region " << region_index_ << " Consists of zero points");
     return false;
   }
 
@@ -125,12 +125,10 @@ bool CHullFinder::getPlaneCoefficientsRegion()
   bool success = getAveragePointAndNormal(average_point, average_normal);
 
   // Plane coefficients given as [0]*x + [1]*y + [2]*z + [3] = 0
+  plane_coefficients_->values.resize(4);
   // The first three coefficients are the normal vector of the plane as
   // all the vectors in the plane are perpendicular to the normal
-  plane_coefficients_->values.resize(4);
-  plane_coefficients_->values[0] = average_normal[0];
-  plane_coefficients_->values[1] = average_normal[1];
-  plane_coefficients_->values[2] = average_normal[2];
+  plane_coefficients_->values.assign(average_normal.begin(), average_normal.end());
   // the final coefficient can be calculated with the plane equation ax + by + cz + d = 0
   plane_coefficients_->values[3] = - (
       average_point[0] * average_normal[0] +
