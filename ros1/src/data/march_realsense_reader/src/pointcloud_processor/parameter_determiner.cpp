@@ -9,6 +9,7 @@
 
 using PointCloud2D = pcl::PontCloud<pcl::PointXY>:
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
+using PointNormalCloud = pcl::PointCloud<pcl::PointNormal>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using Region = pcl::PointIndices;
 using PlaneCoefficients = pcl::ModelCoefficients;
@@ -58,7 +59,17 @@ bool HullParameterDeterminer::cropCloudToHullVector(PointCloud2D::Ptr const inpu
     addZCoordinateToCloudFromPlaneCoefficients(input_cloud,
                                                plane_coefficients_vector_->at(hull_index),
                                                elevated_cloud)
+
+    cropCloudToHull(elevated_cloud, hull_vector_->at(hull_index), polygon_vector_->at(hull_index))
+
+    PointNormalCloud::Ptr elevated_cloud_with_normals (new PointNormalCloud);
+    addNormalToCloudFromPlaneCoefficients(elevated_cloud,
+                                          plane_coefficients_vector_->at(hull_index),
+                                          elevated_cloud_with_normals)
+
+    *output_cloud += *elevated_cloud_with_normals;
   }
+  result = (output_cloud->points.size() == input_cloud->points.size());
 }
 
 bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients()
