@@ -85,7 +85,7 @@ joints:
   - position: 1.6231562
     time_from_start: 1602100000
     velocity: 0.0
-  - position: 0.92273289
+  - position: 0.97625515
     time_from_start: 2750000000
     velocity: 0.0
 name: right_swing
