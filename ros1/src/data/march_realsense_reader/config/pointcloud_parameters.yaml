@@ -19,5 +19,19 @@ preprocessor:
     allowed_length_y: 0.4
     allowed_length_z: 1.0 # 1.0 is max length of a normal vector
 
+region_creator:
+  region_growing:
+    number_of_neighbours: 10
+    min_cluster_size: 100
+    max_cluster_size: 1000000
+    smoothness_threshold: 0.0698 # 4 / 180 * pi
+    curvature_threshold: 0.5
+
+hull_finder:
+  c_hull_finder:
+    convex: true # If set to false, find concave hulls.
+    alpha: 0.5 # Governs the detail of concave hulls, smaller is more detail.
+    hull_dimension: 2
+
 debug: true
 

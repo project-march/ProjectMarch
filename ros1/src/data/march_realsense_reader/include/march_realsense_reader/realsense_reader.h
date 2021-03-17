@@ -3,6 +3,7 @@
 
 #include <string>
 #include <ros/ros.h>
+#include <visualization_msgs/MarkerArray.h>
 #include <pcl_ros/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
@@ -50,7 +51,12 @@ public:
     YAML::Node getConfigIfPresent(std::string key);
 
     // Publishes the pointcloud on a topic for visualisation in rviz or furter use
-    void publishPreprocessedPointCloud(PointCloud::Ptr pointcloud);
+//    void publishPreprocessedPointCloud(PointCloud::Ptr pointcloud);
+//    void publishRegionCreatorPointCloud();
+    template <typename T>
+    void publishCloud(ros::Publisher publisher,
+                      pcl::PointCloud<T> cloud);
+    void publishHullMarkerArray(boost::shared_ptr<HullVector> hull_vector);
 
 private:
     ros::NodeHandle* n_;
@@ -58,9 +64,12 @@ private:
     PointCloud last_pointcloud_;
     ros::ServiceServer read_pointcloud_service_;
     ros::Publisher preprocessed_pointcloud_publisher_;
-    std::unique_ptr<NormalsPreprocessor> preprocessor_;
-    std::unique_ptr<SimpleRegionCreator> region_creator_;
-    std::unique_ptr<SimpleHullFinder> hull_finder_;
+    ros::Publisher region_pointcloud_publisher_;
+    ros::Publisher hull_marker_array_publisher_;
+
+  std::unique_ptr<NormalsPreprocessor> preprocessor_;
+    std::unique_ptr<regionGrower> region_creator_;
+    std::unique_ptr<CHullFinder> hull_finder_;
     std::unique_ptr<SimpleParameterDeterminer> parameter_determiner_;
     bool debugging_;
     std::string config_file_;

@@ -9,10 +9,14 @@
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
-using RegionVector = std::vector<pcl::PointIndices>;
-using PlaneParameterVector = std::vector<pcl::ModelCoefficients::Ptr>;
-using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
-using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
+using Region = pcl::PointIndices;
+using PlaneCoefficients = pcl::ModelCoefficients;
+using Hull = pcl::PointCloud<pcl::PointXYZ>;
+using Polygon = std::vector<pcl::Vertices>;
+using RegionVector = std::vector<Region>;
+using PlaneCoefficientsVector = std::vector<PlaneCoefficients::Ptr>;
+using HullVector = std::vector<Hull::Ptr>;
+using PolygonVector = std::vector<Polygon>;
 
 class HullFinder
 {
@@ -21,9 +25,9 @@ public:
     // This function is required to be implemented by any plane finder
     virtual bool find_hulls(PointCloud::Ptr pointcloud,
                              Normals::Ptr normal_pointcloud,
-                             boost::shared_ptr<RegionVector> region_vector,
-                             boost::shared_ptr<PlaneParameterVector>
-                                 plane_parameter_vector,
+                             RegionVector region_vector,
+                             boost::shared_ptr<PlaneCoefficientsVector>
+                                 plane_coefficients_vector,
                              boost::shared_ptr<HullVector> hull_vector,
                              boost::shared_ptr<PolygonVector> polygon_vector)=0;
 
@@ -31,16 +35,16 @@ public:
 
 protected:
     PointCloud::Ptr pointcloud_;
-    Normals::Ptr normal_pointcloud_;
-    boost::shared_ptr<RegionVector> region_vector_;
-    boost::shared_ptr<PlaneParameterVector> plane_parameter_vector_;
+    Normals::Ptr pointcloud_normals_;
+    RegionVector region_vector_;
+    boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;
     boost::shared_ptr<HullVector> hull_vector_;
     boost::shared_ptr<PolygonVector> polygon_vector_;
     YAML::Node config_tree_;
     bool debugging_;
 };
 
-class SimpleHullFinder : HullFinder
+class CHullFinder : HullFinder
 {
 public:
     //Use the constructors defined in the super class
@@ -49,10 +53,44 @@ public:
      * regions, and turn this into chulls where the foot can be located. **/
     bool find_hulls(PointCloud::Ptr pointcloud,
                      Normals::Ptr normal_pointcloud,
-                     boost::shared_ptr<RegionVector> region_vector,
-                     boost::shared_ptr<PlaneParameterVector> plane_parameter_vector,
+                     RegionVector region_vector,
+                     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,
                      boost::shared_ptr<HullVector> hull_vector,
                      boost::shared_ptr<PolygonVector> polygon_vector) override;
+
+protected:
+    // Convert a region into a convex or concave hull
+    bool getCHullFromRegion();
+
+    // Get the plane coefficients of the region using average point and normal
+    bool getPlaneCoefficientsRegion();
+
+    // project the region to its plane so a convex or concave hull can be create
+    bool projectRegionToPlane();
+
+    // Create the convex or concave hull from a projected region
+    bool getCHullFromProjectedPlane();
+
+    // Add the hull to a vector together with its plane coefficients and polygons
+    bool addCHullToVector();
+
+    // Calculate the average normal and point of a region
+    bool getAveragePointAndNormal(std::vector<double> & average_point, std::vector<double> & average_normal);
+
+    // Read all the relevant parameters from the yaml file
+    bool readYaml();
+    bool convex;
+    double alpha;
+    int hull_dimension;
+
+    int region_index_;
+    PointCloud::Ptr region_points_ = boost::make_shared<PointCloud>();
+    Normals::Ptr region_normals_ = boost::make_shared<Normals>();
+    PointCloud::Ptr region_points_projected_ = boost::make_shared<PointCloud>();
+    PlaneCoefficients::Ptr plane_coefficients_ = boost::make_shared<PlaneCoefficients>();
+    Hull::Ptr hull_ = boost::make_shared<Hull>();
+    Polygon polygon_;
+    Region region_;
 };
 
 #endif //MARCH_HULL_FINDER_H

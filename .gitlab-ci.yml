@@ -1,6 +1,7 @@
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
+
 stages:
   - Tag container
   - Build container
