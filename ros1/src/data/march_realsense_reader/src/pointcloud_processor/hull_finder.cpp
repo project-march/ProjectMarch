@@ -34,7 +34,7 @@ HullFinder::HullFinder(YAML::Node config_tree, bool debugging):
 bool CHullFinder::find_hulls(
      PointCloud::Ptr pointcloud,
      Normals::Ptr pointcloud_normals,
-     RegionVector region_vector,
+     boost::shared_ptr<RegionVector> region_vector,
      boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,
      boost::shared_ptr<HullVector> hull_vector,
      boost::shared_ptr<PolygonVector> polygon_vector)
@@ -55,9 +55,10 @@ bool CHullFinder::find_hulls(
   success &= readYaml();
 
   region_index_ = 0;
-  for (region_index_ = 0; region_index_ < region_vector_.size(); region_index_++)
+  for (Region region : *region_vector_)
   {
-    region_ = region_vector_[region_index_];
+    region_ = region;
+//    region_ = region_vector_[region_index_];
 
     success &= getCHullFromRegion();
 
