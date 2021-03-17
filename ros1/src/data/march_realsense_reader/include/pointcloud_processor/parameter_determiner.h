@@ -46,13 +46,36 @@ public:
     //Use the constructors defined in the super class
     using ParameterDeterminer::ParameterDeterminer;
     /** This function should take in a pointcloud with matching normals and
-     * regions, and turn this into chulls where the foot can be located. **/
+     * regions, and turn this into a location where the foot can be placed,
+     * from this location, gaits parameters should be made. **/
     bool determine_parameters(
         boost::shared_ptr<PlaneParameterVector> plane_parameter_vector,
         boost::shared_ptr<HullVector> hull_vector,
         boost::shared_ptr<PolygonVector> polygon_vector,
         SelectedGait selected_obstacle,
         boost::shared_ptr<GaitParameters> gait_parameters) override;
+};
+
+/** The simple parameter determiner
+ *
+ */
+class SimpleParameterDeterminer : ParameterDeterminer
+{
+public:
+  //Use the constructors defined in the super class
+  using ParameterDeterminer::ParameterDeterminer;
+  /** This function should take in a pointcloud with matching normals and
+   * regions, and turn this into a location where the foot can be placed,
+   * from this location, gaits parameters should be made. **/
+  bool determine_parameters(
+          boost::shared_ptr<PlaneParameterVector> plane_parameter_vector,
+          boost::shared_ptr<HullVector> hull_vector,
+          boost::shared_ptr<PolygonVector> polygon_vector,
+          SelectedGait selected_obstacle,
+          boost::shared_ptr<GaitParameters> gait_parameters) override;
+
+protected:
+  
 };
 
 #endif //MARCH_PARAMETER_DETERMINER_H
