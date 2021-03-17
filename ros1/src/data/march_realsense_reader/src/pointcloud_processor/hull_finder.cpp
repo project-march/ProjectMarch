@@ -58,7 +58,6 @@ bool CHullFinder::find_hulls(
   for (Region region : *region_vector_)
   {
     region_ = region;
-//    region_ = region_vector_[region_index_];
 
     success &= getCHullFromRegion();
 
