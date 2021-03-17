@@ -6,12 +6,12 @@ testsetup:
         actuationMode: torque
         allowActuation: true
         odrive:
-          serial_number: "2084387E304E"
-          axis: "axis0"
+          serial_number: "0x2084387E304E"
+          axis: "axis1"
           absoluteEncoder:
             resolution: 12
             minPositionIU: 240
             maxPositionIU: 445
           incrementalEncoder:
             resolution: 13
-            transmission: 200
+            transmission: 3.141592
