@@ -1,6 +1,6 @@
 gaits:
   test_joint_gait:
-    perform_test: example
+    perform_test: perform_test_v0
 positions:
   setup:
     gait_type: ''
