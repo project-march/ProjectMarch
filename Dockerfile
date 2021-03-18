@@ -2,7 +2,7 @@ FROM ros:foxy-ros1-bridge-focal
 
 # Install ROS Noetic and Foxy base packages
 RUN apt update && apt upgrade -y && apt install -y apt-utils && apt install -y ros-noetic-ros-base ros-foxy-ros-base
-
+ 
 # Install build tools
 RUN apt install -y python3-rosdep python3-rosinstall python3-rosinstall-generator build-essential python3-colcon-common-extensions python3-pip python3-pip python3-catkin-pkg python3-catkin-lint clang-tidy clang libssl-dev wget cmake git git-lfs libbullet-dev python3-flake8 python3-pytest-cov python3-setuptools python3-vcstool && apt install --no-install-recommends -y libasio-dev libtinyxml2-dev libcunit1-dev
 
