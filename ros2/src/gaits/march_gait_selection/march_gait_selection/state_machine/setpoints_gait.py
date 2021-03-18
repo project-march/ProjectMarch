@@ -2,6 +2,7 @@ from march_gait_selection.dynamic_gaits.transition_subgait import TransitionSubg
 from march_utility.exceptions.gait_exceptions import GaitError
 from march_utility.gait.gait import Gait
 from march_utility.utilities.duration import Duration
+from rclpy.time import Time
 
 from .gait_interface import GaitInterface
 from .state_machine_input import TransitionRequest
@@ -17,6 +18,9 @@ class SetpointsGait(GaitInterface, Gait):
         self._transition_to_subgait = None
         self._is_transitioning = False
         self._time_since_start = Duration(0)
+
+        self._subgait_end_time = None
+        self._scheduled_next_subgait = False
 
     @property
     def name(self):
@@ -58,7 +62,7 @@ class SetpointsGait(GaitInterface, Gait):
     def final_position(self):
         return self.subgaits[self.graph.end_subgaits()[0]].final_position
 
-    def start(self):
+    def start(self, start_time: Time):
         """
         Start the gait, sets current subgait to the first subgait, resets the
         time and generates the first trajectory.
@@ -69,9 +73,11 @@ class SetpointsGait(GaitInterface, Gait):
         self._transition_to_subgait = None
         self._is_transitioning = False
         self._time_since_start = Duration(0)
+        self._scheduled_next_subgait = False
+        self._subgait_end_time = start_time + self._current_subgait.duration + Duration(seconds=0.3)
         return self._current_subgait.to_joint_trajectory_msg()
 
-    def update(self, elapsed_time: Duration):
+    def update(self, current_time: Time, node):
         """
         Update the progress of the gait, should be called regularly.
         If the current subgait is still running, this does nothing.
@@ -80,13 +86,17 @@ class SetpointsGait(GaitInterface, Gait):
         :param elapsed_time:
         :return: trajectory, is_finished
         """
-        self._time_since_start += elapsed_time
-        if self._time_since_start < self._current_subgait.duration:
+        duration = Duration(seconds=0.2)
+
+        if not self._scheduled_next_subgait and current_time > self._subgait_end_time - duration:
+            return self._update_next_subgait_early(node)
+
+        if current_time < self._subgait_end_time:
             return None, False
 
-        return self._update_next_subgait()
+        return self._update_next_subgait(node)
 
-    def _update_next_subgait(self):
+    def _update_next_subgait(self, node):
         if self._should_stop:
             next_subgait = self._stop()
 
@@ -100,18 +110,37 @@ class SetpointsGait(GaitInterface, Gait):
 
         else:
             # If there is no transition subgait that has to be used, go to TO subgait
-            next_subgait = self.graph[
-                (self._current_subgait.subgait_name, self.graph.TO)
-            ]
+            next_subgait = self.get_next_subgait()
 
         if next_subgait == self.graph.END:
             return None, True
         self._current_subgait = self.subgaits[next_subgait]
-        trajectory = self._current_subgait.to_joint_trajectory_msg()
 
-        self._time_since_start = Duration(
-            0
-        )  # New subgait is started, so reset the time
+        node.get_logger().info('Updating actual subgait status')
+
+        if not self._scheduled_next_subgait:
+            trajectory = self._current_subgait.to_joint_trajectory_msg()
+        else:
+            trajectory = None
+
+        # New subgait is started, so reset the time
+        self._time_since_start = Duration(0)
+        self._subgait_end_time += self._current_subgait.duration
+
+        # Reset next subgait flag
+        self._scheduled_next_subgait = False
+
+        return trajectory, False
+
+    def _update_next_subgait_early(self, node):
+        next_subgait = self.get_next_subgait()
+        if next_subgait == self.graph.END:
+            trajectory = None
+        else:
+            node.get_logger().info("Scheduling next subgait early")
+            trajectory = self.subgaits[next_subgait].to_joint_trajectory_msg()
+
+        self._scheduled_next_subgait = True
         return trajectory, False
 
     def transition(self, transition_request):
@@ -140,6 +169,9 @@ class SetpointsGait(GaitInterface, Gait):
             self._transition_to_subgait = self.subgaits[name]
             return True
         return False
+
+    def get_next_subgait(self):
+        return self.graph[(self._current_subgait.subgait_name, self.graph.TO)]
 
     def stop(self):
         """Called when the current gait should be stopped. Return a boolean

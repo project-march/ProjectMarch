@@ -340,7 +340,7 @@ class GaitStateMachine(object):
             self._gait_selection.get_logger().info(
                 f"Executing gait `{self._current_gait.name}`"
             )
-            trajectory = self._current_gait.start()
+            trajectory = self._current_gait.start(self._gait_selection.get_clock().now())
             if trajectory is not None:
                 if not self.check_correct_foot_pressure():
                     self._gait_selection.get_logger().debug(
@@ -349,10 +349,11 @@ class GaitStateMachine(object):
                     )
                 self._call_gait_callbacks()
                 self._gait_selection.get_logger().info(
-                    f"Scheduling {self._current_gait.subgait_name}"
+                    f"1: Scheduling {self._current_gait.subgait_name}, "
+                    f"duration: {self._current_gait.duration.seconds}"
                 )
-
-                self._trajectory_scheduler.schedule(trajectory)
+                # Schedule trajectory immediately
+                self._trajectory_scheduler.schedule(trajectory, False)
             elapsed_time = Duration(0)
 
         if self._trajectory_scheduler.failed():
@@ -364,15 +365,18 @@ class GaitStateMachine(object):
             return
 
         self._handle_input()
-        trajectory, should_stop = self._current_gait.update(elapsed_time)
+        trajectory, should_stop = self._current_gait.update(self._gait_selection.get_clock().now(), self._gait_selection)
 
         # schedule trajectory if any
         if trajectory is not None:
             self._call_gait_callbacks()
+            next_subgait = self._current_gait.subgaits[self._current_gait.get_next_subgait()]
             self._gait_selection.get_logger().info(
-                f"Scheduling {self._current_gait.subgait_name}"
+                f"2: Scheduling {next_subgait.subgait_name}, "
+                f"duration: {next_subgait.duration.seconds}"
             )
-            self._trajectory_scheduler.schedule(trajectory)
+            # Schedule trajectory with an delay of the previous subgait duration
+            self._trajectory_scheduler.schedule(trajectory, True)
 
         if should_stop:
             self._current_state = self._gait_transitions[self._current_state]
@@ -384,6 +388,7 @@ class GaitStateMachine(object):
                 f"Finished gait `{self._current_gait.name}`"
             )
             self._current_gait = None
+            self._trajectory_scheduler.reset_previous_trajectory_values()
 
     def _handle_input(self):
         """Handles stop and transition input from the input device. This input

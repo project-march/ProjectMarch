@@ -35,7 +35,7 @@ march:
       stop_trajectory_duration: 0.2        # Override default
 
       constraints:
-#        stopped_velocity_tolerance: 0.2
+        stopped_velocity_tolerance: 1.0
         goal_time: 0.1
         left_ankle:
           trajectory: 0.305
