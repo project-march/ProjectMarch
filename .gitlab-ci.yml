@@ -11,6 +11,10 @@ stages:
 
 image: registry.gitlab.com/project-march/march:$CI_COMMIT_BRANCH
 
+before_script:
+  - git submodule sync --recursive
+  - git submodule update --init --recursive
+
 # Allow each branch to run their own container. This allows a branch to add
 # dependencies to their package.xml and use them as expected. This process works as
 # follows:
