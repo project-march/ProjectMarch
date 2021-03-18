@@ -5,9 +5,9 @@
     <arg name="serial_no_camera_front"    default="033322070612"/>
     <arg name="serial_no_camera_back"     default="048322070237"/>
     <arg name="use_camera_back" default="false"
-         doc="Whether to start the second camera"/>
+         doc="Whether to start the second (back) camera"/>
     <arg name="use_camera_front" default="true"
-         doc="Whether to start the second camera"/>
+         doc="Whether to start the front camera"/>
     <arg name="initial_reset" default="false" doc="Do a hardware reset at start up to reduce errors"/>
     <arg name="camera_fps" default="15"
          doc="The frames per second to use for the physical camera"/>
