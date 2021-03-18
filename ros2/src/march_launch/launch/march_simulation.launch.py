@@ -15,6 +15,7 @@ def generate_launch_description():
     # Input device arguments
     rqt_input = LaunchConfiguration("rqt_input")
     ping_safety_node = LaunchConfiguration("ping_safety_node")
+    layout = LaunchConfiguration("layout")
 
     # Robot state publisher arguments
     robot_state_publisher = LaunchConfiguration("robot_state_publisher")
@@ -53,6 +54,11 @@ def generate_launch_description():
                 default_value="True",
                 description="If this argument is false, the rqt input device will"
                 "not be launched.",
+            ),
+            DeclareLaunchArgument(
+                name="layout",
+                default_value="default",
+                description="Input device layout .json file to use.",
             ),
             DeclareLaunchArgument(
                 name="ping_safety_node",
@@ -139,6 +145,7 @@ def generate_launch_description():
                     ("use_sim_time", use_sim_time),
                     ("rqt_input", rqt_input),
                     ("ping_safety_node", ping_safety_node),
+                    ("layout", layout),
                     ("robot", robot),
                     ("robot_state_publisher", robot_state_publisher),
                     ("robot_description", robot_description),
