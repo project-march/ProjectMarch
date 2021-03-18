@@ -29,7 +29,7 @@ def generate_launch_description():
     gait_package = LaunchConfiguration("gait_package")
     gait_directory = LaunchConfiguration("gait_directory")
     balance = LaunchConfiguration("balance")
-    
+
     # Fake sensor data
     fake_sensor_data = LaunchConfiguration("fake_sensor_data")
     minimum_fake_temperature = LaunchConfiguration("minimum_fake_temperature")
@@ -45,9 +45,7 @@ def generate_launch_description():
                 "/clock topic by gazebo instead of system time.",
             ),
             DeclareLaunchArgument(
-                name="robot",
-                default_value="march4",
-                description="Robot to use."
+                name="robot", default_value="march4", description="Robot to use."
             ),
             # RQT INPUT DEVICE ARGUMENTS
             DeclareLaunchArgument(
@@ -152,8 +150,8 @@ def generate_launch_description():
                     ("balance", balance),
                     ("fake_sensor_data", fake_sensor_data),
                     ("minimum_fake_temperature", minimum_fake_temperature),
-                    ("maximum_fake_temperature", maximum_fake_temperature)
+                    ("maximum_fake_temperature", maximum_fake_temperature),
                 ],
-            )
+            ),
         ]
     )
