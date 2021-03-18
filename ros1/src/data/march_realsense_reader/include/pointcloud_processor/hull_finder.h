@@ -61,6 +61,9 @@ protected:
     // Convert a region into a convex or concave hull
     bool getCHullFromRegion();
 
+    // Get the points and normals of the region and initialize region variables
+    bool initializeRegionVariables();
+
     // Get the plane coefficients of the region using average point and normal
     bool getPlaneCoefficientsRegion();
 
@@ -83,11 +86,11 @@ protected:
     int hull_dimension;
 
     int region_index_;
-    PointCloud::Ptr region_points_ = boost::make_shared<PointCloud>();
-    Normals::Ptr region_normals_ = boost::make_shared<Normals>();
-    PointCloud::Ptr region_points_projected_ = boost::make_shared<PointCloud>();
-    PlaneCoefficients::Ptr plane_coefficients_ = boost::make_shared<PlaneCoefficients>();
-    Hull::Ptr hull_ = boost::make_shared<Hull>();
+    PointCloud::Ptr region_points_;
+    Normals::Ptr region_normals_;
+    PointCloud::Ptr region_points_projected_;
+    PlaneCoefficients::Ptr plane_coefficients_;
+    Hull::Ptr hull_;
     Polygon polygon_;
     Region region_;
 };

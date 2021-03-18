@@ -66,7 +66,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
 
     preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>("/camera/preprocessed_cloud", 1);
     region_pointcloud_publisher_ = n_->advertise<pcl::PointCloud<pcl::PointXYZRGB>>("/camera/region_cloud", 1);
-    hull_marker_array_publisher_ = n_->advertise<visualization_msgs::MarkerArray>("/camera/hull_marker_array", 1);
+    hull_marker_array_publisher_ = n_->advertise<visualization_msgs::Marker>("/camera/hull_marker_list", 1);
   }
 }
 
@@ -162,7 +162,7 @@ bool RealSenseReader::process_pointcloud(
 
   if (debugging_)
   {
-    ROS_DEBUG("Done creating hulls, now publishing to /camera/hull_marker_array");
+    ROS_DEBUG("Done creating hulls, now publishing to /camera/hull_marker_list");
     publishHullMarkerArray(hull_vector);
   }
 
@@ -213,41 +213,46 @@ void RealSenseReader::publishCloud(ros::Publisher publisher,
 
 void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_vector)
 {
-  visualization_msgs::MarkerArray marker_array;
-  int id = 0;
+  visualization_msgs::Marker marker_list;
+  marker_list.header.frame_id= "foot_left";
+  marker_list.header.stamp= ros::Time::now();
+  marker_list.ns= "hulls";
+  marker_list.action= visualization_msgs::Marker::ADD;
+  marker_list.pose.orientation.w= 1.0;
+
+  marker_list.id = 0;
+
+  marker_list.type = visualization_msgs::Marker::CUBE_LIST;
+  marker_list.scale.x = 0.07;
+  marker_list.scale.y = 0.07;
+  marker_list.scale.z = 0.07;
   for (pcl::PointCloud<pcl::PointXYZ>::Ptr hull: *hull_vector)
   {
     // Color the hull with a random color (r, g and b in [1, 0])
     double r = (rand() % 500) / 500.0;
     double g = (rand() % 500) / 500.0;
     double b = (rand() % 500) / 500.0;
-    for (pcl::PointXYZ point : *hull)
+    ROS_DEBUG_STREAM("Adding points for a new hull with hull size " << hull->points.size());
+    for (pcl::PointXYZ hull_point : *hull)
     {
-      visualization_msgs::Marker marker;
-      marker.action = marker.ADD;
-      marker.id = id;
-      marker.header.frame_id = "foot_left";
-      marker.pose.position.x = point.x;
-      marker.pose.position.y = point.y;
-      marker.pose.position.z = point.z;
-      marker.color.r = r;
-      marker.color.g = g;
-      marker.color.b = b;
-      marker.color.a = 1.0;
-      marker.scale.x = 0.1;
-      marker.scale.y = 0.1;
-      marker.scale.z = 0.1;
-      marker.pose.orientation.x = 0.0;
-      marker.pose.orientation.y = 0.0;
-      marker.pose.orientation.z = 0.0;
-      marker.pose.orientation.w = 1.0;
-      marker.type = visualization_msgs::Marker::CUBE;
-      marker_array.markers.push_back(marker);
-      id++;
+      geometry_msgs::Point marker_point;
+      marker_point.x = hull_point.x;
+      marker_point.y = hull_point.y;
+      marker_point.z = hull_point.z;
+
+      std_msgs::ColorRGBA marker_color;
+      marker_color.r = r;
+      marker_color.g = g;
+      marker_color.b = b;
+      marker_color.a = 1.0;
+
+      marker_list.points.push_back(marker_point);
+      marker_list.colors.push_back(marker_color);
+
     }
   }
 
-  hull_marker_array_publisher_.publish(marker_array);
+  hull_marker_array_publisher_.publish(marker_list);
 }
 
 // The callback for the service that was starts processing the point cloud and gives

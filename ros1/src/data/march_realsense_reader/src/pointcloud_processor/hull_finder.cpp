@@ -90,8 +90,8 @@ bool CHullFinder::getCHullFromRegion()
 {
   bool success = true;
 
-  pcl::copyPointCloud(*pointcloud_, region_, *region_points_);
-  pcl::copyPointCloud(*pointcloud_normals_, region_, *region_normals_);
+  // Get the points and normals of the region and initialize region variables
+  sucess &= initializeRegionVariables();
 
   // Get the plane coefficients of the region
   success &= getPlaneCoefficientsRegion();
@@ -112,6 +112,21 @@ bool CHullFinder::getCHullFromRegion()
   }
 
   return success;
+}
+
+// Get the points and normals of the region and initialize region variables
+bool CHullFinder::initializeRegionVariables()
+{
+  region_points_ = boost::make_shared<PointCloud>();
+  region_normals_ = boost::make_shared<Normals>();
+  region_points_projected_ = boost::make_shared<PointCloud>();
+  plane_coefficients_ = boost::make_shared<PlaneCoefficients>();
+  hull_ = boost::make_shared<Hull>();
+
+  pcl::copyPointCloud(*pointcloud_, region_, *region_points_);
+  pcl::copyPointCloud(*pointcloud_normals_, region_, *region_normals_);
+
+  return true;
 }
 
 // Get the plane coefficients of the region using average point and normal
