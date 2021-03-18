@@ -23,7 +23,7 @@ setup(
     zip_safe=True,
     maintainer="Project March",
     maintainer_email="software@projectmarch.nl",
-    description="An RQT plugin for monitoring log messages and writing logs.",
+    description="Rqt automated software tool to analyze the March exoskeleton during runtime.",
     license="TODO: License declaration",
     tests_require=["pytest"],
     entry_points={
