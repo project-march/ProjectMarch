@@ -91,7 +91,7 @@ bool CHullFinder::getCHullFromRegion()
   bool success = true;
 
   // Get the points and normals of the region and initialize region variables
-  sucess &= initializeRegionVariables();
+  success &= initializeRegionVariables();
 
   // Get the plane coefficients of the region
   success &= getPlaneCoefficientsRegion();

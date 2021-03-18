@@ -196,7 +196,7 @@ bool RealSenseReader::process_pointcloud(
   return true;
 }
 
-// Publishes a pointcloud of any point type on a publisher
+// Publish a pointcloud of any point type on a publisher
 template <typename T>
 void RealSenseReader::publishCloud(ros::Publisher publisher,
                                    pcl::PointCloud<T> cloud)
@@ -211,6 +211,7 @@ void RealSenseReader::publishCloud(ros::Publisher publisher,
   publisher.publish(msg);
 }
 
+// Turn a HullVector into published a marker with a list of points on for visualization
 void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_vector)
 {
   visualization_msgs::Marker marker_list;
@@ -219,20 +220,18 @@ void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_
   marker_list.ns= "hulls";
   marker_list.action= visualization_msgs::Marker::ADD;
   marker_list.pose.orientation.w= 1.0;
-
   marker_list.id = 0;
-
   marker_list.type = visualization_msgs::Marker::CUBE_LIST;
   marker_list.scale.x = 0.07;
   marker_list.scale.y = 0.07;
   marker_list.scale.z = 0.07;
+
   for (pcl::PointCloud<pcl::PointXYZ>::Ptr hull: *hull_vector)
   {
     // Color the hull with a random color (r, g and b in [1, 0])
     double r = (rand() % 500) / 500.0;
     double g = (rand() % 500) / 500.0;
     double b = (rand() % 500) / 500.0;
-    ROS_DEBUG_STREAM("Adding points for a new hull with hull size " << hull->points.size());
     for (pcl::PointXYZ hull_point : *hull)
     {
       geometry_msgs::Point marker_point;
@@ -248,10 +247,8 @@ void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_
 
       marker_list.points.push_back(marker_point);
       marker_list.colors.push_back(marker_color);
-
     }
   }
-
   hull_marker_array_publisher_.publish(marker_list);
 }
 
