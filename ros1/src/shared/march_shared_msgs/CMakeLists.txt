@@ -34,8 +34,7 @@ add_message_files(
     msg/mpc_msgs
     FILES
     MpcArray.msg
-    MpcState.msg
-    MpcEstimation.msg
+    MpcStateVectors.msg
     MpcTuning.msg
     MpcDiagnostics.msg
     MpcJoint.msg

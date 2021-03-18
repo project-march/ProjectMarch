@@ -4,3 +4,5 @@ float64 total_time
 
 int32 preparation_status
 int32 feedback_status
+
+float32 cost
