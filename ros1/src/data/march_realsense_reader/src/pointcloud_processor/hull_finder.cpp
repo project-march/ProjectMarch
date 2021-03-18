@@ -129,10 +129,10 @@ bool CHullFinder::getPlaneCoefficientsRegion()
   // all the vectors in the plane are perpendicular to the normal
   plane_coefficients_->values.assign(average_normal.begin(), average_normal.end());
   // the final coefficient can be calculated with the plane equation ax + by + cz + d = 0
-  plane_coefficients_->push_back( - (
-      average_point[0] * average_normal[0] +
-      average_point[1] * average_normal[1] +
-      average_point[2] * average_normal[2]));
+  plane_coefficients_->values.push_back( - (
+          average_point[0] * average_normal[0] +
+          average_point[1] * average_normal[1] +
+          average_point[2] * average_normal[2]));
 
   ROS_DEBUG_STREAM("Region " << region_index_ << " has plane coefficients: " <<
                    output_utilities::vectorToString(plane_coefficients_->values));

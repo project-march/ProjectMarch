@@ -250,22 +250,6 @@ void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_
   hull_marker_array_publisher_.publish(marker_array);
 }
 
-void RealSenseReader::publishRegionCreatorPointCloud()
-{
-  ROS_INFO_STREAM("Publishing a cloud with different regions");
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr coloured_cloud = region_creator_->debug_visualisation();
-
-  coloured_cloud->width  = 1;
-  coloured_cloud->height = coloured_cloud->points.size();
-
-  sensor_msgs::PointCloud2 msg;
-  pcl::toROSMsg(*coloured_cloud, msg);
-
-  // Header part of the msg is overwritten in pcl::toROSMsg.
-  msg.header.frame_id = "foot_left";
-  region_pointcloud_publisher_.publish(msg);
-}
-
 // The callback for the service that was starts processing the point cloud and gives
 // back parameters for a gait
 bool RealSenseReader::process_pointcloud_callback(
