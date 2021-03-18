@@ -205,5 +205,13 @@
       {
          "name":"ik_test_multiple_subgaits"
       }
+   ],
+   [
+      {
+         "name": "home_setup"
+      },
+      {
+         "name": "test_joint_gait"
+      }
    ]
 ]
