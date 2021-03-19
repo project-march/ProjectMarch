@@ -69,7 +69,7 @@ protected:
      * the valid foot locations with associated height and normal vector.
      * Result indicates whether every original point ends up being valid.**/
     bool cropCloudToHullVector(PointCloud2D::Ptr const input_cloud,
-                               Normals::Ptr output_cloud,
+                               PointNormalCloud::Ptr output_cloud,
                                bool result);
 
     bool addZCoordinateToCloudFromPlaneCoefficients(PointCloud2D::Ptr input_cloud,

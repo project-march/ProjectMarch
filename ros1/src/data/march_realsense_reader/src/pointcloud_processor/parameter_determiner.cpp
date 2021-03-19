@@ -28,7 +28,7 @@ ParameterDeterminer::ParameterDeterminer(YAML::Node config_tree, bool debugging)
 
 }
 
-bool SimpleParameterDeterminer::determine_parameters(
+bool HullParameterDeterminer::determine_parameters(
         boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
@@ -53,7 +53,7 @@ bool SimpleParameterDeterminer::determine_parameters(
 * This process is repeated for each hull. If each point in the input_cloud has been moved to the output cloud,
 * result is set to true, it is set to false otherwise **/
 bool HullParameterDeterminer::cropCloudToHullVector(PointCloud2D::Ptr const input_cloud,
-                                                    Normals::Ptr output_cloud,
+                                                    PointNormalCloud::Ptr output_cloud,
                                                     bool result)
 {
   bool success = true;
@@ -69,11 +69,13 @@ bool HullParameterDeterminer::cropCloudToHullVector(PointCloud2D::Ptr const inpu
     PointNormalCloud::Ptr elevated_cloud_with_normals (new PointNormalCloud);
     addNormalToCloudFromPlaneCoefficients(elevated_cloud,
                                           plane_coefficients_vector_->at(hull_index),
-                                          elevated_cloud_with_normals)
+                                          elevated_cloud_with_normals);
 
     *output_cloud += *elevated_cloud_with_normals;
   }
   result = (output_cloud->points.size() == input_cloud->points.size());
+
+  return success;
 }
 
 bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
