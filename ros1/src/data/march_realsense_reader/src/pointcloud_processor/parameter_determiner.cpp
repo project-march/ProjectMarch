@@ -54,6 +54,8 @@ bool HullParameterDeterminer::determine_parameters(
 
   success &= getOptimalFootLocation();
 
+  ROS_DEBUG_STREAM("")
+
   return success;
 };
 
@@ -79,7 +81,7 @@ bool getOptimalFootLocation(PointNormalCloud possible_foot_locations);
 {
   if (possible_foot_locations->points.size() == 0)
   {
-
+    ROS_ERROR_STREAM("Possible_")
   }
   double min_distance_to_most_desirable_location = std::numeric_limits<double>::max();
 
