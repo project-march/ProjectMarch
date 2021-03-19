@@ -9,6 +9,8 @@ topics:
       type: 'actionlib_msgs/msg/GoalID' }
   - { topic: 'march/controller/trajectory/follow_joint_trajectory/goal',
       type: 'march_shared_msgs/msg/FollowJointTrajectoryActionGoal' }
+  - { topic: 'march/controller/trajectory/follow_joint_trajectory/feedback',
+      type: 'march_shared_msgs/msg/FollowJointTrajectoryActionFeedback' }
   - { topic: 'march/controller/trajectory/follow_joint_trajectory/result',
       type: 'march_shared_msgs/msg/FollowJointTrajectoryActionResult' }
   - { topic: 'march/controller/trajectory/follow_joint_trajectory/status',
