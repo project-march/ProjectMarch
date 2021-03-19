@@ -191,6 +191,9 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
     // print desired_states vector
     for (int j = 0; j < desired_states.size(); ++j) {
       std::cout << desired_states[j].position[i] << " ";
+      model_predictive_controllers_[i].reference[j][0] = desired_states[j].position[i];
+      model_predictive_controllers_[i].reference[j][1] = desired_states[j].velocity[i];
+      model_predictive_controllers_[i].reference[j][2] = 0.0;
     }
     std::cout << std::endl;
 
