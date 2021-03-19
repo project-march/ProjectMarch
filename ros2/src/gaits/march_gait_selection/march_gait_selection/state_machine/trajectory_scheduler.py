@@ -5,12 +5,14 @@ from march_utility.utilities.duration import Duration
 from rclpy.time import Time
 from rclpy.callback_groups import ReentrantCallbackGroup
 from std_msgs.msg import Header
-from actionlib_msgs.msg import GoalID
 from march_shared_msgs.msg import (
     FollowJointTrajectoryGoal,
     FollowJointTrajectoryActionGoal,
     FollowJointTrajectoryActionResult,
-    FollowJointTrajectoryResult
+    FollowJointTrajectoryResult,
+    FollowJointTrajectoryActionFeedback,
+    GoalID,
+    GoalStatus
 )
 from trajectory_msgs.msg import JointTrajectory
 
@@ -25,7 +27,8 @@ class TrajectoryScheduler(object):
         self._last_goal = None
 
         # Values of previous scheduled trajectory
-        self._previous_trajectory_end_time = None
+        self._trajectory_end_time = None
+        self._trajectory_duration = None
 
         # Temporary solution to communicate with ros1 action server, should
         # be updated to use ros2 action implementation when simulation is
@@ -42,13 +45,13 @@ class TrajectoryScheduler(object):
             qos_profile=5,
         )
         
-        # self._trajectory_goal_result_sub = self._node.create_subscription(
-        #     msg_type=FollowJointTrajectoryActionFeedback,
-        #     topic="/march/controller/trajectory/follow_joint_trajectory/feedback",
-        #     callback=self._feedback_cb,
-        #     callback_group=ReentrantCallbackGroup,
-        #     qos_profile=10,
-        # )
+        self._trajectory_goal_result_sub = self._node.create_subscription(
+            msg_type=FollowJointTrajectoryActionFeedback,
+            topic="/march/controller/trajectory/follow_joint_trajectory/feedback",
+            callback=self._feedback_cb,
+            callback_group=ReentrantCallbackGroup(),
+            qos_profile=10,
+        )
 
         self._trajectory_goal_result_sub = self._node.create_subscription(
             msg_type=FollowJointTrajectoryActionResult,
@@ -64,16 +67,20 @@ class TrajectoryScheduler(object):
         with a delay of the previous subgait.
         """
         self._failed = False
+        self._trajectory_duration = Duration.from_msg(trajectory.points[-1].time_from_start)
         now = self._node.get_clock().now()
         if should_delay_start and self._can_delay_start():
-            trajectory.header.stamp = self._previous_trajectory_end_time.to_msg()
-            self._previous_trajectory_end_time += Duration.from_msg(trajectory.points[-1].time_from_start)
+            trajectory.header.stamp = self._trajectory_end_time.to_msg()
+            self._trajectory_end_time += self._trajectory_duration
+            goal_id = 'Intermediate subgait'
         else:
-            start_time = now + Duration(seconds=0.3)
-            self._previous_trajectory_end_time = start_time + Duration.from_msg(trajectory.points[-1].time_from_start)
-            trajectory.header.stamp = start_time.to_msg()
+            goal_id = 'First subgait'
+            # start_time = now + Duration(seconds=0.3)
+            # self._previous_trajectory_end_time = start_time + Duration.from_msg(trajectory.points[-1].time_from_start)
+            # trajectory.header.stamp = start_time.to_msg()
             # self._previous_trajectory_end_time = now + Duration.from_msg(trajectory.points[-1].time_from_start)
 
+        self._node.get_logger().info(f'Goal id: {goal_id}')
         self._node.get_logger().info('Schedule time: ' +
                                      str(now.to_msg().sec + round(
                                          now.to_msg().nanosec / 1e9, 2)))
@@ -85,17 +92,19 @@ class TrajectoryScheduler(object):
         self._trajectory_goal_pub.publish(
             FollowJointTrajectoryActionGoal(
                 header=Header(stamp=now.to_msg()),
-                goal_id=GoalID(stamp=now.to_msg()), goal=goal
+                goal_id=GoalID(stamp=now.to_msg(), id=goal_id), goal=goal
             )
         )
 
     def reset_previous_trajectory_values(self):
         "Reset previous trajectory values"
-        self._previous_trajectory_end_time = None
+        self._trajectory_end_time = None
+        self._trajectory_duration = None
 
     def _can_delay_start(self):
         """Start can be delayed if both previous values are not None."""
-        return self._previous_trajectory_end_time is not None
+        return self._trajectory_end_time is not None and \
+               self._trajectory_duration is not None
 
     def failed(self):
         return self._failed
@@ -110,5 +119,9 @@ class TrajectoryScheduler(object):
             )
             self._failed = True
 
-    # def _feedback_cb(self, feedback):
-    #     pass
+    def _feedback_cb(self, msg: FollowJointTrajectoryActionFeedback):
+        # Set trajectory end time for the first goal that is accepted
+        if self._trajectory_end_time is None and \
+            msg.status.goal_id.id == 'First subgait' and \
+            msg.status.status == GoalStatus.ACTIVE:
+            self._trajectory_end_time = Time.from_msg(msg.header.stamp) + self._trajectory_duration

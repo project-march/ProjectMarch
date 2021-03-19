@@ -74,7 +74,7 @@ class SetpointsGait(GaitInterface, Gait):
         self._is_transitioning = False
         self._time_since_start = Duration(0)
         self._scheduled_next_subgait = False
-        self._subgait_end_time = start_time + self._current_subgait.duration + Duration(seconds=0.3)
+        self._subgait_end_time = start_time + self._current_subgait.duration #+ Duration(seconds=0.3)
         return self._current_subgait.to_joint_trajectory_msg()
 
     def update(self, current_time: Time, node):
@@ -88,8 +88,8 @@ class SetpointsGait(GaitInterface, Gait):
         """
         duration = Duration(seconds=0.2)
 
-        if not self._scheduled_next_subgait and current_time > self._subgait_end_time - duration:
-            return self._update_next_subgait_early(node)
+        # if not self._scheduled_next_subgait and current_time > self._subgait_end_time - duration:
+        #     return self._update_next_subgait_early(node)
 
         if current_time < self._subgait_end_time:
             return None, False

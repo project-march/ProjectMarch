@@ -1,3 +1,3 @@
 std_msgs/Header header
-actionlib_msgs/GoalID goal_id
+GoalID goal_id
 FollowJointTrajectoryGoal goal
