@@ -19,6 +19,14 @@ RegionCreator::RegionCreator(YAML::Node config_tree, bool debugging):
 
 }
 
+// Construct a basic CHullFinder class
+RegionGrower::RegionGrower(YAML::Node config_tree, bool debugging):
+    RegionCreator(config_tree, debugging)
+
+{
+  read_yaml();
+}
+
 bool RegionGrower::create_regions(PointCloud::Ptr pointcloud,
                                          Normals::Ptr pointcloud_normals,
                                          boost::shared_ptr<RegionVector>
@@ -32,7 +40,6 @@ bool RegionGrower::create_regions(PointCloud::Ptr pointcloud,
   clock_t start_region_grow = clock();
 
   bool success = true;
-  success &= read_yaml();
   success &= setup_region_grower();
   success &= extract_regions();
 
@@ -43,7 +50,7 @@ bool RegionGrower::create_regions(PointCloud::Ptr pointcloud,
 
   return success;
 }
-bool RegionGrower::read_yaml()
+void RegionGrower::read_yaml()
 {
   if (YAML::Node region_growing_parameters = config_tree_["region_growing"])
   {
@@ -52,12 +59,10 @@ bool RegionGrower::read_yaml()
     max_cluster_size = yaml_utilities::grabParameter<int>(region_growing_parameters, "max_cluster_size");
     smoothness_threshold = yaml_utilities::grabParameter<double>(region_growing_parameters, "smoothness_threshold");
     curvature_threshold = yaml_utilities::grabParameter<double>(region_growing_parameters, "curvature_threshold");
-    return true;
   }
   else
   {
     ROS_ERROR("'region_growing' parameters not found in parameter file");
-    return false;
   }
 }
 

@@ -47,9 +47,8 @@ protected:
 class CHullFinder : HullFinder
 {
 public:
-    //Use the constructors defined in the super class
-    //Use the constructors defined in the super class
-    using HullFinder::HullFinder;
+    /** Basic constructor for simple preprocessor, this will also read the yaml **/
+    CHullFinder(YAML::Node config_tree, bool debugging);
     /** This function should take in a pointcloud with matching normals and
      * regions, and turn this into chulls where the foot can be located. **/
     bool find_hulls(PointCloud::Ptr pointcloud,
@@ -82,7 +81,8 @@ protected:
     bool getAveragePointAndNormal(std::vector<double> & average_point, std::vector<double> & average_normal);
 
     // Read all the relevant parameters from the yaml file
-    bool readYaml();
+    void readYaml();
+
     bool convex;
     double alpha;
     int hull_dimension;

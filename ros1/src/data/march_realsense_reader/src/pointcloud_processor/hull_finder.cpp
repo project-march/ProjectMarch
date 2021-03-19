@@ -3,6 +3,7 @@
 #include <ros/ros.h>
 #include <utilities/output_utilities.h>
 #include <utilities/yaml_utilities.h>
+#include <utilities/linear_algebra_utilities.h>
 #include <cmath>
 
 #include <pcl/surface/convex_hull.h>
@@ -29,6 +30,14 @@ HullFinder::HullFinder(YAML::Node config_tree, bool debugging):
 
 }
 
+// Construct a basic CHullFinder class
+CHullFinder::CHullFinder(YAML::Node config_tree, bool debugging):
+        HullFinder(config_tree, debugging)
+
+{
+  readYaml();
+}
+
 bool CHullFinder::find_hulls(
      PointCloud::Ptr pointcloud,
      Normals::Ptr pointcloud_normals,
@@ -50,8 +59,6 @@ bool CHullFinder::find_hulls(
 
   bool success = true;
 
-  success &= readYaml();
-
   for (region_index_ = 0; region_index_ < region_vector_->size(); region_index_++)
   {
     region_ = region_vector_->at(region_index_);
@@ -68,7 +75,7 @@ bool CHullFinder::find_hulls(
 }
 
 // Read all relevant parameters from the parameter yaml file
-bool CHullFinder::readYaml()
+void CHullFinder::readYaml()
 {
   if (YAML::Node c_hull_finder_parameters = config_tree_["c_hull_finder"])
   {
@@ -79,9 +86,7 @@ bool CHullFinder::readYaml()
   else
   {
     ROS_ERROR("'c_hull_finder' parameters not found in parameter file");
-    return false;
   }
-  return true;
 }
 
 // Converts a region into a convex or concave hull
@@ -143,10 +148,8 @@ bool CHullFinder::getPlaneCoefficientsRegion()
   // all the vectors in the plane are perpendicular to the normal
   plane_coefficients_->values.assign(average_normal.begin(), average_normal.end());
   // the final coefficient can be calculated with the plane equation ax + by + cz + d = 0
-  plane_coefficients_->values.push_back( - (
-          average_point[0] * average_normal[0] +
-          average_point[1] * average_normal[1] +
-          average_point[2] * average_normal[2]));
+  plane_coefficients_->values.push_back(
+          -linear_algebra_utilities::dotProductVector<double>(average_point, average_normal));
 
   ROS_DEBUG_STREAM("Region " << region_index_ << " has plane coefficients: " <<
                    output_utilities::vectorToString(plane_coefficients_->values));
@@ -235,9 +238,7 @@ bool CHullFinder::getAveragePointAndNormal(std::vector<double> & average_point,
     // The norm is generally close to 1, but this need not be the case
     // e.g. if the orientation of the normals is not consistent.
     float minimum_norm_allowed = 0.05;
-    if (average_normal[0] * average_normal[0] +
-        average_normal[1] * average_normal[1] +
-        average_normal[2] * average_normal[2] < minimum_norm_allowed)
+    if (linear_algebra_utilities::dotProductVector<double>(average_normal, average_normal) < minimum_norm_allowed)
     {
       ROS_ERROR_STREAM("Computed average normal of region is too close to zero. Plane parameters will be inaccurate."
                        "Average normal of region " << region_index_ <<
