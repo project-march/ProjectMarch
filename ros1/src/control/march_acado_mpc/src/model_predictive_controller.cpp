@@ -3,7 +3,6 @@
 #include "model_predictive_controller.hpp"
 #include "acado_common.h"
 #include <acado_auxiliary_functions.h>
-#include "mpc_references.h"
 #include <ros/console.h>
 
 #include <iostream>
