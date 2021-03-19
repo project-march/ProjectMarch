@@ -146,6 +146,13 @@ limitations under the License.
     </joint>
     <link name="${name}_color_optical_frame"/>
 
+    <link name="${name}_imu_optical_frame"/>
+    <joint name="${name}_imu_optical_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}"/>
+      <parent link="${name}_depth_frame" />
+      <child link="${name}_imu_optical_frame"/>
+    </joint>
+
     <!-- Realsense Gazebo Plugin -->
     <xacro:if value="${plugin}">
       <xacro:gazebo_d435 camera_name="${name}" reference_link="${name}_link" topics_ns="${topics_ns}" depth_optical_frame="${name}_depth_optical_frame" color_optical_frame="${name}_color_optical_frame" infrared1_optical_frame="${name}_left_ir_optical_frame" infrared2_optical_frame="${name}_right_ir_optical_frame" publish_pointcloud="${publish_pointcloud}"/>

@@ -1,17 +1,9 @@
 preprocessor:
   downsampling:
+    voxel_grid_filter: false
     leaf_size: 0.05
-
-  statistical_outlier_filter:
-    do_statistical_outlier_removal: false
-    sd_factor: 2.0
-    number_of_neighbours: 10
-
-  transformation:
-    rotation_y: 0.05 # - pi / 4
-    translation_x: 0.1
-    translation_y: 0.0
-    translation_z: 0.4 # an estimation of where the foot could be
+    random_filter: true
+    remaining_points: 5000
 
   normal_estimation:
     use_tree_search_method: true
@@ -23,9 +15,17 @@ preprocessor:
 
   normal_filter:
     # We only interested in points who's normal is mainly in the z direction
-    allowed_length_x: 0.7
-    allowed_length_y: 0.8
+    allowed_length_x: 0.5
+    allowed_length_y: 0.4
     allowed_length_z: 1.0 # 1.0 is max length of a normal vector
+
+region_creator:
+  region_growing:
+    number_of_neighbours: 10
+    min_cluster_size: 100
+    max_cluster_size: 1000000
+    smoothness_threshold: 0.0698 # 4 / 180 * pi
+    curvature_threshold: 0.5
 
 debug: true
 

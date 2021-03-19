@@ -1,0 +1,19 @@
+description: Example testjoint subgait
+duration: 6000000000
+gait_type: ''
+joints:
+  rotational_joint:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.45974312
+    time_from_start: 2000000000
+    velocity: 0.0
+  - position: 0.45974312
+    time_from_start: 4000000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 6000000000
+    velocity: 0.0
+name: perform_test
+version: example

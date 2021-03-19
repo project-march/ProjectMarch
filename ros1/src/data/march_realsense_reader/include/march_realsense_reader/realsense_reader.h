@@ -51,6 +51,7 @@ public:
 
     // Publishes the pointcloud on a topic for visualisation in rviz or furter use
     void publishPreprocessedPointCloud(PointCloud::Ptr pointcloud);
+    void publishRegionCreatorPointCloud();
 
 private:
     ros::NodeHandle* n_;
@@ -58,8 +59,9 @@ private:
     PointCloud last_pointcloud_;
     ros::ServiceServer read_pointcloud_service_;
     ros::Publisher preprocessed_pointcloud_publisher_;
+    ros::Publisher region_pointcloud_publisher_;
     std::unique_ptr<NormalsPreprocessor> preprocessor_;
-    std::unique_ptr<SimpleRegionCreator> region_creator_;
+    std::unique_ptr<RegionGrower> region_creator_;
     std::unique_ptr<SimpleHullFinder> hull_finder_;
     std::unique_ptr<SimpleParameterDeterminer> parameter_determiner_;
     bool debugging_;
