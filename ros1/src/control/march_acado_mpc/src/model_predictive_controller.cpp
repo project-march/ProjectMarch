@@ -29,18 +29,33 @@ void ModelPredictiveController::init() {
   // Initialize the solver
   acado_initializeSolver();
 
-  // Prepare a consistent initial guess
-  for (int i = 0; i < ACADO_N + 1; i++) {
-    acadoVariables.x[i * ACADO_NX    ] = 0;     // theta
-    acadoVariables.x[i * ACADO_NX + 1] = 0; // dtheta
+  // Set states, input and reference arrays to zero
+  for (int i = 0; i < ACADO_N; ++i)
+  {
+    // Initialize states with zero
+    for (int j = 0; j < ACADO_NX; ++j)
+    {
+      acadoVariables.x[i * ACADO_NX + j] = 0.0;
+    }
+
+    // Initialize control with zero
+    for (int j = 0; j < ACADO_NU; ++j)
+    {
+      acadoVariables.u[i * ACADO_NU + j] = 0.0;
+    }
+
+    // Initialize running reference with zero
+    for (int j = 0; j < ACADO_NY; ++j)
+    {
+      acadoVariables.y[i * ACADO_NY + j] = 0.0;
+    }
   }
 
-  // Fill reference vector with sinus and or step signals
-//  sinRef(reference, 0.2, 0.785, ACADO_N, 0.001);
-  stepRef(reference, 0.261, ACADO_N);
-
-  // Set the reference
-  setReference(reference);
+  // Initialize end reference with zero
+  for (int i = 0; i < ACADO_NYN; ++i)
+  {
+    acadoVariables.yN[i] = 0.0;
+  }
 
   // Current state feedback
   setInitialState(x0);
@@ -132,9 +147,6 @@ void ModelPredictiveController::calculateControlInput() {
   // Set initial state
   setInitialState(x0);
 
-  // Set reference
-  setReference(reference);
-
   // Preparation step (timed)
   acado_tic(&t);
   preparationStepStatus = acado_preparationStep();
@@ -151,11 +163,6 @@ void ModelPredictiveController::calculateControlInput() {
   // Shift states and control and prepare for the next iteration
   acado_shiftStates(2, 0, 0);
   acado_shiftControls(0);
-
-  // Scroll the reference vector
-  if(repeat_reference) {
-      scrollReference(reference);
-  }
 
   // Perform a diagnosis on the controller
   controllerDiagnosis();
