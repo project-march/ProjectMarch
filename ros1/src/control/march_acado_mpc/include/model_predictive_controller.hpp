@@ -16,7 +16,6 @@ public:
     vector<double> x0{0,0};             // Current state
     double u;                           // Calculated control input
     vector<vector<double>> reference;   // Current reference
-    bool repeat_reference = true;      // Periodically Repeat the reference
     std::string joint_name;
 
     // Error enums
@@ -52,10 +51,11 @@ public:
     void setInitialState(vector<double> x0);
 
     /**
-     * \brief Set the reference
+     * \brief Set the reference for time step n in [0, N]
+     * @param n
      * @param reference
      */
-    void setReference(vector<vector<double>> reference);
+    void setReference(int n, std::vector<double> reference);
 
     /**
      * \brief Assign the weighting matrix values
