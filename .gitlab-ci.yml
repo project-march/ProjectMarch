@@ -12,6 +12,7 @@ stages:
 image: registry.gitlab.com/project-march/march:$CI_COMMIT_BRANCH
 
 before_script:
+  - apt install git
   - git submodule sync --recursive
   - git submodule update --init --recursive
 
