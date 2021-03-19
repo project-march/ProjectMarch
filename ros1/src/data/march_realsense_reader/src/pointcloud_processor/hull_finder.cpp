@@ -8,7 +8,6 @@
 #include <pcl/surface/convex_hull.h>
 #include <pcl/filters/project_inliers.h>
 #include <pcl/surface/concave_hull.h>
-#include <pcl/filters/crop_hull.h>
 #include <pcl/filters/extract_indices.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -107,7 +106,7 @@ bool CHullFinder::getCHullFromRegion()
 
   if (hull_->points.size() == 0)
   {
-    ROS_WARN_STREAM("Hull of region " << region_index_ << " Consists of zero points");
+    ROS_ERROR_STREAM("Hull of region " << region_index_ << " Consists of zero points");
     return false;
   }
 

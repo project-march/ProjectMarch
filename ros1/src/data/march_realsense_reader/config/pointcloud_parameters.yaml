@@ -17,21 +17,36 @@ preprocessor:
     # We only interested in points who's normal is mainly in the z direction
     allowed_length_x: 0.5
     allowed_length_y: 0.4
-    allowed_length_z: 1.0 # 1.0 is max length of a normal vector
+    # 1.0 is max length of a normalized vector
+    allowed_length_z: 1.0
 
 region_creator:
   region_growing:
     number_of_neighbours: 10
     min_cluster_size: 100
     max_cluster_size: 1000000
-    smoothness_threshold: 0.0698 # 4 / 180 * pi
+    # 4 / 180 * pi
+    smoothness_threshold: 0.0698
     curvature_threshold: 0.5
 
 hull_finder:
   c_hull_finder:
-    convex: true # If set to false, find concave hulls.
-    alpha: 0.5 # Governs the detail of concave hulls, smaller is more detail.
+    # If convex is set to false, find concave hulls.
+    convex: true
+    # Alpha governs the detail of concave hulls, smaller is more detail.
+    alpha: 0.5
     hull_dimension: 2
+
+parameter_determiner:
+  hull_parameter_determiner:
+    number_of_optional_foot_locations: 10
+    stairs_locations:
+      min_x_stairs: 0.2
+      max_x_stairs: 0.4
+      min_z_stairs: 0.1
+      max_z_stairs: 0.3
+      # Since we transform to the relevant foot, the y component of the foot location should be 0
+      y_location: 0
 
 debug: true
 
