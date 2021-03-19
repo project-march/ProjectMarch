@@ -19,10 +19,9 @@ namespace output_utilities
   template<typename T>
   std::string pointToString(T point)
   {
-    return string =
-            std::to_string(point.x) + ",   " +
-            std::to_string(point.y) + ",   " +
-            std::to_string(point.z);
+    return std::to_string(point.x) + ",   " +
+           std::to_string(point.y) + ",   " +
+           std::to_string(point.z);
   }
 }
 

@@ -50,7 +50,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
           getConfigIfPresent("region_creator"), debugging_);
   hull_finder_ = std::make_unique<CHullFinder>(
       getConfigIfPresent("hull_finder"), debugging_);
-  parameter_determiner_ = std::make_unique<SimpleParameterDeterminer>(
+  parameter_determiner_ = std::make_unique<HullParameterDeterminer>(
       getConfigIfPresent("parameter_determiner"), debugging_);
 
 
@@ -149,10 +149,12 @@ bool RealSenseReader::process_pointcloud(
       boost::make_shared<PlaneCoefficientsVector>();
   boost::shared_ptr<HullVector> hull_vector = boost::make_shared<HullVector>();
   boost::shared_ptr<PolygonVector> polygon_vector = boost::make_shared<PolygonVector>();
+  bool for_right_foot = false;
   // Find hulls
   bool hull_finding_was_successful =
       hull_finder_->find_hulls(pointcloud, normals, region_vector,
-                               plane_coefficients_vector, hull_vector, polygon_vector);
+                               plane_coefficients_vector, hull_vector,
+                               for_right_foot, polygon_vector);
   if (not hull_finding_was_successful)
   {
     res.error_message = "Hull finding was unsuccessful, see debug output "

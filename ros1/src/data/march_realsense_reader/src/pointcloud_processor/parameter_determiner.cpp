@@ -3,9 +3,9 @@
 #include <pcl_ros/point_cloud.h>
 #include <pcl/filters/crop_hull.h>
 #include <ros/package.h>
-#include <geometry_msgs>
 #include "yaml-cpp/yaml.h"
 #include "utilities/realsense_gait_utilities.h"
+#include "utilities/output_utilities.h"
 #include "pointcloud_processor/parameter_determiner.h"
 #include "march_shared_msgs/GaitParameters.h"
 
@@ -54,7 +54,7 @@ bool HullParameterDeterminer::determine_parameters(
 
   success &= getOptimalFootLocation();
 
-  ROS_DEBUG_STREAM("The optimal foot location is " << output_utilities::pointToString(optimal_foot_location));
+  ROS_DEBUG_STREAM("The optimal foot location is " << output_utilities::pointToString(optimal_foot_location_));
 
   return success;
 };
@@ -65,51 +65,58 @@ bool HullParameterDeterminer::getOptimalFootLocation()
 
   // Get some locations on the ground we might want to place our foot
   PointCloud2D::Ptr foot_locations_to_try (new PointCloud2D);
-  getOptionalFootLocations(foot_locations_to_try);
+  success &= getOptionalFootLocations(foot_locations_to_try);
 
   // Crop those locations to only be left with locations where it is possible to place the foot
   PointNormalCloud::Ptr possible_foot_locations (new PointNormalCloud);
-  succes &= cropCloudToHullVector(foot_location_to_try, possible_foot_locations);
+  success &= cropCloudToHullVector(foot_location_to_try, possible_foot_locations);
 
   // Get the location where we would ideally place the foot
-  getMostDesirableLocation();
+  success &= getMostDesirableLocation();
 
-  getOptimalFootLocation(possible_foot_locations);
+  success &= getOptimalFootLocation(possible_foot_locations);
+
+  return success;
 }
 
-bool getOptimalFootLocation(PointNormalCloud possible_foot_locations);
+bool getOptimalFootLocation(PointNormalCloud possible_foot_locations)
 {
   if (possible_foot_locations->points.size() == 0)
   {
-    ROS_ERROR_STREAM("Possible_")
+    ROS_ERROR_STREAM("");
+    return false;
   }
+
   double min_distance_to_most_desirable_location = std::numeric_limits<double>::max();
 
   for (pcl::PointNormal possible_foot_location : *possible_foot_locations)
   {
-    double distance_to_most_desirable_location = (possible_foot_location.x - most_desirable_location.x) *
-                                                 (possible_foot_location.x - most_desirable_location.x) +
-                                                 (possible_foot_location.y - most_desirable_location.y) *
-                                                 (possible_foot_location.y - most_desirable_location.y) +
-                                                 (possible_foot_location.z - most_desirable_location.z) *
-                                                 (possible_foot_location.z - most_desirable_location.z);
+    double distance_to_most_desirable_location =
+            (possible_foot_location.x - most_desirable_foot_location_.x) *
+            (possible_foot_location.x - most_desirable_foot_location_.x) +
+            (possible_foot_location.y - most_desirable_foot_location_.y) *
+            (possible_foot_location.y - most_desirable_foot_location_.y) +
+            (possible_foot_location.z - most_desirable_foot_location_.z) *
+            (possible_foot_location.z - most_desirable_foot_location_.z);
 
     if (distance_to_most_desirable_location < min_distance_to_most_desirable_location)
     {
       min_distance_to_most_desirable_location = distance_to_most_desirable_location;
-      optimal_foot_location = possible_foot_location;
+      optimal_foot_location_ = possible_foot_location;
     }
   }
+  return true;
 }
 
-void getMostDesirableLocation()
+bool getMostDesirableLocation()
 {
-  most_desirable_foot_location.x = (min_x_stairs + max_x_stairs) / 2.0;
-  most_desirable_foot_location.y = y_location;
-  most_desirable_foot_location.z = (min_z_stairs + max_z_stairs) / 2.0;
+  most_desirable_foot_location_.x = (min_x_stairs + max_x_stairs) / 2.0;
+  most_desirable_foot_location_.y = y_location;
+  most_desirable_foot_location_.z = (min_z_stairs + max_z_stairs) / 2.0;
+  return true;
 }
 
-void HullParameterDeterminer::getOptionalFootLocations(PointCloud::Ptr foot_locations_to_try)
+bool HullParameterDeterminer::getOptionalFootLocations(PointCloud2D::Ptr foot_locations_to_try)
 {
   foot_location_to_try->points.resize(number_of_optional_foot_locations);
   if (selected_obstacle_ == SelectedGait.stairs_up ||
@@ -123,6 +130,7 @@ void HullParameterDeterminer::getOptionalFootLocations(PointCloud::Ptr foot_loca
       foot_locations_to_try->points[i].y = y_location;
     }
   }
+  return true;
 }
 
 /** For each hull, the input cloud's z coordinate is set so that it
@@ -167,13 +175,13 @@ bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
 {
   if (hull_vector_->size() == 0)
   {
-    ROS_ERROR_STREAM("The hull vector of the HullParameterDeterminer has size 0, cannot crop cloud to hulls.")
+    ROS_ERROR_STREAM("The hull vector of the HullParameterDeterminer has size 0, cannot crop cloud to hulls.");
     return false;
   }
   elevated_cloud->points.resize(input_cloud->points.size());
 
   int point_index = 0;
-  for (pcl::PointXY elevated_point : *elevated_cloud)
+  for (pcl::PointXYZ elevated_point : *elevated_cloud)
   {
     // using z = - (d + by + ax) / c from plane equation ax + by + cz + d = 0
     input_point = input_cloud->points[p]
@@ -195,7 +203,7 @@ bool HullParameterDeterminer::cropCloudToHull(
 {
   if (elevated_cloud->points.size() == 0)
   {
-    ROS_WARN_STREAM("The cloud to be cropped in the HullParameterDeterminer contains no points.")
+    ROS_WARN_STREAM("The cloud to be cropped in the HullParameterDeterminer contains no points.");
     return false;
   }
   pcl::CropHull<pcl::PointXYZ> crop_filter;
@@ -222,7 +230,7 @@ bool HullParameterDeterminer::addNormalToCloudFromPlaneCoefficients(
   if (normalising_constant < std::numeric_limits<double>::epsilon())
   {
     ROS_ERROR_STREAM("The normal vector of the current plane is too close "
-                     "to the zero vector.")
+                     "to the zero vector.");
     return false;
   }
 
@@ -238,7 +246,7 @@ bool HullParameterDeterminer::addNormalToCloudFromPlaneCoefficients(
     elevated_point_with_normal.normal_x = plane_coefficients->values[0] / normalising_constant;
     elevated_point_with_normal.normal_y = plane_coefficients->values[1] / normalising_constant;
     elevated_point_with_normal.normal_z = plane_coefficients->values[2] / normalising_constant;
-    p++
+    p++;
   }
   return true;
 }

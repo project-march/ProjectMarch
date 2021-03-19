@@ -32,6 +32,7 @@ public:
       boost::shared_ptr<HullVector> const hull_vector,
       boost::shared_ptr<PolygonVector> const polygon_vector,
       SelectedGait const selected_obstacle,
+      bool const for_right_foot,
       boost::shared_ptr<GaitParameters> gait_parameters)=0;
 
   virtual ~ParameterDeterminer() {};
@@ -62,6 +63,7 @@ public:
       boost::shared_ptr<HullVector> const hull_vector,
       boost::shared_ptr<PolygonVector> const polygon_vector,
       SelectedGait const selected_obstacle,
+      bool const for_right_foot,
       boost::shared_ptr<GaitParameters> gait_parameters) override;
 
 protected:
@@ -82,11 +84,18 @@ protected:
                                              PlaneCoefficients::Ptr plane_coefficients,
                                              PointNormalCloud::Ptr elevated_cloud_with_normals);
 
+  bool getOptimalFootLocation(PointNormalCloud possible_foot_locations);
+
+  bool getOptionalFootLocations(PointCloud2D::Ptr foot_locations_to_try);
+
+  bool getMostDesirableLocation();
+
+  bool getOptimalFootLocation();
+
   SelectedGait selected_obstacle_;
   bool for_right_foot_;
-  geometry_msgs::Point optimal_foot_location_;
-  geometry_msgs::Point most_desirable_foot_location;
-
+  pcl::PointXYZ optimal_foot_location_;
+  pcl::PointXYZ most_desirable_foot_location;
 };
 
 /** The simple parameter determiner
@@ -103,6 +112,7 @@ public:
           boost::shared_ptr<HullVector> const hull_vector,
           boost::shared_ptr<PolygonVector> const polygon_vector,
           SelectedGait const selected_obstacle,
+          bool const for_right_foot,
           boost::shared_ptr<GaitParameters> gait_parameters) override;
 };
 
