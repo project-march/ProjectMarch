@@ -54,7 +54,7 @@ bool HullParameterDeterminer::determine_parameters(
 
   success &= getOptimalFootLocation();
 
-  ROS_DEBUG_STREAM("")
+  ROS_DEBUG_STREAM("The optimal foot location is " << output_utilities::pointToString(optimal_foot_location));
 
   return success;
 };
