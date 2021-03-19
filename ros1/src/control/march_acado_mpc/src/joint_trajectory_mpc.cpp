@@ -170,7 +170,7 @@ void ModelPredictiveControllerInterface::setMpcMsg(int joint_number)
 }
 
 void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/, const ros::Duration& period,
-                                                       const std::vector<joint_trajectory_controller::State>&  /*desired_states*/,
+                                                       const std::vector<joint_trajectory_controller::State>&  desired_states,
                                                        const joint_trajectory_controller::State& state_error)
 {
   // Preconditions
@@ -187,6 +187,12 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
     // Get current joint state
     state = {(*joint_handles_ptr_)[i].getPosition(), (*joint_handles_ptr_)[i].getVelocity()};
     model_predictive_controllers_[i].x0 = state;
+
+    // print desired_states vector
+    for (int j = 0; j < desired_states.size(); ++j) {
+      std::cout << desired_states[j].position[i] << " ";
+    }
+    std::cout << std::endl;
 
     // Calculate mpc control signal
     model_predictive_controllers_[i].calculateControlInput();
