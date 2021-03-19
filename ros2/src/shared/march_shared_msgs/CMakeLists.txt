@@ -44,8 +44,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/joint_trajectory/FollowJointTrajectoryActionResult.msg"
   "msg/joint_trajectory/FollowJointTrajectoryFeedback.msg"
   "msg/joint_trajectory/FollowJointTrajectoryActionFeedback.msg"
-  "msg/joint_trajectory/GoalID.msg"
-  "msg/joint_trajectory/GoalStatus.msg"
   "msg/input_device/GaitInstruction.msg"
   "msg/input_device/GaitInstructionResponse.msg"
   "msg/hardware/HighVoltageNet.msg"
