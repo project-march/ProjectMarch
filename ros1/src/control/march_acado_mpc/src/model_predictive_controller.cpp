@@ -74,16 +74,22 @@ void ModelPredictiveController::setInitialState(vector<double> x0)
   }
 }
 
-void ModelPredictiveController::setReference(vector<vector<double>> reference)
-{
-    for(int i = 0; i < ACADO_N; i++) {
-        for(int j = 0; j < ACADO_NY; j++) {
-            acadoVariables.y[i * ACADO_NY + j] = reference[i][j];
-        }
+void ModelPredictiveController::setReference(int n, std::vector<double> reference) {
+  // check if size of reference at time step n is equal to size of ACADO_NY
+  ROS_WARN_STREAM_COND(ACADO_NY != reference.size(), joint_name << "");
+
+  if(n != ACADO_N) {
+    // set running reference
+    for (int i = 0; i < ACADO_NY ; ++i) {
+      acadoVariables.y[n * ACADO_NY + i] = reference[i];
     }
-    for(int j = 0; j < ACADO_NYN; j++) {
-        acadoVariables.yN[j] = reference[ACADO_N][j];
+  }
+  else {
+    // set end reference if n is equal to ACADO_N
+    for (int i = 0; i < ACADO_NYN ; ++i) {
+      acadoVariables.yN[i] = reference[i];
     }
+  }
 }
 
 void ModelPredictiveController::shiftStatesAndControl()
