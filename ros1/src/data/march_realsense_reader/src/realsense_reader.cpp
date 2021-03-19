@@ -222,9 +222,10 @@ void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_
   marker_list.pose.orientation.w= 1.0;
   marker_list.id = 0;
   marker_list.type = visualization_msgs::Marker::CUBE_LIST;
-  marker_list.scale.x = 0.07;
-  marker_list.scale.y = 0.07;
-  marker_list.scale.z = 0.07;
+  float cube_side_length = 0.07;
+  marker_list.scale.x = cube_side_length;
+  marker_list.scale.y = cube_side_length;
+  marker_list.scale.z = cube_side_length;
 
   for (pcl::PointCloud<pcl::PointXYZ>::Ptr hull: *hull_vector)
   {
