@@ -21,3 +21,23 @@
   ros2_package_name: 'march_shared_msgs'
   ros1_message_name: 'FollowJointTrajectoryActionResult'
   ros2_message_name: 'FollowJointTrajectoryActionResult'
+-
+  ros1_package_name: 'control_msgs'
+  ros2_package_name: 'march_shared_msgs'
+  ros1_message_name: 'FollowJointTrajectoryFeedback'
+  ros2_message_name: 'FollowJointTrajectoryFeedback'
+-
+  ros1_package_name: 'control_msgs'
+  ros2_package_name: 'march_shared_msgs'
+  ros1_message_name: 'FollowJointTrajectoryActionFeedback'
+  ros2_message_name: 'FollowJointTrajectoryActionFeedback'
+-
+  ros1_package_name: 'actionlib_msgs'
+  ros2_package_name: 'march_shared_msgs'
+  ros1_message_name: 'GoalID'
+  ros2_message_name: 'GoalID'
+-
+  ros1_package_name: 'actionlib_msgs'
+  ros2_package_name: 'march_shared_msgs'
+  ros1_message_name: 'GoalStatus'
+  ros2_message_name: 'GoalStatus'

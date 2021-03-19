@@ -1,3 +1,3 @@
 std_msgs/Header header
 actionlib_msgs/GoalStatus status
-FollowJointTrajectoryResult result
+FollowJointTrajectoryFeedback feedback
