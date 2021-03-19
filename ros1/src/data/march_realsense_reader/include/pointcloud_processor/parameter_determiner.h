@@ -8,7 +8,8 @@
 #include "utilities/realsense_gait_utilities.h"
 #include "march_shared_msgs/GetGaitParameters.h"
 
-using PointCloud2D = pcl::PontCloud<pcl::PointXY>:
+using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
+using PointNormalCloud = pcl::PointCloud<pcl::PointNormal>;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using Region = pcl::PointIndices;
@@ -27,7 +28,7 @@ public:
     ParameterDeterminer(YAML::Node config_tree, bool debugging);
     // This function is required to be implemented by any plane finder
     virtual bool determine_parameters(
-        boost::shared_ptr<PlaneParameterVector> const plane_parameter_vector,
+        boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
         SelectedGait const selected_obstacle,
@@ -36,7 +37,7 @@ public:
     virtual ~ParameterDeterminer() {};
 
 protected:
-    boost::shared_ptr<PlaneParameterVector> plane_parameter_vector_;
+    boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;
     boost::shared_ptr<HullVector> hull_vector_;
     boost::shared_ptr<PolygonVector> polygon_vector_;
     SelectedGait selected_obstacle_;
@@ -57,7 +58,7 @@ public:
     * hulls, and turn this into a location where the foot can be placed,
     * from this location, gaits parameters should be made. **/
     bool determine_parameters(
-        boost::shared_ptr<PlaneParameterVector> const plane_parameter_vector,
+        boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
         SelectedGait const selected_obstacle,
@@ -70,6 +71,17 @@ protected:
     bool cropCloudToHullVector(PointCloud2D::Ptr const input_cloud,
                                Normals::Ptr output_cloud,
                                bool result);
+
+    bool addZCoordinateToCloudFromPlaneCoefficients(PointCloud2D::Ptr input_cloud,
+                                                    PlaneCoefficients::Ptr plane_coefficients,
+                                                    PointCloud::Ptr elevated_cloud);
+
+    bool cropCloudToHull(PointCloud::Ptr elevated_cloud, Hull::Ptr hull, Polygon polygon);
+
+    bool addNormalToCloudFromPlaneCoefficients(PointCloud::Ptr elevated_cloud,
+                                               PlaneCoefficients::Ptr plane_coefficients,
+                                               PointNormalCloud::Ptr elevated_cloud_with_normals);
+
 };
 
 /** The simple parameter determiner
@@ -82,7 +94,7 @@ public:
   using ParameterDeterminer::ParameterDeterminer;
   /** A Simple implementation which return parameters of 0.5 **/
   bool determine_parameters(
-          boost::shared_ptr<PlaneParameterVector> const plane_parameter_vector,
+          boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
           boost::shared_ptr<HullVector> const hull_vector,
           boost::shared_ptr<PolygonVector> const polygon_vector,
           SelectedGait const selected_obstacle,
