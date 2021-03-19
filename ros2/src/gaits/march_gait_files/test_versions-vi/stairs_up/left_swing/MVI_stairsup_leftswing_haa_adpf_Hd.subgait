@@ -31,7 +31,7 @@ joints:
   left_hip_fe:
   - position: 0.0
     time_from_start: 0
-    velocity: 0.19194974
+    velocity: 0.17449976
   - position: 1.27409035
     time_from_start: 1880000000
     velocity: 0.0
