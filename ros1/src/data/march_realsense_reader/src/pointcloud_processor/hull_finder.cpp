@@ -30,6 +30,14 @@ HullFinder::HullFinder(YAML::Node config_tree, bool debugging):
 
 }
 
+// Construct a basic CHullFinder class
+CHullFinder::CHullFinder(YAML::Node config_tree, bool debugging):
+        config_tree_{config_tree},
+        debugging_{debugging}
+{
+  readYaml();
+}
+
 bool CHullFinder::find_hulls(
      PointCloud::Ptr pointcloud,
      Normals::Ptr pointcloud_normals,
@@ -51,8 +59,6 @@ bool CHullFinder::find_hulls(
 
   bool success = true;
 
-  success &= readYaml();
-
   for (region_index_ = 0; region_index_ < region_vector_->size(); region_index_++)
   {
     region_ = region_vector_->at(region_index_);
@@ -69,7 +75,7 @@ bool CHullFinder::find_hulls(
 }
 
 // Read all relevant parameters from the parameter yaml file
-bool CHullFinder::readYaml()
+void CHullFinder::readYaml()
 {
   if (YAML::Node c_hull_finder_parameters = config_tree_["c_hull_finder"])
   {
@@ -80,9 +86,7 @@ bool CHullFinder::readYaml()
   else
   {
     ROS_ERROR("'c_hull_finder' parameters not found in parameter file");
-    return false;
   }
-  return true;
 }
 
 // Converts a region into a convex or concave hull

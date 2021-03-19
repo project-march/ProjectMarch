@@ -80,7 +80,8 @@ protected:
     bool getAveragePointAndNormal(std::vector<double> & average_point, std::vector<double> & average_normal);
 
     // Read all the relevant parameters from the yaml file
-    bool readYaml();
+    void readYaml();
+
     bool convex;
     double alpha;
     int hull_dimension;
