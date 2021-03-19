@@ -230,9 +230,10 @@ void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_
   for (pcl::PointCloud<pcl::PointXYZ>::Ptr hull: *hull_vector)
   {
     // Color the hull with a random color (r, g and b in [1, 0])
-    double r = (rand() % 500) / 500.0;
-    double g = (rand() % 500) / 500.0;
-    double b = (rand() % 500) / 500.0;
+    int number_of_colors = 500;
+    double r = (rand() % number_of_colors) / (double) number_of_colors;
+    double g = (rand() % number_of_colors) / (double) number_of_colors;
+    double b = (rand() % number_of_colors) / (double) number_of_colors;
     for (pcl::PointXYZ hull_point : *hull)
     {
       geometry_msgs::Point marker_point;
