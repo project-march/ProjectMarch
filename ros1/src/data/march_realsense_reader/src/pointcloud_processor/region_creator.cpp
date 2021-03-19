@@ -19,7 +19,7 @@ RegionCreator::RegionCreator(YAML::Node config_tree, bool debugging):
 
 }
 
-bool regionGrower::create_regions(PointCloud::Ptr pointcloud,
+bool RegionGrower::create_regions(PointCloud::Ptr pointcloud,
                                          Normals::Ptr pointcloud_normals,
                                          boost::shared_ptr<RegionVector>
                                          region_vector)
@@ -29,22 +29,21 @@ bool regionGrower::create_regions(PointCloud::Ptr pointcloud,
   region_vector_ = region_vector;
   ROS_DEBUG_STREAM("Creating regions with region growing");
 
-  clock_t start_preprocess = clock();
+  clock_t start_region_grow = clock();
 
   bool success = true;
   success &= read_yaml();
   success &= setup_region_grower();
   success &= extract_regions();
 
-  clock_t end_preprocess = clock();
-  double time_taken = double(end_preprocess - start_preprocess) / double(CLOCKS_PER_SEC);
-  ROS_DEBUG_STREAM("Time taken by pointcloud regionGrower is : " << std::fixed <<
+  clock_t end_region_grow = clock();
+  double time_taken = double(end_region_grow - start_region_grow) / double(CLOCKS_PER_SEC);
+  ROS_DEBUG_STREAM("Time taken by pointcloud RegionGrower is : " << std::fixed <<
                     time_taken << std::setprecision(5) << " sec " << std::endl);
 
   return success;
 }
-
-bool regionGrower::read_yaml()
+bool RegionGrower::read_yaml()
 {
   if (YAML::Node region_growing_parameters = config_tree_["region_growing"])
   {
@@ -62,7 +61,7 @@ bool regionGrower::read_yaml()
   }
 }
 
-bool regionGrower::setup_region_grower()
+bool RegionGrower::setup_region_grower()
 {
   if (pointcloud_->size() == pointcloud_normals_->size())
   {
@@ -79,37 +78,37 @@ bool regionGrower::setup_region_grower()
   }
   else
   {
-    ROS_ERROR("pointlcoud_ is of size: %lu, while pointcloud_normals_ is of size: %lu", pointcloud_->size(), pointcloud_normals_->size());
+    ROS_ERROR("pointcloud_ is of size: %lu, while pointcloud_normals_ is of size: %lu", pointcloud_->size(), pointcloud_normals_->size());
     return false;
   }
 }
 
-bool regionGrower::extract_regions()
+bool RegionGrower::extract_regions()
 {
-  try
+  region_grower.extract(*region_vector_);
+  if (debugging_)
   {
-    region_grower.extract(*region_vector_);
-    if (debugging_)
+    ROS_DEBUG("Total number of clusters found: %lu", region_vector_->size());
+    int i = 0;
+    for (auto region: *region_vector_)
     {
-      ROS_DEBUG("Total number of clusters found: %lu", region_vector_->size());
-      int i = 0;
-      for (auto region: *region_vector_)
-      {
-        ROS_DEBUG("Total number of points in cluster %i: %lu", i, region.indices.size());
-        i++;
-      }
+      ROS_DEBUG("Total number of points in cluster %i: %lu", i, region.indices.size());
+      i++;
     }
-    return true;
-  }
-  catch(...)
+
+  if (region_vector_->size() == 0)
   {
-    ROS_ERROR("Something went wrong during extracting the regions from the region grower.");
+    ROS_WARN("Region growing algorithm found no clusters");
     return false;
   }
+  return true;
 }
 
-pcl::PointCloud<pcl::PointXYZRGB>::Ptr regionGrower::debug_visualisation()
+  ROS_ERROR("Something went wrong during extracting the regions from the region grower.");
+  return false;
+}
+
+pcl::PointCloud<pcl::PointXYZRGB>::Ptr RegionGrower::debug_visualisation()
 {
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr coloured_cloud = region_grower.getColoredCloud();
-  return coloured_cloud;
+  return region_grower.getColoredCloud();
 }

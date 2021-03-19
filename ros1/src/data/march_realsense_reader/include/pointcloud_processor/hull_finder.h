@@ -48,6 +48,7 @@ class CHullFinder : HullFinder
 {
 public:
     //Use the constructors defined in the super class
+    //Use the constructors defined in the super class
     using HullFinder::HullFinder;
     /** This function should take in a pointcloud with matching normals and
      * regions, and turn this into chulls where the foot can be located. **/
@@ -62,6 +63,9 @@ protected:
     // Convert a region into a convex or concave hull
     bool getCHullFromRegion();
 
+    // Get the points and normals of the region and initialize region variables
+    bool initializeRegionVariables();
+
     // Get the plane coefficients of the region using average point and normal
     bool getPlaneCoefficientsRegion();
 
@@ -69,7 +73,7 @@ protected:
     bool projectRegionToPlane();
 
     // Create the convex or concave hull from a projected region
-    bool getCHullFromProjectedPlane();
+    bool getCHullFromProjectedRegion();
 
     // Add the hull to a vector together with its plane coefficients and polygons
     bool addCHullToVector();
@@ -84,11 +88,11 @@ protected:
     int hull_dimension;
 
     int region_index_;
-    PointCloud::Ptr region_points_ = boost::make_shared<PointCloud>();
-    Normals::Ptr region_normals_ = boost::make_shared<Normals>();
-    PointCloud::Ptr region_points_projected_ = boost::make_shared<PointCloud>();
-    PlaneCoefficients::Ptr plane_coefficients_ = boost::make_shared<PlaneCoefficients>();
-    Hull::Ptr hull_ = boost::make_shared<Hull>();
+    PointCloud::Ptr region_points_;
+    Normals::Ptr region_normals_;
+    PointCloud::Ptr region_points_projected_;
+    PlaneCoefficients::Ptr plane_coefficients_;
+    Hull::Ptr hull_;
     Polygon polygon_;
     Region region_;
 };

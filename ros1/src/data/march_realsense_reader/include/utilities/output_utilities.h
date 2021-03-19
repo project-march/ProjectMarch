@@ -1,6 +1,7 @@
 #ifndef MARCH_OUTPUT_UTILITIES_H
 #define MARCH_OUTPUT_UTILITIES_H
 
+
 namespace output_utilities
 {
   // Turn a vector in to printable string

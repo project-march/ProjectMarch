@@ -6,7 +6,6 @@
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
 #include "yaml-cpp/yaml.h"
-#include "pointcloud_processor/region_creator.h"
 #include <pcl/segmentation/region_growing.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -32,7 +31,7 @@ class RegionCreator
     bool debugging_;
 };
 
-class regionGrower : RegionCreator
+class RegionGrower : RegionCreator
 {
   public:
     //Use the constructors defined in the super class
@@ -48,7 +47,7 @@ class regionGrower : RegionCreator
      */
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation() override;
 
-private:
+  private:
     /**
     * Read out YAML
     * @return true if succesful
@@ -56,7 +55,7 @@ private:
     bool read_yaml();
 
     /**
-     * configure region growing algorithm
+     * Configure region growing algorithm
      */
     bool setup_region_grower();
 
@@ -66,7 +65,6 @@ private:
      */
     bool extract_regions();
 
-  private:
     // Region Growing Object
     pcl::RegionGrowing <pcl::PointXYZ, pcl::Normal> region_grower;
 

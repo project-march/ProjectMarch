@@ -53,14 +53,11 @@ bool CHullFinder::find_hulls(
 
   success &= readYaml();
 
-  region_index_ = 0;
-  for (Region region : *region_vector_)
+  for (region_index_ = 0; region_index_ < region_vector_->size(); region_index_++)
   {
-    region_ = region;
+    region_ = region_vector_->at(region_index_);
 
     success &= getCHullFromRegion();
-
-    region_index_++;
   }
 
   time_t end_find_hulls = clock();
@@ -93,8 +90,8 @@ bool CHullFinder::getCHullFromRegion()
 {
   bool success = true;
 
-  pcl::copyPointCloud(*pointcloud_, region_, *region_points_);
-  pcl::copyPointCloud(*pointcloud_normals_, region_, *region_normals_);
+  // Get the points and normals of the region and initialize region variables
+  success &= initializeRegionVariables();
 
   // Get the plane coefficients of the region
   success &= getPlaneCoefficientsRegion();
@@ -103,12 +100,33 @@ bool CHullFinder::getCHullFromRegion()
   success &= projectRegionToPlane();
 
   // Create the hull
-  success &= getCHullFromProjectedPlane();
+  success &= getCHullFromProjectedRegion();
 
   // Add the hull to a vector together with its plane coefficients and polygons
   success &= addCHullToVector();
 
+  if (hull_->points.size() == 0)
+  {
+    ROS_WARN_STREAM("Hull of region " << region_index_ << " Consists of zero points");
+    return false;
+  }
+
   return success;
+}
+
+// Get the points and normals of the region and initialize region variables
+bool CHullFinder::initializeRegionVariables()
+{
+  region_points_ = boost::make_shared<PointCloud>();
+  region_normals_ = boost::make_shared<Normals>();
+  region_points_projected_ = boost::make_shared<PointCloud>();
+  plane_coefficients_ = boost::make_shared<PlaneCoefficients>();
+  hull_ = boost::make_shared<Hull>();
+
+  pcl::copyPointCloud(*pointcloud_, region_, *region_points_);
+  pcl::copyPointCloud(*pointcloud_normals_, region_, *region_normals_);
+
+  return true;
 }
 
 // Get the plane coefficients of the region using average point and normal
@@ -121,17 +139,15 @@ bool CHullFinder::getPlaneCoefficientsRegion()
   bool success = getAveragePointAndNormal(average_point, average_normal);
 
   // Plane coefficients given as [0]*x + [1]*y + [2]*z + [3] = 0
+  plane_coefficients_->values.resize(4);
   // The first three coefficients are the normal vector of the plane as
   // all the vectors in the plane are perpendicular to the normal
-  plane_coefficients_->values.resize(4);
-  plane_coefficients_->values[0] = average_normal[0];
-  plane_coefficients_->values[1] = average_normal[1];
-  plane_coefficients_->values[2] = average_normal[2];
+  plane_coefficients_->values.assign(average_normal.begin(), average_normal.end());
   // the final coefficient can be calculated with the plane equation ax + by + cz + d = 0
-  plane_coefficients_->values[3] = - (
-      average_point[0] * average_normal[0] +
-      average_point[1] * average_normal[1] +
-      average_point[2] * average_normal[2]);
+  plane_coefficients_->values.push_back( - (
+          average_point[0] * average_normal[0] +
+          average_point[1] * average_normal[1] +
+          average_point[2] * average_normal[2]));
 
   ROS_DEBUG_STREAM("Region " << region_index_ << " has plane coefficients: " <<
                    output_utilities::vectorToString(plane_coefficients_->values));
@@ -152,7 +168,7 @@ bool CHullFinder::projectRegionToPlane()
 }
 
 // Create the convex or concave hull from a projected region and its corresponding polygons
-bool CHullFinder::getCHullFromProjectedPlane()
+bool CHullFinder::getCHullFromProjectedRegion()
 {
   if (convex)
   {
@@ -186,11 +202,13 @@ bool CHullFinder::addCHullToVector()
 bool CHullFinder::getAveragePointAndNormal(std::vector<double> & average_point,
                                            std::vector<double> & average_normal)
 {
+  // Initialize the average point and normal to zero
   std::fill(average_point.begin(), average_point.end(), 0);
   std::fill(average_normal.begin(), average_normal.end(), 0);
 
   int number_of_points = region_points_->points.size();
   int number_of_normals = region_normals_->points.size();
+
   if (number_of_points == number_of_normals)
   {
     for (int p = 0; p < number_of_points; p++)
@@ -205,7 +223,6 @@ bool CHullFinder::getAveragePointAndNormal(std::vector<double> & average_point,
       average_point[1] += current_point.y;
       average_point[2] += current_point.z;
     }
-
     average_normal[0] /= number_of_normals;
     average_normal[1] /= number_of_normals;
     average_normal[2] /= number_of_normals;

@@ -15,7 +15,7 @@
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using RegionVector = std::vector<pcl::PointIndices>;
-using PlaneParameterVector = std::vector<pcl::ModelCoefficients::Ptr>;
+using PlaneCoefficientsVector = std::vector<pcl::ModelCoefficients::Ptr>;
 using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
 using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
 
@@ -46,7 +46,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
 
   preprocessor_ = std::make_unique<NormalsPreprocessor>(
       getConfigIfPresent("preprocessor"), debugging_);
-  region_creator_ = std::make_unique<regionGrower>(
+  region_creator_ = std::make_unique<RegionGrower>(
           getConfigIfPresent("region_creator"), debugging_);
   hull_finder_ = std::make_unique<CHullFinder>(
       getConfigIfPresent("hull_finder"), debugging_);
@@ -66,7 +66,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
 
     preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>("/camera/preprocessed_cloud", 1);
     region_pointcloud_publisher_ = n_->advertise<pcl::PointCloud<pcl::PointXYZRGB>>("/camera/region_cloud", 1);
-    hull_marker_array_publisher_ = n_->advertise<visualization_msgs::MarkerArray>("/camera/hull_marker_array", 1);
+    hull_marker_array_publisher_ = n_->advertise<visualization_msgs::Marker>("/camera/hull_marker_list", 1);
   }
 }
 
@@ -145,14 +145,14 @@ bool RealSenseReader::process_pointcloud(
   }
 
   // Setup data structures for finding
-  boost::shared_ptr<PlaneParameterVector> plane_parameter_vector =
-      boost::make_shared<PlaneParameterVector>();
+  boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector =
+      boost::make_shared<PlaneCoefficientsVector>();
   boost::shared_ptr<HullVector> hull_vector = boost::make_shared<HullVector>();
   boost::shared_ptr<PolygonVector> polygon_vector = boost::make_shared<PolygonVector>();
   // Find hulls
   bool hull_finding_was_successful =
       hull_finder_->find_hulls(pointcloud, normals, region_vector,
-                                 plane_parameter_vector, hull_vector, polygon_vector);
+                               plane_coefficients_vector, hull_vector, polygon_vector);
   if (not hull_finding_was_successful)
   {
     res.error_message = "Hull finding was unsuccessful, see debug output "
@@ -162,12 +162,9 @@ bool RealSenseReader::process_pointcloud(
 
   if (debugging_)
   {
-    ROS_DEBUG("Done creating hulls, now publishing to /camera/hull_marker_array");
+    ROS_DEBUG("Done creating hulls, now publishing to /camera/hull_marker_list");
     publishHullMarkerArray(hull_vector);
   }
-
-  ROS_DEBUG("Done finding hulls");
-  //TODO: Add publisher to visualize found planes
 
   // Setup data structures for parameter determining
   SelectedGait selected_obstacle = (SelectedGait) selected_gait;
@@ -176,8 +173,8 @@ bool RealSenseReader::process_pointcloud(
   // Determine parameters
   bool parameter_determining_was_successful =
       parameter_determiner_->determine_parameters(
-          plane_parameter_vector, hull_vector, polygon_vector, selected_obstacle,
-          gait_parameters);
+              plane_coefficients_vector, hull_vector, polygon_vector, selected_obstacle,
+              gait_parameters);
   if (not parameter_determining_was_successful)
   {
     res.error_message = "Parameter determining was unsuccessful, see debug output "
@@ -199,7 +196,7 @@ bool RealSenseReader::process_pointcloud(
   return true;
 }
 
-// Publishes a pointcloud of any point type on a publisher
+// Publish a pointcloud of any point type on a publisher
 template <typename T>
 void RealSenseReader::publishCloud(ros::Publisher publisher,
                                    pcl::PointCloud<T> cloud)
@@ -214,43 +211,45 @@ void RealSenseReader::publishCloud(ros::Publisher publisher,
   publisher.publish(msg);
 }
 
+// Turn a HullVector into published a marker with a list of points on for visualization
 void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_vector)
 {
-  visualization_msgs::MarkerArray marker_array;
-  int id = 0;
+  visualization_msgs::Marker marker_list;
+  marker_list.header.frame_id= "foot_left";
+  marker_list.header.stamp= ros::Time::now();
+  marker_list.ns= "hulls";
+  marker_list.action= visualization_msgs::Marker::ADD;
+  marker_list.pose.orientation.w= 1.0;
+  marker_list.id = 0;
+  marker_list.type = visualization_msgs::Marker::CUBE_LIST;
+  marker_list.scale.x = 0.07;
+  marker_list.scale.y = 0.07;
+  marker_list.scale.z = 0.07;
+
   for (pcl::PointCloud<pcl::PointXYZ>::Ptr hull: *hull_vector)
   {
     // Color the hull with a random color (r, g and b in [1, 0])
     double r = (rand() % 500) / 500.0;
     double g = (rand() % 500) / 500.0;
     double b = (rand() % 500) / 500.0;
-    for (pcl::PointXYZ point : *hull)
+    for (pcl::PointXYZ hull_point : *hull)
     {
-      visualization_msgs::Marker marker;
-      marker.action = marker.ADD;
-      marker.id = id;
-      marker.header.frame_id = "foot_left";
-      marker.pose.position.x = point.x;
-      marker.pose.position.y = point.y;
-      marker.pose.position.z = point.z;
-      marker.color.r = r;
-      marker.color.g = g;
-      marker.color.b = b;
-      marker.color.a = 1.0;
-      marker.scale.x = 0.1;
-      marker.scale.y = 0.1;
-      marker.scale.z = 0.1;
-      marker.pose.orientation.x = 0.0;
-      marker.pose.orientation.y = 0.0;
-      marker.pose.orientation.z = 0.0;
-      marker.pose.orientation.w = 1.0;
-      marker.type = visualization_msgs::Marker::CUBE;
-      marker_array.markers.push_back(marker);
-      id++;
+      geometry_msgs::Point marker_point;
+      marker_point.x = hull_point.x;
+      marker_point.y = hull_point.y;
+      marker_point.z = hull_point.z;
+
+      std_msgs::ColorRGBA marker_color;
+      marker_color.r = r;
+      marker_color.g = g;
+      marker_color.b = b;
+      marker_color.a = 1.0;
+
+      marker_list.points.push_back(marker_point);
+      marker_list.colors.push_back(marker_color);
     }
   }
-
-  hull_marker_array_publisher_.publish(marker_array);
+  hull_marker_array_publisher_.publish(marker_list);
 }
 
 // The callback for the service that was starts processing the point cloud and gives
