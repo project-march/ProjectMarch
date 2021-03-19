@@ -15,7 +15,6 @@ from launch_ros.actions import Node
 def generate_launch_description():
     use_sim_time = LaunchConfiguration("use_sim_time", default="true")
     robot_description = LaunchConfiguration("robot_description")
-    simulation = LaunchConfiguration("simulation")
     ground_gait = LaunchConfiguration("ground_gait")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
 
@@ -23,8 +22,8 @@ def generate_launch_description():
         [get_package_share_directory("march_description"), "urdf", robot_description]
     )
     use_imu_data = LaunchConfiguration("use_imu_data")
+    imu_topic = LaunchConfiguration("imu_topic")
     to_world_transform = LaunchConfiguration("to_world_transform")
-    balance = LaunchConfiguration("balance")
 
     return LaunchDescription(
         [
@@ -44,6 +43,11 @@ def generate_launch_description():
                 default_value="False",
                 description="Whether the data from the physical imu should be used to"
                 "publish the rotation of the exoskeleton.",
+            ),
+            DeclareLaunchArgument(
+                name="imu_topic",
+                default_value="/camera_front/imu/data",
+                description="The topic that should be used to determine the orientation"
             ),
             DeclareLaunchArgument(
                 name="to_world_transform",
@@ -96,6 +100,7 @@ def generate_launch_description():
                         ),
                         "use_imu_data": use_imu_data,
                         "to_world_transform": to_world_transform,
+                        "imu_topic": imu_topic
                     }
                 ],
             ),

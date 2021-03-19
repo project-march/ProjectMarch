@@ -35,27 +35,8 @@
     <arg name="realsense" default="false" doc="Launches the realsense reader node when true."/>
     <arg name="realsense_simulation" default="$(arg realsense)"
          doc="Whether the simulation camera or the physical camera should be used"/>
-    <arg name="initial_reset" default="false" doc="Do a hardware reset at start up to reduce errors"/>
-    <arg name="camera_fps" default="15"
-         doc="The frames per second to use for the physical camera"/>
-    <arg name="depth_fps" default="$(arg camera_fps)"
-         doc="The frame rate to use for the depth module of the camera"/>
-    <arg name="color_fps" default="$(arg camera_fps)"
-         doc="The frame rate to use for the color module of the camera"/>
-    <arg name="infra_fps" default="$(arg camera_fps)"
-         doc="The frame rate to use for the infra red module of the camera"/>
-
-    <group if="$(eval (not realsense_simulation) and realsense)">
-        <include file="$(find realsense2_camera)/launch/rs_camera.launch">
-            <arg name="depth_fps" value="$(arg depth_fps)"/>
-            <arg name="color_fps" value="$(arg color_fps)"/>
-            <arg name="infra_fps" value="$(arg infra_fps)"/>
-            <arg name="enable_pointcloud" value="true"/>
-            <arg name="enable_gyro" value="true"/>
-            <arg name="initial_reset" value="$(arg initial_reset)"/>
-        </include>
-    </group>
-
+    <include file="$(find march_launch)/launch/realsense_camera.launch"
+             if="$(eval (not realsense_simulation) and realsense)" pass_all_args="true"/>
     <arg name="data_collector" default="false" doc="Launches the data collector when true."/>
     <arg name="pressure_soles" default="false" doc="Whether a connection with pressure_soles should be established." />
     <arg name="moticon_ip" default="192.168.8.105" doc="The ip-adress with Moticon software running on it, defaults to
