@@ -47,7 +47,7 @@ protected:
 class CHullFinder : HullFinder
 {
 public:
-    /** Basic constructor for simple preprocessor, this will also read the yaml **/
+    /** Basic constructor for HullFinder preprocessor, but this will also read the yaml **/
     CHullFinder(YAML::Node config_tree, bool debugging);
     /** This function should take in a pointcloud with matching normals and
      * regions, and turn this into chulls where the foot can be located. **/

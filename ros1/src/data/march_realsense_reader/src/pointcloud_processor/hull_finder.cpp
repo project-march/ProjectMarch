@@ -33,7 +33,6 @@ HullFinder::HullFinder(YAML::Node config_tree, bool debugging):
 // Construct a basic CHullFinder class
 CHullFinder::CHullFinder(YAML::Node config_tree, bool debugging):
         HullFinder(config_tree, debugging)
-
 {
   readYaml();
 }

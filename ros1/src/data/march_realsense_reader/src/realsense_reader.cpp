@@ -115,6 +115,7 @@ bool RealSenseReader::process_pointcloud(
   {
     res.error_message = "Preprocessing was unsuccessful, see debug output "
                         "for more information";
+    res.success = false;
     return false;
   }
 
@@ -134,6 +135,7 @@ bool RealSenseReader::process_pointcloud(
   {
     res.error_message = "Region creating was unsuccessful, see debug output "
                         "for more information";
+    res.success = false;
     return false;
   }
 
@@ -149,16 +151,16 @@ bool RealSenseReader::process_pointcloud(
       boost::make_shared<PlaneCoefficientsVector>();
   boost::shared_ptr<HullVector> hull_vector = boost::make_shared<HullVector>();
   boost::shared_ptr<PolygonVector> polygon_vector = boost::make_shared<PolygonVector>();
-  bool for_right_foot = false;
   // Find hulls
   bool hull_finding_was_successful =
       hull_finder_->find_hulls(pointcloud, normals, region_vector,
                                plane_coefficients_vector, hull_vector,
-                               for_right_foot, polygon_vector);
+                               polygon_vector);
   if (not hull_finding_was_successful)
   {
     res.error_message = "Hull finding was unsuccessful, see debug output "
                         "for more information";
+    res.success = false;
     return false;
   }
 
@@ -172,15 +174,17 @@ bool RealSenseReader::process_pointcloud(
   SelectedGait selected_obstacle = (SelectedGait) selected_gait;
   boost::shared_ptr<march_shared_msgs::GaitParameters> gait_parameters =
       boost::make_shared<march_shared_msgs::GaitParameters>();
+  bool for_right_foot = false;
   // Determine parameters
   bool parameter_determining_was_successful =
       parameter_determiner_->determine_parameters(
-              plane_coefficients_vector, hull_vector, polygon_vector, selected_obstacle,
-              gait_parameters);
+          plane_coefficients_vector, hull_vector, polygon_vector,
+          selected_obstacle, for_right_foot, gait_parameters);
   if (not parameter_determining_was_successful)
   {
     res.error_message = "Parameter determining was unsuccessful, see debug output "
                         "for more information";
+    res.success = false;
     return false;
   }
   res.gait_parameters = *gait_parameters;
@@ -272,6 +276,7 @@ bool RealSenseReader::process_pointcloud_callback(
   {
     res.error_message = "No pointcloud published within timeout, so "
                         "no processing could be done.";
+    res.success = false;
     return false;
   }
 

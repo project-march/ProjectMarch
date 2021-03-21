@@ -47,6 +47,10 @@ parameter_determiner:
       max_z_stairs: 0.3
       # Since we transform to the relevant foot, the y component of the foot location should be 0
       y_location: 0
+    # Set the most desirable foot location to the mid point of what the gaits are capable off
+    general_most_desirable_location_is_mid: true
+    # Set the most desirable foot location to the smallest / flattest step
+    general_most_desirable_location_is_small: false
 
 debug: true
 

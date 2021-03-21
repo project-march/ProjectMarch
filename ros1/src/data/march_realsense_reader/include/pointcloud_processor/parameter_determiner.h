@@ -26,7 +26,7 @@ class ParameterDeterminer
 {
 public:
   ParameterDeterminer(YAML::Node config_tree, bool debugging);
-  // This function is required to be implemented by any plane finder
+  /** This function is required to be implemented by any plane finder **/
   virtual bool determine_parameters(
       boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
       boost::shared_ptr<HullVector> const hull_vector,
@@ -53,8 +53,9 @@ protected:
 class HullParameterDeterminer : ParameterDeterminer
 {
 public:
-  //Use the constructors defined in the super class
-  using ParameterDeterminer::ParameterDeterminer;
+  /** Basic constructor for ParameterDeterminer preprocessor, but this will also read the yaml **/
+  HullParameterDeterminer(YAML::Node config_tree, bool debugging);
+
   /** This function should take in a pointcloud with matching normals and
   * hulls, and turn this into a location where the foot can be placed,
   * from this location, gaits parameters should be made. **/
@@ -67,12 +68,20 @@ public:
       boost::shared_ptr<GaitParameters> gait_parameters) override;
 
 protected:
+
+  bool getOptimalFootLocation();
+
+  bool getPossibleMostDesirableLocation(PointNormalCloud::Ptr possible_foot_locations);
+
+  bool getGeneralMostDesirableLocation();
+
+  bool getOptionalFootLocations(PointCloud2D::Ptr foot_locations_to_try);
+
   /** Takes a 2D point cloud of potential foot locations and returns
    * the valid foot locations with associated height and normal vector.
    * Result indicates whether every original point ends up being valid.**/
   bool cropCloudToHullVector(PointCloud2D::Ptr const input_cloud,
-                             PointNormalCloud::Ptr output_cloud,
-                             bool result);
+                             PointNormalCloud::Ptr output_cloud);
 
   bool addZCoordinateToCloudFromPlaneCoefficients(PointCloud2D::Ptr input_cloud,
                                                   PlaneCoefficients::Ptr plane_coefficients,
@@ -84,18 +93,20 @@ protected:
                                              PlaneCoefficients::Ptr plane_coefficients,
                                              PointNormalCloud::Ptr elevated_cloud_with_normals);
 
-  bool getOptimalFootLocation(PointNormalCloud possible_foot_locations);
-
-  bool getOptionalFootLocations(PointCloud2D::Ptr foot_locations_to_try);
-
-  bool getMostDesirableLocation();
-
-  bool getOptimalFootLocation();
+  void readYaml();
+  int number_of_optional_foot_locations;
+  double min_x_stairs;
+  double max_x_stairs;
+  double min_z_stairs;
+  double max_z_stairs;
+  double y_location;
+  bool general_most_desirable_location_is_mid;
+  bool general_most_desirable_location_is_small;
 
   SelectedGait selected_obstacle_;
   bool for_right_foot_;
-  pcl::PointXYZ optimal_foot_location_;
-  pcl::PointXYZ most_desirable_foot_location;
+  pcl::PointNormal optimal_foot_location_;
+  pcl::PointXYZ most_desirable_foot_location_;
 };
 
 /** The simple parameter determiner
@@ -104,7 +115,7 @@ protected:
 class SimpleParameterDeterminer : ParameterDeterminer
 {
 public:
-  //Use the constructors defined in the super class
+  /** Use the constructors defined in the super class **/
   using ParameterDeterminer::ParameterDeterminer;
   /** A Simple implementation which return parameters of 0.5 **/
   bool determine_parameters(
