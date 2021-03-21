@@ -67,6 +67,8 @@ public:
       bool const for_right_foot,
       boost::shared_ptr<GaitParameters> gait_parameters) override;
 
+  pcl::PointNormal optimal_foot_location;
+
 protected:
 
   bool getOptimalFootLocation();
@@ -93,6 +95,10 @@ protected:
                                              PlaneCoefficients::Ptr plane_coefficients,
                                              PointNormalCloud::Ptr elevated_cloud_with_normals);
 
+  bool getGaitParametersFromFootLocation();
+
+  bool optimalLocationIsValid();
+
   void readYaml();
   int number_of_optional_foot_locations;
   double min_x_stairs;
@@ -105,7 +111,6 @@ protected:
 
   SelectedGait selected_obstacle_;
   bool for_right_foot_;
-  pcl::PointNormal optimal_foot_location_;
   pcl::PointXYZ most_desirable_foot_location_;
 };
 

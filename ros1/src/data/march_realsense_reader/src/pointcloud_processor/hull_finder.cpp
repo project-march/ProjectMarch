@@ -65,10 +65,23 @@ bool CHullFinder::find_hulls(
     success &= getCHullFromRegion();
   }
 
+  if (hull_vector_->size() != plane_coefficients_vector_->size() ||
+      hull_vector_->size() != polygon_vector_->size())
+  {
+    ROS_WARN_STREAM("The hull vector does not have the same size as either the plane coefficients vector or"
+                    "the polygon vector. Returning with false.");
+    return false;
+  }
+  else if (hull_vector_->size() == 0)
+  {
+    ROS_ERROR_STREAM("No hulls were found. Returning with false.");
+    return false;
+  }
+
   time_t end_find_hulls = clock();
   double time_taken = double(end_find_hulls - start_find_hulls) / double(CLOCKS_PER_SEC);
   ROS_DEBUG_STREAM("Time taken by the pointcloud HullFinder CHullFinder  is : "
-                   << std::fixed << time_taken << std::setprecision(5) << " sec " << std::endl);
+                           << std::fixed << time_taken << std::setprecision(5) << " sec " << std::endl);
 
   return success;
 }

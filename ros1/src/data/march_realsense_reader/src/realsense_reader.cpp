@@ -67,6 +67,8 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
     preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>("/camera/preprocessed_cloud", 1);
     region_pointcloud_publisher_ = n_->advertise<pcl::PointCloud<pcl::PointXYZRGB>>("/camera/region_cloud", 1);
     hull_marker_array_publisher_ = n_->advertise<visualization_msgs::Marker>("/camera/hull_marker_list", 1);
+    optimal_foot_location_marker_publisher_ = n_->advertise<visualization_msgs::Marker>(
+            "/camera/optimal_foot_location_marker", 1);
   }
 }
 
@@ -121,7 +123,7 @@ bool RealSenseReader::process_pointcloud(
 
   if (debugging_)
   {
-    ROS_DEBUG("Done preprocessing, see /camera/preprocessed_cloud for results");
+    ROS_DEBUG("Done preprocessing, see /camera/preprocessed_cloud for resulting point cloud");
     publishCloud<pcl::PointXYZ>(preprocessed_pointcloud_publisher_, *pointcloud);
   }
 
@@ -141,7 +143,7 @@ bool RealSenseReader::process_pointcloud(
 
   if (debugging_)
   {
-    ROS_DEBUG("Done creating regions, now publishing to /camera/region_cloud");
+    ROS_DEBUG("Done creating regions, now publishing point cloud regions to /camera/region_cloud");
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr coloured_cloud = region_creator_->debug_visualisation();
     publishCloud<pcl::PointXYZRGB>(region_pointcloud_publisher_, *coloured_cloud);
   }
@@ -166,7 +168,7 @@ bool RealSenseReader::process_pointcloud(
 
   if (debugging_)
   {
-    ROS_DEBUG("Done creating hulls, now publishing to /camera/hull_marker_list");
+    ROS_DEBUG("Done creating hulls, now publishing markers to /camera/hull_marker_list");
     publishHullMarkerArray(hull_vector);
   }
 
@@ -187,10 +189,14 @@ bool RealSenseReader::process_pointcloud(
     res.success = false;
     return false;
   }
+  if (debugging_)
+  {
+    ROS_DEBUG("Done determining parameters, now publishing a marker to /camera/optimal_foot_location_marker");
+    publishOptimalFootLocationMarker(parameter_determiner_->optimal_foot_location);
+  }
+
   res.gait_parameters = *gait_parameters;
 
-  ROS_DEBUG("Done determining parameters");
-  //TODO: Add publisher to visualize found hulls
 
   clock_t end_of_processing_time = clock();
 
@@ -258,6 +264,23 @@ void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_
     }
   }
   hull_marker_array_publisher_.publish(marker_list);
+}
+
+void RealSenseReader::publishOptimalFootLocationMarker(pcl::PointNormal optimal_foot_location)
+{
+  visualization_msgs::Marker marker;
+  marker.id = 0;
+  marker.header.frame_id = "foot_left";
+  marker.type = visualization_msgs::Marker::CUBE;
+  marker.scale.x = 0.2;
+  marker.scale.y = 0.05;
+  marker.scale.z = 0.05;
+  marker.pose.position.x = optimal_foot_location.x;
+  marker.pose.position.y = optimal_foot_location.y;
+  marker.pose.position.z = optimal_foot_location.z;
+  marker.pose.orientation.w = 1.0;
+  marker.color.a = 1.0;
+  optimal_foot_location_marker_publisher_.publish(marker);
 }
 
 // The callback for the service that was starts processing the point cloud and gives

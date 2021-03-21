@@ -1,4 +1,4 @@
-#include <string>
+#include <ctime>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <pcl/filters/crop_hull.h>
@@ -9,7 +9,6 @@
 #include <utilities/yaml_utilities.h>
 #include "pointcloud_processor/parameter_determiner.h"
 #include "march_shared_msgs/GaitParameters.h"
-
 
 using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -81,6 +80,8 @@ bool HullParameterDeterminer::determine_parameters(
         bool const for_right_foot,
         boost::shared_ptr<GaitParameters> gait_parameters)
 {
+  time_t start_determine_parameters = clock();
+
   ROS_DEBUG("Determining parameters with simple parameter determiner");
   hull_vector_ = hull_vector;
   selected_obstacle_ = selected_obstacle;
@@ -90,17 +91,45 @@ bool HullParameterDeterminer::determine_parameters(
   selected_obstacle_ = selected_obstacle;
   for_right_foot_ = for_right_foot;
 
-  gait_parameters_->step_height_parameter = 0.5;
-  gait_parameters_->step_size_parameter = 0.5;
-
   bool success = true;
 
   success &= getOptimalFootLocation();
 
-  ROS_DEBUG_STREAM("The optimal foot location is " << output_utilities::pointToString(optimal_foot_location_));
+  ROS_DEBUG_STREAM("The optimal foot location is " << output_utilities::pointToString(optimal_foot_location));
+
+  success &= getGaitParametersFromFootLocation();
+
+  ROS_DEBUG_STREAM(
+          "With corresponding parameters (size, height, side) (" <<
+          gait_parameters_->step_size_parameter   << ", " <<
+          gait_parameters_->step_height_parameter << ", " <<
+          gait_parameters_->side_step_parameter   << ") " );
+
+  time_t end_determine_parameters = clock();
+  double time_taken = double(end_determine_parameters - start_determine_parameters) / double(CLOCKS_PER_SEC);
+  ROS_DEBUG_STREAM("Time taken by the hull parameter determiner,   is : " <<
+                   std::fixed << time_taken << std::setprecision(5) << " sec " << std::endl);
 
   return success;
 };
+
+bool HullParameterDeterminer::getGaitParametersFromFootLocation()
+{
+  if (selected_obstacle_ == SelectedGait::stairs_up)
+  {
+    gait_parameters_->step_size_parameter =
+            (optimal_foot_location.x - min_x_stairs) / (max_x_stairs - min_x_stairs);
+    gait_parameters_->step_height_parameter =
+            (optimal_foot_location.z - min_z_stairs) / (max_z_stairs - min_z_stairs);
+  }
+  else
+  {
+    ROS_ERROR_STREAM("No way to transform a foot location to parameters "
+                     "is implemented yet for obstacle " << selected_obstacle_);
+    return false;
+  }
+  return true;
+}
 
 bool HullParameterDeterminer::getOptimalFootLocation()
 {
@@ -134,7 +163,7 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation(
 
   double min_distance_to_most_desirable_location = std::numeric_limits<double>::max();
 
-  for (pcl::PointNormal possible_foot_location : *possible_foot_locations)
+  for (pcl::PointNormal & possible_foot_location : *possible_foot_locations)
   {
     double distance_to_most_desirable_location =
             (possible_foot_location.x - most_desirable_foot_location_.x) *
@@ -147,10 +176,42 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation(
     if (distance_to_most_desirable_location < min_distance_to_most_desirable_location)
     {
       min_distance_to_most_desirable_location = distance_to_most_desirable_location;
-      optimal_foot_location_ = possible_foot_location;
+      optimal_foot_location = possible_foot_location;
     }
   }
-  return true;
+  if (optimalLocationIsValid())
+  {
+    return true;
+  }
+  else
+  {
+    ROS_ERROR_STREAM("The optimal foot location is not reachable for the current selected obstacle. \n"
+                     "Selected obstacle is " << selected_obstacle_ << ", and the optimal foot location is " <<
+                     output_utilities::pointToString(optimal_foot_location));
+    return false;
+  }
+}
+
+bool HullParameterDeterminer::optimalLocationIsValid()
+{
+  if (selected_obstacle_ == SelectedGait::stairs_up)
+  {
+    // Less and larger than signs are swapped for the x coordinate
+    // as the positive x axis points in the backwards direction of the exoskeleton
+    if (optimal_foot_location.x < min_x_stairs && optimal_foot_location.x > max_x_stairs &&
+        optimal_foot_location.z > min_z_stairs && optimal_foot_location.z < max_z_stairs)
+    {
+      return true;
+    }
+  }
+  else
+  {
+    ROS_ERROR_STREAM("optimalLocationIsValid method has not been implemented for obstacle " << selected_obstacle_ <<
+                     ". Returning false.");
+    return false;
+  }
+  // If no check concludes that the location is valid, return that the location is invalid.
+  return false;
 }
 
 bool HullParameterDeterminer::getGeneralMostDesirableLocation()
@@ -245,15 +306,10 @@ bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
         PlaneCoefficients::Ptr const plane_coefficients,
         PointCloud::Ptr elevated_cloud)
 {
-  if (hull_vector_->size() == 0)
-  {
-    ROS_ERROR_STREAM("The hull vector of the HullParameterDeterminer has size 0, cannot crop cloud to hulls.");
-    return false;
-  }
   elevated_cloud->points.resize(input_cloud->points.size());
 
   int point_index = 0;
-  for (pcl::PointXYZ elevated_point : *elevated_cloud)
+  for (pcl::PointXYZ & elevated_point : *elevated_cloud)
   {
     // using z = - (d + by + ax) / c from plane equation ax + by + cz + d = 0
     pcl::PointXY input_point = input_cloud->points[point_index];
@@ -263,6 +319,7 @@ bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
             plane_coefficients->values[1] * input_cloud->points[point_index].y +
             plane_coefficients->values[0] * input_cloud->points[point_index].x)
                     / plane_coefficients->values[2];
+
     point_index++;
   }
   return true;
@@ -309,7 +366,7 @@ bool HullParameterDeterminer::addNormalToCloudFromPlaneCoefficients(
   }
 
   int point_index = 0;
-  for (pcl::PointNormal elevated_point_with_normal: *elevated_cloud_with_normals)
+  for (pcl::PointNormal & elevated_point_with_normal: *elevated_cloud_with_normals)
   {
     pcl::PointXYZ elevated_point = elevated_cloud->points[point_index];
     elevated_point_with_normal.x = elevated_point.x;
