@@ -14,10 +14,10 @@
 #include <pluginlib/class_list_macros.h>
 #include <vector>
 
+// Publishing and msgs
 #include <ros/node_handle.h>
 #include <ros/time.h>
-#include "std_msgs/Float64MultiArray.h"
-#include "std_msgs/Float64.h"
+#include <march_shared_msgs/MpcMsg.h>
 #include <realtime_tools/realtime_publisher.h>
 
 #include <cassert>
@@ -62,6 +62,14 @@ public:
    * \brief Procedure, if required, for stopping the controller
    */
   void stopping(const ros::Time& /*time*/);
+  /**
+   * \brief Start MPC topic and resize vectors in the MPC msg.
+   */
+  void initMpcMsg();
+  /**
+   * \brief Set and publish the message with MPC outputs, and MPC configuration
+   */
+  void setMpcMsg(int joint_number);
 
 private:
   /**
@@ -79,7 +87,7 @@ private:
   std::vector<ModelPredictiveController> model_predictive_controllers_;
   vector<double> state;
 
-  std::unique_ptr<realtime_tools::RealtimePublisher<std_msgs::Float64MultiArray>> command_pub_;
+  std::unique_ptr<realtime_tools::RealtimePublisher<march_shared_msgs::MpcMsg>> mpc_pub_;
 };
 
 // Assign an alias to the class definition
