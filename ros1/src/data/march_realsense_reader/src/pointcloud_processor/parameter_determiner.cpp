@@ -38,6 +38,7 @@ HullParameterDeterminer::HullParameterDeterminer(YAML::Node config_tree, bool de
   readYaml();
 }
 
+// Read all relevant parameters from the parameter yaml file
 void HullParameterDeterminer::readYaml()
 {
   if (YAML::Node hull_parameter_determiner_parameters = config_tree_["hull_parameter_determiner"])
@@ -72,6 +73,9 @@ void HullParameterDeterminer::readYaml()
   }
 }
 
+/** This function takes in a pointcloud with matching normals and
+* hulls, and turn this into a location where the foot can be placed,
+* from this location, gaits parameters are made. **/
 bool HullParameterDeterminer::determine_parameters(
         boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
         boost::shared_ptr<HullVector> const hull_vector,
@@ -113,6 +117,7 @@ bool HullParameterDeterminer::determine_parameters(
   return success;
 };
 
+// Find the parameters from the foot location by finding at what percentage of the end points it is
 bool HullParameterDeterminer::getGaitParametersFromFootLocation()
 {
   if (selected_obstacle_ == SelectedGait::stairs_up)
@@ -131,6 +136,8 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
   return true;
 }
 
+// Get the optimal foot location by finding which possible foot location is closest
+// to the most desirable foot location
 bool HullParameterDeterminer::getOptimalFootLocation()
 {
   bool success = true;
@@ -151,6 +158,7 @@ bool HullParameterDeterminer::getOptimalFootLocation()
   return success;
 }
 
+// From the possible foot locations, find which one is closes to the most desirable location
 bool HullParameterDeterminer::getPossibleMostDesirableLocation(
     PointNormalCloud::Ptr possible_foot_locations)
 {
@@ -192,6 +200,7 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation(
   }
 }
 
+// Verify that the found location is valid for the requested gait
 bool HullParameterDeterminer::optimalLocationIsValid()
 {
   if (selected_obstacle_ == SelectedGait::stairs_up)
@@ -214,6 +223,7 @@ bool HullParameterDeterminer::optimalLocationIsValid()
   return false;
 }
 
+// Compute the optimal foot location as if one were not limited by anything.
 bool HullParameterDeterminer::getGeneralMostDesirableLocation()
 {
   if (general_most_desirable_location_is_mid)
@@ -237,6 +247,8 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
   return true;
 }
 
+// Create a point cloud with points on the ground where the points represent
+// where it should be checked if there is a valid foot location
 bool HullParameterDeterminer::getOptionalFootLocations(PointCloud2D::Ptr foot_locations_to_try)
 {
   foot_locations_to_try->points.resize(number_of_optional_foot_locations);
@@ -301,6 +313,7 @@ bool HullParameterDeterminer::cropCloudToHullVector(PointCloud2D::Ptr const inpu
   return success;
 }
 
+// Elevate the 2D points so they have z coordinate as if they lie on the plane of the hull
 bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
         PointCloud2D::Ptr const input_cloud,
         PlaneCoefficients::Ptr const plane_coefficients,
@@ -325,6 +338,7 @@ bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
   return true;
 }
 
+// Remove all points from a cloud which do not fall in the hull
 bool HullParameterDeterminer::cropCloudToHull(
         PointCloud::Ptr elevated_cloud,
         const Hull::Ptr hull,
@@ -344,6 +358,7 @@ bool HullParameterDeterminer::cropCloudToHull(
   return true;
 }
 
+// Add normals to the elevated cloud which correspond to the normal vector of the plane
 bool HullParameterDeterminer::addNormalToCloudFromPlaneCoefficients(
         PointCloud::Ptr const elevated_cloud,
         PlaneCoefficients::Ptr const plane_coefficients,

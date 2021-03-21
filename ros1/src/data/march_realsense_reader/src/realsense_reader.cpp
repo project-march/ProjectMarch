@@ -223,7 +223,7 @@ void RealSenseReader::publishCloud(ros::Publisher publisher,
   publisher.publish(msg);
 }
 
-// Turn a HullVector into published a marker with a list of points on for visualization
+// Turn a HullVector into a marker with a list of points and publish for visualization
 void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_vector)
 {
   visualization_msgs::Marker marker_list;
@@ -266,6 +266,7 @@ void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_
   hull_marker_array_publisher_.publish(marker_list);
 }
 
+// Create a marker from the optimal foot location and publish it and publish for visualization
 void RealSenseReader::publishOptimalFootLocationMarker(pcl::PointNormal optimal_foot_location)
 {
   visualization_msgs::Marker marker;

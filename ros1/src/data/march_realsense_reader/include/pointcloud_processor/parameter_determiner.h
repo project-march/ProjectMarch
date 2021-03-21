@@ -70,13 +70,18 @@ public:
   pcl::PointNormal optimal_foot_location;
 
 protected:
-
+  // Get the optimal foot location by finding which possible foot location is closest
+  // to the most desirable foot location
   bool getOptimalFootLocation();
 
+  // From the possible foot locations, find which one is closes to the most desirable location
   bool getPossibleMostDesirableLocation(PointNormalCloud::Ptr possible_foot_locations);
 
+  // Compute the optimal foot location as if one were not limited by anything.
   bool getGeneralMostDesirableLocation();
 
+  // Create a point cloud with points on the ground where the points represent
+  // where it should be checked if there is a valid foot location
   bool getOptionalFootLocations(PointCloud2D::Ptr foot_locations_to_try);
 
   /** Takes a 2D point cloud of potential foot locations and returns
@@ -85,20 +90,26 @@ protected:
   bool cropCloudToHullVector(PointCloud2D::Ptr const input_cloud,
                              PointNormalCloud::Ptr output_cloud);
 
+  // Elevate the 2D points so they have z coordinate as if they lie on the plane of the hull
   bool addZCoordinateToCloudFromPlaneCoefficients(PointCloud2D::Ptr input_cloud,
                                                   PlaneCoefficients::Ptr plane_coefficients,
                                                   PointCloud::Ptr elevated_cloud);
 
+  // Remove all points from a cloud which do not fall in the hull
   bool cropCloudToHull(PointCloud::Ptr elevated_cloud, Hull::Ptr hull, Polygon polygon);
 
+  // Add normals to the elevated cloud which correspond to the normal vector of the plane
   bool addNormalToCloudFromPlaneCoefficients(PointCloud::Ptr elevated_cloud,
                                              PlaneCoefficients::Ptr plane_coefficients,
                                              PointNormalCloud::Ptr elevated_cloud_with_normals);
 
+  // Find the parameters from the foot location by finding at what percentage of the end points it is
   bool getGaitParametersFromFootLocation();
 
+  // Verify that the found location is valid for the requested gait
   bool optimalLocationIsValid();
 
+  // Read all relevant parameters from the parameter yaml file
   void readYaml();
   int number_of_optional_foot_locations;
   double min_x_stairs;

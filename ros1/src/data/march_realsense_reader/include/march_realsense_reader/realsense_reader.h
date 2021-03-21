@@ -52,10 +52,12 @@ public:
 
   // Publishes the pointcloud on a topic for visualisation in rviz or furter use
   template <typename T>
-  void publishCloud(ros::Publisher publisher,
-                    pcl::PointCloud<T> cloud);
+  void publishCloud(ros::Publisher publisher, pcl::PointCloud<T> cloud);
+
+  // Turn a HullVector into a marker with a list of points and publish for visualization
   void publishHullMarkerArray(boost::shared_ptr<HullVector> hull_vector);
 
+  // Create a marker from the optimal foot location and publish it and publish for visualization
   void publishOptimalFootLocationMarker(pcl::PointNormal optimal_foot_location);
 
 private:
