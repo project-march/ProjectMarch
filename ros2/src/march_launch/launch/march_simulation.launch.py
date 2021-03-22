@@ -48,7 +48,9 @@ def generate_launch_description():
                 "/clock topic by gazebo instead of system time.",
             ),
             DeclareLaunchArgument(
-                name="robot", default_value="march4", description="Robot to use."
+                name="robot",
+                default_value="march4",
+                description="Robot to use."
             ),
             # RQT INPUT DEVICE ARGUMENTS
             DeclareLaunchArgument(
