@@ -349,14 +349,14 @@ class Subgait(object):
             The interpolated subgait
         """
         first_interpolated_subgait = Subgait.interpolate_subgaits(
-            first_subgait, second_subgait, first_parameter
+            first_subgait, second_subgait, first_parameter, use_foot_position
         )
         second_interpolated_subgait = Subgait.interpolate_subgaits(
-            third_subgait, fourth_subgait, first_parameter
+            third_subgait, fourth_subgait, first_parameter, use_foot_position
         )
 
         return Subgait.interpolate_subgaits(
-            first_interpolated_subgait, second_interpolated_subgait, second_parameter
+            first_interpolated_subgait, second_interpolated_subgait, second_parameter, use_foot_position
         )
 
     @classmethod
