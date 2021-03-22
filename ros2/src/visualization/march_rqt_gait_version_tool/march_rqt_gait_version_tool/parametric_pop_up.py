@@ -30,9 +30,18 @@ class ParametricPopUpWindow(QDialog):
         self.parameterSlider.setValue(50)
         self.parameterLabel.setText("parameter = 0.50")
 
+        # For 'normal' parametric gaits between two subgaits
         self.base_version = ""
         self.other_version = ""
         self.parameter = 0.0
+
+        # For 'multiple' parametric gaits between four subgaits
+        self.parameter = 0.0
+        self.parameter = 0.0
+        self.base_version = ""
+        self.other_version = ""
+        self.base_version = ""
+        self.other_version = ""
         return super(ParametricPopUpWindow, self).exec_()
 
     def value_changed(self):
