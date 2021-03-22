@@ -15,6 +15,7 @@ def generate_launch_description():
     # Input device arguments
     rqt_input = LaunchConfiguration("rqt_input")
     ping_safety_node = LaunchConfiguration("ping_safety_node")
+    layout = LaunchConfiguration("layout")
 
     # Robot state publisher arguments
     robot_state_publisher = LaunchConfiguration("robot_state_publisher")
@@ -26,7 +27,6 @@ def generate_launch_description():
     ground_gait = LaunchConfiguration("ground_gait")
     realsense_simulation = LaunchConfiguration("realsense_simulation")
     to_world_transform = LaunchConfiguration("to_world_transform")
-
 
     # Gait selection arguments
     gait_package = LaunchConfiguration("gait_package")
@@ -56,6 +56,11 @@ def generate_launch_description():
                 default_value="True",
                 description="If this argument is false, the rqt input device will"
                 "not be launched.",
+            ),
+            DeclareLaunchArgument(
+                name="layout",
+                default_value="default",
+                description="Input device layout .json file to use.",
             ),
             DeclareLaunchArgument(
                 name="ping_safety_node",
@@ -152,6 +157,7 @@ def generate_launch_description():
                 launch_arguments=[
                     ("ping_safety_node", ping_safety_node),
                     ("use_sim_time", use_sim_time),
+                    ("layout", layout),
                 ],
                 condition=IfCondition(rqt_input),
             ),
