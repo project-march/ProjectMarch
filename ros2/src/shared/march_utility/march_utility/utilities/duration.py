@@ -17,6 +17,7 @@ class Duration(ROSDuration):
     def __init__(self, seconds: float = 0.0, nanoseconds: float = 0.0):
         super().__init__(seconds=seconds, nanoseconds=nanoseconds)
 
+
     @property
     def seconds(self) -> float:
         """Convert the nanoseconds to seconds."""

@@ -177,6 +177,10 @@ class BalanceGait(GaitInterface):
         elif name == "right_swing_2":
             return self.construct_trajectory("right_leg", name)
         else:
+            self._node.get_logger().warn(
+                f"Grabbing the trajectory from 'default walk'[name].to_joint_trajectory_msgs() \n"
+                f" defualt walk = {self.default_walk}, default walk [name] = {self.default_walk[name]}, name = {name}"
+            )
             return self.default_walk[name].to_joint_trajectory_msg()
 
     # GaitInterface
@@ -205,11 +209,24 @@ class BalanceGait(GaitInterface):
         return self._default_walk.final_position
 
     def start(self) -> JointTrajectory:
+        self._node.get_logger().warn("Starting a balance gait")
         self._current_subgait = self._default_walk.graph.start_subgaits()[0]
         self._time_since_start = Duration(0)
         trajectory = self.get_joint_trajectory_msg(self._current_subgait)
+        self._node.get_logger().warn(
+            f"done making trajectory"
+        )
         time_from_start = trajectory.points[-1].time_from_start
+        self._node.get_logger().warn(
+            f"time from start of trajectory is {time_from_start}"
+        )
+        self._node.get_logger().warn(
+            f"duration from ros duration {Duration.from_ros_duration(time_from_start)}"
+        )
         self._current_subgait_duration = Duration.from_ros_duration(time_from_start)
+        self._node.get_logger().warn(
+            f"done starting a balance gait, duration is {self._current_subgait_duration}"
+        )
         return trajectory
 
     def update(self, elapsed_time: Duration) -> Tuple[Optional[JointTrajectory], bool]:
