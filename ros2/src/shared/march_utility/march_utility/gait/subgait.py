@@ -322,6 +322,44 @@ class Subgait(object):
             joint.setpoints = new_joint_setpoints
 
     @classmethod
+    def interpolate_four_subgait(
+        cls,
+        first_subgait: Subgait,
+        second_subgait: Subgait,
+        third_subgait: Subgait,
+        fourth_subgait: Subgait,
+        first_parameter: float,
+        second_parameter: float,
+        use_foot_position: bool = False,
+    ):
+        """
+        Interpolate two subgaits with the parameter to get a new subgait.
+
+        :param i'th_subgait:
+            subgaits to interpolate
+        :param first_parameter:
+            The parameter to use for interpolation between subgait 1&2 and 3&4. Should be 0 <= parameter <= 1
+        :param second_parameter:
+            The parameter to use for interpolation between the interpolated subgaits. Should be 0 <= parameter <= 1
+        :param use_foot_position:
+            Determine whether the interpolation should be done on the foot
+            location or on the joint angles
+
+        :return:
+            The interpolated subgait
+        """
+        first_interpolated_subgait = Subgait.interpolate_subgaits(
+            first_subgait, second_subgait, first_parameter
+        )
+        second_interpolated_subgait = Subgait.interpolate_subgaits(
+            third_subgait, fourth_subgait, first_parameter
+        )
+
+        return Subgait.interpolate_subgaits(
+            first_interpolated_subgait, second_interpolated_subgait, second_parameter
+        )
+
+    @classmethod
     def interpolate_subgaits(
         cls,
         base_subgait: Subgait,
@@ -330,7 +368,7 @@ class Subgait(object):
         use_foot_position: bool = False,
     ) -> Subgait:
         """
-        Linearly interpolate two subgaits with the parameter to get a new subgait.
+        Interpolate two subgaits with the parameter to get a new subgait.
 
         :param base_subgait:
             base subgait, return value if parameter is equal to zero
