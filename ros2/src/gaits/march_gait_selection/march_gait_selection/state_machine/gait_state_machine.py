@@ -342,6 +342,9 @@ class GaitStateMachine(object):
             )
             trajectory = self._current_gait.start()
             if trajectory is not None:
+                self._gait_selection.get_logger().warn(
+                    f"Gait {self._current_gait.name} has a trajectory"
+                )
                 if not self.check_correct_foot_pressure():
                     self._gait_selection.get_logger().debug(
                         f"Foot forces when incorrect pressure warning was issued: "
@@ -353,9 +356,17 @@ class GaitStateMachine(object):
                 )
 
                 self._trajectory_scheduler.schedule(trajectory)
+            else:
+                self._gait_selection.get_logger().error(
+                    f"Gait {self._current_gait.name} has no trajectory!"
+                )
             elapsed_time = Duration(0)
 
         if self._trajectory_scheduler.failed():
+            self._gait_selection.get_logger().warn(
+                f"Failed to schedule trajectory for trajectory of gait "
+                f"{self._current_gait.name} and subgait {self._current_gait.subgait_name}."
+            )
             self._trajectory_scheduler.reset()
             self._current_gait.end()
             self._current_gait = None
