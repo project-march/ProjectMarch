@@ -72,7 +72,8 @@ class ParametricPopUpWindow(QDialog):
 
     def save(self):
         """Check and save value while closing, close if successful."""
-        if self.fourSubgaitInterpolation.isChecked():
+        self.four_subgait_interpolation = self.fourSubgaitInterpolation.isChecked()
+        if self.four_subgait_interpolation:
             self.first_version = self.firstVersionComboBox.currentText()
             self.second_version = self.secondVersionComboBox.currentText()
             self.third_version = self.thirdVersionComboBox.currentText()

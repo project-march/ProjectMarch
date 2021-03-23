@@ -6,7 +6,6 @@ from .gait_version_tool_errors import GaitVersionToolError
 from .gait_version_tool_pop_up import PopUpWindow
 from .parametric_pop_up import ParametricPopUpWindow
 
-
 DEFAULT_AMOUNT_OF_AVAILABLE_SUBGAITS = 3
 PARAMETRIC_GAIT_PREFIX = "_pg_"
 
