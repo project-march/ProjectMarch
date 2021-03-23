@@ -4,7 +4,6 @@
 #include <pcl/point_types.h>
 #include <ros/ros.h>
 #include <ros/console.h>
-#include <visualization_msgs/MarkerArray.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <march_shared_msgs/GetGaitParameters.h>
 #include <pointcloud_processor/preprocessor.h>
