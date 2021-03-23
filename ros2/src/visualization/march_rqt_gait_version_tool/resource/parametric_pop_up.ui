@@ -200,7 +200,7 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBox">
+  <widget class="QCheckBox" name="fourSubgaitInterpolation">
    <property name="geometry">
     <rect>
      <x>190</x>

@@ -25,12 +25,19 @@ class ParametricPopUpWindow(QDialog):
 
     def show_pop_up(self, versions):
         """Reset and show pop up."""
-        self.baseVersionComboBox.clear()
-        self.baseVersionComboBox.addItems(versions)
-        self.otherVersionComboBox.clear()
-        self.otherVersionComboBox.addItems(versions)
-        self.parameterSlider.setValue(50)
-        self.parameterLabel.setText("parameter = 0.50")
+        self.firstVersionComboBox.clear()
+        self.firstVersionComboBox.addItems(versions)
+        self.secondVersionComboBox.clear()
+        self.secondVersionComboBox.addItems(versions)
+        self.thirdVersionComboBox.clear()
+        self.thirdVersionComboBox.addItems(versions)
+        self.fourthVersionComboBox.clear()
+        self.fourthVersionComboBox.addItems(versions)
+        self.firstParameterSlider.setValue(50)
+        self.firstParameterLabel.setText("parameter = 0.50")
+        self.secondParameterSlider.setValue(50)
+        self.secondParameterLabel.setText("parameter = 0.50")
+
         self.four_subgait_interpolation = False
 
         # For 'normal' parametric gaits between two subgaits
