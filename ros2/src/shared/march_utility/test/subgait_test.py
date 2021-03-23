@@ -13,6 +13,7 @@ from march_utility.gait.limits import Limits
 from march_utility.gait.setpoint import Setpoint
 from march_utility.gait.subgait import Subgait
 
+FOUR_PARAMETRIC_GAITS_PREFIX = "_fpg_"
 
 class SubgaitTest(unittest.TestCase):
     def setUp(self):
@@ -366,3 +367,19 @@ class SubgaitTest(unittest.TestCase):
             other_setpoints,
         ) = Subgait.prepare_subgaits_for_inverse_kinematics(base_subgait, other_subgait)
         self.assertEqual(len(base_setpoints), len(other_setpoints))
+
+    def test_four_parametric_gaits_from_name_and_version(self):
+        """Test the four parametric gaits feature"""
+        first_parameter = 0.5
+        second_parameter = 0.5
+        first_version = "MV_walk_leftclose_inverse_kinematics_v2"
+        second_version = "MV_walk_leftclose_v1"
+        third_version = "MV_walk_leftclose_v2"
+        fourth_version = "MIV_final"
+        version = f"{FOUR_PARAMETRIC_GAITS_PREFIX}{first_parameter}_{second_parameter}_" \
+                  f"({first_version})_({second_version})_({third_version})_({fourth_version})"
+
+        subgait = Subgait.from_name_and_version(self.robot, self.resources_folder, "walk", "left_close", version)
+        self.assertIsInstance(subgait, Subgait)
+        Subgait.interpolate_four_subgait.assert_called_once()
+
