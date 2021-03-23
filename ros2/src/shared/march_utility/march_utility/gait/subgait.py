@@ -629,7 +629,7 @@ class Subgait(object):
         return base_version, other_version, parameter
 
     @staticmethod
-    def unpack_four_parametric_version(version: str) -> Tuple[str, str, float]:
+    def unpack_four_parametric_version(version: str) -> Tuple[List[str], List[float]]:
         """Unpack a version to four versions and two parameters."""
         parameter_search = re.findall(
             r"(\d+\.\d+)".format(FOUR_PARAMETRIC_GAITS_PREFIX), version
@@ -638,21 +638,16 @@ class Subgait(object):
             raise SubgaitInterpolationError(
                 "Parametric version was stored in wrong format."
             )
-        first_parameter = float(parameter_search[0])
-        second_parameter = float(parameter_search[1])
+        parameter_list = [float(parameter_search[0]), float(parameter_search[1])]
         versions = re.findall(r"\([^\)]*\)", version)
-        first_version = versions[0][1:-1]
-        second_version = versions[1][1:-1]
-        third_version = versions[2][1:-1]
-        fourth_version = versions[3][1:-1]
+
+        version_list = []
+        for version in versions:
+            version_list.append(version[1:-1])
 
         return (
-            first_version,
-            second_version,
-            third_version,
-            fourth_version,
-            first_parameter,
-            second_parameter,
+            version_list,
+            parameter_list
         )
 
     @staticmethod

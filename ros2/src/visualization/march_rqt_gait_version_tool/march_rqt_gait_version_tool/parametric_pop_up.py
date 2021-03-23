@@ -1,3 +1,4 @@
+from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog
 from python_qt_binding import loadUi
@@ -21,7 +22,12 @@ class ParametricPopUpWindow(QDialog):
         self.buttonBox.rejected.connect(self.cancel)
         self.firstParameterSlider.valueChanged.connect(self.first_parameter_value_changed)
         self.secondParameterSlider.valueChanged.connect(self.second_parameter_value_changed)
+        self.fourSubgaitInterpolation.stateChanged.connect(self.four_subgait_interpolation_changed)
 
+        # Initialize the third and fourth combo box and the second parameter slider as blocked
+        self.thirdVersionComboBox.setEnabled(False)
+        self.fourthVersionComboBox.setEnabled(False)
+        self.secondParameterSlider.setEnabled(False)
 
     def show_pop_up(self, versions):
         """Reset and show pop up."""
@@ -34,9 +40,9 @@ class ParametricPopUpWindow(QDialog):
         self.fourthVersionComboBox.clear()
         self.fourthVersionComboBox.addItems(versions)
         self.firstParameterSlider.setValue(50)
-        self.firstParameterLabel.setText("parameter = 0.50")
+        self.firstParameterLabel.setText("first parameter = 0.50")
         self.secondParameterSlider.setValue(50)
-        self.secondParameterLabel.setText("parameter = 0.50")
+        self.secondParameterLabel.setText("second parameter = 0.50")
 
         self.four_subgait_interpolation = False
 
@@ -65,6 +71,17 @@ class ParametricPopUpWindow(QDialog):
         self.secondParameterLabel.setText(
             "second parameter = {val:.2f}".format(val=self.secondParameterSlider.value() / 100.0)
         )
+
+    def four_subgait_interpolation_changed(self):
+        """Unlocks the buttons for four subgait interpolation when it is enabled"""
+        if self.fourSubgaitInterpolation.isChecked():
+            self.thirdVersionComboBox.setEnabled(True)
+            self.fourthVersionComboBox.setEnabled(True)
+            self.secondParameterSlider.setEnabled(True)
+        else:
+            self.thirdVersionComboBox.setEnabled(False)
+            self.fourthVersionComboBox.setEnabled(False)
+            self.secondParameterSlider.setEnabled(False)
 
     def cancel(self):
         """Close without applying the values."""
