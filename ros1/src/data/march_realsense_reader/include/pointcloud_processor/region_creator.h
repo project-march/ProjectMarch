@@ -35,7 +35,7 @@ class RegionGrower : RegionCreator
 {
   public:
     //Use the constructors defined in the super class
-    using RegionCreator::RegionCreator;
+    RegionGrower(YAML::Node config_tree, bool debugging);
     /** Create cluster using the region growing algorithm, takes algorithm configuration from the YAML, and fills
      * parameter region_vector with clusters. **/
     bool create_regions(PointCloud::Ptr pointcloud,
@@ -52,7 +52,7 @@ class RegionGrower : RegionCreator
     * Read out YAML
     * @return true if succesful
     */
-    bool read_yaml();
+    void read_yaml();
 
     /**
      * Configure region growing algorithm

@@ -85,31 +85,31 @@ class NormalsPreprocessor : Preprocessor {
     bool filterOnNormalOrientation();
 
     // Reads all the relevant parameters from the yaml file
-    bool readYaml();
+    void readYaml();
 
     // Downsampling parameters
-    bool getDownsamplingParameters();
+    void getDownsamplingParameters();
     bool voxel_grid_filter;
     double leaf_size;
     bool random_filter;
     int remaining_points;
 
     // Transform parameters
-    bool getTransformParameters();
+    void getTransformParameters();
     double rotation_y;
 
     // Distance filter parameters
-    bool getDistanceFilterParameters();
+    void getDistanceFilterParameters();
     double distance_threshold;
 
     // Normal estimation parameters
-    bool getNormalEstimationParameters();
+    void getNormalEstimationParameters();
     bool use_tree_search_method;
     int number_of_neighbours;
     double search_radius;
 
     // Normal filter parameters
-    bool getNormalFilterParameters();
+    void getNormalFilterParameters();
     double allowed_length_x;
     double allowed_length_y;
     double allowed_length_z;

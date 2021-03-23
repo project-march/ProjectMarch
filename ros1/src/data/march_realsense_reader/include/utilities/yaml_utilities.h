@@ -7,7 +7,7 @@
 
 namespace yaml_utilities
 {
-// Grabs a parameter from a YAML::Node and throws a clear warning if the requested parameter does not exist
+  // Grab a parameter from a YAML::Node and throws a clear warning if the requested parameter does not exist
   template<typename T>
   T grabParameter(YAML::Node const yaml_node, std::string const parameter_name)
   {
