@@ -15,6 +15,7 @@ from march_utility.gait.subgait import Subgait
 
 FOUR_PARAMETRIC_GAITS_PREFIX = "_fpg_"
 
+
 class SubgaitTest(unittest.TestCase):
     def setUp(self):
         self.gait_name = "walk"
@@ -372,12 +373,16 @@ class SubgaitTest(unittest.TestCase):
         """Test the four parametric gaits feature"""
         first_parameter = 0.5
         second_parameter = 0.5
-        first_version =  "MIV_final"
+        first_version = "MIV_final"
         second_version = "MV_walk_leftclose_v1"
-        third_version =  "MV_walk_leftclose_v2"
+        third_version = "MV_walk_leftclose_v2"
         fourth_version = "MV_walk_leftclose_inverse_kinematics_v2"
-        version = f"{FOUR_PARAMETRIC_GAITS_PREFIX}{first_parameter}_{second_parameter}_" \
-                  f"({first_version})_({second_version})_({third_version})_({fourth_version})"
+        version = (
+            f"{FOUR_PARAMETRIC_GAITS_PREFIX}{first_parameter}_{second_parameter}_"
+            f"({first_version})_({second_version})_({third_version})_({fourth_version})"
+        )
 
-        subgait = Subgait.from_name_and_version(self.robot, self.resources_folder, "walk", "left_close", version)
+        subgait = Subgait.from_name_and_version(
+            self.robot, self.resources_folder, "walk", "left_close", version
+        )
         self.assertIsInstance(subgait, Subgait)
