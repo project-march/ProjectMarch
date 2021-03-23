@@ -38,6 +38,7 @@ NormalsPreprocessor::NormalsPreprocessor(YAML::Node config_tree, bool debugging)
 {
   tfBuffer = std::make_unique<tf2_ros::Buffer>();
   tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
+  readYaml();
 }
 
 // Removes a point from a pointcloud (and optionally the corresponding pointcloud_normals as well) at a given index
@@ -78,8 +79,6 @@ bool NormalsPreprocessor::preprocess(
 
   bool success = true;
 
-  success &= readYaml();
-
   success &= downsample();
 
   geometry_msgs::TransformStamped transform_stamped;
@@ -109,22 +108,18 @@ bool NormalsPreprocessor::preprocess(
   return success;
 }
 
-bool NormalsPreprocessor::readYaml()
+void NormalsPreprocessor::readYaml()
 {
-  bool success = true;
+  getDownsamplingParameters();
 
-  success &= getDownsamplingParameters();
+  getDistanceFilterParameters();
 
-  success &= getDistanceFilterParameters();
+  getNormalEstimationParameters();
 
-  success &= getNormalEstimationParameters();
-
-  success &= getNormalFilterParameters();
-
-  return success;
+  getNormalFilterParameters();
 }
 
-bool NormalsPreprocessor::getDownsamplingParameters()
+void NormalsPreprocessor::getDownsamplingParameters()
 {
   // Grab downsampling parameters
   if (YAML::Node downsampling_parameters = config_tree_["downsampling"])
@@ -147,12 +142,10 @@ bool NormalsPreprocessor::getDownsamplingParameters()
   else
   {
     ROS_ERROR("Downsample parameters not found in parameter file");
-    return false;
   }
-  return true;
 }
 
-bool NormalsPreprocessor::getDistanceFilterParameters()
+void NormalsPreprocessor::getDistanceFilterParameters()
 {
   //  Grab distance filter parameters
   if (YAML::Node parameters = config_tree_["distance_filter"])
@@ -162,12 +155,10 @@ bool NormalsPreprocessor::getDistanceFilterParameters()
   else
   {
     ROS_ERROR("Distance filter parameters not found in parameter file");
-    return false;
   }
-  return true;
 }
 
-bool NormalsPreprocessor::getNormalEstimationParameters()
+void NormalsPreprocessor::getNormalEstimationParameters()
 {
   //  Grab normal estimation parameters
   if (YAML::Node normal_estimation_parameters = config_tree_["normal_estimation"])
@@ -185,12 +176,10 @@ bool NormalsPreprocessor::getNormalEstimationParameters()
   else
   {
     ROS_ERROR("Normal estimation parameters not found in parameter file");
-    return false;
   }
-  return true;
 }
 
-bool NormalsPreprocessor::getNormalFilterParameters()
+void NormalsPreprocessor::getNormalFilterParameters()
 {
   //  Grab normal filter parameters
   if (YAML::Node normal_filter_parameters = config_tree_["normal_filter"])
@@ -202,9 +191,7 @@ bool NormalsPreprocessor::getNormalFilterParameters()
   else
   {
     ROS_ERROR("Normal filter parameters not found in parameter file");
-    return false;
   }
-  return true;
 }
 
 // Downsample the number of points in the pointcloud to have a more workable number of points
