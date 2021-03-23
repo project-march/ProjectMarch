@@ -19,7 +19,9 @@ class ParametricPopUpWindow(QDialog):
 
         self.buttonBox.accepted.connect(self.save)
         self.buttonBox.rejected.connect(self.cancel)
-        self.parameterSlider.valueChanged.connect(self.value_changed)
+        self.firstParameterSlider.valueChanged.connect(self.first_parameter_value_changed)
+        self.secondParameterSlider.valueChanged.connect(self.second_parameter_value_changed)
+
 
     def show_pop_up(self, versions):
         """Reset and show pop up."""
@@ -29,25 +31,32 @@ class ParametricPopUpWindow(QDialog):
         self.otherVersionComboBox.addItems(versions)
         self.parameterSlider.setValue(50)
         self.parameterLabel.setText("parameter = 0.50")
+        self.four_subgait_interpolation = False
 
         # For 'normal' parametric gaits between two subgaits
+        self.parameter = 0.0
         self.base_version = ""
         self.other_version = ""
-        self.parameter = 0.0
 
         # For 'multiple' parametric gaits between four subgaits
-        self.parameter = 0.0
-        self.parameter = 0.0
-        self.base_version = ""
-        self.other_version = ""
-        self.base_version = ""
-        self.other_version = ""
+        self.first_parameter = 0.0
+        self.second_parameter = 0.0
+        self.first_version = ""
+        self.second_version = ""
+        self.third_version = ""
+        self.fourth_version = ""
         return super(ParametricPopUpWindow, self).exec_()
 
-    def value_changed(self):
+    def first_parameter_value_changed(self):
         """Puts the new slider value in the label next to it."""
-        self.parameterLabel.setText(
-            "parameter = {val:.2f}".format(val=self.parameterSlider.value() / 100.0)
+        self.firstParameterLabel.setText(
+            "first parameter = {val:.2f}".format(val=self.firstParameterSlider.value() / 100.0)
+        )
+
+    def second_parameter_value_changed(self):
+        """Puts the new slider value in the label next to it."""
+        self.secondParameterLabel.setText(
+            "second parameter = {val:.2f}".format(val=self.secondParameterSlider.value() / 100.0)
         )
 
     def cancel(self):
@@ -56,7 +65,16 @@ class ParametricPopUpWindow(QDialog):
 
     def save(self):
         """Check and save value while closing, close if successful."""
-        self.base_version = self.baseVersionComboBox.currentText()
-        self.other_version = self.otherVersionComboBox.currentText()
-        self.parameter = self.parameterSlider.value() / 100.0
-        self.accept()
+        if self.fourSubgaitInterpolation.isChecked():
+            self.first_version = self.firstVersionComboBox.currentText()
+            self.second_version = self.secondVersionComboBox.currentText()
+            self.third_version = self.thirdVersionComboBox.currentText()
+            self.fourth_version = self.fourthVersionComboBox.currentText()
+            self.first_parameter = self.firstParameterSlider.value() / 100.0
+            self.second_parameter = self.secondParameterSlider.value() / 100.0
+            self.accept()
+        else:
+            self.base_version = self.firstVersionComboBox.currentText()
+            self.other_version = self.secondVersionComboBox.currentText()
+            self.parameter = self.firstParameterSlider.value() / 100.0
+            self.accept()
