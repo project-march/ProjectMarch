@@ -28,9 +28,6 @@ bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::Jo
       model_predictive_controllers_[i].init();
   }
 
-  command_pub_ =
-      std::make_unique<realtime_tools::RealtimePublisher<std_msgs::Float64MultiArray>>(nh, "/march/mpc/command", 10);
-  command_pub_->msg_.data.resize(num_joints_);
   return true;
 }
 
@@ -208,14 +205,6 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
 
     // Apply command
     (*joint_handles_ptr_)[i].setCommand(command);
-  }
-
-    // Publish command
-    if (!command_pub_->trylock())
-    {
-      return;
-    }
-    command_pub_->msg_.data[i] = command;
   }
 
   for (unsigned int i = 0; i < num_joints_; ++i)
