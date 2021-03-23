@@ -20,9 +20,15 @@ class ParametricPopUpWindow(QDialog):
 
         self.buttonBox.accepted.connect(self.save)
         self.buttonBox.rejected.connect(self.cancel)
-        self.firstParameterSlider.valueChanged.connect(self.first_parameter_value_changed)
-        self.secondParameterSlider.valueChanged.connect(self.second_parameter_value_changed)
-        self.fourSubgaitInterpolation.stateChanged.connect(self.four_subgait_interpolation_changed)
+        self.firstParameterSlider.valueChanged.connect(
+            self.first_parameter_value_changed
+        )
+        self.secondParameterSlider.valueChanged.connect(
+            self.second_parameter_value_changed
+        )
+        self.fourSubgaitInterpolation.stateChanged.connect(
+            self.four_subgait_interpolation_changed
+        )
 
         # Initialize the third and fourth combo box and the second parameter slider as blocked
         self.thirdVersionComboBox.setEnabled(False)
@@ -63,13 +69,17 @@ class ParametricPopUpWindow(QDialog):
     def first_parameter_value_changed(self):
         """Puts the new slider value in the label next to it."""
         self.firstParameterLabel.setText(
-            "first parameter = {val:.2f}".format(val=self.firstParameterSlider.value() / 100.0)
+            "first parameter = {val:.2f}".format(
+                val=self.firstParameterSlider.value() / 100.0
+            )
         )
 
     def second_parameter_value_changed(self):
         """Puts the new slider value in the label next to it."""
         self.secondParameterLabel.setText(
-            "second parameter = {val:.2f}".format(val=self.secondParameterSlider.value() / 100.0)
+            "second parameter = {val:.2f}".format(
+                val=self.secondParameterSlider.value() / 100.0
+            )
         )
 
     def four_subgait_interpolation_changed(self):

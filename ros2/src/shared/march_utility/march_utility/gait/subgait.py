@@ -586,14 +586,13 @@ class Subgait(object):
             gait_version_list,
             parameter_list,
         ) = Subgait.unpack_four_parametric_version(version)
-        version_path_list = [''] * 4
+        version_path_list = [""] * 4
         for version_index in range(4):
             version_path_list[version_index] = os.path.join(
                 subgait_path, gait_version_list[version_index] + SUBGAIT_SUFFIX
             )
         return all(
-            not os.path.isfile(version_path)
-            for version_path in version_path_list
+            not os.path.isfile(version_path) for version_path in version_path_list
         )
 
     @staticmethod
@@ -645,10 +644,7 @@ class Subgait(object):
         for version in versions:
             version_list.append(version[1:-1])
 
-        return (
-            version_list,
-            parameter_list
-        )
+        return (version_list, parameter_list)
 
     @staticmethod
     def check_foot_position_interpolation_is_safe(
