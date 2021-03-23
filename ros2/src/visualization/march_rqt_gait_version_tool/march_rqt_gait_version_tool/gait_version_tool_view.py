@@ -344,7 +344,7 @@ class GaitVersionToolView(QWidget):
         )
 
     def get_four_parametric_version(self):
-        return "{0}{1}_{2}_({3})_({4})_({5})".format(
+        return "{0}{1}_{2}_({3})_({4})_({5})_({6})".format(
             PARAMETRIC_GAIT_PREFIX,
             self._parametric_pop_up.first_parameter,
             self._parametrix_pup_up.second_parameter,

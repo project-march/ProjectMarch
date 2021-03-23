@@ -24,7 +24,7 @@ from .limits import Limits
 from .setpoint import Setpoint
 
 PARAMETRIC_GAITS_PREFIX = "_pg_"
-FOUR_PARAMETRIC_GAITS_PREFIX = "_mpg_"
+FOUR_PARAMETRIC_GAITS_PREFIX = "_fpg_"
 SUBGAIT_SUFFIX = ".subgait"
 JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
 TIME_STAMPS_ROUNDING = 4
