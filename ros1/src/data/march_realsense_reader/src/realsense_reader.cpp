@@ -206,7 +206,7 @@ void RealSenseReader::publishCloud(ros::Publisher publisher,
 
   sensor_msgs::PointCloud2 msg;
 
-  pcl::toROSMsg(*pointcloud, msg);
+  pcl::toROSMsg(cloud, msg);
 
   msg.header.frame_id = "foot_left";
 
