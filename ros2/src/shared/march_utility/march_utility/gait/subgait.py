@@ -377,7 +377,7 @@ class Subgait(object):
         first_parameter: float,
         second_parameter: float,
         use_foot_position: bool = False,
-    ):
+    ) -> Subgait:
         """
         Interpolate two subgaits with the parameter to get a new subgait.
 
