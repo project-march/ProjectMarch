@@ -19,7 +19,7 @@ using PlaneCoefficientsVector = std::vector<pcl::ModelCoefficients::Ptr>;
 using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
 using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
 
-std::string POINTCLOUD_TOPIC = "/camera/depth/color/points";
+std::string POINTCLOUD_TOPIC = "/camera_front/depth/color/points";
 ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(1.0); // secs
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n):
@@ -205,7 +205,9 @@ void RealSenseReader::publishCloud(ros::Publisher publisher,
   cloud.height = cloud.points.size();
 
   sensor_msgs::PointCloud2 msg;
-  pcl::toROSMsg(cloud, msg);
+
+  pcl::toROSMsg(*pointcloud, msg);
+
   msg.header.frame_id = "foot_left";
 
   publisher.publish(msg);
