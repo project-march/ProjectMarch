@@ -1,15 +1,64 @@
-description: Stairs up with height of 13 cm and depth of 35 cm
+description: Stairs up with height of 12 cm and depth of 20 cm
 duration: 3750000000
 gait_type: stairs_like
 joints:
   left_ankle:
-  - position: -0.08726646
+  - position: 0.04360007
     time_from_start: 0
+    velocity: 0.0
+  - position: 0.04363323
+    time_from_start: 2080000000
     velocity: 0.0
   - position: 0.0436
     time_from_start: 3750000000
     velocity: 0.0
   left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 3750000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.17449976
+  - position: 0.87266463
+    time_from_start: 1700000000
+    velocity: 0.0
+  - position: 0.08726646
+    time_from_start: 2750000000
+    velocity: 0.0
+  - position: 0.08726646
+    time_from_start: 3000000000
+    velocity: 0.0
+  - position: -0.0873
+    time_from_start: 3750000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.24430072
+    time_from_start: 0
+    velocity: 0.69810028
+  - position: 1.3962634
+    time_from_start: 1400000000
+    velocity: 0.0
+  - position: 1.04719755
+    time_from_start: 1888000000
+    velocity: -1.33309994
+  - position: 0.0
+    time_from_start: 2750000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 3750000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.04360007
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0436
+    time_from_start: 3750000000
+    velocity: 0.0
+  right_hip_aa:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
@@ -22,52 +71,9 @@ joints:
   - position: 0.0
     time_from_start: 3750000000
     velocity: 0.0
-  left_hip_fe:
-  - position: 0.82641166
-    time_from_start: 0
-    velocity: 0.0
-  - position: 0.08726646
-    time_from_start: 2750000000
-    velocity: 0.0
-  - position: 0.08726646
-    time_from_start: 3000000000
-    velocity: 0.0
-  - position: -0.0873
-    time_from_start: 3750000000
-    velocity: 0.0
-  left_knee:
-  - position: 0.65194331
-    time_from_start: 0
-    velocity: 0.0
-  - position: 0.0
-    time_from_start: 2750000000
-    velocity: 0.0
-  - position: 0.0
-    time_from_start: 3750000000
-    velocity: 0.0
-  right_ankle:
-  - position: 0.04360007
-    time_from_start: 0
-    velocity: 0.0
-  - position: 0.04363323
-    time_from_start: 2080000000
-    velocity: 0.0
-  - position: 0.0436
-    time_from_start: 3750000000
-    velocity: 0.0
-  right_hip_aa:
-  - position: 0.0
-    time_from_start: 0
-    velocity: 0.0
-  - position: 0.0
-    time_from_start: 3750000000
-    velocity: 0.0
   right_hip_fe:
-  - position: -0.08726646
+  - position: 0.91097286
     time_from_start: 0
-    velocity: 0.17449976
-  - position: 1.04719755
-    time_from_start: 1700000000
     velocity: 0.0
   - position: 0.08726646
     time_from_start: 2750000000
@@ -79,20 +85,14 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
   right_knee:
-  - position: 0.2443
+  - position: 1.17154353
     time_from_start: 0
-    velocity: 0.76791
-  - position: 1.57079633
-    time_from_start: 1400000000
     velocity: 0.0
-  - position: 1.20080049
-    time_from_start: 1888000000
-    velocity: -1.33309994
   - position: 0.0
     time_from_start: 2750000000
     velocity: 0.0
   - position: 0.0
     time_from_start: 3750000000
     velocity: 0.0
-name: right_close
-version: MVI_stairsup_rightclose_haa_adpf_hD
+name: left_close
+version: MVI_stairsup_leftclose_low_undeep

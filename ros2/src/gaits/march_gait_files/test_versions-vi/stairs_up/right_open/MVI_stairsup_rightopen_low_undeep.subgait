@@ -1,4 +1,4 @@
-description: Stairs up height 20 cm and depth 20
+description: Stairs up height 12 cm and depth 20
 duration: 3500000000
 gait_type: stairs_like
 joints:
@@ -78,7 +78,7 @@ joints:
     time_from_start: 750000000
     velocity: 0.0
   - position: 0.08726646
-    time_from_start: 3500000000
+    time_from_start: 1950000000
     velocity: 0.0
   - position: 0.0
     time_from_start: 3500000000
@@ -96,7 +96,7 @@ joints:
   - position: 1.20427718
     time_from_start: 2750000000
     velocity: 0.0
-  - position: 1.00635336
+  - position: 0.91097286
     time_from_start: 3500000000
     velocity: 0.0
   right_knee:
@@ -107,10 +107,10 @@ joints:
     time_from_start: 750000000
     velocity: 0.52359878
   - position: 1.74532925
-    time_from_start: 2750000000
-    velocity: -0.52359878
-  - position: 1.33779487
+    time_from_start: 2350000000
+    velocity: 0.0
+  - position: 1.17154353
     time_from_start: 3500000000
     velocity: 0.0
 name: right_open
-version: MVI_stairsup_rightopen_haa_adpf_Hd
+version: MVI_stairsup_rightopen_low_undeep

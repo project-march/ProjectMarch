@@ -1,10 +1,13 @@
-description: Stairs up with height of 13 cm and depth of 35 cm
+description: Stairs up height 22 cm and depth 20
 duration: 3500000000
 gait_type: stairs_like
 joints:
   left_ankle:
-  - position: 0.0436
+  - position: 0.04360007
     time_from_start: 0
+    velocity: 0.0
+  - position: 0.04363323
+    time_from_start: 750000000
     velocity: 0.0
   - position: 0.04360007
     time_from_start: 3500000000
@@ -20,7 +23,7 @@ joints:
     time_from_start: 1550000000
     velocity: -0.12217305
   - position: -0.06108652
-    time_from_start: 2450000000
+    time_from_start: 2950000000
     velocity: 0.12217305
   - position: 0.0
     time_from_start: 3500000000
@@ -36,29 +39,35 @@ joints:
     time_from_start: 750000000
     velocity: 0.0
   - position: 0.08726646
-    time_from_start: 2500000000
-    velocity: 0.02349213
-  - position: -0.08726646
+    time_from_start: 2184900000
+    velocity: 0.02153387
+  - position: 0.0
     time_from_start: 3500000000
     velocity: 0.17449976
   left_knee:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
+  - position: 0.0
+    time_from_start: 750000000
+    velocity: 0.0
   - position: 0.13960016
     time_from_start: 3050000000
-    velocity: 0.08726646
+    velocity: 0.03490659
   - position: 0.24430072
     time_from_start: 3500000000
-    velocity: 0.76790996
+    velocity: 0.69810028
   right_ankle:
   - position: 0.04360007
     time_from_start: 0
     velocity: 0.0
-  - position: 0.02189166
-    time_from_start: 1000000000
+  - position: 0.04360007
+    time_from_start: 750000000
     velocity: 0.0
-  - position: -0.08726646
+  - position: 0.04363323
+    time_from_start: 2900000000
+    velocity: 0.0
+  - position: 0.04360007
     time_from_start: 3500000000
     velocity: 0.0
   right_hip_aa:
@@ -69,7 +78,7 @@ joints:
     time_from_start: 750000000
     velocity: 0.0
   - position: 0.08726646
-    time_from_start: 2150000000
+    time_from_start: 1950000000
     velocity: 0.0
   - position: 0.0
     time_from_start: 3500000000
@@ -84,10 +93,10 @@ joints:
   - position: 0.08726646
     time_from_start: 750000000
     velocity: 0.0
-  - position: 1.110553
+  - position: 1.48352986
     time_from_start: 2750000000
-    velocity: -0.17453293
-  - position: 0.82641166
+    velocity: 0.0
+  - position: 1.27116344
     time_from_start: 3500000000
     velocity: 0.0
   right_knee:
@@ -97,11 +106,14 @@ joints:
   - position: 0.0
     time_from_start: 750000000
     velocity: 0.0
-  - position: 1.58824962
-    time_from_start: 2350000000
+  - position: 1.96017498
+    time_from_start: 2115500000
     velocity: 0.0
-  - position: 0.65194331
+  - position: 1.91986218
+    time_from_start: 2300000000
+    velocity: 0.0
+  - position: 1.6794134
     time_from_start: 3500000000
     velocity: 0.0
 name: right_open
-version: MVI_stairsup_rightopen_haa_adpf_hD
+version: MVI_stairsup_rightopen_high_undeep

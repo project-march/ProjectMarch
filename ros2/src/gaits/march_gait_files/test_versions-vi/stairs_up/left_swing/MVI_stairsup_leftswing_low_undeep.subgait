@@ -22,6 +22,9 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
+  - position: 0.08726646
+    time_from_start: 1250000000
+    velocity: 0.0
   - position: 0.0
     time_from_start: 2500000000
     velocity: 0.0
@@ -30,9 +33,9 @@ joints:
     time_from_start: 0
     velocity: 0.17449976
   - position: 1.03423674
-    time_from_start: 1886800000
+    time_from_start: 1880000000
     velocity: 0.0
-  - position: 0.78662688
+  - position: 0.91097286
     time_from_start: 2500000000
     velocity: 0.0
   left_knee:
@@ -42,7 +45,7 @@ joints:
   - position: 1.65806279
     time_from_start: 1550000000
     velocity: 0.0
-  - position: 0.92273289
+  - position: 1.17154353
     time_from_start: 2500000000
     velocity: 0.0
   right_ankle:
@@ -56,24 +59,21 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.06108652
-    time_from_start: 733900000
-    velocity: -0.13439035
   - position: -0.08726646
-    time_from_start: 1432200000
+    time_from_start: 1250000000
     velocity: 0.01210211
   - position: 0.0
     time_from_start: 2500000000
     velocity: 0.0
   right_hip_fe:
-  - position: 0.78662688
+  - position: 0.91097286
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
     time_from_start: 2500000000
     velocity: 0.17449976
   right_knee:
-  - position: 0.97625515
+  - position: 1.17154353
     time_from_start: 0
     velocity: 0.0
   - position: 0.13960016
@@ -83,4 +83,4 @@ joints:
     time_from_start: 2500000000
     velocity: 0.69810028
 name: left_swing
-version: MVI_stairsup_leftswing_haa_adpf_hd
+version: MVI_stairsup_leftswing_low_undeep

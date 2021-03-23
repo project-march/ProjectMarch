@@ -23,7 +23,7 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
   left_hip_fe:
-  - position: 0.78662688
+  - position: 0.91097286
     time_from_start: 0
     velocity: 0.0
   - position: 0.08726646
@@ -36,7 +36,7 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
   left_knee:
-  - position: 0.92273289
+  - position: 1.17154353
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
@@ -95,4 +95,4 @@ joints:
     time_from_start: 3750000000
     velocity: 0.0
 name: right_close
-version: MVI_stairsup_rightclose_haa_adpf_hd
+version: MVI_stairsup_rightclose_low_undeep
