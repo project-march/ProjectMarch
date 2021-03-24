@@ -1,4 +1,4 @@
-description: Subgait generated using TestJointGaitGenerator, with a duration of 6.0s
+description: Subgait generated using TestJointGaitGenerator, with a duration of 8.0s
   and 2 setpoints.
 duration:
   nsecs: 0
@@ -11,20 +11,20 @@ joints:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: -0.2
+  - position: -20.0
     time_from_start:
       nsecs: 0
       secs: 2
     velocity: 0.0
-  - position: 0.2
-    time_from_start:
-      nsecs: 0
-      secs: 4
-    velocity: 0.0
-  - position: 0.0
+  - position: 20.0
     time_from_start:
       nsecs: 0
       secs: 6
     velocity: 0.0
-name: rot_test
-version: rot_test
+  - position: 0.0
+    time_from_start:
+      nsecs: 0
+      secs: 8
+    velocity: 0.0
+name: sine_subgait
+version: MVI_linear_sine_subgait_v1

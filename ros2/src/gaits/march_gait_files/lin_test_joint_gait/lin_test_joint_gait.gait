@@ -1,6 +1,0 @@
-name: lin_test_joint_gait
-subgaits:
-  lin_test:
-    to: end
-  start:
-    to: lin_test

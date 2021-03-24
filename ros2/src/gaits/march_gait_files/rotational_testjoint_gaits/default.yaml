@@ -1,6 +1,6 @@
 gaits:
-  rot_test_joint_gait:
-    rot_test: rot_test
+  sine_gait:
+    sine_subgait: MVI_rotational_sine_subgait_v1
 positions:
   setup:
     gait_type: ''

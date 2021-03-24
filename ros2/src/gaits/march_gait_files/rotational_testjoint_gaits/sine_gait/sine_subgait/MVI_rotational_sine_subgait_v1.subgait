@@ -11,20 +11,20 @@ joints:
       nsecs: 0
       secs: 0
     velocity: 0.0
-  - position: -20.0
+  - position: -0.2
+    time_from_start:
+      nsecs: 0
+      secs: 2
+    velocity: 0.0
+  - position: 0.2
     time_from_start:
       nsecs: 0
       secs: 4
     velocity: 0.0
-  - position: 20.0
-    time_from_start:
-      nsecs: 0
-      secs: 12
-    velocity: 0.0
   - position: 0.0
     time_from_start:
       nsecs: 0
-      secs: 16
+      secs: 6
     velocity: 0.0
-name: lin_test
-version: lin_test
+name: sine_subgait
+version: MVI_rotational_sine_subgait_v1

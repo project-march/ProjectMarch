@@ -1,6 +1,6 @@
 gaits:
-  lin_test_joint_gait:
-    lin_test: lin_test
+  sine_gait:
+    sine_subgait: MVI_linear_sine_subgait_v1
 positions:
   setup:
     gait_type: ''
