@@ -8,8 +8,6 @@
     <arg name="controller_type" default="effort_control" doc="Changes the controller used by simulation."/>
     <arg name="controller_name" default="$(arg robot)" doc="Name of the controller"/>
 
-    <param name="robot_description" textfile="$(find march_description)/urdf/$(arg robot_description).xacro"/>
-
     <arg name="gain_scheduling" default="true" doc="Whether to use gain scheduling, which changes PID values based on executed gait."/>
     <arg name="gain_tuning" default="groundgait" doc="The configuration to use for gain scheduling. Only used when 'gain_scheduling' is true."/>
 
@@ -131,18 +129,18 @@
 <!-- Simulation            -->
         <param name="robot_description"
                command="$(find xacro)/xacro '$(find march_description)/urdf/$(arg robot_description).xacro'
-                    k_velocity_value_hfe:=60.0 k_velocity_value_kfe:=60.0
-                    k_velocity_value_haa:=60.0 k_velocity_value_adpf:=15.0
-                    k_position_value_hfe:=5000.0 k_position_value_kfe:=5000.0
-                    k_position_value_haa:=5000.0 k_position_value_adpf:=5000.0
-                    max_effort_rotary:=200.0 max_effort_linear:=200.0
-                    ground_gait:=$(arg ground_gait) configuration:=$(arg configuration)"/>
+                    ground_gait:=$(arg ground_gait) realsense_simulation:=$(arg realsense_simulation)
+                    configuration:=$(arg configuration)"/>
+
         <include if="$(arg balance)" file="$(find march_moveit)/launch/march_moveit.launch" />
         <include if="$(arg balance)"
                  file="$(find march_moveit_interface)/launch/moveit_interface.launch" />
     </group>
     <param name="balance" value="$(arg balance)"/>
 
+    <param name="robot_description"
+           command="$(find xacro)/xacro '$(find march_description)/urdf/$(arg robot_description).xacro'
+                    ground_gait:=$(arg ground_gait) configuration:=$(arg configuration)"/>
 
     <node name="rviz" pkg="rviz" type="rviz" if="$(eval not headless and rviz)"/>
     <group if="$(eval configuration == 'simulation')">
