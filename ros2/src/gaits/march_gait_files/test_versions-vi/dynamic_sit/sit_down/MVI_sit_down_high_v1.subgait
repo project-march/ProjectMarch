@@ -1,0 +1,98 @@
+description: Sit down gait for a high sit block.
+duration: 2500000000
+gait_type: sit_like
+joints:
+  left_ankle:
+  - position: 0.04360007
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.15707963
+    time_from_start: 1638600000
+    velocity: 0.0
+  - position: 0.04360007
+    time_from_start: 2500000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 937500000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1250000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2500000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: -0.08729962
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.17449976
+    time_from_start: 500000000
+    velocity: 0.69810028
+  - position: 1.48350019
+    time_from_start: 2000000000
+    velocity: 0.55850012
+  - position: 1.57079633
+    time_from_start: 2500000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.30274307
+    time_from_start: 800000000
+    velocity: 0.69810028
+  - position: 1.57079633
+    time_from_start: 2500000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.04360007
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.15707963
+    time_from_start: 1656800000
+    velocity: 0.0
+  - position: 0.04360007
+    time_from_start: 2500000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 937500000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1250000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2500000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: -0.08729962
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.17449976
+    time_from_start: 500000000
+    velocity: 0.69810028
+  - position: 1.48350019
+    time_from_start: 2000000000
+    velocity: 0.55850012
+  - position: 1.57079633
+    time_from_start: 2500000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.25322459
+    time_from_start: 800000000
+    velocity: 0.6981317
+  - position: 1.57079633
+    time_from_start: 2500000000
+    velocity: 0.0
+name: sit_down
+version: MVI_sit_down_high_v1
