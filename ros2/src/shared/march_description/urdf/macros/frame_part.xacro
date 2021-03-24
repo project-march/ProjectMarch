@@ -4,17 +4,14 @@
                  params="name reflect length direction collision_origin visual_origin:=0 mesh:=0 com:=0 mass:=0 inertia:=0 scale:='1 1 1'">
         <xacro:if value="${direction == 'x'}">
             <xacro:property name="size" value="${length} ${width} ${width}"/>
-<!--            <xacro:property name="collision_origin" value="${-length/2} ${width} ${width}"/>-->
             <xacro:property name="rpy" value="0 0 0"/>
         </xacro:if>
         <xacro:if value="${direction == 'y'}">
             <xacro:property name="size" value="${width} ${length} ${width}"/>
-<!--            <xacro:property name="collision_origin" value="${-length/2} ${width} ${width}"/>-->
             <xacro:property name="rpy" value="0 0 ${pi}"/>
         </xacro:if>
         <xacro:if value="${direction == 'z'}">
-            <xacro:property name="size" value="${width} ${width} ${length}"/>
-<!--            <xacro:property name="collision_origin" value="${-length/2} ${width} ${width}"/>-->
+            <xacro:property name="size" value="${width} ${width} ${length}"/>>
             <xacro:property name="rpy" value="0 0 ${pi}"/>
         </xacro:if>
 
