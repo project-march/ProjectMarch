@@ -1,4 +1,4 @@
-name: sofa_sit
+name: dynamic_sit
 subgaits:
   sit_down:
     to: sit_home
