@@ -292,7 +292,7 @@ bool HullParameterDeterminer::cropCloudToHullVector(PointCloud2D::Ptr const inpu
   bool success = true;
   for (int hull_index = 0; hull_index < hull_vector_->size(); hull_index++)
   {
-    PointCloud::Ptr elevated_cloud (new PointCloud);
+    PointCloud::Ptr elevated_cloud = boost::make_shared<PointCloud>();
     success &= addZCoordinateToCloudFromPlaneCoefficients(input_cloud,
                                                           plane_coefficients_vector_->at(hull_index),
                                                           elevated_cloud);
