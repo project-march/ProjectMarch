@@ -41,35 +41,28 @@ HullParameterDeterminer::HullParameterDeterminer(YAML::Node config_tree, bool de
 // Read all relevant parameters from the parameter yaml file
 void HullParameterDeterminer::readYaml()
 {
-  if (YAML::Node hull_parameter_determiner_parameters = config_tree_["hull_parameter_determiner"])
+  number_of_optional_foot_locations = yaml_utilities::grabParameter<int>(
+      config_tree_, "number_of_optional_foot_locations");
+  general_most_desirable_location_is_mid = yaml_utilities::grabParameter<bool>(
+      config_tree_, "general_most_desirable_location_is_mid");
+  general_most_desirable_location_is_small = yaml_utilities::grabParameter<bool>(
+      config_tree_, "general_most_desirable_location_is_small");
+  if (YAML::Node stairs_locations_parameters = config_tree_["stairs_locations"])
   {
-    number_of_optional_foot_locations = yaml_utilities::grabParameter<int>(
-        hull_parameter_determiner_parameters, "number_of_optional_foot_locations");
-    general_most_desirable_location_is_mid = yaml_utilities::grabParameter<bool>(
-        hull_parameter_determiner_parameters, "general_most_desirable_location_is_mid");
-    general_most_desirable_location_is_small = yaml_utilities::grabParameter<bool>(
-        hull_parameter_determiner_parameters, "general_most_desirable_location_is_small");
-    if (YAML::Node stairs_locations_parameters = hull_parameter_determiner_parameters["stairs_locations"])
-    {
-      min_x_stairs = yaml_utilities::grabParameter<double>(
-          stairs_locations_parameters, "min_x_stairs");
-      max_x_stairs = yaml_utilities::grabParameter<double>(
-          stairs_locations_parameters, "max_x_stairs");
-      min_z_stairs = yaml_utilities::grabParameter<double>(
-          stairs_locations_parameters, "min_z_stairs");
-      max_z_stairs = yaml_utilities::grabParameter<double>(
-          stairs_locations_parameters, "max_z_stairs");
-      y_location = yaml_utilities::grabParameter<double>(
-          stairs_locations_parameters,"y_location");
-    }
-    else
-    {
-      ROS_ERROR("'stairs_locations' parameters not found in parameters file");
-    }
+    min_x_stairs = yaml_utilities::grabParameter<double>(
+        stairs_locations_parameters, "min_x_stairs");
+    max_x_stairs = yaml_utilities::grabParameter<double>(
+        stairs_locations_parameters, "max_x_stairs");
+    min_z_stairs = yaml_utilities::grabParameter<double>(
+        stairs_locations_parameters, "min_z_stairs");
+    max_z_stairs = yaml_utilities::grabParameter<double>(
+        stairs_locations_parameters, "max_z_stairs");
+    y_location = yaml_utilities::grabParameter<double>(
+        stairs_locations_parameters,"y_location");
   }
   else
   {
-    ROS_ERROR("'hull_parameter_determiner' parameters not found in parameter file");
+    ROS_ERROR("'stairs_locations' parameters not found in parameters file");
   }
 }
 
