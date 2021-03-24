@@ -32,6 +32,11 @@
     <arg name="rosbag" default="true" doc="Enables rosbag record node."/>
     <arg name="bag_prefix" default="log" doc="Prefix of the bag file. Only used if rosbag is true."/>
 
+    <arg name="realsense" default="false" doc="Launches the realsense reader node when true."/>
+    <arg name="realsense_simulation" default="$(arg realsense)"
+         doc="Whether the simulation camera or the physical camera should be used"/>
+    <include file="$(find march_launch)/launch/realsense_camera.launch"
+             if="$(eval (not realsense_simulation) and realsense)" pass_all_args="true"/>
     <arg name="data_collector" default="false" doc="Launches the data collector when true."/>
     <arg name="pressure_soles" default="false" doc="Whether a connection with pressure_soles should be established." />
     <arg name="moticon_ip" default="192.168.8.105" doc="The ip-adress with Moticon software running on it, defaults to
@@ -79,10 +84,17 @@
             args="-a -q -o $(arg bag_prefix)"
     />
 
+    <rosparam file="$(find march_bridge_parameters)/config/topics_services_to_bridge.yaml"
+              command="load"/>
+
     <group ns="march">
+        <include file="$(find march_realsense_reader)/launch/realsense_reader.launch"
+                 if="$(arg realsense)"/>
+
         <include file="$(find march_data_collector)/launch/march_data_collector.launch" if="$(eval data_collector or balance)">
             <arg name="pressure_soles" value="$(arg pressure_soles)"/>
             <arg name="moticon_ip" value="$(arg moticon_ip)"/>
+            <arg name="simulation" value="$(eval configuration == 'simulation')"/>
         </include>
 
 
@@ -97,15 +109,24 @@
             <arg name="sounds" value="$(arg sounds)"/>
         </include>
 
-        <include file="$(find march_safety)/launch/march_safety.launch"/>
         <include file="$(find march_gain_scheduling)/launch/march_gain_scheduling.launch" if="$(arg gain_scheduling)">
             <arg name="configuration" value="$(arg gain_tuning)"/>
         </include>
 
 <!-- Simulation            -->
+        <param name="robot_description"
+               command="$(find xacro)/xacro '$(find march_description)/urdf/$(arg robot_description).xacro'
+                    k_velocity_value_hfe:=60.0 k_velocity_value_kfe:=60.0
+                    k_velocity_value_haa:=60.0 k_velocity_value_adpf:=15.0
+                    k_position_value_hfe:=5000.0 k_position_value_kfe:=5000.0
+                    k_position_value_haa:=5000.0 k_position_value_adpf:=5000.0
+                    max_effort_rotary:=200.0 max_effort_linear:=200.0
+                    ground_gait:=$(arg ground_gait)" />
         <include if="$(arg balance)" file="$(find march_moveit)/launch/march_moveit.launch" />
-        <param name="balance" value="$(arg balance)"/>
+        <include if="$(arg balance)"
+                 file="$(find march_moveit_interface)/launch/moveit_interface.launch" />
     </group>
+    <param name="balance" value="$(arg balance)"/>
 
 
     <node name="rviz" pkg="rviz" type="rviz" if="$(eval not headless and rviz)"/>
@@ -119,6 +140,7 @@
             <arg name="robot_description" value="$(arg robot_description)"/>
             <arg name="controller_name" value="$(arg controller_name)"/>
             <arg name="controller_type" value="$(arg controller_type)"/>
+            <arg name="realsense_simulation" value="$(arg realsense_simulation)"/>
         </include>
     </group>
 

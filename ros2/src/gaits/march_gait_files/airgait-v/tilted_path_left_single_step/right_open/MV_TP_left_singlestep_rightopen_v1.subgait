@@ -1,87 +1,87 @@
 description: The right open gait for the single step for the grass part of the Tilted
   Path.
-duration: {nsecs: 500000000, secs: 1}
+duration: 1500000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: -0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 562400000, secs: 0}
+    time_from_start: 562400000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 750000000, secs: 0}
+    time_from_start: 750000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: -0.0
   left_hip_fe:
   - position: 0.4014
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.3316
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: 0.0
   left_knee:
   - position: 0.6981
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.8378
-    time_from_start: {nsecs: 20000000, secs: 1}
+    time_from_start: 1020000000
     velocity: 0.0
   - position: 0.8378
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: 0.0
   right_ankle:
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: -0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 562400000, secs: 0}
+    time_from_start: 562400000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 750000000, secs: 0}
+    time_from_start: 750000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: -0.0
   right_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.5585
-    time_from_start: {nsecs: 900000000, secs: 0}
+    time_from_start: 900000000
     velocity: 0.1396
   - position: 0.3142
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: -0.3491
   right_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.8727
-    time_from_start: {nsecs: 630000000, secs: 0}
+    time_from_start: 630000000
     velocity: 0.0
   - position: 0.0969
-    time_from_start: {nsecs: 350000000, secs: 1}
+    time_from_start: 1350000000
     velocity: 0.0
   - position: 0.1396
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: 0.0
 name: right_open
 version: MV_TP_left_singlestep_rightopen_v1

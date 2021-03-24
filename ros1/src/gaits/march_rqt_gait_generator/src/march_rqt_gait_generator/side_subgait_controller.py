@@ -3,7 +3,12 @@ from numpy_ringbuffer import RingBuffer
 
 class SideSubgaitController(object):
     def __init__(
-        self, default, view, lock_checked=False, default_checked=False, subgait=None
+        self,
+        default,
+        view,
+        lock_checked=False,
+        default_checked=False,
+        subgait=None,
     ):
         self._lock_checked = lock_checked
         self._default_checked = default_checked

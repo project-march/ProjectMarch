@@ -25,6 +25,11 @@ def generate_launch_description():
                 description="The directory in which the gait files to use are "
                 "located, relative to the gait_package.",
             ),
+            DeclareLaunchArgument(
+                "balance",
+                default_value="False",
+                description="Whether balance is being used.",
+            ),
             Node(
                 package="march_gait_selection",
                 executable="march_gait_selection",
@@ -34,6 +39,7 @@ def generate_launch_description():
                     {"use_sim_time": LaunchConfiguration("use_sim_time")},
                     {"gait_package": LaunchConfiguration("gait_package")},
                     {"gait_directory": LaunchConfiguration("gait_directory")},
+                    {"balance": LaunchConfiguration("balance")},
                 ],
             ),
         ]

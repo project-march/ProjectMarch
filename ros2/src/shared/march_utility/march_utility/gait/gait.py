@@ -12,7 +12,7 @@ from march_utility.exceptions.gait_exceptions import (
 from .subgait import Subgait
 from .subgait_graph import SubgaitGraph
 
-ALLOWED_ERROR_ENDPOINTS = 0.0001
+ALLOWED_ERROR_ENDPOINTS = 0.001
 
 
 class Gait(object):

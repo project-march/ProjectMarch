@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
     message_generation
     std_msgs
     trajectory_msgs
+    sensor_msgs
 )
 
 add_message_files(
@@ -18,6 +19,7 @@ add_message_files(
     Error.msg
     GaitInstruction.msg
     GaitInstructionResponse.msg
+    GaitParameters.msg
     HighVoltageNet.msg
     ImcState.msg
     MotorControllerState.msg
@@ -25,20 +27,38 @@ add_message_files(
     LowVoltageNet.msg
     PowerDistributionBoardState.msg
     PressureSole.msg
+    PressureSoleData.msg
+    PressureSolesData.msg
+)
+add_message_files(
+    DIRECTORY
+    msg/mpc_msgs
+    FILES
+    MpcArray.msg
+    MpcStateVectors.msg
+    MpcTuning.msg
+    MpcDiagnostics.msg
+    MpcJoint.msg
+    MpcMsg.msg
 )
 
 add_service_files(
     FILES
     CapturePointPose.srv
+    ChangeComLevel.srv
     ContainsGait.srv
+    GetGaitParameters.srv
+    GetMoveItTrajectory.srv
     GetParamBool.srv
     GetParamFloat.srv
     GetParamInt.srv
     GetParamString.srv
     GetParamStringList.srv
+    GetPossibleComLevels.srv
     PossibleGaits.srv
     SetGaitVersion.srv
-    SetObstacleSize.srv
+    SetObstacleSizeRampLike.srv
+    SetObstacleSizeBlockLike.srv
     SetParamBool.srv
     SetParamFloat.srv
     SetParamInt.srv
@@ -51,6 +71,7 @@ generate_messages(
     control_msgs
     std_msgs
     trajectory_msgs
+    sensor_msgs
 )
 
 catkin_package(
@@ -60,4 +81,5 @@ catkin_package(
     message_runtime
     std_msgs
     trajectory_msgs
+    sensor_msgs
 )

@@ -22,6 +22,7 @@
 #include <march_hardware_builder/hardware_builder.h>
 #include <march_shared_msgs/AfterLimitJointCommand.h>
 #include <march_shared_msgs/MotorControllerState.h>
+#include <march_shared_msgs/PressureSolesData.h>
 
 #include <std_msgs/Float64.h>
 template <typename T>
@@ -92,6 +93,7 @@ private:
   void updatePowerDistributionBoard();
   void updateAfterLimitJointCommand();
   void updateMotorControllerStates();
+  void updatePressureSoleData();
   void outsideLimitsCheck(size_t joint_index);
   bool motorControllerStateCheck(size_t joint_index);
   static void getSoftJointLimitsError(const std::string& name, const urdf::JointConstSharedPtr& urdf_joint,
@@ -144,6 +146,7 @@ private:
   /* Real time safe publishers */
   RtPublisherPtr<march_shared_msgs::AfterLimitJointCommand> after_limit_joint_command_pub_;
   RtPublisherPtr<march_shared_msgs::MotorControllerState> motor_controller_state_pub_;
+  RtPublisherPtr<march_shared_msgs::PressureSolesData> pressure_sole_data_pub_;
 };
 
 #endif  // MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_H

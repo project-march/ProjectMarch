@@ -1,87 +1,87 @@
 description: Left open for stepping straight onto the Tilted Path, starting with the
   left foot.
-duration: {nsecs: 700000000, secs: 2}
+duration: 2700000000
 gait_type: stairs_like
 joints:
   left_ankle:
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 700000000, secs: 2}
+    time_from_start: 2700000000
     velocity: -0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 350000000, secs: 1}
+    time_from_start: 1350000000
     velocity: -0.0
   - position: 0.0
-    time_from_start: {nsecs: 687700000, secs: 1}
+    time_from_start: 1687700000
     velocity: -0.0
   - position: 0.0
-    time_from_start: {nsecs: 700000000, secs: 2}
+    time_from_start: 2700000000
     velocity: -0.0
   left_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -0.0
   - position: 0.6981
-    time_from_start: {nsecs: 963100000, secs: 0}
+    time_from_start: 963100000
     velocity: 0.0
   - position: 0.384
-    time_from_start: {nsecs: 700000000, secs: 2}
+    time_from_start: 2700000000
     velocity: -0.0
   left_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -0.0
   - position: 1.3963
-    time_from_start: {nsecs: 864000000, secs: 0}
+    time_from_start: 864000000
     velocity: -0.0
   - position: 0.6688
-    time_from_start: {nsecs: 715000000, secs: 1}
+    time_from_start: 1715000000
     velocity: -0.8409
   - position: 0.3491
-    time_from_start: {nsecs: 700000000, secs: 2}
+    time_from_start: 2700000000
     velocity: -0.0
   right_ankle:
   - position: 0.0436
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0436
-    time_from_start: {nsecs: 700000000, secs: 2}
+    time_from_start: 2700000000
     velocity: -0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 350000000, secs: 1}
+    time_from_start: 1350000000
     velocity: -0.0
   - position: 0.0
-    time_from_start: {nsecs: 687700000, secs: 1}
+    time_from_start: 1687700000
     velocity: -0.0
   - position: 0.0
-    time_from_start: {nsecs: 700000000, secs: 2}
+    time_from_start: 2700000000
     velocity: -0.0
   right_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: -0.2269
-    time_from_start: {nsecs: 700000000, secs: 2}
+    time_from_start: 2700000000
     velocity: -0.0
   right_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -0.0
   - position: 0.1396
-    time_from_start: {nsecs: 836000000, secs: 1}
+    time_from_start: 1836000000
     velocity: 0.0
   - position: 0.1396
-    time_from_start: {nsecs: 700000000, secs: 2}
+    time_from_start: 2700000000
     velocity: -0.0
 name: left_open
 version: MV_TPstraight_leftopen_v1

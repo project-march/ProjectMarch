@@ -1,0 +1,13 @@
+[submodule "ros1/src/libraries/realsense_gazebo_plugin"]
+	path = ros1/src/libraries/realsense_gazebo_plugin
+	url = ../libraries/realsense_gazebo_plugin.git
+[submodule "ros2/src/libraries/diagnostic_updater"]
+	path = ros2/src/libraries/diagnostic_updater
+	url = ../libraries/diagnostic-updater.git
+[submodule "ros2/src/libraries/march_robot_state_publisher"]
+	path = ros2/src/libraries/march_robot_state_publisher
+	url = ../libraries/robot-state-publisher.git
+	branch = 2-rename-to-march_robot_state_publisher-and-fix-tests
+[submodule "ros1/src/libraries/joint_trajectory_controller"]
+	path = ros1/src/libraries/joint_trajectory_controller
+	url = ../libraries/joint-trajectory-controller.git

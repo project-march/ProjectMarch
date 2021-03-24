@@ -28,6 +28,7 @@ find_package(trajectory_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(control_msgs REQUIRED)
 find_package(actionlib_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 
 rosidl_generate_interfaces(${PROJECT_NAME}
@@ -40,6 +41,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/FollowJointTrajectoryActionGoal.msg"
   "msg/FollowJointTrajectoryResult.msg"
   "msg/FollowJointTrajectoryActionResult.msg"
+  "msg/FollowJointTrajectoryFeedback.msg"
+  "msg/FollowJointTrajectoryActionFeedback.msg"
   "msg/GaitInstruction.msg"
   "msg/GaitInstructionResponse.msg"
   "msg/HighVoltageNet.msg"
@@ -47,10 +50,15 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/LowVoltageNet.msg"
   "msg/PowerDistributionBoardState.msg"
   "msg/PressureSole.msg"
+  "msg/PressureSoleData.msg"
+  "msg/PressureSolesData.msg"
   "srv/CapturePointPose.srv"
   "srv/ContainsGait.srv"
   "srv/PossibleGaits.srv"
   "srv/SetGaitVersion.srv"
+  "srv/SetObstacleSizeRampLike.srv"
+  "srv/SetObstacleSizeBlockLike.srv"
+  "srv/GetMoveItTrajectory.srv"
   "srv/GetParamStringList.srv"
   "srv/GetParamString.srv"
   "srv/GetParamBool.srv"
@@ -62,7 +70,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/SetParamInt.srv"
   "srv/SetParamFloat.srv"
   "srv/GetJointNames.srv"
-  DEPENDENCIES std_msgs builtin_interfaces geometry_msgs rosgraph_msgs trajectory_msgs control_msgs actionlib_msgs
+  DEPENDENCIES std_msgs builtin_interfaces geometry_msgs rosgraph_msgs
+        trajectory_msgs control_msgs actionlib_msgs sensor_msgs
  )
 
 install(

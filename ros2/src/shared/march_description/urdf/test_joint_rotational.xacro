@@ -5,11 +5,11 @@
     <xacro:property name="joint_base_mass" value="1"/> <!-- arbitrary value for joint_base_mass -->
     <xacro:property name="joint_base_width" value="0.05"/> <!-- Cube dimensions (width x width x width) of joint base -->
 
-    <xacro:property name="bar_length" value="${0.39}"/>
+    <xacro:property name="bar_length" value="0.39"/>
     <xacro:property name="bar_mass" value="1.080"/>
     <xacro:property name="bar_width" value="0.05"/>
 
-    <xacro:property name="joint_buffer" value="${3*pi/180}"/> <!-- rad -->
+    <xacro:property name="joint_buffer" value="${3*(pi/180)}"/> <!-- rad -->
     <xacro:property name="joint_lower_limit" value="-0.5363"/> <!-- rad -->
     <xacro:property name="joint_upper_limit" value="0.5363"/> <!-- rad -->
     <xacro:property name="joint_effort_limit" value="21840"/> <!-- IU = 20 A -->

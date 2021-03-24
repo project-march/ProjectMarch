@@ -1,0 +1,96 @@
+topics:
+  - { topic: 'clock', type: 'rosgraph_msgs/msg/Clock' }
+  - { topic: 'gazebo/link_states', type: 'gazebo_msgs/msg/LinkStates' }
+  - { topic: 'gazebo/model_states', type: 'gazebo_msgs/msg/ModelStates' }
+  - { topic: 'initialpose', type: 'geometry_msgs/msg/PoseWithCovarianceStamped' }
+  - { topic: 'march/contact/ankle_plate_left_contact', type: 'std_msgs/msg/Bool' }
+  - { topic: 'march/contact/ankle_plate_right_contact', type: 'std_msgs/msg/Bool' }
+  - { topic: 'march/controller/trajectory/follow_joint_trajectory/cancel',
+      type: 'actionlib_msgs/msg/GoalID' }
+  - { topic: 'march/controller/trajectory/follow_joint_trajectory/goal',
+      type: 'march_shared_msgs/msg/FollowJointTrajectoryActionGoal' }
+  - { topic: 'march/controller/trajectory/follow_joint_trajectory/feedback',
+      type: 'march_shared_msgs/msg/FollowJointTrajectoryActionFeedback' }
+  - { topic: 'march/controller/trajectory/follow_joint_trajectory/result',
+      type: 'march_shared_msgs/msg/FollowJointTrajectoryActionResult' }
+  - { topic: 'march/controller/trajectory/follow_joint_trajectory/status',
+      type: 'actionlib_msgs/msg/GoalStatusArray' }
+  - { topic: 'march/controller/trajectory/state',
+      type: 'control_msgs/msg/JointTrajectoryControllerState' }
+  - { topic: 'march/error', type: 'march_shared_msgs/msg/Error' }
+  - { topic: 'march/gait/current', type: 'std_msgs/msg/String' }
+  - { topic: 'march/gait_selection/current_gait',
+      type: 'march_shared_msgs/msg/CurrentGait' }
+  - { topic: 'march/gait_selection/current_state',
+      type: 'march_shared_msgs/msg/CurrentState' }
+  - { topic: 'march/input_device/alive', type: 'march_shared_msgs/msg/Alive' }
+  - { topic: 'march/input_device/instruction',
+      type: 'march_shared_msgs/msg/GaitInstruction' }
+  - { topic: 'march/input_device/instruction_response',
+      type: 'march_shared_msgs/msg/GaitInstructionResponse' }
+  - { topic: 'march/joint_states', type: 'sensor_msgs/msg/JointState' }
+  - { topic: 'march/robot_description', type: 'std_msgs/msg/String' }
+  - { topic: 'march/sensor/left_pressure_sole', type: 'gazebo_msgs/msg/ContactsState' }
+  - { topic: 'march/sensor/right_pressure_sole', type: 'gazebo_msgs/msg/ContactsState' }
+  - { topic: 'march/temperature/left_ankle', type: 'sensor_msgs/msg/Temperature' }
+  - { topic: 'march/temperature/left_hip_aa', type: 'sensor_msgs/msg/Temperature' }
+  - { topic: 'march/temperature/left_hip_fe', type: 'sensor_msgs/msg/Temperature' }
+  - { topic: 'march/temperature/left_knee', type: 'sensor_msgs/msg/Temperature' }
+  - { topic: 'march/temperature/right_ankle', type: 'sensor_msgs/msg/Temperature' }
+  - { topic: 'march/temperature/right_hip_aa', type: 'sensor_msgs/msg/Temperature' }
+  - { topic: 'march/temperature/right_hip_fe', type: 'sensor_msgs/msg/Temperature' }
+  - { topic: 'march/temperature/right_knee', type: 'sensor_msgs/msg/Temperature' }
+  - { topic: 'move_base_simple/goal', type: 'geometry_msgs/msg/PoseStamped' }
+  - { topic: 'rosout', type: 'rcl_interfaces/msg/Log' }
+  - { topic: 'rosout_agg', type: 'rcl_interfaces/msg/Log' }
+  - { topic: 'tf', type: 'tf2_msgs/msg/TFMessage' }
+  - { topic: 'tf_static', type: 'tf2_msgs/msg/TFMessage' }
+  - { topic: 'march/imc_states', type: 'march_shared_msgs/msg/ImcState'}
+  - { topic: 'camera_front/imu/data', type: 'sensor_msgs/msg/Imu'}
+
+services_1_to_2:
+  - { service: '/freeze',
+      type: 'std_srvs/srv/Trigger' }
+  - { service: '/march/gait_selection/contains_gait',
+      type: 'march_shared_msgs/ContainsGait' }
+  - { service: '/march/gait_selection/get_default_dict',
+      type: 'std_srvs/srv/Trigger' }
+  - { service: '/march/gait_selection/get_directory_structure',
+      type: 'std_srvs/srv/Trigger' }
+  - { service: '/march/gait_selection/get_gait_directory',
+      type: 'std_srvs/srv/Trigger' }
+  - { service: '/march/gait_selection/get_version_map',
+      type: 'std_srvs/srv/Trigger' }
+  - { service: '/march/gait_selection/set_gait_version',
+      type: 'march_shared_msgs/srv/SetGaitVersion' }
+services_2_to_1:
+  - { service: '/gazebo/get_world_properties',
+      type: 'gazebo_msgs/GetWorldProperties' }
+  - { service: '/camera/process_pointcloud',
+      type: 'std_srvs/Trigger' }
+  - { service: '/gazebo/get_model_state',
+      type: 'gazebo_msgs/GetModelState' }
+  - { service: '/march/set_obstacle_size/block_like',
+      type: 'march_shared_msgs/SetObstacleSizeBlockLike' }
+  - { service: '/march/set_obstacle_size/ramp_like',
+      type: 'march_shared_msgs/SetObstacleSizeRampLike' }
+  - { service: '/march/parameter_server/get_param_bool',
+      type: 'march_shared_msgs/GetParamBool' }
+  - { service: '/march/parameter_server/get_param_float',
+      type: 'march_shared_msgs/GetParamFloat' }
+  - { service: '/march/parameter_server/get_param_int',
+      type: 'march_shared_msgs/GetParamInt' }
+  - { service: '/march/parameter_server/get_param_string',
+      type: 'march_shared_msgs/GetParamString' }
+  - { service: '/march/parameter_server/get_param_string_list',
+      type: 'march_shared_msgs/GetParamStringList' }
+  - { service: '/march/parameter_server/set_param_bool',
+      type: 'march_shared_msgs/SetParamBool' }
+  - { service: '/march/parameter_server/set_param_float',
+      type: 'march_shared_msgs/SetParamFloat' }
+  - { service: '/march/parameter_server/set_param_int',
+      type: 'march_shared_msgs/SetParamInt' }
+  - { service: '/march/parameter_server/set_param_string',
+      type: 'march_shared_msgs/SetParamString' }
+  - { service: '/march/parameter_server/set_param_string_list',
+      type: 'march_shared_msgs/SetParamStringList' }

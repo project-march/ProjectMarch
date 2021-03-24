@@ -1,0 +1,122 @@
+description: swinging down &backwards with both legs setpoints
+duration: 8000000000
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: 0.04360007
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.04360006
+    time_from_start: 2290285710
+    velocity: -1.0e-08
+  - position: 0.04360003
+    time_from_start: 4660571430
+    velocity: -1.0e-08
+  - position: 0.0436
+    time_from_start: 8000000000
+    velocity: -0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 5496000000
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 8000000000
+    velocity: -0.0
+  left_hip_fe:
+  - position: -0.31493265
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.3060702
+    time_from_start: 949714290
+    velocity: 0.0178614
+  - position: -0.27032095
+    time_from_start: 2270857139
+    velocity: 0.03470526
+  - position: -0.23146765
+    time_from_start: 3281142860
+    velocity: 0.04130264
+  - position: -0.19283052
+    time_from_start: 4194285709
+    velocity: 0.04258043
+  - position: -0.17722761
+    time_from_start: 4563428570
+    velocity: 0.0418343
+  - position: -0.1604698
+    time_from_start: 4971428569
+    velocity: 0.04016381
+  - position: -0.13953071
+    time_from_start: 5515428570
+    velocity: 0.03655499
+  - position: -0.12990473
+    time_from_start: 5787428570
+    velocity: 0.0341585
+  - position: -0.10568939
+    time_from_start: 6603428570
+    velocity: 0.02460076
+  - position: -0.0873
+    time_from_start: 8000000000
+    velocity: -0.0
+  left_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 8000000000
+    velocity: -0.0
+  right_ankle:
+  - position: 0.04360007
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.04360003
+    time_from_start: 4679999999
+    velocity: -1.0e-08
+  - position: 0.0436
+    time_from_start: 6933714290
+    velocity: -1.0e-08
+  - position: 0.0436
+    time_from_start: 8000000000
+    velocity: -0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 3805714290
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 6176000000
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 8000000000
+    velocity: -0.0
+  right_hip_fe:
+  - position: -0.30079126
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.28572339
+    time_from_start: 1299428569
+    velocity: 0.0217834
+  - position: -0.21949054
+    time_from_start: 3358857140
+    velocity: 0.03900119
+  - position: -0.12418882
+    time_from_start: 5884571430
+    velocity: 0.03114401
+  - position: -0.0873
+    time_from_start: 8000000000
+    velocity: -0.0
+  right_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 4913142859
+    velocity: -0.0
+  - position: 0.0
+    time_from_start: 8000000000
+    velocity: -0.0
+name: swing_down
+version: backward_swing_setpoints

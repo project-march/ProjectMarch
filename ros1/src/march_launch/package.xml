@@ -19,13 +19,11 @@
     
     <exec_depend>march_data_collector</exec_depend>
     <exec_depend>march_gain_scheduling</exec_depend>
-    <exec_depend>march_gait_selection</exec_depend>
     <exec_depend>march_hardware_interface</exec_depend>
     <exec_depend>march_moveit</exec_depend>
     <exec_depend>march_parameter_server</exec_depend>
-    <exec_depend>march_safety</exec_depend>
 
-    <exec_depend>robot_state_publisher</exec_depend>
+    <exec_depend>realsense2_camera</exec_depend>
     <exec_depend>rosserial_python</exec_depend>
     <exec_depend>rviz</exec_depend>
     <exec_depend>sound_play</exec_depend>

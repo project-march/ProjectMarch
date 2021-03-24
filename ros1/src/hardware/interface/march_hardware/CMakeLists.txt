@@ -83,6 +83,7 @@ add_library(${PROJECT_NAME}
         include/${PROJECT_NAME}/power/power_distribution_board.h
         include/${PROJECT_NAME}/temperature/temperature_ges.h
         include/${PROJECT_NAME}/temperature/temperature_sensor.h
+        include/${PROJECT_NAME}/pressure_sole/pressure_sole.h
         src/encoder/absolute_encoder.cpp
         src/encoder/encoder.cpp
         src/encoder/incremental_encoder.cpp
@@ -104,7 +105,9 @@ add_library(${PROJECT_NAME}
         src/power/low_voltage.cpp
         src/power/power_distribution_board.cpp
         src/temperature/temperature_ges.cpp
-        )
+        src/pressure_sole/pressure_sole.cpp
+)
+
 
 target_link_libraries(${PROJECT_NAME}
         ${catkin_LIBRARIES}
@@ -137,33 +140,34 @@ install(DIRECTORY launch config
 ## Add gtest based cpp test target and link libraries
 if(CATKIN_ENABLE_TESTING)
     catkin_add_gmock(${PROJECT_NAME}_test
-            test/encoder/absolute_encoder_test.cpp
-            test/encoder/encoder_test.cpp
-            test/encoder/incremental_encoder_test.cpp
-            test/error/hardware_exception_test.cpp
-            test/error/motion_error_test.cpp
-            test/ethercat/pdo_map_test.cpp
-            test/ethercat/slave_test.cpp
-            test/imotioncube/imotioncube_test.cpp
-            test/joint_test.cpp
-            test/mocks/mock_absolute_encoder.h
-            test/mocks/mock_encoder.h
-            test/mocks/mock_motor_controller.h
-            test/mocks/mock_incremental_encoder.h
-            test/mocks/mock_joint.h
-            test/mocks/mock_pdo_interface.h
-            test/mocks/mock_sdo_interface.h
-            test/mocks/mock_slave.h
-            test/mocks/mock_temperature_ges.h
-            test/power/boot_shutdown_offsets_test.cpp
-            test/power/high_voltage_test.cpp
-            test/power/low_voltage_test.cpp
-            test/power/net_driver_offsets_test.cpp
-            test/power/net_monitor_offsets_test.cpp
-            test/power/power_distribution_board_test.cpp
-            test/temperature/temperature_ges_test.cpp
-            test/test_runner.cpp
-            )
+        test/encoder/absolute_encoder_test.cpp
+        test/encoder/encoder_test.cpp
+        test/encoder/incremental_encoder_test.cpp
+        test/error/hardware_exception_test.cpp
+        test/error/motion_error_test.cpp
+        test/ethercat/pdo_map_test.cpp
+        test/ethercat/slave_test.cpp
+        test/imotioncube/imotioncube_test.cpp
+        test/joint_test.cpp
+        test/mocks/mock_absolute_encoder.h
+        test/mocks/mock_encoder.h
+        test/mocks/mock_motor_controller.h
+        test/mocks/mock_incremental_encoder.h
+        test/mocks/mock_joint.h
+        test/mocks/mock_pdo_interface.h
+        test/mocks/mock_sdo_interface.h
+        test/mocks/mock_slave.h
+        test/mocks/mock_temperature_ges.h
+        test/power/boot_shutdown_offsets_test.cpp
+        test/power/high_voltage_test.cpp
+        test/power/low_voltage_test.cpp
+        test/power/net_driver_offsets_test.cpp
+        test/power/net_monitor_offsets_test.cpp
+        test/power/power_distribution_board_test.cpp
+        test/temperature/temperature_ges_test.cpp
+        test/pressure_sole/pressure_sole_test.cpp
+        test/test_runner.cpp
+    )
     target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES} ${PROJECT_NAME})
 
     if(ENABLE_COVERAGE_TESTING)

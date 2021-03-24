@@ -1,0 +1,24 @@
+# this file represents the controller being used
+march:
+  # Publish all joint states -----------------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50
+
+  controller:
+    trajectory:
+      type: model_predictive_trajectory_controller/JointTrajectoryController
+      joints:
+        - rotational_joint
+      N: 2
+      q_matrices:
+        rotational_joint:
+          n_rows: 3
+          n_cols: 3
+          Q: [100.0, 0.0,  0.0,
+              0.0,   1.0,  0.0,
+              0.0,   0.0, 0.01]
+
+      state_publish_rate:  25            # Override default
+      action_monitor_rate: 30            # Override default
+      stop_trajectory_duration: 0        # Override default

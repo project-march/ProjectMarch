@@ -1,131 +1,83 @@
 description: MVI walk with no ADPF movements version 2
-duration:
-  nsecs: 300000000
-  secs: 1
+duration: 1300000000
 gait_type: walk_like
 joints:
   left_ankle:
   - position: 0.0436
-    time_from_start:
-      nsecs: 0
-      secs: 0
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0436
-    time_from_start:
-      nsecs: 300000000
-      secs: 1
+    time_from_start: 1300000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start:
-      nsecs: 0
-      secs: 0
+    time_from_start: 0
     velocity: 0.0
   - position: -0.0873
-    time_from_start:
-      nsecs: 457200000
-      secs: 0
+    time_from_start: 457200000
     velocity: 0.0
   - position: -0.0873
-    time_from_start:
-      nsecs: 0
-      secs: 1
+    time_from_start: 1000000000
     velocity: 0.0
   - position: 0.0
-    time_from_start:
-      nsecs: 300000000
-      secs: 1
+    time_from_start: 1300000000
     velocity: 0.0
   left_hip_fe:
   - position: -0.0873
-    time_from_start:
-      nsecs: 0
-      secs: 0
+    time_from_start: 0
     velocity: 0.0
   - position: -0.1667
-    time_from_start:
-      nsecs: 300000000
-      secs: 1
+    time_from_start: 1300000000
     velocity: 0.0
   left_knee:
   - position: 0.0
-    time_from_start:
-      nsecs: 0
-      secs: 0
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1396
-    time_from_start:
-      nsecs: 884000000
-      secs: 0
+    time_from_start: 884000000
     velocity: 0.0
   - position: 0.1396
-    time_from_start:
-      nsecs: 300000000
-      secs: 1
+    time_from_start: 1300000000
     velocity: 0.0
   right_ankle:
   - position: 0.0436
-    time_from_start:
-      nsecs: 0
-      secs: 0
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0436
-    time_from_start:
-      nsecs: 300000000
-      secs: 1
+    time_from_start: 1300000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start:
-      nsecs: 0
-      secs: 0
+    time_from_start: 0
     velocity: 0.0
   - position: 0.1047
-    time_from_start:
-      nsecs: 650000000
-      secs: 0
+    time_from_start: 650000000
     velocity: 0.0
   - position: 0.0
-    time_from_start:
-      nsecs: 300000000
-      secs: 1
+    time_from_start: 1300000000
     velocity: 0.0
   right_hip_fe:
   - position: -0.0873
-    time_from_start:
-      nsecs: 0
-      secs: 0
+    time_from_start: 0
     velocity: 0.0
   - position: 0.6191
-    time_from_start:
-      nsecs: 780000000
-      secs: 0
+    time_from_start: 780000000
     velocity: 0.1611
   - position: 0.288
-    time_from_start:
-      nsecs: 300000000
-      secs: 1
+    time_from_start: 1300000000
     velocity: -0.3491
   right_knee:
   - position: 0.0
-    time_from_start:
-      nsecs: 0
-      secs: 0
+    time_from_start: 0
     velocity: 0.0
   - position: 1.0251
-    time_from_start:
-      nsecs: 555400000
-      secs: 0
+    time_from_start: 555400000
     velocity: 0.0
   - position: 0.0969
-    time_from_start:
-      nsecs: 169999999
-      secs: 1
+    time_from_start: 1169999999
     velocity: 0.0
   - position: 0.1396
-    time_from_start:
-      nsecs: 300000000
-      secs: 1
+    time_from_start: 1300000000
     velocity: 0.0
 name: right_open
 version: MVI_walk_rightopen_haa_v2

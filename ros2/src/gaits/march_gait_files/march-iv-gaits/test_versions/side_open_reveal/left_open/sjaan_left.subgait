@@ -1,104 +1,104 @@
 description: This gait is used for the reveal to show the HAA movement
-duration: {nsecs: 500000000, secs: 1}
+duration: 1500000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 562500000, secs: 0}
+    time_from_start: 562500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 750000000, secs: 0}
+    time_from_start: 750000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.2094
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: 0.0
   left_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 562500000, secs: 0}
+    time_from_start: 562500000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 750000000, secs: 0}
+    time_from_start: 750000000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: 0.0
   left_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 562500000, secs: 0}
+    time_from_start: 562500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 750000000, secs: 0}
+    time_from_start: 750000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: 0.0
   right_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 562500000, secs: 0}
+    time_from_start: 562500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 750000000, secs: 0}
+    time_from_start: 750000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 562500000, secs: 0}
+    time_from_start: 562500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 750000000, secs: 0}
+    time_from_start: 750000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: 0.0
   right_hip_fe:
   - position: -0.0873
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 562500000, secs: 0}
+    time_from_start: 562500000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 750000000, secs: 0}
+    time_from_start: 750000000
     velocity: 0.0
   - position: -0.0873
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: 0.0
   right_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 562500000, secs: 0}
+    time_from_start: 562500000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 750000000, secs: 0}
+    time_from_start: 750000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 1}
+    time_from_start: 1500000000
     velocity: 0.0
 name: left_open
 version: sjaan_left

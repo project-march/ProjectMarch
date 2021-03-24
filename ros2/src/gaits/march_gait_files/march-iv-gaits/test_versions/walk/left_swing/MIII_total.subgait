@@ -1,188 +1,188 @@
 description: 'MIII walking gait. '
-duration: {nsecs: 500000000, secs: 2}
+duration: 2500000000
 gait_type: ''
 joints:
   left_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 31250000, secs: 0}
+    time_from_start: 31250000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 468749999, secs: 0}
+    time_from_start: 468749999
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 625000000, secs: 0}
+    time_from_start: 625000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: -0.0
   - position: 0.0
-    time_from_start: {nsecs: 281250000, secs: 1}
+    time_from_start: 1281250000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 718749999, secs: 1}
+    time_from_start: 1718749999
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 875000000, secs: 1}
+    time_from_start: 1875000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   left_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 31250000, secs: 0}
+    time_from_start: 31250000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 468749999, secs: 0}
+    time_from_start: 468749999
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 625000000, secs: 0}
+    time_from_start: 625000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: -0.0
   - position: 0.0
-    time_from_start: {nsecs: 281250000, secs: 1}
+    time_from_start: 1281250000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 718749999, secs: 1}
+    time_from_start: 1718749999
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 875000000, secs: 1}
+    time_from_start: 1875000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   left_hip_fe:
   - position: -0.16667894356545848
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.0698131700798
-    time_from_start: {nsecs: 400000000, secs: 0}
+    time_from_start: 400000000
     velocity: 1.49923782746
   - position: 0.558505360638
-    time_from_start: {nsecs: 887500000, secs: 0}
+    time_from_start: 887500000
     velocity: 0.200712863979
   - position: 0.349065850399
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: -1.00007366139
   - position: 0.209439510239
-    time_from_start: {nsecs: 448412698, secs: 1}
+    time_from_start: 1448412698
     velocity: -1.00007366139
   - position: -0.16667894356545848
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   left_knee:
   - position: 0.0
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: 0.0
   - position: 0.349065850399
-    time_from_start: {nsecs: 287500000, secs: 0}
+    time_from_start: 287500000
     velocity: 2.50000962056
   - position: 0.872664625997
-    time_from_start: {nsecs: 775000000, secs: 0}
+    time_from_start: 775000000
     velocity: 0.0
   - position: 0.349065850399
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: -0.872664625997
   - position: 0.0968657734857
-    time_from_start: {nsecs: 448412698, secs: 1}
+    time_from_start: 1448412698
     velocity: -0.399680398707
   - position: 0.0
-    time_from_start: {nsecs: 100000000, secs: 2}
+    time_from_start: 2100000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   right_ankle:
   - position: 0.0
-    time_from_start: {nsecs: 31250000, secs: 0}
+    time_from_start: 31250000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 468749999, secs: 0}
+    time_from_start: 468749999
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 625000000, secs: 0}
+    time_from_start: 625000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: -0.0
   - position: 0.0
-    time_from_start: {nsecs: 281250000, secs: 1}
+    time_from_start: 1281250000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 718749999, secs: 1}
+    time_from_start: 1718749999
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 875000000, secs: 1}
+    time_from_start: 1875000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   right_hip_aa:
   - position: 0.0
-    time_from_start: {nsecs: 31250000, secs: 0}
+    time_from_start: 31250000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 468749999, secs: 0}
+    time_from_start: 468749999
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 625000000, secs: 0}
+    time_from_start: 625000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: -0.0
   - position: 0.0
-    time_from_start: {nsecs: 281250000, secs: 1}
+    time_from_start: 1281250000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 718749999, secs: 1}
+    time_from_start: 1718749999
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 875000000, secs: 1}
+    time_from_start: 1875000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: 0.0
   right_hip_fe:
   - position: 0.3490658503988659
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -1.0000736613927508
   - position: 0.209439510239
-    time_from_start: {nsecs: 198412698, secs: 0}
+    time_from_start: 198412698
     velocity: -1.00007366139
   - position: -0.166678943565
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: 0.0
   - position: 0.0698131700798
-    time_from_start: {nsecs: 650000000, secs: 1}
+    time_from_start: 1650000000
     velocity: 1.49923782746
   - position: 0.558505360638
-    time_from_start: {nsecs: 137500000, secs: 2}
+    time_from_start: 2137500000
     velocity: 0.200712863979
   - position: 0.3490658503988659
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: -1.0000736613927508
   right_knee:
   - position: 0.3490658503988659
-    time_from_start: {nsecs: 0, secs: 0}
+    time_from_start: 0
     velocity: -0.8726646259971648
   - position: 0.0968657734857
-    time_from_start: {nsecs: 198412698, secs: 0}
+    time_from_start: 198412698
     velocity: -0.399680398707
   - position: 0.0
-    time_from_start: {nsecs: 850000000, secs: 0}
+    time_from_start: 850000000
     velocity: 0.0
   - position: 0.0
-    time_from_start: {nsecs: 250000000, secs: 1}
+    time_from_start: 1250000000
     velocity: 0.0
   - position: 0.349065850399
-    time_from_start: {nsecs: 537500000, secs: 1}
+    time_from_start: 1537500000
     velocity: 2.50000962056
   - position: 0.872664625997
-    time_from_start: {nsecs: 25000000, secs: 2}
+    time_from_start: 2025000000
     velocity: 0.0
   - position: 0.3490658503988659
-    time_from_start: {nsecs: 500000000, secs: 2}
+    time_from_start: 2500000000
     velocity: -0.8726646259971648
 name: left_swing
 version: MIII_total

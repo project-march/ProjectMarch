@@ -20,6 +20,7 @@ public:
     test_joint_linear,
     pdb,
     two_odrive_joints,
+    pressure_soles
   };
 
   AllowedRobot() = default;
@@ -56,6 +57,10 @@ public:
     else if (robot_name == "pdb")
     {
       this->value = pdb;
+    }
+    else if (robot_name == "pressure_soles")
+    {
+      this->value = pressure_soles;
     }
     else
     {
@@ -98,6 +103,10 @@ public:
     else if (this->value == AllowedRobot::pdb)
     {
       return base_path.append("/robots/pdb.yaml");
+    }
+    else if (this->value == AllowedRobot::pressure_soles)
+    {
+      return base_path.append("/robots/pressure_soles.yaml");
     }
     ROS_ERROR("Robotname not implemented. Using test_joint_rotational.yaml...");
     return base_path.append("/robots/test_joint_rotational.yaml");
@@ -143,6 +152,9 @@ public:
         break;
       case pdb:
         out << "pdb";
+        break;
+      case pressure_soles:
+        out << "pressure_soles";
         break;
       default:
         out << "(Unknown)";

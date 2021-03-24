@@ -1,0 +1,173 @@
+<launch>
+<!--    These serial numbers should always be updated to correspond with the actual
+        cameras, you can find these using `rs-enumerate-devices` command if you
+        have all realsense dependencies installed or printed on the camera-->
+    <arg name="serial_no_camera_front"    default="033322070612"/>
+    <arg name="serial_no_camera_back"     default="048322070237"/>
+    <arg name="use_camera_back" default="false"
+         doc="Whether to start the second (back) camera"/>
+    <arg name="use_camera_front" default="true"
+         doc="Whether to start the front camera"/>
+    <arg name="initial_reset" default="false" doc="Do a hardware reset at start up to reduce errors"/>
+    <arg name="camera_fps" default="15"
+         doc="The frames per second to use for the physical camera"/>
+    <arg name="depth_fps" default="$(arg camera_fps)"
+         doc="The frame rate to use for the depth module of the camera"/>
+    <arg name="color_fps" default="$(arg camera_fps)"
+         doc="The frame rate to use for the color module of the camera"/>
+    <arg name="infra_fps" default="$(arg camera_fps)"
+         doc="The frame rate to use for the infra red module of the camera"/>
+
+    <arg name="enable_fisheye"          default="false"/>
+    <arg name="depth_width"             default="640"/>
+    <arg name="depth_height"            default="480"/>
+    <arg name="enable_depth"            default="true"/>
+
+    <arg name="infra_width"             default="640"/>
+    <arg name="infra_height"            default="480"/>
+    <arg name="enable_infra"            default="false"/>
+    <arg name="enable_infra1"           default="$(arg enable_infra)"/>
+    <arg name="enable_infra2"           default="$(arg enable_infra)"/>
+
+    <arg name="color_width"             default="640"/>
+    <arg name="color_height"            default="480"/>
+    <arg name="enable_color"            default="true"/>
+
+    <arg name="gyro_fps"                default="400"/>
+    <arg name="accel_fps"               default="250"/>
+    <arg name="enable_gyro"             default="true"/>
+    <arg name="enable_accel"            default="true"/>
+    <arg name="enable_gyro_camera_back" default="false"/>
+    <arg name="enable_accel_camera_back" default="false"/>
+
+    <arg name="enable_pointcloud"         default="true"/>
+    <arg name="pointcloud_texture_stream" default="RS2_STREAM_COLOR"/>
+    <arg name="pointcloud_texture_index"  default="0"/>
+
+    <arg name="enable_sync"               default="false"/>
+    <arg name="align_depth"               default="false"/>
+    <arg name="publish_tf"                default="true"/>
+    <arg name="tf_publish_rate"           default="0"/>
+
+    <arg name="filters"                   default="pointcloud"/>
+    <arg name="clip_distance"             default="-2"/>
+    <arg name="linear_accel_cov"          default="0.01"/>
+    <arg name="unite_imu_method"          default="linear_interpolation"/>
+    <arg name="topic_odom_in"             default="odom_in"/>
+    <arg name="calib_odom_file"           default=""/>
+    <arg name="publish_odom_tf"           default="false"/>
+    <arg name="allow_no_texture_points"   default="true"/>
+    <arg name="camera_front_name"         default="camera_front"/>
+    <arg name="camera_back_name"          default="camera_back"/>
+    <arg name="tf_prefix_camera_front"    default="$(arg camera_front_name)"/>
+    <arg name="tf_prefix_camera_back"     default="$(arg camera_back_name)"/>
+
+    <group ns="$(arg camera_front_name)" if="$(arg use_camera_front)">
+        <include file="$(find realsense2_camera)/launch/includes/nodelet.launch.xml">
+            <arg name="serial_no"
+                 value="$(arg serial_no_camera_front)"/>
+            <arg name="tf_prefix"
+                 value="$(arg tf_prefix_camera_front)"/>
+            <arg name="depth_fps" value="$(arg depth_fps)"/>
+            <arg name="color_fps" value="$(arg color_fps)"/>
+            <arg name="infra_fps" value="$(arg infra_fps)"/>
+
+            <arg name="enable_pointcloud"        value="$(arg enable_pointcloud)"/>
+            <arg name="pointcloud_texture_stream" value="$(arg pointcloud_texture_stream)"/>
+            <arg name="pointcloud_texture_index" value="$(arg pointcloud_texture_index)"/>
+            <arg name="enable_sync"              value="$(arg enable_sync)"/>
+            <arg name="align_depth"              value="$(arg align_depth)"/>
+            <arg name="enable_fisheye"           value="$(arg enable_fisheye)"/>
+
+            <arg name="depth_width"              value="$(arg depth_width)"/>
+            <arg name="depth_height"             value="$(arg depth_height)"/>
+            <arg name="enable_depth"             value="$(arg enable_depth)"/>
+
+            <arg name="color_width"              value="$(arg color_width)"/>
+            <arg name="color_height"             value="$(arg color_height)"/>
+            <arg name="enable_color"             value="$(arg enable_color)"/>
+
+            <arg name="infra_width"              value="$(arg infra_width)"/>
+            <arg name="infra_height"             value="$(arg infra_height)"/>
+            <arg name="enable_infra"             value="$(arg enable_infra)"/>
+            <arg name="enable_infra1"            value="$(arg enable_infra1)"/>
+            <arg name="enable_infra2"            value="$(arg enable_infra2)"/>
+
+            <arg name="gyro_fps"                 value="$(arg gyro_fps)"/>
+            <arg name="accel_fps"                value="$(arg accel_fps)"/>
+            <arg name="enable_gyro"              value="$(arg enable_gyro)"/>
+            <arg name="enable_accel"             value="$(arg enable_accel)"/>
+
+            <arg name="publish_tf"               value="$(arg publish_tf)"/>
+            <arg name="tf_publish_rate"          value="$(arg tf_publish_rate)"/>
+
+            <arg name="filters"                  value="$(arg filters)"/>
+            <arg name="clip_distance"            value="$(arg clip_distance)"/>
+            <arg name="linear_accel_cov"         value="$(arg linear_accel_cov)"/>
+            <arg name="initial_reset"            value="$(arg initial_reset)"/>
+            <arg name="unite_imu_method"         value="$(arg unite_imu_method)"/>
+            <arg name="topic_odom_in"            value="$(arg topic_odom_in)"/>
+            <arg name="calib_odom_file"          value="$(arg calib_odom_file)"/>
+            <arg name="publish_odom_tf"          value="$(arg publish_odom_tf)"/>
+            <arg name="allow_no_texture_points"  value="$(arg allow_no_texture_points)"/>
+
+        </include>
+
+        <node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter">
+            <param name="use_mag" type="bool" value="false" />
+            <param name="publish_tf" type="bool" value="false" />
+            <param name="_world_frame" type="string" value="nwu" />
+            <remap from="imu/data_raw" to="imu"/>
+        </node>
+    </group>
+
+    <group ns="$(arg camera_back_name)" if="$(arg use_camera_back)">
+        <include file="$(find realsense2_camera)/launch/includes/nodelet.launch.xml">
+            <arg name="serial_no" value="$(arg serial_no_camera_back)"/>
+            <arg name="tf_prefix"
+                 value="$(arg tf_prefix_camera_back)"/>
+            <arg name="depth_fps" value="$(arg depth_fps)"/>
+            <arg name="color_fps" value="$(arg color_fps)"/>
+            <arg name="infra_fps" value="$(arg infra_fps)"/>
+
+            <arg name="enable_pointcloud"        value="$(arg enable_pointcloud)"/>
+            <arg name="pointcloud_texture_stream" value="$(arg pointcloud_texture_stream)"/>
+            <arg name="pointcloud_texture_index"  value="$(arg pointcloud_texture_index)"/>
+            <arg name="enable_sync"              value="$(arg enable_sync)"/>
+            <arg name="align_depth"              value="$(arg align_depth)"/>
+            <arg name="enable_fisheye"           value="$(arg enable_fisheye)"/>
+
+            <arg name="depth_width"              value="$(arg depth_width)"/>
+            <arg name="depth_height"             value="$(arg depth_height)"/>
+            <arg name="enable_depth"             value="$(arg enable_depth)"/>
+
+            <arg name="color_width"              value="$(arg color_width)"/>
+            <arg name="color_height"             value="$(arg color_height)"/>
+            <arg name="enable_color"             value="$(arg enable_color)"/>
+
+            <arg name="infra_width"              value="$(arg infra_width)"/>
+            <arg name="infra_height"             value="$(arg infra_height)"/>
+            <arg name="enable_infra"             value="$(arg enable_infra)"/>
+            <arg name="enable_infra1"            value="$(arg enable_infra1)"/>
+            <arg name="enable_infra2"            value="$(arg enable_infra2)"/>
+
+            <arg name="gyro_fps"                 value="$(arg gyro_fps)"/>
+            <arg name="accel_fps"                value="$(arg accel_fps)"/>
+            <arg name="enable_gyro"              value="$(arg enable_gyro_camera_back)"/>
+            <arg name="enable_accel"             value="$(arg enable_accel_camera_back)"/>
+
+            <arg name="publish_tf"               value="$(arg publish_tf)"/>
+            <arg name="tf_publish_rate"          value="$(arg tf_publish_rate)"/>
+
+            <arg name="filters"                  value="$(arg filters)"/>
+            <arg name="clip_distance"            value="$(arg clip_distance)"/>
+            <arg name="linear_accel_cov"         value="$(arg linear_accel_cov)"/>
+            <arg name="initial_reset"            value="$(arg initial_reset)"/>
+            <arg name="unite_imu_method"         value="$(arg unite_imu_method)"/>
+            <arg name="topic_odom_in"            value="$(arg topic_odom_in)"/>
+            <arg name="calib_odom_file"          value="$(arg calib_odom_file)"/>
+            <arg name="publish_odom_tf"          value="$(arg publish_odom_tf)"/>
+            <arg name="allow_no_texture_points"  value="$(arg allow_no_texture_points)"/>
+        </include>
+    </group>
+</launch>

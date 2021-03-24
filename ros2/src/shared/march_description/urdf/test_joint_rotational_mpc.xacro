@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<!-- Revolute-Revolute Manipulator -->
+<robot name="march" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <!-- Constants for robot dimensions -->
+    <xacro:property name="joint_base_mass" value="1"/> <!-- arbitrary value for joint_base_mass -->
+    <xacro:property name="joint_base_width" value="0.05"/> <!-- Cube dimensions (width x width x width) of joint base -->
+
+    <xacro:property name="bar_length" value="0.39"/>
+    <xacro:property name="bar_mass" value="1.080"/>
+    <xacro:property name="bar_width" value="0.05"/>
+
+    <xacro:property name="joint_buffer" value="${3*(pi/180)}"/> <!-- rad -->
+    <xacro:property name="joint_lower_limit" value="-0.5363"/> <!-- rad -->
+    <xacro:property name="joint_upper_limit" value="0.5363"/> <!-- rad -->
+    <xacro:property name="joint_effort_limit" value="21840"/> <!-- IU = 20 A -->
+    <xacro:property name="joint_velocity_limit" value="20.0"/> <!-- rad/s -->
+
+    <xacro:property name="hover_height" value="0.5"/>
+
+    <xacro:include filename="march.gazebo"/>
+
+    <!-- Used for fixing robot to Gazebo 'base_link' -->
+    <link name="world"/>
+
+    <joint name="joint_base_fixed_parent_joint" type="fixed">
+        <parent link="world"/>
+        <child link="joint_base"/>
+        <origin xyz="0 0 ${hover_height}" rpy="0 0 0"/>
+    </joint>
+
+    <joint name="rotational_joint" type="revolute">
+        <parent link="joint_base"/>
+        <child link="bar"/>
+        <origin xyz="0 ${-joint_base_width} 0" rpy="0 0 0"/>
+        <axis xyz="0 1 0"/>
+        <limit velocity="${joint_velocity_limit}" effort="${joint_effort_limit}" lower="${joint_lower_limit}" upper="${joint_upper_limit}"/>
+
+        <!-- The safety_controller has been disabled because it was interfering
+        with the internal workings of the model predictive controller.
+        It will be enabled again once a solution has been found -->
+
+        <!-- <safety_controller soft_lower_limit="${joint_lower_limit + joint_buffer}" soft_upper_limit="${joint_upper_limit - joint_buffer}" k_position="5" k_velocity="20000" /> -->
+    </joint>
+
+    <!-- give colors to some links in gazebo -->
+    <gazebo reference="joint_base">
+        <material>Gazebo/Blue</material>
+    </gazebo>
+
+
+    <!-- Joint Base-->
+    <link name="joint_base">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${joint_base_width} ${joint_base_width} ${joint_base_width}"/>
+            </geometry>
+        </visual>
+
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="${joint_base_mass}"/>
+            <inertia
+                    ixx="${joint_base_mass / 12.0 * (2*(joint_base_width*joint_base_width))}" ixy="0.0" ixz="0.0"
+                    iyy="${joint_base_mass / 12.0 * (2*(joint_base_width*joint_base_width))}" iyz="0.0"
+                    izz="${joint_base_mass / 12.0 * (2*(joint_base_width*joint_base_width))}"/>
+        </inertial>
+    </link>
+
+    <!-- Bar-->
+    <link name="bar">
+        <visual>
+            <origin xyz="0 0 ${-bar_length/2}" rpy="0 0 0"/>
+            <geometry>
+                <box size="${bar_width} ${bar_width} ${bar_length}"/>
+            </geometry>
+        </visual>
+
+        <inertial>
+            <origin xyz="0 0 ${-bar_length/2}" rpy="0 0 0"/>
+            <mass value="${bar_mass}"/>
+            <inertia
+                    ixx="${joint_base_mass / 12.0 * (bar_width*bar_width + bar_length*bar_length)}" ixy="0.0" ixz="0.0"
+                    iyy="${joint_base_mass / 12.0 * (bar_length*bar_length + bar_width*bar_width)}" iyz="0.0"
+                    izz="${joint_base_mass / 12.0 * (bar_width*bar_width + bar_width*bar_width)}"/>
+        </inertial>
+    </link>
+
+    <!-- ROS Control plugin for Gazebo -->
+    <transmission name="rotational_joint_transmission">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="rotational_joint">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="rotational_joint_motor">
+            <mechanicalReduction>101</mechanicalReduction>
+        </actuator>
+    </transmission>
+</robot>

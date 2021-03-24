@@ -1,0 +1,3 @@
+std_msgs/Header header
+march_shared_msgs/PressureSoleData left_foot
+march_shared_msgs/PressureSoleData right_foot
