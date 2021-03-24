@@ -299,7 +299,7 @@ bool HullParameterDeterminer::cropCloudToHullVector(PointCloud2D::Ptr const inpu
 
     success &= cropCloudToHull(elevated_cloud, hull_vector_->at(hull_index), polygon_vector_->at(hull_index));
 
-    PointNormalCloud::Ptr elevated_cloud_with_normals (new PointNormalCloud);
+    PointNormalCloud::Ptr elevated_cloud_with_normals = boost::make_shared<PointNormalCloud>();
     success &= addNormalToCloudFromPlaneCoefficients(elevated_cloud,
                                           plane_coefficients_vector_->at(hull_index),
                                           elevated_cloud_with_normals);
