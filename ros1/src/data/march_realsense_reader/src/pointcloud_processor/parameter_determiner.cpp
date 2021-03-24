@@ -191,8 +191,8 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation(
   }
   else
   {
-    ROS_ERROR_STREAM("No valid foot location could be found for the current "
-                     "selected obstacle " << selected_obstacle_ << ".;
+    ROS_ERROR_STREAM("No valid foot location could be found for the "
+                     "current selected obstacle " << selected_obstacle_);
     return false;
   }
 }
