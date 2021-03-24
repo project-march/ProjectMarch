@@ -1,4 +1,4 @@
-name: sine_gait
+name: linear_sine_gait
 subgaits:
   sine_subgait:
     to: end

@@ -1,5 +1,5 @@
 gaits:
-  sine_gait:
+  rotational_sine_gait:
     sine_subgait: MVI_rotational_sine_subgait_v1
 positions:
   setup:

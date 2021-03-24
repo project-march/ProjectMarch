@@ -403,14 +403,14 @@ class InputDeviceView(QWidget):
         home_test_gait_button = self.create_button(
             "home_setup", callback=lambda: self._controller.publish_gait("home_setup")
         )
-        rot_testjoint_gait_button = self.create_button(
-            "rot_test_joint_gait",
-            callback=lambda: self._controller.publish_gait("rot_test_joint_gait"),
+        rotational_sine_gait_button = self.create_button(
+            "rotational_sine_gait",
+            callback=lambda: self._controller.publish_gait("rotational_sine_gait"),
         )
 
-        lin_testjoint_gait_button = self.create_button(
-            "lin_test_joint_gait",
-            callback=lambda: self._controller.publish_gait("lin_test_joint_gait"),
+        linear_sine_gait_button = self.create_button(
+            "linear_sine_gait",
+            callback=lambda: self._controller.publish_gait("linear_sine_gait"),
         )
 
         # The button layout.
@@ -490,8 +490,15 @@ class InputDeviceView(QWidget):
                 gait_tilted_path_first_end,
                 gait_tilted_path_second_end,
             ],
-            [ik_test, gait_curb],
-            [home_test_gait_button, rot_testjoint_gait_button, lin_testjoint_gait_button],
+            [
+                ik_test,
+                gait_curb,
+            ],
+            [
+                home_test_gait_button,
+                rotational_sine_gait_button,
+                linear_sine_gait_button,
+            ],
         ]
 
         # Create the qt_layout from the button layout.
