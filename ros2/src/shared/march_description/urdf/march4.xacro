@@ -38,17 +38,14 @@
 
 
     <!-- Add yaml files with properties -->
-    <xacro:property name="joint_limits_yaml_file"
-                    value="properties/march4_joint_limits.yaml"/>
-    <xacro:property name="joint_limits" value="${load_yaml(joint_limits_yaml_file)}"/>
-    <xacro:property name="safety_yaml_file"
-                    value="properties/march4_safety_${configuration}.yaml"/>
-    <xacro:property name="safety_values" value="${load_yaml(safety_yaml_file)}"/>
-    <xacro:property name="inertia_yaml_file" value="properties/march4_inertia.yaml"/>
-    <xacro:property name="inertia" value="${load_yaml(inertia_yaml_file)}"/>
-    <xacro:property name="dimensions_yaml_file"
-                    value="properties/march4_dimensions.yaml"/>
-    <xacro:property name="dimensions" value="${load_yaml(dimensions_yaml_file)}"/>
+    <xacro:property name="config_yaml_file"
+                    value="properties/march4.yaml"/>
+    <xacro:property name="properties" value="${load_yaml(config_yaml_file)}"/>
+    <xacro:property name="joint_limits" value="${properties['joint_limits']}"/>
+    <xacro:property name="safety_values"
+                    value="${properties['safety'][configuration]}"/>
+    <xacro:property name="inertia" value="${properties['inertia']}"/>
+    <xacro:property name="dimensions" value="${properties['dimensions']}"/>
 
     <xacro:property name="rotary_reduction" value="101"/>
     <xacro:property name="linear_reduction" value="200"/>
