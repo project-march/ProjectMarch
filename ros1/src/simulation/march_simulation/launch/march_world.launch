@@ -39,6 +39,7 @@
                     realsense_simulation:=$(arg realsense_simulation)
                     configuration:='simulation'" />
 
+
     <!-- Upload the controller configuration -->
     <rosparam file="$(find march_simulation)/config/$(arg controller_type)/$(arg controller_name).yaml" command="load"/>
 
