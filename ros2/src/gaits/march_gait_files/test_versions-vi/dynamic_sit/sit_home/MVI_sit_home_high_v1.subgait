@@ -33,7 +33,7 @@ joints:
   - position: 1.57079633
     time_from_start: 0
     velocity: 0.0
-  - position: 1.7453
+  - position: 1.57079633
     time_from_start: 1000000000
     velocity: 0.0
   right_ankle:
@@ -67,7 +67,7 @@ joints:
   - position: 1.57079633
     time_from_start: 0
     velocity: 0.0
-  - position: 1.7453
+  - position: 1.57079633
     time_from_start: 1000000000
     velocity: 0.0
 name: sit_home
