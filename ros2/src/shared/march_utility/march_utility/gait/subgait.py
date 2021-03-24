@@ -619,7 +619,9 @@ class Subgait(object):
         )
         if parameter_search is None:
             raise SubgaitInterpolationError(
-                "Parametric version was stored in wrong format."
+                f"Parametric version string was stored in wrong format. "
+                f"Version string is {version}. Correct example is "
+                f"'_{PARAMETRIC_GAITS_PREFIX}0.5_(version_1)_(version_2)"
             )
         parameter = float(parameter_search.group(1))
         versions = re.findall(r"\([^\)]*\)", version)
@@ -635,7 +637,9 @@ class Subgait(object):
         )
         if parameter_search is None:
             raise SubgaitInterpolationError(
-                "Parametric version was stored in wrong format."
+                f"Parametric version string was stored in wrong format. "
+                f"Version string is {version}. Correct example is "
+                f"'_{FOUR_PARAMETRIC_GAITS_PREFIX}_0.5_0.5_(version_1)_(version_2)_(version_3)_(version_4)"
             )
         parameter_list = [float(parameter_search[0]), float(parameter_search[1])]
         versions = re.findall(r"\([^\)]*\)", version)
