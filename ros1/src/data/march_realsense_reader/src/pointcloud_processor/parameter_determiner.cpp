@@ -166,6 +166,11 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation(
 
   for (pcl::PointNormal & possible_foot_location : *possible_foot_locations)
   {
+    if (not isValidLocation(possible_foot_location))
+    {
+      continue;
+    }
+
     double distance_to_most_desirable_location =
             (possible_foot_location.x - most_desirable_foot_location_.x) *
             (possible_foot_location.x - most_desirable_foot_location_.x) +
@@ -180,28 +185,27 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation(
       optimal_foot_location = possible_foot_location;
     }
   }
-  if (optimalLocationIsValid())
+  if (min_distance_to_most_desirable_location != std::numeric_limits<double>::max())
   {
     return true;
   }
   else
   {
-    ROS_ERROR_STREAM("The optimal foot location is not reachable for the current selected obstacle. \n"
-                     "Selected obstacle is " << selected_obstacle_ << ", and the optimal foot location is " <<
-                     output_utilities::pointToString(optimal_foot_location));
+    ROS_ERROR_STREAM("No valid foot location could be found for the current "
+                     "selected obstacle " << selected_obstacle_ << ".;
     return false;
   }
 }
 
 // Verify that the found location is valid for the requested gait
-bool HullParameterDeterminer::optimalLocationIsValid()
+bool HullParameterDeterminer::isValidLocation(pcl::PointNormal possible_foot_location)
 {
   if (selected_obstacle_ == SelectedGait::stairs_up)
   {
     // Less and larger than signs are swapped for the x coordinate
     // as the positive x axis points in the backwards direction of the exoskeleton
-    if (optimal_foot_location.x < min_x_stairs && optimal_foot_location.x > max_x_stairs &&
-        optimal_foot_location.z > min_z_stairs && optimal_foot_location.z < max_z_stairs)
+    if (possible_foot_location.x < min_x_stairs && optimal_foot_location.x > max_x_stairs &&
+        possible_foot_location.z > min_z_stairs && optimal_foot_location.z < max_z_stairs)
     {
       return true;
     }

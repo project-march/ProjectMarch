@@ -106,8 +106,8 @@ protected:
   // Find the parameters from the foot location by finding at what percentage of the end points it is
   bool getGaitParametersFromFootLocation();
 
-  // Verify that the found location is valid for the requested gait
-  bool optimalLocationIsValid();
+  // Verify that a possible foot location is valid for the requested gait
+  bool isValidLocation(pcl::PointNormal possible_foot_location);
 
   // Read all relevant parameters from the parameter yaml file
   void readYaml();
