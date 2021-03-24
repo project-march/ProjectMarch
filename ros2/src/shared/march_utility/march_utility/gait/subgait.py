@@ -187,7 +187,7 @@ class Subgait(object):
         if third_file_name and fourth_file_name and second_parameter:
             first_subgait = cls.from_file(robot, first_file_name)
             second_subgait = cls.from_file(robot, second_file_name)
-            third_subgiat = cls.from_file(robot, third_file_name)
+            third_subgait = cls.from_file(robot, third_file_name)
             fourth_subgait = cls.from_file(robot, fourth_file_name)
             return cls.interpolate_four_subgaits(
                 first_subgait,
