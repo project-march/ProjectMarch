@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!-- Revolute-Revolute Manipulator -->
 <robot name="march" xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <!-- Switch between airgaiting or standing on the ground-->
-    <!--Value set to: 'world' fixes the robot to the world-->
-    <!--Value set to: 'base_link' makes the robot stand on the ground-->
-    <!--Important note: when changing value make sure rviz fixed frame is set to the same value (moveit.rviz)-->
+    <!-- Switch between airgaiting or standing on the ground -->
+    <!-- Value set to 'world' fixes the robot to the world -->
+    <!-- Value set to 'base_link' makes the robot stand on the ground -->
+    <!-- Important note when changing value make sure rviz fixed frame is set to the same value (moveit.rviz) -->
 
     <!-- Constants for robot dimensions -->
     <xacro:property name="PI" value="3.1415926535897931"/>
@@ -99,7 +99,6 @@
             <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
         </joint>
         <actuator name="linear_joint_motor">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
             <mechanicalReduction>3.14159265</mechanicalReduction>
         </actuator>
     </transmission>
