@@ -16,8 +16,9 @@ public:
     vector<double> x0{0,0};             // Current state
     double u;                           // Calculated control input
     vector<vector<double>> reference;   // Current reference
-    bool repeat_reference = true;      // Periodically Repeat the reference
+    bool repeat_reference = true;       // Periodically Repeat the reference
     std::string joint_name;
+    double cost;                        // Objective value
 
     // Error enums
     enum Error {
@@ -73,9 +74,13 @@ public:
      * \brief Calculate the control input
      */
     void calculateControlInput();
+    /**
+     * \brief Shift the state and control acadoVariables
+     */
+    void shiftStatesAndControl();
 
 private:
-  std::vector<std::vector<float>> Q_;
+    std::vector<std::vector<float>> Q_;
 };
 
 #endif

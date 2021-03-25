@@ -1,0 +1,25 @@
+[
+   [
+      {
+         "name": "home_setup"
+      },
+      {
+         "name": "test_joint_gait"
+      },
+      {
+         "name":"stop",
+         "callback":"publish_stop",
+         "always_enabled":true
+      },
+      {
+         "name":"error",
+         "callback":"publish_error",
+         "always_enabled":true
+      },
+      {
+         "name":"force unknown",
+         "callback":"publish_sm_to_unknown",
+         "always_enabled":true
+      }
+   ]
+]
