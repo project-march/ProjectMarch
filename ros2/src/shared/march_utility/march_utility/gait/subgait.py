@@ -116,7 +116,7 @@ class Subgait(object):
                 other_version_path = os.path.join(
                     subgait_path, other_version + SUBGAIT_SUFFIX
                 )
-                return cls.from_files_interpolated(
+                return cls.from_two_files_interpolated(
                     robot,
                     base_version_path,
                     other_version_path,
@@ -133,15 +133,11 @@ class Subgait(object):
                 version_path_list[version_index] = os.path.join(
                     subgait_path, gait_version_list[version_index] + SUBGAIT_SUFFIX
                 )
-            return cls.from_files_interpolated(
+            return cls.from_four_files_interpolated(
                 robot,
-                version_path_list[0],
-                version_path_list[1],
-                parameter_list[0],
+                version_path_list,
+                parameter_list,
                 use_foot_position=True,
-                third_file_name=version_path_list[2],
-                fourth_file_name=version_path_list[3],
-                second_parameter=parameter_list[1],
             )
 
         else:
@@ -149,16 +145,52 @@ class Subgait(object):
             return cls.from_file(robot, subgait_version_path)
 
     @classmethod
-    def from_files_interpolated(
+    def from_four_files_interpolated(
+            cls,
+            robot: urdf.Robot,
+            version_path_list: List[str, str, str, str],
+            parameter_list: List[float, float],
+            use_foot_position: bool = False,
+    ) -> Subgait:
+        """
+        Extract two subgaits from files and interpolate.
+
+        :param robot:
+            The robot corresponding to the given subgait file
+        :param version_path_list:
+            The .yaml file names of the subgaits to interpolate
+            The parameter to use for interpolation. Should be between 0 and 1
+        :param parameter_list:
+            The parameters to use for interpolation. Should all be between 0 and 1
+        :param use_foot_position:
+            Determine whether the interpolation should be done on the foot location or
+            on the joint angles
+
+        :return:
+            A populated Subgait object
+        """
+        first_subgait = cls.from_file(robot, version_path_list[0])
+        second_subgait = cls.from_file(robot, version_path_list[1])
+        third_subgait = cls.from_file(robot, version_path_list[2])
+        fourth_subgait = cls.from_file(robot, version_path_list[3])
+        return cls.interpolate_four_subgaits(
+            first_subgait,
+            second_subgait,
+            third_subgait,
+            fourth_subgait,
+            parameter_list[0],
+            parameter_list[1],
+            use_foot_position,
+        )
+
+    @classmethod
+    def from_two_files_interpolated(
         cls,
         robot: urdf.Robot,
         first_file_name: str,
         second_file_name: str,
         first_parameter: float,
         use_foot_position: bool = False,
-        third_file_name: str = "",
-        fourth_file_name: str = "",
-        second_parameter: float = 0.0,
     ) -> Subgait:
         """
         Extract two subgaits from files and interpolate.
@@ -173,37 +205,15 @@ class Subgait(object):
         :param use_foot_position:
             Determine whether the interpolation should be done on the foot location or
             on the joint angles
-        :param third_file_name:
-            The .yaml file name of the third subgait for parametrization between four subgaits
-        :param fourth_file_name:
-            The .yaml file name of the fourth subgait for parametrization between four subgaits
-        :param second_parameter:
-            The parameter to use for inter polation after the subgaits have first been interpolated with parameter
-            Should be 0 <= parameter <= 1
 
         :return:
             A populated Subgait object
         """
-        if third_file_name and fourth_file_name and second_parameter:
-            first_subgait = cls.from_file(robot, first_file_name)
-            second_subgait = cls.from_file(robot, second_file_name)
-            third_subgait = cls.from_file(robot, third_file_name)
-            fourth_subgait = cls.from_file(robot, fourth_file_name)
-            return cls.interpolate_four_subgaits(
-                first_subgait,
-                second_subgait,
-                third_subgait,
-                fourth_subgait,
-                first_parameter,
-                second_parameter,
-                use_foot_position,
-            )
-        else:
-            base_subgait = cls.from_file(robot, first_file_name)
-            other_subgait = cls.from_file(robot, second_file_name)
-            return cls.interpolate_subgaits(
-                base_subgait, other_subgait, first_parameter, use_foot_position
-            )
+        base_subgait = cls.from_file(robot, first_file_name)
+        other_subgait = cls.from_file(robot, second_file_name)
+        return cls.interpolate_subgaits(
+            base_subgait, other_subgait, first_parameter, use_foot_position
+        )
 
     @classmethod
     def from_dict(
