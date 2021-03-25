@@ -27,7 +27,7 @@ RegionGrower::RegionGrower(YAML::Node config_tree, bool debugging):
   read_yaml();
 }
 
-bool RegionGrower::create_regions(PointCloud::Ptr pointcloud,
+bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
                                          Normals::Ptr pointcloud_normals,
                                          boost::shared_ptr<RegionVector>
                                          region_vector)
@@ -50,7 +50,7 @@ bool RegionGrower::create_regions(PointCloud::Ptr pointcloud,
 
   return success;
 }
-void RegionGrower::read_yaml()
+void RegionGrower::readYaml()
 {
   if (YAML::Node region_growing_parameters = config_tree_["region_growing"])
   {
@@ -66,7 +66,7 @@ void RegionGrower::read_yaml()
   }
 }
 
-bool RegionGrower::setup_region_grower()
+bool RegionGrower::setupRegionGrower()
 {
   if (pointcloud_->size() == pointcloud_normals_->size())
   {
@@ -88,7 +88,7 @@ bool RegionGrower::setup_region_grower()
   }
 }
 
-bool RegionGrower::extract_regions()
+bool RegionGrower::extractRegions()
 {
   region_grower.extract(*region_vector_);
   if (debugging_)

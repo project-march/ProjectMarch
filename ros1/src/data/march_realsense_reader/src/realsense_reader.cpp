@@ -132,7 +132,7 @@ bool RealSenseReader::processPointcloud(
       boost::make_shared<RegionVector>();
   // Create regions
   bool region_creating_was_successful =
-      region_creator_->create_regions(pointcloud, normals, region_vector);
+      region_creator_->createRegions(pointcloud, normals, region_vector);
   if (not region_creating_was_successful)
   {
     res.error_message = "Region creating was unsuccessful, see debug output "
