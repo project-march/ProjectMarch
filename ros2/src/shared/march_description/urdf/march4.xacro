@@ -414,7 +414,7 @@
             origin="0 ${-ankle_plate_offset} ${-lower_leg_height}"
             axis="0 1 0"
             reduction="${linear_reduction}"
-            limits="${joint_limits['left_ankle']}"
+            limits="${joint_limits['right_ankle']}"
     />
 
     <joint name="right_foot_angle" type="fixed">

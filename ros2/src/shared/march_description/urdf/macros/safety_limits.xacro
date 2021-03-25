@@ -6,8 +6,8 @@
                lower="${limits['lower_limit']*pi/180}"
                upper="${limits['upper_limit']*pi/180}"/>
         <safety_controller
-                soft_lower_limit="${limits['lower_limit']*pi/180 + safety['lower_soft_buffer']*pi/180}"
-                soft_upper_limit="${limits['upper_limit']*pi/180 - safety['upper_soft_buffer']*pi/180}"
+                soft_lower_limit="${(limits['lower_limit'] + safety['lower_soft_buffer']) * pi / 180}"
+                soft_upper_limit="${(limits['upper_limit'] - safety['upper_soft_buffer']) * pi / 180}"
                 k_position="${safety['k_position']}"
                 k_velocity="${safety['k_velocity']}" />
     </xacro:macro>
