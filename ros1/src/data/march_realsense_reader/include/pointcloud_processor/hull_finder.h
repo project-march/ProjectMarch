@@ -23,7 +23,7 @@ class HullFinder
 public:
     HullFinder(YAML::Node config_tree, bool debugging);
     // This function is required to be implemented by any plane finder
-    virtual bool find_hulls(PointCloud::Ptr pointcloud,
+    virtual bool findHulls(PointCloud::Ptr pointcloud,
                             Normals::Ptr normal_pointcloud,
                             boost::shared_ptr<RegionVector> region_vector,
                             boost::shared_ptr<PlaneCoefficientsVector>
@@ -51,7 +51,7 @@ public:
     CHullFinder(YAML::Node config_tree, bool debugging);
     /** This function should take in a pointcloud with matching normals and
      * regions, and turn this into chulls where the foot can be located. **/
-    bool find_hulls(PointCloud::Ptr pointcloud,
+    bool findHulls(PointCloud::Ptr pointcloud,
                     Normals::Ptr normal_pointcloud,
                     boost::shared_ptr<RegionVector> region_vector,
                     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,

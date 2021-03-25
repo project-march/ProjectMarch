@@ -37,7 +37,7 @@ CHullFinder::CHullFinder(YAML::Node config_tree, bool debugging):
   readYaml();
 }
 
-bool CHullFinder::find_hulls(
+bool CHullFinder::findHulls(
      PointCloud::Ptr pointcloud,
      Normals::Ptr pointcloud_normals,
      boost::shared_ptr<RegionVector> region_vector,
