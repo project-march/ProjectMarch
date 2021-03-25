@@ -69,7 +69,7 @@ void HullParameterDeterminer::readYaml()
 /** This function takes in a pointcloud with matching normals and
 * hulls, and turn this into a location where the foot can be placed,
 * from this location, gaits parameters are made. **/
-bool HullParameterDeterminer::determine_parameters(
+bool HullParameterDeterminer::determineParameters(
         boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
@@ -395,7 +395,7 @@ bool HullParameterDeterminer::addNormalToCloudFromPlaneCoefficients(
 }
 
 
-bool SimpleParameterDeterminer::determine_parameters(
+bool SimpleParameterDeterminer::determineParameters(
         boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,

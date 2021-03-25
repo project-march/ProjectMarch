@@ -179,7 +179,7 @@ bool RealSenseReader::processPointcloud(
   bool for_right_foot = false;
   // Determine parameters
   bool parameter_determining_was_successful =
-      parameter_determiner_->determine_parameters(
+      parameter_determiner_->determineParameters(
           plane_coefficients_vector, hull_vector, polygon_vector,
           selected_obstacle, for_right_foot, gait_parameters);
   if (not parameter_determining_was_successful)
