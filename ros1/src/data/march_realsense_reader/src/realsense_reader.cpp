@@ -27,10 +27,10 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
 {
   pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>
       (POINTCLOUD_TOPIC, 1,
-       &RealSenseReader::pointcloud_callback, this);
+       &RealSenseReader::pointcloudCallback, this);
   read_pointcloud_service_ = n_->advertiseService
       ("/camera/process_pointcloud",
-       &RealSenseReader::process_pointcloud_callback,
+       &RealSenseReader::processPointcloudCallback,
        this);
 
   config_tree_ = readConfig("pointcloud_parameters.yaml");
@@ -103,7 +103,7 @@ YAML::Node RealSenseReader::getConfigIfPresent(std::string key)
 }
 
 // This method executes the logic to process a pointcloud
-bool RealSenseReader::process_pointcloud(
+bool RealSenseReader::processPointcloud(
     PointCloud::Ptr pointcloud,
     int selected_gait,
     march_shared_msgs::GetGaitParameters::Response &res)
@@ -286,7 +286,7 @@ void RealSenseReader::publishOptimalFootLocationMarker(pcl::PointNormal optimal_
 
 // The callback for the service that was starts processing the point cloud and gives
 // back parameters for a gait
-bool RealSenseReader::process_pointcloud_callback(
+bool RealSenseReader::processPointcloudCallback(
     march_shared_msgs::GetGaitParameters::Request &req,
     march_shared_msgs::GetGaitParameters::Response &res)
 {
@@ -308,7 +308,7 @@ bool RealSenseReader::process_pointcloud_callback(
   pcl::fromROSMsg(*input_cloud, converted_cloud);
   PointCloud::Ptr point_cloud = boost::make_shared<PointCloud>(converted_cloud);
 
-  bool success = process_pointcloud(point_cloud, req.selected_gait, res);
+  bool success = processPointcloud(point_cloud, req.selected_gait, res);
 
   time_t end_callback = clock();
   double time_taken = double(end_callback - start_callback) / double(CLOCKS_PER_SEC);

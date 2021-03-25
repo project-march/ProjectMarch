@@ -27,20 +27,20 @@ public:
    * gait parameters, these parameters are put into the response,
    * returns whether the processing was successful.
    */
-  bool process_pointcloud(PointCloud::Ptr input_cloud,
+  bool processPointcloud(PointCloud::Ptr input_cloud,
                           int selected_gait,
                           march_shared_msgs::GetGaitParameters::Response &res);
 
   /** A callback that starts the entire pointcloud processing when the
    * /camera/process_pointcloud service is called.
    */
-  bool process_pointcloud_callback(march_shared_msgs::GetGaitParameters::Request &req,
+  bool processPointcloudCallback(march_shared_msgs::GetGaitParameters::Request &req,
                                 march_shared_msgs::GetGaitParameters::Response &res);
 
   /** Pointcloud callback, empty since we are not processing all pointclouds, this
    * gives a speedup when you need a single pointcloud.
    */
-  void pointcloud_callback(const sensor_msgs::PointCloud2 pointCloud2) {};
+  void pointcloudCallback(const sensor_msgs::PointCloud2 pointCloud2) {};
 
   /** Read in the config file, the string is the name of the file, which should be
    * in the config directory. Returns a YAML::Node with the configurations.
