@@ -27,7 +27,7 @@ class ParameterDeterminer
 public:
   ParameterDeterminer(YAML::Node config_tree, bool debugging);
   /** This function is required to be implemented by any plane finder **/
-  virtual bool determine_parameters(
+  virtual bool determineParameters(
       boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
       boost::shared_ptr<HullVector> const hull_vector,
       boost::shared_ptr<PolygonVector> const polygon_vector,
@@ -134,7 +134,7 @@ public:
   /** Use the constructors defined in the super class **/
   using ParameterDeterminer::ParameterDeterminer;
   /** A Simple implementation which return parameters of 0.5 **/
-  bool determine_parameters(
+  bool determineParameters(
           boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
           boost::shared_ptr<HullVector> const hull_vector,
           boost::shared_ptr<PolygonVector> const polygon_vector,

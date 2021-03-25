@@ -24,7 +24,7 @@ RegionGrower::RegionGrower(YAML::Node config_tree, bool debugging):
     RegionCreator(config_tree, debugging)
 
 {
-  read_yaml();
+  readYaml();
 }
 
 bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
@@ -40,8 +40,8 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
   clock_t start_region_grow = clock();
 
   bool success = true;
-  success &= setup_region_grower();
-  success &= extract_regions();
+  success &= setupRegionGrower();
+  success &= extractRegions();
 
   clock_t end_region_grow = clock();
   double time_taken = double(end_region_grow - start_region_grow) / double(CLOCKS_PER_SEC);
