@@ -136,11 +136,11 @@ bool HullParameterDeterminer::getOptimalFootLocation()
   bool success = true;
 
   // Get some locations on the ground we might want to place our foot
-  PointCloud2D::Ptr foot_locations_to_try = boost::make_shared<PointCloud2D>();
+  foot_locations_to_try = boost::make_shared<PointCloud2D>();
   success &= getOptionalFootLocations(foot_locations_to_try);
 
   // Crop those locations to only be left with locations where it is possible to place the foot
-  PointNormalCloud::Ptr possible_foot_locations = boost::make_shared<PointNormalCloud>();
+  possible_foot_locations = boost::make_shared<PointNormalCloud>();
   success &= cropCloudToHullVector(foot_locations_to_try, possible_foot_locations);
 
   // Get the location where we would ideally place the foot

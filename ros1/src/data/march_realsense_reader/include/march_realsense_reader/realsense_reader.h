@@ -57,8 +57,20 @@ public:
   // Turn a HullVector into a marker with a list of points and publish for visualization
   void publishHullMarkerArray(boost::shared_ptr<HullVector> hull_vector);
 
+  // Create markers from the parameter determiner and publish them for visualization
+  void publishParameterDeterminerMarkerArray(HullParameterDeterminer const parameter_determiner);
+
   // Create a marker from the optimal foot location and publish it and publish for visualization
-  void publishOptimalFootLocationMarker(pcl::PointNormal optimal_foot_location);
+  void fillOptimalFootLocationMarker(pcl::PointNormal const optimal_foot_location,
+                                     visualization_msgs::Marker & marker);
+
+  // Create a marker list from the 'foot locations to try' and publish it and publish for visualization
+  void fillFootLocationsToTryMarker(PointCloud2D const foot_locations_to_try,
+                                    visualization_msgs::Marker & marker_list);
+
+  // Create a marker list from the 'foot locations to try' and publish it and publish for visualization
+  void fillPossibleFootLocationsToTryMarker(PointNormalCloud const possible_foot_locations,
+                                            visualization_msgs::Marker & marker_list);
 
 private:
   ros::NodeHandle* n_;

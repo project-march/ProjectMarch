@@ -68,6 +68,9 @@ public:
       boost::shared_ptr<GaitParameters> gait_parameters) override;
 
   pcl::PointNormal optimal_foot_location;
+  PointNormalCloud::Ptr possible_foot_locations;
+  PointCloud2D::Ptr foot_locations_to_try;
+
 
 protected:
   // Get the optimal foot location by finding which possible foot location is closest
