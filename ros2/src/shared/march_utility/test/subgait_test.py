@@ -72,7 +72,7 @@ class SubgaitTest(unittest.TestCase):
             subgait="left_close",
             version="MV_walk_leftclose_v2",
         )
-        subgait = Subgait.from_files_interpolated(
+        subgait = Subgait.from_two_files_interpolated(
             self.robot,
             base_subgait_path,
             other_subgait_path,
@@ -94,7 +94,7 @@ class SubgaitTest(unittest.TestCase):
             subgait=self.other_subgait_name,
             version=self.other_version,
         )
-        subgait = Subgait.from_files_interpolated(
+        subgait = Subgait.from_two_files_interpolated(
             self.robot,
             base_subgait_path,
             other_subgait_path,
