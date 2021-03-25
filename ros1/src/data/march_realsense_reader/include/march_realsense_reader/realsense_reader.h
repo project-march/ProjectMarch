@@ -58,19 +58,21 @@ public:
   void publishHullMarkerArray(boost::shared_ptr<HullVector> hull_vector);
 
   // Create markers from the parameter determiner and publish them for visualization
-  void publishParameterDeterminerMarkerArray(HullParameterDeterminer const parameter_determiner);
+  void publishParameterDeterminerMarkerArray();
 
   // Create a marker from the optimal foot location and publish it and publish for visualization
   void fillOptimalFootLocationMarker(pcl::PointNormal const optimal_foot_location,
                                      visualization_msgs::Marker & marker);
 
   // Create a marker list from the 'foot locations to try' and publish it and publish for visualization
-  void fillFootLocationsToTryMarker(PointCloud2D const foot_locations_to_try,
+  void fillFootLocationsToTryMarker(PointCloud2D::Ptr const foot_locations_to_try,
                                     visualization_msgs::Marker & marker_list);
 
   // Create a marker list from the 'foot locations to try' and publish it and publish for visualization
-  void fillPossibleFootLocationsToTryMarker(PointNormalCloud const possible_foot_locations,
-                                            visualization_msgs::Marker & marker_list);
+  void fillPossibleFootLocationsMarker(
+          PointNormalCloud::Ptr const possible_foot_locations,
+          pcl::PointNormal const optimal_foot_location,
+          visualization_msgs::Marker & marker_list);
 
 private:
   ros::NodeHandle* n_;
@@ -80,7 +82,7 @@ private:
   ros::Publisher preprocessed_pointcloud_publisher_;
   ros::Publisher region_pointcloud_publisher_;
   ros::Publisher hull_marker_array_publisher_;
-  ros::Publisher optimal_foot_location_marker_publisher_;
+  ros::Publisher hull_parameter_determiner_publisher_;
 
   std::unique_ptr<NormalsPreprocessor> preprocessor_;
   std::unique_ptr<RegionGrower> region_creator_;
