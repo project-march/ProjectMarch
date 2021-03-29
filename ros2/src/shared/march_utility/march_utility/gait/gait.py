@@ -168,45 +168,44 @@ class Gait(object):
 
         for from_subgait_name, to_subgait_name in self.graph:
             if from_subgait_name in new_subgaits or to_subgait_name in new_subgaits:
-                if from_subgait_name == self.graph.START:
-                    old_subgait = self.subgaits[to_subgait_name]
-                    new_subgait = new_subgaits[to_subgait_name]
-
-                    old_starting_positions = old_subgait.starting_position
-                    new_starting_positions = new_subgait.starting_position
-                    for joint in old_subgait.joints:
-                        if (
-                            abs(
-                                old_starting_positions[joint.name]
-                                - new_starting_positions[joint.name]
-                            )
-                            >= ALLOWED_ERROR_ENDPOINTS
-                        ):
-                            raise NonValidGaitContent(
-                                msg=f"The starting position of new version "
-                                f"{self.gait_name} {to_subgait_name} does not match"
-                            )
-                elif to_subgait_name == self.graph.END:
-                    old_subgait = self.subgaits[from_subgait_name]
-                    new_subgait = new_subgaits[from_subgait_name]
-
-                    old_final_positions = old_subgait.final_position
-                    new_final_positions = new_subgait.final_position
-                    for joint in old_subgait.joints:
-                        if (
-                            abs(
-                                old_final_positions[joint.name]
-                                - new_final_positions[joint.name]
-                            )
-                            >= ALLOWED_ERROR_ENDPOINTS
-                        ):
-                            raise NonValidGaitContent(
-                                msg=f"The final position of new version "
-                                f"{self.gait_name} {from_subgait_name} does not "
-                                f"match"
-                            )
-
-                else:
+                # if from_subgait_name == self.graph.START:
+                #     old_subgait = self.subgaits[to_subgait_name]
+                #     new_subgait = new_subgaits[to_subgait_name]
+                #
+                #     old_starting_positions = old_subgait.starting_position
+                #     new_starting_positions = new_subgait.starting_position
+                #     for joint in old_subgait.joints:
+                #         if (
+                #             abs(
+                #                 old_starting_positions[joint.name]
+                #                 - new_starting_positions[joint.name]
+                #             )
+                #             >= ALLOWED_ERROR_ENDPOINTS
+                #         ):
+                #             raise NonValidGaitContent(
+                #                 msg=f"The starting position of new version "
+                #                 f"{self.gait_name} {to_subgait_name} does not match"
+                #             )
+                # elif to_subgait_name == self.graph.END:
+                #     old_subgait = self.subgaits[from_subgait_name]
+                #     new_subgait = new_subgaits[from_subgait_name]
+                #
+                    # old_final_positions = old_subgait.final_position
+                    # new_final_positions = new_subgait.final_position
+                    # for joint in old_subgait.joints:
+                    #     if (
+                    #         abs(
+                    #             old_final_positions[joint.name]
+                    #             - new_final_positions[joint.name]
+                    #         )
+                    #         >= ALLOWED_ERROR_ENDPOINTS
+                    #     ):
+                    #         raise NonValidGaitContent(
+                    #             msg=f"The final position of new version "
+                    #             f"{self.gait_name} {from_subgait_name} does not "
+                    #             f"match"
+                    #         )
+                if to_subgait_name != self.graph.END and from_subgait_name != self.graph.START:
                     from_subgait = new_subgaits.get(
                         from_subgait_name, self.subgaits[from_subgait_name]
                     )
@@ -214,12 +213,12 @@ class Gait(object):
                         to_subgait_name, self.subgaits[to_subgait_name]
                     )
 
-                    if not from_subgait.validate_subgait_transition(to_subgait):
-                        raise NonValidGaitContent(
-                            msg=f"Gait {self.gait_name} with end setpoint of subgait "
-                            f"{from_subgait.subgait_name} to "
-                            f"subgait {to_subgait.subgait_name} does not match"
-                        )
+                if not from_subgait.validate_subgait_transition(to_subgait):
+                    raise NonValidGaitContent(
+                        msg=f"Gait {self.gait_name} with end setpoint of subgait "
+                        f"{from_subgait.subgait_name} to "
+                        f"subgait {to_subgait.subgait_name} does not match"
+                    )
 
         self.subgaits.update(new_subgaits)
 

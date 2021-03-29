@@ -1,6 +1,6 @@
 description: 'Move to a position from where once can comfortably stand up. '
 duration: 1000000000
-gait_type: walk_like
+gait_type: sit_like
 joints:
   left_ankle:
   - position: 0.15707963

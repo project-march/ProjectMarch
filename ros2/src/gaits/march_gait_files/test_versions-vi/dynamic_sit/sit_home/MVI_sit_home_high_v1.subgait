@@ -1,4 +1,4 @@
-description: Move to the location Sjaan felt comfortable in.
+description: Move to the location Sjaan felt comfortable in, but higher.
 duration: 1000000000
 gait_type: sit_like
 joints:
@@ -23,17 +23,17 @@ joints:
     time_from_start: 1000000000
     velocity: 0.0
   left_hip_fe:
-  - position: 1.57079633
+  - position: 1.48352986
     time_from_start: 0
     velocity: 0.0
-  - position: 1.5708
+  - position: 1.3962634
     time_from_start: 1000000000
     velocity: 0.0
   left_knee:
-  - position: 1.57079633
+  - position: 1.48352986
     time_from_start: 0
     velocity: 0.0
-  - position: 1.57079633
+  - position: 1.48352986
     time_from_start: 1000000000
     velocity: 0.0
   right_ankle:
@@ -57,17 +57,17 @@ joints:
     time_from_start: 1000000000
     velocity: 0.0
   right_hip_fe:
-  - position: 1.57079633
+  - position: 1.48352986
     time_from_start: 0
     velocity: 0.0
-  - position: 1.5708
+  - position: 1.3962634
     time_from_start: 1000000000
     velocity: 0.0
   right_knee:
-  - position: 1.57079633
+  - position: 1.48352986
     time_from_start: 0
     velocity: 0.0
-  - position: 1.57079633
+  - position: 1.48352986
     time_from_start: 1000000000
     velocity: 0.0
 name: sit_home

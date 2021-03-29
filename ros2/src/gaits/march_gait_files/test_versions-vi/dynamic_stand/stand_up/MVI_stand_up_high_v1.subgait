@@ -1,15 +1,15 @@
-description: 'Stand up gait: from a low sit block to the standing position.'
+description: 'Stand up gait: from a high sit block to the standing position.'
 duration: 1700000000
-gait_type: walk_like
+gait_type: sit_like
 joints:
   left_ankle:
-  - position: 0.15707963
+  - position: 0.04360007
     time_from_start: 0
     velocity: 0.0
   - position: 0.15707963
     time_from_start: 1000000000
     velocity: 0.0
-  - position: 0.04360007
+  - position: 0.0436
     time_from_start: 1700000000
     velocity: 0.0
   left_hip_aa:
@@ -20,42 +20,39 @@ joints:
     time_from_start: 1700000000
     velocity: 0.0
   left_hip_fe:
-  - position: 1.57079633
+  - position: 1.65806279
     time_from_start: 0
     velocity: 0.0
-  - position: 1.57079982
-    time_from_start: 500000000
-    velocity: -0.52359878
-  - position: 1.08885856
+  - position: 0.97384311
     time_from_start: 1100000000
     velocity: -1.63293005
   - position: 0.0
     time_from_start: 1600000000
     velocity: -1.01229969
-  - position: -0.08729962
+  - position: -0.0873
     time_from_start: 1700000000
     velocity: 0.0
   left_knee:
-  - position: 1.83259571
+  - position: 1.48352986
     time_from_start: 0
     velocity: 0.0
-  - position: 1.7279
-    time_from_start: 100000000
-    velocity: -1.0123
-  - position: 0.0873
+  - position: 0.46813919
+    time_from_start: 730300000
+    velocity: -0.90519233
+  - position: 0.08729962
     time_from_start: 1600000000
-    velocity: -1.0123
+    velocity: -1.01229969
   - position: 0.0
     time_from_start: 1700000000
     velocity: 0.0
   right_ankle:
-  - position: 0.15707963
+  - position: 0.04360007
     time_from_start: 0
     velocity: 0.0
   - position: 0.15707963
     time_from_start: 1000000000
     velocity: 0.0
-  - position: 0.04360007
+  - position: 0.0436
     time_from_start: 1700000000
     velocity: 0.0
   right_hip_aa:
@@ -66,28 +63,25 @@ joints:
     time_from_start: 1700000000
     velocity: 0.0
   right_hip_fe:
-  - position: 1.57079633
+  - position: 1.65806279
     time_from_start: 0
     velocity: 0.0
-  - position: 1.57079982
-    time_from_start: 500000000
-    velocity: -0.52359878
-  - position: 1.08886205
+  - position: 0.97384242
     time_from_start: 1100000000
     velocity: -1.63334544
   - position: 0.0
     time_from_start: 1600000000
     velocity: -1.01229969
-  - position: -0.08729962
+  - position: -0.0873
     time_from_start: 1700000000
     velocity: 0.0
   right_knee:
-  - position: 1.83259571
+  - position: 1.48352986
     time_from_start: 0
     velocity: 0.0
-  - position: 1.7279
-    time_from_start: 100000000
-    velocity: -1.0123
+  - position: 0.46813869
+    time_from_start: 730271430
+    velocity: -0.90519147
   - position: 0.0873
     time_from_start: 1600000000
     velocity: -1.0123
@@ -95,4 +89,4 @@ joints:
     time_from_start: 1700000000
     velocity: 0.0
 name: stand_up
-version: MVI_stand_up_low
+version: MVI_stand_up_high_v1

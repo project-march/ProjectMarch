@@ -1,6 +1,6 @@
-description: 'Stand up gait: from a high sit block to the standing position.'
+description: 'Stand up gait: from a low sit block to the standing position.'
 duration: 1700000000
-gait_type: walk_like
+gait_type: sit_like
 joints:
   left_ankle:
   - position: 0.15707963
@@ -95,4 +95,4 @@ joints:
     time_from_start: 1700000000
     velocity: 0.0
 name: stand_up
-version: MVI_stand_up_high
+version: MVI_stand_up_low
