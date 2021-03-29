@@ -42,16 +42,20 @@ catkin_package(
 # is downloaded in the _deps/acado-solver-src folder in the build directory.
 fetchcontent_declare(acado-solver
     GIT_REPOSITORY "https://gitlab.com/project-march/libraries/acado-solver.git"
-    GIT_TAG "main"
+    GIT_TAG "8-refracture-the-acado-solver-repository"
     GIT_SHALLOW true
 )
 if(NOT acado-solver_POPULATED)
     fetchcontent_populate(acado-solver)
 endif()
 
-# Define a variable that points to the location of the ACADO. This
+# Choose which model to use
+set(MODEL_NAME test_joint_rotational)
+
+# Define a variable that points to the location of the chosen ACADO model_export directory. This
 # location is chosen by FetchContent_Declare.
-set(ACADO_DIR "${PROJECT_BINARY_DIR}/_deps/acado-solver-src/mpc_export")
+set(ACADO_DIR "${PROJECT_BINARY_DIR}/_deps/acado-solver-src/models/${MODEL_NAME}/model_export")
+
 
 # Create a list of all source files in the ACADO directory and store it
 # in ACADO_SRCS.
