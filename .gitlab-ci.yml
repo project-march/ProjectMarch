@@ -5,6 +5,7 @@ stages:
   - Tag container
   - Build container
   - Lint code
+  - Format C++ code
   - Build code
   - Test code
   - Static analysis on code
@@ -128,9 +129,6 @@ foxy:clang_tidy:
 
 noetic:clang_format:
   stage: Format C++ code
-  dependencies:
-    - noetic:build
-  needs: [ "noetic:build" ]
   script:
     - python3 run-clang-format.py -r ros1/src --style=file
   only:
@@ -139,9 +137,6 @@ noetic:clang_format:
 
 foxy:clang_format:
   stage: Format C++ code
-  dependencies:
-    - foxy:build
-  needs: [ "foxy:build" ]
   script:
     - python3 run-clang-format.py -r ros2/src --style=file
   only:
