@@ -214,10 +214,10 @@ void ObstacleController::getSitGoalPositionX(double time_since_start, double sta
 void ObstacleController::getStandGoalPositionX(double time_since_start, double stable_foot_pose_x)
 {
   goal_position_x = stable_foot_pose_x;
-  // If the exoskeleton is busy standing up, move the CoM forward again (relative when sitting down)
   // Set 'Standing' as the new default state
+  default_subgait_name_ = STAND_IDLE;
+  // If the exoskeleton is busy standing up, move the CoM forward again (relative when sitting down)
   if (subgait_name_.substr(subgait_name_.size() - 8) == "stand_up") {
-    default_subgait_name_ = STAND_IDLE;
     goal_position_x += halved_upper_leg_length_ * (1 - time_since_start / subgait_duration_);
   }
 }
