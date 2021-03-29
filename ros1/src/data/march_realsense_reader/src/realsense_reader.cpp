@@ -105,6 +105,8 @@ YAML::Node RealSenseReader::getConfigIfPresent(std::string key)
 bool RealSenseReader::processPointcloud(
     PointCloud::Ptr pointcloud,
     int selected_gait,
+    std::string frame_id,
+    bool use_left_foot,
     march_shared_msgs::GetGaitParameters::Response &res)
 {
   clock_t start_of_processing_time = clock();
@@ -406,7 +408,8 @@ bool RealSenseReader::processPointcloudCallback(
   pcl::fromROSMsg(*input_cloud, converted_cloud);
   PointCloud::Ptr point_cloud = boost::make_shared<PointCloud>(converted_cloud);
 
-  bool success = processPointcloud(point_cloud, req.selected_gait, res);
+  bool success = process_pointcloud(point_cloud, req.selected_gait, req.frame_id,
+                                    req.use_left_foot, res);
 
   time_t end_callback = clock();
   double time_taken = double(end_callback - start_callback) / double(CLOCKS_PER_SEC);

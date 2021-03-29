@@ -6,6 +6,12 @@ uint8 STAIRS_DOWN=1
 uint8 RAMP_UP=2
 uint8 RAMP_DOWN=3
 uint8 selected_gait
+
+# The link to transform to, is generally set to either "foot_left" or "foot_right"
+string frame_id
+
+# A bool specifying for which foot a new foot locations has to be searched.
+bool use_left_foot
 ---
 # Whether a valid place to set the foot was found using the camera.
 bool success
