@@ -26,10 +26,10 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
 {
   pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>
       (POINTCLOUD_TOPIC, 1,
-       &RealSenseReader::pointcloud_callback, this);
+       &RealSenseReader::pointcloudCallback, this);
   read_pointcloud_service_ = n_->advertiseService
       ("/camera/process_pointcloud",
-       &RealSenseReader::process_pointcloud_callback,
+       &RealSenseReader::processPointcloudCallback,
        this);
 
   config_tree_ = readConfig("pointcloud_parameters.yaml");
@@ -49,7 +49,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
           getConfigIfPresent("region_creator"), debugging_);
   hull_finder_ = std::make_unique<CHullFinder>(
       getConfigIfPresent("hull_finder"), debugging_);
-  parameter_determiner_ = std::make_unique<SimpleParameterDeterminer>(
+  parameter_determiner_ = std::make_unique<HullParameterDeterminer>(
       getConfigIfPresent("parameter_determiner"), debugging_);
 
 
@@ -66,6 +66,8 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
     preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>("/camera/preprocessed_cloud", 1);
     region_pointcloud_publisher_ = n_->advertise<pcl::PointCloud<pcl::PointXYZRGB>>("/camera/region_cloud", 1);
     hull_marker_array_publisher_ = n_->advertise<visualization_msgs::Marker>("/camera/hull_marker_list", 1);
+    hull_parameter_determiner_publisher_ = n_->advertise<visualization_msgs::MarkerArray>(
+            "/camera/parameter_determiner_marker_array", 1);
   }
 }
 
@@ -100,7 +102,7 @@ YAML::Node RealSenseReader::getConfigIfPresent(std::string key)
 }
 
 // This method executes the logic to process a pointcloud
-bool RealSenseReader::process_pointcloud(
+bool RealSenseReader::processPointcloud(
     PointCloud::Ptr pointcloud,
     int selected_gait,
     march_shared_msgs::GetGaitParameters::Response &res)
@@ -114,12 +116,13 @@ bool RealSenseReader::process_pointcloud(
   {
     res.error_message = "Preprocessing was unsuccessful, see debug output "
                         "for more information";
+    res.success = false;
     return false;
   }
 
   if (debugging_)
   {
-    ROS_DEBUG("Done preprocessing, see /camera/preprocessed_cloud for results");
+    ROS_DEBUG("Done preprocessing, see /camera/preprocessed_cloud for resulting point cloud");
     publishCloud<pcl::PointXYZ>(preprocessed_pointcloud_publisher_, *pointcloud);
   }
 
@@ -128,17 +131,18 @@ bool RealSenseReader::process_pointcloud(
       boost::make_shared<RegionVector>();
   // Create regions
   bool region_creating_was_successful =
-      region_creator_->create_regions(pointcloud, normals, region_vector);
+      region_creator_->createRegions(pointcloud, normals, region_vector);
   if (not region_creating_was_successful)
   {
     res.error_message = "Region creating was unsuccessful, see debug output "
                         "for more information";
+    res.success = false;
     return false;
   }
 
   if (debugging_)
   {
-    ROS_DEBUG("Done creating regions, now publishing to /camera/region_cloud");
+    ROS_DEBUG("Done creating regions, now publishing point cloud regions to /camera/region_cloud");
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr coloured_cloud = region_creator_->debug_visualisation();
     publishCloud<pcl::PointXYZRGB>(region_pointcloud_publisher_, *coloured_cloud);
   }
@@ -150,18 +154,20 @@ bool RealSenseReader::process_pointcloud(
   boost::shared_ptr<PolygonVector> polygon_vector = boost::make_shared<PolygonVector>();
   // Find hulls
   bool hull_finding_was_successful =
-      hull_finder_->find_hulls(pointcloud, normals, region_vector,
-                               plane_coefficients_vector, hull_vector, polygon_vector);
+      hull_finder_->findHulls(pointcloud, normals, region_vector,
+                               plane_coefficients_vector, hull_vector,
+                               polygon_vector);
   if (not hull_finding_was_successful)
   {
     res.error_message = "Hull finding was unsuccessful, see debug output "
                         "for more information";
+    res.success = false;
     return false;
   }
 
   if (debugging_)
   {
-    ROS_DEBUG("Done creating hulls, now publishing to /camera/hull_marker_list");
+    ROS_DEBUG("Done creating hulls, now publishing markers to /camera/hull_marker_list");
     publishHullMarkerArray(hull_vector);
   }
 
@@ -169,21 +175,27 @@ bool RealSenseReader::process_pointcloud(
   SelectedGait selected_obstacle = (SelectedGait) selected_gait;
   boost::shared_ptr<march_shared_msgs::GaitParameters> gait_parameters =
       boost::make_shared<march_shared_msgs::GaitParameters>();
+  bool for_right_foot = false;
   // Determine parameters
   bool parameter_determining_was_successful =
-      parameter_determiner_->determine_parameters(
-              plane_coefficients_vector, hull_vector, polygon_vector, selected_obstacle,
-              gait_parameters);
+      parameter_determiner_->determineParameters(
+          plane_coefficients_vector, hull_vector, polygon_vector,
+          selected_obstacle, for_right_foot, gait_parameters);
   if (not parameter_determining_was_successful)
   {
     res.error_message = "Parameter determining was unsuccessful, see debug output "
                         "for more information";
+    res.success = false;
     return false;
   }
+  if (debugging_)
+  {
+    ROS_DEBUG("Done determining parameters, now publishing a marker to /camera/optimal_foot_location_marker");
+    publishParameterDeterminerMarkerArray();
+  }
+
   res.gait_parameters = *gait_parameters;
 
-  ROS_DEBUG("Done determining parameters");
-  //TODO: Add publisher to visualize found hulls
 
   clock_t end_of_processing_time = clock();
 
@@ -212,7 +224,7 @@ void RealSenseReader::publishCloud(ros::Publisher publisher,
   publisher.publish(msg);
 }
 
-// Turn a HullVector into published a marker with a list of points on for visualization
+// Turn a HullVector into a marker with a list of points and publish for visualization
 void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_vector)
 {
   visualization_msgs::Marker marker_list;
@@ -255,9 +267,124 @@ void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_
   hull_marker_array_publisher_.publish(marker_list);
 }
 
+// Create markers from the parameter determiner and publish them for visualization
+void RealSenseReader::publishParameterDeterminerMarkerArray()
+{
+  std::string frame_id = "foot_left";
+
+  visualization_msgs::MarkerArray marker_array;
+
+  visualization_msgs::Marker optimal_foot_location_marker;
+  optimal_foot_location_marker.id = 0;
+  optimal_foot_location_marker.header.frame_id = frame_id;
+  fillOptimalFootLocationMarker(parameter_determiner_->optimal_foot_location,
+                                optimal_foot_location_marker);
+
+  visualization_msgs::Marker foot_locations_to_try_marker_list;
+  foot_locations_to_try_marker_list.id = 1;
+  foot_locations_to_try_marker_list.header.frame_id = frame_id;
+  fillFootLocationsToTryMarker(parameter_determiner_->foot_locations_to_try,
+                               foot_locations_to_try_marker_list);
+
+  visualization_msgs::Marker possible_foot_locations_marker_list;
+  possible_foot_locations_marker_list.id = 2;
+  possible_foot_locations_marker_list.header.frame_id = frame_id;
+  fillPossibleFootLocationsMarker(parameter_determiner_->possible_foot_locations,
+                                  parameter_determiner_->optimal_foot_location,
+                                  possible_foot_locations_marker_list);
+
+  marker_array.markers.push_back(optimal_foot_location_marker);
+  marker_array.markers.push_back(foot_locations_to_try_marker_list);
+  marker_array.markers.push_back(possible_foot_locations_marker_list);
+
+  hull_parameter_determiner_publisher_.publish(marker_array);
+}
+
+void RealSenseReader::fillPossibleFootLocationsMarker(
+        PointNormalCloud::Ptr const possible_foot_locations,
+        pcl::PointNormal const optimal_foot_location,
+        visualization_msgs::Marker & marker_list)
+{
+  marker_list.pose.orientation.w= 1.0;
+  marker_list.type = visualization_msgs::Marker::SPHERE_LIST;
+  float sphere_radius = 0.05;
+  marker_list.scale.x = sphere_radius;
+  marker_list.scale.y = sphere_radius;
+  marker_list.scale.z = sphere_radius;
+
+  for (pcl::PointNormal ground_point: *possible_foot_locations)
+  {
+    geometry_msgs::Point marker_point;
+    marker_point.x = ground_point.x;
+    marker_point.y = ground_point.y;
+    marker_point.z = ground_point.z;
+
+    std_msgs::ColorRGBA marker_color;
+    marker_color.r = 0.0;
+    marker_color.g = 1.0;
+    marker_color.b = 0.0;
+    marker_color.a = 0.7;
+
+    marker_list.points.push_back(marker_point);
+    marker_list.colors.push_back(marker_color);
+  }
+}
+
+// Create a marker list from the 'foot locations to try' and publish it and publish for visualization
+void RealSenseReader::fillFootLocationsToTryMarker(
+        PointCloud2D::Ptr const foot_locations_to_try,
+        visualization_msgs::Marker & marker_list)
+{
+  marker_list.pose.orientation.w= 1.0;
+  marker_list.type = visualization_msgs::Marker::SPHERE_LIST;
+  float sphere_radius = 0.05;
+  marker_list.scale.x = sphere_radius;
+  marker_list.scale.y = sphere_radius;
+  marker_list.scale.z = sphere_radius;
+
+  for (pcl::PointXY ground_point: *foot_locations_to_try)
+  {
+
+    geometry_msgs::Point marker_point;
+    marker_point.x = ground_point.x;
+    marker_point.y = ground_point.y;
+    marker_point.z = 0;
+
+    std_msgs::ColorRGBA marker_color;
+    marker_color.r = 0.0;
+    marker_color.g = 0.0;
+    marker_color.b = 1.0;
+    marker_color.a = 0.7;
+
+    marker_list.points.push_back(marker_point);
+    marker_list.colors.push_back(marker_color);
+  }
+}
+
+
+// Create a marker from the optimal foot location and publish it and publish for visualization
+void RealSenseReader::fillOptimalFootLocationMarker(
+        pcl::PointNormal const optimal_foot_location,
+        visualization_msgs::Marker & marker)
+{
+  marker.type = visualization_msgs::Marker::SPHERE;
+  float sphere_radius = 0.07;
+  marker.scale.x = sphere_radius;
+  marker.scale.y = sphere_radius;
+  marker.scale.z = sphere_radius;
+  marker.pose.position.x = optimal_foot_location.x;
+  marker.pose.position.y = optimal_foot_location.y;
+  marker.pose.position.z = optimal_foot_location.z;
+  marker.pose.orientation.w = 1.0;
+  marker.color.r = 1.0;
+  marker.color.g = 1.0;
+  marker.color.b = 1.0;
+  marker.color.a = 1.0;
+}
+
 // The callback for the service that was starts processing the point cloud and gives
 // back parameters for a gait
-bool RealSenseReader::process_pointcloud_callback(
+bool RealSenseReader::processPointcloudCallback(
     march_shared_msgs::GetGaitParameters::Request &req,
     march_shared_msgs::GetGaitParameters::Response &res)
 {
@@ -271,6 +398,7 @@ bool RealSenseReader::process_pointcloud_callback(
   {
     res.error_message = "No pointcloud published within timeout, so "
                         "no processing could be done.";
+    res.success = false;
     return false;
   }
 
@@ -278,7 +406,7 @@ bool RealSenseReader::process_pointcloud_callback(
   pcl::fromROSMsg(*input_cloud, converted_cloud);
   PointCloud::Ptr point_cloud = boost::make_shared<PointCloud>(converted_cloud);
 
-  bool success = process_pointcloud(point_cloud, req.selected_gait, res);
+  bool success = processPointcloud(point_cloud, req.selected_gait, res);
 
   time_t end_callback = clock();
   double time_taken = double(end_callback - start_callback) / double(CLOCKS_PER_SEC);
