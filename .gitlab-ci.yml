@@ -59,6 +59,14 @@ flake8:
       codequality: flakehell.json
   allow_failure: true
 
+clang_format:
+  stage: Format C++ code
+  script:
+    - python3 run-clang-format.py -r ros1/src ros2/src --style=file
+  only:
+    changes:
+      - "*.{hpp,h,cpp}"
+
 noetic:build:
   stage: Build code
   artifacts:
@@ -126,20 +134,3 @@ foxy:clang_tidy:
     changes:
       - "ros2/**/*.{hpp,h,cpp}"
   allow_failure: true
-
-noetic:clang_format:
-  stage: Format C++ code
-  script:
-    - python3 run-clang-format.py -r ros1/src --style=file
-  only:
-    changes:
-      - "ros1/**/*.{hpp,h,cpp}"
-
-foxy:clang_format:
-  stage: Format C++ code
-  script:
-    - python3 run-clang-format.py -r ros2/src --style=file
-  only:
-    changes:
-      - "ros2/**/*.{hpp,h,cpp}"
-
