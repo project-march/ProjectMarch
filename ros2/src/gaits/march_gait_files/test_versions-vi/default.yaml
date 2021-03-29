@@ -65,9 +65,12 @@ gaits:
   single_step_normal:
     right_open: MIV_final
     left_close: MIV_final
-  sofa_sit:
-  	sit_down: MIV_final
-  	sit_home: MIV_final
+  dynamic_sit:
+    sit_down: MIV_final
+    sit_home: MIV_final
+  dynamic_stand:
+    prepare_stand_up: MIV_final
+    stand_up: MIV_final
   tilted_path_first_start:
     left_open: MV_TPstart1_leftopen_v1
     right_close: MV_TPstart1_rightclose_v1
