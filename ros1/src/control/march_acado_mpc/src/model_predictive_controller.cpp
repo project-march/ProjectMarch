@@ -55,8 +55,7 @@ void ModelPredictiveController::setInitialState(vector<double> x0)
     acadoVariables.x0[i] = x0[i];
   }
 }
-
-void ModelPredictiveController::setReference(int n, std::vector<double> reference) {
+void ModelPredictiveController::setReference(int n, const std::vector<double>& reference) {
   // check if size of reference at time step n is equal to size of ACADO_NY
   ROS_WARN_STREAM_COND(ACADO_NY != reference.size(), joint_name << "");
 
