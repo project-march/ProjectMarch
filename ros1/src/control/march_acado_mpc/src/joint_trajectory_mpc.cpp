@@ -71,6 +71,7 @@ std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(c
   return Q;
 }
 
+// Function that dictates what to do when the controller is started by the controller manager
 void ModelPredictiveControllerInterface::starting(const ros::Time& /*time*/)
 {
   if (!joint_handles_ptr_)
@@ -171,6 +172,7 @@ void ModelPredictiveControllerInterface::setMpcMsg(int joint_number)
   mpc_pub_->msg_.joint[i].diagnostics.feedback_status = model_predictive_controllers_[i].feedbackStepStatus;
 }
 
+// Function that calculates the command that needs to be send to each joint
 void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/, const ros::Duration& period,
                                                        const std::vector<joint_trajectory_controller::State>&  desired_states,
                                                        const joint_trajectory_controller::State& state_error)
@@ -219,8 +221,14 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
   mpc_pub_->unlockAndPublish();
 }
 
+// Function that dictates what to do when the controller is stopped by the controller manager
 void ModelPredictiveControllerInterface::stopping(const ros::Time& /*time*/)
 {
+  // zero commands
+  for (unsigned int i = 0; i < num_joints_; ++i)
+  {
+    (*joint_handles_ptr_)[i].setCommand(0.0);
+  }
 }
 
 // Exporting the controller plugin
