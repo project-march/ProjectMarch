@@ -31,8 +31,7 @@ bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::Jo
   return true;
 }
 
-// Retrieve the Q matrix from the parameter server for a joint.
-std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(std::string joint_name)
+std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(const std::string& joint_name)
 {
   int n_rows, n_cols;
   std::string parameter_path = "/march/controller/trajectory";
