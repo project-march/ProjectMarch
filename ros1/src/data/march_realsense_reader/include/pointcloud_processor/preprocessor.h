@@ -16,7 +16,7 @@ class Preprocessor {
 
     // This function is required to be implemented by any preprocessor
     virtual bool preprocess(PointCloud::Ptr pointcloud,
-                            Normals::Ptr normal_pointcloud
+                            Normals::Ptr normal_pointcloud,
                             std::string frame_id_to_transform_to_)=0;
 
     virtual ~Preprocessor() {};

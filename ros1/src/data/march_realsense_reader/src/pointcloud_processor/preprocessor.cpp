@@ -68,7 +68,7 @@ void Preprocessor::removePointByIndex(int const index, PointCloud::Ptr pointclou
 }
 
 bool NormalsPreprocessor::preprocess(
-    PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals std::string frame_id_to_transform_to)
+    PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals, std::string frame_id_to_transform_to)
 {
   pointcloud_ = pointcloud;
   pointcloud_normals_ = pointcloud_normals;
@@ -334,10 +334,12 @@ bool NormalsPreprocessor::filterOnNormalOrientation()
 
 // Preprocess the pointcloud, this means only transforming for the simple preprocessor
 bool SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud,
-                                    Normals::Ptr pointcloud_normals)
+                                    Normals::Ptr pointcloud_normals,
+                                    std::string frame_id_to_transform_to)
 {
   pointcloud_ = pointcloud;
   pointcloud_normals_ = pointcloud_normals;
+  frame_id_to_transform_to_ = frame_id_to_transform_to;
 
   ROS_DEBUG("Preprocessing with SimplePreprocessor");
   transformPointCloudFromUrdf();

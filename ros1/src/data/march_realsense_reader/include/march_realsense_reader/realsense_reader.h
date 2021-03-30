@@ -28,9 +28,6 @@ public:
    * returns whether the processing was successful.
    */
   bool processPointcloud(PointCloud::Ptr input_cloud,
-                          int selected_gait,
-                          std::string frame_id,
-                          bool use_left_foot,
                           march_shared_msgs::GetGaitParameters::Response &res);
 
   /** A callback that starts the entire pointcloud processing when the

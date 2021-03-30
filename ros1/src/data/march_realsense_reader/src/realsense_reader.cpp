@@ -171,7 +171,7 @@ bool RealSenseReader::processPointcloud(
   }
 
   // Setup data structures for parameter determining
-  SelectedGait selected_obstacle = (SelectedGait) selected_gait;
+  SelectedGait selected_obstacle = (SelectedGait) selected_gait_;
   boost::shared_ptr<march_shared_msgs::GaitParameters> gait_parameters =
       boost::make_shared<march_shared_msgs::GaitParameters>();
   // Determine parameters
