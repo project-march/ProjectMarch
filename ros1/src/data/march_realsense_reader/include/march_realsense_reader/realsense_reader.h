@@ -27,7 +27,7 @@ public:
    * gait parameters, these parameters are put into the response,
    * returns whether the processing was successful.
    */
-  bool process_pointcloud(PointCloud::Ptr input_cloud,
+  bool processPointcloud(PointCloud::Ptr input_cloud,
                           int selected_gait,
                           std::string frame_id,
                           bool use_left_foot,

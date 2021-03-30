@@ -16,7 +16,8 @@ class Preprocessor {
 
     // This function is required to be implemented by any preprocessor
     virtual bool preprocess(PointCloud::Ptr pointcloud,
-                            Normals::Ptr normal_pointcloud)=0;
+                            Normals::Ptr normal_pointcloud
+                            std::string frame_id_to_transform_to_)=0;
 
     virtual ~Preprocessor() {};
 
@@ -40,7 +41,8 @@ class SimplePreprocessor : Preprocessor {
 
     // Preprocess the given pointcloud, based on parameters in the config tree
     bool preprocess(PointCloud::Ptr pointcloud,
-                    Normals::Ptr pointcloud_normals) override;
+                    Normals::Ptr pointcloud_normals,
+                    std::string frame_id_to_transform_to = "foot_left") override;
 
   protected:
     /** Calls the tf listener, to know transform at current time and transforms the
@@ -63,7 +65,7 @@ class NormalsPreprocessor : Preprocessor {
     // Calls all subsequent methods to preprocess a pointlcoud using normal vectors
     bool preprocess(PointCloud::Ptr pointcloud,
                     Normals::Ptr pointcloud_normals,
-                    std::string frame_id_to_transform_to) override;
+                    std::string frame_id_to_transform_to = "foot_left") override;
 
   protected:
     // Removes points from the pointcloud such that there is only one point left in a certain area
