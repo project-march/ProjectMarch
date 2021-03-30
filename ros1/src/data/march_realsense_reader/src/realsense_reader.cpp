@@ -110,7 +110,7 @@ bool RealSenseReader::processPointcloud(
   Normals::Ptr normals = boost::make_shared<Normals>();
 
   // Preprocess
-  bool preprocessing_was_successful = preprocessor_->preprocess(pointcloud, normals, frame_id_to_transform_to);
+  bool preprocessing_was_successful = preprocessor_->preprocess(pointcloud, normals, frame_id_to_transform_to_);
   if (not preprocessing_was_successful)
   {
     res.error_message = "Preprocessing was unsuccessful, see debug output "
@@ -174,12 +174,11 @@ bool RealSenseReader::processPointcloud(
   SelectedGait selected_obstacle = (SelectedGait) selected_gait;
   boost::shared_ptr<march_shared_msgs::GaitParameters> gait_parameters =
       boost::make_shared<march_shared_msgs::GaitParameters>();
-  bool for_right_foot = false;
   // Determine parameters
   bool parameter_determining_was_successful =
       parameter_determiner_->determineParameters(
           plane_coefficients_vector, hull_vector, polygon_vector,
-          selected_obstacle, for_right_foot, gait_parameters);
+          selected_obstacle, gait_parameters);
   if (not parameter_determining_was_successful)
   {
     res.error_message = "Parameter determining was unsuccessful, see debug output "
@@ -218,7 +217,7 @@ void RealSenseReader::publishCloud(ros::Publisher publisher,
 
   pcl::toROSMsg(cloud, msg);
 
-  msg.header.frame_id = "foot_left";
+  msg.header.frame_id = frame_id_to_transform_to_;
 
   publisher.publish(msg);
 }
@@ -227,7 +226,7 @@ void RealSenseReader::publishCloud(ros::Publisher publisher,
 void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_vector)
 {
   visualization_msgs::Marker marker_list;
-  marker_list.header.frame_id= "foot_left";
+  marker_list.header.frame_id= frame_id_to_transform_to_;
   marker_list.header.stamp= ros::Time::now();
   marker_list.ns= "hulls";
   marker_list.action= visualization_msgs::Marker::ADD;
@@ -269,25 +268,23 @@ void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_
 // Create markers from the parameter determiner and publish them for visualization
 void RealSenseReader::publishParameterDeterminerMarkerArray()
 {
-  std::string frame_id = "foot_left";
-
   visualization_msgs::MarkerArray marker_array;
 
   visualization_msgs::Marker optimal_foot_location_marker;
   optimal_foot_location_marker.id = 0;
-  optimal_foot_location_marker.header.frame_id = frame_id;
+  optimal_foot_location_marker.header.frame_id = frame_id_to_transform_to_;
   fillOptimalFootLocationMarker(parameter_determiner_->optimal_foot_location,
                                 optimal_foot_location_marker);
 
   visualization_msgs::Marker foot_locations_to_try_marker_list;
   foot_locations_to_try_marker_list.id = 1;
-  foot_locations_to_try_marker_list.header.frame_id = frame_id;
+  foot_locations_to_try_marker_list.header.frame_id = frame_id_to_transform_to_;
   fillFootLocationsToTryMarker(parameter_determiner_->foot_locations_to_try,
                                foot_locations_to_try_marker_list);
 
   visualization_msgs::Marker possible_foot_locations_marker_list;
   possible_foot_locations_marker_list.id = 2;
-  possible_foot_locations_marker_list.header.frame_id = frame_id;
+  possible_foot_locations_marker_list.header.frame_id = frame_id_to_transform_to_;
   fillPossibleFootLocationsMarker(parameter_determiner_->possible_foot_locations,
                                   parameter_determiner_->optimal_foot_location,
                                   possible_foot_locations_marker_list);
@@ -389,7 +386,6 @@ bool RealSenseReader::processPointcloudCallback(
 {
   selected_gait_ = req.selected_gait;
   frame_id_to_transform_to_ = req.frame_id_to_transform_to;
-  use_left_foot = req.use_left_foot;
 
   time_t start_callback = clock();
 

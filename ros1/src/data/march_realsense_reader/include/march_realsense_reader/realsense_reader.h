@@ -96,8 +96,8 @@ private:
   YAML::Node config_tree_;
 
   int selected_gait_;
-  std::string frame_id_;
-  bool use_left_foot;
+  std::string frame_id_to_transform_to_;
+  bool use_left_foot_;
 };
 
 #endif //MARCH_REALSENSE_READER_HPP

@@ -62,7 +62,8 @@ class NormalsPreprocessor : Preprocessor {
 
     // Calls all subsequent methods to preprocess a pointlcoud using normal vectors
     bool preprocess(PointCloud::Ptr pointcloud,
-                    Normals::Ptr pointcloud_normals) override;
+                    Normals::Ptr pointcloud_normals,
+                    std::string frame_id_to_transform_to) override;
 
   protected:
     // Removes points from the pointcloud such that there is only one point left in a certain area
@@ -118,7 +119,7 @@ class NormalsPreprocessor : Preprocessor {
     std::unique_ptr<tf2_ros::Buffer> tfBuffer;
     std::unique_ptr<tf2_ros::TransformListener> tfListener;
     std::string pointcloud_frame_id;
-    std::string frame_id_to_transform_to;
+    std::string frame_id_to_transform_to_;
 };
 
 #endif //MARCH_PREPROCESSOR_H
