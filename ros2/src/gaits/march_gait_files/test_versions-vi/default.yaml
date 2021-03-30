@@ -146,12 +146,12 @@ positions:
     joints:
       left_ankle: 0.0436
       left_hip_aa: 0.0
-      left_hip_fe: 1.5708
-      left_knee: 1.5708
+      left_hip_fe: 1.3962634
+      left_knee: 1.48352986
       right_ankle: 0.0436
       right_hip_aa: 0.0
-      right_hip_fe: 1.5708
-      right_knee: 1.5708
+      right_hip_fe: 1.3962634
+      right_knee: 1.48352986
   idle_1:
     gait_type: walk_like
     joints:

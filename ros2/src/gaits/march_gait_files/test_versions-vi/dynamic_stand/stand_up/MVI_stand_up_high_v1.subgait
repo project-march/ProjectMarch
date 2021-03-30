@@ -23,8 +23,11 @@ joints:
   - position: 1.65806279
     time_from_start: 0
     velocity: 0.0
-  - position: 0.84239189
-    time_from_start: 1050500000
+  - position: 1.30899694
+    time_from_start: 400000000
+    velocity: -1.13446401
+  - position: 0.69446651
+    time_from_start: 900000000
     velocity: -1.74532925
   - position: 0.0
     time_from_start: 1600000000
@@ -66,8 +69,11 @@ joints:
   - position: 1.65806279
     time_from_start: 0
     velocity: 0.0
+  - position: 1.30899694
+    time_from_start: 400000000
+    velocity: -1.13446401
   - position: 0.6945084
-    time_from_start: 1050500000
+    time_from_start: 900000000
     velocity: -1.74532925
   - position: 0.0
     time_from_start: 1600000000
