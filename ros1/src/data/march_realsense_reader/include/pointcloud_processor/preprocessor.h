@@ -51,7 +51,7 @@ class SimplePreprocessor : Preprocessor {
     std::unique_ptr<tf2_ros::Buffer> tfBuffer;
     std::unique_ptr<tf2_ros::TransformListener> tfListener;
     std::string pointcloud_frame_id;
-    std::string link_to_transform_to = "foot_left";
+    std::string frame_id_to_transform_to_;
 };
 
 class NormalsPreprocessor : Preprocessor {
@@ -118,7 +118,7 @@ class NormalsPreprocessor : Preprocessor {
     std::unique_ptr<tf2_ros::Buffer> tfBuffer;
     std::unique_ptr<tf2_ros::TransformListener> tfListener;
     std::string pointcloud_frame_id;
-    std::string link_to_transform_to = "foot_left";
+    std::string frame_id_to_transform_to;
 };
 
 #endif //MARCH_PREPROCESSOR_H

@@ -104,16 +104,13 @@ YAML::Node RealSenseReader::getConfigIfPresent(std::string key)
 // This method executes the logic to process a pointcloud
 bool RealSenseReader::processPointcloud(
     PointCloud::Ptr pointcloud,
-    int selected_gait,
-    std::string frame_id,
-    bool use_left_foot,
     march_shared_msgs::GetGaitParameters::Response &res)
 {
   clock_t start_of_processing_time = clock();
   Normals::Ptr normals = boost::make_shared<Normals>();
 
   // Preprocess
-  bool preprocessing_was_successful = preprocessor_->preprocess(pointcloud, normals);
+  bool preprocessing_was_successful = preprocessor_->preprocess(pointcloud, normals, frame_id_to_transform_to);
   if (not preprocessing_was_successful)
   {
     res.error_message = "Preprocessing was unsuccessful, see debug output "
@@ -390,6 +387,10 @@ bool RealSenseReader::processPointcloudCallback(
     march_shared_msgs::GetGaitParameters::Request &req,
     march_shared_msgs::GetGaitParameters::Response &res)
 {
+  selected_gait_ = req.selected_gait;
+  frame_id_to_transform_to_ = req.frame_id_to_transform_to;
+  use_left_foot = req.use_left_foot;
+
   time_t start_callback = clock();
 
   boost::shared_ptr<const sensor_msgs::PointCloud2> input_cloud =
@@ -408,8 +409,7 @@ bool RealSenseReader::processPointcloudCallback(
   pcl::fromROSMsg(*input_cloud, converted_cloud);
   PointCloud::Ptr point_cloud = boost::make_shared<PointCloud>(converted_cloud);
 
-  bool success = process_pointcloud(point_cloud, req.selected_gait, req.frame_id,
-                                    req.use_left_foot, res);
+  bool success = processPointcloud(point_cloud, res);
 
   time_t end_callback = clock();
   double time_taken = double(end_callback - start_callback) / double(CLOCKS_PER_SEC);

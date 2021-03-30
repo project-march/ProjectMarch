@@ -68,10 +68,11 @@ void Preprocessor::removePointByIndex(int const index, PointCloud::Ptr pointclou
 }
 
 bool NormalsPreprocessor::preprocess(
-    PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals)
+    PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals std::string frame_id_to_transform_to)
 {
   pointcloud_ = pointcloud;
   pointcloud_normals_ = pointcloud_normals;
+  frame_id_to_transform_to_ = frame_id_to_transform_to;
 
   ROS_DEBUG_STREAM("Preprocessing with normal filtering. Pointcloud size: " << pointcloud_->points.size());
 

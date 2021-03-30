@@ -94,6 +94,10 @@ private:
   std::string config_file_;
   ros::Publisher pointcloud_publisher_;
   YAML::Node config_tree_;
+
+  int selected_gait_;
+  std::string frame_id_;
+  bool use_left_foot;
 };
 
 #endif //MARCH_REALSENSE_READER_HPP
