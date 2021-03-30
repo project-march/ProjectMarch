@@ -11,6 +11,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <algorithm>
 
 using namespace std;
 
@@ -29,30 +30,14 @@ void ModelPredictiveController::init()
   acado_initializeSolver();
 
   // Initialize state array with zero
-  for (int i = 0; i < ACADO_N + 1; ++i) {
-    for (int j = 0; j < ACADO_NX; ++j) {
-      acadoVariables.x[i * ACADO_NX + j] = 0.0;
-    }
-  }
+  std::fill(std::begin(acadoVariables.x), std::end(acadoVariables.x), 0.0);
 
   // Initialize input and "running" reference array with zero
-  for (int i = 0; i < ACADO_N; ++i) {
-    for (int j = 0; j < ACADO_NU; ++j)
-    {
-      acadoVariables.u[i * ACADO_NU + j] = 0.0;
-    }
-
-    for (int j = 0; j < ACADO_NY; ++j)
-    {
-      acadoVariables.y[i * ACADO_NY + j] = 0.0;
-    }
-  }
+  std::fill(std::begin(acadoVariables.u), std::end(acadoVariables.u), 0.0);
+  std::fill(std::begin(acadoVariables.y), std::end(acadoVariables.y), 0.0);
 
   // Initialize "end" reference with zero
-  for (int i = 0; i < ACADO_NYN; ++i)
-  {
-    acadoVariables.yN[i] = 0.0;
-  }
+  std::fill(std::begin(acadoVariables.yN), std::end(acadoVariables.yN), 0.0);
 
   // Current state feedback
   setInitialState(x0);
