@@ -4,16 +4,16 @@ duration: 1550000000
 gait_type: walk_like
 joints:
   left_ankle:
-  - position: 0.0436
+  - position: 0.04360007
     time_from_start: 0
-    velocity: 0.0
+    velocity: -0.0
   - position: 0.0436
     time_from_start: 1550000000
-    velocity: -0.0
+    velocity: 0.0
   left_hip_aa:
   - position: 0.0
     time_from_start: 0
-    velocity: 0.0
+    velocity: -0.0
   - position: -0.06108652
     time_from_start: 285600000
     velocity: 0.0
@@ -22,11 +22,11 @@ joints:
     velocity: 0.0
   - position: 0.0
     time_from_start: 1550000000
-    velocity: -0.0
+    velocity: 0.0
   left_hip_fe:
   - position: 0.3142
     time_from_start: 0
-    velocity: -0.3491
+    velocity: -0.32000833
   - position: 0.0524
     time_from_start: 930000000
     velocity: 0.0
@@ -41,22 +41,22 @@ joints:
     time_from_start: 1550000000
     velocity: 0.0
   right_ankle:
-  - position: 0.04360007
+  - position: 0.0436
     time_from_start: 0
-    velocity: 0.0
+    velocity: -0.0
   - position: -0.10471976
     time_from_start: 180000000
     velocity: 0.0
   - position: 0.03793473
     time_from_start: 372200000
     velocity: 0.0
-  - position: 0.04360007
+  - position: 0.0436
     time_from_start: 1550000000
-    velocity: -0.0
+    velocity: 0.0
   right_hip_aa:
   - position: 0.0
     time_from_start: 0
-    velocity: 0.0
+    velocity: -0.0
   - position: 0.06981317
     time_from_start: 300000000
     velocity: 0.0
@@ -65,7 +65,7 @@ joints:
     velocity: 0.0
   - position: 0.0
     time_from_start: 1550000000
-    velocity: -0.0
+    velocity: 0.0
   right_hip_fe:
   - position: -0.1667
     time_from_start: 0

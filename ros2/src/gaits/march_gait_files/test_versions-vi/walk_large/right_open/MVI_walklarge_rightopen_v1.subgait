@@ -44,9 +44,12 @@ joints:
   - position: 0.04360007
     time_from_start: 0
     velocity: 0.0
-  - position: -0.13962634
-    time_from_start: 250000000
-    velocity: 0.0
+  - position: 0.04326868
+    time_from_start: 196285720
+    velocity: 0
+  - position: -0.12775285
+    time_from_start: 382071430
+    velocity: 0
   - position: 0.04363323
     time_from_start: 600000000
     velocity: 0.0
@@ -77,13 +80,13 @@ joints:
   - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.8727
+  - position: 1.04719755
     time_from_start: 630000000
     velocity: 0.0
-  - position: 0.0969
+  - position: 0.09690068
     time_from_start: 1350000000
     velocity: 0.0
-  - position: 0.1396
+  - position: 0.13960016
     time_from_start: 1500000000
     velocity: 0.0
 name: right_open
