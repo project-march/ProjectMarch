@@ -67,7 +67,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n):
     region_pointcloud_publisher_ = n_->advertise<pcl::PointCloud<pcl::PointXYZRGB>>("/camera/region_cloud", 1);
     hull_marker_array_publisher_ = n_->advertise<visualization_msgs::Marker>("/camera/hull_marker_list", 1);
     hull_parameter_determiner_publisher_ = n_->advertise<visualization_msgs::MarkerArray>(
-            "/camera/parameter_determiner_marker_array", 1);
+            "/camera/foot_locations_marker_array", 1);
   }
 }
 
