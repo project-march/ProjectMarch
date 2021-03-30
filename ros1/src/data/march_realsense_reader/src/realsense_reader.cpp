@@ -190,12 +190,11 @@ bool RealSenseReader::processPointcloud(
   }
   if (debugging_)
   {
-    ROS_DEBUG("Done determining parameters, now publishing a marker to /camera/optimal_foot_location_marker");
+    ROS_DEBUG("Done determining parameters, now publishing a marker to /camera/foot_locations_marker_array");
     publishParameterDeterminerMarkerArray();
   }
 
   res.gait_parameters = *gait_parameters;
-
 
   clock_t end_of_processing_time = clock();
 
@@ -360,7 +359,6 @@ void RealSenseReader::fillFootLocationsToTryMarker(
     marker_list.colors.push_back(marker_color);
   }
 }
-
 
 // Create a marker from the optimal foot location and publish it and publish for visualization
 void RealSenseReader::fillOptimalFootLocationMarker(
