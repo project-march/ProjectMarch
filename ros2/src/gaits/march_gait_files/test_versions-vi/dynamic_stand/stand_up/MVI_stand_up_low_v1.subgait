@@ -9,7 +9,7 @@ joints:
   - position: 0.15707963
     time_from_start: 1000000000
     velocity: 0.0
-  - position: 0.04360007
+  - position: 0.0436
     time_from_start: 1700000000
     velocity: 0.0
   left_hip_aa:
@@ -32,7 +32,7 @@ joints:
   - position: 0.0
     time_from_start: 1600000000
     velocity: -1.01229969
-  - position: -0.08729962
+  - position: -0.0873
     time_from_start: 1700000000
     velocity: 0.0
   left_knee:
@@ -55,7 +55,7 @@ joints:
   - position: 0.15707963
     time_from_start: 1000000000
     velocity: 0.0
-  - position: 0.04360007
+  - position: 0.0436
     time_from_start: 1700000000
     velocity: 0.0
   right_hip_aa:
@@ -78,7 +78,7 @@ joints:
   - position: 0.0
     time_from_start: 1600000000
     velocity: -1.01229969
-  - position: -0.08729962
+  - position: -0.0873
     time_from_start: 1700000000
     velocity: 0.0
   right_knee:
@@ -95,4 +95,4 @@ joints:
     time_from_start: 1700000000
     velocity: 0.0
 name: stand_up
-version: MVI_stand_up_low
+version: MVI_stand_up_low_v1

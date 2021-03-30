@@ -3,11 +3,11 @@ gaits:
     left_close: curb_sdg_leftclose_v1
     right_open: curb_sdg_rightopen_v1
   dynamic_sit:
-    sit_down: MVI_sit_down_high_v1
-    sit_home: MVI_sit_home_high_v1
+    sit_down: MVI_sit_down_low_v1
+    sit_home: MVI_sit_home_low_v1
   dynamic_stand:
-    prepare_stand_up: MVI_prepare_stand_up_high_v1
-    stand_up: MVI_stand_up_high_v1
+    prepare_stand_up: MVI_prepare_stand_up_low_v1
+    stand_up: MVI_stand_up_low_v1
   ramp_door_last_step:
     left_close: MV_RD_laststep_leftclose_v2
     right_open: MV_RD_laststep_rightopen_v2
