@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
-    <height>185</height>
+    <width>666</width>
+    <height>287</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -36,8 +36,8 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>481</width>
-     <height>121</height>
+     <width>641</width>
+     <height>191</height>
     </rect>
    </property>
    <layout class="QFormLayout" name="formLayout">
@@ -48,17 +48,17 @@
      <number>6</number>
     </property>
     <item row="0" column="0">
-     <widget class="QLabel" name="parameterLabel">
+     <widget class="QLabel" name="firstParameterLabel">
       <property name="toolTip">
        <string extracomment="The parameter decides 'how much' of the base version is done. ">The parameter decides 'how much' of the base version is done. </string>
       </property>
       <property name="text">
-       <string>parameter = 0.00</string>
+       <string>first parameter = 0.00</string>
       </property>
      </widget>
     </item>
     <item row="0" column="1">
-     <widget class="QSlider" name="parameterSlider">
+     <widget class="QSlider" name="firstParameterSlider">
       <property name="toolTip">
        <string extracomment="The parameter decides 'how much' of the base version is done. ">The parameter decides 'how much' of the base version is done. </string>
       </property>
@@ -83,34 +83,103 @@
      </widget>
     </item>
     <item row="1" column="0">
-     <widget class="QLabel" name="baseVersionLabel">
+     <widget class="QLabel" name="secondParameterLabel">
       <property name="toolTip">
-       <string extracomment="The parametric subgait would result to this version if the parameter is 0%.">The parametric subgait would result to this version if the parameter is 0%.</string>
+       <string extracomment="The parameter decides 'how much' of the base version is done. ">The parameter decides 'how much' of the base version is done. </string>
       </property>
       <property name="text">
-       <string>base version</string>
+       <string>second parameter = 0.00</string>
       </property>
      </widget>
     </item>
     <item row="1" column="1">
-     <widget class="QComboBox" name="baseVersionComboBox">
+     <widget class="QSlider" name="secondParameterSlider">
+      <property name="toolTip">
+       <string extracomment="The parameter decides 'how much' of the base version is done. ">The parameter decides 'how much' of the base version is done. </string>
+      </property>
+      <property name="whatsThis">
+       <string>ello</string>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="singleStep">
+       <number>1</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksBelow</enum>
+      </property>
+      <property name="tickInterval">
+       <number>10</number>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="firstVersionLabel">
+      <property name="toolTip">
+       <string extracomment="The parametric subgait would result to this version if the parameter is 0%.">The parametric subgait would result to this version if the parameter is 0%.</string>
+      </property>
+      <property name="text">
+       <string>first version</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QComboBox" name="firstVersionComboBox">
       <property name="toolTip">
        <string extracomment="The parametric subgait would result in this version if the parameter is 0%.">The parametric subgait would result in this version if the parameter is 0%.</string>
       </property>
      </widget>
     </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="otherVersionLabel">
+    <item row="3" column="0">
+     <widget class="QLabel" name="secondVersionLabel">
       <property name="toolTip">
        <string extracomment="The parametric subgait would result in this version if the parameter is 100%.">The parametric subgait would result in this version if the parameter is 100%.</string>
       </property>
       <property name="text">
-       <string>other version</string>
+       <string>second version</string>
       </property>
      </widget>
     </item>
-    <item row="2" column="1">
-     <widget class="QComboBox" name="otherVersionComboBox">
+    <item row="3" column="1">
+     <widget class="QComboBox" name="secondVersionComboBox">
+      <property name="toolTip">
+       <string extracomment="The parametric subgait would result to this version if the parameter is 100%.">The parametric subgait would result to this version if the parameter is 100%.</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="thirdVersionLabel">
+      <property name="toolTip">
+       <string extracomment="The parametric subgait would result in this version if the parameter is 100%.">The parametric subgait would result in this version if the parameter is 100%.</string>
+      </property>
+      <property name="text">
+       <string>third version</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QComboBox" name="thirdVersionComboBox">
+      <property name="toolTip">
+       <string extracomment="The parametric subgait would result to this version if the parameter is 100%.">The parametric subgait would result to this version if the parameter is 100%.</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QLabel" name="fourthVersionLabel">
+      <property name="toolTip">
+       <string extracomment="The parametric subgait would result in this version if the parameter is 100%.">The parametric subgait would result in this version if the parameter is 100%.</string>
+      </property>
+      <property name="text">
+       <string>fourth version</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QComboBox" name="fourthVersionComboBox">
       <property name="toolTip">
        <string extracomment="The parametric subgait would result to this version if the parameter is 100%.">The parametric subgait would result to this version if the parameter is 100%.</string>
       </property>
@@ -121,14 +190,27 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>310</x>
-     <y>150</y>
+     <x>490</x>
+     <y>250</y>
      <width>166</width>
      <height>25</height>
     </rect>
    </property>
    <property name="standardButtons">
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="fourSubgaitInterpolation">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>200</y>
+     <width>431</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Interpolate between four subgaits</string>
    </property>
   </widget>
  </widget>
