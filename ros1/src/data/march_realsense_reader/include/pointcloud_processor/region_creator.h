@@ -17,7 +17,7 @@ class RegionCreator
   public:
     RegionCreator(YAML::Node config_tree, bool debugging);
     // This function is required to be implemented by any region creator
-    virtual bool create_regions(PointCloud::Ptr pointcloud,
+    virtual bool createRegions(PointCloud::Ptr pointcloud,
                                 Normals::Ptr pointcloud_normals,
                                 boost::shared_ptr<RegionVector> region_vector)=0;
     virtual ~RegionCreator() {};
@@ -38,7 +38,7 @@ class RegionGrower : RegionCreator
     RegionGrower(YAML::Node config_tree, bool debugging);
     /** Create cluster using the region growing algorithm, takes algorithm configuration from the YAML, and fills
      * parameter region_vector with clusters. **/
-    bool create_regions(PointCloud::Ptr pointcloud,
+    bool createRegions(PointCloud::Ptr pointcloud,
                         Normals::Ptr pointcloud_normals,
                         boost::shared_ptr<RegionVector> region_vector) override;
 
@@ -52,18 +52,18 @@ class RegionGrower : RegionCreator
     * Read out YAML
     * @return true if succesful
     */
-    void read_yaml();
+    void readYaml();
 
     /**
      * Configure region growing algorithm
      */
-    bool setup_region_grower();
+    bool setupRegionGrower();
 
     /**
      * Extract clusters from region_grower object
      * @return true if succesful
      */
-    bool extract_regions();
+    bool extractRegions();
 
     // Region Growing Object
     pcl::RegionGrowing <pcl::PointXYZ, pcl::Normal> region_grower;
