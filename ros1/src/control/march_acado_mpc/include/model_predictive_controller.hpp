@@ -56,7 +56,7 @@ public:
      * @param n
      * @param reference
      */
-    void setReference(int n, std::vector<double> reference);
+    void setReference(int n, const std::vector<double>& reference);
 
     /**
      * \brief Assign the weighting matrix values
