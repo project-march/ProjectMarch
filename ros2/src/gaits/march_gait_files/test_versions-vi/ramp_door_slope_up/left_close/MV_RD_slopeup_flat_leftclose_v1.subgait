@@ -65,4 +65,4 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
 name: left_close
-version: MV_RD_slopeup_flat_leftclose_v1
+version: MVI_RD_slopeup_flat_leftclose_v1

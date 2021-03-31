@@ -68,4 +68,4 @@ joints:
     time_from_start: 2500000000
     velocity: 0.0
 name: right_open
-version: MV_RD_slopeup_flat_rightopen_v1
+version: MVI_RD_slopeup_flat_rightopen_v1
