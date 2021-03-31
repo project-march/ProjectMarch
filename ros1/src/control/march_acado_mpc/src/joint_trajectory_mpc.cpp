@@ -6,7 +6,11 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
+// WARNING! UNSAFE!
+// If you initialize this object, YOU, the caller, have to ensure
+// that both `joint_handles` and `nh` have a lifetime that is at
+// least as long as the lifetime of this object. Otherwise, 
+// undefined behavior WILL happen.
 bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::JointHandle>& joint_handles,
                                               ros::NodeHandle& nh)
 {
