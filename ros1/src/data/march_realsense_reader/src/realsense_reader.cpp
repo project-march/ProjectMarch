@@ -104,14 +104,13 @@ YAML::Node RealSenseReader::getConfigIfPresent(std::string key)
 // This method executes the logic to process a pointcloud
 bool RealSenseReader::processPointcloud(
     PointCloud::Ptr pointcloud,
-    int selected_gait,
     march_shared_msgs::GetGaitParameters::Response &res)
 {
   clock_t start_of_processing_time = clock();
   Normals::Ptr normals = boost::make_shared<Normals>();
 
   // Preprocess
-  bool preprocessing_was_successful = preprocessor_->preprocess(pointcloud, normals);
+  bool preprocessing_was_successful = preprocessor_->preprocess(pointcloud, normals, frame_id_to_transform_to_);
   if (not preprocessing_was_successful)
   {
     res.error_message = "Preprocessing was unsuccessful, see debug output "
@@ -172,15 +171,14 @@ bool RealSenseReader::processPointcloud(
   }
 
   // Setup data structures for parameter determining
-  SelectedGait selected_obstacle = (SelectedGait) selected_gait;
+  SelectedGait selected_obstacle = (SelectedGait) selected_gait_;
   boost::shared_ptr<march_shared_msgs::GaitParameters> gait_parameters =
       boost::make_shared<march_shared_msgs::GaitParameters>();
-  bool for_right_foot = false;
   // Determine parameters
   bool parameter_determining_was_successful =
       parameter_determiner_->determineParameters(
           plane_coefficients_vector, hull_vector, polygon_vector,
-          selected_obstacle, for_right_foot, gait_parameters);
+          selected_obstacle, gait_parameters);
   if (not parameter_determining_was_successful)
   {
     res.error_message = "Parameter determining was unsuccessful, see debug output "
@@ -218,7 +216,7 @@ void RealSenseReader::publishCloud(ros::Publisher publisher,
 
   pcl::toROSMsg(cloud, msg);
 
-  msg.header.frame_id = "foot_left";
+  msg.header.frame_id = frame_id_to_transform_to_;
 
   publisher.publish(msg);
 }
@@ -227,7 +225,7 @@ void RealSenseReader::publishCloud(ros::Publisher publisher,
 void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_vector)
 {
   visualization_msgs::Marker marker_list;
-  marker_list.header.frame_id= "foot_left";
+  marker_list.header.frame_id= frame_id_to_transform_to_;
   marker_list.header.stamp= ros::Time::now();
   marker_list.ns= "hulls";
   marker_list.action= visualization_msgs::Marker::ADD;
@@ -269,25 +267,23 @@ void RealSenseReader::publishHullMarkerArray(boost::shared_ptr<HullVector> hull_
 // Create markers from the parameter determiner and publish them for visualization
 void RealSenseReader::publishParameterDeterminerMarkerArray()
 {
-  std::string frame_id = "foot_left";
-
   visualization_msgs::MarkerArray marker_array;
 
   visualization_msgs::Marker optimal_foot_location_marker;
   optimal_foot_location_marker.id = 0;
-  optimal_foot_location_marker.header.frame_id = frame_id;
+  optimal_foot_location_marker.header.frame_id = frame_id_to_transform_to_;
   fillOptimalFootLocationMarker(parameter_determiner_->optimal_foot_location,
                                 optimal_foot_location_marker);
 
   visualization_msgs::Marker foot_locations_to_try_marker_list;
   foot_locations_to_try_marker_list.id = 1;
-  foot_locations_to_try_marker_list.header.frame_id = frame_id;
+  foot_locations_to_try_marker_list.header.frame_id = frame_id_to_transform_to_;
   fillFootLocationsToTryMarker(parameter_determiner_->foot_locations_to_try,
                                foot_locations_to_try_marker_list);
 
   visualization_msgs::Marker possible_foot_locations_marker_list;
   possible_foot_locations_marker_list.id = 2;
-  possible_foot_locations_marker_list.header.frame_id = frame_id;
+  possible_foot_locations_marker_list.header.frame_id = frame_id_to_transform_to_;
   fillPossibleFootLocationsMarker(parameter_determiner_->possible_foot_locations,
                                   parameter_determiner_->optimal_foot_location,
                                   possible_foot_locations_marker_list);
@@ -386,6 +382,9 @@ bool RealSenseReader::processPointcloudCallback(
     march_shared_msgs::GetGaitParameters::Request &req,
     march_shared_msgs::GetGaitParameters::Response &res)
 {
+  selected_gait_ = req.selected_gait;
+  frame_id_to_transform_to_ = req.frame_id_to_transform_to;
+
   time_t start_callback = clock();
 
   boost::shared_ptr<const sensor_msgs::PointCloud2> input_cloud =
@@ -404,7 +403,7 @@ bool RealSenseReader::processPointcloudCallback(
   pcl::fromROSMsg(*input_cloud, converted_cloud);
   PointCloud::Ptr point_cloud = boost::make_shared<PointCloud>(converted_cloud);
 
-  bool success = processPointcloud(point_cloud, req.selected_gait, res);
+  bool success = processPointcloud(point_cloud, res);
 
   time_t end_callback = clock();
   double time_taken = double(end_callback - start_callback) / double(CLOCKS_PER_SEC);
