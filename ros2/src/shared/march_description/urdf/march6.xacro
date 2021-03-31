@@ -225,7 +225,7 @@
     <xacro:include filename="march.gazebo"/>
 
     <material name="blue">
-        <color rgba="0 0.35 0.52"/> <!-- TODO nieuwe huisstijl -->
+        <color rgba="0 0 0.6 1"/> <!-- TODO nieuwe huisstijl -->
     </material>
 
     <!-- Used for fixing robot to Gazebo 'base_link' -->
@@ -309,9 +309,9 @@
     <!-- Upper Leg Left-->
     <link name="upper_leg_left">
         <visual>
-            <origin xyz="0 ${hip_base_height/2 + hip_aa_frame_height - upper_leg_offset} 0" rpy="0 0 ${pi}"/>
+            <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
             <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/UpperLeftLeg.stl" scale="1 1 1"/>
+                <mesh filename="package://march_description/urdf/stl-files/march6/UpperLegTest.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="blue"/>
         </visual>
