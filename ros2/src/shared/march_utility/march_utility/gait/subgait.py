@@ -751,7 +751,7 @@ class Subgait(object):
         base_time_stamps = base_subgait.get_unique_timestamps(sorted_timestamps=False)
         other_time_stamps = other_subgait.get_unique_timestamps(sorted_timestamps=False)
 
-        original_other_time_stamps = other_time_stamps
+        original_other_time_stamps = set(other_time_stamps)
 
         for base_time in base_time_stamps:
             other_time_stamps.add(
