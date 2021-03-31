@@ -1,7 +1,10 @@
+from typing import Optional, Tuple
+
 from march_gait_selection.dynamic_gaits.transition_subgait import TransitionSubgait
 from march_utility.exceptions.gait_exceptions import GaitError
 from march_utility.gait.gait import Gait
 from march_utility.utilities.duration import Duration
+from .trajectory_scheduler import ScheduleCommand
 
 from .gait_interface import GaitInterface
 from .state_machine_input import TransitionRequest
@@ -69,9 +72,9 @@ class SetpointsGait(GaitInterface, Gait):
         self._transition_to_subgait = None
         self._is_transitioning = False
         self._time_since_start = Duration(0)
-        return self._current_subgait.to_joint_trajectory_msg()
+        return ScheduleCommand.from_subgait(self._current_subgait)
 
-    def update(self, elapsed_time: Duration):
+    def update(self, elapsed_time: Duration) -> Tuple[Optional[ScheduleCommand], bool]:
         """
         Update the progress of the gait, should be called regularly.
         If the current subgait is still running, this does nothing.
@@ -112,7 +115,7 @@ class SetpointsGait(GaitInterface, Gait):
         self._time_since_start = Duration(
             0
         )  # New subgait is started, so reset the time
-        return trajectory, False
+        return ScheduleCommand.from_subgait(self._current_subgait), False
 
     def transition(self, transition_request):
         """
@@ -204,4 +207,4 @@ class SetpointsGait(GaitInterface, Gait):
         self._current_subgait = transition_subgait
         self._time_since_start = Duration(0)
         self._is_transitioning = True
-        return transition_subgait.to_joint_trajectory_msg(), False
+        return ScheduleCommand.from_subgait(transition_subgait), False

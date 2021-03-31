@@ -1,3 +1,7 @@
+from attr import dataclass
+from march_utility.gait.joint_trajectory import JointTrajectory
+from march_utility.gait.subgait import Subgait
+from march_utility.utilities.duration import Duration
 from std_msgs.msg import Header
 from actionlib_msgs.msg import GoalID
 from march_shared_msgs.msg import (
@@ -6,6 +10,18 @@ from march_shared_msgs.msg import (
     FollowJointTrajectoryActionResult,
     FollowJointTrajectoryResult,
 )
+
+
+@dataclass
+class ScheduleCommand:
+    trajectory: JointTrajectory
+    duration: Duration
+    name: str
+
+    @staticmethod
+    def from_subgait(subgait: Subgait):
+        return ScheduleCommand(subgait.to_joint_trajectory_msg(), subgait.duration,
+                        subgait.subgait_name)
 
 
 class TrajectoryScheduler(object):
@@ -39,13 +55,14 @@ class TrajectoryScheduler(object):
             qos_profile=5,
         )
 
-    def schedule(self, trajectory):
+    def schedule(self, command: ScheduleCommand):
         """Schedules a new trajectory.
         :param JointTrajectory trajectory: a trajectory for all joints to follow
         """
         self._failed = False
+        self._node.get_logger().info(f"Scheduling {command.name}")
         stamp = self._node.get_clock().now().to_msg()
-        goal = FollowJointTrajectoryGoal(trajectory=trajectory)
+        goal = FollowJointTrajectoryGoal(trajectory=command.trajectory)
         self._trajectory_goal_pub.publish(
             FollowJointTrajectoryActionGoal(
                 header=Header(stamp=stamp), goal_id=GoalID(stamp=stamp), goal=goal

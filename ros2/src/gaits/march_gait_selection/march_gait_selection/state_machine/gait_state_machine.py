@@ -1,5 +1,6 @@
 from gazebo_msgs.msg import ContactsState
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
+from march_utility.gait.joint_trajectory import JointTrajectory
 from march_utility.utilities.duration import Duration
 from rclpy.callback_groups import ReentrantCallbackGroup
 from std_msgs.msg import Header
@@ -7,6 +8,7 @@ from std_srvs.srv import Trigger
 
 from .gait_state_machine_error import GaitStateMachineError
 from .home_gait import HomeGait
+from .trajectory_scheduler import ScheduleCommand
 from march_shared_msgs.msg import CurrentState, CurrentGait, Error
 from march_shared_msgs.srv import PossibleGaits
 from march_utility.utilities.side import Side
@@ -340,19 +342,9 @@ class GaitStateMachine(object):
             self._gait_selection.get_logger().info(
                 f"Executing gait `{self._current_gait.name}`"
             )
-            trajectory = self._current_gait.start()
-            if trajectory is not None:
-                if not self.check_correct_foot_pressure():
-                    self._gait_selection.get_logger().debug(
-                        f"Foot forces when incorrect pressure warning was issued: "
-                        f"left={self._force_left_foot}, right={self._force_right_foot}"
-                    )
-                self._call_gait_callbacks()
-                self._gait_selection.get_logger().info(
-                    f"Scheduling {self._current_gait.subgait_name}"
-                )
-
-                self._trajectory_scheduler.schedule(trajectory)
+            command = self._current_gait.start()
+            if command is not None:
+                self._schedule_command(command)
             elapsed_time = Duration(0)
 
         if self._trajectory_scheduler.failed():
@@ -364,15 +356,11 @@ class GaitStateMachine(object):
             return
 
         self._handle_input()
-        trajectory, should_stop = self._current_gait.update(elapsed_time)
+        command, should_stop = self._current_gait.update(elapsed_time)
 
         # schedule trajectory if any
-        if trajectory is not None:
-            self._call_gait_callbacks()
-            self._gait_selection.get_logger().info(
-                f"Scheduling {self._current_gait.subgait_name}"
-            )
-            self._trajectory_scheduler.schedule(trajectory)
+        if command is not None:
+            self._schedule_command(command)
 
         if should_stop:
             self._current_state = self._gait_transitions[self._current_state]
@@ -384,6 +372,16 @@ class GaitStateMachine(object):
                 f"Finished gait `{self._current_gait.name}`"
             )
             self._current_gait = None
+
+    def _schedule_command(self, command: ScheduleCommand):
+        if not self.check_correct_foot_pressure():
+            self._gait_selection.get_logger().debug(
+                f"Foot forces when incorrect pressure warning was issued: "
+                f"left={self._force_left_foot}, right={self._force_right_foot}"
+            )
+
+        self._call_gait_callbacks()
+        self._trajectory_scheduler.schedule(command)
 
     def _handle_input(self):
         """Handles stop and transition input from the input device. This input

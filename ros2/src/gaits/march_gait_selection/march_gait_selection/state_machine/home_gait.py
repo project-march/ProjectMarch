@@ -1,6 +1,9 @@
+from typing import Optional, Tuple
+
 from march_utility.utilities.duration import Duration
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from .gait_interface import GaitInterface
+from .trajectory_scheduler import ScheduleCommand
 
 
 class HomeGait(GaitInterface):
@@ -51,16 +54,16 @@ class HomeGait(GaitInterface):
     def version(self):
         return "home_gait_version"
 
-    def start(self):
+    def start(self) -> ScheduleCommand:
         """
         Creates a trajectory message to go towards the idle position in the
         given duration.
         :return: A JointTrajectory message that can be used to actually schedule the gait.
         """
         self._time_since_start = Duration(0)
-        return self._get_trajectory_msg()
+        return ScheduleCommand(self._get_trajectory_msg(), self._duration, self._name)
 
-    def update(self, elapsed_time: Duration):
+    def update(self, elapsed_time: Duration) -> Tuple[Optional[ScheduleCommand], bool]:
         """
         Gives an update on the progress of the gait.
         :param elapsed_time: The time that has elapsed
