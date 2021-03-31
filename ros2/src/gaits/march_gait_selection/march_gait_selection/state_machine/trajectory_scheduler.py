@@ -22,8 +22,7 @@ class ScheduleCommand:
 
     @staticmethod
     def from_subgait(subgait: Subgait, start_time: Time):
-        return ScheduleCommand(subgait.to_joint_trajectory_msg(), subgait.duration,
-                        subgait.subgait_name, start_time)
+        return ScheduleCommand(subgait.to_joint_trajectory_msg(), subgait.duration, subgait.subgait_name, start_time)
 
 
 class TrajectoryScheduler(object):
@@ -33,7 +32,6 @@ class TrajectoryScheduler(object):
     def __init__(self, node):
         self._failed = False
         self._node = node
-        self._previous_command_end_time = None
 
         # Temporary solution to communicate with ros1 action server, should
         # be updated to use ros2 action implementation when simulation is
@@ -62,7 +60,6 @@ class TrajectoryScheduler(object):
         :param JointTrajectory trajectory: a trajectory for all joints to follow
         """
         self._failed = False
-        self._node.get_logger().info(f"Scheduling {command.name}")
         stamp = command.start_time.to_msg()
         command.trajectory.header.stamp = stamp
         goal = FollowJointTrajectoryGoal(trajectory=command.trajectory)
@@ -71,19 +68,16 @@ class TrajectoryScheduler(object):
                 header=Header(stamp=stamp), goal_id=GoalID(stamp=stamp), goal=goal
             )
         )
-        if self._previous_command_end_time is None:
-            self._previous_command_end_time = command.start_time + command.duration
-        else:
-            self._previous_command_end_time += command.duration
+        self._node.get_logger().info(f"Scheduling {command.name}, "
+                                     f"t_n={round(self._node.get_clock().now().nanoseconds / 1e9, 3)}, "
+                                     f"t_s={round(command.start_time.nanoseconds / 1e9, 3)},"
+                                     f"d={round(command.duration.nanoseconds / 1e9, 2)} ")
 
     def failed(self):
         return self._failed
 
     def reset(self):
         self._failed = False
-
-    def reset_previous_command(self):
-        self._previous_command_end_time = None
 
     def _done_cb(self, result):
         if result.result.error_code != FollowJointTrajectoryResult.SUCCESSFUL:

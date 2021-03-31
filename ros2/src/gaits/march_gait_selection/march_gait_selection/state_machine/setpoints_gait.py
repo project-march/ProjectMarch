@@ -23,6 +23,7 @@ class SetpointsGait(GaitInterface, Gait):
         self._is_transitioning = False
 
         self._start_time = None
+        self._scheduled_early = False
 
     @property
     def name(self):
@@ -74,12 +75,13 @@ class SetpointsGait(GaitInterface, Gait):
         self._should_stop = False
         self._transition_to_subgait = None
         self._is_transitioning = False
+        self._scheduled_early = False
 
         self._start_time = current_time
 
         return ScheduleCommand.from_subgait(self._current_subgait, self._start_time)
 
-    def update(self, current_time: Time) -> Tuple[Optional[ScheduleCommand], bool]:
+    def update(self, current_time: Time, node) -> Tuple[Optional[ScheduleCommand], bool]:
         """
         Update the progress of the gait, should be called regularly.
         If the current subgait is still running, this does nothing.
@@ -88,37 +90,77 @@ class SetpointsGait(GaitInterface, Gait):
         :param elapsed_time:
         :return: trajectory, is_finished
         """
-        if current_time < (self._start_time + self._current_subgait.duration):
+        early_schedule_duration = Duration(seconds=0.2)
+        end_time = self._start_time + self._current_subgait.duration
+
+        # If the previous subgait ended, schedule a new one
+        if current_time >= end_time:
+            return self._update_next_subgait(current_time, node)
+        # Schedule a new subgait early
+        if not self._scheduled_early and current_time >= end_time - early_schedule_duration:
+            return self._update_next_subgait_early(node)
+        return None, False
+
+    def _update_next_subgait_early(self, node):
+        self._scheduled_early = True
+
+        next_subgait = self._next_subgait()
+
+        # If the next subgait is the final subgait, there is no need to schedule a new subgait early
+        if next_subgait == self.graph.END:
             return None, False
 
-        return self._update_next_subgait(current_time)
+        # When updating the next subgait early, we don't set the current_subgait or a new start time
+        # Instead we only send a schedule command and let self._update_next_subgait()
+        # deal with clean up after the previous subgait has actually finished
+        new_start_time = self._start_time + self._current_subgait.duration
+        # node.get_logger().info(f"Update early, next={next_subgait}, curr={self._current_subgait.subgait_name}")
+        return ScheduleCommand.from_subgait(self.subgaits[next_subgait], new_start_time), False
 
-    def _update_next_subgait(self, current_time):
-        if self._should_stop:
-            next_subgait = self._stop()
 
-        elif self._transition_to_subgait is not None and not self._is_transitioning:
-            return self._transition_subgait(current_time), False
+    def _update_next_subgait(self, current_time: Time, node):
+        # /if self._should_stop and not self._scheduled_early:
+        #     next_subgait = self._stop()
 
-        elif self._transition_to_subgait is not None and self._is_transitioning:
-            next_subgait = self._transition_to_subgait.subgait_name
-            self._transition_to_subgait = None
-            self._is_transitioning = False
+        # # TODO: incorporate transitioning subgaits into new changes
+        # elif self._transition_to_subgait is not None and not self._is_transitioning:
+        #     return self._transition_subgait(current_time), False
+        #
+        # elif self._transition_to_subgait is not None and self._is_transitioning:
+        #     next_subgait = self._transition_to_subgait.subgait_name
+        #     self._transition_to_subgait = None
+        #     self._is_transitioning = False
+        # # TODO: End of the previous TODO
 
-        else:
-            # If there is no transition subgait that has to be used, go to TO subgait
-            next_subgait = self.graph[
-                (self._current_subgait.subgait_name, self.graph.TO)
-            ]
+        # else:
+        #     # If there is no transition subgait that has to be used, go to TO subgait
+        #     next_subgait = self._next_subgait()
+
+        next_subgait = self._next_subgait()
 
         if next_subgait == self.graph.END:
+            self._should_stop = False
             return None, True
+
+        if not self._scheduled_early:
+            self._start_time = current_time
+            command = ScheduleCommand.from_subgait(self._current_subgait, self._start_time)
+        else:
+            # Don't schedule the next subgait if we already scheduled early
+            self._start_time += self._current_subgait.duration
+            command = None
+
+        # node.get_logger().info(f"Update, next={next_subgait}, curr={self._current_subgait.subgait_name}")
         self._current_subgait = self.subgaits[next_subgait]
-        trajectory = self._current_subgait.to_joint_trajectory_msg()
+        self._scheduled_early = False
+        return command, False
 
-        self._start_time = current_time
-
-        return ScheduleCommand.from_subgait(self._current_subgait, current_time), False
+    def _next_subgait(self): # curr = left_swing
+        if self._should_stop:
+            return self._stop() # next = right_close
+        else:
+            return self.graph[ # next = right_swing
+                (self._current_subgait.subgait_name, self.graph.TO)]
 
     def transition(self, transition_request):
         """
@@ -186,8 +228,6 @@ class SetpointsGait(GaitInterface, Gait):
             next_subgait = self.graph[
                 (self._current_subgait.subgait_name, self.graph.TO)
             ]
-        else:
-            self._should_stop = False
         return next_subgait
 
     def _transition_subgait(self, start_time):

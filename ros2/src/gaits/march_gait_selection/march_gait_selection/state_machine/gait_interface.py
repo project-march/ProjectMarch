@@ -56,7 +56,7 @@ class GaitInterface(object):
         optional starting trajectory."""
         return None
 
-    def update(self, current_time: Time) -> (JointTrajectory, bool):
+    def update(self, current_time: Time, node) -> (JointTrajectory, bool):
         """Called in a loop with the elapsed time since the last update.
 
         :param float elapsed_time: Elapsed time in seconds since the last update

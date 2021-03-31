@@ -345,7 +345,6 @@ class GaitStateMachine(object):
             command = self._current_gait.start(current_time)
             if command is not None:
                 self._schedule_command(command)
-            elapsed_time = Duration(0)
 
         if self._trajectory_scheduler.failed():
             self._trajectory_scheduler.reset()
@@ -356,7 +355,7 @@ class GaitStateMachine(object):
             return
 
         self._handle_input()
-        command, should_stop = self._current_gait.update(current_time)
+        command, should_stop = self._current_gait.update(current_time, self._gait_selection)
 
         # schedule trajectory if any
         if command is not None:
@@ -372,7 +371,6 @@ class GaitStateMachine(object):
                 f"Finished gait `{self._current_gait.name}`"
             )
             self._current_gait = None
-            self._trajectory_scheduler.reset_previous_command()
 
     def _schedule_command(self, command: ScheduleCommand):
         if not self.check_correct_foot_pressure():

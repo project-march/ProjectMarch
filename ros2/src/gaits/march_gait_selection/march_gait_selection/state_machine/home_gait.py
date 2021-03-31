@@ -64,7 +64,7 @@ class HomeGait(GaitInterface):
         self._start_time = current_time
         return ScheduleCommand(self._get_trajectory_msg(), self._duration, self._name, self._start_time)
 
-    def update(self, current_time: Time) -> Tuple[Optional[ScheduleCommand], bool]:
+    def update(self, current_time: Time, _) -> Tuple[Optional[ScheduleCommand], bool]:
         """
         Gives an update on the progress of the gait.
         :param elapsed_time: The time that has elapsed
