@@ -3,6 +3,7 @@ from typing import Optional
 from march_gait_selection.state_machine.state_machine_input import TransitionRequest
 from march_utility.gait.joint_trajectory import JointTrajectory
 from march_utility.utilities.duration import Duration
+from rclpy.time import Time
 
 
 class GaitInterface(object):
@@ -50,12 +51,12 @@ class GaitInterface(object):
         """Returns the position of all the joints after the gait has ended."""
         return {}
 
-    def start(self) -> Optional[JointTrajectory]:
+    def start(self, current_time: Time) -> Optional[JointTrajectory]:
         """Called when the gait has been selected for execution and returns an
         optional starting trajectory."""
         return None
 
-    def update(self, elapsed_time: Duration) -> (JointTrajectory, bool):
+    def update(self, current_time: Time) -> (JointTrajectory, bool):
         """Called in a loop with the elapsed time since the last update.
 
         :param float elapsed_time: Elapsed time in seconds since the last update

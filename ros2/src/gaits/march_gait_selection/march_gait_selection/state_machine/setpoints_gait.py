@@ -4,6 +4,8 @@ from march_gait_selection.dynamic_gaits.transition_subgait import TransitionSubg
 from march_utility.exceptions.gait_exceptions import GaitError
 from march_utility.gait.gait import Gait
 from march_utility.utilities.duration import Duration
+from rclpy.time import Time
+
 from .trajectory_scheduler import ScheduleCommand
 
 from .gait_interface import GaitInterface
@@ -19,7 +21,8 @@ class SetpointsGait(GaitInterface, Gait):
         self._should_stop = False
         self._transition_to_subgait = None
         self._is_transitioning = False
-        self._time_since_start = Duration(0)
+
+        self._start_time = None
 
     @property
     def name(self):
@@ -61,7 +64,7 @@ class SetpointsGait(GaitInterface, Gait):
     def final_position(self):
         return self.subgaits[self.graph.end_subgaits()[0]].final_position
 
-    def start(self):
+    def start(self, current_time: Time):
         """
         Start the gait, sets current subgait to the first subgait, resets the
         time and generates the first trajectory.
@@ -71,10 +74,12 @@ class SetpointsGait(GaitInterface, Gait):
         self._should_stop = False
         self._transition_to_subgait = None
         self._is_transitioning = False
-        self._time_since_start = Duration(0)
-        return ScheduleCommand.from_subgait(self._current_subgait)
 
-    def update(self, elapsed_time: Duration) -> Tuple[Optional[ScheduleCommand], bool]:
+        self._start_time = current_time
+
+        return ScheduleCommand.from_subgait(self._current_subgait, self._start_time)
+
+    def update(self, current_time: Time) -> Tuple[Optional[ScheduleCommand], bool]:
         """
         Update the progress of the gait, should be called regularly.
         If the current subgait is still running, this does nothing.
@@ -83,18 +88,17 @@ class SetpointsGait(GaitInterface, Gait):
         :param elapsed_time:
         :return: trajectory, is_finished
         """
-        self._time_since_start += elapsed_time
-        if self._time_since_start < self._current_subgait.duration:
+        if current_time < (self._start_time + self._current_subgait.duration):
             return None, False
 
-        return self._update_next_subgait()
+        return self._update_next_subgait(current_time)
 
-    def _update_next_subgait(self):
+    def _update_next_subgait(self, current_time):
         if self._should_stop:
             next_subgait = self._stop()
 
         elif self._transition_to_subgait is not None and not self._is_transitioning:
-            return self._transition_subgait(), False
+            return self._transition_subgait(current_time), False
 
         elif self._transition_to_subgait is not None and self._is_transitioning:
             next_subgait = self._transition_to_subgait.subgait_name
@@ -112,10 +116,9 @@ class SetpointsGait(GaitInterface, Gait):
         self._current_subgait = self.subgaits[next_subgait]
         trajectory = self._current_subgait.to_joint_trajectory_msg()
 
-        self._time_since_start = Duration(
-            0
-        )  # New subgait is started, so reset the time
-        return ScheduleCommand.from_subgait(self._current_subgait), False
+        self._start_time = current_time
+
+        return ScheduleCommand.from_subgait(self._current_subgait, current_time), False
 
     def transition(self, transition_request):
         """
@@ -187,7 +190,7 @@ class SetpointsGait(GaitInterface, Gait):
             self._should_stop = False
         return next_subgait
 
-    def _transition_subgait(self):
+    def _transition_subgait(self, start_time):
         """
         Creates the transition subgait message from the next subgait to the
         subgait stored in _transition_to_subgait
@@ -205,6 +208,8 @@ class SetpointsGait(GaitInterface, Gait):
             "{s}_transition".format(s=self._transition_to_subgait.subgait_name),
         )
         self._current_subgait = transition_subgait
-        self._time_since_start = Duration(0)
         self._is_transitioning = True
-        return ScheduleCommand.from_subgait(transition_subgait), False
+
+        self._start_time = start_time
+
+        return ScheduleCommand.from_subgait(transition_subgait, start_time), False

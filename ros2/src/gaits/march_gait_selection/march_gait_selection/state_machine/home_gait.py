@@ -1,6 +1,7 @@
 from typing import Optional, Tuple
 
 from march_utility.utilities.duration import Duration
+from rclpy.time import Time
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from .gait_interface import GaitInterface
 from .trajectory_scheduler import ScheduleCommand
@@ -24,7 +25,7 @@ class HomeGait(GaitInterface):
         self._position = position
         self._gait_type = gait_type
         self._duration = duration
-        self._time_since_start = Duration(0)
+        self._start_time = None
 
     @property
     def name(self):
@@ -54,16 +55,16 @@ class HomeGait(GaitInterface):
     def version(self):
         return "home_gait_version"
 
-    def start(self) -> ScheduleCommand:
+    def start(self, current_time: Time) -> ScheduleCommand:
         """
         Creates a trajectory message to go towards the idle position in the
         given duration.
         :return: A JointTrajectory message that can be used to actually schedule the gait.
         """
-        self._time_since_start = Duration(0)
-        return ScheduleCommand(self._get_trajectory_msg(), self._duration, self._name)
+        self._start_time = current_time
+        return ScheduleCommand(self._get_trajectory_msg(), self._duration, self._name, self._start_time)
 
-    def update(self, elapsed_time: Duration) -> Tuple[Optional[ScheduleCommand], bool]:
+    def update(self, current_time: Time) -> Tuple[Optional[ScheduleCommand], bool]:
         """
         Gives an update on the progress of the gait.
         :param elapsed_time: The time that has elapsed
@@ -71,8 +72,7 @@ class HomeGait(GaitInterface):
         trajectory is always None in the home gait, since the exact gait is unknown
         is_finished is based on the given duration, not the actual position
         """
-        self._time_since_start += elapsed_time
-        if self._time_since_start >= self._duration:
+        if current_time >= self._start_time + self._duration:
             return None, True
         else:
             return None, False

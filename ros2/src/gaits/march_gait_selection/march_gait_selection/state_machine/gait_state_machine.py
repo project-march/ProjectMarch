@@ -3,6 +3,7 @@ from march_gait_selection.state_machine.state_machine_input import StateMachineI
 from march_utility.gait.joint_trajectory import JointTrajectory
 from march_utility.utilities.duration import Duration
 from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.time import Time
 from std_msgs.msg import Header
 from std_srvs.srv import Trigger
 
@@ -257,12 +258,11 @@ class GaitStateMachine(object):
         """
         if not self._shutdown_requested:
             now = self._gait_selection.get_clock().now()
-            elapsed_time = Duration.from_ros_duration(now - self.last_update_time)
             self.last_update_time = now
             if self._is_idle:
                 self._process_idle_state()
             else:
-                self._process_gait_state(elapsed_time)
+                self._process_gait_state(now)
         else:
             self.update_timer.cancel()
 
@@ -329,7 +329,7 @@ class GaitStateMachine(object):
             self._input.gait_finished()
             self._call_transition_callbacks()
 
-    def _process_gait_state(self, elapsed_time: Duration):
+    def _process_gait_state(self, current_time: Time):
         """Processes the current state when there is a gait happening.
         Schedules the next subgait if there is no trajectory happening or
         finishes the gait if it is done."""
@@ -342,7 +342,7 @@ class GaitStateMachine(object):
             self._gait_selection.get_logger().info(
                 f"Executing gait `{self._current_gait.name}`"
             )
-            command = self._current_gait.start()
+            command = self._current_gait.start(current_time)
             if command is not None:
                 self._schedule_command(command)
             elapsed_time = Duration(0)
@@ -356,7 +356,7 @@ class GaitStateMachine(object):
             return
 
         self._handle_input()
-        command, should_stop = self._current_gait.update(elapsed_time)
+        command, should_stop = self._current_gait.update(current_time)
 
         # schedule trajectory if any
         if command is not None:
@@ -372,6 +372,7 @@ class GaitStateMachine(object):
                 f"Finished gait `{self._current_gait.name}`"
             )
             self._current_gait = None
+            self._trajectory_scheduler.reset_previous_command()
 
     def _schedule_command(self, command: ScheduleCommand):
         if not self.check_correct_foot_pressure():
