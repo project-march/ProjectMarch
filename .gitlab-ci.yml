@@ -62,10 +62,10 @@ flake8:
 clang_format:
   stage: Format C++ code
   script:
-    - python3 run-clang-format.py -r ros1/src ros2/src --style=file
+    - python3 .scripts/run-clang-format.py -r ros1/src ros2/src --style=file
   only:
     changes:
-      - "*.{hpp,h,cpp}"
+      - "*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
 
 noetic:build:
   stage: Build code
