@@ -131,6 +131,7 @@
             <arg name="depth_fps" value="$(arg depth_fps)"/>
             <arg name="color_fps" value="$(arg color_fps)"/>
             <arg name="infra_fps" value="$(arg infra_fps)"/>
+            <arg name="output" value="$(arg camera_output)"/>
 
             <arg name="enable_pointcloud"        value="$(arg enable_pointcloud)"/>
             <arg name="pointcloud_texture_stream" value="$(arg pointcloud_texture_stream)"/>
