@@ -1,12 +1,12 @@
-description: 'Move to a position from where once can comfortably stand up. '
+description: Move to the position in which Sjaan was comfortable sitting for a chair of 35cm.
 duration: 1000000000
 gait_type: sit_like
 joints:
   left_ankle:
-  - position: 0.1571
+  - position: 0.15707963
     time_from_start: 0
     velocity: 0.0
-  - position: 0.15707963
+  - position: 0.1571
     time_from_start: 1000000000
     velocity: 0.0
   left_hip_aa:
@@ -14,27 +14,33 @@ joints:
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
+    time_from_start: 375000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 500000000
+    velocity: 0.0
+  - position: 0.0
     time_from_start: 1000000000
     velocity: 0.0
   left_hip_fe:
-  - position: 1.5708
+  - position: 1.6581
     time_from_start: 0
     velocity: 0.0
-  - position: 1.57079633
+  - position: 1.5708
     time_from_start: 1000000000
     velocity: 0.0
   left_knee:
-  - position: 1.8326
+  - position: 1.83259571
     time_from_start: 0
     velocity: 0.0
-  - position: 1.83259571
+  - position: 1.8326
     time_from_start: 1000000000
     velocity: 0.0
   right_ankle:
-  - position: 0.1571
+  - position: 0.15707963
     time_from_start: 0
     velocity: 0.0
-  - position: 0.15707963
+  - position: 0.1571
     time_from_start: 1000000000
     velocity: 0.0
   right_hip_aa:
@@ -42,21 +48,27 @@ joints:
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
+    time_from_start: 375000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 500000000
+    velocity: 0.0
+  - position: 0.0
     time_from_start: 1000000000
     velocity: 0.0
   right_hip_fe:
-  - position: 1.5708
+  - position: 1.68391463
     time_from_start: 0
     velocity: 0.0
-  - position: 1.57079633
+  - position: 1.5708
     time_from_start: 1000000000
     velocity: 0.0
   right_knee:
-  - position: 1.8326
+  - position: 1.83259571
     time_from_start: 0
     velocity: 0.0
-  - position: 1.83259571
+  - position: 1.8326
     time_from_start: 1000000000
     velocity: 0.0
-name: prepare_stand_up
-version: MVI_prepare_stand_up_low_v1
+name: sit_home
+version: MVI_sit_home_low_v1

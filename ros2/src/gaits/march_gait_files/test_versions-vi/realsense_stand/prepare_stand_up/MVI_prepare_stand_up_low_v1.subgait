@@ -1,12 +1,12 @@
-description: 'Move to a position from where once can comfortably stand up. '
+description: Move to a position from where once can comfortably stand up from a chair of 35 cm.
 duration: 1000000000
 gait_type: sit_like
 joints:
   left_ankle:
-  - position: 0.0436
+  - position: 0.1571
     time_from_start: 0
     velocity: 0.0
-  - position: 0.04360007
+  - position: 0.15707963
     time_from_start: 1000000000
     velocity: 0.0
   left_hip_aa:
@@ -17,24 +17,24 @@ joints:
     time_from_start: 1000000000
     velocity: 0.0
   left_hip_fe:
-  - position: 1.3962634
+  - position: 1.5708
     time_from_start: 0
     velocity: 0.0
-  - position: 1.65806279
+  - position: 1.57079633
     time_from_start: 1000000000
     velocity: 0.0
   left_knee:
-  - position: 1.48352986
+  - position: 1.8326
     time_from_start: 0
     velocity: 0.0
-  - position: 1.48352986
+  - position: 1.83259571
     time_from_start: 1000000000
     velocity: 0.0
   right_ankle:
-  - position: 0.0436
+  - position: 0.1571
     time_from_start: 0
     velocity: 0.0
-  - position: 0.04360007
+  - position: 0.15707963
     time_from_start: 1000000000
     velocity: 0.0
   right_hip_aa:
@@ -45,18 +45,18 @@ joints:
     time_from_start: 1000000000
     velocity: 0.0
   right_hip_fe:
-  - position: 1.3962634
+  - position: 1.5708
     time_from_start: 0
     velocity: 0.0
-  - position: 1.65806279
+  - position: 1.57079633
     time_from_start: 1000000000
     velocity: 0.0
   right_knee:
-  - position: 1.48352986
+  - position: 1.8326
     time_from_start: 0
     velocity: 0.0
-  - position: 1.48352986
+  - position: 1.83259571
     time_from_start: 1000000000
     velocity: 0.0
 name: prepare_stand_up
-version: MVI_prepare_stand_up_high_v1
+version: MVI_prepare_stand_up_low_v1

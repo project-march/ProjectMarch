@@ -1,4 +1,4 @@
-name: dynamic_stand
+name: realsense_stand
 subgaits:
   prepare_stand_up:
     to: stand_up

@@ -1,4 +1,4 @@
-description: Sit down gait for a high sit block.
+description: Sit down gait for a sit block of 55 cm.
 duration: 2500000000
 gait_type: sit_like
 joints:

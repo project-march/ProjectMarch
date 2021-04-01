@@ -1,4 +1,4 @@
-name: dynamic_sit
+name: realsense_sit
 subgaits:
   sit_down:
     to: sit_home
