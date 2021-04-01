@@ -61,11 +61,11 @@ void ModelPredictiveController::setReference(int n, const std::vector<double>& r
 
   if(n != ACADO_N) {
     // set running reference
-    std::copy(reference.begin(), reference.end(), std::begin(acadoVariables.y) + n * ACADO_NY);
+    std::move(reference.begin(), reference.end(), std::begin(acadoVariables.y) + n * ACADO_NY);
   }
   else {
     // set "end" reference
-    std::copy(reference.begin(), reference.begin()+ACADO_NYN, std::begin(acadoVariables.yN));
+    std::move(reference.begin(), reference.begin()+ACADO_NYN, std::begin(acadoVariables.yN));
   }
 }
 
