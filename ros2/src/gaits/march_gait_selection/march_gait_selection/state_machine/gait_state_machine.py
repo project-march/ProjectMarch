@@ -551,7 +551,6 @@ class GaitStateMachine(object):
                 raise GaitStateMachineError(
                     f"Gaits cannot have the same name as home gait `{home_gait_name}`"
                 )
-
             self._gait_transitions[home_gait_name] = idle_name
             self._idle_transitions[self.UNKNOWN].add(home_gait_name)
 
