@@ -74,7 +74,6 @@ bool HullParameterDeterminer::determineParameters(
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
         SelectedGait const selected_obstacle,
-        bool const for_right_foot,
         boost::shared_ptr<GaitParameters> gait_parameters)
 {
   time_t start_determine_parameters = clock();
@@ -86,7 +85,6 @@ bool HullParameterDeterminer::determineParameters(
   plane_coefficients_vector_ = plane_coefficients_vector;
   polygon_vector_ = polygon_vector;
   selected_obstacle_ = selected_obstacle;
-  for_right_foot_ = for_right_foot;
 
   bool success = true;
 
@@ -400,7 +398,6 @@ bool SimpleParameterDeterminer::determineParameters(
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
         SelectedGait const selected_obstacle,
-        bool const for_right_foot,
         boost::shared_ptr<GaitParameters> gait_parameters)
 {
   ROS_DEBUG("Determining parameters with simple parameter determiner");

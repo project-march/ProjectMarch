@@ -28,7 +28,6 @@ public:
    * returns whether the processing was successful.
    */
   bool processPointcloud(PointCloud::Ptr input_cloud,
-                          int selected_gait,
                           march_shared_msgs::GetGaitParameters::Response &res);
 
   /** A callback that starts the entire pointcloud processing when the
@@ -92,6 +91,10 @@ private:
   std::string config_file_;
   ros::Publisher pointcloud_publisher_;
   YAML::Node config_tree_;
+
+  int selected_gait_;
+  std::string frame_id_to_transform_to_;
+  bool use_left_foot_;
 };
 
 #endif //MARCH_REALSENSE_READER_HPP

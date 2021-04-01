@@ -32,7 +32,6 @@ public:
       boost::shared_ptr<HullVector> const hull_vector,
       boost::shared_ptr<PolygonVector> const polygon_vector,
       SelectedGait const selected_obstacle,
-      bool const for_right_foot,
       boost::shared_ptr<GaitParameters> gait_parameters)=0;
 
   virtual ~ParameterDeterminer() {};
@@ -64,7 +63,6 @@ public:
       boost::shared_ptr<HullVector> const hull_vector,
       boost::shared_ptr<PolygonVector> const polygon_vector,
       SelectedGait const selected_obstacle,
-      bool const for_right_foot,
       boost::shared_ptr<GaitParameters> gait_parameters) override;
 
   pcl::PointNormal optimal_foot_location;
@@ -124,7 +122,6 @@ protected:
   bool general_most_desirable_location_is_small;
 
   SelectedGait selected_obstacle_;
-  bool for_right_foot_;
   pcl::PointXYZ most_desirable_foot_location_;
 };
 
@@ -142,7 +139,6 @@ public:
           boost::shared_ptr<HullVector> const hull_vector,
           boost::shared_ptr<PolygonVector> const polygon_vector,
           SelectedGait const selected_obstacle,
-          bool const for_right_foot,
           boost::shared_ptr<GaitParameters> gait_parameters) override;
 };
 
