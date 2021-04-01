@@ -146,11 +146,11 @@ class Subgait(object):
 
     @classmethod
     def from_four_files_interpolated(
-            cls,
-            robot: urdf.Robot,
-            version_path_list: List[str, str, str, str],
-            parameter_list: List[float, float],
-            use_foot_position: bool = False,
+        cls,
+        robot: urdf.Robot,
+        version_path_list: List[str, str, str, str],
+        parameter_list: List[float, float],
+        use_foot_position: bool = False,
     ) -> Subgait:
         """
         Extract two subgaits from files and interpolate.
@@ -159,7 +159,6 @@ class Subgait(object):
             The robot corresponding to the given subgait file
         :param version_path_list:
             The .yaml file names of the subgaits to interpolate
-            The parameter to use for interpolation. Should be between 0 and 1
         :param parameter_list:
             The parameters to use for interpolation. Should all be between 0 and 1
         :param use_foot_position:

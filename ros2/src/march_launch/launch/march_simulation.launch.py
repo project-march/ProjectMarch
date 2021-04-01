@@ -50,9 +50,7 @@ def generate_launch_description():
                 "/clock topic by gazebo instead of system time.",
             ),
             DeclareLaunchArgument(
-                name="robot",
-                default_value="march4",
-                description="Robot to use."
+                name="robot", default_value="march4", description="Robot to use."
             ),
             # RQT INPUT DEVICE ARGUMENTS
             DeclareLaunchArgument(
@@ -109,12 +107,12 @@ def generate_launch_description():
                 name="use_imu_data",
                 default_value="False",
                 description="Whether to use the camera imu to know the real "
-                            "orientation of the exoskeleton"
+                "orientation of the exoskeleton",
             ),
             DeclareLaunchArgument(
                 name="imu_topic",
                 default_value="/camera_front/imu/data",
-                description="The topic that should be used to determine the orientation"
+                description="The topic that should be used to determine the orientation",
             ),
             # GAIT SELECTION ARGUMENTS
             DeclareLaunchArgument(
