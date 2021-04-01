@@ -2,7 +2,7 @@ gaits:
   curb_sdg:
     right_open: curb_sdg_rightopen_v1
     left_close: curb_sdg_leftclose_v1
-  dynamic_stairs_up_single_step:
+  realsense_stairs_up_single_step:
     right_open: MVI_stairsup_rightopen_low_undeep
     left_close: MVI_stairsup_leftclose_low_undeep
   ramp_door_slope_up:

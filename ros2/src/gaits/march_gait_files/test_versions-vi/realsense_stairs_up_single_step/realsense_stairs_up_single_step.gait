@@ -1,4 +1,4 @@
-name: dynamic_stairs_up_single_step
+name: realsense_stairs_up_single_step
 subgaits:
   start:
     to: right_open
