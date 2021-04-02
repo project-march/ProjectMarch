@@ -87,7 +87,7 @@ class TrajectoryScheduler(object):
             time_difference = Duration.from_ros_duration(
                 command.start_time - self._node.get_clock().now()
             )
-            log_message += f"in {round(time_difference.seconds, 2)}s"
+            log_message += f"in {round(time_difference.seconds, 3)}s"
         else:
             log_message += "now"
 

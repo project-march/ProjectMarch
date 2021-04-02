@@ -15,7 +15,7 @@ from .home_gait import HomeGait
 from .trajectory_scheduler import TrajectoryCommand, TrajectoryScheduler
 
 PRESSURE_SOLE_STANDING_FORCE = 8000
-DEFAULT_TIMER_PERIOD = 0.04
+DEFAULT_TIMER_PERIOD = 0.004
 
 
 class GaitStateMachine(object):
