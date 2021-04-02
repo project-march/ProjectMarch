@@ -1,13 +1,13 @@
 from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
 from march_shared_msgs.msg import GaitParameters
-from march_shared_msgs.srv import GetGaitParametersRequest, GetGaitParameters
+from march_shared_msgs.srv import GetGaitParameters
 from march_utility.gait.gait import Gait
 from march_utility.gait.subgait import Subgait
 from march_utility.gait.subgait_graph import SubgaitGraph
 from march_utility.utilities.duration import Duration
-from rclpy import Node
-
-from ros2.src.shared.march_utility.march_utility.utilities.camera import CameraSide
+from rclpy.node import Node
+from urdf_parser_py import urdf
+from march_utility.utilities.camera import CameraSide
 
 
 class RealSenseGait(SetpointsGait):
@@ -24,31 +24,8 @@ class RealSenseGait(SetpointsGait):
         self.camera_to_use = camera_to_use
         self.robot = robot
 
-    @classmethod
-    def from_yaml(cls, node: Node, robot: urdf.Robot, gait_name: str, gait_config:
-    dict):
-        try:
-            obstacle = gait_config["obstacle"]
-            camera_to_use = CameraSide.from_string(gait_config["camera_to_use"])
-            subgait_version_map = gait_config["subgaits"]
-            graph = SubgaitGraph(subgait_version_map)
-            subgaits = dict(
-                [
-                    (
-                        name,
-                        Subgait.from_four_files_interpolated(
-                            robot,
-                            version_path_list=subgait_version_map[name],
-                            parameter_list=[0.5, 0.5]
-                        )
-                    )
-                    for name in subgait_version_map
-                    if name not in ("start", "end")
-                ]
-    )
-
     def start(self):
-        request = GetGaitParametersRequest(obstacle=self.obstacle,
+        request = GetGaitParameters.Request(obstacle=self.obstacle,
                                            camera_to_use=self.camera_to_use)
 
         gait_parameters_response = self._get_gait_parameters_service.call(request)
@@ -76,8 +53,8 @@ class RealSenseGait(SetpointsGait):
 
 class RealSense2DGait(RealSenseGait):
 
-    def __init__(self, gait_name: str, subgaits, graph, node: Node, obstacle,
-                 camera_to_use, robot, subgait_versions: dict):
+    def __init__(self, gait_name: str, subgaits, graph, node: Node, obstacle: str,
+                 camera_to_use: CameraSide, robot: urdf.Robot, subgait_versions: dict):
         super(RealSense2DGait, self).__init__(gait_name, subgaits, graph, node,
                                               obstacle, camera_to_use, robot)
         self.first_parameter = 0.0 # For stairs, this is depth
@@ -98,9 +75,36 @@ class RealSense2DGait(RealSenseGait):
                 parameter_list=parameter_list
             )
 
+    @classmethod
+    def from_yaml(cls, node: Node, robot: urdf.Robot, gait_name: str, gait_config:
+    dict, gait_graph: dict):
+        try:
+            obstacle = gait_config["obstacle"]
+            camera_to_use = CameraSide.from_string(gait_config["camera_to_use"])
+            subgait_version_map = gait_config["subgaits"]
+            graph = SubgaitGraph(gait_graph)
+            subgaits = dict(
+                [
+                    (
+                        name,
+                        Subgait.from_four_files_interpolated(
+                            robot,
+                            version_path_list=subgait_version_map[name],
+                            parameter_list=[0.5, 0.5]
+                        )
+                    )
+                    for name in subgait_version_map
+                    if name not in ("start", "end")
+                ]
+            )
+            subgait_versions = gait_config["subgaits"]
+        except KeyError as e:
+            node.get_logger().error(f"Not all information to create realsense gait "
+                                    f"{gait_name} was available")
+        return cls(gait_name, subgaits, graph, node, obstacle, camera_to_use, robot, subgait_versions)
+
 
 class RealSense1DGait(RealSenseGait):
-
     def __init__(self, gait_name: str, subgaits, graph, node: Node, obstacle,
                  camera_to_use, robot, subgait_versions: dict):
         super(RealSense1DGait, self).__init__(gait_name, subgaits, graph, node,
@@ -121,3 +125,33 @@ class RealSense1DGait(RealSenseGait):
                 second_file_name=version_path_list[1],
                 first_parameter=self.parameter
             )
+
+
+    @classmethod
+    def from_yaml(cls, node: Node, robot: urdf.Robot, gait_name: str, gait_config:
+    dict, gait_graph: dict):
+        try:
+            obstacle = gait_config["obstacle"]
+            camera_to_use = CameraSide.from_string(gait_config["camera_to_use"])
+            subgait_version_map = gait_config["subgaits"]
+            graph = SubgaitGraph(gait_graph)
+            subgaits = dict(
+                [
+                    (
+                        name,
+                        Subgait.from_two_files_interpolated(
+                            robot,
+                            first_file_name=subgait_version_map[name][0],
+                            second_file_name=subgait_version_map[name][1],
+                            first_parameter=0.5
+                        )
+                    )
+                    for name in subgait_version_map
+                    if name not in ("start", "end")
+                ]
+            )
+            subgait_versions = gait_config["subgaits"]
+        except KeyError as e:
+            node.get_logger().error(f"Not all information to create realsense gait "
+                                    f"{gait_name} was available")
+        return cls(gait_name, subgaits, graph, node, obstacle, camera_to_use, robot, subgait_versions)
