@@ -63,4 +63,4 @@ class TrajectoryScheduler(object):
             self._node.get_logger().error(
                 f"Failed to execute trajectory. {result.result.error_string} ({result.result.error_code})"
             )
-            self._failed = True
+            # self._failed = True

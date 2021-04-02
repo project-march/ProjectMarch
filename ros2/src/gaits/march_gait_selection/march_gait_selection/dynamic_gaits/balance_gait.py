@@ -210,11 +210,18 @@ class BalanceGait(GaitInterface):
 
     def start(self) -> JointTrajectory:
         self._node.get_logger().warn("Starting a balance gait")
-        self._current_subgait = self._default_walk.graph.start_subgaits()[0]
+        default_walk = self._default_walk
+        self._node.get_logger().warn(f"Default walk is {default_walk.gait_name}")
+        graph = default_walk.graph
+        self._node.get_logger().warn(f"Graph is {graph}")
+        start_subgaits = graph.start_subgaits()
+        self._node.get_logger().warn(f"Start subgaits is {start_subgaits}")
+        self._current_subgait = start_subgaits[0]
+        self._node.get_logger().warn(f"First subgait is: {self._current_subgait}")
         self._time_since_start = Duration(0)
         trajectory = self.get_joint_trajectory_msg(self._current_subgait)
         self._node.get_logger().warn(
-            f"done making trajectory"
+            f"done making trajectory {trajectory}"
         )
         time_from_start = trajectory.points[-1].time_from_start
         self._node.get_logger().warn(

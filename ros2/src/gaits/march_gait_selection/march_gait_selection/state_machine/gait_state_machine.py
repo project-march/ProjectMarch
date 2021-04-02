@@ -341,6 +341,7 @@ class GaitStateMachine(object):
                 f"Executing gait `{self._current_gait.name}`"
             )
             trajectory = self._current_gait.start()
+            self._gait_selection.get_logger().warn(f"Trajectory returned: {trajectory}")
             if trajectory is not None:
                 self._gait_selection.get_logger().warn(
                     f"Gait {self._current_gait.name} has a trajectory"
