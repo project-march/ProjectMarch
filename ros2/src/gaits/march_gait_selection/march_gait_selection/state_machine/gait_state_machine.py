@@ -1,18 +1,18 @@
 from gazebo_msgs.msg import ContactsState
 from march_gait_selection.state_machine.state_machine_input import StateMachineInput
-from march_utility.gait.joint_trajectory import JointTrajectory
+from march_shared_msgs.msg import CurrentState, CurrentGait, Error
+from march_shared_msgs.srv import PossibleGaits
 from march_utility.utilities.duration import Duration
+from march_utility.utilities.side import Side
 from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.node import Node
 from rclpy.time import Time
 from std_msgs.msg import Header
 from std_srvs.srv import Trigger
 
 from .gait_state_machine_error import GaitStateMachineError
 from .home_gait import HomeGait
-from .trajectory_scheduler import ScheduleCommand
-from march_shared_msgs.msg import CurrentState, CurrentGait, Error
-from march_shared_msgs.srv import PossibleGaits
-from march_utility.utilities.side import Side
+from .trajectory_scheduler import TrajectoryCommand, TrajectoryScheduler
 
 PRESSURE_SOLE_STANDING_FORCE = 8000
 DEFAULT_TIMER_PERIOD = 0.04
@@ -24,7 +24,7 @@ class GaitStateMachine(object):
 
     UNKNOWN = "unknown"
 
-    def __init__(self, gait_selection, trajectory_scheduler):
+    def __init__(self, gait_selection: Node, trajectory_scheduler: TrajectoryScheduler):
         """Generates a state machine from given gaits and resets it to
         UNKNOWN state.
 
@@ -59,6 +59,13 @@ class GaitStateMachine(object):
 
         self.update_timer = None
         self.last_update_time = None
+
+        if gait_selection.has_parameter("early_schedule_duration"):
+            self._early_schedule_duration = Duration(
+                seconds=gait_selection.get_parameter("early_schedule_duration").value
+            )
+        else:
+            self._early_schedule_duration = None
 
         self.current_state_pub = self._gait_selection.create_publisher(
             msg_type=CurrentState,
@@ -355,7 +362,13 @@ class GaitStateMachine(object):
             return
 
         self._handle_input()
-        command, should_stop = self._current_gait.update(current_time, self._gait_selection)
+
+        if self._current_gait.can_be_scheduled_early:
+            command, should_stop = self._current_gait.update(
+                current_time, self._early_schedule_duration
+            )
+        else:
+            command, should_stop = self._current_gait.update(current_time)
 
         # schedule trajectory if any
         if command is not None:
@@ -372,7 +385,7 @@ class GaitStateMachine(object):
             )
             self._current_gait = None
 
-    def _schedule_command(self, command: ScheduleCommand):
+    def _schedule_command(self, command: TrajectoryCommand):
         if not self.check_correct_foot_pressure():
             self._gait_selection.get_logger().debug(
                 f"Foot forces when incorrect pressure warning was issued: "

@@ -1,7 +1,7 @@
-from typing import Optional
+from typing import Optional, Tuple
 
 from march_gait_selection.state_machine.state_machine_input import TransitionRequest
-from march_utility.gait.joint_trajectory import JointTrajectory
+from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.utilities.duration import Duration
 from rclpy.time import Time
 
@@ -51,17 +51,21 @@ class GaitInterface(object):
         """Returns the position of all the joints after the gait has ended."""
         return {}
 
-    def start(self, current_time: Time) -> Optional[JointTrajectory]:
+    @property
+    def can_be_scheduled_early(self) -> bool:
+        """Return whether this gait can be scheduled early, default is False."""
+        return False
+
+    def start(self, current_time: Time) -> Optional[TrajectoryCommand]:
         """Called when the gait has been selected for execution and returns an
-        optional starting trajectory."""
+        optional starting trajectory command."""
         return None
 
-    def update(self, current_time: Time, node) -> (JointTrajectory, bool):
-        """Called in a loop with the elapsed time since the last update.
+    def update(self, current_time: Time) -> Tuple[Optional[TrajectoryCommand], bool]:
+        """Called in a loop with the current time.
 
-        :param float elapsed_time: Elapsed time in seconds since the last update
-
-        :returns A pair of a trajectory and a flag. The trajectory that will be
+        :param current_time: Current time
+        :returns A pair of a trajectory command and a flag. The trajectory command that will be
                  set as the new goal for the controller, can be None. The flag
                  indicates whether the gait has finished.
         """

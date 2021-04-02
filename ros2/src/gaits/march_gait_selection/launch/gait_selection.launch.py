@@ -30,6 +30,12 @@ def generate_launch_description():
                 default_value="False",
                 description="Whether balance is being used.",
             ),
+            DeclareLaunchArgument(
+                name="early_schedule_duration",
+                default_value="0.2",
+                description="Duration to schedule next subgait early. If 0 then the"
+                "next subgait is never scheduled early.",
+            ),
             Node(
                 package="march_gait_selection",
                 executable="march_gait_selection",
@@ -40,6 +46,11 @@ def generate_launch_description():
                     {"gait_package": LaunchConfiguration("gait_package")},
                     {"gait_directory": LaunchConfiguration("gait_directory")},
                     {"balance": LaunchConfiguration("balance")},
+                    {
+                        "early_schedule_duration": LaunchConfiguration(
+                            "early_schedule_duration"
+                        )
+                    },
                 ],
             ),
         ]

@@ -14,7 +14,14 @@ from trajectory_msgs.msg import JointTrajectory
 
 
 @dataclass
-class ScheduleCommand:
+class TrajectoryCommand:
+    """A container for scheduling trajectories.
+
+    It contains besides the trajectory to be scheduled some additional information
+    about the scheduled trajectory, such as the subgait name, duration and start time
+    of the trajectory.
+    """
+
     trajectory: JointTrajectory
     duration: Duration
     name: str
@@ -22,7 +29,13 @@ class ScheduleCommand:
 
     @staticmethod
     def from_subgait(subgait: Subgait, start_time: Time):
-        return ScheduleCommand(subgait.to_joint_trajectory_msg(), subgait.duration, subgait.subgait_name, start_time)
+        """Create a TrajectoryCommand from a subgait."""
+        return TrajectoryCommand(
+            subgait.to_joint_trajectory_msg(),
+            subgait.duration,
+            subgait.subgait_name,
+            start_time,
+        )
 
 
 class TrajectoryScheduler(object):
@@ -55,9 +68,9 @@ class TrajectoryScheduler(object):
             qos_profile=5,
         )
 
-    def schedule(self, command: ScheduleCommand):
+    def schedule(self, command: TrajectoryCommand):
         """Schedules a new trajectory.
-        :param JointTrajectory trajectory: a trajectory for all joints to follow
+        :param TrajectoryCommand command: The trajectory command to schedule
         """
         self._failed = False
         stamp = command.start_time.to_msg()
@@ -68,12 +81,19 @@ class TrajectoryScheduler(object):
                 header=Header(stamp=stamp), goal_id=GoalID(stamp=stamp), goal=goal
             )
         )
-        self._node.get_logger().info(f"Scheduling {command.name}, "
-                                     f"t_n={round(self._node.get_clock().now().nanoseconds / 1e9, 3)}, "
-                                     f"t_s={round(command.start_time.nanoseconds / 1e9, 3)},"
-                                     f"d={round(command.duration.nanoseconds / 1e9, 2)} ")
 
-    def failed(self):
+        log_message = f"Scheduling {command.name} to start "
+        if self._node.get_clock().now() < command.start_time:
+            time_difference = Duration.from_ros_duration(
+                command.start_time - self._node.get_clock().now()
+            )
+            log_message += f"in {round(time_difference.seconds, 2)}s"
+        else:
+            log_message += "now"
+
+        self._node.get_logger().info(log_message)
+
+    def failed(self) -> bool:
         return self._failed
 
     def reset(self):
