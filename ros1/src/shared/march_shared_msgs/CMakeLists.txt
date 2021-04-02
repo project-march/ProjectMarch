@@ -14,6 +14,7 @@ add_message_files(
     FILES
     AfterLimitJointCommand.msg
     Alive.msg
+    Camera.msg
     CurrentGait.msg
     CurrentState.msg
     Error.msg

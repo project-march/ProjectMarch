@@ -689,7 +689,7 @@ bool SimpleParameterDeterminer::determineParameters(
 
     // Return a standard step parameter, which works for medium stairs and
     // medium ramp
-    gait_parameters_->step_height_parameter = 0.5;
-    gait_parameters_->step_size_parameter = 0.5;
+    gait_parameters_->first_parameter = 0.5;
+    gait_parameters_->second_parameter = 0.5;
     return true;
 };
