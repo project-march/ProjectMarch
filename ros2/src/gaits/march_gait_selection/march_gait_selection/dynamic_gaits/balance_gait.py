@@ -164,6 +164,9 @@ class BalanceGait(GaitInterface):
 
         trajectory_future.add_done_callback(self.moveit_event_cb)
         if self.moveit_event.wait(self.MOVEIT_INTERFACE_SERVICE_TIMEOUT):
+            self._node.get_logger().warn(
+                "Move it result complete."
+            )
             return self.moveit_trajectory_result.trajectory
         else:
             self._node.get_logger().warn(
@@ -253,6 +256,8 @@ class BalanceGait(GaitInterface):
             return None, False
         else:
             if self._constructing:
+                self._node.get_logger().info("Still constructing, returning None, "
+                                             "False")
                 return None, False
             next_subgait = self._default_walk.graph[
                 (self._current_subgait, self._default_walk.graph.TO)
@@ -261,12 +266,15 @@ class BalanceGait(GaitInterface):
             if next_subgait == self._default_walk.graph.END:
                 return None, True
             self._constructing = True
+            self._node.get_logger().info("Getting joint trajectory msg")
             trajectory = self.get_joint_trajectory_msg(next_subgait)
+            self._node.get_logger().info(f"New trajectory is {trajectory}")
             self._current_subgait = next_subgait
             time_from_start = trajectory.points[-1].time_from_start
-            self._current_subgait_duration = Duration.from_ros_duration(time_from_start)
+            self._current_subgait_duration = Duration.from_msg(time_from_start)
             self._time_since_start = Duration(0)
             self._constructing = False
+            self._node.get_logger().info("Returning trajectory msg")
             return trajectory, False
 
     def end(self):
