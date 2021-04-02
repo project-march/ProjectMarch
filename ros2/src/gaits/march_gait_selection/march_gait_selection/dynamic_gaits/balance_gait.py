@@ -179,9 +179,9 @@ class BalanceGait(GaitInterface):
         else:
             self._node.get_logger().warn(
                 f"Grabbing the trajectory from 'default walk'[name].to_joint_trajectory_msgs() \n"
-                f" defualt walk = {self.default_walk}, default walk [name] = {self.default_walk[name]}, name = {name}"
+                f" defualt walk = {self.default_walk}, default walk = {self._default_walk.subgaits[name]}, name = {name}"
             )
-            return self.default_walk[name].to_joint_trajectory_msg()
+            return self._default_walk.subgaits[name].to_joint_trajectory_msg(self._node)
 
     # GaitInterface
     @property
@@ -210,8 +210,12 @@ class BalanceGait(GaitInterface):
 
     def start(self) -> JointTrajectory:
         self._node.get_logger().warn("Starting a balance gait")
+        self._node.get_logger().warn("print before using default_walk.graph")
+        self._node.get_logger().warn("self._default_walk.graph", self._default_walk.graph)
+        self._node.get_logger().warn("print after using default_walk.graph")
+
         self._current_subgait = self._default_walk.graph.start_subgaits()[0]
-        self._node.get_logger().warn("current subgait name", self._current_subgait.name)
+        self._node.get_logger().warn("current subgait name", self._current_subgait)
         self._time_since_start = Duration(0)
         trajectory = self.get_joint_trajectory_msg(self._current_subgait)
 

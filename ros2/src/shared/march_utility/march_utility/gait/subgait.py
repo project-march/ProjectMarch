@@ -57,8 +57,6 @@ class Subgait(object):
         self.description = str(description)
         self.duration = duration
 
-        self.node = Node("march_utility")
-
     # region Create subgait
     @classmethod
     def from_file(cls, robot: urdf.Robot, file_name: str) -> Subgait:
@@ -281,24 +279,26 @@ class Subgait(object):
     # endregion
 
     # region Create messages
-    def to_joint_trajectory_msg(self):
+    def to_joint_trajectory_msg(self, node=None ):
         """
         Create trajectory msg for the publisher.
 
         :returns
             a ROS msg for the joint trajectory
         """
-        self.node.get_logger().info(
-            f"Making joint trajectory msg of subgait {self.subgait_name}"
-        )
+        if node is not None:
+            self.node.get_logger().info(
+                f"Making joint trajectory msg of subgait {self.subgait_name}"
+            )
         joint_trajectory_msg = trajectory_msg.JointTrajectory()
 
         joint_trajectory_msg.joint_names = [joint.name for joint in self.joints]
 
         timestamps = self.get_unique_timestamps()
-        self.node.get_logger().info(
-            f"time stamps of the subgait are {timestamps}"
-        )
+        if node is not None:
+            self.node.get_logger().info(
+                f"time stamps of the subgait are {timestamps}"
+            )
         for timestamp in timestamps:
             joint_trajectory_point = trajectory_msg.JointTrajectoryPoint()
             joint_trajectory_point.time_from_start = timestamp.to_msg()
