@@ -117,8 +117,8 @@ bool HullParameterDeterminer::determineParameters(
         ROS_DEBUG_STREAM("The optimal foot location is "
             << output_utilities::pointToString(optimal_foot_location)
             << "\n With corresponding parameters (size, height, side) ("
-            << gait_parameters_->step_size_parameter << ", "
-            << gait_parameters_->step_height_parameter << ", "
+            << gait_parameters_->first_parameter << ", "
+            << gait_parameters_->second_parameter << ", "
             << gait_parameters_->side_step_parameter << ") ");
     }
 
@@ -159,10 +159,10 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
 }
 bool HullParameterDeterminer::getGaitParametersFromFootLocationStairsUp()
 {
-    gait_parameters_->step_size_parameter
+    gait_parameters_->first_parameter
         = (optimal_foot_location.x - min_x_stairs)
         / (max_x_stairs - min_x_stairs);
-    gait_parameters_->step_height_parameter
+    gait_parameters_->second_parameter
         = (optimal_foot_location.z - min_z_stairs)
         / (max_z_stairs - min_z_stairs);
     // The side step parameter is unused for the stairs gait so we set it to -1
@@ -189,7 +189,7 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationRampDown()
         = (optimal_foot_location.z - z_flat) / (z_steep - z_flat);
 
     if (parameter_from_x - parameter_from_z < EPSILON) {
-        gait_parameters_->step_size_parameter
+        gait_parameters_->first_parameter
             = (optimal_foot_location.x - x_flat) / (x_steep - x_flat);
     } else {
         ROS_ERROR_STREAM(
@@ -201,7 +201,7 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationRampDown()
 
     // The step height and side step parameter are unused for the ramp down
     // gait, so they are set to -1
-    gait_parameters_->step_height_parameter = -1;
+    gait_parameters_->second_parameter = -1;
     gait_parameters_->side_step_parameter = -1;
     return true;
 }

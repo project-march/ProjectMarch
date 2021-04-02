@@ -18,6 +18,8 @@ from std_msgs.msg import String
 from std_srvs.srv import Trigger
 from urdf_parser_py import urdf
 
+from march_utility.utilities.node_utils import get_robot_urdf
+from .dynamic_gaits.realsense_gait import RealSense1DGait, RealSense2DGait
 from .state_machine.setpoints_gait import SetpointsGait
 
 NODE_NAME = "gait_selection"
@@ -59,6 +61,7 @@ class GaitSelection(Node):
         self._directory_name = directory
         self._gait_directory = os.path.join(package_path, directory)
         self._default_yaml = os.path.join(self._gait_directory, "default.yaml")
+        self._realsense_yaml = os.path.join(self._gait_directory, "realsense_gaits.yaml")
 
         if not os.path.isdir(self._gait_directory):
             self.get_logger().error(f"Gait directory does not exist: {directory}")
@@ -66,7 +69,11 @@ class GaitSelection(Node):
             self.get_logger().error(
                 f"Gait default yaml file does not exist: {directory}/default.yaml"
             )
+        if not os.path.isfile(self._realsense_yaml):
+            self.get_logger().warn("No realsense_yaml present, no realsense gaits "
+                                   "will be created.")
 
+        self._realsense_gait_version_map = self._load_realsense_configuration()
         (
             self._gait_version_map,
             self._positions,
@@ -312,7 +319,7 @@ class GaitSelection(Node):
             )
 
         self._load_semi_dynamic_gaits(gaits)
-
+        self._load_realsense_gaits(gaits)
         if self._balance_used and "balance_walk" in gaits.keys():
             balance_gait = BalanceGait(node=self, default_walk=gaits["balance_walk"])
             if balance_gait is not None:
@@ -334,6 +341,40 @@ class GaitSelection(Node):
                 self._semi_dynamic_gait_version_map,
             )
 
+    def _load_realsense_gaits(self, gaits):
+        self._load_realsense_1d_gaits(gaits)
+        self._load_realsense_2d_gaits(gaits)
+
+    def _load_realsense_1d_gaits(self, gaits):
+        try:
+            realsense_1d_gaits = self._realsense_gait_version_map["1_dimensions"]
+        except KeyError:
+            self.get_logger().info("No 1_dimensions key in the realsense_gaits.yaml")
+            realsense_1d_gaits = []
+        for gait_name in realsense_1d_gaits:
+            gait = RealSense1DGait.from_yaml(
+                node=self,
+                gait_name=gait_name,
+                gait_config=self._realsense_gait_version_map[gait_name]
+            )
+            gaits[gait.gait_name] = gait
+
+    def _load_realsense_2d_gaits(self, gaits):
+        try:
+            realsense_2d_gaits = self._realsense_gait_version_map["2_dimensions"]
+        except KeyError:
+            self.get_logger().info("No 2_dimensions key in the realsense_gaits.yaml")
+            realsense_2d_gaits = []
+        for gait_config in realsense_2d_gaits:
+            gait = RealSense2DGait.from_yaml(self, gait_config)
+            gaits[gait.gait_name] = gait
+
+    def _load_realsense_configuration(self):
+        with open(self._realsense_yaml, "r") as realsense_config_file:
+            realsense_config = yaml.load(realsense_config_file, Loader=yaml.SafeLoader)
+        return realsense_config
+
+
     def _load_configuration(self):
         """Loads and verifies the gaits configuration."""
         with open(self._default_yaml, "r") as default_yaml_file:
@@ -349,6 +390,7 @@ class GaitSelection(Node):
             raise GaitError(
                 msg="Gait version map: {gm}, is not valid".format(gm=version_map)
             )
+
 
         return version_map, default_config["positions"], semi_dynamic_version_map
 
