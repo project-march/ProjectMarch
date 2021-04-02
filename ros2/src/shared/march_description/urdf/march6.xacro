@@ -236,9 +236,9 @@
     <!-- Hip-->
     <link name="hip_base">
         <visual>
-            <origin xyz="${-hip_aa_frame_width} 0 0" rpy="0 0 ${pi}"/>
+            <origin xyz="${hip_aa_frame_width} ${-hip_base_height/2} ${-width}" rpy="0 0 0"/>
             <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/HipBase.stl" scale="1 1 1"/>
+                <mesh filename="package://march_description/urdf/stl-files/march6/HipBase.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="blue"/>
         </visual>
@@ -311,7 +311,7 @@
         <visual>
             <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
             <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/march6/UpperLegTest.stl" scale="0.001 0.001 0.001"/>
+                <mesh filename="package://march_description/urdf/stl-files/UpperLeftLeg.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="blue"/>
         </visual>
@@ -494,9 +494,9 @@
     <!-- Upper Leg Right-->
     <link name="upper_leg_right">
         <visual>
-            <origin xyz="0 ${-hip_base_height/2 - hip_aa_frame_height + upper_leg_offset} 0" rpy="0 0 ${pi}"/>
+            <origin xyz="0 0 ${-upper_leg_height-width}" rpy="0 0 0"/>
             <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/UpperRightLeg.stl" scale="1 1 1"/>
+                <mesh filename="package://march_description/urdf/stl-files/march6/UpperRightLeg.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="blue"/>
         </visual>
@@ -526,11 +526,11 @@
     <link name="lower_leg_right">
         <visual>
             <origin
-                xyz="0 ${-hip_base_height/2 - hip_aa_frame_height + upper_leg_offset} ${upper_leg_height}"
-                rpy="0 0 ${pi}"
+                xyz="0 ${0} ${-lower_leg_height}"
+                rpy="0 0 0"
             />
             <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/LowerRightLeg.stl" scale="1 1 1"/>
+                <mesh filename="package://march_description/urdf/stl-files/march6/LowerRightLeg.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <material name="blue"/>
         </visual>
