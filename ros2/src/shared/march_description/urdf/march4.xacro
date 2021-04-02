@@ -220,8 +220,11 @@
         <fdir1>1 0 0</fdir1>
     </gazebo>
 
-    <xacro:pressure_sole foot_place="left_hallux" foot_name="foot_left">
-        <origin xyz="${(-foot_height_forward+foot_height_backward)/8} ${width/2} 0" rpy="0 0 0"/>
+    <xacro:pressure_sole foot_place="left_heel_1" foot_name="foot_left">
+        <origin xyz="${(-foot_height_forward+foot_height_backward)/8} ${width/4} 0" rpy="0 0 0"/>
+    </xacro:pressure_sole>
+    <xacro:pressure_sole foot_place="left_heel_2" foot_name="foot_left">
+        <origin xyz="${(-foot_height_forward+foot_height_backward)/8} ${-width/4} 0" rpy="0 0 0"/>
     </xacro:pressure_sole>
 
     <xacro:frame_part name="hip_aa_frame_right_side"
@@ -281,8 +284,11 @@
     />
 
     <!-- Foot Right -->
-    <xacro:pressure_sole foot_place="right_toe" foot_name="foot_right">
-        <origin xyz="${(-foot_height_forward+foot_height_backward)/2} 0 0" rpy="0 0 0"/>
+    <xacro:pressure_sole foot_place="right_heel_1" foot_name="foot_right">
+        <origin xyz="${(-foot_height_forward+foot_height_backward)/8} ${width/4} 0" rpy="0 0 0"/>
+    </xacro:pressure_sole>
+    <xacro:pressure_sole foot_place="right_heel_2" foot_name="foot_right">
+        <origin xyz="${(-foot_height_forward+foot_height_backward)/8} ${-width/4} 0" rpy="0 0 0"/>
     </xacro:pressure_sole>
 
     <xacro:frame_part name="foot_right"
