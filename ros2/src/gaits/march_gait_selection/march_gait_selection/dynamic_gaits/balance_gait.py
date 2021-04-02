@@ -78,7 +78,10 @@ class BalanceGait(GaitInterface):
         self.capture_point_event.clear()
 
         future = self._capture_point_service[leg_name].call_async(
-            CapturePointPose.Request(duration=subgait_duration)
+            CapturePointPose.Request(duration=subgait_duration.seconds)
+        )
+        self._node.get_logger().warn(
+            f"Async call done"
         )
         future.add_done_callback(self.capture_point_cb)
         return self.capture_point_event.wait(timeout=self.CAPTURE_POINT_SERVICE_TIMEOUT)
@@ -86,6 +89,9 @@ class BalanceGait(GaitInterface):
     def capture_point_cb(self, future: Future):
         """Set capture point result when the capture point service returns."""
         self.capture_point_result = future.result()
+        self._node.get_logger().warn(
+            f"Capture point result in callback received"
+        )
         self.capture_point_event.set()
 
     def compute_stance_leg_target(self, leg_name: str, subgait_name: str) -> JointState:
@@ -140,8 +146,13 @@ class BalanceGait(GaitInterface):
                 "Capture point call took too long, using default gait."
             )
             return self.default_walk[subgait_name].to_joint_trajectory_msg()
+        self._node.get_logger().warn(
+            "Capture point call was a success."
+        )
         stance_leg_target = self.compute_stance_leg_target(stance_leg, subgait_name)
-
+        self._node.get_logger().warn(
+            "Stance leg target computed."
+        )
         self.moveit_event.clear()
 
         request = GetMoveItTrajectory.Request(
@@ -228,9 +239,9 @@ class BalanceGait(GaitInterface):
             f"time from start of trajectory is {time_from_start}"
         )
         self._node.get_logger().warn(
-            f"duration from ros duration {Duration.from_ros_duration(time_from_start)}"
+            f"duration from ros duration {Duration.from_msg(time_from_start)}"
         )
-        self._current_subgait_duration = Duration.from_ros_duration(time_from_start)
+        self._current_subgait_duration = Duration.from_msg(time_from_start)
         self._node.get_logger().warn(
             f"done starting a balance gait, duration is {self._current_subgait_duration}"
         )
