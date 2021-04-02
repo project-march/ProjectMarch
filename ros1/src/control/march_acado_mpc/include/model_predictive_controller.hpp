@@ -15,7 +15,6 @@ public:
     // Public variables
     vector<double> x0{0,0};             // Current state
     double u;                           // Calculated control input
-    vector<vector<double>> reference;   // Current reference
     std::string joint_name;
     double cost;                        // Objective value
 
