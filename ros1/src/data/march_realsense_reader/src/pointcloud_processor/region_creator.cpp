@@ -19,7 +19,15 @@ RegionCreator::RegionCreator(YAML::Node config_tree, bool debugging):
 
 }
 
-bool RegionGrower::create_regions(PointCloud::Ptr pointcloud,
+// Construct a basic CHullFinder class
+RegionGrower::RegionGrower(YAML::Node config_tree, bool debugging):
+    RegionCreator(config_tree, debugging)
+
+{
+  readYaml();
+}
+
+bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
                                          Normals::Ptr pointcloud_normals,
                                          boost::shared_ptr<RegionVector>
                                          region_vector)
@@ -32,9 +40,8 @@ bool RegionGrower::create_regions(PointCloud::Ptr pointcloud,
   clock_t start_region_grow = clock();
 
   bool success = true;
-  success &= read_yaml();
-  success &= setup_region_grower();
-  success &= extract_regions();
+  success &= setupRegionGrower();
+  success &= extractRegions();
 
   clock_t end_region_grow = clock();
   double time_taken = double(end_region_grow - start_region_grow) / double(CLOCKS_PER_SEC);
@@ -43,7 +50,7 @@ bool RegionGrower::create_regions(PointCloud::Ptr pointcloud,
 
   return success;
 }
-bool RegionGrower::read_yaml()
+void RegionGrower::readYaml()
 {
   if (YAML::Node region_growing_parameters = config_tree_["region_growing"])
   {
@@ -52,16 +59,14 @@ bool RegionGrower::read_yaml()
     max_cluster_size = yaml_utilities::grabParameter<int>(region_growing_parameters, "max_cluster_size");
     smoothness_threshold = yaml_utilities::grabParameter<double>(region_growing_parameters, "smoothness_threshold");
     curvature_threshold = yaml_utilities::grabParameter<double>(region_growing_parameters, "curvature_threshold");
-    return true;
   }
   else
   {
     ROS_ERROR("'region_growing' parameters not found in parameter file");
-    return false;
   }
 }
 
-bool RegionGrower::setup_region_grower()
+bool RegionGrower::setupRegionGrower()
 {
   if (pointcloud_->size() == pointcloud_normals_->size())
   {
@@ -83,7 +88,7 @@ bool RegionGrower::setup_region_grower()
   }
 }
 
-bool RegionGrower::extract_regions()
+bool RegionGrower::extractRegions()
 {
   region_grower.extract(*region_vector_);
   if (debugging_)

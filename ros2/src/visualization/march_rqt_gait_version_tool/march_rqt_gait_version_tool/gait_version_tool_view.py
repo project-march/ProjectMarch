@@ -6,9 +6,9 @@ from .gait_version_tool_errors import GaitVersionToolError
 from .gait_version_tool_pop_up import PopUpWindow
 from .parametric_pop_up import ParametricPopUpWindow
 
-
 DEFAULT_AMOUNT_OF_AVAILABLE_SUBGAITS = 3
 PARAMETRIC_GAIT_PREFIX = "_pg_"
+FOUR_PARAMETRIC_GAIT_PREFIX = "_fpg_"
 
 
 class GaitVersionToolView(QWidget):
@@ -197,7 +197,10 @@ class GaitVersionToolView(QWidget):
                     if "parametric" == str(subgait_menu.currentText()):
                         versions = self.available_gaits[gait_name][subgait_name]
                         if self._show_parametric_pop_up(versions):
-                            new_version = self.get_parametric_version()
+                            if self._parametric_pop_up.four_subgait_interpolation:
+                                new_version = self.get_four_parametric_version()
+                            else:
+                                new_version = self.get_parametric_version()
                             subgait_label.setStyleSheet(
                                 "color:{color}".format(color=self._colors["warning"])
                             )
@@ -341,4 +344,15 @@ class GaitVersionToolView(QWidget):
             self._parametric_pop_up.parameter,
             self._parametric_pop_up.base_version,
             self._parametric_pop_up.other_version,
+        )
+
+    def get_four_parametric_version(self):
+        return "{0}{1}_{2}_({3})_({4})_({5})_({6})".format(
+            FOUR_PARAMETRIC_GAIT_PREFIX,
+            self._parametric_pop_up.first_parameter,
+            self._parametric_pop_up.second_parameter,
+            self._parametric_pop_up.first_version,
+            self._parametric_pop_up.second_version,
+            self._parametric_pop_up.third_version,
+            self._parametric_pop_up.fourth_version,
         )

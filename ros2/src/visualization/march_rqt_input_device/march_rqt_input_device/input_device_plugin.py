@@ -1,6 +1,7 @@
 import os
 from qt_gui.plugin import Plugin
 from ament_index_python.packages import get_package_share_directory
+from rclpy.node import Node
 from rqt_gui.main import Main
 import sys
 import rclpy
@@ -39,11 +40,16 @@ class InputDevicePlugin(Plugin):
             get_package_share_directory("march_rqt_input_device"), "input_device.ui"
         )
 
-        self._node = context.node
-
+        self._node: Node = context.node
         self._node.declare_parameter("ping_safety_node")
+        self._node.declare_parameter("layout_file")
+        layout_file = (
+            self._node.get_parameter("layout_file").get_parameter_value().string_value
+        )
         self._controller = InputDeviceController(self._node)
-        self._widget = InputDeviceView(ui_file, self._controller)
+        self._widget = InputDeviceView(
+            ui_file, layout_file, self._controller, self._node.get_logger()
+        )
         context.add_widget(self._widget)
 
         # Show _widget.windowTitle on left-top of each plugin (when it's set in _widget). (useful for multiple windows)
