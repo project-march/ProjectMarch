@@ -1,0 +1,45 @@
+# All realsense gaits that will be parameterized on 2 dimensions, this will generally
+# be done by first parameterizing the 1st with the 2nd & 3rd with the 4th using the
+# depth parameter and then the two created subgaits with the height pararmeter
+2_dimensions:
+  realsense_stairs_up:
+    obstacle: stairs
+    camera_to_use: front
+    subgaits:
+      right_open:
+        - MVI_stairsup_rightopen_low_undeep
+        - MVI_stairsup_rightopen_low_deep
+        - MVI_stairsup_rightopen_high_undeep
+        - MVI_stairsup_rightopen_high_deep
+      left_swing:
+        - MVI_stairsup_leftswing_low_undeep
+        - MVI_stairsup_leftswing_low_deep
+        - MVI_stairsup_leftswing_high_undeep
+        - MVI_stairsup_leftswing_high_deep
+      right_swing:
+        - MVI_stairsup_rightswing_low_undeep
+        - MVI_stairsup_rightswing_low_deep
+        - MVI_stairsup_rightswing_high_undeep
+        - MVI_stairsup_rightswing_high_deep
+      left_close:
+        - MVI_stairsup_leftclose_low_undeep
+        - MVI_stairsup_leftclose_low_deep
+        - MVI_stairsup_leftclose_high_undeep
+        - MVI_stairsup_leftclose_high_deep
+      right_close:
+        - MVI_stairsup_rightclose_low_undeep
+        - MVI_stairsup_rightclose_low_deep
+        - MVI_stairsup_rightclose_high_undeep
+        - MVI_stairsup_rightclose_high_deep
+# EXAMPLE FOR A FUTURE 1 dimension gait
+#  1_dimensions:
+#    realsense_sit:
+#      obstacle: sit
+#      camera_to_use: back
+#      subgaits:
+#        sit_down:
+#        - MVI_sit_down_low_v1
+#        - MVI_sit_down_high_v1
+#        sit_home:
+#        - MVI_sit_home_low_v1
+#        - MVI_sit_home_high_v1

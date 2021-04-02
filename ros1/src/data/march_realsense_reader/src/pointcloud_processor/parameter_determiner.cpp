@@ -96,8 +96,8 @@ bool HullParameterDeterminer::determineParameters(
 
   ROS_DEBUG_STREAM(
           "With corresponding parameters (size, height, side) (" <<
-          gait_parameters_->step_size_parameter   << ", " <<
-          gait_parameters_->step_height_parameter << ", " <<
+          gait_parameters_->first_parameter   << ", " <<
+          gait_parameters_->second_parameter << ", " <<
           gait_parameters_->side_step_parameter   << ") " );
 
   time_t end_determine_parameters = clock();
@@ -113,9 +113,9 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
 {
   if (selected_obstacle_ == SelectedGait::stairs_up)
   {
-    gait_parameters_->step_size_parameter =
+    gait_parameters_->first_parameter =
             (optimal_foot_location.x - min_x_stairs) / (max_x_stairs - min_x_stairs);
-    gait_parameters_->step_height_parameter =
+    gait_parameters_->second_parameter =
             (optimal_foot_location.z - min_z_stairs) / (max_z_stairs - min_z_stairs);
   }
   else
