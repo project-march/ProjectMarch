@@ -6,7 +6,7 @@
 namespace linear_algebra_utilities
 {
   template<typename T>
-  double dotProductVector(std::vector<T> vector1, std::vector<T> vector2);
+  T dotProductVector(std::vector<T> vector1, std::vector<T> vector2);
 
   template<typename T>
   double dotProductPoint(T point1, T point2);
