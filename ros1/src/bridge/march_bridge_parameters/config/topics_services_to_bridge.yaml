@@ -94,3 +94,9 @@ services_2_to_1:
       type: 'march_shared_msgs/SetParamString' }
   - { service: '/march/parameter_server/set_param_string_list',
       type: 'march_shared_msgs/SetParamStringList' }
+  - { service: '/march/capture_point/foot_left',
+      type: 'march_shared_msgs/CapturePointPose'}
+  - { service: '/march/capture_point/foot_right',
+      type: 'march_shared_msgs/CapturePointPose' }
+  - { service: '/march/moveit/get_trajectory',
+      type: 'march_shared_msgs/GetMoveItTrajectory'}
