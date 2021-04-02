@@ -34,6 +34,7 @@ find_package(sensor_msgs REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/AfterLimitJointCommand.msg"
   "msg/Alive.msg"
+  "msg/Camera.msg"
   "msg/CurrentGait.msg"
   "msg/CurrentState.msg"
   "msg/Error.msg"
@@ -45,6 +46,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/FollowJointTrajectoryActionFeedback.msg"
   "msg/GaitInstruction.msg"
   "msg/GaitInstructionResponse.msg"
+  "msg/GaitParameters.msg"
   "msg/HighVoltageNet.msg"
   "msg/MotorControllerState.msg"
   "msg/LowVoltageNet.msg"
@@ -58,6 +60,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/SetGaitVersion.srv"
   "srv/SetObstacleSizeRampLike.srv"
   "srv/SetObstacleSizeBlockLike.srv"
+  "srv/GetGaitParameters.srv"
   "srv/GetMoveItTrajectory.srv"
   "srv/GetParamStringList.srv"
   "srv/GetParamString.srv"

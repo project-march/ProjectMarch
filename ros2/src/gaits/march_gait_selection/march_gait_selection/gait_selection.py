@@ -19,8 +19,9 @@ from std_srvs.srv import Trigger
 from urdf_parser_py import urdf
 
 from march_utility.utilities.node_utils import get_robot_urdf
-from .dynamic_gaits.realsense_gait import RealSense1DGait, RealSense2DGait
-from .state_machine.setpoints_gait import SetpointsGait
+from march_gait_selection.dynamic_gaits.realsense_gait import RealSense1DGait, \
+    RealSense2DGait
+from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
 
 NODE_NAME = "gait_selection"
 
@@ -352,10 +353,17 @@ class GaitSelection(Node):
             self.get_logger().info("No 1_dimensions key in the realsense_gaits.yaml")
             realsense_1d_gaits = []
         for gait_name in realsense_1d_gaits:
+            gait_folder = gait_name
+            gait_path = os.path.join(self._gait_directory, gait_folder, gait_name + ".gait")
+            with open(gait_path, "r") as gait_file:
+                gait_graph = yaml.load(gait_file, Loader=yaml.SafeLoader)["subgaits"]
+
             gait = RealSense1DGait.from_yaml(
                 node=self,
+                robot=self._robot,
                 gait_name=gait_name,
-                gait_config=self._realsense_gait_version_map[gait_name]
+                gait_config=realsense_1d_gaits[gait_name],
+                gait_graph=gait_graph
             )
             gaits[gait.gait_name] = gait
 
@@ -365,8 +373,20 @@ class GaitSelection(Node):
         except KeyError:
             self.get_logger().info("No 2_dimensions key in the realsense_gaits.yaml")
             realsense_2d_gaits = []
-        for gait_config in realsense_2d_gaits:
-            gait = RealSense2DGait.from_yaml(self, gait_config)
+        for gait_name in realsense_2d_gaits:
+            gait_folder = gait_name
+            gait_path = os.path.join(self._gait_directory, gait_folder, gait_name + ".gait")
+            self.get_logger().info(f"Gait path found: ")
+            with open(gait_path, "r") as gait_file:
+                gait_graph = yaml.load(gait_file, Loader=yaml.SafeLoader)["subgaits"]
+
+            gait = RealSense2DGait.from_yaml(
+                node=self,
+                robot=self._robot,
+                gait_name=gait_name,
+                gait_config=realsense_2d_gaits[gait_name],
+                gait_graph=gait_graph
+            )
             gaits[gait.gait_name] = gait
 
     def _load_realsense_configuration(self):
