@@ -14,6 +14,7 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using Region = pcl::PointIndices;
 using PlaneCoefficients = pcl::ModelCoefficients;
+using LineCoefficients = pcl::ModelCoefficients;
 using Hull = pcl::PointCloud<pcl::PointXYZ>;
 using Polygon = std::vector<pcl::Vertices>;
 using RegionVector = std::vector<Region>;
@@ -69,14 +70,13 @@ public:
   PointNormalCloud::Ptr possible_foot_locations;
   PointCloud2D::Ptr foot_locations_to_try;
 
-
 protected:
   // Get the optimal foot location by finding which possible foot location is closest
   // to the most desirable foot location
   bool getOptimalFootLocation();
 
   // From the possible foot locations, find which one is closes to the most desirable location
-  bool getPossibleMostDesirableLocation(PointNormalCloud::Ptr possible_foot_locations);
+  bool getPossibleMostDesirableLocation();
 
   // Compute the optimal foot location as if one were not limited by anything.
   bool getGeneralMostDesirableLocation();
@@ -123,6 +123,7 @@ protected:
 
   SelectedGait selected_obstacle_;
   pcl::PointXYZ most_desirable_foot_location_;
+  LineCoefficients::Ptr possible_locations_line_coefficients;
 };
 
 /** The simple parameter determiner

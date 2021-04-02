@@ -47,6 +47,12 @@ parameter_determiner:
     max_z_stairs: 0.3
     # Since we transform to the relevant foot, the y component of the foot location should be 0
     y_location: 0
+  ramp_locations:
+    # The end locations of the foot for the different ramp gaits
+    x_flat: 0.4
+    y_flat: 0.1
+    x_steep: 0.3
+    y_steep: 0.2
   # Set the most desirable foot location to the mid point of what the gaits are capable off
   general_most_desirable_location_is_mid: true
   # Set the most desirable foot location to the smallest / flattest step
