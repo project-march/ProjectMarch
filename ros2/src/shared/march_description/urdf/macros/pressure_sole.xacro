@@ -8,7 +8,7 @@
                 <xacro:insert_block name="origin"/>
                 <!--<origin xyz="${(-foot_height_forward+foot_height_backward)/2} 0 0" rpy="0 0 0"/>-->
                 <geometry>
-                    <box size="${foot_height_forward+foot_height_backward} ${width} 0.001"/>
+                    <box size="${(foot_height_forward+foot_height_backward)/4} ${width/2} 0.001"/>
                 </geometry>
             </collision>
         </link>

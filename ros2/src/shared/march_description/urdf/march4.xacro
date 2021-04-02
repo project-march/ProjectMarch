@@ -221,7 +221,7 @@
     </gazebo>
 
     <xacro:pressure_sole foot_place="left_hallux" foot_name="foot_left">
-        <origin xyz="${(-foot_height_forward+foot_height_backward)/2} 0 0" rpy="0 0 0"/>
+        <origin xyz="${(-foot_height_forward+foot_height_backward)/8} ${width/2} 0" rpy="0 0 0"/>
     </xacro:pressure_sole>
 
     <xacro:frame_part name="hip_aa_frame_right_side"
