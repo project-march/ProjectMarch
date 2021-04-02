@@ -6,10 +6,10 @@
 namespace linear_algebra_utilities
 {
   template<typename T>
-  T dotProductVector(std::vector<T> vector1, std::vector<T> vector2);
+  double dotProductVector(std::vector<T> vector1, std::vector<T> vector2);
 
   template<typename T>
-  T dotProductPoint(T point1, T point2);
+  double dotProductPoint(T point1, T point2);
 }
 
 #endif //MARCH_LINEAR_ALGEBRA_UTILITIES_H
