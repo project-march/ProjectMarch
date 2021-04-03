@@ -75,11 +75,11 @@ public:
                                                                        const urdf::JointConstSharedPtr& urdf_joint);
   static std::shared_ptr<march::IncrementalEncoder>
   createIncrementalEncoder(const YAML::Node& incremental_encoder_config);
-  static std::shared_ptr<march::IMotionCube> createIMotionCube(const YAML::Node& imc_config, march::ActuationMode mode,
+  static std::unique_ptr<march::IMotionCube> createIMotionCube(const YAML::Node& imc_config, march::ActuationMode mode,
                                                                const urdf::JointConstSharedPtr& urdf_joint,
                                                                march::PdoInterfacePtr pdo_interface,
                                                                march::SdoInterfacePtr sdo_interface);
-  static std::shared_ptr<march::ODrive> createODrive(const YAML::Node& odrive_config,
+  static std::unique_ptr<march::ODrive> createODrive(const YAML::Node& odrive_config,
                                                      march::ActuationMode mode,
                                                      const urdf::JointConstSharedPtr& urdf_joint,
                                                      march::PdoInterfacePtr pdo_interface,

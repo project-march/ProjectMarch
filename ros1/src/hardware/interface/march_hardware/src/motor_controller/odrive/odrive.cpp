@@ -4,7 +4,7 @@
 #include <march_hardware/motor_controller/motor_controller_state.h>
 #include "march_hardware/motor_controller/motor_controller.h"
 #include "march_hardware/error/hardware_exception.h"
-#include "march_hardware/error/motion_error.h"
+#include "march_hardware/error/motor_controller_error.h"
 #include "march_hardware/ethercat/pdo_types.h"
 #include "march_hardware/ethercat/pdo_map.h"
 
@@ -119,29 +119,29 @@ double ODrive::getAbsoluteVelocity()
   return absolute_encoder_->toRadians(getAbsoluteVelocityIU(), false);
 }
 
-ODriveAxisError ODrive::getAxisError()
+uint32_t ODrive::getAxisError()
 {
-  return ODriveAxisError(this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisError, axis_number_)).ui);
+  return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::AxisError, axis_number_)).ui;
 }
 
-ODriveMotorError ODrive::getMotorError()
+uint32_t ODrive::getMotorError()
 {
-  return ODriveMotorError(this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorError, axis_number_)).ui);
+  return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::MotorError, axis_number_)).ui;
 }
 
-ODriveEncoderManagerError ODrive::getEncoderManagerError()
+uint32_t ODrive::getEncoderManagerError()
 {
-  return ODriveEncoderManagerError(this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::EncoderManagerError, axis_number_)).ui);
+  return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::EncoderManagerError, axis_number_)).ui;
 }
 
-ODriveEncoderError ODrive::getEncoderError()
+uint32_t ODrive::getEncoderError()
 {
-  return ODriveEncoderError(this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::EncoderError, axis_number_)).ui);
+  return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::EncoderError, axis_number_)).ui;
 }
 
-ODriveControllerError ODrive::getControllerError()
+uint32_t ODrive::getControllerError()
 {
-  return ODriveControllerError(this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ControllerError, axis_number_)).ui);
+  return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ControllerError, axis_number_)).ui;
 }
 
 // Throw NotImplemented error by default for functions not part of the Minimum Viable Product

@@ -3,6 +3,7 @@
 #define MARCH_HARDWARE_MOTOR_CONTROLLER_STATES_H
 
 #include <string>
+#include <optional>
 
 namespace march
 {
@@ -33,15 +34,22 @@ public:
   }
 
   /**
-   * Check whether the motor controller is in an error state
-   * @return false if the motor controller is in error state, otherwise true
+   * Check whether the motor controller is in an operational state
+   * @return true if the motor controller is in an operational state, otherwise false
    */
-  virtual bool isOk() = 0;
+  virtual bool isOperational() = 0;
+
+  /**
+   * Check whether the motor controller has an error
+   * @return true if the motor controller has an error, otherwise false
+   */
+  virtual bool hasError() = 0;
+
   /**
    * Get a string description of the state and error states of the motor controller
    * @return string describing the current state as well as the error state(s) of the motor controller
    */
-  virtual std::string getErrorStatus() = 0;
+  virtual std::optional<std::string> getErrorStatus() = 0;
 
   /**
    * Get a string description of the operational state

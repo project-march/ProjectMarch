@@ -2,7 +2,7 @@
 #include "march_hardware/ethercat/slave.h"
 #include "march_hardware/joint.h"
 #include "march_hardware/error/hardware_exception.h"
-#include "march_hardware/error/motion_error.h"
+#include "march_hardware/error/motor_controller_error.h"
 #include <march_hardware/motor_controller/motor_controller_state.h>
 
 #include <ros/ros.h>
@@ -15,7 +15,7 @@
 
 namespace march
 {
-Joint::Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<MotorController> motor_controller)
+Joint::Joint(std::string name, int net_number, bool allow_actuation, std::unique_ptr<MotorController> motor_controller)
   : name_(std::move(name))
   , net_number_(net_number)
   , allow_actuation_(allow_actuation)
@@ -23,7 +23,7 @@ Joint::Joint(std::string name, int net_number, bool allow_actuation, std::shared
 {
 }
 
-Joint::Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<MotorController> motor_controller,
+Joint::Joint(std::string name, int net_number, bool allow_actuation, std::unique_ptr<MotorController> motor_controller,
              std::shared_ptr<TemperatureGES> temperature_ges)
   : name_(std::move(name))
   , net_number_(net_number)
@@ -146,7 +146,7 @@ bool Joint::receivedDataUpdate()
   return data_updated;
 }
 
-std::shared_ptr<MotorController> Joint::getMotorController()
+std::unique_ptr<MotorController>& Joint::getMotorController()
 {
   return motor_controller_;
 }

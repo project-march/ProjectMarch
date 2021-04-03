@@ -4,7 +4,7 @@
 #include <march_hardware/motor_controller/motor_controller_state.h>
 #include "march_hardware/motor_controller/motor_controller.h"
 #include "march_hardware/error/hardware_exception.h"
-#include "march_hardware/error/motion_error.h"
+#include "march_hardware/error/motor_controller_error.h"
 #include "march_hardware/ethercat/pdo_types.h"
 
 #include "march_hardware/motor_controller/actuation_mode.h"
@@ -310,12 +310,12 @@ void IMotionCube::goToTargetState(IMotionCubeTargetState target_state)
       ROS_FATAL("IMotionCube went to fault state while attempting to go to '%s'. Shutting down.",
                 target_state.getDescription().c_str());
       ROS_FATAL("Motion Error (MER): %s",
-                error::parseError(this->getMotionError(), error::ErrorRegisters::MOTION_ERROR).c_str());
+                error::parseError(this->getMotionError(), error::ErrorRegister::IMOTIONCUBE_MOTION_ERROR).c_str());
       ROS_FATAL("Detailed Error (DER): %s",
-                error::parseError(this->getDetailedError(), error::ErrorRegisters::DETAILED_ERROR).c_str());
+                error::parseError(this->getDetailedError(), error::ErrorRegister::IMOTIONCUBE_DETAILED_MOTION_ERROR).c_str());
       ROS_FATAL(
           "Detailed Error 2 (DER2): %s",
-          error::parseError(this->getSecondDetailedError(), error::ErrorRegisters::SECOND_DETAILED_ERROR).c_str());
+          error::parseError(this->getSecondDetailedError(), error::ErrorRegister::IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR).c_str());
 
       throw std::domain_error("IMC to fault state");
     }
@@ -491,20 +491,11 @@ std::shared_ptr<MotorControllerState> IMotionCube::getState()
 {
   auto state = std::make_shared<IMotionCubeState>();
 
-  std::bitset<16> motionErrorBits = this->getMotionError();
-  state->motion_error_ = motionErrorBits.to_string();
-  std::bitset<16> detailedErrorBits = this->getDetailedError();
-  state->detailed_error_ = detailedErrorBits.to_string();
-  std::bitset<16> secondDetailedErrorBits = this->getSecondDetailedError();
-  state->second_detailed_error_ = secondDetailedErrorBits.to_string();
+  state->state_of_operation_ = IMCStateOfOperation(getStatusWord());
 
-  state->state_of_operation_ = IMCStateOfOperation(this->getStatusWord());
-
-  state->motion_error_description_ = error::parseError(this->getMotionError(), error::ErrorRegisters::MOTION_ERROR);
-  state->detailed_error_description_ =
-      error::parseError(this->getDetailedError(), error::ErrorRegisters::DETAILED_ERROR);
-  state->second_detailed_error_description_ =
-      error::parseError(this->getSecondDetailedError(), error::ErrorRegisters::SECOND_DETAILED_ERROR);
+  state->motion_error_ = getMotionError();
+  state->detailed_error_ = getDetailedError();
+  state->second_detailed_error_ = getSecondDetailedError();
 
   state->motor_current_ = getMotorCurrent();
   state->motor_controller_voltage_ = getMotorControllerVoltage();

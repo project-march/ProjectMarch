@@ -18,10 +18,10 @@ class Joint
 {
 public:
   // Initialize a Joint with motor controller and without temperature slave.
-  Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<MotorController> motor_controller);
+  Joint(std::string name, int net_number, bool allow_actuation, std::unique_ptr<MotorController> motor_controller);
 
   // Initialize a Joint with motor controller and temperature slave.
-  Joint(std::string name, int net_number, bool allow_actuation, std::shared_ptr<MotorController> motor_controller,
+  Joint(std::string name, int net_number, bool allow_actuation, std::unique_ptr<MotorController> motor_controller,
         std::shared_ptr<TemperatureGES> temperature_ges);
 
   virtual ~Joint() noexcept = default;
@@ -58,7 +58,7 @@ public:
   void setAllowActuation(bool allow_actuation);
 
   // A joint must have a MotorController
-  std::shared_ptr<MotorController> getMotorController();
+  std::unique_ptr<MotorController>& getMotorController();
 
   // A joint may have a temperature GES
   bool hasTemperatureGES() const;
@@ -121,7 +121,7 @@ private:
   std::shared_ptr<MotorControllerState> previous_state_ = nullptr;
 
   // A joint must have a MotorController but may have a TemperatureGES
-  std::shared_ptr<MotorController> motor_controller_;
+  std::unique_ptr<MotorController> motor_controller_;
   std::shared_ptr<TemperatureGES> temperature_ges_ = nullptr;
 };
 

@@ -2,8 +2,12 @@
 #ifndef MARCH_HARDWARE_IMOTIONCUBE_STATE_H
 #define MARCH_HARDWARE_IMOTIONCUBE_STATE_H
 
+#include <bitset>
 #include <string>
+#include <optional>
 #include "march_hardware/motor_controller/motor_controller_state.h"
+#include "march_hardware/error/hardware_exception.h"
+#include "march_hardware/error/motor_controller_error.h"
 
 namespace march
 {
@@ -125,21 +129,33 @@ class IMotionCubeState : public MotorControllerState
 public:
   IMotionCubeState() = default;
 
-  bool isOk() override
+  bool isOperational() override
   {
     return state_of_operation_.value_ != march::IMCStateOfOperation::FAULT;
   }
 
-  std::string getErrorStatus() override
+  bool hasError() override
   {
-    std::ostringstream error_stream;
-    std::string state = this->state_of_operation_.toString().c_str();
+    return motion_error_ || detailed_error_ || second_detailed_error_;
+  }
 
-    error_stream << "State: " << state << "\nMotion Error: " << this->motion_error_description_ << " ("
-                 << this->motion_error_ << ")\nDetailed Error: " << this->detailed_error_description_ << " ("
-                 << this->detailed_error_ << ")\nSecond Detailed Error: " << this->second_detailed_error_description_ << " ("
-                 << this->second_detailed_error_ << ")";
-    return error_stream.str();
+  std::optional<std::string> getErrorStatus() override
+  {
+    if (hasError())
+    {
+      std::ostringstream error_stream;
+      error_stream << "\nMotion Error: " <<  error::parseError(motion_error_, error::ErrorRegister::IMOTIONCUBE_MOTION_ERROR)
+                   << " (" << std::bitset<16>(motion_error_).to_string() << ")"
+                   << "\nDetailed Error: " << error::parseError(detailed_error_, error::ErrorRegister::IMOTIONCUBE_DETAILED_MOTION_ERROR)
+                   << " (" << std::bitset<16>(motion_error_).to_string() << ")"
+                   << "\nSecond Detailed Error: " << error::parseError(second_detailed_error_, error::ErrorRegister::IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR)
+                   << " (" << std::bitset<16>(motion_error_).to_string() << ")";
+      return error_stream.str();
+    }
+    else
+    {
+      return std::nullopt;
+    }
   }
 
   std::string getOperationalState() override
@@ -148,12 +164,9 @@ public:
   }
 
   IMCStateOfOperation state_of_operation_;
-  std::string motion_error_;
-  std::string detailed_error_;
-  std::string second_detailed_error_;
-  std::string detailed_error_description_;
-  std::string motion_error_description_;
-  std::string second_detailed_error_description_;
+  uint16_t motion_error_;
+  uint16_t detailed_error_;
+  uint16_t second_detailed_error_;
 };
 }  // namespace march
 

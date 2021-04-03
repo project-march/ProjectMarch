@@ -76,11 +76,12 @@ private:
   float getAbsolutePositionIU();
   float getAbsoluteVelocityIU();
 
-  ODriveAxisError getAxisError();
-  ODriveMotorError getMotorError();
-  ODriveEncoderManagerError getEncoderManagerError();
-  ODriveEncoderError getEncoderError();
-  ODriveControllerError getControllerError();
+  uint32_t getAxisError();
+  uint32_t getMotorError();
+  uint32_t getEncoderManagerError();
+  uint32_t getEncoderError();
+  uint32_t getControllerError();
+
 
   int axis_number_;
 };

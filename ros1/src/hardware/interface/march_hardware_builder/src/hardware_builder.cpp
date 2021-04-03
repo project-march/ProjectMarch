@@ -113,7 +113,7 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const 
     mode = march::ActuationMode(joint_config["actuationMode"].as<std::string>());
   }
 
-  std::shared_ptr<march::MotorController> motor_controller;
+  std::unique_ptr<march::MotorController> motor_controller;
   if (joint_config["imotioncube"])
   {
     motor_controller = HardwareBuilder::createIMotionCube(joint_config["imotioncube"], mode, urdf_joint, pdo_interface, sdo_interface);
@@ -135,7 +135,7 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const 
   return { joint_name, net_number, allow_actuation, std::move(motor_controller), std::move(ges) };
 }
 
-std::shared_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAML::Node& imc_config,
+std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAML::Node& imc_config,
                                                                        march::ActuationMode mode,
                                                                        const urdf::JointConstSharedPtr& urdf_joint,
                                                                        march::PdoInterfacePtr pdo_interface,
@@ -155,13 +155,13 @@ std::shared_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAM
   std::ifstream imc_setup_data;
   imc_setup_data.open(ros::package::getPath("march_hardware").append("/config/sw_files/" + urdf_joint->name + ".sw"));
   std::string setup = convertSWFileToString(imc_setup_data);
-  return std::make_shared<march::IMotionCube>(
+  return std::make_unique<march::IMotionCube>(
       march::Slave(slave_index, pdo_interface, sdo_interface),
       HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, urdf_joint),
       HardwareBuilder::createIncrementalEncoder(incremental_encoder_config), setup, mode);
 }
 
-std::shared_ptr<march::ODrive> HardwareBuilder::createODrive(const YAML::Node& odrive_config,
+std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(const YAML::Node& odrive_config,
                                                              march::ActuationMode mode,
                                                              const urdf::JointConstSharedPtr& urdf_joint,
                                                              march::PdoInterfacePtr pdo_interface,
@@ -178,7 +178,7 @@ std::shared_ptr<march::ODrive> HardwareBuilder::createODrive(const YAML::Node& o
   int slave_index = odrive_config["slaveIndex"].as<int>();
   int axis_number = odrive_config["axis"].as<int>();
 
-  return std::make_shared<march::ODrive>(
+  return std::make_unique<march::ODrive>(
       march::Slave(slave_index, pdo_interface, sdo_interface), axis_number,
       HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, urdf_joint), mode);
 }

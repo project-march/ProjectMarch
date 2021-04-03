@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(march_hardware)
 
-add_compile_options(-std=c++14 -Wall -Wextra -Werror)
+add_compile_options(-std=c++17 -Wall -Wextra -Werror)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
@@ -46,7 +46,7 @@ add_library(${PROJECT_NAME}
     include/${PROJECT_NAME}/encoder/incremental_encoder.h
     include/${PROJECT_NAME}/error/error_type.h
     include/${PROJECT_NAME}/error/hardware_exception.h
-    include/${PROJECT_NAME}/error/motion_error.h
+    include/${PROJECT_NAME}/error/motor_controller_error.h
     include/${PROJECT_NAME}/ethercat/ethercat_master.h
     include/${PROJECT_NAME}/ethercat/pdo_interface.h
     include/${PROJECT_NAME}/ethercat/pdo_map.h
@@ -76,7 +76,7 @@ add_library(${PROJECT_NAME}
     src/encoder/encoder.cpp
     src/encoder/incremental_encoder.cpp
     src/error/error_type.cpp
-    src/error/motion_error.cpp
+    src/error/motor_controller_error.cpp
     src/ethercat/ethercat_master.cpp
     src/ethercat/pdo_interface.cpp
     src/ethercat/pdo_map.cpp
@@ -124,7 +124,7 @@ if(CATKIN_ENABLE_TESTING)
         test/encoder/encoder_test.cpp
         test/encoder/incremental_encoder_test.cpp
         test/error/hardware_exception_test.cpp
-        test/error/motion_error_test.cpp
+            test/error/motor_controller_error_test.cpp
         test/ethercat/pdo_map_test.cpp
         test/ethercat/slave_test.cpp
         test/imotioncube/imotioncube_test.cpp

@@ -1,6 +1,6 @@
 #pragma once
 #include "march_hardware/motor_controller/motor_controller_state.h"
-
+#include <optional>
 #include <gmock/gmock.h>
 
 class MockMotorControllerState : public march::MotorControllerState
@@ -10,11 +10,17 @@ public:
   {
   }
 
-  bool isOk() override
+  bool isOperational() override
   {
     return true;
   };
-  std::string getErrorStatus() override
+
+  bool hasError() override
+  {
+    return false;
+  }
+
+  std::optional<std::string> getErrorStatus() override
   {
     return "";
   };

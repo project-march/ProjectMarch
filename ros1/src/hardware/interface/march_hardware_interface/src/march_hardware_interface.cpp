@@ -463,7 +463,15 @@ void MarchHardwareInterface::updateMotorControllerState()
     motor_controller_state_pub_->msg_.header.stamp = ros::Time::now();
     motor_controller_state_pub_->msg_.joint_names[i] = joint.getName();
     motor_controller_state_pub_->msg_.operational_state[i] = motor_controller_state->getOperationalState();
-    motor_controller_state_pub_->msg_.error_status[i] = motor_controller_state->getErrorStatus();
+
+    if (motor_controller_state->hasError())
+    {
+      motor_controller_state_pub_->msg_.error_status[i] = *(motor_controller_state->getErrorStatus());
+    }
+    else
+    {
+      motor_controller_state_pub_->msg_.error_status[i] = "";
+    }
 
     motor_controller_state_pub_->msg_.motor_current[i] = motor_controller_state->motor_current_;
     motor_controller_state_pub_->msg_.motor_voltage[i] = motor_controller_state->motor_voltage_;
@@ -486,11 +494,11 @@ bool MarchHardwareInterface::MotorControllerStateCheck(size_t joint_index)
 {
   march::Joint& joint = march_robot_->getJoint(joint_index);
   auto motor_controller_state = joint.getMotorController()->getState();
-  if (!motor_controller_state->isOk())
+  if (!motor_controller_state->isOperational())
   {
     ROS_ERROR("MotorController of joint %s is in fault state %s.\n Error Status: \n%s",
               joint.getName().c_str(), motor_controller_state->getOperationalState().c_str(),
-              motor_controller_state->getErrorStatus().c_str());
+              motor_controller_state->getErrorStatus()->c_str());
     return false;
   }
   return true;
