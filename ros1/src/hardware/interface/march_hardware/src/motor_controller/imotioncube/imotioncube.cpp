@@ -20,8 +20,8 @@
 
 namespace march
 {
-IMotionCube::IMotionCube(const Slave& slave, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
-                         std::shared_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode)
+IMotionCube::IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+                         std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode)
   : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode)
   , sw_string_("empty")
 {
@@ -32,8 +32,8 @@ IMotionCube::IMotionCube(const Slave& slave, std::shared_ptr<AbsoluteEncoder> ab
   }
 }
 
-IMotionCube::IMotionCube(const Slave& slave, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
-                         std::shared_ptr<IncrementalEncoder> incremental_encoder, std::string& sw_stream,
+IMotionCube::IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+                         std::unique_ptr<IncrementalEncoder> incremental_encoder, std::string& sw_stream,
                          ActuationMode actuation_mode)
   : IMotionCube(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode)
 {
@@ -487,9 +487,9 @@ unsigned int IMotionCube::getActuationModeNumber() const
   }
 }
 
-std::shared_ptr<MotorControllerState> IMotionCube::getState()
+std::unique_ptr<MotorControllerState> IMotionCube::getState()
 {
-  auto state = std::make_shared<IMotionCubeState>();
+  auto state = std::make_unique<IMotionCubeState>();
 
   state->state_of_operation_ = IMCStateOfOperation(getStatusWord());
 

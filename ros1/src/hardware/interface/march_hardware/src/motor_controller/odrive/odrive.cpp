@@ -21,8 +21,8 @@
 
 namespace march
 {
-ODrive::ODrive(const Slave& slave, int axis_number, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
-               std::shared_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode)
+ODrive::ODrive(const Slave& slave, int axis_number, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+               std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode)
   : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode)
   , axis_number_(axis_number)
 {
@@ -33,7 +33,7 @@ ODrive::ODrive(const Slave& slave, int axis_number, std::shared_ptr<AbsoluteEnco
   }
 };
 
-ODrive::ODrive(const Slave& slave, int axis_number, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
+ODrive::ODrive(const Slave& slave, int axis_number, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
                ActuationMode actuation_mode)
     : ODrive(slave, axis_number, std::move(absolute_encoder), nullptr, actuation_mode)
 {};
@@ -62,9 +62,9 @@ unsigned int ODrive::getActuationModeNumber() const
   }
 }
 
-std::shared_ptr<MotorControllerState> ODrive::getState()
+std::unique_ptr<MotorControllerState> ODrive::getState()
 {
-  auto state = std::make_shared<ODriveState>();
+  auto state = std::make_unique<ODriveState>();
 
   //Set general attributes
   state->absolute_position_iu_ = getAbsolutePositionIU();

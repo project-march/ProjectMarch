@@ -31,9 +31,9 @@ public:
    * @param actuation_mode actuation mode in which the IMotionCube must operate
    * @throws std::invalid_argument When an absolute or incremental encoder is nullptr.
    */
-  ODrive(const Slave& slave, int axis_number, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
-         std::shared_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
-  ODrive(const Slave& slave, int axis_number, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
+  ODrive(const Slave& slave, int axis_number, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+         std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
+  ODrive(const Slave& slave, int axis_number, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
          ActuationMode actuation_mode);
 
   ~ODrive() noexcept override = default;
@@ -47,7 +47,7 @@ public:
   unsigned int getActuationModeNumber() const override;
 
   // Get a full description of the state of the ODrive
-  std::shared_ptr<MotorControllerState> getState() override;
+  std::unique_ptr<MotorControllerState> getState() override;
 
   // Getters for specific information about the state of the motor and the ODrive
   float getTorque() override;

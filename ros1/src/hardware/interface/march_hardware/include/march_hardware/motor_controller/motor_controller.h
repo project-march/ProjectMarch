@@ -15,8 +15,8 @@ namespace march
 class MotorController : public Slave
 {
 public:
-  MotorController(const Slave& slave, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
-                  std::shared_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
+  MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+                  std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
 
   // Get the most precise position or velocity
   double getPosition();
@@ -49,9 +49,9 @@ public:
   // A MotorController doesn't necessarily have an AbsoluteEncoder and an IncrementalEncoder, but will have
   // at least one of the two
   bool hasAbsoluteEncoder() const;
-  std::shared_ptr<AbsoluteEncoder> getAbsoluteEncoder();
+  std::unique_ptr<AbsoluteEncoder>& getAbsoluteEncoder();
   bool hasIncrementalEncoder() const;
-  std::shared_ptr<IncrementalEncoder> getIncrementalEncoder();
+  std::unique_ptr<IncrementalEncoder>& getIncrementalEncoder();
 
   // Getters for specific information about the state of the motor and its controller
   virtual float getTorque() = 0;
@@ -60,7 +60,7 @@ public:
   virtual float getMotorVoltage() = 0;
 
   // Get a full description of the state of the MotorController
-  virtual std::shared_ptr<MotorControllerState> getState() = 0;
+  virtual std::unique_ptr<MotorControllerState> getState() = 0;
 
   // Override comparison operator
   friend bool operator==(const MotorController& lhs, const MotorController& rhs)
@@ -93,8 +93,8 @@ protected:
 
   // A MotorController doesn't necessarily have an AbsoluteEncoder and an IncrementalEncoder, but will have
   // at least one of the two
-  std::shared_ptr<AbsoluteEncoder> absolute_encoder_ = nullptr;
-  std::shared_ptr<IncrementalEncoder> incremental_encoder_ = nullptr;
+  std::unique_ptr<AbsoluteEncoder> absolute_encoder_ = nullptr;
+  std::unique_ptr<IncrementalEncoder> incremental_encoder_ = nullptr;
   ActuationMode actuation_mode_;
 };
 

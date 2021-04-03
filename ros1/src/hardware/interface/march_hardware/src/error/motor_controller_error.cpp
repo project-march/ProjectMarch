@@ -148,7 +148,7 @@ void addErrorToDescription(size_t index, ErrorRegister error_register, std::stri
 
 std::string parseError(uint16_t error, ErrorRegister error_register)
 {
-  std::string description = "[";
+  std::string description;
   const std::bitset<16> bitset(error);
 
   for (size_t i = 0; i < 16; i++)
@@ -158,12 +158,12 @@ std::string parseError(uint16_t error, ErrorRegister error_register)
       addErrorToDescription(i, error_register, description);
     }
   }
-  return description + "]";
+  return description;
 }
 
 std::string parseError(uint32_t error, ErrorRegister error_register)
 {
-  std::string description = "[";
+  std::string description;
   const std::bitset<32> bitset(error);
 
   for (size_t i = 0; i < 32; i++)
@@ -173,7 +173,7 @@ std::string parseError(uint32_t error, ErrorRegister error_register)
       addErrorToDescription(i, error_register, description);
     }
   }
-  return description + "]";
+  return description;
 }
 }  // namespace error
 }  // namespace march

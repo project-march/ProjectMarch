@@ -122,10 +122,10 @@ public:
       std::ostringstream error_stream;
 
       error_stream << "Axis: " << error::parseError(axis_error_, error::ErrorRegister::ODRIVE_AXIS_ERROR) << ", "
-                   << "Motor: " << error::parseError(motor_error_, error::ErrorRegister::ODRIVE_MOTOR_ERROR) << ", "
-                   << "Encoder: " << error::parseError(encoder_error_, error::ErrorRegister::ODRIVE_ENCODER_ERROR) << ", "
-                   << "Encoder Manager: " << error::parseError(encoder_manager_error_, error::ErrorRegister::ODRIVE_ENCODER_MANAGER_ERROR) << ", "
-                   << "Controller: " << error::parseError(controller_error_, error::ErrorRegister::ODRIVE_CONTROLLER_ERROR);
+                   << "\nMotor: " << error::parseError(motor_error_, error::ErrorRegister::ODRIVE_MOTOR_ERROR) << ", "
+                   << "\nEncoder: " << error::parseError(encoder_error_, error::ErrorRegister::ODRIVE_ENCODER_ERROR) << ", "
+                   << "\nEncoder Manager: " << error::parseError(encoder_manager_error_, error::ErrorRegister::ODRIVE_ENCODER_MANAGER_ERROR) << ", "
+                   << "\nController: " << error::parseError(controller_error_, error::ErrorRegister::ODRIVE_CONTROLLER_ERROR);
       return error_stream.str();
     }
     else

@@ -20,7 +20,7 @@ public:
   {
   }
 
-  MOCK_METHOD0(getState, std::shared_ptr<march::MotorControllerState>());
+  MOCK_METHOD0(getState, std::unique_ptr<march::MotorControllerState>());
 
   MOCK_METHOD0(prepareActuation, void());
 

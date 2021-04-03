@@ -22,7 +22,7 @@ public:
 
   // Initialize a Joint with motor controller and temperature slave.
   Joint(std::string name, int net_number, bool allow_actuation, std::unique_ptr<MotorController> motor_controller,
-        std::shared_ptr<TemperatureGES> temperature_ges);
+        std::unique_ptr<TemperatureGES> temperature_ges);
 
   virtual ~Joint() noexcept = default;
 
@@ -62,7 +62,7 @@ public:
 
   // A joint may have a temperature GES
   bool hasTemperatureGES() const;
-  std::shared_ptr<TemperatureGES> getTemperatureGES();
+  std::unique_ptr<TemperatureGES>& getTemperatureGES();
 
   /** @brief Override comparison operator */
   friend bool operator==(const Joint& lhs, const Joint& rhs)
@@ -118,11 +118,11 @@ private:
   double velocity_ = 0.0;
 
   // Keep track of the state of the MotorController
-  std::shared_ptr<MotorControllerState> previous_state_ = nullptr;
+  std::unique_ptr<MotorControllerState> previous_state_ = nullptr;
 
   // A joint must have a MotorController but may have a TemperatureGES
   std::unique_ptr<MotorController> motor_controller_;
-  std::shared_ptr<TemperatureGES> temperature_ges_ = nullptr;
+  std::unique_ptr<TemperatureGES> temperature_ges_ = nullptr;
 };
 
 }  // namespace march

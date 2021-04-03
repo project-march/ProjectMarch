@@ -32,10 +32,10 @@ public:
    * @param actuation_mode actuation mode in which the IMotionCube must operate
    * @throws std::invalid_argument When an absolute or incremental encoder is nullptr.
    */
-  IMotionCube(const Slave& slave, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
-              std::shared_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
-  IMotionCube(const Slave& slave, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
-              std::shared_ptr<IncrementalEncoder> incremental_encoder, std::string& sw_stream,
+  IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+              std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
+  IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+              std::unique_ptr<IncrementalEncoder> incremental_encoder, std::string& sw_stream,
               ActuationMode actuation_mode);
 
   ~IMotionCube() noexcept override = default;
@@ -49,7 +49,7 @@ public:
   unsigned int getActuationModeNumber() const override;
 
   // Get a full description of the state of the IMotionCube
-  std::shared_ptr<MotorControllerState> getState() override;
+  std::unique_ptr<MotorControllerState> getState() override;
 
   // Getters for specific information about the state of the motor and the IMotionCube
   float getTorque() override;

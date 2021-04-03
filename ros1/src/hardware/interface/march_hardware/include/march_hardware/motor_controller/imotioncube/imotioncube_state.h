@@ -144,7 +144,7 @@ public:
     if (hasError())
     {
       std::ostringstream error_stream;
-      error_stream << "\nMotion Error: " <<  error::parseError(motion_error_, error::ErrorRegister::IMOTIONCUBE_MOTION_ERROR)
+      error_stream << "Motion Error: " <<  error::parseError(motion_error_, error::ErrorRegister::IMOTIONCUBE_MOTION_ERROR)
                    << " (" << std::bitset<16>(motion_error_).to_string() << ")"
                    << "\nDetailed Error: " << error::parseError(detailed_error_, error::ErrorRegister::IMOTIONCUBE_DETAILED_MOTION_ERROR)
                    << " (" << std::bitset<16>(motion_error_).to_string() << ")"

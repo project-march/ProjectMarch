@@ -15,6 +15,7 @@
 using testing::_;
 using testing::Eq;
 using testing::Return;
+using testing::ByMove;
 
 class JointTest : public testing::Test
 {
@@ -153,12 +154,12 @@ TEST_F(JointTest, TestReceivedDataUpdateFirstTimeTrue)
 
 TEST_F(JointTest, TestReceivedDataUpdateTrue)
 {
-  auto basic_state = std::make_shared<MockMotorControllerState>();
-  auto new_state = std::make_shared<MockMotorControllerState>();
+  auto basic_state = std::make_unique<MockMotorControllerState>();
+  auto new_state = std::make_unique<MockMotorControllerState>();
   new_state->motor_current_ = 11;
   EXPECT_CALL(*this->imc, getState())
-      .WillOnce(Return(basic_state))
-      .WillOnce(Return(new_state));
+      .WillOnce(Return(ByMove(std::move(basic_state))))
+      .WillOnce(Return(ByMove(std::move(new_state))));
   march::Joint joint("actuate_true", 0, true, std::move(this->imc));
   ASSERT_TRUE(joint.receivedDataUpdate());
   ASSERT_TRUE(joint.receivedDataUpdate());
@@ -166,11 +167,11 @@ TEST_F(JointTest, TestReceivedDataUpdateTrue)
 
 TEST_F(JointTest, TestReceivedDataUpdateFalse)
 {
-  auto basic_state = std::make_shared<MockMotorControllerState>();
-  auto new_state = std::make_shared<MockMotorControllerState>();
+  auto basic_state = std::make_unique<MockMotorControllerState>();
+  auto new_state = std::make_unique<MockMotorControllerState>();
   EXPECT_CALL(*this->imc, getState())
-      .WillOnce(Return(basic_state))
-      .WillOnce(Return(new_state));
+      .WillOnce(Return(ByMove(std::move(basic_state))))
+      .WillOnce(Return(ByMove(std::move(new_state))));
   march::Joint joint("actuate_true", 0, true, std::move(this->imc));
   ASSERT_TRUE(joint.receivedDataUpdate());
   ASSERT_FALSE(joint.receivedDataUpdate());
@@ -215,12 +216,12 @@ TEST_F(JointTest, TestReadEncodersTwice)
   double third_incremental_position = 6;
 
   // receivedDataUpdate should return true
-  auto basic_state = std::make_shared<MockMotorControllerState>();
-  auto new_state = std::make_shared<MockMotorControllerState>();
+  auto basic_state = std::make_unique<MockMotorControllerState>();
+  auto new_state = std::make_unique<MockMotorControllerState>();
   new_state->motor_current_ = 11;
   EXPECT_CALL(*this->imc, getState())
-      .WillOnce(Return(basic_state))
-      .WillOnce(Return(new_state));
+      .WillOnce(Return(ByMove(std::move(basic_state))))
+      .WillOnce(Return(ByMove(std::move(new_state))));
 
   EXPECT_CALL(*this->imc, isIncrementalEncoderMorePrecise())
       .WillRepeatedly(Return(true));
@@ -258,11 +259,11 @@ TEST_F(JointTest, TestReadEncodersNoUpdate)
   double initial_absolute_position = 3;
 
   // receivedDataUpdate should return false
-  auto basic_state = std::make_shared<MockMotorControllerState>();
-  auto new_state = std::make_shared<MockMotorControllerState>();
+  auto basic_state = std::make_unique<MockMotorControllerState>();
+  auto new_state = std::make_unique<MockMotorControllerState>();
   EXPECT_CALL(*this->imc, getState())
-      .WillOnce(Return(basic_state))
-      .WillOnce(Return(new_state));
+      .WillOnce(Return(ByMove(std::move(basic_state))))
+      .WillOnce(Return(ByMove(std::move(new_state))));
 
   EXPECT_CALL(*this->imc, getIncrementalPosition())
       .WillOnce(Return(first_incremental_position))

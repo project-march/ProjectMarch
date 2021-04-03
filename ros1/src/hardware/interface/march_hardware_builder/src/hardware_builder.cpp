@@ -183,7 +183,7 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(const YAML::Node& o
       HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, urdf_joint), mode);
 }
 
-std::shared_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
+std::unique_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
     const YAML::Node& absolute_encoder_config, const urdf::JointConstSharedPtr& urdf_joint)
 {
   if (!absolute_encoder_config || !urdf_joint)
@@ -216,7 +216,7 @@ std::shared_ptr<march::AbsoluteEncoder> HardwareBuilder::createAbsoluteEncoder(
                                                   urdf_joint->limits->upper, soft_lower_limit, soft_upper_limit);
 }
 
-std::shared_ptr<march::IncrementalEncoder>
+std::unique_ptr<march::IncrementalEncoder>
 HardwareBuilder::createIncrementalEncoder(const YAML::Node& incremental_encoder_config)
 {
   if (!incremental_encoder_config)
@@ -232,7 +232,7 @@ HardwareBuilder::createIncrementalEncoder(const YAML::Node& incremental_encoder_
   return std::make_unique<march::IncrementalEncoder>(resolution, transmission);
 }
 
-std::shared_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(const YAML::Node& temperature_ges_config,
+std::unique_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(const YAML::Node& temperature_ges_config,
                                                                              march::PdoInterfacePtr pdo_interface,
                                                                              march::SdoInterfacePtr sdo_interface)
 {
@@ -246,7 +246,7 @@ std::shared_ptr<march::TemperatureGES> HardwareBuilder::createTemperatureGES(con
 
   const auto slave_index = temperature_ges_config["slaveIndex"].as<int>();
   const auto byte_offset = temperature_ges_config["byteOffset"].as<int>();
-  return std::make_shared<march::TemperatureGES>(march::Slave(slave_index, pdo_interface, sdo_interface), byte_offset);
+  return std::make_unique<march::TemperatureGES>(march::Slave(slave_index, pdo_interface, sdo_interface), byte_offset);
 }
 
 std::unique_ptr<march::PowerDistributionBoard> HardwareBuilder::createPowerDistributionBoard(

@@ -8,8 +8,8 @@
 #include <memory>
 namespace march
 {
-MotorController::MotorController(const Slave& slave, std::shared_ptr<AbsoluteEncoder> absolute_encoder,
-                                 std::shared_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode)
+MotorController::MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+                                 std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode)
   : Slave(slave), actuation_mode_(actuation_mode)
 {
   if (incremental_encoder == nullptr && absolute_encoder_ == nullptr)
@@ -118,12 +118,12 @@ bool MotorController::hasIncrementalEncoder() const
   return incremental_encoder_ != nullptr;
 }
 
-std::shared_ptr<AbsoluteEncoder> MotorController::getAbsoluteEncoder()
+std::unique_ptr<AbsoluteEncoder>& MotorController::getAbsoluteEncoder()
 {
   return absolute_encoder_;
 }
 
-std::shared_ptr<IncrementalEncoder> MotorController::getIncrementalEncoder()
+std::unique_ptr<IncrementalEncoder>& MotorController::getIncrementalEncoder()
 {
   return incremental_encoder_;
 }
