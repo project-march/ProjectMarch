@@ -53,6 +53,8 @@ const char* getErrorDescription(ErrorType type)
       return "Slave has incorrect SW file";
     case ErrorType::SLAVE_LOST_TIMOUT:
       return "EtherCAT slave monitor timer elapsed, connection has been lost";
+    case ErrorType::ODRIVE_WRONG_AXIS_NUMBER:
+      return "ODrive axis number must be either 1 or 2";
     default:
       return "Unknown error occurred. Please create/use a documented error";
   }

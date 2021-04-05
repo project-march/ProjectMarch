@@ -42,9 +42,9 @@ double AbsoluteEncoder::getRadiansPerBit() const
   return PI_2 / getTotalPositions();
 }
 
-double AbsoluteEncoder::toRadians(double iu, bool is_position) const
+double AbsoluteEncoder::toRadians(double iu, bool use_zero_position) const
 {
-  if (is_position)
+  if (use_zero_position)
   {
     return (iu - zero_position_iu_) * getRadiansPerBit();
   }
@@ -54,9 +54,9 @@ double AbsoluteEncoder::toRadians(double iu, bool is_position) const
   }
 }
 
-double AbsoluteEncoder::toIU(double radians, bool is_position) const
+double AbsoluteEncoder::toIU(double radians, bool use_zero_position) const
 {
-  if (is_position)
+  if (use_zero_position)
   {
     return (radians / getRadiansPerBit()) + zero_position_iu_;
   }

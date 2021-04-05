@@ -22,16 +22,18 @@ public:
    * This is a pure virtual function and must be implemented by subclasses,
    * since each type of encoder has a different way of calculating radians.
    * Conversion may be different if it is position or velocity
+   * @param use_zero_position: Whether to use the zero position in the calculation
    */
-  virtual double toRadians(double iu, bool is_position) const = 0;
+  virtual double toRadians(double iu, bool use_zero_position) const = 0;
 
   /**
    * Converts radians to encoder Internal Units (IU).
    * This is a pure virtual function and must be implemented by subclasses,
    * since each type of encoder has a different way of calculating radians.
    * Conversion may be different if it is position or velocity
+   * @param use_zero_position: Whether to use the zero position in the calculation
    */
-  virtual double toIU(double radians, bool is_position) const = 0;
+  virtual double toIU(double radians, bool use_zero_position) const = 0;
 
   /**
    * Returns the radians corresponding to the distance between two bits.

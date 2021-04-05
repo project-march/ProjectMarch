@@ -3,11 +3,18 @@
 #define MARCH_HARDWARE_ODRIVE_STATE_H
 
 #include <string>
+#include <sstream>
 #include "march_hardware/motor_controller/motor_controller_state.h"
 #include "march_hardware/error/motor_controller_error.h"
 
 namespace march
 {
+
+enum class ODriveAxis
+{
+  Zero = 0,
+  One = 1
+};
 
 class ODriveAxisState
 {

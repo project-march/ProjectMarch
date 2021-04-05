@@ -18,8 +18,8 @@ public:
 
   // Inherited methods
   double getRadiansPerBit() const override;
-  double toRadians(double iu, bool is_position) const override;
-  double toIU(double radians, bool is_position) const override;
+  double toRadians(double iu, bool use_zero_position) const override;
+  double toIU(double radians, bool use_zero_position) const override;
 
   bool isWithinHardLimitsIU(int32_t iu) const;
   bool isWithinSoftLimitsIU(int32_t iu) const;

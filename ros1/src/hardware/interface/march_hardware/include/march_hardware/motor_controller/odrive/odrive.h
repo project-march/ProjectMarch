@@ -31,9 +31,9 @@ public:
    * @param actuation_mode actuation mode in which the IMotionCube must operate
    * @throws std::invalid_argument When an absolute or incremental encoder is nullptr.
    */
-  ODrive(const Slave& slave, int axis_number, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+  ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
          std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
-  ODrive(const Slave& slave, int axis_number, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+  ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
          ActuationMode actuation_mode);
 
   ~ODrive() noexcept override = default;
@@ -83,7 +83,7 @@ private:
   uint32_t getControllerError();
 
 
-  int axis_number_;
+  ODriveAxis axis_;
 };
 
 }  // namespace march

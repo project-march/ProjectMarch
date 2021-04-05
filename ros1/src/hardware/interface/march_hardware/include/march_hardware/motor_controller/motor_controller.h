@@ -62,6 +62,8 @@ public:
   // Get a full description of the state of the MotorController
   virtual std::unique_ptr<MotorControllerState> getState() = 0;
 
+  ~MotorController() {};
+
   // Override comparison operator
   friend bool operator==(const MotorController& lhs, const MotorController& rhs)
   {

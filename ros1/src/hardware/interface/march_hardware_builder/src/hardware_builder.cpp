@@ -16,6 +16,7 @@
 #include <march_hardware/ethercat/sdo_interface.h>
 #include <march_hardware/error/hardware_exception.h>
 #include <march_hardware/pressure_sole/pressure_sole.h>
+#include <march_hardware/motor_controller/odrive/odrive_state.h>
 
 // clang-format off
 const std::vector<std::string> HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS =
@@ -176,10 +177,10 @@ std::unique_ptr<march::ODrive> HardwareBuilder::createODrive(const YAML::Node& o
 
   YAML::Node absolute_encoder_config = odrive_config["absoluteEncoder"];
   int slave_index = odrive_config["slaveIndex"].as<int>();
-  int axis_number = odrive_config["axis"].as<int>();
+  march::ODriveAxis axis = march::ODriveAxis(odrive_config["axis"].as<int>());
 
   return std::make_unique<march::ODrive>(
-      march::Slave(slave_index, pdo_interface, sdo_interface), axis_number,
+      march::Slave(slave_index, pdo_interface, sdo_interface), axis,
       HardwareBuilder::createAbsoluteEncoder(absolute_encoder_config, urdf_joint), mode);
 }
 

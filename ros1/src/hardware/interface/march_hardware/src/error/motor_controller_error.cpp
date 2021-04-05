@@ -36,7 +36,7 @@ const char* IMOTIONCUBE_DETAILED_MOTION_ERRORS[IMOTIONCUBE_DETAILED_MOTION_ERROR
   "Invalid S-curve profile. ",
 };
 
-const char* IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS[IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR_SIZE] = {
+const char* IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS[IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS_SIZE] = {
   "BiSS data CRC error. ",
   "BiSS data warning bit is set. ",
   "BiSS data error bit is set. ",
@@ -118,28 +118,52 @@ void addErrorToDescription(size_t index, ErrorRegister error_register, std::stri
   switch (error_register)
   {
     case ErrorRegister::IMOTIONCUBE_MOTION_ERROR:
-      description += IMOTIONCUBE_MOTION_ERRORS[index];
+      if (index < IMOTIONCUBE_MOTION_ERRORS_SIZE)
+      {
+          description += IMOTIONCUBE_MOTION_ERRORS[index];
+      }
       break;
     case ErrorRegister::IMOTIONCUBE_DETAILED_MOTION_ERROR:
-      description += IMOTIONCUBE_DETAILED_MOTION_ERRORS[index];
+      if (index < IMOTIONCUBE_DETAILED_MOTION_ERRORS_SIZE)
+      {
+        description += IMOTIONCUBE_DETAILED_MOTION_ERRORS[index];
+      }
       break;
     case ErrorRegister::IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR:
-      description += IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS[index];
+      if (index < IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS_SIZE)
+      {
+        description += IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS[index];
+      }
       break;
     case ErrorRegister::ODRIVE_AXIS_ERROR:
-      description += ODRIVE_AXIS_ERRORS[index];
+      if (index < ODRIVE_AXIS_ERRORS_SIZE)
+      {
+        description += ODRIVE_AXIS_ERRORS[index];
+      }
       break;
     case ErrorRegister::ODRIVE_MOTOR_ERROR:
-      description += ODRIVE_MOTOR_ERRORS[index];
+      if (index < ODRIVE_MOTOR_ERRORS_SIZE)
+      {
+        description += ODRIVE_MOTOR_ERRORS[index];
+      }
       break;
     case ErrorRegister::ODRIVE_ENCODER_ERROR:
-      description += ODRIVE_ENCODER_ERRORS[index];
+      if (index < ODRIVE_MOTOR_ERRORS_SIZE)
+      {
+        description += ODRIVE_ENCODER_ERRORS[index];
+      }
       break;
     case ErrorRegister::ODRIVE_ENCODER_MANAGER_ERROR:
-      description += ODRIVE_ENCODER_MANAGER_ERRORS[index];
+      if (index < ODRIVE_ENCODER_MANAGER_ERRORS_SIZE)
+      {
+        description += ODRIVE_ENCODER_MANAGER_ERRORS[index];
+      }
       break;
     case ErrorRegister::ODRIVE_CONTROLLER_ERROR:
-      description += ODRIVE_CONTROLLER_ERRORS[index];
+      if (index < ODRIVE_CONTROLLER_ERRORS_SIZE)
+      {
+        description += ODRIVE_CONTROLLER_ERRORS[index];
+      }
       break;
     default:
       break;

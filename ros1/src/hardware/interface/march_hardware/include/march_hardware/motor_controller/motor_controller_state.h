@@ -15,14 +15,14 @@ public:
   float motor_current_;
   float motor_voltage_;
   float motor_controller_voltage_;
-  double absolute_position_iu_;
-  double incremental_position_iu_;
-  double absolute_velocity_iu_;
-  double incremental_velocity_iu_;
-  double absolute_position_;
-  double incremental_position_;
-  double absolute_velocity_;
-  double incremental_velocity_;
+  float absolute_position_iu_;
+  float incremental_position_iu_;
+  float absolute_velocity_iu_;
+  float incremental_velocity_iu_;
+  float absolute_position_;
+  float incremental_position_;
+  float absolute_velocity_;
+  float incremental_velocity_;
 
   friend bool operator==(const MotorControllerState& lhs, const MotorControllerState& rhs)
   {

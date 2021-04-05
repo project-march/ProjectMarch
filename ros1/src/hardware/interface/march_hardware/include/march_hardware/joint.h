@@ -44,7 +44,7 @@ public:
   // Then sets some initial values
   void prepareActuation();
 
-  // Actuate the joint if it is allowed to do so
+  // Actuate the joint if allow_actuation is true
   void actuate(double target);
 
   // Get the position and velocity of the joint
@@ -84,20 +84,11 @@ public:
   {
     os << "name: " << joint.name_ << ", "
        << "allowActuation: " << joint.allow_actuation_ << ", "
-       << "MotorController: ";
-    if (joint.motor_controller_)
-    {
-      os << *joint.motor_controller_;
-    }
-    else
-    {
-      os << "none";
-    }
-
+       << "MotorController: "<<  *joint.motor_controller_;
     os << ", temperatureges: ";
-    if (joint.temperature_ges_)
+    if (joint.hasTemperatureGES())
     {
-      os << *joint.temperature_ges_;
+      os << *(joint.temperature_ges_.value());
     }
     else
     {
@@ -118,11 +109,11 @@ private:
   double velocity_ = 0.0;
 
   // Keep track of the state of the MotorController
-  std::unique_ptr<MotorControllerState> previous_state_ = nullptr;
+  std::optional<std::unique_ptr<MotorControllerState>> previous_state_ = std::nullopt;
 
   // A joint must have a MotorController but may have a TemperatureGES
   std::unique_ptr<MotorController> motor_controller_;
-  std::unique_ptr<TemperatureGES> temperature_ges_ = nullptr;
+  std::optional<std::unique_ptr<TemperatureGES>> temperature_ges_ = std::nullopt;
 };
 
 }  // namespace march

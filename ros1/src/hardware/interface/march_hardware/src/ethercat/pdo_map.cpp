@@ -187,39 +187,29 @@ std::vector<std::pair<IMCObjectName, IMCObject>> IMCPDOmap::sortPDOObjects()
 }
 
 
-int8_t ODrivePDOmap::getMISOByteOffset(ODriveObjectName object_name, int axis_number)
+int8_t ODrivePDOmap::getMISOByteOffset(ODriveObjectName object_name, ODriveAxis axis)
 {
-  // TODO: Add contains key check
-  if(axis_number == 0)
+  switch(axis)
   {
-    return miso_objects_axis_0.at(object_name).offset;
-  }
-  else if(axis_number == 1)
-  {
-    return miso_objects_axis_1.at(object_name).offset;
-  }
-  else
-  {
-    // TODO: throw HardwareException
-    return -1;
+    case ODriveAxis::Zero:
+      return miso_objects_axis_0.at(object_name).offset;
+    case ODriveAxis::One:
+      return miso_objects_axis_1.at(object_name).offset;
+    default:
+      throw error::HardwareException(error::ErrorType::ODRIVE_WRONG_AXIS_NUMBER, "Cannot get MISO Byte offset.");
   }
 }
 
-int8_t ODrivePDOmap::getMOSIByteOffset(ODriveObjectName object_name, int axis_number)
+int8_t ODrivePDOmap::getMOSIByteOffset(ODriveObjectName object_name, ODriveAxis axis)
 {
-  // TODO: Add contains key check
-  if(axis_number == 0)
+  switch(axis)
   {
-    return mosi_objects_axis_0.at(object_name).offset;
-  }
-  else if(axis_number == 1)
-  {
-    return mosi_objects_axis_1.at(object_name).offset;
-  }
-  else
-  {
-    // TODO: throw HardwareException
-    return -1;
+    case ODriveAxis::Zero:
+      return mosi_objects_axis_0.at(object_name).offset;
+    case ODriveAxis::One:
+      return mosi_objects_axis_1.at(object_name).offset;
+    default:
+      throw error::HardwareException(error::ErrorType::ODRIVE_WRONG_AXIS_NUMBER, "Cannot get MOSI Byte offset.");
   }
 }
 

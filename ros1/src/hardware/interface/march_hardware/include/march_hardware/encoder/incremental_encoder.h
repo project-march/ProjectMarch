@@ -17,8 +17,8 @@ public:
 
   // Inherited methods
   double getRadiansPerBit() const override;
-  double toRadians(double iu, bool is_position) const override;
-  double toIU(double radians, bool is_position) const override;
+  double toRadians(double iu, bool /* use_zero_position */) const override;
+  double toIU(double radians, bool /* use_zero_position */) const override;
 
 
   double getTransmission() const;

@@ -2,6 +2,7 @@
 #ifndef MARCH_HARDWARE_PDOMAP_H
 #define MARCH_HARDWARE_PDOMAP_H
 #include "march_hardware/ethercat/sdo_interface.h"
+#include "march_hardware/motor_controller/odrive/odrive_state.h"
 
 #include <string>
 #include <utility>
@@ -134,8 +135,8 @@ public:
   static ObjectMap mosi_objects_axis_1;
 
   // Get the byte offset for an ODriveObject of an axis
-  static int8_t getMISOByteOffset(ODriveObjectName object_name, int axis_number);
-  static int8_t getMOSIByteOffset(ODriveObjectName object_name, int axis_number);
+  static int8_t getMISOByteOffset(ODriveObjectName object_name, ODriveAxis axis);
+  static int8_t getMOSIByteOffset(ODriveObjectName object_name, ODriveAxis axis);
 };
 
 }// namespace march

@@ -36,10 +36,10 @@ Joint::Joint(std::string name, int net_number, bool allow_actuation, std::unique
 bool Joint::initSdo(int cycle_time)
 {
   bool reset = false;
-  reset |= this->motor_controller_->Slave::initSdo(cycle_time);
-  if (this->hasTemperatureGES())
+  reset |= motor_controller_->Slave::initSdo(cycle_time);
+  if (hasTemperatureGES())
   {
-    reset |= this->temperature_ges_->initSdo(cycle_time);
+    reset |= getTemperatureGES()->initSdo(cycle_time);
   }
   return reset;
 }
@@ -96,12 +96,12 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
 
 double Joint::getPosition() const
 {
-  return this->position_;
+  return position_;
 }
 
 double Joint::getVelocity() const
 {
-  return this->velocity_;
+  return velocity_;
 }
 
 void Joint::setAllowActuation(bool allow_actuation)
@@ -111,22 +111,22 @@ void Joint::setAllowActuation(bool allow_actuation)
 
 int Joint::getNetNumber() const
 {
-  return this->net_number_;
+  return net_number_;
 }
 
 std::string Joint::getName() const
 {
-  return this->name_;
+  return name_;
 }
 
 bool Joint::hasTemperatureGES() const
 {
-  return this->temperature_ges_ != nullptr;
+  return temperature_ges_.has_value();
 }
 
 bool Joint::canActuate() const
 {
-  return this->allow_actuation_;
+  return allow_actuation_;
 }
 
 bool Joint::receivedDataUpdate()
@@ -134,13 +134,13 @@ bool Joint::receivedDataUpdate()
   auto new_state = motor_controller_->getState();
 
   bool data_updated;
-  if (previous_state_ == nullptr)
+  if (!previous_state_.has_value())
   {
     data_updated = true;
   }
   else
   {
-    data_updated =  !(*previous_state_ == *new_state);
+    data_updated =  !(*(previous_state_.value()) == *new_state);
   }
   previous_state_ = std::move(new_state);
   return data_updated;
@@ -153,7 +153,15 @@ std::unique_ptr<MotorController>& Joint::getMotorController()
 
 std::unique_ptr<TemperatureGES>& Joint::getTemperatureGES()
 {
-  return temperature_ges_;
+  if (hasTemperatureGES())
+  {
+    return *temperature_ges_;
+  }
+  else
+  {
+    throw error::HardwareException(error::ErrorType::MISSING_TEMPERATURE_GES,
+                                   "Cannot get TemperatureGES of a Joint that does not have a TemperatureGES");
+  }
 }
 
 }  // namespace march
