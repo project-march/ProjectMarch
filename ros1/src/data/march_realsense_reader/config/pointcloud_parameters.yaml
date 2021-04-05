@@ -50,8 +50,8 @@ parameter_determiner:
   ramp_locations:
     # The end locations of the foot for the different ramp gaits
     x_flat: -0.4
-    z_flat: -0.1
-    x_steep: -0.3
+    z_flat: -0.05
+    x_steep: -0.2
     z_steep: -0.2
     # Since we transform to the relevant foot, the y component of the foot location should be 0
     y_location: 0
