@@ -38,7 +38,7 @@ hull_finder:
     hull_dimension: 2
 
 parameter_determiner:
-  number_of_optional_foot_locations: 10
+  number_of_optional_foot_locations: 15
   # Remember that forward in negative in the x direction!
   stairs_locations:
     min_x_stairs: -0.2
@@ -55,6 +55,8 @@ parameter_determiner:
     z_steep: -0.2
     # Since we transform to the relevant foot, the y component of the foot location should be 0
     y_location: 0
+    min_search_area: -0
+    max_search_area: -0.6
   # Set the most desirable foot location to the mid point of what the gaits are capable off
   general_most_desirable_location_is_mid: true
   # Set the most desirable foot location to the smallest / flattest step

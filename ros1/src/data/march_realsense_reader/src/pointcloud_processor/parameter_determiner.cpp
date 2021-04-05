@@ -73,7 +73,11 @@ void HullParameterDeterminer::readYaml()
     z_steep = yaml_utilities::grabParameter<double>(
         ramp_locations_parameters, "z_steep");
     y_location = yaml_utilities::grabParameter<double>(
-        ramp_locations_parameters,"y_location");
+        ramp_locations_parameters, "y_location");
+    min_search_area = yaml_utilities::grabParameter<double>(
+        ramp_locations_parameters, "min_search_area");
+    max_search_area = yaml_utilities::grabParameter<double>(
+        ramp_locations_parameters, "max_search_area");
   }
   else
   {
@@ -317,8 +321,14 @@ bool HullParameterDeterminer::isValidLocation(pcl::PointNormal possible_foot_loc
   }
   else if (selected_obstacle_ == SelectedGait::ramp_down)
   {
-    // All locations are valid for now.
-    return true;
+//    // All locations are valid for now.
+//    return true;
+    // Only points on the line which are between the two given values are valid
+    pcl::PointXYZ projected_point = linear_algebra_utilities::projectPointToLine(
+        possible_foot_location, executable_locations_line_coefficients_);
+    // Less and larger than signs are swapped for the x coordinate
+    // as the positive x axis points in the backwards direction of the exoskeleton
+    return (projected_point.x < x_steep && projected_point.x > x_flat);
   }
   else
   {
@@ -326,8 +336,6 @@ bool HullParameterDeterminer::isValidLocation(pcl::PointNormal possible_foot_loc
                      ". Returning false.");
     return false;
   }
-  // If no check concludes that the location is valid, return that the location is invalid.
-  return false;
 }
 
 // Compute the optimal foot location as if one were not limited by anything.
@@ -374,7 +382,7 @@ bool HullParameterDeterminer::getOptionalFootLocations(PointCloud2D::Ptr foot_lo
   {
     for (int i = 0; i < number_of_optional_foot_locations; i++)
     {
-      double x_location = x_steep + (x_steep - x_flat) *
+      double x_location = min_search_area + (max_search_area - min_search_area) *
                                         i / (double) (number_of_optional_foot_locations - 1);
       foot_locations_to_try->points[i].x = x_location;
       foot_locations_to_try->points[i].y = y_location;

@@ -132,6 +132,8 @@ protected:
   double z_flat;
   double x_steep;
   double z_steep;
+  double min_search_area;
+  double max_search_area;
   bool general_most_desirable_location_is_mid;
   bool general_most_desirable_location_is_small;
 

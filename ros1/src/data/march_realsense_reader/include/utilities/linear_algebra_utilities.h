@@ -2,6 +2,7 @@
 #define MARCH_LINEAR_ALGEBRA_UTILITIES_H
 
 #include <pcl/point_types.h>
+#include <math.h>
 
 namespace linear_algebra_utilities
 {
@@ -27,12 +28,10 @@ namespace linear_algebra_utilities
   template<typename T, typename Q>
   double distanceBetweenPoints(T point1, Q point2)
   {
-    return (point1.x - point2.x) *
-           (point1.x - point2.x) +
-           (point1.y - point2.y) *
-           (point1.y - point2.y) +
-           (point1.z - point2.z) *
-           (point1.z - point2.z);
+    return sqrt(
+        (point1.x - point2.x) * (point1.x - point2.x) +
+        (point1.y - point2.y) * (point1.y - point2.y) +
+        (point1.z - point2.z) * (point1.z - point2.z));
   }
 
   // Project a point to a line
@@ -62,8 +61,6 @@ namespace linear_algebra_utilities
         (((point_to_project.getArray3fMap() - position.getArray3fMap()) * direction.getArray3fMap()).sum() /
           (direction.getArray3fMap() * direction.getArray3fMap()).sum()) *
            direction.getArray3fMap() + position.getArray3fMap();
-
-    ROS_WARN_STREAM("The projected point is " << projected_point);
 
     return projected_point;
   }
