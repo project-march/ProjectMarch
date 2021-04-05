@@ -24,7 +24,13 @@ namespace march
 ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder, ActuationMode actuation_mode)
   : MotorController(slave, std::move(absolute_encoder), actuation_mode)
   , axis_(axis)
-{}
+{
+  if (this->absolute_encoder_.value() == nullptr)
+  {
+    throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
+                                   "An ODrive needs an absolute encoder");
+  }
+}
 
 void ODrive::prepareActuation()
 {

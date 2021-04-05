@@ -123,7 +123,7 @@ TEST_F(JointTest, PrepareForActuationAllowed)
 
 TEST_F(JointTest, hasTemperatureGes)
 {
-  march::Joint joint("get_temperature", 0, false, nullptr, nullptr);
+  march::Joint joint("get_temperature", 0, false, nullptr);
   ASSERT_FALSE(joint.hasTemperatureGES());
 }
 

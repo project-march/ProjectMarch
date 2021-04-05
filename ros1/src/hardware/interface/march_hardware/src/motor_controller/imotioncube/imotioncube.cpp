@@ -25,6 +25,11 @@ IMotionCube::IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> ab
   : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode)
   , sw_string_("empty")
 {
+  if (this->absolute_encoder_.value() == nullptr || this->incremental_encoder_.value() == nullptr)
+  {
+    throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
+                                   "An IMotionCube needs both an incremental and an absolute encoder");
+  }
 }
 
 IMotionCube::IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
