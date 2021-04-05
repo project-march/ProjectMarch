@@ -142,9 +142,11 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
     optimal_foot_location.y = projected_optimal_foot_location.y;
     optimal_foot_location.z = projected_optimal_foot_location.z;
 
+    parameter_from_x = (optimal_foot_location.x - x_flat) / (x_steep - x_flat);
+    parameter_from_z = (optimal_foot_location.z - z_flat) / (z_steep - z_flat);
+
     double allowable_error = 0.01;
-    if ((optimal_foot_location.x - x_flat) / (x_steep - x_flat) -
-        (optimal_foot_location.z - z_flat) / (z_steep - z_flat) < allowable_error)
+    if (parameter_from_x - parameter_from_z < allowable_error)
     {
       gait_parameters_->step_size_parameter =
           (optimal_foot_location.x - x_flat) / (x_steep - x_flat);
@@ -310,16 +312,18 @@ bool HullParameterDeterminer::isValidLocation(pcl::PointNormal possible_foot_loc
   {
     // Less and larger than signs are swapped for the x coordinate
     // as the positive x axis points in the backwards direction of the exoskeleton
-    if (possible_foot_location.x < min_x_stairs && optimal_foot_location.x > max_x_stairs &&
-        possible_foot_location.z > min_z_stairs && optimal_foot_location.z < max_z_stairs)
-    {
-      return true;
-    }
+    return (possible_foot_location.x < min_x_stairs && optimal_foot_location.x > max_x_stairs &&
+        possible_foot_location.z > min_z_stairs && optimal_foot_location.z < max_z_stairs);
   }
   else if (selected_obstacle_ == SelectedGait::ramp_down)
   {
-    // The way a ramp location is chosed all foot locations are valid
-    return true;
+    // Only points on the line which are between the two given values are valid
+    pcl::PointXYZ projected_point = linear_algebra_utilities::projectPointToLine(
+        possible_foot_location, executable_locations_line_coefficients_);
+
+    // Less and larger than signs are swapped for the x coordinate
+    // as the positive x axis points in the backwards direction of the exoskeleton
+    return projected_point.x < x_steep && projected_point.x > x_flat;
   }
   else
   {
