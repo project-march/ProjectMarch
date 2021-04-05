@@ -12,11 +12,12 @@ march6:
   ecatSlaveTimeout: 50
   joints:
     - left_ankle:
-        actuationMode: torque
         allowActuation: true
         netNumber: 4
         temperatureges: {slaveIndex: 1, byteOffset: 0}
-        odrive:
+        motor_controller:
+          actuationMode: torque
+          type: "odrive" 
           slaveIndex: 1
           axis: 0
           absoluteEncoder:
@@ -25,11 +26,12 @@ march6:
             maxPositionIU: 4125
 
     - left_hip_aa:
-        actuationMode: torque
         allowActuation: true
         netNumber: 3
         temperatureges: {slaveIndex: 2, byteOffset: 0}
-        odrive:
+        motor_controller:
+          actuationMode: torque
+          type: "odrive" 
           slaveIndex: 2
           axis: 0
           absoluteEncoder:
@@ -38,11 +40,12 @@ march6:
             maxPositionIU: 1427
 
     - left_hip_fe:
-        actuationMode: torque
         allowActuation: true
         netNumber: 3
         temperatureges: {slaveIndex: 2, byteOffset: 0}
-        odrive:
+        motor_controller:
+          actuationMode: torque
+          type: "odrive" 
           slaveIndex: 2
           axis: 1
           absoluteEncoder:
@@ -51,11 +54,12 @@ march6:
             maxPositionIU: 89385
 
     - left_knee:
-        actuationMode: torque
         allowActuation: true
         netNumber: 4
         temperatureges: {slaveIndex: 1, byteOffset: 4}
-        odrive:
+        motor_controller:
+          actuationMode: torque
+          type: "odrive" 
           slaveIndex: 1
           axis: 1
           absoluteEncoder:
@@ -64,11 +68,12 @@ march6:
             maxPositionIU: 62557
 
     - right_ankle:
-        actuationMode: torque
         allowActuation: true
         netNumber: 2
         temperatureges: {slaveIndex: 4, byteOffset: 0}
-        odrive:
+        motor_controller:
+          actuationMode: torque
+          type: "odrive" 
           slaveIndex: 4
           axis: 0
           absoluteEncoder:
@@ -77,11 +82,12 @@ march6:
             maxPositionIU: 1233
 
     - right_hip_aa:
-        actuationMode: torque
         allowActuation: true
         netNumber: 1
         temperatureges: {slaveIndex: 3, byteOffset: 4}
-        odrive:
+        motor_controller:
+          actuationMode: torque
+          type: "odrive" 
           slaveIndex: 3
           axis: 1
           absoluteEncoder:
@@ -90,11 +96,12 @@ march6:
             maxPositionIU: 4076
             
     - right_hip_fe:
-        actuationMode: torque
         allowActuation: true
         netNumber: 1
         temperatureges: {slaveIndex: 3, byteOffset: 0}
-        odrive:
+        motor_controller:
+          actuationMode: torque
+          type: "odrive" 
           slaveIndex: 3
           axis: 0
           absoluteEncoder:
@@ -103,11 +110,12 @@ march6:
             maxPositionIU: 45632
 
     - right_knee:
-        actuationMode: torque
         allowActuation: true
         netNumber: 2
         temperatureges: {slaveIndex: 4, byteOffset: 4}
-        odrive:
+        motor_controller:
+          actuationMode: torque
+          type: "odrive" 
           slaveIndex: 4
           axis: 1
           absoluteEncoder:

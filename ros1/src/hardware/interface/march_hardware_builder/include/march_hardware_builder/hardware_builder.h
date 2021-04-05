@@ -75,6 +75,11 @@ public:
                                                                        const urdf::JointConstSharedPtr& urdf_joint);
   static std::unique_ptr<march::IncrementalEncoder>
   createIncrementalEncoder(const YAML::Node& incremental_encoder_config);
+  static std::unique_ptr<march::MotorController> createMotorController(const YAML::Node& config,
+                                                                       march::ActuationMode mode,
+                                                                       const urdf::JointConstSharedPtr& urdf_joint,
+                                                                       march::PdoInterfacePtr pdo_interface,
+                                                                       march::SdoInterfacePtr sdo_interface);
   static std::unique_ptr<march::IMotionCube> createIMotionCube(const YAML::Node& imc_config, march::ActuationMode mode,
                                                                const urdf::JointConstSharedPtr& urdf_joint,
                                                                march::PdoInterfacePtr pdo_interface,
@@ -105,6 +110,7 @@ public:
   static const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS;
   static const std::vector<std::string> POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS;
   static const std::vector<std::string> JOINT_REQUIRED_KEYS;
+  static const std::vector<std::string> MOTOR_CONTROLLER_REQUIRED_KEYS;
   static const std::vector<std::string> PRESSURE_SOLE_REQUIRED_KEYS;
 
 

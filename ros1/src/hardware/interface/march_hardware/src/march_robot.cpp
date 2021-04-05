@@ -104,9 +104,9 @@ int MarchRobot::getMaxSlaveIndex()
   {
     if (joint.hasTemperatureGES())
     {
-      maxSlaveIndex = std::max(joint.getTemperatureGES()->getSlaveIndex(), maxSlaveIndex);
+      maxSlaveIndex = std::max((int) joint.getTemperatureGES()->getSlaveIndex(), maxSlaveIndex);
     }
-    maxSlaveIndex = std::max(joint.getMotorController()->getSlaveIndex(), maxSlaveIndex);
+    maxSlaveIndex = std::max((int) joint.getMotorController()->getSlaveIndex(), maxSlaveIndex);
   }
   return maxSlaveIndex;
 }

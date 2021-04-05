@@ -25,11 +25,6 @@ IMotionCube::IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> ab
   : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode)
   , sw_string_("empty")
 {
-  if (this->absolute_encoder_ == nullptr || this->incremental_encoder_ == nullptr)
-  {
-    throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
-                                   "An IMotionCube needs both an incremental and an absolute encoder");
-  }
 }
 
 IMotionCube::IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
@@ -115,10 +110,10 @@ bool IMotionCube::writeInitialSettings(SdoSlaveInterface& sdo, int cycle_time)
   int mode_of_op = sdo.write(0x6060, 0, getActuationModeNumber());
 
   // position limit -- min position
-  int min_pos_lim = sdo.write(0x607D, 1, this->absolute_encoder_->getLowerSoftLimitIU());
+  int min_pos_lim = sdo.write(0x607D, 1, this->getAbsoluteEncoder()->getLowerSoftLimitIU());
 
   // position limit -- max position
-  int max_pos_lim = sdo.write(0x607D, 2, this->absolute_encoder_->getUpperSoftLimitIU());
+  int max_pos_lim = sdo.write(0x607D, 2, this->getAbsoluteEncoder()->getUpperSoftLimitIU());
 
   // Quick stop option
   int stop_opt = sdo.write<int16_t>(0x605A, 0, 6);
@@ -161,17 +156,17 @@ void IMotionCube::actuateRadians(float target_position)
                                    "Target %f exceeds max difference of %f from current %f for slave %d", target_position,
                                    MAX_TARGET_DIFFERENCE, this->getAbsolutePosition(), this->getSlaveIndex());
   }
-  this->actuateIU(this->absolute_encoder_->toIU(target_position, true));
+  this->actuateIU(this->getAbsoluteEncoder()->toIU(target_position, true));
 }
 
 void IMotionCube::actuateIU(int32_t target_iu)
 {
-  if (!this->absolute_encoder_->isValidTargetIU(this->getAbsolutePositionIU(), target_iu))
+  if (!this->getAbsoluteEncoder()->isValidTargetIU(this->getAbsolutePositionIU(), target_iu))
   {
     throw error::HardwareException(error::ErrorType::INVALID_ACTUATE_POSITION,
                                    "Position %d is invalid for slave %d. (%d, %d)", target_iu, this->getSlaveIndex(),
-                                   this->absolute_encoder_->getLowerSoftLimitIU(),
-                                   this->absolute_encoder_->getUpperSoftLimitIU());
+                                   this->getAbsoluteEncoder()->getLowerSoftLimitIU(),
+                                   this->getAbsoluteEncoder()->getUpperSoftLimitIU());
   }
 
   bit32 target_position = { .i = target_iu };
@@ -345,13 +340,13 @@ void IMotionCube::prepareActuation()
                                    "Encoder of IMotionCube with slave index %d has reset. Read angle %d IU",
                                    this->getSlaveIndex(), angle);
   }
-  else if (!this->absolute_encoder_->isWithinHardLimitsIU(angle))
+  else if (!this->getAbsoluteEncoder()->isWithinHardLimitsIU(angle))
   {
     throw error::HardwareException(error::ErrorType::OUTSIDE_HARD_LIMITS,
                                    "Joint with slave index %d is outside hard limits (read value %d IU, limits from %d "
                                    "IU to %d IU)",
-                                   this->getSlaveIndex(), angle, this->absolute_encoder_->getLowerHardLimitIU(),
-                                   this->absolute_encoder_->getUpperHardLimitIU());
+                                   this->getSlaveIndex(), angle, this->getAbsoluteEncoder()->getLowerHardLimitIU(),
+                                   this->getAbsoluteEncoder()->getUpperHardLimitIU());
   }
 
   if (this->actuation_mode_ == ActuationMode::position)
@@ -518,22 +513,22 @@ std::unique_ptr<MotorControllerState> IMotionCube::getState()
 
 float IMotionCube::getAbsolutePosition()
 {
-  return absolute_encoder_->toRadians(getAbsolutePositionIU(), true);
+  return this->getAbsoluteEncoder()->toRadians(getAbsolutePositionIU(), true);
 }
 
 float IMotionCube::getIncrementalPosition()
 {
-  return incremental_encoder_->toRadians(getIncrementalPositionIU(), true);
+  return this->getIncrementalEncoder()->toRadians(getIncrementalPositionIU(), true);
 }
 
 float IMotionCube::getAbsoluteVelocity()
 {
-  return absolute_encoder_->toRadians(getAbsoluteVelocityIU(), false);
+  return this->getAbsoluteEncoder()->toRadians(getAbsoluteVelocityIU(), false);
 }
 
 float IMotionCube::getIncrementalVelocity()
 {
-  return incremental_encoder_->toRadians(getIncrementalVelocityIU(), false);
+  return this->getIncrementalEncoder()->toRadians(getIncrementalVelocityIU(), false);
 }
 
 }  // namespace march

@@ -26,18 +26,19 @@ const std::vector<std::string> HardwareBuilder::ABSOLUTE_ENCODER_REQUIRED_KEYS =
 const std::vector<std::string> HardwareBuilder::INCREMENTAL_ENCODER_REQUIRED_KEYS = { "resolution", "transmission" };
 const std::vector<std::string> HardwareBuilder::IMOTIONCUBE_REQUIRED_KEYS =
     {
-        "slaveIndex", "incrementalEncoder", "absoluteEncoder"
+        "incrementalEncoder", "absoluteEncoder"
     };
 const std::vector<std::string> HardwareBuilder::ODRIVE_REQUIRED_KEYS =
     {
-        "slaveIndex", "axis", "absoluteEncoder"
+        "axis", "absoluteEncoder"
     };
 const std::vector<std::string> HardwareBuilder::TEMPERATUREGES_REQUIRED_KEYS = { "slaveIndex", "byteOffset" };
 const std::vector<std::string> HardwareBuilder::POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS =
     {
         "slaveIndex", "bootShutdownOffsets", "netMonitorByteOffsets", "netDriverByteOffsets"
     };
-const std::vector<std::string> HardwareBuilder::JOINT_REQUIRED_KEYS = { "allowActuation" };
+const std::vector<std::string> HardwareBuilder::JOINT_REQUIRED_KEYS = { "allowActuation", "motor_controller" };
+const std::vector<std::string> HardwareBuilder::MOTOR_CONTROLLER_REQUIRED_KEYS = { "slaveIndex", "type" };
 const std::vector<std::string> HardwareBuilder::PRESSURE_SOLE_REQUIRED_KEYS = { "slaveIndex", "byteOffset", "side" };
 // clang-format on
 
@@ -114,19 +115,7 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const 
     mode = march::ActuationMode(joint_config["actuationMode"].as<std::string>());
   }
 
-  std::unique_ptr<march::MotorController> motor_controller;
-  if (joint_config["imotioncube"])
-  {
-    motor_controller = HardwareBuilder::createIMotionCube(joint_config["imotioncube"], mode, urdf_joint, pdo_interface, sdo_interface);
-  }
-  else if (joint_config["odrive"])
-  {
-    motor_controller = HardwareBuilder::createODrive(joint_config["odrive"], mode, urdf_joint, pdo_interface, sdo_interface);
-  }
-  if (!motor_controller)
-  {
-    throw MissingKeyException("imotioncube or odrive", "joint");
-  }
+  auto motor_controller = HardwareBuilder::createMotorController(joint_config["motor_controller"], mode, urdf_joint, pdo_interface, sdo_interface);
 
   auto ges = HardwareBuilder::createTemperatureGES(joint_config["temperatureges"], pdo_interface, sdo_interface);
   if (!ges)
@@ -134,6 +123,31 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const 
     ROS_WARN("Joint %s does not have a configuration for a TemperatureGes", joint_name.c_str());
   }
   return { joint_name, net_number, allow_actuation, std::move(motor_controller), std::move(ges) };
+}
+
+std::unique_ptr<march::MotorController> HardwareBuilder::createMotorController(const YAML::Node& config,
+                                                                               march::ActuationMode mode,
+                                                                               const urdf::JointConstSharedPtr& urdf_joint,
+                                                                               march::PdoInterfacePtr pdo_interface,
+                                                                               march::SdoInterfacePtr sdo_interface)
+{
+  HardwareBuilder::validateRequiredKeysExist(config, HardwareBuilder::MOTOR_CONTROLLER_REQUIRED_KEYS, "motor_controller");
+
+  std::unique_ptr<march::MotorController> motor_controller;
+  std::string type = config["type"].as<std::string>();
+  if (type == "imotioncube")
+  {
+    motor_controller = createIMotionCube(config, mode, urdf_joint, pdo_interface, sdo_interface);
+  }
+  else if (type == "odrive")
+  {
+    motor_controller = createODrive(config, mode, urdf_joint, pdo_interface, sdo_interface);
+  }
+  else
+  {
+    throw march::error::HardwareException(march::error::ErrorType::INVALID_MOTOR_CONTROLLER, "Motorcontroller %s not valid", type);
+  }
+  return motor_controller;
 }
 
 std::unique_ptr<march::IMotionCube> HardwareBuilder::createIMotionCube(const YAML::Node& imc_config,

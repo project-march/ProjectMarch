@@ -8,11 +8,13 @@
 #include <memory>
 namespace march
 {
-MotorController::MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                                 std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode)
+MotorController::MotorController(const Slave& slave,
+                                 std::optional<std::unique_ptr<AbsoluteEncoder>> absolute_encoder,
+                                 std::optional<std::unique_ptr<IncrementalEncoder>> incremental_encoder,
+                                 ActuationMode actuation_mode)
   : Slave(slave), actuation_mode_(actuation_mode)
 {
-  if (incremental_encoder == nullptr && absolute_encoder_ == nullptr)
+  if (!incremental_encoder.has_value() && !absolute_encoder_.has_value())
   {
     throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "A MotorController needs at least an incremental or an absolute encoder");
   }
@@ -22,6 +24,28 @@ MotorController::MotorController(const Slave& slave, std::unique_ptr<AbsoluteEnc
     incremental_encoder_ = std::move(incremental_encoder);
   }
 }
+
+MotorController::MotorController(const Slave& slave,
+                std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+                std::unique_ptr<IncrementalEncoder> incremental_encoder,
+                ActuationMode actuation_mode)
+  : MotorController(slave, std::optional<std::unique_ptr<AbsoluteEncoder>>{std::move(absolute_encoder)},
+                    std::optional<std::unique_ptr<IncrementalEncoder>>{std::move(incremental_encoder)}, actuation_mode)
+{}
+
+MotorController::MotorController(const Slave& slave,
+                std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+                ActuationMode actuation_mode)
+  : MotorController(slave, std::optional<std::unique_ptr<AbsoluteEncoder>>{std::move(absolute_encoder)},
+                    std::nullopt, actuation_mode)
+{}
+
+MotorController::MotorController(const Slave& slave,
+                std::unique_ptr<IncrementalEncoder> incremental_encoder,
+                ActuationMode actuation_mode)
+  : MotorController(slave, std::nullopt,
+                    std::optional<std::unique_ptr<IncrementalEncoder>>{std::move(incremental_encoder)}, actuation_mode)
+{}
 
 bool MotorController::isIncrementalEncoderMorePrecise() const
 {
@@ -33,7 +57,7 @@ bool MotorController::isIncrementalEncoderMorePrecise() const
   {
     return true;
   }
-  return incremental_encoder_->getRadiansPerBit() < absolute_encoder_->getRadiansPerBit();
+  return incremental_encoder_.value()->getRadiansPerBit() < absolute_encoder_.value()->getRadiansPerBit();
 }
 
 float MotorController::getPosition()
@@ -110,22 +134,30 @@ void MotorController::setActuationMode(ActuationMode actuation_mode)
 
 bool MotorController::hasAbsoluteEncoder() const
 {
-  return absolute_encoder_ != nullptr;
+  return absolute_encoder_.has_value();
 }
 
 bool MotorController::hasIncrementalEncoder() const
 {
-  return incremental_encoder_ != nullptr;
+  return incremental_encoder_.has_value();
 }
 
 std::unique_ptr<AbsoluteEncoder>& MotorController::getAbsoluteEncoder()
 {
-  return absolute_encoder_;
+  if (!hasAbsoluteEncoder())
+  {
+    throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "Cannot get absolute encoder");
+  }
+  return absolute_encoder_.value();
 }
 
 std::unique_ptr<IncrementalEncoder>& MotorController::getIncrementalEncoder()
 {
-  return incremental_encoder_;
+  if (!hasIncrementalEncoder())
+  {
+    throw error::HardwareException(error::ErrorType::MISSING_ENCODER, "Cannot get incremental encoder");
+  }
+  return incremental_encoder_.value();
 }
 
 void MotorController::actuate(float target)

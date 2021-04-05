@@ -21,22 +21,10 @@
 
 namespace march
 {
-ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-               std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode)
-  : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode)
+ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder, ActuationMode actuation_mode)
+  : MotorController(slave, std::move(absolute_encoder), actuation_mode)
   , axis_(axis)
-{
-  if (this->absolute_encoder_ == nullptr)
-  {
-    throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
-                                   "An ODrive needs an absolute encoder");
-  }
-};
-
-ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-               ActuationMode actuation_mode)
-    : ODrive(slave, axis, std::move(absolute_encoder), nullptr, actuation_mode)
-{};
+{}
 
 void ODrive::prepareActuation()
 {
@@ -114,12 +102,12 @@ float ODrive::getAbsoluteVelocityIU()
 
 float ODrive::getAbsolutePosition()
 {
-  return absolute_encoder_->toRadians(getAbsolutePositionIU(), true);
+  return this->getAbsoluteEncoder()->toRadians(getAbsolutePositionIU(), true);
 }
 
 float ODrive::getAbsoluteVelocity()
 {
-  return absolute_encoder_->toRadians(getAbsoluteVelocityIU(), false);
+  return this->getAbsoluteEncoder()->toRadians(getAbsoluteVelocityIU(), false);
 }
 
 uint32_t ODrive::getAxisError()

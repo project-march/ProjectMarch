@@ -9,14 +9,27 @@
 #include "march_hardware/ethercat/slave.h"
 #include <string>
 #include <memory>
+#include <optional>
 
 namespace march
 {
 class MotorController : public Slave
 {
 public:
-  MotorController(const Slave& slave, std::unique_ptr<AbsoluteEncoder> absolute_encoder,
-                  std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
+  MotorController(const Slave& slave,
+                  std::optional<std::unique_ptr<AbsoluteEncoder>> absolute_encoder,
+                  std::optional<std::unique_ptr<IncrementalEncoder>> incremental_encoder,
+                  ActuationMode actuation_mode);
+  MotorController(const Slave& slave,
+                  std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+                  std::unique_ptr<IncrementalEncoder> incremental_encoder,
+                  ActuationMode actuation_mode);
+  MotorController(const Slave& slave,
+                  std::unique_ptr<AbsoluteEncoder> absolute_encoder,
+                  ActuationMode actuation_mode);
+  MotorController(const Slave& slave,
+                  std::unique_ptr<IncrementalEncoder> incremental_encoder,
+                  ActuationMode actuation_mode);
 
   // Get the most precise position or velocity
   float getPosition();
@@ -74,10 +87,18 @@ public:
   // Override stream operator for clean printing
   friend std::ostream& operator<<(std::ostream& os, const MotorController& motor_controller)
   {
-    return os << "slaveIndex: " << motor_controller.getSlaveIndex() << ", "
-              << "incrementalEncoder: " << *motor_controller.incremental_encoder_ << ", "
-              << "absoluteEncoder: " << *motor_controller.absolute_encoder_
-              << "actuationMode" << motor_controller.actuation_mode_.toString();
+    os << "slave index: " << motor_controller.getSlaveIndex();
+
+    if (motor_controller.hasAbsoluteEncoder())
+    {
+      os << ", absolute encoder: " << *motor_controller.absolute_encoder_.value();
+    }
+    if (motor_controller.hasIncrementalEncoder())
+    {
+      os << ", incremental encoder: " << *motor_controller.incremental_encoder_.value();
+    }
+    os << ", actuation mode" << motor_controller.actuation_mode_.toString();
+    return os;
   }
 
   // Watchdog base time = 1 / 25 MHz * (2498 + 2) = 0.0001 seconds=100 µs
@@ -95,8 +116,8 @@ protected:
 
   // A MotorController doesn't necessarily have an AbsoluteEncoder and an IncrementalEncoder, but will have
   // at least one of the two
-  std::unique_ptr<AbsoluteEncoder> absolute_encoder_ = nullptr;
-  std::unique_ptr<IncrementalEncoder> incremental_encoder_ = nullptr;
+  std::optional<std::unique_ptr<AbsoluteEncoder>> absolute_encoder_ = std::nullopt;
+  std::optional<std::unique_ptr<IncrementalEncoder>> incremental_encoder_ = std::nullopt;
   ActuationMode actuation_mode_;
 };
 
