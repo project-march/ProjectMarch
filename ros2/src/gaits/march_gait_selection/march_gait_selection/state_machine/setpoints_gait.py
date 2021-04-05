@@ -22,8 +22,11 @@ class SetpointsGait(GaitInterface, Gait):
         self._should_stop = False
         self._transition_to_subgait = None
         self._is_transitioning = False
+
         self._start_time = None
         self._end_time = None
+        self._current_time = None
+
         self._scheduled_early = False
 
     @property
@@ -76,14 +79,13 @@ class SetpointsGait(GaitInterface, Gait):
         time and generates the first trajectory command.
         :return: A TrajectoryCommand message with the trajectory of the first subgait.
         """
+        self._current_time = current_time
         self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
         self._should_stop = False
         self._transition_to_subgait = None
         self._is_transitioning = False
         self._scheduled_early = False
-        self._update_time_stamps(
-            current_time, self._current_subgait, self._current_subgait
-        )
+        self._update_time_stamps(self._current_subgait)
         return self._command_from_current_subgait()
 
     def update(
@@ -98,21 +100,21 @@ class SetpointsGait(GaitInterface, Gait):
         the end time, then schedule a new subgait early.
         Else return nothing.
         :param current_time: Current time
+        :param early_schedule_duration: Optional duration to schedule early
         :return: optional trajectory_command, is_finished
         """
-        if current_time >= self._end_time:
-            return self._update_next_subgait(current_time)
+        self._current_time = current_time
+        if self._current_time >= self._end_time:
+            return self._update_next_subgait()
         if (
             early_schedule_duration is not None
             and not self._scheduled_early
-            and current_time >= self._end_time - early_schedule_duration
+            and self._current_time >= self._end_time - early_schedule_duration
         ):
             return self._update_next_subgait_early(), False
         return None, False
 
-    def _update_next_subgait(
-        self, current_time: Time
-    ) -> Tuple[Optional[TrajectoryCommand], bool]:
+    def _update_next_subgait(self) -> Tuple[Optional[TrajectoryCommand], bool]:
         """Update the next subgait.
 
         Behaves differently based on whether a new subgait has been scheduled early.
@@ -125,7 +127,6 @@ class SetpointsGait(GaitInterface, Gait):
         If a new subgait hasn't been scheduled early, this function also returns a
         TrajectoryCommand.
 
-        :param current_time: Current time
         :return: optional trajectory_command, is_finished
         """
         if self._transition_to_subgait is not None and not self._is_transitioning:
@@ -145,7 +146,7 @@ class SetpointsGait(GaitInterface, Gait):
             return None, True
 
         # Update subgait and timestamps
-        self._update_time_stamps(current_time, self._current_subgait, next_subgait)
+        self._update_time_stamps(next_subgait)
         self._current_subgait = next_subgait
 
         # Schedule the next subgait if we haven't already scheduled early
@@ -169,7 +170,6 @@ class SetpointsGait(GaitInterface, Gait):
         Instead we only send a schedule command and let self._update_next_subgait()
         deal with clean up after the previous subgait has actually finished.
 
-        :param current_time: Current time
         :return: optional trajectory_command
         """
         self._scheduled_early = True
@@ -209,7 +209,7 @@ class SetpointsGait(GaitInterface, Gait):
             next_subgait = self.subgaits[next_subgait_name]
         return next_subgait
 
-    def transition(self, transition_request):
+    def transition(self, transition_request) -> bool:
         """
         Request to transition between two subgaits with increasing or decreasing
         size of the step.
@@ -236,7 +236,7 @@ class SetpointsGait(GaitInterface, Gait):
             return True
         return False
 
-    def stop(self):
+    def stop(self) -> bool:
         """Called when the current gait should be stopped. Return a boolean
         for whether the stopping was succesfull."""
         if (
@@ -287,24 +287,20 @@ class SetpointsGait(GaitInterface, Gait):
             "{s}_transition".format(s=self._transition_to_subgait.subgait_name),
         )
 
-    def _command_from_current_subgait(self):
+    def _command_from_current_subgait(self) -> TrajectoryCommand:
+        """Construct a TrajectoryCommand from the current subgait.
+
+        :return Returns a TrajectoryCommand with the current subgait and start time.
+        """
         return TrajectoryCommand.from_subgait(self._current_subgait, self._start_time)
 
-    def _update_end_time(self):
-        self._end_time = self._start_time + self._current_subgait.duration
+    def _update_time_stamps(self, next_subgait: Subgait):
+        """Update the starting and end time.
 
-    def _update_time_stamps(
-        self, current_time: Time, previous_subgait: Subgait, next_subgait: Subgait
-    ):
+        :param next_subgait: Next subgait to be scheduled
         """
-        Update the starting time and end time.
-        :param current_time:
-        :param previous_subgait:
-        :param next_subgait:
-        :return:
-        """
-        if not self._scheduled_early:
-            self._start_time = current_time
+        if not self._scheduled_early or self._end_time is None:
+            self._start_time = self._current_time
         else:
-            self._start_time += previous_subgait.duration
+            self._start_time = self._end_time
         self._end_time = self._start_time + next_subgait.duration

@@ -1,7 +1,11 @@
 from copy import deepcopy
+from typing import Optional, Tuple
+
 from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
+from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.gait.subgait import Subgait
 from march_utility.utilities.duration import Duration
+from rclpy.time import Time
 
 SHOULD_NOT_FREEZE_FIRST_SECS = Duration(seconds=0.3)
 
@@ -25,12 +29,20 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         therefore not possible during the first second of the subgait, to
         prevent accidental freezing."""
         if (
-            self._time_since_start < SHOULD_NOT_FREEZE_FIRST_SECS
+            self.elapsed_time < SHOULD_NOT_FREEZE_FIRST_SECS
             or self._should_freeze
             or self._is_frozen
         ):
             return False
         return True
+
+    @property
+    def can_be_scheduled_early(self) -> bool:
+        return False
+
+    @property
+    def elapsed_time(self) -> Duration:
+        return Duration.from_ros_duration(self._current_time - self._start_time)
 
     def freeze(self, duration: Duration = Duration(seconds=3)):
         """
@@ -43,36 +55,29 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             self._should_freeze = True
             self._freeze_duration = duration
 
-    def update(self, elapsed_time: Duration):
+    def update(self, current_time: Time, *_) -> Tuple[Optional[TrajectoryCommand], bool]:
         """
         Update the progress of the gait, should be called regularly.
         If the current subgait is still running, this does nothing.
         If the gait should be stopped, this will be done
         If the current subgait is done, it will start the next subgait
-        :param elapsed_time:
-        :return: trjectory, is_finished
+        :param current_time: Current time
+        :return: optional trajectory_command, is_finished
         """
-        self._time_since_start += elapsed_time
+        self._current_time = current_time
         if self._should_freeze:
-            trajectory = self._execute_freeze()
-            self._time_since_start = Duration(
-                0
-            )  # New subgait is started, so reset the time
-            return trajectory, False
+            return self._execute_freeze(), False
 
         # If the current subgait is not finished, no new trajectory is necessary
-        if self._time_since_start < self._current_subgait.duration:
+        if current_time < self._end_time:
             return None, False
 
         # If the subgait is finished and it was frozen, execute the subgait after freeze
         if self._is_frozen:
             self._current_subgait = self._subgait_after_freeze
-            trajectory = self._current_subgait.to_joint_trajectory_msg()
-            self._time_since_start = Duration(
-                0
-            )  # New subgait is started, so reset the time
             self._is_frozen = False
-            return trajectory, False
+            self._update_time_stamps(self._current_subgait)
+            return self._command_from_current_subgait()
 
         return self._update_next_subgait()
 
@@ -84,28 +89,29 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         original subgait after the freeze.
         :return:
         """
-        self._freeze_position = self._position_after_time(self._time_since_start)
+        self._freeze_position = self._position_after_time()
         self._previous_subgait = self._current_subgait.subgait_name
         self._subgait_after_freeze = self.subgait_after_freeze()
         self._current_subgait = self._freeze_subgait()
         self._should_freeze = False
         self._is_frozen = True
-        return self._current_subgait.to_joint_trajectory_msg()
+        self._update_time_stamps(self._current_subgait)
+        return self._command_from_current_subgait()
 
     def subgait_after_freeze(self):
         """
         Generates the subgait that should be executed after the freezing.
         :return: The subgait to execute after the freeze
         """
-        if self._time_since_start < self._current_subgait.duration:
+        if self._current_time < self._end_time:
             # The subgait after freeze is a copy of the current gait from
             # the current time point
             subgait_after_freeze = deepcopy(self._current_subgait)
             for joint in subgait_after_freeze:
                 joint.from_begin_point(
-                    self._time_since_start, self._freeze_position[joint.name]
+                    self.elapsed_time, self._freeze_position[joint.name]
                 )
-            subgait_after_freeze.duration -= self._time_since_start
+            subgait_after_freeze.duration -= self.elapsed_time
             subgait_after_freeze.subgait_name = "freeze_subgait_after"
             # Add the subgait after the freeze to the subgait graph
             self.graph.graph[subgait_after_freeze.subgait_name] = {
@@ -154,14 +160,13 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             version="Only version, generated from code",
         )
 
-    def _position_after_time(self, elapsed_time: Duration):
+    def _position_after_time(self):
         """
-        The position that the exoskeleton should be in after a certain elapsed
+        The position that the exoskeleton should be in after the elapsed
         time of the current subgait.
-        :param elapsed_time: The time since the start of the subgait in secs.
         :return: dict with joints and joint positions
         """
         return {
-            joint.name: joint.get_interpolated_setpoint(elapsed_time).position
+            joint.name: joint.get_interpolated_setpoint(self.elapsed_time).position
             for joint in self._current_subgait
         }
