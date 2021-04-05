@@ -135,11 +135,16 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
   }
   else if (selected_obstacle_ == SelectedGait::ramp_down)
   {
-    optimal_foot_location = linear_algebra_utilities::projectPointToLine(
-        optimal_foot_location, executable_locations_line_coefficients);
+    pcl::PointXYZ projected_optimal_foot_location =
+        linear_algebra_utilities::projectPointToLine(
+            optimal_foot_location, executable_locations_line_coefficients_);
+    optimal_foot_location.x = projected_optimal_foot_location.x;
+    optimal_foot_location.y = projected_optimal_foot_location.y;
+    optimal_foot_location.z = projected_optimal_foot_location.z;
 
-    if ((optimal_foot_location.x - x_flat) / (x_steep - x_flat) ==
-        (optimal_foot_location.z - z_flat) / (z_steep - z_flat))
+    double allowable_error = 0.01;
+    if ((optimal_foot_location.x - x_flat) / (x_steep - x_flat) -
+        (optimal_foot_location.z - z_flat) / (z_steep - z_flat) < allowable_error)
     {
       gait_parameters_->step_size_parameter =
           (optimal_foot_location.x - x_flat) / (x_steep - x_flat);
@@ -211,17 +216,15 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
 bool HullParameterDeterminer::getExecutableLocationsLine()
 {
   // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t + ([3], [4], [5])^T
-  executable_locations_line_coefficients->values.resize(6);
+  executable_locations_line_coefficients_->values.resize(6);
 
-  pcl::PointXYZ direction_vector;
-  executable_locations_line_coefficients->values[0]  = x_flat - x_steep;
-  executable_locations_line_coefficients->values[1]  = 0;
-  executable_locations_line_coefficients->values[2]  = z_flat - z_steep;
+  executable_locations_line_coefficients_->values[0]  = x_flat - x_steep;
+  executable_locations_line_coefficients_->values[1]  = 0;
+  executable_locations_line_coefficients_->values[2]  = z_flat - z_steep;
 
-  pcl::PointXYZ position_vector;
-  executable_locations_line_coefficients->values[3] = x_steep;
-  executable_locations_line_coefficients->values[4] = 0;
-  executable_locations_line_coefficients->values[5] = z_steep;
+  executable_locations_line_coefficients_->values[3] = x_steep;
+  executable_locations_line_coefficients_->values[4] = 0;
+  executable_locations_line_coefficients_->values[5] = z_steep;
 
   return true;
 }
@@ -259,6 +262,9 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation()
   }
   if (min_distance_to_object != std::numeric_limits<double>::max())
   {
+    ROS_DEBUG_STREAM("The optimal foot location is "
+                     << min_distance_to_object
+                     << " removed from its ideal location");
     return success;
   }
   else
@@ -285,7 +291,7 @@ bool HullParameterDeterminer::getDistanceToObject(
   {
     // For the ramp find which point is closest to the possible locations line
     distance = linear_algebra_utilities::distancePointToLine(
-        possible_foot_location, executable_locations_line_coefficients);
+        possible_foot_location, executable_locations_line_coefficients_);
   }
   else
   {
@@ -293,6 +299,7 @@ bool HullParameterDeterminer::getDistanceToObject(
                      "for selected obstacle " << selected_obstacle_);
     return false;
   }
+
   return true;
 }
 
@@ -316,7 +323,7 @@ bool HullParameterDeterminer::isValidLocation(pcl::PointNormal possible_foot_loc
   }
   else
   {
-    ROS_ERROR_STREAM("optimalLocationIsValid method has not been implemented for obstacle " << selected_obstacle_ <<
+    ROS_ERROR_STREAM("isValidLocation method has not been implemented for obstacle " << selected_obstacle_ <<
                      ". Returning false.");
     return false;
   }

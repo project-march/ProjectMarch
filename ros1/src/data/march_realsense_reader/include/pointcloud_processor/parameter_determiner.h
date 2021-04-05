@@ -138,7 +138,8 @@ protected:
   SelectedGait selected_obstacle_;
   pcl::PointXYZ most_desirable_foot_location_;
   // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t  + ([3], [4], [5])^T
-  LineCoefficients::Ptr executable_locations_line_coefficients;
+  LineCoefficients::Ptr executable_locations_line_coefficients_ =
+      boost::make_shared<LineCoefficients>();
 };
 
 /** The simple parameter determiner

@@ -37,8 +37,14 @@ namespace linear_algebra_utilities
 
   // Project a point to a line
   template<typename T>
-  T projectPointToLine(T point, pcl::ModelCoefficients::Ptr line_coefficients)
+  pcl::PointXYZ projectPointToLine(T point, pcl::ModelCoefficients::Ptr line_coefficients)
   {
+    // The calculations only with pointXYZ types as pcl does the calculations
+    pcl::PointXYZ point_to_project;
+    point_to_project.x = point.x;
+    point_to_project.y = point.y;
+    point_to_project.z = point.z;
+
     // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t  + ([3], [4], [5])^T
     pcl::PointXYZ direction;
     direction.x = line_coefficients->values[0];
@@ -51,11 +57,13 @@ namespace linear_algebra_utilities
     position.z = line_coefficients->values[5];
 
     // Compute the projected point using dot products
-    T projected_point;
+    pcl::PointXYZ projected_point;
     projected_point.getArray3fMap() =
-        (point.getArray3fMap() - position.getArray3fMap()) * direction.getArray3fMap()
-        / (point.getArray3fMap() - position.getArray3fMap()) * (point.getArray3fMap() - position.getArray3fMap())
-        * direction.getArray3fMap() + position.getArray3fMap();
+        (((point_to_project.getArray3fMap() - position.getArray3fMap()) * direction.getArray3fMap()).sum() /
+          (direction.getArray3fMap() * direction.getArray3fMap()).sum()) *
+           direction.getArray3fMap() + position.getArray3fMap();
+
+    ROS_WARN_STREAM("The projected point is " << projected_point);
 
     return projected_point;
   }
@@ -64,8 +72,8 @@ namespace linear_algebra_utilities
   template<typename T>
   double distancePointToLine(T point, pcl::ModelCoefficients::Ptr line_coefficients)
   {
-    T projected_point = projectPointToLine<T>(point, line_coefficients);
-    return distanceBetweenPoints<T, T>(point, projected_point);
+    pcl::PointXYZ projected_point = projectPointToLine<T>(point, line_coefficients);
+    return distanceBetweenPoints<T, pcl::PointXYZ>(point, projected_point);
   }
 }
 
