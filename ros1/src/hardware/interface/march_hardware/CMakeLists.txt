@@ -49,7 +49,8 @@ add_library(${PROJECT_NAME}
     include/${PROJECT_NAME}/error/motor_controller_error.h
     include/${PROJECT_NAME}/ethercat/ethercat_master.h
     include/${PROJECT_NAME}/ethercat/pdo_interface.h
-    include/${PROJECT_NAME}/ethercat/pdo_map.h
+    include/${PROJECT_NAME}/ethercat/imotioncube_pdo_map.h
+    include/${PROJECT_NAME}/ethercat/odrive_pdo_map.h
     include/${PROJECT_NAME}/ethercat/pdo_types.h
     include/${PROJECT_NAME}/ethercat/sdo_interface.h
     include/${PROJECT_NAME}/ethercat/slave.h
@@ -79,7 +80,8 @@ add_library(${PROJECT_NAME}
     src/error/motor_controller_error.cpp
     src/ethercat/ethercat_master.cpp
     src/ethercat/pdo_interface.cpp
-    src/ethercat/pdo_map.cpp
+    src/ethercat/imotioncube_pdo_map.cpp
+    src/ethercat/odrive_pdo_map.cpp
     src/ethercat/sdo_interface.cpp
     src/motor_controller/imotioncube/imotioncube.cpp
     src/motor_controller/odrive/odrive.cpp
@@ -124,8 +126,8 @@ if(CATKIN_ENABLE_TESTING)
         test/encoder/encoder_test.cpp
         test/encoder/incremental_encoder_test.cpp
         test/error/hardware_exception_test.cpp
-            test/error/motor_controller_error_test.cpp
-        test/ethercat/pdo_map_test.cpp
+        test/error/motor_controller_error_test.cpp
+        test/ethercat/imotioncube_pdo_map_test.cpp
         test/ethercat/slave_test.cpp
         test/imotioncube/imotioncube_test.cpp
         test/joint_test.cpp

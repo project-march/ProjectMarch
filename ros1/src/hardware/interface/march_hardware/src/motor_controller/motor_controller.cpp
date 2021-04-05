@@ -36,7 +36,7 @@ bool MotorController::isIncrementalEncoderMorePrecise() const
   return incremental_encoder_->getRadiansPerBit() < absolute_encoder_->getRadiansPerBit();
 }
 
-double MotorController::getPosition()
+float MotorController::getPosition()
 {
   if (isIncrementalEncoderMorePrecise())
   {
@@ -45,7 +45,7 @@ double MotorController::getPosition()
   return getAbsolutePosition();
 }
 
-double MotorController::getPosition(bool absolute)
+float MotorController::getPosition(bool absolute)
 {
   if (absolute)
   {
@@ -67,7 +67,7 @@ double MotorController::getPosition(bool absolute)
   }
 }
 
-double MotorController::getVelocity()
+float MotorController::getVelocity()
 {
   if (isIncrementalEncoderMorePrecise())
   {
@@ -76,7 +76,7 @@ double MotorController::getVelocity()
   return getAbsoluteVelocity();
 }
 
-double MotorController::getVelocity(bool absolute)
+float MotorController::getVelocity(bool absolute)
 {
   if (absolute)
   {
@@ -128,7 +128,7 @@ std::unique_ptr<IncrementalEncoder>& MotorController::getIncrementalEncoder()
   return incremental_encoder_;
 }
 
-void MotorController::actuate(double target)
+void MotorController::actuate(float target)
 {
   if (actuation_mode_ == march::ActuationMode::position)
   {

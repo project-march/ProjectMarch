@@ -146,7 +146,7 @@ bool IMotionCube::writeInitialSettings(SdoSlaveInterface& sdo, int cycle_time)
   return false;
 }
 
-void IMotionCube::actuateRadians(double target_position)
+void IMotionCube::actuateRadians(float target_position)
 {
   if (this->actuation_mode_ != ActuationMode::position)
   {
@@ -181,7 +181,7 @@ void IMotionCube::actuateIU(int32_t target_iu)
   this->write32(target_position_location, target_position);
 }
 
-void IMotionCube::actuateTorque(double target_torque)
+void IMotionCube::actuateTorque(float target_torque)
 {
   int16_t target_torque_iu = (int16_t) std::round(target_torque);
   if (this->actuation_mode_ != ActuationMode::torque)
@@ -231,13 +231,13 @@ int IMotionCube::getIncrementalPositionIU()
   return return_byte.i;
 }
 
-double IMotionCube::getAbsoluteVelocityIU()
+float IMotionCube::getAbsoluteVelocityIU()
 {
   bit32 return_byte = this->read32(this->miso_byte_offsets_.at(IMCObjectName::ActualVelocity));
   return return_byte.i / (TIME_PER_VELOCITY_SAMPLE * FIXED_POINT_TO_FLOAT_CONVERSION);
 }
 
-double IMotionCube::getIncrementalVelocityIU()
+float IMotionCube::getIncrementalVelocityIU()
 {
   bit32 return_byte = this->read32(this->miso_byte_offsets_.at(IMCObjectName::MotorVelocity));
   return return_byte.i / (TIME_PER_VELOCITY_SAMPLE * FIXED_POINT_TO_FLOAT_CONVERSION);
@@ -476,6 +476,7 @@ void IMotionCube::downloadSetupToDrive(SdoSlaveInterface& sdo)
 
 unsigned int IMotionCube::getActuationModeNumber() const
 {
+  /* These values were retrieved from the IMC manual, section 4.2.4 */
   switch(this->actuation_mode_.getValue())
   {
     case ActuationMode::position:
@@ -515,22 +516,22 @@ std::unique_ptr<MotorControllerState> IMotionCube::getState()
 }
 
 
-double IMotionCube::getAbsolutePosition()
+float IMotionCube::getAbsolutePosition()
 {
   return absolute_encoder_->toRadians(getAbsolutePositionIU(), true);
 }
 
-double IMotionCube::getIncrementalPosition()
+float IMotionCube::getIncrementalPosition()
 {
   return incremental_encoder_->toRadians(getIncrementalPositionIU(), true);
 }
 
-double IMotionCube::getAbsoluteVelocity()
+float IMotionCube::getAbsoluteVelocity()
 {
   return absolute_encoder_->toRadians(getAbsoluteVelocityIU(), false);
 }
 
-double IMotionCube::getIncrementalVelocity()
+float IMotionCube::getIncrementalVelocity()
 {
   return incremental_encoder_->toRadians(getIncrementalVelocityIU(), false);
 }

@@ -19,23 +19,23 @@ public:
                   std::unique_ptr<IncrementalEncoder> incremental_encoder, ActuationMode actuation_mode);
 
   // Get the most precise position or velocity
-  double getPosition();
-  double getVelocity();
+  float getPosition();
+  float getVelocity();
 
   // Get the position, either absolute or incremental
-  double getPosition(bool absolute);
-  double getVelocity(bool absolute);
+  float getPosition(bool absolute);
+  float getVelocity(bool absolute);
 
   // A MotorController should support both actuating by position (radians) or by torque
-  virtual void actuateRadians(double target_position) = 0;
-  virtual void actuateTorque(double target_effort) = 0;
+  virtual void actuateRadians(float target_position) = 0;
+  virtual void actuateTorque(float target_effort) = 0;
 
   // Getter and setter for the ActuationMode
   ActuationMode getActuationMode() const;
   void setActuationMode(ActuationMode actuation_mode);
 
   // Actuate based on the actuation mode of the motor controller
-  void actuate(double target);
+  void actuate(float target);
 
   // Prepare the MotorController for actuation, move it into its 'ready' state
   virtual void prepareActuation() = 0;
@@ -88,10 +88,10 @@ public:
 protected:
   // Getters for absolute and incremental position and velocity.
   // These will throw an error where the encoder is not available.
-  virtual double getAbsolutePosition() = 0;
-  virtual double getIncrementalPosition() = 0;
-  virtual double getAbsoluteVelocity() = 0;
-  virtual double getIncrementalVelocity() = 0;
+  virtual float getAbsolutePosition() = 0;
+  virtual float getIncrementalPosition() = 0;
+  virtual float getAbsoluteVelocity() = 0;
+  virtual float getIncrementalVelocity() = 0;
 
   // A MotorController doesn't necessarily have an AbsoluteEncoder and an IncrementalEncoder, but will have
   // at least one of the two

@@ -4,7 +4,7 @@
 #define MARCH_HARDWARE_IMOTIONCUBE_H
 #include "march_hardware/motor_controller/actuation_mode.h"
 #include "march_hardware/motor_controller/motor_controller.h"
-#include "march_hardware/ethercat/pdo_map.h"
+#include "march_hardware/ethercat/imotioncube_pdo_map.h"
 #include "march_hardware/ethercat/pdo_types.h"
 #include "march_hardware/ethercat/sdo_interface.h"
 #include "march_hardware/ethercat/slave.h"
@@ -21,6 +21,11 @@
 namespace march
 {
 class IMotionCube : public MotorController
+/* You will often find that the documentation references to the IMC Manual. This Manual can be found at
+ * https://technosoftmotion.com/wp-content/uploads/P091.025.iMOTIONCUBE.CAN_.CAT_.UM_-1.pdf
+ * Or if this link no longer works a copy can be found on the NAS:
+ * 'march/2020-2021/03 - Technical/Motorcontrollers/IMotionCube/P091.064.EtherCAT.iPOS.UM.pdf'
+ */
 {
 public:
   /**
@@ -42,8 +47,8 @@ public:
 
   // Override functions for actuating the IMotionCube
   void prepareActuation() override;
-  void actuateRadians(double target_position) override;
-  void actuateTorque(double target_torque) override;
+  void actuateRadians(float target_position) override;
+  void actuateTorque(float target_torque) override;
 
   // Transform the ActuationMode to a number that is understood by the IMotionCube
   unsigned int getActuationModeNumber() const override;
@@ -57,16 +62,16 @@ public:
   float getMotorControllerVoltage() override;
   float getMotorVoltage() override;
 
-  constexpr static double MAX_TARGET_DIFFERENCE = 0.393;
+  constexpr static float MAX_TARGET_DIFFERENCE = 0.393;
   // This value is slightly larger than the current limit of the
   // linear joints defined in the URDF.
   const static int16_t MAX_TARGET_TORQUE = 23500;
 
-  // Constant used for converting a fixed point 16.16 bit number to a double, which is done by dividing by 2^16
-  static constexpr double FIXED_POINT_TO_FLOAT_CONVERSION = 1 << 16;
+  // Constant used for converting a fixed point 16.16 bit number to a float, which is done by dividing by 2^16
+  static constexpr float FIXED_POINT_TO_FLOAT_CONVERSION = 1 << 16;
 
   // iMOTIONCUBE setting (slow loop sample period)
-  static constexpr double TIME_PER_VELOCITY_SAMPLE = 0.004;
+  static constexpr float TIME_PER_VELOCITY_SAMPLE = 0.004;
 
 protected:
   // Override protected functions from Slave class
@@ -74,10 +79,10 @@ protected:
   void reset(SdoSlaveInterface& sdo) override;
 
   // Override protected functions from MotorController class
-  double getAbsolutePosition() override;
-  double getIncrementalPosition() override;
-  double getAbsoluteVelocity() override;
-  double getIncrementalVelocity() override;
+  float getAbsolutePosition() override;
+  float getIncrementalPosition() override;
+  float getAbsoluteVelocity() override;
+  float getIncrementalVelocity() override;
 
 private:
   // Actuate position in Internal Units
@@ -90,8 +95,8 @@ private:
   // Getters for information about the state of the IMotionCube
   int32_t getAbsolutePositionIU();
   int32_t getIncrementalPositionIU();
-  double getAbsoluteVelocityIU();
-  double getIncrementalVelocityIU();
+  float getAbsoluteVelocityIU();
+  float getIncrementalVelocityIU();
   uint16_t getStatusWord();
   uint16_t getMotionError();
   uint16_t getDetailedError();

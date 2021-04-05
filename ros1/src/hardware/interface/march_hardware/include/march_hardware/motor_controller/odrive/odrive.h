@@ -5,7 +5,7 @@
 
 #include "march_hardware/motor_controller/actuation_mode.h"
 #include "march_hardware/motor_controller/motor_controller.h"
-#include "march_hardware/ethercat/pdo_map.h"
+#include "march_hardware/ethercat/odrive_pdo_map.h"
 #include "march_hardware/ethercat/pdo_types.h"
 #include "march_hardware/ethercat/sdo_interface.h"
 #include "march_hardware/ethercat/slave.h"
@@ -40,8 +40,8 @@ public:
 
   // Override functions for actuating the ODrive
   void prepareActuation() override;
-  void actuateTorque(double target_torque) override;
-  void actuateRadians(double target_position) override;
+  void actuateTorque(float target_torque) override;
+  void actuateRadians(float target_position) override;
 
   // Transform the ActuationMode to a number that is understood by the ODrive
   unsigned int getActuationModeNumber() const override;
@@ -61,10 +61,10 @@ protected:
   void reset(SdoSlaveInterface& sdo) override;
 
   // Override protected functions from MotorController class
-  double getAbsolutePosition() override;
-  double getIncrementalPosition() override;
-  double getAbsoluteVelocity() override;
-  double getIncrementalVelocity() override;
+  float getAbsolutePosition() override;
+  float getIncrementalPosition() override;
+  float getAbsoluteVelocity() override;
+  float getIncrementalVelocity() override;
 
 private:
   // Set the ODrive in a certain axis state

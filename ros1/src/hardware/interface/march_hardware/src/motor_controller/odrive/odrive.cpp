@@ -6,7 +6,7 @@
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/error/motor_controller_error.h"
 #include "march_hardware/ethercat/pdo_types.h"
-#include "march_hardware/ethercat/pdo_map.h"
+#include "march_hardware/ethercat/odrive_pdo_map.h"
 
 #include "march_hardware/motor_controller/actuation_mode.h"
 
@@ -40,18 +40,21 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEnco
 
 void ODrive::prepareActuation()
 {
-  // No action is needed as the DieBoSlave make sure actuation is ready when etherCAT connection is made
+  // No action is needed as the DieBoSlave makes sure actuation is ready when etherCAT connection is made
 }
 
-void ODrive::actuateTorque(double target_torque)
+void ODrive::actuateTorque(float target_torque)
 {
-  bit32 write_torque = {.f = (float) target_torque};
+  bit32 write_torque = {.f = target_torque};
   this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetTorque, axis_), write_torque);
 }
 
 unsigned int ODrive::getActuationModeNumber() const
 {
-  switch(this->actuation_mode_.getValue())
+  /* These values were retrieved from https://github.com/odriverobotics/ODrive/blob/devel/Firmware/odrive-interface.yaml
+   * It does require some digging. Look for 'ODrive.Controller.ControlMode'.
+   */
+  switch(actuation_mode_.getValue())
   {
     case ActuationMode::position:
       return 3;
@@ -109,12 +112,12 @@ float ODrive::getAbsoluteVelocityIU()
   return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ActualVelocity, axis_)).f;
 }
 
-double ODrive::getAbsolutePosition()
+float ODrive::getAbsolutePosition()
 {
   return absolute_encoder_->toRadians(getAbsolutePositionIU(), true);
 }
 
-double ODrive::getAbsoluteVelocity()
+float ODrive::getAbsoluteVelocity()
 {
   return absolute_encoder_->toRadians(getAbsoluteVelocityIU(), false);
 }
@@ -145,7 +148,7 @@ uint32_t ODrive::getControllerError()
 }
 
 // Throw NotImplemented error by default for functions not part of the Minimum Viable Product
-void ODrive::actuateRadians(double /*target_position*/)
+void ODrive::actuateRadians(float /*target_position*/)
 {
   throw error::NotImplemented("actuateRadians", "ODrive");
 }
@@ -165,12 +168,12 @@ float ODrive::getMotorVoltage()
   throw error::NotImplemented("getMotorVoltage", "ODrive");
 }
 
-double ODrive::getIncrementalPosition()
+float ODrive::getIncrementalPosition()
 {
   throw error::NotImplemented("getIncrementalPosition", "ODrive");
 }
 
-double ODrive::getIncrementalVelocity()
+float ODrive::getIncrementalVelocity()
 {
   throw error::NotImplemented("getIncrementalVelocity", "ODrive");
 }
