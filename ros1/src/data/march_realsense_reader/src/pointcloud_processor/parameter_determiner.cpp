@@ -317,13 +317,8 @@ bool HullParameterDeterminer::isValidLocation(pcl::PointNormal possible_foot_loc
   }
   else if (selected_obstacle_ == SelectedGait::ramp_down)
   {
-    // Only points on the line which are between the two given values are valid
-    pcl::PointXYZ projected_point = linear_algebra_utilities::projectPointToLine(
-        possible_foot_location, executable_locations_line_coefficients_);
-
-    // Less and larger than signs are swapped for the x coordinate
-    // as the positive x axis points in the backwards direction of the exoskeleton
-    return projected_point.x < x_steep && projected_point.x > x_flat;
+    // All locations are valid for now.
+    return true;
   }
   else
   {
