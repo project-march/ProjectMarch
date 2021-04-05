@@ -6,7 +6,7 @@
 #include "yaml-cpp/yaml.h"
 #include "utilities/realsense_gait_utilities.h"
 #include "utilities/output_utilities.h"
-#include "utilities/linear_algebra_utilities"
+#include "utilities/linear_algebra_utilities.h"
 #include <utilities/yaml_utilities.h>
 #include "pointcloud_processor/parameter_determiner.h"
 #include "march_shared_msgs/GaitParameters.h"
@@ -17,6 +17,7 @@ using PointNormalCloud = pcl::PointCloud<pcl::PointNormal>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using Region = pcl::PointIndices;
 using PlaneCoefficients = pcl::ModelCoefficients;
+using LineCoefficients = pcl::ModelCoefficients;
 using Hull = pcl::PointCloud<pcl::PointXYZ>;
 using Polygon = std::vector<pcl::Vertices>;
 using RegionVector = std::vector<Region>;
@@ -65,12 +66,12 @@ void HullParameterDeterminer::readYaml()
   {
     x_flat = yaml_utilities::grabParameter<double>(
         ramp_locations_parameters, "x_flat");
-    y_flat = yaml_utilities::grabParameter<double>(
-        ramp_locations_parameters, "y_flat");
+    z_flat = yaml_utilities::grabParameter<double>(
+        ramp_locations_parameters, "z_flat");
     x_steep = yaml_utilities::grabParameter<double>(
         ramp_locations_parameters, "x_steep");
-    y_steep = yaml_utilities::grabParameter<double>(
-        ramp_locations_parameters, "y_steep");
+    z_steep = yaml_utilities::grabParameter<double>(
+        ramp_locations_parameters, "z_steep");
   }
   else
   {
@@ -130,6 +131,21 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
     gait_parameters_->step_height_parameter =
             (optimal_foot_location.z - min_z_stairs) / (max_z_stairs - min_z_stairs);
   }
+  else if (selected_obstacle_ == SelectedGait::ramp_down)
+  {
+    if ((optimal_foot_location.x - x_flat) / (x_steep - x_flat) ==
+        (optimal_foot_location.z - z_flat) / (z_steep - z_flat))
+    {
+      gait_parameters_->step_size_parameter =
+          (optimal_foot_location.x - x_flat) / (x_steep - x_flat);
+    }
+    else
+    {
+      ROS_ERROR_STREAM("The optimal foot location for the ramp gait was not on a linear line "
+                       "between the flat and steep gait, unable to determine parameter.");
+      return false;
+    }
+  }
   else
   {
     ROS_ERROR_STREAM("No way to transform a foot location to parameters "
@@ -153,13 +169,14 @@ bool HullParameterDeterminer::getOptimalFootLocation()
   possible_foot_locations = boost::make_shared<PointNormalCloud>();
   success &= cropCloudToHullVector(foot_locations_to_try, possible_foot_locations);
 
-  succes &= getOptimalFootLocation();
+  success &= getOptimalFootLocation();
 
   return success;
 }
 
 bool HullParameterDeterminer::getOptimalFootLocation()
 {
+  bool success = true;
   if (selected_obstacle_ == SelectedGait::stairs_up)
   {
     // Get the location where we would ideally place the foot
@@ -171,21 +188,37 @@ bool HullParameterDeterminer::getOptimalFootLocation()
   else if (selected_obstacle_ == SelectedGait::ramp_down)
   {
     // Get the line on which it is possible to stand for a ramp gait.
-    success &= getPossibleLocationsLine();
+    success &= getExecutableLocationsLine();
 
     // Get the possible location which is closest to the line
-    succes &= getPossibleMostDesirableLocation();
+    success &= getPossibleMostDesirableLocation();
   }
+  else
+  {
+    ROS_ERROR_STREAM("getOptimalFootLocation method is not implemented "
+                    "for selected obstacle " << selected_obstacle_);
+    return false;
+  }
+  return success
 }
 
-bool HullParameterDeterminer::getPossibleLocationsLine()
+bool HullParameterDeterminer::getExecutableLocationsLine()
 {
-  // Interpreted as y = [0] * x + [1]
-  possible_locations_line_coefficients->values.resize(2);
-  slope = (y_flat - y_steep) / (x_flat - x_steep);
-  initial_value = x_steep - x_steep * slope;
-  possible_locations_line_coefficinets->values[0] = slope;
-  possible_locations_line_coefficinets->values[1] = slope;
+  // Interpreted as (x(t), y(t), z(t))^T = ([0])^T * t  + ([1])^T
+  executable_locations_line_coefficients->values.resize(2);
+
+  pcl::PointXYZ position_vector;
+  position_vector.x = x_steep;
+  position_vector.y = 0;
+  position_vector.z = z_steep;
+
+  pcl::PointXYZ direction_vector;
+  direction_vector.x = x_flat - x_steep;
+  direction_vector.y = 0;
+  direction_vector.z = z_flat - z_steep;
+
+  executable_locations_line_coefficients->values[0] = direction_vector;
+  executable_locations_line_coefficients->values[1] = position_vector;
 }
 
 // From the possible foot locations, find which one is closes to some object
@@ -229,25 +262,31 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation()
   }
 }
 
-// For the stair gaits this object is a most desirable location
-// For the ramp gait this is the possible locations line
+// get the distance from a location to some object
 double HullParameterDeterminer::getDistanceToObject(
-    pcl::PointNormal possible_foot_location)
+    pcl::PointNormal possible_foot_location, double & distance)
 {
   if (selected_obstacle_ == SelectedGait::stairs_up or
       selected_obstacle_ ==  SelectedGait::stairs_down)
   {
     // For stairs gait find which point is closest to the most desirable location
-    return linear_algebra_utilities::distanceBetweenPoints(
+    distance linear_algebra_utilities::distanceBetweenPoints(
         possible_foot_location, most_desirable_foot_location);
   }
   else if (selected_obstacle_ == SelectedGait::ramp_up or
-           selected_obstacle_ ==  SelectedGait::ramp_down)
+           selected_obstacle_ == SelectedGait::ramp_down)
   {
     // For the ramp find which point is closest to the possible locations line
-    return linear_algebra_utilities::distancePointToLine(
-        possible_foot_location, possible_locations_line_coefficients);
+    distance = linear_algebra_utilities::distancePointToLine(
+        possible_foot_location, executable_locations_line_coefficients);
   }
+  else
+  {
+    ROS_ERROR_STREAM("getDistanceToObject method is not implemented "
+                     "for selected obstacle " << selected_obstacle_);
+    return false;
+  }
+  return true;
 }
 
 // Verify that the found location is valid for the requested gait
@@ -262,6 +301,11 @@ bool HullParameterDeterminer::isValidLocation(pcl::PointNormal possible_foot_loc
     {
       return true;
     }
+  }
+  else if (selected_obstacle_ == SelectedGait::ramp_down)
+  {
+    // The way a ramp location is chosed all foot locations are valid
+    return true;
   }
   else
   {

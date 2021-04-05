@@ -107,8 +107,14 @@ protected:
   // Find the parameters from the foot location by finding at what percentage of the end points it is
   bool getGaitParametersFromFootLocation();
 
+  // get the distance from a location to some object
+  double getDistanceToObject(pcl::PointNormal possible_foot_location);
+
   // Verify that a possible foot location is valid for the requested gait
   bool isValidLocation(pcl::PointNormal possible_foot_location);
+
+  // Get the line on which it is possible to stand for a ramp gait.
+  bool getExecutableLocationsLine();
 
   // Read all relevant parameters from the parameter yaml file
   void readYaml();
@@ -118,12 +124,17 @@ protected:
   double min_z_stairs;
   double max_z_stairs;
   double y_location;
+  double x_flat;
+  double z_flat;
+  double x_steep;
+  double z_steep;
   bool general_most_desirable_location_is_mid;
   bool general_most_desirable_location_is_small;
 
   SelectedGait selected_obstacle_;
   pcl::PointXYZ most_desirable_foot_location_;
-  LineCoefficients::Ptr possible_locations_line_coefficients;
+  // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T  + ([3], [4], [5])^T * t
+  LineCoefficients::Ptr executable_locations_line_coefficients;
 };
 
 /** The simple parameter determiner
