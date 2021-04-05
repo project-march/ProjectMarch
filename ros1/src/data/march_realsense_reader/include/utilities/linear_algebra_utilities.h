@@ -1,6 +1,8 @@
 #ifndef MARCH_LINEAR_ALGEBRA_UTILITIES_H
 #define MARCH_LINEAR_ALGEBRA_UTILITIES_H
 
+#include <pcl/point_types.h>
+
 namespace linear_algebra_utilities
 {
   // Calculate a dot product of two vectors
@@ -37,10 +39,18 @@ namespace linear_algebra_utilities
   template<typename T>
   T projectPointToLine(T point, pcl::ModelCoefficients::Ptr line_coefficients)
   {
-    // Line coefficients are stored as y = [0] * x + [1]
-    pcl::PointXYZ direction = line_coefficients->values[0];
-    pcl::PointXYZ position = line_coefficients->values[1];
-    // Compute the projected point using
+    // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t  + ([3], [4], [5])^T
+    pcl::PointXYZ direction;
+    direction.x = line_coefficients->values[0];
+    direction.y = line_coefficients->values[1];
+    direction.z = line_coefficients->values[2];
+
+    pcl::PointXYZ position;
+    position.x = line_coefficients->values[3];
+    position.y = line_coefficients->values[4];
+    position.z = line_coefficients->values[5];
+
+    // Compute the projected point using dot products
     T projected_point;
     projected_point.getArray3fMap() =
         (point.getArray3fMap() - position.getArray3fMap()) * direction.getArray3fMap()

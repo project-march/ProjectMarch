@@ -75,6 +75,9 @@ protected:
   // to the most desirable foot location
   bool getOptimalFootLocation();
 
+  // Get the optimal foot location by selecting one from the possible locations
+  bool getOptimalFootLocationFromPossibleLocations();
+
   // From the possible foot locations, find which one is closes to the most desirable location
   bool getPossibleMostDesirableLocation();
 
@@ -100,18 +103,19 @@ protected:
   bool cropCloudToHull(PointCloud::Ptr elevated_cloud, Hull::Ptr hull, Polygon polygon);
 
   // Add normals to the elevated cloud which correspond to the normal vector of the plane
-  bool addNormalToCloudFromPlaneCoefficients(PointCloud::Ptr elevated_cloud,
-                                             PlaneCoefficients::Ptr plane_coefficients,
-                                             PointNormalCloud::Ptr elevated_cloud_with_normals);
+  bool addNormalToCloudFromPlaneCoefficients(
+      PointCloud::Ptr elevated_cloud,
+      PlaneCoefficients::Ptr plane_coefficients,
+      PointNormalCloud::Ptr elevated_cloud_with_normals);
 
   // Find the parameters from the foot location by finding at what percentage of the end points it is
   bool getGaitParametersFromFootLocation();
 
-  // get the distance from a location to some object
-  double getDistanceToObject(pcl::PointNormal possible_foot_location);
-
   // Verify that a possible foot location is valid for the requested gait
   bool isValidLocation(pcl::PointNormal possible_foot_location);
+
+  // get the distance from a location to some object depending on the obstacle
+  bool getDistanceToObject(pcl::PointNormal possible_foot_location, double & distance);
 
   // Get the line on which it is possible to stand for a ramp gait.
   bool getExecutableLocationsLine();
@@ -133,7 +137,7 @@ protected:
 
   SelectedGait selected_obstacle_;
   pcl::PointXYZ most_desirable_foot_location_;
-  // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T  + ([3], [4], [5])^T * t
+  // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t  + ([3], [4], [5])^T
   LineCoefficients::Ptr executable_locations_line_coefficients;
 };
 

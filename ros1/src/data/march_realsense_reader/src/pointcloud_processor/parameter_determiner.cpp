@@ -72,6 +72,8 @@ void HullParameterDeterminer::readYaml()
         ramp_locations_parameters, "x_steep");
     z_steep = yaml_utilities::grabParameter<double>(
         ramp_locations_parameters, "z_steep");
+    y_location = yaml_utilities::grabParameter<double>(
+        ramp_locations_parameters,"y_location");
   }
   else
   {
@@ -91,7 +93,7 @@ bool HullParameterDeterminer::determineParameters(
 {
   time_t start_determine_parameters = clock();
 
-  ROS_DEBUG("Determining parameters with simple parameter determiner");
+  ROS_DEBUG("Determining parameters with hull parameter determiner");
   hull_vector_ = hull_vector;
   selected_obstacle_ = selected_obstacle;
   gait_parameters_ = gait_parameters;
@@ -133,6 +135,9 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
   }
   else if (selected_obstacle_ == SelectedGait::ramp_down)
   {
+    optimal_foot_location = linear_algebra_utilities::projectPointToLine(
+        optimal_foot_location, executable_locations_line_coefficients);
+
     if ((optimal_foot_location.x - x_flat) / (x_steep - x_flat) ==
         (optimal_foot_location.z - z_flat) / (z_steep - z_flat))
     {
@@ -169,12 +174,13 @@ bool HullParameterDeterminer::getOptimalFootLocation()
   possible_foot_locations = boost::make_shared<PointNormalCloud>();
   success &= cropCloudToHullVector(foot_locations_to_try, possible_foot_locations);
 
-  success &= getOptimalFootLocation();
+  success &= getOptimalFootLocationFromPossibleLocations();
 
   return success;
 }
 
-bool HullParameterDeterminer::getOptimalFootLocation()
+// Get the optimal foot location by selecting one from the possible locations
+bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
 {
   bool success = true;
   if (selected_obstacle_ == SelectedGait::stairs_up)
@@ -196,29 +202,28 @@ bool HullParameterDeterminer::getOptimalFootLocation()
   else
   {
     ROS_ERROR_STREAM("getOptimalFootLocation method is not implemented "
-                    "for selected obstacle " << selected_obstacle_);
+                     "for selected obstacle " << selected_obstacle_);
     return false;
   }
-  return success
+  return success;
 }
 
 bool HullParameterDeterminer::getExecutableLocationsLine()
 {
-  // Interpreted as (x(t), y(t), z(t))^T = ([0])^T * t  + ([1])^T
-  executable_locations_line_coefficients->values.resize(2);
-
-  pcl::PointXYZ position_vector;
-  position_vector.x = x_steep;
-  position_vector.y = 0;
-  position_vector.z = z_steep;
+  // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t + ([3], [4], [5])^T
+  executable_locations_line_coefficients->values.resize(6);
 
   pcl::PointXYZ direction_vector;
-  direction_vector.x = x_flat - x_steep;
-  direction_vector.y = 0;
-  direction_vector.z = z_flat - z_steep;
+  executable_locations_line_coefficients->values[0]  = x_flat - x_steep;
+  executable_locations_line_coefficients->values[1]  = 0;
+  executable_locations_line_coefficients->values[2]  = z_flat - z_steep;
 
-  executable_locations_line_coefficients->values[0] = direction_vector;
-  executable_locations_line_coefficients->values[1] = position_vector;
+  pcl::PointXYZ position_vector;
+  executable_locations_line_coefficients->values[3] = x_steep;
+  executable_locations_line_coefficients->values[4] = 0;
+  executable_locations_line_coefficients->values[5] = z_steep;
+
+  return true;
 }
 
 // From the possible foot locations, find which one is closes to some object
@@ -226,6 +231,7 @@ bool HullParameterDeterminer::getExecutableLocationsLine()
 // For the ramp gait this is the possible locations line
 bool HullParameterDeterminer::getPossibleMostDesirableLocation()
 {
+  bool success = true;
   if (possible_foot_locations->points.size() == 0)
   {
     ROS_ERROR_STREAM("The possible foot locations cloud is empty. "
@@ -234,6 +240,7 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation()
   }
 
   double min_distance_to_object = std::numeric_limits<double>::max();
+  double distance_to_object;
 
   for (pcl::PointNormal & possible_foot_location : *possible_foot_locations)
   {
@@ -242,17 +249,17 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation()
       continue;
     }
 
-    distance_to_object = getDistanceToObject(possible_foot_location);
+    success &= getDistanceToObject(possible_foot_location, distance_to_object);
 
     if (distance_to_object < min_distance_to_object)
     {
-      min_distance_to_most_desirable_location = distance_to_most_desirable_location;
+      min_distance_to_object = distance_to_object;
       optimal_foot_location = possible_foot_location;
     }
   }
-  if (min_distance_to_most_desirable_location != std::numeric_limits<double>::max())
+  if (min_distance_to_object != std::numeric_limits<double>::max())
   {
-    return true;
+    return success;
   }
   else
   {
@@ -262,16 +269,16 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation()
   }
 }
 
-// get the distance from a location to some object
-double HullParameterDeterminer::getDistanceToObject(
+// get the distance from a location to some object depending on the obstacle
+bool HullParameterDeterminer::getDistanceToObject(
     pcl::PointNormal possible_foot_location, double & distance)
 {
   if (selected_obstacle_ == SelectedGait::stairs_up or
       selected_obstacle_ ==  SelectedGait::stairs_down)
   {
     // For stairs gait find which point is closest to the most desirable location
-    distance linear_algebra_utilities::distanceBetweenPoints(
-        possible_foot_location, most_desirable_foot_location);
+    distance = linear_algebra_utilities::distanceBetweenPoints(
+        possible_foot_location, most_desirable_foot_location_);
   }
   else if (selected_obstacle_ == SelectedGait::ramp_up or
            selected_obstacle_ == SelectedGait::ramp_down)
@@ -353,6 +360,16 @@ bool HullParameterDeterminer::getOptionalFootLocations(PointCloud2D::Ptr foot_lo
     {
       double x_location = min_x_stairs + (max_x_stairs - min_x_stairs) *
                                          i / (double) (number_of_optional_foot_locations - 1);
+      foot_locations_to_try->points[i].x = x_location;
+      foot_locations_to_try->points[i].y = y_location;
+    }
+  }
+  else if (selected_obstacle_ == SelectedGait::ramp_down)
+  {
+    for (int i = 0; i < number_of_optional_foot_locations; i++)
+    {
+      double x_location = x_steep + (x_steep - x_flat) *
+                                        i / (double) (number_of_optional_foot_locations - 1);
       foot_locations_to_try->points[i].x = x_location;
       foot_locations_to_try->points[i].y = y_location;
     }
