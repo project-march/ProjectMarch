@@ -142,8 +142,8 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
     optimal_foot_location.y = projected_optimal_foot_location.y;
     optimal_foot_location.z = projected_optimal_foot_location.z;
 
-    parameter_from_x = (optimal_foot_location.x - x_flat) / (x_steep - x_flat);
-    parameter_from_z = (optimal_foot_location.z - z_flat) / (z_steep - z_flat);
+    double parameter_from_x = (optimal_foot_location.x - x_flat) / (x_steep - x_flat);
+    double parameter_from_z = (optimal_foot_location.z - z_flat) / (z_steep - z_flat);
 
     double allowable_error = 0.01;
     if (parameter_from_x - parameter_from_z < allowable_error)
