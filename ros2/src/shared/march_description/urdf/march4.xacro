@@ -220,7 +220,7 @@
         <fdir1>1 0 0</fdir1>
     </gazebo>
 
-    <xacro:pressure_sole foot_name="foot_left"
+    <xacro:pressure_sole foot_name="left"
     />
 
     <xacro:frame_part name="hip_aa_frame_right_side"
