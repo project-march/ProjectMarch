@@ -52,9 +52,13 @@ std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(
         ROS_WARN("Q_matrix is not square");
     }
 
-    std::vector<float> Q_flat;
-    ros::param::get(
-        parameter_path + "/q_matrices/" + joint_name + "/Q", Q_flat);
+  // Initialize the model predictive controllers
+  for (unsigned int i = 0; i < num_joints_; ++i)
+  {
+      model_predictive_controllers_.push_back(ModelPredictiveController(getWArray(joint_names[i])));
+      model_predictive_controllers_[i].joint_name = joint_names[i];
+      model_predictive_controllers_[i].init();
+  }
 
     // Set QMatrix for the mpc msg
     for (int i = 0; i < num_joints_; ++i) {
@@ -62,18 +66,25 @@ std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(
             Q_flat.begin(), Q_flat.end());
     }
 
-    std::vector<std::vector<float>> Q(n_rows, std::vector<float>(n_cols));
-    if (Q_flat.size() != n_rows * n_cols) {
-        ROS_WARN("Q_matrix does not have specified matrix dimensions.");
-    } else {
-        for (int y = 0; y < n_rows; y++) {
-            for (int x = 0; x < n_cols; x++) {
-                Q[y][x] = Q_flat[y * n_cols + x];
-            }
-        }
-    }
+// Retrieve the Q matrix from the parameter server for a joint.
+std::vector<double> ModelPredictiveControllerInterface::getWArray(std::string joint_name)
+{
+  std::string parameter_path = "/march/controller/trajectory";
 
-    return Q;
+  // Get W from controller config
+  std::vector<double> W;
+  ros::param::get(parameter_path + "/weighting_arrays/"  + joint_name, W);
+
+  // Check for validity of the weighting array
+  ROS_DEBUG_STREAM_COND(W.size() != ACADO_NY, joint_name << ", Incorrect weighting array size");
+
+  // Set WArray for the mpc msg
+  for (int i =0; i < num_joints_; ++i)
+  {
+    mpc_pub_->msg_.joint[i].tuning.q_matrix.assign(W.begin(), W.end());
+  }
+
+  return W;
 }
 
 // Function that dictates what to do when the controller is started by the

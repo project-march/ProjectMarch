@@ -81,12 +81,12 @@ public:
     void setMpcMsg(int joint_number);
 
 private:
-    /**
-     * @brief Retrieve the Q matrix from the parameter server for a joint.
-     * @param joint_name Joint to retrieve Q Matrix for
-     * @return Returns a 2d vector: The Q Matrix.
-     */
-    std::vector<std::vector<float>> getQMatrix(const std::string& joint_name);
+  /**
+   * @brief Retrieve the W array from the parameter server for a joint.
+   * @param joint_name Joint to retrieve W array for
+   * @return Returns a vector: The W array.
+   */
+  std::vector<double> getWArray(std::string joint_name);
 
     std::vector<hardware_interface::JointHandle>* joint_handles_ptr_;
 
