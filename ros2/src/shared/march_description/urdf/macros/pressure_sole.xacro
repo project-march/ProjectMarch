@@ -1,12 +1,10 @@
 <?xml version="1.0"?>
 <robot  xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <xacro:macro name="pressure_sole"
+    <xacro:macro name="pressure_sensor"
                  params="foot_place foot_name *origin">
-
         <link name="pressure_sole_${foot_place}">
             <collision>
                 <xacro:insert_block name="origin"/>
-                <!--<origin xyz="${(-foot_height_forward+foot_height_backward)/2} 0 0" rpy="0 0 0"/>-->
                 <geometry>
                     <box size="${(foot_height_forward+foot_height_backward)/4} ${width/2} 0.001"/>
                 </geometry>
@@ -29,5 +27,37 @@
             <child link="pressure_sole_${foot_place}"/>
             <origin xyz="0 0 ${-(width/2)}" rpy="0 0 0"/>
         </joint>
+    </xacro:macro>
+
+    <xacro:macro name="pressure_sole"
+                 params="foot_name">
+        <xacro:pressure_sensor foot_place="left_heel_1" foot_name="${foot_name}">
+            <origin xyz="${-(foot_height_forward+foot_height_backward)/8} ${width/4} 0" rpy="0 0 0"/>
+        </xacro:pressure_sensor>
+        <xacro:pressure_sensor foot_place="left_heel_2" foot_name="${foot_name}">
+            <origin xyz="${-(foot_height_forward+foot_height_backward)/8} ${-width/4} 0" rpy="0 0 0"/>
+        </xacro:pressure_sensor>
+
+        <xacro:pressure_sensor foot_place="left_heel_Arch" foot_name="${foot_name}">
+            <origin xyz="${-(foot_height_forward+foot_height_backward)*3/8} ${width/4} 0" rpy="0 0 0"/>
+        </xacro:pressure_sensor>
+        <xacro:pressure_sensor foot_place="left_heel_MET1" foot_name="${foot_name}">
+            <origin xyz="${-(foot_height_forward+foot_height_backward)*3/8} ${-width/4} 0" rpy="0 0 0"/>
+        </xacro:pressure_sensor>
+
+        <xacro:pressure_sensor foot_place="left_heel_MET3" foot_name="${foot_name}">
+            <origin xyz="${-(foot_height_forward+foot_height_backward)*5/8} ${-width/4} 0" rpy="0 0 0"/>
+        </xacro:pressure_sensor>
+        <xacro:pressure_sensor foot_place="left_heel_MET5" foot_name="${foot_name}">
+            <origin xyz="${-(foot_height_forward+foot_height_backward)*5/8} ${width/4} 0" rpy="0 0 0"/>
+        </xacro:pressure_sensor>
+
+        <xacro:pressure_sensor foot_place="left_heel_Toes" foot_name="${foot_name}">
+            <origin xyz="${-(foot_height_forward+foot_height_backward)*7/8} ${width/4} 0" rpy="0 0 0"/>
+        </xacro:pressure_sensor>
+        <xacro:pressure_sensor foot_place="left_heel_Hallux" foot_name="${foot_name}">
+            <origin xyz="${-(foot_height_forward+foot_height_backward)*7/8} ${-width/4} 0" rpy="0 0 0"/>
+        </xacro:pressure_sensor>
+
     </xacro:macro>
 </robot>
