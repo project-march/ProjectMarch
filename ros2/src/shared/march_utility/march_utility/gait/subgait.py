@@ -168,18 +168,40 @@ class Subgait(object):
         :return:
             A populated Subgait object
         """
-        first_subgait = cls.from_file(robot, version_path_list[0])
-        second_subgait = cls.from_file(robot, version_path_list[1])
-        third_subgait = cls.from_file(robot, version_path_list[2])
-        fourth_subgait = cls.from_file(robot, version_path_list[3])
+        subgaits = []
+        for i in range(4):
+            subgaits.append(cls.from_file(robot, version_path_list[i]))
         return cls.interpolate_four_subgaits(
-            first_subgait,
-            second_subgait,
-            third_subgait,
-            fourth_subgait,
-            parameter_list[0],
-            parameter_list[1],
+            subgaits,
+            parameter_list,
             use_foot_position,
+        )
+
+    @classmethod
+    def from_four_names_and_versions_interpolated(
+        cls,
+        robot: urdf.Robot,
+        version_path_list: List[str, str, str, str],
+        parameter_list: List[float, float],
+        gait_directory: str,
+        gait_name: str,
+        subgait_name: str,
+        use_foot_position: bool = False,
+    ):
+        subgaits = []
+        for i in range(4):
+            subgaits.append(
+                cls.from_name_and_version(
+                    robot=robot,
+                    gait_dir=gait_directory,
+                    gait_name=gait_name,
+                    subgait_name=subgait_name,
+                    version=version_path_list[i],
+                )
+            )
+
+        return cls.interpolate_four_subgaits(
+            subgaits, parameter_list, use_foot_position
         )
 
     @classmethod
@@ -212,6 +234,37 @@ class Subgait(object):
         other_subgait = cls.from_file(robot, second_file_name)
         return cls.interpolate_subgaits(
             base_subgait, other_subgait, first_parameter, use_foot_position
+        )
+
+    @classmethod
+    def from_two_names_and_versions_interpolated(
+        cls,
+        robot: urdf.Robot,
+        first_file_name: str,
+        second_file_name: str,
+        parameter: float,
+        gait_directory: str,
+        gait_name: str,
+        subgait_name: str,
+        use_foot_position: bool = False,
+    ):
+        first_subgait = cls.from_name_and_version(
+            robot=robot,
+            gait_dir=gait_directory,
+            gait_name=gait_name,
+            subgait_name=subgait_name,
+            version=first_file_name,
+        )
+        second_subgait = cls.from_name_and_version(
+            robot=robot,
+            gait_dir=gait_directory,
+            gait_name=gait_name,
+            subgait_name=subgait_name,
+            version=second_file_name,
+        )
+
+        return cls.interpolate_subgaits(
+            first_subgait, second_subgait, parameter, use_foot_position
         )
 
     @classmethod
@@ -379,12 +432,8 @@ class Subgait(object):
     @classmethod
     def interpolate_four_subgaits(
         cls,
-        first_subgait: Subgait,
-        second_subgait: Subgait,
-        third_subgait: Subgait,
-        fourth_subgait: Subgait,
-        first_parameter: float,
-        second_parameter: float,
+        subgaits: List[Subgait, Subgait, Subgait, Subgait],
+        parameters: [float, float],
         use_foot_position: bool = False,
     ) -> Subgait:
         """
@@ -404,16 +453,16 @@ class Subgait(object):
             The interpolated subgait
         """
         first_interpolated_subgait = Subgait.interpolate_subgaits(
-            first_subgait, second_subgait, first_parameter, use_foot_position
+            subgaits[0], subgaits[1], parameters[0], use_foot_position
         )
         second_interpolated_subgait = Subgait.interpolate_subgaits(
-            third_subgait, fourth_subgait, first_parameter, use_foot_position
+            subgaits[2], subgaits[3], parameters[0], use_foot_position
         )
 
         return Subgait.interpolate_subgaits(
             first_interpolated_subgait,
             second_interpolated_subgait,
-            second_parameter,
+            parameters[1],
             use_foot_position,
         )
 
