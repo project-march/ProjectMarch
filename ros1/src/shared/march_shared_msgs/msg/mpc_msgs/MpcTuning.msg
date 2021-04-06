@@ -1,2 +1,2 @@
-float32[] q_matrix
+float32[] w_matrix
 int32 horizon

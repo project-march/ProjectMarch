@@ -81,7 +81,7 @@ std::vector<double> ModelPredictiveControllerInterface::getWArray(std::string jo
   // Set WArray for the mpc msg
   for (int i =0; i < num_joints_; ++i)
   {
-    mpc_pub_->msg_.joint[i].tuning.q_matrix.assign(W.begin(), W.end());
+    mpc_pub_->msg_.joint[i].tuning.w_matrix.assign(W.begin(), W.end());
   }
 
   return W;
