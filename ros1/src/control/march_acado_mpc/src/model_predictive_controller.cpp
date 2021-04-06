@@ -62,13 +62,16 @@ void ModelPredictiveController::setReference(int n, const std::vector<double>& r
     ROS_DEBUG_STREAM_ONCE(joint_name << ", The supplied reference vector has an incorrect size");
   }
 
+  // Set the reference of node n
   if(n != ACADO_N) {
     // set "running" reference
+    // reference of node 0 to node ACADO_N-1, includes states and control references
     std::copy_n(reference.begin(), ACADO_NY, std::begin(acadoVariables.y) + n * ACADO_NY);
   }
   else {
     // set "end" reference
-    std::copy(reference.begin(), reference.begin() + ACADO_NYN, std::begin(acadoVariables.yN));
+    // reference of the last node N, includes only the states references
+    std::copy_n(reference.begin(), ACADO_NYN, std::begin(acadoVariables.yN));
   }
 }
 
