@@ -58,9 +58,9 @@ class CPCalculator(object):
         self._capture_point_marker.pose.orientation.w = 1.0
         self._capture_point_marker.color.a = 1.0
         self._capture_point_marker.color.g = 1.0
-        self._capture_point_marker.scale.x = 0.03
-        self._capture_point_marker.scale.y = 0.03
-        self._capture_point_marker.scale.z = 0.03
+        self._capture_point_marker.scale.x = 0.1
+        self._capture_point_marker.scale.y = 0.1
+        self._capture_point_marker.scale.z = 0.1
 
     @property
     def center_of_mass(self) -> Point:
@@ -142,6 +142,10 @@ class CPCalculator(object):
             self._capture_point_marker.pose.position.x = x_cp + static_foot_position.x
             self._capture_point_marker.pose.position.y = y_cp + static_foot_position.y
             self._capture_point_marker.pose.position.z = 0
+            rospy.loginfo('Capture point coordinate relative to the other foot ({x_f}, {y_f}). \n '
+                          'Capture point coordinate in world coordinates({x_w}, {y_w})'.
+                          format(x_f=x_cp, y_f=y_cp, x_w=self._capture_point_marker.pose.position.x,
+                                 y_w=self._capture_point_marker.pose.position.y))
 
             self.cp_publisher.publish(self._capture_point_marker)
         except tf2_ros.TransformException as e:
