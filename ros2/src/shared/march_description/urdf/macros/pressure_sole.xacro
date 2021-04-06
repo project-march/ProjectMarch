@@ -11,17 +11,23 @@
             </collision>
         </link>
 
-        <gazebo reference="pressure_sole_${foot_place}">
+        <gazebo reference="ankle_plate_${foot_name}">
             <sensor name="pressure_sole_${foot_place}" type="contact">
                 <always_on>true</always_on>
-                <!--<contact collision="ankle_plate_${foot_name}_fixed_joint_lump__pressure_sole_${foot_place}_collision_${counter}"/>-->
-                <contact collision="ankle_plate_left_fixed_joint_lump__pressure_sole_left_heel_Hallux_collision_2"/>
+                <contact>
+                        collision="ankle_plate_${foot_name}_fixed_joint_lump__pressure_sole_${foot_place}_collision_${counter}"
+                </contact>
                 <plugin name="pressure_sole_plugin_${foot_place}" filename="libgazebo_ros_bumper.so">
                     <bumperTopicName>/march/sensor/${foot_name}_pressure_sole_${foot_place}</bumperTopicName>
                     <frameName>world</frameName>
                 </plugin>
-            </sensor>
-        </gazebo>`
+                <!--<contact>
+                    collision="ankle_plate_left_fixed_joint_lump__pressure_sole_left_heel_1_collision_2"
+                </contact>-->
+
+                <!--<update_rate>30</update_rate>-->
+                </sensor>
+        </gazebo>
 
         <joint name="pressure_sole_${foot_place}_joint" type="fixed">
             <parent link="foot_${foot_name}"/>
@@ -32,7 +38,6 @@
 
     <xacro:macro name="pressure_sole"
                  params="foot_name">
-        <!--
         <xacro:pressure_sensor foot_place="left_heel_1" foot_name="${foot_name}" counter="2">
             <origin xyz="${-(foot_height_forward+foot_height_backward)/8} ${width/4} 0" rpy="0 0 0"/>
         </xacro:pressure_sensor>
@@ -56,7 +61,7 @@
 
         <xacro:pressure_sensor foot_place="left_heel_Toes" foot_name="${foot_name}" counter="9">
             <origin xyz="${-(foot_height_forward+foot_height_backward)*7/8} ${width/4} 0" rpy="0 0 0"/>
-        </xacro:pressure_sensor>-->
+        </xacro:pressure_sensor>
         <xacro:pressure_sensor foot_place="left_heel_Hallux" foot_name="${foot_name}" counter="5">
             <origin xyz="${-(foot_height_forward+foot_height_backward)*7/8} ${-width/4} 0" rpy="0 0 0"/>
         </xacro:pressure_sensor>
