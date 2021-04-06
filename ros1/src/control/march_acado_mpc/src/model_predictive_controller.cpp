@@ -56,16 +56,19 @@ void ModelPredictiveController::setInitialState(vector<double> x0)
   }
 }
 void ModelPredictiveController::setReference(int n, const std::vector<double>& reference) {
+
   // check if size of reference at time step n is equal to size of ACADO_NY
-  ROS_WARN_STREAM_COND(ACADO_NY != reference.size(), joint_name << "");
+  if(ACADO_NY != reference.size()) {
+    ROS_DEBUG_STREAM_ONCE(joint_name << ", The supplied reference vector has an incorrect size");
+  }
 
   if(n != ACADO_N) {
-    // set running reference
+    // set "running" reference
     std::copy(reference.begin(), reference.end(), std::begin(acadoVariables.y) + n * ACADO_NY);
   }
   else {
     // set "end" reference
-    std::copy(reference.begin(), reference.begin()+ACADO_NYN, std::begin(acadoVariables.yN));
+    std::copy(reference.begin(), reference.begin() + ACADO_NYN, std::begin(acadoVariables.yN));
   }
 }
 
