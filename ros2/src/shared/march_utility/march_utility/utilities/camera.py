@@ -2,8 +2,8 @@ from enum import Enum
 
 
 class CameraSide(Enum):
-    FRONT=0
-    BACK=1
+    FRONT = 0
+    BACK = 1
 
     @classmethod
     def from_string(cls, camera_string):
