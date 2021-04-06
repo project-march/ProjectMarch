@@ -5,6 +5,7 @@ uint8 STAIRS_UP=0
 uint8 STAIRS_DOWN=1
 uint8 RAMP_UP=2
 uint8 RAMP_DOWN=3
+uint8 selected_gait
 
 # The link to transform to, is generally set to either "foot_left" or "foot_right"
 string frame_id_to_transform_to
