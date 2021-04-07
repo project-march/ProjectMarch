@@ -82,6 +82,12 @@ class ModifiableJointTrajectory(JointTrajectory):
         self.enforce_limits()
         self.interpolate_setpoints()
 
+    def replace_setpoint(self, index, new_setpoint):
+        self.save_setpoints()
+        self.setpoints[index] = new_setpoint
+        self.enforce_limits()
+        self.interpolate_setpoints()
+
     def remove_setpoint(self, index):
         self.save_setpoints()
         del self.setpoints[index]
