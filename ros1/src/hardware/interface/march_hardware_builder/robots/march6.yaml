@@ -17,7 +17,7 @@ march6:
         temperatureges: {slaveIndex: 1, byteOffset: 0}
         motor_controller:
           actuationMode: torque
-          type: "odrive" 
+          type: odrive 
           slaveIndex: 1
           axis: 0
           absoluteEncoder:
@@ -31,7 +31,7 @@ march6:
         temperatureges: {slaveIndex: 2, byteOffset: 0}
         motor_controller:
           actuationMode: torque
-          type: "odrive" 
+          type: odrive 
           slaveIndex: 2
           axis: 0
           absoluteEncoder:
@@ -45,7 +45,7 @@ march6:
         temperatureges: {slaveIndex: 2, byteOffset: 0}
         motor_controller:
           actuationMode: torque
-          type: "odrive" 
+          type: odrive 
           slaveIndex: 2
           axis: 1
           absoluteEncoder:
@@ -59,7 +59,7 @@ march6:
         temperatureges: {slaveIndex: 1, byteOffset: 4}
         motor_controller:
           actuationMode: torque
-          type: "odrive" 
+          type: odrive 
           slaveIndex: 1
           axis: 1
           absoluteEncoder:
@@ -73,7 +73,7 @@ march6:
         temperatureges: {slaveIndex: 4, byteOffset: 0}
         motor_controller:
           actuationMode: torque
-          type: "odrive" 
+          type: odrive 
           slaveIndex: 4
           axis: 0
           absoluteEncoder:
@@ -87,7 +87,7 @@ march6:
         temperatureges: {slaveIndex: 3, byteOffset: 4}
         motor_controller:
           actuationMode: torque
-          type: "odrive" 
+          type: odrive 
           slaveIndex: 3
           axis: 1
           absoluteEncoder:
@@ -101,7 +101,7 @@ march6:
         temperatureges: {slaveIndex: 3, byteOffset: 0}
         motor_controller:
           actuationMode: torque
-          type: "odrive" 
+          type: odrive 
           slaveIndex: 3
           axis: 0
           absoluteEncoder:
@@ -115,7 +115,7 @@ march6:
         temperatureges: {slaveIndex: 4, byteOffset: 4}
         motor_controller:
           actuationMode: torque
-          type: "odrive" 
+          type: odrive 
           slaveIndex: 4
           axis: 1
           absoluteEncoder:

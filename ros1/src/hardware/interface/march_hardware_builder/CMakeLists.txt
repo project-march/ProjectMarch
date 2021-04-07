@@ -56,6 +56,7 @@ if(CATKIN_ENABLE_TESTING)
         test/absolute_encoder_builder_test.cpp
         test/allowed_robot_test.cpp
         test/imc_builder_test.cpp
+        test/motor_controller_builder_test.cpp
         test/incremental_encoder_builder_test.cpp
         test/joint_builder_test.cpp
         test/pdb_builder_test.cpp

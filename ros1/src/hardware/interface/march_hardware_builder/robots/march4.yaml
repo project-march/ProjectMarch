@@ -9,7 +9,7 @@ march4:
         netNumber: 8
         temperatureges: {slaveIndex: 1, byteOffset: 0}
         motor_controller:
-          type: "imotioncube"
+          type: imotioncube
           actuationMode: torque
           slaveIndex: 2
           absoluteEncoder:
@@ -25,7 +25,7 @@ march4:
         netNumber: 5
         temperatureges: {slaveIndex: 7, byteOffset: 0}
         motor_controller:
-          type: "imotioncube"
+          type: imotioncube
           actuationMode: torque
           slaveIndex: 6
           absoluteEncoder:
@@ -41,7 +41,7 @@ march4:
         netNumber: 6
         temperatureges: {slaveIndex: 5, byteOffset: 0}
         motor_controller:
-          type: "imotioncube"
+          type: imotioncube
           actuationMode: torque
           slaveIndex: 4
           absoluteEncoder:
@@ -57,7 +57,7 @@ march4:
         netNumber: 7
         temperatureges: {slaveIndex: 5, byteOffset: 4}
         motor_controller:
-          type: "imotioncube"
+          type: imotioncube
           actuationMode: torque
           slaveIndex: 3
           absoluteEncoder:
@@ -73,7 +73,7 @@ march4:
         netNumber: 4
         temperatureges: {slaveIndex: 13, byteOffset: 0}
         motor_controller:
-          type: "imotioncube"
+          type: imotioncube
           actuationMode: torque
           slaveIndex: 12
           absoluteEncoder:
@@ -89,7 +89,7 @@ march4:
         netNumber: 1
         temperatureges: {slaveIndex: 7, byteOffset: 4}
         motor_controller:
-          type: "imotioncube"
+          type: imotioncube
           actuationMode: torque
           slaveIndex: 8
           absoluteEncoder:
@@ -105,7 +105,7 @@ march4:
         netNumber: 2
         temperatureges: {slaveIndex: 9, byteOffset: 0}
         motor_controller:
-          type: "imotioncube"
+          type: imotioncube
           actuationMode: torque
           slaveIndex: 10
           absoluteEncoder:
@@ -121,7 +121,7 @@ march4:
         netNumber: 3
         temperatureges: {slaveIndex: 9, byteOffset: 4}
         motor_controller:
-          type: "imotioncube"
+          type: imotioncube
           actuationMode: torque
           slaveIndex: 11
           absoluteEncoder:

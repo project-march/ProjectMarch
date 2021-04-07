@@ -80,8 +80,26 @@ public:
   // Override comparison operator
   friend bool operator==(const MotorController& lhs, const MotorController& rhs)
   {
-    return lhs.getSlaveIndex() == rhs.getSlaveIndex() && *lhs.absolute_encoder_ == *rhs.absolute_encoder_ &&
-           *lhs.incremental_encoder_ == *rhs.incremental_encoder_ &&
+    bool encoders_are_equal = true;
+    if (lhs.incremental_encoder_.has_value() && rhs.incremental_encoder_.has_value())
+    {
+      encoders_are_equal &= *lhs.incremental_encoder_.value() == *rhs.incremental_encoder_.value();
+    }
+    else
+    {
+      encoders_are_equal &= lhs.incremental_encoder_ == rhs.incremental_encoder_;
+    }
+
+    if (lhs.absolute_encoder_.has_value() && rhs.absolute_encoder_.has_value())
+    {
+      encoders_are_equal &= *lhs.absolute_encoder_.value() == *rhs.absolute_encoder_.value();
+    }
+    else
+    {
+      encoders_are_equal &= lhs.absolute_encoder_ == rhs.absolute_encoder_;
+    }
+
+    return encoders_are_equal && lhs.getSlaveIndex() == rhs.getSlaveIndex() &&
            lhs.actuation_mode_.getValue() == rhs.actuation_mode_.getValue();
   }
   // Override stream operator for clean printing

@@ -109,29 +109,32 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const 
 
   const bool allow_actuation = joint_config["allowActuation"].as<bool>();
 
-  march::ActuationMode mode;
-  if (joint_config["actuationMode"])
+  auto motor_controller = HardwareBuilder::createMotorController(joint_config["motor_controller"], urdf_joint, pdo_interface, sdo_interface);
+
+  if (joint_config["temperatureges"])
   {
-    mode = march::ActuationMode(joint_config["actuationMode"].as<std::string>());
+    auto ges = HardwareBuilder::createTemperatureGES(joint_config["temperatureges"], pdo_interface, sdo_interface);
+    return { joint_name, net_number, allow_actuation, std::move(motor_controller), std::move(ges) };
   }
-
-  auto motor_controller = HardwareBuilder::createMotorController(joint_config["motor_controller"], mode, urdf_joint, pdo_interface, sdo_interface);
-
-  auto ges = HardwareBuilder::createTemperatureGES(joint_config["temperatureges"], pdo_interface, sdo_interface);
-  if (!ges)
+  else
   {
     ROS_WARN("Joint %s does not have a configuration for a TemperatureGes", joint_name.c_str());
+    return { joint_name, net_number, allow_actuation, std::move(motor_controller) };
   }
-  return { joint_name, net_number, allow_actuation, std::move(motor_controller), std::move(ges) };
 }
 
 std::unique_ptr<march::MotorController> HardwareBuilder::createMotorController(const YAML::Node& config,
-                                                                               march::ActuationMode mode,
                                                                                const urdf::JointConstSharedPtr& urdf_joint,
                                                                                march::PdoInterfacePtr pdo_interface,
                                                                                march::SdoInterfacePtr sdo_interface)
 {
   HardwareBuilder::validateRequiredKeysExist(config, HardwareBuilder::MOTOR_CONTROLLER_REQUIRED_KEYS, "motor_controller");
+
+  march::ActuationMode mode;
+  if (config["actuationMode"])
+  {
+    mode = march::ActuationMode(config["actuationMode"].as<std::string>());
+  }
 
   std::unique_ptr<march::MotorController> motor_controller;
   std::string type = config["type"].as<std::string>();

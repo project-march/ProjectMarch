@@ -67,11 +67,19 @@ public:
   /** @brief Override comparison operator */
   friend bool operator==(const Joint& lhs, const Joint& rhs)
   {
+    bool temperature_ges_is_equal;
+    if (lhs.temperature_ges_.has_value() && rhs.temperature_ges_.has_value())
+    {
+      temperature_ges_is_equal = *lhs.temperature_ges_.value() == *rhs.temperature_ges_.value();
+    }
+    else
+    {
+      temperature_ges_is_equal = lhs.temperature_ges_ == rhs.temperature_ges_;
+    }
     return lhs.name_ == rhs.name_ &&
            ((lhs.motor_controller_ && rhs.motor_controller_ && *lhs.motor_controller_ == *rhs.motor_controller_) ||
             (!lhs.motor_controller_ && !rhs.motor_controller_)) &&
-           ((lhs.temperature_ges_ && rhs.temperature_ges_ && *lhs.temperature_ges_ == *rhs.temperature_ges_) ||
-            (!lhs.temperature_ges_ && !rhs.temperature_ges_)) &&
+           temperature_ges_is_equal &&
            lhs.allow_actuation_ == rhs.allow_actuation_;
   }
 

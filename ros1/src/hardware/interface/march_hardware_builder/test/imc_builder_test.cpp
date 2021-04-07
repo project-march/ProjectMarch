@@ -53,7 +53,6 @@ TEST_F(IMotionCubeBuilderTest, ValidIMotionCubeHip)
   auto incremental_encoder = std::make_unique<march::IncrementalEncoder>(12, 101.0);
   march::IMotionCube expected(march::Slave(2, this->pdo_interface, this->sdo_interface), std::move(absolute_encoder),
                               std::move(incremental_encoder), march::ActuationMode::unknown);
-
   ASSERT_EQ(expected, *created);
 }
 
@@ -83,15 +82,6 @@ TEST_F(IMotionCubeBuilderTest, NoAbsoluteEncoder)
 TEST_F(IMotionCubeBuilderTest, NoIncrementalEncoder)
 {
   YAML::Node config = this->loadTestYaml("/imotioncube_no_incremental_encoder.yaml");
-
-  ASSERT_THROW(HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, this->joint,
-                                                  this->pdo_interface, this->sdo_interface),
-               MissingKeyException);
-}
-
-TEST_F(IMotionCubeBuilderTest, NoSlaveIndex)
-{
-  YAML::Node config = this->loadTestYaml("/imotioncube_no_slave_index.yaml");
 
   ASSERT_THROW(HardwareBuilder::createIMotionCube(config, march::ActuationMode::unknown, this->joint,
                                                   this->pdo_interface, this->sdo_interface),

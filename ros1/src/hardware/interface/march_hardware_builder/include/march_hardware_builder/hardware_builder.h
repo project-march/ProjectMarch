@@ -76,7 +76,6 @@ public:
   static std::unique_ptr<march::IncrementalEncoder>
   createIncrementalEncoder(const YAML::Node& incremental_encoder_config);
   static std::unique_ptr<march::MotorController> createMotorController(const YAML::Node& config,
-                                                                       march::ActuationMode mode,
                                                                        const urdf::JointConstSharedPtr& urdf_joint,
                                                                        march::PdoInterfacePtr pdo_interface,
                                                                        march::SdoInterfacePtr sdo_interface);
