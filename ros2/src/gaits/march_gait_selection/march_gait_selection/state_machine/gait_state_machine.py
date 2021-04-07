@@ -392,6 +392,7 @@ class GaitStateMachine(object):
                 f"left={self._force_left_foot}, right={self._force_right_foot}"
             )
 
+        # TODO: Gait callback should only be called after gait has started
         self._call_gait_callbacks()
         self._trajectory_scheduler.schedule(command)
 

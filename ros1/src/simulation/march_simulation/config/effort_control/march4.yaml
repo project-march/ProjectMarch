@@ -3,7 +3,7 @@ march:
   # Publish all joint states -----------------------------------
   joint_state_controller:
     type: joint_state_controller/JointStateController
-    publish_rate: 50
+    publish_rate: 250
 
   controller:
     trajectory:
@@ -29,6 +29,9 @@ march:
         right_hip_aa: {p: 1000,  d: 10, i: 0, i_clamp: 0}
         right_hip_fe: {p: 1500,  d: 150, i: 0, i_clamp: 0}
         right_knee: {p: 1000,  d: 10, i: 0, i_clamp: 0}
+
+      action_monitor_rate: 250
+      state_publish_rate: 250
 
       constraints:
         goal_time: 0.2

@@ -300,7 +300,7 @@ class SetpointsGait(GaitInterface, Gait):
         :param next_subgait: Next subgait to be scheduled
         """
         if not self._scheduled_early or self._end_time is None:
-            self._start_time = self._current_time
+            self._start_time = self._current_time + Duration(seconds=3)
         else:
             self._start_time = self._end_time
         self._end_time = self._start_time + next_subgait.duration
