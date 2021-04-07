@@ -19,7 +19,7 @@ using namespace std;
 ACADOvariables acadoVariables = {};
 ACADOworkspace acadoWorkspace = {};
 
-ModelPredictiveController::ModelPredictiveController(std::vector<double> W)
+ModelPredictiveController::ModelPredictiveController(std::vector<float> W)
     : W_(W)
 {
 }
@@ -86,7 +86,7 @@ void ModelPredictiveController::shiftStatesAndControl()
     acado_shiftControls(0);
 }
 
-void ModelPredictiveController::assignWeightingMatrix(std::vector<double> W)
+void ModelPredictiveController::assignWeightingMatrix(std::vector<float> W)
 {
     // set the ACADO W matrix (state and input weights)
     for (int i = 0; i < ACADO_NY; ++i) {

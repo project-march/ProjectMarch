@@ -10,7 +10,7 @@ using namespace std;
 class ModelPredictiveController {
 
 public:
-    ModelPredictiveController(std::vector<double> W);
+    ModelPredictiveController(std::vector<float> W);
 
     // Public variables
     vector<double> x0 { 0, 0 }; // Current state
@@ -61,7 +61,7 @@ public:
      * \brief Assign the weighting array values
      * @param W - weighting array
      */
-    void assignWeightingMatrix(std::vector<double> W);
+    void assignWeightingMatrix(std::vector<float> W);
 
     /**
      * \brief Check status codes and other
@@ -79,7 +79,7 @@ public:
     void shiftStatesAndControl();
 
 private:
-    std::vector<double> W_;
+    std::vector<float> W_;
 };
 
 #endif

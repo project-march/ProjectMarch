@@ -67,12 +67,12 @@ std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(
     }
 
 // Retrieve the Q matrix from the parameter server for a joint.
-std::vector<double> ModelPredictiveControllerInterface::getWArray(std::string joint_name)
+std::vector<float> ModelPredictiveControllerInterface::getWArray(std::string joint_name)
 {
   std::string parameter_path = "/march/controller/trajectory";
 
   // Get W from controller config
-  std::vector<double> W;
+  std::vector<float> W;
   ros::param::get(parameter_path + "/weighting_arrays/"  + joint_name, W);
 
   // Check for validity of the weighting array
