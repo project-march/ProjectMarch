@@ -12,8 +12,8 @@ march:
       joints:
         - rotational_joint
 
-      weighting_arrays:
-        rotational_joint: [100.0, 1.0, 0.01]
+      weights:
+        rotational_joint: {Q:[100.0, 1.0], R: 0.01}
 
       state_publish_rate:  25            # Override default
       action_monitor_rate: 30            # Override default

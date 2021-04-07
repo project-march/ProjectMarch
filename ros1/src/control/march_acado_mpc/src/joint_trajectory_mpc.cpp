@@ -71,9 +71,12 @@ std::vector<float> ModelPredictiveControllerInterface::getWArray(std::string joi
 {
   std::string parameter_path = "/march/controller/trajectory";
 
-  // Get W from controller config
-  std::vector<float> W;
-  ros::param::get(parameter_path + "/weighting_arrays/"  + joint_name, W);
+  // Get Q and R from controller config
+  std::vector<float> Q;
+  float R;
+
+  ros::param::get(parameter_path + "/weights/" + joint_name + "/Q", Q);
+  ros::param::get(parameter_path + "/weights/" + joint_name + "/R", R);
 
   // Check for validity of the weighting array
   ROS_DEBUG_STREAM_COND(W.size() != ACADO_NY, joint_name << ", Incorrect weighting array size");
