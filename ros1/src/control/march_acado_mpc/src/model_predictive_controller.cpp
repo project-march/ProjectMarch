@@ -32,15 +32,19 @@ void ModelPredictiveController::init()
     // Initialize state array with zero
     std::fill(std::begin(acadoVariables.x), std::end(acadoVariables.x), 0.0);
 
-    // Initialize input and "running" reference array with zero
-    std::fill(std::begin(acadoVariables.u), std::end(acadoVariables.u), 0.0);
-    std::fill(std::begin(acadoVariables.y), std::end(acadoVariables.y), 0.0);
+  // Initialize input array with zero
+  std::fill(std::begin(acadoVariables.u), std::end(acadoVariables.u), 0.0);
 
-    // Initialize "end" reference with zero
-    std::fill(std::begin(acadoVariables.yN), std::end(acadoVariables.yN), 0.0);
+  // Initialize "running" and "end" reference array with zero
+  std::fill(std::begin(acadoVariables.y), std::end(acadoVariables.y), 0.0);
+  std::fill(std::begin(acadoVariables.yN), std::end(acadoVariables.yN), 0.0);
 
-    // Current state feedback
-    setInitialState(x0);
+  // Initialize "running" and "end" weighting array with zero
+  std::fill(std::begin(acadoVariables.W), std::end(acadoVariables.W), 0.0);
+  std::fill(std::begin(acadoVariables.WN), std::end(acadoVariables.WN), 0.0);
+
+  // Current state feedback
+  setInitialState(x0);
 
   // Assign the weighting matrix
   assignWeightingMatrix(W_);
