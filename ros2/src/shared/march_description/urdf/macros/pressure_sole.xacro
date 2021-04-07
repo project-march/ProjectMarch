@@ -11,12 +11,11 @@
             </collision>
         </link>
 
-        <gazebo reference="ankle_plate_${foot_name}">
+        <gazebo reference="pressure_sole_${foot_place}">
             <sensor name="pressure_sole_${foot_place}" type="contact">
                 <always_on>true</always_on>
-                <contact>
-                        collision="ankle_plate_${foot_name}_fixed_joint_lump__pressure_sole_${foot_place}_collision_${counter}"
-                </contact>
+                <contact collision="ankle_plate_${foot_name}_fixed_joint_lump__pressure_sole_${foot_place}_collision_${counter}"/>
+                <!--<contact collision="ankle_plate_left_collision"/>-->
                 <plugin name="pressure_sole_plugin_${foot_place}" filename="libgazebo_ros_bumper.so">
                     <bumperTopicName>/march/sensor/${foot_name}_pressure_sole_${foot_place}</bumperTopicName>
                     <frameName>world</frameName>
