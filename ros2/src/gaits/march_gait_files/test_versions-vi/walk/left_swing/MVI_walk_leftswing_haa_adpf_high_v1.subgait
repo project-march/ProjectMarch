@@ -1,0 +1,101 @@
+description: 'The MVI high rightswing with the v2 HAA movements. '
+duration: 1300000000
+gait_type: walk_like
+joints:
+  left_ankle:
+  - position: 0.04360007
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.13962634
+    time_from_start: 195000000
+    velocity: -0.32221463
+  - position: 0.04363323
+    time_from_start: 595833330
+    velocity: 0.0
+  - position: 0.04360007
+    time_from_start: 1300000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.0873
+    time_from_start: 650000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 1300000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: -0.07849967
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.79161038
+    time_from_start: 503488100
+    velocity: 1.13824574
+  - position: 0.9589899
+    time_from_start: 780000000
+    velocity: 0.11815449
+  - position: 0.37520041
+    time_from_start: 1300000000
+    velocity: -0.29538382
+  left_knee:
+  - position: 0.13960016
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.3962634
+    time_from_start: 533108330
+    velocity: 0.0
+  - position: 0.87269953
+    time_from_start: 833408330
+    velocity: -2.27012291
+  - position: 0.09690068
+    time_from_start: 1170000000
+    velocity: 0.0
+  - position: 0.13960016
+    time_from_start: 1300000000
+    velocity: 0.0
+  right_ankle:
+  - position: 0.04360007
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.04360007
+    time_from_start: 1300000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.0611
+    time_from_start: 325000000
+    velocity: -0.19476923
+  - position: -0.0611
+    time_from_start: 975000000
+    velocity: 0.19476923
+  - position: 0.0
+    time_from_start: 1300000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.3752
+    time_from_start: 0
+    velocity: -0.29538462
+  - position: 0.3386
+    time_from_start: 510575000
+    velocity: -0.46855385
+  - position: -0.0785
+    time_from_start: 1300000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.1396
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.2094
+    time_from_start: 260000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 884000000
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 1300000000
+    velocity: 0.0
+name: left_swing
+version: MVI_walk_leftswing_haa_adpf_high_v1
