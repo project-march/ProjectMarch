@@ -3,7 +3,6 @@
 #include "model_predictive_controller.hpp"
 #include "acado_common.h"
 #include <acado_auxiliary_functions.h>
-#include "mpc_references.h"
 #include <ros/console.h>
 
 #include <iostream>
@@ -12,6 +11,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <algorithm>
 
 using namespace std;
 
@@ -29,18 +29,15 @@ void ModelPredictiveController::init()
   // Initialize the solver
   acado_initializeSolver();
 
-  // Prepare a consistent initial guess
-  for (int i = 0; i < ACADO_N + 1; i++) {
-    acadoVariables.x[i * ACADO_NX    ] = 0;     // theta
-    acadoVariables.x[i * ACADO_NX + 1] = 0; // dtheta
-  }
+  // Initialize state array with zero
+  std::fill(std::begin(acadoVariables.x), std::end(acadoVariables.x), 0.0);
 
-  // Fill reference vector with sinus and or step signals
-//  sinRef(reference, 0.2, 0.785, ACADO_N, 0.001);
-  stepRef(reference, 0.261, ACADO_N);
+  // Initialize input and "running" reference array with zero
+  std::fill(std::begin(acadoVariables.u), std::end(acadoVariables.u), 0.0);
+  std::fill(std::begin(acadoVariables.y), std::end(acadoVariables.y), 0.0);
 
-  // Set the reference
-  setReference(reference);
+  // Initialize "end" reference with zero
+  std::fill(std::begin(acadoVariables.yN), std::end(acadoVariables.yN), 0.0);
 
   // Current state feedback
   setInitialState(x0);
@@ -58,17 +55,24 @@ void ModelPredictiveController::setInitialState(vector<double> x0)
     acadoVariables.x0[i] = x0[i];
   }
 }
+void ModelPredictiveController::setReference(int n, const std::vector<double>& reference) {
 
-void ModelPredictiveController::setReference(vector<vector<double>> reference)
-{
-    for(int i = 0; i < ACADO_N; i++) {
-        for(int j = 0; j < ACADO_NY; j++) {
-            acadoVariables.y[i * ACADO_NY + j] = reference[i][j];
-        }
-    }
-    for(int j = 0; j < ACADO_NYN; j++) {
-        acadoVariables.yN[j] = reference[ACADO_N][j];
-    }
+  // check if size of reference at time step n is equal to size of ACADO_NY
+  if(ACADO_NY != reference.size()) {
+    ROS_DEBUG_STREAM_ONCE(joint_name << ", The supplied reference vector has an incorrect size");
+  }
+
+  // Set the reference of node n
+  if(n != ACADO_N) {
+    // set "running" reference
+    // reference of node 0 to node ACADO_N-1, includes states and control references
+    std::copy_n(reference.begin(), ACADO_NY, std::begin(acadoVariables.y) + n * ACADO_NY);
+  }
+  else {
+    // set "end" reference
+    // reference of the last node N, includes only the states references
+    std::copy_n(reference.begin(), ACADO_NYN, std::begin(acadoVariables.yN));
+  }
 }
 
 void ModelPredictiveController::shiftStatesAndControl()
@@ -138,9 +142,6 @@ void ModelPredictiveController::calculateControlInput()
   // Set initial state
   setInitialState(x0);
 
-  // Set reference
-  setReference(reference);
-
   // Preparation step (timed)
   acado_tic(&t);
   preparationStepStatus = acado_preparationStep();
@@ -157,10 +158,9 @@ void ModelPredictiveController::calculateControlInput()
   // Set mpc command 
   u = acadoVariables.u[0];
 
-  // Scroll the reference vector
-  if(repeat_reference) {
-      scrollReference(reference);
-  }
+  // Shift states and control and prepare for the next iteration
+  acado_shiftStates(2, 0, 0);
+  acado_shiftControls(0);
 
   // Perform a diagnosis on the controller
   controllerDiagnosis();
