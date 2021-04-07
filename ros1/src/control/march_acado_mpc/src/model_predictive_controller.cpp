@@ -19,11 +19,7 @@ using namespace std;
 ACADOvariables acadoVariables = {};
 ACADOworkspace acadoWorkspace = {};
 
-<<<<<<< HEAD
 ModelPredictiveController::ModelPredictiveController(std::vector<float> W)
-=======
-ModelPredictiveController::ModelPredictiveController(std::vector<double> W)
->>>>>>> Updating weight assigning functions
     : W_(W)
 {
 }
