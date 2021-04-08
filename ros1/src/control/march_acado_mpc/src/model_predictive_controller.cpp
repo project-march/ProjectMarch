@@ -92,12 +92,12 @@ void ModelPredictiveController::shiftStatesAndControl()
 
 void ModelPredictiveController::assignWeightingMatrix(std::vector<float> W)
 {
-    // set the ACADO W matrix (state and input weights)
+    // set the diagonal of the ACADO W matrix (state and input weights)
     for (int i = 0; i < ACADO_NY; ++i) {
       acadoVariables.W[i*(ACADO_NY+1)] = W[i];
     }
 
-    // Set the ACADO WN matrix (only state weights)
+    // Set the diagonal of the ACADO WN matrix (only state weights)
     for (int i = 0; i < ACADO_NYN; ++i) {
       acadoVariables.WN[i*(ACADO_NYN+1)] = W[i];
     }

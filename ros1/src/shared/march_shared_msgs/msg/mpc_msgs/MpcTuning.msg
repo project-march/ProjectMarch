@@ -1,2 +1,2 @@
-float32[] w_matrix
+float32[] weights
 int32 horizon

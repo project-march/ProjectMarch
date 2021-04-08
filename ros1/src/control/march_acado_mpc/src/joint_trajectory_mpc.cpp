@@ -90,7 +90,7 @@ std::vector<float> ModelPredictiveControllerInterface::getWeights(std::string jo
   // Set WArray for the mpc msg
   for (int i =0; i < num_joints_; ++i)
   {
-    mpc_pub_->msg_.joint[i].tuning.w_matrix.assign(W.begin(), W.end());
+    mpc_pub_->msg_.joint[i].tuning.weights.assign(W.begin(), W.end());
   }
 
   return W;
