@@ -57,6 +57,7 @@ class GaitStateMachine(object):
         self._is_idle = True
         self._shutdown_requested = False
         self._should_stop = False
+        self._is_stopping = False
 
         self.update_timer = None
         self.last_update_time = None
@@ -184,6 +185,7 @@ class GaitStateMachine(object):
     ):
         """Standard callback when gait changes, publishes the current gait
         More callbacke can be added using add_gait_callback"""
+        self._gait_selection.get_logger().info(f'Current subgait updated to {subgait_name}')
         self.current_gait_pub.publish(
             CurrentGait(
                 header=Header(stamp=self._gait_selection.get_clock().now().to_msg()),
@@ -350,7 +352,13 @@ class GaitStateMachine(object):
             self._gait_selection.get_logger().info(
                 f"Executing gait `{self._current_gait.name}`"
             )
-            self._process_gait_update(self._current_gait.start(current_time))
+            gait_update = self._current_gait.start(current_time)
+            if not self.check_correct_foot_pressure():
+                self._gait_selection.get_logger().debug(
+                    f"Foot forces when incorrect pressure warning was issued: "
+                    f"left={self._force_left_foot}, right={self._force_right_foot}"
+                )
+            self._process_gait_update(gait_update)
 
         if self._trajectory_scheduler.failed():
             self._trajectory_scheduler.reset()
@@ -371,12 +379,6 @@ class GaitStateMachine(object):
         self._process_gait_update(gait_update)
 
     def _process_gait_update(self, gait_update: GaitUpdate):
-        if not self.check_correct_foot_pressure():
-            self._gait_selection.get_logger().debug(
-                f"Foot forces when incorrect pressure warning was issued: "
-                f"left={self._force_left_foot}, right={self._force_right_foot}"
-            )
-
         # Call gait callback if there is a new subgait
         if gait_update.is_new_subgait:
             self._call_gait_callbacks()
@@ -396,12 +398,14 @@ class GaitStateMachine(object):
                 f"Finished gait `{self._current_gait.name}`"
             )
             self._current_gait = None
+            self._is_stopping = False
 
     def _handle_input(self):
         """Handles stop and transition input from the input device. This input
         is passed on to the current gait to execute the request"""
-        if self._input.stop_requested() or self._should_stop:
+        if (self._input.stop_requested() or self._should_stop) and not self._is_stopping:
             self._should_stop = False
+            self._is_stopping = True
             if self._current_gait.stop():
                 self._gait_selection.get_logger().info(
                     f"Gait {self._current_gait.name} responded to stop"

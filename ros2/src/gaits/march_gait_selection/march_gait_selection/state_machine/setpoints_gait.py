@@ -28,7 +28,6 @@ class SetpointsGait(GaitInterface, Gait):
         self._current_time = None
 
         self._scheduled_early = False
-        self._started = False
 
     @property
     def name(self):
@@ -87,8 +86,7 @@ class SetpointsGait(GaitInterface, Gait):
         self._is_transitioning = False
         self._scheduled_early = False
         self._update_time_stamps(self._current_subgait)
-        self._started = False
-        return GaitUpdate.early_schedule(self._command_from_current_subgait())
+        return GaitUpdate.schedule(self._command_from_current_subgait())
 
     def update(
         self,
@@ -106,10 +104,6 @@ class SetpointsGait(GaitInterface, Gait):
         :return: optional trajectory_command, is_finished
         """
         self._current_time = current_time
-
-        if self._current_time >= self._start_time and not self._started:
-            self._started = True
-            return GaitUpdate.subgait_update()
 
         if self._current_time >= self._end_time:
             return self._update_next_subgait()
@@ -308,7 +302,7 @@ class SetpointsGait(GaitInterface, Gait):
         :param next_subgait: Next subgait to be scheduled
         """
         if not self._scheduled_early or self._end_time is None:
-            self._start_time = self._current_time + Duration(seconds=3)
+            self._start_time = self._current_time
         else:
             self._start_time = self._end_time
         self._end_time = self._start_time + next_subgait.duration
