@@ -3,8 +3,11 @@
 # depth parameter and then the two created subgaits with the height pararmeter
 2_dimensions:
   realsense_stairs_up:
-    obstacle: stairs
+    obstacle: stairs_up
     camera_to_use: front
+    default_parameters:
+    - 0.5
+    - 0.5
     subgaits:
       right_open:
         - MVI_stairsup_rightopen_low_undeep
@@ -31,6 +34,8 @@
         - MVI_stairsup_rightclose_low_deep
         - MVI_stairsup_rightclose_high_undeep
         - MVI_stairsup_rightclose_high_deep
+
+
 # EXAMPLE FOR A FUTURE 1 dimension gait
 #  1_dimensions:
 #    realsense_sit:
@@ -43,3 +48,5 @@
 #        sit_home:
 #        - MVI_sit_home_low_v1
 #        - MVI_sit_home_high_v1
+#      responsible_for:
+#      - realsense_stand
