@@ -6,6 +6,7 @@
 #include <ros/console.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <march_shared_msgs/GetGaitParameters.h>
+#include <march_shared_msgs/SelectedRealSenseGait.h>
 #include <pointcloud_processor/preprocessor.h>
 #include <pointcloud_processor/region_creator.h>
 #include <pointcloud_processor/parameter_determiner.h>
@@ -115,7 +116,6 @@ bool RealSenseReader::processPointcloud(
   {
     res.error_message = "Preprocessing was unsuccessful, see debug output "
                         "for more information";
-    res.success = false;
     return false;
   }
 
@@ -135,7 +135,6 @@ bool RealSenseReader::processPointcloud(
   {
     res.error_message = "Region creating was unsuccessful, see debug output "
                         "for more information";
-    res.success = false;
     return false;
   }
 
@@ -160,7 +159,6 @@ bool RealSenseReader::processPointcloud(
   {
     res.error_message = "Hull finding was unsuccessful, see debug output "
                         "for more information";
-    res.success = false;
     return false;
   }
 
@@ -183,7 +181,6 @@ bool RealSenseReader::processPointcloud(
   {
     res.error_message = "Parameter determining was unsuccessful, see debug output "
                         "for more information";
-    res.success = false;
     return false;
   }
   if (debugging_)
@@ -200,7 +197,6 @@ bool RealSenseReader::processPointcloud(
   ROS_DEBUG_STREAM("Time taken by point cloud processor is : " << std::fixed <<
                    time_taken << std::setprecision(5) << " sec " << std::endl);
 
-  res.success = true;
   return true;
 }
 
@@ -396,19 +392,19 @@ bool RealSenseReader::processPointcloudCallback(
     res.error_message = "No pointcloud published within timeout, so "
                         "no processing could be done.";
     res.success = false;
-    return false;
+    return true;
   }
 
   PointCloud converted_cloud;
   pcl::fromROSMsg(*input_cloud, converted_cloud);
   PointCloud::Ptr point_cloud = boost::make_shared<PointCloud>(converted_cloud);
 
-  bool success = processPointcloud(point_cloud, res);
+  res.success = processPointcloud(point_cloud, res);
 
   time_t end_callback = clock();
   double time_taken = double(end_callback - start_callback) / double(CLOCKS_PER_SEC);
   ROS_DEBUG_STREAM("Time taken by process point cloud callback method: " << std::fixed <<
                    time_taken << std::setprecision(5) << " sec " << std::endl);
 
-  return success;
+  return true;
 }

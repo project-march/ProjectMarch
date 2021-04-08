@@ -19,7 +19,7 @@ JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
 class Setpoint:
     """Base class to define the setpoints of a subgait."""
 
-    digits = 8
+    digits = 4
 
     def __init__(
         self, time: Duration, position: float, velocity: Optional[float] = None

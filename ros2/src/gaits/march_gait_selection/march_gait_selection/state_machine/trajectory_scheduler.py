@@ -46,10 +46,14 @@ class TrajectoryScheduler(object):
         self._failed = False
         stamp = self._node.get_clock().now().to_msg()
         goal = FollowJointTrajectoryGoal(trajectory=trajectory)
+        self._last_goal = trajectory
         self._trajectory_goal_pub.publish(
             FollowJointTrajectoryActionGoal(
                 header=Header(stamp=stamp), goal_id=GoalID(stamp=stamp), goal=goal
             )
+        )
+        self._node.get_logger().info(
+            f"Done scheduling"
         )
 
     def failed(self):
@@ -63,4 +67,5 @@ class TrajectoryScheduler(object):
             self._node.get_logger().error(
                 f"Failed to execute trajectory. {result.result.error_string} ({result.result.error_code})"
             )
+            self._node.get_logger.info(f"Last goal was {self._last_goal}")
             self._failed = True

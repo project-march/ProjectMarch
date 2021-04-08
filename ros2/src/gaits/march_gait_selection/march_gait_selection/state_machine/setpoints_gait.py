@@ -80,6 +80,8 @@ class SetpointsGait(GaitInterface, Gait):
         :param elapsed_time:
         :return: trajectory, is_finished
         """
+        if self._current_subgait is None:
+            return None, False
         self._time_since_start += elapsed_time
         if self._time_since_start < self._current_subgait.duration:
             return None, False

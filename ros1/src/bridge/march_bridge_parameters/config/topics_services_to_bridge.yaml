@@ -67,7 +67,7 @@ services_2_to_1:
   - { service: '/gazebo/get_world_properties',
       type: 'gazebo_msgs/GetWorldProperties' }
   - { service: '/camera/process_pointcloud',
-      type: 'std_srvs/Trigger' }
+      type: 'march_shared_msgs/GetGaitParameters' }
   - { service: '/gazebo/get_model_state',
       type: 'gazebo_msgs/GetModelState' }
   - { service: '/march/set_obstacle_size/block_like',

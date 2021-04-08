@@ -223,8 +223,12 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(geometry_msgs::TransformSt
   try
   {
     pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
-    transform_stamped = tfBuffer->lookupTransform(frame_id_to_transform_to_, pointcloud_frame_id,
-                                                 ros::Time::now(), ros::Duration(0.5));
+    if(tfBuffer->canTransform(frame_id_to_transform_to_, pointcloud_frame_id,
+                              ros::Time(), ros::Duration(1.0))) {
+      transform_stamped = tfBuffer->lookupTransform(frame_id_to_transform_to_,
+                                                    pointcloud_frame_id,
+                                                    ros::Time(0));
+    }
     pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_,
                                  transform_stamped.transform);
   }
