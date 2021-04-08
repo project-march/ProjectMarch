@@ -1,9 +1,37 @@
 from typing import Optional, Tuple
 
+from attr import dataclass
 from march_gait_selection.state_machine.state_machine_input import TransitionRequest
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.utilities.duration import Duration
 from rclpy.time import Time
+
+
+@dataclass
+class GaitUpdate:
+    new_trajectory_command: Optional[TrajectoryCommand]
+    is_new_subgait: bool
+    is_finished: bool
+
+    @staticmethod
+    def empty():
+        return GaitUpdate(None, False, False)
+
+    @staticmethod
+    def finished():
+        return GaitUpdate(None, False, True)
+
+    @staticmethod
+    def subgait_update():
+        return GaitUpdate(None, True, False)
+
+    @staticmethod
+    def schedule(command: Optional[TrajectoryCommand] = None):
+        return GaitUpdate(command, True, False)
+
+    @staticmethod
+    def early_schedule(command: TrajectoryCommand):
+        return GaitUpdate(command, False, False)
 
 
 class GaitInterface(object):
@@ -56,12 +84,12 @@ class GaitInterface(object):
         """Return whether this gait can be scheduled early, default is False."""
         return False
 
-    def start(self, current_time: Time) -> Optional[TrajectoryCommand]:
+    def start(self, current_time: Time) -> GaitUpdate:
         """Called when the gait has been selected for execution and returns an
         optional starting trajectory command."""
-        return None
+        return GaitUpdate.empty()
 
-    def update(self, current_time: Time) -> Tuple[Optional[TrajectoryCommand], bool]:
+    def update(self, current_time: Time) -> GaitUpdate:
         """Called in a loop with the current time.
 
         :param current_time: Current time
@@ -69,7 +97,7 @@ class GaitInterface(object):
                  set as the new goal for the controller, can be None. The flag
                  indicates whether the gait has finished.
         """
-        return None, True
+        return GaitUpdate.finished()
 
     def transition(self, transition_request: TransitionRequest) -> bool:
         """Requests a special transition.

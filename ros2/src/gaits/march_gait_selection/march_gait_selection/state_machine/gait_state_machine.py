@@ -13,6 +13,7 @@ from std_srvs.srv import Trigger
 from .gait_state_machine_error import GaitStateMachineError
 from .home_gait import HomeGait
 from .trajectory_scheduler import TrajectoryCommand, TrajectoryScheduler
+from .gait_interface import GaitUpdate
 
 PRESSURE_SOLE_STANDING_FORCE = 8000
 DEFAULT_TIMER_PERIOD = 0.004
@@ -349,9 +350,7 @@ class GaitStateMachine(object):
             self._gait_selection.get_logger().info(
                 f"Executing gait `{self._current_gait.name}`"
             )
-            command = self._current_gait.start(current_time)
-            if command is not None:
-                self._schedule_command(command)
+            self._process_gait_update(self._current_gait.start(current_time))
 
         if self._trajectory_scheduler.failed():
             self._trajectory_scheduler.reset()
@@ -364,17 +363,30 @@ class GaitStateMachine(object):
         self._handle_input()
 
         if self._current_gait.can_be_scheduled_early:
-            command, should_stop = self._current_gait.update(
+            gait_update = self._current_gait.update(
                 current_time, self._early_schedule_duration
             )
         else:
-            command, should_stop = self._current_gait.update(current_time)
+            gait_update = self._current_gait.update(current_time)
+        self._process_gait_update(gait_update)
 
-        # schedule trajectory if any
-        if command is not None:
-            self._schedule_command(command)
+    def _process_gait_update(self, gait_update: GaitUpdate):
+        if not self.check_correct_foot_pressure():
+            self._gait_selection.get_logger().debug(
+                f"Foot forces when incorrect pressure warning was issued: "
+                f"left={self._force_left_foot}, right={self._force_right_foot}"
+            )
 
-        if should_stop:
+        # Call gait callback if there is a new subgait
+        if gait_update.is_new_subgait:
+            self._call_gait_callbacks()
+
+        # Schedule a new trajectory if any
+        if gait_update.new_trajectory_command is not None:
+            self._trajectory_scheduler.schedule(gait_update.new_trajectory_command)
+
+        # Process finishing of the gait
+        if gait_update.is_finished:
             self._current_state = self._gait_transitions[self._current_state]
             self._is_idle = True
             self._current_gait.end()
@@ -384,17 +396,6 @@ class GaitStateMachine(object):
                 f"Finished gait `{self._current_gait.name}`"
             )
             self._current_gait = None
-
-    def _schedule_command(self, command: TrajectoryCommand):
-        if not self.check_correct_foot_pressure():
-            self._gait_selection.get_logger().debug(
-                f"Foot forces when incorrect pressure warning was issued: "
-                f"left={self._force_left_foot}, right={self._force_right_foot}"
-            )
-
-        # TODO: Gait callback should only be called after gait has started
-        self._call_gait_callbacks()
-        self._trajectory_scheduler.schedule(command)
 
     def _handle_input(self):
         """Handles stop and transition input from the input device. This input

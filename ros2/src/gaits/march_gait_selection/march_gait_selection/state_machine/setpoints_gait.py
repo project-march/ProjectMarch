@@ -9,7 +9,7 @@ from rclpy.time import Time
 
 from .trajectory_scheduler import TrajectoryCommand
 
-from .gait_interface import GaitInterface
+from .gait_interface import GaitInterface, GaitUpdate
 from .state_machine_input import TransitionRequest
 
 
@@ -28,6 +28,7 @@ class SetpointsGait(GaitInterface, Gait):
         self._current_time = None
 
         self._scheduled_early = False
+        self._started = False
 
     @property
     def name(self):
@@ -73,7 +74,7 @@ class SetpointsGait(GaitInterface, Gait):
     def can_be_scheduled_early(self) -> bool:
         return True
 
-    def start(self, current_time: Time):
+    def start(self, current_time: Time) -> GaitUpdate:
         """
         Start the gait, sets current subgait to the first subgait, resets the
         time and generates the first trajectory command.
@@ -86,13 +87,14 @@ class SetpointsGait(GaitInterface, Gait):
         self._is_transitioning = False
         self._scheduled_early = False
         self._update_time_stamps(self._current_subgait)
-        return self._command_from_current_subgait()
+        self._started = False
+        return GaitUpdate.early_schedule(self._command_from_current_subgait())
 
     def update(
         self,
         current_time: Time,
         early_schedule_duration: Optional[Duration] = None,
-    ) -> Tuple[Optional[TrajectoryCommand], bool]:
+    ) -> GaitUpdate:
         """
         Update the progress of the gait, should be called regularly.
         If the previous subgait ended, schedule a new one.
@@ -104,17 +106,23 @@ class SetpointsGait(GaitInterface, Gait):
         :return: optional trajectory_command, is_finished
         """
         self._current_time = current_time
+
+        if self._current_time >= self._start_time and not self._started:
+            self._started = True
+            return GaitUpdate.subgait_update()
+
         if self._current_time >= self._end_time:
             return self._update_next_subgait()
+
         if (
             early_schedule_duration is not None
             and not self._scheduled_early
             and self._current_time >= self._end_time - early_schedule_duration
         ):
-            return self._update_next_subgait_early(), False
-        return None, False
+            return self._update_next_subgait_early()
+        return GaitUpdate.empty()
 
-    def _update_next_subgait(self) -> Tuple[Optional[TrajectoryCommand], bool]:
+    def _update_next_subgait(self) -> GaitUpdate:
         """Update the next subgait.
 
         Behaves differently based on whether a new subgait has been scheduled early.
@@ -143,7 +151,7 @@ class SetpointsGait(GaitInterface, Gait):
 
         # If there is no next subgait, then we are finished
         if next_subgait is None:
-            return None, True
+            return GaitUpdate.finished()
 
         # Update subgait and timestamps
         self._update_time_stamps(next_subgait)
@@ -156,9 +164,9 @@ class SetpointsGait(GaitInterface, Gait):
             command = None
 
         self._scheduled_early = False
-        return command, False
+        return GaitUpdate.schedule(command)
 
-    def _update_next_subgait_early(self) -> Optional[TrajectoryCommand]:
+    def _update_next_subgait_early(self) -> GaitUpdate:
         """Update the next subgait.
 
         First the next subgait is determined, which is based on the status of transitioning
@@ -183,8 +191,8 @@ class SetpointsGait(GaitInterface, Gait):
 
         # If there is no subgait, return None and False for is_finished
         if next_subgait is None:
-            return None
-        return TrajectoryCommand.from_subgait(next_subgait, self._end_time)
+            return GaitUpdate.empty()
+        return GaitUpdate.early_schedule(TrajectoryCommand.from_subgait(next_subgait, self._end_time))
 
     def _next_graph_subgait(self) -> Optional[Subgait]:
         """Get the next subgait from the graph.

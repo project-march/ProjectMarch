@@ -3,7 +3,7 @@ from typing import Optional, Tuple
 from march_utility.utilities.duration import Duration
 from rclpy.time import Time
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
-from .gait_interface import GaitInterface
+from .gait_interface import GaitInterface, GaitUpdate
 from .trajectory_scheduler import TrajectoryCommand
 
 
@@ -56,7 +56,7 @@ class HomeGait(GaitInterface):
     def version(self):
         return "home_gait_version"
 
-    def start(self, current_time: Time) -> TrajectoryCommand:
+    def start(self, current_time: Time) -> GaitUpdate:
         """
         Creates a trajectory message to go towards the idle position in the
         given duration.
@@ -64,9 +64,9 @@ class HomeGait(GaitInterface):
         """
         self._start_time = current_time
         self._end_time = self._start_time + self._duration
-        return TrajectoryCommand(
+        return GaitUpdate.schedule(TrajectoryCommand(
             self._get_trajectory_msg(), self._duration, self._name, self._start_time
-        )
+        ))
 
     def update(self, current_time: Time) -> Tuple[Optional[TrajectoryCommand], bool]:
         """
@@ -77,9 +77,9 @@ class HomeGait(GaitInterface):
         is_finished is based on the given duration, not the actual position
         """
         if current_time >= self._end_time:
-            return None, True
+            return GaitUpdate.finished()
         else:
-            return None, False
+            return GaitUpdate.empty()
 
     def _get_trajectory_msg(self):
         """
