@@ -86,7 +86,7 @@ private:
    * @param joint_name Joint to retrieve W array for
    * @return Returns a vector: The W array.
    */
-  std::vector<float> getWArray(std::string joint_name);
+  std::vector<float> getWeights(std::string joint_name);
 
     std::vector<hardware_interface::JointHandle>* joint_handles_ptr_;
 

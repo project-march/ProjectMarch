@@ -55,7 +55,7 @@ std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(
   // Initialize the model predictive controllers
   for (unsigned int i = 0; i < num_joints_; ++i)
   {
-      model_predictive_controllers_.push_back(ModelPredictiveController(getWArray(joint_names[i])));
+      model_predictive_controllers_.push_back(ModelPredictiveController(getWeights(joint_names[i])));
       model_predictive_controllers_[i].joint_name = joint_names[i];
       model_predictive_controllers_[i].init();
   }
@@ -67,7 +67,7 @@ std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(
     }
 
 // Retrieve the Q matrix from the parameter server for a joint.
-std::vector<float> ModelPredictiveControllerInterface::getWArray(std::string joint_name)
+std::vector<float> ModelPredictiveControllerInterface::getWeights(std::string joint_name)
 {
   // get path to controller parameters
   std::string parameter_path = "/march/controller/trajectory";
