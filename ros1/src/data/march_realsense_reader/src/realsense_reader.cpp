@@ -8,6 +8,8 @@
 #include <pcl_ros/point_cloud.h>
 #include <pointcloud_processor/hull_finder.h>
 #include <pointcloud_processor/parameter_determiner.h>
+#include <march_shared_msgs/GetGaitParameters.h>
+#include <march_shared_msgs/SelectedRealSenseGait.h
 #include <pointcloud_processor/preprocessor.h>
 #include <pointcloud_processor/region_creator.h>
 #include <ros/console.h>
@@ -118,17 +120,18 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
     // Preprocess
     bool preprocessing_was_successful = preprocessor_->preprocess(
         pointcloud, normals, frame_id_to_transform_to_);
+
+    if (not preprocessing_was_successful) {
+        res.error_message = "Preprocessing was unsuccessful, see debug output "
+                            "for more information";
+        return false;
+    }
+
     if (debugging_) {
         ROS_DEBUG("Done preprocessing, see /camera/preprocessed_cloud for "
                   "resulting point cloud");
         publishCloud<pcl::PointXYZ>(
             preprocessed_pointcloud_publisher_, *pointcloud);
-    }
-    if (not preprocessing_was_successful) {
-        res.error_message = "Preprocessing was unsuccessful, see debug output "
-                            "for more information";
-        res.success = false;
-        return false;
     }
 
     // Setup data structures for region creating
@@ -155,7 +158,7 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
             region_pointcloud_publisher_, *coloured_cloud);
     }
 
-    // Setup data structures for finding
+    // Setup data structures for finding hulls
     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector
         = boost::make_shared<PlaneCoefficientsVector>();
     boost::shared_ptr<HullVector> hull_vector
@@ -166,16 +169,17 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
     bool hull_finding_was_successful
         = hull_finder_->findHulls(pointcloud, normals, region_vector,
             plane_coefficients_vector, hull_vector, polygon_vector);
+
+    if (not hull_finding_was_successful) {
+      res.error_message = "Hull finding was unsuccessful, see debug output "
+                          "for more information";
+      return false;
+    }
+
     if (debugging_) {
         ROS_DEBUG("Done creating hulls, now publishing markers to "
                   "/camera/hull_marker_list");
         publishHullMarkerArray(hull_vector);
-    }
-    if (not hull_finding_was_successful) {
-        res.error_message = "Hull finding was unsuccessful, see debug output "
-                            "for more information";
-        res.success = false;
-        return false;
     }
 
     // Setup data structures for parameter determining
@@ -186,17 +190,16 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
     bool parameter_determining_was_successful
         = parameter_determiner_->determineParameters(plane_coefficients_vector,
             hull_vector, polygon_vector, selected_gait, gait_parameters);
-    if (debugging_) {
-        ROS_DEBUG("Done determining parameters, now publishing a marker to "
-                  "/camera/foot_locations_marker_array");
-        publishParameterDeterminerMarkerArray();
-    }
     if (not parameter_determining_was_successful) {
         res.error_message
             = "Parameter determining was unsuccessful, see debug output "
               "for more information";
-        res.success = false;
         return false;
+    }
+    if (debugging_) {
+      ROS_DEBUG("Done determining parameters, now publishing a marker to "
+                "/camera/foot_locations_marker_array");
+      publishParameterDeterminerMarkerArray();
     }
 
     res.gait_parameters = *gait_parameters;
@@ -210,10 +213,9 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
         << std::fixed << time_taken << std::setprecision(5) << " sec "
         << std::endl);
 
-    res.success = true;
-    // Returning false means that the service was not able to respond at all,
-    // this causes problems with the bridge, therefore always return true!
+    // The processing was successful, so return true
     return true;
+
 }
 
 // Publish a pointcloud of any point type on a publisher
@@ -424,7 +426,7 @@ bool RealSenseReader::processPointcloudCallback(
         res.error_message = "No pointcloud published within timeout, so "
                             "no processing could be done.";
         res.success = false;
-        return false;
+        return true;
     }
 
     PointCloud converted_cloud;
@@ -432,7 +434,7 @@ bool RealSenseReader::processPointcloudCallback(
     PointCloud::Ptr point_cloud
         = boost::make_shared<PointCloud>(converted_cloud);
 
-    bool success = processPointcloud(point_cloud, res);
+    res.success = processPointcloud(point_cloud, res);
 
     time_t end_callback = clock();
     double time_taken
@@ -441,5 +443,7 @@ bool RealSenseReader::processPointcloudCallback(
         << std::fixed << time_taken << std::setprecision(5) << " sec "
         << std::endl);
 
-    return success;
+    // Always return true, to show that the service was able to handle the
+    // request. Otherwise, the bridge will fail.
+    return true;
 }

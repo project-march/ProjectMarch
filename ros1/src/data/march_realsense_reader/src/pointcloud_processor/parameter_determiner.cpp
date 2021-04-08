@@ -107,11 +107,10 @@ bool HullParameterDeterminer::determineParameters(
 
     success &= getGaitParametersFromFootLocation();
 
-  ROS_DEBUG_STREAM(
-          "With corresponding parameters (size, height, side) (" <<
-          gait_parameters_->first_parameter   << ", " <<
-          gait_parameters_->second_parameter << ", " <<
-          gait_parameters_->side_step_parameter   << ") " );
+    ROS_DEBUG_STREAM("With corresponding parameters (size, height, side) ("
+        << gait_parameters_->first_parameter << ", "
+        << gait_parameters_->second_parameter << ", "
+        << gait_parameters_->side_step_parameter << ") ");
 
     time_t end_determine_parameters = clock();
     double time_taken

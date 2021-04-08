@@ -288,6 +288,7 @@ class GaitStateMachine(object):
 
         If not, issue a warning. This will only be checked when transitioning from idle to gait state
         """
+        self._gait_selection.get_logger().info(f"Begin foot of {self._current_gait}")
         if (
             "right" in self._current_gait.subgait_name
             and self._force_right_foot > self._force_left_foot
@@ -339,10 +340,16 @@ class GaitStateMachine(object):
         finishes the gait if it is done."""
         now = self._gait_selection.get_clock().now()
         if self._current_gait is None:
+            self._gait_selection.get_logger().info(
+                f"Current state `{self._current_state}`"
+            )
             if self._current_state in self._home_gaits:
                 self._current_gait = self._home_gaits[self._current_state]
             else:
                 self._current_gait = self._gait_selection[self._current_state]
+            self._gait_selection.get_logger().info(
+                f"Current gait 1 `{self._current_gait}`"
+            )
 
             self._gait_selection.get_logger().info(
                 f"Executing gait `{self._current_gait.name}`"
@@ -350,6 +357,7 @@ class GaitStateMachine(object):
             if self._current_gait.can_be_scheduled_early:
                 gait_update = self._current_gait.start(
                     now, self._gait_selection._first_subgait_delay
+
                 )
             else:
                 gait_update = self._current_gait.start(now)
