@@ -49,35 +49,37 @@ void HullParameterDeterminer::readYaml()
       config_tree_, "general_most_desirable_location_is_mid");
   general_most_desirable_location_is_small = yaml_utilities::grabParameter<bool>(
       config_tree_, "general_most_desirable_location_is_small");
-  if (YAML::Node stairs_locations_parameters = config_tree_["stairs_locations"])
+  if (YAML::Node stairs_parameters = config_tree_["stairs_parameters"])
   {
     min_x_stairs = yaml_utilities::grabParameter<double>(
-        stairs_locations_parameters, "min_x_stairs");
+            stairs_parameters, "min_x_stairs");
     max_x_stairs = yaml_utilities::grabParameter<double>(
-        stairs_locations_parameters, "max_x_stairs");
+            stairs_parameters, "max_x_stairs");
     min_z_stairs = yaml_utilities::grabParameter<double>(
-        stairs_locations_parameters, "min_z_stairs");
+            stairs_parameters, "min_z_stairs");
     max_z_stairs = yaml_utilities::grabParameter<double>(
-        stairs_locations_parameters, "max_z_stairs");
+            stairs_parameters, "max_z_stairs");
     y_location = yaml_utilities::grabParameter<double>(
-        stairs_locations_parameters,"y_location");
+            stairs_parameters,"y_location");
   }
-  if (YAML::Node ramp_locations_parameters = config_tree_["ramp_locations"])
+  if (YAML::Node ramp_parameters = config_tree_["ramp_parameters"])
   {
     x_flat = yaml_utilities::grabParameter<double>(
-        ramp_locations_parameters, "x_flat");
+            ramp_parameters, "x_flat");
     z_flat = yaml_utilities::grabParameter<double>(
-        ramp_locations_parameters, "z_flat");
+            ramp_parameters, "z_flat");
     x_steep = yaml_utilities::grabParameter<double>(
-        ramp_locations_parameters, "x_steep");
+            ramp_parameters, "x_steep");
     z_steep = yaml_utilities::grabParameter<double>(
-        ramp_locations_parameters, "z_steep");
+            ramp_parameters, "z_steep");
     y_location = yaml_utilities::grabParameter<double>(
-        ramp_locations_parameters, "y_location");
+            ramp_parameters, "y_location");
     min_search_area = yaml_utilities::grabParameter<double>(
-        ramp_locations_parameters, "min_search_area");
+            ramp_parameters, "min_search_area");
     max_search_area = yaml_utilities::grabParameter<double>(
-        ramp_locations_parameters, "max_search_area");
+            ramp_parameters, "max_search_area");
+    max_distance_to_line = yaml_utilities::grabParameter<double>(
+            ramp_parameters, "max_distance_to_line");
   }
   else
   {
@@ -139,28 +141,14 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
   }
   else if (selected_obstacle_ == SelectedGait::ramp_down)
   {
+    // As we can only execute gaits in a certain line, project to the line and find where on the line the point falls.
+    // The distance to the line is capped by max_distance_to_line
     pcl::PointXYZ projected_optimal_foot_location =
         linear_algebra_utilities::projectPointToLine(
             optimal_foot_location, executable_locations_line_coefficients_);
-    optimal_foot_location.x = projected_optimal_foot_location.x;
-    optimal_foot_location.y = projected_optimal_foot_location.y;
-    optimal_foot_location.z = projected_optimal_foot_location.z;
 
-    double parameter_from_x = (optimal_foot_location.x - x_flat) / (x_steep - x_flat);
-    double parameter_from_z = (optimal_foot_location.z - z_flat) / (z_steep - z_flat);
-
-    double allowable_error = 0.01;
-    if (parameter_from_x - parameter_from_z < allowable_error)
-    {
-      gait_parameters_->step_size_parameter =
-          (optimal_foot_location.x - x_flat) / (x_steep - x_flat);
-    }
-    else
-    {
-      ROS_ERROR_STREAM("The optimal foot location for the ramp gait was not on a linear line "
-                       "between the flat and steep gait, unable to determine parameter.");
-      return false;
-    }
+    gait_parameters_->step_size_parameter =
+        (projected_optimal_foot_location.x - x_flat) / (x_steep - x_flat);
   }
   else
   {
@@ -321,14 +309,15 @@ bool HullParameterDeterminer::isValidLocation(pcl::PointNormal possible_foot_loc
   }
   else if (selected_obstacle_ == SelectedGait::ramp_down)
   {
-//    // All locations are valid for now.
-//    return true;
-    // Only points on the line which are between the two given values are valid
     pcl::PointXYZ projected_point = linear_algebra_utilities::projectPointToLine(
-        possible_foot_location, executable_locations_line_coefficients_);
+            possible_foot_location, executable_locations_line_coefficients_);
+    double distance = linear_algebra_utilities::distanceBetweenPoints(
+            projected_point, possible_foot_location);
+    // only points which are close enough to the line are valid
+    // Only points on the line which are between the two given values are valid
     // Less and larger than signs are swapped for the x coordinate
     // as the positive x axis points in the backwards direction of the exoskeleton
-    return (projected_point.x < x_steep && projected_point.x > x_flat);
+    return (projected_point.x < x_steep && projected_point.x > x_flat && distance < max_distance_to_line);
   }
   else
   {

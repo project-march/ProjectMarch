@@ -40,14 +40,14 @@ hull_finder:
 parameter_determiner:
   number_of_optional_foot_locations: 15
   # Remember that forward in negative in the x direction!
-  stairs_locations:
+  stairs_paremters:
     min_x_stairs: -0.2
     max_x_stairs: -0.4
     min_z_stairs: 0.1
     max_z_stairs: 0.3
     # Since we transform to the relevant foot, the y component of the foot location should be 0
     y_location: 0
-  ramp_locations:
+  ramp_parameters:
     # The end locations of the foot for the different ramp gaits
     x_flat: -0.4
     z_flat: -0.05
@@ -55,8 +55,11 @@ parameter_determiner:
     z_steep: -0.2
     # Since we transform to the relevant foot, the y component of the foot location should be 0
     y_location: 0
+    # As we project to a possible locations line, we want to search in a region larger then x_steep to x_flat
     min_search_area: -0
     max_search_area: -0.6
+    # The maximum allowed distance from the best location to the possible locations line
+    max_distance_to_line: 0.01
   # Set the most desirable foot location to the mid point of what the gaits are capable off
   general_most_desirable_location_is_mid: true
   # Set the most desirable foot location to the smallest / flattest step
