@@ -139,7 +139,7 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
               (optimal_foot_location.x - min_x_stairs) / (max_x_stairs - min_x_stairs);
       gait_parameters_->step_height_parameter =
               (optimal_foot_location.z - min_z_stairs) / (max_z_stairs - min_z_stairs);
-
+      break;
     case SelectedGait::ramp_down:
       // As we can only execute gaits in a certain line, project to the line and find where on the line the point falls.
       // The distance to the line is capped by max_distance_to_line
@@ -149,6 +149,7 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
 
       gait_parameters_->step_size_parameter =
               (projected_optimal_foot_location.x - x_flat) / (x_steep - x_flat);
+      break;
     default:
       ROS_ERROR_STREAM("No way to transform a foot location to parameters "
                        "is implemented yet for obstacle " << selected_obstacle_);
@@ -188,12 +189,14 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
 
       // Get the possible location which is closest to the ideal location
       success &= getPossibleMostDesirableLocation();
+      break;
     case SelectedGait::ramp_down:
       // Get the line on which it is possible to stand for a ramp gait.
       success &= getExecutableLocationsLine();
 
       // Get the possible location which is closest to the line
       success &= getPossibleMostDesirableLocation();
+      break;
     default:
         ROS_ERROR_STREAM("getOptimalFootLocation method is not implemented "
                        "for selected obstacle " << selected_obstacle_);
