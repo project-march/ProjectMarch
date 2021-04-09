@@ -122,6 +122,7 @@ protected:
 
   // Read all relevant parameters from the parameter yaml file
   void readYaml();
+  int hull_dimension;
   int number_of_optional_foot_locations;
   double min_x_stairs;
   double max_x_stairs;

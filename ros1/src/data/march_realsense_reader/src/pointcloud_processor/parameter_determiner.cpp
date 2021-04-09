@@ -45,11 +45,13 @@ HullParameterDeterminer::HullParameterDeterminer(YAML::Node config_tree, bool de
 void HullParameterDeterminer::readYaml()
 {
   number_of_optional_foot_locations = yaml_utilities::grabParameter<int>(
-      config_tree_, "number_of_optional_foot_locations");
+          config_tree_, "number_of_optional_foot_locations");
   general_most_desirable_location_is_mid = yaml_utilities::grabParameter<bool>(
-      config_tree_, "general_most_desirable_location_is_mid");
+          config_tree_, "general_most_desirable_location_is_mid");
   general_most_desirable_location_is_small = yaml_utilities::grabParameter<bool>(
-      config_tree_, "general_most_desirable_location_is_small");
+          config_tree_, "general_most_desirable_location_is_small");
+  hull_dimension = yaml_utilities::grabParameters<int>(
+          config_tree, "hull_dimension");
   if (YAML::Node stairs_parameters = config_tree_["stairs_parameters"])
   {
     min_x_stairs = yaml_utilities::grabParameter<double>(
@@ -510,7 +512,7 @@ bool HullParameterDeterminer::cropCloudToHull(
   crop_filter.setInputCloud(elevated_cloud);
   crop_filter.setHullCloud(hull);
   crop_filter.setHullIndices(polygon);
-  crop_filter.setDim(2); //////////////////////////////////////////////////////////
+  crop_filter.setDim(hull_dimension);
   crop_filter.filter(*elevated_cloud);
   return true;
 }

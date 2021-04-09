@@ -38,6 +38,7 @@ hull_finder:
     hull_dimension: 2
 
 parameter_determiner:
+  hull_dimension: 2
   number_of_optional_foot_locations: 15
   # Remember that forward in negative in the x direction!
   stairs_parameters:
