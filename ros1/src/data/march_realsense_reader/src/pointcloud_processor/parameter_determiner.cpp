@@ -50,8 +50,8 @@ void HullParameterDeterminer::readYaml()
           config_tree_, "general_most_desirable_location_is_mid");
   general_most_desirable_location_is_small = yaml_utilities::grabParameter<bool>(
           config_tree_, "general_most_desirable_location_is_small");
-  hull_dimension = yaml_utilities::grabParameters<int>(
-          config_tree, "hull_dimension");
+  hull_dimension = yaml_utilities::grabParameter<int>(
+          config_tree_, "hull_dimension");
   if (YAML::Node stairs_parameters = config_tree_["stairs_parameters"])
   {
     min_x_stairs = yaml_utilities::grabParameter<double>(
@@ -140,14 +140,14 @@ bool HullParameterDeterminer::determineParameters(
 // Find the parameters from the foot location by finding at what percentage of the end points it is
 bool HullParameterDeterminer::getGaitParametersFromFootLocation()
 {
-  success = true;
+  bool success = true;
   switch (selected_gait_) {
     case SelectedGait::stairs_up: {
-      succes &= getGaitParametersFromFootLocationStairsUp();
+      success &= getGaitParametersFromFootLocationStairsUp();
       break;
     }
     case SelectedGait::ramp_down: {
-      success &= getGaitParametersFromFootLocationsRampDown();
+      success &= getGaitParametersFromFootLocationRampDown();
       break;
     }
     default:
@@ -433,7 +433,7 @@ bool HullParameterDeterminer::getOptionalFootLocations(PointCloud2D::Ptr foot_lo
 }
 
 // Fill the foot locations to try cloud with a line of points from (start, 0) to (end, 0)
-void HullParameterDeterminer::fillOptionalFootLocationCloud(double start, double end)
+bool HullParameterDeterminer::fillOptionalFootLocationCloud(double start, double end)
 {
   if (number_of_optional_foot_locations == 0)
   {

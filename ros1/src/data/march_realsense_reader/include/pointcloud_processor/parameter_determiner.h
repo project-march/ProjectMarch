@@ -126,7 +126,8 @@ protected:
   // Find the ramp down parameter from the foot locations
   bool getGaitParametersFromFootLocationRampDown();
 
-  void fillOptionalFootLocationCloud();
+  // Fill the foot locations to try cloud with a line of points from (start, 0) to (end, 0)
+  bool fillOptionalFootLocationCloud(double start, double end);
 
   // Read all relevant parameters from the parameter yaml file
   void readYaml();
