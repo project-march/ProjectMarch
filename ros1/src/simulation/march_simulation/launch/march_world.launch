@@ -12,7 +12,7 @@
     <arg name="controller_name" default="$(arg robot)" doc="Name of the controller"/>
     <arg name="realsense_simulation" default="true"
          doc="Whether the simulation camera or the physical camera should be used"/>
-
+    
 <!-- To prevent a lot of unnecessary topics and messages, we disable the plugins that
  send a lot of compressed versions of the camera topics. -->
     <include file="$(find march_simulation)/launch/disable_camera_plugins.launch"
@@ -23,7 +23,7 @@
              if="$(eval realsense_simulation)">
         <arg name="camera_name" value="camera_back"/>
     </include>
-    
+
     <!-- Load the URDF into the ROS Parameter Server -->
     <!-- Override effort values as Gazebo uses different units than the actual IMC. -->
     <!-- In theory, if the controller is properly tuned, these values can be arbitrarily large. -->
