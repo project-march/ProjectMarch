@@ -193,9 +193,7 @@ bool HullParameterDeterminer::getOptimalFootLocation()
 
   // Get some locations on the ground we might want to place our foot
   foot_locations_to_try = boost::make_shared<PointCloud2D>();
-  ROS_WARN_STREAM("fine after initializing the foot locations to try");
   success &= getOptionalFootLocations(foot_locations_to_try);
-  ROS_WARN_STREAM("fine after getting optional foot locations");
 
   // Crop those locations to only be left with locations where it is possible to place the foot
   possible_foot_locations = boost::make_shared<PointNormalCloud>();
@@ -392,31 +390,37 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
 // where it should be checked if there is a valid foot location
 bool HullParameterDeterminer::getOptionalFootLocations(PointCloud2D::Ptr foot_locations_to_try)
 {
-  if (selected_obstacle_ == SelectedGait::stairs_up)
+  foot_locations_to_try->points.resize(number_of_optional_foot_locations);
+  switch (selected_obstacle_)
   {
-    for (int i = 0; i < number_of_optional_foot_locations; i++)
+    case SelectedGait::stairs_up:
     {
-      double x_location = min_x_stairs + (max_x_stairs - min_x_stairs) *
-                                         i / (double) (number_of_optional_foot_locations - 1);
-      foot_locations_to_try->points[i].x = x_location;
-      foot_locations_to_try->points[i].y = y_location;
+      for (int i = 0; i < number_of_optional_foot_locations; i++)
+      {
+        double x_location = min_x_stairs + (max_x_stairs - min_x_stairs) *
+                                           i / (double) (number_of_optional_foot_locations - 1);
+        foot_locations_to_try->points[i].x = x_location;
+        foot_locations_to_try->points[i].y = y_location;
+      }
+      break;
     }
-  }
-  else if (selected_obstacle_ == SelectedGait::ramp_down)
-  {
-    for (int i = 0; i < number_of_optional_foot_locations; i++)
+    case SelectedGait::ramp_down:
     {
-      double x_location = min_search_area + (max_search_area - min_search_area) *
-                                        i / (double) (number_of_optional_foot_locations - 1);
-      foot_locations_to_try->points[i].x = x_location;
-      foot_locations_to_try->points[i].y = y_location;
+      for (int i = 0; i < number_of_optional_foot_locations; i++)
+      {
+        double x_location = min_search_area + (max_search_area - min_search_area) *
+                                              i / (double) (number_of_optional_foot_locations - 1);
+        foot_locations_to_try->points[i].x = x_location;
+        foot_locations_to_try->points[i].y = y_location;
+      }
+      break;
     }
-  }
-  else
-  {
-    ROS_ERROR_STREAM("The selected obstacle " << selected_obstacle_ <<
-                     " does not have a way to create the optional foot locations to try cloud");
-    return false;
+    default:
+    {
+      ROS_ERROR_STREAM("The selected obstacle " << selected_obstacle_ <<
+                                                " does not have a way to create the optional foot locations to try cloud");
+      return false;
+    }
   }
   return true;
 }
