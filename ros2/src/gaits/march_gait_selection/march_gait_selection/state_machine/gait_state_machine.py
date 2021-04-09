@@ -352,7 +352,12 @@ class GaitStateMachine(object):
             self._gait_selection.get_logger().info(
                 f"Executing gait `{self._current_gait.name}`"
             )
-            gait_update = self._current_gait.start(current_time)
+            if self._current_gait.can_be_scheduled_early:
+                gait_update = self._current_gait.start(
+                    current_time, Duration(seconds=3)
+                )
+            else:
+                gait_update = self._current_gait.start(current_time)
             if not self.check_correct_foot_pressure():
                 self._gait_selection.get_logger().debug(
                     f"Foot forces when incorrect pressure warning was issued: "

@@ -28,6 +28,7 @@ class SetpointsGait(GaitInterface, Gait):
         self._current_time = None
 
         self._scheduled_early = False
+        self._start_is_delayed = False
 
     @property
     def name(self):
@@ -73,7 +74,7 @@ class SetpointsGait(GaitInterface, Gait):
     def can_be_scheduled_early(self) -> bool:
         return True
 
-    def start(self, current_time: Time) -> GaitUpdate:
+    def start(self, current_time: Time, first_subgait_delay: Optional[Duration] = None) -> GaitUpdate:
         """
         Start the gait, sets current subgait to the first subgait, resets the
         time and generates the first trajectory command.
@@ -85,8 +86,9 @@ class SetpointsGait(GaitInterface, Gait):
         self._transition_to_subgait = None
         self._is_transitioning = False
         self._scheduled_early = False
-        self._update_time_stamps(self._current_subgait)
-        return GaitUpdate.schedule(self._command_from_current_subgait())
+        self._start_is_delayed = True
+        self._update_time_stamps(self._current_subgait, first_subgait_delay)
+        return GaitUpdate.early_schedule(self._command_from_current_subgait())
 
     def update(
         self,
@@ -104,6 +106,11 @@ class SetpointsGait(GaitInterface, Gait):
         :return: optional trajectory_command, is_finished
         """
         self._current_time = current_time
+
+        if self._start_is_delayed and self._current_time >= self._start_time:
+            # Reset start delayed flag and update first subgait
+            self._start_is_delayed = False
+            return GaitUpdate.subgait_update()
 
         if self._current_time >= self._end_time:
             return self._update_next_subgait()
@@ -296,13 +303,16 @@ class SetpointsGait(GaitInterface, Gait):
         """
         return TrajectoryCommand.from_subgait(self._current_subgait, self._start_time)
 
-    def _update_time_stamps(self, next_subgait: Subgait):
+    def _update_time_stamps(self, next_subgait: Subgait, first_subgait_delay: Optional[Duration] = None):
         """Update the starting and end time.
 
         :param next_subgait: Next subgait to be scheduled
         """
         if not self._scheduled_early or self._end_time is None:
-            self._start_time = self._current_time
+            if first_subgait_delay is not None:
+                self._start_time = self._current_time + first_subgait_delay
+            else:
+                self._start_time = self._current_time
         else:
             self._start_time = self._end_time
         self._end_time = self._start_time + next_subgait.duration
