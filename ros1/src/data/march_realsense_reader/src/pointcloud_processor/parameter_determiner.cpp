@@ -102,18 +102,18 @@ bool HullParameterDeterminer::determineParameters(
         boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
-        SelectedGait const selected_obstacle,
+        SelectedGait const selected_gait,
         boost::shared_ptr<GaitParameters> gait_parameters)
 {
   time_t start_determine_parameters = clock();
 
   ROS_DEBUG("Determining parameters with hull parameter determiner");
   hull_vector_ = hull_vector;
-  selected_obstacle_ = selected_obstacle;
+  selected_gait_ = selected_gait;
   gait_parameters_ = gait_parameters;
   plane_coefficients_vector_ = plane_coefficients_vector;
   polygon_vector_ = polygon_vector;
-  selected_obstacle_ = selected_obstacle;
+  selected_gait_ = selected_gait;
 
   bool success = true;
 
@@ -140,7 +140,7 @@ bool HullParameterDeterminer::determineParameters(
 // Find the parameters from the foot location by finding at what percentage of the end points it is
 bool HullParameterDeterminer::getGaitParametersFromFootLocation()
 {
-  switch (selected_obstacle_) {
+  switch (selected_gait_) {
     case SelectedGait::stairs_up: {
       gait_parameters_->step_size_parameter =
               (optimal_foot_location.x - min_x_stairs) / (max_x_stairs - min_x_stairs);
@@ -185,7 +185,7 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
     default:
     {
       ROS_ERROR_STREAM("No way to transform a foot location to parameters "
-                       "is implemented yet for obstacle " << selected_obstacle_);
+                       "is implemented yet for obstacle " << selected_gait_);
       return false;
     }
   }
@@ -215,7 +215,7 @@ bool HullParameterDeterminer::getOptimalFootLocation()
 bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
 {
   bool success = true;
-  switch (selected_obstacle_)
+  switch (selected_gait_)
   {
     case SelectedGait::stairs_up:
     {
@@ -238,7 +238,7 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
     default:
     {
       ROS_ERROR_STREAM("getOptimalFootLocation method is not implemented "
-                       "for selected obstacle " << selected_obstacle_);
+                       "for selected obstacle " << selected_gait_);
       return false;
     }
   }
@@ -251,11 +251,11 @@ bool HullParameterDeterminer::getExecutableLocationsLine()
   executable_locations_line_coefficients_->values.resize(6);
 
   executable_locations_line_coefficients_->values[0]  = x_flat - x_steep;
-  executable_locations_line_coefficients_->values[1]  = 0;
+  executable_locations_line_coefficients_->values[1]  = y_location;
   executable_locations_line_coefficients_->values[2]  = z_flat - z_steep;
 
   executable_locations_line_coefficients_->values[3] = x_steep;
-  executable_locations_line_coefficients_->values[4] = 0;
+  executable_locations_line_coefficients_->values[4] = y_location;
   executable_locations_line_coefficients_->values[5] = z_steep;
 
   return true;
@@ -302,7 +302,7 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation()
   else
   {
     ROS_ERROR_STREAM("No valid foot location could be found for the "
-                     "current selected obstacle " << selected_obstacle_);
+                     "current selected gait " << selected_gait_);
     return false;
   }
 }
@@ -311,15 +311,15 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation()
 bool HullParameterDeterminer::getDistanceToObject(
     pcl::PointNormal possible_foot_location, double & distance)
 {
-  if (selected_obstacle_ == SelectedGait::stairs_up or
-      selected_obstacle_ ==  SelectedGait::stairs_down)
+  if (selected_gait_ == SelectedGait::stairs_up or
+      selected_gait_ ==  SelectedGait::stairs_down)
   {
     // For stairs gait find which point is closest to the most desirable location
     distance = linear_algebra_utilities::distanceBetweenPoints(
         possible_foot_location, most_desirable_foot_location_);
   }
-  else if (selected_obstacle_ == SelectedGait::ramp_up or
-           selected_obstacle_ == SelectedGait::ramp_down)
+  else if (selected_gait_ == SelectedGait::ramp_up or
+           selected_gait_ == SelectedGait::ramp_down)
   {
     // For the ramp find which point is closest to the possible locations line
     distance = linear_algebra_utilities::distancePointToLine(
@@ -328,7 +328,7 @@ bool HullParameterDeterminer::getDistanceToObject(
   else
   {
     ROS_ERROR_STREAM("getDistanceToObject method is not implemented "
-                     "for selected obstacle " << selected_obstacle_);
+                     "for selected obstacle " << selected_gait_);
     return false;
   }
 
@@ -338,7 +338,7 @@ bool HullParameterDeterminer::getDistanceToObject(
 // Verify that the found location is valid for the requested gait
 bool HullParameterDeterminer::isValidLocation(pcl::PointNormal possible_foot_location)
 {
-  switch (selected_obstacle_)
+  switch (selected_gait_)
   {
     case SelectedGait::stairs_up:
     {
@@ -362,7 +362,7 @@ bool HullParameterDeterminer::isValidLocation(pcl::PointNormal possible_foot_loc
     default:
     {
       ROS_ERROR_STREAM("isValidLocation method has not been implemented for obstacle "
-                        << selected_obstacle_ << ". Returning false.");
+                        << selected_gait_ << ". Returning false.");
       return false;
     }
   }
@@ -397,7 +397,7 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
 bool HullParameterDeterminer::getOptionalFootLocations(PointCloud2D::Ptr foot_locations_to_try)
 {
   foot_locations_to_try->points.resize(number_of_optional_foot_locations);
-  switch (selected_obstacle_)
+  switch (selected_gait_)
   {
     case SelectedGait::stairs_up:
     {
@@ -423,7 +423,7 @@ bool HullParameterDeterminer::getOptionalFootLocations(PointCloud2D::Ptr foot_lo
     }
     default:
     {
-      ROS_ERROR_STREAM("The selected obstacle " << selected_obstacle_ <<
+      ROS_ERROR_STREAM("The selected obstacle " << selected_gait_ <<
                                                 " does not have a way to create the optional foot locations to try cloud");
       return false;
     }
@@ -561,12 +561,12 @@ bool SimpleParameterDeterminer::determineParameters(
         boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
-        SelectedGait const selected_obstacle,
+        SelectedGait const selected_gait,
         boost::shared_ptr<GaitParameters> gait_parameters)
 {
   ROS_DEBUG("Determining parameters with simple parameter determiner");
   hull_vector_ = hull_vector;
-  selected_obstacle_ = selected_obstacle;
+  selected_gait_ = selected_gait;
   gait_parameters_ = gait_parameters;
   plane_coefficients_vector_ = plane_coefficients_vector;
   polygon_vector_ = polygon_vector;

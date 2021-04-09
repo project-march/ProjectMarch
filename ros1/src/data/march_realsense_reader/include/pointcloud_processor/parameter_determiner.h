@@ -32,7 +32,7 @@ public:
       boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
       boost::shared_ptr<HullVector> const hull_vector,
       boost::shared_ptr<PolygonVector> const polygon_vector,
-      SelectedGait const selected_obstacle,
+      SelectedGait const selected_gait,
       boost::shared_ptr<GaitParameters> gait_parameters)=0;
 
   virtual ~ParameterDeterminer() {};
@@ -41,7 +41,7 @@ protected:
   boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;
   boost::shared_ptr<HullVector> hull_vector_;
   boost::shared_ptr<PolygonVector> polygon_vector_;
-  SelectedGait selected_obstacle_;
+  SelectedGait selected_gait_;
   boost::shared_ptr<GaitParameters> gait_parameters_;
   YAML::Node config_tree_;
   bool debugging_;
@@ -63,7 +63,7 @@ public:
       boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
       boost::shared_ptr<HullVector> const hull_vector,
       boost::shared_ptr<PolygonVector> const polygon_vector,
-      SelectedGait const selected_obstacle,
+      SelectedGait const selected_gait,
       boost::shared_ptr<GaitParameters> gait_parameters) override;
 
   pcl::PointNormal optimal_foot_location;
@@ -139,7 +139,6 @@ protected:
   bool general_most_desirable_location_is_mid;
   bool general_most_desirable_location_is_small;
 
-  SelectedGait selected_obstacle_;
   pcl::PointXYZ most_desirable_foot_location_;
   // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t  + ([3], [4], [5])^T
   LineCoefficients::Ptr executable_locations_line_coefficients_ =
@@ -159,7 +158,7 @@ public:
           boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
           boost::shared_ptr<HullVector> const hull_vector,
           boost::shared_ptr<PolygonVector> const polygon_vector,
-          SelectedGait const selected_obstacle,
+          SelectedGait const selected_gait,
           boost::shared_ptr<GaitParameters> gait_parameters) override;
 };
 

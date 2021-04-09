@@ -168,14 +168,14 @@ bool RealSenseReader::processPointcloud(
   }
 
   // Setup data structures for parameter determining
-  SelectedGait selected_obstacle = (SelectedGait) selected_gait_;
+  SelectedGait selected_gait = (SelectedGait) selected_gait_;
   boost::shared_ptr<march_shared_msgs::GaitParameters> gait_parameters =
       boost::make_shared<march_shared_msgs::GaitParameters>();
   // Determine parameters
   bool parameter_determining_was_successful =
       parameter_determiner_->determineParameters(
           plane_coefficients_vector, hull_vector, polygon_vector,
-          selected_obstacle, gait_parameters);
+          selected_gait, gait_parameters);
   if (debugging_)
   {
     ROS_DEBUG("Done determining parameters, now publishing a marker to /camera/foot_locations_marker_array");
