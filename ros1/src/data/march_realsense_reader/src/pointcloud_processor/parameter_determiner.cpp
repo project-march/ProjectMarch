@@ -10,6 +10,7 @@
 #include <utilities/yaml_utilities.h>
 #include "pointcloud_processor/parameter_determiner.h"
 #include "march_shared_msgs/GaitParameters.h"
+#define EPSILON 0.0001
 
 using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
@@ -134,25 +135,44 @@ bool HullParameterDeterminer::determineParameters(
 // Find the parameters from the foot location by finding at what percentage of the end points it is
 bool HullParameterDeterminer::getGaitParametersFromFootLocation()
 {
-  // If a parameter should be ignored for the obstacle, set it to -1
   switch (selected_obstacle_) {
     case SelectedGait::stairs_up: {
       gait_parameters_->step_size_parameter =
               (optimal_foot_location.x - min_x_stairs) / (max_x_stairs - min_x_stairs);
       gait_parameters_->step_height_parameter =
               (optimal_foot_location.z - min_z_stairs) / (max_z_stairs - min_z_stairs);
+      // The side step parameter is unused for the stairs gait so we set it to -1
       gait_parameters_->side_step_parameter = -1;
       break;
     }
     case SelectedGait::ramp_down: {
-      // As we can only execute gaits in a certain line, project to the line and find where on the line the point falls.
+      // As we can only execute gaits in a certain line,
+      // project to the line and find where on the line the point falls.
       // The distance to the line is capped by max_distance_to_line
       pcl::PointXYZ projected_optimal_foot_location =
               linear_algebra_utilities::projectPointToLine(
                       optimal_foot_location, executable_locations_line_coefficients_);
 
-      gait_parameters_->step_size_parameter =
-              (projected_optimal_foot_location.x - x_flat) / (x_steep - x_flat);
+      optimal_foot_location.x = projected_optimal_foot_location.x;
+      optimal_foot_location.y = projected_optimal_foot_location.y;
+      optimal_foot_location.z = projected_optimal_foot_location.z;
+
+      double parameter_from_x = (optimal_foot_location.x - x_flat) / (x_steep - x_flat);
+      double parameter_from_z = (optimal_foot_location.z - z_flat) / (z_steep - z_flat);
+
+      if (parameter_from_x - parameter_from_z < EPSILON)
+      {
+        gait_parameters_->step_size_parameter =
+                (optimal_foot_location.x - x_flat) / (x_steep - x_flat);
+      }
+      else
+      {
+        ROS_ERROR_STREAM("The optimal foot location for the ramp gait was not on a linear line "
+                         "between the flat and steep gait, unable to determine parameter.");
+        return false;
+      }
+
+      // The step height and side step parameter are unused for the ramp down gait, so they are set to -1
       gait_parameters_->step_height_parameter = -1;
       gait_parameters_->side_step_parameter = -1;
       break;
