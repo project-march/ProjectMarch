@@ -60,6 +60,7 @@ flake8:
 
 clang_format:
   stage: Lint code
+  allow_failure: true
   script:
     - python3 .scripts/run-clang-format.py -r ros1/src ros2/src --style=file
   only:
