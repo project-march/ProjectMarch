@@ -18,6 +18,7 @@ class RealSenseGait(SetpointsGait):
         camera_to_use,
         robot,
         gait_directory,
+        subgait_version_map
     ):
         super(RealSenseGait, self).__init__(gait_name, subgaits, graph)
         self._node = node
@@ -28,6 +29,13 @@ class RealSenseGait(SetpointsGait):
         self.selected_gait = self.realsense_gait_msg_from_string(selected_gait)
         self.camera_to_use = self.camera_msg_from_string(camera_to_use)
         self.robot = robot
+        self.subgaits_to_interpolate = {}
+        for subgait_name in subgait_version_map:
+            self.subgaits_to_interpolate[subgait_name] = [
+                Subgait.from_name_and_version(robot, gait_directory, gait_name,
+                                              subgait_name, version) for version in
+                subgait_version_map[subgait_name]
+            ]
 
     def realsense_gait_msg_from_string(self, gait_name: str):
         mapping = {"stairs_up": GetGaitParameters.Request.STAIRS_UP}
@@ -102,6 +110,7 @@ class RealSense2DGait(RealSenseGait):
             camera_to_use,
             robot,
             gait_directory,
+            subgait_versions
         )
         self.first_parameter = 0.0  # For stairs, this is depth
         self.second_parameter = 0.0  # For stairs, this is height
@@ -114,19 +123,15 @@ class RealSense2DGait(RealSenseGait):
 
         new_subgaits = {}
         for subgait_name in self.subgaits.keys():
-            version_path_list = self.subgait_versions[subgait_name]
             parameter_list = [self.first_parameter, self.second_parameter]
             new_subgaits[subgait_name] = \
-                Subgait.from_four_names_and_versions_interpolated(
-                self.robot,
-                version_path_list=version_path_list,
-                parameter_list=parameter_list,
-                gait_directory=self.gait_directory,
-                gait_name=self.gait_name,
-                subgait_name=subgait_name,
+                Subgait.interpolate_four_subgaits(
+                subgaits = self.subgaits_to_interpolate[subgait_name],
+                parameters=parameter_list,
                 use_foot_position=True,
                 node=self._node,
             )
+        self._node.get_logger().info(f"Updated subgait versions to {new_subgaits}")
         self.set_subgaits(new_subgaits)
 
     @classmethod
@@ -204,6 +209,7 @@ class RealSense1DGait(RealSenseGait):
             camera_to_use,
             robot,
             gait_directory,
+            subgait_versions,
         )
         self.parameter = 0.0  # For ramp for example, this is steepness of the ramp
         self.subgait_versions = subgait_versions
