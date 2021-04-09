@@ -205,8 +205,6 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
 bool HullParameterDeterminer::getExecutableLocationsLine()
 {
   // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t + ([3], [4], [5])^T
-  executable_locations_line_coefficients_->values.resize(6);
-
   executable_locations_line_coefficients_->values[0]  = x_flat - x_steep;
   executable_locations_line_coefficients_->values[1]  = 0;
   executable_locations_line_coefficients_->values[2]  = z_flat - z_steep;

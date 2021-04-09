@@ -143,6 +143,8 @@ protected:
   // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t  + ([3], [4], [5])^T
   LineCoefficients::Ptr executable_locations_line_coefficients_ =
       boost::make_shared<LineCoefficients>();
+  executable_locations_line_coefficients_->values.resize(6);
+
 };
 
 /** The simple parameter determiner
