@@ -63,6 +63,10 @@ void HullParameterDeterminer::readYaml()
     y_location = yaml_utilities::grabParameter<double>(
             stairs_parameters,"y_location");
   }
+  else
+  {
+    ROS_ERROR("'stairs_parameters' parameters not found in parameters file");
+  }
   if (YAML::Node ramp_parameters = config_tree_["ramp_parameters"])
   {
     x_flat = yaml_utilities::grabParameter<double>(
@@ -84,8 +88,9 @@ void HullParameterDeterminer::readYaml()
   }
   else
   {
-    ROS_ERROR("'stairs_locations' parameters not found in parameters file");
+    ROS_ERROR("'ramp_parameters' parameters not found in parameters file");
   }
+
 }
 
 /** This function takes in a pointcloud with matching normals and
@@ -197,7 +202,6 @@ bool HullParameterDeterminer::getOptimalFootLocation()
 
   // Crop those locations to only be left with locations where it is possible to place the foot
   possible_foot_locations = boost::make_shared<PointNormalCloud>();
-
   success &= cropCloudToHullVector(foot_locations_to_try, possible_foot_locations);
 
   success &= getOptimalFootLocationFromPossibleLocations();
