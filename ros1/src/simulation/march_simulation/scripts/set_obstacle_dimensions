@@ -1,4 +1,7 @@
 #! /usr/bin/env python
+import random
+import string
+
 import rospy
 
 from march_shared_msgs.srv import SetObstacleSizeRampLikeResponse, SetObstacleSizeRampLike, \
@@ -12,11 +15,18 @@ import xacro
 RESIZABLE_OBSTACLES_RAMP_LIKE = ['ramp_and_door'] # for files which accept slope_up, slope_down and length_ramp_up
 RESIZABLE_OBSTACLES_BLOCK_LIKE = ['bench', 'stairs'] # for files which accept height, width and length
 
+# In order to ensure the camera is also able to see the altered obstacle,
+# it is necessary to change the model name at every size change. This dictionary is
+# used to keep track of these names to delete them again
+current_model_name = {name: name for name in RESIZABLE_OBSTACLES_RAMP_LIKE.join(
+    RESIZABLE_OBSTACLES_BLOCK_LIKE)
+}
 rospy.init_node('set_obstacle_dimensions', anonymous=True)
 
 spawn_publisher = rospy.ServiceProxy('/gazebo/spawn_urdf_model', SpawnModel)
 delete_publisher = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
 get_world_properties = rospy.ServiceProxy('/gazebo/get_world_properties', GetWorldProperties)
+
 
 def set_new_block_like_obstacle(name, length=0, width=0, height=0):
     length_string = make_set_size_string('length', length)
@@ -26,6 +36,7 @@ def set_new_block_like_obstacle(name, length=0, width=0, height=0):
     doc = make_xacro_file(name, length_string, width_string, height_string)
     set_size(name, doc)
 
+
 def set_new_ramp_like_obstacle(name, slope_up=0, slope_down=0, ramp_up_length=0):
     slope_up_string = make_set_size_string('slope_up', slope_up)
     slope_down_string = make_set_size_string('slope_down', slope_down)
@@ -34,10 +45,12 @@ def set_new_ramp_like_obstacle(name, slope_up=0, slope_down=0, ramp_up_length=0)
     doc = make_xacro_file(name, slope_up_string, slope_down_string, ramp_up_length_string)
     set_size(name, doc)
 
+
 def make_set_size_string(dimension, size):
     if size == 0:
         return ''
     return f'{dimension}="{size}"'
+
 
 def make_xacro_file(name, parameter_1, parameter_2, parameter_3):
     doc = xacro.parse(f'''<?xml version="1.0"?>
@@ -48,11 +61,16 @@ def make_xacro_file(name, parameter_1, parameter_2, parameter_3):
                       ''')
     return doc
 
+
 def set_size(name, doc):
     xacro.process_doc(doc)
     new_obstacle = doc.toprettyxml(indent='  ')
-    delete_publisher(model_name=name)
-    spawn_publisher(model_name=name, model_xml=new_obstacle)
+    delete_publisher(model_name=current_model_name[name])
+    new_name = "".join(random.choice(string.ascii_letters) for _ in
+                       range(10))
+    spawn_publisher(model_name=new_name, model_xml=new_obstacle)
+    current_model_name[name] = new_name
+
 
 def set_size_block_like_callback(msg):
     if msg.obstacle_name not in RESIZABLE_OBSTACLES_BLOCK_LIKE:
@@ -62,6 +80,7 @@ def set_size_block_like_callback(msg):
         set_new_block_like_obstacle(name=msg.obstacle_name, length=msg.new_length, width=msg.new_width,
                                      height=msg.new_height)
         return SetObstacleSizeBlockLikeResponse(success=True)
+
 
 def set_size_ramp_like_callback(msg):
     if msg.obstacle_name not in RESIZABLE_OBSTACLES_RAMP_LIKE:
