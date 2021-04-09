@@ -59,7 +59,7 @@ parameter_determiner:
     min_search_area: -0
     max_search_area: -0.6
     # The maximum allowed distance from the best location to the possible locations line
-    max_distance_to_line: 0.01
+    max_distance_to_line: 0.05
   # Set the most desirable foot location to the mid point of what the gaits are capable off
   general_most_desirable_location_is_mid: true
   # Set the most desirable foot location to the smallest / flattest step

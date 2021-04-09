@@ -132,29 +132,27 @@ bool HullParameterDeterminer::determineParameters(
 // Find the parameters from the foot location by finding at what percentage of the end points it is
 bool HullParameterDeterminer::getGaitParametersFromFootLocation()
 {
-  if (selected_obstacle_ == SelectedGait::stairs_up)
+  switch (selected_obstacle_)
   {
-    gait_parameters_->step_size_parameter =
-            (optimal_foot_location.x - min_x_stairs) / (max_x_stairs - min_x_stairs);
-    gait_parameters_->step_height_parameter =
-            (optimal_foot_location.z - min_z_stairs) / (max_z_stairs - min_z_stairs);
-  }
-  else if (selected_obstacle_ == SelectedGait::ramp_down)
-  {
-    // As we can only execute gaits in a certain line, project to the line and find where on the line the point falls.
-    // The distance to the line is capped by max_distance_to_line
-    pcl::PointXYZ projected_optimal_foot_location =
-        linear_algebra_utilities::projectPointToLine(
-            optimal_foot_location, executable_locations_line_coefficients_);
+    case SelectedGait::stairs_up:
+      gait_parameters_->step_size_parameter =
+              (optimal_foot_location.x - min_x_stairs) / (max_x_stairs - min_x_stairs);
+      gait_parameters_->step_height_parameter =
+              (optimal_foot_location.z - min_z_stairs) / (max_z_stairs - min_z_stairs);
 
-    gait_parameters_->step_size_parameter =
-        (projected_optimal_foot_location.x - x_flat) / (x_steep - x_flat);
-  }
-  else
-  {
-    ROS_ERROR_STREAM("No way to transform a foot location to parameters "
-                     "is implemented yet for obstacle " << selected_obstacle_);
-    return false;
+    case SelectedGait::ramp_down:
+      // As we can only execute gaits in a certain line, project to the line and find where on the line the point falls.
+      // The distance to the line is capped by max_distance_to_line
+      pcl::PointXYZ projected_optimal_foot_location =
+              linear_algebra_utilities::projectPointToLine(
+                      optimal_foot_location, executable_locations_line_coefficients_);
+
+      gait_parameters_->step_size_parameter =
+              (projected_optimal_foot_location.x - x_flat) / (x_steep - x_flat);
+    default:
+      ROS_ERROR_STREAM("No way to transform a foot location to parameters "
+                       "is implemented yet for obstacle " << selected_obstacle_);
+      return false;
   }
   return true;
 }
@@ -182,27 +180,24 @@ bool HullParameterDeterminer::getOptimalFootLocation()
 bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
 {
   bool success = true;
-  if (selected_obstacle_ == SelectedGait::stairs_up)
+  switch (selected_obstacle_)
   {
-    // Get the location where we would ideally place the foot
-    success &= getGeneralMostDesirableLocation();
+    case SelectedGait::stairs_up:
+      // Get the location where we would ideally place the foot
+      success &= getGeneralMostDesirableLocation();
 
-    // Get the possible location which is closest to the ideal location
-    success &= getPossibleMostDesirableLocation();
-  }
-  else if (selected_obstacle_ == SelectedGait::ramp_down)
-  {
-    // Get the line on which it is possible to stand for a ramp gait.
-    success &= getExecutableLocationsLine();
+      // Get the possible location which is closest to the ideal location
+      success &= getPossibleMostDesirableLocation();
+    case SelectedGait::ramp_down:
+      // Get the line on which it is possible to stand for a ramp gait.
+      success &= getExecutableLocationsLine();
 
-    // Get the possible location which is closest to the line
-    success &= getPossibleMostDesirableLocation();
-  }
-  else
-  {
-    ROS_ERROR_STREAM("getOptimalFootLocation method is not implemented "
-                     "for selected obstacle " << selected_obstacle_);
-    return false;
+      // Get the possible location which is closest to the line
+      success &= getPossibleMostDesirableLocation();
+    default:
+        ROS_ERROR_STREAM("getOptimalFootLocation method is not implemented "
+                       "for selected obstacle " << selected_obstacle_);
+      return false;
   }
   return success;
 }
@@ -300,30 +295,29 @@ bool HullParameterDeterminer::getDistanceToObject(
 // Verify that the found location is valid for the requested gait
 bool HullParameterDeterminer::isValidLocation(pcl::PointNormal possible_foot_location)
 {
-  if (selected_obstacle_ == SelectedGait::stairs_up)
+  switch (selected_obstacle_)
   {
-    // Less and larger than signs are swapped for the x coordinate
-    // as the positive x axis points in the backwards direction of the exoskeleton
-    return (possible_foot_location.x < min_x_stairs && optimal_foot_location.x > max_x_stairs &&
-        possible_foot_location.z > min_z_stairs && optimal_foot_location.z < max_z_stairs);
-  }
-  else if (selected_obstacle_ == SelectedGait::ramp_down)
-  {
-    pcl::PointXYZ projected_point = linear_algebra_utilities::projectPointToLine(
-            possible_foot_location, executable_locations_line_coefficients_);
-    double distance = linear_algebra_utilities::distanceBetweenPoints(
-            projected_point, possible_foot_location);
-    // only points which are close enough to the line are valid
-    // Only points on the line which are between the two given values are valid
-    // Less and larger than signs are swapped for the x coordinate
-    // as the positive x axis points in the backwards direction of the exoskeleton
-    return (projected_point.x < x_steep && projected_point.x > x_flat && distance < max_distance_to_line);
-  }
-  else
-  {
-    ROS_ERROR_STREAM("isValidLocation method has not been implemented for obstacle " << selected_obstacle_ <<
-                     ". Returning false.");
-    return false;
+    case SelectedGait::stairs_up:
+      // Less and larger than signs are swapped for the x coordinate
+      // as the positive x axis points in the backwards direction of the exoskeleton
+      return (possible_foot_location.x < min_x_stairs && possible_foot_location.x > max_x_stairs &&
+              possible_foot_location.z > min_z_stairs && possible_foot_location.z < max_z_stairs);
+
+    case SelectedGait::ramp_down:
+      pcl::PointXYZ projected_point = linear_algebra_utilities::projectPointToLine(
+              possible_foot_location, executable_locations_line_coefficients_);
+      double distance = linear_algebra_utilities::distanceBetweenPoints(
+              projected_point, possible_foot_location);
+      // only points which are close enough to the line are valid
+      // Only points on the line which are between the two given values are valid
+      // Less and larger than signs are swapped for the x coordinate
+      // as the positive x axis points in the backwards direction of the exoskeleton
+      return (projected_point.x < x_steep && projected_point.x > x_flat && distance < max_distance_to_line);
+
+    default:
+        ROS_ERROR_STREAM("isValidLocation method has not been implemented for obstacle " << selected_obstacle_ <<
+                                                                                       ". Returning false.");
+      return false;
   }
 }
 
