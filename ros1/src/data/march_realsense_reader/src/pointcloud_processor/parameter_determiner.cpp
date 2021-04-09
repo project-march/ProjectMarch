@@ -39,8 +39,6 @@ HullParameterDeterminer::HullParameterDeterminer(YAML::Node config_tree, bool de
     ParameterDeterminer(config_tree, debugging)
 {
   readYaml();
-  executable_locations_line_coefficients_->values.resize(6);
-  foot_locations_to_try->points.resize(number_of_optional_foot_locations);
 }
 
 // Read all relevant parameters from the parameter yaml file
@@ -243,6 +241,8 @@ bool HullParameterDeterminer::getOptimalFootLocationFromPossibleLocations()
 bool HullParameterDeterminer::getExecutableLocationsLine()
 {
   // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t + ([3], [4], [5])^T
+  executable_locations_line_coefficients_->values.resize(6);
+
   executable_locations_line_coefficients_->values[0]  = x_flat - x_steep;
   executable_locations_line_coefficients_->values[1]  = 0;
   executable_locations_line_coefficients_->values[2]  = z_flat - z_steep;
