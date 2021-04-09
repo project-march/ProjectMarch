@@ -340,16 +340,10 @@ class GaitStateMachine(object):
         finishes the gait if it is done."""
         now = self._gait_selection.get_clock().now()
         if self._current_gait is None:
-            self._gait_selection.get_logger().info(
-                f"Current state `{self._current_state}`"
-            )
             if self._current_state in self._home_gaits:
                 self._current_gait = self._home_gaits[self._current_state]
             else:
                 self._current_gait = self._gait_selection[self._current_state]
-            self._gait_selection.get_logger().info(
-                f"Current gait 1 `{self._current_gait}`"
-            )
 
             self._gait_selection.get_logger().info(
                 f"Executing gait `{self._current_gait.name}`"
