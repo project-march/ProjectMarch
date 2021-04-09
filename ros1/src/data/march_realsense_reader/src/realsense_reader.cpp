@@ -6,7 +6,6 @@
 #include <ros/console.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <march_shared_msgs/GetGaitParameters.h>
-#include <march_shared_msgs/SelectedRealSenseGait.h>
 #include <pointcloud_processor/preprocessor.h>
 #include <pointcloud_processor/region_creator.h>
 #include <pointcloud_processor/parameter_determiner.h>
