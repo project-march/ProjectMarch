@@ -129,17 +129,6 @@ class RealSense2DGait(RealSenseGait):
             )
         self.set_subgaits(new_subgaits)
 
-    @property
-    def subgait_name(self):
-        if self._current_subgait is not None:
-            self._node.get_logger().info(f"Not none, name requested of "
-                                        f"{self._current_subgait}")
-            return self._current_subgait.subgait_name
-        else:
-            self._node.get_logger().info(f"None, name requested of "
-                                         f"{self._current_subgait}")
-            return None
-
     @classmethod
     def from_yaml(
         cls,

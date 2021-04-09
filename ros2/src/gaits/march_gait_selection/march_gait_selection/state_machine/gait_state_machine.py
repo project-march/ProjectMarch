@@ -333,41 +333,21 @@ class GaitStateMachine(object):
         Schedules the next subgait if there is no trajectory happening or
         finishes the gait if it is done."""
         if self._current_gait is None:
-            self._gait_selection.get_logger().info(
-                f"Current state `{self._current_state}`"
-            )
             if self._current_state in self._home_gaits:
                 self._current_gait = self._home_gaits[self._current_state]
             else:
                 self._current_gait = self._gait_selection[self._current_state]
-            self._gait_selection.get_logger().info(
-                f"Current gait 1 `{self._current_gait}`"
-            )
 
-            self._gait_selection.get_logger().info(
-                f"Executing gait `{self._current_gait.name}`"
-            )
+            self._trajectory_scheduler.reset()
             trajectory = self._current_gait.start()
-            self._gait_selection.get_logger().info(
-                f"Current gait 2 `{self._current_gait}`"
-            )
+
             if trajectory is not None:
-                self._gait_selection.get_logger().info(
-                    f"Current gait 3 `{self._current_gait}`"
-                )
                 if not self.check_correct_foot_pressure():
                     self._gait_selection.get_logger().debug(
                         f"Foot forces when incorrect pressure warning was issued: "
                         f"left={self._force_left_foot}, right={self._force_right_foot}"
                     )
-                self._gait_selection.get_logger().info(
-                    f"Current gait 4 `{self._current_gait}`"
-                )
                 self._call_gait_callbacks()
-                self._gait_selection.get_logger().info(
-                    f"Scheduling {self._current_gait.subgait_name}"
-                )
-
                 self._trajectory_scheduler.schedule(trajectory)
             elapsed_time = Duration(0)
 

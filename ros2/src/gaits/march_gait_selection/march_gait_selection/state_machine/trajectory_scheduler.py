@@ -52,9 +52,6 @@ class TrajectoryScheduler(object):
                 header=Header(stamp=stamp), goal_id=GoalID(stamp=stamp), goal=goal
             )
         )
-        self._node.get_logger().info(
-            f"Done scheduling"
-        )
 
     def failed(self):
         return self._failed
@@ -67,5 +64,4 @@ class TrajectoryScheduler(object):
             self._node.get_logger().error(
                 f"Failed to execute trajectory. {result.result.error_string} ({result.result.error_code})"
             )
-            self._node.get_logger.info(f"Last goal was {self._last_goal}")
             self._failed = True
