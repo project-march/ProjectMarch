@@ -120,6 +120,14 @@ protected:
   // Get the line on which it is possible to stand for a ramp gait.
   bool getExecutableLocationsLine();
 
+  // Find the stairs up parameters from the foot locations
+  bool getGaitParametersFromFootLocationStairsUp();
+
+  // Find the ramp down parameter from the foot locations
+  bool getGaitParametersFromFootLocationRampDown();
+
+  void fillOptionalFootLocationCloud();
+
   // Read all relevant parameters from the parameter yaml file
   void readYaml();
   int hull_dimension;

@@ -140,46 +140,14 @@ bool HullParameterDeterminer::determineParameters(
 // Find the parameters from the foot location by finding at what percentage of the end points it is
 bool HullParameterDeterminer::getGaitParametersFromFootLocation()
 {
+  success = true;
   switch (selected_gait_) {
     case SelectedGait::stairs_up: {
-      gait_parameters_->step_size_parameter =
-              (optimal_foot_location.x - min_x_stairs) / (max_x_stairs - min_x_stairs);
-      gait_parameters_->step_height_parameter =
-              (optimal_foot_location.z - min_z_stairs) / (max_z_stairs - min_z_stairs);
-      // The side step parameter is unused for the stairs gait so we set it to -1
-      gait_parameters_->side_step_parameter = -1;
+      succes &= getGaitParametersFromFootLocationStairsUp();
       break;
     }
     case SelectedGait::ramp_down: {
-      // As we can only execute gaits in a certain line,
-      // project to the line and find where on the line the point falls.
-      // The distance to the line is capped by max_distance_to_line
-      pcl::PointXYZ projected_optimal_foot_location =
-              linear_algebra_utilities::projectPointToLine(
-                      optimal_foot_location, executable_locations_line_coefficients_);
-
-      optimal_foot_location.x = projected_optimal_foot_location.x;
-      optimal_foot_location.y = projected_optimal_foot_location.y;
-      optimal_foot_location.z = projected_optimal_foot_location.z;
-
-      double parameter_from_x = (optimal_foot_location.x - x_flat) / (x_steep - x_flat);
-      double parameter_from_z = (optimal_foot_location.z - z_flat) / (z_steep - z_flat);
-
-      if (parameter_from_x - parameter_from_z < EPSILON)
-      {
-        gait_parameters_->step_size_parameter =
-                (optimal_foot_location.x - x_flat) / (x_steep - x_flat);
-      }
-      else
-      {
-        ROS_ERROR_STREAM("The optimal foot location for the ramp gait was not on a linear line "
-                         "between the flat and steep gait, unable to determine parameter.");
-        return false;
-      }
-
-      // The step height and side step parameter are unused for the ramp down gait, so they are set to -1
-      gait_parameters_->step_height_parameter = -1;
-      gait_parameters_->side_step_parameter = -1;
+      success &= getGaitParametersFromFootLocationsRampDown();
       break;
     }
     default:
@@ -189,6 +157,50 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
       return false;
     }
   }
+  return success;
+}
+bool HullParameterDeterminer::getGaitParametersFromFootLocationStairsUp()
+{
+  gait_parameters_->step_size_parameter =
+          (optimal_foot_location.x - min_x_stairs) / (max_x_stairs - min_x_stairs);
+  gait_parameters_->step_height_parameter =
+          (optimal_foot_location.z - min_z_stairs) / (max_z_stairs - min_z_stairs);
+  // The side step parameter is unused for the stairs gait so we set it to -1
+  gait_parameters_->side_step_parameter = -1;
+  return true;
+}
+
+bool HullParameterDeterminer::getGaitParametersFromFootLocationRampDown()
+{
+  // As we can only execute gaits in a certain line,
+  // project to the line and find where on the line the point falls.
+  // The distance to the line is capped by max_distance_to_line
+  pcl::PointXYZ projected_optimal_foot_location =
+          linear_algebra_utilities::projectPointToLine(
+                  optimal_foot_location, executable_locations_line_coefficients_);
+
+  optimal_foot_location.x = projected_optimal_foot_location.x;
+  optimal_foot_location.y = projected_optimal_foot_location.y;
+  optimal_foot_location.z = projected_optimal_foot_location.z;
+
+  double parameter_from_x = (optimal_foot_location.x - x_flat) / (x_steep - x_flat);
+  double parameter_from_z = (optimal_foot_location.z - z_flat) / (z_steep - z_flat);
+
+  if (parameter_from_x - parameter_from_z < EPSILON)
+  {
+    gait_parameters_->step_size_parameter =
+            (optimal_foot_location.x - x_flat) / (x_steep - x_flat);
+  }
+  else
+  {
+    ROS_ERROR_STREAM("The optimal foot location for the ramp gait was not on a linear line "
+                     "between the flat and steep gait, unable to determine parameter.");
+    return false;
+  }
+
+  // The step height and side step parameter are unused for the ramp down gait, so they are set to -1
+  gait_parameters_->step_height_parameter = -1;
+  gait_parameters_->side_step_parameter = -1;
   return true;
 }
 
@@ -396,37 +408,45 @@ bool HullParameterDeterminer::getGeneralMostDesirableLocation()
 // where it should be checked if there is a valid foot location
 bool HullParameterDeterminer::getOptionalFootLocations(PointCloud2D::Ptr foot_locations_to_try)
 {
+  bool success = true;
   foot_locations_to_try->points.resize(number_of_optional_foot_locations);
   switch (selected_gait_)
   {
     case SelectedGait::stairs_up:
     {
-      for (int i = 0; i < number_of_optional_foot_locations; i++)
-      {
-        double x_location = min_x_stairs + (max_x_stairs - min_x_stairs) *
-                                           i / (double) (number_of_optional_foot_locations - 1);
-        foot_locations_to_try->points[i].x = x_location;
-        foot_locations_to_try->points[i].y = y_location;
-      }
+      success &= fillOptionalFootLocationCloud(min_x_stairs, max_x_stairs);
       break;
     }
     case SelectedGait::ramp_down:
     {
-      for (int i = 0; i < number_of_optional_foot_locations; i++)
-      {
-        double x_location = min_search_area + (max_search_area - min_search_area) *
-                                              i / (double) (number_of_optional_foot_locations - 1);
-        foot_locations_to_try->points[i].x = x_location;
-        foot_locations_to_try->points[i].y = y_location;
-      }
+      success &= fillOptionalFootLocationCloud(min_search_area, max_search_area);
       break;
     }
     default:
     {
       ROS_ERROR_STREAM("The selected obstacle " << selected_gait_ <<
-                                                " does not have a way to create the optional foot locations to try cloud");
+                       " does not have a way to create the optional foot locations to try cloud");
       return false;
     }
+  }
+  return success;
+}
+
+// Fill the foot locations to try cloud with a line of points from (start, 0) to (end, 0)
+void HullParameterDeterminer::fillOptionalFootLocationCloud(double start, double end)
+{
+  if (number_of_optional_foot_locations == 0)
+  {
+    ROS_WARN_STREAM("The number of optional foot locations parameter is set to 0, "
+                    "not filling the foot_locations_to_try cloud");
+    return false;
+  }
+  for (int i = 0; i < number_of_optional_foot_locations; i++)
+  {
+    double x_location = start + (end - start) *
+            i / (double) (number_of_optional_foot_locations - 1);
+    foot_locations_to_try->points[i].x = x_location;
+    foot_locations_to_try->points[i].y = y_location;
   }
   return true;
 }
