@@ -1,6 +1,4 @@
 #! /usr/bin/env python
-import random
-import string
 
 import rospy
 
@@ -18,8 +16,8 @@ RESIZABLE_OBSTACLES_BLOCK_LIKE = ['bench', 'stairs'] # for files which accept he
 # In order to ensure the camera is also able to see the altered obstacle,
 # it is necessary to change the model name at every size change. This dictionary is
 # used to keep track of these names to delete them again
-current_model_name = {name: name for name in RESIZABLE_OBSTACLES_RAMP_LIKE.join(
-    RESIZABLE_OBSTACLES_BLOCK_LIKE)
+current_model_name = {name: name for name in RESIZABLE_OBSTACLES_RAMP_LIKE +
+    RESIZABLE_OBSTACLES_BLOCK_LIKE
 }
 rospy.init_node('set_obstacle_dimensions', anonymous=True)
 
@@ -66,8 +64,7 @@ def set_size(name, doc):
     xacro.process_doc(doc)
     new_obstacle = doc.toprettyxml(indent='  ')
     delete_publisher(model_name=current_model_name[name])
-    new_name = "".join(random.choice(string.ascii_letters) for _ in
-                       range(10))
+    new_name = name + str(rospy.Time.now().nsecs)
     spawn_publisher(model_name=new_name, model_xml=new_obstacle)
     current_model_name[name] = new_name
 
