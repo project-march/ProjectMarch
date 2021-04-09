@@ -5,7 +5,6 @@ stages:
   - Tag container
   - Build container
   - Lint code
-  - Format C++ code
   - Build code
   - Test code
   - Static analysis on code
@@ -60,7 +59,7 @@ flake8:
   allow_failure: true
 
 clang_format:
-  stage: Format C++ code
+  stage: Lint code
   script:
     - python3 .scripts/run-clang-format.py -r ros1/src ros2/src --style=file
   only:
