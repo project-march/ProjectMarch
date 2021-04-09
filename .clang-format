@@ -1,2 +1,17 @@
-BasedOnStyle: Webkit
+---
+BasedOnStyle: WebKit
+AllowShortBlocksOnASingleLine: 'false'
+AllowShortCaseLabelsOnASingleLine: 'false'
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: None
+AllowShortLoopsOnASingleLine: 'false'
+BinPackArguments: 'true'
+BinPackParameters: 'true'
+BreakStringLiterals: 'true'
+ColumnLimit: '80'
+FixNamespaceComments: 'true'
+IndentCaseLabels: 'true'
+Language: Cpp
+Standard: Cpp11
 ...
