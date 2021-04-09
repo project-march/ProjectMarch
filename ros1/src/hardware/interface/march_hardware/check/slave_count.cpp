@@ -2,6 +2,10 @@
 
 #include <ros/ros.h>
 
+// SOEM ignores normal C header behaviour so these
+// libraries HAVE to be included in this specific
+// order.
+// clang-format off
 #include <soem/ethercattype.h>
 #include <soem/nicdrv.h>
 #include <soem/ethercatbase.h>
@@ -11,6 +15,7 @@
 #include <soem/ethercatfoe.h>
 #include <soem/ethercatconfig.h>
 #include <soem/ethercatprint.h>
+// clang-format on
 
 int main(int argc, char** argv)
 {
