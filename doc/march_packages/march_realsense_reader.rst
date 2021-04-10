@@ -8,7 +8,10 @@ Overview
 
 This package subscribes the the realsense camera topics and processes one of pointclouds published there with a service callback.
 
-This software does 4 main things:
+The processing makes heavy use of the `Point Cloud Library (pcl) <https://pointclouds.org/>`_ to do the processing.
+Many of its classes are used even when not directly using methods from pcl.
+
+The processing consists does 4 main phases:
 
 * Preprocess the point cloud
 
