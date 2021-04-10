@@ -68,10 +68,11 @@ void Preprocessor::removePointByIndex(int const index, PointCloud::Ptr pointclou
 }
 
 bool NormalsPreprocessor::preprocess(
-    PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals)
+    PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals, std::string frame_id_to_transform_to)
 {
   pointcloud_ = pointcloud;
   pointcloud_normals_ = pointcloud_normals;
+  frame_id_to_transform_to_ = frame_id_to_transform_to;
 
   ROS_DEBUG_STREAM("Preprocessing with normal filtering. Pointcloud size: " << pointcloud_->points.size());
 
@@ -222,7 +223,7 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(geometry_msgs::TransformSt
   try
   {
     pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
-    transform_stamped = tfBuffer->lookupTransform(link_to_transform_to, pointcloud_frame_id,
+    transform_stamped = tfBuffer->lookupTransform(frame_id_to_transform_to_, pointcloud_frame_id,
                                                  ros::Time::now(), ros::Duration(0.5));
     pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_,
                                  transform_stamped.transform);
@@ -333,10 +334,12 @@ bool NormalsPreprocessor::filterOnNormalOrientation()
 
 // Preprocess the pointcloud, this means only transforming for the simple preprocessor
 bool SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud,
-                                    Normals::Ptr pointcloud_normals)
+                                    Normals::Ptr pointcloud_normals,
+                                    std::string frame_id_to_transform_to)
 {
   pointcloud_ = pointcloud;
   pointcloud_normals_ = pointcloud_normals;
+  frame_id_to_transform_to_ = frame_id_to_transform_to;
 
   ROS_DEBUG("Preprocessing with SimplePreprocessor");
   transformPointCloudFromUrdf();
@@ -351,7 +354,7 @@ void SimplePreprocessor::transformPointCloudFromUrdf()
   try
   {
     pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
-    transformStamped = tfBuffer->lookupTransform(link_to_transform_to, pointcloud_frame_id,
+    transformStamped = tfBuffer->lookupTransform(frame_id_to_transform_to_, pointcloud_frame_id,
                                                   ros::Time::now(), ros::Duration(0.5));
     pcl_ros::transformPointCloud(*pointcloud_, *pointcloud_,
                                  transformStamped.transform);
