@@ -115,6 +115,12 @@ The generalized steps we are expecting from the PCL implementation, split into c
 .. figure:: images/pcl_software_architecture.png
    :align: center
 
+This will be implemented in the form of an Interface for every of these 4 steps, that can be inherited by any possible implementation of these steps.
+The inbetween steps will then be split into functions within this class. See below for an example for the preprocessor step:
+
+.. figure:: images/pcl_class_structure.png
+   :align: center
+
 ROS API
 -------
 
