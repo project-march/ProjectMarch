@@ -1,7 +1,7 @@
-.. _march-realsense_reader-label:
+.. _march-realsense-reader-label:
 
 march_realsense_reader
-====================
+======================
 
 Overview
 --------
