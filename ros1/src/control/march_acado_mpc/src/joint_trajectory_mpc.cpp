@@ -6,8 +6,13 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
-bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::JointHandle>& joint_handles, ros::NodeHandle& nh)
+// WARNING! UNSAFE!
+// If you initialize this object, YOU, the caller, have to ensure
+// that both `joint_handles` and `nh` have a lifetime that is at
+// least as long as the lifetime of this object. Otherwise, 
+// undefined behavior WILL happen.
+bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::JointHandle>& joint_handles,
+                                              ros::NodeHandle& nh)
 {
   joint_handles_ptr_ = &joint_handles;
   num_joints_ = joint_handles.size();
@@ -23,21 +28,19 @@ bool ModelPredictiveControllerInterface::init(std::vector<hardware_interface::Jo
   for (unsigned int i = 0; i < num_joints_; ++i)
   {
       model_predictive_controllers_.push_back(ModelPredictiveController(getQMatrix(joint_names[i])));
-      model_predictive_controllers_[i].joint_name = joint_names[i];
+      model_predictive_controllers_[i].joint_name = std::move(joint_names[i]);
       model_predictive_controllers_[i].init();
   }
-
 
   return true;
 }
 
-// Retrieve the Q matrix from the parameter server for a joint.
-std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(std::string joint_name)
+std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(const std::string& joint_name)
 {
   int n_rows, n_cols;
   std::string parameter_path = "/march/controller/trajectory";
-  ros::param::get(parameter_path + "/q_matrices/"  + joint_name + "/n_rows", n_rows);
-  ros::param::get(parameter_path + "/q_matrices/"  + joint_name + "/n_cols", n_cols);
+  ros::param::get(parameter_path + "/q_matrices/" + joint_name + "/n_rows", n_rows);
+  ros::param::get(parameter_path + "/q_matrices/" + joint_name + "/n_cols", n_cols);
 
   if (n_rows != n_cols)
   {
@@ -45,7 +48,7 @@ std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(s
   }
 
   std::vector<float> Q_flat;
-  ros::param::get(parameter_path + "/q_matrices/"  + joint_name + "/Q", Q_flat);
+  ros::param::get(parameter_path + "/q_matrices/" + joint_name + "/Q", Q_flat);
 
   // Set QMatrix for the mpc msg
   for (int i =0; i < num_joints_; ++i)
@@ -72,9 +75,13 @@ std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(s
   return Q;
 }
 
+// Function that dictates what to do when the controller is started by the controller manager
 void ModelPredictiveControllerInterface::starting(const ros::Time& /*time*/)
 {
-  if (!joint_handles_ptr_) {return;}
+  if (!joint_handles_ptr_)
+  {
+    return;
+  }
 
   // zero commands
   for (unsigned int i = 0; i < num_joints_; ++i)
@@ -169,8 +176,9 @@ void ModelPredictiveControllerInterface::setMpcMsg(int joint_number)
   mpc_pub_->msg_.joint[i].diagnostics.feedback_status = model_predictive_controllers_[i].feedbackStepStatus;
 }
 
+// Function that calculates the command that needs to be send to each joint
 void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/, const ros::Duration& period,
-                                                       const std::vector<joint_trajectory_controller::State>&  /*desired_states*/,
+                                                       const std::vector<joint_trajectory_controller::State>&  desired_states,
                                                        const joint_trajectory_controller::State& state_error)
 {
   // Preconditions
@@ -185,8 +193,16 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
   for (unsigned int i = 0; i < num_joints_; ++i)
   {
     // Get current joint state
-    state = {(*joint_handles_ptr_)[i].getPosition(), (*joint_handles_ptr_)[i].getVelocity()};
+    state = { (*joint_handles_ptr_)[i].getPosition(), (*joint_handles_ptr_)[i].getVelocity() };
     model_predictive_controllers_[i].x0 = state;
+
+    // Set reference
+    for (int j = 0; j < desired_states.size(); ++j)
+    {
+      model_predictive_controllers_[i].setReference(j, { desired_states[j].position[i],  // angle
+                                                          desired_states[j].velocity[i],  // angular velocity
+                                                          0.0 });                         // torque
+    }
 
     // Calculate mpc control signal
     model_predictive_controllers_[i].calculateControlInput();
@@ -194,10 +210,6 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
 
     // Apply command
     (*joint_handles_ptr_)[i].setCommand(command);
-  }
-
-  if (!mpc_pub_->trylock()) {
-    return;
   }
 
   for (unsigned int i = 0; i < num_joints_; ++i)
@@ -213,19 +225,25 @@ void ModelPredictiveControllerInterface::updateCommand(const ros::Time& /*time*/
   mpc_pub_->unlockAndPublish();
 }
 
+// Function that dictates what to do when the controller is stopped by the controller manager
 void ModelPredictiveControllerInterface::stopping(const ros::Time& /*time*/)
 {
-
+  // zero commands
+  for (unsigned int i = 0; i < num_joints_; ++i)
+  {
+    (*joint_handles_ptr_)[i].setCommand(0.0);
+  }
 }
 
 // Exporting the controller plugin
 namespace model_predictive_trajectory_controller
 {
 typedef joint_trajectory_controller::JointTrajectoryController<trajectory_interface::QuinticSplineSegment<double>,
-hardware_interface::EffortJointInterface>
+                                                               hardware_interface::EffortJointInterface>
 
   JointTrajectoryController;
 
-}  // model_predictive_trajectory_controller
+}  // namespace model_predictive_trajectory_controller
 
-PLUGINLIB_EXPORT_CLASS(model_predictive_trajectory_controller::JointTrajectoryController, controller_interface::ControllerBase);
+PLUGINLIB_EXPORT_CLASS(model_predictive_trajectory_controller::JointTrajectoryController,
+                       controller_interface::ControllerBase);
