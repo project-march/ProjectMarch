@@ -25,7 +25,7 @@ These have implementations which execute the logic, these classes can do this in
 We currently use the implementations ``NormalsPreprocessor``, ``RegionGrower``, ``CHullFinder`` and``HullParameterDeterminer``.
 
 NormalsPreprocessor
--------------------
+^^^^^^^^^^^^^^^^^^^
 
 The idea behind this step is that a point cloud can be noisy, large, and filled with points which are not necessarily relevant.
 Preprocessing aims to reduce the point cloud size and the useless areas.
@@ -47,7 +47,7 @@ Preprocessing consists of the following steps:
 
 
 RegionGrower
-------------
+^^^^^^^^^^^^
 
 The idea behind finding regions is that in the preprocessed cloud there are certain areas which belong together.
 Regions where it is possible to place the foot, like a step of a stair. Region finding finds these regions which belong together.
@@ -56,7 +56,7 @@ We use the region growing algorithm to find regions in the cloud which is explai
 `The pcl tutorial on region growing segmentation <https://pcl.readthedocs.io/projects/tutorials/en/latest/region_growing_segmentation.html>`_
 
 CHullFinder
------------
+^^^^^^^^^^^
 
 In order to find a potential foot location in the point cloud the found regions need to be transformed into a continuous
 region where we believe it is possible to place the foot.
@@ -73,7 +73,7 @@ For each region:
   4. Add the found hull, its plane parameters and a vector of the indices to vectors for future use
 
 HullParameterDeterminer
------------------------
+^^^^^^^^^^^^^^^^^^^^^^^
 
 Now that we have hulls (or bounded planes) where where we can potentially place the foot. We can start finding a desired
 foot location depending on the gait that is to be executed.
@@ -103,12 +103,12 @@ For the ramp gait this is done as follows:
 
 
 More Information On The Algorithms In Place
--------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For more details on the implementation see the header or the source files of the classes.
 
 Software Architecture
----------------------
+^^^^^^^^^^^^^^^^^^^^^
 
 The generalized steps we are expecting from the PCL implementation, split into classes where we expect to possibly implement multiple alternatives:
 
