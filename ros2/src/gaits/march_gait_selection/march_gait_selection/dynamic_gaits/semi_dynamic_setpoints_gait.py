@@ -1,8 +1,7 @@
 from copy import deepcopy
-from typing import Optional, Tuple
 
+from march_gait_selection.state_machine.gait_interface import GaitUpdate
 from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
-from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from march_utility.gait.subgait import Subgait
 from march_utility.utilities.duration import Duration
 from rclpy.time import Time
@@ -57,39 +56,39 @@ class SemiDynamicSetpointsGait(SetpointsGait):
 
     def update(
         self, current_time: Time, *_
-    ) -> Tuple[Optional[TrajectoryCommand], bool]:
-        """
-        Update the progress of the gait, should be called regularly.
+    ) -> GaitUpdate:
+        """Give an update on the progress of the gait.
         If the current subgait is still running, this does nothing.
         If the gait should be stopped, this will be done
         If the current subgait is done, it will start the next subgait
         :param current_time: Current time
-        :return: optional trajectory_command, is_finished
+        :returns: Returns a GaitUpdate that may contain a TrajectoryCommand, and any of the
+                flags set to true, depending on the state of the Gait.
         """
         self._current_time = current_time
         if self._should_freeze:
-            return self._execute_freeze(), False
+            return self._execute_freeze()
 
         # If the current subgait is not finished, no new trajectory is necessary
         if current_time < self._end_time:
-            return None, False
+            return GaitUpdate.empty()
 
         # If the subgait is finished and it was frozen, execute the subgait after freeze
         if self._is_frozen:
             self._current_subgait = self._subgait_after_freeze
             self._is_frozen = False
             self._update_time_stamps(self._current_subgait)
-            return self._command_from_current_subgait()
+            return GaitUpdate.schedule(self._command_from_current_subgait())
 
         return self._update_next_subgait()
 
-    def _execute_freeze(self):
+    def _execute_freeze(self) -> GaitUpdate:
         """
         Freezes the subgait, currently this means that there is a new subgait
         started of the given freeze duration which ends at the current position.
         If this happens in the middle of a subgait, it plans the rest of the
         original subgait after the freeze.
-        :return:
+        :return: Returns a GaitUpdate
         """
         self._freeze_position = self._position_after_time()
         self._previous_subgait = self._current_subgait.subgait_name
@@ -98,7 +97,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         self._should_freeze = False
         self._is_frozen = True
         self._update_time_stamps(self._current_subgait)
-        return self._command_from_current_subgait()
+        return GaitUpdate.schedule(self._command_from_current_subgait())
 
     def subgait_after_freeze(self):
         """
