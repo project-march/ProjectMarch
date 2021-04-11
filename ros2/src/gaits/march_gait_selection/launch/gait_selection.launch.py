@@ -31,6 +31,13 @@ def generate_launch_description():
                 description="Whether balance is being used.",
             ),
             DeclareLaunchArgument(
+                name="first_subgait_delay",
+                default_value="0.25",
+                description="Duration to wait before starting first subgait."
+                            "If 0 then the first subgait is started immediately,"
+                            "dropping the first setpoint in the process.",
+            ),
+            DeclareLaunchArgument(
                 name="early_schedule_duration",
                 default_value="0.1",
                 description="Duration to schedule next subgait early. If 0 then the"
@@ -46,11 +53,8 @@ def generate_launch_description():
                     {"gait_package": LaunchConfiguration("gait_package")},
                     {"gait_directory": LaunchConfiguration("gait_directory")},
                     {"balance": LaunchConfiguration("balance")},
-                    {
-                        "early_schedule_duration": LaunchConfiguration(
-                            "early_schedule_duration"
-                        )
-                    },
+                    {"first_subgait_delay": LaunchConfiguration("first_subgait_delay")},
+                    {"early_schedule_duration": LaunchConfiguration("early_schedule_duration")},
                 ],
             ),
         ]

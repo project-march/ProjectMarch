@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Optional
 
 from march_gait_selection.dynamic_gaits.transition_subgait import TransitionSubgait
 from march_utility.exceptions.gait_exceptions import GaitError
@@ -7,10 +7,9 @@ from march_utility.gait.subgait import Subgait
 from march_utility.utilities.duration import Duration
 from rclpy.time import Time
 
-from .trajectory_scheduler import TrajectoryCommand
-
 from .gait_interface import GaitInterface, GaitUpdate
 from .state_machine_input import TransitionRequest
+from .trajectory_scheduler import TrajectoryCommand
 
 
 class SetpointsGait(GaitInterface, Gait):
@@ -74,7 +73,7 @@ class SetpointsGait(GaitInterface, Gait):
     def can_be_scheduled_early(self) -> bool:
         return True
 
-    def start(self, current_time: Time, first_subgait_delay: Optional[Duration] = None) -> GaitUpdate:
+    def start(self, current_time: Time, first_subgait_delay: Optional[Duration] = Duration(0)) -> GaitUpdate:
         """
         Start the gait, sets current subgait to the first subgait, resets the
         time and generates the first trajectory command.
@@ -86,14 +85,21 @@ class SetpointsGait(GaitInterface, Gait):
         self._transition_to_subgait = None
         self._is_transitioning = False
         self._scheduled_early = False
-        self._start_is_delayed = True
-        self._update_time_stamps(self._current_subgait, first_subgait_delay)
-        return GaitUpdate.early_schedule(self._command_from_current_subgait())
+
+        # Delay first subgait if duration is greater than zero
+        if first_subgait_delay > Duration(0):
+            self._start_is_delayed = True
+            self._update_time_stamps(self._current_subgait, first_subgait_delay)
+            return GaitUpdate.early_schedule(self._command_from_current_subgait())
+        else:
+            self._start_is_delayed = False
+            self._update_time_stamps(self._current_subgait)
+            return GaitUpdate.schedule(self._command_from_current_subgait())
 
     def update(
         self,
         current_time: Time,
-        early_schedule_duration: Optional[Duration] = None,
+        early_schedule_duration: Optional[Duration] = Duration(0),
     ) -> GaitUpdate:
         """
         Update the progress of the gait, should be called regularly.
@@ -116,7 +122,7 @@ class SetpointsGait(GaitInterface, Gait):
             return self._update_next_subgait()
 
         if (
-            early_schedule_duration is not None
+            early_schedule_duration > Duration(0)
             and not self._scheduled_early
             and self._current_time >= self._end_time - early_schedule_duration
         ):
@@ -303,16 +309,13 @@ class SetpointsGait(GaitInterface, Gait):
         """
         return TrajectoryCommand.from_subgait(self._current_subgait, self._start_time)
 
-    def _update_time_stamps(self, next_subgait: Subgait, first_subgait_delay: Optional[Duration] = None):
+    def _update_time_stamps(self, next_subgait: Subgait, first_subgait_delay: Optional[Duration] = Duration(0)):
         """Update the starting and end time.
 
         :param next_subgait: Next subgait to be scheduled
         """
         if not self._scheduled_early or self._end_time is None:
-            if first_subgait_delay is not None:
-                self._start_time = self._current_time + first_subgait_delay
-            else:
-                self._start_time = self._current_time
+            self._start_time = self._current_time + first_subgait_delay
         else:
             self._start_time = self._end_time
         self._end_time = self._start_time + next_subgait.duration

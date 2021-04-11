@@ -1,24 +1,21 @@
 import os
-import rclpy
+
+import yaml
+from ament_index_python.packages import get_package_share_directory
 from march_gait_selection.dynamic_gaits.balance_gait import BalanceGait
 from march_gait_selection.dynamic_gaits.semi_dynamic_setpoints_gait import (
     SemiDynamicSetpointsGait,
 )
 from march_shared_msgs.srv import SetGaitVersion, ContainsGait
-from rclpy.parameter import Parameter
-from rcl_interfaces.srv import GetParameters
-from rclpy.callback_groups import ReentrantCallbackGroup
-from rclpy.exceptions import ParameterNotDeclaredException
-from rclpy.node import Node
-from ament_index_python.packages import get_package_share_directory
-import yaml
 from march_utility.exceptions.gait_exceptions import GaitError, GaitNameNotFound
 from march_utility.gait.subgait import Subgait
+from march_utility.utilities.node_utils import get_robot_urdf
+from rclpy.exceptions import ParameterNotDeclaredException
+from rclpy.node import Node
 from std_msgs.msg import String
 from std_srvs.srv import Trigger
 from urdf_parser_py import urdf
 
-from march_utility.utilities.node_utils import get_robot_urdf
 from .state_machine.setpoints_gait import SetpointsGait
 
 NODE_NAME = "gait_selection"
