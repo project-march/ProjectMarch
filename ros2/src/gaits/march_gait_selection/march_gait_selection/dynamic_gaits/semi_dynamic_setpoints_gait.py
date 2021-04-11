@@ -55,7 +55,9 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             self._should_freeze = True
             self._freeze_duration = duration
 
-    def update(self, current_time: Time, *_) -> Tuple[Optional[TrajectoryCommand], bool]:
+    def update(
+        self, current_time: Time, *_
+    ) -> Tuple[Optional[TrajectoryCommand], bool]:
         """
         Update the progress of the gait, should be called regularly.
         If the current subgait is still running, this does nothing.

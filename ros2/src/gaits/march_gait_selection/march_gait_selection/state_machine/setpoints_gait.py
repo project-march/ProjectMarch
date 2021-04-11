@@ -73,10 +73,14 @@ class SetpointsGait(GaitInterface, Gait):
     def can_be_scheduled_early(self) -> bool:
         return True
 
-    def start(self, current_time: Time, first_subgait_delay: Optional[Duration] = Duration(0)) -> GaitUpdate:
-        """
-        Start the gait, sets current subgait to the first subgait, resets the
+    def start(
+        self, current_time: Time, first_subgait_delay: Optional[Duration] = Duration(0)
+    ) -> GaitUpdate:
+        """Start the gait.
+        Sets current subgait to the first subgait, resets the
         time and generates the first trajectory command.
+        May optionally delay the first subgait.
+        :param first_subgait_delay Optional duration to delay the first subgait by.
         :return: A TrajectoryCommand message with the trajectory of the first subgait.
         """
         self._current_time = current_time
@@ -101,15 +105,18 @@ class SetpointsGait(GaitInterface, Gait):
         current_time: Time,
         early_schedule_duration: Optional[Duration] = Duration(0),
     ) -> GaitUpdate:
-        """
-        Update the progress of the gait, should be called regularly.
+        """Give an update on the progress of the gait.
+        If the start was delayed and we have passed the start time,
+         we are now actually starting the gait.
+         Hence the is_new_subgait flag shuold be set to true.
         If the previous subgait ended, schedule a new one.
         If we haven't scheduled early yet, and we are within early_schedule_duration of
         the end time, then schedule a new subgait early.
         Else return nothing.
         :param current_time: Current time
         :param early_schedule_duration: Optional duration to schedule early
-        :return: optional trajectory_command, is_finished
+        :returns: Returns a GaitUpdate that may contain a TrajectoryCommand, and any of the
+                flags set to true, depending on the state of the Gait.
         """
         self._current_time = current_time
 
@@ -199,7 +206,9 @@ class SetpointsGait(GaitInterface, Gait):
         # If there is no subgait, return None and False for is_finished
         if next_subgait is None:
             return GaitUpdate.empty()
-        return GaitUpdate.early_schedule(TrajectoryCommand.from_subgait(next_subgait, self._end_time))
+        return GaitUpdate.early_schedule(
+            TrajectoryCommand.from_subgait(next_subgait, self._end_time)
+        )
 
     def _next_graph_subgait(self) -> Optional[Subgait]:
         """Get the next subgait from the graph.
@@ -309,7 +318,11 @@ class SetpointsGait(GaitInterface, Gait):
         """
         return TrajectoryCommand.from_subgait(self._current_subgait, self._start_time)
 
-    def _update_time_stamps(self, next_subgait: Subgait, first_subgait_delay: Optional[Duration] = Duration(0)):
+    def _update_time_stamps(
+        self,
+        next_subgait: Subgait,
+        first_subgait_delay: Optional[Duration] = Duration(0),
+    ):
         """Update the starting and end time.
 
         :param next_subgait: Next subgait to be scheduled

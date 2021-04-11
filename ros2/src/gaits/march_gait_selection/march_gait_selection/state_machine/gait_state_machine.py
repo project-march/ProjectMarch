@@ -62,8 +62,12 @@ class GaitStateMachine(object):
         self.update_timer = None
         self.last_update_time = None
 
-        self._early_schedule_duration = self._parse_duration_parameter("early_schedule_duration")
-        self._first_subgait_delay = self._parse_duration_parameter("first_subgait_delay")
+        self._early_schedule_duration = self._parse_duration_parameter(
+            "early_schedule_duration"
+        )
+        self._first_subgait_delay = self._parse_duration_parameter(
+            "first_subgait_delay"
+        )
 
         self.current_state_pub = self._gait_selection.create_publisher(
             msg_type=CurrentState,
@@ -191,7 +195,9 @@ class GaitStateMachine(object):
     ):
         """Standard callback when gait changes, publishes the current gait
         More callbacke can be added using add_gait_callback"""
-        self._gait_selection.get_logger().debug(f'Current subgait updated to {subgait_name}')
+        self._gait_selection.get_logger().debug(
+            f"Current subgait updated to {subgait_name}"
+        )
         self.current_gait_pub.publish(
             CurrentGait(
                 header=Header(stamp=self._gait_selection.get_clock().now().to_msg()),
@@ -415,7 +421,9 @@ class GaitStateMachine(object):
     def _handle_input(self):
         """Handles stop and transition input from the input device. This input
         is passed on to the current gait to execute the request"""
-        if (self._input.stop_requested() or self._should_stop) and not self._is_stopping:
+        if (
+            self._input.stop_requested() or self._should_stop
+        ) and not self._is_stopping:
             self._should_stop = False
             self._is_stopping = True
             if self._current_gait.stop():

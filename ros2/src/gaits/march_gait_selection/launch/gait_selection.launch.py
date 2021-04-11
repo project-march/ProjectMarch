@@ -34,8 +34,8 @@ def generate_launch_description():
                 name="first_subgait_delay",
                 default_value="0.25",
                 description="Duration to wait before starting first subgait."
-                            "If 0 then the first subgait is started immediately,"
-                            "dropping the first setpoint in the process.",
+                "If 0 then the first subgait is started immediately,"
+                "dropping the first setpoint in the process.",
             ),
             DeclareLaunchArgument(
                 name="early_schedule_duration",
@@ -54,7 +54,11 @@ def generate_launch_description():
                     {"gait_directory": LaunchConfiguration("gait_directory")},
                     {"balance": LaunchConfiguration("balance")},
                     {"first_subgait_delay": LaunchConfiguration("first_subgait_delay")},
-                    {"early_schedule_duration": LaunchConfiguration("early_schedule_duration")},
+                    {
+                        "early_schedule_duration": LaunchConfiguration(
+                            "early_schedule_duration"
+                        )
+                    },
                 ],
             ),
         ]

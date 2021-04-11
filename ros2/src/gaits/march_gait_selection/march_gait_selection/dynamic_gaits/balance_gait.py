@@ -244,8 +244,12 @@ class BalanceGait(GaitInterface):
         self._current_subgait_duration = Duration.from_ros_duration(time_from_start)
         self._start_time = self._current_time
         self._end_time = self._start_time + self._current_subgait_duration
-        return TrajectoryCommand(trajectory, self._current_subgait_duration,
-                                 self.subgait_name, self._start_time)
+        return TrajectoryCommand(
+            trajectory,
+            self._current_subgait_duration,
+            self.subgait_name,
+            self._start_time,
+        )
 
     def end(self):
         self._current_subgait = None

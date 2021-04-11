@@ -9,28 +9,36 @@ from rclpy.time import Time
 
 @dataclass
 class GaitUpdate:
+    """The GaitUpdate is a data structure for the different gaits to communicate with
+    the gait state machine."""
+
     new_trajectory_command: Optional[TrajectoryCommand]
     is_new_subgait: bool
     is_finished: bool
 
     @staticmethod
     def empty():
+        """A GaitUpdate with no information."""
         return GaitUpdate(None, False, False)
 
     @staticmethod
     def finished():
+        """A GaitUpdate with the is_finished flag set to true."""
         return GaitUpdate(None, False, True)
 
     @staticmethod
     def subgait_update():
+        """A GaitUpdate with the is_new_subgait flag set to true."""
         return GaitUpdate(None, True, False)
 
     @staticmethod
-    def schedule(command: Optional[TrajectoryCommand] = None):
+    def schedule(command):
+        """A GaitUpdate that contains a new TrajectoryCommand, and also the is_new_subgait flag set to true indicating that the subgait has updated."""
         return GaitUpdate(command, True, False)
 
     @staticmethod
     def early_schedule(command: TrajectoryCommand):
+        """A GaitUpdate that contains a new TrajectoryCommand, but the current subgait is not be updated yet"""
         return GaitUpdate(command, False, False)
 
 
@@ -85,17 +93,17 @@ class GaitInterface(object):
         return False
 
     def start(self, current_time: Time) -> GaitUpdate:
-        """Called when the gait has been selected for execution and returns an
-        optional starting trajectory command."""
+        """Start the gait.
+
+        :returns Returns a GaitUpdate that usually contains a TrajectoryCommand."""
         return GaitUpdate.empty()
 
     def update(self, current_time: Time) -> GaitUpdate:
-        """Called in a loop with the current time.
+        """Give an update on the progress of the gait.
 
         :param current_time: Current time
-        :returns A pair of a trajectory command and a flag. The trajectory command that will be
-                 set as the new goal for the controller, can be None. The flag
-                 indicates whether the gait has finished.
+        :returns Returns a GaitUpdate that may contain a TrajectoryCommand, and any of the
+                flags set to true, depending on the state of the Gait.
         """
         return GaitUpdate.finished()
 
