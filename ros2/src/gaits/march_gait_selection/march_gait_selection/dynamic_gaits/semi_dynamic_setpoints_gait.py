@@ -1,4 +1,5 @@
 from copy import deepcopy
+from typing import Optional
 
 from march_gait_selection.state_machine.gait_interface import GaitUpdate
 from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
@@ -54,9 +55,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             self._should_freeze = True
             self._freeze_duration = duration
 
-    def update(
-        self, current_time: Time, *_
-    ) -> GaitUpdate:
+    def update(self, current_time: Time, *_) -> GaitUpdate:
         """Give an update on the progress of the gait.
         If the current subgait is still running, this does nothing.
         If the gait should be stopped, this will be done
@@ -161,13 +160,17 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             version="Only version, generated from code",
         )
 
-    def _position_after_time(self):
+    def _position_after_time(self, elapsed_time: Optional[Duration] = None):
         """
         The position that the exoskeleton should be in after the elapsed
-        time of the current subgait.
+        time.
+        :param: elapsed_time Optional Time that has elapsed, if None uses the elapsed time of
+        the current subgait
         :return: dict with joints and joint positions
         """
+        if elapsed_time is None:
+            elapsed_time = self.elapsed_time
         return {
-            joint.name: joint.get_interpolated_setpoint(self.elapsed_time).position
+            joint.name: joint.get_interpolated_setpoint(elapsed_time).position
             for joint in self._current_subgait
         }
