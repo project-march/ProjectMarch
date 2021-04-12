@@ -64,7 +64,8 @@ clang_format:
     - python3 .scripts/run-clang-format.py -r ros1/src ros2/src --style=file
   only:
     changes:
-      - "*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
+      - "ros1/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
+      - "ros2/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
 
 noetic:build:
   stage: Build code
