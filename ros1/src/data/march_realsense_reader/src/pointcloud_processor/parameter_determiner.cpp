@@ -61,6 +61,12 @@ void HullParameterDeterminer::readYaml()
             stairs_locations_parameters, "max_z_stairs");
         y_location = yaml_utilities::grabParameter<double>(
             stairs_locations_parameters, "y_location");
+        x_deviation_back = yaml_utilities::grabParameter<double>(
+                stairs_locations_parameters, "x_deviation_back");
+        x_deviation_front = yaml_utilities::grabParameter<double>(
+                stairs_locations_parameters, "x_deviation_front");
+        y_devaition = yaml_utilities::grabParameter<double>(
+                stairs_locations_parameters, "y_deviation");
     } else {
         ROS_ERROR("'stairs_locations' parameters not found in parameters file");
     }
