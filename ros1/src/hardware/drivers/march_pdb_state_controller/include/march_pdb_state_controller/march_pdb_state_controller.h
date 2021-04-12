@@ -15,28 +15,32 @@
 #include <march_shared_msgs/LowVoltageNet.h>
 #include <march_shared_msgs/PowerDistributionBoardState.h>
 
-namespace march_pdb_state_controller
-{
-class MarchPdbStateController : public controller_interface::Controller<MarchPdbStateInterface>
-{
+namespace march_pdb_state_controller {
+class MarchPdbStateController
+    : public controller_interface::Controller<MarchPdbStateInterface> {
 public:
-  MarchPdbStateController();
+    MarchPdbStateController();
 
-  bool init(MarchPdbStateInterface* hw, ros::NodeHandle& root_nh, ros::NodeHandle& controller_nh) override;
-  void starting(const ros::Time& time) override;
-  void update(const ros::Time& time, const ros::Duration& /*period*/) override;
-  void stopping(const ros::Time& /*time*/) override;
+    bool init(MarchPdbStateInterface* hw, ros::NodeHandle& root_nh,
+        ros::NodeHandle& controller_nh) override;
+    void starting(const ros::Time& time) override;
+    void update(
+        const ros::Time& time, const ros::Duration& /*period*/) override;
+    void stopping(const ros::Time& /*time*/) override;
 
 private:
-  static std::vector<march_shared_msgs::HighVoltageNet>
-  createHighVoltageNetsMessage(march::HighVoltage high_voltage);
-  static std::vector<march_shared_msgs::LowVoltageNet> createLowVoltageNetsMessage(march::LowVoltage low_voltage);
+    static std::vector<march_shared_msgs::HighVoltageNet>
+    createHighVoltageNetsMessage(march::HighVoltage high_voltage);
+    static std::vector<march_shared_msgs::LowVoltageNet>
+    createLowVoltageNetsMessage(march::LowVoltage low_voltage);
 
-  MarchPdbStateHandle pdb_state_;
-  std::unique_ptr<realtime_tools::RealtimePublisher<march_shared_msgs::PowerDistributionBoardState>> rt_pub_;
-  ros::Time last_publish_times_;
-  double publish_rate_;
+    MarchPdbStateHandle pdb_state_;
+    std::unique_ptr<realtime_tools::RealtimePublisher<
+        march_shared_msgs::PowerDistributionBoardState>>
+        rt_pub_;
+    ros::Time last_publish_times_;
+    double publish_rate_;
 };
-}  // namespace march_pdb_state_controller
+} // namespace march_pdb_state_controller
 
-#endif  // MARCH_PDB_STATE_CONTROLLER_MARCH_PDB_STATE_CONTROLLER_H
+#endif // MARCH_PDB_STATE_CONTROLLER_MARCH_PDB_STATE_CONTROLLER_H

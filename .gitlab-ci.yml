@@ -58,6 +58,15 @@ flake8:
       codequality: flakehell.json
   allow_failure: true
 
+clang_format:
+  stage: Lint code
+  script:
+    - python3 .scripts/run-clang-format.py -r ros1/src ros2/src --style=file
+  only:
+    changes:
+      - "ros1/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
+      - "ros2/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
+
 noetic:build:
   stage: Build code
   artifacts:

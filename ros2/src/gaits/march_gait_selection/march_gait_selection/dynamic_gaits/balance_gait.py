@@ -84,7 +84,7 @@ class BalanceGait(GaitInterface):
         self.capture_point_event.clear()
 
         future = self._capture_point_service[leg_name].call_async(
-            CapturePointPose.Request(duration=subgait_duration)
+            CapturePointPose.Request(duration=subgait_duration.seconds)
         )
         future.add_done_callback(self.capture_point_cb)
         return self.capture_point_event.wait(timeout=self.CAPTURE_POINT_SERVICE_TIMEOUT)
@@ -239,7 +239,7 @@ class BalanceGait(GaitInterface):
         """
         trajectory = self.get_joint_trajectory_msg(self._current_subgait)
         time_from_start = trajectory.points[-1].time_from_start
-        self._current_subgait_duration = Duration.from_ros_duration(time_from_start)
+        self._current_subgait_duration = Duration.from_msg(time_from_start)
         self._start_time = self._current_time
         self._end_time = self._start_time + self._current_subgait_duration
         return GaitUpdate.schedule(

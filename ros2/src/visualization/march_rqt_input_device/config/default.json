@@ -94,6 +94,9 @@
       },
       {
          "name":"stairs_down_single_step"
+      },
+      {
+         "name":"realsense_stairs_up_single_step"
       }
    ],
    [

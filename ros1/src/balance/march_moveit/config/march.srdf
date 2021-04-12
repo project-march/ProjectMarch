@@ -123,4 +123,7 @@
     <disable_collisions link1="lower_leg_right" link2="upper_leg_left" reason="Never" />
     <disable_collisions link1="lower_leg_right" link2="upper_leg_right" reason="Adjacent" />
     <disable_collisions link1="upper_leg_left" link2="upper_leg_right" reason="Never" />
+    <disable_collisions link1="camera_back_link" link2="hip_aa_frame_right_side" reason="Adjacent" />
+    <disable_collisions link1="camera_back_link" link2="hip_aa_frame_right_front" reason="Adjacent" />
+
 </robot>
