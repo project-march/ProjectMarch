@@ -166,10 +166,11 @@ Services
 
 Tutorials
 ---------
+These tutorials use the convenient aliases from :ref:`march_aliases-label`
 
 Running the package in simulation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-It is recommended to run all commands in separate terminals. These tutorials use the convenient aliases from :ref:`march_aliases-label`
+It is recommended to run all commands in separate terminals.
 
 .. code :: bash
 
@@ -186,9 +187,53 @@ add a `pointcloud2`, and set the topic to `/camera/preprocessed_cloud` or `/came
 
 will result in a pointlcoud in RViz with regions indicated by colour.
 
-Running with a camera
-^^^^^^^^^^^^^^^^^^^^^
-You need a camera for this example
+Running with one camera
+^^^^^^^^^^^^^^^^^^^^^^^
+You need a camera for this example. This tutorial shows you how to run the exoskeleton with a physical camera and visualize its results.
+
+First start up the exoskeleton, it is recommended to run all commands in separate terminals.
+.. code :: bash
+
+    march_run_ros1 ground_gait:=true realsense:=true realsense_simulation:=false
+    march_run_ros2 ground_gait:=true use_imu_data:=true
+    march_run_bridge
+
+This will start RViz. In RViz add a `pointcloud2` and set the topic to /camera_front/depth/color/points`, this will visualize what the camera is seeing.
+Also add the robot model to see how the exoskeleton would fall in this world view, note how the camera dictates the orientation.
+If you now hold the camera so that the exo is upright, set the point cloud topic to ` /camera/region_cloud` and call the processing service
+
+.. code :: bash
+
+  snoe && sros1 && rosservice call /camera/process_pointcloud "selected_gait: 0 frame_id_to_transform_to: 'foot_right'"
+
+you will see the result of processing the cloud which, if the tuning of the algorithm is correct and the camera is in the right position,
+should look something like:
+
+.. figure:: images/physical_camera_result.png
+   :align: center
+
+Running with one camera
+^^^^^^^^^^^^^^^^^^^^^^^
+You need two cameras for this example. This tutorial is very similar to the Running with one camera tutorial.
+The main difference is in starting up the exoskeleton. If you have the cameras with the 'front' and 'back' labels, this
+ can be done by running in separate terminals the following:
+
+ .. code :: bash
+
+     march_run_ros1 ground_gait:=true realsense:=true realsense_simulation:=false use_camera_back:=true
+     march_run_ros2 ground_gait:=true use_imu_data:=true
+     march_run_bridge
+
+If not run:
+
+.. code :: bash
+
+    march_run_ros1 ground_gait:=true realsense:=true realsense_simulation:=false serial_no_camera_front:=<your-front-serial-number>
+         use_camera_back:=true serial_no_camera_back:=<your-back-serial-number>
+    march_run_ros2 ground_gait:=true use_imu_data:=true
+    march_run_bridge
+
+The processor only uses the front camera for now, but one can now also visualize the back camera in RViz.
 
 FAQ
 ---
