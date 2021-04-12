@@ -82,9 +82,10 @@ public:
 
 private:
   /**
-   * @brief Retrieve the W array from the parameter server for a joint.
-   * @param joint_name Joint to retrieve W array for
-   * @return Returns a vector: The W array.
+   * @brief Retrieve the weights from the parameter server for a joint.
+   *        Weights are used for tuning the MPC
+   * @param joint_name Joint to retrieve weights for
+   * @return Returns a vector: The weight values belonging to the diagonal of the MPC weight matrix.
    */
   std::vector<float> getWeights(std::string joint_name);
 

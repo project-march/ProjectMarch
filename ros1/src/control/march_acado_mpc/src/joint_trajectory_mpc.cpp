@@ -74,7 +74,7 @@ std::vector<float> ModelPredictiveControllerInterface::getWeights(std::string jo
 
   // Get Q and R from controller config
   std::vector<float> Q;
-  float R;
+  std::vector<float> R;
 
   ros::param::get(parameter_path + "/weights/" + joint_name + "/Q", Q);
   ros::param::get(parameter_path + "/weights/" + joint_name + "/R", R);
@@ -82,9 +82,11 @@ std::vector<float> ModelPredictiveControllerInterface::getWeights(std::string jo
   // Add Q and R to W
   std::vector<float> W;
   W.insert(W.begin(), Q.begin(), Q.end());
-  W.push_back(R);
-
-  // Check for validity of the weighting array
+  W.insert(W.end(), R.begin(), R.end());
+  
+  // Check for validity of the weighting arrays
+  ROS_WARN_STREAM_COND(Q.empty(), joint_name << ", Q array has not been supplied or is empty");
+  ROS_WARN_STREAM_COND(R.empty(), joint_name << ", R array has not been supplied or is empty");
   ROS_WARN_STREAM_COND(W.size() != ACADO_NY, joint_name << ", Incorrect weighting array size");
 
   // Set WArray for the mpc msg
