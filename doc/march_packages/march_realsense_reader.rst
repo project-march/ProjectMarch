@@ -87,7 +87,7 @@ For the stairs method this is done as follows:
 0) The stairs gait is interpolated from a low deep, high deep, low undeep & high undeep gait.
    We can place the foot anywhere in the convex hull of the end locations of those gaits.
 
-1) Test a number of foot locations on the ground whether there is a potential foot location at some height. This five optional foot locations.
+1) For a number of foot locations on the ground test whether there is a potential foot location at some height. This gives optional foot locations.
 
 2) For all the optional foot locations test which ones are executable and pick a valid one which is
    closest to some ideal location (the minimal step, the average step).
@@ -99,11 +99,11 @@ For the ramp gait this is done as follows:
 0) The ramp gait is interpolated from a flat & steep gait. We can place the foot anywhere in between the two ending locations of the gait.
    This is what we call the 'executable foot locations line'.
 
-1) Test a number of foot locations on the ground whether there is a potential foot location at some height. This five optional foot locations.
+1) For a number of foot locations on the ground test whether there is a potential foot location at some height. This gives optional foot locations.
 
 2) For all the optional foot locations find which one is executable and closest to the executable foot locations line.
 
-3) Transform this into a praameter by finding at what percentage of the executable foot locations line.
+3) Transform this into a parameter by finding at what percentage of the executable foot locations line.
 
 
 More Information On The Algorithms In Place
@@ -143,25 +143,26 @@ Published Topics
 The package publisher several debug pointclouds and markers, these topics are purely for visualisation:
 
 */camera/preprocessed_cloud* (sensor_msgs::PointCloud2)
-  The pointcloud outputted by the `preprocessor`. This cloud containts only the points in a xy-plane, and has a lower
-  point density than the original cloud.
+  The pointcloud outputted by the `preprocessor`. This cloud contains only the points part of a locally roughly flat area, and has a lower
+  point density than the original cloud and is transformed to the frame id specified by the /camera/process_pointcloud service.
 
 */camera/region_cloud* (pcl::PointCloud<pcl::PointXYZRGB>)
   This topic contains a single region cloud, created by the `region_creator`. The points in the cloud are grouped into
-  a 'region', indicated by a colour for every region.
+  a 'region', indicated by a colour for every region. Red points are not part of any region.
 
 */camera/hull_marker_list* (visualization_msgs::Marker)
   Markers that visualise the boundary of regions. This boundary is created using a convex or concave hull. This hull is
   used to determine the possible foot locations.
 
 */camera/foot_locations_marker_array* (visualization_msgs::MarkerArray)
-  Markers that indicate the points in the `preprocessed_cloud`, for which is it possible to move the foot of the
-  exoskeleton. The most optimal of these locations is highlighted.
+  Markers that visualize the steps of the parameter determiner. The optional foot locations are in blue, the possible locations are in green
+  and the optimal location is highlighted in white.
 
 Services
 ^^^^^^^^
 */camera/process_pointcloud*
   Calls upon the `march_realsense_reader`. Outputs the `gait_parameters` from which a parametric gait can be constructed.
+  requires the selected gait and the frame id to transform the point cloud to.
 
 Parameters
 ^^^^^^^^^^
