@@ -1,28 +1,30 @@
 #ifndef MARCH_PREPROCESSOR_H
 #define MARCH_PREPROCESSOR_H
 
+#include "yaml-cpp/yaml.h"
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
-#include "yaml-cpp/yaml.h"
 #include <tf2_ros/transform_listener.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 
 class Preprocessor {
-  public:
+public:
     Preprocessor(YAML::Node config_tree, bool debugging);
 
     // This function is required to be implemented by any preprocessor
     virtual bool preprocess(PointCloud::Ptr pointcloud,
-                            Normals::Ptr normal_pointcloud,
-                            std::string frame_id_to_transform_to_)=0;
+        Normals::Ptr normal_pointcloud, std::string frame_id_to_transform_to_)
+        = 0;
 
     virtual ~Preprocessor() {};
 
-    // Removes a point from a pointcloud (and optionally the corresponding pointcloud_normals as well) at a given index
-    void removePointByIndex(int const index, PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals = nullptr);
+    // Removes a point from a pointcloud (and optionally the corresponding
+    // pointcloud_normals as well) at a given index
+    void removePointByIndex(int const index, PointCloud::Ptr pointcloud,
+        Normals::Ptr pointcloud_normals = nullptr);
 
     PointCloud::Ptr pointcloud_;
     Normals::Ptr pointcloud_normals_;
@@ -30,23 +32,22 @@ class Preprocessor {
     bool debugging_;
 };
 
-/** The SimplePreprocessor is mostly for debug purposes, it does only the most vital
- * step of transforming the pointcloud based on the /tf topic. More complex
- * preoprocessors will be made for normal usecases **/
+/** The SimplePreprocessor is mostly for debug purposes, it does only the most
+ * vital step of transforming the pointcloud based on the /tf topic. More
+ * complex preoprocessors will be made for normal usecases **/
 class SimplePreprocessor : Preprocessor {
-  public:
-    /** Basic constructor for simple preprocessor, this will also create a tf_listener
-    that is required for transforming the pointcloud **/
+public:
+    /** Basic constructor for simple preprocessor, this will also create a
+    tf_listener that is required for transforming the pointcloud **/
     SimplePreprocessor(YAML::Node config_tree, bool debugging);
 
     // Preprocess the given pointcloud, based on parameters in the config tree
-    bool preprocess(PointCloud::Ptr pointcloud,
-                    Normals::Ptr pointcloud_normals,
-                    std::string frame_id_to_transform_to = "foot_left") override;
+    bool preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals,
+        std::string frame_id_to_transform_to = "foot_left") override;
 
-  protected:
-    /** Calls the tf listener, to know transform at current time and transforms the
-     pointcloud **/
+protected:
+    /** Calls the tf listener, to know transform at current time and transforms
+     the pointcloud **/
     void transformPointCloudFromUrdf();
 
     // Objects needed for transformation based on URDF
@@ -57,34 +58,39 @@ class SimplePreprocessor : Preprocessor {
 };
 
 class NormalsPreprocessor : Preprocessor {
-  public:
-    /** Basic constructor for normals preprocessor, this will also create a tf_listener
-    that is required for transforming the pointcloud **/
+public:
+    /** Basic constructor for normals preprocessor, this will also create a
+    tf_listener that is required for transforming the pointcloud **/
     NormalsPreprocessor(YAML::Node config_tree, bool debugging);
 
-    // Calls all subsequent methods to preprocess a pointlcoud using normal vectors
-    bool preprocess(PointCloud::Ptr pointcloud,
-                    Normals::Ptr pointcloud_normals,
-                    std::string frame_id_to_transform_to = "foot_left") override;
+    // Calls all subsequent methods to preprocess a pointlcoud using normal
+    // vectors
+    bool preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals,
+        std::string frame_id_to_transform_to = "foot_left") override;
 
-  protected:
-    // Removes points from the pointcloud such that there is only one point left in a certain area
-    // (specified in the parameter file)
+protected:
+    // Removes points from the pointcloud such that there is only one point left
+    // in a certain area (specified in the parameter file)
     bool downsample();
 
     // Transform the pointcloud based on the data found on the /tf topic,
-    bool transformPointCloudFromUrdf(geometry_msgs::TransformStamped & transform_stamped);
+    bool transformPointCloudFromUrdf(
+        geometry_msgs::TransformStamped& transform_stamped);
 
-    // Rotate and translates the pointcloud by some certain amounts (specified in the parameter file)
+    // Rotate and translates the pointcloud by some certain amounts (specified
+    // in the parameter file)
     bool transformPointCloud();
 
-    // Removes all points which are futher away then a certain distance from the origin (specified in the parameter file)
+    // Removes all points which are futher away then a certain distance from the
+    // origin (specified in the parameter file)
     bool filterOnDistanceFromOrigin();
 
-    // Estimates the normals of the pointcloud and fills the pointcloud_normals_ cloud with those
+    // Estimates the normals of the pointcloud and fills the pointcloud_normals_
+    // cloud with those
     bool fillNormalCloud(geometry_msgs::TransformStamped transform_stamped);
 
-    // Removes all points which do not roughly have a normal in a certain direction (specified in the parameter file)
+    // Removes all points which do not roughly have a normal in a certain
+    // direction (specified in the parameter file)
     bool filterOnNormalOrientation();
 
     // Reads all the relevant parameters from the yaml file
@@ -124,4 +130,4 @@ class NormalsPreprocessor : Preprocessor {
     std::string frame_id_to_transform_to_;
 };
 
-#endif //MARCH_PREPROCESSOR_H
+#endif // MARCH_PREPROCESSOR_H
