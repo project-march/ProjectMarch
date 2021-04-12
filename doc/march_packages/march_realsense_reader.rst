@@ -216,7 +216,7 @@ Running with one camera
 ^^^^^^^^^^^^^^^^^^^^^^^
 You need two cameras for this example. This tutorial is very similar to the Running with one camera tutorial.
 The main difference is in starting up the exoskeleton. If you have the cameras with the 'front' and 'back' labels, this
- can be done by running in separate terminals the following:
+can be done by running in separate terminals the following:
 
  .. code :: bash
 
@@ -229,19 +229,8 @@ If not run:
 .. code :: bash
 
     march_run_ros1 ground_gait:=true realsense:=true realsense_simulation:=false serial_no_camera_front:=<your-front-serial-number>
-         use_camera_back:=true serial_no_camera_back:=<your-back-serial-number>
+    use_camera_back:=true serial_no_camera_back:=<your-back-serial-number>
     march_run_ros2 ground_gait:=true use_imu_data:=true
     march_run_bridge
 
 The processor only uses the front camera for now, but one can now also visualize the back camera in RViz.
-
-FAQ
----
-
-How do I x?
-^^^^^^^^^^^
-Please check the tutorials.
-
-How do I z?
-^^^^^^^^^^^
-z is not available at the moment.
