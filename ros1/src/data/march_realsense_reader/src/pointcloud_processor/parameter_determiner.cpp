@@ -4,6 +4,7 @@
 #include "utilities/realsense_gait_utilities.h"
 #include "yaml-cpp/yaml.h"
 #include <ctime>
+#include <cmath>
 #include <pcl/filters/crop_hull.h>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
@@ -62,11 +63,13 @@ void HullParameterDeterminer::readYaml()
         y_location = yaml_utilities::grabParameter<double>(
             stairs_locations_parameters, "y_location");
         x_deviation_back = yaml_utilities::grabParameter<double>(
-                stairs_locations_parameters, "x_deviation_back");
+            stairs_locations_parameters, "x_deviation_back");
         x_deviation_front = yaml_utilities::grabParameter<double>(
-                stairs_locations_parameters, "x_deviation_front");
-        y_devaition = yaml_utilities::grabParameter<double>(
-                stairs_locations_parameters, "y_deviation");
+            stairs_locations_parameters, "x_deviation_front");
+        y_deviation = yaml_utilities::grabParameter<double>(
+            stairs_locations_parameters, "y_deviation");
+        max_allowed_z_deviation = yaml_utilities::grabParameter<double>(
+            stairs_locations_parameters, "max_allowed_z_deviation");
     } else {
         ROS_ERROR("'stairs_locations' parameters not found in parameters file");
     }
@@ -219,8 +222,9 @@ bool HullParameterDeterminer::isValidLocation(
             && optimal_foot_location.x > max_x_stairs
             && possible_foot_location.z > min_z_stairs
             && optimal_foot_location.z < max_z_stairs) {
-            if (entireFootCanBePlaced(pcl::PointNormal possible_foot_location))
-            return true;
+            if (entireFootCanBePlaced(possible_foot_location)) {
+                return true;
+            }
         }
     } else {
         ROS_ERROR_STREAM("optimalLocationIsValid method has not been "
@@ -231,6 +235,43 @@ bool HullParameterDeterminer::isValidLocation(
     // If no check concludes that the location is valid, return that the
     // location is invalid.
     return false;
+}
+
+// Verify if there is support for the entire foot around the possible foot location
+bool HullParameterDeterminer::enitreFootCanBePlaced(pcl::PointNormal possible_foot_location)
+{
+    bool success = true;
+    // First create a pointcloud containing the edge points (vertices) of the foot on the ground
+    PointCloud2D::Ptr foot_pointcloud = boost::make_shared<PointCloud2D>();
+    fillFootPointCloud(foot_pointcloud, possible_foot_location);
+
+    // Then find possible foot locations associated with the foot vertices
+    PointNormalCloud::Ptr potential_foot_support_cloud = boost::make_shared<PointNormalCloud>();
+    succes &= cropCloudToHullVector(foot_pointcloud, potential_foot_support_cloud);
+
+    // If all vertices have a possible foot location and they have z values in a certain range the location is valid
+    if (potential_foot_support_cloud->points.size() == foot_pointcloud->size()) {
+        for (pcl::PointNormal potential_foot_support : potential_foot_support_cloud) {
+            if (potential_foot_support.z - possible_foot_location.z
+        }
+    }
+}
+
+// Fill a point cloud with vertices of the foot on the ground around a possible foot location
+void HullParameterDeterminer::fillFootPointCloud(PointCloud2D::Ptr foot_pointcloud, pcl::PointNormal possible_foot_location)
+{
+    foot_pointcloud->points.resize(4);
+    foot_pointcloud->point.x = possible_foot_location.x - x_deviation_back;
+    foot_pointcloud->point.y = possible_foot_location.y - y_deviation;
+
+    foot_pointcloud->point.x = possible_foot_location.x - x_deviation_back;
+    foot_pointcloud->point.y = possible_foot_location.y + y_deviation;
+
+    foot_pointcloud->point.x = possible_foot_location.x + x_deviation_front;
+    foot_pointcloud->point.y = possible_foot_location.y - y_deviation;
+
+    foot_pointcloud->point.x = possible_foot_location.x + x_deviation_front;
+    foot_pointcloud->point.y = possible_foot_location.y + y_deviation;
 }
 
 // Compute the optimal foot location as if one were not limited by anything.

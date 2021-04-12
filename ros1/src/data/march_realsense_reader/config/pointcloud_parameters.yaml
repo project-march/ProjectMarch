@@ -51,7 +51,8 @@ parameter_determiner:
     # to that end the relative location of the foot vertices are needed
     x_deviation_back: 0.05
     x_deviation_front: 0.1
-    y_devaition: 0.025
+    y_deviation: 0.025
+    max_allowed_z_deviation: 0.03
   # Set the most desirable foot location to the mid point of what the gaits are capable off
   general_most_desirable_location_is_mid: true
   # Set the most desirable foot location to the smallest / flattest step
