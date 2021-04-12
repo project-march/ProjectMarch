@@ -5,14 +5,14 @@
 
 #include <gmock/gmock.h>
 
-class MockTemperatureGES : public march::TemperatureGES
-{
+class MockTemperatureGES : public march::TemperatureGES {
 public:
-  MockTemperatureGES() : TemperatureGES(MockSlave(), 0)
-  {
-  }
+    MockTemperatureGES()
+        : TemperatureGES(MockSlave(), 0)
+    {
+    }
 
-  MOCK_CONST_METHOD0(getTemperature, float());
+    MOCK_CONST_METHOD0(getTemperature, float());
 
-  MOCK_METHOD2(initSdo, bool(march::SdoSlaveInterface& sdo, int cycle_time));
+    MOCK_METHOD2(initSdo, bool(march::SdoSlaveInterface& sdo, int cycle_time));
 };
