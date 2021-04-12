@@ -43,22 +43,22 @@ void HullParameterDeterminer::readYaml()
 {
   number_of_optional_foot_locations = yaml_utilities::grabParameter<int>(
       config_tree_, "number_of_optional_foot_locations");
-  general_most_desirable_location_is_mid = yaml_utilities::grabParameter<bool>(
-      config_tree_, "general_most_desirable_location_is_mid");
-  general_most_desirable_location_is_small = yaml_utilities::grabParameter<bool>(
-      config_tree_, "general_most_desirable_location_is_small");
   if (YAML::Node stairs_locations_parameters = config_tree_["stairs_locations"])
   {
     min_x_stairs = yaml_utilities::grabParameter<double>(
-        stairs_locations_parameters, "min_x_stairs");
+            stairs_locations_parameters, "min_x_stairs");
     max_x_stairs = yaml_utilities::grabParameter<double>(
-        stairs_locations_parameters, "max_x_stairs");
+            stairs_locations_parameters, "max_x_stairs");
     min_z_stairs = yaml_utilities::grabParameter<double>(
-        stairs_locations_parameters, "min_z_stairs");
+            stairs_locations_parameters, "min_z_stairs");
     max_z_stairs = yaml_utilities::grabParameter<double>(
-        stairs_locations_parameters, "max_z_stairs");
+            stairs_locations_parameters, "max_z_stairs");
     y_location = yaml_utilities::grabParameter<double>(
-        stairs_locations_parameters,"y_location");
+            stairs_locations_parameters,"y_location");
+    general_most_desirable_location_is_mid = yaml_utilities::grabParameter<bool>(
+            config_tree_, "general_most_desirable_location_is_mid");
+    general_most_desirable_location_is_small = yaml_utilities::grabParameter<bool>(
+            config_tree_, "general_most_desirable_location_is_small");
   }
   else
   {
