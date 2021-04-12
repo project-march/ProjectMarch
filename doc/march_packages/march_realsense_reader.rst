@@ -164,14 +164,6 @@ Services
   Calls upon the `march_realsense_reader`. Outputs the `gait_parameters` from which a parametric gait can be constructed.
   requires the selected gait and the frame id to transform the point cloud to.
 
-Parameters
-^^^^^^^^^^
-*/march/template/counter* (*int*, required)
-  How many to count
-*/march/template/countings* (*int[]*, default: [])
-  List of countings
-
-
 Tutorials
 ---------
 
