@@ -56,7 +56,7 @@ std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(
   for (unsigned int i = 0; i < num_joints_; ++i)
   {
       model_predictive_controllers_.push_back(ModelPredictiveController(getWeights(joint_names[i])));
-      model_predictive_controllers_[i].joint_name = joint_names[i];
+      model_predictive_controllers_[i].joint_name = std::move(joint_names[i]);
       model_predictive_controllers_[i].init();
   }
 
@@ -85,7 +85,7 @@ std::vector<float> ModelPredictiveControllerInterface::getWeights(std::string jo
   W.push_back(R);
 
   // Check for validity of the weighting array
-  ROS_DEBUG_STREAM_COND(W.size() != ACADO_NY, joint_name << ", Incorrect weighting array size");
+  ROS_WARN_STREAM_COND(W.size() != ACADO_NY, joint_name << ", Incorrect weighting array size");
 
   // Set WArray for the mpc msg
   for (int i =0; i < num_joints_; ++i)
