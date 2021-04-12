@@ -41,10 +41,10 @@ parameter_determiner:
   number_of_optional_foot_locations: 10
   # Remember that forward in negative in the x direction!
   stairs_locations:
-    min_x_stairs: -0.2
-    max_x_stairs: -0.4
-    min_z_stairs: 0.1
-    max_z_stairs: 0.3
+    min_x_stairs: -0.22
+    max_x_stairs: -0.35
+    min_z_stairs: 0.13
+    max_z_stairs: 0.22
     # Since we transform to the relevant foot, the y component of the foot location should be 0
     y_location: 0
   # Set the most desirable foot location to the mid point of what the gaits are capable off
