@@ -213,6 +213,7 @@ bool HullParameterDeterminer::isValidLocation(
             && optimal_foot_location.x > max_x_stairs
             && possible_foot_location.z > min_z_stairs
             && optimal_foot_location.z < max_z_stairs) {
+            if (entireFootCanBePlaced(pcl::PointNormal possible_foot_location))
             return true;
         }
     } else {
