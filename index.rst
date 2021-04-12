@@ -131,3 +131,4 @@ The structure of this documentation is heavily inspired by that of `MoveIt! <htt
   doc/march_packages/march_shared_classes
   doc/march_packages/march_shared_resources
   doc/march_packages/march_simulation
+  doc/march_packages/march_realsense_reader
