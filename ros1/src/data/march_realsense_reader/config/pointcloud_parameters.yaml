@@ -34,7 +34,7 @@ hull_finder:
     # If convex is set to false, find concave hulls.
     convex: false
     # Alpha governs the detail of concave hulls, smaller is more detail.
-    alpha: 0.5
+    alpha: 0.25
     hull_dimension: 2
 
 parameter_determiner:
