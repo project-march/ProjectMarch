@@ -129,7 +129,10 @@ Subscribed Topics
 ^^^^^^^^^^^^^^^^^
 
 *"/camera_front/depth/color/points"* sensor_msgs::PointCloud2
-  The realsense front camera publishes on this topic.
+  The realsense front camera publishes its pointcloud on this topic.
+
+*"/camera_back/depth/color/points"* sensor_msgs::PointCloud2
+  The realsense back camera publishes its pointcloud on this topic
 
 Published Topics
 ^^^^^^^^^^^^^^^^
