@@ -47,7 +47,7 @@ public:
         return this->read(slave, index, sub, val_size, &value);
     }
 
-    virtual ~SdoInterface();
+    virtual ~SdoInterface() {};
 
 protected:
     virtual int write(uint16_t slave, uint16_t index, uint8_t sub,
