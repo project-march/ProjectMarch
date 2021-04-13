@@ -6,34 +6,35 @@
 
 #include <ostream>
 
-namespace march
-{
-class IncrementalEncoder : public Encoder
-{
+namespace march {
+class IncrementalEncoder : public Encoder {
 public:
-  IncrementalEncoder(size_t number_of_bits, double transmission);
+    IncrementalEncoder(size_t number_of_bits, double transmission);
 
-  ~IncrementalEncoder() noexcept override = default;
+    ~IncrementalEncoder() noexcept override = default;
 
-  double toRad(int32_t iu) const override;
-  double getRadPerBit() const override;
-  double getTransmission() const;
+    double toRad(int32_t iu) const override;
+    double getRadPerBit() const override;
+    double getTransmission() const;
 
-  /** @brief Override comparison operator */
-  friend bool operator==(const IncrementalEncoder& lhs, const IncrementalEncoder& rhs)
-  {
-    return lhs.getTotalPositions() == rhs.getTotalPositions() && lhs.transmission_ == rhs.transmission_;
-  }
-  /** @brief Override stream operator for clean printing */
-  friend std::ostream& operator<<(std::ostream& os, const IncrementalEncoder& encoder)
-  {
-    return os << "totalPositions: " << encoder.getTotalPositions() << ", "
-              << "transmission: " << encoder.transmission_;
-  }
+    /** @brief Override comparison operator */
+    friend bool operator==(
+        const IncrementalEncoder& lhs, const IncrementalEncoder& rhs)
+    {
+        return lhs.getTotalPositions() == rhs.getTotalPositions()
+            && lhs.transmission_ == rhs.transmission_;
+    }
+    /** @brief Override stream operator for clean printing */
+    friend std::ostream& operator<<(
+        std::ostream& os, const IncrementalEncoder& encoder)
+    {
+        return os << "totalPositions: " << encoder.getTotalPositions() << ", "
+                  << "transmission: " << encoder.transmission_;
+    }
 
 private:
-  const double transmission_;
+    const double transmission_;
 };
-}  // namespace march
+} // namespace march
 
-#endif  // MARCH_HARDWARE_INCREMENTAL_ENCODER_H
+#endif // MARCH_HARDWARE_INCREMENTAL_ENCODER_H

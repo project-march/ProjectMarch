@@ -1,11 +1,11 @@
 #ifndef MARCH_HULL_FINDER_H
 #define MARCH_HULL_FINDER_H
 
-#include <string>
+#include "yaml-cpp/yaml.h"
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
-#include "yaml-cpp/yaml.h"
+#include <string>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -18,18 +18,17 @@ using PlaneCoefficientsVector = std::vector<PlaneCoefficients::Ptr>;
 using HullVector = std::vector<Hull::Ptr>;
 using PolygonVector = std::vector<Polygon>;
 
-class HullFinder
-{
+class HullFinder {
 public:
     HullFinder(YAML::Node config_tree, bool debugging);
     // This function is required to be implemented by any plane finder
     virtual bool findHulls(PointCloud::Ptr pointcloud,
-                            Normals::Ptr normal_pointcloud,
-                            boost::shared_ptr<RegionVector> region_vector,
-                            boost::shared_ptr<PlaneCoefficientsVector>
-                                    plane_coefficients_vector,
-                            boost::shared_ptr<HullVector> hull_vector,
-                            boost::shared_ptr<PolygonVector> polygon_vector)=0;
+        Normals::Ptr normal_pointcloud,
+        boost::shared_ptr<RegionVector> region_vector,
+        boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,
+        boost::shared_ptr<HullVector> hull_vector,
+        boost::shared_ptr<PolygonVector> polygon_vector)
+        = 0;
 
     virtual ~HullFinder() {};
 
@@ -44,19 +43,18 @@ protected:
     bool debugging_;
 };
 
-class CHullFinder : HullFinder
-{
+class CHullFinder : HullFinder {
 public:
-    /** Basic constructor for HullFinder preprocessor, but this will also read the yaml **/
+    /** Basic constructor for HullFinder preprocessor, but this will also read
+     * the yaml **/
     CHullFinder(YAML::Node config_tree, bool debugging);
     /** This function should take in a pointcloud with matching normals and
      * regions, and turn this into chulls where the foot can be located. **/
-    bool findHulls(PointCloud::Ptr pointcloud,
-                    Normals::Ptr normal_pointcloud,
-                    boost::shared_ptr<RegionVector> region_vector,
-                    boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,
-                    boost::shared_ptr<HullVector> hull_vector,
-                    boost::shared_ptr<PolygonVector> polygon_vector) override;
+    bool findHulls(PointCloud::Ptr pointcloud, Normals::Ptr normal_pointcloud,
+        boost::shared_ptr<RegionVector> region_vector,
+        boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,
+        boost::shared_ptr<HullVector> hull_vector,
+        boost::shared_ptr<PolygonVector> polygon_vector) override;
 
 protected:
     // Convert a region into a convex or concave hull
@@ -74,11 +72,13 @@ protected:
     // Create the convex or concave hull from a projected region
     bool getCHullFromProjectedRegion();
 
-    // Add the hull to a vector together with its plane coefficients and polygons
+    // Add the hull to a vector together with its plane coefficients and
+    // polygons
     bool addCHullToVector();
 
     // Calculate the average normal and point of a region
-    bool getAveragePointAndNormal(std::vector<double> & average_point, std::vector<double> & average_normal);
+    bool getAveragePointAndNormal(std::vector<double>& average_point,
+        std::vector<double>& average_normal);
 
     // Read all the relevant parameters from the yaml file
     void readYaml();
@@ -97,4 +97,4 @@ protected:
     Region region_;
 };
 
-#endif //MARCH_HULL_FINDER_H
+#endif // MARCH_HULL_FINDER_H

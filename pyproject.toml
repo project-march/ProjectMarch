@@ -1,7 +1,7 @@
 [tool.flakehell]
 # specify any flake8 options.
 # dont run plugins on these files and folders
-exclude = [".git", "__init__.py", "build", "install", "log", "venv"]
+exclude = [".git", "__init__.py", "build", "install", "log", "venv", ".scripts"]
 # make output nice
 format = "grouped"
 # set max line length to 80 (becomes 88 with B950)

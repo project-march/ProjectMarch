@@ -7,7 +7,6 @@ stages:
   - Lint code
   - Build code
   - Test code
-  - Static analysis on code
 
 image: registry.gitlab.com/project-march/march:$CI_COMMIT_BRANCH
 
@@ -58,6 +57,15 @@ flake8:
       codequality: flakehell.json
   allow_failure: true
 
+clang_format:
+  stage: Lint code
+  script:
+    - python3 .scripts/run-clang-format.py -r ros1/src ros2/src --style=file
+  only:
+    changes:
+      - "ros1/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
+      - "ros2/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
+
 noetic:build:
   stage: Build code
   artifacts:
@@ -99,29 +107,3 @@ foxy:test:
     - cd ros2/
     - source /opt/ros/foxy/local_setup.bash && source install/local_setup.bash && colcon test --event-handlers console_direct+
     - colcon test-result --verbose
-
-noetic:clang_tidy:
-  stage: Static analysis on code
-  dependencies:
-    - noetic:build
-  needs: ["noetic:build"]
-  script:
-    - cd ros1/
-    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
-  only:
-    changes:
-      - "ros1/**/*.{hpp,h,cpp}"
-  allow_failure: true
-
-foxy:clang_tidy:
-  stage: Static analysis on code
-  dependencies:
-    - foxy:build
-  needs: ["foxy:build"]
-  script:
-    - cd ros2/
-    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
-  only:
-    changes:
-      - "ros2/**/*.{hpp,h,cpp}"
-  allow_failure: true
