@@ -62,12 +62,12 @@ void HullParameterDeterminer::readYaml()
             stairs_locations_parameters, "max_z_stairs");
         y_location = yaml_utilities::grabParameter<double>(
             stairs_locations_parameters, "y_location");
-        x_deviation_back = yaml_utilities::grabParameter<double>(
-            stairs_locations_parameters, "x_deviation_back");
-        x_deviation_front = yaml_utilities::grabParameter<double>(
-            stairs_locations_parameters, "x_deviation_front");
-        y_deviation = yaml_utilities::grabParameter<double>(
-            stairs_locations_parameters, "y_deviation");
+        foot_length_back = yaml_utilities::grabParameter<double>(
+            stairs_locations_parameters, "foot_length_back");
+        foot_length_front = yaml_utilities::grabParameter<double>(
+            stairs_locations_parameters, "foot_length_front");
+        foot_width = yaml_utilities::grabParameter<double>(
+            stairs_locations_parameters, "foot_width");
         max_allowed_z_deviation = yaml_utilities::grabParameter<double>(
             stairs_locations_parameters, "max_allowed_z_deviation");
     } else {
@@ -277,19 +277,19 @@ void HullParameterDeterminer::fillFootPointCloud(
 
     // Deviation back is added as the forward direction of the exoskeleton
     // is the negative x direction in the simulation
-    foot_pointcloud->points[0].x = possible_foot_location.x + x_deviation_back;
-    foot_pointcloud->points[0].y = possible_foot_location.y - y_deviation;
+    foot_pointcloud->points[0].x = possible_foot_location.x + foot_length_back;
+    foot_pointcloud->points[0].y = possible_foot_location.y - foot_width / 2.0;
 
-    foot_pointcloud->points[1].x = possible_foot_location.x + x_deviation_back;
-    foot_pointcloud->points[1].y = possible_foot_location.y + y_deviation;
+    foot_pointcloud->points[1].x = possible_foot_location.x + foot_length_back;
+    foot_pointcloud->points[1].y = possible_foot_location.y + foot_width / 2.0;
 
     // Deviation front is subtracted as the forward direction of the exoskeleton
     // is the negative x direction in the simulation
-    foot_pointcloud->points[2].x = possible_foot_location.x - x_deviation_front;
-    foot_pointcloud->points[2].y = possible_foot_location.y - y_deviation;
+    foot_pointcloud->points[2].x = possible_foot_location.x - foot_length_front;
+    foot_pointcloud->points[2].y = possible_foot_location.y - foot_width / 2.0;
 
-    foot_pointcloud->points[3].x = possible_foot_location.x - x_deviation_front;
-    foot_pointcloud->points[3].y = possible_foot_location.y + y_deviation;
+    foot_pointcloud->points[3].x = possible_foot_location.x - foot_length_front;
+    foot_pointcloud->points[3].y = possible_foot_location.y + foot_width / 2.0;
 }
 
 // Compute the optimal foot location as if one were not limited by anything.
