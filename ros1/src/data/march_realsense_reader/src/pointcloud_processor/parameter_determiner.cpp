@@ -227,9 +227,7 @@ bool HullParameterDeterminer::isValidLocation(
             && entireFootCanBePlaced(possible_foot_location)) {
             return true;
         }
-    }
-    else
-    {
+    } else {
         ROS_ERROR_STREAM("optimalLocationIsValid method has not been "
                          "implemented for obstacle "
             << selected_obstacle_ << ". Returning false.");
