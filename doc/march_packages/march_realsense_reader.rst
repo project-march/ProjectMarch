@@ -22,7 +22,7 @@ The processing consists does 4 main phases:
 
 * Find parameters with which gaits can be interpolated
 
-The package publishes the results of all the steps for visualization in RVIZ.
+The package publishes the results of all the steps for visualization in RVIZ, if the debug parameter is set to true.
 
 These steps are embodied by the interfaces ``Preprocessor``, ``RegionCreator``, ``HullFinder`` and ``ParameterDeterminer``.
 These have implementations which execute the logic, these classes can do this in different ways.
@@ -41,13 +41,13 @@ Preprocessing consists of the following steps:
    This is done because the pointcloud consist of almost 1 million points and we need to speed up the computation.
    Reducing the size by leaving point in a grid of a certain size is possible too, but that is more computationally expensive.
 
-2. Transform the point cloud such that its origin is at the feet that is about to take a step and its orientation matches the orientation of this foot too.
+2. Transform the point cloud such that its origin is at the foot that is about to take a step and its orientation matches the orientation of this foot too. The link that will be taking the step is given by the service caller (the RealSenseGait).
 
 3. Filter points which are too far away from the origin, as points far away are not relevant to the upcoming steps of the exoskeleton.
 
 4. Estimate the normal vectors of the remaining point cloud.
 
-5. Filter based on the normal vectors, points which we believe are part of a wall we remove as we are not capable of standing there.
+5. Filter based on the normal vectors, we remove points which do not have a normal in an upwards direction (e.g. points on a wall) as we are not capable of standing there.
 
 
 RegionGrower
@@ -64,17 +64,15 @@ CHullFinder
 
 In order to find a potential foot location in the point cloud the found regions need to be transformed into a continuous
 region where we believe it is possible to place the foot.
-That is why we transform the regions into 'hulls' (a cloud detailing the edge of the region). To do this we need to:
-
-For each region:
+That is why we transform the regions into 'hulls' (a cloud detailing the edge of the region). To do this we need to do the following for each region we received from the region creator:
 
   1. Find a plane which fits the region (using the average normal and point)
 
   2. Project all the points in the region to the plane
 
-  3. Transform the transformed points into a hull (the hull needs to be 2d), this can either create a convex or concave hull
+  3. Transform the projected points into a hull (the hull needs to be 2d), this can either create a convex or concave hull.
 
-  4. Add the found hull, its plane parameters and a vector of the indices to vectors for future use
+  4. Add the found hull, its plane parameters and a vector of the indices to vectors for future use.
 
 HullParameterDeterminer
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -213,7 +211,7 @@ should look something like:
 .. figure:: images/physical_camera_result.png
    :align: center
 
-Running with one camera
+Running with both cameras
 ^^^^^^^^^^^^^^^^^^^^^^^
 You need two cameras for this example. This tutorial is very similar to the Running with one camera tutorial.
 The main difference is in starting up the exoskeleton. If you have the cameras with the 'front' and 'back' labels, this
