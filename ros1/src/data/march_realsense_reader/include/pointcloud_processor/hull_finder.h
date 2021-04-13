@@ -49,7 +49,8 @@ public:
      * the yaml **/
     CHullFinder(YAML::Node config_tree, bool debugging);
     /** This function should take in a pointcloud with matching normals and
-     * regions, and turn this into chulls where the foot can be located. **/
+     * regions, and turn this into sorted (based on height) chulls where the
+     * foot can be located. **/
     bool findHulls(PointCloud::Ptr pointcloud, Normals::Ptr normal_pointcloud,
         boost::shared_ptr<RegionVector> region_vector,
         boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector,

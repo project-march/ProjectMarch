@@ -70,20 +70,21 @@ void HullParameterDeterminer::readYaml()
  * hulls, and turn this into a location where the foot can be placed,
  * from this location, gaits parameters are made. **/
 bool HullParameterDeterminer::determineParameters(
-    boost::shared_ptr<PlaneCoefficientsVector> const plane_coefficients_vector,
-    boost::shared_ptr<HullVector> const hull_vector,
-    boost::shared_ptr<PolygonVector> const polygon_vector,
+    boost::shared_ptr<PlaneCoefficientsVector> const
+        sorted_plane_coefficients_vector,
+    boost::shared_ptr<HullVector> const sorted_hull_vector,
+    boost::shared_ptr<PolygonVector> const sorted_polygon_vector,
     SelectedGait const selected_obstacle,
     boost::shared_ptr<GaitParameters> gait_parameters)
 {
     time_t start_determine_parameters = clock();
 
     ROS_DEBUG("Determining parameters with simple parameter determiner");
-    hull_vector_ = hull_vector;
+    hull_vector_ = sorted_hull_vector;
     selected_obstacle_ = selected_obstacle;
     gait_parameters_ = gait_parameters;
-    plane_coefficients_vector_ = plane_coefficients_vector;
-    polygon_vector_ = polygon_vector;
+    plane_coefficients_vector_ = sorted_plane_coefficients_vector;
+    polygon_vector_ = sorted_polygon_vector;
     selected_obstacle_ = selected_obstacle;
 
     bool success = true;
@@ -288,18 +289,21 @@ bool HullParameterDeterminer::cropCloudToHullVector(
         return false;
     } else if (hull_vector_->size() == 0) {
         ROS_WARN_STREAM(
-            "cropCloudToHull method called with emtpy hull_vector_. "
+            "cropCloudToHullVector method called with emtpy hull_vector_. "
             "No cropping can be done, returning.");
         return false;
     }
     bool success = true;
+
+    PointCloud::Ptr remaining_cloud = boost::make_shared<PointCloud>();
+    remaining_cloud = input_cloud;
     for (int hull_index = 0; hull_index < hull_vector_->size(); hull_index++) {
         PointCloud::Ptr elevated_cloud = boost::make_shared<PointCloud>();
-        success &= addZCoordinateToCloudFromPlaneCoefficients(input_cloud,
+        success &= addZCoordinateToCloudFromPlaneCoefficients(remaining_cloud,
             plane_coefficients_vector_->at(hull_index), elevated_cloud);
 
         success &= cropCloudToHull(elevated_cloud, hull_vector_->at(hull_index),
-            polygon_vector_->at(hull_index));
+            polygon_vector_->at(hull_index), remaining_cloud);
 
         PointNormalCloud::Ptr elevated_cloud_with_normals
             = boost::make_shared<PointNormalCloud>();
@@ -342,8 +346,9 @@ bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
 }
 
 // Remove all points from a cloud which do not fall in the hull
-bool HullParameterDeterminer::cropCloudToHull(
-    PointCloud::Ptr elevated_cloud, const Hull::Ptr hull, const Polygon polygon)
+bool HullParameterDeterminer::cropCloudToHull(PointCloud::Ptr elevated_cloud,
+    const Hull::Ptr hull, const Polygon polygon,
+    PointCloud::Ptr remaining_cloud)
 {
     if (elevated_cloud->points.size() == 0) {
         ROS_WARN_STREAM("The cloud to be cropped in the "
@@ -354,9 +359,10 @@ bool HullParameterDeterminer::cropCloudToHull(
     crop_filter.setInputCloud(elevated_cloud);
     crop_filter.setHullCloud(hull);
     crop_filter.setHullIndices(polygon);
-    crop_filter.setDim(
-        2); //////////////////////////////////////////////////////////
+    crop_filter.setDim(2);
     crop_filter.filter(*elevated_cloud);
+    crop_filter.setCropOutside(false);
+    crop_filter.filter(*remaining_cloud);
     return true;
 }
 

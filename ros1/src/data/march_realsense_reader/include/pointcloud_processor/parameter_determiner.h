@@ -57,12 +57,12 @@ public:
     HullParameterDeterminer(YAML::Node config_tree, bool debugging);
 
     /** This function should take in a pointcloud with matching normals and
-     * hulls, and turn this into a location where the foot can be placed,
-     * from this location, gaits parameters should be made. **/
+     * sorted (on height) hulls, and turn this into a location where the foot
+     * can be placed, from this location, gaits parameters should be made. **/
     bool determineParameters(boost::shared_ptr<PlaneCoefficientsVector> const
-                                 plane_coefficients_vector,
-        boost::shared_ptr<HullVector> const hull_vector,
-        boost::shared_ptr<PolygonVector> const polygon_vector,
+                                 sorted_plane_coefficients_vector,
+        boost::shared_ptr<HullVector> const sorted_hull_vector,
+        boost::shared_ptr<PolygonVector> const sorted_polygon_vector,
         SelectedGait const selected_obstacle,
         boost::shared_ptr<GaitParameters> gait_parameters) override;
 
