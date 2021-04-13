@@ -110,8 +110,6 @@ void ModelPredictiveControllerInterface::initMpcMsg()
         }
         // Loop trough all the outputs
         for (unsigned int j = 0; j < ACADO_NYN; j++) {
-            //      mpc_pub_->msg_.joint[i].state.reference_trajectory[j].array.resize(prediction_horizon
-            //      + 1);
             mpc_pub_->msg_.joint[i].reference.states[j].array.resize(
                 prediction_horizon + 1);
         }
