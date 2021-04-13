@@ -254,15 +254,23 @@ bool HullParameterDeterminer::enitreFootCanBePlaced(
     succes
         &= cropCloudToHullVector(foot_pointcloud, potential_foot_support_cloud);
 
-    // If all vertices have a possible foot location and they have z values in a
-    // certain range the location is valid
-    if (potential_foot_support_cloud->points.size()
-        == foot_pointcloud->size()) {
+    // If any vertex does not have a possible foot location or has a z value too
+    // far from the possible foot location's, the entire foot cannot be placed
+    if (potential_foot_support_cloud->points.size != foot_pointcloud->size()) {
+        return false;
+    } else {
         for (pcl::PointNormal potential_foot_support :
             potential_foot_support_cloud) {
-            if (potential_foot_support.z - possible_foot_location.z
+            if (abs(potential_foot_support.z - possible_foot_location.z)
+                > max_allowed_z_deviation) {
+                return false;
+            }
         }
     }
+
+    // If all the point have a possible foot location and a z value close
+    // enough to the possible foot location's, the entire foot can be placed
+    return true;
 }
 
 // Fill a point cloud with vertices of the foot on the ground around a possible
