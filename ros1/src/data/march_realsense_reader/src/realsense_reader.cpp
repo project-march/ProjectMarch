@@ -104,99 +104,104 @@ YAML::Node RealSenseReader::getConfigIfPresent(std::string key)
 bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
     march_shared_msgs::GetGaitParameters::Response& res)
 {
-  clock_t start_of_processing_time = clock();
-  Normals::Ptr normals = boost::make_shared<Normals>();
+    clock_t start_of_processing_time = clock();
+    Normals::Ptr normals = boost::make_shared<Normals>();
 
-  // Preprocess
-  bool preprocessing_was_successful = preprocessor_->preprocess(pointcloud, normals, frame_id_to_transform_to_);
-  if (debugging_)
-  {
-    ROS_DEBUG("Done preprocessing, see /camera/preprocessed_cloud for resulting point cloud");
-    publishCloud<pcl::PointXYZ>(preprocessed_pointcloud_publisher_, *pointcloud);
-  }
-  if (not preprocessing_was_successful)
-  {
-    res.error_message = "Preprocessing was unsuccessful, see debug output "
-                        "for more information";
-    res.success = false;
-    return false;
-  }
+    // Preprocess
+    bool preprocessing_was_successful = preprocessor_->preprocess(
+        pointcloud, normals, frame_id_to_transform_to_);
+    if (debugging_) {
+        ROS_DEBUG("Done preprocessing, see /camera/preprocessed_cloud for "
+                  "resulting point cloud");
+        publishCloud<pcl::PointXYZ>(
+            preprocessed_pointcloud_publisher_, *pointcloud);
+    }
+    if (not preprocessing_was_successful) {
+        res.error_message = "Preprocessing was unsuccessful, see debug output "
+                            "for more information";
+        res.success = false;
+        return false;
+    }
 
-  // Setup data structures for region creating
-  boost::shared_ptr<RegionVector> region_vector =
-      boost::make_shared<RegionVector>();
-  // Create regions
-  bool region_creating_was_successful =
-      region_creator_->createRegions(pointcloud, normals, region_vector);
-  if (debugging_)
-  {
-    ROS_DEBUG("Done creating regions, now publishing point cloud regions to /camera/region_cloud");
-    pcl::PointCloud<pcl::PointXYZRGB>::Ptr coloured_cloud = region_creator_->debug_visualisation();
-    publishCloud<pcl::PointXYZRGB>(region_pointcloud_publisher_, *coloured_cloud);
-  }
-  if (not region_creating_was_successful)
-  {
-    res.error_message = "Region creating was unsuccessful, see debug output "
-                        "for more information";
-    res.success = false;
-    return false;
-  }
+    // Setup data structures for region creating
+    boost::shared_ptr<RegionVector> region_vector
+        = boost::make_shared<RegionVector>();
+    // Create regions
+    bool region_creating_was_successful
+        = region_creator_->createRegions(pointcloud, normals, region_vector);
+    if (debugging_) {
+        ROS_DEBUG("Done creating regions, now publishing point cloud regions "
+                  "to /camera/region_cloud");
+        pcl::PointCloud<pcl::PointXYZRGB>::Ptr coloured_cloud
+            = region_creator_->debug_visualisation();
+        publishCloud<pcl::PointXYZRGB>(
+            region_pointcloud_publisher_, *coloured_cloud);
+    }
+    if (not region_creating_was_successful) {
+        res.error_message
+            = "Region creating was unsuccessful, see debug output "
+              "for more information";
+        res.success = false;
+        return false;
+    }
 
-  // Setup data structures for finding
-  boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector =
-      boost::make_shared<PlaneCoefficientsVector>();
-  boost::shared_ptr<HullVector> hull_vector = boost::make_shared<HullVector>();
-  boost::shared_ptr<PolygonVector> polygon_vector = boost::make_shared<PolygonVector>();
-  // Find hulls
-  bool hull_finding_was_successful =
-      hull_finder_->findHulls(pointcloud, normals, region_vector,
-                               plane_coefficients_vector, hull_vector,
-                               polygon_vector);
-  if (debugging_)
-  {
-    ROS_DEBUG("Done creating hulls, now publishing markers to /camera/hull_marker_list");
-    publishHullMarkerArray(hull_vector);
-  }
-  if (not hull_finding_was_successful)
-  {
-    res.error_message = "Hull finding was unsuccessful, see debug output "
-                        "for more information";
-    res.success = false;
-    return false;
-  }
+    // Setup data structures for finding
+    boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector
+        = boost::make_shared<PlaneCoefficientsVector>();
+    boost::shared_ptr<HullVector> hull_vector
+        = boost::make_shared<HullVector>();
+    boost::shared_ptr<PolygonVector> polygon_vector
+        = boost::make_shared<PolygonVector>();
+    // Find hulls
+    bool hull_finding_was_successful
+        = hull_finder_->findHulls(pointcloud, normals, region_vector,
+            plane_coefficients_vector, hull_vector, polygon_vector);
+    if (debugging_) {
+        ROS_DEBUG("Done creating hulls, now publishing markers to "
+                  "/camera/hull_marker_list");
+        publishHullMarkerArray(hull_vector);
+    }
+    if (not hull_finding_was_successful) {
+        res.error_message = "Hull finding was unsuccessful, see debug output "
+                            "for more information";
+        res.success = false;
+        return false;
+    }
 
-  // Setup data structures for parameter determining
-  SelectedGait selected_gait = (SelectedGait) selected_gait_;
-  boost::shared_ptr<march_shared_msgs::GaitParameters> gait_parameters =
-      boost::make_shared<march_shared_msgs::GaitParameters>();
-  // Determine parameters
-  bool parameter_determining_was_successful =
-      parameter_determiner_->determineParameters(
-          plane_coefficients_vector, hull_vector, polygon_vector,
-          selected_gait, gait_parameters);
-  if (debugging_)
-  {
-    ROS_DEBUG("Done determining parameters, now publishing a marker to /camera/foot_locations_marker_array");
-    publishParameterDeterminerMarkerArray();
-  }
-  if (not parameter_determining_was_successful)
-  {
-    res.error_message = "Parameter determining was unsuccessful, see debug output "
-                        "for more information";
-    res.success = false;
-    return false;
-  }
+    // Setup data structures for parameter determining
+    SelectedGait selected_gait = (SelectedGait)selected_gait_;
+    boost::shared_ptr<march_shared_msgs::GaitParameters> gait_parameters
+        = boost::make_shared<march_shared_msgs::GaitParameters>();
+    // Determine parameters
+    bool parameter_determining_was_successful
+        = parameter_determiner_->determineParameters(plane_coefficients_vector,
+            hull_vector, polygon_vector, selected_gait, gait_parameters);
+    if (debugging_) {
+        ROS_DEBUG("Done determining parameters, now publishing a marker to "
+                  "/camera/foot_locations_marker_array");
+        publishParameterDeterminerMarkerArray();
+    }
+    if (not parameter_determining_was_successful) {
+        res.error_message
+            = "Parameter determining was unsuccessful, see debug output "
+              "for more information";
+        res.success = false;
+        return false;
+    }
 
-  res.gait_parameters = *gait_parameters;
+    res.gait_parameters = *gait_parameters;
 
-  clock_t end_of_processing_time = clock();
+    clock_t end_of_processing_time = clock();
 
-  double time_taken = double(end_of_processing_time - start_of_processing_time) / double(CLOCKS_PER_SEC);
-  ROS_DEBUG_STREAM("Time taken by point cloud processor is : " << std::fixed <<
-                   time_taken << std::setprecision(5) << " sec " << std::endl);
+    double time_taken
+        = double(end_of_processing_time - start_of_processing_time)
+        / double(CLOCKS_PER_SEC);
+    ROS_DEBUG_STREAM("Time taken by point cloud processor is : "
+        << std::fixed << time_taken << std::setprecision(5) << " sec "
+        << std::endl);
 
-  res.success = true;
-  return true;
+    res.success = true;
+    return true;
 }
 
 // Publish a pointcloud of any point type on a publisher
