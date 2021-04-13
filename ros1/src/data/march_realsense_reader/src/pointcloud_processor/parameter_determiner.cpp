@@ -255,7 +255,8 @@ bool HullParameterDeterminer::entireFootCanBePlaced(
         &= cropCloudToHullVector(foot_pointcloud, potential_foot_support_cloud);
 
     // The location is only valid if all foot vertices can be placed
-    success &= (potential_foot_support_cloud->size() == foot_pointcloud->size());
+    success
+        &= (potential_foot_support_cloud->size() == foot_pointcloud->size());
 
     // The location is only valid if the foot vertices have a z value close
     // enough to the locations z value
@@ -263,9 +264,7 @@ bool HullParameterDeterminer::entireFootCanBePlaced(
         potential_foot_support_cloud) {
         success &= (abs(potential_foot_support.z - possible_foot_location.z)
             < max_allowed_z_deviation)
-        }
     }
-
     return success;
 }
 
