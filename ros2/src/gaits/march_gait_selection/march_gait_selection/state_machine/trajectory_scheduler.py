@@ -93,7 +93,7 @@ class TrajectoryScheduler(object):
             debug_log_message += "now"
 
         self._node.get_logger().info(info_log_message)
-        self._node.get_logger().info(debug_log_message)
+        self._node.get_logger().debug(debug_log_message)
 
     def failed(self) -> bool:
         return self._failed

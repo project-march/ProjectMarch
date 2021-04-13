@@ -5,7 +5,7 @@ from march_gait_selection.state_machine.setpoints_gait import (
     SetpointsGait,
 )
 from march_gait_selection.gait_selection import GaitSelection
-from march_gait_selection.state_machine.gait_interface import GaitUpdate
+from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
 from rclpy.time import Time
 from urdf_parser_py import urdf
@@ -46,7 +46,7 @@ class TestSetpointsGait(unittest.TestCase):
         self.assertFalse(self.gait._start_is_delayed)
 
         self.assertEqual(
-            gait_update, GaitUpdate.schedule(self.gait._command_from_current_subgait())
+            gait_update, GaitUpdate.should_schedule(self.gait._command_from_current_subgait())
         )
 
     def test_start_delayed(self):
@@ -59,7 +59,7 @@ class TestSetpointsGait(unittest.TestCase):
 
         self.assertEqual(
             gait_update,
-            GaitUpdate.early_schedule(self.gait._command_from_current_subgait()),
+            GaitUpdate.should_schedule_early(self.gait._command_from_current_subgait()),
         )
 
     def test_start_delayed_invalid_duration(self):
@@ -133,7 +133,7 @@ class TestSetpointsGait(unittest.TestCase):
         self.assertFalse(self.gait._scheduled_early)
 
         self.assertEqual(
-            gait_update, GaitUpdate.schedule(self.gait._command_from_current_subgait())
+            gait_update, GaitUpdate.should_schedule(self.gait._command_from_current_subgait())
         )
 
     def test_update_subgait_not_done(self):
@@ -167,7 +167,7 @@ class TestSetpointsGait(unittest.TestCase):
         self.assertEqual(self.gait._end_time, Time(seconds=4.5))
         self.assertFalse(self.gait._start_is_delayed)
 
-        self.assertEqual(gait_update, GaitUpdate.subgait_update())
+        self.assertEqual(gait_update, GaitUpdate.subgait_updated())
 
     def test_update_subgait_schedule_early(self):
         self.gait.start(Time(seconds=0))
@@ -180,7 +180,7 @@ class TestSetpointsGait(unittest.TestCase):
 
         self.assertEqual(
             gait_update,
-            GaitUpdate.early_schedule(
+            GaitUpdate.should_schedule_early(
                 TrajectoryCommand.from_subgait(
                     self.gait.subgaits["left_swing"], Time(seconds=1.5)
                 )
@@ -188,4 +188,4 @@ class TestSetpointsGait(unittest.TestCase):
         )
 
         gait_update = self.gait.update(Time(seconds=1.6), Duration(seconds=0.8))
-        self.assertEqual(gait_update, GaitUpdate.subgait_update())
+        self.assertEqual(gait_update, GaitUpdate.subgait_updated())
