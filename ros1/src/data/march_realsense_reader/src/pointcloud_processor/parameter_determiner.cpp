@@ -41,29 +41,29 @@ HullParameterDeterminer::HullParameterDeterminer(
 // Read all relevant parameters from the parameter yaml file
 void HullParameterDeterminer::readYaml()
 {
-  number_of_optional_foot_locations = yaml_utilities::grabParameter<int>(
-      config_tree_, "number_of_optional_foot_locations");
-  if (YAML::Node stairs_locations_parameters = config_tree_["stairs_locations"])
-  {
-    min_x_stairs = yaml_utilities::grabParameter<double>(
+    number_of_optional_foot_locations = yaml_utilities::grabParameter<int>(
+        config_tree_, "number_of_optional_foot_locations");
+    if (YAML::Node stairs_locations_parameters
+        = config_tree_["stairs_locations"]) {
+        min_x_stairs = yaml_utilities::grabParameter<double>(
             stairs_locations_parameters, "min_x_stairs");
-    max_x_stairs = yaml_utilities::grabParameter<double>(
+        max_x_stairs = yaml_utilities::grabParameter<double>(
             stairs_locations_parameters, "max_x_stairs");
-    min_z_stairs = yaml_utilities::grabParameter<double>(
+        min_z_stairs = yaml_utilities::grabParameter<double>(
             stairs_locations_parameters, "min_z_stairs");
-    max_z_stairs = yaml_utilities::grabParameter<double>(
+        max_z_stairs = yaml_utilities::grabParameter<double>(
             stairs_locations_parameters, "max_z_stairs");
-    y_location = yaml_utilities::grabParameter<double>(
-            stairs_locations_parameters,"y_location");
-    general_most_desirable_location_is_mid = yaml_utilities::grabParameter<bool>(
-            config_tree_, "general_most_desirable_location_is_mid");
-    general_most_desirable_location_is_small = yaml_utilities::grabParameter<bool>(
-            config_tree_, "general_most_desirable_location_is_small");
-  }
-  else
-  {
-    ROS_ERROR("'stairs_locations' parameters not found in parameters file");
-  }
+        y_location = yaml_utilities::grabParameter<double>(
+            stairs_locations_parameters, "y_location");
+        general_most_desirable_location_is_mid
+            = yaml_utilities::grabParameter<bool>(
+                config_tree_, "general_most_desirable_location_is_mid");
+        general_most_desirable_location_is_small
+            = yaml_utilities::grabParameter<bool>(
+                config_tree_, "general_most_desirable_location_is_small");
+    } else {
+        ROS_ERROR("'stairs_locations' parameters not found in parameters file");
+    }
 }
 
 /** This function takes in a pointcloud with matching normals and
