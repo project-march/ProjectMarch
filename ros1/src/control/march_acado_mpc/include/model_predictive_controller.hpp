@@ -1,9 +1,9 @@
 #ifndef MARCH_MODEL_PREDICTIVE_CONTROLLER_H
 #define MARCH_MODEL_PREDICTIVE_CONTROLLER_H
 
+#include <acado_auxiliary_functions.h>
 #include <iostream>
 #include <vector>
-#include <acado_auxiliary_functions.h>
 
 using namespace std;
 
@@ -13,12 +13,10 @@ public:
     ModelPredictiveController(std::vector<std::vector<float>> Q);
 
     // Public variables
-    vector<double> x0{0,0};             // Current state
-    double u;                           // Calculated control input
-    vector<vector<double>> reference;   // Current reference
-    bool repeat_reference = true;       // Periodically Repeat the reference
+    vector<double> x0 { 0, 0 }; // Current state
+    double u; // Calculated control input
     std::string joint_name;
-    double cost;                        // Objective value
+    double cost; // Objective value
 
     // Error enums
     enum Error {
@@ -47,16 +45,17 @@ public:
     void init();
 
     /**
-    * \brief Set the initial state
-    * @param x0 - initial state
-    */
+     * \brief Set the initial state
+     * @param x0 - initial state
+     */
     void setInitialState(vector<double> x0);
 
     /**
-     * \brief Set the reference
+     * \brief Set the reference for time step n in [0, N]
+     * @param n
      * @param reference
      */
-    void setReference(vector<vector<double>> reference);
+    void setReference(int n, const std::vector<double>& reference);
 
     /**
      * \brief Assign the weighting matrix values

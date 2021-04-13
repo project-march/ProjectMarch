@@ -6,8 +6,8 @@
 #include <string>
 
 namespace node_utils {
-    // Get the Joint names from the robot information node.
-    std::vector<std::string> get_joint_names(rclcpp::Node& node);
+// Get the Joint names from the robot information node.
+std::vector<std::string> get_joint_names(rclcpp::Node& node);
 } // namespace node_utils
 
-#endif  // MARCH_UTILITY_NODE_UTILS_HPP
+#endif // MARCH_UTILITY_NODE_UTILS_HPP
