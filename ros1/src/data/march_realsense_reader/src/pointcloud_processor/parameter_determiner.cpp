@@ -251,7 +251,7 @@ bool HullParameterDeterminer::entireFootCanBePlaced(
     // Then find possible foot locations associated with the foot vertices
     PointNormalCloud::Ptr potential_foot_support_cloud
         = boost::make_shared<PointNormalCloud>();
-    succes
+    success
         &= cropCloudToHullVector(foot_pointcloud, potential_foot_support_cloud);
 
     // The location is only valid if all foot vertices can be placed
@@ -261,9 +261,9 @@ bool HullParameterDeterminer::entireFootCanBePlaced(
     // The location is only valid if the foot vertices have a z value close
     // enough to the locations z value
     for (pcl::PointNormal potential_foot_support :
-        potential_foot_support_cloud) {
+        *potential_foot_support_cloud) {
         success &= (abs(potential_foot_support.z - possible_foot_location.z)
-            < max_allowed_z_deviation)
+            < max_allowed_z_deviation);
     }
     return success;
 }
@@ -274,17 +274,17 @@ void HullParameterDeterminer::fillFootPointCloud(
     PointCloud2D::Ptr foot_pointcloud, pcl::PointNormal possible_foot_location)
 {
     foot_pointcloud->points.resize(4);
-    foot_pointcloud->point.x = possible_foot_location.x - x_deviation_back;
-    foot_pointcloud->point.y = possible_foot_location.y - y_deviation;
+    foot_pointcloud->points[0].x = possible_foot_location.x - x_deviation_back;
+    foot_pointcloud->points[0].y = possible_foot_location.y - y_deviation;
 
-    foot_pointcloud->point.x = possible_foot_location.x - x_deviation_back;
-    foot_pointcloud->point.y = possible_foot_location.y + y_deviation;
+    foot_pointcloud->points[1].x = possible_foot_location.x - x_deviation_back;
+    foot_pointcloud->points[1].y = possible_foot_location.y + y_deviation;
 
-    foot_pointcloud->point.x = possible_foot_location.x + x_deviation_front;
-    foot_pointcloud->point.y = possible_foot_location.y - y_deviation;
+    foot_pointcloud->points[2].x = possible_foot_location.x + x_deviation_front;
+    foot_pointcloud->points[2].y = possible_foot_location.y - y_deviation;
 
-    foot_pointcloud->point.x = possible_foot_location.x + x_deviation_front;
-    foot_pointcloud->point.y = possible_foot_location.y + y_deviation;
+    foot_pointcloud->points[3].x = possible_foot_location.x + x_deviation_front;
+    foot_pointcloud->points[3].y = possible_foot_location.y + y_deviation;
 }
 
 // Compute the optimal foot location as if one were not limited by anything.
