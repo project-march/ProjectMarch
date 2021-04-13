@@ -1,4 +1,4 @@
-description: The right swing step for the steep ramp down.
+description: The left swing step for the 20 degrees ramp down.
 duration: 3000000000
 gait_type: stairs_like
 joints:

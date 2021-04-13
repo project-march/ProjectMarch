@@ -1,4 +1,4 @@
-description: The left swing gait for the steep slope up.
+description: The right swing gait for the 20 degrees slope up.
 duration: 2500000000
 gait_type: stairs_like
 joints:

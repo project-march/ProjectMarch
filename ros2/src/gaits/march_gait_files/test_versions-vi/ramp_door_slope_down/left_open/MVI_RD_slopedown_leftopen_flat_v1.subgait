@@ -1,4 +1,4 @@
-description: The left open step for the flat ramp down, so the second step.
+description: The left open step for the 5 degrees ramp down, so the second step.
 duration: 3000000000
 gait_type: stairs_like
 joints:

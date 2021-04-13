@@ -1,4 +1,4 @@
-description: Left close steep ramp down
+description: Left close for the 20 degrees ramp down
 duration: 3000000000
 gait_type: stairs_like
 joints:

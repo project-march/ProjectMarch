@@ -1,4 +1,4 @@
-description: The right swing step for the flat ramp down.
+description: The left swing step for the 5 degrees ramp down.
 duration: 3000000000
 gait_type: stairs_like
 joints:
