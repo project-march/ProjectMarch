@@ -51,11 +51,11 @@ void HullParameterDeterminer::readYaml()
         = yaml_utilities::grabParameter<bool>(
             config_tree_, "general_most_desirable_location_is_small");
     foot_length_back = yaml_utilities::grabParameter<double>(
-        stairs_locations_parameters, "foot_length_back");
+        config_tree_, "foot_length_back");
     foot_length_front = yaml_utilities::grabParameter<double>(
-        stairs_locations_parameters, "foot_length_front");
+        config_tree_, "foot_length_front");
     foot_width = yaml_utilities::grabParameter<double>(
-        stairs_locations_parameters, "foot_width");
+        config_tree_, "foot_width");
     if (YAML::Node stairs_locations_parameters
         = config_tree_["stairs_locations"]) {
         min_x_stairs = yaml_utilities::grabParameter<double>(
