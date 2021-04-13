@@ -72,7 +72,7 @@ To make these hulls we need to do the following for each region we received from
 
   2. Project all the points in the region to the plane
 
-  3. Transform the projected points into a hull (the hull needs to be 2d), this can either create a convex or concave hull.
+  3. Transform the projected points into a hull. This hull can either be made convex or concave hull, hence the name CHullFinder.
      PCL handles this for us.
 
   4. Add the found hull, the parameters of the plane it is in and a vector of the indices to vectors for future use.
@@ -95,12 +95,12 @@ For the stairs method this is done as follows:
 
        2. Checking if the elevated points are inside or outside the hull
 
-       3. returning only the points inside the hull
+       3. The points inside the hull are optional foot locations
 
-  3. For all the optional foot locations test which ones are executable (reachable by the gaits) and pick a valid one which is
-     closest to some ideal location (the lowest, smallest possible end location for example).
+  3. For all the optional foot locations find which one is valid (reachable by the gaits) and closest to some
+     ideal location (the lowest, smallest possible end location for example).
 
-  4. Transform this into a parameter by finding at what percentage of the existing gait end locations the foot location is located.
+  4. Transform this into a parameter by finding at what percentage of the existing gaits end locations the foot location is located.
 
 For the ramp gait this is done as follows:
 
@@ -110,14 +110,14 @@ For the ramp gait this is done as follows:
   2. For a number of foot locations on the ground test whether there is a potential foot location at some height. This gives optional foot locations.
      This is done in the same way as for the stairs gait.
 
-  3. For all the optional foot locations find which one is executable and closest to the executable foot locations line.
-     Checking if a gait is executable for the ramp gait is as follows:
+  3. For all the optional foot locations find which one is valid and closest to the executable foot locations line.
+     Checking if a gait is valid for the ramp gait is as follows:
 
        1. Project the location to the executable foot locations line
 
        2. Check if this projected location is in between the flat and steep gait end locations
 
-       3. Check if the distance between the projected location and the original location is not too big. 
+       3. Check if the distance between the projected location and the original location is not too big.
 
   4. Transform this into a parameter by finding at what percentage of the executable foot locations line.
 
