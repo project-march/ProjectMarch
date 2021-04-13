@@ -17,32 +17,32 @@
     <!-- The compressedDepth plugin has to be turned off to prevent errors when -->
     <!-- using the bridge. -->
     <group ns="/camera/color/image_raw" >
-        <rosparam param="disable_pub_plugins">
-            - 'image_transport/compressedDepth'
-            - 'image_transport/theora'
-            - 'image_transport/compressed'
-        </rosparam>
+      <rosparam param="disable_pub_plugins">
+        - 'image_transport/compressedDepth'
+        - 'image_transport/theora'
+        - 'image_transport/compressed'
+      </rosparam>
     </group>
     <group ns="/camera/infra1/image_raw" >
-        <rosparam param="disable_pub_plugins">
-            - 'image_transport/compressedDepth'
-            - 'image_transport/theora'
-            - 'image_transport/compressed'
-        </rosparam>
+      <rosparam param="disable_pub_plugins">
+        - 'image_transport/compressedDepth'
+        - 'image_transport/theora'
+        - 'image_transport/compressed'
+      </rosparam>
     </group>
     <group ns="/camera/infra2/image_raw" >
-        <rosparam param="disable_pub_plugins">
-            - 'image_transport/compressedDepth'
-            - 'image_transport/theora'
-            - 'image_transport/compressed'
-        </rosparam>
+      <rosparam param="disable_pub_plugins">
+        - 'image_transport/compressedDepth'
+        - 'image_transport/theora'
+        - 'image_transport/compressed'
+      </rosparam>
     </group>
     <group ns="/camera/depth/image_raw" >
-        <rosparam param="disable_pub_plugins">
-            - 'image_transport/compressedDepth'
-            - 'image_transport/theora'
-            - 'image_transport/compressed'
-        </rosparam>
+      <rosparam param="disable_pub_plugins">
+        - 'image_transport/compressedDepth'
+        - 'image_transport/theora'
+        - 'image_transport/compressed'
+      </rosparam>
     </group>
 
 
