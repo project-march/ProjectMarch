@@ -3,6 +3,7 @@
 
 #include <math.h>
 #include <pcl/point_types.h>
+#include <vector>
 
 namespace linear_algebra_utilities {
 // Calculate a dot product of two vectors
