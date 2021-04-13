@@ -104,11 +104,6 @@ For the ramp gait this is done as follows:
 3) Transform this into a parameter by finding at what percentage of the executable foot locations line.
 
 
-More Information On The Algorithms In Place
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-For more details on the implementation see the header or the source files of the classes.
-
 Software Architecture
 ^^^^^^^^^^^^^^^^^^^^^
 
