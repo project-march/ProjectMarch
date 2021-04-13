@@ -137,7 +137,7 @@ protected:
     double foot_length_back;
     double foot_length_front;
     double foot_width;
-    double max_allowed_z_deviation;
+    double max_allowed_z_deviation_foot;
     bool general_most_desirable_location_is_mid;
     bool general_most_desirable_location_is_small;
 

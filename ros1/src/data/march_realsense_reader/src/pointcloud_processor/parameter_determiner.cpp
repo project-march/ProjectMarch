@@ -50,6 +50,12 @@ void HullParameterDeterminer::readYaml()
     general_most_desirable_location_is_small
         = yaml_utilities::grabParameter<bool>(
             config_tree_, "general_most_desirable_location_is_small");
+    foot_length_back = yaml_utilities::grabParameter<double>(
+        stairs_locations_parameters, "foot_length_back");
+    foot_length_front = yaml_utilities::grabParameter<double>(
+        stairs_locations_parameters, "foot_length_front");
+    foot_width = yaml_utilities::grabParameter<double>(
+        stairs_locations_parameters, "foot_width");
     if (YAML::Node stairs_locations_parameters
         = config_tree_["stairs_locations"]) {
         min_x_stairs = yaml_utilities::grabParameter<double>(
@@ -62,14 +68,8 @@ void HullParameterDeterminer::readYaml()
             stairs_locations_parameters, "max_z_stairs");
         y_location = yaml_utilities::grabParameter<double>(
             stairs_locations_parameters, "y_location");
-        foot_length_back = yaml_utilities::grabParameter<double>(
-            stairs_locations_parameters, "foot_length_back");
-        foot_length_front = yaml_utilities::grabParameter<double>(
-            stairs_locations_parameters, "foot_length_front");
-        foot_width = yaml_utilities::grabParameter<double>(
-            stairs_locations_parameters, "foot_width");
-        max_allowed_z_deviation = yaml_utilities::grabParameter<double>(
-            stairs_locations_parameters, "max_allowed_z_deviation");
+        max_allowed_z_deviation_foot = yaml_utilities::grabParameter<double>(
+            stairs_locations_parameters, "max_allowed_z_deviation_foot");
     } else {
         ROS_ERROR("'stairs_locations' parameters not found in parameters file");
     }
@@ -263,7 +263,7 @@ bool HullParameterDeterminer::entireFootCanBePlaced(
     for (pcl::PointNormal potential_foot_support :
         *potential_foot_support_cloud) {
         success &= (abs(potential_foot_support.z - possible_foot_location.z)
-            < max_allowed_z_deviation);
+            < max_allowed_z_deviation_foot);
     }
     return success;
 }
