@@ -1,0 +1,34 @@
+<!-- Disable all plugins that are not used by the physical realsense camera. -->
+<!-- The compressedDepth plugin has to be turned off to prevent errors when -->
+<!-- using the bridge. -->
+<launch>
+<arg name="camera_name" default="camera_front"/>
+<group ns="/$(arg camera_name)/color/image_raw">
+    <rosparam param="disable_pub_plugins">
+        - 'image_transport/compressedDepth'
+        - 'image_transport/theora'
+        - 'image_transport/compressed'
+    </rosparam>
+</group>
+<group ns="/$(arg camera_name)/infra1/image_raw">
+    <rosparam param="disable_pub_plugins">
+        - 'image_transport/compressedDepth'
+        - 'image_transport/theora'
+        - 'image_transport/compressed'
+    </rosparam>
+</group>
+<group ns="/$(arg camera_name)/infra2/image_raw">
+    <rosparam param="disable_pub_plugins">
+        - 'image_transport/compressedDepth'
+        - 'image_transport/theora'
+        - 'image_transport/compressed'
+    </rosparam>
+</group>
+<group ns="/$(arg camera_name)/depth/image_raw">
+    <rosparam param="disable_pub_plugins">
+        - 'image_transport/compressedDepth'
+        - 'image_transport/theora'
+        - 'image_transport/compressed'
+    </rosparam>
+</group>
+</launch>
