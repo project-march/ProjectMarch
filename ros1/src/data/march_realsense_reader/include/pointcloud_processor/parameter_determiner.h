@@ -134,9 +134,9 @@ protected:
     double min_z_stairs;
     double max_z_stairs;
     double y_location;
-    double x_deviation_back;
-    double x_deviation_front;
-    double y_deviation;
+    double foot_length_back;
+    double foot_length_front;
+    double foot_width;
     double max_allowed_z_deviation;
     bool general_most_desirable_location_is_mid;
     bool general_most_desirable_location_is_small;
