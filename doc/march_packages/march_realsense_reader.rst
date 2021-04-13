@@ -9,8 +9,8 @@ The MARCH realsense reader package's goal is to obtain the dimensions of obstacl
 uses two `d435i <https://www.intelrealsense.com/depth-camera-d435i/>`_ camera's for this purpose. This package
 subscribes the the realsense camera topics and processes one of pointclouds published there with a service callback.
 
-The processing makes heavy use of the `Point Cloud Library (pcl) <https://pointclouds.org/>`_ to do the processing.
-Many of its classes are used even when not directly using methods from pcl.
+The processing makes heavy use of the `Point Cloud Library (PCL) <https://pointclouds.org/>`_ to do the processing.
+Many of its classes are used even when not directly using methods from PCL.
 
 The processing consists does 4 main phases:
 
@@ -62,17 +62,20 @@ We use the region growing algorithm to find regions in the cloud which is explai
 CHullFinder
 ^^^^^^^^^^^
 
-In order to find a potential foot location in the point cloud the found regions need to be transformed into a continuous
-region where we believe it is possible to place the foot.
-That is why we transform the regions into 'hulls' (a cloud detailing the edge of the region). To do this we need to do the following for each region we received from the region creator:
+In order to find a potential foot location in the point cloud we want to be able test if we can place our foot at some location.
+In other words, we need a way to verify if a point in inside a region or not. To this end we need to make an outline or hull of the regions.
 
-  1. Find a plane which fits the region (using the average normal and point)
+To make these hulls we need to do the following for each region we received from the region creator:
+
+  1. Find a plane which fits the region. This is needed because the regions we consider are areas and not volumes so we
+     make use of 2 dimensional hulls. This is why we also need to make the regions 2D which we do by projecting the region to a fitting plane.
 
   2. Project all the points in the region to the plane
 
   3. Transform the projected points into a hull (the hull needs to be 2d), this can either create a convex or concave hull.
+     PCL handles this for us.
 
-  4. Add the found hull, its plane parameters and a vector of the indices to vectors for future use.
+  4. Add the found hull, the parameters of the plane it is in and a vector of the indices to vectors for future use.
 
 HullParameterDeterminer
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -83,12 +86,19 @@ foot location depending on the gait that is to be executed.
 For the stairs method this is done as follows:
 
   1. The stairs gait is interpolated from a low deep, high deep, low undeep & high undeep gait.
-     We can place the foot anywhere in the convex hull of the end locations of those gaits.
+     We can place the foot anywhere in the area between the end locations of those gaits.
 
   2. For a number of foot locations on the ground test whether there is a potential foot location at some height. This gives optional foot locations.
+     This is done by, for each region:
 
-  3. For all the optional foot locations test which ones are executable and pick a valid one which is
-     closest to some ideal location (the minimal step, the average step).
+       1. Elevating the points on the ground to the plane of the region
+
+       2. Checking if the elevated points are inside or outside the hull
+
+       3. returning only the points inside the hull
+
+  3. For all the optional foot locations test which ones are executable (reachable by the gaits) and pick a valid one which is
+     closest to some ideal location (the lowest, smallest possible end location for example).
 
   4. Transform this into a parameter by finding at what percentage of the existing gait end locations the foot location is located.
 
@@ -98,8 +108,16 @@ For the ramp gait this is done as follows:
      This is what we call the 'executable foot locations line'.
 
   2. For a number of foot locations on the ground test whether there is a potential foot location at some height. This gives optional foot locations.
+     This is done in the same way as for the stairs gait.
 
   3. For all the optional foot locations find which one is executable and closest to the executable foot locations line.
+     Checking if a gait is executable for the ramp gait is as follows:
+
+       1. Project the location to the executable foot locations line
+
+       2. Check if this projected location is in between the flat and steep gait end locations
+
+       3. Check if the distance between the projected location and the original location is not too big. 
 
   4. Transform this into a parameter by finding at what percentage of the executable foot locations line.
 
