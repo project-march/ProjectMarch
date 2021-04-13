@@ -274,16 +274,21 @@ void HullParameterDeterminer::fillFootPointCloud(
     PointCloud2D::Ptr foot_pointcloud, pcl::PointNormal possible_foot_location)
 {
     foot_pointcloud->points.resize(4);
-    foot_pointcloud->points[0].x = possible_foot_location.x - x_deviation_back;
+
+    // Deviation back is added as the forward direction of the exoskeleton
+    // is the negative x direction in the simulation
+    foot_pointcloud->points[0].x = possible_foot_location.x + x_deviation_back;
     foot_pointcloud->points[0].y = possible_foot_location.y - y_deviation;
 
-    foot_pointcloud->points[1].x = possible_foot_location.x - x_deviation_back;
+    foot_pointcloud->points[1].x = possible_foot_location.x + x_deviation_back;
     foot_pointcloud->points[1].y = possible_foot_location.y + y_deviation;
 
-    foot_pointcloud->points[2].x = possible_foot_location.x + x_deviation_front;
+    // Deviation front is subtracted as the forward direction of the exoskeleton
+    // is the negative x direction in the simulation
+    foot_pointcloud->points[2].x = possible_foot_location.x - x_deviation_front;
     foot_pointcloud->points[2].y = possible_foot_location.y - y_deviation;
 
-    foot_pointcloud->points[3].x = possible_foot_location.x + x_deviation_front;
+    foot_pointcloud->points[3].x = possible_foot_location.x - x_deviation_front;
     foot_pointcloud->points[3].y = possible_foot_location.y + y_deviation;
 }
 
