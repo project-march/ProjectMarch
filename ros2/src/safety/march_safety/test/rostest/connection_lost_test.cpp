@@ -1,8 +1,8 @@
 // Copyright 2019 Project March.
 
-#include <ros/ros.h>
 #include "gtest/gtest.h"
 #include <iostream>
+#include <ros/ros.h>
 
 #include "error_counter.h"
 #include <march_safety/temperature_safety.h>
