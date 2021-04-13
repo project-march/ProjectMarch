@@ -37,17 +37,17 @@ We currently do not remove statistical outliers as this proved too computational
 
 Preprocessing consists of the following steps:
 
-1. Randomly remove points from the point cloud.
-   This is done because the pointcloud consist of almost 1 million points and we need to speed up the computation.
-   Reducing the size by leaving point in a grid of a certain size is possible too, but that is more computationally expensive.
+  1. Randomly remove points from the point cloud.
+     This is done because the pointcloud consist of almost 1 million points and we need to speed up the computation.
+     Reducing the size by leaving point in a grid of a certain size is possible too, but that is more computationally expensive.
 
-2. Transform the point cloud such that its origin is at the foot that is about to take a step and its orientation matches the orientation of this foot too. The link that will be taking the step is given by the service caller (the RealSenseGait).
+  2. Transform the point cloud such that its origin is at the foot that is about to take a step and its orientation matches the orientation of this foot too. The link that will be taking the step is given by the service caller (the RealSenseGait).
 
-3. Filter points which are too far away from the origin, as points far away are not relevant to the upcoming steps of the exoskeleton.
+  3. Filter points which are too far away from the origin, as points far away are not relevant to the upcoming steps of the exoskeleton.
 
-4. Estimate the normal vectors of the remaining point cloud.
+  4. Estimate the normal vectors of the remaining point cloud.
 
-5. Filter based on the normal vectors, we remove points which do not have a normal in an upwards direction (e.g. points on a wall) as we are not capable of standing there.
+  5. Filter based on the normal vectors, we remove points which do not have a normal in an upwards direction (e.g. points on a wall) as we are not capable of standing there.
 
 
 RegionGrower
@@ -82,26 +82,26 @@ foot location depending on the gait that is to be executed.
 
 For the stairs method this is done as follows:
 
-1) The stairs gait is interpolated from a low deep, high deep, low undeep & high undeep gait.
-   We can place the foot anywhere in the convex hull of the end locations of those gaits.
+  1. The stairs gait is interpolated from a low deep, high deep, low undeep & high undeep gait.
+     We can place the foot anywhere in the convex hull of the end locations of those gaits.
 
-2) For a number of foot locations on the ground test whether there is a potential foot location at some height. This gives optional foot locations.
+  2. For a number of foot locations on the ground test whether there is a potential foot location at some height. This gives optional foot locations.
 
-3) For all the optional foot locations test which ones are executable and pick a valid one which is
-   closest to some ideal location (the minimal step, the average step).
+  3. For all the optional foot locations test which ones are executable and pick a valid one which is
+     closest to some ideal location (the minimal step, the average step).
 
-4) Transform this into a parameter by finding at what percentage of the existing gait end locations the foot location is located.
+  4. Transform this into a parameter by finding at what percentage of the existing gait end locations the foot location is located.
 
 For the ramp gait this is done as follows:
 
-1) The ramp gait is interpolated from a flat & steep gait. We can place the foot anywhere in between the two ending locations of the gait.
-   This is what we call the 'executable foot locations line'.
+  1. The ramp gait is interpolated from a flat & steep gait. We can place the foot anywhere in between the two ending locations of the gait.
+     This is what we call the 'executable foot locations line'.
 
-2) For a number of foot locations on the ground test whether there is a potential foot location at some height. This gives optional foot locations.
+  2. For a number of foot locations on the ground test whether there is a potential foot location at some height. This gives optional foot locations.
 
-3) For all the optional foot locations find which one is executable and closest to the executable foot locations line.
+  3. For all the optional foot locations find which one is executable and closest to the executable foot locations line.
 
-4) Transform this into a parameter by finding at what percentage of the executable foot locations line.
+  4. Transform this into a parameter by finding at what percentage of the executable foot locations line.
 
 
 Software Architecture
@@ -210,7 +210,7 @@ should look something like:
    :align: center
 
 Running with both cameras
-^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
 You need two cameras for this example. This tutorial is very similar to the Running with one camera tutorial.
 The main difference is in starting up the exoskeleton. If you have the cameras with the 'front' and 'back' labels, this
 can be done by running in separate terminals the following:
