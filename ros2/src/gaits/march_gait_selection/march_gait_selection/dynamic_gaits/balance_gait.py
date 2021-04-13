@@ -1,18 +1,17 @@
 from copy import deepcopy
 from threading import Event
-from typing import Tuple, Optional
 
+from march_gait_selection.state_machine.gait_update import GaitUpdate
+from march_gait_selection.state_machine.gait_interface import GaitInterface
+from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
+from march_shared_msgs.srv import CapturePointPose, GetMoveItTrajectory
 from march_utility.gait.gait import Gait
+from march_utility.utilities.duration import Duration
 from rclpy import Future
 from rclpy.node import Node
-from march_utility.utilities.duration import Duration
 from rclpy.time import Time
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Header
-
-from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
-from march_gait_selection.state_machine.gait_interface import GaitInterface, GaitUpdate
-from march_shared_msgs.srv import CapturePointPose, GetMoveItTrajectory
 from trajectory_msgs.msg import JointTrajectory
 
 
@@ -213,7 +212,7 @@ class BalanceGait(GaitInterface):
     def start(self, current_time: Time) -> GaitUpdate:
         self._current_time = current_time
         self._current_subgait = self._default_walk.graph.start_subgaits()[0]
-        return self._update_trajectory()
+        return GaitUpdate.should_schedule(self._new_trajectory_command())
 
     def update(self, current_time: Time) -> GaitUpdate:
         self._current_time = current_time
@@ -228,11 +227,11 @@ class BalanceGait(GaitInterface):
                 return GaitUpdate.finished()
             self._constructing = True
             self._current_subgait = next_subgait
-            command = self._update_trajectory()
+            command = self._new_trajectory_command()
             self._constructing = False
-            return GaitUpdate.schedule(command)
+            return GaitUpdate.should_schedule(command)
 
-    def _update_trajectory(self) -> GaitUpdate:
+    def _new_trajectory_command(self) -> TrajectoryCommand:
         """Update the trajectory values and generate a new trajectory command.
 
         :return Return a TrajectoryCommand for the next subgait.
@@ -242,13 +241,11 @@ class BalanceGait(GaitInterface):
         self._current_subgait_duration = Duration.from_msg(time_from_start)
         self._start_time = self._current_time
         self._end_time = self._start_time + self._current_subgait_duration
-        return GaitUpdate.schedule(
-            TrajectoryCommand(
-                trajectory,
-                self._current_subgait_duration,
-                self.subgait_name,
-                self._start_time,
-            )
+        return TrajectoryCommand(
+            trajectory,
+            self._current_subgait_duration,
+            self.subgait_name,
+            self._start_time,
         )
 
     def end(self):

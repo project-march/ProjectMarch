@@ -11,9 +11,9 @@ from std_msgs.msg import Header
 from std_srvs.srv import Trigger
 
 from .gait_state_machine_error import GaitStateMachineError
+from .gait_update import GaitUpdate
 from .home_gait import HomeGait
-from .trajectory_scheduler import TrajectoryCommand, TrajectoryScheduler
-from .gait_interface import GaitUpdate
+from .trajectory_scheduler import TrajectoryScheduler
 
 PRESSURE_SOLE_STANDING_FORCE = 8000
 DEFAULT_TIMER_PERIOD = 0.004
@@ -269,8 +269,6 @@ class GaitStateMachine(object):
         self.update_timer = self._gait_selection.create_timer(
             timer_period_sec=self._timer_period,
             callback=self.update,
-            # Do we actually need this type of callback group?
-            # callback_group=ReentrantCallbackGroup(),
         )
         self.last_update_time = self._gait_selection.get_clock().now()
 

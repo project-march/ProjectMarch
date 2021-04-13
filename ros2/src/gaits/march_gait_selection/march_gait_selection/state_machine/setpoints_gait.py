@@ -7,7 +7,8 @@ from march_utility.gait.subgait import Subgait
 from march_utility.utilities.duration import Duration
 from rclpy.time import Time
 
-from .gait_interface import GaitInterface, GaitUpdate
+from .gait_update import GaitUpdate
+from .gait_interface import GaitInterface
 from .state_machine_input import TransitionRequest
 from .trajectory_scheduler import TrajectoryCommand
 
@@ -94,11 +95,13 @@ class SetpointsGait(GaitInterface, Gait):
         if first_subgait_delay > Duration(0):
             self._start_is_delayed = True
             self._update_time_stamps(self._current_subgait, first_subgait_delay)
-            return GaitUpdate.early_schedule(self._command_from_current_subgait())
+            return GaitUpdate.should_schedule_early(
+                self._command_from_current_subgait()
+            )
         else:
             self._start_is_delayed = False
             self._update_time_stamps(self._current_subgait)
-            return GaitUpdate.schedule(self._command_from_current_subgait())
+            return GaitUpdate.should_schedule(self._command_from_current_subgait())
 
     def update(
         self,
@@ -123,7 +126,7 @@ class SetpointsGait(GaitInterface, Gait):
         if self._start_is_delayed and self._current_time >= self._start_time:
             # Reset start delayed flag and update first subgait
             self._start_is_delayed = False
-            return GaitUpdate.subgait_update()
+            return GaitUpdate.subgait_updated()
 
         if self._current_time >= self._end_time:
             return self._update_next_subgait()
@@ -178,7 +181,7 @@ class SetpointsGait(GaitInterface, Gait):
             command = None
 
         self._scheduled_early = False
-        return GaitUpdate.schedule(command)
+        return GaitUpdate.should_schedule(command)
 
     def _update_next_subgait_early(self) -> GaitUpdate:
         """Update the next subgait.
@@ -206,7 +209,7 @@ class SetpointsGait(GaitInterface, Gait):
         # If there is no subgait, return None and False for is_finished
         if next_subgait is None:
             return GaitUpdate.empty()
-        return GaitUpdate.early_schedule(
+        return GaitUpdate.should_schedule_early(
             TrajectoryCommand.from_subgait(next_subgait, self._end_time)
         )
 

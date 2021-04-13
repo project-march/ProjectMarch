@@ -1,7 +1,7 @@
 from copy import deepcopy
 from typing import Optional
 
-from march_gait_selection.state_machine.gait_interface import GaitUpdate
+from march_gait_selection.state_machine.gait_update import GaitUpdate
 from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
 from march_utility.gait.subgait import Subgait
 from march_utility.utilities.duration import Duration
@@ -77,7 +77,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
             self._current_subgait = self._subgait_after_freeze
             self._is_frozen = False
             self._update_time_stamps(self._current_subgait)
-            return GaitUpdate.schedule(self._command_from_current_subgait())
+            return GaitUpdate.should_schedule(self._command_from_current_subgait())
 
         return self._update_next_subgait()
 
@@ -96,7 +96,7 @@ class SemiDynamicSetpointsGait(SetpointsGait):
         self._should_freeze = False
         self._is_frozen = True
         self._update_time_stamps(self._current_subgait)
-        return GaitUpdate.schedule(self._command_from_current_subgait())
+        return GaitUpdate.should_schedule(self._command_from_current_subgait())
 
     def subgait_after_freeze(self):
         """

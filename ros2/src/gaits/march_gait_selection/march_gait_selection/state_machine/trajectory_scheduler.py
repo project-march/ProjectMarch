@@ -82,16 +82,18 @@ class TrajectoryScheduler(object):
             )
         )
 
-        log_message = f"Scheduling {command.name} to start "
+        info_log_message = f"Scheduling {command.name}"
+        debug_log_message = f"Subgait {command.name} starts "
         if self._node.get_clock().now() < command.start_time:
             time_difference = Duration.from_ros_duration(
                 command.start_time - self._node.get_clock().now()
             )
-            log_message += f"in {round(time_difference.seconds, 3)}s"
+            debug_log_message += f"in {round(time_difference.seconds, 3)}s"
         else:
-            log_message += "now"
+            debug_log_message += "now"
 
-        self._node.get_logger().info(log_message)
+        self._node.get_logger().info(info_log_message)
+        self._node.get_logger().info(debug_log_message)
 
     def failed(self) -> bool:
         return self._failed

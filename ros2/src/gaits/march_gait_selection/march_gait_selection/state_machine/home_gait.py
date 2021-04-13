@@ -3,7 +3,8 @@ from typing import Optional, Tuple
 from march_utility.utilities.duration import Duration
 from rclpy.time import Time
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
-from .gait_interface import GaitInterface, GaitUpdate
+from .gait_update import GaitUpdate
+from .gait_interface import GaitInterface
 from .trajectory_scheduler import TrajectoryCommand
 
 
@@ -63,7 +64,7 @@ class HomeGait(GaitInterface):
         """
         self._start_time = current_time
         self._end_time = self._start_time + self._duration
-        return GaitUpdate.schedule(
+        return GaitUpdate.should_schedule(
             TrajectoryCommand(
                 self._get_trajectory_msg(), self._duration, self._name, self._start_time
             )
