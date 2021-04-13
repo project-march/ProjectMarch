@@ -2,7 +2,7 @@
 
 #include "error_counter.h"
 #include <gtest/gtest.h>
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/Temperature.h>
 
 TEST(TestNoTemperatureError, belowSpecificThreshold)

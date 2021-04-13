@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 #include <iostream>
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include "error_counter.h"
 #include <march_safety/temperature_safety.h>

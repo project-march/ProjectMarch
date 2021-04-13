@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 #include <iostream>
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #include <std_msgs/Time.h>
 
 #include "error_counter.h"
