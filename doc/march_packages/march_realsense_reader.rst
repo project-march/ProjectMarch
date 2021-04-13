@@ -82,26 +82,26 @@ foot location depending on the gait that is to be executed.
 
 For the stairs method this is done as follows:
 
-0) The stairs gait is interpolated from a low deep, high deep, low undeep & high undeep gait.
+1) The stairs gait is interpolated from a low deep, high deep, low undeep & high undeep gait.
    We can place the foot anywhere in the convex hull of the end locations of those gaits.
 
-1) For a number of foot locations on the ground test whether there is a potential foot location at some height. This gives optional foot locations.
+2) For a number of foot locations on the ground test whether there is a potential foot location at some height. This gives optional foot locations.
 
-2) For all the optional foot locations test which ones are executable and pick a valid one which is
+3) For all the optional foot locations test which ones are executable and pick a valid one which is
    closest to some ideal location (the minimal step, the average step).
 
-3) Transform this into a parameter by finding at what percentage of the existing gait end locations the foot location is located.
+4) Transform this into a parameter by finding at what percentage of the existing gait end locations the foot location is located.
 
 For the ramp gait this is done as follows:
 
-0) The ramp gait is interpolated from a flat & steep gait. We can place the foot anywhere in between the two ending locations of the gait.
+1) The ramp gait is interpolated from a flat & steep gait. We can place the foot anywhere in between the two ending locations of the gait.
    This is what we call the 'executable foot locations line'.
 
-1) For a number of foot locations on the ground test whether there is a potential foot location at some height. This gives optional foot locations.
+2) For a number of foot locations on the ground test whether there is a potential foot location at some height. This gives optional foot locations.
 
-2) For all the optional foot locations find which one is executable and closest to the executable foot locations line.
+3) For all the optional foot locations find which one is executable and closest to the executable foot locations line.
 
-3) Transform this into a parameter by finding at what percentage of the executable foot locations line.
+4) Transform this into a parameter by finding at what percentage of the executable foot locations line.
 
 
 Software Architecture
