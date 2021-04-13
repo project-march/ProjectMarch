@@ -8,37 +8,39 @@
 #include <cstdint>
 #include <iostream>
 
-namespace march
-{
-class LowVoltage
-{
+namespace march {
+class LowVoltage {
 private:
-  PdoSlaveInterface& pdo_;
-  NetMonitorOffsets netMonitoringOffsets;
-  NetDriverOffsets netDriverOffsets;
+    PdoSlaveInterface& pdo_;
+    NetMonitorOffsets netMonitoringOffsets;
+    NetDriverOffsets netDriverOffsets;
 
-  uint8_t getNetsOperational();
+    uint8_t getNetsOperational();
 
 public:
-  LowVoltage(PdoSlaveInterface& pdo, NetMonitorOffsets netMonitoringOffsets, NetDriverOffsets netDriverOffsets);
+    LowVoltage(PdoSlaveInterface& pdo, NetMonitorOffsets netMonitoringOffsets,
+        NetDriverOffsets netDriverOffsets);
 
-  float getNetCurrent(int netNumber);
-  bool getNetOperational(int netNumber);
-  void setNetOnOff(bool on, int netNumber);
+    float getNetCurrent(int netNumber);
+    bool getNetOperational(int netNumber);
+    void setNetOnOff(bool on, int netNumber);
 
-  /** @brief Override comparison operator */
-  friend bool operator==(const LowVoltage& lhs, const LowVoltage& rhs)
-  {
-    return lhs.netDriverOffsets == rhs.netDriverOffsets && lhs.netMonitoringOffsets == rhs.netMonitoringOffsets;
-  }
+    /** @brief Override comparison operator */
+    friend bool operator==(const LowVoltage& lhs, const LowVoltage& rhs)
+    {
+        return lhs.netDriverOffsets == rhs.netDriverOffsets
+            && lhs.netMonitoringOffsets == rhs.netMonitoringOffsets;
+    }
 
-  /** @brief Override stream operator for clean printing */
-  friend ::std::ostream& operator<<(std::ostream& os, const LowVoltage& lowVoltage)
-  {
-    return os << "LowVoltage(netMonitoringOffsets: " << lowVoltage.netMonitoringOffsets << ", "
-              << "netDriverOffsets: " << lowVoltage.netDriverOffsets << ")";
-  }
+    /** @brief Override stream operator for clean printing */
+    friend ::std::ostream& operator<<(
+        std::ostream& os, const LowVoltage& lowVoltage)
+    {
+        return os << "LowVoltage(netMonitoringOffsets: "
+                  << lowVoltage.netMonitoringOffsets << ", "
+                  << "netDriverOffsets: " << lowVoltage.netDriverOffsets << ")";
+    }
 };
 
-}  // namespace march
-#endif  // MARCH_HARDWARE_LOW_VOLTAGE_H
+} // namespace march
+#endif // MARCH_HARDWARE_LOW_VOLTAGE_H

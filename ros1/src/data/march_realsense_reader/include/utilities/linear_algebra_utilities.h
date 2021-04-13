@@ -72,6 +72,6 @@ namespace linear_algebra_utilities
     pcl::PointXYZ projected_point = projectPointToLine<T>(point, line_coefficients);
     return distanceBetweenPoints<T, pcl::PointXYZ>(point, projected_point);
   }
-}
+} // namespace linear_algebra_utilities
 
-#endif //MARCH_LINEAR_ALGEBRA_UTILITIES_H
+#endif // MARCH_LINEAR_ALGEBRA_UTILITIES_H

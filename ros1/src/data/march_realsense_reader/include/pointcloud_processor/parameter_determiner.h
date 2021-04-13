@@ -1,12 +1,12 @@
 #ifndef MARCH_PARAMETER_DETERMINER_H
 #define MARCH_PARAMETER_DETERMINER_H
-#include <string>
+#include "march_shared_msgs/GetGaitParameters.h"
+#include "utilities/realsense_gait_utilities.h"
+#include "yaml-cpp/yaml.h"
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
-#include "yaml-cpp/yaml.h"
-#include "utilities/realsense_gait_utilities.h"
-#include "march_shared_msgs/GetGaitParameters.h"
+#include <string>
 
 using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
 using PointNormalCloud = pcl::PointCloud<pcl::PointNormal>;
@@ -23,8 +23,7 @@ using HullVector = std::vector<Hull::Ptr>;
 using PolygonVector = std::vector<Polygon>;
 using GaitParameters = march_shared_msgs::GaitParameters;
 
-class ParameterDeterminer
-{
+class ParameterDeterminer {
 public:
   ParameterDeterminer(YAML::Node config_tree, bool debugging);
   /** This function is required to be implemented by any plane finder **/
@@ -50,8 +49,7 @@ protected:
 /** The hull parameter determiner
  *
  */
-class HullParameterDeterminer : ParameterDeterminer
-{
+class HullParameterDeterminer : ParameterDeterminer {
 public:
   /** Basic constructor for ParameterDeterminer preprocessor, but this will also read the yaml **/
   HullParameterDeterminer(YAML::Node config_tree, bool debugging);
@@ -157,8 +155,7 @@ protected:
 /** The simple parameter determiner
  *
  */
-class SimpleParameterDeterminer : ParameterDeterminer
-{
+class SimpleParameterDeterminer : ParameterDeterminer {
 public:
   /** Use the constructors defined in the super class **/
   using ParameterDeterminer::ParameterDeterminer;
@@ -171,4 +168,4 @@ public:
           boost::shared_ptr<GaitParameters> gait_parameters) override;
 };
 
-#endif //MARCH_PARAMETER_DETERMINER_H
+#endif // MARCH_PARAMETER_DETERMINER_H
