@@ -4,7 +4,7 @@
 
 # Parameter that is used for the first interpolation, between 0 and 1
 #
-# Stairs: Determines step size, min depth is 20 cm, max is ? cm
+# Stairs: Determines step size, min depth is 22 cm, max is 35 cm
 # Ramp: Determines gradient, min gradient is 5 degrees, max is  20 degrees
 float64 first_parameter
 
@@ -12,7 +12,7 @@ float64 first_parameter
 # Parameter that is used for the second interpolation, if obstacle is done with 2D
 # interpolation.
 #
-# Stairs: Determines the step height, min height is 12 cm, max height is 22 cm
+# Stairs: Determines the step height, min height is 13 cm, max height is 22 cm
 # Ramp: Not used for the ramp gait, since this is currently in 1D
 float64 second_parameter
 
