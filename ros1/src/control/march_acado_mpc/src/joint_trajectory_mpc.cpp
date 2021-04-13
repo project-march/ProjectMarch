@@ -39,7 +39,7 @@ bool ModelPredictiveControllerInterface::init(
     return true;
 }
 
-// Retrieve the Q matrix from the parameter server for a joint.
+// Retrieve the weights from the parameter server for a joint.
 std::vector<float> ModelPredictiveControllerInterface::getWeights(
     std::string joint_name)
 {
