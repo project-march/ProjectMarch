@@ -228,17 +228,16 @@ bool HullParameterDeterminer::isValidLocation(
             return true;
         }
     }
-}
-else
-{
-    ROS_ERROR_STREAM("optimalLocationIsValid method has not been "
-                     "implemented for obstacle "
-        << selected_obstacle_ << ". Returning false.");
+    else
+    {
+        ROS_ERROR_STREAM("optimalLocationIsValid method has not been "
+                         "implemented for obstacle "
+            << selected_obstacle_ << ". Returning false.");
+        return false;
+    }
+    // If no check concludes that the location is valid, return that the
+    // location is invalid.
     return false;
-}
-// If no check concludes that the location is valid, return that the
-// location is invalid.
-return false;
 }
 
 // Verify if there is support for the entire foot around the possible foot
