@@ -114,11 +114,14 @@ protected:
     // of the end points it is
     bool getGaitParametersFromFootLocation();
 
-    // Verify if there is support for the entire foot around the possible foot location
+    // Verify if there is support for the entire foot around the possible foot
+    // location
     void entireFootCanBePlaced(pcl::PointNormal possible_foot_location);
 
-    // Fill a point cloud with vertices of the foot on the ground around a possible foot location
-    void fillFootPointCloud(PointCloud2D foot_pointcloud, pcl::PointNormal possible_foot_location);
+    // Fill a point cloud with vertices of the foot on the ground around a
+    // possible foot location
+    void fillFootPointCloud(
+        PointCloud2D foot_pointcloud, pcl::PointNormal possible_foot_location);
 
     // Verify that a possible foot location is valid for the requested gait
     bool isValidLocation(pcl::PointNormal possible_foot_location);

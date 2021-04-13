@@ -3,8 +3,8 @@
 #include "utilities/output_utilities.h"
 #include "utilities/realsense_gait_utilities.h"
 #include "yaml-cpp/yaml.h"
-#include <ctime>
 #include <cmath>
+#include <ctime>
 #include <pcl/filters/crop_hull.h>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
@@ -237,28 +237,38 @@ bool HullParameterDeterminer::isValidLocation(
     return false;
 }
 
-// Verify if there is support for the entire foot around the possible foot location
-bool HullParameterDeterminer::enitreFootCanBePlaced(pcl::PointNormal possible_foot_location)
+// Verify if there is support for the entire foot around the possible foot
+// location
+bool HullParameterDeterminer::enitreFootCanBePlaced(
+    pcl::PointNormal possible_foot_location)
 {
     bool success = true;
-    // First create a pointcloud containing the edge points (vertices) of the foot on the ground
+    // First create a pointcloud containing the edge points (vertices) of the
+    // foot on the ground
     PointCloud2D::Ptr foot_pointcloud = boost::make_shared<PointCloud2D>();
     fillFootPointCloud(foot_pointcloud, possible_foot_location);
 
     // Then find possible foot locations associated with the foot vertices
-    PointNormalCloud::Ptr potential_foot_support_cloud = boost::make_shared<PointNormalCloud>();
-    succes &= cropCloudToHullVector(foot_pointcloud, potential_foot_support_cloud);
+    PointNormalCloud::Ptr potential_foot_support_cloud
+        = boost::make_shared<PointNormalCloud>();
+    succes
+        &= cropCloudToHullVector(foot_pointcloud, potential_foot_support_cloud);
 
-    // If all vertices have a possible foot location and they have z values in a certain range the location is valid
-    if (potential_foot_support_cloud->points.size() == foot_pointcloud->size()) {
-        for (pcl::PointNormal potential_foot_support : potential_foot_support_cloud) {
+    // If all vertices have a possible foot location and they have z values in a
+    // certain range the location is valid
+    if (potential_foot_support_cloud->points.size()
+        == foot_pointcloud->size()) {
+        for (pcl::PointNormal potential_foot_support :
+            potential_foot_support_cloud) {
             if (potential_foot_support.z - possible_foot_location.z
         }
     }
 }
 
-// Fill a point cloud with vertices of the foot on the ground around a possible foot location
-void HullParameterDeterminer::fillFootPointCloud(PointCloud2D::Ptr foot_pointcloud, pcl::PointNormal possible_foot_location)
+// Fill a point cloud with vertices of the foot on the ground around a possible
+// foot location
+void HullParameterDeterminer::fillFootPointCloud(
+    PointCloud2D::Ptr foot_pointcloud, pcl::PointNormal possible_foot_location)
 {
     foot_pointcloud->points.resize(4);
     foot_pointcloud->point.x = possible_foot_location.x - x_deviation_back;
