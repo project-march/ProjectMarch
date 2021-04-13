@@ -214,27 +214,31 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation(
 bool HullParameterDeterminer::isValidLocation(
     pcl::PointNormal possible_foot_location)
 {
+    // Less and larger than signs are swapped for the x coordinate as the
+    // positive x axis points in the backwards direction of the exoskeleton
     if (selected_obstacle_ == SelectedGait::stairs_up) {
-        // Less and larger than signs are swapped for the x coordinate
-        // as the positive x axis points in the backwards direction of the
-        // exoskeleton
+        // A possible foot location for the stairs gait is invalid if it not
+        // reachable by the stairs gait or the location does not offer support
+        // for the entire foot
         if (possible_foot_location.x < min_x_stairs
             && optimal_foot_location.x > max_x_stairs
             && possible_foot_location.z > min_z_stairs
-            && optimal_foot_location.z < max_z_stairs) {
-            if (entireFootCanBePlaced(possible_foot_location)) {
-                return true;
-            }
+            && optimal_foot_location.z < max_z_stairs
+            && entireFootCanBePlaced(possible_foot_location)) {
+            return true;
         }
-    } else {
-        ROS_ERROR_STREAM("optimalLocationIsValid method has not been "
-                         "implemented for obstacle "
-            << selected_obstacle_ << ". Returning false.");
-        return false;
     }
-    // If no check concludes that the location is valid, return that the
-    // location is invalid.
+}
+else
+{
+    ROS_ERROR_STREAM("optimalLocationIsValid method has not been "
+                     "implemented for obstacle "
+        << selected_obstacle_ << ". Returning false.");
     return false;
+}
+// If no check concludes that the location is valid, return that the
+// location is invalid.
+return false;
 }
 
 // Verify if there is support for the entire foot around the possible foot
