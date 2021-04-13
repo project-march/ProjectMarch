@@ -116,7 +116,7 @@ protected:
 
     // Verify if there is support for the entire foot around the possible foot
     // location
-    void entireFootCanBePlaced(pcl::PointNormal possible_foot_location);
+    bool entireFootCanBePlaced(pcl::PointNormal possible_foot_location);
 
     // Fill a point cloud with vertices of the foot on the ground around a
     // possible foot location

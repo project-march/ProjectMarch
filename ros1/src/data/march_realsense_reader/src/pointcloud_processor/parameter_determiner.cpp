@@ -239,7 +239,7 @@ bool HullParameterDeterminer::isValidLocation(
 
 // Verify if there is support for the entire foot around the possible foot
 // location
-bool HullParameterDeterminer::enitreFootCanBePlaced(
+bool HullParameterDeterminer::entireFootCanBePlaced(
     pcl::PointNormal possible_foot_location)
 {
     bool success = true;
