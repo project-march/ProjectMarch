@@ -1,4 +1,4 @@
-description: The MVI small walk, with the version 1 HAA movements of normal walking
+description: The MVI small walk, with the version 2 HAA movements of normal walking
 duration: 1100000000
 gait_type: walk_like
 joints:
@@ -16,13 +16,13 @@ joints:
     time_from_start: 1100000000
     velocity: -0.0
   left_hip_aa:
-  - position: -0.08729962
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: 0.0
+  - position: 0.08726646
     time_from_start: 550000000
     velocity: 0.0
-  - position: -0.08729962
+  - position: 0.0
     time_from_start: 1100000000
     velocity: -0.0
   left_hip_fe:
@@ -56,10 +56,16 @@ joints:
     time_from_start: 1100000000
     velocity: -0.0
   right_hip_aa:
-  - position: -0.08729962
+  - position: 0.0
     time_from_start: 0
     velocity: 0.0
-  - position: -0.08729962
+  - position: -0.05235988
+    time_from_start: 300000000
+    velocity: -0.20943951
+  - position: -0.05235988
+    time_from_start: 800000000
+    velocity: 0.20943951
+  - position: 0.0
     time_from_start: 1100000000
     velocity: -0.0
   right_hip_fe:
@@ -83,4 +89,4 @@ joints:
     time_from_start: 1100000000
     velocity: 0.0
 name: left_swing
-version: MVI_walksmall_leftswing_v1
+version: MVI_walksmall_leftswing_v2

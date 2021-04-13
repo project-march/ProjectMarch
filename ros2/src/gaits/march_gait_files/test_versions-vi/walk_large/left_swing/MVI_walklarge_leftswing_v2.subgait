@@ -1,4 +1,4 @@
-description: 'Large walking gait of MVI with the version 1 HAA movements of normal
+description: 'Large walking gait of MVI with the version 2 HAA movements of normal
   walking gait. '
 duration: 1200000000
 gait_type: walk_like
@@ -17,15 +17,15 @@ joints:
     time_from_start: 1200000000
     velocity: -0.0
   left_hip_aa:
-  - position: -0.08729962
-    time_from_start: 0
-    velocity: 0.0
   - position: 0.0
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.08726646
     time_from_start: 600000000
     velocity: 0.0
-  - position: -0.08729962
+  - position: 0.0
     time_from_start: 1200000000
-    velocity: 0.0
+    velocity: -0.0
   left_hip_fe:
   - position: -0.1667
     time_from_start: 0
@@ -57,10 +57,16 @@ joints:
     time_from_start: 1200000000
     velocity: -0.0
   right_hip_aa:
-  - position: -0.08729962
+  - position: 0.0
     time_from_start: 0
     velocity: -0.0
-  - position: -0.08729962
+  - position: -0.06108652
+    time_from_start: 300000000
+    velocity: -0.20943951
+  - position: -0.06108652
+    time_from_start: 900000000
+    velocity: 0.20943951
+  - position: 0.0
     time_from_start: 1200000000
     velocity: -0.0
   right_hip_fe:
@@ -84,4 +90,4 @@ joints:
     time_from_start: 1200000000
     velocity: 0.0
 name: left_swing
-version: MVI_walklarge_leftswing_v1
+version: MVI_walklarge_leftswing_v2
