@@ -296,10 +296,11 @@ bool HullParameterDeterminer::cropCloudToHullVector(
     bool success = true;
 
     PointCloud::Ptr remaining_cloud = boost::make_shared<PointCloud>();
-    remaining_cloud = input_cloud;
+    copyPointCloud(*input_cloud, *remaining_cloud);
+
     for (int hull_index = 0; hull_index < hull_vector_->size(); hull_index++) {
         PointCloud::Ptr elevated_cloud = boost::make_shared<PointCloud>();
-        success &= addZCoordinateToCloudFromPlaneCoefficients(remaining_cloud,
+        success &= setZCoordinateOfCloudFromPlaneCoefficients(remaining_cloud,
             plane_coefficients_vector_->at(hull_index), elevated_cloud);
 
         success &= cropCloudToHull(elevated_cloud, hull_vector_->at(hull_index),
@@ -319,8 +320,8 @@ bool HullParameterDeterminer::cropCloudToHullVector(
 
 // Elevate the 2D points so they have z coordinate as if they lie on the plane
 // of the hull
-bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
-    PointCloud2D::Ptr const input_cloud,
+bool HullParameterDeterminer::setZCoordinateOfCloudFromPlaneCoefficients(
+    PointCloud::Ptr const input_cloud,
     PlaneCoefficients::Ptr const plane_coefficients,
     PointCloud::Ptr elevated_cloud)
 {
@@ -330,7 +331,7 @@ bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
     for (pcl::PointXYZ& elevated_point : *elevated_cloud) {
         // using z = - (d + by + ax) / c from plane equation ax + by + cz + d =
         // 0
-        pcl::PointXY input_point = input_cloud->points[point_index];
+        pcl::PointXYZ input_point = input_cloud->points[point_index];
         elevated_point.x = input_point.x;
         elevated_point.y = input_point.y;
         elevated_point.z = -(plane_coefficients->values[3]

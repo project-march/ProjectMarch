@@ -32,7 +32,7 @@ region_creator:
 hull_finder:
   c_hull_finder:
     # If convex is set to false, find concave hulls.
-    convex: false
+    convex: true
     # Alpha governs the detail of concave hulls, smaller is more detail.
     alpha: 0.25
     hull_dimension: 2
