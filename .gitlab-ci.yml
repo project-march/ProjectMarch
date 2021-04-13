@@ -4,9 +4,9 @@ variables:
 stages:
   - Tag container
   - Build container
-  - Lint code
+# - Lint code
   - Build code
-  - Test code
+# - Test code
   - Static analysis on code
 
 image: registry.gitlab.com/project-march/march:$CI_COMMIT_BRANCH
