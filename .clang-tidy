@@ -1,6 +1,7 @@
 ---
+Checks:          '-*,portability-*'
 WarningsAsErrors: '*'
-HeaderFilterRegex: 'march.+'
-AnalyzeTemporaryDtors: false
+HeaderFilterRegex: ''
 FormatStyle:     webkit
 ...
+
