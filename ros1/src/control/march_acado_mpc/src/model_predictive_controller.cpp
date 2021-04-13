@@ -32,22 +32,22 @@ void ModelPredictiveController::init()
     // Initialize state array with zero
     std::fill(std::begin(acadoVariables.x), std::end(acadoVariables.x), 0.0);
 
-  // Initialize input array with zero
-  std::fill(std::begin(acadoVariables.u), std::end(acadoVariables.u), 0.0);
+    // Initialize input array with zero
+    std::fill(std::begin(acadoVariables.u), std::end(acadoVariables.u), 0.0);
 
-  // Initialize "running" and "end" reference array with zero
-  std::fill(std::begin(acadoVariables.y), std::end(acadoVariables.y), 0.0);
-  std::fill(std::begin(acadoVariables.yN), std::end(acadoVariables.yN), 0.0);
+    // Initialize "running" and "end" reference array with zero
+    std::fill(std::begin(acadoVariables.y), std::end(acadoVariables.y), 0.0);
+    std::fill(std::begin(acadoVariables.yN), std::end(acadoVariables.yN), 0.0);
 
-  // Initialize "running" and "end" weighting array with zero
-  std::fill(std::begin(acadoVariables.W), std::end(acadoVariables.W), 0.0);
-  std::fill(std::begin(acadoVariables.WN), std::end(acadoVariables.WN), 0.0);
+    // Initialize "running" and "end" weighting array with zero
+    std::fill(std::begin(acadoVariables.W), std::end(acadoVariables.W), 0.0);
+    std::fill(std::begin(acadoVariables.WN), std::end(acadoVariables.WN), 0.0);
 
-  // Current state feedback
-  setInitialState(x0);
+    // Current state feedback
+    setInitialState(x0);
 
-  // Assign the weighting matrix
-  assignWeightingMatrix(W_);
+    // Assign the weighting matrix
+    assignWeightingMatrix(W_);
 
     // Warm-up the solver
     acado_preparationStep();
@@ -94,12 +94,12 @@ void ModelPredictiveController::assignWeightingMatrix(std::vector<float> W)
 {
     // set the diagonal of the ACADO W matrix (state and input weights)
     for (int i = 0; i < ACADO_NY; ++i) {
-      acadoVariables.W[i*(ACADO_NY+1)] = W[i];
+        acadoVariables.W[i * (ACADO_NY + 1)] = W[i];
     }
 
     // Set the diagonal of the ACADO WN matrix (only state weights)
     for (int i = 0; i < ACADO_NYN; ++i) {
-      acadoVariables.WN[i*(ACADO_NYN+1)] = W[i];
+        acadoVariables.WN[i * (ACADO_NYN + 1)] = W[i];
     }
 }
 

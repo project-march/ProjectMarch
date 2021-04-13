@@ -81,13 +81,14 @@ public:
     void setMpcMsg(int joint_number);
 
 private:
-  /**
-   * @brief Retrieve the weights from the parameter server for a joint.
-   *        Weights are used for tuning the MPC
-   * @param joint_name Joint to retrieve weights for
-   * @return Returns a vector: The weight values belonging to the diagonal of the MPC weight matrix.
-   */
-  std::vector<float> getWeights(std::string joint_name);
+    /**
+     * @brief Retrieve the weights from the parameter server for a joint.
+     *        Weights are used for tuning the MPC
+     * @param joint_name Joint to retrieve weights for
+     * @return Returns a vector: The weight values belonging to the diagonal of
+     * the MPC weight matrix.
+     */
+    std::vector<float> getWeights(std::string joint_name);
 
     std::vector<hardware_interface::JointHandle>* joint_handles_ptr_;
 
