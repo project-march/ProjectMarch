@@ -4,10 +4,28 @@ from march_shared_msgs.srv import GetGaitParameters
 from march_utility.gait.subgait import Subgait
 from march_utility.gait.subgait_graph import SubgaitGraph
 from march_utility.utilities.duration import Duration
+from march_utility.utilities.dimensions import (
+    InterpolationDimensions,
+    amount_of_subgaits,
+    amount_of_parameters
+)
+from march_utility.exceptions.gait_exceptions import (
+    UnknownDimensionsError,
+    SubgaitInterpolationError,
+    WrongRealSenseConfigurationError
+)
 from rclpy.node import Node
 from urdf_parser_py import urdf
 
+
 class RealSenseGait(SetpointsGait):
+    SERVICE_TIMEOUT = 2.0  # secs
+    CAMERA_NAME_MAP = {
+        "front": GetGaitParameters.Request.CAMERA_FRONT,
+        "back": GetGaitParameters.Request.CAMERA_BACK,
+    }
+    REALSENSE_GAIT_MAP = {"stairs_up": GetGaitParameters.Request.STAIRS_UP}
+
     def __init__(
         self,
         gait_name,
@@ -15,61 +33,118 @@ class RealSenseGait(SetpointsGait):
         graph,
         node,
         selected_gait: str,
-        camera_to_use,
-        robot,
-        gait_directory,
-        subgait_version_map
+        camera_to_use: str,
+        subgaits_to_interpolate,
+        dimensions,
+        parameters,
     ):
         super(RealSenseGait, self).__init__(gait_name, subgaits, graph)
         self._node = node
         self._get_gait_parameters_service = node.create_client(
             srv_type=GetGaitParameters, srv_name="/camera/process_pointcloud"
         )
-        self.gait_directory = gait_directory
+        self.parameters = parameters
+        self.dimensions = dimensions
         self.selected_gait = self.realsense_gait_msg_from_string(selected_gait)
         self.camera_to_use = self.camera_msg_from_string(camera_to_use)
-        self.robot = robot
-        self.subgaits_to_interpolate = {}
-        for subgait_name in subgait_version_map:
-            self.subgaits_to_interpolate[subgait_name] = [
-                Subgait.from_name_and_version(robot, gait_directory, gait_name,
-                                              subgait_name, version) for version in
-                subgait_version_map[subgait_name]
-            ]
+        self.subgaits_to_interpolate = subgaits_to_interpolate
 
-    def realsense_gait_msg_from_string(self, gait_name: str):
-        mapping = {"stairs_up": GetGaitParameters.Request.STAIRS_UP}
-        return mapping[gait_name]
+    @classmethod
+    def from_yaml(
+        cls,
+        node: Node,
+        robot: urdf.Robot,
+        gait_name: str,
+        gait_config: dict,
+        gait_graph: dict,
+        gait_directory: str,
+    ):
+        graph = SubgaitGraph(gait_graph)
+        subgaits_to_interpolate = {}
+        try:
+            dimensions = InterpolationDimensions.from_integer(gait_config["dimensions"])
+            parameters = [float(param) for param in gait_config["default_parameters"]]
+            if len(parameters) != amount_of_parameters(dimensions):
+                raise WrongRealSenseConfigurationError(f"The amount of parameters in the "
+                                                   f"config file ({len(parameters)}), "
+                                                   f"does't match the dimensions")
+            selected_gait = gait_config["gait_type"]
+            camera_to_use = gait_config["camera_to_use"]
+            subgait_version_map = gait_config["subgaits"]
+            # Create subgaits to interpolate with
+            for subgait_name in subgait_version_map:
+                subgaits_to_interpolate[subgait_name] = [
+                    Subgait.from_name_and_version(
+                        robot, gait_directory, gait_name, subgait_name, version
+                    )
+                    for version in subgait_version_map[subgait_name]
+                ]
+                if len(subgaits_to_interpolate[subgait_name]) != amount_of_subgaits(dimensions):
+                    raise SubgaitInterpolationError(
+                        f"The amount of subgaits in the "
+                        f"realsense version map "
+                        f"{len(subgaits_to_interpolate[subgait_name])}"
+                        f"doesn't match the amount of "
+                        f"dimensions "
+                        f"{amount_of_subgaits(dimensions)} "
+                        f"for subgait {subgait_name}"
+                    )
+            node.get_logger().info("done creating the subgaits to interpolate")
+            node.get_logger().info(f"Creating the new subgaits with {parameters}")
+            subgaits = dict()
+            for subgait_name in subgait_version_map:
+                if subgait_name not in ("start", "end"):
+                    node.get_logger().info(f"interpolating {subgait_name}")
+                    subgaits[subgait_name] = Subgait.interpolate_n_subgaits(
+                        dimensions=dimensions,
+                        subgaits=subgaits_to_interpolate[subgait_name],
+                        parameters=parameters,
+                        use_foot_position=True,
+                    )
 
-    def camera_msg_from_string(self, camera_name: str):
-        mapping = {"front": GetGaitParameters.Request.CAMERA_FRONT,
-                   "back": GetGaitParameters.Request.CAMERA_BACK}
-        return mapping[camera_name]
+            node.get_logger().info("done creating the new subgaits")
+        except KeyError as e:
+            node.get_logger().error(
+                f"Not all information to create realsense gait "
+                f"{gait_name} was available"
+            )
+            raise WrongRealSenseConfigurationError(
+                f"There was a missing key in gait {gait_name}: {e}"
+            )
+        return cls(
+            gait_name,
+            subgaits,
+            graph,
+            node,
+            selected_gait,
+            camera_to_use,
+            subgaits_to_interpolate,
+            dimensions,
+            parameters,
+        )
+
+    @classmethod
+    def realsense_gait_msg_from_string(cls, gait_name: str):
+        return cls.REALSENSE_GAIT_MAP[gait_name]
+
+    @classmethod
+    def camera_msg_from_string(cls, camera_name: str):
+        return cls.CAMERA_NAME_MAP[camera_name]
 
     def start(self):
         self._node.get_logger().info("Starting the realsense gait")
-        request = GetGaitParameters.Request(
-            selected_gait=self.selected_gait, camera_to_use=self.camera_to_use,
-            frame_id_to_transform_to="foot_right"
-        )
 
-        self._node.get_logger().info("Make the service call for the realsense gait")
-        if self._get_gait_parameters_service.wait_for_service(timeout_sec=3.0):
-            gait_parameters_response = self._get_gait_parameters_service.call(request)
-        else:
-            self._node.get_logger().info("Timeout")
-            return None
-
-        self._node.get_logger().info(f"Received response: {gait_parameters_response.success}")
+        gait_parameters_response = self.make_realsense_service_call()
         if not gait_parameters_response.success:
             self._node.get_logger().logwarn(
                 "No gait parameters were found, gait will not be started"
             )
             return None
 
-        self.update_subgait_versions_from_parameters(
+        self.update_parameters(
             gait_parameters_response.gait_parameters
         )
+        self.update_subgait_versions()
         self._node.get_logger().info(f"Done updating subgait versions")
 
         self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
@@ -81,206 +156,45 @@ class RealSenseGait(SetpointsGait):
 
         return self._current_subgait.to_joint_trajectory_msg()
 
-    def update_subgait_versions_from_parameters(self, gait_parameters: GaitParameters):
-        raise NotImplementedError(
-            "Any RealSense gait implementation should specify "
-            "an update function to update all subgaits"
+    def make_realsense_service_call(self) -> GetGaitParameters.Response:
+        request = GetGaitParameters.Request(
+            selected_gait=self.selected_gait,
+            camera_to_use=self.camera_to_use,
+            frame_id_to_transform_to="foot_right",
         )
 
+        self._node.get_logger().info("Make the service call for the realsense gait")
+        if self._get_gait_parameters_service.wait_for_service(timeout_sec=self.SERVICE_TIMEOUT):
+            gait_parameters_response = self._get_gait_parameters_service.call(request)
+        else:
+            self._node.get_logger().info("Timeout")
+            return None
 
-class RealSense2DGait(RealSenseGait):
-    def __init__(
-        self,
-        gait_name: str,
-        subgaits,
-        graph,
-        node: Node,
-        selected_gait: str,
-        camera_to_use: str,
-        robot: urdf.Robot,
-        subgait_versions: dict,
-        gait_directory: str,
-    ):
-        super(RealSense2DGait, self).__init__(
-            gait_name,
-            subgaits,
-            graph,
-            node,
-            selected_gait,
-            camera_to_use,
-            robot,
-            gait_directory,
-            subgait_versions
+        self._node.get_logger().info(
+            f"Received response: {gait_parameters_response.success}"
         )
-        self.first_parameter = 0.0  # For stairs, this is depth
-        self.second_parameter = 0.0  # For stairs, this is height
-        self.subgait_versions = subgait_versions
-        self.dependents = ["realsense_stairs"]
 
-    def update_subgait_versions_from_parameters(self, gait_parameters: GaitParameters):
-        self.first_parameter = gait_parameters.first_parameter
-        self.second_parameter = gait_parameters.second_parameter
+        return gait_parameters_response
 
+    def update_subgait_versions(self):
         new_subgaits = {}
         for subgait_name in self.subgaits.keys():
-            parameter_list = [self.first_parameter, self.second_parameter]
-            new_subgaits[subgait_name] = \
-                Subgait.interpolate_four_subgaits(
-                subgaits = self.subgaits_to_interpolate[subgait_name],
-                parameters=parameter_list,
+            new_subgaits[subgait_name] = Subgait.interpolate_n_subgaits(
+                dimensions=self.dimensions,
+                subgaits=self.subgaits_to_interpolate[subgait_name],
+                parameters=self.parameters,
                 use_foot_position=True,
-                node=self._node,
             )
-        self._node.get_logger().info(f"Updated subgait versions to {new_subgaits}")
         self.set_subgaits(new_subgaits)
+        self._node.get_logger().info(f"Updated subgait versions")
 
-    @classmethod
-    def from_yaml(
-        cls,
-        node: Node,
-        robot: urdf.Robot,
-        gait_name: str,
-        gait_config: dict,
-        gait_graph: dict,
-        gait_directory: str,
-    ):
-        try:
-            selected_gait = gait_config["obstacle"]
-            camera_to_use = gait_config["camera_to_use"]
-            subgait_version_map = gait_config["subgaits"]
-            graph = SubgaitGraph(gait_graph)
-            subgaits = dict(
-                [
-                    (
-                        name,
-                        Subgait.from_four_names_and_versions_interpolated(
-                            robot,
-                            version_path_list=subgait_version_map[name],
-                            parameter_list=[1, 1],
-                            gait_directory=gait_directory,
-                            gait_name=gait_name,
-                            subgait_name=name,
-                            use_foot_position=True,
-                            node=node
-                        ),
-                    )
-                    for name in subgait_version_map
-                    if name not in ("start", "end")
-                ]
-            )
-            subgait_versions = gait_config["subgaits"]
-        except KeyError as e:
-            node.get_logger().error(
-                f"Not all information to create realsense gait "
-                f"{gait_name} was available"
-            )
-        return cls(
-            gait_name,
-            subgaits,
-            graph,
-            node,
-            selected_gait,
-            camera_to_use,
-            robot,
-            subgait_versions,
-            gait_directory,
-        )
-
-
-class RealSense1DGait(RealSenseGait):
-    def __init__(
-        self,
-        gait_name: str,
-        subgaits,
-        graph,
-        node: Node,
-        obstacle,
-        camera_to_use,
-        robot,
-        subgait_versions: dict,
-        gait_directory: str,
-    ):
-        super(RealSense1DGait, self).__init__(
-            gait_name,
-            subgaits,
-            graph,
-            node,
-            obstacle,
-            camera_to_use,
-            robot,
-            gait_directory,
-            subgait_versions,
-        )
-        self.parameter = 0.0  # For ramp for example, this is steepness of the ramp
-        self.subgait_versions = subgait_versions
-
-    def update_subgait_versions_from_parameters(self, gait_parameters: GaitParameters):
-        self.first_parameter = gait_parameters.first_parameter
-        self.second_parameter = gait_parameters.second_parameter
-
-        for subgait_name in self.subgaits.keys():
-            version_path_list = self.subgait_versions[subgait_name]
-            self.subgaits[
-                subgait_name
-            ] = Subgait.from_two_names_and_versions_interpolated(
-                self.robot,
-                first_file_name=version_path_list[0],
-                second_file_name=version_path_list[1],
-                parameter=self.parameter,
-                gait_directory=self.gait_directory,
-                gait_name=self.gait_name,
-                subgait_name=subgait_name,
-                use_foot_position=True,
-            )
-
-    @classmethod
-    def from_yaml(
-        cls,
-        node: Node,
-        robot: urdf.Robot,
-        gait_name: str,
-        gait_config: dict,
-        gait_graph: dict,
-        gait_directory: str,
-    ):
-        try:
-            selected_gait = gait_config["obstacle"]
-            camera_to_use = gait_config["camera_to_use"]
-            subgait_version_map = gait_config["subgaits"]
-            graph = SubgaitGraph(gait_graph)
-            subgaits = dict(
-                [
-                    (
-                        name,
-                        Subgait.from_two_names_and_versions_interpolated(
-                            robot,
-                            first_file_name=subgait_version_map[name][0],
-                            second_file_name=subgait_version_map[name][1],
-                            parameter=0.5,
-                            gait_directory=gait_directory,
-                            gait_name=gait_name,
-                            subgait_name=name,
-                            use_foot_position=True,
-                        ),
-                    )
-                    for name in subgait_version_map
-                    if name not in ("start", "end")
-                ]
-            )
-            subgait_versions = gait_config["subgaits"]
-        except KeyError as e:
-            node.get_logger().error(
-                f"Not all information to create realsense gait "
-                f"{gait_name} was available"
-            )
-        return cls(
-            gait_name,
-            subgaits,
-            graph,
-            node,
-            selected_gait,
-            camera_to_use,
-            robot,
-            subgait_versions,
-            gait_directory,
-        )
+    def update_parameters(self, gait_parameters: GaitParameters):
+        if self.dimensions == InterpolationDimensions.ONE_DIM:
+            self.parameters = [gait_parameters.first_parameter]
+        elif self.dimensions == InterpolationDimensions.TWO_DIM:
+            self.parameters = [
+                gait_parameters.first_parameter,
+                gait_parameters.second_parameter,
+            ]
+        else:
+            raise UnknownDimensionsError(self.dimensions)

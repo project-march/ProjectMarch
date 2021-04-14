@@ -75,3 +75,22 @@ class SubgaitInterpolationError(Exception):
             msg = "An error occurred while trying to merge two subgaits."
 
         super(SubgaitInterpolationError, self).__init__(msg)
+
+
+class UnknownDimensionsError(Exception):
+    def __init__(self, dimensions):
+        msg = (
+            f"Unknwon dimensions, should be from InterpolationDimensions enum, "
+            f"but was: {dimensions}"
+        )
+        super(UnknownDimensionsError, self).__init__(msg)
+
+
+class WrongRealSenseConfigurationError(Exception):
+    def __init__(self, msg: str = None):
+        """Class to raise an error when there was a mistake in the
+        realsense_gaits.yaml."""
+        if msg is None:
+            msg = "An error occurred while trying to read out the realsense config."
+
+        super(WrongRealSenseConfigurationError, self).__init__(msg)
