@@ -288,7 +288,6 @@ class GaitStateMachine(object):
 
         If not, issue a warning. This will only be checked when transitioning from idle to gait state
         """
-        self._gait_selection.get_logger().info(f"Begin foot of {self._current_gait}")
         if (
             "right" in self._current_gait.subgait_name
             and self._force_right_foot > self._force_left_foot

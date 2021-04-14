@@ -319,7 +319,6 @@ class GaitSelection(Node):
         gaits = {}
 
         for gait in self._gait_version_map:
-            self.get_logger().info(f"Loading gait {gait}")
             gaits[gait] = SetpointsGait.from_file(
                 gait, self._gait_directory, self._robot, self._gait_version_map
             )
@@ -364,7 +363,6 @@ class GaitSelection(Node):
                 gait_directory=self._gait_directory,
             )
             gaits[gait_name] = gait
-            self.get_logger().info(f"Done loading {gait_name}")
 
     def _load_realsense_configuration(self):
         with open(self._realsense_yaml, "r") as realsense_config_file:

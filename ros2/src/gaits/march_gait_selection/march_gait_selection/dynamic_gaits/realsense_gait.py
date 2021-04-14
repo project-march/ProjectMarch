@@ -152,7 +152,6 @@ class RealSenseGait(SetpointsGait):
             frame_id_to_transform_to="foot_right",
         )
 
-        self._node.get_logger().info("Make the service call for the realsense gait")
         if self._get_gait_parameters_service.wait_for_service(
             timeout_sec=self.SERVICE_TIMEOUT
         ):
