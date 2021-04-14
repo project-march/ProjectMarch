@@ -95,18 +95,18 @@ protected:
 
     // Elevate the 2D points so they have z coordinate as if they lie on the
     // plane of the hull
-    bool setZCoordinateOfCloudFromPlaneCoefficients(
-        PointCloud::Ptr input_cloud,
+    bool setZCoordinateOfCloudFromPlaneCoefficients(PointCloud::Ptr input_cloud,
         PlaneCoefficients::Ptr plane_coefficients,
         PointCloud::Ptr elevated_cloud);
 
     // Remove all points from a cloud which do not fall in the hull
-    bool cropCloudToHull(
-        PointCloud::Ptr elevated_cloud, Hull::Ptr hull, Polygon polygon, PointCloud::Ptr remaining_cloud);
+    bool cropCloudToHull(PointCloud::Ptr elevated_cloud, Hull::Ptr hull,
+        Polygon polygon, PointCloud::Ptr cropped_cloud,
+        PointCloud::Ptr remaining_cloud);
 
-    // Add normals to the elevated cloud which correspond to the normal vector
-    // of the plane
-    bool addNormalToCloudFromPlaneCoefficients(PointCloud::Ptr elevated_cloud,
+    // Add normals to the cropped and elevated cloud which correspond to the
+    // normal vector of the plane
+    bool addNormalToCloudFromPlaneCoefficients(PointCloud::Ptr cropped_cloud,
         PlaneCoefficients::Ptr plane_coefficients,
         PointNormalCloud::Ptr elevated_cloud_with_normals);
 

@@ -296,23 +296,37 @@ bool HullParameterDeterminer::cropCloudToHullVector(
     bool success = true;
 
     PointCloud::Ptr remaining_cloud = boost::make_shared<PointCloud>();
-    copyPointCloud(*input_cloud, *remaining_cloud);
+    pcl::copyPointCloud(*input_cloud, *remaining_cloud);
 
     for (int hull_index = 0; hull_index < hull_vector_->size(); hull_index++) {
+        ROS_WARN_STREAM(
+            "remaining cloud points" << remaining_cloud->points.size());
+
         PointCloud::Ptr elevated_cloud = boost::make_shared<PointCloud>();
         success &= setZCoordinateOfCloudFromPlaneCoefficients(remaining_cloud,
             plane_coefficients_vector_->at(hull_index), elevated_cloud);
 
+        PointCloud::Ptr cropped_cloud = boost::make_shared<PointCloud>();
+        PointCloud::Ptr remaining_cloud = boost::make_shared<PontCloud>();
         success &= cropCloudToHull(elevated_cloud, hull_vector_->at(hull_index),
-            polygon_vector_->at(hull_index), remaining_cloud);
+            polygon_vector_->at(hull_index), cropped_cloud, remaining_cloud);
+
+        ROS_WARN_STREAM(
+            "elevated cloud points" << elevated_cloud->points.size());
 
         PointNormalCloud::Ptr elevated_cloud_with_normals
             = boost::make_shared<PointNormalCloud>();
-        success &= addNormalToCloudFromPlaneCoefficients(elevated_cloud,
+        success &= addNormalToCloudFromPlaneCoefficients(cropped_cloud,
             plane_coefficients_vector_->at(hull_index),
             elevated_cloud_with_normals);
 
         *output_cloud += *elevated_cloud_with_normals;
+
+        // If there are no more points in the remaining cloud,
+        // all points have been cropped and the method can return its result
+        if (remaining_cloud->points.size() == 0) {
+            return success;
+        }
     }
 
     return success;
@@ -347,21 +361,18 @@ bool HullParameterDeterminer::setZCoordinateOfCloudFromPlaneCoefficients(
 }
 
 // Remove all points from a cloud which do not fall in the hull
-bool HullParameterDeterminer::cropCloudToHull(PointCloud::Ptr elevated_cloud,
-    const Hull::Ptr hull, const Polygon polygon,
+bool HullParameterDeterminer::cropCloudToHull(
+    PointCloud::Ptr const elevated_cloud, const Hull::Ptr hull,
+    const Polygon polygon, PointCloud::Ptr cropped_cloud,
     PointCloud::Ptr remaining_cloud)
 {
-    if (elevated_cloud->points.size() == 0) {
-        ROS_WARN_STREAM("The cloud to be cropped in the "
-                        "HullParameterDeterminer contains no points.");
-        return false;
-    }
+    pcl::PointIndices::Ptr outliers(new pcl::PointIndices());
     pcl::CropHull<pcl::PointXYZ> crop_filter;
     crop_filter.setInputCloud(elevated_cloud);
     crop_filter.setHullCloud(hull);
     crop_filter.setHullIndices(polygon);
     crop_filter.setDim(2);
-    crop_filter.filter(*elevated_cloud);
+    crop_filter.filter(*cropped_cloud);
     crop_filter.setCropOutside(false);
     crop_filter.filter(*remaining_cloud);
     return true;
