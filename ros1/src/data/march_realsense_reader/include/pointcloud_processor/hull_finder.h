@@ -1,11 +1,11 @@
 #ifndef MARCH_HULL_FINDER_H
 #define MARCH_HULL_FINDER_H
 
+#include <march_realsense_reader/pointcloud_parametersConfig.h>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
 #include <string>
-#include <march_realsense_reader/pointcloud_parametersConfig.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -32,10 +32,12 @@ public:
 
     virtual ~HullFinder() {};
 
-    /** This function is called upon whenever a parameter from config is changed,
-     * including when launching the node
+    /** This function is called upon whenever a parameter from config is
+     * changed, including when launching the node
      */
-    virtual void readParameters(march_realsense_reader::pointcloud_parametersConfig &config) = 0;
+    virtual void readParameters(
+        march_realsense_reader::pointcloud_parametersConfig& config)
+        = 0;
 
 protected:
     PointCloud::Ptr pointcloud_;
@@ -59,7 +61,8 @@ public:
         boost::shared_ptr<HullVector> hull_vector,
         boost::shared_ptr<PolygonVector> polygon_vector) override;
 
-    void readParameters(march_realsense_reader::pointcloud_parametersConfig &config) override;
+    void readParameters(
+        march_realsense_reader::pointcloud_parametersConfig& config) override;
 
 protected:
     // Convert a region into a convex or concave hull

@@ -43,7 +43,9 @@ public:
      */
     void pointcloudCallback(const sensor_msgs::PointCloud2 pointCloud2) {};
 
-    void readConfigCb(march_realsense_reader::pointcloud_parametersConfig &config, uint32_t level);
+    void readConfigCb(
+        march_realsense_reader::pointcloud_parametersConfig& config,
+        uint32_t level);
 
     // Publishes the pointcloud on a topic for visualisation in rviz or furter
     // use
@@ -76,7 +78,6 @@ public:
         PointNormalCloud::Ptr const possible_foot_locations,
         pcl::PointNormal const optimal_foot_location,
         visualization_msgs::Marker& marker_list);
-
 
 private:
     PointCloud last_pointcloud_;

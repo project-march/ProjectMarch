@@ -1,4 +1,5 @@
 #include <ctime>
+#include <dynamic_reconfigure/server.h>
 #include <march_realsense_reader/realsense_reader.h>
 #include <march_shared_msgs/GetGaitParameters.h>
 #include <pcl/point_types.h>
@@ -10,9 +11,6 @@
 #include <pointcloud_processor/region_creator.h>
 #include <ros/console.h>
 #include <ros/ros.h>
-#include <dynamic_reconfigure/server.h>
-
-
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -37,11 +35,11 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     preprocessor_ = std::make_unique<NormalsPreprocessor>(debugging_);
     region_creator_ = std::make_unique<RegionGrower>(debugging_);
     hull_finder_ = std::make_unique<CHullFinder>(debugging_);
-    parameter_determiner_ = std::make_unique<HullParameterDeterminer>(debugging_);
+    parameter_determiner_
+        = std::make_unique<HullParameterDeterminer>(debugging_);
 
     debugging_ = true;
-    if (debugging_)
-    {
+    if (debugging_) {
         ROS_DEBUG(
             "Realsense reader started with debugging, all intermediate result "
             "steps will be published and more information given in console, but"
@@ -66,15 +64,18 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     }
 }
 
-void RealSenseReader::readConfigCb(march_realsense_reader::pointcloud_parametersConfig &config, uint32_t level)
+void RealSenseReader::readConfigCb(
+    march_realsense_reader::pointcloud_parametersConfig& config, uint32_t level)
 {
-    ROS_DEBUG("Changed march_realsense_parameters with dynamic reconfiguration");
+    ROS_DEBUG(
+        "Changed march_realsense_parameters with dynamic reconfiguration");
 
     debugging_ = config.debug;
     /*if (debugging_) {
-      ROS_DEBUG("Realsense reader started with debugging, all intermediate result steps will be published "
-                "and more information given in console, but this might slow the process, this can be turned "
-                "off in the config file.");
+      ROS_DEBUG("Realsense reader started with debugging, all intermediate
+    result steps will be published " "and more information given in console, but
+    this might slow the process, this can be turned " "off in the config
+    file.");
     }*/
 
     preprocessor_->readParameters(config);

@@ -28,9 +28,9 @@ SimplePreprocessor::SimplePreprocessor(bool debugging)
     tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
 }
 
-void SimplePreprocessor::readParameters(march_realsense_reader::pointcloud_parametersConfig &config)
+void SimplePreprocessor::readParameters(
+    march_realsense_reader::pointcloud_parametersConfig& config)
 {
-
 }
 
 // Create a normals preprocessor with the ability to transform based on normal
@@ -117,25 +117,29 @@ bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud,
     return success;
 }
 
-void NormalsPreprocessor::readParameters(march_realsense_reader::pointcloud_parametersConfig &config) {
-  // Downsampling parameters
-  voxel_grid_filter = config.preprocessor_downsampling_voxel_grid_filter;
-  leaf_size = config.preprocessor_downsampling_leaf_size;
-  random_filter = config.preprocessor_downsampling_random_filter;
-  remaining_points = config.preprocessor_downsampling_remainig_points;
+void NormalsPreprocessor::readParameters(
+    march_realsense_reader::pointcloud_parametersConfig& config)
+{
+    // Downsampling parameters
+    voxel_grid_filter = config.preprocessor_downsampling_voxel_grid_filter;
+    leaf_size = config.preprocessor_downsampling_leaf_size;
+    random_filter = config.preprocessor_downsampling_random_filter;
+    remaining_points = config.preprocessor_downsampling_remainig_points;
 
-  // Distance Filter parameters
-  distance_threshold = config.preprocessor_distance_filter_threshold;
+    // Distance Filter parameters
+    distance_threshold = config.preprocessor_distance_filter_threshold;
 
-  // Normal Estimation parameters
-  use_tree_search_method = config.preprocessor_normal_estimation_use_tree_search_method;
-  number_of_neighbours = config.preprocessor_normal_estimation_number_of_neighbours;
-  search_radius = config.preprocessor_normal_estimation_search_radius;
+    // Normal Estimation parameters
+    use_tree_search_method
+        = config.preprocessor_normal_estimation_use_tree_search_method;
+    number_of_neighbours
+        = config.preprocessor_normal_estimation_number_of_neighbours;
+    search_radius = config.preprocessor_normal_estimation_search_radius;
 
-  // Normal filter parameters
-  allowed_length_x = config.preprocessor_normal_filter_allowed_length_x;
-  allowed_length_y = config.preprocessor_normal_filter_allowed_length_y;
-  allowed_length_z = config.preprocessor_normal_filter_allowed_length_z;
+    // Normal filter parameters
+    allowed_length_x = config.preprocessor_normal_filter_allowed_length_x;
+    allowed_length_y = config.preprocessor_normal_filter_allowed_length_y;
+    allowed_length_z = config.preprocessor_normal_filter_allowed_length_z;
 }
 
 // Downsample the number of points in the pointcloud to have a more workable

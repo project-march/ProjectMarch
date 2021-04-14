@@ -30,19 +30,19 @@ using GaitParameters = march_shared_msgs::GaitParameters;
 ParameterDeterminer::ParameterDeterminer(bool debugging)
     : debugging_ { debugging }
 {
-
 }
 
 // Construct a basic HullParameterDeterminer class
 HullParameterDeterminer::HullParameterDeterminer(bool debugging)
     : ParameterDeterminer(debugging)
 {
-
 }
 
-void HullParameterDeterminer::readParameters(march_realsense_reader::pointcloud_parametersConfig &config)
+void HullParameterDeterminer::readParameters(
+    march_realsense_reader::pointcloud_parametersConfig& config)
 {
-    number_of_optional_foot_locations = config.parameter_determiner_foot_locations;
+    number_of_optional_foot_locations
+        = config.parameter_determiner_foot_locations;
 
     min_x_stairs = config.parameter_determiner_stairs_locations_min_x;
     max_x_stairs = config.parameter_determiner_stairs_locations_max_x;
@@ -50,8 +50,10 @@ void HullParameterDeterminer::readParameters(march_realsense_reader::pointcloud_
     max_z_stairs = config.parameter_determiner_stairs_locations_max_z;
     y_location = config.parameter_determiner_stairs_locations_y;
 
-    general_most_desirable_location_is_mid = config.parameter_determiner_most_desirable_loc_mid;
-    general_most_desirable_location_is_small = config.parameter_determiner_most_desirable_loc_small;
+    general_most_desirable_location_is_mid
+        = config.parameter_determiner_most_desirable_loc_mid;
+    general_most_desirable_location_is_small
+        = config.parameter_determiner_most_desirable_loc_small;
 }
 
 /** This function takes in a pointcloud with matching normals and
