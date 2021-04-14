@@ -14,16 +14,15 @@ from march_utility.utilities.node_utils import get_robot_urdf
 from march_utility.utilities.duration import Duration
 from rclpy.exceptions import ParameterNotDeclaredException
 from rclpy.node import Node
+from march_utility.utilities.dimensions import InterpolationDimensions
 from std_msgs.msg import String
 from std_srvs.srv import Trigger
 from urdf_parser_py import urdf
 
 from march_utility.utilities.node_utils import get_robot_urdf
-from march_gait_selection.dynamic_gaits.realsense_gait import (
-    RealSense1DGait,
-    RealSense2DGait,
-)
+from march_gait_selection.dynamic_gaits.realsense_gait import RealSenseGait
 from march_gait_selection.state_machine.setpoints_gait import SetpointsGait
+
 
 NODE_NAME = "gait_selection"
 
@@ -349,59 +348,23 @@ class GaitSelection(Node):
             )
 
     def _load_realsense_gaits(self, gaits):
-        self._load_realsense_1d_gaits(gaits)
-        self._load_realsense_2d_gaits(gaits)
-
-    def _load_realsense_1d_gaits(self, gaits):
-        try:
-            realsense_1d_gaits = self._realsense_gait_version_map["1_dimensions"]
-        except KeyError:
-            self.get_logger().info("No 1_dimensions key in the realsense_gaits.yaml")
-            realsense_1d_gaits = []
-        for gait_name in realsense_1d_gaits:
-            self.get_logger().info(f"Loading realsense 1d gait {gait_name}")
+        for gait_name in self._realsense_gait_version_map:
             gait_folder = gait_name
             gait_path = os.path.join(
                 self._gait_directory, gait_folder, gait_name + ".gait"
             )
             with open(gait_path, "r") as gait_file:
                 gait_graph = yaml.load(gait_file, Loader=yaml.SafeLoader)["subgaits"]
-
-            gait = RealSense1DGait.from_yaml(
+            gait = RealSenseGait.from_yaml(
                 node=self,
                 robot=self._robot,
                 gait_name=gait_name,
-                gait_config=realsense_1d_gaits[gait_name],
+                gait_config=self._realsense_gait_version_map[gait_name],
                 gait_graph=gait_graph,
                 gait_directory=self._gait_directory,
             )
-            gaits[gait.gait_name] = gait
-
-    def _load_realsense_2d_gaits(self, gaits):
-        try:
-            realsense_2d_gaits = self._realsense_gait_version_map["2_dimensions"]
-        except KeyError:
-            self.get_logger().info("No 2_dimensions key in the realsense_gaits.yaml")
-            realsense_2d_gaits = []
-        for gait_name in realsense_2d_gaits:
-            self.get_logger().info(f"Loading realsense 2d gait {gait_name}")
-            gait_folder = gait_name
-            gait_path = os.path.join(
-                self._gait_directory, gait_folder, gait_name + ".gait"
-            )
-            self.get_logger().info(f"Gait path found: ")
-            with open(gait_path, "r") as gait_file:
-                gait_graph = yaml.load(gait_file, Loader=yaml.SafeLoader)["subgaits"]
-
-            gait = RealSense2DGait.from_yaml(
-                node=self,
-                robot=self._robot,
-                gait_name=gait_name,
-                gait_config=realsense_2d_gaits[gait_name],
-                gait_graph=gait_graph,
-                gait_directory=self._gait_directory,
-            )
-            gaits[gait.gait_name] = gait
+            gaits[gait_name] = gait
+            self.get_logger().info(f"Done loading {gait_name}")
 
     def _load_realsense_configuration(self):
         with open(self._realsense_yaml, "r") as realsense_config_file:

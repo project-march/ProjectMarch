@@ -1,46 +1,67 @@
 # All realsense gaits that will be parameterized on 2 dimensions, this will generally
 # be done by first parameterizing the 1st with the 2nd & 3rd with the 4th using the
 # depth parameter and then the two created subgaits with the height pararmeter
-2_dimensions:
-  realsense_stairs_up:
-    obstacle: stairs_up
-    camera_to_use: front
-    default_parameters:
-    - 0.5
-    - 0.5
-    subgaits:
-      right_open:
-        - MVI_stairsup_rightopen_low_undeep
-        - MVI_stairsup_rightopen_low_deep
-        - MVI_stairsup_rightopen_high_undeep
-        - MVI_stairsup_rightopen_high_deep
-      left_swing:
-        - MVI_stairsup_leftswing_low_undeep
-        - MVI_stairsup_leftswing_low_deep
-        - MVI_stairsup_leftswing_high_undeep
-        - MVI_stairsup_leftswing_high_deep
-      right_swing:
-        - MVI_stairsup_rightswing_low_undeep
-        - MVI_stairsup_rightswing_low_deep
-        - MVI_stairsup_rightswing_high_undeep
-        - MVI_stairsup_rightswing_high_deep
-      left_close:
-        - MVI_stairsup_leftclose_low_undeep
-        - MVI_stairsup_leftclose_low_deep
-        - MVI_stairsup_leftclose_high_undeep
-        - MVI_stairsup_leftclose_high_deep
-      right_close:
-        - MVI_stairsup_rightclose_low_undeep
-        - MVI_stairsup_rightclose_low_deep
-        - MVI_stairsup_rightclose_high_undeep
-        - MVI_stairsup_rightclose_high_deep
 
+realsense_stairs_up_single_step:
+  # The gait type must match an available gait type in GetGaitParameters.srv
+  gait_type: stairs_up
+  camera_to_use: front
+  dimensions: 2
+  default_parameters:
+  - 0.5
+  - 0.5
+  subgaits:
+    right_open:
+      - MVI_stairsup_rightopen_low_undeep
+      - MVI_stairsup_rightopen_low_deep
+      - MVI_stairsup_rightopen_high_undeep
+      - MVI_stairsup_rightopen_high_deep
+    left_close:
+      - MVI_stairsup_leftclose_low_undeep
+      - MVI_stairsup_leftclose_low_deep
+      - MVI_stairsup_leftclose_high_undeep
+      - MVI_stairsup_leftclose_high_deep
+realsense_stairs_up:
+  gait_type: stairs_up
+  camera_to_use: front
+  dimensions: 2
+  default_parameters:
+  - 1.0
+  - 1.0
+  subgaits:
+    right_open:
+      - MVI_stairsup_rightopen_low_undeep
+      - MVI_stairsup_rightopen_low_deep
+      - MVI_stairsup_rightopen_high_undeep
+      - MVI_stairsup_rightopen_high_deep
+    left_swing:
+      - MVI_stairsup_leftswing_low_undeep
+      - MVI_stairsup_leftswing_low_deep
+      - MVI_stairsup_leftswing_high_undeep
+      - MVI_stairsup_leftswing_high_deep
+    right_swing:
+      - MVI_stairsup_rightswing_low_undeep
+      - MVI_stairsup_rightswing_low_deep
+      - MVI_stairsup_rightswing_high_undeep
+      - MVI_stairsup_rightswing_high_deep
+    left_close:
+      - MVI_stairsup_leftclose_low_undeep
+      - MVI_stairsup_leftclose_low_deep
+      - MVI_stairsup_leftclose_high_undeep
+      - MVI_stairsup_leftclose_high_deep
+    right_close:
+      - MVI_stairsup_rightclose_low_undeep
+      - MVI_stairsup_rightclose_low_deep
+      - MVI_stairsup_rightclose_high_undeep
+      - MVI_stairsup_rightclose_high_deep
 
-# EXAMPLE FOR A FUTURE 1 dimension gait
-#  1_dimensions:
+# EXAMPLE for future 1 dimension gaits that are coupled (implementation for coupled
+#  will be added to realsense gait later)
 #    realsense_sit:
-#      obstacle: sit
+#      gait: sit
 #      camera_to_use: back
+#      default_parameters:
+#       - 0.5
 #      subgaits:
 #        sit_down:
 #        - MVI_sit_down_low_v1
@@ -50,3 +71,16 @@
 #        - MVI_sit_home_high_v1
 #      responsible_for:
 #      - realsense_stand
+#    realsense_stand:
+#      gait: sit
+#      camera_to_use: back
+#      default_parameters:
+#      - 0.5
+#      subgaits:
+#        prepare_stand_up:
+#        - MVI_prepare_stand_up_low
+#        - MVI_prepare_stand_up_high
+#        stand_up:
+#        - MVI_stand_up_low
+#        - MVI_stand_up_high
+#      dependent: True
