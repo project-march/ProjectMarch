@@ -1,25 +1,22 @@
 #include "pointcloud_processor/region_creator.h"
-#include "yaml-cpp/yaml.h"
 #include <ctime>
 #include <pcl/search/kdtree.h>
 #include <pcl/search/search.h>
 #include <ros/ros.h>
-#include <utilities/yaml_utilities.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using RegionVector = std::vector<pcl::PointIndices>;
 
 // Construct a basic RegionCreator class
-RegionCreator::RegionCreator(YAML::Node config_tree, bool debugging)
-    : config_tree_ { config_tree }
-    , debugging_ { debugging }
+RegionCreator::RegionCreator(bool debugging)
+    : debugging_ { debugging }
 {
 }
 
 // Construct a basic CHullFinder class
-RegionGrower::RegionGrower(YAML::Node config_tree, bool debugging)
-    : RegionCreator(config_tree, debugging)
+RegionGrower::RegionGrower(bool debugging)
+    : RegionCreator(debugging)
 
 {
 
@@ -101,9 +98,7 @@ bool RegionGrower::extractRegions()
         return true;
     }
 
-    ROS_ERROR("Something went wrong during extracting the regions from the "
-              "region grower.");
-    return false;
+    return true;
 }
 
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr RegionGrower::debug_visualisation()
