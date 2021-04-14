@@ -313,6 +313,17 @@ bool HullParameterDeterminer::cropCloudToHullVector(
     return success;
 }
 
+bool HullParameterDeterminer::cropPointToHullVector(
+    pcl::PointXY const input_point, PointNormalCloud::Ptr output_cloud)
+{
+    PointCloud2D::Ptr input_cloud = boost::make_shared<PointCloud2D>();
+    input_cloud->points.resize(1);
+    input_cloud->points[1] = input_point;
+
+    bool success = cropCloudToHullVector(input_cloud, output_cloud);
+    return success;
+}
+
 // Elevate the 2D points so they have z coordinate as if they lie on the plane
 // of the hull
 bool HullParameterDeterminer::addZCoordinateToCloudFromPlaneCoefficients(
