@@ -31,6 +31,11 @@ SimplePreprocessor::SimplePreprocessor(YAML::Node config_tree, bool debugging)
     tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
 }
 
+void SimplePreprocessor::readParameters(march_realsense_reader::pointcloud_parametersConfig &config)
+{
+
+}
+
 // Create a normals preprocessor with the ability to transform based on normal
 // orientation
 NormalsPreprocessor::NormalsPreprocessor(YAML::Node config_tree, bool debugging)
@@ -38,7 +43,6 @@ NormalsPreprocessor::NormalsPreprocessor(YAML::Node config_tree, bool debugging)
 {
     tfBuffer = std::make_unique<tf2_ros::Buffer>();
     tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
-    readYaml();
 }
 
 // Removes a point from a pointcloud (and optionally the corresponding
@@ -91,7 +95,7 @@ bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud,
     success &= filterOnDistanceFromOrigin();
 
     success &= fillNormalCloud(transform_stamped);
-    ROS_DEBUG("gekke shit");
+
     success &= filterOnNormalOrientation();
 
     clock_t end_preprocess = clock();
@@ -119,119 +123,29 @@ bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud,
 void NormalsPreprocessor::readParameters(march_realsense_reader::pointcloud_parametersConfig &config)
 {
   // Downsampling parameters
-  bool voxel_grid_filter = config.preprocessor_downsampling_voxel_grid_filter;
-  double leaf_size = config.preprocessor_downsampling_leaf_size;
-  bool random_filter = config.preprocessor_downsampling_random_filter;
-  double remaining_points = config.preprocessor_downsampling_remainig_points;
-
-  /*
-  // Transform parameters
-  double rotation_y = config.;
-  */
+  voxel_grid_filter = config.preprocessor_downsampling_voxel_grid_filter;
+  leaf_size = config.preprocessor_downsampling_leaf_size;
+  random_filter = config.preprocessor_downsampling_random_filter;
+  remaining_points = config.preprocessor_downsampling_remainig_points;
 
   // Distance Filter parameters
-  double distance_threshold = config.preprocessor_distance_filter_threshold;
+  distance_threshold = config.preprocessor_distance_filter_threshold;
 
   // Normal Estimation parameters
-  bool use_tree_search_method = config.preprocessor_normal_estimation_use_tree_search_method;
-  int number_of_neighbours = config.preprocessor_normal_estimation_number_of_neighbours;
-  double search_radius = config.preprocessor_normal_estimation_search_radius;
-  if (use_tree_search_method)
-  {
-    ROS_DEBUG("non: %i, sr: %f", number_of_neighbours, search_radius);
-  }
+  use_tree_search_method = config.preprocessor_normal_estimation_use_tree_search_method;
+  number_of_neighbours = config.preprocessor_normal_estimation_number_of_neighbours;
+  search_radius = config.preprocessor_normal_estimation_search_radius;
 
   // Normal filter parameters
-  double allowed_length_x = config.preprocessor_normal_filter_allowed_length_x;
-  double allowed_length_y = config.preprocessor_normal_filter_allowed_length_y;
-  double allowed_length_z = config.preprocessor_normal_filter_allowed_length_z;
-  ROS_DEBUG("Params");
-}
-
-void NormalsPreprocessor::readYaml()
-{
-    getDownsamplingParameters();
-
-    getDistanceFilterParameters();
-
-    getNormalEstimationParameters();
-
-    getNormalFilterParameters();
-}
-
-void NormalsPreprocessor::getDownsamplingParameters()
-{
-    // Grab downsampling parameters
-    if (YAML::Node downsampling_parameters = config_tree_["downsampling"]) {
-        voxel_grid_filter = yaml_utilities::grabParameter<bool>(
-            downsampling_parameters, "voxel_grid_filter");
-        random_filter = yaml_utilities::grabParameter<bool>(
-            downsampling_parameters, "random_filter");
-        if (voxel_grid_filter) {
-            leaf_size = yaml_utilities::grabParameter<double>(
-                downsampling_parameters, "leaf_size");
-        } else if (random_filter) {
-            remaining_points = yaml_utilities::grabParameter<int>(
-                downsampling_parameters, "remaining_points");
-        } else {
-            ROS_WARN_STREAM("No downsampling method was selected. Continuing "
-                            "without downsampling.");
-        }
-    } else {
-        ROS_ERROR("Downsample parameters not found in parameter file");
-    }
-}
-
-void NormalsPreprocessor::getDistanceFilterParameters()
-{
-    //  Grab distance filter parameters
-    if (YAML::Node parameters = config_tree_["distance_filter"]) {
-        distance_threshold = yaml_utilities::grabParameter<double>(
-            parameters, "distance_threshold");
-    } else {
-        ROS_ERROR("Distance filter parameters not found in parameter file");
-    }
-}
-
-void NormalsPreprocessor::getNormalEstimationParameters()
-{
-    //  Grab normal estimation parameters
-    if (YAML::Node normal_estimation_parameters
-        = config_tree_["normal_estimation"]) {
-        use_tree_search_method = yaml_utilities::grabParameter<bool>(
-            normal_estimation_parameters, "use_tree_search_method");
-        if (use_tree_search_method) {
-            number_of_neighbours = yaml_utilities::grabParameter<int>(
-                normal_estimation_parameters, "number_of_neighbours");
-        } else {
-            search_radius = yaml_utilities::grabParameter<double>(
-                normal_estimation_parameters, "search_radius");
-        }
-    } else {
-        ROS_ERROR("Normal estimation parameters not found in parameter file");
-    }
-}
-
-void NormalsPreprocessor::getNormalFilterParameters()
-{
-    //  Grab normal filter parameters
-    if (YAML::Node normal_filter_parameters = config_tree_["normal_filter"]) {
-        allowed_length_x = yaml_utilities::grabParameter<double>(
-            normal_filter_parameters, "allowed_length_x");
-        allowed_length_y = yaml_utilities::grabParameter<double>(
-            normal_filter_parameters, "allowed_length_y");
-        allowed_length_z = yaml_utilities::grabParameter<double>(
-            normal_filter_parameters, "allowed_length_z");
-    } else {
-        ROS_ERROR("Normal filter parameters not found in parameter file");
-    }
+  allowed_length_x = config.preprocessor_normal_filter_allowed_length_x;
+  allowed_length_y = config.preprocessor_normal_filter_allowed_length_y;
+  allowed_length_z = config.preprocessor_normal_filter_allowed_length_z;
 }
 
 // Downsample the number of points in the pointcloud to have a more workable
 // number of points
 bool NormalsPreprocessor::downsample()
 {
-    ROS_DEBUG("in downsample");
     // Fill in the chosen downsampling object and do the downsampling
     if (voxel_grid_filter) {
         pcl::VoxelGrid<pcl::PointXYZ> voxel_grid;
@@ -252,7 +166,6 @@ bool NormalsPreprocessor::downsample()
 bool NormalsPreprocessor::transformPointCloudFromUrdf(
     geometry_msgs::TransformStamped& transform_stamped)
 {
-  ROS_DEBUG("in transform URDF");
     try {
         pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
         transform_stamped = tfBuffer->lookupTransform(frame_id_to_transform_to_,
@@ -272,7 +185,6 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
 // Currently uses a very rough and static estimation of where the foot should be
 bool NormalsPreprocessor::transformPointCloud()
 {
-  ROS_DEBUG("in transform");
     // make a 4 by 4 transformation Transform = [Rotation (3x3) translation
     // (3x1); 0 (1x3) 1 (1x1)]
     Eigen::Affine3f transform = Eigen::Affine3f::Identity();
@@ -291,7 +203,6 @@ bool NormalsPreprocessor::transformPointCloud()
 // distance
 bool NormalsPreprocessor::filterOnDistanceFromOrigin()
 {
-  ROS_DEBUG("in filter distance");
     double distance_threshold_squared = distance_threshold * distance_threshold;
 
     // Removed any point too far from the origin
@@ -317,30 +228,24 @@ bool NormalsPreprocessor::filterOnDistanceFromOrigin()
 bool NormalsPreprocessor::fillNormalCloud(
     geometry_msgs::TransformStamped transform_stamped)
 {
-  ROS_DEBUG("in fill normal cloud");
     geometry_msgs::Vector3 translation
         = transform_stamped.transform.translation;
-  ROS_DEBUG("5");
     //  Fill the normal estimation object and estimate the normals
     pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> normal_estimator;
-  ROS_DEBUG("6");
     normal_estimator.setInputCloud(pointcloud_);
-  ROS_DEBUG("7");
     normal_estimator.setViewPoint(translation.x, translation.y, translation.z);
-  ROS_DEBUG("1");
+
     if (use_tree_search_method) {
-      ROS_DEBUG("2");
         pcl::search::Search<pcl::PointXYZ>::Ptr search_method(
             new pcl::search::KdTree<pcl::PointXYZ>);
         normal_estimator.setSearchMethod(search_method);
         normal_estimator.setKSearch(number_of_neighbours);
     } else {
-      ROS_DEBUG("3");
         normal_estimator.setRadiusSearch(search_radius);
     }
-    ROS_DEBUG("4");
+
     normal_estimator.compute(*pointcloud_normals_);
-  ROS_DEBUG("8");
+
     return true;
 }
 
@@ -348,7 +253,6 @@ bool NormalsPreprocessor::fillNormalCloud(
 // point. This can work because the normals are of unit length.
 bool NormalsPreprocessor::filterOnNormalOrientation()
 {
-  ROS_DEBUG("in orientation");
     // Remove any point who's normal does not fall into the desired region
     if (pointcloud_->points.size() == pointcloud_normals_->points.size()) {
         for (int p = 0; p < pointcloud_->points.size(); p++) {
@@ -384,7 +288,6 @@ bool SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud,
     pointcloud_normals_ = pointcloud_normals;
     frame_id_to_transform_to_ = frame_id_to_transform_to;
 
-    ROS_DEBUG("Preprocessing with SimplePreprocessor");
     transformPointCloudFromUrdf();
     return true;
 }
