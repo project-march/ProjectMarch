@@ -6,6 +6,7 @@
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
 #include <tf2_ros/transform_listener.h>
+#include <march_realsense_reader/pointcloud_parametersConfig.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -25,6 +26,8 @@ public:
     // pointcloud_normals as well) at a given index
     void removePointByIndex(int const index, PointCloud::Ptr pointcloud,
         Normals::Ptr pointcloud_normals = nullptr);
+
+    virtual void readParameters(march_realsense_reader::pointcloud_parametersConfig &config) = 0;
 
     PointCloud::Ptr pointcloud_;
     Normals::Ptr pointcloud_normals_;
@@ -67,6 +70,8 @@ public:
     // vectors
     bool preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals,
         std::string frame_id_to_transform_to = "foot_left") override;
+
+    void readParameters(march_realsense_reader::pointcloud_parametersConfig &config) override;
 
 protected:
     // Removes points from the pointcloud such that there is only one point left
