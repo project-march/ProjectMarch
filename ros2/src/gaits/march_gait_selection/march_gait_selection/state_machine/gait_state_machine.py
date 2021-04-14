@@ -62,13 +62,6 @@ class GaitStateMachine(object):
         self.update_timer = None
         self.last_update_time = None
 
-        self._early_schedule_duration = self._parse_duration_parameter(
-            "early_schedule_duration"
-        )
-        self._first_subgait_delay = self._parse_duration_parameter(
-            "first_subgait_delay"
-        )
-
         self.current_state_pub = self._gait_selection.create_publisher(
             msg_type=CurrentState,
             topic="/march/gait_selection/current_state",
@@ -117,16 +110,6 @@ class GaitStateMachine(object):
         self.add_transition_callback(self._current_state_cb)
         self.add_gait_callback(self._current_gait_cb)
         self._gait_selection.get_logger().debug("Initialized state machine")
-
-    def _parse_duration_parameter(self, name: str) -> Duration:
-        if self._gait_selection.has_parameter(name):
-            value = self._gait_selection.get_parameter(name).value
-            if value < 0:
-                value = 0
-            duration = Duration(seconds=value)
-        else:
-            duration = Duration(0)
-        return duration
 
     def _freeze_cb(self, request, response):
         if self._freeze():
@@ -365,7 +348,7 @@ class GaitStateMachine(object):
             )
             if self._current_gait.can_be_scheduled_early:
                 gait_update = self._current_gait.start(
-                    current_time, self._first_subgait_delay
+                    current_time, self._gait_selection._first_subgait_delay
                 )
             else:
                 gait_update = self._current_gait.start(current_time)
@@ -388,7 +371,7 @@ class GaitStateMachine(object):
 
         if self._current_gait.can_be_scheduled_early:
             gait_update = self._current_gait.update(
-                current_time, self._early_schedule_duration
+                current_time, self._gait_selection._early_schedule_duration
             )
         else:
             gait_update = self._current_gait.update(current_time)
