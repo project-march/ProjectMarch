@@ -39,57 +39,21 @@ HullParameterDeterminer::HullParameterDeterminer(
     YAML::Node config_tree, bool debugging)
     : ParameterDeterminer(config_tree, debugging)
 {
-    readYaml();
+
 }
 
-// Read all relevant parameters from the parameter yaml file
-void HullParameterDeterminer::readYaml()
+void HullParameterDeterminer::readParameters(march_realsense_reader::pointcloud_parametersConfig &config)
 {
-    number_of_optional_foot_locations = yaml_utilities::grabParameter<int>(
-        config_tree_, "number_of_optional_foot_locations");
-    general_most_desirable_location_is_mid
-        = yaml_utilities::grabParameter<bool>(
-            config_tree_, "general_most_desirable_location_is_mid");
-    general_most_desirable_location_is_small
-        = yaml_utilities::grabParameter<bool>(
-            config_tree_, "general_most_desirable_location_is_small");
-    hull_dimension
-        = yaml_utilities::grabParameter<int>(config_tree_, "hull_dimension");
-    if (YAML::Node stairs_parameters = config_tree_["stairs_parameters"]) {
-        min_x_stairs = yaml_utilities::grabParameter<double>(
-            stairs_parameters, "min_x_stairs");
-        max_x_stairs = yaml_utilities::grabParameter<double>(
-            stairs_parameters, "max_x_stairs");
-        min_z_stairs = yaml_utilities::grabParameter<double>(
-            stairs_parameters, "min_z_stairs");
-        max_z_stairs = yaml_utilities::grabParameter<double>(
-            stairs_parameters, "max_z_stairs");
-        y_location = yaml_utilities::grabParameter<double>(
-            stairs_parameters, "y_location");
-    } else {
-        ROS_ERROR(
-            "'stairs_parameters' parameters not found in parameters file");
-    }
-    if (YAML::Node ramp_parameters = config_tree_["ramp_parameters"]) {
-        x_flat
-            = yaml_utilities::grabParameter<double>(ramp_parameters, "x_flat");
-        z_flat
-            = yaml_utilities::grabParameter<double>(ramp_parameters, "z_flat");
-        x_steep
-            = yaml_utilities::grabParameter<double>(ramp_parameters, "x_steep");
-        z_steep
-            = yaml_utilities::grabParameter<double>(ramp_parameters, "z_steep");
-        y_location = yaml_utilities::grabParameter<double>(
-            ramp_parameters, "y_location");
-        min_search_area = yaml_utilities::grabParameter<double>(
-            ramp_parameters, "min_search_area");
-        max_search_area = yaml_utilities::grabParameter<double>(
-            ramp_parameters, "max_search_area");
-        max_distance_to_line = yaml_utilities::grabParameter<double>(
-            ramp_parameters, "max_distance_to_line");
-    } else {
-        ROS_ERROR("'ramp_parameters' parameters not found in parameters file");
-    }
+    number_of_optional_foot_locations = config.parameter_determiner_foot_locations;
+
+    min_x_stairs = config.parameter_determiner_stairs_locations_min_x;
+    max_x_stairs = config.parameter_determiner_stairs_locations_max_x;
+    min_z_stairs = config.parameter_determiner_stairs_locations_min_z;
+    max_z_stairs = config.parameter_determiner_stairs_locations_max_z;
+    y_location = config.parameter_determiner_stairs_locations_y;
+
+    general_most_desirable_location_is_mid = config.parameter_determiner_most_desirable_loc_mid;
+    general_most_desirable_location_is_small = config.parameter_determiner_most_desirable_loc_small;
 }
 
 /** This function takes in a pointcloud with matching normals and
