@@ -22,7 +22,7 @@ RegionGrower::RegionGrower(YAML::Node config_tree, bool debugging)
     : RegionCreator(config_tree, debugging)
 
 {
-    readYaml();
+
 }
 
 bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
@@ -49,27 +49,14 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
 
     return success;
 }
-void RegionGrower::readYaml()
+
+void RegionGrower::readParameters(march_realsense_reader::pointcloud_parametersConfig &config)
 {
-    if (YAML::Node region_growing_parameters = config_tree_["region_growing"]) {
-        number_of_neighbours = yaml_utilities::grabParameter<int>(
-            region_growing_parameters, "number_of_neighbours")
-                                   .value();
-        min_cluster_size = yaml_utilities::grabParameter<int>(
-            region_growing_parameters, "min_cluster_size")
-                               .value();
-        max_cluster_size = yaml_utilities::grabParameter<int>(
-            region_growing_parameters, "max_cluster_size")
-                               .value();
-        smoothness_threshold = yaml_utilities::grabParameter<float>(
-            region_growing_parameters, "smoothness_threshold")
-                                   .value();
-        curvature_threshold = yaml_utilities::grabParameter<float>(
-            region_growing_parameters, "curvature_threshold")
-                                  .value();
-    } else {
-        ROS_ERROR("'region_growing' parameters not found in parameter file");
-    }
+    number_of_neighbours = config.region_creator_region_growing_number_of_neighbours;
+    min_cluster_size = config.region_creator_region_growing_min_cluster_size;
+    max_cluster_size = config.region_creator_region_growing_max_cluster_size;
+    smoothness_threshold = config.region_creator_region_growing_smoothness_threshold;
+    curvature_threshold = config.region_creator_region_growing_curvature_threshold;
 }
 
 bool RegionGrower::setupRegionGrower()

@@ -27,6 +27,9 @@ public:
     void removePointByIndex(int const index, PointCloud::Ptr pointcloud,
         Normals::Ptr pointcloud_normals = nullptr);
 
+    /** This function is called upon whenever a parameter from config is changed,
+     * including when launching the node
+     */
     virtual void readParameters(march_realsense_reader::pointcloud_parametersConfig &config) = 0;
 
     PointCloud::Ptr pointcloud_;
@@ -47,6 +50,8 @@ public:
     // Preprocess the given pointcloud, based on parameters in the config tree
     bool preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals,
         std::string frame_id_to_transform_to = "foot_left") override;
+
+    void readParameters(march_realsense_reader::pointcloud_parametersConfig &config) override;
 
 protected:
     /** Calls the tf listener, to know transform at current time and transforms
@@ -94,28 +99,21 @@ protected:
     // direction (specified in the parameter file)
     bool filterOnNormalOrientation();
 
-    // Reads all the relevant parameters from the yaml file
-    void readYaml();
-
     // Downsampling parameters
-    void getDownsamplingParameters();
     bool voxel_grid_filter;
     float leaf_size;
     bool random_filter;
     int remaining_points;
 
     // Distance filter parameters
-    void getDistanceFilterParameters();
     double distance_threshold;
 
     // Normal estimation parameters
-    void getNormalEstimationParameters();
     bool use_tree_search_method;
     int number_of_neighbours;
     double search_radius;
 
     // Normal filter parameters
-    void getNormalFilterParameters();
     double allowed_length_x;
     double allowed_length_y;
     double allowed_length_z;

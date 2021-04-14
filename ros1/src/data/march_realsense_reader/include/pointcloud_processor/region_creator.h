@@ -7,6 +7,7 @@
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
 #include <string>
+#include <march_realsense_reader/pointcloud_parametersConfig.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -22,6 +23,7 @@ public:
         = 0;
     virtual ~RegionCreator() {};
     virtual pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation() = 0;
+    virtual void readParameters(march_realsense_reader::pointcloud_parametersConfig &config) = 0;
 
 protected:
     PointCloud::Ptr pointcloud_;
@@ -48,13 +50,9 @@ public:
      */
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation() override;
 
-private:
-    /**
-     * Read out YAML
-     * @return true if succesful
-     */
-    void readYaml();
+    void readParameters(march_realsense_reader::pointcloud_parametersConfig &config) override;
 
+private:
     /**
      * Configure region growing algorithm
      */
