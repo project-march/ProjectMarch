@@ -25,8 +25,6 @@ container:tag:
     GIT_CHECKOUT: "true"
   before_script:
     - podman login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-
-
   script:
     - if ! podman manifest inspect $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH; then podman pull $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH && podman tag $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH && podman push $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH; fi;
 
