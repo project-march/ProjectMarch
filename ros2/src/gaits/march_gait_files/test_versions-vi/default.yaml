@@ -1,140 +1,132 @@
 gaits:
   curb_sdg:
-    right_open: curb_sdg_rightopen_v1
     left_close: curb_sdg_leftclose_v1
-  ramp_door_slope_up:
-    right_open: MV_RD_slopeup_flat_rightopen_v1
-    left_open: MV_RD_slopeup_flat_leftopen_v1
-    right_swing: MV_RD_slopeup_flat_rightswing_v1
-    left_swing: MV_RD_slopeup_flat_leftswing_v1
-    right_close: MV_RD_slopeup_flat_rightclose_v1
-    left_close: MV_RD_slopeup_flat_leftclose_v1
-  ramp_door_slope_down:
-    right_open: MV_RD_slopedown_rightopen_v2
-    left_open: MV_RD_slopedown_leftopen_v2
-    right_swing: MV_RD_slopedown_rightswing_v1
-    left_swing: MV_RD_slopedown_leftswing_v1
-    right_close: MV_RD_slopedown_rightclose_v1
-    left_close: MV_RD_slopedown_leftclose_v1
-  ramp_door_slope_down_fixed:
-    right_open: MV_RD_slopedown_fixed_rightopen_v1
-    left_swing: MV_RD_slopedown_fixed_leftswing_v1
-    right_swing: MV_RD_slopedown_fixed_rightswing_v1
-    left_close: MV_RD_slopedown_fixed_leftclose_v1
+    right_open: curb_sdg_rightopen_v1
   ramp_door_last_step:
-    right_open: MV_RD_laststep_rightopen_v2
     left_close: MV_RD_laststep_leftclose_v2
+    right_open: MV_RD_laststep_rightopen_v2
+  realsense_stairs_up_single_step:
+    right_open: MVI_stairsup_rightopen_low_undeep
+    left_close: MVI_stairsup_leftclose_low_undeep
+  ramp_door_slope_up:
+    right_open: MVI_RD_slopeup_rightopen_flat_v1
+    left_open: MVI_RD_slopeup_leftopen_flat_v1
+    right_swing: MVI_RD_slopeup_rightswing_flat_v1
+    left_swing: MVI_RD_slopeup_leftswing_flat_v1
+    right_close: MVI_RD_slopeup_rightclose_flat_v1
+    left_close: MVI_RD_slopeup_leftclose_flat_v1
+  ramp_door_slope_down:
+    left_close: MVI_RD_slopedown_leftclose_steep_v1
+    left_open: MVI_RD_slopedown_leftopen_steep_v1
+    left_swing: MVI_RD_slopedown_leftswing_steep_v1
+    right_close: MVI_RD_slopedown_rightclose_steep_v1
+    right_open: MVI_RD_slopedown_rightopen_steep_v1
+    right_swing: MVI_RD_slopedown_rightswing_steep_v1
+  ramp_door_slope_down_fixed:
+    left_close: MV_RD_slopedown_fixed_leftclose_v1
+    left_swing: MV_RD_slopedown_fixed_leftswing_v1
+    right_open: MV_RD_slopedown_fixed_rightopen_v1
+    right_swing: MV_RD_slopedown_fixed_rightswing_v1
   ramp_door_slope_down_single:
-    right_open: MV_RD_slopedownsingle_rightopen_v1
     left_close: MV_RD_slopedownsingle_leftclose_v1
-  rough_terrain_high_step:
-    right_open: MV_RT_highstep_rightopen_v6
-    left_close: MV_RT_highstep_leftclose_v8
-  rough_terrain_middle_steps:
-    right_open: MV_RT_middlestep_rightopen_v2
-    left_swing: MV_RT_middlestep_leftswing_v2
-    right_swing: MV_RT_middlestep_rightswing_v2
-    left_close: MV_RT_middlestep_leftclose_v3
+    right_open: MV_RD_slopedownsingle_rightopen_v1
   rough_terrain_first_middle_step:
-    right_open: MV_RT_first_middlestep_rightopen_v2
     left_close: MV_RT_first_middlestep_leftclose_v2
+    right_open: MV_RT_first_middlestep_rightopen_v2
+  rough_terrain_high_step:
+    left_close: MV_RT_highstep_leftclose_v8
+    right_open: MV_RT_highstep_rightopen_v6
+  rough_terrain_middle_steps:
+    left_close: MV_RT_middlestep_leftclose_v3
+    left_swing: MV_RT_middlestep_leftswing_v2
+    right_open: MV_RT_middlestep_rightopen_v2
+    right_swing: MV_RT_middlestep_rightswing_v2
   rough_terrain_second_middle_step:
-    right_open: MV_RT_second_middlestep_rightopen_v1
     left_close: MV_RT_second_middlestep_leftclose_v1
+    right_open: MV_RT_second_middlestep_rightopen_v1
   rough_terrain_third_middle_step:
-    right_open: MV_RT_third_middlestep_rightopen_v1
     left_close: MV_RT_third_middlestep_leftclose_v1
-  walk:
-    right_open: MV_walk_rightopen_v3
-    left_swing: MV_walk_leftswing_v2
-    right_swing: MV_walk_rightswing_v2
-    left_close: MV_walk_leftclose_v3
-    right_close: MV_walk_rightclose_v3
-  walk_small:
-    right_open: MV_walksmall_rightopen_v1
-    left_swing: MV_walksmall_leftswing_v1
-    right_swing: MV_walksmall_rightswing_v1
-    left_close: MV_walksmall_leftclose_v1
-    right_close: MV_walksmall_rightclose_v1
-  walk_large:
-    right_open: MV_walklarge_rightopen_v1
-    left_swing: MV_walklarge_leftswing_v1
-    right_swing: MV_walklarge_rightswing_v1
-    left_close: MV_walklarge_leftclose_v1
-    right_close: MV_walklarge_rightclose_v1
+    right_open: MV_RT_third_middlestep_rightopen_v1
   single_step_normal:
-    right_open: MIV_final
     left_close: MIV_final
-  tilted_path_first_start:
-    left_open: MV_TPstart1_leftopen_v1
-    right_close: MV_TPstart1_rightclose_v1
-  tilted_path_second_start:
-    left_open: MV_TPstart2_leftopen_v1
-    right_close: MV_TPstart2_rightclose_v1
+    right_open: MIV_final
+  stairs_down:
+    left_close: MV_stairsdown_leftclose_v2
+    left_swing: MV_stairsdown_leftswing_v2
+    right_close: MV_stairsdown_rightclose_v2
+    right_open: MV_stairsdown_rightopen_v2
+    right_swing: MV_stairsdown_rightswing_v2
+  stairs_up:
+    left_close: MVI_stairsup_leftclose_IK_v1
+    left_swing: MVI_stairsup_leftswing_IK_v1
+    right_close: MVI_stairsup_rightclose_IK_v1
+    right_open: MVI_stairsup_rightopen_IK_v1
+    right_swing: MVI_stairsup_rightswing_IK_v1
   tilted_path_first_end:
     left_open: MV_TPend1_leftopen_v1
     right_close: MV_TPend1_rightclose_v1
-  tilted_path_second_end:
-    left_open: MV_TPend2_leftopen_v1
-    right_close: MV_TPend2_rightclose_v1
-  tilted_path_straight_start_right:
-    right_open: MV_TPstraight_rightopen_v1
-    left_close: MV_TPstraight_leftclose_v1
-  tilted_path_straight_start_left:
-    left_open: MV_TPstraight_leftopen_v1
-    right_close: MV_TPstraight_rightclose_v1
-  stairs_up:
-    right_open: MVI_stairsup_rightopen_IK_v1
-    left_swing: MVI_stairsup_leftswing_IK_v1
-    right_swing: MVI_stairsup_rightswing_IK_v1
-    left_close: MVI_stairsup_leftclose_IK_v1
-    right_close: MVI_stairsup_rightclose_IK_v1
-  stairs_down:
-    right_open: MV_stairsdown_rightopen_v2
-    left_swing: MV_stairsdown_leftswing_v2
-    right_swing: MV_stairsdown_rightswing_v2
-    left_close: MV_stairsdown_leftclose_v2
-    right_close: MV_stairsdown_rightclose_v2
-  tilted_path_left_straight_start:
-    right_open: MV_TP_left_straightstart_rightopen_v5
-    left_close: MV_TP_left_straightstart_leftclose_v5
+  tilted_path_first_start:
+    left_open: MV_TPstart1_leftopen_v1
+    right_close: MV_TPstart1_rightclose_v1
+  tilted_path_left_flexed_knee_step:
+    left_close: MV_TP_left_flexed_knee_step_leftclose_v1
+    right_open: MV_TP_left_flexed_knee_step_rightopen_v1
+  tilted_path_left_knee_bend:
+    right_open: MV_TP_left_kneebend_rightopen_v5
   tilted_path_left_single_step:
-    right_open: MV_TP_left_singlestep_rightopen_v5
     left_close: MV_TP_left_singlestep_leftclose_v5
+    right_open: MV_TP_left_singlestep_rightopen_v5
   tilted_path_left_straight_end:
     left_open: MV_TP_left_straightend_leftopen_v5
     right_close: MV_TP_left_straightend_rightclose_v5
-  tilted_path_left_knee_bend:
-    right_open: MV_TP_left_kneebend_rightopen_v5
-  tilted_path_left_flexed_knee_step:
-    right_open: MV_TP_left_flexed_knee_step_rightopen_v1
-    left_close: MV_TP_left_flexed_knee_step_leftclose_v1
-  tilted_path_right_straight_start:
-    left_open: MV_TP_right_straightstart_leftopen_v5
-    right_close: MV_TP_right_straightstart_rightclose_v5
+  tilted_path_left_straight_start:
+    left_close: MV_TP_left_straightstart_leftclose_v5
+    right_open: MV_TP_left_straightstart_rightopen_v5
+  tilted_path_right_flexed_knee_step:
+    left_open: MV_TP_right_flexed_knee_step_leftopen_v1
+    right_close: MV_TP_right_flexed_knee_step_rightclose_v1
+  tilted_path_right_knee_bend:
+    right_open: MV_TP_right_kneebend_rightopen_v5
   tilted_path_right_single_step:
     left_open: MV_TP_right_singlestep_leftopen_v5
     right_close: MV_TP_right_singlestep_rightclose_v5
   tilted_path_right_straight_end:
-    right_open: MV_TP_right_straightend_rightopen_v5
     left_close: MV_TP_right_straightend_leftclose_v5
-  tilted_path_right_knee_bend:
-    right_open: MV_TP_right_kneebend_rightopen_v5
-  tilted_path_right_flexed_knee_step:
-    left_open: MV_TP_right_flexed_knee_step_leftopen_v1
-    right_close: MV_TP_right_flexed_knee_step_rightclose_v1
+    right_open: MV_TP_right_straightend_rightopen_v5
+  tilted_path_right_straight_start:
+    left_open: MV_TP_right_straightstart_leftopen_v5
+    right_close: MV_TP_right_straightstart_rightclose_v5
+  tilted_path_second_end:
+    left_open: MV_TPend2_leftopen_v1
+    right_close: MV_TPend2_rightclose_v1
+  tilted_path_second_start:
+    left_open: MV_TPstart2_leftopen_v1
+    right_close: MV_TPstart2_rightclose_v1
+  tilted_path_straight_start_left:
+    left_open: MV_TPstraight_leftopen_v1
+    right_close: MV_TPstraight_rightclose_v1
+  tilted_path_straight_start_right:
+    left_close: MV_TPstraight_leftclose_v1
+    right_open: MV_TPstraight_rightopen_v1
+  walk:
+    left_close: MV_walk_leftclose_v3
+    left_swing: MV_walk_leftswing_v2
+    right_close: MV_walk_rightclose_v3
+    right_open: MV_walk_rightopen_v3
+    right_swing: MV_walk_rightswing_v2
+  walk_large:
+    left_close: MV_walklarge_leftclose_v1
+    left_swing: MV_walklarge_leftswing_v1
+    right_close: MV_walklarge_rightclose_v1
+    right_open: MV_walklarge_rightopen_v1
+    right_swing: MV_walklarge_rightswing_v1
+  walk_small:
+    left_close: MV_walksmall_leftclose_v1
+    left_swing: MV_walksmall_leftswing_v1
+    right_close: MV_walksmall_rightclose_v1
+    right_open: MV_walksmall_rightopen_v1
+    right_swing: MV_walksmall_rightswing_v1
 positions:
-  stand:
-    gait_type: walk_like
-    joints:
-      left_ankle: 0.0436
-      left_hip_aa: 0.0
-      left_hip_fe: -0.0873
-      left_knee: 0.0
-      right_ankle: 0.0436
-      right_hip_aa: 0.0
-      right_hip_fe: -0.0873
-      right_knee: 0.0
   idle_1:
     gait_type: walk_like
     joints:
@@ -146,6 +138,28 @@ positions:
       right_hip_aa: -0.0524
       right_hip_fe: 0.5236
       right_knee: 0.8203
+  idle_10:
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.0436
+      left_hip_aa: 0.0
+      left_hip_fe: -0.0873
+      left_knee: 0.0
+      right_ankle: 0.0436
+      right_hip_aa: 0.0
+      right_hip_fe: 0.4014
+      right_knee: 0.6981
+  idle_11:
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.0436
+      left_hip_aa: 0.0
+      left_hip_fe: 0.4014
+      left_knee: 0.6981
+      right_ankle: 0.0436
+      right_hip_aa: 0.0
+      right_hip_fe: -0.0873
+      right_knee: 0.0
   idle_2:
     gait_type: walk_like
     joints:
@@ -179,17 +193,6 @@ positions:
       right_hip_aa: 0.0
       right_hip_fe: -0.0873
       right_knee: 0.0
-  sit:
-    gait_type: walk_like
-    joints:
-      left_ankle: 0.0436
-      left_hip_aa: 0.0
-      left_hip_fe: 1.2217
-      left_knee: 1.5708
-      right_ankle: 0.0436
-      right_hip_aa: 0.0
-      right_hip_fe: 1.2217
-      right_knee: 1.5708
   idle_6:
     gait_type: walk_like
     joints:
@@ -234,7 +237,18 @@ positions:
       right_hip_aa: 0.1222
       right_hip_fe: -0.0873
       right_knee: 0.0
-  idle_10:
+  sit:
+    gait_type: walk_like
+    joints:
+      left_ankle: 0.0436
+      left_hip_aa: 0.0
+      left_hip_fe: 1.2217
+      left_knee: 1.5708
+      right_ankle: 0.0436
+      right_hip_aa: 0.0
+      right_hip_fe: 1.2217
+      right_knee: 1.5708
+  stand:
     gait_type: walk_like
     joints:
       left_ankle: 0.0436
@@ -243,20 +257,5 @@ positions:
       left_knee: 0.0
       right_ankle: 0.0436
       right_hip_aa: 0.0
-      right_hip_fe: 0.4014
-      right_knee: 0.6981
-  idle_11:
-    gait_type: walk_like
-    joints:
-      left_ankle: 0.0436
-      left_hip_aa: 0.0
-      left_hip_fe: 0.4014
-      left_knee: 0.6981
-      right_ankle: 0.0436
-      right_hip_aa: 0.0
       right_hip_fe: -0.0873
       right_knee: 0.0
-semi_dynamic_gaits:
-  curb_sdg:
-    right_open: curb_sdg_rightopen_v1
-    left_close: curb_sdg_leftclose_v1

@@ -514,11 +514,18 @@ class GaitGeneratorController(object):
             position = setpoint_dictionary[joint_name].position
             velocity = setpoint_dictionary[joint_name].velocity
             joint = self.subgait.get_joint(joint_name)
-            # If the current subgait already has a setpoint at the specified time, remove it before adding the new one
+
+            # If the current joint already has a setpoint at the specified time, replace it
+            # Otherwise, add the setpoint to the joint.
+            setpoint_is_replaced = False
             for index, setpoint in enumerate(joint.setpoints):
                 if setpoint.time == time:
-                    joint.remove_setpoint(index)
-            joint.add_setpoint(ModifiableSetpoint(time, position, velocity))
+                    joint.replace_setpoint(index, setpoint_dictionary[joint_name])
+                    setpoint_is_replaced = True
+
+            if not setpoint_is_replaced:
+                joint.add_setpoint(ModifiableSetpoint(time, position, velocity))
+
             self.view.update_joint_widget(joint)
             self.view.publish_preview(self.subgait, self.current_time)
 
