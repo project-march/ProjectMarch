@@ -2,7 +2,6 @@
 #define MARCH_PARAMETER_DETERMINER_H
 #include "march_shared_msgs/GetGaitParameters.h"
 #include "utilities/realsense_gait_utilities.h"
-#include "yaml-cpp/yaml.h"
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
@@ -25,7 +24,7 @@ using GaitParameters = march_shared_msgs::GaitParameters;
 
 class ParameterDeterminer {
 public:
-    ParameterDeterminer(YAML::Node config_tree, bool debugging);
+    ParameterDeterminer(bool debugging);
     /** This function is required to be implemented by any plane finder **/
     virtual bool determineParameters(
         boost::shared_ptr<PlaneCoefficientsVector> const
@@ -46,7 +45,6 @@ protected:
     boost::shared_ptr<PolygonVector> polygon_vector_;
     SelectedGait selected_obstacle_;
     boost::shared_ptr<GaitParameters> gait_parameters_;
-    YAML::Node config_tree_;
     bool debugging_;
 };
 
@@ -55,9 +53,8 @@ protected:
  */
 class HullParameterDeterminer : ParameterDeterminer {
 public:
-    /** Basic constructor for ParameterDeterminer preprocessor, but this will
-     * also read the yaml **/
-    HullParameterDeterminer(YAML::Node config_tree, bool debugging);
+    /** Basic constructor for ParameterDeterminer preprocessor **/
+    HullParameterDeterminer(bool debugging);
 
     /** This function should take in a pointcloud with matching normals and
      * hulls, and turn this into a location where the foot can be placed,
@@ -122,7 +119,7 @@ protected:
     // Verify that a possible foot location is valid for the requested gait
     bool isValidLocation(pcl::PointNormal possible_foot_location);
 
-    // Read all relevant parameters from the parameter yaml file
+    // Read all relevant parameters
     int number_of_optional_foot_locations;
     double min_x_stairs;
     double max_x_stairs;
