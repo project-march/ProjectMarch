@@ -10,6 +10,9 @@
 #include <pointcloud_processor/region_creator.h>
 #include <ros/console.h>
 #include <ros/ros.h>
+#include <dynamic_reconfigure/server.h>
+
+
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -48,7 +51,8 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     parameter_determiner_ = std::make_unique<HullParameterDeterminer>(
         getConfigIfPresent("parameter_determiner"), debugging_);
 
-    if (debugging_) {
+    if (debugging_)
+    {
         ROS_DEBUG(
             "Realsense reader started with debugging, all intermediate result "
             "steps will be published and more information given in console, but"
@@ -101,6 +105,11 @@ YAML::Node RealSenseReader::getConfigIfPresent(std::string key)
     }
 }
 
+void RealSenseReader::readConfigCb(march_realsense_reader::pointcloud_parametersConfig &config, uint32_t level)
+{
+  ROS_DEBUG("Changed march_realsense_parameters with dynamic reconfiguration");
+  preprocessor_->readParameters(config);
+}
 // This method executes the logic to process a pointcloud
 bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
     march_shared_msgs::GetGaitParameters::Response& res)

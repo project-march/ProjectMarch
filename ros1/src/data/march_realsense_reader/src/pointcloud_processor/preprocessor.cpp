@@ -116,6 +116,11 @@ bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud,
     return success;
 }
 
+void NormalsPreprocessor::readParameters(march_realsense_reader::pointcloud_parametersConfig &config)
+{
+  ROS_INFO("This is NormalsPreprocessor::parameterCb");
+}
+
 void NormalsPreprocessor::readYaml()
 {
     getDownsamplingParameters();

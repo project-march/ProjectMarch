@@ -15,6 +15,9 @@
 #include <string>
 #include <visualization_msgs/MarkerArray.h>
 
+#include <dynamic_reconfigure/server.h>
+#include <march_realsense_reader/pointcloud_parametersConfig.h>
+
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
 class RealSenseReader {
@@ -51,6 +54,8 @@ public:
     // missing.
     YAML::Node getConfigIfPresent(std::string key);
 
+    void readConfigCb(march_realsense_reader::pointcloud_parametersConfig &config, uint32_t level);
+
     // Publishes the pointcloud on a topic for visualisation in rviz or furter
     // use
     template <typename T>
@@ -82,6 +87,7 @@ public:
         PointNormalCloud::Ptr const possible_foot_locations,
         pcl::PointNormal const optimal_foot_location,
         visualization_msgs::Marker& marker_list);
+
 
 private:
     PointCloud last_pointcloud_;

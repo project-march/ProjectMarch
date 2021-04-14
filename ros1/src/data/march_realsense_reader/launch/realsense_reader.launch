@@ -2,4 +2,5 @@
     <node name="march_realsense_reader_node" pkg="march_realsense_reader"
           type="march_realsense_reader_node"
           output="screen"/>
+    <rosparam command="load" file="$(find march_realsense_reader)/config/pointcloud_parameters.yaml"/>
 </launch>

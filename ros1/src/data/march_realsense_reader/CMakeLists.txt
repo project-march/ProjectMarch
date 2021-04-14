@@ -12,6 +12,10 @@ find_package(catkin REQUIRED COMPONENTS
     sensor_msgs
     tf2_ros
     march_shared_msgs
+    dynamic_reconfigure
+)
+generate_dynamic_reconfigure_options(
+    config/pointcloud_parameters.cfg
 )
 
 find_package(yaml-cpp)
@@ -25,6 +29,7 @@ catkin_package(
     sensor_msgs
     tf2_ros
     march_shared_msgs
+    dynamic_reconfigure
 )
 
 include_directories(
@@ -45,6 +50,7 @@ target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} yaml-cpp)
 
 add_executable(${PROJECT_NAME}_node src/realsense_reader_node.cpp)
 add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME})
+add_dependencies(march_realsense_reader_node ${PROJECT_NAME}_gencfg)
 
 target_link_libraries(${PROJECT_NAME}_node
     ${PROJECT_NAME}
