@@ -115,9 +115,10 @@ noetic:clang_tidy:
   script:
     - cd ros1/
     - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
-# only:
-#   changes:
-#     - "ros1/**/*.{hpp,h,cpp}"
+  only:
+    changes:
+      - "ros1/**/*.{hpp,h,cpp}"
+      - "ros1/**/CMakeLists.txt"
 
 foxy:clang_tidy:
   stage: Static analysis on code
@@ -127,6 +128,7 @@ foxy:clang_tidy:
   script:
     - cd ros2/
     - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | grep -v "src/libraries" | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
-# only:
-#   changes:
-#     - "ros2/**/*.{hpp,h,cpp}"
+  only:
+    changes:
+      - "ros2/**/*.{hpp,h,cpp}"
+      - "ros2/**/CMakeLists.txt"
