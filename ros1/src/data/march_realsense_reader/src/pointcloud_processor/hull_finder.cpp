@@ -30,7 +30,6 @@ HullFinder::HullFinder(bool debugging)
 CHullFinder::CHullFinder(bool debugging)
     : HullFinder(debugging)
 {
-
 }
 
 bool CHullFinder::findHulls(PointCloud::Ptr pointcloud,
@@ -81,11 +80,12 @@ bool CHullFinder::findHulls(PointCloud::Ptr pointcloud,
 
     return success;
 }
-void CHullFinder::readParameters(march_realsense_reader::pointcloud_parametersConfig &config)
+void CHullFinder::readParameters(
+    march_realsense_reader::pointcloud_parametersConfig& config)
 {
-  convex = config.hull_finder_convex;
-  alpha = config.hull_finder_alpha;
-  hull_dimension = config.hull_dimension;
+    convex = config.hull_finder_convex;
+    alpha = config.hull_finder_alpha;
+    hull_dimension = config.hull_dimension;
 }
 
 // Converts a region into a convex or concave hull

@@ -2,11 +2,11 @@
 #define MARCH_PARAMETER_DETERMINER_H
 #include "march_shared_msgs/GetGaitParameters.h"
 #include "utilities/realsense_gait_utilities.h"
+#include <march_realsense_reader/pointcloud_parametersConfig.h>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
 #include <string>
-#include <march_realsense_reader/pointcloud_parametersConfig.h>
 
 using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
 using PointNormalCloud = pcl::PointCloud<pcl::PointNormal>;
@@ -38,7 +38,9 @@ public:
 
     virtual ~ParameterDeterminer() {};
 
-    virtual void readParameters(march_realsense_reader::pointcloud_parametersConfig &config) = 0;
+    virtual void readParameters(
+        march_realsense_reader::pointcloud_parametersConfig& config)
+        = 0;
 
 protected:
     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;
@@ -67,7 +69,8 @@ public:
         SelectedGait const selected_gait,
         boost::shared_ptr<GaitParameters> gait_parameters) override;
 
-    void readParameters(march_realsense_reader::pointcloud_parametersConfig &config) override;
+    void readParameters(
+        march_realsense_reader::pointcloud_parametersConfig& config) override;
 
     pcl::PointNormal optimal_foot_location;
     PointNormalCloud::Ptr possible_foot_locations;

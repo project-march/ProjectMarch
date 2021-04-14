@@ -1,12 +1,12 @@
 #ifndef MARCH_REGION_CREATOR_H
 #define MARCH_REGION_CREATOR_H
 
+#include <march_realsense_reader/pointcloud_parametersConfig.h>
 #include <pcl/point_types.h>
 #include <pcl/segmentation/region_growing.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
 #include <string>
-#include <march_realsense_reader/pointcloud_parametersConfig.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
@@ -22,7 +22,9 @@ public:
         = 0;
     virtual ~RegionCreator() {};
     virtual pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation() = 0;
-    virtual void readParameters(march_realsense_reader::pointcloud_parametersConfig &config) = 0;
+    virtual void readParameters(
+        march_realsense_reader::pointcloud_parametersConfig& config)
+        = 0;
 
 protected:
     PointCloud::Ptr pointcloud_;
@@ -36,8 +38,8 @@ public:
     // Use the constructors defined in the super class
     RegionGrower(bool debugging);
     /** Create cluster using the region growing algorithm, takes algorithm
-     * configuration from the dynamic parameter server, and fills parameter region_vector with
-     * clusters. **/
+     * configuration from the dynamic parameter server, and fills parameter
+     * region_vector with clusters. **/
     bool createRegions(PointCloud::Ptr pointcloud,
         Normals::Ptr pointcloud_normals,
         boost::shared_ptr<RegionVector> region_vector) override;
@@ -48,7 +50,8 @@ public:
      */
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation() override;
 
-    void readParameters(march_realsense_reader::pointcloud_parametersConfig &config) override;
+    void readParameters(
+        march_realsense_reader::pointcloud_parametersConfig& config) override;
 
 private:
     /**
