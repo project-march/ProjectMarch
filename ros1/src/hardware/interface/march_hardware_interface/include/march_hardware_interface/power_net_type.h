@@ -1,6 +1,8 @@
 // Copyright 2019 Project March.
 #ifndef MARCH_HARDWARE_INTERFACE_POWERNETTYPE_H
 #define MARCH_HARDWARE_INTERFACE_POWERNETTYPE_H
+#include <ostream>
+#include <ros/assert.h>
 #include <ros/package.h>
 #include <string>
 
