@@ -1,24 +1,22 @@
 #ifndef MARCH_MODEL_PREDICTIVE_CONTROLLER_H
 #define MARCH_MODEL_PREDICTIVE_CONTROLLER_H
 
+#include <acado_auxiliary_functions.h>
 #include <iostream>
 #include <vector>
-#include <acado_auxiliary_functions.h>
 
 using namespace std;
 
 class ModelPredictiveController {
 
 public:
-    ModelPredictiveController(std::vector<std::vector<float>> Q);
+    ModelPredictiveController(std::vector<float> W);
 
     // Public variables
-    vector<double> x0{0,0};             // Current state
-    double u;                           // Calculated control input
-    vector<vector<double>> reference;   // Current reference
-    bool repeat_reference = true;       // Periodically Repeat the reference
+    vector<double> x0 { 0, 0 }; // Current state
+    double u; // Calculated control input
     std::string joint_name;
-    double cost;                        // Objective value
+    double cost; // Objective value
 
     // Error enums
     enum Error {
@@ -47,22 +45,23 @@ public:
     void init();
 
     /**
-    * \brief Set the initial state
-    * @param x0 - initial state
-    */
+     * \brief Set the initial state
+     * @param x0 - initial state
+     */
     void setInitialState(vector<double> x0);
 
     /**
-     * \brief Set the reference
+     * \brief Set the reference for time step n in [0, N]
+     * @param n
      * @param reference
      */
-    void setReference(vector<vector<double>> reference);
+    void setReference(int n, const std::vector<double>& reference);
 
     /**
-     * \brief Assign the weighting matrix values
-     * @param Q - weighting matrix
+     * \brief Assign the weighting array values
+     * @param W - weighting array
      */
-    void assignWeightingMatrix(std::vector<std::vector<float>> Q);
+    void assignWeightingMatrix(std::vector<float> W);
 
     /**
      * \brief Check status codes and other
@@ -80,7 +79,7 @@ public:
     void shiftStatesAndControl();
 
 private:
-    std::vector<std::vector<float>> Q_;
+    std::vector<float> W_;
 };
 
 #endif

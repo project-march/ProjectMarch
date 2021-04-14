@@ -8,16 +8,19 @@ march:
   controller:
     trajectory:
       type: model_predictive_trajectory_controller/JointTrajectoryController
+      N: 20
       joints:
         - rotational_joint
-      N: 2
-      q_matrices:
+
+      # Controller tuning parameters
+      # Q and R are the weights on the states and inputs of the system respectively
+      # The parameters represent the values on the diagonal of the MPC weighting matrix
+      # Both parameters are required for each joint
+      weights:
         rotational_joint:
-          n_rows: 3
-          n_cols: 3
-          Q: [100.0, 0.0,  0.0,
-              0.0,   1.0,  0.0,
-              0.0,   0.0, 0.01]
+          Q: [100.0, 1.0]
+          R: [0.01]
+
 
       state_publish_rate:  25            # Override default
       action_monitor_rate: 30            # Override default
