@@ -110,6 +110,7 @@ void RealSenseReader::readConfigCb(march_realsense_reader::pointcloud_parameters
   ROS_DEBUG("Changed march_realsense_parameters with dynamic reconfiguration");
   preprocessor_->readParameters(config);
   region_creator_->readParameters(config);
+  parameter_determiner_->readParameters(config);
 }
 // This method executes the logic to process a pointcloud
 bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,

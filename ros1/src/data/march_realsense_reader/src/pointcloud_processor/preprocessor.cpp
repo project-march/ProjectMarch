@@ -120,8 +120,7 @@ bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud,
     return success;
 }
 
-void NormalsPreprocessor::readParameters(march_realsense_reader::pointcloud_parametersConfig &config)
-{
+void NormalsPreprocessor::readParameters(march_realsense_reader::pointcloud_parametersConfig &config) {
   // Downsampling parameters
   voxel_grid_filter = config.preprocessor_downsampling_voxel_grid_filter;
   leaf_size = config.preprocessor_downsampling_leaf_size;
@@ -137,106 +136,9 @@ void NormalsPreprocessor::readParameters(march_realsense_reader::pointcloud_para
   search_radius = config.preprocessor_normal_estimation_search_radius;
 
   // Normal filter parameters
-<<<<<<< HEAD
-  double allowed_length_x = config.preprocessor_normal_filter_allowed_length_x;
-  double allowed_length_y = config.preprocessor_normal_filter_allowed_length_y;
-  double allowed_length_z = config.preprocessor_normal_filter_allowed_length_z;
-  ROS_DEBUG("Params");
-}
-
-void NormalsPreprocessor::readYaml()
-{
-    getDownsamplingParameters();
-
-    getDistanceFilterParameters();
-
-    getNormalEstimationParameters();
-
-    getNormalFilterParameters();
-}
-
-void NormalsPreprocessor::getDownsamplingParameters()
-{
-    // Grab downsampling parameters
-    if (YAML::Node downsampling_parameters = config_tree_["downsampling"]) {
-        voxel_grid_filter = yaml_utilities::grabParameter<bool>(
-            downsampling_parameters, "voxel_grid_filter")
-                                .value();
-        random_filter = yaml_utilities::grabParameter<bool>(
-            downsampling_parameters, "random_filter")
-                            .value();
-        if (voxel_grid_filter) {
-            leaf_size = yaml_utilities::grabParameter<float>(
-                downsampling_parameters, "leaf_size")
-                            .value();
-        } else if (random_filter) {
-            remaining_points = yaml_utilities::grabParameter<int>(
-                downsampling_parameters, "remaining_points")
-                                   .value();
-        } else {
-            ROS_WARN_STREAM("No downsampling method was selected. Continuing "
-                            "without downsampling.");
-        }
-    } else {
-        ROS_ERROR("Downsample parameters not found in parameter file");
-    }
-}
-
-void NormalsPreprocessor::getDistanceFilterParameters()
-{
-    //  Grab distance filter parameters
-    if (YAML::Node parameters = config_tree_["distance_filter"]) {
-        distance_threshold = yaml_utilities::grabParameter<double>(
-            parameters, "distance_threshold")
-                                 .value();
-    } else {
-        ROS_ERROR("Distance filter parameters not found in parameter file");
-    }
-}
-
-void NormalsPreprocessor::getNormalEstimationParameters()
-{
-    //  Grab normal estimation parameters
-    if (YAML::Node normal_estimation_parameters
-        = config_tree_["normal_estimation"]) {
-        use_tree_search_method = yaml_utilities::grabParameter<bool>(
-            normal_estimation_parameters, "use_tree_search_method")
-                                     .value();
-        if (use_tree_search_method) {
-            number_of_neighbours = yaml_utilities::grabParameter<int>(
-                normal_estimation_parameters, "number_of_neighbours")
-                                       .value();
-        } else {
-            search_radius = yaml_utilities::grabParameter<double>(
-                normal_estimation_parameters, "search_radius")
-                                .value();
-        }
-    } else {
-        ROS_ERROR("Normal estimation parameters not found in parameter file");
-    }
-}
-
-void NormalsPreprocessor::getNormalFilterParameters()
-{
-    //  Grab normal filter parameters
-    if (YAML::Node normal_filter_parameters = config_tree_["normal_filter"]) {
-        allowed_length_x = yaml_utilities::grabParameter<double>(
-            normal_filter_parameters, "allowed_length_x")
-                               .value();
-        allowed_length_y = yaml_utilities::grabParameter<double>(
-            normal_filter_parameters, "allowed_length_y")
-                               .value();
-        allowed_length_z = yaml_utilities::grabParameter<double>(
-            normal_filter_parameters, "allowed_length_z")
-                               .value();
-    } else {
-        ROS_ERROR("Normal filter parameters not found in parameter file");
-    }
-=======
   allowed_length_x = config.preprocessor_normal_filter_allowed_length_x;
   allowed_length_y = config.preprocessor_normal_filter_allowed_length_y;
   allowed_length_z = config.preprocessor_normal_filter_allowed_length_z;
->>>>>>> Add dynamic reconfiguration to regrion creator
 }
 
 // Downsample the number of points in the pointcloud to have a more workable

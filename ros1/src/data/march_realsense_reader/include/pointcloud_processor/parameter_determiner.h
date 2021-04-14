@@ -7,6 +7,7 @@
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
 #include <string>
+#include <march_realsense_reader/pointcloud_parametersConfig.h>
 
 using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
 using PointNormalCloud = pcl::PointCloud<pcl::PointNormal>;
@@ -38,6 +39,8 @@ public:
 
     virtual ~ParameterDeterminer() {};
 
+    virtual void readParameters(march_realsense_reader::pointcloud_parametersConfig &config) = 0;
+
 protected:
     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;
     boost::shared_ptr<HullVector> hull_vector_;
@@ -66,6 +69,8 @@ public:
         boost::shared_ptr<PolygonVector> const polygon_vector,
         SelectedGait const selected_gait,
         boost::shared_ptr<GaitParameters> gait_parameters) override;
+
+    void readParameters(march_realsense_reader::pointcloud_parametersConfig &config) override;
 
     pcl::PointNormal optimal_foot_location;
     PointNormalCloud::Ptr possible_foot_locations;
@@ -139,7 +144,7 @@ protected:
     bool fillOptionalFootLocationCloud(float start, float end);
 
     // Read all relevant parameters from the parameter yaml file
-    void readYaml();
+
     int hull_dimension;
     int number_of_optional_foot_locations;
     float min_x_stairs;
