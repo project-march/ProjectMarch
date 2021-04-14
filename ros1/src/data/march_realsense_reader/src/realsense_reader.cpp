@@ -213,7 +213,6 @@ bool RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
 
     // The processing was successful, so return true
     return true;
-
 }
 
 // Publish a pointcloud of any point type on a publisher

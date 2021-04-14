@@ -387,7 +387,8 @@ class Subgait(object):
             )
         if len(parameters) != amount_of_parameters(dimensions):
             raise SubgaitInterpolationError(
-                f"The amount of parameters does not match {len(parameters)}" "the "
+                f"The amount of parameters does not match {len(parameters)}"
+                "the "
                 f"given dimensions {dimensions}"
             )
         if dimensions == InterpolationDimensions.ONE_DIM:
