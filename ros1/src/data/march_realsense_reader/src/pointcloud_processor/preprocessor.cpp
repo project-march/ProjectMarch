@@ -1,4 +1,3 @@
-#include "yaml-cpp/yaml.h"
 #include <ctime>
 #include <pcl/common/transforms.h>
 #include <pcl/features/normal_3d.h>
@@ -8,7 +7,6 @@
 #include <pcl/search/kdtree.h>
 #include <pointcloud_processor/preprocessor.h>
 #include <ros/ros.h>
-#include <utilities/yaml_utilities.h>
 
 #include <pcl_ros/transforms.h>
 #include <tf2_ros/transform_listener.h>
@@ -17,15 +15,14 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 
 // Base constructor for preprocessors
-Preprocessor::Preprocessor(YAML::Node config_tree, bool debugging)
-    : config_tree_ { config_tree }
-    , debugging_ { debugging }
+Preprocessor::Preprocessor(bool debugging)
+    : debugging_ { debugging }
 {
 }
 
 // Create a simple preprocessor with the ability to look up transforms
-SimplePreprocessor::SimplePreprocessor(YAML::Node config_tree, bool debugging)
-    : Preprocessor(config_tree, debugging)
+SimplePreprocessor::SimplePreprocessor(bool debugging)
+    : Preprocessor(debugging)
 {
     tfBuffer = std::make_unique<tf2_ros::Buffer>();
     tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
@@ -38,8 +35,8 @@ void SimplePreprocessor::readParameters(march_realsense_reader::pointcloud_param
 
 // Create a normals preprocessor with the ability to transform based on normal
 // orientation
-NormalsPreprocessor::NormalsPreprocessor(YAML::Node config_tree, bool debugging)
-    : Preprocessor(config_tree, debugging)
+NormalsPreprocessor::NormalsPreprocessor(bool debugging)
+    : Preprocessor(debugging)
 {
     tfBuffer = std::make_unique<tf2_ros::Buffer>();
     tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);

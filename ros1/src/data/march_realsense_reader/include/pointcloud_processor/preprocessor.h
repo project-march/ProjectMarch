@@ -1,7 +1,6 @@
 #ifndef MARCH_PREPROCESSOR_H
 #define MARCH_PREPROCESSOR_H
 
-#include "yaml-cpp/yaml.h"
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
@@ -13,7 +12,7 @@ using Normals = pcl::PointCloud<pcl::Normal>;
 
 class Preprocessor {
 public:
-    Preprocessor(YAML::Node config_tree, bool debugging);
+    Preprocessor(bool debugging);
 
     // This function is required to be implemented by any preprocessor
     virtual bool preprocess(PointCloud::Ptr pointcloud,
@@ -34,7 +33,6 @@ public:
 
     PointCloud::Ptr pointcloud_;
     Normals::Ptr pointcloud_normals_;
-    YAML::Node config_tree_;
     bool debugging_;
 };
 
@@ -45,7 +43,7 @@ class SimplePreprocessor : Preprocessor {
 public:
     /** Basic constructor for simple preprocessor, this will also create a
     tf_listener that is required for transforming the pointcloud **/
-    SimplePreprocessor(YAML::Node config_tree, bool debugging);
+    SimplePreprocessor(bool debugging);
 
     // Preprocess the given pointcloud, based on parameters in the config tree
     bool preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals,
@@ -69,7 +67,7 @@ class NormalsPreprocessor : Preprocessor {
 public:
     /** Basic constructor for normals preprocessor, this will also create a
     tf_listener that is required for transforming the pointcloud **/
-    NormalsPreprocessor(YAML::Node config_tree, bool debugging);
+    NormalsPreprocessor(bool debugging);
 
     // Calls all subsequent methods to preprocess a pointlcoud using normal
     // vectors

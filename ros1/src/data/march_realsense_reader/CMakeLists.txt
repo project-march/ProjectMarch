@@ -18,8 +18,6 @@ generate_dynamic_reconfigure_options(
     config/pointcloud_parameters.cfg
 )
 
-find_package(yaml-cpp)
-
 catkin_package(
     INCLUDE_DIRS include
     CATKIN_DEPENDS
@@ -46,7 +44,7 @@ add_library(${PROJECT_NAME}
     src/pointcloud_processor/hull_finder.cpp
     src/pointcloud_processor/parameter_determiner.cpp
 )
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} yaml-cpp)
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 add_executable(${PROJECT_NAME}_node src/realsense_reader_node.cpp)
 add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME})

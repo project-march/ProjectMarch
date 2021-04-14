@@ -4,13 +4,12 @@
 #include "utilities/linear_algebra_utilities.h"
 #include "utilities/output_utilities.h"
 #include "utilities/realsense_gait_utilities.h"
-#include "utilities/yaml_utilities.h"
-#include "yaml-cpp/yaml.h"
 #include <ctime>
 #include <pcl/filters/crop_hull.h>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
+
 #define EPSILON 0.0001
 
 using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
@@ -28,16 +27,15 @@ using HullVector = std::vector<Hull::Ptr>;
 using PolygonVector = std::vector<Polygon>;
 using GaitParameters = march_shared_msgs::GaitParameters;
 
-ParameterDeterminer::ParameterDeterminer(YAML::Node config_tree, bool debugging)
+ParameterDeterminer::ParameterDeterminer(bool debugging)
     : debugging_ { debugging }
-    , config_tree_ { config_tree }
 {
+
 }
 
 // Construct a basic HullParameterDeterminer class
-HullParameterDeterminer::HullParameterDeterminer(
-    YAML::Node config_tree, bool debugging)
-    : ParameterDeterminer(config_tree, debugging)
+HullParameterDeterminer::HullParameterDeterminer(bool debugging)
+    : ParameterDeterminer(debugging)
 {
 
 }

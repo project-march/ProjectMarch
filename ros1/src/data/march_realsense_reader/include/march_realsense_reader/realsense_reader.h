@@ -1,7 +1,6 @@
 #ifndef MARCH_REALSENSE_READER_HPP
 #define MARCH_REALSENSE_READER_HPP
 
-#include "yaml-cpp/yaml.h"
 #include <march_shared_msgs/GetGaitParameters.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
@@ -43,16 +42,6 @@ public:
      * this gives a speedup when you need a single pointcloud.
      */
     void pointcloudCallback(const sensor_msgs::PointCloud2 pointCloud2) {};
-
-    /** Read in the config file, the string is the name of the file, which
-     * should be in the config directory. Returns a YAML::Node with the
-     * configurations.
-     */
-    YAML::Node readConfig(std::string config_file);
-
-    // Get a config key from the root of the file, returns empty if key is
-    // missing.
-    YAML::Node getConfigIfPresent(std::string key);
 
     void readConfigCb(march_realsense_reader::pointcloud_parametersConfig &config, uint32_t level);
 
@@ -109,6 +98,7 @@ private:
     std::string config_file_;
     YAML::Node config_tree_;
     std::string frame_id_to_transform_to_;
+    ros::Publisher pointcloud_publisher_;
 
     int selected_gait_;
     bool debugging_;

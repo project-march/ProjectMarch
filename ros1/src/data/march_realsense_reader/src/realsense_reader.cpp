@@ -34,23 +34,12 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
         = n_->advertiseService("/camera/process_pointcloud",
             &RealSenseReader::processPointcloudCallback, this);
 
-    config_tree_ = readConfig("pointcloud_parameters.yaml");
+    preprocessor_ = std::make_unique<NormalsPreprocessor>(debugging_);
+    region_creator_ = std::make_unique<RegionGrower>(debugging_);
+    hull_finder_ = std::make_unique<CHullFinder>(debugging_);
+    parameter_determiner_ = std::make_unique<HullParameterDeterminer>(debugging_);
 
-    if (config_tree_["debug"]) {
-        debugging_ = config_tree_["debug"].as<bool>();
-    } else {
-        debugging_ = false;
-    }
-
-    preprocessor_ = std::make_unique<NormalsPreprocessor>(
-        getConfigIfPresent("preprocessor"), debugging_);
-    region_creator_ = std::make_unique<RegionGrower>(
-        getConfigIfPresent("region_creator"), debugging_);
-    hull_finder_ = std::make_unique<CHullFinder>(
-        getConfigIfPresent("hull_finder"), debugging_);
-    parameter_determiner_ = std::make_unique<HullParameterDeterminer>(
-        getConfigIfPresent("parameter_determiner"), debugging_);
-
+    debugging_ = true;
     if (debugging_)
     {
         ROS_DEBUG(
@@ -77,41 +66,23 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     }
 }
 
-YAML::Node RealSenseReader::readConfig(std::string config_file)
-{
-    YAML::Node config_tree;
-    std::string path = ros::package::getPath("march_realsense_reader")
-        + "/config/" + config_file;
-    try {
-        config_tree = YAML::LoadFile(path);
-    } catch (YAML::Exception& e) {
-        ROS_WARN_STREAM("YAML file with path " << path
-                                               << " could not be loaded, using "
-                                                  "empty config instead");
-    }
-    return config_tree;
-}
-
-YAML::Node RealSenseReader::getConfigIfPresent(std::string key)
-{
-    if (config_tree_[key]) {
-        return config_tree_[key];
-    } else {
-        ROS_WARN_STREAM("Key "
-            << key
-            << " was not found in the config file, empty config "
-               "will be used");
-        return YAML::Node();
-    }
-}
-
 void RealSenseReader::readConfigCb(march_realsense_reader::pointcloud_parametersConfig &config, uint32_t level)
 {
-  ROS_DEBUG("Changed march_realsense_parameters with dynamic reconfiguration");
-  preprocessor_->readParameters(config);
-  region_creator_->readParameters(config);
-  parameter_determiner_->readParameters(config);
+    ROS_DEBUG("Changed march_realsense_parameters with dynamic reconfiguration");
+
+    debugging_ = config.debug;
+    /*if (debugging_) {
+      ROS_DEBUG("Realsense reader started with debugging, all intermediate result steps will be published "
+                "and more information given in console, but this might slow the process, this can be turned "
+                "off in the config file.");
+    }*/
+
+    preprocessor_->readParameters(config);
+    region_creator_->readParameters(config);
+    parameter_determiner_->readParameters(config);
+    hull_finder_->readParameters(config);
 }
+
 // This method executes the logic to process a pointcloud
 bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
     march_shared_msgs::GetGaitParameters::Response& res)
