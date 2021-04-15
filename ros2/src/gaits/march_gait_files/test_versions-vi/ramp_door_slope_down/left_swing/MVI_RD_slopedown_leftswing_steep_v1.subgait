@@ -1,0 +1,86 @@
+description: The left swing step for the 20 degrees ramp down.
+duration: 3000000000
+gait_type: stairs_like
+joints:
+  left_ankle:
+  - position: 0.04363323
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.15768162
+    time_from_start: 319714290
+    velocity: 0
+  - position: 0.04326868
+    time_from_start: 640285710
+    velocity: 0
+  - position: 0.04326868
+    time_from_start: 902571430
+    velocity: 0
+  - position: -0.26179939
+    time_from_start: 1500000000
+    velocity: 0.0
+  - position: -0.26179939
+    time_from_start: 3000000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.05235988
+    time_from_start: 0
+    velocity: -0.0
+  - position: -0.05235988
+    time_from_start: 3000000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: 0.1745
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.81507854
+    time_from_start: 1271935710
+    velocity: 0.0
+  - position: 0.4583
+    time_from_start: 3000000000
+    velocity: -0.0
+  left_knee:
+  - position: 0.6981
+    time_from_start: 0
+    velocity: 0.0
+  - position: 1.415223
+    time_from_start: 976092860
+    velocity: -0.0
+  - position: 0.23265955
+    time_from_start: 2226621430
+    velocity: 0.0
+  - position: 0.2065
+    time_from_start: 3000000000
+    velocity: -0.0
+  right_ankle:
+  - position: -0.26179939
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.04363323
+    time_from_start: 3000000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: -0.05235988
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.05235988
+    time_from_start: 3000000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.4583
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.1745
+    time_from_start: 3000000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.2065
+    time_from_start: 0
+    velocity: -0.0
+  - position: 0.5089
+    time_from_start: 1498800000
+    velocity: 0.3491
+  - position: 0.6981
+    time_from_start: 3000000000
+    velocity: -0.0
+name: left_swing
+version: MVI_RD_slopedown_leftswing_steep_v1
