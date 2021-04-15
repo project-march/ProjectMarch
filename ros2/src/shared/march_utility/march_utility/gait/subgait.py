@@ -718,23 +718,26 @@ class Subgait(object):
         ) = Subgait.prepare_subgaits_for_inverse_kinematics(base_subgait, other_subgait)
 
         number_of_setpoints = len(base_setpoints_to_interpolate)
-        other_number_of_setpoints = len(other_setpoints_to_interpolate)
 
         new_setpoints: dict = {joint.name: [] for joint in base_subgait.joints}
         # fill all joints in new_setpoints except the ankle joints using
         # the inverse kinematics
         for setpoint_index in range(0, number_of_setpoints):
-            base_feet_state = FeetState.from_setpoint_dict(
-                base_setpoints_to_interpolate[setpoint_index]
-            )
-            other_feet_state = FeetState.from_setpoint_dict(
-                other_setpoints_to_interpolate[setpoint_index]
-            )
-            new_feet_state = FeetState.weighted_average_states(
-                base_feet_state, other_feet_state, parameter
-            )
+            if base_setpoints_to_interpolate[setpoint_index] == \
+                    other_setpoints_to_interpolate[setpoint_index]:
+                setpoints_to_add = base_setpoints_to_interpolate[setpoint_index]
+            else:
+                base_feet_state = FeetState.from_setpoint_dict(
+                    base_setpoints_to_interpolate[setpoint_index]
+                )
+                other_feet_state = FeetState.from_setpoint_dict(
+                    other_setpoints_to_interpolate[setpoint_index]
+                )
+                new_feet_state = FeetState.weighted_average_states(
+                    base_feet_state, other_feet_state, parameter
+                )
 
-            setpoints_to_add = FeetState.feet_state_to_setpoints(new_feet_state)
+                setpoints_to_add = FeetState.feet_state_to_setpoints(new_feet_state)
 
             for joint_name in JOINT_NAMES_IK:
                 new_setpoints[joint_name].append(setpoints_to_add[joint_name])
