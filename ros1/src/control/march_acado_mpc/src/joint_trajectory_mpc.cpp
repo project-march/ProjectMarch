@@ -216,7 +216,7 @@ void ModelPredictiveControllerInterface::updateCommand(
         (*joint_handles_ptr_)[i].setCommand(command);
     }
 
-    for (unsigned int i = 0; i < num_joints_; ++i) {
+    for (int i = 0; i < num_joints_; ++i) {
         // Fill MPC message with information
         setMpcMsg(i);
 
