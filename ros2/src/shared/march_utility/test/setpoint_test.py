@@ -13,6 +13,10 @@ from march_utility.utilities.utility_functions import (
 from march_utility.utilities.vector_3d import Vector3d
 
 
+def round_setpoint(n):
+    return round(n, Setpoint.digits)
+
+
 class SetpointTest(unittest.TestCase):
     def setUp(self):
         self.setpoint = Setpoint(
@@ -28,20 +32,20 @@ class SetpointTest(unittest.TestCase):
         }
 
     def test_time_rounding(self):
-        self.assertEqual(self.setpoint.time, Duration(seconds=1.12341254))
+        self.assertEqual(self.setpoint.time, Duration(seconds=round_setpoint(1.12341254)))
 
     def test_position_rounding(self):
-        self.assertEqual(self.setpoint.position, 0.03434126)
+        self.assertEqual(self.setpoint.position, round_setpoint(0.03434126))
 
     def test_velocity_rounding(self):
-        self.assertEqual(self.setpoint.velocity, 123.16208455)
+        self.assertEqual(self.setpoint.velocity, round_setpoint(123.16208455))
 
     def test_string_output(self):
         self.assertEqual(
             str(self.setpoint),
-            "Time: {t}, Position: {p}, Velocity: {v}".format(
-                t=1123412540, p=0.03434126, v=123.16208455
-            ),
+            f"Time: {round_setpoint(Duration(nanoseconds=1123412540)).nanoseconds}, "
+            f"Position: {round_setpoint(0.03434126)}, Velocity: "
+            f"{round_setpoint(123.16208455)}"
         )
 
     def test_equal(self):
@@ -99,7 +103,9 @@ class SetpointTest(unittest.TestCase):
         new_setpoints = FeetState.feet_state_to_setpoints(feet_state)
         for key in new_setpoints.keys():
             self.assertAlmostEqual(
-                new_setpoints[key].velocity, self.setpoint_dict[key].velocity, places=4
+                new_setpoints[key].velocity, round_setpoint(self.setpoint_dict[
+                                                                key].velocity),
+                places=3
             )
 
     def test_inverse_kinematics_reversed_position(self):
@@ -115,8 +121,8 @@ class SetpointTest(unittest.TestCase):
         dif_right = (
             desired_state.right_foot.position - resulting_position.right_foot.position
         )
-        self.assertLess(dif_left.norm(), 0.00001)
-        self.assertLess(dif_right.norm(), 1 / 0.00001)
+        self.assertLess(dif_left.norm(), 0.0001)
+        self.assertLess(dif_right.norm(), 1 / 0.0001)
 
     def test_weighted_average_states(self):
         parameter = 0.8

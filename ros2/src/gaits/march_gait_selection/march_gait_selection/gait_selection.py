@@ -73,10 +73,6 @@ class GaitSelection(Node):
             self.get_logger().error(
                 f"Gait default yaml file does not exist: {directory}/default.yaml"
             )
-        if not os.path.isfile(self._realsense_yaml):
-            self.get_logger().warn(
-                "No realsense_yaml present, no realsense gaits " "will be created."
-            )
 
         self._realsense_gait_version_map = self._load_realsense_configuration()
         (
@@ -365,6 +361,11 @@ class GaitSelection(Node):
             gaits[gait_name] = gait
 
     def _load_realsense_configuration(self):
+        if not os.path.isfile(self._realsense_yaml):
+            self.get_logger().warn(
+                "No realsense_yaml present, no realsense gaits will be created."
+            )
+            return {}
         with open(self._realsense_yaml, "r") as realsense_config_file:
             realsense_config = yaml.load(realsense_config_file, Loader=yaml.SafeLoader)
         return realsense_config
