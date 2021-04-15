@@ -86,8 +86,8 @@ void ModelPredictiveController::setReference(
 
 void ModelPredictiveController::shiftStatesAndControl()
 {
-    acado_shiftStates(2, 0, 0);
-    acado_shiftControls(0);
+    acado_shiftStates(/*strategy=*/2, /*xEnd=*/0, /*uEnd=*/0);
+    acado_shiftControls(/*uEnd=*/0);
 }
 
 void ModelPredictiveController::assignWeightingMatrix(std::vector<float> W)
@@ -156,8 +156,8 @@ void ModelPredictiveController::calculateControlInput()
     u = acadoVariables.u[0];
 
     // Shift states and control and prepare for the next iteration
-    acado_shiftStates(2, 0, 0);
-    acado_shiftControls(0);
+    acado_shiftStates(/*strategy=*/2, /*xEnd=*/0, /*uEnd=*/0);
+    acado_shiftControls(/*uEnd=*/0);
 
     // Perform a diagnosis on the controller
     controllerDiagnosis();

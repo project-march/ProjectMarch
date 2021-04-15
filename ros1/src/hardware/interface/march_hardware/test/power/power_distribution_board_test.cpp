@@ -19,8 +19,15 @@ protected:
 
 TEST_F(PowerDistributionBoardTest, Unequals)
 {
-    NetDriverOffsets netDriverOffsets2(1, 2, 3);
-    NetMonitorOffsets netMonitorOffsets2(1, 1, 1, 1, 1, 1, 1, 1);
+    NetDriverOffsets netDriverOffsets2(/*lowVoltageNetOnOff=*/1,
+        /*highVoltageNetOnOff=*/2, /*highVoltageNetEnableDisable=*/3);
+    NetMonitorOffsets netMonitorOffsets2(
+        /*powerDistributionBoardCurrentByteOffset=*/1,
+        /*lowVoltageNet1CurrentByteOffset=*/1,
+        /*lowVoltageNet2CurrentByteOffset=*/1,
+        /*highVoltageNetCurrentByteOffset=*/1, /*lowVoltageStateByteOffset=*/1,
+        /*highVoltageOvercurrentTriggerByteOffset=*/1, /*highVoltageEnabled=*/1,
+        /*highVoltageStateByteOffset=*/1);
     march::PowerDistributionBoard powerDistributionBoard1(this->mock_slave,
         netMonitoringOffsets, netDriverOffsets, bootShutdownOffsets);
     march::PowerDistributionBoard powerDistributionBoard2(this->mock_slave,

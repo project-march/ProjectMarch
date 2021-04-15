@@ -21,7 +21,7 @@ IMotionCube::IMotionCube(const Slave& slave,
     : Slave(slave)
     , absolute_encoder_(std::move(absolute_encoder))
     , incremental_encoder_(std::move(incremental_encoder))
-    , sw_string_("empty")
+    , sw_string_(/*__s=*/"empty")
     , actuation_mode_(actuation_mode)
 {
     if (!this->absolute_encoder_ || !this->incremental_encoder_) {
@@ -109,32 +109,38 @@ bool IMotionCube::writeInitialSettings(SdoSlaveInterface& sdo, int cycle_time)
     }
 
     // mode of operation
-    int mode_of_op = sdo.write(0x6060, 0, this->actuation_mode_.toModeNumber());
+    int mode_of_op = sdo.write(
+        /*index=*/0x6060, /*sub=*/0, this->actuation_mode_.toModeNumber());
 
     // position limit -- min position
-    int min_pos_lim
-        = sdo.write(0x607D, 1, this->absolute_encoder_->getLowerSoftLimitIU());
+    int min_pos_lim = sdo.write(/*index=*/0x607D, /*sub=*/1,
+        this->absolute_encoder_->getLowerSoftLimitIU());
 
     // position limit -- max position
-    int max_pos_lim
-        = sdo.write(0x607D, 2, this->absolute_encoder_->getUpperSoftLimitIU());
+    int max_pos_lim = sdo.write(/*index=*/0x607D, /*sub=*/2,
+        this->absolute_encoder_->getUpperSoftLimitIU());
 
     // Quick stop option
-    int stop_opt = sdo.write<int16_t>(0x605A, 0, 6);
+    int stop_opt = sdo.write<int16_t>(/*index=*/0x605A, /*sub=*/0, /*value=*/6);
 
     // Quick stop deceleration
-    int stop_decl = sdo.write<uint32_t>(0x6085, 0, 0x7FFFFFFF);
+    int stop_decl = sdo.write<uint32_t>(
+        /*index=*/0x6085, /*sub=*/0, /*value=*/0x7FFFFFFF);
 
     // Abort connection option code
-    int abort_con = sdo.write<int16_t>(0x6007, 0, 1);
+    int abort_con
+        = sdo.write<int16_t>(/*index=*/0x6007, /*sub=*/0, /*value=*/1);
 
     // set the ethercat rate of encoder in form x*10^y
-    int rate_ec_x = sdo.write<uint8_t>(0x60C2, 1, cycle_time);
-    int rate_ec_y = sdo.write<int8_t>(0x60C2, 2, -3);
+    int rate_ec_x = sdo.write<uint8_t>(/*index=*/0x60C2, /*sub=*/1, cycle_time);
+    int rate_ec_y
+        = sdo.write<int8_t>(/*index=*/0x60C2, /*sub=*/2, /*value=*/-3);
 
     // use filter object to read motor voltage
-    int volt_address = sdo.write<int16_t>(0x2108, 1, 0x0232);
-    int volt_filter = sdo.write<int16_t>(0x2108, 2, 32767);
+    int volt_address
+        = sdo.write<int16_t>(/*index=*/0x2108, /*sub=*/1, /*value=*/0x0232);
+    int volt_filter
+        = sdo.write<int16_t>(/*index=*/0x2108, /*sub=*/2, /*value=*/32767);
 
     if (!(mode_of_op && max_pos_lim && min_pos_lim && stop_opt && stop_decl
             && abort_con && rate_ec_x && rate_ec_y && volt_address
@@ -404,7 +410,7 @@ void IMotionCube::goToOperationEnabled()
             "Trying to go to operation enabled with "
             "unknown actuation mode");
     }
-    this->setControlWord(128);
+    this->setControlWord(/*control_word=*/128);
 
     this->goToTargetState(IMotionCubeTargetState::SWITCH_ON_DISABLED);
     this->goToTargetState(IMotionCubeTargetState::READY_TO_SWITCH_ON);
@@ -432,7 +438,7 @@ void IMotionCube::goToOperationEnabled()
         this->actuateIU(angle);
     }
     if (this->actuation_mode_ == ActuationMode::torque) {
-        this->actuateTorque(0);
+        this->actuateTorque(/*target_torque=*/0);
     }
 
     this->goToTargetState(IMotionCubeTargetState::OPERATION_ENABLED);
@@ -440,9 +446,9 @@ void IMotionCube::goToOperationEnabled()
 
 void IMotionCube::reset(SdoSlaveInterface& sdo)
 {
-    this->setControlWord(0);
+    this->setControlWord(/*control_word=*/0);
     ROS_DEBUG("Slave: %d, Try to reset IMC", this->getSlaveIndex());
-    sdo.write<uint16_t>(0x2080, 0, 1);
+    sdo.write<uint16_t>(/*index=*/0x2080, /*sub=*/0, /*value=*/1);
 }
 
 uint16_t IMotionCube::computeSWCheckSum(
@@ -455,7 +461,7 @@ uint16_t IMotionCube::computeSWCheckSum(
     while ((pos = sw_string_.find(delimiter, old_pos)) != std::string::npos) {
         std::string token = sw_string_.substr(old_pos, pos - old_pos);
         if (old_pos == 0) {
-            start_address = std::stoi(token, nullptr, 16);
+            start_address = std::stoi(token, /*__idx=*/nullptr, /*__base=*/16);
             token = "0";
         }
         if (pos == old_pos) {
@@ -464,8 +470,8 @@ uint16_t IMotionCube::computeSWCheckSum(
             return sum;
         }
         end_address++;
-        sum += std::stoi(token, nullptr,
-            16); // State that we are looking at hexadecimal numbers
+        sum += std::stoi(token, /*__idx=*/nullptr,
+            /*__base=*/16); // State that we are looking at hexadecimal numbers
         old_pos = pos + delimiter.length(); // Make sure to check the position
                                             // after the previous one
     }
@@ -480,14 +486,14 @@ bool IMotionCube::verifySetup(SdoSlaveInterface& sdo)
     const uint32_t sw_value
         = this->computeSWCheckSum(start_address, end_address);
     // set parameters to compute checksum on the imc
-    const int checksum_setup
-        = sdo.write<uint32_t>(0x2069, 0, (end_address << 16) | start_address);
+    const int checksum_setup = sdo.write<uint32_t>(
+        /*index=*/0x2069, /*sub=*/0, (end_address << 16) | start_address);
 
     uint16_t imc_value;
     int value_size = sizeof(imc_value);
     // read computed checksum on imc
-    const int check_sum_read
-        = sdo.read<uint16_t>(0x206A, 0, value_size, imc_value);
+    const int check_sum_read = sdo.read<uint16_t>(
+        /*index=*/0x206A, /*sub=*/0, value_size, imc_value);
     if (!(checksum_setup && check_sum_read)) {
         throw error::HardwareException(
             error::ErrorType::WRITING_INITIAL_SETTINGS_FAILED,
@@ -510,9 +516,10 @@ void IMotionCube::downloadSetupToDrive(SdoSlaveInterface& sdo)
     while ((pos = sw_string_.find(delimiter, old_pos)) != std::string::npos) {
         const std::string token = sw_string_.substr(old_pos, pos - old_pos);
         if (old_pos == 0) {
-            const uint16_t mem_location = std::stoi(token, nullptr, 16);
+            const uint16_t mem_location
+                = std::stoi(token, /*__idx=*/nullptr, /*__base=*/16);
             const uint16_t mem_setup = 9; // send 16-bits and auto increment
-            result = sdo.write<uint32_t>(0x2064, 0,
+            result = sdo.write<uint32_t>(/*index=*/0x2064, /*sub=*/0,
                 (mem_location << 16)
                     | mem_setup); // write the write-configuration
             final_result |= result;
@@ -527,13 +534,16 @@ void IMotionCube::downloadSetupToDrive(SdoSlaveInterface& sdo)
 
                 uint32_t data = 0;
                 if (pos != old_pos) {
-                    data = (std::stoi(next_token, nullptr, 16) << 16)
-                        | std::stoi(token, nullptr, 16);
+                    data = (std::stoi(
+                                next_token, /*__idx=*/nullptr, /*__base=*/16)
+                               << 16)
+                        | std::stoi(token, /*__idx=*/nullptr, /*__base=*/16);
                 } else {
-                    data = std::stoi(token, nullptr, 16);
+                    data = std::stoi(token, /*__idx=*/nullptr, /*__base=*/16);
                 }
                 result = sdo.write<uint32_t>(
-                    0x2065, 0, data); // write the write-configuration
+                    /*index=*/0x2065, /*sub=*/0,
+                    data); // write the write-configuration
             }
         }
         final_result &= result;
