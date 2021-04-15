@@ -1,8 +1,7 @@
 ---
 Checks:     -*,
             portability-*,
-            bugprone-assert-side-effect,
-            bugprone-argument-comment
+            bugprone-*
 WarningsAsErrors: '*'
 HeaderFilterRegex: ''
 FormatStyle:     webkit
