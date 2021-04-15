@@ -17,8 +17,8 @@ TEST(UniformDistributionTest, generate_within_bounds)
 
 TEST(UniformDistributionTest, valid_change_range)
 {
-    UniformDistribution distribution { -100, 100 };
-    distribution.set_range(-1, 1);
+    UniformDistribution distribution { /*start=*/-100, /*end=*/100 };
+    distribution.set_range(/*start=*/-1, /*end=*/1);
     for (int i { 0 }; i < 10; ++i) {
         auto number = distribution.get_random_number();
         ASSERT_LE(-1, number);
