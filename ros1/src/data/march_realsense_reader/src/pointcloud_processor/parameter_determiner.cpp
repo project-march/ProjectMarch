@@ -153,7 +153,7 @@ bool HullParameterDeterminer::getOptimalFootLocation()
     // Crop those locations to only be left with locations where it is possible
     // to place the foot
     possible_foot_locations = boost::make_shared<PointNormalCloud>();
-    success &= cropCloudToHullVector(
+    success &= cropCloudToHullVectorUnique(
         foot_locations_to_try, possible_foot_locations);
 
     // Get the location where we would ideally place the foot
@@ -377,6 +377,43 @@ bool HullParameterDeterminer::cropCloudToHullVector(
         *output_cloud += *elevated_cloud_with_normals;
     }
 
+    return success;
+}
+
+bool HullParameterDeterminer::cropPointToHullVector(
+    pcl::PointXY const input_point, PointNormalCloud::Ptr output_cloud)
+{
+    PointCloud2D::Ptr input_cloud = boost::make_shared<PointCloud2D>();
+    input_cloud->push_back(input_point);
+
+    bool success = cropCloudToHullVector(input_cloud, output_cloud);
+    return success;
+}
+
+bool HullParameterDeterminer::cropCloudToHullVectorUnique(
+    PointCloud2D::Ptr const input_cloud, PointNormalCloud::Ptr output_cloud)
+{
+    bool success = true;
+
+    for (pcl::PointXY ground_point : *input_cloud) {
+        PointNormalCloud::Ptr potential_foot_locations_of_point
+            = boost::make_shared<PointNormalCloud>();
+        success &= HullParameterDeterminer::cropPointToHullVector(
+            ground_point, potential_foot_locations_of_point);
+
+        pcl::PointNormal highest_point;
+        highest_point.z = -std::numeric_limits<double>::max();
+
+        for (pcl::PointNormal potential_foot_location :
+            *potential_foot_locations_of_point) {
+            if (potential_foot_location.z > highest_point.z) {
+                highest_point = potential_foot_location;
+            }
+        }
+        if (highest_point.z != std::numeric_limits<double>::min()) {
+            output_cloud->push_back(highest_point);
+        }
+    }
     return success;
 }
 

@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+
 // WARNING! UNSAFE!
 // If you initialize this object, YOU, the caller, have to ensure
 // that both `joint_handles` and `nh` have a lifetime that is at
@@ -30,7 +31,7 @@ bool ModelPredictiveControllerInterface::init(
     // Initialize the model predictive controllers
     for (unsigned int i = 0; i < num_joints_; ++i) {
         model_predictive_controllers_.push_back(
-            ModelPredictiveController(getQMatrix(joint_names[i])));
+            ModelPredictiveController(getWeights(joint_names[i])));
         model_predictive_controllers_[i].joint_name = std::move(joint_names[i]);
         model_predictive_controllers_[i].init();
     }
@@ -38,42 +39,39 @@ bool ModelPredictiveControllerInterface::init(
     return true;
 }
 
-std::vector<std::vector<float>> ModelPredictiveControllerInterface::getQMatrix(
-    const std::string& joint_name)
+// Retrieve the weights from the parameter server for a joint.
+std::vector<float> ModelPredictiveControllerInterface::getWeights(
+    std::string joint_name)
 {
-    int n_rows, n_cols;
+    // get path to controller parameters
     std::string parameter_path = "/march/controller/trajectory";
-    ros::param::get(
-        parameter_path + "/q_matrices/" + joint_name + "/n_rows", n_rows);
-    ros::param::get(
-        parameter_path + "/q_matrices/" + joint_name + "/n_cols", n_cols);
 
-    if (n_rows != n_cols) {
-        ROS_WARN("Q_matrix is not square");
-    }
+    // Get Q and R from controller config
+    std::vector<float> Q;
+    std::vector<float> R;
 
-    std::vector<float> Q_flat;
-    ros::param::get(
-        parameter_path + "/q_matrices/" + joint_name + "/Q", Q_flat);
+    ros::param::get(parameter_path + "/weights/" + joint_name + "/Q", Q);
+    ros::param::get(parameter_path + "/weights/" + joint_name + "/R", R);
 
-    // Set QMatrix for the mpc msg
+    // Add Q and R to W
+    std::vector<float> W;
+    W.insert(W.begin(), Q.begin(), Q.end());
+    W.insert(W.end(), R.begin(), R.end());
+
+    // Check for validity of the weighting arrays
+    ROS_WARN_STREAM_COND(
+        Q.empty(), joint_name << ", Q array has not been supplied or is empty");
+    ROS_WARN_STREAM_COND(
+        R.empty(), joint_name << ", R array has not been supplied or is empty");
+    ROS_WARN_STREAM_COND(
+        W.size() != ACADO_NY, joint_name << ", Incorrect weighting array size");
+
+    // Set WArray for the mpc msg
     for (int i = 0; i < num_joints_; ++i) {
-        mpc_pub_->msg_.joint[i].tuning.q_matrix.assign(
-            Q_flat.begin(), Q_flat.end());
+        mpc_pub_->msg_.joint[i].tuning.weights.assign(W.begin(), W.end());
     }
 
-    std::vector<std::vector<float>> Q(n_rows, std::vector<float>(n_cols));
-    if (Q_flat.size() != n_rows * n_cols) {
-        ROS_WARN("Q_matrix does not have specified matrix dimensions.");
-    } else {
-        for (int y = 0; y < n_rows; y++) {
-            for (int x = 0; x < n_cols; x++) {
-                Q[y][x] = Q_flat[y * n_cols + x];
-            }
-        }
-    }
-
-    return Q;
+    return W;
 }
 
 // Function that dictates what to do when the controller is started by the
@@ -112,8 +110,6 @@ void ModelPredictiveControllerInterface::initMpcMsg()
         }
         // Loop trough all the outputs
         for (unsigned int j = 0; j < ACADO_NYN; j++) {
-            //      mpc_pub_->msg_.joint[i].state.reference_trajectory[j].array.resize(prediction_horizon
-            //      + 1);
             mpc_pub_->msg_.joint[i].reference.states[j].array.resize(
                 prediction_horizon + 1);
         }
