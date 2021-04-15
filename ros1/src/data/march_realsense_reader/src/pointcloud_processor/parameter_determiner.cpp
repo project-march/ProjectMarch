@@ -329,8 +329,8 @@ bool HullParameterDeterminer::cropCloudToHullVectorUnique(
 {
     bool success = true;
 
-    for (pcl::PointXY ground_point : *output_cloud) {
-        PointNormalCloud potential_foot_locations_of_point
+    for (pcl::PointXY ground_point : *input_cloud) {
+        PointNormalCloud::Ptr potential_foot_locations_of_point
             = boost::make_shared<PointNormalCloud>();
         success &= HullParameterDeterminer::cropPointToHullVector(
             ground_point, potential_foot_locations_of_point);
@@ -340,7 +340,7 @@ bool HullParameterDeterminer::cropCloudToHullVectorUnique(
         for (pcl::PointNormal potential_foot_location :
             *potential_foot_locations_of_point) {
             if (potential_foot_location.z > highest_point.z) {
-                highest_point = potential_foot_location
+                highest_point = potential_foot_location;
             }
         }
         if (highest_point.z != std::numeric_limits<double>::min()) {

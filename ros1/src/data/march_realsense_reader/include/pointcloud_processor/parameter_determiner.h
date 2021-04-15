@@ -93,7 +93,7 @@ protected:
     bool cropCloudToHullVector(PointCloud2D::Ptr const input_cloud,
         PointNormalCloud::Ptr output_cloud);
 
-    bool cropPointToHullVector(PointCloud2D::Ptr const input_cloud,
+    bool cropPointToHullVector(pcl::PointXY const input_point,
         PointNormalCloud::Ptr output_cloud);
 
     bool cropCloudToHullVectorUnique(PointCloud2D::Ptr const input_cloud,
