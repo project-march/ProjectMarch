@@ -344,7 +344,7 @@ bool HullParameterDeterminer::cropCloudToHullVectorUnique(
             }
         }
         if (highest_point.z != std::numeric_limits<double>::min()) {
-            output_cloud->points.push_back(highest_point);
+            output_cloud->push_back(highest_point);
         }
     }
     return success;
