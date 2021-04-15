@@ -48,12 +48,11 @@ void HullParameterDeterminer::readParameters(
     max_x_stairs = config.parameter_determiner_stairs_locations_max_x;
     min_z_stairs = config.parameter_determiner_stairs_locations_min_z;
     max_z_stairs = config.parameter_determiner_stairs_locations_max_z;
-    y_location = config.parameter_determiner_stairs_locations_y;
 
     general_most_desirable_location_is_mid
-        = config.parameter_determiner_most_desirable_loc_mid;
+        = config.parameter_determiner_most_desirable_loc_is_mid;
     general_most_desirable_location_is_small
-        = config.parameter_determiner_most_desirable_loc_small;
+        = config.parameter_determiner_most_desirable_loc_is_small;
 }
 
 /** This function takes in a pointcloud with matching normals and
