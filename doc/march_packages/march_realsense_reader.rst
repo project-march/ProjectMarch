@@ -83,6 +83,13 @@ HullParameterDeterminer
 Now that we have hulls (or bounded planes) where where we can potentially place the foot. We can start finding a desired
 foot location depending on the gait that is to be executed.
 
+The specifics of this class differ per obstacle. Consider for example the stairs gait:
+when finding a parameter for the stairs gait, the foot can be placed anywhere in a bounded 2D plane in space (anywhere between
+low-undeep, low-deep, high-undeep, high-deep stair) and therefore also two parameters will need to be found, one specifying the
+depth of the step, and one specifying the height of the step. This contrasts with the ramp gait for which is interpolated between
+a steep and flat ramp and as a result the foot can be placed anywhere on some line between the final foot locations of the
+flat and steep gait.
+
 For the stairs method this is done as follows:
 
   1. The stairs gait is interpolated from a low deep, high deep, low undeep & high undeep gait.
