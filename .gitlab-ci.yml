@@ -119,6 +119,7 @@ noetic:clang_tidy:
     changes:
       - "ros1/**/*.{hpp,h,cpp}"
       - "ros1/**/CMakeLists.txt"
+      - ".clang-tidy"
 
 foxy:clang_tidy:
   stage: Static analysis on code
@@ -132,3 +133,4 @@ foxy:clang_tidy:
     changes:
       - "ros2/**/*.{hpp,h,cpp}"
       - "ros2/**/CMakeLists.txt"
+      - ".clang-tidy"
