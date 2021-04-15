@@ -324,19 +324,21 @@ bool HullParameterDeterminer::cropPointToHullVector(
     return success;
 }
 
-bool HullParameterDeterminer::CropCloudToHullVectorUnique(
-        PointCloud2D::Ptr const input_cloud, PointNormalCloud::Ptr output_cloud)
+bool HullParameterDeterminer::cropCloudToHullVectorUnique(
+    PointCloud2D::Ptr const input_cloud, PointNormalCloud::Ptr output_cloud)
 {
     bool success = true;
 
     for (pcl::PointXY ground_point : *output_cloud) {
-        PointNormalCloud potential_foot_locations_of_point = boost::make_shared<PointNormalCloud>();
+        PointNormalCloud potential_foot_locations_of_point
+            = boost::make_shared<PointNormalCloud>();
         success &= HullParameterDeterminer::cropPointToHullVector(
-                ground_point, potential_foot_locations_of_point);
+            ground_point, potential_foot_locations_of_point);
 
         pcl::PointNormal highest_point;
         highest_point.z = std::numeric_limits<double>::min();
-        for (pcl::PointNormal potential_foot_location : *potential_foot_locations_of_point) {
+        for (pcl::PointNormal potential_foot_location :
+            *potential_foot_locations_of_point) {
             if (potential_foot_location.z > highest_point.z) {
                 highest_point = potential_foot_location
             }
@@ -347,7 +349,6 @@ bool HullParameterDeterminer::CropCloudToHullVectorUnique(
     }
     return success;
 }
-
 
 // Elevate the 2D points so they have z coordinate as if they lie on the plane
 // of the hull
