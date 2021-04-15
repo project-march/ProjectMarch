@@ -30,12 +30,12 @@ gaits:
     left_close: MV_RD_slopedownsingle_leftclose_v1
     right_open: MV_RD_slopedownsingle_rightopen_v1
   ramp_door_slope_up:
-    left_close: MV_RD_slopeup_flat_leftclose_v1
-    left_open: MV_RD_slopeup_flat_leftopen_v1
-    left_swing: MV_RD_slopeup_flat_leftswing_v1
-    right_close: MV_RD_slopeup_flat_rightclose_v1
-    right_open: MV_RD_slopeup_flat_rightopen_v1
-    right_swing: MV_RD_slopeup_flat_rightswing_v1
+    left_close: MVI_RD_slopeup_leftclose_flat_v1
+    left_open: MVI_RD_slopeup_leftopen_flat_v1
+    left_swing: MVI_RD_slopeup_leftswing_flat_v1
+    right_close: MVI_RD_slopeup_rightclose_flat_v1
+    right_open: MVI_RD_slopeup_rightopen_flat_v1
+    right_swing: MVI_RD_slopeup_rightswing_flat_v1
   rough_terrain_first_middle_step:
     left_close: MV_RT_first_middlestep_leftclose_v2
     right_open: MV_RT_first_middlestep_rightopen_v2
