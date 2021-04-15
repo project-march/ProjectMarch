@@ -18,9 +18,13 @@ using namespace std::chrono_literals;
 
 const int DEFAULT_MINIMUM_TEMPERATURE { 0 };
 const int DEFAULT_MAXIMUM_TEMPERATURE { 0 };
-const std::string MINIMUM_TEMPERATURE_PARAMETER_NAME { "minimum_temperature" };
-const std::string MAXIMUM_TEMPERATURE_PARAMETER_NAME { "maximum_temperature" };
-const std::string LOGGER_NAME { "fake_temperature" };
+const std::string MINIMUM_TEMPERATURE_PARAMETER_NAME {
+    /*__s=*/"minimum_temperature"
+};
+const std::string MAXIMUM_TEMPERATURE_PARAMETER_NAME {
+    /*__s=*/"maximum_temperature"
+};
+const std::string LOGGER_NAME { /*__s=*/"fake_temperature" };
 
 /**
  * @file FakeTemperatureData.cpp
@@ -40,7 +44,7 @@ FakeTemperatureDataNode::FakeTemperatureDataNode(const std::string& node_name,
     const std::vector<float>&& autoregression_weights)
     : Node(node_name,
         rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(
-            true))
+            /*automatically_declare_parameters_from_overrides=*/true))
     , latest_temperatures { std::deque<int>(autoregression_weights.size()) }
     , autoregression_weights { std::move(autoregression_weights) }
     , minimum_temperature { DEFAULT_MINIMUM_TEMPERATURE }
@@ -144,14 +148,16 @@ void FakeTemperatureDataNode::add_temperature_publisher(
     if (sensor_name.empty()) {
         throw std::invalid_argument("Sensor name cannot be empty");
     }
-    std::string topic_name = std::string("/march/temperature/") + sensor_name;
+    std::string topic_name
+        = std::string(/*__s=*/"/march/temperature/") + sensor_name;
     // This is not an important topic, therefore it has lenient QoS settings:
     // - keep only the last sample
     // - attempt to deliver samples, but may lose them if the network is not
     // robust
     //   (best effort)
     // - no attempt is made to persist samples (volatile)
-    auto qos = rclcpp::QoS(1).best_effort().durability_volatile();
+    auto qos
+        = rclcpp::QoS(/*history_depth=*/1).best_effort().durability_volatile();
     auto publisher = this->create_publisher<MessageType>(topic_name, qos);
     temperature_publishers.push_back(publisher);
 }
