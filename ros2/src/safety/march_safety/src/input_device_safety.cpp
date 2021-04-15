@@ -126,6 +126,7 @@ void InputDeviceSafety::check_last_alive_stamp(
     // This can happen when one node is using sim_time and others aren't.
     // Add small margin to take the stamp offset between board and PC into
     // account
+    // NOLINTNEXTLINE(bugprone-argument-comment)
     if (now + rclcpp::Duration(/*duration=*/0.5s) < last_alive) {
         RCLCPP_WARN_STREAM_THROTTLE(node_->get_logger(), *node_->get_clock(),
             THROTTLE_DURATION_MS,
