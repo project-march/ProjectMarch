@@ -22,7 +22,7 @@ protected:
     void SetUp() override
     {
         this->base_path = ros::package::getPath("march_hardware_builder")
-                              .append("/test/yaml/imotioncube");
+                              .append(/*__s=*/"/test/yaml/imotioncube");
         this->joint = std::make_shared<urdf::Joint>();
         this->joint->limits = std::make_shared<urdf::JointLimits>();
         this->joint->safety = std::make_shared<urdf::JointSafety>();
@@ -54,8 +54,8 @@ TEST_F(IMotionCubeBuilderTest, ValidIMotionCubeHip)
         this->joint->safety->soft_upper_limit);
     auto incremental_encoder
         = std::make_unique<march::IncrementalEncoder>(12, 101.0);
-    march::IMotionCube expected(
-        march::Slave(2, this->pdo_interface, this->sdo_interface),
+    march::IMotionCube expected(march::Slave(/*slave_index=*/2,
+                                    this->pdo_interface, this->sdo_interface),
         std::move(absolute_encoder), std::move(incremental_encoder),
         march::ActuationMode::unknown);
 

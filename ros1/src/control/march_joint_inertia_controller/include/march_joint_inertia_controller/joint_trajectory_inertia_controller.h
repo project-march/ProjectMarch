@@ -52,7 +52,7 @@ public:
         pids_.resize(num_joints_);
         for (unsigned int i = 0; i < pids_.size(); ++i) {
             ros::NodeHandle joint_nh(
-                nh, std::string("gains/") + joint_handles[i].getName());
+                nh, std::string(/*__s=*/"gains/") + joint_handles[i].getName());
 
             // Init PID gains from ROS parameter server
             pids_[i] = std::make_shared<control_toolbox::Pid>();
@@ -70,7 +70,7 @@ public:
             { 0.0, 0.0 } };
         std::vector<double> default_vibration = { 0.0, 1.0 };
         ros::NodeHandle rotary_estimator_nh(
-            nh, std::string("inertia_estimator/rotary"));
+            nh, std::string(/*__s=*/"inertia_estimator/rotary"));
         rotary_estimator_nh.param("std_samples", samples_, 100);
         rotary_estimator_nh.param("lambda", lambda[0], 1.0);
         rotary_estimator_nh.param(
@@ -79,7 +79,7 @@ public:
             "vibration_boundaries", vibration_boundaries[0], default_vibration);
 
         ros::NodeHandle linear_estimator_nh(
-            nh, std::string("inertia_estimator/linear"));
+            nh, std::string(/*__s=*/"inertia_estimator/linear"));
         linear_estimator_nh.param("lambda", lambda[1], 1.0);
         linear_estimator_nh.param(
             "alpha_filter_size", alpha_filter_size[1], 12);
@@ -174,7 +174,7 @@ public:
         // Reset PIDs, zero commands
         for (unsigned int i = 0; i < pids_.size(); ++i) {
             pids_[i]->reset();
-            (*joint_handles_ptr_)[i].setCommand(0.0);
+            (*joint_handles_ptr_)[i].setCommand(/*command=*/0.0);
         }
     }
 

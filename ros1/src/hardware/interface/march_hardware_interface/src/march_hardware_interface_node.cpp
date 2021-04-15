@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 {
     ros::init(argc, argv, "march_hardware_interface");
     ros::NodeHandle nh;
-    ros::AsyncSpinner spinner(2);
+    ros::AsyncSpinner spinner(/*thread_count=*/2);
 
     if (argc < 2) {
         ROS_FATAL("Missing robot argument\nusage: "
@@ -35,12 +35,12 @@ int main(int argc, char** argv)
     try {
         bool success = march.init(nh, nh);
         if (!success) {
-            std::exit(1);
+            std::exit(/*__status=*/1);
         }
     } catch (const std::exception& e) {
         ROS_FATAL("Hardware interface caught an exception during init");
         ROS_FATAL("%s", e.what());
-        std::exit(1);
+        std::exit(/*__status=*/1);
     }
 
     controller_manager::ControllerManager controller_manager(&march, nh);
@@ -77,6 +77,6 @@ std::unique_ptr<march::MarchRobot> build(AllowedRobot robot)
         ROS_FATAL(
             "Hardware interface caught an exception during building hardware");
         ROS_FATAL("%s", e.what());
-        std::exit(1);
+        std::exit(/*__status=*/1);
     }
 }

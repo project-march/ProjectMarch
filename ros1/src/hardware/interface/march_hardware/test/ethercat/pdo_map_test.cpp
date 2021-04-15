@@ -7,7 +7,8 @@
 class PDOTest : public ::testing::Test {
 protected:
     MockSdoInterfacePtr mock_sdo = std::make_shared<MockSdoInterface>();
-    march::SdoSlaveInterface sdo = march::SdoSlaveInterface(1, mock_sdo);
+    march::SdoSlaveInterface sdo
+        = march::SdoSlaveInterface(/*slave_index=*/1, mock_sdo);
 };
 
 TEST_F(PDOTest, sortPDOmap)
@@ -70,7 +71,8 @@ TEST_F(PDOTest, CombinedAdressConstructWithSubindexValue)
 {
     march::PDOmap pdoMap;
 
-    auto test_object = march::IMCObject(0x6060, 2, 16);
+    auto test_object = march::IMCObject(
+        /*_address=*/0x6060, /*_sub_index=*/2, /*_length=*/16);
     uint32_t combined_address = test_object.combined_address;
 
     ASSERT_EQ(16u, (combined_address & 0xFF));

@@ -84,7 +84,7 @@ void ModelPredictiveControllerInterface::starting(const ros::Time& /*time*/)
 
     // zero commands
     for (unsigned int i = 0; i < num_joints_; ++i) {
-        (*joint_handles_ptr_)[i].setCommand(0.0);
+        (*joint_handles_ptr_)[i].setCommand(/*command=*/0.0);
     }
 }
 
@@ -234,7 +234,7 @@ void ModelPredictiveControllerInterface::stopping(const ros::Time& /*time*/)
 {
     // zero commands
     for (unsigned int i = 0; i < num_joints_; ++i) {
-        (*joint_handles_ptr_)[i].setCommand(0.0);
+        (*joint_handles_ptr_)[i].setCommand(/*command=*/0.0);
     }
 }
 

@@ -15,7 +15,7 @@
 namespace march {
 EthercatMaster::EthercatMaster(
     std::string ifname, int max_slave_index, int cycle_time, int slave_timeout)
-    : is_operational_(false)
+    : is_operational_(/*__i=*/false)
     , ifname_(std::move(ifname))
     , max_slave_index_(max_slave_index)
     , cycle_time_ms_(cycle_time)
@@ -81,11 +81,11 @@ void EthercatMaster::ethercatMasterInitiation()
 int setSlaveWatchdogTimer(uint16 slave)
 {
     uint16 configadr = ec_slave[slave].configadr;
-    ec_FPWRw(configadr, 0x0400, IMotionCube::WATCHDOG_DIVIDER,
+    ec_FPWRw(configadr, /*ADO=*/0x0400, IMotionCube::WATCHDOG_DIVIDER,
         EC_TIMEOUTRET); // Set the divider register of the WD
-    ec_FPWRw(configadr, 0x0410, IMotionCube::WATCHDOG_TIME,
+    ec_FPWRw(configadr, /*ADO=*/0x0410, IMotionCube::WATCHDOG_TIME,
         EC_TIMEOUTRET); // Set the PDI watchdog = WD
-    ec_FPWRw(configadr, 0x0420, IMotionCube::WATCHDOG_TIME,
+    ec_FPWRw(configadr, /*ADO=*/0x0420, IMotionCube::WATCHDOG_TIME,
         EC_TIMEOUTRET); // Set the SM watchdog = WD
     return 1;
 }
@@ -94,7 +94,7 @@ bool EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
 {
     ROS_INFO("Request pre-operational state for all slaves");
     bool reset = false;
-    ec_statecheck(0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
+    ec_statecheck(/*slave=*/0, EC_STATE_PRE_OP, EC_TIMEOUTSTATE * 4);
 
     for (Joint& joint : joints) {
         if (joint.hasIMotionCube()) {
@@ -108,7 +108,7 @@ bool EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
     ec_configdc();
 
     ROS_INFO("Request safe-operational state for all slaves");
-    ec_statecheck(0, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE * 4);
+    ec_statecheck(/*slave=*/0, EC_STATE_SAFE_OP, EC_TIMEOUTSTATE * 4);
 
     this->expected_working_counter_
         = (ec_group[0].outputsWKC * 2) + ec_group[0].inputsWKC;
@@ -118,13 +118,13 @@ bool EthercatMaster::ethercatSlaveInitiation(std::vector<Joint>& joints)
     ec_receive_processdata(EC_TIMEOUTRET);
 
     ROS_INFO("Request operational state for all slaves");
-    ec_writestate(0);
+    ec_writestate(/*slave=*/0);
     int chk = 40;
 
     do {
         ec_send_processdata();
         ec_receive_processdata(EC_TIMEOUTRET);
-        ec_statecheck(0, EC_STATE_OPERATIONAL, 50000);
+        ec_statecheck(/*slave=*/0, EC_STATE_OPERATIONAL, /*timeout=*/50000);
     } while (chk-- && (ec_slave[0].state != EC_STATE_OPERATIONAL));
 
     if (ec_slave[0].state == EC_STATE_OPERATIONAL) {
@@ -271,7 +271,7 @@ bool EthercatMaster::attemptSlaveRecover(int slave)
         }
 
         if (ec_slave[slave].state > EC_STATE_NONE) {
-            if (ec_reconfig_slave(slave, 500)) {
+            if (ec_reconfig_slave(slave, /*timeout=*/500)) {
                 ec_slave[slave].islost = FALSE;
             }
         }
@@ -287,7 +287,7 @@ bool EthercatMaster::attemptSlaveRecover(int slave)
 
     if (ec_slave[slave].islost) {
         if (ec_slave[slave].state == EC_STATE_NONE) {
-            if (ec_recover_slave(slave, 500)) {
+            if (ec_recover_slave(slave, /*timeout=*/500)) {
                 ec_slave[slave].islost = FALSE;
             }
         } else {
@@ -306,7 +306,7 @@ bool EthercatMaster::attemptSlaveRecover(int slave)
 void EthercatMaster::closeEthercat()
 {
     ec_slave[0].state = EC_STATE_INIT;
-    ec_writestate(0);
+    ec_writestate(/*slave=*/0);
     ec_close();
 }
 
