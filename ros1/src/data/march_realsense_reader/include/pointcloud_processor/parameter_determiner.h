@@ -14,6 +14,7 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using Region = pcl::PointIndices;
 using PlaneCoefficients = pcl::ModelCoefficients;
+using LineCoefficients = pcl::ModelCoefficients;
 using Hull = pcl::PointCloud<pcl::PointXYZ>;
 using Polygon = std::vector<pcl::Vertices>;
 using RegionVector = std::vector<Region>;
@@ -31,7 +32,7 @@ public:
             plane_coefficients_vector,
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
-        SelectedGait const selected_obstacle,
+        SelectedGait const selected_gait,
         boost::shared_ptr<GaitParameters> gait_parameters)
         = 0;
 
@@ -41,7 +42,7 @@ protected:
     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;
     boost::shared_ptr<HullVector> hull_vector_;
     boost::shared_ptr<PolygonVector> polygon_vector_;
-    SelectedGait selected_obstacle_;
+    SelectedGait selected_gait_;
     boost::shared_ptr<GaitParameters> gait_parameters_;
     YAML::Node config_tree_;
     bool debugging_;
@@ -63,7 +64,7 @@ public:
                                  plane_coefficients_vector,
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
-        SelectedGait const selected_obstacle,
+        SelectedGait const selected_gait,
         boost::shared_ptr<GaitParameters> gait_parameters) override;
 
     pcl::PointNormal optimal_foot_location;
@@ -75,10 +76,13 @@ protected:
     // closest to the most desirable foot location
     bool getOptimalFootLocation();
 
+    // Get the optimal foot location by selecting one from the possible
+    // locations
+    bool getOptimalFootLocationFromPossibleLocations();
+
     // From the possible foot locations, find which one is closes to the most
     // desirable location
-    bool getPossibleMostDesirableLocation(
-        PointNormalCloud::Ptr possible_foot_locations);
+    bool getPossibleMostDesirableLocation();
 
     // Compute the optimal foot location as if one were not limited by anything.
     bool getGeneralMostDesirableLocation();
@@ -132,8 +136,26 @@ protected:
     // Verify that a possible foot location is valid for the requested gait
     bool isValidLocation(pcl::PointNormal possible_foot_location);
 
+    // get the distance from a location to some object depending on the obstacle
+    bool getDistanceToObject(
+        pcl::PointNormal possible_foot_location, double& distance);
+
+    // Get the line on which it is possible to stand for a ramp gait.
+    bool getExecutableLocationsLine();
+
+    // Find the stairs up parameters from the foot locations
+    bool getGaitParametersFromFootLocationStairsUp();
+
+    // Find the ramp down parameter from the foot locations
+    bool getGaitParametersFromFootLocationRampDown();
+
+    // Fill the foot locations to try cloud with a line of points from (start,
+    // 0) to (end, 0)
+    bool fillOptionalFootLocationCloud(double start, double end);
+
     // Read all relevant parameters from the parameter yaml file
     void readYaml();
+    int hull_dimension;
     int number_of_optional_foot_locations;
     double min_x_stairs;
     double max_x_stairs;
@@ -144,11 +166,21 @@ protected:
     double foot_length_front;
     double foot_width;
     double max_allowed_z_deviation_foot;
+    double x_flat;
+    double z_flat;
+    double x_steep;
+    double z_steep;
+    double min_search_area;
+    double max_search_area;
+    double max_distance_to_line;
     bool general_most_desirable_location_is_mid;
     bool general_most_desirable_location_is_small;
 
-    SelectedGait selected_obstacle_;
     pcl::PointXYZ most_desirable_foot_location_;
+    // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t  + ([3], [4],
+    // [5])^T
+    LineCoefficients::Ptr executable_locations_line_coefficients_
+        = boost::make_shared<LineCoefficients>();
 };
 
 /** The simple parameter determiner
@@ -163,7 +195,7 @@ public:
                                  plane_coefficients_vector,
         boost::shared_ptr<HullVector> const hull_vector,
         boost::shared_ptr<PolygonVector> const polygon_vector,
-        SelectedGait const selected_obstacle,
+        SelectedGait const selected_gait,
         boost::shared_ptr<GaitParameters> gait_parameters) override;
 };
 
