@@ -3,7 +3,7 @@ march:
   # Publish all joint states -----------------------------------
   joint_state_controller:
     type: joint_state_controller/JointStateController
-    publish_rate: 250
+    publish_rate: 50
 
   controller:
     trajectory:
@@ -21,20 +21,17 @@ march:
       gains: # Required because we're controlling an effort interface
         # The pid values are working, but they seem to be heavily dependent
         # on the max effort values (in the march_world.launch file) for reasons unknown.
-        left_ankle: {p: 1000,  d: 10, i: 0, i_clamp: 0}
-        left_hip_aa: {p: 1000,  d: 10, i: 0, i_clamp: 0}
-        left_hip_fe: {p: 1500,  d: 150, i: 0, i_clamp: 0}
-        left_knee: {p: 1000,  d: 10, i: 0, i_clamp: 0}
-        right_ankle: {p: 1000,  d: 10, i: 0, i_clamp: 0}
-        right_hip_aa: {p: 1000,  d: 10, i: 0, i_clamp: 0}
-        right_hip_fe: {p: 1500,  d: 150, i: 0, i_clamp: 0}
-        right_knee: {p: 1000,  d: 10, i: 0, i_clamp: 0}
-
-      action_monitor_rate: 250
-      state_publish_rate: 250
+        left_ankle: {p: 1500,  d: 150, i: 0, i_clamp: 0}
+        left_hip_aa: {p: 1000,  d: 100, i: 0, i_clamp: 0}
+        left_hip_fe: {p: 2500,  d: 150, i: 0, i_clamp: 0}
+        left_knee: {p: 1500,  d: 100, i: 0, i_clamp: 0}
+        right_ankle: {p: 1500,  d: 150, i: 0, i_clamp: 0}
+        right_hip_aa: {p: 1000,  d: 100, i: 0, i_clamp: 0}
+        right_hip_fe: {p: 2500,  d: 150, i: 0, i_clamp: 0}
+        right_knee: {p: 1500,  d: 100, i: 0, i_clamp: 0}
 
       constraints:
-        goal_time: 0.2
+        goal_time: 0.5
         stopped_velocity_tolerance: 0.2
         left_ankle:
           trajectory: 0.305
