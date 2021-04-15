@@ -8,7 +8,7 @@
 #include <ros/ros.h>
 
 #include <xsensdeviceapi.h>
-#include <xstypes.h>
+#include <xsenstypes.h>
 
 #include "march_imu_manager/mtw.h"
 

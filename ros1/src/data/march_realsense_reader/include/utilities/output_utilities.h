@@ -1,6 +1,9 @@
 #ifndef MARCH_OUTPUT_UTILITIES_H
 #define MARCH_OUTPUT_UTILITIES_H
 
+#include <string>
+#include <vector>
+
 namespace output_utilities {
 // Turn a vector in to printable string
 template <typename T> std::string vectorToString(std::vector<T> vector)
