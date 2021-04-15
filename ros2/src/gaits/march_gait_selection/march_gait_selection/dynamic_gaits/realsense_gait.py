@@ -168,11 +168,19 @@ class RealSenseGait(SetpointsGait):
     def update_subgait_versions(self):
         new_subgaits = {}
         for subgait_name in self.subgaits.keys():
+            self._node.get_logger().warn(
+                f"Interpolating n subgaits with: \n"
+                f"Dimensions={self.dimensions}\n"
+                f"Subgaits={self.subgaits_to_interpolate[subgait_name]}\n"
+                f"Parameters={self.parameters}]n"
+                f"use foot position = true"
+            )
             new_subgaits[subgait_name] = Subgait.interpolate_n_subgaits(
                 dimensions=self.dimensions,
                 subgaits=self.subgaits_to_interpolate[subgait_name],
                 parameters=self.parameters,
                 use_foot_position=True,
+                node=self._node
             )
         self.set_subgaits(new_subgaits)
 

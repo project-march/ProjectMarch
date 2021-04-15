@@ -125,3 +125,6 @@ class Duration(ROSDuration):
 
     def __str__(self):
         return f"{round(self.seconds, 4)}s"
+
+    def __abs__(self):
+        return Duration(nanoseconds=abs(self.nanoseconds))
