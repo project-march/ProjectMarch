@@ -20,7 +20,7 @@ from urdf_parser_py import urdf
 from .limits import Limits
 from .setpoint import Setpoint
 
-ALLOWED_ERROR = 0.001
+ALLOWED_ERROR = 0.01
 
 
 class JointTrajectory(object):
@@ -29,11 +29,11 @@ class JointTrajectory(object):
     setpoint_class = Setpoint
 
     def __init__(
-        self,
-        name: str,
-        limits: Limits,
-        setpoints: List[Setpoint],
-        duration: Duration,
+            self,
+            name: str,
+            limits: Limits,
+            setpoints: List[Setpoint],
+            duration: Duration,
     ) -> None:
         """Initialize a joint trajectory."""
         self.name = name
@@ -46,7 +46,8 @@ class JointTrajectory(object):
 
     @classmethod
     def from_setpoint_dict(
-        cls, name: str, limits: Limits, setpoint_dict: List[dict], duration: Duration
+            cls, name: str, limits: Limits, setpoint_dict: List[dict],
+            duration: Duration
     ) -> JointTrajectory:
         """Creates a list of joint trajectories.
 
@@ -117,8 +118,8 @@ class JointTrajectory(object):
             else:
                 setpoint.time -= begin_time
         self.setpoints = [
-            Setpoint(time=Duration(), position=position, velocity=0)
-        ] + self.setpoints
+                             Setpoint(time=Duration(), position=position, velocity=0)
+                         ] + self.setpoints
         self._duration = self._duration - begin_time
 
     @property
@@ -159,15 +160,26 @@ class JointTrajectory(object):
             raise NonValidGaitContent(
                 self.name,
                 msg=f"Invalid boundary points for begin setpoint {self.setpoints[0]} "
-                f"and end setpoint {self.setpoints[-1]}",
+                    f"and end setpoint {self.setpoints[-1]} with duration {self.duration}",
             )
 
         from_setpoint = self.setpoints[-1]
         to_setpoint = joint.setpoints[0]
 
+        if abs(from_setpoint.velocity - to_setpoint.velocity) > ALLOWED_ERROR:
+            raise NonValidGaitContent(self.name, msg=
+            f"The joint {self.name} does not have a valid velocity "
+            f"transition between "
+            f"{from_setpoint.velocity} and  {to_setpoint.velocity}. ")
+        if abs(from_setpoint.position - to_setpoint.position) > ALLOWED_ERROR:
+            raise NonValidGaitContent(self.name, msg=
+            f"The joint {self.name} does not have a valid position "
+            f"transition between "
+            f"{from_setpoint.position} and  {to_setpoint.position}. ")
+
         return (
-            abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR
-            and abs(from_setpoint.position - to_setpoint.position) <= ALLOWED_ERROR
+                abs(from_setpoint.velocity - to_setpoint.velocity) <= ALLOWED_ERROR
+                and abs(from_setpoint.position - to_setpoint.position) <= ALLOWED_ERROR
         )
 
     def _validate_boundary_points(self) -> bool:
@@ -178,11 +190,14 @@ class JointTrajectory(object):
             (has nonzero speed), True otherwise
         """
         return (
-            self.setpoints[0].time.nanoseconds == 0 or self.setpoints[0].velocity == 0
-        ) and (
-            self.setpoints[-1].time == round(self.duration, Setpoint.digits)
-            or self.setpoints[-1].velocity == 0
-        )
+                       self.setpoints[0].time.nanoseconds == 0 or self.setpoints[
+                   0].velocity == 0
+               ) and (
+                       abs(self.setpoints[-1].time - round(self.duration,
+                                                           Setpoint.digits)).seconds <=
+                       ALLOWED_ERROR
+                       or self.setpoints[-1].velocity == 0
+               )
 
     def interpolate_setpoints(self) -> None:
         """Interpolate the setpoints from the joint trajectory."""
@@ -226,9 +241,9 @@ class JointTrajectory(object):
 
     @staticmethod
     def interpolate_joint_trajectories(
-        base_trajectory: JointTrajectory,
-        other_trajectory: JointTrajectory,
-        parameter: float,
+            base_trajectory: JointTrajectory,
+            other_trajectory: JointTrajectory,
+            parameter: float,
     ) -> JointTrajectory:
         """Linearly interpolate two joint trajectories with the parameter.
 
@@ -258,7 +273,7 @@ class JointTrajectory(object):
         setpoints = []
 
         for base_setpoint, other_setpoint in zip(
-            base_trajectory.setpoints, other_trajectory.setpoints
+                base_trajectory.setpoints, other_trajectory.setpoints
         ):
             interpolated_setpoint_to_add = (
                 JointTrajectory.setpoint_class.interpolate_setpoints(
@@ -276,8 +291,8 @@ class JointTrajectory(object):
 
     @staticmethod
     def check_joint_interpolation_is_safe(
-        base_joint: JointTrajectory,
-        other_joint: JointTrajectory,
+            base_joint: JointTrajectory,
+            other_joint: JointTrajectory,
     ) -> bool:
         """Check whether it is possible to interpolate between the two joint trajectories.
 
