@@ -1,4 +1,5 @@
-description: 'Stand up gait: from a high sit block to the standing position from a chair of 55 cm.'
+description: 'Stand up gait: from a high sit block to the standing position from a
+  chair of 55 cm.'
 duration: 1700000000
 gait_type: sit_like
 joints:
@@ -32,7 +33,7 @@ joints:
   - position: 0.0
     time_from_start: 1600000000
     velocity: -1.01229969
-  - position: -0.08729962
+  - position: -0.0873
     time_from_start: 1700000000
     velocity: 0.0
   left_knee:
@@ -78,7 +79,7 @@ joints:
   - position: 0.0
     time_from_start: 1600000000
     velocity: -1.01229969
-  - position: -0.08729962
+  - position: -0.0873
     time_from_start: 1700000000
     velocity: 0.0
   right_knee:
