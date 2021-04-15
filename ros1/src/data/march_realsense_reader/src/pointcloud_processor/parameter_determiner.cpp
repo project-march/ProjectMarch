@@ -253,7 +253,7 @@ bool HullParameterDeterminer::entireFootCanBePlaced(
     PointNormalCloud::Ptr potential_foot_support_cloud
         = boost::make_shared<PointNormalCloud>();
     success
-        &= cropCloudToHullVector(foot_pointcloud, potential_foot_support_cloud);
+        &= cropCloudToHullVectorUnique(foot_pointcloud, potential_foot_support_cloud);
 
     // The location is only valid if all foot vertices can be placed
     success
