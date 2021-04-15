@@ -81,11 +81,17 @@ bool CHullFinder::findHulls(PointCloud::Ptr pointcloud,
     return success;
 }
 void CHullFinder::readParameters(
-    march_realsense_reader::pointcloud_parametersConfig& config)
+    march_realsense_reader::pointcloud_parametersConfig& config,
+    march_shared_msgs::PointCloudParameters* msg_)
 {
     convex = config.hull_finder_convex;
     alpha = config.hull_finder_alpha;
     hull_dimension = config.hull_dimension;
+
+    // Set parameter message
+    msg_->chull_finder.convex = convex;
+    msg_->chull_finder.alpha = alpha;
+    msg_->chull_finder.dimension = hull_dimension;
 }
 
 // Converts a region into a convex or concave hull

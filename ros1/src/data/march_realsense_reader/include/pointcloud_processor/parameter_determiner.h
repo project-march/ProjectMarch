@@ -3,6 +3,7 @@
 #include "march_shared_msgs/GetGaitParameters.h"
 #include "utilities/realsense_gait_utilities.h"
 #include <march_realsense_reader/pointcloud_parametersConfig.h>
+#include <march_shared_msgs/PointCloudParameters.h>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
@@ -38,7 +39,8 @@ public:
     virtual ~ParameterDeterminer() {};
 
     virtual void readParameters(
-        march_realsense_reader::pointcloud_parametersConfig& config)
+        march_realsense_reader::pointcloud_parametersConfig& config,
+        march_shared_msgs::PointCloudParameters* msg_)
         = 0;
 
 protected:
@@ -69,7 +71,8 @@ public:
         boost::shared_ptr<GaitParameters> gait_parameters) override;
 
     void readParameters(
-        march_realsense_reader::pointcloud_parametersConfig& config) override;
+        march_realsense_reader::pointcloud_parametersConfig& config,
+        march_shared_msgs::PointCloudParameters* msg_) override;
 
     pcl::PointNormal optimal_foot_location;
     PointNormalCloud::Ptr possible_foot_locations;

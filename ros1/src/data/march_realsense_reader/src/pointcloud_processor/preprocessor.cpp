@@ -29,7 +29,8 @@ SimplePreprocessor::SimplePreprocessor(bool debugging)
 }
 
 void SimplePreprocessor::readParameters(
-    march_realsense_reader::pointcloud_parametersConfig& config)
+    march_realsense_reader::pointcloud_parametersConfig& config,
+    march_shared_msgs::PointCloudParameters* msg_)
 {
 }
 
@@ -118,7 +119,8 @@ bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud,
 }
 
 void NormalsPreprocessor::readParameters(
-    march_realsense_reader::pointcloud_parametersConfig& config)
+    march_realsense_reader::pointcloud_parametersConfig& config,
+    march_shared_msgs::PointCloudParameters* msg_)
 {
     // Downsampling parameters
     voxel_grid_filter = config.preprocessor_downsampling_voxel_grid_filter;
@@ -140,6 +142,29 @@ void NormalsPreprocessor::readParameters(
     allowed_length_x = config.preprocessor_normal_filter_allowed_length_x;
     allowed_length_y = config.preprocessor_normal_filter_allowed_length_y;
     allowed_length_z = config.preprocessor_normal_filter_allowed_length_z;
+
+    set_parameter_msg(msg_);
+}
+
+void NormalsPreprocessor::set_parameter_msg(
+    march_shared_msgs::PointCloudParameters* msg_)
+{
+    msg_->preprocessor.downsampling.voxel_grid_filter = voxel_grid_filter;
+    msg_->preprocessor.downsampling.leaf_size = leaf_size;
+    msg_->preprocessor.downsampling.random_filter = random_filter;
+    msg_->preprocessor.downsampling.remaining_points = remaining_points;
+
+    msg_->preprocessor.distance_filter.threshold = distance_threshold;
+
+    msg_->preprocessor.normal_estimation.use_tree_search_method
+        = use_tree_search_method;
+    msg_->preprocessor.normal_estimation.number_of_neighbours
+        = number_of_neighbours;
+    msg_->preprocessor.normal_estimation.search_radius = search_radius;
+
+    msg_->preprocessor.normal_filter.allowed_length_x = allowed_length_x;
+    msg_->preprocessor.normal_filter.allowed_length_y = allowed_length_y;
+    msg_->preprocessor.normal_filter.allowed_length_z = allowed_length_z;
 }
 
 // Downsample the number of points in the pointcloud to have a more workable

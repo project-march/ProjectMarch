@@ -16,6 +16,7 @@
 
 #include <dynamic_reconfigure/server.h>
 #include <march_realsense_reader/pointcloud_parametersConfig.h>
+#include <march_shared_msgs/PointCloudParameters.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
@@ -88,6 +89,7 @@ private:
     ros::Publisher region_pointcloud_publisher_;
     ros::Publisher hull_marker_array_publisher_;
     ros::Publisher hull_parameter_determiner_publisher_;
+    ros::Publisher pointcloud_parameters_publisher_;
 
     std::unique_ptr<NormalsPreprocessor> preprocessor_;
     std::unique_ptr<RegionGrower> region_creator_;
@@ -95,8 +97,8 @@ private:
     std::unique_ptr<HullParameterDeterminer> parameter_determiner_;
     bool debugging_;
     std::string config_file_;
-    ros::Publisher pointcloud_publisher_;
-
+    std::unique_ptr<march_shared_msgs::PointCloudParameters>
+        pointcloud_parameters_msg_;
     int selected_gait_;
     std::string frame_id_to_transform_to_;
     bool use_left_foot_;

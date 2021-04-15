@@ -1,0 +1,5 @@
+int32 number_of_neighbours
+int32 min_cluster_size
+int32 max_cluster_size
+float64 smoothness_threshold
+float64 curvature_threshold
