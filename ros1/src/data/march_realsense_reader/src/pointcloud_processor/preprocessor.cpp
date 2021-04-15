@@ -270,6 +270,7 @@ bool SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud,
     pointcloud_normals_ = pointcloud_normals;
     frame_id_to_transform_to_ = frame_id_to_transform_to;
 
+    ROS_DEBUG("Preprocessing with SimplePreprocessor");
     transformPointCloudFromUrdf();
     return true;
 }

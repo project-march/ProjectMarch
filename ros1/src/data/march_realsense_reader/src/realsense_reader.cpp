@@ -71,12 +71,6 @@ void RealSenseReader::readConfigCb(
         "Changed march_realsense_parameters with dynamic reconfiguration");
 
     debugging_ = config.debug;
-    /*if (debugging_) {
-      ROS_DEBUG("Realsense reader started with debugging, all intermediate
-    result steps will be published " "and more information given in console, but
-    this might slow the process, this can be turned " "off in the config
-    file.");
-    }*/
 
     preprocessor_->readParameters(config);
     region_creator_->readParameters(config);
