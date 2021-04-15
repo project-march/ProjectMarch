@@ -133,18 +133,6 @@ gaits:
     right_open: MV_walksmall_rightopen_v1
     right_swing: MV_walksmall_rightswing_v1
 positions:
-<<<<<<< HEAD
-  dynamic_sit:
-    gait_type: sit_like
-    joints:
-      left_ankle: 0.0436
-      left_hip_aa: 0.0
-      left_hip_fe: 1.5708
-      left_knee: 1.7453
-      right_ankle: 0.0436
-      right_hip_aa: 0.0
-      right_hip_fe: 1.5708
-      right_knee: 1.7453
   high_sit:
     gait_type: sit_like
     joints:
