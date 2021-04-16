@@ -80,7 +80,7 @@ YAML::Node RealSenseReader::readConfig(std::string config_file)
         + "/config/" + config_file;
     try {
         config_tree = YAML::LoadFile(path);
-    } catch (YAML::Exception e) {
+    } catch (YAML::Exception& e) {
         ROS_WARN_STREAM("YAML file with path " << path
                                                << " could not be loaded, using "
                                                   "empty config instead");
