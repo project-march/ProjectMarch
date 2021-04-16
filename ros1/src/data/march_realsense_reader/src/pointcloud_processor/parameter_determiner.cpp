@@ -334,16 +334,18 @@ bool HullParameterDeterminer::cropCloudToHullVectorUnique(
         success &= HullParameterDeterminer::cropPointToHullVector(
             ground_point, potential_foot_locations_of_point);
 
-        pcl::PointNormal highest_point;
-        highest_point.z = -std::numeric_limits<double>::max();
+        if (potential_foot_locations_of_point->points.size() != 0) {
+            // Find the highest point in the potential cloud by setting it to
+            // the first point and checking if there is a higher point
+            pcl::PointNormal highest_point
+                = potential_fooot_locations_of_point->points[0];
 
-        for (pcl::PointNormal potential_foot_location :
-            *potential_foot_locations_of_point) {
-            if (potential_foot_location.z > highest_point.z) {
-                highest_point = potential_foot_location;
+            for (pcl::PointNormal potential_foot_location :
+                *potential_foot_locations_of_point) {
+                if (potential_foot_location.z > highest_point.z) {
+                    highest_point = potential_foot_location;
+                }
             }
-        }
-        if (highest_point.z != std::numeric_limits<double>::min()) {
             output_cloud->push_back(highest_point);
         }
     }
