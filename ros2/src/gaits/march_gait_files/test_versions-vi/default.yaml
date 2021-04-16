@@ -54,11 +54,11 @@ gaits:
     left_close: MV_walk_leftclose_v3
     right_close: MV_walk_rightclose_v3
   walk_small:
-    right_open: MV_walksmall_rightopen_v1
-    left_swing: MV_walksmall_leftswing_v1
-    right_swing: MV_walksmall_rightswing_v1
-    left_close: MV_walksmall_leftclose_v1
-    right_close: MV_walksmall_rightclose_v1
+    right_open: MVI_walksmall_rightopen_v2
+    left_swing: MVI_walksmall_leftswing_v2
+    right_swing: MVI_walksmall_rightswing_v2
+    left_close: MVI_walksmall_leftclose_v2
+    right_close: MVI_walksmall_rightclose_v2
   walk_large:
     right_open: MV_walklarge_rightopen_v1
     left_swing: MV_walklarge_leftswing_v1
