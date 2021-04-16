@@ -3,6 +3,7 @@
 #define MARCH_HARDWARE_INTERFACE_POWERNETONOFFCOMMAND_H
 
 #include <march_hardware_interface/power_net_type.h>
+#include <ostream>
 
 class PowerNetOnOffCommand {
     PowerNetType type_;
