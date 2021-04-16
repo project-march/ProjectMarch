@@ -88,7 +88,8 @@ private:
     std::unique_ptr<CHullFinder> hull_finder_;
     std::unique_ptr<HullParameterDeterminer> parameter_determiner_;
 
-    ros::Subscriber pointcloud_subscriber_;
+    std::map<int, ros::Subscriber> pointcloud_subscribers_;
+    PointCloud last_pointcloud_;
     ros::ServiceServer read_pointcloud_service_;
     ros::Publisher preprocessed_pointcloud_publisher_;
     ros::Publisher region_pointcloud_publisher_;
