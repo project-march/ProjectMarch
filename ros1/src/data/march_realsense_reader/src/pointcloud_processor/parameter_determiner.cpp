@@ -338,7 +338,7 @@ bool HullParameterDeterminer::cropCloudToHullVectorUnique(
             // Find the highest point in the potential cloud by setting it to
             // the first point and checking if there is a higher point
             pcl::PointNormal highest_point
-                = potential_fooot_locations_of_point->points[0];
+                = potential_foot_locations_of_point->points[0];
 
             for (pcl::PointNormal potential_foot_location :
                 *potential_foot_locations_of_point) {
