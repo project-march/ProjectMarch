@@ -1,4 +1,5 @@
 #include <ctime>
+#include <map>
 #include <march_realsense_reader/realsense_reader.h>
 #include <march_shared_msgs/GetGaitParameters.h>
 #include <pcl/point_types.h>
@@ -18,15 +19,25 @@ using PlaneCoefficientsVector = std::vector<pcl::ModelCoefficients::Ptr>;
 using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
 using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
 
-std::string POINTCLOUD_TOPIC = "/camera_front/depth/color/points";
+std::map<int, std::string> POINTCLOUD_TOPICS = {
+    {march_shared_msgs::GetGaitParametersRequest::CAMERA_FRONT,
+    "/camera_front/depth/color/points"},
+    {march_shared_msgs::GetGaitParametersRequest::CAMERA_BACK,
+    "/camera_back/depth/color/points"}
+};
 ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(/*t=*/1.0); // secs
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     : n_(n)
 {
-    pointcloud_subscriber_
-        = n_->subscribe<sensor_msgs::PointCloud2>(POINTCLOUD_TOPIC,
-            /*queue_size=*/1, &RealSenseReader::pointcloudCallback, this);
+
+    // Create a subscriber for every pointcloud topic
+    for (auto &item : POINTCLOUD_TOPICS) {
+      pointcloud_subscribers_[item.first] =
+          n_->subscribe<sensor_msgs::PointCloud2>(
+          item.second, /*queue_size=*/1, &RealSenseReader::pointcloudCallback, this);
+    }
+    
     read_pointcloud_service_
         = n_->advertiseService("/camera/process_pointcloud",
             &RealSenseReader::processPointcloudCallback, this);
@@ -401,7 +412,7 @@ bool RealSenseReader::processPointcloudCallback(
 
     boost::shared_ptr<const sensor_msgs::PointCloud2> input_cloud
         = ros::topic::waitForMessage<sensor_msgs::PointCloud2>(
-            POINTCLOUD_TOPIC, *n_, POINTCLOUD_TIMEOUT);
+            POINTCLOUD_TOPICS[req.camera_to_use], *n_, POINTCLOUD_TIMEOUT);
 
     if (input_cloud == nullptr) {
         res.error_message = "No pointcloud published within timeout, so "
