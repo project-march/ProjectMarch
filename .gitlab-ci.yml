@@ -55,6 +55,10 @@ flake8:
     reports:
       codequality: flakehell.json
   allow_failure: true
+  only:
+    changes:
+      - "pyproject.toml"
+      - "**/*.py"
 
 clang_format:
   stage: Lint code
