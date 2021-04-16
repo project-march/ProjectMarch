@@ -19,23 +19,30 @@ using PlaneCoefficientsVector = std::vector<pcl::ModelCoefficients::Ptr>;
 using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
 using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
 
-std::map<int, std::string> POINTCLOUD_TOPICS = {
-    {march_shared_msgs::GetGaitParametersRequest::CAMERA_FRONT,
-    "/camera_front/depth/color/points"},
-    {march_shared_msgs::GetGaitParametersRequest::CAMERA_BACK,
-    "/camera_back/depth/color/points"}
-};
+std::map<int, std::string> POINTCLOUD_TOPICS
+    = { { march_shared_msgs::GetGaitParametersRequest::CAMERA_FRONT,
+            "/camera_front/depth/color/points" },
+          { march_shared_msgs::GetGaitParametersRequest::CAMERA_BACK,
+              "/camera_back/depth/color/points" } };
 ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(/*t=*/1.0); // secs
+
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     : n_(n)
 {
 
     // Create a subscriber for every pointcloud topic
+<<<<<<< HEAD
     for (auto &item : POINTCLOUD_TOPICS) {
       pointcloud_subscribers_[item.first] =
           n_->subscribe<sensor_msgs::PointCloud2>(
           item.second, /*queue_size=*/1, &RealSenseReader::pointcloudCallback, this);
+=======
+    for (auto& item : POINTCLOUD_TOPICS) {
+        pointcloud_subscribers_[item.first]
+            = n_->subscribe<sensor_msgs::PointCloud2>(
+                item.second, 1, &RealSenseReader::pointcloudCallback, this);
+>>>>>>> 78e67cd0a... Format code
     }
     
     read_pointcloud_service_
