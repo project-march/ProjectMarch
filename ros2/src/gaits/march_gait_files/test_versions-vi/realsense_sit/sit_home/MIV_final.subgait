@@ -1,5 +1,4 @@
-description: 'Prepare stand up: perform hip flexion before the actual standing up
-  from the sofa.'
+description: Sit home gait for the sofa.
 duration: 1000000000
 gait_type: sit_like
 joints:
@@ -15,13 +14,19 @@ joints:
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
+    time_from_start: 375000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 500000000
+    velocity: 0.0
+  - position: 0.0
     time_from_start: 1000000000
     velocity: 0.0
   left_hip_fe:
-  - position: 1.5708
+  - position: 1.6581
     time_from_start: 0
     velocity: 0.0
-  - position: 1.6581
+  - position: 1.5708
     time_from_start: 1000000000
     velocity: 0.0
   left_knee:
@@ -43,13 +48,19 @@ joints:
     time_from_start: 0
     velocity: 0.0
   - position: 0.0
+    time_from_start: 375000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 500000000
+    velocity: 0.0
+  - position: 0.0
     time_from_start: 1000000000
     velocity: 0.0
   right_hip_fe:
-  - position: 1.5708
+  - position: 1.6581
     time_from_start: 0
     velocity: 0.0
-  - position: 1.6581
+  - position: 1.5708
     time_from_start: 1000000000
     velocity: 0.0
   right_knee:
@@ -59,5 +70,5 @@ joints:
   - position: 1.7453
     time_from_start: 1000000000
     velocity: 0.0
-name: prepare_stand_up
+name: sit_home
 version: MIV_final
