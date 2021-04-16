@@ -18,7 +18,7 @@
 
 namespace march_pdb_state_controller {
 MarchPdbStateController::MarchPdbStateController()
-    : last_publish_times_(ros::Time(0))
+    : last_publish_times_(ros::Time(/*t=*/0))
     , publish_rate_(0.0)
 {
 }

@@ -21,12 +21,12 @@ bool InertiaController::init(
     }
 
     sub_command_ = nh.subscribe<std_msgs::Float64>(
-        "command", 1, &InertiaController::commandCB, this);
+        "command", /*queue_size=*/1, &InertiaController::commandCB, this);
 
     // Get joint handle from hardware interface
     joint_ = hw->getHandle(joint_name_);
 
-    ros::Duration first(0.004);
+    ros::Duration first(/*t=*/0.004);
     inertia_estimator_.fillBuffers(
         joint_.getVelocity(), joint_.getEffort(), first);
 

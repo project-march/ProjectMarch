@@ -151,13 +151,13 @@ bool CHullFinder::getPlaneCoefficientsRegion()
 {
     // calculate average normal and average point to calculate plane
     // coefficients from
-    std::vector<double> average_normal(3);
-    std::vector<double> average_point(3);
+    std::vector<double> average_normal(/*__n=*/3);
+    std::vector<double> average_point(/*__n=*/3);
 
     bool success = getAveragePointAndNormal(average_point, average_normal);
 
     // Plane coefficients given as [0]*x + [1]*y + [2]*z + [3] = 0
-    plane_coefficients_->values.resize(4);
+    plane_coefficients_->values.resize(/*__new_size=*/4);
     // The first three coefficients are the normal vector of the plane as
     // all the vectors in the plane are perpendicular to the normal
     plane_coefficients_->values.assign(

@@ -10,7 +10,7 @@
 class AbsoluteEncoderTest : public testing::Test {
 protected:
     const size_t resolution = 17;
-    const size_t total_positions = std::pow(2, resolution);
+    const size_t total_positions = std::pow(/*__x=*/2, resolution);
     const int32_t lower_limit = 2053;
     const int32_t upper_limit = 45617;
     const double lower_limit_rad = -0.34906585;

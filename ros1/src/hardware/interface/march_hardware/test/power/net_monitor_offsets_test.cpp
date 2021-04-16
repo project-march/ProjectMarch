@@ -90,15 +90,18 @@ TEST_F(NetMonitorOffsetsTest, Equals)
 }
 TEST_F(NetMonitorOffsetsTest, NotEquals)
 {
-    NetMonitorOffsets netMonitorOffsets1(24, lowVoltageNet1Current,
+    NetMonitorOffsets netMonitorOffsets1(
+        /*powerDistributionBoardCurrentByteOffset=*/24, lowVoltageNet1Current,
         lowVoltageNet2Current, highVoltageNetCurrent, lowVoltageState,
         highVoltageOvercurrentTrigger, highVoltageEnabled, highVoltageState);
     NetMonitorOffsets netMonitorOffsets2(powerDistributionBoardCurrent,
-        lowVoltageNet1Current, lowVoltageNet2Current, highVoltageNetCurrent, 42,
-        highVoltageOvercurrentTrigger, highVoltageEnabled, highVoltageState);
+        lowVoltageNet1Current, lowVoltageNet2Current, highVoltageNetCurrent,
+        /*lowVoltageStateByteOffset=*/42, highVoltageOvercurrentTrigger,
+        highVoltageEnabled, highVoltageState);
     NetMonitorOffsets netMonitorOffsets3(powerDistributionBoardCurrent,
-        lowVoltageNet1Current, lowVoltageNet2Current, highVoltageNetCurrent, 42,
-        highVoltageOvercurrentTrigger, highVoltageEnabled, 11);
+        lowVoltageNet1Current, lowVoltageNet2Current, highVoltageNetCurrent,
+        /*lowVoltageStateByteOffset=*/42, highVoltageOvercurrentTrigger,
+        highVoltageEnabled, /*highVoltageStateByteOffset=*/11);
 
     EXPECT_FALSE(netMonitorOffsets1 == netMonitorOffsets2);
     EXPECT_FALSE(netMonitorOffsets1 == netMonitorOffsets3);
