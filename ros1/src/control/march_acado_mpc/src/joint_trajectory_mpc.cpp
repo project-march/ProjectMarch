@@ -106,12 +106,12 @@ void ModelPredictiveControllerInterface::initMpcMsg()
         // Loop trough the states
         for (unsigned int j = 0; j < ACADO_NX; j++) {
             mpc_pub_->msg_.joint[i].estimation.states[j].array.resize(
-                prediction_horizon + 1);
+                (size_t)prediction_horizon + 1);
         }
         // Loop trough all the outputs
         for (unsigned int j = 0; j < ACADO_NYN; j++) {
             mpc_pub_->msg_.joint[i].reference.states[j].array.resize(
-                prediction_horizon + 1);
+                (size_t)prediction_horizon + 1);
         }
 
         // Loop trough all the inputs
@@ -119,9 +119,9 @@ void ModelPredictiveControllerInterface::initMpcMsg()
             // The optimal control is one value shorter than the output,
             // since there is no control on the terminal state
             mpc_pub_->msg_.joint[i].estimation.inputs[j].array.resize(
-                prediction_horizon);
+                (size_t)prediction_horizon);
             mpc_pub_->msg_.joint[i].reference.inputs[j].array.resize(
-                prediction_horizon);
+                (size_t)prediction_horizon);
         }
     }
 }

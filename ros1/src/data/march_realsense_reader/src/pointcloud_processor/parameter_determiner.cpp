@@ -388,9 +388,9 @@ bool HullParameterDeterminer::isValidLocation(
 bool HullParameterDeterminer::getGeneralMostDesirableLocation()
 {
     if (general_most_desirable_location_is_mid) {
-        most_desirable_foot_location_.x = (min_x_stairs + max_x_stairs) / 2.0;
+        most_desirable_foot_location_.x = (min_x_stairs + max_x_stairs) / 2.0f;
         most_desirable_foot_location_.y = y_location;
-        most_desirable_foot_location_.z = (min_z_stairs + max_z_stairs) / 2.0;
+        most_desirable_foot_location_.z = (min_z_stairs + max_z_stairs) / 2.0f;
     } else if (general_most_desirable_location_is_small) {
         most_desirable_foot_location_.x = min_x_stairs;
         most_desirable_foot_location_.y = y_location;
@@ -447,8 +447,8 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
     }
     for (int i = 0; i < number_of_optional_foot_locations; i++) {
         float x_location = start
-            + (end - start) * i
-                / ((float)number_of_optional_foot_locations - 1.0);
+            + (end - start) * (float)i
+                / ((float)number_of_optional_foot_locations - 1.0f);
         foot_locations_to_try->points[i].x = x_location;
         foot_locations_to_try->points[i].y = y_location;
     }
