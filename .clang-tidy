@@ -26,4 +26,6 @@ CheckOptions:
       value:    '1'
     - key:      bugprone-misplaced-widening-cast.CheckImplicitCasts
       value:    '1'
+    - key:      bugprone-suspicious-enum-usage.StrictMode
+      value:    '1'
 ...
