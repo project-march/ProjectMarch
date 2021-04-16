@@ -6,7 +6,7 @@
 class MockIncrementalEncoder : public march::IncrementalEncoder {
 public:
     MockIncrementalEncoder()
-        : IncrementalEncoder(10, 100.0)
+        : IncrementalEncoder(/*number_of_bits=*/10, /*transmission=*/100.0)
     {
     }
 

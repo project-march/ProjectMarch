@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
     }
 
     // Blocks this thread until 1 MTw has connected
-    wireless_master.waitForConnections(1);
+    wireless_master.waitForConnections(/*connections=*/1);
 
     ROS_DEBUG("Starting measurement...");
     if (!wireless_master.startMeasurement()) {

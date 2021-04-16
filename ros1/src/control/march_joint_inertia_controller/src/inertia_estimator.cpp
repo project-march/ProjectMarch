@@ -159,14 +159,16 @@ double InertiaEstimator::gainCalculation()
 {
     auto it = filtered_acceleration_array_.begin();
     auto error = *it - *(++it);
-    return (corr_coeff_ * error) / (lambda_ + corr_coeff_ * pow(error, 2));
+    return (corr_coeff_ * error)
+        / (lambda_ + corr_coeff_ * pow(error, /*__y=*/2));
 }
 
 // Calculate the correlation coefficient of the acceleration buffer
 void InertiaEstimator::correlationCalculation()
 {
     auto it = filtered_acceleration_array_.begin();
-    corr_coeff_ = corr_coeff_ / (lambda_ + corr_coeff_ * pow(*it - *(++it), 2));
+    corr_coeff_
+        = corr_coeff_ / (lambda_ + corr_coeff_ * pow(*it - *(++it), /*__y=*/2));
     const double large_number = 10e8;
     if (corr_coeff_ > large_number) {
         corr_coeff_ = large_number;
@@ -201,7 +203,7 @@ void InertiaEstimator::initP(unsigned int samples)
     double sum = 0;
 
     for (const auto& it : standard_deviation) {
-        sum += std::pow(it - mean_value, 2);
+        sum += std::pow(it - mean_value, /*__y=*/2);
     }
     corr_coeff_ = 100 * (sum / samples);
 }

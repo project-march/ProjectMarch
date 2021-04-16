@@ -222,7 +222,7 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
     try {
         pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
         transform_stamped = tfBuffer->lookupTransform(frame_id_to_transform_to_,
-            pointcloud_frame_id, ros::Time::now(), ros::Duration(0.5));
+            pointcloud_frame_id, ros::Time::now(), ros::Duration(/*t=*/0.5));
         pcl_ros::transformPointCloud(
             *pointcloud_, *pointcloud_, transform_stamped.transform);
     } catch (tf2::TransformException& ex) {
@@ -353,7 +353,7 @@ void SimplePreprocessor::transformPointCloudFromUrdf()
     try {
         pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
         transformStamped = tfBuffer->lookupTransform(frame_id_to_transform_to_,
-            pointcloud_frame_id, ros::Time::now(), ros::Duration(0.5));
+            pointcloud_frame_id, ros::Time::now(), ros::Duration(/*t=*/0.5));
         pcl_ros::transformPointCloud(
             *pointcloud_, *pointcloud_, transformStamped.transform);
     } catch (tf2::TransformException& ex) {

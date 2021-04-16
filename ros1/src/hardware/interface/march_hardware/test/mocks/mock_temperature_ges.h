@@ -8,7 +8,7 @@
 class MockTemperatureGES : public march::TemperatureGES {
 public:
     MockTemperatureGES()
-        : TemperatureGES(MockSlave(), 0)
+        : TemperatureGES(MockSlave(), /*byte_offset=*/0)
     {
     }
 
