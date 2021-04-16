@@ -142,11 +142,11 @@ protected:
     void readYaml();
     int hull_dimension;
     int number_of_optional_foot_locations;
-    double min_x_stairs;
-    double max_x_stairs;
-    double min_z_stairs;
-    double max_z_stairs;
-    double y_location;
+    float min_x_stairs;
+    float max_x_stairs;
+    float min_z_stairs;
+    float max_z_stairs;
+    float y_location;
     double x_flat;
     double z_flat;
     double x_steep;

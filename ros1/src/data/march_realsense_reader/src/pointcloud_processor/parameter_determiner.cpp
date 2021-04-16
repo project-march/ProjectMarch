@@ -437,7 +437,7 @@ bool HullParameterDeterminer::getOptionalFootLocations(
 // Fill the foot locations to try cloud with a line of points from (start, 0) to
 // (end, 0)
 bool HullParameterDeterminer::fillOptionalFootLocationCloud(
-    double start, double end)
+    float start, float end)
 {
     if (number_of_optional_foot_locations == 0) {
         ROS_WARN_STREAM(
@@ -446,9 +446,9 @@ bool HullParameterDeterminer::fillOptionalFootLocationCloud(
         return false;
     }
     for (int i = 0; i < number_of_optional_foot_locations; i++) {
-        double x_location = start
+        float x_location = start
             + (end - start) * i
-                / (double)(number_of_optional_foot_locations - 1);
+                / ((float)number_of_optional_foot_locations - 1.0);
         foot_locations_to_try->points[i].x = x_location;
         foot_locations_to_try->points[i].y = y_location;
     }
@@ -553,7 +553,7 @@ bool HullParameterDeterminer::addNormalToCloudFromPlaneCoefficients(
     elevated_cloud_with_normals->height = elevated_cloud->height;
     elevated_cloud_with_normals->points.resize(elevated_cloud->points.size());
 
-    double normalising_constant
+    float normalising_constant
         = plane_coefficients->values[0] * plane_coefficients->values[0]
         + plane_coefficients->values[1] * plane_coefficients->values[1]
         + plane_coefficients->values[2] * plane_coefficients->values[2];
