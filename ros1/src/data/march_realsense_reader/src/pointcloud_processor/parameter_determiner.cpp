@@ -53,6 +53,9 @@ void HullParameterDeterminer::readParameters(
         = config.parameter_determiner_most_desirable_loc_is_mid;
     general_most_desirable_location_is_small
         = config.parameter_determiner_most_desirable_loc_is_small;
+
+    debugging_ = config.debug;
+
 }
 
 /** This function takes in a pointcloud with matching normals and

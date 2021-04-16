@@ -86,6 +86,8 @@ void CHullFinder::readParameters(
     convex = config.hull_finder_convex;
     alpha = config.hull_finder_alpha;
     hull_dimension = config.hull_dimension;
+
+    debugging_ = config.debug;
 }
 
 // Converts a region into a convex or concave hull
