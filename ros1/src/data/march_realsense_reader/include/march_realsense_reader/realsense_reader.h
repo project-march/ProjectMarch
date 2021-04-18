@@ -96,13 +96,15 @@ private:
     ros::Publisher hull_parameter_determiner_publisher_;
     ros::Publisher pointcloud_publisher_;
 
-    std::string config_file_;
-    YAML::Node config_tree_;
+    // Debugging flag at launch
+    bool debugging_launch;
+
+    // Debugging flag, dynamically reconfigurable debugging_launch is true
+    bool debugging_;
+
     std::string frame_id_to_transform_to_;
-    ros::Publisher pointcloud_publisher_;
 
     int selected_gait_;
-    bool debugging_;
     bool use_left_foot_;
 };
 
