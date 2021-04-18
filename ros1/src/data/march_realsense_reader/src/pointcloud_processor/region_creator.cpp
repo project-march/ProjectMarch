@@ -68,6 +68,8 @@ void RegionGrower::readParameters(
         = smoothness_threshold;
     msg_->region_creator.region_growing.curvature_threshold
         = curvature_threshold;
+
+    debugging_ = config.debug;
 }
 
 bool RegionGrower::setupRegionGrower()

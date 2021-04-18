@@ -143,7 +143,10 @@ void NormalsPreprocessor::readParameters(
     allowed_length_y = config.preprocessor_normal_filter_allowed_length_y;
     allowed_length_z = config.preprocessor_normal_filter_allowed_length_z;
 
-    set_parameter_msg(msg_);
+    debugging_ = config.debug;
+
+
+  set_parameter_msg(msg_);
 }
 
 void NormalsPreprocessor::set_parameter_msg(

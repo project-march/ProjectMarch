@@ -37,13 +37,18 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     parameter_determiner_
         = std::make_unique<HullParameterDeterminer>(debugging_);
 
-    debugging_ = true;
+    if (ros::param::get("/realsense_debug", debugging_launch)) {
+        debugging_ = debugging_launch;
+    } else {
+        ROS_WARN("Unable to obtain debug parameter from parameter server");
+    }
+
     if (debugging_) {
         ROS_DEBUG(
             "Realsense reader started with debugging, all intermediate result "
             "steps will be published and more information given in console, but"
             " this might slow the process, this can be turned off in the "
-            "yaml.");
+            "realsense_reader.launch of with dynamic reconfiguring.");
         if (ros::console::set_logger_level(
                 ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug)) {
             ros::console::notifyLoggerLevelsChanged();
@@ -64,7 +69,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
 
     pointcloud_parameters_publisher_
         = n_->advertise<march_shared_msgs::PointCloudParameters>(
-            "camera/pointcloud_parameters", 100, true);
+            "camera/pointcloud_parameters", 1, true);
 }
 
 void RealSenseReader::readConfigCb(
@@ -73,24 +78,28 @@ void RealSenseReader::readConfigCb(
     ROS_DEBUG(
         "Changed march_realsense_parameters with dynamic reconfiguration");
 
-    debugging_ = config.debug;
-    /*if (debugging_) {
-      ROS_DEBUG("Realsense reader started with debugging, all intermediate
-    result steps will be published " "and more information given in console, but
-    this might slow the process, this can be turned " "off in the config
-    file.");
-    }*/
+    // Only dynamically reconfigure debug flag if flag was true at launch
+    if (debugging_launch) {
+        debugging_ = config.debug;
+    }
 
-    pointcloud_parameters_msg_
-        = std::make_unique<march_shared_msgs::PointCloudParameters>();
+    if (not debugging_) {
+        if (ros::console::set_logger_level(
+                ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info)) {
+            ros::console::notifyLoggerLevelsChanged();
+        }
+    }
 
-    preprocessor_->readParameters(config, pointcloud_parameters_msg_.get());
-    region_creator_->readParameters(config, pointcloud_parameters_msg_.get());
-    parameter_determiner_->readParameters(
-        config, pointcloud_parameters_msg_.get());
-    hull_finder_->readParameters(config, pointcloud_parameters_msg_.get());
+  pointcloud_parameters_msg_
+          = std::make_unique<march_shared_msgs::PointCloudParameters>();
 
-    pointcloud_parameters_publisher_.publish(*pointcloud_parameters_msg_);
+  preprocessor_->readParameters(config, pointcloud_parameters_msg_.get());
+  region_creator_->readParameters(config, pointcloud_parameters_msg_.get());
+  parameter_determiner_->readParameters(
+          config, pointcloud_parameters_msg_.get());
+  hull_finder_->readParameters(config, pointcloud_parameters_msg_.get());
+
+  pointcloud_parameters_publisher_.publish(*pointcloud_parameters_msg_);
 }
 
 // This method executes the logic to process a pointcloud
@@ -103,18 +112,17 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
     // Preprocess
     bool preprocessing_was_successful = preprocessor_->preprocess(
         pointcloud, normals, frame_id_to_transform_to_);
-    if (not preprocessing_was_successful) {
-        res.error_message = "Preprocessing was unsuccessful, see debug output "
-                            "for more information";
-        res.success = false;
-        return false;
-    }
-
     if (debugging_) {
         ROS_DEBUG("Done preprocessing, see /camera/preprocessed_cloud for "
                   "resulting point cloud");
         publishCloud<pcl::PointXYZ>(
             preprocessed_pointcloud_publisher_, *pointcloud);
+    }
+    if (not preprocessing_was_successful) {
+        res.error_message = "Preprocessing was unsuccessful, see debug output "
+                            "for more information";
+        res.success = false;
+        return false;
     }
 
     // Setup data structures for region creating
@@ -123,14 +131,6 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
     // Create regions
     bool region_creating_was_successful
         = region_creator_->createRegions(pointcloud, normals, region_vector);
-    if (not region_creating_was_successful) {
-        res.error_message
-            = "Region creating was unsuccessful, see debug output "
-              "for more information";
-        res.success = false;
-        return false;
-    }
-
     if (debugging_) {
         ROS_DEBUG("Done creating regions, now publishing point cloud regions "
                   "to /camera/region_cloud");
@@ -138,6 +138,13 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
             = region_creator_->debug_visualisation();
         publishCloud<pcl::PointXYZRGB>(
             region_pointcloud_publisher_, *coloured_cloud);
+    }
+    if (not region_creating_was_successful) {
+        res.error_message
+            = "Region creating was unsuccessful, see debug output "
+              "for more information";
+        res.success = false;
+        return false;
     }
 
     // Setup data structures for finding
@@ -151,6 +158,11 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
     bool hull_finding_was_successful
         = hull_finder_->findHulls(pointcloud, normals, region_vector,
             plane_coefficients_vector, hull_vector, polygon_vector);
+    if (debugging_) {
+        ROS_DEBUG("Done creating hulls, now publishing markers to "
+                  "/camera/hull_marker_list");
+        publishHullMarkerArray(hull_vector);
+    }
     if (not hull_finding_was_successful) {
         res.error_message = "Hull finding was unsuccessful, see debug output "
                             "for more information";
@@ -158,31 +170,25 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
         return false;
     }
 
-    if (debugging_) {
-        ROS_DEBUG("Done creating hulls, now publishing markers to "
-                  "/camera/hull_marker_list");
-        publishHullMarkerArray(hull_vector);
-    }
-
     // Setup data structures for parameter determining
-    SelectedGait selected_obstacle = (SelectedGait)selected_gait_;
+    SelectedGait selected_gait = (SelectedGait)selected_gait_;
     boost::shared_ptr<march_shared_msgs::GaitParameters> gait_parameters
         = boost::make_shared<march_shared_msgs::GaitParameters>();
     // Determine parameters
     bool parameter_determining_was_successful
         = parameter_determiner_->determineParameters(plane_coefficients_vector,
-            hull_vector, polygon_vector, selected_obstacle, gait_parameters);
+            hull_vector, polygon_vector, selected_gait, gait_parameters);
+    if (debugging_) {
+        ROS_DEBUG("Done determining parameters, now publishing a marker to "
+                  "/camera/foot_locations_marker_array");
+        publishParameterDeterminerMarkerArray();
+    }
     if (not parameter_determining_was_successful) {
         res.error_message
             = "Parameter determining was unsuccessful, see debug output "
               "for more information";
         res.success = false;
         return false;
-    }
-    if (debugging_) {
-        ROS_DEBUG("Done determining parameters, now publishing a marker to "
-                  "/camera/foot_locations_marker_array");
-        publishParameterDeterminerMarkerArray();
     }
 
     res.gait_parameters = *gait_parameters;
