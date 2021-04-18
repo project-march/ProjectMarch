@@ -43,6 +43,7 @@ void HullParameterDeterminer::readParameters(
 {
     number_of_optional_foot_locations
         = config.parameter_determiner_foot_locations;
+    hull_dimension = config.hull_dimension;
 
     min_x_stairs = config.parameter_determiner_stairs_locations_min_x;
     max_x_stairs = config.parameter_determiner_stairs_locations_max_x;
@@ -55,7 +56,6 @@ void HullParameterDeterminer::readParameters(
         = config.parameter_determiner_most_desirable_loc_is_small;
 
     debugging_ = config.debug;
-
 }
 
 /** This function takes in a pointcloud with matching normals and

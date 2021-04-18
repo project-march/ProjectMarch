@@ -100,7 +100,6 @@ private:
     // Debugging flag, dynamically reconfigurable debugging_launch is true
     bool debugging_;
 
-
     std::string config_file_;
     ros::Publisher pointcloud_publisher_;
 

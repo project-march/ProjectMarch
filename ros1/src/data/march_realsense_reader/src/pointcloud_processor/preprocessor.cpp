@@ -142,7 +142,6 @@ void NormalsPreprocessor::readParameters(
     allowed_length_z = config.preprocessor_normal_filter_allowed_length_z;
 
     debugging_ = config.debug;
-
 }
 
 // Downsample the number of points in the pointcloud to have a more workable
