@@ -57,6 +57,21 @@ void HullParameterDeterminer::readParameters(
         = config.parameter_determiner_most_desirable_loc_is_small;
 
     debugging_ = config.debug;
+
+    setParameterMessage(msg_);
+}
+
+void HullParameterDeterminer::setParameterMessage(
+        march_shared_msgs::PointCloudParameters* msg_)
+{
+    msg_->parameter_determiner.stairs.number_of_optional_foot_locations = number_of_optional_foot_locations;
+    msg_->parameter_determiner.stairs.hull_dimension = hull_dimension;
+    msg_->parameter_determiner.stairs.min_x_stairs = min_x_stairs;
+    msg_->parameter_determiner.stairs.max_x_stairs = max_x_stairs;
+    msg_->parameter_determiner.stairs.min_z_stairs = min_z_stairs;
+    msg_->parameter_determiner.stairs.max_z_stairs = max_z_stairs;
+    msg_->parameter_determiner.stairs.general_most_desirable_location_is_mid = general_most_desirable_location_is_mid;
+    msg_->parameter_determiner.stairs.general_most_desirable_location_is_small = general_most_desirable_location_is_small;
 }
 
 /** This function takes in a pointcloud with matching normals and

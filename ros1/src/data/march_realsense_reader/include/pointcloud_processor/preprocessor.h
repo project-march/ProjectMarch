@@ -110,7 +110,7 @@ protected:
     bool filterOnNormalOrientation();
 
     // Set the parameter message equal to the most recent parameters
-    void set_parameter_msg(march_shared_msgs::PointCloudParameters* msg_);
+    void setParameterMessage(march_shared_msgs::PointCloudParameters* msg_);
 
     // Downsampling parameters
     bool voxel_grid_filter;

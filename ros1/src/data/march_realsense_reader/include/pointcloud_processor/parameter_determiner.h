@@ -145,7 +145,7 @@ protected:
     // 0) to (end, 0)
     bool fillOptionalFootLocationCloud(double start, double end);
 
-    // Read all relevant parameters from the parameter yaml file
+    void setParameterMessage(march_shared_msgs::PointCloudParameters* msg_);
 
     // Read all relevant parameters
     int hull_dimension;

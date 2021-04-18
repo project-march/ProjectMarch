@@ -1,7 +1,9 @@
-float64 min_x
-float64 max_x
-float64 min_z
-float64 max_z
-bool most_desirable_loc_is_mid
-bool most_desirable_loc_is_small
+float64 min_x_stairs
+float64 max_x_stairs
+float64 min_z_stairs
+float64 max_z_stairs
+int32 hull_dimension
+bool general_most_desirable_location_is_mid
+bool general_most_desirable_location_is_small
+int32 number_of_optional_foot_locations
 

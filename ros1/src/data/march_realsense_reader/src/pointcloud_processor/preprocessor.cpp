@@ -146,10 +146,10 @@ void NormalsPreprocessor::readParameters(
     debugging_ = config.debug;
 
 
-  set_parameter_msg(msg_);
+    setParameterMessage(msg_);
 }
 
-void NormalsPreprocessor::set_parameter_msg(
+void NormalsPreprocessor::setParameterMessage(
     march_shared_msgs::PointCloudParameters* msg_)
 {
     msg_->preprocessor.downsampling.voxel_grid_filter = voxel_grid_filter;
