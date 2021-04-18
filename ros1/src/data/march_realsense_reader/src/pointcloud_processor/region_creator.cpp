@@ -59,7 +59,6 @@ void RegionGrower::readParameters(
         = config.region_creator_region_growing_curvature_threshold;
 
     debugging_ = config.debug;
-
 }
 
 bool RegionGrower::setupRegionGrower()

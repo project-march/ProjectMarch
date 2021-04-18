@@ -38,12 +38,10 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     parameter_determiner_
         = std::make_unique<HullParameterDeterminer>(debugging_);
 
-    if(ros::param::get("/realsense_debug", debugging_launch))
-    {
-      debugging_ = debugging_launch;
-    } else
-    {
-      ROS_WARN("Unable to obtain debug parameter from parameter server");
+    if (ros::param::get("/realsense_debug", debugging_launch)) {
+        debugging_ = debugging_launch;
+    } else {
+        ROS_WARN("Unable to obtain debug parameter from parameter server");
     }
 
     if (debugging_) {
@@ -78,18 +76,15 @@ void RealSenseReader::readConfigCb(
         "Changed march_realsense_parameters with dynamic reconfiguration");
 
     // Only dynamically reconfigure debug flag if flag was true at launch
-    if (debugging_launch)
-    {
+    if (debugging_launch) {
         debugging_ = config.debug;
     }
 
-    if (not debugging_)
-    {
+    if (not debugging_) {
         if (ros::console::set_logger_level(
                 ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info)) {
             ros::console::notifyLoggerLevelsChanged();
         }
-
     }
 
     preprocessor_->readParameters(config);
@@ -109,7 +104,6 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
     bool preprocessing_was_successful = preprocessor_->preprocess(
         pointcloud, normals, frame_id_to_transform_to_);
     if (debugging_) {
-        ROS_INFO("hoi");
         ROS_DEBUG("Done preprocessing, see /camera/preprocessed_cloud for "
                   "resulting point cloud");
         publishCloud<pcl::PointXYZ>(
