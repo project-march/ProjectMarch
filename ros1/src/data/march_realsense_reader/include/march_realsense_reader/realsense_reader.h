@@ -93,7 +93,14 @@ private:
     std::unique_ptr<RegionGrower> region_creator_;
     std::unique_ptr<CHullFinder> hull_finder_;
     std::unique_ptr<HullParameterDeterminer> parameter_determiner_;
+
+    // Debugging flag at launch
+    bool debugging_launch;
+
+    // Debugging flag, dynamically reconfigurable debugging_launch is true
     bool debugging_;
+
+
     std::string config_file_;
     ros::Publisher pointcloud_publisher_;
 
