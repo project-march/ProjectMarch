@@ -145,7 +145,6 @@ void NormalsPreprocessor::readParameters(
 
     debugging_ = config.debug;
 
-
     setParameterMessage(msg_);
 }
 

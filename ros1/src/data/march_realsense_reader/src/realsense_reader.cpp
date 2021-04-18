@@ -90,16 +90,16 @@ void RealSenseReader::readConfigCb(
         }
     }
 
-  pointcloud_parameters_msg_
-          = std::make_unique<march_shared_msgs::PointCloudParameters>();
+    pointcloud_parameters_msg_
+        = std::make_unique<march_shared_msgs::PointCloudParameters>();
 
-  preprocessor_->readParameters(config, pointcloud_parameters_msg_.get());
-  region_creator_->readParameters(config, pointcloud_parameters_msg_.get());
-  parameter_determiner_->readParameters(
-          config, pointcloud_parameters_msg_.get());
-  hull_finder_->readParameters(config, pointcloud_parameters_msg_.get());
+    preprocessor_->readParameters(config, pointcloud_parameters_msg_.get());
+    region_creator_->readParameters(config, pointcloud_parameters_msg_.get());
+    parameter_determiner_->readParameters(
+        config, pointcloud_parameters_msg_.get());
+    hull_finder_->readParameters(config, pointcloud_parameters_msg_.get());
 
-  pointcloud_parameters_publisher_.publish(*pointcloud_parameters_msg_);
+    pointcloud_parameters_publisher_.publish(*pointcloud_parameters_msg_);
 }
 
 // This method executes the logic to process a pointcloud

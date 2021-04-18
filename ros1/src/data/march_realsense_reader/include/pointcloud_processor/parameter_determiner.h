@@ -41,7 +41,8 @@ public:
 
     virtual void readParameters(
         march_realsense_reader::pointcloud_parametersConfig& config,
-        march_shared_msgs::PointCloudParameters* msg_)=0;
+        march_shared_msgs::PointCloudParameters* msg_)
+        = 0;
 
 protected:
     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;

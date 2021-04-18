@@ -94,7 +94,6 @@ void CHullFinder::readParameters(
     msg_->chull_finder.dimension = hull_dimension;
 
     debugging_ = config.debug;
-
 }
 
 // Converts a region into a convex or concave hull
