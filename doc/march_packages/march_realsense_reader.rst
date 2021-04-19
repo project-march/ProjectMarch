@@ -49,6 +49,9 @@ Preprocessing consists of the following steps:
 
 5. Filter based on the normal vectors, points which we believe are part of a wall we remove as we are not capable of standing there.
 
+.. figure:: images/NormalsPreprocessor.png
+   :align: center
+
 
 RegionGrower
 ^^^^^^^^^^^^
@@ -58,6 +61,9 @@ Regions where it is possible to place the foot, like a step of a stair. Region f
 
 We use the region growing algorithm to find regions in the cloud which is explained in detail in
 `The pcl tutorial on region growing segmentation <https://pcl.readthedocs.io/projects/tutorials/en/latest/region_growing_segmentation.html>`_
+
+.. figure:: images/RegionGrowing.png
+   :align: center
 
 CHullFinder
 ^^^^^^^^^^^
@@ -75,6 +81,9 @@ For each region:
   3. Transform the transformed points into a hull (the hull needs to be 2d), this can either create a convex or concave hull
 
   4. Add the found hull, its plane parameters and a vector of the indices to vectors for future use
+
+.. figure:: images/Planes.png
+ :align: center
 
 HullParameterDeterminer
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -104,6 +113,9 @@ For the ramp gait this is done as follows:
 2) For all the optional foot locations find which one is executable and closest to the executable foot locations line.
 
 3) Transform this into a praameter by finding at what percentage of the executable foot locations line.
+
+.. figure:: images/FootLocations.png
+   :align: center
 
 
 More Information On The Algorithms In Place
