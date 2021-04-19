@@ -172,7 +172,7 @@ Subscribed Topics
 
 Published Topics
 ^^^^^^^^^^^^^^^^
-The package publisher several debug pointclouds and markers, these topics are purely for visualisation:
+The package publisher several debug pointclouds and markers, if the debug flag is enabled. These topics are purely for visualisation:
 
 */camera/preprocessed_cloud* (sensor_msgs::PointCloud2)
   The pointcloud outputted by the `preprocessor`. This cloud contains only the points part of a locally roughly flat area, and has a lower
@@ -189,6 +189,7 @@ The package publisher several debug pointclouds and markers, these topics are pu
 */camera/foot_locations_marker_array* (visualization_msgs::MarkerArray)
   Markers that visualize the steps of the parameter determiner. The optional foot locations are in blue, the possible locations are in green
   and the optimal location is highlighted in white.
+
 
 Services
 ^^^^^^^^
@@ -266,3 +267,17 @@ If not run:
     march_run_bridge
 
 The processor only uses the front camera for now, but one can now also visualize the back camera in RViz.
+
+Configuring the realsense_reader
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The processor has a default configuration. This configuration affects what points are discarded in the preprocessor,
+which regions are found and what the potential foot locations are. The march_realsense_reader support dynamic reconfiguration.
+The rqt interface can be launched by:
+
+.. code :: bash
+
+    snoe && sros1 && rosrun rqt_reconfigure rqt_reconfigure
+
+while running for example the simulation. Changing the parameters and calling upon */camera/process_pointcloud*, will
+result in different outputs.
+
