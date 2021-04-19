@@ -136,7 +136,7 @@ void NormalsPreprocessor::getDownsamplingParameters()
         random_filter = yaml_utilities::grabParameter<bool>(
             downsampling_parameters, "random_filter");
         if (voxel_grid_filter) {
-            leaf_size = yaml_utilities::grabParameter<double>(
+            leaf_size = yaml_utilities::grabParameter<float>(
                 downsampling_parameters, "leaf_size");
         } else if (random_filter) {
             remaining_points = yaml_utilities::grabParameter<int>(
