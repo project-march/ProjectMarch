@@ -5,7 +5,11 @@ Checks:     -*,
             cert-*,
             -cert-err58-cpp,
             clang-analyzer-*,
-            concurrency-*
+            concurrency-*,
+            hicpp-*,
+            -hicpp-special-member-functions,
+            -hicpp-no-array-decay,
+            -hicpp-vararg
 WarningsAsErrors: '*'
 HeaderFilterRegex: ''
 FormatStyle:     webkit
