@@ -58,9 +58,9 @@ void RegionGrower::readYaml()
             region_growing_parameters, "min_cluster_size");
         max_cluster_size = yaml_utilities::grabParameter<int>(
             region_growing_parameters, "max_cluster_size");
-        smoothness_threshold = yaml_utilities::grabParameter<double>(
+        smoothness_threshold = yaml_utilities::grabParameter<float>(
             region_growing_parameters, "smoothness_threshold");
-        curvature_threshold = yaml_utilities::grabParameter<double>(
+        curvature_threshold = yaml_utilities::grabParameter<float>(
             region_growing_parameters, "curvature_threshold");
     } else {
         ROS_ERROR("'region_growing' parameters not found in parameter file");

@@ -73,8 +73,8 @@ private:
     int number_of_neighbours;
     int min_cluster_size;
     int max_cluster_size;
-    double smoothness_threshold;
-    double curvature_threshold;
+    float smoothness_threshold;
+    float curvature_threshold;
 };
 
 #endif // MARCH_PREPROCESSOR_H

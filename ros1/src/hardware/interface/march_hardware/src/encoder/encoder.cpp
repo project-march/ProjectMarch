@@ -50,7 +50,7 @@ size_t Encoder::calculateTotalPositions(size_t number_of_bits)
             "Encoder resolution of %d is not within range [%ld, %ld]",
             number_of_bits, Encoder::MIN_RESOLUTION, Encoder::MAX_RESOLUTION);
     }
-    return 1u << number_of_bits;
+    return (size_t)1 << number_of_bits;
 }
 
 } // namespace march
