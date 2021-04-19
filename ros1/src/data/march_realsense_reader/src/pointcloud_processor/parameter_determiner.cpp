@@ -310,7 +310,7 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation()
     }
 
     double min_distance_to_object = std::numeric_limits<double>::max();
-    double distance_to_object;
+    double distance_to_object = std::numeric_limits<double>::max();
 
     for (pcl::PointNormal& possible_foot_location : *possible_foot_locations) {
         if (not isValidLocation(possible_foot_location)) {
