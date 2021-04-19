@@ -22,7 +22,7 @@ container:tag:
   stage: Tag container
   image: quay.io/podman/stable
   variables:
-    GIT_CHECKOUT: "false"
+    GIT_CHECKOUT: "true"
   before_script:
     - podman login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
@@ -55,6 +55,19 @@ flake8:
     reports:
       codequality: flakehell.json
   allow_failure: true
+  only:
+    changes:
+      - "pyproject.toml"
+      - "**/*.py"
+
+clang_format:
+  stage: Lint code
+  script:
+    - python3 .scripts/run-clang-format.py -r ros1/src ros2/src --style=file
+  only:
+    changes:
+      - "ros1/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
+      - "ros2/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
 
 noetic:build:
   stage: Build code
@@ -105,11 +118,12 @@ noetic:clang_tidy:
   needs: ["noetic:build"]
   script:
     - cd ros1/
-    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
+    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
   only:
     changes:
       - "ros1/**/*.{hpp,h,cpp}"
-  allow_failure: true
+      - "ros1/**/CMakeLists.txt"
+      - ".clang-tidy"
 
 foxy:clang_tidy:
   stage: Static analysis on code
@@ -118,8 +132,9 @@ foxy:clang_tidy:
   needs: ["foxy:build"]
   script:
     - cd ros2/
-    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
+    - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | grep -v "src/libraries" | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
   only:
     changes:
       - "ros2/**/*.{hpp,h,cpp}"
-  allow_failure: true
+      - "ros2/**/CMakeLists.txt"
+      - ".clang-tidy"

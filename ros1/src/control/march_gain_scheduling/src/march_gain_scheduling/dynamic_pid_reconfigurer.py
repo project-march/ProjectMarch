@@ -33,7 +33,7 @@ class DynamicPIDReconfigurer:
                 "~gait_types/{gait_type}".format(gait_type=new_gait_type)
             )
         ):
-            rospy.logwarn(
+            rospy.logwarn_once(
                 "The gait has unknown gait type of `{gait_type}`, default is set to walk_like".format(
                     gait_type=new_gait_type
                 )

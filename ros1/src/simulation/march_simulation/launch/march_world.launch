@@ -13,39 +13,17 @@
     <arg name="realsense_simulation" default="true"
          doc="Whether the simulation camera or the physical camera should be used"/>
 
-    <!-- Disable all plugins that are not used by the physical realsense camera. -->
-    <!-- The compressedDepth plugin has to be turned off to prevent errors when -->
-    <!-- using the bridge. -->
-    <group ns="/camera/color/image_raw" >
-      <rosparam param="disable_pub_plugins">
-        - 'image_transport/compressedDepth'
-        - 'image_transport/theora'
-        - 'image_transport/compressed'
-      </rosparam>
-    </group>
-    <group ns="/camera/infra1/image_raw" >
-      <rosparam param="disable_pub_plugins">
-        - 'image_transport/compressedDepth'
-        - 'image_transport/theora'
-        - 'image_transport/compressed'
-      </rosparam>
-    </group>
-    <group ns="/camera/infra2/image_raw" >
-      <rosparam param="disable_pub_plugins">
-        - 'image_transport/compressedDepth'
-        - 'image_transport/theora'
-        - 'image_transport/compressed'
-      </rosparam>
-    </group>
-    <group ns="/camera/depth/image_raw" >
-      <rosparam param="disable_pub_plugins">
-        - 'image_transport/compressedDepth'
-        - 'image_transport/theora'
-        - 'image_transport/compressed'
-      </rosparam>
-    </group>
-
-
+<!-- To prevent a lot of unnecessary topics and messages, we disable the plugins that
+ send a lot of compressed versions of the camera topics. -->
+    <include file="$(find march_simulation)/launch/disable_camera_plugins.launch"
+             if="$(eval realsense_simulation)">
+        <arg name="camera_name" value="camera_front"/>
+    </include>
+    <include file="$(find march_simulation)/launch/disable_camera_plugins.launch"
+             if="$(eval realsense_simulation)">
+        <arg name="camera_name" value="camera_back"/>
+    </include>
+    
     <!-- Load the URDF into the ROS Parameter Server -->
     <!-- Override effort values as Gazebo uses different units than the actual IMC. -->
     <!-- In theory, if the controller is properly tuned, these values can be arbitrarily large. -->

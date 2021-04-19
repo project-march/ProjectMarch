@@ -1,0 +1,92 @@
+description: Stairs up with height of 13 cm and depth of 35 cm
+duration: 2500000000
+gait_type: stairs_like
+joints:
+  left_ankle:
+  - position: 0.04360007
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.26179939
+    time_from_start: 454500000
+    velocity: 0.0
+  - position: 0.04785433
+    time_from_start: 1165000000
+    velocity: 0
+  - position: 0.04363323
+    time_from_start: 1963600000
+    velocity: 0.0
+  - position: -0.08726646
+    time_from_start: 2500000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.08415461
+    time_from_start: 1280357150
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2500000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: -0.08726646
+    time_from_start: 0
+    velocity: 0.17449976
+  - position: 1.08365922
+    time_from_start: 1845000000
+    velocity: 0.0
+  - position: 0.82641166
+    time_from_start: 2500000000
+    velocity: 0.0
+  left_knee:
+  - position: 0.24430072
+    time_from_start: 0
+    velocity: 0.76790996
+  - position: 1.58824962
+    time_from_start: 1462500000
+    velocity: 0.0
+  - position: 0.65194331
+    time_from_start: 2500000000
+    velocity: 0.0
+  right_ankle:
+  - position: -0.08726646
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.04360007
+    time_from_start: 2500000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.06108652
+    time_from_start: 733909090
+    velocity: -0.13439036
+  - position: -0.08726646
+    time_from_start: 1432181820
+    velocity: 0.01210282
+  - position: -0.06108652
+    time_from_start: 2015000000
+    velocity: 0.13439036
+  - position: 0.0
+    time_from_start: 2500000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: 0.82641166
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.08726646
+    time_from_start: 2500000000
+    velocity: 0.17449976
+  right_knee:
+  - position: 0.65194331
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.1396
+    time_from_start: 2075000000
+    velocity: 0.0
+  - position: 0.2443
+    time_from_start: 2500000000
+    velocity: 0.76791
+name: left_swing
+version: MVI_stairsup_leftswing_low_deep

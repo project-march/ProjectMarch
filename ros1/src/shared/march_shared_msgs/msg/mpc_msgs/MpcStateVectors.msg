@@ -1,0 +1,2 @@
+MpcArray[] states
+MpcArray[] inputs

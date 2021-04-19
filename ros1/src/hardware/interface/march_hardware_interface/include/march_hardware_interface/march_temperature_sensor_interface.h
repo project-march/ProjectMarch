@@ -6,41 +6,45 @@
 #include <hardware_interface/internal/hardware_resource_manager.h>
 #include <string>
 
-class MarchTemperatureSensorHandle
-{
+class MarchTemperatureSensorHandle {
 public:
-  MarchTemperatureSensorHandle(const std::string& name,    ///< The name of joint
-                               const double* temperature,  ///< A pointer of the temperature in degrees celsius.
-                               const double* variance      ///< A pointer to the storage of the temperature covariance.
-                               )
-    : name_(name), temperature_(temperature), variance(variance)
-  {
-  }
+    MarchTemperatureSensorHandle(const std::string& name, ///< The name of joint
+        const double*
+            temperature, ///< A pointer of the temperature in degrees celsius.
+        const double* variance ///< A pointer to the storage of the temperature
+                               ///< covariance.
+        )
+        : name_(name)
+        , temperature_(temperature)
+        , variance(variance)
+    {
+    }
 
-  std::string getName() const
-  {
-    return name_;
-  }
+    std::string getName() const
+    {
+        return name_;
+    }
 
-  const double* getTemperature() const
-  {
-    return temperature_;
-  }
+    const double* getTemperature() const
+    {
+        return temperature_;
+    }
 
-  const double* getVariance() const
-  {
-    return variance;
-  }
+    const double* getVariance() const
+    {
+        return variance;
+    }
 
 private:
-  std::string name_;
+    std::string name_;
 
-  const double* temperature_;
-  const double* variance;
+    const double* temperature_;
+    const double* variance;
 };
 
-class MarchTemperatureSensorInterface : public hardware_interface::HardwareResourceManager<MarchTemperatureSensorHandle>
-{
+class MarchTemperatureSensorInterface
+    : public hardware_interface::HardwareResourceManager<
+          MarchTemperatureSensorHandle> {
 };
 
-#endif  // MARCH_HARDWARE_INTERFACE_MARCH_TEMPERATURE_SENSOR_INTERFACE_H
+#endif // MARCH_HARDWARE_INTERFACE_MARCH_TEMPERATURE_SENSOR_INTERFACE_H

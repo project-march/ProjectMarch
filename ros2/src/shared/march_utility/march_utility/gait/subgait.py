@@ -24,6 +24,7 @@ from .limits import Limits
 from .setpoint import Setpoint
 
 PARAMETRIC_GAITS_PREFIX = "_pg_"
+FOUR_PARAMETRIC_GAITS_PREFIX = "_fpg_"
 SUBGAIT_SUFFIX = ".subgait"
 JOINT_NAMES_IK = get_joint_names_for_inverse_kinematics()
 TIME_STAMPS_ROUNDING = 4
@@ -115,25 +116,80 @@ class Subgait(object):
                 other_version_path = os.path.join(
                     subgait_path, other_version + SUBGAIT_SUFFIX
                 )
-                return cls.from_files_interpolated(
+                return cls.from_two_files_interpolated(
                     robot,
                     base_version_path,
                     other_version_path,
                     parameter,
                     use_foot_position=True,
                 )
+        elif version.startswith(FOUR_PARAMETRIC_GAITS_PREFIX):
+            version_path_list = [""] * 4
+            (
+                gait_version_list,
+                parameter_list,
+            ) = Subgait.unpack_four_parametric_version(version)
+            for version_index in range(4):
+                version_path_list[version_index] = os.path.join(
+                    subgait_path, gait_version_list[version_index] + SUBGAIT_SUFFIX
+                )
+            return cls.from_four_files_interpolated(
+                robot,
+                version_path_list,
+                parameter_list,
+                use_foot_position=True,
+            )
 
         else:
             subgait_version_path = os.path.join(subgait_path, version + SUBGAIT_SUFFIX)
             return cls.from_file(robot, subgait_version_path)
 
     @classmethod
-    def from_files_interpolated(
+    def from_four_files_interpolated(
+            cls,
+            robot: urdf.Robot,
+            version_path_list: List[str, str, str, str],
+            parameter_list: List[float, float],
+            use_foot_position: bool = False,
+    ) -> Subgait:
+        """
+        Extract two subgaits from files and interpolate.
+
+        :param robot:
+            The robot corresponding to the given subgait file
+        :param version_path_list:
+            The .yaml file names of the subgaits to interpolate
+            The parameter to use for interpolation. Should be between 0 and 1
+        :param parameter_list:
+            The parameters to use for interpolation. Should all be between 0 and 1
+        :param use_foot_position:
+            Determine whether the interpolation should be done on the foot location or
+            on the joint angles
+
+        :return:
+            A populated Subgait object
+        """
+        first_subgait = cls.from_file(robot, version_path_list[0])
+        second_subgait = cls.from_file(robot, version_path_list[1])
+        third_subgait = cls.from_file(robot, version_path_list[2])
+        fourth_subgait = cls.from_file(robot, version_path_list[3])
+        return cls.interpolate_four_subgaits(
+            first_subgait,
+            second_subgait,
+            third_subgait,
+            fourth_subgait,
+            parameter_list[0],
+            parameter_list[1],
+            use_foot_position,
+        )
+
+    @classmethod
+    def from_two_files_interpolated(
         cls,
         robot: urdf.Robot,
-        file_name_base: str,
-        file_name_other: str,
-        parameter: float,
+        first_file_name: str,
+        second_file_name: str,
+        first_parameter: float,
         use_foot_position: bool = False,
     ) -> Subgait:
         """
@@ -141,9 +197,9 @@ class Subgait(object):
 
         :param robot:
             The robot corresponding to the given subgait file
-        :param file_name_base:
+        :param first_file_name:
             The .yaml file name of the base subgait
-        :param file_name_other:
+        :param second_file_name:
         :param parameter:
             The parameter to use for interpolation. Should be 0 <= parameter <= 1
         :param use_foot_position:
@@ -153,10 +209,10 @@ class Subgait(object):
         :return:
             A populated Subgait object
         """
-        base_subgait = cls.from_file(robot, file_name_base)
-        other_subgait = cls.from_file(robot, file_name_other)
+        base_subgait = cls.from_file(robot, first_file_name)
+        other_subgait = cls.from_file(robot, second_file_name)
         return cls.interpolate_subgaits(
-            base_subgait, other_subgait, parameter, use_foot_position
+            base_subgait, other_subgait, first_parameter, use_foot_position
         )
 
     @classmethod
@@ -322,6 +378,47 @@ class Subgait(object):
             joint.setpoints = new_joint_setpoints
 
     @classmethod
+    def interpolate_four_subgaits(
+        cls,
+        first_subgait: Subgait,
+        second_subgait: Subgait,
+        third_subgait: Subgait,
+        fourth_subgait: Subgait,
+        first_parameter: float,
+        second_parameter: float,
+        use_foot_position: bool = False,
+    ) -> Subgait:
+        """
+        Interpolate two subgaits with the parameter to get a new subgait.
+
+        :param i'th_subgait:
+            subgaits to interpolate
+        :param first_parameter:
+            The parameter to use for interpolation between subgait 1&2 and 3&4. Should be 0 <= parameter <= 1
+        :param second_parameter:
+            The parameter to use for interpolation between the interpolated subgaits. Should be 0 <= parameter <= 1
+        :param use_foot_position:
+            Determine whether the interpolation should be done on the foot
+            location or on the joint angles
+
+        :return:
+            The interpolated subgait
+        """
+        first_interpolated_subgait = Subgait.interpolate_subgaits(
+            first_subgait, second_subgait, first_parameter, use_foot_position
+        )
+        second_interpolated_subgait = Subgait.interpolate_subgaits(
+            third_subgait, fourth_subgait, first_parameter, use_foot_position
+        )
+
+        return Subgait.interpolate_subgaits(
+            first_interpolated_subgait,
+            second_interpolated_subgait,
+            second_parameter,
+            use_foot_position,
+        )
+
+    @classmethod
     def interpolate_subgaits(
         cls,
         base_subgait: Subgait,
@@ -330,7 +427,7 @@ class Subgait(object):
         use_foot_position: bool = False,
     ) -> Subgait:
         """
-        Linearly interpolate two subgaits with the parameter to get a new subgait.
+        Interpolate two subgaits with the parameter to get a new subgait.
 
         :param base_subgait:
             base subgait, return value if parameter is equal to zero
@@ -377,6 +474,7 @@ class Subgait(object):
         gait_type = (
             base_subgait.gait_type if parameter <= 0.5 else other_subgait.gait_type
         )
+        ## What to do with the version of the new gait
         version = "{0}{1}_({2})_({3})".format(
             PARAMETRIC_GAITS_PREFIX,
             parameter,
@@ -478,11 +576,34 @@ class Subgait(object):
         subgait_path = os.path.join(gait_path, subgait_name)
         if version.startswith(PARAMETRIC_GAITS_PREFIX):
             Subgait.validate_parametric_version(subgait_path, version)
+        elif version.startswith(FOUR_PARAMETRIC_GAITS_PREFIX):
+            Subgait.validate_four_parametric_version(subgait_path, version)
         else:
             version_path = os.path.join(subgait_path, version + SUBGAIT_SUFFIX)
             if not os.path.isfile(version_path):
                 return False
         return True
+
+    @staticmethod
+    def validate_four_parametric_version(subgait_path: str, version: str) -> bool:
+        """Check whether a parametric gait is valid.
+
+        :param subgait_path: The path to the subgait file
+        :param version: The version of the parametric gait
+        :return: True if the subgait is parametrized between two existing subgaits
+        """
+        (
+            gait_version_list,
+            parameter_list,
+        ) = Subgait.unpack_four_parametric_version(version)
+        version_path_list = [""] * 4
+        for version_index in range(4):
+            version_path_list[version_index] = os.path.join(
+                subgait_path, gait_version_list[version_index] + SUBGAIT_SUFFIX
+            )
+        return all(
+            not os.path.isfile(version_path) for version_path in version_path_list
+        )
 
     @staticmethod
     def validate_parametric_version(subgait_path: str, version: str) -> bool:
@@ -508,13 +629,36 @@ class Subgait(object):
         )
         if parameter_search is None:
             raise SubgaitInterpolationError(
-                "Parametric version was stored in wrong " "format."
+                f"Parametric version string was stored in wrong format. "
+                f"Version string is {version}. Correct example is "
+                f"'_{PARAMETRIC_GAITS_PREFIX}0.5_(version_1)_(version_2)"
             )
         parameter = float(parameter_search.group(1))
         versions = re.findall(r"\([^\)]*\)", version)
         base_version = versions[0][1:-1]
         other_version = versions[1][1:-1]
         return base_version, other_version, parameter
+
+    @staticmethod
+    def unpack_four_parametric_version(version: str) -> Tuple[List[str], List[float]]:
+        """Unpack a version to four versions and two parameters."""
+        parameter_search = re.findall(
+            r"(\d+\.\d+)".format(FOUR_PARAMETRIC_GAITS_PREFIX), version
+        )
+        if parameter_search is None:
+            raise SubgaitInterpolationError(
+                f"Parametric version string was stored in wrong format. "
+                f"Version string is {version}. Correct example is "
+                f"'_{FOUR_PARAMETRIC_GAITS_PREFIX}_0.5_0.5_(version_1)_(version_2)_(version_3)_(version_4)"
+            )
+        parameter_list = [float(parameter_search[0]), float(parameter_search[1])]
+        versions = re.findall(r"\([^\)]*\)", version)
+
+        version_list = []
+        for version in versions:
+            version_list.append(version[1:-1])
+
+        return (version_list, parameter_list)
 
     @staticmethod
     def check_foot_position_interpolation_is_safe(
@@ -607,7 +751,7 @@ class Subgait(object):
         base_time_stamps = base_subgait.get_unique_timestamps(sorted_timestamps=False)
         other_time_stamps = other_subgait.get_unique_timestamps(sorted_timestamps=False)
 
-        original_other_time_stamps = other_time_stamps
+        original_other_time_stamps = set(other_time_stamps)
 
         for base_time in base_time_stamps:
             other_time_stamps.add(
