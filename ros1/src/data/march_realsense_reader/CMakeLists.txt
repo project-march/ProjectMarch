@@ -70,6 +70,11 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 # Mark cpp header files for installation
+# Config (*.cfg) headers should be build before any node using said headers
+install(DIRECTORY config
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+        )
+
 install(DIRECTORY include/${PROJECT_NAME}/ include/pointcloud_processor/
         include/utilities/
     DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
@@ -81,9 +86,5 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 install(DIRECTORY launch
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
-
-install(DIRECTORY config
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
