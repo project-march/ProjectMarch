@@ -243,8 +243,15 @@ void RealSenseReader::publishHullMarkerArray(
     for (pcl::PointCloud<pcl::PointXYZ>::Ptr hull : *hull_vector) {
         // Color the hull with a random color (r, g and b in [1, 0])
         int number_of_colors = 500;
+
+        // clang-tidy linter cert-msc30-c and cert-msc50-cpp say that rand() is
+        // not a uniform distribution. This is not something that is important
+        // here, therefore these lines can ignore this linter rule.
+        // NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp)
         double r = (rand() % number_of_colors) / (double)number_of_colors;
+        // NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp)
         double g = (rand() % number_of_colors) / (double)number_of_colors;
+        // NOLINTNEXTLINE(cert-msc30-c, cert-msc50-cpp)
         double b = (rand() % number_of_colors) / (double)number_of_colors;
         for (pcl::PointXYZ hull_point : *hull) {
             geometry_msgs::Point marker_point;
