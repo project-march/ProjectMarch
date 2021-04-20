@@ -13,7 +13,6 @@ from march_utility.utilities.dimensions import (
 )
 from march_utility.exceptions.gait_exceptions import (
     UnknownDimensionsError,
-    SubgaitInterpolationError,
     WrongRealSenseConfigurationError,
 )
 from rclpy.node import Node
@@ -180,7 +179,7 @@ class RealSenseGait(SetpointsGait):
                 subgaits=self.subgaits_to_interpolate[subgait_name],
                 parameters=self.parameters,
                 use_foot_position=True,
-                node=self._node
+                node=self._node,
             )
         self.set_subgaits(new_subgaits)
 
