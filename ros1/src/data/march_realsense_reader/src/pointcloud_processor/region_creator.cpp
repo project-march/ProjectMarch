@@ -1,11 +1,11 @@
 #include "pointcloud_processor/region_creator.h"
 #include "yaml-cpp/yaml.h"
 #include <ctime>
+#include <pcl/filters/extract_indices.h>
 #include <pcl/search/kdtree.h>
 #include <pcl/search/search.h>
-#include <pcl/segmentation/region_growing.h>
 #include <pcl/segmentation/extract_clusters.h>
-#include <pcl/filters/extract_indices.h>
+#include <pcl/segmentation/region_growing.h>
 #include <ros/ros.h>
 #include <utilities/yaml_utilities.h>
 
@@ -144,33 +144,33 @@ void EuclideanClustering::readYaml()
 }
 
 bool EuclideanClustering::createRegions(PointCloud::Ptr pointcloud,
-                                        Normals::Ptr pointcloud_normals,
-                                        boost::shared_ptr<RegionVector> region_vector)
+    Normals::Ptr pointcloud_normals,
+    boost::shared_ptr<RegionVector> region_vector)
 {
     pointcloud_ = pointcloud;
     pointcloud_normals_ = pointcloud_normals;
     region_vector_ = region_vector;
-    ROS_DEBUG_STREAM("Creating regions with region growing");
+    ROS_DEBUG_STREAM("Creating regions with euclidean clustering");
 
-    clock_t start_region_grow = clock();
+    clock_t start_euclidean_clustering = clock();
 
     bool success = true;
     success &= createEuclideanClusters();
 
-    clock_t end_region_grow = clock();
+    clock_t end_euclidean_clustering = clock();
     double time_taken
-            = double(end_region_grow - start_region_grow) / double(CLOCKS_PER_SEC);
-    ROS_DEBUG_STREAM("Time taken by pointcloud RegionGrower is : "
-                             << std::fixed << time_taken << std::setprecision(5) << " sec "
-                             << std::endl);
+        = double(end_euclidean_clustering - start_euclidean_clustering) / double(CLOCKS_PER_SEC);
+    ROS_DEBUG_STREAM("Time taken by pointcloud EuclideanClustering is : "
+        << std::fixed << time_taken << std::setprecision(5) << " sec "
+        << std::endl);
 
     return success;
 }
 
 bool EuclideanClustering::createEuclideanClusters()
 {
-    pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(
-        new pcl::search::KdTree<pcl::PointXYZ>);
+    pcl::search::KdTree<pcl::PointXYZ>::Ptr tree
+        = boost::make_shared<pcl::search::KdTree<pcl::PointXYZ>>();
     tree->setInputCloud(pointcloud_);
     pcl::EuclideanClusterExtraction<pcl::PointXYZ> euclidean_clusterer;
 
@@ -182,9 +182,10 @@ bool EuclideanClustering::createEuclideanClusters()
     euclidean_clusterer.extract(*region_vector_);
 
     ROS_DEBUG("Total number of clusters found: %lu", region_vector_->size());
-    for (int cluster_index = 0; cluster_index < region_vector_->size(); cluster_index++) {
+    for (int cluster_index = 0; cluster_index < region_vector_->size();
+         cluster_index++) {
         ROS_DEBUG("Total number of points in cluster %i: %lu", cluster_index,
-                  region_vector_->at(cluster_index).indices.size());
+            region_vector_->at(cluster_index).indices.size());
     }
 
     if (region_vector_->size() == 0) {
@@ -196,7 +197,8 @@ bool EuclideanClustering::createEuclideanClusters()
 
 ColoredPointCloud::Ptr EuclideanClustering::debug_visualisation()
 {
-    ColoredPointCloud::Ptr colored_cloud = boost::make_shared<ColoredPointCloud>();
+    ColoredPointCloud::Ptr colored_cloud
+        = boost::make_shared<ColoredPointCloud>();
     // Initialize the object with which to get the cloud corresponding to the
     // indices of the clusters
     pcl::ExtractIndices<pcl::PointXYZ> extract;
