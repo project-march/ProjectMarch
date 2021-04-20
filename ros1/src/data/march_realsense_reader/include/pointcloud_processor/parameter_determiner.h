@@ -93,7 +93,7 @@ protected:
     bool cropCloudToHullVector(PointCloud2D::Ptr const input_cloud,
         PointNormalCloud::Ptr output_cloud);
 
-    // Crops a single point to a hull vector. 
+    // Crops a single point to a hull vector.
     bool cropPointToHullVector(
         pcl::PointXY const input_point, PointNormalCloud::Ptr output_cloud);
 
@@ -103,7 +103,7 @@ protected:
         PointNormalCloud::Ptr output_cloud);
 
     // Return true if the z coordinate of point1 is lower then that of point2
-    bool pointIsLower(pcl::PointNormal point1, pcl::PointNormal point2);
+    static bool pointIsLower(pcl::PointNormal point1, pcl::PointNormal point2);
 
     // Elevate the 2D points so they have z coordinate as if they lie on the
     // plane of the hull

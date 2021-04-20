@@ -313,6 +313,7 @@ bool HullParameterDeterminer::cropCloudToHullVector(
     return success;
 }
 
+// Crops a single point to a hull vector.
 bool HullParameterDeterminer::cropPointToHullVector(
     pcl::PointXY const input_point, PointNormalCloud::Ptr output_cloud)
 {
@@ -323,6 +324,8 @@ bool HullParameterDeterminer::cropPointToHullVector(
     return success;
 }
 
+// Crops a cloud to a hull vector, but only puts each input point in
+// the highest hull it falls into
 bool HullParameterDeterminer::cropCloudToHullVectorUnique(
     PointCloud2D::Ptr const input_cloud, PointNormalCloud::Ptr output_cloud)
 {
@@ -335,17 +338,18 @@ bool HullParameterDeterminer::cropCloudToHullVectorUnique(
             ground_point, potential_foot_locations_of_point);
 
         if (potential_foot_locations_of_point->points.size() != 0) {
-            pcl::PointNormal highest_point = std::max_element(
-                potential_foot_locations_of_point->points.begin(),
-                potential_foot_locations_of_point->points.end(), pointIsLower);
-            output_cloud->push_back(highest_point);
+            PointNormalCloud::iterator result= std::max_element(
+                potential_foot_locations_of_point->begin(),
+                potential_foot_locations_of_point->end(), pointIsLower);
+            output_cloud->push_back(*result);
         }
     }
     return success;
 }
 
+// Return true if the z coordinate of point1 is lower then that of point2
 bool HullParameterDeterminer::pointIsLower(
-    const pcl::PointNormal point1, const pcl::PointNormal point2)
+        pcl::PointNormal point1, pcl::PointNormal point2)
 {
     return point1.z < point2.z;
 }
