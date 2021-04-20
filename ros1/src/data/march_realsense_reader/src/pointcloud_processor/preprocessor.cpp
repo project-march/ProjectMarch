@@ -28,11 +28,6 @@ SimplePreprocessor::SimplePreprocessor(bool debugging)
     tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
 }
 
-void SimplePreprocessor::readParameters(
-    march_realsense_reader::pointcloud_parametersConfig& config)
-{
-}
-
 // Create a normals preprocessor with the ability to transform based on normal
 // orientation
 NormalsPreprocessor::NormalsPreprocessor(bool debugging)

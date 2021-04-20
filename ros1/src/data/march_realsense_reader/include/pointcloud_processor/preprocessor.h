@@ -51,9 +51,6 @@ public:
     bool preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals,
         std::string frame_id_to_transform_to = "foot_left") override;
 
-    void readParameters(
-        march_realsense_reader::pointcloud_parametersConfig& config) override;
-
 protected:
     /** Calls the tf listener, to know transform at current time and transforms
      the pointcloud **/
