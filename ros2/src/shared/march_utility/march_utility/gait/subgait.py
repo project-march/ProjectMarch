@@ -380,7 +380,7 @@ class Subgait(object):
         subgaits: List[Subgait],
         parameters: List[float],
         use_foot_position: bool,
-        node=None
+        node=None,
     ):
         if len(subgaits) != amount_of_subgaits(dimensions):
             raise SubgaitInterpolationError(
@@ -408,7 +408,7 @@ class Subgait(object):
         subgaits: List[Subgait, Subgait, Subgait, Subgait],
         parameters: [float, float],
         use_foot_position: bool = False,
-        node = None
+        node=None,
     ) -> Subgait:
         """
         Interpolate two subgaits with the parameter to get a new subgait.
@@ -447,7 +447,7 @@ class Subgait(object):
         other_subgait: Subgait,
         parameter: float,
         use_foot_position: bool = False,
-        node = None
+        node=None,
     ) -> Subgait:
         """
         Interpolate two subgaits with the parameter to get a new subgait.
@@ -725,8 +725,10 @@ class Subgait(object):
         # fill all joints in new_setpoints except the ankle joints using
         # the inverse kinematics
         for setpoint_index in range(0, number_of_setpoints):
-            if base_setpoints_to_interpolate[setpoint_index] == \
-                    other_setpoints_to_interpolate[setpoint_index]:
+            if (
+                base_setpoints_to_interpolate[setpoint_index]
+                == other_setpoints_to_interpolate[setpoint_index]
+            ):
                 setpoints_to_add = base_setpoints_to_interpolate[setpoint_index]
             else:
                 base_feet_state = FeetState.from_setpoint_dict(
@@ -739,13 +741,16 @@ class Subgait(object):
                     base_feet_state, other_feet_state, parameter
                 )
                 if node is not None:
-                    node.get_logger().info(f"Interpolating {base_feet_state} and "
-                                           f"{other_feet_state} resulting in "
-                                           f"{new_feet_state}")
+                    node.get_logger().info(
+                        f"Interpolating {base_feet_state} and "
+                        f"{other_feet_state} resulting in "
+                        f"{new_feet_state}"
+                    )
                 setpoints_to_add = FeetState.feet_state_to_setpoints(new_feet_state)
                 if node is not None:
-                    node.get_logger().info(f"Matching setpoint is "
-                                           f"{setpoints_to_add}")
+                    node.get_logger().info(
+                        f"Matching setpoint is " f"{setpoints_to_add}"
+                    )
 
             for joint_name in JOINT_NAMES_IK:
                 new_setpoints[joint_name].append(setpoints_to_add[joint_name])

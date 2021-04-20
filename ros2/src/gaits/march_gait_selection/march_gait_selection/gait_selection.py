@@ -8,6 +8,7 @@ from march_gait_selection.dynamic_gaits.semi_dynamic_setpoints_gait import (
     SemiDynamicSetpointsGait,
 )
 from march_shared_msgs.srv import SetGaitVersion, ContainsGait
+
 from march_utility.exceptions.gait_exceptions import GaitError, GaitNameNotFound
 from march_utility.gait.subgait import Subgait
 from march_utility.utilities.node_utils import get_robot_urdf

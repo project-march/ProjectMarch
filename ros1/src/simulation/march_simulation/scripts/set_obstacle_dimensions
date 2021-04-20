@@ -17,8 +17,8 @@ RESIZABLE_OBSTACLES_BLOCK_LIKE = ['bench', 'stairs'] # for files which accept he
 # it is necessary to change the model name at every size change. This dictionary is
 # used to keep track of these names to delete them again
 current_model_name = {name: name for name in RESIZABLE_OBSTACLES_RAMP_LIKE +
-    RESIZABLE_OBSTACLES_BLOCK_LIKE}
-
+    RESIZABLE_OBSTACLES_BLOCK_LIKE
+}
 rospy.init_node('set_obstacle_dimensions', anonymous=True)
 
 spawn_publisher = rospy.ServiceProxy('/gazebo/spawn_urdf_model', SpawnModel)
@@ -64,7 +64,6 @@ def set_size(name, doc):
     xacro.process_doc(doc)
     new_obstacle = doc.toprettyxml(indent='  ')
     delete_publisher(model_name=current_model_name[name])
-
     new_name = name + str(rospy.Time.now().nsecs)
     spawn_publisher(model_name=new_name, model_xml=new_obstacle)
     current_model_name[name] = new_name

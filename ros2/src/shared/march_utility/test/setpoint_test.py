@@ -32,7 +32,9 @@ class SetpointTest(unittest.TestCase):
         }
 
     def test_time_rounding(self):
-        self.assertEqual(self.setpoint.time, Duration(seconds=round_setpoint(1.12341254)))
+        self.assertEqual(
+            self.setpoint.time, Duration(seconds=round_setpoint(1.12341254))
+        )
 
     def test_position_rounding(self):
         self.assertEqual(self.setpoint.position, round_setpoint(0.03434126))
@@ -45,7 +47,7 @@ class SetpointTest(unittest.TestCase):
             str(self.setpoint),
             f"Time: {round_setpoint(Duration(nanoseconds=1123412540)).nanoseconds}, "
             f"Position: {round_setpoint(0.03434126)}, Velocity: "
-            f"{round_setpoint(123.16208455)}"
+            f"{round_setpoint(123.16208455)}",
         )
 
     def test_equal(self):
@@ -103,9 +105,9 @@ class SetpointTest(unittest.TestCase):
         new_setpoints = FeetState.feet_state_to_setpoints(feet_state)
         for key in new_setpoints.keys():
             self.assertAlmostEqual(
-                new_setpoints[key].velocity, round_setpoint(self.setpoint_dict[
-                                                                key].velocity),
-                places=3
+                new_setpoints[key].velocity,
+                round_setpoint(self.setpoint_dict[key].velocity),
+                places=3,
             )
 
     def test_inverse_kinematics_reversed_position(self):
