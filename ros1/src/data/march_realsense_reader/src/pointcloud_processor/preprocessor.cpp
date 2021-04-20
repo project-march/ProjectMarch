@@ -221,12 +221,15 @@ bool NormalsPreprocessor::filterOnDistanceFromOrigin()
     double distance_threshold_squared = distance_threshold * distance_threshold;
 
     // Removed any point too far from the origin
-    for (int point_index = 0; point_index < pointcloud_->points.size(); point_index++) {
+    for (int point_index = 0; point_index < pointcloud_->points.size();
+         point_index++) {
         // find the squared distance from the origin
-        float point_distance_squared
-            = (pointcloud_->points[point_index].x * pointcloud_->points[point_index].x)
-            + (pointcloud_->points[point_index].y * pointcloud_->points[point_index].y)
-            + (pointcloud_->points[point_index].z * pointcloud_->points[point_index].z);
+        float point_distance_squared = (pointcloud_->points[point_index].x
+                                           * pointcloud_->points[point_index].x)
+            + (pointcloud_->points[point_index].y
+                * pointcloud_->points[point_index].y)
+            + (pointcloud_->points[point_index].z
+                * pointcloud_->points[point_index].z);
 
         // remove point if it's outside the threshold distance
         if (point_distance_squared > distance_threshold_squared) {
@@ -279,7 +282,8 @@ bool NormalsPreprocessor::filterOnNormalOrientation()
 
     // Remove any point who's normal does not fall into the desired region
     if (pointcloud_->points.size() == pointcloud_normals_->points.size()) {
-        for (int point_index = 0; point_index < pointcloud_->points.size(); point_index++) {
+        for (int point_index = 0; point_index < pointcloud_->points.size();
+             point_index++) {
             // remove point if its normal is too far from what is desired
             if (pointcloud_normals_->points[point_index].normal_x
                         * pointcloud_normals_->points[point_index].normal_x
@@ -293,7 +297,8 @@ bool NormalsPreprocessor::filterOnNormalOrientation()
                 inliers->indices.push_back(point_index);
             }
         }
-        // Remove all points indexed by indices from the pointcloud and the normals
+        // Remove all points indexed by indices from the pointcloud and the
+        // normals
         extract_points.setIndices(inliers);
         extract_points.setNegative(true);
         extract_points.setInputCloud(pointcloud_);
@@ -315,10 +320,12 @@ bool NormalsPreprocessor::filterOnNormalOrientation()
 // Remove NaN's and Inf's from the point cloud if present
 bool NormalsPreprocessor::cleanUpPointCloud()
 {
-    // The index map is required by the removeNaN methods, but we will not use this value
+    // The index map is required by the removeNaN methods, but we will not use
+    // this value
     std::vector<int> index_map;
     pcl::removeNaNFromPointCloud(*pointcloud_, *pointcloud_, index_map);
-    pcl::removeNaNNormalsFromPointCloud(*pointcloud_normals_, *pointcloud_normals_, index_map);
+    pcl::removeNaNNormalsFromPointCloud(
+        *pointcloud_normals_, *pointcloud_normals_, index_map);
     return true;
 }
 

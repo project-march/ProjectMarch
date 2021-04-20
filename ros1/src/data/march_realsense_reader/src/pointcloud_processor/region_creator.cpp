@@ -159,7 +159,8 @@ bool EuclideanClustering::createRegions(PointCloud::Ptr pointcloud,
 
     clock_t end_euclidean_clustering = clock();
     double time_taken
-        = double(end_euclidean_clustering - start_euclidean_clustering) / double(CLOCKS_PER_SEC);
+        = double(end_euclidean_clustering - start_euclidean_clustering)
+        / double(CLOCKS_PER_SEC);
     ROS_DEBUG_STREAM("Time taken by pointcloud EuclideanClustering is : "
         << std::fixed << time_taken << std::setprecision(5) << " sec "
         << std::endl);
