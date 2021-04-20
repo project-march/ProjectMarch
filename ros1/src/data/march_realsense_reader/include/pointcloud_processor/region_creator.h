@@ -21,7 +21,9 @@ public:
         Normals::Ptr pointcloud_normals,
         boost::shared_ptr<RegionVector> region_vector)
         = 0;
+
     virtual ~RegionCreator() {};
+
     virtual ColoredPointCloud::Ptr debug_visualisation() = 0;
 
 protected:
@@ -47,7 +49,7 @@ public:
      * @return A pointer to a single pointcloud, with unique colours for every
      * cluster
      */
-    PointCloudColoredPointCloud::Ptr debug_visualisation() override;
+    ColoredPointCloud::Ptr debug_visualisation() override;
 
 private:
     /**
@@ -78,10 +80,10 @@ private:
     float curvature_threshold;
 };
 
-class RegionGrower : EuclideanClustering {
+class EuclideanClustering : RegionCreator {
 public:
     // Use the constructors defined in the super class
-    RegionGrower(YAML::Node config_tree, bool debugging);
+    EuclideanClustering(YAML::Node config_tree, bool debugging);
     /** Create cluster using the euclidean clustering algorithm, takes algorithm
      * configuration from the YAML, and fills parameter region_vector with
      * clusters. **/
