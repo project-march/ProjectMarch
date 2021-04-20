@@ -17,7 +17,7 @@ protected:
 
 TEST_F(PressureSoleTest, GetSide)
 {
-    march::PressureSole pressure_sole(mock_slave, 0, "left");
+    march::PressureSole pressure_sole(mock_slave, /*byte_offset=*/0, "left");
 
     ASSERT_EQ("left", pressure_sole.getSide());
 }

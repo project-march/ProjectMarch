@@ -101,8 +101,8 @@ bool MarchHardwareInterface::init(
                         .getNetOperational(net_number)) {
                 march_robot_->getPowerDistributionBoard()
                     ->getHighVoltage()
-                    .setNetOnOff(true, net_number);
-                usleep(100000);
+                    .setNetOnOff(/*on=*/true, net_number);
+                usleep(/*__useconds=*/100000);
                 ROS_WARN(
                     "[%s] Waiting on high voltage", joint.getName().c_str());
             }

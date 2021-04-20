@@ -19,13 +19,14 @@ using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
 using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
 
 std::string POINTCLOUD_TOPIC = "/camera_front/depth/color/points";
-ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(1.0); // secs
+ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(/*t=*/1.0); // secs
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     : n_(n)
 {
-    pointcloud_subscriber_ = n_->subscribe<sensor_msgs::PointCloud2>(
-        POINTCLOUD_TOPIC, 1, &RealSenseReader::pointcloudCallback, this);
+    pointcloud_subscriber_
+        = n_->subscribe<sensor_msgs::PointCloud2>(POINTCLOUD_TOPIC,
+            /*queue_size=*/1, &RealSenseReader::pointcloudCallback, this);
     read_pointcloud_service_
         = n_->advertiseService("/camera/process_pointcloud",
             &RealSenseReader::processPointcloudCallback, this);
@@ -58,17 +59,17 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
             ros::console::notifyLoggerLevelsChanged();
         }
 
-        preprocessed_pointcloud_publisher_
-            = n_->advertise<PointCloud>("/camera/preprocessed_cloud", 1);
+        preprocessed_pointcloud_publisher_ = n_->advertise<PointCloud>(
+            "/camera/preprocessed_cloud", /*queue_size=*/1);
         region_pointcloud_publisher_
             = n_->advertise<pcl::PointCloud<pcl::PointXYZRGB>>(
-                "/camera/region_cloud", 1);
+                "/camera/region_cloud", /*queue_size=*/1);
         hull_marker_array_publisher_
             = n_->advertise<visualization_msgs::Marker>(
-                "/camera/hull_marker_list", 1);
+                "/camera/hull_marker_list", /*queue_size=*/1);
         hull_parameter_determiner_publisher_
             = n_->advertise<visualization_msgs::MarkerArray>(
-                "/camera/foot_locations_marker_array", 1);
+                "/camera/foot_locations_marker_array", /*queue_size=*/1);
     }
 }
 

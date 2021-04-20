@@ -37,7 +37,7 @@ void ComControllerPlugin::Load(
     // Create a named topic, and subscribe to it.
     ros::SubscribeOptions so
         = ros::SubscribeOptions::create<march_shared_msgs::CurrentGait>(
-            "/march/gait_selection/current_gait", 1,
+            "/march/gait_selection/current_gait", /*queue_size=*/1,
             boost::bind(&ComControllerPlugin::onRosMsg, this, _1),
             ros::VoidPtr(), &ros_queue_);
     ros_sub_ = ros_node_->subscribe(so);
@@ -87,9 +87,9 @@ void ComControllerPlugin::onUpdate()
     controller_->update(torque_left, torque_right);
 
     for (auto const& link : model_->GetLinks()) {
-        if (link->GetName().find("left") != std::string::npos) {
+        if (link->GetName().find(/*__s=*/"left") != std::string::npos) {
             link->AddTorque(torque_left);
-        } else if (link->GetName().find("right") != std::string::npos) {
+        } else if (link->GetName().find(/*__s=*/"right") != std::string::npos) {
             link->AddTorque(torque_right);
         }
     }
