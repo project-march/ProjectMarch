@@ -136,7 +136,7 @@ void NormalsPreprocessor::getDownsamplingParameters()
         random_filter = yaml_utilities::grabParameter<bool>(
             downsampling_parameters, "random_filter");
         if (voxel_grid_filter) {
-            leaf_size = yaml_utilities::grabParameter<double>(
+            leaf_size = yaml_utilities::grabParameter<float>(
                 downsampling_parameters, "leaf_size");
         } else if (random_filter) {
             remaining_points = yaml_utilities::grabParameter<int>(
@@ -222,7 +222,7 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
     try {
         pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
         transform_stamped = tfBuffer->lookupTransform(frame_id_to_transform_to_,
-            pointcloud_frame_id, ros::Time::now(), ros::Duration(0.5));
+            pointcloud_frame_id, ros::Time::now(), ros::Duration(/*t=*/0.5));
         pcl_ros::transformPointCloud(
             *pointcloud_, *pointcloud_, transform_stamped.transform);
     } catch (tf2::TransformException& ex) {
@@ -353,7 +353,7 @@ void SimplePreprocessor::transformPointCloudFromUrdf()
     try {
         pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
         transformStamped = tfBuffer->lookupTransform(frame_id_to_transform_to_,
-            pointcloud_frame_id, ros::Time::now(), ros::Duration(0.5));
+            pointcloud_frame_id, ros::Time::now(), ros::Duration(/*t=*/0.5));
         pcl_ros::transformPointCloud(
             *pointcloud_, *pointcloud_, transformStamped.transform);
     } catch (tf2::TransformException& ex) {

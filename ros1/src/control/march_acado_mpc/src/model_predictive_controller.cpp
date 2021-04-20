@@ -19,9 +19,8 @@ using namespace std;
 ACADOvariables acadoVariables = {};
 ACADOworkspace acadoWorkspace = {};
 
-ModelPredictiveController::ModelPredictiveController(
-    std::vector<std::vector<float>> Q)
-    : Q_(Q)
+ModelPredictiveController::ModelPredictiveController(std::vector<float> W)
+    : W_(W)
 {
 }
 
@@ -33,18 +32,22 @@ void ModelPredictiveController::init()
     // Initialize state array with zero
     std::fill(std::begin(acadoVariables.x), std::end(acadoVariables.x), 0.0);
 
-    // Initialize input and "running" reference array with zero
+    // Initialize input array with zero
     std::fill(std::begin(acadoVariables.u), std::end(acadoVariables.u), 0.0);
-    std::fill(std::begin(acadoVariables.y), std::end(acadoVariables.y), 0.0);
 
-    // Initialize "end" reference with zero
+    // Initialize "running" and "end" reference array with zero
+    std::fill(std::begin(acadoVariables.y), std::end(acadoVariables.y), 0.0);
     std::fill(std::begin(acadoVariables.yN), std::end(acadoVariables.yN), 0.0);
+
+    // Initialize "running" and "end" weighting array with zero
+    std::fill(std::begin(acadoVariables.W), std::end(acadoVariables.W), 0.0);
+    std::fill(std::begin(acadoVariables.WN), std::end(acadoVariables.WN), 0.0);
 
     // Current state feedback
     setInitialState(x0);
 
     // Assign the weighting matrix
-    assignWeightingMatrix(Q_);
+    assignWeightingMatrix(W_);
 
     // Warm-up the solver
     acado_preparationStep();
@@ -83,38 +86,20 @@ void ModelPredictiveController::setReference(
 
 void ModelPredictiveController::shiftStatesAndControl()
 {
-    acado_shiftStates(2, 0, 0);
-    acado_shiftControls(0);
+    acado_shiftStates(/*strategy=*/2, /*xEnd=*/0, /*uEnd=*/0);
+    acado_shiftControls(/*uEnd=*/0);
 }
 
-void ModelPredictiveController::assignWeightingMatrix(
-    std::vector<std::vector<float>> Q)
+void ModelPredictiveController::assignWeightingMatrix(std::vector<float> W)
 {
-    // Get size of weighting array
-    double ACADO_NW = sizeof(acadoVariables.W) / sizeof(acadoVariables.W[0]);
-    double ACADO_NWN = sizeof(acadoVariables.WN) / sizeof(acadoVariables.WN[0]);
+    // set the diagonal of the ACADO W matrix (state and input weights)
+    for (int i = 0; i < ACADO_NY; ++i) {
+        acadoVariables.W[i * (ACADO_NY + 1)] = W[i];
+    }
 
-    // Get size of Q matrix
-    int n_rows = Q.size();
-    int n_cols = Q[0].size();
-
-    // Check if the given weighting matrix is the correct size.
-    // If so, assign the weighting matrices
-    if (ACADO_NW == (n_rows * n_cols)
-        && ACADO_NWN == (n_rows - ACADO_NU) * (n_cols - ACADO_NU)) {
-        // set W matrix with Q matrix (state and input weights)
-        for (int i = 0; i < n_rows; i++) {
-            for (int j = 0; j < n_cols; j++) {
-                acadoVariables.W[i * n_cols + j] = Q[i][j];
-            }
-        }
-
-        // Set WN matrix with a subset of the Q matrix (only state weights)
-        for (int i = 0; i < (n_rows - ACADO_NU); i++) {
-            for (int j = 0; j < 2; j++) {
-                acadoVariables.WN[i * (n_cols - ACADO_NU) + j] = Q[i][j];
-            }
-        }
+    // Set the diagonal of the ACADO WN matrix (only state weights)
+    for (int i = 0; i < ACADO_NYN; ++i) {
+        acadoVariables.WN[i * (ACADO_NYN + 1)] = W[i];
     }
 }
 
@@ -171,8 +156,8 @@ void ModelPredictiveController::calculateControlInput()
     u = acadoVariables.u[0];
 
     // Shift states and control and prepare for the next iteration
-    acado_shiftStates(2, 0, 0);
-    acado_shiftControls(0);
+    acado_shiftStates(/*strategy=*/2, /*xEnd=*/0, /*uEnd=*/0);
+    acado_shiftControls(/*uEnd=*/0);
 
     // Perform a diagnosis on the controller
     controllerDiagnosis();

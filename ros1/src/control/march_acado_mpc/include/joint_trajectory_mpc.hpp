@@ -82,11 +82,13 @@ public:
 
 private:
     /**
-     * @brief Retrieve the Q matrix from the parameter server for a joint.
-     * @param joint_name Joint to retrieve Q Matrix for
-     * @return Returns a 2d vector: The Q Matrix.
+     * @brief Retrieve the weights from the parameter server for a joint.
+     *        Weights are used for tuning the MPC
+     * @param joint_name Joint to retrieve weights for
+     * @return Returns a vector: The weight values belonging to the diagonal of
+     * the MPC weight matrix.
      */
-    std::vector<std::vector<float>> getQMatrix(const std::string& joint_name);
+    std::vector<float> getWeights(std::string joint_name);
 
     std::vector<hardware_interface::JointHandle>* joint_handles_ptr_;
 

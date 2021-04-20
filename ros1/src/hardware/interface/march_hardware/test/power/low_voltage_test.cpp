@@ -9,7 +9,8 @@
 class LowVoltageTest : public ::testing::Test {
 protected:
     MockPdoInterfacePtr mock_pdo;
-    march::PdoSlaveInterface pdo = march::PdoSlaveInterface(1, this->mock_pdo);
+    march::PdoSlaveInterface pdo
+        = march::PdoSlaveInterface(/*slave_index=*/1, this->mock_pdo);
 };
 
 TEST_F(LowVoltageTest, Equals)
@@ -27,7 +28,8 @@ TEST_F(LowVoltageTest, NotEquals)
 {
     NetMonitorOffsets netMonitoringOffsets;
     NetDriverOffsets netDriverOffsets;
-    NetDriverOffsets netDriverOffsets2(1, 2, 3);
+    NetDriverOffsets netDriverOffsets2(/*lowVoltageNetOnOff=*/1,
+        /*highVoltageNetOnOff=*/2, /*highVoltageNetEnableDisable=*/3);
     march::LowVoltage lowVoltage1(
         this->pdo, netMonitoringOffsets, netDriverOffsets);
     march::LowVoltage lowVoltage2(

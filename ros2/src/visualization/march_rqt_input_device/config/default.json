@@ -207,6 +207,12 @@
       },
       {
          "name":"ik_test_multiple_subgaits"
+      },
+      {
+         "name":"dynamic_sit"
+      },
+      {
+         "name":"dynamic_stand"
       }
    ],
    [

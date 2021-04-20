@@ -56,11 +56,12 @@ TEST_F(NetDriverOffsetsTest, Equals)
 TEST_F(NetDriverOffsetsTest, NotEquals)
 {
     NetDriverOffsets netDriverOffsets1(
-        11, highVoltageNetOnOff, highVoltageNetEnableDisable);
-    NetDriverOffsets netDriverOffsets2(
-        lowVoltageNetOnOff, 22, highVoltageNetEnableDisable);
-    NetDriverOffsets netDriverOffsets3(
-        lowVoltageNetOnOff, highVoltageNetOnOff, 33);
+        /*lowVoltageNetOnOff=*/11, highVoltageNetOnOff,
+        highVoltageNetEnableDisable);
+    NetDriverOffsets netDriverOffsets2(lowVoltageNetOnOff,
+        /*highVoltageNetOnOff=*/22, highVoltageNetEnableDisable);
+    NetDriverOffsets netDriverOffsets3(lowVoltageNetOnOff, highVoltageNetOnOff,
+        /*highVoltageNetEnableDisable=*/33);
 
     EXPECT_FALSE(netDriverOffsets1 == netDriverOffsets2);
     EXPECT_FALSE(netDriverOffsets1 == netDriverOffsets3);

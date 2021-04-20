@@ -29,7 +29,7 @@ bool MarchTemperatureSensorController::init(MarchTemperatureSensorInterface* hw,
         RtPublisherPtr rt_pub(
             new realtime_tools::RealtimePublisher<sensor_msgs::Temperature>(
                 root_nh, "/march/temperature/" + temperature_sensor_names[i],
-                4));
+                /*queue_size=*/4));
         realtime_pubs_.push_back(rt_pub);
     }
 
