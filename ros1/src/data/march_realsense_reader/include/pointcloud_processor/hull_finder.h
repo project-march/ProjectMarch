@@ -30,7 +30,7 @@ public:
         boost::shared_ptr<PolygonVector> polygon_vector)
         = 0;
 
-    virtual ~HullFinder() {};
+    virtual ~HullFinder() = default;
 
     /** This function is called upon whenever a parameter from config is
      * changed, including when launching the node
@@ -91,11 +91,11 @@ protected:
     bool getAveragePointAndNormal(std::vector<double>& average_point,
         std::vector<double>& average_normal);
 
-    bool convex;
-    double alpha;
-    int hull_dimension;
+    bool convex = false;
+    double alpha = 0.0;
+    int hull_dimension = 0;
 
-    int region_index_;
+    int region_index_ = 0;
     PointCloud::Ptr region_points_;
     Normals::Ptr region_normals_;
     PointCloud::Ptr region_points_projected_;

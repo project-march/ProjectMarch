@@ -20,7 +20,7 @@ public:
         Normals::Ptr pointcloud_normals,
         boost::shared_ptr<RegionVector> region_vector)
         = 0;
-    virtual ~RegionCreator() {};
+    virtual ~RegionCreator() = default;
     virtual pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation() = 0;
 
     /** This function is called upon whenever a parameter from config is

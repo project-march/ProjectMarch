@@ -19,7 +19,7 @@ public:
         Normals::Ptr normal_pointcloud, std::string frame_id_to_transform_to_)
         = 0;
 
-    virtual ~Preprocessor() {};
+    virtual ~Preprocessor() = default;
 
     // Removes a point from a pointcloud (and optionally the corresponding
     // pointcloud_normals as well) at a given index
@@ -99,23 +99,23 @@ protected:
     bool filterOnNormalOrientation();
 
     // Downsampling parameters
-    bool voxel_grid_filter;
-    float leaf_size;
-    bool random_filter;
-    int remaining_points;
+    bool voxel_grid_filter = false;
+    float leaf_size = 0.0;
+    bool random_filter = false;
+    int remaining_points = 0;
 
     // Distance filter parameters
-    double distance_threshold;
+    double distance_threshold = 0.0;
 
     // Normal estimation parameters
-    bool use_tree_search_method;
-    int number_of_neighbours;
-    double search_radius;
+    bool use_tree_search_method = false;
+    int number_of_neighbours = 0;
+    double search_radius = 0.0;
 
     // Normal filter parameters
-    double allowed_length_x;
-    double allowed_length_y;
-    double allowed_length_z;
+    double allowed_length_x = 0.0;
+    double allowed_length_y = 0.0;
+    double allowed_length_z = 0.0;
 
     // Objects needed for transformation based on URDF
     std::unique_ptr<tf2_ros::Buffer> tfBuffer;
