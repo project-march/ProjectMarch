@@ -9,7 +9,8 @@ Checks:     -*,
             hicpp-*,
             -hicpp-special-member-functions,
             -hicpp-no-array-decay,
-            -hicpp-vararg
+            -hicpp-vararg,
+            -hicpp-avoid-goto
 WarningsAsErrors: '*'
 HeaderFilterRegex: ''
 FormatStyle:     webkit
