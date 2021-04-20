@@ -4,6 +4,7 @@
 #include "yaml-cpp/yaml.h"
 #include <pcl/point_types.h>
 #include <pcl/segmentation/region_growing.h>
+#include <pcl/segmentation/extract_clusters.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
 #include <string>
