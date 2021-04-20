@@ -5,12 +5,12 @@
     "value":10.0
   },
   {
-    "name":"encoder_manager.encoder1.config.cpr",
+    "name":"encoder_manager.encoder2.config.cpr",
     "type":"int32",
     "value":8192
   },
   {
-    "name":"encoder_manager.encoder1.config.use_index",
+    "name":"encoder_manager.encoder2.config.use_index",
     "type":"bool",
     "value":1
   },
@@ -45,7 +45,7 @@
     "value": 50.0
   },
   {
-    "name": "encoder_manager.encoder_processor1.use_axis",
+    "name": "encoder_manager.encoder_processor2.use_axis",
     "type": "bool",
     "value": 1
   }
