@@ -94,7 +94,7 @@ private:
     ros::Publisher hull_parameter_determiner_publisher_;
 
     std::unique_ptr<NormalsPreprocessor> preprocessor_;
-    std::unique_ptr<RegionGrower> region_creator_;
+    std::unique_ptr<EuclideanClustering> region_creator_;
     std::unique_ptr<CHullFinder> hull_finder_;
     std::unique_ptr<HullParameterDeterminer> parameter_determiner_;
     bool debugging_;
