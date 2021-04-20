@@ -37,4 +37,6 @@ CheckOptions:
       value:    '1'
     - key:      bugprone-suspicious-enum-usage.StrictMode
       value:    '1'
+    - key:      hicpp-signed-bitwise.IgnorePositiveIntegerLiterals 
+      value:    '1'
 ...
