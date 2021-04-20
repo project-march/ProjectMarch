@@ -298,20 +298,21 @@ bool NormalsPreprocessor::fillNormalCloud(
 bool NormalsPreprocessor::filterOnNormalOrientation()
 {
     pcl::ExtractIndices<pcl::PointXYZ> extract_points;
-    pcl::ExtractIndices<pcl::Normals> extract_normals;
+    pcl::ExtractIndices<pcl::Normal> extract_normals;
+    pcl::PointIndices::Ptr inliers = boost::make_shared<pcl::PointIndices>();
 
     // Remove any point who's normal does not fall into the desired region
     if (pointcloud_->points.size() == pointcloud_normals_->points.size()) {
-        for (int p = 0; p < pointcloud_->points.size(); p++) {
+        for (int point_index = 0; point_index < pointcloud_->points.size(); point_index++) {
             // remove point if its normal is too far from what is desired
-            if (pointcloud_normals_->points[p].normal_x
-                        * pointcloud_normals_->points[p].normal_x
+            if (pointcloud_normals_->points[point_index].normal_x
+                        * pointcloud_normals_->points[point_index].normal_x
                     > allowed_length_x
-                || pointcloud_normals_->points[p].normal_y
-                        * pointcloud_normals_->points[p].normal_y
+                || pointcloud_normals_->points[point_index].normal_y
+                        * pointcloud_normals_->points[point_index].normal_y
                     > allowed_length_y
-                || pointcloud_normals_->points[p].normal_z
-                        * pointcloud_normals_->points[p].normal_z
+                || pointcloud_normals_->points[point_index].normal_z
+                        * pointcloud_normals_->points[point_index].normal_z
                     > allowed_length_z) {
                 inliers->indices.push_back(point_index);
             }
