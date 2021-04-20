@@ -339,6 +339,7 @@ bool NormalsPreprocessor::filterOnNormalOrientation()
     return true;
 }
 
+// Remove NaN's and Inf's from the point cloud if present
 bool NormalsPreprocessor::cleanUpPointCloud()
 {
     // The index map is required by the removeNaN methods, but we will not use this value
