@@ -9,8 +9,8 @@
 #include <string>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
-using ColoredPointCloud = pcl::ColoredPointCloud<pcl::pointXYZRGB> using Normals
-    = pcl::PointCloud<pcl::Normal>;
+using ColoredPointCloud = pcl::PointCloud<pcl::PointXYZRGB>;
+using Normals = pcl::PointCloud<pcl::Normal>;
 using RegionVector = std::vector<pcl::PointIndices>;
 
 class RegionCreator {

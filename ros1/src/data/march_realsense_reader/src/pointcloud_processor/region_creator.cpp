@@ -7,8 +7,8 @@
 #include <utilities/yaml_utilities.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
-using ColoredPointCloud = pcl::ColoredPointCloud<pcl::pointXYZRGB> using Normals
-    = pcl::PointCloud<pcl::Normal>;
+using ColoredPointCloud = pcl::PointCloud<pcl::PointXYZRGB>;
+using Normals = pcl::PointCloud<pcl::Normal>;
 using RegionVector = std::vector<pcl::PointIndices>;
 
 // Construct a basic RegionCreator class
@@ -121,7 +121,7 @@ ColoredPointCloud::Ptr RegionGrower::debug_visualisation()
 }
 
 // Contrust a basic EuclideanClustering class
-EuclideanClustering(YAML::Node config_tree, bool debugging)
+EuclideanClustering::EuclideanClustering(YAML::Node config_tree, bool debugging)
     : RegionCreator(config_tree, debugging)
 {
     readYAML();
@@ -140,6 +140,30 @@ void EuclideanClustering::ReadYAML()
     }
 }
 
+bool EuclideanClustering::createRegions(PointCloud::Ptr pointcloud,
+                                        Normals::Ptr pointcloud_normals,
+                                        boost::shared_ptr<RegionVector> region_vector)
+{
+    pointcloud_ = pointcloud;
+    pointcloud_normals_ = pointcloud_normals;
+    region_vector_ = region_vector;
+    ROS_DEBUG_STREAM("Creating regions with region growing");
+
+    clock_t start_region_grow = clock();
+
+    bool success = true;
+    success &= createEuclideanClusters();
+
+    clock_t end_region_grow = clock();
+    double time_taken
+            = double(end_region_grow - start_region_grow) / double(CLOCKS_PER_SEC);
+    ROS_DEBUG_STREAM("Time taken by pointcloud RegionGrower is : "
+                             << std::fixed << time_taken << std::setprecision(5) << " sec "
+                             << std::endl);
+
+    return success;
+}
+
 bool EuclideanClustering::createEuclideanClusters()
 {
     pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(
@@ -151,8 +175,20 @@ bool EuclideanClustering::createEuclideanClusters()
     euclidean_clusterer.setMinClusterSize(min_cluster_size);
     euclidean_clusterer.setMaxClusterSize(max_cluster_size);
     euclidean_clusterer.setSearchMethod(tree);
-    euclidean_clusterer.setInputCloud(cloud);
-    euclidean_clusterer.extract(cluster_indices);
+    euclidean_clusterer.setInputCloud(pointcloud_);
+    euclidean_clusterer.extract(*region_vector_);
+
+    ROS_DEBUG("Total number of clusters found: %lu", region_vector_->size());
+    for (int cluster_index = 0; cluster_index < region_vector->size(); cluster_index++) {
+        ROS_DEBUG("Total number of points in cluster %i: %lu", cluster_index,
+                  region_vector_->at(cluster_index).indices.size());
+    }
+
+    if (region_vector_->size() == 0) {
+        ROS_WARN("Region growing algorithm found no clusters");
+        return false;
+    }
+    return true;
 }
 
 ColoredPointCloud::Ptr EuclideanClustering::debug_visualisation()
