@@ -40,7 +40,7 @@ joints:
   - position: 0.1396
     time_from_start: 816000000
     velocity: 0.0
-  - position: 0.1396
+  - position: 0.13960016
     time_from_start: 1200000000
     velocity: 0.0
   right_ankle:
@@ -75,7 +75,7 @@ joints:
     velocity: 0.12796667
   - position: 0.3142
     time_from_start: 1200000000
-    velocity: -0.32000833
+    velocity: -0.3491
   right_knee:
   - position: 0.13960016
     time_from_start: 0
