@@ -89,6 +89,9 @@ protected:
     // direction (specified in the parameter file)
     bool filterOnNormalOrientation();
 
+    // Remove NaN's and Inf's from the point cloud if present
+    bool cleanUpPointCloud();
+
     // Reads all the relevant parameters from the yaml file
     void readYaml();
 
