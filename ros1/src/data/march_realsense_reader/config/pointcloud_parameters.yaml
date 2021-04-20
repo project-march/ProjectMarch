@@ -21,8 +21,8 @@ preprocessor:
     allowed_length_z: 1.0
 
 region_creator:
-  min_cluster_size: 100
-  max_cluster_size: 1000000
+  min_cluster_size: 20
+  max_cluster_size: 100
   region_growing:
     number_of_neighbours: 10
     # 4 / 180 * pi
