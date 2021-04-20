@@ -432,7 +432,7 @@ bool HullParameterDeterminer::entireFootCanBePlaced(
 void HullParameterDeterminer::fillFootPointCloud(
     PointCloud2D::Ptr foot_pointcloud, pcl::PointNormal possible_foot_location)
 {
-    foot_pointcloud->points.resize(4);
+    foot_pointcloud->points.resize(/*__new_size=*/4);
 
     // Deviation back is added as the forward direction of the exoskeleton
     // is the negative x direction in the simulation
