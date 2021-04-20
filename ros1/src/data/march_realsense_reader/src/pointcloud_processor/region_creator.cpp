@@ -7,8 +7,8 @@
 #include <utilities/yaml_utilities.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
-using ColoredPointCloud = pcl::ColoredPointCloud<pcl::pointXYZRGB>
-using Normals = pcl::PointCloud<pcl::Normal>;
+using ColoredPointCloud = pcl::ColoredPointCloud<pcl::pointXYZRGB> using Normals
+    = pcl::PointCloud<pcl::Normal>;
 using RegionVector = std::vector<pcl::PointIndices>;
 
 // Construct a basic RegionCreator class
@@ -158,12 +158,14 @@ bool EuclideanClustering::createEuclideanClusters()
 ColoredPointCloud::Ptr EuclideanClustering::debug_visualisation()
 {
     ColoredPointCloud colored_cloud = boost::make_shared<ColoredPointCloud>();
-    // Initialize the object with which to get the cloud corresponding to the indices of the clusters
+    // Initialize the object with which to get the cloud corresponding to the
+    // indices of the clusters
     pcl::extractIndices<pcl::PointXYZ> extract;
 
     for (cluster : cluster_indices) {
         PointCloud::Ptr cloud_cluster = boost::make_shared<PointCloud>();
-        ColoredPointCloud::Ptr colored_cluster = boost::make_shared<ColoredPointCloud>();
+        ColoredPointCloud::Ptr colored_cluster
+            = boost::make_shared<ColoredPointCloud>();
 
         // Extract the region from the point cloud
         extract.setInputCloud(pointcloud_);
@@ -179,9 +181,12 @@ ColoredPointCloud::Ptr EuclideanClustering::debug_visualisation()
         colored_cluster->points.resize(region_size);
 
         for (int point_index = 0; point_index < region_size; point_index++) {
-            colored_cluster->points[point_index].x = cloud_cluster->points[point_index].x;
-            colored_cluster->points[point_index].y = cloud_cluster->points[point_index].y;
-            colored_cluster->points[point_index].z = cloud_cluster->points[point_index].z;
+            colored_cluster->points[point_index].x
+                = cloud_cluster->points[point_index].x;
+            colored_cluster->points[point_index].y
+                = cloud_cluster->points[point_index].y;
+            colored_cluster->points[point_index].z
+                = cloud_cluster->points[point_index].z;
 
             colored_cluster->points[point_index].r = r;
             colored_cluster->points[point_index].g = g;
