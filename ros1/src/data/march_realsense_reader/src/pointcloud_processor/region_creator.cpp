@@ -7,6 +7,7 @@
 #include <utilities/yaml_utilities.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
+using ColoredPointCloud = pcl::ColoredPointCloud<pcl::pointXYZRGB>
 using Normals = pcl::PointCloud<pcl::Normal>;
 using RegionVector = std::vector<pcl::PointIndices>;
 
@@ -114,7 +115,7 @@ bool RegionGrower::extractRegions()
     return false;
 }
 
-pcl::PointCloud<pcl::PointXYZRGB>::Ptr RegionGrower::debug_visualisation()
+ColoredPointCloud::Ptr RegionGrower::debug_visualisation()
 {
     return region_grower.getColoredCloud();
 }
@@ -143,7 +144,7 @@ bool EuclideanClustering::createEuclideanClusters()
 {
     pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(
         new pcl::search::KdTree<pcl::PointXYZ>);
-    tree->setInputCloud(cloud);
+    tree->setInputCloud(pointcloud_);
     pcl::EuclideanClusterExtraction<pcl::PointXYZ> euclidean_clusterer;
 
     euclidean_clusterer.setClusterTolerance(distance_tolerance);
@@ -152,4 +153,41 @@ bool EuclideanClustering::createEuclideanClusters()
     euclidean_clusterer.setSearchMethod(tree);
     euclidean_clusterer.setInputCloud(cloud);
     euclidean_clusterer.extract(cluster_indices);
+}
+
+ColoredPointCloud::Ptr EuclideanClustering::debug_visualisation()
+{
+    ColoredPointCloud colored_cloud = boost::make_shared<ColoredPointCloud>();
+    // Initialize the object with which to get the cloud corresponding to the indices of the clusters
+    pcl::extractIndices<pcl::PointXYZ> extract;
+
+    for (cluster : cluster_indices) {
+        PointCloud::Ptr cloud_cluster = boost::make_shared<PointCloud>();
+        ColoredPointCloud::Ptr colored_cluster = boost::make_shared<ColoredPointCloud>();
+
+        // Extract the region from the point cloud
+        extract.setInputCloud(pointcloud_);
+        extract.setIndices(cluster);
+        extract.setNegative(false);
+        extract.filter(*cloud_cluster);
+
+        int r = rand() % 256;
+        int g = rand() % 256;
+        int b = rand() % 256;
+
+        int region_size = cluster.indices.size();
+        colored_cluster->points.resize(region_size);
+
+        for (int point_index = 0; point_index < region_size; point_index++) {
+            colored_cluster->points[point_index].x = cloud_cluster->points[point_index].x;
+            colored_cluster->points[point_index].y = cloud_cluster->points[point_index].y;
+            colored_cluster->points[point_index].z = cloud_cluster->points[point_index].z;
+
+            colored_cluster->points[point_index].r = r;
+            colored_cluster->points[point_index].g = g;
+            colored_cluster->points[point_index].b = b;
+        }
+        *colored_cloud += *colored_cluster;
+    }
+    return output_cloud;
 }
