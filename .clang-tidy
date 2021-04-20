@@ -1,7 +1,9 @@
 ---
 Checks:     -*,
             portability-*,
-            bugprone-*
+            bugprone-*,
+            cert-*,
+            -cert-err58-cpp
 WarningsAsErrors: '*'
 HeaderFilterRegex: ''
 FormatStyle:     webkit
