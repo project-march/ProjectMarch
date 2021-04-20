@@ -124,17 +124,17 @@ ColoredPointCloud::Ptr RegionGrower::debug_visualisation()
 EuclideanClustering::EuclideanClustering(YAML::Node config_tree, bool debugging)
     : RegionCreator(config_tree, debugging)
 {
-    readYAML();
+    readYaml();
 }
 
-void EuclideanClustering::ReadYAML()
+void EuclideanClustering::readYaml()
 {
     min_cluster_size
         = yaml_utilities::grabParameter<int>(config_tree_, "min_cluster_size");
     max_cluster_size
         = yaml_utilities::grabParameter<int>(config_tree_, "max_cluster_size");
     if (YAML::Node euclidean_clustering_parameters
-        = config_tree["euclidean_clustering"]) {
+        = config_tree_["euclidean_clustering"]) {
         distance_tolerance = yaml_utilities::grabParameter<double>(
             euclidean_clustering_parameters, "distance_tolerance");
     }
