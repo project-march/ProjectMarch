@@ -17,7 +17,7 @@ class SafetyHandler {
     using GaitInstruction = march_shared_msgs::msg::GaitInstruction;
 
 public:
-    SafetyHandler(std::shared_ptr<SafetyNode> node);
+    explicit SafetyHandler(std::shared_ptr<SafetyNode> node);
 
     // Publish a fatal error message to the /march/error topic
     void publishFatal(const std::string& message);

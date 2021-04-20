@@ -8,7 +8,7 @@
 
 #include <string>
 
-SafetyHandler::SafetyHandler(std::shared_ptr<SafetyNode> node)
+explicit SafetyHandler::SafetyHandler(std::shared_ptr<SafetyNode> node)
     : node_(node)
 {
 }
