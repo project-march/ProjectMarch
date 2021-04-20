@@ -774,9 +774,7 @@ class Subgait(object):
         base_subgait: Subgait, other_subgait: Subgait
     ) -> Tuple[List[dict], List[dict]]:
         """Create two lists of setpoints with equal time stamps."""
-        base_to_other_duration_ratio = round(
-            other_subgait.duration / base_subgait.duration, Setpoint.digits
-        )
+        base_to_other_duration_ratio = other_subgait.duration / base_subgait.duration
 
         original_base_time_stamps = set(
             base_subgait.get_unique_timestamps(sorted_timestamps=False)
