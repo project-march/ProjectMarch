@@ -4,6 +4,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include <gtest/gtest.h>
 
+// NOLINT(hicpp-member-init)
 class FakeTemperatureDataNodeTest : public testing::Test {
 protected:
     void SetUp() override
