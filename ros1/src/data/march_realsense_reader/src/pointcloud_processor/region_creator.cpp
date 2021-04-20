@@ -17,12 +17,18 @@ RegionCreator::RegionCreator(YAML::Node config_tree, bool debugging)
 {
 }
 
-// Construct a basic CHullFinder class
+// Construct a basic RegionGrower class
 RegionGrower::RegionGrower(YAML::Node config_tree, bool debugging)
     : RegionCreator(config_tree, debugging)
-
 {
     readYaml();
+}
+
+// Contrust a basic EuclideanClustering class
+EuclideanClustering(YAML::Node config_tree, bool debugging)
+    : RegionCreator(config_tree, debugging)
+{
+    readYAML();
 }
 
 bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
@@ -49,15 +55,29 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
 
     return success;
 }
+
+void EuclideanClustering::ReadYAML()
+{
+    min_cluster_size
+        = yaml_utilities::grabParameter<int>(config_tree_, "min_cluster_size");
+    max_cluster_size
+        = yaml_utilities::grabParameter<int>(config_tree_, "max_cluster_size");
+    if (YAML::Node euclidean_clustering_parameters
+        = config_tree["euclidean_clustering"]) {
+        distance_tolerance = yaml_utilities::grabParameter<double>(
+            euclidean_clustering_parameters, "distance_tolerance");
+    }
+}
+
 void RegionGrower::readYaml()
 {
+    min_cluster_size
+        = yaml_utilities::grabParameter<int>(config_tree_, "min_cluster_size");
+    max_cluster_size
+        = yaml_utilities::grabParameter<int>(config_tree_, "max_cluster_size");
     if (YAML::Node region_growing_parameters = config_tree_["region_growing"]) {
         number_of_neighbours = yaml_utilities::grabParameter<int>(
             region_growing_parameters, "number_of_neighbours");
-        min_cluster_size = yaml_utilities::grabParameter<int>(
-            region_growing_parameters, "min_cluster_size");
-        max_cluster_size = yaml_utilities::grabParameter<int>(
-            region_growing_parameters, "max_cluster_size");
         smoothness_threshold = yaml_utilities::grabParameter<float>(
             region_growing_parameters, "smoothness_threshold");
         curvature_threshold = yaml_utilities::grabParameter<float>(

@@ -21,13 +21,15 @@ preprocessor:
     allowed_length_z: 1.0
 
 region_creator:
+  min_cluster_size: 100
+  max_cluster_size: 1000000
   region_growing:
     number_of_neighbours: 10
-    min_cluster_size: 100
-    max_cluster_size: 1000000
     # 4 / 180 * pi
     smoothness_threshold: 0.0698
     curvature_threshold: 0.5
+  euclidean_clustering:
+    distance_tolerance: 0.05
 
 hull_finder:
   c_hull_finder:
