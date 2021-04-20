@@ -24,13 +24,6 @@ RegionGrower::RegionGrower(YAML::Node config_tree, bool debugging)
     readYaml();
 }
 
-// Contrust a basic EuclideanClustering class
-EuclideanClustering(YAML::Node config_tree, bool debugging)
-    : RegionCreator(config_tree, debugging)
-{
-    readYAML();
-}
-
 bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
     Normals::Ptr pointcloud_normals,
     boost::shared_ptr<RegionVector> region_vector)
@@ -54,19 +47,6 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
         << std::endl);
 
     return success;
-}
-
-void EuclideanClustering::ReadYAML()
-{
-    min_cluster_size
-        = yaml_utilities::grabParameter<int>(config_tree_, "min_cluster_size");
-    max_cluster_size
-        = yaml_utilities::grabParameter<int>(config_tree_, "max_cluster_size");
-    if (YAML::Node euclidean_clustering_parameters
-        = config_tree["euclidean_clustering"]) {
-        distance_tolerance = yaml_utilities::grabParameter<double>(
-            euclidean_clustering_parameters, "distance_tolerance");
-    }
 }
 
 void RegionGrower::readYaml()
@@ -137,4 +117,39 @@ bool RegionGrower::extractRegions()
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr RegionGrower::debug_visualisation()
 {
     return region_grower.getColoredCloud();
+}
+
+// Contrust a basic EuclideanClustering class
+EuclideanClustering(YAML::Node config_tree, bool debugging)
+    : RegionCreator(config_tree, debugging)
+{
+    readYAML();
+}
+
+void EuclideanClustering::ReadYAML()
+{
+    min_cluster_size
+        = yaml_utilities::grabParameter<int>(config_tree_, "min_cluster_size");
+    max_cluster_size
+        = yaml_utilities::grabParameter<int>(config_tree_, "max_cluster_size");
+    if (YAML::Node euclidean_clustering_parameters
+        = config_tree["euclidean_clustering"]) {
+        distance_tolerance = yaml_utilities::grabParameter<double>(
+            euclidean_clustering_parameters, "distance_tolerance");
+    }
+}
+
+bool EuclideanClustering::createEuclideanClusters()
+{
+    pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(
+        new pcl::search::KdTree<pcl::PointXYZ>);
+    tree->setInputCloud(cloud);
+    pcl::EuclideanClusterExtraction<pcl::PointXYZ> euclidean_clusterer;
+
+    euclidean_clusterer.setClusterTolerance(distance_tolerance);
+    euclidean_clusterer.setMinClusterSize(min_cluster_size);
+    euclidean_clusterer.setMaxClusterSize(max_cluster_size);
+    euclidean_clusterer.setSearchMethod(tree);
+    euclidean_clusterer.setInputCloud(cloud);
+    euclidean_clusterer.extract(cluster_indices);
 }

@@ -79,41 +79,38 @@ private:
 
 class RegionGrower : EuclideanClustering {
 public:
-  // Use the constructors defined in the super class
-  RegionGrower(YAML::Node config_tree, bool debugging);
-  /** Create cluster using the region growing algorithm, takes algorithm
-   * configuration from the YAML, and fills parameter region_vector with
-   * clusters. **/
-  bool createRegions(PointCloud::Ptr pointcloud,
-                     Normals::Ptr pointcloud_normals,
-                     boost::shared_ptr<RegionVector> region_vector) override;
+    // Use the constructors defined in the super class
+    RegionGrower(YAML::Node config_tree, bool debugging);
+    /** Create cluster using the euclidean clustering algorithm, takes algorithm
+     * configuration from the YAML, and fills parameter region_vector with
+     * clusters. **/
+    bool createRegions(PointCloud::Ptr pointcloud,
+        Normals::Ptr pointcloud_normals,
+        boost::shared_ptr<RegionVector> region_vector) override;
 
-  /**
-   * @return A pointer to a single pointcloud, with unique colours for every
-   * cluster
-   */
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation() override;
+    /**
+     * @return A pointer to a single pointcloud, with unique colours for every
+     * cluster
+     */
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation() override;
 
 private:
-  /**
-   * Read out YAML
-   * @return true if succesful
-   */
-  void readYaml();
+    /**
+     * Read out YAML
+     * @return true if succesful
+     */
+    void readYaml();
 
-  /**
-   * Extract clusters with a euclidean clustering object
-   * @return true if succesful
-   */
-  bool createEuclianClusters();
+    /**
+     * Extract clusters with a euclidean clustering object
+     * @return true if succesful
+     */
+    bool createEuclideanClusters();
 
-  // Region Growing Object
-  pcl::EuclideanClusterExtraction<pcl::PointXYZ> euclidean_clusterer;
-
-  // Region Growing configuration parameters
-  int min_cluster_size;
-  int max_cluster_size;
-  double distance_tolerance;
+    // Euclidean clustering configuration parameters
+    int min_cluster_size;
+    int max_cluster_size;
+    double distance_tolerance;
 };
 
 #endif // MARCH_PREPROCESSOR_H
