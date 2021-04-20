@@ -2,6 +2,7 @@
 #include <ctime>
 #include <pcl/common/transforms.h>
 #include <pcl/features/normal_3d.h>
+#include <pcl/filters/extract_indices.h>
 #include <pcl/filters/random_sample.h>
 #include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl/filters/voxel_grid.h>
@@ -238,22 +239,31 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
 // distance
 bool NormalsPreprocessor::filterOnDistanceFromOrigin()
 {
+    pcl::PointIndices::Ptr inliers = boost::make_shared<pcl::PointIndices>();
+    pcl::ExtractIndices<pcl::PointXYZ> extract;
+
     double distance_threshold_squared = distance_threshold * distance_threshold;
 
     // Removed any point too far from the origin
-    for (int p = 0; p < pointcloud_->points.size(); p++) {
+    for (int point_index = 0; point_index < pointcloud_->points.size(); point_index++) {
         // find the squared distance from the origin
         float point_distance_squared
-            = (pointcloud_->points[p].x * pointcloud_->points[p].x)
-            + (pointcloud_->points[p].y * pointcloud_->points[p].y)
-            + (pointcloud_->points[p].z * pointcloud_->points[p].z);
+            = (pointcloud_->points[point_index].x * pointcloud_->points[point_index].x)
+            + (pointcloud_->points[point_index].y * pointcloud_->points[point_index].y)
+            + (pointcloud_->points[point_index].z * pointcloud_->points[point_index].z);
 
         // remove point if it's outside the threshold distance
         if (point_distance_squared > distance_threshold_squared) {
-            removePointByIndex(p, pointcloud_);
-            p--;
+            inliers->indices.push_back(point_index);
         }
     }
+
+    // Remove all points indexed by indices from the pointcloud
+    extract.setInputCloud(pointcloud_);
+    extract.setIndices(inliers);
+    extract.setNegative(true);
+    extract.filter(*pointcloud_);
+
     return true;
 }
 
@@ -287,6 +297,9 @@ bool NormalsPreprocessor::fillNormalCloud(
 // point. This can work because the normals are of unit length.
 bool NormalsPreprocessor::filterOnNormalOrientation()
 {
+    pcl::ExtractIndices<pcl::PointXYZ> extract_points;
+    pcl::ExtractIndices<pcl::Normals> extract_normals;
+
     // Remove any point who's normal does not fall into the desired region
     if (pointcloud_->points.size() == pointcloud_normals_->points.size()) {
         for (int p = 0; p < pointcloud_->points.size(); p++) {
@@ -300,10 +313,19 @@ bool NormalsPreprocessor::filterOnNormalOrientation()
                 || pointcloud_normals_->points[p].normal_z
                         * pointcloud_normals_->points[p].normal_z
                     > allowed_length_z) {
-                removePointByIndex(p, pointcloud_, pointcloud_normals_);
-                p--;
+                inliers->indices.push_back(point_index);
             }
         }
+        // Remove all points indexed by indices from the pointcloud and the normals
+        extract_points.setIndices(inliers);
+        extract_points.setNegative(true);
+        extract_points.setInputCloud(pointcloud_);
+        extract_points.filter(*pointcloud_);
+
+        extract_normals.setIndices(inliers);
+        extract_normals.setNegative(true);
+        extract_normals.setInputCloud(pointcloud_normals_);
+        extract_normals.filter(*pointcloud_normals_);
     } else {
         ROS_ERROR("The size of the pointcloud and the normal pointcloud are "
                   "not the same. Cannot filter on normals.");
