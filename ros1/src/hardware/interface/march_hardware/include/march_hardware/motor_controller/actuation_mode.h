@@ -19,13 +19,13 @@ public:
     {
     }
 
-    // NOLINT(hicpp-explicit-conversions) because it is intended here
+    // NOLINTNEXTLINE(hicpp-explicit-conversions)
     ActuationMode(Value value)
         : value_(value)
     {
     }
 
-    // NOLINT(hicpp-explicit-conversions) because it is intended here
+    // NOLINTNEXTLINE(hicpp-explicit-conversions)
     ActuationMode(const std::string& actuationMode)
     {
         if (actuationMode == "position") {

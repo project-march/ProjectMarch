@@ -22,7 +22,7 @@ public:
     };
 
     AllowedRobot() = default;
-    // NOLINT(hicpp-explicit-conversions) because it is intended here
+    // NOLINTLINE(hicpp-explicit-conversions)
     AllowedRobot(const std::string& robot_name)
     {
         if (robot_name == "march6") {
@@ -79,7 +79,7 @@ public:
         return base_path.append(/*__s=*/"/robots/test_joint_rotational.yaml");
     }
 
-    // NOLINT(hicpp-explicit-conversions) because it is intended here
+    // NOLINTNEXTLINE(hicpp-explicit-conversions)
     constexpr AllowedRobot(Value allowed_robot)
         : value(allowed_robot)
     {
