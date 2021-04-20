@@ -21,11 +21,6 @@ public:
 
     virtual ~Preprocessor() {};
 
-    // Removes a point from a pointcloud (and optionally the corresponding
-    // pointcloud_normals as well) at a given index
-    void removePointByIndex(int const index, PointCloud::Ptr pointcloud,
-        Normals::Ptr pointcloud_normals = nullptr);
-
     PointCloud::Ptr pointcloud_;
     Normals::Ptr pointcloud_normals_;
     YAML::Node config_tree_;

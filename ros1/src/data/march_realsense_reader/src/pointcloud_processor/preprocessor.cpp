@@ -43,34 +43,6 @@ NormalsPreprocessor::NormalsPreprocessor(YAML::Node config_tree, bool debugging)
     readYaml();
 }
 
-// Removes a point from a pointcloud (and optionally the corresponding
-// pointcloud_normals as well) at a given index
-void Preprocessor::removePointByIndex(int const index,
-    PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals)
-{
-    if (index < pointcloud->points.size() && index >= 0) {
-        if (pointcloud_normals != nullptr) {
-            if (index < pointcloud_normals->points.size() && index >= 0) {
-                pointcloud_normals->points[index]
-                    = pointcloud_normals
-                          ->points[pointcloud_normals->points.size() - 1];
-                pointcloud_normals->points.resize(
-                    pointcloud_normals->points.size() - 1);
-            } else {
-                ROS_WARN_STREAM("Index "
-                    << index
-                    << " to be removed is not valid for pointcloud_normals");
-            }
-        }
-        pointcloud->points[index]
-            = pointcloud->points[pointcloud->points.size() - 1];
-        pointcloud->points.resize(pointcloud->points.size() - 1);
-    } else {
-        ROS_WARN_STREAM(
-            "Index " << index << " to be removed is not valid for pointcloud");
-    }
-}
-
 bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud,
     Normals::Ptr pointcloud_normals, std::string frame_id_to_transform_to)
 {
