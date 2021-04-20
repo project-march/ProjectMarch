@@ -335,21 +335,19 @@ bool HullParameterDeterminer::cropCloudToHullVectorUnique(
             ground_point, potential_foot_locations_of_point);
 
         if (potential_foot_locations_of_point->points.size() != 0) {
-            // Find the highest point in the potential cloud by setting it to
-            // the first point and checking if there is a higher point
-            pcl::PointNormal highest_point
-                = potential_foot_locations_of_point->points[0];
-
-            for (pcl::PointNormal potential_foot_location :
-                *potential_foot_locations_of_point) {
-                if (potential_foot_location.z > highest_point.z) {
-                    highest_point = potential_foot_location;
-                }
-            }
+            pcl::PointNormal highest_point = std::max_element(
+                potential_foot_locations_of_point->points.begin(),
+                potential_foot_locations_of_point->points.end(), pointIsLower);
             output_cloud->push_back(highest_point);
         }
     }
     return success;
+}
+
+bool HullParameterDeterminer::pointIsLower(
+    const pcl::PointNormal point1, const pcl::PointNormal point2)
+{
+    return point1.z < point2.z;
 }
 
 // Elevate the 2D points so they have z coordinate as if they lie on the plane
