@@ -87,9 +87,6 @@
          "name":"stairs_up"
       },
       {
-         "name":"realsense_stairs_up"
-      },
-      {
          "name":"stairs_down"
       },
       {
@@ -97,6 +94,9 @@
       },
       {
          "name":"stairs_down_single_step"
+      },
+      {
+         "name":"realsense_stairs_up"
       },
       {
          "name":"realsense_stairs_up_single_step"
