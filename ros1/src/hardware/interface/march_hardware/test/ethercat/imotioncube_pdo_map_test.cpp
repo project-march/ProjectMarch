@@ -62,9 +62,9 @@ TEST_F(IMCPDOTest, CombinedAddressConstruct)
         = pdoMap.all_objects.find(march::IMCObjectName::StatusWord);
     uint32_t combined_address = status_word->second.combined_address;
 
-    ASSERT_EQ(16U, (combined_address & 0xFF));
-    ASSERT_EQ(0U, ((combined_address >> 8) & 0xFF));
-    ASSERT_EQ(0x6041U, ((combined_address >> 16) & 0xFFFF));
+    ASSERT_EQ(16U, (combined_address & 0xFFU));
+    ASSERT_EQ(0U, ((combined_address >> 8U) & 0xFFU));
+    ASSERT_EQ(0x6041U, ((combined_address >> 16U) & 0xFFFFU));
 }
 
 TEST_F(IMCPDOTest, CombinedAdressConstructWithSubindexValue)
@@ -75,7 +75,7 @@ TEST_F(IMCPDOTest, CombinedAdressConstructWithSubindexValue)
         /*_address=*/0x6060, /*_sub_index=*/2, /*_length=*/16);
     uint32_t combined_address = test_object.combined_address;
 
-    ASSERT_EQ(16U, (combined_address & 0xFF));
-    ASSERT_EQ(2U, ((combined_address >> 8) & 0xFF));
-    ASSERT_EQ(0x6060U, ((combined_address >> 16) & 0xFFFF));
+    ASSERT_EQ(16U, (combined_address & 0xFFU));
+    ASSERT_EQ(2U, ((combined_address >> 8U) & 0xFFU));
+    ASSERT_EQ(0x6060U, ((combined_address >> 16U) & 0xFFFFU));
 }

@@ -4,6 +4,7 @@
 #include "march_hardware/ethercat/sdo_interface.h"
 #include "march_hardware/motor_controller/odrive/odrive_state.h"
 
+#include <array>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -26,8 +27,8 @@ struct IMCObject {
         , sub_index(_sub_index)
         , length(_length)
     {
-        uint32_t MSword = (address << 16);
-        uint32_t LSword = (sub_index << 8) | length;
+        uint32_t MSword = (address << 16U);
+        uint32_t LSword = (sub_index << 8U) | length;
 
         combined_address = (MSword | LSword);
     }
@@ -101,7 +102,7 @@ private:
     const int bits_per_register = 64; // Maximum amount of bits that can be
                                       // constructed in one PDO message.
     const int nr_of_regs = 4; // Amount of registers available.
-    const int object_sizes[3] = { 32, 16, 8 }; // Available sizes.
+    const std::array<int, 3> object_sizes { 32, 16, 8 }; // Available sizes.
 };
 } // namespace march
 
