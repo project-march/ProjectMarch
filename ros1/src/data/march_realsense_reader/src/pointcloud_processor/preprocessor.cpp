@@ -234,24 +234,6 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
     return true;
 }
 
-// Translate and rotate the pointcloud so that the origin is at the foot
-// Currently uses a very rough and static estimation of where the foot should be
-bool NormalsPreprocessor::transformPointCloud()
-{
-    // make a 4 by 4 transformation Transform = [Rotation (3x3) translation
-    // (3x1); 0 (1x3) 1 (1x1)]
-    Eigen::Affine3f transform = Eigen::Affine3f::Identity();
-
-    // Add the desired rotation (currently just around the Y axis) to the
-    // transformation matrix
-    transform.rotate(Eigen::AngleAxisf(rotation_y, Eigen::Vector3f::UnitY()));
-
-    // Actually transform
-    pcl::transformPointCloud(*pointcloud_, *pointcloud_, transform);
-
-    return true;
-}
-
 // Remove all the points which are far away from the origin in 3d euclidean
 // distance
 bool NormalsPreprocessor::filterOnDistanceFromOrigin()
