@@ -36,7 +36,7 @@ namespace error {
         {
         }
 
-        virtual ~HardwareException() noexcept = default;
+        ~HardwareException() noexcept override = default;
 
         const char* what() const noexcept override
         {

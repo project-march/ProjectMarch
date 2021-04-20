@@ -150,22 +150,22 @@ protected:
     bool fillOptionalFootLocationCloud(float start, float end);
 
     // Read all relevant parameters
-    int hull_dimension = 0;
-    int number_of_optional_foot_locations = 0;
-    float min_x_stairs = 0.0;
-    float max_x_stairs = 0.0;
-    float min_z_stairs = 0.0;
-    float max_z_stairs = 0.0;
-    float y_location = 0.0;
-    double x_flat = 0.0;
-    double z_flat = 0.0;
-    double x_steep = 0.0;
-    double z_steep = 0.0;
-    float min_search_area = 0.0;
-    float max_search_area = 0.0;
-    double max_distance_to_line = 0.0;
-    bool general_most_desirable_location_is_mid = false;
-    bool general_most_desirable_location_is_small = false;
+    int hull_dimension {};
+    int number_of_optional_foot_locations {};
+    float min_x_stairs {};
+    float max_x_stairs {};
+    float min_z_stairs {};
+    float max_z_stairs {};
+    float y_location {};
+    double x_flat {};
+    double z_flat {};
+    double x_steep {};
+    double z_steep {};
+    float min_search_area {};
+    float max_search_area {};
+    double max_distance_to_line {};
+    bool general_most_desirable_location_is_mid {};
+    bool general_most_desirable_location_is_small {};
 
     pcl::PointXYZ most_desirable_foot_location_;
     // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t  + ([3], [4],

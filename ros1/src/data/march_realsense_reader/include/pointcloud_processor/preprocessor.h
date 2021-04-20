@@ -99,23 +99,23 @@ protected:
     bool filterOnNormalOrientation();
 
     // Downsampling parameters
-    bool voxel_grid_filter = false;
-    float leaf_size = 0.0;
-    bool random_filter = false;
-    int remaining_points = 0;
+    bool voxel_grid_filter {};
+    float leaf_size {};
+    bool random_filter {};
+    int remaining_points {};
 
     // Distance filter parameters
-    double distance_threshold = 0.0;
+    double distance_threshold {};
 
     // Normal estimation parameters
-    bool use_tree_search_method = false;
-    int number_of_neighbours = 0;
-    double search_radius = 0.0;
+    bool use_tree_search_method {};
+    int number_of_neighbours {};
+    double search_radius {};
 
     // Normal filter parameters
-    double allowed_length_x = 0.0;
-    double allowed_length_y = 0.0;
-    double allowed_length_z = 0.0;
+    double allowed_length_x {};
+    double allowed_length_y {};
+    double allowed_length_z {};
 
     // Objects needed for transformation based on URDF
     std::unique_ptr<tf2_ros::Buffer> tfBuffer;

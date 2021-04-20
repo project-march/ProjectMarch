@@ -18,8 +18,8 @@
  */
 class WirelessMaster : public XsCallback {
 public:
-    WirelessMaster(ros::NodeHandle* node);
-    ~WirelessMaster();
+    explicit WirelessMaster(ros::NodeHandle* node);
+    ~WirelessMaster() override;
 
     /**
      * Finds and constructs a wireless master.
@@ -79,8 +79,8 @@ protected:
      * Callback for when new MTws connect or disconnect.
      * Runs in a separate thread.
      */
-    virtual void onConnectivityChanged(
-        XsDevice* dev, XsConnectivityState new_state);
+    void onConnectivityChanged(
+        XsDevice* dev, XsConnectivityState new_state) override;
 
 private:
     ros::NodeHandle* node_;

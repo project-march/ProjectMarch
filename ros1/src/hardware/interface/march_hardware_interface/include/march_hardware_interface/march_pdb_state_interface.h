@@ -69,10 +69,10 @@ public:
 
 private:
     std::string name_;
-    bool* master_shutdown_allowed_command_;
-    bool* all_high_voltage_on_off_command_;
-    PowerNetOnOffCommand* power_net_on_off_command_;
-    march::PowerDistributionBoard* powerDistributionBoard_;
+    bool* master_shutdown_allowed_command_ {};
+    bool* all_high_voltage_on_off_command_ {};
+    PowerNetOnOffCommand* power_net_on_off_command_ {};
+    march::PowerDistributionBoard* powerDistributionBoard_ {};
 };
 
 class MarchPdbStateInterface

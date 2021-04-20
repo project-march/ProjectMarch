@@ -69,7 +69,7 @@ void HighVoltage::setNetOnOff(bool on, int netNumber)
         ROS_WARN_THROTTLE(2, "High voltage net %d is already on", netNumber);
     }
     uint8_t currentStateHighVoltageNets = getNetsOperational();
-    bit8 highVoltageNets;
+    bit8 highVoltageNets {};
     highVoltageNets.ui = 1 << (netNumber - 1);
     if (on) {
         // Force bit of the respective net to one.
@@ -98,7 +98,7 @@ void HighVoltage::enableDisableHighVoltage(bool enable)
         ROS_DEBUG_THROTTLE(2, "Trying to disable high voltage from software");
     }
 
-    bit8 isEnabled;
+    bit8 isEnabled {};
     isEnabled.ui = enable;
     this->pdo_.write8(
         this->netDriverOffsets.getHighVoltageEnableDisable(), isEnabled);

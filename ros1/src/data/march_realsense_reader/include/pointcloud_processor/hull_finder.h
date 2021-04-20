@@ -91,11 +91,11 @@ protected:
     bool getAveragePointAndNormal(std::vector<double>& average_point,
         std::vector<double>& average_normal);
 
-    bool convex = false;
-    double alpha = 0.0;
-    int hull_dimension = 0;
+    bool convex {};
+    double alpha {};
+    int hull_dimension {};
 
-    int region_index_ = 0;
+    int region_index_ {};
     PointCloud::Ptr region_points_;
     Normals::Ptr region_normals_;
     PointCloud::Ptr region_points_projected_;

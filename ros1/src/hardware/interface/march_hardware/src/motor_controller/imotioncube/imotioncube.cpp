@@ -312,10 +312,10 @@ float IMotionCube::getMotorCurrent()
     int16_t motor_current_iu
         = this->read16(this->miso_byte_offsets_.at(IMCObjectName::ActualTorque))
               .i;
-    return (2.0f * PEAK_CURRENT / IU_CONVERSION_CONST)
+    return (2.0F * PEAK_CURRENT / IU_CONVERSION_CONST)
         * static_cast<float>(
             motor_current_iu); // Conversion to Amp, see Technosoft CoE
-                               // programming manual
+    // programming manual
 }
 
 float IMotionCube::getMotorControllerVoltage()

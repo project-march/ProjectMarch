@@ -14,12 +14,12 @@
 namespace march {
 /** Store IMC data as a struct to prevent data overlap.*/
 struct IMCObject {
-    uint16_t address; // in IMC memory (see IMC manual)
-    uint8_t
-        sub_index; // sub index corresponding to PDO register (see IMC manual)
-    uint8_t length; // bits (see IMC manual)
-    uint32_t combined_address; // combine the address(hex), sub-index(hex) and
-                               // length(hex)
+    uint16_t address {}; // in IMC memory (see IMC manual)
+    uint8_t sub_index {}; // sub index corresponding to PDO register (see IMC
+                          // manual)
+    uint8_t length {}; // bits (see IMC manual)
+    uint32_t combined_address {}; // combine the address(hex), sub-index(hex)
+                                  // and length(hex)
 
     IMCObject(uint16_t _address, uint8_t _sub_index, uint8_t _length)
         : address(_address)
@@ -32,7 +32,8 @@ struct IMCObject {
         combined_address = (MSword | LSword);
     }
 
-    IMCObject() {};
+    IMCObject() = default;
+    ;
 };
 
 /** The data direction to which the PDO is specified is restricted to master in
