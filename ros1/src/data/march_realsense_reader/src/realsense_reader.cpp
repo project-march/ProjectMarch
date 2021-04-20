@@ -399,7 +399,9 @@ void RealSenseReader::fillOptimalFootLocationMarker(
 }
 
 // The callback for the service that was starts processing the point cloud and
-// gives back parameters for a gait
+// gives back parameters for a gait. This function should always return true,
+// otherwise this gives problems with the bridge. The response can be altered
+// to show if the processing was successful.
 bool RealSenseReader::processPointcloudCallback(
     march_shared_msgs::GetGaitParameters::Request& req,
     march_shared_msgs::GetGaitParameters::Response& res)

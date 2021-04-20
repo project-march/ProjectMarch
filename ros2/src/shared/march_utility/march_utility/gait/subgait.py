@@ -380,7 +380,6 @@ class Subgait(object):
         subgaits: List[Subgait],
         parameters: List[float],
         use_foot_position: bool,
-        node=None,
     ):
         if len(subgaits) != amount_of_subgaits(dimensions):
             raise SubgaitInterpolationError(
@@ -393,11 +392,11 @@ class Subgait(object):
             )
         if dimensions == InterpolationDimensions.ONE_DIM:
             return cls.interpolate_subgaits(
-                subgaits[0], subgaits[1], parameters[0], use_foot_position, node
+                subgaits[0], subgaits[1], parameters[0], use_foot_position
             )
         elif dimensions == InterpolationDimensions.TWO_DIM:
             return cls.interpolate_four_subgaits(
-                subgaits, parameters, use_foot_position, node
+                subgaits, parameters, use_foot_position
             )
         else:
             raise UnknownDimensionsError(dimensions)
@@ -408,7 +407,6 @@ class Subgait(object):
         subgaits: List[Subgait, Subgait, Subgait, Subgait],
         parameters: [float, float],
         use_foot_position: bool = False,
-        node=None,
     ) -> Subgait:
         """
         Interpolate two subgaits with the parameter to get a new subgait.
@@ -427,10 +425,10 @@ class Subgait(object):
             The interpolated subgait
         """
         first_interpolated_subgait = Subgait.interpolate_subgaits(
-            subgaits[0], subgaits[1], parameters[0], use_foot_position, node
+            subgaits[0], subgaits[1], parameters[0], use_foot_position
         )
         second_interpolated_subgait = Subgait.interpolate_subgaits(
-            subgaits[2], subgaits[3], parameters[0], use_foot_position, node
+            subgaits[2], subgaits[3], parameters[0], use_foot_position
         )
 
         return Subgait.interpolate_subgaits(
@@ -447,7 +445,6 @@ class Subgait(object):
         other_subgait: Subgait,
         parameter: float,
         use_foot_position: bool = False,
-        node=None,
     ) -> Subgait:
         """
         Interpolate two subgaits with the parameter to get a new subgait.
@@ -477,7 +474,7 @@ class Subgait(object):
 
         if use_foot_position:
             joints = Subgait.get_foot_position_interpolated_joint_trajectories(
-                base_subgait, other_subgait, parameter, node
+                base_subgait, other_subgait, parameter
             )
         else:
             joints = Subgait.get_joint_angle_interpolated_joint_trajectories(
@@ -698,7 +695,7 @@ class Subgait(object):
 
     @staticmethod
     def get_foot_position_interpolated_joint_trajectories(
-        base_subgait: Subgait, other_subgait: Subgait, parameter: float, node=None
+        base_subgait: Subgait, other_subgait: Subgait, parameter: float
     ) -> List[JointTrajectory]:
         """Create a list of joint trajectories by interpolating foot locations.
 
@@ -740,17 +737,7 @@ class Subgait(object):
                 new_feet_state = FeetState.weighted_average_states(
                     base_feet_state, other_feet_state, parameter
                 )
-                if node is not None:
-                    node.get_logger().info(
-                        f"Interpolating {base_feet_state} and "
-                        f"{other_feet_state} resulting in "
-                        f"{new_feet_state}"
-                    )
                 setpoints_to_add = FeetState.feet_state_to_setpoints(new_feet_state)
-                if node is not None:
-                    node.get_logger().info(
-                        f"Matching setpoint is " f"{setpoints_to_add}"
-                    )
 
             for joint_name in JOINT_NAMES_IK:
                 new_setpoints[joint_name].append(setpoints_to_add[joint_name])
