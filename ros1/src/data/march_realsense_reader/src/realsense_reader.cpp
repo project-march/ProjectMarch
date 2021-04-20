@@ -408,7 +408,12 @@ bool RealSenseReader::processPointcloudCallback(
     frame_id_to_transform_to_ = req.frame_id_to_transform_to;
 
     time_t start_callback = clock();
-
+    if (req.camera_to_use >= POINTCLOUD_TOPICS.size()) {
+        res.error_message = "Unknown camera given in the request, not available in the "
+                          "POINTCLOUD_TOPICS in the realsense_reader";
+        res.success = false;
+        return true;
+    }
     boost::shared_ptr<const sensor_msgs::PointCloud2> input_cloud
         = ros::topic::waitForMessage<sensor_msgs::PointCloud2>(
             POINTCLOUD_TOPICS[req.camera_to_use], *n_, POINTCLOUD_TIMEOUT);
