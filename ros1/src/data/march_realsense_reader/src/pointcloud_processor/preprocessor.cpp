@@ -4,6 +4,7 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/filters/extract_indices.h>
 #include <pcl/filters/filter.h>
+#include <pcl/filters/filter_indices.h>
 #include <pcl/filters/random_sample.h>
 #include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl/filters/voxel_grid.h>
@@ -315,9 +316,10 @@ bool NormalsPreprocessor::filterOnNormalOrientation()
 bool NormalsPreprocessor::cleanUpPointCloud()
 {
     // The index map is required by the removeNaN methods, but we will not use this value
-    pcl::PointIndices index_map;
-    pcl::removeNaNFromPointCloud(pointcloud_, pointcloud_, index_map);
-    pcl::removeNaNNormalsFromPointCloud(pointcloud_normals_, pointcloud_normals_, index_map);
+    std::vector<int> index_map;
+    pcl::removeNaNFromPointCloud(*pointcloud_, *pointcloud_, index_map);
+    pcl::removeNaNNormalsFromPointCloud(*pointcloud_normals_, *pointcloud_normals_, index_map);
+    return true;
 }
 
 // Preprocess the pointcloud, this means only transforming for the simple
