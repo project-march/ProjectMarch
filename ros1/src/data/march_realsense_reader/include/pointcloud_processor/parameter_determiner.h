@@ -49,7 +49,7 @@ protected:
     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;
     boost::shared_ptr<HullVector> hull_vector_;
     boost::shared_ptr<PolygonVector> polygon_vector_;
-    SelectedGait selected_gait_;
+    std::optional<SelectedGait> selected_gait_ = std::nullopt;
     boost::shared_ptr<GaitParameters> gait_parameters_;
     bool debugging_;
 };
