@@ -16,7 +16,7 @@ protected:
     void SetUp() override
     {
         this->base_path = ros::package::getPath("march_hardware_builder")
-                              .append("/test/yaml/encoder");
+                              .append(/*__s=*/"/test/yaml/encoder");
     }
 
     YAML::Node loadTestYaml(const std::string& relative_path)
@@ -29,7 +29,8 @@ TEST_F(IncrementalEncoderBuilderTest, ValidIncrementalEncoder)
 {
     YAML::Node config = this->loadTestYaml("/incremental_encoder_correct.yaml");
 
-    march::IncrementalEncoder expected = march::IncrementalEncoder(12, 45.5);
+    march::IncrementalEncoder expected = march::IncrementalEncoder(
+        /*number_of_bits=*/12, /*transmission=*/45.5);
     auto created = HardwareBuilder::createIncrementalEncoder(config);
     ASSERT_EQ(expected, *created);
 }

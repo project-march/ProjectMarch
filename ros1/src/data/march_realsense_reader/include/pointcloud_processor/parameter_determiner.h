@@ -151,7 +151,7 @@ protected:
 
     // Fill the foot locations to try cloud with a line of points from (start,
     // 0) to (end, 0)
-    bool fillOptionalFootLocationCloud(double start, double end);
+    bool fillOptionalFootLocationCloud(float start, float end);
 
     // Read all relevant parameters from the parameter yaml file
     void readYaml();
@@ -170,8 +170,8 @@ protected:
     double z_flat;
     double x_steep;
     double z_steep;
-    double min_search_area;
-    double max_search_area;
+    float min_search_area;
+    float max_search_area;
     double max_distance_to_line;
     bool general_most_desirable_location_is_mid;
     bool general_most_desirable_location_is_small;

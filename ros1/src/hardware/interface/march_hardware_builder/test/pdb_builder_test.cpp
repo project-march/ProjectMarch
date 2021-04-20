@@ -15,7 +15,7 @@ protected:
     void SetUp() override
     {
         base_path = ros::package::getPath("march_hardware_builder")
-                        .append("/test/yaml/powerdistributionboard");
+                        .append(/*__s=*/"/test/yaml/powerdistributionboard");
         this->pdo_interface = march::PdoInterfaceImpl::create();
         this->sdo_interface = march::SdoInterfaceImpl::create();
     }
@@ -34,12 +34,21 @@ TEST_F(PowerDistributionBoardBuilderTest, ValidPowerDistributionBoard)
     auto createdPowerDistributionBoard
         = HardwareBuilder::createPowerDistributionBoard(
             config, this->pdo_interface, this->sdo_interface);
-    NetMonitorOffsets netMonitoringOffsets(5, 9, 13, 17, 3, 2, 1, 4);
-    NetDriverOffsets netDriverOffsets(4, 3, 2);
-    BootShutdownOffsets bootShutdownOffsets(0, 0, 1);
+    NetMonitorOffsets netMonitoringOffsets(
+        /*powerDistributionBoardCurrentByteOffset=*/5,
+        /*lowVoltageNet1CurrentByteOffset=*/9,
+        /*lowVoltageNet2CurrentByteOffset=*/13,
+        /*highVoltageNetCurrentByteOffset=*/17, /*lowVoltageStateByteOffset=*/3,
+        /*highVoltageOvercurrentTriggerByteOffset=*/2, /*highVoltageEnabled=*/1,
+        /*highVoltageStateByteOffset=*/4);
+    NetDriverOffsets netDriverOffsets(/*lowVoltageNetOnOff=*/4,
+        /*highVoltageNetOnOff=*/3, /*highVoltageNetEnableDisable=*/2);
+    BootShutdownOffsets bootShutdownOffsets(/*masterOkByteOffset=*/0,
+        /*shutdownByteOffset=*/0, /*shutdownAllowedByteOffset=*/1);
     march::PowerDistributionBoard powerDistributionBoard
         = march::PowerDistributionBoard(
-            march::Slave(1, this->pdo_interface, this->sdo_interface),
+            march::Slave(
+                /*slave_index=*/1, this->pdo_interface, this->sdo_interface),
             netMonitoringOffsets, netDriverOffsets, bootShutdownOffsets);
 
     ASSERT_EQ(powerDistributionBoard, *createdPowerDistributionBoard);
