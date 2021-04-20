@@ -71,14 +71,22 @@ bool HullParameterDeterminer::determineParameters(
     time_t start_determine_parameters = clock();
 
     ROS_DEBUG("Determining parameters with hull parameter determiner");
+  ROS_DEBUG("0");
     hull_vector_ = hull_vector;
+  ROS_DEBUG("0");
     selected_gait_ = selected_gait;
+  ROS_DEBUG("0");
     gait_parameters_ = gait_parameters;
+  ROS_DEBUG("0");
     plane_coefficients_vector_ = plane_coefficients_vector;
+  ROS_DEBUG("0");
     polygon_vector_ = polygon_vector;
+  ROS_DEBUG("0");
     selected_gait_ = selected_gait;
+  ROS_DEBUG("0");
 
     bool success = true;
+
 
     success &= getOptimalFootLocation();
 
@@ -181,19 +189,21 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationRampDown()
 bool HullParameterDeterminer::getOptimalFootLocation()
 {
     bool success = true;
+  ROS_DEBUG("0");
 
     // Get some locations on the ground we might want to place our foot
     foot_locations_to_try = boost::make_shared<PointCloud2D>();
-    success &= getOptionalFootLocations(foot_locations_to_try);
 
+    success &= getOptionalFootLocations(foot_locations_to_try);
+  ROS_DEBUG("1");
     // Crop those locations to only be left with locations where it is possible
     // to place the foot
     possible_foot_locations = boost::make_shared<PointNormalCloud>();
     success &= cropCloudToHullVector(
         foot_locations_to_try, possible_foot_locations);
-
+  ROS_DEBUG("2");
     success &= getOptimalFootLocationFromPossibleLocations();
-
+  ROS_DEBUG("3");
     return success;
 }
 
