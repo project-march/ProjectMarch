@@ -41,7 +41,7 @@ const std::string LOGGER_NAME { /*__s=*/"fake_temperature" };
  * temperatures.
  */
 FakeTemperatureDataNode::FakeTemperatureDataNode(const std::string& node_name,
-    std::vector<float> autoregression_weights)
+    std::vector<float>&& autoregression_weights)
     : Node(node_name,
         rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(
             /*automatically_declare_parameters_from_overrides=*/true))
