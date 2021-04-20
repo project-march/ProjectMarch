@@ -56,11 +56,14 @@ class GaitStateMachine(object):
         self._current_gait = None
         self._is_idle = True
         self._shutdown_requested = False
+
+        # Boolean flag that indicates that the gait should stop
         self._should_stop = False
+
+        # Boolean flag to not execute a stop when the gait is already stopping
         self._is_stopping = False
 
         self.update_timer = None
-        self.last_update_time = None
 
         self.current_state_pub = self._gait_selection.create_publisher(
             msg_type=CurrentState,
@@ -253,7 +256,6 @@ class GaitStateMachine(object):
             timer_period_sec=self._timer_period,
             callback=self.update,
         )
-        self.last_update_time = self._gait_selection.get_clock().now()
 
     def update(self):
         """
@@ -261,12 +263,10 @@ class GaitStateMachine(object):
         machine is started, this function is called every timer period.
         """
         if not self._shutdown_requested:
-            now = self._gait_selection.get_clock().now()
-            self.last_update_time = now
             if self._is_idle:
                 self._process_idle_state()
             else:
-                self._process_gait_state(now)
+                self._process_gait_state()
         else:
             self.update_timer.cancel()
 
@@ -279,7 +279,7 @@ class GaitStateMachine(object):
     def stop_gait(self):
         """Requests a stop from the current executing gait, but keeps the state
         machine running."""
-        if not self._is_idle:
+        if not self._is_idle and not self._is_stopping:
             self._should_stop = True
 
     def check_correct_foot_pressure(self) -> bool:
@@ -333,10 +333,11 @@ class GaitStateMachine(object):
             self._input.gait_finished()
             self._call_transition_callbacks()
 
-    def _process_gait_state(self, current_time: Time):
+    def _process_gait_state(self):
         """Processes the current state when there is a gait happening.
         Schedules the next subgait if there is no trajectory happening or
         finishes the gait if it is done."""
+        now = self._gait_selection.get_clock().now()
         if self._current_gait is None:
             if self._current_state in self._home_gaits:
                 self._current_gait = self._home_gaits[self._current_state]
@@ -348,10 +349,10 @@ class GaitStateMachine(object):
             )
             if self._current_gait.can_be_scheduled_early:
                 gait_update = self._current_gait.start(
-                    current_time, self._gait_selection._first_subgait_delay
+                    now, self._gait_selection._first_subgait_delay
                 )
             else:
-                gait_update = self._current_gait.start(current_time)
+                gait_update = self._current_gait.start(now)
             if not self.check_correct_foot_pressure():
                 self._gait_selection.get_logger().debug(
                     f"Foot forces when incorrect pressure warning was issued: "
@@ -371,10 +372,10 @@ class GaitStateMachine(object):
 
         if self._current_gait.can_be_scheduled_early:
             gait_update = self._current_gait.update(
-                current_time, self._gait_selection._early_schedule_duration
+                now, self._gait_selection._early_schedule_duration
             )
         else:
-            gait_update = self._current_gait.update(current_time)
+            gait_update = self._current_gait.update(now)
         self._process_gait_update(gait_update)
 
     def _process_gait_update(self, gait_update: GaitUpdate):
@@ -402,9 +403,7 @@ class GaitStateMachine(object):
     def _handle_input(self):
         """Handles stop and transition input from the input device. This input
         is passed on to the current gait to execute the request"""
-        if (
-            self._input.stop_requested() or self._should_stop
-        ) and not self._is_stopping:
+        if self._is_stop_requested() and not self._is_stopping:
             self._should_stop = False
             self._is_stopping = True
             if self._current_gait.stop():
@@ -438,6 +437,11 @@ class GaitStateMachine(object):
         self._call_callbacks(
             self._transition_callbacks, self._current_state, self._is_idle
         )
+
+    def _is_stop_requested(self):
+        """Returns true if either the input device requested a stop or some other
+        external source requested a stop."""
+        return self._input.stop_requested() or self._should_stop
 
     def _call_gait_callbacks(self):
         """ Calls all added gait callbacks when the current gait changes. """

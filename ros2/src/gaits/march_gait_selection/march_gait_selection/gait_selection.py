@@ -89,10 +89,12 @@ class GaitSelection(Node):
         )
         subgait = self.shortest_subgait()
         if self._early_schedule_duration >= subgait.duration:
-            self.get_logger().warn(f"Shortest subgait '{subgait.subgait_name}' of gait '{subgait.gait_name}' "
-                                   f"has a duration ({subgait.duration}) smaller than "
-                                   f"the early schedule duration ({self._early_schedule_duration}). "
-                                   "This may cause undefined behaviour.")
+            self.get_logger().warn(
+                f"Shortest subgait '{subgait.subgait_name}' of gait '{subgait.gait_name}' "
+                f"has a duration ({subgait.duration}) smaller than "
+                f"the early schedule duration ({self._early_schedule_duration}). "
+                "This may cause undefined behaviour."
+            )
 
         self._first_subgait_delay = self._parse_duration_parameter(
             "first_subgait_delay"
@@ -163,7 +165,10 @@ class GaitSelection(Node):
         shortest_subgait = None
         for gait in self._loaded_gaits.values():
             for subgait in gait.subgaits.values():
-                if shortest_subgait is None or subgait.duration < shortest_subgait.duration:
+                if (
+                    shortest_subgait is None
+                    or subgait.duration < shortest_subgait.duration
+                ):
                     shortest_subgait = subgait
         return shortest_subgait
 

@@ -27,8 +27,10 @@ class SetpointsGait(GaitInterface, Gait):
         self._end_time = None
         self._current_time = None
 
-        self._scheduled_early = False
         self._start_is_delayed = False
+        self._scheduled_early = False
+        # Keep track of next subgait for early scheduling
+        self._next_subgait = None
 
     @property
     def name(self):
@@ -74,6 +76,21 @@ class SetpointsGait(GaitInterface, Gait):
     def can_be_scheduled_early(self) -> bool:
         return True
 
+    def _reset(self):
+        """Reset all attributes of the gait"""
+        self._current_subgait = None
+        self._should_stop = False
+        self._transition_to_subgait = None
+        self._is_transitioning = False
+
+        self._start_time = None
+        self._end_time = None
+        self._current_time = None
+
+        self._start_is_delayed = False
+        self._scheduled_early = False
+        self._next_subgait = None
+
     def start(
         self, current_time: Time, first_subgait_delay: Optional[Duration] = Duration(0)
     ) -> GaitUpdate:
@@ -84,12 +101,10 @@ class SetpointsGait(GaitInterface, Gait):
         :param first_subgait_delay Optional duration to delay the first subgait by.
         :return: A TrajectoryCommand message with the trajectory of the first subgait.
         """
+        self._reset()
         self._current_time = current_time
         self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
-        self._should_stop = False
-        self._transition_to_subgait = None
-        self._is_transitioning = False
-        self._scheduled_early = False
+        self._next_subgait = self._current_subgait
 
         # Delay first subgait if duration is greater than zero
         if first_subgait_delay > Duration(0):
@@ -163,7 +178,11 @@ class SetpointsGait(GaitInterface, Gait):
             next_subgait = self.subgaits.get(self._transition_to_subgait.subgait_name)
             self._transition_to_subgait = None
             self._is_transitioning = False
+        elif self._scheduled_early:
+            # We scheduled early and already determined the next subgait
+            next_subgait = self._next_subgait
         else:
+            # We determine the next subgait with the subgait graph
             next_subgait = self._next_graph_subgait()
 
         # If there is no next subgait, then we are finished
@@ -176,12 +195,12 @@ class SetpointsGait(GaitInterface, Gait):
 
         # Schedule the next subgait if we haven't already scheduled early
         if not self._scheduled_early:
-            command = self._command_from_current_subgait()
+            return GaitUpdate.should_schedule(self._command_from_current_subgait())
         else:
-            command = None
-
-        self._scheduled_early = False
-        return GaitUpdate.should_schedule(command)
+            # Reset early schedule attributes
+            self._scheduled_early = False
+            self._next_subgait = None
+            return GaitUpdate.subgait_updated()
 
     def _update_next_subgait_early(self) -> GaitUpdate:
         """Update the next subgait.
@@ -206,9 +225,11 @@ class SetpointsGait(GaitInterface, Gait):
         else:
             next_subgait = self._next_graph_subgait()
 
+        self._next_subgait = next_subgait
         # If there is no subgait, return None and False for is_finished
         if next_subgait is None:
             return GaitUpdate.empty()
+
         return GaitUpdate.should_schedule_early(
             TrajectoryCommand.from_subgait(next_subgait, self._end_time)
         )
@@ -266,15 +287,19 @@ class SetpointsGait(GaitInterface, Gait):
     def stop(self) -> bool:
         """Called when the current gait should be stopped. Return a boolean
         for whether the stopping was succesfull."""
-        if (
-            self.graph.is_stoppable()
-            and not self._is_transitioning
-            and self._transition_to_subgait is None
-        ):
+        if self._can_stop():
             self._should_stop = True
             return True
         else:
             return False
+
+    def _can_stop(self):
+        """Determine if the gait can stop at the current moment."""
+        return (
+            self.graph.is_stoppable()
+            and not self._is_transitioning
+            and self._transition_to_subgait is None
+        )
 
     def end(self):
         """Called when the gait has finished."""

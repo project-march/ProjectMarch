@@ -31,8 +31,7 @@ march:
         right_knee: {p: 1000,  d: 10, i: 0, i_clamp: 0}
 
       constraints:
-        goal_time: 0.5
-        stopped_velocity_tolerance: 0.2
+        goal_time: 0.2
         left_ankle:
           trajectory: 0.5
           goal: 0.5

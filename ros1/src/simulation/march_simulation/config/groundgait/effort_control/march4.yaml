@@ -35,7 +35,8 @@ march:
       stop_trajectory_duration: 0        # Override default
 
       constraints:
-        goal_time: 0.1
+        goal_time: 0.5
+        stopped_velocity_tolerance: 0.2
         left_ankle:
           trajectory: 0.5
         left_hip_aa:
