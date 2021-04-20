@@ -338,9 +338,9 @@ bool HullParameterDeterminer::cropCloudToHullVectorUnique(
             ground_point, potential_foot_locations_of_point);
 
         if (potential_foot_locations_of_point->points.size() != 0) {
-            PointNormalCloud::iterator result= std::max_element(
-                potential_foot_locations_of_point->begin(),
-                potential_foot_locations_of_point->end(), pointIsLower);
+            PointNormalCloud::iterator result
+                = std::max_element(potential_foot_locations_of_point->begin(),
+                    potential_foot_locations_of_point->end(), pointIsLower);
             output_cloud->push_back(*result);
         }
     }
@@ -349,7 +349,7 @@ bool HullParameterDeterminer::cropCloudToHullVectorUnique(
 
 // Return true if the z coordinate of point1 is lower then that of point2
 bool HullParameterDeterminer::pointIsLower(
-        pcl::PointNormal point1, pcl::PointNormal point2)
+    pcl::PointNormal point1, pcl::PointNormal point2)
 {
     return point1.z < point2.z;
 }
