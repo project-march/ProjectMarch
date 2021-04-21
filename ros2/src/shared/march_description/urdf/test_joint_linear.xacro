@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!-- Revolute-Revolute Manipulator -->
 <robot name="march" xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <!-- Switch between airgaiting or standing on the ground -->
-    <!-- Value set to 'world' fixes the robot to the world -->
-    <!-- Value set to 'base_link' makes the robot stand on the ground -->
-    <!-- Important note when changing value make sure rviz fixed frame is set to the same value (moveit.rviz) -->
+    <!-- Switch between airgaiting or standing on the ground-->
+    <!--Value set to: 'world' fixes the robot to the world-->
+    <!--Value set to: 'base_link' makes the robot stand on the ground-->
+    <!--Important note: when changing value make sure rviz fixed frame is set to the same value (moveit.rviz)-->
 
     <!-- Constants for robot dimensions -->
     <xacro:property name="PI" value="3.1415926535897931"/>
@@ -16,10 +16,10 @@
     <xacro:property name="bar_width" value="0.05"/>
 
     <xacro:property name="joint_buffer" value="${3*pi/180}"/> <!-- rad -->
-    <xacro:property name="joint_lower_limit" value="${-223*pi/360}"/> <!-- rad -->
-    <xacro:property name="joint_upper_limit" value="${223*pi/360}"/> <!-- rad -->
+    <xacro:property name="joint_lower_limit" value="${-8.5*pi/180}"/> <!-- rad -->
+    <xacro:property name="joint_upper_limit" value="${8.5*pi/180}"/> <!-- rad -->
     <xacro:property name="joint_effort_limit" value="10927.0"/>
-    <xacro:property name="joint_velocity_limit" value="10.0"/> <!-- rad/s -->
+    <xacro:property name="joint_velocity_limit" value="1.0"/> <!-- rad/s -->
 
     <xacro:property name="hover_height" value="0.5"/>
 
@@ -99,7 +99,8 @@
             <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
         </joint>
         <actuator name="linear_joint_motor">
-            <mechanicalReduction>3.14159265</mechanicalReduction>
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
         </actuator>
     </transmission>
 

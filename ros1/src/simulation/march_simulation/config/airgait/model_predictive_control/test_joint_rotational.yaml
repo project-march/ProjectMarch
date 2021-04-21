@@ -1,0 +1,27 @@
+# this file represents the controller being used
+march:
+  # Publish all joint states -----------------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50
+
+  controller:
+    trajectory:
+      type: model_predictive_trajectory_controller/JointTrajectoryController
+      N: 20
+      joints:
+        - rotational_joint
+
+      # Controller tuning parameters
+      # Q and R are the weights on the states and inputs of the system respectively
+      # The parameters represent the values on the diagonal of the MPC weighting matrix
+      # Both parameters are required for each joint
+      weights:
+        rotational_joint:
+          Q: [100.0, 1.0]
+          R: [0.01]
+
+
+      state_publish_rate:  25            # Override default
+      action_monitor_rate: 30            # Override default
+      stop_trajectory_duration: 0        # Override default

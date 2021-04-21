@@ -22,7 +22,6 @@ add_message_files(
     GaitParameters.msg
     HighVoltageNet.msg
     ImcState.msg
-    MotorControllerState.msg
     JointValues.msg
     LowVoltageNet.msg
     PowerDistributionBoardState.msg
