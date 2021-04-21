@@ -100,7 +100,7 @@ protected:
 
     // Downsampling parameters
     bool voxel_grid_filter;
-    float leaf_size;
+    double leaf_size;
     bool random_filter;
     int remaining_points;
 
