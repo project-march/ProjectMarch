@@ -40,7 +40,7 @@ protected:
      * thread and only stores the packets in the buffer.
      */
     void onLiveDataAvailable(
-        XsDevice* device, const XsDataPacket* packet) override;
+        XsDevice* device, const XsDataPacket* packet) override final;
 
 private:
     /**
