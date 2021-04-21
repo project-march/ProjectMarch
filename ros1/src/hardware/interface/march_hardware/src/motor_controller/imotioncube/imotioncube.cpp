@@ -25,7 +25,7 @@ IMotionCube::IMotionCube(const Slave& slave, std::unique_ptr<AbsoluteEncoder> ab
   : MotorController(slave, std::move(absolute_encoder), std::move(incremental_encoder), actuation_mode)
   , sw_string_("empty")
 {
-  if (this->absolute_encoder_.value() == nullptr || this->incremental_encoder_.value() == nullptr)
+  if (!absolute_encoder_ || !incremental_encoder_)
   {
     throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
                                    "An IMotionCube needs both an incremental and an absolute encoder");
@@ -155,11 +155,11 @@ void IMotionCube::actuateRadians(float target_position)
                                    this->actuation_mode_.toString().c_str());
   }
 
-  if (std::abs(target_position - this->getAbsolutePosition()) > MAX_TARGET_DIFFERENCE)
+  if (std::abs(target_position - this->getAbsolutePositionUnchecked()) > MAX_TARGET_DIFFERENCE)
   {
     throw error::HardwareException(error::ErrorType::TARGET_EXCEEDS_MAX_DIFFERENCE,
                                    "Target %f exceeds max difference of %f from current %f for slave %d", target_position,
-                                   MAX_TARGET_DIFFERENCE, this->getAbsolutePosition(), this->getSlaveIndex());
+                                   MAX_TARGET_DIFFERENCE, this->getAbsolutePositionUnchecked(), this->getSlaveIndex());
   }
   this->actuateIU(this->getAbsoluteEncoder()->toIU(target_position, true));
 }
@@ -474,7 +474,7 @@ void IMotionCube::downloadSetupToDrive(SdoSlaveInterface& sdo)
   }
 }
 
-unsigned int IMotionCube::getActuationModeNumber() const
+int IMotionCube::getActuationModeNumber() const
 {
   /* These values were retrieved from the IMC manual, section 4.2.4 */
   switch(this->actuation_mode_.getValue())
@@ -507,31 +507,31 @@ std::unique_ptr<MotorControllerState> IMotionCube::getState()
   state->absolute_velocity_iu_ = getAbsoluteVelocityIU();
   state->incremental_velocity_iu_ = getIncrementalVelocityIU();
 
-  state->absolute_position_ = getAbsolutePosition();
+  state->absolute_position_ = getAbsolutePositionUnchecked();
   state->incremental_position_ = getIncrementalPosition();
-  state->absolute_velocity_ = getAbsoluteVelocity();
+  state->absolute_velocity_ = getAbsoluteVelocityUnchecked();
   state->incremental_velocity_ = getIncrementalVelocity();
 
   return state;
 }
 
 
-float IMotionCube::getAbsolutePosition()
+float IMotionCube::getAbsolutePositionUnchecked()
 {
   return this->getAbsoluteEncoder()->toRadians(getAbsolutePositionIU(), true);
 }
 
-float IMotionCube::getIncrementalPosition()
+float IMotionCube::getIncrementalPositionUnchecked()
 {
   return this->getIncrementalEncoder()->toRadians(getIncrementalPositionIU(), true);
 }
 
-float IMotionCube::getAbsoluteVelocity()
+float IMotionCube::getAbsoluteVelocityUnchecked()
 {
   return this->getAbsoluteEncoder()->toRadians(getAbsoluteVelocityIU(), false);
 }
 
-float IMotionCube::getIncrementalVelocity()
+float IMotionCube::getIncrementalVelocityUnchecked()
 {
   return this->getIncrementalEncoder()->toRadians(getIncrementalVelocityIU(), false);
 }

@@ -25,7 +25,7 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEnco
   : MotorController(slave, std::move(absolute_encoder), actuation_mode)
   , axis_(axis)
 {
-  if (this->absolute_encoder_.value() == nullptr)
+  if (!absolute_encoder)
   {
     throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
                                    "An ODrive needs an absolute encoder");
@@ -43,19 +43,22 @@ void ODrive::actuateTorque(float target_torque)
   this->write32(ODrivePDOmap::getMOSIByteOffset(ODriveObjectName::TargetTorque, axis_), write_torque);
 }
 
-unsigned int ODrive::getActuationModeNumber() const
+int ODrive::getActuationModeNumber() const
 {
-  /* These values were retrieved from https://github.com/odriverobotics/ODrive/blob/devel/Firmware/odrive-interface.yaml
-   * It does require some digging. Look for 'ODrive.Controller.ControlMode'.
+  /* These values are used to set the control mode of the ODrive.
+   * They were retrieved from https://github.com/odriverobotics/ODrive/blob/devel/Firmware/odrive-interface.yaml
+   * Look for 'ODrive.Controller.ControlMode'.
+   * The index in the list then represents the number corresponding to that actuation mode.
+   * If the actuation mode is unknown this will return -1.
    */
   switch(actuation_mode_.getValue())
   {
-    case ActuationMode::position:
-      return 3;
     case ActuationMode::torque:
       return 1;
+    case ActuationMode::position:
+      return 3;
     default:
-      return 1;
+      return -1;
   }
 }
 
@@ -67,8 +70,8 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
   state->absolute_position_iu_ = getAbsolutePositionIU();
   state->absolute_velocity_iu_ = getAbsoluteVelocityIU();
 
-  state->absolute_position_ = getAbsolutePosition();
-  state->absolute_velocity_ = getAbsoluteVelocity();
+  state->absolute_position_ = getAbsolutePositionUnchecked();
+  state->absolute_velocity_ = getAbsoluteVelocityUnchecked();
 
   // Set ODrive specific attributes
 //  state->axis_state_ = getAxisState(); // TODO: implement
@@ -106,12 +109,12 @@ float ODrive::getAbsoluteVelocityIU()
   return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ActualVelocity, axis_)).f;
 }
 
-float ODrive::getAbsolutePosition()
+float ODrive::getAbsolutePositionUnchecked()
 {
   return this->getAbsoluteEncoder()->toRadians(getAbsolutePositionIU(), true);
 }
 
-float ODrive::getAbsoluteVelocity()
+float ODrive::getAbsoluteVelocityUnchecked()
 {
   return this->getAbsoluteEncoder()->toRadians(getAbsoluteVelocityIU(), false);
 }
@@ -162,12 +165,12 @@ float ODrive::getMotorVoltage()
   throw error::NotImplemented("getMotorVoltage", "ODrive");
 }
 
-float ODrive::getIncrementalPosition()
+float ODrive::getIncrementalPositionUnchecked()
 {
   throw error::NotImplemented("getIncrementalPosition", "ODrive");
 }
 
-float ODrive::getIncrementalVelocity()
+float ODrive::getIncrementalVelocityUnchecked()
 {
   throw error::NotImplemented("getIncrementalVelocity", "ODrive");
 }

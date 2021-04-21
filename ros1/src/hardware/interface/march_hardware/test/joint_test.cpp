@@ -123,7 +123,7 @@ TEST_F(JointTest, PrepareForActuationAllowed)
 
 TEST_F(JointTest, hasTemperatureGes)
 {
-  march::Joint joint("get_temperature", 0, false, nullptr);
+  march::Joint joint("get_temperature", 0, false, std::move(this->imc));
   ASSERT_FALSE(joint.hasTemperatureGES());
 }
 
@@ -136,8 +136,8 @@ TEST_F(JointTest, ResetController)
 
 TEST_F(JointTest, TestPrepareActuation)
 {
-  EXPECT_CALL(*this->imc, getIncrementalPosition()).WillOnce(Return(5));
-  EXPECT_CALL(*this->imc, getAbsolutePosition()).WillOnce(Return(3));
+  EXPECT_CALL(*this->imc, getIncrementalPositionUnchecked()).WillOnce(Return(5));
+  EXPECT_CALL(*this->imc, getAbsolutePositionUnchecked()).WillOnce(Return(3));
   EXPECT_CALL(*this->imc, prepareActuation()).Times(1);
   march::Joint joint("actuate_true", 0, true, std::move(this->imc));
   joint.prepareActuation();
@@ -187,13 +187,13 @@ TEST_F(JointTest, TestReadEncodersOnce)
 
   EXPECT_CALL(*this->imc, isIncrementalEncoderMorePrecise()).WillRepeatedly(Return(true));
   EXPECT_CALL(*this->imc, getState()).Times(1);
-  EXPECT_CALL(*this->imc, getIncrementalPosition())
+  EXPECT_CALL(*this->imc, getIncrementalPositionUnchecked())
       .WillOnce(Return(initial_incremental_position))
       .WillOnce(Return(new_incremental_position));
-  EXPECT_CALL(*this->imc, getAbsolutePosition())
+  EXPECT_CALL(*this->imc, getAbsolutePositionUnchecked())
       .WillOnce(Return(initial_absolute_position));
 
-  EXPECT_CALL(*this->imc, getIncrementalVelocity()).WillOnce(Return(velocity));
+  EXPECT_CALL(*this->imc, getIncrementalVelocityUnchecked()).WillOnce(Return(velocity));
 
   march::Joint joint("actuate_true", 0, true, std::move(this->imc));
   joint.prepareActuation();
@@ -226,14 +226,14 @@ TEST_F(JointTest, TestReadEncodersTwice)
   EXPECT_CALL(*this->imc, isIncrementalEncoderMorePrecise())
       .WillRepeatedly(Return(true));
 
-  EXPECT_CALL(*this->imc, getIncrementalPosition())
+  EXPECT_CALL(*this->imc, getIncrementalPositionUnchecked())
       .WillOnce(Return(first_incremental_position))
       .WillOnce(Return(second_incremental_position))
       .WillOnce(Return(third_incremental_position));
-  EXPECT_CALL(*this->imc, getAbsolutePosition())
+  EXPECT_CALL(*this->imc, getAbsolutePositionUnchecked())
       .WillOnce(Return(initial_absolute_position));
 
-  EXPECT_CALL(*this->imc, getIncrementalVelocity())
+  EXPECT_CALL(*this->imc, getIncrementalVelocityUnchecked())
       .WillOnce(Return(first_velocity))
       .WillOnce(Return(second_velocity));
 
@@ -265,12 +265,12 @@ TEST_F(JointTest, TestReadEncodersNoUpdate)
       .WillOnce(Return(ByMove(std::move(basic_state))))
       .WillOnce(Return(ByMove(std::move(new_state))));
 
-  EXPECT_CALL(*this->imc, getIncrementalPosition())
+  EXPECT_CALL(*this->imc, getIncrementalPositionUnchecked())
       .WillOnce(Return(first_incremental_position))
       .WillOnce(Return(second_incremental_position));
-  EXPECT_CALL(*this->imc, getAbsolutePosition())
+  EXPECT_CALL(*this->imc, getAbsolutePositionUnchecked())
       .WillOnce(Return(initial_absolute_position));
-  EXPECT_CALL(*this->imc, getIncrementalVelocity())
+  EXPECT_CALL(*this->imc, getIncrementalVelocityUnchecked())
       .WillOnce(Return(velocity));
 
   march::Joint joint("actuate_true", 0, true, std::move(this->imc));

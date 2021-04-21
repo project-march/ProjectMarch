@@ -21,6 +21,10 @@ Joint::Joint(std::string name, int net_number, bool allow_actuation, std::unique
   , allow_actuation_(allow_actuation)
   , motor_controller_(std::move(motor_controller))
 {
+  if (!motor_controller_)
+  {
+    throw error::HardwareException(error::ErrorType::MISSING_MOTOR_CONTROLLER, "A Joint must have a MotorController");
+  }
 }
 
 Joint::Joint(std::string name, int net_number, bool allow_actuation, std::unique_ptr<MotorController> motor_controller,
@@ -46,7 +50,7 @@ bool Joint::initSdo(int cycle_time)
 
 void Joint::prepareActuation()
 {
-  if (!this->canActuate())
+  if (!canActuate())
   {
     throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE, "Failed to prepare joint %s for actuation",
                                    this->name_.c_str());
@@ -55,9 +59,19 @@ void Joint::prepareActuation()
   motor_controller_->prepareActuation();
   ROS_INFO("[%s] Successfully prepared for actuation", this->name_.c_str());
 
-  this->previous_incremental_position_ = motor_controller_->getPosition(false);
-  this->position_ = motor_controller_->getPosition(true);
-  this->velocity_ = 0;
+  if (motor_controller_->hasIncrementalEncoder())
+  {
+    previous_incremental_position_ = motor_controller_->getIncrementalPosition();
+  }
+  if (motor_controller_->hasAbsoluteEncoder())
+  {
+    position_ = motor_controller_->getAbsolutePosition();
+  }
+  else
+  {
+    position_ = previous_incremental_position_;
+  }
+  velocity_ = 0;
 }
 
 void Joint::actuate(double target)
@@ -76,13 +90,13 @@ void Joint::readEncoders(const ros::Duration& elapsed_time)
   {
     if (motor_controller_->isIncrementalEncoderMorePrecise())
     {
-      double new_incremental_position = motor_controller_->getPosition(false);
+      double new_incremental_position = motor_controller_->getIncrementalPosition();
       position_ += (new_incremental_position - previous_incremental_position_);
       previous_incremental_position_ = new_incremental_position;
     }
     else
     {
-      position_ = motor_controller_->getPosition(true);
+      position_ = motor_controller_->getAbsolutePosition();
     }
     velocity_ = motor_controller_->getVelocity();
   }
@@ -121,7 +135,7 @@ std::string Joint::getName() const
 
 bool Joint::hasTemperatureGES() const
 {
-  return temperature_ges_.has_value();
+  return temperature_ges_ != nullptr;
 }
 
 bool Joint::canActuate() const
@@ -155,7 +169,7 @@ std::unique_ptr<TemperatureGES>& Joint::getTemperatureGES()
 {
   if (hasTemperatureGES())
   {
-    return *temperature_ges_;
+    return temperature_ges_;
   }
   else
   {

@@ -9,17 +9,12 @@
 #include "march_hardware/ethercat/slave.h"
 #include <string>
 #include <memory>
-#include <optional>
 
 namespace march
 {
 class MotorController : public Slave
 {
 public:
-  MotorController(const Slave& slave,
-                  std::optional<std::unique_ptr<AbsoluteEncoder>> absolute_encoder,
-                  std::optional<std::unique_ptr<IncrementalEncoder>> incremental_encoder,
-                  ActuationMode actuation_mode);
   MotorController(const Slave& slave,
                   std::unique_ptr<AbsoluteEncoder> absolute_encoder,
                   std::unique_ptr<IncrementalEncoder> incremental_encoder,
@@ -36,8 +31,11 @@ public:
   float getVelocity();
 
   // Get the position, either absolute or incremental
-  float getPosition(bool absolute);
-  float getVelocity(bool absolute);
+  // Will throw an HardwareException if the MotorController doesn't have the requested encoder
+  float getAbsolutePosition();
+  float getAbsoluteVelocity();
+  float getIncrementalPosition();
+  float getIncrementalVelocity();
 
   // A MotorController should support both actuating by position (radians) or by torque
   virtual void actuateRadians(float target_position) = 0;
@@ -54,7 +52,7 @@ public:
   virtual void prepareActuation() = 0;
 
   // Transform the ActuationMode to a number that is understood by the MotorController
-  virtual unsigned int getActuationModeNumber() const = 0;
+  virtual int getActuationModeNumber() const = 0;
 
   // Get whether the incremental encoder is more precise than the absolute encoder
   bool isIncrementalEncoderMorePrecise() const;
@@ -80,26 +78,11 @@ public:
   // Override comparison operator
   friend bool operator==(const MotorController& lhs, const MotorController& rhs)
   {
-    bool encoders_are_equal = true;
-    if (lhs.incremental_encoder_.has_value() && rhs.incremental_encoder_.has_value())
-    {
-      encoders_are_equal &= *lhs.incremental_encoder_.value() == *rhs.incremental_encoder_.value();
-    }
-    else
-    {
-      encoders_are_equal &= lhs.incremental_encoder_ == rhs.incremental_encoder_;
-    }
-
-    if (lhs.absolute_encoder_.has_value() && rhs.absolute_encoder_.has_value())
-    {
-      encoders_are_equal &= *lhs.absolute_encoder_.value() == *rhs.absolute_encoder_.value();
-    }
-    else
-    {
-      encoders_are_equal &= lhs.absolute_encoder_ == rhs.absolute_encoder_;
-    }
-
-    return encoders_are_equal && lhs.getSlaveIndex() == rhs.getSlaveIndex() &&
+    return lhs.getSlaveIndex() == rhs.getSlaveIndex() &&
+            ((lhs.absolute_encoder_ && rhs.absolute_encoder_ && *lhs.absolute_encoder_ == *rhs.absolute_encoder_) ||
+            (!lhs.absolute_encoder_ && !rhs.absolute_encoder_)) &&
+            ((lhs.incremental_encoder_ && rhs.incremental_encoder_ && *lhs.incremental_encoder_ == *rhs.incremental_encoder_) ||
+             (!lhs.incremental_encoder_ && !rhs.incremental_encoder_)) &&
            lhs.actuation_mode_.getValue() == rhs.actuation_mode_.getValue();
   }
   // Override stream operator for clean printing
@@ -109,11 +92,11 @@ public:
 
     if (motor_controller.hasAbsoluteEncoder())
     {
-      os << ", absolute encoder: " << *motor_controller.absolute_encoder_.value();
+      os << ", absolute encoder: " << *motor_controller.absolute_encoder_;
     }
     if (motor_controller.hasIncrementalEncoder())
     {
-      os << ", incremental encoder: " << *motor_controller.incremental_encoder_.value();
+      os << ", incremental encoder: " << *motor_controller.incremental_encoder_;
     }
     os << ", actuation mode" << motor_controller.actuation_mode_.toString();
     return os;
@@ -126,16 +109,16 @@ public:
 
 protected:
   // Getters for absolute and incremental position and velocity.
-  // These will throw an error where the encoder is not available.
-  virtual float getAbsolutePosition() = 0;
-  virtual float getIncrementalPosition() = 0;
-  virtual float getAbsoluteVelocity() = 0;
-  virtual float getIncrementalVelocity() = 0;
+  // These will not check whether the encoder actually exists but may give a segmentation fault.
+  virtual float getAbsolutePositionUnchecked() = 0;
+  virtual float getIncrementalPositionUnchecked() = 0;
+  virtual float getAbsoluteVelocityUnchecked() = 0;
+  virtual float getIncrementalVelocityUnchecked() = 0;
 
   // A MotorController doesn't necessarily have an AbsoluteEncoder and an IncrementalEncoder, but will have
   // at least one of the two
-  std::optional<std::unique_ptr<AbsoluteEncoder>> absolute_encoder_ = std::nullopt;
-  std::optional<std::unique_ptr<IncrementalEncoder>> incremental_encoder_ = std::nullopt;
+  std::unique_ptr<AbsoluteEncoder> absolute_encoder_ = nullptr;
+  std::unique_ptr<IncrementalEncoder> incremental_encoder_ = nullptr;
   ActuationMode actuation_mode_;
 };
 

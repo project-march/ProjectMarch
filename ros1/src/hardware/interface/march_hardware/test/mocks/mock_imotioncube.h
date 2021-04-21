@@ -26,10 +26,10 @@ public:
 
   MOCK_METHOD0(isIncrementalEncoderMorePrecise, bool());
 
-  MOCK_METHOD0(getIncrementalPosition, float());
-  MOCK_METHOD0(getAbsolutePosition, float());
-  MOCK_METHOD0(getIncrementalVelocity, float());
-  MOCK_METHOD0(getAbsoluteVelocity, float());
+  MOCK_METHOD0(getIncrementalPositionUnchecked, float());
+  MOCK_METHOD0(getAbsolutePositionUnchecked, float());
+  MOCK_METHOD0(getIncrementalVelocityUnchecked, float());
+  MOCK_METHOD0(getAbsoluteVelocityUnchecked, float());
 
   MOCK_METHOD0(getMotorControllerVoltage, float());
   MOCK_METHOD0(getMotorVoltage, float());

@@ -44,7 +44,7 @@ public:
   void actuateRadians(float target_position) override;
 
   // Transform the ActuationMode to a number that is understood by the ODrive
-  unsigned int getActuationModeNumber() const override;
+  int getActuationModeNumber() const override;
 
   // Get a full description of the state of the ODrive
   std::unique_ptr<MotorControllerState> getState() override;
@@ -61,10 +61,10 @@ protected:
   void reset(SdoSlaveInterface& sdo) override;
 
   // Override protected functions from MotorController class
-  float getAbsolutePosition() override;
-  float getIncrementalPosition() override;
-  float getAbsoluteVelocity() override;
-  float getIncrementalVelocity() override;
+  float getAbsolutePositionUnchecked() override;
+  float getIncrementalPositionUnchecked() override;
+  float getAbsoluteVelocityUnchecked() override;
+  float getIncrementalVelocityUnchecked() override;
 
 private:
   // Set the ODrive in a certain axis state

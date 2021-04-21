@@ -51,7 +51,7 @@ public:
   void actuateTorque(float target_torque) override;
 
   // Transform the ActuationMode to a number that is understood by the IMotionCube
-  unsigned int getActuationModeNumber() const override;
+  int getActuationModeNumber() const override;
 
   // Get a full description of the state of the IMotionCube
   std::unique_ptr<MotorControllerState> getState() override;
@@ -79,10 +79,10 @@ protected:
   void reset(SdoSlaveInterface& sdo) override;
 
   // Override protected functions from MotorController class
-  float getAbsolutePosition() override;
-  float getIncrementalPosition() override;
-  float getAbsoluteVelocity() override;
-  float getIncrementalVelocity() override;
+  float getAbsolutePositionUnchecked() override;
+  float getIncrementalPositionUnchecked() override;
+  float getAbsoluteVelocityUnchecked() override;
+  float getIncrementalVelocityUnchecked() override;
 
 private:
   // Actuate position in Internal Units

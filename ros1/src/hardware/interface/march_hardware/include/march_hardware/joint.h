@@ -18,9 +18,12 @@ class Joint
 {
 public:
   // Initialize a Joint with motor controller and without temperature slave.
+  // MotorController cannot be a nullptr, since a Joint should always have a MotorController.
   Joint(std::string name, int net_number, bool allow_actuation, std::unique_ptr<MotorController> motor_controller);
 
   // Initialize a Joint with motor controller and temperature slave.
+  // MotorController cannot be a nullptr, since a Joint should always have a MotorController.
+  // Temperature ges may be a nullptr, since a Joint may have a Temperature ges.
   Joint(std::string name, int net_number, bool allow_actuation, std::unique_ptr<MotorController> motor_controller,
         std::unique_ptr<TemperatureGES> temperature_ges);
 
@@ -45,6 +48,7 @@ public:
   void prepareActuation();
 
   // Actuate the joint if allow_actuation is true
+  // Will throw a HardwareException if canActuate() is false
   void actuate(double target);
 
   // Get the position and velocity of the joint
@@ -67,19 +71,11 @@ public:
   /** @brief Override comparison operator */
   friend bool operator==(const Joint& lhs, const Joint& rhs)
   {
-    bool temperature_ges_is_equal;
-    if (lhs.temperature_ges_.has_value() && rhs.temperature_ges_.has_value())
-    {
-      temperature_ges_is_equal = *lhs.temperature_ges_.value() == *rhs.temperature_ges_.value();
-    }
-    else
-    {
-      temperature_ges_is_equal = lhs.temperature_ges_ == rhs.temperature_ges_;
-    }
     return lhs.name_ == rhs.name_ &&
            ((lhs.motor_controller_ && rhs.motor_controller_ && *lhs.motor_controller_ == *rhs.motor_controller_) ||
             (!lhs.motor_controller_ && !rhs.motor_controller_)) &&
-           temperature_ges_is_equal &&
+            ((lhs.temperature_ges_ && rhs.temperature_ges_ && *lhs.temperature_ges_ == *rhs.temperature_ges_) ||
+            (!lhs.temperature_ges_ && !rhs.temperature_ges_)) &&
            lhs.allow_actuation_ == rhs.allow_actuation_;
   }
 
@@ -96,7 +92,7 @@ public:
     os << ", temperatureges: ";
     if (joint.hasTemperatureGES())
     {
-      os << *(joint.temperature_ges_.value());
+      os << *joint.temperature_ges_;
     }
     else
     {
@@ -121,7 +117,7 @@ private:
 
   // A joint must have a MotorController but may have a TemperatureGES
   std::unique_ptr<MotorController> motor_controller_;
-  std::optional<std::unique_ptr<TemperatureGES>> temperature_ges_ = std::nullopt;
+  std::unique_ptr<TemperatureGES> temperature_ges_ = nullptr;
 };
 
 }  // namespace march
