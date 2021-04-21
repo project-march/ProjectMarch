@@ -16,7 +16,7 @@
  * The wireless master class that connects to MTws and publishes the data on
  * '/march/imu/' ROS topics.
  */
-class WirelessMaster : public XsCallback {
+class WirelessMaster final : public XsCallback {
 public:
     explicit WirelessMaster(ros::NodeHandle* node);
     ~WirelessMaster() override final;
