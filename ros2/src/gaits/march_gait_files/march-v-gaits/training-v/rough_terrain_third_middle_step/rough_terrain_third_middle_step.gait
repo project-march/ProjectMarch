@@ -1,0 +1,8 @@
+name: rough_terrain_third_middle_step
+subgaits:
+  left_close:
+    to: end
+  right_open:
+    to: left_close
+  start:
+    to: right_open

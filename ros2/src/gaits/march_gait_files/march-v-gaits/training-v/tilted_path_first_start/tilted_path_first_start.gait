@@ -1,0 +1,8 @@
+name: tilted_path_first_start
+subgaits:
+  left_open:
+    to: right_close
+  right_close:
+    to: end
+  start:
+    to: left_open

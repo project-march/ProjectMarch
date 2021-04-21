@@ -1,0 +1,98 @@
+description: Extra hip flexion of 10 degrees for the whole gait
+duration: 2750000000
+gait_type: stairs_like
+joints:
+  left_ankle:
+  - position: 0.04360007
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.04363323
+    time_from_start: 670000000
+    velocity: 0.0
+  - position: -0.15707963
+    time_from_start: 1368300000
+    velocity: 0.0
+  - position: -0.15707963
+    time_from_start: 2750000000
+    velocity: 0.0
+  left_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: -0.03490659
+    time_from_start: 750000000
+    velocity: -0.17453293
+  - position: -0.08726646
+    time_from_start: 1750000000
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2750000000
+    velocity: 0.0
+  left_hip_fe:
+  - position: -0.08729962
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.08726646
+    time_from_start: 250000000
+    velocity: 0.0
+  - position: 0.08726646
+    time_from_start: 2002800000
+    velocity: 0.02349213
+  - position: 0.08726646
+    time_from_start: 2750000000
+    velocity: 0.17449976
+  left_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.13960016
+    time_from_start: 2000000000
+    velocity: 0.08726646
+  - position: 0.24430072
+    time_from_start: 2750000000
+    velocity: 0.69810028
+  right_ankle:
+  - position: 0.04360007
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.04360007
+    time_from_start: 2750000000
+    velocity: 0.0
+  right_hip_aa:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 2750000000
+    velocity: 0.0
+  right_hip_fe:
+  - position: -0.08729962
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.08726646
+    time_from_start: 250000000
+    velocity: 1.04719755
+  - position: 1.36135682
+    time_from_start: 2016099999
+    velocity: -0.17453293
+  - position: 1.27409035
+    time_from_start: 2299999999
+    velocity: -0.34906585
+  - position: 1.22173048
+    time_from_start: 2750000000
+    velocity: 0.0
+  right_knee:
+  - position: 0.0
+    time_from_start: 0
+    velocity: 0.0
+  - position: 0.0
+    time_from_start: 250000000
+    velocity: 0.0
+  - position: 1.6406095
+    time_from_start: 1642099999
+    velocity: -0.87266463
+  - position: 1.0471993
+    time_from_start: 2750000000
+    velocity: 0.0
+name: right_open
+version: MVI_stairsup_rightopen_haa_adpf_v2
