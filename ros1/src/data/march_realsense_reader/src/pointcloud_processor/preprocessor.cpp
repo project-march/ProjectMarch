@@ -167,8 +167,9 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
         pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
         if (tfBuffer->canTransform(frame_id_to_transform_to_,
                 pointcloud_frame_id, ros::Time(), ros::Duration(/*t=*/1.0))) {
-            transform_stamped = tfBuffer->lookupTransform(
-                frame_id_to_transform_to_, pointcloud_frame_id, ros::Time(/*t=*/0));
+            transform_stamped
+                = tfBuffer->lookupTransform(frame_id_to_transform_to_,
+                    pointcloud_frame_id, ros::Time(/*t=*/0));
         }
         pcl_ros::transformPointCloud(
             *pointcloud_, *pointcloud_, transform_stamped.transform);

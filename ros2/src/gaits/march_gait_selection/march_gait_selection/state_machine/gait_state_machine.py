@@ -350,7 +350,6 @@ class GaitStateMachine(object):
             if self._current_gait.can_be_scheduled_early:
                 gait_update = self._current_gait.start(
                     now, self._gait_selection._first_subgait_delay
-
                 )
             else:
                 gait_update = self._current_gait.start(now)

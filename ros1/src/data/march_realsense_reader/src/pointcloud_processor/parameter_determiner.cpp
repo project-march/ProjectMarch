@@ -149,8 +149,7 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocation()
 }
 bool HullParameterDeterminer::getGaitParametersFromFootLocationStairsUp()
 {
-    gait_parameters_->first_parameter
-        = (optimal_foot_location.x - min_x_stairs)
+    gait_parameters_->first_parameter = (optimal_foot_location.x - min_x_stairs)
         / (max_x_stairs - min_x_stairs);
     gait_parameters_->second_parameter
         = (optimal_foot_location.z - min_z_stairs)
