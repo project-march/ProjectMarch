@@ -127,7 +127,6 @@ public:
     if (hasError())
     {
       std::ostringstream error_stream;
-
       error_stream << "Axis: " << error::parseError(axis_error_, error::ErrorRegister::ODRIVE_AXIS_ERROR) << ", "
                    << "\nMotor: " << error::parseError(motor_error_, error::ErrorRegister::ODRIVE_MOTOR_ERROR) << ", "
                    << "\nEncoder: " << error::parseError(encoder_error_, error::ErrorRegister::ODRIVE_ENCODER_ERROR) << ", "

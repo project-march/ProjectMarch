@@ -14,17 +14,17 @@ namespace march
 class IMCStateOfOperation
 {
 public:
-  enum Value
+  enum Value : uint16_t
   {
-    NOT_READY_TO_SWITCH_ON,
-    SWITCH_ON_DISABLED,
-    READY_TO_SWITCH_ON,
-    SWITCHED_ON,
-    OPERATION_ENABLED,
-    QUICK_STOP_ACTIVE,
-    FAULT_REACTION_ACTIVE,
-    FAULT,
-    UNKNOWN,
+    NOT_READY_TO_SWITCH_ON = 0b0000000000000000,
+    SWITCH_ON_DISABLED = 0b0000000001000000,
+    READY_TO_SWITCH_ON = 0b0000000000100001,
+    SWITCHED_ON = 0b0000000000100011,
+    OPERATION_ENABLED = 0b0000000000100111,
+    QUICK_STOP_ACTIVE = 0b0000000000000111,
+    FAULT_REACTION_ACTIVE = 0b0000000000001111,
+    FAULT = 0b0000000000001000,
+    UNKNOWN
   };
 
   IMCStateOfOperation() : value_(UNKNOWN)
@@ -33,50 +33,43 @@ public:
 
   explicit IMCStateOfOperation(uint16_t status) : value_(UNKNOWN)
   {
+    /* Two masks are used to determine the exact state of operation
+       See the IMC Manual Section 4.2.2 For more details */
     const uint16_t five_bit_mask = 0b0000000001001111;
     const uint16_t six_bit_mask = 0b0000000001101111;
-
-    const uint16_t not_ready_switch_on = 0b0000000000000000;
-    const uint16_t switch_on_disabled = 0b0000000001000000;
-    const uint16_t ready_to_switch_on = 0b0000000000100001;
-    const uint16_t switched_on = 0b0000000000100011;
-    const uint16_t operation_enabled = 0b0000000000100111;
-    const uint16_t quick_stop_active = 0b0000000000000111;
-    const uint16_t fault_reaction_active = 0b0000000000001111;
-    const uint16_t fault = 0b0000000000001000;
 
     const uint16_t five_bit_masked = (status & five_bit_mask);
     const uint16_t six_bit_masked = (status & six_bit_mask);
 
-    if (five_bit_masked == not_ready_switch_on)
+    if (five_bit_masked == IMCStateOfOperation::NOT_READY_TO_SWITCH_ON)
     {
       this->value_ = IMCStateOfOperation::NOT_READY_TO_SWITCH_ON;
     }
-    else if (five_bit_masked == switch_on_disabled)
+    else if (five_bit_masked == IMCStateOfOperation::SWITCH_ON_DISABLED)
     {
       this->value_ = IMCStateOfOperation::SWITCH_ON_DISABLED;
     }
-    else if (six_bit_masked == ready_to_switch_on)
+    else if (six_bit_masked == IMCStateOfOperation::READY_TO_SWITCH_ON)
     {
       this->value_ = IMCStateOfOperation::READY_TO_SWITCH_ON;
     }
-    else if (six_bit_masked == switched_on)
+    else if (six_bit_masked == IMCStateOfOperation::SWITCHED_ON)
     {
       this->value_ = IMCStateOfOperation::SWITCHED_ON;
     }
-    else if (six_bit_masked == operation_enabled)
+    else if (six_bit_masked == IMCStateOfOperation::OPERATION_ENABLED)
     {
       this->value_ = IMCStateOfOperation::OPERATION_ENABLED;
     }
-    else if (six_bit_masked == quick_stop_active)
+    else if (six_bit_masked == IMCStateOfOperation::QUICK_STOP_ACTIVE)
     {
       this->value_ = IMCStateOfOperation::QUICK_STOP_ACTIVE;
     }
-    else if (five_bit_masked == fault_reaction_active)
+    else if (five_bit_masked == IMCStateOfOperation::FAULT_REACTION_ACTIVE)
     {
       this->value_ = IMCStateOfOperation::FAULT_REACTION_ACTIVE;
     }
-    else if (five_bit_masked == fault)
+    else if (five_bit_masked == IMCStateOfOperation::FAULT)
     {
       this->value_ = IMCStateOfOperation::FAULT;
     }
@@ -124,6 +117,7 @@ public:
 
   Value value_;
 };
+
 class IMotionCubeState : public MotorControllerState
 {
 public:

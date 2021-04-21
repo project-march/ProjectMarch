@@ -49,11 +49,22 @@ extern const std::array<std::string, ODRIVE_CONTROLLER_ERRORS_SIZE> ODRIVE_CONTR
 // Add an error type to the description
 void addErrorToDescription(size_t index, ErrorRegister error_register, std::string &description);
 
-// Parse an uint16_t error
-std::string parseError(uint16_t error, ErrorRegister);
+template<typename T>
+std::string parseError(T error, ErrorRegister error_register)
+{
+  std::string description;
+  const auto size = sizeof(error) * 8;
+  const std::bitset<size> bitset(error);
 
-// Parse an uint32_t error
-std::string parseError(uint32_t error, ErrorRegister);
+  for (size_t i = 0; i < size; i++)
+  {
+    if (bitset.test(i))
+    {
+      addErrorToDescription(i, error_register, description);
+    }
+  }
+  return description;
+}
 
 }  // namespace error
 }  // namespace march

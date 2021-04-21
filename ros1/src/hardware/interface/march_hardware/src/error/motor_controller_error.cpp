@@ -171,34 +171,8 @@ void addErrorToDescription(size_t index, ErrorRegister error_register, std::stri
   }
 }
 
-std::string parseError(uint16_t error, ErrorRegister error_register)
-{
-  std::string description;
-  const std::bitset<16> bitset(error);
+template std::string parseError<uint16_t>(uint16_t, ErrorRegister);
+template std::string parseError<uint32_t>(uint32_t, ErrorRegister);
 
-  for (size_t i = 0; i < 16; i++)
-  {
-    if (bitset.test(i))
-    {
-      addErrorToDescription(i, error_register, description);
-    }
-  }
-  return description;
-}
-
-std::string parseError(uint32_t error, ErrorRegister error_register)
-{
-  std::string description;
-  const std::bitset<32> bitset(error);
-
-  for (size_t i = 0; i < 32; i++)
-  {
-    if (bitset.test(i))
-    {
-      addErrorToDescription(i, error_register, description);
-    }
-  }
-  return description;
-}
 }  // namespace error
 }  // namespace march

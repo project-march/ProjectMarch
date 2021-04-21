@@ -111,6 +111,8 @@ bool IMotionCube::writeInitialSettings(SdoSlaveInterface& sdo, int cycle_time)
     ROS_DEBUG("The .sw file for slave %d is equal to the setup of the drive.", this->getSlaveIndex());
   }
 
+  /* All addresses were retrieved from the IMC Manual:
+     https://technosoftmotion.com/wp-content/uploads/P091.025.iMOTIONCUBE.CAN_.CAT_.UM_-1.pdf */
   // mode of operation
   int mode_of_op = sdo.write(0x6060, 0, getActuationModeNumber());
 

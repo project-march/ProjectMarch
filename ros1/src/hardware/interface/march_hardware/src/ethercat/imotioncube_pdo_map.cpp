@@ -9,6 +9,8 @@
 
 namespace march
 {
+/* All addresses were retrieved from the IMC Manual:
+   https://technosoftmotion.com/wp-content/uploads/P091.025.iMOTIONCUBE.CAN_.CAT_.UM_-1.pdf */
 std::unordered_map<IMCObjectName, IMCObject> IMCPDOmap::all_objects = {
   { IMCObjectName::StatusWord, IMCObject(0x6041, 0, 16) },
   { IMCObjectName::ActualPosition, IMCObject(0x6064, 0, 32) },
