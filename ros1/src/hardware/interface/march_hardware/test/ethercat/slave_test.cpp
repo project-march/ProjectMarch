@@ -16,7 +16,7 @@ protected:
 
 TEST_F(SlaveTest, CorrectSlaveIndex)
 {
-    march::Slave slave(1, this->mock_pdo, this->mock_sdo);
+    march::Slave slave(/*slave_index=*/1, this->mock_pdo, this->mock_sdo);
     ASSERT_EQ(slave.getSlaveIndex(), 1);
 }
 

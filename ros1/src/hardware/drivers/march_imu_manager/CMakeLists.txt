@@ -30,16 +30,16 @@ if(CATKIN_ENABLE_TESTING AND ENABLE_COVERAGE_TESTING)
 endif()
 
 set(xsensdeviceapi_LOCATION ${PROJECT_SOURCE_DIR}/lib/libxsensdeviceapi.so)
-set(xstypes_LOCATION ${PROJECT_SOURCE_DIR}/lib/libxstypes.so)
+set(xsenstypes_LOCATION ${PROJECT_SOURCE_DIR}/lib/libxsenstypes.so)
 
 find_library(xsensdeviceapi_LIBRARY NAMES xsensdeviceapi PATHS ${PROJECT_SOURCE_DIR}/lib)
-find_library(xstypes_LIBRARY NAMES xstypes PATHS ${PROJECT_SOURCE_DIR}/lib)
+find_library(xsenstypes_LIBRARY NAMES xsenstypes PATHS ${PROJECT_SOURCE_DIR}/lib)
 
 add_library(xsensdeviceapi SHARED IMPORTED)
 set_property(TARGET xsensdeviceapi PROPERTY IMPORTED_LOCATION ${xsensdeviceapi_LOCATION})
 
-add_library(xstypes SHARED IMPORTED)
-set_property(TARGET xstypes PROPERTY IMPORTED_LOCATION ${xstypes_LOCATION})
+add_library(xsenstypes SHARED IMPORTED)
+set_property(TARGET xsenstypes PROPERTY IMPORTED_LOCATION ${xsenstypes_LOCATION})
 
 add_library(${PROJECT_NAME}
     src/mtw.cpp
@@ -48,7 +48,7 @@ add_library(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     ${xsensdeviceapi_LIBRARY}
-    ${xstypes_LIBRARY}
+    ${xsenstypes_LIBRARY}
     ${catkin_LIBRARIES}
 )
 
@@ -57,7 +57,7 @@ add_executable(${PROJECT_NAME}_node src/main.cpp)
 target_link_libraries(${PROJECT_NAME}_node
     ${PROJECT_NAME}
     ${xsensdeviceapi_LIBRARY}
-    ${xstypes_LIBRARY}
+    ${xsenstypes_LIBRARY}
     ${catkin_LIBRARIES}
 )
 
@@ -66,9 +66,9 @@ install(
     ${xsensdeviceapi_LOCATION}
     ${xsensdeviceapi_LOCATION}.4
     ${xsensdeviceapi_LOCATION}.4.6.0
-    ${xstypes_LOCATION}
-    ${xstypes_LOCATION}.4
-    ${xstypes_LOCATION}.4.6.0
+    ${xsenstypes_LOCATION}
+    ${xsenstypes_LOCATION}.4
+    ${xsenstypes_LOCATION}.4.6.0
     DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
@@ -87,7 +87,7 @@ if(CATKIN_ENABLE_TESTING)
     target_link_libraries(wireless_master_test
         ${PROJECT_NAME}
         ${xsensdeviceapi_LIBRARY}
-        ${xstypes_LIBRARY}
+        ${xsenstypes_LIBRARY}
         ${catkin_LIBRARIES}
     )
 

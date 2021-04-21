@@ -7,9 +7,9 @@
 namespace gazebo {
 ObstacleController::ObstacleController(physics::ModelPtr model)
     : model_(std::move(model))
-    , HOME_STAND("home_stand")
-    , STAND_IDLE("idle_stand")
-    , SIT_IDLE("idle_sit")
+    , HOME_STAND(/*__s=*/"home_stand")
+    , STAND_IDLE(/*__s=*/"idle_stand")
+    , SIT_IDLE(/*__s=*/"idle_sit")
     , subgait_start_time_(0)
     , subgait_duration_(0)
     , subgait_changed_(true)
@@ -67,7 +67,8 @@ void ObstacleController::newSubgait(
                     - foot_left_->WorldPose().Pos().X());
     }
 
-    if (subgait_name_ == HOME_STAND and msg->subgait.substr(0, 4) == "left") {
+    if (subgait_name_ == HOME_STAND
+        and msg->subgait.substr(/*__pos=*/0, /*__n=*/4) == "left") {
         ROS_WARN("Gait starts with left. CoM controller plugin might not work "
                  "properly.");
     }
@@ -149,7 +150,7 @@ void ObstacleController::update(
     double T_yaw = -p_yaw_actual * error_yaw
         - d_yaw_actual * (error_yaw - error_yaw_last_timestep_);
 
-    if (subgait_name_.substr(0, 4) == "left") {
+    if (subgait_name_.substr(/*__pos=*/0, /*__n=*/4) == "left") {
         torque_right
             = ignition::math::v6::Vector3<double>(T_roll, T_pitch, T_yaw);
         torque_left = ignition::math::v6::Vector3<double>(0, 0, 0);
@@ -170,7 +171,7 @@ void ObstacleController::getGoalPosition(double time_since_start)
     auto stable_foot_pose = foot_left_->WorldCoGPose().Pos();
     auto swing_foot_pose = foot_right_->WorldCoGPose().Pos();
 
-    if (subgait_name_.find("left") != std::string::npos) {
+    if (subgait_name_.find(/*__s=*/"left") != std::string::npos) {
         stable_foot_pose = foot_right_->WorldCoGPose().Pos();
         swing_foot_pose = foot_left_->WorldCoGPose().Pos();
     }
@@ -182,14 +183,14 @@ void ObstacleController::getGoalPosition(double time_since_start)
     // X coordinate of the goal position is determined from the current subgait
     // the exoskeleton in executing if the exo skeleton is frozen, do not send a
     // new goal_position_x, keep it at previous value
-    if (subgait_name_.find("freeze") == std::string::npos) {
-        if (subgait_name_.find("sit") != std::string::npos
+    if (subgait_name_.find(/*__s=*/"freeze") == std::string::npos) {
+        if (subgait_name_.find(/*__s=*/"sit") != std::string::npos
             || subgait_name_ == "prepare_stand_up") {
             getSitGoalPositionX(time_since_start, stable_foot_pose.X());
-        } else if (subgait_name_.find("stand") != std::string::npos) {
+        } else if (subgait_name_.find(/*__s=*/"stand") != std::string::npos) {
             getStandGoalPositionX(time_since_start, stable_foot_pose.X());
-        } else if (subgait_name_.find("right") != std::string::npos
-            || subgait_name_.find("left") != std::string::npos) {
+        } else if (subgait_name_.find(/*__s=*/"right") != std::string::npos
+            || subgait_name_.find(/*__s=*/"left") != std::string::npos) {
             getWalkGoalPositionX(time_since_start, stable_foot_pose.X());
         }
     }

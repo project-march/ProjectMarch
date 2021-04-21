@@ -10,7 +10,7 @@
 class AbsoluteEncoderTest : public testing::Test {
 protected:
     const size_t resolution = 17;
-    const size_t total_positions = std::pow(2, resolution);
+    const size_t total_positions = std::pow(/*__x=*/2, resolution);
     const int32_t lower_limit = 2053;
     const int32_t upper_limit = 45617;
     const double lower_limit_rad = -0.34906585;
@@ -116,7 +116,7 @@ TEST_F(AbsoluteEncoderTest, CorrectToRad)
     ASSERT_EQ(this->encoder.toRad(iu), expected);
 }
 
-INSTANTIATE_TEST_CASE_P(ParameterizedLimits, TestEncoderParameterizedLimits,
+INSTANTIATE_TEST_SUITE_P(ParameterizedLimits, TestEncoderParameterizedLimits,
     testing::Values(std::make_tuple(2053 - 1, false),
         std::make_tuple(2053, false), std::make_tuple(2053 + 1, true),
         std::make_tuple(45617 - 1, true), std::make_tuple(45617, false),
@@ -131,7 +131,7 @@ TEST_P(TestEncoderParameterizedLimits, IsWithinHardLimits)
     ASSERT_EQ(this->encoder.isWithinHardLimitsIU(iu), expected);
 }
 
-INSTANTIATE_TEST_CASE_P(ParameterizedSoftLimits,
+INSTANTIATE_TEST_SUITE_P(ParameterizedSoftLimits,
     TestEncoderParameterizedSoftLimits,
     testing::Values(std::make_tuple(3095 - 1, false),
         std::make_tuple(3095, false), std::make_tuple(3095 + 1, true),
@@ -147,7 +147,7 @@ TEST_P(TestEncoderParameterizedSoftLimits, IsWithinSoftLimits)
     ASSERT_EQ(this->encoder.isWithinSoftLimitsIU(iu), expected);
 }
 
-INSTANTIATE_TEST_CASE_P(ParameterizedValidTarget,
+INSTANTIATE_TEST_SUITE_P(ParameterizedValidTarget,
     TestEncoderParameterizedValidTarget,
     testing::Values(std::make_tuple(4000, 4500, true),
         std::make_tuple(4000, 2000, false), std::make_tuple(46000, 40000, true),
