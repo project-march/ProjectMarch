@@ -3,8 +3,11 @@ project(march_gait_files)
 
 find_package(ament_cmake REQUIRED)
 
-install(DIRECTORY airgait-v minimal simulation_only-vi test_versions-vi training-v test_joint_gaits
-    DESTINATION share/${PROJECT_NAME}
+install(DIRECTORY
+        airgait-v airgait-vi minimal simulation_only-vi test_versions-v
+        test_versions-vi training-v training-vi test_joint_gaits
+        DESTINATION
+        share/${PROJECT_NAME}
 )
 
 ament_package()
