@@ -48,7 +48,7 @@ bool LowVoltage::getNetOperational(uint8_t netNumber)
         = this->pdo_.read8(this->netMonitoringOffsets.getLowVoltageState());
     // The last bit of the 8 bits represents net 1
     // The second to last bit of the 8 bits represents net 2
-    return ((operational.ui >> (netNumber - 1)) & 1);
+    return ((uint8_t)(operational.ui >> (netNumber - 1U)) & 1U);
 }
 
 void LowVoltage::setNetOnOff(bool /* on */, uint8_t /* netNumber */)

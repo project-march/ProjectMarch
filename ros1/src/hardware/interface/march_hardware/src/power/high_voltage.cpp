@@ -47,7 +47,7 @@ bool HighVoltage::getNetOperational(uint8_t netNumber)
         = this->pdo_.read8(this->netMonitoringOffsets.getHighVoltageState());
     // The first bit of the 8 bits represents net 1 and so on till the last 8th
     // bit which represents net 8.
-    return ((operational.ui >> (netNumber - 1)) & 1);
+    return ((uint8_t)(operational.ui >> (netNumber - 1U)) & 1U);
 }
 
 bool HighVoltage::getOvercurrentTrigger(uint8_t netNumber)
@@ -57,7 +57,7 @@ bool HighVoltage::getOvercurrentTrigger(uint8_t netNumber)
     }
     bit8 overcurrent = this->pdo_.read8(
         this->netMonitoringOffsets.getHighVoltageOvercurrentTrigger());
-    return ((overcurrent.ui >> (netNumber - 1)) & 1);
+    return ((uint8_t)(overcurrent.ui >> (netNumber - 1U)) & 1U);
 }
 
 bool HighVoltage::getHighVoltageEnabled()
@@ -78,7 +78,7 @@ void HighVoltage::setNetOnOff(bool on, uint8_t netNumber)
     }
     uint8_t currentStateHighVoltageNets = getNetsOperational();
     bit8 highVoltageNets {};
-    highVoltageNets.ui = 1 << (netNumber - 1);
+    highVoltageNets.ui = 1U << (netNumber - 1U);
     if (on) {
         // Force bit of the respective net to one.
         highVoltageNets.ui |= currentStateHighVoltageNets;
