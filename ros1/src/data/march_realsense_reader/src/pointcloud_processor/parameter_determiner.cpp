@@ -71,6 +71,7 @@ bool HullParameterDeterminer::determineParameters(
     time_t start_determine_parameters = clock();
 
     ROS_DEBUG("Determining parameters with hull parameter determiner");
+
     hull_vector_ = hull_vector;
     selected_gait_ = selected_gait;
     gait_parameters_ = gait_parameters;
