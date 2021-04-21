@@ -12,6 +12,24 @@ HighVoltage::HighVoltage(PdoSlaveInterface& pdo,
 {
 }
 
+bool HighVoltage::isValidHighVoltageNetNumber(uint8_t netNumber)
+{
+    return netNumber >= MIN_NET_NUMBER && netNumber <= MAX_NET_NUMBER;
+}
+
+void HighVoltage::throwInvalidNetArgument(
+    uint8_t netNumber, const char* caller_name)
+{
+    ROS_FATAL_THROTTLE(2,
+        "Can't execute call at %s for net %d because there are only %d high "
+        "voltage nets.",
+        caller_name, netNumber, MAX_NET_NUMBER);
+
+    throw std::invalid_argument("High voltage net number should be between "
+        + std::to_string(MIN_NET_NUMBER) + " and "
+        + std::to_string(MAX_NET_NUMBER) + ".");
+}
+
 float HighVoltage::getNetCurrent()
 {
     bit32 current = this->pdo_.read32(
@@ -19,15 +37,12 @@ float HighVoltage::getNetCurrent()
     return current.f;
 }
 
-bool HighVoltage::getNetOperational(int netNumber)
+bool HighVoltage::getNetOperational(uint8_t netNumber)
 {
-    if (netNumber < 1 || netNumber > 8) {
-        ROS_ERROR_THROTTLE(2,
-            "Can't get operational state from high voltage net %d, there are "
-            "only 8 high voltage nets",
-            netNumber);
-        throw std::invalid_argument("Only high voltage net 1 and 8 exist");
+    if (not isValidHighVoltageNetNumber(netNumber)) {
+        throwInvalidNetArgument(netNumber);
     }
+
     bit8 operational
         = this->pdo_.read8(this->netMonitoringOffsets.getHighVoltageState());
     // The first bit of the 8 bits represents net 1 and so on till the last 8th
@@ -35,14 +50,10 @@ bool HighVoltage::getNetOperational(int netNumber)
     return ((operational.ui >> (netNumber - 1)) & 1);
 }
 
-bool HighVoltage::getOvercurrentTrigger(int netNumber)
+bool HighVoltage::getOvercurrentTrigger(uint8_t netNumber)
 {
-    if (netNumber < 1 || netNumber > 8) {
-        ROS_FATAL_THROTTLE(2,
-            "Can't get overcurrent trigger from high voltage net %d, there are "
-            "only 8 high voltage nets",
-            netNumber);
-        throw std::exception();
+    if (not isValidHighVoltageNetNumber(netNumber)) {
+        throwInvalidNetArgument(netNumber);
     }
     bit8 overcurrent = this->pdo_.read8(
         this->netMonitoringOffsets.getHighVoltageOvercurrentTrigger());
@@ -56,15 +67,12 @@ bool HighVoltage::getHighVoltageEnabled()
     return highVoltageEnabled.ui;
 }
 
-void HighVoltage::setNetOnOff(bool on, int netNumber)
+void HighVoltage::setNetOnOff(bool on, uint8_t netNumber)
 {
-    if (netNumber < 1 || netNumber > 8) {
-        ROS_ERROR_THROTTLE(2,
-            "Can't turn high voltage net %d on, only high voltage net 1 to 8 "
-            "exist",
-            netNumber);
-        throw std::invalid_argument("Only high voltage net 1 to 8 exist");
+    if (not isValidHighVoltageNetNumber(netNumber)) {
+        throwInvalidNetArgument(netNumber);
     }
+
     if (on && getNetOperational(netNumber)) {
         ROS_WARN_THROTTLE(2, "High voltage net %d is already on", netNumber);
     }
