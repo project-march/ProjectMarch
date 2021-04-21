@@ -468,7 +468,8 @@ bool IMotionCube::verifySetup(SdoSlaveInterface& sdo)
         = this->computeSWCheckSum(start_address, end_address);
     // set parameters to compute checksum on the imc
     const int checksum_setup = sdo.write<uint32_t>(
-        /*index=*/0x2069, /*sub=*/0, (end_address << 16U) | start_address);
+        /*index=*/0x2069, /*sub=*/0,
+        (uint32_t)(end_address << 16U) | start_address);
 
     uint16_t imc_value;
     int value_size = sizeof(imc_value);
@@ -501,7 +502,7 @@ void IMotionCube::downloadSetupToDrive(SdoSlaveInterface& sdo)
                 = std::stoi(token, /*__idx=*/nullptr, /*__base=*/16);
             const uint16_t mem_setup = 9; // send 16-bits and auto increment
             result = (uint32_t)sdo.write<uint32_t>(/*index=*/0x2064, /*sub=*/0,
-                (mem_location << 16U)
+                (uint32_t)(mem_location << 16U)
                     | mem_setup); // write the write-configuration
             final_result |= result;
         } else {
