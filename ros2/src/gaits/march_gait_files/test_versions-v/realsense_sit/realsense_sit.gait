@@ -1,8 +1,0 @@
-name: realsense_sit
-subgaits:
-  sit_down:
-    to: sit_home
-  sit_home:
-    to: end
-  start:
-    to: sit_down
