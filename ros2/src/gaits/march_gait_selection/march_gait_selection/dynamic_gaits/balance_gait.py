@@ -1,15 +1,17 @@
 from copy import deepcopy
 from threading import Event
-from typing import Tuple, Optional
+
+from march_gait_selection.state_machine.gait_update import GaitUpdate
+from march_gait_selection.state_machine.gait_interface import GaitInterface
+from march_gait_selection.state_machine.trajectory_scheduler import TrajectoryCommand
+from march_shared_msgs.srv import CapturePointPose, GetMoveItTrajectory
 from march_utility.gait.gait import Gait
+from march_utility.utilities.duration import Duration
 from rclpy import Future
 from rclpy.node import Node
-from march_utility.utilities.duration import Duration
+from rclpy.time import Time
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Header
-
-from march_gait_selection.state_machine.gait_interface import GaitInterface
-from march_shared_msgs.srv import CapturePointPose, GetMoveItTrajectory
 from trajectory_msgs.msg import JointTrajectory
 
 
@@ -29,7 +31,10 @@ class BalanceGait(GaitInterface):
 
         self._current_subgait = None
         self._current_subgait_duration = Duration(0)
-        self._time_since_start = Duration(0)
+
+        self._start_time = None
+        self._end_time = None
+        self._current_time = None
 
         self.capture_point_event = Event()
         self.capture_point_result = None
@@ -204,35 +209,44 @@ class BalanceGait(GaitInterface):
     def final_position(self):
         return self._default_walk.final_position
 
-    def start(self) -> JointTrajectory:
+    def start(self, current_time: Time) -> GaitUpdate:
+        self._current_time = current_time
         self._current_subgait = self._default_walk.graph.start_subgaits()[0]
-        self._time_since_start = Duration(0)
-        trajectory = self.get_joint_trajectory_msg(self._current_subgait)
-        time_from_start = trajectory.points[-1].time_from_start
-        self._current_subgait_duration = Duration.from_msg(time_from_start)
-        return trajectory
+        return GaitUpdate.should_schedule(self._new_trajectory_command())
 
-    def update(self, elapsed_time: Duration) -> Tuple[Optional[JointTrajectory], bool]:
-        self._time_since_start += elapsed_time
-        if self._time_since_start < self._current_subgait_duration:
-            return None, False
+    def update(self, current_time: Time) -> GaitUpdate:
+        self._current_time = current_time
+        if self._current_time < self._end_time or self._constructing:
+            return GaitUpdate.empty()
         else:
-            if self._constructing:
-                return None, False
             next_subgait = self._default_walk.graph[
                 (self._current_subgait, self._default_walk.graph.TO)
             ]
 
             if next_subgait == self._default_walk.graph.END:
-                return None, True
+                return GaitUpdate.finished()
             self._constructing = True
-            trajectory = self.get_joint_trajectory_msg(next_subgait)
             self._current_subgait = next_subgait
-            time_from_start = trajectory.points[-1].time_from_start
-            self._current_subgait_duration = Duration.from_msg(time_from_start)
-            self._time_since_start = Duration(0)
+            command = self._new_trajectory_command()
             self._constructing = False
-            return trajectory, False
+            return GaitUpdate.should_schedule(command)
+
+    def _new_trajectory_command(self) -> TrajectoryCommand:
+        """Update the trajectory values and generate a new trajectory command.
+
+        :return Return a TrajectoryCommand for the next subgait.
+        """
+        trajectory = self.get_joint_trajectory_msg(self._current_subgait)
+        time_from_start = trajectory.points[-1].time_from_start
+        self._current_subgait_duration = Duration.from_msg(time_from_start)
+        self._start_time = self._current_time
+        self._end_time = self._start_time + self._current_subgait_duration
+        return TrajectoryCommand(
+            trajectory,
+            self._current_subgait_duration,
+            self.subgait_name,
+            self._start_time,
+        )
 
     def end(self):
         self._current_subgait = None
