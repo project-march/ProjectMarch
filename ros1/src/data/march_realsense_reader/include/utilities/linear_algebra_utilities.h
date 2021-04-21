@@ -77,10 +77,9 @@ double distancePointToLine(
 }
 
 // Return true if the z coordinate of point1 is lower then that of point2
-inline bool pointIsLower(
-      pcl::PointNormal point1, pcl::PointNormal point2)
+inline bool pointIsLower(pcl::PointNormal point1, pcl::PointNormal point2)
 {
-  return point1.z < point2.z;
+    return point1.z < point2.z;
 }
 
 } // namespace linear_algebra_utilities
