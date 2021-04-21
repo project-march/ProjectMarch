@@ -45,15 +45,25 @@ void HullParameterDeterminer::readParameters(
         = config.parameter_determiner_foot_locations;
     hull_dimension = config.hull_dimension;
 
-    min_x_stairs = config.parameter_determiner_stairs_locations_min_x;
-    max_x_stairs = config.parameter_determiner_stairs_locations_max_x;
-    min_z_stairs = config.parameter_determiner_stairs_locations_min_z;
-    max_z_stairs = config.parameter_determiner_stairs_locations_max_z;
+    min_x_stairs = (float) config.parameter_determiner_stairs_locations_min_x;
+    max_x_stairs = (float) config.parameter_determiner_stairs_locations_max_x;
+    min_z_stairs = (float) config.parameter_determiner_stairs_locations_min_z;
+    max_z_stairs = (float) config.parameter_determiner_stairs_locations_max_z;
 
     general_most_desirable_location_is_mid
         = config.parameter_determiner_most_desirable_loc_is_mid;
     general_most_desirable_location_is_small
         = config.parameter_determiner_most_desirable_loc_is_small;
+
+    max_search_area = (float) config.parameter_determiner_ramp_max_search_area;
+    min_search_area = (float) config.parameter_determiner_ramp_min_search_area;
+    max_distance_to_line = config.parameter_determiner_ramp_max_distance_to_line;
+    x_flat = config.parameter_determiner_ramp_x_flat;
+    z_flat = config.parameter_determiner_ramp_z_flat;
+    x_steep = config.parameter_determiner_ramp_x_steep;
+    z_steep = config.parameter_determiner_ramp_z_steep;
+    y_location = config.parameter_determiner_ramp_y_location;
+    max_distance_to_line = (float) config.parameter_determiner_ramp_max_distance_to_line;
 
     debugging_ = config.debug;
 }
