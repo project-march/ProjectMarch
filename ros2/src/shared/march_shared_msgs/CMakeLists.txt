@@ -54,6 +54,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/PressureSolesData.msg"
   "srv/CapturePointPose.srv"
   "srv/ContainsGait.srv"
+  "srv/PublishTestDataset.srv"
   "srv/PossibleGaits.srv"
   "srv/SetGaitVersion.srv"
   "srv/SetObstacleSizeRampLike.srv"

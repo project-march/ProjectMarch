@@ -10,7 +10,7 @@
 #include <pointcloud_processor/parameter_determiner.h>
 #include <pointcloud_processor/preprocessor.h>
 #include <pointcloud_processor/region_creator.h>
-#include <ros/ros.h>
+
 #include <sensor_msgs/PointCloud2.h>
 #include <string>
 #include <visualization_msgs/MarkerArray.h>

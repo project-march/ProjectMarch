@@ -55,6 +55,7 @@ add_service_files(
     GetParamStringList.srv
     GetPossibleComLevels.srv
     PossibleGaits.srv
+    PublishTestDataset.srv
     SetGaitVersion.srv
     SetObstacleSizeRampLike.srv
     SetObstacleSizeBlockLike.srv

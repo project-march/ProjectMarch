@@ -35,6 +35,8 @@
     <arg name="realsense" default="false" doc="Launches the realsense reader node when true."/>
     <arg name="realsense_simulation" default="$(arg realsense)"
          doc="Whether the simulation camera or the physical camera should be used"/>
+    <arg name="realsense_test_data" default="$(arg realsense)" doc="Whether the node which can publish pointclouds
+    from datasets should be started."/>
     <include file="$(find march_launch)/launch/realsense_camera.launch"
              if="$(eval (not realsense_simulation) and realsense)" pass_all_args="true"/>
     <arg name="data_collector" default="false" doc="Launches the data collector when true."/>
@@ -90,6 +92,9 @@
     <group ns="march">
         <include file="$(find march_realsense_reader)/launch/realsense_reader.launch"
                  if="$(arg realsense)"/>
+
+        <include file="$(find march_realsense_test_publisher)/launch/realsense_test_publisher.launch"
+                 if="$(arg realsense_test_data)"/>
 
         <include file="$(find march_data_collector)/launch/march_data_collector.launch" if="$(eval data_collector or balance)">
             <arg name="pressure_soles" value="$(arg pressure_soles)"/>

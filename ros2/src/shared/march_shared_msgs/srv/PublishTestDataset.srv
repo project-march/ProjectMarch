@@ -1,0 +1,17 @@
+# This enum is used for specifying to which mode of publishing the test publisher should switch.
+# All supported modes should be specified here
+uint8 START=0
+uint8 NEXT=1
+uint8 STOP=2
+uint8 CUSTOM=3
+uint8 selected_mode
+
+# This enum is used to specify the front or back camera
+uint8 FRONT=0
+uint8 BACK=1
+uint8 selected_camera
+
+# A string specifying the name of the pointcloud when CUSTOM is the selected mode.
+string pointcloud_file_name
+---
+bool success
