@@ -5,7 +5,8 @@ namespace march
 {
 namespace error
 {
-const char* IMOTIONCUBE_MOTION_ERRORS[IMOTIONCUBE_MOTION_ERRORS_SIZE] = {
+
+const std::array<std::string, IMOTIONCUBE_MOTION_ERRORS_SIZE> IMOTIONCUBE_MOTION_ERRORS = {
   "EtherCAT communication error. ",
   "Short-circuit. ",
   "Invalid setup (EEPROM) data. ",
@@ -24,7 +25,7 @@ const char* IMOTIONCUBE_MOTION_ERRORS[IMOTIONCUBE_MOTION_ERRORS_SIZE] = {
   "Drive disabled (Emergency button connector not shorted). ",
 };
 
-const char* IMOTIONCUBE_DETAILED_MOTION_ERRORS[IMOTIONCUBE_DETAILED_MOTION_ERRORS_SIZE] = {
+const std::array<std::string, IMOTIONCUBE_DETAILED_MOTION_ERRORS_SIZE> IMOTIONCUBE_DETAILED_MOTION_ERRORS = {
   "TML stack overflow. ",
   "TML stack underflow. ",
   "Homing not available. ",
@@ -36,7 +37,7 @@ const char* IMOTIONCUBE_DETAILED_MOTION_ERRORS[IMOTIONCUBE_DETAILED_MOTION_ERROR
   "Invalid S-curve profile. ",
 };
 
-const char* IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS[IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS_SIZE] = {
+const std::array<std::string, IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS_SIZE> IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS = {
   "BiSS data CRC error. ",
   "BiSS data warning bit is set. ",
   "BiSS data error bit is set. ",
@@ -46,7 +47,7 @@ const char* IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS[IMOTIONCUBE_SECOND_DETAILE
   "Position wraparound. The position 2^31 was exceeded. ",
 };
 
-const char* ODRIVE_AXIS_ERRORS[ODRIVE_AXIS_ERRORS_SIZE] = {
+const std::array<std::string, ODRIVE_AXIS_ERRORS_SIZE> ODRIVE_AXIS_ERRORS = {
     "Invalid state. ",
     "Watchdog timer expired. ",
     "Min endstop pressed. ",
@@ -57,7 +58,7 @@ const char* ODRIVE_AXIS_ERRORS[ODRIVE_AXIS_ERRORS_SIZE] = {
     "Invalid encoder chosen. ",
 };
 
-const char* ODRIVE_MOTOR_ERRORS[ODRIVE_MOTOR_ERRORS_SIZE] = {
+const std::array<std::string, ODRIVE_MOTOR_ERRORS_SIZE> ODRIVE_MOTOR_ERRORS = {
     "Phase resistance out of range. ",
     "Phase inductance out of range. ",
     "DRV fault. ",
@@ -86,7 +87,7 @@ const char* ODRIVE_MOTOR_ERRORS[ODRIVE_MOTOR_ERRORS_SIZE] = {
     "Controller initializing. ",
 };
 
-const char* ODRIVE_ENCODER_ERRORS[ODRIVE_ENCODER_ERRORS_SIZE] = {
+const std::array<std::string, ODRIVE_ENCODER_ERRORS_SIZE> ODRIVE_ENCODER_ERRORS = {
     "Unstable gain. ",
     "CPR polepairs mismatch. ",
     "No response. ",
@@ -100,11 +101,11 @@ const char* ODRIVE_ENCODER_ERRORS[ODRIVE_ENCODER_ERRORS_SIZE] = {
     "Infeasible IO num. ",
 };
 
-const char* ODRIVE_ENCODER_MANAGER_ERRORS[ODRIVE_ENCODER_MANAGER_ERRORS_SIZE] = {
+const std::array<std::string, ODRIVE_ENCODER_MANAGER_ERRORS_SIZE> ODRIVE_ENCODER_MANAGER_ERRORS = {
   "Error. "
 };
 
-const char* ODRIVE_CONTROLLER_ERRORS[ODRIVE_CONTROLLER_ERRORS_SIZE] = {
+const std::array<std::string, ODRIVE_CONTROLLER_ERRORS_SIZE> ODRIVE_CONTROLLER_ERRORS = {
     "Overspeed. ",
     "Invalid input mode. ",
     "Unstable gain. ",
@@ -118,49 +119,49 @@ void addErrorToDescription(size_t index, ErrorRegister error_register, std::stri
   switch (error_register)
   {
     case ErrorRegister::IMOTIONCUBE_MOTION_ERROR:
-      if (index < IMOTIONCUBE_MOTION_ERRORS_SIZE)
+      if (index < IMOTIONCUBE_MOTION_ERRORS.size())
       {
           description += IMOTIONCUBE_MOTION_ERRORS[index];
       }
       break;
     case ErrorRegister::IMOTIONCUBE_DETAILED_MOTION_ERROR:
-      if (index < IMOTIONCUBE_DETAILED_MOTION_ERRORS_SIZE)
+      if (index < IMOTIONCUBE_DETAILED_MOTION_ERRORS.size())
       {
         description += IMOTIONCUBE_DETAILED_MOTION_ERRORS[index];
       }
       break;
     case ErrorRegister::IMOTIONCUBE_SECOND_DETAILED_MOTION_ERROR:
-      if (index < IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS_SIZE)
+      if (index < IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS.size())
       {
         description += IMOTIONCUBE_SECOND_DETAILED_MOTION_ERRORS[index];
       }
       break;
     case ErrorRegister::ODRIVE_AXIS_ERROR:
-      if (index < ODRIVE_AXIS_ERRORS_SIZE)
+      if (index < ODRIVE_AXIS_ERRORS.size())
       {
         description += ODRIVE_AXIS_ERRORS[index];
       }
       break;
     case ErrorRegister::ODRIVE_MOTOR_ERROR:
-      if (index < ODRIVE_MOTOR_ERRORS_SIZE)
+      if (index < ODRIVE_MOTOR_ERRORS.size())
       {
         description += ODRIVE_MOTOR_ERRORS[index];
       }
       break;
     case ErrorRegister::ODRIVE_ENCODER_ERROR:
-      if (index < ODRIVE_MOTOR_ERRORS_SIZE)
+      if (index < ODRIVE_MOTOR_ERRORS.size())
       {
         description += ODRIVE_ENCODER_ERRORS[index];
       }
       break;
     case ErrorRegister::ODRIVE_ENCODER_MANAGER_ERROR:
-      if (index < ODRIVE_ENCODER_MANAGER_ERRORS_SIZE)
+      if (index < ODRIVE_ENCODER_MANAGER_ERRORS.size())
       {
         description += ODRIVE_ENCODER_MANAGER_ERRORS[index];
       }
       break;
     case ErrorRegister::ODRIVE_CONTROLLER_ERROR:
-      if (index < ODRIVE_CONTROLLER_ERRORS_SIZE)
+      if (index < ODRIVE_CONTROLLER_ERRORS.size())
       {
         description += ODRIVE_CONTROLLER_ERRORS[index];
       }
