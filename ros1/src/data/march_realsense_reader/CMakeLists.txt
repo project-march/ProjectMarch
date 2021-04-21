@@ -48,7 +48,6 @@ target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 add_executable(${PROJECT_NAME}_node src/realsense_reader_node.cpp)
 add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME})
-add_dependencies(march_realsense_reader_node ${PROJECT_NAME}_gencfg)
 
 target_link_libraries(${PROJECT_NAME}_node
     ${PROJECT_NAME}
@@ -88,3 +87,7 @@ install(TARGETS ${PROJECT_NAME}
 install(DIRECTORY launch
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
+
+# The node has to be build, before this line is reached
+add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_gencfg)
+
