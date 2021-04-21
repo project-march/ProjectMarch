@@ -32,7 +32,7 @@ public:
 
     std::string getSide();
 
-    const unsigned int PRESSURE_SOLE_DATA_LENGTH = 8;
+    constexpr static unsigned int PRESSURE_SOLE_DATA_LENGTH = 8;
 
 private:
     const uint8_t byte_offset_;
