@@ -3,7 +3,8 @@ Checks:     -*,
             portability-*,
             bugprone-*,
             cert-*,
-            -cert-err58-cpp
+            -cert-err58-cpp,
+            clang-analyzer-*
 WarningsAsErrors: '*'
 HeaderFilterRegex: ''
 FormatStyle:     webkit

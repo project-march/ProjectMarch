@@ -90,11 +90,14 @@ void CHullFinder::readYaml()
 {
     if (YAML::Node c_hull_finder_parameters = config_tree_["c_hull_finder"]) {
         convex = yaml_utilities::grabParameter<bool>(
-            c_hull_finder_parameters, "convex");
+            c_hull_finder_parameters, "convex")
+                     .value();
         alpha = yaml_utilities::grabParameter<double>(
-            c_hull_finder_parameters, "alpha");
+            c_hull_finder_parameters, "alpha")
+                    .value();
         hull_dimension = yaml_utilities::grabParameter<int>(
-            c_hull_finder_parameters, "hull_dimension");
+            c_hull_finder_parameters, "hull_dimension")
+                             .value();
     } else {
         ROS_ERROR("'c_hull_finder' parameters not found in parameter file");
     }
