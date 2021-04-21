@@ -63,7 +63,7 @@ void HullParameterDeterminer::readParameters(
     z_flat = config.parameter_determiner_ramp_z_flat;
     x_steep = config.parameter_determiner_ramp_x_steep;
     z_steep = config.parameter_determiner_ramp_z_steep;
-    y_location = (float) config.parameter_determiner_ramp_y_location;
+    y_location = (float)config.parameter_determiner_ramp_y_location;
     max_distance_to_line
         = (float)config.parameter_determiner_ramp_max_distance_to_line;
 

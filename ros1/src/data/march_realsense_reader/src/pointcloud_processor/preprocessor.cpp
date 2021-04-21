@@ -117,7 +117,7 @@ void NormalsPreprocessor::readParameters(
 {
     // Downsampling parameters
     voxel_grid_filter = config.preprocessor_downsampling_voxel_grid_filter;
-    leaf_size = (float) config.preprocessor_downsampling_leaf_size;
+    leaf_size = (float)config.preprocessor_downsampling_leaf_size;
     random_filter = config.preprocessor_downsampling_random_filter;
     remaining_points = config.preprocessor_downsampling_remainig_points;
 
