@@ -4,7 +4,6 @@
 #include "rclcpp/rclcpp.hpp"
 #include <gtest/gtest.h>
 
-// NOLINT(hicpp-member-init)
 class FakeTemperatureDataNodeTest : public testing::Test {
 protected:
     void SetUp() override
@@ -21,7 +20,7 @@ protected:
         rclcpp::shutdown();
     }
 
-    FakeTemperatureDataNode* node;
+    FakeTemperatureDataNode* node {};
 };
 
 TEST_F(FakeTemperatureDataNodeTest, test_default_range)
