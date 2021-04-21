@@ -1,3 +1,7 @@
+from attr import dataclass
+from march_utility.gait.subgait import Subgait
+from march_utility.utilities.duration import Duration
+from rclpy.time import Time
 from std_msgs.msg import Header
 from actionlib_msgs.msg import GoalID
 from march_shared_msgs.msg import (
@@ -6,6 +10,32 @@ from march_shared_msgs.msg import (
     FollowJointTrajectoryActionResult,
     FollowJointTrajectoryResult,
 )
+from trajectory_msgs.msg import JointTrajectory
+
+
+@dataclass
+class TrajectoryCommand:
+    """A container for scheduling trajectories.
+
+    It contains besides the trajectory to be scheduled some additional information
+    about the scheduled trajectory, such as the subgait name, duration and start time
+    of the trajectory.
+    """
+
+    trajectory: JointTrajectory
+    duration: Duration
+    name: str
+    start_time: Time
+
+    @staticmethod
+    def from_subgait(subgait: Subgait, start_time: Time):
+        """Create a TrajectoryCommand from a subgait."""
+        return TrajectoryCommand(
+            subgait.to_joint_trajectory_msg(),
+            subgait.duration,
+            subgait.subgait_name,
+            start_time,
+        )
 
 
 class TrajectoryScheduler(object):
@@ -15,7 +45,6 @@ class TrajectoryScheduler(object):
     def __init__(self, node):
         self._failed = False
         self._node = node
-        self._last_goal = None
 
         # Temporary solution to communicate with ros1 action server, should
         # be updated to use ros2 action implementation when simulation is
@@ -39,20 +68,34 @@ class TrajectoryScheduler(object):
             qos_profile=5,
         )
 
-    def schedule(self, trajectory):
+    def schedule(self, command: TrajectoryCommand):
         """Schedules a new trajectory.
-        :param JointTrajectory trajectory: a trajectory for all joints to follow
+        :param TrajectoryCommand command: The trajectory command to schedule
         """
         self._failed = False
-        stamp = self._node.get_clock().now().to_msg()
-        goal = FollowJointTrajectoryGoal(trajectory=trajectory)
+        stamp = command.start_time.to_msg()
+        command.trajectory.header.stamp = stamp
+        goal = FollowJointTrajectoryGoal(trajectory=command.trajectory)
         self._trajectory_goal_pub.publish(
             FollowJointTrajectoryActionGoal(
                 header=Header(stamp=stamp), goal_id=GoalID(stamp=stamp), goal=goal
             )
         )
 
-    def failed(self):
+        info_log_message = f"Scheduling {command.name}"
+        debug_log_message = f"Subgait {command.name} starts "
+        if self._node.get_clock().now() < command.start_time:
+            time_difference = Duration.from_ros_duration(
+                command.start_time - self._node.get_clock().now()
+            )
+            debug_log_message += f"in {round(time_difference.seconds, 3)}s"
+        else:
+            debug_log_message += "now"
+
+        self._node.get_logger().info(info_log_message)
+        self._node.get_logger().debug(debug_log_message)
+
+    def failed(self) -> bool:
         return self._failed
 
     def reset(self):

@@ -122,3 +122,6 @@ class Duration(ROSDuration):
     def __deepcopy__(self, _: Any) -> Duration:
         """Create a deepcopy of the Duration."""
         return Duration(nanoseconds=self.nanoseconds)
+
+    def __str__(self):
+        return f"{round(self.seconds, 4)}s"
