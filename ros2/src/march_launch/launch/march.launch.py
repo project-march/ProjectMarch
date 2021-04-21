@@ -135,14 +135,14 @@ def generate_launch_description():
                 name="first_subgait_delay",
                 default_value="0.2",
                 description="Duration to wait before starting first subgait."
-                            "If 0 then the first subgait is started immediately,"
-                            "dropping the first setpoint in the process.",
+                "If 0 then the first subgait is started immediately,"
+                "dropping the first setpoint in the process.",
             ),
             DeclareLaunchArgument(
                 name="early_schedule_duration",
                 default_value="0.2",
                 description="Duration to schedule next subgait early. If 0 then the"
-                            "next subgait is never scheduled early.",
+                "next subgait is never scheduled early.",
             ),
             # FAKE SENSOR DATA ARGUMENTS
             DeclareLaunchArgument(
@@ -212,7 +212,7 @@ def generate_launch_description():
                     ("gait_package", gait_package),
                     ("balance", balance),
                     ("first_subgait_delay", first_subgait_delay),
-                    ("early_schedule_duration", early_schedule_duration)
+                    ("early_schedule_duration", early_schedule_duration),
                 ],
             ),
             # Safety

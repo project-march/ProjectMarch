@@ -169,9 +169,9 @@ bool RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
             plane_coefficients_vector, hull_vector, polygon_vector);
 
     if (not hull_finding_was_successful) {
-      res.error_message = "Hull finding was unsuccessful, see debug output "
-                          "for more information";
-      return false;
+        res.error_message = "Hull finding was unsuccessful, see debug output "
+                            "for more information";
+        return false;
     }
 
     if (debugging_) {
@@ -195,9 +195,9 @@ bool RealSenseReader::processPointcloud(const PointCloud::Ptr& pointcloud,
         return false;
     }
     if (debugging_) {
-      ROS_DEBUG("Done determining parameters, now publishing a marker to "
-                "/camera/foot_locations_marker_array");
-      publishParameterDeterminerMarkerArray();
+        ROS_DEBUG("Done determining parameters, now publishing a marker to "
+                  "/camera/foot_locations_marker_array");
+        publishParameterDeterminerMarkerArray();
     }
 
     res.gait_parameters = *gait_parameters;
