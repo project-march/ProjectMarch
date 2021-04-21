@@ -54,9 +54,9 @@ void RegionGrower::readParameters(
     min_cluster_size = config.region_creator_region_growing_min_cluster_size;
     max_cluster_size = config.region_creator_region_growing_max_cluster_size;
     smoothness_threshold
-        = (float) config.region_creator_region_growing_smoothness_threshold;
+        = (float)config.region_creator_region_growing_smoothness_threshold;
     curvature_threshold
-        = (float) config.region_creator_region_growing_curvature_threshold;
+        = (float)config.region_creator_region_growing_curvature_threshold;
 
     debugging_ = config.debug;
 }
