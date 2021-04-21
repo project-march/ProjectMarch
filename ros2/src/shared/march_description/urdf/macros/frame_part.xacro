@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot  xmlns:xacro="http://www.ros.org/wiki/xacro">
     <xacro:macro name="frame_part"
-                 params="name reflect length direction collision_origin visual_origin:=0 mesh:=0 com:=0 mass:=0 inertia:=0 scale:='1 1 1'">
+                 params="name reflect length direction collision_origin visual_origin:=0 visual_rpy:=0 mesh:=0 com:=0 mass:=0 inertia:=0 scale:='1 1 1'">
         <xacro:if value="${direction == 'x'}">
             <xacro:property name="size" value="${length} ${width} ${width}"/>
             <xacro:property name="rpy" value="0 0 0"/>
@@ -14,6 +14,9 @@
             <xacro:property name="size" value="${width} ${width} ${length}"/>>
             <xacro:property name="rpy" value="0 0 ${pi}"/>
         </xacro:if>
+        <xacro:unless value="${visual_rpy == 0}">
+            <xacro:property name="rpy" value="${visual_rpy}"/>
+        </xacro:unless>
 
         <link name="${name}">
             <xacro:unless value="${visual_origin == 0}">

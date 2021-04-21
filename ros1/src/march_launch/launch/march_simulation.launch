@@ -38,5 +38,7 @@
         <arg name="configuration" value="simulation"/>
     </include>
 
-
+    <group ns="march">
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="rob_st_pub"/>
+    </group>
 </launch>

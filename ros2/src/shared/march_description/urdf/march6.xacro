@@ -1,13 +1,4 @@
 <?xml version="1.0"?>
-
-<!--\________________________________________________________/-->
-<!--                                                          -->
-<!--                Fred Het Exoskelet                        -->
-<!--                                                          -->
-<!--\________________________________________________________/-->
-<!-- Up to date -->
-        <!-- lengths, meshes -->
-
 <!-- Revolute-Revolute Manipulator -->
 <robot name="march" xmlns:xacro="http://www.ros.org/wiki/xacro">
     <!-- Switch between airgaiting or standing on the ground-->
@@ -16,12 +7,12 @@
     the hover_height to 0.0. Set ground_gait to true to ground gait in simulation.-->
     <xacro:arg name="ground_gait" default="false"/>
 
-<!--    Switch between using the physical camera and the simulation camera -->
-<!--    If set to 'true', no physical camera is needed -->
-<!--    If this value is set to 'false', the plugin will not be started and the topics -->
-<!--    published by the real camera will be used. -->
-<!--    In both these situations the camera will still be visible and placed in the urdf,-->
-<!--    to be used for the transformations.-->
+    <!--    Switch between using the physical camera and the simulation camera -->
+    <!--    If set to 'true', no physical camera is needed -->
+    <!--    If this value is set to 'false', the plugin will not be started and the topics -->
+    <!--    published by the real camera will be used. -->
+    <!--    In both these situations the camera will still be visible and placed in the urdf,-->
+    <!--    to be used for the transformations.-->
     <xacro:arg name="realsense_simulation" default="false"/>
 
     <xacro:unless value="$(arg ground_gait)">
@@ -36,196 +27,115 @@
         </gazebo>
     </xacro:if>
 
+    <xacro:arg name="configuration" default="exoskeleton"/>
+    <xacro:property name="configuration" value="$(arg configuration)"/>
 
-    <!-- TODO Change max efforts and velocity for the MARCH VI -->
-    <!-- The max effort of the rotary joints is lower then the value corresponding to 25A, because short-circuit errors
-    have occured while applying the theoretical max effort for a long time. -->
-    <xacro:arg name="max_effort_rotary" default="18000.0" /> <!-- TODO -->
-    <xacro:arg name="max_effort_linear" default="22932.0" />  <!-- = 28 A --> <!-- TODO -->
-    <xacro:property name="max_effort_rotary" value="$(arg max_effort_rotary)" /> <!-- TODO -->
-    <xacro:property name="max_effort_linear" value="$(arg max_effort_linear)" /> <!-- TODO -->
+    <!-- Include all macro files    -->
+    <xacro:include filename="macros/safety_limits.xacro"/>
+    <xacro:include filename="macros/pressure_sole.xacro"/>
+    <xacro:include filename="macros/frame_part.xacro"/>
+    <xacro:include filename="macros/joint.xacro"/>
 
-    <!-- Values for the safety limits, see https://wiki.ros.org/pr2_controller_manager/safety_limits -->
-    <xacro:arg name="k_velocity_value_hfe" default="20000.0" /> <!-- TODO -->
-    <xacro:arg name="k_velocity_value_kfe" default="20000.0" /> <!-- TODO -->
-    <xacro:arg name="k_velocity_value_haa" default="20000.0" /> <!-- TODO -->
-    <xacro:arg name="k_velocity_value_adpf" default="20000.0" /> <!-- TODO -->
-    <xacro:property name="k_velocity_value_hfe" value="$(arg k_velocity_value_hfe)" /> <!-- TODO -->
-    <xacro:property name="k_velocity_value_kfe" value="$(arg k_velocity_value_kfe)" /> <!-- TODO -->
-    <xacro:property name="k_velocity_value_haa" value="$(arg k_velocity_value_haa)" /> <!-- TODO -->
-    <xacro:property name="k_velocity_value_adpf" value="$(arg k_velocity_value_adpf)" /> <!-- TODO -->
 
-    <xacro:arg name="k_position_value_hfe" default="14.88" /> <!-- TODO -->
-    <xacro:arg name="k_position_value_kfe" default="14.88" /> <!-- TODO -->
-    <xacro:arg name="k_position_value_haa" default="4.0" /> <!-- TODO -->
-    <xacro:arg name="k_position_value_adpf" default="5.0" /> <!-- TODO -->
-    <xacro:property name="k_position_value_hfe" value="$(arg k_position_value_hfe)" /> <!-- TODO -->
-    <xacro:property name="k_position_value_kfe" value="$(arg k_position_value_kfe)" /> <!-- TODO -->
-    <xacro:property name="k_position_value_haa" value="$(arg k_position_value_haa)" /> <!-- TODO -->
-    <xacro:property name="k_position_value_adpf" value="$(arg k_position_value_adpf)" /> <!-- TODO -->
+    <!-- Add yaml files with properties -->
+    <xacro:property name="config_yaml_file"
+                    value="properties/march6.yaml"/>
+    <xacro:property name="properties" value="${load_yaml(config_yaml_file)}"/>
+    <xacro:property name="joint_limits" value="${properties['joint_limits']}"/>
+    <xacro:property name="safety_values"
+                    value="${properties['safety'][configuration]}"/>
+    <xacro:property name="inertia" value="${properties['inertia']}"/>
+    <xacro:property name="dimensions" value="${properties['dimensions']}"/>
+
+    <xacro:property name="rotary_reduction" value="101"/>
+    <xacro:property name="linear_reduction" value="200"/>
+
 
     <!-- Constants for robot dimensions -->
-    <!-- TODO Change masses for the MARCH VI -->
     <!-- Masses determined in Catia, see https://confluence.projectmarch.nl:8443/display/51/URDF+description -->
-    <xacro:property name="width" value="0.05"/> <!-- Square dimensions (widthxwidth) of beams -->
+    <xacro:property name="width"
+                    value="0.05"/> <!-- Square dimensions (widthxwidth) of beams -->
 
-    <xacro:property name="hip_base_height" value="0.145"/>
-    <xacro:property name="hip_base_mass" value="8.686"/> <!-- TODO -->
+    <xacro:property name="hip_base_height" value="${dimensions['hip_base']['length']}"/>
+    <xacro:property name="hip_base_mass" value="${dimensions['hip_base']['mass']}"/>
     <!-- mass = Hip base + HAA actuators -->
 
-    <xacro:property name="hip_aa_frame_height" value="0.151"/>
-    <xacro:property name="hip_aa_frame_width" value="0.1605"/>
-    <xacro:property name="hip_aa_mass" value="2.982"/> <!-- TODO -->
+    <xacro:property name="hip_aa_frame_height"
+                    value="${dimensions['hip_aa_side']['length']}"/>
+    <xacro:property name="hip_aa_frame_width"
+                    value="${dimensions['hip_aa_base']['length']}"/>
+    <xacro:property name="hip_aa_mass" value="${dimensions['hip_aa_side']['mass']}"/>
     <!-- mass = Moving hip -->
 
-    <xacro:property name="upper_leg_height" value="0.410"/>
-    <xacro:property name="upper_leg_offset" value="0.04"/> <!-- TODO -->
-    <xacro:property name="upper_leg_mass" value="4.995"/> <!-- TODO -->
+    <xacro:property name="upper_leg_height"
+                    value="${dimensions['upper_leg']['length']}"/>
+    <xacro:property name="upper_leg_offset"
+                    value="${dimensions['upper_leg']['offset']}"/>
+    <xacro:property name="upper_leg_mass"
+                    value="${dimensions['upper_leg']['mass']}"/>
     <!-- mass = KFE joint + HFE joint + Upper leg -->
 
-    <xacro:property name="lower_leg_height" value="0.410"/>
-    <xacro:property name="lower_leg_mass" value="4.458"/> <!-- TODO -->
+    <xacro:property name="lower_leg_height"
+                    value="${dimensions['lower_leg']['length']}"/>
+    <xacro:property name="lower_leg_mass"
+                    value="${dimensions['lower_leg']['mass']}"/>
     <!-- mass = Ankle actuator + Lower leg -->
 
-    <xacro:property name="ankle_plate_height" value="0.14567"/>
-    <xacro:property name="ankle_plate_offset" value="0.07"/>
+    <xacro:property name="ankle_plate_height"
+                    value="${dimensions['ankle_plate']['length']}"/>
+    <xacro:property name="ankle_plate_offset"
+                    value="${dimensions['ankle_plate']['offset']}"/>
 
-    <xacro:property name="foot_height_forward" value="0.184"/>
-    <xacro:property name="foot_height_backward" value="0.059"/>
-    <xacro:property name="foot_mass" value="1.821"/> <!-- TODO -->
-    <xacro:property name="foot_mu1" value="1"/> <!-- TODO -->
-    <xacro:property name="foot_mu2" value="1"/> <!-- TODO -->
+    <xacro:property name="foot_height_forward"
+                    value="${dimensions['foot']['height_forward']}"/>
+    <xacro:property name="foot_height_backward"
+                    value="${dimensions['foot']['height_backward']}"/>
+    <xacro:property name="foot_mass"
+                    value="${dimensions['foot']['mass']}"/>
+    <xacro:property name="foot_mu1" value="1"/>
+    <xacro:property name="foot_mu2" value="1"/>
     <!-- Minimum allowable depth before contact correction impulse is applied. -->
     <xacro:property name="foot_min_depth" value="0.0005"/>
     <!-- mass = Passive ankle + foot -->
 
-    <!-- TODO Change center of masses for the MARCH VI -->
     <!-- Center of Mass (CoM) of the parts -->
-    <!-- CoM has been determined in Catia, see https://confluence.projectmarch.nl:8443/display/62tech/Exo+dimensions -->
+    <!-- CoM has been determined in Catia, see https://confluence.projectmarch.nl:8443/display/51/URDF+description -->
     <!-- The Catia locations were defined in a global coordinate system with the origin at the center of the
          rotation axis of the two HFE joints. Here, the joints were all set at zero degrees. Hence, we need some
          translations to transfer it to the reference frame of each of the parts. Note that in the Catia x axis is
          the URDF y axis and the Catia y axis is the negative URDF x axis. The given CoM are for the right leg,
          the y coordinate will be inverted for the left leg. -->
-    <xacro:property name="hip_base_com_x" value="${-hip_aa_frame_width + 0.147989}"/> <!-- TODO -->
-    <xacro:property name="hip_base_com_y" value="0.016341"/> <!-- TODO -->
-    <xacro:property name="hip_base_com_z" value="0.147761"/> <!-- TODO -->
+    <xacro:property name="hip_base_com_x" value="${-hip_aa_frame_width + 0.147989}"/>
+    <xacro:property name="hip_base_com_y" value="0.016341"/>
+    <xacro:property name="hip_base_com_z" value="0.147761"/>
 
-    <xacro:property name="hip_aa_com_x" value="${-hip_aa_frame_width + 0.108094}"/> <!-- TODO -->
-    <xacro:property name="hip_aa_com_y" value="${-hip_base_height/2 - hip_aa_frame_height + 0.197758}"/> <!-- TODO -->
-    <xacro:property name="hip_aa_com_z" value="0.029507"/> <!-- TODO -->
+    <xacro:property name="hip_aa_com_x" value="${-hip_aa_frame_width + 0.108094}"/>
+    <xacro:property name="hip_aa_com_y"
+                    value="${-hip_base_height/2 - hip_aa_frame_height + 0.197758}"/>
+    <xacro:property name="hip_aa_com_z" value="0.029507"/>
 
-    <xacro:property name="upper_leg_com_x" value="0.000709"/> <!-- TODO -->
+    <xacro:property name="upper_leg_com_x" value="0.000709"/>
     <xacro:property name="upper_leg_com_y" value="${-hip_base_height/2 - hip_aa_frame_height +
-                                                    upper_leg_offset + 0.215254}"/> <!-- TODO -->
-    <xacro:property name="upper_leg_com_z" value="-0.19205"/> <!-- TODO -->
+                                                    upper_leg_offset + 0.215254}"/>
+    <xacro:property name="upper_leg_com_z" value="-0.19205"/>
 
-    <xacro:property name="lower_leg_com_x" value="-0.00321"/> <!-- TODO -->
+    <xacro:property name="lower_leg_com_x" value="-0.00321"/>
     <xacro:property name="lower_leg_com_y" value="${-hip_base_height/2 - hip_aa_frame_height +
-                                                    upper_leg_offset + 0.184081}"/> <!-- TODO -->
-    <xacro:property name="lower_leg_com_z" value="${upper_leg_height - 0.527082}"/> <!-- TODO -->
+                                                    upper_leg_offset + 0.184081}"/>
+    <xacro:property name="lower_leg_com_z" value="${upper_leg_height - 0.527082}"/>
 
-    <xacro:property name="foot_com_x" value="-0.028926"/> <!-- TODO -->
+    <xacro:property name="foot_com_x" value="-0.028926"/>
     <xacro:property name="foot_com_y" value="${-hip_base_height/2 - hip_aa_frame_height +
-                                               upper_leg_offset + ankle_plate_offset + 0.155916}"/> <!-- TODO -->
-    <xacro:property name="foot_com_z" value="${upper_leg_height + lower_leg_height + ankle_plate_height - 0.789788}"/> <!-- TODO -->
-    <xacro:property name="foot_scale" value="1.35"/> <!-- TODO -->
-
-    <!-- TODO Change Inertia's for the MARCH VI -->
-    <!-- Inertia of the parts -->
-    <!-- Inertia's have been determined in Catia, see
-         https://confluence.projectmarch.nl:8443/display/51/URDF+description -->
-    <!-- The inertia's were defined around the CoM. Note that in the Catia x axis is the URDF y axis and the Catia y
-         axis is the negative URDF x axis, see confluence for the impact. The given inertia's are for the right leg,
-         Ixy and Iyz will be inverted for the left leg. -->
-    <xacro:property name="hip_base_Ixx" value="0.141"/> <!-- TODO -->
-    <xacro:property name="hip_base_Ixy" value="0.0000336"/> <!-- TODO -->
-    <xacro:property name="hip_base_Ixz" value="-0.007"/> <!-- TODO -->
-    <xacro:property name="hip_base_Iyy" value="0.087"/> <!-- TODO -->
-    <xacro:property name="hip_base_Iyz" value="0.0005089"/> <!-- TODO -->
-    <xacro:property name="hip_base_Izz" value="0.091"/> <!-- TODO -->
-
-    <xacro:property name="hip_aa_Ixx" value="0.013"/> <!-- TODO -->
-    <xacro:property name="hip_aa_Ixy" value="0.008"/> <!-- TODO -->
-    <xacro:property name="hip_aa_Ixz" value="0.005"/> <!-- TODO -->
-    <xacro:property name="hip_aa_Iyy" value="0.023"/> <!-- TODO -->
-    <xacro:property name="hip_aa_Iyz" value="-0.001"/> <!-- TODO -->
-    <xacro:property name="hip_aa_Izz" value="0.028"/> <!-- TODO -->
-
-    <xacro:property name="upper_leg_Ixx" value="0.127"/> <!-- TODO -->
-    <xacro:property name="upper_leg_Ixy" value="0.0001291"/> <!-- TODO -->
-    <xacro:property name="upper_leg_Ixz" value="-0.0002056"/> <!-- TODO -->
-    <xacro:property name="upper_leg_Iyy" value="0.122"/> <!-- TODO -->
-    <xacro:property name="upper_leg_Iyz" value="0.016"/> <!-- TODO -->
-    <xacro:property name="upper_leg_Izz" value="0.015"/> <!-- TODO -->
-
-    <xacro:property name="lower_leg_Ixx" value="0.075"/> <!-- TODO -->
-    <xacro:property name="lower_leg_Ixy" value="-0.027"/> <!-- TODO -->
-    <xacro:property name="lower_leg_Ixz" value="-0.008"/> <!-- TODO -->
-    <xacro:property name="lower_leg_Iyy" value="0.11"/> <!-- TODO -->
-    <xacro:property name="lower_leg_Iyz" value="-0.002"/> <!-- TODO -->
-    <xacro:property name="lower_leg_Izz" value="0.071" /> <!-- TODO -->
-
-    <xacro:property name="foot_Ixx" value="0.021"/> <!-- TODO -->
-    <xacro:property name="foot_Ixy" value="-0.002"/> <!-- TODO -->
-    <xacro:property name="foot_Ixz" value="0.02"/> <!-- TODO -->
-    <xacro:property name="foot_Iyy" value="0.027"/> <!-- TODO -->
-    <xacro:property name="foot_Iyz" value="0.004"/> <!-- TODO -->
-    <xacro:property name="foot_Izz" value="0.01" /> <!-- TODO -->
-
-    <!-- TODO Change range of motion for the MARCH VI -->
-    <!-- Joint properties -->
-    <!-- For limit calculations, see https://confluence.projectmarch.nl:8443/pages/viewpage.action?pageId=268697604 -->
-    <xacro:property name="left_hip_fe_rotation_lower_limit" value="${-21.04431152*pi/180}"/> <!-- rad --> <!-- TODO -->
-    <xacro:property name="left_hip_fe_rotation_upper_limit" value="${98.97033691*pi/180}"/> <!-- rad --> <!-- TODO -->
-
-    <xacro:property name="right_hip_fe_rotation_lower_limit" value="${-20.23406982*pi/180}"/> <!-- rad --> <!-- TODO -->
-    <xacro:property name="right_hip_fe_rotation_upper_limit" value="${99.48120117*pi/180}"/> <!-- rad --> <!-- TODO -->
-
-    <xacro:property name="hip_fe_soft_buffer" value="${3*pi/180}"/> <!-- rad --> <!-- TODO -->
-    <xacro:property name="hip_fe_effort_limit" value="${max_effort_rotary}"/> <!-- IU --> <!-- TODO -->
-    <xacro:property name="hip_fe_velocity_limit" value="2.0"/> <!-- rad/s --> <!-- TODO -->
-
-    <xacro:property name="left_hip_aa_rotation_lower_limit" value="${-18.54492188*pi/180}"/> <!-- rad --> <!-- TODO -->
-    <xacro:property name="left_hip_aa_rotation_upper_limit" value="${16.34765625*pi/180}"/> <!-- rad --> <!-- TODO -->
-
-    <xacro:property name="right_hip_aa_rotation_lower_limit" value="${-18.10546875*pi/180}"/> <!-- rad --> <!-- TODO -->
-    <xacro:property name="right_hip_aa_rotation_upper_limit" value="${15.99609375*pi/180}"/> <!-- rad --> <!-- TODO -->
-
-    <xacro:property name="hip_aa_soft_buffer" value="${3.5*pi/180}"/> <!-- rad --> <!-- TODO -->
-    <xacro:property name="hip_aa_effort_limit" value="${max_effort_linear}"/> <!-- IU --> <!-- TODO -->
-    <xacro:property name="hip_aa_velocity_limit" value="1.0"/> <!-- rad/s --> <!-- TODO -->
-
-    <xacro:property name="left_knee_rotation_lower_limit" value="${-5.012512207*pi/180}"/> <!-- TODO -->
-    <xacro:property name="left_knee_rotation_upper_limit" value="${112.4230957*pi/180}"/> <!-- TODO -->
-
-    <xacro:property name="right_knee_rotation_lower_limit" value="${-4.89440918*pi/180}"/> <!-- TODO -->
-    <xacro:property name="right_knee_rotation_upper_limit" value="${115.3097534*pi/180}"/> <!-- TODO -->
-
-    <xacro:property name="knee_extension_soft_buffer" value="${3.5*pi/180}"/> <!-- rad --> <!-- TODO -->
-    <xacro:property name="knee_flexion_soft_buffer" value="${3*pi/180}"/> <!-- rad --> <!-- TODO -->
-    <xacro:property name="knee_effort_limit" value="${max_effort_rotary}"/> <!-- IU --> <!-- TODO -->
-    <xacro:property name="knee_velocity_limit" value="2.5"/> <!-- TODO -->
-
-    <xacro:property name="left_ankle_rotation_lower_limit" value="${-26.30401611*pi/180}"/> <!-- TODO -->
-    <xacro:property name="left_ankle_rotation_upper_limit" value="${15.88348389*pi/180}"/> <!-- TODO -->
-
-    <xacro:property name="right_ankle_rotation_lower_limit" value="${-23.203125*pi/180}"/> <!-- TODO -->
-    <xacro:property name="right_ankle_rotation_upper_limit" value="${14.23828125*pi/180}"/> <!-- TODO -->
-
-    <xacro:property name="ankle_dorsalflexion_soft_buffer" value="${5*pi/180}"/> <!-- rad --> <!-- TODO -->
-    <xacro:property name="ankle_plantarflexion_soft_buffer" value="${3*pi/180}"/> <!-- rad --> <!-- TODO -->
-    <xacro:property name="ankle_effort_limit" value="${max_effort_linear}"/> <!-- IU --> <!-- TODO -->
-    <xacro:property name="ankle_velocity_limit" value="1.0"/> <!-- TODO -->
-
-    <xacro:property name="camera_link" value="0.05"/> <!-- Size of square 'camera' box --> <!-- TODO -->
-    <xacro:property name="axel_offset" value="0.05"/> <!-- Space btw top of beam and the each joint --> <!-- TODO -->
+                                               upper_leg_offset + ankle_plate_offset + 0.155916}"/>
+    <xacro:property name="foot_com_z"
+                    value="${upper_leg_height + lower_leg_height + ankle_plate_height - 0.789788}"/>
+    <xacro:property name="foot_scale" value="1.35"/>
 
     <!-- Import all Gazebo-customization elements, including Gazebo colors -->
     <xacro:include filename="march.gazebo"/>
 
     <material name="blue">
-        <color rgba="0 0 0.6 1"/> <!-- TODO nieuwe huisstijl -->
+        <color rgba="0.163 0.476 0.718 0.8"/>
     </material>
 
     <!-- Used for fixing robot to Gazebo 'base_link' -->
@@ -234,216 +144,94 @@
 
     <!-- Parts -->
     <!-- Hip-->
-    <link name="hip_base">
-        <visual>
-            <origin xyz="${hip_aa_frame_width} ${-hip_base_height/2} ${-width}" rpy="0 0 0"/>
-            <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/march6/HipBase.stl" scale="0.001 0.001 0.001"/>
-            </geometry>
-            <material name="blue"/>
-        </visual>
+    <xacro:frame_part name="hip_base"
+                      reflect="1"
+                      length="${hip_base_height}"
+                      direction="y"
+                      visual_origin="${hip_aa_frame_width} 0 ${-width}"
+                      collision_origin="0 0 0"
+                      mesh="march6/HipBase.stl"
+                      com="${hip_base_com_x} ${hip_base_com_y} ${hip_base_com_z}"
+                      mass="${dimensions['hip_base']['mass']}"
+                      inertia="${inertia['hip_base']}"
+                      scale="0.001 0.001 0.001"
+                      visual_rpy="0 0 0"
+    />
 
-        <inertial>
-            <origin xyz="${hip_base_com_x} ${hip_base_com_y} ${hip_base_com_z}" rpy="0 0 0"/>
-            <mass value="${hip_base_mass}"/>
-            <inertia
-                    ixx="${hip_base_Ixx}"
-                    ixy="${hip_base_Ixy}"
-                    ixz="${hip_base_Ixz}"
-                    iyy="${hip_base_Iyy}"
-                    iyz="${hip_base_Iyz}"
-                    izz="${hip_base_Izz}" />
-        </inertial>
-
-        <collision>
-            <origin xyz="0 0 0" rpy="0 0 0"/>
-            <geometry>
-                <box size="${width} ${hip_base_height} ${width}"/>
-            </geometry>
-        </collision>
-    </link>
 
     <!-- IMU-->
     <link name="imu_link">
     </link>
 
-    <!-- Left Moving Hip-->
-    <link name="hip_aa_frame_left_side">
-        <visual>
-            <origin xyz="${-hip_aa_frame_width} ${hip_base_height/2} 0" rpy="0 0 ${pi}"/>
-            <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/LeftHAA.stl" scale="1 1 1"/>
-            </geometry>
-            <material name="blue"/>
-        </visual>
+    <xacro:frame_part name="hip_aa_frame_left_side"
+                      reflect="-1"
+                      length="${hip_aa_frame_height}"
+                      direction="y"
+                      collision_origin="0 ${-hip_aa_frame_height/2} 0"
+                      visual_origin="${hip_aa_frame_width-width} ${hip_aa_frame_height/2} ${-width}"
+                      mesh="march6/LeftHAA.stl"
+                      scale="0.001 0.001 0.001"
+                      visual_rpy="0 0 0"
+    />
 
-        <collision>
-            <origin xyz="0 ${-hip_aa_frame_height/2} 0" rpy="0 0 0"/>
-            <geometry>
-                <box size="${width} ${hip_aa_frame_height} ${width}"/>
-            </geometry>
-        </collision>
-    </link>
+    <xacro:frame_part name="hip_aa_frame_left_front"
+                      reflect="-1"
+                      length="${hip_aa_frame_width}"
+                      direction="x"
+                      collision_origin="${-hip_aa_frame_width/2} 0 0"
+                      com="${hip_aa_com_x} ${-hip_aa_com_y} ${hip_aa_com_z}"
+                      mass="${hip_aa_mass}"
+                      inertia="${inertia['hip_aa']}"
+                      visual_rpy="0 0 0"
+    />
 
-    <link name="hip_aa_frame_left_front">
-        <inertial>
-            <origin xyz="${hip_aa_com_x} ${-hip_aa_com_y} ${hip_aa_com_z}" rpy="0 0 0"/>
-            <mass value="${hip_aa_mass}"/>
-            <inertia
-                    ixx="${hip_aa_Ixx}"
-                    ixy="${-hip_aa_Ixy}"
-                    ixz="${hip_aa_Ixz}"
-                    iyy="${hip_aa_Iyy}"
-                    iyz="${-hip_aa_Iyz}"
-                    izz="${hip_aa_Izz}" />
-        </inertial>
+    <xacro:frame_part name="upper_leg_left"
+                      reflect="-1"
+                      length="${upper_leg_height}"
+                      direction="z"
+                      collision_origin="0 0 ${-upper_leg_height/2}"
+                      visual_origin="0 0 ${-upper_leg_height-width}"
+                      mesh="march6/UpperLeftLeg.stl"
+                      com="${upper_leg_com_x} ${-upper_leg_com_y} ${upper_leg_com_z}"
+                      mass="${upper_leg_mass}"
+                      inertia="${inertia['upper_leg']}"
+                      scale="0.001 0.001 0.001"
+    />
 
-        <collision>
-            <origin xyz="${-hip_aa_frame_width/2} 0 0" rpy="0 0 0"/>
-            <geometry>
-                <box size="${hip_aa_frame_width} ${width} ${width}"/>
-            </geometry>
-        </collision>
-    </link>
+    <xacro:frame_part name="lower_leg_left"
+                      reflect="-1"
+                      length="${lower_leg_height}"
+                      direction="z"
+                      collision_origin="0 0 ${-lower_leg_height/2}"
+                      visual_origin="0 0 ${-lower_leg_height-width}"
+                      mesh="march6/LowerLeftLeg.stl"
+                      com="${lower_leg_com_x} ${-lower_leg_com_y} ${lower_leg_com_z}"
+                      mass="${lower_leg_mass}"
+                      inertia="${inertia['lower_leg']}"
+                      scale="0.001 0.001 0.001"
+    />
 
-    <!-- Upper Leg Left-->
-    <link name="upper_leg_left">
-        <visual>
-            <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
-            <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/UpperLeftLeg.stl" scale="0.001 0.001 0.001"/>
-            </geometry>
-            <material name="blue"/>
-        </visual>
+    <xacro:frame_part name="ankle_plate_left"
+                      reflect="-1"
+                      length="${ankle_plate_height}"
+                      direction="z"
+                      mesh="march6/LeftFoot.stl"
+                      visual_origin="${foot_height_forward}
+                     0
+                     ${-ankle_plate_height - width/2}"
+                      collision_origin="0 0 ${-ankle_plate_height/2}"
+                      scale="0.001 0.001 0.001"
+                      visual_rpy="0 0 ${-pi/2}"
+    />
 
-        <inertial>
-            <origin xyz="${upper_leg_com_x} ${-upper_leg_com_y} ${upper_leg_com_z}" rpy="0 0 0"/>
-            <mass value="${upper_leg_mass}"/>
-            <inertia
-                    ixx="${upper_leg_Ixx}"
-                    ixy="${-upper_leg_Ixy}"
-                    ixz="${upper_leg_Ixz}"
-                    iyy="${upper_leg_Iyy}"
-                    iyz="${-upper_leg_Iyz}"
-                    izz="${upper_leg_Izz}" />
-        </inertial>
-
-        <collision>
-            <origin xyz="0 0 ${-upper_leg_height/2}" rpy="0 0 0"/>
-            <geometry>
-                <box size="${width} ${width} ${upper_leg_height}"/>
-            </geometry>
-        </collision>
-    </link>
-
-    <!-- Lower Leg Left -->
-    <link name="lower_leg_left">
-        <visual>
-            <origin
-                xyz="0 ${hip_base_height/2 + hip_aa_frame_height - upper_leg_offset} ${upper_leg_height}"
-                rpy="0 0 ${pi}"
-            />
-            <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/LowerLeftLeg.stl" scale="1 1 1"/>
-            </geometry>
-            <material name="blue"/>
-        </visual>
-
-        <inertial>
-            <origin xyz="${lower_leg_com_x} ${-lower_leg_com_y} ${lower_leg_com_z}" rpy="0 0 0"/>
-            <mass value="${lower_leg_mass}"/>
-            <inertia
-                    ixx="${lower_leg_Ixx}"
-                    ixy="${-lower_leg_Ixy}"
-                    ixz="${lower_leg_Ixz}"
-                    iyy="${lower_leg_Iyy}"
-                    iyz="${-lower_leg_Iyz}"
-                    izz="${lower_leg_Izz}" />
-        </inertial>
-
-        <collision>
-            <origin xyz="0 0 ${-lower_leg_height/2}" rpy="0 0 0"/>
-            <geometry>
-                <box size="${width} ${width} ${lower_leg_height}"/>
-            </geometry>
-        </collision>
-    </link>
-
-    <!-- Ankle plate Left -->
-    <link name="ankle_plate_left">
-        <visual>
-            <origin
-                xyz="0
-                     ${hip_base_height/2 + hip_aa_frame_height - upper_leg_offset - ankle_plate_offset}
-                     ${foot_scale * (upper_leg_height + lower_leg_height)}"
-                rpy="0 0 ${pi}"
-            />
-            <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/LeftFoot.stl" scale="1 1 ${foot_scale}"/>
-            </geometry>
-            <material name="blue"/>
-        </visual>
-        <collision>
-            <origin xyz="0 0 ${-ankle_plate_height/2}" rpy="0 0 0"/>
-            <geometry>
-                <box size="${width} ${width} ${ankle_plate_height}"/>
-            </geometry>
-        </collision>
-    </link>
-
-    <gazebo reference="ankle_plate_left">
-        <sensor name="ankle_plate_left_contact" type="contact">
-            <plugin name="contact_plugin" filename="libcontact.so"/>
-            <contact>
-                <collision>ankle_plate_left_fixed_joint_lump__foot_left_collision_1</collision>
-            </contact>
-            <update_rate>30</update_rate>
-            <always_on>true</always_on>
-        </sensor>
-    </gazebo>
-
-    <!-- Foot Left -->
-    <link name="foot_left">
-        <inertial>
-            <origin xyz="${foot_com_x} ${-foot_com_y} ${foot_com_z}" rpy="0 0 0"/>
-            <mass value="${foot_mass}"/>
-            <inertia
-                    ixx="${foot_Ixx}"
-                    ixy="${-foot_Ixy}"
-                    ixz="${foot_Ixz}"
-                    iyy="${foot_Iyy}"
-                    iyz="${-foot_Iyz}"
-                    izz="${foot_Izz}" />
-        </inertial>
-        <collision>
-            <origin xyz="${(-foot_height_forward+foot_height_backward)/2} 0 0" rpy="0 0 0"/>
-            <geometry>
-                <box size="${foot_height_forward+foot_height_backward} ${width} ${width}"/>
-            </geometry>
-        </collision>
-    </link>
-
-    <link name="pressure_sole_left">
-        <collision>
-            <origin xyz="${(-foot_height_forward+foot_height_backward)/2} 0 0" rpy="0 0 0"/>
-            <geometry>
-                <box size="${foot_height_forward+foot_height_backward} ${width} 0.001"/>
-            </geometry>
-        </collision>
-    </link>
-
-    <gazebo reference="pressure_sole_left">
-        <sensor name="left_pressure_sole" type="contact">
-            <always_on>true</always_on>
-            <contact>
-                <collision>ankle_plate_left_fixed_joint_lump__pressure_sole_left_collision_2</collision>
-            </contact>
-            <plugin name="left_foot_plugin" filename="libgazebo_ros_bumper.so">
-                <bumperTopicName>march/sensor/left_pressure_sole</bumperTopicName>
-                <frameName>world</frameName>
-            </plugin>
-        </sensor>
-    </gazebo>
+    <xacro:frame_part name="foot_left"
+                      reflect="-1"
+                      length="${foot_height_forward+foot_height_backward}"
+                      direction="x"
+                      inertia="${inertia['foot']}"
+                      collision_origin="${-(foot_height_forward+foot_height_backward)/2} 0 0"
+                      com="${foot_com_x} ${-foot_com_y} ${foot_com_z}"
+                      mass="${foot_mass}"/>
 
     <gazebo reference="foot_left">
         <mu1>${foot_mu1}</mu1>
@@ -452,163 +240,80 @@
         <fdir1>1 0 0</fdir1>
     </gazebo>
 
-    <!-- Right Moving Hip-->
-    <link name="hip_aa_frame_right_side">
-        <visual>
-            <origin xyz="${-hip_aa_frame_width} ${-hip_base_height/2} 0" rpy="0 0 ${pi}"/>
-            <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/RightHAA.stl" scale="1 1 1"/>
-            </geometry>
-            <material name="blue"/>
-        </visual>
+    <xacro:pressure_sole side="left" foot_name="foot_left"/>
 
-        <collision>
-            <origin xyz="0 ${hip_aa_frame_height/2} 0" rpy="0 0 0"/>
-            <geometry>
-                <box size="${width} ${hip_aa_frame_height} ${width}"/>
-            </geometry>
-        </collision>
-    </link>
+    <xacro:frame_part name="hip_aa_frame_right_side"
+                      reflect="1"
+                      direction="y"
+                      length="${hip_aa_frame_height}"
+                      visual_origin="${-hip_aa_frame_width-hip_base_height} ${-hip_aa_frame_height/2} ${-width}"
+                      collision_origin="0 ${hip_aa_frame_height/2} 0"
+                      mesh="march6/RightHAA.stl"
+                      scale="0.001 0.001 0.001"
+                      visual_rpy="0 0 ${pi}"
+    />
 
-    <link name="hip_aa_frame_right_front">
-        <inertial>
-            <origin xyz="${hip_aa_com_x} ${hip_aa_com_y} ${hip_aa_com_z}" rpy="0 0 0"/>
-            <mass value="${hip_aa_mass}"/>
-            <inertia
-                    ixx="${hip_aa_Ixx}"
-                    ixy="${hip_aa_Ixy}"
-                    ixz="${hip_aa_Ixz}"
-                    iyy="${hip_aa_Iyy}"
-                    iyz="${hip_aa_Iyz}"
-                    izz="${hip_aa_Izz}" />
-        </inertial>
+    <xacro:frame_part name="hip_aa_frame_right_front"
+                      length="${hip_aa_frame_width}"
+                      direction="x"
+                      collision_origin="${-hip_aa_frame_width/2} 0 0"
+                      reflect="1"
+                      com="${hip_aa_com_x} ${hip_aa_com_y} ${hip_aa_com_z}"
+                      mass="${hip_aa_mass}"
+                      inertia="${inertia['hip_aa']}"
+    />
 
-        <collision>
-            <origin xyz="${-hip_aa_frame_width/2} 0 0" rpy="0 0 0"/>
-            <geometry>
-                <box size="${hip_aa_frame_width} ${width} ${width}"/>
-            </geometry>
-        </collision>
-    </link>
+    <xacro:frame_part name="upper_leg_right"
+                      reflect="1"
+                      direction="z"
+                      length="${upper_leg_height}"
+                      collision_origin="0 0 ${-upper_leg_height/2}"
+                      visual_origin="0 0 ${-upper_leg_height-width}"
+                      mesh="march6/UpperRightLeg.stl"
+                      com="${upper_leg_com_x} ${upper_leg_com_y} ${upper_leg_com_z}"
+                      inertia="${inertia['upper_leg']}"
+                      mass="${upper_leg_mass}"
+                      scale="0.001 0.001 0.001"
+                      visual_rpy="0 0 0"
+    />
 
-    <!-- Upper Leg Right-->
-    <link name="upper_leg_right">
-        <visual>
-            <origin xyz="0 0 ${-upper_leg_height-width}" rpy="0 0 0"/>
-            <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/march6/UpperRightLeg.stl" scale="0.001 0.001 0.001"/>
-            </geometry>
-            <material name="blue"/>
-        </visual>
-
-        <inertial>
-            <origin xyz="${upper_leg_com_x} ${upper_leg_com_y} ${upper_leg_com_z}" rpy="0 0 0"/>
-            <mass value="${upper_leg_mass}"/>
-            <inertia
-                    ixx="${upper_leg_Ixx}"
-                    ixy="${upper_leg_Ixy}"
-                    ixz="${upper_leg_Ixz}"
-                    iyy="${upper_leg_Iyy}"
-                    iyz="${upper_leg_Iyz}"
-                    izz="${upper_leg_Izz}" />
-        </inertial>
-
-        <collision>
-            <origin xyz="0 0 ${-upper_leg_height/2}" rpy="0 0 0"/>
-            <geometry>
-                <box size="${width} ${width} ${upper_leg_height}"/>
-            </geometry>
-        </collision>
-
-    </link>
-
-    <!-- Lower Leg Right -->
-    <link name="lower_leg_right">
-        <visual>
-            <origin
-                xyz="0 ${0} ${-lower_leg_height}"
-                rpy="0 0 0"
-            />
-            <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/march6/LowerRightLeg.stl" scale="0.001 0.001 0.001"/>
-            </geometry>
-            <material name="blue"/>
-        </visual>
-
-        <inertial>
-            <origin xyz="${lower_leg_com_x} ${lower_leg_com_y} ${lower_leg_com_z}" rpy="0 0 0"/>
-            <mass value="${lower_leg_mass}"/>
-            <inertia
-                    ixx="${lower_leg_Ixx}"
-                    ixy="${lower_leg_Ixy}"
-                    ixz="${lower_leg_Ixz}"
-                    iyy="${lower_leg_Iyy}"
-                    iyz="${lower_leg_Iyz}"
-                    izz="${lower_leg_Izz}" />
-        </inertial>
-
-        <collision>
-            <origin xyz="0 0 ${-lower_leg_height/2}" rpy="0 0 0"/>
-            <geometry>
-                <box size="${width} ${width} ${lower_leg_height}"/>
-            </geometry>
-        </collision>
-    </link>
-
-    <!-- Ankle Plate Right -->
-    <link name="ankle_plate_right">
-        <visual>
-            <origin
-                xyz="0
-                    ${-hip_base_height/2 - hip_aa_frame_height+ upper_leg_offset + ankle_plate_offset}
-                    ${foot_scale * (upper_leg_height + lower_leg_height)}"
-                rpy="0 0 ${pi}"/>
-            />
-            <geometry>
-                <mesh filename="package://march_description/urdf/stl-files/RightFoot.stl" scale="1 1 ${foot_scale}"/>
-            </geometry>
-            <material name="blue"/>
-        </visual>
-        <collision>
-            <origin xyz="0 0 ${-ankle_plate_height/2}" rpy="0 0 0"/>
-            <geometry>
-                <box size="${width} ${width} ${ankle_plate_height}"/>
-            </geometry>
-        </collision>
-    </link>
+    <xacro:frame_part name="lower_leg_right"
+                      reflect="1"
+                      length="${lower_leg_height}"
+                      direction="z"
+                      visual_origin="0 0 ${-lower_leg_height-width}"
+                      mesh="march6/LowerRightLeg.stl"
+                      com="${lower_leg_com_x} ${lower_leg_com_y} ${lower_leg_com_z}"
+                      mass="${lower_leg_mass}"
+                      inertia="${inertia['lower_leg']}"
+                      collision_origin="0 0 ${-lower_leg_height/2}"
+                      scale="0.001 0.001 0.001"
+                      visual_rpy="0 0 0"
+    />
 
 
-    <gazebo reference="ankle_plate_right">
-        <sensor name="ankle_plate_right_contact" type="contact">
-            <plugin name="contact_plugin" filename="libcontact.so"/>
-            <contact>
-                <collision>ankle_plate_right_fixed_joint_lump__foot_right_collision_1</collision>
-            </contact>
-            <update_rate>30</update_rate>
-            <always_on>true</always_on>
-        </sensor>
-    </gazebo>
+    <xacro:frame_part name="ankle_plate_right"
+                      reflect="1"
+                      length="${ankle_plate_height}"
+                      direction="z"
+                      mesh="march6/RightFoot.stl"
+                      visual_origin="${foot_height_forward} 0 ${-ankle_plate_height-width/2}"
+                      collision_origin="0 0 ${-ankle_plate_height/2}"
+                      scale="0.001 0.001 0.001"
+                      visual_rpy="0 0 ${-pi/2}"
+    />
 
     <!-- Foot Right -->
-    <link name="foot_right">
-        <inertial>
-            <origin xyz="${foot_com_x} ${foot_com_y} ${foot_com_z}" rpy="0 0 0"/>
-            <mass value="${foot_mass}"/>
-            <inertia
-                    ixx="${foot_Ixx}"
-                    ixy="${foot_Ixy}"
-                    ixz="${foot_Ixz}"
-                    iyy="${foot_Iyy}"
-                    iyz="${foot_Iyz}"
-                    izz="${foot_Izz}" />
-        </inertial>
-        <collision>
-            <origin xyz="${(-foot_height_forward+foot_height_backward)/2} 0 0" rpy="0 0 0"/>
-            <geometry>
-                <box size="${foot_height_forward+foot_height_backward} ${width} ${width}"/>
-            </geometry>
-        </collision>
-    </link>
+    <xacro:pressure_sole side="right" foot_name="foot_right"/>
+
+    <xacro:frame_part name="foot_right"
+                      reflect="1"
+                      length="${foot_height_forward+foot_height_backward}"
+                      direction="x"
+                      inertia="${inertia['foot']}"
+                      collision_origin="${-(foot_height_forward+foot_height_backward)/2} 0 0"
+                      com="${foot_com_x} ${foot_com_y} ${foot_com_z}"
+                      mass="${foot_mass}"/>
 
     <gazebo reference="foot_right">
         <mu1>${foot_mu1}</mu1>
@@ -617,27 +322,6 @@
         <fdir1>1 0 0</fdir1>
     </gazebo>
 
-    <link name="pressure_sole_right">
-        <collision>
-            <origin xyz="${(-foot_height_forward+foot_height_backward)/2} 0 0" rpy="0 0 0"/>
-            <geometry>
-                <box size="${foot_height_forward+foot_height_backward} ${width} 0.001"/>
-            </geometry>
-        </collision>
-    </link>
-
-    <gazebo reference="pressure_sole_right">
-        <sensor name="right_pressure_sole" type="contact">
-            <always_on>true</always_on>
-            <contact>
-                <collision>ankle_plate_right_fixed_joint_lump__pressure_sole_right_collision_2</collision>
-            </contact>
-            <plugin name="right_foot_plugin" filename="libgazebo_ros_bumper.so">
-                <bumperTopicName>march/sensor/right_pressure_sole</bumperTopicName>
-                <frameName>world</frameName>
-            </plugin>
-        </sensor>
-    </gazebo>
 
     <!-- Joints -->
     <joint name="imu_joint" type="fixed">
@@ -651,21 +335,16 @@
         <origin xyz="0 0 ${lower_leg_height+upper_leg_height+ankle_plate_height+width/2.0+hover_height}" rpy="0 0 0"/>
     </joint>
 
-    <joint name="left_hip_aa" type="revolute">
-        <parent link="hip_base"/>
-        <child link="hip_aa_frame_left_side"/>
-        <origin xyz="0 ${-hip_base_height/2} 0" rpy="0 0 0"/>
-        <axis xyz="-1 0 0"/>
-
-        <limit velocity="${hip_aa_velocity_limit}"
-               effort="${hip_aa_effort_limit}"
-               lower="${left_hip_aa_rotation_lower_limit}"
-               upper="${left_hip_aa_rotation_upper_limit}"/>
-        <safety_controller soft_lower_limit="${left_hip_aa_rotation_lower_limit + hip_aa_soft_buffer}"
-                           soft_upper_limit="${left_hip_aa_rotation_upper_limit - hip_aa_soft_buffer}"
-                           k_position="${k_position_value_haa}"
-                           k_velocity="${k_velocity_value_haa}" />
-    </joint>
+    <xacro:march_joint
+            name="left_hip_aa"
+            parent="hip_base"
+            child="hip_aa_frame_left_side"
+            origin="0 ${-hip_base_height/2} 0"
+            axis="-1 0 0"
+            safety="${safety_values['haa']}"
+            limits="${joint_limits['left_haa']}"
+            reduction="${linear_reduction}"
+    />
 
     <joint name="left_hip_angle" type="fixed">
         <parent link="hip_aa_frame_left_side"/>
@@ -673,53 +352,39 @@
         <origin xyz="0 ${-hip_aa_frame_height} 0" rpy="0 0 0"/>
     </joint>
 
-    <joint name="left_hip_fe" type="revolute">
-        <parent link="hip_aa_frame_left_front"/>
-        <child link="upper_leg_left"/>
-        <origin xyz="${-hip_aa_frame_width} ${upper_leg_offset} 0" rpy="0 0 0"/>
-        <axis xyz="0 1 0"/>
+    <xacro:march_joint
+            name="left_hip_fe"
+            parent="hip_aa_frame_left_front"
+            child="upper_leg_left"
+            axis="0 1 0"
+            safety="${safety_values['hfe']}"
+            origin="${-hip_aa_frame_width} ${upper_leg_offset} 0"
+            reduction="${rotary_reduction}"
+            limits="${joint_limits['left_hfe']}"
+    />
 
-        <limit velocity="${hip_fe_velocity_limit}"
-               effort="${hip_fe_effort_limit}"
-               lower="${left_hip_fe_rotation_lower_limit}"
-               upper="${left_hip_fe_rotation_upper_limit}"/>
-        <safety_controller soft_lower_limit="${left_hip_fe_rotation_lower_limit + hip_fe_soft_buffer}"
-                           soft_upper_limit="${left_hip_fe_rotation_upper_limit - hip_fe_soft_buffer}"
-                           k_position="${k_position_value_hfe}"
-                           k_velocity="${k_velocity_value_hfe}" />
-    </joint>
 
-    <joint name="left_knee" type="revolute">
-        <parent link= "upper_leg_left"/>
-        <child link="lower_leg_left"/>
-        <origin xyz="0 0 ${-upper_leg_height}" rpy="0 0 0"/>
-        <axis xyz="0 -1 0"/>
+    <xacro:march_joint
+            name="left_knee"
+            parent="upper_leg_left"
+            child="lower_leg_left"
+            safety="${safety_values['knee']}"
+            origin="0 0 ${-upper_leg_height}"
+            axis="0 -1 0"
+            reduction="${rotary_reduction}"
+            limits="${joint_limits['left_knee']}"
+    />
 
-        <limit velocity="${knee_velocity_limit}"
-               effort="${knee_effort_limit}"
-               lower="${left_knee_rotation_lower_limit}"
-               upper="${left_knee_rotation_upper_limit}"/>
-        <safety_controller soft_lower_limit="${left_knee_rotation_lower_limit + knee_extension_soft_buffer}"
-                           soft_upper_limit="${left_knee_rotation_upper_limit - knee_flexion_soft_buffer}"
-                           k_position="${k_position_value_kfe}"
-                           k_velocity="${k_velocity_value_kfe}" />
-    </joint>
-
-    <joint name="left_ankle" type="revolute">
-        <parent link="lower_leg_left"/>
-        <child link="ankle_plate_left"/>
-        <origin xyz="0 ${ankle_plate_offset} ${-lower_leg_height}" rpy="0 0 0"/>
-        <axis xyz="0 1 0"/>
-
-        <limit velocity="${ankle_velocity_limit}"
-               effort="${ankle_effort_limit}"
-               lower="${left_ankle_rotation_lower_limit}"
-               upper="${left_ankle_rotation_upper_limit}"/>
-        <safety_controller soft_lower_limit="${left_ankle_rotation_lower_limit + ankle_plantarflexion_soft_buffer}"
-                           soft_upper_limit="${left_ankle_rotation_upper_limit - ankle_dorsalflexion_soft_buffer}"
-                           k_position="${k_position_value_adpf}"
-                           k_velocity="${k_velocity_value_adpf}" />
-    </joint>
+    <xacro:march_joint
+            name="left_ankle"
+            parent="lower_leg_left"
+            child="ankle_plate_left"
+            safety="${safety_values['ankle']}"
+            origin="0 ${ankle_plate_offset} ${-lower_leg_height}"
+            axis="0 1 0"
+            reduction="${linear_reduction}"
+            limits="${joint_limits['left_ankle']}"
+    />
 
     <joint name="left_foot_angle" type="fixed">
         <parent link="ankle_plate_left"/>
@@ -727,34 +392,16 @@
         <origin xyz="0 0 ${-ankle_plate_height}" rpy="0 0 0"/>
     </joint>
 
-    <joint name="left_pressure_sole_joint" type="fixed">
-        <parent link="foot_left"/>
-        <child link="pressure_sole_left"/>
-        <origin xyz="0 0 ${-(width/2)}" rpy="0 0 0"/>
-    </joint>
-
-    <joint name="right_pressure_sole_joint" type="fixed">
-        <parent link="foot_right"/>
-        <child link="pressure_sole_right"/>
-        <origin xyz="0 0 ${-(width/2)}" rpy="0 0 0"/>
-    </joint>
-
-    <joint name="right_hip_aa" type="revolute">
-        <parent link="hip_base"/>
-        <child link="hip_aa_frame_right_side"/>
-        <origin xyz="0 ${hip_base_height/2} 0" rpy="0 0 0"/>
-        <axis xyz="1 0 0"/>
-
-        <limit velocity="${hip_aa_velocity_limit}"
-               effort="${hip_aa_effort_limit}"
-               lower="${right_hip_aa_rotation_lower_limit}"
-               upper="${right_hip_aa_rotation_upper_limit}"/>
-        <safety_controller soft_lower_limit="${right_hip_aa_rotation_lower_limit + hip_aa_soft_buffer}"
-                           soft_upper_limit="${right_hip_aa_rotation_upper_limit - hip_aa_soft_buffer}"
-                           k_position="${k_position_value_haa}"
-                           k_velocity="${k_velocity_value_haa}" />
-
-    </joint>
+    <xacro:march_joint
+            name="right_hip_aa"
+            parent="hip_base"
+            child="hip_aa_frame_right_side"
+            origin="0 ${hip_base_height/2} 0"
+            axis="1 0 0"
+            safety="${safety_values['haa']}"
+            reduction="${linear_reduction}"
+            limits="${joint_limits['right_haa']}"
+    />
 
     <joint name="right_hip_angle" type="fixed">
         <parent link="hip_aa_frame_right_side"/>
@@ -762,54 +409,38 @@
         <origin xyz="0 ${hip_aa_frame_height} 0" rpy="0 0 0"/>
     </joint>
 
-    <joint name="right_hip_fe" type="revolute">
-        <parent link="hip_aa_frame_right_front"/>
-        <child link="upper_leg_right"/>
-        <origin xyz="${-hip_aa_frame_width} ${-upper_leg_offset} 0" rpy="0 0 0"/>
-        <axis xyz="0 1 0"/>
+    <xacro:march_joint
+            name="right_hip_fe"
+            parent="hip_aa_frame_right_front"
+            child="upper_leg_right"
+            origin="${-hip_aa_frame_width} ${-upper_leg_offset} 0"
+            axis="0 1 0"
+            safety="${safety_values['hfe']}"
+            reduction="${rotary_reduction}"
+            limits="${joint_limits['right_hfe']}"
+    />
 
-        <limit velocity="${hip_fe_velocity_limit}"
-               effort="${hip_fe_effort_limit}"
-               lower="${right_hip_fe_rotation_lower_limit}"
-               upper="${right_hip_fe_rotation_upper_limit}"/>
-        <safety_controller soft_lower_limit="${right_hip_fe_rotation_lower_limit + hip_fe_soft_buffer}"
-                           soft_upper_limit="${right_hip_fe_rotation_upper_limit - hip_fe_soft_buffer}"
-                           k_position="${k_position_value_hfe}"
-                           k_velocity="${k_velocity_value_hfe}" />
+    <xacro:march_joint
+            name="right_knee"
+            parent="upper_leg_right"
+            child="lower_leg_right"
+            origin="0 0 ${-upper_leg_height}"
+            axis="0 -1 0"
+            safety="${safety_values['knee']}"
+            limits="${joint_limits['right_knee']}"
+            reduction="${rotary_reduction}"
+    />
 
-    </joint>
-
-    <joint name="right_knee" type="revolute">
-        <parent link="upper_leg_right"/>
-        <child link="lower_leg_right"/>
-        <origin xyz="0 0 ${-upper_leg_height}" rpy="0 0 0"/>
-        <axis xyz="0 -1 0"/>
-
-        <limit velocity="${knee_velocity_limit}"
-               effort="${knee_effort_limit}"
-               lower="${right_knee_rotation_lower_limit}"
-               upper="${right_knee_rotation_upper_limit}"/>
-        <safety_controller soft_lower_limit="${right_knee_rotation_lower_limit + knee_extension_soft_buffer}"
-                           soft_upper_limit="${right_knee_rotation_upper_limit - knee_flexion_soft_buffer}"
-                           k_position="${k_position_value_kfe}"
-                           k_velocity="${k_velocity_value_kfe}" />
-    </joint>
-
-    <joint name="right_ankle" type="revolute">
-        <parent link="lower_leg_right"/>
-        <child link="ankle_plate_right"/>
-        <origin xyz="0 ${-ankle_plate_offset} ${-lower_leg_height}" rpy="0 0 0"/>
-        <axis xyz="0 1 0"/>
-
-        <limit velocity="${ankle_velocity_limit}"
-               effort="${ankle_effort_limit}"
-               lower="${right_ankle_rotation_lower_limit}"
-               upper="${right_ankle_rotation_upper_limit}"/>
-        <safety_controller soft_lower_limit="${right_ankle_rotation_lower_limit + ankle_plantarflexion_soft_buffer}"
-                           soft_upper_limit="${right_ankle_rotation_upper_limit - ankle_dorsalflexion_soft_buffer}"
-                           k_position="${k_position_value_adpf}"
-                           k_velocity="${k_velocity_value_adpf}" />
-    </joint>
+    <xacro:march_joint
+            name="right_ankle"
+            parent="lower_leg_right"
+            child="ankle_plate_right"
+            safety="${safety_values['ankle']}"
+            origin="0 ${-ankle_plate_offset} ${-lower_leg_height}"
+            axis="0 1 0"
+            reduction="${linear_reduction}"
+            limits="${joint_limits['right_ankle']}"
+    />
 
     <joint name="right_foot_angle" type="fixed">
         <parent link="ankle_plate_right"/>
@@ -818,93 +449,18 @@
     </joint>
 
 
-    <xacro:include filename="camera/_d435.urdf.xacro" />
-    <xacro:sensor_d435 parent="hip_base" plugin="$(arg realsense_simulation)">
-<!--    Attached to the hip_base, since this is most comparable to the backpack -->
-<!--    in amount of movement, the distance from hip base is based on first design.-->
+    <xacro:include filename="camera/_d435.urdf.xacro"/>
+    <xacro:sensor_d435 name="camera_front" topics_ns="camera_front" parent="hip_base"
+                       plugin="$(arg realsense_simulation)">
+        <!--    Attached to the hip_base, since this is most comparable to the backpack -->
+        <!--    in amount of movement, the distance from hip base is based on first design.-->
         <origin xyz="-0.17 0.195 0.215" rpy="${0.5 * pi} ${0.25 * pi} ${pi}"/>
         <!-- Rotate to be vertical and pointing down 45 degrees -->
     </xacro:sensor_d435>
 
+    <xacro:sensor_d435 name="camera_back" topics_ns="camera_back" parent="hip_base"
+                       plugin="$(arg realsense_simulation)">
+        <origin xyz="0 0.22 0" rpy="0 ${0.3 * pi} 0"/>
+    </xacro:sensor_d435>
 
-    <!-- ROS Control plugin for Gazebo -->
-    <transmission name="left_hip_aa">
-        <type>transmission_interface/SimpleTransmission</type>
-        <joint name="left_hip_aa">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-        </joint>
-        <actuator name="left_hip_aa_motor">
-            <mechanicalReduction>200</mechanicalReduction>
-        </actuator>
-    </transmission>
-
-    <transmission name="left_hip_fe">
-        <type>transmission_interface/SimpleTransmission</type>
-        <joint name="left_hip_fe">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-        </joint>
-        <actuator name="left_hip_fe_motor">
-            <mechanicalReduction>101</mechanicalReduction>
-        </actuator>
-    </transmission>
-
-    <transmission name="left_knee">
-        <type>transmission_interface/SimpleTransmission</type>
-        <joint name="left_knee">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-        </joint>
-        <actuator name="left_knee_motor">
-            <mechanicalReduction>101</mechanicalReduction>
-        </actuator>
-    </transmission>
-
-    <transmission name="left_ankle">
-        <type>transmission_interface/SimpleTransmission</type>
-        <joint name="left_ankle">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-        </joint>
-        <actuator name="left_ankle_motor">
-            <mechanicalReduction>200</mechanicalReduction>
-        </actuator>
-    </transmission>
-
-    <transmission name="right_hip_aa">
-        <type>transmission_interface/SimpleTransmission</type>
-        <joint name="right_hip_aa">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-        </joint>
-        <actuator name="right_hip_aa_motor">
-            <mechanicalReduction>200</mechanicalReduction>
-        </actuator>
-    </transmission>
-
-    <transmission name="right_hip_fe">
-        <type>transmission_interface/SimpleTransmission</type>
-        <joint name="right_hip_fe">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-        </joint>
-        <actuator name="right_hip_fe_motor">
-            <mechanicalReduction>101</mechanicalReduction>
-        </actuator>
-    </transmission>
-
-    <transmission name="right_knee">
-        <type>transmission_interface/SimpleTransmission</type>
-        <joint name="right_knee">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-        </joint>
-        <actuator name="right_knee_motor">
-            <mechanicalReduction>101</mechanicalReduction>
-        </actuator>
-    </transmission>
-
-    <transmission name="right_ankle">
-        <type>transmission_interface/SimpleTransmission</type>
-        <joint name="right_ankle">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-        </joint>
-        <actuator name="right_ankle_motor">
-            <mechanicalReduction>200</mechanicalReduction>
-        </actuator>
-    </transmission>
 </robot>

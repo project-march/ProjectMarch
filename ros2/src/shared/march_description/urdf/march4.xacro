@@ -56,30 +56,42 @@
     <xacro:property name="width"
                     value="0.05"/> <!-- Square dimensions (widthxwidth) of beams -->
 
-    <xacro:property name="hip_base_height" value="0.160"/>
-    <xacro:property name="hip_base_mass" value="8.686"/>
+    <xacro:property name="hip_base_height" value="${dimensions['hip_base']['length']}"/>
+    <xacro:property name="hip_base_mass" value="${dimensions['hip_base']['mass']}"/>
     <!-- mass = Hip base + HAA actuators -->
 
-    <xacro:property name="hip_aa_frame_height" value="0.170"/>
-    <xacro:property name="hip_aa_frame_width" value="0.1395"/>
-    <xacro:property name="hip_aa_mass" value="2.982"/>
+    <xacro:property name="hip_aa_frame_height"
+                    value="${dimensions['hip_aa_side']['length']}"/>
+    <xacro:property name="hip_aa_frame_width"
+                    value="${dimensions['hip_aa_base']['length']}"/>
+    <xacro:property name="hip_aa_mass" value="${dimensions['hip_aa_side']['mass']}"/>
     <!-- mass = Moving hip -->
 
-    <xacro:property name="upper_leg_height" value="0.385"/>
-    <xacro:property name="upper_leg_offset" value="0.04"/>
-    <xacro:property name="upper_leg_mass" value="4.995"/>
+    <xacro:property name="upper_leg_height"
+                    value="${dimensions['upper_leg']['length']}"/>
+    <xacro:property name="upper_leg_offset"
+                    value="${dimensions['upper_leg']['offset']}"/>
+    <xacro:property name="upper_leg_mass"
+                    value="${dimensions['upper_leg']['mass']}"/>
     <!-- mass = KFE joint + HFE joint + Upper leg -->
 
-    <xacro:property name="lower_leg_height" value="0.385"/>
-    <xacro:property name="lower_leg_mass" value="4.458"/>
+    <xacro:property name="lower_leg_height"
+                    value="${dimensions['lower_leg']['length']}"/>
+    <xacro:property name="lower_leg_mass"
+                    value="${dimensions['lower_leg']['mass']}"/>
     <!-- mass = Ankle actuator + Lower leg -->
 
-    <xacro:property name="ankle_plate_height" value="0.12"/>
-    <xacro:property name="ankle_plate_offset" value="0.07"/>
+    <xacro:property name="ankle_plate_height"
+                    value="${dimensions['ankle_plate']['length']}"/>
+    <xacro:property name="ankle_plate_offset"
+                    value="${dimensions['ankle_plate']['offset']}"/>
 
-    <xacro:property name="foot_height_forward" value="${0.184}"/>
-    <xacro:property name="foot_height_backward" value="${0.059}"/>
-    <xacro:property name="foot_mass" value="1.821"/>
+    <xacro:property name="foot_height_forward"
+                    value="${dimensions['foot']['height_forward']}"/>
+    <xacro:property name="foot_height_backward"
+                    value="${dimensions['foot']['height_backward']}"/>
+    <xacro:property name="foot_mass"
+                    value="${dimensions['foot']['mass']}"/>
     <xacro:property name="foot_mu1" value="1"/>
     <xacro:property name="foot_mu2" value="1"/>
     <!-- Minimum allowable depth before contact correction impulse is applied. -->
@@ -138,9 +150,9 @@
                       direction="y"
                       visual_origin="${-hip_aa_frame_width} 0 0"
                       collision_origin="0 0 0"
-                      mesh="HipBase.stl"
+                      mesh="march4/HipBase.stl"
                       com="${hip_base_com_x} ${hip_base_com_y} ${hip_base_com_z}"
-                      mass="${hip_base_mass}"
+                      mass="${dimensions['hip_base']['mass']}"
                       inertia="${inertia['hip_base']}"
     />
 
@@ -155,7 +167,7 @@
                       direction="y"
                       collision_origin="0 ${-hip_aa_frame_height/2} 0"
                       visual_origin="${-hip_aa_frame_width} ${hip_base_height/2} 0"
-                      mesh="LeftHAA.stl"
+                      mesh="march4/LeftHAA.stl"
     />
 
     <xacro:frame_part name="hip_aa_frame_left_front"
@@ -174,7 +186,7 @@
                       direction="z"
                       collision_origin="0 0 ${-upper_leg_height/2}"
                       visual_origin="0 ${hip_base_height/2 + hip_aa_frame_height - upper_leg_offset} 0"
-                      mesh="UpperLeftLeg.stl"
+                      mesh="march4/UpperLeftLeg.stl"
                       com="${upper_leg_com_x} ${-upper_leg_com_y} ${upper_leg_com_z}"
                       mass="${upper_leg_mass}"
                       inertia="${inertia['upper_leg']}"
@@ -186,7 +198,7 @@
                       direction="z"
                       collision_origin="0 0 ${-lower_leg_height/2}"
                       visual_origin="0 ${hip_base_height/2 + hip_aa_frame_height - upper_leg_offset} ${upper_leg_height}"
-                      mesh="LowerLeftLeg.stl"
+                      mesh="march4/LowerLeftLeg.stl"
                       com="${lower_leg_com_x} ${-lower_leg_com_y} ${lower_leg_com_z}"
                       mass="${lower_leg_mass}"
                       inertia="${inertia['lower_leg']}"
@@ -196,7 +208,7 @@
                       reflect="-1"
                       length="${ankle_plate_height}"
                       direction="z"
-                      mesh="LeftFoot.stl"
+                      mesh="march4/LeftFoot.stl"
                       visual_origin="0
                                      ${hip_base_height/2 + hip_aa_frame_height - upper_leg_offset - ankle_plate_offset}
                                      ${foot_scale * (upper_leg_height + lower_leg_height)}"
@@ -228,7 +240,7 @@
                       length="${hip_aa_frame_height}"
                       visual_origin="${-hip_aa_frame_width} ${-hip_base_height/2} 0"
                       collision_origin="0 ${hip_aa_frame_height/2} 0"
-                      mesh="RightHAA.stl"
+                      mesh="march4/RightHAA.stl"
     />
 
     <xacro:frame_part name="hip_aa_frame_right_front"
@@ -247,7 +259,7 @@
                       length="${upper_leg_height}"
                       collision_origin="0 0 ${-upper_leg_height/2}"
                       visual_origin="0 ${-hip_base_height/2 - hip_aa_frame_height + upper_leg_offset} 0"
-                      mesh="UpperRightLeg.stl"
+                      mesh="march4/UpperRightLeg.stl"
                       com="${upper_leg_com_x} ${upper_leg_com_y} ${upper_leg_com_z}"
                       inertia="${inertia['upper_leg']}"
                       mass="${upper_leg_mass}"
@@ -258,7 +270,7 @@
                       length="${lower_leg_height}"
                       direction="z"
                       visual_origin="0 ${-hip_base_height/2 - hip_aa_frame_height + upper_leg_offset} ${upper_leg_height}"
-                      mesh="LowerRightLeg.stl"
+                      mesh="march4/LowerRightLeg.stl"
                       com="${lower_leg_com_x} ${lower_leg_com_y} ${lower_leg_com_z}"
                       mass="${lower_leg_mass}"
                       inertia="${inertia['lower_leg']}"
@@ -270,7 +282,7 @@
                       reflect="1"
                       length="${ankle_plate_height}"
                       direction="z"
-                      mesh="RightFoot.stl"
+                      mesh="march4/RightFoot.stl"
                       visual_origin="0
                                      ${-hip_base_height/2 - hip_aa_frame_height + upper_leg_offset + ankle_plate_offset}
                                      ${foot_scale * (upper_leg_height + lower_leg_height)}"
