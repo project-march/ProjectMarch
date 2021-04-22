@@ -1,12 +1,12 @@
-description: 'Stairs down closing step subgait of the stairs with height of 12 cm
+description: 'Stairs down closing step subgait of the stairs with height of 22 cm
   and depth of 45cm. '
 duration: 4000000000
 gait_type: stairs_like
 joints:
   left_ankle:
-  - position: -0.26179939
+  - position: 0.04363323
     time_from_start: 0
-    velocity: 0.13960016
+    velocity: 0.0
   - position: 0.04363323
     time_from_start: 1000000000
     velocity: 0.0
@@ -24,21 +24,21 @@ joints:
     time_from_start: 4000000000
     velocity: 0.0
   left_hip_fe:
-  - position: 0.62829933
+  - position: 0.99386553
     time_from_start: 0
-    velocity: 0.26179939
-  - position: 1.01776132
-    time_from_start: 2029142860
-    velocity: 0
+    velocity: 0.0
+  - position: 1.21493765
+    time_from_start: 2029100000
+    velocity: 0.0
   - position: -0.0873
     time_from_start: 4000000000
     velocity: 0.0
   left_knee:
-  - position: 1.57079633
+  - position: 1.9097933
     time_from_start: 0
-    velocity: 0.43629915
-  - position: 1.38253464
-    time_from_start: 2000000000
+    velocity: 0.0
+  - position: 1.9097933
+    time_from_start: 2009900000
     velocity: -0.34906585
   - position: 0.0
     time_from_start: 4000000000
@@ -78,4 +78,4 @@ joints:
     time_from_start: 4000000000
     velocity: 0.0
 name: left_close
-version: MVI_stairsdown_leftclose_low_deep_v1
+version: MVI_stairsdown_leftclose_high_deep_v1
