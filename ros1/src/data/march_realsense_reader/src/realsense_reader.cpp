@@ -21,9 +21,9 @@ using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
 
 std::map<int, std::string> POINTCLOUD_TOPICS
     = { { march_shared_msgs::GetGaitParametersRequest::CAMERA_FRONT,
-            "/camera_front/depth/color/points" },
+            /*__y=*/"/camera_front/depth/color/points" },
           { march_shared_msgs::GetGaitParametersRequest::CAMERA_BACK,
-              "/camera_back/depth/color/points" } };
+              /*__y=*/"/camera_back/depth/color/points" } };
 ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(/*t=*/1.0); // secs
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n)
