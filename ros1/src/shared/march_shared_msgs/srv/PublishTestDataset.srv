@@ -6,9 +6,6 @@ uint8 STOP=2
 uint8 CUSTOM=3
 uint8 selected_mode
 
-# This bool is used to specify the front or back camera
-bool front_camera
-
 # A string specifying the name of the pointcloud when CUSTUM is the selected mode.
 string pointcloud_file_name
 ---

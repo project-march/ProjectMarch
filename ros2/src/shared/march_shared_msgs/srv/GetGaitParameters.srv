@@ -12,6 +12,7 @@ string frame_id_to_transform_to
 
 uint8 CAMERA_FRONT=0
 uint8 CAMERA_BACK=1
+uint8 TEST_CLOUD=2
 uint8 camera_to_use
 ---
 # Whether a valid place to set the foot was found using the camera.
