@@ -7,6 +7,7 @@ and to check the safety limits.
 
 from __future__ import annotations
 
+from math import isclose
 from typing import List, Tuple, Any
 
 from march_utility.exceptions.gait_exceptions import (
@@ -180,8 +181,10 @@ class JointTrajectory(object):
         return (
             self.setpoints[0].time.nanoseconds == 0 or self.setpoints[0].velocity == 0
         ) and (
-            abs(self.setpoints[-1].time - round(self.duration, Setpoint.digits)).seconds
-            <= ALLOWED_ERROR
+            isclose(
+                self.setpoints[-1].time.seconds, self.duration.seconds,
+                abs_tol=ALLOWED_ERROR
+            )
             or self.setpoints[-1].velocity == 0
         )
 

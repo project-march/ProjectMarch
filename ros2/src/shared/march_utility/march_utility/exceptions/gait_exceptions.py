@@ -80,8 +80,8 @@ class SubgaitInterpolationError(Exception):
 class UnknownDimensionsError(Exception):
     def __init__(self, dimensions):
         msg = (
-            f"Unknwon dimensions, should be from InterpolationDimensions enum, "
-            f"but was: {dimensions}"
+            f"Unknown amount of dimensions, should be from InterpolationDimensions "
+            f"enum, but was: {dimensions}"
         )
         super(UnknownDimensionsError, self).__init__(msg)
 
