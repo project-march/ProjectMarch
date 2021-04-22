@@ -53,15 +53,20 @@ void RegionGrower::readYaml()
 {
     if (YAML::Node region_growing_parameters = config_tree_["region_growing"]) {
         number_of_neighbours = yaml_utilities::grabParameter<int>(
-            region_growing_parameters, "number_of_neighbours");
+            region_growing_parameters, "number_of_neighbours")
+                                   .value();
         min_cluster_size = yaml_utilities::grabParameter<int>(
-            region_growing_parameters, "min_cluster_size");
+            region_growing_parameters, "min_cluster_size")
+                               .value();
         max_cluster_size = yaml_utilities::grabParameter<int>(
-            region_growing_parameters, "max_cluster_size");
+            region_growing_parameters, "max_cluster_size")
+                               .value();
         smoothness_threshold = yaml_utilities::grabParameter<float>(
-            region_growing_parameters, "smoothness_threshold");
+            region_growing_parameters, "smoothness_threshold")
+                                   .value();
         curvature_threshold = yaml_utilities::grabParameter<float>(
-            region_growing_parameters, "curvature_threshold");
+            region_growing_parameters, "curvature_threshold")
+                                  .value();
     } else {
         ROS_ERROR("'region_growing' parameters not found in parameter file");
     }
