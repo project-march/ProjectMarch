@@ -214,6 +214,8 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
         << std::endl);
 
     res.success = true;
+    // Returning false means that the service was not able to respond at all,
+    // this causes problems with the bridge, therefore always return true!
     return true;
 }
 
