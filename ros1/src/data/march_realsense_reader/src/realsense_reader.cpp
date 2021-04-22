@@ -31,17 +31,10 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
 {
 
     // Create a subscriber for every pointcloud topic
-<<<<<<< HEAD
-    for (auto& item : POINTCLOUD_TOPICS) {
-        pointcloud_subscribers_[item.first]
-            = n_->subscribe<sensor_msgs::PointCloud2>(item.second,
-                /*queue_size=*/1, &RealSenseReader::pointcloudCallback, this);
-=======
     for (auto& item : POINTCLOUD_TOPICS) {
         pointcloud_subscribers_[item.first]
             = n_->subscribe<sensor_msgs::PointCloud2>(
-                item.second, 1, &RealSenseReader::pointcloudCallback, this);
->>>>>>> 78e67cd0a... Format code
+                item.second, /*queue_size=*/1, &RealSenseReader::pointcloudCallback, this);
     }
 
     read_pointcloud_service_
