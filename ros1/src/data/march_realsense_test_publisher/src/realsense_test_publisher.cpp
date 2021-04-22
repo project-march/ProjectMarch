@@ -36,50 +36,56 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
     march_shared_msgs::PublishTestDataset::Request& req,
     march_shared_msgs::PublishTestDataset::Response& res)
 {
-    bool success;
+    bool success = true;
 
-    std::string selected_topic;
     if (req.use_front_camera) {
-        selected_topic = POINTCLOUD_FRONT_TOPIC;
+        pointcloud_topic = POINTCLOUD_FRONT_TOPIC;
     } else {
-        selected_topic = POINTCLOUD_BACK_TOPIC;
+        pointcloud_topic = POINTCLOUD_BACK_TOPIC;
     }
 
     SelectedMode selected_mode = (SelectedMode)req.selected_mode;
     switch (selected_mode) {
         case SelectedMode::start: {
-            startPublishingPointclouds();
+//            startPublishingPointclouds();
             ROS_DEBUG_STREAM("Started publishing pointclouds");
             break;
         }
         case SelectedMode::next: {
-            publishNextPointcloud();
+//            publishNextPointcloud();
             ROS_DEBUG_STREAM("now publishing next pointcloud");
             break;
         }
         case SelectedMode::custom: {
-            ROS_DEBUG_STREAM("Now publishing pointcloud with file name "
-                << req.pointcloud_file_name)
+            success &= publishCustomPointcloud(req.pointcloud_file_name);
             if (success) {
                 ROS_DEBUG_STREAM("Now publishing pointcloud with file name "
-                    << req.pointcloud_file_name)
+                    << req.pointcloud_file_name);
             } else {
                 ROS_DEBUG_STREAM("Failed to publish pointcloud with file name "
-                    << req.pointcloud_file_name)
+                    << req.pointcloud_file_name);
             }
+            break;
         }
         case SelectedMode::end: {
-            stopPublishingPointClouds();
+//            stopPublishingPointClouds();
             ROS_DEBUG_STREAM("Stopped publishing pointclouds");
+            break;
         }
     }
     res.success = success;
     return success;
 }
 
+bool RealsenseTestPublisher::publishCustomPointcloud(std::string pointcloud_file_name)
+{
+    printPointcloudNames();
+    return false;
+}
+
 void RealsenseTestPublisher::printPointcloudNames()
 {
-    for (std::string path : file_paths) {
-        ROS_DEBUG_STREAM(path);
+    for (path path : file_paths) {
+        ROS_DEBUG_STREAM(path.filename().string());
     }
 }
