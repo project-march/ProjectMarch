@@ -12,6 +12,7 @@
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
+
 #define EPSILON 0.0001
 
 using PointCloud2D = pcl::PointCloud<pcl::PointXY>;
@@ -29,101 +30,52 @@ using HullVector = std::vector<Hull::Ptr>;
 using PolygonVector = std::vector<Polygon>;
 using GaitParameters = march_shared_msgs::GaitParameters;
 
-ParameterDeterminer::ParameterDeterminer(YAML::Node config_tree, bool debugging)
+ParameterDeterminer::ParameterDeterminer(bool debugging)
     : debugging_ { debugging }
-    , config_tree_ { config_tree }
 {
 }
 
 // Construct a basic HullParameterDeterminer class
-HullParameterDeterminer::HullParameterDeterminer(
-    YAML::Node config_tree, bool debugging)
-    : ParameterDeterminer(config_tree, debugging)
+HullParameterDeterminer::HullParameterDeterminer(bool debugging)
+    : ParameterDeterminer(debugging)
 {
-    readYaml();
 }
 
-// Read all relevant parameters from the parameter yaml file
-void HullParameterDeterminer::readYaml()
+void HullParameterDeterminer::readParameters(
+    march_realsense_reader::pointcloud_parametersConfig& config)
 {
-    number_of_optional_foot_locations = yaml_utilities::grabParameter<int>(
-        config_tree_, "number_of_optional_foot_locations")
-                                            .value();
+    number_of_optional_foot_locations
+        = config.parameter_determiner_foot_locations;
+    hull_dimension = config.hull_dimension;
+
+    min_x_stairs = config.parameter_determiner_stairs_locations_min_x;
+    max_x_stairs = config.parameter_determiner_stairs_locations_max_x;
+    min_z_stairs = config.parameter_determiner_stairs_locations_min_z;
+    max_z_stairs = config.parameter_determiner_stairs_locations_max_z;
+
     general_most_desirable_location_is_mid
-        = yaml_utilities::grabParameter<bool>(
-            config_tree_, "general_most_desirable_location_is_mid")
-              .value();
+        = config.parameter_determiner_most_desirable_loc_is_mid;
     general_most_desirable_location_is_small
-        = yaml_utilities::grabParameter<bool>(
-            config_tree_, "general_most_desirable_location_is_small")
-              .value();
+        = config.parameter_determiner_most_desirable_loc_is_small;
 
-    foot_length_back = yaml_utilities::grabParameter<double>(
-        config_tree_, "foot_length_back")
-                           .value() foot_length_front
-        = yaml_utilities::grabParameter<double>(
-            config_tree_, "foot_length_front")
-              .value() foot_width
-        = yaml_utilities::grabParameter<double>(config_tree_, "foot_width")
-              .value() hull_dimension
-        = yaml_utilities::grabParameter<int>(config_tree_, "hull_dimension")
-              .value()
+    foot_length_back = config.parameter_determiner_foot_length_back;
+    foot_length_front = config.parameter_determiner_foot_length_front;
+    foot_width = config.parameter_determiner_foot_length_front;
+    hull_dimension = config.hull_dimension;
 
-                  hull_dimension
-        = yaml_utilities::grabParameter<int>(config_tree_, "hull_dimension")
-              .value();
-    if (YAML::Node stairs_parameters = config_tree_["stairs_parameters"]) {
-        min_x_stairs = yaml_utilities::grabParameter<double>(
-            stairs_parameters, "min_x_stairs")
-                           .value();
-        max_x_stairs = yaml_utilities::grabParameter<double>(
-            stairs_parameters, "max_x_stairs")
-                           .value();
-        min_z_stairs = yaml_utilities::grabParameter<double>(
-            stairs_parameters, "min_z_stairs")
-                           .value();
-        max_z_stairs = yaml_utilities::grabParameter<double>(
-            stairs_parameters, "max_z_stairs")
-                           .value();
-        y_location = yaml_utilities::grabParameter<double>(
-            stairs_parameters, "y_location")
-                         .value();
-    } else {
-        ROS_ERROR(
-            "'stairs_parameters' parameters not found in parameters file");
-    }
+    max_search_area = config.parameter_determiner_ramp_max_search_area;
+    min_search_area = config.parameter_determiner_ramp_min_search_area;
+    x_flat = config.parameter_determiner_ramp_x_flat;
+    z_flat = config.parameter_determiner_ramp_z_flat;
+    x_steep = config.parameter_determiner_ramp_x_steep;
+    z_steep = config.parameter_determiner_ramp_z_steep;
+    y_location = config.parameter_determiner_ramp_y_location;
+    max_allowed_z_deviation_foot = config.parameter_determiner_max_allowed_z_deviation_foot;
+    max_distance_to_line
+        = config.parameter_determiner_ramp_max_distance_to_line;
 
-    if (YAML::Node ramp_parameters = config_tree_["ramp_parameters"]) {
-        x_flat
-            = yaml_utilities::grabParameter<double>(ramp_parameters, "x_flat")
-                  .value();
-        z_flat
-            = yaml_utilities::grabParameter<double>(ramp_parameters, "z_flat")
-                  .value();
-        x_steep
-            = yaml_utilities::grabParameter<double>(ramp_parameters, "x_steep")
-                  .value();
-        z_steep
-            = yaml_utilities::grabParameter<double>(ramp_parameters, "z_steep")
-                  .value();
-        y_location = yaml_utilities::grabParameter<double>(
-            ramp_parameters, "y_location")
-                         .value();
-        max_allowed_z_deviation_foot = yaml_utilities::grabParameter<double>(
-            ramp_parameters, "max_allowed_z_deviation_foot")
-                                           .value() min_search_area
-            = yaml_utilities::grabParameter<double>(
-                ramp_parameters, "min_search_area")
-                  .value();
-        max_search_area = yaml_utilities::grabParameter<double>(
-            ramp_parameters, "max_search_area")
-                              .value();
-        max_distance_to_line = yaml_utilities::grabParameter<double>(
-            ramp_parameters, "max_distance_to_line")
-                                   .value();
-    } else {
-        ROS_ERROR("'ramp_parameters' parameters not found in parameters file");
-    }
+    debugging_ = config.debug;
+>>>>>>> main
 }
 
 /** This function takes in a pointcloud with matching normals and
@@ -139,6 +91,7 @@ bool HullParameterDeterminer::determineParameters(
     time_t start_determine_parameters = clock();
 
     ROS_DEBUG("Determining parameters with hull parameter determiner");
+
     hull_vector_ = hull_vector;
     selected_gait_ = selected_gait;
     gait_parameters_ = gait_parameters;
@@ -249,19 +202,16 @@ bool HullParameterDeterminer::getGaitParametersFromFootLocationRampDown()
 bool HullParameterDeterminer::getOptimalFootLocation()
 {
     bool success = true;
-
     // Get some locations on the ground we might want to place our foot
     foot_locations_to_try = boost::make_shared<PointCloud2D>();
-    success &= getOptionalFootLocations(foot_locations_to_try);
 
+    success &= getOptionalFootLocations(foot_locations_to_try);
     // Crop those locations to only be left with locations where it is possible
     // to place the foot
     possible_foot_locations = boost::make_shared<PointNormalCloud>();
     success &= cropCloudToHullVectorUnique(
         foot_locations_to_try, possible_foot_locations);
-
     success &= getOptimalFootLocationFromPossibleLocations();
-
     return success;
 }
 
@@ -327,7 +277,7 @@ bool HullParameterDeterminer::getPossibleMostDesirableLocation()
     }
 
     double min_distance_to_object = std::numeric_limits<double>::max();
-    double distance_to_object = std::numeric_limits<double>::max();
+    double distance_to_object;
 
     for (pcl::PointNormal& possible_foot_location : *possible_foot_locations) {
         if (not isValidLocation(possible_foot_location)) {

@@ -2,7 +2,7 @@
 #define MARCH_PARAMETER_DETERMINER_H
 #include "march_shared_msgs/GetGaitParameters.h"
 #include "utilities/realsense_gait_utilities.h"
-#include "yaml-cpp/yaml.h"
+#include <march_realsense_reader/pointcloud_parametersConfig.h>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
@@ -25,7 +25,7 @@ using GaitParameters = march_shared_msgs::GaitParameters;
 
 class ParameterDeterminer {
 public:
-    ParameterDeterminer(YAML::Node config_tree, bool debugging);
+    ParameterDeterminer(bool debugging);
     /** This function is required to be implemented by any plane finder **/
     virtual bool determineParameters(
         boost::shared_ptr<PlaneCoefficientsVector> const
@@ -38,13 +38,19 @@ public:
 
     virtual ~ParameterDeterminer() {};
 
+    /** This function is called upon whenever a parameter from config is
+     * changed, including when launching the node
+     */
+    virtual void readParameters(
+        march_realsense_reader::pointcloud_parametersConfig& config)
+        = 0;
+
 protected:
     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;
     boost::shared_ptr<HullVector> hull_vector_;
     boost::shared_ptr<PolygonVector> polygon_vector_;
     SelectedGait selected_gait_;
     boost::shared_ptr<GaitParameters> gait_parameters_;
-    YAML::Node config_tree_;
     bool debugging_;
 };
 
@@ -53,9 +59,8 @@ protected:
  */
 class HullParameterDeterminer : ParameterDeterminer {
 public:
-    /** Basic constructor for ParameterDeterminer preprocessor, but this will
-     * also read the yaml **/
-    HullParameterDeterminer(YAML::Node config_tree, bool debugging);
+    /** Basic constructor for ParameterDeterminer preprocessor **/
+    HullParameterDeterminer(bool debugging);
 
     /** This function should take in a pointcloud with matching normals and
      * hulls, and turn this into a location where the foot can be placed,
@@ -66,6 +71,12 @@ public:
         boost::shared_ptr<PolygonVector> const polygon_vector,
         SelectedGait const selected_gait,
         boost::shared_ptr<GaitParameters> gait_parameters) override;
+
+    /** This function is called upon whenever a parameter from config is
+     * changed, including when launching the node
+     */
+    void readParameters(
+        march_realsense_reader::pointcloud_parametersConfig& config) override;
 
     pcl::PointNormal optimal_foot_location;
     PointNormalCloud::Ptr possible_foot_locations;
@@ -159,8 +170,7 @@ protected:
     // 0) to (end, 0)
     bool fillOptionalFootLocationCloud(float start, float end);
 
-    // Read all relevant parameters from the parameter yaml file
-    void readYaml();
+    // Read all relevant parameters
     int hull_dimension;
     int number_of_optional_foot_locations;
     float min_x_stairs;
