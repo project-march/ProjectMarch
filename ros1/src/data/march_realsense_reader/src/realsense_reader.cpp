@@ -27,17 +27,16 @@ std::map<int, std::string> POINTCLOUD_TOPICS
               "/camera_back/depth/color/points" } };
 ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(/*t=*/1.0); // secs
 
-
 RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     : n_(n)
 {
 
     // Create a subscriber for every pointcloud topic
 <<<<<<< HEAD
-    for (auto &item : POINTCLOUD_TOPICS) {
-      pointcloud_subscribers_[item.first] =
-          n_->subscribe<sensor_msgs::PointCloud2>(
-          item.second, /*queue_size=*/1, &RealSenseReader::pointcloudCallback, this);
+    for (auto& item : POINTCLOUD_TOPICS) {
+        pointcloud_subscribers_[item.first]
+            = n_->subscribe<sensor_msgs::PointCloud2>(item.second,
+                /*queue_size=*/1, &RealSenseReader::pointcloudCallback, this);
 =======
     for (auto& item : POINTCLOUD_TOPICS) {
         pointcloud_subscribers_[item.first]
@@ -45,7 +44,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
                 item.second, 1, &RealSenseReader::pointcloudCallback, this);
 >>>>>>> 78e67cd0a... Format code
     }
-    
+
     read_pointcloud_service_
         = n_->advertiseService("/camera/process_pointcloud",
             &RealSenseReader::processPointcloudCallback, this);
@@ -409,8 +408,9 @@ bool RealSenseReader::processPointcloudCallback(
 
     time_t start_callback = clock();
     if (req.camera_to_use >= POINTCLOUD_TOPICS.size()) {
-        res.error_message = "Unknown camera given in the request, not available in the "
-                          "POINTCLOUD_TOPICS in the realsense_reader";
+        res.error_message
+            = "Unknown camera given in the request, not available in the "
+              "POINTCLOUD_TOPICS in the realsense_reader";
         res.success = false;
         return true;
     }
