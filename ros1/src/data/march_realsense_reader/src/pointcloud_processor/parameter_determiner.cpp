@@ -48,35 +48,34 @@ void HullParameterDeterminer::readParameters(
         = config.parameter_determiner_foot_locations;
     hull_dimension = config.hull_dimension;
 
-    min_x_stairs = config.parameter_determiner_stairs_locations_min_x;
-    max_x_stairs = config.parameter_determiner_stairs_locations_max_x;
-    min_z_stairs = config.parameter_determiner_stairs_locations_min_z;
-    max_z_stairs = config.parameter_determiner_stairs_locations_max_z;
+    min_x_stairs = (float)config.parameter_determiner_stairs_locations_min_x;
+    max_x_stairs = (float)config.parameter_determiner_stairs_locations_max_x;
+    min_z_stairs = (float)config.parameter_determiner_stairs_locations_min_z;
+    max_z_stairs = (float)config.parameter_determiner_stairs_locations_max_z;
 
     general_most_desirable_location_is_mid
         = config.parameter_determiner_most_desirable_loc_is_mid;
     general_most_desirable_location_is_small
         = config.parameter_determiner_most_desirable_loc_is_small;
 
-    foot_length_back = config.parameter_determiner_foot_length_back;
-    foot_length_front = config.parameter_determiner_foot_length_front;
-    foot_width = config.parameter_determiner_foot_length_front;
-    hull_dimension = config.hull_dimension;
+    foot_length_back = (float)config.parameter_determiner_foot_length_back;
+    foot_length_front = (float)config.parameter_determiner_foot_length_front;
+    foot_width = (float)config.parameter_determiner_foot_length_front;
+    hull_dimension = (float)config.hull_dimension;
 
-    max_search_area = config.parameter_determiner_ramp_max_search_area;
-    min_search_area = config.parameter_determiner_ramp_min_search_area;
-    x_flat = config.parameter_determiner_ramp_x_flat;
-    z_flat = config.parameter_determiner_ramp_z_flat;
-    x_steep = config.parameter_determiner_ramp_x_steep;
-    z_steep = config.parameter_determiner_ramp_z_steep;
-    y_location = config.parameter_determiner_ramp_y_location;
+    max_search_area = (float)config.parameter_determiner_ramp_max_search_area;
+    min_search_area = (float)config.parameter_determiner_ramp_min_search_area;
+    x_flat = (float)config.parameter_determiner_ramp_x_flat;
+    z_flat = (float)config.parameter_determiner_ramp_z_flat;
+    x_steep = (float)config.parameter_determiner_ramp_x_steep;
+    z_steep = (float)config.parameter_determiner_ramp_z_steep;
+    y_location = (float)config.parameter_determiner_ramp_y_location;
     max_allowed_z_deviation_foot
-        = config.parameter_determiner_max_allowed_z_deviation_foot;
+        = (float)config.parameter_determiner_max_allowed_z_deviation_foot;
     max_distance_to_line
-        = config.parameter_determiner_ramp_max_distance_to_line;
+        = (float)config.parameter_determiner_ramp_max_distance_to_line;
 
     debugging_ = config.debug;
->>>>>>> main
 }
 
 /** This function takes in a pointcloud with matching normals and
