@@ -17,8 +17,10 @@ from march_utility.exceptions.gait_exceptions import (
     WrongRealSenseConfigurationError,
 )
 from rclpy import Future
+from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.node import Node
 from rclpy.time import Time
+from rclpy.client import Client
 from urdf_parser_py import urdf
 
 from march_gait_selection.state_machine.gait_update import GaitUpdate
@@ -49,12 +51,11 @@ class RealSenseGait(SetpointsGait):
         subgaits_to_interpolate: dict,
         dimensions: InterpolationDimensions,
         parameters: List[float],
+        service: Client
     ):
         super(RealSenseGait, self).__init__(gait_name, subgaits, graph)
-        self._node = Node(gait_name)
-        self._get_gait_parameters_service = node.create_client(
-            srv_type=GetGaitParameters, srv_name="/camera/process_pointcloud"
-        )
+        self._node = node
+        self._get_gait_parameters_service = service
         self.parameters = parameters
         self.dimensions = dimensions
         self.selected_gait = self.selected_realsense_gait_msg_from_string(selected_gait)
@@ -72,6 +73,7 @@ class RealSenseGait(SetpointsGait):
         gait_config: dict,
         gait_graph: dict,
         gait_directory: str,
+        service: Client
     ):
         """
         Construct a realsense gait from the gait_config from the realsense_gaits.yaml.
@@ -141,6 +143,7 @@ class RealSenseGait(SetpointsGait):
             subgaits_to_interpolate,
             dimensions,
             parameters,
+            service
         )
 
     @classmethod
@@ -190,11 +193,9 @@ class RealSenseGait(SetpointsGait):
         """
         # Currently, we hardcode foot_right in start, since this is almost
         # always a right_open
-        self._node.get_logger().info("start start")
         gait_parameters_response = self.make_realsense_service_call(
             frame_id_to_transform_to="foot_right"
         )
-        self._node.get_logger().info("received response")
         if gait_parameters_response is None or not gait_parameters_response.success:
             self._node.get_logger().warn(
                 "No gait parameters were found, gait will not be started"
@@ -203,24 +204,20 @@ class RealSenseGait(SetpointsGait):
 
         self.update_parameters(gait_parameters_response.gait_parameters)
         self.interpolate_subgaits_from_parameters()
-        self._node.get_logger().info("interpolated")
 
         self._reset()
         self._current_time = current_time
         self._current_subgait = self.subgaits[self.graph.start_subgaits()[0]]
         self._next_subgait = self._current_subgait
-        self._node.get_logger().info("setted params")
 
         # Delay first subgait if duration is greater than zero
         if first_subgait_delay is not None and first_subgait_delay > Duration(0):
-            self._node.get_logger().info("delay schedule")
             self._start_is_delayed = True
             self._update_time_stamps(self._current_subgait, first_subgait_delay)
             return GaitUpdate.should_schedule_early(
                 self._command_from_current_subgait()
             )
         else:
-            self._node.get_logger().info("not delayed schedule")
             self._start_is_delayed = False
             self._update_time_stamps(self._current_subgait)
             return GaitUpdate.should_schedule(self._command_from_current_subgait())
@@ -235,7 +232,6 @@ class RealSenseGait(SetpointsGait):
         :param frame_id_to_transform_to: The frame that should be given to the reader.
         :return: The response from the service, None if it was not available.
         """
-        self._node.get_logger().info("make call start")
         request = GetGaitParameters.Request(
             selected_gait=self.selected_gait,
             camera_to_use=self.camera_to_use,
@@ -245,10 +241,8 @@ class RealSenseGait(SetpointsGait):
         if self._get_gait_parameters_service.wait_for_service(
             timeout_sec=self.SERVICE_TIMEOUT.seconds
         ):
-            self._node.get_logger().info("service is available")
             gait_parameters_response_future = \
                 self._get_gait_parameters_service.call_async(request)
-            self._node.get_logger().info("async call done")
         else:
             self._node.get_logger().error(
                 f"The service took longer than {self.SERVICE_TIMEOUT} to become "
@@ -256,11 +250,8 @@ class RealSenseGait(SetpointsGait):
             )
             return None
 
-        gait_parameters_response_future.add_done_callback(self.realsense_response_cb)
-        self._node.get_logger().info("added done callback")
         wait_res =  self.realsense_service_event.wait(
             timeout=self.SERVICE_TIMEOUT.seconds)
-        self._node.get_logger().info(f"{wait_res}")
         if wait_res:
             return self.realsense_service_result
         else:

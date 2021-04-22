@@ -353,6 +353,11 @@ class GaitStateMachine(object):
                 )
             else:
                 gait_update = self._current_gait.start(now)
+
+            if gait_update == GaitUpdate.empty():
+                # TODO: implement fallback with empty gait
+                pass
+
             if not self.check_correct_foot_pressure():
                 self._gait_selection.get_logger().debug(
                     f"Foot forces when incorrect pressure warning was issued: "
