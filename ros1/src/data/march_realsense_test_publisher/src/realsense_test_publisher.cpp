@@ -5,11 +5,13 @@
 #include <ros/package.h>
 #include <string>
 #include <utilities/camera_mode_utilities.h>
+#include <pcl/io/ply_io.h>
+#include <pcl/point_types.h>
 
 using namespace std::filesystem;
 
-std::string POINTCLOUD_FRONT_TOPIC = "/camera_front/depth/color/points";
-std::string POINTCLOUD_BACK_TOPIC = "/camera_back/depth/color/points";
+std::string TOPIC_TEST_CLOUDS = "/test_clouds";
+float PUBLISH_RATE = 1.0 / 5.0;
 
 RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     : n_(n)
@@ -28,8 +30,10 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
         file_paths.push_back(entry.path());
     }
 
-    publish_service_ = n_->advertiseService("/camera/publish_tests",
+    publish_test_cloud_service = n_->advertiseService("/camera/publish_test_cloud",
         &RealsenseTestPublisher::publishTestDatasetCallback, this);
+
+    test_cloud_publisher = n_->advertize<PointCloud>(TOPIC_TEST_CLOUDS, /*queue_size=*/1);
 }
 
 bool RealsenseTestPublisher::publishTestDatasetCallback(
@@ -79,13 +83,35 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
 
 bool RealsenseTestPublisher::publishCustomPointcloud(std::string pointcloud_file_name)
 {
-    printPointcloudNames();
+    std::vector<path>::iterator element = std::find(file_paths.begin(), file_paths.end(), pointcloud_file_name);
+    if (it == file_paths.end()) {
+        std::string file_names_string = getFileNamesString();
+        ROS_WARN_STREAM("The requested pointcloud file could not be found. Valid options are: \n" << file_names_string);
+    } else {
+        PointCloud pointcloud = boost::make_shared<pcl::PointCloud>();
+        pcl::io::loadPLYFile<pcl::PointXYZ>(*it.path());
+        ROS_DEBUG_STREAM("The file from path " << *it.path() << "has been loaded up! now publishing")
+        publishTestCloudOnTimer(pointcloud);
+    }
     return false;
 }
 
-void RealsenseTestPublisher::printPointcloudNames()
+void RealsenseTestPublisher::publishTestCloudOnTimer(PointCloud pointcloud)
 {
+    ros::Timer timer_publisher = n_.createTimer(ros::Duration(PUBLISH_RATE),
+                                                std::bind(&publishTestCloud, pointcloud));
+}
+
+void RealsenseTestPublisher::publishTestCloud(PointCloud pointcloud)
+{
+    test_cloud_publisher.publish(pointcloud);
+}
+
+std::string RealsenseTestPublisher::getFileNamesString()
+{
+    std::string file_names_string;
     for (path path : file_paths) {
-        ROS_DEBUG_STREAM(path.filename().string());
+        file_names_string += path.filename().string() + "\n";
     }
+    return file_names_string
 }

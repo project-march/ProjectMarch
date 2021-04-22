@@ -19,8 +19,8 @@ public:
     RealsenseTestPublisher(ros::NodeHandle* n);
 
 private:
-    // Outputs the name of all available pointcloud files to debug
-    void printPointcloudNames();
+    // Creates a string of all the valid file names separated by an end line
+    std::string getFileNamesString();
 
     // Publishes the right pointcloud on the right topic
     bool publishTestDatasetCallback(
