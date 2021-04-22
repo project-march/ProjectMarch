@@ -19,11 +19,13 @@ using PlaneCoefficientsVector = std::vector<pcl::ModelCoefficients::Ptr>;
 using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
 using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
 
+std::string TOPIC_CAMERA_FRONT = "/camera_front/depth/color/points";
+std::string TOPIC_CAMERA_BACK = "/camera_back/depth/color/points";
 std::map<int, std::string> POINTCLOUD_TOPICS
     = { { march_shared_msgs::GetGaitParametersRequest::CAMERA_FRONT,
-            /*__y=*/"/camera_front/depth/color/points" },
+            TOPIC_CAMERA_FRONT },
           { march_shared_msgs::GetGaitParametersRequest::CAMERA_BACK,
-              /*__y=*/"/camera_back/depth/color/points" } };
+              TOPIC_CAMERA_BACK } };
 ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(/*t=*/1.0); // secs
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n)
