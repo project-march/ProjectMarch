@@ -1,12 +1,15 @@
 #include <filesystem>
 #include <iostream>
 #include <march_shared_msgs/PublishTestDataset.h>
-#include <utilities/camera_mode_utilities.h>
 #include <realsense_test_publisher.h>
 #include <ros/package.h>
 #include <string>
+#include <utilities/camera_mode_utilities.h>
 
 using namespace std::filesystem;
+
+std::string POINTCLOUD_FRONT_TOPIC = "/camera_front/depth/color/points";
+std::string POINTCLOUD_BACK_TOPIC = "/camera_back/depth/color/points";
 
 RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     : n_(n)
@@ -33,19 +36,45 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
     march_shared_msgs::PublishTestDataset::Request& req,
     march_shared_msgs::PublishTestDataset::Response& res)
 {
-    SelectedMode selected_mode = (SelectedMode) req.selected_mode;
+    bool success;
+
+    std::string selected_topic;
+    if (req.use_front_camera) {
+        selected_topic = POINTCLOUD_FRONT_TOPIC;
+    } else {
+        selected_topic = POINTCLOUD_BACK_TOPIC;
+    }
+
+    SelectedMode selected_mode = (SelectedMode)req.selected_mode;
     switch (selected_mode) {
         case SelectedMode::start: {
-            printPointcloudNames();
+            startPublishingPointclouds();
+            ROS_DEBUG_STREAM("Started publishing pointclouds");
             break;
+        }
+        case SelectedMode::next: {
+            publishNextPointcloud();
+            ROS_DEBUG_STREAM("now publishing next pointcloud");
+            break;
+        }
+        case SelectedMode::custom: {
+            ROS_DEBUG_STREAM("Now publishing pointcloud with file name "
+                << req.pointcloud_file_name)
+            if (success) {
+                ROS_DEBUG_STREAM("Now publishing pointcloud with file name "
+                    << req.pointcloud_file_name)
+            } else {
+                ROS_DEBUG_STREAM("Failed to publish pointcloud with file name "
+                    << req.pointcloud_file_name)
+            }
         }
         case SelectedMode::end: {
-            ROS_WARN_STREAM("TESTING, YOU PRESSED END");
-            break;
+            stopPublishingPointClouds();
+            ROS_DEBUG_STREAM("Stopped publishing pointclouds");
         }
     }
-    res.success = true;
-    return true;
+    res.success = success;
+    return success;
 }
 
 void RealsenseTestPublisher::printPointcloudNames()
