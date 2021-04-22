@@ -38,7 +38,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     }
 
     read_pointcloud_service_
-        = n_->advertiseService("/camera/process_pointcloud",
+        = n_->advertiseService(/*service=*/"/camera/process_pointcloud",
             &RealSenseReader::processPointcloudCallback, this);
 
     config_tree_ = readConfig("pointcloud_parameters.yaml");
