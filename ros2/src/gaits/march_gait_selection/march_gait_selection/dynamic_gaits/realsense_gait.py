@@ -51,7 +51,7 @@ class RealSenseGait(SetpointsGait):
         subgaits_to_interpolate: dict,
         dimensions: InterpolationDimensions,
         parameters: List[float],
-        service: Client
+        service: Client,
     ):
         super(RealSenseGait, self).__init__(gait_name, subgaits, graph)
         self._node = node
@@ -73,7 +73,7 @@ class RealSenseGait(SetpointsGait):
         gait_config: dict,
         gait_graph: dict,
         gait_directory: str,
-        service: Client
+        service: Client,
     ):
         """
         Construct a realsense gait from the gait_config from the realsense_gaits.yaml.
@@ -143,7 +143,7 @@ class RealSenseGait(SetpointsGait):
             subgaits_to_interpolate,
             dimensions,
             parameters,
-            service
+            service,
         )
 
     @classmethod
@@ -241,8 +241,9 @@ class RealSenseGait(SetpointsGait):
         if self._get_gait_parameters_service.wait_for_service(
             timeout_sec=self.SERVICE_TIMEOUT.seconds
         ):
-            gait_parameters_response_future = \
+            gait_parameters_response_future = (
                 self._get_gait_parameters_service.call_async(request)
+            )
         else:
             self._node.get_logger().error(
                 f"The service took longer than {self.SERVICE_TIMEOUT} to become "
@@ -250,8 +251,9 @@ class RealSenseGait(SetpointsGait):
             )
             return None
 
-        wait_res =  self.realsense_service_event.wait(
-            timeout=self.SERVICE_TIMEOUT.seconds)
+        wait_res = self.realsense_service_event.wait(
+            timeout=self.SERVICE_TIMEOUT.seconds
+        )
         if wait_res:
             return self.realsense_service_result
         else:
