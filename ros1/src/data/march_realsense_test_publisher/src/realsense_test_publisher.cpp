@@ -18,7 +18,7 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     path directory_path = ros::package::getPath("march_realsense_test_publisher");
     ROS_WARN_STREAM(directory_path.u8string());
 
-    path relative_path("config/data_sets/");
+    path relative_path("config/datasets/");
     path data_path = directory_path / relative_path;
 
     for (const auto& entry : std::filesystem::directory_iterator(data_path)) {
