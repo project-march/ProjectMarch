@@ -61,7 +61,7 @@ void HullParameterDeterminer::readParameters(
     foot_length_back = (float)config.parameter_determiner_foot_length_back;
     foot_length_front = (float)config.parameter_determiner_foot_length_front;
     foot_width = (float)config.parameter_determiner_foot_length_front;
-    hull_dimension = (float)config.hull_dimension;
+    hull_dimension = config.hull_dimension;
 
     max_search_area = (float)config.parameter_determiner_ramp_max_search_area;
     min_search_area = (float)config.parameter_determiner_ramp_min_search_area;
