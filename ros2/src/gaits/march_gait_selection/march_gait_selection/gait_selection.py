@@ -7,12 +7,13 @@ from march_gait_selection.dynamic_gaits.balance_gait import BalanceGait
 from march_gait_selection.dynamic_gaits.semi_dynamic_setpoints_gait import (
     SemiDynamicSetpointsGait,
 )
-from march_shared_msgs.srv import SetGaitVersion, ContainsGait
+from march_shared_msgs.srv import SetGaitVersion, ContainsGait, GetGaitParameters
 
 from march_utility.exceptions.gait_exceptions import GaitError, GaitNameNotFound
 from march_utility.gait.subgait import Subgait
 from march_utility.utilities.node_utils import get_robot_urdf
 from march_utility.utilities.duration import Duration
+from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.exceptions import ParameterNotDeclaredException
 from rclpy.node import Node
 from march_utility.utilities.dimensions import InterpolationDimensions
@@ -344,6 +345,11 @@ class GaitSelection(Node):
             )
 
     def _load_realsense_gaits(self, gaits):
+        realsense_callback_group = MutuallyExclusiveCallbackGroup()
+        get_gait_parameters_service = self.create_client(
+            srv_type=GetGaitParameters, srv_name="/camera/process_pointcloud",
+            callback_group=realsense_callback_group
+        )
         for gait_name in self._realsense_gait_version_map:
             gait_folder = gait_name
             gait_path = os.path.join(
@@ -358,6 +364,7 @@ class GaitSelection(Node):
                 gait_config=self._realsense_gait_version_map[gait_name],
                 gait_graph=gait_graph,
                 gait_directory=self._gait_directory,
+                service=get_gait_parameters_service,
             )
             gaits[gait_name] = gait
 
