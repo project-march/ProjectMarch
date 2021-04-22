@@ -61,6 +61,9 @@ public:
         boost::shared_ptr<HullVector> hull_vector,
         boost::shared_ptr<PolygonVector> polygon_vector) override;
 
+    /** This function is called upon whenever a parameter from config is
+     * changed, including when launching the node
+     */
     void readParameters(
         march_realsense_reader::pointcloud_parametersConfig& config) override;
 

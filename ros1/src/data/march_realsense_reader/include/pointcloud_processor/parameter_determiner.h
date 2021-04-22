@@ -38,6 +38,9 @@ public:
 
     virtual ~ParameterDeterminer() {};
 
+    /** This function is called upon whenever a parameter from config is
+     * changed, including when launching the node
+     */
     virtual void readParameters(
         march_realsense_reader::pointcloud_parametersConfig& config)
         = 0;
@@ -69,6 +72,9 @@ public:
         SelectedGait const selected_gait,
         boost::shared_ptr<GaitParameters> gait_parameters) override;
 
+    /** This function is called upon whenever a parameter from config is
+     * changed, including when launching the node
+     */
     void readParameters(
         march_realsense_reader::pointcloud_parametersConfig& config) override;
 
@@ -142,8 +148,6 @@ protected:
     // Fill the foot locations to try cloud with a line of points from (start,
     // 0) to (end, 0)
     bool fillOptionalFootLocationCloud(float start, float end);
-
-    // Read all relevant parameters from the parameter yaml file
 
     // Read all relevant parameters
     int hull_dimension;
