@@ -3,8 +3,9 @@
 #include <march_shared_msgs/PublishTestDataset.h>
 #include <realsense_test_publisher.h>
 #include <string>
+#include <ros/package.h>
 
-using std::filesystem::current_path;
+using namespace std::filesystem;
 
 RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     : n_(n)
@@ -14,11 +15,13 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
         ros::console::notifyLoggerLevelsChanged();
     }
 
-    char tmp[256];
-    ROS_WARN_STREAM(getcwd(tmp, 256));
+    path directory_path = ros::package::getPath("march_realsense_test_publisher");
+    ROS_WARN_STREAM(directory_path.u8string());
 
-    std::string path = "config/data_sets/";
-    for (const auto& entry : std::filesystem::directory_iterator(path)) {
+    path relative_path("config/data_sets/");
+    path data_path = directory_path / relative_path;
+
+    for (const auto& entry : std::filesystem::directory_iterator(data_path)) {
         file_paths.push_back(entry.path());
     }
 
@@ -30,8 +33,6 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
     march_shared_msgs::PublishTestDataset::Request& req,
     march_shared_msgs::PublishTestDataset::Response& res)
 {
-    ROS_DEBUG_STREAM(req.selected_mode);
-    ROS_DEBUG_STREAM(req.selected_camera);
     printPointcloudNames();
     return true;
 }
