@@ -33,7 +33,7 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     publish_test_cloud_service = n_->advertiseService("/camera/publish_test_cloud",
         &RealsenseTestPublisher::publishTestDatasetCallback, this);
 
-    test_cloud_publisher = n_->advertize<PointCloud>(TOPIC_TEST_CLOUDS, /*queue_size=*/1);
+    test_cloud_publisher = n_->advertise<PointCloud>(TOPIC_TEST_CLOUDS, /*queue_size=*/1);
 }
 
 bool RealsenseTestPublisher::publishTestDatasetCallback(
@@ -41,12 +41,6 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
     march_shared_msgs::PublishTestDataset::Response& res)
 {
     bool success = true;
-
-    if (req.use_front_camera) {
-        pointcloud_topic = POINTCLOUD_FRONT_TOPIC;
-    } else {
-        pointcloud_topic = POINTCLOUD_BACK_TOPIC;
-    }
 
     SelectedMode selected_mode = (SelectedMode)req.selected_mode;
     switch (selected_mode) {
@@ -84,16 +78,17 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
 bool RealsenseTestPublisher::publishCustomPointcloud(std::string pointcloud_file_name)
 {
     std::vector<path>::iterator element = std::find(file_paths.begin(), file_paths.end(), pointcloud_file_name);
-    if (it == file_paths.end()) {
+    if (element == file_paths.end()) {
         std::string file_names_string = getFileNamesString();
         ROS_WARN_STREAM("The requested pointcloud file could not be found. Valid options are: \n" << file_names_string);
-    } else {
-        PointCloud pointcloud = boost::make_shared<pcl::PointCloud>();
-        pcl::io::loadPLYFile<pcl::PointXYZ>(*it.path());
-        ROS_DEBUG_STREAM("The file from path " << *it.path() << "has been loaded up! now publishing")
-        publishTestCloudOnTimer(pointcloud);
+        return false;
     }
-    return false;
+
+    PointCloud pointcloud = boost::make_shared<PointCloud>();
+    pcl::io::loadPLYFile<pcl::PointXYZ>(*element.path());
+    ROS_DEBUG_STREAM("The file from path " << *it.path() << "has been loaded up! now publishing")
+    publishTestCloudOnTimer(pointcloud);
+    return true;
 }
 
 void RealsenseTestPublisher::publishTestCloudOnTimer(PointCloud pointcloud)
@@ -113,5 +108,5 @@ std::string RealsenseTestPublisher::getFileNamesString()
     for (path path : file_paths) {
         file_names_string += path.filename().string() + "\n";
     }
-    return file_names_string
+    return file_names_string;
 }

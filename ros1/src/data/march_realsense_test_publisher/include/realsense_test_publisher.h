@@ -39,8 +39,15 @@ private:
     // Stops publishing pointclouds
     void stopPublishingPointClouds();
 
+    // Publish a pointcloud on a timer
+    void publishTestCloudOnTimer(PointCloud pointcloud);
+
+    // Publish a pointcloud
+    void publishTestCloud(PointCloud pointcloud);
+
     ros::NodeHandle* n_;
-    ros::ServiceServer publish_service_;
+    ros::ServiceServer publish_test_cloud_service;
+    ros::Publisher test_cloud_publisher;
 
     std::vector<path> file_paths;
     std::string pointcloud_topic;
