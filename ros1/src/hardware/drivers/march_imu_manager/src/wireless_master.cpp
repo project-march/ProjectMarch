@@ -70,7 +70,13 @@ int WirelessMaster::init()
 
 int WirelessMaster::configure(const int update_rate, const int channel)
 {
-    if (this->master_ && !this->master_->gotoConfig()) {
+    if (!this->master_) {
+        ROS_FATAL(
+            "Wireless master cannot be configured before it is initialized!");
+        return -1;
+    }
+
+    if (!this->master_->gotoConfig()) {
         ROS_FATAL("Failed to go to config mode");
         return -1;
     }

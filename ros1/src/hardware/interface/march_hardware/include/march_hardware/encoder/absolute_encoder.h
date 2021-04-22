@@ -15,8 +15,8 @@ public:
 
     ~AbsoluteEncoder() noexcept override = default;
 
-    double toRad(int32_t iu) const override;
-    double getRadPerBit() const override;
+    double toRad(int32_t iu) const override final;
+    double getRadPerBit() const override final;
 
     /**
      * Converts radians to encoder Internal Units (IU).
