@@ -39,7 +39,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     }
 
     read_pointcloud_service_
-        = n_->advertiseService("/camera/process_pointcloud",
+        = n_->advertiseService(/*service=*/"/camera/process_pointcloud",
             &RealSenseReader::processPointcloudCallback, this);
 
     preprocessor_ = std::make_unique<NormalsPreprocessor>(debugging_);
