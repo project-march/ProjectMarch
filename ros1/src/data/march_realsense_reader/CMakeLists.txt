@@ -12,9 +12,11 @@ find_package(catkin REQUIRED COMPONENTS
     sensor_msgs
     tf2_ros
     march_shared_msgs
+    dynamic_reconfigure
 )
-
-find_package(yaml-cpp)
+generate_dynamic_reconfigure_options(
+    config/pointcloud_parameters.cfg
+)
 
 catkin_package(
     INCLUDE_DIRS include
@@ -25,6 +27,7 @@ catkin_package(
     sensor_msgs
     tf2_ros
     march_shared_msgs
+    dynamic_reconfigure
 )
 
 include_directories(
@@ -41,7 +44,7 @@ add_library(${PROJECT_NAME}
     src/pointcloud_processor/hull_finder.cpp
     src/pointcloud_processor/parameter_determiner.cpp
 )
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} yaml-cpp)
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 add_executable(${PROJECT_NAME}_node src/realsense_reader_node.cpp)
 add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME})
@@ -67,6 +70,10 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 # Mark cpp header files for installation
+install(DIRECTORY config
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+        )
+
 install(DIRECTORY include/${PROJECT_NAME}/ include/pointcloud_processor/
         include/utilities/
     DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
@@ -81,6 +88,6 @@ install(DIRECTORY launch
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
-install(DIRECTORY config
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+# The node has to be build, before this line is reached
+add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_gencfg)
+
