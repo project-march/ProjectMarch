@@ -54,7 +54,7 @@ const char* getErrorDescription(ErrorType type)
     case ErrorType::SLAVE_LOST_TIMOUT:
       return "EtherCAT slave monitor timer elapsed, connection has been lost";
     case ErrorType::ODRIVE_WRONG_AXIS_NUMBER:
-      return "ODrive axis number must be either 1 or 2";
+      return "ODrive axis number must be either 0 or 1";
     default:
       return "Unknown error occurred. Please create/use a documented error";
   }

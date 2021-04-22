@@ -107,7 +107,7 @@ march::Joint HardwareBuilder::createJoint(const YAML::Node& joint_config, const 
     ROS_WARN("Joint %s does not have a netNumber", joint_name.c_str());
   }
 
-  const bool allow_actuation = joint_config["allowActuation"].as<bool>();
+  const auto allow_actuation = joint_config["allowActuation"].as<bool>();
 
   auto motor_controller = HardwareBuilder::createMotorController(joint_config["motor_controller"], urdf_joint, pdo_interface, sdo_interface);
 
