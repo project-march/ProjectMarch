@@ -1,9 +1,10 @@
 #include <filesystem>
 #include <iostream>
 #include <march_shared_msgs/PublishTestDataset.h>
+#include <utilities/camera_mode_utilities.h>
 #include <realsense_test_publisher.h>
-#include <string>
 #include <ros/package.h>
+#include <string>
 
 using namespace std::filesystem;
 
@@ -15,9 +16,8 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
         ros::console::notifyLoggerLevelsChanged();
     }
 
-    path directory_path = ros::package::getPath("march_realsense_test_publisher");
-    ROS_WARN_STREAM(directory_path.u8string());
-
+    path directory_path
+        = ros::package::getPath("march_realsense_test_publisher");
     path relative_path("config/datasets/");
     path data_path = directory_path / relative_path;
 
@@ -33,7 +33,18 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
     march_shared_msgs::PublishTestDataset::Request& req,
     march_shared_msgs::PublishTestDataset::Response& res)
 {
-    printPointcloudNames();
+    SelectedMode selected_mode = (SelectedMode) req.selected_mode;
+    switch (selected_mode) {
+        case SelectedMode::start: {
+            printPointcloudNames();
+            break;
+        }
+        case SelectedMode::end: {
+            ROS_WARN_STREAM("TESTING, YOU PRESSED END");
+            break;
+        }
+    }
+    res.success = true;
     return true;
 }
 
