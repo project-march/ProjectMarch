@@ -65,6 +65,10 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
             }
             break;
         }
+        case SelectedMode::slide_show: {
+//            publishSlideShow();
+            ROS_DEBUG_STREAM("Now publishing a slide show of pointclouds");
+        }
         case SelectedMode::end: {
 //            stopPublishingPointClouds();
             ROS_DEBUG_STREAM("Stopped publishing pointclouds");
