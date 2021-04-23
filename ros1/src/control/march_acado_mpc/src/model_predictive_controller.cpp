@@ -1,8 +1,9 @@
 #define _USE_MATH_DEFINES
 
 #include "model_predictive_controller.hpp"
+#include "acado_auxiliary_functions.h"
 #include "acado_common.h"
-#include <acado_auxiliary_functions.h>
+#include "acado_qpoases_interface.hpp"
 #include <ros/console.h>
 
 #include <algorithm>
@@ -106,32 +107,12 @@ void ModelPredictiveController::assignWeightingMatrix(std::vector<float> W)
 void ModelPredictiveController::controllerDiagnosis()
 {
     // Check acado_preparationStep() status code
-    ROS_WARN_STREAM_COND(preparationStepStatus >= PREP_INTERNAL_ERROR,
-        joint_name << ", Error in preparation step");
+    ROS_WARN_STREAM_COND(preparationStepStatus != 0,
+        acado_getErrorString(preparationStepStatus));
 
     // Check acado_feedbackStep() status code
-    // Only checks codes that indicate an error
-    switch (feedbackStepStatus) {
-        case QP_ITERATION_LIMIT_REACHED:
-            ROS_WARN_STREAM(joint_name << ", QP could not be solved within the "
-                                          "given number of iterations");
-            break;
-
-        case QP_INTERNAL_ERROR:
-            ROS_WARN_STREAM(joint_name
-                << ", QP could not be solved due to an internal error");
-            break;
-
-        case QP_INFEASIBLE:
-            ROS_WARN_STREAM(joint_name
-                << ", QP is infeasible and thus could not be solved");
-            break;
-
-        case QP_UNBOUNDED:
-            ROS_WARN_STREAM(
-                joint_name << ", QP is unbounded and thus could not be solved");
-            break;
-    }
+    ROS_WARN_STREAM_COND(
+        feedbackStepStatus != 0, acado_getErrorString(feedbackStepStatus));
 }
 
 void ModelPredictiveController::calculateControlInput()
