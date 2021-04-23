@@ -81,6 +81,7 @@ public:
             case FAULT:
                 return "Fault";
             case UNKNOWN:
+            default:
                 return "Not in a recognized IMC state";
         }
     }

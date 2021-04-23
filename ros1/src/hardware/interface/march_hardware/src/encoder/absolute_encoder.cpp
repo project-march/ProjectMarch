@@ -33,8 +33,8 @@ AbsoluteEncoder::AbsoluteEncoder(size_t number_of_bits, int32_t lower_limit_iu,
 
     const double range_of_motion = upper_limit_rad - lower_limit_rad;
     const double encoder_range_of_motion
-        = this->toRadians(this->upper_limit_iu_, true)
-        - this->toRadians(this->lower_limit_iu_, true);
+        = this->toRadians(this->upper_limit_iu_, /*use_zero_position=*/true)
+        - this->toRadians(this->lower_limit_iu_, /*use_zero_position=*/true);
     const double difference
         = std::abs(encoder_range_of_motion - range_of_motion)
         / encoder_range_of_motion;
