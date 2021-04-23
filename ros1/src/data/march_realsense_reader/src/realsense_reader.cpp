@@ -27,8 +27,8 @@ std::map<int, std::string> POINTCLOUD_TOPICS
             TOPIC_CAMERA_FRONT },
           { march_shared_msgs::GetGaitParametersRequest::CAMERA_BACK,
               TOPIC_CAMERA_BACK },
-              march_shared_msgs::GetGaitParametersRequest::TEST_CLOUD,
-              TOPIC_TEST_CLOUDS};
+        {march_shared_msgs::GetGaitParametersRequest::TEST_CLOUD,
+              TOPIC_TEST_CLOUDS}};
 ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(/*t=*/1.0); // secs
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n)

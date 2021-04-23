@@ -40,10 +40,10 @@ private:
     void stopPublishingPointClouds();
 
     // Publish a pointcloud on a timer
-    void publishTestCloudOnTimer(PointCloud::Ptr pointcloud);
+    void publishTestCloudOnTimer();
 
     // Publish a pointcloud
-    void publishTestCloud(PointCloud::Ptr pointcloud);
+    void publishTestCloud();
 
     ros::NodeHandle* n_;
     ros::ServiceServer publish_test_cloud_service;
@@ -51,6 +51,7 @@ private:
 
     std::vector<path> file_paths;
     std::string pointcloud_topic;
+    PointCloud::Ptr pointcloud_to_publish;
 };
 
 #endif // MARCH_REALSENSE_TEST_PUBLISHER_H
