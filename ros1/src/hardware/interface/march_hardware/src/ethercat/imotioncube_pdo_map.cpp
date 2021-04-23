@@ -1,7 +1,7 @@
 // Copyright 2019 Project March.
 #include "march_hardware/ethercat/imotioncube_pdo_map.h"
-#include "march_hardware/ethercat/sdo_interface.h"
 #include "march_hardware/error/hardware_exception.h"
+#include "march_hardware/ethercat/sdo_interface.h"
 
 #include <cstdint>
 #include <map>
@@ -9,7 +9,8 @@
 
 namespace march {
 /* All addresses were retrieved from the IMC Manual:
-https://technosoftmotion.com/wp-content/uploads/P091.025.iMOTIONCUBE.CAN_.CAT_.UM_-1.pdf */
+https://technosoftmotion.com/wp-content/uploads/P091.025.iMOTIONCUBE.CAN_.CAT_.UM_-1.pdf
+*/
 std::unordered_map<IMCObjectName, IMCObject> IMCPDOmap::all_objects = {
     { IMCObjectName::StatusWord,
         IMCObject(/*_address=*/0x6041, /*_sub_index=*/0, /*_length=*/16) },

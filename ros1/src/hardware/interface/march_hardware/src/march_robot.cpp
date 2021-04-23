@@ -87,71 +87,73 @@ void MarchRobot::stopEtherCAT()
 
 void MarchRobot::resetMotorControllers()
 {
-  for (auto& joint : jointList)
-  {
-    joint.getMotorController()->Slave::reset();
-  }
+    for (auto& joint : jointList) {
+        joint.getMotorController()->Slave::reset();
+    }
 }
 
 int MarchRobot::getMaxSlaveIndex()
 {
-  int maxSlaveIndex = -1;
+    int maxSlaveIndex = -1;
 
-  for (Joint& joint : jointList)
-  {
-    if (joint.hasTemperatureGES())
-    {
-      maxSlaveIndex = std::max((int) joint.getTemperatureGES()->getSlaveIndex(), maxSlaveIndex);
+    for (Joint& joint : jointList) {
+        if (joint.hasTemperatureGES()) {
+            maxSlaveIndex = std::max(
+                (int)joint.getTemperatureGES()->getSlaveIndex(), maxSlaveIndex);
+        }
+        maxSlaveIndex = std::max(
+            (int)joint.getMotorController()->getSlaveIndex(), maxSlaveIndex);
     }
-    maxSlaveIndex = std::max((int) joint.getMotorController()->getSlaveIndex(), maxSlaveIndex);
-  }
-  return maxSlaveIndex;
+    return maxSlaveIndex;
 }
 
 bool MarchRobot::hasValidSlaves()
 {
-  ::std::vector<int> motorControllerIndices;
-  ::std::vector<int> temperatureSlaveIndices;
+    ::std::vector<int> motorControllerIndices;
+    ::std::vector<int> temperatureSlaveIndices;
 
-  for (auto& joint : jointList)
-  {
-    if (joint.hasTemperatureGES())
-    {
-      int temperatureSlaveIndex = joint.getTemperatureGES()->getSlaveIndex();
-      temperatureSlaveIndices.push_back(temperatureSlaveIndex);
+    for (auto& joint : jointList) {
+        if (joint.hasTemperatureGES()) {
+            int temperatureSlaveIndex
+                = joint.getTemperatureGES()->getSlaveIndex();
+            temperatureSlaveIndices.push_back(temperatureSlaveIndex);
+        }
+
+        int motorControllerSlaveIndex
+            = joint.getMotorController()->getSlaveIndex();
+        motorControllerIndices.push_back(motorControllerSlaveIndex);
+    }
+    // Multiple temperature sensors may be connected to the same slave.
+    // Remove duplicate temperatureSlaveIndices so they don't trigger as
+    // duplicates later.
+    sort(temperatureSlaveIndices.begin(), temperatureSlaveIndices.end());
+    temperatureSlaveIndices.erase(
+        unique(temperatureSlaveIndices.begin(), temperatureSlaveIndices.end()),
+        temperatureSlaveIndices.end());
+
+    // Merge the slave indices
+    ::std::vector<int> slaveIndices;
+
+    slaveIndices.reserve(
+        motorControllerIndices.size() + temperatureSlaveIndices.size());
+    slaveIndices.insert(slaveIndices.end(), motorControllerIndices.begin(),
+        motorControllerIndices.end());
+    slaveIndices.insert(slaveIndices.end(), temperatureSlaveIndices.begin(),
+        temperatureSlaveIndices.end());
+
+    if (slaveIndices.size() == 1) {
+        ROS_INFO("Found configuration for 1 slave.");
+        return true;
     }
 
-    int motorControllerSlaveIndex = joint.getMotorController()->getSlaveIndex();
-    motorControllerIndices.push_back(motorControllerSlaveIndex);
-  }
-  // Multiple temperature sensors may be connected to the same slave.
-  // Remove duplicate temperatureSlaveIndices so they don't trigger as
-  // duplicates later.
-  sort(temperatureSlaveIndices.begin(), temperatureSlaveIndices.end());
-  temperatureSlaveIndices.erase(unique(temperatureSlaveIndices.begin(), temperatureSlaveIndices.end()),
-                                temperatureSlaveIndices.end());
+    ROS_INFO("Found configuration for %lu slaves.", slaveIndices.size());
 
-  // Merge the slave indices
-  ::std::vector<int> slaveIndices;
-
-  slaveIndices.reserve(motorControllerIndices.size() + temperatureSlaveIndices.size());
-  slaveIndices.insert(slaveIndices.end(), motorControllerIndices.begin(), motorControllerIndices.end());
-  slaveIndices.insert(slaveIndices.end(), temperatureSlaveIndices.begin(), temperatureSlaveIndices.end());
-
-  if (slaveIndices.size() == 1)
-  {
-    ROS_INFO("Found configuration for 1 slave.");
-    return true;
-  }
-
-  ROS_INFO("Found configuration for %lu slaves.", slaveIndices.size());
-
-  // Sort the indices and check for duplicates.
-  // If there are no duplicates, the configuration is valid.
-  ::std::sort(slaveIndices.begin(), slaveIndices.end());
-  auto it = ::std::unique(slaveIndices.begin(), slaveIndices.end());
-  bool isUnique = (it == slaveIndices.end());
-  return isUnique;
+    // Sort the indices and check for duplicates.
+    // If there are no duplicates, the configuration is valid.
+    ::std::sort(slaveIndices.begin(), slaveIndices.end());
+    auto it = ::std::unique(slaveIndices.begin(), slaveIndices.end());
+    bool isUnique = (it == slaveIndices.end());
+    return isUnique;
 }
 
 bool MarchRobot::isEthercatOperational()

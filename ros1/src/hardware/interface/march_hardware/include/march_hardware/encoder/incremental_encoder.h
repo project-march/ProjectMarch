@@ -9,28 +9,33 @@
 namespace march {
 class IncrementalEncoder : public Encoder {
 public:
-  IncrementalEncoder(size_t number_of_bits, double transmission);
+    IncrementalEncoder(size_t number_of_bits, double transmission);
 
-  ~IncrementalEncoder() noexcept override = default;
+    ~IncrementalEncoder() noexcept override = default;
 
-  // Inherited methods
-  double getRadiansPerBit() const override final;
-  double toRadians(double iu, bool /* use_zero_position */) const override final;
-  double toIU(double radians, bool /* use_zero_position */) const override final;
+    // Inherited methods
+    double getRadiansPerBit() const override final;
+    double toRadians(
+        double iu, bool /* use_zero_position */) const override final;
+    double toIU(
+        double radians, bool /* use_zero_position */) const override final;
 
-  double getTransmission() const;
+    double getTransmission() const;
 
-  /** @brief Override comparison operator */
-  friend bool operator==(const IncrementalEncoder& lhs, const IncrementalEncoder& rhs)
-  {
-    return lhs.getTotalPositions() == rhs.getTotalPositions() && lhs.transmission_ == rhs.transmission_;
-  }
-  /** @brief Override stream operator for clean printing */
-  friend std::ostream& operator<<(std::ostream& os, const IncrementalEncoder& encoder)
-  {
-    return os << "totalPositions: " << encoder.getTotalPositions() << ", "
-              << "transmission: " << encoder.transmission_;
-  }
+    /** @brief Override comparison operator */
+    friend bool operator==(
+        const IncrementalEncoder& lhs, const IncrementalEncoder& rhs)
+    {
+        return lhs.getTotalPositions() == rhs.getTotalPositions()
+            && lhs.transmission_ == rhs.transmission_;
+    }
+    /** @brief Override stream operator for clean printing */
+    friend std::ostream& operator<<(
+        std::ostream& os, const IncrementalEncoder& encoder)
+    {
+        return os << "totalPositions: " << encoder.getTotalPositions() << ", "
+                  << "transmission: " << encoder.transmission_;
+    }
 
 private:
     const double transmission_;

@@ -7,11 +7,9 @@
 #include <ros/package.h>
 #include <ros/ros.h>
 
-class AllowedRobot
-{
+class AllowedRobot {
 public:
-    enum Value : int
-    {
+    enum Value : int {
         march6,
         march4,
         march3,
@@ -26,44 +24,25 @@ public:
     AllowedRobot() = default;
     explicit AllowedRobot(const std::string& robot_name)
     {
-        if (robot_name == "march6")
-        {
+        if (robot_name == "march6") {
             this->value = march6;
-        }
-        else if (robot_name == "march4")
-        {
+        } else if (robot_name == "march4") {
             this->value = march4;
-        }
-        else if (robot_name == "march3")
-        {
+        } else if (robot_name == "march3") {
             this->value = march3;
-        }
-        else if (robot_name == "test_joint_rotational")
-        {
+        } else if (robot_name == "test_joint_rotational") {
             this->value = test_joint_rotational;
-        }
-        else if (robot_name == "test_joint_linear")
-        {
+        } else if (robot_name == "test_joint_linear") {
             this->value = test_joint_linear;
-        }
-        else if (robot_name == "test_joint_rotational_odrive")
-        {
+        } else if (robot_name == "test_joint_rotational_odrive") {
             this->value = test_joint_rotational_odrive;
-        }
-        else if (robot_name == "test_joint_linear_odrive")
-        {
+        } else if (robot_name == "test_joint_linear_odrive") {
             this->value = test_joint_linear_odrive;
-        }
-        else if (robot_name == "pdb")
-        {
+        } else if (robot_name == "pdb") {
             this->value = pdb;
-        }
-        else if (robot_name == "pressure_soles")
-        {
+        } else if (robot_name == "pressure_soles") {
             this->value = pressure_soles;
-        }
-        else
-        {
+        } else {
             ROS_WARN_STREAM("Unknown robot " << robot_name);
             this->value = AllowedRobot::test_joint_rotational;
         }
@@ -72,47 +51,35 @@ public:
     std::string getFilePath()
     {
         std::string base_path = ros::package::getPath("march_hardware_builder");
-        if (this->value == AllowedRobot::march6)
-        {
+        if (this->value == AllowedRobot::march6) {
             return base_path.append(/*__s=*/"/robots/march6.yaml");
-        }
-        else if (this->value == AllowedRobot::march4)
-        {
+        } else if (this->value == AllowedRobot::march4) {
             return base_path.append(/*__s=*/"/robots/march4.yaml");
-        }
-        else if (this->value == AllowedRobot::march3)
-        {
+        } else if (this->value == AllowedRobot::march3) {
             return base_path.append(/*__s=*/"/robots/march3.yaml");
-        }
-        else if (this->value == AllowedRobot::test_joint_rotational)
-        {
-            return base_path.append(/*__s=*/"/robots/test_joint_rotational.yaml");
-        }
-        else if (this->value == AllowedRobot::test_joint_linear)
-        {
+        } else if (this->value == AllowedRobot::test_joint_rotational) {
+            return base_path.append(
+                /*__s=*/"/robots/test_joint_rotational.yaml");
+        } else if (this->value == AllowedRobot::test_joint_linear) {
             return base_path.append(/*__s=*/"/robots/test_joint_linear.yaml");
-        }
-        else if (this->value == AllowedRobot::test_joint_rotational_odrive)
-        {
-            return base_path.append(/*__s=*/"/robots/test_joint_rotational_odrive.yaml");
-        }
-        else if (this->value == AllowedRobot::test_joint_linear_odrive)
-        {
-            return base_path.append(/*__s=*/"/robots/test_joint_linear_odrive.yaml");
-        }
-        else if (this->value == AllowedRobot::pdb)
-        {
+        } else if (this->value == AllowedRobot::test_joint_rotational_odrive) {
+            return base_path.append(
+                /*__s=*/"/robots/test_joint_rotational_odrive.yaml");
+        } else if (this->value == AllowedRobot::test_joint_linear_odrive) {
+            return base_path.append(
+                /*__s=*/"/robots/test_joint_linear_odrive.yaml");
+        } else if (this->value == AllowedRobot::pdb) {
             return base_path.append(/*__s=*/"/robots/pdb.yaml");
-        }
-        else if (this->value == AllowedRobot::pressure_soles)
-        {
+        } else if (this->value == AllowedRobot::pressure_soles) {
             return base_path.append(/*__s=*/"/robots/pressure_soles.yaml");
         }
-        ROS_ERROR("Robotname not implemented. Using test_joint_rotational.yaml...");
+        ROS_ERROR(
+            "Robotname not implemented. Using test_joint_rotational.yaml...");
         return base_path.append(/*__s=*/"/robots/test_joint_rotational.yaml");
     }
 
-    constexpr AllowedRobot(Value allowed_robot) : value(allowed_robot)
+    constexpr AllowedRobot(Value allowed_robot)
+        : value(allowed_robot)
     {
     }
 
@@ -127,8 +94,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& out, const AllowedRobot& c)
     {
-        switch (c.value)
-        {
+        switch (c.value) {
             case march6:
                 out << "march6";
                 break;
@@ -167,4 +133,4 @@ private:
     Value value;
 };
 
-#endif  // MARCH_HARDWARE_BUILDER_ALLOWED_ROBOT_H
+#endif // MARCH_HARDWARE_BUILDER_ALLOWED_ROBOT_H

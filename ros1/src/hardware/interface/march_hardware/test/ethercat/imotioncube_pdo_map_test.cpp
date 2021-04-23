@@ -4,8 +4,7 @@
 
 #include <gtest/gtest.h>
 
-class IMCPDOTest : public ::testing::Test
-{
+class IMCPDOTest : public ::testing::Test {
 protected:
     MockSdoInterfacePtr mock_sdo = std::make_shared<MockSdoInterface>();
     march::SdoSlaveInterface sdo
@@ -14,38 +13,38 @@ protected:
 
 TEST_F(IMCPDOTest, sortPDOmap)
 {
-  march::IMCPDOmap pdoMapMISO;
-  pdoMapMISO.addObject(march::IMCObjectName::StatusWord);
-  pdoMapMISO.addObject(march::IMCObjectName::ActualPosition);
-  std::unordered_map<march::IMCObjectName, uint8_t> misoByteOffsets =
-      pdoMapMISO.map(this->sdo, march::DataDirection::MISO);
+    march::IMCPDOmap pdoMapMISO;
+    pdoMapMISO.addObject(march::IMCObjectName::StatusWord);
+    pdoMapMISO.addObject(march::IMCObjectName::ActualPosition);
+    std::unordered_map<march::IMCObjectName, uint8_t> misoByteOffsets
+        = pdoMapMISO.map(this->sdo, march::DataDirection::MISO);
 
-  ASSERT_EQ(0u, misoByteOffsets[march::IMCObjectName::ActualPosition]);
-  ASSERT_EQ(4u, misoByteOffsets[march::IMCObjectName::StatusWord]);
+    ASSERT_EQ(0u, misoByteOffsets[march::IMCObjectName::ActualPosition]);
+    ASSERT_EQ(4u, misoByteOffsets[march::IMCObjectName::StatusWord]);
 }
 
 TEST_F(IMCPDOTest, InvalidDataDirection)
 {
-  march::IMCPDOmap map;
-  std::unordered_map<march::IMCObjectName, uint8_t> expected;
-  ASSERT_EQ(map.map(this->sdo, (march::DataDirection)7), expected);
+    march::IMCPDOmap map;
+    std::unordered_map<march::IMCObjectName, uint8_t> expected;
+    ASSERT_EQ(map.map(this->sdo, (march::DataDirection)7), expected);
 }
 
 TEST_F(IMCPDOTest, multipleAddObjects)
 {
-  march::IMCPDOmap pdoMapMISO;
+    march::IMCPDOmap pdoMapMISO;
 
-  pdoMapMISO.addObject(march::IMCObjectName::ActualPosition);
-  pdoMapMISO.addObject(march::IMCObjectName::StatusWord);
-  pdoMapMISO.addObject(march::IMCObjectName::StatusWord);
-  std::unordered_map<march::IMCObjectName, uint8_t> misoByteOffsets =
-      pdoMapMISO.map(this->sdo, march::DataDirection::MISO);
-  ASSERT_EQ(2u, misoByteOffsets.size());
+    pdoMapMISO.addObject(march::IMCObjectName::ActualPosition);
+    pdoMapMISO.addObject(march::IMCObjectName::StatusWord);
+    pdoMapMISO.addObject(march::IMCObjectName::StatusWord);
+    std::unordered_map<march::IMCObjectName, uint8_t> misoByteOffsets
+        = pdoMapMISO.map(this->sdo, march::DataDirection::MISO);
+    ASSERT_EQ(2u, misoByteOffsets.size());
 }
 
 TEST_F(IMCPDOTest, ObjectCounts)
 {
-  march::IMCPDOmap pdoMapMISO;
+    march::IMCPDOmap pdoMapMISO;
 
     pdoMapMISO.addObject(march::IMCObjectName::CurrentLimit);
     std::unordered_map<march::IMCObjectName, uint8_t> misoByteOffsets
@@ -57,7 +56,7 @@ TEST_F(IMCPDOTest, ObjectCounts)
 
 TEST_F(IMCPDOTest, CombinedAddressConstruct)
 {
-  march::IMCPDOmap pdoMap;
+    march::IMCPDOmap pdoMap;
 
     auto status_word
         = pdoMap.all_objects.find(march::IMCObjectName::StatusWord);
@@ -70,7 +69,7 @@ TEST_F(IMCPDOTest, CombinedAddressConstruct)
 
 TEST_F(IMCPDOTest, CombinedAdressConstructWithSubindexValue)
 {
-  march::IMCPDOmap pdoMap;
+    march::IMCPDOmap pdoMap;
 
     auto test_object = march::IMCObject(
         /*_address=*/0x6060, /*_sub_index=*/2, /*_length=*/16);

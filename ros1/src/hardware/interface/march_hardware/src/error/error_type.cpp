@@ -7,7 +7,8 @@ namespace error {
     {
         switch (type) {
             case ErrorType::INVALID_ACTUATION_MODE:
-                return "An invalid actuation mode was used to perform an action";
+                return "An invalid actuation mode was used to perform an "
+                       "action";
             case ErrorType::INVALID_ACTUATE_POSITION:
                 return "Invalid IU position command";
             case ErrorType::ENCODER_RESET:
@@ -15,7 +16,8 @@ namespace error {
             case ErrorType::OUTSIDE_HARD_LIMITS:
                 return "A joint is outside its defined hard limits";
             case ErrorType::TARGET_EXCEEDS_MAX_DIFFERENCE:
-                return "The target position exceeds the max allowed difference from the current position";
+                return "The target position exceeds the max allowed difference "
+                       "from the current position";
             case ErrorType::TARGET_TORQUE_EXCEEDS_MAX_TORQUE:
                 return "The target torque exceeds the max allowed torque";
             case ErrorType::PDO_OBJECT_NOT_DEFINED:
@@ -23,21 +25,26 @@ namespace error {
             case ErrorType::PDO_REGISTER_OVERFLOW:
                 return "The PDO map could not fit within the registers";
             case ErrorType::WRITING_INITIAL_SETTINGS_FAILED:
-                return "Failed to write initial settings to slave required for operation";
+                return "Failed to write initial settings to slave required for "
+                       "operation";
             case ErrorType::NO_SOCKET_CONNECTION:
                 return "Failed to connect to socket";
             case ErrorType::NOT_ALL_SLAVES_FOUND:
                 return "Not all configured slaves were able to be found";
             case ErrorType::FAILED_TO_REACH_OPERATIONAL_STATE:
-                return "At least one slave failed to reach ethercat operational state";
+                return "At least one slave failed to reach ethercat "
+                       "operational state";
             case ErrorType::INVALID_ENCODER_RESOLUTION:
                 return "The encoder resolution is outside the allowed range";
             case ErrorType::INVALID_RANGE_OF_MOTION:
-                return "The lower and upper limits of an encoder are conflicting";
+                return "The lower and upper limits of an encoder are "
+                       "conflicting";
             case ErrorType::INVALID_SLAVE_CONFIGURATION:
-                return "The slave configuration contains duplicate slave indices";
+                return "The slave configuration contains duplicate slave "
+                       "indices";
             case ErrorType::NOT_ALLOWED_TO_ACTUATE:
-                return "A joint is not allowed to actuate, yet it's trying to actuate";
+                return "A joint is not allowed to actuate, yet it's trying to "
+                       "actuate";
             case ErrorType::INVALID_SLAVE_INDEX:
                 return "Slave index has an invalid value";
             case ErrorType::MISSING_URDF_JOINT:
@@ -49,11 +56,13 @@ namespace error {
             case ErrorType::INVALID_SW_STRING:
                 return "Slave has incorrect SW file";
             case ErrorType::SLAVE_LOST_TIMOUT:
-                return "EtherCAT slave monitor timer elapsed, connection has been lost";
+                return "EtherCAT slave monitor timer elapsed, connection has "
+                       "been lost";
             case ErrorType::ODRIVE_WRONG_AXIS_NUMBER:
                 return "ODrive axis number must be either 0 or 1";
             default:
-                return "Unknown error occurred. Please create/use a documented error";
+                return "Unknown error occurred. Please create/use a documented "
+                       "error";
         }
     }
 

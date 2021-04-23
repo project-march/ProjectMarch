@@ -42,31 +42,30 @@ enum class DataDirection {
     MOSI,
 };
 
-/** All the available IMC object names divided over the PDO maps. make sure to also add it to IMCPDOmap constructor.*/
-enum class IMCObjectName
-{
-  StatusWord,
-  ActualPosition,
-  ActualVelocity,
-  MotionErrorRegister,
-  DetailedErrorRegister,
-  SecondDetailedErrorRegister,
-  DCLinkVoltage,
-  DriveTemperature,
-  ActualTorque,
-  CurrentLimit,
-  MotorPosition,
-  MotorVelocity,
-  ControlWord,
-  TargetPosition,
-  TargetTorque,
-  QuickStopDeceleration,
-  QuickStopOption,
-  MotorVoltage
+/** All the available IMC object names divided over the PDO maps. make sure to
+ * also add it to IMCPDOmap constructor.*/
+enum class IMCObjectName {
+    StatusWord,
+    ActualPosition,
+    ActualVelocity,
+    MotionErrorRegister,
+    DetailedErrorRegister,
+    SecondDetailedErrorRegister,
+    DCLinkVoltage,
+    DriveTemperature,
+    ActualTorque,
+    CurrentLimit,
+    MotorPosition,
+    MotorVelocity,
+    ControlWord,
+    TargetPosition,
+    TargetTorque,
+    QuickStopDeceleration,
+    QuickStopOption,
+    MotorVoltage
 };
 
-class IMCPDOmap
-{
+class IMCPDOmap {
 public:
     /**
      * Initiate all the entered IMC objects to prepare the PDO.
@@ -103,6 +102,6 @@ private:
     const int nr_of_regs = 4; // Amount of registers available.
     const int object_sizes[3] = { 32, 16, 8 }; // Available sizes.
 };
-}// namespace march
+} // namespace march
 
-#endif  // MARCH_HARDWARE_IMOTIONCUBE_PDOMAP_H
+#endif // MARCH_HARDWARE_IMOTIONCUBE_PDOMAP_H
