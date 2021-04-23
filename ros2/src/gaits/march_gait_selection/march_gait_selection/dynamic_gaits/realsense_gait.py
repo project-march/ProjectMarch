@@ -189,13 +189,18 @@ class RealSenseGait(SetpointsGait):
         3) Update the gait parameters to prepare for stari
         4) Return the first subgait, if correct parameters were found.
 
-        :return: A gait update that tells the state machine what to do.
+        :return: A gait update that tells the state machine what to do. Empty means
+        that that state machine should not start a gait.
         """
         # Currently, we hardcode foot_right in start, since this is almost
         # always a right_open
-        gait_parameters_response = self.make_realsense_service_call(
+        service_call_succesful = self.make_realsense_service_call(
             frame_id_to_transform_to="foot_right"
         )
+        if not service_call_succesful:
+            return GaitUpdate.empty()
+
+        gait_parameters_response = self.realsense_service_result
         if gait_parameters_response is None or not gait_parameters_response.success:
             self._node.get_logger().warn(
                 "No gait parameters were found, gait will not be started"
@@ -222,44 +227,39 @@ class RealSenseGait(SetpointsGait):
             self._update_time_stamps(self._current_subgait)
             return GaitUpdate.should_schedule(self._command_from_current_subgait())
 
-    def make_realsense_service_call(
-        self, frame_id_to_transform_to: str
-    ) -> Optional[GetGaitParameters.Response]:
+    def make_realsense_service_call(self, frame_id_to_transform_to: str) -> bool:
         """
         Make a call to the realsense service, if it is available
         and returns the response.
 
         :param frame_id_to_transform_to: The frame that should be given to the reader.
-        :return: The response from the service, None if it was not available.
+        :return: Whether the call was succesful
         """
         request = GetGaitParameters.Request(
             selected_gait=self.selected_gait,
             camera_to_use=self.camera_to_use,
             frame_id_to_transform_to=frame_id_to_transform_to,
         )
-
+        self.realsense_service_event.clear()
         if self._get_gait_parameters_service.wait_for_service(
             timeout_sec=self.SERVICE_TIMEOUT.seconds
         ):
             gait_parameters_response_future = (
                 self._get_gait_parameters_service.call_async(request)
             )
+            gait_parameters_response_future.add_done_callback(
+                self._realsense_response_cb
+            )
         else:
             self._node.get_logger().error(
                 f"The service took longer than {self.SERVICE_TIMEOUT} to become "
                 f"available, is the realsense reader running?"
             )
-            return None
+            return False
 
-        wait_res = self.realsense_service_event.wait(
-            timeout=self.SERVICE_TIMEOUT.seconds
-        )
-        if wait_res:
-            return self.realsense_service_result
-        else:
-            return None
+        return self.realsense_service_event.wait(timeout=self.SERVICE_TIMEOUT.seconds)
 
-    def realsense_response_cb(self, future: Future):
+    def _realsense_response_cb(self, future: Future):
         """Set capture point result when the capture point service returns."""
         self.realsense_service_result = future.result()
         self.realsense_service_event.set()

@@ -355,8 +355,23 @@ class GaitStateMachine(object):
                 gait_update = self._current_gait.start(now)
 
             if gait_update == GaitUpdate.empty():
-                # TODO: implement fallback with empty gait
-                pass
+                self._input.gait_finished()
+                self._is_idle = True
+                # Find the start position of the current gait, to go back to idle.
+                self._current_state = next(
+                    (
+                        name
+                        for name, position in self._gait_selection.positions.items()
+                        if position["joints"] == self._current_gait.starting_position
+                    ),
+                    None,
+                )
+                self._current_gait = None
+                self._gait_selection.get_logger().info(
+                    f"Starting the gait returned "
+                    f"no trajectory, going back to ide state {self._current_state}"
+                )
+                return
 
             if not self.check_correct_foot_pressure():
                 self._gait_selection.get_logger().debug(
