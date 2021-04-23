@@ -47,17 +47,17 @@ bool RegionGrower::createRegions(PointCloud::Ptr pointcloud,
 }
 
 void RegionGrower::readParameters(
-    march_realsense_reader::pointcloud_parametersConfig& config,
-    march_shared_msgs::PointCloudParameters* msg_)
+        march_realsense_reader::pointcloud_parametersConfig& config,
+        march_shared_msgs::PointCloudParameters* msg_)
 {
     number_of_neighbours
         = config.region_creator_region_growing_number_of_neighbours;
     min_cluster_size = config.region_creator_region_growing_min_cluster_size;
     max_cluster_size = config.region_creator_region_growing_max_cluster_size;
     smoothness_threshold
-        = config.region_creator_region_growing_smoothness_threshold;
+            = (float)config.region_creator_region_growing_smoothness_threshold;
     curvature_threshold
-        = config.region_creator_region_growing_curvature_threshold;
+            = (float)config.region_creator_region_growing_curvature_threshold;
 
     // Set Parameter message
     msg_->region_creator.region_growing.number_of_neighbours

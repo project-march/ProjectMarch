@@ -10,9 +10,12 @@ find_package(gazebo REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
 include_directories(
+    include
+)
+include_directories(
+    SYSTEM
     ${catkin_INCLUDE_DIRS}
     ${GAZEBO_INCLUDE_DIRS}
-    include
 )
 
 catkin_package(
@@ -27,7 +30,7 @@ add_library(${PROJECT_NAME}
     src/walk_controller.cpp
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${catkin_INCLUDE_DIRS}/${PROJECT_NAME} ${GAZEBO_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${catkin_INCLUDE_DIRS}/${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${catkin_LIBRARIES} yaml-cpp)
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror)
@@ -47,7 +50,7 @@ add_library(contact
     src/contact_plugin.cpp
 )
 
-target_include_directories(contact PRIVATE ${catkin_INCLUDE_DIRS}/contact ${GAZEBO_INCLUDE_DIRS})
+target_include_directories(contact PRIVATE ${catkin_INCLUDE_DIRS}/contact)
 target_link_libraries(contact PRIVATE ${GAZEBO_LIBRARIES} ${catkin_LIBRARIES})
 target_compile_features(contact PRIVATE cxx_std_17)
 target_compile_options(contact PRIVATE -Wall -Wextra -Werror)

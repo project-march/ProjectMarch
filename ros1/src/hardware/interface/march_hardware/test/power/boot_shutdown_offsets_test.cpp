@@ -58,10 +58,10 @@ TEST_F(BootShutdownOffsetsTest, NotEquals)
 {
     BootShutdownOffsets bootShutdownOffsets1(
         masterOkByteOffset, shutdownByteOffset, shutdownAllowedByteOffset);
-    BootShutdownOffsets bootShutdownOffsets2(
-        masterOkByteOffset, 17, shutdownAllowedByteOffset);
-    BootShutdownOffsets bootShutdownOffsets3(
-        masterOkByteOffset, shutdownByteOffset, 32);
+    BootShutdownOffsets bootShutdownOffsets2(masterOkByteOffset,
+        /*shutdownByteOffset=*/17, shutdownAllowedByteOffset);
+    BootShutdownOffsets bootShutdownOffsets3(masterOkByteOffset,
+        shutdownByteOffset, /*shutdownAllowedByteOffset=*/32);
 
     EXPECT_FALSE(bootShutdownOffsets1 == bootShutdownOffsets2);
     EXPECT_FALSE(bootShutdownOffsets1 == bootShutdownOffsets3);

@@ -12,12 +12,19 @@ public:
     MissingKeyException(
         const std::string& key_name, const std::string& object_name)
         : march::error::HardwareException(
-            march::error::ErrorType::MISSING_REQUIRED_KEY)
+            march::error::ErrorType::MISSING_REQUIRED_KEY,
+            createDescription(key_name, object_name))
+    {
+    }
+
+private:
+    static std::string createDescription(
+        const std::string& key_name, const std::string& object_name)
     {
         std::ostringstream ss;
         ss << "Missing required key '" << key_name
            << "' while creating object '" << object_name << "'";
-        this->description_ = this->createDescription(ss.str());
+        return ss.str();
     }
 };
 #endif // MARCH_HARDWARE_BUILDER_HARDWARE_CONFIG_EXCEPTIONS_H

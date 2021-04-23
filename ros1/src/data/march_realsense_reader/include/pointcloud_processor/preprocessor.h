@@ -93,10 +93,6 @@ protected:
     bool transformPointCloudFromUrdf(
         geometry_msgs::TransformStamped& transform_stamped);
 
-    // Rotate and translates the pointcloud by some certain amounts (specified
-    // in the parameter file)
-    bool transformPointCloud();
-
     // Removes all points which are futher away then a certain distance from the
     // origin (specified in the parameter file)
     bool filterOnDistanceFromOrigin();
@@ -114,12 +110,9 @@ protected:
 
     // Downsampling parameters
     bool voxel_grid_filter;
-    double leaf_size;
+    float leaf_size;
     bool random_filter;
     int remaining_points;
-
-    // Transform parameters
-    double rotation_y;
 
     // Distance filter parameters
     double distance_threshold;

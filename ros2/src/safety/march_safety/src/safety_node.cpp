@@ -42,7 +42,7 @@ int main(int argc, char** argv)
 SafetyNode::SafetyNode()
     : Node("safety_node", "march",
         rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(
-            true))
+            /*automatically_declare_parameters_from_overrides=*/true))
 {
     joint_names = node_utils::get_joint_names(*this);
     RCLCPP_DEBUG(this->get_logger(), "Got joint names.");

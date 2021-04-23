@@ -124,7 +124,7 @@ void NormalsPreprocessor::readParameters(
 {
     // Downsampling parameters
     voxel_grid_filter = config.preprocessor_downsampling_voxel_grid_filter;
-    leaf_size = config.preprocessor_downsampling_leaf_size;
+    leaf_size = (float)config.preprocessor_downsampling_leaf_size;
     random_filter = config.preprocessor_downsampling_random_filter;
     remaining_points = config.preprocessor_downsampling_remainig_points;
 
@@ -196,7 +196,7 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
     try {
         pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
         transform_stamped = tfBuffer->lookupTransform(frame_id_to_transform_to_,
-            pointcloud_frame_id, ros::Time::now(), ros::Duration(0.5));
+            pointcloud_frame_id, ros::Time::now(), ros::Duration(/*t=*/0.5));
         pcl_ros::transformPointCloud(
             *pointcloud_, *pointcloud_, transform_stamped.transform);
     } catch (tf2::TransformException& ex) {
@@ -205,24 +205,6 @@ bool NormalsPreprocessor::transformPointCloudFromUrdf(
             << ex.what());
         return false;
     }
-    return true;
-}
-
-// Translate and rotate the pointcloud so that the origin is at the foot
-// Currently uses a very rough and static estimation of where the foot should be
-bool NormalsPreprocessor::transformPointCloud()
-{
-    // make a 4 by 4 transformation Transform = [Rotation (3x3) translation
-    // (3x1); 0 (1x3) 1 (1x1)]
-    Eigen::Affine3f transform = Eigen::Affine3f::Identity();
-
-    // Add the desired rotation (currently just around the Y axis) to the
-    // transformation matrix
-    transform.rotate(Eigen::AngleAxisf(rotation_y, Eigen::Vector3f::UnitY()));
-
-    // Actually transform
-    pcl::transformPointCloud(*pointcloud_, *pointcloud_, transform);
-
     return true;
 }
 
@@ -327,7 +309,7 @@ void SimplePreprocessor::transformPointCloudFromUrdf()
     try {
         pointcloud_frame_id = pointcloud_->header.frame_id.c_str();
         transformStamped = tfBuffer->lookupTransform(frame_id_to_transform_to_,
-            pointcloud_frame_id, ros::Time::now(), ros::Duration(0.5));
+            pointcloud_frame_id, ros::Time::now(), ros::Duration(/*t=*/0.5));
         pcl_ros::transformPointCloud(
             *pointcloud_, *pointcloud_, transformStamped.transform);
     } catch (tf2::TransformException& ex) {

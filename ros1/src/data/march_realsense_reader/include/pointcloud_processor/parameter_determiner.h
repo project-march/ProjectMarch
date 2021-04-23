@@ -39,10 +39,12 @@ public:
 
     virtual ~ParameterDeterminer() {};
 
+    /** This function is called upon whenever a parameter from config is
+   * changed, including when launching the node
+   */
     virtual void readParameters(
         march_realsense_reader::pointcloud_parametersConfig& config,
-        march_shared_msgs::PointCloudParameters* msg_)
-        = 0;
+        march_shared_msgs::PointCloudParameters* msg_)=0;
 
 protected:
     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;
@@ -71,13 +73,16 @@ public:
         SelectedGait const selected_gait,
         boost::shared_ptr<GaitParameters> gait_parameters) override;
 
+    /** This function is called upon whenever a parameter from config is
+     * changed, including when launching the node
+     */
     void readParameters(
         march_realsense_reader::pointcloud_parametersConfig& config,
         march_shared_msgs::PointCloudParameters* msg_) override;
 
-    pcl::PointNormal optimal_foot_location;
-    PointNormalCloud::Ptr possible_foot_locations;
-    PointCloud2D::Ptr foot_locations_to_try;
+      pcl::PointNormal optimal_foot_location;
+      PointNormalCloud::Ptr possible_foot_locations;
+      PointCloud2D::Ptr foot_locations_to_try;
 
 protected:
     // Get the optimal foot location by finding which possible foot location is
@@ -144,24 +149,24 @@ protected:
 
     // Fill the foot locations to try cloud with a line of points from (start,
     // 0) to (end, 0)
-    bool fillOptionalFootLocationCloud(double start, double end);
+    bool fillOptionalFootLocationCloud(float start, float end);
 
     void setParameterMessage(march_shared_msgs::PointCloudParameters* msg_);
 
     // Read all relevant parameters
     int hull_dimension;
     int number_of_optional_foot_locations;
-    double min_x_stairs;
-    double max_x_stairs;
-    double min_z_stairs;
-    double max_z_stairs;
-    double y_location;
+    float min_x_stairs;
+    float max_x_stairs;
+    float min_z_stairs;
+    float max_z_stairs;
+    float y_location;
     double x_flat;
     double z_flat;
     double x_steep;
     double z_steep;
-    double min_search_area;
-    double max_search_area;
+    float min_search_area;
+    float max_search_area;
     double max_distance_to_line;
     bool general_most_desirable_location_is_mid;
     bool general_most_desirable_location_is_small;

@@ -1,8 +1,8 @@
-from typing import Optional
-
 from march_gait_selection.state_machine.state_machine_input import TransitionRequest
-from march_utility.gait.joint_trajectory import JointTrajectory
 from march_utility.utilities.duration import Duration
+from rclpy.time import Time
+
+from .gait_update import GaitUpdate
 
 
 class GaitInterface(object):
@@ -50,21 +50,25 @@ class GaitInterface(object):
         """Returns the position of all the joints after the gait has ended."""
         return {}
 
-    def start(self) -> Optional[JointTrajectory]:
-        """Called when the gait has been selected for execution and returns an
-        optional starting trajectory."""
-        return None
+    @property
+    def can_be_scheduled_early(self) -> bool:
+        """Return whether this gait can be scheduled early, default is False."""
+        return False
 
-    def update(self, elapsed_time: Duration) -> (JointTrajectory, bool):
-        """Called in a loop with the elapsed time since the last update.
+    def start(self, current_time: Time) -> GaitUpdate:
+        """Start the gait.
 
-        :param float elapsed_time: Elapsed time in seconds since the last update
+        :returns Returns a GaitUpdate that usually contains a TrajectoryCommand."""
+        return GaitUpdate.empty()
 
-        :returns A pair of a trajectory and a flag. The trajectory that will be
-                 set as the new goal for the controller, can be None. The flag
-                 indicates whether the gait has finished.
+    def update(self, current_time: Time) -> GaitUpdate:
+        """Give an update on the progress of the gait.
+
+        :param current_time: Current time
+        :returns Returns a GaitUpdate that may contain a TrajectoryCommand, and any of the
+                flags set to true, depending on the state of the Gait.
         """
-        return None, True
+        return GaitUpdate.finished()
 
     def transition(self, transition_request: TransitionRequest) -> bool:
         """Requests a special transition.

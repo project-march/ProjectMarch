@@ -15,7 +15,7 @@ public:
 
     // Assume the start to be 0 if only the end is specified.
     explicit UniformDistribution(const int end)
-        : UniformDistribution { 0, end } {};
+        : UniformDistribution { /*start=*/0, end } {};
 
     // While the constructor does also create the random device and the random
     // generator, there should also be a possibility to change the range of the

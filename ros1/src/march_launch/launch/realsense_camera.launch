@@ -17,6 +17,9 @@
          doc="The frame rate to use for the color module of the camera"/>
     <arg name="infra_fps" default="$(arg camera_fps)"
          doc="The frame rate to use for the infra red module of the camera"/>
+<!--    Determines whether camera info is printed to the terminal,
+        change this to `screen` if you  want all output-->
+    <arg name="camera_output" default="log"/>
 
     <arg name="enable_fisheye"          default="false"/>
     <arg name="depth_width"             default="640"/>
@@ -71,6 +74,7 @@
             <arg name="depth_fps" value="$(arg depth_fps)"/>
             <arg name="color_fps" value="$(arg color_fps)"/>
             <arg name="infra_fps" value="$(arg infra_fps)"/>
+            <arg name="output" value="$(arg camera_output)"/>
 
             <arg name="enable_pointcloud"        value="$(arg enable_pointcloud)"/>
             <arg name="pointcloud_texture_stream" value="$(arg pointcloud_texture_stream)"/>
@@ -129,6 +133,7 @@
             <arg name="depth_fps" value="$(arg depth_fps)"/>
             <arg name="color_fps" value="$(arg color_fps)"/>
             <arg name="infra_fps" value="$(arg infra_fps)"/>
+            <arg name="output" value="$(arg camera_output)"/>
 
             <arg name="enable_pointcloud"        value="$(arg enable_pointcloud)"/>
             <arg name="pointcloud_texture_stream" value="$(arg pointcloud_texture_stream)"/>

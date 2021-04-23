@@ -43,21 +43,22 @@ public:
     {
         std::string base_path = ros::package::getPath("march_hardware_builder");
         if (this->value == AllowedRobot::march4) {
-            return base_path.append("/robots/march4.yaml");
+            return base_path.append(/*__s=*/"/robots/march4.yaml");
         } else if (this->value == AllowedRobot::march3) {
-            return base_path.append("/robots/march3.yaml");
+            return base_path.append(/*__s=*/"/robots/march3.yaml");
         } else if (this->value == AllowedRobot::test_joint_rotational) {
-            return base_path.append("/robots/test_joint_rotational.yaml");
+            return base_path.append(
+                /*__s=*/"/robots/test_joint_rotational.yaml");
         } else if (this->value == AllowedRobot::test_joint_linear) {
-            return base_path.append("/robots/test_joint_linear.yaml");
+            return base_path.append(/*__s=*/"/robots/test_joint_linear.yaml");
         } else if (this->value == AllowedRobot::pdb) {
-            return base_path.append("/robots/pdb.yaml");
+            return base_path.append(/*__s=*/"/robots/pdb.yaml");
         } else if (this->value == AllowedRobot::pressure_soles) {
-            return base_path.append("/robots/pressure_soles.yaml");
+            return base_path.append(/*__s=*/"/robots/pressure_soles.yaml");
         }
         ROS_ERROR(
             "Robotname not implemented. Using test_joint_rotational.yaml...");
-        return base_path.append("/robots/test_joint_rotational.yaml");
+        return base_path.append(/*__s=*/"/robots/test_joint_rotational.yaml");
     }
 
     constexpr AllowedRobot(Value allowed_robot)

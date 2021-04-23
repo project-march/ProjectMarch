@@ -23,6 +23,10 @@ public:
         = 0;
     virtual ~RegionCreator() {};
     virtual pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation() = 0;
+
+    /** This function is called upon whenever a parameter from config is
+   * changed, including when launching the node
+   */
     virtual void readParameters(
         march_realsense_reader::pointcloud_parametersConfig& config,
         march_shared_msgs::PointCloudParameters* msg_)
@@ -52,6 +56,9 @@ public:
      */
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation() override;
 
+    /** This function is called upon whenever a parameter from config is
+     * changed, including when launching the node
+     */
     void readParameters(
         march_realsense_reader::pointcloud_parametersConfig& config,
         march_shared_msgs::PointCloudParameters* msg_) override;
@@ -75,8 +82,8 @@ private:
     int number_of_neighbours;
     int min_cluster_size;
     int max_cluster_size;
-    double smoothness_threshold;
-    double curvature_threshold;
+    float smoothness_threshold;
+    float curvature_threshold;
 };
 
 #endif // MARCH_PREPROCESSOR_H

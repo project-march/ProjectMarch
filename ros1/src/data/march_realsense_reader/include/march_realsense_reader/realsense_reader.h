@@ -18,6 +18,7 @@
 #include <march_realsense_reader/pointcloud_parametersConfig.h>
 #include <march_shared_msgs/PointCloudParameters.h>
 
+
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
 class RealSenseReader {
@@ -81,9 +82,15 @@ public:
         visualization_msgs::Marker& marker_list);
 
 private:
-    ros::NodeHandle* n_;
-    ros::Subscriber pointcloud_subscriber_;
     PointCloud last_pointcloud_;
+
+    ros::NodeHandle* n_;
+    std::unique_ptr<NormalsPreprocessor> preprocessor_;
+    std::unique_ptr<RegionGrower> region_creator_;
+    std::unique_ptr<CHullFinder> hull_finder_;
+    std::unique_ptr<HullParameterDeterminer> parameter_determiner_;
+
+    ros::Subscriber pointcloud_subscriber_;
     ros::ServiceServer read_pointcloud_service_;
     ros::Publisher preprocessed_pointcloud_publisher_;
     ros::Publisher region_pointcloud_publisher_;
@@ -91,10 +98,10 @@ private:
     ros::Publisher hull_parameter_determiner_publisher_;
     ros::Publisher pointcloud_parameters_publisher_;
 
-    std::unique_ptr<NormalsPreprocessor> preprocessor_;
-    std::unique_ptr<RegionGrower> region_creator_;
-    std::unique_ptr<CHullFinder> hull_finder_;
-    std::unique_ptr<HullParameterDeterminer> parameter_determiner_;
+    ros::Publisher pointcloud_publisher_;
+    std::unique_ptr<march_shared_msgs::PointCloudParameters>
+            pointcloud_parameters_msg_;
+
 
     // Debugging flag at launch
     bool debugging_launch;
@@ -102,14 +109,9 @@ private:
     // Debugging flag, dynamically reconfigurable debugging_launch is true
     bool debugging_;
 
-    std::string config_file_;
-    std::unique_ptr<march_shared_msgs::PointCloudParameters>
-        pointcloud_parameters_msg_;
-
-    ros::Publisher pointcloud_publisher_;
+    std::string frame_id_to_transform_to_;
 
     int selected_gait_;
-    std::string frame_id_to_transform_to_;
     bool use_left_foot_;
 };
 

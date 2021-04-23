@@ -4,11 +4,15 @@
 
 namespace march {
 const IMotionCubeTargetState IMotionCubeTargetState::SWITCH_ON_DISABLED
-    = IMotionCubeTargetState("Switch on Disabled", 128, 0b0000000001001111, 64);
+    = IMotionCubeTargetState("Switch on Disabled", /*controlWord=*/128,
+        /*stateMask=*/0b0000000001001111, /*state=*/64);
 const IMotionCubeTargetState IMotionCubeTargetState::READY_TO_SWITCH_ON
-    = IMotionCubeTargetState("Ready to Switch On", 6, 0b0000000001101111, 33);
+    = IMotionCubeTargetState("Ready to Switch On", /*controlWord=*/6,
+        /*stateMask=*/0b0000000001101111, /*state=*/33);
 const IMotionCubeTargetState IMotionCubeTargetState::SWITCHED_ON
-    = IMotionCubeTargetState("Switched On", 7, 0b0000000001101111, 35);
+    = IMotionCubeTargetState("Switched On", /*controlWord=*/7,
+        /*stateMask=*/0b0000000001101111, /*state=*/35);
 const IMotionCubeTargetState IMotionCubeTargetState::OPERATION_ENABLED
-    = IMotionCubeTargetState("Operation Enabled", 15, 0b0000000001101111, 39);
+    = IMotionCubeTargetState("Operation Enabled", /*controlWord=*/15,
+        /*stateMask=*/0b0000000001101111, /*state=*/39);
 } // namespace march

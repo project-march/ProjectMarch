@@ -13,8 +13,8 @@ const double DEFAULT_TEMPERATURE_THRESHOLD { 40.0 };
 const int DEFAULT_SEND_ERRORS_INTERVAL { 1000 };
 
 const std::map<ThresholdType, std::string> THRESHOLD_NAMES
-    = { { FATAL, "fatal" }, { NON_FATAL, "non_fatal" },
-          { WARNING, "warning" } };
+    = { { FATAL, /*__y=*/"fatal" }, { NON_FATAL, /*__y=*/"non_fatal" },
+          { WARNING, /*__y=*/"warning" } };
 
 // TODO(@Tim) Throw an exception when no temperatures are published.
 /**
@@ -28,7 +28,7 @@ TemperatureSafety::TemperatureSafety(std::shared_ptr<SafetyNode> node,
     std::shared_ptr<SafetyHandler> safety_handler)
     : node_(node)
     , safety_handler_(safety_handler)
-    , send_errors_interval_(0)
+    , send_errors_interval_(/*nanoseconds=*/0)
 {
     node_->get_parameter_or("default_temperature_threshold",
         default_temperature_threshold_, DEFAULT_TEMPERATURE_THRESHOLD);

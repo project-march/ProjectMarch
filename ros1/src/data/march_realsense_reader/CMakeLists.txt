@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.5.2)
 project(march_realsense_reader)
+set(CMAKE_CXX_STANDARD 17)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -70,7 +71,6 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 # Mark cpp header files for installation
-# Config (*.cfg) headers should be build before any node using said headers
 install(DIRECTORY config
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
         )
@@ -88,3 +88,7 @@ install(TARGETS ${PROJECT_NAME}
 install(DIRECTORY launch
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
+
+# The node has to be build, before this line is reached
+add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_gencfg)
+

@@ -6,7 +6,7 @@
 #include <ros/ros.h>
 
 #include <xsensdeviceapi.h>
-#include <xstypes.h>
+#include <xsenstypes.h>
 
 class Mtw : public XsCallback {
 public:
