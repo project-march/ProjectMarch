@@ -25,7 +25,7 @@ ODrive::ODrive(const Slave& slave, ODriveAxis axis, std::unique_ptr<AbsoluteEnco
   : MotorController(slave, std::move(absolute_encoder), actuation_mode)
   , axis_(axis)
 {
-  if (!absolute_encoder)
+  if (!absolute_encoder_)
   {
     throw error::HardwareException(error::ErrorType::MISSING_ENCODER,
                                    "An ODrive needs an absolute encoder");
@@ -74,7 +74,7 @@ std::unique_ptr<MotorControllerState> ODrive::getState()
   state->absolute_velocity_ = getAbsoluteVelocityUnchecked();
 
   // Set ODrive specific attributes
-//  state->axis_state_ = getAxisState(); // TODO: implement
+  state->axis_state_ = getAxisState();
   state->axis_error_ = getAxisError();
   state->motor_error_ = getMotorError();
   state->encoder_manager_error_ = getEncoderManagerError();
@@ -99,6 +99,12 @@ void ODrive::reset(SdoSlaveInterface& /*sdo*/)
   //TODO: implement
 }
 
+ODriveAxisState ODrive::getAxisState()
+{
+  //TODO: implement
+  return ODriveAxisState::CLOSED_LOOP_CONTROL;
+}
+
 float ODrive::getAbsolutePositionIU()
 {
   return this->read32(ODrivePDOmap::getMISOByteOffset(ODriveObjectName::ActualPosition, axis_)).f;
@@ -111,7 +117,8 @@ float ODrive::getAbsoluteVelocityIU()
 
 float ODrive::getAbsolutePositionUnchecked()
 {
-  return this->getAbsoluteEncoder()->toRadians(getAbsolutePositionIU(), true);
+  return this->getAbsolutePositionIU();
+  //return this->getAbsoluteEncoder()->toRadians(getAbsolutePositionIU(), true);
 }
 
 float ODrive::getAbsoluteVelocityUnchecked()
@@ -174,4 +181,5 @@ float ODrive::getIncrementalVelocityUnchecked()
 {
   throw error::NotImplemented("getIncrementalVelocity", "ODrive");
 }
+
 }

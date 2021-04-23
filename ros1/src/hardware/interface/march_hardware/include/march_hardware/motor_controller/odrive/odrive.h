@@ -70,8 +70,7 @@ private:
   // Set the ODrive in a certain axis state
 //  void goToAxisState(ODriveAxisState target_state);
 
-//  TODO: Look at getAxisState()
-//  ODriveAxisState getAxisState();
+  ODriveAxisState getAxisState();
 
   float getAbsolutePositionIU();
   float getAbsoluteVelocityIU();
