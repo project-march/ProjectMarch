@@ -51,16 +51,17 @@ class RealSenseGait(SetpointsGait):
         subgaits_to_interpolate: dict,
         dimensions: InterpolationDimensions,
         parameters: List[float],
-        service: Client,
+        process_service: Client,
     ):
         super(RealSenseGait, self).__init__(gait_name, subgaits, graph)
         self._node = node
-        self._get_gait_parameters_service = service
         self.parameters = parameters
         self.dimensions = dimensions
         self.selected_gait = self.selected_realsense_gait_msg_from_string(selected_gait)
         self.camera_to_use = self.camera_msg_from_string(camera_to_use)
         self.subgaits_to_interpolate = subgaits_to_interpolate
+        # Set up service and event for asynchronous
+        self._get_gait_parameters_service = process_service
         self.realsense_service_event = Event()
         self.realsense_service_result = None
 
@@ -73,7 +74,7 @@ class RealSenseGait(SetpointsGait):
         gait_config: dict,
         gait_graph: dict,
         gait_directory: str,
-        service: Client,
+        process_service: Client,
     ):
         """
         Construct a realsense gait from the gait_config from the realsense_gaits.yaml.
@@ -143,7 +144,7 @@ class RealSenseGait(SetpointsGait):
             subgaits_to_interpolate,
             dimensions,
             parameters,
-            service,
+            process_service,
         )
 
     @classmethod
