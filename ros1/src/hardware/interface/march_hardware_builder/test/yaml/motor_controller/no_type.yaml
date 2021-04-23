@@ -1,0 +1,10 @@
+slaveIndex: 2
+absoluteEncoder:
+  resolution: 16
+  minPositionIU: 22134
+  maxPositionIU: 43436
+  zeroPositionIU: 24515
+  safetyMarginRad: 0.05
+incrementalEncoder:
+  resolution: 12
+  transmission: 101

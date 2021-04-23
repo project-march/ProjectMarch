@@ -1,7 +1,9 @@
 // Copyright 2018 Project March.
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/joint.h"
+#include "march_hardware/motor_controller/imotioncube/imotioncube_state.h"
 #include "mocks/mock_imotioncube.h"
+#include "mocks/mock_motorcontroller_state.h"
 #include "mocks/mock_temperature_ges.h"
 
 #include <memory>
@@ -11,6 +13,7 @@
 #include <gtest/gtest.h>
 
 using testing::_;
+using testing::ByMove;
 using testing::Eq;
 using testing::Return;
 
@@ -26,12 +29,6 @@ protected:
     std::unique_ptr<MockTemperatureGES> temperature_ges;
 };
 
-TEST_F(JointTest, InitializeWithoutMotorControllerAndGes)
-{
-    march::Joint joint("test", /*net_number=*/0);
-    ASSERT_NO_THROW(joint.initialize(1));
-}
-
 TEST_F(JointTest, InitializeWithoutTemperatureGes)
 {
     const int expected_cycle = 3;
@@ -39,18 +36,7 @@ TEST_F(JointTest, InitializeWithoutTemperatureGes)
 
     march::Joint joint("test", /*net_number=*/0, /*allow_actuation=*/false,
         std::move(this->imc));
-    ASSERT_NO_THROW(joint.initialize(expected_cycle));
-}
-
-TEST_F(JointTest, InitializeWithoutMotorController)
-{
-    const int expected_cycle = 3;
-    EXPECT_CALL(*this->temperature_ges, initSdo(_, Eq(expected_cycle)))
-        .Times(/*n=*/1);
-
-    march::Joint joint("test", /*net_number=*/0, /*allow_actuation=*/false,
-        nullptr, std::move(this->temperature_ges));
-    ASSERT_NO_THROW(joint.initialize(expected_cycle));
+    ASSERT_NO_THROW(joint.initSdo(expected_cycle));
 }
 
 TEST_F(JointTest, AllowActuation)
@@ -58,13 +44,6 @@ TEST_F(JointTest, AllowActuation)
     march::Joint joint("test", /*net_number=*/0, /*allow_actuation=*/true,
         std::move(this->imc));
     ASSERT_TRUE(joint.canActuate());
-}
-
-TEST_F(JointTest, DisallowActuationWithoutMotorController)
-{
-    march::Joint joint(
-        "test", /*net_number=*/0, /*allow_actuation=*/true, nullptr);
-    ASSERT_FALSE(joint.canActuate());
 }
 
 TEST_F(JointTest, DisableActuation)
@@ -104,17 +83,19 @@ TEST_F(JointTest, ActuatePositionDisableActuation)
     march::Joint joint("actuate_false", /*net_number=*/0,
         /*allow_actuation=*/false, std::move(this->imc));
     EXPECT_FALSE(joint.canActuate());
-    ASSERT_THROW(joint.actuateRad(0.3), march::error::HardwareException);
+    ASSERT_THROW(joint.actuate(0.3), march::error::HardwareException);
 }
 
 TEST_F(JointTest, ActuatePosition)
 {
     const double expected_rad = 5;
-    EXPECT_CALL(*this->imc, actuateRad(Eq(expected_rad))).Times(/*n=*/1);
+    EXPECT_CALL(*this->imc, actuateRadians(Eq(expected_rad))).Times(/*n=*/1);
 
     march::Joint joint("actuate_false", /*net_number=*/0,
         /*allow_actuation=*/true, std::move(this->imc));
-    ASSERT_NO_THROW(joint.actuateRad(expected_rad));
+    joint.getMotorController()->setActuationMode(
+        march::ActuationMode::position);
+    ASSERT_NO_THROW(joint.actuate(expected_rad));
 }
 
 TEST_F(JointTest, ActuateTorqueDisableActuation)
@@ -122,17 +103,19 @@ TEST_F(JointTest, ActuateTorqueDisableActuation)
     march::Joint joint("actuate_false", /*net_number=*/0,
         /*allow_actuation=*/false, std::move(this->imc));
     EXPECT_FALSE(joint.canActuate());
-    ASSERT_THROW(joint.actuateTorque(3), march::error::HardwareException);
+    ASSERT_THROW(joint.actuate(3), march::error::HardwareException);
 }
 
 TEST_F(JointTest, ActuateTorque)
 {
-    const int16_t expected_torque = 5;
+    const double expected_torque = 5;
     EXPECT_CALL(*this->imc, actuateTorque(Eq(expected_torque))).Times(/*n=*/1);
 
-    march::Joint joint("actuate_false", /*net_number=*/0,
+    march::Joint joint("actuate_true", /*net_number=*/0,
         /*allow_actuation=*/true, std::move(this->imc));
-    ASSERT_NO_THROW(joint.actuateTorque(expected_torque));
+    joint.getMotorController()->setActuationMode(march::ActuationMode::torque);
+
+    ASSERT_NO_THROW(joint.actuate(expected_torque));
 }
 
 TEST_F(JointTest, PrepareForActuationNotAllowed)
@@ -144,28 +127,17 @@ TEST_F(JointTest, PrepareForActuationNotAllowed)
 
 TEST_F(JointTest, PrepareForActuationAllowed)
 {
-    EXPECT_CALL(*this->imc, goToOperationEnabled()).Times(/*n=*/1);
+    EXPECT_CALL(*this->imc, prepareActuation()).Times(/*n=*/1);
     march::Joint joint("actuate_true", /*net_number=*/0,
         /*allow_actuation=*/true, std::move(this->imc));
     ASSERT_NO_THROW(joint.prepareActuation());
 }
 
-TEST_F(JointTest, GetTemperature)
-{
-    const float expected_temperature = 45.0;
-    EXPECT_CALL(*this->temperature_ges, getTemperature())
-        .WillOnce(Return(expected_temperature));
-
-    march::Joint joint("get_temperature", /*net_number=*/0,
-        /*allow_actuation=*/false, nullptr, std::move(this->temperature_ges));
-    ASSERT_FLOAT_EQ(joint.getTemperature(), expected_temperature);
-}
-
-TEST_F(JointTest, GetTemperatureWithoutTemperatureGes)
+TEST_F(JointTest, hasTemperatureGes)
 {
     march::Joint joint("get_temperature", /*net_number=*/0,
-        /*allow_actuation=*/false, nullptr, nullptr);
-    ASSERT_FLOAT_EQ(joint.getTemperature(), -1.0);
+        /*allow_actuation=*/false, std::move(this->imc));
+    ASSERT_FALSE(joint.hasTemperatureGES());
 }
 
 TEST_F(JointTest, ResetController)
@@ -173,34 +145,26 @@ TEST_F(JointTest, ResetController)
     EXPECT_CALL(*this->imc, reset(_)).Times(/*n=*/1);
     march::Joint joint("reset_controller", /*net_number=*/0,
         /*allow_actuation=*/true, std::move(this->imc));
-    ASSERT_NO_THROW(joint.resetIMotionCube());
-}
-
-TEST_F(JointTest, ResetControllerWithoutController)
-{
-    EXPECT_CALL(*this->imc, reset(_)).Times(/*n=*/0);
-    march::Joint joint("reset_controller", /*net_number=*/0,
-        /*allow_actuation=*/true, nullptr, std::move(this->temperature_ges));
-    ASSERT_NO_THROW(joint.resetIMotionCube());
+    ASSERT_NO_THROW(joint.getMotorController()->reset());
 }
 
 TEST_F(JointTest, TestPrepareActuation)
 {
-    EXPECT_CALL(*this->imc, getAngleRadIncremental())
+    EXPECT_CALL(*this->imc, getIncrementalPositionUnchecked())
         .WillOnce(Return(/*value=*/5));
-    EXPECT_CALL(*this->imc, getAngleRadAbsolute())
+    EXPECT_CALL(*this->imc, getAbsolutePositionUnchecked())
         .WillOnce(Return(/*value=*/3));
-    EXPECT_CALL(*this->imc, goToOperationEnabled()).Times(/*n=*/1);
+    EXPECT_CALL(*this->imc, prepareActuation()).Times(/*n=*/1);
     march::Joint joint("actuate_true", /*net_number=*/0,
         /*allow_actuation=*/true, std::move(this->imc));
     joint.prepareActuation();
-    ASSERT_EQ(joint.getIncrementalPosition(), 5);
-    ASSERT_EQ(joint.getAbsolutePosition(), 3);
+    ASSERT_EQ(joint.getPosition(), 3);
+    ASSERT_EQ(joint.getVelocity(), 0);
 }
 
 TEST_F(JointTest, TestReceivedDataUpdateFirstTimeTrue)
 {
-    EXPECT_CALL(*this->imc, getIMCVoltage()).WillOnce(Return(/*value=*/48));
+    EXPECT_CALL(*this->imc, getState()).Times(/*n=*/1);
     march::Joint joint("actuate_true", /*net_number=*/0,
         /*allow_actuation=*/true, std::move(this->imc));
     ASSERT_TRUE(joint.receivedDataUpdate());
@@ -208,22 +172,28 @@ TEST_F(JointTest, TestReceivedDataUpdateFirstTimeTrue)
 
 TEST_F(JointTest, TestReceivedDataUpdateTrue)
 {
-    EXPECT_CALL(*this->imc, getIMCVoltage())
-        .WillOnce(Return(/*value=*/48))
-        .WillOnce(Return(/*value=*/48.001));
+    auto basic_state = std::make_unique<MockMotorControllerState>();
+    auto new_state = std::make_unique<MockMotorControllerState>();
+    new_state->motor_current_ = 11;
+    EXPECT_CALL(*this->imc, getState())
+        .WillOnce(Return(ByMove(std::move(basic_state))))
+        .WillOnce(Return(ByMove(std::move(new_state))));
     march::Joint joint("actuate_true", /*net_number=*/0,
         /*allow_actuation=*/true, std::move(this->imc));
-    joint.receivedDataUpdate();
+    ASSERT_TRUE(joint.receivedDataUpdate());
     ASSERT_TRUE(joint.receivedDataUpdate());
 }
 
 TEST_F(JointTest, TestReceivedDataUpdateFalse)
 {
-    EXPECT_CALL(*this->imc, getIMCVoltage())
-        .WillRepeatedly(Return(/*value=*/48));
+    auto basic_state = std::make_unique<MockMotorControllerState>();
+    auto new_state = std::make_unique<MockMotorControllerState>();
+    EXPECT_CALL(*this->imc, getState())
+        .WillOnce(Return(ByMove(std::move(basic_state))))
+        .WillOnce(Return(ByMove(std::move(new_state))));
     march::Joint joint("actuate_true", /*net_number=*/0,
         /*allow_actuation=*/true, std::move(this->imc));
-    joint.receivedDataUpdate();
+    ASSERT_TRUE(joint.receivedDataUpdate());
     ASSERT_FALSE(joint.receivedDataUpdate());
 }
 
@@ -231,109 +201,78 @@ TEST_F(JointTest, TestReadEncodersOnce)
 {
     ros::Duration elapsed_time(/*t=*/0.2);
     double velocity = 0.5;
-    double velocity_with_noise = velocity
-        - 2 * this->imc->getAbsoluteRadPerBit() / elapsed_time.toSec();
-
-    double initial_incremental_position = 5;
     double initial_absolute_position = 3;
+    double initial_incremental_position = 5;
+    double new_incremental_position = 4;
 
-    double new_incremental_position
-        = initial_incremental_position + velocity * elapsed_time.toSec();
-    double new_absolute_position = initial_absolute_position
-        + velocity_with_noise * elapsed_time.toSec();
+    EXPECT_CALL(*this->imc, isIncrementalEncoderMorePrecise())
+        .WillRepeatedly(Return(/*value=*/true));
+    EXPECT_CALL(*this->imc, getState()).Times(/*n=*/1);
+    EXPECT_CALL(*this->imc, getIncrementalPositionUnchecked())
+        .WillOnce(Return(/*value=*/initial_incremental_position))
+        .WillOnce(Return(/*value=*/new_incremental_position));
+    EXPECT_CALL(*this->imc, getAbsolutePositionUnchecked())
+        .WillOnce(Return(/*value=*/initial_absolute_position));
 
-    EXPECT_CALL(*this->imc, getIMCVoltage()).WillOnce(Return(/*value=*/48));
-    EXPECT_CALL(*this->imc, getMotorCurrent()).WillOnce(Return(/*value=*/5));
-    EXPECT_CALL(*this->imc, getAngleRadIncremental())
-        .WillOnce(Return(initial_incremental_position))
-        .WillOnce(Return(new_incremental_position))
-        .WillOnce(Return(new_incremental_position));
-    EXPECT_CALL(*this->imc, getAngleRadAbsolute())
-        .WillOnce(Return(initial_absolute_position))
-        .WillOnce(Return(new_absolute_position))
-        .WillOnce(Return(new_absolute_position));
-
-    EXPECT_CALL(*this->imc, getVelocityRadIncremental())
-        .WillOnce(Return(velocity))
-        .WillOnce(Return(velocity));
-    EXPECT_CALL(*this->imc, getVelocityRadAbsolute())
-        .WillOnce(Return(velocity_with_noise));
+    EXPECT_CALL(*this->imc, getIncrementalVelocityUnchecked())
+        .WillOnce(Return(/*value=*/velocity));
 
     march::Joint joint("actuate_true", /*net_number=*/0,
         /*allow_actuation=*/true, std::move(this->imc));
     joint.prepareActuation();
-
     joint.readEncoders(elapsed_time);
 
-    ASSERT_DOUBLE_EQ(joint.getPosition(),
-        initial_absolute_position + velocity * elapsed_time.toSec());
-    ASSERT_NEAR(joint.getVelocity(),
-        (new_incremental_position - initial_incremental_position)
-            / elapsed_time.toSec(),
-        0.0000001);
+    double expected_position = initial_absolute_position
+        + (new_incremental_position - initial_incremental_position);
+
+    ASSERT_DOUBLE_EQ(joint.getPosition(), expected_position);
+    ASSERT_DOUBLE_EQ(joint.getVelocity(), velocity);
 }
 
 TEST_F(JointTest, TestReadEncodersTwice)
 {
     ros::Duration elapsed_time(/*t=*/0.2);
-    double first_velocity = 0.5;
-    double second_velocity = 0.8;
+    double first_velocity = 10;
+    double second_velocity = 8;
+    double initial_absolute_position = 2;
+    double first_incremental_position = 5;
+    double second_incremental_position = 4;
+    double third_incremental_position = 6;
 
-    double absolute_noise = -this->imc->getAbsoluteRadPerBit();
-    double first_velocity_with_noise
-        = first_velocity + absolute_noise / elapsed_time.toSec();
-    double second_velocity_with_noise
-        = second_velocity + absolute_noise / elapsed_time.toSec();
+    // receivedDataUpdate should return true
+    auto basic_state = std::make_unique<MockMotorControllerState>();
+    auto new_state = std::make_unique<MockMotorControllerState>();
+    new_state->motor_current_ = 11;
+    EXPECT_CALL(*this->imc, getState())
+        .WillOnce(Return(ByMove(std::move(basic_state))))
+        .WillOnce(Return(ByMove(std::move(new_state))));
 
-    double initial_incremental_position = 5;
-    double initial_absolute_position = 3;
-    double second_incremental_position
-        = initial_incremental_position + first_velocity * elapsed_time.toSec();
-    double second_absolute_position
-        = initial_absolute_position + first_velocity * elapsed_time.toSec();
-    double third_incremental_position
-        = second_incremental_position + second_velocity * elapsed_time.toSec();
-    double third_absolute_position = second_absolute_position
-        + second_velocity_with_noise * elapsed_time.toSec();
+    EXPECT_CALL(*this->imc, isIncrementalEncoderMorePrecise())
+        .WillRepeatedly(Return(/*value=*/true));
 
-    EXPECT_CALL(*this->imc, getIMCVoltage())
-        .WillOnce(Return(/*value=*/48))
-        .WillOnce(Return(/*value=*/48.01));
-    EXPECT_CALL(*this->imc, getAngleRadIncremental())
-        .WillOnce(Return(initial_incremental_position))
+    EXPECT_CALL(*this->imc, getIncrementalPositionUnchecked())
+        .WillOnce(Return(first_incremental_position))
         .WillOnce(Return(second_incremental_position))
-        .WillOnce(Return(second_incremental_position))
-        .WillOnce(Return(third_incremental_position))
         .WillOnce(Return(third_incremental_position));
-    EXPECT_CALL(*this->imc, getAngleRadAbsolute())
-        .WillOnce(Return(initial_absolute_position))
-        .WillOnce(Return(second_absolute_position))
-        .WillOnce(Return(second_absolute_position))
-        .WillOnce(Return(third_absolute_position))
-        .WillOnce(Return(third_absolute_position));
-    EXPECT_CALL(*this->imc, getVelocityRadIncremental())
+    EXPECT_CALL(*this->imc, getAbsolutePositionUnchecked())
+        .WillOnce(Return(initial_absolute_position));
+
+    EXPECT_CALL(*this->imc, getIncrementalVelocityUnchecked())
         .WillOnce(Return(first_velocity))
-        .WillOnce(Return(first_velocity))
-        .WillOnce(Return(second_velocity))
         .WillOnce(Return(second_velocity));
-    EXPECT_CALL(*this->imc, getVelocityRadAbsolute())
-        .WillOnce(Return(first_velocity_with_noise))
-        .WillOnce(Return(second_velocity_with_noise));
 
     march::Joint joint("actuate_true", /*net_number=*/0,
         /*allow_actuation=*/true, std::move(this->imc));
     joint.prepareActuation();
-
     joint.readEncoders(elapsed_time);
     joint.readEncoders(elapsed_time);
 
-    ASSERT_DOUBLE_EQ(joint.getPosition(),
-        initial_absolute_position
-            + (first_velocity + second_velocity) * elapsed_time.toSec());
-    ASSERT_NEAR(joint.getVelocity(),
-        (third_incremental_position - second_incremental_position)
-            / elapsed_time.toSec(),
-        0.0000001);
+    double expected_position = initial_absolute_position
+        + (third_incremental_position - second_incremental_position)
+        + (second_incremental_position - first_incremental_position);
+
+    ASSERT_DOUBLE_EQ(joint.getPosition(), expected_position);
+    ASSERT_DOUBLE_EQ(joint.getVelocity(), second_velocity);
 }
 
 TEST_F(JointTest, TestReadEncodersNoUpdate)
@@ -341,37 +280,35 @@ TEST_F(JointTest, TestReadEncodersNoUpdate)
     ros::Duration elapsed_time(/*t=*/0.2);
 
     double velocity = 0.5;
-
-    double absolute_noise = -this->imc->getAbsoluteRadPerBit();
-
-    double initial_incremental_position = 5;
+    double first_incremental_position = 5;
+    double second_incremental_position = 4;
     double initial_absolute_position = 3;
-    double second_incremental_position
-        = initial_incremental_position + velocity * elapsed_time.toSec();
-    double second_absolute_position = initial_absolute_position
-        + velocity * elapsed_time.toSec() + absolute_noise;
 
-    EXPECT_CALL(*this->imc, getIMCVoltage())
-        .WillRepeatedly(Return(/*value=*/48));
-    EXPECT_CALL(*this->imc, getAngleRadIncremental())
-        .WillOnce(Return(initial_incremental_position))
-        .WillRepeatedly(Return(second_incremental_position));
-    EXPECT_CALL(*this->imc, getAngleRadAbsolute())
-        .WillOnce(Return(initial_absolute_position))
-        .WillRepeatedly(Return(second_absolute_position));
-    EXPECT_CALL(*this->imc, getVelocityRadIncremental())
-        .WillRepeatedly(Return(velocity));
-    EXPECT_CALL(*this->imc, getVelocityRadAbsolute())
-        .WillRepeatedly(Return(velocity));
+    // receivedDataUpdate should return false
+    auto basic_state = std::make_unique<MockMotorControllerState>();
+    auto new_state = std::make_unique<MockMotorControllerState>();
+    EXPECT_CALL(*this->imc, getState())
+        .WillOnce(Return(ByMove(std::move(basic_state))))
+        .WillOnce(Return(ByMove(std::move(new_state))));
+
+    EXPECT_CALL(*this->imc, getIncrementalPositionUnchecked())
+        .WillOnce(Return(first_incremental_position))
+        .WillOnce(Return(second_incremental_position));
+    EXPECT_CALL(*this->imc, getAbsolutePositionUnchecked())
+        .WillOnce(Return(initial_absolute_position));
+    EXPECT_CALL(*this->imc, getIncrementalVelocityUnchecked())
+        .WillOnce(Return(velocity));
 
     march::Joint joint("actuate_true", /*net_number=*/0,
         /*allow_actuation=*/true, std::move(this->imc));
     joint.prepareActuation();
-
     joint.readEncoders(elapsed_time);
     joint.readEncoders(elapsed_time);
 
-    ASSERT_DOUBLE_EQ(joint.getPosition(),
-        initial_absolute_position + 2 * velocity * elapsed_time.toSec());
+    double expected_position = initial_absolute_position
+        + (second_incremental_position - first_incremental_position)
+        + velocity * elapsed_time.toSec();
+
+    ASSERT_DOUBLE_EQ(joint.getPosition(), expected_position);
     ASSERT_DOUBLE_EQ(joint.getVelocity(), velocity);
 }

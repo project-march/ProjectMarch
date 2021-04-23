@@ -1,6 +1,7 @@
-actuationMode: position
 allowActuation: false
-imotioncube:
+motor_controller:
+  type: imotioncube
+  actuationMode: position
   slaveIndex: 1
   absoluteEncoder:
     resolution: 16

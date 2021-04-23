@@ -1,7 +1,8 @@
 // Copyright 2019 Project March.
-#ifndef MARCH_HARDWARE_PDOMAP_H
-#define MARCH_HARDWARE_PDOMAP_H
+#ifndef MARCH_HARDWARE_IMOTIONCUBE_PDOMAP_H
+#define MARCH_HARDWARE_IMOTIONCUBE_PDOMAP_H
 #include "march_hardware/ethercat/sdo_interface.h"
+#include "march_hardware/motor_controller/odrive/odrive_state.h"
 
 #include <string>
 #include <unordered_map>
@@ -42,7 +43,7 @@ enum class DataDirection {
 };
 
 /** All the available IMC object names divided over the PDO maps. make sure to
- * also add it to PDOmap constructor.*/
+ * also add it to IMCPDOmap constructor.*/
 enum class IMCObjectName {
     StatusWord,
     ActualPosition,
@@ -64,7 +65,7 @@ enum class IMCObjectName {
     MotorVoltage
 };
 
-class PDOmap {
+class IMCPDOmap {
 public:
     /**
      * Initiate all the entered IMC objects to prepare the PDO.
@@ -103,4 +104,4 @@ private:
 };
 } // namespace march
 
-#endif // MARCH_HARDWARE_PDOMAP_H
+#endif // MARCH_HARDWARE_IMOTIONCUBE_PDOMAP_H

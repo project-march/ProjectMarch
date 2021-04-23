@@ -11,7 +11,7 @@
 #include <march_hardware/encoder/absolute_encoder.h>
 #include <march_hardware/encoder/incremental_encoder.h>
 #include <march_hardware/error/hardware_exception.h>
-#include <march_hardware/imotioncube/imotioncube.h>
+#include <march_hardware/motor_controller/imotioncube/imotioncube.h>
 
 class JointBuilderTest : public ::testing::Test {
 protected:
@@ -110,16 +110,6 @@ TEST_F(JointBuilderTest, NoActuate)
     ASSERT_THROW(HardwareBuilder::createJoint(config, "test_joint_no_actuate",
                      this->joint, this->pdo_interface, this->sdo_interface),
         MissingKeyException);
-}
-
-TEST_F(JointBuilderTest, NoIMotionCube)
-{
-    YAML::Node config = this->loadTestYaml("/joint_no_imotioncube.yaml");
-    march::Joint joint
-        = HardwareBuilder::createJoint(config, "test_joint_no_imotioncube",
-            this->joint, this->pdo_interface, this->sdo_interface);
-
-    ASSERT_FALSE(joint.hasIMotionCube());
 }
 
 TEST_F(JointBuilderTest, NoTemperatureGES)

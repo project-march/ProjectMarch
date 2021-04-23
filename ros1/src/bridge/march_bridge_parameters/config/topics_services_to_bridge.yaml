@@ -45,7 +45,7 @@ topics:
   - { topic: 'rosout_agg', type: 'rcl_interfaces/msg/Log' }
   - { topic: 'tf', type: 'tf2_msgs/msg/TFMessage' }
   - { topic: 'tf_static', type: 'tf2_msgs/msg/TFMessage' }
-  - { topic: 'march/imc_states', type: 'march_shared_msgs/msg/ImcState'}
+  - { topic: 'march/motor_controller_states', type: 'march_shared_msgs/msg/MotorControllerState'}
   - { topic: 'camera_front/imu/data', type: 'sensor_msgs/msg/Imu'}
 
 services_1_to_2:

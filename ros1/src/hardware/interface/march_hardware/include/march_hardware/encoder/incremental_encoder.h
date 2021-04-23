@@ -13,8 +13,13 @@ public:
 
     ~IncrementalEncoder() noexcept override = default;
 
-    double toRad(int32_t iu) const override;
-    double getRadPerBit() const override;
+    // Inherited methods
+    double getRadiansPerBit() const override final;
+    double toRadians(
+        double iu, bool /* use_zero_position */) const override final;
+    double toIU(
+        double radians, bool /* use_zero_position */) const override final;
+
     double getTransmission() const;
 
     /** @brief Override comparison operator */

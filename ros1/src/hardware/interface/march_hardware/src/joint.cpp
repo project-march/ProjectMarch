@@ -1,8 +1,9 @@
 // Copyright 2019 Project March.
 #include "march_hardware/joint.h"
 #include "march_hardware/error/hardware_exception.h"
-#include "march_hardware/error/motion_error.h"
+#include "march_hardware/error/motor_controller_error.h"
 #include "march_hardware/ethercat/slave.h"
+#include "march_hardware/motor_controller/motor_controller_state.h"
 
 #include <ros/ros.h>
 
@@ -13,241 +14,100 @@
 #include <utility>
 
 namespace march {
-Joint::Joint(std::string name, int net_number)
-    : name_(std::move(name))
-    , net_number_(net_number)
-{
-}
-
 Joint::Joint(std::string name, int net_number, bool allow_actuation,
-    std::unique_ptr<IMotionCube> imc)
+    std::unique_ptr<MotorController> motor_controller)
     : name_(std::move(name))
     , net_number_(net_number)
     , allow_actuation_(allow_actuation)
-    , imc_(std::move(imc))
+    , motor_controller_(std::move(motor_controller))
 {
+    if (!motor_controller_) {
+        throw error::HardwareException(
+            error::ErrorType::MISSING_MOTOR_CONTROLLER,
+            "A Joint must have a MotorController");
+    }
 }
 
 Joint::Joint(std::string name, int net_number, bool allow_actuation,
-    std::unique_ptr<IMotionCube> imc,
+    std::unique_ptr<MotorController> motor_controller,
     std::unique_ptr<TemperatureGES> temperature_ges)
     : name_(std::move(name))
     , net_number_(net_number)
     , allow_actuation_(allow_actuation)
-    , imc_(std::move(imc))
+    , motor_controller_(std::move(motor_controller))
     , temperature_ges_(std::move(temperature_ges))
 {
 }
 
-bool Joint::initialize(int cycle_time)
+bool Joint::initSdo(int cycle_time)
 {
     bool reset = false;
-    if (this->hasIMotionCube()) {
-        reset |= this->imc_->Slave::initSdo(cycle_time);
-    }
-    if (this->hasTemperatureGES()) {
-        reset |= this->temperature_ges_->initSdo(cycle_time);
+    reset |= motor_controller_->Slave::initSdo(cycle_time);
+    if (hasTemperatureGES()) {
+        reset |= getTemperatureGES()->initSdo(cycle_time);
     }
     return reset;
 }
 
 void Joint::prepareActuation()
 {
-    if (!this->canActuate()) {
+    if (!canActuate()) {
         throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE,
             "Failed to prepare joint %s for actuation", this->name_.c_str());
     }
     ROS_INFO("[%s] Preparing for actuation", this->name_.c_str());
-    this->imc_->goToOperationEnabled();
+    motor_controller_->prepareActuation();
     ROS_INFO("[%s] Successfully prepared for actuation", this->name_.c_str());
 
-    this->incremental_position_ = this->imc_->getAngleRadIncremental();
-    this->absolute_position_ = this->imc_->getAngleRadAbsolute();
-    this->position_ = this->absolute_position_;
-    this->velocity_ = 0;
-}
-
-void Joint::resetIMotionCube()
-{
-    if (!this->hasIMotionCube()) {
-        ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
-    } else {
-        this->imc_->Slave::reset();
+    if (motor_controller_->hasIncrementalEncoder()) {
+        previous_incremental_position_
+            = motor_controller_->getIncrementalPosition();
     }
+    if (motor_controller_->hasAbsoluteEncoder()) {
+        position_ = motor_controller_->getAbsolutePosition();
+    } else {
+        position_ = previous_incremental_position_;
+    }
+    velocity_ = 0;
 }
 
-void Joint::actuateRad(double target_position)
+void Joint::actuate(float target)
 {
     if (!this->canActuate()) {
         throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE,
             "Joint %s is not allowed to actuate", this->name_.c_str());
     }
-    this->imc_->actuateRad(target_position);
+    motor_controller_->actuate(target);
 }
 
 void Joint::readEncoders(const ros::Duration& elapsed_time)
 {
-    if (!this->hasIMotionCube()) {
-        ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
-        return;
-    }
-
     if (this->receivedDataUpdate()) {
-        const double incremental_position_change
-            = this->imc_->getAngleRadIncremental()
-            - this->incremental_position_;
-
-        // Take the velocity and position from the encoder with the highest
-        // resolution.
-        if (this->imc_->getIncrementalRadPerBit()
-            < this->imc_->getAbsoluteRadPerBit()) {
-            this->velocity_ = this->imc_->getVelocityRadIncremental();
-            this->position_ += incremental_position_change;
+        if (motor_controller_->isIncrementalEncoderMorePrecise()) {
+            double new_incremental_position
+                = motor_controller_->getIncrementalPosition();
+            position_
+                += (new_incremental_position - previous_incremental_position_);
+            previous_incremental_position_ = new_incremental_position;
         } else {
-            this->velocity_ = this->imc_->getVelocityRadAbsolute();
-            this->position_ = this->imc_->getAngleRadAbsolute();
+            position_ = motor_controller_->getAbsolutePosition();
         }
-        this->incremental_position_ += incremental_position_change;
-        this->absolute_position_ = this->imc_->getAngleRadAbsolute();
+        velocity_ = motor_controller_->getVelocity();
     } else {
         // Update positions with velocity from last time step
-        this->position_ += this->velocity_ * elapsed_time.toSec();
-        this->incremental_position_ += this->velocity_ * elapsed_time.toSec();
-        this->absolute_position_ += this->velocity_ * elapsed_time.toSec();
+        position_ += velocity_ * elapsed_time.toSec();
+        previous_incremental_position_ += velocity_ * elapsed_time.toSec();
     }
 }
 
 double Joint::getPosition() const
 {
-    return this->position_;
+    return position_;
 }
 
 double Joint::getVelocity() const
 {
-    return this->velocity_;
-}
-
-double Joint::getVoltageVelocity() const
-{
-    // For the underlying calculations, see:
-    // https://en.wikipedia.org/wiki/Motor_constants#Motor_velocity_constant,_back_EMF_constant
-    // https://www.motioncontroltips.com/faq-whats-relationship-voltage-dc-motor-output-speed/
-    const double resistance = 0.05;
-    const double velocity_constant = 355;
-    const double rpm_to_rad = M_PI / 30;
-    const double electric_constant = velocity_constant * rpm_to_rad;
-    return (this->imc_->getMotorVoltage()
-               + this->imc_->getMotorCurrent() * resistance)
-        / electric_constant;
-}
-
-double Joint::getIncrementalPosition() const
-{
-    return this->incremental_position_;
-}
-
-double Joint::getAbsolutePosition() const
-{
-    return this->absolute_position_;
-}
-
-void Joint::actuateTorque(int16_t target_torque)
-{
-    if (!this->canActuate()) {
-        throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE,
-            "Joint %s is not allowed to actuate", this->name_.c_str());
-    }
-    this->imc_->actuateTorque(target_torque);
-}
-
-int16_t Joint::getTorque()
-{
-    if (!this->hasIMotionCube()) {
-        ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
-        return -1;
-    }
-    return this->imc_->getTorque();
-}
-
-int32_t Joint::getAngleIUAbsolute()
-{
-    if (!this->hasIMotionCube()) {
-        ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
-        return -1;
-    }
-    return this->imc_->getAngleIUAbsolute();
-}
-
-int32_t Joint::getAngleIUIncremental()
-{
-    if (!this->hasIMotionCube()) {
-        ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
-        return -1;
-    }
-    return this->imc_->getAngleIUIncremental();
-}
-
-double Joint::getVelocityIUAbsolute()
-{
-    if (!this->hasIMotionCube()) {
-        ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
-        return -1;
-    }
-    return this->imc_->getVelocityIUAbsolute();
-}
-
-double Joint::getVelocityIUIncremental()
-{
-    if (!this->hasIMotionCube()) {
-        ROS_WARN("[%s] Has no iMotionCube", this->name_.c_str());
-        return -1;
-    }
-    return this->imc_->getVelocityIUIncremental();
-}
-
-float Joint::getTemperature()
-{
-    if (!this->hasTemperatureGES()) {
-        ROS_WARN("[%s] Has no temperature sensor", this->name_.c_str());
-        return -1.0;
-    }
-    return this->temperature_ges_->getTemperature();
-}
-
-IMotionCubeState Joint::getIMotionCubeState()
-{
-    IMotionCubeState states;
-
-    std::bitset<16> statusWordBits = this->imc_->getStatusWord();
-    states.statusWord = statusWordBits.to_string();
-    std::bitset<16> motionErrorBits = this->imc_->getMotionError();
-    states.motionError = motionErrorBits.to_string();
-    std::bitset<16> detailedErrorBits = this->imc_->getDetailedError();
-    states.detailedError = detailedErrorBits.to_string();
-    std::bitset<16> secondDetailedErrorBits
-        = this->imc_->getSecondDetailedError();
-    states.secondDetailedError = secondDetailedErrorBits.to_string();
-
-    states.state = IMCState(this->imc_->getStatusWord());
-
-    states.motionErrorDescription = error::parseError(
-        this->imc_->getMotionError(), error::ErrorRegisters::MOTION_ERROR);
-    states.detailedErrorDescription = error::parseError(
-        this->imc_->getDetailedError(), error::ErrorRegisters::DETAILED_ERROR);
-    states.secondDetailedErrorDescription
-        = error::parseError(this->imc_->getSecondDetailedError(),
-            error::ErrorRegisters::SECOND_DETAILED_ERROR);
-
-    states.motorCurrent = this->imc_->getMotorCurrent();
-    states.IMCVoltage = this->imc_->getIMCVoltage();
-    states.motorVoltage = this->imc_->getMotorVoltage();
-
-    states.absoluteEncoderValue = this->imc_->getAngleIUAbsolute();
-    states.incrementalEncoderValue = this->imc_->getAngleIUIncremental();
-    states.absoluteVelocity = this->imc_->getVelocityIUAbsolute();
-    states.incrementalVelocity = this->imc_->getVelocityIUIncremental();
-
-    return states;
+    return velocity_;
 }
 
 void Joint::setAllowActuation(bool allow_actuation)
@@ -255,82 +115,55 @@ void Joint::setAllowActuation(bool allow_actuation)
     this->allow_actuation_ = allow_actuation;
 }
 
-int Joint::getTemperatureGESSlaveIndex() const
-{
-    if (this->hasTemperatureGES()) {
-        return this->temperature_ges_->getSlaveIndex();
-    }
-    return -1;
-}
-
-int Joint::getIMotionCubeSlaveIndex() const
-{
-    if (this->hasIMotionCube()) {
-        return this->imc_->getSlaveIndex();
-    }
-    return -1;
-}
-
 int Joint::getNetNumber() const
 {
-    return this->net_number_;
+    return net_number_;
 }
 
 std::string Joint::getName() const
 {
-    return this->name_;
-}
-
-bool Joint::hasIMotionCube() const
-{
-    return this->imc_ != nullptr;
+    return name_;
 }
 
 bool Joint::hasTemperatureGES() const
 {
-    return this->temperature_ges_ != nullptr;
+    return temperature_ges_ != nullptr;
 }
 
 bool Joint::canActuate() const
 {
-    return this->allow_actuation_ && this->hasIMotionCube();
+    return allow_actuation_;
 }
 
 bool Joint::receivedDataUpdate()
 {
-    if (!this->hasIMotionCube()) {
-        return false;
-    }
-    // If imc voltage, motor current, and both encoders positions and velocities
-    // did not change, we probably did not receive an update for this joint.
-    float new_imc_volt = this->imc_->getIMCVoltage();
-    float new_motor_volt = this->imc_->getMotorVoltage();
-    float new_motor_current = this->imc_->getMotorCurrent();
-    double new_absolute_position = this->imc_->getAngleRadAbsolute();
-    double new_incremental_position = this->imc_->getAngleRadIncremental();
-    double new_absolute_velocity = this->imc_->getVelocityRadAbsolute();
-    double new_incremental_velocity = this->imc_->getVelocityRadIncremental();
-    bool data_updated = (new_imc_volt != this->previous_imc_volt_
-        || new_motor_volt != this->previous_motor_volt_
-        || new_motor_current != this->previous_motor_current_
-        || new_absolute_position != this->previous_absolute_position_
-        || new_incremental_position != this->previous_incremental_position_
-        || new_absolute_velocity != this->previous_absolute_velocity_
-        || new_incremental_velocity != this->previous_incremental_velocity_);
+    auto new_state = motor_controller_->getState();
 
-    this->previous_imc_volt_ = new_imc_volt;
-    this->previous_motor_volt_ = new_motor_volt;
-    this->previous_motor_current_ = new_motor_current;
-    this->previous_absolute_position_ = new_absolute_position;
-    this->previous_incremental_position_ = new_incremental_position;
-    this->previous_absolute_velocity_ = new_absolute_velocity;
-    this->previous_incremental_velocity_ = new_incremental_velocity;
+    bool data_updated;
+    if (!previous_state_.has_value()) {
+        data_updated = true;
+    } else {
+        data_updated = !(*(previous_state_.value()) == *new_state);
+    }
+    previous_state_ = std::move(new_state);
     return data_updated;
 }
 
-ActuationMode Joint::getActuationMode() const
+std::unique_ptr<MotorController>& Joint::getMotorController()
 {
-    return this->imc_->getActuationMode();
+    return motor_controller_;
+}
+
+std::unique_ptr<TemperatureGES>& Joint::getTemperatureGES()
+{
+    if (hasTemperatureGES()) {
+        return temperature_ges_;
+    } else {
+        throw error::HardwareException(
+            error::ErrorType::MISSING_TEMPERATURE_GES,
+            "Cannot get TemperatureGES of a Joint that does not have a "
+            "TemperatureGES");
+    }
 }
 
 } // namespace march

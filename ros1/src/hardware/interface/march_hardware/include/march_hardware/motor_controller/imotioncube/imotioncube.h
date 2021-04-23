@@ -2,22 +2,32 @@
 
 #ifndef MARCH_HARDWARE_IMOTIONCUBE_H
 #define MARCH_HARDWARE_IMOTIONCUBE_H
-#include "actuation_mode.h"
 #include "imotioncube_state.h"
 #include "imotioncube_target_state.h"
 #include "march_hardware/encoder/absolute_encoder.h"
 #include "march_hardware/encoder/incremental_encoder.h"
-#include "march_hardware/ethercat/pdo_map.h"
+#include "march_hardware/ethercat/imotioncube_pdo_map.h"
 #include "march_hardware/ethercat/pdo_types.h"
 #include "march_hardware/ethercat/sdo_interface.h"
 #include "march_hardware/ethercat/slave.h"
+#include "march_hardware/motor_controller/actuation_mode.h"
+#include "march_hardware/motor_controller/motor_controller.h"
+#include <march_hardware/motor_controller/motor_controller_state.h>
 
 #include <memory>
 #include <string>
 #include <unordered_map>
 
 namespace march {
-class IMotionCube : public Slave {
+class IMotionCube : public MotorController
+/* You will often find that the documentation references to the IMC Manual. This
+ * Manual can be found at
+ * https://technosoftmotion.com/wp-content/uploads/P091.025.iMOTIONCUBE.CAN_.CAT_.UM_-1.pdf
+ * Or if this link no longer works a copy can be found on the NAS:
+ * 'march/2020-2021/03 -
+ * Technical/Motorcontrollers/IMotionCube/P091.064.EtherCAT.iPOS.UM.pdf'
+ */
+{
 public:
     /**
      * Constructs an IMotionCube with an incremental and absolute encoder.
@@ -43,74 +53,65 @@ public:
 
     ~IMotionCube() noexcept override = default;
 
-    /* Delete copy constructor/assignment since the unique_ptrs cannot be copied
-     */
-    IMotionCube(const IMotionCube&) = delete;
-    IMotionCube& operator=(const IMotionCube&) = delete;
+    // Override functions for actuating the IMotionCube
+    void prepareActuation() override;
+    void actuateRadians(float target_position) override;
+    void actuateTorque(float target_torque) override;
 
-    virtual double getAngleRadAbsolute();
-    virtual double getAngleRadIncremental();
-    double getAbsoluteRadPerBit() const;
-    double getIncrementalRadPerBit() const;
-    int16_t getTorque();
-    int32_t getAngleIUAbsolute();
-    int32_t getAngleIUIncremental();
-    double getVelocityIUAbsolute();
-    double getVelocityIUIncremental();
-    virtual double getVelocityRadAbsolute();
-    virtual double getVelocityRadIncremental();
+    // Transform the ActuationMode to a number that is understood by the
+    // IMotionCube
+    int getActuationModeNumber() const override;
 
-    uint16_t getStatusWord();
-    uint16_t getMotionError();
-    uint16_t getDetailedError();
-    uint16_t getSecondDetailedError();
+    // Get a full description of the state of the IMotionCube
+    std::unique_ptr<MotorControllerState> getState() override;
 
-    ActuationMode getActuationMode() const;
+    // Getters for specific information about the state of the motor and the
+    // IMotionCube
+    float getTorque() override;
+    float getMotorCurrent() override;
+    float getMotorControllerVoltage() override;
+    float getMotorVoltage() override;
 
-    virtual float getMotorCurrent();
-    virtual float getIMCVoltage();
-    virtual float getMotorVoltage();
-
-    void setControlWord(uint16_t control_word);
-
-    virtual void actuateRad(double target_rad);
-    virtual void actuateTorque(int16_t target_torque);
-
-    void goToTargetState(IMotionCubeTargetState target_state);
-    virtual void goToOperationEnabled();
-
-    /** @brief Override comparison operator */
-    friend bool operator==(const IMotionCube& lhs, const IMotionCube& rhs)
-    {
-        return lhs.getSlaveIndex() == rhs.getSlaveIndex()
-            && *lhs.absolute_encoder_ == *rhs.absolute_encoder_
-            && *lhs.incremental_encoder_ == *rhs.incremental_encoder_;
-    }
-    /** @brief Override stream operator for clean printing */
-    friend std::ostream& operator<<(std::ostream& os, const IMotionCube& imc)
-    {
-        return os << "slaveIndex: " << imc.getSlaveIndex() << ", "
-                  << "incrementalEncoder: " << *imc.incremental_encoder_ << ", "
-                  << "absoluteEncoder: " << *imc.absolute_encoder_;
-    }
-
-    constexpr static double MAX_TARGET_DIFFERENCE = 0.393;
+    constexpr static float MAX_TARGET_DIFFERENCE = 0.393;
     // This value is slightly larger than the current limit of the
     // linear joints defined in the URDF.
     const static int16_t MAX_TARGET_TORQUE = 23500;
 
-    // Watchdog base time = 1 / 25 MHz * (2498 + 2) = 0.0001 seconds=100 µs
-    static const uint16_t WATCHDOG_DIVIDER = 2498;
-    // 500 * 100us = 50 ms = watchdog timer
-    static const uint16_t WATCHDOG_TIME = 500;
+    // Constant used for converting a fixed point 16.16 bit number to a float,
+    // which is done by dividing by 2^16
+    static constexpr float FIXED_POINT_TO_FLOAT_CONVERSION = 1 << 16;
+
+    // iMOTIONCUBE setting (slow loop sample period)
+    static constexpr float TIME_PER_VELOCITY_SAMPLE = 0.004;
 
 protected:
+    // Override protected functions from Slave class
     bool initSdo(SdoSlaveInterface& sdo, int cycle_time) override;
-
     void reset(SdoSlaveInterface& sdo) override;
 
+    // Override protected functions from MotorController class
+    float getAbsolutePositionUnchecked() override;
+    float getIncrementalPositionUnchecked() override;
+    float getAbsoluteVelocityUnchecked() override;
+    float getIncrementalVelocityUnchecked() override;
+
 private:
+    // Actuate position in Internal Units
     void actuateIU(int32_t target_iu);
+
+    // Set the IMotionCube in a certain state
+    void goToTargetState(IMotionCubeTargetState target_state);
+    void setControlWord(uint16_t control_word);
+
+    // Getters for information about the state of the IMotionCube
+    int32_t getAbsolutePositionIU();
+    int32_t getIncrementalPositionIU();
+    float getAbsoluteVelocityIU();
+    float getIncrementalVelocityIU();
+    uint16_t getStatusWord();
+    uint16_t getMotionError();
+    uint16_t getDetailedError();
+    uint16_t getSecondDetailedError();
 
     void mapMisoPDOs(SdoSlaveInterface& sdo);
     void mapMosiPDOs(SdoSlaveInterface& sdo);
@@ -153,10 +154,7 @@ private:
     // possible and thus allow for mocking the encoders. A unique pointer is
     // chosen since the IMotionCube should be the owner and the encoders
     // do not need to be passed around.
-    std::unique_ptr<AbsoluteEncoder> absolute_encoder_;
-    std::unique_ptr<IncrementalEncoder> incremental_encoder_;
     std::string sw_string_;
-    ActuationMode actuation_mode_;
 
     std::unordered_map<IMCObjectName, uint8_t> miso_byte_offsets_;
     std::unordered_map<IMCObjectName, uint8_t> mosi_byte_offsets_;

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(march_hardware)
 
-add_compile_options(-std=c++14 -Wall -Wextra -Werror)
+add_compile_options(-std=c++17 -Wall -Wextra -Werror)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
@@ -46,17 +46,22 @@ add_library(${PROJECT_NAME}
     include/${PROJECT_NAME}/encoder/incremental_encoder.h
     include/${PROJECT_NAME}/error/error_type.h
     include/${PROJECT_NAME}/error/hardware_exception.h
-    include/${PROJECT_NAME}/error/motion_error.h
+    include/${PROJECT_NAME}/error/motor_controller_error.h
     include/${PROJECT_NAME}/ethercat/ethercat_master.h
     include/${PROJECT_NAME}/ethercat/pdo_interface.h
-    include/${PROJECT_NAME}/ethercat/pdo_map.h
+    include/${PROJECT_NAME}/ethercat/imotioncube_pdo_map.h
+    include/${PROJECT_NAME}/ethercat/odrive_pdo_map.h
     include/${PROJECT_NAME}/ethercat/pdo_types.h
     include/${PROJECT_NAME}/ethercat/sdo_interface.h
     include/${PROJECT_NAME}/ethercat/slave.h
-    include/${PROJECT_NAME}/imotioncube/actuation_mode.h
-    include/${PROJECT_NAME}/imotioncube/imotioncube.h
-    include/${PROJECT_NAME}/imotioncube/imotioncube_state.h
-    include/${PROJECT_NAME}/imotioncube/imotioncube_target_state.h
+    include/${PROJECT_NAME}/motor_controller/actuation_mode.h
+    include/${PROJECT_NAME}/motor_controller/imotioncube/imotioncube.h
+    include/${PROJECT_NAME}/motor_controller/imotioncube/imotioncube_state.h
+    include/${PROJECT_NAME}/motor_controller/imotioncube/imotioncube_target_state.h
+    include/${PROJECT_NAME}/motor_controller/motor_controller.h
+    include/${PROJECT_NAME}/motor_controller/motor_controller_state.h
+    include/${PROJECT_NAME}/motor_controller/odrive/odrive.h
+    include/${PROJECT_NAME}/motor_controller/odrive/odrive_state.h
     include/${PROJECT_NAME}/joint.h
     include/${PROJECT_NAME}/march_robot.h
     include/${PROJECT_NAME}/power/boot_shutdown_offsets.h
@@ -72,13 +77,16 @@ add_library(${PROJECT_NAME}
     src/encoder/encoder.cpp
     src/encoder/incremental_encoder.cpp
     src/error/error_type.cpp
-    src/error/motion_error.cpp
+    src/error/motor_controller_error.cpp
     src/ethercat/ethercat_master.cpp
     src/ethercat/pdo_interface.cpp
-    src/ethercat/pdo_map.cpp
+    src/ethercat/imotioncube_pdo_map.cpp
+    src/ethercat/odrive_pdo_map.cpp
     src/ethercat/sdo_interface.cpp
-    src/imotioncube/imotioncube.cpp
-    src/imotioncube/imotioncube_target_state.cpp
+    src/motor_controller/imotioncube/imotioncube.cpp
+    src/motor_controller/odrive/odrive.cpp
+    src/motor_controller/motor_controller.cpp
+    src/motor_controller/imotioncube/imotioncube_target_state.cpp
     src/joint.cpp
     src/march_robot.cpp
     src/power/high_voltage.cpp
@@ -118,8 +126,8 @@ if(CATKIN_ENABLE_TESTING)
         test/encoder/encoder_test.cpp
         test/encoder/incremental_encoder_test.cpp
         test/error/hardware_exception_test.cpp
-        test/error/motion_error_test.cpp
-        test/ethercat/pdo_map_test.cpp
+        test/error/motor_controller_error_test.cpp
+        test/ethercat/imotioncube_pdo_map_test.cpp
         test/ethercat/slave_test.cpp
         test/imotioncube/imotioncube_test.cpp
         test/joint_test.cpp
@@ -127,7 +135,7 @@ if(CATKIN_ENABLE_TESTING)
         test/mocks/mock_encoder.h
         test/mocks/mock_imotioncube.h
         test/mocks/mock_incremental_encoder.h
-        test/mocks/mock_joint.h
+        test/mocks/mock_motorcontroller_state.h
         test/mocks/mock_pdo_interface.h
         test/mocks/mock_sdo_interface.h
         test/mocks/mock_slave.h

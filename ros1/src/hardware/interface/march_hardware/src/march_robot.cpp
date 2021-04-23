@@ -67,7 +67,7 @@ void MarchRobot::startEtherCAT(bool reset_imc)
         ROS_DEBUG("Resetting all IMotionCubes due to either: reset arg: %d or "
                   "downloading of .sw fie: %d",
             reset_imc, sw_reset);
-        resetIMotionCubes();
+        resetMotorControllers();
 
         ROS_INFO("Restarting the EtherCAT Master");
         ethercatMaster.stop();
@@ -85,10 +85,10 @@ void MarchRobot::stopEtherCAT()
     ethercatMaster.stop();
 }
 
-void MarchRobot::resetIMotionCubes()
+void MarchRobot::resetMotorControllers()
 {
     for (auto& joint : jointList) {
-        joint.resetIMotionCube();
+        joint.getMotorController()->Slave::reset();
     }
 }
 
@@ -97,35 +97,31 @@ int MarchRobot::getMaxSlaveIndex()
     int maxSlaveIndex = -1;
 
     for (Joint& joint : jointList) {
-        int temperatureSlaveIndex = joint.getTemperatureGESSlaveIndex();
-        if (temperatureSlaveIndex > maxSlaveIndex) {
-            maxSlaveIndex = temperatureSlaveIndex;
+        if (joint.hasTemperatureGES()) {
+            maxSlaveIndex = std::max(
+                (int)joint.getTemperatureGES()->getSlaveIndex(), maxSlaveIndex);
         }
-
-        int iMotionCubeSlaveIndex = joint.getIMotionCubeSlaveIndex();
-
-        if (iMotionCubeSlaveIndex > maxSlaveIndex) {
-            maxSlaveIndex = iMotionCubeSlaveIndex;
-        }
+        maxSlaveIndex = std::max(
+            (int)joint.getMotorController()->getSlaveIndex(), maxSlaveIndex);
     }
     return maxSlaveIndex;
 }
 
 bool MarchRobot::hasValidSlaves()
 {
-    ::std::vector<int> iMotionCubeIndices;
+    ::std::vector<int> motorControllerIndices;
     ::std::vector<int> temperatureSlaveIndices;
 
     for (auto& joint : jointList) {
         if (joint.hasTemperatureGES()) {
-            int temperatureSlaveIndex = joint.getTemperatureGESSlaveIndex();
+            int temperatureSlaveIndex
+                = joint.getTemperatureGES()->getSlaveIndex();
             temperatureSlaveIndices.push_back(temperatureSlaveIndex);
         }
 
-        if (joint.hasIMotionCube()) {
-            int iMotionCubeSlaveIndex = joint.getIMotionCubeSlaveIndex();
-            iMotionCubeIndices.push_back(iMotionCubeSlaveIndex);
-        }
+        int motorControllerSlaveIndex
+            = joint.getMotorController()->getSlaveIndex();
+        motorControllerIndices.push_back(motorControllerSlaveIndex);
     }
     // Multiple temperature sensors may be connected to the same slave.
     // Remove duplicate temperatureSlaveIndices so they don't trigger as
@@ -139,9 +135,9 @@ bool MarchRobot::hasValidSlaves()
     ::std::vector<int> slaveIndices;
 
     slaveIndices.reserve(
-        iMotionCubeIndices.size() + temperatureSlaveIndices.size());
-    slaveIndices.insert(slaveIndices.end(), iMotionCubeIndices.begin(),
-        iMotionCubeIndices.end());
+        motorControllerIndices.size() + temperatureSlaveIndices.size());
+    slaveIndices.insert(slaveIndices.end(), motorControllerIndices.begin(),
+        motorControllerIndices.end());
     slaveIndices.insert(slaveIndices.end(), temperatureSlaveIndices.begin(),
         temperatureSlaveIndices.end());
 

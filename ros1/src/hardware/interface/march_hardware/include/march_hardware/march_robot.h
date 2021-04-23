@@ -49,7 +49,7 @@ public:
     MarchRobot(MarchRobot&&) = delete;
     MarchRobot& operator=(MarchRobot&&) = delete;
 
-    void resetIMotionCubes();
+    void resetMotorControllers();
 
     void startEtherCAT(bool reset_imc);
 

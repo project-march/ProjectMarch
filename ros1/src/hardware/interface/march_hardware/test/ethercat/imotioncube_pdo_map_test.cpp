@@ -1,19 +1,19 @@
 // Copyright 2018 Project March.
 #include "../mocks/mock_sdo_interface.h"
-#include "march_hardware/ethercat/pdo_map.h"
+#include "march_hardware/ethercat/imotioncube_pdo_map.h"
 
 #include <gtest/gtest.h>
 
-class PDOTest : public ::testing::Test {
+class IMCPDOTest : public ::testing::Test {
 protected:
     MockSdoInterfacePtr mock_sdo = std::make_shared<MockSdoInterface>();
     march::SdoSlaveInterface sdo
         = march::SdoSlaveInterface(/*slave_index=*/1, mock_sdo);
 };
 
-TEST_F(PDOTest, sortPDOmap)
+TEST_F(IMCPDOTest, sortPDOmap)
 {
-    march::PDOmap pdoMapMISO;
+    march::IMCPDOmap pdoMapMISO;
     pdoMapMISO.addObject(march::IMCObjectName::StatusWord);
     pdoMapMISO.addObject(march::IMCObjectName::ActualPosition);
     std::unordered_map<march::IMCObjectName, uint8_t> misoByteOffsets
@@ -23,16 +23,16 @@ TEST_F(PDOTest, sortPDOmap)
     ASSERT_EQ(4u, misoByteOffsets[march::IMCObjectName::StatusWord]);
 }
 
-TEST_F(PDOTest, InvalidDataDirection)
+TEST_F(IMCPDOTest, InvalidDataDirection)
 {
-    march::PDOmap map;
+    march::IMCPDOmap map;
     std::unordered_map<march::IMCObjectName, uint8_t> expected;
     ASSERT_EQ(map.map(this->sdo, (march::DataDirection)7), expected);
 }
 
-TEST_F(PDOTest, multipleAddObjects)
+TEST_F(IMCPDOTest, multipleAddObjects)
 {
-    march::PDOmap pdoMapMISO;
+    march::IMCPDOmap pdoMapMISO;
 
     pdoMapMISO.addObject(march::IMCObjectName::ActualPosition);
     pdoMapMISO.addObject(march::IMCObjectName::StatusWord);
@@ -42,9 +42,9 @@ TEST_F(PDOTest, multipleAddObjects)
     ASSERT_EQ(2u, misoByteOffsets.size());
 }
 
-TEST_F(PDOTest, ObjectCounts)
+TEST_F(IMCPDOTest, ObjectCounts)
 {
-    march::PDOmap pdoMapMISO;
+    march::IMCPDOmap pdoMapMISO;
 
     pdoMapMISO.addObject(march::IMCObjectName::CurrentLimit);
     std::unordered_map<march::IMCObjectName, uint8_t> misoByteOffsets
@@ -54,9 +54,9 @@ TEST_F(PDOTest, ObjectCounts)
     ASSERT_EQ(0u, misoByteOffsets.count(march::IMCObjectName::DCLinkVoltage));
 }
 
-TEST_F(PDOTest, CombinedAddressConstruct)
+TEST_F(IMCPDOTest, CombinedAddressConstruct)
 {
-    march::PDOmap pdoMap;
+    march::IMCPDOmap pdoMap;
 
     auto status_word
         = pdoMap.all_objects.find(march::IMCObjectName::StatusWord);
@@ -67,9 +67,9 @@ TEST_F(PDOTest, CombinedAddressConstruct)
     ASSERT_EQ(0x6041u, ((combined_address >> 16) & 0xFFFF));
 }
 
-TEST_F(PDOTest, CombinedAdressConstructWithSubindexValue)
+TEST_F(IMCPDOTest, CombinedAdressConstructWithSubindexValue)
 {
-    march::PDOmap pdoMap;
+    march::IMCPDOmap pdoMap;
 
     auto test_object = march::IMCObject(
         /*_address=*/0x6060, /*_sub_index=*/2, /*_length=*/16);
