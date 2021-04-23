@@ -89,7 +89,7 @@ TEST_F(JointTest, ActuatePositionDisableActuation)
 TEST_F(JointTest, ActuatePosition)
 {
     const double expected_rad = 5;
-    EXPECT_CALL(*this->imc, actuateRadians(Eq(expected_rad))).Times(1);
+    EXPECT_CALL(*this->imc, actuateRadians(Eq(expected_rad))).Times(/*n=*/1);
 
     march::Joint joint("actuate_false", /*net_number=*/0,
         /*allow_actuation=*/true, std::move(this->imc));
@@ -109,7 +109,7 @@ TEST_F(JointTest, ActuateTorqueDisableActuation)
 TEST_F(JointTest, ActuateTorque)
 {
     const double expected_torque = 5;
-    EXPECT_CALL(*this->imc, actuateTorque(Eq(expected_torque))).Times(1);
+    EXPECT_CALL(*this->imc, actuateTorque(Eq(expected_torque))).Times(/*n=*/1);
 
     march::Joint joint("actuate_true", /*net_number=*/0,
         /*allow_actuation=*/true, std::move(this->imc));
@@ -127,7 +127,7 @@ TEST_F(JointTest, PrepareForActuationNotAllowed)
 
 TEST_F(JointTest, PrepareForActuationAllowed)
 {
-    EXPECT_CALL(*this->imc, prepareActuation()).Times(1);
+    EXPECT_CALL(*this->imc, prepareActuation()).Times(/*n=*/1);
     march::Joint joint("actuate_true", /*net_number=*/0,
         /*allow_actuation=*/true, std::move(this->imc));
     ASSERT_NO_THROW(joint.prepareActuation());
@@ -142,7 +142,7 @@ TEST_F(JointTest, hasTemperatureGes)
 
 TEST_F(JointTest, ResetController)
 {
-    EXPECT_CALL(*this->imc, reset(_)).Times(1);
+    EXPECT_CALL(*this->imc, reset(_)).Times(/*n=*/1);
     march::Joint joint("reset_controller", /*net_number=*/0,
         /*allow_actuation=*/true, std::move(this->imc));
     ASSERT_NO_THROW(joint.getMotorController()->reset());

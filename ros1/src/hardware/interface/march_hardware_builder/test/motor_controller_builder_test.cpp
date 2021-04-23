@@ -17,7 +17,7 @@ protected:
     void SetUp() override
     {
         this->base_path = ros::package::getPath("march_hardware_builder")
-                              .append("/test/yaml/motor_controller");
+                              .append(/*s=*/"/test/yaml/motor_controller");
         this->joint = std::make_shared<urdf::Joint>();
         this->joint->limits = std::make_shared<urdf::JointLimits>();
         this->joint->safety = std::make_shared<urdf::JointSafety>();
@@ -67,7 +67,7 @@ TEST_F(MotorControllerBuilderTest, ValidIMotionCube)
     auto incremental_encoder
         = std::make_unique<march::IncrementalEncoder>(12, 101.0);
     march::IMotionCube expected(
-        march::Slave(2, this->pdo_interface, this->sdo_interface),
+        march::Slave(/*slave_index=*/2, this->pdo_interface, this->sdo_interface),
         std::move(absolute_encoder), std::move(incremental_encoder),
         march::ActuationMode::unknown);
     ASSERT_EQ(expected, *created);
