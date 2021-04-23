@@ -7,7 +7,7 @@
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl_ros/point_cloud.h>
 #include <pointcloud_processor/hull_finder.h>
-#include <pointcloud_processor/parameter_determiner.h>f
+#include <pointcloud_processor/parameter_determiner.h>
 #include <pointcloud_processor/preprocessor.h>
 #include <pointcloud_processor/region_creator.h>
 #include <ros/console.h>
