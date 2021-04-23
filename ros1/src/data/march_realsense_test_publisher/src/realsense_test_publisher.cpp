@@ -81,16 +81,16 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
 
 bool RealsenseTestPublisher::publishCustomPointcloud(std::string pointcloud_file_name)
 {
-    std::vector<path>::iterator element = std::find(file_paths.begin(), file_paths.end(), pointcloud_file_name);
-    if (element == file_paths.end()) {
+    std::vector<path>::iterator path_iterator = std::find(file_paths.begin(), file_paths.end(), pointcloud_file_name);
+    if (path_iterator == file_paths.end()) {
         std::string file_names_string = getFileNamesString();
         ROS_WARN_STREAM("The requested pointcloud file could not be found. Valid options are: \n" << file_names_string);
         return false;
     }
 
-    PointCloud pointcloud = boost::make_shared<PointCloud>();
-    pcl::io::loadPLYFile<pcl::PointXYZ>(*element.path());
-    ROS_DEBUG_STREAM("The file from path " << *it.path() << "has been loaded up! now publishing")
+    PointCloud::Ptr pointcloud = boost::make_shared<PointCloud>();
+    pcl::io::loadPLYFile<pcl::PointXYZ>((*path_iterator).path());
+    ROS_DEBUG_STREAM("The file from path " << (*path_iterator).path() << "has been loaded up! now publishing")
     publishTestCloudOnTimer(pointcloud);
     return true;
 }
