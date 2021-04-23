@@ -28,6 +28,12 @@ SimplePreprocessor::SimplePreprocessor(bool debugging)
     tfListener = std::make_unique<tf2_ros::TransformListener>(*tfBuffer);
 }
 
+void SimplePreprocessor::readParameters(
+    march_realsense_reader::pointcloud_parametersConfig& config,
+    march_shared_msgs::PointCloudParameters* msg_)
+{
+}
+
 // Create a normals preprocessor with the ability to transform based on normal
 // orientation
 NormalsPreprocessor::NormalsPreprocessor(bool debugging)
@@ -113,7 +119,8 @@ bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud,
 }
 
 void NormalsPreprocessor::readParameters(
-    march_realsense_reader::pointcloud_parametersConfig& config)
+    march_realsense_reader::pointcloud_parametersConfig& config,
+    march_shared_msgs::PointCloudParameters* msg_)
 {
     // Downsampling parameters
     voxel_grid_filter = config.preprocessor_downsampling_voxel_grid_filter;
@@ -137,6 +144,29 @@ void NormalsPreprocessor::readParameters(
     allowed_length_z = config.preprocessor_normal_filter_allowed_length_z;
 
     debugging_ = config.debug;
+
+    setParameterMessage(msg_);
+}
+
+void NormalsPreprocessor::setParameterMessage(
+    march_shared_msgs::PointCloudParameters* msg_)
+{
+    msg_->preprocessor.downsampling.voxel_grid_filter = voxel_grid_filter;
+    msg_->preprocessor.downsampling.leaf_size = leaf_size;
+    msg_->preprocessor.downsampling.random_filter = random_filter;
+    msg_->preprocessor.downsampling.remaining_points = remaining_points;
+
+    msg_->preprocessor.distance_filter.threshold = distance_threshold;
+
+    msg_->preprocessor.normal_estimation.use_tree_search_method
+        = use_tree_search_method;
+    msg_->preprocessor.normal_estimation.number_of_neighbours
+        = number_of_neighbours;
+    msg_->preprocessor.normal_estimation.search_radius = search_radius;
+
+    msg_->preprocessor.normal_filter.allowed_length_x = allowed_length_x;
+    msg_->preprocessor.normal_filter.allowed_length_y = allowed_length_y;
+    msg_->preprocessor.normal_filter.allowed_length_z = allowed_length_z;
 }
 
 // Downsample the number of points in the pointcloud to have a more workable
@@ -267,7 +297,6 @@ bool SimplePreprocessor::preprocess(PointCloud::Ptr pointcloud,
     pointcloud_normals_ = pointcloud_normals;
     frame_id_to_transform_to_ = frame_id_to_transform_to;
 
-    ROS_DEBUG("Preprocessing with SimplePreprocessor");
     transformPointCloudFromUrdf();
     return true;
 }

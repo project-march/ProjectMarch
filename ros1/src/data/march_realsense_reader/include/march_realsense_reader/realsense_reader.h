@@ -16,6 +16,8 @@
 
 #include <dynamic_reconfigure/server.h>
 #include <march_realsense_reader/pointcloud_parametersConfig.h>
+#include <march_shared_msgs/PointCloudParameters.h>
+
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
@@ -96,7 +98,12 @@ private:
     ros::Publisher region_pointcloud_publisher_;
     ros::Publisher hull_marker_array_publisher_;
     ros::Publisher hull_parameter_determiner_publisher_;
+    ros::Publisher pointcloud_parameters_publisher_;
+
     ros::Publisher pointcloud_publisher_;
+    std::unique_ptr<march_shared_msgs::PointCloudParameters>
+            pointcloud_parameters_msg_;
+
 
     // Debugging flag at launch
     bool debugging_launch;

@@ -3,6 +3,7 @@
 #include "march_shared_msgs/GetGaitParameters.h"
 #include "utilities/realsense_gait_utilities.h"
 #include <march_realsense_reader/pointcloud_parametersConfig.h>
+#include <march_shared_msgs/PointCloudParameters.h>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
@@ -39,11 +40,11 @@ public:
     virtual ~ParameterDeterminer() {};
 
     /** This function is called upon whenever a parameter from config is
-     * changed, including when launching the node
-     */
+   * changed, including when launching the node
+   */
     virtual void readParameters(
-        march_realsense_reader::pointcloud_parametersConfig& config)
-        = 0;
+        march_realsense_reader::pointcloud_parametersConfig& config,
+        march_shared_msgs::PointCloudParameters* msg_)=0;
 
 protected:
     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;
@@ -76,11 +77,12 @@ public:
      * changed, including when launching the node
      */
     void readParameters(
-        march_realsense_reader::pointcloud_parametersConfig& config) override;
+        march_realsense_reader::pointcloud_parametersConfig& config,
+        march_shared_msgs::PointCloudParameters* msg_) override;
 
-    pcl::PointNormal optimal_foot_location;
-    PointNormalCloud::Ptr possible_foot_locations;
-    PointCloud2D::Ptr foot_locations_to_try;
+      pcl::PointNormal optimal_foot_location;
+      PointNormalCloud::Ptr possible_foot_locations;
+      PointCloud2D::Ptr foot_locations_to_try;
 
 protected:
     // Get the optimal foot location by finding which possible foot location is
@@ -148,6 +150,8 @@ protected:
     // Fill the foot locations to try cloud with a line of points from (start,
     // 0) to (end, 0)
     bool fillOptionalFootLocationCloud(float start, float end);
+
+    void setParameterMessage(march_shared_msgs::PointCloudParameters* msg_);
 
     // Read all relevant parameters
     int hull_dimension;

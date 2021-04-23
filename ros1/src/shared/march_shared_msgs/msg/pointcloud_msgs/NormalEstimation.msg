@@ -1,0 +1,3 @@
+bool use_tree_search_method
+int32 number_of_neighbours
+float64 search_radius

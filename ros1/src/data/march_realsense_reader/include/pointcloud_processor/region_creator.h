@@ -2,6 +2,7 @@
 #define MARCH_REGION_CREATOR_H
 
 #include <march_realsense_reader/pointcloud_parametersConfig.h>
+#include <march_shared_msgs/PointCloudParameters.h>
 #include <pcl/point_types.h>
 #include <pcl/segmentation/region_growing.h>
 #include <pcl_ros/point_cloud.h>
@@ -24,10 +25,11 @@ public:
     virtual pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation() = 0;
 
     /** This function is called upon whenever a parameter from config is
-     * changed, including when launching the node
-     */
+   * changed, including when launching the node
+   */
     virtual void readParameters(
-        march_realsense_reader::pointcloud_parametersConfig& config)
+        march_realsense_reader::pointcloud_parametersConfig& config,
+        march_shared_msgs::PointCloudParameters* msg_)
         = 0;
 
 protected:
@@ -58,7 +60,8 @@ public:
      * changed, including when launching the node
      */
     void readParameters(
-        march_realsense_reader::pointcloud_parametersConfig& config) override;
+        march_realsense_reader::pointcloud_parametersConfig& config,
+        march_shared_msgs::PointCloudParameters* msg_) override;
 
 private:
     /**

@@ -29,6 +29,24 @@ add_message_files(
     PressureSoleData.msg
     PressureSolesData.msg
 )
+
+add_message_files(
+    DIRECTORY
+    msg/pointcloud_msgs
+    FILES
+    Downsampling.msg
+    NormalEstimation.msg
+    DistanceFilter.msg
+    NormalFilter.msg
+    RegionGrowing.msg
+    Stairs.msg
+    CHullFinder.msg
+    RegionCreator.msg
+    ParameterDeterminer.msg
+    Preprocessor.msg
+    PointCloudParameters.msg
+)
+
 add_message_files(
     DIRECTORY
     msg/mpc_msgs

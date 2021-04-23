@@ -39,7 +39,8 @@ HullParameterDeterminer::HullParameterDeterminer(bool debugging)
 }
 
 void HullParameterDeterminer::readParameters(
-    march_realsense_reader::pointcloud_parametersConfig& config)
+    march_realsense_reader::pointcloud_parametersConfig& config,
+    march_shared_msgs::PointCloudParameters* msg_)
 {
     number_of_optional_foot_locations
         = config.parameter_determiner_foot_locations;
@@ -58,16 +59,35 @@ void HullParameterDeterminer::readParameters(
     max_search_area = (float)config.parameter_determiner_ramp_max_search_area;
     min_search_area = (float)config.parameter_determiner_ramp_min_search_area;
     max_distance_to_line
-        = config.parameter_determiner_ramp_max_distance_to_line;
+            = config.parameter_determiner_ramp_max_distance_to_line;
     x_flat = config.parameter_determiner_ramp_x_flat;
     z_flat = config.parameter_determiner_ramp_z_flat;
     x_steep = config.parameter_determiner_ramp_x_steep;
     z_steep = config.parameter_determiner_ramp_z_steep;
     y_location = (float)config.parameter_determiner_ramp_y_location;
     max_distance_to_line
-        = (float)config.parameter_determiner_ramp_max_distance_to_line;
+            = (float)config.parameter_determiner_ramp_max_distance_to_line;
 
     debugging_ = config.debug;
+
+    setParameterMessage(msg_);
+}
+
+void HullParameterDeterminer::setParameterMessage(
+    march_shared_msgs::PointCloudParameters* msg_)
+{
+    msg_->parameter_determiner.stairs.number_of_optional_foot_locations
+        = number_of_optional_foot_locations;
+    msg_->parameter_determiner.stairs.hull_dimension = hull_dimension;
+    msg_->parameter_determiner.stairs.min_x_stairs = min_x_stairs;
+    msg_->parameter_determiner.stairs.max_x_stairs = max_x_stairs;
+    msg_->parameter_determiner.stairs.min_z_stairs = min_z_stairs;
+    msg_->parameter_determiner.stairs.max_z_stairs = max_z_stairs;
+    msg_->parameter_determiner.stairs.general_most_desirable_location_is_mid
+        = general_most_desirable_location_is_mid;
+    msg_->parameter_determiner.stairs.general_most_desirable_location_is_small
+        = general_most_desirable_location_is_small;
+
 }
 
 /** This function takes in a pointcloud with matching normals and

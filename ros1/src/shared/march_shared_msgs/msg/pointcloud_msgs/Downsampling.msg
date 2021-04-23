@@ -1,0 +1,4 @@
+bool voxel_grid_filter
+float64 leaf_size
+bool random_filter
+int32 remaining_points

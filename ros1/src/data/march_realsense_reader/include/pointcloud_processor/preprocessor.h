@@ -2,6 +2,7 @@
 #define MARCH_PREPROCESSOR_H
 
 #include <march_realsense_reader/pointcloud_parametersConfig.h>
+#include <march_shared_msgs/PointCloudParameters.h>
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
@@ -30,7 +31,8 @@ public:
      * changed, including when launching the node
      */
     virtual void readParameters(
-        march_realsense_reader::pointcloud_parametersConfig& config)
+        march_realsense_reader::pointcloud_parametersConfig& config,
+        march_shared_msgs::PointCloudParameters* msg_)
         = 0;
 
     PointCloud::Ptr pointcloud_;
@@ -50,6 +52,10 @@ public:
     // Preprocess the given pointcloud, based on parameters in the config tree
     bool preprocess(PointCloud::Ptr pointcloud, Normals::Ptr pointcloud_normals,
         std::string frame_id_to_transform_to = "foot_left") override;
+
+    void readParameters(
+        march_realsense_reader::pointcloud_parametersConfig& config,
+        march_shared_msgs::PointCloudParameters* msg_) override;
 
 protected:
     /** Calls the tf listener, to know transform at current time and transforms
@@ -75,7 +81,8 @@ public:
         std::string frame_id_to_transform_to = "foot_left") override;
 
     void readParameters(
-        march_realsense_reader::pointcloud_parametersConfig& config) override;
+        march_realsense_reader::pointcloud_parametersConfig& config,
+        march_shared_msgs::PointCloudParameters* msg_) override;
 
 protected:
     // Removes points from the pointcloud such that there is only one point left
@@ -97,6 +104,9 @@ protected:
     // Removes all points which do not roughly have a normal in a certain
     // direction (specified in the parameter file)
     bool filterOnNormalOrientation();
+
+    // Set the parameter message equal to the most recent parameters
+    void setParameterMessage(march_shared_msgs::PointCloudParameters* msg_);
 
     // Downsampling parameters
     bool voxel_grid_filter;
