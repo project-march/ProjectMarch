@@ -345,6 +345,14 @@ class GaitSelection(Node):
             )
 
     def _load_realsense_gaits(self, gaits):
+        """
+        Load all gaits from the realsense gait version map.
+        Also create a service with a separate callback group that can be used by the
+        realsense gaits to get parameters from the realsense_reader. A new callback
+        group is necessary to prevent a deadlock.
+
+        :param gaits: The dictionary where the loaded gaits will be added to.
+        """
         realsense_callback_group = MutuallyExclusiveCallbackGroup()
         get_gait_parameters_service = self.create_client(
             srv_type=GetGaitParameters,
@@ -365,7 +373,7 @@ class GaitSelection(Node):
                 gait_config=self._realsense_gait_version_map[gait_name],
                 gait_graph=gait_graph,
                 gait_directory=self._gait_directory,
-                service=get_gait_parameters_service,
+                process_service=get_gait_parameters_service,
             )
             gaits[gait_name] = gait
 
