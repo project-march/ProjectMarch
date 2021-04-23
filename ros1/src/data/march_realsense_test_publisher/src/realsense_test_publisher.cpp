@@ -89,19 +89,19 @@ bool RealsenseTestPublisher::publishCustomPointcloud(std::string pointcloud_file
     }
 
     PointCloud::Ptr pointcloud = boost::make_shared<PointCloud>();
-    pcl::io::loadPLYFile<pcl::PointXYZ>((*path_iterator).path());
-    ROS_DEBUG_STREAM("The file from path " << (*path_iterator).path() << "has been loaded up! now publishing")
+    pcl::io::loadPLYFile<pcl::PointXYZ>((*path_iterator).string(), *pointcloud);
+    ROS_DEBUG_STREAM("The file from path " << (*path_iterator).string() << "has been loaded up! now publishing");
     publishTestCloudOnTimer(pointcloud);
     return true;
 }
 
-void RealsenseTestPublisher::publishTestCloudOnTimer(PointCloud pointcloud)
+void RealsenseTestPublisher::publishTestCloudOnTimer(PointCloud::Ptr pointcloud)
 {
-    ros::Timer timer_publisher = n_.createTimer(ros::Duration(PUBLISH_RATE),
+    ros::Timer timer_publisher = n_->createTimer(ros::Duration(PUBLISH_RATE),
                                                 std::bind(&publishTestCloud, pointcloud));
 }
 
-void RealsenseTestPublisher::publishTestCloud(PointCloud pointcloud)
+void RealsenseTestPublisher::publishTestCloud(PointCloud::Ptr pointcloud)
 {
     test_cloud_publisher.publish(pointcloud);
 }

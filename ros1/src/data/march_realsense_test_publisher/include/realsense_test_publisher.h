@@ -40,10 +40,10 @@ private:
     void stopPublishingPointClouds();
 
     // Publish a pointcloud on a timer
-    void publishTestCloudOnTimer(PointCloud pointcloud);
+    void publishTestCloudOnTimer(PointCloud::Ptr pointcloud);
 
     // Publish a pointcloud
-    void publishTestCloud(PointCloud pointcloud);
+    void publishTestCloud(PointCloud::Ptr pointcloud);
 
     ros::NodeHandle* n_;
     ros::ServiceServer publish_test_cloud_service;
