@@ -52,7 +52,7 @@ public:
 
     // Actuate the joint if allow_actuation is true
     // Will throw a HardwareException if canActuate() is false
-    void actuate(double target);
+    void actuate(float target);
 
     // Get the position and velocity of the joint
     double getPosition() const;

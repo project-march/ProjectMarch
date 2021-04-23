@@ -130,13 +130,13 @@ float ODrive::getAbsoluteVelocityIU()
 
 float ODrive::getAbsolutePositionUnchecked()
 {
-    return this->getAbsoluteEncoder()->toRadians(
+    return (float)this->getAbsoluteEncoder()->toRadians(
         getAbsolutePositionIU(), /*use_zero_position=*/true);
 }
 
 float ODrive::getAbsoluteVelocityUnchecked()
 {
-    return this->getAbsoluteEncoder()->toRadians(
+    return (float)this->getAbsoluteEncoder()->toRadians(
         getAbsoluteVelocityIU(), /*use_zero_position=*/false);
 }
 

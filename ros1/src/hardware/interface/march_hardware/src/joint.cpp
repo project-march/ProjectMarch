@@ -71,7 +71,7 @@ void Joint::prepareActuation()
     velocity_ = 0;
 }
 
-void Joint::actuate(double target)
+void Joint::actuate(float target)
 {
     if (!this->canActuate()) {
         throw error::HardwareException(error::ErrorType::NOT_ALLOWED_TO_ACTUATE,
