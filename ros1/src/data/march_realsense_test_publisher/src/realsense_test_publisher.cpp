@@ -1,12 +1,12 @@
 #include <filesystem>
 #include <iostream>
 #include <march_shared_msgs/PublishTestDataset.h>
+#include <pcl/io/ply_io.h>
+#include <pcl/point_types.h>
 #include <realsense_test_publisher.h>
 #include <ros/package.h>
 #include <string>
 #include <utilities/camera_mode_utilities.h>
-#include <pcl/io/ply_io.h>
-#include <pcl/point_types.h>
 
 using namespace std::filesystem;
 
@@ -30,10 +30,12 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
         file_paths.push_back(entry.path());
     }
 
-    publish_test_cloud_service = n_->advertiseService(/*service=*/"/camera/publish_test_cloud",
-        &RealsenseTestPublisher::publishTestDatasetCallback, this);
+    publish_test_cloud_service
+        = n_->advertiseService(/*service=*/"/camera/publish_test_cloud",
+            &RealsenseTestPublisher::publishTestDatasetCallback, this);
 
-    test_cloud_publisher = n_->advertise<PointCloud>(TOPIC_TEST_CLOUDS, /*queue_size=*/1);
+    test_cloud_publisher
+        = n_->advertise<PointCloud>(TOPIC_TEST_CLOUDS, /*queue_size=*/1);
 }
 
 bool RealsenseTestPublisher::publishTestDatasetCallback(
@@ -45,12 +47,12 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
     SelectedMode selected_mode = (SelectedMode)req.selected_mode;
     switch (selected_mode) {
         case SelectedMode::start: {
-//            startPublishingPointclouds();
+            //            startPublishingPointclouds();
             ROS_DEBUG_STREAM("Started publishing pointclouds");
             break;
         }
         case SelectedMode::next: {
-//            publishNextPointcloud();
+            //            publishNextPointcloud();
             ROS_DEBUG_STREAM("now publishing next pointcloud");
             break;
         }
@@ -66,11 +68,11 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
             break;
         }
         case SelectedMode::slide_show: {
-//            publishSlideShow();
+            //            publishSlideShow();
             ROS_DEBUG_STREAM("Now publishing a slide show of pointclouds");
         }
         case SelectedMode::end: {
-//            stopPublishingPointClouds();
+            //            stopPublishingPointClouds();
             ROS_DEBUG_STREAM("Stopped publishing pointclouds");
             break;
         }
@@ -79,18 +81,24 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
     return success;
 }
 
-bool RealsenseTestPublisher::publishCustomPointcloud(std::string pointcloud_file_name)
+bool RealsenseTestPublisher::publishCustomPointcloud(
+    std::string pointcloud_file_name)
 {
-    std::vector<path>::iterator path_iterator = std::find(file_paths.begin(), file_paths.end(), pointcloud_file_name);
+    std::vector<path>::iterator path_iterator
+        = std::find(file_paths.begin(), file_paths.end(), pointcloud_file_name);
     if (path_iterator == file_paths.end()) {
         std::string file_names_string = getFileNamesString();
-        ROS_WARN_STREAM("The requested pointcloud file could not be found. Valid options are: \n" << file_names_string);
+        ROS_WARN_STREAM("The requested pointcloud file could not be found. "
+                        "Valid options are: \n"
+            << file_names_string);
         return false;
     }
 
     pointcloud_to_publish = boost::make_shared<PointCloud>();
-    pcl::io::loadPLYFile<pcl::PointXYZ>((*path_iterator).string(), *pointcloud_to_publish);
-    ROS_DEBUG_STREAM("The file from path " << (*path_iterator).string() << "has been loaded up! now publishing");
+    pcl::io::loadPLYFile<pcl::PointXYZ>(
+        (*path_iterator).string(), *pointcloud_to_publish);
+    ROS_DEBUG_STREAM("The file from path "
+        << (*path_iterator).string() << "has been loaded up! now publishing");
     publishTestCloudOnTimer();
     return true;
 }
@@ -98,7 +106,7 @@ bool RealsenseTestPublisher::publishCustomPointcloud(std::string pointcloud_file
 void RealsenseTestPublisher::publishTestCloudOnTimer()
 {
     ros::Timer timer_publisher = n_->createTimer(ros::Duration(PUBLISH_RATE),
-                                                 std::bind(&RealsenseTestPublisher::publishTestCloud, this));
+        std::bind(&RealsenseTestPublisher::publishTestCloud, this));
 }
 
 void RealsenseTestPublisher::publishTestCloud()

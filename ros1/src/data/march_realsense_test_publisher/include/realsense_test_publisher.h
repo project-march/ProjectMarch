@@ -1,6 +1,7 @@
 #ifndef MARCH_REALSENSE_TEST_PUBLISHER_H
 #define MARCH_REALSENSE_TEST_PUBLISHER_H
 
+#include <filesystem>
 #include <iostream>
 #include <march_shared_msgs/PublishTestDataset.h>
 #include <pcl/point_types.h>
@@ -8,7 +9,6 @@
 #include <ros/ros.h>
 #include <string>
 #include <vector>
-#include <filesystem>
 
 using namespace std::filesystem;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
