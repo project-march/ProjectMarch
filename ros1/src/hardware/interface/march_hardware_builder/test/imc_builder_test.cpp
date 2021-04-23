@@ -10,7 +10,7 @@
 
 #include <march_hardware/encoder/absolute_encoder.h>
 #include <march_hardware/encoder/incremental_encoder.h>
-#include <march_hardware/imotioncube/imotioncube.h>
+#include <march_hardware/motor_controller/imotioncube/imotioncube.h>
 
 class IMotionCubeBuilderTest : public ::testing::Test {
 protected:
@@ -58,7 +58,6 @@ TEST_F(IMotionCubeBuilderTest, ValidIMotionCubeHip)
                                     this->pdo_interface, this->sdo_interface),
         std::move(absolute_encoder), std::move(incremental_encoder),
         march::ActuationMode::unknown);
-
     ASSERT_EQ(expected, *created);
 }
 
@@ -95,16 +94,6 @@ TEST_F(IMotionCubeBuilderTest, NoIncrementalEncoder)
 {
     YAML::Node config
         = this->loadTestYaml("/imotioncube_no_incremental_encoder.yaml");
-
-    ASSERT_THROW(HardwareBuilder::createIMotionCube(config,
-                     march::ActuationMode::unknown, this->joint,
-                     this->pdo_interface, this->sdo_interface),
-        MissingKeyException);
-}
-
-TEST_F(IMotionCubeBuilderTest, NoSlaveIndex)
-{
-    YAML::Node config = this->loadTestYaml("/imotioncube_no_slave_index.yaml");
 
     ASSERT_THROW(HardwareBuilder::createIMotionCube(config,
                      march::ActuationMode::unknown, this->joint,

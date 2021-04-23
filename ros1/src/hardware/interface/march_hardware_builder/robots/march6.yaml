@@ -1,0 +1,124 @@
+# For convenience it is easiest if the joint order is maintained, it is chosen to sort the joints alphabetically.
+# TODO: Update IU values of absolute encoders
+# TODO: Update ifName
+# TODO: Add pressure soles to this .yaml file
+# TODO: Add PDB to this .yaml files
+# TODO: Make sure slaveIndexes are correct
+# TODO: Make sure axis numbers of ODrives are correct
+# TODO: Update netNumbers if necessary
+march6:
+  ifName: enp0s31f6
+  ecatCycleTime: 4
+  ecatSlaveTimeout: 50
+  joints:
+    - left_ankle:
+        allowActuation: true
+        netNumber: 4
+        temperatureges: {slaveIndex: 1, byteOffset: 0}
+        motor_controller:
+          actuationMode: torque
+          type: odrive 
+          slaveIndex: 1
+          axis: 0
+          absoluteEncoder:
+            resolution: 12
+            minPositionIU: 3645
+            maxPositionIU: 4125
+
+    - left_hip_aa:
+        allowActuation: true
+        netNumber: 3
+        temperatureges: {slaveIndex: 2, byteOffset: 0}
+        motor_controller:
+          actuationMode: torque
+          type: odrive 
+          slaveIndex: 2
+          axis: 0
+          absoluteEncoder:
+            resolution: 12
+            minPositionIU: 1039
+            maxPositionIU: 1427
+
+    - left_hip_fe:
+        allowActuation: true
+        netNumber: 3
+        temperatureges: {slaveIndex: 2, byteOffset: 0}
+        motor_controller:
+          actuationMode: torque
+          type: odrive 
+          slaveIndex: 2
+          axis: 1
+          absoluteEncoder:
+            resolution: 17
+            minPositionIU: 45689
+            maxPositionIU: 89385
+
+    - left_knee:
+        allowActuation: true
+        netNumber: 4
+        temperatureges: {slaveIndex: 1, byteOffset: 4}
+        motor_controller:
+          actuationMode: torque
+          type: odrive 
+          slaveIndex: 1
+          axis: 1
+          absoluteEncoder:
+            resolution: 17
+            minPositionIU: 19800
+            maxPositionIU: 62557
+
+    - right_ankle:
+        allowActuation: true
+        netNumber: 2
+        temperatureges: {slaveIndex: 4, byteOffset: 0}
+        motor_controller:
+          actuationMode: torque
+          type: odrive 
+          slaveIndex: 4
+          axis: 0
+          absoluteEncoder:
+            resolution: 12
+            minPositionIU: 807
+            maxPositionIU: 1233
+
+    - right_hip_aa:
+        allowActuation: true
+        netNumber: 1
+        temperatureges: {slaveIndex: 3, byteOffset: 4}
+        motor_controller:
+          actuationMode: torque
+          type: odrive 
+          slaveIndex: 3
+          axis: 1
+          absoluteEncoder:
+            resolution: 12
+            minPositionIU: 3694
+            maxPositionIU: 4076
+            
+    - right_hip_fe:
+        allowActuation: true
+        netNumber: 1
+        temperatureges: {slaveIndex: 3, byteOffset: 0}
+        motor_controller:
+          actuationMode: torque
+          type: odrive 
+          slaveIndex: 3
+          axis: 0
+          absoluteEncoder:
+            resolution: 17
+            minPositionIU: 2045
+            maxPositionIU: 45632
+
+    - right_knee:
+        allowActuation: true
+        netNumber: 2
+        temperatureges: {slaveIndex: 4, byteOffset: 4}
+        motor_controller:
+          actuationMode: torque
+          type: odrive 
+          slaveIndex: 4
+          axis: 1
+          absoluteEncoder:
+            resolution: 17
+            minPositionIU: 41533
+            maxPositionIU: 85298

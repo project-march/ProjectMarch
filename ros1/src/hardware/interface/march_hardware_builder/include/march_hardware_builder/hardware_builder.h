@@ -14,10 +14,11 @@
 #include <march_hardware/encoder/incremental_encoder.h>
 #include <march_hardware/ethercat/pdo_interface.h>
 #include <march_hardware/ethercat/sdo_interface.h>
-#include <march_hardware/imotioncube/actuation_mode.h>
-#include <march_hardware/imotioncube/imotioncube.h>
 #include <march_hardware/joint.h>
 #include <march_hardware/march_robot.h>
+#include <march_hardware/motor_controller/actuation_mode.h>
+#include <march_hardware/motor_controller/imotioncube/imotioncube.h>
+#include <march_hardware/motor_controller/odrive/odrive.h>
 #include <march_hardware/power/power_distribution_board.h>
 #include <march_hardware/pressure_sole/pressure_sole.h>
 #include <march_hardware/temperature/temperature_ges.h>
@@ -79,8 +80,17 @@ public:
         const urdf::JointConstSharedPtr& urdf_joint);
     static std::unique_ptr<march::IncrementalEncoder> createIncrementalEncoder(
         const YAML::Node& incremental_encoder_config);
+    static std::unique_ptr<march::MotorController> createMotorController(
+        const YAML::Node& config, const urdf::JointConstSharedPtr& urdf_joint,
+        march::PdoInterfacePtr pdo_interface,
+        march::SdoInterfacePtr sdo_interface);
     static std::unique_ptr<march::IMotionCube> createIMotionCube(
         const YAML::Node& imc_config, march::ActuationMode mode,
+        const urdf::JointConstSharedPtr& urdf_joint,
+        march::PdoInterfacePtr pdo_interface,
+        march::SdoInterfacePtr sdo_interface);
+    static std::unique_ptr<march::ODrive> createODrive(
+        const YAML::Node& odrive_config, march::ActuationMode mode,
         const urdf::JointConstSharedPtr& urdf_joint,
         march::PdoInterfacePtr pdo_interface,
         march::SdoInterfacePtr sdo_interface);
@@ -106,10 +116,12 @@ public:
     static const std::vector<std::string> INCREMENTAL_ENCODER_REQUIRED_KEYS;
     static const std::vector<std::string> ABSOLUTE_ENCODER_REQUIRED_KEYS;
     static const std::vector<std::string> IMOTIONCUBE_REQUIRED_KEYS;
+    static const std::vector<std::string> ODRIVE_REQUIRED_KEYS;
     static const std::vector<std::string> TEMPERATUREGES_REQUIRED_KEYS;
     static const std::vector<std::string>
         POWER_DISTRIBUTION_BOARD_REQUIRED_KEYS;
     static const std::vector<std::string> JOINT_REQUIRED_KEYS;
+    static const std::vector<std::string> MOTOR_CONTROLLER_REQUIRED_KEYS;
     static const std::vector<std::string> PRESSURE_SOLE_REQUIRED_KEYS;
 
 private:

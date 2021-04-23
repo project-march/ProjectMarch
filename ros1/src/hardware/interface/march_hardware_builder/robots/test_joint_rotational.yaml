@@ -4,9 +4,10 @@ testsetup:
   ecatSlaveTimeout: 50
   joints:
     - rotational_joint:
-        actuationMode: torque
         allowActuation: true
-        imotioncube:
+        motor_controller:
+          type: imotioncube
+          actuationMode: torque
           slaveIndex: 1
           absoluteEncoder:
             resolution: 17
