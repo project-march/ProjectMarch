@@ -8,14 +8,12 @@
 #include <vector>
 
 #include <march_hardware/motor_controller/motor_controller.h>
+#include <march_hardware/motor_controller/motor_controller_state.h>
 #include <march_hardware/power/power_distribution_board.h>
 #include <march_hardware/temperature/temperature_ges.h>
-#include <march_hardware/motor_controller/motor_controller_state.h>
 
-namespace march
-{
-class Joint
-{
+namespace march {
+class Joint {
 public:
   // Initialize a Joint with motor controller and without temperature slave.
   // MotorController cannot be a nullptr, since a Joint should always have a MotorController.
@@ -86,20 +84,16 @@ public:
   /** @brief Override stream operator for clean printing */
   friend ::std::ostream& operator<<(std::ostream& os, const Joint& joint)
   {
-    os << "name: " << joint.name_ << ", "
-       << "allowActuation: " << joint.allow_actuation_ << ", "
-       << "MotorController: "<<  *joint.motor_controller_;
-    os << ", temperatureges: ";
-    if (joint.hasTemperatureGES())
-    {
-      os << *joint.temperature_ges_;
-    }
-    else
-    {
-      os << "none";
-    }
-
-    return os;
+      os << "name: " << joint.name_ << ", "
+         << "allowActuation: " << joint.allow_actuation_ << ", "
+         << "MotorController: " << *joint.motor_controller_;
+      os << ", temperatureges: ";
+      if (joint.hasTemperatureGES()) {
+          os << *joint.temperature_ges_;
+      } else {
+          os << "none";
+      }
+      return os;
   }
 
 private:
@@ -120,5 +114,5 @@ private:
   std::unique_ptr<TemperatureGES> temperature_ges_ = nullptr;
 };
 
-}  // namespace march
-#endif  // MARCH_HARDWARE_JOINT_H
+} // namespace march
+#endif // MARCH_HARDWARE_JOINT_H

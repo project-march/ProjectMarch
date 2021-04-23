@@ -6,20 +6,17 @@
 
 #include <ostream>
 
-namespace march
-{
-class IncrementalEncoder : public Encoder
-{
+namespace march {
+class IncrementalEncoder : public Encoder {
 public:
   IncrementalEncoder(size_t number_of_bits, double transmission);
 
   ~IncrementalEncoder() noexcept override = default;
 
   // Inherited methods
-  double getRadiansPerBit() const final override;
-  double toRadians(double iu, bool /* use_zero_position */) const final override;
-  double toIU(double radians, bool /* use_zero_position */) const final override;
-
+  double getRadiansPerBit() const override final;
+  double toRadians(double iu, bool /* use_zero_position */) const override final;
+  double toIU(double radians, bool /* use_zero_position */) const override final;
 
   double getTransmission() const;
 
@@ -36,8 +33,8 @@ public:
   }
 
 private:
-  const double transmission_;
+    const double transmission_;
 };
-}  // namespace march
+} // namespace march
 
-#endif  // MARCH_HARDWARE_INCREMENTAL_ENCODER_H
+#endif // MARCH_HARDWARE_INCREMENTAL_ENCODER_H

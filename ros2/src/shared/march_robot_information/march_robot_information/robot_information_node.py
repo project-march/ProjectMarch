@@ -17,7 +17,12 @@ def main():
 
     node = RobotInformation()
 
-    rclpy.spin(node)
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+
+    rclpy.shutdown()
 
 
 class RobotInformation(Node):

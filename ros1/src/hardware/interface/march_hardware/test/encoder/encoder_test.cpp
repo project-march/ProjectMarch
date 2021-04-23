@@ -17,25 +17,24 @@ using testing::Return;
  * instantiate a pure abstract class. So as long as the non virtual
  * methods are tested all is ok.
  */
-class EncoderTest : public testing::Test
-{
+class EncoderTest : public testing::Test {
 protected:
-  const uint16_t slave_index = 1;
-  const size_t resolution = 12;
+    const uint16_t slave_index = 1;
+    const size_t resolution = 12;
 };
 
 TEST_F(EncoderTest, ResolutionBelowRange)
 {
-  ASSERT_THROW(MockEncoder(0), march::error::HardwareException);
+    ASSERT_THROW(MockEncoder(0), march::error::HardwareException);
 }
 
 TEST_F(EncoderTest, ResolutionAboveRange)
 {
-  ASSERT_THROW(MockEncoder(50), march::error::HardwareException);
+    ASSERT_THROW(MockEncoder(50), march::error::HardwareException);
 }
 
 TEST_F(EncoderTest, CorrectTotalPositions)
 {
-  MockEncoder encoder(this->resolution);
-  ASSERT_EQ(std::pow(2, this->resolution), encoder.getTotalPositions());
+    MockEncoder encoder(this->resolution);
+    ASSERT_EQ(std::pow(2, this->resolution), encoder.getTotalPositions());
 }

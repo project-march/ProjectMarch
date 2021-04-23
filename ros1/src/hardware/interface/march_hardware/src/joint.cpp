@@ -1,9 +1,9 @@
 // Copyright 2019 Project March.
-#include "march_hardware/ethercat/slave.h"
 #include "march_hardware/joint.h"
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/error/motor_controller_error.h"
-#include <march_hardware/motor_controller/motor_controller_state.h>
+#include "march_hardware/ethercat/slave.h"
+#include "march_hardware/motor_controller/motor_controller_state.h"
 
 #include <ros/ros.h>
 
@@ -178,4 +178,4 @@ std::unique_ptr<TemperatureGES>& Joint::getTemperatureGES()
   }
 }
 
-}  // namespace march
+} // namespace march

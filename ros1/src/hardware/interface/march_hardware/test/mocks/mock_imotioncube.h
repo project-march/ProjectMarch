@@ -11,14 +11,14 @@
 
 #include <gmock/gmock.h>
 
-class MockIMotionCube : public march::IMotionCube
-{
+class MockIMotionCube : public march::IMotionCube {
 public:
-  MockIMotionCube()
-    : IMotionCube(MockSlave(), std::make_unique<MockAbsoluteEncoder>(), std::make_unique<MockIncrementalEncoder>(),
-                  march::ActuationMode::unknown)
-  {
-  }
+    MockIMotionCube()
+        : IMotionCube(MockSlave(), std::make_unique<MockAbsoluteEncoder>(),
+            std::make_unique<MockIncrementalEncoder>(),
+            march::ActuationMode::unknown)
+    {
+    }
 
   MOCK_METHOD0(getState, std::unique_ptr<march::MotorControllerState>());
 
@@ -38,6 +38,7 @@ public:
   MOCK_METHOD1(actuateRadians, void(float));
   MOCK_METHOD1(actuateTorque, void(float));
 
-  MOCK_METHOD2(initSdo, bool(march::SdoSlaveInterface& sdo, int cycle_time));
-  MOCK_METHOD1(reset, void(march::SdoSlaveInterface&));
+
+    MOCK_METHOD2(initSdo, bool(march::SdoSlaveInterface& sdo, int cycle_time));
+    MOCK_METHOD1(reset, void(march::SdoSlaveInterface&));
 };

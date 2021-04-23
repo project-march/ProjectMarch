@@ -7,8 +7,9 @@
 class IMCPDOTest : public ::testing::Test
 {
 protected:
-  MockSdoInterfacePtr mock_sdo = std::make_shared<MockSdoInterface>();
-  march::SdoSlaveInterface sdo = march::SdoSlaveInterface(1, mock_sdo);
+    MockSdoInterfacePtr mock_sdo = std::make_shared<MockSdoInterface>();
+    march::SdoSlaveInterface sdo
+        = march::SdoSlaveInterface(/*slave_index=*/1, mock_sdo);
 };
 
 TEST_F(IMCPDOTest, sortPDOmap)
@@ -46,34 +47,36 @@ TEST_F(IMCPDOTest, ObjectCounts)
 {
   march::IMCPDOmap pdoMapMISO;
 
-  pdoMapMISO.addObject(march::IMCObjectName::CurrentLimit);
-  std::unordered_map<march::IMCObjectName, uint8_t> misoByteOffsets =
-      pdoMapMISO.map(this->sdo, march::DataDirection::MISO);
+    pdoMapMISO.addObject(march::IMCObjectName::CurrentLimit);
+    std::unordered_map<march::IMCObjectName, uint8_t> misoByteOffsets
+        = pdoMapMISO.map(this->sdo, march::DataDirection::MISO);
 
-  ASSERT_EQ(1u, misoByteOffsets.count(march::IMCObjectName::CurrentLimit));
-  ASSERT_EQ(0u, misoByteOffsets.count(march::IMCObjectName::DCLinkVoltage));
+    ASSERT_EQ(1u, misoByteOffsets.count(march::IMCObjectName::CurrentLimit));
+    ASSERT_EQ(0u, misoByteOffsets.count(march::IMCObjectName::DCLinkVoltage));
 }
 
 TEST_F(IMCPDOTest, CombinedAddressConstruct)
 {
   march::IMCPDOmap pdoMap;
 
-  auto status_word = pdoMap.all_objects.find(march::IMCObjectName::StatusWord);
-  uint32_t combined_address = status_word->second.combined_address;
+    auto status_word
+        = pdoMap.all_objects.find(march::IMCObjectName::StatusWord);
+    uint32_t combined_address = status_word->second.combined_address;
 
-  ASSERT_EQ(16u, (combined_address & 0xFF));
-  ASSERT_EQ(0u, ((combined_address >> 8) & 0xFF));
-  ASSERT_EQ(0x6041u, ((combined_address >> 16) & 0xFFFF));
+    ASSERT_EQ(16u, (combined_address & 0xFF));
+    ASSERT_EQ(0u, ((combined_address >> 8) & 0xFF));
+    ASSERT_EQ(0x6041u, ((combined_address >> 16) & 0xFFFF));
 }
 
 TEST_F(IMCPDOTest, CombinedAdressConstructWithSubindexValue)
 {
   march::IMCPDOmap pdoMap;
 
-  auto test_object = march::IMCObject(0x6060, 2, 16);
-  uint32_t combined_address = test_object.combined_address;
+    auto test_object = march::IMCObject(
+        /*_address=*/0x6060, /*_sub_index=*/2, /*_length=*/16);
+    uint32_t combined_address = test_object.combined_address;
 
-  ASSERT_EQ(16u, (combined_address & 0xFF));
-  ASSERT_EQ(2u, ((combined_address >> 8) & 0xFF));
-  ASSERT_EQ(0x6060u, ((combined_address >> 16) & 0xFFFF));
+    ASSERT_EQ(16u, (combined_address & 0xFF));
+    ASSERT_EQ(2u, ((combined_address >> 8) & 0xFF));
+    ASSERT_EQ(0x6060u, ((combined_address >> 16) & 0xFFFF));
 }

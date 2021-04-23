@@ -164,4 +164,4 @@ public:
 };
 }  // namespace march
 
-#endif  // MARCH_HARDWARE_IMOTIONCUBE_STATE_OF_OPERATION_H
+#endif  // MARCH_HARDWARE_IMOTIONCUBE_STATE_H

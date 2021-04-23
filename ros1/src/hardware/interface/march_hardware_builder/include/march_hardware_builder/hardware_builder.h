@@ -20,14 +20,13 @@
 #include <march_hardware/joint.h>
 #include <march_hardware/march_robot.h>
 #include <march_hardware/power/power_distribution_board.h>
-#include <march_hardware/temperature/temperature_ges.h>
 #include <march_hardware/pressure_sole/pressure_sole.h>
+#include <march_hardware/temperature/temperature_ges.h>
 
 /**
  * @brief Creates a MarchRobot from a robot yaml and URDF.
  */
-class HardwareBuilder
-{
+class HardwareBuilder {
 public:
   /**
    * @brief Initialises a HardwareBuilder with a robotName enumerator.
@@ -112,31 +111,32 @@ public:
   static const std::vector<std::string> MOTOR_CONTROLLER_REQUIRED_KEYS;
   static const std::vector<std::string> PRESSURE_SOLE_REQUIRED_KEYS;
 
-
 private:
-  /**
-   * Initializes the URDF if necessary.
-   */
-  void initUrdf();
+    /**
+     * Initializes the URDF if necessary.
+     */
+    void initUrdf();
 
-  /**
-   * Returns all joints found in the given config.
-   * Warns when joints are defined as FIXED in the URDF and when a non-FIXED
-   * joint is not contained in the config.
-   * @param joints_config YAML node that contains a sequence of joint objects
-   * @return list of created joints
-   */
-  std::vector<march::Joint> createJoints(const YAML::Node& joints_config, march::PdoInterfacePtr pdo_interface,
-                                         march::SdoInterfacePtr sdo_interface) const;
+    /**
+     * Returns all joints found in the given config.
+     * Warns when joints are defined as FIXED in the URDF and when a non-FIXED
+     * joint is not contained in the config.
+     * @param joints_config YAML node that contains a sequence of joint objects
+     * @return list of created joints
+     */
+    std::vector<march::Joint> createJoints(const YAML::Node& joints_config,
+        march::PdoInterfacePtr pdo_interface,
+        march::SdoInterfacePtr sdo_interface) const;
 
-  YAML::Node robot_config_;
-  urdf::Model urdf_;
-  bool init_urdf_ = true;
+    YAML::Node robot_config_;
+    urdf::Model urdf_;
+    bool init_urdf_ = true;
 };
 
 /**
- * Converts the input filestream object to a stringstream object so that is easier to test for in IMotionCUbe.cpp
+ * Converts the input filestream object to a stringstream object so that is
+ * easier to test for in IMotionCUbe.cpp
  */
 std::string convertSWFileToString(std::ifstream& sw_file);
 
-#endif  // MARCH_HARDWARE_BUILDER_HARDWARE_BUILDER_H
+#endif // MARCH_HARDWARE_BUILDER_HARDWARE_BUILDER_H

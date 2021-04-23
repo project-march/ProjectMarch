@@ -1,44 +1,86 @@
 #ifndef MARCH_REGION_CREATOR_H
 #define MARCH_REGION_CREATOR_H
 
-#include <string>
+#include <march_realsense_reader/pointcloud_parametersConfig.h>
 #include <pcl/point_types.h>
+#include <pcl/segmentation/region_growing.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/package.h>
-#include "yaml-cpp/yaml.h"
+#include <string>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 using Normals = pcl::PointCloud<pcl::Normal>;
 using RegionVector = std::vector<pcl::PointIndices>;
 
-class RegionCreator
-{
-  public:
-    RegionCreator(YAML::Node config_tree, bool debugging);
+class RegionCreator {
+public:
+    RegionCreator(bool debugging);
     // This function is required to be implemented by any region creator
-    virtual bool create_regions(PointCloud::Ptr pointcloud,
-                                Normals::Ptr normal_pointcloud,
-                                boost::shared_ptr<RegionVector> region_vector)=0;
+    virtual bool createRegions(PointCloud::Ptr pointcloud,
+        Normals::Ptr pointcloud_normals,
+        boost::shared_ptr<RegionVector> region_vector)
+        = 0;
     virtual ~RegionCreator() {};
+    virtual pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation() = 0;
 
-  protected:
+    /** This function is called upon whenever a parameter from config is
+     * changed, including when launching the node
+     */
+    virtual void readParameters(
+        march_realsense_reader::pointcloud_parametersConfig& config)
+        = 0;
+
+protected:
     PointCloud::Ptr pointcloud_;
-    Normals::Ptr normal_pointcloud_;
+    Normals::Ptr pointcloud_normals_;
     boost::shared_ptr<RegionVector> region_vector_;
-    YAML::Node config_tree_;
     bool debugging_;
 };
 
-class SimpleRegionCreator : RegionCreator
-{
-  public:
-    //Use the constructors defined in the super class
-    using RegionCreator::RegionCreator;
-    /** This function should take in a pointcloud with matching normals and cluster them
-    in regions, based on the parameters in the YAML node given at construction. **/
-    bool create_regions(PointCloud::Ptr pointcloud,
-                        Normals::Ptr normal_pointcloud,
-                        boost::shared_ptr<RegionVector> region_vector) override;
+class RegionGrower : RegionCreator {
+public:
+    // Use the constructors defined in the super class
+    RegionGrower(bool debugging);
+    /** Create cluster using the region growing algorithm, takes algorithm
+     * configuration from the dynamic parameter server, and fills parameter
+     * region_vector with clusters. **/
+    bool createRegions(PointCloud::Ptr pointcloud,
+        Normals::Ptr pointcloud_normals,
+        boost::shared_ptr<RegionVector> region_vector) override;
+
+    /**
+     * @return A pointer to a single pointcloud, with unique colours for every
+     * cluster
+     */
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr debug_visualisation() override;
+
+    /** This function is called upon whenever a parameter from config is
+     * changed, including when launching the node
+     */
+    void readParameters(
+        march_realsense_reader::pointcloud_parametersConfig& config) override;
+
+private:
+    /**
+     * Configure region growing algorithm
+     */
+    bool setupRegionGrower();
+
+    /**
+     * Extract clusters from region_grower object
+     * @return true if succesful
+     */
+    bool extractRegions();
+
+    // Region Growing Object
+    pcl::RegionGrowing<pcl::PointXYZ, pcl::Normal> region_grower;
+
+    // Region Growing configuration parameters
+    int number_of_neighbours;
+    int min_cluster_size;
+    int max_cluster_size;
+    float smoothness_threshold;
+    float curvature_threshold;
 };
 
-#endif //MARCH_PREPROCESSOR_H
+#endif // MARCH_PREPROCESSOR_H

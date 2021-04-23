@@ -3,10 +3,10 @@
 
 #include <gmock/gmock.h>
 
-class MockIncrementalEncoder : public march::IncrementalEncoder
-{
+class MockIncrementalEncoder : public march::IncrementalEncoder {
 public:
-  MockIncrementalEncoder() : IncrementalEncoder(10, 100.0)
-  {
-  }
+    MockIncrementalEncoder()
+        : IncrementalEncoder(/*number_of_bits=*/10, /*transmission=*/100.0)
+    {
+    }
 };

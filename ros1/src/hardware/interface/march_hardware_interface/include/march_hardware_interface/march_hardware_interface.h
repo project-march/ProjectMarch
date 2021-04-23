@@ -32,47 +32,50 @@ using RtPublisherPtr = std::unique_ptr<realtime_tools::RealtimePublisher<T>>;
  * @details Register an interface for each joint such that they can be actuated
  *     by a controller via ros_control.
  */
-class MarchHardwareInterface : public hardware_interface::RobotHW
-{
+class MarchHardwareInterface : public hardware_interface::RobotHW {
 public:
-  MarchHardwareInterface(std::unique_ptr<march::MarchRobot> robot, bool reset_imc);
+    MarchHardwareInterface(
+        std::unique_ptr<march::MarchRobot> robot, bool reset_imc);
 
-  /**
-   * @brief Initialize the HardwareInterface by registering position interfaces
-   * for each joint.
-   */
-  bool init(ros::NodeHandle& nh, ros::NodeHandle& robot_hw_nh) override;
+    /**
+     * @brief Initialize the HardwareInterface by registering position
+     * interfaces for each joint.
+     */
+    bool init(ros::NodeHandle& nh, ros::NodeHandle& robot_hw_nh) override;
 
-  /**
-   * Reads (in realtime) the state from the march robot.
-   *
-   * @param time Current time
-   * @param elapsed_time Duration since last write action
-   */
-  void read(const ros::Time& time, const ros::Duration& elapsed_time) override;
+    /**
+     * Reads (in realtime) the state from the march robot.
+     *
+     * @param time Current time
+     * @param elapsed_time Duration since last write action
+     */
+    void read(
+        const ros::Time& time, const ros::Duration& elapsed_time) override;
 
-  /**
-   * @brief Perform all safety checks that might crash the exoskeleton.
-   */
-  void validate();
+    /**
+     * @brief Perform all safety checks that might crash the exoskeleton.
+     */
+    void validate();
 
-  /**
-   * Writes (in realtime) the commands from the controllers to the march robot.
-   *
-   * @param time Current time
-   * @param elapsed_time Duration since last write action
-   */
-  void write(const ros::Time& time, const ros::Duration& elapsed_time) override;
+    /**
+     * Writes (in realtime) the commands from the controllers to the march
+     * robot.
+     *
+     * @param time Current time
+     * @param elapsed_time Duration since last write action
+     */
+    void write(
+        const ros::Time& time, const ros::Duration& elapsed_time) override;
 
-  /**
-   * Returns the ethercat cycle time in milliseconds.
-   */
-  int getEthercatCycleTime() const;
+    /**
+     * Returns the ethercat cycle time in milliseconds.
+     */
+    int getEthercatCycleTime() const;
 
-  /**
-   * Wait for received PDO.
-   */
-  void waitForPdo();
+    /**
+     * Wait for received PDO.
+     */
+    void waitForPdo();
 
 private:
   void uploadJointNames(ros::NodeHandle& nh) const;
@@ -142,4 +145,4 @@ private:
   RtPublisherPtr<march_shared_msgs::PressureSolesData> pressure_sole_data_pub_;
 };
 
-#endif  // MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_H
+#endif // MARCH_HARDWARE_INTERFACE_MARCH_HARDWARE_INTERFACE_H

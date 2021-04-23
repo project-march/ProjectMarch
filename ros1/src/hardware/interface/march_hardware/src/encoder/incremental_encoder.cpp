@@ -1,10 +1,11 @@
 // Copyright 2019 Project March.
 #include "march_hardware/encoder/incremental_encoder.h"
 
-namespace march
-{
-IncrementalEncoder::IncrementalEncoder(size_t number_of_bits, double transmission)
-  : Encoder(number_of_bits), transmission_(transmission)
+namespace march {
+IncrementalEncoder::IncrementalEncoder(
+    size_t number_of_bits, double transmission)
+    : Encoder(number_of_bits)
+    , transmission_(transmission)
 {
 }
 
@@ -25,6 +26,6 @@ double IncrementalEncoder::toRadians(double iu, bool /*use_zero_position*/) cons
 
 double IncrementalEncoder::getTransmission() const
 {
-  return this->transmission_;
+    return this->transmission_;
 }
-}  //  namespace march
+} //  namespace march

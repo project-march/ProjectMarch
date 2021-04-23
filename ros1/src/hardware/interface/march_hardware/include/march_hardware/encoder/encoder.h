@@ -8,10 +8,8 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace march
-{
-class Encoder
-{
+namespace march {
+class Encoder {
 public:
   explicit Encoder(size_t number_of_bits);
 
@@ -58,19 +56,19 @@ public:
   static constexpr double PI_2 = 2 * M_PI;
 
 private:
-  /**
-   * Returns the total number of positions possible on an encoder
-   * with the given amount of bits.
-   * @param number_of_bits The resolution of the encoder
-   * @returns The total amount of different positions
-   * @throws HardwareException When the given resolution is outside the allowed range
-   *                           Which is determined by Encoder::MIN_RESOLUTION
-   *                           and Encoder::MAX_RESOLUTION.
-   */
-  static size_t calculateTotalPositions(size_t number_of_bits);
+    /**
+     * Returns the total number of positions possible on an encoder
+     * with the given amount of bits.
+     * @param number_of_bits The resolution of the encoder
+     * @returns The total amount of different positions
+     * @throws HardwareException When the given resolution is outside the
+     * allowed range Which is determined by Encoder::MIN_RESOLUTION and
+     * Encoder::MAX_RESOLUTION.
+     */
+    static size_t calculateTotalPositions(size_t number_of_bits);
 
-  size_t total_positions_ = 0;
+    size_t total_positions_ = 0;
 };
-}  // namespace march
+} // namespace march
 
-#endif  // MARCH_HARDWARE_ENCODER_H
+#endif // MARCH_HARDWARE_ENCODER_H

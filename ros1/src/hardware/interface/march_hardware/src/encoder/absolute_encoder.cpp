@@ -4,8 +4,7 @@
 
 #include <ros/ros.h>
 
-namespace march
-{
+namespace march {
 AbsoluteEncoder::AbsoluteEncoder(size_t number_of_bits, int32_t lower_limit_iu, int32_t upper_limit_iu,
                                  double lower_limit_rad, double upper_limit_rad, double lower_soft_limit_rad,
                                  double upper_soft_limit_rad)
@@ -68,47 +67,46 @@ double AbsoluteEncoder::toIU(double radians, bool use_zero_position) const
 
 bool AbsoluteEncoder::isWithinHardLimitsIU(int32_t iu) const
 {
-  return (iu > this->lower_limit_iu_ && iu < this->upper_limit_iu_);
+    return (iu > this->lower_limit_iu_ && iu < this->upper_limit_iu_);
 }
 
 bool AbsoluteEncoder::isWithinSoftLimitsIU(int32_t iu) const
 {
-  return (iu > this->lower_soft_limit_iu_ && iu < this->upper_soft_limit_iu_);
+    return (iu > this->lower_soft_limit_iu_ && iu < this->upper_soft_limit_iu_);
 }
 
-bool AbsoluteEncoder::isValidTargetIU(int32_t current_iu, int32_t target_iu) const
+bool AbsoluteEncoder::isValidTargetIU(
+    int32_t current_iu, int32_t target_iu) const
 {
-  if (target_iu <= this->lower_soft_limit_iu_)
-  {
-    return target_iu >= current_iu;
-  }
+    if (target_iu <= this->lower_soft_limit_iu_) {
+        return target_iu >= current_iu;
+    }
 
-  if (target_iu >= this->upper_soft_limit_iu_)
-  {
-    return target_iu <= current_iu;
-  }
+    if (target_iu >= this->upper_soft_limit_iu_) {
+        return target_iu <= current_iu;
+    }
 
-  return true;
+    return true;
 }
 
 int32_t AbsoluteEncoder::getUpperSoftLimitIU() const
 {
-  return this->upper_soft_limit_iu_;
+    return this->upper_soft_limit_iu_;
 }
 
 int32_t AbsoluteEncoder::getLowerSoftLimitIU() const
 {
-  return this->lower_soft_limit_iu_;
+    return this->lower_soft_limit_iu_;
 }
 
 int32_t AbsoluteEncoder::getUpperHardLimitIU() const
 {
-  return this->upper_limit_iu_;
+    return this->upper_limit_iu_;
 }
 
 int32_t AbsoluteEncoder::getLowerHardLimitIU() const
 {
-  return this->lower_limit_iu_;
+    return this->lower_limit_iu_;
 }
 
-}  // namespace march
+} // namespace march

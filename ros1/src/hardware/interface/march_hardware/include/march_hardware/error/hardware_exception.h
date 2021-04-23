@@ -6,70 +6,77 @@
 
 #include <exception>
 #include <ostream>
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
-namespace march
-{
-namespace error
-{
-class HardwareException : public std::exception
-{
-public:
-  explicit HardwareException(ErrorType type) : HardwareException(type, "")
-  {
-  }
+namespace march {
+namespace error {
+    class HardwareException : public std::exception {
+        const ErrorType type_ = ErrorType::UNKNOWN;
+        std::runtime_error m;
 
-  HardwareException(ErrorType type, const std::string& message)
-    : type_(type), description_(this->createDescription(message))
-  {
-  }
+    public:
+        explicit HardwareException(ErrorType type)
+            : HardwareException(type, "")
+        {
+        }
 
-  template <typename... Args>
-  HardwareException(ErrorType type, const std::string& format, Args... args) : type_(type)
-  {
-    const size_t size = std::snprintf(nullptr, 0, format.c_str(), args...);
-    std::vector<char> buffer(size + 1);  // note +1 for null terminator
-    std::snprintf(&buffer[0], buffer.size(), format.c_str(), args...);
+        HardwareException(ErrorType type, const std::string& message)
+            : type_(type)
+            , m(this->createDescription(message))
+        {
+        }
 
-    this->description_ = this->createDescription(std::string(buffer.data(), size));
-  }
+        template <typename... Args>
+        HardwareException(
+            ErrorType type, const std::string& format, Args... args)
+            : type_(type)
+            , m(this->createDescription(format, args...))
+        {
+        }
 
-  virtual ~HardwareException() noexcept = default;
+        virtual ~HardwareException() noexcept = default;
 
-  const char* what() const noexcept override
-  {
-    return this->description_.c_str();
-  }
+        const char* what() const noexcept override
+        {
+            return m.what();
+        }
 
-  ErrorType type() const noexcept
-  {
-    return this->type_;
-  }
+        ErrorType type() const noexcept
+        {
+            return this->type_;
+        }
 
-  friend std::ostream& operator<<(std::ostream& s, const HardwareException& e)
-  {
-    s << e.description_;
-    return s;
-  }
+        friend std::ostream& operator<<(
+            std::ostream& s, const HardwareException& e)
+        {
+            s << e.what();
+            return s;
+        }
 
-protected:
-  std::string createDescription(const std::string& message)
-  {
-    std::stringstream ss;
-    ss << this->type_;
-    if (!message.empty())
-    {
-      ss << std::endl;
-      ss << message;
-    }
-    return ss.str();
-  }
+    protected:
+        std::string createDescription(const std::string& message)
+        {
+            std::stringstream ss;
+            ss << this->type_;
+            if (!message.empty()) {
+                ss << std::endl;
+                ss << message;
+            }
+            return ss.str();
+        }
+        template <typename... Args>
+        std::string createDescription(const std::string& format, Args... args)
+        {
+            const size_t size = std::snprintf(
+                /*__s=*/nullptr, /*__maxlen=*/0, format.c_str(), args...);
+            std::vector<char> buffer(size + 1); // note +1 for null terminator
+            std::snprintf(&buffer[0], buffer.size(), format.c_str(), args...);
 
-  const ErrorType type_ = ErrorType::UNKNOWN;
-  std::string description_;
-};
+            return this->createDescription(std::string(buffer.data(), size));
+        }
+    };
 
 class NotImplemented : public std::logic_error
 {
@@ -87,4 +94,4 @@ public:
 }  // namespace error
 }  // namespace march
 
-#endif  // MARCH_HARDWARE_HARDWARE_EXCEPTION_H
+#endif // MARCH_HARDWARE_HARDWARE_EXCEPTION_H

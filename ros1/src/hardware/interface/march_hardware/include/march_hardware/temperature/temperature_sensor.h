@@ -2,15 +2,13 @@
 #ifndef MARCH_HARDWARE_TEMPERATURE_SENSOR_H
 #define MARCH_HARDWARE_TEMPERATURE_SENSOR_H
 
-namespace march
-{
-class TemperatureSensor
-{
+namespace march {
+class TemperatureSensor {
 public:
-  virtual ~TemperatureSensor() noexcept = default;
+    virtual ~TemperatureSensor() noexcept = default;
 
-  virtual float getTemperature() const = 0;
+    virtual float getTemperature() const = 0;
 };
-}  // namespace march
+} // namespace march
 
-#endif  // MARCH_HARDWARE_TEMPERATURE_SENSOR_H
+#endif // MARCH_HARDWARE_TEMPERATURE_SENSOR_H
