@@ -66,8 +66,8 @@ TEST_F(MotorControllerBuilderTest, ValidIMotionCube)
         this->joint->safety->soft_upper_limit);
     auto incremental_encoder
         = std::make_unique<march::IncrementalEncoder>(12, 101.0);
-    march::IMotionCube expected(
-        march::Slave(/*slave_index=*/2, this->pdo_interface, this->sdo_interface),
+    march::IMotionCube expected(march::Slave(/*slave_index=*/2,
+                                    this->pdo_interface, this->sdo_interface),
         std::move(absolute_encoder), std::move(incremental_encoder),
         march::ActuationMode::unknown);
     ASSERT_EQ(expected, *created);

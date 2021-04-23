@@ -175,7 +175,8 @@ void IMotionCube::actuateRadians(float target_position)
             target_position, MAX_TARGET_DIFFERENCE,
             this->getAbsolutePositionUnchecked(), this->getSlaveIndex());
     }
-    this->actuateIU(this->absolute_encoder_->toIU(target_position, /*use_zero_position=*/true));
+    this->actuateIU(this->absolute_encoder_->toIU(
+        target_position, /*use_zero_position=*/true));
 }
 
 void IMotionCube::actuateIU(int32_t target_iu)
@@ -580,7 +581,8 @@ std::unique_ptr<MotorControllerState> IMotionCube::getState()
 
 float IMotionCube::getAbsolutePositionUnchecked()
 {
-    return this->getAbsoluteEncoder()->toRadians(getAbsolutePositionIU(), /*use_zero_position=*/true);
+    return this->getAbsoluteEncoder()->toRadians(
+        getAbsolutePositionIU(), /*use_zero_position=*/true);
 }
 
 float IMotionCube::getIncrementalPositionUnchecked()

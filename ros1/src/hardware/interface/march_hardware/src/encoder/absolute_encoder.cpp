@@ -14,8 +14,10 @@ AbsoluteEncoder::AbsoluteEncoder(size_t number_of_bits, int32_t lower_limit_iu,
 {
     this->zero_position_iu_ = this->lower_limit_iu_
         - lower_limit_rad * this->getTotalPositions() / PI_2;
-    this->lower_soft_limit_iu_ = this->toIU(lower_soft_limit_rad, /*use_zero_position=*/true);
-    this->upper_soft_limit_iu_ = this->toIU(upper_soft_limit_rad, /*use_zero_position=*/true);
+    this->lower_soft_limit_iu_
+        = this->toIU(lower_soft_limit_rad, /*use_zero_position=*/true);
+    this->upper_soft_limit_iu_
+        = this->toIU(upper_soft_limit_rad, /*use_zero_position=*/true);
 
     if (this->lower_limit_iu_ >= this->upper_limit_iu_
         || this->lower_soft_limit_iu_ >= this->upper_soft_limit_iu_
