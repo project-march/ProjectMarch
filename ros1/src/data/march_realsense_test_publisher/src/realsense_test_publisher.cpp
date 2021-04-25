@@ -64,9 +64,9 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
             } else {
                 std::string file_names_string = getFileNamesString();
 
-                ROS_WARN_STREAM(
-                        "Failed to publish pointcloud with file name " << req.pointcloud_file_name
-                        << " \n Valid options are: \n" << file_names_string);
+                ROS_WARN_STREAM("Failed to publish pointcloud with file name "
+                    << req.pointcloud_file_name << " \n Valid options are: \n"
+                    << file_names_string);
             }
             break;
         }
