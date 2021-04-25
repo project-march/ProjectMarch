@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(march_hardware_builder)
 
-add_compile_options(-std=c++14 -Wall -Wextra -Werror)
+add_compile_options(-std=c++17 -Wall -Wextra -Werror)
 
 find_package(catkin REQUIRED COMPONENTS
     march_hardware
@@ -56,6 +56,7 @@ if(CATKIN_ENABLE_TESTING)
         test/absolute_encoder_builder_test.cpp
         test/allowed_robot_test.cpp
         test/imc_builder_test.cpp
+        test/motor_controller_builder_test.cpp
         test/incremental_encoder_builder_test.cpp
         test/joint_builder_test.cpp
         test/pdb_builder_test.cpp

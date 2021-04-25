@@ -1,4 +1,6 @@
 #include <ctime>
+#include <dynamic_reconfigure/server.h>
+#include <map>
 #include <march_realsense_reader/realsense_reader.h>
 #include <march_shared_msgs/GetGaitParameters.h>
 #include <pcl/point_types.h>
@@ -18,42 +20,48 @@ using PlaneCoefficientsVector = std::vector<pcl::ModelCoefficients::Ptr>;
 using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
 using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
 
-std::string POINTCLOUD_TOPIC = "/camera_front/depth/color/points";
+std::string TOPIC_CAMERA_FRONT = "/camera_front/depth/color/points";
+std::string TOPIC_CAMERA_BACK = "/camera_back/depth/color/points";
+std::map<int, std::string> POINTCLOUD_TOPICS
+    = { { march_shared_msgs::GetGaitParametersRequest::CAMERA_FRONT,
+            TOPIC_CAMERA_FRONT },
+          { march_shared_msgs::GetGaitParametersRequest::CAMERA_BACK,
+              TOPIC_CAMERA_BACK } };
 ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(/*t=*/1.0); // secs
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     : n_(n)
 {
-    pointcloud_subscriber_
-        = n_->subscribe<sensor_msgs::PointCloud2>(POINTCLOUD_TOPIC,
-            /*queue_size=*/1, &RealSenseReader::pointcloudCallback, this);
-    read_pointcloud_service_
-        = n_->advertiseService("/camera/process_pointcloud",
-            &RealSenseReader::processPointcloudCallback, this);
 
-    config_tree_ = readConfig("pointcloud_parameters.yaml");
-
-    if (config_tree_["debug"]) {
-        debugging_ = config_tree_["debug"].as<bool>();
-    } else {
-        debugging_ = false;
+    // Create a subscriber for every pointcloud topic
+    for (auto& item : POINTCLOUD_TOPICS) {
+        pointcloud_subscribers_[item.first]
+            = n_->subscribe<sensor_msgs::PointCloud2>(item.second,
+                /*queue_size=*/1, &RealSenseReader::pointcloudCallback, this);
     }
 
-    preprocessor_ = std::make_unique<NormalsPreprocessor>(
-        getConfigIfPresent("preprocessor"), debugging_);
-    region_creator_ = std::make_unique<RegionGrower>(
-        getConfigIfPresent("region_creator"), debugging_);
-    hull_finder_ = std::make_unique<CHullFinder>(
-        getConfigIfPresent("hull_finder"), debugging_);
-    parameter_determiner_ = std::make_unique<HullParameterDeterminer>(
-        getConfigIfPresent("parameter_determiner"), debugging_);
+    read_pointcloud_service_
+        = n_->advertiseService(/*service=*/"/camera/process_pointcloud",
+            &RealSenseReader::processPointcloudCallback, this);
+
+    preprocessor_ = std::make_unique<NormalsPreprocessor>(debugging_);
+    region_creator_ = std::make_unique<RegionGrower>(debugging_);
+    hull_finder_ = std::make_unique<CHullFinder>(debugging_);
+    parameter_determiner_
+        = std::make_unique<HullParameterDeterminer>(debugging_);
+
+    if (ros::param::get("/realsense_debug", debugging_launch)) {
+        debugging_ = debugging_launch;
+    } else {
+        ROS_WARN("Unable to obtain debug parameter from parameter server");
+    }
 
     if (debugging_) {
         ROS_DEBUG(
             "Realsense reader started with debugging, all intermediate result "
             "steps will be published and more information given in console, but"
             " this might slow the process, this can be turned off in the "
-            "yaml.");
+            "realsense_reader.launch of with dynamic reconfiguring.");
         if (ros::console::set_logger_level(
                 ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug)) {
             ros::console::notifyLoggerLevelsChanged();
@@ -73,32 +81,28 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     }
 }
 
-YAML::Node RealSenseReader::readConfig(std::string config_file)
+void RealSenseReader::readConfigCb(
+    march_realsense_reader::pointcloud_parametersConfig& config, uint32_t level)
 {
-    YAML::Node config_tree;
-    std::string path = ros::package::getPath("march_realsense_reader")
-        + "/config/" + config_file;
-    try {
-        config_tree = YAML::LoadFile(path);
-    } catch (YAML::Exception& e) {
-        ROS_WARN_STREAM("YAML file with path " << path
-                                               << " could not be loaded, using "
-                                                  "empty config instead");
-    }
-    return config_tree;
-}
+    ROS_DEBUG(
+        "Changed march_realsense_parameters with dynamic reconfiguration");
 
-YAML::Node RealSenseReader::getConfigIfPresent(std::string key)
-{
-    if (config_tree_[key]) {
-        return config_tree_[key];
-    } else {
-        ROS_WARN_STREAM("Key "
-            << key
-            << " was not found in the config file, empty config "
-               "will be used");
-        return YAML::Node();
+    // Only dynamically reconfigure debug flag if flag was true at launch
+    if (debugging_launch) {
+        debugging_ = config.debug;
     }
+
+    if (not debugging_) {
+        if (ros::console::set_logger_level(
+                ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info)) {
+            ros::console::notifyLoggerLevelsChanged();
+        }
+    }
+
+    preprocessor_->readParameters(config);
+    region_creator_->readParameters(config);
+    parameter_determiner_->readParameters(config);
+    hull_finder_->readParameters(config);
 }
 
 // This method executes the logic to process a pointcloud
@@ -202,6 +206,8 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
         << std::endl);
 
     res.success = true;
+    // Returning false means that the service was not able to respond at all,
+    // this causes problems with the bridge, therefore always return true!
     return true;
 }
 
@@ -398,10 +404,16 @@ bool RealSenseReader::processPointcloudCallback(
     frame_id_to_transform_to_ = req.frame_id_to_transform_to;
 
     time_t start_callback = clock();
-
+    if (req.camera_to_use >= POINTCLOUD_TOPICS.size()) {
+        res.error_message
+            = "Unknown camera given in the request, not available in the "
+              "POINTCLOUD_TOPICS in the realsense_reader";
+        res.success = false;
+        return true;
+    }
     boost::shared_ptr<const sensor_msgs::PointCloud2> input_cloud
         = ros::topic::waitForMessage<sensor_msgs::PointCloud2>(
-            POINTCLOUD_TOPIC, *n_, POINTCLOUD_TIMEOUT);
+            POINTCLOUD_TOPICS[req.camera_to_use], *n_, POINTCLOUD_TIMEOUT);
 
     if (input_cloud == nullptr) {
         res.error_message = "No pointcloud published within timeout, so "

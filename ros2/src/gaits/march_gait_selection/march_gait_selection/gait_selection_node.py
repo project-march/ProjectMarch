@@ -15,4 +15,10 @@ def main():
     gait_state_machine = GaitStateMachine(gait_selection, scheduler)
     gait_state_machine.run()
     executor = MultiThreadedExecutor()
-    rclpy.spin(gait_selection, executor)
+
+    try:
+        rclpy.spin(gait_selection, executor)
+    except KeyboardInterrupt:
+        pass
+
+    rclpy.shutdown()
