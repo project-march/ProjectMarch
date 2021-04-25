@@ -94,12 +94,14 @@ bool RealsenseTestPublisher::publishCustomPointcloud(
     if (filename_iterator == file_names.end()) {
         return false;
     }
+    std::string selected_file_name = *filename_iterator;
 
     pointcloud_to_publish = boost::make_shared<PointCloud>();
     pcl::io::loadPLYFile<pcl::PointXYZ>(
-        data_path.string() + (*filename_iterator), *pointcloud_to_publish);
+        data_path.string() + selected_file_name, *pointcloud_to_publish);
     ROS_DEBUG_STREAM("The file from path "
-        << (*filename_iterator) << " has been loaded up! now publishing a pointcloud with " << pointcloud_to_publish->points.size() << " points.");
+        << selected_file_name << " has been loaded up! now publishing a pointcloud with "
+        << pointcloud_to_publish->points.size() << " points.");
     publishTestCloudOnTimer();
     return true;
 }
@@ -132,7 +134,8 @@ void RealsenseTestPublisher::testForParseErrors()
         pcl::io::loadPLYFile<pcl::PointXYZ>(
                 data_path.string() + name, *pointcloud_to_publish);
         ROS_DEBUG_STREAM("The file from path "
-                                 << name << "has been loaded up! now publishing");
+            << name << " has been loaded up! now publishing a pointcloud with "
+            << pointcloud_to_publish->points.size() << " points.");
         publishTestCloudOnTimer();
     }
 }

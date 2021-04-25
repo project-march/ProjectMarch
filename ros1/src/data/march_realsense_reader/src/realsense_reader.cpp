@@ -422,10 +422,10 @@ bool RealSenseReader::processPointcloudCallback(
     if (input_cloud == nullptr) {
         res.error_message = "No pointcloud published within timeout, so "
                             "no processing could be done.";
+        ROS_WARN_STREAM(res.error_message);
         res.success = false;
-        return false;
+        return true;
     }
-
     PointCloud converted_cloud;
     pcl::fromROSMsg(*input_cloud, converted_cloud);
     PointCloud::Ptr point_cloud
@@ -440,5 +440,5 @@ bool RealSenseReader::processPointcloudCallback(
         << std::fixed << time_taken << std::setprecision(5) << " sec "
         << std::endl);
 
-    return success;
+    return true;
 }
