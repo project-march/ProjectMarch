@@ -1,4 +1,5 @@
 #include <ctime>
+#include <dynamic_reconfigure/server.h>
 #include <map>
 #include <march_realsense_reader/realsense_reader.h>
 #include <march_shared_msgs/GetGaitParameters.h>
@@ -22,6 +23,7 @@ using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
 std::string TOPIC_CAMERA_FRONT = "/camera_front/depth/color/points";
 std::string TOPIC_CAMERA_BACK = "/camera_back/depth/color/points";
 std::string TOPIC_TEST_CLOUDS = "/test_clouds";
+
 std::map<int, std::string> POINTCLOUD_TOPICS
     = { { march_shared_msgs::GetGaitParametersRequest::CAMERA_FRONT,
             TOPIC_CAMERA_FRONT },
@@ -46,29 +48,24 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
         = n_->advertiseService(/*service=*/"/camera/process_pointcloud",
             &RealSenseReader::processPointcloudCallback, this);
 
-    config_tree_ = readConfig("pointcloud_parameters.yaml");
+    preprocessor_ = std::make_unique<NormalsPreprocessor>(debugging_);
+    region_creator_ = std::make_unique<RegionGrower>(debugging_);
+    hull_finder_ = std::make_unique<CHullFinder>(debugging_);
+    parameter_determiner_
+        = std::make_unique<HullParameterDeterminer>(debugging_);
 
-    if (config_tree_["debug"]) {
-        debugging_ = config_tree_["debug"].as<bool>();
+    if (ros::param::get("/realsense_debug", debugging_launch)) {
+        debugging_ = debugging_launch;
     } else {
-        debugging_ = false;
+        ROS_WARN("Unable to obtain debug parameter from parameter server");
     }
-
-    preprocessor_ = std::make_unique<NormalsPreprocessor>(
-        getConfigIfPresent("preprocessor"), debugging_);
-    region_creator_ = std::make_unique<RegionGrower>(
-        getConfigIfPresent("region_creator"), debugging_);
-    hull_finder_ = std::make_unique<CHullFinder>(
-        getConfigIfPresent("hull_finder"), debugging_);
-    parameter_determiner_ = std::make_unique<HullParameterDeterminer>(
-        getConfigIfPresent("parameter_determiner"), debugging_);
 
     if (debugging_) {
         ROS_DEBUG(
             "Realsense reader started with debugging, all intermediate result "
             "steps will be published and more information given in console, but"
             " this might slow the process, this can be turned off in the "
-            "yaml.");
+            "realsense_reader.launch of with dynamic reconfiguring.");
         if (ros::console::set_logger_level(
                 ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug)) {
             ros::console::notifyLoggerLevelsChanged();
@@ -88,32 +85,28 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     }
 }
 
-YAML::Node RealSenseReader::readConfig(std::string config_file)
+void RealSenseReader::readConfigCb(
+    march_realsense_reader::pointcloud_parametersConfig& config, uint32_t level)
 {
-    YAML::Node config_tree;
-    std::string path = ros::package::getPath("march_realsense_reader")
-        + "/config/" + config_file;
-    try {
-        config_tree = YAML::LoadFile(path);
-    } catch (YAML::Exception& e) {
-        ROS_WARN_STREAM("YAML file with path " << path
-                                               << " could not be loaded, using "
-                                                  "empty config instead");
-    }
-    return config_tree;
-}
+    ROS_DEBUG(
+        "Changed march_realsense_parameters with dynamic reconfiguration");
 
-YAML::Node RealSenseReader::getConfigIfPresent(std::string key)
-{
-    if (config_tree_[key]) {
-        return config_tree_[key];
-    } else {
-        ROS_WARN_STREAM("Key "
-            << key
-            << " was not found in the config file, empty config "
-               "will be used");
-        return YAML::Node();
+    // Only dynamically reconfigure debug flag if flag was true at launch
+    if (debugging_launch) {
+        debugging_ = config.debug;
     }
+
+    if (not debugging_) {
+        if (ros::console::set_logger_level(
+                ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info)) {
+            ros::console::notifyLoggerLevelsChanged();
+        }
+    }
+
+    preprocessor_->readParameters(config);
+    region_creator_->readParameters(config);
+    parameter_determiner_->readParameters(config);
+    hull_finder_->readParameters(config);
 }
 
 // This method executes the logic to process a pointcloud

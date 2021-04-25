@@ -1,7 +1,6 @@
 #ifndef MARCH_REALSENSE_READER_HPP
 #define MARCH_REALSENSE_READER_HPP
 
-#include "yaml-cpp/yaml.h"
 #include <march_shared_msgs/GetGaitParameters.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
@@ -14,6 +13,9 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <string>
 #include <visualization_msgs/MarkerArray.h>
+
+#include <dynamic_reconfigure/server.h>
+#include <march_realsense_reader/pointcloud_parametersConfig.h>
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
@@ -41,15 +43,9 @@ public:
      */
     void pointcloudCallback(const sensor_msgs::PointCloud2 pointCloud2) {};
 
-    /** Read in the config file, the string is the name of the file, which
-     * should be in the config directory. Returns a YAML::Node with the
-     * configurations.
-     */
-    YAML::Node readConfig(std::string config_file);
-
-    // Get a config key from the root of the file, returns empty if key is
-    // missing.
-    YAML::Node getConfigIfPresent(std::string key);
+    void readConfigCb(
+        march_realsense_reader::pointcloud_parametersConfig& config,
+        uint32_t level);
 
     // Publishes the pointcloud on a topic for visualisation in rviz or furter
     // use
@@ -102,12 +98,15 @@ private:
     ros::Publisher hull_parameter_determiner_publisher_;
     ros::Publisher pointcloud_publisher_;
 
-    std::string config_file_;
-    YAML::Node config_tree_;
+    // Debugging flag at launch
+    bool debugging_launch;
+
+    // Debugging flag, dynamically reconfigurable debugging_launch is true
+    bool debugging_;
+
     std::string frame_id_to_transform_to_;
 
     int selected_gait_;
-    bool debugging_;
     bool use_left_foot_;
 };
 

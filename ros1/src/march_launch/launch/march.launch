@@ -39,6 +39,8 @@
     from datasets should be started."/>
     <include file="$(find march_launch)/launch/realsense_camera.launch"
              if="$(eval (not realsense_simulation) and realsense)" pass_all_args="true"/>
+    <arg name="realsense_debug" default="true" doc="Enables the debugging for the realsense_reader_node"/>
+    <param name="realsense_debug" value="$(arg realsense_debug)"/>
     <arg name="data_collector" default="false" doc="Launches the data collector when true."/>
     <arg name="pressure_soles" default="false" doc="Whether a connection with pressure_soles should be established." />
     <arg name="moticon_ip" default="192.168.8.105" doc="The ip-adress with Moticon software running on it, defaults to
