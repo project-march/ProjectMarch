@@ -49,7 +49,8 @@ private:
     ros::ServiceServer publish_test_cloud_service;
     ros::Publisher test_cloud_publisher;
 
-    std::vector<path> file_paths;
+    std::vector<std::string> file_names;
+    path data_path;
     std::string pointcloud_topic;
     PointCloud::Ptr pointcloud_to_publish;
 };
