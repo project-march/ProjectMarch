@@ -45,6 +45,9 @@ private:
     // Publish a pointcloud
     void publishTestCloud();
 
+    // This is temporary!!!
+    void testForParseErrors();
+
     ros::NodeHandle* n_;
     ros::ServiceServer publish_test_cloud_service;
     ros::Publisher test_cloud_publisher;
