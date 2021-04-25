@@ -110,12 +110,12 @@ void RealsenseTestPublisher::publishTestCloudOnTimer()
 {
     ros::Timer timer_publisher = n_->createTimer(ros::Duration(PUBLISH_RATE),
         std::bind(&RealsenseTestPublisher::publishTestCloud, this));
-    ROS_WARN_STREAM("The timer has been created")
+    ROS_WARN_STREAM("The timer has been created");
 }
 
 void RealsenseTestPublisher::publishTestCloud()
 {
-    ROS_WARN_STREAM("The timer calls on the publisher")
+    ROS_WARN_STREAM("The timer calls on the publisher");
     test_cloud_publisher.publish(pointcloud_to_publish);
 }
 
