@@ -7,11 +7,13 @@
 #include <ros/package.h>
 #include <string>
 #include <utilities/camera_mode_utilities.h>
+#include <pcl_conversions/pcl_conversions.h>
 
 using namespace std::filesystem;
 
 std::string TOPIC_TEST_CLOUDS = "/test_clouds";
-float PUBLISH_RATE = 1.0 / 5.0;
+float PUBLISH_RATE = 5.0; // images per second
+std::string CAMERA_FRAME_ID = "camera_front_depth_optical_frame";
 
 RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     : n_(n)
@@ -108,16 +110,26 @@ bool RealsenseTestPublisher::publishCustomPointcloud(
 
 void RealsenseTestPublisher::publishTestCloudOnTimer()
 {
-    ros::Timer timer_publisher = n_->createTimer(ros::Duration(PUBLISH_RATE),
-        std::bind(&RealsenseTestPublisher::publishTestCloud, this));
-    ROS_WARN_STREAM("The timer has been created");
+//    ros::Timer timer_publisher = n_->createTimer(ros::Duration(PUBLISH_RATE),
+//        std::bind(&RealsenseTestPublisher::publishTestCloud, this));
+//    ROS_WARN_STREAM("The timer has been created");
+
+    ros::Rate loop_rate(PUBLISH_RATE);
+    pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID;
+    while (n_->ok()) {
+        pcl_conversions::toPCL(ros::Time::now(), pointcloud_to_publish->header.stamp);
+        test_cloud_publisher.publish(pointcloud_to_publish);
+        ROS_WARN_STREAM("Pointcloud has actually been published");
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
 }
 
-void RealsenseTestPublisher::publishTestCloud()
-{
-    ROS_WARN_STREAM("The timer calls on the publisher");
-    test_cloud_publisher.publish(pointcloud_to_publish);
-}
+//void RealsenseTestPublisher::publishTestCloud()
+//{
+//    ROS_WARN_STREAM("The timer calls on the publisher");
+//    test_cloud_publisher.publish(pointcloud_to_publish);
+//}
 
 std::string RealsenseTestPublisher::getFileNamesString()
 {
@@ -131,13 +143,13 @@ std::string RealsenseTestPublisher::getFileNamesString()
 // This is temporary
 void RealsenseTestPublisher::testForParseErrors()
 {
-    for (std::string name : file_names) {
-        pointcloud_to_publish = boost::make_shared<PointCloud>();
-        pcl::io::loadPLYFile<pcl::PointXYZ>(
-                data_path.string() + name, *pointcloud_to_publish);
-        ROS_DEBUG_STREAM("The file from path "
-            << name << " has been loaded up! now publishing a pointcloud with "
-            << pointcloud_to_publish->points.size() << " points.");
-        publishTestCloudOnTimer();
-    }
+//    for (std::string name : file_names) {
+//        pointcloud_to_publish = boost::make_shared<PointCloud>();
+//        pcl::io::loadPLYFile<pcl::PointXYZ>(
+//                data_path.string() + name, *pointcloud_to_publish);
+//        ROS_DEBUG_STREAM("The file from path "
+//            << name << " has been loaded up! now publishing a pointcloud with "
+//            << pointcloud_to_publish->points.size() << " points.");
+//        publishTestCloudOnTimer();
+//    }
 }
