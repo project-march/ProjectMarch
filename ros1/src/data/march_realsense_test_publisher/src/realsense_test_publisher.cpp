@@ -67,7 +67,6 @@ void RealsenseTestPublisher::publishCustomPointcloud(
     pcl::io::loadPLYFile<pcl::PointXYZ>(
                 data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
     pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID;
-    publishTestCloud();
 }
 
 
