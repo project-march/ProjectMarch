@@ -56,7 +56,7 @@ private:
     PointCloud::Ptr pointcloud_to_publish;
     std::string pointcloud_file_name;
     SelectedMode selected_mode;
-    bool ready_to_publish;
+    bool should_publish;
 };
 
 #endif // MARCH_REALSENSE_TEST_PUBLISHER_H

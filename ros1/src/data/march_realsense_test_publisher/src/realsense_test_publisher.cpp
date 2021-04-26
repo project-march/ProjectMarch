@@ -12,7 +12,7 @@
 using namespace std::filesystem;
 
 std::string TOPIC_TEST_CLOUDS = "/test_clouds";
-float PUBLISH_RATE = 1.0; // images per second
+float PUBLISH_RATE = 10.0; // images per second
 std::string CAMERA_FRAME_ID = "camera_front_depth_optical_frame";
 
 RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
@@ -39,7 +39,7 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     test_cloud_publisher
         = n_->advertise<PointCloud>(TOPIC_TEST_CLOUDS, /*queue_size=*/1);
 
-    ready_to_publish = false;
+    should_publish = false;
     runPublishLoop();
 }
 
@@ -75,7 +75,7 @@ void RealsenseTestPublisher::runPublishLoop()
 {
     ros::Rate loop_rate(PUBLISH_RATE);
     while (n_->ok()) {
-        if (ready_to_publish) {
+        if (should_publish) {
             pcl_conversions::toPCL(
                 ros::Time::now(), pointcloud_to_publish->header.stamp);
             test_cloud_publisher.publish(pointcloud_to_publish);
@@ -100,29 +100,29 @@ void RealsenseTestPublisher::updatePublishLoop()
         case SelectedMode::start: {
             ROS_DEBUG_STREAM("Start publishing pointclouds");
             //            startPublishingPointclouds();
-            ready_to_publish = true;
+            should_publish = true;
             break;
         }
         case SelectedMode::next: {
             ROS_DEBUG_STREAM("Publish next pointcloud");
             //            publishNextPointcloud();
-            ready_to_publish = true;
+            should_publish = true;
             break;
         }
         case SelectedMode::custom: {
             ROS_DEBUG_STREAM("Publish a custom pointcloud");
             publishCustomPointcloud(pointcloud_file_name);
-            ready_to_publish = true;
+            should_publish = true;
             break;
         }
         case SelectedMode::slide_show: {
             ROS_DEBUG_STREAM("Publish a slide show of pointclouds");
             //            publishSlideShow();
-            ready_to_publish = true;
+            should_publish = true;
         }
         case SelectedMode::end: {
             ROS_DEBUG_STREAM("Stop publishing pointclouds");
-            ready_to_publish = false;
+            should_publish = false;
             break;
         }
     }
