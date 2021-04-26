@@ -12,7 +12,6 @@
 using namespace std::filesystem;
 
 std::string TOPIC_TEST_CLOUDS = "/test_clouds";
-float PUBLISH_RATE = 1.0 / 10.0; // images per second
 std::string CAMERA_FRAME_ID = "camera_front_depth_optical_frame";
 
 RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
