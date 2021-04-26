@@ -40,11 +40,6 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
         = n_->advertise<PointCloud>(TOPIC_TEST_CLOUDS, /*queue_size=*/1);
 
     should_publish = false;
-
-    ros::Timer timer_publish_pointcloud = n_->createTimer(ros::Duration(PUBLISH_RATE),
-                                                          &RealsenseTestPublisher::publishTestCloud, this);
-
-    ROS_WARN_STREAM("TESTSDFSDFSDFSDFSDF");
 }
 
 bool RealsenseTestPublisher::publishTestDatasetCallback(
