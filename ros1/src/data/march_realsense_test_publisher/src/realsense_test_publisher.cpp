@@ -3,11 +3,11 @@
 #include <march_shared_msgs/PublishTestDataset.h>
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
+#include <pcl_conversions/pcl_conversions.h>
 #include <realsense_test_publisher.h>
 #include <ros/package.h>
 #include <string>
 #include <utilities/publish_mode_utilities.h>
-#include <pcl_conversions/pcl_conversions.h>
 
 using namespace std::filesystem;
 
@@ -59,23 +59,25 @@ void RealsenseTestPublisher::publishCustomPointcloud(
     std::vector<std::string>::iterator filename_iterator
         = std::find(file_names.begin(), file_names.end(), pointcloud_file_name);
     if (filename_iterator == file_names.end()) {
-        ROS_WARN_STREAM("the given file name " << pointcloud_file_name << " is invalid. Must be one of " << getFileNamesString());
+        ROS_WARN_STREAM("the given file name " << pointcloud_file_name
+                                               << " is invalid. Must be one of "
+                                               << getFileNamesString());
         return;
     }
 
     pointcloud_to_publish = boost::make_shared<PointCloud>();
     pcl::io::loadPLYFile<pcl::PointXYZ>(
-                data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
+        data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
     pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID;
 }
-
 
 void RealsenseTestPublisher::runPublishLoop()
 {
     ros::Rate loop_rate(PUBLISH_RATE);
-    while(n_->ok()) {
+    while (n_->ok()) {
         if (ready_to_publish) {
-            pcl_conversions::toPCL(ros::Time::now(), pointcloud_to_publish->header.stamp);
+            pcl_conversions::toPCL(
+                ros::Time::now(), pointcloud_to_publish->header.stamp);
             test_cloud_publisher.publish(pointcloud_to_publish);
             ros::spinOnce();
             loop_rate.sleep();
@@ -124,6 +126,6 @@ void RealsenseTestPublisher::updatePublishLoop()
             break;
         }
     }
-    ROS_DEBUG_STREAM("Now publishing a pointcloud with name " << pointcloud_file_name);
-
+    ROS_DEBUG_STREAM(
+        "Now publishing a pointcloud with name " << pointcloud_file_name);
 }

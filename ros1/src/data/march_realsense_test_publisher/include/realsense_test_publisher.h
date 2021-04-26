@@ -8,8 +8,8 @@
 #include <pcl_ros/point_cloud.h>
 #include <ros/ros.h>
 #include <string>
-#include <vector>
 #include <utilities/publish_mode_utilities.h>
+#include <vector>
 
 using namespace std::filesystem;
 using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
