@@ -40,6 +40,9 @@ def generate_launch_description():
     minimum_fake_temperature = LaunchConfiguration("minimum_fake_temperature")
     maximum_fake_temperature = LaunchConfiguration("maximum_fake_temperature")
 
+    # Mpc visualization
+    mpc_visualization = LaunchConfiguration("mpc_visualization")
+
     return launch.LaunchDescription(
         [
             # GENERAL ARGUMENTS
@@ -160,6 +163,12 @@ def generate_launch_description():
                 default_value="30",
                 description="Upper bound to generate fake temperatures from",
             ),
+            # MPC VISUALIZATION ARGUMENTS
+            DeclareLaunchArgument(
+                "mpc_visualization",
+                default_value="false",
+                description="Whether to launch the visualization of the model predictive controller",
+            ),
             # Launch rqt input device if not rqt_input:=false
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
@@ -249,6 +258,20 @@ def generate_launch_description():
                     ("maximum_fake_temperature", maximum_fake_temperature),
                 ],
                 condition=IfCondition(fake_sensor_data),
+            ),
+            # March mpc visualization node
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    os.path.join(
+                        get_package_share_directory("march_mpc_visualization"),
+                        "launch",
+                        "march_mpc_visualization.launch.py",
+                    )
+                ),
+                launch_arguments=[
+                    ("mpc_visualization", mpc_visualization),
+                ],
+                condition=IfCondition(mpc_visualization),
             ),
         ]
     )

@@ -40,6 +40,9 @@ def generate_launch_description():
     minimum_fake_temperature = LaunchConfiguration("minimum_fake_temperature")
     maximum_fake_temperature = LaunchConfiguration("maximum_fake_temperature")
 
+    # Mpc visualization
+    mpc_visualization = LlaunchConfiguration("mpc_visualization")
+
     return launch.LaunchDescription(
         [
             # GENERAL ARGUMENTS
@@ -162,6 +165,12 @@ def generate_launch_description():
                 default_value="30",
                 description="Upper bound to generate fake temperatures from",
             ),
+            # MPC VISUALIZATION ARGUMENTS
+            DeclareLaunchArgument(
+                "mpc_visualization",
+                default_value="false",
+                description="Whether to launch the visualization of the model predictive controller",
+            ),
             # Use normal launch file with different launch_arguments
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
@@ -192,6 +201,7 @@ def generate_launch_description():
                     ("fake_sensor_data", fake_sensor_data),
                     ("minimum_fake_temperature", minimum_fake_temperature),
                     ("maximum_fake_temperature", maximum_fake_temperature),
+                    ("mpc_visualization", mpc_visualization),
                 ],
             ),
         ]
