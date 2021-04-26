@@ -39,16 +39,17 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     test_cloud_publisher
         = n_->advertise<PointCloud>(TOPIC_TEST_CLOUDS, /*queue_size=*/1);
 
-    publishLoop();
+    ready_to_publish = false;
+    runPublishLoop();
 }
 
 bool RealsenseTestPublisher::publishTestDatasetCallback(
     march_shared_msgs::PublishTestDataset::Request& req,
     march_shared_msgs::PublishTestDataset::Response& res)
 {
-    new_callback = true;
     selected_mode = (SelectedMode)req.selected_mode;
     pointcloud_file_name = req.pointcloud_file_name;
+    updatePublishLoop();
     return true;
 }
 
@@ -61,20 +62,26 @@ void RealsenseTestPublisher::publishCustomPointcloud(
         ROS_WARN_STREAM("the given file name " << pointcloud_file_name << " is invalid. Must be one of " << getFileNamesString());
         return;
     }
-    std::string selected_file_name = *filename_iterator;
 
     pointcloud_to_publish = boost::make_shared<PointCloud>();
     pcl::io::loadPLYFile<pcl::PointXYZ>(
-        data_path.string() + selected_file_name, *pointcloud_to_publish);
+                data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
     pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID;
     publishTestCloud();
 }
 
 
-void RealsenseTestPublisher::publishTestCloud()
+void RealsenseTestPublisher::runPublishLoop()
 {
-    pcl_conversions::toPCL(ros::Time::now(), pointcloud_to_publish->header.stamp);
-    test_cloud_publisher.publish(pointcloud_to_publish);
+    ros::Rate loop_rate(PUBLISH_RATE);
+    while(n_->ok()) {
+        if (ready_to_publish) {
+            pcl_conversions::toPCL(ros::Time::now(), pointcloud_to_publish->header.stamp);
+            test_cloud_publisher.publish(pointcloud_to_publish);
+            ros::spinOnce();
+            loop_rate.sleep();
+        }
+    }
 }
 
 std::string RealsenseTestPublisher::getFileNamesString()
@@ -86,48 +93,38 @@ std::string RealsenseTestPublisher::getFileNamesString()
     return file_names_string;
 }
 
-void RealsenseTestPublisher::publishLoop()
+void RealsenseTestPublisher::updatePublishLoop()
 {
-    ros::Rate loop_rate(PUBLISH_RATE);
-    while(n_->ok()) {
-        switch (selected_mode) {
-            case SelectedMode::start: {
-                //            startPublishingPointclouds();
-                if (new_callback) {
-                    ROS_DEBUG_STREAM("Started publishing pointclouds");
-                }
-                break;
-            }
-            case SelectedMode::next: {
-                //            publishNextPointcloud();
-                if (new_callback) {
-                    ROS_DEBUG_STREAM("Publishing next pointcloud");
-                }
-                break;
-            }
-            case SelectedMode::custom: {
-                publishCustomPointcloud(pointcloud_file_name);
-                if (new_callback) {
-                    ROS_DEBUG_STREAM("Publishing a custom pointcloud with file name " << pointcloud_file_name);
-                }
-                break;
-            }
-            case SelectedMode::slide_show: {
-                //            publishSlideShow();
-                if (new_callback) {
-                    ROS_DEBUG_STREAM("Publishing a slide show of pointclouds");
-                }
-            }
-            case SelectedMode::end: {
-                if (new_callback) {
-                    ROS_DEBUG_STREAM("Stopped publishing pointclouds");
-                }
-                break;
-            }
+    switch (selected_mode) {
+        case SelectedMode::start: {
+            ROS_DEBUG_STREAM("Start publishing pointclouds");
+            //            startPublishingPointclouds();
+            ready_to_publish = true;
+            break;
         }
-        new_callback = false;
-        ROS_DEBUG_STREAM_THROTTLE(5, "Now publishing a pointcloud with name " << pointcloud_file_name);
-        ros::spinOnce();
-        loop_rate.sleep();
+        case SelectedMode::next: {
+            ROS_DEBUG_STREAM("Publish next pointcloud");
+            //            publishNextPointcloud();
+            ready_to_publish = true;
+            break;
+        }
+        case SelectedMode::custom: {
+            ROS_DEBUG_STREAM("Publish a custom pointcloud");
+            publishCustomPointcloud(pointcloud_file_name);
+            ready_to_publish = true;
+            break;
+        }
+        case SelectedMode::slide_show: {
+            ROS_DEBUG_STREAM("Publish a slide show of pointclouds");
+            //            publishSlideShow();
+            ready_to_publish = true;
+        }
+        case SelectedMode::end: {
+            ROS_DEBUG_STREAM("Stop publishing pointclouds");
+            ready_to_publish = false;
+            break;
+        }
     }
+    ROS_DEBUG_STREAM("Now publishing a pointcloud with name " << pointcloud_file_name);
+
 }

@@ -41,10 +41,10 @@ private:
     void stopPublishingPointClouds();
 
     // Publish a pointcloud on a timer
-    void publishTestCloud();
+    void runPublishLoop();
 
     // Publish the right pointcloud based on the latest service call
-    void publishLoop();
+    void updatePublishLoop();
 
     ros::NodeHandle* n_;
     ros::ServiceServer publish_test_cloud_service;
@@ -56,7 +56,7 @@ private:
     PointCloud::Ptr pointcloud_to_publish;
     std::string pointcloud_file_name;
     SelectedMode selected_mode;
-    bool new_callback;
+    bool ready_to_publish;
 };
 
 #endif // MARCH_REALSENSE_TEST_PUBLISHER_H
