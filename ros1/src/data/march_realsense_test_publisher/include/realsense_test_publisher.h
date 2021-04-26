@@ -41,7 +41,7 @@ private:
     void stopPublishingPointClouds();
 
     // Publish a pointcloud on a timer
-    void runPublishLoop();
+    void publishTestCloud(const ros::TimerEvent& timer_event);
 
     // Publish the right pointcloud based on the latest service call
     void updatePublishLoop();

@@ -12,7 +12,7 @@
 using namespace std::filesystem;
 
 std::string TOPIC_TEST_CLOUDS = "/test_clouds";
-float PUBLISH_RATE = 10.0; // images per second
+float PUBLISH_RATE = 1.0 / 10.0; // images per second
 std::string CAMERA_FRAME_ID = "camera_front_depth_optical_frame";
 
 RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
@@ -40,7 +40,11 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
         = n_->advertise<PointCloud>(TOPIC_TEST_CLOUDS, /*queue_size=*/1);
 
     should_publish = false;
-    runPublishLoop();
+
+    ros::Timer timer_publish_pointcloud = n_->createTimer(ros::Duration(PUBLISH_RATE),
+                                                          &RealsenseTestPublisher::publishTestCloud, this);
+
+    ROS_WARN_STREAM("TESTSDFSDFSDFSDFSDF");
 }
 
 bool RealsenseTestPublisher::publishTestDatasetCallback(
@@ -68,20 +72,15 @@ void RealsenseTestPublisher::publishCustomPointcloud(
     pointcloud_to_publish = boost::make_shared<PointCloud>();
     pcl::io::loadPLYFile<pcl::PointXYZ>(
         data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
-    pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID;
 }
 
-void RealsenseTestPublisher::runPublishLoop()
+void RealsenseTestPublisher::publishTestCloud(const ros::TimerEvent& timer_event)
 {
-    ros::Rate loop_rate(PUBLISH_RATE);
-    while (n_->ok()) {
-        if (should_publish) {
-            pcl_conversions::toPCL(
-                ros::Time::now(), pointcloud_to_publish->header.stamp);
-            test_cloud_publisher.publish(pointcloud_to_publish);
-            ros::spinOnce();
-            loop_rate.sleep();
-        }
+    if (should_publish) {
+        pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID;
+        pcl_conversions::toPCL(
+            ros::Time::now(), pointcloud_to_publish->header.stamp);
+        test_cloud_publisher.publish(pointcloud_to_publish);
     }
 }
 
