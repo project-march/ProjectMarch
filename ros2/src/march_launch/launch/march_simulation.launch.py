@@ -41,7 +41,7 @@ def generate_launch_description():
     maximum_fake_temperature = LaunchConfiguration("maximum_fake_temperature")
 
     # Mpc visualization
-    mpc_visualization = LlaunchConfiguration("mpc_visualization")
+    mpc_visualization = LaunchConfiguration("mpc_visualization")
 
     return launch.LaunchDescription(
         [
