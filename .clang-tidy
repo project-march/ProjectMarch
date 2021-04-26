@@ -4,7 +4,8 @@ Checks:     -*,
             bugprone-*,
             cert-*,
             -cert-err58-cpp,
-            clang-analyzer-*
+            clang-analyzer-*,
+            concurrency-*
 WarningsAsErrors: '*'
 HeaderFilterRegex: ''
 FormatStyle:     webkit
