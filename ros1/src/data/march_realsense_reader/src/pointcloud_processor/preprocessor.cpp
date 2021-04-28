@@ -84,21 +84,22 @@ bool NormalsPreprocessor::preprocess(PointCloud::Ptr pointcloud,
     geometry_msgs::TransformStamped transform_stamped;
     success &= transformPointCloudFromUrdf(transform_stamped);
 
-    success &= filterOnDistanceFromOrigin();
-
-    success &= fillNormalCloud(transform_stamped);
-
-    success &= filterOnNormalOrientation();
+//    success &= filterOnDistanceFromOrigin();
+//
+//    success &= fillNormalCloud(transform_stamped);
+//
+//    success &= filterOnNormalOrientation();
 
     clock_t end_preprocess = clock();
 
-    if (pointcloud_->points.size() != pointcloud_normals_->points.size()) {
-        ROS_ERROR_STREAM("The number of points in pointcloud and "
-                         "pointcloud_normals is not equal after preprocessing. "
-            << "Points in pointcloud: " << pointcloud_->points.size()
-            << "Points in pointcloud_normals: "
-            << pointcloud_normals_->points.size());
-    }
+//    if (pointcloud_->points.size() != pointcloud_normals_->points.size()) {
+//        ROS_ERROR_STREAM("The number of points in pointcloud and "
+//                         "pointcloud_normals is not equal after preprocessing. "
+//            << "Points in pointcloud: " << pointcloud_->points.size()
+//            << "Points in pointcloud_normals: "
+//            << pointcloud_normals_->points.size());
+//        return false;
+//    }
 
     double time_taken
         = double(end_preprocess - start_preprocess) / double(CLOCKS_PER_SEC);
