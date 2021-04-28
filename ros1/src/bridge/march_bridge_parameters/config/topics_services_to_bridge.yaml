@@ -47,6 +47,7 @@ topics:
   - { topic: 'tf_static', type: 'tf2_msgs/msg/TFMessage' }
   - { topic: 'march/motor_controller_states', type: 'march_shared_msgs/msg/MotorControllerState'}
   - { topic: 'camera_front/imu/data', type: 'sensor_msgs/msg/Imu'}
+  - { topic: 'march/mpc', type: 'march_shared_msgs/msg/MpcMsg'}
 
 services_1_to_2:
   - { service: '/freeze',
