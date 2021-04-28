@@ -18,7 +18,7 @@ image: registry.gitlab.com/project-march/march:$CI_COMMIT_BRANCH
 #   is pulled and tagged as the image for this branch.
 # 2. If there are changes to the Dockerfile or to a package.xml file, rebuild the
 #   container. This will use remote caches from GitLab to speed up the process.
-container:tag:
+.container:tag-base:
   stage: Tag container
   image: quay.io/podman/stable
   variables:
@@ -30,7 +30,23 @@ container:tag:
   before_script:
     - podman login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - if ! podman manifest inspect $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH; then podman pull $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH && podman tag $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH && podman push $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH; fi;
+    - if ! podman manifest inspect $CI_REGISTRY_IMAGE:$BRANCH_NAME; then podman pull $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH && podman tag $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH $CI_REGISTRY_IMAGE:$BRANCH_NAME && podman push $CI_REGISTRY_IMAGE:$BRANCH_NAME; fi;
+
+container:tag:
+  variables:
+    BRANCH_NAME: $CI_COMMIT_BRANCH
+  extends:
+    - .container:tag-base
+    - .branch-base
+
+container:tag for MRs:
+  variables:
+    BRANCH_NAME: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+  only:
+    refs:
+      - merge_requests
+  extends:
+    - .container:tag-base
 
 container:build:
   stage: Build container
@@ -66,7 +82,6 @@ container:build:
 # mistakes
 .flake8-base:
   stage: Lint code
-  dependencies: ["container:tag"]
   script:
     - python3 -m flakehell lint --suppress-none-returning --format=gitlab --output-file flakehell.json
   artifacts:
