@@ -146,7 +146,7 @@ std::unique_ptr<march::MotorController> HardwareBuilder::createMotorController(
     }
 
     std::unique_ptr<march::MotorController> motor_controller;
-    std::string type = config["type"].as<std::string>();
+    auto type = config["type"].as<std::string>();
     if (type == "imotioncube") {
         motor_controller = createIMotionCube(
             config, mode, urdf_joint, pdo_interface, sdo_interface);

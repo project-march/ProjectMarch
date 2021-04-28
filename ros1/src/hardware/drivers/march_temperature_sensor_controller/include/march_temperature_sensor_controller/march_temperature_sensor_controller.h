@@ -15,15 +15,14 @@ namespace march_temperature_sensor_controller {
 class MarchTemperatureSensorController
     : public controller_interface::Controller<MarchTemperatureSensorInterface> {
 public:
-    MarchTemperatureSensorController()
-    {
-    }
+    MarchTemperatureSensorController() = default;
 
-    virtual bool init(MarchTemperatureSensorInterface* hw,
-        ros::NodeHandle& root_nh, ros::NodeHandle& controller_nh);
-    virtual void starting(const ros::Time& time);
-    virtual void update(const ros::Time& time, const ros::Duration& /*period*/);
-    virtual void stopping(const ros::Time& /*time*/);
+    bool init(MarchTemperatureSensorInterface* hw, ros::NodeHandle& root_nh,
+        ros::NodeHandle& controller_nh) override;
+    void starting(const ros::Time& time) override;
+    void update(
+        const ros::Time& time, const ros::Duration& /*period*/) override;
+    void stopping(const ros::Time& /*time*/) override;
 
 private:
     std::vector<MarchTemperatureSensorHandle> temperature_sensors_;
@@ -32,7 +31,7 @@ private:
         RtPublisherPtr;
     std::vector<RtPublisherPtr> realtime_pubs_;
     std::vector<ros::Time> last_publish_times_;
-    double publish_rate_;
+    double publish_rate_ {};
 };
 } // namespace march_temperature_sensor_controller
 

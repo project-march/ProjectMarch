@@ -17,15 +17,21 @@ private:
 
     uint8_t getNetsOperational();
 
+    bool isValidHighVoltageNetNumber(uint8_t netNumber);
+    void throwInvalidNetArgument(
+        uint8_t netNumber, const char* caller_name = __builtin_FUNCTION());
+    const uint8_t MIN_NET_NUMBER = 1;
+    const uint8_t MAX_NET_NUMBER = 8;
+
 public:
     HighVoltage(PdoSlaveInterface& pdo, NetMonitorOffsets netMonitoringOffsets,
         NetDriverOffsets netDriverOffsets);
 
     float getNetCurrent();
-    bool getNetOperational(int netNumber);
-    bool getOvercurrentTrigger(int netNumber);
+    bool getNetOperational(uint8_t netNumber);
+    bool getOvercurrentTrigger(uint8_t netNumber);
     bool getHighVoltageEnabled();
-    void setNetOnOff(bool on, int netNumber);
+    void setNetOnOff(bool on, uint8_t netNumber);
     void enableDisableHighVoltage(bool enable);
 
     /** @brief Override comparison operator */

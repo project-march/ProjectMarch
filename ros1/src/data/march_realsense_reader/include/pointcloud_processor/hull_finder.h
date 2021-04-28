@@ -20,7 +20,7 @@ using PolygonVector = std::vector<Polygon>;
 
 class HullFinder {
 public:
-    HullFinder(bool debugging);
+    explicit HullFinder(bool debugging);
     // This function is required to be implemented by any plane finder
     virtual bool findHulls(PointCloud::Ptr pointcloud,
         Normals::Ptr normal_pointcloud,
@@ -30,7 +30,7 @@ public:
         boost::shared_ptr<PolygonVector> polygon_vector)
         = 0;
 
-    virtual ~HullFinder() {};
+    virtual ~HullFinder() = default;
 
     /** This function is called upon whenever a parameter from config is
      * changed, including when launching the node
@@ -52,7 +52,7 @@ protected:
 class CHullFinder : HullFinder {
 public:
     /** Basic constructor for HullFinder preprocessor**/
-    CHullFinder(bool debugging);
+    explicit CHullFinder(bool debugging);
     /** This function should take in a pointcloud with matching normals and
      * regions, and turn this into chulls where the foot can be located. **/
     bool findHulls(PointCloud::Ptr pointcloud, Normals::Ptr normal_pointcloud,
@@ -91,11 +91,11 @@ protected:
     bool getAveragePointAndNormal(std::vector<double>& average_point,
         std::vector<double>& average_normal);
 
-    bool convex;
-    double alpha;
-    int hull_dimension;
+    bool convex {};
+    double alpha {};
+    int hull_dimension {};
 
-    int region_index_;
+    int region_index_ {};
     PointCloud::Ptr region_points_;
     Normals::Ptr region_normals_;
     PointCloud::Ptr region_points_projected_;

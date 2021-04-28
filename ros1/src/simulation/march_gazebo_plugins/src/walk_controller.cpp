@@ -18,7 +18,7 @@ WalkController::WalkController(physics::ModelPtr model)
 
     for (YAML::const_iterator it = com_levels_tree.begin();
          it != com_levels_tree.end(); ++it) {
-        std::string key = it->first.as<std::string>();
+        auto key = it->first.as<std::string>();
         com_levels.push_back(key);
     }
 

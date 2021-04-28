@@ -31,6 +31,9 @@ ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(/*t=*/1.0); // secs
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     : n_(n)
+    , selected_gait_(-1)
+    , use_left_foot_(nullptr)
+    , debugging_launch(false)
 {
 
     // Create a subscriber for every pointcloud topic
@@ -174,7 +177,7 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
     }
 
     // Setup data structures for parameter determining
-    SelectedGait selected_gait = (SelectedGait)selected_gait_;
+    auto selected_gait = (SelectedGait)selected_gait_;
     boost::shared_ptr<march_shared_msgs::GaitParameters> gait_parameters
         = boost::make_shared<march_shared_msgs::GaitParameters>();
     // Determine parameters

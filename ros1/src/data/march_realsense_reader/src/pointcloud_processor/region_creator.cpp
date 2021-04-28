@@ -17,7 +17,11 @@ RegionCreator::RegionCreator(bool debugging)
 // Construct a basic CHullFinder class
 RegionGrower::RegionGrower(bool debugging)
     : RegionCreator(debugging)
-
+    , number_of_neighbours(-1)
+    , min_cluster_size(-1)
+    , max_cluster_size(-1)
+    , smoothness_threshold(std::numeric_limits<float>::lowest())
+    , curvature_threshold(std::numeric_limits<float>::lowest())
 {
 }
 

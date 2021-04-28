@@ -1,7 +1,7 @@
 #ifndef MARCH_LINEAR_ALGEBRA_UTILITIES_H
 #define MARCH_LINEAR_ALGEBRA_UTILITIES_H
 
-#include <math.h>
+#include <cmath>
 #include <pcl/ModelCoefficients.h>
 #include <pcl/point_types.h>
 #include <vector>

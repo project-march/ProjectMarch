@@ -7,8 +7,8 @@
 
 class PowerNetOnOffCommand {
     PowerNetType type_;
-    bool on_or_off_;
-    int net_number_;
+    bool on_or_off_ {};
+    int net_number_ {};
 
 public:
     PowerNetOnOffCommand()

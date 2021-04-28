@@ -29,6 +29,7 @@ TemperatureSafety::TemperatureSafety(std::shared_ptr<SafetyNode> node,
     : node_(node)
     , safety_handler_(safety_handler)
     , send_errors_interval_(/*nanoseconds=*/0)
+    , default_temperature_threshold_(DEFAULT_TEMPERATURE_THRESHOLD)
 {
     node_->get_parameter_or("default_temperature_threshold",
         default_temperature_threshold_, DEFAULT_TEMPERATURE_THRESHOLD);

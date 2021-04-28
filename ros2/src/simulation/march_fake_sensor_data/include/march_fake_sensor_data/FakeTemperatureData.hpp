@@ -53,7 +53,7 @@ private:
 public:
     // Constructor that moves the predefined auto regression values into itself.
     FakeTemperatureDataNode(const std::string& node_name,
-        const std::vector<float>&& autoregression_weights);
+        std::vector<float>&& autoregression_weights);
 
     void add_temperature_publisher(const std::string& sensor_name);
 

@@ -16,10 +16,10 @@
  * The wireless master class that connects to MTws and publishes the data on
  * '/march/imu/' ROS topics.
  */
-class WirelessMaster : public XsCallback {
+class WirelessMaster final : public XsCallback {
 public:
-    WirelessMaster(ros::NodeHandle* node);
-    ~WirelessMaster();
+    explicit WirelessMaster(ros::NodeHandle* node);
+    ~WirelessMaster() override final;
 
     /**
      * Finds and constructs a wireless master.
@@ -79,8 +79,8 @@ protected:
      * Callback for when new MTws connect or disconnect.
      * Runs in a separate thread.
      */
-    virtual void onConnectivityChanged(
-        XsDevice* dev, XsConnectivityState new_state);
+    void onConnectivityChanged(
+        XsDevice* dev, XsConnectivityState new_state) override final;
 
 private:
     ros::NodeHandle* node_;

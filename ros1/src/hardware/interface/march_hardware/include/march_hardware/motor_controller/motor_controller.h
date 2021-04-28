@@ -76,7 +76,7 @@ public:
     // Get a full description of the state of the MotorController
     virtual std::unique_ptr<MotorControllerState> getState() = 0;
 
-    ~MotorController() {};
+    ~MotorController() override = default;
 
     // Override comparison operator
     friend bool operator==(

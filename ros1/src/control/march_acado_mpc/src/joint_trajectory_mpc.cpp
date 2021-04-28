@@ -30,8 +30,7 @@ bool ModelPredictiveControllerInterface::init(
 
     // Initialize the model predictive controllers
     for (unsigned int i = 0; i < num_joints_; ++i) {
-        model_predictive_controllers_.push_back(
-            ModelPredictiveController(getWeights(joint_names[i])));
+        model_predictive_controllers_.emplace_back(getWeights(joint_names[i]));
         model_predictive_controllers_[i].joint_name = std::move(joint_names[i]);
         model_predictive_controllers_[i].init();
     }
