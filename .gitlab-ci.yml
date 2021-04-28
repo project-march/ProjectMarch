@@ -25,8 +25,6 @@ container:tag:
     GIT_CHECKOUT: "true"
   before_script:
     - podman login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    # Try to overwrite the CI_COMMIT_BRANCH variable if this is a merge_requests pipeline.
-    - if [[ $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME != "" ]]; then CI_COMMIT_BRANCH=$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME; fi
   script:
     - if ! podman manifest inspect $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH; then podman pull $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH && podman tag $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH && podman push $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH; fi;
 
@@ -47,10 +45,24 @@ container:build:
       changes:
         - Dockerfile
 
+.branch-base:
+  only:
+    refs:
+      - branches
+
+# Use this as a "base" for all jobs. Merge requests require a different variable
+# for the Docker image tag.
+.merge_request-base:
+  image: registry.gitlab.com/project-march/march:$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+  only:
+    refs:
+      - merge_requests
+
 # Runs a linter on the code to see if the code style is consistent and to avoid common
 # mistakes
-flake8:
+.flake8-base:
   stage: Lint code
+  dependencies: ["container:tag"]
   script:
     - python3 -m flakehell lint --suppress-none-returning --format=gitlab --output-file flakehell.json
   artifacts:
@@ -58,26 +70,40 @@ flake8:
       codequality: flakehell.json
   allow_failure: true
   only:
-    refs:
-      - branches
-      - merge_requests
     changes:
       - "pyproject.toml"
       - "**/*.py"
 
-clang_format:
+flake8:
+  extends:
+    - .flake8-base
+    - .branch-base
+
+flake8 for MRs:
+  extends:
+    - .flake8-base
+    - .merge_request-base
+
+.clang_format-base:
   stage: Lint code
   script:
     - python3 .scripts/run-clang-format.py -r ros1/src ros2/src --style=file
   only:
-    refs:
-      - branches
-      - merge_requests
     changes:
       - "ros1/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
       - "ros2/**/*.{c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx}"
 
-noetic:build:
+clang_format:
+  extends:
+    - .clang_format-base
+    - .branch-base
+
+clang_format for MRs:
+  extends:
+    - .clang_format-base
+    - .merge_request-base
+
+.noetic:build-base:
   stage: Build code
   artifacts:
     paths:
@@ -88,14 +114,21 @@ noetic:build:
     - cd ros1/
     - source /opt/ros/noetic/local_setup.bash && colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
   only:
-    refs:
-      - branches
-      - merge_requests
     changes:
       - "ros1/**"
       - ".clang-tidy"
 
-foxy:build:
+noetic:build:
+  extends:
+    - .noetic:build-base
+    - .branch-base
+
+noetic:build for MRs:
+  extends:
+    - .noetic:build-base
+    - .merge_request-base
+
+.foxy:build-base:
   stage: Build code
   artifacts:
     paths:
@@ -106,14 +139,21 @@ foxy:build:
     - cd ros2/
     - source /opt/ros/foxy/local_setup.bash && colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
   only:
-    refs:
-      - branches
-      - merge_requests
     changes:
       - "ros2/**"
       - ".clang-tidy"
 
-noetic:test:
+foxy:build:
+  extends:
+    - .foxy:build-base
+    - .branch-base
+
+foxy:build for MRs:
+  extends:
+    - .foxy:build-base
+    - .merge_request-base
+
+.noetic:test-base:
   stage: Test code
   dependencies:
     - noetic:build
@@ -123,13 +163,20 @@ noetic:test:
     - source /opt/ros/noetic/local_setup.bash && source install/local_setup.bash && colcon test --event-handlers console_direct+
     - colcon test-result --verbose
   only:
-    refs:
-      - branches
-      - merge_requests
     changes:
       - "ros1/**"
 
-foxy:test:
+noetic:test:
+  extends:
+    - .noetic:test-base
+    - .branch-base
+
+noetic:test for MRs:
+  extends:
+    - .noetic:test-base
+    - .merge_request-base
+
+.foxy:test-base:
   stage: Test code
   dependencies:
     - foxy:build
@@ -139,13 +186,20 @@ foxy:test:
     - source /opt/ros/foxy/local_setup.bash && source install/local_setup.bash && colcon test --event-handlers console_direct+
     - colcon test-result --verbose
   only:
-    refs:
-      - branches
-      - merge_requests
     changes:
       - "ros2/**"
 
-noetic:clang_tidy:
+foxy:test:
+  extends:
+    - .foxy:test-base
+    - .branch-base
+
+foxy:test for MRs:
+  extends:
+    - .foxy:test-base
+    - .merge_request-base
+
+.noetic:clang_tidy-base:
   stage: Static analysis on code
   dependencies:
     - noetic:build
@@ -154,15 +208,22 @@ noetic:clang_tidy:
     - cd ros1/
     - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | grep -v "src/libraries" | grep -v "xsens" | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
   only:
-    refs:
-      - branches
-      - merge_requests
     changes:
       - "ros1/**/*.{hpp,h,cpp}"
       - "ros1/**/CMakeLists.txt"
       - ".clang-tidy"
 
-foxy:clang_tidy:
+noetic:clang_tidy:
+  extends:
+    - .noetic:clang_tidy-base
+    - .branch-base
+
+noetic:clang_tidy for MRs:
+  extends:
+    - .noetic:clang_tidy-base
+    - .merge_request-base
+
+.foxy:clang_tidy-base:
   stage: Static analysis on code
   dependencies:
     - foxy:build
@@ -171,10 +232,17 @@ foxy:clang_tidy:
     - cd ros2/
     - find src -name '*.hpp' -or -name '*.h' -or -name '*.cpp' | grep -v "src/libraries" | xargs -L1 -P$(getconf _NPROCESSORS_ONLN) -I{} -- clang-tidy -p build {} 2> /dev/null
   only:
-    refs:
-      - branches
-      - merge_requests
     changes:
       - "ros2/**/*.{hpp,h,cpp}"
       - "ros2/**/CMakeLists.txt"
       - ".clang-tidy"
+
+foxy:clang_tidy:
+  extends:
+    - .foxy:clang_tidy-base
+    - .branch-base
+
+foxy:clang_tidy for MRs:
+  extends:
+    - .foxy:clang_tidy-base
+    - .merge_request-base
