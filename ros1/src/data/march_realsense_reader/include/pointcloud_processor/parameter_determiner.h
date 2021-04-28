@@ -25,7 +25,7 @@ using GaitParameters = march_shared_msgs::GaitParameters;
 
 class ParameterDeterminer {
 public:
-    ParameterDeterminer(bool debugging);
+    explicit ParameterDeterminer(bool debugging);
     /** This function is required to be implemented by any plane finder **/
     virtual bool determineParameters(
         boost::shared_ptr<PlaneCoefficientsVector> const
@@ -60,7 +60,7 @@ protected:
 class HullParameterDeterminer : ParameterDeterminer {
 public:
     /** Basic constructor for ParameterDeterminer preprocessor **/
-    HullParameterDeterminer(bool debugging);
+    explicit HullParameterDeterminer(bool debugging);
 
     /** This function should take in a pointcloud with matching normals and
      * hulls, and turn this into a location where the foot can be placed,

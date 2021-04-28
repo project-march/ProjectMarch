@@ -14,7 +14,7 @@ using RegionVector = std::vector<pcl::PointIndices>;
 
 class RegionCreator {
 public:
-    RegionCreator(bool debugging);
+    explicit RegionCreator(bool debugging);
     // This function is required to be implemented by any region creator
     virtual bool createRegions(PointCloud::Ptr pointcloud,
         Normals::Ptr pointcloud_normals,
@@ -40,7 +40,7 @@ protected:
 class RegionGrower : RegionCreator {
 public:
     // Use the constructors defined in the super class
-    RegionGrower(bool debugging);
+    explicit RegionGrower(bool debugging);
     /** Create cluster using the region growing algorithm, takes algorithm
      * configuration from the dynamic parameter server, and fills parameter
      * region_vector with clusters. **/

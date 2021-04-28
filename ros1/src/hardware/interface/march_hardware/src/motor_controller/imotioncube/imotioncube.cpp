@@ -201,7 +201,7 @@ void IMotionCube::actuateIU(int32_t target_iu)
 
 void IMotionCube::actuateTorque(float target_torque)
 {
-    int16_t target_torque_iu = (int16_t)std::round(target_torque);
+    auto target_torque_iu = (int16_t)std::round(target_torque);
     if (this->actuation_mode_ != ActuationMode::torque) {
         throw error::HardwareException(error::ErrorType::INVALID_ACTUATION_MODE,
             "trying to actuate torque, while actuation mode is %s",

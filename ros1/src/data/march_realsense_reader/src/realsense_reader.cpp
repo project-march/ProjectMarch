@@ -33,6 +33,7 @@ RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     : n_(n)
     , selected_gait_(-1)
     , use_left_foot_(nullptr)
+    , debugging_launch(false)
 {
 
     // Create a subscriber for every pointcloud topic
