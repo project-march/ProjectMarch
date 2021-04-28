@@ -172,6 +172,8 @@ noetic:test:
     - .branch-base
 
 noetic:test for MRs:
+  dependencies: ["noetic:build for MRs"]
+  needs: ["noetic:build for MRs"]
   extends:
     - .noetic:test-base
     - .merge_request-base
@@ -195,6 +197,8 @@ foxy:test:
     - .branch-base
 
 foxy:test for MRs:
+  dependencies: ["foxy:build for MRs"]
+  needs: ["foxy:build for MRs"]
   extends:
     - .foxy:test-base
     - .merge_request-base
@@ -219,6 +223,8 @@ noetic:clang_tidy:
     - .branch-base
 
 noetic:clang_tidy for MRs:
+  dependencies: ["noetic:build for MRs"]
+  needs: ["noetic:build for MRs"]
   extends:
     - .noetic:clang_tidy-base
     - .merge_request-base
@@ -243,6 +249,8 @@ foxy:clang_tidy:
     - .branch-base
 
 foxy:clang_tidy for MRs:
+  dependencies: ["foxy:build for MRs"]
+  needs: ["foxy:build for MRs"]
   extends:
     - .foxy:clang_tidy-base
     - .merge_request-base
