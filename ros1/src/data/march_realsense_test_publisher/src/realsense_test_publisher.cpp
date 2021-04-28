@@ -169,8 +169,11 @@ void RealsenseTestPublisher::updatePublishLoop(
                 should_publish = false;
                 break;
             }
+            default: {
+                ROS_DEBUG_STREAM("Invalid mode selected");
+            }
         }
-        if (success) {
+        if (success && slected_mode != SelectedMode::end) {
             ROS_DEBUG_STREAM("Now publishing a pointcloud with name "
                 << pointcloud_file_name);
         }
