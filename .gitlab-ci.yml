@@ -23,6 +23,10 @@ container:tag:
   image: quay.io/podman/stable
   variables:
     GIT_CHECKOUT: "true"
+  only:
+    refs:
+      - branches
+      - merge_requests
   before_script:
     - podman login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
