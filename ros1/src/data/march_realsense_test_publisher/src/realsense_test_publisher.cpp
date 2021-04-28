@@ -13,8 +13,9 @@ using namespace std::filesystem;
 
 std::string TOPIC_TEST_CLOUDS = "/test_clouds";
 std::string CAMERA_FRAME_ID = "camera_front_depth_optical_frame";
+std::string POINTCLOUD_EXTENSION = ".ply"
 
-RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
+    RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle * n)
     : n_(n)
 {
     if (ros::console::set_logger_level(
@@ -28,9 +29,16 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     data_path = directory_path / relative_path;
 
     for (const auto& entry : std::filesystem::directory_iterator(data_path)) {
-        file_names.push_back(entry.path().filename().string());
+        if (std::filesystem::is_regular_file(entry)
+            && entry.path().extension() == POINTCLOUD_EXTENSION) {
+            file_names.push_back(entry.path().filename().string());
+        }
     }
-
+    no_files_present = (file_names.size() == 0);
+    if (no_files_present) {
+        ROS_ERROR_STREAM("There are no .ply files present under path "
+            << data_path << ". Test publisher will not work.");
+    }
     publish_test_cloud_service
         = n_->advertiseService(/*service=*/"/camera/publish_test_cloud",
             &RealsenseTestPublisher::publishTestDatasetCallback, this);
@@ -47,11 +55,11 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
 {
     selected_mode = (SelectedMode)req.selected_mode;
     pointcloud_file_name = req.pointcloud_file_name;
-    updatePublishLoop();
+    updatePublishLoop(march_shared_msgs::PublishTestDataset::Response & res);
     return true;
 }
 
-void RealsenseTestPublisher::publishCustomPointcloud(
+bool RealsenseTestPublisher::publishCustomPointcloud(
     std::string pointcloud_file_name)
 {
     std::vector<std::string>::iterator filename_iterator
@@ -60,12 +68,13 @@ void RealsenseTestPublisher::publishCustomPointcloud(
         ROS_WARN_STREAM("the given file name " << pointcloud_file_name
                                                << " is invalid. Must be one of "
                                                << getFileNamesString());
-        return;
+        return false;
     }
 
     pointcloud_to_publish = boost::make_shared<PointCloud>();
     pcl::io::loadPLYFile<pcl::PointXYZ>(
         data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
+    return true;
 }
 
 void RealsenseTestPublisher::publishTestCloud(
@@ -88,38 +97,78 @@ std::string RealsenseTestPublisher::getFileNamesString()
     return file_names_string;
 }
 
-void RealsenseTestPublisher::updatePublishLoop()
+void RealsenseTestPublisher::startPublishingPointclouds();
 {
-    switch (selected_mode) {
-        case SelectedMode::start: {
-            ROS_DEBUG_STREAM("Start publishing pointclouds");
-            //            startPublishingPointclouds();
-            should_publish = true;
-            break;
-        }
-        case SelectedMode::next: {
-            ROS_DEBUG_STREAM("Publish next pointcloud");
-            //            publishNextPointcloud();
-            should_publish = true;
-            break;
-        }
-        case SelectedMode::custom: {
-            ROS_DEBUG_STREAM("Publish a custom pointcloud");
-            publishCustomPointcloud(pointcloud_file_name);
-            should_publish = true;
-            break;
-        }
-        case SelectedMode::slide_show: {
-            ROS_DEBUG_STREAM("Publish a slide show of pointclouds");
-            //            publishSlideShow();
-            should_publish = true;
-        }
-        case SelectedMode::end: {
-            ROS_DEBUG_STREAM("Stop publishing pointclouds");
-            should_publish = false;
-            break;
-        }
+    pointcloud_file_name = file_names[0];
+    pointcloud_to_publish = boost::make_shared<PointCloud>();
+    pcl::io::loadPLYFile<pcl::PointXYZ>(
+            data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
+}
+
+void RealsenseTestPublisher::publishNextPointcloud();
+{
+    // If already publishing, find the next pointcloud and publish that
+    // Otherwise, start publishing
+    if (should_publish) {
+        std::vector<std::string>::iterator filename_iterator
+                = std::find(file_names.begin(), file_names.end(), pointcloud_file_name);
+        // Set the current pointcloud file name to the next name in the list
+        pointcloud_file_name = *std::next(filename_iterator)
+
+        pointcloud_to_publish = boost::make_shared<PointCloud>();
+        pcl::io::loadPLYFile<pcl::PointXYZ>(
+                data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
+    } else {
+        startPublishingPointClouds();
     }
-    ROS_DEBUG_STREAM(
-        "Now publishing a pointcloud with name " << pointcloud_file_name);
+}
+
+void RealsenseTestPublisher::updatePublishLoop(
+    march_shared_msgs::PublishTestDataset::Response& res)
+{
+    // Only update the publish loop if there are files available
+    if (!no_files_present) {
+        // The update is successful by default until something goes wrong
+        bool success = true;
+
+        switch (selected_mode) {
+            case SelectedMode::start: {
+                ROS_DEBUG_STREAM("Start publishing pointclouds");
+                startPublishingPointclouds();
+                should_publish = true;
+                break;
+            }
+            case SelectedMode::next: {
+                ROS_DEBUG_STREAM("Publish next pointcloud");
+                publishNextPointcloud();
+                should_publish = true;
+                break;
+            }
+            case SelectedMode::custom: {
+                ROS_DEBUG_STREAM("Publish a custom pointcloud");
+                success = publishCustomPointcloud(pointcloud_file_name);
+                should_publish = success;
+                break;
+            }
+            case SelectedMode::slide_show: {
+                ROS_DEBUG_STREAM("Publish a slide show of pointclouds");
+                //            publishSlideShow();
+                should_publish = true;
+            }
+            case SelectedMode::end: {
+                ROS_DEBUG_STREAM("Stop publishing pointclouds");
+                should_publish = false;
+                break;
+            }
+        }
+        if (success) {
+            ROS_DEBUG_STREAM("Now publishing a pointcloud with name "
+                << pointcloud_file_name);
+        }
+        res.success = success;
+    } else {
+        ROS_ERROR_STREAM(
+            "No .ply files can be found by the test publisher under path "
+            << data_path << ". Unable to publish a test cloud.");
+    }
 }

@@ -38,13 +38,14 @@ private:
     void publishNextPointcloud();
 
     // Publishes the pointcloud with the requested file name
-    void publishCustomPointcloud(std::string pointcloud_file_name);
+    bool publishCustomPointcloud(std::string pointcloud_file_name);
 
     // Stops publishing pointclouds
     void stopPublishingPointClouds();
 
     // Publish the right pointcloud based on the latest service call
-    void updatePublishLoop();
+    void updatePublishLoop(
+        march_shared_msgs::PublishTestDataset::Response& res);
 
     ros::NodeHandle* n_;
     ros::ServiceServer publish_test_cloud_service;
@@ -57,6 +58,7 @@ private:
     std::string pointcloud_file_name;
     SelectedMode selected_mode;
     bool should_publish;
+    bool no_files_present;
 };
 
 #endif // MARCH_REALSENSE_TEST_PUBLISHER_H
