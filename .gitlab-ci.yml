@@ -115,7 +115,7 @@ clang_format for MRs:
     - source /opt/ros/noetic/local_setup.bash && colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
   only:
     changes:
-      - "ros1/**"
+      - "ros1/**/*"
       - ".clang-tidy"
 
 noetic:build:
@@ -140,7 +140,7 @@ noetic:build for MRs:
     - source /opt/ros/foxy/local_setup.bash && colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
   only:
     changes:
-      - "ros2/**"
+      - "ros2/**/*"
       - ".clang-tidy"
 
 foxy:build:
@@ -164,7 +164,7 @@ foxy:build for MRs:
     - colcon test-result --verbose
   only:
     changes:
-      - "ros1/**"
+      - "ros1/**/*"
 
 noetic:test:
   extends:
@@ -189,7 +189,7 @@ noetic:test for MRs:
     - colcon test-result --verbose
   only:
     changes:
-      - "ros2/**"
+      - "ros2/**/*"
 
 foxy:test:
   extends:
