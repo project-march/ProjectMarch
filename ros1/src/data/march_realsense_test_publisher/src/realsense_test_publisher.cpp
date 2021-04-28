@@ -68,7 +68,8 @@ void RealsenseTestPublisher::publishCustomPointcloud(
         data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
 }
 
-void RealsenseTestPublisher::publishTestCloud(const ros::TimerEvent& timer_event)
+void RealsenseTestPublisher::publishTestCloud(
+    const ros::TimerEvent& timer_event)
 {
     if (should_publish) {
         pointcloud_to_publish->header.frame_id = CAMERA_FRAME_ID;

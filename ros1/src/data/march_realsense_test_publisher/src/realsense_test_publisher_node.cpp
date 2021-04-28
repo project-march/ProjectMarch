@@ -12,9 +12,9 @@ int main(int argc, char** argv)
 
     RealsenseTestPublisher test_publisher = RealsenseTestPublisher(&n);
 
-    ros::Timer timer_publish_pointcloud = n.createTimer(ros::Duration(PUBLISH_RATE),
-                                                          std::bind(&RealsenseTestPublisher::publishTestCloud,
-                                                                    test_publisher));
+    ros::Timer timer_publish_pointcloud = n.createTimer(
+        ros::Duration(PUBLISH_RATE),
+        std::bind(&RealsenseTestPublisher::publishTestCloud, test_publisher));
 
     ros::spin();
     ros::shutdown();

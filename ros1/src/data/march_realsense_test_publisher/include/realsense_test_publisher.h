@@ -19,8 +19,8 @@ public:
     // Setup realsense reader with given node handle.
     RealsenseTestPublisher(ros::NodeHandle* n);
 
-      // Publish a pointcloud on a timer
-      void publishTestCloud(const ros::TimerEvent& timer_event);
+    // Publish a pointcloud on a timer
+    void publishTestCloud(const ros::TimerEvent& timer_event);
 
 private:
     // Creates a string of all the valid file names separated by an end line
