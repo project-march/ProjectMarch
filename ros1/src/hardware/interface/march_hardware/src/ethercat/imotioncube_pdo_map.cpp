@@ -1,5 +1,5 @@
 // Copyright 2019 Project March.
-#include "march_hardware/ethercat/pdo_map.h"
+#include "march_hardware/ethercat/imotioncube_pdo_map.h"
 #include "march_hardware/error/hardware_exception.h"
 #include "march_hardware/ethercat/sdo_interface.h"
 
@@ -8,7 +8,10 @@
 #include <utility>
 
 namespace march {
-std::unordered_map<IMCObjectName, IMCObject> PDOmap::all_objects = {
+/* All addresses were retrieved from the IMC Manual:
+https://technosoftmotion.com/wp-content/uploads/P091.025.iMOTIONCUBE.CAN_.CAT_.UM_-1.pdf
+*/
+std::unordered_map<IMCObjectName, IMCObject> IMCPDOmap::all_objects = {
     { IMCObjectName::StatusWord,
         IMCObject(/*_address=*/0x6041, /*_sub_index=*/0, /*_length=*/16) },
     { IMCObjectName::ActualPosition,
@@ -47,10 +50,10 @@ std::unordered_map<IMCObjectName, IMCObject> PDOmap::all_objects = {
         IMCObject(/*_address=*/0x2108, /*_sub_index=*/3, /*_length=*/16) }
 };
 
-void PDOmap::addObject(IMCObjectName object_name)
+void IMCPDOmap::addObject(IMCObjectName object_name)
 {
-    auto it = PDOmap::all_objects.find(object_name);
-    if (it == PDOmap::all_objects.end()) {
+    auto it = IMCPDOmap::all_objects.find(object_name);
+    if (it == IMCPDOmap::all_objects.end()) {
         throw error::HardwareException(
             error::ErrorType::PDO_OBJECT_NOT_DEFINED);
     }
@@ -74,7 +77,7 @@ void PDOmap::addObject(IMCObjectName object_name)
     }
 }
 
-std::unordered_map<IMCObjectName, uint8_t> PDOmap::map(
+std::unordered_map<IMCObjectName, uint8_t> IMCPDOmap::map(
     SdoSlaveInterface& sdo, DataDirection direction)
 {
     switch (direction) {
@@ -90,7 +93,7 @@ std::unordered_map<IMCObjectName, uint8_t> PDOmap::map(
     }
 }
 
-std::unordered_map<IMCObjectName, uint8_t> PDOmap::configurePDO(
+std::unordered_map<IMCObjectName, uint8_t> IMCPDOmap::configurePDO(
     SdoSlaveInterface& sdo, int base_register, uint16_t base_sync_manager)
 {
     int counter = 1;
@@ -162,7 +165,7 @@ std::unordered_map<IMCObjectName, uint8_t> PDOmap::configurePDO(
     return byte_offsets;
 }
 
-std::vector<std::pair<IMCObjectName, IMCObject>> PDOmap::sortPDOObjects()
+std::vector<std::pair<IMCObjectName, IMCObject>> IMCPDOmap::sortPDOObjects()
 {
     std::vector<std::pair<IMCObjectName, IMCObject>> sorted_PDO_objects;
 

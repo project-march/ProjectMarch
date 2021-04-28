@@ -1,5 +1,6 @@
 #include <ctime>
 #include <dynamic_reconfigure/server.h>
+#include <map>
 #include <march_realsense_reader/realsense_reader.h>
 #include <march_shared_msgs/GetGaitParameters.h>
 #include <pcl/point_types.h>
@@ -19,17 +20,28 @@ using PlaneCoefficientsVector = std::vector<pcl::ModelCoefficients::Ptr>;
 using HullVector = std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>;
 using PolygonVector = std::vector<std::vector<pcl::Vertices>>;
 
-std::string POINTCLOUD_TOPIC = "/camera_front/depth/color/points";
+std::string TOPIC_CAMERA_FRONT = "/camera_front/depth/color/points";
+std::string TOPIC_CAMERA_BACK = "/camera_back/depth/color/points";
+std::map<int, std::string> POINTCLOUD_TOPICS
+    = { { march_shared_msgs::GetGaitParametersRequest::CAMERA_FRONT,
+            TOPIC_CAMERA_FRONT },
+          { march_shared_msgs::GetGaitParametersRequest::CAMERA_BACK,
+              TOPIC_CAMERA_BACK } };
 ros::Duration POINTCLOUD_TIMEOUT = ros::Duration(/*t=*/1.0); // secs
 
 RealSenseReader::RealSenseReader(ros::NodeHandle* n)
     : n_(n)
 {
-    pointcloud_subscriber_
-        = n_->subscribe<sensor_msgs::PointCloud2>(POINTCLOUD_TOPIC,
-            /*queue_size=*/1, &RealSenseReader::pointcloudCallback, this);
+
+    // Create a subscriber for every pointcloud topic
+    for (auto& item : POINTCLOUD_TOPICS) {
+        pointcloud_subscribers_[item.first]
+            = n_->subscribe<sensor_msgs::PointCloud2>(item.second,
+                /*queue_size=*/1, &RealSenseReader::pointcloudCallback, this);
+    }
+
     read_pointcloud_service_
-        = n_->advertiseService("/camera/process_pointcloud",
+        = n_->advertiseService(/*service=*/"/camera/process_pointcloud",
             &RealSenseReader::processPointcloudCallback, this);
 
     preprocessor_ = std::make_unique<NormalsPreprocessor>(debugging_);
@@ -194,6 +206,8 @@ bool RealSenseReader::processPointcloud(PointCloud::Ptr pointcloud,
         << std::endl);
 
     res.success = true;
+    // Returning false means that the service was not able to respond at all,
+    // this causes problems with the bridge, therefore always return true!
     return true;
 }
 
@@ -390,10 +404,16 @@ bool RealSenseReader::processPointcloudCallback(
     frame_id_to_transform_to_ = req.frame_id_to_transform_to;
 
     time_t start_callback = clock();
-
+    if (req.camera_to_use >= POINTCLOUD_TOPICS.size()) {
+        res.error_message
+            = "Unknown camera given in the request, not available in the "
+              "POINTCLOUD_TOPICS in the realsense_reader";
+        res.success = false;
+        return true;
+    }
     boost::shared_ptr<const sensor_msgs::PointCloud2> input_cloud
         = ros::topic::waitForMessage<sensor_msgs::PointCloud2>(
-            POINTCLOUD_TOPIC, *n_, POINTCLOUD_TIMEOUT);
+            POINTCLOUD_TOPICS[req.camera_to_use], *n_, POINTCLOUD_TIMEOUT);
 
     if (input_cloud == nullptr) {
         res.error_message = "No pointcloud published within timeout, so "
