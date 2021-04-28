@@ -25,6 +25,8 @@ container:tag:
     GIT_CHECKOUT: "true"
   before_script:
     - podman login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    # Try to overwrite the CI_COMMIT_BRANCH variable if this is a merge_requests pipeline.
+    - if [[ $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME != "" ]]; then CI_COMMIT_BRANCH=$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME; fi
   script:
     - if ! podman manifest inspect $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH; then podman pull $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH && podman tag $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH && podman push $CI_REGISTRY_IMAGE:$CI_COMMIT_BRANCH; fi;
 
