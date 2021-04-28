@@ -41,7 +41,7 @@ private:
     bool publishCustomPointcloud(std::string pointcloud_file_name);
 
     // Publishes all pointcloud for some amount of time in series
-    void publishSlideShow()
+    void publishSlideShow();
 
     // Publish the right pointcloud based on the latest service call
     void updatePublishLoop(

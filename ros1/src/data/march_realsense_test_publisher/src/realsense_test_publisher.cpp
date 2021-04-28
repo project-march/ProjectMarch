@@ -140,7 +140,7 @@ void RealsenseTestPublisher::publishNextPointcloud()
 void RealsenseTestPublisher::publishSlideShow()
 {
     ros::Timer timer_publish_pointcloud
-            = n.createTimer(ros::Duration(SLIDESHOW_SPEED),
+            = n_->createTimer(ros::Duration(SLIDESHOW_SPEED),
                             RealsenseTestPublisher::publishNextPointcloud);
 }
 
