@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-float PUBLISH_RATE = 1.0 / 10.0; // seconds per frame
+float PUBLISH_FREQUENCY = 1.0 / 10.0; // seconds per frame
 
 int main(int argc, char** argv)
 {
@@ -13,7 +13,7 @@ int main(int argc, char** argv)
     RealsenseTestPublisher test_publisher = RealsenseTestPublisher(&n);
 
     ros::Timer timer_publish_pointcloud
-        = n.createTimer(ros::Duration(PUBLISH_RATE),
+        = n.createTimer(ros::Duration(PUBLISH_FREQUENCY),
             &RealsenseTestPublisher::publishTestCloud, &test_publisher);
 
     ros::spin();
