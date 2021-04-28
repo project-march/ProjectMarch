@@ -22,7 +22,7 @@ using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 class RealSenseReader {
 public:
     // Setup realsense reader with given node handle.
-    RealSenseReader(ros::NodeHandle* n);
+    explicit RealSenseReader(ros::NodeHandle* n);
 
     /** Takes the pointcloud and transform that into
      * gait parameters, these parameters are put into the response,

@@ -25,7 +25,7 @@ using GaitParameters = march_shared_msgs::GaitParameters;
 
 class ParameterDeterminer {
 public:
-    ParameterDeterminer(bool debugging);
+    explicit ParameterDeterminer(bool debugging);
     /** This function is required to be implemented by any plane finder **/
     virtual bool determineParameters(
         boost::shared_ptr<PlaneCoefficientsVector> const
@@ -36,7 +36,7 @@ public:
         boost::shared_ptr<GaitParameters> gait_parameters)
         = 0;
 
-    virtual ~ParameterDeterminer() {};
+    virtual ~ParameterDeterminer() = default;
 
     /** This function is called upon whenever a parameter from config is
      * changed, including when launching the node
@@ -49,7 +49,7 @@ protected:
     boost::shared_ptr<PlaneCoefficientsVector> plane_coefficients_vector_;
     boost::shared_ptr<HullVector> hull_vector_;
     boost::shared_ptr<PolygonVector> polygon_vector_;
-    SelectedGait selected_gait_;
+    std::optional<SelectedGait> selected_gait_ = std::nullopt;
     boost::shared_ptr<GaitParameters> gait_parameters_;
     bool debugging_;
 };
@@ -60,7 +60,7 @@ protected:
 class HullParameterDeterminer : ParameterDeterminer {
 public:
     /** Basic constructor for ParameterDeterminer preprocessor **/
-    HullParameterDeterminer(bool debugging);
+    explicit HullParameterDeterminer(bool debugging);
 
     /** This function should take in a pointcloud with matching normals and
      * hulls, and turn this into a location where the foot can be placed,
@@ -170,27 +170,27 @@ protected:
     // 0) to (end, 0)
     bool fillOptionalFootLocationCloud(float start, float end);
 
-    // Read all relevant parameters
-    int hull_dimension;
-    int number_of_optional_foot_locations;
-    float min_x_stairs;
-    float max_x_stairs;
-    float min_z_stairs;
-    float max_z_stairs;
-    float y_location;
-    float foot_length_back;
-    float foot_length_front;
-    float foot_width;
-    float max_allowed_z_deviation_foot;
-    float x_flat;
-    float z_flat;
-    float x_steep;
-    float z_steep;
-    float min_search_area;
-    float max_search_area;
-    float max_distance_to_line;
-    bool general_most_desirable_location_is_mid;
-    bool general_most_desirable_location_is_small;
+    // All relevant parameters
+    int hull_dimension {};
+    int number_of_optional_foot_locations {};
+    float min_x_stairs {};
+    float max_x_stairs {};
+    float min_z_stairs {};
+    float max_z_stairs {};
+    float y_location {};
+    float foot_length_back {};
+    float foot_length_front {};
+    float foot_width {};
+    float max_allowed_z_deviation_foot {};
+    float x_flat {};
+    float z_flat {};
+    float x_steep {};
+    float z_steep {};
+    float min_search_area {};
+    float max_search_area {};
+    float max_distance_to_line {};
+    bool general_most_desirable_location_is_mid {};
+    bool general_most_desirable_location_is_small {};
 
     pcl::PointXYZ most_desirable_foot_location_;
     // Interpreted as (x(t), y(t), z(t))^T = ([0], [1], [2])^T * t  + ([3], [4],
