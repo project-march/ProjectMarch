@@ -13,9 +13,9 @@ using namespace std::filesystem;
 
 std::string TOPIC_TEST_CLOUDS = "/test_clouds";
 std::string CAMERA_FRAME_ID = "camera_front_depth_optical_frame";
-std::string POINTCLOUD_EXTENSION = ".ply"
+std::string POINTCLOUD_EXTENSION = ".ply";
 
-    RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle * n)
+RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle * n)
     : n_(n)
 {
     if (ros::console::set_logger_level(
@@ -55,7 +55,7 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
 {
     selected_mode = (SelectedMode)req.selected_mode;
     pointcloud_file_name = req.pointcloud_file_name;
-    updatePublishLoop(march_shared_msgs::PublishTestDataset::Response & res);
+    updatePublishLoop(res);
     return true;
 }
 
@@ -97,7 +97,7 @@ std::string RealsenseTestPublisher::getFileNamesString()
     return file_names_string;
 }
 
-void RealsenseTestPublisher::startPublishingPointclouds();
+void RealsenseTestPublisher::startPublishingPointclouds()
 {
     pointcloud_file_name = file_names[0];
     pointcloud_to_publish = boost::make_shared<PointCloud>();
@@ -105,7 +105,7 @@ void RealsenseTestPublisher::startPublishingPointclouds();
             data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
 }
 
-void RealsenseTestPublisher::publishNextPointcloud();
+void RealsenseTestPublisher::publishNextPointcloud()
 {
     // If already publishing, find the next pointcloud and publish that
     // Otherwise, start publishing
@@ -113,13 +113,13 @@ void RealsenseTestPublisher::publishNextPointcloud();
         std::vector<std::string>::iterator filename_iterator
                 = std::find(file_names.begin(), file_names.end(), pointcloud_file_name);
         // Set the current pointcloud file name to the next name in the list
-        pointcloud_file_name = *std::next(filename_iterator)
+        pointcloud_file_name = *std::next(filename_iterator);
 
         pointcloud_to_publish = boost::make_shared<PointCloud>();
         pcl::io::loadPLYFile<pcl::PointXYZ>(
                 data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
     } else {
-        startPublishingPointClouds();
+        startPublishingPointclouds();
     }
 }
 
