@@ -15,7 +15,7 @@ std::string TOPIC_TEST_CLOUDS = "/test_clouds";
 std::string CAMERA_FRAME_ID = "camera_front_depth_optical_frame";
 std::string POINTCLOUD_EXTENSION = ".ply";
 
-RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle * n)
+RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     : n_(n)
 {
     if (ros::console::set_logger_level(
@@ -54,7 +54,10 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
     march_shared_msgs::PublishTestDataset::Response& res)
 {
     selected_mode = (SelectedMode)req.selected_mode;
-    pointcloud_file_name = req.pointcloud_file_name;
+    // Only update the pointcloud file name from the service if it is relevant
+    if (selected_mode == SelectedMode::custom) {
+        pointcloud_file_name = req.pointcloud_file_name;
+    }
     updatePublishLoop(res);
     return true;
 }
@@ -102,7 +105,7 @@ void RealsenseTestPublisher::startPublishingPointclouds()
     pointcloud_file_name = file_names[0];
     pointcloud_to_publish = boost::make_shared<PointCloud>();
     pcl::io::loadPLYFile<pcl::PointXYZ>(
-            data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
+        data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
 }
 
 void RealsenseTestPublisher::publishNextPointcloud()
@@ -110,14 +113,24 @@ void RealsenseTestPublisher::publishNextPointcloud()
     // If already publishing, find the next pointcloud and publish that
     // Otherwise, start publishing
     if (should_publish) {
-        std::vector<std::string>::iterator filename_iterator
-                = std::find(file_names.begin(), file_names.end(), pointcloud_file_name);
-        // Set the current pointcloud file name to the next name in the list
-        pointcloud_file_name = *std::next(filename_iterator);
+        // find the current pointcloud filename
+        std::vector<std::string>::iterator filename_iterator = std::find(
+            file_names.begin(), file_names.end(), pointcloud_file_name);
+        // Set the current pointcloud file name to the next name in the list, if
+        // the old name is the last in the list, set the new name to the first
+        // in the list
+        if (filename_iterator == file_names.end()) {
+            ROS_WARN_STREAM("The pointcloud file name could not be found in "
+                            "the file name vector.");
+        } else if (filename_iterator == file_names.end() - 1) {
+            pointcloud_file_name = file_names[0];
+        } else {
+            pointcloud_file_name = *(filename_iterator + 1);
+        }
 
         pointcloud_to_publish = boost::make_shared<PointCloud>();
         pcl::io::loadPLYFile<pcl::PointXYZ>(
-                data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
+            data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
     } else {
         startPublishingPointclouds();
     }
