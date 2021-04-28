@@ -40,8 +40,8 @@ private:
     // Publishes the pointcloud with the requested file name
     bool publishCustomPointcloud(std::string pointcloud_file_name);
 
-    // Stops publishing pointclouds
-    void stopPublishingPointClouds();
+    // Publishes all pointcloud for some amount of time in series
+    void publishSlideShow()
 
     // Publish the right pointcloud based on the latest service call
     void updatePublishLoop(

@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-float PUBLISH_RATE = 1.0 / 10.0; // images per second
+float PUBLISH_RATE = 1.0 / 10.0; // seconds per frame
 
 int main(int argc, char** argv)
 {

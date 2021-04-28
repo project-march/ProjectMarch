@@ -14,6 +14,7 @@ using namespace std::filesystem;
 std::string TOPIC_TEST_CLOUDS = "/test_clouds";
 std::string CAMERA_FRAME_ID = "camera_front_depth_optical_frame";
 std::string POINTCLOUD_EXTENSION = ".ply";
+float SLIDESHOW_SPEED = 5.0; // seconds per point cloud
 
 RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
     : n_(n)
@@ -136,6 +137,13 @@ void RealsenseTestPublisher::publishNextPointcloud()
     }
 }
 
+void RealsenseTestPublisher::publishSlideShow()
+{
+    ros::Timer timer_publish_pointcloud
+            = n.createTimer(ros::Duration(SLIDESHOW_SPEED),
+                            RealsenseTestPublisher::publishNextPointcloud);
+}
+
 void RealsenseTestPublisher::updatePublishLoop(
     march_shared_msgs::PublishTestDataset::Response& res)
 {
@@ -165,7 +173,7 @@ void RealsenseTestPublisher::updatePublishLoop(
             }
             case SelectedMode::slide_show: {
                 ROS_DEBUG_STREAM("Publish a slide show of pointclouds");
-                //            publishSlideShow();
+                publishSlideShow();
                 should_publish = true;
             }
             case SelectedMode::end: {
