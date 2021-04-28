@@ -10,7 +10,7 @@
 
 class Mtw : public XsCallback {
 public:
-    Mtw(XsDevice* device, size_t max_buffer_size = 100);
+    explicit Mtw(XsDevice* device, size_t max_buffer_size = 100);
 
     /**
      * Returns whether any new packets are available.
@@ -39,8 +39,8 @@ protected:
      * Callback when new packets are available. This runs in a seperate
      * thread and only stores the packets in the buffer.
      */
-    virtual void onLiveDataAvailable(
-        XsDevice* device, const XsDataPacket* packet);
+    void onLiveDataAvailable(
+        XsDevice* device, const XsDataPacket* packet) override final;
 
 private:
     /**

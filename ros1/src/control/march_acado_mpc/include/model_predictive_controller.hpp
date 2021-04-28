@@ -10,21 +10,21 @@ using namespace std;
 class ModelPredictiveController {
 
 public:
-    ModelPredictiveController(std::vector<float> W);
+    explicit ModelPredictiveController(std::vector<float> W);
 
     // Public variables
     vector<double> x0 { 0, 0 }; // Current state
-    double u; // Calculated control input
+    double u {}; // Calculated control input
     std::string joint_name;
-    double cost; // Objective value
+    double cost {}; // Objective value
 
     // Timing variables
-    acado_timer t;
-    double t_preparation, t_feedback;
+    acado_timer t {};
+    double t_preparation {}, t_feedback {};
 
     // status variables
-    int preparationStepStatus;
-    int feedbackStepStatus;
+    int preparationStepStatus {};
+    int feedbackStepStatus {};
 
     /**
      * \brief Initialise the model predictive controller

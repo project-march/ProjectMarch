@@ -12,30 +12,46 @@ LowVoltage::LowVoltage(PdoSlaveInterface& pdo,
 {
 }
 
-float LowVoltage::getNetCurrent(int netNumber)
+bool LowVoltage::isValidLowVoltageNetNumber(uint8_t netNumber)
 {
+    return netNumber >= MIN_NET_NUMBER && netNumber <= MAX_NET_NUMBER;
+}
+
+void LowVoltage::throwInvalidNetArgument(
+    uint8_t netNumber, const char* caller_name)
+{
+    ROS_FATAL_THROTTLE(2,
+        "Can't execute call at %s for net %d because there are only %d low "
+        "voltage nets.",
+        caller_name, netNumber, MAX_NET_NUMBER);
+
+    throw std::invalid_argument("Low voltage net number should be between "
+        + std::to_string(MIN_NET_NUMBER) + " and "
+        + std::to_string(MAX_NET_NUMBER) + ".");
+}
+float LowVoltage::getNetCurrent(uint8_t netNumber)
+{
+    if (not isValidLowVoltageNetNumber(netNumber)) {
+        throwInvalidNetArgument(netNumber);
+    }
     bit32 current = this->pdo_.read32(
         this->netMonitoringOffsets.getLowVoltageNetCurrent(netNumber));
     return current.f;
 }
 
-bool LowVoltage::getNetOperational(int netNumber)
+bool LowVoltage::getNetOperational(uint8_t netNumber)
 {
-    if (netNumber < 1 || netNumber > 2) {
-        ROS_ERROR_THROTTLE(2,
-            "Can't get operational state from low voltage net %d, there are "
-            "only 2 low voltage nets",
-            netNumber);
-        throw std::invalid_argument("Only low voltage net 1 and 2 exist");
+    if (not isValidLowVoltageNetNumber(netNumber)) {
+        throwInvalidNetArgument(netNumber);
     }
     bit8 operational
         = this->pdo_.read8(this->netMonitoringOffsets.getLowVoltageState());
     // The last bit of the 8 bits represents net 1
     // The second to last bit of the 8 bits represents net 2
-    return ((operational.ui >> (netNumber - 1)) & 1);
+    return ((uint8_t)(operational.ui >> (netNumber - 1U)) & 1U);
 }
 
-void LowVoltage::setNetOnOff(bool /* on */, int /* netNumber */)
+void LowVoltage::setNetOnOff(bool /* on */, uint8_t /* netNumber */)
 {
     ROS_ERROR_THROTTLE(2, "Can't control low voltage nets from master");
 }

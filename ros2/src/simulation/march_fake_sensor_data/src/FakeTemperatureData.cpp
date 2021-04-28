@@ -40,8 +40,8 @@ const std::string LOGGER_NAME { /*__s=*/"fake_temperature" };
  * previous temperature values weigh the most in the calculation of new
  * temperatures.
  */
-FakeTemperatureDataNode::FakeTemperatureDataNode(const std::string& node_name,
-    const std::vector<float>&& autoregression_weights)
+FakeTemperatureDataNode::FakeTemperatureDataNode(
+    const std::string& node_name, std::vector<float>&& autoregression_weights)
     : Node(node_name,
         rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(
             /*automatically_declare_parameters_from_overrides=*/true))

@@ -22,7 +22,10 @@ public:
     };
 
     AllowedRobot() = default;
-    explicit AllowedRobot(const std::string& robot_name)
+    // We want non-explicit conversions in this case
+    // to increase usability.
+    // NOLINTNEXTLINE(hicpp-explicit-conversions)
+    AllowedRobot(const std::string& robot_name)
     {
         if (robot_name == "march6") {
             this->value = march6;
@@ -78,6 +81,9 @@ public:
         return base_path.append(/*__s=*/"/robots/test_joint_rotational.yaml");
     }
 
+    // We want non-explicit conversions in this case
+    // to increase usability.
+    // NOLINTNEXTLINE(hicpp-explicit-conversions)
     constexpr AllowedRobot(Value allowed_robot)
         : value(allowed_robot)
     {
