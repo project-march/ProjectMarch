@@ -85,6 +85,12 @@ noetic:build:
   script:
     - cd ros1/
     - source /opt/ros/noetic/local_setup.bash && colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
+  only:
+    refs:
+      - branches
+      - merge_requests
+    changes:
+      - "ros1/**"
 
 foxy:build:
   stage: Build code
@@ -96,6 +102,12 @@ foxy:build:
   script:
     - cd ros2/
     - source /opt/ros/foxy/local_setup.bash && colcon build --cmake-args "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" --event-handlers console_direct+
+  only:
+    refs:
+      - branches
+      - merge_requests
+    changes:
+      - "ros2/**"
 
 noetic:test:
   stage: Test code
@@ -106,6 +118,12 @@ noetic:test:
     - cd ros1/
     - source /opt/ros/noetic/local_setup.bash && source install/local_setup.bash && colcon test --event-handlers console_direct+
     - colcon test-result --verbose
+  only:
+    refs:
+      - branches
+      - merge_requests
+    changes:
+      - "ros1/**"
 
 foxy:test:
   stage: Test code
@@ -116,6 +134,12 @@ foxy:test:
     - cd ros2/
     - source /opt/ros/foxy/local_setup.bash && source install/local_setup.bash && colcon test --event-handlers console_direct+
     - colcon test-result --verbose
+  only:
+    refs:
+      - branches
+      - merge_requests
+    changes:
+      - "ros2/**"
 
 noetic:clang_tidy:
   stage: Static analysis on code
