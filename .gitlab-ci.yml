@@ -16,7 +16,7 @@ stages:
 # GitLab defines different job types, depending on how the job is scheduled.
 # Right now, we use two types: 1) branches and 2) merge_requests.
 #
-# 1) Brancheshttps://clang.llvm.org/extra/clang-tidy/
+# 1) Branches
 # Pipelines labeled "branches" are executed on the latest commit of a branch. All
 # jobs that are scheduled conditionally based on the file changes in the
 # latest commit (the "changes" keyword,
