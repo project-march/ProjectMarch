@@ -1,5 +1,5 @@
 pdb:
-  ifName: enp2s0
+  if_name: enp2s0
   ecatCycleTime: 4
   powerDistributionBoard:
     slaveIndex: 1

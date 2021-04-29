@@ -76,7 +76,15 @@ std::unique_ptr<march::MarchRobot> HardwareBuilder::createMarchRobot()
 
     // Remove top level robot name key
     YAML::Node config = this->robot_config_[robot_name];
-    const auto if_name = config["ifName"].as<std::string>();
+
+    // Read if name from parameter server or from yaml config if it is an empty
+    // string
+    std::string if_name;
+    ros::param::get("if_name", if_name);
+    if (if_name == "") {
+        if_name = config["if_name"].as<std::string>();
+    }
+
     const auto cycle_time = config["ecatCycleTime"].as<int>();
     const auto slave_timeout = config["ecatSlaveTimeout"].as<int>();
 

@@ -15,9 +15,9 @@
 
 namespace march {
 EthercatMaster::EthercatMaster(
-    std::string ifname, int max_slave_index, int cycle_time, int slave_timeout)
+    std::string if_name, int max_slave_index, int cycle_time, int slave_timeout)
     : is_operational_(/*__i=*/false)
-    , ifname_(std::move(ifname))
+    , if_name_(std::move(if_name))
     , max_slave_index_(max_slave_index)
     , cycle_time_ms_(cycle_time)
     , slave_watchdog_timeout_(slave_timeout)
@@ -63,11 +63,11 @@ bool EthercatMaster::start(std::vector<Joint>& joints)
 void EthercatMaster::ethercatMasterInitiation()
 {
     ROS_INFO("Trying to start EtherCAT");
-    if (!ec_init(this->ifname_.c_str())) {
+    if (!ec_init(this->if_name_.c_str())) {
         throw error::HardwareException(error::ErrorType::NO_SOCKET_CONNECTION,
-            "No socket connection on %s", this->ifname_.c_str());
+            "No socket connection on %s", this->if_name_.c_str());
     }
-    ROS_INFO("ec_init on %s succeeded", this->ifname_.c_str());
+    ROS_INFO("ec_init on %s succeeded", this->if_name_.c_str());
 
     const int slave_count = ec_config_init(FALSE);
     if (slave_count < this->max_slave_index_) {

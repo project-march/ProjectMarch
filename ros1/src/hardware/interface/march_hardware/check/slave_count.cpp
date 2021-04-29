@@ -24,22 +24,22 @@ int main(int argc, char** argv)
     const std::string param = "/march/check/slave_count";
 
     ROS_INFO("Trying to start EtherCAT");
-    std::string ifname = "enp2s0";
+    std::string if_name = "enp2s0";
 
-    // Initialise SOEM, bind socket to ifname
-    if (!ec_init(&ifname[0])) {
+    // Initialise SOEM, bind socket to if_name
+    if (!ec_init(&if_name[0])) {
         ROS_FATAL("No socket connection on %s. Confirm that you have selected "
-                  "the right ifname",
-            ifname.c_str());
+                  "the right if_name",
+            if_name.c_str());
         nh.setParam(param, /*i=*/0);
         return 1;
     }
-    ROS_INFO("ec_init on %s succeeded", ifname.c_str());
+    ROS_INFO("ec_init on %s succeeded", if_name.c_str());
 
     // Find and auto-config slaves
     if (ec_config_init(FALSE) <= 0) {
         ROS_FATAL("No slaves found, shutting down. Confirm that you have "
-                  "selected the right ifname.");
+                  "selected the right if_name.");
         ROS_FATAL("Check that the first slave is connected properly");
         nh.setParam(param, /*i=*/0);
         return 1;
