@@ -1,7 +1,7 @@
 #include <filesystem>
 #include <iostream>
 #include <march_shared_msgs/PublishTestDataset.h>
-#include <march_shared_msgs/GetGaitParameters.srv>
+#include <march_shared_msgs/GetGaitParameters.h>
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
@@ -50,7 +50,7 @@ RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
         = n_->advertise<PointCloud>(TOPIC_TEST_CLOUDS, /*queue_size=*/1);
 
     process_pointcloud_publisher
-        = n_->advertise<march_shared_msgs::GetGaitParameters>(PROCESS_POINTCLOUD_TOPIC, 1);
+        = n_->advertise<march_shared_msgs::GetGaitParameters>(PROCESS_POINTCLOUD_TOPIC, /*queue_size=*/1);
 
     should_publish = false;
 }
@@ -225,9 +225,10 @@ void RealsenseTestPublisher::mirrorZCoordinate()
 }
 
 // Calls on the realsense reader to process a pointcloud from the test topic
-void makeProcessPointcloudCall() {
+void RealsenseTestPublisher::makeProcessPointcloudCall() {
     march_shared_msgs::GetGaitParameters service;
-    service.selected_gait = 0;
-    service.frame_id_to_transform_to = "foot_left";
+    service.request.selected_gait = 0;
+    service.request.frame_id_to_transform_to = "foot_left";
+    service.request.camera_to_use = 2;
     process_pointcloud_publisher.publish(service);
 }

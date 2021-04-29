@@ -55,10 +55,13 @@ private:
     // Calls on the realsense reader to process a pointcloud from the test topic
     void makeProcessPointcloudCall();
 
+    // Sets the right cloud as the pointcloud to publish based on the file name
+    void loadPointcloudToFromFilename();
+
     ros::NodeHandle* n_;
     ros::ServiceServer publish_test_cloud_service;
     ros::Publisher test_cloud_publisher;
-    rps::Publisher process_pointcloud_publisher;
+    ros::Publisher process_pointcloud_publisher;
 
     std::vector<std::string> file_names;
     path data_path;

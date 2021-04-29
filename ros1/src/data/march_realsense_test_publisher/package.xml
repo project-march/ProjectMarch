@@ -20,6 +20,5 @@
   <exec_depend>pcl_ros</exec_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>march_shared_msgs</exec_depend>
-  <depend>imu_filter_madgwick</depend>
 
 </package>
