@@ -1,6 +1,10 @@
 variables:
+  # Define how submodules are handled. See https://docs.gitlab.com/ee/ci/runners/README.html#git-submodule-strategy
   GIT_SUBMODULE_STRATEGY: recursive
 
+# The different stages of the pipeline. They will occur in this order.
+# See https://docs.gitlab.com/ee/ci/yaml/README.html#stages for more explaination
+# on how this should be interpreted.
 stages:
   - Tag container
   - Build container
@@ -9,7 +13,40 @@ stages:
   - Test code
   - Static analysis on code
 
-image: registry.gitlab.com/project-march/march:$CI_COMMIT_BRANCH
+# These following jobs are so called "hidden jobs" (https://docs.gitlab.com/ee/ci/yaml/README.html#hide-jobs). 
+# These jobs are not actually used here, but used in other jobs with the help of
+# the "extends" keyword (sort of like #include or import, see https://docs.gitlab.com/ee/ci/yaml/README.html#extends)
+# They are used to extract statements that are included in almost every job, to
+# prevent duplication.
+
+# GitLab defines different job types, depending on how the job is scheduled.
+# Right now, we use two types: 1) branches and 2) merge_requests.
+# An overview can be found on https://docs.gitlab.com/ee/ci/yaml/README.html#onlyexcept-basic
+# This job defines the branches in which to run a "branch" pipeline.
+.branches_to_run_pipeline_on:
+  only:
+    refs:
+      - branches
+  except:
+    refs:
+      # Regular expression that matches branches that start with some digits, followed by a '-'
+      # i.e. all branches that are created from an issue. 
+      - /^[\d]+-.*$/
+
+.merge_request_ref:
+  only:
+    refs:
+      - merge_requests
+
+.branches:
+    image: registry.gitlab.com/project-march/march:$CI_COMMIT_BRANCH
+    extends:
+      - .branches_to_run_pipeline_on
+
+.merge_requests:
+    image: registry.gitlab.com/project-march/march:$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
+    extends:
+      - .merge_request_ref
 
 # Allow each branch to run their own container. This allows a branch to add
 # dependencies to their package.xml and use them as expected. This process works as
@@ -23,10 +60,6 @@ image: registry.gitlab.com/project-march/march:$CI_COMMIT_BRANCH
   image: quay.io/podman/stable
   variables:
     GIT_CHECKOUT: "true"
-  only:
-    refs:
-      - branches
-      - merge_requests
   before_script:
     - podman login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
@@ -37,16 +70,14 @@ container:tag:
     BRANCH_NAME: $CI_COMMIT_BRANCH
   extends:
     - .container:tag-base
-    - .branch-base
+    - .branches_to_run_pipeline_on
 
 container:tag for MRs:
   variables:
     BRANCH_NAME: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-  only:
-    refs:
-      - merge_requests
   extends:
     - .container:tag-base
+    - .merge_request_ref
 
 container:build:
   stage: Build container
@@ -64,19 +95,6 @@ container:build:
     - if: '$CI_COMMIT_BRANCH'
       changes:
         - Dockerfile
-
-.branch-base:
-  only:
-    refs:
-      - branches
-
-# Use this as a "base" for all jobs. Merge requests require a different variable
-# for the Docker image tag.
-.merge_request-base:
-  image: registry.gitlab.com/project-march/march:$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME
-  only:
-    refs:
-      - merge_requests
 
 # Runs a linter on the code to see if the code style is consistent and to avoid common
 # mistakes
@@ -96,12 +114,12 @@ container:build:
 flake8:
   extends:
     - .flake8-base
-    - .branch-base
+    - .branches
 
 flake8 for MRs:
   extends:
     - .flake8-base
-    - .merge_request-base
+    - .merge_requests
 
 .clang_format-base:
   stage: Lint code
@@ -115,12 +133,12 @@ flake8 for MRs:
 clang_format:
   extends:
     - .clang_format-base
-    - .branch-base
+    - .branches
 
 clang_format for MRs:
   extends:
     - .clang_format-base
-    - .merge_request-base
+    - .merge_requests
 
 .noetic:build-base:
   stage: Build code
@@ -140,12 +158,12 @@ clang_format for MRs:
 noetic:build:
   extends:
     - .noetic:build-base
-    - .branch-base
+    - .branches
 
 noetic:build for MRs:
   extends:
     - .noetic:build-base
-    - .merge_request-base
+    - .merge_requests
 
 .foxy:build-base:
   stage: Build code
@@ -165,12 +183,12 @@ noetic:build for MRs:
 foxy:build:
   extends:
     - .foxy:build-base
-    - .branch-base
+    - .branches
 
 foxy:build for MRs:
   extends:
     - .foxy:build-base
-    - .merge_request-base
+    - .merge_requests
 
 .noetic:test-base:
   stage: Test code
@@ -188,14 +206,14 @@ foxy:build for MRs:
 noetic:test:
   extends:
     - .noetic:test-base
-    - .branch-base
+    - .branches
 
 noetic:test for MRs:
   dependencies: ["noetic:build for MRs"]
   needs: ["noetic:build for MRs"]
   extends:
     - .noetic:test-base
-    - .merge_request-base
+    - .merge_requests
 
 .foxy:test-base:
   stage: Test code
@@ -213,14 +231,14 @@ noetic:test for MRs:
 foxy:test:
   extends:
     - .foxy:test-base
-    - .branch-base
+    - .branches
 
 foxy:test for MRs:
   dependencies: ["foxy:build for MRs"]
   needs: ["foxy:build for MRs"]
   extends:
     - .foxy:test-base
-    - .merge_request-base
+    - .merge_requests
 
 .noetic:clang_tidy-base:
   stage: Static analysis on code
@@ -239,14 +257,14 @@ foxy:test for MRs:
 noetic:clang_tidy:
   extends:
     - .noetic:clang_tidy-base
-    - .branch-base
+    - .branches
 
 noetic:clang_tidy for MRs:
   dependencies: ["noetic:build for MRs"]
   needs: ["noetic:build for MRs"]
   extends:
     - .noetic:clang_tidy-base
-    - .merge_request-base
+    - .merge_requests
 
 .foxy:clang_tidy-base:
   stage: Static analysis on code
@@ -265,11 +283,11 @@ noetic:clang_tidy for MRs:
 foxy:clang_tidy:
   extends:
     - .foxy:clang_tidy-base
-    - .branch-base
+    - .branches
 
 foxy:clang_tidy for MRs:
   dependencies: ["foxy:build for MRs"]
   needs: ["foxy:build for MRs"]
   extends:
     - .foxy:clang_tidy-base
-    - .merge_request-base
+    - .merge_requests
