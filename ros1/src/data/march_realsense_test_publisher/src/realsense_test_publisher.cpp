@@ -62,6 +62,18 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
     return true;
 }
 
+void RealsenseTestPublisher::loadPointcloudToPublishFromFilename()
+{
+    mirrorZCoordinate();
+    pointcloud_to_publish = boost::make_shared<PointCloud>();
+    if (pcl::io::loadPLYFile<pcl::PointXYZ>(
+            data_path.string() + pointcloud_file_name, *pointcloud_to_publish) == -1) {
+        ROS_WARN_STREAM("Couldn't find file from path " << data_path.string() + pointcloud_file_name);
+    } else {
+        ROS_DEBUG_STREAM("File loaded.");
+    }
+}
+
 bool RealsenseTestPublisher::publishCustomPointcloud(
     std::string pointcloud_file_name)
 {
@@ -74,9 +86,7 @@ bool RealsenseTestPublisher::publishCustomPointcloud(
         return false;
     }
 
-    pointcloud_to_publish = boost::make_shared<PointCloud>();
-    pcl::io::loadPLYFile<pcl::PointXYZ>(
-        data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
+    loadPointcloudToPublishFromFilename();
     return true;
 }
 
@@ -91,9 +101,11 @@ void RealsenseTestPublisher::publishTestCloud(
     }
 }
 
+// Creates a string of all the valid file names separated by an end line
 std::string RealsenseTestPublisher::getFileNamesString()
 {
-    std::string file_names_string;
+    // Start with an end line for ease of printing
+    std::string file_names_string = "\n";
     for (std::string name : file_names) {
         file_names_string += name + "\n";
     }
@@ -103,9 +115,7 @@ std::string RealsenseTestPublisher::getFileNamesString()
 void RealsenseTestPublisher::startPublishingPointclouds()
 {
     pointcloud_file_name = file_names[0];
-    pointcloud_to_publish = boost::make_shared<PointCloud>();
-    pcl::io::loadPLYFile<pcl::PointXYZ>(
-        data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
+    loadPointcloudToPublishFromFilename();
 }
 
 void RealsenseTestPublisher::publishNextPointcloud()
@@ -121,18 +131,14 @@ void RealsenseTestPublisher::publishNextPointcloud()
         // the old name is the last in the list, set the new name to the first
         // in the list
         if (filename_iterator == file_names.end()) {
-            ROS_WARN_STREAM("The pointcloud file name could not be found in "
-                            "the file name vector.");
+            ROS_WARN_STREAM("The old pointcloud file name could not be found in "
+                            "the file name vector. Unable to find next pointcloud.");
         } else if (filename_iterator == file_names.end() - 1) {
             pointcloud_file_name = file_names[0];
         } else {
             pointcloud_file_name = *(filename_iterator + 1);
         }
-
-        pointcloud_to_publish = boost::make_shared<PointCloud>();
-        pcl::io::loadPLYFile<pcl::PointXYZ>(
-            data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
-        mirrorXCoordinate(pointcloud_to_publish);
+        loadPointcloudToPublishFromFilename();
     } else {
         startPublishingPointclouds();
     }
@@ -161,7 +167,7 @@ void RealsenseTestPublisher::updatePublishLoop(
             }
             case SelectedMode::custom: {
                 ROS_DEBUG_STREAM("Publish a custom pointcloud");
-                success = publishCustomPointcloud(pointcloud_file_name);
+                success &= publishCustomPointcloud(pointcloud_file_name);
                 should_publish = success;
                 break;
             }
@@ -174,10 +180,6 @@ void RealsenseTestPublisher::updatePublishLoop(
                 ROS_DEBUG_STREAM("Invalid mode selected");
             }
         }
-        if (success && selected_mode != SelectedMode::end) {
-            ROS_DEBUG_STREAM("Now publishing a pointcloud with name "
-                << pointcloud_file_name);
-        }
         res.success = success;
     } else {
         ROS_ERROR_STREAM(
@@ -186,9 +188,10 @@ void RealsenseTestPublisher::updatePublishLoop(
     }
 }
 
-void RealsenseTestPublisher::mirrorXCoordinate(PointCloud::Ptr pointcloud)
+void RealsenseTestPublisher::mirrorZCoordinate()
 {
-    for (pcl::PointXYZ point : *pointcloud) {
-        point.z = -point.z;
+    for (size_t i = 0; i < pointcloud_to_publish->size(); ++i) {
+        float z_value = pointcloud_to_publish->points[i].z;
+        pointcloud_to_publish->points[i].z = -z_value;
     }
 }
