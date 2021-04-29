@@ -14,34 +14,34 @@
 
 namespace march {
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
-    ::std::string ifName, int ecatCycleTime, int ecatSlaveTimeout)
+    ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout)
     : jointList(std::move(jointList))
     , urdf_(std::move(urdf))
     , ethercatMaster(
-          ifName, this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout)
+          if_name, this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout)
     , pdb_(nullptr)
 {
 }
 
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
     std::unique_ptr<PowerDistributionBoard> powerDistributionBoard,
-    ::std::string ifName, int ecatCycleTime, int ecatSlaveTimeout)
+    ::std::string if_name, int ecatCycleTime, int ecatSlaveTimeout)
     : jointList(std::move(jointList))
     , urdf_(std::move(urdf))
     , ethercatMaster(
-          ifName, this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout)
+          if_name, this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout)
     , pdb_(std::move(powerDistributionBoard))
 {
 }
 
 MarchRobot::MarchRobot(::std::vector<Joint> jointList, urdf::Model urdf,
     std::unique_ptr<PowerDistributionBoard> powerDistributionBoard,
-    std::vector<PressureSole> pressureSoles, ::std::string ifName,
+    std::vector<PressureSole> pressureSoles, ::std::string if_name,
     int ecatCycleTime, int ecatSlaveTimeout)
     : jointList(std::move(jointList))
     , urdf_(std::move(urdf))
     , ethercatMaster(
-          ifName, this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout)
+          if_name, this->getMaxSlaveIndex(), ecatCycleTime, ecatSlaveTimeout)
     , pdb_(std::move(powerDistributionBoard))
     , pressureSoles(std::move(pressureSoles))
 {
