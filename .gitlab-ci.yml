@@ -90,6 +90,15 @@ stages:
     - podman login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - if ! podman manifest inspect $CI_REGISTRY_IMAGE:$BRANCH_NAME; then podman pull $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH && podman tag $CI_REGISTRY_IMAGE:$CI_DEFAULT_BRANCH $CI_REGISTRY_IMAGE:$BRANCH_NAME && podman push $CI_REGISTRY_IMAGE:$BRANCH_NAME; fi;
+  only:
+    # Only trigger this stage when one of the following files have been changed.
+    # These files are in the "only:changed" option in other jobs, which means that
+    # this container:tag job only runs iff another job runs.
+    changes:
+      - "ros{1,2}/**/*"
+      - "Dockerfile"
+      - ".pyproject.toml"
+      - ".clang-tidy"
 
 # If the pipeline is for branches defined in `.branches_to_run_pipeline_on`,
 # then use $CI_COMMIT_BRANCH as the $BRANCH_NAME in the "tag" job.
