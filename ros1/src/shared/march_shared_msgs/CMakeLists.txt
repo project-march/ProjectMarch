@@ -28,24 +28,18 @@ add_message_files(
     PressureSole.msg
     PressureSoleData.msg
     PressureSolesData.msg
-    MpcArray.msg
-    MpcStateVectors.msg
-    MpcTuning.msg
-    MpcDiagnostics.msg
-    MpcJoint.msg
-    MpcMsg.msg
 )
-#add_message_files(
-#    DIRECTORY
-#   msg/mpc_msgs
-#   FILES
-#   MpcArray.msg
-#  MpcStateVectors.msg
-#   MpcTuning.msg
-#   MpcDiagnostics.msg
-#   MpcJoint.msg
-#   MpcMsg.msg
-#)
+add_message_files(
+   DIRECTORY
+   msg/mpc_msgs
+   FILES
+   MpcArray.msg
+   MpcStateVectors.msg
+   MpcTuning.msg
+   MpcDiagnostics.msg
+   MpcJoint.msg
+   MpcMsg.msg
+)
 
 add_service_files(
     FILES
