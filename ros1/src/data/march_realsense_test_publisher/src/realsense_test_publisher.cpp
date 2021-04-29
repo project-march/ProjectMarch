@@ -12,7 +12,8 @@
 using namespace std::filesystem;
 
 std::string TOPIC_TEST_CLOUDS = "/test_clouds";
-std::string CAMERA_FRAME_ID = "camera_front_depth_optical_frame";
+std::string CAMERA_FRAME_ID_FRONT = "camera_front_depth_optical_frame";
+std::string CAMERA_FRAME_ID_BACK = "camera_back_depth_optimal_frame";
 std::string POINTCLOUD_EXTENSION = ".ply";
 
 RealsenseTestPublisher::RealsenseTestPublisher(ros::NodeHandle* n)
@@ -55,6 +56,7 @@ bool RealsenseTestPublisher::publishTestDatasetCallback(
     march_shared_msgs::PublishTestDataset::Response& res)
 {
     selected_mode = (SelectedMode)req.selected_mode;
+    use_front_camera = req.use_front_camera;
     // Only update the pointcloud file name from the service if it is relevant
     if (selected_mode == SelectedMode::custom) {
         pointcloud_file_name = req.pointcloud_file_name;
@@ -187,8 +189,12 @@ void RealsenseTestPublisher::updatePublishLoop(
                 break;
             }
             default: {
-                ROS_DEBUG_STREAM("Invalid mode selected");
+                ROS_WARN_STREAM("Invalid mode selected");
+                return;
             }
+        }
+        if (selected_mode != SelectedMode::end) {
+            makeProcessPointcloudCall();
         }
         res.success = success;
     } else {
@@ -207,4 +213,9 @@ void RealsenseTestPublisher::mirrorZCoordinate()
         float z_value = pointcloud_to_publish->points[i].z;
         pointcloud_to_publish->points[i].z = -z_value;
     }
+}
+
+// Calls on the realsense reader to process a pointcloud from the test topic
+void makeProcessPointcloudCall() {
+
 }

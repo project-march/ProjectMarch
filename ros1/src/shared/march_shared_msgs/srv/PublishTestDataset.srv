@@ -8,5 +8,8 @@ uint8 selected_mode
 
 # A string specifying the name of the pointcloud when CUSTUM is the selected mode.
 string pointcloud_file_name
+
+# A bool indicating whether the imagine originated from the front or back camera
+bool use_front_camera
 ---
 bool success

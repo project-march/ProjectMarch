@@ -52,6 +52,9 @@ private:
     // viewer and the .ply files
     void mirrorZCoordinate();
 
+    // Calls on the realsense reader to process a pointcloud from the test topic
+    void makeProcessPointcloudCall();
+
     ros::NodeHandle* n_;
     ros::ServiceServer publish_test_cloud_service;
     ros::Publisher test_cloud_publisher;
