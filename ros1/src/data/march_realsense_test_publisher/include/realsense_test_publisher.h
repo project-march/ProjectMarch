@@ -44,6 +44,9 @@ private:
     void updatePublishLoop(
         march_shared_msgs::PublishTestDataset::Response& res);
 
+    // flips in x coordinate, likely temporary!!
+    void mirrorXCoordinate(PointCloud::Ptr pointcloud);
+
     ros::NodeHandle* n_;
     ros::ServiceServer publish_test_cloud_service;
     ros::Publisher test_cloud_publisher;

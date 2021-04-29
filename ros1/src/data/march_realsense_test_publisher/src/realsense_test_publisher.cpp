@@ -132,7 +132,7 @@ void RealsenseTestPublisher::publishNextPointcloud()
         pointcloud_to_publish = boost::make_shared<PointCloud>();
         pcl::io::loadPLYFile<pcl::PointXYZ>(
             data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
-        mirrorXCoordinate(pointcloud_to_pulish);
+        mirrorXCoordinate(pointcloud_to_publish);
     } else {
         startPublishingPointclouds();
     }
@@ -188,7 +188,7 @@ void RealsenseTestPublisher::updatePublishLoop(
 
 void RealsenseTestPublisher::mirrorXCoordinate(PointCloud::Ptr pointcloud)
 {
-    for (pointXYZ point : *pointcloud) {
+    for (pcl::PointXYZ point : *pointcloud) {
         point.x = -point.x;
     }
 }
