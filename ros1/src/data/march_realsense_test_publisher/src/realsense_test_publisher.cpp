@@ -132,6 +132,7 @@ void RealsenseTestPublisher::publishNextPointcloud()
         pointcloud_to_publish = boost::make_shared<PointCloud>();
         pcl::io::loadPLYFile<pcl::PointXYZ>(
             data_path.string() + pointcloud_file_name, *pointcloud_to_publish);
+        mirrorXCoordinate(pointcloud_to_pulish);
     } else {
         startPublishingPointclouds();
     }
@@ -182,5 +183,12 @@ void RealsenseTestPublisher::updatePublishLoop(
         ROS_ERROR_STREAM(
             "No .ply files can be found by the test publisher under path "
             << data_path << ". Unable to publish a test cloud.");
+    }
+}
+
+void RealsenseTestPublisher::mirrorXCoordinate(PointCloud::Ptr pointcloud)
+{
+    for (pointXYZ point : *pointcloud) {
+        point.x = -point.x;
     }
 }
